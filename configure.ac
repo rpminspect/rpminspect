@@ -1,9 +1,10 @@
 AC_PREREQ([2.69])
 AC_INIT([rpminspect], [1.0], [dcantrell@redhat.com])
 AM_INIT_AUTOMAKE([foreign])
-AC_USE_SYSTEM_EXTENSIONS
 AC_CONFIG_SRCDIR([src/rpminspect/rpminspect.c])
 AC_CONFIG_HEADERS([config.h])
+AC_USE_SYSTEM_EXTENSIONS
+
 LT_INIT
 AC_CONFIG_MACRO_DIRS([m4])
 
@@ -13,6 +14,13 @@ AC_PROG_CPP
 AC_PROG_MAKE_SET
 
 # Checks for libraries.
+PKG_CHECK_MODULES(JSON_C, [json-c])
+PKG_CHECK_MODULES(XMLRPC, [xmlrpc xmlrpc_util xmlrpc_client])
+PKG_CHECK_MODULES(LIBXML, [libxml-2.0])
+PKG_CHECK_MODULES(RPM, [rpm])
+PKG_CHECK_MODULES(LIBARCHIVE, [libarchive])
+PKG_CHECK_MODULES(LIBELF, [libelf])
+PKG_CHECK_MODULES(LIBKMOD, [libkmod])
 
 # Checks for header files.
 AC_CHECK_HEADERS([fcntl.h limits.h stddef.h stdint.h stdlib.h string.h sys/ioctl.h unistd.h])
@@ -32,6 +40,21 @@ AC_FUNC_MALLOC
 AC_FUNC_MMAP
 AC_FUNC_REALLOC
 AC_CHECK_FUNCS([getcwd memset mkdir munmap realpath regcomp rmdir strcasecmp strchr strdup strerror strstr])
+
+AC_SUBST([JSON_C_CFLAGS])
+AC_SUBST([JSON_C_LIBS])
+AC_SUBST([XMLRPC_CFLAGS])
+AC_SUBST([XMLRPC_LIBS])
+AC_SUBST([LIBXML_CFLAGS])
+AC_SUBST([LIBXML_LIBS])
+AC_SUBST([RPM_CFLAGS])
+AC_SUBST([RPM_LIBS])
+AC_SUBST([LIBARCHIVE_CFLAGS])
+AC_SUBST([LIBARCHIVE_LIBS])
+AC_SUBST([LIBELF_CFLAGS])
+AC_SUBST([LIBELF_LIBS])
+AC_SUBST([LIBKMOD_CFLAGS])
+AC_SUBST([LIBKMOD_LIBS])
 
 AC_CONFIG_FILES([Makefile
                  src/Makefile
