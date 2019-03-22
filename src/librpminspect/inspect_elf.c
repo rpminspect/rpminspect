@@ -16,6 +16,8 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+#include "config.h"
+
 #include <assert.h>
 #include <fcntl.h>
 #include <search.h>

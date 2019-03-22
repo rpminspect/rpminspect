@@ -16,6 +16,8 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+#include "config.h"
+
 #include <stdbool.h>
 #include <rpm/rpmlib.h>
 #include <rpm/rpmts.h>
