@@ -1,0 +1,71 @@
+==========
+rpminspect
+==========
+
+RPM build deviation analysis tools.  rpminspect inspections the output of an
+RPM build (e.g., the output of a Koji build) and looks at the contents of
+the build artifacts to report:
+
+    * Policy compliance
+    * Changes from a previous build to the current build
+    * General correctness and best practices
+
+rpminspect is the frontend tool and librpminspect provides the inspection
+engine and individual inspections.  The program is configured through the
+rpminspect.conf file and runtime data is provided by a vendor specific
+rpminspect-data package.  The rpminspect-data-generic package in this source
+tree provides a template for constructing the vendor specific data package.
+
+
+Intended Audience
+-----------------
+
+Developers, QE, release engineers, and system administrators who regularly
+build RPMs for use in some environment or product.
+
+From an individual user standpoint, rpminspect is intended to be a command
+line tool you can use as a linter of sorts.  rpminspect reports and that's
+it.  rpminspect can output information in JSON format which is intended to
+make it easier to integrate in to automated workflows or web frontends.
+
+
+Contributing
+------------
+
+Patches are welcome as are bug reports.  There's a lot to do in this
+project.  Some things to keep in mind:
+
+    * Please follow existing coding style in files you modify.  Things like
+      variable and function naming, spacing, and indentation.  I want to
+      avoid wildly varying code styles throughout the tree.
+
+    * New inspections in librpminspect need to be in the form of an
+      inspect_NAME.c file with a driver added to the main struct.  You may
+      add static and non-static support functions to your inspect_NAME.c file
+      and expose those as part of the librpminspect API.  If the function is
+      generic enough, feel free to start a new source file.
+
+    * Test cases or updates to existing test cases need to accompany patches
+      and new code submissions.
+
+    * Use the standard C library whenever possible.  Code using glib,
+      libbsd, or any other type of generic utility library is going to be
+      reviewed and likely rejected until it is modified to use the standard C
+      library.
+
+    * That said, inspections are expected to make use of available libraries
+      for performing their work.  When given the option between a library
+      and forking an execing a program, please use the library.  This is not
+      always possible, but in many cases it is.
+
+    * See the TODO file for a current list of things that need work.
+
+
+Licensing and Copyright
+-----------------------
+
+The project is licensed under the GNU General Public License version 3 or,
+at your option, any later version.  A number of contributions have been
+under the Apache License 2.0 and GPLv3+ allows for that.
+
+Copyright statements are in the boilerplates of each source file.

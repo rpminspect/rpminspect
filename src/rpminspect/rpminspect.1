@@ -1,0 +1,127 @@
+.\" Copyright (C) 2018-2019  Red Hat, Inc.
+.\" Author(s):  David Cantrell <dcantrell@redhat.com>
+.\"
+.\" This program is free software: you can redistribute it and/or modify
+.\" it under the terms of the GNU General Public License as published by
+.\" the Free Software Foundation, either version 3 of the License, or
+.\" (at your option) any later version.
+.\"
+.\" This program is distributed in the hope that it will be useful,
+.\" but WITHOUT ANY WARRANTY; without even the implied warranty of
+.\" MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+.\" GNU General Public License for more details.
+.\"
+.\" You should have received a copy of the GNU General Public License
+.\" along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
+.TH RPMINSPECT "1" "February 2019" "rpminspect" "Red Hat"
+.SH NAME
+rpminspect \- compare package builds
+.SH SYNOPSIS
+.B rpminspect
+[
+.B OPTIONS
+]
+.B before_build
+[
+.B after_build
+]
+.SH DESCRIPTION
+.PP
+rpminspect is a tool designed to help developers maintain build policy
+compliance and consistency among releases.  The tool is intended to provide
+output alerting the developer to any changes in the built packages that
+significantly differ from a previous built; the implication being the
+previous build has already been made available to users.
+.PP
+rpminspect originated at Red Hat as an auditing tool used by the QA
+department to ensure builds complied with certain release rules and
+policies.  Over time it grew to incorporate other checks, such as making
+sure debugging symbols are accurate.  Users are encourage to contribute
+tests for new functionality as well as bug fixes.
+.PP
+The software is made available as this command line program and an
+accompanying library.  This is intentional.  Our findings over time have
+shown that simple tools with a flexible design are more easy to integrate
+in to continuous integration systems.  The library allows development of
+other frontends should anyone ever be interested in that.  The thought
+is that most developers will interact with rpminspect through the command
+line.  Everything about an rpminspect run is configurable at runtime
+through command line options as well as a configuration file.  The command
+line options override the configuration file which overrides the compiled
+in defaults.
+.SH OPTIONS
+.PP
+.TP
+.B \-c FILE, \-\-config=FILE
+Configuration file to use (default: /etc/rpminspect/rpminspect.conf)
+.TP
+.B \-T LIST, \-\---tests=LIST
+Comma-separated list of tests to perform (default: ALL)
+.TP
+.B \-l, \-\-list
+List available output formats and inspections
+.TP
+.B \-o FILE, \-\-output=FILE
+Write the results to the name output file.  By default, results go to
+stdout.
+.TP
+.B \-F TYPE, \-\-format=TYPE
+Write the inspection results in the TYPE format.  The default format
+is text.  Available formats can be seen with the \-l option.
+.TP
+.B \-w PATH, \-\-workdir=PATH
+Temporary working directory to use (default: /var/tmp/rpminspect)
+.TP
+.B \-k, \-\-keep
+Do not remove temporary working files before exit
+.TP
+.B \-v, \-\-verbose
+Verbose inspection output.  By default, only warnings or failures
+are reported.  This option also displays informational findings.
+.TP
+.B \-?, \-\-help
+Display usage information
+.TP
+.B \-V, \-\-version
+Display version information
+.SH USAGE
+.PP
+rpminspect requires very little to run.  Assuming you meet the runtime
+requirements to either build the software from source or you have installed
+it on your operating system, you are ready to use it.  The only required
+argument is a build, which we will call the before_build.  It is possible
+to run rpminspect against a single build and perform the policy checks
+against the packages in it.  If two builds are specified, the policy checks
+are performed, but the builds are also compared.
+.PP
+Builds are specified using koji syntax.  The common method is the NVR, or
+name, version, and release of a package with hyphens separating each part.
+But you can also supply any valid koji build identifier.  For example, you
+can use the koji build ID number.  For more information on koji build
+specification, please see the koji documentation.
+.PP
+Lastly, builds may be local to the system you are using.  If you specify
+a directory tree containing the output of a properly structure koji build,
+rpminspect can use that directly.  This may be useful for multiple runs of
+rpminspect against a specific previous build where you are trying to fix
+something in a new build compared against the old one.
+.PP
+Examples:
+.IP
+rpminspect \-t ALL \-k zlib-1.2.7-1.fc29 zlib-1.2.7-2.fc29
+.IP
+rpminspect \-t license,elfsyms perl-5.28.0-47.fc6 perl-5.28.1-1.fc6
+.PP
+The end result of running rpminspect is a report on standard output explaining
+what was found.  Descriptions of actions developers can take are provided in
+the findings.
+.SH SEE ALSO
+.na
+.nh
+.BR rpm (8)
+.SH AUTHOR
+.PP
+.nf
+David Cantrell <dcantrell@redhat.com>
+.fi

@@ -1,0 +1,41 @@
+#
+# This is the ABI checking control file.  rpminspect uses this information
+# to perform ABI compatibility tests.  The file is divided in to sections
+# as follows:
+#
+# [level X]
+# package={list_of_dsos|"all-dsos"}
+#
+# First the levels.  There are four levels available for ABI compatibility
+# testing:
+#     level 1       Symbol mismatches are considered a failure
+#     level 2       Symbol mismatches are noted, but can be waived
+#     level >=3     Symbol mismatches are reported as informational
+#     level none    Explicitly note packages to not run the ABI check on
+#
+# This file has sections for each level desired.  Under each section are
+# lines that are a package name, an equal sign, then a list of DSOs to
+# check or the keyword "all-dsos".  For example:
+#
+#     glibc=all-dsos
+#     zlib=libz.so.1
+#
+# All DSOs in the glibc package would be examined while only the libz.so.1
+# DSO from the zlib package would be examined.  Explicit paths are not
+# required, but can be used to further refine the check.
+#
+# Full example (commented out):
+#
+#[level 1]
+#glibc=all-dsos
+#
+#[level 2]
+#openssl=all-dsos
+#
+#[level 3]
+#gtk3=all-dsos
+#
+# In practice, you likely want to use "all-dsos" for nearly every package.
+# Exceptions are instances where a .so is shipped with a package, but is
+# entirely internal to the package itself.
+#

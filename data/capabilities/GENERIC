@@ -1,0 +1,15 @@
+#
+# This is the capabilities whitelist file.  Lines beginning with '#' and
+# blank lines are ignored.
+#
+# The format of this file is:
+# <package name>    <file path>          <capabilities>
+#
+# Where <capabilities> is a comma-delimited list of capabilities as returned
+# by the cap_to_text(3) function.  Capabilities information can be found in
+# the capabilities(7) man page.
+#
+# Example (commented out):
+#iputils                         /usr/bin/ping                   = cap_net_admin,cap_net_raw+p
+#
+# <package name>    <file path>          <capabilities>

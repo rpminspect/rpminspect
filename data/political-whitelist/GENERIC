@@ -1,0 +1,9 @@
+#
+# List of files by message digest that are allowed through
+# the political sensitivity inspection.
+#
+# This file just lists a message digest of the file allowed.  The filename
+# is not included.  Digests can be MD5, SHA-1, SHA-256, or SHA-512.  One
+# digest per line, leading and trailing whitespace is ignored.  Blank lines
+# and lines beginning with '#' are ignored.
+#

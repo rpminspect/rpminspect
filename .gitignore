@@ -1,0 +1,2 @@
+*.o
+inspect_elf_bits.c

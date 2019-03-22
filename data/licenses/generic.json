@@ -1,0 +1,12 @@
+{
+  "#alias of license#": {
+    "approved": "#has legal approved this license; if no|unknown ask legal#",
+    "fedora_abbrev": "#official Fedora abbreviation if license is in Fedora list#",
+    "fedora_name": "#official Fedora full name if license is in Fedora list#",
+    "id": "0",
+    "license_text": "#not used yet#",
+    "spdx_abbrev": "#official SPDX abbreviation if license is in SPDX list#",
+    "spdx_name": "#official SPDX full name if license is in SPDX list#",
+    "url": "#url containing the license text#"
+  }
+}
