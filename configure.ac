@@ -13,14 +13,6 @@ AC_PROG_CC
 AC_PROG_CPP
 AC_PROG_MAKE_SET
 
-# Checks for libraries.
-PKG_CHECK_MODULES(JSON_C, [json-c])
-PKG_CHECK_MODULES(XMLRPC, [xmlrpc xmlrpc_util xmlrpc_client])
-PKG_CHECK_MODULES(LIBXML, [libxml-2.0])
-PKG_CHECK_MODULES(RPM, [rpm])
-PKG_CHECK_MODULES(LIBARCHIVE, [libarchive])
-PKG_CHECK_MODULES(LIBELF, [libelf])
-
 # Checks for header files.
 AC_CHECK_HEADERS([fcntl.h limits.h stddef.h stdint.h stdlib.h string.h sys/ioctl.h unistd.h])
 
@@ -40,6 +32,35 @@ AC_FUNC_MMAP
 AC_FUNC_REALLOC
 AC_CHECK_FUNCS([getcwd memset mkdir munmap realpath regcomp rmdir strcasecmp strchr strdup strerror strstr])
 
+# Checks for libraries.
+PKG_CHECK_MODULES(JSON_C, [json-c])
+PKG_CHECK_MODULES(XMLRPC, [xmlrpc xmlrpc_util xmlrpc_client])
+PKG_CHECK_MODULES(LIBXML, [libxml-2.0])
+PKG_CHECK_MODULES(RPM, [rpm])
+PKG_CHECK_MODULES(LIBARCHIVE, [libarchive])
+PKG_CHECK_MODULES(LIBELF, [libelf])
+PKG_CHECK_MODULES(LIBKMOD, [libkmod])
+PKG_CHECK_MODULES(LIBCURL, [libcurl])
+PKG_CHECK_MODULES(ZLIB, [zlib])
+
+# Check for libmandoc
+AC_SEARCH_LIBS([mparse_alloc], [mandoc], [found=1], [found=0], [$ZLIB_LIBS])
+if test $found -eq 1; then
+    LIBMANDOC_LIBS="-lmandoc"
+    AC_SUBST([LIBMANDOC_LIBS])
+else
+    AC_MSG_ERROR([*** unable to find mparse_alloc() in libmandoc])
+fi
+
+# Check for libiniparser
+AC_SEARCH_LIBS([iniparser_load], [iniparser], [found=1], [found=0], [$ZLIB_LIBS])
+if test $found -eq 1; then
+    INIPARSER_LIBS="-liniparser"
+    AC_SUBST([INIPARSER_LIBS])
+else
+    AC_MSG_ERROR([*** unable to find iniparser_load() in libiniparser])
+fi
+
 AC_SUBST([JSON_C_CFLAGS])
 AC_SUBST([JSON_C_LIBS])
 AC_SUBST([XMLRPC_CFLAGS])
@@ -54,6 +75,10 @@ AC_SUBST([LIBELF_CFLAGS])
 AC_SUBST([LIBELF_LIBS])
 AC_SUBST([LIBKMOD_CFLAGS])
 AC_SUBST([LIBKMOD_LIBS])
+AC_SUBST([LIBCURL_CFLAGS])
+AC_SUBST([LIBCURL_LIBS])
+AC_SUBST([ZLIB_CFLAGS])
+AC_SUBST([ZLIB_LIBS])
 
 AC_CONFIG_FILES([Makefile
                  src/Makefile
