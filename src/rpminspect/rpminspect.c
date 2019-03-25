@@ -16,6 +16,8 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+#include "config.h"
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <getopt.h>
@@ -201,7 +203,7 @@ int main(int argc, char **argv) {
                 usage(progname);
                 exit(0);
             case 'V':
-                printf("%s version %s\n", progname, _RPMINSPECT_VERSION);
+                printf("%s version %s\n", progname, PACKAGE_VERSION);
                 exit(0);
             default:
                 printf("?? getopt returned character code 0%o ??\n", c);
