@@ -178,7 +178,7 @@ struct koji_build *get_koji_build(struct rpminspect *ri, const char *buildspec) 
     assert(build != NULL);
     init_koji_build(build);
     xmlrpc_env_init(&env);
-    xmlrpc_client_init2(&env, XMLRPC_CLIENT_NO_FLAGS, SOFTWARE_NAME, _LIBRPMINSPECT_VERSION, NULL, 0);
+    xmlrpc_client_init2(&env, XMLRPC_CLIENT_NO_FLAGS, SOFTWARE_NAME, PACKAGE_VERSION, NULL, 0);
     xmlrpc_abort_on_fault(&env);
 
     /* call 'getBuild' on the koji hub */
