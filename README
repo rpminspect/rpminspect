@@ -2,7 +2,7 @@
 rpminspect
 ==========
 
-RPM build deviation analysis tools.  rpminspect inspections the output of an
+RPM build deviation analysis tools.  rpminspect inspects the output of an
 RPM build (e.g., the output of a Koji build) and looks at the contents of
 the build artifacts to report:
 
@@ -27,6 +27,34 @@ From an individual user standpoint, rpminspect is intended to be a command
 line tool you can use as a linter of sorts.  rpminspect reports and that's
 it.  rpminspect can output information in JSON format which is intended to
 make it easier to integrate in to automated workflows or web frontends.
+
+
+Requirements
+------------
+
+A typical Linux system with a toolchain for building C software and the
+following libraries (make sure the header files are available):
+
+    * json-c
+          http://json-c.github.io/json-c/
+
+    * xmlrpc-c
+          http://xmlrpc-c.sourceforge.net/
+
+    * libxml-2.0
+          http://xmlsoft.org/
+
+    * rpm
+          https://github.com/rpm-software-management/rpm
+
+    * libarchive
+          https://www.libarchive.org/
+
+    * elfutils
+          https://sourceware.org/elfutils/
+
+Most distributions include the above projects in prebuilt and packaged
+form.  If those are available, you should use those packages.
 
 
 Contributing
