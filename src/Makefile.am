@@ -1,1 +1,1 @@
-SUBDIRS = librpminspect
+SUBDIRS = librpminspect rpminspect

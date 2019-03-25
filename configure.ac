@@ -20,7 +20,6 @@ PKG_CHECK_MODULES(LIBXML, [libxml-2.0])
 PKG_CHECK_MODULES(RPM, [rpm])
 PKG_CHECK_MODULES(LIBARCHIVE, [libarchive])
 PKG_CHECK_MODULES(LIBELF, [libelf])
-PKG_CHECK_MODULES(LIBKMOD, [libkmod])
 
 # Checks for header files.
 AC_CHECK_HEADERS([fcntl.h limits.h stddef.h stdint.h stdlib.h string.h sys/ioctl.h unistd.h])
@@ -58,6 +57,7 @@ AC_SUBST([LIBKMOD_LIBS])
 
 AC_CONFIG_FILES([Makefile
                  src/Makefile
-                 src/librpminspect/Makefile])
+                 src/librpminspect/Makefile
+                 src/rpminspect/Makefile])
 
 AC_OUTPUT
