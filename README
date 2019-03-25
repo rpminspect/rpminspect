@@ -53,8 +53,38 @@ following libraries (make sure the header files are available):
     * elfutils
           https://sourceware.org/elfutils/
 
+    * kmod
+          https://git.kernel.org/pub/scm/utils/kernel/kmod/kmod.git
+
+    * zlib
+          https://www.zlib.net/
+
+    * mandoc (formerly mdocml)
+          https://mandoc.bsd.lv/
+
+    * iniparser
+          http://ndevilla.free.fr/iniparser/
+
 Most distributions include the above projects in prebuilt and packaged
 form.  If those are available, you should use those packages.
+
+
+Building
+--------
+
+If you got the source from a released tarball, you can probably do this:
+
+    ./configure
+    make
+    make install
+
+If you have the source cloned from git, you should do this:
+
+    ./autogen.sh
+    # then the steps above
+
+Building from git will require autoconf, automake, libtool, and the rest
+of the autotools packages.
 
 
 Contributing
