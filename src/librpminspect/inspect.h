@@ -67,6 +67,13 @@ bool inspect_elf(struct rpminspect *);
 bool compare_module_parameters(const struct kmod_list *, const struct kmod_list *, string_list_t **);
 bool compare_module_dependencies(const struct kmod_list *, const struct kmod_list *, string_list_t **, string_list_t **);
 
+struct kernel_alias_data;
+typedef void (*module_alias_callback)(const char *, const string_list_t *, const string_list_t *, void *);
+
+void gather_module_aliases(const char *, const struct kmod_list *, struct kernel_alias_data **);
+void free_module_aliases(struct kernel_alias_data *);
+bool compare_module_aliases(struct kernel_alias_data *, struct kernel_alias_data *, module_alias_callback, void *);
+
 /* inspect_license.c */
 void free_licensedb(void);
 bool is_valid_license(const char *, const char *);
