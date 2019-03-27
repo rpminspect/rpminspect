@@ -178,6 +178,8 @@ string_list_t * list_union(const string_list_t *a, const string_list_t *b)
         u_table_size = 1;
     }
 
+    memset(&u_table, 0, sizeof(u_table));
+
     if (!hcreate_r(u_table_size, &u_table)) {
         fprintf(stderr, "Unable to create hash table: %s\n", strerror(errno));
         return NULL;
