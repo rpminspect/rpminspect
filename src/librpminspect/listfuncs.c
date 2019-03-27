@@ -39,6 +39,10 @@ static struct hsearch_data * list_to_table(const string_list_t *list)
     /* Iterate over the list once to get the size */
     table_size = list_len(list);
 
+    if (table_size == 0) {
+        table_size = 1;
+    }
+
     /* Allocate the table */
     table = calloc(1, sizeof(*table));
     assert(table != NULL);
@@ -169,6 +173,10 @@ string_list_t * list_union(const string_list_t *a, const string_list_t *b)
 
     u_table_size += list_len(a);
     u_table_size += list_len(b);
+
+    if (u_table_size == 0) {
+        u_table_size = 1;
+    }
 
     if (!hcreate_r(u_table_size, &u_table)) {
         fprintf(stderr, "Unable to create hash table: %s\n", strerror(errno));
