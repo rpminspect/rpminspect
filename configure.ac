@@ -61,6 +61,15 @@ else
     AC_MSG_ERROR([*** unable to find iniparser_load() in libiniparser])
 fi
 
+# Check for dlopen
+AC_SEARCH_LIBS([dlopen], [dl], [found=1], [found=0], [$ZLIB_LIBS])
+if test $found -eq 1; then
+    DL_LIBS="-ldl"
+    AC_SUBST([DL_LIBS])
+else
+    AC_MSG_ERROR([*** unable to find dlopen() in libdl])
+fi
+
 AC_SUBST([JSON_C_CFLAGS])
 AC_SUBST([JSON_C_LIBS])
 AC_SUBST([XMLRPC_CFLAGS])
