@@ -1,4 +1,4 @@
-librpminspect_includedir = $(includedir)/librpminspect
+librpminspectdir = $(includedir)/librpminspect
 librpminspect_HEADERS = constants.h \
                         inspect.h \
                         output.h \
@@ -57,6 +57,7 @@ librpminspect_la_LIBADD = $(JSON_C_LIBS) \
 librpminspect_la_SOURCES += inspect_elf_bits.c
 BUILT_SOURCES = inspect_elf_bits.c
 CLEANFILES = inspect_elf_bits.c
+EXTRA_DIST = pic_bits.sh
 
 inspect_elf_bits.c: pic_bits.sh /usr/include/elf.h
 	./pic_bits.sh > $@

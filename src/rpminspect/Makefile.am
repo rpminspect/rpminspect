@@ -1,4 +1,6 @@
 bin_PROGRAMS = rpminspect
+dist_man1_MANS = rpminspect.1
+EXTRA_DIST = builds.h
 
 rpminspect_SOURCES = rpminspect.c builds.c
 rpminspect_CFLAGS = -I$(top_srcdir)/src/librpminspect
