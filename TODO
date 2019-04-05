@@ -6,8 +6,6 @@
       - Unit tests
       - Inspection test suite with valid and invalid data
 
-- configure.ac and Makefile.am build system
-
 - Documentation
       - User documentation
       - Developer documentation
