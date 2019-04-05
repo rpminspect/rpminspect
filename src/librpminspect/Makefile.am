@@ -1,3 +1,12 @@
+librpminspect_includedir = $(includedir)/librpminspect
+librpminspect_HEADERS = constants.h \
+                        inspect.h \
+                        output.h \
+                        readelf.h \
+                        results.h \
+                        rpminspect.h \
+                        types.h
+
 lib_LTLIBRARIES = librpminspect.la
 librpminspect_la_SOURCES = badwords.c \
                            compression.c \
