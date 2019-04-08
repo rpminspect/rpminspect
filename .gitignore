@@ -1,6 +1,8 @@
 *.la
 *.lo
 *.o
+*.src.rpm
+*.tar.gz
 .*.swp
 .deps
 .libs
@@ -23,4 +25,5 @@ ltmain.sh
 m4
 missing
 rpminspect
+rpminspect.spec
 stamp-h1

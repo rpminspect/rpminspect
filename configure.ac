@@ -90,6 +90,13 @@ AC_SUBST([ZLIB_CFLAGS])
 AC_SUBST([ZLIB_LIBS])
 
 AC_CONFIG_FILES([Makefile
+                 data/Makefile
+                 data/setuid/Makefile
+                 data/capabilities/Makefile
+                 data/political-whitelist/Makefile
+                 data/licenses/Makefile
+                 data/abi-checking-whitelist/Makefile
+                 data/version-whitelist/Makefile
                  src/Makefile
                  src/librpminspect/Makefile
                  src/rpminspect/Makefile])
