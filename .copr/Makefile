@@ -1,6 +1,7 @@
 topdir := $(dir $(lastword $(MAKEFILE_LIST)))/..
 
 srpm:
+	$(topdir)/.copr/installate-packages.sh
 	( cd $(topdir) ; ./autogen.sh )
 	( cd $(topdir) ; ./configure )
 	$(MAKE) -C $(topdir) rpminspect.spec
