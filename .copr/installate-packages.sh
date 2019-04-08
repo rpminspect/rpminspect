@@ -11,4 +11,4 @@ yum --help >/dev/null 2>&1
 ${INSTALLATOR} install -y automake autoconf libtool
 
 # Install the BuildRequires from the spec file
-${INSTALLATOR} install -y $(grep BuildRequires: "${TOPDIR}/rpminspect.spec.in" | awk '{ print $2; }')
+${INSTALLATOR} install -y $(grep ^BuildRequires: "${TOPDIR}/rpminspect.spec.in" | awk '{ print $2; }')
