@@ -17,6 +17,7 @@ PKG := $(shell grep ^Name: "$(SPEC_TEMPLATE)" | awk '{ print $$2; }')
 VER := $(shell grep ^AC_INIT "$(topdir)/configure.ac" | cut -d '[' -f 3 | cut -d ']' -f 1)
 
 srpm:
+	$(topdir)/.copr/installate-package.sh
 	sed -e 's|%%VERSION%%|$(VER)|g' < "$(SPEC_TEMPLATE)" > "$(SPEC)"
 	sed -i -e 's|%%RPMDATE%%|$(RPMDATE)|g' "$(SPEC)"
 	sed -i -e "/^Release:/ s|$(RELEASE)|$(NEWRELEASE)|g" "$(SPEC)"
