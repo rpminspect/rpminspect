@@ -302,3 +302,116 @@ bool process_file_path(const rpmfile_entry_t *file, regex_t *include_regex, rege
 
     return true;
 }
+
+/* Helper for find_file_peers. Returns a hash table keyed by the fullpath fields of
+ * the file list, with the rpmfile_entry_t items as values.
+ *
+ * The list cannot be empty.
+ *
+ * The keys and values use the same pointers as the rpmfile_entry_t and should not
+ * be separately freed. The hash table itself must be hdestroy_r'd and freed by the caller.
+ */
+struct hsearch_data * _files_to_table(rpmfile_t *list)
+{
+    struct hsearch_data *table;
+    ENTRY e;
+    ENTRY *eptr;
+
+    rpmfile_entry_t *iter;
+
+    rpmtd td;
+    rpm_count_t td_size;
+
+    /* Use the length of RPMTAG_FILENAMES for the hash table size */
+    td = rpmtdNew();
+    assert(td != NULL);
+
+    iter = TAILQ_FIRST(list);
+    assert(iter);
+
+    if (headerGet(iter->rpm_header, RPMTAG_FILENAMES, td, HEADERGET_MINMEM | HEADERGET_EXT) != 1) {
+        fprintf(stderr, "***Unable to read RPMTAG_FILENAMES\n");
+        return NULL;
+    }
+
+    td_size = rpmtdCount(td);
+    rpmtdFree(td);
+
+    table = calloc(1, sizeof(*table));
+    assert(table);
+
+    if (hcreate_r(td_size * 1.25, table) == 0) {
+        fprintf(stderr, "*** Unable to allocate hash table: %s\n", strerror(errno));
+        free(table);
+        return NULL;
+    }
+
+    TAILQ_FOREACH(iter, list, items) {
+        e.key = iter->fullpath;
+        e.data = iter;
+
+        if (hsearch_r(e, ENTER, &eptr, table) == 0) {
+            fprintf(stderr, "*** Unable to add %s to hash table: %s\n", iter->fullpath, strerror(errno));
+            hdestroy_r(table);
+            free(table);
+            return NULL;
+        }
+    }
+
+    return table;
+}
+
+/* For the given file from "before", attempt to find a matching file in "after".
+ *
+ * Any time a match is found, the hash table ENTRY's value field will be set
+ * to NULL so that the match cannot be used again. For the purposes of adding
+ * tests to match peers, this means that attempts must be made in order from
+ * best match to worst match.
+ */
+void _find_one_peer(rpmfile_entry_t *file, struct hsearch_data *after_table)
+{
+    rpmfile_entry_t *peer;
+    ENTRY e;
+    ENTRY *eptr;
+
+    /* Start with the obvious case: the paths match */
+    e.key = file->fullpath;
+    eptr = NULL;
+
+    if (hsearch_r(e, FIND, &eptr, after_table) != 0) {
+        peer = eptr->data;
+        eptr->data = NULL;
+
+        file->peer_file = peer;
+        peer->peer_file = file;
+        return;
+    }
+}
+
+/* Find matching files between the before and after lists, and populate the "peer_file" members of the entries.
+ * Returns 0 on success, -1 on failure.
+ */
+void find_file_peers(rpmfile_t *before, rpmfile_t *after)
+{
+    struct hsearch_data *after_table = NULL;
+    rpmfile_entry_t *iter;
+
+    int result = -1;
+
+    /* Make sure there is something to match */
+    if (TAILQ_EMPTY(before) || TAILQ_EMPTY(after)) {
+        return;
+    }
+
+    /* Create a hash table of the after list, mapping path(char *) to rpmfile_entry_t */
+    after_table = _files_to_table(after);
+    assert(after_table);
+
+    TAILQ_FOREACH(iter, before, items) {
+        _find_one_peer(iter, after_table);
+    }
+
+
+    hdestroy_r(after_table);
+    free(after_table);
+}
