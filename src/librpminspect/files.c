@@ -64,7 +64,8 @@ rpmfile_t * extract_rpm(const char *pkg, Header hdr)
     rpm_count_t td_size;
 
     const char *rpm_path;
-    struct hsearch_data path_table;
+    struct hsearch_data path_table = { 0 };
+    bool path_table_initialized = false;
     ENTRY e;
     ENTRY *eptr;
     int *rpm_indices = NULL;
@@ -120,10 +121,13 @@ rpmfile_t * extract_rpm(const char *pkg, Header hdr)
      * that the hash table entries will point to.
      */
     td_size = rpmtdCount(td);
-    if (hcreate_r(td_size, &path_table) == 0) {
+
+    if (hcreate_r(td_size * 1.25, &path_table) == 0) {
         fprintf(stderr, "*** Unable to allocate hash table: %s\n", strerror(errno));
         goto cleanup;
     }
+
+    path_table_initialized = true;
 
     rpm_indices = calloc(td_size, sizeof(int));
     assert(rpm_indices != NULL);
@@ -238,7 +242,10 @@ cleanup:
         rpmtdFree(td);
     }
 
-    hdestroy_r(&path_table);
+    if (path_table_initialized) {
+        hdestroy_r(&path_table);
+    }
+
     free(rpm_indices);
 
     if (archive != NULL) {
