@@ -61,6 +61,7 @@ typedef struct _rpmfile_entry_t {
     char *fullpath;
     struct stat st;
     int idx;
+    struct _rpmfile_entry_t *peer_file;
     TAILQ_ENTRY(_rpmfile_entry_t) items;
 } rpmfile_entry_t;
 

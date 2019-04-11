@@ -116,6 +116,7 @@ void free_files(rpmfile_t *files);
 rpmfile_t * extract_rpm(const char *, Header);
 const char * get_file_path(const rpmfile_entry_t *file);
 bool process_file_path(const rpmfile_entry_t *, regex_t *, regex_t *);
+void find_file_peers(rpmfile_t *, rpmfile_t *);
 
 /* tty.c */
 size_t tty_width(void);
