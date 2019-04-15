@@ -22,6 +22,7 @@
 #include <fcntl.h>
 #include <search.h>
 #include <stdbool.h>
+#include <stdio.h>
 #include <sys/queue.h>
 #include <sys/types.h>
 
@@ -477,40 +478,52 @@ static const char * pflags_to_str(uint64_t flags)
     return output;
 }
 
-static bool inspect_elf_execstack(struct rpminspect *ri, Elf *elf, const char *localpath, const char *arch)
+static bool _inspect_elf_execstack(struct rpminspect *ri, Elf *after_elf, Elf *before_elf, const char *localpath, const char *arch)
 {
     Elf64_Half elf_type;
     uint64_t execstack_flags;
     bool result = false;
     char *msg = NULL;
 
+    bool before_execstack = false;
+    severity_t severity;
+
     /* If there is no executable code, there is no executable stack */
-    if (!has_executable_program(elf)) {
+    if (!has_executable_program(after_elf)) {
         return true;
     }
 
-    elf_type = get_elf_type(elf);
+    elf_type = get_elf_type(after_elf);
+
+    /* If the peer file had an executable stack, turn down the result severity */
+    if (before_elf) {
+        before_execstack = is_stack_executable(before_elf, get_execstack_flags(before_elf));
+    }
 
     /* Check if execstack information is present */
-    if (!is_execstack_present(elf)) {
+    if (!is_execstack_present(after_elf)) {
         if (elf_type == ET_REL) {
             /* Missing .note.GNU-stack will result in an executable stack */
-            xasprintf(&msg, "Object has executable stack (no GNU-stack note): %s on %s", localpath, arch);
-
-            add_result(&ri->results, RESULT_BAD, WAIVABLE_BY_SECURITY, HEADER_ELF, msg, NULL, REMEDY_ELF_EXECSTACK_MISSING);
+            if (before_execstack) {
+                xasprintf(&msg, "Object still has executable stack (no GNU-stack note): %s on %s", localpath, arch);
+                severity = RESULT_VERIFY;
+            } else {
+                xasprintf(&msg, "Object has executable stack (no GNU-stack note): %s on %s", localpath, arch);
+                severity = RESULT_BAD;
+            }
         } else {
             xasprintf(&msg, "Program built without GNU_STACK: %s on %s", localpath, arch);
-
-            add_result(&ri->results, RESULT_BAD, WAIVABLE_BY_SECURITY, HEADER_ELF, msg, NULL, REMEDY_ELF_EXECSTACK_MISSING);
+            severity = RESULT_BAD;
         }
 
+        add_result(&ri->results, severity, WAIVABLE_BY_SECURITY, HEADER_ELF, msg, NULL, REMEDY_ELF_EXECSTACK_MISSING);
         goto cleanup;
     }
 
     /* Check that the execstack flags make sense */
-    execstack_flags = get_execstack_flags(elf);
+    execstack_flags = get_execstack_flags(after_elf);
 
-    if (!is_execstack_valid(elf, execstack_flags)) {
+    if (!is_execstack_valid(after_elf, execstack_flags)) {
         if (elf_type == ET_REL) {
             xasprintf(&msg, "File %s has invalid execstack flags %lX on %s", localpath, execstack_flags, arch);
 
@@ -525,17 +538,26 @@ static bool inspect_elf_execstack(struct rpminspect *ri, Elf *elf, const char *l
     }
 
     /* Check that the stack is not marked as executable */
-    if (is_stack_executable(elf, execstack_flags)) {
+    if (is_stack_executable(after_elf, execstack_flags)) {
         if (elf_type == ET_REL) {
-            xasprintf(&msg, "Stack is executable: %s on %s", localpath, arch);
-
-            add_result(&ri->results, RESULT_BAD, WAIVABLE_BY_SECURITY, HEADER_ELF, msg, NULL, REMEDY_ELF_EXECSTACK_EXECUTABLE);
+            if (before_execstack) {
+                xasprintf(&msg, "Object still has executable stack (GNU-stack note = X): %s on %s", localpath, arch);
+                severity = RESULT_VERIFY;
+            } else {
+                xasprintf(&msg, "Object has executable stack (GNU-stack note = X): %s on %s", localpath, arch);
+                severity = RESULT_BAD;
+            }
         } else {
-            xasprintf(&msg, "Object has executable stack (GNU-stack note = X): %s on %s", localpath, arch);
-
-            add_result(&ri->results, RESULT_BAD, WAIVABLE_BY_SECURITY, HEADER_ELF, msg, NULL, REMEDY_ELF_EXECSTACK_EXECUTABLE);
+            if (before_execstack) {
+                xasprintf(&msg, "Stack is still executable: %s on %s", localpath, arch);
+                severity = RESULT_VERIFY;
+            } else {
+                xasprintf(&msg, "Stack is executable: %s on %s", localpath, arch);
+                severity = RESULT_BAD;
+            }
         }
 
+        add_result(&ri->results, severity, WAIVABLE_BY_SECURITY, HEADER_ELF, msg, NULL, REMEDY_ELF_EXECSTACK_EXECUTABLE);
         goto cleanup;
     }
 
@@ -547,53 +569,421 @@ cleanup:
     return result;
 }
 
-static bool _elf_driver(struct rpminspect *ri, rpmfile_entry_t *file)
+static bool _check_relro(struct rpminspect *ri, Elf *before_elf, Elf *after_elf, const char *localpath, const char *arch)
+{
+    bool before_relro = has_relro(before_elf);
+    bool before_bind_now = has_bind_now(before_elf);
+    bool after_relro = has_relro(after_elf);
+    bool after_bind_now = has_bind_now(after_elf);
+    char *msg = NULL;
+
+    if (before_relro && before_bind_now && after_relro && !after_bind_now) {
+        /* full relro in before, partial relro in after */
+        xasprintf(&msg, "%s lost full GNU_RELRO security protection on %s", localpath, arch);
+    } else if (before_relro && !after_relro) {
+        /* partial or full relro in before, no relro in after */
+        xasprintf(&msg, "%s lost GNU_RELRO security protection on %s", localpath, arch);
+    }
+
+    if (msg != NULL) {
+        add_result(&ri->results, RESULT_BAD, WAIVABLE_BY_SECURITY, HEADER_ELF, msg, NULL, REMEDY_ELF_GNU_RELRO);
+        free(msg);
+        return false;
+    }
+
+    return true;
+}
+
+/* Check for binaries that had fortified symbols in before, and have no fortified symbols in after.
+ * This could indicate a loss of hardening build flags.
+ */
+static bool _check_fortified(struct rpminspect *ri, Elf *before_elf, Elf *after_elf, const char *localpath, const char *arch)
+{
+    string_list_t *before_fortifiable = NULL;
+    string_list_t *before_fortified = NULL;
+    string_list_t *after_fortifiable = NULL;
+    string_list_t *after_fortified = NULL;
+    string_list_t *sorted_list;
+    string_entry_t *iter;
+
+    FILE *output_stream;
+    char *output_buffer = NULL;
+    size_t output_size;
+    int output_result;
+
+    char *msg;
+    bool result = true;
+
+    /* If "before" had no fortified symbols, it can't lose fortified symbols. Return. */
+    before_fortified = get_fortified_symbols(before_elf);
+    assert(before_fortified != NULL);
+
+    if ((before_fortified == NULL) || TAILQ_EMPTY(before_fortified)) {
+        goto cleanup;
+    }
+
+    /*
+     * If "after" has any fortified symbols, then at least some of it was compiled with
+     * -D_FORTIFY_SOURCE. Assume it's fine.
+     */
+    after_fortified = get_fortified_symbols(after_elf);
+    assert(after_fortified != NULL);
+
+    if ((after_fortified != NULL) && !TAILQ_EMPTY(after_fortified)) {
+        goto cleanup;
+    }
+
+    /* If "after" has no fortifiable symbols, it's fine. */
+    after_fortifiable = get_fortifiable_symbols(after_elf);
+    assert(after_fortifiable != NULL);
+
+    if ((after_fortifiable == NULL) || TAILQ_EMPTY(after_fortifiable)) {
+        goto cleanup;
+    }
+
+    /*
+     * At this point:
+     *   - before is definitely fortified,
+     *   - after shows no sign of being fortified, and
+     *   - after contains symbols that we think could have been fortified.
+     */
+    result = false;
+
+    /* Create a screendump listing the symbols involved. */
+    output_stream = open_memstream(&output_buffer, &output_size);
+    assert(output_stream != NULL);
+
+    output_result = fprintf(output_stream, "Fortified symbols lost:\n");
+    assert(output_result > 0);
+
+    sorted_list = list_sort(before_fortified);
+    assert(sorted_list != NULL);
+
+    TAILQ_FOREACH(iter, sorted_list, items) {
+        output_result = fprintf(output_stream, "\t%s\n", iter->data);
+        assert(output_result > 0);
+    }
+
+    list_free(sorted_list, NULL);
+
+    output_result = fprintf(output_stream, "Fortifiable symbols present:\n");
+    assert(output_result > 0);
+
+    sorted_list = list_sort(after_fortifiable);
+    assert(sorted_list != NULL);
+
+    TAILQ_FOREACH(iter, sorted_list, items) {
+        output_result = fprintf(output_stream, "\t%s\n", iter->data);
+        assert(output_result > 0);
+    }
+
+    list_free(sorted_list, NULL);
+
+    output_result = fclose(output_stream);
+    assert(output_result == 0);
+
+    xasprintf(&msg, "%s may have lost -D_FORTIFY_SOURCE on %s", localpath, arch);
+    add_result(&ri->results, RESULT_VERIFY, WAIVABLE_BY_SECURITY, HEADER_ELF, msg, output_buffer, REMEDY_ELF_FORTIFY_SOURCE);
+    free(msg);
+
+cleanup:
+    list_free(before_fortifiable, NULL);
+    list_free(before_fortified, NULL);
+    list_free(after_fortifiable, NULL);
+    list_free(after_fortified, NULL);
+
+    free(output_buffer);
+
+    return result;
+}
+
+/* Helper for _elf_archive_tests; add the archive member to the list if compiled *without* -fPIC */
+static bool _find_no_pic(Elf *elf, void *user_data)
+{
+    string_list_t *no_pic_list = (string_list_t *) user_data;
+    string_entry_t *entry;
+    Elf_Arhdr *arhdr;
+
+    if ((arhdr = elf_getarhdr(elf)) == NULL) {
+        return true;
+    }
+
+    /* Skip the / entry */
+    if (!strcmp(arhdr->ar_name, "/")) {
+        return true;
+    }
+
+    if (!is_pic_ok(elf)) {
+        entry = calloc(1, sizeof(*entry));
+        assert(entry != NULL);
+
+        entry->data = strdup(arhdr->ar_name);
+        assert(entry->data != NULL);
+
+        TAILQ_INSERT_TAIL(no_pic_list, entry, items);
+    }
+
+    return true;
+}
+
+/* Helper for _elf_archive_tests, add the archive member to the list if compiled *with* -fPIC */
+static bool _find_pic(Elf *elf, void *user_data)
+{
+    string_list_t *pic_list = (string_list_t *) user_data;
+    string_entry_t *entry;
+    Elf_Arhdr *arhdr;
+
+    if ((arhdr = elf_getarhdr(elf)) == NULL) {
+        return true;
+    }
+
+    /* Skip the / entry */
+    if (!strcmp(arhdr->ar_name, "/")) {
+        return true;
+    }
+
+    if (is_pic_ok(elf)) {
+        entry = calloc(1, sizeof(*entry));
+        assert(entry != NULL);
+
+        entry->data = strdup(arhdr->ar_name);
+        assert(entry->data != NULL);
+
+        TAILQ_INSERT_TAIL(pic_list, entry, items);
+    }
+
+    return true;
+}
+
+/* Helper for _elf_archive_tests, get all archive member names */
+static bool _find_all(Elf *elf, void *user_data)
+{
+    string_list_t *all_list = (string_list_t *) user_data;
+    string_entry_t *entry;
+    Elf_Arhdr *arhdr;
+
+    if ((arhdr = elf_getarhdr(elf)) == NULL) {
+        return true;
+    }
+
+    /* Skip the / entry */
+    if (!strcmp(arhdr->ar_name, "/")) {
+        return true;
+    }
+
+    entry = calloc(1, sizeof(*entry));
+    assert(entry != NULL);
+
+    entry->data = strdup(arhdr->ar_name);
+    assert(entry->data != NULL);
+
+    TAILQ_INSERT_TAIL(all_list, entry, items);
+
+    return true;
+}
+
+static bool _elf_archive_tests(struct rpminspect *ri, Elf *after_elf, int after_elf_fd, Elf *before_elf, int before_elf_fd, const char *localpath, const char *arch)
+{
+    string_list_t *after_no_pic = NULL;
+    string_list_t *before_pic = NULL;
+    string_list_t *before_all = NULL;
+
+    string_list_t *after_lost_pic = NULL;
+    string_list_t *after_new = NULL;
+
+    string_entry_t *iter;
+
+    FILE *output_stream;
+    char *screendump = NULL;
+    size_t screendump_size;
+    int output_result;
+
+    char *msg = NULL;
+    bool result = true;
+
+    /* comparison-only, skip if no before */
+    if (!before_elf) {
+        return result;
+    }
+
+    after_no_pic = calloc(1, sizeof(*after_no_pic));
+    assert(after_no_pic != NULL);
+
+    TAILQ_INIT(after_no_pic);
+    elf_archive_iterate(after_elf_fd, after_elf, _find_no_pic, after_no_pic);
+
+    /* If everything in after looks ok, we're done */
+    if (TAILQ_EMPTY(after_no_pic)) {
+        goto cleanup;
+    }
+
+    /* Gather data for two possible messages:
+     *   - Objects in after that had -fPIC in before
+     *   - Objects in after that are completely new
+     *
+     * It's still possible for this test to pass if everything without -fPIC in after
+     * also did not have -fPIC in before.
+     */
+
+    output_stream = open_memstream(&screendump, &screendump_size);
+    assert(output_stream != NULL);
+
+    before_pic = calloc(1, sizeof(*before_pic));
+    assert(before_pic != NULL);
+
+    TAILQ_INIT(before_pic);
+    elf_archive_iterate(before_elf_fd, before_elf, _find_pic, before_pic);
+
+    after_lost_pic = list_intersection(after_no_pic, before_pic);
+    assert(after_lost_pic != NULL);
+
+    if (!TAILQ_EMPTY(after_lost_pic)) {
+        result = false;
+
+        output_result = fprintf(output_stream, "The following objects lost -fPIC:\n");
+        assert(output_result > 0);
+
+        TAILQ_FOREACH(iter, after_lost_pic, items) {
+            output_result = fprintf(output_stream, "\t%s\n", iter->data);
+            assert(output_result > 0);
+        }
+    }
+
+    before_all = calloc(1, sizeof(*before_all));
+    assert(before_all != NULL);
+
+    TAILQ_INIT(before_all);
+    elf_archive_iterate(before_elf_fd, before_elf, _find_all, before_all);
+
+    after_new = list_difference(after_no_pic, before_all);
+    assert(after_new != NULL);
+
+    if (!TAILQ_EMPTY(after_new)) {
+        result = false;
+
+        output_result = fprintf(output_stream, "The following new objects were built without -fPIC:\n");
+        assert(output_result > 0);
+
+        TAILQ_FOREACH(iter, after_new, items) {
+            output_result = fprintf(output_stream, "\t%s\n", iter->data);
+            assert(output_result > 0);
+        }
+    }
+
+    output_result = fclose(output_stream);
+    assert(output_result == 0);
+
+    if (!result) {
+        xasprintf(&msg, "%s lost -fPIC on %s", localpath, arch);
+        add_result(&ri->results, RESULT_BAD, WAIVABLE_BY_SECURITY, HEADER_ELF, msg, screendump, REMEDY_ELF_FPIC);
+    }
+
+cleanup:
+    list_free(after_lost_pic, NULL);
+    list_free(after_new, NULL);
+
+    list_free(after_no_pic, free);
+    list_free(before_pic, free);
+    list_free(before_all, free);
+
+    free(screendump);
+    free(msg);
+
+    return result;
+}
+
+static bool _elf_regular_tests(struct rpminspect *ri, Elf *after_elf, Elf *before_elf, const char *localpath, const char *arch)
+{
+    char *msg = NULL;
+    bool result = true;
+
+    if (!_inspect_elf_execstack(ri, after_elf, before_elf, localpath, arch)) {
+        result = false;
+    }
+
+    if (has_textrel(after_elf)) {
+        /* Only complain for baseline (no before), or for gaining TEXTREL between before and after. */
+        if (before_elf && !has_textrel(before_elf)) {
+            xasprintf(&msg, "%s acquired TEXTREL relocations on %s", localpath, arch);
+        } else if (!before_elf) {
+            xasprintf(&msg, "%s has TEXTREL relocations on %s", localpath, arch);
+        }
+
+        if (msg != NULL) {
+            add_result(&ri->results, RESULT_BAD, WAIVABLE_BY_SECURITY, HEADER_ELF, msg, NULL, REMEDY_ELF_TEXTREL);
+            result = false;
+            free(msg);
+            msg = NULL;
+        }
+    }
+
+    if (before_elf) {
+        /* Check if we lost GNU_RELRO */
+        if (!_check_relro(ri, after_elf, before_elf, localpath, arch)) {
+            result = false;
+        }
+
+        /* Check if the object lost fortified symbols or gained unfortified, fortifiable symbols */
+        if (!_check_fortified(ri, after_elf, before_elf, localpath, arch)) {
+            result = false;
+        }
+    }
+
+    return result;
+}
+
+static bool _elf_driver(struct rpminspect *ri, rpmfile_entry_t *after)
 {
     const char *localpath;
     const char *arch;
-    Elf *elf;
-    int elf_fd;
+    Elf *after_elf = NULL;
+    Elf *before_elf = NULL;
+    int after_elf_fd;
+    int before_elf_fd;
     bool result = true;
-    char *msg = NULL;
 
-    if (!file->fullpath || !S_ISREG(file->st.st_mode)) {
+    if (!after->fullpath || !S_ISREG(after->st.st_mode)) {
         return true;
     }
 
-    if (!process_file_path(file, ri->elf_path_include, ri->elf_path_exclude)) {
+    if (!process_file_path(after, ri->elf_path_include, ri->elf_path_exclude)) {
         return true;
     }
 
-    localpath = get_file_path(file);
+    localpath = get_file_path(after);
 
     if (!localpath) {
         return true;
     }
 
-    /* Is it an elf file? */
-    elf = get_elf(file->fullpath, &elf_fd);
-    if (!elf) {
-        return true;
+    arch = headerGetString(after->rpm_header, RPMTAG_ARCH);
+
+    /* Is this an archive or a regular ELF file? */
+    if ((after_elf = get_elf_archive(after->fullpath, &after_elf_fd)) != NULL) {
+        if (after->peer_file != NULL) {
+            before_elf = get_elf_archive(after->peer_file->fullpath, &before_elf_fd);
+        }
+
+        result = _elf_archive_tests(ri, after_elf, after_elf_fd, before_elf, before_elf_fd, localpath, arch);
+    } else if ((after_elf = get_elf(after->fullpath, &after_elf_fd)) != NULL) {
+        if (after->peer_file != NULL) {
+            before_elf = get_elf_archive(after->peer_file->fullpath, &before_elf_fd);
+        }
+
+        result = _elf_regular_tests(ri, after_elf, before_elf, localpath, arch);
     }
 
-    arch = headerGetString(file->rpm_header, RPMTAG_ARCH);
 
-    if (!inspect_elf_execstack(ri, elf, localpath, arch)) {
-        result = false;
+    if (after_elf) {
+        elf_end(after_elf);
+        close(after_elf_fd);
     }
 
-    if (has_textrel(elf)) {
-        xasprintf(&msg, "%s has TEXTREL relocations on %s", localpath, arch);
-
-        add_result(&ri->results, RESULT_BAD, WAIVABLE_BY_SECURITY, HEADER_ELF, msg, NULL, REMEDY_ELF_TEXTREL);
-
-        free(msg);
+    if (before_elf) {
+        elf_end(before_elf);
+        close(before_elf_fd);
     }
 
-    /* TODO: comparison tests: PT_GNU_RELRO, fortified symbols */
-
-    elf_end(elf);
-    close(elf_fd);
     return result;
 }
 
