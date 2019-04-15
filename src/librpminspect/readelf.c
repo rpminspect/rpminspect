@@ -309,9 +309,13 @@ static string_list_t * get_elf_symbol_list(Elf *elf, bool (*filter)(const char *
     string_list_t *list;
     string_entry_t *entry;
 
+    list = malloc(sizeof(*list));
+    assert(list != NULL);
+    TAILQ_INIT(list);
+
     /* get the .dynsym section */
     if ((scn = get_elf_section(elf, sh_type, table_name, NULL, &shdr)) == NULL) {
-        return NULL;
+        return list;
     }
 
     /* If this is a .symtab, look for an extended index table for this section */
@@ -321,16 +325,14 @@ static string_list_t * get_elf_symbol_list(Elf *elf, bool (*filter)(const char *
 
     /* Get the section data */
     if ((data = elf_getdata(scn, NULL)) == NULL) {
+        list_free(list, NULL);
         return NULL;
     }
 
     if ((xndxscn != NULL) && ((xndxdata = elf_getdata(xndxscn, NULL)) == NULL)) {
+        list_free(list, NULL);
         return NULL;
     }
-
-    list = malloc(sizeof(*list));
-    assert(list != NULL);
-    TAILQ_INIT(list);
 
     /* Iterate over each symbol */
     assert(shdr.sh_entsize > 0);
