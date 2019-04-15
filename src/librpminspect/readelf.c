@@ -362,9 +362,8 @@ static string_list_t * get_elf_symbol_list(Elf *elf, bool (*filter)(const char *
 /* Returns a list of symbols used by an ELF object's .dynsym section.
  * If filter is not NULL, only the symbol's returned true by the filter will be added.
  *
- * The return value is a doubly-linked list usable with the insque/remque functions.
- * The memory pointed to by 'data' is owned by the Elf* context. It is up to the
- * caller to free each list element.
+ * The memory pointed to by the list elements is owned by the Elf* context. The list
+ * itself should be freed with list_free(<list>, NULL) by the caller.
  */
 string_list_t * get_elf_imported_functions(Elf *elf, bool (*filter)(const char *))
 {
