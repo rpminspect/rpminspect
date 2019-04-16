@@ -41,7 +41,8 @@ librpminspect_la_CPPFLAGS = $(JSON_C_CFLAGS) \
                             $(RPM_CFLAGS) \
                             $(LIBARCHIVE_CFLAGS) \
                             $(LIBELF_CFLAGS) \
-                            $(LIBKMOD_CFLAGS)
+                            $(LIBKMOD_CFLAGS) \
+			    $(ZLIB_CFLAGS)
 librpminspect_la_LIBADD = $(JSON_C_LIBS) \
                           $(XMLRPC_LIBS) \
                           $(LIBXML_LIBS) \
@@ -49,6 +50,7 @@ librpminspect_la_LIBADD = $(JSON_C_LIBS) \
                           $(LIBARCHIVE_LIBS) \
                           $(LIBELF_LIBS) \
                           $(LIBKMOD_LIBS) \
+			  $(ZLIB_LIBS) \
                           $(LIBMANDOC_LIBS) \
                           $(INIPARSER_LIBS) \
                           $(DL_LIBS)
