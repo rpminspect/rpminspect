@@ -70,9 +70,10 @@ rpmfile_t * extract_rpm(const char *pkg, Header hdr)
     ENTRY *eptr;
     int *rpm_indices = NULL;
 
+    char *hardlinkpath = NULL;
     char *output_dir = NULL;
     struct archive *archive = NULL;
-    struct archive_entry *entry;
+    struct archive_entry *entry = NULL;
     const char *archive_path;
     mode_t archive_perm;
     int archive_result;
@@ -227,6 +228,13 @@ rpmfile_t * extract_rpm(const char *pkg, Header hdr)
         }
 
         archive_entry_set_perm(entry, archive_perm);
+
+        /* If this is a hard link, update the hardlink destination path */
+        if (archive_entry_nlink(entry) > 1) {
+            xasprintf(&hardlinkpath, "%s/%s", output_dir, archive_entry_hardlink(entry));
+            archive_entry_set_link(entry, hardlinkpath);
+            free(hardlinkpath);
+        }
 
         /* Write the file to disk */
         if (archive_read_extract(archive, entry, archive_flags) != ARCHIVE_OK) {
