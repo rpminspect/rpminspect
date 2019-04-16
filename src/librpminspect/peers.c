@@ -146,7 +146,9 @@ void add_peer(rpmpeer_t **peers, int whichbuild, const char *pkg, Header *hdr) {
         TAILQ_INSERT_TAIL(*peers, peer, items);
     }
 
-    find_file_peers(peer->before_files, peer->after_files);
+    if (peer->before_files && peer->after_files) {
+        find_file_peers(peer->before_files, peer->after_files);
+    }
 
     return;
 }

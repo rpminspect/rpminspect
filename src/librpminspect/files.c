@@ -398,6 +398,9 @@ void find_file_peers(rpmfile_t *before, rpmfile_t *after)
 
     int result = -1;
 
+    assert(before != NULL);
+    assert(after != NULL);
+
     /* Make sure there is something to match */
     if (TAILQ_EMPTY(before) || TAILQ_EMPTY(after)) {
         return;
