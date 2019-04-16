@@ -26,8 +26,8 @@ libtool
 ltmain.sh
 m4
 missing
-rpminspect
 rpminspect.spec
+src/rpminspect/rpminspect
 stamp-h1
 test-*.log
 test-*.trs
