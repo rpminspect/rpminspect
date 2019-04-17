@@ -70,6 +70,13 @@ else
     AC_MSG_ERROR([*** unable to find dlopen() in libdl])
 fi
 
+# Check for CUnit -- needed for unit tests
+PKG_CHECK_MODULES(CUNIT, [cunit], [found_cunit=1], [found_cunit=0])
+if test $found_cunit -eq 0; then
+    AC_MSG_WARN([WARNING: unable to find CUnit, disabling unit tests])
+fi
+AM_CONDITIONAL([HAVE_CUNIT], [test x$found_cunit = x1])
+
 AC_SUBST([JSON_C_CFLAGS])
 AC_SUBST([JSON_C_LIBS])
 AC_SUBST([XMLRPC_CFLAGS])
@@ -88,6 +95,8 @@ AC_SUBST([LIBCURL_CFLAGS])
 AC_SUBST([LIBCURL_LIBS])
 AC_SUBST([ZLIB_CFLAGS])
 AC_SUBST([ZLIB_LIBS])
+AC_SUBST([CUNIT_CFLAGS])
+AC_SUBST([CUNIT_LIBS])
 
 AC_CONFIG_FILES([Makefile
                  data/Makefile
@@ -99,6 +108,8 @@ AC_CONFIG_FILES([Makefile
                  data/version-whitelist/Makefile
                  src/Makefile
                  src/librpminspect/Makefile
-                 src/rpminspect/Makefile])
+                 src/rpminspect/Makefile
+                 tests/Makefile
+                 tests/librpminspect/Makefile])
 
 AC_OUTPUT

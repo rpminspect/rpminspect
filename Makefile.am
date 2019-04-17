@@ -2,7 +2,7 @@ ACLOCAL_AMFLAGS = -I m4
 CLEANFILES = rpminspect.spec *.src.rpm
 EXTRA_DIST = rpminspect.spec.in
 
-SUBDIRS = src data
+SUBDIRS = src data tests
 
 # Compute a date string suitable for RPM spec file changelogs
 RPMDATE = $(shell date +'%a %b %d %Y')
