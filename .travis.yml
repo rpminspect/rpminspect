@@ -1,0 +1,17 @@
+---
+language: c
+services:
+  - docker
+
+# Run everything in a Fedora container (created in before_install) so
+# that we're not fighting with deps on two distros
+env:
+  DOCKER_RUN="docker run -v $PWD:/rpminspect --workdir /rpminspect rpminspect/test-env"
+
+before_install:
+  - docker build -t rpminspect/test-env -f Dockerfile.test .
+
+script:
+  - $DOCKER_RUN ./autogen.sh
+  - $DOCKER_RUN ./configure
+  - $DOCKER_RUN make distcheck
