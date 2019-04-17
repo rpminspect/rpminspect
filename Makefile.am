@@ -1,3 +1,5 @@
+include $(top_srcdir)/aminclude_static.am
+
 ACLOCAL_AMFLAGS = -I m4
 CLEANFILES = rpminspect.spec *.src.rpm
 EXTRA_DIST = rpminspect.spec.in
@@ -14,3 +16,6 @@ rpminspect.spec: rpminspect.spec.in
 
 srpm: rpminspect.spec dist
 	rpmbuild -bs --nodeps --define "_sourcedir ." --define "_srcrpmdir ." --define "_rpmdir ." rpminspect.spec
+
+clean-local: code-coverage-clean
+distclean-local: code-coverage-dist-clean

@@ -13,5 +13,11 @@ before_install:
 
 script:
   - $DOCKER_RUN ./autogen.sh
-  - $DOCKER_RUN ./configure
+  - $DOCKER_RUN ./configure --enable-code-coverage
+  - $DOCKER_RUN make check-code-coverage
   - $DOCKER_RUN make distcheck
+
+after_success:
+  # This also needs to run from inside the container, so that gcov and gcc match
+  # The container needs some environment variables from the host, see https://docs.travis-ci.com/user/coveralls/
+  - docker run -v $PWD:/rpminspect --workdir /rpminspect -e TRAVIS_JOB_ID="$TRAVIS_JOB_ID" -e TRAVIS_BRANCH="$TRAVIS_BRANCH" rpminspect/test-env coveralls --exclude tests --gcov-options '\-lp'
