@@ -27,3 +27,9 @@ missing
 rpminspect
 rpminspect.spec
 stamp-h1
+test-*.log
+test-*.trs
+test-badwords
+test-driver
+test-koji
+test-suite.log
