@@ -1,3 +1,7 @@
+*-coverage
+*-coverage.info
+*.gcda
+*.gcno
 *.la
 *.lo
 *.o
@@ -9,6 +13,7 @@
 Makefile
 Makefile.in
 aclocal.m4
+aminclude_static.am
 autom4te.cache
 compile
 config.guess
@@ -24,7 +29,8 @@ inspect_elf_bits.c
 install-sh
 libtool
 ltmain.sh
-m4
+m4/libtool.m4
+m4/lt*.m4
 missing
 rpminspect.spec
 src/rpminspect/rpminspect
