@@ -31,5 +31,9 @@ elftest_execstack_LDFLAGS = -no-install
 elftest_noexecstack_SOURCES = elftest.c
 elftest_noexecstack_CFLAGS = -z noexecstack -z relro
 elftest_noexecstack_LDFLAGS = -no-install
+else
+
+check-local:
+	echo "*** CUnit is required to run the tests"; exit 1
 
 endif
