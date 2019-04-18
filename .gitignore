@@ -18,6 +18,8 @@ config.status
 config.sub
 configure
 depcomp
+elftest-execstack
+elftest-noexecstack
 inspect_elf_bits.c
 install-sh
 libtool
@@ -31,7 +33,10 @@ test-*.log
 test-*.trs
 test-badwords
 test-driver
+test-free
+test-init
+test-inspect_elf
 test-koji
-test-suite.log
 test-strfuncs
+test-suite.log
 test-tty
