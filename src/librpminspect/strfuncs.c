@@ -102,6 +102,7 @@ int printwrap(const char *s, const size_t width, const unsigned int indent, FILE
     bool first = false;
     bool begin = false;
     size_t lw = 0;
+    size_t lastlw = 0;
     char *start = NULL;
     char *str = NULL;
     char *word = NULL;
@@ -123,6 +124,12 @@ int printwrap(const char *s, const size_t width, const unsigned int indent, FILE
         } else if (isspace(*str)) {
             *str = '\0';
             lw = _printword(word, width, indent, lw, first, dest);
+
+            if (lw < lastlw) {
+                lines++;
+            }
+
+            lastlw = lw;
             str++;
             word = str;
             first = false;
@@ -133,7 +140,10 @@ int printwrap(const char *s, const size_t width, const unsigned int indent, FILE
     }
 
     /* print the last word */
-    _printword(word, width, indent, lw, first, dest);
+    lw = _printword(word, width, indent, lw, first, dest);
+    if (lw < lastlw) {
+        lines++;
+    }
 
     free(start);
     return lines;
