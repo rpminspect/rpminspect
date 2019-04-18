@@ -7,7 +7,8 @@ check_PROGRAMS = test-badwords \
                  test-tty \
                  test-strfuncs \
                  test-free \
-                 test-init
+                 test-init \
+                 test-inspect_elf
 
 CFLAGS += -I$(top_srcdir)/src/librpminspect
 LDADD = $(top_builddir)/src/librpminspect/librpminspect.la $(CUNIT_LIBS)
@@ -18,4 +19,17 @@ test_tty_SOURCES = test-tty.c
 test_strfuncs_SOURCES = test-strfuncs.c
 test_free_SOURCES = test-free.c
 test_init_SOURCES = test-init.c
+test_inspect_elf_SOURCES = test-inspect_elf.c
+
+# Used by the inspect_elf tests
+noinst_PROGRAMS = elftest-execstack elftest-noexecstack
+
+elftest_execstack_SOURCES = elftest.c
+elftest_execstack_CFLAGS = -z execstack -z relro
+elftest_execstack_LDFLAGS = -no-install
+
+elftest_noexecstack_SOURCES = elftest.c
+elftest_noexecstack_CFLAGS = -z noexecstack -z relro
+elftest_noexecstack_LDFLAGS = -no-install
+
 endif
