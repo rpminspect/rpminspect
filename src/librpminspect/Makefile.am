@@ -9,7 +9,6 @@ librpminspect_HEADERS = constants.h \
 
 lib_LTLIBRARIES = librpminspect.la
 librpminspect_la_SOURCES = badwords.c \
-                           compression.c \
                            copyfile.c \
                            files.c \
                            free.c \

@@ -54,9 +54,6 @@ enum { BEFORE_BUILD, AFTER_BUILD };
 
 /* Common functions */
 
-/* compression.c */
-int inflate_data(const char *, size_t, char **, size_t *);
-
 /* init.c */
 int init_rpminspect(struct rpminspect *, const char *);
 
