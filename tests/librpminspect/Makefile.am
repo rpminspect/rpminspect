@@ -5,7 +5,9 @@ TESTS = $(check_PROGRAMS)
 check_PROGRAMS = test-badwords \
                  test-koji \
                  test-tty \
-                 test-strfuncs
+                 test-strfuncs \
+                 test-free \
+                 test-init
 
 CFLAGS += -I$(top_srcdir)/src/librpminspect
 LDADD = $(top_builddir)/src/librpminspect/librpminspect.la $(CUNIT_LIBS)
@@ -14,4 +16,6 @@ test_badwords_SOURCES = test-badwords.c
 test_koji_SOURCES = test-koji.c
 test_tty_SOURCES = test-tty.c
 test_strfuncs_SOURCES = test-strfuncs.c
+test_free_SOURCES = test-free.c
+test_init_SOURCES = test-init.c
 endif
