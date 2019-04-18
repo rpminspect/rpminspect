@@ -33,4 +33,5 @@ test-badwords
 test-driver
 test-koji
 test-suite.log
+test-strfuncs
 test-tty
