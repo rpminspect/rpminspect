@@ -25,6 +25,12 @@
 
 #define LOREM_IPSUM "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur."
 
+#define ASSERT_AND_FREE(expr, expected) {\
+    char *actual = (expr);\
+    RI_ASSERT_STRING_EQUAL(actual, expected);\
+    free(actual);\
+}
+
 int init_test_strfuncs(void) {
     return 0;
 }
@@ -68,6 +74,16 @@ void test_strwaiverauth(void) {
     RI_ASSERT_EQUAL(strcmp(strwaiverauth(-1), "UnKnOwN"), 0);
 }
 
+void test_strreplace(void) {
+    ASSERT_AND_FREE(strreplace("", "", ""), "");
+    ASSERT_AND_FREE(strreplace("start match", "start", "replace"), "replace match");
+    ASSERT_AND_FREE(strreplace("match end", "end", "replace"), "match replace");
+    ASSERT_AND_FREE(strreplace("match middle of string", "middle", "replace"), "match replace of string");
+    ASSERT_AND_FREE(strreplace("no match", "nothing", "replace"), "no match");
+    ASSERT_AND_FREE(strreplace("match several substrings in several places", "a", "replace"),
+            "mreplacetch severreplacel substrings in severreplacel plreplaceces");
+}
+
 CU_pSuite get_suite(void) {
     CU_pSuite pSuite = NULL;
 
@@ -82,7 +98,8 @@ CU_pSuite get_suite(void) {
         CU_add_test(pSuite, "test strsuffix()", test_strsuffix) == NULL ||
         CU_add_test(pSuite, "test printwrap()", test_printwrap) == NULL ||
         CU_add_test(pSuite, "test strseverity()", test_strseverity) == NULL ||
-        CU_add_test(pSuite, "test strwaiverauth()", test_strwaiverauth) == NULL) {
+        CU_add_test(pSuite, "test strwaiverauth()", test_strwaiverauth) == NULL ||
+        CU_add_test(pSuite, "test strreplace()", test_strreplace) == NULL) {
         return NULL;
     }
 

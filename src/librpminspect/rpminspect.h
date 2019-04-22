@@ -97,6 +97,7 @@ int printwrap(const char *, const size_t, const unsigned int, FILE *);
 bool versioned_match(const char *, Header, const char *, Header);
 char *strseverity(const severity_t);
 char *strwaiverauth(const waiverauth_t);
+char *strreplace(const char *, const char *, const char *);
 
 /* badwords.c */
 bool has_bad_word(const char *, const string_list_t *);

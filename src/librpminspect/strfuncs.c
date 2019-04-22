@@ -275,3 +275,58 @@ char *strwaiverauth(const waiverauth_t waiverauth) {
 
     return NULL;
 }
+
+/*
+ * Given a string s, find the substring "find", and return a newly allocated string
+ * with "find" replaced with "replace".
+ *
+ * Replaces all matches.
+ *
+ */
+char * strreplace(const char *s, const char *find, const char *replace)
+{
+    const char *find_start;
+    size_t find_len;
+    const char *remainder;
+    char *tmp;
+    char *result = NULL;
+
+    assert(s);
+    assert(find);
+    assert(replace);
+
+    find_len = strlen(find);
+    remainder = s;
+
+    while (*remainder != '\0') {
+        find_start = strstr(remainder, find);
+
+        /* No more instances of find, concat the rest of the string on to the result and finish */
+        if (find_start == NULL) {
+            xasprintf(&tmp, "%s%s", result ? result : "", remainder);
+            free(result);
+            result = tmp;
+
+            break;
+        } else {
+            /* Print the string up to the start of the match, then the "replace" string.
+             * Reset remainder to the end of the match.
+             */
+            xasprintf(&tmp, "%s%.*s%s", result ? result : "", (int) (find_start - remainder), remainder, replace);
+            free(result);
+            result = tmp;
+
+            remainder = find_start + find_len;
+        }
+    }
+
+    /* result could be NULL at this point if the input was an empty string. In that case,
+     * just allocate a new empty string
+     */
+    if (result == NULL) {
+        result = strdup(s);
+        assert(result != NULL);
+    }
+
+    return result;
+}
