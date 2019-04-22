@@ -54,19 +54,13 @@ void test_free_koji_rpmlist(void) {
     CU_ASSERT_PTR_NULL(list);
 }
 
-int main(void) {
+CU_pSuite get_suite(void) {
     CU_pSuite pSuite = NULL;
-
-    /* initialize this test registry */
-    if (CU_initialize_registry() != CUE_SUCCESS) {
-        return CU_get_error();
-    }
 
     /* add a suite to the registry */
     pSuite = CU_add_suite("koji", init_test_koji, clean_test_koji);
     if (pSuite == NULL) {
-        CU_cleanup_registry();
-        return CU_get_error();
+        return NULL;
     }
 
     /* add tests to the suite */
@@ -74,13 +68,8 @@ int main(void) {
         CU_add_test(pSuite, "test free_koji_build()", test_free_koji_build) == NULL ||
         CU_add_test(pSuite, "test init_koji_rpmlist()", test_init_koji_rpmlist) == NULL ||
         CU_add_test(pSuite, "test free_koji_rpmlist()", test_free_koji_rpmlist) == NULL) {
-        CU_cleanup_registry();
-        return CU_get_error();
+        return NULL;
     }
 
-    /* run all tests using the CUnit basic interface */
-    CU_basic_set_mode(CU_BRM_VERBOSE);
-    CU_basic_run_tests();
-    CU_cleanup_registry();
-    return CU_get_error();
+    return pSuite;
 }

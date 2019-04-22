@@ -81,30 +81,19 @@ void test_has_bad_word(void) {
     CU_ASSERT(has_bad_word("supermonkeyball", forbidden_words) == false);
 }
 
-int main(void) {
+CU_pSuite get_suite(void) {
     CU_pSuite pSuite = NULL;
-
-    /* initialize this test registry */
-    if (CU_initialize_registry() != CUE_SUCCESS) {
-        return CU_get_error();
-    }
 
     /* add a suite to the registry */
     pSuite = CU_add_suite("badwords", init_test_badwords, clean_test_badwords);
     if (pSuite == NULL) {
-        CU_cleanup_registry();
-        return CU_get_error();
+        return NULL;
     }
 
     /* add tests to the suite */
     if (CU_add_test(pSuite, "test has_bad_word()", test_has_bad_word) == NULL) {
-        CU_cleanup_registry();
-        return CU_get_error();
+        return NULL;
     }
 
-    /* run all tests using the CUnit basic interface */
-    CU_basic_set_mode(CU_BRM_VERBOSE);
-    CU_basic_run_tests();
-    CU_cleanup_registry();
-    return CU_get_error();
+    return pSuite;
 }

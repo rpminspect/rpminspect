@@ -167,19 +167,13 @@ void test_is_pic_ok(void) {
     return;
 }
 
-int main(void) {
+CU_pSuite get_suite(void) {
     CU_pSuite pSuite = NULL;
-
-    /* initialize this test registry */
-    if (CU_initialize_registry() != CUE_SUCCESS) {
-        return CU_get_error();
-    }
 
     /* add a suite to the registry */
     pSuite = CU_add_suite("inspect_elf", init_test_inspect_elf, clean_test_inspect_elf);
     if (pSuite == NULL) {
-        CU_cleanup_registry();
-        return CU_get_error();
+        return NULL;
     }
 
     /* add tests to the suite */
@@ -196,13 +190,8 @@ int main(void) {
         CU_add_test(pSuite, "test get_fortified_symbols()", test_get_fortified_symbols) == NULL ||
         CU_add_test(pSuite, "test get_fortifiable_symbols()", test_get_fortifiable_symbols) == NULL ||
         CU_add_test(pSuite, "test is_pic_ok()", test_is_pic_ok) == NULL) {
-        CU_cleanup_registry();
-        return CU_get_error();
+        return NULL;
     }
 
-    /* run all tests using the CUnit basic interface */
-    CU_basic_set_mode(CU_BRM_VERBOSE);
-    CU_basic_run_tests();
-    CU_cleanup_registry();
-    return CU_get_error();
+    return pSuite;
 }
