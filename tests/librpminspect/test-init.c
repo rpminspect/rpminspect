@@ -35,30 +35,19 @@ void test_init_rpminspect(void) {
     return;
 }
 
-int main(void) {
+CU_pSuite get_suite(void) {
     CU_pSuite pSuite = NULL;
-
-    /* initialize this test registry */
-    if (CU_initialize_registry() != CUE_SUCCESS) {
-        return CU_get_error();
-    }
 
     /* add a suite to the registry */
     pSuite = CU_add_suite("init", init_test_init, clean_test_init);
     if (pSuite == NULL) {
-        CU_cleanup_registry();
-        return CU_get_error();
+        return NULL;
     }
 
     /* add tests to the suite */
     if (CU_add_test(pSuite, "test init_rpminspect()", test_init_rpminspect) == NULL) {
-        CU_cleanup_registry();
-        return CU_get_error();
+        return NULL;
     }
 
-    /* run all tests using the CUnit basic interface */
-    CU_basic_set_mode(CU_BRM_VERBOSE);
-    CU_basic_run_tests();
-    CU_cleanup_registry();
-    return CU_get_error();
+    return pSuite;
 }

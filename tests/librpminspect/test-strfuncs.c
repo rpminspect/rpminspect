@@ -64,19 +64,13 @@ void test_strwaiverauth(void) {
     CU_ASSERT_EQUAL(strcmp(strwaiverauth(-1), "UnKnOwN"), 0);
 }
 
-int main(void) {
+CU_pSuite get_suite(void) {
     CU_pSuite pSuite = NULL;
-
-    /* initialize this test registry */
-    if (CU_initialize_registry() != CUE_SUCCESS) {
-        return CU_get_error();
-    }
 
     /* add a suite to the registry */
     pSuite = CU_add_suite("strfuncs", init_test_strfuncs, clean_test_strfuncs);
     if (pSuite == NULL) {
-        CU_cleanup_registry();
-        return CU_get_error();
+        return NULL;
     }
 
     /* add tests to the suite */
@@ -85,13 +79,8 @@ int main(void) {
         CU_add_test(pSuite, "test printwrap()", test_printwrap) == NULL ||
         CU_add_test(pSuite, "test strseverity()", test_strseverity) == NULL ||
         CU_add_test(pSuite, "test strwaiverauth()", test_strwaiverauth) == NULL) {
-        CU_cleanup_registry();
-        return CU_get_error();
+        return NULL;
     }
 
-    /* run all tests using the CUnit basic interface */
-    CU_basic_set_mode(CU_BRM_VERBOSE);
-    CU_basic_run_tests();
-    CU_cleanup_registry();
-    return CU_get_error();
+    return pSuite;
 }
