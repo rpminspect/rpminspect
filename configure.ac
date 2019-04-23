@@ -11,6 +11,10 @@ AC_CONFIG_MACRO_DIRS([m4])
 # Generate code coverage targets
 AX_CODE_COVERAGE
 
+# Add valgrind check targets
+AX_VALGRIND_DFLT([sgcheck], [off])
+AX_VALGRIND_CHECK
+
 # Checks for programs.
 AC_PROG_CC
 AC_PROG_CPP
