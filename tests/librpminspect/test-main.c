@@ -33,11 +33,16 @@ int main(void)
 {
     CU_pSuite pSuite;
     unsigned int failures;
+    unsigned int tests_run;
+    unsigned int tests_skipped;
 
     if (CU_initialize_registry() != CUE_SUCCESS) {
         fprintf(stderr, "*** Unable to initialize test registry: %s\n", CU_get_error_msg());
         return EXIT_HARD_ERROR;
     }
+
+    /* Don't fail on inactive tests */
+    CU_set_fail_on_inactive(CU_FALSE);
 
     pSuite = get_suite();
     if (pSuite == NULL) {
@@ -55,8 +60,20 @@ int main(void)
     }
 
     failures = CU_get_number_of_tests_failed();
+    tests_run = CU_get_number_of_tests_run();
+    tests_skipped = CU_get_number_of_tests_inactive();
 
     CU_cleanup_registry();
 
-    return (failures == 0) ? EXIT_SUCCESS : EXIT_FAILURE;
+    /* If any tests failed, return failure */
+    if (failures > 0) {
+        return EXIT_FAILURE;
+    }
+
+    /* If all tests were skipped, return EXIT_SKIP */
+    if ((tests_run == 0) && (tests_skipped > 0)) {
+        return EXIT_SKIP;
+    }
+
+    return EXIT_SUCCESS;
 }
