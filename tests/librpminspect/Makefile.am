@@ -1,5 +1,9 @@
 # Only perform unit tests if we have CUnit available
 if HAVE_CUNIT
+
+# Add the check-valgrind target
+@VALGRIND_CHECK_RULES@
+
 TESTS = $(check_PROGRAMS)
 
 check_PROGRAMS = test-badwords \
