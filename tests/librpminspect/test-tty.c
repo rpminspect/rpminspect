@@ -16,6 +16,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+#include <unistd.h>
 #include <CUnit/Basic.h>
 #include "rpminspect.h"
 
@@ -35,6 +36,7 @@ void test_tty_width(void) {
 
 CU_pSuite get_suite(void) {
     CU_pSuite pSuite = NULL;
+    CU_pTest pTtyWidthTest = NULL;
 
     /* add a suite to the registry */
     pSuite = CU_add_suite("tty", init_test_tty, clean_test_tty);
@@ -43,8 +45,13 @@ CU_pSuite get_suite(void) {
     }
 
     /* add tests to the suite */
-    if (CU_add_test(pSuite, "test tty_width()", test_tty_width) == NULL) {
+    if ((pTtyWidthTest = CU_add_test(pSuite, "test tty_width()", test_tty_width)) == NULL) {
         return NULL;
+    }
+
+    /* Only run the tty_width test if we have a tty */
+    if (!isatty(STDIN_FILENO)) {
+        CU_set_test_active(pTtyWidthTest, CU_FALSE);
     }
 
     return pSuite;
