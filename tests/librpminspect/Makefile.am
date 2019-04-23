@@ -6,7 +6,6 @@ check_PROGRAMS = test-badwords \
                  test-koji \
                  test-tty \
                  test-strfuncs \
-                 test-free \
                  test-init \
                  test-inspect_elf
 
@@ -17,7 +16,6 @@ test_badwords_SOURCES = test-badwords.c test-main.c
 test_koji_SOURCES = test-koji.c test-main.c
 test_tty_SOURCES = test-tty.c test-main.c
 test_strfuncs_SOURCES = test-strfuncs.c test-main.c
-test_free_SOURCES = test-free.c test-main.c
 test_init_SOURCES = test-init.c test-main.c
 test_inspect_elf_SOURCES = test-inspect_elf.c test-main.c
 

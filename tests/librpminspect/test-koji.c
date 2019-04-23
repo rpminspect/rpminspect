@@ -37,21 +37,9 @@ void test_init_koji_build(void) {
     CU_ASSERT_PTR_NOT_NULL(build);
 }
 
-void test_free_koji_build(void) {
-    CU_ASSERT_PTR_NOT_NULL(build);
-    free_koji_build(build);
-    CU_ASSERT_PTR_NULL(build);
-}
-
 void test_init_koji_rpmlist(void) {
     list = init_koji_rpmlist();
     CU_ASSERT_PTR_NOT_NULL(list);
-}
-
-void test_free_koji_rpmlist(void) {
-    CU_ASSERT_PTR_NOT_NULL(list);
-    free_koji_rpmlist(list);
-    CU_ASSERT_PTR_NULL(list);
 }
 
 CU_pSuite get_suite(void) {
@@ -65,9 +53,7 @@ CU_pSuite get_suite(void) {
 
     /* add tests to the suite */
     if (CU_add_test(pSuite, "test init_koji_build()", test_init_koji_build) == NULL ||
-        CU_add_test(pSuite, "test free_koji_build()", test_free_koji_build) == NULL ||
-        CU_add_test(pSuite, "test init_koji_rpmlist()", test_init_koji_rpmlist) == NULL ||
-        CU_add_test(pSuite, "test free_koji_rpmlist()", test_free_koji_rpmlist) == NULL) {
+        CU_add_test(pSuite, "test init_koji_rpmlist()", test_init_koji_rpmlist) == NULL) {
         return NULL;
     }
 
