@@ -18,6 +18,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <elf.h>
 #include <CUnit/Basic.h>
 #include "rpminspect.h"
 
@@ -59,7 +60,7 @@ void test_is_execstack_present(void) {
     elf = elf_begin(fd, ELF_C_READ_MMAP_PRIVATE, NULL);
     CU_ASSERT_PTR_NOT_NULL(elf);
 
-    CU_ASSERT_FALSE(is_execstack_present(elf));
+    CU_ASSERT_TRUE(is_execstack_present(elf));
 
     CU_ASSERT_EQUAL(elf_end(elf), 0);
     CU_ASSERT_EQUAL(close(fd), 0);
@@ -78,7 +79,7 @@ void test_get_execstack_flags(void) {
     elf = elf_begin(fd, ELF_C_READ_MMAP_PRIVATE, NULL);
     CU_ASSERT_PTR_NOT_NULL(elf);
 
-    CU_ASSERT_NOT_EQUAL(get_execstack_flags(elf), 0);
+    CU_ASSERT_EQUAL(get_execstack_flags(elf), PF_X|PF_W|PF_R);
 
     CU_ASSERT_EQUAL(elf_end(elf), 0);
     CU_ASSERT_EQUAL(close(fd), 0);
@@ -90,7 +91,7 @@ void test_get_execstack_flags(void) {
     elf = elf_begin(fd, ELF_C_READ_MMAP_PRIVATE, NULL);
     CU_ASSERT_PTR_NOT_NULL(elf);
 
-    CU_ASSERT_EQUAL(get_execstack_flags(elf), 0);
+    CU_ASSERT_EQUAL(get_execstack_flags(elf), PF_W|PF_R);
 
     CU_ASSERT_EQUAL(elf_end(elf), 0);
     CU_ASSERT_EQUAL(close(fd), 0);
