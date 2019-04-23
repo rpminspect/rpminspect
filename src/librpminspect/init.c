@@ -87,7 +87,7 @@ int init_rpminspect(struct rpminspect *ri, const char *cfgfile) {
     }
 
     /* In case we have a missing configuration file, defaults all the way */
-    if (access(ri->cfgfile, F_OK|R_OK)) {
+    if ((ri->cfgfile == NULL) || access(ri->cfgfile, F_OK|R_OK)) {
         free(ri->cfgfile);
         ri->cfgfile = NULL;
 
