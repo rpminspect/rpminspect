@@ -57,7 +57,7 @@
 #define REMEDY_ELF_FPIC                 "Ensure all object files are compiled with -fPIC"
 
 /* man */
-#define REMEDY_MAN_ERRORS   "Correct the errors in the manpage as reported by the libmandoc parser"
+#define REMEDY_MAN_ERRORS   "Correct the errors in the man page as reported by the libmandoc parser."
 #define REMEDY_MAN_PATH     "Correct the installation path for the man page. Man pages must be installed in the directory beneath /usr/share/man that matches the section number of the page."
 
 /* xml */

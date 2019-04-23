@@ -91,7 +91,7 @@ bool inspect_xml(struct rpminspect *);
 bool inspect_manpage_alloc(void);
 void inspect_manpage_free(void);
 bool inspect_manpage_path(const char *);
-char * inspect_manpage_validity(const char *);
+char * inspect_manpage_validity(const char *, const char *);
 bool inspect_manpage(struct rpminspect *);
 
 /* inspect_metadata.c */

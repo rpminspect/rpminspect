@@ -1,6 +1,7 @@
 /*
  * Copyright (C) 2019  Red Hat, Inc.
  * Author(s):  David Shea <dshea@redhat.com>
+ *             David Cantrell <dcantrell@redhat.com>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -126,7 +127,7 @@ bool inspect_manpage_path(const char *path)
  * Returns NULL on success, otherwise returns an error message as a string.
  * The returned string is statically allocated.
  */
-char * inspect_manpage_validity(const char *path)
+char * inspect_manpage_validity(const char *path, const char *localpath)
 {
     struct mparse *parser;
     int fd = -1;
@@ -153,7 +154,7 @@ char * inspect_manpage_validity(const char *path)
     assert(error_stream != NULL);
 
     /* Allocate a new manpage parsing context */
-    parser = mparse_alloc(MPARSE_MAN | MPARSE_SO | MPARSE_UTF8 | MPARSE_LATIN1,
+    parser = mparse_alloc(MPARSE_MAN | MPARSE_UTF8 | MPARSE_LATIN1,
             MANDOCERR_ERROR, error_handler, MANDOC_OS_OTHER, NULL);
     assert(parser != NULL);
 
@@ -175,7 +176,7 @@ char * inspect_manpage_validity(const char *path)
         }
 
         if (magic[0] != '\x1F' || magic[1] != '\x8B') {
-            fprintf(error_stream, "manpage with .gz suffix is not really gzipped\n");
+            fprintf(error_stream, "man page with .gz suffix is not really compressed with gzip\n");
         }
 
         /* Reset the fd and continue */
@@ -199,7 +200,7 @@ char * inspect_manpage_validity(const char *path)
     /* Check for validation errors */
     mparse_updaterc(parser, &result);
     if (result > MANDOCLEVEL_OK) {
-        fprintf(error_stream, "Errors found validating %s\n", path);
+        fprintf(error_stream, "Errors found validating %s\n", (localpath == NULL) ? path : localpath);
     }
 
 end:
@@ -245,8 +246,8 @@ static bool _manpage_driver(struct rpminspect *ri, rpmfile_entry_t *file)
 
     arch = headerGetString(file->rpm_header, RPMTAG_ARCH);
 
-    if ((manpage_errors = inspect_manpage_validity(file->fullpath)) != NULL) {
-        xasprintf(&msg, "Manpage checker reported problems with %s on %s", localpath, arch);
+    if ((manpage_errors = inspect_manpage_validity(file->fullpath, localpath)) != NULL) {
+        xasprintf(&msg, "Man page checker reported problems with %s on %s", localpath, arch);
 
         add_result(&ri->results, RESULT_VERIFY, WAIVABLE_BY_ANYONE, HEADER_MAN, msg, manpage_errors, REMEDY_MAN_ERRORS);
 
