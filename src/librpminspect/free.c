@@ -38,8 +38,6 @@ static void _free_regex(regex_t *regex)
  * librpminspect before they exit.
  */
 void free_rpminspect(struct rpminspect *ri) {
-    string_entry_t *s = NULL;
-
     if (ri == NULL) {
         return;
     }
@@ -51,14 +49,7 @@ void free_rpminspect(struct rpminspect *ri) {
     free(ri->kojidownload);
     free(ri->worksubdir);
 
-    if (ri->badwords != NULL) {
-        while (!TAILQ_EMPTY(ri->badwords)) {
-            s = TAILQ_FIRST(ri->badwords);
-            TAILQ_REMOVE(ri->badwords, s, items);
-            free(s->data);
-            s->data = NULL;
-        }
-    }
+    list_free(ri->badwords, free);
 
     _free_regex(ri->elf_path_include);
     _free_regex(ri->elf_path_exclude);
