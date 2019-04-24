@@ -319,7 +319,7 @@ bool process_file_path(const rpmfile_entry_t *file, regex_t *include_regex, rege
  * The keys and values use the same pointers as the rpmfile_entry_t and should not
  * be separately freed. The hash table itself must be hdestroy_r'd and freed by the caller.
  */
-struct hsearch_data * _files_to_table(rpmfile_t *list)
+static struct hsearch_data * _files_to_table(rpmfile_t *list)
 {
     struct hsearch_data *table;
     ENTRY e;
@@ -376,7 +376,7 @@ struct hsearch_data * _files_to_table(rpmfile_t *list)
  * tests to match peers, this means that attempts must be made in order from
  * best match to worst match.
  */
-void _find_one_peer(rpmfile_entry_t *file, struct hsearch_data *after_table)
+static void _find_one_peer(rpmfile_entry_t *file, struct hsearch_data *after_table)
 {
     rpmfile_entry_t *peer;
     ENTRY e;
