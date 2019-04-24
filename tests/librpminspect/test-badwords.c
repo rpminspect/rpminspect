@@ -23,6 +23,8 @@
 #include <CUnit/Basic.h>
 #include "rpminspect.h"
 
+#include "test-main.h"
+
 string_list_t *forbidden_words = NULL;
 
 int init_test_badwords(void) {
@@ -73,14 +75,14 @@ int clean_test_badwords(void) {
 }
 
 void test_has_bad_word(void) {
-    CU_ASSERT(has_bad_word("foo", forbidden_words) == true);
-    CU_ASSERT(has_bad_word("bar", forbidden_words) == true);
-    CU_ASSERT(has_bad_word("baz", forbidden_words) == true);
-    CU_ASSERT(has_bad_word("qux", forbidden_words) == true);
-    CU_ASSERT(has_bad_word("flargenblarfle", forbidden_words) == false);
-    CU_ASSERT(has_bad_word("cocacola", forbidden_words) == false);
-    CU_ASSERT(has_bad_word("suse", forbidden_words) == false);
-    CU_ASSERT(has_bad_word("supermonkeyball", forbidden_words) == false);
+    RI_ASSERT(has_bad_word("foo", forbidden_words) == true);
+    RI_ASSERT(has_bad_word("bar", forbidden_words) == true);
+    RI_ASSERT(has_bad_word("baz", forbidden_words) == true);
+    RI_ASSERT(has_bad_word("qux", forbidden_words) == true);
+    RI_ASSERT(has_bad_word("flargenblarfle", forbidden_words) == false);
+    RI_ASSERT(has_bad_word("cocacola", forbidden_words) == false);
+    RI_ASSERT(has_bad_word("suse", forbidden_words) == false);
+    RI_ASSERT(has_bad_word("supermonkeyball", forbidden_words) == false);
 }
 
 CU_pSuite get_suite(void) {

@@ -22,6 +22,8 @@
 #include <CUnit/Basic.h>
 #include "rpminspect.h"
 
+#include "test-main.h"
+
 int init_test_tty(void) {
     return 0;
 }
@@ -33,7 +35,7 @@ int clean_test_tty(void) {
 void test_tty_width(void) {
     size_t w;
     w = tty_width();
-    CU_ASSERT(w > 0);
+    RI_ASSERT(w > 0);
 }
 
 CU_pSuite get_suite(void) {

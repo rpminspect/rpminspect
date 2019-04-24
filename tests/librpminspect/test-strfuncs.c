@@ -21,6 +21,8 @@
 #include <CUnit/Basic.h>
 #include "rpminspect.h"
 
+#include "test-main.h"
+
 #define LOREM_IPSUM "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur."
 
 int init_test_strfuncs(void) {
@@ -32,38 +34,38 @@ int clean_test_strfuncs(void) {
 }
 
 void test_strprefix(void) {
-    CU_ASSERT_TRUE(strprefix("flargenblarfle", "flarg"));
-    CU_ASSERT_FALSE(strprefix("flargenblarfle", "monkey"));
+    RI_ASSERT_TRUE(strprefix("flargenblarfle", "flarg"));
+    RI_ASSERT_FALSE(strprefix("flargenblarfle", "monkey"));
 }
 
 void test_strsuffix(void) {
-    CU_ASSERT_TRUE(strsuffix("flargenblarfle", "blarfle"));
-    CU_ASSERT_FALSE(strsuffix("flargenblarfle", "monkey"));
+    RI_ASSERT_TRUE(strsuffix("flargenblarfle", "blarfle"));
+    RI_ASSERT_FALSE(strsuffix("flargenblarfle", "monkey"));
 }
 
 void test_printwrap(void) {
     FILE *output = fopen("/dev/null", "w+");
 
-    CU_ASSERT_PTR_NOT_NULL(output);
-    CU_ASSERT_EQUAL(printwrap(LOREM_IPSUM, 40, 0, output), 8);
-    CU_ASSERT_EQUAL(fclose(output), 0);
+    RI_ASSERT_PTR_NOT_NULL(output);
+    RI_ASSERT_EQUAL(printwrap(LOREM_IPSUM, 40, 0, output), 8);
+    RI_ASSERT_EQUAL(fclose(output), 0);
 }
 
 void test_strseverity(void) {
-    CU_ASSERT_EQUAL(strcmp(strseverity(RESULT_OK), "OK"), 0);
-    CU_ASSERT_EQUAL(strcmp(strseverity(RESULT_INFO), "INFO"), 0);
-    CU_ASSERT_EQUAL(strcmp(strseverity(RESULT_WAIVED), "WAIVED"), 0);
-    CU_ASSERT_EQUAL(strcmp(strseverity(RESULT_VERIFY), "VERIFY"), 0);
-    CU_ASSERT_EQUAL(strcmp(strseverity(RESULT_BAD), "BAD"), 0);
-    CU_ASSERT_EQUAL(strcmp(strseverity(-1), "UnKnOwN"), 0);
+    RI_ASSERT_EQUAL(strcmp(strseverity(RESULT_OK), "OK"), 0);
+    RI_ASSERT_EQUAL(strcmp(strseverity(RESULT_INFO), "INFO"), 0);
+    RI_ASSERT_EQUAL(strcmp(strseverity(RESULT_WAIVED), "WAIVED"), 0);
+    RI_ASSERT_EQUAL(strcmp(strseverity(RESULT_VERIFY), "VERIFY"), 0);
+    RI_ASSERT_EQUAL(strcmp(strseverity(RESULT_BAD), "BAD"), 0);
+    RI_ASSERT_EQUAL(strcmp(strseverity(-1), "UnKnOwN"), 0);
 }
 
 void test_strwaiverauth(void) {
-    CU_ASSERT_EQUAL(strcmp(strwaiverauth(NOT_WAIVABLE), "Not Waivable"), 0);
-    CU_ASSERT_EQUAL(strcmp(strwaiverauth(WAIVABLE_BY_ANYONE), "Anyone"), 0);
-    CU_ASSERT_EQUAL(strcmp(strwaiverauth(WAIVABLE_BY_SECURITY), "Security"), 0);
-    CU_ASSERT_EQUAL(strcmp(strwaiverauth(WAIVABLE_BY_RELENG), "Release Engineering"), 0);
-    CU_ASSERT_EQUAL(strcmp(strwaiverauth(-1), "UnKnOwN"), 0);
+    RI_ASSERT_EQUAL(strcmp(strwaiverauth(NOT_WAIVABLE), "Not Waivable"), 0);
+    RI_ASSERT_EQUAL(strcmp(strwaiverauth(WAIVABLE_BY_ANYONE), "Anyone"), 0);
+    RI_ASSERT_EQUAL(strcmp(strwaiverauth(WAIVABLE_BY_SECURITY), "Security"), 0);
+    RI_ASSERT_EQUAL(strcmp(strwaiverauth(WAIVABLE_BY_RELENG), "Release Engineering"), 0);
+    RI_ASSERT_EQUAL(strcmp(strwaiverauth(-1), "UnKnOwN"), 0);
 }
 
 CU_pSuite get_suite(void) {

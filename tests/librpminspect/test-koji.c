@@ -21,6 +21,8 @@
 #include <CUnit/Basic.h>
 #include "rpminspect.h"
 
+#include "test-main.h"
+
 struct koji_build *build = NULL;
 koji_rpmlist_t *list = NULL;
 
@@ -34,14 +36,14 @@ int clean_test_koji(void) {
 
 void test_init_koji_build(void) {
     build = calloc(1, sizeof(*build));
-    CU_ASSERT_PTR_NOT_NULL(build);
+    RI_ASSERT_PTR_NOT_NULL(build);
     init_koji_build(build);
-    CU_ASSERT_PTR_NOT_NULL(build);
+    RI_ASSERT_PTR_NOT_NULL(build);
 }
 
 void test_init_koji_rpmlist(void) {
     list = init_koji_rpmlist();
-    CU_ASSERT_PTR_NOT_NULL(list);
+    RI_ASSERT_PTR_NOT_NULL(list);
 }
 
 CU_pSuite get_suite(void) {
