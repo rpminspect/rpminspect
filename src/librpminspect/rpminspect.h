@@ -42,9 +42,12 @@ extern struct inspect inspections[];
 extern struct format formats[];
 
 /* Macros */
-#define xasprintf(dest, ...)                     \
+#define xasprintf(dest, ...) {                   \
+    int _xasprintf_result;                       \
     *(dest) = NULL;                              \
-    assert(asprintf((dest), __VA_ARGS__) != -1);
+    _xasprintf_result = asprintf((dest), __VA_ARGS__);\
+    assert(_xasprintf_result != -1);             \
+}
 
 /*
  * Build identifier strings (used in paths)
