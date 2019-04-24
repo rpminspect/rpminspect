@@ -369,6 +369,18 @@ static struct hsearch_data * _files_to_table(rpmfile_t *list)
     return table;
 }
 
+/* Helper for _find_one_peer */
+static void _set_peer(rpmfile_entry_t *file, ENTRY *eptr)
+{
+    rpmfile_entry_t *peer;
+
+    peer = eptr->data;
+    eptr->data = NULL;
+
+    file->peer_file = peer;
+    peer->peer_file = file;
+}
+
 /* For the given file from "before", attempt to find a matching file in "after".
  *
  * Any time a match is found, the hash table ENTRY's value field will be set
@@ -376,23 +388,81 @@ static struct hsearch_data * _files_to_table(rpmfile_t *list)
  * tests to match peers, this means that attempts must be made in order from
  * best match to worst match.
  */
-static void _find_one_peer(rpmfile_entry_t *file, struct hsearch_data *after_table)
+static void _find_one_peer(rpmfile_entry_t *file, Header after_header, struct hsearch_data *after_table)
 {
-    rpmfile_entry_t *peer;
     ENTRY e;
     ENTRY *eptr;
+    int hsearch_result;
+
+    const char *before_version;
+    const char *after_version;
+    bool has_version;
+
+    const char *before_release;
+    const char *after_release;
+    char *before_vr;
+    char *after_vr;
+
+    char *search_path;
 
     /* Start with the obvious case: the paths match */
     e.key = file->fullpath;
     eptr = NULL;
+    hsearch_result = hsearch_r(e, FIND, &eptr, after_table);
 
-    if (hsearch_r(e, FIND, &eptr, after_table) != 0) {
-        peer = eptr->data;
-        eptr->data = NULL;
-
-        file->peer_file = peer;
-        peer->peer_file = file;
+    if (hsearch_result != 0) {
+        _set_peer(file, eptr);
         return;
+    }
+
+    /* Try substituting the version strings */
+    before_version = headerGetString(file->rpm_header, RPMTAG_VERSION);
+    after_version = headerGetString(after_header, RPMTAG_VERSION);
+
+    /* If the path doesn't have a version in it we can skip these substitutions */
+    has_version = (strstr(file->fullpath, before_version) != NULL);
+
+    if (has_version && (strcmp(before_version, after_version) != 0)) {
+        search_path = strreplace(file->fullpath, before_version, after_version);
+
+        e.key = search_path;
+        eptr = NULL;
+        hsearch_result = hsearch_r(e, FIND, &eptr, after_table);
+        free(search_path);
+
+        if (hsearch_result != 0) {
+            _set_peer(file, eptr);
+            return;
+        }
+    }
+
+    /* Try substituting version-release */
+    if (has_version) {
+        before_release = headerGetString(file->rpm_header, RPMTAG_RELEASE);
+        after_release = headerGetString(after_header, RPMTAG_RELEASE);
+
+        xasprintf(&before_vr, "%s-%s", before_version, before_release);
+        xasprintf(&after_vr, "%s-%s", after_version, after_release);
+
+        if (strcmp(before_vr, after_vr) != 0) {
+            search_path = strreplace(file->fullpath, before_vr, after_vr);
+
+            free(before_vr);
+            free(after_vr);
+
+            e.key = search_path;
+            eptr = NULL;
+            hsearch_result = hsearch_r(e, FIND, &eptr, after_table);
+            free(search_path);
+
+            if (hsearch_result != 0) {
+                _set_peer(file, eptr);
+                return;
+            }
+        } else {
+            free(before_vr);
+            free(after_vr);
+        }
     }
 }
 
@@ -403,6 +473,7 @@ void find_file_peers(rpmfile_t *before, rpmfile_t *after)
 {
     struct hsearch_data *after_table = NULL;
     rpmfile_entry_t *iter;
+    rpmfile_entry_t *after_entry;
 
     int result = -1;
 
@@ -414,12 +485,14 @@ void find_file_peers(rpmfile_t *before, rpmfile_t *after)
         return;
     }
 
+    after_entry = TAILQ_FIRST(after);
+
     /* Create a hash table of the after list, mapping path(char *) to rpmfile_entry_t */
     after_table = _files_to_table(after);
     assert(after_table);
 
     TAILQ_FOREACH(iter, before, items) {
-        _find_one_peer(iter, after_table);
+        _find_one_peer(iter, after_entry->rpm_header, after_table);
     }
 
 
