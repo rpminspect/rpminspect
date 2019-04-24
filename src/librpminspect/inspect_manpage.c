@@ -224,7 +224,6 @@ end:
 static bool _manpage_driver(struct rpminspect *ri, rpmfile_entry_t *file)
 {
     char *manpage_errors;
-    const char *localpath;
     bool result = true;
     const char *arch;
     char *msg = NULL;
@@ -238,16 +237,10 @@ static bool _manpage_driver(struct rpminspect *ri, rpmfile_entry_t *file)
         return true;
     }
 
-    localpath = get_file_path(file);
-
-    if (!localpath) {
-        return true;
-    }
-
     arch = headerGetString(file->rpm_header, RPMTAG_ARCH);
 
-    if ((manpage_errors = inspect_manpage_validity(file->fullpath, localpath)) != NULL) {
-        xasprintf(&msg, "Man page checker reported problems with %s on %s", localpath, arch);
+    if ((manpage_errors = inspect_manpage_validity(file->fullpath, file->localpath)) != NULL) {
+        xasprintf(&msg, "Man page checker reported problems with %s on %s", file->localpath, arch);
 
         add_result(&ri->results, RESULT_VERIFY, WAIVABLE_BY_ANYONE, HEADER_MAN, msg, manpage_errors, REMEDY_MAN_ERRORS);
 
@@ -256,7 +249,7 @@ static bool _manpage_driver(struct rpminspect *ri, rpmfile_entry_t *file)
     }
 
     if (!inspect_manpage_path(file->fullpath)) {
-        xasprintf(&msg, "Man page %s has incorrect path on %s", localpath, arch);
+        xasprintf(&msg, "Man page %s has incorrect path on %s", file->localpath, arch);
 
         add_result(&ri->results, RESULT_VERIFY, WAIVABLE_BY_ANYONE, HEADER_MAN, msg, NULL, REMEDY_MAN_PATH);
 

@@ -49,6 +49,7 @@ void free_files(rpmfile_t *files)
         TAILQ_REMOVE(files, entry, items);
         headerFree(entry->rpm_header);
         free(entry->fullpath);
+        free(entry->localpath);
         free(entry);
     }
 
@@ -207,6 +208,9 @@ rpmfile_t * extract_rpm(const char *pkg, Header hdr)
         memcpy(&file_entry->st, archive_entry_stat(entry), sizeof(struct stat));
         file_entry->idx = *((int *)eptr->data);
 
+        file_entry->localpath = strdup(archive_path);
+        assert(file_entry->localpath);
+
         TAILQ_INSERT_TAIL(file_list, file_entry, items);
 
         /* Are we extracting this file? */
@@ -293,18 +297,13 @@ cleanup:
 
 bool process_file_path(const rpmfile_entry_t *file, regex_t *include_regex, regex_t *exclude_regex)
 {
-    const char *localpath;
-
-    localpath = get_file_path(file);
-    assert(localpath != NULL);
-
     /* If include is set, the path must match the regex */
-    if ((include_regex != NULL) && (regexec(include_regex, localpath, 0, NULL, 0) != 0)) {
+    if ((include_regex != NULL) && (regexec(include_regex, file->localpath, 0, NULL, 0) != 0)) {
         return false;
     }
 
     /* If exclude is set, the path must not match the regex */
-    if ((exclude_regex != NULL) && (regexec(exclude_regex, localpath, 0, NULL, 0) == 0)) {
+    if ((exclude_regex != NULL) && (regexec(exclude_regex, file->localpath, 0, NULL, 0) == 0)) {
         return false;
     }
 

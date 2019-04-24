@@ -152,7 +152,7 @@ static bool _xml_driver(struct rpminspect *ri, rpmfile_entry_t *file)
     result = is_xml_well_formed(file->fullpath, &errors);
 
     if (!result) {
-        xasprintf(&msg, "File %s has become malformed XML on %s", get_file_path(file), headerGetString(file->rpm_header, RPMTAG_ARCH));
+        xasprintf(&msg, "File %s has become malformed XML on %s", file->localpath, headerGetString(file->rpm_header, RPMTAG_ARCH));
 
         add_result(&ri->results, RESULT_VERIFY, WAIVABLE_BY_ANYONE, HEADER_XML, msg, errors, REMEDY_XML);
 
