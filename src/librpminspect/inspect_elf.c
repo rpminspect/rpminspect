@@ -950,12 +950,6 @@ static bool _elf_driver(struct rpminspect *ri, rpmfile_entry_t *after)
         return true;
     }
 
-    localpath = get_file_path(after);
-
-    if (!localpath) {
-        return true;
-    }
-
     arch = headerGetString(after->rpm_header, RPMTAG_ARCH);
 
     /* Is this an archive or a regular ELF file? */
@@ -964,13 +958,13 @@ static bool _elf_driver(struct rpminspect *ri, rpmfile_entry_t *after)
             before_elf = get_elf_archive(after->peer_file->fullpath, &before_elf_fd);
         }
 
-        result = _elf_archive_tests(ri, after_elf, after_elf_fd, before_elf, before_elf_fd, localpath, arch);
+        result = _elf_archive_tests(ri, after_elf, after_elf_fd, before_elf, before_elf_fd, after->localpath, arch);
     } else if ((after_elf = get_elf(after->fullpath, &after_elf_fd)) != NULL) {
         if (after->peer_file != NULL) {
             before_elf = get_elf_archive(after->peer_file->fullpath, &before_elf_fd);
         }
 
-        result = _elf_regular_tests(ri, after_elf, before_elf, localpath, arch);
+        result = _elf_regular_tests(ri, after_elf, before_elf, after->localpath, arch);
     }
 
 

@@ -48,8 +48,9 @@ typedef TAILQ_HEAD(string_entry_s, _string_entry_t) string_list_t;
  * The ownership and permissions of the unpacked file may not match the
  * intended owner and mode from the RPM metadata.
  *
- * "st" is the metadata about the file, as described by the RPM payload. st not
- * necessarily match the description of the file in the RPM header.
+ * "localpath" is file path from the RPM payload, and "st" is the metadata about the file,
+ * as described by the RPM payload. localpath and st may not necessarily match
+ * the description of the file in the RPM header.
  *
  * The rpm_header field is shared by multiple files. Each file entry must
  * call headerFree to dereference the header.
@@ -59,6 +60,7 @@ typedef TAILQ_HEAD(string_entry_s, _string_entry_t) string_list_t;
 typedef struct _rpmfile_entry_t {
     Header rpm_header;
     char *fullpath;
+    char *localpath;
     struct stat st;
     int idx;
     struct _rpmfile_entry_t *peer_file;
