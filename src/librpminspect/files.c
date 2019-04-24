@@ -310,7 +310,7 @@ bool process_file_path(const rpmfile_entry_t *file, regex_t *include_regex, rege
     return true;
 }
 
-/* Helper for find_file_peers. Returns a hash table keyed by the fullpath fields of
+/* Helper for find_file_peers. Returns a hash table keyed by the localpath fields of
  * the file list, with the rpmfile_entry_t items as values.
  *
  * The list cannot be empty.
@@ -354,11 +354,11 @@ static struct hsearch_data * _files_to_table(rpmfile_t *list)
     }
 
     TAILQ_FOREACH(iter, list, items) {
-        e.key = iter->fullpath;
+        e.key = iter->localpath;
         e.data = iter;
 
         if (hsearch_r(e, ENTER, &eptr, table) == 0) {
-            fprintf(stderr, "*** Unable to add %s to hash table: %s\n", iter->fullpath, strerror(errno));
+            fprintf(stderr, "*** Unable to add %s to hash table: %s\n", iter->localpath, strerror(errno));
             hdestroy_r(table);
             free(table);
             return NULL;
@@ -405,7 +405,7 @@ static void _find_one_peer(rpmfile_entry_t *file, Header after_header, struct hs
     char *search_path;
 
     /* Start with the obvious case: the paths match */
-    e.key = file->fullpath;
+    e.key = file->localpath;
     eptr = NULL;
     hsearch_result = hsearch_r(e, FIND, &eptr, after_table);
 
@@ -419,10 +419,10 @@ static void _find_one_peer(rpmfile_entry_t *file, Header after_header, struct hs
     after_version = headerGetString(after_header, RPMTAG_VERSION);
 
     /* If the path doesn't have a version in it we can skip these substitutions */
-    has_version = (strstr(file->fullpath, before_version) != NULL);
+    has_version = (strstr(file->localpath, before_version) != NULL);
 
     if (has_version && (strcmp(before_version, after_version) != 0)) {
-        search_path = strreplace(file->fullpath, before_version, after_version);
+        search_path = strreplace(file->localpath, before_version, after_version);
 
         e.key = search_path;
         eptr = NULL;
@@ -444,7 +444,7 @@ static void _find_one_peer(rpmfile_entry_t *file, Header after_header, struct hs
         xasprintf(&after_vr, "%s-%s", after_version, after_release);
 
         if (strcmp(before_vr, after_vr) != 0) {
-            search_path = strreplace(file->fullpath, before_vr, after_vr);
+            search_path = strreplace(file->localpath, before_vr, after_vr);
 
             free(before_vr);
             free(after_vr);
