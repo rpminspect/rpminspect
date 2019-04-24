@@ -18,16 +18,36 @@
 
 #include "config.h"
 
+#include <stdarg.h>
+#include <stdio.h>
 #include <stdlib.h>
 
 #include <CUnit/Basic.h>
+
+#include "test-main.h"
 
 /* Special exit codes used by automake */
 #define EXIT_SKIP       (77)
 #define EXIT_HARD_ERROR (99)
 
-/* Defined by the test module */
-CU_pSuite get_suite(void);
+/* Wrappers around CU_assertImplementation to print better messages */
+CU_BOOL RI_assert_impl(CU_BOOL value, unsigned int line, const char *file, const char *format, ...)
+{
+    va_list ap;
+    char *msg = NULL;
+
+    va_start(ap, format);
+
+    if (vasprintf(&msg, format, ap) == -1) {
+        CU_assertImplementation(CU_FALSE, line, "*** Unable to allocate memory for assertion", file, "", CU_TRUE);
+    } else {
+        CU_assertImplementation(value, line, msg, file, "", CU_FALSE);
+    }
+
+    va_end(ap);
+    free(msg);
+    return value;
+}
 
 /* Given a function that returns a test suite, initialize the test registry,
  * run the test suite, cleanup, and exit with the appropriate error code */

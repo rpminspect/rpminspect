@@ -23,6 +23,7 @@
 #include <elf.h>
 #include <CUnit/Basic.h>
 #include "rpminspect.h"
+#include "test-main.h"
 
 int init_test_inspect_elf(void) {
     init_elf_data();
@@ -45,27 +46,27 @@ void test_is_execstack_present(void) {
 
     /* expected true */
     fd = open("elftest-execstack", O_RDONLY);
-    CU_ASSERT_NOT_EQUAL(fd, -1);
+    RI_ASSERT_NOT_EQUAL(fd, -1);
 
     elf = elf_begin(fd, ELF_C_READ_MMAP_PRIVATE, NULL);
-    CU_ASSERT_PTR_NOT_NULL(elf);
+    RI_ASSERT_PTR_NOT_NULL(elf);
 
-    CU_ASSERT_TRUE(is_execstack_present(elf));
+    RI_ASSERT_TRUE(is_execstack_present(elf));
 
-    CU_ASSERT_EQUAL(elf_end(elf), 0);
-    CU_ASSERT_EQUAL(close(fd), 0);
+    RI_ASSERT_EQUAL(elf_end(elf), 0);
+    RI_ASSERT_EQUAL(close(fd), 0);
 
     /* expected false */
     fd = open("elftest-noexecstack", O_RDONLY);
-    CU_ASSERT_NOT_EQUAL(fd, -1);
+    RI_ASSERT_NOT_EQUAL(fd, -1);
 
     elf = elf_begin(fd, ELF_C_READ_MMAP_PRIVATE, NULL);
-    CU_ASSERT_PTR_NOT_NULL(elf);
+    RI_ASSERT_PTR_NOT_NULL(elf);
 
-    CU_ASSERT_TRUE(is_execstack_present(elf));
+    RI_ASSERT_TRUE(is_execstack_present(elf));
 
-    CU_ASSERT_EQUAL(elf_end(elf), 0);
-    CU_ASSERT_EQUAL(close(fd), 0);
+    RI_ASSERT_EQUAL(elf_end(elf), 0);
+    RI_ASSERT_EQUAL(close(fd), 0);
 
     return;
 }
@@ -76,27 +77,27 @@ void test_get_execstack_flags(void) {
 
     /* expected non-zero return */
     fd = open("elftest-execstack", O_RDONLY);
-    CU_ASSERT_NOT_EQUAL(fd, -1);
+    RI_ASSERT_NOT_EQUAL(fd, -1);
 
     elf = elf_begin(fd, ELF_C_READ_MMAP_PRIVATE, NULL);
-    CU_ASSERT_PTR_NOT_NULL(elf);
+    RI_ASSERT_PTR_NOT_NULL(elf);
 
-    CU_ASSERT_EQUAL(get_execstack_flags(elf), PF_X|PF_W|PF_R);
+    RI_ASSERT_EQUAL(get_execstack_flags(elf), PF_X|PF_W|PF_R);
 
-    CU_ASSERT_EQUAL(elf_end(elf), 0);
-    CU_ASSERT_EQUAL(close(fd), 0);
+    RI_ASSERT_EQUAL(elf_end(elf), 0);
+    RI_ASSERT_EQUAL(close(fd), 0);
 
     /* expected zero return */
     fd = open("elftest-noexecstack", O_RDONLY);
-    CU_ASSERT_NOT_EQUAL(fd, -1);
+    RI_ASSERT_NOT_EQUAL(fd, -1);
 
     elf = elf_begin(fd, ELF_C_READ_MMAP_PRIVATE, NULL);
-    CU_ASSERT_PTR_NOT_NULL(elf);
+    RI_ASSERT_PTR_NOT_NULL(elf);
 
-    CU_ASSERT_EQUAL(get_execstack_flags(elf), PF_W|PF_R);
+    RI_ASSERT_EQUAL(get_execstack_flags(elf), PF_W|PF_R);
 
-    CU_ASSERT_EQUAL(elf_end(elf), 0);
-    CU_ASSERT_EQUAL(close(fd), 0);
+    RI_ASSERT_EQUAL(elf_end(elf), 0);
+    RI_ASSERT_EQUAL(close(fd), 0);
 
     return;
 }
@@ -107,15 +108,15 @@ void test_has_executable_program(void) {
 
     /* expected true */
     fd = open("elftest-execstack", O_RDONLY);
-    CU_ASSERT_NOT_EQUAL(fd, -1);
+    RI_ASSERT_NOT_EQUAL(fd, -1);
 
     elf = elf_begin(fd, ELF_C_READ_MMAP_PRIVATE, NULL);
-    CU_ASSERT_PTR_NOT_NULL(elf);
+    RI_ASSERT_PTR_NOT_NULL(elf);
 
-    CU_ASSERT_TRUE(has_executable_program(elf));
+    RI_ASSERT_TRUE(has_executable_program(elf));
 
-    CU_ASSERT_EQUAL(elf_end(elf), 0);
-    CU_ASSERT_EQUAL(close(fd), 0);
+    RI_ASSERT_EQUAL(elf_end(elf), 0);
+    RI_ASSERT_EQUAL(close(fd), 0);
 
     return;
 }

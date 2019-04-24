@@ -20,6 +20,7 @@
 
 #include <CUnit/Basic.h>
 #include "rpminspect.h"
+#include "test-main.h"
 
 int init_test_init(void) {
     return 0;
@@ -32,7 +33,7 @@ int clean_test_init(void) {
 void test_init_rpminspect(void) {
     struct rpminspect ri;
 
-    CU_ASSERT_EQUAL(init_rpminspect(&ri, NULL), 0);
+    RI_ASSERT_EQUAL(init_rpminspect(&ri, NULL), 0);
     free_rpminspect(&ri);
     return;
 }

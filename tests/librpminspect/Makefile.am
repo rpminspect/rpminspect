@@ -33,6 +33,8 @@ elftest_execstack_LDFLAGS = -no-install
 elftest_noexecstack_SOURCES = elftest.c
 elftest_noexecstack_CFLAGS = -z noexecstack -z relro
 elftest_noexecstack_LDFLAGS = -no-install
+
+EXTRA_DIST = test-main.h
 else
 
 check-local:
