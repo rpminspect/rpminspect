@@ -18,20 +18,19 @@
 
 #include "config.h"
 
+#include <ctype.h>
+#include <string.h>
 #include <sys/queue.h>
 #include <sys/types.h>
-#include <regex.h>
 #include "rpminspect.h"
 
 /*
  * Check the given string for any defined bad words, return true if found.
  */
 bool has_bad_word(const char *s, const string_list_t *badwords) {
-    string_entry_t *badexp = NULL;
-    regex_t re;
-    int reg_result;
-    char reg_error[BUFSIZ];
-    regmatch_t match[1];
+    string_entry_t *badword = NULL;
+    size_t badword_len;
+    char *search;
     bool found = false;
 
     assert(s != NULL);
@@ -41,27 +40,35 @@ bool has_bad_word(const char *s, const string_list_t *badwords) {
     }
 
     /* check each bad word expression for a match with our string */
-    TAILQ_FOREACH(badexp, badwords, items) {
-        /* compile this expression, POSIX extended and case insensitive */
-        reg_result = regcomp(&re, badexp->data, REG_EXTENDED | REG_ICASE);
+    TAILQ_FOREACH(badword, badwords, items) {
+        /* Do a case insensitive search for the word */
+        search = strcasestr(s, badword->data);
 
-        if (reg_result != 0) {
-            regerror(reg_result, &re, reg_error, sizeof(reg_error));
-            fprintf(stderr, "*** Unable to compile bad word regular expression: %s\n", reg_error);
-            fflush(stderr);
-            return false;
-        }
+        if (search != NULL) {
+            /*
+             * Only consider this a match if it's at the beginning or end of a word,
+             * determined by the match being at the beginning or end of the string,
+             * or preceded or followed by a space
+             */
+            if (search == s) {
+                found = true;
+                break;
+            }
 
-        /* look for a match */
-        if (regexec(&re, s, 1, match, 0) == 0) {
-            found = true;
-        }
+            /*
+             * Only check for a preceding space after we're sure that "search"
+             * is not the beginning of the string
+             */
+            if (isspace(*(search - 1))) {
+                found = true;
+                break;
+            }
 
-        /* clean up */
-        regfree(&re);
-
-        if (found) {
-            break;
+            badword_len = strlen(badword->data);
+            if ((*(search + badword_len) == '\0') || isspace(*(search + badword_len))) {
+                found = true;
+                break;
+            }
         }
     }
 
