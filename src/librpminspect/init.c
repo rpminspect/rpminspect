@@ -131,23 +131,18 @@ int init_rpminspect(struct rpminspect *ri, const char *cfgfile) {
         /* make a copy of the string for splitting */
         start = walk = strdup(tmp);
 
-        /* split up the string of bad words and turn them in to regexps */
+        /* split up the string of bad words and turn them in to a list */
         ri->badwords = calloc(1, sizeof(*(ri->badwords)));
         assert(ri->badwords != NULL);
         TAILQ_INIT(ri->badwords);
 
-        /* convert each word to a regexp and add it to the list */
         while ((badword = strsep(&walk, " \t")) != NULL) {
-            /* create the first pattern with a beginning word boundary */
             entry = calloc(1, sizeof(*entry));
             assert(entry != NULL);
-            xasprintf(&entry->data, "\\b%s", badword);
-            TAILQ_INSERT_TAIL(ri->badwords, entry, items);
 
-            /* create the second pattern with an ending word boundary */
-            entry = calloc(1, sizeof(*entry));
-            assert(entry != NULL);
-            xasprintf(&entry->data, "%s\\b", badword);
+            entry->data = strdup(badword);
+            assert(entry->data != NULL);
+
             TAILQ_INSERT_TAIL(ri->badwords, entry, items);
         }
 
