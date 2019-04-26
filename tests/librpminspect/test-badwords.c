@@ -83,6 +83,13 @@ void test_has_bad_word(void) {
     RI_ASSERT(has_bad_word("cocacola", forbidden_words) == false);
     RI_ASSERT(has_bad_word("suse", forbidden_words) == false);
     RI_ASSERT(has_bad_word("supermonkeyball", forbidden_words) == false);
+
+    /* Ensure bad words match at the start or end of a word, but not the middle */
+    RI_ASSERT(has_bad_word("bazzing", forbidden_words) == true);
+    RI_ASSERT(has_bad_word("is bazzing", forbidden_words) == true);
+    RI_ASSERT(has_bad_word("motherbaz", forbidden_words) == true);
+    RI_ASSERT(has_bad_word("motherbaz other words", forbidden_words) == true);
+    RI_ASSERT(has_bad_word("bebazzled", forbidden_words) == false);
 }
 
 CU_pSuite get_suite(void) {
