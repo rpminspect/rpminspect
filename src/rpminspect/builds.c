@@ -184,8 +184,13 @@ static int _download_rpms(struct koji_build *build) {
 
         /* build path strings */
         xasprintf(&pkg, "%s-%s-%s.%s.rpm", rpm->name, rpm->version, rpm->release, rpm->arch);
-        xasprintf(&src, "%s/vol/%s/packages/%s/%s/%s/%s/%s", workri->kojidownload, build->volume_name, build->name, build->version, build->release, rpm->arch, pkg);
         xasprintf(&dst, "%s/%s/%s/%s", workri->worksubdir, build_desc[whichbuild], rpm->arch, pkg);
+
+        if (!strcmp(build->volume_name, "DEFAULT")) {
+            xasprintf(&src, "%s/packages/%s/%s/%s/%s/%s", workri->kojidownload, build->name, build->version, build->release, rpm->arch, pkg);
+        } else {
+            xasprintf(&src, "%s/%s/packages/%s/%s/%s/%s/%s", workri->kojidownload, build->volume_name, build->name, build->version, build->release, rpm->arch, pkg);
+        }
 
         /* perform the download */
         fp = fopen(dst, "wb");
