@@ -342,6 +342,10 @@ struct koji_build *get_koji_build(struct rpminspect *ri, const char *buildspec) 
                 xmlrpc_parse_value(&env, value, "s", &s);
                 xmlrpc_abort_on_fault(&env);
                 rpm->release = strdup(s);
+            } else if (!strcmp(key, "epoch") && (xmlrpc_value_type(value) == XMLRPC_TYPE_INT)) {
+                xmlrpc_parse_value(&env, value, "i", &rpm->epoch);
+            } else if (!strcmp(key, "size") && (xmlrpc_value_type(value) == XMLRPC_TYPE_INT)) {
+                xmlrpc_parse_value(&env, value, "i", &rpm->size);
             }
 
             xmlrpc_DECREF(k);

@@ -221,6 +221,8 @@ typedef struct _koji_rpmlist_entry_t {
     char *name;
     char *version;
     char *release;
+    int epoch;
+    int size;
     TAILQ_ENTRY(_koji_rpmlist_entry_t) items;
 } koji_rpmlist_entry_t;
 
