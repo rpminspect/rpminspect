@@ -211,6 +211,11 @@ int main(int argc, char **argv) {
         }
     }
 
+    /* Find an appropriate configuration file */
+    if ((cfgfile == NULL) || (access(CFGFILE, F_OK|R_OK) == -1)) {
+        cfgfile = strdup(CFGFILE);
+    }
+
     /* Initialize librpminspect */
     if (init_rpminspect(&ri, cfgfile) != 0) {
         fprintf(stderr, "Failed to read configuration file\n");

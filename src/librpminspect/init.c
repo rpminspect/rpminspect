@@ -79,15 +79,11 @@ int init_rpminspect(struct rpminspect *ri, const char *cfgfile) {
     assert(ri != NULL);
     memset(ri, 0, sizeof(*ri));
 
-    /* Find an appropriate configuration file */
-    if ((cfgfile == NULL) || !access(CFGFILE, F_OK|R_OK)) {
-        ri->cfgfile = realpath(CFGFILE, NULL);
-    } else {
-        ri->cfgfile = realpath(cfgfile, NULL);
-    }
+    /* Store full path to the config file */
+    ri->cfgfile = realpath(cfgfile, NULL);
 
     /* In case we have a missing configuration file, defaults all the way */
-    if ((ri->cfgfile == NULL) || access(ri->cfgfile, F_OK|R_OK)) {
+    if ((ri->cfgfile == NULL) || (access(ri->cfgfile, F_OK|R_OK) == -1)) {
         free(ri->cfgfile);
         ri->cfgfile = NULL;
 
