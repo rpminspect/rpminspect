@@ -280,6 +280,11 @@ bool inspect_license(struct rpminspect *ri) {
 
     /* Second check the binary peers */
     TAILQ_FOREACH(peer, ri->peers, items) {
+        /* Disappearing subpackages are reported via INSPECT_EMPTYRPM */
+        if (peer->after_rpm == NULL) {
+            continue;
+        }
+
         good += _check_peer_license(ri, peer->after_hdr);
         seen++;
     }
