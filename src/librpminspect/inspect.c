@@ -84,6 +84,11 @@ bool foreach_peer_file(struct rpminspect *ri, foreach_peer_file_func check_fn)
     assert(check_fn != NULL);
 
     TAILQ_FOREACH(peer, ri->peers, items) {
+        /* Disappearing subpackages are caught by INSPECT_EMPTYRPM */
+        if (peer->after_files == NULL) {
+            continue;
+        }
+
         TAILQ_FOREACH(file, peer->after_files, items) {
             if (!check_fn(ri, file)) {
                 result = false;

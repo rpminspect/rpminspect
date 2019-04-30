@@ -56,6 +56,17 @@ bool inspect_emptyrpm(struct rpminspect *ri) {
 
     /* Check the binary peers */
     TAILQ_FOREACH(peer, ri->peers, items) {
+        /*
+         * Subpackages may disappear in subsequent builds.  Sometimes this
+         * is intentional, sometimes not.
+         */
+        if (peer->before_rpm != NULL && peer->after_rpm == NULL) {
+            xasprintf(&msg, "Existing subpackage %s is now missing", headerGetAsString(peer->before_hdr, RPMTAG_NAME));
+            add_result(&ri->results, RESULT_VERIFY, WAIVABLE_BY_ANYONE, HEADER_EMPTYRPM, msg, NULL, REMEDY_EMPTYRPM);
+            free(msg);
+            continue;
+        }
+
         if (is_payload_empty(peer->after_files)) {
             if (peer->before_rpm == NULL) {
                 xasprintf(&msg, "New package %s is empty (no payloads)", basename(peer->after_rpm));

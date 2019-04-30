@@ -151,6 +151,11 @@ bool inspect_metadata(struct rpminspect *ri) {
 
     /* Check the binary peers */
     TAILQ_FOREACH(peer, ri->peers, items) {
+        /* Disappearing subpackages are caught by INSPECT_EMPTYRPM */
+        if (peer->after_rpm == NULL) {
+            continue;
+        }
+
         if (!_valid_peers(ri, peer->before_hdr, peer->before_rpm, peer->after_hdr, peer->after_rpm)) {
             ret = true;
         }
