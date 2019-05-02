@@ -32,6 +32,7 @@
 #define HEADER_ELF           "ELF object properties"
 #define HEADER_MAN           "Man pages"
 #define HEADER_XML           "XML files"
+#define HEADER_DESKTOP       "Desktop Entry files"
 
 /*
  * Inspection remedies
@@ -62,5 +63,8 @@
 
 /* xml */
 #define REMEDY_XML          "Correct the reported errors in the XML document"
+
+/* desktop */
+#define REMEDY_DESKTOP "Refer to the Desktop Entry Specification at https://standards.freedesktop.org/desktop-entry-spec/latest/ for help correcting the errors and warnings"
 
 #endif

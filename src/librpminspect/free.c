@@ -58,6 +58,8 @@ void free_rpminspect(struct rpminspect *ri) {
     _free_regex(ri->xml_path_include);
     _free_regex(ri->xml_path_exclude);
 
+    free(ri->desktop_entry_files_dir);
+    free(ri->desktop_file_validate);
     free(ri->vendor);
     free(ri->buildhost_subdomain);
     free(ri->before);

@@ -148,6 +148,12 @@ struct rpminspect {
     regex_t *xml_path_include;
     regex_t *xml_path_exclude;
 
+    /* Where desktop entry files live */
+    char *desktop_entry_files_dir;
+
+    /* desktop-file-validate command location */
+    char *desktop_file_validate;
+
     /* Options specified by the user */
     char *before;              /* before build ID arg given on cmdline */
     char *after;               /* after build ID arg given on cmdline */

@@ -194,6 +194,20 @@ int init_rpminspect(struct rpminspect *ri, const char *cfgfile) {
         return -1;
     }
 
+    tmp = iniparser_getstring(cfg, "tests:desktop_entry_files_dir", NULL);
+    if (tmp == NULL) {
+        ri->desktop_entry_files_dir = strdup(DESKTOP_ENTRY_FILES_DIR);
+    } else {
+        ri->desktop_entry_files_dir = strdup(tmp);
+    }
+
+    tmp = iniparser_getstring(cfg, "tests:desktop_file_validate", NULL);
+    if (tmp == NULL) {
+        ri->desktop_file_validate = strdup(DESKTOP_FILE_VALIDATE);
+    } else {
+        ri->desktop_file_validate = strdup(tmp);
+    }
+
     ri->before = NULL;
     ri->after = NULL;
     ri->before_srpm = NULL;

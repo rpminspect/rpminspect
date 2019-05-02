@@ -45,4 +45,14 @@
  */
 #define LICENSE_DB_FILE "/usr/share/rpminspect/licenses/generic.json"
 
+/*
+ * Standard location for desktop entry files.
+ */
+#define DESKTOP_ENTRY_FILES_DIR "/usr/share/applications"
+
+/*
+ * Default location of desktop-file-validate(1)
+ */
+#define DESKTOP_FILE_VALIDATE "/usr/bin/desktop-file-validate"
+
 #endif
