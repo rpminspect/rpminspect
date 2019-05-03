@@ -474,8 +474,6 @@ void find_file_peers(rpmfile_t *before, rpmfile_t *after)
     rpmfile_entry_t *iter;
     rpmfile_entry_t *after_entry;
 
-    int result = -1;
-
     assert(before != NULL);
     assert(after != NULL);
 
