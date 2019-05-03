@@ -37,6 +37,7 @@ against the defined parameters.
 Summary:        Library providing RPM test API and functionality
 Group:          Development/Tools
 Requires:       rpminspect-data
+Requires:       /usr/bin/desktop-file-validate
 
 %description -n librpminspect
 The library providing the backend test functionality and API for the
