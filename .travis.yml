@@ -16,7 +16,7 @@ before_install:
 
 script:
   - $DOCKER_RUN ./autogen.sh
-  - $DOCKER_RUN ./configure --enable-code-coverage --enable-valgrind
+  - $DOCKER_RUN env CFLAGS="-O2 -Wall -Wextra -Werror" ./configure --enable-code-coverage --enable-valgrind
 
   # Stop after the first failure, to keep the output more readable
   - |

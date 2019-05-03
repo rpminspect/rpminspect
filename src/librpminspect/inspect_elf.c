@@ -935,7 +935,6 @@ static bool _elf_regular_tests(struct rpminspect *ri, Elf *after_elf, Elf *befor
 
 static bool _elf_driver(struct rpminspect *ri, rpmfile_entry_t *after)
 {
-    const char *localpath;
     const char *arch;
     Elf *after_elf = NULL;
     Elf *before_elf = NULL;

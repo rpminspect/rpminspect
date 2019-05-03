@@ -32,7 +32,7 @@ static char *file_to_find = NULL;
 /*
  * Helper used by nftw() in _validate_desktop_contents()
  */
-static int _find_file(const char *fpath, const struct stat *sb, int tflag, struct FTW *ftwbuf) {
+static int _find_file(const char *fpath, __attribute__((unused)) const struct stat *sb, int tflag, __attribute__((unused)) struct FTW *ftwbuf) {
     /* Only looking at regular files */
     if (tflag != FTW_F) {
         return 0;
@@ -81,7 +81,6 @@ static bool _is_desktop_entry_file(const char *desktop_entry_files_dir, const rp
 static int _validate_desktop_file(const char *tool, const char *fullpath, char **result) {
     int ret;
     char *cmd = NULL;
-    char *out = NULL;
     char *new = NULL;
     char buf[BUFSIZ];
     FILE *cmdfp = NULL;
@@ -282,7 +281,6 @@ static bool _validate_desktop_contents(struct rpminspect *ri, const rpmfile_entr
 static bool _desktop_driver(struct rpminspect *ri, rpmfile_entry_t *file) {
     bool result = true;
     int after_code;
-    int before_code;
     char *after_out = NULL;
     char *before_out = NULL;
     char *msg = NULL;
@@ -301,7 +299,7 @@ static bool _desktop_driver(struct rpminspect *ri, rpmfile_entry_t *file) {
 
     if (file->peer_file && _is_desktop_entry_file(ri->desktop_entry_files_dir, file->peer_file)) {
         /* if we have a before peer, validate the corresponding desktop file */
-        before_code = _validate_desktop_file(ri->desktop_file_validate, file->peer_file->fullpath, &before_out);
+        (void) _validate_desktop_file(ri->desktop_file_validate, file->peer_file->fullpath, &before_out);
     }
 
     if (after_code == -1) {

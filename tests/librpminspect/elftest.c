@@ -23,7 +23,7 @@ int some_function(void) {
     return 47;
 }
 
-int main(int argc, char **argv) {
+int main(void) {
     char *s = "Hello, world.";
     printf("%s\n", s);
     return EXIT_SUCCESS;
