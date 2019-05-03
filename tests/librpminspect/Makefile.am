@@ -4,14 +4,16 @@ if HAVE_CUNIT
 # Add the check-valgrind target
 @VALGRIND_CHECK_RULES@
 
-TESTS = $(check_PROGRAMS)
+TESTS = test-badwords \
+	test-koji \
+	test-tty \
+	test-strfuncs \
+	test-init \
+	test-inspect_elf
 
-check_PROGRAMS = test-badwords \
-                 test-koji \
-                 test-tty \
-                 test-strfuncs \
-                 test-init \
-                 test-inspect_elf
+check_PROGRAMS = $(TESTS) \
+		 execstack \
+		 noexecstack
 
 CFLAGS += -I$(top_srcdir)/src/librpminspect -D_BUILDDIR_=\"$(abs_builddir)\"
 LDADD = $(top_builddir)/src/librpminspect/librpminspect.la $(CUNIT_LIBS)
@@ -25,8 +27,6 @@ test_inspect_elf_SOURCES = test-inspect_elf.c test-main.c
 
 # Used by the inspect_elf tests
 # Compile elftest.c in a bunch of different ways for the ELF tests
-noinst_PROGRAMS = execstack noexecstack
-
 execstack_SOURCES = elftest.c
 execstack_CFLAGS = -z execstack -z relro
 execstack_LDFLAGS = -no-install
