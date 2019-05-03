@@ -19,6 +19,10 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+int some_function(void) {
+    return 47;
+}
+
 int main(int argc, char **argv) {
     char *s = "Hello, world.";
     printf("%s\n", s);

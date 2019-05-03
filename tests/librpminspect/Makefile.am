@@ -24,15 +24,12 @@ test_init_SOURCES = test-init.c test-main.c
 test_inspect_elf_SOURCES = test-inspect_elf.c test-main.c
 
 # Used by the inspect_elf tests
-noinst_PROGRAMS = elftest-execstack elftest-noexecstack
+# Compile elftest.c in a bunch of different ways for the ELF tests
+execstack_SOURCES = elftest.c
+execstack_CFLAGS = -z execstack -z relro
 
-elftest_execstack_SOURCES = elftest.c
-elftest_execstack_CFLAGS = -z execstack -z relro
-elftest_execstack_LDFLAGS = -no-install
-
-elftest_noexecstack_SOURCES = elftest.c
-elftest_noexecstack_CFLAGS = -z noexecstack -z relro
-elftest_noexecstack_LDFLAGS = -no-install
+noexecstack_SOURCES = elftest.c
+noexecstack_CFLAGS = -z noexecstack -z relro
 
 EXTRA_DIST = test-main.h
 else
