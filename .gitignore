@@ -23,8 +23,6 @@ config.status
 config.sub
 configure
 depcomp
-elftest-execstack
-elftest-noexecstack
 inspect_elf_bits.c
 install-sh
 libtool
@@ -46,3 +44,5 @@ test-koji
 test-strfuncs
 test-suite.log
 test-tty
+tests/librpminspect/execstack
+tests/librpminspect/noexecstack
