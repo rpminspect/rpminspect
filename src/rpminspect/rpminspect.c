@@ -42,7 +42,7 @@ static void usage(const char *progname) {
     printf("Options:\n");
     printf("  -c FILE, --config=FILE   Configuration file to use\n");
     printf("                             (default: %s)\n", CFGFILE);
-    printf("  -T LIST, --tests=LIST    Comma-separated list of tests to perform\n");
+    printf("  -T LIST, --tests=LIST    Comma-separated list of tests to run or skip\n");
     printf("                             (default: ALL)\n");
     printf("  -o FILE, --output=FILE   Write results to FILE\n");
     printf("                             (default: stdout)\n");
@@ -89,8 +89,9 @@ int main(int argc, char **argv) {
     int mode = S_IRWXU | S_IRGRP | S_IXGRP | S_IROTH | S_IXOTH;
     bool found = false;
     char *test = NULL;
-    uint64_t selected = 0;
     uint64_t tests = 0;
+    uint64_t selected = 0;
+    bool negated_tests = false;
     size_t width = tty_width();
 
     /* parse command line options */
@@ -116,7 +117,18 @@ int main(int argc, char **argv) {
                     found = false;
 
                     for (i = 0; inspections[i].flag != 0; i++) {
-                        if (!strcasecmp(test, inspections[i].name)) {
+                        if (*test == '!' && !strcasecmp(test+1, inspections[i].name)) {
+                            if (!negated_tests) {
+                                negated_tests = true;
+                                selected = ~tests;
+                            }
+
+                            /* user wants to skip this specific test */
+                            selected &= ~(inspections[i].flag);
+                            found = true;
+                            break;
+                        } else if (!strcasecmp(test, inspections[i].name)) {
+                            /* user wants to perform this specific test */
                             selected |= inspections[i].flag;
                             found = true;
                             break;

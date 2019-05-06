@@ -56,8 +56,8 @@ in defaults.
 .B \-c FILE, \-\-config=FILE
 Configuration file to use (default: /etc/rpminspect/rpminspect.conf)
 .TP
-.B \-T LIST, \-\---tests=LIST
-Comma-separated list of tests to perform (default: ALL)
+.B \-T LIST, \-\-tests=LIST
+Comma-separated list of inspections to run or skip (default: ALL)
 .TP
 .B \-l, \-\-list
 List available output formats and inspections
@@ -95,6 +95,12 @@ to run rpminspect against a single build and perform the policy checks
 against the packages in it.  If two builds are specified, the policy checks
 are performed, but the builds are also compared.
 .PP
+Use the -l option to list available inspections.  By default, all inspections
+will be run.  You can restrict the program to a subset of inspections by
+listing their short names and separating them with commas (no spaces).  Or
+you can list inspections to skip by listing the short name prefixed with a
+`!' in the same comma-delimited list.
+.PP
 Builds are specified using koji syntax.  The common method is the NVR, or
 name, version, and release of a package with hyphens separating each part.
 But you can also supply any valid koji build identifier.  For example, you
@@ -109,9 +115,11 @@ something in a new build compared against the old one.
 .PP
 Examples:
 .IP
-rpminspect \-t ALL \-k zlib-1.2.7-1.fc29 zlib-1.2.7-2.fc29
+rpminspect \-T ALL \-k zlib-1.2.7-1.fc29 zlib-1.2.7-2.fc29
 .IP
-rpminspect \-t license,elfsyms perl-5.28.0-47.fc6 perl-5.28.1-1.fc6
+rpminspect \-T license,elfsyms perl-5.28.0-47.fc6 perl-5.28.1-1.fc6
+.IP
+rpminspect \-T !manpage x3270-3.6ga5-6.fc31 x3270-3.6ga6-1.fc31
 .PP
 The end result of running rpminspect is a report on standard output explaining
 what was found.  Descriptions of actions developers can take are provided in
