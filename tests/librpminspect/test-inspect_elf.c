@@ -45,7 +45,7 @@ void test_is_execstack_present(void) {
     Elf *elf;
 
     /* expected true */
-    fd = open(".libs/execstack", O_RDONLY);
+    fd = open(_BUILDDIR_"/.libs/execstack", O_RDONLY);
     RI_ASSERT_NOT_EQUAL(fd, -1);
 
     elf = elf_begin(fd, ELF_C_READ_MMAP_PRIVATE, NULL);
@@ -57,7 +57,7 @@ void test_is_execstack_present(void) {
     RI_ASSERT_EQUAL(close(fd), 0);
 
     /* expected false */
-    fd = open(".libs/noexecstack", O_RDONLY);
+    fd = open(_BUILDDIR_"/.libs/noexecstack", O_RDONLY);
     RI_ASSERT_NOT_EQUAL(fd, -1);
 
     elf = elf_begin(fd, ELF_C_READ_MMAP_PRIVATE, NULL);
@@ -76,7 +76,7 @@ void test_get_execstack_flags(void) {
     Elf *elf;
 
     /* expected non-zero return */
-    fd = open(".libs/execstack", O_RDONLY);
+    fd = open(_BUILDDIR_"/.libs/execstack", O_RDONLY);
     RI_ASSERT_NOT_EQUAL(fd, -1);
 
     elf = elf_begin(fd, ELF_C_READ_MMAP_PRIVATE, NULL);
@@ -88,7 +88,7 @@ void test_get_execstack_flags(void) {
     RI_ASSERT_EQUAL(close(fd), 0);
 
     /* expected zero return */
-    fd = open(".libs/noexecstack", O_RDONLY);
+    fd = open(_BUILDDIR_"/.libs/noexecstack", O_RDONLY);
     RI_ASSERT_NOT_EQUAL(fd, -1);
 
     elf = elf_begin(fd, ELF_C_READ_MMAP_PRIVATE, NULL);
@@ -107,7 +107,7 @@ void test_has_executable_program(void) {
     Elf *elf;
 
     /* expected true */
-    fd = open(".libs/execstack", O_RDONLY);
+    fd = open(_BUILDDIR_"/.libs/execstack", O_RDONLY);
     RI_ASSERT_NOT_EQUAL(fd, -1);
 
     elf = elf_begin(fd, ELF_C_READ_MMAP_PRIVATE, NULL);
@@ -126,7 +126,7 @@ void test_is_execstack_valid(void) {
     Elf *elf;
 
     /* expect true */
-    fd = open(".libs/execstack", O_RDONLY);
+    fd = open(_BUILDDIR_"/.libs/execstack", O_RDONLY);
     RI_ASSERT_NOT_EQUAL(fd, -1);
 
     elf = elf_begin(fd, ELF_C_READ_MMAP_PRIVATE, NULL);
@@ -145,7 +145,7 @@ void test_is_stack_executable(void) {
     Elf *elf;
 
     /* expect true */
-    fd = open(".libs/execstack", O_RDONLY);
+    fd = open(_BUILDDIR_"/.libs/execstack", O_RDONLY);
     RI_ASSERT_NOT_EQUAL(fd, -1);
 
     elf = elf_begin(fd, ELF_C_READ_MMAP_PRIVATE, NULL);
@@ -157,7 +157,7 @@ void test_is_stack_executable(void) {
     RI_ASSERT_EQUAL(close(fd), 0);
 
     /* expect false */
-    fd = open(".libs/noexecstack", O_RDONLY);
+    fd = open(_BUILDDIR_"/.libs/noexecstack", O_RDONLY);
     RI_ASSERT_NOT_EQUAL(fd, -1);
 
     elf = elf_begin(fd, ELF_C_READ_MMAP_PRIVATE, NULL);
@@ -176,7 +176,7 @@ void test_has_textrel(void) {
     Elf *elf;
 
     /* expect false */
-    fd = open(".libs/execstack", O_RDONLY);
+    fd = open(_BUILDDIR_"/.libs/execstack", O_RDONLY);
     RI_ASSERT_NOT_EQUAL(fd, -1);
 
     elf = elf_begin(fd, ELF_C_READ_MMAP_PRIVATE, NULL);
@@ -195,7 +195,7 @@ void test_has_relro(void) {
     Elf *elf;
 
     /* expect true */
-    fd = open(".libs/execstack", O_RDONLY);
+    fd = open(_BUILDDIR_"/.libs/execstack", O_RDONLY);
     RI_ASSERT_NOT_EQUAL(fd, -1);
 
     elf = elf_begin(fd, ELF_C_READ_MMAP_PRIVATE, NULL);
@@ -214,7 +214,7 @@ void test_has_bind_now(void) {
     Elf *elf;
 
     /* expect false */
-    fd = open(".libs/execstack", O_RDONLY);
+    fd = open(_BUILDDIR_"/.libs/execstack", O_RDONLY);
     RI_ASSERT_NOT_EQUAL(fd, -1);
 
     elf = elf_begin(fd, ELF_C_READ_MMAP_PRIVATE, NULL);
@@ -243,7 +243,7 @@ void test_is_pic_ok(void) {
     Elf *elf;
 
     /* expect true */
-    fd = open(".libs/execstack", O_RDONLY);
+    fd = open(_BUILDDIR_"/.libs/execstack", O_RDONLY);
     RI_ASSERT_NOT_EQUAL(fd, -1);
 
     elf = elf_begin(fd, ELF_C_READ_MMAP_PRIVATE, NULL);

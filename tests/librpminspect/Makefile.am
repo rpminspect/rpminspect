@@ -13,7 +13,7 @@ check_PROGRAMS = test-badwords \
                  test-init \
                  test-inspect_elf
 
-CFLAGS += -I$(top_srcdir)/src/librpminspect
+CFLAGS += -I$(top_srcdir)/src/librpminspect -D_BUILDDIR_=\"$(abs_builddir)\"
 LDADD = $(top_builddir)/src/librpminspect/librpminspect.la $(CUNIT_LIBS)
 
 test_badwords_SOURCES = test-badwords.c test-main.c
@@ -25,6 +25,8 @@ test_inspect_elf_SOURCES = test-inspect_elf.c test-main.c
 
 # Used by the inspect_elf tests
 # Compile elftest.c in a bunch of different ways for the ELF tests
+noinst_PROGRAMS = execstack noexecstack
+
 execstack_SOURCES = elftest.c
 execstack_CFLAGS = -z execstack -z relro
 
