@@ -6,7 +6,7 @@ SPEC = $(topdir)/rpminspect.spec
 
 # Replace placeholders in the spec file template
 RPMDATE = $(shell date +'%a %b %d %Y')
-GITDATE = $(shell date +'%Y%m%d')
+GITDATE = $(shell date +'%Y%m%d%H%M')
 GITHASH = $(shell git rev-parse --short HEAD)
 
 # Various things we need to generate a tarball
