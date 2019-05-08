@@ -1,5 +1,5 @@
 AC_PREREQ([2.69])
-AC_INIT([rpminspect], [1.0], [dcantrell@redhat.com])
+AC_INIT([rpminspect], [0], [dcantrell@redhat.com])
 AM_INIT_AUTOMAKE([foreign])
 AC_CONFIG_SRCDIR([src/rpminspect/rpminspect.c])
 AC_CONFIG_HEADERS([config.h])
