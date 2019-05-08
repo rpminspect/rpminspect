@@ -24,8 +24,6 @@ BuildRequires:  zlib-devel
 BuildRequires:  libmandoc-devel
 BuildRequires:  iniparser-devel
 
-Requires:       librpminspect = %{version}-%{release}
-
 %description
 Build deviation and compliance tool.  This program runs a number of tests
 against one or two builds of source RPM files.  The built artifacts are
@@ -48,7 +46,7 @@ programs wanting to incorporate RPM test functionality.
 %package -n librpminspect-devel
 Summary:         Header files and development libraries for librpminspect
 Group:           Development/Tools
-Requires:        librpminspect = %{version}-%{release}
+Requires:        librpminspect%{?_isa} = %{version}-%{release}
 Requires:        rpminspect-data
 
 %description -n librpminspect-devel
@@ -74,36 +72,36 @@ control files.
 
 %build
 [ -x configure  ] || ./autogen.sh
-%configure --disable-static
-%{__make}
+CFLAGS="%{optflags}" %configure --disable-static
+%make_build
 
 
 %install
-%{__make} install DESTDIR=%{buildroot}
+%make_build install DESTDIR=%{buildroot}
 rm -f %{buildroot}%{_libdir}/*.la
 
 
 %files
-%defattr(-,root,root)
-%doc AUTHORS COPYING README TODO
+%doc AUTHORS README TODO
+%license COPYING
 %{_bindir}/rpminspect
 %{_mandir}/man1/rpminspect.1*
 
 
 %files -n librpminspect
-%defattr(-,root,root)
+%license COPYING
 %{_libdir}/librpminspect.so.*
 
 
 %files -n librpminspect-devel
-%defattr(-,root,root)
 %{_includedir}/librpminspect
 %{_libdir}/librpminspect.so
 
 
 %files -n rpminspect-data-generic
-%defattr(-,root,root)
+%license COPYING
 %{_datadir}/rpminspect
+%dir %{_sysconfdir}/rpminspect
 %config(noreplace) %{_sysconfdir}/rpminspect/rpminspect.conf
 
 
