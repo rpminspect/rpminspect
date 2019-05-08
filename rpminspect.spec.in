@@ -79,11 +79,7 @@ control files.
 
 
 %prep
-%if %{!?snapshot: 1}
 %setup -q -n %{name}-%{version}-%%GITDATE%%git%%GITHASH%%
-%else
-%setup -q -n %{name}-%{version}
-%endif
 
 
 %build
