@@ -8,7 +8,7 @@ SUBDIRS = src data tests
 
 # Compute a date string suitable for RPM spec file changelogs
 RPMDATE = $(shell date +'%a %b %d %Y')
-GITDATE = $(shell date +'%Y%m%d')
+GITDATE = $(shell date +'%Y%m%d%H%M')
 GITHASH = $(shell git rev-parse --short HEAD)
 
 # Generate a spec file and SRPM file
