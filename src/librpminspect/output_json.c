@@ -63,9 +63,12 @@ void output_json(const results_t *results, const char *dest) {
 
         /* create the object for this result */
         jr = json_object_new_object();
-        json_object_object_add(jr, "message", json_object_new_string(result->msg));
         json_object_object_add(jr, "result", json_object_new_string(strseverity(result->severity)));
         json_object_object_add(jr, "waiver authorization", json_object_new_string(strwaiverauth(result->waiverauth)));
+
+        if (result->msg != NULL) {
+            json_object_object_add(jr, "message", json_object_new_string(result->msg));
+        }
 
         if (result->screendump != NULL) {
             json_object_object_add(jr, "screendump", json_object_new_string(result->screendump));

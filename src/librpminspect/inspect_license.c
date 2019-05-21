@@ -263,6 +263,7 @@ bool is_valid_license(const char *licensedb, const char *tag) {
 bool inspect_license(struct rpminspect *ri) {
     int good = 0;
     int seen = 0;
+    bool result;
     rpmpeer_entry_t *peer = NULL;
 
     assert(ri != NULL);
@@ -292,5 +293,11 @@ bool inspect_license(struct rpminspect *ri) {
     /* Clean up */
     free_licensedb();
 
-    return (good == seen);
+    result = (good == seen);
+
+    if (result) {
+        add_result(&ri->results, RESULT_OK, NOT_WAIVABLE, HEADER_LICENSE, NULL, NULL, NULL);
+    }
+
+    return result;
 }

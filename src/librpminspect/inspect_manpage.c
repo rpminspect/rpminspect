@@ -268,5 +268,9 @@ bool inspect_manpage(struct rpminspect *ri)
     result = foreach_peer_file(ri, _manpage_driver);
     inspect_manpage_free();
 
+    if (result) {
+        add_result(&ri->results, RESULT_OK, NOT_WAIVABLE, HEADER_MAN, NULL, NULL, NULL);
+    }
+
     return result;
 }

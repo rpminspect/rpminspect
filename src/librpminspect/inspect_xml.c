@@ -1,6 +1,7 @@
 /*
  * Copyright (C) 2019  Red Hat, Inc.
  * Author(s):  David Shea <dshea@redhat.com>
+ *             David Cantrell <dcantrell@redhat.com>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -165,5 +166,14 @@ static bool _xml_driver(struct rpminspect *ri, rpmfile_entry_t *file)
 
 bool inspect_xml(struct rpminspect *ri)
 {
-    return foreach_peer_file(ri, _xml_driver);
+    bool result;
+
+    assert(ri != NULL);
+    result = foreach_peer_file(ri, _xml_driver);
+
+    if (result) {
+        add_result(&ri->results, RESULT_OK, NOT_WAIVABLE, HEADER_XML, NULL, NULL, NULL);
+    }
+
+    return result;
 }

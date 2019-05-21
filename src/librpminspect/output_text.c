@@ -70,22 +70,27 @@ void output_text(const results_t *results, const char *dest) {
             displayed_header = true;
         }
 
-        xasprintf(&msg, "%d) %s", count++, result->msg);
-        printwrap(msg, width, 0, fp);
-        free(msg);
-
-        fprintf(fp, "\nResult: %s\n", strseverity(result->severity));
-        fprintf(fp, "Waiver Authorization: %s\n\n", strwaiverauth(result->waiverauth));
-
-        if (result->screendump != NULL) {
-            fprintf(fp, "Screendump:\n%s\n", result->screendump);
+        if (msg != NULL) {
+            xasprintf(&msg, "%d) %s", count++, result->msg);
+            printwrap(msg, width, 0, fp);
+            free(msg);
         }
 
-        if (result->remedy != NULL) {
-            xasprintf(&msg, "Suggested Remedy:\n%s", result->remedy);
-            printwrap(msg, width, 0, fp);
-            fprintf(fp, "\n\n");
-            free(msg);
+        fprintf(fp, "\nResult: %s\n", strseverity(result->severity));
+
+        if (result->severity != RESULT_OK) {
+            fprintf(fp, "Waiver Authorization: %s\n\n", strwaiverauth(result->waiverauth));
+
+            if (result->screendump != NULL) {
+                fprintf(fp, "Screendump:\n%s\n", result->screendump);
+            }
+
+            if (result->remedy != NULL) {
+                xasprintf(&msg, "Suggested Remedy:\n%s", result->remedy);
+                printwrap(msg, width, 0, fp);
+                fprintf(fp, "\n\n");
+                free(msg);
+            }
         }
     }
 

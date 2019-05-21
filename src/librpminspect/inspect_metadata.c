@@ -161,5 +161,9 @@ bool inspect_metadata(struct rpminspect *ri) {
         }
     }
 
+    if (ret) {
+        add_result(&ri->results, RESULT_OK, NOT_WAIVABLE, HEADER_METADATA, NULL, NULL, NULL);
+    }
+
     return ret;
 }

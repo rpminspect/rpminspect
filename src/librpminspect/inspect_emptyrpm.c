@@ -94,5 +94,9 @@ bool inspect_emptyrpm(struct rpminspect *ri) {
         }
     }
 
+    if (ret) {
+        add_result(&ri->results, RESULT_OK, WAIVABLE_BY_ANYONE, HEADER_EMPTYRPM, NULL, NULL, NULL);
+    }
+
     return ret;
 }

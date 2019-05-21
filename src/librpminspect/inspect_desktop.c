@@ -338,6 +338,8 @@ static bool _desktop_driver(struct rpminspect *ri, rpmfile_entry_t *file) {
  * Main driver for the 'desktop' inspection.
  */
 bool inspect_desktop(struct rpminspect *ri) {
+    bool result;
+
     assert(ri != NULL);
     assert(ri->peers != NULL);
 
@@ -347,5 +349,11 @@ bool inspect_desktop(struct rpminspect *ri) {
      * them.  The before and after peers are compared for these files.
      * For the after files, the Exec and Icon references are checked.
      */
-    return foreach_peer_file(ri, _desktop_driver);
+    result = foreach_peer_file(ri, _desktop_driver);
+
+    if (result) {
+        add_result(&ri->results, RESULT_OK, NOT_WAIVABLE, HEADER_DESKTOP, NULL, NULL, NULL);
+    }
+
+    return result;
 }

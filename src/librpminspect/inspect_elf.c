@@ -1,6 +1,7 @@
 /*
  * Copyright (C) 2019  Red Hat, Inc.
  * Author(s):  David Shea <dshea@redhat.com>
+ *             David Cantrell <dcantrell@redhat.com>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -988,6 +989,10 @@ bool inspect_elf(struct rpminspect *ri)
     init_elf_data();
     result = foreach_peer_file(ri, _elf_driver);
     free_elf_data();
+
+    if (result) {
+        add_result(&ri->results, RESULT_OK, WAIVABLE_BY_ANYONE, HEADER_ELF, NULL, NULL, NULL);
+    }
 
     return result;
 }
