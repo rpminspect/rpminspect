@@ -1,23 +1,11 @@
-%global snapshot .%%GITDATE%%git%%GITHASH%%
-
 Name:           rpminspect
 Version:        %%VERSION%%
-Release:        1%{?snapshot}%{?dist}
+Release:        1%{?dist}
 Summary:        Build deviation compliance tool
 Group:          Development/Tools
 License:        GPLv3+
 URL:            https://github.com/dcantrell/rpminspect
-
-# The source for this package was pulled from upstream's vcs.  Use the
-# following commands to generate the tarball:
-#     git clone https://github.com/dcantrell/rpminspect
-#     cd rpminspect
-#     git reset --hard %%GITHASH%%
-#     git archive \
-#         --format=tar.gz \
-#         --output=rpminspect-%%VERSION%%-%%GITDATE%%git%%GITHASH%%.tar.gz \
-#         --prefix='rpminspect-%%VERSION%%-%%GITDATE%%git%%GITHASH%%/' HEAD
-Source0:        %{name}-%{version}-%%GITDATE%%git%%GITHASH%%.tar.gz
+Source0:        https://github.com/dcantrell/rpminspect/releases/download/v%%VERSION%%/rpminspect-%%VERSION%%.tar.gz
 
 BuildRequires:  autoconf
 BuildRequires:  automake
@@ -79,7 +67,7 @@ control files.
 
 
 %prep
-%setup -q -n %{name}-%{version}-%%GITDATE%%git%%GITHASH%%
+%setup -q
 
 
 %build
