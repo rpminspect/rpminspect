@@ -21,5 +21,10 @@ rpminspect.spec: rpminspect.spec.in
 srpm: rpminspect.spec dist
 	rpmbuild -bs --nodeps --define "_sourcedir ." --define "_srcrpmdir ." --define "_rpmdir ." rpminspect.spec
 
+# Create a dist archive, tag the repo, and sign the dist archive
+release: dist
+	git tag -s -a -m "Tag release v$(VERSION)" v$(VERSION)
+	gpg --detach-sign --armor $(PACKAGE)-$(VERSION).tar.gz
+
 clean-local: code-coverage-clean
 distclean-local: code-coverage-dist-clean
