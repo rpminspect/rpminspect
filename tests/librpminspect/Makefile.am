@@ -29,9 +29,11 @@ noinst_PROGRAMS = execstack noexecstack
 
 execstack_SOURCES = elftest.c
 execstack_CFLAGS = -z execstack -z relro
+execstack_LDFLAGS = -no-install
 
 noexecstack_SOURCES = elftest.c
 noexecstack_CFLAGS = -z noexecstack -z relro
+noexecstack_LDFLAGS = -no-install
 
 EXTRA_DIST = test-main.h
 else
