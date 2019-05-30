@@ -159,6 +159,10 @@ static int _download_rpms(struct koji_build *build) {
     int r;
     CURLcode cc;
 
+    /* ignore unusued variable warnings if assert is disabled */
+    (void) r;
+    (void) cc;
+
     assert(build != NULL);
     assert(build->rpms != NULL);
 

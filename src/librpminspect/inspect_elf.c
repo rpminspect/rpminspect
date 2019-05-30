@@ -615,6 +615,9 @@ static bool _check_fortified(struct rpminspect *ri, Elf *before_elf, Elf *after_
     char *msg;
     bool result = true;
 
+    /* ignore unused variable warnings if assert is disabled */
+    (void) output_result;
+
     /* If "before" had no fortified symbols, it can't lose fortified symbols. Return. */
     before_fortified = get_fortified_symbols(before_elf);
     assert(before_fortified != NULL);
@@ -801,6 +804,9 @@ static bool _elf_archive_tests(struct rpminspect *ri, Elf *after_elf, int after_
 
     char *msg = NULL;
     bool result = true;
+
+    /* ignore unused variable warnings if assert is disabled */
+    (void) output_result;
 
     /* comparison-only, skip if no before */
     if (!before_elf) {

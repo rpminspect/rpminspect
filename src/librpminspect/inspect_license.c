@@ -109,6 +109,9 @@ static int _check_peer_license(struct rpminspect *ri, const Header hdr) {
 void free_licensedb(void) {
     int r;
 
+    /* ignore unused variable warnings if assert is disabled */
+    (void) r;
+
     if (licdb == NULL) {
         return;
     }

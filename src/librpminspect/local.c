@@ -36,6 +36,9 @@ bool is_local_build(const char *build) {
     char *r = NULL;
     struct stat sb;
 
+    /* ignore unused variable warnings if assert is disabled */
+    (void) r;
+
     if (build == NULL) {
         return false;
     }

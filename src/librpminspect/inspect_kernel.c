@@ -326,6 +326,9 @@ static void _finalize_module_aliases(struct kernel_alias_data *data)
     string_entry_t *module_entry;
     int result;
 
+    /* ignore unused variable warnings if assert is disabled */
+    (void) result;
+
     assert(data);
 
     data->alias_table = calloc(1, sizeof(*(data->alias_table)));

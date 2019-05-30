@@ -26,9 +26,7 @@
 /*
  * Validate the metadata tags in the RPM headers.
  */
-static bool _valid_peers(struct rpminspect *ri,
-                         const Header before_hdr, const char *before_rpm,
-                         const Header after_hdr, const char *after_rpm) {
+static bool _valid_peers(struct rpminspect *ri, const Header before_hdr, const Header after_hdr) {
     bool ret = true;
     char *after_vendor = NULL;
     char *after_buildhost = NULL;
@@ -39,7 +37,6 @@ static bool _valid_peers(struct rpminspect *ri,
     char *dump = NULL;
 
     assert(ri != NULL);
-    assert(after_rpm != NULL);
 
     after_nevra = headerGetAsString(after_hdr, RPMTAG_NEVRA);
 
@@ -85,7 +82,7 @@ static bool _valid_peers(struct rpminspect *ri,
         free(msg);
     }
 
-    if (before_rpm != NULL) {
+    if (before_hdr != NULL) {
         char *before_vendor = headerGetAsString(before_hdr, RPMTAG_VENDOR);
         char *before_summary = headerGetAsString(before_hdr, RPMTAG_SUMMARY);
         char *before_description = headerGetAsString(before_hdr, RPMTAG_DESCRIPTION);
@@ -145,7 +142,7 @@ bool inspect_metadata(struct rpminspect *ri) {
      */
 
     /* Check the source peers */
-    if (!_valid_peers(ri, ri->before_srpm_hdr, ri->before_srpm, ri->after_srpm_hdr, ri->after_srpm)) {
+    if (!_valid_peers(ri, ri->before_srpm_hdr, ri->after_srpm_hdr)) {
         ret = true;
     }
 
@@ -156,7 +153,7 @@ bool inspect_metadata(struct rpminspect *ri) {
             continue;
         }
 
-        if (!_valid_peers(ri, peer->before_hdr, peer->before_rpm, peer->after_hdr, peer->after_rpm)) {
+        if (!_valid_peers(ri, peer->before_hdr, peer->after_hdr)) {
             ret = true;
         }
     }

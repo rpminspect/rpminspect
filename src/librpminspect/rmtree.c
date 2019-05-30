@@ -30,11 +30,9 @@
 /* Local prototypes */
 static int _rmtree_entry(const char *, const struct stat *, int, struct FTW *);
 
-static int _rmtree_entry(const char *fpath, const struct stat *sb,
-                         int tflag, struct FTW *ftwbuf) {
-    assert(sb != NULL);
-    assert(tflag >= 0);
-    assert(ftwbuf != NULL);
+static int _rmtree_entry(const char *fpath, __attribute__((unused)) const struct stat *sb,
+                         __attribute__((unused)) int tflag, __attribute__((unused)) struct FTW *ftwbuf) {
+    assert(fpath != NULL);
     return remove(fpath);
 }
 

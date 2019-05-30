@@ -42,6 +42,9 @@ Elf64_Half get_elf_type(Elf *elf)
     GElf_Ehdr ehdr;
     GElf_Ehdr *eh = NULL;
 
+    /* ignore unused variable warnings if assert is disabled */
+    (void) eh;
+
     eh = gelf_getehdr(elf, &ehdr);
     assert(eh != NULL);
 
