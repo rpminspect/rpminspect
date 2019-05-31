@@ -55,6 +55,11 @@ static bool _is_desktop_entry_file(const char *desktop_entry_files_dir, const rp
     assert(desktop_entry_files_dir != NULL);
     assert(file != NULL);
 
+    /* Skip source packages */
+    if (headerIsSource(file->rpm_header)) {
+        return true;
+    }
+
     /* Is this a regular file? */
     if (!file->fullpath || !S_ISREG(file->st.st_mode)) {
         return false;
