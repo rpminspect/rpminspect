@@ -29,9 +29,10 @@
 void output_text(const results_t *results, const char *dest) {
     results_entry_t *result = NULL;
     int r = 0;
-    int count = 1;
+    int count = 0;
     int len = 0;
     bool displayed_header = false;
+    bool first = true;
     FILE *fp = NULL;
     char *header = NULL;
     char *msg = NULL;
@@ -58,6 +59,12 @@ void output_text(const results_t *results, const char *dest) {
             count = 1;
         }
 
+        if (first) {
+            first = false;
+        } else {
+            fprintf(fp, "\n");
+        }
+
         if (!displayed_header) {
             len = strlen(header) + 1;
             fprintf(fp, "%s:\n", header);
@@ -66,7 +73,7 @@ void output_text(const results_t *results, const char *dest) {
                 fprintf(fp, "-");
             }
 
-            fprintf(fp, "\n\n");
+            fprintf(fp, "\n");
             displayed_header = true;
         }
 
@@ -88,9 +95,10 @@ void output_text(const results_t *results, const char *dest) {
             if (result->remedy != NULL) {
                 xasprintf(&msg, "Suggested Remedy:\n%s", result->remedy);
                 printwrap(msg, width, 0, fp);
-                fprintf(fp, "\n\n");
                 free(msg);
             }
+
+            fprintf(fp, "\n");
         }
     }
 
