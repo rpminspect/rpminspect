@@ -67,7 +67,6 @@ static int _check_peer_license(struct rpminspect *ri, const Header hdr) {
     char *msg = NULL;
 
     assert(ri != NULL);
-    assert(ri->licensedb != NULL);
 
     nevra = headerGetAsString(hdr, RPMTAG_NEVRA);
     license = headerGetAsString(hdr, RPMTAG_LICENSE);
@@ -268,9 +267,17 @@ bool inspect_license(struct rpminspect *ri) {
     int seen = 0;
     bool result;
     rpmpeer_entry_t *peer = NULL;
+    char *msg = NULL;
 
     assert(ri != NULL);
     assert(ri->peers != NULL);
+
+    if (ri->licensedb == NULL || access(ri->licensedb, F_OK|R_OK)) {
+        msg = strdup("Missing license database");
+        add_result(&ri->results, RESULT_BAD, NOT_WAIVABLE, HEADER_LICENSE, msg, NULL, REMEDY_LICENSEDB);
+        free(msg);
+        return false;
+    }
 
     /*
      * The license test just looks at the licenses on the after build

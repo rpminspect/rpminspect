@@ -47,6 +47,7 @@
 
 /* license */
 #define REMEDY_LICENSE       "The License tag must contain an approved license string as defined by the distribution (e.g., GPLv2+)."
+#define REMEDY_LICENSEDB     "Make sure the licensedb setting in the rpminspect.conf file is set to a valid licensedb file.  This is also commonly due to a missing vendor specific rpminspect-data package on the system."
 
 /* elf */
 #define REMEDY_ELF_TEXTREL              "Ensure all object files are compiled with -fPIC"

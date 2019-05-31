@@ -80,7 +80,6 @@ void add_result(results_t **results, severity_t severity,
 
     assert(severity >= 0);
     assert(header != NULL);
-    assert(msg != NULL);
 
     if (*results == NULL) {
         *results = init_results();
@@ -92,7 +91,10 @@ void add_result(results_t **results, severity_t severity,
     entry->severity = severity;
     entry->waiverauth = waiverauth;
     entry->header = strdup(header);
-    entry->msg = strdup(msg);
+
+    if (msg != NULL) {
+        entry->msg = strdup(msg);
+    }
 
     if (screendump != NULL) {
         entry->screendump = strdup(screendump);
