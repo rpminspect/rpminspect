@@ -141,12 +141,6 @@ bool inspect_metadata(struct rpminspect *ri) {
      *       between the above RPM header values and report them.
      */
 
-    /* Check the source peers */
-    if (!_valid_peers(ri, ri->before_srpm_hdr, ri->after_srpm_hdr)) {
-        ret = true;
-    }
-
-    /* Check the binary peers */
     TAILQ_FOREACH(peer, ri->peers, items) {
         /* Disappearing subpackages are caught by INSPECT_EMPTYRPM */
         if (peer->after_rpm == NULL) {

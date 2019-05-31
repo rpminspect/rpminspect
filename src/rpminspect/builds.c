@@ -81,18 +81,7 @@ static int _get_rpm_info(const char *pkg) {
         return ret;
     }
 
-    if (headerIsSource(h)) {
-        if (whichbuild == BEFORE_BUILD) {
-            workri->before_srpm_hdr = headerCopy(h);
-            workri->before_srpm = strdup(pkg);
-        } else if (whichbuild == AFTER_BUILD) {
-            workri->after_srpm_hdr = headerCopy(h);
-            workri->after_srpm = strdup(pkg);
-        }
-    } else {
-        add_peer(&workri->peers, whichbuild, pkg, &h);
-    }
-
+    add_peer(&workri->peers, whichbuild, pkg, &h);
     headerFree(h);
     return ret;
 }

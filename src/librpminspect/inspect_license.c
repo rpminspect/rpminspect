@@ -270,17 +270,12 @@ bool inspect_license(struct rpminspect *ri) {
     rpmpeer_entry_t *peer = NULL;
 
     assert(ri != NULL);
-    assert(ri->after_srpm_hdr != NULL);
     assert(ri->peers != NULL);
 
     /*
      * The license test just looks at the licenses on the after build
      * packages.  The before build is not used here.
      */
-
-    /* First check the SRPM */
-    good += _check_peer_license(ri, ri->after_srpm_hdr);
-    seen++;
 
     /* Second check the binary peers */
     TAILQ_FOREACH(peer, ri->peers, items) {

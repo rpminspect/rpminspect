@@ -161,11 +161,7 @@ struct rpminspect {
     bool verbose;              /* verbose inspection output? */
 
     /* accumulated data of the build set */
-    Header before_srpm_hdr;    /* RPM header of the before src package */
-    Header after_srpm_hdr;     /* RPM header of the after src package */
-    char *before_srpm;         /* full path to the before source RPM file */
-    char *after_srpm;          /* full path to the after source RPM file */
-    rpmpeer_t *peers;          /* list of binary packages */
+    rpmpeer_t *peers;          /* list of packages */
 
     /* inspection results */
     results_t *results;

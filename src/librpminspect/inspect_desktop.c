@@ -309,10 +309,10 @@ static bool _desktop_driver(struct rpminspect *ri, rpmfile_entry_t *file) {
     /* Report validation results */
     arch = headerGetAsString(file->rpm_header, RPMTAG_ARCH);
 
-    if (ri->before_srpm != NULL && file->peer_file && before_out == NULL && after_out != NULL) {
+    if (file->peer_file && before_out == NULL && after_out != NULL) {
         xasprintf(&msg, "File %s is no longer a valid desktop entry file on %s; desktop-file-validate reports:", file->localpath, arch);
         add_result(&ri->results, (after_code == 0) ? RESULT_INFO : RESULT_BAD, WAIVABLE_BY_ANYONE, HEADER_DESKTOP, msg, after_out, REMEDY_DESKTOP);
-    } else if (ri->before_srpm != NULL && file->peer_file == NULL && after_out != NULL) {
+    } else if (file->peer_file == NULL && after_out != NULL) {
         xasprintf(&msg, "New file %s is not a valid desktop file on %s; desktop-file-validate reports:", file->localpath, arch);
         add_result(&ri->results, (after_code == 0) ? RESULT_INFO : RESULT_BAD, WAIVABLE_BY_ANYONE, HEADER_DESKTOP, msg, after_out, REMEDY_DESKTOP);
     } else if (after_out != NULL) {
