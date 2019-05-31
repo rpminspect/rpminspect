@@ -80,6 +80,7 @@ void output_text(const results_t *results, const char *dest) {
         if (result->msg != NULL) {
             xasprintf(&msg, "%d) %s\n", count++, result->msg);
             printwrap(msg, width, 0, fp);
+            fprintf(fp, "\n");
             free(msg);
         }
 
