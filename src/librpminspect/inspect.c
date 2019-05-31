@@ -77,6 +77,12 @@ struct inspect inspections[] = {
       &inspect_disttag,
       "Check that the 'Release' tag in the RPM spec file includes the %{?dist} directive." },
 
+    { INSPECT_SPECNAME,
+      "specname",
+      true,
+      &inspect_specname,
+      "Ensure the spec file name conforms to the NAME.spec naming format." },
+
     /*
      * { INSPECT_TYPE (add to inspect.h),
      *   "short name",

@@ -34,6 +34,7 @@
 #define HEADER_XML           "XML files"
 #define HEADER_DESKTOP       "Desktop Entry files"
 #define HEADER_DISTTAG       "%{?dist} tag"
+#define HEADER_SPECNAME      "Spec file name"
 
 /*
  * Inspection remedies
@@ -71,5 +72,8 @@
 
 /* disttag */
 #define REMEDY_DISTTAG "The Release: tag in the spec file must include a '%%{?dist}' string.  Please add this to the spec file per the distribution packaging guidelines."
+
+/* specname */
+#define REMEDY_SPECNAME "The spec file name does not match the expected NAME.spec format.  Rename the spec file to conform to this policy."
 
 #endif
