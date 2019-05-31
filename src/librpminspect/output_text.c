@@ -77,13 +77,13 @@ void output_text(const results_t *results, const char *dest) {
             displayed_header = true;
         }
 
-        if (msg != NULL) {
-            xasprintf(&msg, "%d) %s", count++, result->msg);
+        if (result->msg != NULL) {
+            xasprintf(&msg, "%d) %s\n", count++, result->msg);
             printwrap(msg, width, 0, fp);
             free(msg);
         }
 
-        fprintf(fp, "\nResult: %s\n", strseverity(result->severity));
+        fprintf(fp, "Result: %s\n", strseverity(result->severity));
 
         if (result->severity != RESULT_OK) {
             fprintf(fp, "Waiver Authorization: %s\n\n", strwaiverauth(result->waiverauth));
