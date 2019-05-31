@@ -320,10 +320,10 @@ int main(int argc, char **argv) {
 
     /* Clean up */
     if (keep) {
-        printf("Keeping working directory: %s\n", ri.worksubdir);
+        printf("\nKeeping working directory: %s\n", ri.worksubdir);
     } else {
         if (rmtree(ri.workdir, true, true)) {
-            fprintf(stderr, "*** Error removing directory %s: %s\n", ri.workdir, strerror(errno));
+           fprintf(stderr, "*** Error removing directory %s: %s\n", ri.workdir, strerror(errno));
            fflush(stderr);
         }
     }
