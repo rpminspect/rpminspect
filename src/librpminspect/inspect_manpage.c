@@ -228,6 +228,11 @@ static bool _manpage_driver(struct rpminspect *ri, rpmfile_entry_t *file)
     const char *arch;
     char *msg = NULL;
 
+    /* Skip source packages */
+    if (headerIsSource(file->rpm_header)) {
+        return true;
+    }
+
     /* Is this a man page? */
     if (!file->fullpath || !S_ISREG(file->st.st_mode)) {
         return true;
