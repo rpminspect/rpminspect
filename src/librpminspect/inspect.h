@@ -100,6 +100,9 @@ bool inspect_metadata(struct rpminspect *);
 /* inspect_desktop.c */
 bool inspect_desktop(struct rpminspect *);
 
+/* inspect_disttag.c */
+bool inspect_disttag(struct rpminspect *);
+
 /*
  * Inspections are referenced by flag.  These flags are set in bitfields
  * to indicate which ones we want to run.  When adding new ones, please
@@ -115,5 +118,6 @@ bool inspect_desktop(struct rpminspect *);
 #define INSPECT_XML                         (((uint64_t) 1) << 5)
 #define INSPECT_ELF                         (((uint64_t) 1) << 6)
 #define INSPECT_DESKTOP                     (((uint64_t) 1) << 7)
+#define INSPECT_DISTTAG                     (((uint64_t) 1) << 8)
 
 #endif

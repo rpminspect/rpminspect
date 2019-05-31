@@ -71,6 +71,20 @@ struct inspect inspections[] = {
       &inspect_desktop,
       "Perform syntax and file reference checks on *.desktop files. Syntax errors and invalid file references are reported as errors." },
 
+    { INSPECT_DISTTAG,
+      "disttag",
+      true,
+      &inspect_disttag,
+      "Check that the 'Release' tag in the RPM spec file includes the %{?dist} directive." },
+
+    /*
+     * { INSPECT_TYPE (add to inspect.h),
+     *   "short name",
+     *   bool--true if for single build, false is before&after required,
+     *   &function_pointer,
+     *   "Long description string" },
+     */
+
     { 0, NULL, false, NULL, NULL }
 };
 

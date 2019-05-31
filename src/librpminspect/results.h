@@ -33,6 +33,7 @@
 #define HEADER_MAN           "Man pages"
 #define HEADER_XML           "XML files"
 #define HEADER_DESKTOP       "Desktop Entry files"
+#define HEADER_DISTTAG       "%{?dist} tag"
 
 /*
  * Inspection remedies
@@ -67,5 +68,8 @@
 
 /* desktop */
 #define REMEDY_DESKTOP "Refer to the Desktop Entry Specification at https://standards.freedesktop.org/desktop-entry-spec/latest/ for help correcting the errors and warnings"
+
+/* disttag */
+#define REMEDY_DISTTAG "The Release: tag in the spec file must include a '%%{?dist}' string.  Please add this to the spec file per the distribution packaging guidelines."
 
 #endif

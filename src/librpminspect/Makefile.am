@@ -24,6 +24,7 @@ librpminspect_la_SOURCES = badwords.c \
                            inspect_metadata.c \
                            inspect_xml.c \
                            inspect_desktop.c \
+                           inspect_disttag.c \
                            koji.c \
                            listfuncs.c \
                            local.c \
