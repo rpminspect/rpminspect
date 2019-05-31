@@ -948,6 +948,11 @@ static bool _elf_driver(struct rpminspect *ri, rpmfile_entry_t *after)
     int before_elf_fd;
     bool result = true;
 
+    /* Skip source packages */
+    if (headerIsSource(after->rpm_header)) {
+        return true;
+    }
+
     if (!after->fullpath || !S_ISREG(after->st.st_mode)) {
         return true;
     }
