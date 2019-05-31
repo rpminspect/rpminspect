@@ -137,6 +137,11 @@ static bool _xml_driver(struct rpminspect *ri, rpmfile_entry_t *file)
     char *msg = NULL;
     bool result;
 
+    /* Skip source packages */
+    if (headerIsSource(file->rpm_header)) {
+        return true;
+    }
+
     /* Is this an XML file? */
     if (!file->fullpath || !S_ISREG(file->st.st_mode)) {
         return true;
