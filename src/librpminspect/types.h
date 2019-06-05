@@ -231,6 +231,18 @@ typedef struct _koji_rpmlist_entry_t {
 typedef TAILQ_HEAD(koji_rpmlist_s, _koji_rpmlist_entry_t) koji_rpmlist_t;
 
 /*
+ * Known types of Koji builds
+ */
+typedef enum _koji_build_type_t {
+    KOJI_BUILD_NULL = 0,       /* initializer, not an actual build */
+    KOJI_BUILD_IMAGE = 1,
+    KOJI_BUILD_MAVEN = 2,
+    KOJI_BUILD_MODULE = 3,
+    KOJI_BUILD_RPM = 4,
+    KOJI_BUILD_WIN = 5
+} koji_build_type_t;
+
+/*
  * Koji build structure.  This is determined by looking at the
  * output of a getBuild XMLRPC call to a Koji hub.
  *
@@ -240,7 +252,16 @@ typedef TAILQ_HEAD(koji_rpmlist_s, _koji_rpmlist_entry_t) koji_rpmlist_t;
  * Not all things returned are represented in this struct.
  */
 struct koji_build {
-    /* These are all relevant to the name of the package */
+    /* The type of Koji build we are looking at */
+    /*
+     * NOTE: rpminspect works with RPMs at the lowest level, so
+     * build types that are other collections of RPMs may be
+     * supported. But supporting non-RPM containers in rpminspect
+     * is not really in scope.
+     */
+    koji_build_type_t type;
+
+    /* These are all relevant to the name of the build */
     char *package_name;
     char *epoch;
     char *name;
@@ -264,12 +285,27 @@ struct koji_build {
     char *start_time;
     int creation_event_id;
     double start_ts;
-    int volume_id;
     double creation_ts;
     int task_id;
 
     /* Where to find the resulting build artifacts */
+    int volume_id;
     char *volume_name;
+
+    /*
+     * Original source URL, for some reason
+     * (not present for module builds)
+     */
+    char *original_url;
+
+    /* Module metadata -- only if this build is a module */
+    char *modulemd_str;
+    char *module_name;
+    char *module_stream;
+    int module_build_service_id;
+    char *module_version;
+    char *module_context;
+    char *module_content_koji_tag;
 
     /* List of RPMs in this build */
     koji_rpmlist_t *rpms;
