@@ -58,31 +58,12 @@ bool is_local_build(const char *build) {
         return false;
     }
 
-    /*
-     * If we got this far, we think it's a build, but do some checking.
-     * Let's look for some common log files:
-     *     data/logs/src/state.log
-     *     data/logs/src/build.log
-     *     data/logs/src/root.log
-     */
     memset(cwd, '\0', sizeof(cwd));
     r = getcwd(cwd, PATH_MAX);
     assert(r != NULL);
 
     if (chdir(build) == -1) {
         fprintf(stderr, "%s (%d): %s\n", __func__, __LINE__, strerror(errno));
-        fflush(stderr);
-        return false;
-    }
-
-    if (chdir("data/logs/src") == -1) {
-        fprintf(stderr, "%s (%d): %s\n", __func__, __LINE__, strerror(errno));
-        fflush(stderr);
-        return false;
-    }
-
-    if (access("state.log", F_OK|R_OK) || access("build.log", F_OK|R_OK) || access("root.log", F_OK|R_OK)) {
-        fprintf(stderr, "*** Unable to find all build logs in data/logs/src (state.log, build.log, root.log) for %s\n", build);
         fflush(stderr);
         return false;
     }
