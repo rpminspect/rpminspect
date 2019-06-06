@@ -117,11 +117,18 @@ int init_rpminspect(struct rpminspect *ri, const char *cfgfile) {
         ri->kojihub = strdup(tmp);
     }
 
-    tmp = iniparser_getstring(cfg, "koji:download", NULL);
+    tmp = iniparser_getstring(cfg, "koji:download_ursine", NULL);
     if (tmp == NULL) {
-        ri->kojidownload = NULL;
+        ri->kojiursine = NULL;
     } else {
-        ri->kojidownload = strdup(tmp);
+        ri->kojiursine = strdup(tmp);
+    }
+
+    tmp = iniparser_getstring(cfg, "koji:download_mbs", NULL);
+    if (tmp == NULL) {
+        ri->kojimbs = NULL;
+    } else {
+        ri->kojimbs = strdup(tmp);
     }
 
     tmp = iniparser_getstring(cfg, "tests:badwords", NULL);

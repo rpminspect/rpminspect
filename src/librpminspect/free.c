@@ -46,7 +46,8 @@ void free_rpminspect(struct rpminspect *ri) {
     free(ri->workdir);
     free(ri->licensedb);
     free(ri->kojihub);
-    free(ri->kojidownload);
+    free(ri->kojiursine);
+    free(ri->kojimbs);
     free(ri->worksubdir);
 
     list_free(ri->badwords, free);
