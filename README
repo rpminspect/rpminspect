@@ -17,6 +17,19 @@ rpminspect-data package.  The rpminspect-data-generic package in this source
 tree provides a template for constructing the vendor specific data package.
 
 
+Build Types Support
+-------------------
+
+rpminspect expects its input to come from Koji.  That said, Koji produces
+certain types of builds that are not supported by rpminspect.  Right now,
+the following Koji build types are supported:
+
+    * RPM packages
+    * Modules (https://docs.fedoraproject.org/en-US/modularity/)
+
+More information on Koji can be found at https://pagure.io/koji
+
+
 Intended Audience
 -----------------
 
