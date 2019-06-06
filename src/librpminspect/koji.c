@@ -37,6 +37,45 @@ static void xmlrpc_abort_on_fault(xmlrpc_env *env) {
 }
 
 /*
+ * Initialize a koji_buildlist_t.
+ */
+koji_buildlist_t *init_koji_buildlist(void) {
+    koji_buildlist_t *builds = NULL;
+
+    builds = calloc(1, sizeof(*(builds)));
+    assert(builds != NULL);
+    TAILQ_INIT(builds);
+    return builds;
+}
+
+/*
+ * Free memory associated with a koji_buildlist_t.
+ */
+void free_koji_buildlist(koji_buildlist_t *builds) {
+    koji_buildlist_entry_t *entry = NULL;
+
+    if (builds == NULL) {
+        return;
+    }
+
+    while (!TAILQ_EMPTY(builds)) {
+        entry = TAILQ_FIRST(builds);
+        TAILQ_REMOVE(builds, entry, builditems);
+
+        free(entry->package_name);
+        entry->package_name = NULL;
+
+        free_koji_rpmlist(entry->rpms);
+
+        free(entry);
+    }
+
+    free(builds);
+
+    return;
+}
+
+/*
  * Initialize a koji_rpmlist_t.
  */
 koji_rpmlist_t *init_koji_rpmlist(void) {
@@ -98,7 +137,6 @@ void init_koji_build(struct koji_build *build) {
     build->completion_time = NULL;
     build->package_id = -1;
     build->id = -1;
-    build->build_id = -1;
     build->state = -1;
     build->completion_ts = 0;
     build->owner_id = -1;
@@ -122,7 +160,7 @@ void init_koji_build(struct koji_build *build) {
     build->module_context = NULL;
     build->module_content_koji_tag = NULL;
 
-    build->rpms = init_koji_rpmlist();
+    build->builds = init_koji_buildlist();
 
     return;
 }
@@ -158,7 +196,7 @@ void free_koji_build(struct koji_build *build) {
     free(build->module_context);
     free(build->module_content_koji_tag);
 
-    free_koji_rpmlist(build->rpms);
+    free_koji_buildlist(build->builds);
 
     free(build);
 
@@ -181,6 +219,7 @@ struct koji_build *get_koji_build(struct rpminspect *ri, const char *buildspec) 
     xmlrpc_value *value = NULL;
     char *key = NULL;
     char *s = NULL;
+    koji_buildlist_entry_t *buildentry = NULL;
     koji_rpmlist_entry_t *rpm = NULL;
 
     assert(ri != NULL);
@@ -283,8 +322,22 @@ struct koji_build *get_koji_build(struct rpminspect *ri, const char *buildspec) 
             xmlrpc_decompose_value(&env, value, "i", &build->id);
             xmlrpc_abort_on_fault(&env);
         } else if (!strcmp(key, "build_id")) {
-            xmlrpc_decompose_value(&env, value, "i", &build->build_id);
+            /* we hit this on regular packages, modules handled below */
+            buildentry = calloc(1, sizeof(*buildentry));
+            assert(buildentry != NULL);
+
+            xmlrpc_decompose_value(&env, value, "i", &buildentry->build_id);
             xmlrpc_abort_on_fault(&env);
+
+            if (build->package_name != NULL) {
+                buildentry->package_name = strdup(build->package_name);
+            }
+
+            buildentry->rpms = calloc(1, sizeof(*buildentry->rpms));
+            assert(buildentry->rpms != NULL);
+            TAILQ_INIT(buildentry->rpms);
+
+            TAILQ_INSERT_TAIL(build->builds, buildentry, builditems);
         } else if (!strcmp(key, "state")) {
             xmlrpc_decompose_value(&env, value, "i", &build->state);
             xmlrpc_abort_on_fault(&env);
@@ -397,69 +450,123 @@ struct koji_build *get_koji_build(struct rpminspect *ri, const char *buildspec) 
         }
     }
 
-    /* call 'listBuildRPMs' on the koji hub */
-    result = xmlrpc_client_call(&env, ri->kojihub, "listBuildRPMs", "(i)", build->build_id);
-    xmlrpc_abort_on_fault(&env);
-
-    /* read the values from the result */
-    size = xmlrpc_array_size(&env, result);
-    xmlrpc_abort_on_fault(&env);
-
-    for (i = 0; i < size; i++) {
-        xmlrpc_array_read_item(&env, result, i, &element);
+    /* Modules have multiple builds, so collect the IDs */
+    if (build->type == KOJI_BUILD_MODULE) {
+        xmlrpc_DECREF(result);
+        result = xmlrpc_client_call(&env, ri->kojihub, "getLatestBuilds", "(s)", build->module_content_koji_tag);
         xmlrpc_abort_on_fault(&env);
 
-        /* each array element is a struct */
-        s_sz = xmlrpc_struct_size(&env, element);
+        /* read the values from the result */
+        size = xmlrpc_array_size(&env, result);
         xmlrpc_abort_on_fault(&env);
 
-        /* create a new rpm list entry */
-        rpm = calloc(1, sizeof(*rpm));
-        assert(rpm != NULL);
-
-        for (j = 0; j < s_sz; j++) {
-            xmlrpc_struct_get_key_and_value(&env, element, j, &k, &value);
+        for (i = 0; i < size; i++) {
+            xmlrpc_array_read_item(&env, result, i, &element);
             xmlrpc_abort_on_fault(&env);
 
-            /* Get the key as a string */
-            xmlrpc_decompose_value(&env, k, "s", &key);
+            /* each array element is a struct */
+            s_sz = xmlrpc_struct_size(&env, element);
             xmlrpc_abort_on_fault(&env);
 
-            /* Skip nil values */
-            if (xmlrpc_value_type(value) == XMLRPC_TYPE_NIL) {
-                continue;
+            buildentry = calloc(1, sizeof(*buildentry));
+            assert(buildentry != NULL);
+
+            for (j = 0; j < s_sz; j++) {
+                xmlrpc_struct_get_key_and_value(&env, element, j, &k, &value);
+                xmlrpc_abort_on_fault(&env);
+
+                /* Get the key as a string */
+                xmlrpc_decompose_value(&env, k, "s", &key);
+                xmlrpc_abort_on_fault(&env);
+
+                /* Skip nil values */
+                if (xmlrpc_value_type(value) == XMLRPC_TYPE_NIL) {
+                    continue;
+                }
+
+                /* Grab the values we need */
+                if (!strcmp(key, "build_id")) {
+                    xmlrpc_decompose_value(&env, value, "i", &buildentry->build_id);
+                    xmlrpc_abort_on_fault(&env);
+                } else if (!strcmp(key, "package_name")) {
+                    xmlrpc_decompose_value(&env, value, "s", &s);
+                    xmlrpc_abort_on_fault(&env);
+                    buildentry->package_name = strdup(s);
+                }
             }
 
-            /* Grab the values we need */
-            if (!strcmp(key, "arch")) {
-                xmlrpc_decompose_value(&env, value, "s", &s);
-                xmlrpc_abort_on_fault(&env);
-                rpm->arch = strdup(s);
-            } else if (!strcmp(key, "name")) {
-                xmlrpc_decompose_value(&env, value, "s", &s);
-                xmlrpc_abort_on_fault(&env);
-                rpm->name = strdup(s);
-            } else if (!strcmp(key, "version")) {
-                xmlrpc_decompose_value(&env, value, "s", &s);
-                xmlrpc_abort_on_fault(&env);
-                rpm->version = strdup(s);
-            } else if (!strcmp(key, "release")) {
-                xmlrpc_decompose_value(&env, value, "s", &s);
-                xmlrpc_abort_on_fault(&env);
-                rpm->release = strdup(s);
-            } else if (!strcmp(key, "epoch")) {
-                xmlrpc_decompose_value(&env, value, "i", &rpm->epoch);
-            } else if (!strcmp(key, "size")) {
-                xmlrpc_decompose_value(&env, value, "i", &rpm->size);
-            }
+            buildentry->rpms = calloc(1, sizeof(*buildentry->rpms));
+            assert(buildentry->rpms != NULL);
+            TAILQ_INIT(buildentry->rpms);
 
-            if (rpm->arch != NULL && rpm->name != NULL && rpm->version != NULL && rpm->release != NULL) {
-                break;
-            }
+            TAILQ_INSERT_TAIL(build->builds, buildentry, builditems);
         }
+    }
 
-        /* add this rpm to the list */
-        TAILQ_INSERT_TAIL(build->rpms, rpm, items);
+    xmlrpc_DECREF(result);
+
+    /* Call 'listBuildRPMs' on the koji hub for each build_id */
+    TAILQ_FOREACH(buildentry, build->builds, builditems) {
+        result = xmlrpc_client_call(&env, ri->kojihub, "listBuildRPMs", "(i)", buildentry->build_id);
+        xmlrpc_abort_on_fault(&env);
+
+        /* read the values from the result */
+        size = xmlrpc_array_size(&env, result);
+        xmlrpc_abort_on_fault(&env);
+
+        for (i = 0; i < size; i++) {
+            xmlrpc_array_read_item(&env, result, i, &element);
+            xmlrpc_abort_on_fault(&env);
+
+            /* each array element is a struct */
+            s_sz = xmlrpc_struct_size(&env, element);
+            xmlrpc_abort_on_fault(&env);
+
+            /* create a new rpm list entry */
+            rpm = calloc(1, sizeof(*rpm));
+            assert(rpm != NULL);
+
+            for (j = 0; j < s_sz; j++) {
+                xmlrpc_struct_get_key_and_value(&env, element, j, &k, &value);
+                xmlrpc_abort_on_fault(&env);
+
+                /* Get the key as a string */
+                xmlrpc_decompose_value(&env, k, "s", &key);
+                xmlrpc_abort_on_fault(&env);
+
+                /* Skip nil values */
+                if (xmlrpc_value_type(value) == XMLRPC_TYPE_NIL) {
+                    continue;
+                }
+
+                /* Grab the values we need */
+                if (!strcmp(key, "arch")) {
+                    xmlrpc_decompose_value(&env, value, "s", &s);
+                    xmlrpc_abort_on_fault(&env);
+                    rpm->arch = strdup(s);
+                } else if (!strcmp(key, "name")) {
+                    xmlrpc_decompose_value(&env, value, "s", &s);
+                    xmlrpc_abort_on_fault(&env);
+                    rpm->name = strdup(s);
+                } else if (!strcmp(key, "version")) {
+                    xmlrpc_decompose_value(&env, value, "s", &s);
+                    xmlrpc_abort_on_fault(&env);
+                    rpm->version = strdup(s);
+                } else if (!strcmp(key, "release")) {
+                    xmlrpc_decompose_value(&env, value, "s", &s);
+                    xmlrpc_abort_on_fault(&env);
+                    rpm->release = strdup(s);
+                } else if (!strcmp(key, "epoch")) {
+                    xmlrpc_decompose_value(&env, value, "i", &rpm->epoch);
+                } else if (!strcmp(key, "size")) {
+                    xmlrpc_decompose_value(&env, value, "i", &rpm->size);
+                }
+
+            }
+
+            /* add this rpm to the list */
+            TAILQ_INSERT_TAIL(buildentry->rpms, rpm, items);
+        }
     }
 
     /* Cleanup */

@@ -132,7 +132,8 @@ struct rpminspect {
 
     /* Koji information (from config file) */
     char *kojihub;             /* URL of Koji hub */
-    char *kojidownload;        /* URL to access Koji build artifacts */
+    char *kojiursine;          /* URL to access packages built in Koji */
+    char *kojimbs;             /* URL to access module packages in Koji */
 
     /* Information used by different tests */
     string_list_t *badwords;   /* Space-delimited list of words prohibited
@@ -231,6 +232,24 @@ typedef struct _koji_rpmlist_entry_t {
 typedef TAILQ_HEAD(koji_rpmlist_s, _koji_rpmlist_entry_t) koji_rpmlist_t;
 
 /*
+ * List of build IDs from a Koji build.
+ */
+typedef struct _koji_buildlist_entry_t {
+    /* the main identifier in koji */
+    int build_id;
+
+    /* the name of the build */
+    char *package_name;
+
+    /* List of RPMs in this build */
+    koji_rpmlist_t *rpms;
+
+    TAILQ_ENTRY(_koji_buildlist_entry_t) builditems;
+} koji_buildlist_entry_t;
+
+typedef TAILQ_HEAD(koji_buildlist_s, _koji_buildlist_entry_t) koji_buildlist_t;
+
+/*
  * Known types of Koji builds
  */
 typedef enum _koji_build_type_t {
@@ -277,7 +296,6 @@ struct koji_build {
     char *completion_time;
     int package_id;
     int id;
-    int build_id;
     int state;
     double completion_ts;
     int owner_id;
@@ -307,8 +325,8 @@ struct koji_build {
     char *module_context;
     char *module_content_koji_tag;
 
-    /* List of RPMs in this build */
-    koji_rpmlist_t *rpms;
+    /* List of build IDs associated with this build */
+    koji_buildlist_t *builds;
 };
 
 #endif

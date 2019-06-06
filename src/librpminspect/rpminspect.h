@@ -89,6 +89,8 @@ string_list_t * list_copy(const string_list_t *);
 bool is_local_build(const char *);
 
 /* koji.c */
+koji_buildlist_t *init_koji_buildlist(void);
+void free_koji_buildlist(koji_buildlist_t *);
 koji_rpmlist_t *init_koji_rpmlist(void);
 void free_koji_rpmlist(koji_rpmlist_t *);
 void init_koji_build(struct koji_build *);

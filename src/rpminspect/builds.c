@@ -139,6 +139,7 @@ static int _copytree(const char *fpath, const struct stat *sb,
  * to our working directory.
  */
 static int _download_rpms(struct koji_build *build) {
+    koji_buildlist_entry_t *buildentry = NULL;
     koji_rpmlist_entry_t *rpm = NULL;
     char *src = NULL;
     char *dst = NULL;
@@ -153,7 +154,7 @@ static int _download_rpms(struct koji_build *build) {
     (void) cc;
 
     assert(build != NULL);
-    assert(build->rpms != NULL);
+    assert(build->builds != NULL);
 
     /* initialize curl */
     if (!(c = curl_easy_init())) {
@@ -163,54 +164,67 @@ static int _download_rpms(struct koji_build *build) {
     curl_easy_setopt(c, CURLOPT_WRITEFUNCTION, NULL);
     curl_easy_setopt(c, CURLOPT_FOLLOWLOCATION, 1L);
 
-    TAILQ_FOREACH(rpm, build->rpms, items) {
-        /* create the destination directory */
-        xasprintf(&dst, "%s/%s/%s", workri->worksubdir, build_desc[whichbuild], rpm->arch);
-
-        if (mkdirp(dst, mode)) {
-            fprintf(stderr, "*** Error creating directory %s: %s\n", dst, strerror(errno));
-            fflush(stderr);
-            return -1;
+    /* Iterate over list of builds, each with a list of packages */
+    TAILQ_FOREACH(buildentry, build->builds, builditems) {
+        if (TAILQ_EMPTY(buildentry->rpms)) {
+            /*
+             * not sure how you could have an empty package list,
+             * but let's not underestimate what jobs people can
+             * submit to koji
+             */
+            continue;
         }
 
-        free(dst);
+        /* Iterate over the list of packages for this build */
+        TAILQ_FOREACH(rpm, buildentry->rpms, items) {
+            /* create the destination directory */
+            xasprintf(&dst, "%s/%s/%s", workri->worksubdir, build_desc[whichbuild], rpm->arch);
 
-        /* build path strings */
-        xasprintf(&pkg, "%s-%s-%s.%s.rpm", rpm->name, rpm->version, rpm->release, rpm->arch);
-        xasprintf(&dst, "%s/%s/%s/%s", workri->worksubdir, build_desc[whichbuild], rpm->arch, pkg);
+            if (mkdirp(dst, mode)) {
+                fprintf(stderr, "*** Error creating directory %s: %s\n", dst, strerror(errno));
+                fflush(stderr);
+                return -1;
+            }
 
-        if (!strcmp(build->volume_name, "DEFAULT")) {
-            xasprintf(&src, "%s/packages/%s/%s/%s/%s/%s", workri->kojidownload, build->name, build->version, build->release, rpm->arch, pkg);
-        } else {
-            xasprintf(&src, "%s/%s/packages/%s/%s/%s/%s/%s", workri->kojidownload, build->volume_name, build->name, build->version, build->release, rpm->arch, pkg);
+            free(dst);
+
+            /* build path strings */
+            xasprintf(&pkg, "%s-%s-%s.%s.rpm", rpm->name, rpm->version, rpm->release, rpm->arch);
+            xasprintf(&dst, "%s/%s/%s/%s", workri->worksubdir, build_desc[whichbuild], rpm->arch, pkg);
+
+            if (!strcmp(build->volume_name, "DEFAULT")) {
+                xasprintf(&src, "%s/packages/%s/%s/%s/%s/%s", (build->type == KOJI_BUILD_MODULE) ? workri->kojimbs : workri->kojiursine, buildentry->package_name, rpm->version, rpm->release, rpm->arch, pkg);
+            } else {
+                xasprintf(&src, "%s/%s/packages/%s/%s/%s/%s/%s", (build->type == KOJI_BUILD_MODULE) ? workri->kojimbs : workri->kojiursine, build->volume_name, buildentry->package_name, rpm->version, rpm->release, rpm->arch, pkg);
+            }
+
+            /* perform the download */
+            fp = fopen(dst, "wb");
+            assert(fp != NULL);
+            curl_easy_setopt(c, CURLOPT_URL, src);
+            curl_easy_setopt(c, CURLOPT_WRITEDATA, fp);
+
+            if (workri->verbose) {
+                printf("Downloading %s...\n", src);
+            }
+
+            cc = curl_easy_perform(c);
+            assert(cc == CURLE_OK);
+            r = fclose(fp);
+            assert(r == 0);
+
+            /* gather the RPM header */
+            if (_get_rpm_info(dst)) {
+                fprintf(stderr, "*** Error reading RPM: %s\n", dst);
+                fflush(stderr);
+                return -1;
+            }
+
+            /* start over */
+            free(src);
+            free(dst);
+            free(pkg);
         }
-
-        /* perform the download */
-        fp = fopen(dst, "wb");
-        assert(fp != NULL);
-        curl_easy_setopt(c, CURLOPT_URL, src);
-        curl_easy_setopt(c, CURLOPT_WRITEDATA, fp);
-
-        if (workri->verbose) {
-            printf("Downloading %s...\n", src);
-        }
-
-        cc = curl_easy_perform(c);
-        assert(cc == CURLE_OK);
-        r = fclose(fp);
-        assert(r == 0);
-
-        /* gather the RPM header */
-        if (_get_rpm_info(dst)) {
-            fprintf(stderr, "*** Error reading RPM: %s\n", dst);
-            fflush(stderr);
-            return -1;
-        }
-
-        /* start over */
-        free(src);
-        free(dst);
-        free(pkg);
     }
 
     curl_easy_cleanup(c);
