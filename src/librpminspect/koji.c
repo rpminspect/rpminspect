@@ -122,8 +122,6 @@ void free_koji_rpmlist(koji_rpmlist_t *rpms) {
 void init_koji_build(struct koji_build *build) {
     assert(build != NULL);
 
-    build->type = KOJI_BUILD_RPM;
-
     build->package_name = NULL;
     build->epoch = NULL;
     build->name = NULL;
@@ -419,7 +417,7 @@ struct koji_build *get_koji_build(struct rpminspect *ri, const char *buildspec) 
                     xmlrpc_decompose_value(&env, subv, "s", &s);
                     xmlrpc_abort_on_fault(&env);
                     build->modulemd_str = strdup(s);
-                    build->type = KOJI_BUILD_MODULE;
+                    ri->buildtype = KOJI_BUILD_MODULE;
                 } else if(!strcmp(subkey, "name")) {
                     xmlrpc_decompose_value(&env, subv, "s", &s);
                     xmlrpc_abort_on_fault(&env);
@@ -451,7 +449,7 @@ struct koji_build *get_koji_build(struct rpminspect *ri, const char *buildspec) 
     }
 
     /* Modules have multiple builds, so collect the IDs */
-    if (build->type == KOJI_BUILD_MODULE) {
+    if (ri->buildtype == KOJI_BUILD_MODULE) {
         xmlrpc_DECREF(result);
         result = xmlrpc_client_call(&env, ri->kojihub, "getLatestBuilds", "(s)", build->module_content_koji_tag);
         xmlrpc_abort_on_fault(&env);

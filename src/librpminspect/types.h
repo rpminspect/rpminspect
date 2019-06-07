@@ -117,6 +117,18 @@ typedef struct _results_entry_t {
 typedef TAILQ_HEAD(results_s, _results_entry_t) results_t;
 
 /*
+ * Known types of Koji builds
+ */
+typedef enum _koji_build_type_t {
+    KOJI_BUILD_NULL = 0,       /* initializer, not an actual build */
+    KOJI_BUILD_IMAGE = 1,      /* not supported */
+    KOJI_BUILD_MAVEN = 2,      /* not supported */
+    KOJI_BUILD_MODULE = 3,
+    KOJI_BUILD_RPM = 4,
+    KOJI_BUILD_WIN = 5         /* not supported */
+} koji_build_type_t;
+
+/*
  * Configuration and state instance for librpminspect run.
  * Applications using librpminspect should initialize the
  * library and retain this structure through the run of
@@ -160,6 +172,15 @@ struct rpminspect {
     char *after;               /* after build ID arg given on cmdline */
     uint64_t tests;            /* which tests to run (default: ALL) */
     bool verbose;              /* verbose inspection output? */
+
+    /* The type of Koji build we are looking at */
+    /*
+     * NOTE: rpminspect works with RPMs at the lowest level, so
+     * build types that are other collections of RPMs may be
+     * supported. But supporting non-RPM containers in rpminspect
+     * is not really in scope.
+     */
+    koji_build_type_t buildtype;
 
     /* accumulated data of the build set */
     rpmpeer_t *peers;          /* list of packages */
@@ -250,18 +271,6 @@ typedef struct _koji_buildlist_entry_t {
 typedef TAILQ_HEAD(koji_buildlist_s, _koji_buildlist_entry_t) koji_buildlist_t;
 
 /*
- * Known types of Koji builds
- */
-typedef enum _koji_build_type_t {
-    KOJI_BUILD_NULL = 0,       /* initializer, not an actual build */
-    KOJI_BUILD_IMAGE = 1,
-    KOJI_BUILD_MAVEN = 2,
-    KOJI_BUILD_MODULE = 3,
-    KOJI_BUILD_RPM = 4,
-    KOJI_BUILD_WIN = 5
-} koji_build_type_t;
-
-/*
  * Koji build structure.  This is determined by looking at the
  * output of a getBuild XMLRPC call to a Koji hub.
  *
@@ -271,15 +280,6 @@ typedef enum _koji_build_type_t {
  * Not all things returned are represented in this struct.
  */
 struct koji_build {
-    /* The type of Koji build we are looking at */
-    /*
-     * NOTE: rpminspect works with RPMs at the lowest level, so
-     * build types that are other collections of RPMs may be
-     * supported. But supporting non-RPM containers in rpminspect
-     * is not really in scope.
-     */
-    koji_build_type_t type;
-
     /* These are all relevant to the name of the build */
     char *package_name;
     char *epoch;

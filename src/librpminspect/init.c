@@ -212,6 +212,7 @@ int init_rpminspect(struct rpminspect *ri, const char *cfgfile) {
 
     ri->before = NULL;
     ri->after = NULL;
+    ri->buildtype = KOJI_BUILD_RPM;
     ri->peers = init_rpmpeer();
     ri->worksubdir = NULL;
     ri->tests = ~tests;
