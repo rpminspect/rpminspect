@@ -1,11 +1,119 @@
-- Inspections
-      - More inspections
+There's a large amount of work to do in rpminspect.  Any of the items below are
+welcome contributions as well as bug fixes and other such updates.
+
+
+INSPECTIONS
+===========
+
+The inspections in librpminspect do the work of the program.  There are several
+now, but that can be expanded.  Here is a list of inspection ideas:
+
+* abi
+
+Runs 'abidiff' on ELF files in before and after packages to collect symbol
+information and report on new or removed symbols.  This inspection should also
+honor the rpminspect "ABI whitelist" as defined in the data/ subdirectory.
+Additionally, SRPMs can contain Source* lines that specify *.abignore files
+that should be used by abidiff in this inspection.
+
+* kmi
+
+Kernel Module Interface comparison and report using kmidiff.  This is the same
+as the 'abi' test for ELF objects, but is strictly for kernel objects.  The
+inspection should honor an optional kmi whitelist in the same context as the
+"ABI whitelist" for the 'abi' test.
+
+* buildlogs
+
+Analyze build logs from koji for common known failure strings.  Report these
+out as either INFO or VERIFY or BAD.
+
+* changed
+
+Look for content changes in files between the before and after packages.  This
+should be divided up by categories and reported accordingly:
+
+    XXX
+
+* config (in %files)
+
+
+* doc (in %files)
+
+
+* license (in %files)
+
+
+* elflint
+
+Run elflint on all ELF objects in before and after packages, report any changes
+of gaining or losing things.  Also report architecture mismatches based on the
+architecturt given by elflint and the architecture of the package the file is
+in.  Needs special handling for vdso32- files and files in the /usr/lib/grub
+directory.
+
+* elfcheck
+
+Run annocheck on ELF files and report changes.  Should skip the kernel and
+kernel modules.  Check for losing or gaining any of these things in ELF
+objects:
+
+    execstack
+    textrel
+    relro
+    built with -D_FORTIFY_SOURCE=N
+    PIE
+    PIC
+
+Things appearing in the after package should be reported as RESULT_BAD and
+require a security team waiver.  Things lost are the same way.  It might be a
+better idea for each of these sub inspections to be their own inspection so
+they can be individually enabled and disabled at runtime.
+
+* filelist
+
+Look for any files added to or removed from packages.  Iterate over the %files
+section of each subpackage.  Also perform some checks to ensure files we never
+want in packages are not there (this should be a configuration file setting).
+For example, the following wildcards should never appear in packages:
+
+    CVS
+    .svn
+    .git
+    var/tmp/*
+    __MACOSX
+    tmp/*
+    *.orig
+    *~
+
+Removal of certain files requires a security team waiver.  For example, sudoers
+files or PolicyKit files.  The list requiring a security team waiver should be
+controlled by a configuration file setting.
+
+* setxid
+
+Look for setuid and setgid files.  If any are added or lost, raise that as a
+problem that requires a security team waiver.  But first, check to see if any
+added are on the setxid whitelist.  If they are, just keep going.
+
+
+OTHER WORK
+==========
 
 - Test suite
       - Invoked via 'make check'
-      - Unit tests
+      - Unit tests for librpminspect
       - Inspection test suite with valid and invalid data
 
 - Documentation
       - User documentation
       - Developer documentation
+
+
+NOTES ABOUT TESTS
+=================
+
+Aside from unit tests, we should have an integration test suite to validate the functionality of the program when run against real builds.  Here are some notes about tests to implement:
+
+* Handle empty RPMs (i.e., missing RPMTAG_FILELIST).  This is legal and allows
+  RPMs to just provide metadata.
