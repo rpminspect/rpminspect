@@ -49,7 +49,6 @@ static int _printword(const char *word, const size_t width,
     }
 
     /* print a space between words except at the start of a line */
-    assert(strlen(word) < (width - ret));
     ret += fprintf(dest, "%s%s", first ? "" : " ", word);
 
     return ret;
