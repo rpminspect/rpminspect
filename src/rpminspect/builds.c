@@ -41,7 +41,7 @@ static char *build_desc[] = { "before", "after" };
 static void _set_worksubdir(struct rpminspect *, bool, struct koji_build *);
 static int _get_rpm_info(const char *);
 static int _copytree(const char *, const struct stat *, int, struct FTW *);
-static int _download_rpms(struct koji_build *);
+static int _download_artifacts(struct koji_build *);
 
 /*
  * Set the working subdirectory for this particular run based on whether
@@ -135,10 +135,10 @@ static int _copytree(const char *fpath, const struct stat *sb,
 }
 
 /*
- * Given a remote RPM specification in a Koji build, download it
+ * Given a remote artifact specification in a Koji build, download it
  * to our working directory.
  */
-static int _download_rpms(struct koji_build *build) {
+static int _download_artifacts(struct koji_build *build) {
     koji_buildlist_entry_t *buildentry = NULL;
     koji_rpmlist_entry_t *rpm = NULL;
     char *src = NULL;
@@ -261,7 +261,7 @@ int gather_builds(struct rpminspect *ri) {
             whichbuild = AFTER_BUILD;
             _set_worksubdir(ri, false, build);
 
-            if (_download_rpms(build)) {
+            if (_download_artifacts(build)) {
                 fprintf(stderr, "*** Error downloading build %s\n", ri->after);
                 fflush(stderr);
                 return -1;
@@ -293,7 +293,7 @@ int gather_builds(struct rpminspect *ri) {
         whichbuild = BEFORE_BUILD;
         _set_worksubdir(ri, false, build);
 
-        if (_download_rpms(build)) {
+        if (_download_artifacts(build)) {
             fprintf(stderr, "*** Error downloading build %s\n", ri->before);
             fflush(stderr);
             return -1;
