@@ -29,32 +29,39 @@ static bool _modularity_driver(struct rpminspect *ri, rpmfile_entry_t *file) {
     rpmTagType tt;
     rpmTagVal tv;
     char *modularitylabel = NULL;
+    char *msg = NULL;
 
-    /* XXX
-     * Some more should happen here, like determining if we are looking
-     * at a module build.  Not all packages will be in modules, so there
-     * needs to be an outer check to determine that first.
-     */
+    assert(ri != NULL);
+    assert(file != NULL);
+
+    /* Build the message we'll use for errors */
+    xasprintf(&msg, "Package \"%s\" is part of a module but lacks the '%%{modularitylabel}' header tag.", headerGetAsString(file->rpm_header, RPMTAG_NAME));
 
     /* Find how to find the header */
     tv = rpmTagGetValue("modularitylabel");
     if (tv == -1) {
-        /* XXX */
-        return true;
+        add_result(&ri->results, RESULT_BAD, NOT_WAIVABLE, HEADER_MODULARITY, msg, NULL, REMEDY_MODULARITY);
+        free(msg);
+        return false;
     }
 
     tt = rpmTagGetTagType(tv);
     if (tt == RPM_NULL_TYPE) {
-        /* XXX */
-        return true;
+        add_result(&ri->results, RESULT_BAD, NOT_WAIVABLE, HEADER_MODULARITY, msg, NULL, REMEDY_MODULARITY);
+        free(msg);
+        return false;
     }
 
     /* Get the tag from the header */
     modularitylabel = headerGetAsString(file->rpm_header, tv);
 
+    if (modularitylabel == NULL) {
+        add_result(&ri->results, RESULT_BAD, NOT_WAIVABLE, HEADER_MODULARITY, msg, NULL, REMEDY_MODULARITY);
+        free(msg);
+        return false;
+    }
 
-printf("modularitylabel: |%s|\n", modularitylabel);
-
+    free(msg);
     free(modularitylabel);
     return result;
 }
@@ -64,6 +71,10 @@ printf("modularitylabel: |%s|\n", modularitylabel);
  */
 bool inspect_modularity(struct rpminspect *ri) {
     bool result = false;
+
+    if (ri->buildtype != KOJI_BUILD_MODULE) {
+        return true;
+    }
 
     assert(ri != NULL);
     result = foreach_peer_file(ri, _modularity_driver);
