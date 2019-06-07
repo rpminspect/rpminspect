@@ -83,6 +83,12 @@ struct inspect inspections[] = {
       &inspect_specname,
       "Ensure the spec file name conforms to the NAME.spec naming format." },
 
+    { INSPECT_MODULARITY,
+      "modularity",
+      true,
+      &inspect_modularity,
+      "Ensure compliance with modularity build and packaging policies (only valid for module builds, no-op otherwise)." },
+
     /*
      * { INSPECT_TYPE (add to inspect.h),
      *   "short name",

@@ -35,6 +35,7 @@
 #define HEADER_DESKTOP       "Desktop Entry files"
 #define HEADER_DISTTAG       "%{?dist} tag"
 #define HEADER_SPECNAME      "Spec file name"
+#define HEADER_MODULARITY    "Modularity"
 
 /*
  * Inspection remedies
@@ -75,5 +76,8 @@
 
 /* specname */
 #define REMEDY_SPECNAME "The spec file name does not match the expected NAME.spec format.  Rename the spec file to conform to this policy."
+
+/* modularity */
+#define REMEDY_MODULARITY "This package is part of a module but is missing the %{modularitylabel} header tag.  Add this as a %%define in the spec file and rebuild."
 
 #endif
