@@ -41,7 +41,8 @@ static char *build_desc[] = { "before", "after" };
 static void _set_worksubdir(struct rpminspect *, bool, struct koji_build *);
 static int _get_rpm_info(const char *);
 static int _copytree(const char *, const struct stat *, int, struct FTW *);
-static int _download_artifacts(struct koji_build *);
+static int _download_artifacts(const struct rpminspect *, struct koji_build *);
+static void _curl_helper(const bool, const char *, const char *);
 
 /*
  * Set the working subdirectory for this particular run based on whether
@@ -135,15 +136,9 @@ static int _copytree(const char *fpath, const struct stat *sb,
 }
 
 /*
- * Given a remote artifact specification in a Koji build, download it
- * to our working directory.
+ * Download helper for libcurl
  */
-static int _download_artifacts(struct koji_build *build) {
-    koji_buildlist_entry_t *buildentry = NULL;
-    koji_rpmlist_entry_t *rpm = NULL;
-    char *src = NULL;
-    char *dst = NULL;
-    char *pkg = NULL;
+static void _curl_helper(const bool verbose, const char *src, const char *dst) {
     FILE *fp = NULL;
     CURL *c = NULL;
     int r;
@@ -153,16 +148,59 @@ static int _download_artifacts(struct koji_build *build) {
     (void) r;
     (void) cc;
 
-    assert(build != NULL);
-    assert(build->builds != NULL);
+    assert(src != NULL);
+    assert(dst != NULL);
 
     /* initialize curl */
     if (!(c = curl_easy_init())) {
-        return -1;
+        fprintf(stderr, "*** curl_easy_init() failed\n");
+        fflush(stderr);
+        return;
     }
 
     curl_easy_setopt(c, CURLOPT_WRITEFUNCTION, NULL);
     curl_easy_setopt(c, CURLOPT_FOLLOWLOCATION, 1L);
+
+    if (verbose) {
+        printf("Downloading %s...\n", src);
+    }
+
+    /* perform the download */
+    fp = fopen(dst, "wb");
+    assert(fp != NULL);
+    curl_easy_setopt(c, CURLOPT_URL, src);
+    curl_easy_setopt(c, CURLOPT_WRITEDATA, fp);
+    curl_easy_setopt(c, CURLOPT_FAILONERROR, true);
+    cc = curl_easy_perform(c);
+    r = fclose(fp);
+    assert(r == 0);
+
+    /* remove output file if there was a download error (e.g., 404) */
+    if (cc != CURLE_OK) {
+        if (unlink(dst)) {
+            fprintf(stderr, "*** unable to unlink %s: %s\n", dst, strerror(errno));
+            fflush(stderr);
+        }
+    }
+
+    curl_easy_cleanup(c);
+
+    return;
+}
+
+/*
+ * Given a remote artifact specification in a Koji build, download it
+ * to our working directory.
+ */
+static int _download_artifacts(const struct rpminspect *ri, struct koji_build *build) {
+    koji_buildlist_entry_t *buildentry = NULL;
+    koji_rpmlist_entry_t *rpm = NULL;
+    char *src = NULL;
+    char *dst = NULL;
+    char *pkg = NULL;
+
+    assert(build != NULL);
+    assert(build->builds != NULL);
 
     /* Iterate over list of builds, each with a list of packages */
     TAILQ_FOREACH(buildentry, build->builds, builditems) {
@@ -173,6 +211,27 @@ static int _download_artifacts(struct koji_build *build) {
              * submit to koji
              */
             continue;
+        }
+
+        /* Download module metadata at the top level */
+        if (ri->buildtype == KOJI_BUILD_MODULE) {
+            /* Create destination directory */
+            xasprintf(&dst, "%s/%s", workri->worksubdir, build_desc[whichbuild]);
+
+            if (mkdirp(dst, mode)) {
+                fprintf(stderr, "*** Error creating directory %s: %s\n", dst, strerror(errno));
+                fflush(stderr);
+                return -1;
+            }
+
+            free(dst);
+
+            /* Get the main metadata file */
+            xasprintf(&dst, "%s/%s/modulemd.txt", workri->worksubdir, build_desc[whichbuild]);
+            xasprintf(&src, "%s/packages/%s/%s/%s/files/module/modulemd.txt", workri->kojimbs, build->package_name, build->version, build->release);
+            _curl_helper(workri->verbose, src, dst);
+            free(src);
+            free(dst);
         }
 
         /* Iterate over the list of packages for this build */
@@ -188,6 +247,20 @@ static int _download_artifacts(struct koji_build *build) {
 
             free(dst);
 
+            /* for modules, get the per-arch module metadata */
+            if (workri->buildtype == KOJI_BUILD_MODULE) {
+                xasprintf(&dst, "%s/%s/%s/modulemd.%s.txt", workri->worksubdir, build_desc[whichbuild], rpm->arch, rpm->arch);
+
+                /* only download this file if we have not already gotten it */
+                if (access(dst, F_OK|R_OK)) {
+                    xasprintf(&src, "%s/packages/%s/%s/%s/files/module/modulemd.%s.txt", workri->kojimbs, build->package_name, build->version, build->release, rpm->arch);
+                    _curl_helper(workri->verbose, src, dst);
+                    free(src);
+                }
+
+                free(dst);
+            }
+
             /* build path strings */
             xasprintf(&pkg, "%s-%s-%s.%s.rpm", rpm->name, rpm->version, rpm->release, rpm->arch);
             xasprintf(&dst, "%s/%s/%s/%s", workri->worksubdir, build_desc[whichbuild], rpm->arch, pkg);
@@ -198,20 +271,7 @@ static int _download_artifacts(struct koji_build *build) {
                 xasprintf(&src, "%s/%s/packages/%s/%s/%s/%s/%s", (workri->buildtype == KOJI_BUILD_MODULE) ? workri->kojimbs : workri->kojiursine, build->volume_name, buildentry->package_name, rpm->version, rpm->release, rpm->arch, pkg);
             }
 
-            /* perform the download */
-            fp = fopen(dst, "wb");
-            assert(fp != NULL);
-            curl_easy_setopt(c, CURLOPT_URL, src);
-            curl_easy_setopt(c, CURLOPT_WRITEDATA, fp);
-
-            if (workri->verbose) {
-                printf("Downloading %s...\n", src);
-            }
-
-            cc = curl_easy_perform(c);
-            assert(cc == CURLE_OK);
-            r = fclose(fp);
-            assert(r == 0);
+            _curl_helper(workri->verbose, src, dst);
 
             /* gather the RPM header */
             if (_get_rpm_info(dst)) {
@@ -226,8 +286,6 @@ static int _download_artifacts(struct koji_build *build) {
             free(pkg);
         }
     }
-
-    curl_easy_cleanup(c);
 
     return 0;
 }
@@ -261,7 +319,7 @@ int gather_builds(struct rpminspect *ri) {
             whichbuild = AFTER_BUILD;
             _set_worksubdir(ri, false, build);
 
-            if (_download_artifacts(build)) {
+            if (_download_artifacts(ri, build)) {
                 fprintf(stderr, "*** Error downloading build %s\n", ri->after);
                 fflush(stderr);
                 return -1;
@@ -293,7 +351,7 @@ int gather_builds(struct rpminspect *ri) {
         whichbuild = BEFORE_BUILD;
         _set_worksubdir(ri, false, build);
 
-        if (_download_artifacts(build)) {
+        if (_download_artifacts(ri, build)) {
             fprintf(stderr, "*** Error downloading build %s\n", ri->before);
             fflush(stderr);
             return -1;
