@@ -19,6 +19,7 @@ srpm:
 	sed -i -e 's|%%RPMDATE%%|$(RPMDATE)|g' "$(SPEC)"
 	sed -i -e 's|%%GITDATE%%|$(GITDATE)|g' "$(SPEC)"
 	sed -i -e 's|%%GITHASH%%|$(GITHASH)|g' "$(SPEC)"
+	sed -i -e 's|%%TARBALL%%|$(PKG)-$(VER)-$(GITDATE)git$(GITHASH).tar.gz|g' "$(SPEC)"
 	git archive \
 		--format=tar.gz \
 		--output='$(topdir)/$(PKG)-$(VER)-$(GITDATE)git$(GITHASH).tar.gz' \
