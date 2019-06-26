@@ -23,6 +23,7 @@ BuildRequires:  libcurl-devel
 BuildRequires:  zlib-devel
 BuildRequires:  libmandoc-devel
 BuildRequires:  iniparser-devel
+BuildRequires:  libyaml-devel
 
 %description
 Build deviation and compliance tool.  This program runs a number of tests

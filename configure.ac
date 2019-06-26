@@ -49,6 +49,7 @@ PKG_CHECK_MODULES(LIBELF, [libelf])
 PKG_CHECK_MODULES(LIBKMOD, [libkmod])
 PKG_CHECK_MODULES(LIBCURL, [libcurl])
 PKG_CHECK_MODULES(ZLIB, [zlib])
+PKG_CHECK_MODULES(YAML, [yaml-0.1])
 
 # Check for libmandoc
 AC_SEARCH_LIBS([mparse_alloc], [mandoc], [found=1], [found=0], [$ZLIB_LIBS])
@@ -104,6 +105,8 @@ AC_SUBST([ZLIB_CFLAGS])
 AC_SUBST([ZLIB_LIBS])
 AC_SUBST([CUNIT_CFLAGS])
 AC_SUBST([CUNIT_LIBS])
+AC_SUBST([YAML_CFLAGS])
+AC_SUBST([YAML_LIBS])
 
 AC_CONFIG_FILES([Makefile
                  data/Makefile
