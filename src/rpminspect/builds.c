@@ -26,6 +26,7 @@
 #include <errno.h>
 #include <rpm/rpmlib.h>
 #include <curl/curl.h>
+#include <yaml.h>
 #include "builds.h"
 #include "rpminspect.h"
 
@@ -167,13 +168,23 @@ static void _curl_helper(const bool verbose, const char *src, const char *dst) {
 
     /* perform the download */
     fp = fopen(dst, "wb");
-    assert(fp != NULL);
+
+    if (fp == NULL) {
+        fprintf(stderr, "*** error opening %s: %s\n", dst, strerror(errno));
+        fflush(stderr);
+        abort();
+    }
+
     curl_easy_setopt(c, CURLOPT_URL, src);
     curl_easy_setopt(c, CURLOPT_WRITEDATA, fp);
     curl_easy_setopt(c, CURLOPT_FAILONERROR, true);
     cc = curl_easy_perform(c);
-    r = fclose(fp);
-    assert(r == 0);
+
+    if (fclose(fp) != 0) {
+        fprintf(stderr, "*** error ening %s: %s\n", dst, strerror(errno));
+        fflush(stderr);
+        abort();
+    }
 
     /* remove output file if there was a download error (e.g., 404) */
     if (cc != CURLE_OK) {
@@ -198,6 +209,13 @@ static int _download_artifacts(const struct rpminspect *ri, struct koji_build *b
     char *src = NULL;
     char *dst = NULL;
     char *pkg = NULL;
+    FILE *fp = NULL;
+    yaml_parser_t parser;
+    yaml_token_t token;
+    int in_filter = 0;
+    string_list_t *filter = NULL;
+    string_entry_t *filtered_rpm = NULL;
+    bool filtered = false;
 
     assert(build != NULL);
     assert(build->builds != NULL);
@@ -231,6 +249,74 @@ static int _download_artifacts(const struct rpminspect *ri, struct koji_build *b
             xasprintf(&src, "%s/packages/%s/%s/%s/files/module/modulemd.txt", workri->kojimbs, build->package_name, build->version, build->release);
             _curl_helper(workri->verbose, src, dst);
             free(src);
+
+            /* Get the list of artifacts to filter if we don't have it */
+            if (filter == NULL) {
+                /* prepare a YAML parser */
+                if (!yaml_parser_initialize(&parser)) {
+                    fprintf(stderr, "*** error initializing YAML parser for module metadata, unable to filter\n");
+                    fflush(stderr);
+                }
+
+                /* open the modulemd file */
+                if ((fp = fopen(dst, "r")) == NULL) {
+                    fprintf(stderr, "*** error opening %s: %s\n", dst, strerror(errno));
+                    fflush(stderr);
+                    abort();
+                }
+
+                /* initialize a string list for the loop */
+                filter = calloc(1, sizeof(*filter));
+                assert(filter != NULL);
+                TAILQ_INIT(filter);
+
+                /* tell the YAML parser to read the modulemd file */
+                yaml_parser_set_input_file(&parser, fp);
+
+                /*
+                 * Loop over the YAML file looking for the filter:
+                 * block and pull in the 'rpms' listed there.  Store
+                 * them as a string_list_t which we will turn in to
+                 * a hash table at the end.
+                 */
+                do {
+                    yaml_parser_scan(&parser, &token);
+
+                    switch (token.type) {
+                        case YAML_SCALAR_TOKEN:
+                            if ((in_filter == 0) && !strcmp(token.data.scalar.value, "filter")) {
+                                in_filter++;
+                            } else if ((in_filter == 1) && !strcmp(token.data.scalar.value, "rpms")) {
+                                in_filter++;
+                            } else if (in_filter == 2) {
+                                filtered_rpm = calloc(1, sizeof(*filtered_rpm));
+                                assert(filtered_rpm != NULL);
+                                filtered_rpm->data = strdup(token.data.scalar.value);
+                                TAILQ_INSERT_TAIL(filter, filtered_rpm, items);
+                            }
+
+                            break;
+                        case YAML_BLOCK_END_TOKEN:
+                            in_filter = 0;
+                            break;
+                    }
+
+                    if (token.type != YAML_STREAM_END_TOKEN) {
+                        yaml_token_delete(&token);
+                    }
+                } while (token.type != YAML_STREAM_END_TOKEN);
+
+                /* destroy the YAML parser, close the input file */
+                yaml_parser_delete(&parser);
+
+                if (fclose(fp) != 0) {
+                    fprintf(stderr, "*** error ening %s: %s\n", dst, strerror(errno));
+                    fflush(stderr);
+                    abort();
+                }
+            }
+
+            /* Need to use this in the next loop */
             free(dst);
         }
 
@@ -261,6 +347,22 @@ static int _download_artifacts(const struct rpminspect *ri, struct koji_build *b
                 free(dst);
             }
 
+            /* for module builds, filter out packages */
+            if (workri->buildtype == KOJI_BUILD_MODULE && filter != NULL) {
+                filtered = false;
+
+                TAILQ_FOREACH(filtered_rpm, filter, items) {
+                    if (!strcmp(filtered_rpm->data, rpm->name)) {
+                        filtered = true;
+                        break;
+                    }
+                }
+
+                if (filtered) {
+                    continue;
+                }
+            }
+
             /* build path strings */
             xasprintf(&pkg, "%s-%s-%s.%s.rpm", rpm->name, rpm->version, rpm->release, rpm->arch);
             xasprintf(&dst, "%s/%s/%s/%s", workri->worksubdir, build_desc[whichbuild], rpm->arch, pkg);
@@ -284,7 +386,11 @@ static int _download_artifacts(const struct rpminspect *ri, struct koji_build *b
             free(src);
             free(dst);
             free(pkg);
+
         }
+
+        list_free(filter, free);
+        filter = NULL;
     }
 
     return 0;
