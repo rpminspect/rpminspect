@@ -51,6 +51,8 @@ static void usage(const char *progname) {
     printf("  -l, --list               List available tests and formats\n");
     printf("  -w PATH, --workdir=PATH  Temporary directory to use\n");
     printf("                             (default: %s)\n", DEFAULT_WORKDIR);
+    printf("  -f, --fetch-only         Fetch builds only, do not perform inspections\n");
+    printf("                             (implies -k)\n");
     printf("  -k, --keep               Do not remove the comparison working files\n");
     printf("  -v, --verbose            Verbose inspection output\n");
     printf("                           when finished, display full path\n");
@@ -66,7 +68,7 @@ int main(int argc, char **argv) {
     int c, i;
     int idx = 0;
     int ret = EXIT_SUCCESS;
-    char *short_options = "c:T:o:F:lw:kv\?V";
+    char *short_options = "c:T:o:F:lw:fkv\?V";
     struct option long_options[] = {
         { "config", required_argument, 0, 'c' },
         { "tests", required_argument, 0, 'T' },
@@ -74,6 +76,7 @@ int main(int argc, char **argv) {
         { "output", required_argument, 0, 'o' },
         { "format", required_argument, 0, 'F' },
         { "workdir", required_argument, 0, 'w' },
+        { "fetch-only", no_argument, 0, 'f' },
         { "keep", no_argument, 0, 'k' },
         { "verbose", no_argument, 0, 'v' },
         { "help", no_argument, 0, '?' },
@@ -84,6 +87,7 @@ int main(int argc, char **argv) {
     char *workdir = NULL;
     char *output = NULL;
     int formatidx = -1;
+    bool fetch_only = false;
     bool keep = false;
     bool verbose = false;
     int mode = S_IRWXU | S_IRGRP | S_IXGRP | S_IROTH | S_IXOTH;
@@ -205,6 +209,8 @@ int main(int argc, char **argv) {
             case 'w':
                 workdir = strdup(optarg);
                 break;
+            case 'f':
+                fetch_only = true;        /* fall-thru: -f implies -k */
             case 'k':
                 keep = true;
                 break;
@@ -286,36 +292,38 @@ int main(int argc, char **argv) {
     }
 
     /* validate and gather the builds specified */
-    if ((ret = gather_builds(&ri))) {
+    if ((ret = gather_builds(&ri, fetch_only))) {
         fprintf(stderr, "*** Failed to gather specified builds.\n");
         fflush(stderr);
         exit(EXIT_FAILURE);
     }
 
     /* perform the selected inspections */
-    for (i = 0; inspections[i].flag != 0; i++) {
-        /* test not selected by user */
-        if (!(ri.tests & inspections[i].flag)) {
-            continue;
+    if (!fetch_only) {
+        for (i = 0; inspections[i].flag != 0; i++) {
+            /* test not selected by user */
+            if (!(ri.tests & inspections[i].flag)) {
+                continue;
+            }
+
+           /* inspection requires before/after builds and we have one */
+           if (ri.before == NULL && !inspections[i].single_build) {
+               continue;
+           }
+
+            if (!inspections[i].driver(&ri)) {
+                ret = EXIT_FAILURE;
+            }
         }
 
-        /* inspection requires before/after builds and we have one */
-        if (ri.before == NULL && !inspections[i].single_build) {
-            continue;
+        /* output the results */
+        if (formatidx == -1) {
+            formatidx = 0;                 /* default to 'text' output */
         }
 
-        if (!inspections[i].driver(&ri)) {
-            ret = EXIT_FAILURE;
+        if (ri.results != NULL) {
+            formats[formatidx].driver(ri.results, output);
         }
-    }
-
-    /* output the results */
-    if (formatidx == -1) {
-        formatidx = 0;                 /* default to 'text' output */
-    }
-
-    if (ri.results != NULL) {
-        formats[formatidx].driver(ri.results, output);
     }
 
     /* Clean up */

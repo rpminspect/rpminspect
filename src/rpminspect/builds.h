@@ -22,6 +22,6 @@
 #include "rpminspect.h"
 
 /* builds.c */
-int gather_builds(struct rpminspect *);
+int gather_builds(struct rpminspect *, bool);
 
 #endif

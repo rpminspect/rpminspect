@@ -73,6 +73,11 @@ is text.  Available formats can be seen with the \-l option.
 .B \-w PATH, \-\-workdir=PATH
 Temporary working directory to use (default: /var/tmp/rpminspect)
 .TP
+.B \-f, \-\-fetch\-only
+Only download builds, do not perform any inspections (implies \-k).
+This option is intended as a convenience for developers as well as
+for easier integration in to different CI workflows.
+.TP
 .B \-k, \-\-keep
 Do not remove temporary working files before exit
 .TP

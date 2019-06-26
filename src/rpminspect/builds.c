@@ -18,6 +18,7 @@
 
 #include "config.h"
 
+#include <stdbool.h>
 #include <assert.h>
 #include <ftw.h>
 #include <sys/types.h>
@@ -33,6 +34,7 @@
 /* Local global variables */
 static struct rpminspect *workri = NULL;
 static int whichbuild = BEFORE_BUILD;
+static bool fetch_only = false;
 static int mode = S_IRWXU | S_IRGRP | S_IXGRP | S_IROTH | S_IXOTH;
 
 /* This array holds strings that map to the whichbuild index value. */
@@ -83,7 +85,7 @@ static int _get_rpm_info(const char *pkg) {
         return ret;
     }
 
-    add_peer(&workri->peers, whichbuild, pkg, &h);
+    add_peer(&workri->peers, whichbuild, fetch_only, pkg, &h);
     headerFree(h);
     return ret;
 }
@@ -401,13 +403,14 @@ static int _download_artifacts(const struct rpminspect *ri, struct koji_build *b
  * them to the working directory.  Either build can be local or
  * remote.
  */
-int gather_builds(struct rpminspect *ri) {
+int gather_builds(struct rpminspect *ri, bool fo) {
     struct koji_build *build = NULL;
 
     assert(ri != NULL);
     assert(ri->after != NULL);
 
     workri = ri;
+    fetch_only = fo;
 
     /* process after first so the temp directory gets the NV of that pkg */
     if (ri->after != NULL) {

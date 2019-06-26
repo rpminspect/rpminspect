@@ -67,7 +67,7 @@ void free_rpmpeer(rpmpeer_t *peers) {
 /*
  * Add the specified package as a peer in the list of packages.
  */
-void add_peer(rpmpeer_t **peers, int whichbuild, const char *pkg, Header *hdr) {
+void add_peer(rpmpeer_t **peers, int whichbuild, bool fetch_only, const char *pkg, Header *hdr) {
     rpmpeer_entry_t *peer = NULL;
     bool found = false;
     char *newname = NULL;
@@ -135,11 +135,21 @@ void add_peer(rpmpeer_t **peers, int whichbuild, const char *pkg, Header *hdr) {
     if (whichbuild == BEFORE_BUILD) {
         peer->before_hdr = headerCopy(*hdr);
         peer->before_rpm = strdup(pkg);
-        peer->before_files = extract_rpm(pkg, *hdr);
+
+        if (fetch_only) {
+            peer->before_files = NULL;
+        } else {
+            peer->before_files = extract_rpm(pkg, *hdr);
+        }
     } else if (whichbuild == AFTER_BUILD) {
         peer->after_hdr = headerCopy(*hdr);
         peer->after_rpm = strdup(pkg);
-        peer->after_files = extract_rpm(pkg, *hdr);
+
+        if (fetch_only) {
+            peer->after_files = NULL;
+        } else {
+            peer->after_files = extract_rpm(pkg, *hdr);
+        }
     }
 
     if (!found) {
