@@ -75,6 +75,7 @@ int init_rpminspect(struct rpminspect *, const char *);
 void free_rpminspect(struct rpminspect *);
 
 /* listfuncs.c */
+struct hsearch_data * list_to_table(const string_list_t *);
 string_list_t * list_difference(const string_list_t *, const string_list_t *);
 string_list_t * list_intersection(const string_list_t *, const string_list_t *);
 string_list_t * list_union(const string_list_t *, const string_list_t *);

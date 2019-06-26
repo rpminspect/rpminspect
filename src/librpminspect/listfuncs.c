@@ -27,7 +27,7 @@
 
 #include "rpminspect.h"
 
-static struct hsearch_data * list_to_table(const string_list_t *list)
+struct hsearch_data * list_to_table(const string_list_t *list)
 {
     struct hsearch_data *table;
     size_t table_size = 0;
