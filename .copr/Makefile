@@ -21,6 +21,7 @@ srpm:
 	sed -i -e 's|%%GITHASH%%|$(GITHASH)|g' "$(SPEC)"
 	sed -i -e 's|%%TARBALL%%|$(PKG)-$(VER)-$(GITDATE)git$(GITHASH).tar.gz|g' "$(SPEC)"
 	sed -i -e 's|^%setup.*$$|%setup -q -n $(PKG)-$(VER)-$(GITDATE)git$(GITHASH)|g' "$(SPEC)"
+	sed -i -e '/^Release:/ s/1[^%]*/0.1.$(GITDATE)git$(GITHASH)/' "$(SPEC)"
 	git archive \
 		--format=tar.gz \
 		--output='$(topdir)/$(PKG)-$(VER)-$(GITDATE)git$(GITHASH).tar.gz' \
