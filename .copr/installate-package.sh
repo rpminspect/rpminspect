@@ -4,7 +4,7 @@ PATH=/usr/bin
 
 [ ${UID} -ne 0 ] && exit 0
 
-# None of us is as dumb as all of us.
+# *sigh*
 yum --help >/dev/null 2>&1
 [ $? -eq 0 ] && INSTALLATOR=yum || INSTALLATOR=dnf
 
