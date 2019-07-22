@@ -31,7 +31,9 @@
  * payload is not empty.
  */
 bool is_payload_empty(rpmfile_t *filelist) {
-    assert(filelist != NULL);
+    if (filelist == NULL) {
+        return true;
+    }
 
     /* Make sure the file list has at least one entry */
     return TAILQ_EMPTY(filelist);
