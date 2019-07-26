@@ -89,6 +89,12 @@ struct inspect inspections[] = {
       &inspect_modularity,
       "Ensure compliance with modularity build and packaging policies (only valid for module builds, no-op otherwise)." },
 
+    { INSPECT_JAVABYTECODE,
+      "javabytecode",
+      true,
+      &inspect_javabytecode,
+      "Check minimum required Java bytecode version in class files, report bytecode version changes between builds, and report if bytecode versions are exceeded.  The bytecode version is vendor specific to releases and defined in the configuration file." },
+
     /*
      * { INSPECT_TYPE (add to inspect.h),
      *   "short name",
@@ -117,7 +123,7 @@ bool foreach_peer_file(struct rpminspect *ri, foreach_peer_file_func check_fn)
 
     TAILQ_FOREACH(peer, ri->peers, items) {
         /* Disappearing subpackages are caught by INSPECT_EMPTYRPM */
-        if (peer->after_files == NULL) {
+        if (TAILQ_EMPTY(peer->after_files)) {
             continue;
         }
 
