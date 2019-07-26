@@ -36,6 +36,7 @@
 #define HEADER_DISTTAG       "%{?dist} tag"
 #define HEADER_SPECNAME      "Spec file name"
 #define HEADER_MODULARITY    "Modularity"
+#define HEADER_JAVABYTECODE  "Java Bytecode"
 
 /*
  * Inspection remedies
@@ -79,5 +80,8 @@
 
 /* modularity */
 #define REMEDY_MODULARITY "This package is part of a module but is missing the %{modularitylabel} header tag.  Add this as a %%define in the spec file and rebuild."
+
+/* javabytecode */
+#define REMEDY_JAVABYTECODE "The Java bytecode version for one or more class files in the build was not met for the product release.  Ensure you are using the correct JDK for the build."
 
 #endif

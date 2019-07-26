@@ -18,6 +18,7 @@ librpminspect_la_SOURCES = badwords.c \
                            inspect.c \
                            inspect_elf.c \
                            inspect_emptyrpm.c \
+                           inspect_javabytecode.c \
                            inspect_kernel.c \
                            inspect_license.c \
                            inspect_manpage.c \

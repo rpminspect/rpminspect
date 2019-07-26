@@ -109,6 +109,9 @@ bool inspect_specname(struct rpminspect *);
 /* inspect_modularity.c */
 bool inspect_modularity(struct rpminspect *);
 
+/* inspect_javabytecode.c */
+bool inspect_javabytecode(struct rpminspect *);
+
 /*
  * Inspections are referenced by flag.  These flags are set in bitfields
  * to indicate which ones we want to run.  When adding new ones, please
@@ -127,5 +130,6 @@ bool inspect_modularity(struct rpminspect *);
 #define INSPECT_DISTTAG                     (((uint64_t) 1) << 8)
 #define INSPECT_SPECNAME                    (((uint64_t) 1) << 9)
 #define INSPECT_MODULARITY                  (((uint64_t) 1) << 10)
+#define INSPECT_JAVABYTECODE                (((uint64_t) 1) << 11)
 
 #endif
