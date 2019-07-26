@@ -282,7 +282,7 @@ typedef TAILQ_HEAD(koji_buildlist_s, _koji_buildlist_entry_t) koji_buildlist_t;
 struct koji_build {
     /* These are all relevant to the name of the build */
     char *package_name;
-    char *epoch;
+    int epoch;
     char *name;
     char *version;
     char *release;
@@ -320,7 +320,7 @@ struct koji_build {
     char *modulemd_str;
     char *module_name;
     char *module_stream;
-    int module_build_service_id;
+    char *module_build_service_id;
     char *module_version;
     char *module_context;
     char *module_content_koji_tag;

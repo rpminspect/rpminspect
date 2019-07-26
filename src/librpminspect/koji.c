@@ -123,7 +123,7 @@ void init_koji_build(struct koji_build *build) {
     assert(build != NULL);
 
     build->package_name = NULL;
-    build->epoch = NULL;
+    build->epoch = 0;
     build->name = NULL;
     build->version = NULL;
     build->release = NULL;
@@ -153,7 +153,7 @@ void init_koji_build(struct koji_build *build) {
     build->modulemd_str = NULL;
     build->module_name = NULL;
     build->module_stream = NULL;
-    build->module_build_service_id = -1;
+    build->module_build_service_id = NULL;
     build->module_version = NULL;
     build->module_context = NULL;
     build->module_content_koji_tag = NULL;
@@ -170,7 +170,6 @@ void free_koji_build(struct koji_build *build) {
     assert(build != NULL);
 
     free(build->package_name);
-    free(build->epoch);
     free(build->name);
     free(build->version);
     free(build->release);
@@ -282,9 +281,8 @@ struct koji_build *get_koji_build(struct rpminspect *ri, const char *buildspec) 
             xmlrpc_abort_on_fault(&env);
             build->package_name = strdup(s);
         } else if (!strcmp(key, "epoch")) {
-            xmlrpc_decompose_value(&env, value, "s", &s);
+            xmlrpc_decompose_value(&env, value, "i", &build->epoch);
             xmlrpc_abort_on_fault(&env);
-            build->epoch = strdup(s);
         } else if (!strcmp(key, "name")) {
             xmlrpc_decompose_value(&env, value, "s", &s);
             xmlrpc_abort_on_fault(&env);
@@ -427,8 +425,9 @@ struct koji_build *get_koji_build(struct rpminspect *ri, const char *buildspec) 
                     xmlrpc_abort_on_fault(&env);
                     build->module_stream = strdup(s);
                 } else if(!strcmp(subkey, "module_build_service_id")) {
-                    xmlrpc_decompose_value(&env, subv, "i", &build->module_build_service_id);
+                    xmlrpc_decompose_value(&env, subv, "s", &s);
                     xmlrpc_abort_on_fault(&env);
+                    build->module_build_service_id = strdup(s);
                 } else if(!strcmp(subkey, "version")) {
                     xmlrpc_decompose_value(&env, subv, "s", &s);
                     xmlrpc_abort_on_fault(&env);
