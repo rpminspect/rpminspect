@@ -202,7 +202,7 @@ static bool _validate_desktop_contents(struct rpminspect *ri, const rpmfile_entr
              * found and is valid.  If found, the nftw() helper replaces
              * file_to_find with the full path to where it was found.
              */
-            if (nftw(subtree, _find_file, 20, FTW_MOUNT|FTW_PHYS) == 1) {
+            if (nftw(subtree, _find_file, 25, FTW_MOUNT|FTW_PHYS) == 1) {
                 if (lstat(file_to_find, &sb) == -1) {
                     fprintf(stderr, "error stat'ing %s: %s\n", file_to_find, strerror(errno));
                     fflush(stderr);
