@@ -40,7 +40,8 @@ librpminspect_la_SOURCES = badwords.c \
                            rmtree.c \
                            rpm.c \
                            strfuncs.c \
-                           tty.c
+                           tty.c \
+                           unpack.c
 librpminspect_la_CPPFLAGS = $(JSON_C_CFLAGS) \
                             $(XMLRPC_CFLAGS) \
                             $(LIBXML_CFLAGS) \

@@ -149,4 +149,7 @@ void output_text(const results_t *, const char *);
 /* output_json.c */
 void output_json(const results_t *, const char *);
 
+/* unpack.c */
+int unpack_archive(const char *, const char *, const bool);
+
 #endif
