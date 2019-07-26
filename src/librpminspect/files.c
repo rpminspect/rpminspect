@@ -104,14 +104,6 @@ rpmfile_t * extract_rpm(const char *pkg, Header hdr)
         return NULL;
     }
 
-    /*
-     * Check if this is just an empty RPM.  These can exist in builds as
-     * a way of encapsulating metadata (e.g., dependencies).
-     */
-    if (!headerIsEntry(hdr, RPMTAG_FILENAMES)) {
-        return NULL;
-    }
-
     /* Payload data and header data is not in the same order. In order to match things up,
      * read all of the filenames from the RPM header into a hash table, with the index into
      * RPM's arrays as the value.
@@ -122,7 +114,10 @@ rpmfile_t * extract_rpm(const char *pkg, Header hdr)
     /* Use the RPMTAG_FILENAMES extension tag to uncompress the filenames */
     /* NB: this function returns 1 for success, not RPMRC_OK */
     if (headerGet(hdr, RPMTAG_FILENAMES, td, HEADERGET_MINMEM | HEADERGET_EXT) != 1) {
-        fprintf(stderr, "*** Unable to read RPMTAG_FILENAMES from %s\n", pkg);
+        /*
+         * A failure here indicates an empty payload, which means this
+         * package is just storing metadata (e.g., dependencies).
+         */
         goto cleanup;
     }
 
