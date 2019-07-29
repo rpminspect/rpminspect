@@ -25,6 +25,7 @@
 #include <fcntl.h>
 #include <errno.h>
 #include <ftw.h>
+#include <byteswap.h>
 
 #include "rpminspect.h"
 
@@ -38,7 +39,8 @@ static char *jarfile = NULL;
 static bool is_java_class(const char *filename, const char *localpath, const char *container)
 {
     int fd;
-    char magic[6];
+    short major;
+    char magic[8];
 
     assert(filename != NULL);
     assert(localpath != NULL);
@@ -64,9 +66,19 @@ static bool is_java_class(const char *filename, const char *localpath, const cha
             return false;
         }
 
-        /* Java class files begin with 0xCAFEBABE and then a long int >= 30 */
+        /* Java class files begin with 0xCAFEBABE */
         if (magic[0] == '\xCA' && magic[1] == '\xFE' && magic[2] == '\xBA' && magic[3] == '\xBE') {
-            return true;
+            /* check the major number for compliance */
+            memcpy(&major, magic + 6, sizeof(major));
+
+            if (__BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__) {
+
+                major = bswap_16(major);
+            }
+
+            if (major >= 30) {
+                return true;
+            }
         }
     }
 
