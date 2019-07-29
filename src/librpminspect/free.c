@@ -65,6 +65,7 @@ void free_rpminspect(struct rpminspect *ri) {
     free(ri->buildhost_subdomain);
     free(ri->before);
     free(ri->after);
+    free(ri->product_release);
 
     free_rpmpeer(ri->peers);
 

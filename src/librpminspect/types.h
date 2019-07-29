@@ -173,6 +173,9 @@ struct rpminspect {
     uint64_t tests;            /* which tests to run (default: ALL) */
     bool verbose;              /* verbose inspection output? */
 
+    /* The product release we are inspecting against */
+    char *product_release;
+
     /* The type of Koji build we are looking at */
     /*
      * NOTE: rpminspect works with RPMs at the lowest level, so
