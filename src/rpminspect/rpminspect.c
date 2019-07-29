@@ -44,6 +44,7 @@ static void usage(const char *progname) {
     printf("                             (default: %s)\n", CFGFILE);
     printf("  -T LIST, --tests=LIST    Comma-separated list of tests to run or skip\n");
     printf("                             (default: ALL)\n");
+    printf("  -r STR, --release=STR    Product release string\n");
     printf("  -o FILE, --output=FILE   Write results to FILE\n");
     printf("                             (default: stdout)\n");
     printf("  -F TYPE, --format=TYPE   Format output results as TYPE\n");
@@ -63,15 +64,54 @@ static void usage(const char *progname) {
     return;
 }
 
+static char *get_product_release(const char *before, const char *after) {
+    char *pos = NULL;
+    char *before_product = NULL;
+    char *after_product = NULL;
+
+    assert(after != NULL);
+
+    pos = rindex(after, '.') + 1;
+    after_product = strdup(pos);
+
+    if (!after_product) {
+        fprintf(stderr, "*** Product release for after build (%s) is empty\n", after);
+        return NULL;
+    }
+
+    if (before) {
+        pos = rindex(before, '.') + 1;
+        before_product = strdup(pos);
+
+        if (!before_product) {
+            fprintf(stderr, "*** Product release for before build (%s) is empty\n", before);
+            free(after_product);
+            return NULL;
+        }
+
+        if (strcmp(before_product, after_product)) {
+            fprintf(stderr, "*** Builds have different product releases (%s != %s)\n", before_product, after_product);
+            free(before_product);
+            free(after_product);
+            return NULL;
+        }
+
+        free(before_product);
+    }
+
+    return after_product;
+}
+
 int main(int argc, char **argv) {
     char *progname = basename(argv[0]);
     int c, i;
     int idx = 0;
     int ret = EXIT_SUCCESS;
-    char *short_options = "c:T:o:F:lw:fkv\?V";
+    char *short_options = "c:T:r:o:F:lw:fkv\?V";
     struct option long_options[] = {
         { "config", required_argument, 0, 'c' },
         { "tests", required_argument, 0, 'T' },
+        { "release", required_argument, 0, 'r' },
         { "list", no_argument, 0, 'l' },
         { "output", required_argument, 0, 'o' },
         { "format", required_argument, 0, 'F' },
@@ -86,6 +126,7 @@ int main(int argc, char **argv) {
     char *cfgfile = NULL;
     char *workdir = NULL;
     char *output = NULL;
+    char *release = NULL;
     int formatidx = -1;
     bool fetch_only = false;
     bool keep = false;
@@ -151,6 +192,9 @@ int main(int argc, char **argv) {
                     }
                 }
 
+                break;
+            case 'r':
+                release = strdup(optarg);
                 break;
             case 'o':
                 output = strdup(optarg);
@@ -244,6 +288,7 @@ int main(int argc, char **argv) {
 
     /* various options from the command line */
     ri.verbose = verbose;
+    ri.product_release = release;
 
     /* Copy in user-selected tests if they specified something */
     if (selected != 0) {
@@ -274,6 +319,19 @@ int main(int argc, char **argv) {
         fflush(stderr);
         free_rpminspect(&ri);
         return EXIT_FAILURE;
+    }
+
+    /*
+     * Determine product release unless the user specified one.
+     */
+    if (ri.product_release == NULL) {
+        ri.product_release = get_product_release(ri.before, ri.after);
+
+        if (ri.product_release == NULL) {
+            fflush(stderr);
+            free_rpminspect(&ri);
+            return EXIT_FAILURE;
+        }
     }
 
     /* initialize librpm, we'll be using it */

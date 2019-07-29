@@ -56,6 +56,16 @@ in defaults.
 .B \-c FILE, \-\-config=FILE
 Configuration file to use (default: /etc/rpminspect/rpminspect.conf)
 .TP
+.B \-r STR, \-\-release=STR
+String identifying the product release for the specified build or builds.
+Normally rpminspect will determine this by looking for a "dist tag" at
+the end of the NVR.  For build comparisons, the determined product releases
+must match in order for rpminspect to continue.  If you want to compare
+builds from different products, you will need to specify a product release
+manually.  You will also need to specify the product release if the builds
+you are comparing lack any kind of product release identifier at the end
+of the NVR.
+.TP
 .B \-T LIST, \-\-tests=LIST
 Comma-separated list of inspections to run or skip (default: ALL)
 .TP
