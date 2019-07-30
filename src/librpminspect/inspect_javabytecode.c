@@ -18,8 +18,11 @@
 
 #include "config.h"
 
+#include <stdio.h>
+#include <stdlib.h>
 #include <stdbool.h>
 #include <unistd.h>
+#include <limits.h>
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <fcntl.h>
@@ -32,11 +35,13 @@
 /* Globals */
 static int prefixlen = 0;
 static char *jarfile = NULL;
+static short expected_major = -1;
 
 /*
- * Returns true if the file is a compiled Java class file.
+ * Returns major JVM version found if the file is a compiled Java class file,
+ * or -1 if it's not a Java class file.
  */
-static bool is_java_class(const char *filename, const char *localpath, const char *container)
+static short get_jvm_major(const char *filename, const char *localpath, const char *container)
 {
     int fd;
     short major;
@@ -53,17 +58,17 @@ static bool is_java_class(const char *filename, const char *localpath, const cha
 
         if (fd == -1) {
             fprintf(stderr, "unable to open(2) %s from %s for reading: %s\n", localpath, container, strerror(errno));
-            return false;
+            return -1;
         }
 
         if (read(fd, magic, sizeof(magic)) != sizeof(magic)) {
             fprintf(stderr, "unable to read(2) %s from %s: %s\n", localpath, container, strerror(errno));
-            return false;
+            return -1;
         }
 
         if (close(fd) == -1) {
             fprintf(stderr, "unable to close(2) %s from %s: %s\n", localpath, container, strerror(errno));
-            return false;
+            return -1;
         }
 
         /* Java class files begin with 0xCAFEBABE */
@@ -72,17 +77,16 @@ static bool is_java_class(const char *filename, const char *localpath, const cha
             memcpy(&major, magic + 6, sizeof(major));
 
             if (__BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__) {
-
                 major = bswap_16(major);
             }
 
             if (major >= 30) {
-                return true;
+                return major;
             }
         }
     }
 
-    return false;
+    return -1;
 }
 
 /*
@@ -95,13 +99,20 @@ static int jar_walker(const char *fpath, __attribute__((unused)) const struct st
     }
 
     /* Only looking at Java .class files */
-    if (!is_java_class(fpath, fpath+prefixlen, jarfile)) {
+    if (!get_jvm_major(fpath, fpath+prefixlen, jarfile)) {
         return 0;
     }
 
+/* XXX
+    if (strsuffix(fpath, file_to_find)) {
+        free(file_to_find);
+        file_to_find = strdup(fpath);
+        return 1;
+    }
+XXX */
+
     return 0;
 }
-
 
 /*
  * Main driver for the inspection.
@@ -111,14 +122,12 @@ static bool javabytecode_driver(struct rpminspect *ri, rpmfile_entry_t *file, co
     bool result = true;
     char *tmppath = NULL;
     int jarstatus = 0;
+    short major;
+    char *msg = NULL;
 
-    if (is_java_class(file->fullpath, file->localpath, rpmfile)) {
-        printf("|%s| is a Java class file\n", file->fullpath);
-        return true;
-    }
-
-    /* if we have a possible jar file, try to unpack and walk it */
     if (strsuffix(file->fullpath, ".jar")) {
+        /* if we have a possible jar file, try to unpack and walk it */
+
         /* create a temporary directory to unpack this file */
         xasprintf(&tmppath, "%s/jar.XXXXXX", ri->workdir);
 
@@ -147,6 +156,25 @@ static bool javabytecode_driver(struct rpminspect *ri, rpmfile_entry_t *file, co
         /* clean up */
         rmtree(tmppath, true, false);
         free(tmppath);
+    } else {
+        /* try to see if this is just a .class file */
+        major = get_jvm_major(file->fullpath, file->localpath, rpmfile);
+
+        if (major == -1 && !strsuffix(file->localpath, ".class")) {
+            return true;
+        } else if (major < 0 || major > 60) {
+            xasprintf(&msg, "File %s (%s), Java byte code version %d is incorrect (wrong endianness? corrupted file? space JDK?)", file->localpath, file->fullpath, major);
+            add_result(&ri->results, RESULT_BAD, WAIVABLE_BY_ANYONE, HEADER_JAVABYTECODE, msg, NULL, NULL);
+            free(msg);
+            return false;
+        } else if (major > expected_major) {
+            xasprintf(&msg, "File %s (%s), Java byte code version %d greater than expected %d for product release %s", file->localpath, file->fullpath, major, expected_major, ri->product_release);
+            add_result(&ri->results, RESULT_BAD, WAIVABLE_BY_ANYONE, HEADER_JAVABYTECODE, msg, NULL, NULL);
+            free(msg);
+            return false;
+        }
+
+        return true;
     }
 
     return result;
@@ -161,9 +189,38 @@ bool inspect_javabytecode(struct rpminspect *ri)
     rpmpeer_entry_t *peer = NULL;
     rpmfile_entry_t *file = NULL;
     char *container = NULL;
+    ENTRY e;
+    ENTRY *eptr;
+    char *prod = NULL;
 
     assert(ri != NULL);
     assert(ri->peers != NULL);
+
+    /*
+     * Get the major JVM version for this product release.
+     */
+    e.key = ri->product_release;
+    hsearch_r(e, FIND, &eptr, ri->jvm_table);
+
+    if (eptr == NULL) {
+        prod = strdup("default");
+        e.key = prod;
+        hsearch_r(e, FIND, &eptr, ri->jvm_table);
+        free(prod);
+    }
+
+    if (eptr == NULL) {
+        fprintf(stderr, "*** missing JVM version to product release mapping\n");
+        fflush(stderr);
+        return false;
+    }
+
+    expected_major = strtol(eptr->data, NULL, 10);
+    if ((expected_major == LONG_MIN || expected_major == LONG_MAX) && errno == ERANGE) {
+        fprintf(stderr, "*** invalid JVM major version: %s: %s\n", eptr->data, strerror(errno));
+        fflush(stderr);
+        return false;
+    }
 
     /*
      * The javabytecode inspection reads Java class files and reports
