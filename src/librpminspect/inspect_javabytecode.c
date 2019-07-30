@@ -216,8 +216,8 @@ bool inspect_javabytecode(struct rpminspect *ri)
     }
 
     expected_major = strtol(eptr->data, NULL, 10);
-    if ((expected_major == LONG_MIN || expected_major == LONG_MAX) && errno == ERANGE) {
-        fprintf(stderr, "*** invalid JVM major version: %s: %s\n", eptr->data, strerror(errno));
+    if (errno == ERANGE) {
+        fprintf(stderr, "*** invalid JVM major version: %s: %s\n", (char *) eptr->data, strerror(errno));
         fflush(stderr);
         return false;
     }
