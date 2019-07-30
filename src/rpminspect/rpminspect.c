@@ -255,6 +255,7 @@ int main(int argc, char **argv) {
                 break;
             case 'f':
                 fetch_only = true;        /* fall-thru: -f implies -k */
+                __attribute__ ((fallthrough));
             case 'k':
                 keep = true;
                 break;
