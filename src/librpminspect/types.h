@@ -23,6 +23,7 @@
 #include <regex.h>
 #include <stdint.h>
 #include <stdbool.h>
+#include <search.h>
 #include <sys/queue.h>
 #include <sys/stat.h>
 #include <rpm/rpmlib.h>
@@ -166,6 +167,10 @@ struct rpminspect {
 
     /* desktop-file-validate command location */
     char *desktop_file_validate;
+
+    /* hash table of product release -> JVM major versions */
+    struct hsearch_data *jvm_table;
+    string_list_t *jvm_keys;
 
     /* Options specified by the user */
     char *before;              /* before build ID arg given on cmdline */

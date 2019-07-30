@@ -21,6 +21,7 @@
 #include <regex.h>
 #include <stdlib.h>
 #include <sys/queue.h>
+#include <search.h>
 #include "rpminspect.h"
 
 static void _free_regex(regex_t *regex)
@@ -38,6 +39,10 @@ static void _free_regex(regex_t *regex)
  * librpminspect before they exit.
  */
 void free_rpminspect(struct rpminspect *ri) {
+    string_entry_t *entry = NULL;
+    ENTRY e;
+    ENTRY *eptr;
+
     if (ri == NULL) {
         return;
     }
@@ -66,6 +71,25 @@ void free_rpminspect(struct rpminspect *ri) {
     free(ri->before);
     free(ri->after);
     free(ri->product_release);
+
+    if (ri->jvm_table != NULL && ri->jvm_keys != NULL) {
+        /* look up each key and free the memory for the value */
+        TAILQ_FOREACH(entry, ri->jvm_keys, items) {
+            e.key = entry->data;
+            hsearch_r(e, FIND, &eptr, ri->jvm_table);
+
+            if (eptr != NULL) {
+                free(eptr->data);
+            }
+        }
+
+        /* destroy the hash table */
+        hdestroy_r(ri->jvm_table);
+        free(ri->jvm_table);
+
+        /* destroy the list of keys */
+        list_free(ri->jvm_keys, free);
+    }
 
     free_rpmpeer(ri->peers);
 

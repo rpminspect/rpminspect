@@ -23,6 +23,7 @@
 #include <string.h>
 #include <limits.h>
 #include <assert.h>
+#include <search.h>
 #include <iniparser.h>
 #include "rpminspect.h"
 
@@ -75,6 +76,12 @@ int init_rpminspect(struct rpminspect *ri, const char *cfgfile) {
     char *badword = NULL;
     string_entry_t *entry = NULL;
     uint64_t tests = 0;
+    int nkeys = 0;
+    int len = 0;
+    const char **keys = NULL;
+    const char *val = NULL;
+    ENTRY e;
+    ENTRY *eptr;
 
     assert(ri != NULL);
     memset(ri, 0, sizeof(*ri));
@@ -210,6 +217,62 @@ int init_rpminspect(struct rpminspect *ri, const char *cfgfile) {
         ri->desktop_file_validate = strdup(tmp);
     }
 
+    /* if a jvm major versions exist, collect those in to a hash table */
+    ri->jvm_table = NULL;
+    ri->jvm_keys = NULL;
+    tmp = "javabytecode";
+    len = strlen(tmp);
+    nkeys = iniparser_getsecnkeys(cfg, tmp);
+
+    if (nkeys > 0) {
+        keys = calloc(nkeys, sizeof(*keys));
+        assert(keys != NULL);
+
+        if (iniparser_getseckeys(cfg, tmp, keys) == NULL) {
+            free(keys);
+            keys = NULL;
+            nkeys = 0;
+        }
+    }
+
+    if (nkeys > 0) {
+        ri->jvm_table = calloc(1, sizeof(*ri->jvm_table));
+        assert(ri->jvm_table != NULL);
+
+        if (hcreate_r(nkeys, ri->jvm_table) == 0) {
+            free(ri->jvm_table);
+            ri->jvm_table = NULL;
+            free(keys);
+            keys = NULL;
+            nkeys = 0;
+        } else {
+           ri->jvm_keys = calloc(1, sizeof(*ri->jvm_keys));
+           assert(ri->jvm_keys != NULL);
+           TAILQ_INIT(ri->jvm_keys);
+        }
+    }
+
+    while (nkeys > 0) {
+        val = iniparser_getstring(cfg, keys[nkeys - 1], NULL);
+
+        if (val == NULL) {
+            nkeys--;
+            continue;
+        }
+
+        /* this grabs the key string, but advances past the block name */
+        entry = calloc(1, sizeof(*entry));
+        assert(entry != NULL);
+        entry->data = strdup((char *) keys[nkeys - 1] + len + 1);
+        TAILQ_INSERT_TAIL(ri->jvm_keys, entry, items);
+
+        e.key = entry->data;
+        e.data = strdup((char *) val);
+        hsearch_r(e, ENTER, &eptr, ri->jvm_table);
+        nkeys--;
+    }
+
+    /* the rest of the members */
     ri->before = NULL;
     ri->after = NULL;
     ri->buildtype = KOJI_BUILD_RPM;
