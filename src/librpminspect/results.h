@@ -26,17 +26,17 @@
 /*
  * Inspection headers
  */
-#define HEADER_METADATA      "Header Metadata"
-#define HEADER_EMPTYRPM      "Payload"
-#define HEADER_LICENSE       "License"
-#define HEADER_ELF           "ELF object properties"
-#define HEADER_MAN           "Man pages"
-#define HEADER_XML           "XML files"
-#define HEADER_DESKTOP       "Desktop Entry files"
-#define HEADER_DISTTAG       "%{?dist} tag"
-#define HEADER_SPECNAME      "Spec file name"
-#define HEADER_MODULARITY    "Modularity"
-#define HEADER_JAVABYTECODE  "Java Bytecode"
+#define HEADER_METADATA      "header-metadata"
+#define HEADER_EMPTYRPM      "payload"
+#define HEADER_LICENSE       "license"
+#define HEADER_ELF           "elf-object-properties"
+#define HEADER_MAN           "man-pages"
+#define HEADER_XML           "xml-files"
+#define HEADER_DESKTOP       "desktop-entry-files"
+#define HEADER_DISTTAG       "dist-tag"
+#define HEADER_SPECNAME      "spec-file-name"
+#define HEADER_MODULARITY    "modularity"
+#define HEADER_JAVABYTECODE  "java-bytecode"
 
 /*
  * Inspection remedies
