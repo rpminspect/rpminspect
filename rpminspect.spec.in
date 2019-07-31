@@ -21,7 +21,7 @@ BuildRequires:  elfutils-devel
 BuildRequires:  kmod-devel
 BuildRequires:  libcurl-devel
 BuildRequires:  zlib-devel
-BuildRequires:  libmandoc-devel
+BuildRequires:  libmandoc-devel <= 1.14.4
 BuildRequires:  iniparser-devel
 BuildRequires:  libyaml-devel
 

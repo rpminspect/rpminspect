@@ -60,6 +60,13 @@ else
     AC_MSG_ERROR([*** unable to find mparse_alloc() in libmandoc])
 fi
 
+# mandoc releases >= 1.14.5 have changed the headers around, so we need
+# check for that release and fail (until we update rpminspect)
+AC_CHECK_HEADERS([mandoc_parse.h], [found=1], [found=0], [])
+if test $found -eq 1; then
+    AC_MSG_ERROR([*** mandoc >= 1.14.5 found, must use <= 1.14.4])
+fi
+
 # Check for libiniparser
 AC_SEARCH_LIBS([iniparser_load], [iniparser], [found=1], [found=0], [$ZLIB_LIBS])
 if test $found -eq 1; then
