@@ -36,12 +36,15 @@
 static int prefixlen = 0;
 static char *jarfile = NULL;
 static short expected_major = -1;
+static struct rpminspect *jar_ri = NULL;
+static bool jar_result = true;
 
 /*
  * Returns major JVM version found if the file is a compiled Java class file,
  * or -1 if it's not a Java class file.
  */
-static short get_jvm_major(const char *filename, const char *localpath, const char *container)
+static short get_jvm_major(const char *filename, const char *localpath,
+                           const char *container)
 {
     int fd;
     short major;
@@ -90,50 +93,26 @@ static short get_jvm_major(const char *filename, const char *localpath, const ch
 }
 
 /*
- * Helper used by nftw() in _validate_desktop_contents()
- */
-static int jar_walker(const char *fpath, __attribute__((unused)) const struct stat *sb, int tflag, __attribute__((unused)) struct FTW *ftwbuf) {
-    /* Only looking at regular files */
-    if (tflag != FTW_F) {
-        return 0;
-    }
-
-    /* Only looking at Java .class files */
-    if (!get_jvm_major(fpath, fpath+prefixlen, jarfile)) {
-        return 0;
-    }
-
-/* XXX
-    if (strsuffix(fpath, file_to_find)) {
-        free(file_to_find);
-        file_to_find = strdup(fpath);
-        return 1;
-    }
-XXX */
-
-    return 0;
-}
-
-/*
  * Called for each file in the package payload or inside the .jar file.
  */
-static bool check_class_file(struct rpminspect *ri, const rpmfile_entry_t *file, const char *container)
+static bool check_class_file(struct rpminspect *ri, const char *fullpath,
+                             const char *localpath, const char *container)
 {
     short major;
     char *msg = NULL;
 
     /* try to see if this is just a .class file */
-    major = get_jvm_major(file->fullpath, file->localpath, container);
+    major = get_jvm_major(fullpath, localpath, container);
 
-    if (major == -1 && !strsuffix(file->localpath, ".class")) {
+    if (major == -1 && !strsuffix(localpath, ".class")) {
         return true;
     } else if (major < 0 || major > 60) {
-        xasprintf(&msg, "File %s (%s), Java byte code version %d is incorrect (wrong endianness? corrupted file? space JDK?)", file->localpath, file->fullpath, major);
+        xasprintf(&msg, "File %s (%s), Java byte code version %d is incorrect (wrong endianness? corrupted file? space JDK?)", localpath, fullpath, major);
         add_result(&ri->results, RESULT_BAD, WAIVABLE_BY_ANYONE, HEADER_JAVABYTECODE, msg, NULL, NULL);
         free(msg);
         return false;
     } else if (major > expected_major) {
-        xasprintf(&msg, "File %s (%s), Java byte code version %d greater than expected %d for product release %s", file->localpath, file->fullpath, major, expected_major, ri->product_release);
+        xasprintf(&msg, "File %s (%s), Java byte code version %d greater than expected %d for product release %s", localpath, fullpath, major, expected_major, ri->product_release);
         add_result(&ri->results, RESULT_BAD, WAIVABLE_BY_ANYONE, HEADER_JAVABYTECODE, msg, NULL, NULL);
         free(msg);
         return false;
@@ -143,12 +122,27 @@ static bool check_class_file(struct rpminspect *ri, const rpmfile_entry_t *file,
 }
 
 /*
+ * Helper used by nftw() in _validate_desktop_contents()
+ */
+static int jar_walker(const char *fpath, __attribute__((unused)) const struct stat *sb, int tflag, __attribute__((unused)) struct FTW *ftwbuf) {
+    /* Only looking at regular files */
+    if (tflag != FTW_F) {
+        return 0;
+    }
+
+    if (!check_class_file(jar_ri, fpath, fpath+prefixlen, jarfile)) {
+        jar_result = false;
+    }
+
+    return 0;
+}
+
+/*
  * Main driver for the inspection.
  */
 static bool javabytecode_driver(struct rpminspect *ri, rpmfile_entry_t *file, 
                                 const char *container)
 {
-    bool result = true;
     char *tmppath = NULL;
     int jarstatus = 0;
     char *msg = NULL;
@@ -174,18 +168,21 @@ static bool javabytecode_driver(struct rpminspect *ri, rpmfile_entry_t *file,
         /* iterate over the unpacked jar file */
         prefixlen = strlen(tmppath);
         jarfile = file->localpath;
+        jar_ri = ri;
         jarstatus = nftw(tmppath, jar_walker, 25, FTW_MOUNT | FTW_PHYS);
 
         if (jarstatus != 0) {
-            /* non-zero return means we errored somewhere, just report it */
+            /* we errored somewhere, just report it */
             fprintf(stderr, "*** error walking the unpacked directory tree for %s\n", file->fullpath);
         }
 
         /* clean up */
         rmtree(tmppath, true, false);
         free(tmppath);
+
+        return jar_result;
     } else {
-        return check_class_file(ri, file, container);
+        return check_class_file(ri, file->fullpath, file->localpath, container);
     }
 }
 
