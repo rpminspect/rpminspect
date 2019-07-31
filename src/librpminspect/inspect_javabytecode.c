@@ -96,14 +96,19 @@ static short get_jvm_major(const char *filename, const char *localpath,
  * Called for each file in the package payload or inside the .jar file.
  */
 static bool check_class_file(struct rpminspect *ri, const char *fullpath,
-                             const char *localpath, const char *container)
+                             const char *localpath, const char *peerfullpath,
+                             const char *peerlocalpath, const char *container)
 {
-    short major;
+    short major, majorpeer;
     char *msg = NULL;
+
+    assert(fullpath != NULL);
+    assert(localpath != NULL);
 
     /* try to see if this is just a .class file */
     major = get_jvm_major(fullpath, localpath, container);
 
+    /* basic checks on the most recent build */
     if (major == -1 && !strsuffix(localpath, ".class")) {
         return true;
     } else if (major < 0 || major > 60) {
@@ -118,6 +123,22 @@ static bool check_class_file(struct rpminspect *ri, const char *fullpath,
         return false;
     }
 
+    /* if a peer exists, perform comparisons on version changes */
+    if (peerfullpath && peerlocalpath) {
+        majorpeer = get_jvm_major(peerfullpath, peerlocalpath, container);
+
+        if (majorpeer == -1) {
+            return true;
+        }
+
+        if (major != majorpeer) {
+            xasprintf(&msg, "Java byte code version changed from %d to %d in %s from %s", majorpeer, major, localpath, container);
+            add_result(&ri->results, RESULT_BAD, WAIVABLE_BY_ANYONE, HEADER_JAVABYTECODE, msg, NULL, NULL);
+            free(msg);
+            return false;
+        }
+    }
+
     return true;
 }
 
@@ -130,7 +151,7 @@ static int jar_walker(const char *fpath, __attribute__((unused)) const struct st
         return 0;
     }
 
-    if (!check_class_file(jar_ri, fpath, fpath+prefixlen, jarfile)) {
+    if (!check_class_file(jar_ri, fpath, fpath+prefixlen, NULL, NULL, jarfile)) {
         jar_result = false;
     }
 
@@ -143,6 +164,7 @@ static int jar_walker(const char *fpath, __attribute__((unused)) const struct st
 static bool javabytecode_driver(struct rpminspect *ri, rpmfile_entry_t *file, 
                                 const char *container)
 {
+    bool result;
     char *tmppath = NULL;
     int jarstatus = 0;
     char *msg = NULL;
@@ -180,10 +202,16 @@ static bool javabytecode_driver(struct rpminspect *ri, rpmfile_entry_t *file,
         rmtree(tmppath, true, false);
         free(tmppath);
 
-        return jar_result;
+        result = jar_result;
     } else {
-        return check_class_file(ri, file->fullpath, file->localpath, container);
+        if (file->peer_file) {
+            result = check_class_file(ri, file->fullpath, file->localpath, file->peer_file->fullpath, file->peer_file->localpath, container);
+        } else {
+            result = check_class_file(ri, file->fullpath, file->localpath, NULL, NULL, container);
+        }
     }
+
+    return result;
 }
 
 /*
