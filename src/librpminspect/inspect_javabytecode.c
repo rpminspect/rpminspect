@@ -115,14 +115,42 @@ XXX */
 }
 
 /*
+ * Called for each file in the package payload or inside the .jar file.
+ */
+static bool check_class_file(struct rpminspect *ri, const rpmfile_entry_t *file, const char *container)
+{
+    short major;
+    char *msg = NULL;
+
+    /* try to see if this is just a .class file */
+    major = get_jvm_major(file->fullpath, file->localpath, container);
+
+    if (major == -1 && !strsuffix(file->localpath, ".class")) {
+        return true;
+    } else if (major < 0 || major > 60) {
+        xasprintf(&msg, "File %s (%s), Java byte code version %d is incorrect (wrong endianness? corrupted file? space JDK?)", file->localpath, file->fullpath, major);
+        add_result(&ri->results, RESULT_BAD, WAIVABLE_BY_ANYONE, HEADER_JAVABYTECODE, msg, NULL, NULL);
+        free(msg);
+        return false;
+    } else if (major > expected_major) {
+        xasprintf(&msg, "File %s (%s), Java byte code version %d greater than expected %d for product release %s", file->localpath, file->fullpath, major, expected_major, ri->product_release);
+        add_result(&ri->results, RESULT_BAD, WAIVABLE_BY_ANYONE, HEADER_JAVABYTECODE, msg, NULL, NULL);
+        free(msg);
+        return false;
+    }
+
+    return true;
+}
+
+/*
  * Main driver for the inspection.
  */
-static bool javabytecode_driver(struct rpminspect *ri, rpmfile_entry_t *file, const char *rpmfile)
+static bool javabytecode_driver(struct rpminspect *ri, rpmfile_entry_t *file, 
+                                const char *container)
 {
     bool result = true;
     char *tmppath = NULL;
     int jarstatus = 0;
-    short major;
     char *msg = NULL;
 
     if (strsuffix(file->fullpath, ".jar")) {
@@ -157,27 +185,8 @@ static bool javabytecode_driver(struct rpminspect *ri, rpmfile_entry_t *file, co
         rmtree(tmppath, true, false);
         free(tmppath);
     } else {
-        /* try to see if this is just a .class file */
-        major = get_jvm_major(file->fullpath, file->localpath, rpmfile);
-
-        if (major == -1 && !strsuffix(file->localpath, ".class")) {
-            return true;
-        } else if (major < 0 || major > 60) {
-            xasprintf(&msg, "File %s (%s), Java byte code version %d is incorrect (wrong endianness? corrupted file? space JDK?)", file->localpath, file->fullpath, major);
-            add_result(&ri->results, RESULT_BAD, WAIVABLE_BY_ANYONE, HEADER_JAVABYTECODE, msg, NULL, NULL);
-            free(msg);
-            return false;
-        } else if (major > expected_major) {
-            xasprintf(&msg, "File %s (%s), Java byte code version %d greater than expected %d for product release %s", file->localpath, file->fullpath, major, expected_major, ri->product_release);
-            add_result(&ri->results, RESULT_BAD, WAIVABLE_BY_ANYONE, HEADER_JAVABYTECODE, msg, NULL, NULL);
-            free(msg);
-            return false;
-        }
-
-        return true;
+        return check_class_file(ri, file, container);
     }
-
-    return result;
 }
 
 /*
