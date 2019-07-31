@@ -199,6 +199,12 @@ bool inspect_javabytecode(struct rpminspect *ri)
     /*
      * Get the major JVM version for this product release.
      */
+    if (ri->jvm_table == NULL) {
+        fprintf(stderr, "*** missing JVM version to product release mapping\n");
+        fflush(stderr);
+        return false;
+    }
+
     e.key = ri->product_release;
     hsearch_r(e, FIND, &eptr, ri->jvm_table);
 
