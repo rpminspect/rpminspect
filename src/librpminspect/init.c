@@ -260,7 +260,12 @@ int init_rpminspect(struct rpminspect *ri, const char *cfgfile) {
             continue;
         }
 
-        /* this grabs the key string, but advances past the block name */
+        /*
+         * This grabs the key string, but advances past the block name.
+         * The key is stored in the tailq for the ability to free it
+         * later.  We have to dupe it because the iniparser data will
+         * go away.
+         */
         entry = calloc(1, sizeof(*entry));
         assert(entry != NULL);
         entry->data = strdup((char *) keys[nkeys - 1] + len + 1);
