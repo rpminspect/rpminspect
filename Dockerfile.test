@@ -1,5 +1,5 @@
 # Set up an environment for running the tests.
-FROM fedora:29
+FROM fedora:30
 RUN dnf -y install 'dnf-command(builddep)'
 
 # Start with the buildreqs from the spec file
