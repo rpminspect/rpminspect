@@ -167,7 +167,6 @@ static bool javabytecode_driver(struct rpminspect *ri, rpmfile_entry_t *file,
     bool result;
     char *tmppath = NULL;
     int jarstatus = 0;
-    char *msg = NULL;
 
     if (strsuffix(file->fullpath, ".jar")) {
         /* if we have a possible jar file, try to unpack and walk it */
