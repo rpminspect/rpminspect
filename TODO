@@ -113,7 +113,9 @@ OTHER WORK
 NOTES ABOUT TESTS
 =================
 
-Aside from unit tests, we should have an integration test suite to validate the functionality of the program when run against real builds.  Here are some notes about tests to implement:
+Aside from unit tests, we should have an integration test suite to validate the
+functionality of the program when run against real builds.  Here are some notes
+about tests to implement:
 
 * Handle empty RPMs (i.e., missing RPMTAG_FILELIST).  This is legal and allows
   RPMs to just provide metadata.
