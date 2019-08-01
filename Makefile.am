@@ -33,9 +33,8 @@ srpm: rpminspect.spec dist
 bumpver:
 	sed -i -e '/^AC_INIT/ s/\[$(CURVER)\]/[$(CURMAJ).$(NEWMIN)]/' configure.ac
 
-# Increment version number, create a dist archive, tag the repo, and sign the
-# dist archive
-release: bumpver dist
+# Create a dist archive, tag the repo, and sign the dist archive
+release: dist
 	git tag -s -a -m "Tag release v$(VERSION)" v$(VERSION)
 	gpg --detach-sign --armor $(DIST_ARCHIVES)
 	@echo
