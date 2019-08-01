@@ -10,6 +10,7 @@ Source0:        https://github.com/dcantrell/rpminspect/releases/download/v%%VER
 BuildRequires:  autoconf
 BuildRequires:  automake
 BuildRequires:  libtool
+BuildRequires:  make
 BuildRequires:  gcc
 BuildRequires:  glibc-devel
 BuildRequires:  json-c-devel
