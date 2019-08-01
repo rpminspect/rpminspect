@@ -103,6 +103,23 @@ Building from git will require autoconf, automake, libtool, and the rest
 of the autotools packages.
 
 
+Releasing
+---------
+
+Releases are made using these steps:
+
+    git clean -d -x -f
+    git pull
+    ./autogen.sh
+    ./configure
+    make release
+
+This will increment the x.y version number, create a new tarball, sign it,
+and create a signed git tag.  All of that is pushed to github and then a
+release entry is made and the tarball and detached signature are uploaded
+there.
+
+
 Contributing
 ------------
 
