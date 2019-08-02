@@ -180,6 +180,7 @@ static void _curl_helper(const bool verbose, const char *src, const char *dst) {
     curl_easy_setopt(c, CURLOPT_URL, src);
     curl_easy_setopt(c, CURLOPT_WRITEDATA, fp);
     curl_easy_setopt(c, CURLOPT_FAILONERROR, true);
+    curl_easy_setopt(c, CURLOPT_TCP_FASTOPEN, 1);
     cc = curl_easy_perform(c);
 
     if (fclose(fp) != 0) {
