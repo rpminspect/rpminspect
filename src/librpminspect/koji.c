@@ -21,6 +21,7 @@
 #include <stdlib.h>
 #include <stdbool.h>
 #include <assert.h>
+#include <limits.h>
 #include <xmlrpc-c/client.h>
 #include <xmlrpc-c/client_global.h>
 #include "rpminspect.h"
@@ -237,6 +238,9 @@ struct koji_build *get_koji_build(struct rpminspect *ri, const char *buildspec) 
     xmlrpc_env_init(&env);
     xmlrpc_client_init2(&env, XMLRPC_CLIENT_NO_FLAGS, SOFTWARE_NAME, PACKAGE_VERSION, NULL, 0);
     xmlrpc_abort_on_fault(&env);
+
+    /* increase the message response size */
+    xmlrpc_limit_set(XMLRPC_XML_SIZE_LIMIT_ID, INT_MAX);
 
     /* call 'getBuild' on the koji hub */
     result = xmlrpc_client_call(&env, ri->kojihub, "getBuild", "(s)", buildspec);
