@@ -245,7 +245,7 @@ rpmfile_t * extract_rpm(const char *pkg, Header hdr)
         }
 
         /* Write the file to disk */
-        if ((archive_read_extract(archive, entry, archive_flags) != ARCHIVE_OK)) {
+        if (archive_read_extract(archive, entry, archive_flags) != ARCHIVE_OK) {
             fprintf(stderr, "*** Error extracting %s: %s\n", pkg, archive_error_string(archive));
             free_files(file_list);
             file_list = NULL;
