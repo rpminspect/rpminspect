@@ -72,6 +72,7 @@ rpmfile_t * extract_rpm(const char *pkg, Header hdr)
     int *rpm_indices = NULL;
 
     char *hardlinkpath = NULL;
+    bool hardlink = false;
     char *output_dir = NULL;
     struct archive *archive = NULL;
     struct archive_entry *entry = NULL;
@@ -188,6 +189,8 @@ rpmfile_t * extract_rpm(const char *pkg, Header hdr)
             goto cleanup;
         }
 
+        hardlink = false;
+
         /* Look up this path in the hash table */
         archive_path = archive_entry_pathname(entry);
 
@@ -241,10 +244,11 @@ rpmfile_t * extract_rpm(const char *pkg, Header hdr)
             xasprintf(&hardlinkpath, "%s/%s", output_dir, archive_entry_hardlink(entry));
             archive_entry_set_link(entry, hardlinkpath);
             free(hardlinkpath);
+            hardlink = true;
         }
 
         /* Write the file to disk */
-        if (archive_read_extract(archive, entry, archive_flags) != ARCHIVE_OK) {
+        if ((archive_read_extract(archive, entry, archive_flags) != ARCHIVE_OK) && !hardlink) {
             fprintf(stderr, "*** Error extracting %s: %s\n", pkg, archive_error_string(archive));
             free_files(file_list);
             file_list = NULL;
