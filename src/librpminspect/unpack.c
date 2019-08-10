@@ -1,5 +1,3 @@
-/* Unpack a file from a .dist package. */
-
 /*
  * Copyright 2012-2019 David Cantrell <david.l.cantrell@gmail.com>
  *                     Chris Lumens <chris@bangmoney.org>
@@ -119,13 +117,13 @@ int unpack_archive(const char *archive, const char *dest, const bool force) {
         flags |= ARCHIVE_EXTRACT_UNLINK;
     }
 
-    /* full location to the .dist */
+    /* full location to the archive */
     if ((rfilename = realpath(archive, rfilename)) == NULL) {
         fprintf(stderr, "*** unable to find real path to %s\n", archive);
         return -1;
     }
 
-    /* .dist reader */
+    /* archive reader */
     input = archive_read_new();
 #if ARCHIVE_VERSION_NUMBER < 3000000
     archive_read_support_compression_all(input);
@@ -149,12 +147,12 @@ int unpack_archive(const char *archive, const char *dest, const bool force) {
         return -1;
     }
 
-    /* handler to write .dist members to disk */
+    /* handler to write archive members to disk */
     output = archive_write_disk_new();
     archive_write_disk_set_options(output, flags);
     archive_write_disk_set_standard_lookup(output);
 
-    /* extract each .dist member */
+    /* extract each archive member */
     while ((r = archive_read_next_header(input, &entry)) != ARCHIVE_EOF) {
         if (r != ARCHIVE_OK) {
             fprintf(stderr, "%s\n", archive_error_string(input));
