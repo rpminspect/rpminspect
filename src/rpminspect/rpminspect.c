@@ -64,6 +64,12 @@ static void usage(const char *progname) {
     return;
 }
 
+/*
+ * Get the product release string by grabbing a possible dist tag from
+ * the Release value.  Dist tags begin with '.' and go to the end of the
+ * Release value.  Trim any trailing '/' characters in case the user is
+ * specifying a build from a local path.
+ */
 static char *get_product_release(const char *before, const char *after) {
     char *pos = NULL;
     char *before_product = NULL;
@@ -79,6 +85,12 @@ static char *get_product_release(const char *before, const char *after) {
         return NULL;
     }
 
+    /*
+     * Trim any trailing slashes in case the user is specifying builds from
+     * local paths
+     */
+    after_product[strcspn(after_product, "/")] = 0;
+
     if (before) {
         pos = rindex(before, '.') + 1;
         before_product = strdup(pos);
@@ -88,6 +100,12 @@ static char *get_product_release(const char *before, const char *after) {
             free(after_product);
             return NULL;
         }
+
+        /*
+         * Trim any trailing slashes in case the user is specifying builds from
+         * local paths
+         */
+        before_product[strcspn(before_product, "/")] = 0;
 
         if (strcmp(before_product, after_product)) {
             fprintf(stderr, "*** Builds have different product releases (%s != %s)\n", before_product, after_product);
