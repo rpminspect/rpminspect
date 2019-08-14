@@ -57,7 +57,7 @@ static bool _is_desktop_entry_file(const char *desktop_entry_files_dir, const rp
 
     /* Skip source packages */
     if (headerIsSource(file->rpm_header)) {
-        return true;
+        return false;
     }
 
     /* Is this a regular file? */
@@ -94,7 +94,7 @@ static int _validate_desktop_file(const char *tool, const char *fullpath, char *
     assert(fullpath != NULL);
 
     /* Run the validation tool */
-    xasprintf(&cmd, "%s %s", tool, fullpath);
+    xasprintf(&cmd, "%s %s 2>&1", tool, fullpath);
     cmdfp = popen(cmd, "r");
 
     if (cmdfp == NULL) {
@@ -126,17 +126,24 @@ static int _validate_desktop_file(const char *tool, const char *fullpath, char *
     }
 
     /*
-     * Trim the leading filename since those will be reported dby our add_result().
+     * There may be no results from desktop-file-validate
      */
-    new = strdup(*result + strlen(fullpath) + 2);
+    if (result != NULL && *result != NULL) {
+        /*
+         * Trim the leading filename since those will be reported by our
+         * add_result().
+         */
+        new = strdup(*result + strlen(fullpath) + 2);
 
-    /*
-     * Trim trailing newlines, again for nicer reporting.
-     */
-    new[strcspn(new, "\n")] = 0;
+        /*
+         * Trim trailing newlines, again for nicer reporting.
+         */
+        new[strcspn(new, "\n")] = 0;
 
-    free(*result);
-    *result = new;
+        free(*result);
+        *result = new;
+    }
+
     return ret;
 }
 
