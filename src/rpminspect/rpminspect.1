@@ -81,7 +81,10 @@ Write the inspection results in the TYPE format.  The default format
 is text.  Available formats can be seen with the \-l option.
 .TP
 .B \-w PATH, \-\-workdir=PATH
-Temporary working directory to use (default: /var/tmp/rpminspect)
+Temporary working directory to use (default: /var/tmp/rpminspect).  You
+can specify a tilde (~) character in the PATH specification and rpminspect
+will expand it.  Keep in mind that the PATH you specify with ~ must exist
+in order for expansion to work.
 .TP
 .B \-f, \-\-fetch\-only
 Only download builds, do not perform any inspections (implies \-k).

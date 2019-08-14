@@ -27,6 +27,7 @@
 #include <sys/stat.h>
 #include <sys/ioctl.h>
 #include <unistd.h>
+#include <glob.h>
 
 #include "rpminspect.h"
 #include "builds.h"
@@ -122,9 +123,10 @@ static char *get_product_release(const char *before, const char *after) {
 
 int main(int argc, char **argv) {
     char *progname = basename(argv[0]);
-    int c, i;
+    int c, i, j;
     int idx = 0;
     int ret = EXIT_SUCCESS;
+    glob_t expand;
     char *short_options = "c:T:r:o:F:lw:fkv\?V";
     struct option long_options[] = {
         { "config", required_argument, 0, 'c' },
@@ -269,7 +271,23 @@ int main(int argc, char **argv) {
                 exit(EXIT_SUCCESS);
                 break;
             case 'w':
-                workdir = strdup(optarg);
+                if (index(optarg, '~')) {
+                    /* allow for ~ expansion */
+                    j = glob(optarg, GLOB_TILDE_CHECK, NULL, &expand);
+
+                    if (j == 0 && expand.gl_pathc == 1) {
+                        workdir = strdup(expand.gl_pathv[0]);
+                    } else {
+                        fprintf(stderr, "*** Unable to expand workdir: `%s`: %s", optarg, strerror(errno));
+                        fflush(stderr);
+                        return EXIT_FAILURE;
+                    }
+
+                    globfree(&expand);
+                } else {
+                    workdir = strdup(optarg);
+                }
+
                 break;
             case 'f':
                 fetch_only = true;        /* fall-thru: -f implies -k */
@@ -287,7 +305,8 @@ int main(int argc, char **argv) {
                 printf("%s version %s\n", progname, PACKAGE_VERSION);
                 exit(0);
             default:
-                printf("?? getopt returned character code 0%o ??\n", c);
+                fprintf(stderr, "?? getopt returned character code 0%o ??\n", c);
+                fflush(stderr);
                 exit(EXIT_FAILURE);
         }
     }
