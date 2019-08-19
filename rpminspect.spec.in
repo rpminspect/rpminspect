@@ -4,8 +4,8 @@ Release:        1%{?dist}
 Summary:        Build deviation compliance tool
 Group:          Development/Tools
 License:        GPLv3+
-URL:            https://github.com/dcantrell/rpminspect
-Source0:        https://github.com/dcantrell/rpminspect/releases/download/v%%VERSION%%/%%TARBALL%%
+URL:            https://github.com/rpminspect/rpminspect
+Source0:        https://github.com/rpminspect/rpminspect/releases/download/v%%VERSION%%/%%TARBALL%%
 
 BuildRequires:  autoconf
 BuildRequires:  automake
@@ -109,4 +109,4 @@ rm -f %{buildroot}%{_libdir}/*.la
 
 %changelog
 * %%RPMDATE%% David Cantrell <dcantrell@redhat.com> - %%VERSION%%-1
-- See commit log at https://github.com/dcantrell/rpminspect
+- See commit log at https://github.com/rpminspect/rpminspect
