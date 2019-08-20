@@ -153,7 +153,9 @@ struct rpminspect {
                                 * from certain package strings.
                                 */
     char *vendor;              /* Required vendor string */
-    char *buildhost_subdomain; /* Required subdomain for buildhosts */
+
+    /* Required subdomain for buildhosts -- multiple subdomains allowed */
+    string_list_t *buildhost_subdomain;
 
     regex_t *elf_path_include;
     regex_t *elf_path_exclude;

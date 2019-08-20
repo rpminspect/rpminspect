@@ -21,6 +21,7 @@
 #include <stdbool.h>
 #include <string.h>
 #include <assert.h>
+#include <sys/queue.h>
 #include "rpminspect.h"
 
 /*
@@ -28,6 +29,8 @@
  */
 static bool _valid_peers(struct rpminspect *ri, const Header before_hdr, const Header after_hdr) {
     bool ret = true;
+    bool valid_subdomain = false;
+    string_entry_t *subdomain = NULL;
     char *after_vendor = NULL;
     char *after_buildhost = NULL;
     char *after_summary = NULL;
@@ -51,13 +54,24 @@ static bool _valid_peers(struct rpminspect *ri, const Header before_hdr, const H
     }
 
     after_buildhost = headerGetAsString(after_hdr, RPMTAG_BUILDHOST);
-    if (after_buildhost && !strsuffix(after_buildhost, ri->buildhost_subdomain)) {
-        xasprintf(&msg, "Package Build Host \"%s\" is not within \"%s\" in %s", after_buildhost, ri->buildhost_subdomain, after_nevra);
+    if (after_buildhost && ri->buildhost_subdomain != NULL) {
+        valid_subdomain = false;
 
-        add_result(&ri->results, RESULT_BAD, NOT_WAIVABLE, HEADER_METADATA, msg, NULL, REMEDY_BUILDHOST);
-        ret = false;
+        TAILQ_FOREACH(subdomain, ri->buildhost_subdomain, items) {
+            if (strsuffix(after_buildhost, subdomain->data)) {
+                valid_subdomain = true;
+                break;
+            }
+        }
 
-        free(msg);
+        if (!valid_subdomain) {
+            xasprintf(&msg, "Package Build Host \"%s\" is not within an expected build host subdomain in %s", after_buildhost, after_nevra);
+
+            add_result(&ri->results, RESULT_BAD, NOT_WAIVABLE, HEADER_METADATA, msg, NULL, REMEDY_BUILDHOST);
+            ret = false;
+
+            free(msg);
+        }
     }
 
     after_summary = headerGetAsString(after_hdr, RPMTAG_SUMMARY);

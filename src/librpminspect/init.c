@@ -73,7 +73,7 @@ int init_rpminspect(struct rpminspect *ri, const char *cfgfile) {
     const char *tmp = NULL;
     char *walk = NULL;
     char *start = NULL;
-    char *badword = NULL;
+    char *token = NULL;
     string_entry_t *entry = NULL;
     uint64_t tests = 0;
     int nkeys = 0;
@@ -150,11 +150,11 @@ int init_rpminspect(struct rpminspect *ri, const char *cfgfile) {
         assert(ri->badwords != NULL);
         TAILQ_INIT(ri->badwords);
 
-        while ((badword = strsep(&walk, " \t")) != NULL) {
+        while ((token = strsep(&walk, " \t")) != NULL) {
             entry = calloc(1, sizeof(*entry));
             assert(entry != NULL);
 
-            entry->data = strdup(badword);
+            entry->data = strdup(token);
             assert(entry->data != NULL);
 
             TAILQ_INSERT_TAIL(ri->badwords, entry, items);
@@ -175,7 +175,26 @@ int init_rpminspect(struct rpminspect *ri, const char *cfgfile) {
     if (tmp == NULL) {
         ri->buildhost_subdomain = NULL;
     } else {
-        ri->buildhost_subdomain = strdup(tmp);
+        /* make a copy of the string for splitting */
+        start = walk = strdup(tmp);
+
+        /* split up the string of subdomains and turn them in to a list */
+        ri->buildhost_subdomain = calloc(1, sizeof(*(ri->buildhost_subdomain)));
+        assert(ri->buildhost_subdomain != NULL);
+        TAILQ_INIT(ri->buildhost_subdomain);
+
+        while ((token = strsep(&walk, " \t")) != NULL) {
+            entry = calloc(1, sizeof(*entry));
+            assert(entry != NULL);
+
+            entry->data = strdup(token);
+            assert(entry->data != NULL);
+
+            TAILQ_INSERT_TAIL(ri->buildhost_subdomain, entry, items);
+        }
+
+        /* clean up */
+        free(start);
     }
 
     /* If any of the regular expressions fail to compile, stop and return failure */
