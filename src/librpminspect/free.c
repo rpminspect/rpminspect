@@ -67,7 +67,7 @@ void free_rpminspect(struct rpminspect *ri) {
     free(ri->desktop_entry_files_dir);
     free(ri->desktop_file_validate);
     free(ri->vendor);
-    free(ri->buildhost_subdomain);
+    list_free(ri->buildhost_subdomain, free);
     free(ri->before);
     free(ri->after);
     free(ri->product_release);
