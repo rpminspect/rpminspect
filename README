@@ -124,6 +124,92 @@ release entry is made and the tarball and detached signature are uploaded
 there.
 
 
+How To Use
+----------
+
+SETUP
+
+Make sure you have installed the program and corresponding data file
+collection.  On Fedora, this can be done using dnf:
+
+    dnf install rpminspect rpminspect-data-fedora
+
+The first package is the actual program.  The rpminspect-data-fedora package
+delivers data files used by the various inspections performed by rpminspect.
+It also delivers the rpminspect.conf configuration file.  Have a look at
+this file and make sure it will work for your environment.  The idea is to
+easily support per-vendor data packages.  For example, if CentOS needs
+different settings, we should create an rpminspect-data-centos package and
+customize that.
+
+Ideally the configuration file should not need changing.  If you do find
+mistakes, please file an issue or send a pull request to the project:
+
+    https://github.com/rpminspect/rpminspect-data-fedora
+
+We should aim for the vendor-specific data packages providing everything a
+developer needs to successfully run rpminspect locally for that product.
+
+USAGE
+
+rpminspect is run from the command.  The input is expected to be a build as
+output by Koji.  rpminspect will talk to Koji and download the build you
+specify, but to avoid repeated downloads you can also download and cache a
+build locally and refer to a local path.
+
+Here is a simple invocation using tmux as an example:
+
+    $ rpminspect -v tmux-2.9a-2.fc31 tmux-2.9a-3.fc31
+
+This just runs with verbose mode enabled and compares tmux-2.9a-2.fc31 to
+tmux-2.9a-3.fc31.  rpminspect will download the packages for these builds
+and run the inspections.
+
+If you want to keep temporary files created during the run, pass -k.
+rpminspect will tell you where those files after it finishes.
+
+You can list available inspections with the -l option:
+
+    $ rpminspect -l
+
+Say you only want to run the license inspection on the builds above:
+
+    $ rpminspect -v -k -T license tmux-2.9a-2.fc31 tmux-2.9a-3.fc31
+
+Now let's say you want to run the license and manpage inspections:
+
+    $ rpminspect -v -k -T license,manpage tmux-2.9a-2.fc31 tmux-2.9a-3.fc31
+
+And lastly, what if you want to run *all* inspections except the license
+one:
+
+    $ rpminspect -v -k -T \!license tmux-2.9a-2.fc31 tmux-2.9a-3.fc31
+
+(NOTE: The -T option syntax will be changing in the future, so keep that in
+mind.)
+
+What about specify a locally cached build?  First, let's start by caching
+the builds we have been using:
+
+    $ mkdir ~/builds
+    $ rpminspect -v -k -f tmux-2.9a-2.fc31
+    $ mv PATH_RPMINSPECT_DISPLAY/after ~/builds/tmux-2.9a-2.fc31
+    $ rpminspect -v -k -f tmux-2.9a-3.fc31
+    $ mv PATH_RPMINSPECT_DISPLAY/after ~/builds/tmux-2.9a-3.fc31
+
+Not exactly elegant, but it gets the job done.  Now let's run all the
+inspections but specify the locally cached builds:
+
+    $ rpminspect -v ~/builds/tmux-2.9a-2.fc31 ~/builds/tmux-2.9a-3.fc31
+
+Easy.  Again, these locally cached builds must look like what rpminspect
+would download from koji.  Hence using rpminspect to first download it, then
+manually moving it to a cache.
+
+For more information, see the man page for rpminspect(1).  And see the
+--help output for information on command line option syntax.
+
+
 Contributing
 ------------
 
