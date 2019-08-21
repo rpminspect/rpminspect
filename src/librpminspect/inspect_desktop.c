@@ -30,9 +30,9 @@
 static char *file_to_find = NULL;
 
 /*
- * Helper used by nftw() in _validate_desktop_contents()
+ * Helper used by nftw() in validate_desktop_contents()
  */
-static int _find_file(const char *fpath, __attribute__((unused)) const struct stat *sb, int tflag, __attribute__((unused)) struct FTW *ftwbuf) {
+static int find_file(const char *fpath, __attribute__((unused)) const struct stat *sb, int tflag, __attribute__((unused)) struct FTW *ftwbuf) {
     /* Only looking at regular files */
     if (tflag != FTW_F) {
         return 0;
@@ -48,10 +48,10 @@ static int _find_file(const char *fpath, __attribute__((unused)) const struct st
 }
 
 /*
- * Called by _desktop_driver() to determine if a found file is one we want to
+ * Called by desktop_driver() to determine if a found file is one we want to
  * look at.  Returns true if it is, false otherwise.
  */
-static bool _is_desktop_entry_file(const char *desktop_entry_files_dir, const rpmfile_entry_t *file) {
+static bool is_desktop_entry_file(const char *desktop_entry_files_dir, const rpmfile_entry_t *file) {
     assert(desktop_entry_files_dir != NULL);
     assert(file != NULL);
 
@@ -78,12 +78,12 @@ static bool _is_desktop_entry_file(const char *desktop_entry_files_dir, const rp
 }
 
 /*
- * Called by _desktop_driver() to run desktop-file-validate on individual desktop
+ * Called by desktop_driver() to run desktop-file-validate on individual desktop
  * files.  The return value is the return value of pclose() which is -1 on failure
  * otherwise it's the return code of desktop-file-validate.  The output of the
  * command (if it exists) is written to result in the calling function.
  */
-static int _validate_desktop_file(const char *tool, const char *fullpath, char **result) {
+static int validate_desktop_file(const char *tool, const char *fullpath, char **result) {
     int ret;
     char *cmd = NULL;
     char *new = NULL;
@@ -151,7 +151,7 @@ static int _validate_desktop_file(const char *tool, const char *fullpath, char *
  * Validate the Exec= and Icon= lines in a desktop entry file.  False means
  * something didn't validate.  Results are reported from this function.
  */
-static bool _validate_desktop_contents(struct rpminspect *ri, const rpmfile_entry_t *file) {
+static bool validate_desktop_contents(struct rpminspect *ri, const rpmfile_entry_t *file) {
     bool result = true;
     FILE *fp = NULL;
     size_t len;
@@ -209,7 +209,7 @@ static bool _validate_desktop_contents(struct rpminspect *ri, const rpmfile_entr
              * found and is valid.  If found, the nftw() helper replaces
              * file_to_find with the full path to where it was found.
              */
-            if (nftw(subtree, _find_file, 25, FTW_MOUNT|FTW_PHYS) == 1) {
+            if (nftw(subtree, find_file, 25, FTW_MOUNT|FTW_PHYS) == 1) {
                 if (lstat(file_to_find, &sb) == -1) {
                     fprintf(stderr, "error stat'ing %s: %s\n", file_to_find, strerror(errno));
                     fflush(stderr);
@@ -252,7 +252,7 @@ static bool _validate_desktop_contents(struct rpminspect *ri, const rpmfile_entr
              * found and is valid.  If found, the nftw() helper replaces
              * file_to_find with the full path to where it was found.
              */
-            if (nftw(subtree, _find_file, 20, FTW_MOUNT|FTW_PHYS) == 1) {
+            if (nftw(subtree, find_file, 20, FTW_MOUNT|FTW_PHYS) == 1) {
                 if (lstat(file_to_find, &sb) == -1) {
                     fprintf(stderr, "error stat'ing %s: %s\n", file_to_find, strerror(errno));
                     fflush(stderr);
@@ -290,7 +290,7 @@ static bool _validate_desktop_contents(struct rpminspect *ri, const rpmfile_entr
     return result;
 }
 
-static bool _desktop_driver(struct rpminspect *ri, rpmfile_entry_t *file) {
+static bool desktop_driver(struct rpminspect *ri, rpmfile_entry_t *file) {
     bool result = true;
     int after_code;
     char *after_out = NULL;
@@ -302,16 +302,16 @@ static bool _desktop_driver(struct rpminspect *ri, rpmfile_entry_t *file) {
      * Is this a file we should look at?
      * NOTE: Returning 'true' here is like 'continue' in the calling loop.
      */
-    if (!_is_desktop_entry_file(ri->desktop_entry_files_dir, file)) {
+    if (!is_desktop_entry_file(ri->desktop_entry_files_dir, file)) {
         return true;
     }
 
     /* Validate the desktop file */
-    after_code = _validate_desktop_file(ri->desktop_file_validate, file->fullpath, &after_out);
+    after_code = validate_desktop_file(ri->desktop_file_validate, file->fullpath, &after_out);
 
-    if (file->peer_file && _is_desktop_entry_file(ri->desktop_entry_files_dir, file->peer_file)) {
+    if (file->peer_file && is_desktop_entry_file(ri->desktop_entry_files_dir, file->peer_file)) {
         /* if we have a before peer, validate the corresponding desktop file */
-        (void) _validate_desktop_file(ri->desktop_file_validate, file->peer_file->fullpath, &before_out);
+        (void) validate_desktop_file(ri->desktop_file_validate, file->peer_file->fullpath, &before_out);
     }
 
     if (after_code == -1) {
@@ -337,7 +337,7 @@ static bool _desktop_driver(struct rpminspect *ri, rpmfile_entry_t *file) {
     free(before_out);
 
     /* Validate the contents of the desktop entry file */
-    if (!_validate_desktop_contents(ri, file) && result) {
+    if (!validate_desktop_contents(ri, file) && result) {
         result = false;
     }
 
@@ -359,7 +359,7 @@ bool inspect_desktop(struct rpminspect *ri) {
      * them.  The before and after peers are compared for these files.
      * For the after files, the Exec and Icon references are checked.
      */
-    result = foreach_peer_file(ri, _desktop_driver);
+    result = foreach_peer_file(ri, desktop_driver);
 
     if (result) {
         add_result(&ri->results, RESULT_OK, NOT_WAIVABLE, HEADER_DESKTOP, NULL, NULL, NULL);

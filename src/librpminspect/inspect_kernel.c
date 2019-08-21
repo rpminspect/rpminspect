@@ -31,8 +31,8 @@
 #include "rpminspect.h"
 
 /* Filter a libkmod list and convert to a string_list_t */
-typedef void (*_modinfo_to_entries)(string_list_t *, const struct kmod_list *);
-static string_list_t * _modinfo_to_list(const struct kmod_list *list, _modinfo_to_entries convert)
+typedef void (*modinfo_to_entries)(string_list_t *, const struct kmod_list *);
+static string_list_t * modinfo_to_list(const struct kmod_list *list, modinfo_to_entries convert)
 {
     const struct kmod_list *iter = NULL;
     string_list_t *result;
@@ -50,7 +50,7 @@ static string_list_t * _modinfo_to_list(const struct kmod_list *list, _modinfo_t
 }
 
 /* Helper for compare_parameters */
-static void _convert_module_parameters(string_list_t *list, const struct kmod_list *modinfo)
+static void convert_module_parameters(string_list_t *list, const struct kmod_list *modinfo)
 {
     const char *key;
     const char *value;
@@ -80,7 +80,7 @@ static void _convert_module_parameters(string_list_t *list, const struct kmod_li
     TAILQ_INSERT_TAIL(list, entry, items);
 }
 
-void _convert_module_dependencies(string_list_t *list, const struct kmod_list *modinfo)
+void convert_module_dependencies(string_list_t *list, const struct kmod_list *modinfo)
 {
     const char *key;
     const char *value;
@@ -140,8 +140,8 @@ bool compare_module_parameters(const struct kmod_list *before, const struct kmod
     assert(lost);
 
     /* Get the parameter list for each module */
-    before_parm_list = _modinfo_to_list(before, _convert_module_parameters);
-    after_parm_list = _modinfo_to_list(after, _convert_module_parameters);
+    before_parm_list = modinfo_to_list(before, convert_module_parameters);
+    after_parm_list = modinfo_to_list(after, convert_module_parameters);
 
     /* diff the parameter lists */
     difference = list_difference(before_parm_list, after_parm_list);
@@ -182,8 +182,8 @@ bool compare_module_dependencies(const struct kmod_list *before, const struct km
     assert(before_deps);
     assert(after_deps);
 
-    before_depends_list = _modinfo_to_list(before, _convert_module_dependencies);
-    after_depends_list = _modinfo_to_list(after, _convert_module_dependencies);
+    before_depends_list = modinfo_to_list(before, convert_module_dependencies);
+    after_depends_list = modinfo_to_list(after, convert_module_dependencies);
 
     difference = list_symmetric_difference(before_depends_list, after_depends_list);
 
@@ -209,17 +209,17 @@ bool compare_module_dependencies(const struct kmod_list *before, const struct km
 /* Module alias regression checking */
 
 /* mapping of an alias string to a module name */
-struct _alias_entry_t {
+struct alias_entry_t {
     char *alias;
     char *module;
-    TAILQ_ENTRY(_alias_entry_t) items;
+    TAILQ_ENTRY(alias_entry_t) items;
 };
 
-TAILQ_HEAD(_alias_list_t, _alias_entry_t);
+TAILQ_HEAD(alias_list_t, alias_entry_t);
 
 struct kernel_alias_data {
     size_t num_aliases;
-    struct _alias_list_t *alias_list;
+    struct alias_list_t *alias_list;
     struct hsearch_data *alias_table;
 };
 
@@ -233,7 +233,7 @@ void gather_module_aliases(const char *module_name, const struct kmod_list *modi
     const struct kmod_list *iter = NULL;
     const char *key;
     const char *value;
-    struct _alias_entry_t *alias_entry;
+    struct alias_entry_t *alias_entry;
 
     assert(module_name);
     assert(modinfo_list);
@@ -280,7 +280,7 @@ void gather_module_aliases(const char *module_name, const struct kmod_list *modi
 /* Free the kernel_alias_data struct created by gather_module_aliases */
 void free_module_aliases(struct kernel_alias_data *data)
 {
-    struct _alias_entry_t *alias_entry;
+    struct alias_entry_t *alias_entry;
     ENTRY e;
     ENTRY *eptr;
 
@@ -317,10 +317,10 @@ void free_module_aliases(struct kernel_alias_data *data)
     free(data);
 }
 
-static void _finalize_module_aliases(struct kernel_alias_data *data)
+static void finalize_module_aliases(struct kernel_alias_data *data)
 {
-    struct _alias_entry_t *alias_entry;
-    struct _alias_entry_t *tmp;
+    struct alias_entry_t *alias_entry;
+    struct alias_entry_t *tmp;
     ENTRY e;
     ENTRY *eptr;
     string_entry_t *module_entry;
@@ -384,11 +384,11 @@ static void _finalize_module_aliases(struct kernel_alias_data *data)
     }
 }
 
-static string_list_t * _wildcard_alias_search(const char *alias, const struct _alias_list_t *after_aliases)
+static string_list_t * wildcard_alias_search(const char *alias, const struct alias_list_t *after_aliases)
 {
     string_list_t *result;
     string_entry_t *entry;
-    struct _alias_entry_t *iter;
+    struct alias_entry_t *iter;
 
     result = calloc(1, sizeof(*result));
     assert(result);
@@ -424,7 +424,7 @@ static string_list_t * _wildcard_alias_search(const char *alias, const struct _a
  */
 bool compare_module_aliases(struct kernel_alias_data *before, struct kernel_alias_data *after, module_alias_callback callback, void *user_data)
 {
-    struct _alias_entry_t *iter;
+    struct alias_entry_t *iter;
     string_list_t *before_modules;
     string_list_t *after_modules;
     string_list_t *difference;
@@ -447,10 +447,10 @@ bool compare_module_aliases(struct kernel_alias_data *before, struct kernel_alia
     }
 
     /* Gather the lists of aliases into hash tables, mapping an alias string to a string_list_t of module names. */
-    _finalize_module_aliases(before);
+    finalize_module_aliases(before);
 
     if (after != NULL) {
-        _finalize_module_aliases(after);
+        finalize_module_aliases(after);
     }
 
     /* For each alias in before, look for the matching alias in after */
@@ -474,7 +474,7 @@ bool compare_module_aliases(struct kernel_alias_data *before, struct kernel_alia
 
         /* No match found, do a wildcard search */
         if (eptr == NULL) {
-            after_modules = _wildcard_alias_search(iter->alias, after->alias_list);
+            after_modules = wildcard_alias_search(iter->alias, after->alias_list);
             wildcard_search = true;
         } else {
             after_modules = (string_list_t *) eptr->data;
@@ -482,7 +482,7 @@ bool compare_module_aliases(struct kernel_alias_data *before, struct kernel_alia
 
             /* If the lists differ, do a wildcard search */
             if (!TAILQ_EMPTY(difference)) {
-                after_modules = _wildcard_alias_search(iter->alias, after->alias_list);
+                after_modules = wildcard_alias_search(iter->alias, after->alias_list);
                 wildcard_search = true;
             }
 

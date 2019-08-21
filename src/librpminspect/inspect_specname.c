@@ -26,7 +26,7 @@
 
 static bool specgood = false;
 
-static bool _specname_driver(struct rpminspect *ri, rpmfile_entry_t *file) {
+static bool specname_driver(struct rpminspect *ri, rpmfile_entry_t *file) {
     bool result = false;
     char *specfile = NULL;
     char *msg = NULL;
@@ -66,7 +66,7 @@ bool inspect_specname(struct rpminspect *ri) {
     bool result = false;
 
     assert(ri != NULL);
-    result = foreach_peer_file(ri, _specname_driver);
+    result = foreach_peer_file(ri, specname_driver);
 
     if (specgood) {
         add_result(&ri->results, RESULT_OK, WAIVABLE_BY_ANYONE, HEADER_SPECNAME, NULL, NULL, NULL);

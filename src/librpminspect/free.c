@@ -24,7 +24,7 @@
 #include <search.h>
 #include "rpminspect.h"
 
-static void _free_regex(regex_t *regex)
+static void free_regex(regex_t *regex)
 {
     if (regex == NULL) {
         return;
@@ -57,12 +57,12 @@ void free_rpminspect(struct rpminspect *ri) {
 
     list_free(ri->badwords, free);
 
-    _free_regex(ri->elf_path_include);
-    _free_regex(ri->elf_path_exclude);
-    _free_regex(ri->manpage_path_include);
-    _free_regex(ri->manpage_path_exclude);
-    _free_regex(ri->xml_path_include);
-    _free_regex(ri->xml_path_exclude);
+    free_regex(ri->elf_path_include);
+    free_regex(ri->elf_path_exclude);
+    free_regex(ri->manpage_path_include);
+    free_regex(ri->manpage_path_exclude);
+    free_regex(ri->xml_path_include);
+    free_regex(ri->xml_path_exclude);
 
     free(ri->desktop_entry_files_dir);
     free(ri->desktop_file_validate);

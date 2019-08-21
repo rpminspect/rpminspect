@@ -36,7 +36,7 @@ static char *licdata = NULL;
 static int liclen = 0;
 
 /* Local helper functions */
-static struct json_object *_read_licensedb(const char *licensedb) {
+static struct json_object *read_licensedb(const char *licensedb) {
     int fd = 0;
 
     assert(licensedb != NULL);
@@ -59,7 +59,7 @@ static struct json_object *_read_licensedb(const char *licensedb) {
 /*
  * Called by inspect_license()
  */
-static int _check_peer_license(struct rpminspect *ri, const Header hdr) {
+static int check_peer_license(struct rpminspect *ri, const Header hdr) {
     int ret = 0;
     bool valid = false;
     char *nevra = NULL;
@@ -181,7 +181,7 @@ bool is_valid_license(const char *licensedb, const char *tag) {
 
     /* read in the approved license database */
     if (licdb == NULL) {
-        licdb = _read_licensedb(licensedb);
+        licdb = read_licensedb(licensedb);
 
         if (licdb == NULL) {
             return false;
@@ -291,7 +291,7 @@ bool inspect_license(struct rpminspect *ri) {
             continue;
         }
 
-        good += _check_peer_license(ri, peer->after_hdr);
+        good += check_peer_license(ri, peer->after_hdr);
         seen++;
     }
 

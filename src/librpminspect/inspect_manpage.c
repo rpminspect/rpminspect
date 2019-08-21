@@ -221,7 +221,7 @@ end:
     return error_buffer;
 }
 
-static bool _manpage_driver(struct rpminspect *ri, rpmfile_entry_t *file)
+static bool manpage_driver(struct rpminspect *ri, rpmfile_entry_t *file)
 {
     char *manpage_errors;
     bool result = true;
@@ -270,7 +270,7 @@ bool inspect_manpage(struct rpminspect *ri)
     bool result;
 
     inspect_manpage_alloc();
-    result = foreach_peer_file(ri, _manpage_driver);
+    result = foreach_peer_file(ri, manpage_driver);
     inspect_manpage_free();
 
     if (result) {

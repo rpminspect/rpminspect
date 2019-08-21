@@ -131,7 +131,7 @@ static bool is_xml(const char *path)
     return (bytes_read >= min_size) && (memcmp(xml_data, xml_prelude, min_size) == 0);
 }
 
-static bool _xml_driver(struct rpminspect *ri, rpmfile_entry_t *file)
+static bool xml_driver(struct rpminspect *ri, rpmfile_entry_t *file)
 {
     char *errors = NULL;
     char *msg = NULL;
@@ -174,7 +174,7 @@ bool inspect_xml(struct rpminspect *ri)
     bool result;
 
     assert(ri != NULL);
-    result = foreach_peer_file(ri, _xml_driver);
+    result = foreach_peer_file(ri, xml_driver);
 
     if (result) {
         add_result(&ri->results, RESULT_OK, NOT_WAIVABLE, HEADER_XML, NULL, NULL, NULL);
