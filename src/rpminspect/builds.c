@@ -23,6 +23,7 @@
 #include <ftw.h>
 #include <sys/types.h>
 #include <sys/stat.h>
+#include <dirent.h>
 #include <unistd.h>
 #include <errno.h>
 #include <rpm/rpmlib.h>
@@ -80,14 +81,54 @@ static void _set_worksubdir(struct rpminspect *ri, bool is_local, struct koji_bu
 static int _get_rpm_info(const char *pkg) {
     int ret = 0;
     Header h;
+    char *arch = NULL;
 
     if ((ret = get_rpm_header(pkg, &h)) != 0) {
         return ret;
     }
 
-    add_peer(&workri->peers, whichbuild, fetch_only, pkg, &h);
+    arch = headerGetAsString(h, RPMTAG_ARCH);
+
+    if (allowed_arch(workri, arch)) {
+        add_peer(&workri->peers, whichbuild, fetch_only, pkg, &h);
+    }
+
     headerFree(h);
     return ret;
+}
+
+/*
+ * Walk a local build tree and prune empty arch subdirectories.
+ */
+static void prune_local_build(const int whichbuild) {
+    char *lpath = NULL;
+    char *apath = NULL;
+    DIR *d = NULL;
+    struct dirent *de = NULL;
+
+    xasprintf(&lpath, "%s/%s", workri->worksubdir, build_desc[whichbuild]);
+
+    if ((d = opendir(lpath)) == NULL) {
+        fprintf(stderr, "*** Unable to open directory: %s: %s\n", lpath, strerror(errno));
+        fflush(stderr);
+        abort();
+    }
+
+    while ((de = readdir(d)) != NULL) {
+        xasprintf(&apath, "%s/%s", lpath, de->d_name);
+        (void) rmdir(apath);
+        free(apath);
+    }
+
+    if (closedir(d) == -1) {
+        fprintf(stderr, "*** Unable to close directory: %s: %s\n", lpath, strerror(errno));
+        fflush(stderr);
+        abort();
+    }
+
+    free(lpath);
+
+    return;
 }
 
 /*
@@ -98,6 +139,8 @@ static int _copytree(const char *fpath, const struct stat *sb,
     static int toptrim = 0;
     char *workfpath = NULL;
     char *bufpath = NULL;
+    Header h;
+    char *arch = NULL;
     int ret = 0;
 
     /*
@@ -118,6 +161,19 @@ static int _copytree(const char *fpath, const struct stat *sb,
             ret = -1;
         }
     } else if (S_ISREG(sb->st_mode)) {
+        if ((ret = get_rpm_header(fpath, &h)) != 0) {
+            return ret;
+        }
+
+        arch = headerGetAsString(h, RPMTAG_ARCH);
+
+        if (!allowed_arch(workri, arch)) {
+            headerFree(h);
+            return 0;
+        }
+
+        headerFree(h);
+
         if (copyfile(fpath, bufpath, true, false)) {
             fprintf(stderr, "*** Error copying file %s: %s\n", bufpath, strerror(errno));
             ret = -1;
@@ -425,6 +481,9 @@ int gather_builds(struct rpminspect *ri, bool fo) {
                 fflush(stderr);
                 return -1;
             }
+
+            /* clean up */
+            prune_local_build(whichbuild);
         } else if ((build = get_koji_build(ri, ri->after)) != NULL) {
             whichbuild = AFTER_BUILD;
             _set_worksubdir(ri, false, build);
@@ -457,6 +516,9 @@ int gather_builds(struct rpminspect *ri, bool fo) {
             fflush(stderr);
             return -1;
         }
+
+        /* clean up */
+        prune_local_build(whichbuild);
     } else if ((build = get_koji_build(ri, ri->before)) != NULL) {
         whichbuild = BEFORE_BUILD;
         _set_worksubdir(ri, false, build);
