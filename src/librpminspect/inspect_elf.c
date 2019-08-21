@@ -479,7 +479,7 @@ static const char * pflags_to_str(uint64_t flags)
     return output;
 }
 
-static bool _inspect_elf_execstack(struct rpminspect *ri, Elf *after_elf, Elf *before_elf, const char *localpath, const char *arch)
+static bool inspect_elf_execstack(struct rpminspect *ri, Elf *after_elf, Elf *before_elf, const char *localpath, const char *arch)
 {
     Elf64_Half elf_type;
     uint64_t execstack_flags;
@@ -570,7 +570,7 @@ cleanup:
     return result;
 }
 
-static bool _check_relro(struct rpminspect *ri, Elf *before_elf, Elf *after_elf, const char *localpath, const char *arch)
+static bool check_relro(struct rpminspect *ri, Elf *before_elf, Elf *after_elf, const char *localpath, const char *arch)
 {
     bool before_relro = has_relro(before_elf);
     bool before_bind_now = has_bind_now(before_elf);
@@ -598,7 +598,7 @@ static bool _check_relro(struct rpminspect *ri, Elf *before_elf, Elf *after_elf,
 /* Check for binaries that had fortified symbols in before, and have no fortified symbols in after.
  * This could indicate a loss of hardening build flags.
  */
-static bool _check_fortified(struct rpminspect *ri, Elf *before_elf, Elf *after_elf, const char *localpath, const char *arch)
+static bool check_fortified(struct rpminspect *ri, Elf *before_elf, Elf *after_elf, const char *localpath, const char *arch)
 {
     string_list_t *before_fortifiable = NULL;
     string_list_t *before_fortified = NULL;
@@ -701,8 +701,8 @@ cleanup:
     return result;
 }
 
-/* Helper for _elf_archive_tests; add the archive member to the list if compiled *without* -fPIC */
-static bool _find_no_pic(Elf *elf, void *user_data)
+/* Helper for elf_archive_tests; add the archive member to the list if compiled *without* -fPIC */
+static bool find_no_pic(Elf *elf, void *user_data)
 {
     string_list_t *no_pic_list = (string_list_t *) user_data;
     string_entry_t *entry;
@@ -730,8 +730,8 @@ static bool _find_no_pic(Elf *elf, void *user_data)
     return true;
 }
 
-/* Helper for _elf_archive_tests, add the archive member to the list if compiled *with* -fPIC */
-static bool _find_pic(Elf *elf, void *user_data)
+/* Helper for elf_archive_tests, add the archive member to the list if compiled *with* -fPIC */
+static bool find_pic(Elf *elf, void *user_data)
 {
     string_list_t *pic_list = (string_list_t *) user_data;
     string_entry_t *entry;
@@ -759,8 +759,8 @@ static bool _find_pic(Elf *elf, void *user_data)
     return true;
 }
 
-/* Helper for _elf_archive_tests, get all archive member names */
-static bool _find_all(Elf *elf, void *user_data)
+/* Helper for elf_archive_tests, get all archive member names */
+static bool find_all(Elf *elf, void *user_data)
 {
     string_list_t *all_list = (string_list_t *) user_data;
     string_entry_t *entry;
@@ -786,7 +786,7 @@ static bool _find_all(Elf *elf, void *user_data)
     return true;
 }
 
-static bool _elf_archive_tests(struct rpminspect *ri, Elf *after_elf, int after_elf_fd, Elf *before_elf, int before_elf_fd, const char *localpath, const char *arch)
+static bool elf_archive_tests(struct rpminspect *ri, Elf *after_elf, int after_elf_fd, Elf *before_elf, int before_elf_fd, const char *localpath, const char *arch)
 {
     string_list_t *after_no_pic = NULL;
     string_list_t *before_pic = NULL;
@@ -817,7 +817,7 @@ static bool _elf_archive_tests(struct rpminspect *ri, Elf *after_elf, int after_
     assert(after_no_pic != NULL);
 
     TAILQ_INIT(after_no_pic);
-    elf_archive_iterate(after_elf_fd, after_elf, _find_no_pic, after_no_pic);
+    elf_archive_iterate(after_elf_fd, after_elf, find_no_pic, after_no_pic);
 
     /* If everything in after looks ok, we're done */
     if (TAILQ_EMPTY(after_no_pic)) {
@@ -839,7 +839,7 @@ static bool _elf_archive_tests(struct rpminspect *ri, Elf *after_elf, int after_
     assert(before_pic != NULL);
 
     TAILQ_INIT(before_pic);
-    elf_archive_iterate(before_elf_fd, before_elf, _find_pic, before_pic);
+    elf_archive_iterate(before_elf_fd, before_elf, find_pic, before_pic);
 
     after_lost_pic = list_intersection(after_no_pic, before_pic);
     assert(after_lost_pic != NULL);
@@ -860,7 +860,7 @@ static bool _elf_archive_tests(struct rpminspect *ri, Elf *after_elf, int after_
     assert(before_all != NULL);
 
     TAILQ_INIT(before_all);
-    elf_archive_iterate(before_elf_fd, before_elf, _find_all, before_all);
+    elf_archive_iterate(before_elf_fd, before_elf, find_all, before_all);
 
     after_new = list_difference(after_no_pic, before_all);
     assert(after_new != NULL);
@@ -899,12 +899,12 @@ cleanup:
     return result;
 }
 
-static bool _elf_regular_tests(struct rpminspect *ri, Elf *after_elf, Elf *before_elf, const char *localpath, const char *arch)
+static bool elf_regular_tests(struct rpminspect *ri, Elf *after_elf, Elf *before_elf, const char *localpath, const char *arch)
 {
     char *msg = NULL;
     bool result = true;
 
-    if (!_inspect_elf_execstack(ri, after_elf, before_elf, localpath, arch)) {
+    if (!inspect_elf_execstack(ri, after_elf, before_elf, localpath, arch)) {
         result = false;
     }
 
@@ -926,12 +926,12 @@ static bool _elf_regular_tests(struct rpminspect *ri, Elf *after_elf, Elf *befor
 
     if (before_elf) {
         /* Check if we lost GNU_RELRO */
-        if (!_check_relro(ri, after_elf, before_elf, localpath, arch)) {
+        if (!check_relro(ri, after_elf, before_elf, localpath, arch)) {
             result = false;
         }
 
         /* Check if the object lost fortified symbols or gained unfortified, fortifiable symbols */
-        if (!_check_fortified(ri, after_elf, before_elf, localpath, arch)) {
+        if (!check_fortified(ri, after_elf, before_elf, localpath, arch)) {
             result = false;
         }
     }
@@ -939,7 +939,7 @@ static bool _elf_regular_tests(struct rpminspect *ri, Elf *after_elf, Elf *befor
     return result;
 }
 
-static bool _elf_driver(struct rpminspect *ri, rpmfile_entry_t *after)
+static bool elf_driver(struct rpminspect *ri, rpmfile_entry_t *after)
 {
     const char *arch;
     Elf *after_elf = NULL;
@@ -969,13 +969,13 @@ static bool _elf_driver(struct rpminspect *ri, rpmfile_entry_t *after)
             before_elf = get_elf_archive(after->peer_file->fullpath, &before_elf_fd);
         }
 
-        result = _elf_archive_tests(ri, after_elf, after_elf_fd, before_elf, before_elf_fd, after->localpath, arch);
+        result = elf_archive_tests(ri, after_elf, after_elf_fd, before_elf, before_elf_fd, after->localpath, arch);
     } else if ((after_elf = get_elf(after->fullpath, &after_elf_fd)) != NULL) {
         if (after->peer_file != NULL) {
             before_elf = get_elf_archive(after->peer_file->fullpath, &before_elf_fd);
         }
 
-        result = _elf_regular_tests(ri, after_elf, before_elf, after->localpath, arch);
+        result = elf_regular_tests(ri, after_elf, before_elf, after->localpath, arch);
     }
 
 
@@ -997,7 +997,7 @@ bool inspect_elf(struct rpminspect *ri)
     bool result;
 
     init_elf_data();
-    result = foreach_peer_file(ri, _elf_driver);
+    result = foreach_peer_file(ri, elf_driver);
     free_elf_data();
 
     if (result) {

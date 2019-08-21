@@ -28,10 +28,10 @@
 #include <ftw.h>
 
 /* Local prototypes */
-static int _rmtree_entry(const char *, const struct stat *, int, struct FTW *);
+static int rmtree_entry(const char *, const struct stat *, int, struct FTW *);
 
-static int _rmtree_entry(const char *fpath, __attribute__((unused)) const struct stat *sb,
-                         __attribute__((unused)) int tflag, __attribute__((unused)) struct FTW *ftwbuf) {
+static int rmtree_entry(const char *fpath, __attribute__((unused)) const struct stat *sb,
+                        __attribute__((unused)) int tflag, __attribute__((unused)) struct FTW *ftwbuf) {
     assert(fpath != NULL);
     return remove(fpath);
 }
@@ -64,7 +64,7 @@ int rmtree(const char *path, const bool ignore_errors, const bool contentsonly) 
         }
     }
 
-    status = nftw(path, _rmtree_entry, 25, flags);
+    status = nftw(path, rmtree_entry, 25, flags);
 
     if (contentsonly) {
         return status;

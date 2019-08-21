@@ -27,7 +27,7 @@
 #include <iniparser.h>
 #include "rpminspect.h"
 
-static int _add_regex(dictionary *cfg, const char *key, regex_t **regex_out)
+static int add_regex(dictionary *cfg, const char *key, regex_t **regex_out)
 {
     const char *pattern;
     int reg_result;
@@ -198,27 +198,27 @@ int init_rpminspect(struct rpminspect *ri, const char *cfgfile) {
     }
 
     /* If any of the regular expressions fail to compile, stop and return failure */
-    if (_add_regex(cfg, "tests:elf_path_include", &ri->elf_path_include) != 0) {
+    if (add_regex(cfg, "tests:elf_path_include", &ri->elf_path_include) != 0) {
         return -1;
     }
 
-    if (_add_regex(cfg, "tests:elf_path_exclude", &ri->elf_path_exclude) != 0) {
+    if (add_regex(cfg, "tests:elf_path_exclude", &ri->elf_path_exclude) != 0) {
         return -1;
     }
 
-    if (_add_regex(cfg, "tests:manpage_path_include", &ri->manpage_path_include) != 0) {
+    if (add_regex(cfg, "tests:manpage_path_include", &ri->manpage_path_include) != 0) {
         return -1;
     }
 
-    if (_add_regex(cfg, "tests:manpage_path_exclude", &ri->manpage_path_exclude) != 0) {
+    if (add_regex(cfg, "tests:manpage_path_exclude", &ri->manpage_path_exclude) != 0) {
         return -1;
     }
 
-    if (_add_regex(cfg, "tests:xml_path_include", &ri->xml_path_include) != 0) {
+    if (add_regex(cfg, "tests:xml_path_include", &ri->xml_path_include) != 0) {
         return -1;
     }
 
-    if (_add_regex(cfg, "tests:xml_path_exclude", &ri->xml_path_exclude) != 0) {
+    if (add_regex(cfg, "tests:xml_path_exclude", &ri->xml_path_exclude) != 0) {
         return -1;
     }
 

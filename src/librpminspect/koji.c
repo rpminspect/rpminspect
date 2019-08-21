@@ -619,7 +619,7 @@ string_list_t *get_all_arches(const struct rpminspect *ri) {
     arch = calloc(1, sizeof(*arch));
     assert(arch != NULL);
 
-    arch->data = strdup("src");
+    arch->data = strdup(SRPM_ARCH_NAME);
     assert(arch->data != NULL);
 
     TAILQ_INSERT_TAIL(arches, arch, items);

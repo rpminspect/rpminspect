@@ -143,7 +143,7 @@ static bool check_class_file(struct rpminspect *ri, const char *fullpath,
 }
 
 /*
- * Helper used by nftw() in _validate_desktop_contents()
+ * Helper used by nftw() in javabytecode_driver()
  */
 static int jar_walker(const char *fpath, __attribute__((unused)) const struct stat *sb, int tflag, __attribute__((unused)) struct FTW *ftwbuf) {
     /* Only looking at regular files */

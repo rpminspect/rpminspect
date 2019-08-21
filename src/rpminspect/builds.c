@@ -42,18 +42,18 @@ static int mode = S_IRWXU | S_IRGRP | S_IXGRP | S_IROTH | S_IXOTH;
 static char *build_desc[] = { "before", "after" };
 
 /* Local prototypes */
-static void _set_worksubdir(struct rpminspect *, bool, struct koji_build *);
-static int _get_rpm_info(const char *);
+static void set_worksubdir(struct rpminspect *, bool, struct koji_build *);
+static int get_rpm_info(const char *);
 static void prune_local_build(const int);
-static int _copytree(const char *, const struct stat *, int, struct FTW *);
-static int _download_artifacts(const struct rpminspect *, struct koji_build *);
-static void _curl_helper(const bool, const char *, const char *);
+static int copytree(const char *, const struct stat *, int, struct FTW *);
+static int download_artifacts(const struct rpminspect *, struct koji_build *);
+static void curl_helper(const bool, const char *, const char *);
 
 /*
  * Set the working subdirectory for this particular run based on whether
  * this is a remote build or a local build.
  */
-static void _set_worksubdir(struct rpminspect *ri, bool is_local, struct koji_build *kb) {
+static void set_worksubdir(struct rpminspect *ri, bool is_local, struct koji_build *kb) {
     assert(ri != NULL);
 
     if (ri->worksubdir != NULL) {
@@ -79,7 +79,7 @@ static void _set_worksubdir(struct rpminspect *ri, bool is_local, struct koji_bu
 /*
  * Collect package peer information.
  */
-static int _get_rpm_info(const char *pkg) {
+static int get_rpm_info(const char *pkg) {
     int ret = 0;
     Header h;
     char *arch = NULL;
@@ -135,8 +135,8 @@ static void prune_local_build(const int whichbuild) {
 /*
  * Used to recursively copy a build tree over to the working directory.
  */
-static int _copytree(const char *fpath, const struct stat *sb,
-                     int tflag, struct FTW *ftwbuf) {
+static int copytree(const char *fpath, const struct stat *sb,
+                    int tflag, struct FTW *ftwbuf) {
     static int toptrim = 0;
     char *workfpath = NULL;
     char *bufpath = NULL;
@@ -167,7 +167,7 @@ static int _copytree(const char *fpath, const struct stat *sb,
         }
 
         if (headerIsSource(h)) {
-            arch = "src";
+            arch = SRPM_ARCH_NAME;
         } else {
             arch = headerGetAsString(h, RPMTAG_ARCH);
         }
@@ -189,7 +189,7 @@ static int _copytree(const char *fpath, const struct stat *sb,
     }
 
     /* Gather the RPM header for packages */
-    if (tflag == FTW_F && strsuffix(bufpath, ".rpm") && _get_rpm_info(bufpath)) {
+    if (tflag == FTW_F && strsuffix(bufpath, RPM_FILENAME_EXTENSION) && get_rpm_info(bufpath)) {
         ret = -1;
     }
 
@@ -202,7 +202,7 @@ static int _copytree(const char *fpath, const struct stat *sb,
 /*
  * Download helper for libcurl
  */
-static void _curl_helper(const bool verbose, const char *src, const char *dst) {
+static void curl_helper(const bool verbose, const char *src, const char *dst) {
     FILE *fp = NULL;
     CURL *c = NULL;
     int r;
@@ -267,7 +267,7 @@ static void _curl_helper(const bool verbose, const char *src, const char *dst) {
  * Given a remote artifact specification in a Koji build, download it
  * to our working directory.
  */
-static int _download_artifacts(const struct rpminspect *ri, struct koji_build *build) {
+static int download_artifacts(const struct rpminspect *ri, struct koji_build *build) {
     koji_buildlist_entry_t *buildentry = NULL;
     koji_rpmlist_entry_t *rpm = NULL;
     char *src = NULL;
@@ -311,7 +311,7 @@ static int _download_artifacts(const struct rpminspect *ri, struct koji_build *b
             /* Get the main metadata file */
             xasprintf(&dst, "%s/%s/modulemd.txt", workri->worksubdir, build_desc[whichbuild]);
             xasprintf(&src, "%s/packages/%s/%s/%s/files/module/modulemd.txt", workri->kojimbs, build->package_name, build->version, build->release);
-            _curl_helper(workri->verbose, src, dst);
+            curl_helper(workri->verbose, src, dst);
             free(src);
 
             /* Get the list of artifacts to filter if we don't have it */
@@ -404,7 +404,7 @@ static int _download_artifacts(const struct rpminspect *ri, struct koji_build *b
                 /* only download this file if we have not already gotten it */
                 if (access(dst, F_OK|R_OK)) {
                     xasprintf(&src, "%s/packages/%s/%s/%s/files/module/modulemd.%s.txt", workri->kojimbs, build->package_name, build->version, build->release, rpm->arch);
-                    _curl_helper(workri->verbose, src, dst);
+                    curl_helper(workri->verbose, src, dst);
                     free(src);
                 }
 
@@ -437,10 +437,10 @@ static int _download_artifacts(const struct rpminspect *ri, struct koji_build *b
                 xasprintf(&src, "%s/%s/packages/%s/%s/%s/%s/%s", (workri->buildtype == KOJI_BUILD_MODULE) ? workri->kojimbs : workri->kojiursine, build->volume_name, buildentry->package_name, rpm->version, rpm->release, rpm->arch, pkg);
             }
 
-            _curl_helper(workri->verbose, src, dst);
+            curl_helper(workri->verbose, src, dst);
 
             /* gather the RPM header */
-            if (_get_rpm_info(dst)) {
+            if (get_rpm_info(dst)) {
                 fprintf(stderr, "*** Error reading RPM: %s\n", dst);
                 fflush(stderr);
                 return -1;
@@ -478,10 +478,10 @@ int gather_builds(struct rpminspect *ri, bool fo) {
     if (ri->after != NULL) {
         if (is_local_build(ri->after)) {
             whichbuild = AFTER_BUILD;
-            _set_worksubdir(ri, true, NULL);
+            set_worksubdir(ri, true, NULL);
 
             /* copy after tree */
-            if (nftw(ri->after, _copytree, 15, FTW_PHYS) == -1) {
+            if (nftw(ri->after, copytree, 15, FTW_PHYS) == -1) {
                 fprintf(stderr, "*** Error gathering build %s: %s\n", ri->after, strerror(errno));
                 fflush(stderr);
                 return -1;
@@ -491,9 +491,9 @@ int gather_builds(struct rpminspect *ri, bool fo) {
             prune_local_build(whichbuild);
         } else if ((build = get_koji_build(ri, ri->after)) != NULL) {
             whichbuild = AFTER_BUILD;
-            _set_worksubdir(ri, false, build);
+            set_worksubdir(ri, false, build);
 
-            if (_download_artifacts(ri, build)) {
+            if (download_artifacts(ri, build)) {
                 fprintf(stderr, "*** Error downloading build %s\n", ri->after);
                 fflush(stderr);
                 return -1;
@@ -513,10 +513,10 @@ int gather_builds(struct rpminspect *ri, bool fo) {
     /* before build specified, find it */
     if (is_local_build(ri->before)) {
         whichbuild = BEFORE_BUILD;
-        _set_worksubdir(ri, true, NULL);
+        set_worksubdir(ri, true, NULL);
 
         /* copy before tree */
-        if (nftw(ri->before, _copytree, 15, FTW_PHYS) == -1) {
+        if (nftw(ri->before, copytree, 15, FTW_PHYS) == -1) {
             fprintf(stderr, "*** Error gathering build %s: %s\n", ri->before, strerror(errno));
             fflush(stderr);
             return -1;
@@ -526,9 +526,9 @@ int gather_builds(struct rpminspect *ri, bool fo) {
         prune_local_build(whichbuild);
     } else if ((build = get_koji_build(ri, ri->before)) != NULL) {
         whichbuild = BEFORE_BUILD;
-        _set_worksubdir(ri, false, build);
+        set_worksubdir(ri, false, build);
 
-        if (_download_artifacts(ri, build)) {
+        if (download_artifacts(ri, build)) {
             fprintf(stderr, "*** Error downloading build %s\n", ri->before);
             fflush(stderr);
             return -1;

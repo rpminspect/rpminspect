@@ -24,7 +24,7 @@
 
 #include "rpminspect.h"
 
-static bool _disttag_driver(struct rpminspect *ri, rpmfile_entry_t *file) {
+static bool disttag_driver(struct rpminspect *ri, rpmfile_entry_t *file) {
     bool result = true;
     FILE *fp = NULL;
     size_t len = 0;
@@ -110,7 +110,7 @@ bool inspect_disttag(struct rpminspect *ri) {
     bool result = false;
 
     assert(ri != NULL);
-    result = foreach_peer_file(ri, _disttag_driver);
+    result = foreach_peer_file(ri, disttag_driver);
 
     if (result) {
         add_result(&ri->results, RESULT_OK, WAIVABLE_BY_ANYONE, HEADER_DISTTAG, NULL, NULL, NULL);

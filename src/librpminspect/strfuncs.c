@@ -30,9 +30,9 @@
  * Helper function for printwrap().  Handles printing the specified word with
  * the optional indentation and a space for the next word.
  */
-static int _printword(const char *word, const size_t width,
-                      const unsigned int indent, const size_t lw,
-                      bool first, FILE *dest) {
+static int printword(const char *word, const size_t width,
+                     const unsigned int indent, const size_t lw,
+                     bool first, FILE *dest) {
     int ret = 0;
 
     if ((strlen(word) + lw) >= width) {
@@ -122,7 +122,7 @@ int printwrap(const char *s, const size_t width, const unsigned int indent, FILE
             begin = true;
         } else if (isspace(*str)) {
             *str = '\0';
-            lw = _printword(word, width, indent, lw, first, dest);
+            lw = printword(word, width, indent, lw, first, dest);
 
             if (lw < lastlw) {
                 lines++;
@@ -139,7 +139,7 @@ int printwrap(const char *s, const size_t width, const unsigned int indent, FILE
     }
 
     /* print the last word */
-    lw = _printword(word, width, indent, lw, first, dest);
+    lw = printword(word, width, indent, lw, first, dest);
     if (lw < lastlw) {
         lines++;
     }

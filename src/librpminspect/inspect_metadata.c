@@ -27,7 +27,7 @@
 /*
  * Validate the metadata tags in the RPM headers.
  */
-static bool _valid_peers(struct rpminspect *ri, const Header before_hdr, const Header after_hdr) {
+static bool valid_peers(struct rpminspect *ri, const Header before_hdr, const Header after_hdr) {
     bool ret = true;
     bool valid_subdomain = false;
     string_entry_t *subdomain = NULL;
@@ -161,7 +161,7 @@ bool inspect_metadata(struct rpminspect *ri) {
             continue;
         }
 
-        if (!_valid_peers(ri, peer->before_hdr, peer->after_hdr)) {
+        if (!valid_peers(ri, peer->before_hdr, peer->after_hdr)) {
             ret = true;
         }
     }

@@ -94,7 +94,7 @@ rpmfile_t * extract_rpm(const char *pkg, Header hdr)
      * Name the directory the same as the package, but without the ".rpm".
      * If some joker hands us a file that doesn't end in .rpm, slap a ".d" on the end instead.
      */
-    if (strsuffix(pkg, ".rpm")) {
+    if (strsuffix(pkg, RPM_FILENAME_EXTENSION)) {
         xasprintf(&output_dir, "%.*s", (int) strlen(pkg) - 4, pkg);
     } else {
         xasprintf(&output_dir, "%s.d", pkg);
@@ -322,7 +322,7 @@ bool process_file_path(const rpmfile_entry_t *file, regex_t *include_regex, rege
  * The keys and values use the same pointers as the rpmfile_entry_t and should not
  * be separately freed. The hash table itself must be hdestroy_r'd and freed by the caller.
  */
-static struct hsearch_data * _files_to_table(rpmfile_t *list)
+static struct hsearch_data * files_to_table(rpmfile_t *list)
 {
     struct hsearch_data *table;
     ENTRY e;
@@ -372,8 +372,8 @@ static struct hsearch_data * _files_to_table(rpmfile_t *list)
     return table;
 }
 
-/* Helper for _find_one_peer */
-static void _set_peer(rpmfile_entry_t *file, ENTRY *eptr)
+/* Helper for find_one_peer */
+static void set_peer(rpmfile_entry_t *file, ENTRY *eptr)
 {
     rpmfile_entry_t *peer;
 
@@ -391,7 +391,7 @@ static void _set_peer(rpmfile_entry_t *file, ENTRY *eptr)
  * tests to match peers, this means that attempts must be made in order from
  * best match to worst match.
  */
-static void _find_one_peer(rpmfile_entry_t *file, Header after_header, struct hsearch_data *after_table)
+static void find_one_peer(rpmfile_entry_t *file, Header after_header, struct hsearch_data *after_table)
 {
     ENTRY e;
     ENTRY *eptr;
@@ -414,7 +414,7 @@ static void _find_one_peer(rpmfile_entry_t *file, Header after_header, struct hs
     hsearch_result = hsearch_r(e, FIND, &eptr, after_table);
 
     if (hsearch_result != 0) {
-        _set_peer(file, eptr);
+        set_peer(file, eptr);
         return;
     }
 
@@ -434,7 +434,7 @@ static void _find_one_peer(rpmfile_entry_t *file, Header after_header, struct hs
         free(search_path);
 
         if (hsearch_result != 0) {
-            _set_peer(file, eptr);
+            set_peer(file, eptr);
             return;
         }
     }
@@ -459,7 +459,7 @@ static void _find_one_peer(rpmfile_entry_t *file, Header after_header, struct hs
             free(search_path);
 
             if (hsearch_result != 0) {
-                _set_peer(file, eptr);
+                set_peer(file, eptr);
                 return;
             }
         } else {
@@ -489,11 +489,11 @@ void find_file_peers(rpmfile_t *before, rpmfile_t *after)
     after_entry = TAILQ_FIRST(after);
 
     /* Create a hash table of the after list, mapping path(char *) to rpmfile_entry_t */
-    after_table = _files_to_table(after);
+    after_table = files_to_table(after);
     assert(after_table);
 
     TAILQ_FOREACH(iter, before, items) {
-        _find_one_peer(iter, after_entry->rpm_header, after_table);
+        find_one_peer(iter, after_entry->rpm_header, after_table);
     }
 
 

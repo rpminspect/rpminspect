@@ -55,4 +55,14 @@
  */
 #define DESKTOP_FILE_VALIDATE "/usr/bin/desktop-file-validate"
 
+/*
+ * Architecture name of source RPMs (from Koji)
+ */
+#define SRPM_ARCH_NAME "src"
+
+/*
+ * RPM file extension
+ */
+#define RPM_FILENAME_EXTENSION ".rpm"
+
 #endif

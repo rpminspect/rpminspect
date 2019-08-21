@@ -24,7 +24,7 @@
 
 #include "rpminspect.h"
 
-static bool _modularity_driver(struct rpminspect *ri, rpmfile_entry_t *file) {
+static bool modularity_driver(struct rpminspect *ri, rpmfile_entry_t *file) {
     bool result = true;
     rpmTagType tt;
     rpmTagVal tv;
@@ -77,7 +77,7 @@ bool inspect_modularity(struct rpminspect *ri) {
     }
 
     assert(ri != NULL);
-    result = foreach_peer_file(ri, _modularity_driver);
+    result = foreach_peer_file(ri, modularity_driver);
 
     if (result) {
         add_result(&ri->results, RESULT_OK, WAIVABLE_BY_ANYONE, HEADER_MODULARITY, NULL, NULL, NULL);
