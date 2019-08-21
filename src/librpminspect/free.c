@@ -71,6 +71,7 @@ void free_rpminspect(struct rpminspect *ri) {
     free(ri->before);
     free(ri->after);
     free(ri->product_release);
+    list_free(ri->arches, free);
 
     if (ri->jvm_table != NULL && ri->jvm_keys != NULL) {
         /* look up each key and free the memory for the value */

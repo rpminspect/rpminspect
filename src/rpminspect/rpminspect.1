@@ -72,6 +72,16 @@ Comma-separated list of inspections to run or skip (default: ALL)
 .B \-l, \-\-list
 List available output formats and inspections
 .TP
+.B \-a LIST, \-\-arches=LIST
+Comma-separated list of architectures to inspect packages on.  By default
+rpminspect will gather all available architectures for the builds you
+specify, but you may want to restrict a run to just x86_64 or just
+aarch64.  You can do that with this option.  If you do specify this
+option, be sure to include the 'src' architecture to inspect source
+packages.  The architectures you list here are validated against the
+available architectures in the Koji hub and any invalid ones will report
+an error.
+.TP
 .B \-o FILE, \-\-output=FILE
 Write the results to the name output file.  By default, results go to
 stdout.
@@ -138,6 +148,8 @@ rpminspect \-T ALL \-k zlib-1.2.7-1.fc29 zlib-1.2.7-2.fc29
 rpminspect \-T license,elfsyms perl-5.28.0-47.fc6 perl-5.28.1-1.fc6
 .IP
 rpminspect \-T !manpage x3270-3.6ga5-6.fc31 x3270-3.6ga6-1.fc31
+.IP
+rpminspect \-T ALL \-a ppc64le zsh-5.7.1-3.fc31 zsh-5.7.1-4.fc31
 .PP
 The end result of running rpminspect is a report on standard output explaining
 what was found.  Descriptions of actions developers can take are provided in

@@ -578,3 +578,116 @@ struct koji_build *get_koji_build(struct rpminspect *ri, const char *buildspec) 
 
     return build;
 }
+
+/*
+ * Return a list of all architectures supported by this Koji instance.
+ * NOTE: This should not be called until after config file initialization
+ * because we need the Koji settings from the conf file in order to make
+ * the XML-RPC calls.
+ */
+string_list_t *get_all_arches(const struct rpminspect *ri) {
+    string_list_t *arches = NULL;
+    string_entry_t *arch = NULL;
+    int size = 0;
+    int i = 0;
+    xmlrpc_env env;
+    xmlrpc_server_info *server = NULL;
+    xmlrpc_value *fake_params = NULL;
+    xmlrpc_value *result = NULL;
+    xmlrpc_value *value = NULL;
+    char *element = NULL;
+
+    assert(ri != NULL);
+
+    /* if there is no koji system specified in the configuration, stop */
+    if (ri->kojihub == NULL) {
+        return NULL;
+    }
+
+    /* initialize our list of architectures, always allow 'src' */
+    arches = calloc(1, sizeof(*(arches)));
+    assert(arches != NULL);
+    TAILQ_INIT(arches);
+
+    arch = calloc(1, sizeof(*arch));
+    assert(arch != NULL);
+
+    arch->data = strdup("src");
+    assert(arch->data != NULL);
+
+    TAILQ_INSERT_TAIL(arches, arch, items);
+
+    /* initialize everything and get XMLRPC ready */
+    xmlrpc_env_init(&env);
+    xmlrpc_client_init2(&env, XMLRPC_CLIENT_NO_FLAGS, SOFTWARE_NAME, PACKAGE_VERSION, NULL, 0);
+    xmlrpc_abort_on_fault(&env);
+
+    /* increase the message response size */
+    xmlrpc_limit_set(XMLRPC_XML_SIZE_LIMIT_ID, INT_MAX);
+
+    /*
+     * call 'getAllArches' on the koji hub
+     * Why not use xmlrpc_client_call() here?  I'm glad you asked.  That
+     * function takes a format string and argument list and builds a
+     * parameter array for the call.  There's just one problem.  You can't
+     * tell it NULL for the format string for calls that require no
+     * parameters.  This is a problem for this call because we need to
+     * pass nothing.  Within libxmlrpc there is another call we can use
+     * but we do still have to create an empty argument array and pass it
+     * anyway.  I believe it's better to use xmlrpc_client_call_server_params
+     * rather than the xmlrpc_client_call function.  This is what the command
+     * line xmlrpc(1) tool does and it works with basically anything.
+     */
+    server = xmlrpc_server_info_new(&env, ri->kojihub);
+    xmlrpc_abort_on_fault(&env);
+    fake_params = xmlrpc_array_new(&env);              /* super empty array */
+    result = xmlrpc_client_call_server_params(&env, server, "getAllArches", fake_params);
+    xmlrpc_abort_on_fault(&env);
+
+    /* is this a valid return value? */
+    if (xmlrpc_value_type(result) != XMLRPC_TYPE_ARRAY) {
+        xmlrpc_DECREF(result);
+        xmlrpc_env_clean(&env);
+        xmlrpc_client_cleanup();
+        return NULL;
+    }
+
+    /* read the values from the result */
+    size = xmlrpc_array_size(&env, result);
+    xmlrpc_abort_on_fault(&env);
+
+    for (i = 0; i < size; i++) {
+        xmlrpc_array_read_item(&env, result, i, &value);
+        xmlrpc_abort_on_fault(&env);
+
+        /* Get the array element as a string */
+        xmlrpc_decompose_value(&env, value, "s", &element);
+        xmlrpc_abort_on_fault(&env); 
+
+        /*
+         * If the value of an element is nil, just skip over it.  We can't
+         * do anything with nil values, so it might as well just not
+         * be present in the output.
+         */
+        if (xmlrpc_value_type(value) == XMLRPC_TYPE_NIL) {
+            continue;
+        }
+
+        /* add this architecture to the list */
+        arch = calloc(1, sizeof(*arch));
+        assert(arch != NULL);
+
+        arch->data = strdup(element);
+        assert(arch->data != NULL);
+
+        TAILQ_INSERT_TAIL(arches, arch, items);
+    }
+
+    /* Cleanup */
+    xmlrpc_DECREF(result);
+
+    xmlrpc_env_clean(&env);
+    xmlrpc_client_cleanup();
+
+    return arches;
+}

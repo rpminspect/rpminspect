@@ -97,6 +97,7 @@ void free_koji_rpmlist(koji_rpmlist_t *);
 void init_koji_build(struct koji_build *);
 void free_koji_build(struct koji_build *);
 struct koji_build *get_koji_build(struct rpminspect *, const char *);
+string_list_t *get_all_arches(const struct rpminspect *);
 
 /* mkdirp.c */
 int mkdirp(char *, mode_t);
