@@ -29,6 +29,11 @@
 /*
  * Local only functions.
  */
+
+/*
+ * General error handler for xmlrpc failures.  Could be improved
+ * a bit to be more helpful to the user.
+ */
 static void xmlrpc_abort_on_fault(xmlrpc_env *env) {
     if (env->fault_occurred) {
         fprintf(stderr, "XML-RPC Fault: %s (%d)\n", env->fault_string, env->fault_code);
@@ -566,7 +571,9 @@ struct koji_build *get_koji_build(struct rpminspect *ri, const char *buildspec) 
             }
 
             /* add this rpm to the list */
-            TAILQ_INSERT_TAIL(buildentry->rpms, rpm, items);
+            if (allowed_arch(ri, rpm->arch)) {
+                TAILQ_INSERT_TAIL(buildentry->rpms, rpm, items);
+            }
         }
     }
 
@@ -690,4 +697,30 @@ string_list_t *get_all_arches(const struct rpminspect *ri) {
     xmlrpc_client_cleanup();
 
     return arches;
+}
+
+/*
+ * Checks an RPM architecture against the user-specified list.
+ * If the user did not specify a list of architectures, return
+ * true.  If the user specified a list, only return true if the
+ * RPM architecture is in the specified list.  The function
+ * returns false if the architecture is not allowed.
+ */
+bool allowed_arch(const struct rpminspect *ri, const char *rpmarch) {
+    string_entry_t *arch = NULL;
+
+    assert(ri != NULL);
+    assert(rpmarch != NULL);
+
+    if (ri->arches == NULL) {
+        return true;
+    }
+
+    TAILQ_FOREACH(arch, ri->arches, items) {
+        if (!strcmp(rpmarch, arch->data)) {
+            return true;
+        }
+    }
+
+    return false;
 }
