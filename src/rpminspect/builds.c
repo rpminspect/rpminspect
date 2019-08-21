@@ -44,6 +44,7 @@ static char *build_desc[] = { "before", "after" };
 /* Local prototypes */
 static void _set_worksubdir(struct rpminspect *, bool, struct koji_build *);
 static int _get_rpm_info(const char *);
+static void prune_local_build(const int);
 static int _copytree(const char *, const struct stat *, int, struct FTW *);
 static int _download_artifacts(const struct rpminspect *, struct koji_build *);
 static void _curl_helper(const bool, const char *, const char *);
@@ -165,7 +166,11 @@ static int _copytree(const char *fpath, const struct stat *sb,
             return ret;
         }
 
-        arch = headerGetAsString(h, RPMTAG_ARCH);
+        if (headerIsSource(h)) {
+            arch = "src";
+        } else {
+            arch = headerGetAsString(h, RPMTAG_ARCH);
+        }
 
         if (!allowed_arch(workri, arch)) {
             headerFree(h);
