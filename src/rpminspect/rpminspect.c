@@ -493,28 +493,3 @@ int main(int argc, char **argv) {
 
     return EXIT_SUCCESS;
 }
-
-
-
-
-
-/*
- * CAREFUL!  This string comes to us as the --release=XXX option,
- * which nominally comes from the 'variant' row in the Errata
- * rpmdiff_runs table.  (In short: we get that from ET).
- * But erratadiff.py:get_release_for_variant() can "massage"
- * that!  For instance, "6Server" gets converted to "6any".
- */
-//struct {
-//    const char *release;
-//    enum Platform platform;
-//} release_platform_map[] = {
-//    {"2.1AS",   PLATFORM_RHEL_2_1      },
-//    {"3AS",     PLATFORM_RHEL_3        },
-//    {"4AS",     PLATFORM_RHEL_4        },
-//    {"5Server", PLATFORM_RHEL_5_Server },
-//    {"5Client", PLATFORM_RHEL_5_Client },
-//    {"6any",    PLATFORM_RHEL_6        },
-//    {"7any",    PLATFORM_RHEL_7        },
-//    {"8any",    PLATFORM_RHEL_8        },
-//};
