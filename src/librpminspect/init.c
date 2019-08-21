@@ -305,6 +305,7 @@ int init_rpminspect(struct rpminspect *ri, const char *cfgfile) {
     ri->tests = ~tests;
     ri->results = NULL;
     ri->product_release = NULL;
+    ri->arches = NULL;
 
     /* Clean up */
     iniparser_freedict(cfg);

@@ -43,8 +43,9 @@ static void usage(const char *progname) {
     printf("Options:\n");
     printf("  -c FILE, --config=FILE   Configuration file to use\n");
     printf("                             (default: %s)\n", CFGFILE);
-    printf("  -T LIST, --tests=LIST    Comma-separated list of tests to run or skip\n");
+    printf("  -T LIST, --tests=LIST    List of tests to run or skip\n");
     printf("                             (default: ALL)\n");
+    printf("  -a LIST, --arches=LIST   List of architectures to check\n");
     printf("  -r STR, --release=STR    Product release string\n");
     printf("  -o FILE, --output=FILE   Write results to FILE\n");
     printf("                             (default: stdout)\n");
@@ -127,10 +128,11 @@ int main(int argc, char **argv) {
     int idx = 0;
     int ret = EXIT_SUCCESS;
     glob_t expand;
-    char *short_options = "c:T:r:o:F:lw:fkv\?V";
+    char *short_options = "c:T:a:r:o:F:lw:fkv\?V";
     struct option long_options[] = {
         { "config", required_argument, 0, 'c' },
         { "tests", required_argument, 0, 'T' },
+        { "arches", required_argument, 0, 'a' },
         { "release", required_argument, 0, 'r' },
         { "list", no_argument, 0, 'l' },
         { "output", required_argument, 0, 'o' },
@@ -144,6 +146,9 @@ int main(int argc, char **argv) {
         { 0, 0, 0, 0 }
     };
     char *cfgfile = NULL;
+    char *archopt = NULL;
+    char *walk = NULL;
+    char *token = NULL;
     char *workdir = NULL;
     char *output = NULL;
     char *release = NULL;
@@ -158,6 +163,9 @@ int main(int argc, char **argv) {
     uint64_t selected = 0;
     bool negated_tests = false;
     size_t width = tty_width();
+    string_list_t *valid_arches = NULL;
+    string_entry_t *arch = NULL;
+    string_entry_t *entry = NULL;
 
     /* parse command line options */
     while (1) {
@@ -212,6 +220,9 @@ int main(int argc, char **argv) {
                     }
                 }
 
+                break;
+            case 'a':
+                archopt = strdup(optarg);
                 break;
             case 'r':
                 release = strdup(optarg);
@@ -377,6 +388,52 @@ int main(int argc, char **argv) {
         fprintf(stderr, "*** unable to read RPM configuration\n");
         fflush(stderr);
         return EXIT_FAILURE;
+    }
+
+    /* if an architecture list is specified, validate it */
+    if (archopt) {
+        /* initialize the list of allowed architectures */
+        ri.arches = calloc(1, sizeof(*ri.arches));
+        assert(ri.arches != NULL);
+        TAILQ_INIT(ri.arches);
+
+        /* get a list of valid architectures */
+        valid_arches = get_all_arches(&ri);
+
+        /* collect the specified architectures */
+        walk = archopt;
+
+        while ((token = strsep(&walk, ",")) != NULL) {
+            /* if the architecture is invalid, report it and exit */
+            found = false;
+
+            TAILQ_FOREACH(arch, valid_arches, items) {
+                if (!strcmp(token, arch->data)) {
+                    found = true;
+                    break;
+                }
+            }
+
+            if (!found) {
+                fprintf(stderr, "*** Unsupported architecture specified: `%s`\n", token);
+                fprintf(stderr, "*** See `%s --help` for more information.\n", progname);
+                fflush(stderr);
+                return EXIT_FAILURE;
+            }
+
+            /* architecture is valid, save it */
+            entry = calloc(1, sizeof(*entry));
+            assert(entry != NULL);
+
+            entry->data = strdup(token);
+            assert(entry->data != NULL);
+
+            TAILQ_INSERT_TAIL(ri.arches, entry, items);
+        }
+
+        /* clean up */
+        free(archopt);
+        list_free(valid_arches, free);
     }
 
     /* create the working directory */
