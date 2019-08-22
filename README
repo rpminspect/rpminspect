@@ -81,6 +81,9 @@ following libraries (make sure the header files are available):
     * libyaml
           https://github.com/yaml/libyaml
 
+    * file (for libmagic)
+          http://www.darwinsys.com/file/
+
 Most distributions include the above projects in prebuilt and packaged
 form.  If those are available, you should use those packages.
 
