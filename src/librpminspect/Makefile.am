@@ -31,6 +31,7 @@ librpminspect_la_SOURCES = badwords.c \
                            koji.c \
                            listfuncs.c \
                            local.c \
+                           magic.c \
                            mkdirp.c \
                            output.c \
                            output_json.c \
@@ -65,6 +66,7 @@ librpminspect_la_LIBADD = $(JSON_C_LIBS) \
                           $(ZLIB_LIBS) \
                           $(LIBMANDOC_LIBS) \
                           $(INIPARSER_LIBS) \
+                          $(MAGIC_LIBS) \
                           $(DL_LIBS) \
                           $(CODE_COVERAGE_LIBS)
 

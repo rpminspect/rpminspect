@@ -25,6 +25,7 @@ BuildRequires:  zlib-devel
 BuildRequires:  libmandoc-devel <= 1.14.4
 BuildRequires:  iniparser-devel
 BuildRequires:  libyaml-devel
+BuildRequires:  file-devel
 
 %description
 Build deviation and compliance tool.  This program runs a number of tests

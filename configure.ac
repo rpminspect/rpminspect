@@ -76,6 +76,15 @@ else
     AC_MSG_ERROR([*** unable to find iniparser_load() in libiniparser])
 fi
 
+# Check for libmagic
+AC_SEARCH_LIBS([magic_open], [magic], [found=1], [found=0], [])
+if test $found -eq 1; then
+    MAGIC_LIBS="-lmagic"
+    AC_SUBST([MAGIC_LIBS])
+else
+    AC_MSG_ERROR([*** unable to find magic_open() in libmagic])
+fi
+
 # Check for dlopen
 AC_SEARCH_LIBS([dlopen], [dl], [found=1], [found=0], [$ZLIB_LIBS])
 if test $found -eq 1; then

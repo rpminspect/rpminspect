@@ -154,4 +154,7 @@ void output_json(const results_t *, const char *);
 /* unpack.c */
 int unpack_archive(const char *, const char *, const bool);
 
+/* magic.c */
+char *get_mime_type(const char *);
+
 #endif
