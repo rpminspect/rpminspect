@@ -43,8 +43,10 @@ static void usage(const char *progname) {
     printf("Options:\n");
     printf("  -c FILE, --config=FILE   Configuration file to use\n");
     printf("                             (default: %s)\n", CFGFILE);
-    printf("  -T LIST, --tests=LIST    List of tests to run or skip\n");
+    printf("  -T LIST, --tests=LIST    List of tests to run\n");
     printf("                             (default: ALL)\n");
+    printf("  -E LIST, --exclude=LIST  List of tests to exclude\n");
+    printf("                             (default: none)\n");
     printf("  -a LIST, --arches=LIST   List of architectures to check\n");
     printf("  -r STR, --release=STR    Product release string\n");
     printf("  -o FILE, --output=FILE   Write results to FILE\n");
@@ -122,16 +124,101 @@ static char *get_product_release(const char *before, const char *after) {
     return after_product;
 }
 
+/*
+ * Used to ensure the user only specifies the -T or -E option.
+ */
+static void check_inspection_options(const bool inspection_opt, const char *progname)
+{
+    assert(progname != NULL);
+
+    if (inspection_opt) {
+        fprintf(stderr, "*** The -T and -E options are mutually exclusive\n");
+        fprintf(stderr, "*** See `%s --help` for more information.\n", progname);
+        fflush(stderr);
+        exit(EXIT_FAILURE);
+    }
+
+    return;
+}
+
+/*
+ * Used in the -T and -E option processing to report any unknown
+ * test names provided.  Exit if true.
+ */
+static void check_found(const bool found, const char *inspection, const char *progname)
+{
+    assert(inspection != NULL);
+    assert(progname != NULL);
+
+    if (!found) {
+        fprintf(stderr, "*** Unknown test specified: `%s`\n", inspection);
+        fprintf(stderr, "*** See `%s --help` for more information.\n", progname);
+        fflush(stderr);
+        exit(EXIT_FAILURE);
+    }
+
+    return;
+}
+
+/*
+ * Used in the -T and -E option processing to handle each test
+ * flag.  Arguments:
+ *     inspection      The name of the inspection from the command
+ *                     line.  e.g., "-T license,manpage" would make
+ *                     two calls to this function with inspection
+ *                     being "license" and then "manpage".
+ *     exclude         True if -E option, False otherwise.
+ *     selected        The selected test bitmap from the caller.
+ * Returns true if the inspection name is valid.
+ */
+static bool process_inspection_flag(const char *inspection, const bool exclude, uint64_t *selected)
+{
+    int i = 0;
+    bool found = false;
+
+    assert(inspection != NULL);
+    assert(selected != NULL);
+
+    if (!strcasecmp(inspection, "ALL")) {
+        /* ALL tests specified */
+        if (exclude) {
+            *selected = 0;
+            return true;
+        } else {
+            *selected = ~0;
+            return true;
+        }
+    }
+
+    for (i = 0; inspections[i].flag != 0; i++) {
+        if (!strcasecmp(inspection, inspections[i].name)) {
+            /* user specified a valid inspection */
+            if (exclude) {
+                *selected &= ~(inspections[i].flag);
+                found = true;
+                break;
+            } else {
+                *selected |= inspections[i].flag;
+                found = true;
+                break;
+            }
+        }
+    }
+
+    return found;
+}
+
 int main(int argc, char **argv) {
     char *progname = basename(argv[0]);
     int c, i, j;
     int idx = 0;
     int ret = EXIT_SUCCESS;
     glob_t expand;
-    char *short_options = "c:T:a:r:o:F:lw:fkv\?V";
+    char *short_options = "c:T:E:a:r:o:F:lw:fkv\?V";
     struct option long_options[] = {
         { "config", required_argument, 0, 'c' },
         { "tests", required_argument, 0, 'T' },
+        { "exclude", required_argument, 0, 'E' },
         { "arches", required_argument, 0, 'a' },
         { "release", required_argument, 0, 'r' },
         { "list", no_argument, 0, 'l' },
@@ -158,10 +245,10 @@ int main(int argc, char **argv) {
     bool verbose = false;
     int mode = S_IRWXU | S_IRGRP | S_IXGRP | S_IROTH | S_IXOTH;
     bool found = false;
-    char *test = NULL;
-    uint64_t tests = 0;
+    char *inspection = NULL;
     uint64_t selected = 0;
-    bool negated_tests = false;
+    bool inspection_opt = false;
+    bool exclude = false;
     size_t width = tty_width();
     string_list_t *valid_arches = NULL;
     string_entry_t *arch = NULL;
@@ -181,45 +268,24 @@ int main(int argc, char **argv) {
                 cfgfile = strdup(optarg);
                 break;
             case 'T':
-                if (!strcasecmp(optarg, "all")) {
-                    selected = ~tests;
-                    break;
+            case 'E':
+                /* Process the -T or the -E options */
+                check_inspection_options(inspection_opt, progname);
+
+                if (c == 'T') {
+                    selected = 0;
+                    exclude = false;
+                } else {
+                    selected = ~0;
+                    exclude = true;
                 }
 
-                while ((test = strsep(&optarg, ",")) != NULL) {
-                    found = false;
-
-                    for (i = 0; inspections[i].flag != 0; i++) {
-                        if (*test == '!' && !strcasecmp(test+1, inspections[i].name)) {
-                            if (!negated_tests) {
-                                negated_tests = true;
-                                selected = ~tests;
-                            }
-
-                            /* user wants to skip this specific test */
-                            selected &= ~(inspections[i].flag);
-                            found = true;
-                            break;
-                        } else if (!strcasecmp(test, inspections[i].name)) {
-                            /* user wants to perform this specific test */
-                            selected |= inspections[i].flag;
-                            found = true;
-                            break;
-                        } else if (!strcasecmp(test, "ALL")) {
-                            selected = ~tests;
-                            found = true;
-                            break;
-                        }
-                    }
-
-                    if (!found) {
-                        fprintf(stderr, "*** Unknown test specified: `%s`\n", test);
-                        fprintf(stderr, "*** See `%s --help` for more information.\n", progname);
-                        fflush(stderr);
-                        return EXIT_FAILURE;
-                    }
+                while ((inspection = strsep(&optarg, ",")) != NULL) {
+                    found = process_inspection_flag(inspection, exclude, &selected);
+                    check_found(found, inspection, progname);
                 }
 
+                inspection_opt = true;
                 break;
             case 'a':
                 archopt = strdup(optarg);
@@ -340,7 +406,7 @@ int main(int argc, char **argv) {
     ri.product_release = release;
 
     /* Copy in user-selected tests if they specified something */
-    if (selected != 0) {
+    if (selected != 0 || exclude) {
         ri.tests = selected;
     }
 

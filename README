@@ -183,10 +183,7 @@ Now let's say you want to run the license and manpage inspections:
 And lastly, what if you want to run *all* inspections except the license
 one:
 
-    $ rpminspect -v -k -T \!license tmux-2.9a-2.fc31 tmux-2.9a-3.fc31
-
-(NOTE: The -T option syntax will be changing in the future, so keep that in
-mind.)
+    $ rpminspect -v -k -E license tmux-2.9a-2.fc31 tmux-2.9a-3.fc31
 
 What about specify a locally cached build?  First, let's start by caching
 the builds we have been using:
