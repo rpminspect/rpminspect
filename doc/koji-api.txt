@@ -158,7 +158,7 @@ countAndFilterResults(methodName, *args, **kw)
   description: Filter results by a given name and count total results account.
 
         Execute the XML-RPC method with the given name and filter the results
-        based on the options specified in the keywork option "filterOpts".
+        based on the options specified in the keyword option "filterOpts".
         The method must return a list of maps.  Any other return type will
         result in a TypeError.
 
@@ -294,7 +294,7 @@ fault()
   description: debugging. raise an error
 filterResults(methodName, *args, **kw)
   description: Execute the XML-RPC method with the given name and filter the results
-        based on the options specified in the keywork option "filterOpts".  The method
+        based on the options specified in the keyword option "filterOpts".  The method
         must return a list of maps.  Any other return type will result in a TypeError.
         Currently supported options are:
         - offset: the number of elements to trim off the front of the list
@@ -348,7 +348,7 @@ getArchive(archive_id, strict=False)
       flags
 
     If the archive is part of an image build, and it is the image file that
-    contains the root partitioning ('/'), there will be a additional fields:
+    contains the root partitioning ('/'), there will be additional fields:
       rootid
       arch
 
@@ -356,7 +356,7 @@ getArchiveFile(archive_id, filename, strict=False)
   description:
     Get information about a file with the given filename
     contained in the archive with the given ID.
-    Returns a map with with following keys:
+    Returns a map with following keys:
 
     archive_id: id of the archive the file is contained in (integer)
     name: name of the file (string)
@@ -383,7 +383,7 @@ getAverageBuildDuration(package)
 getBuild(buildInfo, strict=False)
   description: Return information about a build.
 
-    buildID may be either a int ID, a string NVR, or a map containing
+    buildID may be either an int ID, a string NVR, or a map containing
     'name', 'version' and 'release.
 
     A map will be returned containing the following keys*:
@@ -610,7 +610,7 @@ getRPM(rpminfo, strict=False, multi=False)
   description: Get information about the specified RPM
 
     rpminfo may be any one of the following:
-    - a int ID
+    - an int ID
     - a string N-V-R.A
     - a string N-V-R.A@location
     - a map containing 'name', 'version', 'release', and 'arch'
@@ -1006,7 +1006,7 @@ krbLogin(*args, **opts)
 listArchiveFiles(archive_id, queryOpts=None, strict=False)
   description:
     Get information about the files contained in the archive with the given ID.
-    Returns a list of maps with with following keys:
+    Returns a list of maps with following keys:
 
     archive_id: id of the archive the file is contained in (integer)
     name: name of the file (string)
@@ -1471,7 +1471,7 @@ packageListSetOwner(taginfo, pkginfo, owner, force=False)
 packageListUnblock(taginfo, pkginfo, force=False)
   description: Unblock the package in tag
 
-    Generally this just adds a unblocked duplicate of the blocked entry.
+    Generally this just adds an unblocked duplicate of the blocked entry.
     However, if the block is actually in tag directly (not through inheritance),
     the blocking entry is simply removed
 queryHistory(tables=None, **kwargs)
