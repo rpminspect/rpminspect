@@ -23,6 +23,7 @@
 #include <errno.h>
 #include <libgen.h>
 #include <ftw.h>
+#include <assert.h>
 
 #include "rpminspect.h"
 

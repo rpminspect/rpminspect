@@ -29,6 +29,7 @@
 #include <errno.h>
 #include <ftw.h>
 #include <byteswap.h>
+#include <assert.h>
 
 #include "rpminspect.h"
 
