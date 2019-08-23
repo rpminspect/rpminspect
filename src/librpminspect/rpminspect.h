@@ -67,6 +67,11 @@ extern struct format formats[];
  */
 enum { BEFORE_BUILD, AFTER_BUILD };
 
+/*
+ * Supported checksum types.
+ */
+enum checksum { NULLSUM, MD5SUM, SHA1SUM, SHA256SUM };
+
 /* Common functions */
 
 /* init.c */
@@ -157,6 +162,9 @@ int unpack_archive(const char *, const char *, const bool);
 
 /* magic.c */
 char *get_mime_type(const char *);
+
+/* checksums.c */
+char *checksum(const char *, mode_t *, enum checksum);
 
 /* runcmd.c */
 int run_cmd(char **, char *, ...);

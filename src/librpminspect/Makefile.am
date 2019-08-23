@@ -11,6 +11,7 @@ librpminspect_HEADERS = constants.h \
 
 lib_LTLIBRARIES = librpminspect.la
 librpminspect_la_SOURCES = badwords.c \
+                           checksums.c \
                            copyfile.c \
                            files.c \
                            free.c \
@@ -53,6 +54,7 @@ librpminspect_la_CPPFLAGS = $(JSON_C_CFLAGS) \
                             $(LIBELF_CFLAGS) \
                             $(LIBKMOD_CFLAGS) \
                             $(ZLIB_CFLAGS) \
+                            $(OPENSSL_CFLAGS) \
                             $(CODE_COVERAGE_CPPFLAGS)
 
 librpminspect_la_CFLAGS =   $(CODE_COVERAGE_CFLAGS)
@@ -68,6 +70,7 @@ librpminspect_la_LIBADD = $(JSON_C_LIBS) \
                           $(LIBMANDOC_LIBS) \
                           $(INIPARSER_LIBS) \
                           $(MAGIC_LIBS) \
+                          $(OPENSSL_LIBS) \
                           $(DL_LIBS) \
                           $(CODE_COVERAGE_LIBS)
 

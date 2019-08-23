@@ -84,6 +84,10 @@ following libraries (make sure the header files are available):
     * file (for libmagic)
           http://www.darwinsys.com/file/
 
+    * OpenSSL or LibreSSL
+          https://www.openssl.org/
+          http://www.libressl.org/
+
 Most distributions include the above projects in prebuilt and packaged
 form.  If those are available, you should use those packages.
 

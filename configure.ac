@@ -50,6 +50,7 @@ PKG_CHECK_MODULES(LIBKMOD, [libkmod])
 PKG_CHECK_MODULES(LIBCURL, [libcurl])
 PKG_CHECK_MODULES(ZLIB, [zlib])
 PKG_CHECK_MODULES(YAML, [yaml-0.1])
+PKG_CHECK_MODULES(OPENSSL, [openssl])
 
 # Check for libmandoc
 AC_SEARCH_LIBS([mparse_alloc], [mandoc], [found=1], [found=0], [$ZLIB_LIBS])
