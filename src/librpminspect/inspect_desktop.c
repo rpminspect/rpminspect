@@ -79,76 +79,6 @@ static bool is_desktop_entry_file(const char *desktop_entry_files_dir, const rpm
 }
 
 /*
- * Called by desktop_driver() to run desktop-file-validate on individual desktop
- * files.  The return value is the return value of pclose() which is -1 on failure
- * otherwise it's the return code of desktop-file-validate.  The output of the
- * command (if it exists) is written to result in the calling function.
- */
-static int validate_desktop_file(const char *tool, const char *fullpath, char **result) {
-    int ret;
-    char *cmd = NULL;
-    char *new = NULL;
-    char buf[BUFSIZ];
-    FILE *cmdfp = NULL;
-
-    assert(tool != NULL);
-    assert(fullpath != NULL);
-
-    /* Run the validation tool */
-    xasprintf(&cmd, "%s %s 2>&1", tool, fullpath);
-    cmdfp = popen(cmd, "r");
-
-    if (cmdfp == NULL) {
-        fprintf(stderr, "error running %s on %s: %s\n", tool, fullpath, strerror(errno));
-        return false;
-    }
-
-    /*
-     * Read in all of the information back from the command and store
-     * it as our result.  Just concatenate the string as we read it
-     * back in buffer size chunks.
-     */
-    while (fgets(buf, sizeof(buf), cmdfp) != NULL) {
-        if (*result == NULL) {
-            *result = strdup(buf);
-        } else {
-            xasprintf(&new, "%s%s", *result, buf);
-            free(*result);
-            *result = new;
-        }
-    }
-
-    /* Capture the return code from the validation tool */
-    ret = pclose(cmdfp);
-
-    if (ret == -1) {
-        fprintf(stderr, "error closing %s for %s: %s\n", tool, fullpath, strerror(errno));
-        return -1;
-    }
-
-    /*
-     * There may be no results from desktop-file-validate
-     */
-    if (result != NULL && *result != NULL) {
-        /*
-         * Trim the leading filename since those will be reported by our
-         * add_result().
-         */
-        new = strdup(*result + strlen(fullpath) + 2);
-
-        /*
-         * Trim trailing newlines, again for nicer reporting.
-         */
-        new[strcspn(new, "\n")] = 0;
-
-        free(*result);
-        *result = new;
-    }
-
-    return ret;
-}
-
-/*
  * Validate the Exec= and Icon= lines in a desktop entry file.  False means
  * something didn't validate.  Results are reported from this function.
  */
@@ -308,11 +238,11 @@ static bool desktop_driver(struct rpminspect *ri, rpmfile_entry_t *file) {
     }
 
     /* Validate the desktop file */
-    after_code = validate_desktop_file(ri->desktop_file_validate, file->fullpath, &after_out);
+    after_code = run_cmd(&after_out, ri->desktop_file_validate, file->fullpath, "2>&1", NULL);
 
     if (file->peer_file && is_desktop_entry_file(ri->desktop_entry_files_dir, file->peer_file)) {
         /* if we have a before peer, validate the corresponding desktop file */
-        (void) validate_desktop_file(ri->desktop_file_validate, file->peer_file->fullpath, &before_out);
+        (void) run_cmd(&before_out, ri->desktop_file_validate, file->peer_file->fullpath, "2>&1", NULL);
     }
 
     if (after_code == -1) {
