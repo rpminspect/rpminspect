@@ -19,6 +19,8 @@
 #include "config.h"
 
 #include <stdbool.h>
+#include <assert.h>
+
 #include "rpminspect.h"
 
 /*

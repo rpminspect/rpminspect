@@ -19,8 +19,10 @@
 #include "config.h"
 
 #include <stdbool.h>
+#include <assert.h>
 #include <rpm/rpmlib.h>
 #include <rpm/rpmts.h>
+
 #include "rpminspect.h"
 
 /* Initialize librpm if needed */
