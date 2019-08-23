@@ -63,6 +63,39 @@ static int add_regex(dictionary *cfg, const char *key, regex_t **regex_out)
     return 0;
 }
 
+static void parse_list(const char *tmp, string_list_t **list)
+{
+    char *walk = NULL;
+    char *start = NULL;
+    char *token = NULL;
+    string_entry_t *entry = NULL;
+
+    assert(tmp != NULL);
+    assert(list != NULL);
+
+    /* make a copy of the string for splitting */
+    start = walk = strdup(tmp);
+
+    /* split up the string and turn it in to a list */
+    *list = calloc(1, sizeof(*(*list)));
+    assert(*list != NULL);
+    TAILQ_INIT(*list);
+
+    while ((token = strsep(&walk, " \t")) != NULL) {
+        entry = calloc(1, sizeof(*entry));
+        assert(entry != NULL);
+
+        entry->data = strdup(token);
+        assert(entry->data != NULL);
+
+        TAILQ_INSERT_TAIL(*list, entry, items);
+    }
+
+    /* clean up */
+    free(start);
+    return;
+}
+
 /*
  * Initialize a struct rpminspect.  Called by applications using
  * librpminspect before they began calling library functions.
@@ -71,10 +104,6 @@ static int add_regex(dictionary *cfg, const char *key, regex_t **regex_out)
 int init_rpminspect(struct rpminspect *ri, const char *cfgfile) {
     dictionary *cfg = NULL;
     const char *tmp = NULL;
-    char *walk = NULL;
-    char *start = NULL;
-    char *token = NULL;
-    string_entry_t *entry = NULL;
     uint64_t tests = 0;
     int nkeys = 0;
     int len = 0;
@@ -82,6 +111,7 @@ int init_rpminspect(struct rpminspect *ri, const char *cfgfile) {
     const char *val = NULL;
     ENTRY e;
     ENTRY *eptr;
+    string_entry_t *entry = NULL;
 
     assert(ri != NULL);
     memset(ri, 0, sizeof(*ri));
@@ -142,26 +172,7 @@ int init_rpminspect(struct rpminspect *ri, const char *cfgfile) {
     if (tmp == NULL) {
         ri->badwords = NULL;
     } else {
-        /* make a copy of the string for splitting */
-        start = walk = strdup(tmp);
-
-        /* split up the string of bad words and turn them in to a list */
-        ri->badwords = calloc(1, sizeof(*(ri->badwords)));
-        assert(ri->badwords != NULL);
-        TAILQ_INIT(ri->badwords);
-
-        while ((token = strsep(&walk, " \t")) != NULL) {
-            entry = calloc(1, sizeof(*entry));
-            assert(entry != NULL);
-
-            entry->data = strdup(token);
-            assert(entry->data != NULL);
-
-            TAILQ_INSERT_TAIL(ri->badwords, entry, items);
-        }
-
-        /* clean up */
-        free(start);
+        parse_list(tmp, &ri->badwords);
     }
 
     tmp = iniparser_getstring(cfg, "tests:vendor", NULL);
@@ -175,26 +186,14 @@ int init_rpminspect(struct rpminspect *ri, const char *cfgfile) {
     if (tmp == NULL) {
         ri->buildhost_subdomain = NULL;
     } else {
-        /* make a copy of the string for splitting */
-        start = walk = strdup(tmp);
+        parse_list(tmp, &ri->buildhost_subdomain);
+    }
 
-        /* split up the string of subdomains and turn them in to a list */
-        ri->buildhost_subdomain = calloc(1, sizeof(*(ri->buildhost_subdomain)));
-        assert(ri->buildhost_subdomain != NULL);
-        TAILQ_INIT(ri->buildhost_subdomain);
-
-        while ((token = strsep(&walk, " \t")) != NULL) {
-            entry = calloc(1, sizeof(*entry));
-            assert(entry != NULL);
-
-            entry->data = strdup(token);
-            assert(entry->data != NULL);
-
-            TAILQ_INSERT_TAIL(ri->buildhost_subdomain, entry, items);
-        }
-
-        /* clean up */
-        free(start);
+    tmp = iniparser_getstring(cfg, "tests:security_path_prefix", NULL);
+    if (tmp == NULL) {
+        ri->security_path_prefix = NULL;
+    } else {
+        parse_list(tmp, &ri->security_path_prefix);
     }
 
     /* If any of the regular expressions fail to compile, stop and return failure */
