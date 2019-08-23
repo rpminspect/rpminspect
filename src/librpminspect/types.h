@@ -157,6 +157,12 @@ struct rpminspect {
     /* Required subdomain for buildhosts -- multiple subdomains allowed */
     string_list_t *buildhost_subdomain;
 
+    /*
+     * Optional: if not NULL, contains list of path prefixes for files
+     * that are of security concern.
+     */
+    string_list_t *security_path_prefix;
+
     /* Optional: if not NULL, contains list of architectures */
     string_list_t *arches;
 
