@@ -41,6 +41,7 @@ librpminspect_la_SOURCES = badwords.c \
                            results.c \
                            rmtree.c \
                            rpm.c \
+                           runcmd.c \
                            strfuncs.c \
                            tty.c \
                            unpack.c

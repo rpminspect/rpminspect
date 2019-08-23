@@ -20,11 +20,12 @@
  * This header includes the API definition for librpminspect.
  */
 
-#include <assert.h>
 #include <stdbool.h>
 #include <sys/types.h>
 #include <iniparser.h>
+#include <regex.h>
 #include <rpm/header.h>
+
 #include "constants.h"
 #include "types.h"
 #include "inspect.h"
@@ -156,5 +157,8 @@ int unpack_archive(const char *, const char *, const bool);
 
 /* magic.c */
 char *get_mime_type(const char *);
+
+/* runcmd.c */
+int run_cmd(char **, char *, ...);
 
 #endif
