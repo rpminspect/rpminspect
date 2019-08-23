@@ -37,6 +37,7 @@
 #define HEADER_SPECNAME      "spec-file-name"
 #define HEADER_MODULARITY    "modularity"
 #define HEADER_JAVABYTECODE  "java-bytecode"
+#define HEADER_CHANGEDFILES  "changed-files"
 
 /*
  * Inspection remedies
@@ -83,5 +84,8 @@
 
 /* javabytecode */
 #define REMEDY_JAVABYTECODE "The Java bytecode version for one or more class files in the build was not met for the product release.  Ensure you are using the correct JDK for the build."
+
+/* changedfiles */
+#define REMEDY_CHANGEDFILES "Unexpected file changes were found.  Verify these changes are expected.  If they are not, adjust the build to prevent file changes."
 
 #endif

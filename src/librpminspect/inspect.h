@@ -25,6 +25,7 @@
 #include <stdint.h>
 #include <libelf.h>
 #include <libkmod.h>
+
 #include "types.h"
 
 #ifndef _LIBRPMINSPECT_INSPECT_H
@@ -112,6 +113,9 @@ bool inspect_modularity(struct rpminspect *);
 /* inspect_javabytecode.c */
 bool inspect_javabytecode(struct rpminspect *);
 
+/* inspect_changedfiles.c */
+bool inspect_changedfiles(struct rpminspect *);
+
 /*
  * Inspections are referenced by flag.  These flags are set in bitfields
  * to indicate which ones we want to run.  When adding new ones, please
@@ -131,5 +135,6 @@ bool inspect_javabytecode(struct rpminspect *);
 #define INSPECT_SPECNAME                    (((uint64_t) 1) << 9)
 #define INSPECT_MODULARITY                  (((uint64_t) 1) << 10)
 #define INSPECT_JAVABYTECODE                (((uint64_t) 1) << 11)
+#define INSPECT_CHANGEDFILES                (((uint64_t) 1) << 12)
 
 #endif

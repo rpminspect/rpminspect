@@ -61,8 +61,10 @@
 #define SRPM_ARCH_NAME "src"
 
 /*
- * RPM file extension
+ * File extensions
  */
 #define RPM_FILENAME_EXTENSION ".rpm"
+#define JAR_FILENAME_EXTENSION ".jar"
+#define CLASS_FILENAME_EXTENSION ".class"
 
 #endif
