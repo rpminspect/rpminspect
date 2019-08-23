@@ -70,7 +70,6 @@ static bool run_and_capture(const char *where, char **output, char *cmd,
                             const char *fullpath, char **errors)
 {
     int fd;
-    int result;
 
     assert(where != NULL);
     assert(output != NULL);
@@ -104,7 +103,6 @@ static bool run_and_capture(const char *where, char **output, char *cmd,
  */
 static bool changedfiles_driver(struct rpminspect *ri, rpmfile_entry_t *file)
 {
-    int fd;
     bool result = true;
     const char *arch = NULL;
     char *type = NULL;
