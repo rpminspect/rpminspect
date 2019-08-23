@@ -167,6 +167,6 @@ char *get_mime_type(const char *);
 char *checksum(const char *, mode_t *, enum checksum);
 
 /* runcmd.c */
-int run_cmd(char **, char *, ...);
+int run_cmd(char **, const char *, ...);
 
 #endif

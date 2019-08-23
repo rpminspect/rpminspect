@@ -42,7 +42,7 @@
  * all of the subsequent arguments need to be strings because they all
  * get concatenated together.
  */
-int run_cmd(char **result, char *cmd, ...) {
+int run_cmd(char **result, const char *cmd, ...) {
     va_list ap;
     int ret;
     char *new = NULL;

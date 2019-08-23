@@ -42,8 +42,8 @@ it.  rpminspect can output information in JSON format which is intended to
 make it easier to integrate in to automated workflows or web frontends.
 
 
-Requirements
-------------
+Build Requirements
+------------------
 
 A typical Linux system with a toolchain for building C software and the
 following libraries (make sure the header files are available):
@@ -90,6 +90,26 @@ following libraries (make sure the header files are available):
 
 Most distributions include the above projects in prebuilt and packaged
 form.  If those are available, you should use those packages.
+
+
+Runtime Requirements
+--------------------
+
+In addition to the libraries that will be linked in to librpminspect, there
+are a number of userspace programs required:
+
+    /usr/bin/desktop-file-validate
+    /usr/bin/zcmp
+    /usr/bin/bzcmp
+    /usr/bin/xzcmp
+    /usr/bin/eu-elfcmp
+    /usr/bin/msgunfmt
+    /usr/bin/cpp
+    /usr/bin/diff
+
+The provided spec file template uses the Fedora locations for these files,
+but in the program they are assumed to be in PATH at runtime.  These tools
+are used by different inspections at runtime.
 
 
 Building
