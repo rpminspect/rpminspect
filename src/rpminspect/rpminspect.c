@@ -437,6 +437,17 @@ int main(int argc, char **argv) {
     }
 
     /*
+     * Fetch-only mode can only work with a single build
+     */
+    if (fetch_only && ri.before) {
+        fprintf(stderr, "*** Fetch only mode takes a single build specification.\n");
+        fprintf(stderr, "*** See `%s --help` for more information.\n", progname);
+        fflush(stderr);
+        free_rpminspect(&ri);
+        return EXIT_FAILURE;
+    }
+
+    /*
      * Determine product release unless the user specified one.
      */
     if (ri.product_release == NULL) {
