@@ -60,17 +60,28 @@ static void set_worksubdir(struct rpminspect *ri, bool is_local, struct koji_bui
         return;
     }
 
-    if (is_local) {
-        xasprintf(&ri->worksubdir, "%s/local.XXXXXX", ri->workdir);
-    } else {
+    if (fetch_only) {
         assert(kb != NULL);
-        xasprintf(&ri->worksubdir, "%s/%s-%s.XXXXXX", ri->workdir, kb->name, kb->version);
-    }
+        xasprintf(&ri->worksubdir, "%s/%s", ri->workdir, kb->nvr);
 
-    if (mkdtemp(ri->worksubdir) == NULL) {
-        fprintf(stderr, "*** Unable to create local work subdirectory: %s\n", strerror(errno));
-        fflush(stderr);
-        abort();
+        if (mkdirp(ri->worksubdir, mode)) {
+            fprintf(stderr, "*** Unable to create download directory %s: %s\n", ri->worksubdir, strerror(errno));
+            fflush(stderr);
+            abort();
+        }
+    } else {
+        if (is_local) {
+            xasprintf(&ri->worksubdir, "%s/local.XXXXXX", ri->workdir);
+        } else {
+            assert(kb != NULL);
+            xasprintf(&ri->worksubdir, "%s/%s-%s.XXXXXX", ri->workdir, kb->name, kb->version);
+        }
+
+        if (mkdtemp(ri->worksubdir) == NULL) {
+            fprintf(stderr, "*** Unable to create local work subdirectory: %s\n", strerror(errno));
+            fflush(stderr);
+            abort();
+        }
     }
 
     return;
@@ -107,7 +118,11 @@ static void prune_local_build(const int whichbuild) {
     DIR *d = NULL;
     struct dirent *de = NULL;
 
-    xasprintf(&lpath, "%s/%s", workri->worksubdir, build_desc[whichbuild]);
+    if (fetch_only) {
+        lpath = strdup(workri->worksubdir);
+    } else {
+        xasprintf(&lpath, "%s/%s", workri->worksubdir, build_desc[whichbuild]);
+    }
 
     if ((d = opendir(lpath)) == NULL) {
         fprintf(stderr, "*** Unable to open directory: %s: %s\n", lpath, strerror(errno));
@@ -298,7 +313,11 @@ static int download_artifacts(const struct rpminspect *ri, struct koji_build *bu
         /* Download module metadata at the top level */
         if (ri->buildtype == KOJI_BUILD_MODULE) {
             /* Create destination directory */
-            xasprintf(&dst, "%s/%s", workri->worksubdir, build_desc[whichbuild]);
+            if (fetch_only) {
+                dst = strdup(workri->worksubdir);
+            } else {
+                xasprintf(&dst, "%s/%s", workri->worksubdir, build_desc[whichbuild]);
+            }
 
             if (mkdirp(dst, mode)) {
                 fprintf(stderr, "*** Error creating directory %s: %s\n", dst, strerror(errno));
@@ -387,7 +406,11 @@ static int download_artifacts(const struct rpminspect *ri, struct koji_build *bu
         /* Iterate over the list of packages for this build */
         TAILQ_FOREACH(rpm, buildentry->rpms, items) {
             /* create the destination directory */
-            xasprintf(&dst, "%s/%s/%s", workri->worksubdir, build_desc[whichbuild], rpm->arch);
+            if (fetch_only) {
+                xasprintf(&dst, "%s/%s", workri->worksubdir, rpm->arch);
+            } else {
+                xasprintf(&dst, "%s/%s/%s", workri->worksubdir, build_desc[whichbuild], rpm->arch);
+            }
 
             if (mkdirp(dst, mode)) {
                 fprintf(stderr, "*** Error creating directory %s: %s\n", dst, strerror(errno));
@@ -399,7 +422,11 @@ static int download_artifacts(const struct rpminspect *ri, struct koji_build *bu
 
             /* for modules, get the per-arch module metadata */
             if (workri->buildtype == KOJI_BUILD_MODULE) {
-                xasprintf(&dst, "%s/%s/%s/modulemd.%s.txt", workri->worksubdir, build_desc[whichbuild], rpm->arch, rpm->arch);
+                if (fetch_only) {
+                    xasprintf(&dst, "%s/%s/modulemd.%s.txt", workri->worksubdir, rpm->arch, rpm->arch);
+                } else {
+                    xasprintf(&dst, "%s/%s/%s/modulemd.%s.txt", workri->worksubdir, build_desc[whichbuild], rpm->arch, rpm->arch);
+                }
 
                 /* only download this file if we have not already gotten it */
                 if (access(dst, F_OK|R_OK)) {
@@ -429,7 +456,12 @@ static int download_artifacts(const struct rpminspect *ri, struct koji_build *bu
 
             /* build path strings */
             xasprintf(&pkg, "%s-%s-%s.%s.rpm", rpm->name, rpm->version, rpm->release, rpm->arch);
-            xasprintf(&dst, "%s/%s/%s/%s", workri->worksubdir, build_desc[whichbuild], rpm->arch, pkg);
+
+            if (fetch_only) {
+                xasprintf(&dst, "%s/%s/%s", workri->worksubdir, rpm->arch, pkg);
+            } else {
+                xasprintf(&dst, "%s/%s/%s/%s", workri->worksubdir, build_desc[whichbuild], rpm->arch, pkg);
+            }
 
             if (!strcmp(build->volume_name, "DEFAULT")) {
                 xasprintf(&src, "%s/packages/%s/%s/%s/%s/%s", (workri->buildtype == KOJI_BUILD_MODULE) ? workri->kojimbs : workri->kojiursine, buildentry->package_name, rpm->version, rpm->release, rpm->arch, pkg);
@@ -477,6 +509,12 @@ int gather_builds(struct rpminspect *ri, bool fo) {
     /* process after first so the temp directory gets the NV of that pkg */
     if (ri->after != NULL) {
         if (is_local_build(ri->after)) {
+            if (fetch_only) {
+                fprintf(stderr, "*** Unable to fetch local builds\n");
+                fflush(stderr);
+                return -1;
+            }
+
             whichbuild = AFTER_BUILD;
             set_worksubdir(ri, true, NULL);
 
