@@ -140,15 +140,21 @@ Releases are made using these steps:
     ./autogen.sh
     ./configure
     make bumpver
+    git add configure.ac
+    git commit -m "New release"
     git clean -d -x -f
     ./autogen.sh
     ./configure
     make release
+    make rpminspect.spec
 
 This will increment the x.y version number, create a new tarball, sign it,
 and create a signed git tag.  All of that is pushed to github and then a
 release entry is made and the tarball and detached signature are uploaded
 there.
+
+You can also run the utils/make-release.sh script to do all of the above
+for you and have it ready to build in dist-git.
 
 
 How To Use
