@@ -222,13 +222,10 @@ What about specify a locally cached build?  First, let's start by caching
 the builds we have been using:
 
     $ mkdir ~/builds
-    $ rpminspect -v -k -f tmux-2.9a-2.fc31
-    $ mv PATH_RPMINSPECT_DISPLAY/after ~/builds/tmux-2.9a-2.fc31
-    $ rpminspect -v -k -f tmux-2.9a-3.fc31
-    $ mv PATH_RPMINSPECT_DISPLAY/after ~/builds/tmux-2.9a-3.fc31
+    $ rpminspect -v -w ~/builds -f tmux-2.9a-2.fc31
+    $ rpminspect -v -w ~/builds -f tmux-2.9a-3.fc31
 
-Not exactly elegant, but it gets the job done.  Now let's run all the
-inspections but specify the locally cached builds:
+Now let's run all the inspections but specify the locally cached builds:
 
     $ rpminspect -v ~/builds/tmux-2.9a-2.fc31 ~/builds/tmux-2.9a-3.fc31
 
