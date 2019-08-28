@@ -76,3 +76,29 @@ bool is_local_build(const char *build) {
 
     return true;
 }
+
+/*
+ * Returns true if the specified filename is a local RPM.
+ */
+bool is_local_rpm(const char *rpm) {
+    Header h;
+    char *rpmpath = NULL;
+    bool ret = true;
+
+    if (rpm == NULL) {
+        return false;
+    }
+
+    if (access(rpm, R_OK)) {
+        return false;
+    }
+
+    rpmpath = realpath(rpm, NULL);
+
+    if ((rpmpath == NULL) || (get_rpm_header(rpm, &h) == -1)) {
+        ret = false;
+    }
+
+    free(rpmpath);
+    return ret;
+}
