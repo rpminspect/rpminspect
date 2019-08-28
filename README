@@ -22,9 +22,11 @@ Build Types Support
 
 rpminspect expects its input to come from Koji.  That said, Koji produces
 certain types of builds that are not supported by rpminspect.  Right now,
-the following Koji build types are supported:
+the following input types are supported:
 
-    * RPM packages
+    * Local RPM packages (source or binary)
+    * Koji builds (i.e., an SRPM run with 'rpmbuild -ba' on all specified
+                   architectures)
     * Modules (https://docs.fedoraproject.org/en-US/modularity/)
 
 More information on Koji can be found at https://pagure.io/koji
@@ -185,10 +187,12 @@ developer needs to successfully run rpminspect locally for that product.
 
 USAGE
 
-rpminspect is run from the command.  The input is expected to be a build as
-output by Koji.  rpminspect will talk to Koji and download the build you
-specify, but to avoid repeated downloads you can also download and cache a
-build locally and refer to a local path.
+rpminspect is run from the command.  The inputs must be local RPM packages,
+a Koji build specification (NVR), a Koji module specification, or a locally
+cached Koji build output (regular build or module).  For inputs originating
+from Koji, rpminspect will talk to Koji and download the build artifacts.
+For repeated runs, you may want to cache a remote build locally to avoid
+downloading it with each run.
 
 Here is a simple invocation using tmux as an example:
 
@@ -232,6 +236,19 @@ Now let's run all the inspections but specify the locally cached builds:
 Easy.  Again, these locally cached builds must look like what rpminspect
 would download from koji.  Hence using rpminspect to first download it, then
 manually moving it to a cache.
+
+rpminspect can also run inspections on local RPM packages.  Similar to Koji
+inputs, you may specify a single RPM or two RPMs to compare.  For example:
+
+    $ rpminspect -v ~/rpmbuild/RPMS/x86_64/tmux-2.9a-2.fc31.x86_64.rpm
+
+Or:
+
+    $ cd ~/rpmbuild/RPMS/x86_64
+    $ rpminspect -v tmux-2.9a-2.fc31.x86_64.rpm tmux-2.9a-3.fc31.x86_64.rpm
+
+All of the other command line options that apply to Koji tests work for
+local RPM packages.
 
 For more information, see the man page for rpminspect(1).  And see the
 --help output for information on command line option syntax.

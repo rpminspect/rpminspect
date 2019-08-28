@@ -44,7 +44,7 @@ static char *build_desc[] = { "before", "after" };
 /* Local prototypes */
 static void set_worksubdir(struct rpminspect *, bool, struct koji_build *);
 static int get_rpm_info(const char *);
-static void prune_local_build(const int);
+static void prune_local(const int);
 static int copytree(const char *, const struct stat *, int, struct FTW *);
 static int download_artifacts(const struct rpminspect *, struct koji_build *);
 static void curl_helper(const bool, const char *, const char *);
@@ -112,7 +112,7 @@ static int get_rpm_info(const char *pkg) {
 /*
  * Walk a local build tree and prune empty arch subdirectories.
  */
-static void prune_local_build(const int whichbuild) {
+static void prune_local(const int whichbuild) {
     char *lpath = NULL;
     char *apath = NULL;
     DIR *d = NULL;
@@ -125,9 +125,8 @@ static void prune_local_build(const int whichbuild) {
     }
 
     if ((d = opendir(lpath)) == NULL) {
-        fprintf(stderr, "*** Unable to open directory: %s: %s\n", lpath, strerror(errno));
-        fflush(stderr);
-        abort();
+        free(lpath);
+        return;
     }
 
     while ((de = readdir(d)) != NULL) {
@@ -139,7 +138,7 @@ static void prune_local_build(const int whichbuild) {
     if (closedir(d) == -1) {
         fprintf(stderr, "*** Unable to close directory: %s: %s\n", lpath, strerror(errno));
         fflush(stderr);
-        abort();
+        return;
     }
 
     free(lpath);
@@ -163,7 +162,7 @@ static int copytree(const char *fpath, const struct stat *sb,
      * On our first call, take the length of the main directory that we will work
      * relative to for this rescursive copy.
      */
-    if (ftwbuf->level == 0) {
+    if (ftwbuf->level == 0 && S_ISDIR(sb->st_mode)) {
         toptrim = strlen(fpath) + 1;
         return 0;
     }
@@ -508,9 +507,9 @@ int gather_builds(struct rpminspect *ri, bool fo) {
 
     /* process after first so the temp directory gets the NV of that pkg */
     if (ri->after != NULL) {
-        if (is_local_build(ri->after)) {
+        if (is_local_build(ri->after) || is_local_rpm(ri->after)) {
             if (fetch_only) {
-                fprintf(stderr, "*** Unable to fetch local builds\n");
+                fprintf(stderr, "*** Unable to fetch local build trees or RPMs\n");
                 fflush(stderr);
                 return -1;
             }
@@ -526,7 +525,7 @@ int gather_builds(struct rpminspect *ri, bool fo) {
             }
 
             /* clean up */
-            prune_local_build(whichbuild);
+            prune_local(whichbuild);
         } else if ((build = get_koji_build(ri, ri->after)) != NULL) {
             whichbuild = AFTER_BUILD;
             set_worksubdir(ri, false, build);
@@ -549,7 +548,7 @@ int gather_builds(struct rpminspect *ri, bool fo) {
     }
 
     /* before build specified, find it */
-    if (is_local_build(ri->before)) {
+    if (is_local_build(ri->before) || is_local_rpm(ri->before)) {
         whichbuild = BEFORE_BUILD;
         set_worksubdir(ri, true, NULL);
 
@@ -561,7 +560,7 @@ int gather_builds(struct rpminspect *ri, bool fo) {
         }
 
         /* clean up */
-        prune_local_build(whichbuild);
+        prune_local(whichbuild);
     } else if ((build = get_koji_build(ri, ri->before)) != NULL) {
         whichbuild = BEFORE_BUILD;
         set_worksubdir(ri, false, build);
