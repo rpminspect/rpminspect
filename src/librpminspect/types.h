@@ -101,8 +101,7 @@ typedef enum _severity_t {
 typedef enum _waiverauth_t {
     NOT_WAIVABLE         = 0,
     WAIVABLE_BY_ANYONE   = 1,
-    WAIVABLE_BY_SECURITY = 2,
-    WAIVABLE_BY_RELENG   = 3
+    WAIVABLE_BY_SECURITY = 2
 } waiverauth_t;
 
 typedef struct _results_entry_t {
