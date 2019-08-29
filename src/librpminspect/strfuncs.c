@@ -266,8 +266,6 @@ char *strwaiverauth(const waiverauth_t waiverauth) {
             return "Anyone";
         case WAIVABLE_BY_SECURITY:
             return "Security";
-        case WAIVABLE_BY_RELENG:
-            return "Release Engineering";
         default:
             return "UnKnOwN";
     }
