@@ -92,7 +92,7 @@ void output_text(const results_t *results, const char *dest) {
             fprintf(fp, "Waiver Authorization: %s\n\n", strwaiverauth(result->waiverauth));
 
             if (result->screendump != NULL) {
-                fprintf(fp, "Screendump:\n%s\n", result->screendump);
+                fprintf(fp, "Screendump:\n%s\n\n", result->screendump);
             }
 
             if (result->remedy != NULL) {
