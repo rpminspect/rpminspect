@@ -36,6 +36,7 @@ bool have_elf_section(Elf *, int64_t, const char *);
 Elf_Scn * get_elf_section(Elf *, int64_t, const char *, Elf_Scn *, GElf_Shdr *);
 Elf_Scn * get_elf_extended_section(Elf *, Elf_Scn *, GElf_Shdr *);
 GElf_Phdr * get_elf_phdr(Elf *, Elf64_Word, GElf_Phdr *);
+char *get_elf_soname(const char *);
 
 bool have_dynamic_tag(Elf *, const Elf64_Sxword);
 bool get_dynamic_tags(Elf *, const Elf64_Sxword, GElf_Dyn **, size_t *, GElf_Shdr *);
