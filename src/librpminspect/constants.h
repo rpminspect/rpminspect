@@ -66,5 +66,17 @@
 #define RPM_FILENAME_EXTENSION ".rpm"
 #define JAR_FILENAME_EXTENSION ".jar"
 #define CLASS_FILENAME_EXTENSION ".class"
+#define EGGINFO_FILENAME_EXTENSION ".egg-info"
+
+/*
+ * Build ID
+ */
+#define BUILD_ID_DIR "/.build-id/"
+
+/*
+ * Debug packages
+ */
+#define DEBUGINFO_SUFFIX "-debuginfo"
+#define DEBUGSOURCE_SUFFIX "-debugsource"
 
 #endif

@@ -101,6 +101,12 @@ struct inspect inspections[] = {
       &inspect_changedfiles,
       "Report changed files from the before build to the after build.  Certain file changes will raise additional warnings if the concern is more critical than just reporting changes (e.g., a suspected security impact).  Any gzip, bzip2, or xz compressed files will have their uncompressed content compared only, which will allow changes through in the compression level used.  Message catalog files (.mo) are unpacked and compared using diff(1).  Public C and C++ header files are preprocessed and compared using diff(1).  Any changes with diff output are included in the results." },
 
+    { INSPECT_REMOVEDFILES,
+      "removedfiles",
+      false,
+      &inspect_removedfiles,
+      "Report removed files from the before build to the after build.  Shared libraries get additional reporting output as they may be unexpected dependency removals.  Files removed with a security path prefix generated special reporting in case a security review is required.  Source RPMs and debuginfo files are ignored by this inspection." },
+
     /*
      * { INSPECT_TYPE (add to inspect.h),
      *   "short name",
