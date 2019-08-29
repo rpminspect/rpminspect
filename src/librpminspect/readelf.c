@@ -229,7 +229,10 @@ bool get_dynamic_tags(Elf *elf, const Elf64_Sxword tag, GElf_Dyn **out, size_t *
 
                 found = true;
 
-                /* alloc one more GElf_Dyn worth of memory and add to the end of the array */
+                /*
+                 * alloc one more GElf_Dyn worth of memory and
+                 * add to the end of the array
+                 */
                 dyn_tmp = realloc(*out, ((*out_size) + 1) * (sizeof(GElf_Dyn)));
                 assert(dyn_tmp != NULL);
                 memcpy(dyn_tmp + *out_size, &dyn, sizeof(GElf_Dyn));
@@ -289,6 +292,39 @@ GElf_Phdr * get_elf_phdr(Elf *elf, Elf64_Word type, GElf_Phdr *out)
     }
 
     return NULL;
+}
+
+/*
+ * Returns the SONAME of the given file or NULL if unable.
+ */
+char *get_elf_soname(const char *filepath) {
+    char *soname = NULL;
+    Elf *e = NULL;
+    int fd = 0;
+    GElf_Dyn *tags = NULL;
+    GElf_Shdr shdr;
+    size_t sz = 0;
+    bool found = false;
+
+    assert(filepath != NULL);
+
+    if ((e = get_elf(filepath, &fd)) == NULL) {
+        return NULL;
+    }
+
+    found = get_dynamic_tags(e, DT_SONAME, &tags, &sz, &shdr);
+
+    /*
+     * Expect exactly one SONAME, if we have more than that then the
+     * ELF format changed and the world is strange and confusing.
+     */
+    if (found && sz == 1) {
+        soname = strdup(elf_strptr(e, shdr.sh_link, (size_t) tags[0].d_un.d_ptr));
+    }
+
+    elf_end(e);
+    close(fd);
+    return soname;
 }
 
 static string_list_t * get_elf_symbol_list(Elf *elf, bool (*filter)(const char *),
