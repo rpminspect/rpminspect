@@ -18,6 +18,8 @@ librpminspect_la_SOURCES = badwords.c \
                            init.c \
                            inspect.c \
                            inspect_changedfiles.c \
+                           inspect_desktop.c \
+                           inspect_disttag.c \
                            inspect_elf.c \
                            inspect_emptyrpm.c \
                            inspect_javabytecode.c \
@@ -25,11 +27,10 @@ librpminspect_la_SOURCES = badwords.c \
                            inspect_license.c \
                            inspect_manpage.c \
                            inspect_metadata.c \
-                           inspect_xml.c \
-                           inspect_desktop.c \
-                           inspect_disttag.c \
-                           inspect_specname.c \
                            inspect_modularity.c \
+                           inspect_removedfiles.c \
+                           inspect_specname.c \
+                           inspect_xml.c \
                            koji.c \
                            listfuncs.c \
                            local.c \
