@@ -90,8 +90,22 @@ following libraries (make sure the header files are available):
           https://www.openssl.org/
           http://www.libressl.org/
 
+Additionally, the follow packages are required for running the unit tests:
+
+    * CUnit (including headers)
+          http://cunit.sourceforge.net/
+
 Most distributions include the above projects in prebuilt and packaged
 form.  If those are available, you should use those packages.
+
+In Fedora for example, you can run the following to install the required
+packages:
+
+    dnf install json-c-devel xmlrpc-c-devel libxml2-devel rpm-devel \
+                libarchive-devel elfutils-devel kmod-devel zlib-devel \
+                libmandoc-devel iniparser-devel libyaml-devel file-devel \
+                openssl-devel make automake autoconf libtool CUnit \
+                CUnit-devel gcc
 
 
 Runtime Requirements
@@ -111,7 +125,12 @@ are a number of userspace programs required:
 
 The provided spec file template uses the Fedora locations for these files,
 but in the program they are assumed to be in PATH at runtime.  These tools
-are used by different inspections at runtime.
+are used by different inspections at runtime. Most distributions include the
+above tools. If they are available, you should use those packages.
+
+In Fedora for example, you can run the following to install these programs:
+
+    dnf install desktop-file-utils gzip bzip2 xz elfutils gettext cpp diffutils
 
 
 Building
