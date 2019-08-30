@@ -46,6 +46,7 @@ bool inspect_manpage_alloc(void)
 {
     int reg_result;
     char reg_error[BUFSIZ];
+    char *tmp = NULL;
 
     mchars_alloc();
 
@@ -53,7 +54,9 @@ bool inspect_manpage_alloc(void)
      * For the directory section, look for /man<section>
      * For the filename section, look for <name>.<section>.gz
      */
-    reg_result = regcomp(&sections_regex, "/man\\([^/]\\+\\)/[^/]\\+\\.\\([^.]\\+\\)\\.gz$", 0);
+    xasprintf(&tmp, "/man\\([^/]\\+\\)/[^/]\\+\\.\\([^.]\\+\\)\\%s$", GZIPPED_FILENAME_EXTENSION);
+    reg_result = regcomp(&sections_regex, tmp, 0);
+    free(tmp);
     if (reg_result != 0) {
         regerror(reg_result, &sections_regex, reg_error, sizeof(reg_error));
         fprintf(stderr, "Unable to compile man page path regular expression: %s\n", reg_error);
@@ -167,8 +170,8 @@ char * inspect_manpage_validity(const char *path, const char *localpath)
     /* Ensure the file is compressed. The file *should* end in .gz, and if it
      * does make sure that it's actually gzipped.
      */
-    if (!strsuffix(path, ".gz")) {
-        fprintf(error_stream, "Man page %s does not end in .gz\n", path);
+    if (!strsuffix(path, GZIPPED_FILENAME_EXTENSION)) {
+        fprintf(error_stream, "Man page %s does not end in %s\n", path, GZIPPED_FILENAME_EXTENSION);
     } else {
         if (read(fd, magic, sizeof(magic)) != sizeof(magic)) {
             fprintf(error_stream, "Unable to read man page %s\n", path);
@@ -176,7 +179,7 @@ char * inspect_manpage_validity(const char *path, const char *localpath)
         }
 
         if (magic[0] != '\x1F' || magic[1] != '\x8B') {
-            fprintf(error_stream, "man page with .gz suffix is not really compressed with gzip\n");
+            fprintf(error_stream, "man page with %s suffix is not really compressed with gzip\n", GZIPPED_FILENAME_EXTENSION);
         }
 
         /* Reset the fd and continue */
