@@ -45,5 +45,7 @@ test-koji
 test-strfuncs
 test-suite.log
 test-tty
+tests/*.log
+tests/*.trs
 tests/librpminspect/execstack
 tests/librpminspect/noexecstack
