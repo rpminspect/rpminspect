@@ -366,20 +366,22 @@ static int download_artifacts(const struct rpminspect *ri, struct koji_build *bu
 
                     switch (token.type) {
                         case YAML_SCALAR_TOKEN:
-                            if ((in_filter == 0) && !strcmp(token.data.scalar.value, "filter")) {
+                            if ((in_filter == 0) && !strcmp((char *) token.data.scalar.value, "filter")) {
                                 in_filter++;
-                            } else if ((in_filter == 1) && !strcmp(token.data.scalar.value, "rpms")) {
+                            } else if ((in_filter == 1) && !strcmp((char *) token.data.scalar.value, "rpms")) {
                                 in_filter++;
                             } else if (in_filter == 2) {
                                 filtered_rpm = calloc(1, sizeof(*filtered_rpm));
                                 assert(filtered_rpm != NULL);
-                                filtered_rpm->data = strdup(token.data.scalar.value);
+                                filtered_rpm->data = strdup((char *) token.data.scalar.value);
                                 TAILQ_INSERT_TAIL(filter, filtered_rpm, items);
                             }
 
                             break;
                         case YAML_BLOCK_END_TOKEN:
                             in_filter = 0;
+                            break;
+                        default:
                             break;
                     }
 
