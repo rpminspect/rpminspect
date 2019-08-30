@@ -110,6 +110,7 @@ static bool changedfiles_driver(struct rpminspect *ri, rpmfile_entry_t *file)
     char *after_sum = NULL;
     char *msg = NULL;
     char *errors = NULL;
+    bool possible_header = false;
     string_entry_t *entry = NULL;
     severity_t severity = RESULT_VERIFY;
     waiverauth_t waiver = WAIVABLE_BY_ANYONE;
@@ -271,10 +272,16 @@ static bool changedfiles_driver(struct rpminspect *ri, rpmfile_entry_t *file)
      * be a configuration file change.  But more importantly, this check
      * excludes any header files that lack a file ending like this.
      */
-    if (!strcmp(type, "text/x-c") &&
-        (strsuffix(file->localpath, ".h") || strsuffix(file->localpath, ".H") ||
-         strsuffix(file->localpath, ".hpp") || strsuffix(file->localpath, ".hxx"))) {
+    if (ri->header_file_extensions) {
+        TAILQ_FOREACH(entry, ri->header_file_extensions, items) {
+            if (strsuffix(file->localpath, entry->data)) {
+                possible_header = true;
+                break;
+            }
+        }
+    }
 
+    if (!strcmp(type, "text/x-c") && possible_header) {
         /* First, preprocess the header files to strip comments */
         if (run_and_capture(ri->workdir, &after_tmp, CPP_CMD, file->fullpath, &errors)) {
             xasprintf(&msg, "Error running cpp on %s on %s", file->localpath, arch);

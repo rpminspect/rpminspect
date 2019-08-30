@@ -196,6 +196,13 @@ int init_rpminspect(struct rpminspect *ri, const char *cfgfile) {
         parse_list(tmp, &ri->security_path_prefix);
     }
 
+    tmp = iniparser_getstring(cfg, "tests:header_file_extensions", NULL);
+    if (tmp == NULL) {
+        ri->header_file_extensions = NULL;
+    } else {
+        parse_list(tmp, &ri->header_file_extensions);
+    }
+
     /* If any of the regular expressions fail to compile, stop and return failure */
     if (add_regex(cfg, "tests:elf_path_include", &ri->elf_path_include) != 0) {
         return -1;
