@@ -81,9 +81,18 @@ static char *get_product_release(const char *before, const char *after) {
 
     assert(after != NULL);
 
-    pos = rindex(after, '.') + 1;
-    after_product = strdup(pos);
+    pos = rindex(after, '.');
+    if (!pos) {
+        fprintf(stderr, "*** Product release for after build (%s) is empty\n", after);
+        return NULL;
+    }
 
+    /*
+     * Get the character after the last occurrence of a period. This should
+     * tell us what release flag the product is.
+     */
+    pos += 1;
+    after_product = strdup(pos);
     if (!after_product) {
         fprintf(stderr, "*** Product release for after build (%s) is empty\n", after);
         return NULL;
