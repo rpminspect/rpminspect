@@ -70,7 +70,6 @@ void test_strwaiverauth(void) {
     RI_ASSERT_EQUAL(strcmp(strwaiverauth(NOT_WAIVABLE), "Not Waivable"), 0);
     RI_ASSERT_EQUAL(strcmp(strwaiverauth(WAIVABLE_BY_ANYONE), "Anyone"), 0);
     RI_ASSERT_EQUAL(strcmp(strwaiverauth(WAIVABLE_BY_SECURITY), "Security"), 0);
-    RI_ASSERT_EQUAL(strcmp(strwaiverauth(WAIVABLE_BY_RELENG), "Release Engineering"), 0);
     RI_ASSERT_EQUAL(strcmp(strwaiverauth(-1), "UnKnOwN"), 0);
 }
 
