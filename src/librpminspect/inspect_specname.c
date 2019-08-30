@@ -40,18 +40,18 @@ static bool specname_driver(struct rpminspect *ri, rpmfile_entry_t *file) {
 
     /* Spec files are all named in a standard way */
     pkgname = headerGetAsString(file->rpm_header, RPMTAG_NAME);
-    xasprintf(&specfile, "%s.spec", pkgname);
+    xasprintf(&specfile, "%s%s", pkgname, SPEC_FILENAME_EXTENSION);
 
     /* We only want to look at the spec files */
     if (!strcmp(file->localpath, specfile)) {
         result = true;
         specgood = true;
-    } else if (strsuffix(file->localpath, ".spec")) {
+    } else if (strsuffix(file->localpath, SPEC_FILENAME_EXTENSION)) {
         /*
          * Emit a failure if we're looking at what we think is a spec file
          * but it's not named in the expected way.
          */
-        xasprintf(&msg, "Spec filename does not match the pattern of NAME.spec; expected '%s', got '%s'", specfile, file->localpath);
+        xasprintf(&msg, "Spec filename does not match the pattern of NAME%s; expected '%s', got '%s'", SPEC_FILENAME_EXTENSION, specfile, file->localpath);
         add_result(&ri->results, RESULT_VERIFY, WAIVABLE_BY_ANYONE, HEADER_SPECNAME, msg, NULL, REMEDY_SPECNAME);
         free(msg);
     }

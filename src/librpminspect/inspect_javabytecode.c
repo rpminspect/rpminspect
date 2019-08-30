@@ -56,7 +56,7 @@ static short get_jvm_major(const char *filename, const char *localpath,
     assert(container != NULL);
 
     /* Go ahead and assume Java class filenames end with .class */
-    if (strsuffix(filename, ".class")) {
+    if (strsuffix(filename, CLASS_FILENAME_EXTENSION)) {
         /* read the first 5 bytes and verify it's a Java class */
         fd = open(filename, O_RDONLY | O_CLOEXEC | O_LARGEFILE);
 
@@ -110,7 +110,7 @@ static bool check_class_file(struct rpminspect *ri, const char *fullpath,
     major = get_jvm_major(fullpath, localpath, container);
 
     /* basic checks on the most recent build */
-    if (major == -1 && !strsuffix(localpath, ".class")) {
+    if (major == -1 && !strsuffix(localpath, CLASS_FILENAME_EXTENSION)) {
         return true;
     } else if (major < 0 || major > 60) {
         xasprintf(&msg, "File %s (%s), Java byte code version %d is incorrect (wrong endianness? corrupted file? space JDK?)", localpath, fullpath, major);
@@ -169,7 +169,7 @@ static bool javabytecode_driver(struct rpminspect *ri, rpmfile_entry_t *file,
     char *tmppath = NULL;
     int jarstatus = 0;
 
-    if (strsuffix(file->fullpath, ".jar")) {
+    if (strsuffix(file->fullpath, JAR_FILENAME_EXTENSION)) {
         /* if we have a possible jar file, try to unpack and walk it */
 
         /* create a temporary directory to unpack this file */

@@ -215,7 +215,8 @@ static bool changedfiles_driver(struct rpminspect *ri, rpmfile_entry_t *file)
     /*
      * Compare gettext .mo files and report any changes.
      */
-    if (!strcmp(type, "application/x-gettext-translation") && strsuffix(file->localpath, ".mo")) {
+    if (!strcmp(type, "application/x-gettext-translation") &&
+        strsuffix(file->localpath, MO_FILENAME_EXTENSION)) {
         /*
          * This one is somewhat complicated.  We run msgunfmt on the mo files,
          * but first we have to make temporary files for that output.  Then

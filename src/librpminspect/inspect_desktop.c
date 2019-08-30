@@ -71,7 +71,8 @@ static bool is_desktop_entry_file(const char *desktop_entry_files_dir, const rpm
         return false;
     }
 
-    if (!strsuffix(file->localpath, ".desktop") && !strsuffix(file->localpath, ".directory")) {
+    if (!strsuffix(file->localpath, DESKTOP_FILENAME_EXTENSION) &&
+        !strsuffix(file->localpath, DIRECTORY_FILENAME_EXTENSION)) {
         return false;
     }
 

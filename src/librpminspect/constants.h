@@ -64,9 +64,14 @@
  * File extensions
  */
 #define RPM_FILENAME_EXTENSION ".rpm"
+#define SPEC_FILENAME_EXTENSION ".spec"
 #define JAR_FILENAME_EXTENSION ".jar"
 #define CLASS_FILENAME_EXTENSION ".class"
 #define EGGINFO_FILENAME_EXTENSION ".egg-info"
+#define GZIPPED_FILENAME_EXTENSION ".gz"
+#define DESKTOP_FILENAME_EXTENSION ".desktop"
+#define DIRECTORY_FILENAME_EXTENSION ".directory"
+#define MO_FILENAME_EXTENSION ".mo"
 
 /*
  * Build ID
