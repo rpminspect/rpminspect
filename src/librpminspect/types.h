@@ -162,6 +162,13 @@ struct rpminspect {
      */
     string_list_t *security_path_prefix;
 
+    /*
+     * Optional: if not NULL, contains a list of filename extensions
+     * for C and C++ header files.
+     */
+    string_list_t *header_file_extensions;
+
+
     /* Optional: if not NULL, contains list of architectures */
     string_list_t *arches;
 
