@@ -148,7 +148,7 @@ static bool changedfiles_driver(struct rpminspect *ri, rpmfile_entry_t *file)
                 entry->data++;
             }
 
-            if (strprefix(entry->data, file->localpath)) {
+            if (strprefix(file->localpath, entry->data)) {
                 severity = RESULT_BAD;
                 waiver = WAIVABLE_BY_SECURITY;
                 break;
