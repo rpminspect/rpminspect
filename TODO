@@ -28,13 +28,6 @@ inspection should honor an optional kmi whitelist in the same context as the
 Analyze build logs from koji for common known failure strings.  Report these
 out as either INFO or VERIFY or BAD.
 
-* changed
-
-Look for content changes in files between the before and after packages.  This
-should be divided up by categories and reported accordingly:
-
-    XXX
-
 * config (in %files)
 
 
@@ -69,26 +62,6 @@ Things appearing in the after package should be reported as RESULT_BAD and
 require a security team waiver.  Things lost are the same way.  It might be a
 better idea for each of these sub inspections to be their own inspection so
 they can be individually enabled and disabled at runtime.
-
-* filelist
-
-Look for any files added to or removed from packages.  Iterate over the %files
-section of each subpackage.  Also perform some checks to ensure files we never
-want in packages are not there (this should be a configuration file setting).
-For example, the following wildcards should never appear in packages:
-
-    CVS
-    .svn
-    .git
-    var/tmp/*
-    __MACOSX
-    tmp/*
-    *.orig
-    *~
-
-Removal of certain files requires a security team waiver.  For example, sudoers
-files or PolicyKit files.  The list requiring a security team waiver should be
-controlled by a configuration file setting.
 
 * setxid
 
