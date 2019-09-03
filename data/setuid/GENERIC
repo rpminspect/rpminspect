@@ -1,7 +1,0 @@
-#
-# setuid verification list.  All files installed with setuid or setgid permissions must be listed here with the expected permissions (st_mode), expected owner, and expected group.  Blank lines and lines beginning with '#' are ignored.
-#
-# Example (commented out):
-#-rwsr-xr-x    root    root     /usr/bin/mount
-#
-#<symbolic mode>    <owner>    <group>    <file path>
