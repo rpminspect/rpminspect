@@ -1,1 +1,1 @@
-SUBDIRS = abi-checking-whitelist capabilities licenses political-whitelist setuid version-whitelist
+SUBDIRS = abi-checking-whitelist capabilities licenses political-whitelist st_mode version-whitelist
