@@ -46,6 +46,11 @@
 #define LICENSE_DB_FILE "/usr/share/rpminspect/licenses/generic.json"
 
 /*
+ * Standard location for stat-whitelist files per product release.
+ */
+#define STAT_WHITELIST_DIR "/usr/share/rpminspect/stat-whitelist"
+
+/*
  * Standard location for desktop entry files.
  */
 #define DESKTOP_ENTRY_FILES_DIR "/usr/share/applications"

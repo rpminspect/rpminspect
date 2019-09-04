@@ -71,7 +71,6 @@ static void parse_list(const char *tmp, string_list_t **list)
     string_entry_t *entry = NULL;
 
     assert(tmp != NULL);
-    assert(list != NULL);
 
     /* make a copy of the string for splitting */
     start = walk = strdup(tmp);
@@ -82,6 +81,10 @@ static void parse_list(const char *tmp, string_list_t **list)
     TAILQ_INIT(*list);
 
     while ((token = strsep(&walk, " \t")) != NULL) {
+        if (*token == '\0') {
+            continue;
+        }
+
         entry = calloc(1, sizeof(*entry));
         assert(entry != NULL);
 
@@ -140,13 +143,6 @@ int init_rpminspect(struct rpminspect *ri, const char *cfgfile) {
         ri->workdir = strdup(tmp);
     }
 
-    tmp = iniparser_getstring(cfg, "common:licensedb", NULL);
-    if (tmp == NULL) {
-        ri->licensedb = strdup(LICENSE_DB_FILE);
-    } else {
-        ri->licensedb = strdup(tmp);
-    }
-
     tmp = iniparser_getstring(cfg, "koji:hub", NULL);
     if (tmp == NULL) {
         ri->kojihub = NULL;
@@ -166,6 +162,20 @@ int init_rpminspect(struct rpminspect *ri, const char *cfgfile) {
         ri->kojimbs = NULL;
     } else {
         ri->kojimbs = strdup(tmp);
+    }
+
+    tmp = iniparser_getstring(cfg, "vendor-data:licensedb", NULL);
+    if (tmp == NULL) {
+        ri->licensedb = strdup(LICENSE_DB_FILE);
+    } else {
+        ri->licensedb = strdup(tmp);
+    }
+
+    tmp = iniparser_getstring(cfg, "vendor-data:stat_whitelist_dir", NULL);
+    if (tmp == NULL) {
+        ri->stat_whitelist_dir = strdup(STAT_WHITELIST_DIR);
+    } else {
+        ri->stat_whitelist_dir = strdup(tmp);
     }
 
     tmp = iniparser_getstring(cfg, "tests:badwords", NULL);

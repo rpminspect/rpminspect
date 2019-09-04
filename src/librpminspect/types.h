@@ -139,8 +139,9 @@ struct rpminspect {
     char *workdir;             /* full path to working directory */
     char *worksubdir;          /* within workdir, where these builds go */
 
-    /* Runtime data used by tests */
+    /* Vendor data */
     char *licensedb;           /* full path to the license database */
+    char *stat_whitelist_dir;  /* directory with stat-whitelist files */
 
     /* Koji information (from config file) */
     char *kojihub;             /* URL of Koji hub */
