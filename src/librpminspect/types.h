@@ -192,6 +192,12 @@ struct rpminspect {
      */
     string_list_t *header_file_extensions;
 
+    /*
+     * Optional: Lists of path substrings and directories to forbid.
+     */
+    string_list_t *forbidden_path_prefixes;
+    string_list_t *forbidden_path_suffixes;
+    string_list_t *forbidden_directories;
 
     /* Optional: if not NULL, contains list of architectures */
     string_list_t *arches;

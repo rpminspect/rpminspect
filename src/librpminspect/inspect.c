@@ -107,6 +107,12 @@ struct inspect inspections[] = {
       &inspect_removedfiles,
       "Report removed files from the before build to the after build.  Shared libraries get additional reporting output as they may be unexpected dependency removals.  Files removed with a security path prefix generated special reporting in case a security review is required.  Source RPMs and debuginfo files are ignored by this inspection." },
 
+    { INSPECT_ADDEDFILES,
+      "addedfiles",
+      false,
+      &inspect_addedfiles,
+      "Report added files from the before build to the after build.  Debuginfo files are ignored as are files that match the patterns defined in the configuration file.  Files added to security paths generate special reporting in case a security review is required.  New setuid and setgid files raise a security warning unless the file is in the whitelist." },
+
     /*
      * { INSPECT_TYPE (add to inspect.h),
      *   "short name",

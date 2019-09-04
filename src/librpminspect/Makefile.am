@@ -17,6 +17,7 @@ librpminspect_la_SOURCES = badwords.c \
                            free.c \
                            init.c \
                            inspect.c \
+                           inspect_addedfiles.c \
                            inspect_changedfiles.c \
                            inspect_desktop.c \
                            inspect_disttag.c \

@@ -436,6 +436,27 @@ int init_rpminspect(struct rpminspect *ri, const char *cfgfile) {
         parse_list(tmp, &ri->header_file_extensions);
     }
 
+    tmp = iniparser_getstring(cfg, "tests:forbidden_path_prefixes", NULL);
+    if (tmp == NULL) {
+        ri->forbidden_path_prefixes = NULL;
+    } else {
+        parse_list(tmp, &ri->forbidden_path_prefixes);
+    }
+
+    tmp = iniparser_getstring(cfg, "tests:forbidden_path_suffixes", NULL);
+    if (tmp == NULL) {
+        ri->forbidden_path_suffixes = NULL;
+    } else {
+        parse_list(tmp, &ri->forbidden_path_suffixes);
+    }
+
+    tmp = iniparser_getstring(cfg, "tests:forbidden_directories", NULL);
+    if (tmp == NULL) {
+        ri->forbidden_directories = NULL;
+    } else {
+        parse_list(tmp, &ri->forbidden_directories);
+    }
+
     /* If any of the regular expressions fail to compile, stop and return failure */
     if (add_regex(cfg, "tests:elf_path_include", &ri->elf_path_include) != 0) {
         return -1;
