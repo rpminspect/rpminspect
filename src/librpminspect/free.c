@@ -72,6 +72,9 @@ void free_rpminspect(struct rpminspect *ri) {
     list_free(ri->buildhost_subdomain, free);
     list_free(ri->security_path_prefix, free);
     list_free(ri->header_file_extensions, free);
+    list_free(ri->forbidden_path_prefixes, free);
+    list_free(ri->forbidden_path_suffixes, free);
+    list_free(ri->forbidden_directories, free);
     free(ri->before);
     free(ri->after);
     free(ri->product_release);

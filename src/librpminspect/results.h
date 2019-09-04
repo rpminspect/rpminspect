@@ -39,6 +39,7 @@
 #define HEADER_JAVABYTECODE  "java-bytecode"
 #define HEADER_CHANGEDFILES  "changed-files"
 #define HEADER_REMOVEDFILES  "removed-files"
+#define HEADER_ADDEDFILES    "added-files"
 
 /*
  * Inspection remedies
@@ -91,5 +92,8 @@
 
 /* removedfiles */
 #define REMEDY_REMOVEDFILES "Unexpected file removals were found.  Verify these changes are correct.  If they are not, adjust the build to prevent the file removals."
+
+/* addedfiles */
+#define REMEDY_ADDEDFILES "Unexpected file additions were found.  Verify these changes are correct.  If they are not, adjust the build to prevent the file additions."
 
 #endif

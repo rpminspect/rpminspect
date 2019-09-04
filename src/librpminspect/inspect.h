@@ -119,6 +119,9 @@ bool inspect_changedfiles(struct rpminspect *);
 /* inspect_removedfiles.c */
 bool inspect_removedfiles(struct rpminspect *);
 
+/* inspect_addedfiles.c */
+bool inspect_addedfiles(struct rpminspect *);
+
 /*
  * Inspections are referenced by flag.  These flags are set in bitfields
  * to indicate which ones we want to run.  When adding new ones, please
@@ -140,5 +143,6 @@ bool inspect_removedfiles(struct rpminspect *);
 #define INSPECT_JAVABYTECODE                (((uint64_t) 1) << 11)
 #define INSPECT_CHANGEDFILES                (((uint64_t) 1) << 12)
 #define INSPECT_REMOVEDFILES                (((uint64_t) 1) << 13)
+#define INSPECT_ADDEDFILES                  (((uint64_t) 1) << 14)
 
 #endif
