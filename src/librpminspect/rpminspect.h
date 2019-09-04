@@ -75,6 +75,7 @@ enum checksum { NULLSUM, MD5SUM, SHA1SUM, SHA256SUM };
 /* Common functions */
 
 /* init.c */
+bool init_stat_whitelist(struct rpminspect *);
 int init_rpminspect(struct rpminspect *, const char *);
 
 /* free.c */
