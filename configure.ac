@@ -127,7 +127,7 @@ AC_SUBST([YAML_LIBS])
 
 AC_CONFIG_FILES([Makefile
                  data/Makefile
-                 data/st_mode/Makefile
+                 data/stat-whitelist/Makefile
                  data/capabilities/Makefile
                  data/political-whitelist/Makefile
                  data/licenses/Makefile
