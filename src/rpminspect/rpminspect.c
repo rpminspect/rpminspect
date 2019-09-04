@@ -397,9 +397,22 @@ int main(int argc, char **argv) {
         }
     }
 
-    /* Find an appropriate configuration file */
-    if ((cfgfile == NULL) || (access(CFGFILE, F_OK|R_OK) == -1)) {
+    /*
+     * Find an appropriate configuration file. This involves:
+     *
+     *  - Using the user-passed value and sanity-checking it,
+     *  - Using the global default if it exists, or
+     *  - Telling the user they need to install a required dependency.
+     */
+    if (cfgfile != NULL && access(cfgfile, F_OK|R_OK) == -1) {
+        fprintf(stderr, "Specified config file (%s) is unreadable.\n", cfgfile);
+        exit(EXIT_FAILURE);
+    } else if (cfgfile == NULL && access(CFGFILE, F_OK|R_OK) == 0) {
         cfgfile = strdup(CFGFILE);
+    } else if (cfgfile == NULL) {
+        fprintf(stderr, "Unable to read the default config file (%s).\n", CFGFILE);
+        fprintf(stderr, "Have you installed an rpminspect-data package for your distro?\n");
+        exit(EXIT_FAILURE);
     }
 
     /* Initialize librpminspect */
