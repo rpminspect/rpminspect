@@ -100,6 +100,227 @@ static void parse_list(const char *tmp, string_list_t **list)
 }
 
 /*
+ * Convert a 10 character mode string for a file to a mode_t
+ * For example, convert "-rwsr-xr-x" to a mode_t
+ */
+static mode_t parse_mode(const char *input) {
+    mode_t mode = 0;
+    char i;
+
+    assert(input != NULL);
+
+    if (strlen(input) != 10) {
+        fprintf(stderr, "*** Invalid input string `%s`\n", input);
+        return mode;
+    }
+
+        /* type */
+    i = input[0];
+    if (i == 'd') {
+        mode |= S_IFDIR;
+    } else if (i == 'c') {
+        mode |= S_IFCHR;
+    } else if (i == 'b') {
+        mode |= S_IFBLK;
+    } else if (i == '-') {
+        mode |= S_IFREG;
+    } else if (i == 'l') {
+        mode |= S_IFLNK;
+    } else if (i == 's') {
+        mode |= S_IFSOCK;
+#ifdef S_IFIFO
+    } else if (i == 'p') {
+        mode |= S_IFIFO;
+#endif
+#ifdef S_IFWHT
+    } else if (i == 'w') {
+        mode |= S_IFWHT;
+#endif
+    } else if (i != '-') {
+        fprintf(stderr, "*** Invalid mode string: %s\n", input);
+        return mode;
+    }
+
+    /* owner */
+    i = input[1];
+    if (i == 'r') {
+        mode |= S_IRUSR;
+    } else if (i != '-') {
+        fprintf(stderr, "*** Invalid mode string: %s\n", input);
+        return mode;
+    }
+
+    i = input[2];
+    if (i == 'w') {
+        mode |= S_IWUSR;
+    } else if (i != '-') {
+        fprintf(stderr, "*** Invalid mode string: %s\n", input);
+        return mode;
+    }
+
+    i = input[3];
+    if (i == 'x') {
+        mode |= S_IXUSR;
+    } else if (i == 'S') {
+        mode |= S_ISUID;
+    } else if (i == 's') {
+        mode |= S_IXUSR | S_ISUID;
+    } else if (i != '-') {
+        fprintf(stderr, "*** Invalid mode string: %s\n", input);
+        return mode;
+    }
+
+    /* group */
+    i = input[4];
+    if (i == 'r') {
+        mode |= S_IRGRP;
+    } else if (i != '-') {
+        fprintf(stderr, "*** Invalid mode string: %s\n", input);
+        return mode;
+    }
+
+    i = input[5];
+    if (i == 'w') {
+        mode |= S_IWGRP;
+    } else if (i != '-') {
+        fprintf(stderr, "*** Invalid mode string: %s\n", input);
+        return mode;
+    }
+
+    i = input[6];
+    if (i == 'x') {
+        mode |= S_IXGRP;
+    } else if (i == 'S') {
+        mode |= S_ISGID;
+    } else if (i == 's') {
+        mode |= S_IXGRP | S_ISGID;
+    } else if (i != '-') {
+        fprintf(stderr, "*** Invalid mode string: %s\n", input);
+        return mode;
+    }
+
+    /* other */
+    i = input[7];
+    if (i == 'r') {
+        mode |= S_IROTH;
+    } else if (i != '-') {
+        fprintf(stderr, "*** Invalid mode string: %s\n", input);
+        return mode;
+    }
+
+    i = input[8];
+    if (i == 'w') {
+        mode |= S_IWOTH;
+    } else if (i != '-') {
+        fprintf(stderr, "*** Invalid mode string: %s\n", input);
+        return mode;
+    }
+
+    i = input[9];
+    if (i == 'x') {
+        mode |= S_IXOTH;
+    } else if (i == 'T') {
+        mode |= S_ISVTX;
+    } else if (i == 't') {
+        mode |= S_IXOTH | S_ISVTX;
+    } else if (i != '-') {
+        fprintf(stderr, "*** Invalid mode string: %s\n", input);
+        return mode;
+    }
+
+    return mode;
+}
+
+/*
+ * Initialize the stat-whitelist for the given product release.  If
+ * the file cannot be found, return false.
+ */
+bool init_stat_whitelist(struct rpminspect *ri) {
+    char *filename = NULL;
+    FILE *input = NULL;
+    char *line = NULL;
+    size_t len = 0;
+    ssize_t nread = 0;
+    char *token = NULL;
+    bool first = true;
+    stat_whitelist_field_t field = MODE;
+    stat_whitelist_entry_t *entry = NULL;
+
+    assert(ri != NULL);
+    assert(ri->stat_whitelist_dir != NULL);
+    assert(ri->product_release != NULL);
+
+    /* already initialized */
+    if (ri->stat_whitelist) {
+        return true;
+    }
+
+    /* the actual stat-whitelist file */
+    xasprintf(&filename, "%s/%s", ri->stat_whitelist_dir, ri->product_release);
+    assert(filename != NULL);
+
+    input = fopen(filename, "r");
+    free(filename);
+
+    if (input == NULL) {
+        return false;
+    }
+
+    /* initialize the list */
+    ri->stat_whitelist = calloc(1, sizeof(*(ri->stat_whitelist)));
+    assert(ri->stat_whitelist != NULL);
+    TAILQ_INIT(ri->stat_whitelist);
+
+    /* add all the entries to the stat-whitelist */
+    while ((nread = getline(&line, &len, input)) != -1) {
+        /* skip blank lines and comments */
+        if (*line == '#' || *line == '\n' || *line == '\r') {
+            free(line);
+            line = NULL;
+            continue;
+        }
+
+        /* trim line ending characters */
+        line[strcspn(line, "\r\n")] = '\0';
+
+        /* initialize a new list entry */
+        entry = calloc(1, sizeof(*entry));
+        assert(entry != NULL);
+
+        /* read the fields */
+        while ((token = strsep(&line, " \t")) != NULL) {
+            /* might be lots of space between fields */
+            if (*token == '\0') {
+                continue;
+            }
+
+            /* copy the field in to the correct struct member */
+            if (field == MODE) {
+                entry->mode = parse_mode(token);
+            } else if (field == OWNER) {
+                entry->owner = strdup(token);
+            } else if (field == GROUP) {
+                entry->group = strdup(token);
+            } else if (field = FILENAME) {
+                entry->filename = strdup(token);
+                break;     /* nothing should come after this field */
+            }
+
+            field++;
+        }
+
+        /* add the entry */
+        TAILQ_INSERT_TAIL(ri->stat_whitelist, entry, items);
+
+        /* clean up */
+        free(line);
+        line = NULL;
+    }
+
+    return true;
+}
+
+/*
  * Initialize a struct rpminspect.  Called by applications using
  * librpminspect before they began calling library functions.
  * Return 0 on success, -1 on failure.
@@ -177,6 +398,8 @@ int init_rpminspect(struct rpminspect *ri, const char *cfgfile) {
     } else {
         ri->stat_whitelist_dir = strdup(tmp);
     }
+
+    ri->stat_whitelist = NULL;
 
     tmp = iniparser_getstring(cfg, "tests:badwords", NULL);
     if (tmp == NULL) {
