@@ -242,7 +242,6 @@ bool init_stat_whitelist(struct rpminspect *ri) {
     size_t len = 0;
     ssize_t nread = 0;
     char *token = NULL;
-    bool first = true;
     stat_whitelist_field_t field = MODE;
     stat_whitelist_entry_t *entry = NULL;
 
@@ -301,7 +300,7 @@ bool init_stat_whitelist(struct rpminspect *ri) {
                 entry->owner = strdup(token);
             } else if (field == GROUP) {
                 entry->group = strdup(token);
-            } else if (field = FILENAME) {
+            } else if (field == FILENAME) {
                 entry->filename = strdup(token);
                 break;     /* nothing should come after this field */
             }
