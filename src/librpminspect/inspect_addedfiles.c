@@ -30,29 +30,6 @@
 #include "rpminspect.h"
 
 /*
- * Called by changedfiles_driver() to add additional information for
- * files marked as security concerns.
- */
-static void add_changedfiles_result(struct rpminspect *ri, const char *msg, char *errors,
-                                    const severity_t severity, const waiverauth_t waiver)
-{
-    char *tmp = NULL;
-
-    assert(ri != NULL);
-    assert(msg != NULL);
-
-    if (waiver == WAIVABLE_BY_SECURITY) {
-        xasprintf(&tmp, "%s.  Changes to security policy related files require inspection by the Security Response Team.", msg);
-    } else {
-        tmp = strdup(msg);
-    }
-
-    add_result(&ri->results, severity, waiver, HEADER_CHANGEDFILES, tmp, errors, REMEDY_CHANGEDFILES);
-    free(tmp);
-    return;
-}
-
-/*
  * Performs all of the tests associated with the addedfiles inspection.
  */
 static bool addedfiles_driver(struct rpminspect *ri, rpmfile_entry_t *file)
