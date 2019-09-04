@@ -1,1 +1,1 @@
-SUBDIRS = abi-checking-whitelist capabilities licenses political-whitelist st_mode version-whitelist
+SUBDIRS = abi-checking-whitelist capabilities licenses political-whitelist stat-whitelist version-whitelist
