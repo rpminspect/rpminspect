@@ -23,11 +23,6 @@ as the 'abi' test for ELF objects, but is strictly for kernel objects.  The
 inspection should honor an optional kmi whitelist in the same context as the
 "ABI whitelist" for the 'abi' test.
 
-* buildlogs
-
-Analyze build logs from koji for common known failure strings.  Report these
-out as either INFO or VERIFY or BAD.
-
 * config (in %files)
 
 
@@ -36,6 +31,9 @@ out as either INFO or VERIFY or BAD.
 
 * license (in %files)
 
+The license inspection right now validates the short form in the License header
+tag, but we should also make sure a license file is included in the %files
+section of one of the packages.
 
 * elflint
 
@@ -62,12 +60,6 @@ Things appearing in the after package should be reported as RESULT_BAD and
 require a security team waiver.  Things lost are the same way.  It might be a
 better idea for each of these sub inspections to be their own inspection so
 they can be individually enabled and disabled at runtime.
-
-* setxid
-
-Look for setuid and setgid files.  If any are added or lost, raise that as a
-problem that requires a security team waiver.  But first, check to see if any
-added are on the setxid whitelist.  If they are, just keep going.
 
 
 OTHER WORK
