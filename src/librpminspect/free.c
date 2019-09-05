@@ -40,6 +40,7 @@ static void free_regex(regex_t *regex)
  */
 void free_rpminspect(struct rpminspect *ri) {
     string_entry_t *entry = NULL;
+    stat_whitelist_entry_t *swlentry = NULL;
     ENTRY e;
     ENTRY *eptr;
 
@@ -56,6 +57,21 @@ void free_rpminspect(struct rpminspect *ri) {
 
     free(ri->licensedb);
     free(ri->stat_whitelist_dir);
+
+    if (ri->stat_whitelist) {
+        while (!TAILQ_EMPTY(ri->stat_whitelist)) {
+            swlentry = TAILQ_FIRST(ri->stat_whitelist);
+            TAILQ_REMOVE(ri->stat_whitelist, swlentry, items);
+
+            free(swlentry->owner);
+            free(swlentry->group);
+            free(swlentry->filename);
+
+            free(entry);
+        }
+
+        free(ri->stat_whitelist);
+    }
 
     list_free(ri->badwords, free);
 
