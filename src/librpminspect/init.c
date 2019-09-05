@@ -242,6 +242,7 @@ bool init_stat_whitelist(struct rpminspect *ri) {
     size_t len = 0;
     ssize_t nread = 0;
     char *token = NULL;
+    char *fnpart = NULL;
     stat_whitelist_field_t field = MODE;
     stat_whitelist_entry_t *entry = NULL;
 
@@ -301,7 +302,27 @@ bool init_stat_whitelist(struct rpminspect *ri) {
             } else if (field == GROUP) {
                 entry->group = strdup(token);
             } else if (field == FILENAME) {
-                entry->filename = strdup(token);
+                fnpart = token;
+
+                /* trim leading slashes since we compare to localpath later */
+                while (*token != '/' && *token != '\0') {
+                    token++;
+                }
+
+                if (*token == '\0') {
+                    /* this is an invalid entry in the stat-whitelist */
+                    fprintf(stderr, "*** Invalid filename in the stat-whitelist: %s\n", fnpart);
+                    fprintf(stderr, "*** From this invalid line:\n");
+                    fprintf(stderr, "***     %s\n", line);
+
+                    free(entry->owner);
+                    free(entry->group);
+                    free(entry);
+                    entry = NULL;
+                } else {
+                    entry->filename = strdup(token);
+                }
+
                 break;     /* nothing should come after this field */
             }
 
@@ -309,7 +330,9 @@ bool init_stat_whitelist(struct rpminspect *ri) {
         }
 
         /* add the entry */
-        TAILQ_INSERT_TAIL(ri->stat_whitelist, entry, items);
+        if (entry != NULL) {
+            TAILQ_INSERT_TAIL(ri->stat_whitelist, entry, items);
+        }
 
         /* clean up */
         free(line);
