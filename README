@@ -2,8 +2,8 @@
 rpminspect
 ==========
 
-RPM build deviation analysis tools.  rpminspect inspects the output of an
-RPM build (e.g., the output of a Koji build) and looks at the contents of
+RPM build deviation analysis tools.  rpminspect looks at the output of an
+RPM build (e.g., the output of a Koji build) and examines the contents of
 the build artifacts to report:
 
     * Policy compliance
@@ -20,9 +20,9 @@ tree provides a template for constructing the vendor specific data package.
 Build Types Support
 -------------------
 
-rpminspect expects its input to come from Koji.  That said, Koji produces
-certain types of builds that are not supported by rpminspect.  Right now,
-the following input types are supported:
+rpminspect expects its input to either be local RPM packages or a Koji
+build.  Koji produces certain types of builds that are not supported by
+rpminspect.  Right now, the following input types are supported:
 
     * Local RPM packages (source or binary)
     * Koji builds (i.e., an SRPM run with 'rpmbuild -ba' on all specified
@@ -30,6 +30,11 @@ the following input types are supported:
     * Modules (https://docs.fedoraproject.org/en-US/modularity/)
 
 More information on Koji can be found at https://pagure.io/koji
+
+If comparing local RPM packages, rpminspect assumes the before and after
+specifications are peers whereas for a Koji build, rpminspect will figure
+out peers (e.g., in the gcc package, gcc-gfortran in the before build is
+peered with gcc-gfortran in the after build).
 
 
 Intended Audience
@@ -42,6 +47,11 @@ From an individual user standpoint, rpminspect is intended to be a command
 line tool you can use as a linter of sorts.  rpminspect reports and that's
 it.  rpminspect can output information in JSON format which is intended to
 make it easier to integrate in to automated workflows or web frontends.
+
+The reporting uses certain classifications for different things found, but
+it up to the end user to determine what to do with that information.  If
+rpminspect is integrated in to a build tool, the JSON data may be more
+useful as you can construct decision making around those results.
 
 
 Build Requirements
@@ -193,25 +203,24 @@ delivers data files used by the various inspections performed by rpminspect.
 It also delivers the rpminspect.conf configuration file.  Have a look at
 this file and make sure it will work for your environment.  The idea is to
 easily support per-vendor data packages.  For example, if CentOS needs
-different settings, we should create an rpminspect-data-centos package and
-customize that.
+different settings, it should provide an rpminspect-data-centos package.
 
 Ideally the configuration file should not need changing.  If you do find
 mistakes, please file an issue or send a pull request to the project:
 
     https://github.com/rpminspect/rpminspect-data-fedora
 
-We should aim for the vendor-specific data packages providing everything a
+The aim should be the vendor-specific data packages providing everything a
 developer needs to successfully run rpminspect locally for that product.
 
 USAGE
 
-rpminspect is run from the command.  The inputs must be local RPM packages,
-a Koji build specification (NVR), a Koji module specification, or a locally
-cached Koji build output (regular build or module).  For inputs originating
-from Koji, rpminspect will talk to Koji and download the build artifacts.
-For repeated runs, you may want to cache a remote build locally to avoid
-downloading it with each run.
+rpminspect is run from the command line.  The inputs must be local RPM
+packages, a Koji build specification (NVR), a Koji module specification, or
+a locally cached Koji build output (regular build or module).  For inputs
+originating from Koji, rpminspect will talk to Koji and download the build
+artifacts.  For repeated runs, you may want to cache a remote build locally
+to avoid downloading it with each run.
 
 Here is a simple invocation using tmux as an example:
 
@@ -253,8 +262,7 @@ Now let's run all the inspections but specify the locally cached builds:
     $ rpminspect -v ~/builds/tmux-2.9a-2.fc31 ~/builds/tmux-2.9a-3.fc31
 
 Easy.  Again, these locally cached builds must look like what rpminspect
-would download from koji.  Hence using rpminspect to first download it, then
-manually moving it to a cache.
+would download from koji.  Hence using rpminspect to first download it.
 
 rpminspect can also run inspections on local RPM packages.  Similar to Koji
 inputs, you may specify a single RPM or two RPMs to compare.  For example:
@@ -281,13 +289,13 @@ project.  Some things to keep in mind:
 
     * Please follow existing coding style in files you modify.  Things like
       variable and function naming, spacing, and indentation.  I want to
-      avoid wildly varying code styles throughout the tree.
+      avoid wildly varying coding styles throughout the tree.
 
     * New inspections in librpminspect need to be in the form of an
       inspect_NAME.c file with a driver added to the main struct.  You may
       add static and non-static support functions to your inspect_NAME.c file
-      and expose those as part of the librpminspect API.  If the function is
-      generic enough, feel free to start a new source file.
+      and expose those as part of the librpminspect API.  If the support
+      functions are generic enough, feel free to start a new source file.
 
     * Test cases or updates to existing test cases need to accompany patches
       and new code submissions.
