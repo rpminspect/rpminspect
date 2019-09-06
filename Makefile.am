@@ -2,7 +2,7 @@ include $(top_srcdir)/aminclude_static.am
 
 ACLOCAL_AMFLAGS = -I m4
 CLEANFILES = rpminspect.spec *.src.rpm
-EXTRA_DIST = rpminspect.spec.in
+EXTRA_DIST = rpminspect.spec.in meson.build
 
 SUBDIRS = src data tests
 
