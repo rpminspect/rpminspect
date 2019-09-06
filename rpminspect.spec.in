@@ -7,10 +7,7 @@ License:        GPLv3+
 URL:            https://github.com/rpminspect/rpminspect
 Source0:        https://github.com/rpminspect/rpminspect/releases/download/v%%VERSION%%/%%TARBALL%%
 
-BuildRequires:  autoconf
-BuildRequires:  automake
-BuildRequires:  libtool
-BuildRequires:  make
+BuildRequires:  meson
 BuildRequires:  gcc
 BuildRequires:  glibc-devel
 BuildRequires:  json-c-devel
@@ -82,14 +79,12 @@ control files.
 
 
 %build
-[ -x configure  ] || ./autogen.sh
-CFLAGS="%{optflags}" %configure --disable-static
-%make_build
+%meson
+%meson_build
 
 
 %install
-%make_build install DESTDIR=%{buildroot}
-rm -f %{buildroot}%{_libdir}/*.la
+%meson_install
 
 
 %files
