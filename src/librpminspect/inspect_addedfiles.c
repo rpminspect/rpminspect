@@ -125,7 +125,7 @@ static bool addedfiles_driver(struct rpminspect *ri, rpmfile_entry_t *file)
 
             if (strprefix(file->localpath, subpath)) {
                 xasprintf(&msg, "New security-related file `%s` added on %s requires inspection by the Security Team", file->localpath, arch);
-                add_result(&ri->results, RESULT_BAD, WAIVABLE_BY_SECURITY, HEADER_ADDEDFILES, msg, NULL, REMEDY_ADDEDFILES);
+                add_result(&ri->results, RESULT_VERIFY, WAIVABLE_BY_SECURITY, HEADER_ADDEDFILES, msg, NULL, REMEDY_ADDEDFILES);
                 goto done;
             }
         }
@@ -143,7 +143,7 @@ static bool addedfiles_driver(struct rpminspect *ri, rpmfile_entry_t *file)
                         goto done;
                     } else {
                         xasprintf(&msg, "%s on %s carries mode %04o, is on the stat whitelist but expected mode %04o", file->localpath, arch, file->st.st_mode, wlentry->mode);
-                        add_result(&ri->results, RESULT_BAD, WAIVABLE_BY_SECURITY, HEADER_ADDEDFILES, msg, NULL, REMEDY_ADDEDFILES);
+                        add_result(&ri->results, RESULT_VERIFY, WAIVABLE_BY_SECURITY, HEADER_ADDEDFILES, msg, NULL, REMEDY_ADDEDFILES);
                         goto done;
                     }
                 }
