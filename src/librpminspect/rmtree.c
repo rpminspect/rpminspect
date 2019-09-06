@@ -15,8 +15,6 @@
  * limitations under the License.
  */
 
-#include "config.h"
-
 #include <stdio.h>
 #include <unistd.h>
 #include <sys/types.h>
