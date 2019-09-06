@@ -16,8 +16,6 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "config.h"
-
 #include <stdlib.h>
 #include <string.h>
 #include <CUnit/Basic.h>
