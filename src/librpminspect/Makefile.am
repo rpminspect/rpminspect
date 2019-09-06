@@ -60,7 +60,9 @@ librpminspect_la_CPPFLAGS = $(JSON_C_CFLAGS) \
                             $(OPENSSL_CFLAGS) \
                             $(CODE_COVERAGE_CPPFLAGS)
 
-librpminspect_la_CFLAGS = -D_GNU_SOURCE $(CODE_COVERAGE_CFLAGS)
+librpminspect_la_CFLAGS = -D_GNU_SOURCE \
+                          -DPACKAGE_VERSION=\"$(PACKAGE_VERSION)\" \
+                          $(CODE_COVERAGE_CFLAGS)
 
 librpminspect_la_LIBADD = $(JSON_C_LIBS) \
                           $(XMLRPC_LIBS) \
