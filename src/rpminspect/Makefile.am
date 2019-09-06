@@ -10,7 +10,7 @@ EXTRA_DIST = builds.h
 
 rpminspect_SOURCES = rpminspect.c builds.c
 rpminspect_CPPFLAGS = -I$(top_srcdir)/src/librpminspect $(LIBCURL_CFLAGS) $(YAML_CFLAGS) $(CODE_COVERAGE_CPPFLAGS)
-rpminspect_CFLAGS = $(CODE_COVERAGE_CFLAGS)
+rpminspect_CFLAGS = -D_GNU_SOURCE -DPACKAGE_VERSION=\"$(PACKAGE_VERSION)\" $(CODE_COVERAGE_CFLAGS)
 rpminspect_LDADD = $(top_builddir)/src/librpminspect/librpminspect.la $(LIBCURL_LIBS) $(YAML_LIBS) $(CODE_COVERAGE_LIBS)
 
 clean-local: code-coverage-clean
