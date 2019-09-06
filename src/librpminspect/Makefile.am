@@ -84,7 +84,7 @@ CLEANFILES = inspect_elf_bits.c
 EXTRA_DIST = pic_bits.sh
 
 inspect_elf_bits.c: pic_bits.sh /usr/include/elf.h
-	$(srcdir)/pic_bits.sh > $@
+	$(srcdir)/pic_bits.sh $@
 
 clean-local: code-coverage-clean
 distclean-local: code-coverage-dist-clean
