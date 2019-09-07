@@ -15,7 +15,7 @@ check_PROGRAMS = $(TESTS) \
 		 execstack \
 		 noexecstack
 
-CFLAGS += -I$(top_srcdir)/src/librpminspect -D_BUILDDIR_=\"$(abs_builddir)\"
+CFLAGS += -I$(top_srcdir)/src/librpminspect -D_BUILDDIR_=\"$(abs_builddir)\" -D_GNU_SOURCE
 LDADD = $(top_builddir)/src/librpminspect/librpminspect.la $(CUNIT_LIBS)
 
 test_badwords_SOURCES = test-badwords.c test-main.c
