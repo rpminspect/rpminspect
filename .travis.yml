@@ -15,7 +15,7 @@ before_install:
 
 script:
   - $DOCKER_RUN meson setup build --werror -Db_coverage=true
-  - pip-3 install --user cpp-coveralls
+#  - pip-3 install --user cpp-coveralls
 
   # Stop after the first failure, to keep the output more readable
   - |
