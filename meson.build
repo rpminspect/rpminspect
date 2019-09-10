@@ -117,6 +117,7 @@ librpminspect_sources = [
 librpminspect = library(
     'rpminspect',
     librpminspect_sources,
+    version : '0.5.0',
     install : true,
     include_directories : include_directories('src/librpminspect'),
     dependencies : [
