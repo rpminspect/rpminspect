@@ -236,13 +236,13 @@ if cunit.found()
     execstack_prog = executable(
         'execstack',
         ['tests/librpminspect/elftest.c'],
-        c_args : '-z execstack -z relro'
+        link_args : ['-Wl,-z,execstack', '-Wl,-z,relro']
     )
 
     noexecstack_prog = executable(
         'noexecstack',
         ['tests/librpminspect/elftest.c'],
-        c_args : '-z noexecstack -z relro'
+        link_args : ['-Wl,-z,noexecstack', '-Wl,-z,relro']
     )
 
     # Unit tests
