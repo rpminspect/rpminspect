@@ -57,8 +57,9 @@ useful as you can construct decision making around those results.
 Build Requirements
 ------------------
 
-A typical Linux system with a toolchain for building C software and the
-following libraries (make sure the header files are available):
+A typical Linux system with a toolchain for building C software using
+meson and ninja, plus the following libraries (make sure the header files
+are available):
 
     * json-c
           http://json-c.github.io/json-c/
@@ -114,8 +115,7 @@ packages:
     dnf install json-c-devel xmlrpc-c-devel libxml2-devel rpm-devel \
                 libarchive-devel elfutils-devel kmod-devel zlib-devel \
                 libmandoc-devel iniparser-devel libyaml-devel file-devel \
-                openssl-devel make automake autoconf libtool CUnit \
-                CUnit-devel gcc
+                openssl-devel meson ninja CUnit CUnit-devel gcc
 
 
 Runtime Requirements
@@ -146,46 +146,37 @@ In Fedora for example, you can run the following to install these programs:
 Building
 --------
 
-If you got the source from a released tarball, you can probably do this:
+If you got the source from a released tarball or from cloned from git, you
+can do this:
 
-    ./configure
-    make
-    make install
+    meson setup build
+    ninja -C build
 
-If you have the source cloned from git, you should do this:
+For more information on meson and ninja, see these sites:
 
-    ./autogen.sh
-    # then the steps above
-
-Building from git will require autoconf, automake, libtool, and the rest
-of the autotools packages.
+    https://mesonbuild.com/
+    https://ninja-build.org/
 
 
 Releasing
 ---------
 
-Releases are made using these steps:
+Releases are made using the release.sh script:
 
-    git clean -d -x -f
-    git pull
-    ./autogen.sh
-    ./configure
-    make bumpver
-    git add configure.ac
-    git commit -m "New release"
-    git clean -d -x -f
-    ./autogen.sh
-    ./configure
-    make release
-    make rpminspect.spec
+    ./release.sh -b -t -p -g
 
 This will increment the x.y version number, create a new tarball, sign it,
 and create a signed git tag.  All of that is pushed to github and then a
 release entry is made and the tarball and detached signature are uploaded
 there.
 
-You can also run the utils/make-release.sh script to do all of the above
-for you and have it ready to build in dist-git.
+You can run the release.sh script directly and it will generate a release
+tarball from the source you have.  The command line options enable the
+version incrementing, git commits, tags, and pushes.
+
+The release will generate tar.xz file, a detached GPG signature of the
+tar.xz file, and a SRPM.  The SRPM file is suitable for import in to
+Fedora's dist-git and systems similar to it.
 
 
 How To Use
