@@ -10,3 +10,4 @@ RUN dnf -y builddep --spec rpminspect.spec
 
 # Add additional test dependencies
 RUN dnf -y install CUnit-devel valgrind gcovr
+RUN pip-3 install cpp-coveralls
