@@ -142,8 +142,8 @@ librpminspect = library(
 
 # Build rpminspect
 rpminspect_prog_sources = [
-    'src/rpminspect/rpminspect.c',
-    'src/rpminspect/builds.c',
+    'src/rpminspect.c',
+    'src/builds.c',
 ]
 rpminspect_prog = executable(
     'rpminspect',
@@ -151,7 +151,7 @@ rpminspect_prog = executable(
     install : true,
     include_directories : [
         include_directories('lib'),
-        include_directories('src/rpminspect'),
+        include_directories('src'),
     ],
     link_with : [
         librpminspect,
@@ -171,7 +171,7 @@ add_test_setup(
 # Unit test suite (disabled if we do not have CUnit installed)
 if cunit.found()
     incdirs = [include_directories('lib'),
-               include_directories('src/rpminspect'),
+               include_directories('src'),
                include_directories('tests/lib')]
 
     test_badwords = executable(
@@ -287,7 +287,7 @@ install_headers(
 )
 
 # Install man pages
-install_man('src/rpminspect/rpminspect.1')
+install_man('src/rpminspect.1')
 
 # Install data files
 install_subdir(
@@ -298,6 +298,6 @@ install_subdir(
 
 # Install the configuration file
 install_data(
-    sources : 'src/rpminspect/rpminspect.conf',
+    sources : 'src/rpminspect.conf',
     install_dir : get_option('sysconfdir') / 'rpminspect'
 )
