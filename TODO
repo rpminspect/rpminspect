@@ -5,8 +5,8 @@ welcome contributions as well as bug fixes and other such updates.
 INSPECTIONS
 ===========
 
-The inspections in librpminspect do the work of the program.  There are several
-now, but that can be expanded.  Here is a list of inspection ideas:
+The inspections in librpminspect do the work of the program.  There are
+several now, but that can be expanded.  Here is a list of inspection ideas:
 
 * abi
 
@@ -31,17 +31,17 @@ inspection should honor an optional kmi whitelist in the same context as the
 
 * license (in %files)
 
-The license inspection right now validates the short form in the License header
-tag, but we should also make sure a license file is included in the %files
-section of one of the packages.
+The license inspection right now validates the short form in the License
+header tag, but we should also make sure a license file is included in the
+%files section of one of the packages.
 
 * elflint
 
-Run elflint on all ELF objects in before and after packages, report any changes
-of gaining or losing things.  Also report architecture mismatches based on the
-architecturt given by elflint and the architecture of the package the file is
-in.  Needs special handling for vdso32- files and files in the /usr/lib/grub
-directory.
+Run elflint on all ELF objects in before and after packages, report any
+changes of gaining or losing things.  Also report architecture mismatches
+based on the architecturt given by elflint and the architecture of the
+package the file is in.  Needs special handling for vdso32- files and files
+in the /usr/lib/grub directory.
 
 * elfcheck
 
@@ -66,7 +66,7 @@ OTHER WORK
 ==========
 
 - Test suite
-      - Invoked via 'make check'
+      - Invoked via 'meson test'
       - Unit tests for librpminspect
       - Inspection test suite with valid and invalid data
 
