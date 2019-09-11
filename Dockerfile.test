@@ -9,5 +9,5 @@ RUN sed -i -e 's|%%VERSION%%|1.0|g' -e 's|%%RPMDATE%%|Mon Apr 15 2019|g' /rpmins
 RUN dnf -y builddep --spec rpminspect.spec
 
 # Add additional test dependencies
-RUN dnf -y install CUnit-devel valgrind gcovr
+RUN dnf -y install CUnit-devel valgrind gcovr python3-pip
 RUN pip-3 install cpp-coveralls
