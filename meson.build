@@ -163,6 +163,11 @@ rpminspect_prog = executable(
     ]
 )
 
+# Test setups
+add_test_setup(
+    'valgrind',
+    exe_wrapper : ['valgrind', '--verbose', '--error-exitcode=1', '--leak-check=full', '--track-origins=yes'])
+
 # Unit test suite (disabled if we do not have CUnit installed)
 if cunit.found()
     incdirs = [include_directories('src/librpminspect'),
