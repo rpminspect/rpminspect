@@ -13,11 +13,9 @@ env:
 before_install:
   - docker build -t rpminspect/test-env -f Dockerfile.test .
 
-# Fedora spells it 'pip-3' and Ubuntu spells it 'pip3'.  Both package
-# names are 'python3-pip'.
 script:
   - $DOCKER_RUN meson setup build --werror -Db_coverage=true
-  - pip3 install --user cpp-coveralls
+  - pip install --user cpp-coveralls
 
   # Stop after the first failure, to keep the output more readable
   - |
