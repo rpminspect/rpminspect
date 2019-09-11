@@ -21,8 +21,8 @@ script:
   - |
     $DOCKER_RUN ninja -v -C build &&
     $DOCKER_RUN ninja -C build coverage &&
-    $DOCKER_RUN ninja -C build test
-#    $DOCKER_RUN meson -C build test --print-errorlogs --wrap='valgrind --leak-check=full --track-origins=yes --error-exitcode=47'
+    $DOCKER_RUN ninja -C build test &&
+    $DOCKER_RUN meson -C build test --print-errorlogs --wrap='valgrind --leak-check=full --track-origins=yes --error-exitcode=47'
 
 after_success:
   - coveralls -b build --gcov-options '\-lp'
