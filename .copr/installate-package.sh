@@ -8,4 +8,4 @@ PATH=/usr/bin
 yum --help >/dev/null 2>&1
 [ $? -eq 0 ] && INSTALLATOR=yum || INSTALLATOR=dnf
 
-${INSTALLATOR} install -y git meson
+${INSTALLATOR} install -y git
