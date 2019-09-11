@@ -14,7 +14,7 @@ PKG := $(shell grep ^Name: "$(SPEC_TEMPLATE)" | awk '{ print $$2; }')
 VER := $(shell grep 'version :' $(topdir)/meson.build | grep -E "'[0-9]+\.[0-9]+'" | cut -d "'" -f 2)
 
 srpm:
-	$(topdir)/.copr/installate-packages.sh
+	$(topdir)/.copr/installate-package.sh
 	sed -e 's|%%VERSION%%|$(VER)|g' < "$(SPEC_TEMPLATE)" > "$(SPEC)"
 	sed -i -e 's|%%RPMDATE%%|$(RPMDATE)|g' "$(SPEC)"
 	sed -i -e 's|%%GITDATE%%|$(GITDATE)|g' "$(SPEC)"
