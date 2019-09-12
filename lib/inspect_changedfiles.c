@@ -33,7 +33,6 @@
 #define XZCMP_CMD "xzcmp"
 #define ELFCMP_CMD "eu-elfcmp --ignore-build-id --verbose"
 #define MSGUNFMT_CMD "msgunfmt"
-#define CPP_CMD "cpp -fpreprocessed"
 #define DIFF_CMD "diff"
 
 /*
@@ -287,38 +286,10 @@ static bool changedfiles_driver(struct rpminspect *ri, rpmfile_entry_t *file)
     }
 
     if (!strcmp(type, "text/x-c") && possible_header) {
-        /* First, preprocess the header files to strip comments */
-        if (run_and_capture(ri->workdir, &after_tmp, CPP_CMD, file->fullpath, &errors)) {
-            xasprintf(&msg, "Error running cpp on %s on %s", file->localpath, arch);
-            add_result(&ri->results, RESULT_BAD, NOT_WAIVABLE, HEADER_CHANGEDFILES, msg, errors, REMEDY_CHANGEDFILES);
-            result = false;
-            goto done;
-        }
-
-        if (run_and_capture(ri->workdir, &before_tmp, CPP_CMD, file->peer_file->fullpath, &errors)) {
-            xasprintf(&msg, "Error running cpp on %s on %s", file->peer_file->localpath, arch);
-            add_result(&ri->results, RESULT_BAD, NOT_WAIVABLE, HEADER_CHANGEDFILES, msg, errors, REMEDY_CHANGEDFILES);
-            result = false;
-            goto done;
-        }
-
         /* Now diff the header content */
-        if (run_cmd(&errors, DIFF_CMD, "-u", "-w", before_tmp, after_tmp, "2>&1", NULL)) {
+        if (run_cmd(&errors, DIFF_CMD, "-u", "-w", "--label", file->localpath, file->peer_file->fullpath, file->fullpath, "2>&1", NULL)) {
             xasprintf(&msg, "Public header file %s changed content on %s, Please make sure this does not change the ABI exported by this package.  The output of `diff -uw` follows.", file->localpath, arch);
             add_result(&ri->results, RESULT_VERIFY, WAIVABLE_BY_ANYONE, HEADER_CHANGEDFILES, msg, errors, REMEDY_CHANGEDFILES);
-            result = false;
-        }
-
-        /* Remove the temporary files */
-        if (unlink(before_tmp) == -1) {
-            fprintf(stderr, "*** Unable to remove temporary file %s: %s\n", before_tmp, strerror(errno));
-            fflush(stderr);
-            result = false;
-        }
-
-        if (unlink(after_tmp) == -1) {
-            fprintf(stderr, "*** Unable to remove temporary file %s: %s\n", after_tmp, strerror(errno));
-            fflush(stderr);
             result = false;
         }
     }

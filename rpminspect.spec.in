@@ -42,7 +42,6 @@ Requires:       /usr/bin/bzcmp
 Requires:       /usr/bin/xzcmp
 Requires:       /usr/bin/eu-elfcmp
 Requires:       /usr/bin/msgunfmt
-Requires:       /usr/bin/cpp
 Requires:       /usr/bin/diff
 
 %description -n librpminspect
