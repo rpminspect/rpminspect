@@ -79,7 +79,13 @@ void output_text(const results_t *results, const char *dest) {
 
         if (result->msg != NULL) {
             xasprintf(&msg, "%d) %s\n", count++, result->msg);
-            printwrap(msg, width, 0, fp);
+
+            if (width) {
+                printwrap(msg, width, 0, fp);
+            } else {
+                fprintf(fp, msg);
+            }
+
             fprintf(fp, "\n");
             free(msg);
         }
@@ -95,7 +101,13 @@ void output_text(const results_t *results, const char *dest) {
 
             if (result->remedy != NULL) {
                 xasprintf(&msg, "Suggested Remedy:\n%s", result->remedy);
-                printwrap(msg, width, 0, fp);
+
+                if (width) {
+                    printwrap(msg, width, 0, fp);
+                } else {
+                    fprintf(fp, msg);
+                }
+
                 free(msg);
             }
 

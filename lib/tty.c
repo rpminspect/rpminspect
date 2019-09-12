@@ -24,15 +24,14 @@
 
 /*
  * Return the terminal width.  Used by output routines sending text to
- * stdout.
+ * stdout.  This function returns 0 if it cannot figure out the width,
+ * which means callers should just not worry about the terminal.
  */
 size_t tty_width(void) {
     struct winsize w;
 
     /* get the terminal size */
     if (ioctl(0, TIOCGWINSZ, &w) == -1) {
-        fprintf(stderr, "*** Unable to get terminal window size: %s\n", strerror(errno));
-        fflush(stderr);
         return 0;
     }
 
