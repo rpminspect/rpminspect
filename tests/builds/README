@@ -1,0 +1,11 @@
+This directory contains source files necessary to do an rpmbuild
+and generate a set of binary and source RPM files.  The script
+create-koji-build.sh will do that but then sort the resulting
+files out in to a directory structure like Koji does.  This is
+done so the test suite can have input to rpminspect like it would
+be getting builds from Koji.
+
+The subdirectories here are organized by inspection.  Within each
+of those subdirectories are more directories for each build type
+necessary.  The integration test suite needs known good and known
+bad build inputs to test rpminspect functionality.
