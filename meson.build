@@ -268,6 +268,7 @@ endif
 # Integration test suite
 test_env = environment()
 test_env.set('RPMINSPECT', rpminspect_prog.full_path())
+test_env.set('BUILDDIR', meson.current_build_dir())
 
 help_test = find_program('tests/rpminspect-help.sh')
 segv_test = find_program('tests/rpminspect-segv.sh')
