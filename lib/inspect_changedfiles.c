@@ -92,7 +92,7 @@ static bool run_and_capture(const char *where, char **output, char *cmd,
     }
 
     /* Run command and capture output */
-    return run_cmd(errors, cmd, fullpath, ">", *output, "2>&1", NULL);
+    return run_cmd(errors, cmd, fullpath, ">", *output, NULL);
 }
 
 /*
@@ -167,7 +167,7 @@ static bool changedfiles_driver(struct rpminspect *ri, rpmfile_entry_t *file)
      * compression levels changed between builds.
      */
     if (!strcmp(type, "application/x-gzip")) {
-        result = run_cmd(&errors, ZCMP_CMD, file->peer_file->fullpath, file->fullpath, "2>&1", NULL);
+        result = run_cmd(&errors, ZCMP_CMD, file->peer_file->fullpath, file->fullpath, NULL);
 
         if (result) {
             xasprintf(&msg, "Compressed gzip file %s changed content on %s", file->localpath, arch);
@@ -175,7 +175,7 @@ static bool changedfiles_driver(struct rpminspect *ri, rpmfile_entry_t *file)
             result = false;
         }
     } else if (!strcmp(type, "application/x-bzip2")) {
-        result = run_cmd(&msg, BZCMP_CMD, file->peer_file->fullpath, file->fullpath, "2>&1", NULL);
+        result = run_cmd(&msg, BZCMP_CMD, file->peer_file->fullpath, file->fullpath, NULL);
 
         if (result) {
             xasprintf(&errors, "Compressed bzip2 file %s changed content on %s", file->localpath, arch);
@@ -183,7 +183,7 @@ static bool changedfiles_driver(struct rpminspect *ri, rpmfile_entry_t *file)
             result = false;
         }
     } else if (!strcmp(type, "application/x-xz")) {
-        result = run_cmd(&errors, XZCMP_CMD, file->peer_file->fullpath, file->fullpath, "2>&1", NULL);
+        result = run_cmd(&errors, XZCMP_CMD, file->peer_file->fullpath, file->fullpath, NULL);
 
         if (result) {
             xasprintf(&msg, "Compressed xz file %s changed content on %s", file->localpath, arch);
@@ -202,7 +202,7 @@ static bool changedfiles_driver(struct rpminspect *ri, rpmfile_entry_t *file)
     if (!strcmp(type, "application/x-pie-executable") ||
         !strcmp(type, "application/x-executable") ||
         !strcmp(type, "application/x-object")) {
-        result = run_cmd(&errors, ELFCMP_CMD, file->peer_file->fullpath, file->fullpath, "2>&1", NULL);
+        result = run_cmd(&errors, ELFCMP_CMD, file->peer_file->fullpath, file->fullpath, NULL);
 
         if (result) {
             xasprintf(&msg, "ELF file %s changed content on %s", file->localpath, arch);
@@ -245,7 +245,7 @@ static bool changedfiles_driver(struct rpminspect *ri, rpmfile_entry_t *file)
         }
 
         /* Now diff the mo content */
-        if (run_cmd(&errors, DIFF_CMD, "-u", before_tmp, after_tmp, "2>&1", NULL)) {
+        if (run_cmd(&errors, DIFF_CMD, "-u", before_tmp, after_tmp, NULL)) {
             xasprintf(&msg, "Message catalog %s changed content on %s", file->localpath, arch);
             add_result(&ri->results, RESULT_VERIFY, WAIVABLE_BY_ANYONE, HEADER_CHANGEDFILES, msg, errors, REMEDY_CHANGEDFILES);
             result = false;
@@ -287,7 +287,7 @@ static bool changedfiles_driver(struct rpminspect *ri, rpmfile_entry_t *file)
 
     if (!strcmp(type, "text/x-c") && possible_header) {
         /* Now diff the header content */
-        if (run_cmd(&errors, DIFF_CMD, "-u", "-w", "--label", file->localpath, file->peer_file->fullpath, file->fullpath, "2>&1", NULL)) {
+        if (run_cmd(&errors, DIFF_CMD, "-u", "-w", "--label", file->localpath, file->peer_file->fullpath, file->fullpath, NULL)) {
             xasprintf(&msg, "Public header file %s changed content on %s, Please make sure this does not change the ABI exported by this package.  The output of `diff -uw` follows.", file->localpath, arch);
             add_result(&ri->results, RESULT_VERIFY, WAIVABLE_BY_ANYONE, HEADER_CHANGEDFILES, msg, errors, REMEDY_CHANGEDFILES);
             result = false;

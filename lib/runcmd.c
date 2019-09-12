@@ -68,6 +68,12 @@ int run_cmd(char **result, const char *cmd, ...) {
 
     va_end(ap);
 
+    /* always combine stdout and stderr */
+    xasprintf(&new, "%s 2>&1", built);
+    assert(new != NULL);
+    free(built);
+    built = new;
+
     /* shrink memory allocation */
     built = realloc(built, strlen(built) + 1);
 

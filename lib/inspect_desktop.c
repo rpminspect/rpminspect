@@ -237,11 +237,11 @@ static bool desktop_driver(struct rpminspect *ri, rpmfile_entry_t *file) {
     }
 
     /* Validate the desktop file */
-    after_code = run_cmd(&after_out, ri->desktop_file_validate, file->fullpath, "2>&1", NULL);
+    after_code = run_cmd(&after_out, ri->desktop_file_validate, file->fullpath, NULL);
 
     if (file->peer_file && is_desktop_entry_file(ri->desktop_entry_files_dir, file->peer_file)) {
         /* if we have a before peer, validate the corresponding desktop file */
-        (void) run_cmd(&before_out, ri->desktop_file_validate, file->peer_file->fullpath, "2>&1", NULL);
+        (void) run_cmd(&before_out, ri->desktop_file_validate, file->peer_file->fullpath, NULL);
     }
 
     if (after_code == -1) {
