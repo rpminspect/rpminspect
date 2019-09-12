@@ -84,9 +84,11 @@
 #define BUILD_ID_DIR "/.build-id/"
 
 /*
- * Debug packages
+ * Debug packages and paths
  */
 #define DEBUGINFO_SUFFIX "-debuginfo"
 #define DEBUGSOURCE_SUFFIX "-debugsource"
+#define DEBUG_PATH "/usr/lib/debug/"
+#define DEBUG_SRC_PATH "/usr/src/debug/"
 
 #endif
