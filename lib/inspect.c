@@ -111,6 +111,12 @@ struct inspect inspections[] = {
       &inspect_addedfiles,
       "Report added files from the before build to the after build.  Debuginfo files are ignored as are files that match the patterns defined in the configuration file.  Files added to security paths generate special reporting in case a security review is required.  New setuid and setgid files raise a security warning unless the file is in the whitelist." },
 
+    { INSPECT_UPSTREAM,
+      "upstream",
+      false,
+      &inspect_upstream,
+      "Report Source archives defined in the RPM spec file changing content between the before and after build. If the source archives change and the package is on the version-whitelist, the change is reported as informational. Otherwise the change is reported as a rebase of the package and requires inspection." },
+
     /*
      * { INSPECT_TYPE (add to inspect.h),
      *   "short name",
