@@ -122,6 +122,9 @@ bool inspect_removedfiles(struct rpminspect *);
 /* inspect_addedfiles.c */
 bool inspect_addedfiles(struct rpminspect *);
 
+/* inspect_upstream.c */
+bool inspect_upstream(struct rpminspect *);
+
 /*
  * Inspections are referenced by flag.  These flags are set in bitfields
  * to indicate which ones we want to run.  When adding new ones, please
@@ -144,5 +147,6 @@ bool inspect_addedfiles(struct rpminspect *);
 #define INSPECT_CHANGEDFILES                (((uint64_t) 1) << 12)
 #define INSPECT_REMOVEDFILES                (((uint64_t) 1) << 13)
 #define INSPECT_ADDEDFILES                  (((uint64_t) 1) << 14)
+#define INSPECT_UPSTREAM                    (((uint64_t) 1) << 15)
 
 #endif

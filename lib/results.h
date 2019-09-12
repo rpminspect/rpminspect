@@ -40,6 +40,7 @@
 #define HEADER_CHANGEDFILES  "changed-files"
 #define HEADER_REMOVEDFILES  "removed-files"
 #define HEADER_ADDEDFILES    "added-files"
+#define HEADER_UPSTREAM      "upstream"
 
 /*
  * Inspection remedies
@@ -95,5 +96,8 @@
 
 /* addedfiles */
 #define REMEDY_ADDEDFILES "Unexpected file additions were found.  Verify these changes are correct.  If they are not, adjust the build to prevent the file additions."
+
+/* upstream */
+#define REMEDY_UPSTREAM "Unexpected changed source archive content.  The version of the package did not change between builds, but the source archive content did.  This may be deliberate, but needs inspection."
 
 #endif
