@@ -33,7 +33,8 @@
  * (if it exists) is written to result in the calling function.
  *
  * The first argument is a pointer to a dynamic string that will hold the
- * captured output from the program.
+ * captured output from the program.  This can be NULL and this function
+ * will initialize it and concatenate the results in to it.
  *
  * The second argument is the command followed by any additional arguments
  * that should be included with it.  Note that it is not a format string,
@@ -49,7 +50,6 @@ int run_cmd(char **result, const char *cmd, ...) {
     char *built = NULL;
     char *element = NULL;
 
-    assert(result != NULL);
     assert(cmd != NULL);
 
     /* Allocate a large buffer to use for building the command */
