@@ -136,6 +136,12 @@ static bool changedfiles_driver(struct rpminspect *ri, rpmfile_entry_t *file)
         goto done;
     }
 
+    /* Skip files in the debug path and debug source path */
+    if (strprefix(file->localpath, DEBUG_PATH) ||
+        strprefix(file->localpath, DEBUG_SRC_PATH)) {
+        goto done;
+    }
+
     /* The architecture is used in reporting messages */
     arch = headerGetString(file->rpm_header, RPMTAG_ARCH);
 
