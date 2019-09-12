@@ -588,5 +588,5 @@ int main(int argc, char **argv) {
 
     free_rpminspect(&ri);
 
-    return EXIT_SUCCESS;
+    return ret;
 }
