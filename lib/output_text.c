@@ -83,7 +83,7 @@ void output_text(const results_t *results, const char *dest) {
             if (width) {
                 printwrap(msg, width, 0, fp);
             } else {
-                fprintf(fp, msg);
+                fprintf(fp, "%s", msg);
             }
 
             fprintf(fp, "\n");
@@ -105,7 +105,7 @@ void output_text(const results_t *results, const char *dest) {
                 if (width) {
                     printwrap(msg, width, 0, fp);
                 } else {
-                    fprintf(fp, msg);
+                    fprintf(fp, "%s", msg);
                 }
 
                 free(msg);
