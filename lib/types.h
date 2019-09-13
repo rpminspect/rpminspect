@@ -215,6 +215,15 @@ struct rpminspect {
     /* desktop-file-validate command location */
     char *desktop_file_validate;
 
+    /* Executable path prefixes and required ownership */
+    string_list_t *bin_paths;
+    char *bin_owner;
+    char *bin_group;
+
+    /* Optional: Forbidden file owners and groups */
+    string_list_t *forbidden_owners;
+    string_list_t *forbidden_groups;
+
     /* hash table of product release -> JVM major versions */
     struct hsearch_data *jvm_table;
     string_list_t *jvm_keys;
