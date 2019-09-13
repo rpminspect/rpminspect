@@ -516,6 +516,29 @@ int init_rpminspect(struct rpminspect *ri, const char *cfgfile) {
         ri->desktop_file_validate = strdup(tmp);
     }
 
+    tmp = iniparser_getstring(cfg, "tests:bin_paths", BIN_PATHS);
+    parse_list(tmp, &ri->bin_paths);
+
+    tmp = iniparser_getstring(cfg, "tests:bin_owner", BIN_OWNER);
+    ri->bin_owner = strdup(tmp);
+
+    tmp = iniparser_getstring(cfg, "tests:bin_group", BIN_GROUP);
+    ri->bin_group = strdup(tmp);
+
+    tmp = iniparser_getstring(cfg, "tests:forbidden_owners", NULL);
+    if (tmp == NULL) {
+        ri->forbidden_owners = NULL;
+    } else {
+        parse_list(tmp, &ri->forbidden_owners);
+    }
+
+    tmp = iniparser_getstring(cfg, "tests:forbidden_groups", NULL);
+    if (tmp == NULL) {
+        ri->forbidden_groups = NULL;
+    } else {
+        parse_list(tmp, &ri->forbidden_groups);
+    }
+
     /* if a jvm major versions exist, collect those in to a hash table */
     ri->jvm_table = NULL;
     ri->jvm_keys = NULL;

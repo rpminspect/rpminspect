@@ -66,6 +66,21 @@
 #define SRPM_ARCH_NAME "src"
 
 /*
+ * Path prefixes for executable files
+ */
+#define BIN_PATHS "/bin /sbin /usr/bin /usr/sbin"
+
+/*
+ * Executable file owner
+ */
+#define BIN_OWNER "root"
+
+/*
+ * Executable file group
+ */
+#define BIN_GROUP "root"
+
+/*
  * File extensions
  */
 #define RPM_FILENAME_EXTENSION ".rpm"
