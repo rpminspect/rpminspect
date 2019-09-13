@@ -29,19 +29,19 @@ static bool valid_peers(struct rpminspect *ri, const Header before_hdr, const He
     bool ret = true;
     bool valid_subdomain = false;
     string_entry_t *subdomain = NULL;
-    char *after_vendor = NULL;
-    char *after_buildhost = NULL;
-    char *after_summary = NULL;
-    char *after_description = NULL;
-    char *after_nevra = NULL;
+    const char *after_vendor = NULL;
+    const char *after_buildhost = NULL;
+    const char *after_summary = NULL;
+    const char *after_description = NULL;
+    const char *after_nevra = NULL;
     char *msg = NULL;
     char *dump = NULL;
 
     assert(ri != NULL);
 
-    after_nevra = headerGetAsString(after_hdr, RPMTAG_NEVRA);
+    after_nevra = headerGetString(after_hdr, RPMTAG_NEVRA);
 
-    after_vendor = headerGetAsString(after_hdr, RPMTAG_VENDOR);
+    after_vendor = headerGetString(after_hdr, RPMTAG_VENDOR);
     if (after_vendor && strcmp(after_vendor, ri->vendor)) {
         xasprintf(&msg, "Package Vendor \"%s\" is not \"%s\" in %s", after_vendor, ri->vendor, after_nevra);
 
@@ -51,7 +51,7 @@ static bool valid_peers(struct rpminspect *ri, const Header before_hdr, const He
         free(msg);
     }
 
-    after_buildhost = headerGetAsString(after_hdr, RPMTAG_BUILDHOST);
+    after_buildhost = headerGetString(after_hdr, RPMTAG_BUILDHOST);
     if (after_buildhost && ri->buildhost_subdomain != NULL) {
         valid_subdomain = false;
 
@@ -72,7 +72,7 @@ static bool valid_peers(struct rpminspect *ri, const Header before_hdr, const He
         }
     }
 
-    after_summary = headerGetAsString(after_hdr, RPMTAG_SUMMARY);
+    after_summary = headerGetString(after_hdr, RPMTAG_SUMMARY);
     if (after_summary && has_bad_word(after_summary, ri->badwords)) {
         xasprintf(&msg, "Package Summary contains unprofessional language in %s", after_nevra);
         xasprintf(&dump, "Summary: %s", after_summary);
@@ -84,25 +84,34 @@ static bool valid_peers(struct rpminspect *ri, const Header before_hdr, const He
         free(dump);
     }
 
-    after_description = headerGetAsString(after_hdr, RPMTAG_DESCRIPTION);
+    after_description = headerGetString(after_hdr, RPMTAG_DESCRIPTION);
     if (after_description && has_bad_word(after_description, ri->badwords)) {
         xasprintf(&msg, "Package Description contains unprofessional language in %s:", after_nevra);
+        xasprintf(&dump, "%s", after_description);
 
-        add_result(&ri->results, RESULT_BAD, NOT_WAIVABLE, HEADER_METADATA, msg, after_description, REMEDY_BADWORDS);
+        add_result(&ri->results, RESULT_BAD, NOT_WAIVABLE, HEADER_METADATA, msg, dump, REMEDY_BADWORDS);
         ret = false;
 
         free(msg);
+        free(dump);
     }
 
     if (before_hdr != NULL) {
-        char *before_vendor = headerGetAsString(before_hdr, RPMTAG_VENDOR);
-        char *before_summary = headerGetAsString(before_hdr, RPMTAG_SUMMARY);
-        char *before_description = headerGetAsString(before_hdr, RPMTAG_DESCRIPTION);
-        after_nevra = headerGetAsString(after_hdr, RPMTAG_NAME);
+        const char *before_vendor = headerGetString(before_hdr, RPMTAG_VENDOR);
+        const char *before_summary = headerGetString(before_hdr, RPMTAG_SUMMARY);
+        const char *before_description = headerGetString(before_hdr, RPMTAG_DESCRIPTION);
+        after_nevra = headerGetString(after_hdr, RPMTAG_NAME);
+        msg = NULL;
 
-        if (strcmp(before_vendor, after_vendor)) {
+        if (before_vendor == NULL && after_vendor) {
+            xasprintf(&msg, "Gained Package Vendor \"%s\" in %s", after_vendor, after_nevra);
+        } else if (before_vendor && after_vendor == NULL) {
+            xasprintf(&msg, "Lost Package Vendor \"%s\" in %s", before_vendor, after_nevra);
+        } else if (before_vendor && after_vendor && strcmp(before_vendor, after_vendor)) {
             xasprintf(&msg, "Package Vendor changed from \"%s\" to \"%s\" in %s", before_vendor, after_vendor, after_nevra);
+        }
 
+        if (msg) {
             add_result(&ri->results, RESULT_VERIFY, WAIVABLE_BY_ANYONE, HEADER_METADATA, msg, NULL, NULL);
             ret = false;
 
