@@ -41,6 +41,7 @@
 #define HEADER_REMOVEDFILES  "removed-files"
 #define HEADER_ADDEDFILES    "added-files"
 #define HEADER_UPSTREAM      "upstream"
+#define HEADER_OWNERSHIP     "ownership"
 
 /*
  * Inspection remedies
@@ -99,5 +100,13 @@
 
 /* upstream */
 #define REMEDY_UPSTREAM "Unexpected changed source archive content.  The version of the package did not change between builds, but the source archive content did.  This may be deliberate, but needs inspection."
+
+/* ownership */
+#define REMEDY_OWNERSHIP_DEFATTR "Make sure the %%files section includes the %%defattr macro."
+#define REMEDY_OWNERSHIP_BIN_OWNER "Bin path files must be owned by the bin_owner set in rpminspect.conf, which is usually root."
+#define REMEDY_OWNERSHIP_BIN_GROUP "Bin path files must be owned by the bin_group set in rpminspect.conf, which is usually root."
+#define REMEDY_OWNERSHIP_IXOTH "Either chgrp the file to the bin_group set in rpminspect.conf or remove the world execute bit on the file (chmod o-x)."
+#define REMEDY_OWNERSHIP_IWGRP "Either chgrp the file to the bin_group set in rpminspect.conf or remove the group write bit on the file (chmod g-w)."
+#define REMEDY_OWNERSHIP_CHANGED "Verify the ownership changes are expected. If not, adjust the package build process to set correct owner and group information."
 
 #endif

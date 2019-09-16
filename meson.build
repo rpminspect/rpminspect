@@ -26,6 +26,8 @@ libcurl = dependency('libcurl', method : 'pkg-config', required : true)
 zlib = dependency('zlib', method : 'pkg-config', required : true)
 yaml = dependency('yaml-0.1', method : 'pkg-config', required : true)
 openssl = dependency('openssl', method : 'pkg-config', required : true)
+libcap = dependency('libcap', method : 'pkg-config', required : true)
+
 cunit = dependency('cunit', method : 'pkg-config', required : false)
 
 # Other dependencies
@@ -93,6 +95,7 @@ librpminspect_sources = [
     'lib/inspect_manpage.c',
     'lib/inspect_metadata.c',
     'lib/inspect_modularity.c',
+    'lib/inspect_ownership.c',
     'lib/inspect_removedfiles.c',
     'lib/inspect_specname.c',
     'lib/inspect_upstream.c',
@@ -134,6 +137,7 @@ librpminspect = library(
         zlib,
         yaml,
         openssl,
+        libcap,
         mandoc,
         iniparser,
         magic,
