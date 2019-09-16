@@ -117,6 +117,12 @@ struct inspect inspections[] = {
       &inspect_upstream,
       "Report Source archives defined in the RPM spec file changing content between the before and after build. If the source archives change and the package is on the version-whitelist, the change is reported as informational. Otherwise the change is reported as a rebase of the package and requires inspection." },
 
+    { INSPECT_OWNERSHIP,
+      "ownership",
+      true,
+      &inspect_ownership,
+      "Report files and directories owned by unexpected users and groups. Check to make sure executables are owned by the correct user and group. If a before and after build have been specified, also report ownership changes." },
+
     /*
      * { INSPECT_TYPE (add to inspect.h),
      *   "short name",
