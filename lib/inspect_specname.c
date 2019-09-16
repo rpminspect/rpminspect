@@ -26,7 +26,6 @@
 static bool specgood = false;
 
 static bool specname_driver(struct rpminspect *ri, rpmfile_entry_t *file) {
-    bool result = false;
     char *specfile = NULL;
     char *msg = NULL;
     char *pkgname = NULL;
@@ -42,7 +41,6 @@ static bool specname_driver(struct rpminspect *ri, rpmfile_entry_t *file) {
 
     /* We only want to look at the spec files */
     if (!strcmp(file->localpath, specfile)) {
-        result = true;
         specgood = true;
     } else if (strsuffix(file->localpath, SPEC_FILENAME_EXTENSION)) {
         /*
@@ -52,24 +50,23 @@ static bool specname_driver(struct rpminspect *ri, rpmfile_entry_t *file) {
         xasprintf(&msg, "Spec filename does not match the pattern of NAME%s; expected '%s', got '%s'", SPEC_FILENAME_EXTENSION, specfile, file->localpath);
         add_result(&ri->results, RESULT_VERIFY, WAIVABLE_BY_ANYONE, HEADER_SPECNAME, msg, NULL, REMEDY_SPECNAME);
         free(msg);
+        specgood = false;
     }
 
     free(specfile);
-    return result;
+    return specgood;
 }
 
 /*
  * Main driver for the 'specname' inspection.
  */
 bool inspect_specname(struct rpminspect *ri) {
-    bool result = false;
-
     assert(ri != NULL);
-    result = foreach_peer_file(ri, specname_driver);
+    foreach_peer_file(ri, specname_driver);
 
     if (specgood) {
         add_result(&ri->results, RESULT_OK, WAIVABLE_BY_ANYONE, HEADER_SPECNAME, NULL, NULL, NULL);
     }
 
-    return result;
+    return specgood;
 }
