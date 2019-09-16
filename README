@@ -101,6 +101,9 @@ are available):
           https://www.openssl.org/
           http://www.libressl.org/
 
+    * libcap
+          https://sites.google.com/site/fullycapable/
+
 Additionally, the follow packages are required for running the unit tests:
 
     * CUnit (including headers)
@@ -115,7 +118,8 @@ packages:
     dnf install json-c-devel xmlrpc-c-devel libxml2-devel rpm-devel \
                 libarchive-devel elfutils-devel kmod-devel zlib-devel \
                 libmandoc-devel iniparser-devel libyaml-devel file-devel \
-                openssl-devel meson ninja CUnit CUnit-devel gcc
+                openssl-devel libcap-devel meson ninja CUnit CUnit-devel \
+                gcc
 
 
 Runtime Requirements
@@ -130,7 +134,6 @@ are a number of userspace programs required:
     /usr/bin/xzcmp
     /usr/bin/eu-elfcmp
     /usr/bin/msgunfmt
-    /usr/bin/cpp
     /usr/bin/diff
 
 The provided spec file template uses the Fedora locations for these files,
@@ -140,7 +143,7 @@ above tools. If they are available, you should use those packages.
 
 In Fedora for example, you can run the following to install these programs:
 
-    dnf install desktop-file-utils gzip bzip2 xz elfutils gettext cpp diffutils
+    dnf install desktop-file-utils gzip bzip2 xz elfutils gettext diffutils
 
 
 Building
