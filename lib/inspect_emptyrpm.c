@@ -41,7 +41,7 @@ bool is_payload_empty(rpmfile_t *filelist) {
  * Main driver for the 'emptyrpm' inspection.
  */
 bool inspect_emptyrpm(struct rpminspect *ri) {
-    bool ret = false;
+    bool good = true;
     rpmpeer_entry_t *peer = NULL;
     char *msg = NULL;
 
@@ -90,13 +90,13 @@ bool inspect_emptyrpm(struct rpminspect *ri) {
                 free(msg);
             }
 
-            ret = true;
+            good = false;
         }
     }
 
-    if (ret) {
+    if (good) {
         add_result(&ri->results, RESULT_OK, WAIVABLE_BY_ANYONE, HEADER_EMPTYRPM, NULL, NULL, NULL);
     }
 
-    return ret;
+    return good;
 }
