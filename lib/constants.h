@@ -89,6 +89,12 @@
 #define BIN_GROUP "root"
 
 /*
+ * List of shells to use for syntax checking
+ * (only the basename is needed)
+ */
+#define SHELLS "sh ksh zsh csh tcsh rc bash"
+
+/*
  * File extensions
  */
 #define RPM_FILENAME_EXTENSION ".rpm"
