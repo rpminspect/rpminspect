@@ -146,7 +146,7 @@ static bool valid_peers(struct rpminspect *ri, const Header before_hdr, const He
  * Main driver for the 'metadata' inspection.
  */
 bool inspect_metadata(struct rpminspect *ri) {
-    bool ret = false;
+    bool good = true;
     rpmpeer_entry_t *peer = NULL;
 
     assert(ri != NULL);
@@ -169,13 +169,13 @@ bool inspect_metadata(struct rpminspect *ri) {
         }
 
         if (!valid_peers(ri, peer->before_hdr, peer->after_hdr)) {
-            ret = true;
+            good = false;
         }
     }
 
-    if (ret) {
+    if (good) {
         add_result(&ri->results, RESULT_OK, NOT_WAIVABLE, HEADER_METADATA, NULL, NULL, NULL);
     }
 
-    return ret;
+    return good;
 }
