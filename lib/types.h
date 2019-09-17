@@ -212,9 +212,6 @@ struct rpminspect {
     /* Where desktop entry files live */
     char *desktop_entry_files_dir;
 
-    /* desktop-file-validate command location */
-    char *desktop_file_validate;
-
     /* Executable path prefixes and required ownership */
     string_list_t *bin_paths;
     char *bin_owner;

@@ -509,13 +509,6 @@ int init_rpminspect(struct rpminspect *ri, const char *cfgfile) {
         ri->desktop_entry_files_dir = strdup(tmp);
     }
 
-    tmp = iniparser_getstring(cfg, "tests:desktop_file_validate", NULL);
-    if (tmp == NULL) {
-        ri->desktop_file_validate = strdup(DESKTOP_FILE_VALIDATE);
-    } else {
-        ri->desktop_file_validate = strdup(tmp);
-    }
-
     tmp = iniparser_getstring(cfg, "tests:bin_paths", BIN_PATHS);
     parse_list(tmp, &ri->bin_paths);
 

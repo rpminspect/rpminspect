@@ -56,9 +56,17 @@
 #define DESKTOP_ENTRY_FILES_DIR "/usr/share/applications"
 
 /*
- * Default location of desktop-file-validate(1)
+ * Commands used by different inspections
+ * Avoid explicit paths, rpminspect assumes these commands are
+ * available in the $PATH.
  */
-#define DESKTOP_FILE_VALIDATE "/usr/bin/desktop-file-validate"
+#define ZCMP_CMD "zcmp"
+#define BZCMP_CMD "bzcmp"
+#define XZCMP_CMD "xzcmp"
+#define ELFCMP_CMD "eu-elfcmp --ignore-build-id --verbose"
+#define MSGUNFMT_CMD "msgunfmt"
+#define DIFF_CMD "diff"
+#define DESKTOP_FILE_VALIDATE_CMD "desktop-file-validate"
 
 /*
  * Architecture name of source RPMs (from Koji)
