@@ -271,7 +271,7 @@ bool inspect_javabytecode(struct rpminspect *ri)
      */
     TAILQ_FOREACH(peer, ri->peers, items) {
         /* Disappearing subpackages are caught by INSPECT_EMPTYRPM */
-        if (TAILQ_EMPTY(peer->after_files)) {
+        if (peer->after_files == NULL || TAILQ_EMPTY(peer->after_files)) {
             continue;
         }
 
