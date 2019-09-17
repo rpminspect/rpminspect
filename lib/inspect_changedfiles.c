@@ -113,6 +113,8 @@ static bool changedfiles_driver(struct rpminspect *ri, rpmfile_entry_t *file)
     waiverauth_t waiver = WAIVABLE_BY_ANYONE;
     char *before_tmp = NULL;
     char *after_tmp = NULL;
+    int fd;
+    char magic[4];
 
     /* Skip files without a peer, other inspections handle new/missing files */
     if (!file->peer_file) {
@@ -123,6 +125,15 @@ static bool changedfiles_driver(struct rpminspect *ri, rpmfile_entry_t *file)
     if (!S_ISREG(file->st.st_mode)) {
         return true;
     }
+
+    /* Skip files in the debug path and debug source path */
+    if (strprefix(file->localpath, DEBUG_PATH) ||
+        strprefix(file->localpath, DEBUG_SRC_PATH)) {
+        goto done;
+    }
+
+    /* The architecture is used in reporting messages */
+    arch = headerGetString(file->rpm_header, RPMTAG_ARCH);
 
     /* Get the MIME type of the file, will need that */
     type = get_mime_type(file->fullpath);
@@ -135,14 +146,36 @@ static bool changedfiles_driver(struct rpminspect *ri, rpmfile_entry_t *file)
         goto done;
     }
 
-    /* Skip files in the debug path and debug source path */
-    if (strprefix(file->localpath, DEBUG_PATH) ||
-        strprefix(file->localpath, DEBUG_SRC_PATH)) {
-        goto done;
-    }
+    /* Skip Python bytecode files (these always change) */
+    if (!strcmp(type, "application/octet-stream") &&
+        (strsuffix(file->fullpath, PYTHON_PYC_FILE_EXTENSION) ||
+         strsuffix(file->fullpath, PYTHON_PYO_FILE_EXTENSION))) {
+        /* Double check that this is a Python bytecode file */
+        fd = open(file->fullpath, O_RDONLY | O_CLOEXEC | O_LARGEFILE);
 
-    /* The architecture is used in reporting messages */
-    arch = headerGetString(file->rpm_header, RPMTAG_ARCH);
+        if (fd == -1) {
+            fprintf(stderr, "unable to open(2) %s on %s for reading: %s\n", file->localpath, arch, strerror(errno));
+            goto done;
+        }
+
+        if (read(fd, magic, sizeof(magic)) != sizeof(magic)) {
+            fprintf(stderr, "unable to read(2) %s on %s: %s\n", file->localpath, arch, strerror(errno));
+            goto done;
+        }
+
+        if (close(fd) == -1) {
+            fprintf(stderr, "unable to close(2) %s on %s: %s\n", file->localpath, arch, strerror(errno));
+            goto done;
+        }
+
+        /*
+         * Python bytecode files begin with 0x__0D0D0A
+         * The __ is a version identifier which changes from time to time
+         */
+        if (magic[1] == '\x0D' && magic[2] == '\x0D' && magic[3] == '\x0A') {
+            goto done;
+        }
+    }
 
     /* Set the waiver type if this is a file of security concern */
     if (ri->security_path_prefix) {
