@@ -92,6 +92,8 @@
 #define DESKTOP_FILENAME_EXTENSION ".desktop"
 #define DIRECTORY_FILENAME_EXTENSION ".directory"
 #define MO_FILENAME_EXTENSION ".mo"
+#define PYTHON_PYC_FILE_EXTENSION ".pyc"
+#define PYTHON_PYO_FILE_EXTENSION ".pyo"
 
 /*
  * Build ID
