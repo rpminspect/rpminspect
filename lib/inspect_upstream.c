@@ -174,7 +174,7 @@ bool inspect_upstream(struct rpminspect *ri)
         }
 
         /* On the off chance the SRPM is empty, just ignore */
-        if (TAILQ_EMPTY(peer->after_files)) {
+        if (peer->after_files == NULL || TAILQ_EMPTY(peer->after_files)) {
             continue;
         }
 
