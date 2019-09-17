@@ -221,6 +221,9 @@ struct rpminspect {
     string_list_t *forbidden_owners;
     string_list_t *forbidden_groups;
 
+    /* List of shells to check script syntax */
+    string_list_t *shells;
+
     /* hash table of product release -> JVM major versions */
     struct hsearch_data *jvm_table;
     string_list_t *jvm_keys;

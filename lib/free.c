@@ -97,6 +97,7 @@ void free_rpminspect(struct rpminspect *ri) {
     free(ri->bin_group);
     list_free(ri->forbidden_owners, free);
     list_free(ri->forbidden_groups, free);
+    list_free(ri->shells, free);
 
     if (ri->jvm_table != NULL && ri->jvm_keys != NULL) {
         /* look up each key and free the memory for the value */

@@ -532,6 +532,9 @@ int init_rpminspect(struct rpminspect *ri, const char *cfgfile) {
         parse_list(tmp, &ri->forbidden_groups);
     }
 
+    tmp = iniparser_getstring(cfg, "tests:shells", SHELLS);
+    parse_list(tmp, &ri->shells);
+
     /* if a jvm major versions exist, collect those in to a hash table */
     ri->jvm_table = NULL;
     ri->jvm_keys = NULL;
