@@ -27,14 +27,6 @@
 
 #include "rpminspect.h"
 
-/* Command strings used during this inspection */
-#define ZCMP_CMD "zcmp"
-#define BZCMP_CMD "bzcmp"
-#define XZCMP_CMD "xzcmp"
-#define ELFCMP_CMD "eu-elfcmp --ignore-build-id --verbose"
-#define MSGUNFMT_CMD "msgunfmt"
-#define DIFF_CMD "diff"
-
 /*
  * Called by changedfiles_driver() to add additional information for
  * files marked as security concerns.
