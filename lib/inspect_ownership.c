@@ -20,7 +20,6 @@
 #include <string.h>
 #include <errno.h>
 #include <assert.h>
-#include <sys/capability.h>
 #include <cap-ng.h>
 
 #include "rpminspect.h"
