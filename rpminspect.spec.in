@@ -24,7 +24,7 @@ BuildRequires:  iniparser-devel
 BuildRequires:  libyaml-devel
 BuildRequires:  file-devel
 BuildRequires:  openssl-devel
-BuildRequires:  libcap-devel
+BuildRequires:  libcap-ng-devel
 
 %description
 Build deviation and compliance tool.  This program runs a number of tests

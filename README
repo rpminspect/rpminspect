@@ -101,8 +101,8 @@ are available):
           https://www.openssl.org/
           http://www.libressl.org/
 
-    * libcap
-          https://sites.google.com/site/fullycapable/
+    * libcap-ng
+          https://github.com/stevegrubb/libcap-ng
 
 Additionally, the follow packages are required for running the unit tests:
 
@@ -118,7 +118,7 @@ packages:
     dnf install json-c-devel xmlrpc-c-devel libxml2-devel rpm-devel \
                 libarchive-devel elfutils-devel kmod-devel zlib-devel \
                 libmandoc-devel iniparser-devel libyaml-devel file-devel \
-                openssl-devel libcap-devel meson ninja CUnit CUnit-devel \
+                openssl-devel libcap-ng-devel meson ninja CUnit CUnit-devel \
                 gcc
 
 
