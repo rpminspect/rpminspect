@@ -21,6 +21,7 @@
 #include <errno.h>
 #include <assert.h>
 #include <sys/capability.h>
+#include <cap-ng.h>
 
 #include "rpminspect.h"
 
@@ -79,13 +80,13 @@ static bool ownership_driver(struct rpminspect *ri, rpmfile_entry_t *file) {
     char *before_group = NULL;
     char *msg = NULL;
     string_entry_t *entry = NULL;
-    cap_t cap;
-    cap_flag_value_t capval = 0;
     severity_t sev;
     bool bin = false;
     char *before_val = NULL;
     char *after_val = NULL;
     char *what = NULL;
+    int fd = -1;
+    int cap = -1;
 
     /* Skip source packages */
     if (headerIsSource(file->rpm_header)) {
@@ -145,20 +146,20 @@ static bool ownership_driver(struct rpminspect *ri, rpmfile_entry_t *file) {
             /* Check the group - special handling */
             if (strcmp(group, ri->bin_group)) {
                 /* Gather capabilities(7) for the file we need */
-                cap = cap_get_file(file->fullpath);
-
-                if (cap == NULL) {
-                    fprintf(stderr, "*** unable to get capabilities(7) on %s on %s: %s\n", file->localpath, arch, strerror(errno));
+                if ((fd = open(file->fullpath, O_RDONLY)) == -1) {
+                    fprintf(stderr, "*** unable to open() %s on %s: %s\n", file->localpath, arch, strerror(errno));
                     break;
                 }
 
-                if (cap_get_flag(cap, CAP_SETUID, CAP_EFFECTIVE, &capval) == -1) {
-                    fprintf(stderr, "*** unable to get capabilities(7) flag on %s on %s: %s\n", file->localpath, arch, strerror(errno));
+                cap = capng_get_caps_fd(fd);
+
+                if (close(fd) == -1) {
+                    fprintf(stderr, "*** unable to close() %s on %s: %s\n", file->localpath, arch, strerror(errno));
                     break;
                 }
 
                 /* Handle if CAP_SETUID is present or not */
-                if (capval == CAP_SET) {
+                if ((cap == 0) && capng_have_capability(CAPNG_EFFECTIVE, CAP_SETUID)) {
                     if (file->st.st_mode & S_IXOTH) {
                         xasprintf(&msg, "File %s on %s has CAP_SETUID capability but group `%s` and is world executable", file->localpath, arch, group);
                         add_result(&ri->results, RESULT_BAD, WAIVABLE_BY_ANYONE, HEADER_OWNERSHIP, msg, NULL, REMEDY_OWNERSHIP_IXOTH);
