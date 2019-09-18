@@ -37,10 +37,24 @@
 
 #include "rpminspect.h"
 
+static FILE *error_stream = NULL;
 static regex_t sections_regex;
 
+static void error_handler(enum mandocerr errtype, enum mandoclevel level, const char *file, int line, int col, const char *msg)
+{
+    fprintf(error_stream, "Error parsing %s:%d:%d: %s: %s: %s\n",
+            basename(file), line, col, mparse_strlevel(level), mparse_strerror(errtype), msg);
+}
+
+/* Free the memory used by mandoc */
+static void inspect_manpage_free(void)
+{
+    mchars_free();
+    regfree(&sections_regex);
+}
+
 /* Allocate memory used by inspect_manpage */
-bool inspect_manpage_alloc(void)
+static bool inspect_manpage_alloc(void)
 {
     int reg_result;
     char reg_error[BUFSIZ];
@@ -65,13 +79,6 @@ bool inspect_manpage_alloc(void)
     return true;
 }
 
-/* Free the memory used by mandoc */
-void inspect_manpage_free(void)
-{
-    mchars_free();
-    regfree(&sections_regex);
-}
-
 /*
  * Check that a man page is in the correct directory for its section.
  * The directory section (/usr/share/man/man<section>) must be a prefix
@@ -79,14 +86,13 @@ void inspect_manpage_free(void)
  * can include additional trailing characters. e.g., man1/x509.1ssl.gz is valid.
  * man1x/imake.1.gz is not.
  */
-bool inspect_manpage_path(const char *path)
+static bool inspect_manpage_path(const char *path)
 {
     /* 0 is the whole match, 1 is the directory section, 2 is the filename section */
     regmatch_t section_matches[3];
 
     char directory_section[128];
     char filename_section[128];
-
 
     /* If there was no match, or if the match is bigger than our buffer,
      * assume something is wrong with the path and return false.
@@ -112,11 +118,11 @@ bool inspect_manpage_path(const char *path)
     }
 
     snprintf(directory_section, sizeof(directory_section), "%.*s",
-            section_matches[1].rm_eo - section_matches[1].rm_so,
-            path + section_matches[1].rm_so);
+             section_matches[1].rm_eo - section_matches[1].rm_so,
+             path + section_matches[1].rm_so);
     snprintf(filename_section, sizeof(filename_section), "%.*s",
-            section_matches[2].rm_eo - section_matches[2].rm_so,
-            path + section_matches[2].rm_so);
+             section_matches[2].rm_eo - section_matches[2].rm_so,
+             path + section_matches[2].rm_so);
 
     return strprefix(filename_section, directory_section);
 }
@@ -128,7 +134,7 @@ bool inspect_manpage_path(const char *path)
  * Returns NULL on success, otherwise returns an error message as a string.
  * The returned string is statically allocated.
  */
-char * inspect_manpage_validity(const char *path, const char *localpath)
+static char *inspect_manpage_validity(const char *path, const char *localpath)
 {
     struct mparse *parser;
     int fd = -1;
@@ -142,13 +148,6 @@ char * inspect_manpage_validity(const char *path, const char *localpath)
      */
     char *error_buffer = NULL;
     size_t error_buffer_size = 0;
-    FILE *error_stream;
-    void error_handler(enum mandocerr errtype, enum mandoclevel level, const char *file,
-            int line, int col, const char *msg)
-    {
-        fprintf(error_stream, "Error parsing %s:%d:%d: %s: %s: %s\n",
-                basename(file), line, col, mparse_strlevel(level), mparse_strerror(errtype), msg);
-    }
 
     /* Initialize the error buffer */
     error_stream = open_memstream(&error_buffer, &error_buffer_size);
