@@ -1,6 +1,7 @@
 /*
  * Copyright (C) 2019  Red Hat, Inc.
  * Author(s):  David Shea <dshea@redhat.com>
+ *             David Cantrell <dcantrell@redhat.com>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -24,6 +25,8 @@
 #include <string.h>
 
 #include "rpminspect.h"
+
+string_list_t *sorted_list = NULL;
 
 struct hsearch_data * list_to_table(const string_list_t *list)
 {
@@ -284,6 +287,20 @@ static void do_nothing(void *nodep __attribute__((unused)))
     return;
 }
 
+/* define the twalk action as a nested function so we can get to the sorted_list */
+static void walk_action(const void *nodep, const VISIT which, const int depth __attribute__((unused)))
+{
+    string_entry_t *entry = *((string_entry_t **) nodep);
+    string_entry_t *sorted_entry;
+
+    if ((which == postorder) || (which == leaf)) {
+        sorted_entry = calloc(1, sizeof(*sorted_entry));
+        assert(sorted_entry != NULL);
+        sorted_entry->data = entry->data;
+        TAILQ_INSERT_TAIL(sorted_list, sorted_entry, items);
+    }
+}
+
 /* Return a sorted copy of the list.
  *
  * The data pointers used by the sorted list entries are the same as those
@@ -292,23 +309,7 @@ static void do_nothing(void *nodep __attribute__((unused)))
 string_list_t * list_sort(const string_list_t *list)
 {
     string_entry_t *iter;
-    string_list_t *sorted_list = NULL;
     void *tree = NULL;
-
-    /* define the twalk action as a nested function so we can get to the sorted_list */
-    void walk_action(const void *nodep, const VISIT which, const int depth __attribute__((unused)))
-    {
-        string_entry_t *entry = *((string_entry_t **) nodep);
-        string_entry_t *sorted_entry;
-
-        if ((which == postorder) || (which == leaf)) {
-            sorted_entry = calloc(1, sizeof(*sorted_entry));
-            assert(sorted_entry != NULL);
-            sorted_entry->data = entry->data;
-            TAILQ_INSERT_TAIL(sorted_list, sorted_entry, items);
-        }
-    }
-
 
     /* copy entries into a tree to sort */
     TAILQ_FOREACH(iter, list, items) {

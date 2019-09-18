@@ -942,8 +942,8 @@ static bool elf_driver(struct rpminspect *ri, rpmfile_entry_t *after)
     const char *arch;
     Elf *after_elf = NULL;
     Elf *before_elf = NULL;
-    int after_elf_fd;
-    int before_elf_fd;
+    int after_elf_fd = -1;
+    int before_elf_fd = -1;
     bool result = true;
 
     /* Skip source packages */
