@@ -51,7 +51,7 @@ usage() {
 }
 
 # Handle command line options
-OPTS=$(getopt -o 'btpgh' --long 'bumpver,tag,push,github,help' -n "${PROG}" -- "$@")
+OPTS=$(getopt -o 'btpgAh' --long 'bumpver,tag,push,github,all,help' -n "${PROG}" -- "$@")
 
 if [ $? -ne 0 ]; then
     echo "Terminating..." >&2
