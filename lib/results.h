@@ -42,6 +42,7 @@
 #define HEADER_ADDEDFILES    "added-files"
 #define HEADER_UPSTREAM      "upstream"
 #define HEADER_OWNERSHIP     "ownership"
+#define HEADER_SHELLSYNTAX   "shell-syntax"
 
 /*
  * Inspection remedies
@@ -108,5 +109,10 @@
 #define REMEDY_OWNERSHIP_IXOTH "Either chgrp the file to the bin_group set in rpminspect.conf or remove the world execute bit on the file (chmod o-x)."
 #define REMEDY_OWNERSHIP_IWGRP "Either chgrp the file to the bin_group set in rpminspect.conf or remove the group write bit on the file (chmod g-w)."
 #define REMEDY_OWNERSHIP_CHANGED "Verify the ownership changes are expected. If not, adjust the package build process to set correct owner and group information."
+
+/* shellsyntax */
+#define REMEDY_SHELLSYNTAX "Consult the shell documentation for proper syntax."
+#define REMEDY_SHELLSYNTAX_GAINED_SHELL "The file referenced was not a known shell script in the before build but is now a shell script in the after build."
+#define REMEDY_SHELLSYNTAX_BAD "The referenced shell script is invalid. Consider debugging it with the '-n' option on the shell to find and fix the problem."
 
 #endif

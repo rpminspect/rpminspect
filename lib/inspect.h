@@ -124,6 +124,9 @@ bool inspect_upstream(struct rpminspect *);
 /* inspect_ownership.c */
 bool inspect_ownership(struct rpminspect *);
 
+/* inspect_shellsyntax.c */
+bool inspect_shellsyntax(struct rpminspect *);
+
 /*
  * Inspections are referenced by flag.  These flags are set in bitfields
  * to indicate which ones we want to run.  When adding new ones, please
@@ -148,5 +151,6 @@ bool inspect_ownership(struct rpminspect *);
 #define INSPECT_ADDEDFILES                  (((uint64_t) 1) << 14)
 #define INSPECT_UPSTREAM                    (((uint64_t) 1) << 15)
 #define INSPECT_OWNERSHIP                   (((uint64_t) 1) << 16)
+#define INSPECT_SHELLSYNTAX                 (((uint64_t) 1) << 17)
 
 #endif
