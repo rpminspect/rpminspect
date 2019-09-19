@@ -189,10 +189,12 @@ if [ "${OPT_GITHUB}" = "y" ]; then
 
     # Create new release on github
     API_JSON=$(printf '{"tag_name": "%s", "target_commitish": "master", "name": "%s-%s", "body": "%s-%s", "draft": false, "prerelease": false}' ${TAG} ${PROJECT} ${VERSION} ${PROJECT} ${VERSION})
-    ${CURL} --data "${API_JSON}" https://api.github.com/repos/${PROJECT}/${PROJECT}/releases?access_token=${TOKEN}
+    RELEASE_INFO="$(mktemp)"
+    ${CURL} -o "${RELEASE_INFO}" --data "${API_JSON}" https://api.github.com/repos/${PROJECT}/${PROJECT}/releases?access_token=${TOKEN}
 
     # Get the ID of the asset
-    ASSET_ID="$(${CURL} -sH "${GH_AUTH}" "${GH_TAGS}" | grep -m 1 "id.:" | grep -w id | tr : = | tr -cd '[[:alnum:]]=')"
+    ASSET_ID="$(grep -m 1 "id.:" ${RELEASE_INFO} | grep -w id | tr : = | tr -cd '[[:alnum:]]=')"
+    rm -f ${RELEASE_INFO}
     if [ -z "${ASSET_ID}" ]; then
         echo "*** Unable to get the asset ID" >&2
         exit 1
