@@ -145,6 +145,12 @@ In Fedora for example, you can run the following to install these programs:
 
     dnf install desktop-file-utils gzip bzip2 xz elfutils gettext diffutils
 
+The 'shellsyntax' inspection uses the actual shell programs listed in the
+shells setting in the rpminspect.conf.  Since this can vary by system, you
+should make sure the are available in the system PATH.  Or you can just not
+use the shellsyntax inspection.  The spec file for rpminspect includes weak
+dependencies on the default list of shells.
+
 
 Building
 --------

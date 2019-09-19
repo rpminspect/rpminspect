@@ -97,6 +97,7 @@ librpminspect_sources = [
     'lib/inspect_modularity.c',
     'lib/inspect_ownership.c',
     'lib/inspect_removedfiles.c',
+    'lib/inspect_shellsyntax.c',
     'lib/inspect_specname.c',
     'lib/inspect_upstream.c',
     'lib/inspect_xml.c',
@@ -276,8 +277,10 @@ test_env.set('RPMINSPECT', rpminspect_prog.full_path())
 help_test = find_program('tests/rpminspect-help.sh')
 segv_test = find_program('tests/rpminspect-segv.sh')
 
+
 test('rpminspect-help', help_test, env : test_env)
 test('rpminspect-segv', segv_test, env : test_env)
+
 
 # Install header files
 install_headers(
