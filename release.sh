@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/sh -x
 #
 # Automate making a new release of rpminspect
 # This script will increment the version minor number and continue
@@ -138,7 +138,9 @@ fi
 # Generate the dist artifact and sign it
 meson setup build
 ninja -v -C build dist
-( cd build/meson-dist ; gpg --detach-sign --armor ${PROJECT}-${VERSION}.tar.xz )
+cd build/meson-dist
+gpg --detach-sign --armor ${PROJECT}-${VERSION}.tar.xz
+cd ${CWD}
 
 # Create an rpminspect.spec file
 RPMDATE="$(date +'%a %b %d %Y')"
