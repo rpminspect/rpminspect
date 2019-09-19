@@ -123,7 +123,7 @@ if [ "${OPT_BUMPVER}" = "y" ]; then
     OLDVERSION="${VERSION}"
     NEWMIN="$(expr ${CURMIN} + 1)"
     VERSION="${CURMAJ}.${NEWMIN}"
-    sed -i -e "s|'${CURVER}'|'${VERSION}'|g" meson.build
+    sed -i -e "s|'${OLDVERSION}'|'${VERSION}'|g" meson.build
     git add meson.build
     git commit -m "New release (${VERSION})"
 else
