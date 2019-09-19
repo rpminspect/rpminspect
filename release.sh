@@ -3,6 +3,7 @@
 # Automate making a new release of rpminspect
 # This script will increment the version minor number and continue
 # through with tagging the repo and make the archive and spec file.
+# by: David Cantrell <dcantrell@redhat.com>
 #
 
 PATH=/usr/bin
@@ -174,19 +175,19 @@ if [ "${GITHUB}" = "y" ]; then
     fi
 
     # XXX: Create new release on github
-    #API_JSON=$(printf '{"tag_name": "%s", "target_commitish": "master", "name": "%s-%s", "body": "%s-%s", "draft": false, "prerelease": false}' ${TAG} ${PROJECT} ${VERSION} ${PROJECT} ${VERSION})
-    #${CURL} --data "${API_JSON}" https://api.github.com/repos/${PROJECT}/${PROJECT}/releases?access_token=${TOKEN}
+    API_JSON=$(printf '{"tag_name": "%s", "target_commitish": "master", "name": "%s-%s", "body": "%s-%s", "draft": false, "prerelease": false}' ${TAG} ${PROJECT} ${VERSION} ${PROJECT} ${VERSION})
+    ${CURL} --data "${API_JSON}" https://api.github.com/repos/${PROJECT}/${PROJECT}/releases?access_token=${TOKEN}
 
     # XXX: Get the ID of the asset
-    #ASSET_ID="$(${CURL} -sH "${GH_AUTH}" "${GH_TAGS}" | grep -m 1 "id.:" | grep -w id | tr : = | tr -cd '[[:alnum:]]=')"
-    #if [ -z "${ASSET_ID}" ]; then
-    #    echo "*** Unable to get the asset ID" >&2
-    #    exit 1
-    #fi
+    ASSET_ID="$(${CURL} -sH "${GH_AUTH}" "${GH_TAGS}" | grep -m 1 "id.:" | grep -w id | tr : = | tr -cd '[[:alnum:]]=')"
+    if [ -z "${ASSET_ID}" ]; then
+        echo "*** Unable to get the asset ID" >&2
+        exit 1
+    fi
 
     # XXX: Upload the assets
-    #for asset in ${PROJECT}-${VERSION}.tar.gz ${PROJECT}-${VERSION}.tar.gz.asc ; do
-    #    GH_ASSET="https://uploads.github.com/repos/${PROJECT}/${PROJECT}/releases/${ASSET_ID}/assets?name=${asset}"
-    #    ${CURL} "$GITHUB_OAUTH_BASIC" --data-binary @"$filename" -H "${GH_AUTH}" -H "Content-Type: application/octet-stream" ${GH_ASSET}
-    #done
+    for asset in ${PROJECT}-${VERSION}.tar.gz ${PROJECT}-${VERSION}.tar.gz.asc ; do
+        GH_ASSET="https://uploads.github.com/repos/${PROJECT}/${PROJECT}/releases/${ASSET_ID}/assets?name=${asset}"
+        ${CURL} "$GITHUB_OAUTH_BASIC" --data-binary @"$filename" -H "${GH_AUTH}" -H "Content-Type: application/octet-stream" ${GH_ASSET}
+    done
 fi
