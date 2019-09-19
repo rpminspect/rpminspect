@@ -10,12 +10,17 @@ PATH=/usr/bin
 CWD="$(pwd)"
 CURL="curl -L -O --progress-bar"
 PROG="$(basename $0)"
-TMPOPTS="$(mktemp)"
 
 # Github settings
 PROJECT=rpminspect
 GH_API="https://api.github.com"
 GH_REPO="${GH_API}/repos/${PROJECT}/${PROJECT}"
+
+# Command line options
+OPT_BUMPVER=
+OPT_TAG=
+OPT_PUSH=
+OPT_GITHUB=
 
 usage() {
     echo "Create a release for rpminspect"
@@ -26,6 +31,7 @@ usage() {
     echo "    -p, --push         Push the release and release tag"
     echo "    -g, --github       Create github release entry and upload"
     echo "                       artifacts"
+    echo "    -A, --all          Same as '-b -t -p -g'"
     echo "    -h, --help         Display usage"
     echo "The options control behavior on the repo and upstream."
     echo
@@ -58,24 +64,30 @@ unset OPTS
 while true ; do
     case "$1" in
         '-b'|'--bumpver')
-            echo "BUMPVER=y" >> ${TMPOPTS}
+            OPT_BUMPVER=y
             shift
             ;;
         '-t'|'--tag')
-            echo "TAG=y" >> ${TMPOPTS}
+            OPT_TAG=y
             shift
             ;;
         '-p'|'--push')
-            echo "PUSH=y" >> ${TMPOPTS}
+            OPT_PUSH=y
             shift
             ;;
         '-g'|'--github')
-            echo "GITHUB=y" >> ${TMPOPTS}
+            OPT_GITHUB=y
+            shift
+            ;;
+        '-A'|'--all')
+            OPT_BUMPVER=y
+            OPT_TAG=y
+            OPT_PUSH=y
+            OPT_GITHUB=y
             shift
             ;;
         '-h'|'--help')
             usage
-            rm -f "${TMPOPTS}"
             exit 0
             ;;
         '--')
@@ -88,10 +100,6 @@ while true ; do
             ;;
     esac
 done
-
-# Turn the command line options in to variables
-. "${TMPOPTS}"
-rm -f "${TMPOPTS}"
 
 # Make sure we are in the right place
 if [ ! -f "${CWD}/meson.build" ] && [ ! -f "${CWD}/rpminspect.spec.in" ]; then
@@ -111,16 +119,19 @@ VERSION="$(grep 'version :' meson.build | grep -E "'[0-9]+\.[0-9]+'" | cut -d "'
 CURMAJ="$(echo ${VERSION} | cut -d '.' -f 1)"
 CURMIN="$(echo ${VERSION} | cut -d '.' -f 2)"
 
-if [ "${BUMPVER}" = "y" ]; then
+if [ "${OPT_BUMPVER}" = "y" ]; then
+    OLDVERSION="${VERSION}"
     NEWMIN="$(expr ${CURMIN} + 1)"
     VERSION="${CURMAJ}.${NEWMIN}"
     sed -i -e "s|'${CURVER}'|'${VERSION}'|g" meson.build
     git add meson.build
     git commit -m "New release (${VERSION})"
+else
+    OLDVERSION="${VERSION}"
 fi
 
 # Now tag the release
-if [ "${TAG}" = "y" ]; then
+if [ "${OPT_TAG}" = "y" ]; then
     git tag -s -a -m "Tag release v${VERSION}" v${VERSION}
 fi
 
@@ -147,13 +158,13 @@ sed -i -e "s|%%TARBALL%%|${PROJECT}-${VERSION}.tar.xz|g" build/meson-dist/rpmins
            --define "_rpmdir ." rpminspect.spec )
 
 # Push the changes
-if [ "${PUSH}" = "y" ]; then
+if [ "${OPT_PUSH}" = "y" ]; then
     git push
     git push --tags
 fi
 
 # Create a github release entry
-if [ "${GITHUB}" = "y" ]; then
+if [ "${OPT_GITHUB}" = "y" ]; then
     TAG="$(git tag -l | tail -n 1)"
 
     # Get github access token
@@ -174,20 +185,27 @@ if [ "${GITHUB}" = "y" ]; then
         exit 1
     fi
 
-    # XXX: Create new release on github
+    # Create new release on github
     API_JSON=$(printf '{"tag_name": "%s", "target_commitish": "master", "name": "%s-%s", "body": "%s-%s", "draft": false, "prerelease": false}' ${TAG} ${PROJECT} ${VERSION} ${PROJECT} ${VERSION})
     ${CURL} --data "${API_JSON}" https://api.github.com/repos/${PROJECT}/${PROJECT}/releases?access_token=${TOKEN}
 
-    # XXX: Get the ID of the asset
+    # Get the ID of the asset
     ASSET_ID="$(${CURL} -sH "${GH_AUTH}" "${GH_TAGS}" | grep -m 1 "id.:" | grep -w id | tr : = | tr -cd '[[:alnum:]]=')"
     if [ -z "${ASSET_ID}" ]; then
         echo "*** Unable to get the asset ID" >&2
         exit 1
     fi
 
-    # XXX: Upload the assets
-    for asset in ${PROJECT}-${VERSION}.tar.gz ${PROJECT}-${VERSION}.tar.gz.asc ; do
+    # Upload the assets
+    cd build/meson-build
+    for asset in ${PROJECT}-${VERSION}.tar.xz ${PROJECT}-${VERSION}.tar.xz.asc ; do
         GH_ASSET="https://uploads.github.com/repos/${PROJECT}/${PROJECT}/releases/${ASSET_ID}/assets?name=${asset}"
-        ${CURL} "$GITHUB_OAUTH_BASIC" --data-binary @"$filename" -H "${GH_AUTH}" -H "Content-Type: application/octet-stream" ${GH_ASSET}
+        ${CURL} -H "${GH_AUTH}" --data-binary @"${asset}" -H "Content-Type: application/octet-stream" ${GH_ASSET}
     done
+    cd ${CWD}
 fi
+
+echo
+echo "Log entries since the last release can be obtained with:"
+echo "    git log v${OLDVERSION}.."
+echo
