@@ -28,7 +28,10 @@ yaml = dependency('yaml-0.1', method : 'pkg-config', required : true)
 openssl = dependency('openssl', method : 'pkg-config', required : true)
 libcap_ng = dependency('libcap-ng', method : 'pkg-config', required : true)
 
+# Test suite dependencies
 cunit = dependency('cunit', method : 'pkg-config', required : false)
+pymod = import('python')
+python = pymod.find_installation('python3', required: false)
 
 # Other dependencies
 
@@ -271,16 +274,18 @@ else
 endif
 
 # Integration test suite
-test_env = environment()
-test_env.set('RPMINSPECT', rpminspect_prog.full_path())
+if python.found()
+    test_env = environment()
+    test_env.set('RPMINSPECT', rpminspect_prog.full_path())
 
-help_test = find_program('tests/rpminspect-help.sh')
-segv_test = find_program('tests/rpminspect-segv.sh')
-
-
-test('rpminspect-help', help_test, env : test_env)
-test('rpminspect-segv', segv_test, env : test_env)
-
+    test('rpminspect-test-suite',
+         python,
+         args : ['-B', '-m', 'unittest', 'discover', '-v', meson.source_root() + '/tests'],
+         env : test_env
+        )
+else
+    warning('Python not found, skipping integration test suite')
+endif
 
 # Install header files
 install_headers(
