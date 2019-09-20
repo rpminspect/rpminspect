@@ -54,7 +54,7 @@ static bool disttag_driver(struct rpminspect *ri, rpmfile_entry_t *file) {
     if (fp == NULL) {
         fprintf(stderr, "error opening %s for reading: %s\n", file->fullpath, strerror(errno));
         fflush(stderr);
-        return false;
+        return true;
     }
 
     while (getline(&buf, &len, fp) != -1) {
@@ -78,7 +78,6 @@ static bool disttag_driver(struct rpminspect *ri, rpmfile_entry_t *file) {
     if (fclose(fp) == -1) {
         fprintf(stderr, "error closing %s: %s\n", file->fullpath, strerror(errno));
         fflush(stderr);
-        result = false;
     }
 
     /* Check the line if we found it */
@@ -86,16 +85,19 @@ static bool disttag_driver(struct rpminspect *ri, rpmfile_entry_t *file) {
         msg = strdup("The %s file is missing the Release: tag.");
         add_result(&ri->results, RESULT_BAD, WAIVABLE_BY_ANYONE, HEADER_DISTTAG, msg, buf, REMEDY_DISTTAG);
         free(msg);
+        result = false;
     } else if (strstr(buf, "dist")) {
         if (strstr(buf, "%{?dist}") == NULL) {
             msg = strdup("The dist tag should be of the form '%%{?dist}' in the Release tag.");
-            add_result(&ri->results, RESULT_VERIFY, WAIVABLE_BY_ANYONE, HEADER_DISTTAG, msg, buf, REMEDY_DISTTAG);
+            add_result(&ri->results, RESULT_BAD, WAIVABLE_BY_ANYONE, HEADER_DISTTAG, msg, buf, REMEDY_DISTTAG);
             free(msg);
+            result = false;
         }
     } else {
         msg = strdup("The Release: tag does not seem to contain a '%%{?dist}' tag.");
-        add_result(&ri->results, RESULT_VERIFY, WAIVABLE_BY_ANYONE, HEADER_DISTTAG, msg, buf, REMEDY_DISTTAG);
+        add_result(&ri->results, RESULT_BAD, WAIVABLE_BY_ANYONE, HEADER_DISTTAG, msg, buf, REMEDY_DISTTAG);
         free(msg);
+        result = false;
     }
 
     free(buf);
@@ -106,13 +108,39 @@ static bool disttag_driver(struct rpminspect *ri, rpmfile_entry_t *file) {
  * Main driver for the 'disttag' inspection.
  */
 bool inspect_disttag(struct rpminspect *ri) {
-    bool result = false;
+    bool result = true;
+    bool src = false;
+    rpmpeer_entry_t *peer = NULL;
+    rpmfile_entry_t *file = NULL;
 
     assert(ri != NULL);
-    result = foreach_peer_file(ri, disttag_driver);
 
-    if (result) {
-        add_result(&ri->results, RESULT_OK, WAIVABLE_BY_ANYONE, HEADER_DISTTAG, NULL, NULL, NULL);
+    /*
+     * Only run over the package headers and mark if
+     * we never see an SRPM file.
+     */
+    TAILQ_FOREACH(peer, ri->peers, items) {
+        if (!headerIsSource(peer->after_hdr)) {
+            continue;
+        }
+
+        if (peer->after_files == NULL || TAILQ_EMPTY(peer->after_files)) {
+            continue;
+        }
+
+        /* We have at least one source package */
+        src = true;
+
+        TAILQ_FOREACH(file, peer->after_files, items) {
+            result = disttag_driver(ri, file);
+        }
+    }
+
+    /* If we never saw an SRPM, tell the user. */
+    if (result && src) {
+        add_result(&ri->results, RESULT_OK, NOT_WAIVABLE, HEADER_DISTTAG, NULL, NULL, NULL);
+    } else if (!src) {
+        add_result(&ri->results, RESULT_BAD, NOT_WAIVABLE, HEADER_DISTTAG, "Specified package is not a source RPM, cannot run disttag inspection.", NULL, NULL);
     }
 
     return result;
