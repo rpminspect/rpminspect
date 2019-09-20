@@ -21,8 +21,8 @@ script:
   - |
     $DOCKER_RUN ninja -v -C build &&
     $DOCKER_RUN ninja -C build coverage &&
-    $DOCKER_RUN ninja -C build test
-    $DOCKER_RUN meson test -C build --setup valgrind
+    $DOCKER_RUN meson test -C build -v &&
+    $DOCKER_RUN meson test -C build -v --setup valgrind
 
 after_success:
   - coveralls -b build --gcov-options '\-lp'
