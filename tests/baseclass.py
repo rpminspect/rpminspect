@@ -23,11 +23,18 @@ import unittest
 class MissingRpminspect(Exception):
     pass
 
+class MissingRpminspectConf(Exception):
+    pass
+
 # Base test case class that ensures we have 'rpminspect'
 # as an executable command.
 class RequiresRpminspect(unittest.TestCase):
     def setUp(self):
         self.rpminspect = os.environ['RPMINSPECT']
+        self.conffile = os.environ['RPMINSPECTCONF']
 
-        if not os.path.isfile or not os.access(self.rpminspect, os.X_OK):
+        if not os.path.isfile(self.rpminspect) or not os.access(self.rpminspect, os.X_OK):
             raise MissingRpminspect
+
+        if not os.path.isfile(self.conffile) or not os.access(self.conffile, os.R_OK):
+            raise MissingRpminspectConf
