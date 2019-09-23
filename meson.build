@@ -277,6 +277,7 @@ endif
 if python.found()
     test_env = environment()
     test_env.set('RPMINSPECT', rpminspect_prog.full_path())
+    test_env.set('RPMINSPECTCONF', meson.source_root() + '/src/rpminspect.conf')
 
     test('rpminspect-test-suite',
          python,
