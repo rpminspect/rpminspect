@@ -13,9 +13,12 @@ env:
 before_install:
   - docker build -t rpminspect/test-env -f Dockerfile.test .
 
+# The pip command here needs to be what's available in the Travis-CI
+# image root, which is an Ubuntu system.  So it's spelled 'pip' or
+# 'pip3' whereas Fedora spells it 'pip-3'.
 script:
   - $DOCKER_RUN meson setup build --werror -Db_coverage=true
-  - pip-3 install --user cpp-coveralls
+  - pip install --user cpp-coveralls
 
   # Stop after the first failure, to keep the output more readable
   - |
