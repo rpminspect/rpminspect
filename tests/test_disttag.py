@@ -30,9 +30,8 @@ class TestMissingDistTag(RequiresRpminspect):
         self.rpm.make()
 
     def runTest(self):
-        p = subprocess.Popen([self.rpminspect, '-F', 'json', '-T', 'disttag', self.rpm.get_built_srpm()], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        p = subprocess.Popen([self.rpminspect, '-c', self.conffile, '-F', 'json', '-T', 'disttag', self.rpm.get_built_srpm()], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         (out, err) = p.communicate()
-        print("\n\n|%s|\n\n" % out)
         results = json.loads(out)
         self.assertEqual(p.returncode, 1)
         self.assertEqual(results['dist-tag'][0]['result'], 'BAD')
