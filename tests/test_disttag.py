@@ -16,65 +16,39 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 #
 
-import subprocess
 import unittest
-import json
-import rpmfluff
-from baseclass import RequiresRpminspect
+from baseclass import TestSRPM, TestRPMs
 
 # Verify missing %{?dist} in Release fails (BAD)
-class TestMissingDistTag(RequiresRpminspect):
+class TestMissingDistTag(TestSRPM):
     def setUp(self):
-        RequiresRpminspect.setUp(self)
-        self.rpm = rpmfluff.SimpleRpmBuild("example", "0.1", "1")
-        self.rpm.make()
-
-    def runTest(self):
-        p = subprocess.Popen([self.rpminspect, '-c', self.conffile, '-F', 'json', '-T', 'disttag', self.rpm.get_built_srpm()], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-        (out, err) = p.communicate()
-        results = json.loads(out)
-        self.assertEqual(p.returncode, 1)
-        self.assertEqual(results['dist-tag'][0]['result'], 'BAD')
+        TestSRPM.setUp(self)
+        self.inspection = 'disttag'
+        self.label = 'dist-tag'
+        self.result = 'BAD'
 
 # Verify running on not an SRPM fails
-class TestDistTagOnNonSRPM(RequiresRpminspect):
+class TestDistTagOnNonSRPM(TestRPMs):
     def setUp(self):
-        RequiresRpminspect.setUp(self)
-        self.rpm = rpmfluff.SimpleRpmBuild("example", "0.1", "1%{?dist}")
-        self.rpm.make()
-
-    def runTest(self):
-        for a in self.rpm.get_build_archs():
-            p = subprocess.Popen([self.rpminspect, '-c', self.conffile, '-F', 'json', '-T', 'disttag', self.rpm.get_built_rpm(a)], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-            (out, err) = p.communicate()
-            results = json.loads(out)
-            self.assertEqual(p.returncode, 1)
-            self.assertEqual(results['dist-tag'][0]['result'], 'BAD')
+        TestRPMs.setUp(self)
+        self.rpm.release = '1%{?dist}'
+        self.inspection = 'disttag'
+        self.label = 'dist-tag'
+        self.result = 'BAD'
 
 # Verify malformed %{?dist} tag in Release fails (BAD)
-class TestMalformedDistTag(RequiresRpminspect):
+class TestMalformedDistTag(TestSRPM):
     def setUp(self):
-        RequiresRpminspect.setUp(self)
-        self.rpm = rpmfluff.SimpleRpmBuild("example", "0.1", "1dist")
-        self.rpm.make()
-
-    def runTest(self):
-        p = subprocess.Popen([self.rpminspect, '-c', self.conffile, '-F', 'json', '-T', 'disttag', self.rpm.get_built_srpm()], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-        (out, err) = p.communicate()
-        results = json.loads(out)
-        self.assertEqual(p.returncode, 1)
-        self.assertEqual(results['dist-tag'][0]['result'], 'BAD')
+        TestSRPM.setUp(self)
+        self.rpm.release = '1dist'
+        self.inspection = 'disttag'
+        self.label = 'dist-tag'
+        self.result = 'BAD'
 
 # Verify correct %{?dist} usage passes (OK)
-class TestDistTag(RequiresRpminspect):
+class TestDistTag(TestSRPM):
     def setUp(self):
-        RequiresRpminspect.setUp(self)
-        self.rpm = rpmfluff.SimpleRpmBuild("example", "0.1", "1%{?dist}")
-        self.rpm.make()
-
-    def runTest(self):
-        p = subprocess.Popen([self.rpminspect, '-c', self.conffile, '-F', 'json', '-T', 'disttag', self.rpm.get_built_srpm()], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-        (out, err) = p.communicate()
-        results = json.loads(out)
-        self.assertEqual(p.returncode, 0)
-        self.assertEqual(results['dist-tag'][0]['result'], 'OK')
+        TestSRPM.setUp(self)
+        self.rpm.release = '1%{?dist}'
+        self.inspection = 'disttag'
+        self.label = 'dist-tag'
