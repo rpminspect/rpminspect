@@ -37,6 +37,44 @@ class TestMissingDistTag(RequiresRpminspect):
         self.assertEqual(results['dist-tag'][0]['result'], 'BAD')
 
 # Verify running on not an SRPM fails
-# Verify malformed %{?dist} in Release needs inspection (VERIFY)
-# Verify missing Release tag fails (BAD)
+class TestDistTagOnNonSRPM(RequiresRpminspect):
+    def setUp(self):
+        RequiresRpminspect.setUp(self)
+        self.rpm = rpmfluff.SimpleRpmBuild("example", "0.1", "1%{?dist}")
+        self.rpm.make()
+
+    def runTest(self):
+        for a in self.rpm.get_build_archs():
+            p = subprocess.Popen([self.rpminspect, '-c', self.conffile, '-F', 'json', '-T', 'disttag', self.rpm.get_built_rpm(a)], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+            (out, err) = p.communicate()
+            results = json.loads(out)
+            self.assertEqual(p.returncode, 1)
+            self.assertEqual(results['dist-tag'][0]['result'], 'BAD')
+
+# Verify malformed %{?dist} tag in Release fails (BAD)
+class TestMalformedDistTag(RequiresRpminspect):
+    def setUp(self):
+        RequiresRpminspect.setUp(self)
+        self.rpm = rpmfluff.SimpleRpmBuild("example", "0.1", "1dist")
+        self.rpm.make()
+
+    def runTest(self):
+        p = subprocess.Popen([self.rpminspect, '-c', self.conffile, '-F', 'json', '-T', 'disttag', self.rpm.get_built_srpm()], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        (out, err) = p.communicate()
+        results = json.loads(out)
+        self.assertEqual(p.returncode, 1)
+        self.assertEqual(results['dist-tag'][0]['result'], 'BAD')
+
 # Verify correct %{?dist} usage passes (OK)
+class TestDistTag(RequiresRpminspect):
+    def setUp(self):
+        RequiresRpminspect.setUp(self)
+        self.rpm = rpmfluff.SimpleRpmBuild("example", "0.1", "1%{?dist}")
+        self.rpm.make()
+
+    def runTest(self):
+        p = subprocess.Popen([self.rpminspect, '-c', self.conffile, '-F', 'json', '-T', 'disttag', self.rpm.get_built_srpm()], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        (out, err) = p.communicate()
+        results = json.loads(out)
+        self.assertEqual(p.returncode, 0)
+        self.assertEqual(results['dist-tag'][0]['result'], 'OK')
