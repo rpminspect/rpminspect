@@ -86,14 +86,12 @@ static bool disttag_driver(struct rpminspect *ri, rpmfile_entry_t *file) {
         add_result(&ri->results, RESULT_BAD, WAIVABLE_BY_ANYONE, HEADER_DISTTAG, msg, buf, REMEDY_DISTTAG);
         free(msg);
         result = false;
-    } else if (strstr(buf, "dist")) {
-        if (strstr(buf, "%{?dist}") == NULL) {
-            msg = strdup("The dist tag should be of the form '%%{?dist}' in the Release tag.");
-            add_result(&ri->results, RESULT_BAD, WAIVABLE_BY_ANYONE, HEADER_DISTTAG, msg, buf, REMEDY_DISTTAG);
-            free(msg);
-            result = false;
-        }
-    } else {
+    } else if (strstr(buf, "dist") && !strstr(buf, "%{?dist}")) {
+        msg = strdup("The dist tag should be of the form '%%{?dist}' in the Release tag.");
+        add_result(&ri->results, RESULT_BAD, WAIVABLE_BY_ANYONE, HEADER_DISTTAG, msg, buf, REMEDY_DISTTAG);
+        free(msg);
+        result = false;
+    } else if (!strstr(buf, "%{?dist}")) {
         msg = strdup("The Release: tag does not seem to contain a '%%{?dist}' tag.");
         add_result(&ri->results, RESULT_BAD, WAIVABLE_BY_ANYONE, HEADER_DISTTAG, msg, buf, REMEDY_DISTTAG);
         free(msg);
@@ -141,6 +139,7 @@ bool inspect_disttag(struct rpminspect *ri) {
         add_result(&ri->results, RESULT_OK, NOT_WAIVABLE, HEADER_DISTTAG, NULL, NULL, NULL);
     } else if (!src) {
         add_result(&ri->results, RESULT_BAD, NOT_WAIVABLE, HEADER_DISTTAG, "Specified package is not a source RPM, cannot run disttag inspection.", NULL, NULL);
+        result = false;
     }
 
     return result;
