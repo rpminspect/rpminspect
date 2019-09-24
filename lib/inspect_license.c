@@ -217,13 +217,13 @@ bool is_valid_license(const char *licensedb, const char *tag) {
                     fedora_abbrev = json_object_get_string(propval);
                 } else if (!strcmp(prop, "spdx_abbrev")) {
                     spdx_abbrev = json_object_get_string(propval);
-                } else if (!strcmp(prop, "approved")) {
-                    approved = json_object_get_boolean(propval);
+                } else if (!strcmp(prop, "approved") && !strcasecmp(json_object_get_string(propval), "yes")) {
+                    approved = true;
                 }
             }
 
             /*
-             * if either of these are empty, it means the entire license
+             * if both of these are empty, it means the entire license
              * name is the only thing we can match and if we got here it
              * means we didn't match it, so continue.
              */
@@ -236,7 +236,7 @@ bool is_valid_license(const char *licensedb, const char *tag) {
              * if we hit 'spdx_abbrev' and approved is true, that is valid
              * NOTE: we only match the first hit in the license database
              */
-            if (!strcmp(lic, fedora_abbrev) || (!strcmp(lic, spdx_abbrev) && approved)) {
+            if ((!strcmp(lic, fedora_abbrev) || !strcmp(lic, spdx_abbrev)) && approved) {
                 valid++;
                 break;
             }
