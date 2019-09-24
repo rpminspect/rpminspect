@@ -91,7 +91,7 @@ class TestSRPM(RequiresRpminspect):
         if not self.inspection:
             return
 
-        self.rpm.make()
+        self.rpm.do_make()
         self.p = subprocess.Popen([self.rpminspect,
                                    '-c', self.conffile,
                                    '-F', 'json',
@@ -127,7 +127,7 @@ class TestRPMs(RequiresRpminspect):
         if not self.inspection and not self.label:
             return
 
-        self.rpm.make()
+        self.rpm.do_make()
 
         # anything not OK or INFO is a non-zero return
         if self.result not in ['OK', 'INFO'] and self.exitcode == 0:
