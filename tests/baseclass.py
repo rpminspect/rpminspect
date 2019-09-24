@@ -17,10 +17,17 @@
 #
 
 import os
+import shutil
 import subprocess
+import tempfile
 import unittest
 import json
 import rpmfluff
+
+# NVRs to use for the fake test packages
+NAME = "vaporware"
+VER = "0.1"
+REL = "1"
 
 # Exceptions used by the test suite
 class MissingRpminspect(Exception):
@@ -34,19 +41,43 @@ class MissingRpminspectConf(Exception):
 class RequiresRpminspect(unittest.TestCase):
     def setUp(self):
         self.rpminspect = os.environ['RPMINSPECT']
-        self.conffile = os.environ['RPMINSPECTCONF']
 
         if not os.path.isfile(self.rpminspect) or not os.access(self.rpminspect, os.X_OK):
             raise MissingRpminspect
 
-        if not os.path.isfile(self.conffile) or not os.access(self.conffile, os.R_OK):
+        # create a copy of the sample conf file for test purposes
+        if not os.path.isfile(os.environ['RPMINSPECT_CONF']) or not os.access(os.environ['RPMINSPECT_CONF'], os.R_OK):
             raise MissingRpminspectConf
+
+        (handle, self.conffile) = tempfile.mkstemp()
+        os.close(handle)
+
+        shutil.copyfile(os.environ['RPMINSPECT_CONF'], self.conffile)
+
+        f = open(os.environ['RPMINSPECT_CONF'], "r+")
+        conflines = f.readlines()
+        f.close()
+
+        f = open(self.conffile, "w+")
+
+        for line in conflines:
+            if line.startswith("licensedb"):
+                # point to our test license database
+                # we have some known good licenses and known bad licenses
+                f.write("licensedb = \"%s/licenses.json\"\n" % os.environ['RPMINSPECT_TEST_DATA_PATH'])
+            else:
+                f.write(line)
+
+        f.close()
+
+    def tearDown(self):
+        os.unlink(self.conffile)
 
 # Base test case class that tests on the SRPM package only
 class TestSRPM(RequiresRpminspect):
     def setUp(self):
         RequiresRpminspect.setUp(self)
-        self.rpm = rpmfluff.SimpleRpmBuild("example", "0.1", "1")
+        self.rpm = rpmfluff.SimpleRpmBuild(NAME, VER, REL)
 
         # the inheriting class needs to override these
         self.inspection = None
@@ -82,7 +113,7 @@ class TestSRPM(RequiresRpminspect):
 class TestRPMs(RequiresRpminspect):
     def setUp(self):
         RequiresRpminspect.setUp(self)
-        self.rpm = rpmfluff.SimpleRpmBuild("example", "0.1", "1")
+        self.rpm = rpmfluff.SimpleRpmBuild(NAME, VER, REL)
 
         # the inheriting class needs to override these
         self.inspection = None

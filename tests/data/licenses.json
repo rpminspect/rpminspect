@@ -1,0 +1,92 @@
+{
+  "GNU General Public License v2.0 only": {
+    "approved": "yes",
+    "fedora_abbrev": "GPLv2",
+    "fedora_name": "GNU General Public License v2.0 only",
+    "id": "224",
+    "license_text": "",
+    "spdx_abbrev": "GPL-2.0",
+    "spdx_name": "GNU General Public License v2.0 only",
+    "url": "http://www.gnu.org/licenses/old-licenses/gpl-2.0-standalone.html"
+  },
+  "GNU General Public License v2.0 or later": {
+    "approved": "yes",
+    "fedora_abbrev": "GPLv2+",
+    "fedora_name": "GNU General Public License v2.0 or later",
+    "id": "227",
+    "license_text": "",
+    "spdx_abbrev": "GPL-2.0+",
+    "spdx_name": "GNU General Public License v2.0 or later",
+    "url": "https://spdx.org/licenses/GPL-2.0+.html"
+  },
+  "GNU General Public License v3.0 only": {
+    "approved": "yes",
+    "fedora_abbrev": "GPLv3",
+    "fedora_name": "GNU General Public License v3.0 only",
+    "id": "230",
+    "license_text": "",
+    "spdx_abbrev": "GPL-3.0",
+    "spdx_name": "GNU General Public License v3.0 only",
+    "url": "http://www.gnu.org/licenses/gpl-3.0-standalone.html"
+  },
+  "GNU General Public License v3.0 or later": {
+    "approved": "yes",
+    "fedora_abbrev": "GPLv3+",
+    "fedora_name": "GNU General Public License v3.0 or later",
+    "id": "233",
+    "license_text": "",
+    "spdx_abbrev": "GPL-3.0+",
+    "spdx_name": "GNU General Public License v3.0 or later",
+    "url": "https://www.gnu.org/licenses/gpl.html"
+  },
+  "MIT License": {
+    "approved": "yes",
+    "fedora_abbrev": "",
+    "fedora_name": "",
+    "id": "328",
+    "license_text": "",
+    "spdx_abbrev": "MIT",
+    "spdx_name": "MIT License",
+    "url": "http://www.opensource.org/licenses/MIT"
+  },
+  "The Apache License, Version 2.0": {
+    "approved": "yes",
+    "fedora_abbrev": "ASL 2.0",
+    "fedora_name": "Apache Software License 2.0",
+    "id": "578",
+    "license_text": "",
+    "spdx_abbrev": "Apache-2.0",
+    "spdx_name": "Apache License 2.0",
+    "url": "http://www.apache.org/licenses/LICENSE-2.0"
+  },
+  "Apple Public Source License 1.2": {
+    "approved": "no",
+    "fedora_abbrev": "",
+    "fedora_name": "Apple Public Source License 1.2",
+    "id": "41",
+    "license_text": "",
+    "spdx_abbrev": "APSL-1.2",
+    "spdx_name": "Apple Public Source License 1.2",
+    "url": "http://www.samurajdata.se/opensource/mirror/licenses/apsl.php"
+  },
+  "Apple Public Source License 2.0": {
+    "approved": "yes",
+    "fedora_abbrev": "APSL 2.0",
+    "fedora_name": "Apple Public Source License 2.0",
+    "id": "42",
+    "license_text": "",
+    "spdx_abbrev": "APSL-2.0",
+    "spdx_name": "Apple Public Source License 2.0",
+    "url": "http://www.opensource.apple.com/license/apsl/"
+  },
+  "CodeProject Open License (CPOL)": {
+    "approved": "no",
+    "fedora_abbrev": "",
+    "fedora_name": "CodeProject Open License (CPOL)",
+    "id": "109",
+    "license_text": "",
+    "spdx_abbrev": "CPOL-1.02",
+    "spdx_name": "Code Project Open License 1.02",
+    "url": "http://www.codeproject.com/info/cpol10.aspx"
+  }
+}
