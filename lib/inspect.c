@@ -41,7 +41,7 @@ struct inspect inspections[] = {
 
     { INSPECT_METADATA,
       "metadata",
-      false,
+      true,
       &inspect_metadata,
       "Perform some RPM header checks. First, check that the Vendor contains the expected string as defined in the configuration file. Second, check that the build host is in the expected subdomain as defined in the configuration file. Third, check the Summary string for any unprofessional words. Fourth, check the Description for any unprofessional words. Lastly, if there is a before build specified, check for differences between the before and after build values of the previous RPM header values and report them." },
 
@@ -65,7 +65,7 @@ struct inspect inspections[] = {
 
     { INSPECT_DESKTOP,
       "desktop",
-      false,
+      true,
       &inspect_desktop,
       "Perform syntax and file reference checks on *.desktop files. Syntax errors and invalid file references are reported as errors." },
 
