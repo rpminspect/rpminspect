@@ -73,6 +73,33 @@ class TestInvalidVendorKojiBuild(TestKoji):
         self.label = 'header-metadata'
         self.result = 'BAD'
 
+# XXX: Verify gaining Vendor reports verify on SRPM (VERIFY)
+#class TestGainingVendorCompareSRPM(TestCompareSRPM):
+
+# XXX: Verify gaining Vendor reports verify on built RPMS (VERIFY)
+#class TestGainingVendorCompareRPMs(TestCompareRPMs):
+
+# XXX: Verify gaining Vendor reports verify on Koji build (VERIFY)
+#class TestGainingVendorCompareKojiBuild(TestCompareKoji):
+
+# XXX: Verify losing Vendor reports verify on SRPM (VERIFY)
+#class TestLosingVendorCompareSRPM(TestCompareSRPM):
+
+# XXX: Verify losing Vendor reports verify on built RPMs (VERIFY)
+#class TestLosingVendorCompareRPMs(TestCompareRPMs):
+
+# XXX: Verify losing Vendor reports verify on Koji build (VERIFY)
+#class TestLosingVendorCompareKojiBuild(TestCompareKoji):
+
+# XXX: Verify changing Vendor reports verify on SRPM (VERIFY)
+#class TestChangingVendorCompareSRPM(TestCompareSRPM):
+
+# XXX: Verify changing Vendor reports verify on built RPMs (VERIFY)
+#class TestChangingVendorCompareRPMs(TestCompareRPMs):
+
+# XXX: Verify changing Vendor reports verify on Koji build (VERIFY)
+#class TestLosingVendorCompareKojiBuild(TestCompareKoji):
+
 # Verify invalid Buildhost subdomain fails on an SRPM (BAD)
 class TestInvalidBuildhostSubdomainSRPM(TestSRPM):
     def setUp(self):
@@ -157,6 +184,15 @@ class TestDirtySummaryKojiBuild(TestKoji):
         self.label = 'header-metadata'
         self.result = 'BAD'
 
+# XXX: Verify changing Summary reports verify on SRPM (VERIFY)
+#class TestChangingSummaryCompareSRPM(TestCompareSRPM):
+
+# XXX: Verify changing Summary reports verify on built RPMs (VERIFY)
+#class TestChangingSummaryCompareRPMs(TestCompareRPMs):
+
+# XXX: Verify changing Summary reports verify on Koji build (VERIFY)
+#class TestChangingSummaryCompareKojiBuild(TestCompareKoji):
+
 # Verify Description without bad words passes on an SRPM (OK)
 class TestCleanDescriptionSRPM(TestSRPM):
     def setUp(self):
@@ -210,3 +246,12 @@ class TestDirtyDescriptionKojiBuild(TestKoji):
         self.inspection = 'metadata'
         self.label = 'header-metadata'
         self.result = 'BAD'
+
+# XXX: Verify changing Description reports verify on SRPM (VERIFY)
+#class TestChangingDescriptionCompareSRPM(TestCompareSRPM):
+
+# XXX: Verify changing Description reports verify on built RPMs (VERIFY)
+#class TestChangingDescriptionCompareRPMs(TestCompareRPMs):
+
+# XXX: Verify changing Description reports verify on Koji build (VERIFY)
+#class TestChangingDescriptionCompareKojiBuild(TestCompareKoji):
