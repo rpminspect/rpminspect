@@ -16,18 +16,24 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 #
 
-from baseclass import TestSRPM
+from baseclass import TestSRPM, TestRPMs, TestKoji
 
-# Empty License tag should fail (BAD)
-class TestEmptyLicenseTag(TestSRPM):
+# Empty License tag fails on SRPM (BAD)
+class TestEmptyLicenseTagSRPM(TestSRPM):
     def setUp(self):
         TestSRPM.setUp(self)
         self.inspection = 'license'
         self.label = 'license'
         self.result = 'BAD'
 
-# Forbidden License tag should fail (BAD)
-class TestForbiddenLicenseTag(TestSRPM):
+# XXX: Empty License tag fails on built RPMs (BAD)
+#class TestEmptyLicenseTagRPMs(TestRPMs):
+
+# XXX: Empty License tag fails on Koji build (BAD)
+#class TestEmptyLicenseTagKojiBuild(TestKoji):
+
+# Forbidden License tag fails on SRPM (BAD)
+class TestForbiddenLicenseTagSRPM(TestSRPM):
     def setUp(self):
         TestSRPM.setUp(self)
         self.rpm.addLicense("APSL-1.2")
@@ -35,8 +41,14 @@ class TestForbiddenLicenseTag(TestSRPM):
         self.label = 'license'
         self.result = 'BAD'
 
-# License tag with unprofessional language should fail (BAD)
-class TestBadWordLicenseTag(TestSRPM):
+# XXX: Forbidden License tag fails on built RPMs (BAD)
+#class TestForbiddenLicenseTagRPMs(TestRPMs):
+
+# XXX: Forbidden License tag fails on Koji build (BAD)
+#class TestForbiddenLicenseTagKojiBuild(TestKoji):
+
+# License tag with unprofessional language fails on SRPM (BAD)
+class TestBadWordLicenseTagSRPM(TestSRPM):
     def setUp(self):
         TestSRPM.setUp(self)
         self.rpm.addLicense("GPLv2+ and reallybadword and MIT")
@@ -44,11 +56,23 @@ class TestBadWordLicenseTag(TestSRPM):
         self.label = 'license'
         self.result = 'BAD'
 
-# Valid License tag should pass (OK)
-class TestValidLicenseTag(TestSRPM):
+# XXX: License tag with unprofessional language fails on built RPMs (BAD)
+#class TestBadWordLicenseTagRPMs(TestRPMs):
+
+# XXX: License tag with unprofessional language fails on Koji build (BAD)
+#class TestBadWordLicenseTagKojiBuild(TestKoji):
+
+# Valid License tag passes on SRPM (OK)
+class TestValidLicenseTagSRPM(TestSRPM):
     def setUp(self):
         TestSRPM.setUp(self)
         self.rpm.addLicense("GPLv3+")
         self.inspection = 'license'
         self.label = 'license'
         self.result = 'INFO'
+
+# XXX: Valid License tag passes on built RPMs (OK)
+#class TestValidLicenseTagRPMs(TestRPMs):
+
+# XXX: Valid License tag passes on Koji build (OK)
+#class TestValidLicenseTagKojiBuild(TestKoji):

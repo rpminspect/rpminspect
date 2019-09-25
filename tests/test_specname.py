@@ -17,15 +17,18 @@
 #
 
 import unittest
-from baseclass import TestSRPM, TestRPMs
+from baseclass import TestSRPM, TestRPMs, TestKoji
 
 # Verify spec filename matches package name on SRPM (OK)
-class TestSpecName(TestSRPM):
+class TestSpecNameSRPM(TestSRPM):
     def setUp(self):
         TestSRPM.setUp(self)
         self.inspection = 'specname'
         self.label = 'spec-file-name'
         self.result = 'OK'
+
+# XXX: Verify spec filename matches package name on Koji build (OK)
+#class TestSpecNameKojiBuild(TestKoji):
 
 # Verify spec filename test on binary RPMs fails (BAD)
 class TestSpecNameRPMs(TestRPMs):
@@ -35,8 +38,8 @@ class TestSpecNameRPMs(TestRPMs):
         self.label = 'spec-file-name'
         self.result = 'BAD'
 
-# Verify spec filename not matching package name fails (BAD)
-class TestBadSpecName(TestSRPM):
+# XXX: Verify spec filename not matching package name fails (BAD)
+class TestBadSpecNameSRPM(TestSRPM):
     @unittest.skip("requires addSpecBasename() support in rpmfluff")
     def setUp(self):
         TestSRPM.setUp(self)
@@ -44,3 +47,6 @@ class TestBadSpecName(TestSRPM):
         self.inspection = 'specname'
         self.label = 'spec-file-name'
         self.result = 'BAD'
+
+# XXX: Verify spec filename not matching package name fails on Koji build (BAD)
+#class TestBadSpecNameKojiBuild(TestKoji):
