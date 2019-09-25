@@ -22,10 +22,8 @@ srpm:
 	sed -i -e 's|%%TARBALL%%|$(PKG)-$(VER)-$(GITDATE)git$(GITHASH).tar.xz|g' "$(SPEC)"
 	sed -i -e 's|^%setup.*$$|%setup -q -n $(PKG)-$(VER)|g' "$(SPEC)"
 	sed -i -e '/^Release:/ s/1[^%]*/0.1.$(GITDATE)git$(GITHASH)/' "$(SPEC)"
-	meson setup build
-	ninja -v -C build
-	ninja -v -C build dist
-	cp -p build/meson-dist/$(PKG)-$(VER).tar.xz $(topdir)/$(PKG)-$(VER)-$(GITDATE)git$(GITHASH).tar.xz
+	git archive --format=tar --prefix=$(PKG)-$(VER)/ -o $(topdir)/$(PKG)-$(VER)-$(GITDATE)git$(GITHASH).tar
+	xz -9 $(topdir)/$(PKG)-$(VER)-$(GITDATE)git$(GITHASH).tar
 	rpmbuild \
 		-bs --nodeps \
 		--define "_sourcedir $(topdir)" \
