@@ -138,6 +138,9 @@ class TestSRPM(RequiresRpminspect):
         self.assertEqual(self.p.returncode, self.exitcode)
         self.assertEqual(self.results[self.label][0]['result'], self.result)
 
+# XXX: Base test case class that compares a before and after SRPM
+#class TestCompareSRPM(TestSRPM):
+
 # Base test case class that tests the binary RPMs
 class TestRPMs(TestSRPM):
     def runTest(self):
@@ -169,6 +172,9 @@ class TestRPMs(TestSRPM):
 
             self.assertEqual(self.p.returncode, self.exitcode)
             self.assertEqual(self.results[self.label][0]['result'], self.result)
+
+# XXX: Base test case class that compares before and after built RPMs
+#class TestCompareRPMs(TestRPMs):
 
 # Base test case class that tests a fake Koji build
 class TestKoji(TestSRPM):
@@ -218,3 +224,6 @@ class TestKoji(TestSRPM):
 
             self.assertEqual(self.p.returncode, self.exitcode)
             self.assertEqual(self.results[self.label][0]['result'], self.result)
+
+# XXX: Base test case class that compares before and after Koji builds
+#class TestCompareKoji(TestKoji):
