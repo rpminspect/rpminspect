@@ -29,9 +29,15 @@ openssl = dependency('openssl', method : 'pkg-config', required : true)
 libcap_ng = dependency('libcap-ng', method : 'pkg-config', required : true)
 
 # Test suite dependencies
-cunit = dependency('cunit', method : 'pkg-config', required : false)
-pymod = import('python')
-python = pymod.find_installation('python3', required: false)
+run_tests = get_option('tests')
+if run_tests
+    cunit = dependency('cunit', method : 'pkg-config', required : false)
+    pymod = import('python')
+    python = pymod.find_installation('python3', required: false)
+else
+    cunit = disabler()
+    python = disabler()
+endif
 
 # Other dependencies
 
