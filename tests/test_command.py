@@ -23,6 +23,7 @@ from baseclass import RequiresRpminspect
 # Verify --help gives help output
 class TestRpminspectHelp(RequiresRpminspect):
     def runTest(self):
+        RequiresRpminspect.configFile(self)
         p = subprocess.Popen([self.rpminspect, '--help'], stdout=subprocess.PIPE, stderr=subprocess.DEVNULL)
         (out, err) = p.communicate()
         self.assertEqual(p.returncode, 0)
@@ -37,6 +38,7 @@ class TestRpminspectHelp(RequiresRpminspect):
 # Verify rpminspect doesn't segfault on release-less args
 class TestRpminspectSegv(RequiresRpminspect):
     def runTest(self):
+        RequiresRpminspect.configFile(self)
         p = subprocess.Popen([self.rpminspect, '42'], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
         p.communicate()
         self.assertNotEqual(p.returncode, 139)
