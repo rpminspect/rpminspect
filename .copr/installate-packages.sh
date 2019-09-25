@@ -9,4 +9,10 @@ TOPDIR="$1"
 yum --help >/dev/null 2>&1
 [ $? -eq 0 ] && INSTALLATOR=yum || INSTALLATOR=dnf
 
-${INSTALLATOR} install -y git $(grep ^BuildRequires: ${TOPDIR}/rpminspect.spec.in | awk '{ print $2; }')
+# Test dependencies not listed as BuildRequires
+TEST_PKGS="CUnit-devel valgrind gcovr python3-rpmfluff"
+
+# The actual BuildRequires
+BUILD_REQUIRES="$(grep ^BuildRequires: ${TOPDIR}/rpminspect.spec.in | awk '{ print $2; }')"
+
+${INSTALLATOR} install -y git ${TEST_PKGS} ${BUILD_REQUIRES}
