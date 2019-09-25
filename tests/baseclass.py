@@ -23,7 +23,12 @@ import subprocess
 import tempfile
 import unittest
 import json
-import rpmfluff
+
+# if we don't have rpmfluff, just skip over the tests
+try:
+    import rpmfluff
+except ModuleNotFoundError:
+    sys.exit(0)
 
 # NVRs to use for the fake test packages
 BEFORE_NAME = "vaporware"
