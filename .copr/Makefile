@@ -25,7 +25,7 @@ srpm:
 	git archive \
 		--format=tar \
 		--prefix=$(PKG)-$(VER)-$(GITDATE)git$(GITHASH)/ \
-		--ouput=$(topdir)/$(PKG)-$(VER)-$(GITDATE)git$(GITHASH).tar \
+		--output=$(topdir)/$(PKG)-$(VER)-$(GITDATE)git$(GITHASH).tar \
 		HEAD $(topdir)
 	xz -9 $(topdir)/$(PKG)-$(VER)-$(GITDATE)git$(GITHASH).tar
 	rpmbuild \
