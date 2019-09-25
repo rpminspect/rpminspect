@@ -1,0 +1,5 @@
+option('tests',
+       type : 'boolean',
+       value : true,
+       description : 'Run the test suite'
+)
