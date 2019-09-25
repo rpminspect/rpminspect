@@ -22,7 +22,7 @@ srpm:
 	sed -i -e 's|%%TARBALL%%|$(PKG)-$(VER)-$(GITDATE)git$(GITHASH).tar.xz|g' "$(SPEC)"
 	sed -i -e 's|^%setup.*$$|%setup -q -n $(PKG)-$(VER)|g' "$(SPEC)"
 	sed -i -e '/^Release:/ s/1[^%]*/0.1.$(GITDATE)git$(GITHASH)/' "$(SPEC)"
-	git archive --format=tar --prefix=$(PKG)-$(VER)/ -o $(topdir)/$(PKG)-$(VER)-$(GITDATE)git$(GITHASH).tar
+	git archive --format=tar --prefix=$(PKG)-$(VER)/ -o $(topdir)/$(PKG)-$(VER)-$(GITDATE)git$(GITHASH).tar HEAD
 	xz -9 $(topdir)/$(PKG)-$(VER)-$(GITDATE)git$(GITHASH).tar
 	rpmbuild \
 		-bs --nodeps \
