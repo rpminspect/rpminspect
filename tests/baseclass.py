@@ -18,6 +18,7 @@
 
 import os
 import shutil
+import socket
 import subprocess
 import tempfile
 import unittest
@@ -25,9 +26,13 @@ import json
 import rpmfluff
 
 # NVRs to use for the fake test packages
-NAME = "vaporware"
-VER = "0.1"
-REL = "1"
+BEFORE_NAME = "vaporware"
+BEFORE_VER = "0.1"
+BEFORE_REL = "1"
+
+AFTER_NAME = BEFORE_NAME
+AFTER_VER = "0.2"
+AFTER_REL = "2"
 
 # Exceptions used by the test suite
 class MissingRpminspect(Exception):
@@ -40,15 +45,24 @@ class MissingRpminspectConf(Exception):
 # as an executable command.
 class RequiresRpminspect(unittest.TestCase):
     def setUp(self):
+        # make sure we have the program
         self.rpminspect = os.environ['RPMINSPECT']
 
         if not os.path.isfile(self.rpminspect) or not os.access(self.rpminspect, os.X_OK):
             raise MissingRpminspect
 
-        # create a copy of the sample conf file for test purposes
+        # ensure we have the sample configuration file
         if not os.path.isfile(os.environ['RPMINSPECT_CONF']) or not os.access(os.environ['RPMINSPECT_CONF'], os.R_OK):
             raise MissingRpminspectConf
 
+        # set in configFile()
+        self.conffile = None
+
+        # settings that the inheriting test can override
+        self.buildhost_subdomain = None
+
+    def configFile(self):
+        # create a copy of the sample conf file for test purposes
         (handle, self.conffile) = tempfile.mkstemp()
         os.close(handle)
 
@@ -60,11 +74,17 @@ class RequiresRpminspect(unittest.TestCase):
 
         f = open(self.conffile, "w+")
 
+        # modify settings for the test suite based on where it's running
         for line in conflines:
             if line.startswith("licensedb"):
                 # point to our test license database
                 # we have some known good licenses and known bad licenses
                 f.write("licensedb = \"%s/licenses.json\"\n" % os.environ['RPMINSPECT_TEST_DATA_PATH'])
+            elif line.startswith("buildhost_subdomain"):
+                if self.buildhost_subdomain:
+                    f.write("buildhost_subdomain = \"%s\"\n" % self.buildhost_subdomain)
+                else:
+                    f.write("buildhost_subdomain = \"%s\"\n" % socket.getfqdn())
             else:
                 f.write(line)
 
@@ -77,7 +97,7 @@ class RequiresRpminspect(unittest.TestCase):
 class TestSRPM(RequiresRpminspect):
     def setUp(self):
         RequiresRpminspect.setUp(self)
-        self.rpm = rpmfluff.SimpleRpmBuild(NAME, VER, REL)
+        self.rpm = rpmfluff.SimpleRpmBuild(AFTER_NAME, AFTER_VER, AFTER_REL)
 
         # the inheriting class needs to override these
         self.inspection = None
@@ -87,7 +107,12 @@ class TestSRPM(RequiresRpminspect):
         self.exitcode = 0
         self.result = 'OK'
 
+    def configFile(self):
+        RequiresRpminspect.configFile(self)
+
     def runTest(self):
+        self.configFile()
+
         if not self.inspection:
             return
 
@@ -106,24 +131,18 @@ class TestSRPM(RequiresRpminspect):
         if self.result not in ['OK', 'INFO'] and self.exitcode == 0:
             self.exitcode = 1
 
+        # dump stdout and stderr if these do not match
+        if self.p.returncode != self.exitcode:
+            print("\n\nstdout: |%s|\nstderr: |%s|\n\n" % (self.out, self.err))
+
         self.assertEqual(self.p.returncode, self.exitcode)
         self.assertEqual(self.results[self.label][0]['result'], self.result)
 
 # Base test case class that tests the binary RPMs
-class TestRPMs(RequiresRpminspect):
-    def setUp(self):
-        RequiresRpminspect.setUp(self)
-        self.rpm = rpmfluff.SimpleRpmBuild(NAME, VER, REL)
-
-        # the inheriting class needs to override these
-        self.inspection = None
-        self.label = None
-
-        # these default to 0 and OK
-        self.exitcode = 0
-        self.result = 'OK'
-
+class TestRPMs(TestSRPM):
     def runTest(self):
+        TestSRPM.configFile(self)
+
         if not self.inspection and not self.label:
             return
 
@@ -143,6 +162,59 @@ class TestRPMs(RequiresRpminspect):
                                       stderr=subprocess.PIPE)
             (self.out, self.err) = self.p.communicate()
             self.results = json.loads(self.out)
+
+            # dump stdout and stderr if these do not match
+            if self.p.returncode != self.exitcode:
+                print("\n\nstdout: |%s|\nstderr: |%s|\n\n" % (self.out, self.err))
+
+            self.assertEqual(self.p.returncode, self.exitcode)
+            self.assertEqual(self.results[self.label][0]['result'], self.result)
+
+# Base test case class that tests a fake Koji build
+class TestKoji(TestSRPM):
+    def runTest(self):
+        TestSRPM.configFile(self)
+
+        if not self.inspection:
+            return
+
+        # add some additional subpackages to the build
+        self.rpm.add_devel_subpackage()
+
+        # generate the build
+        self.rpm.do_make()
+
+        # copy everything in to place as if Koji built it
+        with tempfile.TemporaryDirectory() as kojidir:
+            # copy over the SRPM to the fake koji build
+            srcdir = kojidir + '/src'
+            os.makedirs(srcdir, exist_ok=True)
+            shutil.copy(self.rpm.get_built_srpm(), srcdir)
+
+            # copy over the built RPMs to the fake koji build
+            for a in self.rpm.get_build_archs():
+                adir = kojidir + '/' + a
+                os.makedirs(adir, exist_ok=True)
+                shutil.copy(self.rpm.get_built_rpm(a), adir)
+
+            self.p = subprocess.Popen([self.rpminspect,
+                                       '-c', self.conffile,
+                                       '-F', 'json',
+                                       '-T', self.inspection,
+                                       '-r', AFTER_REL,
+                                       kojidir],
+                                      stdout=subprocess.PIPE,
+                                      stderr=subprocess.PIPE)
+            (self.out, self.err) = self.p.communicate()
+            self.results = json.loads(self.out)
+
+            # anything not OK or INFO is a non-zero return
+            if self.result not in ['OK', 'INFO'] and self.exitcode == 0:
+                self.exitcode = 1
+
+            # dump stdout and stderr if these do not match
+            if self.p.returncode != self.exitcode:
+                print("\n\nstdout: |%s|\nstderr: |%s|\n\n" % (self.out, self.err))
 
             self.assertEqual(self.p.returncode, self.exitcode)
             self.assertEqual(self.results[self.label][0]['result'], self.result)
