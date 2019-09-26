@@ -1,18 +1,32 @@
-#!/bin/sh -x
+#!/bin/sh
 #
-# Automate making a new release of rpminspect
-# This script will increment the version minor number and continue
-# through with tagging the repo and make the archive and spec file.
-# by: David Cantrell <dcantrell@redhat.com>
+# Automate making a new release of meson-built projects that also
+# use Copr for automated builds and that carry template RPM spec
+# files.  See README for more information.
+#
+# Copyright (C) 2019 David Cantrell <david.l.cantrell@gmail.com>
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <https://www.gnu.org/licenses/>.
 #
 
 PATH=/usr/bin
 CWD="$(pwd)"
-CURL="curl -L -O --progress-bar"
+CURL="curl -L --progress-bar"
 PROG="$(basename $0)"
 
 # Github settings
-PROJECT=rpminspect
+PROJECT="$(basename $(realpath ${CWD}))"
 GH_API="https://api.github.com"
 GH_REPO="${GH_API}/repos/${PROJECT}/${PROJECT}"
 
@@ -23,7 +37,7 @@ OPT_PUSH=
 OPT_GITHUB=
 
 usage() {
-    echo "Create a release for rpminspect"
+    echo "Create a release for ${PROJECT}"
     echo "${PROG} [options]"
     echo "Options:"
     echo "    -b, --bumpver      Increment the minor version number"
@@ -101,9 +115,15 @@ while true ; do
     esac
 done
 
+# This must be a git project
+if [ ! -d ${CWD}/.git ] && [ ! -f ${CWD}/.git/config ]; then
+    echo "*** Missing .git subdirectory." >&2
+    exit 1
+fi
+
 # Make sure we are in the right place
-if [ ! -f "${CWD}/meson.build" ] && [ ! -f "${CWD}/rpminspect.spec.in" ]; then
-    echo "*** You must run this script from the top level rpminspect directory" >&2
+if [ ! -f "${CWD}/meson.build" ] && [ ! -f "${CWD}/${PROJECT}.spec.in" ]; then
+    echo "*** You must run this script from the top level ${PROJECT} directory" >&2
     exit 1
 fi
 
@@ -111,6 +131,13 @@ fi
 if [ ! -z "$(git status --porcelain)" ]; then
     echo "*** git index is not clean:" >&2
     git status --porcelain | sed -e 's|^|*** |g' >&2
+    exit 1
+fi
+
+# Collect the Github project owner (not necessarily the same as project name)
+OWNER="$(grep "git@github.com" .git/config | cut -d ':' -f 2 | cut -d '/' -f 1)"
+if [ -z "${OWNER}" ]; then
+    echo "*** Unable to determine Github project owner." >&2
     exit 1
 fi
 
@@ -130,6 +157,8 @@ else
     OLDVERSION="${VERSION}"
 fi
 
+
+
 # Now tag the release
 if [ "${OPT_TAG}" = "y" ]; then
     git tag -s -a -m "Tag release v${VERSION}" v${VERSION}
@@ -142,22 +171,22 @@ cd build/meson-dist
 gpg --detach-sign --armor ${PROJECT}-${VERSION}.tar.xz
 cd ${CWD}
 
-# Create an rpminspect.spec file
+# Create a spec file
 RPMDATE="$(date +'%a %b %d %Y')"
 GITDATE="$(date +'%Y%m%d%H%M')"
 GITHASH="$(git rev-parse --short HEAD))"
-sed -e "s|%%VERSION%%|${VERSION}|g" < rpminspect.spec.in > build/meson-dist/rpminspect.spec
-sed -i -e "s|%%RPMDATE%%|${RPMDATE}|g" build/meson-dist/rpminspect.spec
-sed -i -e "s|%%GITDATE%%|${GITDATE}|g" build/meson-dist/rpminspect.spec
-sed -i -e "s|%%GITHASH%%|${GITHASH}|g" build/meson-dist/rpminspect.spec
-sed -i -e "s|%%TARBALL%%|${PROJECT}-${VERSION}.tar.xz|g" build/meson-dist/rpminspect.spec
+sed -e "s|%%VERSION%%|${VERSION}|g" < ${PROJECT}.spec.in > build/meson-dist/${PROJECT}.spec
+sed -i -e "s|%%RPMDATE%%|${RPMDATE}|g" build/meson-dist/${PROJECT}.spec
+sed -i -e "s|%%GITDATE%%|${GITDATE}|g" build/meson-dist/${PROJECT}.spec
+sed -i -e "s|%%GITHASH%%|${GITHASH}|g" build/meson-dist/${PROJECT}.spec
+sed -i -e "s|%%TARBALL%%|${PROJECT}-${VERSION}.tar.xz|g" build/meson-dist/${PROJECT}.spec
 
 # Generate SRPM
 ( cd build/meson-dist
   rpmbuild -bs --nodeps \
            --define "_sourcedir ." \
            --define "_srcrpmdir ." \
-           --define "_rpmdir ." rpminspect.spec )
+           --define "_rpmdir ." ${PROJECT}.spec )
 
 # Push the changes
 if [ "${OPT_PUSH}" = "y" ]; then
@@ -168,6 +197,7 @@ fi
 # Create a github release entry
 if [ "${OPT_GITHUB}" = "y" ]; then
     TAG="$(git tag -l | tail -n 1)"
+    OLDTAG="$(git tag -l | tail -n 2 | head -n 1)"
 
     # Get github access token
     TOKEN="$(cat ${HOME}/.githubtoken 2>/dev/null)"
@@ -188,12 +218,13 @@ if [ "${OPT_GITHUB}" = "y" ]; then
     fi
 
     # Create new release on github
-    API_JSON=$(printf '{"tag_name": "%s", "target_commitish": "master", "name": "%s-%s", "body": "%s-%s", "draft": false, "prerelease": false}' ${TAG} ${PROJECT} ${VERSION} ${PROJECT} ${VERSION})
+    BODY="$(git log --format="%s" ${OLDTAG}.. | sed -e 's|^|* |g')"
+    API_JSON="{\"tag_name\": \"${TAG}\", \"target_commitish\": \"master\", \"name\": \"${PROJECT}-${VERSION}\", \"body\": \"${PROJECT}-${VERSION}\", \"draft\": false, \"prerelease\": false}"
     RELEASE_INFO="$(mktemp)"
-    ${CURL} -o "${RELEASE_INFO}" --data "${API_JSON}" https://api.github.com/repos/${PROJECT}/${PROJECT}/releases?access_token=${TOKEN}
+    ${CURL} -o "${RELEASE_INFO}" --data "${API_JSON}" https://api.github.com/repos/${OWNER}/${PROJECT}/releases?access_token=${TOKEN}
 
     # Get the ID of the asset
-    ASSET_ID="$(grep -m 1 "id.:" ${RELEASE_INFO} | grep -w id | tr : = | tr -cd '[[:alnum:]]=')"
+    ASSET_ID="$(grep -m 1 "id.:" ${RELEASE_INFO} | grep -w id | tr : = | tr -cd '[[:alnum:]]=' | cut -d '=' -f 2)"
     rm -f ${RELEASE_INFO}
     if [ -z "${ASSET_ID}" ]; then
         echo "*** Unable to get the asset ID" >&2
@@ -201,9 +232,9 @@ if [ "${OPT_GITHUB}" = "y" ]; then
     fi
 
     # Upload the assets
-    cd build/meson-build
+    cd build/meson-dist
     for asset in ${PROJECT}-${VERSION}.tar.xz ${PROJECT}-${VERSION}.tar.xz.asc ; do
-        GH_ASSET="https://uploads.github.com/repos/${PROJECT}/${PROJECT}/releases/${ASSET_ID}/assets?name=${asset}"
+        GH_ASSET="https://uploads.github.com/repos/${OWNER}/${PROJECT}/releases/${ASSET_ID}/assets?name=${asset}"
         ${CURL} -H "${GH_AUTH}" --data-binary @"${asset}" -H "Content-Type: application/octet-stream" ${GH_ASSET}
     done
     cd ${CWD}
