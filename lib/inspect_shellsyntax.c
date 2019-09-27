@@ -140,7 +140,7 @@ static bool shellsyntax_driver(struct rpminspect *ri, rpmfile_entry_t *file)
         }
 
         if (msg) {
-            add_result(&ri->results, RESULT_INFO, NOT_WAIVABLE, HEADER_SHELLSYNTAX, msg, NULL, REMEDY_SHELLSYNTAX_GAINED_SHELL);
+            add_result(ri, RESULT_INFO, NOT_WAIVABLE, HEADER_SHELLSYNTAX, msg, NULL, REMEDY_SHELLSYNTAX_GAINED_SHELL);
             free(msg);
         }
     }
@@ -168,7 +168,7 @@ static bool shellsyntax_driver(struct rpminspect *ri, rpmfile_entry_t *file)
     if (before_shell) {
         if (!before_exitcode && exitcode) {
             xasprintf(&msg, "%s is no longer a valid %s script on %s", file->localpath, shell, arch);
-            add_result(&ri->results, RESULT_BAD, WAIVABLE_BY_ANYONE, HEADER_SHELLSYNTAX, msg, errors, REMEDY_SHELLSYNTAX_BAD);
+            add_result(ri, RESULT_BAD, WAIVABLE_BY_ANYONE, HEADER_SHELLSYNTAX, msg, errors, REMEDY_SHELLSYNTAX_BAD);
             free(msg);
             result = false;
         } else if (before_exitcode && !exitcode) {
@@ -180,17 +180,17 @@ static bool shellsyntax_driver(struct rpminspect *ri, rpmfile_entry_t *file)
                 msg = tmp;
             }
 
-            add_result(&ri->results, RESULT_INFO, NOT_WAIVABLE, HEADER_SHELLSYNTAX, msg, NULL, NULL);
+            add_result(ri, RESULT_INFO, NOT_WAIVABLE, HEADER_SHELLSYNTAX, msg, NULL, NULL);
             free(msg);
         }
     } else {
         if (!exitcode && extglob) {
             xasprintf(&msg, "%s fails with '-n' but passes with '-O extglob'; be sure 'shopt extglob' is set in the script on %s", file->localpath, arch);
-            add_result(&ri->results, RESULT_INFO, NOT_WAIVABLE, HEADER_SHELLSYNTAX, msg, NULL, NULL);
+            add_result(ri, RESULT_INFO, NOT_WAIVABLE, HEADER_SHELLSYNTAX, msg, NULL, NULL);
             free(msg);
         } else if (exitcode) {
             xasprintf(&msg, "%s is not a valid %s script on %s", file->localpath, shell, arch);
-            add_result(&ri->results, RESULT_BAD, WAIVABLE_BY_ANYONE, HEADER_SHELLSYNTAX, msg, errors, REMEDY_SHELLSYNTAX_BAD);
+            add_result(ri, RESULT_BAD, WAIVABLE_BY_ANYONE, HEADER_SHELLSYNTAX, msg, errors, REMEDY_SHELLSYNTAX_BAD);
             free(msg);
             result = false;
         }
@@ -212,7 +212,7 @@ bool inspect_shellsyntax(struct rpminspect *ri) {
     result = foreach_peer_file(ri, shellsyntax_driver);
 
     if (result) {
-        add_result(&ri->results, RESULT_OK, NOT_WAIVABLE, HEADER_SHELLSYNTAX, NULL, NULL, NULL);
+        add_result(ri, RESULT_OK, NOT_WAIVABLE, HEADER_SHELLSYNTAX, NULL, NULL, NULL);
     }
 
     return result;

@@ -148,13 +148,13 @@ static bool validate_desktop_contents(struct rpminspect *ri, const rpmfile_entry
 
                 if (!(sb.st_mode & S_IXOTH)) {
                     xasprintf(&msg, "Desktop file %s on %s references executable %s but %s is not executable by all", file->localpath, arch, tmp, tmp);
-                    add_result(&ri->results, RESULT_VERIFY, WAIVABLE_BY_ANYONE, HEADER_DESKTOP, msg, NULL, REMEDY_DESKTOP);
+                    add_result(ri, RESULT_VERIFY, WAIVABLE_BY_ANYONE, HEADER_DESKTOP, msg, NULL, REMEDY_DESKTOP);
                     free(msg);
                     result = false;
                 }
             } else {
                 xasprintf(&msg, "Desktop file %s on %s references executable %s but no subpackages contain an executable of that name", file->localpath, arch, tmp);
-                add_result(&ri->results, RESULT_VERIFY, WAIVABLE_BY_ANYONE, HEADER_DESKTOP, msg, NULL, REMEDY_DESKTOP);
+                add_result(ri, RESULT_VERIFY, WAIVABLE_BY_ANYONE, HEADER_DESKTOP, msg, NULL, REMEDY_DESKTOP);
                 free(msg);
                 result = false;
             }
@@ -191,13 +191,13 @@ static bool validate_desktop_contents(struct rpminspect *ri, const rpmfile_entry
 
                 if (!(sb.st_mode & S_IROTH)) {
                     xasprintf(&msg, "Desktop file %s on %s references icon %s but %s is not readable by all", file->localpath, arch, tmp, tmp);
-                    add_result(&ri->results, RESULT_VERIFY, WAIVABLE_BY_ANYONE, HEADER_DESKTOP, msg, NULL, REMEDY_DESKTOP);
+                    add_result(ri, RESULT_VERIFY, WAIVABLE_BY_ANYONE, HEADER_DESKTOP, msg, NULL, REMEDY_DESKTOP);
                     free(msg);
                     result = false;
                 }
             } else {
                 xasprintf(&msg, "Desktop file %s on %s references icon %s but no subpackages contain %s", file->localpath, arch, tmp, tmp);
-                add_result(&ri->results, RESULT_VERIFY, WAIVABLE_BY_ANYONE, HEADER_DESKTOP, msg, NULL, REMEDY_DESKTOP);
+                add_result(ri, RESULT_VERIFY, WAIVABLE_BY_ANYONE, HEADER_DESKTOP, msg, NULL, REMEDY_DESKTOP);
                 free(msg);
                 result = false;
             }
@@ -253,13 +253,13 @@ static bool desktop_driver(struct rpminspect *ri, rpmfile_entry_t *file) {
 
     if (file->peer_file && before_out == NULL && after_out != NULL) {
         xasprintf(&msg, "File %s is no longer a valid desktop entry file on %s; desktop-file-validate reports:", file->localpath, arch);
-        add_result(&ri->results, (after_code == 0) ? RESULT_INFO : RESULT_BAD, WAIVABLE_BY_ANYONE, HEADER_DESKTOP, msg, after_out, REMEDY_DESKTOP);
+        add_result(ri, (after_code == 0) ? RESULT_INFO : RESULT_BAD, WAIVABLE_BY_ANYONE, HEADER_DESKTOP, msg, after_out, REMEDY_DESKTOP);
     } else if (file->peer_file == NULL && after_out != NULL) {
         xasprintf(&msg, "New file %s is not a valid desktop file on %s; desktop-file-validate reports:", file->localpath, arch);
-        add_result(&ri->results, (after_code == 0) ? RESULT_INFO : RESULT_BAD, WAIVABLE_BY_ANYONE, HEADER_DESKTOP, msg, after_out, REMEDY_DESKTOP);
+        add_result(ri, (after_code == 0) ? RESULT_INFO : RESULT_BAD, WAIVABLE_BY_ANYONE, HEADER_DESKTOP, msg, after_out, REMEDY_DESKTOP);
     } else if (after_out != NULL) {
         xasprintf(&msg, "File %s is not a valid desktop file on %s; desktop-file-validate reports:", file->localpath, arch);
-        add_result(&ri->results, (after_code == 0) ? RESULT_INFO : RESULT_BAD, WAIVABLE_BY_ANYONE, HEADER_DESKTOP, msg, after_out, REMEDY_DESKTOP);
+        add_result(ri, (after_code == 0) ? RESULT_INFO : RESULT_BAD, WAIVABLE_BY_ANYONE, HEADER_DESKTOP, msg, after_out, REMEDY_DESKTOP);
     }
 
     free(msg);
@@ -292,7 +292,7 @@ bool inspect_desktop(struct rpminspect *ri) {
     result = foreach_peer_file(ri, desktop_driver);
 
     if (result) {
-        add_result(&ri->results, RESULT_OK, NOT_WAIVABLE, HEADER_DESKTOP, NULL, NULL, NULL);
+        add_result(ri, RESULT_OK, NOT_WAIVABLE, HEADER_DESKTOP, NULL, NULL, NULL);
     }
 
     return result;

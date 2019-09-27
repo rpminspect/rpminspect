@@ -45,7 +45,7 @@ static bool valid_peers(struct rpminspect *ri, const Header before_hdr, const He
     if (after_vendor && strcmp(after_vendor, ri->vendor)) {
         xasprintf(&msg, "Package Vendor \"%s\" is not \"%s\" in %s", after_vendor, ri->vendor, after_nevra);
 
-        add_result(&ri->results, RESULT_BAD, NOT_WAIVABLE, HEADER_METADATA, msg, NULL, REMEDY_VENDOR);
+        add_result(ri, RESULT_BAD, NOT_WAIVABLE, HEADER_METADATA, msg, NULL, REMEDY_VENDOR);
         ret = false;
 
         free(msg);
@@ -65,7 +65,7 @@ static bool valid_peers(struct rpminspect *ri, const Header before_hdr, const He
         if (!valid_subdomain) {
             xasprintf(&msg, "Package Build Host \"%s\" is not within an expected build host subdomain in %s", after_buildhost, after_nevra);
 
-            add_result(&ri->results, RESULT_BAD, NOT_WAIVABLE, HEADER_METADATA, msg, NULL, REMEDY_BUILDHOST);
+            add_result(ri, RESULT_BAD, NOT_WAIVABLE, HEADER_METADATA, msg, NULL, REMEDY_BUILDHOST);
             ret = false;
 
             free(msg);
@@ -77,7 +77,7 @@ static bool valid_peers(struct rpminspect *ri, const Header before_hdr, const He
         xasprintf(&msg, "Package Summary contains unprofessional language in %s", after_nevra);
         xasprintf(&dump, "Summary: %s", after_summary);
 
-        add_result(&ri->results, RESULT_BAD, NOT_WAIVABLE, HEADER_METADATA, msg, dump, REMEDY_BADWORDS);
+        add_result(ri, RESULT_BAD, NOT_WAIVABLE, HEADER_METADATA, msg, dump, REMEDY_BADWORDS);
         ret = false;
 
         free(msg);
@@ -89,7 +89,7 @@ static bool valid_peers(struct rpminspect *ri, const Header before_hdr, const He
         xasprintf(&msg, "Package Description contains unprofessional language in %s:", after_nevra);
         xasprintf(&dump, "%s", after_description);
 
-        add_result(&ri->results, RESULT_BAD, NOT_WAIVABLE, HEADER_METADATA, msg, dump, REMEDY_BADWORDS);
+        add_result(ri, RESULT_BAD, NOT_WAIVABLE, HEADER_METADATA, msg, dump, REMEDY_BADWORDS);
         ret = false;
 
         free(msg);
@@ -112,7 +112,7 @@ static bool valid_peers(struct rpminspect *ri, const Header before_hdr, const He
         }
 
         if (msg) {
-            add_result(&ri->results, RESULT_VERIFY, WAIVABLE_BY_ANYONE, HEADER_METADATA, msg, NULL, NULL);
+            add_result(ri, RESULT_VERIFY, WAIVABLE_BY_ANYONE, HEADER_METADATA, msg, NULL, NULL);
             ret = false;
 
             free(msg);
@@ -121,7 +121,7 @@ static bool valid_peers(struct rpminspect *ri, const Header before_hdr, const He
         if (strcmp(before_summary, after_summary)) {
             xasprintf(&msg, "Package Summary change from \"%s\" to \"%s\" in %s", before_summary, after_summary, after_nevra);
 
-            add_result(&ri->results, RESULT_VERIFY, WAIVABLE_BY_ANYONE, HEADER_METADATA, msg, NULL, NULL);
+            add_result(ri, RESULT_VERIFY, WAIVABLE_BY_ANYONE, HEADER_METADATA, msg, NULL, NULL);
             ret = false;
 
             free(msg);
@@ -131,7 +131,7 @@ static bool valid_peers(struct rpminspect *ri, const Header before_hdr, const He
             xasprintf(&msg, "Package Description changed in %s", after_nevra);
             xasprintf(&dump, "from:\n\n%s\n\nto:\n\n%s", before_description, after_description);
 
-            add_result(&ri->results, RESULT_VERIFY, WAIVABLE_BY_ANYONE, HEADER_METADATA, msg, dump, NULL);
+            add_result(ri, RESULT_VERIFY, WAIVABLE_BY_ANYONE, HEADER_METADATA, msg, dump, NULL);
             ret = false;
 
             free(msg);
@@ -174,7 +174,7 @@ bool inspect_metadata(struct rpminspect *ri) {
     }
 
     if (good) {
-        add_result(&ri->results, RESULT_OK, NOT_WAIVABLE, HEADER_METADATA, NULL, NULL, NULL);
+        add_result(ri, RESULT_OK, NOT_WAIVABLE, HEADER_METADATA, NULL, NULL, NULL);
     }
 
     return good;

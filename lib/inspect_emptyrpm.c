@@ -62,7 +62,7 @@ bool inspect_emptyrpm(struct rpminspect *ri) {
          */
         if (peer->before_rpm != NULL && peer->after_rpm == NULL) {
             xasprintf(&msg, "Existing subpackage %s is now missing", headerGetAsString(peer->before_hdr, RPMTAG_NAME));
-            add_result(&ri->results, RESULT_VERIFY, WAIVABLE_BY_ANYONE, HEADER_EMPTYRPM, msg, NULL, REMEDY_EMPTYRPM);
+            add_result(ri, RESULT_VERIFY, WAIVABLE_BY_ANYONE, HEADER_EMPTYRPM, msg, NULL, REMEDY_EMPTYRPM);
             free(msg);
             continue;
         }
@@ -71,21 +71,21 @@ bool inspect_emptyrpm(struct rpminspect *ri) {
             if (peer->before_rpm == NULL) {
                 xasprintf(&msg, "New package %s is empty (no payloads)", basename(peer->after_rpm));
 
-                add_result(&ri->results, RESULT_VERIFY, WAIVABLE_BY_ANYONE, HEADER_EMPTYRPM, msg, NULL, REMEDY_EMPTYRPM);
+                add_result(ri, RESULT_VERIFY, WAIVABLE_BY_ANYONE, HEADER_EMPTYRPM, msg, NULL, REMEDY_EMPTYRPM);
 
                 free(msg);
             } else if (is_payload_empty(peer->before_files)) {
                 if (ri->verbose) {
                     xasprintf(&msg, "Package %s continues to be empty (no payloads)", basename(peer->after_rpm));
 
-                    add_result(&ri->results, RESULT_INFO, NOT_WAIVABLE, HEADER_EMPTYRPM, msg, NULL, REMEDY_EMPTYRPM);
+                    add_result(ri, RESULT_INFO, NOT_WAIVABLE, HEADER_EMPTYRPM, msg, NULL, REMEDY_EMPTYRPM);
 
                     free(msg);
                 }
             } else {
                 xasprintf(&msg, "Package %s became empty (no payloads)", basename(peer->after_rpm));
 
-                add_result(&ri->results, RESULT_VERIFY, WAIVABLE_BY_ANYONE, HEADER_EMPTYRPM, msg, NULL, REMEDY_EMPTYRPM);
+                add_result(ri, RESULT_VERIFY, WAIVABLE_BY_ANYONE, HEADER_EMPTYRPM, msg, NULL, REMEDY_EMPTYRPM);
 
                 free(msg);
             }
@@ -95,7 +95,7 @@ bool inspect_emptyrpm(struct rpminspect *ri) {
     }
 
     if (good) {
-        add_result(&ri->results, RESULT_OK, WAIVABLE_BY_ANYONE, HEADER_EMPTYRPM, NULL, NULL, NULL);
+        add_result(ri, RESULT_OK, WAIVABLE_BY_ANYONE, HEADER_EMPTYRPM, NULL, NULL, NULL);
     }
 
     return good;

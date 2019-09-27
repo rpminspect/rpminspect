@@ -158,7 +158,7 @@ static bool xml_driver(struct rpminspect *ri, rpmfile_entry_t *file)
     if (!result) {
         xasprintf(&msg, "File %s has become malformed XML on %s", file->localpath, headerGetString(file->rpm_header, RPMTAG_ARCH));
 
-        add_result(&ri->results, RESULT_VERIFY, WAIVABLE_BY_ANYONE, HEADER_XML, msg, errors, REMEDY_XML);
+        add_result(ri, RESULT_VERIFY, WAIVABLE_BY_ANYONE, HEADER_XML, msg, errors, REMEDY_XML);
 
         free(msg);
     }
@@ -175,7 +175,7 @@ bool inspect_xml(struct rpminspect *ri)
     result = foreach_peer_file(ri, xml_driver);
 
     if (result) {
-        add_result(&ri->results, RESULT_OK, NOT_WAIVABLE, HEADER_XML, NULL, NULL, NULL);
+        add_result(ri, RESULT_OK, NOT_WAIVABLE, HEADER_XML, NULL, NULL, NULL);
     }
 
     return result;

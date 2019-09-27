@@ -39,14 +39,14 @@ static bool modularity_driver(struct rpminspect *ri, rpmfile_entry_t *file) {
     /* Find how to find the header */
     tv = rpmTagGetValue("modularitylabel");
     if (tv == -1) {
-        add_result(&ri->results, RESULT_BAD, NOT_WAIVABLE, HEADER_MODULARITY, msg, NULL, REMEDY_MODULARITY);
+        add_result(ri, RESULT_BAD, NOT_WAIVABLE, HEADER_MODULARITY, msg, NULL, REMEDY_MODULARITY);
         free(msg);
         return false;
     }
 
     tt = rpmTagGetTagType(tv);
     if (tt == RPM_NULL_TYPE) {
-        add_result(&ri->results, RESULT_BAD, NOT_WAIVABLE, HEADER_MODULARITY, msg, NULL, REMEDY_MODULARITY);
+        add_result(ri, RESULT_BAD, NOT_WAIVABLE, HEADER_MODULARITY, msg, NULL, REMEDY_MODULARITY);
         free(msg);
         return false;
     }
@@ -55,7 +55,7 @@ static bool modularity_driver(struct rpminspect *ri, rpmfile_entry_t *file) {
     modularitylabel = headerGetAsString(file->rpm_header, tv);
 
     if (modularitylabel == NULL) {
-        add_result(&ri->results, RESULT_BAD, NOT_WAIVABLE, HEADER_MODULARITY, msg, NULL, REMEDY_MODULARITY);
+        add_result(ri, RESULT_BAD, NOT_WAIVABLE, HEADER_MODULARITY, msg, NULL, REMEDY_MODULARITY);
         free(msg);
         return false;
     }
@@ -79,7 +79,7 @@ bool inspect_modularity(struct rpminspect *ri) {
     result = foreach_peer_file(ri, modularity_driver);
 
     if (result) {
-        add_result(&ri->results, RESULT_OK, WAIVABLE_BY_ANYONE, HEADER_MODULARITY, NULL, NULL, NULL);
+        add_result(ri, RESULT_OK, WAIVABLE_BY_ANYONE, HEADER_MODULARITY, NULL, NULL, NULL);
     }
 
     return result;

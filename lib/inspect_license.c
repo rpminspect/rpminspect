@@ -78,7 +78,7 @@ static int check_peer_license(struct rpminspect *ri, const Header hdr) {
         if (valid) {
             xasprintf(&msg, "Valid License Tag in %s: %s", nevra, license);
 
-            add_result(&ri->results, RESULT_INFO, NOT_WAIVABLE, HEADER_LICENSE, msg, NULL, NULL);
+            add_result(ri, RESULT_INFO, NOT_WAIVABLE, HEADER_LICENSE, msg, NULL, NULL);
             ret = 1;
 
             free(msg);
@@ -93,7 +93,7 @@ static int check_peer_license(struct rpminspect *ri, const Header hdr) {
     }
 
     if (msg != NULL && ret == 0) {
-        add_result(&ri->results, RESULT_BAD, NOT_WAIVABLE, HEADER_LICENSE, msg, NULL, REMEDY_LICENSE);
+        add_result(ri, RESULT_BAD, NOT_WAIVABLE, HEADER_LICENSE, msg, NULL, REMEDY_LICENSE);
         free(msg);
     }
 
@@ -272,7 +272,7 @@ bool inspect_license(struct rpminspect *ri) {
 
     if (ri->licensedb == NULL || access(ri->licensedb, F_OK|R_OK)) {
         msg = strdup("Missing license database");
-        add_result(&ri->results, RESULT_BAD, NOT_WAIVABLE, HEADER_LICENSE, msg, NULL, REMEDY_LICENSEDB);
+        add_result(ri, RESULT_BAD, NOT_WAIVABLE, HEADER_LICENSE, msg, NULL, REMEDY_LICENSEDB);
         free(msg);
         return false;
     }
@@ -299,7 +299,7 @@ bool inspect_license(struct rpminspect *ri) {
     result = (good == seen);
 
     if (result) {
-        add_result(&ri->results, RESULT_OK, NOT_WAIVABLE, HEADER_LICENSE, NULL, NULL, NULL);
+        add_result(ri, RESULT_OK, NOT_WAIVABLE, HEADER_LICENSE, NULL, NULL, NULL);
     }
 
     return result;

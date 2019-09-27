@@ -84,7 +84,7 @@ static bool addedfiles_driver(struct rpminspect *ri, rpmfile_entry_t *file)
 
             if (strprefix(file->localpath, subpath)) {
                 xasprintf(&msg, "Packages should contain files or directories starting with `%s` on %s", entry->data, arch);
-                add_result(&ri->results, RESULT_BAD, WAIVABLE_BY_ANYONE, HEADER_ADDEDFILES, msg, NULL, REMEDY_ADDEDFILES);
+                add_result(ri, RESULT_BAD, WAIVABLE_BY_ANYONE, HEADER_ADDEDFILES, msg, NULL, REMEDY_ADDEDFILES);
                 goto done;
             }
         }
@@ -95,7 +95,7 @@ static bool addedfiles_driver(struct rpminspect *ri, rpmfile_entry_t *file)
         TAILQ_FOREACH(entry, ri->forbidden_path_suffixes, items) {
             if (strsuffix(file->localpath, entry->data)) {
                 xasprintf(&msg, "Packages should contain files or directories ending with `%s` on %s", entry->data, arch); 
-                add_result(&ri->results, RESULT_BAD, WAIVABLE_BY_ANYONE, HEADER_ADDEDFILES, msg, NULL, REMEDY_ADDEDFILES);
+                add_result(ri, RESULT_BAD, WAIVABLE_BY_ANYONE, HEADER_ADDEDFILES, msg, NULL, REMEDY_ADDEDFILES);
                 goto done;
             }
         }
@@ -106,7 +106,7 @@ static bool addedfiles_driver(struct rpminspect *ri, rpmfile_entry_t *file)
         TAILQ_FOREACH(entry, ri->forbidden_directories, items) {
             if (!strcmp(file->localpath, entry->data)) {
                 xasprintf(&msg, "Forbidden directory `%s` found on %s", entry->data, arch);
-                add_result(&ri->results, RESULT_BAD, WAIVABLE_BY_ANYONE, HEADER_ADDEDFILES, msg, NULL, REMEDY_ADDEDFILES);
+                add_result(ri, RESULT_BAD, WAIVABLE_BY_ANYONE, HEADER_ADDEDFILES, msg, NULL, REMEDY_ADDEDFILES);
                 goto done;
             }
         }
@@ -123,7 +123,7 @@ static bool addedfiles_driver(struct rpminspect *ri, rpmfile_entry_t *file)
 
             if (strprefix(file->localpath, subpath)) {
                 xasprintf(&msg, "New security-related file `%s` added on %s requires inspection by the Security Team", file->localpath, arch);
-                add_result(&ri->results, RESULT_VERIFY, WAIVABLE_BY_SECURITY, HEADER_ADDEDFILES, msg, NULL, REMEDY_ADDEDFILES);
+                add_result(ri, RESULT_VERIFY, WAIVABLE_BY_SECURITY, HEADER_ADDEDFILES, msg, NULL, REMEDY_ADDEDFILES);
                 goto done;
             }
         }
@@ -137,11 +137,11 @@ static bool addedfiles_driver(struct rpminspect *ri, rpmfile_entry_t *file)
                 if (!strcmp(file->localpath, wlentry->filename)) {
                     if (file->st.st_mode == wlentry->mode) {
                         xasprintf(&msg, "%s on %s carries mode %04o, but is on the stat whitelist", file->localpath, arch, file->st.st_mode);
-                        add_result(&ri->results, RESULT_INFO, WAIVABLE_BY_ANYONE, HEADER_ADDEDFILES, msg, NULL, REMEDY_ADDEDFILES);
+                        add_result(ri, RESULT_INFO, WAIVABLE_BY_ANYONE, HEADER_ADDEDFILES, msg, NULL, REMEDY_ADDEDFILES);
                         goto done;
                     } else {
                         xasprintf(&msg, "%s on %s carries mode %04o, is on the stat whitelist but expected mode %04o", file->localpath, arch, file->st.st_mode, wlentry->mode);
-                        add_result(&ri->results, RESULT_VERIFY, WAIVABLE_BY_SECURITY, HEADER_ADDEDFILES, msg, NULL, REMEDY_ADDEDFILES);
+                        add_result(ri, RESULT_VERIFY, WAIVABLE_BY_SECURITY, HEADER_ADDEDFILES, msg, NULL, REMEDY_ADDEDFILES);
                         goto done;
                     }
                 }
@@ -150,13 +150,13 @@ static bool addedfiles_driver(struct rpminspect *ri, rpmfile_entry_t *file)
 
         /* catch anything not on the stat-whitelist */
         xasprintf(&msg, "%s on %s carries insecure mode %04o, Security Team review may be required", file->localpath, arch, file->st.st_mode);
-        add_result(&ri->results, RESULT_BAD, WAIVABLE_BY_SECURITY, HEADER_ADDEDFILES, msg, NULL, REMEDY_ADDEDFILES);
+        add_result(ri, RESULT_BAD, WAIVABLE_BY_SECURITY, HEADER_ADDEDFILES, msg, NULL, REMEDY_ADDEDFILES);
         goto done;
     }
 
     /* Default for new files */
     xasprintf(&msg, "`%s` added on %s", file->localpath, arch);
-    add_result(&ri->results, RESULT_VERIFY, WAIVABLE_BY_SECURITY, HEADER_ADDEDFILES, msg, NULL, REMEDY_ADDEDFILES);
+    add_result(ri, RESULT_VERIFY, WAIVABLE_BY_SECURITY, HEADER_ADDEDFILES, msg, NULL, REMEDY_ADDEDFILES);
 
 done:
     free(msg);
@@ -171,7 +171,7 @@ bool inspect_addedfiles(struct rpminspect *ri)
     result = foreach_peer_file(ri, addedfiles_driver);
 
     if (result) {
-        add_result(&ri->results, RESULT_OK, NOT_WAIVABLE, HEADER_ADDEDFILES, NULL, NULL, NULL);
+        add_result(ri, RESULT_OK, NOT_WAIVABLE, HEADER_ADDEDFILES, NULL, NULL, NULL);
     }
 
     return result;
