@@ -234,6 +234,10 @@ struct rpminspect {
     uint64_t tests;            /* which tests to run (default: ALL) */
     bool verbose;              /* verbose inspection output? */
 
+    /* Failure threshold */
+    severity_t threshold;
+    severity_t worst_result;
+
     /* The product release we are inspecting against */
     char *product_release;
 

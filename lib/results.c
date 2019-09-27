@@ -73,16 +73,21 @@ void free_results(results_t *results) {
  *
  * Pass NULL for any optional strings that you have no data for.
  */
-void add_result(results_t **results, severity_t severity,
+void add_result(struct rpminspect *ri, severity_t severity,
                 waiverauth_t waiverauth, char *header, char *msg,
                 char *screendump, char *remedy) {
     results_entry_t *entry = NULL;
 
+    assert(ri != NULL);
     assert(severity >= 0);
     assert(header != NULL);
 
-    if (*results == NULL) {
-        *results = init_results();
+    if (severity > ri->worst_result) {
+        ri->worst_result = severity;
+    }
+
+    if (ri->results == NULL) {
+        ri->results = init_results();
     }
 
     entry = calloc(1, sizeof(*entry));
@@ -104,6 +109,6 @@ void add_result(results_t **results, severity_t severity,
         entry->remedy = strdup(remedy);
     }
 
-    TAILQ_INSERT_TAIL((*results), entry, items);
+    TAILQ_INSERT_TAIL(ri->results, entry, items);
     return;
 }

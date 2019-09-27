@@ -41,7 +41,7 @@ static void add_removedfiles_result(struct rpminspect *ri, const char *msg, char
         tmp = strdup(msg);
     }
 
-    add_result(&ri->results, severity, waiver, HEADER_REMOVEDFILES, tmp, errors, REMEDY_REMOVEDFILES);
+    add_result(ri, severity, waiver, HEADER_REMOVEDFILES, tmp, errors, REMEDY_REMOVEDFILES);
     free(tmp);
     return;
 }
@@ -163,7 +163,7 @@ bool inspect_removedfiles(struct rpminspect *ri)
     }
 
     if (result) {
-        add_result(&ri->results, RESULT_OK, NOT_WAIVABLE, HEADER_REMOVEDFILES, NULL, NULL, NULL);
+        add_result(ri, RESULT_OK, NOT_WAIVABLE, HEADER_REMOVEDFILES, NULL, NULL, NULL);
     }
 
     return result;

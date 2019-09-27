@@ -515,7 +515,7 @@ static bool inspect_elf_execstack(struct rpminspect *ri, Elf *after_elf, Elf *be
             severity = RESULT_BAD;
         }
 
-        add_result(&ri->results, severity, WAIVABLE_BY_SECURITY, HEADER_ELF, msg, NULL, REMEDY_ELF_EXECSTACK_MISSING);
+        add_result(ri, severity, WAIVABLE_BY_SECURITY, HEADER_ELF, msg, NULL, REMEDY_ELF_EXECSTACK_MISSING);
         goto cleanup;
     }
 
@@ -526,11 +526,11 @@ static bool inspect_elf_execstack(struct rpminspect *ri, Elf *after_elf, Elf *be
         if (elf_type == ET_REL) {
             xasprintf(&msg, "File %s has invalid execstack flags %lX on %s", localpath, execstack_flags, arch);
 
-            add_result(&ri->results, RESULT_BAD, WAIVABLE_BY_SECURITY, HEADER_ELF, msg, NULL, REMEDY_ELF_EXECSTACK_INVALID);
+            add_result(ri, RESULT_BAD, WAIVABLE_BY_SECURITY, HEADER_ELF, msg, NULL, REMEDY_ELF_EXECSTACK_INVALID);
         } else {
             xasprintf(&msg, "File %s has unrecognized GNU_STACK '%s' (expected RW or RWE) on %s", localpath, pflags_to_str(execstack_flags), arch);
 
-            add_result(&ri->results, RESULT_BAD, WAIVABLE_BY_SECURITY, HEADER_ELF, msg, NULL, REMEDY_ELF_EXECSTACK_INVALID);
+            add_result(ri, RESULT_BAD, WAIVABLE_BY_SECURITY, HEADER_ELF, msg, NULL, REMEDY_ELF_EXECSTACK_INVALID);
         }
 
         goto cleanup;
@@ -556,7 +556,7 @@ static bool inspect_elf_execstack(struct rpminspect *ri, Elf *after_elf, Elf *be
             }
         }
 
-        add_result(&ri->results, severity, WAIVABLE_BY_SECURITY, HEADER_ELF, msg, NULL, REMEDY_ELF_EXECSTACK_EXECUTABLE);
+        add_result(ri, severity, WAIVABLE_BY_SECURITY, HEADER_ELF, msg, NULL, REMEDY_ELF_EXECSTACK_EXECUTABLE);
         goto cleanup;
     }
 
@@ -585,7 +585,7 @@ static bool check_relro(struct rpminspect *ri, Elf *before_elf, Elf *after_elf, 
     }
 
     if (msg != NULL) {
-        add_result(&ri->results, RESULT_BAD, WAIVABLE_BY_SECURITY, HEADER_ELF, msg, NULL, REMEDY_ELF_GNU_RELRO);
+        add_result(ri, RESULT_BAD, WAIVABLE_BY_SECURITY, HEADER_ELF, msg, NULL, REMEDY_ELF_GNU_RELRO);
         free(msg);
         return false;
     }
@@ -685,7 +685,7 @@ static bool check_fortified(struct rpminspect *ri, Elf *before_elf, Elf *after_e
     assert(output_result == 0);
 
     xasprintf(&msg, "%s may have lost -D_FORTIFY_SOURCE on %s", localpath, arch);
-    add_result(&ri->results, RESULT_VERIFY, WAIVABLE_BY_SECURITY, HEADER_ELF, msg, output_buffer, REMEDY_ELF_FORTIFY_SOURCE);
+    add_result(ri, RESULT_VERIFY, WAIVABLE_BY_SECURITY, HEADER_ELF, msg, output_buffer, REMEDY_ELF_FORTIFY_SOURCE);
     free(msg);
 
 cleanup:
@@ -880,7 +880,7 @@ static bool elf_archive_tests(struct rpminspect *ri, Elf *after_elf, int after_e
 
     if (!result) {
         xasprintf(&msg, "%s lost -fPIC on %s", localpath, arch);
-        add_result(&ri->results, RESULT_BAD, WAIVABLE_BY_SECURITY, HEADER_ELF, msg, screendump, REMEDY_ELF_FPIC);
+        add_result(ri, RESULT_BAD, WAIVABLE_BY_SECURITY, HEADER_ELF, msg, screendump, REMEDY_ELF_FPIC);
     }
 
 cleanup:
@@ -915,7 +915,7 @@ static bool elf_regular_tests(struct rpminspect *ri, Elf *after_elf, Elf *before
         }
 
         if (msg != NULL) {
-            add_result(&ri->results, RESULT_BAD, WAIVABLE_BY_SECURITY, HEADER_ELF, msg, NULL, REMEDY_ELF_TEXTREL);
+            add_result(ri, RESULT_BAD, WAIVABLE_BY_SECURITY, HEADER_ELF, msg, NULL, REMEDY_ELF_TEXTREL);
             result = false;
             free(msg);
             msg = NULL;
@@ -999,7 +999,7 @@ bool inspect_elf(struct rpminspect *ri)
     free_elf_data();
 
     if (result) {
-        add_result(&ri->results, RESULT_OK, WAIVABLE_BY_ANYONE, HEADER_ELF, NULL, NULL, NULL);
+        add_result(ri, RESULT_OK, WAIVABLE_BY_ANYONE, HEADER_ELF, NULL, NULL, NULL);
     }
 
     return result;

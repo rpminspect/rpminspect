@@ -45,7 +45,7 @@ static void add_changedfiles_result(struct rpminspect *ri, const char *msg, char
         tmp = strdup(msg);
     }
 
-    add_result(&ri->results, severity, waiver, HEADER_CHANGEDFILES, tmp, errors, REMEDY_CHANGEDFILES);
+    add_result(ri, severity, waiver, HEADER_CHANGEDFILES, tmp, errors, REMEDY_CHANGEDFILES);
     free(tmp);
     return;
 }
@@ -257,14 +257,14 @@ static bool changedfiles_driver(struct rpminspect *ri, rpmfile_entry_t *file)
         /* First, unformat the mo files */
         if (run_and_capture(ri->workdir, &after_tmp, MSGUNFMT_CMD, file->fullpath, &errors)) {
             xasprintf(&msg, "Error running msgunfmt on %s on %s", file->localpath, arch);
-            add_result(&ri->results, RESULT_BAD, NOT_WAIVABLE, HEADER_CHANGEDFILES, msg, errors, REMEDY_CHANGEDFILES);
+            add_result(ri, RESULT_BAD, NOT_WAIVABLE, HEADER_CHANGEDFILES, msg, errors, REMEDY_CHANGEDFILES);
             result = false;
             goto done;
         }
 
         if (run_and_capture(ri->workdir, &before_tmp, MSGUNFMT_CMD, file->peer_file->fullpath, &errors)) {
             xasprintf(&msg, "Error running msgunfmt on %s on %s", file->peer_file->localpath, arch);
-            add_result(&ri->results, RESULT_BAD, NOT_WAIVABLE, HEADER_CHANGEDFILES, msg, errors, REMEDY_CHANGEDFILES);
+            add_result(ri, RESULT_BAD, NOT_WAIVABLE, HEADER_CHANGEDFILES, msg, errors, REMEDY_CHANGEDFILES);
             result = false;
             goto done;
         }
@@ -272,7 +272,7 @@ static bool changedfiles_driver(struct rpminspect *ri, rpmfile_entry_t *file)
         /* Now diff the mo content */
         if (run_cmd(&errors, DIFF_CMD, "-u", before_tmp, after_tmp, NULL)) {
             xasprintf(&msg, "Message catalog %s changed content on %s", file->localpath, arch);
-            add_result(&ri->results, RESULT_VERIFY, WAIVABLE_BY_ANYONE, HEADER_CHANGEDFILES, msg, errors, REMEDY_CHANGEDFILES);
+            add_result(ri, RESULT_VERIFY, WAIVABLE_BY_ANYONE, HEADER_CHANGEDFILES, msg, errors, REMEDY_CHANGEDFILES);
             result = false;
         }
 
@@ -314,7 +314,7 @@ static bool changedfiles_driver(struct rpminspect *ri, rpmfile_entry_t *file)
         /* Now diff the header content */
         if (run_cmd(&errors, DIFF_CMD, "-u", "-w", "--label", file->localpath, file->peer_file->fullpath, file->fullpath, NULL)) {
             xasprintf(&msg, "Public header file %s changed content on %s, Please make sure this does not change the ABI exported by this package.  The output of `diff -uw` follows.", file->localpath, arch);
-            add_result(&ri->results, RESULT_VERIFY, WAIVABLE_BY_ANYONE, HEADER_CHANGEDFILES, msg, errors, REMEDY_CHANGEDFILES);
+            add_result(ri, RESULT_VERIFY, WAIVABLE_BY_ANYONE, HEADER_CHANGEDFILES, msg, errors, REMEDY_CHANGEDFILES);
             result = false;
         }
     }
@@ -354,7 +354,7 @@ bool inspect_changedfiles(struct rpminspect *ri)
     result = foreach_peer_file(ri, changedfiles_driver);
 
     if (result) {
-        add_result(&ri->results, RESULT_OK, NOT_WAIVABLE, HEADER_CHANGEDFILES, NULL, NULL, NULL);
+        add_result(ri, RESULT_OK, NOT_WAIVABLE, HEADER_CHANGEDFILES, NULL, NULL, NULL);
     }
 
     return result;

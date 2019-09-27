@@ -49,7 +49,7 @@ static bool specname_driver(struct rpminspect *ri, rpmfile_entry_t *file) {
          * but it's not named in the expected way.
          */
         xasprintf(&msg, "Spec filename does not match the pattern of NAME%s; expected '%s', got '%s'", SPEC_FILENAME_EXTENSION, specfile, file->localpath);
-        add_result(&ri->results, RESULT_BAD, WAIVABLE_BY_ANYONE, HEADER_SPECNAME, msg, NULL, REMEDY_SPECNAME);
+        add_result(ri, RESULT_BAD, WAIVABLE_BY_ANYONE, HEADER_SPECNAME, msg, NULL, REMEDY_SPECNAME);
         free(msg);
         specgood = false;
     }
@@ -69,10 +69,10 @@ bool inspect_specname(struct rpminspect *ri) {
     foreach_peer_file(ri, specname_driver);
 
     if (specgood) {
-        add_result(&ri->results, RESULT_OK, WAIVABLE_BY_ANYONE, HEADER_SPECNAME, NULL, NULL, NULL);
+        add_result(ri, RESULT_OK, WAIVABLE_BY_ANYONE, HEADER_SPECNAME, NULL, NULL, NULL);
     } else if (!seen) {
         xasprintf(&msg, "The specname inspection is only for source packages.");
-        add_result(&ri->results, RESULT_BAD, NOT_WAIVABLE, HEADER_SPECNAME, msg, NULL, NULL);
+        add_result(ri, RESULT_BAD, NOT_WAIVABLE, HEADER_SPECNAME, msg, NULL, NULL);
         free(msg);
     }
 

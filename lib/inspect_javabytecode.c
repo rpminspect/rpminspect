@@ -112,12 +112,12 @@ static bool check_class_file(struct rpminspect *ri, const char *fullpath,
         return true;
     } else if (major < 0 || major > 60) {
         xasprintf(&msg, "File %s (%s), Java byte code version %d is incorrect (wrong endianness? corrupted file? space JDK?)", localpath, fullpath, major);
-        add_result(&ri->results, RESULT_BAD, WAIVABLE_BY_ANYONE, HEADER_JAVABYTECODE, msg, NULL, NULL);
+        add_result(ri, RESULT_BAD, WAIVABLE_BY_ANYONE, HEADER_JAVABYTECODE, msg, NULL, NULL);
         free(msg);
         return false;
     } else if (major > expected_major) {
         xasprintf(&msg, "File %s (%s), Java byte code version %d greater than expected %d for product release %s", localpath, fullpath, major, expected_major, ri->product_release);
-        add_result(&ri->results, RESULT_BAD, WAIVABLE_BY_ANYONE, HEADER_JAVABYTECODE, msg, NULL, NULL);
+        add_result(ri, RESULT_BAD, WAIVABLE_BY_ANYONE, HEADER_JAVABYTECODE, msg, NULL, NULL);
         free(msg);
         return false;
     }
@@ -132,7 +132,7 @@ static bool check_class_file(struct rpminspect *ri, const char *fullpath,
 
         if (major != majorpeer) {
             xasprintf(&msg, "Java byte code version changed from %d to %d in %s from %s", majorpeer, major, localpath, container);
-            add_result(&ri->results, RESULT_BAD, WAIVABLE_BY_ANYONE, HEADER_JAVABYTECODE, msg, NULL, NULL);
+            add_result(ri, RESULT_BAD, WAIVABLE_BY_ANYONE, HEADER_JAVABYTECODE, msg, NULL, NULL);
             free(msg);
             return false;
         }
@@ -285,7 +285,7 @@ bool inspect_javabytecode(struct rpminspect *ri)
     }
 
     if (result) {
-        add_result(&ri->results, RESULT_OK, NOT_WAIVABLE, HEADER_JAVABYTECODE, NULL, NULL, NULL);
+        add_result(ri, RESULT_OK, NOT_WAIVABLE, HEADER_JAVABYTECODE, NULL, NULL, NULL);
     }
 
     return result;

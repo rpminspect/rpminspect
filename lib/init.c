@@ -603,6 +603,8 @@ int init_rpminspect(struct rpminspect *ri, const char *cfgfile) {
     ri->worksubdir = NULL;
     ri->tests = ~tests;
     ri->results = NULL;
+    ri->threshold = RESULT_VERIFY;
+    ri->worst_result = RESULT_OK;
     ri->product_release = NULL;
     ri->arches = NULL;
 

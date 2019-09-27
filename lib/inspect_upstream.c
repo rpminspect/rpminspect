@@ -136,7 +136,7 @@ static bool upstream_driver(struct rpminspect *ri, rpmfile_entry_t *file)
 
     if (file->peer_file == NULL) {
         xasprintf(&msg, "New upstream source file `%s` appeared, but the build version (%s) and epoch (%s) remained the same", shortname, ver_after, epoch_after);
-        add_result(&ri->results, RESULT_VERIFY, WAIVABLE_BY_ANYONE, HEADER_UPSTREAM, msg, NULL, REMEDY_UPSTREAM);
+        add_result(ri, RESULT_VERIFY, WAIVABLE_BY_ANYONE, HEADER_UPSTREAM, msg, NULL, REMEDY_UPSTREAM);
         result = false;
     } else {
         before_sum = checksum(file->peer_file->fullpath, &file->peer_file->st.st_mode, SHA256SUM);
@@ -144,7 +144,7 @@ static bool upstream_driver(struct rpminspect *ri, rpmfile_entry_t *file)
 
         if (strcmp(before_sum, after_sum)) {
             xasprintf(&msg, "Upstream source file `%s` changed content, but the build version (%s) and epoch (%s) remained the same", shortname, ver_after, epoch_after);
-            add_result(&ri->results, RESULT_BAD, WAIVABLE_BY_ANYONE, HEADER_UPSTREAM, msg, NULL, REMEDY_UPSTREAM);
+            add_result(ri, RESULT_BAD, WAIVABLE_BY_ANYONE, HEADER_UPSTREAM, msg, NULL, REMEDY_UPSTREAM);
             result = false;
         }
     }
@@ -190,7 +190,7 @@ bool inspect_upstream(struct rpminspect *ri)
             TAILQ_FOREACH(file, peer->before_files, items) {
                 if (file->peer_file == NULL) {
                     xasprintf(&msg, "Source RPM member `%s` removed, but the build version (%s) and epoch (%s) remained the same", basename(file->fullpath), ver_after, epoch_after);
-                    add_result(&ri->results, RESULT_VERIFY, WAIVABLE_BY_ANYONE, HEADER_UPSTREAM, msg, NULL, REMEDY_UPSTREAM);
+                    add_result(ri, RESULT_VERIFY, WAIVABLE_BY_ANYONE, HEADER_UPSTREAM, msg, NULL, REMEDY_UPSTREAM);
                     result = false;
                 }
             }
@@ -199,7 +199,7 @@ bool inspect_upstream(struct rpminspect *ri)
 
     /* Sound the everything-is-ok alarm if everything is, in fact, ok */
     if (result) {
-        add_result(&ri->results, RESULT_OK, NOT_WAIVABLE, HEADER_UPSTREAM, NULL, NULL, NULL);
+        add_result(ri, RESULT_OK, NOT_WAIVABLE, HEADER_UPSTREAM, NULL, NULL, NULL);
     }
 
     /* Our static list of SourceN: spec file members, dump it */
