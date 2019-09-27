@@ -254,6 +254,32 @@ char *strseverity(const severity_t severity) {
 }
 
 /*
+ * Given a severity string, return a severity_t matching it.
+ * Or return the default.
+ */
+severity_t getseverity(const char *name) {
+    severity_t s = RESULT_VERIFY;
+
+    if (name == NULL) {
+        return s;
+    }
+
+    if (strcasecmp(name, "OK")) {
+        s = RESULT_OK;
+    } else if (strcasecmp(name, "INFO")) {
+        s = RESULT_INFO;
+    } else if (strcasecmp(name, "WAIVED")) {
+        s = RESULT_WAIVED;
+    } else if (strcasecmp(name, "VERIFY")) {
+        s = RESULT_VERIFY;
+    } else if (strcasecmp(name, "BAD")) {
+        s = RESULT_BAD;
+    }
+
+    return s;
+}
+
+/*
  * Given a type of waiver authorization, return a string representing it.
  */
 char *strwaiverauth(const waiverauth_t waiverauth) {

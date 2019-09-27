@@ -110,6 +110,13 @@ can specify a tilde (~) character in the PATH specification and rpminspect
 will expand it.  Keep in mind that the PATH you specify with ~ must exist
 in order for expansion to work.
 .TP
+.B \-t TAG, \-\-threshold=TAG
+Result threshold that triggers a non-zero exit code.  By default this is
+VERIFY, which maps to a result code seen in the output.  You can set this
+to any of the valid result codes.  Available result codes are OK, INFO,
+WAIVED, VERIFY, or BAD.  The argument expects the result threshold specified
+as a string.  Case does not matter.
+.TP
 .B \-f, \-\-fetch\-only
 Only download builds, do not perform any inspections (implies \-k).
 This option is intended as a convenience for developers as well as

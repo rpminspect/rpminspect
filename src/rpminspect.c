@@ -51,6 +51,8 @@ static void usage(const char *progname) {
     printf("                             (default: stdout)\n");
     printf("  -F TYPE, --format=TYPE   Format output results as TYPE\n");
     printf("                             (default: text)\n");
+    printf("  -t TAG, --threshold=TAG  Result threshold triggering exit\n");
+    printf("                           failure (default: VERIFY)\n");
     printf("  -l, --list               List available tests and formats\n");
     printf("  -w PATH, --workdir=PATH  Temporary directory to use\n");
     printf("                             (default: %s)\n", DEFAULT_WORKDIR);
@@ -221,7 +223,7 @@ int main(int argc, char **argv) {
     int idx = 0;
     int ret = EXIT_SUCCESS;
     glob_t expand;
-    char *short_options = "c:T:E:a:r:o:F:lw:fkv\?V";
+    char *short_options = "c:T:E:a:r:o:F:lw:t:fkv\?V";
     struct option long_options[] = {
         { "config", required_argument, 0, 'c' },
         { "tests", required_argument, 0, 'T' },
@@ -232,6 +234,7 @@ int main(int argc, char **argv) {
         { "output", required_argument, 0, 'o' },
         { "format", required_argument, 0, 'F' },
         { "workdir", required_argument, 0, 'w' },
+        { "threshold", required_argument, 0, 't' },
         { "fetch-only", no_argument, 0, 'f' },
         { "keep", no_argument, 0, 'k' },
         { "verbose", no_argument, 0, 'v' },
@@ -246,6 +249,7 @@ int main(int argc, char **argv) {
     char *workdir = NULL;
     char *output = NULL;
     char *release = NULL;
+    char *threshold = NULL;
     int formatidx = -1;
     bool fetch_only = false;
     bool keep = false;
@@ -373,6 +377,9 @@ int main(int argc, char **argv) {
                 }
 
                 break;
+            case 't':
+                threshold = strdup(optarg);
+                break;
             case 'f':
                 fetch_only = true;        /* -f implies -k */
                 /* fall through */
@@ -424,6 +431,7 @@ int main(int argc, char **argv) {
     /* various options from the command line */
     ri.verbose = verbose;
     ri.product_release = release;
+    ri.threshold = getseverity(threshold);
 
     /* Copy in user-selected tests if they specified something */
     if (selected != 0 || exclude) {
@@ -556,14 +564,12 @@ int main(int argc, char **argv) {
                 continue;
             }
 
-           /* inspection requires before/after builds and we have one */
-           if (ri.before == NULL && !inspections[i].single_build) {
-               continue;
-           }
-
-            if (!inspections[i].driver(&ri)) {
-                ret = EXIT_FAILURE;
+            /* inspection requires before/after builds and we have one */
+            if (ri.before == NULL && !inspections[i].single_build) {
+                continue;
             }
+
+            inspections[i].driver(&ri);
         }
 
         /* output the results */
@@ -574,6 +580,11 @@ int main(int argc, char **argv) {
         if (ri.results != NULL) {
             formats[formatidx].driver(ri.results, output);
         }
+    }
+
+    /* Set exit code based on result threshold */
+    if (ri.worst_result >= ri.threshold) {
+        ret = EXIT_FAILURE;
     }
 
     /* Clean up */
