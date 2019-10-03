@@ -550,7 +550,7 @@ int main(int argc, char **argv) {
     }
 
     /* validate and gather the builds specified */
-    if ((ret = gather_builds(&ri, fetch_only))) {
+    if (gather_builds(&ri, fetch_only)) {
         fprintf(stderr, "*** Failed to gather specified builds.\n");
         fflush(stderr);
         exit(EXIT_FAILURE);

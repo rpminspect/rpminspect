@@ -264,15 +264,15 @@ severity_t getseverity(const char *name) {
         return s;
     }
 
-    if (strcasecmp(name, "OK")) {
+    if (!strcasecmp(name, "OK")) {
         s = RESULT_OK;
-    } else if (strcasecmp(name, "INFO")) {
+    } else if (!strcasecmp(name, "INFO")) {
         s = RESULT_INFO;
-    } else if (strcasecmp(name, "WAIVED")) {
+    } else if (!strcasecmp(name, "WAIVED")) {
         s = RESULT_WAIVED;
-    } else if (strcasecmp(name, "VERIFY")) {
+    } else if (!strcasecmp(name, "VERIFY")) {
         s = RESULT_VERIFY;
-    } else if (strcasecmp(name, "BAD")) {
+    } else if (!strcasecmp(name, "BAD")) {
         s = RESULT_BAD;
     }
 
