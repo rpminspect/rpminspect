@@ -117,19 +117,6 @@ static bool upstream_driver(struct rpminspect *ri, rpmfile_entry_t *file)
     epoch_before = headerGetString(file->peer_file->rpm_header, RPMTAG_EPOCH);
     epoch_after = headerGetString(file->rpm_header, RPMTAG_EPOCH);
 
-    /*
-     * Versions and/or epoch differ?  Don't care is sources change.
-     * NOTE: librpm will happily give us NULL if there is no Epoch
-     */
-    if (strcmp(ver_before, ver_after)) {
-        return true;
-    }
-
-    if ((epoch_before == NULL && epoch_after) ||
-        ((epoch_before && epoch_after) && strcmp(epoch_before, epoch_after))) {
-        return true;
-    }
-
     /* Compare digests of source archive */
     same = true;
     shortname = basename(file->fullpath);
