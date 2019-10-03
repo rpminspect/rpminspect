@@ -118,7 +118,7 @@ packages:
     dnf install json-c-devel xmlrpc-c-devel libxml2-devel rpm-devel \
                 libarchive-devel elfutils-devel kmod-devel zlib-devel \
                 libmandoc-devel iniparser-devel libyaml-devel file-devel \
-                openssl-devel libcap-ng-devel meson ninja CUnit CUnit-devel \
+                openssl-devel libcap-ng-devel meson ninja-build CUnit CUnit-devel \
                 gcc
 
 
