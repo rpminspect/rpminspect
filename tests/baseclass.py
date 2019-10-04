@@ -138,8 +138,53 @@ class TestSRPM(RequiresRpminspect):
         self.assertEqual(self.p.returncode, self.exitcode)
         self.assertEqual(self.results[self.label][0]['result'], self.result)
 
-# XXX: Base test case class that compares a before and after SRPM
-#class TestCompareSRPM(TestSRPM):
+# Base test case class that compares a before and after SRPM
+class TestCompareSRPM(RequiresRpminspect):
+    def setUp(self):
+        RequiresRpminspect.setUp(self)
+        self.before_rpm = rpmfluff.SimpleRpmBuild(BEFORE_NAME, BEFORE_VER, BEFORE_REL)
+        self.after_rpm = rpmfluff.SimpleRpmBuild(AFTER_NAME, AFTER_VER, AFTER_REL)
+
+        # the inheriting class needs to override these
+        self.inspection = None
+        self.label = None
+
+        # these default to 0 and OK
+        self.exitcode = 0
+        self.result = 'OK'
+
+    def configFile(self):
+        RequiresRpminspect.configFile(self)
+
+    def runTest(self):
+        self.configFile()
+
+        if not self.inspection:
+            return
+
+        self.before_rpm.do_make()
+        self.after_rpm.do_make()
+        self.p = subprocess.Popen([self.rpminspect,
+                                   '-c', self.conffile,
+                                   '-F', 'json',
+                                   '-T', self.inspection,
+                                   self.before_rpm.get_built_srpm(),
+                                   self.after_rpm.get_built_srpm()],
+                                  stdout=subprocess.PIPE,
+                                  stderr=subprocess.PIPE)
+        (self.out, self.err) = self.p.communicate()
+        self.results = json.loads(self.out)
+
+        # anything not OK or INFO is a non-zero return
+        if self.result not in ['OK', 'INFO'] and self.exitcode == 0:
+            self.exitcode = 1
+
+        # dump stdout and stderr if these do not match
+        if self.p.returncode != self.exitcode:
+            print("\n\nstdout: |%s|\nstderr: |%s|\n\n" % (self.out, self.err))
+
+        self.assertEqual(self.p.returncode, self.exitcode)
+        self.assertEqual(self.results[self.label][0]['result'], self.result)
 
 # Base test case class that tests the binary RPMs
 class TestRPMs(TestSRPM):
@@ -173,8 +218,39 @@ class TestRPMs(TestSRPM):
             self.assertEqual(self.p.returncode, self.exitcode)
             self.assertEqual(self.results[self.label][0]['result'], self.result)
 
-# XXX: Base test case class that compares before and after built RPMs
-#class TestCompareRPMs(TestRPMs):
+# Base test case class that compares before and after built RPMs
+class TestCompareRPMs(TestCompareSRPM):
+    def runTest(self):
+        TestCompareSRPM.configFile(self)
+
+        if not self.inspection and not self.label:
+            return
+
+        self.before_rpm.do_make()
+        self.after_rpm.do_make()
+
+        # anything not OK or INFO is a non-zero return
+        if self.result not in ['OK', 'INFO'] and self.exitcode == 0:
+            self.exitcode = 1
+
+        for a in self.before_rpm.get_build_archs():
+            self.p = subprocess.Popen([self.rpminspect,
+                                       '-c', self.conffile,
+                                       '-F', 'json',
+                                       '-T', self.inspection,
+                                       self.before_rpm.get_built_rpm(a),
+                                       self.after_rpm.get_built_rpm(a)],
+                                      stdout=subprocess.PIPE,
+                                      stderr=subprocess.PIPE)
+            (self.out, self.err) = self.p.communicate()
+            self.results = json.loads(self.out)
+
+            # dump stdout and stderr if these do not match
+            if self.p.returncode != self.exitcode:
+                print("\n\nstdout: |%s|\nstderr: |%s|\n\n" % (self.out, self.err))
+
+            self.assertEqual(self.p.returncode, self.exitcode)
+            self.assertEqual(self.results[self.label][0]['result'], self.result)
 
 # Base test case class that tests a fake Koji build
 class TestKoji(TestSRPM):
@@ -225,5 +301,62 @@ class TestKoji(TestSRPM):
             self.assertEqual(self.p.returncode, self.exitcode)
             self.assertEqual(self.results[self.label][0]['result'], self.result)
 
-# XXX: Base test case class that compares before and after Koji builds
-#class TestCompareKoji(TestKoji):
+# Base test case class that compares before and after Koji builds
+class TestCompareKoji(TestCompareSRPM):
+    def runTest(self):
+        TestCompareSRPM.configFile(self)
+
+        if not self.inspection:
+            return
+
+        # add some additional subpackages to the build
+        self.before_rpm.add_devel_subpackage()
+        self.after_rpm.add_devel_subpackage()
+
+        # generate the build
+        self.before_rpm.do_make()
+        self.after_rpm.do_make()
+
+        # copy everything in to place as if Koji built it
+        with tempfile.TemporaryDirectory() as kojidir:
+            # copy over the SRPM to the fake koji build
+            beforesrcdir = kojidir + '/before/src'
+            aftersrcdir = kojidir + '/after/src'
+            os.makedirs(beforesrcdir, exist_ok=True)
+            os.makedirs(aftersrcdir, exist_ok=True)
+            shutil.copy(self.before_rpm.get_built_srpm(), beforesrcdir)
+            shutil.copy(self.after_rpm/get_built_srpm(), aftersrcdir)
+
+            # copy over the built RPMs to the fake koji build
+            for a in self.before_rpm.get_build_archs():
+                adir = kojidir + '/before/' + a
+                os.makedirs(adir, exist_ok=True)
+                shutil.copy(self.before_rpm.get_built_rpm(a), adir)
+
+            for a in self.after_rpm.get_build_archs():
+                adir = kojidir + '/after/' + a
+                os.makedirs(adir, exist_ok=True)
+                shutil.copy(self.after_rpm.get_built_rpm(a), adir)
+
+            self.p = subprocess.Popen([self.rpminspect,
+                                       '-c', self.conffile,
+                                       '-F', 'json',
+                                       '-T', self.inspection,
+                                       '-r', AFTER_REL,
+                                       kojidir + '/before',
+                                       kojidir + '/after'],
+                                      stdout=subprocess.PIPE,
+                                      stderr=subprocess.PIPE)
+            (self.out, self.err) = self.p.communicate()
+            self.results = json.loads(self.out)
+
+            # anything not OK or INFO is a non-zero return
+            if self.result not in ['OK', 'INFO'] and self.exitcode == 0:
+                self.exitcode = 1
+
+            # dump stdout and stderr if these do not match
+            if self.p.returncode != self.exitcode:
+                print("\n\nstdout: |%s|\nstderr: |%s|\n\n" % (self.out, self.err))
+
+            self.assertEqual(self.p.returncode, self.exitcode)
+            self.assertEqual(self.results[self.label][0]['result'], self.result)
