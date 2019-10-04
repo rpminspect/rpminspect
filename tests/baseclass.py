@@ -117,11 +117,15 @@ class TestSRPM(RequiresRpminspect):
             return
 
         self.rpm.do_make()
-        self.p = subprocess.Popen([self.rpminspect,
-                                   '-c', self.conffile,
-                                   '-F', 'json',
-                                   '-T', self.inspection,
-                                   self.rpm.get_built_srpm()],
+
+        args = [self.rpminspect, '-c', self.conffile, '-F', 'json']
+        if self.inspection:
+            args.append('-T')
+            args.append(self.inspection)
+
+        args.append(self.rpm.get_built_srpm())
+
+        self.p = subprocess.Popen(args,
                                   stdout=subprocess.PIPE,
                                   stderr=subprocess.PIPE)
         (self.out, self.err) = self.p.communicate()
@@ -164,12 +168,17 @@ class TestCompareSRPM(RequiresRpminspect):
 
         self.before_rpm.do_make()
         self.after_rpm.do_make()
-        self.p = subprocess.Popen([self.rpminspect,
-                                   '-c', self.conffile,
-                                   '-F', 'json',
-                                   '-T', self.inspection,
-                                   self.before_rpm.get_built_srpm(),
-                                   self.after_rpm.get_built_srpm()],
+
+        args = [self.rpminspect, '-c', self.conffile, '-F', 'json']
+
+        if self.inspection:
+            args.append('-T')
+            args.append(self.inspection)
+
+        args.append(self.before_rpm.get_built_srpm())
+        args.append(self.after_rpm.get_built_srpm())
+
+        self.p = subprocess.Popen(args,
                                   stdout=subprocess.PIPE,
                                   stderr=subprocess.PIPE)
         (self.out, self.err) = self.p.communicate()
@@ -201,11 +210,15 @@ class TestRPMs(TestSRPM):
             self.exitcode = 1
 
         for a in self.rpm.get_build_archs():
-            self.p = subprocess.Popen([self.rpminspect,
-                                       '-c', self.conffile,
-                                       '-F', 'json',
-                                       '-T', self.inspection,
-                                       self.rpm.get_built_rpm(a)],
+            args = [self.rpminspect, '-c', self.conffile, '-F', 'json']
+
+            if self.inspection:
+                args.append('-T')
+                args.append(self.inspection)
+
+            args.append(self.rpm.get_built_rpm(a))
+
+            self.p = subprocess.Popen(args,
                                       stdout=subprocess.PIPE,
                                       stderr=subprocess.PIPE)
             (self.out, self.err) = self.p.communicate()
@@ -234,12 +247,16 @@ class TestCompareRPMs(TestCompareSRPM):
             self.exitcode = 1
 
         for a in self.before_rpm.get_build_archs():
-            self.p = subprocess.Popen([self.rpminspect,
-                                       '-c', self.conffile,
-                                       '-F', 'json',
-                                       '-T', self.inspection,
-                                       self.before_rpm.get_built_rpm(a),
-                                       self.after_rpm.get_built_rpm(a)],
+            args = [self.rpminspect, '-c', self.conffile, '-F', 'json']
+
+            if self.inspection:
+                args.append('-T')
+                args.append(self.inspection)
+
+            args.append(self.before_rpm.get_built_rpm(a))
+            args.append(self.after_rpm.get_built_rpm(a))
+
+            self.p = subprocess.Popen(args,
                                       stdout=subprocess.PIPE,
                                       stderr=subprocess.PIPE)
             (self.out, self.err) = self.p.communicate()
@@ -279,12 +296,14 @@ class TestKoji(TestSRPM):
                 os.makedirs(adir, exist_ok=True)
                 shutil.copy(self.rpm.get_built_rpm(a), adir)
 
-            self.p = subprocess.Popen([self.rpminspect,
-                                       '-c', self.conffile,
-                                       '-F', 'json',
-                                       '-T', self.inspection,
-                                       '-r', AFTER_REL,
-                                       kojidir],
+            args = [self.rpminspect, '-c', self.conffile, '-F', 'json', '-r', AFTER_REL]
+            if self.inspection:
+                args.append('-T')
+                args.append(self.inspection)
+
+            args.append(kojidir)
+
+            self.p = subprocess.Popen(args,
                                       stdout=subprocess.PIPE,
                                       stderr=subprocess.PIPE)
             (self.out, self.err) = self.p.communicate()
@@ -338,13 +357,16 @@ class TestCompareKoji(TestCompareSRPM):
                 os.makedirs(adir, exist_ok=True)
                 shutil.copy(self.after_rpm.get_built_rpm(a), adir)
 
-            self.p = subprocess.Popen([self.rpminspect,
-                                       '-c', self.conffile,
-                                       '-F', 'json',
-                                       '-T', self.inspection,
-                                       '-r', AFTER_REL,
-                                       kojidir + '/before',
-                                       kojidir + '/after'],
+            args = [self.rpminspect, '-c', self.conffile, '-F', 'json', '-r', AFTER_REL]
+
+            if self.inspection:
+                args.append('-T')
+                args.append(self.inspection)
+
+            args.append(kojidir + '/before')
+            args.append(kojidir + '/after')
+
+            self.p = subprocess.Popen(args,
                                       stdout=subprocess.PIPE,
                                       stderr=subprocess.PIPE)
             (self.out, self.err) = self.p.communicate()
