@@ -24,11 +24,6 @@
 #include "rpminspect.h"
 
 static string_list_t *source = NULL;
-static const char *ver_before = NULL;
-static const char *ver_after = NULL;
-static const char *epoch_before = NULL;
-static const char *epoch_after = NULL;
-static bool same = false;
 
 /*
  * Get the SOURCE tag from the RPM header and read in all of
@@ -97,37 +92,6 @@ static bool is_source(const rpmfile_entry_t *file)
     return ret;
 }
 
-/* Generate a message string depending on values of ver and epoch */
-static char *build_upstream_msg(const char *leader, const char *name,
-                                const char *ver, const char *epoch)
-{
-    char *msg = NULL;
-    char *tmp = NULL;
-
-    assert(leader != NULL);
-    assert(ver != NULL);
-
-    xasprintf(&msg, leader, name, ver);
-
-    if (epoch != NULL) {
-        msg = realloc(msg, strlen(msg) + strlen(epoch) + 15);
-        assert(msg != NULL);
-        tmp = msg;
-        tmp += strlen(msg);
-        tmp = stpcpy(tmp, " and epoch (");
-        tmp = stpcpy(tmp, epoch);
-        tmp = stpcpy(tmp, ")");
-    }
-
-    msg = realloc(msg, strlen(msg) + 20);
-    assert(msg != NULL);
-    tmp = msg;
-    tmp += strlen(msg);
-    tmp = stpcpy(tmp, " remained the same");
-
-    return msg;
-}
-
 /* Main driver for the 'upstream' inspection. */
 static bool upstream_driver(struct rpminspect *ri, rpmfile_entry_t *file)
 {
@@ -142,18 +106,11 @@ static bool upstream_driver(struct rpminspect *ri, rpmfile_entry_t *file)
         return true;
     }
 
-    /* Gather the version and epoch information */
-    ver_before = headerGetString(file->peer_file->rpm_header, RPMTAG_VERSION);
-    ver_after = headerGetString(file->rpm_header, RPMTAG_VERSION);
-    epoch_before = headerGetString(file->peer_file->rpm_header, RPMTAG_EPOCH);
-    epoch_after = headerGetString(file->rpm_header, RPMTAG_EPOCH);
-
     /* Compare digests of source archive */
-    same = true;
     shortname = basename(file->fullpath);
 
     if (file->peer_file == NULL) {
-        msg = build_upstream_msg("New upstream source file `%s` appeared, but the build version (%s)", shortname, ver_after, epoch_after);
+        xasprintf(&msg, "New upstream source file `%s` appeared", shortname)
         add_result(ri, RESULT_VERIFY, WAIVABLE_BY_ANYONE, HEADER_UPSTREAM, msg, NULL, REMEDY_UPSTREAM);
         result = false;
     } else {
@@ -161,7 +118,7 @@ static bool upstream_driver(struct rpminspect *ri, rpmfile_entry_t *file)
         after_sum = checksum(file->fullpath, &file->st.st_mode, SHA256SUM);
 
         if (strcmp(before_sum, after_sum)) {
-            msg = build_upstream_msg("Upstream source file `%s` changed content, but the build version (%s)", shortname, ver_after, epoch_after);
+            xasprintf(&msg, "Upstream source file `%s` changed content", shortname);
             add_result(ri, RESULT_BAD, WAIVABLE_BY_ANYONE, HEADER_UPSTREAM, msg, NULL, REMEDY_UPSTREAM);
             result = false;
         }
@@ -204,10 +161,10 @@ bool inspect_upstream(struct rpminspect *ri)
         }
 
         /* Report any removed source files from the SRPM */
-        if (same) {
+        if (peer->before_files) {
             TAILQ_FOREACH(file, peer->before_files, items) {
                 if (file->peer_file == NULL) {
-                    msg = build_upstream_msg("Source RPM member `%s` removed, but the build version (%s)", basename(file->fullpath), ver_after, epoch_after);
+                    xasprintf(&msg, "Source RPM member `%s` removed", basename(file->fullpath));
                     add_result(ri, RESULT_VERIFY, WAIVABLE_BY_ANYONE, HEADER_UPSTREAM, msg, NULL, REMEDY_UPSTREAM);
                     result = false;
                 }
