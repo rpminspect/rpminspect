@@ -113,7 +113,7 @@ struct inspect inspections[] = {
 
     { INSPECT_UPSTREAM,
       "upstream",
-      true,
+      false,
       &inspect_upstream,
       "Report Source archives defined in the RPM spec file changing content between the before and after build. If the source archives change and the package is on the version-whitelist, the change is reported as informational. Otherwise the change is reported as a rebase of the package and requires inspection." },
 
