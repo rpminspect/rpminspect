@@ -152,7 +152,6 @@ bool is_valid_license(const char *licensedb, const char *tag) {
     const char *fedora_abbrev = NULL;
     const char *spdx_abbrev = NULL;
     bool approved = false;
-    bool wholetag = false;
 
     assert(licensedb != NULL);
     assert(tag != NULL);
@@ -195,7 +194,6 @@ bool is_valid_license(const char *licensedb, const char *tag) {
             continue;
         }
 
-        wholetag = false;
         seen++;
 
         /* iterate over the license database to match this license tag */
@@ -204,12 +202,6 @@ bool is_valid_license(const char *licensedb, const char *tag) {
             fedora_abbrev = NULL;
             spdx_abbrev = NULL;
             approved = false;
-
-            /* if the entire license string matches the name, approved */
-            if (!strcmp(tag, license_name)) {
-                wholetag = true;
-                break;
-            }
 
             /* collect the properties */
             json_object_object_foreach(val, prop, propval) {
@@ -223,27 +215,28 @@ bool is_valid_license(const char *licensedb, const char *tag) {
             }
 
             /*
-             * if both of these are empty, it means the entire license
-             * name is the only thing we can match and if we got here it
-             * means we didn't match it, so continue.
+             * no full tag match and no abbreviations, license entry invalid
              */
             if (strlen(fedora_abbrev) == 0 && strlen(spdx_abbrev) == 0) {
                 continue;
             }
 
+            /* if the entire license string matches the name, approved */
+            if (approved && (!strcmp(tag, fedora_abbrev) || !strcmp(tag, spdx_abbrev) || !strcmp(tag, license_name))) {
+                free(tagcopy);
+                return true;
+            }
+
             /*
+             * if the entire license string is approved, that is valid
              * if we hit 'fedora_abbrev', that is valid
              * if we hit 'spdx_abbrev' and approved is true, that is valid
              * NOTE: we only match the first hit in the license database
              */
-            if ((!strcmp(lic, fedora_abbrev) || !strcmp(lic, spdx_abbrev)) && approved) {
+            if (approved && (!strcmp(lic, fedora_abbrev) || !strcmp(lic, spdx_abbrev))) {
                 valid++;
                 break;
             }
-        }
-
-        if (wholetag) {
-            break;
         }
     }
 
