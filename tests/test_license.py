@@ -103,3 +103,30 @@ class TestValidLicenseTagWithSpacesKojiBuild(TestKoji):
         self.inspection = 'license'
         self.label = 'license'
         self.result = 'INFO'
+
+# Valid License tag with spaces passes on SRPM (OK)
+class TestValidLicenseTagWithBooleanSpacesSRPM(TestSRPM):
+    def setUp(self):
+        TestSRPM.setUp(self)
+        self.rpm.addLicense("GPLv3+ and ASL 2.0")
+        self.inspection = 'license'
+        self.label = 'license'
+        self.result = 'INFO'
+
+# Valid License tag with spaces passes on RPMs (OK)
+class TestValidLicenseTagWithBooleanSpacesRPMs(TestRPMs):
+    def setUp(self):
+        TestRPMs.setUp(self)
+        self.rpm.addLicense("ASL 2.0 and GPLv3+")
+        self.inspection = 'license'
+        self.label = 'license'
+        self.result = 'INFO'
+
+# Valid License tag with spaces passes on Koji build (OK)
+class TestValidLicenseTagWithBooleanSpacesKojiBuild(TestKoji):
+    def setUp(self):
+        TestKoji.setUp(self)
+        self.rpm.addLicense("GPLv3+ or ASL 2.0")
+        self.inspection = 'license'
+        self.label = 'license'
+        self.result = 'INFO'
