@@ -148,9 +148,11 @@ bool is_valid_license(const char *licensedb, const char *tag) {
     size_t i = 0;
     char *tagtokens = NULL;
     char *tagcopy = NULL;
-    char *lic = NULL;
+    char *token = NULL;
     const char *fedora_abbrev = NULL;
     const char *spdx_abbrev = NULL;
+    char *lic = NULL;
+    char *tail = NULL;
     bool approved = false;
 
     assert(licensedb != NULL);
@@ -188,10 +190,26 @@ bool is_valid_license(const char *licensedb, const char *tag) {
     /* tokenize the license tag and validate each license */
     tagtokens = tagcopy = strdup(tag);
 
-    while ((lic = strsep(&tagtokens, "() ")) != NULL) {
+    while ((token = strsep(&tagtokens, "() ")) != NULL) {
         /* skip over empty strings and the boolean keywords */
-        if (strlen(lic) == 0 || !strcasecmp(lic, "and") || !strcasecmp(lic, "or")) {
+        if (strlen(token) == 0) {
             continue;
+        } else if (!strcasecmp(token, "and") || !strcasecmp(token, "or")) {
+            free(lic);
+            lic = NULL;
+            continue;
+        } else {
+            /* Abbreviated licenses may contain spaces, so rebuild it */
+            if (lic == NULL) {
+                lic = strdup(token);
+                tail = lic + strlen(lic);
+            } else {
+                tail = stpcpy(tail, " ");
+                tail = stpcpy(tail, token);
+
+                /* We've added a space, so back up the seen counter */
+                seen--;
+            }
         }
 
         seen++;
@@ -224,6 +242,7 @@ bool is_valid_license(const char *licensedb, const char *tag) {
             /* if the entire license string matches the name, approved */
             if (approved && (!strcmp(tag, fedora_abbrev) || !strcmp(tag, spdx_abbrev) || !strcmp(tag, license_name))) {
                 free(tagcopy);
+                free(lic);
                 return true;
             }
 
@@ -242,6 +261,7 @@ bool is_valid_license(const char *licensedb, const char *tag) {
 
     /* cleanup */
     free(tagcopy);
+    free(lic);
 
     /*
      * license tag is approved if number of seen tags equals
