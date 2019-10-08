@@ -172,7 +172,7 @@ Releasing
 
 Releases are made using the release.sh script:
 
-    ./release.sh -b -t -p -g
+    ./utils/release.sh -b -t -p -g
 
 This will increment the x.y version number, create a new tarball, sign it,
 and create a signed git tag.  All of that is pushed to github and then a
