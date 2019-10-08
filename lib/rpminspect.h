@@ -92,6 +92,7 @@ void list_free(string_list_t *, list_entry_data_free_func);
 size_t list_len(const string_list_t *);
 string_list_t * list_sort(const string_list_t *);
 string_list_t * list_copy(const string_list_t *);
+string_list_t * list_split(const char *data, char separator);
 
 /* local.c */
 bool is_local_build(const char *);

@@ -699,6 +699,73 @@ cleanup:
     return result;
 }
 
+/* Check for binaries that use blacklisted functions which don't support IPv6.
+ * This could indicate broken support for IPv6. */
+static bool check_ipv6(struct rpminspect *ri, Elf *after_elf, const char *localpath, const char *arch)
+{
+    string_list_t *after_symbols = NULL;
+    string_list_t *used_symbols = NULL;
+    string_list_t *sorted_used = NULL;
+    string_entry_t *iter = NULL;
+
+    char *msg = NULL;
+    bool result = true;
+
+    FILE *output_stream = NULL;
+    char *output_buffer = NULL;
+    size_t output_size = 0;
+    int output_result = 0;
+
+    if (!ri->ipv6_blacklist) {
+        /* Since we don't have a list of IPv6 files to compare against, pass
+         * the check. */
+        goto cleanup;
+    }
+
+    /* Don't filter the list -- filtering requires knowledge of the
+     * blacklisted functions. Since we can't pass custom arguments to
+     * the filter, return them all and filter them locally. */
+    after_symbols = get_elf_imported_functions(after_elf, NULL);
+    assert(after_symbols != NULL);
+
+    /* Get a list of symbols that are blacklisted that we used. */
+    used_symbols = list_intersection(ri->ipv6_blacklist, after_symbols);
+    if (!used_symbols || TAILQ_EMPTY(used_symbols)) {
+        goto cleanup;
+    }
+
+    /* At this point, we're using offending symbols. Build the results. */
+    result = false;
+
+    output_stream = open_memstream(&output_buffer, &output_size);
+    assert(output_stream != NULL);
+
+    output_result = fprintf(output_stream, "IPv4-only symbols used:\n");
+    assert(output_result > 0);
+
+    sorted_used = list_sort(used_symbols);
+    assert(sorted_used != NULL);
+
+    TAILQ_FOREACH(iter, sorted_used, items) {
+        output_result = fprintf(output_stream, "\t%s\n", iter->data);
+        assert(output_result > 0);
+    }
+
+    output_result = fclose(output_stream);
+    assert(output_result == 0);
+
+    xasprintf(&msg, "%s may use functions unsuitable for IPv6 support on %s", localpath, arch);
+    add_result(ri, RESULT_VERIFY, WAIVABLE_BY_ANYONE, HEADER_ELF, msg, output_buffer, REMEDY_ELF_IPV6);
+    free(msg);
+
+cleanup:
+    list_free(after_symbols, NULL);
+    list_free(used_symbols, NULL);
+    list_free(sorted_used, NULL);
+
+    return result;
+}
+
 /* Helper for elf_archive_tests; add the archive member to the list if compiled *without* -fPIC */
 static bool find_no_pic(Elf *elf, void *user_data)
 {
@@ -933,6 +1000,9 @@ static bool elf_regular_tests(struct rpminspect *ri, Elf *after_elf, Elf *before
             result = false;
         }
     }
+
+    /* Check if we potentially violate IPv6 support. */
+    check_ipv6(ri, after_elf, localpath, arch);
 
     return result;
 }

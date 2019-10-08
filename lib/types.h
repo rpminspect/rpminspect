@@ -199,6 +199,12 @@ struct rpminspect {
     string_list_t *forbidden_path_suffixes;
     string_list_t *forbidden_directories;
 
+    /*
+     * Optional: if not NULL, contains a list of functions known to have
+     * IPv6-compatibility issues.
+     */
+    string_list_t *ipv6_blacklist;
+
     /* Optional: if not NULL, contains list of architectures */
     string_list_t *arches;
 

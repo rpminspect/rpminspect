@@ -67,6 +67,7 @@
 #define REMEDY_ELF_GNU_RELRO            "Ensure executables are linked with with '-z relro -z now'"
 #define REMEDY_ELF_FORTIFY_SOURCE       "Ensure all object files are compiled with '-O2 -D_FORTIFY_SOURCE=2', and that all appropriate headers are included (no implicit function declarations). Symbols may also appear as unfortified if the compiler is unable to determine the size of a buffer, which is not necessarily an error."
 #define REMEDY_ELF_FPIC                 "Ensure all object files are compiled with -fPIC"
+#define REMEDY_ELF_IPV6                 "Please review all usages of IPv4-only functions and ensure IPv6 compliance."
 
 /* man */
 #define REMEDY_MAN_ERRORS   "Correct the errors in the man page as reported by the libmandoc parser."
