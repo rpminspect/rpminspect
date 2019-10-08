@@ -344,7 +344,7 @@ class TestCompareKoji(TestCompareSRPM):
             os.makedirs(beforesrcdir, exist_ok=True)
             os.makedirs(aftersrcdir, exist_ok=True)
             shutil.copy(self.before_rpm.get_built_srpm(), beforesrcdir)
-            shutil.copy(self.after_rpm/get_built_srpm(), aftersrcdir)
+            shutil.copy(self.after_rpm.get_built_srpm(), aftersrcdir)
 
             # copy over the built RPMs to the fake koji build
             for a in self.before_rpm.get_build_archs():
