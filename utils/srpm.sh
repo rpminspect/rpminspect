@@ -24,4 +24,4 @@ if [ ! -f ${CWD}/.copr/Makefile ]; then
     exit 1
 fi
 
-make -f ${CWD}/.copr/Makefile srpm outdir=${CWD}
+make -f ${CWD}/.copr/Makefile srpm outdir=${CWD} BUILDTYPE=release
