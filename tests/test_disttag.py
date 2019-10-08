@@ -27,8 +27,13 @@ class TestMissingDistTagSRPM(TestSRPM):
         self.label = 'dist-tag'
         self.result = 'BAD'
 
-# XXX: Verify missing %{?dist} in Release fails on Koji build (BAD)
-#class TestMissingDistTagKojiBuild(TestKoji):
+# Verify missing %{?dist} in Release fails on Koji build (BAD)
+class TestMissingDistTagKojiBuild(TestKoji):
+    def setUp(self):
+        TestKoji.setUp(self)
+        self.inspection = 'disttag'
+        self.label = 'dist-tag'
+        self.result = 'BAD'
 
 # Verify running on not an SRPM fails
 class TestDistTagOnNonSRPM(TestRPMs):
@@ -48,8 +53,14 @@ class TestMalformedDistTagSRPM(TestSRPM):
         self.label = 'dist-tag'
         self.result = 'BAD'
 
-# XXX: Verify malformed %{?dist} tag in Release fails on Koji build (BAD)
-#class TestMalformedDistTagKojiBuild(TestKoji):
+# Verify malformed %{?dist} tag in Release fails on Koji build (BAD)
+class TestMalformedDistTagKojiBuild(TestKoji):
+    def setUp(self):
+        TestKoji.setUp(self)
+        self.rpm.release = '1dist'
+        self.inspection = 'disttag'
+        self.label = 'dist-tag'
+        self.result = 'BAD'
 
 # Verify correct %{?dist} usage passes on SRPM (OK)
 class TestDistTagSRPM(TestSRPM):
@@ -59,5 +70,10 @@ class TestDistTagSRPM(TestSRPM):
         self.inspection = 'disttag'
         self.label = 'dist-tag'
 
-# XXX: Verify correct %{?dist} usage passes on Koji build (OK)
-#class TestDistTagKojiBuild(TestKoji):
+# Verify correct %{?dist} usage passes on Koji build (OK)
+class TestDistTagKojiBuild(TestKoji):
+    def setUp(self):
+        TestKoji.setUp(self)
+        self.rpm.release = '1%{?dist}'
+        self.inspection = 'disttag'
+        self.label = 'dist-tag'
