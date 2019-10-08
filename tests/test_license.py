@@ -26,11 +26,21 @@ class TestEmptyLicenseTagSRPM(TestSRPM):
         self.label = 'license'
         self.result = 'BAD'
 
-# XXX: Empty License tag fails on built RPMs (BAD)
-#class TestEmptyLicenseTagRPMs(TestRPMs):
+# Empty License tag fails on RPMs (BAD)
+class TestEmptyLicenseTagRPMs(TestRPMs):
+    def setUp(self):
+        TestRPMs.setUp(self)
+        self.inspection = 'license'
+        self.label = 'license'
+        self.result = 'BAD'
 
-# XXX: Empty License tag fails on Koji build (BAD)
-#class TestEmptyLicenseTagKojiBuild(TestKoji):
+# Empty License tag fails on Koji build (BAD)
+class TestEmptyLicenseTagKojiBuild(TestKoji):
+    def setUp(self):
+        TestKoji.setUp(self)
+        self.inspection = 'license'
+        self.label = 'license'
+        self.result = 'BAD'
 
 # Forbidden License tag fails on SRPM (BAD)
 class TestForbiddenLicenseTagSRPM(TestSRPM):
@@ -41,11 +51,23 @@ class TestForbiddenLicenseTagSRPM(TestSRPM):
         self.label = 'license'
         self.result = 'BAD'
 
-# XXX: Forbidden License tag fails on built RPMs (BAD)
-#class TestForbiddenLicenseTagRPMs(TestRPMs):
+# Forbidden License tag fails on RPMs (BAD)
+class TestForbiddenLicenseTagRPMs(TestRPMs):
+    def setUp(self):
+        TestRPMs.setUp(self)
+        self.rpm.addLicense("APSL-1.2")
+        self.inspection = 'license'
+        self.label = 'license'
+        self.result = 'BAD'
 
-# XXX: Forbidden License tag fails on Koji build (BAD)
-#class TestForbiddenLicenseTagKojiBuild(TestKoji):
+# Forbidden License tag fails on Koji build (BAD)
+class TestForbiddenLicenseTagKojiBuild(TestKoji):
+    def setUp(self):
+        TestKoji.setUp(self)
+        self.rpm.addLicense("APSL-1.2")
+        self.inspection = 'license'
+        self.label = 'license'
+        self.result = 'BAD'
 
 # License tag with unprofessional language fails on SRPM (BAD)
 class TestBadWordLicenseTagSRPM(TestSRPM):
@@ -56,11 +78,23 @@ class TestBadWordLicenseTagSRPM(TestSRPM):
         self.label = 'license'
         self.result = 'BAD'
 
-# XXX: License tag with unprofessional language fails on built RPMs (BAD)
-#class TestBadWordLicenseTagRPMs(TestRPMs):
+# License tag with unprofessional language fails on RPMs (BAD)
+class TestBadWordLicenseTagRPMs(TestRPMs):
+    def setUp(self):
+        TestRPMs.setUp(self)
+        self.rpm.addLicense("GPLv2+ and reallybadword and MIT")
+        self.inspection = 'license'
+        self.label = 'license'
+        self.result = 'BAD'
 
-# XXX: License tag with unprofessional language fails on Koji build (BAD)
-#class TestBadWordLicenseTagKojiBuild(TestKoji):
+# License tag with unprofessional language fails on Koji build (BAD)
+class TestBadWordLicenseTagKojiBuild(TestKoji):
+    def setUp(self):
+        TestKoji.setUp(self)
+        self.rpm.addLicense("GPLv2+ and reallybadword and MIT")
+        self.inspection = 'license'
+        self.label = 'license'
+        self.result = 'BAD'
 
 # Valid License tag passes on SRPM (OK)
 class TestValidLicenseTagSRPM(TestSRPM):
@@ -71,11 +105,23 @@ class TestValidLicenseTagSRPM(TestSRPM):
         self.label = 'license'
         self.result = 'INFO'
 
-# XXX: Valid License tag passes on built RPMs (OK)
-#class TestValidLicenseTagRPMs(TestRPMs):
+# Valid License tag passes on RPMs (OK)
+class TestValidLicenseTagRPMs(TestRPMs):
+    def setUp(self):
+        TestRPMs.setUp(self)
+        self.rpm.addLicense("GPLv3+")
+        self.inspection = 'license'
+        self.label = 'license'
+        self.result = 'INFO'
 
-# XXX: Valid License tag passes on Koji build (OK)
-#class TestValidLicenseTagKojiBuild(TestKoji):
+# Valid License tag passes on Koji build (OK)
+class TestValidLicenseTagKojiBuild(TestKoji):
+    def setUp(self):
+        TestKoji.setUp(self)
+        self.rpm.addLicense("GPLv3+")
+        self.inspection = 'license'
+        self.label = 'license'
+        self.result = 'INFO'
 
 # Valid License tag with spaces passes on SRPM (OK)
 class TestValidLicenseTagWithSpacesSRPM(TestSRPM):
