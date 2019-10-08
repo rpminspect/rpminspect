@@ -477,6 +477,13 @@ int init_rpminspect(struct rpminspect *ri, const char *cfgfile) {
         parse_list(tmp, &ri->forbidden_directories);
     }
 
+    tmp = iniparser_getstring(cfg, "tests:elf_ipv6_blacklist", NULL);
+    if (tmp == NULL) {
+        ri->ipv6_blacklist = NULL;
+    } else {
+        parse_list(tmp, &ri->ipv6_blacklist);
+    }
+
     /* If any of the regular expressions fail to compile, stop and return failure */
     if (add_regex(cfg, "tests:elf_path_include", &ri->elf_path_include) != 0) {
         return -1;
