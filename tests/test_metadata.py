@@ -17,7 +17,7 @@
 #
 
 import unittest
-from baseclass import TestSRPM, TestRPMs, TestKoji
+from baseclass import *
 
 # Verify valid Vendor passes on an SRPM (OK)
 class TestValidVendorSRPM(TestSRPM):
@@ -73,32 +73,89 @@ class TestInvalidVendorKojiBuild(TestKoji):
         self.label = 'header-metadata'
         self.result = 'BAD'
 
-# XXX: Verify gaining Vendor reports verify on SRPM (VERIFY)
-#class TestGainingVendorCompareSRPM(TestCompareSRPM):
+# Verify gaining Vendor reports verify on SRPM (VERIFY)
+class TestGainingVendorCompareSRPM(TestCompareSRPM):
+    def setUp(self):
+        TestCompareSRPM.setUp(self)
+        self.after_rpm.addVendor("Vendorco Ltd.")
+        self.inspection = 'metadata'
+        self.label = 'header-metadata'
+        self.result = 'VERIFY'
 
-# XXX: Verify gaining Vendor reports verify on built RPMS (VERIFY)
-#class TestGainingVendorCompareRPMs(TestCompareRPMs):
+# Verify gaining Vendor reports verify on built RPMS (VERIFY)
+class TestGainingVendorCompareRPMs(TestCompareRPMs):
+    def setUp(self):
+        TestCompareRPMs.setUp(self)
+        self.after_rpm.addVendor("Vendorco Ltd.")
+        self.inspection = 'metadata'
+        self.label = 'header-metadata'
+        self.result = 'VERIFY'
 
-# XXX: Verify gaining Vendor reports verify on Koji build (VERIFY)
-#class TestGainingVendorCompareKojiBuild(TestCompareKoji):
+# Verify gaining Vendor reports verify on Koji build (VERIFY)
+class TestGainingVendorCompareKojiBuild(TestCompareKoji):
+    def setUp(self):
+        TestCompareKoji.setUp(self)
+        self.after_rpm.addVendor("Vendorco Ltd.")
+        self.inspection = 'metadata'
+        self.label = 'header-metadata'
+        self.result = 'VERIFY'
 
-# XXX: Verify losing Vendor reports verify on SRPM (VERIFY)
-#class TestLosingVendorCompareSRPM(TestCompareSRPM):
+# Verify losing Vendor reports verify on SRPM (VERIFY)
+class TestLosingVendorCompareSRPM(TestCompareSRPM):
+    def setUp(self):
+        TestCompareSRPM.setUp(self)
+        self.before_rpm.addVendor("Vendorco Ltd.")
+        self.inspection = 'metadata'
+        self.label = 'header-metadata'
+        self.result = 'VERIFY'
 
-# XXX: Verify losing Vendor reports verify on built RPMs (VERIFY)
-#class TestLosingVendorCompareRPMs(TestCompareRPMs):
+# Verify losing Vendor reports verify on built RPMs (VERIFY)
+class TestLosingVendorCompareRPMs(TestCompareRPMs):
+    def setUp(self):
+        TestCompareRPMs.setUp(self)
+        self.before_rpm.addVendor("Vendorco Ltd.")
+        self.inspection = 'metadata'
+        self.label = 'header-metadata'
+        self.result = 'VERIFY'
 
-# XXX: Verify losing Vendor reports verify on Koji build (VERIFY)
-#class TestLosingVendorCompareKojiBuild(TestCompareKoji):
+# Verify losing Vendor reports verify on Koji build (VERIFY)
+class TestLosingVendorCompareKojiBuild(TestCompareKoji):
+    def setUp(self):
+        TestCompareKoji.setUp(self)
+        self.before_rpm.addVendor("Vendorco Ltd.")
+        self.inspection = 'metadata'
+        self.label = 'header-metadata'
+        self.result = 'VERIFY'
 
-# XXX: Verify changing Vendor reports verify on SRPM (VERIFY)
-#class TestChangingVendorCompareSRPM(TestCompareSRPM):
+# Verify changing Vendor reports verify on SRPM (VERIFY)
+class TestChangingVendorCompareSRPM(TestCompareSRPM):
+    def setUp(self):
+        TestCompareSRPM.setUp(self)
+        self.before_rpm.addVendor("Amalgamated Amalgamations LLC")
+        self.after_rpm.addVendor("Vendorco Ltd.")
+        self.inspection = 'metadata'
+        self.label = 'header-metadata'
+        self.result = 'VERIFY'
 
-# XXX: Verify changing Vendor reports verify on built RPMs (VERIFY)
-#class TestChangingVendorCompareRPMs(TestCompareRPMs):
+# Verify changing Vendor reports verify on built RPMs (VERIFY)
+class TestChangingVendorCompareRPMs(TestCompareRPMs):
+    def setUp(self):
+        TestCompareRPMs.setUp(self)
+        self.before_rpm.addVendor("Amalgamated Amalgamations LLC")
+        self.after_rpm.addVendor("Vendorco Ltd.")
+        self.inspection = 'metadata'
+        self.label = 'header-metadata'
+        self.result = 'VERIFY'
 
-# XXX: Verify changing Vendor reports verify on Koji build (VERIFY)
-#class TestLosingVendorCompareKojiBuild(TestCompareKoji):
+# Verify changing Vendor reports verify on Koji build (VERIFY)
+class TestLosingVendorCompareKojiBuild(TestCompareKoji):
+    def setUp(self):
+        TestCompareKoji.setUp(self)
+        self.before_rpm.addVendor("Amalgamated Amalgamations LLC")
+        self.after_rpm.addVendor("Vendorco Ltd.")
+        self.inspection = 'metadata'
+        self.label = 'header-metadata'
+        self.result = 'VERIFY'
 
 # Verify invalid Buildhost subdomain fails on an SRPM (BAD)
 class TestInvalidBuildhostSubdomainSRPM(TestSRPM):
@@ -184,14 +241,35 @@ class TestDirtySummaryKojiBuild(TestKoji):
         self.label = 'header-metadata'
         self.result = 'BAD'
 
-# XXX: Verify changing Summary reports verify on SRPM (VERIFY)
-#class TestChangingSummaryCompareSRPM(TestCompareSRPM):
+# Verify changing Summary reports verify on SRPM (VERIFY)
+class TestChangingSummaryCompareSRPM(TestCompareSRPM):
+    def setUp(self):
+        TestCompareSRPM.setUp(self)
+        self.before_rpm.add_summary("Lorem ipsum dolor sit amet")
+        self.after_rpm.add_summary("Lorem ipsum")
+        self.inspection = 'metadata'
+        self.label = 'header-metadata'
+        self.result = 'VERIFY'
 
-# XXX: Verify changing Summary reports verify on built RPMs (VERIFY)
-#class TestChangingSummaryCompareRPMs(TestCompareRPMs):
+# Verify changing Summary reports verify on built RPMs (VERIFY)
+class TestChangingSummaryCompareRPMs(TestCompareRPMs):
+    def setUp(self):
+        TestCompareRPMs.setUp(self)
+        self.before_rpm.add_summary("Lorem ipsum dolor sit amet")
+        self.after_rpm.add_summary("Lorem ipsum")
+        self.inspection = 'metadata'
+        self.label = 'header-metadata'
+        self.result = 'VERIFY'
 
-# XXX: Verify changing Summary reports verify on Koji build (VERIFY)
-#class TestChangingSummaryCompareKojiBuild(TestCompareKoji):
+# Verify changing Summary reports verify on Koji build (VERIFY)
+class TestChangingSummaryCompareKojiBuild(TestCompareKoji):
+    def setUp(self):
+        TestCompareKoji.setUp(self)
+        self.before_rpm.add_summary("Lorem ipsum dolor sit amet")
+        self.after_rpm.add_summary("Lorem ipsum")
+        self.inspection = 'metadata'
+        self.label = 'header-metadata'
+        self.result = 'VERIFY'
 
 # Verify Description without bad words passes on an SRPM (OK)
 class TestCleanDescriptionSRPM(TestSRPM):
@@ -247,11 +325,32 @@ class TestDirtyDescriptionKojiBuild(TestKoji):
         self.label = 'header-metadata'
         self.result = 'BAD'
 
-# XXX: Verify changing Description reports verify on SRPM (VERIFY)
-#class TestChangingDescriptionCompareSRPM(TestCompareSRPM):
+# Verify changing Description reports verify on SRPM (VERIFY)
+class TestChangingDescriptionCompareSRPM(TestCompareSRPM):
+    def setUp(self):
+        TestCompareSRPM.setUp(self)
+        self.before_rpm.add_description("Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod reallybadword tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.")
+        self.after_rpm.add_description("Lorem ipsum dolor sit amet")
+        self.inspection = 'metadata'
+        self.label = 'header-metadata'
+        self.result = 'VERIFY'
 
-# XXX: Verify changing Description reports verify on built RPMs (VERIFY)
-#class TestChangingDescriptionCompareRPMs(TestCompareRPMs):
+# Verify changing Description reports verify on built RPMs (VERIFY)
+class TestChangingDescriptionCompareRPMs(TestCompareRPMs):
+    def setUp(self):
+        TestCompareRPMs.setUp(self)
+        self.before_rpm.add_description("Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod reallybadword tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.")
+        self.after_rpm.add_description("Lorem ipsum dolor sit amet")
+        self.inspection = 'metadata'
+        self.label = 'header-metadata'
+        self.result = 'VERIFY'
 
-# XXX: Verify changing Description reports verify on Koji build (VERIFY)
-#class TestChangingDescriptionCompareKojiBuild(TestCompareKoji):
+# Verify changing Description reports verify on Koji build (VERIFY)
+class TestChangingDescriptionCompareKojiBuild(TestCompareKoji):
+    def setUp(self):
+        TestCompareKoji.setUp(self)
+        self.before_rpm.add_description("Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod reallybadword tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.")
+        self.after_rpm.add_description("Lorem ipsum dolor sit amet")
+        self.inspection = 'metadata'
+        self.label = 'header-metadata'
+        self.result = 'VERIFY'
