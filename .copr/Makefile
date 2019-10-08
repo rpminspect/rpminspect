@@ -15,33 +15,44 @@
 
 topdir := $(shell realpath $(dir $(lastword $(MAKEFILE_LIST)))/..)
 
+# Pass BUILDTYPE=release to generate a release SRPM
+BUILDTYPE ?= copr
+
 # Spec file and template
 SPEC_TEMPLATE := $(shell ls -1 $(topdir)/*.spec.in)
 SPEC := $(topdir)/$(shell basename $(SPEC_TEMPLATE) .in)
 
 # Replace placeholders in the spec file template
 RPMDATE = $(shell date +'%a %b %d %Y')
-GITDATE = $(shell date +'%Y%m%d%H%M')
-GITHASH = $(shell git rev-parse --short HEAD)
 
 # Various things we need to generate a tarball
 PKG := $(shell grep ^Name: "$(SPEC_TEMPLATE)" | awk '{ print $$2; }')
 VER := $(shell grep 'version :' $(topdir)/meson.build | grep -E "'[0-9]+\.[0-9]+'" | cut -d "'" -f 2)
 
+ifeq ($(BUILDTYPE),copr)
+GITDATE = $(shell date +'%Y%m%d%H%M')
+GITHASH = $(shell git rev-parse --short HEAD)
+TARBALL_BASENAME = $(PKG)-$(VER)-$(GITDATE)git$(GITHASH)
+endif
+
+ifeq ($(BUILDTYPE),release)
+TARBALL_BASENAME = $(PKG)-$(VER)
+endif
+
 srpm:
 	$(topdir)/.copr/instpkgs.sh $(SPEC_TEMPLATE)
 	sed -e 's|%%VERSION%%|$(VER)|g' < "$(SPEC_TEMPLATE)" > "$(SPEC)"
 	sed -i -e 's|%%RPMDATE%%|$(RPMDATE)|g' "$(SPEC)"
-	sed -i -e 's|%%GITDATE%%|$(GITDATE)|g' "$(SPEC)"
-	sed -i -e 's|%%GITHASH%%|$(GITHASH)|g' "$(SPEC)"
-	sed -i -e 's|%%TARBALL%%|$(PKG)-$(VER)-$(GITDATE)git$(GITHASH).tar.xz|g' "$(SPEC)"
-	sed -i -e 's|^%setup.*$$|%setup -q -n $(PKG)-$(VER)-$(GITDATE)git$(GITHASH)|g' "$(SPEC)"
+	sed -i -e 's|%%TARBALL%%|$(TARBALL_BASENAME).tar.xz|g' "$(SPEC)"
+	sed -i -e 's|^%setup.*$$|%setup -q -n $(TARBALL_BASENAME)|g' "$(SPEC)"
+ifeq ($(BUILDTYPE),copr)
 	sed -i -e '/^Release:/ s/1[^%]*/0.1.$(GITDATE)git$(GITHASH)/' "$(SPEC)"
+endif
 	git archive \
 		--format=tar \
-		--output='$(topdir)/$(PKG)-$(VER)-$(GITDATE)git$(GITHASH).tar' \
-		--prefix='$(PKG)-$(VER)-$(GITDATE)git$(GITHASH)/' HEAD $(topdir)
-	xz -9 $(topdir)/$(PKG)-$(VER)-$(GITDATE)git$(GITHASH).tar
+		--output='$(topdir)/$(TARBALL_BASENAME).tar' \
+		--prefix='$(TARBALL_BASENAME)/' HEAD $(topdir)
+	xz -9 $(topdir)/$(TARBALL_BASENAME).tar
 	rpmbuild \
 		-bs --nodeps \
 		--define "_sourcedir $(topdir)" \
