@@ -173,12 +173,8 @@ cd ${CWD}
 
 # Create a spec file
 RPMDATE="$(date +'%a %b %d %Y')"
-GITDATE="$(date +'%Y%m%d%H%M')"
-GITHASH="$(git rev-parse --short HEAD))"
 sed -e "s|%%VERSION%%|${VERSION}|g" < ${PROJECT}.spec.in > build/meson-dist/${PROJECT}.spec
 sed -i -e "s|%%RPMDATE%%|${RPMDATE}|g" build/meson-dist/${PROJECT}.spec
-sed -i -e "s|%%GITDATE%%|${GITDATE}|g" build/meson-dist/${PROJECT}.spec
-sed -i -e "s|%%GITHASH%%|${GITHASH}|g" build/meson-dist/${PROJECT}.spec
 sed -i -e "s|%%TARBALL%%|${PROJECT}-${VERSION}.tar.xz|g" build/meson-dist/${PROJECT}.spec
 
 # Generate SRPM
