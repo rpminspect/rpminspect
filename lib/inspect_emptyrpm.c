@@ -61,7 +61,7 @@ bool inspect_emptyrpm(struct rpminspect *ri) {
          * is intentional, sometimes not.
          */
         if (peer->before_rpm != NULL && peer->after_rpm == NULL) {
-            xasprintf(&msg, "Existing subpackage %s is now missing", headerGetAsString(peer->before_hdr, RPMTAG_NAME));
+            xasprintf(&msg, "Existing subpackage %s is now missing", headerGetString(peer->before_hdr, RPMTAG_NAME));
             add_result(ri, RESULT_VERIFY, WAIVABLE_BY_ANYONE, HEADER_EMPTYRPM, msg, NULL, REMEDY_EMPTYRPM);
             free(msg);
             continue;
@@ -95,7 +95,7 @@ bool inspect_emptyrpm(struct rpminspect *ri) {
     }
 
     if (good) {
-        add_result(ri, RESULT_OK, WAIVABLE_BY_ANYONE, HEADER_EMPTYRPM, NULL, NULL, NULL);
+        add_result(ri, RESULT_OK, NOT_WAIVABLE, HEADER_EMPTYRPM, NULL, NULL, NULL);
     }
 
     return good;
