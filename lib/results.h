@@ -27,7 +27,7 @@
  * Inspection headers
  */
 #define HEADER_METADATA      "header-metadata"
-#define HEADER_EMPTYRPM      "payload"
+#define HEADER_EMPTYRPM      "empty-payload"
 #define HEADER_LICENSE       "license"
 #define HEADER_ELF           "elf-object-properties"
 #define HEADER_MAN           "man-pages"
