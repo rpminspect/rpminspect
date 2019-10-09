@@ -35,7 +35,7 @@ struct inspect inspections[] = {
 
     { INSPECT_EMPTYRPM,
       "emptyrpm",
-      false,
+      true,
       &inspect_emptyrpm,
       "Check all binary RPMs in the before and after builds for any empty payloads. Packages that lost payload data from the before build to the after build are reported as well as any packages in the after build that exist but have no payload data." },
 
