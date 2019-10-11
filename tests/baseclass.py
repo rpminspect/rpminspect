@@ -34,6 +34,10 @@ AFTER_NAME = BEFORE_NAME
 AFTER_VER = "0.2"
 AFTER_REL = "2"
 
+# Set this to True to keep rpminspect results (useful to debug the test
+# suite but will make a big mess)
+KEEP_RESULTS = False
+
 # Exceptions used by the test suite
 class MissingRpminspect(Exception):
     pass
@@ -123,6 +127,9 @@ class TestSRPM(RequiresRpminspect):
             args.append('-T')
             args.append(self.inspection)
 
+        if KEEP_RESULTS:
+            args.append('-k')
+
         args.append(self.rpm.get_built_srpm())
 
         self.p = subprocess.Popen(args,
@@ -175,6 +182,9 @@ class TestCompareSRPM(RequiresRpminspect):
             args.append('-T')
             args.append(self.inspection)
 
+        if KEEP_RESULTS:
+            args.append('-k')
+
         args.append(self.before_rpm.get_built_srpm())
         args.append(self.after_rpm.get_built_srpm())
 
@@ -216,6 +226,9 @@ class TestRPMs(TestSRPM):
                 args.append('-T')
                 args.append(self.inspection)
 
+            if KEEP_RESULTS:
+                args.append('-k')
+
             args.append(self.rpm.get_built_rpm(a))
 
             self.p = subprocess.Popen(args,
@@ -253,6 +266,9 @@ class TestCompareRPMs(TestCompareSRPM):
                 args.append('-T')
                 args.append(self.inspection)
 
+            if KEEP_RESULTS:
+                args.append('-k')
+
             args.append(self.before_rpm.get_built_rpm(a))
             args.append(self.after_rpm.get_built_rpm(a))
 
@@ -277,9 +293,6 @@ class TestKoji(TestSRPM):
         if not self.inspection:
             return
 
-        # add some additional subpackages to the build
-        self.rpm.add_devel_subpackage()
-
         # generate the build
         self.rpm.do_make()
 
@@ -300,6 +313,9 @@ class TestKoji(TestSRPM):
             if self.inspection:
                 args.append('-T')
                 args.append(self.inspection)
+
+            if KEEP_RESULTS:
+                args.append('-k')
 
             args.append(kojidir)
 
@@ -327,10 +343,6 @@ class TestCompareKoji(TestCompareSRPM):
 
         if not self.inspection:
             return
-
-        # add some additional subpackages to the build
-        self.before_rpm.add_devel_subpackage()
-        self.after_rpm.add_devel_subpackage()
 
         # generate the build
         self.before_rpm.do_make()
@@ -362,6 +374,9 @@ class TestCompareKoji(TestCompareSRPM):
             if self.inspection:
                 args.append('-T')
                 args.append(self.inspection)
+
+            if KEEP_RESULTS:
+                args.append('-k')
 
             args.append(kojidir + '/before')
             args.append(kojidir + '/after')
