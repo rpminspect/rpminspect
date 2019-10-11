@@ -91,13 +91,13 @@ static void set_worksubdir(struct rpminspect *ri, bool is_local, struct koji_bui
 static int get_rpm_info(const char *pkg) {
     int ret = 0;
     Header h;
-    char *arch = NULL;
+    const char *arch = NULL;
 
     if ((ret = get_rpm_header(pkg, &h)) != 0) {
         return ret;
     }
 
-    arch = headerGetAsString(h, RPMTAG_ARCH);
+    arch = headerGetString(h, RPMTAG_ARCH);
 
     if (allowed_arch(workri, arch)) {
         add_peer(&workri->peers, whichbuild, fetch_only, pkg, &h);
@@ -153,7 +153,7 @@ static int copytree(const char *fpath, const struct stat *sb,
     char *workfpath = NULL;
     char *bufpath = NULL;
     Header h;
-    char *arch = NULL;
+    const char *arch = NULL;
     int ret = 0;
 
     /*
@@ -181,7 +181,7 @@ static int copytree(const char *fpath, const struct stat *sb,
         if (headerIsSource(h)) {
             arch = SRPM_ARCH_NAME;
         } else {
-            arch = headerGetAsString(h, RPMTAG_ARCH);
+            arch = headerGetString(h, RPMTAG_ARCH);
         }
 
         if (!allowed_arch(workri, arch)) {
