@@ -68,7 +68,7 @@ void free_rpmpeer(rpmpeer_t *peers) {
 /*
  * Add the specified package as a peer in the list of packages.
  */
-void add_peer(rpmpeer_t **peers, int whichbuild, bool fetch_only, const char *pkg, Header *hdr) {
+int add_peer(rpmpeer_t **peers, int whichbuild, bool fetch_only, const char *pkg, Header *hdr) {
     rpmpeer_entry_t *peer = NULL;
     bool found = false;
     const char *newname = NULL;
@@ -97,6 +97,15 @@ void add_peer(rpmpeer_t **peers, int whichbuild, bool fetch_only, const char *pk
         existingarch = NULL;
         existingsrc = false;
 
+        if (existingname != NULL && !strcmp(pkg, existingname)) {
+            return 0;
+        }
+    }
+
+    /* Second, if we don't have this peer, try to add it */
+    existingname = NULL;
+
+    TAILQ_FOREACH(peer, *peers, items) {
         if (whichbuild == BEFORE_BUILD && peer->after_rpm != NULL) {
             existingname = headerGetString(peer->after_hdr, RPMTAG_NAME);
             existingarch = headerGetString(peer->after_hdr, RPMTAG_ARCH);
@@ -124,7 +133,7 @@ void add_peer(rpmpeer_t **peers, int whichbuild, bool fetch_only, const char *pk
         if ((peer = calloc(1, sizeof(*peer))) == NULL) {
             fprintf(stderr, "*** failed to allocate new peer peer\n");
             fflush(stderr);
-            return;
+            return 1;
         }
     }
 
@@ -136,6 +145,9 @@ void add_peer(rpmpeer_t **peers, int whichbuild, bool fetch_only, const char *pk
             peer->before_files = NULL;
         } else {
             peer->before_files = extract_rpm(pkg, *hdr);
+            if (peer->before_files == NULL) {
+                goto fail;
+            }
         }
     } else if (whichbuild == AFTER_BUILD) {
         peer->after_hdr = headerCopy(*hdr);
@@ -145,6 +157,9 @@ void add_peer(rpmpeer_t **peers, int whichbuild, bool fetch_only, const char *pk
             peer->after_files = NULL;
         } else {
             peer->after_files = extract_rpm(pkg, *hdr);
+            if (peer->after_files == NULL) {
+                goto fail;
+            }
         }
     }
 
@@ -156,5 +171,11 @@ void add_peer(rpmpeer_t **peers, int whichbuild, bool fetch_only, const char *pk
         find_file_peers(peer->before_files, peer->after_files);
     }
 
-    return;
+    return 0;
+
+fail:
+    free(peer->before_hdr);
+    free(peer->before_rpm);
+    free(peer);
+    return 1;
 }
