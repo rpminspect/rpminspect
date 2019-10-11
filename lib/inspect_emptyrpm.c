@@ -70,23 +70,15 @@ bool inspect_emptyrpm(struct rpminspect *ri) {
         if (is_payload_empty(peer->after_files)) {
             if (peer->before_rpm == NULL) {
                 xasprintf(&msg, "New package %s is empty (no payloads)", basename(peer->after_rpm));
-
                 add_result(ri, RESULT_VERIFY, WAIVABLE_BY_ANYONE, HEADER_EMPTYRPM, msg, NULL, REMEDY_EMPTYRPM);
-
                 free(msg);
             } else if (is_payload_empty(peer->before_files)) {
-                if (ri->verbose) {
-                    xasprintf(&msg, "Package %s continues to be empty (no payloads)", basename(peer->after_rpm));
-
-                    add_result(ri, RESULT_INFO, NOT_WAIVABLE, HEADER_EMPTYRPM, msg, NULL, REMEDY_EMPTYRPM);
-
-                    free(msg);
-                }
+                xasprintf(&msg, "Package %s continues to be empty (no payloads)", basename(peer->after_rpm));
+                add_result(ri, RESULT_INFO, NOT_WAIVABLE, HEADER_EMPTYRPM, msg, NULL, REMEDY_EMPTYRPM);
+                free(msg);
             } else {
                 xasprintf(&msg, "Package %s became empty (no payloads)", basename(peer->after_rpm));
-
                 add_result(ri, RESULT_VERIFY, WAIVABLE_BY_ANYONE, HEADER_EMPTYRPM, msg, NULL, REMEDY_EMPTYRPM);
-
                 free(msg);
             }
 
