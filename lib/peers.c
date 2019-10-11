@@ -1,6 +1,7 @@
 /*
  * Copyright (C) 2019  Red Hat, Inc.
  * Red Hat Author(s):  David Shea <dshea@redhat.com>
+ *                     David Cantrell <dcantrell@redhat.com>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -70,10 +71,12 @@ void free_rpmpeer(rpmpeer_t *peers) {
 void add_peer(rpmpeer_t **peers, int whichbuild, bool fetch_only, const char *pkg, Header *hdr) {
     rpmpeer_entry_t *peer = NULL;
     bool found = false;
-    char *newname = NULL;
-    char *newarch = NULL;
-    char *existingname = NULL;
-    char *existingarch = NULL;
+    const char *newname = NULL;
+    const char *newarch = NULL;
+    const char *existingname = NULL;
+    const char *existingarch = NULL;
+    bool existingsrc = false;
+    bool newsrc = false;
 
     assert(peers != NULL);
     assert(pkg != NULL);
@@ -84,39 +87,32 @@ void add_peer(rpmpeer_t **peers, int whichbuild, bool fetch_only, const char *pk
     }
 
     /* Get the package or subpackage name and arch */
-    newname = headerGetAsString(*hdr, RPMTAG_NAME);
-    newarch = headerGetAsString(*hdr, RPMTAG_ARCH);
+    newname = headerGetString(*hdr, RPMTAG_NAME);
+    newarch = headerGetString(*hdr, RPMTAG_ARCH);
+    newsrc = headerIsSource(*hdr);
 
-    /* First, see if we already have this peer */
+    /* See if we already have this peer */
     TAILQ_FOREACH(peer, *peers, items) {
-        if (whichbuild == BEFORE_BUILD && peer->before_rpm != NULL) {
-            existingname = peer->before_rpm;
-        } else if (whichbuild == AFTER_BUILD && peer->after_rpm != NULL) {
-            existingname = peer->after_rpm;
-        }
+        existingname = NULL;
+        existingarch = NULL;
+        existingsrc = false;
 
-        if (existingname != NULL && !strcmp(pkg, existingname)) {
-            return;
-        }
-    }
-
-    /* Second, if we don't have this peer, try to add it */
-    existingname = NULL;
-
-    TAILQ_FOREACH(peer, *peers, items) {
         if (whichbuild == BEFORE_BUILD && peer->after_rpm != NULL) {
-            existingname = headerGetAsString(peer->after_hdr, RPMTAG_NAME);
-            existingarch = headerGetAsString(peer->after_hdr, RPMTAG_ARCH);
+            existingname = headerGetString(peer->after_hdr, RPMTAG_NAME);
+            existingarch = headerGetString(peer->after_hdr, RPMTAG_ARCH);
+            existingsrc = headerIsSource(peer->after_hdr);
         } else if (whichbuild == AFTER_BUILD && peer->before_rpm != NULL) {
-            existingname = headerGetAsString(peer->before_hdr, RPMTAG_NAME);
-            existingarch = headerGetAsString(peer->before_hdr, RPMTAG_ARCH);
+            existingname = headerGetString(peer->before_hdr, RPMTAG_NAME);
+            existingarch = headerGetString(peer->before_hdr, RPMTAG_ARCH);
+            existingsrc = headerIsSource(peer->before_hdr);
         }
 
         if (existingname == NULL) {
             continue;
         }
 
-        if (!strcmp(existingname, newname) && !strcmp(existingarch, newarch)) {
+        if ((existingsrc && newsrc && !strcmp(existingname, newname)) ||
+            (!existingsrc && !newsrc && !strcmp(existingname, newname) && !strcmp(existingarch, newarch))) {
             /* found the existing peer */
             found = true;
             break;
