@@ -100,7 +100,10 @@ static int get_rpm_info(const char *pkg) {
     arch = headerGetString(h, RPMTAG_ARCH);
 
     if (allowed_arch(workri, arch)) {
-        add_peer(&workri->peers, whichbuild, fetch_only, pkg, &h);
+        ret = add_peer(&workri->peers, whichbuild, fetch_only, pkg, &h);
+        if (ret != 0) {
+            return ret;
+        }
     }
 
     headerFree(h);
