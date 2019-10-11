@@ -94,6 +94,7 @@ class TestPkgLostPayload(TestCompareKoji):
 class TestExistingPkgMissing(TestCompareKoji):
     def setUp(self):
         TestCompareKoji.setUp(self)
+        self.before_rpm.add_simple_payload_file()
         self.before_rpm.add_subpackage(self.before_rpm.name + '-newthing')
         self.inspection = 'emptyrpm'
         self.label = 'empty-payload'
