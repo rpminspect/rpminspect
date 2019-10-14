@@ -56,6 +56,11 @@
 #define DESKTOP_ENTRY_FILES_DIR "/usr/share/applications"
 
 /*
+ * Standard locations for desktop icons.
+ */
+#define DESKTOP_ICON_PATHS "/usr/share/pixmaps /usr/share/icons"
+
+/*
  * Commands used by different inspections
  * Avoid explicit paths, rpminspect assumes these commands are
  * available in the $PATH.

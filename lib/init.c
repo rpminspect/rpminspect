@@ -516,6 +516,9 @@ int init_rpminspect(struct rpminspect *ri, const char *cfgfile) {
         ri->desktop_entry_files_dir = strdup(tmp);
     }
 
+    tmp = iniparser_getstring(cfg, "tests:desktop_icon_paths", DESKTOP_ICON_PATHS);
+    parse_list(tmp, &ri->desktop_icon_paths);
+
     tmp = iniparser_getstring(cfg, "tests:bin_paths", BIN_PATHS);
     parse_list(tmp, &ri->bin_paths);
 
