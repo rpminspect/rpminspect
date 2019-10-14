@@ -66,12 +66,10 @@ static int find_file(const char *fpath, __attribute__((unused)) const struct sta
      * will pass.
      */
     tmpbuf = strdup(fpath);
-    last = rindex(tmpbuf, '.');
+    last = basename(tmpbuf);
 
     if (last != NULL) {
-        *last = '\0';
-
-        if (strsuffix(tmpbuf, file_to_find)) {
+        if (strprefix(last, file_to_find)) {
             free(tmpbuf);
             free(file_to_find);
             file_to_find = strdup(fpath);
@@ -87,7 +85,9 @@ static int find_file(const char *fpath, __attribute__((unused)) const struct sta
  * Called by desktop_driver() to determine if a found file is one we want to
  * look at.  Returns true if it is, false otherwise.
  */
-static bool is_desktop_entry_file(const char *desktop_entry_files_dir, const rpmfile_entry_t *file) {
+static bool is_desktop_entry_file(const char *desktop_entry_files_dir,
+                                  const rpmfile_entry_t *file)
+{
     assert(desktop_entry_files_dir != NULL);
     assert(file != NULL);
 
@@ -118,7 +118,8 @@ static bool is_desktop_entry_file(const char *desktop_entry_files_dir, const rpm
  * Validate the Exec= and Icon= lines in a desktop entry file.  False means
  * something didn't validate.  Results are reported from this function.
  */
-static bool validate_desktop_contents(struct rpminspect *ri, const rpmfile_entry_t *file) {
+static bool validate_desktop_contents(struct rpminspect *ri, const rpmfile_entry_t *file)
+{
     bool result = true;
     FILE *fp = NULL;
     size_t len;
@@ -129,6 +130,7 @@ static bool validate_desktop_contents(struct rpminspect *ri, const rpmfile_entry
     char *subtree = NULL;
     char *arch = NULL;
     char *exectoken = NULL;
+    char *iconpath = NULL;
     struct stat sb;
     bool found = false;
     string_entry_t *entry = NULL;
@@ -144,8 +146,6 @@ static bool validate_desktop_contents(struct rpminspect *ri, const rpmfile_entry
     *walk = '\0';
     subtree = strdup(dirname(tmp));
     free(tmp);
-
-printf("subtree: |%s|\n", subtree);
 
     /* Open the desktop entry file */
     fp = fopen(file->fullpath, "r");
@@ -218,13 +218,16 @@ printf("subtree: |%s|\n", subtree);
             found = false;
 
             TAILQ_FOREACH(entry, ri->desktop_icon_paths, items) {
+                xasprintf(&iconpath, "%s/%s", subtree, entry->data);
+
                 /*
                  * If we get 1 back from nftw(), it means the icon was
                  * found and is valid.  If found, the nftw() helper replaces
                  * file_to_find with the full path to where it was found.
                  */
-                if (nftw(subtree, find_file, 20, FTW_MOUNT|FTW_PHYS) == 1) {
+                if (nftw(iconpath, find_file, 20, FTW_MOUNT|FTW_PHYS) == 1) {
                     if (lstat(file_to_find, &sb) == -1) {
+                        free(iconpath);
                         continue;
                     }
 
@@ -237,6 +240,8 @@ printf("subtree: |%s|\n", subtree);
                         result = false;
                     }
                 }
+
+                free(iconpath);
 
                 if (found) {
                     break;
@@ -268,7 +273,8 @@ printf("subtree: |%s|\n", subtree);
     return result;
 }
 
-static bool desktop_driver(struct rpminspect *ri, rpmfile_entry_t *file) {
+static bool desktop_driver(struct rpminspect *ri, rpmfile_entry_t *file)
+{
     bool result = true;
     int after_code;
     char *after_out = NULL;
@@ -332,7 +338,8 @@ static bool desktop_driver(struct rpminspect *ri, rpmfile_entry_t *file) {
 /*
  * Main driver for the 'desktop' inspection.
  */
-bool inspect_desktop(struct rpminspect *ri) {
+bool inspect_desktop(struct rpminspect *ri)
+{
     bool result;
 
     assert(ri != NULL);
