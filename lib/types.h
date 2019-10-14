@@ -217,6 +217,7 @@ struct rpminspect {
 
     /* Where desktop entry files live */
     char *desktop_entry_files_dir;
+    string_list_t *desktop_icon_paths;
 
     /* Executable path prefixes and required ownership */
     string_list_t *bin_paths;
