@@ -31,18 +31,55 @@ static char *file_to_find = NULL;
 /*
  * Helper used by nftw() in validate_desktop_contents()
  */
-static int find_file(const char *fpath, __attribute__((unused)) const struct stat *sb, int tflag, __attribute__((unused)) struct FTW *ftwbuf) {
+static int find_file(const char *fpath, __attribute__((unused)) const struct stat *sb,
+                     int tflag, __attribute__((unused)) struct FTW *ftwbuf)
+{
+    char *tmpbuf = NULL;
+    char *last = NULL;
+
     /* Only looking at regular files */
-    if (tflag != FTW_F) {
+    /*
+     * XXX: should FTW_SLN have special handling here?  does packaging policy
+     * allow packages to ship absolute symlinks to paths not provided by the
+     * package itself?
+     */
+    if (tflag == FTW_D || tflag == FTW_DNR || tflag == FTW_DP || tflag == FTW_NS) {
         return 0;
     }
 
+    /* Look for this name as the basename */
     if (strsuffix(fpath, file_to_find)) {
         free(file_to_find);
         file_to_find = strdup(fpath);
         return 1;
     }
 
+    /* Might be a base name missing a graphics format ending */
+    /*
+     * This will take an fpath like:
+     *     iconfile.png
+     *     iconfile.jpg
+     *     org.Organization.IconFile
+     * And will trim the end of the string from the last period
+     * to the end.  So if a desktop entry file specifies 'iconfile'
+     * and the package provides iconfile.* somewhere as a file, this
+     * will pass.
+     */
+    tmpbuf = strdup(fpath);
+    last = rindex(tmpbuf, '.');
+
+    if (last != NULL) {
+        *last = '\0';
+
+        if (strsuffix(tmpbuf, file_to_find)) {
+            free(tmpbuf);
+            free(file_to_find);
+            file_to_find = strdup(fpath);
+            return 1;
+        }
+    }
+
+    free(tmpbuf);
     return 0;
 }
 
@@ -91,7 +128,10 @@ static bool validate_desktop_contents(struct rpminspect *ri, const rpmfile_entry
     char *walk = NULL;
     char *subtree = NULL;
     char *arch = NULL;
+    char *exectoken = NULL;
     struct stat sb;
+    bool found = false;
+    string_entry_t *entry = NULL;
 
     assert(ri != NULL);
     assert(file != NULL);
@@ -104,6 +144,8 @@ static bool validate_desktop_contents(struct rpminspect *ri, const rpmfile_entry
     *walk = '\0';
     subtree = strdup(dirname(tmp));
     free(tmp);
+
+printf("subtree: |%s|\n", subtree);
 
     /* Open the desktop entry file */
     fp = fopen(file->fullpath, "r");
@@ -120,9 +162,18 @@ static bool validate_desktop_contents(struct rpminspect *ri, const rpmfile_entry
      */
     while (getline(&buf, &len, fp) != -1) {
         if (strprefix(buf, "Exec=")) {
+            /* Take everything after the key and trim newlines */
             tmp = buf + 5;
             tmp[strcspn(tmp, "\n")] = 0;
 
+            /* The Exec line may specify arguments to the program, strip those */
+            exectoken = index(tmp, ' ');
+
+            if (exectoken != NULL) {
+                *exectoken = '\0';
+            }
+
+            /* Figure out how to look for the file */
             if (*tmp == '/') {
                 /* value is absolute, take as-is */
                 file_to_find = strdup(tmp);
@@ -163,39 +214,36 @@ static bool validate_desktop_contents(struct rpminspect *ri, const rpmfile_entry
         } else if (strprefix(buf, "Icon=")) {
             tmp = buf + 5;
             tmp[strcspn(tmp, "\n")] = 0;
+            file_to_find = strdup(tmp);
+            found = false;
 
-            if (*tmp == '/') {
-                /* value is absolute, take as-is */
-                file_to_find = strdup(tmp);
-            } else if (strstr(file->localpath, ".") && *tmp != '/') {
-                /* icon file reference, look in directory */
-                xasprintf(&file_to_find, "/usr/share/pixmaps/%s", tmp);
-            } else {
-                /* any other name is a theme icon, skip */
-                free(buf);
-                buf = NULL;
-                continue;
+            TAILQ_FOREACH(entry, ri->desktop_icon_paths, items) {
+                /*
+                 * If we get 1 back from nftw(), it means the icon was
+                 * found and is valid.  If found, the nftw() helper replaces
+                 * file_to_find with the full path to where it was found.
+                 */
+                if (nftw(subtree, find_file, 20, FTW_MOUNT|FTW_PHYS) == 1) {
+                    if (lstat(file_to_find, &sb) == -1) {
+                        continue;
+                    }
+
+                    found = true;
+
+                    if (!(sb.st_mode & S_IROTH)) {
+                        xasprintf(&msg, "Desktop file %s on %s references icon %s but %s is not readable by all", file->localpath, arch, tmp, tmp);
+                        add_result(ri, RESULT_VERIFY, WAIVABLE_BY_ANYONE, HEADER_DESKTOP, msg, NULL, REMEDY_DESKTOP);
+                        free(msg);
+                        result = false;
+                    }
+                }
+
+                if (found) {
+                    break;
+                }
             }
 
-            /*
-             * If we get 1 back from nftw(), it means the icon was
-             * found and is valid.  If found, the nftw() helper replaces
-             * file_to_find with the full path to where it was found.
-             */
-            if (nftw(subtree, find_file, 20, FTW_MOUNT|FTW_PHYS) == 1) {
-                if (lstat(file_to_find, &sb) == -1) {
-                    fprintf(stderr, "error stat'ing %s: %s\n", file_to_find, strerror(errno));
-                    fflush(stderr);
-                    return false;
-                }
-
-                if (!(sb.st_mode & S_IROTH)) {
-                    xasprintf(&msg, "Desktop file %s on %s references icon %s but %s is not readable by all", file->localpath, arch, tmp, tmp);
-                    add_result(ri, RESULT_VERIFY, WAIVABLE_BY_ANYONE, HEADER_DESKTOP, msg, NULL, REMEDY_DESKTOP);
-                    free(msg);
-                    result = false;
-                }
-            } else {
+            if (!found) {
                 xasprintf(&msg, "Desktop file %s on %s references icon %s but no subpackages contain %s", file->localpath, arch, tmp, tmp);
                 add_result(ri, RESULT_VERIFY, WAIVABLE_BY_ANYONE, HEADER_DESKTOP, msg, NULL, REMEDY_DESKTOP);
                 free(msg);
@@ -227,6 +275,7 @@ static bool desktop_driver(struct rpminspect *ri, rpmfile_entry_t *file) {
     char *before_out = NULL;
     char *msg = NULL;
     char *arch = NULL;
+    char *tmpbuf = NULL;
 
     /*
      * Is this a file we should look at?
@@ -238,10 +287,16 @@ static bool desktop_driver(struct rpminspect *ri, rpmfile_entry_t *file) {
 
     /* Validate the desktop file */
     after_code = run_cmd(&after_out, DESKTOP_FILE_VALIDATE_CMD, file->fullpath, NULL);
+    tmpbuf = strreplace(after_out, file->fullpath, file->localpath);
+    free(after_out);
+    after_out = tmpbuf;
 
     if (file->peer_file && is_desktop_entry_file(ri->desktop_entry_files_dir, file->peer_file)) {
         /* if we have a before peer, validate the corresponding desktop file */
         (void) run_cmd(&before_out, DESKTOP_FILE_VALIDATE_CMD, file->peer_file->fullpath, NULL);
+        tmpbuf = strreplace(before_out, file->peer_file->fullpath, file->peer_file->localpath);
+        free(before_out);
+        before_out = tmpbuf;
     }
 
     if (after_code == -1) {
