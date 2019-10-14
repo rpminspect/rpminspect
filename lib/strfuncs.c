@@ -302,7 +302,6 @@ char *strwaiverauth(const waiverauth_t waiverauth) {
  * with "find" replaced with "replace".
  *
  * Replaces all matches.
- *
  */
 char * strreplace(const char *s, const char *find, const char *replace)
 {
@@ -322,7 +321,10 @@ char * strreplace(const char *s, const char *find, const char *replace)
     while (*remainder != '\0') {
         find_start = strstr(remainder, find);
 
-        /* No more instances of find, concat the rest of the string on to the result and finish */
+        /*
+         * No more instances of find, concat the rest of the string on to the
+         * result and finish
+         */
         if (find_start == NULL) {
             xasprintf(&tmp, "%s%s", result ? result : "", remainder);
             free(result);
@@ -330,8 +332,9 @@ char * strreplace(const char *s, const char *find, const char *replace)
 
             break;
         } else {
-            /* Print the string up to the start of the match, then the "replace" string.
-             * Reset remainder to the end of the match.
+            /*
+             * Print the string up to the start of the match, then the
+             * "replace" string.  Reset remainder to the end of the match.
              */
             xasprintf(&tmp, "%s%.*s%s", result ? result : "", (int) (find_start - remainder), remainder, replace);
             free(result);
@@ -341,8 +344,9 @@ char * strreplace(const char *s, const char *find, const char *replace)
         }
     }
 
-    /* result could be NULL at this point if the input was an empty string. In that case,
-     * just allocate a new empty string
+    /*
+     * Result could be NULL at this point if the input was an empty string.
+     * In that case, just allocate a new empty string
      */
     if (result == NULL) {
         result = strdup(s);
