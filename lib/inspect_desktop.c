@@ -22,6 +22,8 @@
 #include <libgen.h>
 #include <ftw.h>
 #include <assert.h>
+#include <sys/types.h>
+#include <dirent.h>
 
 #include "rpminspect.h"
 
@@ -127,13 +129,15 @@ static bool validate_desktop_contents(struct rpminspect *ri, const rpmfile_entry
     char *buf = NULL;
     char *tmp = NULL;
     char *walk = NULL;
-    char *subtree = NULL;
+    char *allpkgtrees = NULL;
     char *arch = NULL;
     char *exectoken = NULL;
     char *iconpath = NULL;
     struct stat sb;
     bool found = false;
     string_entry_t *entry = NULL;
+    DIR *dfd = NULL;
+    struct dirent *de = NULL;
 
     assert(ri != NULL);
     assert(file != NULL);
@@ -144,7 +148,7 @@ static bool validate_desktop_contents(struct rpminspect *ri, const rpmfile_entry
     tmp = strdup(file->fullpath);
     walk = tmp + (strlen(file->fullpath) - strlen(file->localpath));
     *walk = '\0';
-    subtree = strdup(dirname(tmp));
+    allpkgtrees = strdup(dirname(tmp));
     free(tmp);
 
     /* Open the desktop entry file */
@@ -190,7 +194,7 @@ static bool validate_desktop_contents(struct rpminspect *ri, const rpmfile_entry
              * found and is valid.  If found, the nftw() helper replaces
              * file_to_find with the full path to where it was found.
              */
-            if (nftw(subtree, find_file, 25, FTW_MOUNT|FTW_PHYS) == 1) {
+            if (nftw(allpkgtrees, find_file, 25, FTW_MOUNT|FTW_PHYS) == 1) {
                 if (lstat(file_to_find, &sb) == -1) {
                     fprintf(stderr, "error stat'ing %s: %s\n", file_to_find, strerror(errno));
                     fflush(stderr);
@@ -217,31 +221,53 @@ static bool validate_desktop_contents(struct rpminspect *ri, const rpmfile_entry
             file_to_find = strdup(tmp);
             found = false;
 
+            /*
+             * For each desktop icon path, check each extracted subpackage
+             * for the icon.
+             */
             TAILQ_FOREACH(entry, ri->desktop_icon_paths, items) {
-                xasprintf(&iconpath, "%s/%s", subtree, entry->data);
+                dfd = opendir(allpkgtrees);
+                assert(dfd != NULL);
 
-                /*
-                 * If we get 1 back from nftw(), it means the icon was
-                 * found and is valid.  If found, the nftw() helper replaces
-                 * file_to_find with the full path to where it was found.
-                 */
-                if (nftw(iconpath, find_file, 20, FTW_MOUNT|FTW_PHYS) == 1) {
-                    if (lstat(file_to_find, &sb) == -1) {
-                        free(iconpath);
+                while ((de = readdir(dfd)) != NULL) {
+                    if (de->d_type != DT_DIR) {
                         continue;
                     }
 
-                    found = true;
+                    xasprintf(&iconpath, "%s/%s/%s", allpkgtrees, de->d_name, entry->data);
 
-                    if (!(sb.st_mode & S_IROTH)) {
-                        xasprintf(&msg, "Desktop file %s on %s references icon %s but %s is not readable by all", file->localpath, arch, tmp, tmp);
-                        add_result(ri, RESULT_VERIFY, WAIVABLE_BY_ANYONE, HEADER_DESKTOP, msg, NULL, REMEDY_DESKTOP);
-                        free(msg);
-                        result = false;
+                    /*
+                     * If we get 1 back from nftw(), it means the icon was
+                     * found and is valid.  If found, the nftw() helper replaces
+                     * file_to_find with the full path to where it was found.
+                     */
+                    if (nftw(iconpath, find_file, 25, FTW_MOUNT|FTW_PHYS) == 1) {
+                        if (lstat(file_to_find, &sb) == -1) {
+                            free(iconpath);
+                            continue;
+                        }
+
+                        found = true;
+
+                        if (!(sb.st_mode & S_IROTH)) {
+                            xasprintf(&msg, "Desktop file %s on %s references icon %s but %s is not readable by all", file->localpath, arch, tmp, tmp);
+                            add_result(ri, RESULT_VERIFY, WAIVABLE_BY_ANYONE, HEADER_DESKTOP, msg, NULL, REMEDY_DESKTOP);
+                            free(msg);
+                            result = false;
+                        }
+                    }
+
+                    free(iconpath);
+
+                    if (found) {
+                        break;
                     }
                 }
 
-                free(iconpath);
+                if (closedir(dfd) == -1) {
+                    fprintf(stderr, "*** error closing directory: %s\n", strerror(errno));
+                    fflush(stderr);
+                }
 
                 if (found) {
                     break;
@@ -269,7 +295,7 @@ static bool validate_desktop_contents(struct rpminspect *ri, const rpmfile_entry
         result = false;
     }
 
-    free(subtree);
+    free(allpkgtrees);
     return result;
 }
 
