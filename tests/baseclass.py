@@ -136,7 +136,11 @@ class TestSRPM(RequiresRpminspect):
                                   stdout=subprocess.PIPE,
                                   stderr=subprocess.PIPE)
         (self.out, self.err) = self.p.communicate()
-        self.results = json.loads(self.out)
+
+        try:
+            self.results = json.loads(self.out)
+        except json.decoder.JSONDecodeError:
+            print("\n\ninspection: |%s|\nstdout: |%s|\nstderr: |%s|\n\n" % (self.inspection, self.out, self.err))
 
         # anything not OK or INFO is a non-zero return
         if self.result not in ['OK', 'INFO'] and self.exitcode == 0:
@@ -192,7 +196,11 @@ class TestCompareSRPM(RequiresRpminspect):
                                   stdout=subprocess.PIPE,
                                   stderr=subprocess.PIPE)
         (self.out, self.err) = self.p.communicate()
-        self.results = json.loads(self.out)
+
+        try:
+            self.results = json.loads(self.out)
+        except json.decoder.JSONDecodeError:
+            print("\n\ninspection: |%s|\nstdout: |%s|\nstderr: |%s|\n\n" % (self.inspection, self.out, self.err))
 
         # anything not OK or INFO is a non-zero return
         if self.result not in ['OK', 'INFO'] and self.exitcode == 0:
@@ -235,7 +243,11 @@ class TestRPMs(TestSRPM):
                                       stdout=subprocess.PIPE,
                                       stderr=subprocess.PIPE)
             (self.out, self.err) = self.p.communicate()
-            self.results = json.loads(self.out)
+
+            try:
+                self.results = json.loads(self.out)
+            except json.decoder.JSONDecodeError:
+                print("\n\ninspection: |%s|\nstdout: |%s|\nstderr: |%s|\n\n" % (self.inspection, self.out, self.err))
 
             # dump stdout and stderr if these do not match
             if self.p.returncode != self.exitcode:
@@ -276,7 +288,11 @@ class TestCompareRPMs(TestCompareSRPM):
                                       stdout=subprocess.PIPE,
                                       stderr=subprocess.PIPE)
             (self.out, self.err) = self.p.communicate()
-            self.results = json.loads(self.out)
+
+            try:
+                self.results = json.loads(self.out)
+            except json.decoder.JSONDecodeError:
+                print("\n\ninspection: |%s|\nstdout: |%s|\nstderr: |%s|\n\n" % (self.inspection, self.out, self.err))
 
             # dump stdout and stderr if these do not match
             if self.p.returncode != self.exitcode:
@@ -323,7 +339,11 @@ class TestKoji(TestSRPM):
                                       stdout=subprocess.PIPE,
                                       stderr=subprocess.PIPE)
             (self.out, self.err) = self.p.communicate()
-            self.results = json.loads(self.out)
+
+            try:
+                self.results = json.loads(self.out)
+            except json.decoder.JSONDecodeError:
+                print("\n\ninspection: |%s|\nstdout: |%s|\nstderr: |%s|\n\n" % (self.inspection, self.out, self.err))
 
             # anything not OK or INFO is a non-zero return
             if self.result not in ['OK', 'INFO'] and self.exitcode == 0:
@@ -385,7 +405,11 @@ class TestCompareKoji(TestCompareSRPM):
                                       stdout=subprocess.PIPE,
                                       stderr=subprocess.PIPE)
             (self.out, self.err) = self.p.communicate()
-            self.results = json.loads(self.out)
+
+            try:
+                self.results = json.loads(self.out)
+            except json.decoder.JSONDecodeError:
+                print("\n\ninspection: |%s|\nstdout: |%s|\nstderr: |%s|\n\n" % (self.inspection, self.out, self.err))
 
             # anything not OK or INFO is a non-zero return
             if self.result not in ['OK', 'INFO'] and self.exitcode == 0:
