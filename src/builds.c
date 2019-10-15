@@ -101,9 +101,6 @@ static int get_rpm_info(const char *pkg) {
 
     if (allowed_arch(workri, arch)) {
         ret = add_peer(&workri->peers, whichbuild, fetch_only, pkg, &h);
-        if (ret != 0) {
-            return ret;
-        }
     }
 
     headerFree(h);
