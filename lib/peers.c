@@ -145,9 +145,6 @@ int add_peer(rpmpeer_t **peers, int whichbuild, bool fetch_only, const char *pkg
             peer->before_files = NULL;
         } else {
             peer->before_files = extract_rpm(pkg, *hdr);
-            if (peer->before_files == NULL) {
-                goto fail;
-            }
         }
     } else if (whichbuild == AFTER_BUILD) {
         peer->after_hdr = headerCopy(*hdr);
@@ -157,9 +154,6 @@ int add_peer(rpmpeer_t **peers, int whichbuild, bool fetch_only, const char *pkg
             peer->after_files = NULL;
         } else {
             peer->after_files = extract_rpm(pkg, *hdr);
-            if (peer->after_files == NULL) {
-                goto fail;
-            }
         }
     }
 
@@ -172,10 +166,4 @@ int add_peer(rpmpeer_t **peers, int whichbuild, bool fetch_only, const char *pkg
     }
 
     return 0;
-
-fail:
-    free(peer->before_hdr);
-    free(peer->before_rpm);
-    free(peer);
-    return 1;
 }
