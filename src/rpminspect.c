@@ -144,7 +144,7 @@ static void check_inspection_options(const bool inspection_opt, const char *prog
         fprintf(stderr, "*** The -T and -E options are mutually exclusive\n");
         fprintf(stderr, "*** See `%s --help` for more information.\n", progname);
         fflush(stderr);
-        exit(EXIT_FAILURE);
+        exit(RI_PROGRAM_ERROR);
     }
 
     return;
@@ -163,7 +163,7 @@ static void check_found(const bool found, const char *inspection, const char *pr
         fprintf(stderr, "*** Unknown test specified: `%s`\n", inspection);
         fprintf(stderr, "*** See `%s --help` for more information.\n", progname);
         fflush(stderr);
-        exit(EXIT_FAILURE);
+        exit(RI_PROGRAM_ERROR);
     }
 
     return;
@@ -221,7 +221,7 @@ int main(int argc, char **argv) {
     char *progname = basename(argv[0]);
     int c, i, j;
     int idx = 0;
-    int ret = EXIT_SUCCESS;
+    int ret = RI_INSPECTION_SUCCESS;
     glob_t expand;
     char *short_options = "c:T:E:a:r:o:F:lw:t:fkv\?V";
     struct option long_options[] = {
@@ -319,7 +319,7 @@ int main(int argc, char **argv) {
                 if (formatidx < 0) {
                     fprintf(stderr, "*** Invalid output format: `%s`.\n", optarg);
                     fflush(stderr);
-                    return EXIT_FAILURE;
+                    return RI_PROGRAM_ERROR;
                 }
 
                 break;
@@ -356,7 +356,7 @@ int main(int argc, char **argv) {
                     }
                 }
 
-                exit(EXIT_SUCCESS);
+                exit(RI_INSPECTION_SUCCESS);
                 break;
             case 'w':
                 if (index(optarg, '~')) {
@@ -368,7 +368,7 @@ int main(int argc, char **argv) {
                     } else {
                         fprintf(stderr, "*** Unable to expand workdir: `%s`: %s", optarg, strerror(errno));
                         fflush(stderr);
-                        return EXIT_FAILURE;
+                        return RI_PROGRAM_ERROR;
                     }
 
                     globfree(&expand);
@@ -398,7 +398,7 @@ int main(int argc, char **argv) {
             default:
                 fprintf(stderr, "?? getopt returned character code 0%o ??\n", c);
                 fflush(stderr);
-                exit(EXIT_FAILURE);
+                exit(RI_PROGRAM_ERROR);
         }
     }
 
@@ -411,19 +411,19 @@ int main(int argc, char **argv) {
      */
     if (cfgfile != NULL && access(cfgfile, F_OK|R_OK) == -1) {
         fprintf(stderr, "Specified config file (%s) is unreadable.\n", cfgfile);
-        exit(EXIT_FAILURE);
+        exit(RI_PROGRAM_ERROR);
     } else if (cfgfile == NULL && access(CFGFILE, F_OK|R_OK) == 0) {
         cfgfile = strdup(CFGFILE);
     } else if (cfgfile == NULL) {
         fprintf(stderr, "Unable to read the default config file (%s).\n", CFGFILE);
         fprintf(stderr, "Have you installed an rpminspect-data package for your distro?\n");
-        exit(EXIT_FAILURE);
+        exit(RI_PROGRAM_ERROR);
     }
 
     /* Initialize librpminspect */
     if (init_rpminspect(&ri, cfgfile) != 0) {
         fprintf(stderr, "Failed to read configuration file\n");
-        exit(EXIT_FAILURE);
+        exit(RI_PROGRAM_ERROR);
     }
 
     free(cfgfile);
@@ -461,7 +461,7 @@ int main(int argc, char **argv) {
         fprintf(stderr, "*** See `%s --help` for more information.\n", progname);
         fflush(stderr);
         free_rpminspect(&ri);
-        return EXIT_FAILURE;
+        return RI_PROGRAM_ERROR;
     }
 
     /*
@@ -472,7 +472,7 @@ int main(int argc, char **argv) {
         fprintf(stderr, "*** See `%s --help` for more information.\n", progname);
         fflush(stderr);
         free_rpminspect(&ri);
-        return EXIT_FAILURE;
+        return RI_PROGRAM_ERROR;
     }
 
     /*
@@ -484,7 +484,7 @@ int main(int argc, char **argv) {
         if (ri.product_release == NULL) {
             fflush(stderr);
             free_rpminspect(&ri);
-            return EXIT_FAILURE;
+            return RI_PROGRAM_ERROR;
         }
     }
 
@@ -492,7 +492,7 @@ int main(int argc, char **argv) {
     if (init_librpm() != RPMRC_OK) {
         fprintf(stderr, "*** unable to read RPM configuration\n");
         fflush(stderr);
-        return EXIT_FAILURE;
+        return RI_PROGRAM_ERROR;
     }
 
     /* if an architecture list is specified, validate it */
@@ -523,7 +523,7 @@ int main(int argc, char **argv) {
                 fprintf(stderr, "*** Unsupported architecture specified: `%s`\n", token);
                 fprintf(stderr, "*** See `%s --help` for more information.\n", progname);
                 fflush(stderr);
-                return EXIT_FAILURE;
+                return RI_PROGRAM_ERROR;
             }
 
             /* architecture is valid, save it */
@@ -546,14 +546,14 @@ int main(int argc, char **argv) {
         fprintf(stderr, "*** Unable to create directory %s: %s\n", ri.workdir, strerror(errno));
         fflush(stderr);
         free_rpminspect(&ri);
-        return EXIT_FAILURE;
+        return RI_PROGRAM_ERROR;
     }
 
     /* validate and gather the builds specified */
     if (gather_builds(&ri, fetch_only)) {
         fprintf(stderr, "*** Failed to gather specified builds.\n");
         fflush(stderr);
-        exit(EXIT_FAILURE);
+        exit(RI_PROGRAM_ERROR);
     }
 
     /* perform the selected inspections */
@@ -584,7 +584,7 @@ int main(int argc, char **argv) {
 
     /* Set exit code based on result threshold */
     if (ri.worst_result >= ri.threshold) {
-        ret = EXIT_FAILURE;
+        ret = RI_INSPECTION_FAILURE;
     }
 
     /* Clean up */

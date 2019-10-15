@@ -62,6 +62,15 @@ extern struct format formats[];
 #endif
 
 /*
+ * Types of exit codes from the program.
+ */
+enum {
+    RI_INSPECTION_SUCCESS = 0,   /* inspections passed */
+    RI_INSPECTION_FAILURE = 1,   /* inspections failed */
+    RI_PROGRAM_ERROR = 2         /* program errored in some way */
+};
+
+/*
  * Build identifier strings (used in paths)
  * The enum values map to the build_desc array index.
  */
