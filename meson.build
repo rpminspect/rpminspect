@@ -47,7 +47,9 @@ if not cc.has_function('mparse_alloc', args : ['-lmandoc'], dependencies : [zlib
 endif
 
 if cc.has_header('mandoc_parse.h')
-    error('*** mandoc >= 1.14.5 found, must use <= 1.14.4')
+    add_project_arguments('-DNEWLIBMANDOC', language : 'c')
+else
+    message('Using libmandoc < 1.14.5 API')
 endif
 
 mandoc = declare_dependency(link_args : ['-lmandoc'])
