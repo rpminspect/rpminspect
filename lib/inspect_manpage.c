@@ -35,16 +35,27 @@
 #include <man.h>
 #include <mandoc.h>
 
+/* Required for libmandoc >= 1.14.5 */
+#ifdef NEWLIBMANDOC
+#include <roff.h>
+#include <mandoc_parse.h>
+#endif
+
 #include "rpminspect.h"
 
 static FILE *error_stream = NULL;
 static regex_t sections_regex;
 
-static void error_handler(enum mandocerr errtype, enum mandoclevel level, const char *file, int line, int col, const char *msg)
+/* Old API used an error message callback */
+#ifndef NEWLIBMANDOC
+static void error_handler(enum mandocerr errtype, enum mandoclevel level,
+                          const char *file, int line, int col, const char *msg)
 {
     fprintf(error_stream, "Error parsing %s:%d:%d: %s: %s: %s\n",
-            basename(file), line, col, mparse_strlevel(level), mparse_strerror(errtype), msg);
+            basename(file), line, col, mparse_strlevel(level),
+            mparse_strerror(errtype), msg);
 }
+#endif
 
 /* Free the memory used by mandoc */
 static void inspect_manpage_free(void)
@@ -136,12 +147,15 @@ static bool inspect_manpage_path(const char *path)
  */
 static char *inspect_manpage_validity(const char *path, const char *localpath)
 {
-    struct mparse *parser;
+    struct mparse *parser = NULL;
     int fd = -1;
     char magic[2];
-    struct roff_man *man;
+    int parseopts = MPARSE_MAN | MPARSE_UTF8 | MPARSE_LATIN1;
+#ifndef NEWLIBMANDOC
+    struct roff_man *man = NULL;
     enum mandoclevel result_tmp;
     enum mandoclevel result = MANDOCLEVEL_OK;
+#endif
 
     /* Use a nested function to gather error messages, since the callback doesn't
      * take any parameters that would tie it back to this call's context
@@ -152,10 +166,16 @@ static char *inspect_manpage_validity(const char *path, const char *localpath)
     /* Initialize the error buffer */
     error_stream = open_memstream(&error_buffer, &error_buffer_size);
     assert(error_stream != NULL);
+#ifdef NEWLIBMANDOC
+    mandoc_msg_setoutfile(error_stream);
+#endif
 
     /* Allocate a new manpage parsing context */
-    parser = mparse_alloc(MPARSE_MAN | MPARSE_UTF8 | MPARSE_LATIN1,
-            MANDOCERR_ERROR, error_handler, MANDOC_OS_OTHER, NULL);
+#ifdef NEWLIBMANDOC
+    parser = mparse_alloc(parseopts | MPARSE_VALIDATE, MANDOC_OS_OTHER, NULL);
+#else
+    parser = mparse_alloc(parseopts, MANDOCERR_ERROR, error_handler, MANDOC_OS_OTHER, NULL);
+#endif
     assert(parser != NULL);
 
     /* Open the file */
@@ -184,22 +204,34 @@ static char *inspect_manpage_validity(const char *path, const char *localpath)
     }
 
     /* Parse the file */
+#ifdef NEWLIBMANDOC
+    mparse_readfd(parser, fd, path);
+#else
     result_tmp = mparse_readfd(parser, fd, path);
     if (result_tmp > result) {
         result = result_tmp;
     }
+#endif
 
     /* Retrieve the syntax tree */
+#ifdef NEWLIBMANDOC
+    mparse_result(parser);
+#else
     mparse_result(parser, &man, NULL);
 
     /* Validate the man page */
     if (man != NULL) {
         man_validate(man);
     }
+#endif
 
     /* Check for validation errors */
+#ifdef NEWLIBMANDOC
+    if (mandoc_msg_getrc() > MANDOCLEVEL_OK) {
+#else
     mparse_updaterc(parser, &result);
     if (result > MANDOCLEVEL_OK) {
+#endif
         fprintf(error_stream, "Errors found validating %s\n", (localpath == NULL) ? path : localpath);
     }
 
