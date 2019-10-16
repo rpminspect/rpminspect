@@ -111,12 +111,12 @@ static bool check_class_file(struct rpminspect *ri, const char *fullpath,
     if (major == -1 && !strsuffix(localpath, CLASS_FILENAME_EXTENSION)) {
         return true;
     } else if (major < 0 || major > 60) {
-        xasprintf(&msg, "File %s (%s), Java byte code version %d is incorrect (wrong endianness? corrupted file? space JDK?)", localpath, fullpath, major);
+        xasprintf(&msg, "File %s (%s), Java byte code version %d is incorrect (wrong endianness? corrupted file? space JDK?)", localpath, container, major);
         add_result(ri, RESULT_BAD, WAIVABLE_BY_ANYONE, HEADER_JAVABYTECODE, msg, NULL, NULL);
         free(msg);
         return false;
     } else if (major > expected_major) {
-        xasprintf(&msg, "File %s (%s), Java byte code version %d greater than expected %d for product release %s", localpath, fullpath, major, expected_major, ri->product_release);
+        xasprintf(&msg, "File %s (%s), Java byte code version %d greater than expected %d for product release %s", localpath, container, major, expected_major, ri->product_release);
         add_result(ri, RESULT_BAD, WAIVABLE_BY_ANYONE, HEADER_JAVABYTECODE, msg, NULL, NULL);
         free(msg);
         return false;
