@@ -37,24 +37,23 @@ against the defined parameters.
 Summary:        Library providing RPM test API and functionality
 Group:          Development/Tools
 Requires:       rpminspect-data
-Requires:       /usr/bin/desktop-file-validate
-Requires:       /usr/bin/zcmp
-Requires:       /usr/bin/bzcmp
-Requires:       /usr/bin/xzcmp
-Requires:       /usr/bin/eu-elfcmp
-Requires:       /usr/bin/msgunfmt
-Requires:       /usr/bin/diff
+Requires:       desktop-file-utils
+Requires:       gzip
+Requires:       bzip2
+Requires:       xz
+Requires:       elfutils
+Requires:       gettext
+Requires:       diffutils
 
 # These programs are only required for the 'shellsyntax' functionality.
 # You can use rpminspect without these installed, just disable the
 # shellsyntax inspection.
-Suggests:       /usr/bin/sh
-Suggests:       /usr/bin/ksh
-Suggests:       /usr/bin/zsh
-Suggests:       /usr/bin/csh
-Suggests:       /usr/bin/tcsh
-Suggests:       /usr/bin/rc
-Suggests:       /usr/bin/bash
+Suggests:       dash
+Suggests:       ksh
+Suggests:       zsh
+Suggests:       tcsh
+Suggests:       rc
+Suggests:       bash
 
 %description -n librpminspect
 The library providing the backend test functionality and API for the
