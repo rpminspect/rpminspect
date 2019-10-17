@@ -291,7 +291,8 @@ if python.found()
     test('rpminspect-test-suite',
          python,
          args : ['-B', '-m', 'unittest', 'discover', '-v', meson.source_root() + '/tests'],
-         env : test_env
+         env : test_env,
+         timeout : 300
         )
 else
     warning('Python not found, skipping integration test suite')
