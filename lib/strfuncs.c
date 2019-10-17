@@ -311,7 +311,10 @@ char * strreplace(const char *s, const char *find, const char *replace)
     char *tmp;
     char *result = NULL;
 
-    assert(s);
+    if (s == NULL) {
+        return 0;
+    }
+
     assert(find);
     assert(replace);
 
