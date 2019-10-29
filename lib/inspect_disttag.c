@@ -83,17 +83,17 @@ static bool disttag_driver(struct rpminspect *ri, rpmfile_entry_t *file) {
     /* Check the line if we found it */
     if (buf == NULL) {
         msg = strdup("The %s file is missing the Release: tag.");
-        add_result(ri, RESULT_BAD, WAIVABLE_BY_ANYONE, HEADER_DISTTAG, msg, buf, REMEDY_DISTTAG);
+        add_result(ri, RESULT_BAD, NOT_WAIVABLE, HEADER_DISTTAG, msg, buf, REMEDY_DISTTAG);
         free(msg);
         result = false;
     } else if (strstr(buf, "dist") && !strstr(buf, "%{?dist}")) {
         msg = strdup("The dist tag should be of the form '%%{?dist}' in the Release tag.");
-        add_result(ri, RESULT_BAD, WAIVABLE_BY_ANYONE, HEADER_DISTTAG, msg, buf, REMEDY_DISTTAG);
+        add_result(ri, RESULT_BAD, NOT_WAIVABLE, HEADER_DISTTAG, msg, buf, REMEDY_DISTTAG);
         free(msg);
         result = false;
     } else if (!strstr(buf, "%{?dist}")) {
         msg = strdup("The Release: tag does not seem to contain a '%%{?dist}' tag.");
-        add_result(ri, RESULT_BAD, WAIVABLE_BY_ANYONE, HEADER_DISTTAG, msg, buf, REMEDY_DISTTAG);
+        add_result(ri, RESULT_BAD, NOT_WAIVABLE, HEADER_DISTTAG, msg, buf, REMEDY_DISTTAG);
         free(msg);
         result = false;
     }
