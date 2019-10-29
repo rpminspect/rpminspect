@@ -107,9 +107,10 @@ class TestSRPM(RequiresRpminspect):
         self.inspection = None
         self.label = None
 
-        # these default to 0 and OK
+        # defaults
         self.exitcode = 0
         self.result = 'OK'
+        self.waiver_auth = 'Not Waivable'
 
     def configFile(self):
         RequiresRpminspect.configFile(self)
@@ -152,6 +153,7 @@ class TestSRPM(RequiresRpminspect):
 
         self.assertEqual(self.p.returncode, self.exitcode)
         self.assertEqual(self.results[self.label][0]['result'], self.result)
+        self.assertEqual(self.results[self.label][0]['waiver authorization'], self.waiver_auth)
 
 # Base test case class that compares a before and after SRPM
 class TestCompareSRPM(RequiresRpminspect):
@@ -164,9 +166,10 @@ class TestCompareSRPM(RequiresRpminspect):
         self.inspection = None
         self.label = None
 
-        # these default to 0 and OK
+        # defaults
         self.exitcode = 0
         self.result = 'OK'
+        self.waiver_auth = 'Not Waivable'
 
     def configFile(self):
         RequiresRpminspect.configFile(self)
@@ -212,6 +215,7 @@ class TestCompareSRPM(RequiresRpminspect):
 
         self.assertEqual(self.p.returncode, self.exitcode)
         self.assertEqual(self.results[self.label][0]['result'], self.result)
+        self.assertEqual(self.results[self.label][0]['waiver authorization'], self.waiver_auth)
 
 # Base test case class that tests the binary RPMs
 class TestRPMs(TestSRPM):
@@ -255,6 +259,8 @@ class TestRPMs(TestSRPM):
 
             self.assertEqual(self.p.returncode, self.exitcode)
             self.assertEqual(self.results[self.label][0]['result'], self.result)
+            self.assertEqual(self.results[self.label][0]['waiver authorization'], self.waiver_auth)
+
 
 # Base test case class that compares before and after built RPMs
 class TestCompareRPMs(TestCompareSRPM):
@@ -300,6 +306,7 @@ class TestCompareRPMs(TestCompareSRPM):
 
             self.assertEqual(self.p.returncode, self.exitcode)
             self.assertEqual(self.results[self.label][0]['result'], self.result)
+            self.assertEqual(self.results[self.label][0]['waiver authorization'], self.waiver_auth)
 
 # Base test case class that tests a fake Koji build
 class TestKoji(TestSRPM):
@@ -355,6 +362,7 @@ class TestKoji(TestSRPM):
 
             self.assertEqual(self.p.returncode, self.exitcode)
             self.assertEqual(self.results[self.label][0]['result'], self.result)
+            self.assertEqual(self.results[self.label][0]['waiver authorization'], self.waiver_auth)
 
 # Base test case class that compares before and after Koji builds
 class TestCompareKoji(TestCompareSRPM):
@@ -421,3 +429,4 @@ class TestCompareKoji(TestCompareSRPM):
 
             self.assertEqual(self.p.returncode, self.exitcode)
             self.assertEqual(self.results[self.label][0]['result'], self.result)
+            self.assertEqual(self.results[self.label][0]['waiver authorization'], self.waiver_auth)

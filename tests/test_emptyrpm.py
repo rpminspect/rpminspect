@@ -54,6 +54,7 @@ class TestPkgHasEmptyPayload(TestRPMs):
         self.inspection = 'emptyrpm'
         self.label = 'empty-payload'
         self.result = 'VERIFY'
+        self.waiver_auth = 'Anyone'
 
 # Packages in Koji build have empty payloads (VERIFY)
 class TestKojiBuildHaveEmptyPayloads(TestKoji):
@@ -62,6 +63,7 @@ class TestKojiBuildHaveEmptyPayloads(TestKoji):
         self.inspection = 'emptyrpm'
         self.label = 'empty-payload'
         self.result = 'VERIFY'
+        self.waiver_auth = 'Anyone'
 
 # New package has empty payload across Koji builds (VERIFY)
 class TestNewPkgHasEmptyPayload(TestCompareKoji):
@@ -72,6 +74,7 @@ class TestNewPkgHasEmptyPayload(TestCompareKoji):
         self.inspection = 'emptyrpm'
         self.label = 'empty-payload'
         self.result = 'VERIFY'
+        self.waiver_auth = 'Anyone'
 
 # Packages continue to be empty (INFO)
 class TestPkgStillHasEmptyPayload(TestCompareKoji):
@@ -89,6 +92,7 @@ class TestPkgLostPayload(TestCompareKoji):
         self.inspection = 'emptyrpm'
         self.label = 'empty-payload'
         self.result = 'VERIFY'
+        self.waiver_auth = 'Anyone'
 
 # Existing package is now missing across Koji builds (VERIFY)
 class TestExistingPkgMissing(TestCompareKoji):
@@ -99,3 +103,4 @@ class TestExistingPkgMissing(TestCompareKoji):
         self.inspection = 'emptyrpm'
         self.label = 'empty-payload'
         self.result = 'VERIFY'
+        self.waiver_auth = 'Anyone'
