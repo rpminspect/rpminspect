@@ -42,6 +42,7 @@ class TestSpecNameRPMs(TestRPMs):
         self.inspection = 'specname'
         self.label = 'spec-file-name'
         self.result = 'BAD'
+        self.waiver_auth = 'Not Waivable'
 
 # Verify spec filename not matching package name fails (BAD)
 class TestBadSpecNameSRPM(TestSRPM):
@@ -52,6 +53,7 @@ class TestBadSpecNameSRPM(TestSRPM):
         self.inspection = 'specname'
         self.label = 'spec-file-name'
         self.result = 'BAD'
+        self.waiver_auth = 'Not Waivable'
 
 # Verify spec filename not matching package name fails on Koji build (BAD)
 class TestBadSpecNameKojiBuild(TestKoji):
@@ -62,3 +64,4 @@ class TestBadSpecNameKojiBuild(TestKoji):
         self.inspection = 'specname'
         self.label = 'spec-file-name'
         self.result = 'BAD'
+        self.waiver_auth = 'Not Waivable'

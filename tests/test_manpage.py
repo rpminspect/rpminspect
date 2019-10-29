@@ -79,6 +79,7 @@ class TestManPageNotGzippedRPM(TestRPMs):
         self.inspection = 'manpage'
         self.label = 'man-pages'
         self.result = 'VERIFY'
+        self.waiver_auth = 'Anyone'
 
 # Man page not gzipped in Koji build (VERIFY)
 class TestManPageNotGzippedKoji(TestKoji):
@@ -103,6 +104,7 @@ class TestManPageNotGzippedKoji(TestKoji):
         self.inspection = 'manpage'
         self.label = 'man-pages'
         self.result = 'VERIFY'
+        self.waiver_auth = 'Anyone'
 
 # Man page not gzipped in compare RPMs (VERIFY)
 class TestManPageNotGzippedCompareRPMs(TestCompareRPMs):
@@ -134,6 +136,7 @@ class TestManPageNotGzippedCompareRPMs(TestCompareRPMs):
         self.inspection = 'manpage'
         self.label = 'man-pages'
         self.result = 'VERIFY'
+        self.waiver_auth = 'Anyone'
 
 # Man page not gzipped in compare Koji (VERIFY)
 class TestManPageNotGzippedCompareKoji(TestCompareKoji):
@@ -165,6 +168,7 @@ class TestManPageNotGzippedCompareKoji(TestCompareKoji):
         self.inspection = 'manpage'
         self.label = 'man-pages'
         self.result = 'VERIFY'
+        self.waiver_auth = 'Anyone'
 
 # Man page in wrong section subdirectory in RPM (VERIFY)
 class TestManPageWrongSectionRPM(TestRPMs):
@@ -174,6 +178,7 @@ class TestManPageWrongSectionRPM(TestRPMs):
         self.inspection = 'manpage'
         self.label = 'man-pages'
         self.result = 'VERIFY'
+        self.waiver_auth = 'Anyone'
 
 # Man page in wrong section subdirectory in Koji build (VERIFY)
 class TestManPageWrongSectionKoji(TestKoji):
@@ -183,6 +188,7 @@ class TestManPageWrongSectionKoji(TestKoji):
         self.inspection = 'manpage'
         self.label = 'man-pages'
         self.result = 'VERIFY'
+        self.waiver_auth = 'Anyone'
 
 # Man page in wrong section subdirectory in compare RPMs (VERIFY)
 class TestManPageWrongSectionCompareRPMs(TestCompareRPMs):
@@ -193,6 +199,7 @@ class TestManPageWrongSectionCompareRPMs(TestCompareRPMs):
         self.inspection = 'manpage'
         self.label = 'man-pages'
         self.result = 'VERIFY'
+        self.waiver_auth = 'Anyone'
 
 # Man page in wrong section subdirectory in compare Koji (VERIFY)
 class TestManPageWrongSectionCompareRPMs(TestCompareKoji):
@@ -203,6 +210,7 @@ class TestManPageWrongSectionCompareRPMs(TestCompareKoji):
         self.inspection = 'manpage'
         self.label = 'man-pages'
         self.result = 'VERIFY'
+        self.waiver_auth = 'Anyone'
 
 # Invalid man page syntax in RPM (VERIFY)
 class TestInvalidManPageRPM(TestRPMs):
@@ -219,6 +227,7 @@ class TestInvalidManPageRPM(TestRPMs):
         self.inspection = 'manpage'
         self.label = 'man-pages'
         self.result = 'VERIFY'
+        self.waiver_auth = 'Anyone'
 
 # Invalid man page syntax in Koji build (VERIFY)
 class TestInvalidManPageKoji(TestKoji):
@@ -235,6 +244,7 @@ class TestInvalidManPageKoji(TestKoji):
         self.inspection = 'manpage'
         self.label = 'man-pages'
         self.result = 'VERIFY'
+        self.waiver_auth = 'Anyone'
 
 # Invalid man page syntax in compare RPMs (VERIFY)
 class TestInvalidManPageCompareRPMs(TestCompareRPMs):
@@ -253,6 +263,7 @@ class TestInvalidManPageCompareRPMs(TestCompareRPMs):
         self.inspection = 'manpage'
         self.label = 'man-pages'
         self.result = 'VERIFY'
+        self.waiver_auth = 'Anyone'
 
 # Invalid man page syntax in compare Koji (VERIFY)
 class TestInvalidManPageCompareKoji(TestCompareKoji):
@@ -271,3 +282,4 @@ class TestInvalidManPageCompareKoji(TestCompareKoji):
         self.inspection = 'manpage'
         self.label = 'man-pages'
         self.result = 'VERIFY'
+        self.waiver_auth = 'Anyone'

@@ -30,6 +30,7 @@ invalid_xml = """<?xml version='1.0'?>
   <!ELEMENT greeting EMPTY>
 ]>
 <greeting>Hello world</greeting>
+<nonClosingElement variable="value">
 """
 
 # XML file is well formed in RPM (OK)
@@ -77,7 +78,7 @@ class TestXMLWellFormedCompareKoji(TestCompareKoji):
         self.result = 'OK'
 
 # XML file is malformed in RPM (VERIFY)
-class TestXMLWellFormedRPM(TestRPMs):
+class TestXMLMalformedRPM(TestRPMs):
     def setUp(self):
         TestRPMs.setUp(self)
         self.rpm.add_installed_file('/usr/share/data/invalid.xml',
@@ -85,9 +86,10 @@ class TestXMLWellFormedRPM(TestRPMs):
         self.inspection = 'xml'
         self.label = 'xml-files'
         self.result = 'VERIFY'
+        self.waiver_auth = 'Anyone'
 
 # XML file is malformed in Koji build (VERIFY)
-class TestXMLWellFormedKoji(TestKoji):
+class TestXMLMalformedKoji(TestKoji):
     def setUp(self):
         TestKoji.setUp(self)
         self.rpm.add_installed_file('/usr/share/data/invalid.xml',
@@ -95,9 +97,10 @@ class TestXMLWellFormedKoji(TestKoji):
         self.inspection = 'xml'
         self.label = 'xml-files'
         self.result = 'VERIFY'
+        self.waiver_auth = 'Anyone'
 
 # XML file is malformed in compare RPMs (VERIFY)
-class TestXMLWellFormedCompareRPMs(TestCompareRPMs):
+class TestXMLMalformedCompareRPMs(TestCompareRPMs):
     def setUp(self):
         TestCompareRPMs.setUp(self)
         self.before_rpm.add_installed_file('/usr/share/data/invalid.xml',
@@ -107,9 +110,10 @@ class TestXMLWellFormedCompareRPMs(TestCompareRPMs):
         self.inspection = 'xml'
         self.label = 'xml-files'
         self.result = 'VERIFY'
+        self.waiver_auth = 'Anyone'
 
 # XML file is malformed in compare Koji builds (VERIFY)
-class TestXMLWellFormedCompareKoji(TestCompareKoji):
+class TestXMLMalformedCompareKoji(TestCompareKoji):
     def setUp(self):
         TestCompareKoji.setUp(self)
         self.before_rpm.add_installed_file('/usr/share/data/invalid.xml',
@@ -119,3 +123,4 @@ class TestXMLWellFormedCompareKoji(TestCompareKoji):
         self.inspection = 'xml'
         self.label = 'xml-files'
         self.result = 'VERIFY'
+        self.waiver_auth = 'Anyone'

@@ -81,6 +81,7 @@ class TestGainingVendorCompareSRPM(TestCompareSRPM):
         self.inspection = 'metadata'
         self.label = 'header-metadata'
         self.result = 'VERIFY'
+        self.waiver_auth = 'Anyone'
 
 # Verify gaining Vendor reports verify on built RPMS (VERIFY)
 class TestGainingVendorCompareRPMs(TestCompareRPMs):
@@ -90,6 +91,7 @@ class TestGainingVendorCompareRPMs(TestCompareRPMs):
         self.inspection = 'metadata'
         self.label = 'header-metadata'
         self.result = 'VERIFY'
+        self.waiver_auth = 'Anyone'
 
 # Verify gaining Vendor reports verify on Koji build (VERIFY)
 class TestGainingVendorCompareKojiBuild(TestCompareKoji):
@@ -99,6 +101,7 @@ class TestGainingVendorCompareKojiBuild(TestCompareKoji):
         self.inspection = 'metadata'
         self.label = 'header-metadata'
         self.result = 'VERIFY'
+        self.waiver_auth = 'Anyone'
 
 # Verify losing Vendor reports verify on SRPM (VERIFY)
 class TestLosingVendorCompareSRPM(TestCompareSRPM):
@@ -107,7 +110,9 @@ class TestLosingVendorCompareSRPM(TestCompareSRPM):
         self.before_rpm.addVendor("Vendorco Ltd.")
         self.inspection = 'metadata'
         self.label = 'header-metadata'
+        self.waiver_auth = 'Anyone'
         self.result = 'VERIFY'
+        self.waiver_auth = 'Anyone'
 
 # Verify losing Vendor reports verify on built RPMs (VERIFY)
 class TestLosingVendorCompareRPMs(TestCompareRPMs):
@@ -116,7 +121,9 @@ class TestLosingVendorCompareRPMs(TestCompareRPMs):
         self.before_rpm.addVendor("Vendorco Ltd.")
         self.inspection = 'metadata'
         self.label = 'header-metadata'
+        self.waiver_auth = 'Anyone'
         self.result = 'VERIFY'
+        self.waiver_auth = 'Anyone'
 
 # Verify losing Vendor reports verify on Koji build (VERIFY)
 class TestLosingVendorCompareKojiBuild(TestCompareKoji):
@@ -125,7 +132,8 @@ class TestLosingVendorCompareKojiBuild(TestCompareKoji):
         self.before_rpm.addVendor("Vendorco Ltd.")
         self.inspection = 'metadata'
         self.label = 'header-metadata'
-        self.result = 'VERIFY'
+        self.waiver_auth = 'Anyone'
+        self.result = 'OK'
 
 # Verify changing Vendor reports verify on SRPM (VERIFY)
 class TestChangingVendorCompareSRPM(TestCompareSRPM):
@@ -135,7 +143,9 @@ class TestChangingVendorCompareSRPM(TestCompareSRPM):
         self.after_rpm.addVendor("Vendorco Ltd.")
         self.inspection = 'metadata'
         self.label = 'header-metadata'
+        self.waiver_auth = 'Anyone'
         self.result = 'VERIFY'
+        self.waiver_auth = 'Anyone'
 
 # Verify changing Vendor reports verify on built RPMs (VERIFY)
 class TestChangingVendorCompareRPMs(TestCompareRPMs):
@@ -146,6 +156,7 @@ class TestChangingVendorCompareRPMs(TestCompareRPMs):
         self.inspection = 'metadata'
         self.label = 'header-metadata'
         self.result = 'VERIFY'
+        self.waiver_auth = 'Anyone'
 
 # Verify changing Vendor reports verify on Koji build (VERIFY)
 class TestLosingVendorCompareKojiBuild(TestCompareKoji):
@@ -156,6 +167,7 @@ class TestLosingVendorCompareKojiBuild(TestCompareKoji):
         self.inspection = 'metadata'
         self.label = 'header-metadata'
         self.result = 'VERIFY'
+        self.waiver_auth = 'Anyone'
 
 # Verify invalid Buildhost subdomain fails on an SRPM (BAD)
 class TestInvalidBuildhostSubdomainSRPM(TestSRPM):
@@ -250,6 +262,7 @@ class TestChangingSummaryCompareSRPM(TestCompareSRPM):
         self.inspection = 'metadata'
         self.label = 'header-metadata'
         self.result = 'VERIFY'
+        self.waiver_auth = 'Anyone'
 
 # Verify changing Summary reports verify on built RPMs (VERIFY)
 class TestChangingSummaryCompareRPMs(TestCompareRPMs):
@@ -260,6 +273,7 @@ class TestChangingSummaryCompareRPMs(TestCompareRPMs):
         self.inspection = 'metadata'
         self.label = 'header-metadata'
         self.result = 'VERIFY'
+        self.waiver_auth = 'Anyone'
 
 # Verify changing Summary reports verify on Koji build (VERIFY)
 class TestChangingSummaryCompareKojiBuild(TestCompareKoji):
@@ -270,6 +284,7 @@ class TestChangingSummaryCompareKojiBuild(TestCompareKoji):
         self.inspection = 'metadata'
         self.label = 'header-metadata'
         self.result = 'VERIFY'
+        self.waiver_auth = 'Anyone'
 
 # Verify Description without bad words passes on an SRPM (OK)
 class TestCleanDescriptionSRPM(TestSRPM):
@@ -334,6 +349,7 @@ class TestChangingDescriptionCompareSRPM(TestCompareSRPM):
         self.inspection = 'metadata'
         self.label = 'header-metadata'
         self.result = 'VERIFY'
+        self.waiver_auth = 'Anyone'
 
 # Verify changing Description reports verify on built RPMs (VERIFY)
 class TestChangingDescriptionCompareRPMs(TestCompareRPMs):
@@ -344,6 +360,7 @@ class TestChangingDescriptionCompareRPMs(TestCompareRPMs):
         self.inspection = 'metadata'
         self.label = 'header-metadata'
         self.result = 'VERIFY'
+        self.waiver_auth = 'Anyone'
 
 # Verify changing Description reports verify on Koji build (VERIFY)
 class TestChangingDescriptionCompareKojiBuild(TestCompareKoji):
@@ -354,3 +371,4 @@ class TestChangingDescriptionCompareKojiBuild(TestCompareKoji):
         self.inspection = 'metadata'
         self.label = 'header-metadata'
         self.result = 'VERIFY'
+        self.waiver_auth = 'Anyone'

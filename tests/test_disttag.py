@@ -26,6 +26,7 @@ class TestMissingDistTagSRPM(TestSRPM):
         self.inspection = 'disttag'
         self.label = 'dist-tag'
         self.result = 'BAD'
+        self.waiver_auth = 'Not Waivable'
 
 # Verify missing %{?dist} in Release fails on Koji build (BAD)
 class TestMissingDistTagKojiBuild(TestKoji):
@@ -34,6 +35,7 @@ class TestMissingDistTagKojiBuild(TestKoji):
         self.inspection = 'disttag'
         self.label = 'dist-tag'
         self.result = 'BAD'
+        self.waiver_auth = 'Not Waivable'
 
 # Verify running on not an SRPM fails
 class TestDistTagOnNonSRPM(TestRPMs):
@@ -43,6 +45,7 @@ class TestDistTagOnNonSRPM(TestRPMs):
         self.inspection = 'disttag'
         self.label = 'dist-tag'
         self.result = 'BAD'
+        self.waiver_auth = 'Not Waivable'
 
 # Verify malformed %{?dist} tag in Release fails on SRPM (BAD)
 class TestMalformedDistTagSRPM(TestSRPM):
@@ -52,6 +55,7 @@ class TestMalformedDistTagSRPM(TestSRPM):
         self.inspection = 'disttag'
         self.label = 'dist-tag'
         self.result = 'BAD'
+        self.waiver_auth = 'Not Waivable'
 
 # Verify malformed %{?dist} tag in Release fails on Koji build (BAD)
 class TestMalformedDistTagKojiBuild(TestKoji):
@@ -61,6 +65,7 @@ class TestMalformedDistTagKojiBuild(TestKoji):
         self.inspection = 'disttag'
         self.label = 'dist-tag'
         self.result = 'BAD'
+        self.waiver_auth = 'Not Waivable'
 
 # Verify correct %{?dist} usage passes on SRPM (OK)
 class TestDistTagSRPM(TestSRPM):

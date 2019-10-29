@@ -166,6 +166,7 @@ class TestDesktopFileMissingIconRPM(TestRPMs):
         self.inspection = 'desktop'
         self.label = 'desktop-entry-files'
         self.result = 'VERIFY'
+        self.waiver_auth = 'Anyone'
 
 # Desktop file with missing icon in RPM compare (VERIFY)
 class TestDesktopFileMissingIconCompareRPM(TestCompareRPMs):
@@ -183,6 +184,7 @@ class TestDesktopFileMissingIconCompareRPM(TestCompareRPMs):
         self.inspection = 'desktop'
         self.label = 'desktop-entry-files'
         self.result = 'VERIFY'
+        self.waiver_auth = 'Anyone'
 
 # Desktop file with missing icon in Koji build (VERIFY)
 class TestDesktopFileMissingIconKoji(TestKoji):
@@ -198,6 +200,7 @@ class TestDesktopFileMissingIconKoji(TestKoji):
         self.inspection = 'desktop'
         self.label = 'desktop-entry-files'
         self.result = 'VERIFY'
+        self.waiver_auth = 'Anyone'
 
 # Desktop file with missing icon in Koji build compare (VERIFY)
 class TestDesktopFileMissingIconCompareKoji(TestCompareKoji):
@@ -215,6 +218,7 @@ class TestDesktopFileMissingIconCompareKoji(TestCompareKoji):
         self.inspection = 'desktop'
         self.label = 'desktop-entry-files'
         self.result = 'VERIFY'
+        self.waiver_auth = 'Anyone'
 
 # Invalid desktop file fails desktop-file-validate in RPM (BAD)
 class TestDesktopFileValidateFailsRPM(TestRPMs):
@@ -233,6 +237,7 @@ class TestDesktopFileValidateFailsRPM(TestRPMs):
         self.inspection = 'desktop'
         self.label = 'desktop-entry-files'
         self.result = 'BAD'
+        self.waiver_auth = 'Anyone'
 
 # Invalid desktop file fails desktop-file-validate in Koji build (BAD)
 class TestDesktopFileValidateFailsKoji(TestKoji):
@@ -251,6 +256,7 @@ class TestDesktopFileValidateFailsKoji(TestKoji):
         self.inspection = 'desktop'
         self.label = 'desktop-entry-files'
         self.result = 'BAD'
+        self.waiver_auth = 'Anyone'
 
 # Invalid desktop file fails desktop-file-validate in RPM compare (BAD)
 class TestDesktopFileValidateFailsCompareRPM(TestCompareRPMs):
@@ -272,6 +278,7 @@ class TestDesktopFileValidateFailsCompareRPM(TestCompareRPMs):
         self.inspection = 'desktop'
         self.label = 'desktop-entry-files'
         self.result = 'BAD'
+        self.waiver_auth = 'Anyone'
 
 # Invalid desktop file fails desktop-file-validate in Koji build compare (BAD)
 class TestDesktopFileValidateFailsCompareKoji(TestCompareKoji):
@@ -293,6 +300,7 @@ class TestDesktopFileValidateFailsCompareKoji(TestCompareKoji):
         self.inspection = 'desktop'
         self.label = 'desktop-entry-files'
         self.result = 'BAD'
+        self.waiver_auth = 'Anyone'
 
 # Desktop file with Exec with arguments in RPM (OK)
 class TestDesktopFileExecArgsRPM(TestRPMs):
@@ -389,6 +397,7 @@ class TestDesktopFileNotWorldReadableIconRPM(TestRPMs):
         self.inspection = 'desktop'
         self.label = 'desktop-entry-files'
         self.result = 'VERIFY'
+        self.waiver_auth = 'Anyone'
 
 # Desktop file without world readable Icon in Koji build (VERIFY)
 class TestDesktopFileNotWorldReadableIconKoji(TestKoji):
@@ -407,6 +416,7 @@ class TestDesktopFileNotWorldReadableIconKoji(TestKoji):
         self.inspection = 'desktop'
         self.label = 'desktop-entry-files'
         self.result = 'VERIFY'
+        self.waiver_auth = 'Anyone'
 
 # Desktop file without world readable Icon in RPM compare (VERIFY)
 class TestDesktopFileNotWorldReadableIconCompareRPM(TestCompareRPMs):
@@ -428,6 +438,7 @@ class TestDesktopFileNotWorldReadableIconCompareRPM(TestCompareRPMs):
         self.inspection = 'desktop'
         self.label = 'desktop-entry-files'
         self.result = 'VERIFY'
+        self.waiver_auth = 'Anyone'
 
 # Desktop file without world readable Icon in Koji build compare (VERIFY)
 class TestDesktopFileNotWorldReadableIconCompareKoji(TestCompareKoji):
@@ -449,6 +460,7 @@ class TestDesktopFileNotWorldReadableIconCompareKoji(TestCompareKoji):
         self.inspection = 'desktop'
         self.label = 'desktop-entry-files'
         self.result = 'VERIFY'
+        self.waiver_auth = 'Anyone'
 
 # Desktop file with invalid Exec file in RPM (VERIFY)
 class TestDesktopFileInvalidExecRPM(TestRPMs):
@@ -464,6 +476,7 @@ class TestDesktopFileInvalidExecRPM(TestRPMs):
         self.inspection = 'desktop'
         self.label = 'desktop-entry-files'
         self.result = 'VERIFY'
+        self.waiver_auth = 'Anyone'
 
 # Desktop file with invalid Exec file in Koji build (VERIFY)
 class TestDesktopFileInvalidExecRPMs(TestKoji):
@@ -479,6 +492,7 @@ class TestDesktopFileInvalidExecRPMs(TestKoji):
         self.inspection = 'desktop'
         self.label = 'desktop-entry-files'
         self.result = 'VERIFY'
+        self.waiver_auth = 'Anyone'
 
 # Desktop file with invalid Exec file in RPM compare (VERIFY)
 class TestDesktopFileInvalidExecCompareRPM(TestCompareRPMs):
@@ -496,6 +510,7 @@ class TestDesktopFileInvalidExecCompareRPM(TestCompareRPMs):
         self.inspection = 'desktop'
         self.label = 'desktop-entry-files'
         self.result = 'VERIFY'
+        self.waiver_auth = 'Anyone'
 
 # Desktop file with invalid Exec file in Koji compare (VERIFY)
 class TestDesktopFileInvalidExecCompareKoji(TestCompareKoji):
@@ -513,6 +528,7 @@ class TestDesktopFileInvalidExecCompareKoji(TestCompareKoji):
         self.inspection = 'desktop'
         self.label = 'desktop-entry-files'
         self.result = 'VERIFY'
+        self.waiver_auth = 'Anyone'
 
 # Desktop file without world executable Exec file in RPM (VERIFY)
 class TestDesktopFileWithoutWorldExecutableExecRPM(TestRPMs):
@@ -532,6 +548,7 @@ class TestDesktopFileWithoutWorldExecutableExecRPM(TestRPMs):
         self.inspection = 'desktop'
         self.label = 'desktop-entry-files'
         self.result = 'VERIFY'
+        self.waiver_auth = 'Anyone'
 
 # Desktop file without world executable Exec file in Koji build (VERIFY)
 class TestDesktopFileWithoutWorldExecutableExecKoji(TestKoji):
@@ -551,6 +568,7 @@ class TestDesktopFileWithoutWorldExecutableExecKoji(TestKoji):
         self.inspection = 'desktop'
         self.label = 'desktop-entry-files'
         self.result = 'VERIFY'
+        self.waiver_auth = 'Anyone'
 
 # Desktop file without world executable Exec file in RPM compare (VERIFY)
 class TestDesktopFileWithoutWorldExecutableExecCompareRPM(TestCompareRPMs):
@@ -574,6 +592,7 @@ class TestDesktopFileWithoutWorldExecutableExecCompareRPM(TestCompareRPMs):
         self.inspection = 'desktop'
         self.label = 'desktop-entry-files'
         self.result = 'VERIFY'
+        self.waiver_auth = 'Anyone'
 
 # Desktop file without world executable Exec file in Koji build compare (VERIFY)
 class TestDesktopFileWithoutWorldExecutableExecCompareKoji(TestCompareKoji):
@@ -597,3 +616,4 @@ class TestDesktopFileWithoutWorldExecutableExecCompareKoji(TestCompareKoji):
         self.inspection = 'desktop'
         self.label = 'desktop-entry-files'
         self.result = 'VERIFY'
+        self.waiver_auth = 'Anyone'
