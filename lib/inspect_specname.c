@@ -69,7 +69,7 @@ bool inspect_specname(struct rpminspect *ri) {
     foreach_peer_file(ri, specname_driver);
 
     if (specgood) {
-        add_result(ri, RESULT_OK, WAIVABLE_BY_ANYONE, HEADER_SPECNAME, NULL, NULL, NULL);
+        add_result(ri, RESULT_OK, NOT_WAIVABLE, HEADER_SPECNAME, NULL, NULL, NULL);
     } else if (!seen) {
         xasprintf(&msg, "The specname inspection is only for source packages.");
         add_result(ri, RESULT_BAD, NOT_WAIVABLE, HEADER_SPECNAME, msg, NULL, NULL);
