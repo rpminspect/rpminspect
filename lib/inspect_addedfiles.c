@@ -83,7 +83,7 @@ static bool addedfiles_driver(struct rpminspect *ri, rpmfile_entry_t *file)
             }
 
             if (strprefix(file->localpath, subpath)) {
-                xasprintf(&msg, "Packages should contain files or directories starting with `%s` on %s", entry->data, arch);
+                xasprintf(&msg, "Packages should not contain not files or directories starting with `%s` on %s: %s", entry->data, arch, file->localpath);
                 add_result(ri, RESULT_BAD, WAIVABLE_BY_ANYONE, HEADER_ADDEDFILES, msg, NULL, REMEDY_ADDEDFILES);
                 goto done;
             }
@@ -94,7 +94,7 @@ static bool addedfiles_driver(struct rpminspect *ri, rpmfile_entry_t *file)
     if (ri->forbidden_path_suffixes) {
         TAILQ_FOREACH(entry, ri->forbidden_path_suffixes, items) {
             if (strsuffix(file->localpath, entry->data)) {
-                xasprintf(&msg, "Packages should contain files or directories ending with `%s` on %s", entry->data, arch); 
+                xasprintf(&msg, "Packages should not contain files or directories ending with `%s` on %s: %s", entry->data, arch, file->localpath);
                 add_result(ri, RESULT_BAD, WAIVABLE_BY_ANYONE, HEADER_ADDEDFILES, msg, NULL, REMEDY_ADDEDFILES);
                 goto done;
             }
