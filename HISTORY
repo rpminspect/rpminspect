@@ -1,0 +1,27 @@
+rpminspect can be considered a descendant of Red Hat's internal
+rpmdiff tool.  The spirit of rpmdiff lives on in rpminspect.
+
+rpmdiff (the internal one at Red Hat) performed a number of tests on a
+set of packages and reported the results.  These test categories live
+on in spirit in the form of rpminspect's inspections.  rpminspect
+takes a different approach to test categorization and focuses on a
+generic implementation that can be customized per product, whereas
+rpmdiff was developed specifically for Red Hat's process.
+
+Those familiar with Red Hat's rpmdiff may notice some test categories
+are missing from rpminspect.  Here is a list of deliberate exclusions
+from the design of rpminspect:
+
+    Build Log
+        Look at build log output from rpmbuild(1) and look for common
+        compiler error or warning substrings and report those to
+        users.  This is not in rpminspect because it feels out of
+        scope for the tool.  Checking build logs and compiler output
+        should be the job of another dedicated tool, the build process
+        itself, or the project's test suite.  rpminspect is about
+        validating the built artifacts for policy compliance.
+
+    rpmlint
+        The rpmdiff tool would invoke rpmlint(1) on each package and
+        collect the results for reporting.  This is unnecessary as
+        rpmlint can be run by itself and results collected separately.
