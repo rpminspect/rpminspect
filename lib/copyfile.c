@@ -49,7 +49,7 @@ int copyfile(const char *src, const char *dest, bool force, bool verbose) {
     assert(dest != NULL);
 
     /* stat the source */
-    if (stat(src, &sb) == -1) {
+    if (lstat(src, &sb) == -1) {
         fprintf(stderr, "*** Unable to stat %s: %s\n", src, strerror(errno));
         fflush(stderr);
         return -1;
