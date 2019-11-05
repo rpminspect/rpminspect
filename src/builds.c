@@ -507,6 +507,8 @@ int gather_builds(struct rpminspect *ri, bool fo) {
 
     /* process after first so the temp directory gets the NV of that pkg */
     if (ri->after != NULL) {
+        whichbuild = AFTER_BUILD;
+
         if (is_local_build(ri->after) || is_local_rpm(ri->after)) {
             if (fetch_only) {
                 fprintf(stderr, "*** Unable to fetch local build trees or RPMs\n");
@@ -514,7 +516,6 @@ int gather_builds(struct rpminspect *ri, bool fo) {
                 return -1;
             }
 
-            whichbuild = AFTER_BUILD;
             set_worksubdir(ri, true, NULL);
 
             /* copy after tree */
@@ -527,7 +528,6 @@ int gather_builds(struct rpminspect *ri, bool fo) {
             /* clean up */
             prune_local(whichbuild);
         } else if ((build = get_koji_build(ri, ri->after)) != NULL) {
-            whichbuild = AFTER_BUILD;
             set_worksubdir(ri, false, build);
 
             if (download_artifacts(ri, build)) {
@@ -547,9 +547,10 @@ int gather_builds(struct rpminspect *ri, bool fo) {
         return 0;
     }
 
+    whichbuild = BEFORE_BUILD;
+
     /* before build specified, find it */
     if (is_local_build(ri->before) || is_local_rpm(ri->before)) {
-        whichbuild = BEFORE_BUILD;
         set_worksubdir(ri, true, NULL);
 
         /* copy before tree */
@@ -562,7 +563,6 @@ int gather_builds(struct rpminspect *ri, bool fo) {
         /* clean up */
         prune_local(whichbuild);
     } else if ((build = get_koji_build(ri, ri->before)) != NULL) {
-        whichbuild = BEFORE_BUILD;
         set_worksubdir(ri, false, build);
 
         if (download_artifacts(ri, build)) {
