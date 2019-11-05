@@ -991,12 +991,12 @@ static bool elf_regular_tests(struct rpminspect *ri, Elf *after_elf, Elf *before
 
     if (before_elf) {
         /* Check if we lost GNU_RELRO */
-        if (!check_relro(ri, after_elf, before_elf, localpath, arch)) {
+        if (!check_relro(ri, before_elf, after_elf, localpath, arch)) {
             result = false;
         }
 
         /* Check if the object lost fortified symbols or gained unfortified, fortifiable symbols */
-        if (!check_fortified(ri, after_elf, before_elf, localpath, arch)) {
+        if (!check_fortified(ri, before_elf, after_elf, localpath, arch)) {
             result = false;
         }
     }
@@ -1040,7 +1040,7 @@ static bool elf_driver(struct rpminspect *ri, rpmfile_entry_t *after)
         result = elf_archive_tests(ri, after_elf, after_elf_fd, before_elf, before_elf_fd, after->localpath, arch);
     } else if ((after_elf = get_elf(after->fullpath, &after_elf_fd)) != NULL) {
         if (after->peer_file != NULL) {
-            before_elf = get_elf_archive(after->peer_file->fullpath, &before_elf_fd);
+            before_elf = get_elf(after->peer_file->fullpath, &before_elf_fd);
         }
 
         result = elf_regular_tests(ri, after_elf, before_elf, after->localpath, arch);
