@@ -91,20 +91,7 @@ int add_peer(rpmpeer_t **peers, int whichbuild, bool fetch_only, const char *pkg
     newarch = headerGetString(*hdr, RPMTAG_ARCH);
     newsrc = headerIsSource(*hdr);
 
-    /* See if we already have this peer */
-    TAILQ_FOREACH(peer, *peers, items) {
-        existingname = NULL;
-        existingarch = NULL;
-        existingsrc = false;
-
-        if (existingname != NULL && !strcmp(pkg, existingname)) {
-            return 0;
-        }
-    }
-
-    /* Second, if we don't have this peer, try to add it */
-    existingname = NULL;
-
+    /* If we don't have this peer, try to add it */
     TAILQ_FOREACH(peer, *peers, items) {
         if (whichbuild == BEFORE_BUILD && peer->after_rpm != NULL) {
             existingname = headerGetString(peer->after_hdr, RPMTAG_NAME);
