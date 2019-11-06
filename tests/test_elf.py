@@ -17,10 +17,17 @@
 #
 
 import os
+import shutil
+import tempfile
 from baseclass import *
 
+datadir = os.environ['RPMINSPECT_TEST_DATA_PATH']
+
 # Source code used for the -D_FORTIFY_SOURCE tests
-fortify_src = open(os.environ['RPMINSPECT_TEST_DATA_PATH'] + '/fortify.c').read()
+fortify_src = open(datadir + '/fortify.c').read()
+
+# Source code used for the forbidden IPv6 function tests
+forbidden_ipv6_src = open(datadir + '/forbidden-ipv6.c').read()
 
 # Program built with noexecstack
 class TestWithoutExecStackRPM(TestRPMs):
@@ -32,7 +39,7 @@ class TestWithoutExecStackRPM(TestRPMs):
         self.waiver_auth = 'Anyone'
         self.result = 'OK'
 
-class TestWithoutEXecStackKoji(TestKoji):
+class TestWithoutExecStackKoji(TestKoji):
     def setUp(self):
         TestKoji.setUp(self)
         self.rpm.add_simple_compilation(compileFlags='-Wl,-z,noexecstack')
@@ -171,7 +178,44 @@ class TestLostFortifySourceCompareKoji(TestCompareKoji):
         self.waiver_auth = 'Security'
         self.result = 'VERIFY'
 
-# XXX: Program uses forbidden IPv6 function (VERIFY)
+# Program uses forbidden IPv6 function
+class TestForbiddenIPv6FunctionRPM(TestRPMs):
+    def setUp(self):
+        TestRPMs.setUp(self)
+        self.rpm.add_simple_compilation(sourceContent=forbidden_ipv6_src)
+        self.inspection = 'elf'
+        self.label = 'elf-object-properties'
+        self.waiver_auth = 'Anyone'
+        self.result = 'VERIFY'
+
+class TestForbiddenIPv6FunctionKoji(TestKoji):
+    def setUp(self):
+        TestKoji.setUp(self)
+        self.rpm.add_simple_compilation(sourceContent=forbidden_ipv6_src)
+        self.inspection = 'elf'
+        self.label = 'elf-object-properties'
+        self.waiver_auth = 'Anyone'
+        self.result = 'VERIFY'
+
+class TestForbiddenIPv6FunctionCompareRPMs(TestCompareRPMs):
+    def setUp(self):
+        TestCompareRPMs.setUp(self)
+        self.before_rpm.add_simple_compilation(sourceContent=forbidden_ipv6_src)
+        self.after_rpm.add_simple_compilation(sourceContent=forbidden_ipv6_src)
+        self.inspection = 'elf'
+        self.label = 'elf-object-properties'
+        self.waiver_auth = 'Anyone'
+        self.result = 'VERIFY'
+
+class TestForbiddenIPv6FunctionCompareKoji(TestCompareKoji):
+    def setUp(self):
+        TestCompareKoji.setUp(self)
+        self.before_rpm.add_simple_compilation(sourceContent=forbidden_ipv6_src)
+        self.after_rpm.add_simple_compilation(sourceContent=forbidden_ipv6_src)
+        self.inspection = 'elf'
+        self.label = 'elf-object-properties'
+        self.waiver_auth = 'Anyone'
+        self.result = 'VERIFY'
 
 # XXX: Program lost -fPIC in after (BAD, WAIVABLE_BY_SECURITY)
 
