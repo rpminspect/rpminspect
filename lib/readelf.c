@@ -159,7 +159,8 @@ Elf_Scn * get_elf_section(Elf *elf, int64_t section, const char *name, Elf_Scn *
 
         /* Check if this section matches the requested type and name */
         if (((section < 0) || (shdr.sh_type == (GElf_Word) section)) &&
-                ((name == NULL) || ((section_name != NULL) && !strcmp(name, section_name)))) {
+            ((name == NULL) || ((section_name != NULL) &&
+                                !strcmp(name, section_name)))) {
             if (out_shdr != NULL) {
                 memcpy(out_shdr, &shdr, sizeof(*out_shdr));
             }
