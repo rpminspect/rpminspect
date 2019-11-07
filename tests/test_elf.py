@@ -219,4 +219,79 @@ class TestForbiddenIPv6FunctionCompareKoji(TestCompareKoji):
 
 # XXX: Program lost -fPIC in after (BAD, WAIVABLE_BY_SECURITY)
 
-# XXX: Program has or gained TEXTREL relocations
+# Program has or gained TEXTREL relocations (32-bit arches only)
+class TestHasTEXTRELRPMs(TestRPMs):
+    def setUp(self):
+        TestRPMs.setUp(self)
+
+        installPath="usr/lib/libfoo.so"
+
+        # Can't use rpmfluff here because it always adds -fPIC
+        self.rpm.add_source(rpmfluff.SourceFile('simple.c', rpmfluff.simple_library_source))
+        self.rpm.section_build += 'gcc -m32 -shared -Wl,-z,noexecstack -o libsimple.so simple.c\n'
+        self.rpm.create_parent_dirs(installPath)
+        self.rpm.section_install += 'cp libsimple.so $RPM_BUILD_ROOT/%s\n' % installPath
+        sub = self.rpm.get_subpackage(None)
+        sub.section_files += '/%s\n' % installPath
+        self.rpm.add_payload_check(installPath, None)
+
+        self.inspection = 'elf'
+        self.label = 'elf-object-properties'
+        self.waiver_auth = 'Security'
+        self.result = 'BAD'
+
+class TestHasTEXTRELCompareRPMs(TestCompareRPMs):
+    def setUp(self):
+        TestCompareRPMs.setUp(self)
+
+        installPath="usr/lib/libfoo.so"
+
+        # Can't use rpmfluff here because it always adds -fPIC
+        self.before_rpm.add_source(rpmfluff.SourceFile('simple.c', rpmfluff.simple_library_source))
+        self.before_rpm.section_build += 'gcc -m32 -fPIC -shared -Wl,-z,noexecstack -o libsimple.so simple.c\n'
+        self.before_rpm.create_parent_dirs(installPath)
+        self.before_rpm.section_install += 'cp libsimple.so $RPM_BUILD_ROOT/%s\n' % installPath
+        sub = self.before_rpm.get_subpackage(None)
+        sub.section_files += '/%s\n' % installPath
+        self.before_rpm.add_payload_check(installPath, None)
+
+        self.after_rpm.add_source(rpmfluff.SourceFile('simple.c', rpmfluff.simple_library_source))
+        self.after_rpm.section_build += 'gcc -m32 -shared -Wl,-z,noexecstack -o libsimple.so simple.c\n'
+        self.after_rpm.create_parent_dirs(installPath)
+        self.after_rpm.section_install += 'cp libsimple.so $RPM_BUILD_ROOT/%s\n' % installPath
+        sub = self.after_rpm.get_subpackage(None)
+        sub.section_files += '/%s\n' % installPath
+        self.after_rpm.add_payload_check(installPath, None)
+
+        self.inspection = 'elf'
+        self.label = 'elf-object-properties'
+        self.waiver_auth = 'Security'
+        self.result = 'BAD'
+
+class TestHasTEXTRELCompareKoji(TestCompareKoji):
+    def setUp(self):
+        TestCompareKoji.setUp(self)
+
+        installPath="usr/lib/libfoo.so"
+
+        # Can't use rpmfluff here because it always adds -fPIC
+        self.before_rpm.add_source(rpmfluff.SourceFile('simple.c', rpmfluff.simple_library_source))
+        self.before_rpm.section_build += 'gcc -m32 -fPIC -shared -Wl,-z,noexecstack -o libsimple.so simple.c\n'
+        self.before_rpm.create_parent_dirs(installPath)
+        self.before_rpm.section_install += 'cp libsimple.so $RPM_BUILD_ROOT/%s\n' % installPath
+        sub = self.before_rpm.get_subpackage(None)
+        sub.section_files += '/%s\n' % installPath
+        self.before_rpm.add_payload_check(installPath, None)
+
+        self.after_rpm.add_source(rpmfluff.SourceFile('simple.c', rpmfluff.simple_library_source))
+        self.after_rpm.section_build += 'gcc -m32 -shared -Wl,-z,noexecstack -o libsimple.so simple.c\n'
+        self.after_rpm.create_parent_dirs(installPath)
+        self.after_rpm.section_install += 'cp libsimple.so $RPM_BUILD_ROOT/%s\n' % installPath
+        sub = self.after_rpm.get_subpackage(None)
+        sub.section_files += '/%s\n' % installPath
+        self.after_rpm.add_payload_check(installPath, None)
+
+        self.inspection = 'elf'
+        self.label = 'elf-object-properties'
+        self.waiver_auth = 'Security'
+        self.result = 'BAD'
