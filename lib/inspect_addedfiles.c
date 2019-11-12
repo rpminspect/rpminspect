@@ -32,7 +32,7 @@
  */
 static bool addedfiles_driver(struct rpminspect *ri, rpmfile_entry_t *file)
 {
-    char *name = NULL;
+    const char *name = NULL;
     char *subpath = NULL;
     char *msg = NULL;
     const char *arch = NULL;
@@ -50,7 +50,7 @@ static bool addedfiles_driver(struct rpminspect *ri, rpmfile_entry_t *file)
     }
 
     /* Skip debuginfo and debugsource packages */
-    name = headerGetAsString(file->rpm_header, RPMTAG_NAME);
+    name = headerGetString(file->rpm_header, RPMTAG_NAME);
 
     if (strsuffix(name, DEBUGINFO_SUFFIX) || strsuffix(name, DEBUGSOURCE_SUFFIX)) {
         return true;
