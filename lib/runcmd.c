@@ -83,6 +83,7 @@ int run_cmd(char **result, const char *cmd, ...) {
     if (cmdfp == NULL) {
         fprintf(stderr, "error running `%s`: %s\n", built, strerror(errno));
         fflush(stderr);
+        free(built);
         return false;
     }
 
@@ -107,6 +108,7 @@ int run_cmd(char **result, const char *cmd, ...) {
     if (ret == -1) {
         fprintf(stderr, "error closing `%s`: %s\n", built, strerror(errno));
         fflush(stderr);
+        free(built);
         return -1;
     }
 
@@ -124,5 +126,6 @@ int run_cmd(char **result, const char *cmd, ...) {
         *result = new;
     }
 
+    free(built);
     return ret;
 }
