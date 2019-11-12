@@ -217,7 +217,64 @@ class TestForbiddenIPv6FunctionCompareKoji(TestCompareKoji):
         self.waiver_auth = 'Anyone'
         self.result = 'VERIFY'
 
-# XXX: Program lost -fPIC in after (BAD, WAIVABLE_BY_SECURITY)
+# Program lost -fPIC in after (BAD, WAIVABLE_BY_SECURITY)
+class TestLostPICCompareRPMs(TestCompareRPMs):
+    def setUp(self):
+        TestCompareRPMs.setUp(self)
+
+        installPath = "usr/lib/libsimple.a"
+
+        self.before_rpm.add_source(rpmfluff.SourceFile('simple.c', rpmfluff.simple_library_source))
+        self.before_rpm.section_build += "gcc -m32 -fPIC -c simple.c\n"
+        self.before_rpm.section_build += "ar -crs libsimple.a simple.o\n"
+        self.before_rpm.create_parent_dirs(installPath)
+        self.before_rpm.section_install += "cp libsimple.a $RPM_BUILD_ROOT/%s\n" % installPath
+        sub = self.before_rpm.get_subpackage(None)
+        sub.section_files += "/%s\n" % installPath
+        self.before_rpm.add_payload_check(installPath, None)
+
+        self.after_rpm.add_source(rpmfluff.SourceFile('simple.c', rpmfluff.simple_library_source))
+        self.after_rpm.section_build += "gcc -m32 -c simple.c\n"
+        self.after_rpm.section_build += "ar -crs libsimple.a simple.o\n"
+        self.after_rpm.create_parent_dirs(installPath)
+        self.after_rpm.section_install += "cp libsimple.a $RPM_BUILD_ROOT/%s\n" % installPath
+        sub = self.after_rpm.get_subpackage(None)
+        sub.section_files += "/%s\n" % installPath
+        self.after_rpm.add_payload_check(installPath, None)
+
+        self.inspection = 'elf'
+        self.label = 'elf-object-properties'
+        self.waiver_auth = 'Security'
+        self.result = 'BAD'
+
+class TestLostPICCompareKoji(TestCompareKoji):
+    def setUp(self):
+        TestCompareKoji.setUp(self)
+
+        installPath = "usr/lib/libsimple.a"
+
+        self.before_rpm.add_source(rpmfluff.SourceFile('simple.c', rpmfluff.simple_library_source))
+        self.before_rpm.section_build += "gcc -m32 -fPIC -c simple.c\n"
+        self.before_rpm.section_build += "ar -crs libsimple.a simple.o\n"
+        self.before_rpm.create_parent_dirs(installPath)
+        self.before_rpm.section_install += "cp libsimple.a $RPM_BUILD_ROOT/%s\n" % installPath
+        sub = self.before_rpm.get_subpackage(None)
+        sub.section_files += "/%s\n" % installPath
+        self.before_rpm.add_payload_check(installPath, None)
+
+        self.after_rpm.add_source(rpmfluff.SourceFile('simple.c', rpmfluff.simple_library_source))
+        self.after_rpm.section_build += "gcc -m32 -c simple.c\n"
+        self.after_rpm.section_build += "ar -crs libsimple.a simple.o\n"
+        self.after_rpm.create_parent_dirs(installPath)
+        self.after_rpm.section_install += "cp libsimple.a $RPM_BUILD_ROOT/%s\n" % installPath
+        sub = self.after_rpm.get_subpackage(None)
+        sub.section_files += "/%s\n" % installPath
+        self.after_rpm.add_payload_check(installPath, None)
+
+        self.inspection = 'elf'
+        self.label = 'elf-object-properties'
+        self.waiver_auth = 'Security'
+        self.result = 'BAD'
 
 # Program has or gained TEXTREL relocations (32-bit arches only)
 class TestHasTEXTRELRPMs(TestRPMs):
