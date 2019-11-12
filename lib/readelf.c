@@ -421,7 +421,7 @@ string_list_t * get_elf_exported_functions(Elf *elf, bool (*filter)(const char *
 /* Iterate over an archive, performing action on each member until the end
  * of the archive is reached or action returns false.
  */
-void elf_archive_iterate(int fd, Elf *archive, elf_ar_action action, void *user_data)
+void elf_archive_iterate(int fd, Elf *archive, elf_ar_action action, string_list_t **user_data)
 {
     Elf_Cmd cmd = ELF_C_READ_MMAP_PRIVATE;
     Elf *elf;
