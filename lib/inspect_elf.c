@@ -767,9 +767,9 @@ cleanup:
 }
 
 /* Helper for elf_archive_tests; add the archive member to the list if compiled *without* -fPIC */
-static bool find_no_pic(Elf *elf, void *user_data)
+static bool find_no_pic(Elf *elf, string_list_t **user_data)
 {
-    string_list_t *no_pic_list = (string_list_t *) user_data;
+    string_list_t *no_pic_list = *user_data;
     string_entry_t *entry;
     Elf_Arhdr *arhdr;
 
@@ -796,9 +796,9 @@ static bool find_no_pic(Elf *elf, void *user_data)
 }
 
 /* Helper for elf_archive_tests, add the archive member to the list if compiled *with* -fPIC */
-static bool find_pic(Elf *elf, void *user_data)
+static bool find_pic(Elf *elf, string_list_t **user_data)
 {
-    string_list_t *pic_list = (string_list_t *) user_data;
+    string_list_t *pic_list = *user_data;
     string_entry_t *entry;
     Elf_Arhdr *arhdr;
 
@@ -825,9 +825,9 @@ static bool find_pic(Elf *elf, void *user_data)
 }
 
 /* Helper for elf_archive_tests, get all archive member names */
-static bool find_all(Elf *elf, void *user_data)
+static bool find_all(Elf *elf, string_list_t **user_data)
 {
-    string_list_t *all_list = (string_list_t *) user_data;
+    string_list_t *all_list = *user_data;
     string_entry_t *entry;
     Elf_Arhdr *arhdr;
 
@@ -882,7 +882,7 @@ static bool elf_archive_tests(struct rpminspect *ri, Elf *after_elf, int after_e
     assert(after_no_pic != NULL);
 
     TAILQ_INIT(after_no_pic);
-    elf_archive_iterate(after_elf_fd, after_elf, find_no_pic, after_no_pic);
+    elf_archive_iterate(after_elf_fd, after_elf, find_no_pic, &after_no_pic);
 
     /* If everything in after looks ok, we're done */
     if (TAILQ_EMPTY(after_no_pic)) {
@@ -904,12 +904,12 @@ static bool elf_archive_tests(struct rpminspect *ri, Elf *after_elf, int after_e
     assert(before_pic != NULL);
 
     TAILQ_INIT(before_pic);
-    elf_archive_iterate(before_elf_fd, before_elf, find_pic, before_pic);
+    elf_archive_iterate(before_elf_fd, before_elf, find_pic, &before_pic);
 
     after_lost_pic = list_intersection(after_no_pic, before_pic);
     assert(after_lost_pic != NULL);
 
-    if (!TAILQ_EMPTY(after_lost_pic)) {
+    if (TAILQ_FIRST(after_lost_pic) == NULL) {
         result = false;
 
         output_result = fprintf(output_stream, "The following objects lost -fPIC:\n");
@@ -925,12 +925,12 @@ static bool elf_archive_tests(struct rpminspect *ri, Elf *after_elf, int after_e
     assert(before_all != NULL);
 
     TAILQ_INIT(before_all);
-    elf_archive_iterate(before_elf_fd, before_elf, find_all, before_all);
+    elf_archive_iterate(before_elf_fd, before_elf, find_all, &before_all);
 
     after_new = list_difference(after_no_pic, before_all);
     assert(after_new != NULL);
 
-    if (!TAILQ_EMPTY(after_new)) {
+    if (TAILQ_FIRST(after_new) == NULL) {
         result = false;
 
         output_result = fprintf(output_stream, "The following new objects were built without -fPIC:\n");

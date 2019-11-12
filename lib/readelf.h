@@ -44,7 +44,7 @@ bool get_dynamic_tags(Elf *, const Elf64_Sxword, GElf_Dyn **, size_t *, GElf_Shd
 string_list_t * get_elf_imported_functions(Elf *, bool (*)(const char *));
 string_list_t * get_elf_exported_functions(Elf *, bool (*)(const char *));
 
-typedef bool (*elf_ar_action)(Elf *, void *);
-void elf_archive_iterate(int, Elf *, elf_ar_action, void *);
+typedef bool (*elf_ar_action)(Elf *, string_list_t **);
+void elf_archive_iterate(int, Elf *, elf_ar_action, string_list_t **);
 
 #endif
