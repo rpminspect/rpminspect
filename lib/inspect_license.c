@@ -60,14 +60,14 @@ static struct json_object *read_licensedb(const char *licensedb) {
 static int check_peer_license(struct rpminspect *ri, const Header hdr) {
     int ret = 0;
     bool valid = false;
-    char *nevra = NULL;
-    char *license = NULL;
+    const char *nevra = NULL;
+    const char *license = NULL;
     char *msg = NULL;
 
     assert(ri != NULL);
 
-    nevra = headerGetAsString(hdr, RPMTAG_NEVRA);
-    license = headerGetAsString(hdr, RPMTAG_LICENSE);
+    nevra = headerGetString(hdr, RPMTAG_NEVRA);
+    license = headerGetString(hdr, RPMTAG_LICENSE);
 
     if (license == NULL) {
         xasprintf(&msg, "Empty License Tag in %s", nevra);

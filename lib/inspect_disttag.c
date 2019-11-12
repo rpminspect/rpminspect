@@ -37,7 +37,7 @@ static bool disttag_driver(struct rpminspect *ri, rpmfile_entry_t *file) {
     }
 
     /* Spec files are all named in a standard way */
-    xasprintf(&specfile, "%s.spec", headerGetAsString(file->rpm_header, RPMTAG_NAME));
+    xasprintf(&specfile, "%s.spec", headerGetString(file->rpm_header, RPMTAG_NAME));
 
     /* We only want to look at the spec files */
     if (strcmp(file->localpath, specfile)) {

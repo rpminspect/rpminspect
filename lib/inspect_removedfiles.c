@@ -54,7 +54,7 @@ static bool removedfiles_driver(struct rpminspect *ri, rpmfile_entry_t *file)
 {
     bool result = false;
     char *type = NULL;
-    char *arch = NULL;
+    const char *arch = NULL;
     char *soname = NULL;
     char *msg = NULL;
     string_entry_t *entry = NULL;
@@ -83,7 +83,7 @@ static bool removedfiles_driver(struct rpminspect *ri, rpmfile_entry_t *file)
 
     /* Collect the RPM architecture and file MIME type */
     type = get_mime_type(file->fullpath);
-    arch = headerGetAsString(file->rpm_header, RPMTAG_ARCH);
+    arch = headerGetString(file->rpm_header, RPMTAG_ARCH);
 
     /* Set the waiver type if this is a file of security concern */
     if (ri->security_path_prefix) {
@@ -131,7 +131,7 @@ bool inspect_removedfiles(struct rpminspect *ri)
     bool result = true;
     rpmpeer_entry_t *peer = NULL;
     rpmfile_entry_t *file = NULL;
-    char *name = NULL;
+    const char *name = NULL;
 
     assert(ri != NULL);
 
@@ -148,7 +148,7 @@ bool inspect_removedfiles(struct rpminspect *ri)
         }
 
         /* Skip debuginfo and debugsource packages */
-        name = headerGetAsString(peer->before_hdr, RPMTAG_NAME);
+        name = headerGetString(peer->before_hdr, RPMTAG_NAME);
 
         if (strsuffix(name, DEBUGINFO_SUFFIX) || strsuffix(name, DEBUGSOURCE_SUFFIX)) {
             continue;

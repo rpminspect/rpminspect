@@ -29,7 +29,7 @@ static bool seen = false;
 static bool specname_driver(struct rpminspect *ri, rpmfile_entry_t *file) {
     char *specfile = NULL;
     char *msg = NULL;
-    char *pkgname = NULL;
+    const char *pkgname = NULL;
 
     /* Skip binary packages */
     if (!headerIsSource(file->rpm_header)) {
@@ -37,7 +37,7 @@ static bool specname_driver(struct rpminspect *ri, rpmfile_entry_t *file) {
     }
 
     /* Spec files are all named in a standard way */
-    pkgname = headerGetAsString(file->rpm_header, RPMTAG_NAME);
+    pkgname = headerGetString(file->rpm_header, RPMTAG_NAME);
     xasprintf(&specfile, "%s%s", pkgname, SPEC_FILENAME_EXTENSION);
 
     /* We only want to look at the spec files */

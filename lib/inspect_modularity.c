@@ -27,14 +27,14 @@ static bool modularity_driver(struct rpminspect *ri, rpmfile_entry_t *file) {
     bool result = true;
     rpmTagType tt;
     rpmTagVal tv;
-    char *modularitylabel = NULL;
+    const char *modularitylabel = NULL;
     char *msg = NULL;
 
     assert(ri != NULL);
     assert(file != NULL);
 
     /* Build the message we'll use for errors */
-    xasprintf(&msg, "Package \"%s\" is part of a module but lacks the '%%{modularitylabel}' header tag.", headerGetAsString(file->rpm_header, RPMTAG_NAME));
+    xasprintf(&msg, "Package \"%s\" is part of a module but lacks the '%%{modularitylabel}' header tag.", headerGetString(file->rpm_header, RPMTAG_NAME));
 
     /* Find how to find the header */
     tv = rpmTagGetValue("modularitylabel");
@@ -52,7 +52,7 @@ static bool modularity_driver(struct rpminspect *ri, rpmfile_entry_t *file) {
     }
 
     /* Get the tag from the header */
-    modularitylabel = headerGetAsString(file->rpm_header, tv);
+    modularitylabel = headerGetString(file->rpm_header, tv);
 
     if (modularitylabel == NULL) {
         add_result(ri, RESULT_BAD, NOT_WAIVABLE, HEADER_MODULARITY, msg, NULL, REMEDY_MODULARITY);
@@ -61,7 +61,6 @@ static bool modularity_driver(struct rpminspect *ri, rpmfile_entry_t *file) {
     }
 
     free(msg);
-    free(modularitylabel);
     return result;
 }
 
