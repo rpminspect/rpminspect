@@ -523,6 +523,7 @@ int main(int argc, char **argv) {
                 fprintf(stderr, "*** Unsupported architecture specified: `%s`\n", token);
                 fprintf(stderr, "*** See `%s --help` for more information.\n", progname);
                 fflush(stderr);
+                rpmFreeRpmrc();
                 return RI_PROGRAM_ERROR;
             }
 
@@ -546,6 +547,7 @@ int main(int argc, char **argv) {
         fprintf(stderr, "*** Unable to create directory %s: %s\n", ri.workdir, strerror(errno));
         fflush(stderr);
         free_rpminspect(&ri);
+        rpmFreeRpmrc();
         return RI_PROGRAM_ERROR;
     }
 
@@ -553,6 +555,7 @@ int main(int argc, char **argv) {
     if (gather_builds(&ri, fetch_only)) {
         fprintf(stderr, "*** Failed to gather specified builds.\n");
         fflush(stderr);
+        rpmFreeRpmrc();
         exit(RI_PROGRAM_ERROR);
     }
 
@@ -598,6 +601,7 @@ int main(int argc, char **argv) {
     }
 
     free_rpminspect(&ri);
+    rpmFreeRpmrc();
 
     return ret;
 }
