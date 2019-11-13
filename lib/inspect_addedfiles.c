@@ -34,6 +34,7 @@ static bool addedfiles_driver(struct rpminspect *ri, rpmfile_entry_t *file)
 {
     const char *name = NULL;
     char *subpath = NULL;
+    char *localpath = NULL;
     char *msg = NULL;
     const char *arch = NULL;
     string_entry_t *entry = NULL;
@@ -77,12 +78,22 @@ static bool addedfiles_driver(struct rpminspect *ri, rpmfile_entry_t *file)
     if (ri->forbidden_path_prefixes) {
         TAILQ_FOREACH(entry, ri->forbidden_path_prefixes, items) {
             subpath = entry->data;
+            localpath = file->localpath;
 
-            while (*subpath != '/') {
-                subpath++;
+            /* ensure the paths do not start with '/' */
+            if (*subpath == '/') {
+                while (*subpath == '/') {
+                    subpath++;
+                }
             }
 
-            if (strprefix(file->localpath, subpath)) {
+            if (*localpath == '/') {
+                while (*localpath == '/') {
+                    localpath++;
+                }
+            }
+
+            if (strprefix(localpath, subpath)) {
                 xasprintf(&msg, "Packages should not contain not files or directories starting with `%s` on %s: %s", entry->data, arch, file->localpath);
                 add_result(ri, RESULT_BAD, WAIVABLE_BY_ANYONE, HEADER_ADDEDFILES, msg, NULL, REMEDY_ADDEDFILES);
                 goto done;
