@@ -63,9 +63,7 @@ static char *get_header_value(const rpmfile_entry_t *file, rpmTag tag)
         }
     }
 
-    rpmtdFreeData(td);
     rpmtdFree(td);
-
     return ret;
 }
 
