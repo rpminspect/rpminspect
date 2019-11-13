@@ -33,13 +33,14 @@ static bool valid_peers(struct rpminspect *ri, const Header before_hdr, const He
     const char *after_buildhost = NULL;
     const char *after_summary = NULL;
     const char *after_description = NULL;
-    const char *after_nevra = NULL;
+    const char *after_name = NULL;
+    char *after_nevra = NULL;
     char *msg = NULL;
     char *dump = NULL;
 
     assert(ri != NULL);
 
-    after_nevra = headerGetString(after_hdr, RPMTAG_NEVRA);
+    after_nevra = get_nevra(after_hdr);
 
     after_vendor = headerGetString(after_hdr, RPMTAG_VENDOR);
     if (after_vendor && strcmp(after_vendor, ri->vendor)) {
@@ -96,19 +97,21 @@ static bool valid_peers(struct rpminspect *ri, const Header before_hdr, const He
         free(dump);
     }
 
+    free(after_nevra);
+
     if (before_hdr != NULL) {
         const char *before_vendor = headerGetString(before_hdr, RPMTAG_VENDOR);
         const char *before_summary = headerGetString(before_hdr, RPMTAG_SUMMARY);
         const char *before_description = headerGetString(before_hdr, RPMTAG_DESCRIPTION);
-        after_nevra = headerGetString(after_hdr, RPMTAG_NAME);
+        after_name = headerGetString(after_hdr, RPMTAG_NAME);
         msg = NULL;
 
         if (before_vendor == NULL && after_vendor) {
-            xasprintf(&msg, "Gained Package Vendor \"%s\" in %s", after_vendor, after_nevra);
+            xasprintf(&msg, "Gained Package Vendor \"%s\" in %s", after_vendor, after_name);
         } else if (before_vendor && after_vendor == NULL) {
-            xasprintf(&msg, "Lost Package Vendor \"%s\" in %s", before_vendor, after_nevra);
+            xasprintf(&msg, "Lost Package Vendor \"%s\" in %s", before_vendor, after_name);
         } else if (before_vendor && after_vendor && strcmp(before_vendor, after_vendor)) {
-            xasprintf(&msg, "Package Vendor changed from \"%s\" to \"%s\" in %s", before_vendor, after_vendor, after_nevra);
+            xasprintf(&msg, "Package Vendor changed from \"%s\" to \"%s\" in %s", before_vendor, after_vendor, after_name);
         }
 
         if (msg) {
@@ -119,7 +122,7 @@ static bool valid_peers(struct rpminspect *ri, const Header before_hdr, const He
         }
 
         if (strcmp(before_summary, after_summary)) {
-            xasprintf(&msg, "Package Summary change from \"%s\" to \"%s\" in %s", before_summary, after_summary, after_nevra);
+            xasprintf(&msg, "Package Summary change from \"%s\" to \"%s\" in %s", before_summary, after_summary, after_name);
 
             add_result(ri, RESULT_VERIFY, WAIVABLE_BY_ANYONE, HEADER_METADATA, msg, NULL, NULL);
             ret = false;
@@ -128,7 +131,7 @@ static bool valid_peers(struct rpminspect *ri, const Header before_hdr, const He
         }
 
         if (strcmp(before_description, after_description)) {
-            xasprintf(&msg, "Package Description changed in %s", after_nevra);
+            xasprintf(&msg, "Package Description changed in %s", after_name);
             xasprintf(&dump, "from:\n\n%s\n\nto:\n\n%s", before_description, after_description);
 
             add_result(ri, RESULT_VERIFY, WAIVABLE_BY_ANYONE, HEADER_METADATA, msg, dump, NULL);
