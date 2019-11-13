@@ -18,7 +18,7 @@
 
 #include <stdio.h>
 #include <assert.h>
-#include <libgen.h>
+#include <string.h>
 #include <sys/queue.h>
 
 #include "rpminspect.h"
