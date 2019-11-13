@@ -553,7 +553,7 @@ int init_rpminspect(struct rpminspect *ri, const char *cfgfile) {
     nkeys = iniparser_getsecnkeys(cfg, tmp);
 
     if (nkeys > 0) {
-        keys = calloc(nkeys, sizeof(*keys));
+        keys = calloc(nkeys, sizeof(char *));
         assert(keys != NULL);
 
         if (iniparser_getseckeys(cfg, tmp, keys) == NULL) {

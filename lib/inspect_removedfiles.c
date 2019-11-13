@@ -154,6 +154,11 @@ bool inspect_removedfiles(struct rpminspect *ri)
             continue;
         }
 
+        /* If there are no peer files */
+        if (peer->before_files == NULL) {
+            continue;
+        }
+
         /* Iterate over all files in the before package */
         TAILQ_FOREACH(file, peer->before_files, items) {
             if (!removedfiles_driver(ri, file)) {

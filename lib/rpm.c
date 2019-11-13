@@ -77,3 +77,34 @@ int get_rpm_header(const char *pkg, Header *hdr) {
 
     return -1;
 }
+
+/*
+ * Get the RPMTAG_NEVRA extension tag.
+ * NOTE: Caller must free this result.
+ */
+char *get_nevra(Header hdr)
+{
+    char *nevra = NULL;
+    rpmtd td = NULL;
+    rpm_count_t td_size;
+
+    td = rpmtdNew();
+    assert(td != NULL);
+
+    /* NOTE: this function returns 1 for success, not RPMRC_OK */
+    if (headerGet(hdr, RPMTAG_NEVRA, td, HEADERGET_MINMEM | HEADERGET_EXT) != 1) {
+        goto nevra_cleanup;
+    }
+
+    td_size = rpmtdCount(td);
+
+    if (td_size != 1) {
+        goto nevra_cleanup;
+    }
+
+    nevra = strdup(rpmtdGetString(td));
+
+nevra_cleanup:
+    rpmtdFree(td);
+    return nevra;
+}
