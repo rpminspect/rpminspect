@@ -252,21 +252,17 @@ rpmfile_t * extract_rpm(const char *pkg, Header hdr)
     }
 
 cleanup:
-    if (td != NULL) {
-        rpmtdFree(td);
-    }
-
     if (path_table_initialized) {
         hdestroy_r(&path_table);
     }
-
-    free(rpm_indices);
 
     if (archive != NULL) {
         archive_read_free(archive);
     }
 
+    free(rpm_indices);
     free(output_dir);
+    rpmtdFree(td);
 
     return file_list;
 }

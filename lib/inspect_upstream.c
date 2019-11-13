@@ -58,9 +58,7 @@ static void init_source(const rpmfile_entry_t *file)
         TAILQ_INSERT_TAIL(source, entry, items);
     }
 
-    rpmtdFreeData(td);
     rpmtdFree(td);
-
     return;
 }
 
