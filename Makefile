@@ -14,7 +14,7 @@ srpm:
 	$(topdir)/utils/srpm.sh
 
 release:
-	$(topdir)/release.sh -A
+	$(topdir)/utils/release.sh -A
 
 clean:
 	-rm -rf $(MESON_BUILD_DIR)
