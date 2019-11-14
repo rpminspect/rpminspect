@@ -199,18 +199,20 @@ bool is_valid_license(const char *licensedb, const char *tag) {
             free(lic);
             lic = NULL;
             continue;
-        } else {
-            /* Abbreviated licenses may contain spaces, so rebuild it */
-            if (lic == NULL) {
-                lic = strdup(token);
-                tail = lic + strlen(lic);
-            } else {
-                tail = stpcpy(tail, " ");
-                tail = stpcpy(tail, token);
+        }
 
-                /* We've added a space, so back up the seen counter */
-                seen--;
-            }
+        /* Abbreviated licenses may contain spaces, so rebuild it */
+        if (lic == NULL) {
+            lic = strdup(token);
+            tail = lic + strlen(lic);
+        } else {
+            lic = realloc(lic, strlen(lic) + strlen(token) + 2);
+            assert(lic != NULL);
+            tail = stpcpy(tail, " ");
+            tail = stpcpy(tail, token);
+
+            /* We've added a space, so back up the seen counter */
+            seen--;
         }
 
         seen++;
