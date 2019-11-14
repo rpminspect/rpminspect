@@ -219,11 +219,13 @@ if [ "${OPT_GITHUB}" = "y" ]; then
 
     # Get the ID of the asset
     ASSET_ID="$(grep -m 1 "id.:" ${RELEASE_INFO} | grep -w id | tr : = | tr -cd '[[:alnum:]]=' | cut -d '=' -f 2)"
-    rm -f ${RELEASE_INFO}
     if [ -z "${ASSET_ID}" ]; then
         echo "*** Unable to get the asset ID" >&2
+        cat ${RELEASE_INFO}
+        rm -f ${RELEASE_INFO}
         exit 1
     fi
+    rm -f ${RELEASE_INFO}
 
     # Upload the assets
     cd build/meson-dist
