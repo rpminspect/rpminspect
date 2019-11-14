@@ -23,9 +23,18 @@
 PATH=/usr/bin
 CWD="$(pwd)"
 
+PREV_TAG="$(git tag --sort=taggerdate | tail -n 2 | head -n 1)"
 LATEST_TAG="$(git tag --sort=taggerdate | tail -n 1)"
 
-git log --format=%s ${LATEST_TAG}.. | tac | while read line ; do
+# Start the changelog block
+eval $(meson introspect --projectinfo build | jq -r "to_entries|map(\"\(.key)=\(.value|tostring)\")|.[]")
+echo "* $(date +"%a %b %d %Y") $(git config user.name) <$(git config user.email)> - ${version}-1"
+
+# Generate all the changelog entries
+git log --format=%s ${PREV_TAG}..${LATEST_TAG} | tac | while read line ; do
+    echo "${line}" | grep -q -E "^New release " >/dev/null 2>&1
+    [ $? -eq 0 ] && continue
+
     first=1
     echo "${line}" | sed -e 's|%|%%|g' | fold -s -w 70 | \
     while read subline ; do
