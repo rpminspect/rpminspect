@@ -198,6 +198,7 @@ static bool validate_desktop_contents(struct rpminspect *ri, const rpmfile_entry
                 if (lstat(file_to_find, &sb) == -1) {
                     fprintf(stderr, "error stat'ing %s: %s\n", file_to_find, strerror(errno));
                     fflush(stderr);
+                    free(buf);
                     return false;
                 }
 
