@@ -1,0 +1,4 @@
+changelog
+rpminspect.spec
+*.src.rpm
+*.tar.*
