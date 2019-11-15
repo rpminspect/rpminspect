@@ -262,7 +262,7 @@ struct koji_build *get_koji_build(struct rpminspect *ri, const char *buildspec) 
     xmlrpc_abort_on_fault(&env);
 
     for (i = 0; i < size; i++) {
-        xmlrpc_struct_get_key_and_value(&env, result, i, &k, &value);
+        xmlrpc_struct_read_member(&env, result, i, &k, &value);
         xmlrpc_abort_on_fault(&env);
 
         /* Get the key as a string */
@@ -396,7 +396,7 @@ struct koji_build *get_koji_build(struct rpminspect *ri, const char *buildspec) 
             j = 0;
 
             while (j < subsize) {
-                xmlrpc_struct_get_key_and_value(&env, value, j, &subk, &subv);
+                xmlrpc_struct_read_member(&env, value, j, &subk, &subv);
                 xmlrpc_abort_on_fault(&env);
 
                 /* Get the key as a string */
@@ -476,7 +476,7 @@ struct koji_build *get_koji_build(struct rpminspect *ri, const char *buildspec) 
             assert(buildentry != NULL);
 
             for (j = 0; j < s_sz; j++) {
-                xmlrpc_struct_get_key_and_value(&env, element, j, &k, &value);
+                xmlrpc_struct_read_member(&env, element, j, &k, &value);
                 xmlrpc_abort_on_fault(&env);
 
                 /* Get the key as a string */
@@ -531,7 +531,7 @@ struct koji_build *get_koji_build(struct rpminspect *ri, const char *buildspec) 
             assert(rpm != NULL);
 
             for (j = 0; j < s_sz; j++) {
-                xmlrpc_struct_get_key_and_value(&env, element, j, &k, &value);
+                xmlrpc_struct_read_member(&env, element, j, &k, &value);
                 xmlrpc_abort_on_fault(&env);
 
                 /* Get the key as a string */
@@ -563,7 +563,17 @@ struct koji_build *get_koji_build(struct rpminspect *ri, const char *buildspec) 
                 } else if (!strcmp(key, "epoch")) {
                     xmlrpc_decompose_value(&env, value, "i", &rpm->epoch);
                 } else if (!strcmp(key, "size")) {
-                    xmlrpc_decompose_value(&env, value, "i", &rpm->size);
+                    if (xmlrpc_value_type(value) == XMLRPC_TYPE_INT) {
+                        xmlrpc_decompose_value(&env, value, "i", &rpm->size);
+                    } else if (xmlrpc_value_type(value) == XMLRPC_TYPE_I8) {
+                        xmlrpc_decompose_value(&env, value, "I", &rpm->size);
+                    } else {
+                        /*
+                         * XXX: have no idea what we got back here, set it
+                         * negative for future debugging
+                         */
+                        rpm->size = -47;
+                    }
                 }
 
             }
