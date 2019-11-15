@@ -64,6 +64,7 @@ bool inspect_emptyrpm(struct rpminspect *ri) {
             xasprintf(&msg, "Existing subpackage %s is now missing", headerGetString(peer->before_hdr, RPMTAG_NAME));
             add_result(ri, RESULT_VERIFY, WAIVABLE_BY_ANYONE, HEADER_EMPTYRPM, msg, NULL, REMEDY_EMPTYRPM);
             free(msg);
+            good = false;
             continue;
         }
 
