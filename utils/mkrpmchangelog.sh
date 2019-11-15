@@ -23,26 +23,31 @@
 PATH=/usr/bin
 CWD="$(pwd)"
 
-PREV_TAG="$(git tag --sort=taggerdate | tail -n 2 | head -n 1)"
-LATEST_TAG="$(git tag --sort=taggerdate | tail -n 1)"
-
 # Start the changelog block
-eval $(meson introspect --projectinfo build | jq -r "to_entries|map(\"\(.key)=\(.value|tostring)\")|.[]")
+version="$(grep version meson.build | head -n 1 | cut -d "'" -f 2)"
 echo "* $(date +"%a %b %d %Y") $(git config user.name) <$(git config user.email)> - ${version}-1"
 
-# Generate all the changelog entries
-git log --format=%s ${PREV_TAG}..${LATEST_TAG} | tac | while read line ; do
-    echo "${line}" | grep -q -E "^New release " >/dev/null 2>&1
-    [ $? -eq 0 ] && continue
+if [ "$1" = "--copr" ]; then
+    # Just generate a simple changelog for copr builds
+    echo "- https://github.com/rpminspect/rpminspect/commits/v${version}"
+else
+    # Generate all the changelog entries
+    PREV_TAG="$(git tag --sort=taggerdate | tail -n 2 | head -n 1)"
+    LATEST_TAG="$(git tag --sort=taggerdate | tail -n 1)"
 
-    first=1
-    echo "${line}" | sed -e 's|%|%%|g' | fold -s -w 70 | \
-    while read subline ; do
-        if [ ${first} -eq 1 ]; then
-            echo "- ${subline}"
-            first=0
-        else
-            echo "  ${subline}"
-        fi
+    git log --format=%s ${PREV_TAG}..${LATEST_TAG} | tac | while read line ; do
+        echo "${line}" | grep -q -E "^New release " >/dev/null 2>&1
+        [ $? -eq 0 ] && continue
+
+        first=1
+        echo "${line}" | sed -e 's|%|%%|g' | fold -s -w 70 | \
+        while read subline ; do
+            if [ ${first} -eq 1 ]; then
+                echo "- ${subline}"
+                first=0
+            else
+                echo "  ${subline}"
+            fi
+        done
     done
-done
+fi

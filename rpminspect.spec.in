@@ -6,6 +6,7 @@ Group:          Development/Tools
 License:        GPLv3+
 URL:            https://github.com/rpminspect/rpminspect
 Source0:        https://github.com/rpminspect/rpminspect/releases/download/v%%VERSION%%/%%TARBALL%%
+Source1:        changelog
 
 BuildRequires:  meson
 BuildRequires:  gcc
