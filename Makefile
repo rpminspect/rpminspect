@@ -17,7 +17,7 @@ release:
 	$(topdir)/utils/release.sh -A
 
 koji: check srpm
-	$(topdir)/utils/submit-koji-builds.sh $$(ls -1 $(topdir)/*.tar.*)
+	$(topdir)/utils/submit-koji-builds.sh $$(ls -1 $(topdir)/*.tar.*) $$(basename $(topdir))
 
 clean:
 	-rm -rf $(MESON_BUILD_DIR)

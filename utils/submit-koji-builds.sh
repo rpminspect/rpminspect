@@ -1,15 +1,41 @@
 #!/bin/sh
 #
-# Build new release in Koji for Fedora and EPEL
+# Build new releases in Koji
 #
+# Copyright (C) 2019 David Cantrell <david.l.cantrell@gmail.com>
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <https://www.gnu.org/licenses/>.
+#
+
+# Arguments:
+#     $1    Path to the release tarball to build
+#     $2    The name of the project in dist-git
 
 PATH=/usr/bin
 CWD="$(pwd)"
 WRKDIR="$(mktemp -d)"
 
+# The list of tools that may or may not be installed locally but
+# that the script needs.  Extend this list if needed.
+TOOLS="klist fedpkg"
+
+# What dist-git interaction tool we are using, e.g. Fedora is 'fedpkg'
+VENDORPKG="fedpkg"
+
 # Allow the calling environment to override the list of dist-git branches
 if [ -z "${BRANCHES}" ]; then
-    BRANCHES="master f31 epel7"
+    BRANCHES="master"
 fi
 
 cleanup() {
@@ -19,7 +45,7 @@ cleanup() {
 trap cleanup EXIT
 
 # Verify specific tools are available
-for tool in klist fedpkg ; do
+for tool in ${TOOLS} ; do
     ${tool} >/dev/null 2>&1
     if [ $? -eq 127 ]; then
         echo "*** Missing '${tool}', perhaps 'yum install -y /usr/bin/${tool}'" >&2
@@ -46,6 +72,17 @@ if [ $? -ne 0 ]; then
     exit 1
 fi
 
+shift
+
+# Need project name
+if [ $# -eq 0 ]; then
+    echo "*** Missing project name" >&2
+    exit 1
+fi
+
+PROJECT="$1"
+shift
+
 # Need a krb5 ticket
 klist >/dev/null 2>&1
 if [ $? -eq 1 ]; then
@@ -63,17 +100,17 @@ cd ${CWD}
 ${CWD}/utils/mkrpmchangelog.sh > ${WRKDIR}/newchangelog
 
 cd ${WRKDIR}
-fedpkg co rpminspect
-cd rpminspect
+${VENDORPKG} co ${PROJECT}
+cd ${PROJECT}
 
 for branch in ${BRANCHES} ; do
     git clean -d -x -f
 
     # make sure we are on the right branch
-    fedpkg switch-branch ${branch}
+    ${VENDORPKG} switch-branch ${branch}
 
     # add the new source archive
-    fedpkg new-sources ${TARBALL}
+    ${VENDORPKG} new-sources ${TARBALL}
 
     # update the rolling %changelog in dist-git
     if [ -f changelog ]; then
@@ -86,17 +123,14 @@ for branch in ${BRANCHES} ; do
         cp ${WRKDIR}/newchangelog changelog
     fi
 
-    # copy in the new spec file, but replace the %changelog
-    cat ${CWD}/rpminspect.spec > rpminspect.spec
-    sed -i '/^%changelog/,$d' rpminspect.spec
-    echo "%changelog" >> rpminspect.spec
-    cat changelog >> rpminspect.spec
+    # copy in the new spec file
+    cat ${CWD}/${PROJECT}.spec > ${PROJECT}.spec
 
     # commit changes
-    git add sources changelog rpminspect.spec
-    fedpkg ci -c -p
+    git add sources changelog ${PROJECT}.spec
+    ${VENDORPKG} ci -c -p
     git clean -d -x -f
 
     # build
-    fedpkg build --nowait
+    ${VENDORPKG} build --nowait
 done
