@@ -29,7 +29,7 @@ echo "* $(date +"%a %b %d %Y") $(git config user.name) <$(git config user.email)
 
 if [ "$1" = "--copr" ]; then
     # Just generate a simple changelog for copr builds
-    echo "- https://github.com/rpminspect/rpminspect/commits/v${version}"
+    echo "- $(grep ^URL: *.spec.in | head -n 1 | awk '{ print $2; }')/commits/v${version}"
 else
     # Generate all the changelog entries
     PREV_TAG="$(git tag --sort=taggerdate | tail -n 2 | head -n 1)"
