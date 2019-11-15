@@ -16,7 +16,7 @@ srpm:
 release:
 	$(topdir)/utils/release.sh -A
 
-koji: check srpm
+koji: srpm
 	$(topdir)/utils/submit-koji-builds.sh $$(ls -1 $(topdir)/*.tar.*) $$(basename $(topdir))
 
 clean:
