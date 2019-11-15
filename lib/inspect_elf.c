@@ -1069,7 +1069,7 @@ bool inspect_elf(struct rpminspect *ri)
     free_elf_data();
 
     if (result) {
-        add_result(ri, RESULT_OK, WAIVABLE_BY_ANYONE, HEADER_ELF, NULL, NULL, NULL);
+        add_result(ri, RESULT_OK, NOT_WAIVABLE, HEADER_ELF, NULL, NULL, NULL);
     }
 
     return result;
