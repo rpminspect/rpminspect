@@ -553,7 +553,7 @@ int init_rpminspect(struct rpminspect *ri, const char *cfgfile) {
     nkeys = iniparser_getsecnkeys(cfg, tmp);
 
     if (nkeys > 0) {
-        keys = calloc(nkeys, sizeof(char *));
+        keys = calloc(nkeys, len);
         assert(keys != NULL);
 
         if (iniparser_getseckeys(cfg, tmp, keys) == NULL) {
@@ -604,6 +604,8 @@ int init_rpminspect(struct rpminspect *ri, const char *cfgfile) {
         hsearch_r(e, ENTER, &eptr, ri->jvm_table);
         nkeys--;
     }
+
+    free(keys);
 
     /* the rest of the members */
     ri->before = NULL;
