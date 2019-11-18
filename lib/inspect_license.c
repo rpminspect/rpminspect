@@ -206,7 +206,7 @@ bool is_valid_license(const char *licensedb, const char *tag) {
             lic = strdup(token);
             tail = lic + strlen(lic);
         } else {
-            lic = realloc(lic, strlen(lic) + strlen(token) + 2);
+            lic = realloc(lic, strlen(lic) + strlen(token) + 1);
             assert(lic != NULL);
             tail = stpcpy(tail, " ");
             tail = stpcpy(tail, token);
