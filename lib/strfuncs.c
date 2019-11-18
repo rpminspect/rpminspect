@@ -56,10 +56,18 @@ static int printword(const char *word, const size_t width,
  * Returns true if s starts with prefix.
  */
 bool strprefix(const char *s, const char *prefix) {
+    size_t plen;
+
     assert(s);
     assert(prefix);
 
-    if (!strncmp(s, prefix, strlen(prefix))) {
+    plen = strlen(prefix);
+
+    if (plen > strlen(s)) {
+        return false;
+    }
+
+    if (!strncmp(s, prefix, plen)) {
         return true;
     } else {
         return false;
