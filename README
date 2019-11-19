@@ -170,22 +170,15 @@ For more information on meson and ninja, see these sites:
 Releasing
 ---------
 
-Releases are made using the release.sh script:
+Releases are made by running 'make release'.  This creates a release
+notice on Github which can be edited.  The release process _should_
+attach the tarball and signature to the Github release entry, but if
+it doesn't it usually means there's a problem with the
+utils/release.sh script talking with the Github API.  In those cases,
+the entry can be manually edited and the files attached manually.
 
-    ./utils/release.sh -b -t -p -g
-
-This will increment the x.y version number, create a new tarball, sign it,
-and create a signed git tag.  All of that is pushed to github and then a
-release entry is made and the tarball and detached signature are uploaded
-there.
-
-You can run the release.sh script directly and it will generate a release
-tarball from the source you have.  The command line options enable the
-version incrementing, git commits, tags, and pushes.
-
-The release will generate tar.xz file, a detached GPG signature of the
-tar.xz file, and a SRPM.  The SRPM file is suitable for import in to
-Fedora's dist-git and systems similar to it.
+Builds in Fedora and EPEL of the current release are made by running
+'make koji'.
 
 
 How To Use
