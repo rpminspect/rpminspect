@@ -181,6 +181,6 @@ bool is_text_file(const char *);
 char *checksum(const char *, mode_t *, enum checksum);
 
 /* runcmd.c */
-int run_cmd(char **, const char *, ...);
+char *run_cmd(int *, const char *, ...);
 
 #endif

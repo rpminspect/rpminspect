@@ -28,24 +28,27 @@
 #include "rpminspect.h"
 
 /*
- * Generic popen() wrapper to return the exit code of the process and the
- * output collected from the command (if any). The output of the command
- * (if it exists) is written to result in the calling function.
+ * Generic popen() wrapper to return the output of the process and the
+ * exit code (if desired).  This function returns an allocated string of
+ * the output from the program that ran or NULL if there was no output.
  *
- * The first argument is a pointer to a dynamic string that will hold the
- * captured output from the program.  This can be NULL and this function
- * will initialize it and concatenate the results in to it.
+ * The first argument is a pointer to an int that will hold the exit code
+ * from popen().  If this pointer is NULL, then the caller does not want
+ * the exit code and the function does nothing.
  *
  * The second argument is the command followed by any additional arguments
  * that should be included with it.  Note that it is not a format string,
  * all of the subsequent arguments need to be strings because they all
  * get concatenated together.
  */
-int run_cmd(char **result, const char *cmd, ...) {
+char *run_cmd(int *exitcode, const char *cmd, ...)
+{
     va_list ap;
-    int ret;
-    char *new = NULL;
-    char buf[BUFSIZ];
+    int status;
+    char *output = NULL;
+    char *buf = NULL;
+    char *tail = NULL;
+    size_t n = 0;
     FILE *cmdfp = NULL;
     char *built = NULL;
     char *element = NULL;
@@ -60,19 +63,19 @@ int run_cmd(char **result, const char *cmd, ...) {
     va_start(ap, cmd);
 
     while ((element = va_arg(ap, char *)) != NULL) {
-        xasprintf(&new, "%s %s", built, element);
-        assert(new != NULL);
+        xasprintf(&output, "%s %s", built, element);
+        assert(output != NULL);
         free(built);
-        built = new;
+        built = output;
     }
 
     va_end(ap);
 
     /* always combine stdout and stderr */
-    xasprintf(&new, "%s 2>&1", built);
-    assert(new != NULL);
+    xasprintf(&output, "%s 2>&1", built);
+    assert(output != NULL);
     free(built);
-    built = new;
+    built = output;
 
     /* shrink memory allocation */
     built = realloc(built, strlen(built) + 1);
@@ -92,40 +95,46 @@ int run_cmd(char **result, const char *cmd, ...) {
      * it as our result.  Just concatenate the string as we read it
      * back in buffer size chunks.
      */
-    while (fgets(buf, sizeof(buf), cmdfp) != NULL) {
-        if (*result == NULL) {
-            *result = strdup(buf);
+    output = NULL;
+    while (getline(&buf, &n, cmdfp) != -1) {
+        if (output == NULL) {
+            output = strdup(buf);
         } else {
-            xasprintf(&new, "%s%s", *result, buf);
-            free(*result);
-            *result = new;
+            xasprintf(&tail, "%s%s", output, buf);
+            assert(tail != NULL);
+            free(output);
+            output = tail;
         }
+
+        free(buf);
+        buf = NULL;
+        n = 0;
     }
 
     /* Capture the return code from the validation tool */
-    ret = pclose(cmdfp);
+    status = pclose(cmdfp);
 
-    if (ret == -1) {
+    if (exitcode != NULL) {
+        *exitcode = status;
+    }
+
+    if (status == -1) {
         fprintf(stderr, "error closing `%s`: %s\n", built, strerror(errno));
         fflush(stderr);
         free(built);
-        return -1;
+        return NULL;
     }
 
-    /*
-     * There may be no results from the tool
-     */
-    if (result != NULL && *result != NULL) {
-        /*
-         * Trim trailing newlines, again for nicer reporting.
-         */
-        new = strdup(*result);
-        new[strcspn(*result, "\n")] = 0;
+    /* There may be no results from the tool */
+    if (output != NULL) {
+        /* Trim trailing newline */
+        tail = rindex(output, '\n');
 
-        free(*result);
-        *result = new;
+        if (tail != NULL) {
+            tail[strcspn(tail, "\n")] = 0;
+        }
     }
 
     free(built);
-    return ret;
+    return output;
 }
