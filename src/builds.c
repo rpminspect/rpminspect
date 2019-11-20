@@ -63,7 +63,7 @@ static void set_worksubdir(struct rpminspect *ri, bool is_local, struct koji_bui
         xasprintf(&ri->worksubdir, "%s/%s", ri->workdir, kb->nvr);
 
         if (mkdirp(ri->worksubdir, mode)) {
-            fprintf(stderr, "*** Unable to create download directory %s: %s\n", ri->worksubdir, strerror(errno));
+            fprintf(stderr, "*** unable to create download directory %s: %s\n", ri->worksubdir, strerror(errno));
             fflush(stderr);
             abort();
         }
@@ -76,7 +76,7 @@ static void set_worksubdir(struct rpminspect *ri, bool is_local, struct koji_bui
         }
 
         if (mkdtemp(ri->worksubdir) == NULL) {
-            fprintf(stderr, "*** Unable to create local work subdirectory: %s\n", strerror(errno));
+            fprintf(stderr, "*** unable to create local work subdirectory: %s\n", strerror(errno));
             fflush(stderr);
             abort();
         }
@@ -134,7 +134,7 @@ static void prune_local(const int whichbuild) {
     }
 
     if (closedir(d) == -1) {
-        fprintf(stderr, "*** Unable to close directory: %s: %s\n", lpath, strerror(errno));
+        fprintf(stderr, "*** unable to close directory: %s: %s\n", lpath, strerror(errno));
         fflush(stderr);
         return;
     }
@@ -170,7 +170,7 @@ static int copytree(const char *fpath, const struct stat *sb,
 
     if (S_ISDIR(sb->st_mode)) {
         if (mkdirp(bufpath, mode)) {
-            fprintf(stderr, "*** Error creating directory %s: %s\n", bufpath, strerror(errno));
+            fprintf(stderr, "*** error creating directory %s: %s\n", bufpath, strerror(errno));
             ret = -1;
         }
     } else if (S_ISREG(sb->st_mode)) {
@@ -192,11 +192,11 @@ static int copytree(const char *fpath, const struct stat *sb,
         headerFree(h);
 
         if (copyfile(fpath, bufpath, true, false)) {
-            fprintf(stderr, "*** Error copying file %s: %s\n", bufpath, strerror(errno));
+            fprintf(stderr, "*** error copying file %s: %s\n", bufpath, strerror(errno));
             ret = -1;
         }
     } else {
-        fprintf(stderr, "*** Unknown directory member encountered: %s\n", fpath);
+        fprintf(stderr, "*** unknown directory member encountered: %s\n", fpath);
         ret = -1;
     }
 
@@ -257,7 +257,7 @@ static void curl_helper(const bool verbose, const char *src, const char *dst) {
     cc = curl_easy_perform(c);
 
     if (fclose(fp) != 0) {
-        fprintf(stderr, "*** error ening %s: %s\n", dst, strerror(errno));
+        fprintf(stderr, "*** error closing %s: %s\n", dst, strerror(errno));
         fflush(stderr);
         abort();
     }
@@ -317,7 +317,7 @@ static int download_artifacts(const struct rpminspect *ri, struct koji_build *bu
             }
 
             if (mkdirp(dst, mode)) {
-                fprintf(stderr, "*** Error creating directory %s: %s\n", dst, strerror(errno));
+                fprintf(stderr, "*** error creating directory %s: %s\n", dst, strerror(errno));
                 fflush(stderr);
                 return -1;
             }
@@ -412,7 +412,7 @@ static int download_artifacts(const struct rpminspect *ri, struct koji_build *bu
             }
 
             if (mkdirp(dst, mode)) {
-                fprintf(stderr, "*** Error creating directory %s: %s\n", dst, strerror(errno));
+                fprintf(stderr, "*** error creating directory %s: %s\n", dst, strerror(errno));
                 fflush(stderr);
                 return -1;
             }
@@ -472,7 +472,7 @@ static int download_artifacts(const struct rpminspect *ri, struct koji_build *bu
 
             /* gather the RPM header */
             if (get_rpm_info(dst)) {
-                fprintf(stderr, "*** Error reading RPM: %s\n", dst);
+                fprintf(stderr, "*** error reading RPM: %s\n", dst);
                 fflush(stderr);
                 return -1;
             }
@@ -511,7 +511,7 @@ int gather_builds(struct rpminspect *ri, bool fo) {
 
         if (is_local_build(ri->after) || is_local_rpm(ri->after)) {
             if (fetch_only) {
-                fprintf(stderr, "*** Unable to fetch local build trees or RPMs\n");
+                fprintf(stderr, "*** `%s' already exists\n", ri->after);
                 fflush(stderr);
                 return -1;
             }
@@ -520,7 +520,7 @@ int gather_builds(struct rpminspect *ri, bool fo) {
 
             /* copy after tree */
             if (nftw(ri->after, copytree, 15, FTW_PHYS) == -1) {
-                fprintf(stderr, "*** Error gathering build %s: %s\n", ri->after, strerror(errno));
+                fprintf(stderr, "*** error gathering build %s: %s\n", ri->after, strerror(errno));
                 fflush(stderr);
                 return -1;
             }
@@ -531,12 +531,12 @@ int gather_builds(struct rpminspect *ri, bool fo) {
             set_worksubdir(ri, false, build);
 
             if (download_artifacts(ri, build)) {
-                fprintf(stderr, "*** Error downloading build %s\n", ri->after);
+                fprintf(stderr, "*** error downloading build %s\n", ri->after);
                 fflush(stderr);
                 return -1;
             }
         } else {
-            fprintf(stderr, "*** Unable to find after build: %s\n", ri->after);
+            fprintf(stderr, "*** enable to find after build: %s\n", ri->after);
             fflush(stderr);
             return -2;
         }
@@ -555,7 +555,7 @@ int gather_builds(struct rpminspect *ri, bool fo) {
 
         /* copy before tree */
         if (nftw(ri->before, copytree, 15, FTW_PHYS) == -1) {
-            fprintf(stderr, "*** Error gathering build %s: %s\n", ri->before, strerror(errno));
+            fprintf(stderr, "*** error gathering build %s: %s\n", ri->before, strerror(errno));
             fflush(stderr);
             return -1;
         }
@@ -566,12 +566,12 @@ int gather_builds(struct rpminspect *ri, bool fo) {
         set_worksubdir(ri, false, build);
 
         if (download_artifacts(ri, build)) {
-            fprintf(stderr, "*** Error downloading build %s\n", ri->before);
+            fprintf(stderr, "*** error downloading build %s\n", ri->before);
             fflush(stderr);
             return -1;
         }
     } else {
-        fprintf(stderr, "*** Unable to find before build: %s\n", ri->before);
+        fprintf(stderr, "*** unable to find before build: %s\n", ri->before);
         fflush(stderr);
         return -1;
     }
