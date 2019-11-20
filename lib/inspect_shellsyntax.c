@@ -103,9 +103,9 @@ static bool shellsyntax_driver(struct rpminspect *ri, rpmfile_entry_t *file)
     char *shell = NULL;
     char *before_shell = NULL;
     int exitcode = -1;
+    char *before_errors = NULL;
     int before_exitcode = -1;
     char *errors = NULL;
-    char *before_errors = NULL;
     char *msg = NULL;
     char *tmp = NULL;
     bool extglob = false;
@@ -146,17 +146,17 @@ static bool shellsyntax_driver(struct rpminspect *ri, rpmfile_entry_t *file)
     }
 
     /* Run with -n and capture results */
-    exitcode = run_cmd(&errors, shell, "-n", file->fullpath, NULL);
+    errors = run_cmd(&exitcode, shell, "-n", file->fullpath, NULL);
 
     if (before_shell) {
-        before_exitcode = run_cmd(&before_errors, before_shell, "-n", file->peer_file->fullpath, NULL);
+        before_errors = run_cmd(&before_exitcode, before_shell, "-n", file->peer_file->fullpath, NULL);
     }
 
     /* Special cash for GNU bash, try with extglob */
     if (exitcode && !strcmp(shell, "bash")) {
         free(errors);
         errors = NULL;
-        exitcode = run_cmd(&errors, shell, "-n", "-O", "extglob", file->fullpath, NULL);
+        errors = run_cmd(&exitcode, shell, "-n", "-O", "extglob", file->fullpath, NULL);
 
         if (!exitcode) {
             extglob = true;
@@ -180,7 +180,7 @@ static bool shellsyntax_driver(struct rpminspect *ri, rpmfile_entry_t *file)
                 msg = tmp;
             }
 
-            add_result(ri, RESULT_INFO, NOT_WAIVABLE, HEADER_SHELLSYNTAX, msg, NULL, NULL);
+            add_result(ri, RESULT_INFO, NOT_WAIVABLE, HEADER_SHELLSYNTAX, msg, before_errors, NULL);
             free(msg);
         }
     } else {
