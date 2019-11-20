@@ -77,13 +77,12 @@ static bool is_source(const rpmfile_entry_t *file)
     }
 
     /* The RPM header stores basenames */
-    shortname = basename(file->fullpath);
+    shortname = rindex(file->fullpath, '/') + 1;
 
     /* See if this file is a Source file */
     TAILQ_FOREACH(entry, source, items) {
         if (!strcmp(shortname, entry->data)) {
-            ret = true;
-            break;
+            return true;
         }
     }
 
@@ -96,8 +95,11 @@ static bool upstream_driver(struct rpminspect *ri, rpmfile_entry_t *file)
     bool result = true;
     char *before_sum = NULL;
     char *after_sum = NULL;
+    char *diff_output = NULL;
+    char *diff_head = NULL;
     char *shortname = NULL;
     char *msg = NULL;
+    int exitcode;
 
     /* If we are not looking at a Source file, bail. */
     if (!is_source(file)) {
@@ -116,9 +118,27 @@ static bool upstream_driver(struct rpminspect *ri, rpmfile_entry_t *file)
         after_sum = checksum(file->fullpath, &file->st.st_mode, SHA256SUM);
 
         if (strcmp(before_sum, after_sum)) {
+            /* capture 'diff -u' output for text files */
+            if (is_text_file(file->peer_file->fullpath) && is_text_file(file->fullpath)) {
+                diff_head = diff_output = run_cmd(&exitcode, DIFF_CMD, "-u", file->peer_file->fullpath, file->fullpath, NULL);
+
+                /* skip the two leading lines */
+                if (strprefix(diff_head, "--- ")) {
+                    diff_head = index(diff_head, '\n') + 1;
+                }
+
+                if (strprefix(diff_head, "+++ ")) {
+                    diff_head = index(diff_head, '\n') + 1;
+                }
+            }
+
+            /* report the changed file */
             xasprintf(&msg, "Upstream source file `%s` changed content", shortname);
-            add_result(ri, RESULT_BAD, WAIVABLE_BY_ANYONE, HEADER_UPSTREAM, msg, NULL, REMEDY_UPSTREAM);
+            add_result(ri, RESULT_VERIFY, WAIVABLE_BY_ANYONE, HEADER_UPSTREAM, msg, diff_head, REMEDY_UPSTREAM);
             result = false;
+
+            /* clean up */
+            free(diff_output);
         }
     }
 
@@ -165,6 +185,7 @@ bool inspect_upstream(struct rpminspect *ri)
                     xasprintf(&msg, "Source RPM member `%s` removed", basename(file->fullpath));
                     add_result(ri, RESULT_VERIFY, WAIVABLE_BY_ANYONE, HEADER_UPSTREAM, msg, NULL, REMEDY_UPSTREAM);
                     result = false;
+                    free(msg);
                 }
             }
         }
