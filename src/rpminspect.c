@@ -25,6 +25,7 @@
 #include <sys/stat.h>
 #include <sys/ioctl.h>
 #include <unistd.h>
+#include <limits.h>
 #include <glob.h>
 
 #include "rpminspect.h"
@@ -247,6 +248,8 @@ int main(int argc, char **argv) {
     char *walk = NULL;
     char *token = NULL;
     char *workdir = NULL;
+    char cwd[PATH_MAX + 1];
+    char *r = NULL;
     char *output = NULL;
     char *release = NULL;
     char *threshold = NULL;
@@ -438,10 +441,20 @@ int main(int argc, char **argv) {
         ri.tests = selected;
     }
 
-    /* the user did not specify a working directory */
+    /* the user specified a working directory */
     if (workdir != NULL) {
         free(ri.workdir);
         ri.workdir = workdir;
+    }
+
+    /* no workdir specified, but fetch only requested, default to cwd */
+    if (workdir == NULL && fetch_only) {
+        memset(cwd, '\0', sizeof(cwd));
+        r = getcwd(cwd, PATH_MAX);
+        assert(r != NULL);
+
+        free(ri.workdir);
+        ri.workdir = strdup(r);
     }
 
     /*
