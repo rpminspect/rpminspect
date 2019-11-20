@@ -175,6 +175,7 @@ int unpack_archive(const char *, const char *, const bool);
 
 /* magic.c */
 char *get_mime_type(const char *);
+bool is_text_file(const char *);
 
 /* checksums.c */
 char *checksum(const char *, mode_t *, enum checksum);

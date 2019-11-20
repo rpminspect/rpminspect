@@ -35,7 +35,7 @@ char *get_mime_type(const char *filepath) {
     magic_t cookie;
 
     assert(filepath != NULL);
-    cookie = magic_open(MAGIC_MIME);
+    cookie = magic_open(MAGIC_MIME | MAGIC_SYMLINK | MAGIC_CHECK);
 
     if (cookie == NULL) {
         fprintf(stderr, "*** Unable to initialize the magic library\n");
@@ -64,5 +64,22 @@ char *get_mime_type(const char *filepath) {
     }
 
     magic_close(cookie);
+    return ret;
+}
+
+/* Return true if the named file is a text file according to libmagic */
+bool is_text_file(const char *pathname)
+{
+    bool ret = false;
+    char *type = NULL;
+
+    assert(pathname != NULL);
+    type = get_mime_type(pathname);
+
+    if (strprefix(type, "text/")) {
+        ret = true;
+    }
+
+    free(type);
     return ret;
 }
