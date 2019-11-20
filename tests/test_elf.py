@@ -36,7 +36,7 @@ class TestWithoutExecStackRPM(TestRPMs):
         self.rpm.add_simple_compilation(compileFlags='-Wl,-z,noexecstack')
         self.inspection = 'elf'
         self.label = 'elf-object-properties'
-        self.waiver_auth = 'Anyone'
+        self.waiver_auth = 'Not Waivable'
         self.result = 'OK'
 
 class TestWithoutExecStackKoji(TestKoji):
@@ -45,7 +45,7 @@ class TestWithoutExecStackKoji(TestKoji):
         self.rpm.add_simple_compilation(compileFlags='-Wl,-z,noexecstack')
         self.inspection = 'elf'
         self.label = 'elf-object-properties'
-        self.waiver_auth = 'Anyone'
+        self.waiver_auth = 'Not Waivable'
         self.result = 'OK'
 
 class TestWithoutExecStackCompareRPM(TestCompareRPMs):
@@ -55,7 +55,7 @@ class TestWithoutExecStackCompareRPM(TestCompareRPMs):
         self.after_rpm.add_simple_compilation(compileFlags='-Wl,-z,noexecstack')
         self.inspection = 'elf'
         self.label = 'elf-object-properties'
-        self.waiver_auth = 'Anyone'
+        self.waiver_auth = 'Not Waivable'
         self.result = 'OK'
 
 class TestWithoutExecStackCompareKoji(TestCompareKoji):
@@ -65,7 +65,7 @@ class TestWithoutExecStackCompareKoji(TestCompareKoji):
         self.after_rpm.add_simple_compilation(compileFlags='-Wl,-z,noexecstack')
         self.inspection = 'elf'
         self.label = 'elf-object-properties'
-        self.waiver_auth = 'Anyone'
+        self.waiver_auth = 'Not Waivable'
         self.result = 'OK'
 
 # Program built with execstack
