@@ -55,8 +55,8 @@ static void add_changedfiles_result(struct rpminspect *ri, const char *msg, char
  * in this function.  Caller is responsible for removing the temporary
  * file.
  */
-static bool run_and_capture(const char *where, char **output, char *cmd,
-                            const char *fullpath, char **errors)
+static char *run_and_capture(const char *where, char **output, char *cmd,
+                             const char *fullpath, int *exitcode)
 {
     int fd;
 
@@ -64,6 +64,7 @@ static bool run_and_capture(const char *where, char **output, char *cmd,
     assert(output != NULL);
     assert(cmd != NULL);
     assert(fullpath != NULL);
+    assert(exitcode != NULL);
 
     /* Build a temporary file */
     xasprintf(output, "%s/output.XXXXXX", where);
@@ -72,19 +73,19 @@ static bool run_and_capture(const char *where, char **output, char *cmd,
     fd = mkstemp(*output);
 
     if (fd == -1) {
-        fprintf(stderr, "*** Unable to create temporary file: %s\n", strerror(errno));
+        fprintf(stderr, "*** unable to create temporary file: %s\n", strerror(errno));
         fflush(stderr);
         return false;
     }
 
     if (close(fd) == -1) {
-        fprintf(stderr, "*** Unable to close temporary file: %s\n", strerror(errno));
+        fprintf(stderr, "*** unable to close temporary file: %s\n", strerror(errno));
         fflush(stderr);
         return false;
     }
 
-    /* Run command and capture output */
-    return run_cmd(errors, cmd, fullpath, ">", *output, NULL);
+    /* Run command and return output */
+    return run_cmd(exitcode, cmd, fullpath, ">", *output, NULL);
 }
 
 /*
@@ -99,6 +100,7 @@ static bool changedfiles_driver(struct rpminspect *ri, rpmfile_entry_t *file)
     char *after_sum = NULL;
     char *msg = NULL;
     char *errors = NULL;
+    int exitcode;
     bool possible_header = false;
     string_entry_t *entry = NULL;
     severity_t severity = RESULT_VERIFY;
@@ -192,25 +194,25 @@ static bool changedfiles_driver(struct rpminspect *ri, rpmfile_entry_t *file)
      * compression levels changed between builds.
      */
     if (!strcmp(type, "application/x-gzip")) {
-        result = run_cmd(&errors, ZCMP_CMD, file->peer_file->fullpath, file->fullpath, NULL);
+        errors = run_cmd(&exitcode, ZCMP_CMD, file->peer_file->fullpath, file->fullpath, NULL);
 
-        if (result) {
+        if (exitcode) {
             xasprintf(&msg, "Compressed gzip file %s changed content on %s", file->localpath, arch);
             add_changedfiles_result(ri, msg, errors, severity, waiver);
             result = false;
         }
     } else if (!strcmp(type, "application/x-bzip2")) {
-        result = run_cmd(&msg, BZCMP_CMD, file->peer_file->fullpath, file->fullpath, NULL);
+        errors = run_cmd(&exitcode, BZCMP_CMD, file->peer_file->fullpath, file->fullpath, NULL);
 
-        if (result) {
-            xasprintf(&errors, "Compressed bzip2 file %s changed content on %s", file->localpath, arch);
+        if (exitcode) {
+            xasprintf(&msg, "Compressed bzip2 file %s changed content on %s", file->localpath, arch);
             add_changedfiles_result(ri, msg, errors, severity, waiver);
             result = false;
         }
     } else if (!strcmp(type, "application/x-xz")) {
-        result = run_cmd(&errors, XZCMP_CMD, file->peer_file->fullpath, file->fullpath, NULL);
+        errors = run_cmd(&exitcode, XZCMP_CMD, file->peer_file->fullpath, file->fullpath, NULL);
 
-        if (result) {
+        if (exitcode) {
             xasprintf(&msg, "Compressed xz file %s changed content on %s", file->localpath, arch);
             add_changedfiles_result(ri, msg, errors, severity, waiver);
             result = false;
@@ -227,9 +229,9 @@ static bool changedfiles_driver(struct rpminspect *ri, rpmfile_entry_t *file)
     if (!strcmp(type, "application/x-pie-executable") ||
         !strcmp(type, "application/x-executable") ||
         !strcmp(type, "application/x-object")) {
-        result = run_cmd(&errors, ELFCMP_CMD, file->peer_file->fullpath, file->fullpath, NULL);
+        errors = run_cmd(&exitcode, ELFCMP_CMD, file->peer_file->fullpath, file->fullpath, NULL);
 
-        if (result) {
+        if (exitcode) {
             xasprintf(&msg, "ELF file %s changed content on %s", file->localpath, arch);
             add_changedfiles_result(ri, msg, errors, severity, waiver);
             result = false;
@@ -255,14 +257,18 @@ static bool changedfiles_driver(struct rpminspect *ri, rpmfile_entry_t *file)
          */
 
         /* First, unformat the mo files */
-        if (run_and_capture(ri->workdir, &after_tmp, MSGUNFMT_CMD, file->fullpath, &errors)) {
+        errors = run_and_capture(ri->workdir, &after_tmp, MSGUNFMT_CMD, file->fullpath, &exitcode);
+
+        if (exitcode) {
             xasprintf(&msg, "Error running msgunfmt on %s on %s", file->localpath, arch);
             add_result(ri, RESULT_BAD, NOT_WAIVABLE, HEADER_CHANGEDFILES, msg, errors, REMEDY_CHANGEDFILES);
             result = false;
             goto done;
         }
 
-        if (run_and_capture(ri->workdir, &before_tmp, MSGUNFMT_CMD, file->peer_file->fullpath, &errors)) {
+        errors = run_and_capture(ri->workdir, &before_tmp, MSGUNFMT_CMD, file->peer_file->fullpath, &exitcode);
+
+        if (exitcode) {
             xasprintf(&msg, "Error running msgunfmt on %s on %s", file->peer_file->localpath, arch);
             add_result(ri, RESULT_BAD, NOT_WAIVABLE, HEADER_CHANGEDFILES, msg, errors, REMEDY_CHANGEDFILES);
             result = false;
@@ -270,7 +276,9 @@ static bool changedfiles_driver(struct rpminspect *ri, rpmfile_entry_t *file)
         }
 
         /* Now diff the mo content */
-        if (run_cmd(&errors, DIFF_CMD, "-u", before_tmp, after_tmp, NULL)) {
+        errors = run_cmd(&exitcode, DIFF_CMD, "-u", before_tmp, after_tmp, NULL);
+
+        if (exitcode) {
             xasprintf(&msg, "Message catalog %s changed content on %s", file->localpath, arch);
             add_result(ri, RESULT_VERIFY, WAIVABLE_BY_ANYONE, HEADER_CHANGEDFILES, msg, errors, REMEDY_CHANGEDFILES);
             result = false;
@@ -312,7 +320,9 @@ static bool changedfiles_driver(struct rpminspect *ri, rpmfile_entry_t *file)
 
     if (!strcmp(type, "text/x-c") && possible_header) {
         /* Now diff the header content */
-        if (run_cmd(&errors, DIFF_CMD, "-u", "-w", "--label", file->localpath, file->peer_file->fullpath, file->fullpath, NULL)) {
+        errors = run_cmd(&exitcode, DIFF_CMD, "-u", "-w", "--label", file->localpath, file->peer_file->fullpath, file->fullpath, NULL);
+
+        if (exitcode) {
             xasprintf(&msg, "Public header file %s changed content on %s, Please make sure this does not change the ABI exported by this package.  The output of `diff -uw` follows.", file->localpath, arch);
             add_result(ri, RESULT_VERIFY, WAIVABLE_BY_ANYONE, HEADER_CHANGEDFILES, msg, errors, REMEDY_CHANGEDFILES);
             result = false;
@@ -323,9 +333,7 @@ static bool changedfiles_driver(struct rpminspect *ri, rpmfile_entry_t *file)
         goto done;
     }
 
-    /*
-     * Finally, anything that gets down to here just compare checksums.
-     */
+    /* Finally, anything that gets down to here just compare checksums. */
     before_sum = checksum(file->peer_file->fullpath, &file->peer_file->st.st_mode, SHA256SUM);
     after_sum = checksum(file->fullpath, &file->st.st_mode, SHA256SUM);
 
