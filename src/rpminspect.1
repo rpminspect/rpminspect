@@ -120,7 +120,10 @@ as a string.  Case does not matter.
 .B \-f, \-\-fetch\-only
 Only download builds, do not perform any inspections (implies \-k).
 This option is intended as a convenience for developers as well as
-for easier integration in to different CI workflows.
+for easier integration in to different CI workflows.  Note that this
+option sets the working directory (\-w) to the current working
+directory.  If this is undesirable, use the \-w option to set it to
+a different location.
 .TP
 .B \-k, \-\-keep
 Do not remove temporary working files before exit
