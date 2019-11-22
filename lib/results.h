@@ -56,7 +56,7 @@
 #define REMEDY_EMPTYRPM      "Check to see if you eliminated a subpackage but still have the %%package and/or the %%files section for it."
 
 /* license */
-#define REMEDY_LICENSE       "The License tag must contain an approved license string as defined by the distribution (e.g., GPLv2+)."
+#define REMEDY_LICENSE       "The License tag must contain an approved license string as defined by the distribution (e.g., GPLv2+).  If the license in question is approved, the license database needs updating in the rpminspect-data package."
 #define REMEDY_LICENSEDB     "Make sure the licensedb setting in the rpminspect.conf file is set to a valid licensedb file.  This is also commonly due to a missing vendor specific rpminspect-data package on the system."
 
 /* elf */
