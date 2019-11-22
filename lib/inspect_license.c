@@ -67,10 +67,14 @@ static int check_peer_license(struct rpminspect *ri, const Header hdr) {
     assert(ri != NULL);
 
     nevra = get_nevra(hdr);
+    assert(nevra != NULL);
     license = headerGetString(hdr, RPMTAG_LICENSE);
 
     if (license == NULL) {
         xasprintf(&msg, "Empty License Tag in %s", nevra);
+        add_result(ri, RESULT_BAD, NOT_WAIVABLE, HEADER_LICENSE, msg, NULL, REMEDY_LICENSE);
+        ret = 1;
+        free(msg);
     } else {
         /* is the license tag valid or not */
         valid = is_valid_license(ri->licensedb, license);
@@ -80,21 +84,21 @@ static int check_peer_license(struct rpminspect *ri, const Header hdr) {
 
             add_result(ri, RESULT_INFO, NOT_WAIVABLE, HEADER_LICENSE, msg, NULL, NULL);
             ret = 1;
-
-            free(msg);
         } else {
             xasprintf(&msg, "Invalid License Tag in %s: %s", nevra, license);
+            add_result(ri, RESULT_BAD, NOT_WAIVABLE, HEADER_LICENSE, msg, NULL, REMEDY_LICENSE);
+            ret = 1;
         }
+
+        free(msg);
 
         /* does the license tag contain bad words? */
         if (has_bad_word(license, ri->badwords)) {
             xasprintf(&msg, "License Tag contains unprofessional language in %s: %s", nevra, license);
+            add_result(ri, RESULT_BAD, NOT_WAIVABLE, HEADER_LICENSE, msg, NULL, REMEDY_LICENSE);
+            ret = 1;
+            free(msg);
         }
-    }
-
-    if (msg != NULL && ret == 0) {
-        add_result(ri, RESULT_BAD, NOT_WAIVABLE, HEADER_LICENSE, msg, NULL, REMEDY_LICENSE);
-        free(msg);
     }
 
     free(nevra);
@@ -153,7 +157,7 @@ bool is_valid_license(const char *licensedb, const char *tag) {
     const char *fedora_abbrev = NULL;
     const char *spdx_abbrev = NULL;
     char *lic = NULL;
-    char *tail = NULL;
+    char *newlic = NULL;
     bool approved = false;
 
     assert(licensedb != NULL);
@@ -204,12 +208,12 @@ bool is_valid_license(const char *licensedb, const char *tag) {
         /* Abbreviated licenses may contain spaces, so rebuild it */
         if (lic == NULL) {
             lic = strdup(token);
-            tail = lic + strlen(lic);
-        } else {
-            lic = realloc(lic, strlen(lic) + strlen(token) + 1);
             assert(lic != NULL);
-            tail = stpcpy(tail, " ");
-            tail = stpcpy(tail, token);
+        } else {
+            xasprintf(&newlic, "%s %s", lic, token);
+            assert(newlic != NULL);
+            free(lic);
+            lic = newlic;
 
             /* We've added a space, so back up the seen counter */
             seen--;
