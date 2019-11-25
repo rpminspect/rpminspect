@@ -201,7 +201,7 @@ if [ "${OPT_GITHUB}" = "y" ]; then
     # Create new release on github
     API_JSON=$(jq -ns --arg tag_name "${TAG}" --arg target_commitish "master" --arg name "${PROJECT}-${VERSION}" --arg body "$(git log --format="%s" ${OLDTAG}.. | sed -e 's|^|* |g')" '{ tag_name: $tag_name, target_commitish: $target_commitish, name: $name, body: $body, draft: false, prerelease: false }')
     RELEASE_INFO="$(mktemp)"
-    ${CURL} -o "${RELEASE_INFO}" --data "${API_JSON}" https://api.github.com/repos/${OWNER}/${PROJECT}/releases?access_token=${TOKEN}
+    ${CURL} -o "${RELEASE_INFO}" --data "${API_JSON}" https://api.github.com/repos/${OWNER}/${PROJECT}/releases/${TAG}?access_token=${TOKEN}
 
     # Get the ID of the asset
     ASSET_ID="$(grep -m 1 "id.:" ${RELEASE_INFO} | grep -w id | tr : = | tr -cd '[[:alnum:]]=' | cut -d '=' -f 2)"
