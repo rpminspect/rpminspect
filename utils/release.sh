@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/sh -x
 #
 # Automate making a new release of meson-built projects that also
 # use Copr for automated builds and that carry template RPM spec
