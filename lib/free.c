@@ -32,15 +32,40 @@ static void free_regex(regex_t *regex)
     free(regex);
 }
 
+static void free_mapping(struct hsearch_data *table, string_list_t *keys)
+{
+    ENTRY e;
+    ENTRY *eptr;
+    string_entry_t *entry = NULL;
+
+    if (table != NULL && keys != NULL) {
+        /* look up each key and free the memory for the value */
+        TAILQ_FOREACH(entry, keys, items) {
+            e.key = entry->data;
+            hsearch_r(e, FIND, &eptr, table);
+
+            if (eptr != NULL) {
+                free(eptr->data);
+            }
+        }
+
+        /* destroy the hash table */
+        hdestroy_r(table);
+        free(table);
+
+        /* destroy the list of keys */
+        list_free(keys, free);
+    }
+
+    return;
+}
+
 /*
  * Free a struct rpminspect.  Called by applications using
  * librpminspect before they exit.
  */
 void free_rpminspect(struct rpminspect *ri) {
-    string_entry_t *entry = NULL;
     stat_whitelist_entry_t *swlentry = NULL;
-    ENTRY e;
-    ENTRY *eptr;
 
     if (ri == NULL) {
         return;
@@ -65,7 +90,7 @@ void free_rpminspect(struct rpminspect *ri) {
             free(swlentry->group);
             free(swlentry->filename);
 
-            free(entry);
+            free(swlentry);
         }
 
         free(ri->stat_whitelist);
@@ -99,25 +124,8 @@ void free_rpminspect(struct rpminspect *ri) {
     list_free(ri->forbidden_owners, free);
     list_free(ri->forbidden_groups, free);
     list_free(ri->shells, free);
-
-    if (ri->jvm_table != NULL && ri->jvm_keys != NULL) {
-        /* look up each key and free the memory for the value */
-        TAILQ_FOREACH(entry, ri->jvm_keys, items) {
-            e.key = entry->data;
-            hsearch_r(e, FIND, &eptr, ri->jvm_table);
-
-            if (eptr != NULL) {
-                free(eptr->data);
-            }
-        }
-
-        /* destroy the hash table */
-        hdestroy_r(ri->jvm_table);
-        free(ri->jvm_table);
-
-        /* destroy the list of keys */
-        list_free(ri->jvm_keys, free);
-    }
+    free_mapping(ri->jvm_table, ri->jvm_keys);
+    free_mapping(ri->products, ri->product_keys);
 
     free_rpmpeer(ri->peers);
 

@@ -98,6 +98,89 @@ static void parse_list(const char *tmp, string_list_t **list)
 }
 
 /*
+ * Read in a hash table mapping from the config file.  Example:
+ *        [section]
+ *        key = value
+ *        key = value
+ * We use these for the jvm_table and products, maybe other things.
+ */
+static void read_mapping(const dictionary *cfg, const char *section,
+                         struct hsearch_data **table, string_list_t **keys)
+{
+    size_t len = 0;
+    int nk = 0;
+    const char **k = NULL;
+    const char *v = NULL;
+    ENTRY e;
+    ENTRY *eptr;
+    string_entry_t *entry = NULL;
+
+    assert(cfg != NULL);
+    assert(section != NULL);
+
+    *table = NULL;
+    *keys = NULL;
+    len = strlen(section);
+    nk = iniparser_getsecnkeys(cfg, section);
+
+    if (nk > 0) {
+        k = calloc(nk, len);
+        assert(k != NULL);
+
+        if (iniparser_getseckeys(cfg, section, k) == NULL) {
+            free(k);
+            k = NULL;
+            nk = 0;
+        }
+    }
+
+    if (nk > 0) {
+        *table = calloc(1, sizeof(**table));
+        assert(*table != NULL);
+
+        if (hcreate_r(nk, *table) == 0) {
+            free(*table);
+            *table = NULL;
+            free(k);
+            k = NULL;
+            nk = 0;
+        } else {
+            *keys = calloc(1, sizeof(**keys));
+            assert(*keys != NULL);
+            TAILQ_INIT(*keys);
+        }
+    }
+
+    while (nk > 0) {
+        v = iniparser_getstring(cfg, k[nk - 1], NULL);
+
+        if (v == NULL) {
+            nk--;
+            continue;
+        }
+
+        /*
+         * This grabs the key string, but advances past the block name.
+         * The key is stored in the tailq for the ability to free it
+         * later.  We have to dupe it because the iniparser data will
+         * go away.
+         */
+        entry = calloc(1, sizeof(*entry));
+        assert(entry != NULL);
+        entry->data = strdup((char *) k[nk - 1] + len + 1);
+        TAILQ_INSERT_TAIL(*keys, entry, items);
+
+        e.key = entry->data;
+        e.data = strdup((char *) v);
+        hsearch_r(e, ENTER, &eptr, *table);
+        nk--;
+    }
+
+    free(k);
+    return;
+}
+
+/*
  * Convert a 10 character mode string for a file to a mode_t
  * For example, convert "-rwsr-xr-x" to a mode_t
  */
@@ -349,13 +432,6 @@ int init_rpminspect(struct rpminspect *ri, const char *cfgfile) {
     dictionary *cfg = NULL;
     const char *tmp = NULL;
     uint64_t tests = 0;
-    int nkeys = 0;
-    int len = 0;
-    const char **keys = NULL;
-    const char *val = NULL;
-    ENTRY e;
-    ENTRY *eptr;
-    string_entry_t *entry = NULL;
 
     assert(ri != NULL);
     memset(ri, 0, sizeof(*ri));
@@ -546,66 +622,10 @@ int init_rpminspect(struct rpminspect *ri, const char *cfgfile) {
     parse_list(tmp, &ri->shells);
 
     /* if a jvm major versions exist, collect those in to a hash table */
-    ri->jvm_table = NULL;
-    ri->jvm_keys = NULL;
-    tmp = "javabytecode";
-    len = strlen(tmp);
-    nkeys = iniparser_getsecnkeys(cfg, tmp);
+    read_mapping(cfg, "javabytecode", &ri->jvm_table, &ri->jvm_keys);
 
-    if (nkeys > 0) {
-        keys = calloc(nkeys, len);
-        assert(keys != NULL);
-
-        if (iniparser_getseckeys(cfg, tmp, keys) == NULL) {
-            free(keys);
-            keys = NULL;
-            nkeys = 0;
-        }
-    }
-
-    if (nkeys > 0) {
-        ri->jvm_table = calloc(1, sizeof(*ri->jvm_table));
-        assert(ri->jvm_table != NULL);
-
-        if (hcreate_r(nkeys, ri->jvm_table) == 0) {
-            free(ri->jvm_table);
-            ri->jvm_table = NULL;
-            free(keys);
-            keys = NULL;
-            nkeys = 0;
-        } else {
-           ri->jvm_keys = calloc(1, sizeof(*ri->jvm_keys));
-           assert(ri->jvm_keys != NULL);
-           TAILQ_INIT(ri->jvm_keys);
-        }
-    }
-
-    while (nkeys > 0) {
-        val = iniparser_getstring(cfg, keys[nkeys - 1], NULL);
-
-        if (val == NULL) {
-            nkeys--;
-            continue;
-        }
-
-        /*
-         * This grabs the key string, but advances past the block name.
-         * The key is stored in the tailq for the ability to free it
-         * later.  We have to dupe it because the iniparser data will
-         * go away.
-         */
-        entry = calloc(1, sizeof(*entry));
-        assert(entry != NULL);
-        entry->data = strdup((char *) keys[nkeys - 1] + len + 1);
-        TAILQ_INSERT_TAIL(ri->jvm_keys, entry, items);
-
-        e.key = entry->data;
-        e.data = strdup((char *) val);
-        hsearch_r(e, ENTER, &eptr, ri->jvm_table);
-        nkeys--;
-    }
-
-    free(keys);
+    /* if a products section exists, collect those in to a hash table */
+    read_mapping(cfg, "products", &ri->products, &ri->product_keys);
 
     /* the rest of the members */
     ri->before = NULL;
