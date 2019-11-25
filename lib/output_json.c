@@ -79,7 +79,7 @@ void output_json(const results_t *results, const char *dest) {
         }
 
         /* add this result data to the inspection array */
-        json_object_array_add(ji, json_object_get(jr));
+        json_object_array_add(ji, jr);
     }
 
     /* add the final inspection */
