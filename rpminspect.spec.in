@@ -123,5 +123,4 @@ control files.
 
 
 %changelog
-* %%RPMDATE%% David Cantrell <dcantrell@redhat.com> - %%VERSION%%-1
-- https://github.com/rpminspect/rpminspect/commits/v%%VERSION%%
+%include %{SOURCE1}
