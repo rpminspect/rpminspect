@@ -169,19 +169,6 @@ cd build/meson-dist
 gpg --detach-sign --armor ${PROJECT}-${VERSION}.tar.xz
 cd ${CWD}
 
-# Create a spec file
-RPMDATE="$(date +'%a %b %d %Y')"
-sed -e "s|%%VERSION%%|${VERSION}|g" < ${PROJECT}.spec.in > build/meson-dist/${PROJECT}.spec
-sed -i -e "s|%%RPMDATE%%|${RPMDATE}|g" build/meson-dist/${PROJECT}.spec
-sed -i -e "s|%%TARBALL%%|${PROJECT}-${VERSION}.tar.xz|g" build/meson-dist/${PROJECT}.spec
-
-# Generate SRPM
-( cd build/meson-dist
-  rpmbuild -bs --nodeps \
-           --define "_sourcedir ." \
-           --define "_srcrpmdir ." \
-           --define "_rpmdir ." ${PROJECT}.spec )
-
 # Push the changes
 if [ "${OPT_PUSH}" = "y" ]; then
     git push
