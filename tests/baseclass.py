@@ -123,7 +123,7 @@ class TestSRPM(RequiresRpminspect):
 
         self.rpm.do_make()
 
-        args = [self.rpminspect, '-c', self.conffile, '-F', 'json']
+        args = [self.rpminspect, '-c', self.conffile, '-F', 'json', '-r', 'GENERIC']
         if self.inspection:
             args.append('-T')
             args.append(self.inspection)
@@ -183,7 +183,7 @@ class TestCompareSRPM(RequiresRpminspect):
         self.before_rpm.do_make()
         self.after_rpm.do_make()
 
-        args = [self.rpminspect, '-c', self.conffile, '-F', 'json']
+        args = [self.rpminspect, '-c', self.conffile, '-F', 'json', '-r', 'GENERIC']
 
         if self.inspection:
             args.append('-T')
@@ -232,7 +232,7 @@ class TestRPMs(TestSRPM):
             self.exitcode = 1
 
         for a in self.rpm.get_build_archs():
-            args = [self.rpminspect, '-c', self.conffile, '-F', 'json']
+            args = [self.rpminspect, '-c', self.conffile, '-F', 'json', '-r', 'GENERIC']
 
             if self.inspection:
                 args.append('-T')
@@ -278,7 +278,7 @@ class TestCompareRPMs(TestCompareSRPM):
             self.exitcode = 1
 
         for a in self.before_rpm.get_build_archs():
-            args = [self.rpminspect, '-c', self.conffile, '-F', 'json']
+            args = [self.rpminspect, '-c', self.conffile, '-F', 'json', '-r', 'GENERIC']
 
             if self.inspection:
                 args.append('-T')
@@ -332,7 +332,7 @@ class TestKoji(TestSRPM):
                 os.makedirs(adir, exist_ok=True)
                 shutil.copy(self.rpm.get_built_rpm(a), adir)
 
-            args = [self.rpminspect, '-c', self.conffile, '-F', 'json', '-r', AFTER_REL]
+            args = [self.rpminspect, '-c', self.conffile, '-F', 'json', '-r', 'GENERIC']
             if self.inspection:
                 args.append('-T')
                 args.append(self.inspection)

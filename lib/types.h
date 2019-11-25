@@ -235,6 +235,10 @@ struct rpminspect {
     struct hsearch_data *jvm_table;
     string_list_t *jvm_keys;
 
+    /* hash table of product release regexps */
+    struct hsearch_data *products;
+    string_list_t *product_keys;
+
     /* Options specified by the user */
     char *before;              /* before build ID arg given on cmdline */
     char *after;               /* after build ID arg given on cmdline */

@@ -27,6 +27,7 @@
 #include <unistd.h>
 #include <limits.h>
 #include <glob.h>
+#include <regex.h>
 
 #include "rpminspect.h"
 #include "builds.h"
@@ -75,10 +76,20 @@ static void usage(const char *progname) {
  * Release value.  Trim any trailing '/' characters in case the user is
  * specifying a build from a local path.
  */
-static char *get_product_release(const char *before, const char *after) {
+static char *get_product_release(const char *before, const char *after)
+{
     char *pos = NULL;
     char *before_product = NULL;
     char *after_product = NULL;
+    string_entry_t *entry = NULL;
+    ENTRY e;
+    ENTRY *eptr;
+    regex_t product_regex;
+    int result;
+    char reg_error[BUFSIZ];
+    regmatch_t before_matches[1];
+    regmatch_t after_matches[1];
+    bool match = false;
 
     assert(after != NULL);
 
@@ -121,14 +132,62 @@ static char *get_product_release(const char *before, const char *after) {
          */
         before_product[strcspn(before_product, "/")] = 0;
 
+        /*
+         * If builds are different and we have no products hash table, fail
+         */
         if (strcmp(before_product, after_product)) {
-            fprintf(stderr, "*** Builds have different product releases (%s != %s)\n", before_product, after_product);
-            free(before_product);
-            free(after_product);
-            return NULL;
-        }
+            /* Try to see if a product mapping matches our strings */
+            TAILQ_FOREACH(entry, ri.product_keys, items) {
+                e.key = entry->data;
+                hsearch_r(e, FIND, &eptr, ri.products);
 
+                /* if the config file entry is empty, just ignore it */
+                if (eptr == NULL) {
+                    continue;
+                }
+
+                /* build a regex for this product release string */
+                result = regcomp(&product_regex, eptr->data, 0);
+
+                if (result != 0) {
+                    regerror(result, &product_regex, reg_error, sizeof(reg_error));
+                    fprintf(stderr, "*** unable to compile product release regular expression: %s\n", reg_error);
+                    return NULL;
+                }
+
+                /* now try to match the before and after builds */
+                if (regexec(&product_regex, before_product, 1, before_matches, 0) != 0) {
+                    regfree(&product_regex);
+                    continue;
+                }
+
+                if (regexec(&product_regex, after_product, 1, after_matches, 0) != 0) {
+                    regfree(&product_regex);
+                    continue;
+                }
+
+                if (before_matches[0].rm_so > -1 && after_matches[0].rm_so > -1) {
+                    match = true;
+                    free(after_product);
+                    after_product = strdup(entry->data);
+                }
+
+                regfree(&product_regex);
+
+                if (match) {
+                    break;
+                }
+            }
+        }
+    } else {
+        match = true;
+    }
+
+    if (!match) {
+        fprintf(stderr, "*** Builds have different product releases (%s != %s)\n", before_product, after_product);
         free(before_product);
+        free(after_product);
+        after_product = NULL;
     }
 
     return after_product;
