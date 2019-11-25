@@ -25,7 +25,7 @@ if [ ! -f ${CWD}/.copr/Makefile ]; then
 fi
 
 if [ ! -f ${CWD}/changelog ]; then
-    ${CWD}/utils/mkrpmchangelog.sh --copr > changelog
+    ${CWD}/utils/mkrpmchangelog.sh --copr > ${CWD}/changelog
 fi
 
 make -f ${CWD}/.copr/Makefile srpm outdir=${CWD} BUILDTYPE=release
