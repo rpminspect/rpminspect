@@ -212,7 +212,7 @@ if [ "${OPT_GITHUB}" = "y" ]; then
     fi
 
     # Create new release on github
-    API_JSON=$(jq -nq --arg tag_name "${TAG}" --arg name "${PROJECT}-${VERSION}" --arg body "$(git log --format="%s" v0.8 | sed -e 's|^|* |g')" '{ tag_name: $tag, target_commitish: master, name: $name, body: $body, draft: false, prerelease: false }')
+    API_JSON=$(jq -ns --arg tag_name "${TAG}" --arg target_commitish "master" --arg name "${PROJECT}-${VERSION}" --arg body "$(git log --format="%s" v0.8 | sed -e 's|^|* |g')" '{ tag_name: $tag, target_commitish: $target_commitish, name: $name, body: $body, draft: false, prerelease: false }')
     RELEASE_INFO="$(mktemp)"
     ${CURL} -o "${RELEASE_INFO}" --data "${API_JSON}" https://api.github.com/repos/${OWNER}/${PROJECT}/releases?access_token=${TOKEN}
 
