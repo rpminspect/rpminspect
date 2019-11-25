@@ -117,7 +117,15 @@ static char *get_product_release(const char *before, const char *after)
     after_product[strcspn(after_product, "/")] = 0;
 
     if (before) {
-        pos = rindex(before, '.') + 1;
+        pos = rindex(before, '.');
+
+        if (!pos) {
+            fprintf(stderr, "*** Product release for before build (%s) is empty\n", before);
+            free(after_product);
+            return NULL;
+        }
+
+        pos += 1;
         before_product = strdup(pos);
 
         if (!before_product) {
@@ -152,6 +160,8 @@ static char *get_product_release(const char *before, const char *after)
                 if (result != 0) {
                     regerror(result, &product_regex, reg_error, sizeof(reg_error));
                     fprintf(stderr, "*** unable to compile product release regular expression: %s\n", reg_error);
+                    free(before_product);
+                    free(after_product);
                     return NULL;
                 }
 
@@ -185,11 +195,11 @@ static char *get_product_release(const char *before, const char *after)
 
     if (!match) {
         fprintf(stderr, "*** Builds have different product releases (%s != %s)\n", before_product, after_product);
-        free(before_product);
         free(after_product);
         after_product = NULL;
     }
 
+    free(before_product);
     return after_product;
 }
 
