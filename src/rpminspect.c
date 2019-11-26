@@ -132,7 +132,6 @@ static char *get_product_release(const char *before, const char *after)
         if (!before_product) {
             fprintf(stderr, "*** Product release for before build (%s) is empty\n", before);
             free(after_product);
-            free(before_product);
             return NULL;
         }
 
