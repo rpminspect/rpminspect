@@ -89,7 +89,7 @@ static char *get_product_release(const char *before, const char *after)
     char reg_error[BUFSIZ];
     regmatch_t before_matches[1];
     regmatch_t after_matches[1];
-    bool match = false;
+    bool matched = false;
 
     assert(after != NULL);
 
@@ -107,6 +107,7 @@ static char *get_product_release(const char *before, const char *after)
     after_product = strdup(pos);
     if (!after_product) {
         fprintf(stderr, "*** Product release for after build (%s) is empty\n", after);
+        free(after_product);
         return NULL;
     }
 
@@ -131,6 +132,7 @@ static char *get_product_release(const char *before, const char *after)
         if (!before_product) {
             fprintf(stderr, "*** Product release for before build (%s) is empty\n", before);
             free(after_product);
+            free(before_product);
             return NULL;
         }
 
@@ -177,23 +179,25 @@ static char *get_product_release(const char *before, const char *after)
                 }
 
                 if (before_matches[0].rm_so > -1 && after_matches[0].rm_so > -1) {
-                    match = true;
+                    matched = true;
                     free(after_product);
                     after_product = strdup(entry->data);
                 }
 
                 regfree(&product_regex);
 
-                if (match) {
+                if (matched) {
                     break;
                 }
             }
+        } else {
+            matched = true;
         }
     } else {
-        match = true;
+        matched = true;
     }
 
-    if (!match) {
+    if (!matched) {
         fprintf(stderr, "*** Builds have different product releases (%s != %s)\n", before_product, after_product);
         free(after_product);
         after_product = NULL;
