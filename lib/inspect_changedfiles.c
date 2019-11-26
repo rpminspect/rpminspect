@@ -100,6 +100,9 @@ static bool changedfiles_driver(struct rpminspect *ri, rpmfile_entry_t *file)
     char *after_sum = NULL;
     char *msg = NULL;
     char *errors = NULL;
+    char *needle = NULL;
+    char *part_errors = NULL;
+    char *refined_errors = NULL;
     int exitcode;
     bool possible_header = false;
     string_entry_t *entry = NULL;
@@ -232,8 +235,24 @@ static bool changedfiles_driver(struct rpminspect *ri, rpmfile_entry_t *file)
         errors = run_cmd(&exitcode, ELFCMP_CMD, file->peer_file->fullpath, file->fullpath, NULL);
 
         if (exitcode) {
+            /*
+             * Clean up eu-elfcmp results.  Strike the fullpaths and only show
+             * the localpath once.  Keep the eu-elfcmp: prefix.
+             */
+            xasprintf(&needle, "%s differ:", file->localpath);
+            part_errors = strstr(errors, needle);
+
+            if (part_errors) {
+                xasprintf(&refined_errors, "eu-elfcmp: %s", part_errors);
+            } else {
+                /* unknown output format from eu-elfcmp */
+                refined_errors = strdup(errors);
+            }
+
             xasprintf(&msg, "ELF file %s changed content on %s", file->localpath, arch);
-            add_changedfiles_result(ri, msg, errors, severity, waiver);
+            add_changedfiles_result(ri, msg, refined_errors, severity, waiver);
+            free(needle);
+            free(refined_errors);
             result = false;
         }
     }

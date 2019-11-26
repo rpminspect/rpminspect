@@ -68,7 +68,7 @@
 #define ZCMP_CMD "zcmp"
 #define BZCMP_CMD "bzcmp"
 #define XZCMP_CMD "xzcmp"
-#define ELFCMP_CMD "eu-elfcmp --ignore-build-id --verbose"
+#define ELFCMP_CMD "eu-elfcmp --ignore-build-id --hash-inexact"
 #define MSGUNFMT_CMD "msgunfmt"
 #define DIFF_CMD "diff"
 #define DESKTOP_FILE_VALIDATE_CMD "desktop-file-validate"
