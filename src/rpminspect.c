@@ -81,6 +81,7 @@ static char *get_product_release(const char *before, const char *after)
     char *pos = NULL;
     char *before_product = NULL;
     char *after_product = NULL;
+    char *needle = NULL;
     string_entry_t *entry = NULL;
     ENTRY e;
     ENTRY *eptr;
@@ -145,8 +146,23 @@ static char *get_product_release(const char *before, const char *after)
          * If builds are different and we have no products hash table, fail
          */
         if (strcmp(before_product, after_product)) {
+            /* after_product and before_product are refreshed in the loop */
+            free(after_product);
+            free(before_product);
+
             /* Try to see if a product mapping matches our strings */
             TAILQ_FOREACH(entry, ri.product_keys, items) {
+                /* refresh after_product */
+                xasprintf(&needle, "%s.", entry->data);
+                after_product = strstr(after, needle);
+                before_product = strstr(before, needle);
+                free(needle);
+
+                if (after_product == NULL || before_product == NULL) {
+                    continue;
+                }
+
+                /* find this product in the hash table */
                 e.key = entry->data;
                 hsearch_r(e, FIND, &eptr, ri.products);
 
@@ -179,7 +195,6 @@ static char *get_product_release(const char *before, const char *after)
 
                 if (before_matches[0].rm_so > -1 && after_matches[0].rm_so > -1) {
                     matched = true;
-                    free(after_product);
                     after_product = strdup(entry->data);
                 }
 
@@ -197,12 +212,12 @@ static char *get_product_release(const char *before, const char *after)
     }
 
     if (!matched) {
-        fprintf(stderr, "*** Builds have different product releases (%s != %s)\n", before_product, after_product);
+        fprintf(stderr, "*** Unable to determine product release for %s and %s\n", before_product, after_product);
+        free(before_product);
         free(after_product);
         after_product = NULL;
     }
 
-    free(before_product);
     return after_product;
 }
 
