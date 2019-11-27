@@ -46,9 +46,9 @@ char *run_cmd(int *exitcode, const char *cmd, ...)
     va_list ap;
     int status;
     char *output = NULL;
-    char *buf = NULL;
     char *tail = NULL;
-    size_t n = 0;
+    size_t n = BUFSIZ;
+    char *buf = NULL;
     FILE *cmdfp = NULL;
     char *built = NULL;
     char *element = NULL;
@@ -96,6 +96,9 @@ char *run_cmd(int *exitcode, const char *cmd, ...)
      * back in buffer size chunks.
      */
     output = NULL;
+    buf = calloc(1, n);
+    assert(buf != NULL);
+
     while (getline(&buf, &n, cmdfp) != -1) {
         if (output == NULL) {
             output = strdup(buf);
@@ -105,11 +108,9 @@ char *run_cmd(int *exitcode, const char *cmd, ...)
             free(output);
             output = tail;
         }
-
-        free(buf);
-        buf = NULL;
-        n = 0;
     }
+
+    free(buf);
 
     /* Capture the return code from the validation tool */
     status = pclose(cmdfp);
@@ -122,6 +123,7 @@ char *run_cmd(int *exitcode, const char *cmd, ...)
         fprintf(stderr, "error closing `%s`: %s\n", built, strerror(errno));
         fflush(stderr);
         free(built);
+        free(output);
         return NULL;
     }
 
