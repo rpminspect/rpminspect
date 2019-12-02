@@ -28,8 +28,10 @@ static string_list_t *source = NULL;
 /*
  * Get the SOURCE tag from the RPM header and read in all of
  * the values from that tag and put them in the 'source' list.
+ *
+ * False is returned if the package lacks any Source entries.
  */
-static void init_source(const rpmfile_entry_t *file)
+static bool init_source(const rpmfile_entry_t *file)
 {
     rpmtd td = NULL;
     rpmFlags flags = HEADERGET_MINMEM | HEADERGET_EXT | HEADERGET_ARGV;
@@ -42,8 +44,8 @@ static void init_source(const rpmfile_entry_t *file)
     td = rpmtdNew();
 
     if (!headerGet(file->rpm_header, RPMTAG_SOURCE, td, flags)) {
-        fprintf(stderr, "*** unable to find RPMTAG_SOURCE for %s\n", file->fullpath);
-        abort();
+        /* source packages that lack Source files are allowed */
+        return false;
     }
 
     /* walk the SOURCE tag and cram everything in to a list */
@@ -59,7 +61,7 @@ static void init_source(const rpmfile_entry_t *file)
     }
 
     rpmtdFree(td);
-    return;
+    return true;
 }
 
 /* Returns true if this file is a Source file */
@@ -73,7 +75,10 @@ static bool is_source(const rpmfile_entry_t *file)
 
     /* Initialize the source list once for the run */
     if (source == NULL) {
-        init_source(file);
+        if (!init_source(file)) {
+            /* source package lacks any Source archives */
+            return false;
+        }
     }
 
     /* The RPM header stores basenames */
