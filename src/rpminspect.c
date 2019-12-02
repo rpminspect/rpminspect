@@ -153,7 +153,7 @@ static char *get_product_release(const char *before, const char *after)
             /* Try to see if a product mapping matches our strings */
             TAILQ_FOREACH(entry, ri.product_keys, items) {
                 /* refresh after_product */
-                xasprintf(&needle, "%s.", entry->data);
+                xasprintf(&needle, ".%s", entry->data);
                 after_product = strstr(after, needle);
                 before_product = strstr(before, needle);
                 free(needle);
@@ -212,7 +212,7 @@ static char *get_product_release(const char *before, const char *after)
     }
 
     if (!matched) {
-        fprintf(stderr, "*** Unable to determine product release for %s and %s\n", before_product, after_product);
+        fprintf(stderr, "*** Unable to determine product release for %s and %s\n", before, after);
         free(before_product);
         free(after_product);
         after_product = NULL;
