@@ -463,9 +463,9 @@ static int download_artifacts(const struct rpminspect *ri, struct koji_build *bu
             }
 
             if (build->volume_name == NULL || !strcmp(build->volume_name, "DEFAULT")) {
-                xasprintf(&src, "%s/packages/%s/%s/%s/%s/%s", (workri->buildtype == KOJI_BUILD_MODULE) ? workri->kojimbs : workri->kojiursine, buildentry->package_name, rpm->version, rpm->release, rpm->arch, pkg);
+                xasprintf(&src, "%s/packages/%s/%s/%s/%s/%s", (workri->buildtype == KOJI_BUILD_MODULE) ? workri->kojimbs : workri->kojiursine, buildentry->package_name, build->version, build->release, rpm->arch, pkg);
             } else {
-                xasprintf(&src, "%s/vol/%s/packages/%s/%s/%s/%s/%s", (workri->buildtype == KOJI_BUILD_MODULE) ? workri->kojimbs : workri->kojiursine, build->volume_name, buildentry->package_name, rpm->version, rpm->release, rpm->arch, pkg);
+                xasprintf(&src, "%s/vol/%s/packages/%s/%s/%s/%s/%s", (workri->buildtype == KOJI_BUILD_MODULE) ? workri->kojimbs : workri->kojiursine, build->volume_name, buildentry->package_name, build->version, build->release, rpm->arch, pkg);
             }
 
             curl_helper(workri->verbose, src, dst);
