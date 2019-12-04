@@ -354,6 +354,9 @@ int main(int argc, char **argv) {
     string_list_t *valid_arches = NULL;
     string_entry_t *arch = NULL;
     string_entry_t *entry = NULL;
+    rpmpeer_entry_t *peer = NULL;
+    const char *after_rel = NULL;
+    const char *before_rel = NULL;
 
     /* parse command line options */
     while (1) {
@@ -575,19 +578,6 @@ int main(int argc, char **argv) {
         return RI_PROGRAM_ERROR;
     }
 
-    /*
-     * Determine product release unless the user specified one.
-     */
-    if (ri.product_release == NULL) {
-        ri.product_release = get_product_release(ri.before, ri.after);
-
-        if (ri.product_release == NULL) {
-            fflush(stderr);
-            free_rpminspect(&ri);
-            return RI_PROGRAM_ERROR;
-        }
-    }
-
     /* initialize librpm, we'll be using it */
     if (init_librpm() != RPMRC_OK) {
         fprintf(stderr, "*** unable to read RPM configuration\n");
@@ -661,6 +651,24 @@ int main(int argc, char **argv) {
 
     /* perform the selected inspections */
     if (!fetch_only) {
+        /* Determine product release unless the user specified one. */
+        if (ri.product_release == NULL) {
+            peer = TAILQ_FIRST(ri.peers);
+            after_rel = headerGetString(peer->after_hdr, RPMTAG_RELEASE);
+
+            if (ri.before) {
+                before_rel = headerGetString(peer->before_hdr, RPMTAG_RELEASE);
+            }
+
+            ri.product_release = get_product_release(before_rel, after_rel);
+
+            if (ri.product_release == NULL) {
+                fflush(stderr);
+                free_rpminspect(&ri);
+                return RI_PROGRAM_ERROR;
+            }
+        }
+
         for (i = 0; inspections[i].flag != 0; i++) {
             /* test not selected by user */
             if (!(ri.tests & inspections[i].flag)) {
