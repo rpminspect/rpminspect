@@ -142,7 +142,7 @@ Display version information
 rpminspect requires very little to run.  Assuming you meet the runtime
 requirements to either build the software from source or you have installed
 it on your operating system, you are ready to use it.  The only required
-argument is a build, which we will call the before_build.  It is possible
+argument is a build, which we will call the after_build.  It is possible
 to run rpminspect against a single build and perform the policy checks
 against the packages in it.  If two builds are specified, the policy checks
 are performed, but the builds are also compared.
@@ -155,10 +155,13 @@ you can list inspections to skip by listing the short name prefixed with a
 .PP
 Builds may be local RPM packages, regular Koji builds specified using Koji
 syntax (the NVR or name, version, and release of a package with hyphens
-separating each part), Koji module builds, or locally cached Koji builds
-(regular or module).  Any valid Koji build identifier works when specifying
-Koji builds though, such as the build ID number.  For more information on Koji
-build specification, please see the Koji documentation.
+separating each part), Koji module builds, locally cached Koji builds
+(regular or module), Koji scratch builds, or locally cached Koji scratch
+builds.  Any valid Koji build identifier works when specifying Koji builds,
+such as the build ID number or the package NVR.  The only exception to this
+rule is scratch builds.  You must use the Koji task ID number for scratch
+builds.  For more information on Koji build specification, please see the
+Koji documentation.
 .PP
 If you specify a directory tree containing the output of a properly structured
 Koji build, rpminspect can use that directly.  This may be useful for multiple
