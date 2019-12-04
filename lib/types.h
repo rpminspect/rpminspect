@@ -408,4 +408,55 @@ struct koji_build {
     koji_buildlist_t *builds;
 };
 
+/*
+ * Koji task structure.  This is determined by looking at the
+ * output of a getTaskInfo XMLRPC call to a Koji hub.
+ *
+ * You can examine example values by running xmlrpc on the command
+ * line and giving it a task ID, e.g.:
+ *     xmlrpc KOJI_HUB_URL getTaskInfo ID
+ * Not all things returned are represented in this struct.
+ */
+typedef TAILQ_HEAD(koji_task_list_s, _koji_task_entry_t) koji_task_list_t;
+
+struct koji_task {
+    /* members returned from getTaskInfo */
+    double weight;
+    int parent;
+    char *completion_time;
+    char *start_time;
+    double start_ts;
+    bool waiting;
+    bool awaited;
+    char *label;
+    int priority;
+    int channel_id;
+    int state;
+    char *create_time;
+    double create_ts;
+    int owner;
+    int host_id;
+    char *method;
+    double completion_ts;
+    char *arch;
+    int id;
+
+    /* Descendent tasks (where files are) */
+    koji_task_list_t *descendents;
+};
+
+/* A generic list of koji tasks */
+typedef struct _koji_task_entry_t {
+    /* main task information */
+    struct koji_task task;
+
+    /* results from getTaskResult */
+    int brootid;
+    string_list_t *srpms;
+    string_list_t *rpms;
+    string_list_t *logs;
+
+    TAILQ_ENTRY(_koji_task_entry_t) items;
+} koji_task_entry_t;
+
 #endif

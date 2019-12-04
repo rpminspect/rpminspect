@@ -17,6 +17,7 @@
  */
 
 #include <stdbool.h>
+#include <ctype.h>
 #include <assert.h>
 #include <ftw.h>
 #include <sys/types.h>
@@ -39,28 +40,48 @@ static int mode = S_IRWXU | S_IRGRP | S_IXGRP | S_IROTH | S_IXOTH;
 /* This array holds strings that map to the whichbuild index value. */
 static char *build_desc[] = { "before", "after" };
 
+/* Types of workdirs */
+typedef enum _workdir_t {
+    NULL_WORKDIR = 0,          /* unused                    */
+    LOCAL_WORKDIR = 1,         /* locally cached koji build */
+    TASK_WORKDIR = 2,          /* like for scratch builds   */
+    BUILD_WORKDIR = 3          /* remote koji build spec    */
+} workdir_t;
+
 /* Local prototypes */
-static void set_worksubdir(struct rpminspect *, bool, struct koji_build *);
+static void set_worksubdir(struct rpminspect *, workdir_t, const struct koji_build *, const struct koji_task *);
 static int get_rpm_info(const char *);
 static void prune_local(const int);
 static int copytree(const char *, const struct stat *, int, struct FTW *);
-static int download_artifacts(const struct rpminspect *, struct koji_build *);
+static int download_build(const struct rpminspect *, struct koji_build *);
+static int download_task(const struct rpminspect *, struct koji_task *);
 static void curl_helper(const bool, const char *, const char *);
 
 /*
  * Set the working subdirectory for this particular run based on whether
  * this is a remote build or a local build.
  */
-static void set_worksubdir(struct rpminspect *ri, bool is_local, struct koji_build *kb) {
+static void set_worksubdir(struct rpminspect *ri, workdir_t wd,
+                           const struct koji_build *build,
+                           const struct koji_task *task)
+{
     assert(ri != NULL);
+    assert(wd != NULL_WORKDIR);
 
     if (ri->worksubdir != NULL) {
         return;
     }
 
     if (fetch_only) {
-        assert(kb != NULL);
-        xasprintf(&ri->worksubdir, "%s/%s", ri->workdir, kb->nvr);
+        if (build != NULL) {
+            xasprintf(&ri->worksubdir, "%s/%s", ri->workdir, build->nvr);
+        } else if (task != NULL) {
+            xasprintf(&ri->worksubdir, "%s/scratch-%d", ri->workdir, task->id);
+        } else {
+            fprintf(stderr, "*** no Koji build or task specified in set_worksubdir()\n");
+            fflush(stderr);
+            abort();
+        }
 
         if (mkdirp(ri->worksubdir, mode)) {
             fprintf(stderr, "*** unable to create download directory %s: %s\n", ri->worksubdir, strerror(errno));
@@ -68,11 +89,18 @@ static void set_worksubdir(struct rpminspect *ri, bool is_local, struct koji_bui
             abort();
         }
     } else {
-        if (is_local) {
+        if (wd == LOCAL_WORKDIR) {
             xasprintf(&ri->worksubdir, "%s/local.XXXXXX", ri->workdir);
+        } else if (TASK_WORKDIR) {
+            assert(task != NULL);
+            xasprintf(&ri->worksubdir, "%s/scratch-%d.XXXXXX", ri->workdir, task->id);
+        } else if (wd == BUILD_WORKDIR) {
+            assert(build != NULL);
+            xasprintf(&ri->worksubdir, "%s/%s-%s.XXXXXX", ri->workdir, build->name, build->version);
         } else {
-            assert(kb != NULL);
-            xasprintf(&ri->worksubdir, "%s/%s-%s.XXXXXX", ri->workdir, kb->name, kb->version);
+            fprintf(stderr, "*** unknown workdir type: %d\n", wd);
+            fflush(stderr);
+            abort();
         }
 
         if (mkdtemp(ri->worksubdir) == NULL) {
@@ -279,7 +307,8 @@ static void curl_helper(const bool verbose, const char *src, const char *dst) {
  * Given a remote artifact specification in a Koji build, download it
  * to our working directory.
  */
-static int download_artifacts(const struct rpminspect *ri, struct koji_build *build) {
+static int download_build(const struct rpminspect *ri, struct koji_build *build)
+{
     koji_buildlist_entry_t *buildentry = NULL;
     koji_rpmlist_entry_t *rpm = NULL;
     char *src = NULL;
@@ -481,7 +510,6 @@ static int download_artifacts(const struct rpminspect *ri, struct koji_build *bu
             free(src);
             free(dst);
             free(pkg);
-
         }
 
         list_free(filter, free);
@@ -492,12 +520,134 @@ static int download_artifacts(const struct rpminspect *ri, struct koji_build *bu
 }
 
 /*
+ * Given a remote artifact specification in a Koji task, download it
+ * to our working directory.
+ */
+static int download_task(const struct rpminspect *ri, struct koji_task *task)
+{
+    size_t len;
+    char *pkg = NULL;
+    char *src = NULL;
+    char *dst = NULL;
+    char *tail = NULL;
+    koji_task_entry_t *descendent = NULL;
+    string_entry_t *entry = NULL;
+
+    assert(ri != NULL);
+    assert(task != NULL);
+    assert(task->descendents != NULL);
+
+    TAILQ_FOREACH(descendent, task->descendents, items) {
+        /* skip if we have nothing */
+        if (TAILQ_EMPTY(descendent->srpms) && TAILQ_EMPTY(descendent->rpms)) {
+            continue;
+        }
+
+        /* create the destination directory */
+        if (fetch_only) {
+            xasprintf(&dst, "%s/%s", workri->worksubdir, descendent->task.arch);
+        } else {
+            xasprintf(&dst, "%s/%s/%s", workri->worksubdir, build_desc[whichbuild], descendent->task.arch);
+        }
+
+        if (mkdirp(dst, mode)) {
+            fprintf(stderr, "*** error creating directory %s: %s\n", dst, strerror(errno));
+            fflush(stderr);
+            return -1;
+        }
+
+        free(dst);
+
+        /* download SRPMs */
+        TAILQ_FOREACH(entry, descendent->srpms, items) {
+            pkg = basename(entry->data);
+
+            if (fetch_only) {
+                xasprintf(&dst, "%s/src", workri->worksubdir);
+            } else {
+                xasprintf(&dst, "%s/%s/src", workri->worksubdir, build_desc[whichbuild]);
+            }
+
+            if (mkdirp(dst, mode)) {
+                fprintf(stderr, "*** error creating directory %s: %s\n", dst, strerror(errno));
+                fflush(stderr);
+                return -1;
+            }
+
+            len = strlen(dst);
+            dst = realloc(dst, len + strlen(pkg) + 2);
+            tail = dst + len;
+            tail = stpcpy(tail, "/");
+            tail = stpcpy(tail, pkg);
+            assert(dst != NULL);
+
+            xasprintf(&src, "%s/work/%s", workri->kojiursine, entry->data);
+            curl_helper(workri->verbose, src, dst);
+
+            /* gather the RPM header */
+            if (get_rpm_info(dst)) {
+                fprintf(stderr, "*** error reading RPM: %s\n", dst);
+                fflush(stderr);
+                return -1;
+            }
+
+            free(dst);
+            free(src);
+        }
+
+        TAILQ_FOREACH(entry, descendent->rpms, items) {
+            pkg = basename(entry->data);
+
+            if (fetch_only) {
+                xasprintf(&dst, "%s/%s/%s", workri->worksubdir, descendent->task.arch, pkg);
+            } else {
+                xasprintf(&dst, "%s/%s/%s/%s", workri->worksubdir, build_desc[whichbuild], descendent->task.arch, pkg);
+            }
+
+            xasprintf(&src, "%s/work/%s", workri->kojiursine, entry->data);
+            curl_helper(workri->verbose, src, dst);
+
+            /* gather the RPM header */
+            if (get_rpm_info(dst)) {
+                fprintf(stderr, "*** error reading RPM: %s\n", dst);
+                fflush(stderr);
+                return -1;
+            }
+
+            free(dst);
+            free(src);
+        }
+    }
+
+    return 0;
+}
+
+/* Returns true if the string specifies a task ID, which is just an int */
+static bool is_task_id(const char *id)
+{
+    int i = 0;
+
+    assert(id != NULL);
+
+    while (id[i] != '\0') {
+        if (!isdigit(id[i])) {
+            return false;
+        }
+
+        i++;
+    }
+
+    return true;
+}
+
+/*
  * Determines if specified builds are local or remote and fetches
  * them to the working directory.  Either build can be local or
  * remote.
  */
 int gather_builds(struct rpminspect *ri, bool fo) {
     struct koji_build *build = NULL;
+    struct koji_task *task = NULL;
 
     assert(ri != NULL);
     assert(ri->after != NULL);
@@ -516,7 +666,7 @@ int gather_builds(struct rpminspect *ri, bool fo) {
                 return -1;
             }
 
-            set_worksubdir(ri, true, NULL);
+            set_worksubdir(ri, LOCAL_WORKDIR, NULL, NULL);
 
             /* copy after tree */
             if (nftw(ri->after, copytree, 15, FTW_PHYS) == -1) {
@@ -527,10 +677,18 @@ int gather_builds(struct rpminspect *ri, bool fo) {
 
             /* clean up */
             prune_local(whichbuild);
-        } else if ((build = get_koji_build(ri, ri->after)) != NULL) {
-            set_worksubdir(ri, false, build);
+        } else if (is_task_id(ri->after) && (task = get_koji_task(ri, ri->after)) != NULL) {
+            set_worksubdir(ri, TASK_WORKDIR, NULL, task);
 
-            if (download_artifacts(ri, build)) {
+            if (download_task(ri, task)) {
+                fprintf(stderr, "*** error downloading task %s\n", ri->after);
+                fflush(stderr);
+                return -1;
+            }
+        } else if ((build = get_koji_build(ri, ri->after)) != NULL) {
+            set_worksubdir(ri, BUILD_WORKDIR, build, NULL);
+
+            if (download_build(ri, build)) {
                 fprintf(stderr, "*** error downloading build %s\n", ri->after);
                 fflush(stderr);
                 return -1;
@@ -551,7 +709,7 @@ int gather_builds(struct rpminspect *ri, bool fo) {
 
     /* before build specified, find it */
     if (is_local_build(ri->before) || is_local_rpm(ri->before)) {
-        set_worksubdir(ri, true, NULL);
+        set_worksubdir(ri, LOCAL_WORKDIR, NULL, NULL);
 
         /* copy before tree */
         if (nftw(ri->before, copytree, 15, FTW_PHYS) == -1) {
@@ -562,10 +720,18 @@ int gather_builds(struct rpminspect *ri, bool fo) {
 
         /* clean up */
         prune_local(whichbuild);
-    } else if ((build = get_koji_build(ri, ri->before)) != NULL) {
-        set_worksubdir(ri, false, build);
+    } else if (is_task_id(ri->before) && (task = get_koji_task(ri, ri->before)) != NULL) {
+        set_worksubdir(ri, TASK_WORKDIR, NULL, task);
 
-        if (download_artifacts(ri, build)) {
+        if (download_task(ri, task)) {
+            fprintf(stderr, "*** error downloading task %s\n", ri->before);
+            fflush(stderr);
+            return -1;
+        }
+    } else if ((build = get_koji_build(ri, ri->before)) != NULL) {
+        set_worksubdir(ri, BUILD_WORKDIR, build, NULL);
+
+        if (download_build(ri, build)) {
             fprintf(stderr, "*** error downloading build %s\n", ri->before);
             fflush(stderr);
             return -1;
