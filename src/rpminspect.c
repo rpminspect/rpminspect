@@ -78,6 +78,7 @@ static void usage(const char *progname) {
  */
 static char *get_product_release(const char *before, const char *after)
 {
+    int c;
     char *pos = NULL;
     char *before_product = NULL;
     char *after_product = NULL;
@@ -145,7 +146,9 @@ static char *get_product_release(const char *before, const char *after)
         /*
          * If builds are different and we have no products hash table, fail
          */
-        if (strcmp(before_product, after_product)) {
+        c = strcmp(before_product, after_product);
+
+        if (c && (ri.product_keys != NULL)) {
             /* after_product and before_product are refreshed in the loop */
             free(after_product);
             free(before_product);
@@ -204,7 +207,7 @@ static char *get_product_release(const char *before, const char *after)
                     break;
                 }
             }
-        } else {
+        } else if (!c) {
             matched = true;
         }
     } else {
@@ -218,6 +221,7 @@ static char *get_product_release(const char *before, const char *after)
         after_product = NULL;
     }
 
+    free(before_product);
     return after_product;
 }
 
