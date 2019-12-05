@@ -24,6 +24,7 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <sys/ioctl.h>
+#include <signal.h>
 #include <unistd.h>
 #include <limits.h>
 #include <glob.h>
@@ -35,7 +36,14 @@
 /* Global librpminspect state */
 struct rpminspect ri;
 
-static void usage(const char *progname) {
+void sigabrt_handler(__attribute__ ((unused)) int i)
+{
+    rpmFreeRpmrc();
+    return;
+}
+
+static void usage(const char *progname)
+{
     assert(progname != NULL);
 
     printf("Compare package builds for policy compliance and consistency.\n\n");
@@ -364,6 +372,9 @@ int main(int argc, char **argv) {
 
     /* Be friendly to "rpminspect ... 2>&1 | tee" use case */
     setlinebuf(stdout);
+
+    /* SIGABRT handler since we use abort() in some failure cases */
+    signal(SIGABRT, sigabrt_handler);
 
     /* parse command line options */
     while (1) {
