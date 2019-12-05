@@ -271,6 +271,7 @@ void list_free(string_list_t *list, list_entry_data_free_func free_func)
     }
 
     free(list);
+    return;
 }
 
 static int compare_entries(const void *data1, const void *data2)
