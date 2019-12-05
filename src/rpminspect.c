@@ -362,6 +362,9 @@ int main(int argc, char **argv) {
     const char *after_rel = NULL;
     const char *before_rel = NULL;
 
+    /* Be friendly to "rpminspect ... 2>&1 | tee" use case */
+    setlinebuf(stdout);
+
     /* parse command line options */
     while (1) {
         c = getopt_long(argc, argv, short_options, long_options, &idx);
