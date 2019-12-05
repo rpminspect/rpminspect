@@ -685,6 +685,9 @@ int gather_builds(struct rpminspect *ri, bool fo) {
                 fflush(stderr);
                 return -1;
             }
+
+            free_koji_task(task);
+            free(task);
         } else if ((build = get_koji_build(ri, ri->after)) != NULL) {
             set_worksubdir(ri, BUILD_WORKDIR, build, NULL);
 
@@ -693,6 +696,9 @@ int gather_builds(struct rpminspect *ri, bool fo) {
                 fflush(stderr);
                 return -1;
             }
+
+            free_koji_build(build);
+            free(build);
         } else {
             fprintf(stderr, "*** enable to find after build: %s\n", ri->after);
             fflush(stderr);
@@ -728,6 +734,9 @@ int gather_builds(struct rpminspect *ri, bool fo) {
             fflush(stderr);
             return -1;
         }
+
+        free_koji_task(task);
+        free(task);
     } else if ((build = get_koji_build(ri, ri->before)) != NULL) {
         set_worksubdir(ri, BUILD_WORKDIR, build, NULL);
 
@@ -736,6 +745,9 @@ int gather_builds(struct rpminspect *ri, bool fo) {
             fflush(stderr);
             return -1;
         }
+
+        free_koji_build(build);
+        free(build);
     } else {
         fprintf(stderr, "*** unable to find before build: %s\n", ri->before);
         fflush(stderr);

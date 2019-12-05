@@ -26,10 +26,6 @@
 #include "rpminspect.h"
 
 /*
- * Local only functions.
- */
-
-/*
  * General error handler for xmlrpc failures.  Could be improved
  * a bit to be more helpful to the user.
  */
@@ -68,6 +64,7 @@ static void read_koji_task_struct(xmlrpc_env *env, xmlrpc_value *result, struct 
         /* Get the key as a string */
         xmlrpc_decompose_value(env, k, "s", &key);
         xmlrpc_abort_on_fault(env);
+        xmlrpc_DECREF(k);
 
         /*
          * If the value of a key is nil, just skip over it.  We can't
@@ -75,6 +72,7 @@ static void read_koji_task_struct(xmlrpc_env *env, xmlrpc_value *result, struct 
          * be present in the output.
          */
         if (xmlrpc_value_type(value) == XMLRPC_TYPE_NIL) {
+            xmlrpc_DECREF(value);
             continue;
         }
 
@@ -141,6 +139,45 @@ static void read_koji_task_struct(xmlrpc_env *env, xmlrpc_value *result, struct 
             xmlrpc_decompose_value(env, value, "i", &task->id);
             xmlrpc_abort_on_fault(env);
         }
+
+        xmlrpc_DECREF(value);
+        free(key);
+        key = NULL;
+    }
+
+    return;
+}
+
+/*
+ * Turn the array of strings in to a string_list_t.  Used when reading task
+ * results through get_koji_task().
+ */
+static void read_koji_descendent_results(xmlrpc_env *env, xmlrpc_value *value, string_list_t *results)
+{
+    int i = 0;
+    int size = 0;
+    string_entry_t *entry = NULL;
+    xmlrpc_value *s = NULL;
+
+    assert(env != NULL);
+    assert(value != NULL);
+
+    size = xmlrpc_array_size(env, value);
+    xmlrpc_abort_on_fault(env);
+
+    results = calloc(1, sizeof(*results));
+    assert(results != NULL);
+    TAILQ_INIT(results);
+
+    for (i = 0; i < size; i++) {
+        entry = calloc(1, sizeof(*entry));
+        assert(entry != NULL);
+        xmlrpc_array_read_item(env, value, i, &s);
+        xmlrpc_abort_on_fault(env);
+        xmlrpc_decompose_value(env, s, "s", &entry->data);
+        xmlrpc_abort_on_fault(env);
+        xmlrpc_DECREF(s);
+        TAILQ_INSERT_TAIL(results, entry, items);
     }
 
     return;
@@ -311,22 +348,22 @@ void init_koji_task(struct koji_task *task)
 /*
  * Initialize a struct koji_task_list
  */
-void init_koji_descendent(koji_task_entry_t *entry)
+void init_koji_task_entry(koji_task_entry_t *entry)
 {
     assert(entry != NULL);
 
     init_koji_task(&entry->task);
     entry->brootid = -1;
 
-    entry->srpms = calloc(1, sizeof(*entry->srpms));
+    entry->srpms = malloc(sizeof(*entry->srpms));
     assert(entry->srpms != NULL);
     TAILQ_INIT(entry->srpms);
 
-    entry->rpms = calloc(1, sizeof(*entry->rpms));
+    entry->rpms = malloc(sizeof(*entry->rpms));
     assert(entry->rpms != NULL);
     TAILQ_INIT(entry->rpms);
 
-    entry->logs = calloc(1, sizeof(*entry->logs));
+    entry->logs = malloc(sizeof(*entry->logs));
     assert(entry->logs != NULL);
     TAILQ_INIT(entry->logs);
 
@@ -374,10 +411,30 @@ void free_koji_build(struct koji_build *build)
 }
 
 /*
+ * Free dynamically allocated memory associated with a koji_task_entry_t.
+ */
+void free_koji_task_entry(koji_task_entry_t *entry)
+{
+    if (entry == NULL) {
+        return;
+    }
+
+    free_koji_task(&entry->task);
+    list_free(entry->srpms, free);
+    list_free(entry->rpms, free);
+    list_free(entry->logs, free);
+    free(entry);
+
+    return;
+}
+
+/*
  * Free dynamically allocated memory associated with a struct koji_task.
  */
 void free_koji_task(struct koji_task *task)
 {
+    koji_task_entry_t *descendent = NULL;
+
     if (task == NULL) {
         return;
     }
@@ -388,7 +445,16 @@ void free_koji_task(struct koji_task *task)
     free(task->create_time);
     free(task->method);
     free(task->arch);
-    free(task->descendents);
+
+    if (task->descendents) {
+        while (!TAILQ_EMPTY(task->descendents)) {
+            descendent = TAILQ_FIRST(task->descendents);
+            TAILQ_REMOVE(task->descendents, descendent, items);
+            free_koji_task_entry(descendent);
+        }
+
+        free(task->descendents);
+    }
 
     return;
 }
@@ -457,6 +523,7 @@ struct koji_build *get_koji_build(struct rpminspect *ri, const char *buildspec)
         /* Get the key as a string */
         xmlrpc_decompose_value(&env, k, "s", &key);
         xmlrpc_abort_on_fault(&env);
+        xmlrpc_DECREF(k);
 
         /*
          * If the value of a key is nil, just skip over it.  We can't
@@ -464,6 +531,7 @@ struct koji_build *get_koji_build(struct rpminspect *ri, const char *buildspec)
          * be present in the output.
          */
         if (xmlrpc_value_type(value) == XMLRPC_TYPE_NIL) {
+            xmlrpc_DECREF(value);
             continue;
         }
 
@@ -580,15 +648,19 @@ struct koji_build *get_koji_build(struct rpminspect *ri, const char *buildspec)
                 /* Get the key as a string */
                 xmlrpc_decompose_value(&env, subk, "s", &subkey);
                 xmlrpc_abort_on_fault(&env);
+                xmlrpc_DECREF(subk);
 
                 /* Skip nil values */
                 if (xmlrpc_value_type(subv) == XMLRPC_TYPE_NIL) {
+                    xmlrpc_DECREF(subv);
                     continue;
                 }
 
                 if (!strcmp(subkey, "source") || !strcmp(subkey, "typeinfo") || !strcmp(subkey, "module")) {
                     subsize = xmlrpc_struct_size(&env, subv);
                     xmlrpc_abort_on_fault(&env);
+                    xmlrpc_DECREF(value);
+                    free(subkey);
                     value = subv;
                     j = 0;
                     continue;
@@ -620,6 +692,9 @@ struct koji_build *get_koji_build(struct rpminspect *ri, const char *buildspec)
                 }
 
                 j++;
+
+                xmlrpc_DECREF(subv);
+                free(subkey);
             }
         }
     }
@@ -652,9 +727,11 @@ struct koji_build *get_koji_build(struct rpminspect *ri, const char *buildspec)
                 /* Get the key as a string */
                 xmlrpc_decompose_value(&env, k, "s", &key);
                 xmlrpc_abort_on_fault(&env);
+                xmlrpc_DECREF(k);
 
                 /* Skip nil values */
                 if (xmlrpc_value_type(value) == XMLRPC_TYPE_NIL) {
+                    xmlrpc_DECREF(value);
                     continue;
                 }
 
@@ -666,7 +743,12 @@ struct koji_build *get_koji_build(struct rpminspect *ri, const char *buildspec)
                     xmlrpc_decompose_value(&env, value, "s", &buildentry->package_name);
                     xmlrpc_abort_on_fault(&env);
                 }
+
+                xmlrpc_DECREF(value);
+                free(key);
             }
+
+            xmlrpc_DECREF(element);
 
             buildentry->rpms = calloc(1, sizeof(*buildentry->rpms));
             assert(buildentry->rpms != NULL);
@@ -706,9 +788,11 @@ struct koji_build *get_koji_build(struct rpminspect *ri, const char *buildspec)
                 /* Get the key as a string */
                 xmlrpc_decompose_value(&env, k, "s", &key);
                 xmlrpc_abort_on_fault(&env);
+                xmlrpc_DECREF(k);
 
                 /* Skip nil values */
                 if (xmlrpc_value_type(value) == XMLRPC_TYPE_NIL) {
+                    xmlrpc_DECREF(value);
                     continue;
                 }
 
@@ -741,6 +825,8 @@ struct koji_build *get_koji_build(struct rpminspect *ri, const char *buildspec)
                     }
                 }
 
+                xmlrpc_DECREF(value);
+                free(key);
             }
 
             /* add this rpm to the list */
@@ -764,8 +850,8 @@ struct koji_build *get_koji_build(struct rpminspect *ri, const char *buildspec)
  */
 struct koji_task *get_koji_task(struct rpminspect *ri, const char *taskspec)
 {
-    int i, j, k, w;
-    int size, dsize, rsize, lsize;
+    int i, j, k;
+    int size, dsize, rsize;
     xmlrpc_env env;
     xmlrpc_value *result = NULL;
     xmlrpc_value *xk = NULL;
@@ -774,11 +860,9 @@ struct koji_task *get_koji_task(struct rpminspect *ri, const char *taskspec)
     xmlrpc_value *tr_v = NULL;
     xmlrpc_value *dstruct = NULL;
     xmlrpc_value *dresult = NULL;
-    xmlrpc_value *file_path = NULL;
     char *key = NULL;
     struct koji_task *task = NULL;
     koji_task_entry_t *descendent = NULL;
-    string_entry_t *entry = NULL;
 
     assert(ri != NULL);
 
@@ -849,7 +933,7 @@ struct koji_task *get_koji_task(struct rpminspect *ri, const char *taskspec)
             /* initialize a struct and read the results */
             descendent = calloc(1, sizeof(*descendent));
             assert(descendent != NULL);
-            init_koji_descendent(descendent);
+            init_koji_task_entry(descendent);
             read_koji_task_struct(&env, dstruct, &descendent->task);
 
             /* gather the task results */
@@ -865,64 +949,21 @@ struct koji_task *get_koji_task(struct rpminspect *ri, const char *taskspec)
                 /* Get the key as a string */
                 xmlrpc_decompose_value(&env, tr_k, "s", &key);
                 xmlrpc_abort_on_fault(&env);
+                xmlrpc_DECREF(tr_k);
 
                 /* Read the values */
                 if (!strcmp(key, "brootid")) {
                     xmlrpc_decompose_value(&env, tr_v, "i", &descendent->brootid);
                     xmlrpc_abort_on_fault(&env);
                 } else if (!strcmp(key, "srpms") && xmlrpc_value_type(tr_v) == XMLRPC_TYPE_ARRAY) {
-                    lsize = xmlrpc_array_size(&env, tr_v);
-                    xmlrpc_abort_on_fault(&env);
-
-                    descendent->srpms = calloc(1, sizeof(*descendent->srpms));
-                    assert(descendent->srpms != NULL);
-                    TAILQ_INIT(descendent->srpms);
-
-                    for (w = 0; w < lsize; w++) {
-                        entry = calloc(1, sizeof(*entry));
-                        assert(entry != NULL);
-                        xmlrpc_array_read_item(&env, tr_v, w, &file_path);
-                        xmlrpc_abort_on_fault(&env);
-                        xmlrpc_decompose_value(&env, file_path, "s", &entry->data);
-                        xmlrpc_abort_on_fault(&env);
-                        TAILQ_INSERT_TAIL(descendent->srpms, entry, items);
-                    }
+                    read_koji_descendent_results(&env, tr_v, descendent->srpms);
                 } else if (!strcmp(key, "rpms")) {
-                    lsize = xmlrpc_array_size(&env, tr_v);
-                    xmlrpc_abort_on_fault(&env);
-
-                    descendent->rpms = calloc(1, sizeof(*descendent->rpms));
-                    assert(descendent->rpms != NULL);
-                    TAILQ_INIT(descendent->rpms);
-
-                    for (w = 0; w < lsize; w++) {
-                        entry = calloc(1, sizeof(*entry));
-                        assert(entry != NULL);
-                        xmlrpc_array_read_item(&env, tr_v, w, &file_path);
-                        xmlrpc_abort_on_fault(&env);
-                        xmlrpc_decompose_value(&env, file_path, "s", &entry->data);
-                        xmlrpc_abort_on_fault(&env);
-                        TAILQ_INSERT_TAIL(descendent->rpms, entry, items);
-                    }
+                    read_koji_descendent_results(&env, tr_v, descendent->rpms);
                 } else if (!strcmp(key, "logs")) {
-                    lsize = xmlrpc_array_size(&env, tr_v);
-                    xmlrpc_abort_on_fault(&env);
-
-                    descendent->logs = calloc(1, sizeof(*descendent->logs));
-                    assert(descendent->logs != NULL);
-                    TAILQ_INIT(descendent->logs);
-
-                    for (w = 0; w < lsize; w++) {
-                        entry = calloc(1, sizeof(*entry));
-                        assert(entry != NULL);
-                        xmlrpc_array_read_item(&env, tr_v, w, &file_path);
-                        xmlrpc_abort_on_fault(&env);
-                        xmlrpc_decompose_value(&env, file_path, "s", &entry->data);
-                        xmlrpc_abort_on_fault(&env);
-                        TAILQ_INSERT_TAIL(descendent->logs, entry, items);
-                    }
+                    read_koji_descendent_results(&env, tr_v, descendent->logs);
                 }
 
+                xmlrpc_DECREF(tr_v);
                 free(key);
             }
 
