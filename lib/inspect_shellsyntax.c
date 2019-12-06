@@ -110,6 +110,11 @@ static bool shellsyntax_driver(struct rpminspect *ri, rpmfile_entry_t *file)
     char *tmp = NULL;
     bool extglob = false;
 
+    /* Ignore files in the SRPM */
+    if (headerIsSource(file->rpm_header)) {
+        return true;
+    }
+
     /* Get the mime type of the file */
     type = get_mime_type(file->fullpath);
 
