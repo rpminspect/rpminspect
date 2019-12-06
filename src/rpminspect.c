@@ -229,7 +229,6 @@ static char *get_product_release(const char *before, const char *after)
         after_product = NULL;
     }
 
-    free(before_product);
     return after_product;
 }
 
