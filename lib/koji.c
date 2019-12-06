@@ -352,7 +352,10 @@ void init_koji_task_entry(koji_task_entry_t *entry)
 {
     assert(entry != NULL);
 
-    init_koji_task(&entry->task);
+    entry->task = malloc(sizeof(*entry->task));
+    assert(entry->task != NULL);
+    init_koji_task(entry->task);
+
     entry->brootid = -1;
 
     entry->srpms = malloc(sizeof(*entry->srpms));
@@ -419,7 +422,7 @@ void free_koji_task_entry(koji_task_entry_t *entry)
         return;
     }
 
-    free_koji_task(&entry->task);
+    free_koji_task(entry->task);
     list_free(entry->srpms, free);
     list_free(entry->rpms, free);
     list_free(entry->logs, free);
@@ -455,6 +458,8 @@ void free_koji_task(struct koji_task *task)
 
         free(task->descendents);
     }
+
+    free(task);
 
     return;
 }
@@ -934,10 +939,10 @@ struct koji_task *get_koji_task(struct rpminspect *ri, const char *taskspec)
             descendent = calloc(1, sizeof(*descendent));
             assert(descendent != NULL);
             init_koji_task_entry(descendent);
-            read_koji_task_struct(&env, dstruct, &descendent->task);
+            read_koji_task_struct(&env, dstruct, descendent->task);
 
             /* gather the task results */
-            dresult = xmlrpc_client_call(&env, ri->kojihub, "getTaskResult", "(i)", descendent->task.id);
+            dresult = xmlrpc_client_call(&env, ri->kojihub, "getTaskResult", "(i)", descendent->task->id);
             xmlrpc_abort_on_fault(&env);
             rsize = xmlrpc_struct_size(&env, dresult);
 

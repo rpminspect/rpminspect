@@ -545,9 +545,9 @@ static int download_task(const struct rpminspect *ri, struct koji_task *task)
 
         /* create the destination directory */
         if (fetch_only) {
-            xasprintf(&dst, "%s/%s", workri->worksubdir, descendent->task.arch);
+            xasprintf(&dst, "%s/%s", workri->worksubdir, descendent->task->arch);
         } else {
-            xasprintf(&dst, "%s/%s/%s", workri->worksubdir, build_desc[whichbuild], descendent->task.arch);
+            xasprintf(&dst, "%s/%s/%s", workri->worksubdir, build_desc[whichbuild], descendent->task->arch);
         }
 
         if (mkdirp(dst, mode)) {
@@ -599,9 +599,9 @@ static int download_task(const struct rpminspect *ri, struct koji_task *task)
             pkg = basename(entry->data);
 
             if (fetch_only) {
-                xasprintf(&dst, "%s/%s/%s", workri->worksubdir, descendent->task.arch, pkg);
+                xasprintf(&dst, "%s/%s/%s", workri->worksubdir, descendent->task->arch, pkg);
             } else {
-                xasprintf(&dst, "%s/%s/%s/%s", workri->worksubdir, build_desc[whichbuild], descendent->task.arch, pkg);
+                xasprintf(&dst, "%s/%s/%s/%s", workri->worksubdir, build_desc[whichbuild], descendent->task->arch, pkg);
             }
 
             xasprintf(&src, "%s/work/%s", workri->kojiursine, entry->data);
@@ -687,7 +687,6 @@ int gather_builds(struct rpminspect *ri, bool fo) {
             }
 
             free_koji_task(task);
-            free(task);
         } else if ((build = get_koji_build(ri, ri->after)) != NULL) {
             set_worksubdir(ri, BUILD_WORKDIR, build, NULL);
 
@@ -698,7 +697,6 @@ int gather_builds(struct rpminspect *ri, bool fo) {
             }
 
             free_koji_build(build);
-            free(build);
         } else {
             fprintf(stderr, "*** enable to find after build: %s\n", ri->after);
             fflush(stderr);
@@ -736,7 +734,6 @@ int gather_builds(struct rpminspect *ri, bool fo) {
         }
 
         free_koji_task(task);
-        free(task);
     } else if ((build = get_koji_build(ri, ri->before)) != NULL) {
         set_worksubdir(ri, BUILD_WORKDIR, build, NULL);
 
@@ -747,7 +744,6 @@ int gather_builds(struct rpminspect *ri, bool fo) {
         }
 
         free_koji_build(build);
-        free(build);
     } else {
         fprintf(stderr, "*** unable to find before build: %s\n", ri->before);
         fflush(stderr);
