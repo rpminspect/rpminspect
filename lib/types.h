@@ -448,7 +448,7 @@ struct koji_task {
 /* A generic list of koji tasks */
 typedef struct _koji_task_entry_t {
     /* main task information */
-    struct koji_task task;
+    struct koji_task *task;
 
     /* results from getTaskResult */
     int brootid;
