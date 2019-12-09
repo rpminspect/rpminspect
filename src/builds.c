@@ -40,14 +40,6 @@ static int mode = S_IRWXU | S_IRGRP | S_IXGRP | S_IROTH | S_IXOTH;
 /* This array holds strings that map to the whichbuild index value. */
 static char *build_desc[] = { "before", "after" };
 
-/* Types of workdirs */
-typedef enum _workdir_t {
-    NULL_WORKDIR = 0,          /* unused                    */
-    LOCAL_WORKDIR = 1,         /* locally cached koji build */
-    TASK_WORKDIR = 2,          /* like for scratch builds   */
-    BUILD_WORKDIR = 3          /* remote koji build spec    */
-} workdir_t;
-
 /* Local prototypes */
 static void set_worksubdir(struct rpminspect *, workdir_t, const struct koji_build *, const struct koji_task *);
 static int get_rpm_info(const char *);
@@ -91,7 +83,7 @@ static void set_worksubdir(struct rpminspect *ri, workdir_t wd,
     } else {
         if (wd == LOCAL_WORKDIR) {
             xasprintf(&ri->worksubdir, "%s/local.XXXXXX", ri->workdir);
-        } else if (TASK_WORKDIR) {
+        } else if (wd == TASK_WORKDIR) {
             assert(task != NULL);
             xasprintf(&ri->worksubdir, "%s/scratch-%d.XXXXXX", ri->workdir, task->id);
         } else if (wd == BUILD_WORKDIR) {
