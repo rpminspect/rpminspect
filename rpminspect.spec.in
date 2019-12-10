@@ -56,6 +56,10 @@ Suggests:       tcsh
 Suggests:       rc
 Suggests:       bash
 
+# The annocheck program is used by the annocheck inspection.  It is not
+# required.
+Suggests:       /usr/bin/annocheck
+
 %description -n librpminspect
 The library providing the backend test functionality and API for the
 rpminspect frontend program.  This library can also be used by other
