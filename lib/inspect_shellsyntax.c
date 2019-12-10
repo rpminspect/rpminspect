@@ -116,14 +116,11 @@ static bool shellsyntax_driver(struct rpminspect *ri, rpmfile_entry_t *file)
     }
 
     /* Get the mime type of the file */
-    type = get_mime_type(file->fullpath);
+    type = get_mime_type(file);
 
     if (!strprefix(type, "text/")) {
-        free(type);
         return true;
     }
-
-    free(type);
 
     /* We need the architecture for reporting */
     arch = headerGetString(file->rpm_header, RPMTAG_ARCH);

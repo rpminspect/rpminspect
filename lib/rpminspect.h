@@ -179,8 +179,8 @@ void output_json(const results_t *, const char *);
 int unpack_archive(const char *, const char *, const bool);
 
 /* magic.c */
-char *get_mime_type(const char *);
-bool is_text_file(const char *);
+char *get_mime_type(rpmfile_entry_t *);
+bool is_text_file(rpmfile_entry_t *);
 
 /* checksums.c */
 char *checksum(const char *, mode_t *, enum checksum);

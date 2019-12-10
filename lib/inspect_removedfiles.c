@@ -82,7 +82,7 @@ static bool removedfiles_driver(struct rpminspect *ri, rpmfile_entry_t *file)
     }
 
     /* Collect the RPM architecture and file MIME type */
-    type = get_mime_type(file->fullpath);
+    type = get_mime_type(file);
     arch = headerGetString(file->rpm_header, RPMTAG_ARCH);
 
     /* Set the waiver type if this is a file of security concern */
@@ -122,7 +122,6 @@ static bool removedfiles_driver(struct rpminspect *ri, rpmfile_entry_t *file)
         free(msg);
     }
 
-    free(type);
     return result;
 }
 
