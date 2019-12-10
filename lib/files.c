@@ -49,6 +49,7 @@ void free_files(rpmfile_t *files)
         headerFree(entry->rpm_header);
         free(entry->fullpath);
         free(entry->localpath);
+        free(entry->type);
         free(entry);
     }
 
@@ -212,6 +213,8 @@ rpmfile_t * extract_rpm(const char *pkg, Header hdr)
 
         file_entry->localpath = strdup(archive_path);
         assert(file_entry->localpath);
+
+        file_entry->type = NULL;
 
         TAILQ_INSERT_TAIL(file_list, file_entry, items);
 

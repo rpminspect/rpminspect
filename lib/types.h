@@ -57,6 +57,8 @@ typedef TAILQ_HEAD(string_entry_s, _string_entry_t) string_list_t;
  * call headerFree to dereference the header.
  *
  * idx is the index for this file into the RPM array tags such as RPMTAG_FILESIZES.
+ *
+ * type is the MIME type string that you would get from 'file --mime-type'.
  */
 typedef struct _rpmfile_entry_t {
     Header rpm_header;
@@ -64,6 +66,7 @@ typedef struct _rpmfile_entry_t {
     char *localpath;
     struct stat st;
     int idx;
+    char *type;
     struct _rpmfile_entry_t *peer_file;
     TAILQ_ENTRY(_rpmfile_entry_t) items;
 } rpmfile_entry_t;

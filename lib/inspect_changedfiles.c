@@ -133,7 +133,7 @@ static bool changedfiles_driver(struct rpminspect *ri, rpmfile_entry_t *file)
     arch = headerGetString(file->rpm_header, RPMTAG_ARCH);
 
     /* Get the MIME type of the file, will need that */
-    type = get_mime_type(file->fullpath);
+    type = get_mime_type(file);
 
     /* Skip Java class files and JAR files (handled elsewhere) */
     if ((!strcmp(type, "application/zip") &&
@@ -363,7 +363,6 @@ static bool changedfiles_driver(struct rpminspect *ri, rpmfile_entry_t *file)
     }
 
 done:
-    free(type);
     free(before_sum);
     free(after_sum);
     free(msg);
