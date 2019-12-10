@@ -624,6 +624,9 @@ int init_rpminspect(struct rpminspect *ri, const char *cfgfile) {
     /* if a jvm major versions exist, collect those in to a hash table */
     read_mapping(cfg, "javabytecode", &ri->jvm_table, &ri->jvm_keys);
 
+    /* if an annocheck section exists, collect those in to a hash table */
+    read_mapping(cfg, "annocheck", &ri->annocheck_table, &ri->annocheck_keys);
+
     /* if a products section exists, collect those in to a hash table */
     read_mapping(cfg, "products", &ri->products, &ri->product_keys);
 

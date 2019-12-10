@@ -238,6 +238,10 @@ struct rpminspect {
     struct hsearch_data *jvm_table;
     string_list_t *jvm_keys;
 
+    /* hash table of annocheck tests */
+    struct hsearch_data *annocheck_table;
+    string_list_t *annocheck_keys;
+
     /* hash table of product release regexps */
     struct hsearch_data *products;
     string_list_t *product_keys;
