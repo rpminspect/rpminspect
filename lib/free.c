@@ -125,6 +125,7 @@ void free_rpminspect(struct rpminspect *ri) {
     list_free(ri->forbidden_groups, free);
     list_free(ri->shells, free);
     free_mapping(ri->jvm_table, ri->jvm_keys);
+    free_mapping(ri->annocheck_table, ri->annocheck_keys);
     free_mapping(ri->products, ri->product_keys);
 
     free_rpmpeer(ri->peers);
