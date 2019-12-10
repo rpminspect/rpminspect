@@ -72,6 +72,7 @@
 #define MSGUNFMT_CMD "msgunfmt"
 #define DIFF_CMD "diff"
 #define DESKTOP_FILE_VALIDATE_CMD "desktop-file-validate"
+#define ANNOCHECK_CMD "annocheck"
 
 /*
  * Architecture name of source RPMs (from Koji)
