@@ -43,6 +43,7 @@
 #define HEADER_UPSTREAM      "upstream"
 #define HEADER_OWNERSHIP     "ownership"
 #define HEADER_SHELLSYNTAX   "shell-syntax"
+#define HEADER_ANNOCHECK     "annocheck"
 
 /*
  * Inspection remedies
@@ -115,5 +116,8 @@
 #define REMEDY_SHELLSYNTAX "Consult the shell documentation for proper syntax."
 #define REMEDY_SHELLSYNTAX_GAINED_SHELL "The file referenced was not a known shell script in the before build but is now a shell script in the after build."
 #define REMEDY_SHELLSYNTAX_BAD "The referenced shell script is invalid. Consider debugging it with the '-n' option on the shell to find and fix the problem."
+
+/* annocheck */
+#define REMEDY_ANNOCHECK "See annocheck(1) for more information."
 
 #endif
