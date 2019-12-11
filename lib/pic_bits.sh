@@ -1,6 +1,7 @@
 #!/bin/sh
 # Copyright (C) 2019  Red Hat, Inc.
 # Author(s):  David Shea <dshea@redhat.com>
+#             David Cantrell <dcantrell@redhat.com>
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -27,15 +28,18 @@
 # that either use a procedure linkage table (PLT) or global offset table (GOT),
 # and the values for these relocation types are all architecture specific.
 # Some alternatives are:
-#  * do it the old way: run `eu-readelf --reloc` and grep for (PLT|GOT) in the reloc type:
-#    The disadvantage is that you need run eu-readelf and parse its output a whole bunch of times.
-#  * write a function that hard-codes all of the relevant architectures and relocation types:
-#    That's basically what this script is doing. Writing it by hand(ish) would have the
-#    advantage that no bad symbols slip through, but that assumes that the writer actually
-#    knows what any of this stuff means. This would also means the function has to be manually
-#    updated every time a new arch comes along.
-#  * find someone who knows what any of this stuff means to explain a better way:
-#    Maybe?
+#  * do it the old way: run `eu-readelf --reloc` and grep for
+#    (PLT|GOT) in the reloc type: The disadvantage is that you need
+#    run eu-readelf and parse its output a whole bunch of times.
+#  * write a function that hard-codes all of the relevant
+#    architectures and relocation types: That's basically what this
+#    script is doing. Writing it by hand(ish) would have the advantage
+#    that no bad symbols slip through, but that assumes that the
+#    writer actually knows what any of this stuff means. This would
+#    also means the function has to be manually updated every time a
+#    new arch comes along.
+#  * find someone who knows what any of this stuff means to explain a
+#    better way: Maybe?
 #
 # Anyway here goes. The machine types are in the EM_<arch> #define's, and the
 # reloc types are in the R_<arch>_<type> #define's. The only case we (sort of)
@@ -66,13 +70,13 @@ echo "    switch (machine) {" >> $1
 # get a list of the EM_* arch lines:
 echo "$cpp_output" | sed -n -E 's/^#define[[:space:]]+(EM_[^[:space:]]+).*/\1/p' | \
     while read -r arch; do
-        # for each arch, look for corresponding reloc types that have either GOT or PLT
-        # in the macro name.
-
+        # for each arch, look for corresponding reloc types that have
+        # either GOT or PLT in the macro name.
         archpart="$(echo "$arch" | sed 's/^EM_//')"
-        if [ "$archpart" = "IA_64" ]; then
-            archpart="IA64"
-        fi
+
+        # some machine names do not map directly to the names for arch types
+        [ "$archpart" = "IA_64" ] && archpart="IA64"
+        [ "$archpart" = "S390" ] && archpart="390"
 
         relocs="$(echo "$cpp_output" | sed -n -E 's/^#define[[:space:]]+(R_'"${archpart}"'_[^[:space:]]*(PLT|GOT)[^[:space:]]*).*/\1/p')"
         if [ -n "$relocs" ]; then
