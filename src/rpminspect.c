@@ -217,6 +217,7 @@ static char *get_product_release(const char *before, const char *after)
             }
         } else if (!c) {
             matched = true;
+            free(before_product);
         }
     } else {
         matched = true;
