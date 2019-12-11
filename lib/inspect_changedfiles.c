@@ -115,6 +115,14 @@ static bool changedfiles_driver(struct rpminspect *ri, rpmfile_entry_t *file)
     const char *bv = NULL;
     const char *av = NULL;
 
+    assert(ri != NULL);
+    assert(file != NULL);
+
+    /* Skip source packages */
+    if (headerIsSource(file->rpm_header)) {
+        return true;
+    }
+
     /* Skip files without a peer, other inspections handle new/missing files */
     if (!file->peer_file) {
         return true;
