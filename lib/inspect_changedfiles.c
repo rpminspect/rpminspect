@@ -112,6 +112,8 @@ static bool changedfiles_driver(struct rpminspect *ri, rpmfile_entry_t *file)
     char *after_tmp = NULL;
     int fd;
     char magic[4];
+    const char *bv = NULL;
+    const char *av = NULL;
 
     /* Skip files without a peer, other inspections handle new/missing files */
     if (!file->peer_file) {
@@ -127,6 +129,32 @@ static bool changedfiles_driver(struct rpminspect *ri, rpmfile_entry_t *file)
     if (strprefix(file->localpath, DEBUG_PATH) ||
         strprefix(file->localpath, DEBUG_SRC_PATH)) {
         goto done;
+    }
+
+    /* Set the waiver type if this is a file of security concern */
+    if (ri->security_path_prefix) {
+        TAILQ_FOREACH(entry, ri->security_path_prefix, items) {
+            while (*entry->data != '/') {
+                entry->data++;
+            }
+
+            if (strprefix(file->localpath, entry->data)) {
+                severity = RESULT_BAD;
+                waiver = WAIVABLE_BY_SECURITY;
+                break;
+            }
+        }
+    }
+
+    /*
+     * Only run this inspection for builds that change versions or
+     * the waiver type is WAIVABLE_BY_SECURITY.
+     */
+    bv = headerGetString(file->peer_file->rpm_header, RPMTAG_VERSION);
+    av = headerGetString(file->rpm_header, RPMTAG_VERSION);
+
+    if (!strcmp(bv, av) && waiver != WAIVABLE_BY_SECURITY) {
+        return true;
     }
 
     /* The architecture is used in reporting messages */
@@ -171,21 +199,6 @@ static bool changedfiles_driver(struct rpminspect *ri, rpmfile_entry_t *file)
          */
         if (magic[1] == '\x0D' && magic[2] == '\x0D' && magic[3] == '\x0A') {
             goto done;
-        }
-    }
-
-    /* Set the waiver type if this is a file of security concern */
-    if (ri->security_path_prefix) {
-        TAILQ_FOREACH(entry, ri->security_path_prefix, items) {
-            while (*entry->data != '/') {
-                entry->data++;
-            }
-
-            if (strprefix(file->localpath, entry->data)) {
-                severity = RESULT_BAD;
-                waiver = WAIVABLE_BY_SECURITY;
-                break;
-            }
         }
     }
 
