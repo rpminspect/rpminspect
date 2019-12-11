@@ -135,6 +135,12 @@ struct inspect inspections[] = {
       &inspect_annocheck,
       "Perform annocheck tests defined in the configuration file on all ELF files in the build.  A single build specified will perform an analysis only.  Two builds specified will compare the test results between the before and after build.  If no annocheck tests are defined in the configuration file, this inspection is skipped." },
 
+    { INSPECT_DT_NEEDED,
+      "DT_NEEDED",
+      false,
+      &inspect_dt_needed,
+      "Compare DT_NEEDED entries in dynamic ELF executables and shared libraries between the before and after build and report changes." },
+
     /*
      * { INSPECT_TYPE (add to inspect.h),
      *   "short name",
@@ -148,9 +154,10 @@ struct inspect inspections[] = {
 
 /*
  * Inspect each "after" file in each peer of an inspection.
- * If the foreach_peer_file_func returns false for any file, the result will be false.
- * foreach_peer_file_func is run on each file even if an earlier file fails. This allows
- * for multiple errors to be collected for a single inspection.
+ * If the foreach_peer_file_func returns false for any file, the
+ * result will be false.  foreach_peer_file_func is run on each file
+ * even if an earlier file fails. This allows for multiple errors to
+ * be collected for a single inspection.
  */
 bool foreach_peer_file(struct rpminspect *ri, foreach_peer_file_func check_fn)
 {

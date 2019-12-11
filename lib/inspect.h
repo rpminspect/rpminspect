@@ -130,6 +130,9 @@ bool inspect_shellsyntax(struct rpminspect *);
 /* inspect_annocheck.c */
 bool inspect_annocheck(struct rpminspect *);
 
+/* inspect_dt_needed.c */
+bool inspect_dt_needed(struct rpminspect *);
+
 /*
  * Inspections are referenced by flag.  These flags are set in bitfields
  * to indicate which ones we want to run.  When adding new ones, please
@@ -156,5 +159,6 @@ bool inspect_annocheck(struct rpminspect *);
 #define INSPECT_OWNERSHIP                   (((uint64_t) 1) << 16)
 #define INSPECT_SHELLSYNTAX                 (((uint64_t) 1) << 17)
 #define INSPECT_ANNOCHECK                   (((uint64_t) 1) << 18)
+#define INSPECT_DT_NEEDED                   (((uint64_t) 1) << 19)
 
 #endif

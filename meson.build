@@ -99,6 +99,7 @@ librpminspect_sources = [
     'lib/inspect_changedfiles.c',
     'lib/inspect_desktop.c',
     'lib/inspect_disttag.c',
+    'lib/inspect_dt_needed.c',
     'lib/inspect_elf.c',
     'lib/inspect_emptyrpm.c',
     'lib/inspect_javabytecode.c',
