@@ -136,7 +136,7 @@ static bool changedfiles_driver(struct rpminspect *ri, rpmfile_entry_t *file)
     /* Skip files in the debug path and debug source path */
     if (strprefix(file->localpath, DEBUG_PATH) ||
         strprefix(file->localpath, DEBUG_SRC_PATH)) {
-        goto done;
+        return true;
     }
 
     /* Set the waiver type if this is a file of security concern */
@@ -176,7 +176,7 @@ static bool changedfiles_driver(struct rpminspect *ri, rpmfile_entry_t *file)
          strsuffix(file->fullpath, JAR_FILENAME_EXTENSION)) ||
         (!strcmp(type, "application/x-java-applet") &&
          strsuffix(file->fullpath, CLASS_FILENAME_EXTENSION))) {
-        goto done;
+        return true;
     }
 
     /* Skip Python bytecode files (these always change) */
@@ -188,17 +188,17 @@ static bool changedfiles_driver(struct rpminspect *ri, rpmfile_entry_t *file)
 
         if (fd == -1) {
             fprintf(stderr, "unable to open(2) %s on %s for reading: %s\n", file->localpath, arch, strerror(errno));
-            goto done;
+            return true;
         }
 
         if (read(fd, magic, sizeof(magic)) != sizeof(magic)) {
             fprintf(stderr, "unable to read(2) %s on %s: %s\n", file->localpath, arch, strerror(errno));
-            goto done;
+            return true;
         }
 
         if (close(fd) == -1) {
             fprintf(stderr, "unable to close(2) %s on %s: %s\n", file->localpath, arch, strerror(errno));
-            goto done;
+            return true;
         }
 
         /*
@@ -206,7 +206,7 @@ static bool changedfiles_driver(struct rpminspect *ri, rpmfile_entry_t *file)
          * The __ is a version identifier which changes from time to time
          */
         if (magic[1] == '\x0D' && magic[2] == '\x0D' && magic[3] == '\x0A') {
-            goto done;
+            return true;
         }
     }
 
