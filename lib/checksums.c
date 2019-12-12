@@ -39,7 +39,8 @@
  * NOTE: The caller is responsible for freeing the string returned by
  *       this function.
  */
-char *checksum(const char *filename, mode_t *st_mode, enum checksum type) {
+char *compute_checksum(const char *filename, mode_t *st_mode, enum checksum type)
+{
     struct stat sb;
     mode_t *mode = NULL;
     unsigned char buf[BUFSIZ];
@@ -145,4 +146,23 @@ char *checksum(const char *filename, mode_t *st_mode, enum checksum type) {
     }
 
     return ret;
+}
+
+/*
+ * Given an rpmfile_entry_t, returned either the cached checksum or
+ * compute it, cache it, and return that.
+ *
+ * The caller should not directly free this as it is freed with the
+ * call to free_files()
+ */
+char *checksum(rpmfile_entry_t *file)
+{
+    assert(file != NULL);
+
+    if (file->checksum) {
+        return file->checksum;
+    }
+
+    file->checksum = compute_checksum(file->fullpath, &file->st.st_mode, SHA256SUM);
+    return file->checksum;
 }

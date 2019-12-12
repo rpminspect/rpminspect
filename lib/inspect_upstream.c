@@ -138,8 +138,8 @@ static bool upstream_driver(struct rpminspect *ri, rpmfile_entry_t *file)
         }
 
         /* compare checksums to see if the upstream sources changed */
-        before_sum = checksum(file->peer_file->fullpath, &file->peer_file->st.st_mode, SHA256SUM);
-        after_sum = checksum(file->fullpath, &file->st.st_mode, SHA256SUM);
+        before_sum = checksum(file->peer_file);
+        after_sum = checksum(file);
 
         if (strcmp(before_sum, after_sum)) {
             /* capture 'diff -u' output for text files */
@@ -167,8 +167,6 @@ static bool upstream_driver(struct rpminspect *ri, rpmfile_entry_t *file)
     }
 
     free(msg);
-    free(before_sum);
-    free(after_sum);
     return result;
 }
 

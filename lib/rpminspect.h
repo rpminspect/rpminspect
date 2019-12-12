@@ -183,7 +183,8 @@ char *get_mime_type(rpmfile_entry_t *);
 bool is_text_file(rpmfile_entry_t *);
 
 /* checksums.c */
-char *checksum(const char *, mode_t *, enum checksum);
+char *compute_checksum(const char *, mode_t *, enum checksum);
+char *checksum(rpmfile_entry_t *);
 
 /* runcmd.c */
 char *run_cmd(int *, const char *, ...);
