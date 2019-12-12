@@ -98,8 +98,12 @@ static bool is_source(const rpmfile_entry_t *file)
 static bool upstream_driver(struct rpminspect *ri, rpmfile_entry_t *file)
 {
     bool result = true;
+    const char *bv = NULL;
+    const char *av = NULL;
     char *before_sum = NULL;
     char *after_sum = NULL;
+    severity_t sev;
+    waiverauth_t waiver;
     char *diff_output = NULL;
     char *diff_head = NULL;
     char *shortname = NULL;
@@ -119,6 +123,21 @@ static bool upstream_driver(struct rpminspect *ri, rpmfile_entry_t *file)
         add_result(ri, RESULT_VERIFY, WAIVABLE_BY_ANYONE, HEADER_UPSTREAM, msg, NULL, REMEDY_UPSTREAM);
         result = false;
     } else {
+        /* Set correct reporting level and waiver */
+        bv = headerGetString(file->peer_file->rpm_header, RPMTAG_VERSION);
+        av = headerGetString(file->rpm_header, RPMTAG_VERSION);
+
+        if (strcmp(bv, av)) {
+            /* versions changed */
+            sev = RESULT_INFO;
+            waiver = NOT_WAIVABLE;
+        } else {
+            /* versions are the same, likely maintenance */
+            sev = RESULT_VERIFY;
+            waiver = WAIVABLE_BY_ANYONE;
+        }
+
+        /* compare checksums to see if the upstream sources changed */
         before_sum = checksum(file->peer_file->fullpath, &file->peer_file->st.st_mode, SHA256SUM);
         after_sum = checksum(file->fullpath, &file->st.st_mode, SHA256SUM);
 
@@ -139,7 +158,7 @@ static bool upstream_driver(struct rpminspect *ri, rpmfile_entry_t *file)
 
             /* report the changed file */
             xasprintf(&msg, "Upstream source file `%s` changed content", shortname);
-            add_result(ri, RESULT_VERIFY, WAIVABLE_BY_ANYONE, HEADER_UPSTREAM, msg, diff_head, REMEDY_UPSTREAM);
+            add_result(ri, sev, waiver, HEADER_UPSTREAM, msg, diff_head, REMEDY_UPSTREAM);
             result = false;
 
             /* clean up */
