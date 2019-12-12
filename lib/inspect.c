@@ -61,7 +61,7 @@ struct inspect inspections[] = {
       "elf",
       true,
       &inspect_elf,
-      "Perform several checks on ELF files. First, check that ELF objects do not contain an executable stack. Second, check that ELF objects do not contain text relocations. When comparing builds, check that the ELF objects in the after build did not lose a PT_GNU_RELRO segment. Lastly, when comparing builds, check that the ELF objects in the after build did not lose -D_FORTIFY_SOURCE." },
+      "Perform several checks on ELF files. First, check that ELF objects do not contain an executable stack. Second, check that ELF objects do not contain text relocations. When comparing builds, check that the ELF objects in the after build did not lose a PT_GNU_RELRO segment. When comparing builds, check that the ELF objects in the after build did not lose -D_FORTIFY_SOURCE. Lastly, if there is a list of forbidden library functions, make sure nothing uses them." },
 
     { INSPECT_DESKTOP,
       "desktop",
