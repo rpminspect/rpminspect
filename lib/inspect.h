@@ -133,6 +133,9 @@ bool inspect_annocheck(struct rpminspect *);
 /* inspect_dt_needed.c */
 bool inspect_dt_needed(struct rpminspect *);
 
+/* inspect_filesize.c */
+bool inspect_filesize(struct rpminspect *);
+
 /*
  * Inspections are referenced by flag.  These flags are set in bitfields
  * to indicate which ones we want to run.  When adding new ones, please
@@ -160,5 +163,6 @@ bool inspect_dt_needed(struct rpminspect *);
 #define INSPECT_SHELLSYNTAX                 (((uint64_t) 1) << 17)
 #define INSPECT_ANNOCHECK                   (((uint64_t) 1) << 18)
 #define INSPECT_DT_NEEDED                   (((uint64_t) 1) << 19)
+#define INSPECT_FILESIZE                    (((uint64_t) 1) << 20)
 
 #endif

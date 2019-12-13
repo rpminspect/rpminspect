@@ -141,6 +141,12 @@ struct inspect inspections[] = {
       &inspect_dt_needed,
       "Compare DT_NEEDED entries in dynamic ELF executables and shared libraries between the before and after build and report changes." },
 
+    { INSPECT_FILESIZE,
+      "filesize",
+      false,
+      &inspect_filesize,
+      "Report file size changes between builds.  If empty files became non-empty or non-empty files became empty, report those as results needing verification.  Report file change percentages as info-only." },
+
     /*
      * { INSPECT_TYPE (add to inspect.h),
      *   "short name",
