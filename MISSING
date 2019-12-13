@@ -1,0 +1,33 @@
+Those familiar with rpminspect's ancestor may notice some of the tests
+are not present as rpminspect inspections.  Here is an explanation of
+the excluded tests:
+
+TEST_BUILDLOG
+    Looks at rpmbuild output for any common error or warning strings
+    that should be investigated.  Things like "***", "ERROR:",
+    "error:", and so on.  Not a very easy to maintain test and
+    generates a lot of false positives.  This is better caught by
+    gating tests and other test suites.
+
+TEST_RPMLINT
+    Runs rpmlint and reports the results.  We already run rpmlint or can
+    in the gating infrastructure, so no need to have rpminspect also invoke
+    this tool and report the same results.
+
+TEST_UPSTREAM (only the rebase keyword check)
+    The rpmdiff TEST_UPSTREAM check looks at the bug list from Errata
+    Tool for any approved bug with the 'Rebase' keyword set.  If this
+    is not found and the source archives were found to differ, rpmdiff
+    reports that as a BAD where anyone can waive it.  This
+    functionality is not present in rpminspect because rpminspect runs
+    separately from the Errata Tool.  Checking bugs for various
+    keywords and approval settings are things that should be done by
+    other tools and processes.  Once the bug is approved and the
+    developer submits the build, rebase or not, rpminspect should be
+    free to run.  rhpkg can implement rules and we can implement
+    additional gating checks for package rebases if we desire.
+
+TEST_ELFLINT
+    This test runs elflint(1) on ELF files.  We already have the existing
+    ELF tests using eu-elfcmp, libelf, and annocheck so this one is more
+    or less redundant.
