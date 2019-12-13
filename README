@@ -2,64 +2,65 @@
 rpminspect
 ==========
 
-RPM build deviation analysis tools.  rpminspect looks at the output of an
-RPM build (e.g., the output of a Koji build) and examines the contents of
-the build artifacts to report:
+RPM build deviation analysis tools.  rpminspect looks at the output of
+an RPM build (e.g., the output of a Koji build) and examines the
+contents of the build artifacts to report:
 
     * Policy compliance
     * Changes from a previous build to the current build
     * General correctness and best practices
 
-rpminspect is the frontend tool and librpminspect provides the inspection
-engine and individual inspections.  The program is configured through the
-rpminspect.conf file and runtime data is provided by a vendor specific
-rpminspect-data package.  The rpminspect-data-generic package in this source
-tree provides a template for constructing the vendor specific data package.
+rpminspect is the frontend tool, and librpminspect provides the
+inspection engine and inspections.  The program is configured through
+the rpminspect.conf file and runtime data is provided by a
+vendor-specific rpminspect-data package.  The rpminspect-data-generic
+package in this source tree provides a template for constructing the
+vendor-specific data package.
 
 
 Build Types Support
 -------------------
 
 rpminspect expects its input to either be local RPM packages or a Koji
-build.  Koji produces certain types of builds that are not supported by
-rpminspect.  Right now, the following input types are supported:
+build.  Koji produces certain types of builds that are not supported
+by rpminspect.  Right now, the following input types are supported:
 
     * Local RPM packages (source or binary)
     * Koji builds (i.e., an SRPM run with 'rpmbuild -ba' on all specified
                    architectures)
     * Modules (https://docs.fedoraproject.org/en-US/modularity/)
 
-More information on Koji can be found at https://pagure.io/koji
+See https://pagure.io/koji for more information on Koji.
 
-If comparing local RPM packages, rpminspect assumes the before and after
-specifications are peers whereas for a Koji build, rpminspect will figure
-out peers (e.g., in the gcc package, gcc-gfortran in the before build is
-peered with gcc-gfortran in the after build).
+If comparing local RPM packages, rpminspect assumes the before and
+after specifications are peers whereas for a Koji build, rpminspect
+matches peer packages (e.g., in the gcc package, gcc-gfortran in the
+before build is peered with gcc-gfortran in the after build).
 
 
 Intended Audience
 -----------------
 
-Developers, QE, release engineers, and system administrators who regularly
-build RPMs for use in some environment or product.
+Developers, QE, release engineers, and system administrators who
+regularly build RPMs for use in some environments or products.
 
-From an individual user standpoint, rpminspect is intended to be a command
-line tool you can use as a linter of sorts.  rpminspect reports and that's
-it.  rpminspect can output information in JSON format which is intended to
-make it easier to integrate in to automated workflows or web frontends.
+From an individual user standpoint, rpminspect is a command-line tool
+you can use as a linter of sorts.  rpminspect reports, and that's it.
+rpminspect can output information in JSON format, which makes it
+easier to integrate with automated workflows or web frontends.
 
-The reporting uses certain classifications for different things found, but
-it up to the end user to determine what to do with that information.  If
-rpminspect is integrated in to a build tool, the JSON data may be more
-useful as you can construct decision making around those results.
+The reporting uses certain classifications for different things found,
+but it up to the end-user to determine what to do with that
+information.  If used with an external build tool, the JSON data may
+be more useful as you can construct decision making around those
+results.
 
 
 Build Requirements
 ------------------
 
 A typical Linux system with a toolchain for building C software using
-meson and ninja, plus the following libraries (make sure the header files
-are available):
+meson and ninja, plus the following libraries:
 
     * json-c
           http://json-c.github.io/json-c/
@@ -104,7 +105,7 @@ are available):
     * libcap-ng
           https://github.com/stevegrubb/libcap-ng
 
-Additionally, the follow packages are required for running the unit tests:
+Additionally, the unit test suite requires the following packages:
 
     * CUnit (including headers)
           http://cunit.sourceforge.net/
@@ -112,21 +113,21 @@ Additionally, the follow packages are required for running the unit tests:
 Most distributions include the above projects in prebuilt and packaged
 form.  If those are available, you should use those packages.
 
-In Fedora for example, you can run the following to install the required
-packages:
+In Fedora, for example, you can run the following to install the
+required packages:
 
     dnf install json-c-devel xmlrpc-c-devel libxml2-devel rpm-devel \
                 libarchive-devel elfutils-devel kmod-devel zlib-devel \
-                libmandoc-devel iniparser-devel libyaml-devel file-devel \
-                openssl-devel libcap-ng-devel meson ninja-build CUnit CUnit-devel \
-                gcc
+                libmandoc-devel iniparser-devel libyaml-devel \
+                file-devel openssl-devel libcap-ng-devel meson \
+                ninja-build CUnit CUnit-devel gcc
 
 
 Runtime Requirements
 --------------------
 
-In addition to the libraries that will be linked in to librpminspect, there
-are a number of userspace programs required:
+In addition to the libraries that will be linked in to librpminspect,
+there are a number of userspace programs required:
 
     /usr/bin/desktop-file-validate
     /usr/bin/zcmp
@@ -136,27 +137,29 @@ are a number of userspace programs required:
     /usr/bin/msgunfmt
     /usr/bin/diff
 
-The provided spec file template uses the Fedora locations for these files,
-but in the program they are assumed to be in PATH at runtime.  These tools
-are used by different inspections at runtime. Most distributions include the
-above tools. If they are available, you should use those packages.
+The provided spec file template uses the Fedora locations for these
+files, but in the program, they must be on the runtime system.
+Different inspections use these tools at runtime. Most distributions
+include the above tools. If they are available, you should use those
+packages.
 
-In Fedora for example, you can run the following to install these programs:
+In Fedora, for example, you can run the following to install these
+programs:
 
     dnf install desktop-file-utils gzip bzip2 xz elfutils gettext diffutils
 
-The 'shellsyntax' inspection uses the actual shell programs listed in the
-shells setting in the rpminspect.conf.  Since this can vary by system, you
-should make sure the are available in the system PATH.  Or you can just not
-use the shellsyntax inspection.  The spec file for rpminspect includes weak
-dependencies on the default list of shells.
+The 'shellsyntax' inspection uses the actual shell programs listed in
+the shells setting in the rpminspect.conf.  Since this can vary by
+system, you should make sure they are available in the system PATH.
+Or you can just not use the shellsyntax inspection.  The spec file for
+rpminspect includes weak dependencies on the default list of shells.
 
 
 Building
 --------
 
-If you got the source from a released tarball or from cloned from git, you
-can do this:
+If you got the source from a released tarball or from cloned from git,
+you can do this:
 
     meson setup build
     ninja -C build
@@ -170,15 +173,15 @@ For more information on meson and ninja, see these sites:
 Releasing
 ---------
 
-Releases are made by running 'make release'.  This creates a release
-notice on Github which can be edited.  The release process _should_
-attach the tarball and signature to the Github release entry, but if
-it doesn't it usually means there's a problem with the
-utils/release.sh script talking with the Github API.  In those cases,
-the entry can be manually edited and the files attached manually.
+The 'make release' command creates a new release.  The command handles
+the version number change, tests, git tag, repo push, and release
+entry on GitHub.  The release process _should_ attach the tarball and
+signature to the Github release entry, but if it doesn't it usually
+means there's a problem with the utils/release.sh script talking with
+the Github API.  In those cases, you can edit the entry and attach the
+files manually.
 
-Builds in Fedora and EPEL of the current release are made by running
-'make koji'.
+The 'make koji' command submits official builds for Fedora and EPEL.
 
 
 How To Use
@@ -187,44 +190,47 @@ How To Use
 SETUP
 
 Make sure you have installed the program and corresponding data file
-collection.  On Fedora, this can be done using dnf:
+collection.  Fedora users can use dnf:
 
     dnf install rpminspect rpminspect-data-fedora
 
-The first package is the actual program.  The rpminspect-data-fedora package
-delivers data files used by the various inspections performed by rpminspect.
-It also delivers the rpminspect.conf configuration file.  Have a look at
-this file and make sure it will work for your environment.  The idea is to
-easily support per-vendor data packages.  For example, if CentOS needs
-different settings, it should provide an rpminspect-data-centos package.
+The first package is the actual program.  The rpminspect-data-fedora
+package delivers data files used by the various inspections performed
+by rpminspect.  It also delivers the rpminspect.conf configuration
+file.  Have a look at this file and make sure it works for your
+environment.  The idea is to support per-vendor data packages
+efficiently.  For example, if CentOS needs different settings, it
+should provide a rpminspect-data-centos package.
 
-Ideally the configuration file should not need changing.  If you do find
-mistakes, please file an issue or send a pull request to the project:
+Ideally, the configuration file should not need changing.  If you do
+find mistakes, please file an issue or send a pull request to the
+project:
 
     https://github.com/rpminspect/rpminspect-data-fedora
 
-The aim should be the vendor-specific data packages providing everything a
-developer needs to successfully run rpminspect locally for that product.
+The aim should be the vendor-specific data packages providing
+everything a developer needs to run rpminspect locally for that
+product successfully.
 
 USAGE
 
-rpminspect is run from the command line.  The inputs must be local RPM
-packages, a Koji build specification (NVR), a Koji module specification, or
-a locally cached Koji build output (regular build or module).  For inputs
-originating from Koji, rpminspect will talk to Koji and download the build
-artifacts.  For repeated runs, you may want to cache a remote build locally
-to avoid downloading it with each run.
+rpminspect runs from the command line.  The inputs must be local RPM
+packages, a Koji build specification (NVR), a Koji module
+specification, or a locally cached Koji build output (regular build or
+module).  For inputs originating from Koji, rpminspect talks to Koji
+and download the build artifacts.  For repeated runs, you may want to
+cache a remote build locally to avoid downloading it with each run.
 
 Here is a simple invocation using tmux as an example:
 
     $ rpminspect -v tmux-2.9a-2.fc31 tmux-2.9a-3.fc31
 
-This just runs with verbose mode enabled and compares tmux-2.9a-2.fc31 to
-tmux-2.9a-3.fc31.  rpminspect will download the packages for these builds
-and run the inspections.
+This just runs with verbose mode enabled and compares tmux-2.9a-2.fc31
+to tmux-2.9a-3.fc31.  rpminspect downloads the packages for these
+builds and runs the inspections.
 
 If you want to keep temporary files created during the run, pass -k.
-rpminspect will tell you where those files after it finishes.
+rpminspect tells you where those files are when it finishes.
 
 You can list available inspections with the -l option:
 
@@ -255,7 +261,7 @@ Now let's run all the inspections but specify the locally cached builds:
     $ rpminspect -v ~/builds/tmux-2.9a-2.fc31 ~/builds/tmux-2.9a-3.fc31
 
 Easy.  Again, these locally cached builds must look like what rpminspect
-would download from koji.  Hence using rpminspect to first download it.
+would download from koji.  Hence using rpminspect first to download it.
 
 rpminspect can also run inspections on local RPM packages.  Similar to Koji
 inputs, you may specify a single RPM or two RPMs to compare.  For example:
@@ -267,49 +273,51 @@ Or:
     $ cd ~/rpmbuild/RPMS/x86_64
     $ rpminspect -v tmux-2.9a-2.fc31.x86_64.rpm tmux-2.9a-3.fc31.x86_64.rpm
 
-All of the other command line options that apply to Koji tests work for
+All of the other command-line options that apply to Koji tests work for
 local RPM packages.
 
 For more information, see the man page for rpminspect(1).  And see the
---help output for information on command line option syntax.
+--help output for information on command-line option syntax.
 
 
 Contributing
 ------------
 
-Patches are welcome as are bug reports.  There are a lot to do in this
+Patches are welcome, as are bug reports.  There is a lot to do in this
 project.  Some things to keep in mind:
 
-    * Please follow existing coding style in files you modify.  Things like
-      variable and function naming, spacing, and indentation.  I want to
-      avoid wildly varying coding styles throughout the tree.
+    * Please follow the existing coding style in files you modify.
+      Things like variable and function naming, spacing, and
+      indentation.  I want to avoid wildly varying coding styles
+      throughout the tree.
 
     * New inspections in librpminspect need to be in the form of an
-      inspect_NAME.c file with a driver added to the main struct.  You may
-      add static and non-static support functions to your inspect_NAME.c file
-      and expose those as part of the librpminspect API.  If the support
-      functions are generic enough, feel free to start a new source file.
+      inspect_NAME.c file with a driver added to the main struct.  You
+      may add static and non-static support functions to your
+      inspect_NAME.c file and expose those as part of the
+      librpminspect API.  If the support functions are generic enough,
+      feel free to start a new source file.
 
-    * Test cases or updates to existing test cases need to accompany patches
-      and new code submissions.
+    * Test cases or updates to existing test cases need to accompany
+      patches and new code submissions.
 
     * Use the standard C library whenever possible.  Code using glib,
-      libbsd, or any other type of generic utility library is going to be
-      reviewed and likely rejected until it is modified to use the standard C
+      libbsd or any other type of generic utility library is going to
+      be reviewed and likely rejected until it is modified to use the
+      standard C library.
+
+    * That said, inspections should make use of available libraries
+      for performing their work.  When given the option between a
+      library and forking and executing a program, please use the
       library.
 
-    * That said, inspections are expected to make use of available libraries
-      for performing their work.  When given the option between a library
-      and forking an execing a program, please use the library.  This is not
-      always possible, but in many cases it is.
+    * Alternative libraries intended to replace a build requirement
+      are ok so long as configure.ac and the corresponding Makefile.am
+      templates are modified to conditionalize everything.  For
+      example, if there is a compatible but different json-c library,
+      it's ok to meson options that would be something like:
 
-    * Alternative libraries intended to replace a build requirement are ok
-      so long as configure.ac and the corresponding Makefile.am templates
-      are modified to conditionalize everything.  For example, if there is
-      a compatible but different json-c library, it's ok to add configure
-      options that would be something like:
-
-          --disable-json-c --enable-other-json-c
+          -Djson_lib=other_json_lib
 
       If this requires modification in the code, try to minimize the use
       of cpp macros.
@@ -320,8 +328,8 @@ project.  Some things to keep in mind:
 Licensing and Copyright
 -----------------------
 
-The project is licensed under the GNU General Public License version 3 or,
-at your option, any later version.  A number of contributions have been
-under the Apache License 2.0 and GPLv3+ allows for that.
+The project is available under the GNU General Public License version
+3 or, at your option, any later version.  Several contributions have
+been under the Apache License 2.0, and the GPLv3+ allows for that.
 
 Copyright statements are in the boilerplates of each source file.
