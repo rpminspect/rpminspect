@@ -45,6 +45,7 @@
 #define HEADER_SHELLSYNTAX   "shell-syntax"
 #define HEADER_ANNOCHECK     "annocheck"
 #define HEADER_DT_NEEDED     "DT_NEEDED"
+#define HEADER_FILESIZE      "filesize"
 
 /*
  * Inspection remedies
@@ -123,5 +124,9 @@
 
 /* DT_NEEDED */
 #define REMEDY_DT_NEEDED "DT_NEEDED symbols have been added or removed.  This happens when the build environment has different versions of the required libraries.  Sometimes this is deliberate but sometimes not.  Verify these changes are expected.  If they are not, modify the package spec file to ensure the build links with the correct shared libraries."
+
+/* filesize */
+#define REMEDY_FILESIZE_BECAME_NOT_EMPTY "A previously empty file is no longer empty.  Make sure this change is intended and fix the package spec file if necessary."
+#define REMEDY_FILESIZE_BECAME_EMPTY "A previously non-empty file is now empty.  Make sure this change is intended and fix the package space file if necessary."
 
 #endif

@@ -102,6 +102,7 @@ librpminspect_sources = [
     'lib/inspect_dt_needed.c',
     'lib/inspect_elf.c',
     'lib/inspect_emptyrpm.c',
+    'lib/inspect_filesize.c',
     'lib/inspect_javabytecode.c',
     'lib/inspect_kernel.c',
     'lib/inspect_license.c',
