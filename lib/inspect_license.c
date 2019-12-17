@@ -55,6 +55,63 @@ static struct json_object *read_licensedb(const char *licensedb) {
 }
 
 /*
+ * Called by is_valid_license() to check each short license token.  It
+ * will also try to do a whole match on the license tag string.
+ */
+static int check_license_abbrev(const char *tag, const char *lic, bool *whole_match)
+{
+    const char *fedora_abbrev = NULL;
+    const char *spdx_abbrev = NULL;
+    bool approved = false;
+
+    assert(tag != NULL);
+    assert(lic != NULL);
+
+    json_object_object_foreach(licdb, license_name, val) {
+        /* first reset our variables */
+        fedora_abbrev = NULL;
+        spdx_abbrev = NULL;
+        approved = false;
+
+        /* collect the properties */
+        json_object_object_foreach(val, prop, propval) {
+            if (!strcmp(prop, "fedora_abbrev")) {
+                fedora_abbrev = json_object_get_string(propval);
+            } else if (!strcmp(prop, "spdx_abbrev")) {
+                spdx_abbrev = json_object_get_string(propval);
+            } else if (!strcmp(prop, "approved") && !strcasecmp(json_object_get_string(propval), "yes")) {
+                approved = true;
+            }
+        }
+
+        /*
+         * no full tag match and no abbreviations, license entry invalid
+         */
+        if (strlen(fedora_abbrev) == 0 && strlen(spdx_abbrev) == 0) {
+            continue;
+        }
+
+        /* if the entire license string matches the name, approved */
+        if (approved && (!strcmp(tag, fedora_abbrev) || !strcmp(tag, spdx_abbrev) || !strcmp(tag, license_name))) {
+            *whole_match = true;
+            return 0;
+        }
+
+        /*
+         * if the entire license string is approved, that is valid
+         * if we hit 'fedora_abbrev', that is valid
+         * if we hit 'spdx_abbrev' and approved is true, that is valid
+         * NOTE: we only match the first hit in the license database
+         */
+        if (approved && (!strcmp(lic, fedora_abbrev) || !strcmp(lic, spdx_abbrev))) {
+            return 1;
+        }
+    }
+
+    return 0;
+}
+
+/*
  * Called by inspect_license()
  */
 static int check_peer_license(struct rpminspect *ri, const Header hdr) {
@@ -154,11 +211,10 @@ bool is_valid_license(const char *licensedb, const char *tag) {
     char *tagtokens = NULL;
     char *tagcopy = NULL;
     char *token = NULL;
-    const char *fedora_abbrev = NULL;
-    const char *spdx_abbrev = NULL;
     char *lic = NULL;
     char *newlic = NULL;
-    bool approved = false;
+    bool collect = true;
+    bool whole_match = false;
 
     assert(licensedb != NULL);
     assert(tag != NULL);
@@ -196,74 +252,56 @@ bool is_valid_license(const char *licensedb, const char *tag) {
     tagtokens = tagcopy = strdup(tag);
 
     while ((token = strsep(&tagtokens, "() ")) != NULL) {
-        /* skip over empty strings and the boolean keywords */
+        /* skip over empty strings */
         if (strlen(token) == 0) {
             continue;
-        } else if (!strcasecmp(token, "and") || !strcasecmp(token, "or")) {
-            free(lic);
-            lic = NULL;
-            continue;
+        }
+
+        /* keep collecting the license string until we see a boolean */
+        if (!strcasecmp(token, "and") || !strcasecmp(token, "or")) {
+            collect = false;
         }
 
         /* Abbreviated licenses may contain spaces, so rebuild it */
-        if (lic == NULL) {
-            lic = strdup(token);
-            assert(lic != NULL);
-        } else {
-            xasprintf(&newlic, "%s %s", lic, token);
-            assert(newlic != NULL);
-            free(lic);
-            lic = newlic;
+        if (collect) {
+            if (lic == NULL) {
+                lic = strdup(token);
+                assert(lic != NULL);
+            } else {
+                xasprintf(&newlic, "%s %s", lic, token);
+                assert(newlic != NULL);
+                free(lic);
+                lic = newlic;
 
-            /* We've added a space, so back up the seen counter */
-            seen--;
+                /* We've added a space, so back up the seen counter */
+                seen--;
+            }
+
+            seen++;
+            continue;
         }
-
-        seen++;
 
         /* iterate over the license database to match this license tag */
-        json_object_object_foreach(licdb, license_name, val) {
-            /* first reset our variables */
-            fedora_abbrev = NULL;
-            spdx_abbrev = NULL;
-            approved = false;
+        valid += check_license_abbrev(tag, lic, &whole_match);
 
-            /* collect the properties */
-            json_object_object_foreach(val, prop, propval) {
-                if (!strcmp(prop, "fedora_abbrev")) {
-                    fedora_abbrev = json_object_get_string(propval);
-                } else if (!strcmp(prop, "spdx_abbrev")) {
-                    spdx_abbrev = json_object_get_string(propval);
-                } else if (!strcmp(prop, "approved") && !strcasecmp(json_object_get_string(propval), "yes")) {
-                    approved = true;
-                }
-            }
-
-            /*
-             * no full tag match and no abbreviations, license entry invalid
-             */
-            if (strlen(fedora_abbrev) == 0 && strlen(spdx_abbrev) == 0) {
-                continue;
-            }
-
-            /* if the entire license string matches the name, approved */
-            if (approved && (!strcmp(tag, fedora_abbrev) || !strcmp(tag, spdx_abbrev) || !strcmp(tag, license_name))) {
-                free(tagcopy);
-                free(lic);
-                return true;
-            }
-
-            /*
-             * if the entire license string is approved, that is valid
-             * if we hit 'fedora_abbrev', that is valid
-             * if we hit 'spdx_abbrev' and approved is true, that is valid
-             * NOTE: we only match the first hit in the license database
-             */
-            if (approved && (!strcmp(lic, fedora_abbrev) || !strcmp(lic, spdx_abbrev))) {
-                valid++;
-                break;
-            }
+        if (whole_match) {
+            free(tagcopy);
+            free(lic);
+            return true;
         }
+
+        free(lic);
+        lic = NULL;
+        collect = true;
+    }
+
+    /* check the last license abbreviation */
+    valid += check_license_abbrev(tag, lic, &whole_match);
+
+    if (whole_match) {
+        free(tagcopy);
+        free(lic);
+        return true;
     }
 
     /* cleanup */
