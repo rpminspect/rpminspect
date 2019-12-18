@@ -2,7 +2,7 @@ MESON_BUILD_DIR = build
 topdir := $(shell realpath $(dir $(lastword $(MAKEFILE_LIST))))
 
 all: setup
-	ninja -C build -v
+	ninja -C $(MESON_BUILD_DIR) -v
 
 setup:
 	meson setup $(MESON_BUILD_DIR)
