@@ -46,6 +46,7 @@
 #define HEADER_ANNOCHECK     "annocheck"
 #define HEADER_DT_NEEDED     "DT_NEEDED"
 #define HEADER_FILESIZE      "filesize"
+#define HEADER_PERMISSIONS   "permissions"
 
 /*
  * Inspection remedies

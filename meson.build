@@ -110,6 +110,7 @@ librpminspect_sources = [
     'lib/inspect_metadata.c',
     'lib/inspect_modularity.c',
     'lib/inspect_ownership.c',
+    'lib/inspect_permissions.c',
     'lib/inspect_removedfiles.c',
     'lib/inspect_shellsyntax.c',
     'lib/inspect_specname.c',
@@ -132,6 +133,7 @@ librpminspect_sources = [
     'lib/strfuncs.c',
     'lib/tty.c',
     'lib/unpack.c',
+    'lib/whitelist.c',
 ]
 librpminspect = library(
     'rpminspect',
