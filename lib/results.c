@@ -74,8 +74,8 @@ void free_results(results_t *results) {
  * Pass NULL for any optional strings that you have no data for.
  */
 void add_result(struct rpminspect *ri, severity_t severity,
-                waiverauth_t waiverauth, char *header, char *msg,
-                char *screendump, char *remedy) {
+                waiverauth_t waiverauth, const char *header, char *msg,
+                char *screendump, const char *remedy) {
     results_entry_t *entry = NULL;
 
     assert(ri != NULL);
