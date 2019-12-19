@@ -147,6 +147,12 @@ struct inspect inspections[] = {
       &inspect_filesize,
       "Report file size changes between builds.  If empty files became non-empty or non-empty files became empty, report those as results needing verification.  Report file change percentages as info-only." },
 
+    { INSPECT_PERMISSIONS,
+      "permissions",
+      false,
+      &inspect_permissions,
+      "Report stat(2) mode changes between builds.  Checks against the stat-whitelist for the product release specified or determined.  Any setuid or setgid changes will raise a message requiring Security Team review." },
+
     /*
      * { INSPECT_TYPE (add to inspect.h),
      *   "short name",
