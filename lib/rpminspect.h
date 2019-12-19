@@ -190,6 +190,6 @@ char *checksum(rpmfile_entry_t *);
 char *run_cmd(int *, const char *, ...);
 
 /* whitelist.c */
-void check_stat_whitelist(struct rpminspect *, const rpmfile_entry_t *, const char *, const char *);
+bool on_stat_whitelist(struct rpminspect *, const rpmfile_entry_t *, const char *, const char *);
 
 #endif
