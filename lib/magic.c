@@ -44,7 +44,7 @@ char *get_mime_type(rpmfile_entry_t *file) {
 
     /* Get and cache MIME type */
     assert(file->fullpath != NULL);
-    cookie = magic_open(MAGIC_MIME | MAGIC_SYMLINK | MAGIC_CHECK);
+    cookie = magic_open(MAGIC_MIME | MAGIC_CHECK);
 
     if (cookie == NULL) {
         fprintf(stderr, "*** Unable to initialize the magic library\n");
