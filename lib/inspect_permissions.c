@@ -33,6 +33,7 @@ static bool permissions_driver(struct rpminspect *ri, rpmfile_entry_t *file)
     mode_t before_mode;
     mode_t after_mode;
     mode_t mode_diff;
+    bool whitelisted = false;
 
     assert(ri != NULL);
     assert(file != NULL);
@@ -57,14 +58,18 @@ static bool permissions_driver(struct rpminspect *ri, rpmfile_entry_t *file)
 
     /* Compare the modes */
     if (before_mode != after_mode) {
+        whitelisted = on_stat_whitelist(ri, file, HEADER_PERMISSIONS, NULL);
+
         /* if setuid/setgid or new mode is more open */
-        if (!(before_mode & (S_ISUID|S_ISGID)) && (after_mode & (S_ISUID|S_ISGID))) {
-            sev = RESULT_BAD;
-            what = "changed setuid/setgid";
-        } else if (S_ISDIR(file->st.st_mode) && !S_ISLNK(file->st.st_mode)) {
-            if (((mode_diff & S_ISVTX) && !(after_mode & S_ISVTX)) || ((after_mode & mode_diff) != 0)) {
+        if (!whitelisted) {
+            if (!(before_mode & (S_ISUID|S_ISGID)) && (after_mode & (S_ISUID|S_ISGID))) {
                 sev = RESULT_BAD;
-                what = "relaxed";
+                what = "changed setuid/setgid";
+            } else if (S_ISDIR(file->st.st_mode) && !S_ISLNK(file->st.st_mode)) {
+                if (((mode_diff & S_ISVTX) && !(after_mode & S_ISVTX)) || ((after_mode & mode_diff) != 0)) {
+                    sev = RESULT_BAD;
+                    what = "relaxed";
+                }
             }
         }
 
@@ -75,13 +80,8 @@ static bool permissions_driver(struct rpminspect *ri, rpmfile_entry_t *file)
         result = false;
     }
 
-    /* check to see if the file is whitelisted */
-    if (after_mode & (S_ISUID|S_ISGID)) {
-        check_stat_whitelist(ri, file, HEADER_PERMISSIONS, NULL);
-    }
-
     /* check for world-writability */
-    if (!S_ISLNK(file->st.st_mode) && !S_ISDIR(file->st.st_mode) && (after_mode & (S_IWOTH|S_ISVTX))) {
+    if (!whitelisted && (!S_ISLNK(file->st.st_mode) && !S_ISDIR(file->st.st_mode) && (after_mode & (S_IWOTH|S_ISVTX)))) {
         xasprintf(&msg, "%s (%s) is world-writable on %s", file->localpath, get_mime_type(file), arch);
         add_result(ri, RESULT_BAD, WAIVABLE_BY_SECURITY, HEADER_PERMISSIONS, msg, NULL, NULL);
         free(msg);
