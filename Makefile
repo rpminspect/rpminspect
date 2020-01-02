@@ -22,6 +22,9 @@ koji: srpm
 clean:
 	-rm -rf $(MESON_BUILD_DIR)
 
+instreqs:
+	sudo yum install -y $(shell grep -i requires: rpminspect.spec.in | grep -v rpminspect | awk '{ print $$2; }' ORS=' ')
+
 help:
 	@echo "rpminspect helper Makefile"
 	@echo "The source tree uses meson(1) for building and testing, but this Makefile"
@@ -34,6 +37,7 @@ help:
 	@echo "    release      Run 'utils/release.sh -A' to make a new release"
 	@echo "    koji         Run 'make srpm' then 'utils/submit-koji-builds.sh'"
 	@echo "    clean        Run 'rm -rf $(MESON_BUILD_DIR)'"
+	@echo "    instreqs     Install required build and runtime packages"
 	@echo
 	@echo "To build:"
 	@echo "    make"
