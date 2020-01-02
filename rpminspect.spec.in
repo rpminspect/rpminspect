@@ -27,6 +27,14 @@ BuildRequires:  file-devel
 BuildRequires:  openssl-devel
 BuildRequires:  libcap-ng-devel
 
+# The test suite requires additional packages, but they are not used
+# in the package building systems.  They are noted here for reference
+# by the Makefile and other developers.
+#BuildRequires: glibc.i686
+#BuildRequires: glibc-devel.i686
+#BuildRequires: CUnit
+#BuildRequires: CUnit-devel
+
 %description
 Build deviation and compliance tool.  This program runs a number of tests
 against one or two builds of source RPM files.  The built artifacts are
