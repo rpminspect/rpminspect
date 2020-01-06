@@ -119,8 +119,12 @@ int unpack_archive(const char *archive, const char *dest, const bool force) {
 
     /* full location to the archive */
     if ((rfilename = realpath(archive, rfilename)) == NULL) {
-        fprintf(stderr, "*** unable to find real path to %s\n", archive);
-        return -1;
+        if (errno == ENOENT) {
+            return 0;
+        } else {
+            fprintf(stderr, "*** unable to find real path to %s\n", archive);
+            return -1;
+        }
     }
 
     /* archive reader */
