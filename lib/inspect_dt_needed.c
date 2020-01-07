@@ -91,7 +91,7 @@ static bool dt_needed_driver(struct rpminspect *ri, rpmfile_entry_t *file)
 
     after_type = get_elf_type(after_elf);
 
-    if (after_type != ET_EXEC && after_type != ET_DYN) {
+    if (after_type != ET_DYN) {
         result = false;
         goto done;
     }
