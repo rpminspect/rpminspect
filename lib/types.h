@@ -152,6 +152,20 @@ typedef struct _stat_whitelist_entry_t {
 
 typedef TAILQ_HEAD(stat_whitelist_entry_s, _stat_whitelist_entry_t) stat_whitelist_t;
 
+/* Spec filename matching types */
+typedef enum _specname_match_t {
+    MATCH_NULL = 0,
+    MATCH_FULL = 1,
+    MATCH_PREFIX = 2,
+    MATCH_SUFFIX = 3
+} specname_match_t;
+
+typedef enum _specname_primary_t {
+    PRIMARY_NULL = 0,
+    PRIMARY_NAME = 1,
+    PRIMARY_BASENAME = 2
+} specname_primary_t;
+
 /*
  * Configuration and state instance for librpminspect run.
  * Applications using librpminspect should initialize the
@@ -234,6 +248,10 @@ struct rpminspect {
 
     /* List of shells to check script syntax */
     string_list_t *shells;
+
+    /* Spec filename matching type */
+    specname_match_t specmatch;
+    specname_primary_t specprimary;
 
     /* hash table of product release -> JVM major versions */
     struct hsearch_data *jvm_table;

@@ -621,6 +621,38 @@ int init_rpminspect(struct rpminspect *ri, const char *cfgfile) {
     tmp = iniparser_getstring(cfg, "tests:shells", SHELLS);
     parse_list(tmp, &ri->shells);
 
+    tmp = iniparser_getstring(cfg, "specname:match", NULL);
+    if (tmp == NULL) {
+        ri->specmatch = MATCH_FULL;
+    } else {
+        if (!strcasecmp(tmp, "full")) {
+            ri->specmatch = MATCH_FULL;
+        } else if (!strcasecmp(tmp, "prefix")) {
+            ri->specmatch = MATCH_PREFIX;
+        } else if (!strcasecmp(tmp, "suffix")) {
+            ri->specmatch = MATCH_SUFFIX;
+        } else {
+            fprintf(stderr, "*** Invalid specname:match setting in rpminspect.conf: %s\n", tmp);
+            fprintf(stderr, "*** Defaulting to 'full' matching.\n");
+            ri->specmatch = MATCH_FULL;
+        }
+    }
+
+    tmp = iniparser_getstring(cfg, "specname:primary", NULL);
+    if (tmp == NULL) {
+        ri->specprimary = PRIMARY_NAME;
+    } else {
+        if (!strcasecmp(tmp, "name")) {
+            ri->specprimary = PRIMARY_NAME;
+        } else if (!strcasecmp(tmp, "basename")) {
+            ri->specprimary = PRIMARY_BASENAME;
+        } else {
+            fprintf(stderr, "*** Invalid specname:primary setting in rpminspect.conf: %s\n", tmp);
+            fprintf(stderr, "*** Defaulting to 'name' primary setting.\n");
+            ri->specprimary = PRIMARY_NAME;
+        }
+    }
+
     /* if a jvm major versions exist, collect those in to a hash table */
     read_mapping(cfg, "javabytecode", &ri->jvm_table, &ri->jvm_keys);
 

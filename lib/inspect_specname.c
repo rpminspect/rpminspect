@@ -29,31 +29,61 @@ static bool seen = false;
 static bool specname_driver(struct rpminspect *ri, rpmfile_entry_t *file) {
     char *specfile = NULL;
     char *msg = NULL;
-    const char *pkgname = NULL;
+    char *dot = NULL;
+    char *desc = NULL;
+    char *primary = NULL;
 
     /* Skip binary packages */
     if (!headerIsSource(file->rpm_header)) {
         return true;
     }
 
-    /* Spec files are all named in a standard way */
-    pkgname = headerGetString(file->rpm_header, RPMTAG_NAME);
-    xasprintf(&specfile, "%s%s", pkgname, SPEC_FILENAME_EXTENSION);
-
-    /* We only want to look at the spec files */
-    if (!strcmp(file->localpath, specfile)) {
-        specgood = true;
-    } else if (strsuffix(file->localpath, SPEC_FILENAME_EXTENSION)) {
-        /*
-         * Emit a failure if we're looking at what we think is a spec file
-         * but it's not named in the expected way.
-         */
-        xasprintf(&msg, "Spec filename does not match the pattern of NAME%s; expected '%s', got '%s'", SPEC_FILENAME_EXTENSION, specfile, file->localpath);
-        add_result(ri, RESULT_BAD, WAIVABLE_BY_ANYONE, HEADER_SPECNAME, msg, NULL, REMEDY_SPECNAME);
-        free(msg);
-        specgood = false;
+    /* We only want to look at the spec file */
+    if (!strsuffix(file->localpath, SPEC_FILENAME_EXTENSION)) {
+        return true;
     }
 
+    /* Spec files are all named in a standard way */
+    if (ri->specprimary == PRIMARY_NAME) {
+        primary = strdup(headerGetString(file->rpm_header, RPMTAG_NAME));
+    } else if (ri->specprimary == PRIMARY_BASENAME) {
+
+        primary = strdup(file->localpath);
+        dot = rindex(primary, '.');
+        assert(dot != NULL);
+        *dot = '\0';
+    }
+
+    xasprintf(&specfile, "%s%s", primary, SPEC_FILENAME_EXTENSION);
+
+    /* Match spec file name per conf file rule */
+    if (ri->specmatch == MATCH_FULL && !strcmp(file->localpath, specfile)) {
+        specgood = true;
+    } else if (ri->specmatch == MATCH_PREFIX && strprefix(file->localpath, primary)) {
+        specgood = true;
+    } else if (ri->specmatch == MATCH_SUFFIX && strsuffix(file->localpath, specfile)) {
+        specgood = true;
+    }
+
+    /*
+     * Emit a failure if we're looking at what we think is a spec file
+     * but it's not named in the expected way.
+     */
+    if (!specgood) {
+        if (ri->specmatch == MATCH_FULL) {
+            desc = "exactly match";
+        } else if (ri->specmatch == MATCH_PREFIX) {
+            desc = "begin with";
+        } else if (ri->specmatch == MATCH_SUFFIX) {
+            desc = "end with";
+        }
+
+        xasprintf(&msg, "Spec filename does not %s the primary name %s; got '%s'", desc, primary, file->localpath);
+        add_result(ri, RESULT_BAD, WAIVABLE_BY_ANYONE, HEADER_SPECNAME, msg, NULL, REMEDY_SPECNAME);
+        free(msg);
+    }
+
+    free(primary);
     free(specfile);
     seen = true;
     return specgood;
