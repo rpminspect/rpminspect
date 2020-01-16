@@ -112,3 +112,14 @@ inspections lack integration tests:
     annocheck
     DT_NEEDED
     filesize
+
+
+Documentation
+-------------
+
+Developer guide
+Testing guide
+User guide
+
+Also rpminspect.conf.5 documenting the configuration file and the
+profile configuration files.
