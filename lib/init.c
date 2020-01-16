@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2019  Red Hat, Inc.
+ * Copyright (C) 2019-2020  Red Hat, Inc.
  * Author(s):  David Cantrell <dcantrell@redhat.com>
  *
  * This program is free software: you can redistribute it and/or modify
@@ -36,10 +36,10 @@ static int add_regex(dictionary *cfg, const char *key, regex_t **regex_out)
 
     pattern = iniparser_getstring(cfg, key, NULL);
     if ((pattern == NULL) || (*pattern == '\0')) {
-        *regex_out = NULL;
         return 0;
     }
 
+    free_regex(*regex_out);
     *regex_out = calloc(1, sizeof(regex_t));
     assert(*regex_out != NULL);
 
@@ -74,6 +74,7 @@ static void parse_list(const char *tmp, string_list_t **list)
     start = walk = strdup(tmp);
 
     /* split up the string and turn it in to a list */
+    list_free(*list, free);
     *list = calloc(1, sizeof(*(*list)));
     assert(*list != NULL);
     TAILQ_INIT(*list);
@@ -118,8 +119,6 @@ static void read_mapping(const dictionary *cfg, const char *section,
     assert(cfg != NULL);
     assert(section != NULL);
 
-    *table = NULL;
-    *keys = NULL;
     len = strlen(section);
     nk = iniparser_getsecnkeys(cfg, section);
 
@@ -135,6 +134,8 @@ static void read_mapping(const dictionary *cfg, const char *section,
     }
 
     if (nk > 0) {
+        free_mapping(*table, *keys);
+
         *table = calloc(1, sizeof(**table));
         assert(*table != NULL);
 
@@ -313,6 +314,219 @@ static mode_t parse_mode(const char *input) {
 }
 
 /*
+ * Read either the main configuration file or a configuration file
+ * overlay (profile) and populate the struct rpminspect members.
+ */
+static int read_cfgfile(dictionary *cfg, struct rpminspect *ri, const char *filename, const bool overlay)
+{
+    const char *tmp = NULL;
+
+    assert(cfg != NULL);
+    assert(ri != NULL);
+    assert(filename != NULL);
+
+    /* These settings can only appear in the main config file */
+    if (!overlay) {
+        tmp = iniparser_getstring(cfg, "common:workdir", NULL);
+        if (tmp) {
+            free(ri->workdir);
+            ri->workdir = strdup(tmp);
+        }
+
+        tmp = iniparser_getstring(cfg, "common:profiledir", NULL);
+        if (tmp) {
+            free(ri->profiledir);
+            ri->profiledir = strdup(tmp);
+        }
+    }
+
+    tmp = iniparser_getstring(cfg, "koji:hub", NULL);
+    if (tmp) {
+        free(ri->kojihub);
+        ri->kojihub = strdup(tmp);
+    }
+
+    tmp = iniparser_getstring(cfg, "koji:download_ursine", NULL);
+    if (tmp) {
+        free(ri->kojiursine);
+        ri->kojiursine = strdup(tmp);
+    }
+
+    tmp = iniparser_getstring(cfg, "koji:download_mbs", NULL);
+    if (tmp) {
+        free(ri->kojimbs);
+        ri->kojimbs = strdup(tmp);
+    }
+
+    tmp = iniparser_getstring(cfg, "vendor-data:licensedb", NULL);
+    if (tmp) {
+        free(ri->licensedb);
+        ri->licensedb = strdup(tmp);
+    }
+
+    tmp = iniparser_getstring(cfg, "vendor-data:stat_whitelist_dir", NULL);
+    if (tmp) {
+        free(ri->stat_whitelist_dir);
+        ri->stat_whitelist_dir = strdup(tmp);
+    }
+
+    tmp = iniparser_getstring(cfg, "tests:badwords", NULL);
+    if (tmp) {
+        parse_list(tmp, &ri->badwords);
+    }
+
+    tmp = iniparser_getstring(cfg, "tests:vendor", NULL);
+    if (tmp) {
+        free(ri->vendor);
+        ri->vendor = strdup(tmp);
+    }
+
+    tmp = iniparser_getstring(cfg, "tests:buildhost_subdomain", NULL);
+    if (tmp) {
+        parse_list(tmp, &ri->buildhost_subdomain);
+    }
+
+    tmp = iniparser_getstring(cfg, "tests:security_path_prefix", NULL);
+    if (tmp) {
+        parse_list(tmp, &ri->security_path_prefix);
+    }
+
+    tmp = iniparser_getstring(cfg, "tests:header_file_extensions", NULL);
+    if (tmp) {
+        parse_list(tmp, &ri->header_file_extensions);
+    }
+
+    tmp = iniparser_getstring(cfg, "tests:forbidden_path_prefixes", NULL);
+    if (tmp) {
+        parse_list(tmp, &ri->forbidden_path_prefixes);
+    }
+
+    tmp = iniparser_getstring(cfg, "tests:forbidden_path_suffixes", NULL);
+    if (tmp) {
+        parse_list(tmp, &ri->forbidden_path_suffixes);
+    }
+
+    tmp = iniparser_getstring(cfg, "tests:forbidden_directories", NULL);
+    if (tmp) {
+        parse_list(tmp, &ri->forbidden_directories);
+    }
+
+    tmp = iniparser_getstring(cfg, "tests:elf_ipv6_blacklist", NULL);
+    if (tmp) {
+        parse_list(tmp, &ri->ipv6_blacklist);
+    }
+
+    /* If any of the regular expressions fail to compile, stop and return failure */
+    if (add_regex(cfg, "tests:elf_path_include", &ri->elf_path_include) != 0) {
+        return -1;
+    }
+
+    if (add_regex(cfg, "tests:elf_path_exclude", &ri->elf_path_exclude) != 0) {
+        return -1;
+    }
+
+    if (add_regex(cfg, "tests:manpage_path_include", &ri->manpage_path_include) != 0) {
+        return -1;
+    }
+
+    if (add_regex(cfg, "tests:manpage_path_exclude", &ri->manpage_path_exclude) != 0) {
+        return -1;
+    }
+
+    if (add_regex(cfg, "tests:xml_path_include", &ri->xml_path_include) != 0) {
+        return -1;
+    }
+
+    if (add_regex(cfg, "tests:xml_path_exclude", &ri->xml_path_exclude) != 0) {
+        return -1;
+    }
+
+    tmp = iniparser_getstring(cfg, "tests:desktop_entry_files_dir", NULL);
+    if (tmp) {
+        free(ri->desktop_entry_files_dir);
+        ri->desktop_entry_files_dir = strdup(tmp);
+    }
+
+    tmp = iniparser_getstring(cfg, "tests:desktop_icon_paths", NULL);
+    if (tmp) {
+        parse_list(tmp, &ri->desktop_icon_paths);
+    }
+
+    tmp = iniparser_getstring(cfg, "tests:bin_paths", NULL);
+    if (tmp) {
+        parse_list(tmp, &ri->bin_paths);
+    }
+
+    tmp = iniparser_getstring(cfg, "tests:bin_owner", NULL);
+    if (tmp) {
+        free(ri->bin_owner);
+        ri->bin_owner = strdup(tmp);
+    }
+
+    tmp = iniparser_getstring(cfg, "tests:bin_group", NULL);
+    if (tmp) {
+        free(ri->bin_group);
+        ri->bin_group = strdup(tmp);
+    }
+
+    tmp = iniparser_getstring(cfg, "tests:forbidden_owners", NULL);
+    if (tmp) {
+        parse_list(tmp, &ri->forbidden_owners);
+    }
+
+    tmp = iniparser_getstring(cfg, "tests:forbidden_groups", NULL);
+    if (tmp) {
+        parse_list(tmp, &ri->forbidden_groups);
+    }
+
+    tmp = iniparser_getstring(cfg, "tests:shells", NULL);
+    if (tmp) {
+        parse_list(tmp, &ri->shells);
+    }
+
+    tmp = iniparser_getstring(cfg, "specname:match", NULL);
+    if (tmp) {
+        if (!strcasecmp(tmp, "full")) {
+            ri->specmatch = MATCH_FULL;
+        } else if (!strcasecmp(tmp, "prefix")) {
+            ri->specmatch = MATCH_PREFIX;
+        } else if (!strcasecmp(tmp, "suffix")) {
+            ri->specmatch = MATCH_SUFFIX;
+        } else {
+            fprintf(stderr, "*** Invalid specname:match setting in %s: %s\n", filename, tmp);
+            fprintf(stderr, "*** Defaulting to 'full' matching.\n");
+            ri->specmatch = MATCH_FULL;
+        }
+    }
+
+    tmp = iniparser_getstring(cfg, "specname:primary", NULL);
+    if (tmp) {
+        if (!strcasecmp(tmp, "name")) {
+            ri->specprimary = PRIMARY_NAME;
+        } else if (!strcasecmp(tmp, "basename")) {
+            ri->specprimary = PRIMARY_BASENAME;
+        } else {
+            fprintf(stderr, "*** Invalid specname:primary setting in %s: %s\n", filename, tmp);
+            fprintf(stderr, "*** Defaulting to 'name' primary setting.\n");
+            ri->specprimary = PRIMARY_NAME;
+        }
+    }
+
+/* XXX */
+    /* if a jvm major versions exist, collect those in to a hash table */
+    read_mapping(cfg, "javabytecode", &ri->jvm_table, &ri->jvm_keys);
+
+    /* if an annocheck section exists, collect those in to a hash table */
+    read_mapping(cfg, "annocheck", &ri->annocheck_table, &ri->annocheck_keys);
+
+    /* if a products section exists, collect those in to a hash table */
+    read_mapping(cfg, "products", &ri->products, &ri->product_keys);
+/* XXX */
+
+    return 0;
+}
+
+/*
  * Initialize the stat-whitelist for the given product release.  If
  * the file cannot be found, return false.
  */
@@ -428,13 +642,51 @@ bool init_stat_whitelist(struct rpminspect *ri) {
  * librpminspect before they began calling library functions.
  * Return 0 on success, -1 on failure.
  */
-int init_rpminspect(struct rpminspect *ri, const char *cfgfile) {
+int init_rpminspect(struct rpminspect *ri, const char *cfgfile, const char *profile)
+{
+    int ret = 0;
     dictionary *cfg = NULL;
-    const char *tmp = NULL;
     uint64_t tests = 0;
+    char *tmp = NULL;
+    char *filename = NULL;
 
     assert(ri != NULL);
     memset(ri, 0, sizeof(*ri));
+
+    /* Initialize the struct before reading files */
+    ri->workdir = strdup(DEFAULT_WORKDIR);
+    ri->profiledir = strdup(CFG_PROFILE_DIR);
+    ri->kojihub = NULL;
+    ri->kojiursine = NULL;
+    ri->kojimbs = NULL;
+    ri->licensedb = strdup(LICENSE_DB_FILE);
+    ri->stat_whitelist_dir = strdup(STAT_WHITELIST_DIR);
+    ri->stat_whitelist = NULL;
+    ri->badwords = NULL;
+    ri->vendor = NULL;
+    ri->buildhost_subdomain = NULL;
+    ri->security_path_prefix = NULL;
+    ri->header_file_extensions = NULL;
+    ri->forbidden_path_prefixes = NULL;
+    ri->forbidden_path_suffixes = NULL;
+    ri->forbidden_directories = NULL;
+    ri->ipv6_blacklist = NULL;
+    ri->elf_path_include = NULL;
+    ri->elf_path_exclude = NULL;
+    ri->manpage_path_include = NULL;
+    ri->manpage_path_exclude = NULL;
+    ri->xml_path_include = NULL;
+    ri->xml_path_exclude = NULL;
+    ri->desktop_entry_files_dir = strdup(DESKTOP_ENTRY_FILES_DIR);
+    parse_list(DESKTOP_ICON_PATHS, &ri->desktop_icon_paths);
+    parse_list(BIN_PATHS, &ri->bin_paths);
+    ri->bin_owner = strdup(BIN_OWNER);
+    ri->bin_group = strdup(BIN_GROUP);
+    ri->forbidden_owners = NULL;
+    ri->forbidden_groups = NULL;
+    parse_list(SHELLS, &ri->shells);
+    ri->specmatch = MATCH_FULL;
+    ri->specprimary = PRIMARY_NAME;
 
     /* Store full path to the config file */
     ri->cfgfile = realpath(cfgfile, NULL);
@@ -443,226 +695,35 @@ int init_rpminspect(struct rpminspect *ri, const char *cfgfile) {
     if ((ri->cfgfile == NULL) || (access(ri->cfgfile, F_OK|R_OK) == -1)) {
         free(ri->cfgfile);
         ri->cfgfile = NULL;
-
-        ri->workdir = strdup(DEFAULT_WORKDIR);
-
         return 0;
     }
 
     /* Load the configuration file and get a dictionary */
     cfg = iniparser_load(ri->cfgfile);
 
-    /* Read in settings from the config file, falling back on defaults */
-    tmp = iniparser_getstring(cfg, "common:workdir", NULL);
-    if (tmp == NULL) {
-        ri->workdir = strdup(DEFAULT_WORKDIR);
-    } else {
-        ri->workdir = strdup(tmp);
+    /* Read the main configuration file to get things started */
+    ret = read_cfgfile(cfg, ri, ri->cfgfile, false);
+
+    if (ret) {
+        iniparser_freedict(cfg);
+        return ret;
     }
 
-    tmp = iniparser_getstring(cfg, "koji:hub", NULL);
-    if (tmp == NULL) {
-        ri->kojihub = NULL;
-    } else {
-        ri->kojihub = strdup(tmp);
-    }
+    /* If a profile is specified, read an overlay config file */
+    if (profile) {
+        xasprintf(&tmp, "%s/%s.conf", ri->profiledir, profile);
+        filename = realpath(tmp, NULL);
 
-    tmp = iniparser_getstring(cfg, "koji:download_ursine", NULL);
-    if (tmp == NULL) {
-        ri->kojiursine = NULL;
-    } else {
-        ri->kojiursine = strdup(tmp);
-    }
-
-    tmp = iniparser_getstring(cfg, "koji:download_mbs", NULL);
-    if (tmp == NULL) {
-        ri->kojimbs = NULL;
-    } else {
-        ri->kojimbs = strdup(tmp);
-    }
-
-    tmp = iniparser_getstring(cfg, "vendor-data:licensedb", NULL);
-    if (tmp == NULL) {
-        ri->licensedb = strdup(LICENSE_DB_FILE);
-    } else {
-        ri->licensedb = strdup(tmp);
-    }
-
-    tmp = iniparser_getstring(cfg, "vendor-data:stat_whitelist_dir", NULL);
-    if (tmp == NULL) {
-        ri->stat_whitelist_dir = strdup(STAT_WHITELIST_DIR);
-    } else {
-        ri->stat_whitelist_dir = strdup(tmp);
-    }
-
-    ri->stat_whitelist = NULL;
-
-    tmp = iniparser_getstring(cfg, "tests:badwords", NULL);
-    if (tmp == NULL) {
-        ri->badwords = NULL;
-    } else {
-        parse_list(tmp, &ri->badwords);
-    }
-
-    tmp = iniparser_getstring(cfg, "tests:vendor", NULL);
-    if (tmp == NULL) {
-        ri->vendor = NULL;
-    } else {
-        ri->vendor = strdup(tmp);
-    }
-
-    tmp = iniparser_getstring(cfg, "tests:buildhost_subdomain", NULL);
-    if (tmp == NULL) {
-        ri->buildhost_subdomain = NULL;
-    } else {
-        parse_list(tmp, &ri->buildhost_subdomain);
-    }
-
-    tmp = iniparser_getstring(cfg, "tests:security_path_prefix", NULL);
-    if (tmp == NULL) {
-        ri->security_path_prefix = NULL;
-    } else {
-        parse_list(tmp, &ri->security_path_prefix);
-    }
-
-    tmp = iniparser_getstring(cfg, "tests:header_file_extensions", NULL);
-    if (tmp == NULL) {
-        ri->header_file_extensions = NULL;
-    } else {
-        parse_list(tmp, &ri->header_file_extensions);
-    }
-
-    tmp = iniparser_getstring(cfg, "tests:forbidden_path_prefixes", NULL);
-    if (tmp == NULL) {
-        ri->forbidden_path_prefixes = NULL;
-    } else {
-        parse_list(tmp, &ri->forbidden_path_prefixes);
-    }
-
-    tmp = iniparser_getstring(cfg, "tests:forbidden_path_suffixes", NULL);
-    if (tmp == NULL) {
-        ri->forbidden_path_suffixes = NULL;
-    } else {
-        parse_list(tmp, &ri->forbidden_path_suffixes);
-    }
-
-    tmp = iniparser_getstring(cfg, "tests:forbidden_directories", NULL);
-    if (tmp == NULL) {
-        ri->forbidden_directories = NULL;
-    } else {
-        parse_list(tmp, &ri->forbidden_directories);
-    }
-
-    tmp = iniparser_getstring(cfg, "tests:elf_ipv6_blacklist", NULL);
-    if (tmp == NULL) {
-        ri->ipv6_blacklist = NULL;
-    } else {
-        parse_list(tmp, &ri->ipv6_blacklist);
-    }
-
-    /* If any of the regular expressions fail to compile, stop and return failure */
-    if (add_regex(cfg, "tests:elf_path_include", &ri->elf_path_include) != 0) {
-        return -1;
-    }
-
-    if (add_regex(cfg, "tests:elf_path_exclude", &ri->elf_path_exclude) != 0) {
-        return -1;
-    }
-
-    if (add_regex(cfg, "tests:manpage_path_include", &ri->manpage_path_include) != 0) {
-        return -1;
-    }
-
-    if (add_regex(cfg, "tests:manpage_path_exclude", &ri->manpage_path_exclude) != 0) {
-        return -1;
-    }
-
-    if (add_regex(cfg, "tests:xml_path_include", &ri->xml_path_include) != 0) {
-        return -1;
-    }
-
-    if (add_regex(cfg, "tests:xml_path_exclude", &ri->xml_path_exclude) != 0) {
-        return -1;
-    }
-
-    tmp = iniparser_getstring(cfg, "tests:desktop_entry_files_dir", NULL);
-    if (tmp == NULL) {
-        ri->desktop_entry_files_dir = strdup(DESKTOP_ENTRY_FILES_DIR);
-    } else {
-        ri->desktop_entry_files_dir = strdup(tmp);
-    }
-
-    tmp = iniparser_getstring(cfg, "tests:desktop_icon_paths", DESKTOP_ICON_PATHS);
-    parse_list(tmp, &ri->desktop_icon_paths);
-
-    tmp = iniparser_getstring(cfg, "tests:bin_paths", BIN_PATHS);
-    parse_list(tmp, &ri->bin_paths);
-
-    tmp = iniparser_getstring(cfg, "tests:bin_owner", BIN_OWNER);
-    ri->bin_owner = strdup(tmp);
-
-    tmp = iniparser_getstring(cfg, "tests:bin_group", BIN_GROUP);
-    ri->bin_group = strdup(tmp);
-
-    tmp = iniparser_getstring(cfg, "tests:forbidden_owners", NULL);
-    if (tmp == NULL) {
-        ri->forbidden_owners = NULL;
-    } else {
-        parse_list(tmp, &ri->forbidden_owners);
-    }
-
-    tmp = iniparser_getstring(cfg, "tests:forbidden_groups", NULL);
-    if (tmp == NULL) {
-        ri->forbidden_groups = NULL;
-    } else {
-        parse_list(tmp, &ri->forbidden_groups);
-    }
-
-    tmp = iniparser_getstring(cfg, "tests:shells", SHELLS);
-    parse_list(tmp, &ri->shells);
-
-    tmp = iniparser_getstring(cfg, "specname:match", NULL);
-    if (tmp == NULL) {
-        ri->specmatch = MATCH_FULL;
-    } else {
-        if (!strcasecmp(tmp, "full")) {
-            ri->specmatch = MATCH_FULL;
-        } else if (!strcasecmp(tmp, "prefix")) {
-            ri->specmatch = MATCH_PREFIX;
-        } else if (!strcasecmp(tmp, "suffix")) {
-            ri->specmatch = MATCH_SUFFIX;
+        if ((filename == NULL) || (access(filename, F_OK|R_OK) == -1)) {
+            fprintf(stderr, "*** Unable to read profile '%s' from %s\n", profile, filename);
         } else {
-            fprintf(stderr, "*** Invalid specname:match setting in rpminspect.conf: %s\n", tmp);
-            fprintf(stderr, "*** Defaulting to 'full' matching.\n");
-            ri->specmatch = MATCH_FULL;
+            cfg = iniparser_load(filename);
+            ret = read_cfgfile(cfg, ri, filename, true);
+            iniparser_freedict(cfg);
         }
     }
 
-    tmp = iniparser_getstring(cfg, "specname:primary", NULL);
-    if (tmp == NULL) {
-        ri->specprimary = PRIMARY_NAME;
-    } else {
-        if (!strcasecmp(tmp, "name")) {
-            ri->specprimary = PRIMARY_NAME;
-        } else if (!strcasecmp(tmp, "basename")) {
-            ri->specprimary = PRIMARY_BASENAME;
-        } else {
-            fprintf(stderr, "*** Invalid specname:primary setting in rpminspect.conf: %s\n", tmp);
-            fprintf(stderr, "*** Defaulting to 'name' primary setting.\n");
-            ri->specprimary = PRIMARY_NAME;
-        }
-    }
-
-    /* if a jvm major versions exist, collect those in to a hash table */
-    read_mapping(cfg, "javabytecode", &ri->jvm_table, &ri->jvm_keys);
-
-    /* if an annocheck section exists, collect those in to a hash table */
-    read_mapping(cfg, "annocheck", &ri->annocheck_table, &ri->annocheck_keys);
-
-    /* if a products section exists, collect those in to a hash table */
-    read_mapping(cfg, "products", &ri->products, &ri->product_keys);
-
-    /* the rest of the members */
+    /* the rest of the members are used at runtime */
     ri->before = NULL;
     ri->after = NULL;
     ri->buildtype = KOJI_BUILD_RPM;
@@ -674,9 +735,6 @@ int init_rpminspect(struct rpminspect *ri, const char *cfgfile) {
     ri->worst_result = RESULT_OK;
     ri->product_release = NULL;
     ri->arches = NULL;
-
-    /* Clean up */
-    iniparser_freedict(cfg);
 
     return 0;
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2019  Red Hat, Inc.
+ * Copyright (C) 2019-2020  Red Hat, Inc.
  * Author(s):  David Cantrell <dcantrell@redhat.com>
  *
  * This program is free software: you can redistribute it and/or modify
@@ -85,9 +85,11 @@ enum checksum { NULLSUM, MD5SUM, SHA1SUM, SHA256SUM };
 
 /* init.c */
 bool init_stat_whitelist(struct rpminspect *);
-int init_rpminspect(struct rpminspect *, const char *);
+int init_rpminspect(struct rpminspect *, const char *, const char *);
 
 /* free.c */
+void free_regex(regex_t *);
+void free_mapping(struct hsearch_data *, string_list_t *);
 void free_rpminspect(struct rpminspect *);
 
 /* listfuncs.c */

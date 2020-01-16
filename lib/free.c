@@ -22,7 +22,7 @@
 #include <search.h>
 #include "rpminspect.h"
 
-static void free_regex(regex_t *regex)
+void free_regex(regex_t *regex)
 {
     if (regex == NULL) {
         return;
@@ -32,7 +32,7 @@ static void free_regex(regex_t *regex)
     free(regex);
 }
 
-static void free_mapping(struct hsearch_data *table, string_list_t *keys)
+void free_mapping(struct hsearch_data *table, string_list_t *keys)
 {
     ENTRY e;
     ENTRY *eptr;
