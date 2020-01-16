@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2019  Red Hat, Inc.
+ * Copyright (C) 2019-2020  Red Hat, Inc.
  * Author(s):  David Cantrell <dcantrell@redhat.com>
  *
  * This program is free software: you can redistribute it and/or modify
@@ -51,6 +51,7 @@ static void usage(const char *progname)
     printf("Options:\n");
     printf("  -c FILE, --config=FILE   Configuration file to use\n");
     printf("                             (default: %s)\n", CFGFILE);
+    printf("  -p NAME, --profile=NAME  Configuration profile to use\n");
     printf("  -T LIST, --tests=LIST    List of tests to run\n");
     printf("                             (default: ALL)\n");
     printf("  -E LIST, --exclude=LIST  List of tests to exclude\n");
@@ -323,9 +324,10 @@ int main(int argc, char **argv) {
     int idx = 0;
     int ret = RI_INSPECTION_SUCCESS;
     glob_t expand;
-    char *short_options = "c:T:E:a:r:o:F:lw:t:fkv\?V";
+    char *short_options = "c:p:T:E:a:r:o:F:lw:t:fkv\?V";
     struct option long_options[] = {
         { "config", required_argument, 0, 'c' },
+        { "profile", required_argument, 0, 'p' },
         { "tests", required_argument, 0, 'T' },
         { "exclude", required_argument, 0, 'E' },
         { "arches", required_argument, 0, 'a' },
@@ -343,6 +345,7 @@ int main(int argc, char **argv) {
         { 0, 0, 0, 0 }
     };
     char *cfgfile = NULL;
+    char *profile = NULL;
     char *archopt = NULL;
     char *walk = NULL;
     char *token = NULL;
@@ -388,6 +391,10 @@ int main(int argc, char **argv) {
             case 'c':
                 /* Capture user specified config file */
                 cfgfile = strdup(optarg);
+                break;
+            case 'p':
+                /* Configuration profile to use */
+                profile = strdup(optarg);
                 break;
             case 'T':
             case 'E':
@@ -532,12 +539,13 @@ int main(int argc, char **argv) {
     }
 
     /* Initialize librpminspect */
-    if (init_rpminspect(&ri, cfgfile) != 0) {
+    if (init_rpminspect(&ri, cfgfile, profile) != 0) {
         fprintf(stderr, "Failed to read configuration file\n");
         exit(RI_PROGRAM_ERROR);
     }
 
     free(cfgfile);
+    free(profile);
 
     /* various options from the command line */
     ri.verbose = verbose;

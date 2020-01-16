@@ -1,4 +1,4 @@
-.\" Copyright (C) 2018-2019  Red Hat, Inc.
+.\" Copyright (C) 2018-2020  Red Hat, Inc.
 .\" Author(s):  David Cantrell <dcantrell@redhat.com>
 .\"
 .\" This program is free software: you can redistribute it and/or modify
@@ -55,6 +55,26 @@ in defaults.
 .TP
 .B \-c FILE, \-\-config=FILE
 Configuration file to use (default: /etc/rpminspect/rpminspect.conf)
+.TP
+.B \-p NAME, \-\-profile=NAME
+Configuration profile to use.  A configuration profile provides
+overrides to the main configuration file.  The idea is the main
+configuration is loaded, then if you specify a profile name rpminspect
+will load that configuration file and any values specified will
+override what came from the default configuration file.  Think of the
+main configuration file as the common one and profile configuration
+files are optional.
+.RS
+.PP
+The format of a profile configuration file is the same as
+rpminspect.conf, just call it NAME.conf and place it in
+/etc/rpminspect/profiles).  For example, the profile 'scl' should have
+a configuration file named /etc/rpminspect/profiles/scl.conf.
+.PP
+All but the [common] section can appear in profile configuration
+files.  Profile configuration files must end with .conf for rpminspect
+to find them.
+.RE
 .TP
 .B \-r STR, \-\-release=STR
 String identifying the product release for the specified build or builds.

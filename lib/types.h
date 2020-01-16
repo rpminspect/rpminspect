@@ -175,6 +175,7 @@ typedef enum _specname_primary_t {
 struct rpminspect {
     char *cfgfile;             /* full path to configuration file */
     char *workdir;             /* full path to working directory */
+    char *profiledir;          /* full path to profiles directory */
     char *worksubdir;          /* within workdir, where these builds go */
 
     /* Vendor data */

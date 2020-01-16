@@ -31,7 +31,7 @@ int clean_test_init(void) {
 void test_init_rpminspect(void) {
     struct rpminspect ri;
 
-    RI_ASSERT_EQUAL(init_rpminspect(&ri, NULL), 0);
+    RI_ASSERT_EQUAL(init_rpminspect(&ri, NULL, NULL), 0);
     free_rpminspect(&ri);
     return;
 }

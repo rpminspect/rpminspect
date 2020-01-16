@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2018-2019  Red Hat, Inc.
+ * Copyright (C) 2018-2020  Red Hat, Inc.
  * Author(s):  David Cantrell <dcantrell@redhat.com>
  *
  * This program is free software: you can redistribute it and/or modify
@@ -32,6 +32,11 @@
  * Constant pathnames we need to use throughout the source.
  */
 #define CFGFILE "/etc/rpminspect/rpminspect.conf"
+
+/*
+ * Configuration profiles that overlay CFGFILE live here.
+ */
+#define CFG_PROFILE_DIR "/etc/rpminspect/profiles"
 
 /*
  * Defaults, when the configuration file does not provide a
