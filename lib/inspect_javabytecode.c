@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2019  Red Hat, Inc.
+ * Copyright (C) 2019-2020  Red Hat, Inc.
  * Author(s):  David Cantrell <dcantrell@redhat.com>
  *
  * This program is free software: you can redistribute it and/or modify
@@ -34,13 +34,13 @@
 /* Globals */
 static int prefixlen = 0;
 static char *jarfile = NULL;
-static short expected_major = -1;
+static short minimum_major = -1;
 static struct rpminspect *jar_ri = NULL;
 static bool jar_result = true;
 
 /*
- * Returns major JVM version found if the file is a compiled Java class file,
- * or -1 if it's not a Java class file.
+ * Returns major JVM version found if the file is a compiled Java
+ * class file, or -1 if it's not a Java class file.
  */
 static short get_jvm_major(const char *filename, const char *localpath,
                            const char *container)
@@ -115,8 +115,8 @@ static bool check_class_file(struct rpminspect *ri, const char *fullpath,
         add_result(ri, RESULT_BAD, WAIVABLE_BY_ANYONE, HEADER_JAVABYTECODE, msg, NULL, NULL);
         free(msg);
         return false;
-    } else if (major > expected_major) {
-        xasprintf(&msg, "File %s (%s), Java byte code version %d greater than expected %d for product release %s", localpath, container, major, expected_major, ri->product_release);
+    } else if (major < minimum_major) {
+        xasprintf(&msg, "File %s (%s), Java byte code version %d less than the minimum required major version (%d) for product release %s", localpath, container, major, minimum_major, ri->product_release);
         add_result(ri, RESULT_BAD, WAIVABLE_BY_ANYONE, HEADER_JAVABYTECODE, msg, NULL, NULL);
         free(msg);
         return false;
@@ -146,7 +146,7 @@ static bool check_class_file(struct rpminspect *ri, const char *fullpath,
  */
 static int jar_walker(const char *fpath, __attribute__((unused)) const struct stat *sb, int tflag, __attribute__((unused)) struct FTW *ftwbuf) {
     /* Only looking at regular files */
-    if (tflag != FTW_F) {
+    if (tflag != FTW_F || !S_ISREG(sb->st_mode)) {
         return 0;
     }
 
@@ -160,8 +160,7 @@ static int jar_walker(const char *fpath, __attribute__((unused)) const struct st
 /*
  * Main driver for the inspection.
  */
-static bool javabytecode_driver(struct rpminspect *ri, rpmfile_entry_t *file, 
-                                const char *container)
+static bool javabytecode_driver(struct rpminspect *ri, rpmfile_entry_t *file, const char *container)
 {
     bool result;
     char *tmppath = NULL;
@@ -253,7 +252,7 @@ bool inspect_javabytecode(struct rpminspect *ri)
         return false;
     }
 
-    expected_major = strtol(eptr->data, NULL, 10);
+    minimum_major = strtol(eptr->data, NULL, 10);
     if (errno == ERANGE) {
         fprintf(stderr, "*** invalid JVM major version: %s: %s\n", (char *) eptr->data, strerror(errno));
         fflush(stderr);
