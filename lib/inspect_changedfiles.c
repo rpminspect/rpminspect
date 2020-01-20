@@ -100,6 +100,8 @@ static bool changedfiles_driver(struct rpminspect *ri, rpmfile_entry_t *file)
     char *after_sum = NULL;
     char *msg = NULL;
     char *errors = NULL;
+    char *short_errors = NULL;
+    char *skip_line = NULL;
     char *needle = NULL;
     char *part_errors = NULL;
     char *refined_errors = NULL;
@@ -363,8 +365,32 @@ static bool changedfiles_driver(struct rpminspect *ri, rpmfile_entry_t *file)
         errors = run_cmd(&exitcode, DIFF_CMD, "-u", "-w", "--label", file->localpath, file->peer_file->fullpath, file->fullpath, NULL);
 
         if (exitcode) {
+            /*
+             * Skip the diff(1) header since the output from this
+             * gives context.
+             */
+            short_errors = errors;
+
+            if (strlen(short_errors) >= 3) {
+                while (strncmp(short_errors, "@@ ", 3)) {
+                    skip_line = index(short_errors, '\n');
+
+                    if (skip_line == NULL) {
+                        short_errors = errors;
+                        break;
+                    }
+
+                    short_errors = skip_line + 1;
+
+                    if (*short_errors == '\0') {
+                        short_errors = errors;
+                        break;
+                    }
+                }
+            }
+
             xasprintf(&msg, "Public header file %s changed content on %s, Please make sure this does not change the ABI exported by this package.  The output of `diff -uw` follows.", file->localpath, arch);
-            add_result(ri, RESULT_VERIFY, WAIVABLE_BY_ANYONE, HEADER_CHANGEDFILES, msg, errors, REMEDY_CHANGEDFILES);
+            add_result(ri, RESULT_VERIFY, WAIVABLE_BY_ANYONE, HEADER_CHANGEDFILES, msg, short_errors, REMEDY_CHANGEDFILES);
             result = false;
         }
     }
