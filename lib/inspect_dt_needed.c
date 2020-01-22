@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2019  Red Hat, Inc.
+ * Copyright (C) 2019-2020  Red Hat, Inc.
  * Author(s):  David Cantrell <dcantrell@redhat.com>
  *
  * This program is free software: you can redistribute it and/or modify
@@ -166,7 +166,7 @@ static bool dt_needed_driver(struct rpminspect *ri, rpmfile_entry_t *file)
     if (added != NULL && !TAILQ_EMPTY(added)) {
         xasprintf(&msg, "DT_NEEDED symbol(s) added to %s on %s", file->localpath, arch);
 
-        TAILQ_FOREACH(entry, removed, items) {
+        TAILQ_FOREACH(entry, added, items) {
             xasprintf(&tmp, "%s\n", entry->data);
             free(dump);
             dump = tmp;
