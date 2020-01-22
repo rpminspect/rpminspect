@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2019  Red Hat, Inc.
+ * Copyright (C) 2019-2020  Red Hat, Inc.
  * Author(s):  David Shea <dshea@redhat.com>
  *             David Cantrell <dcantrell@redhat.com>
  *
@@ -36,6 +36,10 @@ struct hsearch_data * list_to_table(const string_list_t *list)
     ENTRY *eptr;
 
     const string_entry_t *iter;
+
+    if (list == NULL) {
+        return NULL;
+    }
 
     /* Iterate over the list once to get the size */
     table_size = list_len(list);
@@ -81,13 +85,17 @@ string_list_t * list_difference(const string_list_t *a, const string_list_t *b)
     string_list_t *ret;
     string_entry_t *entry;
 
-    /* Copy list b into a hash table */
-    b_table = list_to_table(b);
-
-    if (b_table == NULL) {
+    /* Simple cases */
+    if (a == NULL && b == NULL) {
         return NULL;
+    } else if (a == NULL && b != NULL) {
+        return list_copy(b);
+    } else if (a != NULL && b == NULL) {
+        return list_copy(a);
     }
 
+    /* Copy list b into a hash table */
+    b_table = list_to_table(b);
     ret = malloc(sizeof(*ret));
     assert(ret != NULL);
     TAILQ_INIT(ret);
@@ -350,7 +358,11 @@ string_list_t * list_copy(const string_list_t *list)
     string_list_t *result;
     string_entry_t *entry;
 
-    result = calloc(1, sizeof(*result));
+    if (list == NULL) {
+        return NULL;
+    }
+
+    result = malloc(sizeof(*result));
     assert(result != NULL);
     TAILQ_INIT(result);
 

@@ -928,7 +928,9 @@ static bool elf_archive_tests(struct rpminspect *ri, Elf *after_elf, int after_e
     elf_archive_iterate(before_elf_fd, before_elf, find_all, &before_all);
 
     after_new = list_difference(after_no_pic, before_all);
-    assert(after_new != NULL);
+    if (after_new == NULL) {
+        goto cleanup;
+    }
 
     if (TAILQ_FIRST(after_new) == NULL) {
         result = false;

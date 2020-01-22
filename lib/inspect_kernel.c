@@ -143,12 +143,11 @@ bool compare_module_parameters(const struct kmod_list *before, const struct kmod
 
     /* diff the parameter lists */
     difference = list_difference(before_parm_list, after_parm_list);
-    assert(difference != NULL);
 
     /* If the list is empty, everything is fine.
      * Otherwise, make a copy of difference so we can clean everything up
      */
-    if (TAILQ_EMPTY(difference)) {
+    if (difference == NULL || TAILQ_EMPTY(difference)) {
         result = true;
     } else {
         result = false;
@@ -479,7 +478,7 @@ bool compare_module_aliases(struct kernel_alias_data *before, struct kernel_alia
             difference = list_difference(before_modules, after_modules);
 
             /* If the lists differ, do a wildcard search */
-            if (!TAILQ_EMPTY(difference)) {
+            if (difference != NULL && !TAILQ_EMPTY(difference)) {
                 after_modules = wildcard_alias_search(iter->alias, after->alias_list);
                 wildcard_search = true;
             }
@@ -490,7 +489,7 @@ bool compare_module_aliases(struct kernel_alias_data *before, struct kernel_alia
         /* Compare the results */
         difference = list_difference(before_modules, after_modules);
 
-        if (!TAILQ_EMPTY(difference)) {
+        if (difference != NULL && !TAILQ_EMPTY(difference)) {
             callback(iter->alias, before_modules, after_modules, user_data);
             result = false;
         }
