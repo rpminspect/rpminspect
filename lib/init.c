@@ -370,116 +370,116 @@ static int read_cfgfile(dictionary *cfg, struct rpminspect *ri, const char *file
         ri->licensedb = strdup(tmp);
     }
 
-    tmp = iniparser_getstring(cfg, "tests:badwords", NULL);
+    tmp = iniparser_getstring(cfg, "settings:badwords", NULL);
     if (tmp) {
         parse_list(tmp, &ri->badwords);
     }
 
-    tmp = iniparser_getstring(cfg, "tests:vendor", NULL);
+    tmp = iniparser_getstring(cfg, "settings:vendor", NULL);
     if (tmp) {
         free(ri->vendor);
         ri->vendor = strdup(tmp);
     }
 
-    tmp = iniparser_getstring(cfg, "tests:buildhost_subdomain", NULL);
+    tmp = iniparser_getstring(cfg, "settings:buildhost_subdomain", NULL);
     if (tmp) {
         parse_list(tmp, &ri->buildhost_subdomain);
     }
 
-    tmp = iniparser_getstring(cfg, "tests:security_path_prefix", NULL);
+    tmp = iniparser_getstring(cfg, "settings:security_path_prefix", NULL);
     if (tmp) {
         parse_list(tmp, &ri->security_path_prefix);
     }
 
-    tmp = iniparser_getstring(cfg, "tests:header_file_extensions", NULL);
+    tmp = iniparser_getstring(cfg, "settings:header_file_extensions", NULL);
     if (tmp) {
         parse_list(tmp, &ri->header_file_extensions);
     }
 
-    tmp = iniparser_getstring(cfg, "tests:forbidden_path_prefixes", NULL);
+    tmp = iniparser_getstring(cfg, "settings:forbidden_path_prefixes", NULL);
     if (tmp) {
         parse_list(tmp, &ri->forbidden_path_prefixes);
     }
 
-    tmp = iniparser_getstring(cfg, "tests:forbidden_path_suffixes", NULL);
+    tmp = iniparser_getstring(cfg, "settings:forbidden_path_suffixes", NULL);
     if (tmp) {
         parse_list(tmp, &ri->forbidden_path_suffixes);
     }
 
-    tmp = iniparser_getstring(cfg, "tests:forbidden_directories", NULL);
+    tmp = iniparser_getstring(cfg, "settings:forbidden_directories", NULL);
     if (tmp) {
         parse_list(tmp, &ri->forbidden_directories);
     }
 
-    tmp = iniparser_getstring(cfg, "tests:elf_ipv6_blacklist", NULL);
+    tmp = iniparser_getstring(cfg, "settings:elf_ipv6_blacklist", NULL);
     if (tmp) {
         parse_list(tmp, &ri->ipv6_blacklist);
     }
 
     /* If any of the regular expressions fail to compile, stop and return failure */
-    if (add_regex(cfg, "tests:elf_path_include", &ri->elf_path_include) != 0) {
+    if (add_regex(cfg, "settings:elf_path_include", &ri->elf_path_include) != 0) {
         return -1;
     }
 
-    if (add_regex(cfg, "tests:elf_path_exclude", &ri->elf_path_exclude) != 0) {
+    if (add_regex(cfg, "settings:elf_path_exclude", &ri->elf_path_exclude) != 0) {
         return -1;
     }
 
-    if (add_regex(cfg, "tests:manpage_path_include", &ri->manpage_path_include) != 0) {
+    if (add_regex(cfg, "settings:manpage_path_include", &ri->manpage_path_include) != 0) {
         return -1;
     }
 
-    if (add_regex(cfg, "tests:manpage_path_exclude", &ri->manpage_path_exclude) != 0) {
+    if (add_regex(cfg, "settings:manpage_path_exclude", &ri->manpage_path_exclude) != 0) {
         return -1;
     }
 
-    if (add_regex(cfg, "tests:xml_path_include", &ri->xml_path_include) != 0) {
+    if (add_regex(cfg, "settings:xml_path_include", &ri->xml_path_include) != 0) {
         return -1;
     }
 
-    if (add_regex(cfg, "tests:xml_path_exclude", &ri->xml_path_exclude) != 0) {
+    if (add_regex(cfg, "settings:xml_path_exclude", &ri->xml_path_exclude) != 0) {
         return -1;
     }
 
-    tmp = iniparser_getstring(cfg, "tests:desktop_entry_files_dir", NULL);
+    tmp = iniparser_getstring(cfg, "settings:desktop_entry_files_dir", NULL);
     if (tmp) {
         free(ri->desktop_entry_files_dir);
         ri->desktop_entry_files_dir = strdup(tmp);
     }
 
-    tmp = iniparser_getstring(cfg, "tests:desktop_icon_paths", NULL);
+    tmp = iniparser_getstring(cfg, "settings:desktop_icon_paths", NULL);
     if (tmp) {
         parse_list(tmp, &ri->desktop_icon_paths);
     }
 
-    tmp = iniparser_getstring(cfg, "tests:bin_paths", NULL);
+    tmp = iniparser_getstring(cfg, "settings:bin_paths", NULL);
     if (tmp) {
         parse_list(tmp, &ri->bin_paths);
     }
 
-    tmp = iniparser_getstring(cfg, "tests:bin_owner", NULL);
+    tmp = iniparser_getstring(cfg, "settings:bin_owner", NULL);
     if (tmp) {
         free(ri->bin_owner);
         ri->bin_owner = strdup(tmp);
     }
 
-    tmp = iniparser_getstring(cfg, "tests:bin_group", NULL);
+    tmp = iniparser_getstring(cfg, "settings:bin_group", NULL);
     if (tmp) {
         free(ri->bin_group);
         ri->bin_group = strdup(tmp);
     }
 
-    tmp = iniparser_getstring(cfg, "tests:forbidden_owners", NULL);
+    tmp = iniparser_getstring(cfg, "settings:forbidden_owners", NULL);
     if (tmp) {
         parse_list(tmp, &ri->forbidden_owners);
     }
 
-    tmp = iniparser_getstring(cfg, "tests:forbidden_groups", NULL);
+    tmp = iniparser_getstring(cfg, "settings:forbidden_groups", NULL);
     if (tmp) {
         parse_list(tmp, &ri->forbidden_groups);
     }
 
-    tmp = iniparser_getstring(cfg, "tests:shells", NULL);
+    tmp = iniparser_getstring(cfg, "settings:shells", NULL);
     if (tmp) {
         parse_list(tmp, &ri->shells);
     }
