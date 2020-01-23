@@ -114,7 +114,8 @@ static int check_license_abbrev(const char *tag, const char *lic, bool *whole_ma
 /*
  * Called by inspect_license()
  */
-static int check_peer_license(struct rpminspect *ri, const Header hdr) {
+static int check_peer_license(struct rpminspect *ri, const char *actual_licensedb, const Header hdr)
+{
     int ret = 0;
     bool valid = false;
     char *nevra = NULL;
@@ -122,6 +123,7 @@ static int check_peer_license(struct rpminspect *ri, const Header hdr) {
     char *msg = NULL;
 
     assert(ri != NULL);
+    assert(actual_licensedb != NULL);
 
     nevra = get_nevra(hdr);
     assert(nevra != NULL);
@@ -134,7 +136,7 @@ static int check_peer_license(struct rpminspect *ri, const Header hdr) {
         free(msg);
     } else {
         /* is the license tag valid or not */
-        valid = is_valid_license(ri->licensedb, license);
+        valid = is_valid_license(actual_licensedb, license);
 
         if (valid) {
             xasprintf(&msg, "Valid License Tag in %s: %s", nevra, license);
@@ -324,14 +326,18 @@ bool inspect_license(struct rpminspect *ri) {
     bool result;
     rpmpeer_entry_t *peer = NULL;
     char *msg = NULL;
+    char *actual_licensedb = NULL;
 
     assert(ri != NULL);
     assert(ri->peers != NULL);
 
-    if (ri->licensedb == NULL || access(ri->licensedb, F_OK|R_OK)) {
+    xasprintf(&actual_licensedb, "%s/%s/%s", ri->vendor_data_dir, LICENSES_DIR, ri->licensedb);
+
+    if (ri->licensedb == NULL || access(actual_licensedb, F_OK|R_OK)) {
         msg = strdup("Missing license database");
         add_result(ri, RESULT_BAD, NOT_WAIVABLE, HEADER_LICENSE, msg, NULL, REMEDY_LICENSEDB);
         free(msg);
+        free(actual_licensedb);
         return false;
     }
 
@@ -347,12 +353,13 @@ bool inspect_license(struct rpminspect *ri) {
             continue;
         }
 
-        good += check_peer_license(ri, peer->after_hdr);
+        good += check_peer_license(ri, actual_licensedb, peer->after_hdr);
         seen++;
     }
 
     /* Clean up */
     free_licensedb();
+    free(actual_licensedb);
 
     result = (good == seen);
 

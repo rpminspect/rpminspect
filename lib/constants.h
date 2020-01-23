@@ -45,15 +45,26 @@
 #define DEFAULT_WORKDIR "/var/tmp/rpminspect"
 
 /*
+ * Default location for the vendor-specific data.
+ */
+#define VENDOR_DATA_DIR "/usr/share/rpminspect"
+
+/*
  * Standard location for the license database.  Can be changed
  * in the configuration file.
  */
-#define LICENSE_DB_FILE "/usr/share/rpminspect/licenses/generic.json"
+#define LICENSE_DB_FILE "generic.json"
 
 /*
- * Standard location for stat-whitelist files per product release.
+ * Names of subdirectories in VENDOR_DATA_DIR.  Used to build
+ * filenames to vendor data files.  These subdirectories cannot
+ * be changed at runtime, only the VENDOR_DATA_DIR.
  */
-#define STAT_WHITELIST_DIR "/usr/share/rpminspect/stat-whitelist"
+#define ABI_CHECKING_WHITELIST_DIR "abi-checking-whitelist"
+#define CAPABILITIES_DIR "capabilities"
+#define LICENSES_DIR "licenses"
+#define STAT_WHITELIST_DIR "stat-whitelist"
+#define VERSION_WHITELIST_DIR "version-whitelist"
 
 /*
  * Standard location for desktop entry files.

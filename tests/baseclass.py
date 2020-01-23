@@ -80,10 +80,11 @@ class RequiresRpminspect(unittest.TestCase):
 
         # modify settings for the test suite based on where it's running
         for line in conflines:
-            if line.startswith("licensedb"):
-                # point to our test license database
-                # we have some known good licenses and known bad licenses
-                f.write("licensedb = \"%s/licenses.json\"\n" % os.environ['RPMINSPECT_TEST_DATA_PATH'])
+            if line.startswith("vendor_data_dir"):
+                # point to our test vendor data
+                f.write("vendor_data_dir = \"%s\"\n" % os.environ['RPMINSPECT_TEST_DATA_PATH'])
+            elif line.startswith("licensedb"):
+                f.write("licensedb = \"test.json\"\n")
             elif line.startswith("buildhost_subdomain"):
                 if self.buildhost_subdomain:
                     f.write("buildhost_subdomain = \"%s\"\n" % self.buildhost_subdomain)
