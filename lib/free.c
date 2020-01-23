@@ -78,8 +78,8 @@ void free_rpminspect(struct rpminspect *ri) {
     free(ri->kojimbs);
     free(ri->worksubdir);
 
+    free(ri->vendor_data_dir);
     free(ri->licensedb);
-    free(ri->stat_whitelist_dir);
 
     if (ri->stat_whitelist) {
         while (!TAILQ_EMPTY(ri->stat_whitelist)) {

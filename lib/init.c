@@ -358,16 +358,16 @@ static int read_cfgfile(dictionary *cfg, struct rpminspect *ri, const char *file
         ri->kojimbs = strdup(tmp);
     }
 
+    tmp = iniparser_getstring(cfg, "vendor-data:vendor_data_dir", NULL);
+    if (tmp) {
+        free(ri->vendor_data_dir);
+        ri->vendor_data_dir = strdup(tmp);
+    }
+
     tmp = iniparser_getstring(cfg, "vendor-data:licensedb", NULL);
     if (tmp) {
         free(ri->licensedb);
         ri->licensedb = strdup(tmp);
-    }
-
-    tmp = iniparser_getstring(cfg, "vendor-data:stat_whitelist_dir", NULL);
-    if (tmp) {
-        free(ri->stat_whitelist_dir);
-        ri->stat_whitelist_dir = strdup(tmp);
     }
 
     tmp = iniparser_getstring(cfg, "tests:badwords", NULL);
@@ -540,7 +540,7 @@ bool init_stat_whitelist(struct rpminspect *ri) {
     stat_whitelist_entry_t *entry = NULL;
 
     assert(ri != NULL);
-    assert(ri->stat_whitelist_dir != NULL);
+    assert(ri->vendor_data_dir != NULL);
     assert(ri->product_release != NULL);
 
     /* already initialized */
@@ -549,7 +549,7 @@ bool init_stat_whitelist(struct rpminspect *ri) {
     }
 
     /* the actual stat-whitelist file */
-    xasprintf(&filename, "%s/%s", ri->stat_whitelist_dir, ri->product_release);
+    xasprintf(&filename, "%s/%s/%s", ri->vendor_data_dir, STAT_WHITELIST_DIR, ri->product_release);
     assert(filename != NULL);
 
     input = fopen(filename, "r");
@@ -658,8 +658,8 @@ int init_rpminspect(struct rpminspect *ri, const char *cfgfile, const char *prof
     ri->kojihub = NULL;
     ri->kojiursine = NULL;
     ri->kojimbs = NULL;
+    ri->vendor_data_dir = strdup(VENDOR_DATA_DIR);
     ri->licensedb = strdup(LICENSE_DB_FILE);
-    ri->stat_whitelist_dir = strdup(STAT_WHITELIST_DIR);
     ri->stat_whitelist = NULL;
     ri->badwords = NULL;
     ri->vendor = NULL;

@@ -179,8 +179,8 @@ struct rpminspect {
     char *worksubdir;          /* within workdir, where these builds go */
 
     /* Vendor data */
-    char *licensedb;           /* full path to the license database */
-    char *stat_whitelist_dir;  /* directory with stat-whitelist files */
+    char *vendor_data_dir;     /* main vendor data directory */
+    char *licensedb;           /* name of file under licenses/ to use */
 
     /* Populated at runtime for the product release */
     stat_whitelist_t *stat_whitelist;
