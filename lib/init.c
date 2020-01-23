@@ -503,8 +503,8 @@ static int read_cfgfile(dictionary *cfg, struct rpminspect *ri, const char *file
     if (tmp) {
         if (!strcasecmp(tmp, "name")) {
             ri->specprimary = PRIMARY_NAME;
-        } else if (!strcasecmp(tmp, "basename")) {
-            ri->specprimary = PRIMARY_BASENAME;
+        } else if (!strcasecmp(tmp, "filename")) {
+            ri->specprimary = PRIMARY_FILENAME;
         } else {
             fprintf(stderr, "*** Invalid specname:primary setting in %s: %s\n", filename, tmp);
             fprintf(stderr, "*** Defaulting to 'name' primary setting.\n");
@@ -512,7 +512,6 @@ static int read_cfgfile(dictionary *cfg, struct rpminspect *ri, const char *file
         }
     }
 
-/* XXX */
     /* if a jvm major versions exist, collect those in to a hash table */
     read_mapping(cfg, "javabytecode", &ri->jvm_table, &ri->jvm_keys);
 
@@ -521,7 +520,6 @@ static int read_cfgfile(dictionary *cfg, struct rpminspect *ri, const char *file
 
     /* if a products section exists, collect those in to a hash table */
     read_mapping(cfg, "products", &ri->products, &ri->product_keys);
-/* XXX */
 
     return 0;
 }
