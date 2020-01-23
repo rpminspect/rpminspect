@@ -34,7 +34,7 @@
 /* Globals */
 static int prefixlen = 0;
 static char *jarfile = NULL;
-static short minimum_major = -1;
+static short supported_major = -1;
 static struct rpminspect *jar_ri = NULL;
 static bool jar_result = true;
 
@@ -115,8 +115,8 @@ static bool check_class_file(struct rpminspect *ri, const char *fullpath,
         add_result(ri, RESULT_BAD, WAIVABLE_BY_ANYONE, HEADER_JAVABYTECODE, msg, NULL, NULL);
         free(msg);
         return false;
-    } else if (major < minimum_major) {
-        xasprintf(&msg, "File %s (%s), Java byte code version %d less than the minimum required major version (%d) for product release %s", localpath, container, major, minimum_major, ri->product_release);
+    } else if (major > supported_major) {
+        xasprintf(&msg, "File %s (%s), Java byte code version %d greater than supported major version %d for product release %s", localpath, container, major, supported_major, ri->product_release);
         add_result(ri, RESULT_BAD, WAIVABLE_BY_ANYONE, HEADER_JAVABYTECODE, msg, NULL, NULL);
         free(msg);
         return false;
@@ -252,7 +252,7 @@ bool inspect_javabytecode(struct rpminspect *ri)
         return false;
     }
 
-    minimum_major = strtol(eptr->data, NULL, 10);
+    supported_major = strtol(eptr->data, NULL, 10);
     if (errno == ERANGE) {
         fprintf(stderr, "*** invalid JVM major version: %s: %s\n", (char *) eptr->data, strerror(errno));
         fflush(stderr);
