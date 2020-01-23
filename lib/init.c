@@ -630,6 +630,7 @@ bool init_stat_whitelist(struct rpminspect *ri) {
         /* clean up */
         free(line);
         line = NULL;
+        field = MODE;
     }
 
     return true;
