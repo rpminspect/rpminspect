@@ -163,7 +163,7 @@ typedef enum _specname_match_t {
 typedef enum _specname_primary_t {
     PRIMARY_NULL = 0,
     PRIMARY_NAME = 1,
-    PRIMARY_BASENAME = 2
+    PRIMARY_FILENAME = 2
 } specname_primary_t;
 
 /*

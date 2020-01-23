@@ -46,8 +46,7 @@ static bool specname_driver(struct rpminspect *ri, rpmfile_entry_t *file) {
     /* Spec files are all named in a standard way */
     if (ri->specprimary == PRIMARY_NAME) {
         primary = strdup(headerGetString(file->rpm_header, RPMTAG_NAME));
-    } else if (ri->specprimary == PRIMARY_BASENAME) {
-
+    } else if (ri->specprimary == PRIMARY_FILENAME) {
         primary = strdup(file->localpath);
         dot = rindex(primary, '.');
         assert(dot != NULL);
