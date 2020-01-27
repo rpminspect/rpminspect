@@ -41,7 +41,7 @@ class TestSpecNameRPMs(TestRPMs):
         TestRPMs.setUp(self)
         self.inspection = 'specname'
         self.label = 'spec-file-name'
-        self.result = 'BAD'
+        self.result = 'INFO'
         self.waiver_auth = 'Not Waivable'
 
 # Verify spec filename not matching package name fails (BAD)

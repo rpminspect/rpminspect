@@ -65,6 +65,29 @@ class RequiresRpminspect(unittest.TestCase):
         # settings that the inheriting test can override
         self.buildhost_subdomain = None
 
+    def dumpResults(self):
+        # The earlier exception may have been on json.loads(), so
+        # give that a try here but default to a string conversion.
+        try:
+            o = json.dumps(json.loads(self.out), sort_keys=True, indent=4)
+        except:
+            o = str(self.out)
+
+        try:
+            e = json.dumps(json.loads(self.err), sort_keys=True, indent=4)
+        except:
+            e = str(self.err)
+
+        print("\n\ninspection=%s\n" % self.inspection)
+
+        if self.out is not None and len(self.out) > 0:
+            print("stdout:\n%s\n" % o)
+
+        if self.err is not None and len(self.err) > 0:
+            print("stderr:\n%s\n" % e)
+
+        print("\n")
+
     def configFile(self):
         # create a copy of the sample conf file for test purposes
         (handle, self.conffile) = tempfile.mkstemp()
@@ -142,7 +165,7 @@ class TestSRPM(RequiresRpminspect):
         try:
             self.results = json.loads(self.out)
         except json.decoder.JSONDecodeError:
-            print("\n\ninspection: |%s|\nstdout: |%s|\nstderr: |%s|\n\n" % (self.inspection, self.out, self.err))
+            self.dumpResults()
 
         # anything not OK or INFO is a non-zero return
         if self.result not in ['OK', 'INFO'] and self.exitcode == 0:
@@ -150,7 +173,7 @@ class TestSRPM(RequiresRpminspect):
 
         # dump stdout and stderr if these do not match
         if self.p.returncode != self.exitcode:
-            print("\n\nstdout: |%s|\nstderr: |%s|\n\n" % (self.out, self.err))
+            self.dumpResults()
 
         self.assertEqual(self.p.returncode, self.exitcode)
         self.assertEqual(self.results[self.label][0]['result'], self.result)
@@ -204,7 +227,7 @@ class TestCompareSRPM(RequiresRpminspect):
         try:
             self.results = json.loads(self.out)
         except json.decoder.JSONDecodeError:
-            print("\n\ninspection: |%s|\nstdout: |%s|\nstderr: |%s|\n\n" % (self.inspection, self.out, self.err))
+            self.dumpResults()
 
         # anything not OK or INFO is a non-zero return
         if self.result not in ['OK', 'INFO'] and self.exitcode == 0:
@@ -212,7 +235,7 @@ class TestCompareSRPM(RequiresRpminspect):
 
         # dump stdout and stderr if these do not match
         if self.p.returncode != self.exitcode:
-            print("\n\nstdout: |%s|\nstderr: |%s|\n\n" % (self.out, self.err))
+            self.dumpResults()
 
         self.assertEqual(self.p.returncode, self.exitcode)
         self.assertEqual(self.results[self.label][0]['result'], self.result)
@@ -252,11 +275,11 @@ class TestRPMs(TestSRPM):
             try:
                 self.results = json.loads(self.out)
             except json.decoder.JSONDecodeError:
-                print("\n\ninspection: |%s|\nstdout: |%s|\nstderr: |%s|\n\n" % (self.inspection, self.out, self.err))
+                self.dumpResults()
 
             # dump stdout and stderr if these do not match
             if self.p.returncode != self.exitcode:
-                print("\n\nstdout: |%s|\nstderr: |%s|\n\n" % (self.out, self.err))
+                self.dumpResults()
 
             self.assertEqual(self.p.returncode, self.exitcode)
             self.assertEqual(self.results[self.label][0]['result'], self.result)
@@ -299,11 +322,11 @@ class TestCompareRPMs(TestCompareSRPM):
             try:
                 self.results = json.loads(self.out)
             except json.decoder.JSONDecodeError:
-                print("\n\ninspection: |%s|\nstdout: |%s|\nstderr: |%s|\n\n" % (self.inspection, self.out, self.err))
+                self.dumpResults()
 
             # dump stdout and stderr if these do not match
             if self.p.returncode != self.exitcode:
-                print("\n\nstdout: |%s|\nstderr: |%s|\n\n" % (self.out, self.err))
+                self.dumpResults()
 
             self.assertEqual(self.p.returncode, self.exitcode)
             self.assertEqual(self.results[self.label][0]['result'], self.result)
@@ -351,7 +374,7 @@ class TestKoji(TestSRPM):
             try:
                 self.results = json.loads(self.out)
             except json.decoder.JSONDecodeError:
-                print("\n\ninspection: |%s|\nstdout: |%s|\nstderr: |%s|\n\n" % (self.inspection, self.out, self.err))
+                self.dumpResults()
 
             # anything not OK or INFO is a non-zero return
             if self.result not in ['OK', 'INFO'] and self.exitcode == 0:
@@ -359,7 +382,7 @@ class TestKoji(TestSRPM):
 
             # dump stdout and stderr if these do not match
             if self.p.returncode != self.exitcode:
-                print("\n\nstdout: |%s|\nstderr: |%s|\n\n" % (self.out, self.err))
+                self.dumpResults()
 
             self.assertEqual(self.p.returncode, self.exitcode)
             self.assertEqual(self.results[self.label][0]['result'], self.result)
@@ -418,7 +441,7 @@ class TestCompareKoji(TestCompareSRPM):
             try:
                 self.results = json.loads(self.out)
             except json.decoder.JSONDecodeError:
-                print("\n\ninspection: |%s|\nstdout: |%s|\nstderr: |%s|\n\n" % (self.inspection, self.out, self.err))
+                self.dumpResults()
 
             # anything not OK or INFO is a non-zero return
             if self.result not in ['OK', 'INFO'] and self.exitcode == 0:
@@ -426,7 +449,7 @@ class TestCompareKoji(TestCompareSRPM):
 
             # dump stdout and stderr if these do not match
             if self.p.returncode != self.exitcode:
-                print("\n\nstdout: |%s|\nstderr: |%s|\n\n" % (self.out, self.err))
+                self.dumpResults()
 
             self.assertEqual(self.p.returncode, self.exitcode)
             self.assertEqual(self.results[self.label][0]['result'], self.result)
