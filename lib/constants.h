@@ -56,6 +56,11 @@
 #define LICENSE_DB_FILE "generic.json"
 
 /*
+ * Name of the [inspections] section in the config file.
+ */
+#define INSPECTIONS "inspections"
+
+/*
  * Names of subdirectories in VENDOR_DATA_DIR.  Used to build
  * filenames to vendor data files.  These subdirectories cannot
  * be changed at runtime, only the VENDOR_DATA_DIR.

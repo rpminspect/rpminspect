@@ -100,8 +100,8 @@ bool inspect_specname(struct rpminspect *ri) {
     if (specgood) {
         add_result(ri, RESULT_OK, NOT_WAIVABLE, HEADER_SPECNAME, NULL, NULL, NULL);
     } else if (!seen) {
-        xasprintf(&msg, "The specname inspection is only for source packages.");
-        add_result(ri, RESULT_BAD, NOT_WAIVABLE, HEADER_SPECNAME, msg, NULL, NULL);
+        xasprintf(&msg, "The specname inspection is only for source packages, skipping.");
+        add_result(ri, RESULT_INFO, NOT_WAIVABLE, HEADER_SPECNAME, msg, NULL, NULL);
         free(msg);
     }
 

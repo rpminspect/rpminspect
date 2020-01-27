@@ -138,8 +138,7 @@ bool inspect_disttag(struct rpminspect *ri) {
     if (result && src) {
         add_result(ri, RESULT_OK, NOT_WAIVABLE, HEADER_DISTTAG, NULL, NULL, NULL);
     } else if (!src) {
-        add_result(ri, RESULT_BAD, NOT_WAIVABLE, HEADER_DISTTAG, "Specified package is not a source RPM, cannot run disttag inspection.", NULL, NULL);
-        result = false;
+        add_result(ri, RESULT_INFO, NOT_WAIVABLE, HEADER_DISTTAG, "Specified package is not a source RPM, skipping.", NULL, NULL);
     }
 
     return result;
