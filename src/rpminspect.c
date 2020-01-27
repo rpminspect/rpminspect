@@ -261,61 +261,13 @@ static void check_found(const bool found, const char *inspection, const char *pr
     assert(progname != NULL);
 
     if (!found) {
-        fprintf(stderr, "*** Unknown test specified: `%s`\n", inspection);
+        fprintf(stderr, "*** Unknown inspection: `%s`\n", inspection);
         fprintf(stderr, "*** See `%s --help` for more information.\n", progname);
         fflush(stderr);
         exit(RI_PROGRAM_ERROR);
     }
 
     return;
-}
-
-/*
- * Used in the -T and -E option processing to handle each test
- * flag.  Arguments:
- *     inspection      The name of the inspection from the command
- *                     line.  e.g., "-T license,manpage" would make
- *                     two calls to this function with inspection
- *                     being "license" and then "manpage".
- *     exclude         True if -E option, False otherwise.
- *     selected        The selected test bitmap from the caller.
- * Returns true if the inspection name is valid.
- */
-static bool process_inspection_flag(const char *inspection, const bool exclude, uint64_t *selected)
-{
-    int i = 0;
-    bool found = false;
-
-    assert(inspection != NULL);
-    assert(selected != NULL);
-
-    if (!strcasecmp(inspection, "ALL")) {
-        /* ALL tests specified */
-        if (exclude) {
-            *selected = 0;
-            return true;
-        } else {
-            *selected = ~0;
-            return true;
-        }
-    }
-
-    for (i = 0; inspections[i].flag != 0; i++) {
-        if (!strcasecmp(inspection, inspections[i].name)) {
-            /* user specified a valid inspection */
-            if (exclude) {
-                *selected &= ~(inspections[i].flag);
-                found = true;
-                break;
-            } else {
-                *selected |= inspections[i].flag;
-                found = true;
-                break;
-            }
-        }
-    }
-
-    return found;
 }
 
 int main(int argc, char **argv) {
@@ -362,7 +314,7 @@ int main(int argc, char **argv) {
     int mode = S_IRWXU | S_IRGRP | S_IXGRP | S_IROTH | S_IXOTH;
     bool found = false;
     char *inspection = NULL;
-    uint64_t selected = 0;
+    char *insoptarg = NULL;
     bool inspection_opt = false;
     bool exclude = false;
     size_t width = tty_width();
@@ -397,23 +349,17 @@ int main(int argc, char **argv) {
                 profile = strdup(optarg);
                 break;
             case 'T':
-            case 'E':
-                /* Process the -T or the -E options */
+                /* Inspections to enable */
                 check_inspection_options(inspection_opt, progname);
-
-                if (c == 'T') {
-                    selected = 0;
-                    exclude = false;
-                } else {
-                    selected = ~0;
-                    exclude = true;
-                }
-
-                while ((inspection = strsep(&optarg, ",")) != NULL) {
-                    found = process_inspection_flag(inspection, exclude, &selected);
-                    check_found(found, inspection, progname);
-                }
-
+                insoptarg = strdup(optarg);
+                exclude = false;
+                inspection_opt = true;
+                break;
+            case 'E':
+                /* Inspections to disable */
+                check_inspection_options(inspection_opt, progname);
+                insoptarg = strdup(optarg);
+                exclude = true;
                 inspection_opt = true;
                 break;
             case 'a':
@@ -552,9 +498,23 @@ int main(int argc, char **argv) {
     ri.product_release = release;
     ri.threshold = getseverity(threshold);
 
-    /* Copy in user-selected tests if they specified something */
-    if (selected != 0 || exclude) {
-        ri.tests = selected;
+    /*
+     * any inspection selections on the command line can override
+     * selections made via the config files
+     */
+    if (inspection_opt) {
+        if (exclude) {
+            ri.tests = ~0;
+        } else {
+            ri.tests = 0;
+        }
+
+        while ((inspection = strsep(&insoptarg, ",")) != NULL) {
+            found = process_inspection_flag(inspection, exclude, &ri.tests);
+            check_found(found, inspection, progname);
+        }
+
+        free(insoptarg);
     }
 
     /* the user specified a working directory */

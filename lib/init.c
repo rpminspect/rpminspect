@@ -319,7 +319,13 @@ static mode_t parse_mode(const char *input) {
  */
 static int read_cfgfile(dictionary *cfg, struct rpminspect *ri, const char *filename, const bool overlay)
 {
+    size_t len = 0;
+    int nk = 0;
+    const char **k = NULL;
+    const char *v = NULL;
     const char *tmp = NULL;
+    const char *inspection = NULL;
+    bool exclude = false;
 
     assert(cfg != NULL);
     assert(ri != NULL);
@@ -370,6 +376,53 @@ static int read_cfgfile(dictionary *cfg, struct rpminspect *ri, const char *file
         ri->licensedb = strdup(tmp);
     }
 
+    /* read optional [inspections] section to enable/disable inspections */
+    len = strlen(INSPECTIONS);
+    nk = iniparser_getsecnkeys(cfg, INSPECTIONS);
+
+    if (nk > 0) {
+        k = calloc(nk, len);
+        assert(k != NULL);
+
+        if (iniparser_getseckeys(cfg, INSPECTIONS, k) == NULL) {
+            free(k);
+            nk = 0;
+        }
+    }
+
+    while (nk > 0) {
+        v = iniparser_getstring(cfg, k[nk - 1], NULL);
+
+        if (v == NULL) {
+            nk--;
+            continue;
+        }
+
+        inspection = k[nk - 1] + len + 1;
+
+        if (!strcasecmp(v, "on")) {
+            exclude = false;
+        } else if (!strcasecmp(v, "off")) {
+            exclude = true;
+        } else {
+            fprintf(stderr, "*** Invalid [%s] line: %s = %s (ignoring)\n", INSPECTIONS, inspection, v);
+            fflush(stderr);
+            nk--;
+            continue;
+        }
+
+        if (!process_inspection_flag(inspection, exclude, &ri->tests)) {
+            fprintf(stderr, "*** Unknown inspection: `%s`\n", inspection);
+            fflush(stderr);
+            exit(RI_PROGRAM_ERROR);
+        }
+
+        nk--;
+    }
+
+    free(k);
+
+    /* Settings for all of the different inspections */
     tmp = iniparser_getstring(cfg, "settings:badwords", NULL);
     if (tmp) {
         parse_list(tmp, &ri->badwords);
@@ -645,7 +698,6 @@ int init_rpminspect(struct rpminspect *ri, const char *cfgfile, const char *prof
 {
     int ret = 0;
     dictionary *cfg = NULL;
-    uint64_t tests = 0;
     char *tmp = NULL;
     char *filename = NULL;
 
@@ -661,6 +713,7 @@ int init_rpminspect(struct rpminspect *ri, const char *cfgfile, const char *prof
     ri->vendor_data_dir = strdup(VENDOR_DATA_DIR);
     ri->licensedb = strdup(LICENSE_DB_FILE);
     ri->stat_whitelist = NULL;
+    ri->tests = ~0;
     ri->badwords = NULL;
     ri->vendor = NULL;
     ri->buildhost_subdomain = NULL;
@@ -728,7 +781,6 @@ int init_rpminspect(struct rpminspect *ri, const char *cfgfile, const char *prof
     ri->buildtype = KOJI_BUILD_RPM;
     ri->peers = init_rpmpeer();
     ri->worksubdir = NULL;
-    ri->tests = ~tests;
     ri->results = NULL;
     ri->threshold = RESULT_VERIFY;
     ri->worst_result = RESULT_OK;

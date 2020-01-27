@@ -194,4 +194,7 @@ char *run_cmd(int *, const char *, ...);
 /* whitelist.c */
 bool on_stat_whitelist(struct rpminspect *, const rpmfile_entry_t *, const char *, const char *);
 
+/* flags.c */
+bool process_inspection_flag(const char *, const bool, uint64_t *);
+
 #endif
