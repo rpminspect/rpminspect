@@ -44,7 +44,7 @@ class TestDistTagOnNonSRPM(TestRPMs):
         self.rpm.release = '1%{?dist}'
         self.inspection = 'disttag'
         self.label = 'dist-tag'
-        self.result = 'BAD'
+        self.result = 'INFO'
         self.waiver_auth = 'Not Waivable'
 
 # Verify malformed %{?dist} tag in Release fails on SRPM (BAD)
