@@ -25,6 +25,10 @@
 #include <xmlrpc-c/client_global.h>
 #include "rpminspect.h"
 
+/* Architechture list strings */
+#define ARCH_NOARCH "noarch"
+#define ARCH_SRC "src"
+
 /*
  * General error handler for xmlrpc failures.  Could be improved
  * a bit to be more helpful to the user.
@@ -1006,6 +1010,8 @@ string_list_t *get_all_arches(const struct rpminspect *ri)
     xmlrpc_value *result = NULL;
     xmlrpc_value *value = NULL;
     char *element = NULL;
+    bool have_noarch = false;
+    bool have_src = false;
 
     assert(ri != NULL);
 
@@ -1074,6 +1080,13 @@ string_list_t *get_all_arches(const struct rpminspect *ri)
         xmlrpc_decompose_value(&env, value, "s", &element);
         xmlrpc_abort_on_fault(&env);
 
+        /* Flag what we have */
+        if (!strcmp(element, ARCH_NOARCH)) {
+            have_noarch = true;
+        } else if (!strcmp(element, ARCH_SRC)) {
+            have_src = true;
+        }
+
         /*
          * If the value of an element is nil, just skip over it.  We can't
          * do anything with nil values, so it might as well just not
@@ -1090,6 +1103,23 @@ string_list_t *get_all_arches(const struct rpminspect *ri)
         arch->data = strdup(element);
         assert(arch->data != NULL);
 
+        TAILQ_INSERT_TAIL(arches, arch, items);
+    }
+
+    /* Always add 'noarch' and 'src' to this list */
+    if (!have_noarch) {
+        arch = calloc(1, sizeof(*arch));
+        assert(arch != NULL);
+        arch->data = strdup(ARCH_NOARCH);
+        assert(arch->data != NULL);
+        TAILQ_INSERT_TAIL(arches, arch, items);
+    }
+
+    if (!have_src) {
+        arch = calloc(1, sizeof(*arch));
+        assert(arch != NULL);
+        arch->data = strdup(ARCH_SRC);
+        assert(arch->data != NULL);
         TAILQ_INSERT_TAIL(arches, arch, items);
     }
 
