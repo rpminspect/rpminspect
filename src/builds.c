@@ -172,28 +172,42 @@ static int copytree(const char *fpath, const struct stat *sb,
     static int toptrim = 0;
     char *workfpath = NULL;
     char *bufpath = NULL;
+    char *copysrc = NULL;
     Header h;
     const char *arch = NULL;
     int ret = 0;
 
     /*
-     * On our first call, take the length of the main directory that we will work
-     * relative to for this rescursive copy.
+     * On our first call, take the length of the main directory that
+     * we will work relative to for this rescursive copy.
      */
     if (ftwbuf->level == 0 && S_ISDIR(sb->st_mode)) {
         toptrim = strlen(fpath) + 1;
         return 0;
     }
 
+    /* Ignore unreadable things */
+    if (tflag == FTW_DNR || tflag == FTW_NS || tflag == FTW_SLN) {
+        fprintf(stderr, "*** unable to read %s, skipping\n", fpath);
+        return 0;
+    }
+
+    /* Copy file or create a directory */
     workfpath = ((char *) fpath) + toptrim;
     xasprintf(&bufpath, "%s/%s/%s", workri->worksubdir, build_desc[whichbuild], workfpath);
+
+    if (S_ISREG(sb->st_mode)) {
+        copysrc = strdup(fpath);
+    } else if (S_ISLNK(sb->st_mode)) {
+        copysrc = realpath(fpath, NULL);
+    }
 
     if (S_ISDIR(sb->st_mode)) {
         if (mkdirp(bufpath, mode)) {
             fprintf(stderr, "*** error creating directory %s: %s\n", bufpath, strerror(errno));
             ret = -1;
         }
-    } else if (S_ISREG(sb->st_mode)) {
+    } else if (S_ISREG(sb->st_mode) || S_ISLNK(sb->st_mode)) {
         if ((ret = get_rpm_header(fpath, &h)) != 0) {
             return ret;
         }
@@ -211,7 +225,7 @@ static int copytree(const char *fpath, const struct stat *sb,
 
         headerFree(h);
 
-        if (copyfile(fpath, bufpath, true, false)) {
+        if (copyfile(copysrc, bufpath, true, false)) {
             fprintf(stderr, "*** error copying file %s: %s\n", bufpath, strerror(errno));
             ret = -1;
         }
@@ -221,12 +235,15 @@ static int copytree(const char *fpath, const struct stat *sb,
     }
 
     /* Gather the RPM header for packages */
-    if (tflag == FTW_F && strsuffix(bufpath, RPM_FILENAME_EXTENSION) && get_rpm_info(bufpath)) {
+    if ((tflag == FTW_F || tflag == FTW_SL) &&
+        strsuffix(bufpath, RPM_FILENAME_EXTENSION) &&
+        get_rpm_info(bufpath)) {
         ret = -1;
     }
 
     fflush(stderr);
     free(bufpath);
+    free(copysrc);
 
     return ret;
 }
@@ -690,7 +707,7 @@ int gather_builds(struct rpminspect *ri, bool fo) {
 
             free_koji_build(build);
         } else {
-            fprintf(stderr, "*** enable to find after build: %s\n", ri->after);
+            fprintf(stderr, "*** unable to find after build: %s\n", ri->after);
             fflush(stderr);
             return -2;
         }
