@@ -639,6 +639,13 @@ int main(int argc, char **argv) {
     if (!fetch_only) {
         /* Determine product release unless the user specified one. */
         if (ri.product_release == NULL) {
+            if (ri.peers == NULL || TAILQ_EMPTY(ri.peers)) {
+                fprintf(stderr, "*** No peers, ensure packages exist for specified architecture(s).\n");
+                fflush(stderr);
+                free_rpminspect(&ri);
+                return RI_PROGRAM_ERROR;
+            }
+
             peer = TAILQ_FIRST(ri.peers);
             after_rel = headerGetString(peer->after_hdr, RPMTAG_RELEASE);
 
