@@ -108,3 +108,18 @@ nevra_cleanup:
     rpmtdFree(td);
     return nevra;
 }
+
+/*
+ * Returns the RPMTAG_ARCH or "src" if it's a source RPM.
+ * NOTE: Do not free() what this function returns.
+ */
+const char *get_rpm_header_arch(Header h)
+{
+    assert(h);
+
+    if (headerIsSource(h)) {
+        return SRPM_ARCH_NAME;
+    } else {
+        return headerGetString(h, RPMTAG_ARCH);
+    }
+}
