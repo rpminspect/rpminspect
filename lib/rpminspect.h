@@ -150,6 +150,7 @@ int copyfile(const char *, const char *, bool, bool);
 int init_librpm(void);
 int get_rpm_header(const char *, Header *);
 char *get_nevra(Header);
+const char *get_rpm_header_arch(Header);
 
 /* peers.c */
 rpmpeer_t *init_rpmpeer(void);
