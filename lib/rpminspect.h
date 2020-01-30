@@ -22,6 +22,7 @@
 
 #include <stdbool.h>
 #include <sys/types.h>
+#include <sys/capability.h>
 #include <iniparser.h>
 #include <regex.h>
 #include <rpm/header.h>
@@ -163,6 +164,7 @@ rpmfile_t * extract_rpm(const char *, Header);
 const char * get_file_path(const rpmfile_entry_t *file);
 bool process_file_path(const rpmfile_entry_t *, regex_t *, regex_t *);
 void find_file_peers(rpmfile_t *, rpmfile_t *);
+cap_t get_cap(rpmfile_entry_t *);
 
 /* tty.c */
 size_t tty_width(void);
