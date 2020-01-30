@@ -114,6 +114,37 @@ inspections lack integration tests:
     filesize
 
 
++=======+
+| Other |
++=======+
+
+General functionality
+---------------------
+
+* In the [inspections] section in config files, all for "ALL = on"
+  and "ALL = off" to toggle everything.  Similar to the command
+  line option.
+
+* Create a single-line reporting mode as suggested by mhroncok that
+  will report changes (see issue #26).
+
+* Support path ignores in the config file:
+      * Allow path specification using standard wildcard syntax.
+      * Allow path ignores to be across all inspections or only
+        specific inspections.
+
+* Improve the performance of the peer matching code.  Possibly
+  fork off per subpackage and only run across subsets or some
+  other method.  Current code works but degrades as subpackage
+  count and size increases a lot.
+
+* Add verbose runtime reporting.  This is currently only available
+  for downloading packages.  Need to figure out how to separate it
+  from the test results.
+
+* Add debug runtime reporting.  Just another level beyond verbose.
+
+
 Documentation
 -------------
 
