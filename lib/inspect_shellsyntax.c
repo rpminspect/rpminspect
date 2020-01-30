@@ -123,7 +123,7 @@ static bool shellsyntax_driver(struct rpminspect *ri, rpmfile_entry_t *file)
     }
 
     /* We need the architecture for reporting */
-    arch = headerGetString(file->rpm_header, RPMTAG_ARCH);
+    arch = get_rpm_header_arch(file->rpm_header);
 
     /* Get the shell from the #! line */
     shell = get_shell(ri, file->fullpath);

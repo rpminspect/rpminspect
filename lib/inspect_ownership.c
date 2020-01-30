@@ -91,7 +91,7 @@ static bool ownership_driver(struct rpminspect *ri, rpmfile_entry_t *file) {
     }
 
     /* Get the arch, we'll use that */
-    arch = headerGetString(file->rpm_header, RPMTAG_ARCH);
+    arch = get_rpm_header_arch(file->rpm_header);
 
     /* Get the owner and group of the file */
     owner = get_header_value(file, RPMTAG_FILEUSERNAME);

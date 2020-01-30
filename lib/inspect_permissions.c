@@ -49,7 +49,7 @@ static bool permissions_driver(struct rpminspect *ri, rpmfile_entry_t *file)
     }
 
     /* We need the architecture for reporting */
-    arch = headerGetString(file->rpm_header, RPMTAG_ARCH);
+    arch = get_rpm_header_arch(file->rpm_header);
 
     /* Local working copies for display */
     before_mode = file->peer_file->st.st_mode & 0777;

@@ -71,7 +71,7 @@ static bool addedfiles_driver(struct rpminspect *ri, rpmfile_entry_t *file)
      */
 
     /* The architecture is used in reporting messages */
-    arch = headerGetString(file->rpm_header, RPMTAG_ARCH);
+    arch = get_rpm_header_arch(file->rpm_header);
 
     /* Check for any forbidden path prefixes */
     if (ri->forbidden_path_prefixes) {

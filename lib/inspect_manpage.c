@@ -274,7 +274,7 @@ static bool manpage_driver(struct rpminspect *ri, rpmfile_entry_t *file)
         return true;
     }
 
-    arch = headerGetString(file->rpm_header, RPMTAG_ARCH);
+    arch = get_rpm_header_arch(file->rpm_header);
 
     if ((manpage_errors = inspect_manpage_validity(file->fullpath, file->localpath)) != NULL) {
         xasprintf(&msg, "Man page checker reported problems with %s on %s", file->localpath, arch);

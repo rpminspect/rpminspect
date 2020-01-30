@@ -88,18 +88,18 @@ int add_peer(rpmpeer_t **peers, int whichbuild, bool fetch_only, const char *pkg
 
     /* Get the package or subpackage name and arch */
     newname = headerGetString(*hdr, RPMTAG_NAME);
-    newarch = headerGetString(*hdr, RPMTAG_ARCH);
+    newarch = get_rpm_header_arch(*hdr);
     newsrc = headerIsSource(*hdr);
 
     /* If we don't have this peer, try to add it */
     TAILQ_FOREACH(peer, *peers, items) {
         if (whichbuild == BEFORE_BUILD && peer->after_rpm != NULL) {
             existingname = headerGetString(peer->after_hdr, RPMTAG_NAME);
-            existingarch = headerGetString(peer->after_hdr, RPMTAG_ARCH);
+            existingarch = get_rpm_header_arch(peer->after_hdr);
             existingsrc = headerIsSource(peer->after_hdr);
         } else if (whichbuild == AFTER_BUILD && peer->before_rpm != NULL) {
             existingname = headerGetString(peer->before_hdr, RPMTAG_NAME);
-            existingarch = headerGetString(peer->before_hdr, RPMTAG_ARCH);
+            existingarch = get_rpm_header_arch(peer->before_hdr);
             existingsrc = headerIsSource(peer->before_hdr);
         }
 

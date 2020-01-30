@@ -1031,7 +1031,7 @@ static bool elf_driver(struct rpminspect *ri, rpmfile_entry_t *after)
         return true;
     }
 
-    arch = headerGetString(after->rpm_header, RPMTAG_ARCH);
+    arch = get_rpm_header_arch(after->rpm_header);
 
     /* Is this an archive or a regular ELF file? */
     if ((after_elf = get_elf_archive(after->fullpath, &after_elf_fd)) != NULL) {

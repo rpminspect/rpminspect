@@ -56,7 +56,7 @@ static bool filesize_driver(struct rpminspect *ri, rpmfile_entry_t *file)
     }
 
     /* We need the architecture for reporting */
-    arch = headerGetString(file->rpm_header, RPMTAG_ARCH);
+    arch = get_rpm_header_arch(file->rpm_header);
 
     /* Size checks and messaging */
     if (file->st.st_size > 0 && file->peer_file->st.st_size == 0) {
