@@ -32,7 +32,7 @@ bool on_stat_whitelist(struct rpminspect *ri, const rpmfile_entry_t *file, const
     assert(ri != NULL);
     assert(file != NULL);
 
-    arch = headerGetString(file->rpm_header, RPMTAG_ARCH);
+    arch = get_rpm_header_arch(file->rpm_header);
 
     if (init_stat_whitelist(ri)) {
         TAILQ_FOREACH(wlentry, ri->stat_whitelist, items) {

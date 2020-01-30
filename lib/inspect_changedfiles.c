@@ -168,7 +168,7 @@ static bool changedfiles_driver(struct rpminspect *ri, rpmfile_entry_t *file)
     }
 
     /* The architecture is used in reporting messages */
-    arch = headerGetString(file->rpm_header, RPMTAG_ARCH);
+    arch = get_rpm_header_arch(file->rpm_header);
 
     /* Get the MIME type of the file, will need that */
     type = get_mime_type(file);

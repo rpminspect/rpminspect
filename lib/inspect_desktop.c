@@ -143,7 +143,7 @@ static bool validate_desktop_contents(struct rpminspect *ri, const rpmfile_entry
     assert(file != NULL);
 
     /* Get the package architecture and the extraction subtree */
-    arch = headerGetString(file->rpm_header, RPMTAG_ARCH);
+    arch = get_rpm_header_arch(file->rpm_header);
 
     tmp = strdup(file->fullpath);
     walk = tmp + (strlen(file->fullpath) - strlen(file->localpath));
@@ -337,7 +337,7 @@ static bool desktop_driver(struct rpminspect *ri, rpmfile_entry_t *file)
     }
 
     /* Report validation results */
-    arch = headerGetString(file->rpm_header, RPMTAG_ARCH);
+    arch = get_rpm_header_arch(file->rpm_header);
 
     if (file->peer_file && before_out == NULL && after_out != NULL) {
         xasprintf(&msg, "File %s is no longer a valid desktop entry file on %s; desktop-file-validate reports:", file->localpath, arch);
