@@ -25,10 +25,6 @@
 #include <xmlrpc-c/client_global.h>
 #include "rpminspect.h"
 
-/* Architechture list strings */
-#define ARCH_NOARCH "noarch"
-#define ARCH_SRC "src"
-
 /*
  * General error handler for xmlrpc failures.  Could be improved
  * a bit to be more helpful to the user.
@@ -1081,9 +1077,9 @@ string_list_t *get_all_arches(const struct rpminspect *ri)
         xmlrpc_abort_on_fault(&env);
 
         /* Flag what we have */
-        if (!strcmp(element, ARCH_NOARCH)) {
+        if (!strcmp(element, RPM_NOARCH_NAME)) {
             have_noarch = true;
-        } else if (!strcmp(element, ARCH_SRC)) {
+        } else if (!strcmp(element, SRPM_ARCH_NAME)) {
             have_src = true;
         }
 
@@ -1110,7 +1106,7 @@ string_list_t *get_all_arches(const struct rpminspect *ri)
     if (!have_noarch) {
         arch = calloc(1, sizeof(*arch));
         assert(arch != NULL);
-        arch->data = strdup(ARCH_NOARCH);
+        arch->data = strdup(RPM_NOARCH_NAME);
         assert(arch->data != NULL);
         TAILQ_INSERT_TAIL(arches, arch, items);
     }
@@ -1118,7 +1114,7 @@ string_list_t *get_all_arches(const struct rpminspect *ri)
     if (!have_src) {
         arch = calloc(1, sizeof(*arch));
         assert(arch != NULL);
-        arch->data = strdup(ARCH_SRC);
+        arch->data = strdup(SRPM_ARCH_NAME);
         assert(arch->data != NULL);
         TAILQ_INSERT_TAIL(arches, arch, items);
     }

@@ -117,7 +117,7 @@ static int get_rpm_info(const char *pkg) {
         return ret;
     }
 
-    arch = headerGetString(h, RPMTAG_ARCH);
+    arch = get_rpm_header_arch(h);
 
     if (allowed_arch(workri, arch)) {
         ret = add_peer(&workri->peers, whichbuild, fetch_only, pkg, &h);
@@ -195,12 +195,7 @@ static int copytree(const char *fpath, const struct stat *sb,
     /* Copy file or create a directory */
     workfpath = ((char *) fpath) + toptrim;
     xasprintf(&bufpath, "%s/%s/%s", workri->worksubdir, build_desc[whichbuild], workfpath);
-
-    if (S_ISREG(sb->st_mode)) {
-        copysrc = strdup(fpath);
-    } else if (S_ISLNK(sb->st_mode)) {
-        copysrc = realpath(fpath, NULL);
-    }
+    copysrc = realpath(fpath, NULL);
 
     if (S_ISDIR(sb->st_mode)) {
         if (mkdirp(bufpath, mode)) {
@@ -212,11 +207,7 @@ static int copytree(const char *fpath, const struct stat *sb,
             return ret;
         }
 
-        if (headerIsSource(h)) {
-            arch = SRPM_ARCH_NAME;
-        } else {
-            arch = headerGetString(h, RPMTAG_ARCH);
-        }
+        arch = get_rpm_header_arch(h);
 
         if (!allowed_arch(workri, arch)) {
             headerFree(h);
@@ -229,15 +220,15 @@ static int copytree(const char *fpath, const struct stat *sb,
             fprintf(stderr, "*** error copying file %s: %s\n", bufpath, strerror(errno));
             ret = -1;
         }
+
+        /* Gather the RPM header for packages */
+        if (strsuffix(bufpath, RPM_FILENAME_EXTENSION)) {
+            if (get_rpm_info(bufpath)) {
+                ret = -1;
+            }
+        }
     } else {
         fprintf(stderr, "*** unknown directory member encountered: %s\n", fpath);
-        ret = -1;
-    }
-
-    /* Gather the RPM header for packages */
-    if ((tflag == FTW_F || tflag == FTW_SL) &&
-        strsuffix(bufpath, RPM_FILENAME_EXTENSION) &&
-        get_rpm_info(bufpath)) {
         ret = -1;
     }
 

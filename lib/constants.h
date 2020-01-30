@@ -96,9 +96,10 @@
 #define ANNOCHECK_CMD "annocheck"
 
 /*
- * Architecture name of source RPMs (from Koji)
+ * Architecture name of special RPMs (from Koji)
  */
 #define SRPM_ARCH_NAME "src"
+#define RPM_NOARCH_NAME "noarch"
 
 /*
  * Path prefixes for executable files
