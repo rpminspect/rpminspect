@@ -10,9 +10,9 @@ TEST_BUILDLOG
     gating tests and other test suites.
 
 TEST_RPMLINT
-    Runs rpmlint and reports the results.  We already run rpmlint or can
-    in the gating infrastructure, so no need to have rpminspect also invoke
-    this tool and report the same results.
+    Runs rpmlint and reports the results.  We already run rpmlint or
+    can in the gating infrastructure, so no need to have rpminspect
+    also invoke this tool and report the same results.
 
 TEST_UPSTREAM (only the rebase keyword check)
     The rpmdiff TEST_UPSTREAM check looks at the bug list from Errata
@@ -28,6 +28,6 @@ TEST_UPSTREAM (only the rebase keyword check)
     additional gating checks for package rebases if we desire.
 
 TEST_ELFLINT
-    This test runs elflint(1) on ELF files.  We already have the existing
-    ELF tests using eu-elfcmp, libelf, and annocheck so this one is more
-    or less redundant.
+    This test runs elflint(1) on ELF files.  We already have the
+    existing ELF tests using eu-elfcmp, libelf, and annocheck so this
+    one is more or less redundant.
