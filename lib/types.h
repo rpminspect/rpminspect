@@ -26,6 +26,7 @@
 #include <search.h>
 #include <sys/queue.h>
 #include <sys/stat.h>
+#include <sys/capability.h>
 #include <rpm/rpmlib.h>
 
 #ifndef _LIBRPMINSPECT_TYPES_H
@@ -68,6 +69,7 @@ typedef struct _rpmfile_entry_t {
     int idx;
     char *type;
     char *checksum;
+    cap_t cap;
     struct _rpmfile_entry_t *peer_file;
     TAILQ_ENTRY(_rpmfile_entry_t) items;
 } rpmfile_entry_t;

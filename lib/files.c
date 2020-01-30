@@ -27,6 +27,8 @@
 #include <unistd.h>
 #include <libgen.h>
 
+#include <cap-ng.h>
+
 #include <rpm/header.h>
 #include <rpm/rpmtd.h>
 
@@ -217,6 +219,7 @@ rpmfile_t * extract_rpm(const char *pkg, Header hdr)
 
         file_entry->type = NULL;
         file_entry->checksum = NULL;
+        file_entry->cap = NULL;
 
         TAILQ_INSERT_TAIL(file_list, file_entry, items);
 
@@ -498,4 +501,38 @@ void find_file_peers(rpmfile_t *before, rpmfile_t *after)
 
     hdestroy_r(after_table);
     free(after_table);
+}
+
+/*
+ * Return the cached capabilities(7) of the file.  Otherwise get it first,
+ * save it, then return it.
+ */
+cap_t get_cap(rpmfile_entry_t *file)
+{
+    int fd;
+    const char *arch = NULL;
+
+    assert(file != NULL);
+    arch = get_rpm_header_arch(file->rpm_header);
+    assert(arch != NULL);
+
+    if (file->cap) {
+        return file->cap;
+    }
+
+    assert(file->fullpath != NULL);
+
+    /* Gather capabilities(7) for the file we need */
+    if ((fd = open(file->fullpath, O_RDONLY)) == -1) {
+        fprintf(stderr, "*** unable to open() %s on %s: %s\n", file->localpath, arch, strerror(errno));
+        return NULL;
+    }
+
+    file->cap = cap_get_fd(fd);
+
+    if (close(fd) == -1) {
+        fprintf(stderr, "*** unable to close() %s on %s: %s\n", file->localpath, arch, strerror(errno));
+    }
+
+    return file->cap;
 }

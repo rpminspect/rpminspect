@@ -26,7 +26,7 @@ libcurl = dependency('libcurl', method : 'pkg-config', required : true)
 zlib = dependency('zlib', method : 'pkg-config', required : true)
 yaml = dependency('yaml-0.1', method : 'pkg-config', required : true)
 openssl = dependency('openssl', method : 'pkg-config', required : true)
-libcap_ng = dependency('libcap-ng', method : 'pkg-config', required : true)
+libcap = dependency('libcap', method : 'pkg-config', required : true)
 
 # Test suite dependencies
 run_tests = get_option('tests')
@@ -155,7 +155,7 @@ librpminspect = library(
         zlib,
         yaml,
         openssl,
-        libcap_ng,
+        libcap,
         mandoc,
         iniparser,
         magic,

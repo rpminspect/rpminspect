@@ -82,8 +82,8 @@ static bool ownership_driver(struct rpminspect *ri, rpmfile_entry_t *file) {
     char *before_val = NULL;
     char *after_val = NULL;
     char *what = NULL;
-    int fd = -1;
-    int cap = -1;
+    cap_t cap = NULL;
+    cap_flag_value_t have_setuid = CAP_CLEAR;
 
     /* Skip source packages */
     if (headerIsSource(file->rpm_header)) {
@@ -143,20 +143,17 @@ static bool ownership_driver(struct rpminspect *ri, rpmfile_entry_t *file) {
             /* Check the group - special handling */
             if (strcmp(group, ri->bin_group)) {
                 /* Gather capabilities(7) for the file we need */
-                if ((fd = open(file->fullpath, O_RDONLY)) == -1) {
-                    fprintf(stderr, "*** unable to open() %s on %s: %s\n", file->localpath, arch, strerror(errno));
-                    break;
-                }
+                cap = get_cap(file);
 
-                cap = capng_get_caps_fd(fd);
-
-                if (close(fd) == -1) {
-                    fprintf(stderr, "*** unable to close() %s on %s: %s\n", file->localpath, arch, strerror(errno));
-                    break;
+                if (cap) {
+                    if (cap_get_flag(cap, CAP_SETUID, CAP_EFFECTIVE, &have_setuid) == -1) {
+                        fprintf(stderr, "*** unable to get capabilities for %s\n", file->localpath);
+                        have_setuid = CAP_CLEAR;
+                    }
                 }
 
                 /* Handle if CAP_SETUID is present or not */
-                if ((cap == 0) && capng_have_capability(CAPNG_EFFECTIVE, CAP_SETUID)) {
+                if (have_setuid == CAP_SET) {
                     if (file->st.st_mode & S_IXOTH) {
                         xasprintf(&msg, "File %s on %s has CAP_SETUID capability but group `%s` and is world executable", file->localpath, arch, group);
                         add_result(ri, RESULT_BAD, WAIVABLE_BY_ANYONE, HEADER_OWNERSHIP, msg, NULL, REMEDY_OWNERSHIP_IXOTH);
