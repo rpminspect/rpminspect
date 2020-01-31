@@ -152,10 +152,11 @@ static void read_koji_task_struct(xmlrpc_env *env, xmlrpc_value *result, struct 
  * Turn the array of strings in to a string_list_t.  Used when reading task
  * results through get_koji_task().
  */
-static void read_koji_descendent_results(xmlrpc_env *env, xmlrpc_value *value, string_list_t *results)
+static string_list_t *read_koji_descendent_results(xmlrpc_env *env, xmlrpc_value *value)
 {
     int i = 0;
     int size = 0;
+    string_list_t *results = NULL;
     string_entry_t *entry = NULL;
     xmlrpc_value *s = NULL;
 
@@ -180,7 +181,7 @@ static void read_koji_descendent_results(xmlrpc_env *env, xmlrpc_value *value, s
         TAILQ_INSERT_TAIL(results, entry, items);
     }
 
-    return;
+    return results;
 }
 
 /*
@@ -944,6 +945,13 @@ struct koji_task *get_koji_task(struct rpminspect *ri, const char *taskspec)
             /* gather the task results */
             dresult = xmlrpc_client_call(&env, ri->kojihub, "getTaskResult", "(i)", descendent->task->id);
             xmlrpc_abort_on_fault(&env);
+
+            if (xmlrpc_value_type(dresult) == XMLRPC_TYPE_NIL) {
+                /* some task IDs may be nothing, so ignore */
+                xmlrpc_DECREF(dresult);
+                continue;
+            }
+
             rsize = xmlrpc_struct_size(&env, dresult);
 
             for (k = 0; k < rsize; k++) {
@@ -961,11 +969,11 @@ struct koji_task *get_koji_task(struct rpminspect *ri, const char *taskspec)
                     xmlrpc_decompose_value(&env, tr_v, "i", &descendent->brootid);
                     xmlrpc_abort_on_fault(&env);
                 } else if (!strcmp(key, "srpms") && xmlrpc_value_type(tr_v) == XMLRPC_TYPE_ARRAY) {
-                    read_koji_descendent_results(&env, tr_v, descendent->srpms);
+                    descendent->srpms = read_koji_descendent_results(&env, tr_v);
                 } else if (!strcmp(key, "rpms")) {
-                    read_koji_descendent_results(&env, tr_v, descendent->rpms);
+                    descendent->rpms = read_koji_descendent_results(&env, tr_v);
                 } else if (!strcmp(key, "logs")) {
-                    read_koji_descendent_results(&env, tr_v, descendent->logs);
+                    descendent->logs = read_koji_descendent_results(&env, tr_v);
                 }
 
                 xmlrpc_DECREF(tr_v);
