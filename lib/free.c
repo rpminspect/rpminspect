@@ -66,6 +66,8 @@ void free_mapping(struct hsearch_data *table, string_list_t *keys)
  */
 void free_rpminspect(struct rpminspect *ri) {
     stat_whitelist_entry_t *swlentry = NULL;
+    caps_whitelist_entry_t *cwlentry = NULL;
+    caps_filelist_entry_t *cflentry = NULL;
 
     if (ri == NULL) {
         return;
@@ -94,6 +96,29 @@ void free_rpminspect(struct rpminspect *ri) {
         }
 
         free(ri->stat_whitelist);
+    }
+
+    if (ri->caps_whitelist) {
+        while (!TAILQ_EMPTY(ri->caps_whitelist)) {
+            cwlentry = TAILQ_FIRST(ri->caps_whitelist);
+            TAILQ_REMOVE(ri->caps_whitelist, cwlentry, items);
+
+            free(cwlentry->pkg);
+
+            if (cwlentry->files) {
+                while (!TAILQ_EMPTY(cwlentry->files)) {
+                    cflentry = TAILQ_FIRST(cwlentry->files);
+                    TAILQ_REMOVE(cwlentry->files, cflentry, items);
+
+                    free(cflentry->path);
+                    free(cflentry->caps);
+
+                    free(cflentry);
+                }
+            }
+        }
+
+        free(ri->caps_whitelist);
     }
 
     list_free(ri->badwords, free);

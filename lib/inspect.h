@@ -139,6 +139,9 @@ bool inspect_filesize(struct rpminspect *);
 /* inspect_permissions.c */
 bool inspect_permissions(struct rpminspect *);
 
+/* inspect_capabilities.c */
+bool inspect_capabilities(struct rpminspect *);
+
 /*
  * Inspections are referenced by flag.  These flags are set in bitfields
  * to indicate which ones we want to run.  When adding new ones, please
@@ -168,5 +171,6 @@ bool inspect_permissions(struct rpminspect *);
 #define INSPECT_DT_NEEDED                   (((uint64_t) 1) << 19)
 #define INSPECT_FILESIZE                    (((uint64_t) 1) << 20)
 #define INSPECT_PERMISSIONS                 (((uint64_t) 1) << 21)
+#define INSPECT_CAPABILITIES                (((uint64_t) 1) << 22)
 
 #endif

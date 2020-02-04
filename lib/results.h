@@ -47,6 +47,7 @@
 #define HEADER_DT_NEEDED     "DT_NEEDED"
 #define HEADER_FILESIZE      "filesize"
 #define HEADER_PERMISSIONS   "permissions"
+#define HEADER_CAPABILITIES  "capabilities"
 
 /*
  * Inspection remedies
@@ -129,5 +130,8 @@
 /* filesize */
 #define REMEDY_FILESIZE_BECAME_NOT_EMPTY "A previously empty file is no longer empty.  Make sure this change is intended and fix the package spec file if necessary."
 #define REMEDY_FILESIZE_BECAME_EMPTY "A previously non-empty file is now empty.  Make sure this change is intended and fix the package space file if necessary."
+
+/* capabilities */
+#define REMEDY_CAPABILITIES "Unexpected capabilities were found on the indicated file.  Consult capabilities(7) and either adjust the files in the package or modify the capabilities whitelist file in the rpminspect vendor data package.  The security team may also be of help for this situation."
 
 #endif

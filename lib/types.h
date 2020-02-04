@@ -154,6 +154,32 @@ typedef struct _stat_whitelist_entry_t {
 
 typedef TAILQ_HEAD(stat_whitelist_entry_s, _stat_whitelist_entry_t) stat_whitelist_t;
 
+/*
+ * caps-whitelist for a product release.  Used by some of the inspections.
+ */
+typedef enum _caps_whitelist_field_t {
+    PACKAGE = 0,
+    FILEPATH = 1,
+    EQUAL = 2,
+    CAPABILITIES = 3
+} caps_whitelist_field_t;
+
+typedef struct _caps_filelist_entry_t {
+    char *path;
+    char *caps;
+    TAILQ_ENTRY(_caps_filelist_entry_t) items;
+} caps_filelist_entry_t;
+
+typedef TAILQ_HEAD(caps_filelist_entry_s, _caps_filelist_entry_t) caps_filelist_t;
+
+typedef struct _caps_whitelist_entry_t {
+    char *pkg;
+    caps_filelist_t *files;
+    TAILQ_ENTRY(_caps_whitelist_entry_t) items;
+} caps_whitelist_entry_t;
+
+typedef TAILQ_HEAD(caps_whitelist_entry_s, _caps_whitelist_entry_t) caps_whitelist_t;
+
 /* Spec filename matching types */
 typedef enum _specname_match_t {
     MATCH_NULL = 0,
@@ -186,6 +212,7 @@ struct rpminspect {
 
     /* Populated at runtime for the product release */
     stat_whitelist_t *stat_whitelist;
+    caps_whitelist_t *caps_whitelist;
 
     /* Koji information (from config file) */
     char *kojihub;             /* URL of Koji hub */
