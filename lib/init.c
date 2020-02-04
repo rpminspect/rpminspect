@@ -364,13 +364,13 @@ static int read_cfgfile(dictionary *cfg, struct rpminspect *ri, const char *file
         ri->kojimbs = strdup(tmp);
     }
 
-    tmp = iniparser_getstring(cfg, "vendor-data:vendor_data_dir", NULL);
+    tmp = iniparser_getstring(cfg, "vendor:vendor_data_dir", NULL);
     if (tmp) {
         free(ri->vendor_data_dir);
         ri->vendor_data_dir = strdup(tmp);
     }
 
-    tmp = iniparser_getstring(cfg, "vendor-data:licensedb", NULL);
+    tmp = iniparser_getstring(cfg, "vendor:licensedb", NULL);
     if (tmp) {
         free(ri->licensedb);
         ri->licensedb = strdup(tmp);
@@ -684,6 +684,114 @@ bool init_stat_whitelist(struct rpminspect *ri) {
         free(line);
         line = NULL;
         field = MODE;
+    }
+
+    return true;
+}
+
+/*
+ * Initialize the caps-whitelist for the given product release.  If
+ * the file cannot be found, return false.
+ */
+bool init_caps_whitelist(struct rpminspect *ri)
+{
+    char *filename = NULL;
+    FILE *input = NULL;
+    char *line = NULL;
+    size_t len = 0;
+    ssize_t nread = 0;
+    char *token = NULL;
+    caps_whitelist_field_t field = PACKAGE;
+    caps_filelist_t *files = NULL;
+    caps_whitelist_entry_t *entry = NULL;
+    caps_filelist_entry_t *filelist_entry = NULL;
+
+    assert(ri != NULL);
+    assert(ri->vendor_data_dir != NULL);
+    assert(ri->product_release != NULL);
+
+    /* already initialized */
+    if (ri->caps_whitelist) {
+        return true;
+    }
+
+    /* the actual caps-whitelist file */
+    xasprintf(&filename, "%s/%s/%s", ri->vendor_data_dir, CAPABILITIES_DIR, ri->product_release);
+    assert(filename != NULL);
+    input = fopen(filename, "r");
+    free(filename);
+
+    if (input == NULL) {
+        return false;
+    }
+
+    /* initialize the list */
+    ri->caps_whitelist = calloc(1, sizeof(*(ri->caps_whitelist)));
+    assert(ri->caps_whitelist != NULL);
+    TAILQ_INIT(ri->caps_whitelist);
+
+    /* add all the entries to the caps-whitelist */
+    while ((nread = getline(&line, &len, input)) != -1) {
+        /* skip blank lines and comments */
+        if (*line == '#' || *line == '\n' || *line == '\r') {
+            free(line);
+            line = NULL;
+            continue;
+        }
+
+        /* trim line ending characters */
+        line[strcspn(line, "\r\n")] = '\0';
+
+        /* read the fields */
+        while ((token = strsep(&line, " \t")) != NULL) {
+            /* might be lots of space between fields */
+            if (*token == '\0') {
+                continue;
+            }
+
+            /* take action on each field */
+            if (field == PACKAGE) {
+                /* this package may exist in the list */
+                TAILQ_FOREACH(entry, ri->caps_whitelist, items) {
+                    if (!strcmp(entry->pkg, token)) {
+                        files = entry->files;
+                        break;
+                    }
+                }
+
+                if (TAILQ_EMPTY(ri->caps_whitelist) || files == NULL) {
+                    /* new package for the list */
+                    entry = calloc(1, sizeof(*entry));
+                    assert(entry != NULL);
+                    entry->pkg = strdup(token);
+                    entry->files = calloc(1, sizeof(*entry->files));
+                    assert(entry->files != NULL);
+                    TAILQ_INIT(entry->files);
+                    TAILQ_INSERT_TAIL(ri->caps_whitelist, entry, items);
+                    files = entry->files;
+                }
+
+                filelist_entry = calloc(1, sizeof(*filelist_entry));
+                assert(filelist_entry != NULL);
+            } else if (field == FILEPATH) {
+                filelist_entry->path = strdup(token);
+            } else if (field == CAPABILITIES) {
+                filelist_entry->caps = strdup(token);
+            }
+
+            field++;
+        }
+
+        /* add the entry */
+        if (filelist_entry != NULL) {
+            TAILQ_INSERT_TAIL(files, filelist_entry, items);
+        }
+
+        /* clean up */
+        free(line);
+        line = NULL;
+        files = NULL;
+        field = PACKAGE;
     }
 
     return true;

@@ -86,6 +86,7 @@ enum checksum { NULLSUM, MD5SUM, SHA1SUM, SHA256SUM };
 
 /* init.c */
 bool init_stat_whitelist(struct rpminspect *);
+bool init_caps_whitelist(struct rpminspect *);
 int init_rpminspect(struct rpminspect *, const char *, const char *);
 
 /* free.c */
@@ -196,6 +197,7 @@ char *run_cmd(int *, const char *, ...);
 
 /* whitelist.c */
 bool on_stat_whitelist(struct rpminspect *, const rpmfile_entry_t *, const char *, const char *);
+caps_filelist_entry_t *get_caps_whitelist_entry(struct rpminspect *, const char *, const char *);
 
 /* flags.c */
 bool process_inspection_flag(const char *, const bool, uint64_t *);

@@ -2,19 +2,11 @@
 | rpminspect and librpminspect |
 +==============================+
 
-The tests below are the categories handled by rpmdiff-checker.  You
-may recognize these as the grid categories on the rpmdiff webui.  Each
-test category may perform a couple of tests.  For example,
-TEST_PATCHES contains both tests for the patches in an SRPM as well as
-the License: tag.  Some tests may do something else that pertains to
-the License: tag check.  The point is, as we iterate through each of
-the test categories, we can refactor things and group them together as
-new single tests exposed through rpminspect which rpmdiff-checker can
-continue working as it always have.
-
-The code for these test categories can be found in src/checker/src/.
-To see how some have moved over to librpminspect, see completed tests
-as indicated below.
+The tests below are the categories handled by rpmdiff-checker, which
+is the ancestor to rpminspect.  Red Hat associates may recognize these
+as the grid categories on the rpmdiff webui.  Each test category may
+perform a couple of tests.  As tests are documented and implemented,
+the specifics will be noted during the work in progress.
 
 * indicates the logic for the tests has moved to librpminspect
 ! means the work is in-progress
@@ -28,8 +20,7 @@ Mandatory test categories to migrate (top is highest priority):
  TEST_CONFIG
  TEST_MODPARM
  TEST_MODPCIID
-!TEST_SIZE (need to support size inc/dec thresholds for reporting)
- TEST_PERMS
+!TEST_SIZE (need to support size inc/dec thresholds for reporting, per pkg)
  TEST_CHANGELOG
  TEST_MULTILIB
 
@@ -81,6 +72,7 @@ Test categories that have been migrated:
 *TEST_NEEDED (this is DT_NEEDED in rpminspect)
 *TEST_UPSTREAM (the BZ 'Rebase' keyword check against the Errata Tool
                 bug list was not migrated, see below)
+*TEST_PERMS (this is permissions and capabilities)
 
 
 Test categories excluded (see MISSING):
@@ -112,6 +104,8 @@ inspections lack integration tests:
     annocheck
     DT_NEEDED
     filesize
+    permissions
+    capabilities
 
 
 +=======+

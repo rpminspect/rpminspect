@@ -58,3 +58,45 @@ bool on_stat_whitelist(struct rpminspect *ri, const rpmfile_entry_t *file, const
     free(msg);
     return true;
 }
+
+/*
+ * Return the caps_whitelist entry that matches the package and filepath.  If
+ * it doesn't exist on the list, return NULL.  This function will take care of
+ * initializing the caps_whitelist if necessary.
+ */
+caps_filelist_entry_t *get_caps_whitelist_entry(struct rpminspect *ri, const char *pkg, const char *filepath)
+{
+    caps_whitelist_entry_t *wlentry = NULL;
+    caps_filelist_entry_t *flentry = NULL;
+
+    assert(ri != NULL);
+    assert(pkg != NULL);
+    assert(filepath != NULL);
+
+    if (init_caps_whitelist(ri)) {
+        /* Look for the package in the caps whitelist */
+        TAILQ_FOREACH(wlentry, ri->caps_whitelist, items) {
+            if (!strcmp(wlentry->pkg, pkg)) {
+                break;
+            }
+        }
+
+        if (wlentry == NULL) {
+            return NULL;
+        }
+
+        /* Look for this file's entry for that package */
+        TAILQ_FOREACH(flentry, wlentry->files, items) {
+            if (strsuffix(flentry->path, filepath)) {
+                break;
+            }
+        }
+
+        /* No entry, make sure to return NULL */
+        if (flentry == NULL) {
+            return NULL;
+        }
+    }
+
+    return flentry;
+}
