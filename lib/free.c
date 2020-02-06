@@ -68,6 +68,7 @@ void free_rpminspect(struct rpminspect *ri) {
     stat_whitelist_entry_t *swlentry = NULL;
     caps_whitelist_entry_t *cwlentry = NULL;
     caps_filelist_entry_t *cflentry = NULL;
+    header_cache_entry_t *hentry = NULL;
 
     if (ri == NULL) {
         return;
@@ -154,6 +155,18 @@ void free_rpminspect(struct rpminspect *ri) {
     free_mapping(ri->products, ri->product_keys);
 
     free_rpmpeer(ri->peers);
+
+    if (ri->header_cache != NULL) {
+        while (!TAILQ_EMPTY(ri->header_cache)) {
+            hentry = TAILQ_FIRST(ri->header_cache);
+            TAILQ_REMOVE(ri->header_cache, hentry, items);
+            free(hentry->pkg);
+            headerFree(hentry->hdr);
+            free(hentry);
+        }
+
+        free(ri->header_cache);
+    }
 
     free_results(ri->results);
 

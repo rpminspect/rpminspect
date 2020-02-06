@@ -888,6 +888,7 @@ int init_rpminspect(struct rpminspect *ri, const char *cfgfile, const char *prof
     ri->after = NULL;
     ri->buildtype = KOJI_BUILD_RPM;
     ri->peers = init_rpmpeer();
+    ri->header_cache = NULL;
     ri->worksubdir = NULL;
     ri->results = NULL;
     ri->threshold = RESULT_VERIFY;

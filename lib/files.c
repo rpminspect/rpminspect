@@ -48,7 +48,6 @@ void free_files(rpmfile_t *files)
     while (!TAILQ_EMPTY(files)) {
         entry = TAILQ_FIRST(files);
         TAILQ_REMOVE(files, entry, items);
-        headerFree(entry->rpm_header);
         free(entry->fullpath);
         free(entry->localpath);
         free(entry->type);

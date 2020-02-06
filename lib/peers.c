@@ -47,8 +47,8 @@ void free_rpmpeer(rpmpeer_t *peers) {
     while (!TAILQ_EMPTY(peers)) {
         entry = TAILQ_FIRST(peers);
         TAILQ_REMOVE(peers, entry, items);
-        headerFree(entry->before_hdr);
-        headerFree(entry->after_hdr);
+        entry->before_hdr = NULL;
+        entry->after_hdr = NULL;
         free(entry->before_rpm);
         entry->before_rpm = NULL;
         free(entry->after_rpm);
@@ -68,7 +68,7 @@ void free_rpmpeer(rpmpeer_t *peers) {
 /*
  * Add the specified package as a peer in the list of packages.
  */
-int add_peer(rpmpeer_t **peers, int whichbuild, bool fetch_only, const char *pkg, Header *hdr) {
+int add_peer(rpmpeer_t **peers, int whichbuild, bool fetch_only, const char *pkg, Header hdr) {
     rpmpeer_entry_t *peer = NULL;
     bool found = false;
     const char *newname = NULL;
@@ -87,9 +87,9 @@ int add_peer(rpmpeer_t **peers, int whichbuild, bool fetch_only, const char *pkg
     }
 
     /* Get the package or subpackage name and arch */
-    newname = headerGetString(*hdr, RPMTAG_NAME);
-    newarch = get_rpm_header_arch(*hdr);
-    newsrc = headerIsSource(*hdr);
+    newname = headerGetString(hdr, RPMTAG_NAME);
+    newarch = get_rpm_header_arch(hdr);
+    newsrc = headerIsSource(hdr);
 
     /* If we don't have this peer, try to add it */
     TAILQ_FOREACH(peer, *peers, items) {
@@ -125,22 +125,22 @@ int add_peer(rpmpeer_t **peers, int whichbuild, bool fetch_only, const char *pkg
     }
 
     if (whichbuild == BEFORE_BUILD) {
-        peer->before_hdr = headerCopy(*hdr);
+        peer->before_hdr = hdr;
         peer->before_rpm = strdup(pkg);
 
         if (fetch_only) {
             peer->before_files = NULL;
         } else {
-            peer->before_files = extract_rpm(pkg, *hdr);
+            peer->before_files = extract_rpm(pkg, hdr);
         }
     } else if (whichbuild == AFTER_BUILD) {
-        peer->after_hdr = headerCopy(*hdr);
+        peer->after_hdr = hdr;
         peer->after_rpm = strdup(pkg);
 
         if (fetch_only) {
             peer->after_files = NULL;
         } else {
-            peer->after_files = extract_rpm(pkg, *hdr);
+            peer->after_files = extract_rpm(pkg, hdr);
         }
     }
 

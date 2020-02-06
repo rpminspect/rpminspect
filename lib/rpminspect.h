@@ -108,7 +108,7 @@ string_list_t * list_copy(const string_list_t *);
 
 /* local.c */
 bool is_local_build(const char *);
-bool is_local_rpm(const char *);
+bool is_local_rpm(struct rpminspect *, const char *);
 
 /* koji.c */
 koji_buildlist_t *init_koji_buildlist(void);
@@ -150,14 +150,14 @@ int copyfile(const char *, const char *, bool, bool);
 
 /* rpm.c */
 int init_librpm(void);
-int get_rpm_header(const char *, Header *);
+int get_rpm_header(struct rpminspect *, const char *, Header *);
 char *get_nevra(Header);
 const char *get_rpm_header_arch(Header);
 
 /* peers.c */
 rpmpeer_t *init_rpmpeer(void);
 void free_rpmpeer(rpmpeer_t *);
-int add_peer(rpmpeer_t **, int, bool, const char *, Header *);
+int add_peer(rpmpeer_t **, int, bool, const char *, Header);
 
 /* files.c */
 void free_files(rpmfile_t *files);
