@@ -113,17 +113,16 @@ static int get_rpm_info(const char *pkg) {
     Header h;
     const char *arch = NULL;
 
-    if ((ret = get_rpm_header(pkg, &h)) != 0) {
+    if ((ret = get_rpm_header(workri, pkg, &h)) != 0) {
         return ret;
     }
 
     arch = get_rpm_header_arch(h);
 
     if (allowed_arch(workri, arch)) {
-        ret = add_peer(&workri->peers, whichbuild, fetch_only, pkg, &h);
+        ret = add_peer(&workri->peers, whichbuild, fetch_only, pkg, h);
     }
 
-    headerFree(h);
     return ret;
 }
 
@@ -203,18 +202,15 @@ static int copytree(const char *fpath, const struct stat *sb,
             ret = -1;
         }
     } else if (S_ISREG(sb->st_mode) || S_ISLNK(sb->st_mode)) {
-        if ((ret = get_rpm_header(fpath, &h)) != 0) {
+        if ((ret = get_rpm_header(workri, fpath, &h)) != 0) {
             return ret;
         }
 
         arch = get_rpm_header_arch(h);
 
         if (!allowed_arch(workri, arch)) {
-            headerFree(h);
             return 0;
         }
-
-        headerFree(h);
 
         if (copyfile(copysrc, bufpath, true, false)) {
             fprintf(stderr, "*** error copying file %s: %s\n", bufpath, strerror(errno));
@@ -659,7 +655,7 @@ int gather_builds(struct rpminspect *ri, bool fo) {
     if (ri->after != NULL) {
         whichbuild = AFTER_BUILD;
 
-        if (is_local_build(ri->after) || is_local_rpm(ri->after)) {
+        if (is_local_build(ri->after) || is_local_rpm(ri, ri->after)) {
             if (fetch_only) {
                 fprintf(stderr, "*** `%s' already exists\n", ri->after);
                 fflush(stderr);
@@ -712,7 +708,7 @@ int gather_builds(struct rpminspect *ri, bool fo) {
     whichbuild = BEFORE_BUILD;
 
     /* before build specified, find it */
-    if (is_local_build(ri->before) || is_local_rpm(ri->before)) {
+    if (is_local_build(ri->before) || is_local_rpm(ri, ri->before)) {
         set_worksubdir(ri, LOCAL_WORKDIR, NULL, NULL);
 
         /* copy before tree */

@@ -194,6 +194,15 @@ typedef enum _specname_primary_t {
     PRIMARY_FILENAME = 2
 } specname_primary_t;
 
+/* RPM header cache so we don't balloon out our memory */
+typedef struct _header_cache_entry_t {
+    char *pkg;
+    Header hdr;
+    TAILQ_ENTRY(_header_cache_entry_t) items;
+} header_cache_entry_t;
+
+typedef TAILQ_HEAD(header_cache_entry_s, _header_cache_entry_t) header_cache_t;
+
 /*
  * Configuration and state instance for librpminspect run.
  * Applications using librpminspect should initialize the
@@ -318,7 +327,8 @@ struct rpminspect {
     koji_build_type_t buildtype;
 
     /* accumulated data of the build set */
-    rpmpeer_t *peers;          /* list of packages */
+    rpmpeer_t *peers;               /* list of packages */
+    header_cache_t *header_cache;   /* RPM header cache */
 
     /* inspection results */
     results_t *results;

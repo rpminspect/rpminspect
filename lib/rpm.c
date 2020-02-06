@@ -43,13 +43,31 @@ int init_librpm(void)
 }
 
 /* Return an RPM header struct for the given package filename. */
-int get_rpm_header(const char *pkg, Header *hdr) {
+int get_rpm_header(struct rpminspect *ri, const char *pkg, Header *hdr)
+{
     rpmts ts;
     FD_t fd;
     rpmRC result;
+    char *bpkg = NULL;
+    header_cache_entry_t *hentry = NULL;
 
+    assert(ri != NULL);
     assert(pkg != NULL);
 
+    /* The cache stores the basename of the pkg */
+    bpkg = basename(pkg);
+
+    /* First see if we can return the cached header */
+    if (ri->header_cache != NULL) {
+        TAILQ_FOREACH(hentry, ri->header_cache, items) {
+            if (!strcmp(hentry->pkg, bpkg)) {
+                *hdr = hentry->hdr;
+                return 0;
+            }
+        }
+    }
+
+    /* No?  Then read the header in, cache it, and return it. */
     fd = Fopen(pkg, "r.ufdio");
 
     if (fd == NULL || Ferror(fd)) {
@@ -60,8 +78,12 @@ int get_rpm_header(const char *pkg, Header *hdr) {
             Fclose(fd);
         }
 
+        hdr = NULL;
         return -1;
     }
+
+    hentry = calloc(1, sizeof(*hentry));
+    hentry->pkg = strdup(bpkg);
 
     ts = rpmtsCreate();
     rpmtsSetVSFlags(ts, _RPMVSF_NODIGESTS | _RPMVSF_NOSIGNATURES);
@@ -70,6 +92,16 @@ int get_rpm_header(const char *pkg, Header *hdr) {
 
     rpmtsFree(ts);
     Fclose(fd);
+
+    if (ri->header_cache == NULL) {
+        /* Initialize the header cache if necessary */
+        ri->header_cache = calloc(1, sizeof(*ri->header_cache));
+        assert(ri->header_cache != NULL);
+        TAILQ_INIT(ri->header_cache);
+    }
+
+    TAILQ_INSERT_TAIL(ri->header_cache, hentry, items);
+    hentry->hdr = *hdr;
 
     if (result == RPMRC_OK) {
         return 0;
@@ -115,7 +147,7 @@ nevra_cleanup:
  */
 const char *get_rpm_header_arch(Header h)
 {
-    assert(h);
+    assert(h != NULL);
 
     if (headerIsSource(h)) {
         return SRPM_ARCH_NAME;
