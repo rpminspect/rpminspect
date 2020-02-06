@@ -521,6 +521,11 @@ cap_t get_cap(rpmfile_entry_t *file)
 
     assert(file->fullpath != NULL);
 
+    /* Only for regular files */
+    if (!S_ISREG(file->st.st_mode)) {
+        return NULL;
+    }
+
     /* Gather capabilities(7) for the file we need */
     if ((fd = open(file->fullpath, O_RDONLY)) == -1) {
         fprintf(stderr, "*** unable to open() %s on %s: %s\n", file->localpath, arch, strerror(errno));
