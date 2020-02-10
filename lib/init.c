@@ -500,11 +500,6 @@ static int read_cfgfile(dictionary *cfg, struct rpminspect *ri, const char *file
         ri->desktop_entry_files_dir = strdup(tmp);
     }
 
-    tmp = iniparser_getstring(cfg, "settings:desktop_icon_paths", NULL);
-    if (tmp) {
-        parse_list(tmp, &ri->desktop_icon_paths);
-    }
-
     tmp = iniparser_getstring(cfg, "settings:bin_paths", NULL);
     if (tmp) {
         parse_list(tmp, &ri->bin_paths);
@@ -838,7 +833,6 @@ int init_rpminspect(struct rpminspect *ri, const char *cfgfile, const char *prof
     ri->xml_path_include = NULL;
     ri->xml_path_exclude = NULL;
     ri->desktop_entry_files_dir = strdup(DESKTOP_ENTRY_FILES_DIR);
-    parse_list(DESKTOP_ICON_PATHS, &ri->desktop_icon_paths);
     parse_list(BIN_PATHS, &ri->bin_paths);
     ri->bin_owner = strdup(BIN_OWNER);
     ri->bin_group = strdup(BIN_GROUP);

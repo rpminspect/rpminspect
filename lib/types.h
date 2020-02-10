@@ -274,7 +274,6 @@ struct rpminspect {
 
     /* Where desktop entry files live */
     char *desktop_entry_files_dir;
-    string_list_t *desktop_icon_paths;
 
     /* Executable path prefixes and required ownership */
     string_list_t *bin_paths;
@@ -524,5 +523,12 @@ typedef struct _koji_task_entry_t {
 
     TAILQ_ENTRY(_koji_task_entry_t) items;
 } koji_task_entry_t;
+
+/* Types of files -- used by internal nftw() callbacks */
+typedef enum _filetype_t {
+    FILETYPE_NULL = 0,
+    FILETYPE_EXECUTABLE = 1,
+    FILETYPE_ICON = 2
+} filetype_t;
 
 #endif

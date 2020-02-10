@@ -166,6 +166,7 @@ const char * get_file_path(const rpmfile_entry_t *file);
 bool process_file_path(const rpmfile_entry_t *, regex_t *, regex_t *);
 void find_file_peers(rpmfile_t *, rpmfile_t *);
 cap_t get_cap(rpmfile_entry_t *);
+bool is_debug_or_build_path(const char *);
 
 /* tty.c */
 size_t tty_width(void);
