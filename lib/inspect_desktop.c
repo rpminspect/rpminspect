@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2019  Red Hat, Inc.
+ * Copyright (C) 2019-2020  Red Hat, Inc.
  * Author(s):  David Cantrell <dcantrell@redhat.com>
  *
  * This program is free software: you can redistribute it and/or modify
@@ -29,6 +29,13 @@
 
 /* Global variables */
 static char *file_to_find = NULL;
+static filetype_t filetype = FILETYPE_NULL;
+
+/*
+ * From:
+ * https://specifications.freedesktop.org/icon-theme-spec/icon-theme-spec-latest.html#icon_lookup
+ */
+static const char *icon_extensions[] = { ".png", ".svg", ".xpm", NULL };
 
 /*
  * Helper used by nftw() in validate_desktop_contents()
@@ -36,6 +43,7 @@ static char *file_to_find = NULL;
 static int find_file(const char *fpath, __attribute__((unused)) const struct stat *sb,
                      int tflag, __attribute__((unused)) struct FTW *ftwbuf)
 {
+    int i = 0;
     char *tmpbuf = NULL;
     char *last = NULL;
 
@@ -50,7 +58,7 @@ static int find_file(const char *fpath, __attribute__((unused)) const struct sta
     }
 
     /* Look for this name as the basename */
-    if (strsuffix(fpath, file_to_find)) {
+    if (filetype == FILETYPE_EXECUTABLE && strsuffix(fpath, file_to_find)) {
         free(file_to_find);
         file_to_find = strdup(fpath);
         return 1;
@@ -67,15 +75,23 @@ static int find_file(const char *fpath, __attribute__((unused)) const struct sta
      * and the package provides iconfile.* somewhere as a file, this
      * will pass.
      */
-    tmpbuf = strdup(fpath);
-    last = basename(tmpbuf);
+    if (filetype == FILETYPE_ICON) {
+        tmpbuf = strdup(fpath);
+        last = basename(tmpbuf);
 
-    if (last != NULL) {
-        if (strprefix(last, file_to_find)) {
-            free(tmpbuf);
-            free(file_to_find);
-            file_to_find = strdup(fpath);
-            return 1;
+        if (last != NULL) {
+            if (strprefix(last, file_to_find)) {
+                while (icon_extensions[i] != NULL) {
+                    if (strsuffix(last, icon_extensions[i]) && strstr(last, ".")) {
+                        free(tmpbuf);
+                        free(file_to_find);
+                        file_to_find = strdup(fpath);
+                        return 1;
+                    }
+
+                    i++;
+                }
+            }
         }
     }
 
@@ -132,15 +148,21 @@ static bool validate_desktop_contents(struct rpminspect *ri, const rpmfile_entry
     char *allpkgtrees = NULL;
     const char *arch = NULL;
     char *exectoken = NULL;
-    char *iconpath = NULL;
     struct stat sb;
     bool found = false;
-    string_entry_t *entry = NULL;
-    DIR *dfd = NULL;
-    struct dirent *de = NULL;
 
     assert(ri != NULL);
     assert(file != NULL);
+
+    /* Not for source packages */
+    if (headerIsSource(file->rpm_header)) {
+        return true;
+    }
+
+    /* Ignore debug and build paths */
+    if (is_debug_or_build_path(file->localpath)) {
+        return true;
+    }
 
     /* Get the package architecture and the extraction subtree */
     arch = get_rpm_header_arch(file->rpm_header);
@@ -165,7 +187,11 @@ static bool validate_desktop_contents(struct rpminspect *ri, const rpmfile_entry
      * lines.  When found, validate the value after the '='.
      */
     while (getline(&buf, &len, fp) != -1) {
+        filetype = FILETYPE_NULL;
+
         if (strprefix(buf, "Exec=")) {
+            filetype = FILETYPE_EXECUTABLE;
+
             /* Take everything after the key and trim newlines */
             tmp = buf + 5;
             tmp[strcspn(tmp, "\n")] = 0;
@@ -181,9 +207,6 @@ static bool validate_desktop_contents(struct rpminspect *ri, const rpmfile_entry
             if (*tmp == '/') {
                 /* value is absolute, take as-is */
                 file_to_find = strdup(tmp);
-            } else if (strstr(file->localpath, "/kde4/") && *tmp != '/') {
-                /* desktop entry is for KDE4, so look in its directory */
-                xasprintf(&file_to_find, "/usr/libexec/kde4/%s", tmp);
             } else {
                 /* everything else would be in /usr/bin */
                 xasprintf(&file_to_find, "/usr/bin/%s", tmp);
@@ -217,61 +240,32 @@ static bool validate_desktop_contents(struct rpminspect *ri, const rpmfile_entry
 
             free(file_to_find);
         } else if (strprefix(buf, "Icon=")) {
+            filetype = FILETYPE_ICON;
             tmp = buf + 5;
             tmp[strcspn(tmp, "\n")] = 0;
             file_to_find = strdup(tmp);
             found = false;
 
             /*
-             * For each desktop icon path, check each extracted subpackage
-             * for the icon.
+             * If we get 1 back from nftw(), it means the icon was
+             * found and is valid.  If found, the nftw() helper replaces
+             * file_to_find with the full path to where it was found.
              */
-            TAILQ_FOREACH(entry, ri->desktop_icon_paths, items) {
-                dfd = opendir(allpkgtrees);
-                assert(dfd != NULL);
+            if (nftw(allpkgtrees, find_file, 25, FTW_MOUNT|FTW_PHYS) == 1) {
+                found = true;
 
-                while ((de = readdir(dfd)) != NULL) {
-                    if (de->d_type != DT_DIR) {
-                        continue;
-                    }
-
-                    xasprintf(&iconpath, "%s/%s/%s", allpkgtrees, de->d_name, entry->data);
-
-                    /*
-                     * If we get 1 back from nftw(), it means the icon was
-                     * found and is valid.  If found, the nftw() helper replaces
-                     * file_to_find with the full path to where it was found.
-                     */
-                    if (nftw(iconpath, find_file, 25, FTW_MOUNT|FTW_PHYS) == 1) {
-                        if (lstat(file_to_find, &sb) == -1) {
-                            free(iconpath);
-                            continue;
-                        }
-
-                        found = true;
-
-                        if (!(sb.st_mode & S_IROTH)) {
-                            xasprintf(&msg, "Desktop file %s on %s references icon %s but %s is not readable by all", file->localpath, arch, tmp, tmp);
-                            add_result(ri, RESULT_VERIFY, WAIVABLE_BY_ANYONE, HEADER_DESKTOP, msg, NULL, REMEDY_DESKTOP);
-                            free(msg);
-                            result = false;
-                        }
-                    }
-
-                    free(iconpath);
-
-                    if (found) {
-                        break;
-                    }
-                }
-
-                if (closedir(dfd) == -1) {
-                    fprintf(stderr, "*** error closing directory: %s\n", strerror(errno));
+                if (lstat(file_to_find, &sb) == -1) {
+                    fprintf(stderr, "error stat'ing %s: %s\n", file_to_find, strerror(errno));
                     fflush(stderr);
+                    free(buf);
+                    return false;
                 }
 
-                if (found) {
-                    break;
+                if (!(sb.st_mode & S_IROTH)) {
+                    xasprintf(&msg, "Desktop file %s on %s references icon %s but %s is not readable by all", file->localpath, arch, tmp, tmp);
+                    add_result(ri, RESULT_VERIFY, WAIVABLE_BY_ANYONE, HEADER_DESKTOP, msg, NULL, REMEDY_DESKTOP);
+                    free(msg);
+                    result = false;
                 }
             }
 

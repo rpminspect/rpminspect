@@ -540,3 +540,17 @@ cap_t get_cap(rpmfile_entry_t *file)
 
     return file->cap;
 }
+
+/*
+ * Returns true if the given path is a debug or build file.
+ */
+bool is_debug_or_build_path(const char *path)
+{
+    assert(path != NULL);
+
+    if (strstr(path, BUILD_ID_DIR) || strstr(path, DEBUG_PATH) || strstr(path, DEBUG_SRC_PATH)) {
+        return true;
+    }
+
+    return false;
+}
