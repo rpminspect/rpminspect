@@ -78,7 +78,7 @@ int get_rpm_header(struct rpminspect *ri, const char *pkg, Header *hdr)
             Fclose(fd);
         }
 
-        hdr = NULL;
+        *hdr = NULL;
         return -1;
     }
 
@@ -88,7 +88,7 @@ int get_rpm_header(struct rpminspect *ri, const char *pkg, Header *hdr)
     ts = rpmtsCreate();
     rpmtsSetVSFlags(ts, _RPMVSF_NODIGESTS | _RPMVSF_NOSIGNATURES);
 
-    result = rpmReadPackageFile(ts, fd, pkg, hdr);
+    result = rpmReadPackageFile(ts, fd, pkg, &hentry->hdr);
 
     rpmtsFree(ts);
     Fclose(fd);
@@ -101,7 +101,7 @@ int get_rpm_header(struct rpminspect *ri, const char *pkg, Header *hdr)
     }
 
     TAILQ_INSERT_TAIL(ri->header_cache, hentry, items);
-    hentry->hdr = *hdr;
+    *hdr = hentry->hdr;
 
     if (result == RPMRC_OK) {
         return 0;
