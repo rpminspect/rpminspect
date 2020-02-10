@@ -64,46 +64,61 @@ meson and ninja, plus the following libraries:
 
     * json-c
           http://json-c.github.io/json-c/
+          MIT license
 
     * xmlrpc-c
           http://xmlrpc-c.sourceforge.net/
+          BSD and MIT licenses
 
     * libxml-2.0
           http://xmlsoft.org/
+          MIT license
 
     * rpm
           https://github.com/rpm-software-management/rpm
+          GPL-2.0-or-later license
 
     * libarchive
           https://www.libarchive.org/
+          BSD license
 
     * elfutils
           https://sourceware.org/elfutils/
+          GPL-3.0-or-later license
 
     * kmod
           https://git.kernel.org/pub/scm/utils/kernel/kmod/kmod.git
+          GPL-2.0-or-later license
 
     * zlib
           https://www.zlib.net/
+          Zlib and BSL-1.0 licenses
 
     * mandoc (formerly mdocml)
           https://mandoc.bsd.lv/
+          ISC license
 
     * iniparser
           http://ndevilla.free.fr/iniparser/
+          MIT license
 
     * libyaml
           https://github.com/yaml/libyaml
+          MIT license
 
     * file (for libmagic)
           http://www.darwinsys.com/file/
+          BSD license
 
     * OpenSSL or LibreSSL
           https://www.openssl.org/
+              OpenSSL license
           http://www.libressl.org/
+              OpenSSL and ISC licenses
 
     * libcap
           https://sites.google.com/site/fullycapable/
+          BSD-3-Clause
 
 Additionally, the unit test suite requires the following packages:
 
