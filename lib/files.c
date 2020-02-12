@@ -1,6 +1,7 @@
 /*
- * Copyright (C) 2019  Red Hat, Inc.
+ * Copyright (C) 2019-2020  Red Hat, Inc.
  * Red Hat Author(s):  David Shea <dshea@redhat.com>
+ *                     David Cantrell <dcantrell@redhat.com>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -26,7 +27,6 @@
 #include <sys/types.h>
 #include <unistd.h>
 #include <libgen.h>
-
 #include <sys/capability.h>
 
 #include <rpm/header.h>
