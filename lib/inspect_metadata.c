@@ -43,7 +43,11 @@ static bool valid_peers(struct rpminspect *ri, const Header before_hdr, const He
     after_nevra = get_nevra(after_hdr);
 
     after_vendor = headerGetString(after_hdr, RPMTAG_VENDOR);
-    if (after_vendor && strcmp(after_vendor, ri->vendor)) {
+    if (ri->vendor == NULL) {
+        xasprintf(&msg, "Vendor not set in rpminspect.conf, ignoring Package Vendor \"%s\" in %s", after_vendor, after_nevra);
+        add_result(ri, RESULT_INFO, NOT_WAIVABLE, HEADER_METADATA, msg, NULL, REMEDY_VENDOR);
+        free(msg);
+    } else if (after_vendor && strcmp(after_vendor, ri->vendor)) {
         xasprintf(&msg, "Package Vendor \"%s\" is not \"%s\" in %s", after_vendor, ri->vendor, after_nevra);
 
         add_result(ri, RESULT_BAD, NOT_WAIVABLE, HEADER_METADATA, msg, NULL, REMEDY_VENDOR);
