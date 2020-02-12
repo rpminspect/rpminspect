@@ -18,7 +18,7 @@ Mandatory test categories to migrate (top is highest priority):
  TEST_FILEMOVE
  TEST_PATHNAMES
  TEST_CONFIG
- TEST_MODPARM
+ TEST_MODPARM (this is modparam.c and moddep.c)
  TEST_MODPCIID
 !TEST_SIZE (need to support size inc/dec thresholds for reporting, per pkg)
  TEST_CHANGELOG
