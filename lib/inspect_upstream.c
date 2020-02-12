@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2019  Red Hat, Inc.
+ * Copyright (C) 2019-2020  Red Hat, Inc.
  * Author(s):  David Cantrell <dcantrell@redhat.com>
  *
  * This program is free software: you can redistribute it and/or modify
@@ -23,7 +23,11 @@
 
 #include "rpminspect.h"
 
+/* Global variables */
 static string_list_t *source = NULL;
+static severity_t sev;
+static waiverauth_t waiver;
+static const char *remedy = NULL;
 
 /*
  * Get the SOURCE tag from the RPM header and read in all of
@@ -98,12 +102,8 @@ static bool is_source(const rpmfile_entry_t *file)
 static bool upstream_driver(struct rpminspect *ri, rpmfile_entry_t *file)
 {
     bool result = true;
-    const char *bv = NULL;
-    const char *av = NULL;
     char *before_sum = NULL;
     char *after_sum = NULL;
-    severity_t sev;
-    waiverauth_t waiver;
     char *diff_output = NULL;
     char *diff_head = NULL;
     char *shortname = NULL;
@@ -118,25 +118,12 @@ static bool upstream_driver(struct rpminspect *ri, rpmfile_entry_t *file)
     /* Compare digests of source archive */
     shortname = basename(file->fullpath);
 
+    /* Report what was found */
     if (file->peer_file == NULL) {
         xasprintf(&msg, "New upstream source file `%s` appeared", shortname)
-        add_result(ri, RESULT_VERIFY, WAIVABLE_BY_ANYONE, HEADER_UPSTREAM, msg, NULL, REMEDY_UPSTREAM);
+        add_result(ri, sev, waiver, HEADER_UPSTREAM, msg, NULL, remedy);
         result = false;
     } else {
-        /* Set correct reporting level and waiver */
-        bv = headerGetString(file->peer_file->rpm_header, RPMTAG_VERSION);
-        av = headerGetString(file->rpm_header, RPMTAG_VERSION);
-
-        if (strcmp(bv, av)) {
-            /* versions changed */
-            sev = RESULT_INFO;
-            waiver = NOT_WAIVABLE;
-        } else {
-            /* versions are the same, likely maintenance */
-            sev = RESULT_VERIFY;
-            waiver = WAIVABLE_BY_ANYONE;
-        }
-
         /* compare checksums to see if the upstream sources changed */
         before_sum = checksum(file->peer_file);
         after_sum = checksum(file);
@@ -158,7 +145,7 @@ static bool upstream_driver(struct rpminspect *ri, rpmfile_entry_t *file)
 
             /* report the changed file */
             xasprintf(&msg, "Upstream source file `%s` changed content", shortname);
-            add_result(ri, sev, waiver, HEADER_UPSTREAM, msg, diff_head, REMEDY_UPSTREAM);
+            add_result(ri, sev, waiver, HEADER_UPSTREAM, msg, diff_head, remedy);
             result = false;
 
             /* clean up */
@@ -176,12 +163,50 @@ static bool upstream_driver(struct rpminspect *ri, rpmfile_entry_t *file)
 bool inspect_upstream(struct rpminspect *ri)
 {
     bool result = true;
+    const char *bv = NULL;
+    const char *av = NULL;
     rpmpeer_entry_t *peer = NULL;
     rpmfile_entry_t *file = NULL;
     char *msg = NULL;
 
     assert(ri != NULL);
 
+    /* Initialize before and after versions */
+    TAILQ_FOREACH(peer, ri->peers, items) {
+        if (bv && av) {
+            break;
+        }
+
+        if (!headerIsSource(peer->after_hdr)) {
+            continue;
+        }
+
+        TAILQ_FOREACH(file, peer->after_files, items) {
+            if (strsuffix(file->localpath, SPEC_FILENAME_EXTENSION)) {
+                bv = headerGetString(file->peer_file->rpm_header, RPMTAG_VERSION);
+                av = headerGetString(file->rpm_header, RPMTAG_VERSION);
+                break;
+            }
+        }
+    }
+
+    assert(bv != NULL);
+    assert(av != NULL);
+
+    /* Set result type based on version difference */
+    if (strcmp(bv, av)) {
+        /* versions changed */
+        sev = RESULT_INFO;
+        waiver = NOT_WAIVABLE;
+        remedy = NULL;
+    } else {
+        /* versions are the same, likely maintenance */
+        sev = RESULT_VERIFY;
+        waiver = WAIVABLE_BY_ANYONE;
+        remedy = REMEDY_UPSTREAM;
+    }
+
+    /* Run the main inspection */
     TAILQ_FOREACH(peer, ri->peers, items) {
         /* Only look at the files in SRPMs */
         if (!headerIsSource(peer->after_hdr)) {
@@ -205,7 +230,7 @@ bool inspect_upstream(struct rpminspect *ri)
             TAILQ_FOREACH(file, peer->before_files, items) {
                 if (file->peer_file == NULL) {
                     xasprintf(&msg, "Source RPM member `%s` removed", basename(file->fullpath));
-                    add_result(ri, RESULT_VERIFY, WAIVABLE_BY_ANYONE, HEADER_UPSTREAM, msg, NULL, REMEDY_UPSTREAM);
+                    add_result(ri, sev, waiver, HEADER_UPSTREAM, msg, NULL, remedy);
                     result = false;
                     free(msg);
                 }
