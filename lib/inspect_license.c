@@ -334,7 +334,7 @@ bool inspect_license(struct rpminspect *ri) {
     xasprintf(&actual_licensedb, "%s/%s/%s", ri->vendor_data_dir, LICENSES_DIR, ri->licensedb);
 
     if (ri->licensedb == NULL || access(actual_licensedb, F_OK|R_OK)) {
-        msg = strdup("Missing license database");
+        msg = strdup("Missing license database: %s: %s", actual_licensedb, strerror(errno));
         add_result(ri, RESULT_BAD, NOT_WAIVABLE, HEADER_LICENSE, msg, NULL, REMEDY_LICENSEDB);
         free(msg);
         free(actual_licensedb);
