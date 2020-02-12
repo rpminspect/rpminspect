@@ -27,7 +27,7 @@
 #include <unistd.h>
 #include <libgen.h>
 
-#include <cap-ng.h>
+#include <sys/capability.h>
 
 #include <rpm/header.h>
 #include <rpm/rpmtd.h>
