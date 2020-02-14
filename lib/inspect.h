@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2019  Red Hat, Inc.
+ * Copyright (C) 2019-2020  Red Hat, Inc.
  * Author(s):  David Cantrell <dcantrell@redhat.com>
  *
  * This program is free software: you can redistribute it and/or modify
@@ -63,17 +63,6 @@ string_list_t * get_fortified_symbols(Elf *);
 string_list_t * get_fortifiable_symbols(Elf *);
 bool is_pic_ok(Elf *);
 bool inspect_elf(struct rpminspect *);
-
-/* inspect_kernel.c */
-bool compare_module_parameters(const struct kmod_list *, const struct kmod_list *, string_list_t **);
-bool compare_module_dependencies(const struct kmod_list *, const struct kmod_list *, string_list_t **, string_list_t **);
-
-struct kernel_alias_data;
-typedef void (*module_alias_callback)(const char *, const string_list_t *, const string_list_t *, void *);
-
-void gather_module_aliases(const char *, const struct kmod_list *, struct kernel_alias_data **);
-void free_module_aliases(struct kernel_alias_data *);
-bool compare_module_aliases(struct kernel_alias_data *, struct kernel_alias_data *, module_alias_callback, void *);
 
 /* inspect_license.c */
 void free_licensedb(void);
@@ -142,6 +131,9 @@ bool inspect_permissions(struct rpminspect *);
 /* inspect_capabilities.c */
 bool inspect_capabilities(struct rpminspect *);
 
+/* inspect_kmod.c */
+bool inspect_kmod(struct rpminspect *);
+
 /*
  * Inspections are referenced by flag.  These flags are set in bitfields
  * to indicate which ones we want to run.  When adding new ones, please
@@ -172,5 +164,6 @@ bool inspect_capabilities(struct rpminspect *);
 #define INSPECT_FILESIZE                    (((uint64_t) 1) << 20)
 #define INSPECT_PERMISSIONS                 (((uint64_t) 1) << 21)
 #define INSPECT_CAPABILITIES                (((uint64_t) 1) << 22)
+#define INSPECT_KMOD                        (((uint64_t) 1) << 23)
 
 #endif

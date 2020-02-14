@@ -28,6 +28,7 @@
 #include <sys/stat.h>
 #include <sys/capability.h>
 #include <rpm/rpmlib.h>
+#include <libkmod.h>
 
 #ifndef _LIBRPMINSPECT_TYPES_H
 #define _LIBRPMINSPECT_TYPES_H
@@ -530,5 +531,24 @@ typedef enum _filetype_t {
     FILETYPE_EXECUTABLE = 1,
     FILETYPE_ICON = 2
 } filetype_t;
+
+/* Kernel module handling */
+typedef void (*modinfo_to_entries)(string_list_t *, const struct kmod_list *);
+typedef void (*module_alias_callback)(const char *, const string_list_t *, const string_list_t *, void *);
+
+/* mapping of an alias string to a module name */
+struct alias_entry_t {
+    char *alias;
+    char *module;
+    TAILQ_ENTRY(alias_entry_t) items;
+};
+
+TAILQ_HEAD(alias_list_t, alias_entry_t);
+
+struct kernel_alias_data {
+    size_t num_aliases;
+    struct alias_list_t *alias_list;
+    struct hsearch_data *alias_table;
+};
 
 #endif

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2019  Red Hat, Inc.
+ * Copyright (C) 2019-2020  Red Hat, Inc.
  * Author(s):  David Cantrell <dcantrell@redhat.com>
  *
  * This program is free software: you can redistribute it and/or modify
@@ -158,6 +158,12 @@ struct inspect inspections[] = {
       true,
       &inspect_capabilities,
       "Report capabilities(7) changes between builds.  Checks against the capabilities whitelist for the product release specified or determined.  Any capabilities changes not whitelisted will raise a message requiring Security Team review." },
+
+    { INSPECT_KMOD,
+      "kmod",
+      false,
+      &inspect_kmod,
+      "Report kernel module parameter, dependency, PCI ID, or symbol differences between builds.  Added and removed parameters are reported and if the package version is unchanged, these messages are reported as failures.  The same is true module dependencies, PCI IDs, and symbols" },
 
     /*
      * { INSPECT_TYPE (add to inspect.h),
