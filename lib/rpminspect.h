@@ -126,6 +126,13 @@ struct koji_task *get_koji_task(struct rpminspect *, const char *);
 string_list_t *get_all_arches(const struct rpminspect *);
 bool allowed_arch(const struct rpminspect *, const char *);
 
+/* kmods.c */
+bool compare_module_parameters(const struct kmod_list *, const struct kmod_list *, string_list_t **, string_list_t **);
+bool compare_module_dependencies(const struct kmod_list *, const struct kmod_list *, string_list_t **, string_list_t **);
+void gather_module_aliases(const char *, const struct kmod_list *, struct kernel_alias_data **);
+void free_module_aliases(struct kernel_alias_data *);
+bool compare_module_aliases(struct kernel_alias_data *, struct kernel_alias_data *, module_alias_callback, void *);
+
 /* mkdirp.c */
 int mkdirp(char *, mode_t);
 
@@ -202,5 +209,8 @@ caps_filelist_entry_t *get_caps_whitelist_entry(struct rpminspect *, const char 
 
 /* flags.c */
 bool process_inspection_flag(const char *, const bool, uint64_t *);
+
+/* kmods.c */
+string_list_t *get_kmod_values(const char *, const char *);
 
 #endif

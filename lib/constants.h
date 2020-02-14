@@ -136,6 +136,7 @@
 #define MO_FILENAME_EXTENSION ".mo"
 #define PYTHON_PYC_FILE_EXTENSION ".pyc"
 #define PYTHON_PYO_FILE_EXTENSION ".pyo"
+#define KERNEL_MODULE_FILENAME_EXTENSION ".ko"
 
 /*
  * Build ID
@@ -149,5 +150,10 @@
 #define DEBUGSOURCE_SUFFIX "-debugsource"
 #define DEBUG_PATH "/usr/lib/debug/"
 #define DEBUG_SRC_PATH "/usr/src/debug/"
+
+/*
+ * Kernel modules subdirectory
+ */
+#define KERNEL_MODULES_DIR "/lib/modules/"
 
 #endif
