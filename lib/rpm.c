@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2019  Red Hat, Inc.
+ * Copyright (C) 2019-2020  Red Hat, Inc.
  * Red Hat Author(s):  David Shea <dshea@redhat.com>
  *                     David Cantrell <dcantrell@redhat.com>
  *
@@ -21,6 +21,7 @@
 #include <assert.h>
 #include <rpm/rpmlib.h>
 #include <rpm/rpmts.h>
+#include <rpm/header.h>
 
 #include "rpminspect.h"
 
@@ -43,7 +44,7 @@ int init_librpm(void)
 }
 
 /* Return an RPM header struct for the given package filename. */
-int get_rpm_header(struct rpminspect *ri, const char *pkg, Header *hdr)
+Header get_rpm_header(struct rpminspect *ri, const char *pkg)
 {
     rpmts ts;
     FD_t fd;
@@ -61,8 +62,7 @@ int get_rpm_header(struct rpminspect *ri, const char *pkg, Header *hdr)
     if (ri->header_cache != NULL) {
         TAILQ_FOREACH(hentry, ri->header_cache, items) {
             if (!strcmp(hentry->pkg, bpkg)) {
-                *hdr = hentry->hdr;
-                return 0;
+                return hentry->hdr;
             }
         }
     }
@@ -78,8 +78,7 @@ int get_rpm_header(struct rpminspect *ri, const char *pkg, Header *hdr)
             Fclose(fd);
         }
 
-        *hdr = NULL;
-        return -1;
+        return NULL;
     }
 
     hentry = calloc(1, sizeof(*hentry));
@@ -87,11 +86,14 @@ int get_rpm_header(struct rpminspect *ri, const char *pkg, Header *hdr)
 
     ts = rpmtsCreate();
     rpmtsSetVSFlags(ts, _RPMVSF_NODIGESTS | _RPMVSF_NOSIGNATURES);
-
     result = rpmReadPackageFile(ts, fd, pkg, &hentry->hdr);
-
     rpmtsFree(ts);
     Fclose(fd);
+
+    if (result != RPMRC_OK) {
+        fprintf(stderr, "*** error reading package header for %s\n", pkg);
+        return NULL;
+    }
 
     if (ri->header_cache == NULL) {
         /* Initialize the header cache if necessary */
@@ -101,13 +103,7 @@ int get_rpm_header(struct rpminspect *ri, const char *pkg, Header *hdr)
     }
 
     TAILQ_INSERT_TAIL(ri->header_cache, hentry, items);
-    *hdr = hentry->hdr;
-
-    if (result == RPMRC_OK) {
-        return 0;
-    }
-
-    return -1;
+    return hentry->hdr;
 }
 
 /*
