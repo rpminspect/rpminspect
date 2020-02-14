@@ -70,6 +70,7 @@ static void usage(const char *progname)
     printf("  -f, --fetch-only         Fetch builds only, do not perform inspections\n");
     printf("                             (implies -k)\n");
     printf("  -k, --keep               Do not remove the comparison working files\n");
+    printf("  -d, --debug              Debugging mode output\n");
     printf("  -v, --verbose            Verbose inspection output\n");
     printf("                           when finished, display full path\n");
     printf("  -?, --help               Display usage information\n");
@@ -276,7 +277,7 @@ int main(int argc, char **argv) {
     int idx = 0;
     int ret = RI_INSPECTION_SUCCESS;
     glob_t expand;
-    char *short_options = "c:p:T:E:a:r:o:F:lw:t:fkv\?V";
+    char *short_options = "c:p:T:E:a:r:o:F:lw:t:fkdv\?V";
     struct option long_options[] = {
         { "config", required_argument, 0, 'c' },
         { "profile", required_argument, 0, 'p' },
@@ -291,6 +292,7 @@ int main(int argc, char **argv) {
         { "threshold", required_argument, 0, 't' },
         { "fetch-only", no_argument, 0, 'f' },
         { "keep", no_argument, 0, 'k' },
+        { "debug", no_argument, 0, 'd' },
         { "verbose", no_argument, 0, 'v' },
         { "help", no_argument, 0, '?' },
         { "version", no_argument, 0, 'V' },
@@ -310,6 +312,8 @@ int main(int argc, char **argv) {
     int formatidx = -1;
     bool fetch_only = false;
     bool keep = false;
+    bool list = false;
+    bool debug = false;
     bool verbose = false;
     int mode = S_IRWXU | S_IRGRP | S_IXGRP | S_IROTH | S_IXOTH;
     bool found = false;
@@ -389,39 +393,7 @@ int main(int argc, char **argv) {
 
                 break;
             case 'l':
-                /* list the formats available */
-                printf("Available output formats:\n");
-
-                for (i = 0; formats[i].type != -1; i++) {
-                    if (i > 0) {
-                        printf("\n");
-                    }
-
-                    printf("    %s\n", formats[i].name);
-
-                    if (formats[i].desc != NULL) {
-                        printwrap(formats[i].desc, width, 8, stdout);
-                        printf("\n");
-                    }
-                }
-
-                /* list the inspections available */
-                printf("\nAvailable inspections:\n");
-
-                for (i = 0; inspections[i].flag != 0; i++) {
-                    if (i > 0) {
-                        printf("\n");
-                    }
-
-                    printf("    %s\n", inspections[i].name);
-
-                    if (inspections[i].desc != NULL) {
-                        printwrap(inspections[i].desc, width, 8, stdout);
-                        printf("\n");
-                    }
-                }
-
-                exit(RI_INSPECTION_SUCCESS);
+                list = true;
                 break;
             case 'w':
                 if (index(optarg, '~')) {
@@ -451,6 +423,9 @@ int main(int argc, char **argv) {
             case 'k':
                 keep = true;
                 break;
+            case 'd':
+                debug = true;
+                break;
             case 'v':
                 verbose = true;
                 break;
@@ -465,6 +440,43 @@ int main(int argc, char **argv) {
                 fflush(stderr);
                 exit(RI_PROGRAM_ERROR);
         }
+    }
+
+    /* list inspections and formats and exit if asked to */
+    if (list) {
+        /* list the formats available */
+        printf("Available output formats:\n");
+
+        for (i = 0; formats[i].type != -1; i++) {
+            if (i > 0 && verbose) {
+                printf("\n");
+            }
+
+            printf("    %s\n", formats[i].name);
+
+            if (formats[i].desc != NULL && verbose) {
+                printwrap(formats[i].desc, width, 8, stdout);
+                printf("\n");
+            }
+        }
+
+        /* list the inspections available */
+        printf("\nAvailable inspections:\n");
+
+        for (i = 0; inspections[i].flag != 0; i++) {
+            if (i > 0 && verbose) {
+                printf("\n");
+            }
+
+            printf("    %s\n", inspections[i].name);
+
+            if (inspections[i].desc != NULL && verbose) {
+                printwrap(inspections[i].desc, width, 8, stdout);
+                printf("\n");
+            }
+        }
+
+        exit(RI_INSPECTION_SUCCESS);
     }
 
     /*
@@ -495,6 +507,7 @@ int main(int argc, char **argv) {
     free(profile);
 
     /* various options from the command line */
+    ri.debug = debug;
     ri.verbose = verbose;
     ri.product_release = release;
     ri.threshold = getseverity(threshold);
