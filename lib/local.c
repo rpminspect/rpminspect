@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2018-2019  Red Hat, Inc.
+ * Copyright (C) 2018-2020  Red Hat, Inc.
  * Author(s):  David Cantrell <dcantrell@redhat.com>
  *
  * This program is free software: you can redistribute it and/or modify
@@ -94,8 +94,9 @@ bool is_local_rpm(struct rpminspect *ri, const char *rpm) {
     }
 
     rpmpath = realpath(rpm, NULL);
+    h = get_rpm_header(ri, rpm);
 
-    if ((rpmpath == NULL) || (get_rpm_header(ri, rpm, &h) == -1)) {
+    if ((rpmpath == NULL) || (h == NULL)) {
         ret = false;
     }
 

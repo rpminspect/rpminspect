@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2019  Red Hat, Inc.
+ * Copyright (C) 2019-2020  Red Hat, Inc.
  * Author(s):  David Cantrell <dcantrell@redhat.com>
  *
  * This program is free software: you can redistribute it and/or modify
@@ -113,7 +113,9 @@ static int get_rpm_info(const char *pkg) {
     Header h;
     const char *arch = NULL;
 
-    if ((ret = get_rpm_header(workri, pkg, &h)) != 0) {
+    h = get_rpm_header(workri, pkg);
+
+    if (h == NULL) {
         return ret;
     }
 
@@ -202,7 +204,9 @@ static int copytree(const char *fpath, const struct stat *sb,
             ret = -1;
         }
     } else if (S_ISREG(sb->st_mode) || S_ISLNK(sb->st_mode)) {
-        if ((ret = get_rpm_header(workri, fpath, &h)) != 0) {
+        h = get_rpm_header(workri, fpath);
+
+        if (h == NULL) {
             return ret;
         }
 

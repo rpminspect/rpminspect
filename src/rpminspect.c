@@ -315,6 +315,7 @@ int main(int argc, char **argv) {
     bool found = false;
     char *inspection = NULL;
     char *insoptarg = NULL;
+    char *tmp = NULL;
     bool inspection_opt = false;
     bool exclude = false;
     size_t width = tty_width();
@@ -509,12 +510,14 @@ int main(int argc, char **argv) {
             ri.tests = 0;
         }
 
+        tmp = insoptarg;
+
         while ((inspection = strsep(&insoptarg, ",")) != NULL) {
             found = process_inspection_flag(inspection, exclude, &ri.tests);
             check_found(found, inspection, progname);
         }
 
-        free(insoptarg);
+        free(tmp);
     }
 
     /* the user specified a working directory */

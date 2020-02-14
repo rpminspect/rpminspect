@@ -857,9 +857,10 @@ int init_rpminspect(struct rpminspect *ri, const char *cfgfile, const char *prof
 
     /* Read the main configuration file to get things started */
     ret = read_cfgfile(cfg, ri, ri->cfgfile, false);
+    iniparser_freedict(cfg);
 
     if (ret) {
-        iniparser_freedict(cfg);
+        fprintf(stderr, "*** error reading '%s'\n", ri->cfgfile);
         return ret;
     }
 
