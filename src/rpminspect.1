@@ -63,7 +63,7 @@ configuration is loaded, then if you specify a profile name rpminspect
 will load that configuration file and any values specified will
 override what came from the default configuration file.  Think of the
 main configuration file as the common one and profile configuration
-files are optional.
+files are optional overlays.
 .RS
 .PP
 The format of a profile configuration file is the same as
@@ -139,24 +139,31 @@ as a string.  Case does not matter.
 .TP
 .B \-f, \-\-fetch\-only
 Only download builds, do not perform any inspections (implies \-k).
-This option is intended as a convenience for developers as well as
-for easier integration in to different CI workflows.  Note that this
-option sets the working directory (\-w) to the current working
-directory.  If this is undesirable, use the \-w option to set it to
-a different location.
+This option is intended as a convenience for developers as well as for
+easier integration in to different CI workflows.  Note that this
+option does not change the working directory (\-w) to the current
+working directory.  If this is undesirable, use the \-w option to set
+it to a different location.  For example, to download to the current
+working directory you can pass "\-w $(pwd)".
 .TP
 .B \-k, \-\-keep
-Do not remove temporary working files before exit
+Do not remove temporary working files before exit.
+.TP
+.B \-d, \-\-debug
+Enable debugging mode.  This mode generates additional output on
+stdout and stderr.
 .TP
 .B \-v, \-\-verbose
-Verbose inspection output.  By default, only warnings or failures
-are reported.  This option also displays informational findings.
+Verbose inspection output.  By default, only warnings or failures are
+reported.  This option also displays informational findings.  Use this
+mode with \-l to display long descriptions of output formats and
+inspections.
 .TP
 .B \-?, \-\-help
-Display usage information
+Display usage information.
 .TP
 .B \-V, \-\-version
-Display version information
+Display version information.
 .SH USAGE
 .PP
 rpminspect requires very little to run.  Assuming you meet the runtime
