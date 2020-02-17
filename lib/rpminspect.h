@@ -129,9 +129,9 @@ bool allowed_arch(const struct rpminspect *, const char *);
 /* kmods.c */
 bool compare_module_parameters(const struct kmod_list *, const struct kmod_list *, string_list_t **, string_list_t **);
 bool compare_module_dependencies(const struct kmod_list *, const struct kmod_list *, string_list_t **, string_list_t **);
-void gather_module_aliases(const char *, const struct kmod_list *, struct kernel_alias_data **);
-void free_module_aliases(struct kernel_alias_data *);
-bool compare_module_aliases(struct kernel_alias_data *, struct kernel_alias_data *, module_alias_callback, void *);
+kernel_alias_data_t *gather_module_aliases(const char *module_name, const struct kmod_list *modinfo_list);
+void free_module_aliases(kernel_alias_data_t *);
+bool compare_module_aliases(kernel_alias_data_t *, kernel_alias_data_t *, module_alias_callback, void *);
 
 /* mkdirp.c */
 int mkdirp(char *, mode_t);

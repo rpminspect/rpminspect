@@ -24,16 +24,52 @@
 
 #include "rpminspect.h"
 
+static severity_t sev = RESULT_INFO;
+static waiverauth_t waiver = NOT_WAIVABLE;
+
+static void lost_alias(const char *alias, const string_list_t *before_modules, const string_list_t *after_modules, void *user_data)
+{
+    struct rpminspect *ri = (struct rpminspect *) user_data;
+    string_entry_t *entry = NULL;
+    char *msg = NULL;
+
+    assert(alias != NULL);
+    assert(before_modules != NULL);
+    assert(after_modules != NULL);
+    assert(ri != NULL);
+
+    TAILQ_FOREACH(entry, before_modules, items) {
+        xasprintf(&msg, "Kernel module '%s' lost alias '%s'", entry->data, alias);
+        add_result(ri, sev, waiver, HEADER_KMOD, msg, NULL, REMEDY_KMOD_ALIAS);
+        free(msg);
+    }
+
+    if (!TAILQ_EMPTY(after_modules)) {
+        TAILQ_FOREACH(entry, after_modules, items) {
+            xasprintf(&msg, "Kernel module '%s' gained alias '%s'", entry->data, alias);
+            add_result(ri, sev, waiver, HEADER_KMOD, msg, NULL, REMEDY_KMOD_ALIAS);
+            free(msg);
+        }
+    }
+
+    return;
+}
+
 static bool kmod_driver(struct rpminspect *ri, rpmfile_entry_t *file)
 {
     int err = -1;
     bool result_parm = true;
     bool result_deps = true;
+    bool result_aliases = true;
     struct kmod_ctx *kctx = NULL;
     struct kmod_module *beforekmod = NULL;
     struct kmod_module *afterkmod = NULL;
     struct kmod_list *beforeinfo = NULL;
     struct kmod_list *afterinfo = NULL;
+    const char *before_kmod_name = NULL;
+    const char *after_kmod_name = NULL;
+    kernel_alias_data_t *beforealiases = NULL;
+    kernel_alias_data_t *afteraliases = NULL;
     string_list_t *lost = NULL;
     string_list_t *gain = NULL;
     string_entry_t *entry = NULL;
@@ -41,8 +77,6 @@ static bool kmod_driver(struct rpminspect *ri, rpmfile_entry_t *file)
     const char *aftername = NULL;
     const char *beforever = NULL;
     const char *afterver = NULL;
-    severity_t sev = RESULT_INFO;
-    waiverauth_t waiver = NOT_WAIVABLE;
     char *msg = NULL;
 
     assert(ri != NULL);
@@ -101,6 +135,8 @@ static bool kmod_driver(struct rpminspect *ri, rpmfile_entry_t *file)
         /* not a kernel module */
         kmod_unref(kctx);
         return true;
+    } else {
+        before_kmod_name = kmod_module_get_name(beforekmod);
     }
 
     kmod_unref(kctx);
@@ -117,6 +153,8 @@ static bool kmod_driver(struct rpminspect *ri, rpmfile_entry_t *file)
         kmod_module_unref(beforekmod);
         kmod_unref(kctx);
         return true;
+    } else {
+        after_kmod_name = kmod_module_get_name(afterkmod);
     }
 
     /* Gather module parameters */
@@ -191,6 +229,11 @@ static bool kmod_driver(struct rpminspect *ri, rpmfile_entry_t *file)
         gain = NULL;
     }
 
+    /* Compute lost PCI device IDs in kernel modules */
+    beforealiases = gather_module_aliases(before_kmod_name, beforeinfo);
+    afteraliases = gather_module_aliases(after_kmod_name, afterinfo);
+    result_aliases = compare_module_aliases(beforealiases, afteraliases, lost_alias, ri);
+
     /* Clean up libkmod usage */
     kmod_module_info_free_list(beforeinfo);
     kmod_module_info_free_list(afterinfo);
@@ -198,7 +241,11 @@ static bool kmod_driver(struct rpminspect *ri, rpmfile_entry_t *file)
     kmod_module_unref(afterkmod);
     kmod_unref(kctx);
 
-    return result_parm && result_deps;
+    /* Our own stuff */
+    free_module_aliases(beforealiases);
+    free_module_aliases(afteraliases);
+
+    return result_parm && result_deps && result_aliases;
 }
 
 /*

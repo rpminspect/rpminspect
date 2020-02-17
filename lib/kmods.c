@@ -219,12 +219,11 @@ bool compare_module_dependencies(const struct kmod_list *before, const struct km
 
 /*
  * Add a module's alias information to a kernel_alias_data collection.
- *
- * Pass NULL as *output to create a new kernel_alias_data object. When
- * done, the data must be freed with free_module_aliases.
+ * The returned kernel_alias_data_t must be freed with free_module_aliases.
  */
-void gather_module_aliases(const char *module_name, const struct kmod_list *modinfo_list, struct kernel_alias_data **output)
+kernel_alias_data_t *gather_module_aliases(const char *module_name, const struct kmod_list *modinfo_list)
 {
+    kernel_alias_data_t *ret = NULL;
     const struct kmod_list *iter = NULL;
     const char *key;
     const char *value;
@@ -232,17 +231,14 @@ void gather_module_aliases(const char *module_name, const struct kmod_list *modi
 
     assert(module_name);
     assert(modinfo_list);
-    assert(output);
 
-    if (*output == NULL) {
-        *output = calloc(1, sizeof(*output));
-        assert(*output);
+    ret = calloc(1, sizeof(*ret));
+    assert(ret);
 
-        (*output)->alias_list = calloc(1, sizeof(*((*output)->alias_list)));
-        assert((*output)->alias_list);
+    ret->alias_list = calloc(1, sizeof(*(ret->alias_list)));
+    assert(ret->alias_list);
 
-        TAILQ_INIT((*output)->alias_list);
-    }
+    TAILQ_INIT(ret->alias_list);
 
     kmod_list_foreach(iter, modinfo_list) {
         /* Only gather pci aliases */
@@ -267,15 +263,15 @@ void gather_module_aliases(const char *module_name, const struct kmod_list *modi
         alias_entry->module = strdup(module_name);
         assert(alias_entry->module);
 
-        (*output)->num_aliases++;
-        TAILQ_INSERT_TAIL((*output)->alias_list, alias_entry, items);
+        ret->num_aliases++;
+        TAILQ_INSERT_TAIL(ret->alias_list, alias_entry, items);
     }
 
-    return;
+    return ret;
 }
 
 /* Free the kernel_alias_data struct created by gather_module_aliases */
-void free_module_aliases(struct kernel_alias_data *data)
+void free_module_aliases(kernel_alias_data_t *data)
 {
     struct alias_entry_t *alias_entry;
     ENTRY e;
@@ -315,7 +311,7 @@ void free_module_aliases(struct kernel_alias_data *data)
     return;
 }
 
-static void finalize_module_aliases(struct kernel_alias_data *data)
+static void finalize_module_aliases(kernel_alias_data_t *data)
 {
     struct alias_entry_t *alias_entry;
     struct alias_entry_t *tmp;
@@ -430,7 +426,7 @@ static string_list_t * wildcard_alias_search(const char *alias, const struct ali
  * exact string match of an alias (using hash tables) results in an
  * apparent regression.
  */
-bool compare_module_aliases(struct kernel_alias_data *before, struct kernel_alias_data *after, module_alias_callback callback, void *user_data)
+bool compare_module_aliases(kernel_alias_data_t *before, kernel_alias_data_t *after, module_alias_callback callback, void *user_data)
 {
     struct alias_entry_t *iter;
     string_list_t *before_modules;

@@ -546,10 +546,10 @@ struct alias_entry_t {
 
 TAILQ_HEAD(alias_list_t, alias_entry_t);
 
-struct kernel_alias_data {
+typedef struct _kernel_alias_data {
     size_t num_aliases;
     struct alias_list_t *alias_list;
     struct hsearch_data *alias_table;
-};
+} kernel_alias_data_t;
 
 #endif
