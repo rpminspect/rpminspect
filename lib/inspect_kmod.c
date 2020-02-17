@@ -27,7 +27,8 @@
 static bool kmod_driver(struct rpminspect *ri, rpmfile_entry_t *file)
 {
     int err = -1;
-    bool result = true;
+    bool result_parm = true;
+    bool result_deps = true;
     struct kmod_ctx *kctx = NULL;
     struct kmod_module *beforekmod = NULL;
     struct kmod_module *afterkmod = NULL;
@@ -139,17 +140,18 @@ static bool kmod_driver(struct rpminspect *ri, rpmfile_entry_t *file)
     }
 
     /* Compute lost and gained module parameters */
-    result = compare_module_parameters(beforeinfo, afterinfo, &lost, &gain);
+    result_parm = compare_module_parameters(beforeinfo, afterinfo, &lost, &gain);
 
-    /* Report */
+    /* Report parameters */
     if (lost != NULL && !TAILQ_EMPTY(lost)) {
         TAILQ_FOREACH(entry, lost, items) {
             xasprintf(&msg, "Kernel module %s removes parameter '%s'", file->localpath, entry->data);
-            add_result(ri, sev, waiver, HEADER_KMOD, msg, NULL, REMEDY_KMOD);
+            add_result(ri, sev, waiver, HEADER_KMOD, msg, NULL, REMEDY_KMOD_PARM);
             free(msg);
         }
 
         list_free(lost, free);
+        lost = NULL;
     }
 
     if (gain != NULL && !TAILQ_EMPTY(gain)) {
@@ -160,6 +162,33 @@ static bool kmod_driver(struct rpminspect *ri, rpmfile_entry_t *file)
         }
 
         list_free(gain, free);
+        gain = NULL;
+    }
+
+    /* Compute lost and gained module dependencies */
+    result_deps = compare_module_dependencies(beforeinfo, afterinfo, &lost, &gain);
+
+    /* Report dependencies */
+    if (lost != NULL && !TAILQ_EMPTY(lost)) {
+        TAILQ_FOREACH(entry, lost, items) {
+            xasprintf(&msg, "Kernel module %s removes dependency '%s'", file->localpath, entry->data);
+            add_result(ri, sev, waiver, HEADER_KMOD, msg, NULL, REMEDY_KMOD_DEPS);
+            free(msg);
+        }
+
+        list_free(lost, free);
+        lost = NULL;
+    }
+
+    if (gain != NULL && !TAILQ_EMPTY(gain)) {
+        TAILQ_FOREACH(entry, gain, items) {
+            xasprintf(&msg, "Kernel module %s adds dependency '%s'", file->localpath, entry->data);
+            add_result(ri, sev, waiver, HEADER_KMOD, msg, NULL, REMEDY_KMOD_DEPS);
+            free(msg);
+        }
+
+        list_free(gain, free);
+        gain = NULL;
     }
 
     /* Clean up libkmod usage */
@@ -169,7 +198,7 @@ static bool kmod_driver(struct rpminspect *ri, rpmfile_entry_t *file)
     kmod_module_unref(afterkmod);
     kmod_unref(kctx);
 
-    return result;
+    return result_parm && result_deps;
 }
 
 /*
