@@ -209,7 +209,7 @@ rpmfile_t * extract_rpm(const char *pkg, Header hdr)
         file_entry = calloc(1, sizeof(rpmfile_entry_t));
         assert(file_entry != NULL);
 
-        file_entry->rpm_header = headerLink(hdr);
+        file_entry->rpm_header = hdr;
         memcpy(&file_entry->st, archive_entry_stat(entry), sizeof(struct stat));
         file_entry->idx = *((int *)eptr->data);
 
