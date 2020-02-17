@@ -136,6 +136,7 @@
 #define REMEDY_CAPABILITIES "Unexpected capabilities were found on the indicated file.  Consult capabilities(7) and either adjust the files in the package or modify the capabilities whitelist file in the rpminspect vendor data package.  The security team may also be of help for this situation."
 
 /* kmod */
-#define REMEDY_KMOD "Kernel module parameters were removed between builds but the package versions are the same.  This can present usability problems for users if module parameters were removed in a maintenance update."
+#define REMEDY_KMOD_PARM "Kernel module parameters were removed between builds but the package versions are the same.  This may present usability problems for users if module parameters were removed in a maintenance update."
+#define REMEDY_KMOD_DEPS "Kernel module dependencies changed between builds but the kernel versions are the same.  This may present usability problems for users if module dependencies changed in a maintenance update."
 
 #endif
