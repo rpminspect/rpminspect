@@ -18,8 +18,6 @@ Mandatory test categories to migrate (top is highest priority):
  TEST_FILEMOVE
  TEST_PATHNAMES
  TEST_CONFIG
- TEST_MODPARM (this is modparam.c and moddep.c)
- TEST_MODPCIID
 !TEST_SIZE (need to support size inc/dec thresholds for reporting, per pkg)
  TEST_CHANGELOG
  TEST_MULTILIB
@@ -73,6 +71,8 @@ Test categories that have been migrated:
 *TEST_UPSTREAM (the BZ 'Rebase' keyword check against the Errata Tool
                 bug list was not migrated, see below)
 *TEST_PERMS (this is permissions and capabilities)
+*TEST_MODPARM (this is modparam.c and moddep.c)
+ TEST_MODPCIID
 
 
 Test categories excluded (see MISSING):
@@ -106,6 +106,7 @@ inspections lack integration tests:
     filesize
     permissions
     capabilities
+    kmod (compare only)
 
 
 +=======+
