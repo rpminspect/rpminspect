@@ -1,11 +1,11 @@
 # Set up an environment for running the tests.
-FROM fedora:30
+FROM fedora:31
 RUN dnf -y install 'dnf-command(builddep)'
 
 # Start with the buildreqs from the spec file
 # Fake enough of the template processing to get dnf to read rpminspect.spec.in as a spec file
 COPY rpminspect.spec.in /rpminspect.spec
-RUN sed -i -e 's|%%VERSION%%|1.0|g' -e 's|%%RPMDATE%%|Mon Apr 15 2019|g' /rpminspect.spec
+RUN sed -i -e 's|%%VERSION%%|1.0|g' -e 's|%%RPMDATE%%|$(date +"%a %b %d %Y")|g' /rpminspect.spec
 RUN dnf -y builddep --spec rpminspect.spec
 
 # Add additional test dependencies
