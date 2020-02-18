@@ -202,6 +202,13 @@ typedef struct _header_cache_entry_t {
     TAILQ_ENTRY(_header_cache_entry_t) items;
 } header_cache_entry_t;
 
+/* Product release string favoring */
+typedef enum _favor_release_t {
+    FAVOR_NONE = 0,
+    FAVOR_OLDEST = 1,
+    FAVOR_NEWEST = 2
+} favor_release_t;
+
 typedef TAILQ_HEAD(header_cache_entry_s, _header_cache_entry_t) header_cache_t;
 
 /*
@@ -219,6 +226,7 @@ struct rpminspect {
     /* Vendor data */
     char *vendor_data_dir;     /* main vendor data directory */
     char *licensedb;           /* name of file under licenses/ to use */
+    favor_release_t favor_release;
 
     /* Populated at runtime for the product release */
     stat_whitelist_t *stat_whitelist;

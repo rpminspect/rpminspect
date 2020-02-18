@@ -376,6 +376,15 @@ static int read_cfgfile(dictionary *cfg, struct rpminspect *ri, const char *file
         ri->licensedb = strdup(tmp);
     }
 
+    tmp = iniparser_getstring(cfg, "vendor:favor_release", NULL);
+    if (!strcasecmp(tmp, "none")) {
+        ri->favor_release = FAVOR_NONE;
+    } else if (!strcasecmp(tmp, "oldest")) {
+        ri->favor_release = FAVOR_OLDEST;
+    } else if (!strcasecmp(tmp, "newest")) {
+        ri->favor_release = FAVOR_NEWEST;
+    }
+
     /* read optional [inspections] section to enable/disable inspections */
     len = strlen(INSPECTIONS);
     nk = iniparser_getsecnkeys(cfg, INSPECTIONS);
@@ -815,6 +824,7 @@ int init_rpminspect(struct rpminspect *ri, const char *cfgfile, const char *prof
     ri->kojimbs = NULL;
     ri->vendor_data_dir = strdup(VENDOR_DATA_DIR);
     ri->licensedb = strdup(LICENSE_DB_FILE);
+    ri->favor_release = FAVOR_NONE;
     ri->stat_whitelist = NULL;
     ri->tests = ~0;
     ri->badwords = NULL;
