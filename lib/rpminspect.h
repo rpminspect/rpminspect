@@ -37,6 +37,9 @@
 #ifndef _LIBRPMINSPECT_RPMINSPECT_H
 #define _LIBRPMINSPECT_RPMINSPECT_H
 
+/* Debugging mode toggle */
+extern bool debug_mode;
+
 /* List of all inspections (inspect.c) */
 extern struct inspect inspections[];
 
@@ -50,17 +53,23 @@ extern struct format formats[];
     *(dest) = NULL;                              \
     asprintf((dest), __VA_ARGS__);               \
 }
-
 #else
-
 #define xasprintf(dest, ...) {                   \
     int _xasprintf_result;                       \
     *(dest) = NULL;                              \
     _xasprintf_result = asprintf((dest), __VA_ARGS__);\
     assert(_xasprintf_result != -1);             \
 }
-
 #endif
+
+/*
+ * Simple debugging printf.  Sends output to stderr if debugging
+ * mode is enabled at runtime.
+ */
+#define DEBUG_PRINT(...)              \
+    if (debug_mode) {                 \
+        fprintf(stderr, __VA_ARGS__); \
+    }
 
 /*
  * Types of exit codes from the program.
@@ -212,5 +221,8 @@ bool process_inspection_flag(const char *, const bool, uint64_t *);
 
 /* kmods.c */
 string_list_t *get_kmod_values(const char *, const char *);
+
+/* debug.c */
+void set_debug_mode(bool);
 
 #endif

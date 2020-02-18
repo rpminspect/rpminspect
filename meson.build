@@ -90,6 +90,7 @@ librpminspect_sources = [
     'lib/badwords.c',
     'lib/checksums.c',
     'lib/copyfile.c',
+    'lib/debug.c',
     'lib/files.c',
     'lib/flags.c',
     'lib/free.c',

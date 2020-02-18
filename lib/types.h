@@ -309,7 +309,6 @@ struct rpminspect {
     char *after;               /* after build ID arg given on cmdline */
     uint64_t tests;            /* which tests to run (default: ALL) */
     bool verbose;              /* verbose inspection output? */
-    bool debug;                /* debugging output? */
 
     /* Failure threshold */
     severity_t threshold;
