@@ -691,8 +691,7 @@ int main(int argc, char **argv) {
                 before_rel = headerGetString(peer->before_hdr, RPMTAG_RELEASE);
             }
 
-            ri.product_release = get_product_release(ri.favor_release, 
-before_rel, after_rel);
+            ri.product_release = get_product_release(ri.favor_release, before_rel, after_rel);
             DEBUG_PRINT("product_release=%s\n", ri.product_release);
 
             if (ri.product_release == NULL) {
