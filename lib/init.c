@@ -377,12 +377,14 @@ static int read_cfgfile(dictionary *cfg, struct rpminspect *ri, const char *file
     }
 
     tmp = iniparser_getstring(cfg, "vendor:favor_release", NULL);
-    if (!strcasecmp(tmp, "none")) {
-        ri->favor_release = FAVOR_NONE;
-    } else if (!strcasecmp(tmp, "oldest")) {
-        ri->favor_release = FAVOR_OLDEST;
-    } else if (!strcasecmp(tmp, "newest")) {
-        ri->favor_release = FAVOR_NEWEST;
+    if (tmp) {
+        if (!strcasecmp(tmp, "none")) {
+            ri->favor_release = FAVOR_NONE;
+        } else if (!strcasecmp(tmp, "oldest")) {
+            ri->favor_release = FAVOR_OLDEST;
+        } else if (!strcasecmp(tmp, "newest")) {
+            ri->favor_release = FAVOR_NEWEST;
+        }
     }
 
     /* read optional [inspections] section to enable/disable inspections */
