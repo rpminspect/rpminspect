@@ -23,6 +23,11 @@
 #include "inspect.h"
 
 /*
+ * Debugging mode toggle, set at runtime.
+ */
+bool debug_mode = false;
+
+/*
  * Ensure the array of inspections is only defined once.
  */
 

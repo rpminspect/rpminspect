@@ -507,7 +507,7 @@ int main(int argc, char **argv) {
     free(profile);
 
     /* various options from the command line */
-    ri.debug = debug;
+    set_debug_mode(debug);
     ri.verbose = verbose;
     ri.product_release = release;
     ri.threshold = getseverity(threshold);
