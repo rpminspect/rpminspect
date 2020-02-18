@@ -7,7 +7,9 @@ TEST_BUILDLOG
     that should be investigated.  Things like "***", "ERROR:",
     "error:", and so on.  Not a very easy to maintain test and
     generates a lot of false positives.  This is better caught by
-    gating tests and other test suites.
+    gating tests and other test suites.  Makefiles and other build
+    scripts should detect this stuff as a build failure and exit as
+    an error which would then filter up through rpmbuild.
 
 TEST_RPMLINT
     Runs rpmlint and reports the results.  We already run rpmlint or
