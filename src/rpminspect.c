@@ -86,7 +86,7 @@ static void usage(const char *progname)
  * Release value.  Trim any trailing '/' characters in case the user is
  * specifying a build from a local path.
  */
-static char *get_product_release(const char *before, const char *after)
+static char *get_product_release(const favor_release_t favor_release, const char *before, const char *after)
 {
     int c;
     char *pos = NULL;
@@ -223,6 +223,28 @@ static char *get_product_release(const char *before, const char *after)
         }
     } else {
         matched = true;
+    }
+
+    /* Handle release favoring */
+    if (!matched && favor_release != FAVOR_NONE) {
+        c = strverscmp(before_product, after_product);
+        matched = true;
+
+        if (favor_release == FAVOR_OLDEST) {
+            if (c <= 0) {
+                free(after_product);
+                after_product = before_product;
+            } else {
+                free(before_product);
+            }
+        } else if (favor_release == FAVOR_NEWEST) {
+            if (c >= 0) {
+                free(after_product);
+                after_product = before_product;
+            } else {
+                free(before_product);
+            }
+        }
     }
 
     if (!matched) {
@@ -669,7 +691,9 @@ int main(int argc, char **argv) {
                 before_rel = headerGetString(peer->before_hdr, RPMTAG_RELEASE);
             }
 
-            ri.product_release = get_product_release(before_rel, after_rel);
+            ri.product_release = get_product_release(ri.favor_release, 
+before_rel, after_rel);
+            DEBUG_PRINT("product_release=%s\n", ri.product_release);
 
             if (ri.product_release == NULL) {
                 fflush(stderr);
