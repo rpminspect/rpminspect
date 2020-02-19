@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2018-2019  Red Hat, Inc.
+ * Copyright (C) 2018-2020  Red Hat, Inc.
  * Author(s):  David Cantrell <dcantrell@redhat.com>
  *
  * This program is free software: you can redistribute it and/or modify
@@ -58,13 +58,12 @@ static struct json_object *read_licensedb(const char *licensedb) {
  * Called by is_valid_license() to check each short license token.  It
  * will also try to do a whole match on the license tag string.
  */
-static int check_license_abbrev(const char *tag, const char *lic, bool *whole_match)
+static bool check_license_abbrev(const char *lic)
 {
     const char *fedora_abbrev = NULL;
     const char *spdx_abbrev = NULL;
     bool approved = false;
 
-    assert(tag != NULL);
     assert(lic != NULL);
 
     json_object_object_foreach(licdb, license_name, val) {
@@ -72,6 +71,10 @@ static int check_license_abbrev(const char *tag, const char *lic, bool *whole_ma
         fedora_abbrev = NULL;
         spdx_abbrev = NULL;
         approved = false;
+
+        if (strlen(license_name) == 0) {
+            continue;
+        }
 
         /* collect the properties */
         json_object_object_foreach(val, prop, propval) {
@@ -91,12 +94,6 @@ static int check_license_abbrev(const char *tag, const char *lic, bool *whole_ma
             continue;
         }
 
-        /* if the entire license string matches the name, approved */
-        if (approved && (!strcmp(tag, fedora_abbrev) || !strcmp(tag, spdx_abbrev) || !strcmp(tag, license_name))) {
-            *whole_match = true;
-            return 0;
-        }
-
         /*
          * if the entire license string is approved, that is valid
          * if we hit 'fedora_abbrev', that is valid
@@ -104,11 +101,11 @@ static int check_license_abbrev(const char *tag, const char *lic, bool *whole_ma
          * NOTE: we only match the first hit in the license database
          */
         if (approved && (!strcmp(lic, fedora_abbrev) || !strcmp(lic, spdx_abbrev))) {
-            return 1;
+            return true;
         }
     }
 
-    return 0;
+    return false;
 }
 
 /*
@@ -165,6 +162,28 @@ static int check_peer_license(struct rpminspect *ri, const char *actual_licensed
 }
 
 /*
+ * Dupe or append a token to the given string.
+ */
+static void token_append(char **dest, const char *token)
+{
+    char *newdest = NULL;
+
+    assert(token != NULL);
+
+    if (*dest == NULL) {
+        *dest = strdup(token);
+        assert(*dest != NULL);
+    } else {
+        xasprintf(&newdest, "%s %s", *dest, token);
+        assert(newdest != NULL);
+        free(*dest);
+        *dest = newdest;
+    }
+
+    return;
+}
+
+/*
  * Helper function to clean up the static globals here.
  */
 void free_licensedb(void) {
@@ -206,17 +225,19 @@ void free_licensedb(void) {
  *    database.  Any single tag that is unapproved results in false.
  */
 bool is_valid_license(const char *licensedb, const char *tag) {
-    int seen = 0;
+    int tok_seen = 0;
     int valid = 0;
+    int paren_valid = 0;
     int balance = 0;
     size_t i = 0;
     char *tagtokens = NULL;
     char *tagcopy = NULL;
     char *token = NULL;
     char *lic = NULL;
-    char *newlic = NULL;
+    char *paren_lic = NULL;
+    bool good_token = false;
     bool collect = true;
-    bool whole_match = false;
+    int paren = 0;
 
     assert(licensedb != NULL);
     assert(tag != NULL);
@@ -250,60 +271,114 @@ bool is_valid_license(const char *licensedb, const char *tag) {
         }
     }
 
+    /* First try to match the entire string */
+    if (check_license_abbrev(tag)) {
+        return true;
+    }
+
     /* tokenize the license tag and validate each license */
     tagtokens = tagcopy = strdup(tag);
+    DEBUG_PRINT("tag=|%s|\n", tag);
 
-    while ((token = strsep(&tagtokens, "() ")) != NULL) {
+    while ((token = strsep(&tagtokens, " ")) != NULL) {
         /* skip over empty strings */
         if (strlen(token) == 0) {
             continue;
         }
 
+        /* build up a license substring if we see parens */
+        if (strprefix(token, "(")) {
+            paren++;
+        }
+
+        if (strsuffix(token, ")")) {
+            paren--;
+
+            if (!paren) {
+                collect = true;
+            }
+        }
+
         /* keep collecting the license string until we see a boolean */
         if (!strcasecmp(token, "and") || !strcasecmp(token, "or")) {
             collect = false;
+
+            /* Don't count boolean words in license abbreviations */
+            tok_seen--;
         }
+
+        /* Ignore leading and trailing parens */
+        while (*token == '(') {
+            token++;
+        }
+
+        if (strsuffix(token, ")")) {
+            token[strcspn(token, ")")] = 0;
+            token_append(&paren_lic, token);
+        }
+
+        DEBUG_PRINT("paren_lic=|%s|, token=|%s|\n", paren_lic, token);
 
         /* Abbreviated licenses may contain spaces, so rebuild it */
         if (collect) {
-            if (lic == NULL) {
-                lic = strdup(token);
-                assert(lic != NULL);
-            } else {
-                xasprintf(&newlic, "%s %s", lic, token);
-                assert(newlic != NULL);
-                free(lic);
-                lic = newlic;
+            token_append(&lic, token);
+            tok_seen++;
+        }
 
-                /* We've added a space, so back up the seen counter */
-                seen--;
-            }
+        /* If inside parens, gather the boolean tokens too */
+        if (paren) {
+            token_append(&paren_lic, token);
+        }
 
-            seen++;
+        if (collect) {
             continue;
         }
 
         /* iterate over the license database to match this license tag */
-        valid += check_license_abbrev(tag, lic, &whole_match);
+        if (lic) {
+            good_token = check_license_abbrev(lic);
 
-        if (whole_match) {
-            free(tagcopy);
-            free(lic);
-            return true;
+            if (good_token) {
+                DEBUG_PRINT("APPROVED lic=|%s|, paren_valid=%d, tok_seen=%d, valid=%d\n", lic, paren_valid, tok_seen, valid);
+                valid++;
+            } else if (!good_token && paren) {
+                tok_seen--;
+            }
+        }
+
+        if (paren_lic && check_license_abbrev(paren_lic)) {
+            DEBUG_PRINT("APPROVED paren_lic=|%s|, paren_valid=%d, tok_seen=%d, valid=%d\n", paren_lic, paren_valid, tok_seen, valid);
+            tok_seen++;
+            paren_valid++;
         }
 
         free(lic);
         lic = NULL;
+
+        if (!paren) {
+            free(paren_lic);
+            paren_lic = NULL;
+        }
+
         collect = true;
     }
 
     /* check the last license abbreviation */
-    valid += check_license_abbrev(tag, lic, &whole_match);
+    if (lic) {
+        good_token = check_license_abbrev(lic);
 
-    if (whole_match) {
-        free(tagcopy);
-        free(lic);
-        return true;
+        if (good_token) {
+            DEBUG_PRINT("APPROVED lic=|%s|, paren_valid=%d, tok_seen=%d, valid=%d\n", lic, paren_valid, tok_seen, valid);
+            valid++;
+        } else if (!good_token && paren) {
+            tok_seen--;
+        }
+    }
+
+    if (paren_lic && check_license_abbrev(paren_lic)) {
+        DEBUG_PRINT("APPROVED paren_lic=|%s|, paren_valid=%d, tok_seen=%d, valid=%d\n", paren_lic, paren_valid, tok_seen, valid);
+        tok_seen++;
+        paren_valid++;
     }
 
     /* cleanup */
@@ -314,7 +389,8 @@ bool is_valid_license(const char *licensedb, const char *tag) {
      * license tag is approved if number of seen tags equals
      * number of valid tags
      */
-    return (seen == valid);
+    DEBUG_PRINT("tok_seen=%d, paren=%d, paren_valid=%d, valid=%d\n", tok_seen, paren, paren_valid, valid);
+    return (tok_seen == (valid + paren_valid));
 }
 
 /*
