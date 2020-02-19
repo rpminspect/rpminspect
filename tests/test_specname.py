@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2019  Red Hat, Inc.
+# Copyright (C) 2019-2020  Red Hat, Inc.
 # Author(s):  David Cantrell <dcantrell@redhat.com>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -20,7 +20,7 @@ import unittest
 from baseclass import TestSRPM, TestRPMs, TestKoji
 
 # Verify spec filename matches package name on SRPM (OK)
-class TestSpecNameSRPM(TestSRPM):
+class SpecNameSRPM(TestSRPM):
     def setUp(self):
         TestSRPM.setUp(self)
         self.inspection = 'specname'
@@ -28,7 +28,7 @@ class TestSpecNameSRPM(TestSRPM):
         self.result = 'OK'
 
 # Verify spec filename matches package name on Koji build (OK)
-class TestSpecNameKojiBuild(TestKoji):
+class SpecNameKojiBuild(TestKoji):
     def setUp(self):
         TestKoji.setUp(self)
         self.inspection = 'specname'
@@ -36,7 +36,7 @@ class TestSpecNameKojiBuild(TestKoji):
         self.result = 'OK'
 
 # Verify spec filename test on binary RPMs fails (BAD)
-class TestSpecNameRPMs(TestRPMs):
+class SpecNameRPMs(TestRPMs):
     def setUp(self):
         TestRPMs.setUp(self)
         self.inspection = 'specname'
@@ -45,7 +45,7 @@ class TestSpecNameRPMs(TestRPMs):
         self.waiver_auth = 'Not Waivable'
 
 # Verify spec filename not matching package name fails (BAD)
-class TestBadSpecNameSRPM(TestSRPM):
+class BadSpecNameSRPM(TestSRPM):
     @unittest.skip("requires addSpecBasename() support in rpmfluff")
     def setUp(self):
         TestSRPM.setUp(self)
@@ -56,7 +56,7 @@ class TestBadSpecNameSRPM(TestSRPM):
         self.waiver_auth = 'Not Waivable'
 
 # Verify spec filename not matching package name fails on Koji build (BAD)
-class TestBadSpecNameKojiBuild(TestKoji):
+class BadSpecNameKojiBuild(TestKoji):
     @unittest.skip("requires addSpecBasename() support in rpmfluff")
     def setUp(self):
         TestKoji.setUp(self)

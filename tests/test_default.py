@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2019  Red Hat, Inc.
+# Copyright (C) 2019-2020  Red Hat, Inc.
 # Author(s):  David Cantrell <dcantrell@redhat.com>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -20,37 +20,37 @@ import unittest
 from baseclass import *
 
 # Verify rpminspect runs against an SRPM
-class TestDefaultSRPM(TestSRPM):
+class DefaultSRPM(TestSRPM):
     def setUp(self):
         TestSRPM.setUp(self)
         self.result = 'OK'
 
 # Verify rpminspect runs against an RPM
-class TestDefaultRPMs(TestRPMs):
+class DefaultRPMs(TestRPMs):
     def setUp(self):
         TestRPMs.setUp(self)
         self.result = 'OK'
 
 # Verify rpminspect runs against a Koji build
-class TestDefaultKoji(TestKoji):
+class DefaultKoji(TestKoji):
     def setUp(self):
         TestKoji.setUp(self)
         self.result = 'OK'
 
 # Verify rpminspect runs against two SRPMs
-class TestDefaultCompareSRPM(TestCompareSRPM):
+class DefaultCompareSRPM(TestCompareSRPM):
     def setUp(self):
         TestCompareSRPM.setUp(self)
         self.result = 'OK'
 
 # Verify rpminspect runs against two RPMs
-class TestDefaultCompareRPMs(TestCompareRPMs):
+class DefaultCompareRPMs(TestCompareRPMs):
     def setUp(self):
         TestCompareRPMs.setUp(self)
         self.result = 'OK'
 
 # Verify rpminspect runs against two Koji builds
-class TestDefaultCompareKoji(TestCompareKoji):
+class DefaultCompareKoji(TestCompareKoji):
     def setUp(self):
         TestCompareKoji.setUp(self)
         self.result = 'OK'

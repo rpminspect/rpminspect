@@ -19,7 +19,7 @@
 from baseclass import TestSRPM, TestRPMs, TestKoji
 
 # Empty License tag fails on SRPM (BAD)
-class TestEmptyLicenseTagSRPM(TestSRPM):
+class EmptyLicenseTagSRPM(TestSRPM):
     def setUp(self):
         TestSRPM.setUp(self)
         self.inspection = 'license'
@@ -27,7 +27,7 @@ class TestEmptyLicenseTagSRPM(TestSRPM):
         self.result = 'BAD'
 
 # Empty License tag fails on RPMs (BAD)
-class TestEmptyLicenseTagRPMs(TestRPMs):
+class EmptyLicenseTagRPMs(TestRPMs):
     def setUp(self):
         TestRPMs.setUp(self)
         self.inspection = 'license'
@@ -35,7 +35,7 @@ class TestEmptyLicenseTagRPMs(TestRPMs):
         self.result = 'BAD'
 
 # Empty License tag fails on Koji build (BAD)
-class TestEmptyLicenseTagKojiBuild(TestKoji):
+class EmptyLicenseTagKojiBuild(TestKoji):
     def setUp(self):
         TestKoji.setUp(self)
         self.inspection = 'license'
@@ -43,7 +43,7 @@ class TestEmptyLicenseTagKojiBuild(TestKoji):
         self.result = 'BAD'
 
 # Forbidden License tag fails on SRPM (BAD)
-class TestForbiddenLicenseTagSRPM(TestSRPM):
+class ForbiddenLicenseTagSRPM(TestSRPM):
     def setUp(self):
         TestSRPM.setUp(self)
         self.rpm.addLicense("APSL-1.2")
@@ -52,7 +52,7 @@ class TestForbiddenLicenseTagSRPM(TestSRPM):
         self.result = 'BAD'
 
 # Forbidden License tag fails on RPMs (BAD)
-class TestForbiddenLicenseTagRPMs(TestRPMs):
+class ForbiddenLicenseTagRPMs(TestRPMs):
     def setUp(self):
         TestRPMs.setUp(self)
         self.rpm.addLicense("APSL-1.2")
@@ -61,7 +61,7 @@ class TestForbiddenLicenseTagRPMs(TestRPMs):
         self.result = 'BAD'
 
 # Forbidden License tag fails on Koji build (BAD)
-class TestForbiddenLicenseTagKojiBuild(TestKoji):
+class ForbiddenLicenseTagKojiBuild(TestKoji):
     def setUp(self):
         TestKoji.setUp(self)
         self.rpm.addLicense("APSL-1.2")
@@ -70,7 +70,7 @@ class TestForbiddenLicenseTagKojiBuild(TestKoji):
         self.result = 'BAD'
 
 # License tag with unprofessional language fails on SRPM (BAD)
-class TestBadWordLicenseTagSRPM(TestSRPM):
+class BadWordLicenseTagSRPM(TestSRPM):
     def setUp(self):
         TestSRPM.setUp(self)
         self.rpm.addLicense("GPLv2+ and reallybadword and MIT")
@@ -79,7 +79,7 @@ class TestBadWordLicenseTagSRPM(TestSRPM):
         self.result = 'BAD'
 
 # License tag with unprofessional language fails on RPMs (BAD)
-class TestBadWordLicenseTagRPMs(TestRPMs):
+class BadWordLicenseTagRPMs(TestRPMs):
     def setUp(self):
         TestRPMs.setUp(self)
         self.rpm.addLicense("GPLv2+ and reallybadword and MIT")
@@ -88,7 +88,7 @@ class TestBadWordLicenseTagRPMs(TestRPMs):
         self.result = 'BAD'
 
 # License tag with unprofessional language fails on Koji build (BAD)
-class TestBadWordLicenseTagKojiBuild(TestKoji):
+class BadWordLicenseTagKojiBuild(TestKoji):
     def setUp(self):
         TestKoji.setUp(self)
         self.rpm.addLicense("GPLv2+ and reallybadword and MIT")
@@ -97,7 +97,7 @@ class TestBadWordLicenseTagKojiBuild(TestKoji):
         self.result = 'BAD'
 
 # Valid License tag passes on SRPM (OK)
-class TestValidLicenseTagSRPM(TestSRPM):
+class ValidLicenseTagSRPM(TestSRPM):
     def setUp(self):
         TestSRPM.setUp(self)
         self.rpm.addLicense("GPLv3+")
@@ -106,7 +106,7 @@ class TestValidLicenseTagSRPM(TestSRPM):
         self.result = 'INFO'
 
 # Valid License tag passes on RPMs (OK)
-class TestValidLicenseTagRPMs(TestRPMs):
+class ValidLicenseTagRPMs(TestRPMs):
     def setUp(self):
         TestRPMs.setUp(self)
         self.rpm.addLicense("GPLv3+")
@@ -115,7 +115,7 @@ class TestValidLicenseTagRPMs(TestRPMs):
         self.result = 'INFO'
 
 # Valid License tag passes on Koji build (OK)
-class TestValidLicenseTagKojiBuild(TestKoji):
+class ValidLicenseTagKojiBuild(TestKoji):
     def setUp(self):
         TestKoji.setUp(self)
         self.rpm.addLicense("GPLv3+")
@@ -124,7 +124,7 @@ class TestValidLicenseTagKojiBuild(TestKoji):
         self.result = 'INFO'
 
 # Valid License tag with spaces passes on SRPM (OK)
-class TestValidLicenseTagWithSpacesSRPM(TestSRPM):
+class ValidLicenseTagWithSpacesSRPM(TestSRPM):
     def setUp(self):
         TestSRPM.setUp(self)
         self.rpm.addLicense("ASL 2.0")
@@ -133,7 +133,7 @@ class TestValidLicenseTagWithSpacesSRPM(TestSRPM):
         self.result = 'INFO'
 
 # Valid License tag with spaces passes on RPMs (OK)
-class TestValidLicenseTagWithSpacesRPMs(TestRPMs):
+class ValidLicenseTagWithSpacesRPMs(TestRPMs):
     def setUp(self):
         TestRPMs.setUp(self)
         self.rpm.addLicense("ASL 2.0")
@@ -142,7 +142,7 @@ class TestValidLicenseTagWithSpacesRPMs(TestRPMs):
         self.result = 'INFO'
 
 # Valid License tag with spaces passes on Koji build (OK)
-class TestValidLicenseTagWithSpacesKojiBuild(TestKoji):
+class ValidLicenseTagWithSpacesKojiBuild(TestKoji):
     def setUp(self):
         TestKoji.setUp(self)
         self.rpm.addLicense("ASL 2.0")
@@ -151,7 +151,7 @@ class TestValidLicenseTagWithSpacesKojiBuild(TestKoji):
         self.result = 'INFO'
 
 # Valid License tag with spaces passes on SRPM (OK)
-class TestValidLicenseTagWithBooleanSpacesSRPM(TestSRPM):
+class ValidLicenseTagWithBooleanSpacesSRPM(TestSRPM):
     def setUp(self):
         TestSRPM.setUp(self)
         self.rpm.addLicense("GPLv3+ and ASL 2.0")
@@ -160,7 +160,7 @@ class TestValidLicenseTagWithBooleanSpacesSRPM(TestSRPM):
         self.result = 'INFO'
 
 # Valid License tag with spaces passes on RPMs (OK)
-class TestValidLicenseTagWithBooleanSpacesRPMs(TestRPMs):
+class ValidLicenseTagWithBooleanSpacesRPMs(TestRPMs):
     def setUp(self):
         TestRPMs.setUp(self)
         self.rpm.addLicense("ASL 2.0 and GPLv3+")
@@ -169,7 +169,7 @@ class TestValidLicenseTagWithBooleanSpacesRPMs(TestRPMs):
         self.result = 'INFO'
 
 # Valid License tag with spaces passes on Koji build (OK)
-class TestValidLicenseTagWithBooleanSpacesKojiBuild(TestKoji):
+class ValidLicenseTagWithBooleanSpacesKojiBuild(TestKoji):
     def setUp(self):
         TestKoji.setUp(self)
         self.rpm.addLicense("GPLv3+ or ASL 2.0")
@@ -178,7 +178,7 @@ class TestValidLicenseTagWithBooleanSpacesKojiBuild(TestKoji):
         self.result = 'INFO'
 
 # Valid License tag with spaces and parens passes on SRPM (OK)
-class TestValidLicenseTagWithBooleanSpacesParensSRPM(TestSRPM):
+class ValidLicenseTagWithBooleanSpacesParensSRPM(TestSRPM):
     def setUp(self):
         TestSRPM.setUp(self)
         self.rpm.addLicense("Artistic 2.0 and (GPL+ or Artistic)")
@@ -187,7 +187,7 @@ class TestValidLicenseTagWithBooleanSpacesParensSRPM(TestSRPM):
         self.result = 'INFO'
 
 # Valid License tag with spaces and parens passes on RPMs (OK)
-class TestValidLicenseTagWithBooleanSpacesParensRPMs(TestRPMs):
+class ValidLicenseTagWithBooleanSpacesParensRPMs(TestRPMs):
     def setUp(self):
         TestRPMs.setUp(self)
         self.rpm.addLicense("Artistic 2.0 and (GPL+ or Artistic)")
@@ -196,7 +196,7 @@ class TestValidLicenseTagWithBooleanSpacesParensRPMs(TestRPMs):
         self.result = 'INFO'
 
 # Valid License tag with spaces and parens passes on Koji build (OK)
-class TestValidLicenseTagWithBooleanSpacesParensKojiBuild(TestKoji):
+class ValidLicenseTagWithBooleanSpacesParensKojiBuild(TestKoji):
     def setUp(self):
         TestKoji.setUp(self)
         self.rpm.addLicense("Artistic 2.0 and (GPL+ or Artistic)")

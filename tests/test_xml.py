@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2019  Red Hat, Inc.
+# Copyright (C) 2019-2020  Red Hat, Inc.
 # Author(s):  David Cantrell <dcantrell@redhat.com>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -34,7 +34,7 @@ invalid_xml = """<?xml version='1.0'?>
 """
 
 # XML file is well formed in RPM (OK)
-class TestXMLWellFormedRPM(TestRPMs):
+class XMLWellFormedRPM(TestRPMs):
     def setUp(self):
         TestRPMs.setUp(self)
         self.rpm.add_installed_file('/usr/share/data/valid.xml',
@@ -44,7 +44,7 @@ class TestXMLWellFormedRPM(TestRPMs):
         self.result = 'OK'
 
 # XML file is well formed in Koji build (OK)
-class TestXMLWellFormedKoji(TestKoji):
+class XMLWellFormedKoji(TestKoji):
     def setUp(self):
         TestKoji.setUp(self)
         self.rpm.add_installed_file('/usr/share/data/valid.xml',
@@ -54,7 +54,7 @@ class TestXMLWellFormedKoji(TestKoji):
         self.result = 'OK'
 
 # XML file is well formed in compare RPMs (OK)
-class TestXMLWellFormedCompareRPMs(TestCompareRPMs):
+class XMLWellFormedCompareRPMs(TestCompareRPMs):
     def setUp(self):
         TestCompareRPMs.setUp(self)
         self.before_rpm.add_installed_file('/usr/share/data/valid.xml',
@@ -66,7 +66,7 @@ class TestXMLWellFormedCompareRPMs(TestCompareRPMs):
         self.result = 'OK'
 
 # XML file is well formed in compare Koji builds (OK)
-class TestXMLWellFormedCompareKoji(TestCompareKoji):
+class XMLWellFormedCompareKoji(TestCompareKoji):
     def setUp(self):
         TestCompareKoji.setUp(self)
         self.before_rpm.add_installed_file('/usr/share/data/valid.xml',
@@ -78,7 +78,7 @@ class TestXMLWellFormedCompareKoji(TestCompareKoji):
         self.result = 'OK'
 
 # XML file is malformed in RPM (VERIFY)
-class TestXMLMalformedRPM(TestRPMs):
+class XMLMalformedRPM(TestRPMs):
     def setUp(self):
         TestRPMs.setUp(self)
         self.rpm.add_installed_file('/usr/share/data/invalid.xml',
@@ -89,7 +89,7 @@ class TestXMLMalformedRPM(TestRPMs):
         self.waiver_auth = 'Anyone'
 
 # XML file is malformed in Koji build (VERIFY)
-class TestXMLMalformedKoji(TestKoji):
+class XMLMalformedKoji(TestKoji):
     def setUp(self):
         TestKoji.setUp(self)
         self.rpm.add_installed_file('/usr/share/data/invalid.xml',
@@ -100,7 +100,7 @@ class TestXMLMalformedKoji(TestKoji):
         self.waiver_auth = 'Anyone'
 
 # XML file is malformed in compare RPMs (VERIFY)
-class TestXMLMalformedCompareRPMs(TestCompareRPMs):
+class XMLMalformedCompareRPMs(TestCompareRPMs):
     def setUp(self):
         TestCompareRPMs.setUp(self)
         self.before_rpm.add_installed_file('/usr/share/data/invalid.xml',
@@ -113,7 +113,7 @@ class TestXMLMalformedCompareRPMs(TestCompareRPMs):
         self.waiver_auth = 'Anyone'
 
 # XML file is malformed in compare Koji builds (VERIFY)
-class TestXMLMalformedCompareKoji(TestCompareKoji):
+class XMLMalformedCompareKoji(TestCompareKoji):
     def setUp(self):
         TestCompareKoji.setUp(self)
         self.before_rpm.add_installed_file('/usr/share/data/invalid.xml',
