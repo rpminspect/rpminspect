@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2019  Red Hat, Inc.
+# Copyright (C) 2019-2020  Red Hat, Inc.
 # Author(s):  David Cantrell <dcantrell@redhat.com>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -20,7 +20,7 @@ import unittest
 from baseclass import TestSRPM, TestRPMs, TestKoji
 
 # Verify missing %{?dist} in Release fails on SRPM (BAD)
-class TestMissingDistTagSRPM(TestSRPM):
+class MissingDistTagSRPM(TestSRPM):
     def setUp(self):
         TestSRPM.setUp(self)
         self.inspection = 'disttag'
@@ -29,7 +29,7 @@ class TestMissingDistTagSRPM(TestSRPM):
         self.waiver_auth = 'Not Waivable'
 
 # Verify missing %{?dist} in Release fails on Koji build (BAD)
-class TestMissingDistTagKojiBuild(TestKoji):
+class MissingDistTagKojiBuild(TestKoji):
     def setUp(self):
         TestKoji.setUp(self)
         self.inspection = 'disttag'
@@ -38,7 +38,7 @@ class TestMissingDistTagKojiBuild(TestKoji):
         self.waiver_auth = 'Not Waivable'
 
 # Verify running on not an SRPM fails
-class TestDistTagOnNonSRPM(TestRPMs):
+class DistTagOnNonSRPM(TestRPMs):
     def setUp(self):
         TestRPMs.setUp(self)
         self.rpm.release = '1%{?dist}'
@@ -48,7 +48,7 @@ class TestDistTagOnNonSRPM(TestRPMs):
         self.waiver_auth = 'Not Waivable'
 
 # Verify malformed %{?dist} tag in Release fails on SRPM (BAD)
-class TestMalformedDistTagSRPM(TestSRPM):
+class MalformedDistTagSRPM(TestSRPM):
     def setUp(self):
         TestSRPM.setUp(self)
         self.rpm.release = '1dist'
@@ -58,7 +58,7 @@ class TestMalformedDistTagSRPM(TestSRPM):
         self.waiver_auth = 'Not Waivable'
 
 # Verify malformed %{?dist} tag in Release fails on Koji build (BAD)
-class TestMalformedDistTagKojiBuild(TestKoji):
+class MalformedDistTagKojiBuild(TestKoji):
     def setUp(self):
         TestKoji.setUp(self)
         self.rpm.release = '1dist'
@@ -68,7 +68,7 @@ class TestMalformedDistTagKojiBuild(TestKoji):
         self.waiver_auth = 'Not Waivable'
 
 # Verify correct %{?dist} usage passes on SRPM (OK)
-class TestDistTagSRPM(TestSRPM):
+class DistTagSRPM(TestSRPM):
     def setUp(self):
         TestSRPM.setUp(self)
         self.rpm.release = '1%{?dist}'
@@ -76,7 +76,7 @@ class TestDistTagSRPM(TestSRPM):
         self.label = 'dist-tag'
 
 # Verify correct %{?dist} usage passes on Koji build (OK)
-class TestDistTagKojiBuild(TestKoji):
+class DistTagKojiBuild(TestKoji):
     def setUp(self):
         TestKoji.setUp(self)
         self.rpm.release = '1%{?dist}'

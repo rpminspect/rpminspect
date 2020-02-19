@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2019  Red Hat, Inc.
+# Copyright (C) 2019-2020  Red Hat, Inc.
 # Author(s):  David Cantrell <dcantrell@redhat.com>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -30,7 +30,7 @@ fortify_src = open(datadir + '/fortify.c').read()
 forbidden_ipv6_src = open(datadir + '/forbidden-ipv6.c').read()
 
 # Program built with noexecstack
-class TestWithoutExecStackRPM(TestRPMs):
+class WithoutExecStackRPM(TestRPMs):
     def setUp(self):
         TestRPMs.setUp(self)
         self.rpm.add_simple_compilation(compileFlags='-Wl,-z,noexecstack')
@@ -39,7 +39,7 @@ class TestWithoutExecStackRPM(TestRPMs):
         self.waiver_auth = 'Not Waivable'
         self.result = 'OK'
 
-class TestWithoutExecStackKoji(TestKoji):
+class WithoutExecStackKoji(TestKoji):
     def setUp(self):
         TestKoji.setUp(self)
         self.rpm.add_simple_compilation(compileFlags='-Wl,-z,noexecstack')
@@ -48,7 +48,7 @@ class TestWithoutExecStackKoji(TestKoji):
         self.waiver_auth = 'Not Waivable'
         self.result = 'OK'
 
-class TestWithoutExecStackCompareRPM(TestCompareRPMs):
+class WithoutExecStackCompareRPM(TestCompareRPMs):
     def setUp(self):
         TestCompareRPMs.setUp(self)
         self.before_rpm.add_simple_compilation(compileFlags='-Wl,-z,noexecstack')
@@ -58,7 +58,7 @@ class TestWithoutExecStackCompareRPM(TestCompareRPMs):
         self.waiver_auth = 'Not Waivable'
         self.result = 'OK'
 
-class TestWithoutExecStackCompareKoji(TestCompareKoji):
+class WithoutExecStackCompareKoji(TestCompareKoji):
     def setUp(self):
         TestCompareKoji.setUp(self)
         self.before_rpm.add_simple_compilation(compileFlags='-Wl,-z,noexecstack')
@@ -69,7 +69,7 @@ class TestWithoutExecStackCompareKoji(TestCompareKoji):
         self.result = 'OK'
 
 # Program built with execstack
-class TestWithExecStackRPM(TestRPMs):
+class WithExecStackRPM(TestRPMs):
     def setUp(self):
         TestRPMs.setUp(self)
         self.rpm.add_simple_compilation(compileFlags='-Wl,-z,execstack')
@@ -78,7 +78,7 @@ class TestWithExecStackRPM(TestRPMs):
         self.waiver_auth = 'Security'
         self.result = 'BAD'
 
-class TestWithExecStackKoji(TestKoji):
+class WithExecStackKoji(TestKoji):
     def setUp(self):
         TestKoji.setUp(self)
         self.rpm.add_simple_compilation(compileFlags='-Wl,-z,execstack')
@@ -87,7 +87,7 @@ class TestWithExecStackKoji(TestKoji):
         self.waiver_auth = 'Security'
         self.result = 'BAD'
 
-class TestWithExecStackCompareRPMs(TestCompareRPMs):
+class WithExecStackCompareRPMs(TestCompareRPMs):
     def setUp(self):
         TestCompareRPMs.setUp(self)
         self.before_rpm.add_simple_compilation(compileFlags='-Wl,-z,execstack')
@@ -97,7 +97,7 @@ class TestWithExecStackCompareRPMs(TestCompareRPMs):
         self.waiver_auth = 'Security'
         self.result = 'VERIFY'
 
-class TestWithExecStackCompare(TestCompareKoji):
+class WithExecStackCompare(TestCompareKoji):
     def setUp(self):
         TestCompareKoji.setUp(self)
         self.before_rpm.add_simple_compilation(compileFlags='-Wl,-z,execstack')
@@ -108,7 +108,7 @@ class TestWithExecStackCompare(TestCompareKoji):
         self.result = 'VERIFY'
 
 # Program lost full RELRO
-class TestLostFullRELROCompareRPMs(TestCompareRPMs):
+class LostFullRELROCompareRPMs(TestCompareRPMs):
     def setUp(self):
         TestCompareRPMs.setUp(self)
         self.before_rpm.add_simple_compilation(compileFlags='-Wl,-z,relro,-z,now')
@@ -118,7 +118,7 @@ class TestLostFullRELROCompareRPMs(TestCompareRPMs):
         self.waiver_auth = 'Security'
         self.result = 'BAD'
 
-class TestLostFullRELROCompareKoji(TestCompareKoji):
+class LostFullRELROCompareKoji(TestCompareKoji):
     def setUp(self):
         TestCompareKoji.setUp(self)
         self.before_rpm.add_simple_compilation(compileFlags='-Wl,-z,relro,-z,now')
@@ -129,7 +129,7 @@ class TestLostFullRELROCompareKoji(TestCompareKoji):
         self.result = 'BAD'
 
 # Program lost full RELRO but retained partial RELRO
-class TestFulltoPartialRELROCompareRPMs(TestCompareRPMs):
+class FulltoPartialRELROCompareRPMs(TestCompareRPMs):
     def setUp(self):
         TestCompareRPMs.setUp(self)
         self.before_rpm.add_simple_compilation(compileFlags='-Wl,-z,relro,-z,now')
@@ -139,7 +139,7 @@ class TestFulltoPartialRELROCompareRPMs(TestCompareRPMs):
         self.waiver_auth = 'Security'
         self.result = 'BAD'
 
-class TestFulltoPartialRELROCompareKoji(TestCompareKoji):
+class FulltoPartialRELROCompareKoji(TestCompareKoji):
     def setUp(self):
         TestCompareKoji.setUp(self)
         self.before_rpm.add_simple_compilation(compileFlags='-Wl,-z,relro,-z,now')
@@ -150,7 +150,7 @@ class TestFulltoPartialRELROCompareKoji(TestCompareKoji):
         self.result = 'BAD'
 
 # Program lost -D_FORTIFY_SOURCE
-class TestLostFortifySourceCompareRPMs(TestCompareRPMs):
+class LostFortifySourceCompareRPMs(TestCompareRPMs):
     def setUp(self):
         TestCompareRPMs.setUp(self)
 
@@ -164,7 +164,7 @@ class TestLostFortifySourceCompareRPMs(TestCompareRPMs):
         self.waiver_auth = 'Security'
         self.result = 'VERIFY'
 
-class TestLostFortifySourceCompareKoji(TestCompareKoji):
+class LostFortifySourceCompareKoji(TestCompareKoji):
     def setUp(self):
         TestCompareKoji.setUp(self)
 
@@ -179,7 +179,7 @@ class TestLostFortifySourceCompareKoji(TestCompareKoji):
         self.result = 'VERIFY'
 
 # Program uses forbidden IPv6 function
-class TestForbiddenIPv6FunctionRPM(TestRPMs):
+class ForbiddenIPv6FunctionRPM(TestRPMs):
     def setUp(self):
         TestRPMs.setUp(self)
         self.rpm.add_simple_compilation(sourceContent=forbidden_ipv6_src)
@@ -188,7 +188,7 @@ class TestForbiddenIPv6FunctionRPM(TestRPMs):
         self.waiver_auth = 'Anyone'
         self.result = 'VERIFY'
 
-class TestForbiddenIPv6FunctionKoji(TestKoji):
+class ForbiddenIPv6FunctionKoji(TestKoji):
     def setUp(self):
         TestKoji.setUp(self)
         self.rpm.add_simple_compilation(sourceContent=forbidden_ipv6_src)
@@ -197,7 +197,7 @@ class TestForbiddenIPv6FunctionKoji(TestKoji):
         self.waiver_auth = 'Anyone'
         self.result = 'VERIFY'
 
-class TestForbiddenIPv6FunctionCompareRPMs(TestCompareRPMs):
+class ForbiddenIPv6FunctionCompareRPMs(TestCompareRPMs):
     def setUp(self):
         TestCompareRPMs.setUp(self)
         self.before_rpm.add_simple_compilation(sourceContent=forbidden_ipv6_src)
@@ -207,7 +207,7 @@ class TestForbiddenIPv6FunctionCompareRPMs(TestCompareRPMs):
         self.waiver_auth = 'Anyone'
         self.result = 'VERIFY'
 
-class TestForbiddenIPv6FunctionCompareKoji(TestCompareKoji):
+class ForbiddenIPv6FunctionCompareKoji(TestCompareKoji):
     def setUp(self):
         TestCompareKoji.setUp(self)
         self.before_rpm.add_simple_compilation(sourceContent=forbidden_ipv6_src)
@@ -218,7 +218,7 @@ class TestForbiddenIPv6FunctionCompareKoji(TestCompareKoji):
         self.result = 'VERIFY'
 
 # Program lost -fPIC in after (BAD, WAIVABLE_BY_SECURITY)
-class TestLostPICCompareRPMs(TestCompareRPMs):
+class LostPICCompareRPMs(TestCompareRPMs):
     def setUp(self):
         TestCompareRPMs.setUp(self)
 
@@ -247,7 +247,7 @@ class TestLostPICCompareRPMs(TestCompareRPMs):
         self.waiver_auth = 'Security'
         self.result = 'BAD'
 
-class TestLostPICCompareKoji(TestCompareKoji):
+class LostPICCompareKoji(TestCompareKoji):
     def setUp(self):
         TestCompareKoji.setUp(self)
 
@@ -277,7 +277,7 @@ class TestLostPICCompareKoji(TestCompareKoji):
         self.result = 'BAD'
 
 # Program has or gained TEXTREL relocations (32-bit arches only)
-class TestHasTEXTRELRPMs(TestRPMs):
+class HasTEXTRELRPMs(TestRPMs):
     def setUp(self):
         TestRPMs.setUp(self)
 
@@ -297,7 +297,7 @@ class TestHasTEXTRELRPMs(TestRPMs):
         self.waiver_auth = 'Security'
         self.result = 'BAD'
 
-class TestHasTEXTRELCompareRPMs(TestCompareRPMs):
+class HasTEXTRELCompareRPMs(TestCompareRPMs):
     def setUp(self):
         TestCompareRPMs.setUp(self)
 
@@ -325,7 +325,7 @@ class TestHasTEXTRELCompareRPMs(TestCompareRPMs):
         self.waiver_auth = 'Security'
         self.result = 'BAD'
 
-class TestHasTEXTRELCompareKoji(TestCompareKoji):
+class HasTEXTRELCompareKoji(TestCompareKoji):
     def setUp(self):
         TestCompareKoji.setUp(self)
 

@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2019  Red Hat, Inc.
+# Copyright (C) 2019-2020  Red Hat, Inc.
 # Author(s):  David Cantrell <dcantrell@redhat.com>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -21,7 +21,7 @@ import unittest
 from baseclass import *
 
 # Regular SRPM has payload (OK)
-class TestHasPayloadSRPM(TestSRPM):
+class HasPayloadSRPM(TestSRPM):
     def setUp(self):
         TestSRPM.setUp(self)
         self.rpm.add_simple_payload_file()
@@ -30,7 +30,7 @@ class TestHasPayloadSRPM(TestSRPM):
         self.result = 'OK'
 
 # Regular RPMs have payload (OK)
-class TestHasPayloadRPMs(TestRPMs):
+class HasPayloadRPMs(TestRPMs):
     def setUp(self):
         TestRPMs.setUp(self)
         self.rpm.add_simple_payload_file()
@@ -39,7 +39,7 @@ class TestHasPayloadRPMs(TestRPMs):
         self.result = 'OK'
 
 # Regular Koji build has payload (OK)
-class TestHasPayloadKojiBuild(TestKoji):
+class HasPayloadKojiBuild(TestKoji):
     def setUp(self):
         TestKoji.setUp(self)
         self.rpm.add_simple_payload_file()
@@ -48,7 +48,7 @@ class TestHasPayloadKojiBuild(TestKoji):
         self.result = 'OK'
 
 # Regular package has empty payload (VERIFY)
-class TestPkgHasEmptyPayload(TestRPMs):
+class PkgHasEmptyPayload(TestRPMs):
     def setUp(self):
         TestRPMs.setUp(self)
         self.inspection = 'emptyrpm'
@@ -57,7 +57,7 @@ class TestPkgHasEmptyPayload(TestRPMs):
         self.waiver_auth = 'Anyone'
 
 # Packages in Koji build have empty payloads (VERIFY)
-class TestKojiBuildHaveEmptyPayloads(TestKoji):
+class KojiBuildHaveEmptyPayloads(TestKoji):
     def setUp(self):
         TestKoji.setUp(self)
         self.inspection = 'emptyrpm'
@@ -66,7 +66,7 @@ class TestKojiBuildHaveEmptyPayloads(TestKoji):
         self.waiver_auth = 'Anyone'
 
 # New package has empty payload across Koji builds (VERIFY)
-class TestNewPkgHasEmptyPayload(TestCompareKoji):
+class NewPkgHasEmptyPayload(TestCompareKoji):
     def setUp(self):
         TestCompareKoji.setUp(self)
         self.before_rpm.add_simple_payload_file()
@@ -77,7 +77,7 @@ class TestNewPkgHasEmptyPayload(TestCompareKoji):
         self.waiver_auth = 'Anyone'
 
 # Packages continue to be empty (INFO)
-class TestPkgStillHasEmptyPayload(TestCompareKoji):
+class PkgStillHasEmptyPayload(TestCompareKoji):
     def setUp(self):
         TestCompareKoji.setUp(self)
         self.inspection = 'emptyrpm'
@@ -85,7 +85,7 @@ class TestPkgStillHasEmptyPayload(TestCompareKoji):
         self.result = 'INFO'
 
 # Package lost payload across Koji builds (VERIFY)
-class TestPkgLostPayload(TestCompareKoji):
+class PkgLostPayload(TestCompareKoji):
     def setUp(self):
         TestCompareKoji.setUp(self)
         self.before_rpm.add_simple_payload_file()
@@ -95,7 +95,7 @@ class TestPkgLostPayload(TestCompareKoji):
         self.waiver_auth = 'Anyone'
 
 # Existing package is now missing across Koji builds (VERIFY)
-class TestExistingPkgMissing(TestCompareKoji):
+class ExistingPkgMissing(TestCompareKoji):
     def setUp(self):
         TestCompareKoji.setUp(self)
         self.before_rpm.add_simple_payload_file()

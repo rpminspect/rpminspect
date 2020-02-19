@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2019  Red Hat, Inc.
+# Copyright (C) 2019-2020  Red Hat, Inc.
 # Author(s):  David Cantrell <dcantrell@redhat.com>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -20,7 +20,7 @@ import unittest
 from baseclass import *
 
 # Verify valid Vendor passes on an SRPM (OK)
-class TestValidVendorSRPM(TestSRPM):
+class ValidVendorSRPM(TestSRPM):
     def setUp(self):
         TestSRPM.setUp(self)
         self.rpm.addVendor("Vendorco Ltd.")
@@ -29,7 +29,7 @@ class TestValidVendorSRPM(TestSRPM):
         self.result = 'OK'
 
 # Verify valid Vendor passes on binary RPMs (OK)
-class TestValidVendorRPMs(TestRPMs):
+class ValidVendorRPMs(TestRPMs):
     def setUp(self):
         TestRPMs.setUp(self)
         self.rpm.addVendor("Vendorco Ltd.")
@@ -38,7 +38,7 @@ class TestValidVendorRPMs(TestRPMs):
         self.result = 'OK'
 
 # Verify valid Vendor passes on Koji build (OK)
-class TestValidVendorKojiBuild(TestKoji):
+class ValidVendorKojiBuild(TestKoji):
     def setUp(self):
         TestKoji.setUp(self)
         self.rpm.addVendor("Vendorco Ltd.")
@@ -47,7 +47,7 @@ class TestValidVendorKojiBuild(TestKoji):
         self.result = 'OK'
 
 # Verify invalid Vendor fails on an SRPM (BAD)
-class TestInvalidVendorSRPM(TestSRPM):
+class InvalidVendorSRPM(TestSRPM):
     def setUp(self):
         TestSRPM.setUp(self)
         self.rpm.addVendor("Amalgamated Amalgamations LLC")
@@ -56,7 +56,7 @@ class TestInvalidVendorSRPM(TestSRPM):
         self.result = 'BAD'
 
 # Verify invalid Vendor fails on binary RPMs (BAD)
-class TestInvalidVendorRPMs(TestRPMs):
+class InvalidVendorRPMs(TestRPMs):
     def setUp(self):
         TestRPMs.setUp(self)
         self.rpm.addVendor("Amalgamated Amalgamations LLC")
@@ -65,7 +65,7 @@ class TestInvalidVendorRPMs(TestRPMs):
         self.result = 'BAD'
 
 # Verify invalid Vendor fails on Koji build (BAD)
-class TestInvalidVendorKojiBuild(TestKoji):
+class InvalidVendorKojiBuild(TestKoji):
     def setUp(self):
         TestKoji.setUp(self)
         self.rpm.addVendor("Amalgamated Amalgamations LLC")
@@ -74,7 +74,7 @@ class TestInvalidVendorKojiBuild(TestKoji):
         self.result = 'BAD'
 
 # Verify gaining Vendor reports verify on SRPM (VERIFY)
-class TestGainingVendorCompareSRPM(TestCompareSRPM):
+class GainingVendorCompareSRPM(TestCompareSRPM):
     def setUp(self):
         TestCompareSRPM.setUp(self)
         self.after_rpm.addVendor("Vendorco Ltd.")
@@ -84,7 +84,7 @@ class TestGainingVendorCompareSRPM(TestCompareSRPM):
         self.waiver_auth = 'Anyone'
 
 # Verify gaining Vendor reports verify on built RPMS (VERIFY)
-class TestGainingVendorCompareRPMs(TestCompareRPMs):
+class GainingVendorCompareRPMs(TestCompareRPMs):
     def setUp(self):
         TestCompareRPMs.setUp(self)
         self.after_rpm.addVendor("Vendorco Ltd.")
@@ -94,7 +94,7 @@ class TestGainingVendorCompareRPMs(TestCompareRPMs):
         self.waiver_auth = 'Anyone'
 
 # Verify gaining Vendor reports verify on Koji build (VERIFY)
-class TestGainingVendorCompareKojiBuild(TestCompareKoji):
+class GainingVendorCompareKojiBuild(TestCompareKoji):
     def setUp(self):
         TestCompareKoji.setUp(self)
         self.after_rpm.addVendor("Vendorco Ltd.")
@@ -104,7 +104,7 @@ class TestGainingVendorCompareKojiBuild(TestCompareKoji):
         self.waiver_auth = 'Anyone'
 
 # Verify losing Vendor reports verify on SRPM (VERIFY)
-class TestLosingVendorCompareSRPM(TestCompareSRPM):
+class LosingVendorCompareSRPM(TestCompareSRPM):
     def setUp(self):
         TestCompareSRPM.setUp(self)
         self.before_rpm.addVendor("Vendorco Ltd.")
@@ -115,7 +115,7 @@ class TestLosingVendorCompareSRPM(TestCompareSRPM):
         self.waiver_auth = 'Anyone'
 
 # Verify losing Vendor reports verify on built RPMs (VERIFY)
-class TestLosingVendorCompareRPMs(TestCompareRPMs):
+class LosingVendorCompareRPMs(TestCompareRPMs):
     def setUp(self):
         TestCompareRPMs.setUp(self)
         self.before_rpm.addVendor("Vendorco Ltd.")
@@ -126,7 +126,7 @@ class TestLosingVendorCompareRPMs(TestCompareRPMs):
         self.waiver_auth = 'Anyone'
 
 # Verify losing Vendor reports verify on Koji build (VERIFY)
-class TestLosingVendorCompareKojiBuild(TestCompareKoji):
+class LosingVendorCompareKojiBuild(TestCompareKoji):
     def setUp(self):
         TestCompareKoji.setUp(self)
         self.before_rpm.addVendor("Vendorco Ltd.")
@@ -136,7 +136,7 @@ class TestLosingVendorCompareKojiBuild(TestCompareKoji):
         self.result = 'OK'
 
 # Verify changing Vendor reports verify on SRPM (VERIFY)
-class TestChangingVendorCompareSRPM(TestCompareSRPM):
+class ChangingVendorCompareSRPM(TestCompareSRPM):
     def setUp(self):
         TestCompareSRPM.setUp(self)
         self.before_rpm.addVendor("Amalgamated Amalgamations LLC")
@@ -148,7 +148,7 @@ class TestChangingVendorCompareSRPM(TestCompareSRPM):
         self.waiver_auth = 'Anyone'
 
 # Verify changing Vendor reports verify on built RPMs (VERIFY)
-class TestChangingVendorCompareRPMs(TestCompareRPMs):
+class ChangingVendorCompareRPMs(TestCompareRPMs):
     def setUp(self):
         TestCompareRPMs.setUp(self)
         self.before_rpm.addVendor("Amalgamated Amalgamations LLC")
@@ -159,7 +159,7 @@ class TestChangingVendorCompareRPMs(TestCompareRPMs):
         self.waiver_auth = 'Anyone'
 
 # Verify changing Vendor reports verify on Koji build (VERIFY)
-class TestLosingVendorCompareKojiBuild(TestCompareKoji):
+class LosingVendorCompareKojiBuild(TestCompareKoji):
     def setUp(self):
         TestCompareKoji.setUp(self)
         self.before_rpm.addVendor("Amalgamated Amalgamations LLC")
@@ -170,7 +170,7 @@ class TestLosingVendorCompareKojiBuild(TestCompareKoji):
         self.waiver_auth = 'Anyone'
 
 # Verify invalid Buildhost subdomain fails on an SRPM (BAD)
-class TestInvalidBuildhostSubdomainSRPM(TestSRPM):
+class InvalidBuildhostSubdomainSRPM(TestSRPM):
     def setUp(self):
         TestSRPM.setUp(self)
         self.buildhost_subdomain = ".totallylegitbuilder.com"
@@ -180,7 +180,7 @@ class TestInvalidBuildhostSubdomainSRPM(TestSRPM):
         self.result = 'BAD'
 
 # Verify invalid Buildhost subdomain fails on binary RPMs (BAD)
-class TestInvalidBuildhostSubdomainRPMs(TestRPMs):
+class InvalidBuildhostSubdomainRPMs(TestRPMs):
     def setUp(self):
         TestRPMs.setUp(self)
         self.buildhost_subdomain = ".totallylegitbuilder.com"
@@ -190,7 +190,7 @@ class TestInvalidBuildhostSubdomainRPMs(TestRPMs):
         self.result = 'BAD'
 
 # Verify invalid Buildhost subdomain fails on Koji build (BAD)
-class TestInvalidBuildhostSubdomainKojiBuild(TestKoji):
+class InvalidBuildhostSubdomainKojiBuild(TestKoji):
     def setUp(self):
         TestKoji.setUp(self)
         self.buildhost_subdomain = ".totallylegitbuilder.com"
@@ -200,7 +200,7 @@ class TestInvalidBuildhostSubdomainKojiBuild(TestKoji):
         self.result = 'BAD'
 
 # Verify Summary without bad words passes on an SRPM (OK)
-class TestCleanSummarySRPM(TestSRPM):
+class CleanSummarySRPM(TestSRPM):
     def setUp(self):
         TestSRPM.setUp(self)
         self.rpm.add_summary("Lorem ipsum dolor sit amet")
@@ -209,7 +209,7 @@ class TestCleanSummarySRPM(TestSRPM):
         self.result = 'OK'
 
 # Verify Summary without bad words passes on binary RPMs (OK)
-class TestCleanSummaryRPMs(TestRPMs):
+class CleanSummaryRPMs(TestRPMs):
     def setUp(self):
         TestRPMs.setUp(self)
         self.rpm.add_summary("Lorem ipsum dolor sit amet")
@@ -218,7 +218,7 @@ class TestCleanSummaryRPMs(TestRPMs):
         self.result = 'OK'
 
 # Verify Summary without bad words passes on Koji build (OK)
-class TestCleanSummaryKojiBuild(TestKoji):
+class CleanSummaryKojiBuild(TestKoji):
     def setUp(self):
         TestKoji.setUp(self)
         self.rpm.add_summary("Lorem ipsum dolor sit amet")
@@ -227,7 +227,7 @@ class TestCleanSummaryKojiBuild(TestKoji):
         self.result = 'OK'
 
 # Verify Summary with bad words fails on an SRPM (BAD)
-class TestDirtySummarySRPM(TestSRPM):
+class DirtySummarySRPM(TestSRPM):
     def setUp(self):
         TestSRPM.setUp(self)
         self.rpm.add_summary("Lorem ipsum reallybadword dolor sit amet")
@@ -236,7 +236,7 @@ class TestDirtySummarySRPM(TestSRPM):
         self.result = 'BAD'
 
 # Verify Summary with bad words fails on binary RPMs (BAD)
-class TestDirtySummaryRPMs(TestRPMs):
+class DirtySummaryRPMs(TestRPMs):
     def setUp(self):
         TestRPMs.setUp(self)
         self.rpm.add_summary("Lorem ipsum reallybadword dolor sit amet")
@@ -245,7 +245,7 @@ class TestDirtySummaryRPMs(TestRPMs):
         self.result = 'BAD'
 
 # Verify Summary with bad words fails on Koji build (BAD)
-class TestDirtySummaryKojiBuild(TestKoji):
+class DirtySummaryKojiBuild(TestKoji):
     def setUp(self):
         TestKoji.setUp(self)
         self.rpm.add_summary("Lorem ipsum reallybadword dolor sit amet")
@@ -254,7 +254,7 @@ class TestDirtySummaryKojiBuild(TestKoji):
         self.result = 'BAD'
 
 # Verify changing Summary reports verify on SRPM (VERIFY)
-class TestChangingSummaryCompareSRPM(TestCompareSRPM):
+class ChangingSummaryCompareSRPM(TestCompareSRPM):
     def setUp(self):
         TestCompareSRPM.setUp(self)
         self.before_rpm.add_summary("Lorem ipsum dolor sit amet")
@@ -265,7 +265,7 @@ class TestChangingSummaryCompareSRPM(TestCompareSRPM):
         self.waiver_auth = 'Anyone'
 
 # Verify changing Summary reports verify on built RPMs (VERIFY)
-class TestChangingSummaryCompareRPMs(TestCompareRPMs):
+class ChangingSummaryCompareRPMs(TestCompareRPMs):
     def setUp(self):
         TestCompareRPMs.setUp(self)
         self.before_rpm.add_summary("Lorem ipsum dolor sit amet")
@@ -276,7 +276,7 @@ class TestChangingSummaryCompareRPMs(TestCompareRPMs):
         self.waiver_auth = 'Anyone'
 
 # Verify changing Summary reports verify on Koji build (VERIFY)
-class TestChangingSummaryCompareKojiBuild(TestCompareKoji):
+class ChangingSummaryCompareKojiBuild(TestCompareKoji):
     def setUp(self):
         TestCompareKoji.setUp(self)
         self.before_rpm.add_summary("Lorem ipsum dolor sit amet")
@@ -287,7 +287,7 @@ class TestChangingSummaryCompareKojiBuild(TestCompareKoji):
         self.waiver_auth = 'Anyone'
 
 # Verify Description without bad words passes on an SRPM (OK)
-class TestCleanDescriptionSRPM(TestSRPM):
+class CleanDescriptionSRPM(TestSRPM):
     def setUp(self):
         TestSRPM.setUp(self)
         self.rpm.add_description("Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.")
@@ -296,7 +296,7 @@ class TestCleanDescriptionSRPM(TestSRPM):
         self.result = 'OK'
 
 # Verify Description without bad words passes on binary RPMs (OK)
-class TestCleanDescriptionRPMs(TestRPMs):
+class CleanDescriptionRPMs(TestRPMs):
     def setUp(self):
         TestRPMs.setUp(self)
         self.rpm.add_description("Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.")
@@ -305,7 +305,7 @@ class TestCleanDescriptionRPMs(TestRPMs):
         self.result = 'OK'
 
 # Verify Description without bad words passes on Koji build (OK)
-class TestCleanDescriptionKojiBuild(TestKoji):
+class CleanDescriptionKojiBuild(TestKoji):
     def setUp(self):
         TestKoji.setUp(self)
         self.rpm.add_description("Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.")
@@ -314,7 +314,7 @@ class TestCleanDescriptionKojiBuild(TestKoji):
         self.result = 'OK'
 
 # Verify Description with bad words fails on an SRPM (BAD)
-class TestDirtyDescriptionSRPM(TestSRPM):
+class DirtyDescriptionSRPM(TestSRPM):
     def setUp(self):
         TestSRPM.setUp(self)
         self.rpm.add_description("Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod reallybadword tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.")
@@ -323,7 +323,7 @@ class TestDirtyDescriptionSRPM(TestSRPM):
         self.result = 'BAD'
 
 # Verify Description with bad words fails on binary RPMs (BAD)
-class TestDirtyDescriptionRPMs(TestRPMs):
+class DirtyDescriptionRPMs(TestRPMs):
     def setUp(self):
         TestRPMs.setUp(self)
         self.rpm.add_description("Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod reallybadword tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.")
@@ -332,7 +332,7 @@ class TestDirtyDescriptionRPMs(TestRPMs):
         self.result = 'BAD'
 
 # Verify Description with bad words fails on Koji build (BAD)
-class TestDirtyDescriptionKojiBuild(TestKoji):
+class DirtyDescriptionKojiBuild(TestKoji):
     def setUp(self):
         TestKoji.setUp(self)
         self.rpm.add_description("Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod reallybadword tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.")
@@ -341,7 +341,7 @@ class TestDirtyDescriptionKojiBuild(TestKoji):
         self.result = 'BAD'
 
 # Verify changing Description reports verify on SRPM (VERIFY)
-class TestChangingDescriptionCompareSRPM(TestCompareSRPM):
+class ChangingDescriptionCompareSRPM(TestCompareSRPM):
     def setUp(self):
         TestCompareSRPM.setUp(self)
         self.before_rpm.add_description("Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod reallybadword tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.")
@@ -352,7 +352,7 @@ class TestChangingDescriptionCompareSRPM(TestCompareSRPM):
         self.waiver_auth = 'Anyone'
 
 # Verify changing Description reports verify on built RPMs (VERIFY)
-class TestChangingDescriptionCompareRPMs(TestCompareRPMs):
+class ChangingDescriptionCompareRPMs(TestCompareRPMs):
     def setUp(self):
         TestCompareRPMs.setUp(self)
         self.before_rpm.add_description("Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod reallybadword tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.")
@@ -363,7 +363,7 @@ class TestChangingDescriptionCompareRPMs(TestCompareRPMs):
         self.waiver_auth = 'Anyone'
 
 # Verify changing Description reports verify on Koji build (VERIFY)
-class TestChangingDescriptionCompareKojiBuild(TestCompareKoji):
+class ChangingDescriptionCompareKojiBuild(TestCompareKoji):
     def setUp(self):
         TestCompareKoji.setUp(self)
         self.before_rpm.add_description("Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod reallybadword tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.")

@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2019  Red Hat, Inc.
+# Copyright (C) 2019-2020  Red Hat, Inc.
 # Author(s):  David Cantrell <dcantrell@redhat.com>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -21,7 +21,7 @@ import unittest
 from baseclass import RequiresRpminspect
 
 # Verify --help gives help output
-class TestRpminspectHelp(RequiresRpminspect):
+class RpminspectHelp(RequiresRpminspect):
     def runTest(self):
         RequiresRpminspect.configFile(self)
         p = subprocess.Popen([self.rpminspect, '--help'], stdout=subprocess.PIPE, stderr=subprocess.DEVNULL)
@@ -36,7 +36,7 @@ class TestRpminspectHelp(RequiresRpminspect):
         self.assertEqual(len(t2), 1)
 
 # Verify rpminspect doesn't segfault on release-less args
-class TestRpminspectSegv(RequiresRpminspect):
+class RpminspectSegv(RequiresRpminspect):
     def runTest(self):
         RequiresRpminspect.configFile(self)
         p = subprocess.Popen([self.rpminspect, '42'], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)

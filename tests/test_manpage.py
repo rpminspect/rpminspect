@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2019  Red Hat, Inc.
+# Copyright (C) 2019-2020  Red Hat, Inc.
 # Author(s):  David Cantrell <dcantrell@redhat.com>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -19,7 +19,7 @@
 from baseclass import *
 
 # Man page in the correct section subdirectory in RPM (OK)
-class TestManPageCorrectSectionRPM(TestRPMs):
+class ManPageCorrectSectionRPM(TestRPMs):
     def setUp(self):
         TestRPMs.setUp(self)
         self.rpm.add_manpage()
@@ -28,7 +28,7 @@ class TestManPageCorrectSectionRPM(TestRPMs):
         self.result = 'OK'
 
 # Man page in the correct section subdirectory in Koji build (OK)
-class TestManPageCorrectSectionKoji(TestKoji):
+class ManPageCorrectSectionKoji(TestKoji):
     def setUp(self):
         TestKoji.setUp(self)
         self.rpm.add_manpage()
@@ -37,7 +37,7 @@ class TestManPageCorrectSectionKoji(TestKoji):
         self.result = 'OK'
 
 # Man page in the correct section subdirectory in compare RPMs (OK)
-class TestManPageCorrectSectionCompareRPMs(TestCompareRPMs):
+class ManPageCorrectSectionCompareRPMs(TestCompareRPMs):
     def setUp(self):
         TestCompareRPMs.setUp(self)
         self.before_rpm.add_manpage()
@@ -47,7 +47,7 @@ class TestManPageCorrectSectionCompareRPMs(TestCompareRPMs):
         self.result = 'OK'
 
 # Man page in the correct section subdirectory in compare Koji (OK)
-class TestManPageCorrectSectionCompareKoji(TestCompareKoji):
+class ManPageCorrectSectionCompareKoji(TestCompareKoji):
     def setUp(self):
         TestCompareKoji.setUp(self)
         self.before_rpm.add_manpage()
@@ -57,7 +57,7 @@ class TestManPageCorrectSectionCompareKoji(TestCompareKoji):
         self.result = 'OK'
 
 # Man page not gzipped in RPM (VERIFY)
-class TestManPageNotGzippedRPM(TestRPMs):
+class ManPageNotGzippedRPM(TestRPMs):
     # Don't use add_manpage() here so we can disable automatic compression
     # of man pages and construct the correct %files section.
     def setUp(self):
@@ -82,7 +82,7 @@ class TestManPageNotGzippedRPM(TestRPMs):
         self.waiver_auth = 'Anyone'
 
 # Man page not gzipped in Koji build (VERIFY)
-class TestManPageNotGzippedKoji(TestKoji):
+class ManPageNotGzippedKoji(TestKoji):
     # Don't use add_manpage() here so we can disable automatic compression
     # of man pages and construct the correct %files section.
     def setUp(self):
@@ -107,7 +107,7 @@ class TestManPageNotGzippedKoji(TestKoji):
         self.waiver_auth = 'Anyone'
 
 # Man page not gzipped in compare RPMs (VERIFY)
-class TestManPageNotGzippedCompareRPMs(TestCompareRPMs):
+class ManPageNotGzippedCompareRPMs(TestCompareRPMs):
     # Don't use add_manpage() here so we can disable automatic compression
     # of man pages and construct the correct %files section.
     def setUp(self):
@@ -139,7 +139,7 @@ class TestManPageNotGzippedCompareRPMs(TestCompareRPMs):
         self.waiver_auth = 'Anyone'
 
 # Man page not gzipped in compare Koji (VERIFY)
-class TestManPageNotGzippedCompareKoji(TestCompareKoji):
+class ManPageNotGzippedCompareKoji(TestCompareKoji):
     # Don't use add_manpage() here so we can disable automatic compression
     # of man pages and construct the correct %files section.
     def setUp(self):
@@ -171,7 +171,7 @@ class TestManPageNotGzippedCompareKoji(TestCompareKoji):
         self.waiver_auth = 'Anyone'
 
 # Man page in wrong section subdirectory in RPM (VERIFY)
-class TestManPageWrongSectionRPM(TestRPMs):
+class ManPageWrongSectionRPM(TestRPMs):
     def setUp(self):
         TestRPMs.setUp(self)
         self.rpm.add_manpage(sourceFileName='foo.8', installPath='usr/share/man/man1/foo.8')
@@ -181,7 +181,7 @@ class TestManPageWrongSectionRPM(TestRPMs):
         self.waiver_auth = 'Anyone'
 
 # Man page in wrong section subdirectory in Koji build (VERIFY)
-class TestManPageWrongSectionKoji(TestKoji):
+class ManPageWrongSectionKoji(TestKoji):
     def setUp(self):
         TestKoji.setUp(self)
         self.rpm.add_manpage(sourceFileName='foo.8', installPath='usr/share/man/man1/foo.8')
@@ -191,7 +191,7 @@ class TestManPageWrongSectionKoji(TestKoji):
         self.waiver_auth = 'Anyone'
 
 # Man page in wrong section subdirectory in compare RPMs (VERIFY)
-class TestManPageWrongSectionCompareRPMs(TestCompareRPMs):
+class ManPageWrongSectionCompareRPMs(TestCompareRPMs):
     def setUp(self):
         TestCompareRPMs.setUp(self)
         self.before_rpm.add_manpage(sourceFileName='foo.8', installPath='usr/share/man/man1/foo.8')
@@ -202,7 +202,7 @@ class TestManPageWrongSectionCompareRPMs(TestCompareRPMs):
         self.waiver_auth = 'Anyone'
 
 # Man page in wrong section subdirectory in compare Koji (VERIFY)
-class TestManPageWrongSectionCompareRPMs(TestCompareKoji):
+class ManPageWrongSectionCompareRPMs(TestCompareKoji):
     def setUp(self):
         TestCompareKoji.setUp(self)
         self.before_rpm.add_manpage(sourceFileName='foo.8', installPath='usr/share/man/man1/foo.8')
@@ -213,7 +213,7 @@ class TestManPageWrongSectionCompareRPMs(TestCompareKoji):
         self.waiver_auth = 'Anyone'
 
 # Invalid man page syntax in RPM (VERIFY)
-class TestInvalidManPageRPM(TestRPMs):
+class InvalidManPageRPM(TestRPMs):
     def setUp(self):
         TestRPMs.setUp(self)
 
@@ -230,7 +230,7 @@ class TestInvalidManPageRPM(TestRPMs):
         self.waiver_auth = 'Anyone'
 
 # Invalid man page syntax in Koji build (VERIFY)
-class TestInvalidManPageKoji(TestKoji):
+class InvalidManPageKoji(TestKoji):
     def setUp(self):
         TestKoji.setUp(self)
 
@@ -247,7 +247,7 @@ class TestInvalidManPageKoji(TestKoji):
         self.waiver_auth = 'Anyone'
 
 # Invalid man page syntax in compare RPMs (VERIFY)
-class TestInvalidManPageCompareRPMs(TestCompareRPMs):
+class InvalidManPageCompareRPMs(TestCompareRPMs):
     def setUp(self):
         TestCompareRPMs.setUp(self)
 
@@ -266,7 +266,7 @@ class TestInvalidManPageCompareRPMs(TestCompareRPMs):
         self.waiver_auth = 'Anyone'
 
 # Invalid man page syntax in compare Koji (VERIFY)
-class TestInvalidManPageCompareKoji(TestCompareKoji):
+class InvalidManPageCompareKoji(TestCompareKoji):
     def setUp(self):
         TestCompareKoji.setUp(self)
 

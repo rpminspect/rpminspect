@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2019  Red Hat, Inc.
+# Copyright (C) 2019-2020  Red Hat, Inc.
 # Author(s):  David Cantrell <dcantrell@redhat.com>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -75,7 +75,7 @@ MimeType=application/x-extension-fcstd;
 '''
 
 # Valid desktop file passes in RPM (OK)
-class TestValidDesktopFileRPM(TestRPMs):
+class ValidDesktopFileRPM(TestRPMs):
     def setUp(self):
         TestRPMs.setUp(self)
 
@@ -93,7 +93,7 @@ class TestValidDesktopFileRPM(TestRPMs):
         self.result = 'OK'
 
 # Valid desktop file passes in Koji build (OK)
-class TestValidDesktopFileKoji(TestKoji):
+class ValidDesktopFileKoji(TestKoji):
     def setUp(self):
         TestKoji.setUp(self)
 
@@ -111,7 +111,7 @@ class TestValidDesktopFileKoji(TestKoji):
         self.result = 'OK'
 
 # Valid desktop file passes in RPM compare (OK)
-class TestValidDesktopFileCompareRPM(TestCompareRPMs):
+class ValidDesktopFileCompareRPM(TestCompareRPMs):
     def setUp(self):
         TestCompareRPMs.setUp(self)
 
@@ -132,7 +132,7 @@ class TestValidDesktopFileCompareRPM(TestCompareRPMs):
         self.result = 'OK'
 
 # Valid desktop file passes in Koji build compare (OK)
-class TestValidDesktopFileCompareKoji(TestCompareKoji):
+class ValidDesktopFileCompareKoji(TestCompareKoji):
     def setUp(self):
         TestCompareKoji.setUp(self)
 
@@ -153,7 +153,7 @@ class TestValidDesktopFileCompareKoji(TestCompareKoji):
         self.result = 'OK'
 
 # Desktop file with missing icon in RPM (VERIFY)
-class TestDesktopFileMissingIconRPM(TestRPMs):
+class DesktopFileMissingIconRPM(TestRPMs):
     def setUp(self):
         TestRPMs.setUp(self)
 
@@ -169,7 +169,7 @@ class TestDesktopFileMissingIconRPM(TestRPMs):
         self.waiver_auth = 'Anyone'
 
 # Desktop file with missing icon in RPM compare (VERIFY)
-class TestDesktopFileMissingIconCompareRPM(TestCompareRPMs):
+class DesktopFileMissingIconCompareRPM(TestCompareRPMs):
     def setUp(self):
         TestCompareRPMs.setUp(self)
 
@@ -187,7 +187,7 @@ class TestDesktopFileMissingIconCompareRPM(TestCompareRPMs):
         self.waiver_auth = 'Anyone'
 
 # Desktop file with missing icon in Koji build (VERIFY)
-class TestDesktopFileMissingIconKoji(TestKoji):
+class DesktopFileMissingIconKoji(TestKoji):
     def setUp(self):
         TestKoji.setUp(self)
 
@@ -203,7 +203,7 @@ class TestDesktopFileMissingIconKoji(TestKoji):
         self.waiver_auth = 'Anyone'
 
 # Desktop file with missing icon in Koji build compare (VERIFY)
-class TestDesktopFileMissingIconCompareKoji(TestCompareKoji):
+class DesktopFileMissingIconCompareKoji(TestCompareKoji):
     def setUp(self):
         TestCompareKoji.setUp(self)
 
@@ -221,7 +221,7 @@ class TestDesktopFileMissingIconCompareKoji(TestCompareKoji):
         self.waiver_auth = 'Anyone'
 
 # Invalid desktop file fails desktop-file-validate in RPM (BAD)
-class TestDesktopFileValidateFailsRPM(TestRPMs):
+class DesktopFileValidateFailsRPM(TestRPMs):
     def setUp(self):
         TestRPMs.setUp(self)
 
@@ -240,7 +240,7 @@ class TestDesktopFileValidateFailsRPM(TestRPMs):
         self.waiver_auth = 'Anyone'
 
 # Invalid desktop file fails desktop-file-validate in Koji build (BAD)
-class TestDesktopFileValidateFailsKoji(TestKoji):
+class DesktopFileValidateFailsKoji(TestKoji):
     def setUp(self):
         TestKoji.setUp(self)
 
@@ -259,7 +259,7 @@ class TestDesktopFileValidateFailsKoji(TestKoji):
         self.waiver_auth = 'Anyone'
 
 # Invalid desktop file fails desktop-file-validate in RPM compare (BAD)
-class TestDesktopFileValidateFailsCompareRPM(TestCompareRPMs):
+class DesktopFileValidateFailsCompareRPM(TestCompareRPMs):
     def setUp(self):
         TestCompareRPMs.setUp(self)
 
@@ -281,7 +281,7 @@ class TestDesktopFileValidateFailsCompareRPM(TestCompareRPMs):
         self.waiver_auth = 'Anyone'
 
 # Invalid desktop file fails desktop-file-validate in Koji build compare (BAD)
-class TestDesktopFileValidateFailsCompareKoji(TestCompareKoji):
+class DesktopFileValidateFailsCompareKoji(TestCompareKoji):
     def setUp(self):
         TestCompareKoji.setUp(self)
 
@@ -303,7 +303,7 @@ class TestDesktopFileValidateFailsCompareKoji(TestCompareKoji):
         self.waiver_auth = 'Anyone'
 
 # Desktop file with Exec with arguments in RPM (OK)
-class TestDesktopFileExecArgsRPM(TestRPMs):
+class DesktopFileExecArgsRPM(TestRPMs):
     def setUp(self):
         TestRPMs.setUp(self)
 
@@ -321,7 +321,7 @@ class TestDesktopFileExecArgsRPM(TestRPMs):
         self.result = 'OK'
 
 # Desktop file with Exec with arguments in Koji build (OK)
-class TestDesktopFileExecArgsKoji(TestKoji):
+class DesktopFileExecArgsKoji(TestKoji):
     def setUp(self):
         TestKoji.setUp(self)
 
@@ -339,7 +339,7 @@ class TestDesktopFileExecArgsKoji(TestKoji):
         self.result = 'OK'
 
 # Desktop file with Exec with arguments in RPM compare (OK)
-class TestDesktopFileExecArgsCompareRPM(TestCompareRPMs):
+class DesktopFileExecArgsCompareRPM(TestCompareRPMs):
     def setUp(self):
         TestCompareRPMs.setUp(self)
 
@@ -360,7 +360,7 @@ class TestDesktopFileExecArgsCompareRPM(TestCompareRPMs):
         self.result = 'OK'
 
 # Desktop file with Exec with arguments in Koji build compare (OK)
-class TestDesktopFileExecArgsCompareKoji(TestCompareKoji):
+class DesktopFileExecArgsCompareKoji(TestCompareKoji):
     def setUp(self):
         TestCompareKoji.setUp(self)
 
@@ -381,7 +381,7 @@ class TestDesktopFileExecArgsCompareKoji(TestCompareKoji):
         self.result = 'OK'
 
 # Desktop file without world readable Icon in RPM (VERIFY)
-class TestDesktopFileNotWorldReadableIconRPM(TestRPMs):
+class DesktopFileNotWorldReadableIconRPM(TestRPMs):
     def setUp(self):
         TestRPMs.setUp(self)
 
@@ -400,7 +400,7 @@ class TestDesktopFileNotWorldReadableIconRPM(TestRPMs):
         self.waiver_auth = 'Anyone'
 
 # Desktop file without world readable Icon in Koji build (VERIFY)
-class TestDesktopFileNotWorldReadableIconKoji(TestKoji):
+class DesktopFileNotWorldReadableIconKoji(TestKoji):
     def setUp(self):
         TestKoji.setUp(self)
 
@@ -419,7 +419,7 @@ class TestDesktopFileNotWorldReadableIconKoji(TestKoji):
         self.waiver_auth = 'Anyone'
 
 # Desktop file without world readable Icon in RPM compare (VERIFY)
-class TestDesktopFileNotWorldReadableIconCompareRPM(TestCompareRPMs):
+class DesktopFileNotWorldReadableIconCompareRPM(TestCompareRPMs):
     def setUp(self):
         TestCompareRPMs.setUp(self)
 
@@ -441,7 +441,7 @@ class TestDesktopFileNotWorldReadableIconCompareRPM(TestCompareRPMs):
         self.waiver_auth = 'Anyone'
 
 # Desktop file without world readable Icon in Koji build compare (VERIFY)
-class TestDesktopFileNotWorldReadableIconCompareKoji(TestCompareKoji):
+class DesktopFileNotWorldReadableIconCompareKoji(TestCompareKoji):
     def setUp(self):
         TestCompareKoji.setUp(self)
 
@@ -463,7 +463,7 @@ class TestDesktopFileNotWorldReadableIconCompareKoji(TestCompareKoji):
         self.waiver_auth = 'Anyone'
 
 # Desktop file with invalid Exec file in RPM (VERIFY)
-class TestDesktopFileInvalidExecRPM(TestRPMs):
+class DesktopFileInvalidExecRPM(TestRPMs):
     def setUp(self):
         TestRPMs.setUp(self)
 
@@ -479,7 +479,7 @@ class TestDesktopFileInvalidExecRPM(TestRPMs):
         self.waiver_auth = 'Anyone'
 
 # Desktop file with invalid Exec file in Koji build (VERIFY)
-class TestDesktopFileInvalidExecRPMs(TestKoji):
+class DesktopFileInvalidExecRPMs(TestKoji):
     def setUp(self):
         TestKoji.setUp(self)
 
@@ -495,7 +495,7 @@ class TestDesktopFileInvalidExecRPMs(TestKoji):
         self.waiver_auth = 'Anyone'
 
 # Desktop file with invalid Exec file in RPM compare (VERIFY)
-class TestDesktopFileInvalidExecCompareRPM(TestCompareRPMs):
+class DesktopFileInvalidExecCompareRPM(TestCompareRPMs):
     def setUp(self):
         TestCompareRPMs.setUp(self)
 
@@ -513,7 +513,7 @@ class TestDesktopFileInvalidExecCompareRPM(TestCompareRPMs):
         self.waiver_auth = 'Anyone'
 
 # Desktop file with invalid Exec file in Koji compare (VERIFY)
-class TestDesktopFileInvalidExecCompareKoji(TestCompareKoji):
+class DesktopFileInvalidExecCompareKoji(TestCompareKoji):
     def setUp(self):
         TestCompareKoji.setUp(self)
 
@@ -531,7 +531,7 @@ class TestDesktopFileInvalidExecCompareKoji(TestCompareKoji):
         self.waiver_auth = 'Anyone'
 
 # Desktop file without world executable Exec file in RPM (VERIFY)
-class TestDesktopFileWithoutWorldExecutableExecRPM(TestRPMs):
+class DesktopFileWithoutWorldExecutableExecRPM(TestRPMs):
     def setUp(self):
         TestRPMs.setUp(self)
 
@@ -551,7 +551,7 @@ class TestDesktopFileWithoutWorldExecutableExecRPM(TestRPMs):
         self.waiver_auth = 'Anyone'
 
 # Desktop file without world executable Exec file in Koji build (VERIFY)
-class TestDesktopFileWithoutWorldExecutableExecKoji(TestKoji):
+class DesktopFileWithoutWorldExecutableExecKoji(TestKoji):
     def setUp(self):
         TestKoji.setUp(self)
 
@@ -571,7 +571,7 @@ class TestDesktopFileWithoutWorldExecutableExecKoji(TestKoji):
         self.waiver_auth = 'Anyone'
 
 # Desktop file without world executable Exec file in RPM compare (VERIFY)
-class TestDesktopFileWithoutWorldExecutableExecCompareRPM(TestCompareRPMs):
+class DesktopFileWithoutWorldExecutableExecCompareRPM(TestCompareRPMs):
     def setUp(self):
         TestCompareRPMs.setUp(self)
 
@@ -595,7 +595,7 @@ class TestDesktopFileWithoutWorldExecutableExecCompareRPM(TestCompareRPMs):
         self.waiver_auth = 'Anyone'
 
 # Desktop file without world executable Exec file in Koji build compare (VERIFY)
-class TestDesktopFileWithoutWorldExecutableExecCompareKoji(TestCompareKoji):
+class DesktopFileWithoutWorldExecutableExecCompareKoji(TestCompareKoji):
     def setUp(self):
         TestCompareKoji.setUp(self)
 
