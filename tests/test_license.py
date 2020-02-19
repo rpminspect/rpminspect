@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2019  Red Hat, Inc.
+# Copyright (C) 2019-2020  Red Hat, Inc.
 # Author(s):  David Cantrell <dcantrell@redhat.com>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -173,6 +173,33 @@ class TestValidLicenseTagWithBooleanSpacesKojiBuild(TestKoji):
     def setUp(self):
         TestKoji.setUp(self)
         self.rpm.addLicense("GPLv3+ or ASL 2.0")
+        self.inspection = 'license'
+        self.label = 'license'
+        self.result = 'INFO'
+
+# Valid License tag with spaces and parens passes on SRPM (OK)
+class TestValidLicenseTagWithBooleanSpacesParensSRPM(TestSRPM):
+    def setUp(self):
+        TestSRPM.setUp(self)
+        self.rpm.addLicense("Artistic 2.0 and (GPL+ or Artistic)")
+        self.inspection = 'license'
+        self.label = 'license'
+        self.result = 'INFO'
+
+# Valid License tag with spaces and parens passes on RPMs (OK)
+class TestValidLicenseTagWithBooleanSpacesParensRPMs(TestRPMs):
+    def setUp(self):
+        TestRPMs.setUp(self)
+        self.rpm.addLicense("Artistic 2.0 and (GPL+ or Artistic)")
+        self.inspection = 'license'
+        self.label = 'license'
+        self.result = 'INFO'
+
+# Valid License tag with spaces and parens passes on Koji build (OK)
+class TestValidLicenseTagWithBooleanSpacesParensKojiBuild(TestKoji):
+    def setUp(self):
+        TestKoji.setUp(self)
+        self.rpm.addLicense("Artistic 2.0 and (GPL+ or Artistic)")
         self.inspection = 'license'
         self.label = 'license'
         self.result = 'INFO'

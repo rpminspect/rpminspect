@@ -88,5 +88,25 @@
     "spdx_abbrev": "CPOL-1.02",
     "spdx_name": "Code Project Open License 1.02",
     "url": "http://www.codeproject.com/info/cpol10.aspx"
+  },
+  "Artistic 2.0": {
+    "approved": "yes",
+    "fedora_abbrev": "Artistic 2.0",
+    "fedora_name": "Artistic 2.0",
+    "id": "47",
+    "license_text": "",
+    "spdx_abbrev": "Artistic-2.0",
+    "spdx_name": "Artistic License 2.0",
+    "url": "http://www.perlfoundation.org/artistic_license_2_0"
+  },
+  "Perl License": {
+    "approved": "yes",
+    "fedora_abbrev": "GPL+ or Artistic",
+    "fedora_name": "Perl License",
+    "id": "416",
+    "license_text": "",
+    "spdx_abbrev": "",
+    "spdx_name": "",
+    "url": "http://dev.perl.org/licenses/"
   }
 }
