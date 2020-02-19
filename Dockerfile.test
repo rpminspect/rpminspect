@@ -6,6 +6,7 @@ RUN dnf -y install 'dnf-command(builddep)'
 # Fake enough of the template processing to get dnf to read rpminspect.spec.in as a spec file
 COPY rpminspect.spec.in /rpminspect.spec
 RUN sed -i -e 's|%%VERSION%%|1.0|g' -e 's|%%RPMDATE%%|$(date +"%a %b %d %Y")|g' /rpminspect.spec
+RUN ./utils/mkrpmchangelog.sh > /changelog
 RUN dnf -y builddep --spec rpminspect.spec
 
 # Add additional test dependencies
