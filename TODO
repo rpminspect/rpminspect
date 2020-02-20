@@ -71,8 +71,8 @@ Test categories that have been migrated:
 *TEST_UPSTREAM (the BZ 'Rebase' keyword check against the Errata Tool
                 bug list was not migrated, see below)
 *TEST_PERMS (this is permissions and capabilities)
-*TEST_MODPARM (this is modparam.c and moddep.c)
- TEST_MODPCIID
+*TEST_MODPARM (this is part of kmod now)
+*TEST_MODPCIID (this is part of kmod now)
 
 
 Test categories excluded (see MISSING):
