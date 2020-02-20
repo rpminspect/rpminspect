@@ -4,7 +4,7 @@
 # git commits for the project.  Requires consistent usage of
 # tagging for releases.
 #
-# Copyright (C) 2019 David Cantrell <david.l.cantrell@gmail.com>
+# Copyright (C) 2019-2020 David Cantrell <david.l.cantrell@gmail.com>
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -20,7 +20,7 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 #
 
-PATH=/usr/bin
+PATH=/bin:/usr/bin
 CWD="$(pwd)"
 
 # Start the changelog block
