@@ -1,4 +1,13 @@
 changelog
+*.ko
+*.ko.cmd
+*.mod
+*.mod.*
+*.mod*.cmd
+modules.order
+Module.symvers
+*.o
+*.o.cmd
 rpminspect.spec
 *.src.rpm
 *.tar.*
