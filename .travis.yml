@@ -11,7 +11,7 @@ env:
   DOCKER_RUN="docker run -v $PWD:$PWD --workdir $PWD rpminspect/test-env"
 
 before_install:
-  - ./utils/mkchangelog.sh > changelog
+  - sh utils/mkchangelog.sh > changelog
   - docker build -t rpminspect/test-env -f Dockerfile.test .
 
 # The pip command here needs to be what's available in the Travis-CI
