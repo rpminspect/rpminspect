@@ -31,6 +31,9 @@ MODULE_LICENSE("GPL");
 MODULE_VERSION("0.1");
 MODULE_INFO(derp, "derp");
 
+/* For the aliases check, leave this here to match alias wildcards */
+MODULE_ALIAS("pci:v00001425d00000020sv*sd*bc*sc*i*");
+
 static int derp_count = 1;
 static char *derp_text = "derp";
 
@@ -78,3 +81,15 @@ static void __exit derp_exit(void)
 
 module_init(derp_init);
 module_exit(derp_exit);
+
+#ifdef _USE_MODULE_DEPENDS
+MODULE_SOFTDEP("pre: video");
+#endif
+
+#ifdef _USE_MODULE_ALIASES
+/* Just some text */
+MODULE_ALIAS("lorem:ipsum");
+
+/* PCI ID wildcard stuff */
+MODULE_ALIAS("pci:v00001425d00000020sv*sd00000001bc*sc*i*");
+#endif
