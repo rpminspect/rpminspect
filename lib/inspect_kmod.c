@@ -245,6 +245,7 @@ static bool kmod_driver(struct rpminspect *ri, rpmfile_entry_t *file)
     free_module_aliases(beforealiases);
     free_module_aliases(afteraliases);
 
+    DEBUG_PRINT("result_parm=%d, result_deps=%d, result_aliases=%d\n", result_parm, result_deps, result_aliases);
     return result_parm && result_deps && result_aliases;
 }
 

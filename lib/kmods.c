@@ -57,7 +57,7 @@ static void convert_module_parameters(string_list_t *list, const struct kmod_lis
 
     key = kmod_module_info_get_key(modinfo);
 
-    if (strcmp(key, "parm") != 0) {
+    if (strcmp(key, "parmtype")) {
         return;
     }
 
@@ -67,6 +67,8 @@ static void convert_module_parameters(string_list_t *list, const struct kmod_lis
     /* The value is of the form <name>:<description>. Drop the description */
     value = kmod_module_info_get_value(modinfo);
     tmp = strchr(value, ':');
+
+    DEBUG_PRINT("found '%s' parameter with value '%s'\n", key, value);
 
     if (tmp == NULL) {
         entry->data = strdup(value);
@@ -78,7 +80,7 @@ static void convert_module_parameters(string_list_t *list, const struct kmod_lis
     TAILQ_INSERT_TAIL(list, entry, items);
 }
 
-void convert_module_dependencies(string_list_t *list, const struct kmod_list *modinfo)
+static void convert_module_dependencies(string_list_t *list, const struct kmod_list *modinfo)
 {
     const char *key;
     const char *value;
@@ -89,7 +91,7 @@ void convert_module_dependencies(string_list_t *list, const struct kmod_list *mo
 
     key = kmod_module_info_get_key(modinfo);
 
-    if (strcmp(key, "depends") != 0) {
+    if (strcmp(key, "depends") && strcmp(key, "softdep")) {
         return;
     }
 
@@ -98,6 +100,8 @@ void convert_module_dependencies(string_list_t *list, const struct kmod_list *mo
     if ((value == NULL) || (*value == '\0')) {
         return;
     }
+
+    DEBUG_PRINT("found '%s' dependency with value '%s'\n", key, value);
 
     /* The value is a comma-separated list of dependencies. Break it up into individual entries. */
     value_copy = strdup(value);
@@ -145,7 +149,9 @@ bool compare_module_parameters(const struct kmod_list *before, const struct kmod
     assert(lost);
 
     /* Get the parameter list for each module */
+    DEBUG_PRINT("before module\n");
     before_parm_list = modinfo_to_list(before, convert_module_parameters);
+    DEBUG_PRINT("after module\n");
     after_parm_list = modinfo_to_list(after, convert_module_parameters);
 
     /* diff the parameter lists */
@@ -156,13 +162,16 @@ bool compare_module_parameters(const struct kmod_list *before, const struct kmod
      * Otherwise, make a copy of difference so we can clean everything up
      */
     if (difference == NULL || TAILQ_EMPTY(difference)) {
+        DEBUG_PRINT("no kernel module param differences\n");
         result = true;
     } else {
+        DEBUG_PRINT("there are module param differences\n");
         result = false;
         *lost = list_copy(difference);
     }
 
     if (added != NULL && !TAILQ_EMPTY(added)) {
+        DEBUG_PRINT("there are added module params\n");
         *gain = list_copy(added);
     }
 
@@ -182,8 +191,7 @@ bool compare_module_parameters(const struct kmod_list *before, const struct kmod
  * "after_deps" parameters will be populated with the dependencies
  * found for the given modules.
  */
-bool compare_module_dependencies(const struct kmod_list *before, const struct kmod_list *after,
-        string_list_t **before_deps, string_list_t **after_deps)
+bool compare_module_dependencies(const struct kmod_list *before, const struct kmod_list *after, string_list_t **before_deps, string_list_t **after_deps)
 {
     string_list_t *before_depends_list;
     string_list_t *after_depends_list;
@@ -194,13 +202,17 @@ bool compare_module_dependencies(const struct kmod_list *before, const struct km
     assert(before_deps);
     assert(after_deps);
 
+    DEBUG_PRINT("before module\n");
     before_depends_list = modinfo_to_list(before, convert_module_dependencies);
+    DEBUG_PRINT("after module\n");
     after_depends_list = modinfo_to_list(after, convert_module_dependencies);
 
     difference = list_symmetric_difference(before_depends_list, after_depends_list);
 
     /* If the list is empty, everything is fine, free everything. */
     if (TAILQ_EMPTY(difference)) {
+        DEBUG_PRINT("no kernel module deps differences\n");
+
         list_free(difference, NULL);
         list_free(before_depends_list, free);
         list_free(after_depends_list, free);
@@ -209,6 +221,7 @@ bool compare_module_dependencies(const struct kmod_list *before, const struct km
     }
 
     /* Otherwise, just free the difference, and return the before and after dependencies */
+    DEBUG_PRINT("there are kernel module deps differences\n");
     list_free(difference, NULL);
 
     *before_deps = before_depends_list;
