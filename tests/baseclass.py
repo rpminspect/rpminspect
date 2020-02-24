@@ -31,7 +31,7 @@ BEFORE_VER = "0.1"
 BEFORE_REL = "1"
 
 AFTER_NAME = BEFORE_NAME
-AFTER_VER = "0.2"
+AFTER_VER = "0.1"
 AFTER_REL = "2"
 
 # Set this to True to keep rpminspect results (useful to debug the test
