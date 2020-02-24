@@ -34,6 +34,7 @@ BuildRequires:  libcap-devel
 #BuildRequires: glibc-devel.i686
 #BuildRequires: CUnit
 #BuildRequires: CUnit-devel
+#BuildRequires: kernel-devel
 
 %description
 Build deviation and compliance tool.  This program runs a number of tests
