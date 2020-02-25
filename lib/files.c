@@ -61,7 +61,7 @@ void free_files(rpmfile_t *files)
 /* Extract the RPM, with path "pkg" and extracted header "hdr", to output_dir.
  * Either output_dir or the directory immediately above it must exist.
  */
-rpmfile_t * extract_rpm(const char *pkg, Header hdr)
+rpmfile_t *extract_rpm(const char *pkg, Header hdr)
 {
     rpmtd td = NULL;
     rpm_count_t td_size;
