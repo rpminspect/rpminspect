@@ -226,6 +226,7 @@ void free_licensedb(void) {
  */
 bool is_valid_license(const char *licensedb, const char *tag) {
     int tok_seen = 0;
+    int paren_tok_seen = 0;
     int valid = 0;
     int paren_valid = 0;
     int balance = 0;
@@ -302,9 +303,6 @@ bool is_valid_license(const char *licensedb, const char *tag) {
         /* keep collecting the license string until we see a boolean */
         if (!strcasecmp(token, "and") || !strcasecmp(token, "or")) {
             collect = false;
-
-            /* Don't count boolean words in license abbreviations */
-            tok_seen--;
         }
 
         /* Ignore leading and trailing parens */
@@ -317,12 +315,11 @@ bool is_valid_license(const char *licensedb, const char *tag) {
             token_append(&paren_lic, token);
         }
 
-        DEBUG_PRINT("paren_lic=|%s|, token=|%s|\n", paren_lic, token);
+        DEBUG_PRINT("lic=|%s|, paren_lic=|%s|, paren=%d, token=|%s|\n", lic, paren_lic, paren, token);
 
         /* Abbreviated licenses may contain spaces, so rebuild it */
         if (collect) {
             token_append(&lic, token);
-            tok_seen++;
         }
 
         /* If inside parens, gather the boolean tokens too */
@@ -337,18 +334,23 @@ bool is_valid_license(const char *licensedb, const char *tag) {
         /* iterate over the license database to match this license tag */
         if (lic) {
             good_token = check_license_abbrev(lic);
+            tok_seen++;
+
+            if (paren) {
+                paren_tok_seen++;
+            }
+
+            DEBUG_PRINT("    lic=|%s|, tok_seen=%d, paren_tok_seen=%d\n", lic, tok_seen, paren_tok_seen);
 
             if (good_token) {
-                DEBUG_PRINT("APPROVED lic=|%s|, paren_valid=%d, tok_seen=%d, valid=%d\n", lic, paren_valid, tok_seen, valid);
                 valid++;
-            } else if (!good_token && paren) {
-                tok_seen--;
+                DEBUG_PRINT("APPROVED lic=|%s|, paren_valid=%d, tok_seen=%d, valid=%d\n", lic, paren_valid, tok_seen, valid);
             }
         }
 
-        if (paren_lic && check_license_abbrev(paren_lic)) {
+        if (!good_token && paren_lic && check_license_abbrev(paren_lic)) {
             DEBUG_PRINT("APPROVED paren_lic=|%s|, paren_valid=%d, tok_seen=%d, valid=%d\n", paren_lic, paren_valid, tok_seen, valid);
-            tok_seen++;
+            tok_seen = tok_seen - paren_tok_seen;
             paren_valid++;
         }
 
@@ -358,6 +360,7 @@ bool is_valid_license(const char *licensedb, const char *tag) {
         if (!paren) {
             free(paren_lic);
             paren_lic = NULL;
+            paren_tok_seen = 0;
         }
 
         collect = true;
@@ -366,18 +369,23 @@ bool is_valid_license(const char *licensedb, const char *tag) {
     /* check the last license abbreviation */
     if (lic) {
         good_token = check_license_abbrev(lic);
+        tok_seen++;
+
+        if (paren) {
+            paren_tok_seen++;
+        }
+
+        DEBUG_PRINT("    lic=|%s|, tok_seen=%d, paren_tok_seen=%d\n", lic, tok_seen, paren_tok_seen);
 
         if (good_token) {
-            DEBUG_PRINT("APPROVED lic=|%s|, paren_valid=%d, tok_seen=%d, valid=%d\n", lic, paren_valid, tok_seen, valid);
             valid++;
-        } else if (!good_token && paren) {
-            tok_seen--;
+            DEBUG_PRINT("APPROVED lic=|%s|, paren_valid=%d, tok_seen=%d, valid=%d\n", lic, paren_valid, tok_seen, valid);
         }
     }
 
-    if (paren_lic && check_license_abbrev(paren_lic)) {
+    if (!good_token && paren_lic && check_license_abbrev(paren_lic)) {
         DEBUG_PRINT("APPROVED paren_lic=|%s|, paren_valid=%d, tok_seen=%d, valid=%d\n", paren_lic, paren_valid, tok_seen, valid);
-        tok_seen++;
+        tok_seen = tok_seen - paren_tok_seen;
         paren_valid++;
     }
 

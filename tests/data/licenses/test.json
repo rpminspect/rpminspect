@@ -108,5 +108,35 @@
     "spdx_abbrev": "",
     "spdx_name": "",
     "url": "http://dev.perl.org/licenses/"
+  },
+  "MIT License": {
+    "approved": "yes",
+    "fedora_abbrev": "",
+    "fedora_name": "",
+    "id": "328",
+    "license_text": "",
+    "spdx_abbrev": "MIT",
+    "spdx_name": "MIT License",
+    "url": "http://www.opensource.org/licenses/MIT"
+  },
+  "BSD 3-Clause \"New\" or \"Revised\" License": {
+    "approved": "yes",
+    "fedora_abbrev": "BSD",
+    "fedora_name": "BSD License (no advertising)",
+    "id": "72",
+    "license_text": "",
+    "spdx_abbrev": "BSD-3-Clause",
+    "spdx_name": "BSD 3-Clause \"New\" or \"Revised\" License",
+    "url": "http://www.opensource.org/licenses/BSD-3-Clause"
+  },
+  "The Apache License, Version 2.0": {
+    "approved": "yes",
+    "fedora_abbrev": "ASL 2.0",
+    "fedora_name": "Apache Software License 2.0",
+    "id": "578",
+    "license_text": "",
+    "spdx_abbrev": "Apache-2.0",
+    "spdx_name": "Apache License 2.0",
+    "url": "http://www.apache.org/licenses/LICENSE-2.0"
   }
 }

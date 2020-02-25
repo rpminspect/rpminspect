@@ -203,3 +203,32 @@ class ValidLicenseTagWithBooleanSpacesParensKojiBuild(TestKoji):
         self.inspection = 'license'
         self.label = 'license'
         self.result = 'INFO'
+
+
+
+# Valid License tag with spaces and parens passes on SRPM (OK)
+class AnotherValidLicenseTagWithBooleanSpacesParensSRPM(TestSRPM):
+    def setUp(self):
+        TestSRPM.setUp(self)
+        self.rpm.addLicense("MIT and (BSD or ASL 2.0)")
+        self.inspection = 'license'
+        self.label = 'license'
+        self.result = 'INFO'
+
+# Valid License tag with spaces and parens passes on RPMs (OK)
+class AnotherValidLicenseTagWithBooleanSpacesParensRPMs(TestRPMs):
+    def setUp(self):
+        TestRPMs.setUp(self)
+        self.rpm.addLicense("MIT and (BSD or ASL 2.0)")
+        self.inspection = 'license'
+        self.label = 'license'
+        self.result = 'INFO'
+
+# Valid License tag with spaces and parens passes on Koji build (OK)
+class AnotherValidLicenseTagWithBooleanSpacesParensKojiBuild(TestKoji):
+    def setUp(self):
+        TestKoji.setUp(self)
+        self.rpm.addLicense("MIT and (BSD or ASL 2.0)")
+        self.inspection = 'license'
+        self.label = 'license'
+        self.result = 'INFO'
