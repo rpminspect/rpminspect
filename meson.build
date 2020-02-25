@@ -98,6 +98,7 @@ librpminspect_sources = [
     'lib/inspect.c',
     'lib/inspect_addedfiles.c',
     'lib/inspect_annocheck.c',
+    'lib/inspect_arch.c',
     'lib/inspect_capabilities.c',
     'lib/inspect_changedfiles.c',
     'lib/inspect_desktop.c',

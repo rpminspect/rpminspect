@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2019  Red Hat, Inc.
+ * Copyright (C) 2019-2020  Red Hat, Inc.
  * Author(s):  David Cantrell <dcantrell@redhat.com>
  *
  * This program is free software: you can redistribute it and/or modify
@@ -49,6 +49,7 @@
 #define HEADER_PERMISSIONS   "permissions"
 #define HEADER_CAPABILITIES  "capabilities"
 #define HEADER_KMOD          "kernel-modules"
+#define HEADER_ARCH          "architectures"
 
 /*
  * Inspection remedies
@@ -139,5 +140,9 @@
 #define REMEDY_KMOD_PARM "Kernel module parameters were removed between builds.  This may present usability problems for users if module parameters were removed in a maintenance update."
 #define REMEDY_KMOD_DEPS "Kernel module dependencies changed between builds.  This may present usability problems for users if module dependencies changed in a maintenance update."
 #define REMEDY_KMOD_ALIAS "Kernel module device aliases changed between builds.  This may present usability problems for users if module device aliases changed in a maintenance update."
+
+/* arch */
+#define REMEDY_ARCH_LOST "An architecture present in the before build is now missing in the after build.  This may be deliberate, but check to make sure you do not have any unexpected ExclusiveArch lines in the spec file."
+#define REMEDY_ARCH_GAIN "A new architecture has appeared in the after build.  This may indicate progress in the world of computing."
 
 #endif
