@@ -142,6 +142,7 @@ bool compare_module_dependencies(const struct kmod_list *, const struct kmod_lis
 kernel_alias_data_t *gather_module_aliases(const char *module_name, const struct kmod_list *modinfo_list);
 void free_module_aliases(kernel_alias_data_t *);
 bool compare_module_aliases(kernel_alias_data_t *, kernel_alias_data_t *, module_alias_callback, void *);
+string_list_t *get_kmod_values(const char *, const char *);
 
 /* mkdirp.c */
 int mkdirp(char *, mode_t);
@@ -219,9 +220,6 @@ caps_filelist_entry_t *get_caps_whitelist_entry(struct rpminspect *, const char 
 
 /* flags.c */
 bool process_inspection_flag(const char *, const bool, uint64_t *);
-
-/* kmods.c */
-string_list_t *get_kmod_values(const char *, const char *);
 
 /* debug.c */
 void set_debug_mode(bool);
