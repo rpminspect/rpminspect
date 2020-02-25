@@ -170,6 +170,12 @@ struct inspect inspections[] = {
       &inspect_kmod,
       "Report kernel module parameter, dependency, PCI ID, or symbol differences between builds.  Added and removed parameters are reported and if the package version is unchanged, these messages are reported as failures.  The same is true module dependencies, PCI IDs, and symbols" },
 
+    { INSPECT_ARCH,
+      "arch",
+      false,
+      &inspect_arch,
+      "Report RPM architectures that appear and disappear between the before and after builds." },
+
     /*
      * { INSPECT_TYPE (add to inspect.h),
      *   "short name",
