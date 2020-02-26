@@ -179,10 +179,27 @@ you can do this:
     meson setup build
     ninja -C build
 
+You can get verbose build output with "ninja -C build -v"
+
 For more information on meson and ninja, see these sites:
 
     https://mesonbuild.com/
     https://ninja-build.org/
+
+
+Testing
+-------
+
+Follow the steps for 'Building' above and then:
+
+    meson test -C build
+
+You can get verbose build output with:
+
+    meson test -C build -v
+
+The verbose mode is useful when tests fail because you can see the
+debugging information dumps and other output.
 
 
 Releasing
