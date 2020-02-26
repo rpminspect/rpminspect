@@ -137,6 +137,9 @@ bool inspect_kmod(struct rpminspect *);
 /* inspect_arch.c */
 bool inspect_arch(struct rpminspect *);
 
+/* inspect_subpackages.c */
+bool inspect_subpackages(struct rpminspect *);
+
 /*
  * Inspections are referenced by flag.  These flags are set in bitfields
  * to indicate which ones we want to run.  When adding new ones, please
@@ -169,5 +172,6 @@ bool inspect_arch(struct rpminspect *);
 #define INSPECT_CAPABILITIES                (((uint64_t) 1) << 22)
 #define INSPECT_KMOD                        (((uint64_t) 1) << 23)
 #define INSPECT_ARCH                        (((uint64_t) 1) << 24)
+#define INSPECT_SUBPACKAGES                 (((uint64_t) 1) << 25)
 
 #endif
