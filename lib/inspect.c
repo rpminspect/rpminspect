@@ -176,6 +176,12 @@ struct inspect inspections[] = {
       &inspect_arch,
       "Report RPM architectures that appear and disappear between the before and after builds." },
 
+    { INSPECT_SUBPACKAGES,
+      "subpackages",
+      false,
+      &inspect_subpackages,
+      "Report RPM subpackages that appear and disappear between the before and after builds." },
+
     /*
      * { INSPECT_TYPE (add to inspect.h),
      *   "short name",

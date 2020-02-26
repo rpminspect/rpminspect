@@ -50,6 +50,7 @@
 #define HEADER_CAPABILITIES  "capabilities"
 #define HEADER_KMOD          "kernel-modules"
 #define HEADER_ARCH          "architectures"
+#define HEADER_SUBPACKAGES   "subpackages"
 
 /*
  * Inspection remedies
@@ -144,5 +145,9 @@
 /* arch */
 #define REMEDY_ARCH_LOST "An architecture present in the before build is now missing in the after build.  This may be deliberate, but check to make sure you do not have any unexpected ExclusiveArch lines in the spec file."
 #define REMEDY_ARCH_GAIN "A new architecture has appeared in the after build.  This may indicate progress in the world of computing."
+
+/* subpackages */
+#define REMEDY_SUBPACKAGES_LOST "A subpackage present in the before build is now missing in the after build.  This may be deliberate, but check to make sure you have correct syntax defining the subpackage in the spec file"
+#define REMEDY_SUBPACKAGES_GAIN "A new subpackage has appeared in the after build.  This may indicate progress in the world of computing."
 
 #endif

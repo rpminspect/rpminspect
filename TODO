@@ -20,7 +20,6 @@ Mandatory test categories to migrate (top is highest priority):
  TEST_CONFIG
 !TEST_SIZE (need to support size inc/dec thresholds for reporting, per pkg)
  TEST_CHANGELOG (split in to arch, subpackages, and changelog)
-     (also subpackages appearing and disappearing)
  TEST_MULTILIB
 
 
@@ -107,6 +106,8 @@ inspections lack integration tests:
     filesize
     permissions
     capabilities
+    arch
+    subpackages
 
 
 +=======+

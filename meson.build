@@ -118,6 +118,7 @@ librpminspect_sources = [
     'lib/inspect_removedfiles.c',
     'lib/inspect_shellsyntax.c',
     'lib/inspect_specname.c',
+    'lib/inspect_subpackages.c',
     'lib/inspect_upstream.c',
     'lib/inspect_xml.c',
     'lib/koji.c',
