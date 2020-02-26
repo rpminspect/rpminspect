@@ -54,9 +54,9 @@ def build_module(rpminspect, build_ext=None, extra_cflags=None):
     os.chdir(moddir)
 
     if extra_cflags is None:
-        cmd = "make"
+        cmd = "make -s"
     else:
-        cmd = "make EXTRA_CFLAGS=" + extra_cflags
+        cmd = "make -s EXTRA_CFLAGS=" + extra_cflags
 
     os.system(cmd)
     os.chdir(cwd)
@@ -78,7 +78,6 @@ def get_derp_kmod_depends(rpminspect):
 
 def get_derp_kmod_aliases(rpminspect):
     return build_module(rpminspect, build_ext='-aliases', extra_cflags='-D_USE_MODULE_ALIASES')
-
 
 ############################
 # kernel module parameters #

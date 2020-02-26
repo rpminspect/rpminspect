@@ -88,7 +88,7 @@ MODULE_SOFTDEP("pre: video");
 
 #ifdef _USE_MODULE_ALIASES
 /* Just some text */
-MODULE_ALIAS("lorem:ipsum");
+MODULE_ALIAS("pci:lorem*ipsum");
 
 /* PCI ID wildcard stuff */
 MODULE_ALIAS("pci:v00001425d00000020sv*sd00000001bc*sc*i*");
