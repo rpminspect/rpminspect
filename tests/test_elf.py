@@ -17,8 +17,6 @@
 #
 
 import os
-import shutil
-import tempfile
 from baseclass import *
 
 datadir = os.environ['RPMINSPECT_TEST_DATA_PATH']

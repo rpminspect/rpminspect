@@ -16,8 +16,6 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 #
 
-import subprocess
-import unittest
 from baseclass import *
 
 # Regular SRPM has payload (OK)

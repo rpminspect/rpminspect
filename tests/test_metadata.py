@@ -16,7 +16,6 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 #
 
-import unittest
 from baseclass import *
 
 # Verify valid Vendor passes on an SRPM (OK)
