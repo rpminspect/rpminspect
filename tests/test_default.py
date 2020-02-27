@@ -16,41 +16,63 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 #
 
-import unittest
-from baseclass import *
+from baseclass import TestKoji
+from baseclass import TestRPMs
+from baseclass import TestSRPM
+from baseclass import TestCompareKoji
+from baseclass import TestCompareRPMs
+from baseclass import TestCompareSRPM
 
-# Verify rpminspect runs against an SRPM
+
 class DefaultSRPM(TestSRPM):
+    """
+    Verify rpminspect runs against an SRPM
+    """
     def setUp(self):
         TestSRPM.setUp(self)
         self.result = 'OK'
 
-# Verify rpminspect runs against an RPM
+
 class DefaultRPMs(TestRPMs):
+    """
+    Verify rpminspect runs against an RPM
+    """
     def setUp(self):
         TestRPMs.setUp(self)
         self.result = 'OK'
 
-# Verify rpminspect runs against a Koji build
+
 class DefaultKoji(TestKoji):
+    """
+    Verify rpminspect runs against a Koji build
+    """
     def setUp(self):
         TestKoji.setUp(self)
         self.result = 'OK'
 
-# Verify rpminspect runs against two SRPMs
+
 class DefaultCompareSRPM(TestCompareSRPM):
+    """
+    Verify rpminspect runs against two SRPMs
+    """
     def setUp(self):
         TestCompareSRPM.setUp(self)
         self.result = 'OK'
 
-# Verify rpminspect runs against two RPMs
+
 class DefaultCompareRPMs(TestCompareRPMs):
+    """
+    Verify rpminspect runs against two RPMs
+    """
     def setUp(self):
         TestCompareRPMs.setUp(self)
         self.result = 'OK'
 
-# Verify rpminspect runs against two Koji builds
+
 class DefaultCompareKoji(TestCompareKoji):
+    """
+    Verify rpminspect runs against two Koji builds
+    """
     def setUp(self):
         TestCompareKoji.setUp(self)
         self.result = 'OK'
