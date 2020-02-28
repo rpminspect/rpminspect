@@ -11,4 +11,4 @@ RUN dnf -y builddep --spec rpminspect.spec
 
 # Add additional test dependencies
 RUN dnf -y install CUnit CUnit-devel valgrind gcovr python3-pip rpm-build desktop-file-utils glibc.i686 glibc-devel.i686 kernel-devel
-RUN pip3 install cpp-coveralls rpmfluff
+RUN pip-3 install cpp-coveralls rpmfluff
