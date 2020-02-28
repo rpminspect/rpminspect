@@ -19,8 +19,7 @@ Mandatory test categories to migrate (top is highest priority):
  TEST_PATHNAMES
  TEST_CONFIG
 !TEST_SIZE (need to support size inc/dec thresholds for reporting, per pkg)
- TEST_CHANGELOG (split in to arch, subpackages, and changelog)
- TEST_MULTILIB
+ TEST_CHANGELOG
 
 
 Unranked tests categories to migrate (might also decide to skip them):
@@ -32,7 +31,6 @@ Unranked tests categories to migrate (might also decide to skip them):
  TEST_POLITICS
  TEST_REQUIRES
  TEST_RPATH
- TEST_RPMCHANGE
  TEST_SCRIPT
  TEST_SPECFILE
 *   dist tag check from rpmpatches.c (this is 'disttag' in rpminspect)
@@ -73,6 +71,7 @@ Test categories that have been migrated:
 *TEST_PERMS (this is permissions and capabilities)
 *TEST_MODPARM (this is part of kmod now)
 *TEST_MODPCIID (this is part of kmod now)
+*TEST_RPMCHANGE (this is now arch and subpackages)
 
 
 Test categories excluded (see MISSING):
@@ -81,6 +80,7 @@ Test categories excluded (see MISSING):
  TEST_RPMLINT
  TEST_UPSTREAM (only the rebase keyword check)
  TEST_ELFLINT
+ TEST_MULTILIB
 
 
 +============+
