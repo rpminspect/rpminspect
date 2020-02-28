@@ -33,3 +33,14 @@ TEST_ELFLINT
     This test runs elflint(1) on ELF files.  We already have the
     existing ELF tests using eu-elfcmp, libelf, and annocheck so this
     one is more or less redundant.
+
+TEST_MULTILIB
+    At one point in time we built distributions on multilib platforms
+    so that the entire system was available as both 32-bit and 64-bit
+    builds.  On applicable platforms, users could have both packages
+    installed and flip between using 32-bit and 64-bit software.  We
+    no longer make this guarantee and what 32-bit packages we have
+    are for BuildRequires or existing runtime support.  Those packages
+    can be validated by all the existing checks, but there is no reason
+    to ensure the 32-bit and 64-bit builds of a package have matching
+    content.
