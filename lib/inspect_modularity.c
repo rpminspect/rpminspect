@@ -70,11 +70,12 @@ static bool modularity_driver(struct rpminspect *ri, rpmfile_entry_t *file) {
 bool inspect_modularity(struct rpminspect *ri) {
     bool result = false;
 
+    assert(ri != NULL);
+
     if (ri->buildtype != KOJI_BUILD_MODULE) {
         return true;
     }
 
-    assert(ri != NULL);
     result = foreach_peer_file(ri, modularity_driver);
 
     if (result) {
