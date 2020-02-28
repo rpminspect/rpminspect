@@ -299,12 +299,31 @@ if python.found()
     test_env.set('RPMINSPECT_CONF', meson.source_root() + '/src/rpminspect.conf')
     test_env.set('RPMINSPECT_TEST_DATA_PATH', meson.source_root() + '/tests/data')
 
-    test('rpminspect-test-suite',
-         python,
-         args : ['-B', '-m', 'unittest', 'discover', '-v', meson.source_root() + '/tests'],
-         env : test_env,
-         timeout : 300
-        )
+    test_suites = [
+        'test_default.py',
+        'test_desktop.py',
+        'test_disttag.py',
+        'test_emptyrpm.py',
+        'test_kmod.py',
+        'test_license.py',
+        'test_manpage.py',
+        'test_metadata.py',
+        'test_ownership.py',
+        'test_shellsyntax.py',
+        'test_specname.py',
+        'test_xml.py'
+        ]
+
+    foreach suite : test_suites
+        test('rpminspect-test-suite.' + suite.split('.')[0],
+             python,
+             args : ['-B', '-m', 'unittest', 'discover', '-v', meson.source_root() + '/tests', suite],
+             env : test_env,
+             is_parallel : false,
+             timeout : 300
+            )
+    endforeach
+
 else
     warning('Python not found, skipping integration test suite')
 endif
