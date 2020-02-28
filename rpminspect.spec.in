@@ -1,12 +1,3 @@
-# Fedora and derivatives will be the default OS family
-%define _family rh
-
-# SuSE family
-%if 0%{?sle_version} || 0%{?is_opensuse}
-%define _family suse
-%endif
-
-
 Name:           rpminspect
 Version:        %%VERSION%%
 Release:        1%{?dist}
@@ -30,12 +21,7 @@ BuildRequires:  kmod-devel
 BuildRequires:  libcurl-devel
 BuildRequires:  zlib-devel
 BuildRequires:  libmandoc-devel
-%if "%{_family}" == "rh"
 BuildRequires:  iniparser-devel
-%endif
-%if "%{_family}" == "suse"
-BuildRequires:  libiniparser-devel
-%endif
 BuildRequires:  libyaml-devel
 BuildRequires:  file-devel
 BuildRequires:  openssl-devel
