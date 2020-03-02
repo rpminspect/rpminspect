@@ -58,16 +58,29 @@ Requires:       diffutils
 # These programs are only required for the 'shellsyntax' functionality.
 # You can use rpminspect without these installed, just disable the
 # shellsyntax inspection.
+%if 0%{?rhel} >= 8 || 0%{?epel} >= 8 || 0%{?fedora}
 Suggests:       dash
 Suggests:       ksh
 Suggests:       zsh
 Suggests:       tcsh
 Suggests:       rc
 Suggests:       bash
+%else
+Requires:       dash
+Requires:       ksh
+Requires:       zsh
+Requires:       tcsh
+Requires:       rc
+Requires:       bash
+%endif
 
 # The annocheck program is used by the annocheck inspection.  It is not
 # required.
+%if 0%{?rhel} >= 8 || 0%{?epel} >= 8 || 0%{?fedora}
 Suggests:       /usr/bin/annocheck
+%else
+Requires:       /usr/bin/annocheck
+%endif
 
 %description -n librpminspect
 The library providing the backend test functionality and API for the

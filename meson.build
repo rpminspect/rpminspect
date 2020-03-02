@@ -6,7 +6,8 @@ project('rpminspect',
             'warning_level=2',
             'buildtype=debugoptimized'
         ],
-        license : 'GPLv3')
+        license : 'GPLv3+',
+        meson_version : '>=0.47.0')
 
 cc = meson.get_compiler('c')
 
@@ -327,12 +328,12 @@ install_man('src/rpminspect.1')
 # Install data files
 install_subdir(
     'data',
-    install_dir : get_option('datadir') / 'rpminspect',
+    install_dir : get_option('datadir') + '/rpminspect',
     strip_directory : true
 )
 
 # Install the configuration file
 install_data(
     sources : 'src/rpminspect.conf',
-    install_dir : get_option('sysconfdir') / 'rpminspect'
+    install_dir : get_option('sysconfdir') + '/rpminspect'
 )
