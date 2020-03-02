@@ -31,6 +31,8 @@
  */
 static void xmlrpc_abort_on_fault(xmlrpc_env *env)
 {
+    DEBUG_PRINT("xmlrpc env: fault_occurred=%d, fault_code=%d, fault_string=|%s|\n", env->fault_occurred, env->fault_code, env->fault_string);
+
     if (env->fault_occurred) {
         fprintf(stderr, "XML-RPC Fault: %s (%d)\n", env->fault_string, env->fault_code);
         fflush(stderr);
@@ -508,7 +510,15 @@ struct koji_build *get_koji_build(struct rpminspect *ri, const char *buildspec)
 
     /* call 'getBuild' on the koji hub */
     result = xmlrpc_client_call(&env, ri->kojihub, "getBuild", "(s)", buildspec);
-    xmlrpc_abort_on_fault(&env);
+
+    if (env.fault_occurred && env.fault_code >= 1000) {
+        /* server side error which means Koji protocol error */
+        xmlrpc_env_clean(&env);
+        xmlrpc_client_cleanup();
+        return NULL;
+    } else {
+        xmlrpc_abort_on_fault(&env);
+    }
 
     /* is this a valid build? */
     if (xmlrpc_value_type(result) == XMLRPC_TYPE_NIL) {
