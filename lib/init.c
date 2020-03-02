@@ -123,12 +123,18 @@ static void read_mapping(const dictionary *cfg, const char *section,
     nk = iniparser_getsecnkeys(cfg, section);
 
     if (nk > 0) {
+#if _INIPARSER == 4
         k = calloc(nk, len);
         assert(k != NULL);
+#endif
 
+#if _INIPARSER == 3
+        if (iniparser_getseckeys(cfg, section) == NULL) {
+#else
         if (iniparser_getseckeys(cfg, section, k) == NULL) {
             free(k);
             k = NULL;
+#endif
             nk = 0;
         }
     }
@@ -142,8 +148,10 @@ static void read_mapping(const dictionary *cfg, const char *section,
         if (hcreate_r(nk, *table) == 0) {
             free(*table);
             *table = NULL;
+#if _INIPARSER == 4
             free(k);
             k = NULL;
+#endif
             nk = 0;
         } else {
             *keys = calloc(1, sizeof(**keys));
@@ -177,7 +185,9 @@ static void read_mapping(const dictionary *cfg, const char *section,
         nk--;
     }
 
+#if _INIPARSER == 4
     free(k);
+#endif
     return;
 }
 
