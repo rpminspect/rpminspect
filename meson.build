@@ -62,6 +62,12 @@ endif
 
 iniparser = declare_dependency(link_args : ['-liniparser'])
 
+if not cc.has_function('iniparser_getlongint', args : ['-liniparser'], depends : [zlib])
+    add_project_arguments('-D_INIPARSER=3', language : 'c')
+else
+    add_project_arguments('-D_INIPARSER=4', language : 'c')
+endif
+
 # libmagic
 if not cc.has_function('magic_open', args : ['-lmagic'])
     error('*** unable to find magic_open() in libmagic')
