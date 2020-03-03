@@ -19,7 +19,6 @@ Mandatory test categories to migrate (top is highest priority):
  TEST_PATHNAMES
  TEST_CONFIG
 !TEST_SIZE (need to support size inc/dec thresholds for reporting, per pkg)
- TEST_CHANGELOG
 
 
 Unranked tests categories to migrate (might also decide to skip them):
@@ -54,24 +53,25 @@ Questions:
 
 Test categories that have been migrated:
 ----------------------------------------
-*TEST_CHANGED (this is changedfiles in rpminspect)
-*TEST_DESKTOP
-*TEST_EMPTYRPM
-*TEST_FILELIST (this is addedfiles and removedfiles in rpminspect)
-*TEST_JAVABYTECODE
-*TEST_MANPAGE
-*TEST_OWNERSHIP
-*TEST_SHELLSYNTAX
-*TEST_XML
+*TEST_CHANGED (changedfiles)
+*TEST_DESKTOP (desktop)
+*TEST_EMPTYRPM (emptyrpm)
+*TEST_FILELIST (addedfiles and removedfiles)
+*TEST_JAVABYTECODE (javabytecode)
+*TEST_MANPAGE (manpage)
+*TEST_OWNERSHIP (ownership)
+*TEST_SHELLSYNTAX (shellsyntax)
+*TEST_XML (xml)
 *TEST_IPV6 (part of elf inspection in rpminspect)
-*TEST_EXECSHIELD (this is elf in rpminspect)
-*TEST_NEEDED (this is DT_NEEDED in rpminspect)
-*TEST_UPSTREAM (the BZ 'Rebase' keyword check against the Errata Tool
-                bug list was not migrated, see below)
-*TEST_PERMS (this is permissions and capabilities)
-*TEST_MODPARM (this is part of kmod now)
-*TEST_MODPCIID (this is part of kmod now)
-*TEST_RPMCHANGE (this is now arch and subpackages)
+*TEST_EXECSHIELD (elf)
+*TEST_NEEDED (DT_NEEDED)
+*TEST_UPSTREAM (upstream; the BZ 'Rebase' keyword check against the
+                Errata Tool bug list was not migrated, see below)
+*TEST_PERMS (permissions and capabilities)
+*TEST_MODPARM (kmod)
+*TEST_MODPCIID (kmod)
+*TEST_RPMCHANGE (arch and subpackages)
+*TEST_CHANGELOG (changelog)
 
 
 Test categories excluded (see MISSING):
@@ -150,3 +150,20 @@ User guide
 
 Also rpminspect.conf.5 documenting the configuration file and the
 profile configuration files.
+
+
+Misc Refactoring
+----------------
+
+These are things I intend to get to over time:
+
+    * peer matching code - create a new tailq that decreases in size
+      as matches are made
+
+    * Parallelize libarchive unpacking of payloads; just fork off
+      enough jobs for each package; set a rate limit in rpminspect.conf
+
+    * Replace iniparser usage with yacc grammar
+
+    * Use libsvn_diff in place of calling diff(1) and reading back
+      stdout and stderr

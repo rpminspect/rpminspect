@@ -51,6 +51,7 @@
 #define HEADER_KMOD          "kernel-modules"
 #define HEADER_ARCH          "architectures"
 #define HEADER_SUBPACKAGES   "subpackages"
+#define HEADER_CHANGELOG     "changelog"
 
 /*
  * Inspection remedies
@@ -149,5 +150,8 @@
 /* subpackages */
 #define REMEDY_SUBPACKAGES_LOST "A subpackage present in the before build is now missing in the after build.  This may be deliberate, but check to make sure you have correct syntax defining the subpackage in the spec file"
 #define REMEDY_SUBPACKAGES_GAIN "A new subpackage has appeared in the after build.  This may indicate progress in the world of computing."
+
+/* changelog */
+#define REMEDY_CHANGELOG "Make sure the spec file in the after build contains a valid %%changelog section."
 
 #endif

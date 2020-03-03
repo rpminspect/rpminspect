@@ -182,6 +182,12 @@ struct inspect inspections[] = {
       &inspect_subpackages,
       "Report RPM subpackages that appear and disappear between the before and after builds." },
 
+    { INSPECT_CHANGELOG,
+      "changelog",
+      false,
+      &inspect_changelog,
+      "Ensure packages contain an entry in the %changelog for the version built.  Reports any other differences in the existing changelog between builds and that the new entry contains new text entries." },
+
     /*
      * { INSPECT_TYPE (add to inspect.h),
      *   "short name",
