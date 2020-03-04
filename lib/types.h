@@ -385,9 +385,6 @@ struct inspect {
 
     /* the driver function for the inspection */
     bool (*driver)(struct rpminspect *);
-
-    /* OPTIONAL: long description of the inspection (displayed in --help) */
-    char *desc;
 };
 
 /*

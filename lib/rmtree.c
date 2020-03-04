@@ -25,6 +25,8 @@
 #include <assert.h>
 #include <ftw.h>
 
+#include "rpminspect.h"
+
 /* Local prototypes */
 static int rmtree_entry(const char *, const struct stat *, int, struct FTW *);
 

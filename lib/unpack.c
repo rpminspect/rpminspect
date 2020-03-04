@@ -25,6 +25,8 @@
 #include <archive.h>
 #include <archive_entry.h>
 
+#include "rpminspect.h"
+
 /* Local prototypes */
 static int copy_data(struct archive *, struct archive *);
 static int extract_entry(struct archive *, struct archive *, struct archive_entry *);

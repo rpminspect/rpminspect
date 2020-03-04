@@ -340,6 +340,7 @@ int main(int argc, char **argv) {
     int mode = S_IRWXU | S_IRGRP | S_IXGRP | S_IROTH | S_IXOTH;
     bool found = false;
     char *inspection = NULL;
+    const char *desc = NULL;
     char *insoptarg = NULL;
     char *tmp = NULL;
     bool inspection_opt = false;
@@ -496,9 +497,10 @@ int main(int argc, char **argv) {
             }
 
             printf("    %s\n", inspections[i].name);
+            desc = inspection_desc(inspections[i].flag);
 
-            if (inspections[i].desc != NULL && verbose) {
-                printwrap(inspections[i].desc, width, 8, stdout);
+            if (desc != NULL && verbose) {
+                printwrap(desc, width, 8, stdout);
                 printf("\n");
             }
         }

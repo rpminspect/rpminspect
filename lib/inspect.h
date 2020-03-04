@@ -47,6 +47,7 @@
 /* inspect.c */
 typedef bool (*foreach_peer_file_func)(struct rpminspect *, rpmfile_entry_t *);
 bool foreach_peer_file(struct rpminspect *, foreach_peer_file_func);
+const char *inspection_desc(const uint64_t);
 
 /* inspect_elf.c */
 void init_elf_data(void);

@@ -24,15 +24,19 @@
  */
 
 struct format formats[] = {
-    { FORMAT_TEXT,
-      "text",
-      &output_text,
-      _("Plain text suitable for the console and piping through paging programs.") },
-
-    { FORMAT_JSON,
-      "json",
-      &output_json,
-      _("Results organized as a JSON data structure suitable for reading by web applications and other frontend tools.") },
-
+    { FORMAT_TEXT, "text", &output_text },
+    { FORMAT_JSON, "json", &output_json },
     { -1, NULL, NULL, NULL }
 };
+
+const char *format_desc(unsigned int format)
+{
+    switch (format) {
+        case FORMAT_TEXT:
+            return _("Plain text suitable for the console and piping through paging programs.");
+        case FORMAT_JSON:
+            return _("Results organized as a JSON data structure suitable for reading by web applications and other frontend tools.");
+        default:
+            return NULL;
+    }
+}
