@@ -59,17 +59,17 @@ static short get_jvm_major(const char *filename, const char *localpath,
         fd = open(filename, O_RDONLY | O_CLOEXEC | O_LARGEFILE);
 
         if (fd == -1) {
-            fprintf(stderr, "unable to open(2) %s from %s for reading: %s\n", localpath, container, strerror(errno));
+            fprintf(stderr, _("unable to open(2) %s from %s for reading: %s\n"), localpath, container, strerror(errno));
             return -1;
         }
 
         if (read(fd, magic, sizeof(magic)) != sizeof(magic)) {
-            fprintf(stderr, "unable to read(2) %s from %s: %s\n", localpath, container, strerror(errno));
+            fprintf(stderr, _("unable to read(2) %s from %s: %s\n"), localpath, container, strerror(errno));
             return -1;
         }
 
         if (close(fd) == -1) {
-            fprintf(stderr, "unable to close(2) %s from %s: %s\n", localpath, container, strerror(errno));
+            fprintf(stderr, _("unable to close(2) %s from %s: %s\n"), localpath, container, strerror(errno));
             return -1;
         }
 
@@ -111,12 +111,12 @@ static bool check_class_file(struct rpminspect *ri, const char *fullpath,
     if (major == -1 && !strsuffix(localpath, CLASS_FILENAME_EXTENSION)) {
         return true;
     } else if (major < 0 || major > 60) {
-        xasprintf(&msg, "File %s (%s), Java byte code version %d is incorrect (wrong endianness? corrupted file? space JDK?)", localpath, container, major);
+        xasprintf(&msg, _("File %s (%s), Java byte code version %d is incorrect (wrong endianness? corrupted file? space JDK?)"), localpath, container, major);
         add_result(ri, RESULT_BAD, WAIVABLE_BY_ANYONE, HEADER_JAVABYTECODE, msg, NULL, NULL);
         free(msg);
         return false;
     } else if (major > supported_major) {
-        xasprintf(&msg, "File %s (%s), Java byte code version %d greater than supported major version %d for product release %s", localpath, container, major, supported_major, ri->product_release);
+        xasprintf(&msg, _("File %s (%s), Java byte code version %d greater than supported major version %d for product release %s"), localpath, container, major, supported_major, ri->product_release);
         add_result(ri, RESULT_BAD, WAIVABLE_BY_ANYONE, HEADER_JAVABYTECODE, msg, NULL, NULL);
         free(msg);
         return false;
@@ -131,7 +131,7 @@ static bool check_class_file(struct rpminspect *ri, const char *fullpath,
         }
 
         if (major != majorpeer) {
-            xasprintf(&msg, "Java byte code version changed from %d to %d in %s from %s", majorpeer, major, localpath, container);
+            xasprintf(&msg, _("Java byte code version changed from %d to %d in %s from %s"), majorpeer, major, localpath, container);
             add_result(ri, RESULT_BAD, WAIVABLE_BY_ANYONE, HEADER_JAVABYTECODE, msg, NULL, NULL);
             free(msg);
             return false;
@@ -173,7 +173,7 @@ static bool javabytecode_driver(struct rpminspect *ri, rpmfile_entry_t *file, co
         xasprintf(&tmppath, "%s/jar.XXXXXX", ri->workdir);
 
         if ((tmppath = mkdtemp(tmppath)) == NULL) {
-            fprintf(stderr, "*** unable to create a temporary directory for %s: %s\n", file->fullpath, strerror(errno));
+            fprintf(stderr, _("*** unable to create a temporary directory for %s: %s\n"), file->fullpath, strerror(errno));
             return false;
         }
 
@@ -192,7 +192,7 @@ static bool javabytecode_driver(struct rpminspect *ri, rpmfile_entry_t *file, co
 
         if (jarstatus != 0) {
             /* we errored somewhere, just report it */
-            fprintf(stderr, "*** error walking the unpacked directory tree for %s\n", file->fullpath);
+            fprintf(stderr, _("*** error walking the unpacked directory tree for %s\n"), file->fullpath);
         }
 
         /* clean up */
@@ -231,7 +231,7 @@ bool inspect_javabytecode(struct rpminspect *ri)
      * Get the major JVM version for this product release.
      */
     if (ri->jvm_table == NULL) {
-        fprintf(stderr, "*** missing JVM version to product release mapping\n");
+        fprintf(stderr, _("*** missing JVM version to product release mapping\n"));
         fflush(stderr);
         return false;
     }
@@ -247,14 +247,14 @@ bool inspect_javabytecode(struct rpminspect *ri)
     }
 
     if (eptr == NULL) {
-        fprintf(stderr, "*** missing JVM version to product release mapping\n");
+        fprintf(stderr, _("*** missing JVM version to product release mapping\n"));
         fflush(stderr);
         return false;
     }
 
     supported_major = strtol(eptr->data, NULL, 10);
     if (errno == ERANGE) {
-        fprintf(stderr, "*** invalid JVM major version: %s: %s\n", (char *) eptr->data, strerror(errno));
+        fprintf(stderr, _("*** invalid JVM major version: %s: %s\n"), (char *) eptr->data, strerror(errno));
         fflush(stderr);
         return false;
     }

@@ -57,7 +57,7 @@ int rmtree(const char *path, const bool ignore_errors, const bool contentsonly) 
         if (ignore_errors) {
             return 0;
         } else {
-            fprintf(stderr, "%s is not a directory.\n", path);
+            fprintf(stderr, _("%s is not a directory.\n"), path);
             return 2;
         }
     }

@@ -52,7 +52,7 @@ static bool disttag_driver(struct rpminspect *ri, rpmfile_entry_t *file) {
     fp = fopen(file->fullpath, "r");
 
     if (fp == NULL) {
-        fprintf(stderr, "error opening %s for reading: %s\n", file->fullpath, strerror(errno));
+        fprintf(stderr, _("error opening %s for reading: %s\n"), file->fullpath, strerror(errno));
         fflush(stderr);
         return true;
     }
@@ -76,23 +76,23 @@ static bool disttag_driver(struct rpminspect *ri, rpmfile_entry_t *file) {
     }
 
     if (fclose(fp) == -1) {
-        fprintf(stderr, "error closing %s: %s\n", file->fullpath, strerror(errno));
+        fprintf(stderr, _("error closing %s: %s\n"), file->fullpath, strerror(errno));
         fflush(stderr);
     }
 
     /* Check the line if we found it */
     if (buf == NULL) {
-        msg = strdup("The %s file is missing the Release: tag.");
+        msg = strdup(_("The %s file is missing the Release: tag."));
         add_result(ri, RESULT_BAD, NOT_WAIVABLE, HEADER_DISTTAG, msg, buf, REMEDY_DISTTAG);
         free(msg);
         result = false;
     } else if (strstr(buf, "dist") && !strstr(buf, "%{?dist}")) {
-        msg = strdup("The dist tag should be of the form '%%{?dist}' in the Release tag.");
+        msg = strdup(_("The dist tag should be of the form '%%{?dist}' in the Release tag."));
         add_result(ri, RESULT_BAD, NOT_WAIVABLE, HEADER_DISTTAG, msg, buf, REMEDY_DISTTAG);
         free(msg);
         result = false;
     } else if (!strstr(buf, "%{?dist}")) {
-        msg = strdup("The Release: tag does not seem to contain a '%%{?dist}' tag.");
+        msg = strdup(_("The Release: tag does not seem to contain a '%%{?dist}' tag."));
         add_result(ri, RESULT_BAD, NOT_WAIVABLE, HEADER_DISTTAG, msg, buf, REMEDY_DISTTAG);
         free(msg);
         result = false;
@@ -138,7 +138,7 @@ bool inspect_disttag(struct rpminspect *ri) {
     if (result && src) {
         add_result(ri, RESULT_OK, NOT_WAIVABLE, HEADER_DISTTAG, NULL, NULL, NULL);
     } else if (!src) {
-        add_result(ri, RESULT_INFO, NOT_WAIVABLE, HEADER_DISTTAG, "Specified package is not a source RPM, skipping.", NULL, NULL);
+        add_result(ri, RESULT_INFO, NOT_WAIVABLE, HEADER_DISTTAG, _("Specified package is not a source RPM, skipping."), NULL, NULL);
     }
 
     return result;

@@ -70,14 +70,14 @@ static bool specname_driver(struct rpminspect *ri, rpmfile_entry_t *file) {
      */
     if (!specgood) {
         if (ri->specmatch == MATCH_FULL) {
-            desc = "exactly match";
+            desc = _("exactly match");
         } else if (ri->specmatch == MATCH_PREFIX) {
-            desc = "begin with";
+            desc = _("begin with");
         } else if (ri->specmatch == MATCH_SUFFIX) {
-            desc = "end with";
+            desc = _("end with");
         }
 
-        xasprintf(&msg, "Spec filename does not %s the primary name %s; got '%s'", desc, primary, file->localpath);
+        xasprintf(&msg, _("Spec filename does not %s the primary name %s; got '%s'"), desc, primary, file->localpath);
         add_result(ri, RESULT_BAD, WAIVABLE_BY_ANYONE, HEADER_SPECNAME, msg, NULL, REMEDY_SPECNAME);
         free(msg);
     }
@@ -100,7 +100,7 @@ bool inspect_specname(struct rpminspect *ri) {
     if (specgood) {
         add_result(ri, RESULT_OK, NOT_WAIVABLE, HEADER_SPECNAME, NULL, NULL, NULL);
     } else if (!seen) {
-        xasprintf(&msg, "The specname inspection is only for source packages, skipping.");
+        xasprintf(&msg, _("The specname inspection is only for source packages, skipping."));
         add_result(ri, RESULT_INFO, NOT_WAIVABLE, HEADER_SPECNAME, msg, NULL, NULL);
         free(msg);
     }

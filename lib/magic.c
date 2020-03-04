@@ -47,13 +47,13 @@ char *get_mime_type(rpmfile_entry_t *file) {
     cookie = magic_open(MAGIC_MIME | MAGIC_CHECK);
 
     if (cookie == NULL) {
-        fprintf(stderr, "*** Unable to initialize the magic library\n");
+        fprintf(stderr, _("*** Unable to initialize the magic library\n"));
         fflush(stderr);
         return ret;
     }
 
     if (magic_load(cookie, NULL) != 0) {
-        fprintf(stderr, "*** Unable to load the magic database: %s\n", magic_error(cookie));
+        fprintf(stderr, _("*** Unable to load the magic database: %s\n"), magic_error(cookie));
         fflush(stderr);
         magic_close(cookie);
         return ret;

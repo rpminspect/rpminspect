@@ -51,7 +51,7 @@ static char *get_header_value(const rpmfile_entry_t *file, rpmTag tag)
     td = rpmtdNew();
 
     if (!headerGet(file->rpm_header, tag, td, flags)) {
-        fprintf(stderr, "*** unable to find tag %d for %s\n", tag, file->fullpath);
+        fprintf(stderr, _("*** unable to find tag %d for %s\n"), tag, file->fullpath);
         abort();
     }
 
@@ -105,7 +105,7 @@ static bool ownership_driver(struct rpminspect *ri, rpmfile_entry_t *file) {
     if (ri->forbidden_owners) {
         TAILQ_FOREACH(entry, ri->forbidden_owners, items) {
             if (!strcmp(owner, entry->data)) {
-                xasprintf(&msg, "File %s has forbidden owner `%s` on %s", file->localpath, owner, arch);
+                xasprintf(&msg, _("File %s has forbidden owner `%s` on %s"), file->localpath, owner, arch);
                 add_result(ri, RESULT_BAD, WAIVABLE_BY_ANYONE, HEADER_OWNERSHIP, msg, NULL, REMEDY_OWNERSHIP_DEFATTR);
                 free(msg);
                 result = false;
@@ -118,7 +118,7 @@ static bool ownership_driver(struct rpminspect *ri, rpmfile_entry_t *file) {
     if (ri->forbidden_groups) {
         TAILQ_FOREACH(entry, ri->forbidden_groups, items) {
             if (!strcmp(group, entry->data)) {
-                xasprintf(&msg, "File %s has forbidden group `%s` on %s", file->localpath, owner, arch);
+                xasprintf(&msg, _("File %s has forbidden group `%s` on %s"), file->localpath, owner, arch);
                 add_result(ri, RESULT_BAD, WAIVABLE_BY_ANYONE, HEADER_OWNERSHIP, msg, NULL, REMEDY_OWNERSHIP_DEFATTR);
                 free(msg);
                 result = false;
@@ -134,7 +134,7 @@ static bool ownership_driver(struct rpminspect *ri, rpmfile_entry_t *file) {
 
             /* Check the owner */
             if (strcmp(owner, ri->bin_owner)) {
-                xasprintf(&msg, "File %s has owner `%s` on %s, but should be `%s`", file->localpath, owner, arch, ri->bin_owner);
+                xasprintf(&msg, _("File %s has owner `%s` on %s, but should be `%s`"), file->localpath, owner, arch, ri->bin_owner);
                 add_result(ri, RESULT_BAD, WAIVABLE_BY_ANYONE, HEADER_OWNERSHIP, msg, NULL, REMEDY_OWNERSHIP_BIN_OWNER);
                 free(msg);
                 result = false;
@@ -147,7 +147,7 @@ static bool ownership_driver(struct rpminspect *ri, rpmfile_entry_t *file) {
 
                 if (cap) {
                     if (cap_get_flag(cap, CAP_SETUID, CAP_EFFECTIVE, &have_setuid) == -1) {
-                        fprintf(stderr, "*** unable to get capabilities for %s\n", file->localpath);
+                        fprintf(stderr, _("*** unable to get capabilities for %s\n"), file->localpath);
                         have_setuid = CAP_CLEAR;
                     }
                 }
@@ -155,20 +155,20 @@ static bool ownership_driver(struct rpminspect *ri, rpmfile_entry_t *file) {
                 /* Handle if CAP_SETUID is present or not */
                 if (have_setuid == CAP_SET) {
                     if (file->st.st_mode & S_IXOTH) {
-                        xasprintf(&msg, "File %s on %s has CAP_SETUID capability but group `%s` and is world executable", file->localpath, arch, group);
+                        xasprintf(&msg, _("File %s on %s has CAP_SETUID capability but group `%s` and is world executable"), file->localpath, arch, group);
                         add_result(ri, RESULT_BAD, WAIVABLE_BY_ANYONE, HEADER_OWNERSHIP, msg, NULL, REMEDY_OWNERSHIP_IXOTH);
                         free(msg);
                         result = false;
                     }
 
                     if (file->st.st_mode & S_IWGRP) {
-                        xasprintf(&msg, "File %s on %s has CAP_SETUID capability but group `%s` and is group writable", file->localpath, arch, group);
+                        xasprintf(&msg, _("File %s on %s has CAP_SETUID capability but group `%s` and is group writable"), file->localpath, arch, group);
                         add_result(ri, RESULT_BAD, WAIVABLE_BY_SECURITY, HEADER_OWNERSHIP, msg, NULL, REMEDY_OWNERSHIP_IWGRP);
                         free(msg);
                         result = false;
                     }
                 } else {
-                    xasprintf(&msg, "File %s has group `%s` on %s, but should be `%s`", file->localpath, group, arch, ri->bin_group);
+                    xasprintf(&msg, _("File %s has group `%s` on %s, but should be `%s`"), file->localpath, group, arch, ri->bin_group);
                     add_result(ri, RESULT_BAD, WAIVABLE_BY_ANYONE, HEADER_OWNERSHIP, msg, NULL, REMEDY_OWNERSHIP_BIN_GROUP);
                     free(msg);
                     result = false;
@@ -226,7 +226,7 @@ static bool ownership_driver(struct rpminspect *ri, rpmfile_entry_t *file) {
             }
 
             free(msg);
-            xasprintf(&msg, "File %s changed %s from `%s` to `%s` on %s", file->localpath, what, before_val, after_val, arch);
+            xasprintf(&msg, _("File %s changed %s from `%s` to `%s` on %s"), file->localpath, what, before_val, after_val, arch);
             add_result(ri, sev, WAIVABLE_BY_ANYONE, HEADER_OWNERSHIP, msg, NULL, REMEDY_OWNERSHIP_CHANGED);
             free(msg);
             result = false;

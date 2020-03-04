@@ -44,11 +44,11 @@ static bool valid_peers(struct rpminspect *ri, const Header before_hdr, const He
 
     after_vendor = headerGetString(after_hdr, RPMTAG_VENDOR);
     if (ri->vendor == NULL) {
-        xasprintf(&msg, "Vendor not set in rpminspect.conf, ignoring Package Vendor \"%s\" in %s", after_vendor, after_nevra);
+        xasprintf(&msg, _("Vendor not set in rpminspect.conf, ignoring Package Vendor \"%s\" in %s"), after_vendor, after_nevra);
         add_result(ri, RESULT_INFO, NOT_WAIVABLE, HEADER_METADATA, msg, NULL, REMEDY_VENDOR);
         free(msg);
     } else if (after_vendor && strcmp(after_vendor, ri->vendor)) {
-        xasprintf(&msg, "Package Vendor \"%s\" is not \"%s\" in %s", after_vendor, ri->vendor, after_nevra);
+        xasprintf(&msg, _("Package Vendor \"%s\" is not \"%s\" in %s"), after_vendor, ri->vendor, after_nevra);
 
         add_result(ri, RESULT_BAD, NOT_WAIVABLE, HEADER_METADATA, msg, NULL, REMEDY_VENDOR);
         ret = false;
@@ -68,7 +68,7 @@ static bool valid_peers(struct rpminspect *ri, const Header before_hdr, const He
         }
 
         if (!valid_subdomain) {
-            xasprintf(&msg, "Package Build Host \"%s\" is not within an expected build host subdomain in %s", after_buildhost, after_nevra);
+            xasprintf(&msg, _("Package Build Host \"%s\" is not within an expected build host subdomain in %s"), after_buildhost, after_nevra);
 
             add_result(ri, RESULT_BAD, NOT_WAIVABLE, HEADER_METADATA, msg, NULL, REMEDY_BUILDHOST);
             ret = false;
@@ -79,8 +79,8 @@ static bool valid_peers(struct rpminspect *ri, const Header before_hdr, const He
 
     after_summary = headerGetString(after_hdr, RPMTAG_SUMMARY);
     if (after_summary && has_bad_word(after_summary, ri->badwords)) {
-        xasprintf(&msg, "Package Summary contains unprofessional language in %s", after_nevra);
-        xasprintf(&dump, "Summary: %s", after_summary);
+        xasprintf(&msg, _("Package Summary contains unprofessional language in %s"), after_nevra);
+        xasprintf(&dump, _("Summary: %s"), after_summary);
 
         add_result(ri, RESULT_BAD, NOT_WAIVABLE, HEADER_METADATA, msg, dump, REMEDY_BADWORDS);
         ret = false;
@@ -91,7 +91,7 @@ static bool valid_peers(struct rpminspect *ri, const Header before_hdr, const He
 
     after_description = headerGetString(after_hdr, RPMTAG_DESCRIPTION);
     if (after_description && has_bad_word(after_description, ri->badwords)) {
-        xasprintf(&msg, "Package Description contains unprofessional language in %s:", after_nevra);
+        xasprintf(&msg, _("Package Description contains unprofessional language in %s:"), after_nevra);
         xasprintf(&dump, "%s", after_description);
 
         add_result(ri, RESULT_BAD, NOT_WAIVABLE, HEADER_METADATA, msg, dump, REMEDY_BADWORDS);
@@ -111,11 +111,11 @@ static bool valid_peers(struct rpminspect *ri, const Header before_hdr, const He
         msg = NULL;
 
         if (before_vendor == NULL && after_vendor) {
-            xasprintf(&msg, "Gained Package Vendor \"%s\" in %s", after_vendor, after_name);
+            xasprintf(&msg, _("Gained Package Vendor \"%s\" in %s"), after_vendor, after_name);
         } else if (before_vendor && after_vendor == NULL) {
-            xasprintf(&msg, "Lost Package Vendor \"%s\" in %s", before_vendor, after_name);
+            xasprintf(&msg, _("Lost Package Vendor \"%s\" in %s"), before_vendor, after_name);
         } else if (before_vendor && after_vendor && strcmp(before_vendor, after_vendor)) {
-            xasprintf(&msg, "Package Vendor changed from \"%s\" to \"%s\" in %s", before_vendor, after_vendor, after_name);
+            xasprintf(&msg, _("Package Vendor changed from \"%s\" to \"%s\" in %s"), before_vendor, after_vendor, after_name);
         }
 
         if (msg) {
@@ -126,7 +126,7 @@ static bool valid_peers(struct rpminspect *ri, const Header before_hdr, const He
         }
 
         if (strcmp(before_summary, after_summary)) {
-            xasprintf(&msg, "Package Summary change from \"%s\" to \"%s\" in %s", before_summary, after_summary, after_name);
+            xasprintf(&msg, _("Package Summary change from \"%s\" to \"%s\" in %s"), before_summary, after_summary, after_name);
 
             add_result(ri, RESULT_VERIFY, WAIVABLE_BY_ANYONE, HEADER_METADATA, msg, NULL, NULL);
             ret = false;
@@ -135,8 +135,8 @@ static bool valid_peers(struct rpminspect *ri, const Header before_hdr, const He
         }
 
         if (strcmp(before_description, after_description)) {
-            xasprintf(&msg, "Package Description changed in %s", after_name);
-            xasprintf(&dump, "from:\n\n%s\n\nto:\n\n%s", before_description, after_description);
+            xasprintf(&msg, _("Package Description changed in %s"), after_name);
+            xasprintf(&dump, _("from:\n\n%s\n\nto:\n\n%s"), before_description, after_description);
 
             add_result(ri, RESULT_VERIFY, WAIVABLE_BY_ANYONE, HEADER_METADATA, msg, dump, NULL);
             ret = false;

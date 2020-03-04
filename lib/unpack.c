@@ -122,7 +122,7 @@ int unpack_archive(const char *archive, const char *dest, const bool force) {
         if (errno == ENOENT) {
             return 0;
         } else {
-            fprintf(stderr, "*** unable to find real path to %s\n", archive);
+            fprintf(stderr, _("*** unable to find real path to %s\n"), archive);
             return -1;
         }
     }
@@ -138,7 +138,7 @@ int unpack_archive(const char *archive, const char *dest, const bool force) {
     r = archive_read_open_filename(input, archive, 10240);
 
     if (r != ARCHIVE_OK) {
-        fprintf(stderr, "*** error opening %s\n", archive);
+        fprintf(stderr, _("*** error opening %s\n"), archive);
         return -1;
     }
 

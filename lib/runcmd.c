@@ -84,7 +84,7 @@ char *run_cmd(int *exitcode, const char *cmd, ...)
     cmdfp = popen(built, "r");
 
     if (cmdfp == NULL) {
-        fprintf(stderr, "error running `%s`: %s\n", built, strerror(errno));
+        fprintf(stderr, _("error running `%s`: %s\n"), built, strerror(errno));
         fflush(stderr);
         free(built);
         return false;
@@ -120,7 +120,7 @@ char *run_cmd(int *exitcode, const char *cmd, ...)
     }
 
     if (status == -1) {
-        fprintf(stderr, "error closing `%s`: %s\n", built, strerror(errno));
+        fprintf(stderr, _("error closing `%s`: %s\n"), built, strerror(errno));
         fflush(stderr);
         free(built);
         free(output);

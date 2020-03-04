@@ -27,12 +27,12 @@ struct format formats[] = {
     { FORMAT_TEXT,
       "text",
       &output_text,
-      "Plain text suitable for the console and piping through paging programs." },
+      _("Plain text suitable for the console and piping through paging programs.") },
 
     { FORMAT_JSON,
       "json",
       &output_json,
-      "Results organized as a JSON data structure suitable for reading by web applications and other frontend tools." },
+      _("Results organized as a JSON data structure suitable for reading by web applications and other frontend tools.") },
 
     { -1, NULL, NULL, NULL }
 };

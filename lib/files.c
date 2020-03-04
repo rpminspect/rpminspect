@@ -102,7 +102,7 @@ rpmfile_t *extract_rpm(const char *pkg, Header hdr)
     }
 
     if (mkdir(output_dir, S_IRWXU | S_IRGRP | S_IXGRP | S_IROTH | S_IXOTH) == -1) {
-        fprintf(stderr, "*** Unable to create directory %s: %s\n", output_dir, strerror(errno));
+        fprintf(stderr, _("*** Unable to create directory %s: %s\n"), output_dir, strerror(errno));
         return NULL;
     }
 
@@ -130,7 +130,7 @@ rpmfile_t *extract_rpm(const char *pkg, Header hdr)
     td_size = rpmtdCount(td);
 
     if (hcreate_r(td_size * 1.25, &path_table) == 0) {
-        fprintf(stderr, "*** Unable to allocate hash table: %s\n", strerror(errno));
+        fprintf(stderr, _("*** Unable to allocate hash table: %s\n"), strerror(errno));
         goto cleanup;
     }
 
@@ -143,7 +143,7 @@ rpmfile_t *extract_rpm(const char *pkg, Header hdr)
         rpm_path = rpmtdNextString(td);
 
         if (rpm_path == NULL) {
-            fprintf(stderr, "*** Error reading RPM metadata for %s\n", pkg);
+            fprintf(stderr, _("*** Error reading RPM metadata for %s\n"), pkg);
             goto cleanup;
         }
 
@@ -152,7 +152,7 @@ rpmfile_t *extract_rpm(const char *pkg, Header hdr)
         e.data = rpm_indices + i;
 
         if (hsearch_r(e, ENTER, &eptr, &path_table) == 0) {
-            fprintf(stderr, "*** Error populating hash table: %s\n", strerror(errno));
+            fprintf(stderr, _("*** Error populating hash table: %s\n"), strerror(errno));
             goto cleanup;
         }
     }
@@ -169,7 +169,7 @@ rpmfile_t *extract_rpm(const char *pkg, Header hdr)
     archive_read_support_format_all(archive);
 
     if (archive_read_open_filename(archive, pkg, 10240) != ARCHIVE_OK) {
-        fprintf(stderr, "*** Unable to open %s with libarchive: %s\n", pkg, archive_error_string(archive));
+        fprintf(stderr, _("*** Unable to open %s with libarchive: %s\n"), pkg, archive_error_string(archive));
         goto cleanup;
     }
 
@@ -184,7 +184,7 @@ rpmfile_t *extract_rpm(const char *pkg, Header hdr)
         }
 
         if (archive_result != ARCHIVE_OK) {
-            fprintf(stderr, "*** Error reading from archive %s: %s\n", pkg, archive_error_string(archive));
+            fprintf(stderr, _("*** Error reading from archive %s: %s\n"), pkg, archive_error_string(archive));
             free_files(file_list);
             file_list = NULL;
             goto cleanup;
@@ -199,7 +199,7 @@ rpmfile_t *extract_rpm(const char *pkg, Header hdr)
 
         e.key = (char *) archive_path;
         if (hsearch_r(e, FIND, &eptr, &path_table) == 0) {
-            fprintf(stderr, "*** Payload path %s not in RPM metadata\n", archive_path);
+            fprintf(stderr, _("*** Payload path %s not in RPM metadata\n"), archive_path);
             free_files(file_list);
             file_list = NULL;
             goto cleanup;
@@ -251,7 +251,7 @@ rpmfile_t *extract_rpm(const char *pkg, Header hdr)
 
         /* Write the file to disk */
         if (archive_read_extract(archive, entry, archive_flags) != ARCHIVE_OK) {
-            fprintf(stderr, "*** Error extracting %s: %s\n", pkg, archive_error_string(archive));
+            fprintf(stderr, _("*** Error extracting %s: %s\n"), pkg, archive_error_string(archive));
             free_files(file_list);
             file_list = NULL;
             goto cleanup;
@@ -283,12 +283,12 @@ const char * get_file_path(const rpmfile_entry_t *file)
     assert(td != NULL);
 
     if (headerGet(file->rpm_header, RPMTAG_FILENAMES, td, HEADERGET_MINMEM | HEADERGET_EXT) != 1) {
-        fprintf(stderr, "*** Unable to read RPMTAG_FILENAMES for %s\n", file->fullpath);
+        fprintf(stderr, _("*** Unable to read RPMTAG_FILENAMES for %s\n"), file->fullpath);
         goto cleanup;
     }
 
     if (rpmtdSetIndex(td, file->idx) == -1) {
-        fprintf(stderr, "*** Invalid file index for %s\n", file->fullpath);
+        fprintf(stderr, _("*** Invalid file index for %s\n"), file->fullpath);
         goto cleanup;
     }
 
@@ -342,7 +342,7 @@ static struct hsearch_data * files_to_table(rpmfile_t *list)
     assert(iter);
 
     if (headerGet(iter->rpm_header, RPMTAG_FILENAMES, td, HEADERGET_MINMEM | HEADERGET_EXT) != 1) {
-        fprintf(stderr, "***Unable to read RPMTAG_FILENAMES\n");
+        fprintf(stderr, _("***Unable to read RPMTAG_FILENAMES\n"));
         return NULL;
     }
 
@@ -353,7 +353,7 @@ static struct hsearch_data * files_to_table(rpmfile_t *list)
     assert(table);
 
     if (hcreate_r(td_size * 1.25, table) == 0) {
-        fprintf(stderr, "*** Unable to allocate hash table: %s\n", strerror(errno));
+        fprintf(stderr, _("*** Unable to allocate hash table: %s\n"), strerror(errno));
         free(table);
         return NULL;
     }
@@ -363,7 +363,7 @@ static struct hsearch_data * files_to_table(rpmfile_t *list)
         e.data = iter;
 
         if (hsearch_r(e, ENTER, &eptr, table) == 0) {
-            fprintf(stderr, "*** Unable to add %s to hash table: %s\n", iter->localpath, strerror(errno));
+            fprintf(stderr, _("*** Unable to add %s to hash table: %s\n"), iter->localpath, strerror(errno));
             hdestroy_r(table);
             free(table);
             return NULL;
@@ -528,14 +528,14 @@ cap_t get_cap(rpmfile_entry_t *file)
 
     /* Gather capabilities(7) for the file we need */
     if ((fd = open(file->fullpath, O_RDONLY)) == -1) {
-        fprintf(stderr, "*** unable to open() %s on %s: %s\n", file->localpath, arch, strerror(errno));
+        fprintf(stderr, _("*** unable to open() %s on %s: %s\n"), file->localpath, arch, strerror(errno));
         return NULL;
     }
 
     file->cap = cap_get_fd(fd);
 
     if (close(fd) == -1) {
-        fprintf(stderr, "*** unable to close() %s on %s: %s\n", file->localpath, arch, strerror(errno));
+        fprintf(stderr, _("*** unable to close() %s on %s: %s\n"), file->localpath, arch, strerror(errno));
     }
 
     return file->cap;

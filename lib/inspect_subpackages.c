@@ -71,7 +71,7 @@ bool inspect_subpackages(struct rpminspect *ri) {
             arch = strstr(entry->data, " ");
             *arch = '\0';
             arch++;
-            xasprintf(&msg, "Subpackage '%s' has disappeared on '%s'", entry->data, arch);
+            xasprintf(&msg, _("Subpackage '%s' has disappeared on '%s'"), entry->data, arch);
             add_result(ri, RESULT_VERIFY, WAIVABLE_BY_ANYONE, HEADER_SUBPACKAGES, msg, NULL, REMEDY_SUBPACKAGES_LOST);
             free(msg);
         }
@@ -86,7 +86,7 @@ bool inspect_subpackages(struct rpminspect *ri) {
             arch = strstr(entry->data, " ");
             *arch = '\0';
             arch++;
-            xasprintf(&msg, "Subpackage '%s' has disappeared on '%s'", entry->data, arch);
+            xasprintf(&msg, _("Subpackage '%s' has disappeared on '%s'"), entry->data, arch);
             add_result(ri, RESULT_INFO, WAIVABLE_BY_ANYONE, HEADER_SUBPACKAGES, msg, NULL, REMEDY_SUBPACKAGES_GAIN);
             free(msg);
         }

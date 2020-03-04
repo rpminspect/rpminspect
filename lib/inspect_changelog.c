@@ -110,14 +110,14 @@ static char *create_changelog(const string_list_t *changelog, const char *where)
     fd = mkstemp(output);
 
     if (fd == -1) {
-        fprintf(stderr, "*** unable to create temporary file %s: %s\n", output, strerror(errno));
+        fprintf(stderr, _("*** unable to create temporary file %s: %s\n"), output, strerror(errno));
         return NULL;
     }
 
     logfp = fdopen(fd, "w");
 
     if (logfp == NULL) {
-        fprintf(stderr, "*** unable to open temporary file %s for writing: %s\n", output, strerror(errno));
+        fprintf(stderr, _("*** unable to open temporary file %s for writing: %s\n"), output, strerror(errno));
         close(fd);
         return NULL;
     }
@@ -127,7 +127,7 @@ static char *create_changelog(const string_list_t *changelog, const char *where)
     }
 
     if (fclose(logfp) != 0) {
-        fprintf(stderr, "*** unable to close writing to temporary file %s: %s\n", output, strerror(errno));
+        fprintf(stderr, _("*** unable to close writing to temporary file %s: %s\n"), output, strerror(errno));
         close(fd);
         return NULL;
     }
@@ -171,22 +171,22 @@ static bool check_src_rpm_changelog(struct rpminspect *ri, const rpmpeer_entry_t
 
     /* Perform checks */
     if (before_changelog && (after_changelog == NULL || TAILQ_EMPTY(after_changelog))) {
-        xasprintf(&msg, "%%changelog lost between the %s and %s builds", before_nevra, after_nevra);
+        xasprintf(&msg, _("%%changelog lost between the %s and %s builds"), before_nevra, after_nevra);
         add_result(ri, RESULT_VERIFY, WAIVABLE_BY_ANYONE, HEADER_CHANGELOG, msg, NULL, REMEDY_CHANGELOG);
         free(msg);
         result = false;
     } else if ((before_changelog == NULL || TAILQ_EMPTY(before_changelog)) && after_changelog) {
-        xasprintf(&msg, "Gained %%changelog between the %s and %s builds", before_nevra, after_nevra);
+        xasprintf(&msg, _("Gained %%changelog between the %s and %s builds"), before_nevra, after_nevra);
         add_result(ri, RESULT_INFO, NOT_WAIVABLE, HEADER_CHANGELOG, msg, NULL, NULL);
         free(msg);
         result = false;
     } else if ((before_changelog == NULL || TAILQ_EMPTY(before_changelog)) && (after_changelog == NULL || TAILQ_EMPTY(after_changelog))) {
-        xasprintf(&msg, "No %%changelog present in the %s build", after_nevra);
+        xasprintf(&msg, _("No %%changelog present in the %s build"), after_nevra);
         add_result(ri, RESULT_BAD, WAIVABLE_BY_ANYONE, HEADER_CHANGELOG, msg, NULL, REMEDY_CHANGELOG);
         free(msg);
         result = false;
     } else if (!strcmp(before->data, after->data)) {
-        xasprintf(&msg, "No new %%changelog entry in the %s build", after_nevra);
+        xasprintf(&msg, _("No new %%changelog entry in the %s build"), after_nevra);
         add_result(ri, RESULT_BAD, WAIVABLE_BY_ANYONE, HEADER_CHANGELOG, msg, NULL, REMEDY_CHANGELOG);
         free(msg);
         result = false;
@@ -269,11 +269,11 @@ static bool check_bin_rpm_changelog(struct rpminspect *ri, const rpmpeer_entry_t
         }
 
         if (severity == RESULT_INFO) {
-            xasprintf(&msg, "%%changelog contains new text in the %s build", after_nevra);
+            xasprintf(&msg, _("%%changelog contains new text in the %s build"), after_nevra);
             add_result(ri, severity, NOT_WAIVABLE, HEADER_CHANGELOG, msg, full_diff_output, NULL);
             free(msg);
         } else if (severity == RESULT_VERIFY) {
-            xasprintf(&msg, "%%changelog modified between the %s and %s builds", before_nevra, after_nevra);
+            xasprintf(&msg, _("%%changelog modified between the %s and %s builds"), before_nevra, after_nevra);
             add_result(ri, severity, WAIVABLE_BY_ANYONE, HEADER_CHANGELOG, msg, full_diff_output, REMEDY_CHANGELOG);
             free(msg);
             result = false;
@@ -288,7 +288,7 @@ static bool check_bin_rpm_changelog(struct rpminspect *ri, const rpmpeer_entry_t
     /* Check for bad words */
     TAILQ_FOREACH(entry, after_changelog, items) {
         if (has_bad_word(entry->data, ri->badwords)) {
-            xasprintf(&msg, "%%changelog entry has unprofessional language in the %s build", after_nevra);
+            xasprintf(&msg, _("%%changelog entry has unprofessional language in the %s build"), after_nevra);
             add_result(ri, RESULT_BAD, WAIVABLE_BY_ANYONE, HEADER_CHANGELOG, msg, entry->data, REMEDY_CHANGELOG);
             free(msg);
             result = false;

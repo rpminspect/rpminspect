@@ -40,7 +40,7 @@ static void add_changedfiles_result(struct rpminspect *ri, const char *msg, char
     assert(msg != NULL);
 
     if (waiver == WAIVABLE_BY_SECURITY) {
-        xasprintf(&tmp, "%s.  Changes to security policy related files require inspection by the Security Response Team.", msg);
+        xasprintf(&tmp, _("%s.  Changes to security policy related files require inspection by the Security Response Team."), msg);
     } else {
         tmp = strdup(msg);
     }
@@ -73,13 +73,13 @@ static char *run_and_capture(const char *where, char **output, char *cmd,
     fd = mkstemp(*output);
 
     if (fd == -1) {
-        fprintf(stderr, "*** unable to create temporary file: %s\n", strerror(errno));
+        fprintf(stderr, _("*** unable to create temporary file: %s\n"), strerror(errno));
         fflush(stderr);
         return false;
     }
 
     if (close(fd) == -1) {
-        fprintf(stderr, "*** unable to close temporary file: %s\n", strerror(errno));
+        fprintf(stderr, _("*** unable to close temporary file: %s\n"), strerror(errno));
         fflush(stderr);
         return false;
     }
@@ -189,17 +189,17 @@ static bool changedfiles_driver(struct rpminspect *ri, rpmfile_entry_t *file)
         fd = open(file->fullpath, O_RDONLY | O_CLOEXEC | O_LARGEFILE);
 
         if (fd == -1) {
-            fprintf(stderr, "unable to open(2) %s on %s for reading: %s\n", file->localpath, arch, strerror(errno));
+            fprintf(stderr, _("unable to open(2) %s on %s for reading: %s\n"), file->localpath, arch, strerror(errno));
             return true;
         }
 
         if (read(fd, magic, sizeof(magic)) != sizeof(magic)) {
-            fprintf(stderr, "unable to read(2) %s on %s: %s\n", file->localpath, arch, strerror(errno));
+            fprintf(stderr, _("unable to read(2) %s on %s: %s\n"), file->localpath, arch, strerror(errno));
             return true;
         }
 
         if (close(fd) == -1) {
-            fprintf(stderr, "unable to close(2) %s on %s: %s\n", file->localpath, arch, strerror(errno));
+            fprintf(stderr, _("unable to close(2) %s on %s: %s\n"), file->localpath, arch, strerror(errno));
             return true;
         }
 
@@ -223,7 +223,7 @@ static bool changedfiles_driver(struct rpminspect *ri, rpmfile_entry_t *file)
         errors = run_cmd(&exitcode, ZCMP_CMD, file->peer_file->fullpath, file->fullpath, NULL);
 
         if (exitcode) {
-            xasprintf(&msg, "Compressed gzip file %s changed content on %s", file->localpath, arch);
+            xasprintf(&msg, _("Compressed gzip file %s changed content on %s"), file->localpath, arch);
             add_changedfiles_result(ri, msg, errors, severity, waiver);
             result = false;
         }
@@ -231,7 +231,7 @@ static bool changedfiles_driver(struct rpminspect *ri, rpmfile_entry_t *file)
         errors = run_cmd(&exitcode, BZCMP_CMD, file->peer_file->fullpath, file->fullpath, NULL);
 
         if (exitcode) {
-            xasprintf(&msg, "Compressed bzip2 file %s changed content on %s", file->localpath, arch);
+            xasprintf(&msg, _("Compressed bzip2 file %s changed content on %s"), file->localpath, arch);
             add_changedfiles_result(ri, msg, errors, severity, waiver);
             result = false;
         }
@@ -239,7 +239,7 @@ static bool changedfiles_driver(struct rpminspect *ri, rpmfile_entry_t *file)
         errors = run_cmd(&exitcode, XZCMP_CMD, file->peer_file->fullpath, file->fullpath, NULL);
 
         if (exitcode) {
-            xasprintf(&msg, "Compressed xz file %s changed content on %s", file->localpath, arch);
+            xasprintf(&msg, _("Compressed xz file %s changed content on %s"), file->localpath, arch);
             add_changedfiles_result(ri, msg, errors, severity, waiver);
             result = false;
         }
@@ -262,7 +262,7 @@ static bool changedfiles_driver(struct rpminspect *ri, rpmfile_entry_t *file)
              * Clean up eu-elfcmp results.  Strike the fullpaths and only show
              * the localpath once.  Keep the eu-elfcmp: prefix.
              */
-            xasprintf(&needle, "%s differ:", file->localpath);
+            xasprintf(&needle, _("%s differ:"), file->localpath);
             part_errors = strstr(errors, needle);
 
             if (part_errors) {
@@ -272,7 +272,7 @@ static bool changedfiles_driver(struct rpminspect *ri, rpmfile_entry_t *file)
                 refined_errors = strdup(errors);
             }
 
-            xasprintf(&msg, "ELF file %s changed content on %s", file->localpath, arch);
+            xasprintf(&msg, _("ELF file %s changed content on %s"), file->localpath, arch);
             add_changedfiles_result(ri, msg, refined_errors, severity, waiver);
             free(needle);
             free(refined_errors);
@@ -302,7 +302,7 @@ static bool changedfiles_driver(struct rpminspect *ri, rpmfile_entry_t *file)
         errors = run_and_capture(ri->workdir, &after_tmp, MSGUNFMT_CMD, file->fullpath, &exitcode);
 
         if (exitcode) {
-            xasprintf(&msg, "Error running msgunfmt on %s on %s", file->localpath, arch);
+            xasprintf(&msg, _("Error running msgunfmt on %s on %s"), file->localpath, arch);
             add_result(ri, RESULT_BAD, NOT_WAIVABLE, HEADER_CHANGEDFILES, msg, errors, REMEDY_CHANGEDFILES);
             result = false;
             goto done;
@@ -311,7 +311,7 @@ static bool changedfiles_driver(struct rpminspect *ri, rpmfile_entry_t *file)
         errors = run_and_capture(ri->workdir, &before_tmp, MSGUNFMT_CMD, file->peer_file->fullpath, &exitcode);
 
         if (exitcode) {
-            xasprintf(&msg, "Error running msgunfmt on %s on %s", file->peer_file->localpath, arch);
+            xasprintf(&msg, _("Error running msgunfmt on %s on %s"), file->peer_file->localpath, arch);
             add_result(ri, RESULT_BAD, NOT_WAIVABLE, HEADER_CHANGEDFILES, msg, errors, REMEDY_CHANGEDFILES);
             result = false;
             goto done;
@@ -321,20 +321,20 @@ static bool changedfiles_driver(struct rpminspect *ri, rpmfile_entry_t *file)
         errors = run_cmd(&exitcode, DIFF_CMD, "-u", before_tmp, after_tmp, NULL);
 
         if (exitcode) {
-            xasprintf(&msg, "Message catalog %s changed content on %s", file->localpath, arch);
+            xasprintf(&msg, _("Message catalog %s changed content on %s"), file->localpath, arch);
             add_result(ri, RESULT_VERIFY, WAIVABLE_BY_ANYONE, HEADER_CHANGEDFILES, msg, errors, REMEDY_CHANGEDFILES);
             result = false;
         }
 
         /* Remove the temporary files */
         if (unlink(before_tmp) == -1) {
-            fprintf(stderr, "*** Unable to remove temporary file %s: %s\n", before_tmp, strerror(errno));
+            fprintf(stderr, _("*** Unable to remove temporary file %s: %s\n"), before_tmp, strerror(errno));
             fflush(stderr);
             result = false;
         }
 
         if (unlink(after_tmp) == -1) {
-            fprintf(stderr, "*** Unable to remove temporary file %s: %s\n", after_tmp, strerror(errno));
+            fprintf(stderr, _("*** Unable to remove temporary file %s: %s\n"), after_tmp, strerror(errno));
             fflush(stderr);
             result = false;
         }
@@ -389,7 +389,7 @@ static bool changedfiles_driver(struct rpminspect *ri, rpmfile_entry_t *file)
                 }
             }
 
-            xasprintf(&msg, "Public header file %s changed content on %s, Please make sure this does not change the ABI exported by this package.  The output of `diff -uw` follows.", file->localpath, arch);
+            xasprintf(&msg, _("Public header file %s changed content on %s, Please make sure this does not change the ABI exported by this package.  The output of `diff -uw` follows."), file->localpath, arch);
             add_result(ri, RESULT_VERIFY, WAIVABLE_BY_ANYONE, HEADER_CHANGEDFILES, msg, short_errors, REMEDY_CHANGEDFILES);
             result = false;
         }
@@ -404,7 +404,7 @@ static bool changedfiles_driver(struct rpminspect *ri, rpmfile_entry_t *file)
     after_sum = checksum(file);
 
     if (strcmp(before_sum, after_sum)) {
-        xasprintf(&msg, "File %s changed content on %s", file->localpath, arch);
+        xasprintf(&msg, _("File %s changed content on %s"), file->localpath, arch);
         add_changedfiles_result(ri, msg, errors, severity, waiver);
         result = false;
     }

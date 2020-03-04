@@ -51,7 +51,7 @@ static regex_t sections_regex;
 static void error_handler(enum mandocerr errtype, enum mandoclevel level,
                           const char *file, int line, int col, const char *msg)
 {
-    fprintf(error_stream, "Error parsing %s:%d:%d: %s: %s: %s\n",
+    fprintf(error_stream, _("Error parsing %s:%d:%d: %s: %s: %s\n"),
             basename(file), line, col, mparse_strlevel(level),
             mparse_strerror(errtype), msg);
 }
@@ -82,7 +82,7 @@ static bool inspect_manpage_alloc(void)
     free(tmp);
     if (reg_result != 0) {
         regerror(reg_result, &sections_regex, reg_error, sizeof(reg_error));
-        fprintf(stderr, "Unable to compile man page path regular expression: %s\n", reg_error);
+        fprintf(stderr, _("Unable to compile man page path regular expression: %s\n"), reg_error);
         inspect_manpage_free();
         return false;
     }
@@ -180,7 +180,7 @@ static char *inspect_manpage_validity(const char *path, const char *localpath)
 
     /* Open the file */
     if ((fd = mparse_open(parser, path)) == -1) {
-        fprintf(error_stream, "Unable to open man page %s\n", path);
+        fprintf(error_stream, _("Unable to open man page %s\n"), path);
         goto end;
     }
 
@@ -188,15 +188,15 @@ static char *inspect_manpage_validity(const char *path, const char *localpath)
      * does make sure that it's actually gzipped.
      */
     if (!strsuffix(path, GZIPPED_FILENAME_EXTENSION)) {
-        fprintf(error_stream, "Man page %s does not end in %s\n", path, GZIPPED_FILENAME_EXTENSION);
+        fprintf(error_stream, _("Man page %s does not end in %s\n"), path, GZIPPED_FILENAME_EXTENSION);
     } else {
         if (read(fd, magic, sizeof(magic)) != sizeof(magic)) {
-            fprintf(error_stream, "Unable to read man page %s\n", path);
+            fprintf(error_stream, _("Unable to read man page %s\n"), path);
             goto end;
         }
 
         if (magic[0] != '\x1F' || magic[1] != '\x8B') {
-            fprintf(error_stream, "man page with %s suffix is not really compressed with gzip\n", GZIPPED_FILENAME_EXTENSION);
+            fprintf(error_stream, _("man page with %s suffix is not really compressed with gzip\n"), GZIPPED_FILENAME_EXTENSION);
         }
 
         /* Reset the fd and continue */
@@ -232,7 +232,7 @@ static char *inspect_manpage_validity(const char *path, const char *localpath)
     mparse_updaterc(parser, &result);
     if (result > MANDOCLEVEL_OK) {
 #endif
-        fprintf(error_stream, "Errors found validating %s\n", (localpath == NULL) ? path : localpath);
+        fprintf(error_stream, _("Errors found validating %s\n"), (localpath == NULL) ? path : localpath);
     }
 
 end:
@@ -277,7 +277,7 @@ static bool manpage_driver(struct rpminspect *ri, rpmfile_entry_t *file)
     arch = get_rpm_header_arch(file->rpm_header);
 
     if ((manpage_errors = inspect_manpage_validity(file->fullpath, file->localpath)) != NULL) {
-        xasprintf(&msg, "Man page checker reported problems with %s on %s", file->localpath, arch);
+        xasprintf(&msg, _("Man page checker reported problems with %s on %s"), file->localpath, arch);
 
         add_result(ri, RESULT_VERIFY, WAIVABLE_BY_ANYONE, HEADER_MAN, msg, manpage_errors, REMEDY_MAN_ERRORS);
 
@@ -286,7 +286,7 @@ static bool manpage_driver(struct rpminspect *ri, rpmfile_entry_t *file)
     }
 
     if (!inspect_manpage_path(file->fullpath)) {
-        xasprintf(&msg, "Man page %s has incorrect path on %s", file->localpath, arch);
+        xasprintf(&msg, _("Man page %s has incorrect path on %s"), file->localpath, arch);
 
         add_result(ri, RESULT_VERIFY, WAIVABLE_BY_ANYONE, HEADER_MAN, msg, NULL, REMEDY_MAN_PATH);
 

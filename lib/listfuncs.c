@@ -53,7 +53,7 @@ struct hsearch_data * list_to_table(const string_list_t *list)
     assert(table != NULL);
 
     if (!hcreate_r(table_size, table)) {
-        fprintf(stderr, "Unable to create hash table: %s\n", strerror(errno));
+        fprintf(stderr, _("Unable to create hash table: %s\n"), strerror(errno));
         free(table);
         return NULL;
     }
@@ -63,7 +63,7 @@ struct hsearch_data * list_to_table(const string_list_t *list)
         e.data = iter->data;
 
         if (!hsearch_r(e, ENTER, &eptr, table)) {
-            fprintf(stderr, "Unable to add entry to hash table: %s\n", strerror(errno));
+            fprintf(stderr, _("Unable to add entry to hash table: %s\n"), strerror(errno));
             hdestroy_r(table);
             free(table);
             return NULL;
@@ -190,7 +190,7 @@ string_list_t * list_union(const string_list_t *a, const string_list_t *b)
     memset(&u_table, 0, sizeof(u_table));
 
     if (!hcreate_r(u_table_size, &u_table)) {
-        fprintf(stderr, "Unable to create hash table: %s\n", strerror(errno));
+        fprintf(stderr, _("Unable to create hash table: %s\n"), strerror(errno));
         return NULL;
     }
 

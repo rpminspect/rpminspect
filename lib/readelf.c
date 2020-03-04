@@ -60,7 +60,7 @@ static Elf * get_elf_with_kind(const char *fullpath, int *out_fd, Elf_Kind kind)
     /* library version check */
     if (!initialized) {
         if (elf_version(EV_CURRENT) == EV_NONE) {
-            fprintf(stderr, "libelf version mismatch\n");
+            fprintf(stderr, _("libelf version mismatch\n"));
             return NULL;
         }
 
@@ -69,7 +69,7 @@ static Elf * get_elf_with_kind(const char *fullpath, int *out_fd, Elf_Kind kind)
 
     /* make sure this is a regular file */
     if (lstat(fullpath, &sbuf) != 0) {
-        fprintf(stderr, "Unable to stat %s\n", fullpath);
+        fprintf(stderr, _("Unable to stat %s\n"), fullpath);
         return NULL;
     }
 

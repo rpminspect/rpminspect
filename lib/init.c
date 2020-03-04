@@ -50,7 +50,7 @@ static int add_regex(dictionary *cfg, const char *key, regex_t **regex_out)
         assert(errbuf != NULL);
 
         regerror(reg_result, *regex_out, errbuf, errbuf_size);
-        fprintf(stderr, "*** Unable to compile regular expression %s: %s\n", pattern, errbuf);
+        fprintf(stderr, _("*** Unable to compile regular expression %s: %s\n"), pattern, errbuf);
 
         /* Clean up and return error */
         free(errbuf);
@@ -202,7 +202,7 @@ static mode_t parse_mode(const char *input) {
     assert(input != NULL);
 
     if (strlen(input) != 10) {
-        fprintf(stderr, "*** Invalid input string `%s`\n", input);
+        fprintf(stderr, _("*** Invalid input string `%s`\n"), input);
         return mode;
     }
 
@@ -229,7 +229,7 @@ static mode_t parse_mode(const char *input) {
         mode |= S_IFWHT;
 #endif
     } else if (i != '-') {
-        fprintf(stderr, "*** Invalid mode string: %s\n", input);
+        fprintf(stderr, _("*** Invalid mode string: %s\n"), input);
         return mode;
     }
 
@@ -238,7 +238,7 @@ static mode_t parse_mode(const char *input) {
     if (i == 'r') {
         mode |= S_IRUSR;
     } else if (i != '-') {
-        fprintf(stderr, "*** Invalid mode string: %s\n", input);
+        fprintf(stderr, _("*** Invalid mode string: %s\n"), input);
         return mode;
     }
 
@@ -246,7 +246,7 @@ static mode_t parse_mode(const char *input) {
     if (i == 'w') {
         mode |= S_IWUSR;
     } else if (i != '-') {
-        fprintf(stderr, "*** Invalid mode string: %s\n", input);
+        fprintf(stderr, _("*** Invalid mode string: %s\n"), input);
         return mode;
     }
 
@@ -258,7 +258,7 @@ static mode_t parse_mode(const char *input) {
     } else if (i == 's') {
         mode |= S_IXUSR | S_ISUID;
     } else if (i != '-') {
-        fprintf(stderr, "*** Invalid mode string: %s\n", input);
+        fprintf(stderr, _("*** Invalid mode string: %s\n"), input);
         return mode;
     }
 
@@ -267,7 +267,7 @@ static mode_t parse_mode(const char *input) {
     if (i == 'r') {
         mode |= S_IRGRP;
     } else if (i != '-') {
-        fprintf(stderr, "*** Invalid mode string: %s\n", input);
+        fprintf(stderr, _("*** Invalid mode string: %s\n"), input);
         return mode;
     }
 
@@ -275,7 +275,7 @@ static mode_t parse_mode(const char *input) {
     if (i == 'w') {
         mode |= S_IWGRP;
     } else if (i != '-') {
-        fprintf(stderr, "*** Invalid mode string: %s\n", input);
+        fprintf(stderr, _("*** Invalid mode string: %s\n"), input);
         return mode;
     }
 
@@ -287,7 +287,7 @@ static mode_t parse_mode(const char *input) {
     } else if (i == 's') {
         mode |= S_IXGRP | S_ISGID;
     } else if (i != '-') {
-        fprintf(stderr, "*** Invalid mode string: %s\n", input);
+        fprintf(stderr, _("*** Invalid mode string: %s\n"), input);
         return mode;
     }
 
@@ -296,7 +296,7 @@ static mode_t parse_mode(const char *input) {
     if (i == 'r') {
         mode |= S_IROTH;
     } else if (i != '-') {
-        fprintf(stderr, "*** Invalid mode string: %s\n", input);
+        fprintf(stderr, _("*** Invalid mode string: %s\n"), input);
         return mode;
     }
 
@@ -304,7 +304,7 @@ static mode_t parse_mode(const char *input) {
     if (i == 'w') {
         mode |= S_IWOTH;
     } else if (i != '-') {
-        fprintf(stderr, "*** Invalid mode string: %s\n", input);
+        fprintf(stderr, _("*** Invalid mode string: %s\n"), input);
         return mode;
     }
 
@@ -316,7 +316,7 @@ static mode_t parse_mode(const char *input) {
     } else if (i == 't') {
         mode |= S_IXOTH | S_ISVTX;
     } else if (i != '-') {
-        fprintf(stderr, "*** Invalid mode string: %s\n", input);
+        fprintf(stderr, _("*** Invalid mode string: %s\n"), input);
         return mode;
     }
 
@@ -426,14 +426,14 @@ static int read_cfgfile(dictionary *cfg, struct rpminspect *ri, const char *file
         } else if (!strcasecmp(v, "off")) {
             exclude = true;
         } else {
-            fprintf(stderr, "*** Invalid [%s] line: %s = %s (ignoring)\n", INSPECTIONS, inspection, v);
+            fprintf(stderr, _("*** Invalid [%s] line: %s = %s (ignoring)\n"), INSPECTIONS, inspection, v);
             fflush(stderr);
             nk--;
             continue;
         }
 
         if (!process_inspection_flag(inspection, exclude, &ri->tests)) {
-            fprintf(stderr, "*** Unknown inspection: `%s`\n", inspection);
+            fprintf(stderr, _("*** Unknown inspection: `%s`\n"), inspection);
             fflush(stderr);
             exit(RI_PROGRAM_ERROR);
         }
@@ -562,8 +562,8 @@ static int read_cfgfile(dictionary *cfg, struct rpminspect *ri, const char *file
         } else if (!strcasecmp(tmp, "suffix")) {
             ri->specmatch = MATCH_SUFFIX;
         } else {
-            fprintf(stderr, "*** Invalid specname:match setting in %s: %s\n", filename, tmp);
-            fprintf(stderr, "*** Defaulting to 'full' matching.\n");
+            fprintf(stderr, _("*** Invalid specname:match setting in %s: %s\n"), filename, tmp);
+            fprintf(stderr, _("*** Defaulting to 'full' matching.\n"));
             ri->specmatch = MATCH_FULL;
         }
     }
@@ -575,8 +575,8 @@ static int read_cfgfile(dictionary *cfg, struct rpminspect *ri, const char *file
         } else if (!strcasecmp(tmp, "filename")) {
             ri->specprimary = PRIMARY_FILENAME;
         } else {
-            fprintf(stderr, "*** Invalid specname:primary setting in %s: %s\n", filename, tmp);
-            fprintf(stderr, "*** Defaulting to 'name' primary setting.\n");
+            fprintf(stderr, _("*** Invalid specname:primary setting in %s: %s\n"), filename, tmp);
+            fprintf(stderr, _("*** Defaulting to 'name' primary setting.\n"));
             ri->specprimary = PRIMARY_NAME;
         }
     }
@@ -673,8 +673,8 @@ bool init_stat_whitelist(struct rpminspect *ri) {
 
                 if (*token == '\0') {
                     /* this is an invalid entry in the stat-whitelist */
-                    fprintf(stderr, "*** Invalid filename in the stat-whitelist: %s\n", fnpart);
-                    fprintf(stderr, "*** From this invalid line:\n");
+                    fprintf(stderr, _("*** Invalid filename in the stat-whitelist: %s\n"), fnpart);
+                    fprintf(stderr, _("*** From this invalid line:\n"));
                     fprintf(stderr, "***     %s\n", line);
 
                     free(entry->owner);
@@ -882,7 +882,7 @@ int init_rpminspect(struct rpminspect *ri, const char *cfgfile, const char *prof
     iniparser_freedict(cfg);
 
     if (ret) {
-        fprintf(stderr, "*** error reading '%s'\n", ri->cfgfile);
+        fprintf(stderr, _("*** error reading '%s'\n"), ri->cfgfile);
         return ret;
     }
 
@@ -892,7 +892,7 @@ int init_rpminspect(struct rpminspect *ri, const char *cfgfile, const char *prof
         filename = realpath(tmp, NULL);
 
         if ((filename == NULL) || (access(filename, F_OK|R_OK) == -1)) {
-            fprintf(stderr, "*** Unable to read profile '%s' from %s\n", profile, filename);
+            fprintf(stderr, _("*** Unable to read profile '%s' from %s\n"), profile, filename);
         } else {
             cfg = iniparser_load(filename);
             ret = read_cfgfile(cfg, ri, filename, true);

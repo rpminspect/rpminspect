@@ -29,7 +29,7 @@
 #include "rpminspect.h"
 
 int mkdirp(char *path, mode_t mode) {
-    int r = 0; 
+    int r = 0;
     char *p = NULL;
     char *start = NULL;
     char *cwd = NULL;
@@ -42,7 +42,7 @@ int mkdirp(char *path, mode_t mode) {
         start = p = strdup(path);
     } else {
         if ((cwd = getcwd(NULL, 0)) == NULL) {
-            fprintf(stderr, "*** error getting current directory: %s\n", strerror(errno));
+            fprintf(stderr, _("*** error getting current directory: %s\n"), strerror(errno));
             fflush(stderr);
             return -1;
         }
@@ -65,7 +65,7 @@ int mkdirp(char *path, mode_t mode) {
                 p++;
                 continue;
             } else if (mkdir(start, mode) == -1) {
-                fprintf(stderr, "*** unable to mkdir %s: %s\n", start, strerror(errno));
+                fprintf(stderr, _("*** unable to mkdir %s: %s\n"), start, strerror(errno));
                 fflush(stderr);
                 return -1;
             }
@@ -78,7 +78,7 @@ int mkdirp(char *path, mode_t mode) {
 
     /* final directory */
     if ((stat(start, &sb) != 0) && (mkdir(start, mode) == -1)) {
-        fprintf(stderr, "*** unable to mkdir %s: %s\n", start, strerror(errno));
+        fprintf(stderr, _("*** unable to mkdir %s: %s\n"), start, strerror(errno));
         fflush(stderr);
         return -1;
     }
