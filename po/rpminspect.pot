@@ -1,0 +1,420 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the rpminspect package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: rpminspect\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2020-03-04 10:44-0500\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=CHARSET\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: src/builds.c:73
+#, c-format
+msgid "*** no Koji build or task specified in set_worksubdir()\n"
+msgstr ""
+
+#: src/builds.c:79
+#, c-format
+msgid "*** unable to create download directory %s: %s\n"
+msgstr ""
+
+#: src/builds.c:93
+#, c-format
+msgid "*** unknown workdir type: %d\n"
+msgstr ""
+
+#: src/builds.c:99
+#, c-format
+msgid "*** unable to create local work subdirectory: %s\n"
+msgstr ""
+
+#: src/builds.c:158
+#, c-format
+msgid "*** unable to close directory: %s: %s\n"
+msgstr ""
+
+#: src/builds.c:192
+#, c-format
+msgid "*** unable to read %s, skipping\n"
+msgstr ""
+
+#: src/builds.c:203 src/builds.c:349 src/builds.c:444 src/builds.c:554
+#: src/builds.c:572
+#, c-format
+msgid "*** error creating directory %s: %s\n"
+msgstr ""
+
+#: src/builds.c:220
+#, c-format
+msgid "*** error copying file %s: %s\n"
+msgstr ""
+
+#: src/builds.c:231
+#, c-format
+msgid "*** unknown directory member encountered: %s\n"
+msgstr ""
+
+#: src/builds.c:260
+#, c-format
+msgid "*** curl_easy_init() failed\n"
+msgstr ""
+
+#: src/builds.c:269
+#, c-format
+msgid "Downloading %s...\n"
+msgstr ""
+
+#: src/builds.c:276 src/builds.c:372
+#, c-format
+msgid "*** error opening %s: %s\n"
+msgstr ""
+
+#: src/builds.c:288
+#, c-format
+msgid "*** error closing %s: %s\n"
+msgstr ""
+
+#: src/builds.c:296
+#, c-format
+msgid "*** unable to unlink %s: %s\n"
+msgstr ""
+
+#: src/builds.c:366
+#, c-format
+msgid ""
+"*** error initializing YAML parser for module metadata, unable to filter\n"
+msgstr ""
+
+#: src/builds.c:424
+#, c-format
+msgid "*** error ening %s: %s\n"
+msgstr ""
+
+#: src/builds.c:504 src/builds.c:589 src/builds.c:612
+#, c-format
+msgid "*** error reading RPM: %s\n"
+msgstr ""
+
+#: src/builds.c:664
+#, c-format
+msgid "*** `%s' already exists\n"
+msgstr ""
+
+#: src/builds.c:673 src/builds.c:720
+#, c-format
+msgid "*** error gathering build %s: %s\n"
+msgstr ""
+
+#: src/builds.c:684 src/builds.c:731
+#, c-format
+msgid "*** error downloading task %s\n"
+msgstr ""
+
+#: src/builds.c:694 src/builds.c:741
+#, c-format
+msgid "*** error downloading build %s\n"
+msgstr ""
+
+#: src/builds.c:701
+#, c-format
+msgid "*** unable to find after build: %s\n"
+msgstr ""
+
+#: src/builds.c:748
+#, c-format
+msgid "*** unable to find before build: %s\n"
+msgstr ""
+
+#: src/rpminspect.c:49
+#, c-format
+msgid ""
+"Compare package builds for policy compliance and consistency.\n"
+"\n"
+msgstr ""
+
+#: src/rpminspect.c:50
+#, c-format
+msgid "Usage: %s [OPTIONS] [before build] [after build]\n"
+msgstr ""
+
+#: src/rpminspect.c:51
+#, c-format
+msgid "Options:\n"
+msgstr ""
+
+#: src/rpminspect.c:52
+#, c-format
+msgid "  -c FILE, --config=FILE   Configuration file to use\n"
+msgstr ""
+
+#: src/rpminspect.c:53 src/rpminspect.c:69
+#, c-format
+msgid "                             (default: %s)\n"
+msgstr ""
+
+#: src/rpminspect.c:54
+#, c-format
+msgid "  -p NAME, --profile=NAME  Configuration profile to use\n"
+msgstr ""
+
+#: src/rpminspect.c:55
+#, c-format
+msgid "  -T LIST, --tests=LIST    List of tests to run\n"
+msgstr ""
+
+#: src/rpminspect.c:56
+#, c-format
+msgid "                             (default: ALL)\n"
+msgstr ""
+
+#: src/rpminspect.c:57
+#, c-format
+msgid "  -E LIST, --exclude=LIST  List of tests to exclude\n"
+msgstr ""
+
+#: src/rpminspect.c:58
+#, c-format
+msgid "                             (default: none)\n"
+msgstr ""
+
+#: src/rpminspect.c:59
+#, c-format
+msgid "  -a LIST, --arches=LIST   List of architectures to check\n"
+msgstr ""
+
+#: src/rpminspect.c:60
+#, c-format
+msgid "  -r STR, --release=STR    Product release string\n"
+msgstr ""
+
+#: src/rpminspect.c:61
+#, c-format
+msgid "  -o FILE, --output=FILE   Write results to FILE\n"
+msgstr ""
+
+#: src/rpminspect.c:62
+#, c-format
+msgid "                             (default: stdout)\n"
+msgstr ""
+
+#: src/rpminspect.c:63
+#, c-format
+msgid "  -F TYPE, --format=TYPE   Format output results as TYPE\n"
+msgstr ""
+
+#: src/rpminspect.c:64
+#, c-format
+msgid "                             (default: text)\n"
+msgstr ""
+
+#: src/rpminspect.c:65
+#, c-format
+msgid "  -t TAG, --threshold=TAG  Result threshold triggering exit\n"
+msgstr ""
+
+#: src/rpminspect.c:66
+#, c-format
+msgid "                           failure (default: VERIFY)\n"
+msgstr ""
+
+#: src/rpminspect.c:67
+#, c-format
+msgid "  -l, --list               List available tests and formats\n"
+msgstr ""
+
+#: src/rpminspect.c:68
+#, c-format
+msgid "  -w PATH, --workdir=PATH  Temporary directory to use\n"
+msgstr ""
+
+#: src/rpminspect.c:70
+#, c-format
+msgid ""
+"  -f, --fetch-only         Fetch builds only, do not perform inspections\n"
+msgstr ""
+
+#: src/rpminspect.c:71
+#, c-format
+msgid "                             (implies -k)\n"
+msgstr ""
+
+#: src/rpminspect.c:72
+#, c-format
+msgid "  -k, --keep               Do not remove the comparison working files\n"
+msgstr ""
+
+#: src/rpminspect.c:73
+#, c-format
+msgid "  -d, --debug              Debugging mode output\n"
+msgstr ""
+
+#: src/rpminspect.c:74
+#, c-format
+msgid "  -v, --verbose            Verbose inspection output\n"
+msgstr ""
+
+#: src/rpminspect.c:75
+#, c-format
+msgid "                           when finished, display full path\n"
+msgstr ""
+
+#: src/rpminspect.c:76
+#, c-format
+msgid "  -?, --help               Display usage information\n"
+msgstr ""
+
+#: src/rpminspect.c:77
+#, c-format
+msgid "  -V, --version            Display program version\n"
+msgstr ""
+
+#: src/rpminspect.c:78
+#, c-format
+msgid ""
+"\n"
+"See the rpminspect(1) man page for more information.\n"
+msgstr ""
+
+#: src/rpminspect.c:110 src/rpminspect.c:121
+#, c-format
+msgid "*** Product release for after build (%s) is empty\n"
+msgstr ""
+
+#: src/rpminspect.c:136 src/rpminspect.c:145
+#, c-format
+msgid "*** Product release for before build (%s) is empty\n"
+msgstr ""
+
+#: src/rpminspect.c:192
+#, c-format
+msgid "*** unable to compile product release regular expression: %s\n"
+msgstr ""
+
+#: src/rpminspect.c:251
+#, c-format
+msgid "*** Unable to determine product release for %s and %s\n"
+msgstr ""
+
+#: src/rpminspect.c:268
+#, c-format
+msgid "*** The -T and -E options are mutually exclusive\n"
+msgstr ""
+
+#: src/rpminspect.c:269 src/rpminspect.c:288 src/rpminspect.c:593
+#: src/rpminspect.c:604 src/rpminspect.c:643
+#, c-format
+msgid "*** See `%s --help` for more information.\n"
+msgstr ""
+
+#: src/rpminspect.c:287
+#, c-format
+msgid "*** Unknown inspection: `%s`\n"
+msgstr ""
+
+#: src/rpminspect.c:416
+#, c-format
+msgid "*** Invalid output format: `%s`.\n"
+msgstr ""
+
+#: src/rpminspect.c:433
+#, c-format
+msgid "*** Unable to expand workdir: `%s`: %s"
+msgstr ""
+
+#: src/rpminspect.c:463
+#, c-format
+msgid "%s version %s\n"
+msgstr ""
+
+#: src/rpminspect.c:466
+#, c-format
+msgid "?? getopt returned character code 0%o ??\n"
+msgstr ""
+
+#: src/rpminspect.c:475
+#, c-format
+msgid "Available output formats:\n"
+msgstr ""
+
+#: src/rpminspect.c:491
+#, c-format
+msgid ""
+"\n"
+"Available inspections:\n"
+msgstr ""
+
+#: src/rpminspect.c:517
+#, c-format
+msgid "Specified config file (%s) is unreadable.\n"
+msgstr ""
+
+#: src/rpminspect.c:522
+#, c-format
+msgid "Unable to read the default config file (%s).\n"
+msgstr ""
+
+#: src/rpminspect.c:523
+#, c-format
+msgid "Have you installed an rpminspect-data package for your distro?\n"
+msgstr ""
+
+#: src/rpminspect.c:529
+#, c-format
+msgid "Failed to read configuration file\n"
+msgstr ""
+
+#: src/rpminspect.c:592
+#, c-format
+msgid "*** Invalid before and after build specification.\n"
+msgstr ""
+
+#: src/rpminspect.c:603
+#, c-format
+msgid "*** Fetch only mode takes a single build specification.\n"
+msgstr ""
+
+#: src/rpminspect.c:612
+#, c-format
+msgid "*** unable to read RPM configuration\n"
+msgstr ""
+
+#: src/rpminspect.c:642
+#, c-format
+msgid "*** Unsupported architecture specified: `%s`\n"
+msgstr ""
+
+#: src/rpminspect.c:666
+#, c-format
+msgid "*** Unable to create directory %s: %s\n"
+msgstr ""
+
+#: src/rpminspect.c:675
+#, c-format
+msgid "*** Failed to gather specified builds.\n"
+msgstr ""
+
+#: src/rpminspect.c:686
+#, c-format
+msgid "*** No peers, ensure packages exist for specified architecture(s).\n"
+msgstr ""
+
+#: src/rpminspect.c:740
+#, c-format
+msgid ""
+"\n"
+"Keeping working directory: %s\n"
+msgstr ""
+
+#: src/rpminspect.c:743
+#, c-format
+msgid "*** Error removing directory %s: %s\n"
+msgstr ""

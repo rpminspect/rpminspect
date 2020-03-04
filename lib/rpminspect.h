@@ -62,6 +62,17 @@ extern struct format formats[];
 }
 #endif
 
+#ifdef GETTEXT_DOMAIN
+#include <libintl.h>
+#include <locale.h>
+
+#define _(STRING) gettext(STRING)
+#define N_(STRING) ngettext(STRING)
+#else
+#define _(STRING) STRING
+#define N_(STRING) STRING
+#endif
+
 /*
  * Simple debugging printf.  Sends output to stderr if debugging
  * mode is enabled at runtime.

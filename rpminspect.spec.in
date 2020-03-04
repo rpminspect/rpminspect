@@ -26,6 +26,7 @@ BuildRequires:  libyaml-devel
 BuildRequires:  file-devel
 BuildRequires:  openssl-devel
 BuildRequires:  libcap-devel
+BuildRequires:  gettext-devel
 
 # The test suite requires additional packages, but they are not used
 # in the package building systems.  They are noted here for reference
