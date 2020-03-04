@@ -67,7 +67,7 @@ bool inspect_arch(struct rpminspect *ri) {
     /* Report results */
     if (lost != NULL && !TAILQ_EMPTY(lost)) {
         TAILQ_FOREACH(entry, lost, items) {
-            xasprintf(&msg, "Architecture '%s' has disappeared", entry->data);
+            xasprintf(&msg, _("Architecture '%s' has disappeared"), entry->data);
             add_result(ri, RESULT_VERIFY, WAIVABLE_BY_ANYONE, HEADER_ARCH, msg, NULL, REMEDY_ARCH_LOST);
             free(msg);
         }
@@ -79,7 +79,7 @@ bool inspect_arch(struct rpminspect *ri) {
 
     if (gain != NULL && !TAILQ_EMPTY(gain)) {
         TAILQ_FOREACH(entry, gain, items) {
-            xasprintf(&msg, "Architecture '%s' has appeared", entry->data);
+            xasprintf(&msg, _("Architecture '%s' has appeared"), entry->data);
             add_result(ri, RESULT_INFO, WAIVABLE_BY_ANYONE, HEADER_ARCH, msg, NULL, REMEDY_ARCH_GAIN);
             free(msg);
         }

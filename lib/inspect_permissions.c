@@ -29,7 +29,7 @@ static bool permissions_driver(struct rpminspect *ri, rpmfile_entry_t *file)
     const char *arch = NULL;
     char *msg = NULL;
     severity_t sev = RESULT_VERIFY;
-    const char *what = "changed";
+    const char *what = _("changed");
     mode_t before_mode;
     mode_t after_mode;
     mode_t mode_diff;
@@ -64,16 +64,16 @@ static bool permissions_driver(struct rpminspect *ri, rpmfile_entry_t *file)
         if (!whitelisted) {
             if (!(before_mode & (S_ISUID|S_ISGID)) && (after_mode & (S_ISUID|S_ISGID))) {
                 sev = RESULT_BAD;
-                what = "changed setuid/setgid";
+                what = _("changed setuid/setgid");
             } else if (S_ISDIR(file->st.st_mode) && !S_ISLNK(file->st.st_mode)) {
                 if (((mode_diff & S_ISVTX) && !(after_mode & S_ISVTX)) || ((after_mode & mode_diff) != 0)) {
                     sev = RESULT_BAD;
-                    what = "relaxed";
+                    what = _("relaxed");
                 }
             }
         }
 
-        xasprintf(&msg, "%s %s permissions from %04o to %04o on %s", file->localpath, what, before_mode, after_mode, arch);
+        xasprintf(&msg, _("%s %s permissions from %04o to %04o on %s"), file->localpath, what, before_mode, after_mode, arch);
         add_result(ri, sev, WAIVABLE_BY_ANYONE, HEADER_PERMISSIONS, msg, NULL, NULL);
         free(msg);
 
@@ -82,7 +82,7 @@ static bool permissions_driver(struct rpminspect *ri, rpmfile_entry_t *file)
 
     /* check for world-writability */
     if (!whitelisted && (!S_ISLNK(file->st.st_mode) && !S_ISDIR(file->st.st_mode) && (after_mode & (S_IWOTH|S_ISVTX)))) {
-        xasprintf(&msg, "%s (%s) is world-writable on %s", file->localpath, get_mime_type(file), arch);
+        xasprintf(&msg, _("%s (%s) is world-writable on %s"), file->localpath, get_mime_type(file), arch);
         add_result(ri, RESULT_BAD, WAIVABLE_BY_SECURITY, HEADER_PERMISSIONS, msg, NULL, NULL);
         free(msg);
         result = false;

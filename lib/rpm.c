@@ -71,7 +71,7 @@ Header get_rpm_header(struct rpminspect *ri, const char *pkg)
     fd = Fopen(pkg, "r.ufdio");
 
     if (fd == NULL || Ferror(fd)) {
-        fprintf(stderr, "*** Fopen() failed for %s: %s\n", pkg, Fstrerror(fd));
+        fprintf(stderr, _("*** Fopen() failed for %s: %s\n"), pkg, Fstrerror(fd));
         fflush(stderr);
 
         if (fd) {
@@ -91,7 +91,7 @@ Header get_rpm_header(struct rpminspect *ri, const char *pkg)
     Fclose(fd);
 
     if (result != RPMRC_OK) {
-        fprintf(stderr, "*** error reading package header for %s\n", pkg);
+        fprintf(stderr, _("*** error reading package header for %s\n"), pkg);
         return NULL;
     }
 

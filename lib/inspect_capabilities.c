@@ -64,12 +64,12 @@ static bool capabilities_driver(struct rpminspect *ri, rpmfile_entry_t *file)
 
     /* Report if the caps are different */
     if (after && before && strcmp(after, before)) {
-        xasprintf(&msg, "File capabilities for %s changed from '%s' to '%s' on %s\n", file->localpath, before, after, arch);
+        xasprintf(&msg, _("File capabilities for %s changed from '%s' to '%s' on %s\n"), file->localpath, before, after, arch);
         add_result(ri, RESULT_VERIFY, WAIVABLE_BY_SECURITY, HEADER_CAPABILITIES, msg, NULL, REMEDY_CAPABILITIES);
         free(msg);
         result = false;
     } else if (after && before && !strcmp(after, before)) {
-        xasprintf(&msg, "File capabilities found for %s: '%s' on %s\n", file->localpath, after, arch);
+        xasprintf(&msg, _("File capabilities found for %s: '%s' on %s\n"), file->localpath, after, arch);
         add_result(ri, RESULT_INFO, NOT_WAIVABLE, HEADER_CAPABILITIES, msg, NULL, NULL);
         free(msg);
     }
@@ -84,22 +84,22 @@ static bool capabilities_driver(struct rpminspect *ri, rpmfile_entry_t *file)
 
     if (after && flcaps) {
         if (!strcmp(after, flcaps->caps)) {
-            xasprintf(&msg, "File capabilities whitelist entry found for %s: '%s' on %s, matches package\n", file->localpath, flcaps->caps, arch);
+            xasprintf(&msg, _("File capabilities whitelist entry found for %s: '%s' on %s, matches package\n"), file->localpath, flcaps->caps, arch);
             add_result(ri, RESULT_INFO, NOT_WAIVABLE, HEADER_CAPABILITIES, msg, NULL, NULL);
             free(msg);
         } else {
-            xasprintf(&msg, "File capabilities whitelist mismatch for %s: expected '%s', got '%s'\n", file->localpath, flcaps->caps, arch);
+            xasprintf(&msg, _("File capabilities whitelist mismatch for %s: expected '%s', got '%s'\n"), file->localpath, flcaps->caps, arch);
             add_result(ri, RESULT_BAD, WAIVABLE_BY_SECURITY, HEADER_CAPABILITIES, msg, NULL, REMEDY_CAPABILITIES);
             free(msg);
             result = false;
         }
     } else if (after && !flcaps) {
-        xasprintf(&msg, "File capabilities for %s not found on the capabilities whitelist on %s\n", file->localpath, arch);
+        xasprintf(&msg, _("File capabilities for %s not found on the capabilities whitelist on %s\n"), file->localpath, arch);
         add_result(ri, RESULT_BAD, WAIVABLE_BY_SECURITY, HEADER_CAPABILITIES, msg, NULL, REMEDY_CAPABILITIES);
         free(msg);
         result = false;
     } else if (!after && flcaps) {
-        xasprintf(&msg, "File capabilities expected for %s but not found on %s: expected '%s'\n", file->localpath, arch, flcaps->caps);
+        xasprintf(&msg, _("File capabilities expected for %s but not found on %s: expected '%s'\n"), file->localpath, arch, flcaps->caps);
         add_result(ri, RESULT_BAD, WAIVABLE_BY_SECURITY, HEADER_CAPABILITIES, msg, NULL, REMEDY_CAPABILITIES);
         free(msg);
         result = false;

@@ -97,7 +97,7 @@ static bool dt_needed_driver(struct rpminspect *ri, rpmfile_entry_t *file)
     }
 
     if ((before_elf = get_elf(file->fullpath, &before_fd)) == NULL) {
-        xasprintf(&msg, "%s was an ELF file and now is not on %s", file->localpath, arch);
+        xasprintf(&msg, _("%s was an ELF file and now is not on %s"), file->localpath, arch);
         add_result(ri, RESULT_VERIFY, WAIVABLE_BY_ANYONE, HEADER_DT_NEEDED, msg, NULL, REMEDY_DT_NEEDED);
         free(msg);
         result = false;
@@ -107,7 +107,7 @@ static bool dt_needed_driver(struct rpminspect *ri, rpmfile_entry_t *file)
     before_type = get_elf_type(before_elf);
 
     if (before_type != ET_EXEC && before_type != ET_DYN) {
-        xasprintf(&msg, "%s was a dynamic ELF file and now is not on %s", file->localpath, arch);
+        xasprintf(&msg, _("%s was a dynamic ELF file and now is not on %s"), file->localpath, arch);
         add_result(ri, RESULT_VERIFY, WAIVABLE_BY_ANYONE, HEADER_DT_NEEDED, msg, NULL, REMEDY_DT_NEEDED);
         free(msg);
         result = false;
@@ -149,7 +149,7 @@ static bool dt_needed_driver(struct rpminspect *ri, rpmfile_entry_t *file)
 
     /* Report out any findings */
     if (removed != NULL && !TAILQ_EMPTY(removed)) {
-        xasprintf(&msg, "DT_NEEDED symbol(s) removed from %s on %s", file->localpath, arch);
+        xasprintf(&msg, _("DT_NEEDED symbol(s) removed from %s on %s"), file->localpath, arch);
 
         TAILQ_FOREACH(entry, removed, items) {
             xasprintf(&tmp, "%s\n", entry->data);
@@ -164,7 +164,7 @@ static bool dt_needed_driver(struct rpminspect *ri, rpmfile_entry_t *file)
     }
 
     if (added != NULL && !TAILQ_EMPTY(added)) {
-        xasprintf(&msg, "DT_NEEDED symbol(s) added to %s on %s", file->localpath, arch);
+        xasprintf(&msg, _("DT_NEEDED symbol(s) added to %s on %s"), file->localpath, arch);
 
         TAILQ_FOREACH(entry, added, items) {
             xasprintf(&tmp, "%s\n", entry->data);

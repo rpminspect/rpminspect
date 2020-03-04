@@ -504,14 +504,14 @@ static bool inspect_elf_execstack(struct rpminspect *ri, Elf *after_elf, Elf *be
         if (elf_type == ET_REL) {
             /* Missing .note.GNU-stack will result in an executable stack */
             if (before_execstack) {
-                xasprintf(&msg, "Object still has executable stack (no GNU-stack note): %s on %s", localpath, arch);
+                xasprintf(&msg, _("Object still has executable stack (no GNU-stack note): %s on %s"), localpath, arch);
                 severity = RESULT_VERIFY;
             } else {
-                xasprintf(&msg, "Object has executable stack (no GNU-stack note): %s on %s", localpath, arch);
+                xasprintf(&msg, _("Object has executable stack (no GNU-stack note): %s on %s"), localpath, arch);
                 severity = RESULT_BAD;
             }
         } else {
-            xasprintf(&msg, "Program built without GNU_STACK: %s on %s", localpath, arch);
+            xasprintf(&msg, _("Program built without GNU_STACK: %s on %s"), localpath, arch);
             severity = RESULT_BAD;
         }
 
@@ -524,11 +524,11 @@ static bool inspect_elf_execstack(struct rpminspect *ri, Elf *after_elf, Elf *be
 
     if (!is_execstack_valid(after_elf, execstack_flags)) {
         if (elf_type == ET_REL) {
-            xasprintf(&msg, "File %s has invalid execstack flags %lX on %s", localpath, execstack_flags, arch);
+            xasprintf(&msg, _("File %s has invalid execstack flags %lX on %s"), localpath, execstack_flags, arch);
 
             add_result(ri, RESULT_BAD, WAIVABLE_BY_SECURITY, HEADER_ELF, msg, NULL, REMEDY_ELF_EXECSTACK_INVALID);
         } else {
-            xasprintf(&msg, "File %s has unrecognized GNU_STACK '%s' (expected RW or RWE) on %s", localpath, pflags_to_str(execstack_flags), arch);
+            xasprintf(&msg, _("File %s has unrecognized GNU_STACK '%s' (expected RW or RWE) on %s"), localpath, pflags_to_str(execstack_flags), arch);
 
             add_result(ri, RESULT_BAD, WAIVABLE_BY_SECURITY, HEADER_ELF, msg, NULL, REMEDY_ELF_EXECSTACK_INVALID);
         }
@@ -540,18 +540,18 @@ static bool inspect_elf_execstack(struct rpminspect *ri, Elf *after_elf, Elf *be
     if (is_stack_executable(after_elf, execstack_flags)) {
         if (elf_type == ET_REL) {
             if (before_execstack) {
-                xasprintf(&msg, "Object still has executable stack (GNU-stack note = X): %s on %s", localpath, arch);
+                xasprintf(&msg, _("Object still has executable stack (GNU-stack note = X): %s on %s"), localpath, arch);
                 severity = RESULT_VERIFY;
             } else {
-                xasprintf(&msg, "Object has executable stack (GNU-stack note = X): %s on %s", localpath, arch);
+                xasprintf(&msg, _("Object has executable stack (GNU-stack note = X): %s on %s"), localpath, arch);
                 severity = RESULT_BAD;
             }
         } else {
             if (before_execstack) {
-                xasprintf(&msg, "Stack is still executable: %s on %s", localpath, arch);
+                xasprintf(&msg, _("Stack is still executable: %s on %s"), localpath, arch);
                 severity = RESULT_VERIFY;
             } else {
-                xasprintf(&msg, "Stack is executable: %s on %s", localpath, arch);
+                xasprintf(&msg, _("Stack is executable: %s on %s"), localpath, arch);
                 severity = RESULT_BAD;
             }
         }
@@ -578,10 +578,10 @@ static bool check_relro(struct rpminspect *ri, Elf *before_elf, Elf *after_elf, 
 
     if (before_relro && before_bind_now && after_relro && !after_bind_now) {
         /* full relro in before, partial relro in after */
-        xasprintf(&msg, "%s lost full GNU_RELRO security protection on %s", localpath, arch);
+        xasprintf(&msg, _("%s lost full GNU_RELRO security protection on %s"), localpath, arch);
     } else if (before_relro && !after_relro) {
         /* partial or full relro in before, no relro in after */
-        xasprintf(&msg, "%s lost GNU_RELRO security protection on %s", localpath, arch);
+        xasprintf(&msg, _("%s lost GNU_RELRO security protection on %s"), localpath, arch);
     }
 
     if (msg != NULL) {
@@ -655,7 +655,7 @@ static bool check_fortified(struct rpminspect *ri, Elf *before_elf, Elf *after_e
     output_stream = open_memstream(&output_buffer, &output_size);
     assert(output_stream != NULL);
 
-    output_result = fprintf(output_stream, "Fortified symbols lost:\n");
+    output_result = fprintf(output_stream, _("Fortified symbols lost:\n"));
     assert(output_result > 0);
 
     sorted_list = list_sort(before_fortified);
@@ -668,7 +668,7 @@ static bool check_fortified(struct rpminspect *ri, Elf *before_elf, Elf *after_e
 
     list_free(sorted_list, NULL);
 
-    output_result = fprintf(output_stream, "Fortifiable symbols present:\n");
+    output_result = fprintf(output_stream, _("Fortifiable symbols present:\n"));
     assert(output_result > 0);
 
     sorted_list = list_sort(after_fortifiable);
@@ -684,7 +684,7 @@ static bool check_fortified(struct rpminspect *ri, Elf *before_elf, Elf *after_e
     output_result = fclose(output_stream);
     assert(output_result == 0);
 
-    xasprintf(&msg, "%s may have lost -D_FORTIFY_SOURCE on %s", localpath, arch);
+    xasprintf(&msg, _("%s may have lost -D_FORTIFY_SOURCE on %s"), localpath, arch);
     add_result(ri, RESULT_VERIFY, WAIVABLE_BY_SECURITY, HEADER_ELF, msg, output_buffer, REMEDY_ELF_FORTIFY_SOURCE);
     free(msg);
 
@@ -740,7 +740,7 @@ static bool check_ipv6(struct rpminspect *ri, Elf *after_elf, const char *localp
     output_stream = open_memstream(&output_buffer, &output_size);
     assert(output_stream != NULL);
 
-    output_result = fprintf(output_stream, "IPv4-only symbols used:\n");
+    output_result = fprintf(output_stream, _("IPv4-only symbols used:\n"));
     assert(output_result > 0);
 
     sorted_used = list_sort(used_symbols);
@@ -754,7 +754,7 @@ static bool check_ipv6(struct rpminspect *ri, Elf *after_elf, const char *localp
     output_result = fclose(output_stream);
     assert(output_result == 0);
 
-    xasprintf(&msg, "%s may use functions unsuitable for IPv6 support on %s", localpath, arch);
+    xasprintf(&msg, _("%s may use functions unsuitable for IPv6 support on %s"), localpath, arch);
     add_result(ri, RESULT_VERIFY, WAIVABLE_BY_ANYONE, HEADER_ELF, msg, output_buffer, REMEDY_ELF_IPV6);
     free(msg);
 
@@ -912,7 +912,7 @@ static bool elf_archive_tests(struct rpminspect *ri, Elf *after_elf, int after_e
     if (TAILQ_FIRST(after_lost_pic) == NULL) {
         result = false;
 
-        output_result = fprintf(output_stream, "The following objects lost -fPIC:\n");
+        output_result = fprintf(output_stream, _("The following objects lost -fPIC:\n"));
         assert(output_result > 0);
 
         TAILQ_FOREACH(iter, after_lost_pic, items) {
@@ -935,7 +935,7 @@ static bool elf_archive_tests(struct rpminspect *ri, Elf *after_elf, int after_e
     if (TAILQ_FIRST(after_new) == NULL) {
         result = false;
 
-        output_result = fprintf(output_stream, "The following new objects were built without -fPIC:\n");
+        output_result = fprintf(output_stream, _("The following new objects were built without -fPIC:\n"));
         assert(output_result > 0);
 
         TAILQ_FOREACH(iter, after_new, items) {
@@ -948,7 +948,7 @@ static bool elf_archive_tests(struct rpminspect *ri, Elf *after_elf, int after_e
     assert(output_result == 0);
 
     if (!result) {
-        xasprintf(&msg, "%s lost -fPIC on %s", localpath, arch);
+        xasprintf(&msg, _("%s lost -fPIC on %s"), localpath, arch);
         add_result(ri, RESULT_BAD, WAIVABLE_BY_SECURITY, HEADER_ELF, msg, screendump, REMEDY_ELF_FPIC);
     }
 
@@ -978,9 +978,9 @@ static bool elf_regular_tests(struct rpminspect *ri, Elf *after_elf, Elf *before
     if (has_textrel(after_elf)) {
         /* Only complain for baseline (no before), or for gaining TEXTREL between before and after. */
         if (before_elf && !has_textrel(before_elf)) {
-            xasprintf(&msg, "%s acquired TEXTREL relocations on %s", localpath, arch);
+            xasprintf(&msg, _("%s acquired TEXTREL relocations on %s"), localpath, arch);
         } else if (!before_elf) {
-            xasprintf(&msg, "%s has TEXTREL relocations on %s", localpath, arch);
+            xasprintf(&msg, _("%s has TEXTREL relocations on %s"), localpath, arch);
         }
 
         if (msg != NULL) {

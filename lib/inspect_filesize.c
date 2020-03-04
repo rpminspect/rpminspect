@@ -61,13 +61,13 @@ static bool filesize_driver(struct rpminspect *ri, rpmfile_entry_t *file)
     /* Size checks and messaging */
     if (file->st.st_size > 0 && file->peer_file->st.st_size == 0) {
         /* became non-empty */
-        xasprintf(&msg, "%s became a non-empty file on %s", file->localpath, arch);
+        xasprintf(&msg, _("%s became a non-empty file on %s"), file->localpath, arch);
         sev = RESULT_VERIFY;
         waiver = WAIVABLE_BY_ANYONE;
         result = false;
     } else if (file->st.st_size == 0 && file->peer_file->st.st_size > 0) {
         /* became empty */
-        xasprintf(&msg, "%s became an empty file on %s", file->localpath, arch);
+        xasprintf(&msg, _("%s became an empty file on %s"), file->localpath, arch);
         sev = RESULT_VERIFY;
         waiver = WAIVABLE_BY_ANYONE;
         result = false;
@@ -76,10 +76,10 @@ static bool filesize_driver(struct rpminspect *ri, rpmfile_entry_t *file)
 
         if (change > 0) {
             /* file grew */
-            xasprintf(&msg, "%s grew by +%ld%% on %s", file->localpath, change, arch);
+            xasprintf(&msg, _("%s grew by +%ld%% on %s"), file->localpath, change, arch);
         } else if (change < 0) {
             /* file shrank */
-            xasprintf(&msg, "%s shrank by -%ld%% on %s", file->localpath, change, arch);
+            xasprintf(&msg, _("%s shrank by -%ld%% on %s"), file->localpath, change, arch);
         }
     }
 

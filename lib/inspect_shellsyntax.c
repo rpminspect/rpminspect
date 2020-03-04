@@ -47,7 +47,7 @@ static char *get_shell(const struct rpminspect *ri, const char *fullpath)
     fp = fopen(fullpath, "r");
 
     if (fp == NULL) {
-        fprintf(stderr, "error opening %s for reading: %s\n", fullpath, strerror(errno));
+        fprintf(stderr, _("error opening %s for reading: %s\n"), fullpath, strerror(errno));
         fflush(stderr);
         return NULL;
     }
@@ -56,12 +56,12 @@ static char *get_shell(const struct rpminspect *ri, const char *fullpath)
     start = buf;
 
     if (fclose(fp) == -1) {
-        fprintf(stderr, "error closing %s: %s\n", fullpath, strerror(errno));
+        fprintf(stderr, _("error closing %s: %s\n"), fullpath, strerror(errno));
         fflush(stderr);
     }
 
     if (r == -1) {
-        fprintf(stderr, "error reading first line from %s: %s\n", fullpath, strerror(errno));
+        fprintf(stderr, _("error reading first line from %s: %s\n"), fullpath, strerror(errno));
         fflush(stderr);
     } else if (!strncmp(buf, "#!", 2)) {
         /* trim newlines */
@@ -136,9 +136,9 @@ static bool shellsyntax_driver(struct rpminspect *ri, rpmfile_entry_t *file)
         before_shell = get_shell(ri, file->peer_file->fullpath);
 
         if (!before_shell) {
-            xasprintf(&msg, "%s is a shell script but was not before on %s", file->localpath, arch);
+            xasprintf(&msg, _("%s is a shell script but was not before on %s"), file->localpath, arch);
         } else if (strcmp(shell, before_shell)) {
-            xasprintf(&msg, "%s is a %s script but was a %s script before on %s", file->localpath, shell, before_shell, arch);
+            xasprintf(&msg, _("%s is a %s script but was a %s script before on %s"), file->localpath, shell, before_shell, arch);
         }
 
         if (msg) {
@@ -169,15 +169,15 @@ static bool shellsyntax_driver(struct rpminspect *ri, rpmfile_entry_t *file)
     /* Report */
     if (before_shell) {
         if (!before_exitcode && exitcode) {
-            xasprintf(&msg, "%s is no longer a valid %s script on %s", file->localpath, shell, arch);
+            xasprintf(&msg, _("%s is no longer a valid %s script on %s"), file->localpath, shell, arch);
             add_result(ri, RESULT_BAD, WAIVABLE_BY_ANYONE, HEADER_SHELLSYNTAX, msg, errors, REMEDY_SHELLSYNTAX_BAD);
             free(msg);
             result = false;
         } else if (before_exitcode && !exitcode) {
-            xasprintf(&msg, "%s became a valid %s script on %s", file->localpath, shell, arch);
+            xasprintf(&msg, _("%s became a valid %s script on %s"), file->localpath, shell, arch);
 
             if (extglob) {
-                xasprintf(&tmp, "%s. The script fails with '-n' but passes with '-O extglob'; be sure 'shopt extglob' is set in the script.", msg);
+                xasprintf(&tmp, _("%s. The script fails with '-n' but passes with '-O extglob'; be sure 'shopt extglob' is set in the script."), msg);
                 free(msg);
                 msg = tmp;
             }
@@ -187,11 +187,11 @@ static bool shellsyntax_driver(struct rpminspect *ri, rpmfile_entry_t *file)
         }
     } else {
         if (!exitcode && extglob) {
-            xasprintf(&msg, "%s fails with '-n' but passes with '-O extglob'; be sure 'shopt extglob' is set in the script on %s", file->localpath, arch);
+            xasprintf(&msg, _("%s fails with '-n' but passes with '-O extglob'; be sure 'shopt extglob' is set in the script on %s"), file->localpath, arch);
             add_result(ri, RESULT_INFO, NOT_WAIVABLE, HEADER_SHELLSYNTAX, msg, NULL, NULL);
             free(msg);
         } else if (exitcode) {
-            xasprintf(&msg, "%s is not a valid %s script on %s", file->localpath, shell, arch);
+            xasprintf(&msg, _("%s is not a valid %s script on %s"), file->localpath, shell, arch);
             add_result(ri, RESULT_BAD, WAIVABLE_BY_ANYONE, HEADER_SHELLSYNTAX, msg, errors, REMEDY_SHELLSYNTAX_BAD);
             free(msg);
             result = false;

@@ -61,7 +61,7 @@ bool inspect_emptyrpm(struct rpminspect *ri) {
          * is intentional, sometimes not.
          */
         if (peer->before_rpm != NULL && peer->after_rpm == NULL) {
-            xasprintf(&msg, "Existing subpackage %s is now missing", headerGetString(peer->before_hdr, RPMTAG_NAME));
+            xasprintf(&msg, _("Existing subpackage %s is now missing"), headerGetString(peer->before_hdr, RPMTAG_NAME));
             add_result(ri, RESULT_VERIFY, WAIVABLE_BY_ANYONE, HEADER_EMPTYRPM, msg, NULL, REMEDY_EMPTYRPM);
             free(msg);
             good = false;
@@ -70,15 +70,15 @@ bool inspect_emptyrpm(struct rpminspect *ri) {
 
         if (is_payload_empty(peer->after_files)) {
             if (peer->before_rpm == NULL) {
-                xasprintf(&msg, "New package %s is empty (no payloads)", basename(peer->after_rpm));
+                xasprintf(&msg, _("New package %s is empty (no payloads)"), basename(peer->after_rpm));
                 add_result(ri, RESULT_VERIFY, WAIVABLE_BY_ANYONE, HEADER_EMPTYRPM, msg, NULL, REMEDY_EMPTYRPM);
                 free(msg);
             } else if (is_payload_empty(peer->before_files)) {
-                xasprintf(&msg, "Package %s continues to be empty (no payloads)", basename(peer->after_rpm));
+                xasprintf(&msg, _("Package %s continues to be empty (no payloads)"), basename(peer->after_rpm));
                 add_result(ri, RESULT_INFO, NOT_WAIVABLE, HEADER_EMPTYRPM, msg, NULL, REMEDY_EMPTYRPM);
                 free(msg);
             } else {
-                xasprintf(&msg, "Package %s became empty (no payloads)", basename(peer->after_rpm));
+                xasprintf(&msg, _("Package %s became empty (no payloads)"), basename(peer->after_rpm));
                 add_result(ri, RESULT_VERIFY, WAIVABLE_BY_ANYONE, HEADER_EMPTYRPM, msg, NULL, REMEDY_EMPTYRPM);
                 free(msg);
             }

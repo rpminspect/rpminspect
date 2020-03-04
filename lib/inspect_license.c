@@ -42,7 +42,7 @@ static struct json_object *read_licensedb(const char *licensedb) {
     fd = open(licensedb, O_RDONLY);
 
     if (fd == -1) {
-        fprintf(stderr, "*** Unable to open license db %s: %s\n", licensedb, strerror(errno));
+        fprintf(stderr, _("*** Unable to open license db %s: %s\n"), licensedb, strerror(errno));
         fflush(stderr);
         return NULL;
     }
@@ -127,7 +127,7 @@ static int check_peer_license(struct rpminspect *ri, const char *actual_licensed
     license = headerGetString(hdr, RPMTAG_LICENSE);
 
     if (license == NULL) {
-        xasprintf(&msg, "Empty License Tag in %s", nevra);
+        xasprintf(&msg, _("Empty License Tag in %s"), nevra);
         add_result(ri, RESULT_BAD, NOT_WAIVABLE, HEADER_LICENSE, msg, NULL, REMEDY_LICENSE);
         ret = 1;
         free(msg);
@@ -136,12 +136,12 @@ static int check_peer_license(struct rpminspect *ri, const char *actual_licensed
         valid = is_valid_license(actual_licensedb, license);
 
         if (valid) {
-            xasprintf(&msg, "Valid License Tag in %s: %s", nevra, license);
+            xasprintf(&msg, _("Valid License Tag in %s: %s"), nevra, license);
 
             add_result(ri, RESULT_INFO, NOT_WAIVABLE, HEADER_LICENSE, msg, NULL, NULL);
             ret = 1;
         } else {
-            xasprintf(&msg, "Invalid License Tag in %s: %s", nevra, license);
+            xasprintf(&msg, _("Invalid License Tag in %s: %s"), nevra, license);
             add_result(ri, RESULT_BAD, NOT_WAIVABLE, HEADER_LICENSE, msg, NULL, REMEDY_LICENSE);
             ret = 1;
         }
@@ -150,7 +150,7 @@ static int check_peer_license(struct rpminspect *ri, const char *actual_licensed
 
         /* does the license tag contain bad words? */
         if (has_bad_word(license, ri->badwords)) {
-            xasprintf(&msg, "License Tag contains unprofessional language in %s: %s", nevra, license);
+            xasprintf(&msg, _("License Tag contains unprofessional language in %s: %s"), nevra, license);
             add_result(ri, RESULT_BAD, NOT_WAIVABLE, HEADER_LICENSE, msg, NULL, REMEDY_LICENSE);
             ret = 1;
             free(msg);
@@ -418,7 +418,7 @@ bool inspect_license(struct rpminspect *ri) {
     xasprintf(&actual_licensedb, "%s/%s/%s", ri->vendor_data_dir, LICENSES_DIR, ri->licensedb);
 
     if (ri->licensedb == NULL || access(actual_licensedb, F_OK|R_OK)) {
-        xasprintf(&msg, "Missing license database: %s: %s", actual_licensedb, strerror(errno));
+        xasprintf(&msg, _("Missing license database: %s: %s"), actual_licensedb, strerror(errno));
         add_result(ri, RESULT_BAD, NOT_WAIVABLE, HEADER_LICENSE, msg, NULL, REMEDY_LICENSEDB);
         free(msg);
         free(actual_licensedb);

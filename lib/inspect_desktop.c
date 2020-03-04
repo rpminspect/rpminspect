@@ -177,7 +177,7 @@ static bool validate_desktop_contents(struct rpminspect *ri, const rpmfile_entry
     fp = fopen(file->fullpath, "r");
 
     if (fp == NULL) {
-        fprintf(stderr, "error opening %s for reading: %s\n", file->fullpath, strerror(errno));
+        fprintf(stderr, _("error opening %s for reading: %s\n"), file->fullpath, strerror(errno));
         fflush(stderr);
         return false;
     }
@@ -219,20 +219,20 @@ static bool validate_desktop_contents(struct rpminspect *ri, const rpmfile_entry
              */
             if (nftw(allpkgtrees, find_file, 25, FTW_MOUNT|FTW_PHYS) == 1) {
                 if (lstat(file_to_find, &sb) == -1) {
-                    fprintf(stderr, "error stat'ing %s: %s\n", file_to_find, strerror(errno));
+                    fprintf(stderr, _("error stat'ing %s: %s\n"), file_to_find, strerror(errno));
                     fflush(stderr);
                     free(buf);
                     return false;
                 }
 
                 if (!(sb.st_mode & S_IXOTH)) {
-                    xasprintf(&msg, "Desktop file %s on %s references executable %s but %s is not executable by all", file->localpath, arch, tmp, tmp);
+                    xasprintf(&msg, _("Desktop file %s on %s references executable %s but %s is not executable by all"), file->localpath, arch, tmp, tmp);
                     add_result(ri, RESULT_VERIFY, WAIVABLE_BY_ANYONE, HEADER_DESKTOP, msg, NULL, REMEDY_DESKTOP);
                     free(msg);
                     result = false;
                 }
             } else {
-                xasprintf(&msg, "Desktop file %s on %s references executable %s but no subpackages contain an executable of that name", file->localpath, arch, tmp);
+                xasprintf(&msg, _("Desktop file %s on %s references executable %s but no subpackages contain an executable of that name"), file->localpath, arch, tmp);
                 add_result(ri, RESULT_VERIFY, WAIVABLE_BY_ANYONE, HEADER_DESKTOP, msg, NULL, REMEDY_DESKTOP);
                 free(msg);
                 result = false;
@@ -255,14 +255,14 @@ static bool validate_desktop_contents(struct rpminspect *ri, const rpmfile_entry
                 found = true;
 
                 if (lstat(file_to_find, &sb) == -1) {
-                    fprintf(stderr, "error stat'ing %s: %s\n", file_to_find, strerror(errno));
+                    fprintf(stderr, _("error stat'ing %s: %s\n"), file_to_find, strerror(errno));
                     fflush(stderr);
                     free(buf);
                     return false;
                 }
 
                 if (!(sb.st_mode & S_IROTH)) {
-                    xasprintf(&msg, "Desktop file %s on %s references icon %s but %s is not readable by all", file->localpath, arch, tmp, tmp);
+                    xasprintf(&msg, _("Desktop file %s on %s references icon %s but %s is not readable by all"), file->localpath, arch, tmp, tmp);
                     add_result(ri, RESULT_VERIFY, WAIVABLE_BY_ANYONE, HEADER_DESKTOP, msg, NULL, REMEDY_DESKTOP);
                     free(msg);
                     result = false;
@@ -270,7 +270,7 @@ static bool validate_desktop_contents(struct rpminspect *ri, const rpmfile_entry
             }
 
             if (!found) {
-                xasprintf(&msg, "Desktop file %s on %s references icon %s but no subpackages contain %s", file->localpath, arch, tmp, tmp);
+                xasprintf(&msg, _("Desktop file %s on %s references icon %s but no subpackages contain %s"), file->localpath, arch, tmp, tmp);
                 add_result(ri, RESULT_VERIFY, WAIVABLE_BY_ANYONE, HEADER_DESKTOP, msg, NULL, REMEDY_DESKTOP);
                 free(msg);
                 result = false;
@@ -285,7 +285,7 @@ static bool validate_desktop_contents(struct rpminspect *ri, const rpmfile_entry
 
     /* Close the desktop entry file */
     if (fclose(fp) == -1) {
-        fprintf(stderr, "error closing %s: %s\n", file->fullpath, strerror(errno));
+        fprintf(stderr, _("error closing %s: %s\n"), file->fullpath, strerror(errno));
         fflush(stderr);
         result = false;
     }
@@ -334,13 +334,13 @@ static bool desktop_driver(struct rpminspect *ri, rpmfile_entry_t *file)
     arch = get_rpm_header_arch(file->rpm_header);
 
     if (file->peer_file && before_out == NULL && after_out != NULL) {
-        xasprintf(&msg, "File %s is no longer a valid desktop entry file on %s; desktop-file-validate reports:", file->localpath, arch);
+        xasprintf(&msg, _("File %s is no longer a valid desktop entry file on %s; desktop-file-validate reports:"), file->localpath, arch);
         add_result(ri, (after_code == 0) ? RESULT_INFO : RESULT_BAD, WAIVABLE_BY_ANYONE, HEADER_DESKTOP, msg, after_out, REMEDY_DESKTOP);
     } else if (file->peer_file == NULL && after_out != NULL) {
-        xasprintf(&msg, "New file %s is not a valid desktop file on %s; desktop-file-validate reports:", file->localpath, arch);
+        xasprintf(&msg, _("New file %s is not a valid desktop file on %s; desktop-file-validate reports:"), file->localpath, arch);
         add_result(ri, (after_code == 0) ? RESULT_INFO : RESULT_BAD, WAIVABLE_BY_ANYONE, HEADER_DESKTOP, msg, after_out, REMEDY_DESKTOP);
     } else if (after_out != NULL) {
-        xasprintf(&msg, "File %s is not a valid desktop file on %s; desktop-file-validate reports:", file->localpath, arch);
+        xasprintf(&msg, _("File %s is not a valid desktop file on %s; desktop-file-validate reports:"), file->localpath, arch);
         add_result(ri, (after_code == 0) ? RESULT_INFO : RESULT_BAD, WAIVABLE_BY_ANYONE, HEADER_DESKTOP, msg, after_out, REMEDY_DESKTOP);
     }
 

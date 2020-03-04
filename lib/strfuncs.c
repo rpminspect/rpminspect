@@ -245,17 +245,17 @@ cleanup:
 char *strseverity(const severity_t severity) {
     switch (severity) {
         case RESULT_OK:
-            return "OK";
+            return _("OK");
         case RESULT_INFO:
-            return "INFO";
+            return _("INFO");
         case RESULT_WAIVED:
-            return "WAIVED";
+            return _("WAIVED");
         case RESULT_VERIFY:
-            return "VERIFY";
+            return _("VERIFY");
         case RESULT_BAD:
-            return "BAD";
+            return _("BAD");
         default:
-            return "UnKnOwN";
+            return _("UnKnOwN");
     }
 
     return NULL;
@@ -272,15 +272,15 @@ severity_t getseverity(const char *name) {
         return s;
     }
 
-    if (!strcasecmp(name, "OK")) {
+    if (!strcasecmp(name, _("OK"))) {
         s = RESULT_OK;
-    } else if (!strcasecmp(name, "INFO")) {
+    } else if (!strcasecmp(name, _("INFO"))) {
         s = RESULT_INFO;
-    } else if (!strcasecmp(name, "WAIVED")) {
+    } else if (!strcasecmp(name, _("WAIVED"))) {
         s = RESULT_WAIVED;
-    } else if (!strcasecmp(name, "VERIFY")) {
+    } else if (!strcasecmp(name, _("VERIFY"))) {
         s = RESULT_VERIFY;
-    } else if (!strcasecmp(name, "BAD")) {
+    } else if (!strcasecmp(name, _("BAD"))) {
         s = RESULT_BAD;
     }
 
@@ -293,13 +293,13 @@ severity_t getseverity(const char *name) {
 char *strwaiverauth(const waiverauth_t waiverauth) {
     switch (waiverauth) {
         case NOT_WAIVABLE:
-            return "Not Waivable";
+            return _("Not Waivable");
         case WAIVABLE_BY_ANYONE:
-            return "Anyone";
+            return _("Anyone");
         case WAIVABLE_BY_SECURITY:
-            return "Security";
+            return _("Security");
         default:
-            return "UnKnOwN";
+            return _("UnKnOwN");
     }
 
     return NULL;

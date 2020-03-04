@@ -34,7 +34,7 @@ static bool modularity_driver(struct rpminspect *ri, rpmfile_entry_t *file) {
     assert(file != NULL);
 
     /* Build the message we'll use for errors */
-    xasprintf(&msg, "Package \"%s\" is part of a module but lacks the '%%{modularitylabel}' header tag.", headerGetString(file->rpm_header, RPMTAG_NAME));
+    xasprintf(&msg, _("Package \"%s\" is part of a module but lacks the '%%{modularitylabel}' header tag."), headerGetString(file->rpm_header, RPMTAG_NAME));
 
     /* Find how to find the header */
     tv = rpmTagGetValue("modularitylabel");

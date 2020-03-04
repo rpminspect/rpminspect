@@ -36,7 +36,7 @@ static void add_removedfiles_result(struct rpminspect *ri, const char *msg, char
     assert(msg != NULL);
 
     if (waiver == WAIVABLE_BY_SECURITY) {
-        xasprintf(&tmp, "%s.  Removing security policy related files requires inspection by the Security Response Team.", msg);
+        xasprintf(&tmp, _("%s.  Removing security policy related files requires inspection by the Security Response Team."), msg);
     } else {
         tmp = strdup(msg);
     }
@@ -108,16 +108,16 @@ static bool removedfiles_driver(struct rpminspect *ri, rpmfile_entry_t *file)
         severity = RESULT_BAD;
 
         if (soname) {
-            xasprintf(&msg, "ABI break: Library %s with SONAME '%s' removed from %s", file->localpath, soname, arch);
+            xasprintf(&msg, _("ABI break: Library %s with SONAME '%s' removed from %s"), file->localpath, soname, arch);
             free(soname);
         } else {
-            xasprintf(&msg, "ABI break: Library %s removed from %s", file->localpath, arch);
+            xasprintf(&msg, _("ABI break: Library %s removed from %s"), file->localpath, arch);
         }
 
         add_removedfiles_result(ri, msg, NULL, severity, waiver);
         free(msg);
     } else {
-        xasprintf(&msg, "%s removed from %s", file->localpath, arch);
+        xasprintf(&msg, _("%s removed from %s"), file->localpath, arch);
         add_removedfiles_result(ri, msg, NULL, severity, waiver);
         free(msg);
     }

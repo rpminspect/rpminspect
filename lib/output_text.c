@@ -45,7 +45,7 @@ void output_text(const results_t *results, const char *dest) {
         fp = fopen(dest, "w");
 
         if (fp == NULL) {
-            fprintf(stderr, "*** Error opening %s for writing: %s\n", dest, strerror(errno));
+            fprintf(stderr, _("*** Error opening %s for writing: %s\n"), dest, strerror(errno));
             fflush(stderr);
             return;
         }
@@ -90,17 +90,17 @@ void output_text(const results_t *results, const char *dest) {
             free(msg);
         }
 
-        fprintf(fp, "Result: %s\n", strseverity(result->severity));
+        fprintf(fp, _("Result: %s\n"), strseverity(result->severity));
 
         if (result->severity != RESULT_OK && result->severity != RESULT_INFO) {
-            fprintf(fp, "Waiver Authorization: %s\n\n", strwaiverauth(result->waiverauth));
+            fprintf(fp, _("Waiver Authorization: %s\n\n"), strwaiverauth(result->waiverauth));
 
             if (result->screendump != NULL) {
-                fprintf(fp, "Screendump:\n%s\n\n", result->screendump);
+                fprintf(fp, _("Screendump:\n%s\n\n"), result->screendump);
             }
 
             if (result->remedy != NULL) {
-                xasprintf(&msg, "Suggested Remedy:\n%s", result->remedy);
+                xasprintf(&msg, _("Suggested Remedy:\n%s"), result->remedy);
 
                 if (width) {
                     printwrap(msg, width, 0, fp);

@@ -50,7 +50,7 @@ int copyfile(const char *src, const char *dest, bool force, bool verbose) {
 
     /* stat the source */
     if (lstat(src, &sb) == -1) {
-        fprintf(stderr, "*** Unable to stat %s: %s\n", src, strerror(errno));
+        fprintf(stderr, _("*** Unable to stat %s: %s\n"), src, strerror(errno));
         fflush(stderr);
         return -1;
     }
@@ -60,7 +60,7 @@ int copyfile(const char *src, const char *dest, bool force, bool verbose) {
     destdir = dirname(destpath);
 
     if (mkdirp(destdir, S_IRWXU) == -1) {
-        fprintf(stderr, "*** Unable to create directory %s: %s\n", destdir, strerror(errno));
+        fprintf(stderr, _("*** Unable to create directory %s: %s\n"), destdir, strerror(errno));
         fflush(stderr);
         return -1;
     }
@@ -70,13 +70,13 @@ int copyfile(const char *src, const char *dest, bool force, bool verbose) {
     /* if src is a symlink, handle it here */
     if (S_ISLNK(sb.st_mode)) {
         if (readlink(src, linkdest, PATH_MAX) == -1) {
-            fprintf(stderr, "*** Unable to read symlink info on %s: %s\n", src, strerror(errno));
+            fprintf(stderr, _("*** Unable to read symlink info on %s: %s\n"), src, strerror(errno));
             fflush(stderr);
             return -1;
         }
 
         if (symlink(linkdest, dest) == -1) {
-            fprintf(stderr, "*** Unable to create symlink %s: %s\n", dest, strerror(errno));
+            fprintf(stderr, _("*** Unable to create symlink %s: %s\n"), dest, strerror(errno));
             fflush(stderr);
             return -1;
         }
@@ -86,7 +86,7 @@ int copyfile(const char *src, const char *dest, bool force, bool verbose) {
 
     /* copy src to dest */
     if ((in = fopen(src, "r")) == NULL) {
-        fprintf(stderr, "*** Unable to open %s for reading: %s\n", src, strerror(errno));
+        fprintf(stderr, _("*** Unable to open %s for reading: %s\n"), src, strerror(errno));
         fflush(stderr);
         return -1;
     }
@@ -94,23 +94,23 @@ int copyfile(const char *src, const char *dest, bool force, bool verbose) {
     if ((out_fd = open(dest, oflags, mode)) == -1) {
         if (errno == EEXIST) {
             if (verbose) {
-                fprintf(stderr, "*** %s already exists", dest);
+                fprintf(stderr, _("*** %s already exists"), dest);
                 fflush(stderr);
             }
 
             if (force) {
                 if (verbose) {
-                    fprintf(stderr, ", overwriting\n");
+                    fprintf(stderr, _(", overwriting\n"));
                     fflush(stderr);
                 }
 
                 if (remove(dest)) {
-                    fprintf(stderr, "*** Unable to remove %s: %s\n", dest, strerror(errno));
+                    fprintf(stderr, _("*** Unable to remove %s: %s\n"), dest, strerror(errno));
                     fflush(stderr);
                     return -1;
                 } else {
                     if ((out_fd = open(dest, oflags, mode)) == -1) {
-                        fprintf(stderr, "*** Still unable to open %s, giving up\n", dest);
+                        fprintf(stderr, _("*** Still unable to open %s, giving up\n"), dest);
                         fflush(stderr);
                     }
                 }
@@ -120,21 +120,21 @@ int copyfile(const char *src, const char *dest, bool force, bool verbose) {
                 return -1;
             }
         } else {
-            fprintf(stderr, "*** Unable to open %s for writing: %s\n", dest, strerror(errno));
+            fprintf(stderr, _("*** Unable to open %s for writing: %s\n"), dest, strerror(errno));
             fflush(stderr);
             return -1;
         }
     }
 
     if ((out = fdopen(out_fd, "wb")) == NULL) {
-        fprintf(stderr, "*** Unable to open %s: %s\n", dest, strerror(errno));
+        fprintf(stderr, _("*** Unable to open %s: %s\n"), dest, strerror(errno));
         fflush(stderr);
         return -1;
     }
 
     while ((s = fread(buf, sizeof(char), BUFSIZ, in)) > 0) {
         if (fwrite(buf, sizeof(char), s, out) != s) {
-            fprintf(stderr, "*** Error writing to %s: %s\n", dest, strerror(errno));
+            fprintf(stderr, _("*** Error writing to %s: %s\n"), dest, strerror(errno));
             fflush(stderr);
             errno = 0;
             success = -1;
@@ -143,7 +143,7 @@ int copyfile(const char *src, const char *dest, bool force, bool verbose) {
     }
 
     if (fflush(out) | fclose(out)) {
-        fprintf(stderr, "*** Error writing to %s: %s\n", dest, strerror(errno));
+        fprintf(stderr, _("*** Error writing to %s: %s\n"), dest, strerror(errno));
         fflush(stderr);
         success = -1;
     }
@@ -157,14 +157,14 @@ int copyfile(const char *src, const char *dest, bool force, bool verbose) {
     /* set ownerships and permissions */
     if (geteuid() == 0) {
         if (chown(dest, sb.st_uid, sb.st_gid) == -1) {
-            fprintf(stderr, "*** chown() error on %s: %s\n", dest, strerror(errno));
+            fprintf(stderr, _("*** chown() error on %s: %s\n"), dest, strerror(errno));
             fflush(stderr);
             success = -1;
         }
     }
 
     if (chmod(dest, (sb.st_mode & (S_ISUID | S_ISGID | S_ISVTX | S_IRWXU | S_IRWXG | S_IRWXO))) == -1) {
-        fprintf(stderr, "*** chmod() error on %s: %s\n", dest, strerror(errno));
+        fprintf(stderr, _("*** chmod() error on %s: %s\n"), dest, strerror(errno));
         fflush(stderr);
         success = -1;
     }

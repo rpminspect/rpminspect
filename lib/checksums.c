@@ -65,7 +65,7 @@ char *compute_checksum(const char *filename, mode_t *st_mode, enum checksum type
     /* don't calculate the checksum of a device node */
     if (S_ISCHR(*mode) || S_ISBLK(*mode) ||
         S_ISFIFO(*mode) || S_ISSOCK(*mode)) {
-        fprintf(stderr, "*** Cannot calculate checksum on devices or fifos: %s\n", filename);
+        fprintf(stderr, _("*** Cannot calculate checksum on devices or fifos: %s\n"), filename);
         fflush(stderr);
         return NULL;
     }
@@ -88,7 +88,7 @@ char *compute_checksum(const char *filename, mode_t *st_mode, enum checksum type
 
     /* read in the file to generate the requested checksum */
     if ((input = open(filename, O_RDONLY)) == -1) {
-        fprintf(stderr, "*** Unable to open %s: %s\n", filename, strerror(errno));
+        fprintf(stderr, _("*** Unable to open %s: %s\n"), filename, strerror(errno));
         fflush(stderr);
         return NULL;
     }

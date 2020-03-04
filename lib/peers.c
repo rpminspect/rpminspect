@@ -118,7 +118,7 @@ int add_peer(rpmpeer_t **peers, int whichbuild, bool fetch_only, const char *pkg
     /* Add the peer if it doesn't already exist, otherwise add it */
     if (!found) {
         if ((peer = calloc(1, sizeof(*peer))) == NULL) {
-            fprintf(stderr, "*** failed to allocate new peer peer\n");
+            fprintf(stderr, _("*** failed to allocate new peer peer\n"));
             fflush(stderr);
             return 1;
         }

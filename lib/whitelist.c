@@ -38,12 +38,12 @@ bool on_stat_whitelist(struct rpminspect *ri, const rpmfile_entry_t *file, const
         TAILQ_FOREACH(wlentry, ri->stat_whitelist, items) {
             if (!strcmp(file->localpath, wlentry->filename)) {
                 if (file->st.st_mode == wlentry->mode) {
-                    xasprintf(&msg, "%s on %s carries mode %04o, but is on the stat whitelist", file->localpath, arch, file->st.st_mode);
+                    xasprintf(&msg, _("%s on %s carries mode %04o, but is on the stat whitelist"), file->localpath, arch, file->st.st_mode);
                     add_result(ri, RESULT_INFO, WAIVABLE_BY_ANYONE, header, msg, NULL, remedy);
                     free(msg);
                     return true;
                 } else {
-                    xasprintf(&msg, "%s on %s carries mode %04o, is on the stat whitelist but expected mode %04o", file->localpath, arch, file->st.st_mode, wlentry->mode);
+                    xasprintf(&msg, _("%s on %s carries mode %04o, is on the stat whitelist but expected mode %04o"), file->localpath, arch, file->st.st_mode, wlentry->mode);
                     add_result(ri, RESULT_VERIFY, WAIVABLE_BY_SECURITY, header, msg, NULL, remedy);
                     free(msg);
                     return true;
@@ -53,7 +53,7 @@ bool on_stat_whitelist(struct rpminspect *ri, const rpmfile_entry_t *file, const
     }
 
     /* catch anything not on the stat-whitelist */
-    xasprintf(&msg, "%s on %s carries insecure mode %04o, Security Team review may be required", file->localpath, arch, file->st.st_mode);
+    xasprintf(&msg, _("%s on %s carries insecure mode %04o, Security Team review may be required"), file->localpath, arch, file->st.st_mode);
     add_result(ri, RESULT_BAD, WAIVABLE_BY_SECURITY, header, msg, NULL, remedy);
     free(msg);
     return true;

@@ -120,7 +120,7 @@ static bool upstream_driver(struct rpminspect *ri, rpmfile_entry_t *file)
 
     /* Report what was found */
     if (file->peer_file == NULL) {
-        xasprintf(&msg, "New upstream source file `%s` appeared", shortname)
+        xasprintf(&msg, _("New upstream source file `%s` appeared"), shortname)
         add_result(ri, sev, waiver, HEADER_UPSTREAM, msg, NULL, remedy);
         result = false;
     } else {
@@ -144,7 +144,7 @@ static bool upstream_driver(struct rpminspect *ri, rpmfile_entry_t *file)
             }
 
             /* report the changed file */
-            xasprintf(&msg, "Upstream source file `%s` changed content", shortname);
+            xasprintf(&msg, _("Upstream source file `%s` changed content"), shortname);
             add_result(ri, sev, waiver, HEADER_UPSTREAM, msg, diff_head, remedy);
             result = false;
 
@@ -229,7 +229,7 @@ bool inspect_upstream(struct rpminspect *ri)
         if (peer->before_files) {
             TAILQ_FOREACH(file, peer->before_files, items) {
                 if (file->peer_file == NULL) {
-                    xasprintf(&msg, "Source RPM member `%s` removed", basename(file->fullpath));
+                    xasprintf(&msg, _("Source RPM member `%s` removed"), basename(file->fullpath));
                     add_result(ri, sev, waiver, HEADER_UPSTREAM, msg, NULL, remedy);
                     result = false;
                     free(msg);

@@ -57,101 +57,101 @@
  * Inspection remedies
  */
 /* metadata */
-#define REMEDY_VENDOR        "Change the string specified on the 'Vendor:' line in the spec file."
-#define REMEDY_BUILDHOST     "Make sure the SRPM is built on a host within the expected subdomain."
-#define REMEDY_BADWORDS      "Unprofessional language as defined in the configuration file was found in the text shown.  Remove or change the offending words and rebuild."
+#define REMEDY_VENDOR _("Change the string specified on the 'Vendor:' line in the spec file.")
+#define REMEDY_BUILDHOST _("Make sure the SRPM is built on a host within the expected subdomain.")
+#define REMEDY_BADWORDS _("Unprofessional language as defined in the configuration file was found in the text shown.  Remove or change the offending words and rebuild.")
 
 /* emptyrpm */
-#define REMEDY_EMPTYRPM      "Check to see if you eliminated a subpackage but still have the %%package and/or the %%files section for it."
+#define REMEDY_EMPTYRPM _("Check to see if you eliminated a subpackage but still have the %%package and/or the %%files section for it.")
 
 /* license */
-#define REMEDY_LICENSE       "The License tag must contain an approved license string as defined by the distribution (e.g., GPLv2+).  If the license in question is approved, the license database needs updating in the rpminspect-data package."
-#define REMEDY_LICENSEDB     "Make sure the licensedb setting in the rpminspect.conf file is set to a valid licensedb file.  This is also commonly due to a missing vendor specific rpminspect-data package on the system."
+#define REMEDY_LICENSE _("The License tag must contain an approved license string as defined by the distribution (e.g., GPLv2+).  If the license in question is approved, the license database needs updating in the rpminspect-data package.")
+#define REMEDY_LICENSEDB _("Make sure the licensedb setting in the rpminspect.conf file is set to a valid licensedb file.  This is also commonly due to a missing vendor specific rpminspect-data package on the system.")
 
 /* elf */
-#define REMEDY_ELF_TEXTREL              "Ensure all object files are compiled with -fPIC"
-#define REMEDY_ELF_EXECSTACK_MISSING    "Ensure that the package is being built with the correct compiler and compiler flags"
-#define REMEDY_ELF_EXECSTACK_INVALID    "The data in an ELF file appears to be corrupt; ensure that packaged ELF files are not being truncated or incorrectly modified"
-#define REMEDY_ELF_EXECSTACK_EXECUTABLE "An ELF stack is marked as executable. Ensure that no execstack options are being passed to the linker, and that no functions are defined on the stack."
-#define REMEDY_ELF_GNU_RELRO            "Ensure executables are linked with with '-z relro -z now'"
-#define REMEDY_ELF_FORTIFY_SOURCE       "Ensure all object files are compiled with '-O2 -D_FORTIFY_SOURCE=2', and that all appropriate headers are included (no implicit function declarations). Symbols may also appear as unfortified if the compiler is unable to determine the size of a buffer, which is not necessarily an error."
-#define REMEDY_ELF_FPIC                 "Ensure all object files are compiled with -fPIC"
-#define REMEDY_ELF_IPV6                 "Please review all usages of IPv4-only functions and ensure IPv6 compliance."
+#define REMEDY_ELF_TEXTREL _("Ensure all object files are compiled with -fPIC")
+#define REMEDY_ELF_EXECSTACK_MISSING _("Ensure that the package is being built with the correct compiler and compiler flags")
+#define REMEDY_ELF_EXECSTACK_INVALID _("The data in an ELF file appears to be corrupt; ensure that packaged ELF files are not being truncated or incorrectly modified")
+#define REMEDY_ELF_EXECSTACK_EXECUTABLE _("An ELF stack is marked as executable. Ensure that no execstack options are being passed to the linker, and that no functions are defined on the stack.")
+#define REMEDY_ELF_GNU_RELRO _("Ensure executables are linked with with '-z relro -z now'")
+#define REMEDY_ELF_FORTIFY_SOURCE _("Ensure all object files are compiled with '-O2 -D_FORTIFY_SOURCE=2', and that all appropriate headers are included (no implicit function declarations). Symbols may also appear as unfortified if the compiler is unable to determine the size of a buffer, which is not necessarily an error.")
+#define REMEDY_ELF_FPIC _("Ensure all object files are compiled with -fPIC")
+#define REMEDY_ELF_IPV6 _("Please review all usages of IPv4-only functions and ensure IPv6 compliance.")
 
 /* man */
-#define REMEDY_MAN_ERRORS   "Correct the errors in the man page as reported by the libmandoc parser."
-#define REMEDY_MAN_PATH     "Correct the installation path for the man page. Man pages must be installed in the directory beneath /usr/share/man that matches the section number of the page."
+#define REMEDY_MAN_ERRORS _("Correct the errors in the man page as reported by the libmandoc parser.")
+#define REMEDY_MAN_PATH _("Correct the installation path for the man page. Man pages must be installed in the directory beneath /usr/share/man that matches the section number of the page.")
 
 /* xml */
-#define REMEDY_XML          "Correct the reported errors in the XML document"
+#define REMEDY_XML _("Correct the reported errors in the XML document")
 
 /* desktop */
-#define REMEDY_DESKTOP "Refer to the Desktop Entry Specification at https://standards.freedesktop.org/desktop-entry-spec/latest/ for help correcting the errors and warnings"
+#define REMEDY_DESKTOP _("Refer to the Desktop Entry Specification at https://standards.freedesktop.org/desktop-entry-spec/latest/ for help correcting the errors and warnings")
 
 /* disttag */
-#define REMEDY_DISTTAG "The Release: tag in the spec file must include a '%%{?dist}' string.  Please add this to the spec file per the distribution packaging guidelines."
+#define REMEDY_DISTTAG _("The Release: tag in the spec file must include a '%%{?dist}' string.  Please add this to the spec file per the distribution packaging guidelines.")
 
 /* specname */
-#define REMEDY_SPECNAME "The spec file name does not match the expected NAME.spec format.  Rename the spec file to conform to this policy."
+#define REMEDY_SPECNAME _("The spec file name does not match the expected NAME.spec format.  Rename the spec file to conform to this policy.")
 
 /* modularity */
-#define REMEDY_MODULARITY "This package is part of a module but is missing the %{modularitylabel} header tag.  Add this as a %%define in the spec file and rebuild."
+#define REMEDY_MODULARITY _("This package is part of a module but is missing the %{modularitylabel} header tag.  Add this as a %%define in the spec file and rebuild.")
 
 /* javabytecode */
-#define REMEDY_JAVABYTECODE "The Java bytecode version for one or more class files in the build was not met for the product release.  Ensure you are using the correct JDK for the build."
+#define REMEDY_JAVABYTECODE _("The Java bytecode version for one or more class files in the build was not met for the product release.  Ensure you are using the correct JDK for the build.")
 
 /* changedfiles */
-#define REMEDY_CHANGEDFILES "Unexpected file changes were found.  Verify these changes are correct.  If they are not, adjust the build to prevent file changes."
+#define REMEDY_CHANGEDFILES _("Unexpected file changes were found.  Verify these changes are correct.  If they are not, adjust the build to prevent file changes.")
 
 /* removedfiles */
-#define REMEDY_REMOVEDFILES "Unexpected file removals were found.  Verify these changes are correct.  If they are not, adjust the build to prevent the file removals."
+#define REMEDY_REMOVEDFILES _("Unexpected file removals were found.  Verify these changes are correct.  If they are not, adjust the build to prevent the file removals.")
 
 /* addedfiles */
-#define REMEDY_ADDEDFILES "Unexpected file additions were found.  Verify these changes are correct.  If they are not, adjust the build to prevent the file additions."
+#define REMEDY_ADDEDFILES _("Unexpected file additions were found.  Verify these changes are correct.  If they are not, adjust the build to prevent the file additions.")
 
 /* upstream */
-#define REMEDY_UPSTREAM "Unexpected changed source archive content.  The version of the package did not change between builds, but the source archive content did.  This may be deliberate, but needs inspection."
+#define REMEDY_UPSTREAM _("Unexpected changed source archive content.  The version of the package did not change between builds, but the source archive content did.  This may be deliberate, but needs inspection.")
 
 /* ownership */
-#define REMEDY_OWNERSHIP_DEFATTR "Make sure the %%files section includes the %%defattr macro."
-#define REMEDY_OWNERSHIP_BIN_OWNER "Bin path files must be owned by the bin_owner set in rpminspect.conf, which is usually root."
-#define REMEDY_OWNERSHIP_BIN_GROUP "Bin path files must be owned by the bin_group set in rpminspect.conf, which is usually root."
-#define REMEDY_OWNERSHIP_IXOTH "Either chgrp the file to the bin_group set in rpminspect.conf or remove the world execute bit on the file (chmod o-x)."
-#define REMEDY_OWNERSHIP_IWGRP "Either chgrp the file to the bin_group set in rpminspect.conf or remove the group write bit on the file (chmod g-w)."
-#define REMEDY_OWNERSHIP_CHANGED "Verify the ownership changes are expected. If not, adjust the package build process to set correct owner and group information."
+#define REMEDY_OWNERSHIP_DEFATTR _("Make sure the %%files section includes the %%defattr macro.")
+#define REMEDY_OWNERSHIP_BIN_OWNER _("Bin path files must be owned by the bin_owner set in rpminspect.conf, which is usually root.")
+#define REMEDY_OWNERSHIP_BIN_GROUP _("Bin path files must be owned by the bin_group set in rpminspect.conf, which is usually root.")
+#define REMEDY_OWNERSHIP_IXOTH _("Either chgrp the file to the bin_group set in rpminspect.conf or remove the world execute bit on the file (chmod o-x).")
+#define REMEDY_OWNERSHIP_IWGRP _("Either chgrp the file to the bin_group set in rpminspect.conf or remove the group write bit on the file (chmod g-w).")
+#define REMEDY_OWNERSHIP_CHANGED _("Verify the ownership changes are expected. If not, adjust the package build process to set correct owner and group information.")
 
 /* shellsyntax */
-#define REMEDY_SHELLSYNTAX "Consult the shell documentation for proper syntax."
-#define REMEDY_SHELLSYNTAX_GAINED_SHELL "The file referenced was not a known shell script in the before build but is now a shell script in the after build."
-#define REMEDY_SHELLSYNTAX_BAD "The referenced shell script is invalid. Consider debugging it with the '-n' option on the shell to find and fix the problem."
+#define REMEDY_SHELLSYNTAX _("Consult the shell documentation for proper syntax.")
+#define REMEDY_SHELLSYNTAX_GAINED_SHELL _("The file referenced was not a known shell script in the before build but is now a shell script in the after build.")
+#define REMEDY_SHELLSYNTAX_BAD _("The referenced shell script is invalid. Consider debugging it with the '-n' option on the shell to find and fix the problem.")
 
 /* annocheck */
-#define REMEDY_ANNOCHECK "See annocheck(1) for more information."
+#define REMEDY_ANNOCHECK _("See annocheck(1) for more information.")
 
 /* DT_NEEDED */
-#define REMEDY_DT_NEEDED "DT_NEEDED symbols have been added or removed.  This happens when the build environment has different versions of the required libraries.  Sometimes this is deliberate but sometimes not.  Verify these changes are expected.  If they are not, modify the package spec file to ensure the build links with the correct shared libraries."
+#define REMEDY_DT_NEEDED _("DT_NEEDED symbols have been added or removed.  This happens when the build environment has different versions of the required libraries.  Sometimes this is deliberate but sometimes not.  Verify these changes are expected.  If they are not, modify the package spec file to ensure the build links with the correct shared libraries.")
 
 /* filesize */
-#define REMEDY_FILESIZE_BECAME_NOT_EMPTY "A previously empty file is no longer empty.  Make sure this change is intended and fix the package spec file if necessary."
-#define REMEDY_FILESIZE_BECAME_EMPTY "A previously non-empty file is now empty.  Make sure this change is intended and fix the package space file if necessary."
+#define REMEDY_FILESIZE_BECAME_NOT_EMPTY _("A previously empty file is no longer empty.  Make sure this change is intended and fix the package spec file if necessary.")
+#define REMEDY_FILESIZE_BECAME_EMPTY _("A previously non-empty file is now empty.  Make sure this change is intended and fix the package space file if necessary.")
 
 /* capabilities */
-#define REMEDY_CAPABILITIES "Unexpected capabilities were found on the indicated file.  Consult capabilities(7) and either adjust the files in the package or modify the capabilities whitelist file in the rpminspect vendor data package.  The security team may also be of help for this situation."
+#define REMEDY_CAPABILITIES _("Unexpected capabilities were found on the indicated file.  Consult capabilities(7) and either adjust the files in the package or modify the capabilities whitelist file in the rpminspect vendor data package.  The security team may also be of help for this situation.")
 
 /* kmod */
-#define REMEDY_KMOD_PARM "Kernel module parameters were removed between builds.  This may present usability problems for users if module parameters were removed in a maintenance update."
-#define REMEDY_KMOD_DEPS "Kernel module dependencies changed between builds.  This may present usability problems for users if module dependencies changed in a maintenance update."
-#define REMEDY_KMOD_ALIAS "Kernel module device aliases changed between builds.  This may present usability problems for users if module device aliases changed in a maintenance update."
+#define REMEDY_KMOD_PARM _("Kernel module parameters were removed between builds.  This may present usability problems for users if module parameters were removed in a maintenance update.")
+#define REMEDY_KMOD_DEPS _("Kernel module dependencies changed between builds.  This may present usability problems for users if module dependencies changed in a maintenance update.")
+#define REMEDY_KMOD_ALIAS _("Kernel module device aliases changed between builds.  This may present usability problems for users if module device aliases changed in a maintenance update.")
 
 /* arch */
-#define REMEDY_ARCH_LOST "An architecture present in the before build is now missing in the after build.  This may be deliberate, but check to make sure you do not have any unexpected ExclusiveArch lines in the spec file."
-#define REMEDY_ARCH_GAIN "A new architecture has appeared in the after build.  This may indicate progress in the world of computing."
+#define REMEDY_ARCH_LOST _("An architecture present in the before build is now missing in the after build.  This may be deliberate, but check to make sure you do not have any unexpected ExclusiveArch lines in the spec file.")
+#define REMEDY_ARCH_GAIN _("A new architecture has appeared in the after build.  This may indicate progress in the world of computing.")
 
 /* subpackages */
-#define REMEDY_SUBPACKAGES_LOST "A subpackage present in the before build is now missing in the after build.  This may be deliberate, but check to make sure you have correct syntax defining the subpackage in the spec file"
-#define REMEDY_SUBPACKAGES_GAIN "A new subpackage has appeared in the after build.  This may indicate progress in the world of computing."
+#define REMEDY_SUBPACKAGES_LOST _("A subpackage present in the before build is now missing in the after build.  This may be deliberate, but check to make sure you have correct syntax defining the subpackage in the spec file")
+#define REMEDY_SUBPACKAGES_GAIN _("A new subpackage has appeared in the after build.  This may indicate progress in the world of computing.")
 
 /* changelog */
-#define REMEDY_CHANGELOG "Make sure the spec file in the after build contains a valid %%changelog section."
+#define REMEDY_CHANGELOG _("Make sure the spec file in the after build contains a valid %%changelog section.")
 
 #endif

@@ -92,7 +92,7 @@ void output_json(const results_t *results, const char *dest) {
         fp = fopen(dest, "w");
 
         if (fp == NULL) {
-            fprintf(stderr, "*** Error opening %s for writing: %s\n", dest, strerror(errno));
+            fprintf(stderr, _("*** Error opening %s for writing: %s\n"), dest, strerror(errno));
             fflush(stderr);
             return;
         }

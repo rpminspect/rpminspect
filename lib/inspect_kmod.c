@@ -39,14 +39,14 @@ static void lost_alias(const char *alias, const string_list_t *before_modules, c
     assert(ri != NULL);
 
     TAILQ_FOREACH(entry, before_modules, items) {
-        xasprintf(&msg, "Kernel module '%s' lost alias '%s'", entry->data, alias);
+        xasprintf(&msg, _("Kernel module '%s' lost alias '%s'"), entry->data, alias);
         add_result(ri, sev, waiver, HEADER_KMOD, msg, NULL, REMEDY_KMOD_ALIAS);
         free(msg);
     }
 
     if (!TAILQ_EMPTY(after_modules)) {
         TAILQ_FOREACH(entry, after_modules, items) {
-            xasprintf(&msg, "Kernel module '%s' gained alias '%s'", entry->data, alias);
+            xasprintf(&msg, _("Kernel module '%s' gained alias '%s'"), entry->data, alias);
             add_result(ri, sev, waiver, HEADER_KMOD, msg, NULL, REMEDY_KMOD_ALIAS);
             free(msg);
         }
@@ -126,7 +126,7 @@ static bool kmod_driver(struct rpminspect *ri, rpmfile_entry_t *file)
     kctx = kmod_new(NULL, NULL);
 
     if (kctx == NULL) {
-        fprintf(stderr, "*** kmod_new() failure\n");
+        fprintf(stderr, _("*** kmod_new() failure\n"));
         return false;
     }
 
@@ -143,7 +143,7 @@ static bool kmod_driver(struct rpminspect *ri, rpmfile_entry_t *file)
     kctx = kmod_new(NULL, NULL);
 
     if (kctx == NULL) {
-        fprintf(stderr, "*** kmod_new() failure\n");
+        fprintf(stderr, _("*** kmod_new() failure\n"));
         return false;
     }
 
@@ -160,7 +160,7 @@ static bool kmod_driver(struct rpminspect *ri, rpmfile_entry_t *file)
     /* Gather module parameters */
     err = kmod_module_get_info(beforekmod, &beforeinfo);
     if (err < 0) {
-        fprintf(stderr, "*** error reading before kernel module %s\n", file->peer_file->fullpath);
+        fprintf(stderr, _("*** error reading before kernel module %s\n"), file->peer_file->fullpath);
         kmod_module_unref(beforekmod);
         kmod_module_unref(afterkmod);
         kmod_unref(kctx);
@@ -169,7 +169,7 @@ static bool kmod_driver(struct rpminspect *ri, rpmfile_entry_t *file)
 
     err = kmod_module_get_info(afterkmod, &afterinfo);
     if (err < 0) {
-        fprintf(stderr, "*** error reading after kernel module %s\n", file->peer_file->fullpath);
+        fprintf(stderr, _("*** error reading after kernel module %s\n"), file->peer_file->fullpath);
         kmod_module_info_free_list(beforeinfo);
         kmod_module_unref(beforekmod);
         kmod_module_unref(afterkmod);
@@ -183,7 +183,7 @@ static bool kmod_driver(struct rpminspect *ri, rpmfile_entry_t *file)
     /* Report parameters */
     if (lost != NULL && !TAILQ_EMPTY(lost)) {
         TAILQ_FOREACH(entry, lost, items) {
-            xasprintf(&msg, "Kernel module %s removes parameter '%s'", file->localpath, entry->data);
+            xasprintf(&msg, _("Kernel module %s removes parameter '%s'"), file->localpath, entry->data);
             add_result(ri, sev, waiver, HEADER_KMOD, msg, NULL, REMEDY_KMOD_PARM);
             free(msg);
         }
@@ -194,7 +194,7 @@ static bool kmod_driver(struct rpminspect *ri, rpmfile_entry_t *file)
 
     if (gain != NULL && !TAILQ_EMPTY(gain)) {
         TAILQ_FOREACH(entry, gain, items) {
-            xasprintf(&msg, "Kernel module %s adds parameter '%s'", file->localpath, entry->data);
+            xasprintf(&msg, _("Kernel module %s adds parameter '%s'"), file->localpath, entry->data);
             add_result(ri, RESULT_INFO, NOT_WAIVABLE, HEADER_KMOD, msg, NULL, NULL);
             free(msg);
         }
@@ -209,7 +209,7 @@ static bool kmod_driver(struct rpminspect *ri, rpmfile_entry_t *file)
     /* Report dependencies */
     if (lost != NULL && !TAILQ_EMPTY(lost)) {
         TAILQ_FOREACH(entry, lost, items) {
-            xasprintf(&msg, "Kernel module %s removes dependency '%s'", file->localpath, entry->data);
+            xasprintf(&msg, _("Kernel module %s removes dependency '%s'"), file->localpath, entry->data);
             add_result(ri, sev, waiver, HEADER_KMOD, msg, NULL, REMEDY_KMOD_DEPS);
             free(msg);
         }
@@ -220,7 +220,7 @@ static bool kmod_driver(struct rpminspect *ri, rpmfile_entry_t *file)
 
     if (gain != NULL && !TAILQ_EMPTY(gain)) {
         TAILQ_FOREACH(entry, gain, items) {
-            xasprintf(&msg, "Kernel module %s adds dependency '%s'", file->localpath, entry->data);
+            xasprintf(&msg, _("Kernel module %s adds dependency '%s'"), file->localpath, entry->data);
             add_result(ri, sev, waiver, HEADER_KMOD, msg, NULL, REMEDY_KMOD_DEPS);
             free(msg);
         }
