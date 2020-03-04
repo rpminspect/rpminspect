@@ -354,9 +354,6 @@ struct format {
 
     /* output driver function */
     void (*driver)(const results_t *, const char *);
-
-    /* OPTIONAL: long description of the format (displayed in --help) */
-    char *desc;
 };
 
 /*

@@ -26,7 +26,7 @@
 struct format formats[] = {
     { FORMAT_TEXT, "text", &output_text },
     { FORMAT_JSON, "json", &output_json },
-    { -1, NULL, NULL, NULL }
+    { -1, NULL, NULL }
 };
 
 const char *format_desc(unsigned int format)
