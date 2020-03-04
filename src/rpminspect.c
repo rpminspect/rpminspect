@@ -481,9 +481,10 @@ int main(int argc, char **argv) {
             }
 
             printf("    %s\n", formats[i].name);
+            desc = format_desc(formats[i].type);
 
-            if (formats[i].desc != NULL && verbose) {
-                printwrap(formats[i].desc, width, 8, stdout);
+            if (desc != NULL && verbose) {
+                printwrap(desc, width, 8, stdout);
                 printf("\n");
             }
         }

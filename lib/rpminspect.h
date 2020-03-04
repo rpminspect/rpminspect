@@ -205,6 +205,9 @@ results_t *init_results(void);
 void free_results(results_t *);
 void add_result(struct rpminspect *, severity_t, waiverauth_t, const char *, char *, char *, const char *);
 
+/* output.c */
+const char *format_desc(unsigned int);
+
 /* output_text.c */
 void output_text(const results_t *, const char *);
 
