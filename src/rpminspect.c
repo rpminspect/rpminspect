@@ -46,36 +46,36 @@ static void usage(const char *progname)
 {
     assert(progname != NULL);
 
-    printf("Compare package builds for policy compliance and consistency.\n\n");
-    printf("Usage: %s [OPTIONS] [before build] [after build]\n", progname);
-    printf("Options:\n");
-    printf("  -c FILE, --config=FILE   Configuration file to use\n");
-    printf("                             (default: %s)\n", CFGFILE);
-    printf("  -p NAME, --profile=NAME  Configuration profile to use\n");
-    printf("  -T LIST, --tests=LIST    List of tests to run\n");
-    printf("                             (default: ALL)\n");
-    printf("  -E LIST, --exclude=LIST  List of tests to exclude\n");
-    printf("                             (default: none)\n");
-    printf("  -a LIST, --arches=LIST   List of architectures to check\n");
-    printf("  -r STR, --release=STR    Product release string\n");
-    printf("  -o FILE, --output=FILE   Write results to FILE\n");
-    printf("                             (default: stdout)\n");
-    printf("  -F TYPE, --format=TYPE   Format output results as TYPE\n");
-    printf("                             (default: text)\n");
-    printf("  -t TAG, --threshold=TAG  Result threshold triggering exit\n");
-    printf("                           failure (default: VERIFY)\n");
-    printf("  -l, --list               List available tests and formats\n");
-    printf("  -w PATH, --workdir=PATH  Temporary directory to use\n");
-    printf("                             (default: %s)\n", DEFAULT_WORKDIR);
-    printf("  -f, --fetch-only         Fetch builds only, do not perform inspections\n");
-    printf("                             (implies -k)\n");
-    printf("  -k, --keep               Do not remove the comparison working files\n");
-    printf("  -d, --debug              Debugging mode output\n");
-    printf("  -v, --verbose            Verbose inspection output\n");
-    printf("                           when finished, display full path\n");
-    printf("  -?, --help               Display usage information\n");
-    printf("  -V, --version            Display program version\n");
-    printf("\nSee the rpminspect(1) man page for more information.\n");
+    printf(_("Compare package builds for policy compliance and consistency.\n\n"));
+    printf(_("Usage: %s [OPTIONS] [before build] [after build]\n"), progname);
+    printf(_("Options:\n"));
+    printf(_("  -c FILE, --config=FILE   Configuration file to use\n"));
+    printf(_("                             (default: %s)\n"), CFGFILE);
+    printf(_("  -p NAME, --profile=NAME  Configuration profile to use\n"));
+    printf(_("  -T LIST, --tests=LIST    List of tests to run\n"));
+    printf(_("                             (default: ALL)\n"));
+    printf(_("  -E LIST, --exclude=LIST  List of tests to exclude\n"));
+    printf(_("                             (default: none)\n"));
+    printf(_("  -a LIST, --arches=LIST   List of architectures to check\n"));
+    printf(_("  -r STR, --release=STR    Product release string\n"));
+    printf(_("  -o FILE, --output=FILE   Write results to FILE\n"));
+    printf(_("                             (default: stdout)\n"));
+    printf(_("  -F TYPE, --format=TYPE   Format output results as TYPE\n"));
+    printf(_("                             (default: text)\n"));
+    printf(_("  -t TAG, --threshold=TAG  Result threshold triggering exit\n"));
+    printf(_("                           failure (default: VERIFY)\n"));
+    printf(_("  -l, --list               List available tests and formats\n"));
+    printf(_("  -w PATH, --workdir=PATH  Temporary directory to use\n"));
+    printf(_("                             (default: %s)\n"), DEFAULT_WORKDIR);
+    printf(_("  -f, --fetch-only         Fetch builds only, do not perform inspections\n"));
+    printf(_("                             (implies -k)\n"));
+    printf(_("  -k, --keep               Do not remove the comparison working files\n"));
+    printf(_("  -d, --debug              Debugging mode output\n"));
+    printf(_("  -v, --verbose            Verbose inspection output\n"));
+    printf(_("                           when finished, display full path\n"));
+    printf(_("  -?, --help               Display usage information\n"));
+    printf(_("  -V, --version            Display program version\n"));
+    printf(_("\nSee the rpminspect(1) man page for more information.\n"));
 
     return;
 }
@@ -107,7 +107,7 @@ static char *get_product_release(const favor_release_t favor_release, const char
 
     pos = rindex(after, '.');
     if (!pos) {
-        fprintf(stderr, "*** Product release for after build (%s) is empty\n", after);
+        fprintf(stderr, _("*** Product release for after build (%s) is empty\n"), after);
         return NULL;
     }
 
@@ -118,7 +118,7 @@ static char *get_product_release(const favor_release_t favor_release, const char
     pos += 1;
     after_product = strdup(pos);
     if (!after_product) {
-        fprintf(stderr, "*** Product release for after build (%s) is empty\n", after);
+        fprintf(stderr, _("*** Product release for after build (%s) is empty\n"), after);
         free(after_product);
         return NULL;
     }
@@ -133,7 +133,7 @@ static char *get_product_release(const favor_release_t favor_release, const char
         pos = rindex(before, '.');
 
         if (!pos) {
-            fprintf(stderr, "*** Product release for before build (%s) is empty\n", before);
+            fprintf(stderr, _("*** Product release for before build (%s) is empty\n"), before);
             free(after_product);
             return NULL;
         }
@@ -142,7 +142,7 @@ static char *get_product_release(const favor_release_t favor_release, const char
         before_product = strdup(pos);
 
         if (!before_product) {
-            fprintf(stderr, "*** Product release for before build (%s) is empty\n", before);
+            fprintf(stderr, _("*** Product release for before build (%s) is empty\n"), before);
             free(after_product);
             return NULL;
         }
@@ -189,7 +189,7 @@ static char *get_product_release(const favor_release_t favor_release, const char
 
                 if (result != 0) {
                     regerror(result, &product_regex, reg_error, sizeof(reg_error));
-                    fprintf(stderr, "*** unable to compile product release regular expression: %s\n", reg_error);
+                    fprintf(stderr, _("*** unable to compile product release regular expression: %s\n"), reg_error);
                     free(before_product);
                     free(after_product);
                     return NULL;
@@ -248,7 +248,7 @@ static char *get_product_release(const favor_release_t favor_release, const char
     }
 
     if (!matched) {
-        fprintf(stderr, "*** Unable to determine product release for %s and %s\n", before, after);
+        fprintf(stderr, _("*** Unable to determine product release for %s and %s\n"), before, after);
         free(before_product);
         free(after_product);
         after_product = NULL;
@@ -265,8 +265,8 @@ static void check_inspection_options(const bool inspection_opt, const char *prog
     assert(progname != NULL);
 
     if (inspection_opt) {
-        fprintf(stderr, "*** The -T and -E options are mutually exclusive\n");
-        fprintf(stderr, "*** See `%s --help` for more information.\n", progname);
+        fprintf(stderr, _("*** The -T and -E options are mutually exclusive\n"));
+        fprintf(stderr, _("*** See `%s --help` for more information.\n"), progname);
         fflush(stderr);
         exit(RI_PROGRAM_ERROR);
     }
@@ -284,8 +284,8 @@ static void check_found(const bool found, const char *inspection, const char *pr
     assert(progname != NULL);
 
     if (!found) {
-        fprintf(stderr, "*** Unknown inspection: `%s`\n", inspection);
-        fprintf(stderr, "*** See `%s --help` for more information.\n", progname);
+        fprintf(stderr, _("*** Unknown inspection: `%s`\n"), inspection);
+        fprintf(stderr, _("*** See `%s --help` for more information.\n"), progname);
         fflush(stderr);
         exit(RI_PROGRAM_ERROR);
     }
@@ -358,6 +358,11 @@ int main(int argc, char **argv) {
     /* SIGABRT handler since we use abort() in some failure cases */
     signal(SIGABRT, sigabrt_handler);
 
+    /* Set up the i18n environment */
+    setlocale(LC_ALL, "");
+    bindtextdomain("rpminspect", "/usr/share/locale/");
+    textdomain("rpminspect");
+
     /* parse command line options */
     while (1) {
         c = getopt_long(argc, argv, short_options, long_options, &idx);
@@ -408,7 +413,7 @@ int main(int argc, char **argv) {
                 }
 
                 if (formatidx < 0) {
-                    fprintf(stderr, "*** Invalid output format: `%s`.\n", optarg);
+                    fprintf(stderr, _("*** Invalid output format: `%s`.\n"), optarg);
                     fflush(stderr);
                     return RI_PROGRAM_ERROR;
                 }
@@ -425,7 +430,7 @@ int main(int argc, char **argv) {
                     if (j == 0 && expand.gl_pathc == 1) {
                         workdir = strdup(expand.gl_pathv[0]);
                     } else {
-                        fprintf(stderr, "*** Unable to expand workdir: `%s`: %s", optarg, strerror(errno));
+                        fprintf(stderr, _("*** Unable to expand workdir: `%s`: %s"), optarg, strerror(errno));
                         fflush(stderr);
                         return RI_PROGRAM_ERROR;
                     }
@@ -455,10 +460,10 @@ int main(int argc, char **argv) {
                 usage(progname);
                 exit(0);
             case 'V':
-                printf("%s version %s\n", progname, PACKAGE_VERSION);
+                printf(_("%s version %s\n"), progname, PACKAGE_VERSION);
                 exit(0);
             default:
-                fprintf(stderr, "?? getopt returned character code 0%o ??\n", c);
+                fprintf(stderr, _("?? getopt returned character code 0%o ??\n"), c);
                 fflush(stderr);
                 exit(RI_PROGRAM_ERROR);
         }
@@ -467,7 +472,7 @@ int main(int argc, char **argv) {
     /* list inspections and formats and exit if asked to */
     if (list) {
         /* list the formats available */
-        printf("Available output formats:\n");
+        printf(_("Available output formats:\n"));
 
         for (i = 0; formats[i].type != -1; i++) {
             if (i > 0 && verbose) {
@@ -483,7 +488,7 @@ int main(int argc, char **argv) {
         }
 
         /* list the inspections available */
-        printf("\nAvailable inspections:\n");
+        printf(_("\nAvailable inspections:\n"));
 
         for (i = 0; inspections[i].flag != 0; i++) {
             if (i > 0 && verbose) {
@@ -509,19 +514,19 @@ int main(int argc, char **argv) {
      *  - Telling the user they need to install a required dependency.
      */
     if (cfgfile != NULL && access(cfgfile, F_OK|R_OK) == -1) {
-        fprintf(stderr, "Specified config file (%s) is unreadable.\n", cfgfile);
+        fprintf(stderr, _("Specified config file (%s) is unreadable.\n"), cfgfile);
         exit(RI_PROGRAM_ERROR);
     } else if (cfgfile == NULL && access(CFGFILE, F_OK|R_OK) == 0) {
         cfgfile = strdup(CFGFILE);
     } else if (cfgfile == NULL) {
-        fprintf(stderr, "Unable to read the default config file (%s).\n", CFGFILE);
-        fprintf(stderr, "Have you installed an rpminspect-data package for your distro?\n");
+        fprintf(stderr, _("Unable to read the default config file (%s).\n"), CFGFILE);
+        fprintf(stderr, _("Have you installed an rpminspect-data package for your distro?\n"));
         exit(RI_PROGRAM_ERROR);
     }
 
     /* Initialize librpminspect */
     if (init_rpminspect(&ri, cfgfile, profile) != 0) {
-        fprintf(stderr, "Failed to read configuration file\n");
+        fprintf(stderr, _("Failed to read configuration file\n"));
         exit(RI_PROGRAM_ERROR);
     }
 
@@ -584,8 +589,8 @@ int main(int argc, char **argv) {
         ri.after = strdup(argv[optind + 1]);
     } else {
         /* user gave us too many arguments */
-        fprintf(stderr, "*** Invalid before and after build specification.\n");
-        fprintf(stderr, "*** See `%s --help` for more information.\n", progname);
+        fprintf(stderr, _("*** Invalid before and after build specification.\n"));
+        fprintf(stderr, _("*** See `%s --help` for more information.\n"), progname);
         fflush(stderr);
         free_rpminspect(&ri);
         return RI_PROGRAM_ERROR;
@@ -595,8 +600,8 @@ int main(int argc, char **argv) {
      * Fetch-only mode can only work with a single build
      */
     if (fetch_only && ri.before) {
-        fprintf(stderr, "*** Fetch only mode takes a single build specification.\n");
-        fprintf(stderr, "*** See `%s --help` for more information.\n", progname);
+        fprintf(stderr, _("*** Fetch only mode takes a single build specification.\n"));
+        fprintf(stderr, _("*** See `%s --help` for more information.\n"), progname);
         fflush(stderr);
         free_rpminspect(&ri);
         return RI_PROGRAM_ERROR;
@@ -604,7 +609,7 @@ int main(int argc, char **argv) {
 
     /* initialize librpm, we'll be using it */
     if (init_librpm() != RPMRC_OK) {
-        fprintf(stderr, "*** unable to read RPM configuration\n");
+        fprintf(stderr, _("*** unable to read RPM configuration\n"));
         fflush(stderr);
         return RI_PROGRAM_ERROR;
     }
@@ -634,8 +639,8 @@ int main(int argc, char **argv) {
             }
 
             if (!found) {
-                fprintf(stderr, "*** Unsupported architecture specified: `%s`\n", token);
-                fprintf(stderr, "*** See `%s --help` for more information.\n", progname);
+                fprintf(stderr, _("*** Unsupported architecture specified: `%s`\n"), token);
+                fprintf(stderr, _("*** See `%s --help` for more information.\n"), progname);
                 fflush(stderr);
                 rpmFreeRpmrc();
                 return RI_PROGRAM_ERROR;
@@ -658,7 +663,7 @@ int main(int argc, char **argv) {
 
     /* create the working directory */
     if (mkdirp(ri.workdir, mode)) {
-        fprintf(stderr, "*** Unable to create directory %s: %s\n", ri.workdir, strerror(errno));
+        fprintf(stderr, _("*** Unable to create directory %s: %s\n"), ri.workdir, strerror(errno));
         fflush(stderr);
         free_rpminspect(&ri);
         rpmFreeRpmrc();
@@ -667,7 +672,7 @@ int main(int argc, char **argv) {
 
     /* validate and gather the builds specified */
     if (gather_builds(&ri, fetch_only)) {
-        fprintf(stderr, "*** Failed to gather specified builds.\n");
+        fprintf(stderr, _("*** Failed to gather specified builds.\n"));
         fflush(stderr);
         rpmFreeRpmrc();
         exit(RI_PROGRAM_ERROR);
@@ -678,7 +683,7 @@ int main(int argc, char **argv) {
         /* Determine product release unless the user specified one. */
         if (ri.product_release == NULL) {
             if (ri.peers == NULL || TAILQ_EMPTY(ri.peers)) {
-                fprintf(stderr, "*** No peers, ensure packages exist for specified architecture(s).\n");
+                fprintf(stderr, _("*** No peers, ensure packages exist for specified architecture(s).\n"));
                 fflush(stderr);
                 free_rpminspect(&ri);
                 return RI_PROGRAM_ERROR;
@@ -732,10 +737,10 @@ int main(int argc, char **argv) {
 
     /* Clean up */
     if (keep) {
-        printf("\nKeeping working directory: %s\n", ri.worksubdir);
+        printf(_("\nKeeping working directory: %s\n"), ri.worksubdir);
     } else {
         if (rmtree(ri.workdir, true, true)) {
-           fprintf(stderr, "*** Error removing directory %s: %s\n", ri.workdir, strerror(errno));
+           fprintf(stderr, _("*** Error removing directory %s: %s\n"), ri.workdir, strerror(errno));
            fflush(stderr);
         }
     }

@@ -15,6 +15,12 @@ cc = meson.get_compiler('c')
 add_global_arguments('-D_GNU_SOURCE', language : 'c')
 add_global_arguments('-DPACKAGE_VERSION="@@0@@"'.format(meson.project_version()), language : 'c')
 
+# Translations
+if find_program('xgettext', required : get_option('nls')).found()
+    add_global_arguments('-DGETTEXT_DOMAIN="' + meson.project_name() + '"', language : 'c')
+    subdir('po')
+endif
+
 # Dependencies that use pkg-config
 jsonc = dependency('json-c', method : 'pkg-config', required : true)
 xmlrpc = dependency('xmlrpc xmlrpc_util xmlrpc_client', method : 'pkg-config', required : true)

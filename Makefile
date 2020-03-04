@@ -10,6 +10,14 @@ setup:
 check: setup
 	meson test -C $(MESON_BUILD_DIR) -v
 
+POTFILES:
+	find src -type f -name "*.c" > po/POTFILES.new
+	find src -type f -name "*.h" >> po/POTFILES.new
+	find lib -type f -name "*.c" >> po/POTFILES.new
+	find lib -type f -name "*.h" >> po/POTFILES.new
+	sort po/POTFILES.new | uniq > po/POTFILES
+	rm -f po/POTFILES.new
+
 srpm:
 	$(topdir)/utils/srpm.sh
 
@@ -33,6 +41,7 @@ help:
 	@echo "    all          Default target, setup tree to build and build"
 	@echo "    setup        Run 'meson setup $(MESON_BUILD_DIR)'"
 	@echo "    check        Run 'meson test -C $(MESON_BUILD_DIR) -v'"
+	@echo "    POTFILES     Update po/POTFILES list"
 	@echo "    srpm         Generate an SRPM package of the latest release"
 	@echo "    release      Run 'utils/release.sh -A' to make a new release"
 	@echo "    koji         Run 'make srpm' then 'utils/submit-koji-builds.sh'"
