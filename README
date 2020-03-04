@@ -202,6 +202,27 @@ The verbose mode is useful when tests fail because you can see the
 debugging information dumps and other output.
 
 
+Run and debug integration tests
+-------------------------------
+Follow the steps for 'Building' above.
+Install python-pip, python-virtualenv.
+
+To prepare a virtual environment for testing simple run:
+
+    virtualenv -p python3.7 my_test_env
+    . my_test_env/bin/activate
+    pip install meson ninja rpm-py-installer rpmfluff setuptools
+    export RPMINSPECT=$PWD/build/rpminspect
+    export RPMINSPECT_CONF=$PWD/src/rpminspect.conf
+    export RPMINSPECT_TEST_DATA_PATH=$PWD/tests/data
+
+To run all tests, execute the command:
+    python -Bm unittest discover -v tests/
+
+To run a specific test suite, execute:
+    python -Bm unittest discover -v tests/ test_emptyrpm.py
+
+
 Releasing
 ---------
 
