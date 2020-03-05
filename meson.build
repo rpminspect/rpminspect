@@ -7,7 +7,7 @@ project('rpminspect',
             'buildtype=debugoptimized'
         ],
         license : 'GPLv3+',
-        meson_version : '>=0.47.0')
+        meson_version : '>=0.51.0')
 
 cc = meson.get_compiler('c')
 
@@ -48,18 +48,30 @@ endif
 
 # Other dependencies
 
-# libmandoc
-if not cc.has_function('mparse_alloc', args : ['-lmandoc'], dependencies : [zlib])
+# libmandoc (favor static one over shared one)
+mandoc = cc.find_library('mandoc', required : false, static : true)
+
+if mandoc.found()
+    message('found static libmandoc')
+else
+    mandoc = cc.find_library('mandoc', required : false, static : false)
+
+    if mandoc.found()
+        message('found shared libmandoc')
+    else
+        error('*** unable to find libmandoc')
+    endif
+endif
+
+if not cc.has_function('mparse_alloc', dependencies : [mandoc, zlib])
     error('*** unable to find mparse_alloc() in libmandoc')
 endif
 
 if cc.has_header('mandoc_parse.h')
     add_project_arguments('-DNEWLIBMANDOC', language : 'c')
 else
-    message('Using libmandoc < 1.14.5 API')
+    message('using libmandoc < 1.14.5 API')
 endif
-
-mandoc = declare_dependency(link_args : ['-lmandoc'])
 
 # libiniparser
 if not cc.has_function('iniparser_load', args : ['-liniparser'], dependencies : [zlib])
