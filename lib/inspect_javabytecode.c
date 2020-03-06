@@ -230,19 +230,19 @@ bool inspect_javabytecode(struct rpminspect *ri)
     /*
      * Get the major JVM version for this product release.
      */
-    if (ri->jvm_table == NULL) {
+    if (ri->jvm == NULL) {
         fprintf(stderr, _("*** missing JVM version to product release mapping\n"));
         fflush(stderr);
         return false;
     }
 
     e.key = ri->product_release;
-    hsearch_r(e, FIND, &eptr, ri->jvm_table);
+    hsearch_r(e, FIND, &eptr, ri->jvm);
 
     if (eptr == NULL) {
         prod = strdup("default");
         e.key = prod;
-        hsearch_r(e, FIND, &eptr, ri->jvm_table);
+        hsearch_r(e, FIND, &eptr, ri->jvm);
         free(prod);
     }
 

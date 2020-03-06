@@ -301,16 +301,23 @@ struct rpminspect {
     specname_primary_t specprimary;
 
     /* hash table of product release -> JVM major versions */
-    struct hsearch_data *jvm_table;
+    struct hsearch_data *jvm;
     string_list_t *jvm_keys;
 
     /* hash table of annocheck tests */
-    struct hsearch_data *annocheck_table;
+    struct hsearch_data *annocheck;
     string_list_t *annocheck_keys;
+
+    /* hash table of path migrations */
+    struct hsearch_data *pathmigration;
+    string_list_t *pathmigration_keys;
 
     /* hash table of product release regexps */
     struct hsearch_data *products;
     string_list_t *product_keys;
+
+    /* list of paths to ignore (these strings allow glob(3) syntax) */
+    string_list_t *ignores;
 
     /* Options specified by the user */
     char *before;              /* before build ID arg given on cmdline */

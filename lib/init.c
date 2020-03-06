@@ -103,7 +103,7 @@ static void parse_list(const char *tmp, string_list_t **list)
  *        [section]
  *        key = value
  *        key = value
- * We use these for the jvm_table and products, maybe other things.
+ * We use these for the jvm and products, maybe other things.
  */
 static void read_mapping(const dictionary *cfg, const char *section,
                          struct hsearch_data **table, string_list_t **keys)
@@ -183,6 +183,8 @@ static void read_mapping(const dictionary *cfg, const char *section,
         e.data = strdup((char *) v);
         hsearch_r(e, ENTER, &eptr, *table);
         nk--;
+
+        DEBUG_PRINT("k=|%s|, v=|%s|\n", entry->data, v);
     }
 
 #if _INIPARSER == 4
@@ -582,10 +584,13 @@ static int read_cfgfile(dictionary *cfg, struct rpminspect *ri, const char *file
     }
 
     /* if a jvm major versions exist, collect those in to a hash table */
-    read_mapping(cfg, "javabytecode", &ri->jvm_table, &ri->jvm_keys);
+    read_mapping(cfg, "javabytecode", &ri->jvm, &ri->jvm_keys);
 
     /* if an annocheck section exists, collect those in to a hash table */
-    read_mapping(cfg, "annocheck", &ri->annocheck_table, &ri->annocheck_keys);
+    read_mapping(cfg, "annocheck", &ri->annocheck, &ri->annocheck_keys);
+
+    /* if a pathmigration section exists, collect those in to a hash table */
+    read_mapping(cfg, "pathmigration", &ri->pathmigration, &ri->pathmigration_keys);
 
     /* if a products section exists, collect those in to a hash table */
     read_mapping(cfg, "products", &ri->products, &ri->product_keys);
@@ -831,41 +836,21 @@ int init_rpminspect(struct rpminspect *ri, const char *cfgfile, const char *prof
     /* Initialize the struct before reading files */
     ri->workdir = strdup(DEFAULT_WORKDIR);
     ri->profiledir = strdup(CFG_PROFILE_DIR);
-    ri->kojihub = NULL;
-    ri->kojiursine = NULL;
-    ri->kojimbs = NULL;
     ri->vendor_data_dir = strdup(VENDOR_DATA_DIR);
     ri->licensedb = strdup(LICENSE_DB_FILE);
     ri->favor_release = FAVOR_NONE;
-    ri->stat_whitelist = NULL;
     ri->tests = ~0;
-    ri->badwords = NULL;
-    ri->vendor = NULL;
-    ri->buildhost_subdomain = NULL;
-    ri->security_path_prefix = NULL;
-    ri->header_file_extensions = NULL;
-    ri->forbidden_path_prefixes = NULL;
-    ri->forbidden_path_suffixes = NULL;
-    ri->forbidden_directories = NULL;
-    ri->ipv6_blacklist = NULL;
-    ri->elf_path_include = NULL;
-    ri->elf_path_exclude = NULL;
-    ri->manpage_path_include = NULL;
-    ri->manpage_path_exclude = NULL;
-    ri->xml_path_include = NULL;
-    ri->xml_path_exclude = NULL;
     ri->desktop_entry_files_dir = strdup(DESKTOP_ENTRY_FILES_DIR);
     parse_list(BIN_PATHS, &ri->bin_paths);
     ri->bin_owner = strdup(BIN_OWNER);
     ri->bin_group = strdup(BIN_GROUP);
-    ri->forbidden_owners = NULL;
-    ri->forbidden_groups = NULL;
     parse_list(SHELLS, &ri->shells);
     ri->specmatch = MATCH_FULL;
     ri->specprimary = PRIMARY_NAME;
 
     /* Store full path to the config file */
     ri->cfgfile = realpath(cfgfile, NULL);
+    DEBUG_PRINT("ri->cfgfile=|%s|\n", ri->cfgfile);
 
     /* In case we have a missing configuration file, defaults all the way */
     if ((ri->cfgfile == NULL) || (access(ri->cfgfile, F_OK|R_OK) == -1)) {
@@ -901,17 +886,10 @@ int init_rpminspect(struct rpminspect *ri, const char *cfgfile, const char *prof
     }
 
     /* the rest of the members are used at runtime */
-    ri->before = NULL;
-    ri->after = NULL;
     ri->buildtype = KOJI_BUILD_RPM;
     ri->peers = init_rpmpeer();
-    ri->header_cache = NULL;
-    ri->worksubdir = NULL;
-    ri->results = NULL;
     ri->threshold = RESULT_VERIFY;
     ri->worst_result = RESULT_OK;
-    ri->product_release = NULL;
-    ri->arches = NULL;
 
     return 0;
 }
