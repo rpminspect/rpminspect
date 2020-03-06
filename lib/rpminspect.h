@@ -77,10 +77,11 @@ extern struct format formats[];
  * Simple debugging printf.  Sends output to stderr if debugging
  * mode is enabled at runtime.
  */
-#define DEBUG_PRINT(...)                          \
-    if (debug_mode) {                             \
-        fprintf(stderr, "debug: %s: ", __func__); \
-        fprintf(stderr, __VA_ARGS__);             \
+#define DEBUG_PRINT(...)                                         \
+    if (debug_mode) {                                            \
+        fprintf(stderr, "debug: %s (%d): ", __func__, __LINE__); \
+        fprintf(stderr, __VA_ARGS__);                            \
+        fflush(stderr);                                          \
     }
 
 /*
