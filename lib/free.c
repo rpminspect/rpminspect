@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2019  Red Hat, Inc.
+ * Copyright (C) 2019-2020  Red Hat, Inc.
  * Author(s):  David Cantrell <dcantrell@redhat.com>
  *
  * This program is free software: you can redistribute it and/or modify
@@ -149,9 +149,11 @@ void free_rpminspect(struct rpminspect *ri) {
     list_free(ri->forbidden_owners, free);
     list_free(ri->forbidden_groups, free);
     list_free(ri->shells, free);
-    free_mapping(ri->jvm_table, ri->jvm_keys);
-    free_mapping(ri->annocheck_table, ri->annocheck_keys);
+    free_mapping(ri->jvm, ri->jvm_keys);
+    free_mapping(ri->annocheck, ri->annocheck_keys);
+    free_mapping(ri->pathmigration, ri->pathmigration_keys);
     free_mapping(ri->products, ri->product_keys);
+    list_free(ri->ignores, free);
 
     free_rpmpeer(ri->peers);
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2019  Red Hat, Inc.
+ * Copyright (C) 2019-2020  Red Hat, Inc.
  * Author(s):  David Cantrell <dcantrell@redhat.com>
  *
  * This program is free software: you can redistribute it and/or modify
@@ -57,7 +57,7 @@ static bool annocheck_driver(struct rpminspect *ri, rpmfile_entry_t *file)
     TAILQ_FOREACH(entry, ri->annocheck_keys, items) {
         /* Get the command options for this test */
         e.key = entry->data;
-        hsearch_r(e, FIND, &eptr, ri->annocheck_table);
+        hsearch_r(e, FIND, &eptr, ri->annocheck);
 
         if (eptr == NULL) {
             continue;
@@ -116,7 +116,7 @@ bool inspect_annocheck(struct rpminspect *ri) {
     assert(ri != NULL);
 
     /* skip if we have no annocheck tests defined */
-    if (ri->annocheck_table == NULL) {
+    if (ri->annocheck == NULL) {
         return true;
     }
 
