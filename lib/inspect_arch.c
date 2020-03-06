@@ -72,7 +72,6 @@ bool inspect_arch(struct rpminspect *ri) {
             free(msg);
         }
 
-        list_free(lost, free);
         result = false;
     }
 
@@ -84,10 +83,11 @@ bool inspect_arch(struct rpminspect *ri) {
             free(msg);
         }
 
-        list_free(gain, free);
         result = false;
     }
 
+    list_free(lost, NULL);
+    list_free(gain, NULL);
     list_free(before_arches, free);
     list_free(after_arches, free);
 

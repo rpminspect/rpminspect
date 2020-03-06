@@ -108,7 +108,7 @@ string_list_t * list_difference(const string_list_t *a, const string_list_t *b)
         if (eptr == NULL) {
             entry = calloc(1, sizeof(*entry));
             assert(entry != NULL);
-            entry->data = strdup(iter->data);
+            entry->data = iter->data;
             TAILQ_INSERT_TAIL(ret, entry, items);
         }
     }
@@ -151,7 +151,7 @@ string_list_t * list_intersection(const string_list_t *a, const string_list_t *b
         if (eptr != NULL) {
             entry = calloc(1, sizeof(*entry));
             assert(entry != NULL);
-            entry->data = strdup(iter->data);
+            entry->data = iter->data;
             TAILQ_INSERT_TAIL(ret, entry, items);
         }
     }
