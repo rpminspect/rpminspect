@@ -140,6 +140,7 @@ librpminspect_sources = [
     'lib/inspect_metadata.c',
     'lib/inspect_modularity.c',
     'lib/inspect_ownership.c',
+    'lib/inspect_pathmigration.c',
     'lib/inspect_permissions.c',
     'lib/inspect_removedfiles.c',
     'lib/inspect_shellsyntax.c',
@@ -335,6 +336,7 @@ if python.found()
         'test_manpage.py',
         'test_metadata.py',
         'test_ownership.py',
+        'test_pathmigration.py',
         'test_shellsyntax.py',
         'test_specname.py',
         'test_xml.py'
