@@ -52,6 +52,7 @@
 #define HEADER_ARCH          "architectures"
 #define HEADER_SUBPACKAGES   "subpackages"
 #define HEADER_CHANGELOG     "changelog"
+#define HEADER_PATHMIGRATION "path-migration"
 
 /*
  * Inspection remedies
@@ -153,5 +154,8 @@
 
 /* changelog */
 #define REMEDY_CHANGELOG _("Make sure the spec file in the after build contains a valid %%changelog section.")
+
+/* pathmigration */
+#define REMEDY_PATHMIGRATION _("Files should not be installed in old directory names.  Modify the package to install the affected file to the preferred directory.")
 
 #endif

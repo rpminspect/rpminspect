@@ -60,13 +60,15 @@ struct inspect inspections[] = {
     { INSPECT_ARCH, "arch", false, &inspect_arch },
     { INSPECT_SUBPACKAGES, "subpackages", false, &inspect_subpackages },
     { INSPECT_CHANGELOG, "changelog", false, &inspect_changelog },
+    { INSPECT_PATHMIGRATION, "pathmigration", true, &inspect_pathmigration },
 
     /*
      * { INSPECT_TYPE (add to inspect.h),
      *   "short name",
      *   bool--true if for single build, false is before&after required,
-     *   &function_pointer,
-     *   "Long description string" },
+     *   &function_pointer },
+     *
+     * NOTE: long descriptions are inspect.h and returned by inspection_desc()
      */
 
     { 0, NULL, false, NULL }
@@ -111,57 +113,57 @@ const char *inspection_desc(const uint64_t inspection)
 {
     switch (inspection) {
         case INSPECT_LICENSE:
-            return _("Verify the string specified in the License tag of the RPM metadata describes permissible software licenses as defined by the license database. Also checks to see if the License tag contains any unprofessional words as defined in the configuration file.");
+            return _(DESC_LICENSE);
         case INSPECT_EMPTYRPM:
-            return _("Check all binary RPMs in the before and after builds for any empty payloads. Packages that lost payload data from the before build to the after build are reported as well as any packages in the after build that exist but have no payload data.");
+            return _(DESC_EMPTYRPM);
         case INSPECT_METADATA:
-            return _("Perform some RPM header checks. First, check that the Vendor contains the expected string as defined in the configuration file. Second, check that the build host is in the expected subdomain as defined in the configuration file. Third, check the Summary string for any unprofessional words. Fourth, check the Description for any unprofessional words. Lastly, if there is a before build specified, check for differences between the before and after build values of the previous RPM header values and report them.");
+            return _(DESC_METADATA);
         case INSPECT_MANPAGE:
-            return _("Perform some checks on man pages in the RPM payload. First, check that each man page is compressed. Second, check that each man page contains valid content. Lastly, check that each man page is installed to the correct path.");
+            return _(DESC_MANPAGE);
         case INSPECT_XML:
-            return _("Check that XML files included in the RPM payload are well-formed.");
+            return _(DESC_XML);
         case INSPECT_ELF:
-            return _("Perform several checks on ELF files. First, check that ELF objects do not contain an executable stack. Second, check that ELF objects do not contain text relocations. When comparing builds, check that the ELF objects in the after build did not lose a PT_GNU_RELRO segment. When comparing builds, check that the ELF objects in the after build did not lose -D_FORTIFY_SOURCE. Lastly, if there is a list of forbidden library functions, make sure nothing uses them.");
+            return _(DESC_ELF);
         case INSPECT_DESKTOP:
-            return _("Perform syntax and file reference checks on *.desktop files. Syntax errors and invalid file references are reported as errors.");
+            return _(DESC_DESKTOP);
         case INSPECT_DISTTAG:
-            return _("Check that the 'Release' tag in the RPM spec file includes the %{?dist} directive.");
+            return _(DESC_DISTTAG);
         case INSPECT_SPECNAME:
-            return _("Ensure the spec file name conforms to the NAME.spec naming format.");
+            return _(DESC_SPECNAME);
         case INSPECT_MODULARITY:
-            return _("Ensure compliance with modularity build and packaging policies (only valid for module builds, no-op otherwise).");
+            return _(DESC_MODULARITY);
         case INSPECT_JAVABYTECODE:
-            return _("Check minimum required Java bytecode version in class files, report bytecode version changes between builds, and report if bytecode versions are exceeded.  The bytecode version is vendor specific to releases and defined in the configuration file.");
+            return _(DESC_JAVABYTECODE);
         case INSPECT_CHANGEDFILES:
-            return _("Report changed files from the before build to the after build.  Certain file changes will raise additional warnings if the concern is more critical than just reporting changes (e.g., a suspected security impact).  Any gzip, bzip2, or xz compressed files will have their uncompressed content compared only, which will allow changes through in the compression level used.  Message catalog files (.mo) are unpacked and compared using diff(1).  Public C and C++ header files are preprocessed and compared using diff(1).  Any changes with diff output are included in the results.");
+            return _(DESC_CHANGEDFILES);
         case INSPECT_REMOVEDFILES:
-            return _("Report removed files from the before build to the after build.  Shared libraries get additional reporting output as they may be unexpected dependency removals.  Files removed with a security path prefix generated special reporting in case a security review is required.  Source RPMs and debuginfo files are ignored by this inspection.");
+            return _(DESC_REMOVEDFILES);
         case INSPECT_ADDEDFILES:
-            return _("Report added files from the before build to the after build.  Debuginfo files are ignored as are files that match the patterns defined in the configuration file.  Files added to security paths generate special reporting in case a security review is required.  New setuid and setgid files raise a security warning unless the file is in the whitelist.");
+            return _(DESC_ADDEDFILES);
         case INSPECT_UPSTREAM:
-            return _("Report Source archives defined in the RPM spec file changing content between the before and after build. If the source archives change and the package is on the version-whitelist, the change is reported as informational. Otherwise the change is reported as a rebase of the package and requires inspection.");
+            return _(DESC_UPSTREAM);
         case INSPECT_OWNERSHIP:
-            return _("Report files and directories owned by unexpected users and groups. Check to make sure executables are owned by the correct user and group. If a before and after build have been specified, also report ownership changes.");
+            return _(DESC_OWNERSHIP);
         case INSPECT_SHELLSYNTAX:
-            return _("For all shell scripts in the build, perform a syntax check on it using the shell defined in its #! line (shell must also be listed in rpminspect.conf's shell setting). If the syntax check returns non-zero, report it to the user and return a combined stdout and stderr. If comparing two builds, perform the previous check but also report if a previously bad script is now passing the syntax check.");
+            return _(DESC_SHELLSYNTAX);
         case INSPECT_ANNOCHECK:
-            return _("Perform annocheck tests defined in the configuration file on all ELF files in the build.  A single build specified will perform an analysis only.  Two builds specified will compare the test results between the before and after build.  If no annocheck tests are defined in the configuration file, this inspection is skipped.");
+            return _(DESC_ANNOCHECK);
         case INSPECT_DT_NEEDED:
-            return _("Compare DT_NEEDED entries in dynamic ELF executables and shared libraries between the before and after build and report changes.");
+            return _(DESC_DT_NEEDED);
         case INSPECT_FILESIZE:
-            return _("Report file size changes between builds.  If empty files became non-empty or non-empty files became empty, report those as results needing verification.  Report file change percentages as info-only.");
+            return _(DESC_FILESIZE);
         case INSPECT_PERMISSIONS:
-            return _("Report stat(2) mode changes between builds.  Checks against the stat-whitelist for the product release specified or determined.  Any setuid or setgid changes will raise a message requiring Security Team review.");
+            return _(DESC_PERMISSIONS);
         case INSPECT_CAPABILITIES:
-            return _("Report capabilities(7) changes between builds.  Checks against the capabilities whitelist for the product release specified or determined.  Any capabilities changes not whitelisted will raise a message requiring Security Team review.");
+            return _(DESC_CAPABILITIES);
         case INSPECT_KMOD:
-            return _("Report kernel module parameter, dependency, PCI ID, or symbol differences between builds.  Added and removed parameters are reported and if the package version is unchanged, these messages are reported as failures.  The same is true module dependencies, PCI IDs, and symbols");
+            return _(DESC_KMOD);
         case INSPECT_ARCH:
-            return _("Report RPM architectures that appear and disappear between the before and after builds.");
+            return _(DESC_ARCH);
         case INSPECT_SUBPACKAGES:
-            return _("Report RPM subpackages that appear and disappear between the before and after builds.");
+            return _(DESC_SUBPACKAGES);
         case INSPECT_CHANGELOG:
-            return _("Ensure packages contain an entry in the %changelog for the version built.  Reports any other differences in the existing changelog between builds and that the new entry contains new text entries.");
+            return _(DESC_CHANGELOG);
         default:
             return NULL;
     }
