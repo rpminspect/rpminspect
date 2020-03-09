@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2018-2019  Red Hat, Inc.
+ * Copyright (C) 2018-2020  Red Hat, Inc.
  * Author(s):  David Cantrell <dcantrell@redhat.com>
  *
  * This program is free software: you can redistribute it and/or modify
@@ -113,7 +113,15 @@ int printwrap(const char *s, const size_t width, const unsigned int indent, FILE
     char *word = NULL;
 
     assert(s != NULL);
-    assert(width > 0);
+
+    /*
+     * A zero width means we're not on a tty or we're on a tty we
+     * don't understand.  Just output the string and call it 1 line.
+     */
+    if (width == 0) {
+        fprintf(dest, s);
+        return 1;
+    }
 
     start = str = strdup(s);
 
