@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2019  Red Hat, Inc.
+ * Copyright (C) 2019-2020  Red Hat, Inc.
  * Author(s):  David Cantrell <dcantrell@redhat.com>
  *
  * This program is free software: you can redistribute it and/or modify
@@ -18,10 +18,13 @@
 
 #include <stdio.h>
 #include <string.h>
+#include <limits.h>
 #include <errno.h>
 #include <assert.h>
 
 #include "rpminspect.h"
+
+static long int threshold = 0;
 
 static bool filesize_driver(struct rpminspect *ri, rpmfile_entry_t *file)
 {
@@ -73,6 +76,15 @@ static bool filesize_driver(struct rpminspect *ri, rpmfile_entry_t *file)
         result = false;
     } else {
         change = ((file->st.st_size - file->peer_file->st.st_size) / file->peer_file->st.st_size) * 100;
+        sev = RESULT_INFO;
+        waiver = NOT_WAIVABLE;
+
+        if (threshold > 0 && (labs(change) >= threshold)) {
+            /* change is at or above our reporting change threshold for VERIFY */
+            sev = RESULT_VERIFY;
+            waiver = WAIVABLE_BY_ANYONE;
+            result = false;
+        }
 
         if (change > 0) {
             /* file grew */
@@ -99,6 +111,17 @@ bool inspect_filesize(struct rpminspect *ri) {
     bool result;
 
     assert(ri != NULL);
+
+    /* if there is a size reporting threshold, get it */
+    if (ri->size_threshold) {
+        threshold = strtol(ri->size_threshold, 0, 10);
+
+        if ((threshold == LONG_MIN || threshold == LONG_MAX) && errno == ERANGE) {
+            /* unable to use the threshold, ignore */
+            DEBUG_PRINT("unable to use size_threshold=|%s|\n", ri->size_threshold);
+            threshold = 0;
+        }
+    }
 
     /* run the size inspection across all RPM files */
     result = foreach_peer_file(ri, filesize_driver);
