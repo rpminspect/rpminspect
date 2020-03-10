@@ -17,7 +17,6 @@ Mandatory test categories to migrate (top is highest priority):
  TEST_ABI
  TEST_FILEMOVE
  TEST_CONFIG
-!TEST_SIZE (need to support size inc/dec thresholds for reporting, per pkg)
 
 
 Unranked tests categories to migrate (might also decide to skip them):
@@ -74,6 +73,7 @@ Test categories that have been migrated:
 *TEST_PATHNAMES (pathmigration; the forbidden init paths are added
                  to forbidden_path_prefixes in the config file and
                  those are caught by 'addedfiles')
+*TEST_SIZE (filesize)
 
 
 Test categories excluded (see MISSING):
@@ -110,6 +110,7 @@ inspections lack integration tests:
     capabilities
     arch
     subpackages
+    pathmigration
 
 
 +=======+
@@ -139,8 +140,6 @@ General functionality
 * Add verbose runtime reporting.  This is currently only available
   for downloading packages.  Need to figure out how to separate it
   from the test results.
-
-* Add debug runtime reporting.  Just another level beyond verbose.
 
 
 Documentation
