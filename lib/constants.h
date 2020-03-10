@@ -137,6 +137,7 @@
 #define PYTHON_PYC_FILE_EXTENSION ".pyc"
 #define PYTHON_PYO_FILE_EXTENSION ".pyo"
 #define KERNEL_MODULE_FILENAME_EXTENSION ".ko"
+#define SVG_FILENAME_EXTENSION ".svg"
 
 /*
  * Build ID
