@@ -296,6 +296,9 @@ struct rpminspect {
     /* List of shells to check script syntax */
     string_list_t *shells;
 
+    /* Optional: file size change threshold for inc/dec reporting (%) */
+    char *size_threshold;
+
     /* Spec filename matching type */
     specname_match_t specmatch;
     specname_primary_t specprimary;

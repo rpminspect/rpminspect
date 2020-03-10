@@ -555,6 +555,11 @@ static int read_cfgfile(dictionary *cfg, struct rpminspect *ri, const char *file
         parse_list(tmp, &ri->shells);
     }
 
+    tmp = iniparser_getstring(cfg, "settings:size_threshold", NULL);
+    if (tmp) {
+        ri->size_threshold = strdup(tmp);
+    }
+
     tmp = iniparser_getstring(cfg, "specname:match", NULL);
     if (tmp) {
         if (!strcasecmp(tmp, "full")) {
