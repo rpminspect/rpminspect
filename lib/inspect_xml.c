@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2019  Red Hat, Inc.
+ * Copyright (C) 2019-2020  Red Hat, Inc.
  * Author(s):  David Shea <dshea@redhat.com>
  *             David Cantrell <dcantrell@redhat.com>
  *
@@ -32,24 +32,44 @@
 #include "rpminspect.h"
 
 /*
- * Return true if the given file is a well-formed XML document, false otherwise.
- * This only checks if the XML is well-formed. No validation is performed.
+ * By default, libxml will send error messages to stderr.  Turn that off for
+ * our purposes.
  */
-bool is_xml_well_formed(const char *path, char **errors)
+static void xml_silence_errors(void *ctx __attribute__((unused)), const char *msg __attribute__((unused)), ...)
+{
+    return;
+}
+
+/*
+ * Return true if the given file is a well-formed XML document, false otherwise.
+ * This function first tries with DTD validation.  Failing that it tries to just
+ * check the XML.  The tests get less and less strict.
+ */
+static bool is_xml_well_formed(const char *path, char **errors)
 {
     static bool initialized = false;
+    static xmlGenericErrorFunc silence = xml_silence_errors;
     xmlParserCtxtPtr ctxt;
     xmlDocPtr doc;
     bool result;
 
     if (!initialized) {
+        initGenericErrorDefaultFunc(&silence);
         LIBXML_TEST_VERSION
         initialized = true;
     }
 
     ctxt = xmlNewParserCtxt();
     assert(ctxt != NULL);
-    doc = xmlCtxtReadFile(ctxt, path, NULL, XML_PARSE_PEDANTIC);
+    doc = xmlCtxtReadFile(ctxt, path, NULL, XML_PARSE_RECOVER | XML_PARSE_NONET | XML_PARSE_DTDVALID);
+    DEBUG_PRINT("path=|%s|, ctxt->valid=%d, ctxt->errNo=%d\n", path, ctxt->valid, ctxt->errNo);
+
+    /* try again if no DTD specified */
+    if (!ctxt->valid && ctxt->errNo == XML_DTD_NO_DTD) {
+        xmlFreeDoc(doc);
+        doc = xmlCtxtReadFile(ctxt, path, NULL, XML_PARSE_RECOVER | XML_PARSE_NONET);
+        DEBUG_PRINT("path=|%s|, ctxt->valid=%d, ctxt->errNo=%d\n", path, ctxt->valid, ctxt->errNo);
+    }
 
     if (!ctxt->valid) {
         if (errors != NULL) {
@@ -66,8 +86,7 @@ bool is_xml_well_formed(const char *path, char **errors)
     }
 
     xmlFreeParserCtxt(ctxt);
-
-    return result;;
+    return result;
 }
 
 static bool is_xml(const char *path)
@@ -133,7 +152,8 @@ static bool xml_driver(struct rpminspect *ri, rpmfile_entry_t *file)
 {
     char *errors = NULL;
     char *msg = NULL;
-    bool result;
+    const char *arch = NULL;
+    bool result = true;
 
     /* Skip source packages */
     if (headerIsSource(file->rpm_header)) {
@@ -153,13 +173,21 @@ static bool xml_driver(struct rpminspect *ri, rpmfile_entry_t *file)
         return true;
     }
 
+    if (strsuffix(file->fullpath, SVG_FILENAME_EXTENSION)) {
+        /*
+         * Skip SVG files which are XML, but don't specify a DTD
+         * We don't validate other image files so we can probably do the
+         * same for SVG.
+         */
+        return true;
+    }
+
+    arch = get_rpm_header_arch(file->rpm_header);
     result = is_xml_well_formed(file->fullpath, &errors);
 
     if (!result) {
-        xasprintf(&msg, _("File %s has become malformed XML on %s"), file->localpath, get_rpm_header_arch(file->rpm_header));
-
+        xasprintf(&msg, _("File %s is a malformed XML file on %s"), file->localpath, arch);
         add_result(ri, RESULT_VERIFY, WAIVABLE_BY_ANYONE, HEADER_XML, msg, errors, REMEDY_XML);
-
         free(msg);
     }
 

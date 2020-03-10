@@ -75,7 +75,6 @@ bool is_payload_empty(rpmfile_t *);
 bool inspect_emptyrpm(struct rpminspect *);
 
 /* inspect_xml.c */
-bool is_xml_well_formed(const char *, char **);
 bool inspect_xml(struct rpminspect *);
 
 /* inspect_manpage.c */
