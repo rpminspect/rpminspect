@@ -92,6 +92,7 @@ static char *get_shell(const struct rpminspect *ri, const char *fullpath)
     }
 
     free(start);
+    DEBUG_PRINT("shell=|%s|\n", shell);
     return shell;
 }
 
@@ -127,6 +128,7 @@ static bool shellsyntax_driver(struct rpminspect *ri, rpmfile_entry_t *file)
 
     /* Get the shell from the #! line */
     shell = get_shell(ri, file->fullpath);
+    DEBUG_PRINT("shell=|%s|\n", shell);
 
     if (!shell) {
         return true;
@@ -134,6 +136,7 @@ static bool shellsyntax_driver(struct rpminspect *ri, rpmfile_entry_t *file)
 
     if (file->peer_file) {
         before_shell = get_shell(ri, file->peer_file->fullpath);
+        DEBUG_PRINT("before_shell=|%s|\n", before_shell);
 
         if (!before_shell) {
             xasprintf(&msg, _("%s is a shell script but was not before on %s"), file->localpath, arch);
@@ -149,16 +152,18 @@ static bool shellsyntax_driver(struct rpminspect *ri, rpmfile_entry_t *file)
 
     /* Run with -n and capture results */
     errors = run_cmd(&exitcode, shell, "-n", file->fullpath, NULL);
+    DEBUG_PRINT("exitcode=%d, errors=|%s|\n", exitcode, errors);
 
     if (before_shell) {
         before_errors = run_cmd(&before_exitcode, before_shell, "-n", file->peer_file->fullpath, NULL);
+        DEBUG_PRINT("before_exitcode=%d, before_errors=|%s|\n", before_exitcode, before_errors);
     }
 
     /* Special cash for GNU bash, try with extglob */
     if (exitcode && !strcmp(shell, "bash")) {
         free(errors);
-        errors = NULL;
         errors = run_cmd(&exitcode, shell, "-n", "-O", "extglob", file->fullpath, NULL);
+        DEBUG_PRINT("exitcode=%d, errors=|%s|\n", exitcode, errors);
 
         if (!exitcode) {
             extglob = true;
@@ -184,6 +189,11 @@ static bool shellsyntax_driver(struct rpminspect *ri, rpmfile_entry_t *file)
 
             add_result(ri, RESULT_INFO, NOT_WAIVABLE, HEADER_SHELLSYNTAX, msg, before_errors, NULL);
             free(msg);
+        } else if (before_exitcode && exitcode) {
+            xasprintf(&msg, _("%s is not a valid %s script on %s"), file->localpath, shell, arch);
+            add_result(ri, RESULT_BAD, WAIVABLE_BY_ANYONE, HEADER_SHELLSYNTAX, msg, errors, REMEDY_SHELLSYNTAX_BAD);
+            free(msg);
+            result = false;
         }
     } else {
         if (!exitcode && extglob) {
