@@ -33,6 +33,7 @@
 #include "results.h"
 #include "output.h"
 #include "readelf.h"
+#include "diff.h"
 
 #ifndef _LIBRPMINSPECT_RPMINSPECT_H
 #define _LIBRPMINSPECT_RPMINSPECT_H
