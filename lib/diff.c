@@ -2,6 +2,8 @@
  * Copyright (c) 2013 Tatsuhiko Kubo <cubicdaiya@gmail.com>
  * Copyright (c) 2018 Kristaps Dzonsons <kristaps@bsd.lv>
  *
+ * Modified for rpminspect by David Cantrell <dcantrell@redhat.com>
+ *
  * Permission is hereby granted, free of charge, to any person obtaining
  * a copy of this software and associated documentation files (the
  * "Software"), to deal in the Software without restriction, including
@@ -22,7 +24,6 @@
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-#include "config.h"
 
 #include <assert.h>
 #include <stdlib.h>
