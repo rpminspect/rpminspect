@@ -28,6 +28,35 @@
 
 string_list_t *sorted_list = NULL;
 
+/*
+ * Lightweight conversion of a string_list_t of length len to an
+ * array of pointers to the entry->data strings.  The caller
+ * should take care to only free the entry->data pointers once;
+ * either with listfree(list, free) or by iterating this array
+ * and calling free() on each.  If the latter, then listfree()
+ * should still be used on list, but pass NULL as the free func.
+ */
+char **list_to_array(const string_list_t *list, int len)
+{
+    int i = 0;
+    char **array = NULL;
+    string_entry_t *entry = NULL;
+
+    assert(list != NULL);
+    assert(len > 0);
+
+    array = calloc(len, sizeof(*array));
+    assert(array != NULL);
+
+    TAILQ_FOREACH(entry, list, items) {
+        array[i] = entry->data;
+        i++;
+    }
+
+    return array;
+}
+
+/* Convert given string_list_t in a hsearch_data hash table. */
 struct hsearch_data * list_to_table(const string_list_t *list)
 {
     struct hsearch_data *table;
@@ -259,6 +288,10 @@ string_list_t * list_symmetric_difference(const string_list_t *a, const string_l
     return combination;
 }
 
+/*
+ * Helper function to free a string_list_t and each entry->data.  If
+ * the free_func is NULL, nothing is done to the entry->data values.
+ */
 void list_free(string_list_t *list, list_entry_data_free_func free_func)
 {
     string_entry_t *entry;
@@ -310,7 +343,8 @@ static void walk_action(const void *nodep, const VISIT which, const int depth __
     }
 }
 
-/* Return a sorted copy of the list.
+/*
+ * Return a sorted copy of the list.
  *
  * The data pointers used by the sorted list entries are the same as those
  * used in the original list.
@@ -340,10 +374,15 @@ cleanup:
     return sorted_list;
 }
 
+/* Returns the number of entries in the list */
 size_t list_len(const string_list_t *list)
 {
     string_entry_t *iter;
     size_t len = 0;
+
+    if (list == NULL || TAILQ_EMPTY(list)) {
+        return len;
+    }
 
     TAILQ_FOREACH(iter, list, items) {
         len++;
@@ -352,6 +391,10 @@ size_t list_len(const string_list_t *list)
     return len;
 }
 
+/*
+ * Returns a malloc'ed copy of the given list.  Caller must use
+ * listfree(list, free) on the returned list.
+ */
 string_list_t * list_copy(const string_list_t *list)
 {
     const string_entry_t *iter;

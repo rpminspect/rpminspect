@@ -118,6 +118,7 @@ void free_mapping(struct hsearch_data *, string_list_t *);
 void free_rpminspect(struct rpminspect *);
 
 /* listfuncs.c */
+char **list_to_array(const string_list_t *, int);
 struct hsearch_data * list_to_table(const string_list_t *);
 string_list_t * list_difference(const string_list_t *, const string_list_t *);
 string_list_t * list_intersection(const string_list_t *, const string_list_t *);
@@ -239,5 +240,8 @@ bool process_inspection_flag(const char *, const bool, uint64_t *);
 
 /* debug.c */
 void set_debug_mode(bool);
+
+/* readfile.c */
+string_list_t *read_file(const char *, int *);
 
 #endif
