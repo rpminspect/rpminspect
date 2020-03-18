@@ -543,7 +543,7 @@ class BashMalformedCompareRPMs(TestCompareRPMs):
         self.waiver_auth = 'Anyone'
 
 
-class BahExtglobWellFormedCompareRPMs(TestCompareRPMs):
+class BashExtglobWellFormedCompareRPMs(TestCompareRPMs):
     """
     Valid but requires 'extglob' script is OK for comparing RPMs
     """
