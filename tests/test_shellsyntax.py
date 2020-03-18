@@ -620,7 +620,7 @@ class BashWellMalformedCompareRPMs(TestCompareRPMs):
         self.waiver_auth = 'Anyone'
 
 
-class BahWellMalformedCompareKoji(TestCompareKoji):
+class BashWellMalformedCompareKoji(TestCompareKoji):
     """
     Valid /bin/bash script in before, invalid in after is BAD when comparing Koji builds
     """
