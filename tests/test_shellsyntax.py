@@ -394,33 +394,243 @@ class ShWellMalformedCompareKoji(TestCompareKoji):
 # passes it reports that the script needs 'extglob' enabled.    #
 #################################################################
 
-# Valid /bin/bash script is OK for RPMs
 
-# Invalid /bin/bash script is BAD for RPMs
+valid_bash = """#!/bin/bash
+valid=true
+count=1
+while [ $valid ]
+do
+echo $count
+if [ $count -eq 5 ];
+then
+break
+fi
+((count++))
+done
+"""
 
-# Valid but requires 'extglob' script is OK for RPMs
 
-# Valid /bin/bash script is OK for Koji build
+invalid_bash = """#!/bin/bash
+valid=true
+count=1
+while [ $valid ]
+do
+echo $count
+if count -eq 5 ]
+then
+"""
 
-# Invalid /bin/bash script is BAD for Koji build
 
-# Valid but requires 'extglob' script is OK for Koji build
+valid_bash_extglob = """#!/bin/bash
+echo !(*/)
+"""
 
-# Valid /bin/bash script is OK for comparing RPMs
 
-# Invalid /bin/bash script is BAD for comparing RPMs
+class BashWellFormedRPM(TestRPMs):
+    """
+    Valid /bin/bash script is OK for RPMs
+    """
+    def setUp(self):
+        TestRPMs.setUp(self)
 
-# Valid but requires 'extglob' script is OK for comparing RPMs
+        self.rpm.add_installed_file('/usr/share/data/valid_bash.sh',
+                                    rpmfluff.SourceFile('valid_bash.sh', valid_bash))
+        self.inspection = 'shellsyntax'
+        self.label = 'shell-syntax'
+        self.result = 'OK'
 
-# Valid /bin/bash script is OK for comparing Koji builds
 
-# Invalid /bin/bash script is BAD for comparing Koji builds
+class BashMalformedRPM(TestRPMs):
+    """
+    Invalid /bin/bash script is BAD for RPMs
+    """
+    def setUp(self):
+        TestRPMs.setUp(self)
 
-# Valid but requires 'extglob' script is OK for comparing
-# Koji builds
+        self.rpm.add_installed_file('/usr/share/data/invalid_bash.sh',
+                                    rpmfluff.SourceFile('invalid_bash.sh', invalid_bash))
+        self.inspection = 'shellsyntax'
+        self.label = 'shell-syntax'
+        self.result = 'BAD'
+        self.waiver_auth = 'Anyone'
 
-# Valid /bin/bash script in before, invalid in after is BAD when
-# comparing RPMs
 
-# Valid /bin/bash script in before, invalid in after is BAD when
-# comparing Koji builds
+class BashExtglobWellFormedRPM(TestRPMs):
+    """
+    Valid but requires 'extglob' script is OK for RPMs
+    """
+    def setUp(self):
+        TestRPMs.setUp(self)
+
+        self.rpm.add_installed_file('/usr/share/data/valid_bash_extglob.sh',
+                                    rpmfluff.SourceFile('valid_bash_extglob.sh', valid_bash_extglob))
+        self.inspection = 'shellsyntax'
+        self.label = 'shell-syntax'
+        self.result = 'INFO'
+
+
+class BashWellFormedKoji(TestKoji):
+    """
+    Valid /bin/bash script is OK for Koji build
+    """
+    def setUp(self):
+        TestKoji.setUp(self)
+
+        self.rpm.add_installed_file('/usr/share/data/valid_bash.sh',
+                                    rpmfluff.SourceFile('valid_bash.sh', valid_bash))
+        self.inspection = 'shellsyntax'
+        self.label = 'shell-syntax'
+        self.result = 'OK'
+
+
+class BashMalformedKoji(TestKoji):
+    """
+    Invalid /bin/bash script is BAD for Koji build
+    """
+    def setUp(self):
+        TestKoji.setUp(self)
+
+        self.rpm.add_installed_file('/usr/share/data/invalid_bash.sh',
+                                    rpmfluff.SourceFile('invalid_bash.sh', invalid_bash))
+        self.inspection = 'shellsyntax'
+        self.label = 'shell-syntax'
+        self.result = 'BAD'
+        self.waiver_auth = 'Anyone'
+
+
+class BashExtglobWellFormedKoji(TestKoji):
+    """
+    Valid but requires 'extglob' script is OK for Koji build
+    """
+    def setUp(self):
+        TestKoji.setUp(self)
+
+        self.rpm.add_installed_file('/usr/share/data/valid_bash_extglob.sh',
+                                    rpmfluff.SourceFile('valid_bash_extglob.sh', valid_bash_extglob))
+        self.inspection = 'shellsyntax'
+        self.label = 'shell-syntax'
+        self.result = 'INFO'
+
+
+class BahWellFormedCompareRPMs(TestCompareRPMs):
+    """
+    Valid /bin/bash script is OK for comparing RPMs
+    """
+    def setUp(self):
+        TestCompareRPMs.setUp(self)
+        self.before_rpm.add_installed_file('/usr/share/data/valid_bash.sh',
+                                           rpmfluff.SourceFile('valid_bash.sh', valid_bash))
+        self.after_rpm.add_installed_file('/usr/share/data/valid_bash.sh',
+                                          rpmfluff.SourceFile('valid_sh.sh', valid_bash))
+        self.inspection = 'shellsyntax'
+        self.label = 'shell-syntax'
+        self.result = 'OK'
+
+
+class BashMalformedCompareRPMs(TestCompareRPMs):
+    """
+    Invalid /bin/bash script is BAD for comparing RPMs
+    """
+    def setUp(self):
+        TestCompareRPMs.setUp(self)
+        self.before_rpm.add_installed_file('/usr/share/data/invalid_bash.sh',
+                                           rpmfluff.SourceFile('invalid_bash.sh', invalid_bash))
+        self.after_rpm.add_installed_file('/usr/share/data/invalid_bash.sh',
+                                          rpmfluff.SourceFile('invalid_bash.sh', invalid_bash))
+        self.inspection = 'shellsyntax'
+        self.label = 'shell-syntax'
+        self.result = 'BAD'
+        self.waiver_auth = 'Anyone'
+
+
+class BahExtglobWellFormedCompareRPMs(TestCompareRPMs):
+    """
+    Valid but requires 'extglob' script is OK for comparing RPMs
+    """
+    def setUp(self):
+        TestCompareRPMs.setUp(self)
+        self.before_rpm.add_installed_file('/usr/share/data/valid_bash_extglob.sh',
+                                           rpmfluff.SourceFile('valid_bash_extglob.sh', valid_bash_extglob))
+        self.after_rpm.add_installed_file('/usr/share/data/valid_bash_extglob.sh',
+                                          rpmfluff.SourceFile('valid_bash_extglob.sh', valid_bash_extglob))
+        self.inspection = 'shellsyntax'
+        self.label = 'shell-syntax'
+        self.result = 'INFO'
+
+
+class BshWellFormedCompareKoji(TestCompareKoji):
+    """
+    Valid /bin/bash script is OK for comparing Koji builds
+    """
+    def setUp(self):
+        TestCompareKoji.setUp(self)
+        self.before_rpm.add_installed_file('/usr/share/data/valid_bash.sh',
+                                           rpmfluff.SourceFile('valid_bash.sh', valid_bash))
+        self.after_rpm.add_installed_file('/usr/share/data/valid_bash.sh',
+                                          rpmfluff.SourceFile('valid_bash.sh', valid_bash))
+        self.inspection = 'shellsyntax'
+        self.label = 'shell-syntax'
+        self.result = 'OK'
+
+
+class BahMalformedCompareKoji(TestCompareKoji):
+    """
+    Invalid /bin/bash script is BAD for comparing Koji builds
+    """
+    def setUp(self):
+        TestCompareKoji.setUp(self)
+        self.before_rpm.add_installed_file('/usr/share/data/invalid_bash.sh',
+                                           rpmfluff.SourceFile('invalid_bash.sh', invalid_bash))
+        self.after_rpm.add_installed_file('/usr/share/data/invalid_bash.sh',
+                                          rpmfluff.SourceFile('invalid_bash.sh', invalid_bash))
+        self.inspection = 'shellsyntax'
+        self.label = 'shell-syntax'
+        self.result = 'BAD'
+        self.waiver_auth = 'Anyone'
+
+
+class BashExtglobWellFormedCompareKoji(TestCompareKoji):
+    """
+    Valid but requires 'extglob' script is OK for comparing Koji builds
+    """
+    def setUp(self):
+        TestCompareKoji.setUp(self)
+        self.before_rpm.add_installed_file('/usr/share/data/valid_bash_extglob.sh',
+                                           rpmfluff.SourceFile('valid_bash_extglob.sh', valid_bash_extglob))
+        self.after_rpm.add_installed_file('/usr/share/data/valid_bash_extglob.sh',
+                                          rpmfluff.SourceFile('valid_bash_extglob.sh', valid_bash_extglob))
+        self.inspection = 'shellsyntax'
+        self.label = 'shell-syntax'
+        self.result = 'INFO'
+
+
+class BashWellMalformedCompareRPMs(TestCompareRPMs):
+    """
+    Valid /bin/bash script in before, invalid in after is BAD when comparing RPMs
+    """
+    def setUp(self):
+        TestCompareRPMs.setUp(self)
+        self.before_rpm.add_installed_file('/usr/share/data/valid_bash.sh',
+                                           rpmfluff.SourceFile('valid_bash.sh', valid_bash))
+        self.after_rpm.add_installed_file('/usr/share/data/invalid_bash.sh',
+                                          rpmfluff.SourceFile('invalid_bash.sh', invalid_bash))
+        self.inspection = 'shellsyntax'
+        self.label = 'shell-syntax'
+        self.result = 'BAD'
+        self.waiver_auth = 'Anyone'
+
+
+class BahWellMalformedCompareKoji(TestCompareKoji):
+    """
+    Valid /bin/bash script in before, invalid in after is BAD when comparing Koji builds
+    """
+    def setUp(self):
+        TestCompareKoji.setUp(self)
+        self.before_rpm.add_installed_file('/usr/share/data/valid_bash.sh',
+                                           rpmfluff.SourceFile('valid_bash.sh', valid_bash))
+        self.after_rpm.add_installed_file('/usr/share/data/invalid_sh.sh',
+                                          rpmfluff.SourceFile('invalid_bash.sh', invalid_bash))
+        self.inspection = 'shellsyntax'
+        self.label = 'shell-syntax'
+        self.result = 'BAD'
+        self.waiver_auth = 'Anyone'
