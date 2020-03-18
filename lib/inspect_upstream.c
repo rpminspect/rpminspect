@@ -104,11 +104,10 @@ static bool upstream_driver(struct rpminspect *ri, rpmfile_entry_t *file)
     bool result = true;
     char *before_sum = NULL;
     char *after_sum = NULL;
-    char *diff_output = NULL;
-    char *diff_head = NULL;
     char *shortname = NULL;
     char *msg = NULL;
-    int exitcode;
+    string_list_t *diffresult = NULL;
+    char *difference = NULL;
 
     /* If we are not looking at a Source file, bail. */
     if (!is_source(file)) {
@@ -129,27 +128,23 @@ static bool upstream_driver(struct rpminspect *ri, rpmfile_entry_t *file)
         after_sum = checksum(file);
 
         if (strcmp(before_sum, after_sum)) {
-            /* capture 'diff -u' output for text files */
+            /* generate unified diff for text files */
             if (is_text_file(file->peer_file) && is_text_file(file)) {
-                diff_head = diff_output = run_cmd(&exitcode, DIFF_CMD, "-u", file->peer_file->fullpath, file->fullpath, NULL);
+                diffresult = unified_diff(file->peer_file->fullpath, file->fullpath);
 
-                /* skip the two leading lines */
-                if (strprefix(diff_head, "--- ")) {
-                    diff_head = index(diff_head, '\n') + 1;
-                }
-
-                if (strprefix(diff_head, "+++ ")) {
-                    diff_head = index(diff_head, '\n') + 1;
+                if (diffresult != NULL && !TAILQ_EMPTY(diffresult)) {
+                    difference = list_to_string(diffresult);
+                    list_free(diffresult, free);
                 }
             }
 
             /* report the changed file */
             xasprintf(&msg, _("Upstream source file `%s` changed content"), shortname);
-            add_result(ri, sev, waiver, HEADER_UPSTREAM, msg, diff_head, remedy);
+            add_result(ri, sev, waiver, HEADER_UPSTREAM, msg, difference, remedy);
             result = false;
 
             /* clean up */
-            free(diff_output);
+            free(difference);
         }
     }
 
