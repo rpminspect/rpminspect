@@ -374,3 +374,25 @@ char * strreplace(const char *s, const char *find, const char *replace)
 
     return result;
 }
+
+/*
+ * Append the second string to the first and returned the result.
+ * Memory is allocated or reallocated and the first argument is
+ * modified.  Caller is responsible for freeing memory.
+ */
+char *strappend(char *first, const char *second)
+{
+    if (first && second == NULL) {
+        return first;
+    } else if (first == NULL && second) {
+        return strdup(second);
+    } else if (first == NULL && second == NULL) {
+        return NULL;
+    }
+
+    first = realloc(first, strlen(first) + strlen(second) + 2);
+    assert(first != NULL);
+    first = strcat(first, second);
+    first = strcat(first, "\n");
+    return first;
+}

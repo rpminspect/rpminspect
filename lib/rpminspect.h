@@ -118,6 +118,7 @@ void free_mapping(struct hsearch_data *, string_list_t *);
 void free_rpminspect(struct rpminspect *);
 
 /* listfuncs.c */
+char *list_to_string(const string_list_t *);
 char **list_to_array(const string_list_t *, int);
 struct hsearch_data * list_to_table(const string_list_t *);
 string_list_t * list_difference(const string_list_t *, const string_list_t *);
@@ -173,6 +174,7 @@ char *strseverity(const severity_t);
 severity_t getseverity(const char *);
 char *strwaiverauth(const waiverauth_t);
 char *strreplace(const char *, const char *, const char *);
+char *strappend(char *, const char *);
 
 /* badwords.c */
 bool has_bad_word(const char *, const string_list_t *);

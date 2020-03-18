@@ -29,6 +29,26 @@
 string_list_t *sorted_list = NULL;
 
 /*
+ * Given a string_list_t, join all entries in to a newline delimited
+ * string.  Caller is responsible for freeing the result.
+ */
+char *list_to_string(const string_list_t *list)
+{
+    char *s = NULL;
+    string_entry_t *entry = NULL;
+
+    if (list == NULL || TAILQ_EMPTY(list)) {
+        return NULL;
+    }
+
+    TAILQ_FOREACH(entry, list, items) {
+        s = strappend(s, entry->data);
+    }
+
+    return s;
+}
+
+/*
  * Lightweight conversion of a string_list_t of length len to an
  * array of pointers to the entry->data strings.  The caller
  * should take care to only free the entry->data pointers once;
