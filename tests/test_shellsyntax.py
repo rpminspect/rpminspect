@@ -512,7 +512,7 @@ class BashExtglobWellFormedKoji(TestKoji):
         self.result = 'INFO'
 
 
-class BahWellFormedCompareRPMs(TestCompareRPMs):
+class BashWellFormedCompareRPMs(TestCompareRPMs):
     """
     Valid /bin/bash script is OK for comparing RPMs
     """
