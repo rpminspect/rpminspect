@@ -157,4 +157,9 @@
  */
 #define KERNEL_MODULES_DIR "/lib/modules/"
 
+/*
+ * Number of unified diff (diff -u) context lines before and after hunk.
+ */
+#define DIFF_CONTEXT_LINES 3
+
 #endif

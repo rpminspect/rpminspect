@@ -563,4 +563,13 @@ typedef struct _kernel_alias_data {
     struct hsearch_data *alias_table;
 } kernel_alias_data_t;
 
+/* Information for a unified diff.  Paired with diff() results. */
+struct unified_diff {
+    size_t from;
+    size_t fromlen;
+    size_t to;
+    size_t tolen;
+    char *symbol;
+};
+
 #endif

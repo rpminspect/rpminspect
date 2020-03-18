@@ -244,4 +244,7 @@ void set_debug_mode(bool);
 /* readfile.c */
 string_list_t *read_file(const char *, int *);
 
+/* unified_diff.c */
+string_list_t *unified_diff(const char *, const char *);
+
 #endif

@@ -167,6 +167,7 @@ librpminspect_sources = [
     'lib/runcmd.c',
     'lib/strfuncs.c',
     'lib/tty.c',
+    'lib/unified_diff.c',
     'lib/unpack.c',
     'lib/whitelist.c',
 ]
