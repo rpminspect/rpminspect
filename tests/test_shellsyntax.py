@@ -558,7 +558,7 @@ class BashExtglobWellFormedCompareRPMs(TestCompareRPMs):
         self.result = 'INFO'
 
 
-class BshWellFormedCompareKoji(TestCompareKoji):
+class BashWellFormedCompareKoji(TestCompareKoji):
     """
     Valid /bin/bash script is OK for comparing Koji builds
     """
