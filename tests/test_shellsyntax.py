@@ -573,7 +573,7 @@ class BshWellFormedCompareKoji(TestCompareKoji):
         self.result = 'OK'
 
 
-class BahMalformedCompareKoji(TestCompareKoji):
+class BashMalformedCompareKoji(TestCompareKoji):
     """
     Invalid /bin/bash script is BAD for comparing Koji builds
     """
