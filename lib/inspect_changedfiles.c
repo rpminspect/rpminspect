@@ -318,7 +318,7 @@ static bool changedfiles_driver(struct rpminspect *ri, rpmfile_entry_t *file)
         }
 
         /* Now diff the mo content */
-        diffresult = unified_diff(before_tmp, after_tmp);
+        diffresult = unified_file_diff(before_tmp, after_tmp);
 
         if (diffresult && !TAILQ_EMPTY(diffresult)) {
             difference = list_to_string(diffresult);
@@ -365,7 +365,7 @@ static bool changedfiles_driver(struct rpminspect *ri, rpmfile_entry_t *file)
 
     if (!strcmp(type, "text/x-c") && possible_header) {
         /* Now diff the header content */
-        diffresult = unified_diff(file->peer_file->fullpath, file->fullpath);
+        diffresult = unified_file_diff(file->peer_file->fullpath, file->fullpath);
 
         if (diffresult && !TAILQ_EMPTY(diffresult)) {
             difference = list_to_string(diffresult);

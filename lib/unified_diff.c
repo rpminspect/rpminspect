@@ -30,43 +30,26 @@ static int cmp(const void *p1, const void *p2)
 }
 
 /*
- * Given two files, construct a string_list_t that is unified diff
- * output (diff -u) of the two files.  NULL means they are the same.
- * Caller must free the returned string_list_t.
+ * Create the unified diff output as a string_list_t given the
+ * result of diff().  Caller must free the result.
  */
-string_list_t *unified_diff(const char *original, const char *modified)
+static string_list_t *unified_output(const string_list_t *original, const string_list_t *modified)
 {
-    char *origfile = NULL;
-    char *modfile = NULL;
-    int origlen = 0;
-    int modlen = 0;
-    string_list_t *orig = NULL;
-    string_list_t *mod = NULL;
-    size_t i = 0;
-    size_t j = 0;
     int rc = 0;
     struct diff p;
-    bool context = false;
     string_list_t *unified = NULL;
     string_list_t *hunk = NULL;
     string_entry_t *entry = NULL;
     struct unified_diff ud;
+    size_t i = 0;
+    size_t j = 0;
+    bool context = false;
 
     assert(original != NULL);
     assert(modified != NULL);
 
-    /* get full real paths to the files */
-    origfile = realpath(original, NULL);
-    assert(origfile != NULL);
-    modfile = realpath(modified, NULL);
-    assert(modfile != NULL);
-
-    /* read in the source files */
-    orig = read_file(origfile, &origlen);
-    mod = read_file(modfile, &modlen);
-
     /* run the diff */
-    rc = diff(&p, cmp, sizeof(char *), list_to_array(orig, origlen), origlen, list_to_array(mod, modlen), modlen);
+    rc = diff(&p, cmp, sizeof(char *), list_to_array(original), list_len(original), list_to_array(modified), list_len(modified));
 
     if (rc < 0) {
         fprintf(stderr, "*** %s (%d): %s\n", __func__, __LINE__, strerror(errno));
@@ -160,14 +143,77 @@ string_list_t *unified_diff(const char *original, const char *modified)
     }
 
     /* cleanup */
-    list_free(unified, free);
     list_free(hunk, NULL);
     free(p.ses);
     free(p.lcs);
+
+    return unified;
+}
+
+/*
+ * Given two files, construct a string_list_t that is unified diff
+ * output (diff -u) of the two files.  NULL means they are the same.
+ * Caller must free the returned string_list_t.
+ */
+string_list_t *unified_file_diff(const char *original, const char *modified)
+{
+    char *origfile = NULL;
+    char *modfile = NULL;
+    string_list_t *orig = NULL;
+    string_list_t *mod = NULL;
+    string_list_t *unified = NULL;
+
+    assert(original != NULL);
+    assert(modified != NULL);
+
+    /* get full real paths to the files */
+    origfile = realpath(original, NULL);
+    assert(origfile != NULL);
+    modfile = realpath(modified, NULL);
+    assert(modfile != NULL);
+
+    /* read in the source files */
+    orig = read_file(origfile);
+    mod = read_file(modfile);
+
+    /* get unified output */
+    unified = unified_output(orig, mod);
+
+    /* clean up */
     list_free(orig, free);
     list_free(mod, free);
     free(origfile);
     free(modfile);
+
+    return unified;
+}
+
+/*
+ * Given two strings, construct a string_list_t that is unified diff
+ * output (diff -u) of the two strings.  The strings are assumed to be
+ * newline delimited.  This function will construct a character array
+ * on that basis.  NULL means they are the same.  Caller must free the
+ * returned string_list_t.
+ */
+string_list_t *unified_str_diff(const char *original, const char *modified)
+{
+    string_list_t *unified = NULL;
+    string_list_t *orig = NULL;
+    string_list_t *mod = NULL;
+
+    assert(original != NULL);
+    assert(modified != NULL);
+
+    /* split the strings */
+    orig = strsplit(original, "\n");
+    mod = strsplit(modified, "\n");
+
+    /* run the diff */
+    unified = unified_output(orig, mod);
+
+    /* cleanup */
+    list_free(orig, free);
+    list_free(mod, free);
 
     return unified;
 }

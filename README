@@ -150,7 +150,6 @@ there are a number of userspace programs required:
     /usr/bin/xzcmp
     /usr/bin/eu-elfcmp
     /usr/bin/msgunfmt
-    /usr/bin/diff
 
 The provided spec file template uses the Fedora locations for these
 files, but in the program, they must be on the runtime system.
@@ -161,7 +160,7 @@ packages.
 In Fedora, for example, you can run the following to install these
 programs:
 
-    dnf install desktop-file-utils gzip bzip2 xz elfutils gettext diffutils
+    dnf install desktop-file-utils gzip bzip2 xz elfutils gettext
 
 The 'shellsyntax' inspection uses the actual shell programs listed in
 the shells setting in the rpminspect.conf.  Since this can vary by

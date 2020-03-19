@@ -49,23 +49,22 @@ char *list_to_string(const string_list_t *list)
 }
 
 /*
- * Lightweight conversion of a string_list_t of length len to an
- * array of pointers to the entry->data strings.  The caller
- * should take care to only free the entry->data pointers once;
- * either with listfree(list, free) or by iterating this array
- * and calling free() on each.  If the latter, then listfree()
- * should still be used on list, but pass NULL as the free func.
+ * Lightweight conversion of a string_list_t to an array of pointers
+ * to the entry->data strings.  The caller should take care to only
+ * free the entry->data pointers once; either with listfree(list,
+ * free) or by iterating this array and calling free() on each.  If
+ * the latter, then listfree() should still be used on list, but pass
+ * NULL as the free func.
  */
-char **list_to_array(const string_list_t *list, int len)
+char **list_to_array(const string_list_t *list)
 {
     int i = 0;
     char **array = NULL;
     string_entry_t *entry = NULL;
 
     assert(list != NULL);
-    assert(len > 0);
 
-    array = calloc(len, sizeof(*array));
+    array = calloc(list_len(list), sizeof(*array));
     assert(array != NULL);
 
     TAILQ_FOREACH(entry, list, items) {
