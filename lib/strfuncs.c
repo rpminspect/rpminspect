@@ -119,7 +119,7 @@ int printwrap(const char *s, const size_t width, const unsigned int indent, FILE
      * don't understand.  Just output the string and call it 1 line.
      */
     if (width == 0) {
-        fprintf(dest, s);
+        fprintf(dest, "%s", s);
         return 1;
     }
 
