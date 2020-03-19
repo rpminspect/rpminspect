@@ -165,6 +165,3 @@ These are things I intend to get to over time:
       enough jobs for each package; set a rate limit in rpminspect.conf
 
     * Replace iniparser usage with yacc grammar
-
-    * Use libsvn_diff in place of calling diff(1) and reading back
-      stdout and stderr
