@@ -130,7 +130,7 @@ static bool upstream_driver(struct rpminspect *ri, rpmfile_entry_t *file)
         if (strcmp(before_sum, after_sum)) {
             /* generate unified diff for text files */
             if (is_text_file(file->peer_file) && is_text_file(file)) {
-                diffresult = unified_diff(file->peer_file->fullpath, file->fullpath);
+                diffresult = unified_file_diff(file->peer_file->fullpath, file->fullpath);
 
                 if (diffresult != NULL && !TAILQ_EMPTY(diffresult)) {
                     difference = list_to_string(diffresult);

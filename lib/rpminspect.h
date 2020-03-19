@@ -119,7 +119,7 @@ void free_rpminspect(struct rpminspect *);
 
 /* listfuncs.c */
 char *list_to_string(const string_list_t *);
-char **list_to_array(const string_list_t *, int);
+char **list_to_array(const string_list_t *);
 struct hsearch_data * list_to_table(const string_list_t *);
 string_list_t * list_difference(const string_list_t *, const string_list_t *);
 string_list_t * list_intersection(const string_list_t *, const string_list_t *);
@@ -175,6 +175,7 @@ severity_t getseverity(const char *);
 char *strwaiverauth(const waiverauth_t);
 char *strreplace(const char *, const char *, const char *);
 char *strappend(char *, const char *);
+string_list_t *strsplit(const char *, const char *);
 
 /* badwords.c */
 bool has_bad_word(const char *, const string_list_t *);
@@ -244,9 +245,10 @@ bool process_inspection_flag(const char *, const bool, uint64_t *);
 void set_debug_mode(bool);
 
 /* readfile.c */
-string_list_t *read_file(const char *, int *);
+string_list_t *read_file(const char *);
 
 /* unified_diff.c */
-string_list_t *unified_diff(const char *, const char *);
+string_list_t *unified_file_diff(const char *, const char *);
+string_list_t *unified_str_diff(const char *, const char *);
 
 #endif

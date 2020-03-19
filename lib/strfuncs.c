@@ -396,3 +396,47 @@ char *strappend(char *first, const char *second)
     first = strcat(first, "\n");
     return first;
 }
+
+/*
+ * Split given string on delimeter.  Put each substring in a
+ * string_list_t as a separate entry, return the list.  Caller
+ * must free the list.
+ */
+string_list_t *strsplit(const char *s, const char *delim)
+{
+    char *walk = NULL;
+    char *token = NULL;
+    string_list_t *list = NULL;
+    string_entry_t *entry = NULL;
+
+    if (s == NULL) {
+        return NULL;
+    }
+
+    walk = strdup(s);
+    assert(s != NULL);
+
+    list = calloc(1, sizeof(*list));
+    assert(list != NULL);
+    TAILQ_INIT(list);
+
+    /* given a string but no delim, just make a single entry list */
+    if (s && delim == NULL) {
+        entry = calloc(1, sizeof(*entry));
+        assert(entry != NULL);
+        entry->data = walk;
+        TAILQ_INSERT_TAIL(list, entry, items);
+        return list;
+    }
+
+    /* split the string and build the list */
+    while ((token = strsep(&walk, delim)) != NULL) {
+        entry = calloc(1, sizeof(*entry));
+        assert(entry != NULL);
+        entry->data = strdup(token);
+        TAILQ_INSERT_TAIL(list, entry, items);
+    }
+
+    free(walk);
+    return list;
+}

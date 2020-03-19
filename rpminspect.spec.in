@@ -54,7 +54,6 @@ Requires:       bzip2
 Requires:       xz
 Requires:       elfutils
 Requires:       gettext
-Requires:       diffutils
 
 # These are required for libxml2 DTD validation
 Requires:       xhtml1-dtds

@@ -94,48 +94,6 @@ static string_list_t *get_changelog(const Header hdr)
 }
 
 /*
- * Generate temporary changelog files for use with diff(1).
- */
-static char *create_changelog(const string_list_t *changelog, const char *where)
-{
-    int fd;
-    char *output = NULL;
-    string_entry_t *entry = NULL;
-    FILE *logfp = NULL;
-
-    assert(changelog != NULL);
-    assert(where != NULL);
-
-    xasprintf(&output, "%s/changelog.XXXXXX", where)
-    fd = mkstemp(output);
-
-    if (fd == -1) {
-        fprintf(stderr, _("*** unable to create temporary file %s: %s\n"), output, strerror(errno));
-        return NULL;
-    }
-
-    logfp = fdopen(fd, "w");
-
-    if (logfp == NULL) {
-        fprintf(stderr, _("*** unable to open temporary file %s for writing: %s\n"), output, strerror(errno));
-        close(fd);
-        return NULL;
-    }
-
-    TAILQ_FOREACH(entry, changelog, items) {
-        fprintf(logfp, "%s\n", entry->data);
-    }
-
-    if (fclose(logfp) != 0) {
-        fprintf(stderr, _("*** unable to close writing to temporary file %s: %s\n"), output, strerror(errno));
-        close(fd);
-        return NULL;
-    }
-
-    return output;
-}
-
-/*
  * Perform %changelog checks on the SRPM packages between builds. Do
  * the following:
  *     - Report if the %changelog was removed in the after build but
@@ -215,14 +173,11 @@ static bool check_bin_rpm_changelog(struct rpminspect *ri, const rpmpeer_entry_t
     char *after_nevra = NULL;
     string_list_t *before_changelog = NULL;
     string_list_t *after_changelog = NULL;
+    char *bclog = NULL;
+    char *aclog = NULL;
     char *msg = NULL;
-    char *before_output = NULL;
-    char *after_output = NULL;
-    char *diff_output = NULL;
-    char *full_diff_output = NULL;
-    int exitcode = 0;
-    char *diff_walk = NULL;
-    char *line = NULL;
+    string_list_t *diffresult = NULL;
+    char *difference = NULL;
     string_entry_t *entry = NULL;
     severity_t severity = RESULT_INFO;
 
@@ -235,55 +190,40 @@ static bool check_bin_rpm_changelog(struct rpminspect *ri, const rpmpeer_entry_t
 
     /* get the before and after changelogs */
     before_changelog = get_changelog(peer->before_hdr);
+    bclog = list_to_string(before_changelog);
     after_changelog = get_changelog(peer->after_hdr);
-
-    /* Generate temporary changelog files */
-    before_output = create_changelog(before_changelog, ri->workdir);
-    after_output = create_changelog(after_changelog, ri->workdir);
+    aclog = list_to_string(after_changelog);
 
     /* Compare the changelogs */
-    diff_output = run_cmd(&exitcode, DIFF_CMD, "-u", before_output, after_output, NULL);
+    diffresult = unified_str_diff(bclog, aclog);
 
-    if (exitcode) {
-        /* Skip past the diff(1) header lines */
-        diff_walk = diff_output;
-
-        if (!strncmp(diff_walk, "--- ", 4)) {
-            diff_walk = strchr(diff_walk, '\n') + 1;
-        }
-
-        if (!strncmp(diff_walk, "+++ ", 4)) {
-            diff_walk = strchr(diff_walk, '\n') + 1;
-        }
-
-        full_diff_output = strdup(diff_walk);
-
+    if (diffresult != NULL && !TAILQ_EMPTY(diffresult)) {
         /* Differences found, see what kind */
-        while ((line = strsep(&diff_walk, "\n")) != NULL) {
-            DEBUG_PRINT("line=|%s|\n", line);
+        TAILQ_FOREACH(entry, diffresult, items) {
+            DEBUG_PRINT("entry->data=|%s|\n", entry->data);
 
-            if (strlen(line) >= 2 && line[0] == '-' && line[1] == ' ') {
+            if (strprefix(entry->data, "- ")) {
                 severity = RESULT_VERIFY;
                 break;
             }
         }
 
+        difference = list_to_string(diffresult);
+        list_free(diffresult, free);
+
         if (severity == RESULT_INFO) {
             xasprintf(&msg, _("%%changelog contains new text in the %s build"), after_nevra);
-            add_result(ri, severity, NOT_WAIVABLE, HEADER_CHANGELOG, msg, full_diff_output, NULL);
+            add_result(ri, severity, NOT_WAIVABLE, HEADER_CHANGELOG, msg, difference, NULL);
             free(msg);
         } else if (severity == RESULT_VERIFY) {
             xasprintf(&msg, _("%%changelog modified between the %s and %s builds"), before_nevra, after_nevra);
-            add_result(ri, severity, WAIVABLE_BY_ANYONE, HEADER_CHANGELOG, msg, full_diff_output, REMEDY_CHANGELOG);
+            add_result(ri, severity, WAIVABLE_BY_ANYONE, HEADER_CHANGELOG, msg, difference, REMEDY_CHANGELOG);
             free(msg);
             result = false;
         }
-    }
 
-    free(diff_output);
-    free(full_diff_output);
-    free(before_output);
-    free(after_output);
+        free(difference);
+    }
 
     /* Check for bad words */
     TAILQ_FOREACH(entry, after_changelog, items) {
@@ -296,6 +236,8 @@ static bool check_bin_rpm_changelog(struct rpminspect *ri, const rpmpeer_entry_t
     }
 
     /* cleanup */
+    free(bclog);
+    free(aclog);
     list_free(before_changelog, free);
     list_free(after_changelog, free);
     free(before_nevra);

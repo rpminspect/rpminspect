@@ -26,17 +26,15 @@
  * Each line is a separate entry.  Caller must call listfree() on the list
  * returned.
  */
-string_list_t *read_file(const char *path, int *len)
+string_list_t *read_file(const char *path)
 {
     FILE *fp = NULL;
     string_list_t *data = NULL;
     string_entry_t *entry = NULL;
     char *buf = NULL;
     size_t buflen = 0;
-    int listlen = 0;
 
     assert(path != NULL);
-    *len = 0;
     fp = fopen(path, "r");
 
     if (fp == NULL) {
@@ -51,12 +49,9 @@ string_list_t *read_file(const char *path, int *len)
     while (getline(&buf, &buflen, fp) != -1) {
         entry = calloc(1, sizeof(*entry));
         entry->data = buf;
-        listlen++;
         TAILQ_INSERT_TAIL(data, entry, items);
         buf = NULL;
     }
-
-    *len = listlen;
 
     if (fclose(fp) == -1) {
         fprintf(stderr, "*** %s (%d): %s\n", __func__, __LINE__, strerror(errno));
