@@ -64,10 +64,12 @@ static bool annocheck_driver(struct rpminspect *ri, rpmfile_entry_t *file)
         }
 
         /* Run the test on the file */
+        DEBUG_PRINT("%s %s %s\n", ANNOCHECK_CMD, (char *) eptr->data, file->fullpath);
         after_out = run_cmd(&after_exit, ANNOCHECK_CMD, (char *) eptr->data, file->fullpath, NULL);
 
         /* If we have a before build, run the command on that */
         if (file->peer_file) {
+            DEBUG_PRINT("%s %s %s\n", ANNOCHECK_CMD, (char *) eptr->data, file->peer_file->fullpath);
             before_out = run_cmd(&before_exit, ANNOCHECK_CMD, (char *) eptr->data, file->peer_file->fullpath, NULL);
         }
 
