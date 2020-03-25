@@ -80,7 +80,7 @@ endif
 
 iniparser = declare_dependency(link_args : ['-liniparser'])
 
-if not cc.has_function('iniparser_getlongint', args : ['-liniparser'], depends : [zlib])
+if not cc.has_function('iniparser_getlongint', args : ['-liniparser'], dependencies : [zlib])
     add_project_arguments('-D_INIPARSER=3', language : 'c')
 else
     add_project_arguments('-D_INIPARSER=4', language : 'c')
