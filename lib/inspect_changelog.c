@@ -202,7 +202,7 @@ static bool check_bin_rpm_changelog(struct rpminspect *ri, const rpmpeer_entry_t
         TAILQ_FOREACH(entry, diffresult, items) {
             DEBUG_PRINT("entry->data=|%s|\n", entry->data);
 
-            if (strprefix(entry->data, "- ")) {
+            if (entry->data && entry->data[0] == '-') {
                 severity = RESULT_VERIFY;
                 break;
             }
