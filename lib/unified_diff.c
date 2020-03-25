@@ -44,6 +44,7 @@ static string_list_t *unified_output(const string_list_t *original, const string
     size_t i = 0;
     size_t j = 0;
     bool context = false;
+    const char *cline = NULL;
 
     assert(original != NULL);
     assert(modified != NULL);
@@ -79,44 +80,56 @@ static string_list_t *unified_output(const string_list_t *original, const string
             if (!context) {
                 /* start a context marker */
                 context = true;
-                ud.from = p.ses[i].originIdx - DIFF_CONTEXT_LINES;
 
-                if (ud.to == 0) {
-                    ud.to = ud.from;
-                }
+                DEBUG_PRINT("p.ses[i].originIdx=%ld, p.ses[i].targetIdx=%ld\n", p.ses[i].originIdx, p.ses[i].targetIdx);
+                ud.from = p.ses[i].targetIdx;
+                ud.to = p.ses[i].targetIdx;
 
-                for (j = DIFF_CONTEXT_LINES; (j > 0) && ((i - j) >= 1); j--) {
-                    entry = calloc(1, sizeof(*entry));
-                    assert(entry != NULL);
-                    xasprintf(&entry->data, " %s", *(const char **) p.ses[i - j].e);
-                    TAILQ_INSERT_TAIL(hunk, entry, items);
-                    ud.fromlen++;
-                    ud.tolen++;
+                if (ud.from > DIFF_CONTEXT_LINES) {
+                    for (j = DIFF_CONTEXT_LINES; (j > 0) && ((i - j) >= p.sessz); j--) {
+                        DEBUG_PRINT("i - j=%ld\n", i - j);
+                        DEBUG_PRINT("p.ses[i - j].e=|%c|\n", *((char *) p.ses[i - j].e));
+
+                        /* the line we're working with */
+                        cline = *(const char **) p.ses[i - j].e;
+
+                        /* add this entry */
+                        entry = calloc(1, sizeof(*entry));
+                        assert(entry != NULL);
+                        DEBUG_PRINT("p.ses[i - j].e=|%s|", cline);
+                        xasprintf(&entry->data, " %s", cline);
+                        TAILQ_INSERT_TAIL(hunk, entry, items);
+
+                        /* advance counters */
+                        ud.fromlen++;
+                        ud.tolen++;
+                    }
                 }
             }
 
             if (p.ses[i].type == DIFF_ADD) {
                 ud.symbol = "+";
-                ud.to++;
                 ud.tolen++;
             } else if (p.ses[i].type == DIFF_DELETE) {
                 ud.symbol = "-";
                 ud.to--;
+                ud.fromlen++;
             } else {
                 ud.symbol = " ";
+                ud.fromlen++;
+                ud.tolen++;
             }
 
             entry = calloc(1, sizeof(*entry));
             assert(entry != NULL);
             xasprintf(&entry->data, "%s%s", ud.symbol, *(const char **) p.ses[i].e);
             TAILQ_INSERT_TAIL(hunk, entry, items);
-            ud.fromlen++;
         } else {
             if (context) {
                 /* end the context marker */
                 context = false;
 
-                for (j = 1; (j <= DIFF_CONTEXT_LINES) && ((i + j) < p.sessz); j++) {
+                for (j = 1; (j <= DIFF_CONTEXT_LINES) && ((i + j) <= p.sessz); j++) {
                     entry = calloc(1, sizeof(*entry));
                     assert(entry != NULL);
                     xasprintf(&entry->data, " %s", *(const char **) p.ses[i + j].e);
@@ -134,9 +147,7 @@ static string_list_t *unified_output(const string_list_t *original, const string
 
                 /* start next hunk */
                 hunk = NULL;
-                ud.from = 0;
                 ud.fromlen = 0;
-                ud.to = 0;
                 ud.tolen = 0;
             }
         }
