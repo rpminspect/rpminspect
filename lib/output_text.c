@@ -95,8 +95,8 @@ void output_text(const results_t *results, const char *dest) {
         if (result->severity != RESULT_OK && result->severity != RESULT_INFO) {
             fprintf(fp, _("Waiver Authorization: %s\n\n"), strwaiverauth(result->waiverauth));
 
-            if (result->screendump != NULL) {
-                fprintf(fp, _("Screendump:\n%s\n\n"), result->screendump);
+            if (result->details != NULL) {
+                fprintf(fp, _("Details:\n%s\n\n"), result->details);
             }
 
             if (result->remedy != NULL) {

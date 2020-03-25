@@ -50,8 +50,8 @@ void free_results(results_t *results) {
         entry->header = NULL;
         free(entry->msg);
         entry->msg = NULL;
-        free(entry->screendump);
-        entry->screendump = NULL;
+        free(entry->details);
+        entry->details = NULL;
         free(entry->remedy);
         entry->remedy = NULL;
         free(entry);
@@ -75,7 +75,7 @@ void free_results(results_t *results) {
  */
 void add_result(struct rpminspect *ri, severity_t severity,
                 waiverauth_t waiverauth, const char *header, char *msg,
-                char *screendump, const char *remedy) {
+                char *details, const char *remedy) {
     results_entry_t *entry = NULL;
 
     assert(ri != NULL);
@@ -101,8 +101,8 @@ void add_result(struct rpminspect *ri, severity_t severity,
         entry->msg = strdup(msg);
     }
 
-    if (screendump != NULL) {
-        entry->screendump = strdup(screendump);
+    if (details != NULL) {
+        entry->details = strdup(details);
     }
 
     if (remedy != NULL) {

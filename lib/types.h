@@ -116,7 +116,7 @@ typedef struct _results_entry_t {
     waiverauth_t waiverauth;  /* who can waive an inspection result */
     char *header;             /* header string for reporting */
     char *msg;                /* the result message */
-    char *screendump;         /* screendump (optional, can be NULL) */
+    char *details;            /* details (optional, can be NULL) */
     char *remedy;             /* suggested correction for the result */
     TAILQ_ENTRY(_results_entry_t) items;
 } results_entry_t;
