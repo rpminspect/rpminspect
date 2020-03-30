@@ -432,27 +432,198 @@ class KshWellMalformedCompareKoji(TestCompareKoji):
 #     https://en.wikipedia.org/wiki/Z_shell                       #
 ###################################################################
 
-# Valid /bin/zsh script is OK for RPMs
 
-# Invalid /bin/zsh script is BAD for RPMs
+valid_zsh = """#!/bin/zsh
+ls > file1 > file2 > file3
 
-# Valid /bin/zsh script is OK for Koji build
+citytext="New York
+Rio
+Tokyo"
 
-# Invalid /bin/zsh script is BAD for Koji build
+cityarray=( ${(ps/\n/)citytext} )
 
-# Valid /bin/zsh script is OK for comparing RPMs
+a=5; b=32; c=24; (( a += (++a + b * c) - 2 ))
 
-# Invalid /bin/zsh script is BAD for comparing RPMs
+if [[ (($x -lt  8) && ($y -ge 32))
+      || (($z -gt 32) && ($w -eq 16)) ]]
+  then
+     print "complex combinations"
+     print "are not a problem."
+fi
+"""
 
-# Valid /bin/zsh script is OK for comparing Koji builds
 
-# Invalid /bin/zsh script is BAD for comparing Koji builds
+invalid_zsh = """#!/bin/zsh
+ls > file1 > file2 > file3
 
-# Valid /bin/zsh script in before, invalid in after is BAD when
-# comparing RPMs
+citytext="New York
+Rio
+Tokyo"
 
-# Valid /bin/zsh script in before, invalid in after is BAD when
-# comparing Koji builds
+cityarray=( ${(ps/\n/)citytext}
+
+a=5; b=32; c=24; (( a += (++a + b * c) - 2 )
+
+if [[ (($x -lt  8) && ($y -ge 32))
+      || (($z -gt 32) && ($w -eq 16)) ]]
+  then
+     print "complex combinations"
+     print "are not a problem."
+fi
+"""
+
+
+class ZshWellFormedRPM(TestRPMs):
+    """
+    Valid /bin/zsh script is OK for RPMs
+    """
+    def setUp(self):
+        TestRPMs.setUp(self)
+
+        self.rpm.add_installed_file('/usr/share/data/valid_zsh.sh',
+                                    rpmfluff.SourceFile('valid_zsh.sh', valid_zsh))
+        self.inspection = 'shellsyntax'
+        self.label = 'shell-syntax'
+        self.result = 'OK'
+
+
+class ZshMalformedRPM(TestRPMs):
+    """
+    Invalid /bin/zsh script is BAD for RPMs
+    """
+    def setUp(self):
+        TestRPMs.setUp(self)
+
+        self.rpm.add_installed_file('/usr/share/data/invalid_zsh.sh',
+                                    rpmfluff.SourceFile('invalid_zsh.sh', invalid_zsh))
+        self.inspection = 'shellsyntax'
+        self.label = 'shell-syntax'
+        self.result = 'BAD'
+        self.waiver_auth = 'Anyone'
+
+
+class ZshWellFormedKoji(TestKoji):
+    """
+    Valid /bin/zsh script is OK for Koji build
+    """
+    def setUp(self):
+        TestKoji.setUp(self)
+
+        self.rpm.add_installed_file('/usr/share/data/valid_zsh.sh',
+                                    rpmfluff.SourceFile('valid_zsh.sh', valid_zsh))
+        self.inspection = 'shellsyntax'
+        self.label = 'shell-syntax'
+        self.result = 'OK'
+
+
+class ZshMalformedKoji(TestKoji):
+    """
+    Invalid /bin/zsh script is BAD for Koji build
+    """
+    def setUp(self):
+        TestKoji.setUp(self)
+
+        self.rpm.add_installed_file('/usr/share/data/invalid_zsh.sh',
+                                    rpmfluff.SourceFile('invalid_zsh.sh', invalid_zsh))
+        self.inspection = 'shellsyntax'
+        self.label = 'shell-syntax'
+        self.result = 'BAD'
+        self.waiver_auth = 'Anyone'
+
+
+class ZshWellFormedCompareRPMs(TestCompareRPMs):
+    """
+    Valid /bin/zsh script is OK for comparing RPMs
+    """
+    def setUp(self):
+        TestCompareRPMs.setUp(self)
+        self.before_rpm.add_installed_file('/usr/share/data/valid_zsh.sh',
+                                           rpmfluff.SourceFile('valid_zsh.sh', valid_zsh))
+        self.after_rpm.add_installed_file('/usr/share/data/valid_zsh.sh',
+                                          rpmfluff.SourceFile('valid_zsh.sh', valid_zsh))
+        self.inspection = 'shellsyntax'
+        self.label = 'shell-syntax'
+        self.result = 'OK'
+
+
+class ZshMalformedCompareRPMs(TestCompareRPMs):
+    """
+    Invalid /bin/zsh script is BAD for comparing RPMs
+    """
+    def setUp(self):
+        TestCompareRPMs.setUp(self)
+        self.before_rpm.add_installed_file('/usr/share/data/invalid_zsh.sh',
+                                           rpmfluff.SourceFile('invalid_zsh.sh', invalid_zsh))
+        self.after_rpm.add_installed_file('/usr/share/data/invalid_zsh.sh',
+                                          rpmfluff.SourceFile('invalid_zsh.sh', invalid_zsh))
+        self.inspection = 'shellsyntax'
+        self.label = 'shell-syntax'
+        self.result = 'BAD'
+        self.waiver_auth = 'Anyone'
+
+
+class ZshWellFormedCompareKoji(TestCompareKoji):
+    """
+    Valid /bin/zsh script is OK for comparing Koji builds
+    """
+    def setUp(self):
+        TestCompareKoji.setUp(self)
+        self.before_rpm.add_installed_file('/usr/share/data/valid_zsh.sh',
+                                           rpmfluff.SourceFile('valid_zsh.sh', valid_zsh))
+        self.after_rpm.add_installed_file('/usr/share/data/valid_zsh.sh',
+                                          rpmfluff.SourceFile('valid_zsh.sh', valid_zsh))
+        self.inspection = 'shellsyntax'
+        self.label = 'shell-syntax'
+        self.result = 'OK'
+
+
+class ZshMalformedCompareKoji(TestCompareKoji):
+    """
+    Invalid /bin/zsh script is BAD for comparing Koji builds
+    """
+    def setUp(self):
+        TestCompareKoji.setUp(self)
+        self.before_rpm.add_installed_file('/usr/share/data/invalid_zsh.sh',
+                                           rpmfluff.SourceFile('invalid_zsh.sh', invalid_zsh))
+        self.after_rpm.add_installed_file('/usr/share/data/invalid_zsh.sh',
+                                          rpmfluff.SourceFile('invalid_zsh.sh', invalid_zsh))
+        self.inspection = 'shellsyntax'
+        self.label = 'shell-syntax'
+        self.result = 'BAD'
+        self.waiver_auth = 'Anyone'
+
+
+class ZshWellMalformedCompareRPMs(TestCompareRPMs):
+    """
+    VValid /bin/zsh script in before, invalid in after is BAD when comparing RPMs
+    """
+    def setUp(self):
+        TestCompareRPMs.setUp(self)
+        self.before_rpm.add_installed_file('/usr/share/data/valid_zsh.sh',
+                                           rpmfluff.SourceFile('valid_zsh.sh', valid_zsh))
+        self.after_rpm.add_installed_file('/usr/share/data/invalid_zsh.sh',
+                                          rpmfluff.SourceFile('invalid_zsh.sh', invalid_zsh))
+        self.inspection = 'shellsyntax'
+        self.label = 'shell-syntax'
+        self.result = 'BAD'
+        self.waiver_auth = 'Anyone'
+
+
+class ZshWellMalformedCompareKoji(TestCompareKoji):
+    """
+    Valid /bin/zsh script in before, invalid in after is BAD when comparing Koji builds
+    """
+    def setUp(self):
+        TestCompareKoji.setUp(self)
+        self.before_rpm.add_installed_file('/usr/share/data/valid_zsh.sh',
+                                           rpmfluff.SourceFile('valid_zsh.sh', valid_zsh))
+        self.after_rpm.add_installed_file('/usr/share/data/invalid_zsh.sh',
+                                          rpmfluff.SourceFile('invalid_zsh.sh', invalid_zsh))
+        self.inspection = 'shellsyntax'
+        self.label = 'shell-syntax'
+        self.result = 'BAD'
+        self.waiver_auth = 'Anyone'
+
 
 #################################################################
 # csh - The C Shell                                             #
