@@ -664,27 +664,189 @@ class ZshWellMalformedCompareKoji(TestCompareKoji):
 #     https://en.wikipedia.org/wiki/Tcsh                       #
 ################################################################
 
-# Valid /bin/tcsh script is OK for RPMs
+valid_tcsh = """#!/bin/tcsh
+# test if we have two arguments, exit with warning if we don't
+if ($# != 2) then
+  echo "Usage $0 oldextension newextension"
+  exit 1
+endif
 
-# Invalid /bin/tcsh script is BAD for RPMs
+foreach file (*.$1)
+   # this one echos filename, and replaces old extension
+   # with the new one
+   set newname=`echo $file | sed s/$1\$/$2/`
+   echo "Renaming $file to $newname"
+   mv "$file" "$newname"
+end
+"""
 
-# Valid /bin/tcsh script is OK for Koji build
 
-# Invalid /bin/tcsh script is BAD for Koji build
+invalid_tcsh = """#!/bin/tcsh
+# test if we have two arguments, exit with warning if we don't
+if [[ $? != 0 ]] then
+ echo "That didn't work!"
+fi
 
-# Valid /bin/tcsh script is OK for comparing RPMs
+foreach file (*.$1)
+   # this one echos filename, and replaces old extension
+   # with the new one
+   set newname=`echo $file | sed s/$1\$/$2/
+   echo "Renaming $file to $newname"
+   mv "$file" "$newname
+"""
 
-# Invalid /bin/tcsh script is BAD for comparing RPMs
 
-# Valid /bin/tcsh script is OK for comparing Koji builds
+class TcshWellFormedRPM(TestRPMs):
+    """
+    Valid /bin/tcsh script is OK for RPMs
+    """
+    def setUp(self):
+        TestRPMs.setUp(self)
 
-# Invalid /bin/tcsh script is BAD for comparing Koji builds
+        self.rpm.add_installed_file('/usr/share/data/valid_tcsh.sh',
+                                    rpmfluff.SourceFile('valid_tcsh.sh', valid_tcsh))
+        self.inspection = 'shellsyntax'
+        self.label = 'shell-syntax'
+        self.result = 'OK'
 
-# Valid /bin/tcsh script in before, invalid in after is BAD when
-# comparing RPMs
 
-# Valid /bin/tcsh script in before, invalid in after is BAD when
-# comparing Koji builds
+class TcshMalformedRPM(TestRPMs):
+    """
+    Invalid /bin/tcsh script is BAD for RPMs
+    """
+    def setUp(self):
+        TestRPMs.setUp(self)
+
+        self.rpm.add_installed_file('/usr/share/data/invalid_tcsh.sh',
+                                    rpmfluff.SourceFile('invalid_tcsh.sh', invalid_tcsh))
+        self.inspection = 'shellsyntax'
+        self.label = 'shell-syntax'
+        self.result = 'BAD'
+        self.waiver_auth = 'Anyone'
+
+
+class TcshWellFormedKoji(TestKoji):
+    """
+    Valid /bin/tcsh script is OK for Koji build
+    """
+    def setUp(self):
+        TestKoji.setUp(self)
+
+        self.rpm.add_installed_file('/usr/share/data/valid_tcsh.sh',
+                                    rpmfluff.SourceFile('valid_tcsh.sh', valid_tcsh))
+        self.inspection = 'shellsyntax'
+        self.label = 'shell-syntax'
+        self.result = 'OK'
+
+
+class TcshMalformedKoji(TestKoji):
+    """
+    Invalid /bin/tcsh script is BAD for Koji build
+    """
+    def setUp(self):
+        TestKoji.setUp(self)
+
+        self.rpm.add_installed_file('/usr/share/data/invalid_tcsh.sh',
+                                    rpmfluff.SourceFile('invalid_tcsh.sh', invalid_tcsh))
+        self.inspection = 'shellsyntax'
+        self.label = 'shell-syntax'
+        self.result = 'BAD'
+        self.waiver_auth = 'Anyone'
+
+
+class TcshWellFormedCompareRPMs(TestCompareRPMs):
+    """
+    Valid /bin/tcsh script is OK for comparing RPMs
+    """
+    def setUp(self):
+        TestCompareRPMs.setUp(self)
+        self.before_rpm.add_installed_file('/usr/share/data/valid_tcsh.sh',
+                                           rpmfluff.SourceFile('valid_tcsh.sh', valid_tcsh))
+        self.after_rpm.add_installed_file('/usr/share/data/valid_tcsh.sh',
+                                          rpmfluff.SourceFile('valid_tcsh.sh', valid_tcsh))
+        self.inspection = 'shellsyntax'
+        self.label = 'shell-syntax'
+        self.result = 'OK'
+
+
+class TcshMalformedCompareRPMs(TestCompareRPMs):
+    """
+    Invalid /bin/tcsh script is BAD for comparing RPMs
+    """
+    def setUp(self):
+        TestCompareRPMs.setUp(self)
+        self.before_rpm.add_installed_file('/usr/share/data/invalid_tcsh.sh',
+                                           rpmfluff.SourceFile('invalid_tcsh.sh', invalid_tcsh))
+        self.after_rpm.add_installed_file('/usr/share/data/invalid_tcsh.sh',
+                                          rpmfluff.SourceFile('invalid_tcsh.sh', invalid_tcsh))
+        self.inspection = 'shellsyntax'
+        self.label = 'shell-syntax'
+        self.result = 'BAD'
+        self.waiver_auth = 'Anyone'
+
+
+class TcshWellFormedCompareKoji(TestCompareKoji):
+    """
+    Valid /bin/tcsh script is OK for comparing Koji builds
+    """
+    def setUp(self):
+        TestCompareKoji.setUp(self)
+        self.before_rpm.add_installed_file('/usr/share/data/valid_tcsh.sh',
+                                           rpmfluff.SourceFile('valid_tcsh.sh', valid_tcsh))
+        self.after_rpm.add_installed_file('/usr/share/data/valid_tcsh.sh',
+                                          rpmfluff.SourceFile('valid_tcsh.sh', valid_tcsh))
+        self.inspection = 'shellsyntax'
+        self.label = 'shell-syntax'
+        self.result = 'OK'
+
+
+class TcshMalformedCompareKoji(TestCompareKoji):
+    """
+    Invalid /bin/tcsh script is BAD for comparing Koji builds
+    """
+    def setUp(self):
+        TestCompareKoji.setUp(self)
+        self.before_rpm.add_installed_file('/usr/share/data/invalid_tcsh.sh',
+                                           rpmfluff.SourceFile('invalid_tcsh.sh', invalid_tcsh))
+        self.after_rpm.add_installed_file('/usr/share/data/invalid_tcsh.sh',
+                                          rpmfluff.SourceFile('invalid_tcsh.sh', invalid_tcsh))
+        self.inspection = 'shellsyntax'
+        self.label = 'shell-syntax'
+        self.result = 'BAD'
+        self.waiver_auth = 'Anyone'
+
+
+class TcshWellMalformedCompareRPMs(TestCompareRPMs):
+    """
+    Valid /bin/tcsh script in before, invalid in after is BAD when comparing RPMs
+    """
+    def setUp(self):
+        TestCompareRPMs.setUp(self)
+        self.before_rpm.add_installed_file('/usr/share/data/valid_tcsh.sh',
+                                           rpmfluff.SourceFile('valid_tcsh.sh', valid_tcsh))
+        self.after_rpm.add_installed_file('/usr/share/data/invalid_tcsh.sh',
+                                          rpmfluff.SourceFile('invalid_tcsh.sh', invalid_tcsh))
+        self.inspection = 'shellsyntax'
+        self.label = 'shell-syntax'
+        self.result = 'BAD'
+        self.waiver_auth = 'Anyone'
+
+
+class TcshWellMalformedCompareKoji(TestCompareKoji):
+    """
+    Valid /bin/tcsh script in before, invalid in after is BAD when comparing Koji builds
+    """
+    def setUp(self):
+        TestCompareKoji.setUp(self)
+        self.before_rpm.add_installed_file('/usr/share/data/valid_tcsh.sh',
+                                           rpmfluff.SourceFile('valid_tcsh.sh', valid_tcsh))
+        self.after_rpm.add_installed_file('/usr/share/data/invalid_tcsh.sh',
+                                          rpmfluff.SourceFile('invalid_tcsh.sh', invalid_tcsh))
+        self.inspection = 'shellsyntax'
+        self.label = 'shell-syntax'
+        self.result = 'BAD'
+        self.waiver_auth = 'Anyone'
+
 
 #################################################################
 # rc - Plan 9 shell                                             #
