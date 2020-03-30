@@ -16,7 +16,7 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 #
 
-from baseclass import TestRPMs, TestSRPM, TestKoji
+from baseclass import TestRPMs, TestKoji
 from baseclass import TestCompareRPMs, TestCompareKoji
 import rpmfluff
 
@@ -1045,27 +1045,208 @@ class TcshWellMalformedCompareKoji(TestCompareKoji):
 #     https://en.wikipedia.org/wiki/Rc                          #
 #################################################################
 
-# Valid /bin/rc script is OK for RPMs
 
-# Invalid /bin/rc script is BAD for RPMs
+valid_rc = """#!/bin/rc
+who >user.names
+who >>user.names
+wc <file
 
-# Valid /bin/rc script is OK for Koji build
+echo [a-f]*.c
+who | wc
+who; date
+vc *.c &
 
-# Invalid /bin/rc script is BAD for Koji build
+mk && v.out /*/bin/fb/*
+echo hully^gully
 
-# Valid /bin/rc script is OK for comparing RPMs
+{sleep 30;echo 'Time''s up!'}&
 
-# Invalid /bin/rc script is BAD for comparing RPMs
+for(i in *.c) if(cpp $i >/tmp/$i) vc /tmp/$i
 
-# Valid /bin/rc script is OK for comparing Koji builds
+fn g {
+    grep $1 *.[hcyl]
+}
 
-# Invalid /bin/rc script is BAD for comparing Koji builds
+vc junk.c >[2=1] >junk.out
+"""
 
-# Valid /bin/rc script in before, invalid in after is BAD when
-# comparing RPMs
 
-# Valid /bin/rc script in before, invalid in after is BAD when
-# comparing Koji builds
+invalid_rc = """#!/bin/rc
+who >user.names
+who >>user.names
+wc <file
+
+echo [a-f]*.c
+who | wc
+who; date
+vc *.c &)
+
+mk && v.out /*/bin/fb/*
+echo hully^gully
+
+{sleep 3600;echo 'Time''s up!'}&
+
+for(i in *.c) if(cpp $i >/tmp/$i) vc /tmp/$i
+
+fn g {
+    grep $1 *.[hcyl]
+}}
+
+vc junk.c >2=1] >junk.out
+"""
+
+
+class RcWellFormedRPM(TestRPMs):
+    """
+    Valid /bin/rc script is OK for RPMs
+    """
+    def setUp(self):
+        TestRPMs.setUp(self)
+
+        self.rpm.add_installed_file('/usr/share/data/valid_rc.sh',
+                                    rpmfluff.SourceFile('valid_rc.sh', valid_rc))
+        self.inspection = 'shellsyntax'
+        self.label = 'shell-syntax'
+        self.result = 'OK'
+
+
+class RcMalformedRPM(TestRPMs):
+    """
+    Invalid /bin/rc script is BAD for RPMs
+    """
+    def setUp(self):
+        TestRPMs.setUp(self)
+
+        self.rpm.add_installed_file('/usr/share/data/invalid_rc.sh',
+                                    rpmfluff.SourceFile('invalid_rc.sh', invalid_rc))
+        self.inspection = 'shellsyntax'
+        self.label = 'shell-syntax'
+        self.result = 'BAD'
+        self.waiver_auth = 'Anyone'
+
+
+class RcWellFormedKoji(TestKoji):
+    """
+    Valid /bin/rc script is OK for Koji build
+    """
+    def setUp(self):
+        TestKoji.setUp(self)
+
+        self.rpm.add_installed_file('/usr/share/data/valid_rc.sh',
+                                    rpmfluff.SourceFile('valid_rc.sh', valid_rc))
+        self.inspection = 'shellsyntax'
+        self.label = 'shell-syntax'
+        self.result = 'OK'
+
+
+class RcMalformedKoji(TestKoji):
+    """
+    Invalid /bin/rc script is BAD for Koji build
+    """
+    def setUp(self):
+        TestKoji.setUp(self)
+
+        self.rpm.add_installed_file('/usr/share/data/invalid_rc.sh',
+                                    rpmfluff.SourceFile('invalid_rc.sh', invalid_rc))
+        self.inspection = 'shellsyntax'
+        self.label = 'shell-syntax'
+        self.result = 'BAD'
+        self.waiver_auth = 'Anyone'
+
+
+class RcWellFormedCompareRPMs(TestCompareRPMs):
+    """
+    Valid /bin/rc script is OK for comparing RPMs
+    """
+    def setUp(self):
+        TestCompareRPMs.setUp(self)
+        self.before_rpm.add_installed_file('/usr/share/data/valid_rc.sh',
+                                           rpmfluff.SourceFile('valid_rc.sh', valid_rc))
+        self.after_rpm.add_installed_file('/usr/share/data/valid_rc.sh',
+                                          rpmfluff.SourceFile('valid_rc.sh', valid_rc))
+        self.inspection = 'shellsyntax'
+        self.label = 'shell-syntax'
+        self.result = 'OK'
+
+
+class RcMalformedCompareRPMs(TestCompareRPMs):
+    """
+    Invalid /bin/rc script is BAD for comparing RPMs
+    """
+    def setUp(self):
+        TestCompareRPMs.setUp(self)
+        self.before_rpm.add_installed_file('/usr/share/data/invalid_rc.sh',
+                                           rpmfluff.SourceFile('invalid_rc.sh', invalid_rc))
+        self.after_rpm.add_installed_file('/usr/share/data/invalid_rc.sh',
+                                          rpmfluff.SourceFile('invalid_rc.sh', invalid_rc))
+        self.inspection = 'shellsyntax'
+        self.label = 'shell-syntax'
+        self.result = 'BAD'
+        self.waiver_auth = 'Anyone'
+
+
+class RcWellFormedCompareKoji(TestCompareKoji):
+    """
+    Valid /bin/rc script is OK for comparing Koji builds
+    """
+    def setUp(self):
+        TestCompareKoji.setUp(self)
+        self.before_rpm.add_installed_file('/usr/share/data/valid_rc.sh',
+                                           rpmfluff.SourceFile('valid_rc.sh', valid_rc))
+        self.after_rpm.add_installed_file('/usr/share/data/valid_rc.sh',
+                                          rpmfluff.SourceFile('valid_rc.sh', valid_rc))
+        self.inspection = 'shellsyntax'
+        self.label = 'shell-syntax'
+        self.result = 'OK'
+
+
+class RcMalformedCompareKoji(TestCompareKoji):
+    """
+    Invalid /bin/rc script is BAD for comparing Koji builds
+    """
+    def setUp(self):
+        TestCompareKoji.setUp(self)
+        self.before_rpm.add_installed_file('/usr/share/data/invalid_rc.sh',
+                                           rpmfluff.SourceFile('invalid_rc.sh', invalid_rc))
+        self.after_rpm.add_installed_file('/usr/share/data/invalid_rc.sh',
+                                          rpmfluff.SourceFile('invalid_rc.sh', invalid_rc))
+        self.inspection = 'shellsyntax'
+        self.label = 'shell-syntax'
+        self.result = 'BAD'
+        self.waiver_auth = 'Anyone'
+
+
+class RcWellMalformedCompareRPMs(TestCompareRPMs):
+    """
+    Valid /bin/rc script in before, invalid in after is BAD when comparing RPMs
+    """
+    def setUp(self):
+        TestCompareRPMs.setUp(self)
+        self.before_rpm.add_installed_file('/usr/share/data/valid_rc.sh',
+                                           rpmfluff.SourceFile('valid_rc.sh', valid_rc))
+        self.after_rpm.add_installed_file('/usr/share/data/invalid_rc.sh',
+                                          rpmfluff.SourceFile('invalid_rc.sh', invalid_rc))
+        self.inspection = 'shellsyntax'
+        self.label = 'shell-syntax'
+        self.result = 'BAD'
+        self.waiver_auth = 'Anyone'
+
+
+class RcWellMalformedCompareKoji(TestCompareKoji):
+    """
+    Valid /bin/rc script in before, invalid in after is BAD when comparing Koji builds
+    """
+    def setUp(self):
+        TestCompareKoji.setUp(self)
+        self.before_rpm.add_installed_file('/usr/share/data/valid_rc.sh',
+                                           rpmfluff.SourceFile('valid_rc.sh', valid_rc))
+        self.after_rpm.add_installed_file('/usr/share/data/invalid_rc.sh',
+                                          rpmfluff.SourceFile('invalid_rc.sh', invalid_rc))
+        self.inspection = 'shellsyntax'
+        self.label = 'shell-syntax'
+        self.result = 'BAD'
+        self.waiver_auth = 'Anyone'
+
 
 #################################################################
 # bash - Bourne again shell from GNU                            #
