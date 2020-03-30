@@ -1,7 +1,7 @@
 # Set up an environment for running the tests.
 FROM fedora:31
 RUN dnf -y install 'dnf-command(builddep)'
-RUN dnf -y install ksh
+RUN dnf -y install ksh zsh
 
 # Start with the buildreqs from the spec file
 # Fake enough of the template processing to get dnf to read rpminspect.spec.in as a spec file
