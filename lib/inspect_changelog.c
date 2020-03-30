@@ -45,6 +45,11 @@ static string_list_t *get_changelog(const Header hdr)
 
     assert(hdr != NULL);
 
+    /* start the changelog */
+    changelog = calloc(1, sizeof(*changelog));
+    assert(changelog != NULL);
+    TAILQ_INIT(changelog);
+
     /* Read this RPM header and construct a new changelog */
     times = rpmtdNew();
     names = rpmtdNew();
@@ -53,11 +58,6 @@ static string_list_t *get_changelog(const Header hdr)
     if (headerGet(hdr, RPMTAG_CHANGELOGTIME, times, flags) &&
         headerGet(hdr, RPMTAG_CHANGELOGNAME, names, flags) &&
         headerGet(hdr, RPMTAG_CHANGELOGTEXT, lines, flags)) {
-        /* start the changelog */
-        changelog = calloc(1, sizeof(*changelog));
-        assert(changelog != NULL);
-        TAILQ_INIT(changelog);
-
         while ((rpmtdNext(times) != -1) &&
                (rpmtdNext(names) != -1) &&
                (rpmtdNext(lines) != -1)) {
@@ -113,13 +113,10 @@ static bool check_src_rpm_changelog(struct rpminspect *ri, const rpmpeer_entry_t
     char *msg = NULL;
     string_entry_t *before = NULL;
     string_entry_t *after = NULL;
+    char *clog = NULL;
 
     assert(ri != NULL);
     assert(peer != NULL);
-
-    /* get reporting information */
-    before_nevra = get_nevra(peer->before_hdr);
-    after_nevra = get_nevra(peer->after_hdr);
 
     /* get the before and after changelogs */
     before_changelog = get_changelog(peer->before_hdr);
@@ -127,20 +124,34 @@ static bool check_src_rpm_changelog(struct rpminspect *ri, const rpmpeer_entry_t
     before = TAILQ_FIRST(before_changelog);
     after = TAILQ_FIRST(after_changelog);
 
+    /* get reporting information */
+    before_nevra = get_nevra(peer->before_hdr);
+    after_nevra = get_nevra(peer->after_hdr);
+
     /* Perform checks */
-    if (before_changelog && (after_changelog == NULL || TAILQ_EMPTY(after_changelog))) {
+    if ((before_changelog && !TAILQ_EMPTY(before_changelog)) && (after_changelog == NULL || TAILQ_EMPTY(after_changelog))) {
+        msg = list_to_string(before_changelog);
+        xasprintf(&clog, "%s build had this %%changelog:\n%s", before_nevra, msg);
+        free(msg);
+
         xasprintf(&msg, _("%%changelog lost between the %s and %s builds"), before_nevra, after_nevra);
-        add_result(ri, RESULT_VERIFY, WAIVABLE_BY_ANYONE, HEADER_CHANGELOG, msg, NULL, REMEDY_CHANGELOG);
+        add_result(ri, RESULT_VERIFY, WAIVABLE_BY_ANYONE, HEADER_CHANGELOG, msg, clog, REMEDY_CHANGELOG);
         free(msg);
+        free(clog);
         result = false;
-    } else if ((before_changelog == NULL || TAILQ_EMPTY(before_changelog)) && after_changelog) {
-        xasprintf(&msg, _("Gained %%changelog between the %s and %s builds"), before_nevra, after_nevra);
-        add_result(ri, RESULT_INFO, NOT_WAIVABLE, HEADER_CHANGELOG, msg, NULL, NULL);
+    } else if ((before_changelog == NULL || TAILQ_EMPTY(before_changelog)) && (after_changelog && !TAILQ_EMPTY(after_changelog))) {
+        msg = list_to_string(after_changelog);
+        xasprintf(&clog, "%s build has this %%changelog:\n%s", after_nevra, msg);
         free(msg);
+
+        xasprintf(&msg, _("Gained %%changelog between the %s and %s builds"), before_nevra, after_nevra);
+        add_result(ri, RESULT_INFO, NOT_WAIVABLE, HEADER_CHANGELOG, msg, clog, REMEDY_CHANGELOG);
+        free(msg);
+        free(clog);
         result = false;
     } else if ((before_changelog == NULL || TAILQ_EMPTY(before_changelog)) && (after_changelog == NULL || TAILQ_EMPTY(after_changelog))) {
         xasprintf(&msg, _("No %%changelog present in the %s build"), after_nevra);
-        add_result(ri, RESULT_BAD, WAIVABLE_BY_ANYONE, HEADER_CHANGELOG, msg, NULL, REMEDY_CHANGELOG);
+        add_result(ri, RESULT_VERIFY, WAIVABLE_BY_ANYONE, HEADER_CHANGELOG, msg, NULL, REMEDY_CHANGELOG);
         free(msg);
         result = false;
     } else if (!strcmp(before->data, after->data)) {
