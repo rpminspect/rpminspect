@@ -297,27 +297,214 @@ class ShWellMalformedCompareKoji(TestCompareKoji):
 #     https://en.wikipedia.org/wiki/C_shell                     #
 #################################################################
 
-# Valid /bin/csh script is OK for RPMs
 
-# Invalid /bin/csh script is BAD for RPMs
+valid_csh = """#!/bin/csh
+set ls1='some files: [a-z]*'
+set ls2="some files: [a-z]*"
 
-# Valid /bin/csh script is OK for Koji build
+foreach i (*)
+        if (-f $i) then
+            echo "$i is a file."
+            echo $ls1
+        endif
+        if (-d $i) then
+             echo "$i is a directory."
+             echo $ls2
+        endif
+end
 
-# Invalid /bin/csh script is BAD for Koji build
+set word = "anything"
+     while ($word != "")
+       echo -n "Enter a word to check (Return to exit): "
+       set word = $<
+       if ($word != "") grep $word /usr/share/dict/words
+end
 
-# Valid /bin/csh script is OK for comparing RPMs
+echo -n Input your value:
+set input = `head -1`
+echo You entered: $input
+"""
 
-# Invalid /bin/csh script is BAD for comparing RPMs
 
-# Valid /bin/csh script is OK for comparing Koji builds
+invalid_csh = """#!/bin/csh
+set ls1='some files: [a-z]*'
+set ls2="some files: [a-z]*
 
-# Invalid /bin/csh script is BAD for comparing Koji builds
+foreach i (*)
+        if (-f $i) then
+            echo "$i is a file."
+            echo $ls1
+        endif
+        if (-d $i) then
+             echo "$i is a directory."
+             echo $ls2
+        end
+end
 
-# Valid /bin/csh script in before, invalid in after is BAD when
-# comparing RPMs
+set word = "anything"
+     while ($word != "")
+       echo -n "Enter a word to check (Return to exit): "
+       set word = $<
+       if ($word != "") grep $word /usr/share/dict/words
+end
 
-# Valid /bin/csh script in before, invalid in after is BAD when
-# comparing Koji builds
+echo -n Input your value:
+set input = `head -1
+echo You entered: $
+"""
+
+
+class CshWellFormedRPM(TestRPMs):
+    """
+    Valid /bin/csh script is OK for RPMs
+    """
+    def setUp(self):
+        TestRPMs.setUp(self)
+
+        self.rpm.add_installed_file('/usr/share/data/valid_csh.sh',
+                                    rpmfluff.SourceFile('valid_csh.sh', valid_csh))
+        self.inspection = 'shellsyntax'
+        self.label = 'shell-syntax'
+        self.result = 'OK'
+
+
+class CshMalformedRPM(TestRPMs):
+    """
+    Invalid /bin/csh script is BAD for RPMs
+    """
+    def setUp(self):
+        TestRPMs.setUp(self)
+
+        self.rpm.add_installed_file('/usr/share/data/invalid_csh.sh',
+                                    rpmfluff.SourceFile('invalid_csh.sh', invalid_csh))
+        self.inspection = 'shellsyntax'
+        self.label = 'shell-syntax'
+        self.result = 'BAD'
+        self.waiver_auth = 'Anyone'
+
+
+class CshWellFormedKoji(TestKoji):
+    """
+    Valid /bin/csh script is OK for Koji build
+    """
+    def setUp(self):
+        TestKoji.setUp(self)
+
+        self.rpm.add_installed_file('/usr/share/data/valid_csh.sh',
+                                    rpmfluff.SourceFile('valid_csh.sh', valid_csh))
+        self.inspection = 'shellsyntax'
+        self.label = 'shell-syntax'
+        self.result = 'OK'
+
+
+class CshMalformedKoji(TestKoji):
+    """
+    Invalid /bin/csh script is BAD for Koji build
+    """
+    def setUp(self):
+        TestKoji.setUp(self)
+
+        self.rpm.add_installed_file('/usr/share/data/invalid_csh.sh',
+                                    rpmfluff.SourceFile('invalid_csh.sh', invalid_csh))
+        self.inspection = 'shellsyntax'
+        self.label = 'shell-syntax'
+        self.result = 'BAD'
+        self.waiver_auth = 'Anyone'
+
+
+class CshWellFormedCompareRPMs(TestCompareRPMs):
+    """
+    Valid /bin/csh script is OK for comparing RPMs
+    """
+    def setUp(self):
+        TestCompareRPMs.setUp(self)
+        self.before_rpm.add_installed_file('/usr/share/data/valid_csh.sh',
+                                           rpmfluff.SourceFile('valid_csh.sh', valid_csh))
+        self.after_rpm.add_installed_file('/usr/share/data/valid_csh.sh',
+                                          rpmfluff.SourceFile('valid_csh.sh', valid_csh))
+        self.inspection = 'shellsyntax'
+        self.label = 'shell-syntax'
+        self.result = 'OK'
+
+
+class CshMalformedCompareRPMs(TestCompareRPMs):
+    """
+    Invalid /bin/csh script is BAD for comparing RPMs
+    """
+    def setUp(self):
+        TestCompareRPMs.setUp(self)
+        self.before_rpm.add_installed_file('/usr/share/data/invalid_csh.sh',
+                                           rpmfluff.SourceFile('invalid_csh.sh', invalid_csh))
+        self.after_rpm.add_installed_file('/usr/share/data/invalid_csh.sh',
+                                          rpmfluff.SourceFile('invalid_csh.sh', invalid_csh))
+        self.inspection = 'shellsyntax'
+        self.label = 'shell-syntax'
+        self.result = 'BAD'
+        self.waiver_auth = 'Anyone'
+
+
+class CshWellFormedCompareKoji(TestCompareKoji):
+    """
+    Valid /bin/csh script is OK for comparing Koji builds
+    """
+    def setUp(self):
+        TestCompareKoji.setUp(self)
+        self.before_rpm.add_installed_file('/usr/share/data/valid_csh.sh',
+                                           rpmfluff.SourceFile('valid_csh.sh', valid_csh))
+        self.after_rpm.add_installed_file('/usr/share/data/valid_csh.sh',
+                                          rpmfluff.SourceFile('valid_csh.sh', valid_csh))
+        self.inspection = 'shellsyntax'
+        self.label = 'shell-syntax'
+        self.result = 'OK'
+
+
+class CshMalformedCompareKoji(TestCompareKoji):
+    """
+    Invalid /bin/csh script is BAD for comparing Koji builds
+    """
+    def setUp(self):
+        TestCompareKoji.setUp(self)
+        self.before_rpm.add_installed_file('/usr/share/data/invalid_csh.sh',
+                                           rpmfluff.SourceFile('invalid_csh.sh', invalid_csh))
+        self.after_rpm.add_installed_file('/usr/share/data/invalid_csh.sh',
+                                          rpmfluff.SourceFile('invalid_csh.sh', invalid_csh))
+        self.inspection = 'shellsyntax'
+        self.label = 'shell-syntax'
+        self.result = 'BAD'
+        self.waiver_auth = 'Anyone'
+
+
+class CshWellMalformedCompareRPMs(TestCompareRPMs):
+    """
+    Valid /bin/csh script in before, invalid in after is BAD when comparing RPMs
+    """
+    def setUp(self):
+        TestCompareRPMs.setUp(self)
+        self.before_rpm.add_installed_file('/usr/share/data/valid_csh.sh',
+                                           rpmfluff.SourceFile('valid_csh.sh', valid_csh))
+        self.after_rpm.add_installed_file('/usr/share/data/invalid_csh.sh',
+                                          rpmfluff.SourceFile('invalid_csh.sh', invalid_csh))
+        self.inspection = 'shellsyntax'
+        self.label = 'shell-syntax'
+        self.result = 'BAD'
+        self.waiver_auth = 'Anyone'
+
+
+class CshWellMalformedCompareKoji(TestCompareKoji):
+    """
+    Valid /bin/csh script in before, invalid in after is BAD when comparing Koji builds
+    """
+    def setUp(self):
+        TestCompareKoji.setUp(self)
+        self.before_rpm.add_installed_file('/usr/share/data/valid_csh.sh',
+                                           rpmfluff.SourceFile('valid_csh.sh', valid_csh))
+        self.after_rpm.add_installed_file('/usr/share/data/invalid_csh.sh',
+                                          rpmfluff.SourceFile('invalid_csh.sh', invalid_csh))
+        self.inspection = 'shellsyntax'
+        self.label = 'shell-syntax'
+        self.result = 'BAD'
+        self.waiver_auth = 'Anyone'
+
 
 ################################################################
 # tcsh - TENEX C shell                                         #
@@ -403,6 +590,7 @@ log() {  # classic logger
    local prefix="[$(date +%Y/%m/%d\ %H:%M:%S)]: "
    echo "${prefix} $@" >&2 
 }
+
 
 log "INFO" "a message"
 
