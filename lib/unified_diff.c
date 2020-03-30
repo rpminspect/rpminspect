@@ -216,8 +216,18 @@ string_list_t *unified_str_diff(const char *original, const char *modified)
     assert(modified != NULL);
 
     /* split the strings */
-    orig = strsplit(original, "\n");
-    mod = strsplit(modified, "\n");
+    /* split the strings */
+    if (original == NULL) {
+        orig = strsplit("", "\n");
+    } else {
+        orig = strsplit(original, "\n");
+    }
+
+    if (modified == NULL) {
+        mod = strsplit("", "\n");
+    } else {
+        mod = strsplit(modified, "\n");
+    }
 
     /* run the diff */
     unified = unified_output(orig, mod);
