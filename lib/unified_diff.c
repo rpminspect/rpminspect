@@ -29,6 +29,18 @@ static int cmp(const void *p1, const void *p2)
     return !strcmp(*(const char **) p1, *(const char **) p2);
 }
 
+/* Format the diff line to match 'diff -u' output */
+static string_entry_t *format_line(const struct diff_ses ses)
+{
+    string_entry_t *entry = NULL;
+
+    entry = calloc(1, sizeof(*entry));
+    assert(entry != NULL);
+    DEBUG_PRINT("ses.e=|%s|\n", *(const char **) ses.e);
+    xasprintf(&entry->data, "%s%s", ses.type == DIFF_ADD ? "+" : ses.type == DIFF_DELETE ? "-" : " ", *(const char **) ses.e);
+    return entry;
+}
+
 /*
  * Create the unified diff output as a string_list_t given the
  * result of diff().  Caller must free the result.
@@ -39,12 +51,13 @@ static string_list_t *unified_output(const string_list_t *original, const string
     struct diff p;
     string_list_t *unified = NULL;
     string_list_t *hunk = NULL;
+    string_list_t *context = NULL;
     string_entry_t *entry = NULL;
+    bool inhunk = false;
+    bool conthunk = false;
     struct unified_diff ud;
-    size_t i = 0;
-    size_t j = 0;
-    bool context = false;
-    const char *cline = NULL;
+    size_t i = 1;
+    size_t j = 1;
 
     assert(original != NULL);
     assert(modified != NULL);
@@ -76,80 +89,113 @@ static string_list_t *unified_output(const string_list_t *original, const string
             TAILQ_INIT(hunk);
         }
 
+        /* determine what kind of line we're looking at */
         if (p.ses[i].type == DIFF_ADD || p.ses[i].type == DIFF_DELETE) {
-            if (!context) {
-                /* start a context marker */
-                context = true;
+            if (inhunk) {
+                /* we're actively in a hunk, take the line */
+                entry = format_line(p.ses[i]);
+                DEBUG_PRINT("A: %ld=|%s|\n", i, entry->data);
+                TAILQ_INSERT_TAIL(hunk, entry, items);
+            } else {
+                /* start a new hunk */
+                hunk = calloc(1, sizeof(*hunk));
+                assert(hunk != NULL);
+                TAILQ_INIT(hunk);
 
-                DEBUG_PRINT("p.ses[i].originIdx=%ld, p.ses[i].targetIdx=%ld\n", p.ses[i].originIdx, p.ses[i].targetIdx);
-                ud.from = p.ses[i].targetIdx;
-                ud.to = p.ses[i].targetIdx;
+                inhunk = true;
 
-                if (ud.from > DIFF_CONTEXT_LINES) {
-                    for (j = DIFF_CONTEXT_LINES; (j > 0) && ((i - j) >= p.sessz); j--) {
-                        DEBUG_PRINT("i - j=%ld\n", i - j);
-                        DEBUG_PRINT("p.ses[i - j].e=|%c|\n", *((char *) p.ses[i - j].e));
+                /* take previous lines of context */
+                if ((i - DIFF_CONTEXT_LINES) > 0) {
+                    /* we have three possible previous lines of context */
+                    j = i - DIFF_CONTEXT_LINES;
 
-                        /* the line we're working with */
-                        cline = *(const char **) p.ses[i - j].e;
-
-                        /* add this entry */
-                        entry = calloc(1, sizeof(*entry));
-                        assert(entry != NULL);
-                        DEBUG_PRINT("p.ses[i - j].e=|%s|", cline);
-                        xasprintf(&entry->data, " %s", cline);
-                        TAILQ_INSERT_TAIL(hunk, entry, items);
-
-                        /* advance counters */
-                        ud.fromlen++;
-                        ud.tolen++;
+                    while (j <= 0) {
+                        j++;
                     }
                 }
-            }
 
-            if (p.ses[i].type == DIFF_ADD) {
-                ud.symbol = "+";
-                ud.tolen++;
-            } else if (p.ses[i].type == DIFF_DELETE) {
-                ud.symbol = "-";
-                ud.to--;
-                ud.fromlen++;
-            } else {
-                ud.symbol = " ";
-                ud.fromlen++;
-                ud.tolen++;
-            }
+                while (j < i) {
+                    /* start a new context section */
+                    if (context == NULL) {
+                        context = calloc(1, sizeof(*context));
+                        assert(context != NULL);
+                        TAILQ_INIT(context);
+                    }
 
-            entry = calloc(1, sizeof(*entry));
-            assert(entry != NULL);
-            xasprintf(&entry->data, "%s%s", ud.symbol, *(const char **) p.ses[i].e);
-            TAILQ_INSERT_TAIL(hunk, entry, items);
-        } else {
-            if (context) {
-                /* end the context marker */
-                context = false;
-
-                for (j = 1; (j <= DIFF_CONTEXT_LINES) && ((i + j) <= p.sessz); j++) {
-                    entry = calloc(1, sizeof(*entry));
-                    assert(entry != NULL);
-                    xasprintf(&entry->data, " %s", *(const char **) p.ses[i + j].e);
-                    TAILQ_INSERT_TAIL(hunk, entry, items);
-                    ud.fromlen++;
-                    ud.tolen++;
+                    /* add context line */
+                    entry = format_line(p.ses[j]);
+                    DEBUG_PRINT("B: %ld=|%s|\n", j, entry->data);
+                    TAILQ_INSERT_TAIL(context, entry, items);
+                    j++;
                 }
 
-                /* add this hunk to the unified diff */
+                if (context) {
+                    TAILQ_CONCAT(context, hunk, items);
+                    hunk = context;
+                    context = NULL;
+                }
+
+                /* we're actively in a hunk, take the line */
+                entry = format_line(p.ses[i]);
+                DEBUG_PRINT("C: %ld=|%s|\n", i, entry->data);
+                TAILQ_INSERT_TAIL(hunk, entry, items);
+            }
+        } else if ((p.ses[i].type == DIFF_COMMON) && inhunk) {
+            /* add the line */
+            entry = format_line(p.ses[i]);
+            DEBUG_PRINT("D: %ld=|%s|\n", i, entry->data);
+            TAILQ_INSERT_TAIL(hunk, entry, items);
+
+            /* another edit line within the context line region is part of this hunk */
+            context = NULL;
+            conthunk = false;
+            j = i + 1;
+
+            while (((j - i) < DIFF_CONTEXT_LINES) && (j < p.sessz)) {
+                /* should we continue this hunk or not? */
+                if (p.ses[j].type != DIFF_COMMON) {
+                    conthunk = true;
+                    break;
+                }
+
+                /* start a new context section */
+                if (context == NULL) {
+                    context = calloc(1, sizeof(*context));
+                    assert(context != NULL);
+                    TAILQ_INIT(context);
+                }
+
+                /* add context line */
+                entry = format_line(p.ses[j]);
+                DEBUG_PRINT("E: %ld=|%s|\n", j, entry->data);
+                TAILQ_INSERT_TAIL(context, entry, items);
+                j++;
+            }
+
+            /* add the context to the hunk */
+            if (context && !TAILQ_EMPTY(context)) {
+                TAILQ_CONCAT(hunk, context, items);
+                context = NULL;
+            }
+
+            /* if we are still in the same hunk, continue */
+            if (conthunk) {
+                conthunk = false;
+                continue;
+            }
+
+            /* generate the hunk header line and add it to the unified diff */
+            if (hunk && !TAILQ_EMPTY(hunk)) {
+                /* generate the hunk header line */
                 entry = calloc(1, sizeof(*entry));
                 assert(entry != NULL);
-                xasprintf(&entry->data, "@@ -%lu,%lu +%lu,%lu @@\n", ud.from, ud.fromlen, ud.to, ud.tolen);
-                TAILQ_INSERT_TAIL(unified, entry, items);
+                xasprintf(&entry->data, "@@ -0,0 +0,0 @@\n");
+                TAILQ_INSERT_HEAD(hunk, entry, items);
                 TAILQ_CONCAT(unified, hunk, items);
-
-                /* start next hunk */
-                hunk = NULL;
-                ud.fromlen = 0;
-                ud.tolen = 0;
             }
+
+            /* close the hunk and continue */
+            inhunk = false;
         }
     }
 
@@ -212,10 +258,6 @@ string_list_t *unified_str_diff(const char *original, const char *modified)
     string_list_t *orig = NULL;
     string_list_t *mod = NULL;
 
-    assert(original != NULL);
-    assert(modified != NULL);
-
-    /* split the strings */
     /* split the strings */
     if (original == NULL) {
         orig = strsplit("", "\n");
