@@ -41,6 +41,7 @@ static string_list_t *get_changelog(const Header hdr)
     struct tm *logtime = NULL;
     const char *name = NULL;
     const char *line = NULL;
+    char *lbuf = NULL;
     char tbuf[16];
 
     assert(hdr != NULL);
@@ -67,15 +68,22 @@ static string_list_t *get_changelog(const Header hdr)
             name = rpmtdGetString(names);
             line = rpmtdGetString(lines);
 
+            /* trim any line endings */
+            if (line) {
+                lbuf = strdup(line);
+                lbuf[strcspn(lbuf, "\r\n")] = 0;
+            } else {
+                lbuf = strdup("");
+            }
+
             /* Convert the time in to an RPM-like string */
             strftime(tbuf, sizeof(tbuf), "%a %b %d %Y", logtime);
 
             /* Create a new changelog entry */
             entry = calloc(1, sizeof(*entry));
             assert(entry != NULL);
-            xasprintf(&entry->data, "* %s %s\n%s\n", tbuf, name, line);
-
-            DEBUG_PRINT("\n%s\n", entry->data);
+            xasprintf(&entry->data, "* %s %s\n%s\n", tbuf, name, lbuf);
+            free(lbuf);
 
             /* Add the changelog entry to the list */
             TAILQ_INSERT_TAIL(changelog, entry, items);
@@ -211,8 +219,6 @@ static bool check_bin_rpm_changelog(struct rpminspect *ri, const rpmpeer_entry_t
     if (diffresult != NULL && !TAILQ_EMPTY(diffresult)) {
         /* Differences found, see what kind */
         TAILQ_FOREACH(entry, diffresult, items) {
-            DEBUG_PRINT("entry->data=|%s|\n", entry->data);
-
             if (entry->data && entry->data[0] == '-') {
                 severity = RESULT_VERIFY;
                 break;
@@ -288,12 +294,14 @@ bool inspect_changelog(struct rpminspect *ri)
         }
     }
 
-    assert(src != NULL);
-    assert(bin != NULL);
-
     /* Check the packages */
-    src_result = check_src_rpm_changelog(ri, src);
-    bin_result = check_bin_rpm_changelog(ri, bin);
+    if (src) {
+        src_result = check_src_rpm_changelog(ri, src);
+    }
+
+    if (bin) {
+        bin_result = check_bin_rpm_changelog(ri, bin);
+    }
 
     if (src_result && bin_result) {
         add_result(ri, RESULT_OK, NOT_WAIVABLE, HEADER_CHANGELOG, NULL, NULL, NULL);
