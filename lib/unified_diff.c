@@ -36,7 +36,6 @@ static string_entry_t *format_line(const struct diff_ses ses)
 
     entry = calloc(1, sizeof(*entry));
     assert(entry != NULL);
-    DEBUG_PRINT("ses.e=|%s|\n", *(const char **) ses.e);
     xasprintf(&entry->data, "%s%s", ses.type == DIFF_ADD ? "+" : ses.type == DIFF_DELETE ? "-" : " ", *(const char **) ses.e);
     return entry;
 }
@@ -174,6 +173,8 @@ static string_list_t *unified_output(const string_list_t *original, const string
 
             /* add the context to the hunk */
             if (context && !TAILQ_EMPTY(context)) {
+                /* advance past the context we've already gathered */
+                i += list_len(context);
                 TAILQ_CONCAT(hunk, context, items);
                 context = NULL;
             }
