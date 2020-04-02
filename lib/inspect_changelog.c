@@ -41,7 +41,6 @@ static string_list_t *get_changelog(const Header hdr)
     struct tm *logtime = NULL;
     const char *name = NULL;
     const char *line = NULL;
-    char *lbuf = NULL;
     char tbuf[16];
 
     assert(hdr != NULL);
@@ -68,22 +67,23 @@ static string_list_t *get_changelog(const Header hdr)
             name = rpmtdGetString(names);
             line = rpmtdGetString(lines);
 
-            /* trim any line endings */
-            if (line) {
-                lbuf = strdup(line);
-                lbuf[strcspn(lbuf, "\r\n")] = 0;
-            } else {
-                lbuf = strdup("");
-            }
-
             /* Convert the time in to an RPM-like string */
             strftime(tbuf, sizeof(tbuf), "%a %b %d %Y", logtime);
 
             /* Create a new changelog entry */
+            /*
+             * The entry reconstruction comes from rpmpopt.in in the rpm
+             * source:
+             *     rpm alias --changes --qf '[* %{CHANGELOGTIME:date} %{CHANGELOGNAME}\n%{CHANGELOGTEXT}\n\n]' \
+             *         --POPTdesc=$"list changes for this package with full time stamps"
+             * Which is worth noting here because when you query the changelog
+             * from an RPM (rpm -qp --changelog), it is reproducing the
+             * %changelog section from the spec file entry by entry and the
+             * actual number of blank lines may not be the same.
+             */
             entry = calloc(1, sizeof(*entry));
             assert(entry != NULL);
-            xasprintf(&entry->data, "* %s %s\n%s\n", tbuf, name, lbuf);
-            free(lbuf);
+            xasprintf(&entry->data, "* %s %s\n%s\n\n", tbuf, name, line);
 
             /* Add the changelog entry to the list */
             TAILQ_INSERT_TAIL(changelog, entry, items);
