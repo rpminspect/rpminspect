@@ -53,10 +53,10 @@ static string_list_t *unified_output(const string_list_t *original, const string
     string_list_t *context = NULL;
     string_entry_t *entry = NULL;
     bool inhunk = false;
-    bool conthunk = false;
     struct unified_diff ud;
-    size_t i = 1;
+    size_t i = 0;
     size_t j = 1;
+    size_t context_lines = 0;
 
     assert(original != NULL);
     assert(modified != NULL);
@@ -81,7 +81,7 @@ static string_list_t *unified_output(const string_list_t *original, const string
 
     memset(&ud, 0, sizeof(ud));
 
-    for (i = 0; i < p.sessz; i++) {
+    while (i < p.sessz) {
         if (hunk == NULL) {
             hunk = calloc(1, sizeof(*hunk));
             assert(hunk != NULL);
@@ -90,6 +90,8 @@ static string_list_t *unified_output(const string_list_t *original, const string
 
         /* determine what kind of line we're looking at */
         if (p.ses[i].type == DIFF_ADD || p.ses[i].type == DIFF_DELETE) {
+            context_lines = 0;
+
             if (inhunk) {
                 /* we're actively in a hunk, take the line */
                 entry = format_line(p.ses[i]);
@@ -104,14 +106,7 @@ static string_list_t *unified_output(const string_list_t *original, const string
                 inhunk = true;
 
                 /* take previous lines of context */
-                if ((i - DIFF_CONTEXT_LINES) > 0) {
-                    /* we have three possible previous lines of context */
-                    j = i - DIFF_CONTEXT_LINES;
-
-                    while (j <= 0) {
-                        j++;
-                    }
-                }
+                j = i - DIFF_CONTEXT_LINES + 1;
 
                 while (j < i) {
                     /* start a new context section */
@@ -144,44 +139,11 @@ static string_list_t *unified_output(const string_list_t *original, const string
             entry = format_line(p.ses[i]);
             DEBUG_PRINT("D: %ld=|%s|\n", i, entry->data);
             TAILQ_INSERT_TAIL(hunk, entry, items);
+            context_lines++;
 
-            /* another edit line within the context line region is part of this hunk */
-            context = NULL;
-            conthunk = false;
-            j = i + 1;
-
-            while (((j - i) < DIFF_CONTEXT_LINES) && (j < p.sessz)) {
-                /* should we continue this hunk or not? */
-                if (p.ses[j].type != DIFF_COMMON) {
-                    conthunk = true;
-                    break;
-                }
-
-                /* start a new context section */
-                if (context == NULL) {
-                    context = calloc(1, sizeof(*context));
-                    assert(context != NULL);
-                    TAILQ_INIT(context);
-                }
-
-                /* add context line */
-                entry = format_line(p.ses[j]);
-                DEBUG_PRINT("E: %ld=|%s|\n", j, entry->data);
-                TAILQ_INSERT_TAIL(context, entry, items);
-                j++;
-            }
-
-            /* add the context to the hunk */
-            if (context && !TAILQ_EMPTY(context)) {
-                /* advance past the context we've already gathered */
-                i += list_len(context);
-                TAILQ_CONCAT(hunk, context, items);
-                context = NULL;
-            }
-
-            /* if we are still in the same hunk, continue */
-            if (conthunk) {
-                conthunk = false;
+            /* if we have taken DIFF_CONTEXT_LINES of context, close the hunk */
+            if (context_lines != DIFF_CONTEXT_LINES) {
+                i += context_lines;
                 continue;
             }
 
@@ -198,6 +160,8 @@ static string_list_t *unified_output(const string_list_t *original, const string
             /* close the hunk and continue */
             inhunk = false;
         }
+
+        i++;
     }
 
     /* cleanup */
