@@ -85,6 +85,8 @@ static string_list_t *get_changelog(const Header hdr)
             assert(entry != NULL);
             xasprintf(&entry->data, "* %s %s\n%s\n\n", tbuf, name, line);
 
+            DEBUG_PRINT("\n%s\n", entry->data);
+
             /* Add the changelog entry to the list */
             TAILQ_INSERT_TAIL(changelog, entry, items);
         }
@@ -99,6 +101,118 @@ static string_list_t *get_changelog(const Header hdr)
     rpmtdFree(lines);
 
     return changelog;
+}
+
+/*
+ * Generate temporary changelog files for use with diff(1).
+ */
+static char *create_changelog(const string_list_t *changelog, const char *where)
+{
+    int fd;
+    char *output = NULL;
+    string_entry_t *entry = NULL;
+    FILE *logfp = NULL;
+
+    assert(changelog != NULL);
+    assert(where != NULL);
+
+    xasprintf(&output, "%s/changelog.XXXXXX", where)
+    fd = mkstemp(output);
+
+    if (fd == -1) {
+        fprintf(stderr, "*** unable to create temporary file %s: %s\n", output, strerror(errno));
+        return NULL;
+    }
+
+    logfp = fdopen(fd, "w");
+
+    if (logfp == NULL) {
+        fprintf(stderr, "*** unable to open temporary file %s for writing: %s\n", output, strerror(errno));
+        close(fd);
+        return NULL;
+    }
+
+    TAILQ_FOREACH(entry, changelog, items) {
+        fprintf(logfp, "%s", entry->data);
+    }
+
+    if (fclose(logfp) != 0) {
+        fprintf(stderr, "*** unable to close writing to temporary file %s: %s\n", output, strerror(errno));
+        close(fd);
+        return NULL;
+    }
+
+    return output;
+}
+
+/*
+ * Given 'diff -u' output, advance the string past the headers.
+ */
+static char *skip_diff_headers(char *diff_output)
+{
+    char *diff_walk = diff_output;
+
+    if (diff_output == NULL) {
+        return diff_output;
+    }
+
+    if (!strncmp(diff_walk, "--- ", 4)) {
+        diff_walk = strchr(diff_walk, '\n') + 1;
+
+        while (*diff_walk == '\n') {
+            diff_walk++;
+        }
+    }
+
+    if (!strncmp(diff_walk, "+++ ", 4)) {
+        diff_walk = strchr(diff_walk, '\n') + 1;
+
+        while (*diff_walk == '\n') {
+            diff_walk++;
+        }
+    }
+
+    return diff_walk;
+}
+
+/*
+ * Analyze the 'diff -u' output and determine the severity of the result.
+ */
+static severity_t get_diff_severity(const char *diff_output)
+{
+    char *diff_walk = NULL;
+    char *line = NULL;
+    long int add = 0;
+    long int del = 0;
+    severity_t sev = RESULT_OK;
+
+    if (diff_output == NULL) {
+        return RESULT_INFO;
+    }
+
+    diff_walk = strdup(diff_output);
+    assert(diff_walk != NULL);
+
+    while ((line = strsep(&diff_walk, "\n")) != NULL) {
+        DEBUG_PRINT("line=|%s|\n", line);
+
+        if (strlen(line) >= 2 && line[1] == ' ') {
+            if (line[0] == '+') {
+                add++;
+            } else if (line[0] == '-') {
+                del++;
+            }
+        }
+    }
+
+    if (del > add) {
+        sev = RESULT_VERIFY;
+    } else {
+        sev = RESULT_INFO;
+    }
+
+    free(diff_walk);
+    return sev;
 }
 
 /*
@@ -121,10 +235,19 @@ static bool check_src_rpm_changelog(struct rpminspect *ri, const rpmpeer_entry_t
     char *msg = NULL;
     string_entry_t *before = NULL;
     string_entry_t *after = NULL;
-    char *clog = NULL;
+    char *before_output = NULL;
+    char *after_output = NULL;
+    char *diff_output = NULL;
+    char *full_diff_output = NULL;
+    int exitcode = 0;
+    char *diff_walk = NULL;
 
     assert(ri != NULL);
     assert(peer != NULL);
+
+    /* get reporting information */
+    before_nevra = get_nevra(peer->before_hdr);
+    after_nevra = get_nevra(peer->after_hdr);
 
     /* get the before and after changelogs */
     before_changelog = get_changelog(peer->before_hdr);
@@ -132,41 +255,40 @@ static bool check_src_rpm_changelog(struct rpminspect *ri, const rpmpeer_entry_t
     before = TAILQ_FIRST(before_changelog);
     after = TAILQ_FIRST(after_changelog);
 
-    /* get reporting information */
-    before_nevra = get_nevra(peer->before_hdr);
-    after_nevra = get_nevra(peer->after_hdr);
+    /* Generate temporary changelog files */
+    before_output = create_changelog(before_changelog, ri->workdir);
+    after_output = create_changelog(after_changelog, ri->workdir);
 
-    /* Perform checks */
-    if ((before_changelog && !TAILQ_EMPTY(before_changelog)) && (after_changelog == NULL || TAILQ_EMPTY(after_changelog))) {
-        msg = list_to_string(before_changelog);
-        xasprintf(&clog, "%s build had this %%changelog:\n%s", before_nevra, msg);
-        free(msg);
+    /* Compare the changelogs */
+    diff_output = run_cmd(&exitcode, DIFF_CMD, "-u", before_output, after_output, NULL);
 
-        xasprintf(&msg, _("%%changelog lost between the %s and %s builds"), before_nevra, after_nevra);
-        add_result(ri, RESULT_VERIFY, WAIVABLE_BY_ANYONE, HEADER_CHANGELOG, msg, clog, REMEDY_CHANGELOG);
-        free(msg);
-        free(clog);
-        result = false;
-    } else if ((before_changelog == NULL || TAILQ_EMPTY(before_changelog)) && (after_changelog && !TAILQ_EMPTY(after_changelog))) {
-        msg = list_to_string(after_changelog);
-        xasprintf(&clog, "%s build has this %%changelog:\n%s", after_nevra, msg);
-        free(msg);
+    if (exitcode) {
+        /* Skip past the diff(1) header lines */
+        diff_walk = skip_diff_headers(diff_output);
+        full_diff_output = strdup(diff_walk);
 
-        xasprintf(&msg, _("Gained %%changelog between the %s and %s builds"), before_nevra, after_nevra);
-        add_result(ri, RESULT_INFO, NOT_WAIVABLE, HEADER_CHANGELOG, msg, clog, REMEDY_CHANGELOG);
-        free(msg);
-        free(clog);
-        result = false;
-    } else if ((before_changelog == NULL || TAILQ_EMPTY(before_changelog)) && (after_changelog == NULL || TAILQ_EMPTY(after_changelog))) {
-        xasprintf(&msg, _("No %%changelog present in the %s build"), after_nevra);
-        add_result(ri, RESULT_VERIFY, WAIVABLE_BY_ANYONE, HEADER_CHANGELOG, msg, NULL, REMEDY_CHANGELOG);
-        free(msg);
-        result = false;
-    } else if (!strcmp(before->data, after->data)) {
-        xasprintf(&msg, _("No new %%changelog entry in the %s build"), after_nevra);
-        add_result(ri, RESULT_BAD, WAIVABLE_BY_ANYONE, HEADER_CHANGELOG, msg, NULL, REMEDY_CHANGELOG);
-        free(msg);
-        result = false;
+        /* Perform checks */
+        if (before_changelog && (after_changelog == NULL || TAILQ_EMPTY(after_changelog))) {
+            xasprintf(&msg, "%%changelog lost between the %s and %s builds", before_nevra, after_nevra);
+            add_result(ri, RESULT_VERIFY, WAIVABLE_BY_ANYONE, HEADER_CHANGELOG, msg, full_diff_output, REMEDY_CHANGELOG);
+            free(msg);
+            result = false;
+        } else if ((before_changelog == NULL || TAILQ_EMPTY(before_changelog)) && after_changelog) {
+            xasprintf(&msg, "Gained %%changelog between the %s and %s builds", before_nevra, after_nevra);
+            add_result(ri, RESULT_INFO, NOT_WAIVABLE, HEADER_CHANGELOG, msg, full_diff_output, NULL);
+            free(msg);
+            result = false;
+        } else if ((before_changelog == NULL || TAILQ_EMPTY(before_changelog)) && (after_changelog == NULL || TAILQ_EMPTY(after_changelog))) {
+            xasprintf(&msg, "No %%changelog present in the %s build", after_nevra);
+            add_result(ri, RESULT_BAD, WAIVABLE_BY_ANYONE, HEADER_CHANGELOG, msg, NULL, REMEDY_CHANGELOG);
+            free(msg);
+            result = false;
+        } else if (!strcmp(before->data, after->data)) {
+            xasprintf(&msg, "No new %%changelog entry in the %s build", after_nevra);
+            add_result(ri, RESULT_BAD, WAIVABLE_BY_ANYONE, HEADER_CHANGELOG, msg, full_diff_output, REMEDY_CHANGELOG);
+            free(msg);
+            result = false;
+        }
     }
 
     /* cleanup */
@@ -192,11 +314,13 @@ static bool check_bin_rpm_changelog(struct rpminspect *ri, const rpmpeer_entry_t
     char *after_nevra = NULL;
     string_list_t *before_changelog = NULL;
     string_list_t *after_changelog = NULL;
-    char *bclog = NULL;
-    char *aclog = NULL;
     char *msg = NULL;
-    string_list_t *diffresult = NULL;
-    char *difference = NULL;
+    char *before_output = NULL;
+    char *after_output = NULL;
+    char *diff_output = NULL;
+    char *full_diff_output = NULL;
+    int exitcode = 0;
+    char *diff_walk = NULL;
     string_entry_t *entry = NULL;
     severity_t severity = RESULT_INFO;
 
@@ -209,43 +333,44 @@ static bool check_bin_rpm_changelog(struct rpminspect *ri, const rpmpeer_entry_t
 
     /* get the before and after changelogs */
     before_changelog = get_changelog(peer->before_hdr);
-    bclog = list_to_string(before_changelog);
     after_changelog = get_changelog(peer->after_hdr);
-    aclog = list_to_string(after_changelog);
+
+    /* Generate temporary changelog files */
+    before_output = create_changelog(before_changelog, ri->workdir);
+    after_output = create_changelog(after_changelog, ri->workdir);
 
     /* Compare the changelogs */
-    diffresult = unified_str_diff(bclog, aclog);
+    diff_output = run_cmd(&exitcode, DIFF_CMD, "-u", before_output, after_output, NULL);
 
-    if (diffresult != NULL && !TAILQ_EMPTY(diffresult)) {
+    if (exitcode) {
+        /* Skip past the diff(1) header lines */
+        diff_walk = skip_diff_headers(diff_output);
+        full_diff_output = strdup(diff_walk);
+
         /* Differences found, see what kind */
-        TAILQ_FOREACH(entry, diffresult, items) {
-            if (entry->data && entry->data[0] == '-') {
-                severity = RESULT_VERIFY;
-                break;
-            }
-        }
-
-        difference = list_to_string(diffresult);
-        list_free(diffresult, free);
+        severity = get_diff_severity(full_diff_output);
 
         if (severity == RESULT_INFO) {
-            xasprintf(&msg, _("%%changelog contains new text in the %s build"), after_nevra);
-            add_result(ri, severity, NOT_WAIVABLE, HEADER_CHANGELOG, msg, difference, NULL);
+            xasprintf(&msg, "%%changelog contains new text in the %s build", after_nevra);
+            add_result(ri, severity, NOT_WAIVABLE, HEADER_CHANGELOG, msg, full_diff_output, NULL);
             free(msg);
         } else if (severity == RESULT_VERIFY) {
-            xasprintf(&msg, _("%%changelog modified between the %s and %s builds"), before_nevra, after_nevra);
-            add_result(ri, severity, WAIVABLE_BY_ANYONE, HEADER_CHANGELOG, msg, difference, REMEDY_CHANGELOG);
+            xasprintf(&msg, "%%changelog modified between the %s and %s builds", before_nevra, after_nevra);
+            add_result(ri, severity, WAIVABLE_BY_ANYONE, HEADER_CHANGELOG, msg, full_diff_output, REMEDY_CHANGELOG);
             free(msg);
             result = false;
         }
-
-        free(difference);
     }
+
+    free(diff_output);
+    free(full_diff_output);
+    free(before_output);
+    free(after_output);
 
     /* Check for bad words */
     TAILQ_FOREACH(entry, after_changelog, items) {
         if (has_bad_word(entry->data, ri->badwords)) {
-            xasprintf(&msg, _("%%changelog entry has unprofessional language in the %s build"), after_nevra);
+            xasprintf(&msg, "%%changelog entry has unprofessional language in the %s build", after_nevra);
             add_result(ri, RESULT_BAD, WAIVABLE_BY_ANYONE, HEADER_CHANGELOG, msg, entry->data, REMEDY_CHANGELOG);
             free(msg);
             result = false;
@@ -253,8 +378,6 @@ static bool check_bin_rpm_changelog(struct rpminspect *ri, const rpmpeer_entry_t
     }
 
     /* cleanup */
-    free(bclog);
-    free(aclog);
     list_free(before_changelog, free);
     list_free(after_changelog, free);
     free(before_nevra);
@@ -294,14 +417,12 @@ bool inspect_changelog(struct rpminspect *ri)
         }
     }
 
-    /* Check the packages */
-    if (src) {
-        src_result = check_src_rpm_changelog(ri, src);
-    }
+    assert(src != NULL);
+    assert(bin != NULL);
 
-    if (bin) {
-        bin_result = check_bin_rpm_changelog(ri, bin);
-    }
+    /* Check the packages */
+    src_result = check_src_rpm_changelog(ri, src);
+    bin_result = check_bin_rpm_changelog(ri, bin);
 
     if (src_result && bin_result) {
         add_result(ri, RESULT_OK, NOT_WAIVABLE, HEADER_CHANGELOG, NULL, NULL, NULL);

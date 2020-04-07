@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2019  Red Hat, Inc.
+ * Copyright (C) 2019-2020  Red Hat, Inc.
  * Author(s):  David Cantrell <dcantrell@redhat.com>
  *
  * This program is free software: you can redistribute it and/or modify
@@ -92,27 +92,25 @@ void output_text(const results_t *results, const char *dest) {
 
         fprintf(fp, _("Result: %s\n"), strseverity(result->severity));
 
-        if (result->severity != RESULT_OK && result->severity != RESULT_INFO) {
-            fprintf(fp, _("Waiver Authorization: %s\n\n"), strwaiverauth(result->waiverauth));
+        fprintf(fp, _("Waiver Authorization: %s\n\n"), strwaiverauth(result->waiverauth));
 
-            if (result->details != NULL) {
-                fprintf(fp, _("Details:\n%s\n\n"), result->details);
-            }
-
-            if (result->remedy != NULL) {
-                xasprintf(&msg, _("Suggested Remedy:\n%s"), result->remedy);
-
-                if (width) {
-                    printwrap(msg, width, 0, fp);
-                } else {
-                    fprintf(fp, "%s", msg);
-                }
-
-                free(msg);
-            }
-
-            fprintf(fp, "\n");
+        if (result->details != NULL) {
+            fprintf(fp, _("Details:\n%s\n\n"), result->details);
         }
+
+        if (result->remedy != NULL) {
+            xasprintf(&msg, _("Suggested Remedy:\n%s"), result->remedy);
+
+            if (width) {
+                printwrap(msg, width, 0, fp);
+            } else {
+                fprintf(fp, "%s", msg);
+            }
+
+            free(msg);
+        }
+
+        fprintf(fp, "\n");
     }
 
     /* tidy up and return */

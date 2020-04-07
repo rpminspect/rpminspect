@@ -116,7 +116,6 @@ librpminspect_sources = [
     'lib/checksums.c',
     'lib/copyfile.c',
     'lib/debug.c',
-    'lib/diff.c',
     'lib/files.c',
     'lib/flags.c',
     'lib/free.c',
@@ -167,7 +166,6 @@ librpminspect_sources = [
     'lib/runcmd.c',
     'lib/strfuncs.c',
     'lib/tty.c',
-    'lib/unified_diff.c',
     'lib/unpack.c',
     'lib/whitelist.c',
 ]
