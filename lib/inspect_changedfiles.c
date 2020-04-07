@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2019  Red Hat, Inc.
+ * Copyright (C) 2019-2020  Red Hat, Inc.
  * Author(s):  David Cantrell <dcantrell@redhat.com>
  *
  * This program is free software: you can redistribute it and/or modify
@@ -99,9 +99,9 @@ static bool changedfiles_driver(struct rpminspect *ri, rpmfile_entry_t *file)
     char *before_sum = NULL;
     char *after_sum = NULL;
     char *msg = NULL;
-    string_list_t *diffresult = NULL;
-    char *difference = NULL;
     char *errors = NULL;
+    char *short_errors = NULL;
+    char *skip_line = NULL;
     char *needle = NULL;
     char *part_errors = NULL;
     char *refined_errors = NULL;
@@ -318,15 +318,12 @@ static bool changedfiles_driver(struct rpminspect *ri, rpmfile_entry_t *file)
         }
 
         /* Now diff the mo content */
-        diffresult = unified_file_diff(before_tmp, after_tmp);
+        errors = run_cmd(&exitcode, DIFF_CMD, "-u", before_tmp, after_tmp, NULL);
 
-        if (diffresult && !TAILQ_EMPTY(diffresult)) {
-            difference = list_to_string(diffresult);
+        if (exitcode) {
             xasprintf(&msg, _("Message catalog %s changed content on %s"), file->localpath, arch);
-            add_result(ri, RESULT_VERIFY, WAIVABLE_BY_ANYONE, HEADER_CHANGEDFILES, msg, difference, REMEDY_CHANGEDFILES);
+            add_result(ri, RESULT_VERIFY, WAIVABLE_BY_ANYONE, HEADER_CHANGEDFILES, msg, errors, REMEDY_CHANGEDFILES);
             result = false;
-            free(difference);
-            list_free(diffresult, free);
         }
 
         /* Remove the temporary files */
@@ -365,15 +362,36 @@ static bool changedfiles_driver(struct rpminspect *ri, rpmfile_entry_t *file)
 
     if (!strcmp(type, "text/x-c") && possible_header) {
         /* Now diff the header content */
-        diffresult = unified_file_diff(file->peer_file->fullpath, file->fullpath);
+        errors = run_cmd(&exitcode, DIFF_CMD, "-u", "-w", "--label", file->localpath, file->peer_file->fullpath, file->fullpath, NULL);
 
-        if (diffresult && !TAILQ_EMPTY(diffresult)) {
-            difference = list_to_string(diffresult);
+        if (exitcode) {
+            /*
+             * Skip the diff(1) header since the output from this
+             * gives context.
+             */
+            short_errors = errors;
+
+            if (strlen(short_errors) >= 3) {
+                while (strncmp(short_errors, "@@ ", 3)) {
+                    skip_line = index(short_errors, '\n');
+
+                    if (skip_line == NULL) {
+                        short_errors = errors;
+                        break;
+                    }
+
+                    short_errors = skip_line + 1;
+
+                    if (*short_errors == '\0') {
+                        short_errors = errors;
+                        break;
+                    }
+                }
+            }
+
             xasprintf(&msg, _("Public header file %s changed content on %s, Please make sure this does not change the ABI exported by this package.  The output of `diff -uw` follows."), file->localpath, arch);
-            add_result(ri, RESULT_VERIFY, WAIVABLE_BY_ANYONE, HEADER_CHANGEDFILES, msg, difference, REMEDY_CHANGEDFILES);
+            add_result(ri, RESULT_VERIFY, WAIVABLE_BY_ANYONE, HEADER_CHANGEDFILES, msg, short_errors, REMEDY_CHANGEDFILES);
             result = false;
-            free(difference);
-            list_free(diffresult, free);
         }
     }
 

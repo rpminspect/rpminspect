@@ -33,7 +33,6 @@
 #include "results.h"
 #include "output.h"
 #include "readelf.h"
-#include "diff.h"
 
 #ifndef _LIBRPMINSPECT_RPMINSPECT_H
 #define _LIBRPMINSPECT_RPMINSPECT_H
@@ -246,9 +245,5 @@ void set_debug_mode(bool);
 
 /* readfile.c */
 string_list_t *read_file(const char *);
-
-/* unified_diff.c */
-string_list_t *unified_file_diff(const char *, const char *);
-string_list_t *unified_str_diff(const char *, const char *);
 
 #endif

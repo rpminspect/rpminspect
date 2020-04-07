@@ -91,6 +91,7 @@
 #define XZCMP_CMD "xzcmp"
 #define ELFCMP_CMD "eu-elfcmp --ignore-build-id --hash-inexact"
 #define MSGUNFMT_CMD "msgunfmt"
+#define DIFF_CMD "diff"
 #define DESKTOP_FILE_VALIDATE_CMD "desktop-file-validate"
 #define ANNOCHECK_CMD "annocheck"
 
@@ -155,10 +156,5 @@
  * Kernel modules subdirectory
  */
 #define KERNEL_MODULES_DIR "/lib/modules/"
-
-/*
- * Number of unified diff (diff -u) context lines before and after hunk.
- */
-#define DIFF_CONTEXT_LINES 3
 
 #endif
