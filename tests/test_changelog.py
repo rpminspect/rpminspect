@@ -24,6 +24,30 @@ from baseclass import *
 # In the source RPM:
 # 1) Remove the %changelog section in the after build.  The test should
 #    report that as VERIFY.
+class LostChangeLogSRPM(TestSRPMs):
+    def setUp(self):
+        TestSRPMs.setUp(self)
+        self.rpm.section_changelog = None
+        self.inspection = 'changelog'
+        self.label = 'changelog'
+        self.result = 'VERIFY'
+
+class LostChangeLogRPM(TestRPMs):
+    def setUp(self):
+        TestRPMs.setUp(self)
+        self.rpm.section_changelog = None
+        self.inspection = 'changelog'
+        self.label = 'changelog'
+        self.result = 'VERIFY'
+
+class ListChangeLogKoji(TestKoji):
+    def setUp(self):
+        TestKoji.setUp(self)
+        self.after_rpm.section_changelog = None
+        self.inspection = 'changelog'
+        self.label = 'changelog'
+        self.result = 'VERIFY'
+
 # 2) Prevent a %changelog in the before build but add one in the after
 #    build.  The test should report that as INFO.
 # 3) If the first entries in the changelog as the same in the before and
