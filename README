@@ -128,15 +128,6 @@ Additionally, the unit test suite requires the following packages:
 Most distributions include the above projects in prebuilt and packaged
 form.  If those are available, you should use those packages.
 
-In Fedora, for example, you can run the following to install the
-required packages:
-
-    dnf install json-c-devel xmlrpc-c-devel libxml2-devel rpm-devel \
-                libarchive-devel elfutils-devel kmod-devel zlib-devel \
-                libmandoc-devel iniparser-devel libyaml-devel \
-                file-devel openssl-devel libcap-devel meson \
-                ninja-build CUnit CUnit-devel gcc
-
 
 Runtime Requirements
 --------------------
@@ -161,13 +152,39 @@ packages.
 In Fedora, for example, you can run the following to install these
 programs:
 
-    dnf install desktop-file-utils gzip bzip2 xz elfutils gettext diffutils
+    yum install desktop-file-utils gzip bzip2 xz elfutils gettext diffutils
 
 The 'shellsyntax' inspection uses the actual shell programs listed in
 the shells setting in the rpminspect.conf.  Since this can vary by
 system, you should make sure they are available in the system PATH.
 Or you can just not use the shellsyntax inspection.  The spec file for
-rpminspect includes weak dependencies on the default list of shells.
+rpminspect includes weak dependencies on the default list of shells:
+
+    yum install dash ksh zsh tcsh rc bash /usr/bin/annocheck
+
+An even easier option is to use the developer setup method described
+in the next section.
+
+
+Developer Setup
+---------------
+
+If you are planning on contributing to rpminspect, you should use the
+developer setup target in the Makefile to make sure you have the required
+packages installed:
+
+    make instreqs
+
+This target will install all BuildRequires, Requires, and Suggests
+including the ones commented out in the spec file template that are
+required for the test suite.
+
+If you are working on a distribution other than Fedora/RHEL/CentOS,
+then have a look at the rpminspect.spec.in template for the packages
+listed as Requires, BuildRequires, and Suggests.  These usually have
+similar names on other distributions.  If you have instructions for
+setting up a development and runtime environment on another
+distribution, please send a pull request with the information.
 
 
 Building
