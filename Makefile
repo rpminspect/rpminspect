@@ -32,7 +32,7 @@ clean:
 	-rm -rf $(MESON_BUILD_DIR)
 
 instreqs:
-	sudo yum install -y $(shell grep -i requires: rpminspect.spec.in | grep -v rpminspect | awk '{ print $$2; }' ORS=' ')
+	yum install -y $(shell grep -iE "(Requires|Suggests):" rpminspect.spec.in | grep -v rpminspect | awk '{ print $$2; }' ORS=' ') 
 
 help:
 	@echo "rpminspect helper Makefile"

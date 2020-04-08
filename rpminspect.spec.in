@@ -9,6 +9,7 @@ Source0:        https://github.com/rpminspect/rpminspect/releases/download/v%%VE
 Source1:        changelog
 
 BuildRequires:  meson
+BuildRequires:  ninja-build
 BuildRequires:  gcc
 BuildRequires:  glibc-devel
 BuildRequires:  json-c-devel
