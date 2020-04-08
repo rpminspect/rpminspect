@@ -260,9 +260,9 @@ How To Use
 SETUP
 
 Make sure you have installed the program and corresponding data file
-collection.  Fedora users can use dnf:
+collection.  Fedora users can use yum:
 
-    dnf install rpminspect rpminspect-data-fedora
+    yum install rpminspect rpminspect-data-fedora
 
 The first package is the actual program.  The rpminspect-data-fedora
 package delivers data files used by the various inspections performed
