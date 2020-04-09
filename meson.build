@@ -23,7 +23,7 @@ endif
 
 # Dependencies that use pkg-config
 jsonc = dependency('json-c', method : 'pkg-config', required : true)
-xmlrpc = dependency('xmlrpc xmlrpc_util xmlrpc_client', method : 'pkg-config', required : true)
+xmlrpc = dependency('xmlrpc xmlrpc_util xmlrpc_client', method : 'pkg-config', version : '>=1.51.0', required : true)
 libxml = dependency('libxml-2.0', method : 'pkg-config', required : true)
 rpm = dependency('rpm', method : 'pkg-config', required : true)
 libarchive = dependency('libarchive', method : 'pkg-config', required : true)
@@ -328,9 +328,12 @@ if python.found()
     test_env.set('RPMINSPECT_TEST_DATA_PATH', meson.source_root() + '/tests/data')
 
     test_suites = [
+        'test_changelog.py',
+        'test_command.py',
         'test_default.py',
         'test_desktop.py',
         'test_disttag.py',
+        'test_elf.py',
         'test_emptyrpm.py',
         'test_kmod.py',
         'test_license.py',
