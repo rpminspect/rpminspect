@@ -185,6 +185,8 @@ int copyfile(const char *, const char *, bool, bool);
 /* rpm.c */
 int init_librpm(void);
 Header get_rpm_header(struct rpminspect *, const char *);
+char *get_rpmtag_str(Header, rpmTagVal);
+char *get_nevr(Header);
 char *get_nevra(Header);
 const char *get_rpm_header_arch(Header);
 

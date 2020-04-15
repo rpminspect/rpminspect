@@ -107,34 +107,53 @@ Header get_rpm_header(struct rpminspect *ri, const char *pkg)
 }
 
 /*
- * Get the RPMTAG_NEVRA extension tag.
- * NOTE: Caller must free this result.
+ * Get and return the named RPM header tag as a string.
  */
-char *get_nevra(Header hdr)
+char *get_rpmtag_str(Header hdr, rpmTagVal tag)
 {
-    char *nevra = NULL;
+    char *val = NULL;
     rpmtd td = NULL;
     rpm_count_t td_size;
+
+    assert(hdr != NULL);
 
     td = rpmtdNew();
     assert(td != NULL);
 
     /* NOTE: this function returns 1 for success, not RPMRC_OK */
-    if (headerGet(hdr, RPMTAG_NEVRA, td, HEADERGET_MINMEM | HEADERGET_EXT) != 1) {
-        goto nevra_cleanup;
+    if (headerGet(hdr, tag, td, HEADERGET_MINMEM | HEADERGET_EXT) != 1) {
+        goto val_cleanup;
     }
 
     td_size = rpmtdCount(td);
 
     if (td_size != 1) {
-        goto nevra_cleanup;
+        goto val_cleanup;
     }
 
-    nevra = strdup(rpmtdGetString(td));
+    val = strdup(rpmtdGetString(td));
 
-nevra_cleanup:
+val_cleanup:
     rpmtdFree(td);
-    return nevra;
+    return val;
+}
+
+/*
+ * Get the RPMTAG_NEVR extension tag.
+ * NOTE: Caller must free this result.
+ */
+char *get_nevr(Header hdr)
+{
+    return get_rpmtag_str(hdr, RPMTAG_NEVR);
+}
+
+/*
+ * Get the RPMTAG_NEVRA extension tag.
+ * NOTE: Caller must free this result.
+ */
+char *get_nevra(Header hdr)
+{
+    return get_rpmtag_str(hdr, RPMTAG_NEVRA);
 }
 
 /*
