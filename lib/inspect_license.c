@@ -34,7 +34,8 @@ static char *licdata = NULL;
 static int liclen = 0;
 
 /* Local helper functions */
-static struct json_object *read_licensedb(const char *licensedb) {
+static struct json_object *read_licensedb(const char *licensedb)
+{
     int fd = 0;
 
     assert(licensedb != NULL);
@@ -109,59 +110,6 @@ static bool check_license_abbrev(const char *lic)
 }
 
 /*
- * Called by inspect_license()
- */
-static int check_peer_license(struct rpminspect *ri, const char *actual_licensedb, const Header hdr)
-{
-    int ret = 0;
-    bool valid = false;
-    char *nevra = NULL;
-    const char *license = NULL;
-    char *msg = NULL;
-
-    assert(ri != NULL);
-    assert(actual_licensedb != NULL);
-
-    nevra = get_nevra(hdr);
-    assert(nevra != NULL);
-    license = headerGetString(hdr, RPMTAG_LICENSE);
-
-    if (license == NULL) {
-        xasprintf(&msg, _("Empty License Tag in %s"), nevra);
-        add_result(ri, RESULT_BAD, NOT_WAIVABLE, HEADER_LICENSE, msg, NULL, REMEDY_LICENSE);
-        ret = 1;
-        free(msg);
-    } else {
-        /* is the license tag valid or not */
-        valid = is_valid_license(actual_licensedb, license);
-
-        if (valid) {
-            xasprintf(&msg, _("Valid License Tag in %s: %s"), nevra, license);
-
-            add_result(ri, RESULT_INFO, NOT_WAIVABLE, HEADER_LICENSE, msg, NULL, NULL);
-            ret = 1;
-        } else {
-            xasprintf(&msg, _("Invalid License Tag in %s: %s"), nevra, license);
-            add_result(ri, RESULT_BAD, NOT_WAIVABLE, HEADER_LICENSE, msg, NULL, REMEDY_LICENSE);
-            ret = 1;
-        }
-
-        free(msg);
-
-        /* does the license tag contain bad words? */
-        if (has_bad_word(license, ri->badwords)) {
-            xasprintf(&msg, _("License Tag contains unprofessional language in %s: %s"), nevra, license);
-            add_result(ri, RESULT_BAD, NOT_WAIVABLE, HEADER_LICENSE, msg, NULL, REMEDY_LICENSE);
-            ret = 1;
-            free(msg);
-        }
-    }
-
-    free(nevra);
-    return ret;
-}
-
-/*
  * Dupe or append a token to the given string.
  */
 static void token_append(char **dest, const char *token)
@@ -184,29 +132,6 @@ static void token_append(char **dest, const char *token)
 }
 
 /*
- * Helper function to clean up the static globals here.
- */
-void free_licensedb(void) {
-    int r;
-
-    /* ignore unused variable warnings if assert is disabled */
-    (void) r;
-
-    if (licdb == NULL) {
-        return;
-    }
-
-    json_object_put(licdb);
-    r = munmap(licdata, liclen);
-    assert(r == 0);
-    licdata = NULL;
-    liclen = 0;
-    licdb = NULL;
-
-    return;
-}
-
-/*
  * RPM License tags in the spec file permit parentheses to group licenses
  * together that need to be used together.  The License tag also permits
  * the use of boolean 'and' and 'or' keywords.  The only thing of note for
@@ -224,7 +149,8 @@ void free_licensedb(void) {
  * 4) The function returns true if all license tags are approved in the
  *    database.  Any single tag that is unapproved results in false.
  */
-bool is_valid_license(const char *licensedb, const char *tag) {
+static bool is_valid_license(struct rpminspect *ri, const char *licensedb, const char *tag)
+{
     int tok_seen = 0;
     int paren_tok_seen = 0;
     int valid = 0;
@@ -237,9 +163,12 @@ bool is_valid_license(const char *licensedb, const char *tag) {
     char *lic = NULL;
     char *paren_lic = NULL;
     bool good_token = false;
+    bool good_paren_token = false;
     bool collect = true;
     int paren = 0;
+    char *msg = NULL;
 
+    assert(ri != NULL);
     assert(licensedb != NULL);
     assert(tag != NULL);
 
@@ -345,13 +274,25 @@ bool is_valid_license(const char *licensedb, const char *tag) {
             if (good_token) {
                 valid++;
                 DEBUG_PRINT("APPROVED lic=|%s|, paren_valid=%d, tok_seen=%d, valid=%d\n", lic, paren_valid, tok_seen, valid);
+            } else {
+                xasprintf(&msg, "`%s' is not an approved license", lic);
+                add_result(ri, RESULT_BAD, NOT_WAIVABLE, HEADER_LICENSE, msg, NULL, REMEDY_UNAPPROVED_LICENSE);
+                free(msg);
             }
         }
 
-        if (!good_token && paren_lic && check_license_abbrev(paren_lic)) {
-            DEBUG_PRINT("APPROVED paren_lic=|%s|, paren_valid=%d, tok_seen=%d, valid=%d\n", paren_lic, paren_valid, tok_seen, valid);
-            tok_seen = tok_seen - paren_tok_seen;
-            paren_valid++;
+        if (!good_token && paren_lic) {
+            good_paren_token = check_license_abbrev(paren_lic);
+
+            if (good_paren_token) {
+                DEBUG_PRINT("APPROVED paren_lic=|%s|, paren_valid=%d, tok_seen=%d, valid=%d\n", paren_lic, paren_valid, tok_seen, valid);
+                tok_seen = tok_seen - paren_tok_seen;
+                paren_valid++;
+            } else {
+                xasprintf(&msg, "`%s' is not an approved license", paren_lic);
+                add_result(ri, RESULT_BAD, NOT_WAIVABLE, HEADER_LICENSE, msg, NULL, REMEDY_UNAPPROVED_LICENSE);
+                free(msg);
+            }
         }
 
         free(lic);
@@ -380,13 +321,25 @@ bool is_valid_license(const char *licensedb, const char *tag) {
         if (good_token) {
             valid++;
             DEBUG_PRINT("APPROVED lic=|%s|, paren_valid=%d, tok_seen=%d, valid=%d\n", lic, paren_valid, tok_seen, valid);
+        } else {
+            xasprintf(&msg, "`%s' is not an approved license", lic);
+            add_result(ri, RESULT_BAD, NOT_WAIVABLE, HEADER_LICENSE, msg, NULL, REMEDY_UNAPPROVED_LICENSE);
+            free(msg);
         }
     }
 
-    if (!good_token && paren_lic && check_license_abbrev(paren_lic)) {
-        DEBUG_PRINT("APPROVED paren_lic=|%s|, paren_valid=%d, tok_seen=%d, valid=%d\n", paren_lic, paren_valid, tok_seen, valid);
-        tok_seen = tok_seen - paren_tok_seen;
-        paren_valid++;
+    if (!good_token && paren_lic) {
+        good_paren_token = check_license_abbrev(paren_lic);
+
+        if (good_paren_token) {
+            DEBUG_PRINT("APPROVED paren_lic=|%s|, paren_valid=%d, tok_seen=%d, valid=%d\n", paren_lic, paren_valid, tok_seen, valid);
+            tok_seen = tok_seen - paren_tok_seen;
+            paren_valid++;
+        } else {
+            xasprintf(&msg, "`%s' is not an approved license", paren_lic);
+            add_result(ri, RESULT_BAD, NOT_WAIVABLE, HEADER_LICENSE, msg, NULL, REMEDY_UNAPPROVED_LICENSE);
+            free(msg);
+        }
     }
 
     /* cleanup */
@@ -402,9 +355,83 @@ bool is_valid_license(const char *licensedb, const char *tag) {
 }
 
 /*
+ * Called by inspect_license()
+ */
+static int check_peer_license(struct rpminspect *ri, const char *actual_licensedb, const Header hdr)
+{
+    int ret = 0;
+    bool valid = false;
+    char *nevra = NULL;
+    const char *license = NULL;
+    char *msg = NULL;
+
+    assert(ri != NULL);
+    assert(actual_licensedb != NULL);
+
+    nevra = get_nevra(hdr);
+    assert(nevra != NULL);
+    license = headerGetString(hdr, RPMTAG_LICENSE);
+
+    if (license == NULL) {
+        xasprintf(&msg, _("Empty License Tag in %s"), nevra);
+        add_result(ri, RESULT_BAD, NOT_WAIVABLE, HEADER_LICENSE, msg, NULL, REMEDY_LICENSE);
+        ret = 1;
+        free(msg);
+    } else {
+        /* is the license tag valid or not */
+        valid = is_valid_license(ri, actual_licensedb, license);
+
+        if (valid) {
+            xasprintf(&msg, _("Valid License Tag in %s: %s"), nevra, license);
+
+            add_result(ri, RESULT_INFO, NOT_WAIVABLE, HEADER_LICENSE, msg, NULL, NULL);
+            ret = 1;
+        }
+
+        free(msg);
+
+        /* does the license tag contain bad words? */
+        if (has_bad_word(license, ri->badwords)) {
+            xasprintf(&msg, _("License Tag contains unprofessional language in %s: %s"), nevra, license);
+            add_result(ri, RESULT_BAD, NOT_WAIVABLE, HEADER_LICENSE, msg, NULL, REMEDY_LICENSE);
+            ret = 1;
+            free(msg);
+        }
+    }
+
+    free(nevra);
+    return ret;
+}
+
+/*
+ * Helper function to clean up the static globals here.
+ */
+static void free_licensedb(void)
+{
+    int r;
+
+    /* ignore unused variable warnings if assert is disabled */
+    (void) r;
+
+    if (licdb == NULL) {
+        return;
+    }
+
+    json_object_put(licdb);
+    r = munmap(licdata, liclen);
+    assert(r == 0);
+    licdata = NULL;
+    liclen = 0;
+    licdb = NULL;
+
+    return;
+}
+
+/*
  * Main driver for the 'license' inspection.
  */
-bool inspect_license(struct rpminspect *ri) {
+bool inspect_license(struct rpminspect *ri)
+{
     int good = 0;
     int seen = 0;
     bool result;
