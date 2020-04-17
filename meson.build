@@ -160,6 +160,7 @@ librpminspect_sources = [
     'lib/peers.c',
     'lib/readelf.c',
     'lib/readfile.c',
+    'lib/release.c',
     'lib/results.c',
     'lib/rmtree.c',
     'lib/rpm.c',
