@@ -170,6 +170,9 @@ void free_rpminspect(struct rpminspect *ri) {
         free(ri->header_cache);
     }
 
+    free(ri->before_rel);
+    free(ri->after_rel);
+
     free_results(ri->results);
 
     return;

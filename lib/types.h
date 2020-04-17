@@ -347,6 +347,8 @@ struct rpminspect {
     /* accumulated data of the build set */
     rpmpeer_t *peers;               /* list of packages */
     header_cache_t *header_cache;   /* RPM header cache */
+    char *before_rel;               /* before Release w/o %{?dist} */
+    char *after_rel;                /* after Release w/o ${?dist} */
 
     /* inspection results */
     results_t *results;
