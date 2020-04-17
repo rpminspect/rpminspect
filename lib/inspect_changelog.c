@@ -308,9 +308,18 @@ static bool check_src_rpm_changelog(struct rpminspect *ri, const rpmpeer_entry_t
             waiver = WAIVABLE_BY_ANYONE;
         }
     } else if (before && after && !strcmp(before->data, after->data)) {
-        xasprintf(&msg, "No new %%changelog entry in the %s build", after_nevr);
-        sev = RESULT_BAD;
-        waiver = WAIVABLE_BY_ANYONE;
+        /*
+         * Only report that a new entry is missing if the builds have
+         * different NVRs.  But compare NVRs with the dist tag
+         * trimmed.
+         */
+        if (strcmp(headerGetString(peer->before_hdr, RPMTAG_NAME), headerGetString(peer->after_hdr, RPMTAG_NAME)) ||
+            strcmp(headerGetString(peer->before_hdr, RPMTAG_VERSION), headerGetString(peer->after_hdr, RPMTAG_VERSION)) ||
+            (get_before_rel(ri) && get_after_rel(ri) && strcmp(get_before_rel(ri), get_after_rel(ri)))) {
+            xasprintf(&msg, "No new %%changelog entry in the %s build", after_nevr);
+            sev = RESULT_BAD;
+            waiver = WAIVABLE_BY_ANYONE;
+        }
     }
 
     if (msg) {
