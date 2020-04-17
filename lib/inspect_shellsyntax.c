@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2019  Red Hat, Inc.
+ * Copyright (C) 2019-2020  Red Hat, Inc.
  * Author(s):  David Cantrell <dcantrell@redhat.com>
  *
  * This program is free software: you can redistribute it and/or modify
@@ -173,12 +173,12 @@ static bool shellsyntax_driver(struct rpminspect *ri, rpmfile_entry_t *file)
 
     /* Report */
     if (before_shell) {
-        if (!before_exitcode && exitcode) {
+        if ((!before_exitcode || before_errors == NULL) && (exitcode || errors)) {
             xasprintf(&msg, _("%s is no longer a valid %s script on %s"), file->localpath, shell, arch);
             add_result(ri, RESULT_BAD, WAIVABLE_BY_ANYONE, HEADER_SHELLSYNTAX, msg, errors, REMEDY_SHELLSYNTAX_BAD);
             free(msg);
             result = false;
-        } else if (before_exitcode && !exitcode) {
+        } else if ((before_exitcode || before_errors) && (!exitcode && errors == NULL)) {
             xasprintf(&msg, _("%s became a valid %s script on %s"), file->localpath, shell, arch);
 
             if (extglob) {
@@ -189,18 +189,18 @@ static bool shellsyntax_driver(struct rpminspect *ri, rpmfile_entry_t *file)
 
             add_result(ri, RESULT_INFO, NOT_WAIVABLE, HEADER_SHELLSYNTAX, msg, before_errors, NULL);
             free(msg);
-        } else if (before_exitcode && exitcode) {
+        } else if ((before_exitcode || before_errors) && (exitcode || errors)) {
             xasprintf(&msg, _("%s is not a valid %s script on %s"), file->localpath, shell, arch);
             add_result(ri, RESULT_BAD, WAIVABLE_BY_ANYONE, HEADER_SHELLSYNTAX, msg, errors, REMEDY_SHELLSYNTAX_BAD);
             free(msg);
             result = false;
         }
     } else {
-        if (!exitcode && extglob) {
+        if ((!exitcode || errors == NULL) && extglob) {
             xasprintf(&msg, _("%s fails with '-n' but passes with '-O extglob'; be sure 'shopt extglob' is set in the script on %s"), file->localpath, arch);
             add_result(ri, RESULT_INFO, NOT_WAIVABLE, HEADER_SHELLSYNTAX, msg, NULL, NULL);
             free(msg);
-        } else if (exitcode) {
+        } else if (exitcode || errors) {
             xasprintf(&msg, _("%s is not a valid %s script on %s"), file->localpath, shell, arch);
             add_result(ri, RESULT_BAD, WAIVABLE_BY_ANYONE, HEADER_SHELLSYNTAX, msg, errors, REMEDY_SHELLSYNTAX_BAD);
             free(msg);
