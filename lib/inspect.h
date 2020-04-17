@@ -66,8 +66,6 @@ bool is_pic_ok(Elf *);
 bool inspect_elf(struct rpminspect *);
 
 /* inspect_license.c */
-void free_licensedb(void);
-bool is_valid_license(const char *, const char *);
 bool inspect_license(struct rpminspect *);
 
 /* inspect_emptyrpm.c */
