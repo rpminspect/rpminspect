@@ -210,6 +210,7 @@ size_t tty_width(void);
 /* results.c */
 results_t *init_results(void);
 void free_results(results_t *);
+void add_result_entry(results_t **, severity_t, waiverauth_t, const char *, char *, char *, const char *);
 void add_result(struct rpminspect *, severity_t, waiverauth_t, const char *, char *, char *, const char *);
 
 /* output.c */

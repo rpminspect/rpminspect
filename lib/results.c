@@ -73,21 +73,15 @@ void free_results(results_t *results) {
  *
  * Pass NULL for any optional strings that you have no data for.
  */
-void add_result(struct rpminspect *ri, severity_t severity,
-                waiverauth_t waiverauth, const char *header, char *msg,
-                char *details, const char *remedy) {
+void add_result_entry(results_t **results, severity_t severity, waiverauth_t waiverauth, const char *header, char *msg, char *details, const char *remedy)
+{
     results_entry_t *entry = NULL;
 
-    assert(ri != NULL);
     assert(severity >= 0);
     assert(header != NULL);
 
-    if (severity > ri->worst_result) {
-        ri->worst_result = severity;
-    }
-
-    if (ri->results == NULL) {
-        ri->results = init_results();
+    if (*results == NULL) {
+        *results = init_results();
     }
 
     entry = calloc(1, sizeof(*entry));
@@ -109,6 +103,22 @@ void add_result(struct rpminspect *ri, severity_t severity,
         entry->remedy = strdup(remedy);
     }
 
-    TAILQ_INSERT_TAIL(ri->results, entry, items);
+    TAILQ_INSERT_TAIL(*results, entry, items);
+    return;
+}
+
+/*
+ * Shortcut to call add_result_entry() by giving the struct rpminspect.
+ */
+void add_result(struct rpminspect *ri, severity_t severity, waiverauth_t waiverauth, const char *header, char *msg, char *details, const char *remedy)
+{
+    assert(ri != NULL);
+    assert(severity >= 0);
+
+    if (severity > ri->worst_result) {
+        ri->worst_result = severity;
+    }
+
+    add_result_entry(&ri->results, severity, waiverauth, header, msg, details, remedy);
     return;
 }
