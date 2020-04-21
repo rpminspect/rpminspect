@@ -3,8 +3,6 @@ lib/checksums.c
 lib/constants.h
 lib/copyfile.c
 lib/debug.c
-lib/diff.c
-lib/diff.h
 lib/files.c
 lib/flags.c
 lib/free.c
@@ -52,6 +50,7 @@ lib/peers.c
 lib/readelf.c
 lib/readelf.h
 lib/readfile.c
+lib/release.c
 lib/results.c
 lib/results.h
 lib/rmtree.c
@@ -61,7 +60,6 @@ lib/runcmd.c
 lib/strfuncs.c
 lib/tty.c
 lib/types.h
-lib/unified_diff.c
 lib/unpack.c
 lib/whitelist.c
 src/builds.c

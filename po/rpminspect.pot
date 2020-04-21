@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: rpminspect\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-03-19 18:21-0400\n"
+"POT-Creation-Date: 2020-04-21 14:57-0400\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -253,22 +253,22 @@ msgstr ""
 msgid "`%s` added on %s"
 msgstr ""
 
-#: lib/inspect_annocheck.c:77 lib/inspect_annocheck.c:86
+#: lib/inspect_annocheck.c:79 lib/inspect_annocheck.c:88
 #, c-format
 msgid "annocheck '%s' test passes for %s on %s"
 msgstr ""
 
-#: lib/inspect_annocheck.c:79
+#: lib/inspect_annocheck.c:81
 #, c-format
 msgid "annocheck '%s' test now passes for %s on %s"
 msgstr ""
 
-#: lib/inspect_annocheck.c:81
+#: lib/inspect_annocheck.c:83
 #, c-format
 msgid "annocheck '%s' test now fails for %s on %s"
 msgstr ""
 
-#: lib/inspect_annocheck.c:88
+#: lib/inspect_annocheck.c:90
 #, c-format
 msgid "annocheck '%s' test fails for %s on %s"
 msgstr ""
@@ -377,61 +377,26 @@ msgstr ""
 msgid "Error running msgunfmt on %s on %s"
 msgstr ""
 
-#: lib/inspect_changedfiles.c:325
+#: lib/inspect_changedfiles.c:324
 #, c-format
 msgid "Message catalog %s changed content on %s"
 msgstr ""
 
-#: lib/inspect_changedfiles.c:334 lib/inspect_changedfiles.c:340
+#: lib/inspect_changedfiles.c:331 lib/inspect_changedfiles.c:337
 #, c-format
 msgid "*** Unable to remove temporary file %s: %s\n"
 msgstr ""
 
-#: lib/inspect_changedfiles.c:372
+#: lib/inspect_changedfiles.c:392
 #, c-format
 msgid ""
 "Public header file %s changed content on %s, Please make sure this does not "
 "change the ABI exported by this package.  The output of `diff -uw` follows."
 msgstr ""
 
-#: lib/inspect_changedfiles.c:389
+#: lib/inspect_changedfiles.c:407
 #, c-format
 msgid "File %s changed content on %s"
-msgstr ""
-
-#: lib/inspect_changelog.c:132
-#, c-format
-msgid "%%changelog lost between the %s and %s builds"
-msgstr ""
-
-#: lib/inspect_changelog.c:137
-#, c-format
-msgid "Gained %%changelog between the %s and %s builds"
-msgstr ""
-
-#: lib/inspect_changelog.c:142
-#, c-format
-msgid "No %%changelog present in the %s build"
-msgstr ""
-
-#: lib/inspect_changelog.c:147
-#, c-format
-msgid "No new %%changelog entry in the %s build"
-msgstr ""
-
-#: lib/inspect_changelog.c:215
-#, c-format
-msgid "%%changelog contains new text in the %s build"
-msgstr ""
-
-#: lib/inspect_changelog.c:219
-#, c-format
-msgid "%%changelog modified between the %s and %s builds"
-msgstr ""
-
-#: lib/inspect_changelog.c:231
-#, c-format
-msgid "%%changelog entry has unprofessional language in the %s build"
 msgstr ""
 
 #: lib/inspect_desktop.c:180 lib/inspect_disttag.c:55
@@ -777,32 +742,27 @@ msgstr ""
 msgid "Kernel module %s adds dependency '%s'"
 msgstr ""
 
-#: lib/inspect_license.c:45
+#: lib/inspect_license.c:46
 #, c-format
 msgid "*** Unable to open license db %s: %s\n"
 msgstr ""
 
-#: lib/inspect_license.c:130
+#: lib/inspect_license.c:403
 #, c-format
 msgid "Empty License Tag in %s"
 msgstr ""
 
-#: lib/inspect_license.c:139
+#: lib/inspect_license.c:412
 #, c-format
 msgid "Valid License Tag in %s: %s"
 msgstr ""
 
-#: lib/inspect_license.c:144
-#, c-format
-msgid "Invalid License Tag in %s: %s"
-msgstr ""
-
-#: lib/inspect_license.c:153
+#: lib/inspect_license.c:420
 #, c-format
 msgid "License Tag contains unprofessional language in %s: %s"
 msgstr ""
 
-#: lib/inspect_license.c:421
+#: lib/inspect_license.c:473
 #, c-format
 msgid "Missing license database: %s: %s"
 msgstr ""
@@ -1090,17 +1050,17 @@ msgstr ""
 msgid "Subpackage '%s' has disappeared on '%s'"
 msgstr ""
 
-#: lib/inspect_upstream.c:122
+#: lib/inspect_upstream.c:123
 #, c-format
 msgid "New upstream source file `%s` appeared"
 msgstr ""
 
-#: lib/inspect_upstream.c:142
+#: lib/inspect_upstream.c:147
 #, c-format
 msgid "Upstream source file `%s` changed content"
 msgstr ""
 
-#: lib/inspect_upstream.c:227
+#: lib/inspect_upstream.c:232
 #, c-format
 msgid "Source RPM member `%s` removed"
 msgstr ""
@@ -1165,22 +1125,22 @@ msgstr ""
 msgid "Result: %s\n"
 msgstr ""
 
-#: lib/output_text.c:96
+#: lib/output_text.c:95
 #, c-format
 msgid ""
 "Waiver Authorization: %s\n"
 "\n"
 msgstr ""
 
-#: lib/output_text.c:99
+#: lib/output_text.c:98
 #, c-format
 msgid ""
-"Screendump:\n"
+"Details:\n"
 "%s\n"
 "\n"
 msgstr ""
 
-#: lib/output_text.c:103
+#: lib/output_text.c:102
 #, c-format
 msgid ""
 "Suggested Remedy:\n"
@@ -1237,33 +1197,43 @@ msgid ""
 "specific rpminspect-data package on the system."
 msgstr ""
 
-#: lib/results.h:73 lib/results.h:79
+#: lib/results.h:71
+msgid ""
+"The specified license abbreviation is not listed as approved in the license "
+"database.  The license database is specified in the rpminspect.conf file.  "
+"Check this file and send a pull request to the appropriate upstream project "
+"to update the database.  If the license is listed in the database but marked "
+"unapproved, you may need to work with the legal team regarding options for "
+"this software."
+msgstr ""
+
+#: lib/results.h:74 lib/results.h:80
 msgid "Ensure all object files are compiled with -fPIC"
 msgstr ""
 
-#: lib/results.h:74
+#: lib/results.h:75
 msgid ""
 "Ensure that the package is being built with the correct compiler and "
 "compiler flags"
 msgstr ""
 
-#: lib/results.h:75
+#: lib/results.h:76
 msgid ""
 "The data in an ELF file appears to be corrupt; ensure that packaged ELF "
 "files are not being truncated or incorrectly modified"
 msgstr ""
 
-#: lib/results.h:76
+#: lib/results.h:77
 msgid ""
 "An ELF stack is marked as executable. Ensure that no execstack options are "
 "being passed to the linker, and that no functions are defined on the stack."
 msgstr ""
 
-#: lib/results.h:77
+#: lib/results.h:78
 msgid "Ensure executables are linked with with '-z relro -z now'"
 msgstr ""
 
-#: lib/results.h:78
+#: lib/results.h:79
 msgid ""
 "Ensure all object files are compiled with '-O2 -D_FORTIFY_SOURCE=2', and "
 "that all appropriate headers are included (no implicit function "
@@ -1271,139 +1241,139 @@ msgid ""
 "unable to determine the size of a buffer, which is not necessarily an error."
 msgstr ""
 
-#: lib/results.h:80
+#: lib/results.h:81
 msgid ""
 "Please review all usages of IPv4-only functions and ensure IPv6 compliance."
 msgstr ""
 
-#: lib/results.h:83
+#: lib/results.h:84
 msgid "Correct the errors in the man page as reported by the libmandoc parser."
 msgstr ""
 
-#: lib/results.h:84
+#: lib/results.h:85
 msgid ""
 "Correct the installation path for the man page. Man pages must be installed "
 "in the directory beneath /usr/share/man that matches the section number of "
 "the page."
 msgstr ""
 
-#: lib/results.h:87
+#: lib/results.h:88
 msgid "Correct the reported errors in the XML document"
 msgstr ""
 
-#: lib/results.h:90
+#: lib/results.h:91
 msgid ""
 "Refer to the Desktop Entry Specification at https://standards.freedesktop."
 "org/desktop-entry-spec/latest/ for help correcting the errors and warnings"
 msgstr ""
 
-#: lib/results.h:93
+#: lib/results.h:94
 #, c-format
 msgid ""
 "The Release: tag in the spec file must include a '%%{?dist}' string.  Please "
 "add this to the spec file per the distribution packaging guidelines."
 msgstr ""
 
-#: lib/results.h:96
+#: lib/results.h:97
 msgid ""
 "The spec file name does not match the expected NAME.spec format.  Rename the "
 "spec file to conform to this policy."
 msgstr ""
 
-#: lib/results.h:99
+#: lib/results.h:100
 msgid ""
 "This package is part of a module but is missing the %{modularitylabel} "
 "header tag.  Add this as a %%define in the spec file and rebuild."
 msgstr ""
 
-#: lib/results.h:102
+#: lib/results.h:103
 msgid ""
 "The Java bytecode version for one or more class files in the build was not "
 "met for the product release.  Ensure you are using the correct JDK for the "
 "build."
 msgstr ""
 
-#: lib/results.h:105
+#: lib/results.h:106
 msgid ""
 "Unexpected file changes were found.  Verify these changes are correct.  If "
 "they are not, adjust the build to prevent file changes."
 msgstr ""
 
-#: lib/results.h:108
+#: lib/results.h:109
 msgid ""
 "Unexpected file removals were found.  Verify these changes are correct.  If "
 "they are not, adjust the build to prevent the file removals."
 msgstr ""
 
-#: lib/results.h:111
+#: lib/results.h:112
 msgid ""
 "Unexpected file additions were found.  Verify these changes are correct.  If "
 "they are not, adjust the build to prevent the file additions."
 msgstr ""
 
-#: lib/results.h:114
+#: lib/results.h:115
 msgid ""
 "Unexpected changed source archive content.  The version of the package did "
 "not change between builds, but the source archive content did.  This may be "
 "deliberate, but needs inspection."
 msgstr ""
 
-#: lib/results.h:117
+#: lib/results.h:118
 #, c-format
 msgid "Make sure the %%files section includes the %%defattr macro."
 msgstr ""
 
-#: lib/results.h:118
+#: lib/results.h:119
 msgid ""
 "Bin path files must be owned by the bin_owner set in rpminspect.conf, which "
 "is usually root."
 msgstr ""
 
-#: lib/results.h:119
+#: lib/results.h:120
 msgid ""
 "Bin path files must be owned by the bin_group set in rpminspect.conf, which "
 "is usually root."
 msgstr ""
 
-#: lib/results.h:120
+#: lib/results.h:121
 msgid ""
 "Either chgrp the file to the bin_group set in rpminspect.conf or remove the "
 "world execute bit on the file (chmod o-x)."
 msgstr ""
 
-#: lib/results.h:121
+#: lib/results.h:122
 msgid ""
 "Either chgrp the file to the bin_group set in rpminspect.conf or remove the "
 "group write bit on the file (chmod g-w)."
 msgstr ""
 
-#: lib/results.h:122
+#: lib/results.h:123
 msgid ""
 "Verify the ownership changes are expected. If not, adjust the package build "
 "process to set correct owner and group information."
 msgstr ""
 
-#: lib/results.h:125
+#: lib/results.h:126
 msgid "Consult the shell documentation for proper syntax."
 msgstr ""
 
-#: lib/results.h:126
+#: lib/results.h:127
 msgid ""
 "The file referenced was not a known shell script in the before build but is "
 "now a shell script in the after build."
 msgstr ""
 
-#: lib/results.h:127
+#: lib/results.h:128
 msgid ""
 "The referenced shell script is invalid. Consider debugging it with the '-n' "
 "option on the shell to find and fix the problem."
 msgstr ""
 
-#: lib/results.h:130
+#: lib/results.h:131
 msgid "See annocheck(1) for more information."
 msgstr ""
 
-#: lib/results.h:133
+#: lib/results.h:134
 msgid ""
 "DT_NEEDED symbols have been added or removed.  This happens when the build "
 "environment has different versions of the required libraries.  Sometimes "
@@ -1412,19 +1382,19 @@ msgid ""
 "the correct shared libraries."
 msgstr ""
 
-#: lib/results.h:136
+#: lib/results.h:137
 msgid ""
 "A previously empty file is no longer empty.  Make sure this change is "
 "intended and fix the package spec file if necessary."
 msgstr ""
 
-#: lib/results.h:137
+#: lib/results.h:138
 msgid ""
 "A previously non-empty file is now empty.  Make sure this change is intended "
 "and fix the package space file if necessary."
 msgstr ""
 
-#: lib/results.h:140
+#: lib/results.h:141
 msgid ""
 "Unexpected capabilities were found on the indicated file.  Consult "
 "capabilities(7) and either adjust the files in the package or modify the "
@@ -1432,61 +1402,61 @@ msgid ""
 "security team may also be of help for this situation."
 msgstr ""
 
-#: lib/results.h:143
+#: lib/results.h:144
 msgid ""
 "Kernel module parameters were removed between builds.  This may present "
 "usability problems for users if module parameters were removed in a "
 "maintenance update."
 msgstr ""
 
-#: lib/results.h:144
+#: lib/results.h:145
 msgid ""
 "Kernel module dependencies changed between builds.  This may present "
 "usability problems for users if module dependencies changed in a maintenance "
 "update."
 msgstr ""
 
-#: lib/results.h:145
+#: lib/results.h:146
 msgid ""
 "Kernel module device aliases changed between builds.  This may present "
 "usability problems for users if module device aliases changed in a "
 "maintenance update."
 msgstr ""
 
-#: lib/results.h:148
+#: lib/results.h:149
 msgid ""
 "An architecture present in the before build is now missing in the after "
 "build.  This may be deliberate, but check to make sure you do not have any "
 "unexpected ExclusiveArch lines in the spec file."
 msgstr ""
 
-#: lib/results.h:149
+#: lib/results.h:150
 msgid ""
 "A new architecture has appeared in the after build.  This may indicate "
 "progress in the world of computing."
 msgstr ""
 
-#: lib/results.h:152
+#: lib/results.h:153
 msgid ""
 "A subpackage present in the before build is now missing in the after build.  "
 "This may be deliberate, but check to make sure you have correct syntax "
 "defining the subpackage in the spec file"
 msgstr ""
 
-#: lib/results.h:153
+#: lib/results.h:154
 msgid ""
 "A new subpackage has appeared in the after build.  This may indicate "
 "progress in the world of computing."
 msgstr ""
 
-#: lib/results.h:156
+#: lib/results.h:157
 #, c-format
 msgid ""
-"Make sure the spec file in the after build contains a valid %%changelog "
+"Make sure the spec file in the after build contains a valid %changelog "
 "section."
 msgstr ""
 
-#: lib/results.h:159
+#: lib/results.h:160
 msgid ""
 "Files should not be installed in old directory names.  Modify the package to "
 "install the affected file to the preferred directory."
