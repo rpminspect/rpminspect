@@ -4,7 +4,7 @@
 # use Copr for automated builds and that carry template RPM spec
 # files.  See README for more information.
 #
-# Copyright (C) 2019 David Cantrell <david.l.cantrell@gmail.com>
+# Copyright (C) 2019-2020 David Cantrell <david.l.cantrell@gmail.com>
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -188,36 +188,17 @@ if [ "${OPT_GITHUB}" = "y" ]; then
     fi
 
     # More Github settings
-    GH_TAGS="${GH_REPO}/releases/tags/${TAG}"
-    GH_AUTH="Authorization: token ${TOKEN}"
+    GH_TAGS="${GH_REPO}/releases?access_token=${TOKEN}"
 
-    # Validate Github token
-    ${CURL} -o /dev/null -sH "${GH_AUTH}" "${GH_REPO}"
-    if [ $? -ne 0 ]; then
-        echo "*** Invalid Github token, repo, or a network issue" >&2
-        exit 1
-    fi
-
-    # Create new release on github
-    API_JSON=$(jq -ns --arg tag_name "${TAG}" --arg target_commitish "${TAG}" --arg name "${PROJECT}-${VERSION}" --arg body "$(git log --format="%s" ${OLDTAG}.. | sed -e 's|^|* |g')" '{ tag_name: $tag_name, target_commitish: $target_commitish, name: $name, body: $body, draft: false, prerelease: false }')
-    RELEASE_INFO="$(mktemp)"
-    ${CURL} -o "${RELEASE_INFO}" --data "${API_JSON}" https://api.github.com/repos/${OWNER}/${PROJECT}/releases?access_token=${TOKEN}
-
-    # Get the ID of the asset
-    ASSET_ID="$(grep -m 1 "id.:" ${RELEASE_INFO} | grep -w id | tr : = | tr -cd '[[:alnum:]]=' | cut -d '=' -f 2)"
-    if [ -z "${ASSET_ID}" ]; then
-        echo "*** Unable to get the asset ID" >&2
-        cat ${RELEASE_INFO}
-        rm -f ${RELEASE_INFO}
-        exit 1
-    fi
-    rm -f ${RELEASE_INFO}
+    # Create the release
+    RELEASE_JSON=$(printf '{"tag_name": "v%s","target_commitish": "master","name": "${PROJECT}-%s","body": "%s","draft": true,"prerelease": false}' "${VERSION}" "${VERSION}" "release paragraph")
+    RELEASE_ID="$(${CURL} --data "${RELEASE_JSON}" "${GH_REPO}" | python3 -c "import sys, json; print json.load(sys.stdin)['id']")"
 
     # Upload the assets
     cd build/meson-dist
     for asset in ${PROJECT}-${VERSION}.tar.xz ${PROJECT}-${VERSION}.tar.xz.asc ; do
-        GH_ASSET="https://uploads.github.com/repos/${OWNER}/${PROJECT}/releases/${ASSET_ID}/assets?name=${asset}"
-        ${CURL} -H "${GH_AUTH}" --data-binary @"${asset}" -H "Content-Type: application/octet-stream" ${GH_ASSET}
+        GH_ASSET="https://uploads.github.com/repos/${OWNER}/${PROJECT}/releases/${ASSET_ID}/assets?name=${asset}&access_token=${TOKEN}"
+        ${CURL} --data-binary @"${asset}" -H "Content-Type: application/octet-stream" "${GH_ASSET}"
     done
     cd ${CWD}
 fi
