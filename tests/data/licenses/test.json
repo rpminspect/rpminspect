@@ -19,6 +19,16 @@
     "spdx_name": "GNU General Public License v2.0 or later",
     "url": "https://spdx.org/licenses/GPL-2.0+.html"
   },
+  "GNU General Public License v2.0 or later, with font embedding exception": {
+    "approved": "yes",
+    "fedora_abbrev": "GPLv2+ with exceptions",
+    "fedora_name": "GNU General Public License v2.0 or later, with font embedding exception",
+    "id": "229",
+    "license_text": "",
+    "spdx_abbrev": "",
+    "spdx_name": "",
+    "url": "http://www.gnu.org/licenses/gpl-faq.html#FontException"
+  },
   "GNU General Public License v3.0 only": {
     "approved": "yes",
     "fedora_abbrev": "GPLv3",
@@ -138,5 +148,65 @@
     "spdx_abbrev": "Apache-2.0",
     "spdx_name": "Apache License 2.0",
     "url": "http://www.apache.org/licenses/LICENSE-2.0"
+  },
+  "GNU Lesser General Public License v2 (or 2.1) or later": {
+    "approved": "yes",
+    "fedora_abbrev": "LGPLv2+",
+    "fedora_name": "GNU Lesser General Public License v2 (or 2.1) or later",
+    "id": "240",
+    "license_text": "",
+    "spdx_abbrev": "",
+    "spdx_name": "",
+    "url": "http://www.gnu.org/licenses/old-licenses/lgpl-2.1.html"
+  },
+  "GNU Lesser General Public License v2 (or 2.1) or later, with exceptions": {
+    "approved": "yes",
+    "fedora_abbrev": "LGPLv2+ with exceptions",
+    "fedora_name": "GNU Lesser General Public License v2 (or 2.1) or later, with exceptions",
+    "id": "241",
+    "license_text": "",
+    "spdx_abbrev": "",
+    "spdx_name": "",
+    "url": ""
+  },
+  "ISC License": {
+    "approved": "yes",
+    "fedora_abbrev": "ISC",
+    "fedora_name": "ISC License (Bind, DHCP Server)",
+    "id": "279",
+    "license_text": "",
+    "spdx_abbrev": "ISC",
+    "spdx_name": "ISC License",
+    "url": "http://www.isc.org/downloads/software-support-policy/isc-license/"
+  },
+  "Public Domain": {
+    "approved": "yes",
+    "fedora_abbrev": "Public Domain",
+    "fedora_name": "Public Domain",
+    "id": "429",
+    "license_text": "Being in the public domain is not a license; rather, it means the material is not copyrighted and no license is needed.",
+    "spdx_abbrev": "",
+    "spdx_name": "",
+    "url": ""
+  },
+  "GNU Free Documentation License": {
+    "approved": "yes",
+    "fedora_abbrev": "GFDL",
+    "fedora_name": "GNU Free Documentation License",
+    "id": "600",
+    "license_text": "",
+    "spdx_abbrev": "GFDL-1.3",
+    "spdx_name": "GNU Free Documentation License v1.3",
+    "url": "http://www.fsf.org/licensing/licenses/fdl.html"
+  },
+  "Inner Net License": {
+    "approved": "yes",
+    "fedora_abbrev": "Inner-Net",
+    "fedora_name": "Inner Net License",
+    "id": "9000",
+    "license_text": "",
+    "spdx_abbrev": "",
+    "spdx_name": "",
+    "url": "https://old.calculate-linux.org/packages/licenses/inner-net"
   }
 }
