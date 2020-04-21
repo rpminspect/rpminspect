@@ -16,28 +16,35 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 #
 
+import unittest
 from baseclass import TestSRPM, TestRPMs, TestKoji
 
 # Empty License tag fails on SRPM (BAD)
 class EmptyLicenseTagSRPM(TestSRPM):
+    @unittest.skip("requires self.license=None support in rpmfluff")
     def setUp(self):
         TestSRPM.setUp(self)
+        self.rpm.license = ''
         self.inspection = 'license'
         self.label = 'license'
         self.result = 'BAD'
 
 # Empty License tag fails on RPMs (BAD)
 class EmptyLicenseTagRPMs(TestRPMs):
+    @unittest.skip("requires self.license=None support in rpmfluff")
     def setUp(self):
         TestRPMs.setUp(self)
+        self.rpm.license = ''
         self.inspection = 'license'
         self.label = 'license'
         self.result = 'BAD'
 
 # Empty License tag fails on Koji build (BAD)
-class EmptyLicenseTagKojiBuild(TestKoji):
+class EmptyLicenseTagKoji(TestKoji):
+    @unittest.skip("requires self.license=None support in rpmfluff")
     def setUp(self):
         TestKoji.setUp(self)
+        self.rpm.license = ''
         self.inspection = 'license'
         self.label = 'license'
         self.result = 'BAD'
@@ -61,7 +68,7 @@ class ForbiddenLicenseTagRPMs(TestRPMs):
         self.result = 'BAD'
 
 # Forbidden License tag fails on Koji build (BAD)
-class ForbiddenLicenseTagKojiBuild(TestKoji):
+class ForbiddenLicenseTagKoji(TestKoji):
     def setUp(self):
         TestKoji.setUp(self)
         self.rpm.addLicense("APSL-1.2")
@@ -88,7 +95,7 @@ class BadWordLicenseTagRPMs(TestRPMs):
         self.result = 'BAD'
 
 # License tag with unprofessional language fails on Koji build (BAD)
-class BadWordLicenseTagKojiBuild(TestKoji):
+class BadWordLicenseTagKoji(TestKoji):
     def setUp(self):
         TestKoji.setUp(self)
         self.rpm.addLicense("GPLv2+ and reallybadword and MIT")
@@ -115,7 +122,7 @@ class ValidLicenseTagRPMs(TestRPMs):
         self.result = 'INFO'
 
 # Valid License tag passes on Koji build (OK)
-class ValidLicenseTagKojiBuild(TestKoji):
+class ValidLicenseTagKoji(TestKoji):
     def setUp(self):
         TestKoji.setUp(self)
         self.rpm.addLicense("GPLv3+")
@@ -142,7 +149,7 @@ class ValidLicenseTagWithSpacesRPMs(TestRPMs):
         self.result = 'INFO'
 
 # Valid License tag with spaces passes on Koji build (OK)
-class ValidLicenseTagWithSpacesKojiBuild(TestKoji):
+class ValidLicenseTagWithSpacesKoji(TestKoji):
     def setUp(self):
         TestKoji.setUp(self)
         self.rpm.addLicense("ASL 2.0")
@@ -169,7 +176,7 @@ class ValidLicenseTagWithBooleanSpacesRPMs(TestRPMs):
         self.result = 'INFO'
 
 # Valid License tag with spaces passes on Koji build (OK)
-class ValidLicenseTagWithBooleanSpacesKojiBuild(TestKoji):
+class ValidLicenseTagWithBooleanSpacesKoji(TestKoji):
     def setUp(self):
         TestKoji.setUp(self)
         self.rpm.addLicense("GPLv3+ or ASL 2.0")
@@ -196,15 +203,13 @@ class ValidLicenseTagWithBooleanSpacesParensRPMs(TestRPMs):
         self.result = 'INFO'
 
 # Valid License tag with spaces and parens passes on Koji build (OK)
-class ValidLicenseTagWithBooleanSpacesParensKojiBuild(TestKoji):
+class ValidLicenseTagWithBooleanSpacesParensKoji(TestKoji):
     def setUp(self):
         TestKoji.setUp(self)
         self.rpm.addLicense("Artistic 2.0 and (GPL+ or Artistic)")
         self.inspection = 'license'
         self.label = 'license'
         self.result = 'INFO'
-
-
 
 # Valid License tag with spaces and parens passes on SRPM (OK)
 class AnotherValidLicenseTagWithBooleanSpacesParensSRPM(TestSRPM):
@@ -225,10 +230,19 @@ class AnotherValidLicenseTagWithBooleanSpacesParensRPMs(TestRPMs):
         self.result = 'INFO'
 
 # Valid License tag with spaces and parens passes on Koji build (OK)
-class AnotherValidLicenseTagWithBooleanSpacesParensKojiBuild(TestKoji):
+class AnotherValidLicenseTagWithBooleanSpacesParensKoji(TestKoji):
     def setUp(self):
         TestKoji.setUp(self)
         self.rpm.addLicense("MIT and (BSD or ASL 2.0)")
+        self.inspection = 'license'
+        self.label = 'license'
+        self.result = 'INFO'
+
+# Valid glibc License tag on Koji build (OK)
+class ValidGlibcLicenseTagKoji(TestKoji):
+    def setUp(self):
+        TestKoji.setUp(self)
+        self.rpm.addLicense("LGPLv2+ and LGPLv2+ with exceptions and GPLv2+ and GPLv2+ with exceptions and BSD and Inner-Net and ISC and Public Domain and GFDL")
         self.inspection = 'license'
         self.label = 'license'
         self.result = 'INFO'
