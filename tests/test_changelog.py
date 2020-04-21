@@ -221,32 +221,16 @@ class AddChangeLogEntryCompareKoji(TestCompareKoji):
 
 # 3) Add unprofessional language to the after build %changelog and make
 #    sure that is reported as BAD.
-#class UnprofessinalChangeLogEntryRPMs(TestRPMs):
-#    def setUp(self):
-#        TestRPMs.setUp(self)
-#
-#        # create a simple prefix that will result in a new entry
-#        today = datetime.date.today().strftime("%a %b %d %Y")
-#        clog = "* %s Packie McPackerson <packie@mcpackerson.io> - 47.7-1\n- Upgrade to anotherbadword release\n\n" % today
-#
-#        # modify the changelog
-#        self.rpm.section_changelog = clog
-#
-#        self.inspection = 'changelog'
-#        self.label = 'changelog'
-#        self.result = 'BAD'
-#        self.waiver_auth = 'Not Waivable'
-#
-#class UnprofessionalChangeLogEntryCompareKoji(TestCompareKoji):
+#class UnprofessinalChangeLogEntryCompareKoji(TestCompareKoji):
 #    def setUp(self):
 #        TestCompareKoji.setUp(self)
 #
-#        # create a simple prefix that will result in a new entry
+#        # create a change with a bad word
 #        today = datetime.date.today().strftime("%a %b %d %Y")
-#        after_prefix = "* %s Packie McPackerson <packie@mcpackerson.io> - 47.7-1\n- Upgrade to anotherbadword release\n\n" % today
+#        after_prefix = "* %s Packie McPackerson <packie@mcpackerson.io> - 47.7-1\n- Upgrade to the latest and anotherbadword greatest\n\n" % today
 #        suffix = "* %s Packie McPackerson <packie@mcpackerson.io> - 1.0\n- Initial package\n" % today
 #
-#        # modify the changelogs
+#        # modify the changelog
 #        self.before_rpm.section_changelog = suffix
 #        self.after_rpm.section_changelog = after_prefix + suffix
 #
