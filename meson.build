@@ -6,8 +6,7 @@ project('rpminspect',
             'warning_level=2',
             'buildtype=debugoptimized'
         ],
-        license : 'GPLv3+',
-        meson_version : '>=0.51.0')
+        license : 'GPLv3+')
 
 cc = meson.get_compiler('c')
 
