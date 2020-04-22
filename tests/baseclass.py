@@ -112,7 +112,9 @@ class RequiresRpminspect(unittest.TestCase):
                 if self.buildhost_subdomain:
                     f.write("buildhost_subdomain = \"%s\"\n" % self.buildhost_subdomain)
                 else:
-                    f.write("buildhost_subdomain = \"%s\"\n" % socket.getfqdn())
+                    hn = socket.getfqdn()
+                    if hn.startswith("localhost"):
+                        f.write("buildhost_subdomain = \"localhost %s\"\n" % hn)
             else:
                 f.write(line)
 
