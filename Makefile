@@ -1,8 +1,17 @@
 MESON_BUILD_DIR = build
 topdir := $(shell realpath $(dir $(lastword $(MAKEFILE_LIST))))
 
+# ninja may be called something else
+NINJA := $(shell which ninja 2>/dev/null)
+ifeq ($(NINJA),)
+NINJA := $(shell which ninja-build 2>/dev/null)
+endif
+ifeq ($(NINJA),)
+NINJA := $(error "Unable to find a suitable `ninja' command in the PATH")
+endif
+
 all: setup
-	ninja -C $(MESON_BUILD_DIR) -v
+	$(NINJA) -C $(MESON_BUILD_DIR) -v
 
 setup:
 	meson setup $(MESON_BUILD_DIR)
@@ -17,7 +26,7 @@ update-pot: setup
 	find lib -type f -name "*.h" >> po/POTFILES.new
 	sort po/POTFILES.new | uniq > po/POTFILES
 	rm -f po/POTFILES.new
-	ninja -C $(MESON_BUILD_DIR) rpminspect-pot
+	$(NINJA) -C $(MESON_BUILD_DIR) rpminspect-pot
 
 srpm:
 	$(topdir)/utils/srpm.sh
