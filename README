@@ -196,7 +196,10 @@ you can do this:
     meson setup build
     ninja -C build
 
-You can get verbose build output with "ninja -C build -v"
+You can get verbose build output with "ninja -C build -v".
+
+NOTE:  On CentOS 7.x and RHEL 7.x systems, the ninja command is named
+'ninja-build' and installed in /usr/bin.
 
 For more information on meson and ninja, see these sites:
 
@@ -382,10 +385,8 @@ project.  Some things to keep in mind:
       library.
 
     * Alternative libraries intended to replace a build requirement
-      are ok so long as configure.ac and the corresponding Makefile.am
-      templates are modified to conditionalize everything.  For
-      example, if there is a compatible but different json-c library,
-      it's ok to meson options that would be something like:
+      are ok so long as meson.build and meson_options.txt are modified
+      to conditionalize the choices.  For example:
 
           -Djson_lib=other_json_lib
 
