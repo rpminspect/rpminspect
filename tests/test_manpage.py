@@ -67,13 +67,7 @@ class ManPageNotGzippedRPM(TestRPMs):
         self.rpm.header += "%global __brp_compress /bin/true\n"
 
         # add an uncompressed man page
-        sourceIndex = self.rpm.add_source(rpmfluff.SourceFile('foo.1', rpmfluff.sample_man_page))
-        installPath = 'usr/share/man/man1/foo.1'
-        self.rpm.create_parent_dirs(installPath)
-        self.rpm.section_install += 'cp %%{SOURCE%i} $RPM_BUILD_ROOT/%s\n' % (sourceIndex, self.rpm.escape_path(installPath))
-        sub = self.rpm.get_subpackage(None)
-        sub.section_files += '/%s\n' % installPath
-        self.rpm.add_payload_check(installPath, None)
+        self.rpm.add_installed_file('usr/local/share/man/man1/foo.1', rpmfluff.SourceFile('foo.1', rpmfluff.sample_man_page))
 
         # the test
         self.inspection = 'manpage'
@@ -92,13 +86,7 @@ class ManPageNotGzippedKoji(TestKoji):
         self.rpm.header += "%global __brp_compress /bin/true\n"
 
         # add an uncompressed man page
-        sourceIndex = self.rpm.add_source(rpmfluff.SourceFile('foo.1', rpmfluff.sample_man_page))
-        installPath = 'usr/share/man/man1/foo.1'
-        self.rpm.create_parent_dirs(installPath)
-        self.rpm.section_install += 'cp %%{SOURCE%i} $RPM_BUILD_ROOT/%s\n' % (sourceIndex, self.rpm.escape_path(installPath))
-        sub = self.rpm.get_subpackage(None)
-        sub.section_files += '/%s\n' % installPath
-        self.rpm.add_payload_check(installPath, None)
+        self.rpm.add_installed_file('usr/local/share/man/man1/foo.1', rpmfluff.SourceFile('foo.1', rpmfluff.sample_man_page))
 
         # the test
         self.inspection = 'manpage'
@@ -118,19 +106,8 @@ class ManPageNotGzippedCompareRPMs(TestCompareRPMs):
         self.after_rpm.header += "%global __brp_compress /bin/true\n"
 
         # add an uncompressed man page
-        beforeIndex = self.before_rpm.add_source(rpmfluff.SourceFile('foo.1', rpmfluff.sample_man_page))
-        afterIndex = self.after_rpm.add_source(rpmfluff.SourceFile('foo.1', rpmfluff.sample_man_page))
-        installPath = 'usr/share/man/man1/foo.1'
-        self.before_rpm.create_parent_dirs(installPath)
-        self.after_rpm.create_parent_dirs(installPath)
-        self.before_rpm.section_install += 'cp %%{SOURCE%i} $RPM_BUILD_ROOT/%s\n' % (beforeIndex, self.before_rpm.escape_path(installPath))
-        self.after_rpm.section_install += 'cp %%{SOURCE%i} $RPM_BUILD_ROOT/%s\n' % (afterIndex, self.after_rpm.escape_path(installPath))
-        sub = self.before_rpm.get_subpackage(None)
-        sub.section_files += '/%s\n' % installPath
-        sub = self.after_rpm.get_subpackage(None)
-        sub.section_files += '/%s\n' % installPath
-        self.before_rpm.add_payload_check(installPath, None)
-        self.after_rpm.add_payload_check(installPath, None)
+        self.before_rpm.add_installed_file('usr/local/share/man/man1/foo.1', rpmfluff.SourceFile('foo.1', rpmfluff.sample_man_page))
+        self.after_rpm.add_installed_file('usr/local/share/man/man1/foo.1', rpmfluff.SourceFile('foo.1', rpmfluff.sample_man_page))
 
         # the test
         self.inspection = 'manpage'
@@ -150,19 +127,8 @@ class ManPageNotGzippedCompareKoji(TestCompareKoji):
         self.after_rpm.header += "%global __brp_compress /bin/true\n"
 
         # add an uncompressed man page
-        beforeIndex = self.before_rpm.add_source(rpmfluff.SourceFile('foo.1', rpmfluff.sample_man_page))
-        afterIndex = self.after_rpm.add_source(rpmfluff.SourceFile('foo.1', rpmfluff.sample_man_page))
-        installPath = 'usr/share/man/man1/foo.1'
-        self.before_rpm.create_parent_dirs(installPath)
-        self.after_rpm.create_parent_dirs(installPath)
-        self.before_rpm.section_install += 'cp %%{SOURCE%i} $RPM_BUILD_ROOT/%s\n' % (beforeIndex, self.before_rpm.escape_path(installPath))
-        self.after_rpm.section_install += 'cp %%{SOURCE%i} $RPM_BUILD_ROOT/%s\n' % (afterIndex, self.after_rpm.escape_path(installPath))
-        sub = self.before_rpm.get_subpackage(None)
-        sub.section_files += '/%s\n' % installPath
-        sub = self.after_rpm.get_subpackage(None)
-        sub.section_files += '/%s\n' % installPath
-        self.before_rpm.add_payload_check(installPath, None)
-        self.after_rpm.add_payload_check(installPath, None)
+        self.before_rpm.add_installed_file('usr/local/share/man/man1/foo.1', rpmfluff.SourceFile('foo.1', rpmfluff.sample_man_page))
+        self.after_rpm.add_installed_file('usr/local/share/man/man1/foo.1', rpmfluff.SourceFile('foo.1', rpmfluff.sample_man_page))
 
         # the test
         self.inspection = 'manpage'
@@ -174,7 +140,7 @@ class ManPageNotGzippedCompareKoji(TestCompareKoji):
 class ManPageWrongSectionRPM(TestRPMs):
     def setUp(self):
         TestRPMs.setUp(self)
-        self.rpm.add_manpage(sourceFileName='foo.8', installPath='usr/share/man/man1/foo.8')
+        self.rpm.add_manpage(sourceFileName='foo.8', installPath='usr/share/man/man1/foo.8.gz')
         self.inspection = 'manpage'
         self.label = 'man-pages'
         self.result = 'VERIFY'
@@ -184,7 +150,7 @@ class ManPageWrongSectionRPM(TestRPMs):
 class ManPageWrongSectionKoji(TestKoji):
     def setUp(self):
         TestKoji.setUp(self)
-        self.rpm.add_manpage(sourceFileName='foo.8', installPath='usr/share/man/man1/foo.8')
+        self.rpm.add_manpage(sourceFileName='foo.8', installPath='usr/share/man/man1/foo.8.gz')
         self.inspection = 'manpage'
         self.label = 'man-pages'
         self.result = 'VERIFY'
@@ -194,8 +160,8 @@ class ManPageWrongSectionKoji(TestKoji):
 class ManPageWrongSectionCompareRPMs(TestCompareRPMs):
     def setUp(self):
         TestCompareRPMs.setUp(self)
-        self.before_rpm.add_manpage(sourceFileName='foo.8', installPath='usr/share/man/man1/foo.8')
-        self.after_rpm.add_manpage(sourceFileName='foo.8', installPath='usr/share/man/man1/foo.8')
+        self.before_rpm.add_manpage(sourceFileName='foo.8', installPath='usr/share/man/man1/foo.8.gz')
+        self.after_rpm.add_manpage(sourceFileName='foo.8', installPath='usr/share/man/man1/foo.8.gz')
         self.inspection = 'manpage'
         self.label = 'man-pages'
         self.result = 'VERIFY'
@@ -205,8 +171,8 @@ class ManPageWrongSectionCompareRPMs(TestCompareRPMs):
 class ManPageWrongSectionCompareRPMs(TestCompareKoji):
     def setUp(self):
         TestCompareKoji.setUp(self)
-        self.before_rpm.add_manpage(sourceFileName='foo.8', installPath='usr/share/man/man1/foo.8')
-        self.after_rpm.add_manpage(sourceFileName='foo.8', installPath='usr/share/man/man1/foo.8')
+        self.before_rpm.add_manpage(sourceFileName='foo.8', installPath='usr/share/man/man1/foo.8.gz')
+        self.after_rpm.add_manpage(sourceFileName='foo.8', installPath='usr/share/man/man1/foo.8.gz')
         self.inspection = 'manpage'
         self.label = 'man-pages'
         self.result = 'VERIFY'
@@ -217,11 +183,8 @@ class InvalidManPageRPM(TestRPMs):
     def setUp(self):
         TestRPMs.setUp(self)
 
-        # disable automatic compressing since we are simulating that
-        self.rpm.header += "%global __brp_compress /bin/true\n"
-
         # add a bad man page
-        self.rpm.add_installed_file('/usr/share/man/man1/foo.1', rpmfluff.GeneratedSourceFile('foo.1', rpmfluff.make_png()))
+        self.rpm.add_installed_file('/usr/share/man/man1/foo.1.gz', rpmfluff.GeneratedSourceFile('foo.1', rpmfluff.make_png()))
 
         # the test
         self.inspection = 'manpage'
@@ -234,11 +197,8 @@ class InvalidManPageKoji(TestKoji):
     def setUp(self):
         TestKoji.setUp(self)
 
-        # disable automatic compressing since we are simulating that
-        self.rpm.header += "%global __brp_compress /bin/true\n"
-
         # add a bad man page
-        self.rpm.add_installed_file('/usr/share/man/man1/foo.1', rpmfluff.GeneratedSourceFile('foo.1', rpmfluff.make_png()))
+        self.rpm.add_installed_file('/usr/share/man/man1/foo.1.gz', rpmfluff.GeneratedSourceFile('foo.1', rpmfluff.make_png()))
 
         # the test
         self.inspection = 'manpage'
@@ -251,13 +211,9 @@ class InvalidManPageCompareRPMs(TestCompareRPMs):
     def setUp(self):
         TestCompareRPMs.setUp(self)
 
-        # disable automatic compressing since we are simulating that
-        self.before_rpm.header += "%global __brp_compress /bin/true\n"
-        self.after_rpm.header += "%global __brp_compress /bin/true\n"
-
         # add a bad man page
-        self.before_rpm.add_installed_file('/usr/share/man/man1/foo.1', rpmfluff.GeneratedSourceFile('foo.1', rpmfluff.make_png()))
-        self.after_rpm.add_installed_file('/usr/share/man/man1/foo.1', rpmfluff.GeneratedSourceFile('foo.1', rpmfluff.make_png()))
+        self.before_rpm.add_installed_file('/usr/share/man/man1/foo.1.gz', rpmfluff.GeneratedSourceFile('foo.1', rpmfluff.make_png()))
+        self.after_rpm.add_installed_file('/usr/share/man/man1/foo.1.gz', rpmfluff.GeneratedSourceFile('foo.1', rpmfluff.make_png()))
 
         # the test
         self.inspection = 'manpage'
@@ -270,13 +226,9 @@ class InvalidManPageCompareKoji(TestCompareKoji):
     def setUp(self):
         TestCompareKoji.setUp(self)
 
-        # disable automatic compressing since we are simulating that
-        self.before_rpm.header += "%global __brp_compress /bin/true\n"
-        self.after_rpm.header += "%global __brp_compress /bin/true\n"
-
         # add a bad man page
-        self.before_rpm.add_installed_file('/usr/share/man/man1/foo.1', rpmfluff.GeneratedSourceFile('foo.1', rpmfluff.make_png()))
-        self.after_rpm.add_installed_file('/usr/share/man/man1/foo.1', rpmfluff.GeneratedSourceFile('foo.1', rpmfluff.make_png()))
+        self.before_rpm.add_installed_file('/usr/share/man/man1/foo.1.gz', rpmfluff.GeneratedSourceFile('foo.1', rpmfluff.make_png()))
+        self.after_rpm.add_installed_file('/usr/share/man/man1/foo.1.gz', rpmfluff.GeneratedSourceFile('foo.1', rpmfluff.make_png()))
 
         # the test
         self.inspection = 'manpage'
