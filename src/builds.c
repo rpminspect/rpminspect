@@ -281,7 +281,9 @@ static void curl_helper(const bool verbose, const char *src, const char *dst) {
     curl_easy_setopt(c, CURLOPT_URL, src);
     curl_easy_setopt(c, CURLOPT_WRITEDATA, fp);
     curl_easy_setopt(c, CURLOPT_FAILONERROR, true);
+#ifdef CURLOPT_TCP_FASTOPEN /* not available on all versions of libcurl (e.g., <= 7.29) */
     curl_easy_setopt(c, CURLOPT_TCP_FASTOPEN, 1);
+#endif
     cc = curl_easy_perform(c);
 
     if (fclose(fp) != 0) {
