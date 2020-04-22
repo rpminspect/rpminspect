@@ -105,12 +105,19 @@ static void parse_list(const char *tmp, string_list_t **list)
  *        key = value
  * We use these for the jvm and products, maybe other things.
  */
-static void read_mapping(const dictionary *cfg, const char *section,
-                         struct hsearch_data **table, string_list_t **keys)
+#if _INIPARSER == 3  /* w/ v4.x lib, cfg and section come in as const pointers */
+static void read_mapping(dictionary *cfg, char *section, struct hsearch_data **table, string_list_t **keys)
+#else
+static void read_mapping(const dictionary *cfg, const char *section, struct hsearch_data **table, string_list_t **keys)
+#endif
 {
     size_t len = 0;
     int nk = 0;
+#if _INIPARSER == 3
+    char **k = NULL;
+#else
     const char **k = NULL;
+#endif
     const char *v = NULL;
     ENTRY e;
     ENTRY *eptr;
@@ -129,7 +136,7 @@ static void read_mapping(const dictionary *cfg, const char *section,
 #endif
 
 #if _INIPARSER == 3
-        if (iniparser_getseckeys(cfg, section) == NULL) {
+        if ((k = iniparser_getseckeys(cfg, section)) == NULL) {
 #else
         if (iniparser_getseckeys(cfg, section, k) == NULL) {
             free(k);
@@ -407,7 +414,11 @@ static int read_cfgfile(dictionary *cfg, struct rpminspect *ri, const char *file
         k = calloc(nk, len);
         assert(k != NULL);
 
+#if _INIPARSER == 3
+        if (iniparser_getseckeys(cfg, INSPECTIONS) == NULL) {
+#else
         if (iniparser_getseckeys(cfg, INSPECTIONS, k) == NULL) {
+#endif
             free(k);
             nk = 0;
         }
