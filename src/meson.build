@@ -16,9 +16,3 @@ rpminspect_prog = executable(
 
 # Install man pages
 install_man('rpminspect.1')
-
-# Install the configuration file
-install_data(
-    sources : 'rpminspect.conf',
-    install_dir : get_option('sysconfdir') + '/rpminspect'
-)
