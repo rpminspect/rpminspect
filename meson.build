@@ -12,7 +12,7 @@ cc = meson.get_compiler('c')
 
 # Pull in all the usual glibc defines
 add_global_arguments('-D_GNU_SOURCE', language : 'c')
-add_global_arguments('-DPACKAGE_VERSION="@@0@@"'.format(meson.project_version()), language : 'c')
+add_global_arguments('-DPACKAGE_VERSION="@0@"'.format(meson.project_version()), language : 'c')
 
 # Translations
 if find_program('xgettext', required : get_option('nls')).found()
