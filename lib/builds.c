@@ -28,7 +28,6 @@
 #include <rpm/rpmlib.h>
 #include <curl/curl.h>
 #include <yaml.h>
-#include "builds.h"
 #include "rpminspect.h"
 
 /* Local global variables */

@@ -31,7 +31,6 @@
 #include <regex.h>
 
 #include "rpminspect.h"
-#include "builds.h"
 
 /* Global librpminspect state */
 struct rpminspect ri;
