@@ -1,5 +1,3 @@
-/* Calculate an MD5, SHA-1, or SHA-256 checksum for a file. */
-
 /* {{{ Apache License version 2.0
  */
 /*
@@ -21,6 +19,16 @@
  */
 /* }}} */
 
+/**
+ * @file checksums.c
+ * @author David Cantrell
+ * @author Chris Lumens
+ * @author David Shea
+ * @date 2004-2019
+ * @brief Calculate an MD5, SHA-1, or SHA-256 checksum for a file.
+ * @copyright Apache-2.0
+ */
+
 #include <stdio.h>
 #include <unistd.h>
 #include <string.h>
@@ -34,10 +42,19 @@
 
 #include "rpminspect.h"
 
-/*
- * Take in a file, return a checksum.
- * NOTE: The caller is responsible for freeing the string returned by
- *       this function.
+/**
+ * @brief Take in a file, return a checksum.
+ *
+ * Given a file, its **mode_t**, and a valid checksum type, compute
+ * the checksum and return the human-readable digest string for that
+ * checksum.  This function allocates memory for the string and the
+ * caller must free it when done.
+ *
+ * @param filename Filename the function should use.
+ * @param st_mode The **mode_t** for the specified file, gathered from **stat(2)**.
+ * @param type Which checksum type to calculate.
+ * @note Caller must free returned string when done.
+ * @return String containing the human-readable checksum digest, or NULL on failure.
  */
 char *compute_checksum(const char *filename, mode_t *st_mode, enum checksum type)
 {
@@ -148,12 +165,19 @@ char *compute_checksum(const char *filename, mode_t *st_mode, enum checksum type
     return ret;
 }
 
-/*
- * Given an rpmfile_entry_t, returned either the cached checksum or
- * compute it, cache it, and return that.
+/**
+ * @brief Return checksum string of the given **rpmfile_entry_t**.
  *
- * The caller should not directly free this as it is freed with the
- * call to free_files()
+ * The **rpmfile_entry_t** will contain a cached checksum string or
+ * not.  If it does, this function returns the cached string.  If the
+ * string is NULL, this function calculates the checksum, caches it,
+ * and returns the string.
+ *
+ * @param file The **rpmfile_entry_t** specifying the file to use.
+ * @note Do not free the result returned, that is handled by
+ *       **free_files()**.
+ * @return String containing the human-readable checksum digest, or
+ *         NULL on failure.
  */
 char *checksum(rpmfile_entry_t *file)
 {
