@@ -565,4 +565,12 @@ typedef struct _kernel_alias_data {
     struct hsearch_data *alias_table;
 } kernel_alias_data_t;
 
+/* Types of workdirs */
+typedef enum _workdir_t {
+    NULL_WORKDIR = 0,          /* unused                    */
+    LOCAL_WORKDIR = 1,         /* locally cached koji build */
+    TASK_WORKDIR = 2,          /* like for scratch builds   */
+    BUILD_WORKDIR = 3          /* remote koji build spec    */
+} workdir_t;
+
 #endif

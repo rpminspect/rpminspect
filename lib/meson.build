@@ -11,6 +11,7 @@ inspect_elf_bits_dep = declare_dependency(sources : [inspect_elf_bits_c])
 # Build librpminspect
 librpminspect_sources = [
     'badwords.c',
+    'builds.c',
     'checksums.c',
     'copyfile.c',
     'debug.c',

@@ -254,4 +254,7 @@ char *read_release(const rpmfile_t *);
 const char *get_before_rel(struct rpminspect *);
 const char *get_after_rel(struct rpminspect *);
 
+/* builds.c */
+int gather_builds(struct rpminspect *, bool);
+
 #endif

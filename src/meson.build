@@ -1,11 +1,7 @@
 # Build rpminspect
-rpminspect_prog_sources = [
-    'rpminspect.c',
-    'builds.c',
-]
 rpminspect_prog = executable(
     'rpminspect',
-    rpminspect_prog_sources,
+    [ 'rpminspect.c' ],
     include_directories : inc,
     install : true,
     link_with : [
