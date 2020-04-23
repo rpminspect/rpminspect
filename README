@@ -234,13 +234,13 @@ To prepare a virtual environment for testing simple run:
     pip install meson ninja rpm-py-installer rpmfluff setuptools
     export RPMINSPECT=$PWD/build/rpminspect
     export RPMINSPECT_CONF=$PWD/src/rpminspect.conf
-    export RPMINSPECT_TEST_DATA_PATH=$PWD/tests/data
+    export RPMINSPECT_TEST_DATA_PATH=$PWD/test/data
 
 To run all tests, execute the command:
-    python -Bm unittest discover -v tests/
+    python -Bm unittest discover -v test/
 
 To run a specific test suite, execute:
-    python -Bm unittest discover -v tests/ test_emptyrpm.py
+    python -Bm unittest discover -v test/ test_emptyrpm.py
 
 
 Releasing

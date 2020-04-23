@@ -228,12 +228,12 @@ add_test_setup(
 if cunit.found()
     incdirs = [include_directories('lib'),
                include_directories('src'),
-               include_directories('tests/lib')]
+               include_directories('test/lib')]
 
     test_badwords = executable(
         'test-badwords',
-        ['tests/lib/test-badwords.c',
-         'tests/lib/test-main.c'],
+        ['test/lib/test-badwords.c',
+         'test/lib/test-main.c'],
         include_directories : incdirs,
         dependencies : [ cunit ],
         c_args : '-D_BUILDDIR_="@0@"'.format(meson.current_build_dir()),
@@ -242,8 +242,8 @@ if cunit.found()
 
     test_koji = executable(
         'test-koji',
-        ['tests/lib/test-koji.c',
-         'tests/lib/test-main.c'],
+        ['test/lib/test-koji.c',
+         'test/lib/test-main.c'],
         include_directories : incdirs,
         dependencies : [ cunit ],
         c_args : '-D_BUILDDIR_="@0@"'.format(meson.current_build_dir()),
@@ -252,8 +252,8 @@ if cunit.found()
 
     test_tty = executable(
         'test-tty',
-        ['tests/lib/test-tty.c',
-         'tests/lib/test-main.c'],
+        ['test/lib/test-tty.c',
+         'test/lib/test-main.c'],
         include_directories : incdirs,
         dependencies : [ cunit ],
         c_args : '-D_BUILDDIR_="@0@"'.format(meson.current_build_dir()),
@@ -262,8 +262,8 @@ if cunit.found()
 
     test_strfuncs = executable(
         'test-strfuncs',
-        ['tests/lib/test-strfuncs.c',
-         'tests/lib/test-main.c'],
+        ['test/lib/test-strfuncs.c',
+         'test/lib/test-main.c'],
         include_directories : incdirs,
         dependencies : [ cunit ],
         c_args : '-D_BUILDDIR_="@0@"'.format(meson.current_build_dir()),
@@ -272,8 +272,8 @@ if cunit.found()
 
     test_init = executable(
         'test-init',
-        ['tests/lib/test-init.c',
-         'tests/lib/test-main.c'],
+        ['test/lib/test-init.c',
+         'test/lib/test-main.c'],
         include_directories : incdirs,
         dependencies : [ cunit ],
         c_args : '-D_BUILDDIR_="@0@"'.format(meson.current_build_dir()),
@@ -282,8 +282,8 @@ if cunit.found()
 
     test_inspect_elf = executable(
         'test-inspect_elf',
-        ['tests/lib/test-inspect_elf.c',
-         'tests/lib/test-main.c'],
+        ['test/lib/test-inspect_elf.c',
+         'test/lib/test-main.c'],
         include_directories : incdirs,
         dependencies : [
             cunit,
@@ -296,13 +296,13 @@ if cunit.found()
     # Support program used by test-inspect-elf
     execstack_prog = executable(
         'execstack',
-        ['tests/lib/elftest.c'],
+        ['test/lib/elftest.c'],
         link_args : ['-Wl,-z,execstack', '-Wl,-z,relro']
     )
 
     noexecstack_prog = executable(
         'noexecstack',
-        ['tests/lib/elftest.c'],
+        ['test/lib/elftest.c'],
         link_args : ['-Wl,-z,noexecstack', '-Wl,-z,relro']
     )
 
@@ -325,7 +325,7 @@ if python.found()
     test_env = environment()
     test_env.set('RPMINSPECT', rpminspect_prog.full_path())
     test_env.set('RPMINSPECT_CONF', meson.source_root() + '/src/rpminspect.conf')
-    test_env.set('RPMINSPECT_TEST_DATA_PATH', meson.source_root() + '/tests/data')
+    test_env.set('RPMINSPECT_TEST_DATA_PATH', meson.source_root() + '/test/data')
 
     test_suites = [
         'test_changelog.py',
@@ -349,7 +349,7 @@ if python.found()
     foreach suite : test_suites
         test('rpminspect-test-suite.' + suite.split('.')[0],
              python,
-             args : ['-B', '-m', 'unittest', 'discover', '-v', meson.source_root() + '/tests', suite],
+             args : ['-B', '-m', 'unittest', 'discover', '-v', meson.source_root() + '/test', suite],
              env : test_env,
              is_parallel : false,
              timeout : 300
