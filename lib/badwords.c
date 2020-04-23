@@ -16,6 +16,14 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+/**
+ * @file badwords.c
+ * @author David Cantrell
+ * @date 2019-2020
+ * @brief Check for `bad' (unprofessional) words in strings.
+ * @copyright GPL-3.0-or-later
+ */
+
 #include <stdbool.h>
 #include <ctype.h>
 #include <string.h>
@@ -25,8 +33,22 @@
 
 #include "rpminspect.h"
 
-/*
- * Check the given string for any defined bad words, return true if found.
+/**
+ * @brief Check the given string for any defined bad words, return
+ * true if found.
+ *
+ * Given a list of bad words, check the specified string for any of
+ * those bad words and return true on a match.  The search is
+ * conducted with **strcasestr(3)** as well as checking for a preceeding
+ * space to ensure it avoids substrings in the middle of a word.  For
+ * example, if the badwords list contains `flag' then this function
+ * will match ` flag' and ` flagging' but not ` conflagration'.  If
+ * the list of bad words provided is empty, the function returns
+ * false.
+ *
+ * @param s NUL-terminated string to scan for bad words.
+ * @param badwords List of bad words to look for.
+ * @return True if a bad word was found in the string, false otherwise.
  */
 bool has_bad_word(const char *s, const string_list_t *badwords) {
     string_entry_t *badword = NULL;

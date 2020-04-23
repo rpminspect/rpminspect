@@ -16,6 +16,14 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+/**
+ * @file builds.c
+ * @author David Cantrell
+ * @date 2019-2020
+ * @brief Collect builds from either a local or remote (Koji) source.
+ * @copyright GPL-3.0-or-later
+ */
+
 #include <stdbool.h>
 #include <ctype.h>
 #include <assert.h>
@@ -641,10 +649,20 @@ static bool is_task_id(const char *id)
     return true;
 }
 
-/*
- * Determines if specified builds are local or remote and fetches
- * them to the working directory.  Either build can be local or
- * remote.
+/**
+ * @brief Collects specified builds in to the working directory.
+ *
+ * For each build that is not NULL, determine if it is local or remote
+ * and collect it in the appropriate manner.  For local builds, that
+ * is just copying files.  For remote builds, **libcurl** is called to
+ * download files.  Files are downloaded to each build's subdirectory
+ * in the program working directory.  This function gathers both
+ * before and after builds if specified at run time.
+ *
+ * @param ri The main program data structure; contains the before and
+ *        after build specifications from the command line.
+ * @param fo True if '-f' (fetch only) specified, false otherwise.
+ * @return 0 on success, non-zero on failure.
  */
 int gather_builds(struct rpminspect *ri, bool fo) {
     struct koji_build *build = NULL;
