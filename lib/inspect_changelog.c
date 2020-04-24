@@ -116,8 +116,12 @@ static char *create_changelog(const string_list_t *changelog, const char *where)
     string_entry_t *entry = NULL;
     FILE *logfp = NULL;
 
-    assert(changelog != NULL);
     assert(where != NULL);
+
+    /* no changelog data means no changelog file */
+    if (changelog == NULL) {
+        return NULL;
+    }
 
     xasprintf(&output, "%s/changelog.XXXXXX", where)
     fd = mkstemp(output);
@@ -260,15 +264,13 @@ static bool check_src_rpm_changelog(struct rpminspect *ri, const rpmpeer_entry_t
     /* compare changelog data */
     if (before_changelog) {
         before = TAILQ_FIRST(before_changelog);
+        before_output = create_changelog(before_changelog, ri->workdir);
     }
 
     if (after_changelog) {
         after = TAILQ_FIRST(after_changelog);
+        after_output = create_changelog(after_changelog, ri->workdir);
     }
-
-    /* Generate temporary changelog files */
-    before_output = create_changelog(before_changelog, ri->workdir);
-    after_output = create_changelog(after_changelog, ri->workdir);
 
     /* Compare the changelogs */
     if (before_output && after_output) {
@@ -379,7 +381,9 @@ static bool check_bin_rpm_changelog(struct rpminspect *ri, const rpmpeer_entry_t
     after_output = create_changelog(after_changelog, ri->workdir);
 
     /* Compare the changelogs */
-    full_diff_output = run_cmd(&exitcode, DIFF_CMD, "-u", before_output, after_output, NULL);
+    if (before_output && after_output) {
+        full_diff_output = run_cmd(&exitcode, DIFF_CMD, "-u", before_output, after_output, NULL);
+    }
 
     if (exitcode) {
         /* Skip past the diff(1) header lines */
@@ -447,10 +451,13 @@ bool inspect_changelog(struct rpminspect *ri)
             break;
         }
 
-        if (headerIsSource(peer->after_hdr)) {
-            src = peer;
-        } else {
-            bin = peer;
+        /* we need both a before and an after package */
+        if (peer->before_hdr && peer->after_hdr) {
+            if (headerIsSource(peer->after_hdr)) {
+                src = peer;
+            } else {
+                bin = peer;
+            }
         }
     }
 
