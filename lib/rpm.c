@@ -115,7 +115,10 @@ char *get_rpmtag_str(Header hdr, rpmTagVal tag)
     rpmtd td = NULL;
     rpm_count_t td_size;
 
-    assert(hdr != NULL);
+    /* no header means no tag value */
+    if (hdr == NULL) {
+        return NULL;
+    }
 
     td = rpmtdNew();
     assert(td != NULL);
