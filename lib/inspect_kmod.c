@@ -94,6 +94,11 @@ static bool kmod_driver(struct rpminspect *ri, rpmfile_entry_t *file)
         return true;
     }
 
+    /* No peer file, skip */
+    if (file->peer_file == NULL) {
+        return true;
+    }
+
     /* Only perform this inspection on regular files */
     if (!S_ISREG(file->st.st_mode)) {
         return true;
