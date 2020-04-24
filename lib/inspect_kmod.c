@@ -87,6 +87,13 @@ static bool kmod_driver(struct rpminspect *ri, rpmfile_entry_t *file)
         return true;
     }
 
+    /* Skip debuginfo and debugsource packages */
+    aftername = headerGetString(file->rpm_header, RPMTAG_NAME);
+
+    if (strsuffix(aftername, DEBUGINFO_SUFFIX) || strsuffix(aftername, DEBUGSOURCE_SUFFIX)) {
+        return true;
+    }
+
     /* Only perform this inspection on regular files */
     if (!S_ISREG(file->st.st_mode)) {
         return true;
