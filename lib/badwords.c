@@ -18,7 +18,7 @@
 
 /**
  * @file badwords.c
- * @author David Cantrell
+ * @author David Cantrell &lt;dcantrell@redhat.com&gt;
  * @date 2019-2020
  * @brief Check for `bad' (unprofessional) words in strings.
  * @copyright GPL-3.0-or-later

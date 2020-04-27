@@ -21,9 +21,9 @@
 
 /**
  * @file checksums.c
- * @author David Cantrell
- * @author Chris Lumens
- * @author David Shea
+ * @author David Cantrell &lt;david.l.cantrell@gmail.com&gt;
+ * @author Chris Lumens &lt;chris@bangmoney.org&gt;
+ * @author David Shea &lt;david@reallylongword.org&gt;
  * @date 2004-2019
  * @brief Calculate an MD5, SHA-1, or SHA-256 checksum for a file.
  * @copyright Apache-2.0
