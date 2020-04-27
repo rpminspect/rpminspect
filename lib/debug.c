@@ -16,8 +16,25 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+/**
+ * @file debug.c
+ * @author David Cantrell &lt;dcantrell@redhat.com&gt;
+ * @date 2020
+ * @brief Debugging utility functions.
+ * @copyright GPL-3.0-or-later
+ */
+
 #include "rpminspect.h"
 
+/**
+ * @brief Set the global debugging mode.
+ *
+ * Pass true to enable debugging messages, false to disable.  Usually
+ * used in a frontend program after reading in configuration files but
+ * before collecting builds and running inspections.
+ *
+ * @param debug True to enable debugging messages, false to disable.
+ */
 void set_debug_mode(bool debug)
 {
     debug_mode = debug;

@@ -18,7 +18,7 @@
 
 /**
  * @file builds.c
- * @author David Cantrell
+ * @author David Cantrell &lt;dcantrell@redhat.com&gt;
  * @date 2019-2020
  * @brief Collect builds from either a local or remote (Koji) source.
  * @copyright GPL-3.0-or-later

@@ -1,5 +1,3 @@
-/* Generic copy file function. */
-
 /*
  * Copyright 2003-2018 David Cantrell <david.l.cantrell@gmail.com>
  *                     David Shea <david@reallylongword.org>
@@ -17,6 +15,15 @@
  * limitations under the License.
  */
 
+/**
+ * @file copyfile.c
+ * @author David Cantrell &lt;david.l.cantrell@gmail.com&gt;
+ * @author David Shea &lt;david@reallylongword.org&gt;
+ * @date 2003-2018
+ * @brief Generic file copy function
+ * @copyright Apache-2.0
+ */
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
@@ -31,6 +38,21 @@
 #include <assert.h>
 #include "rpminspect.h"
 
+/**
+ * @brief Generic file copy function.
+ *
+ * copyfile() is suitable for use in the callback for functions like
+ * ftw() and nftw().  You must specify the source and destination and
+ * the function only works on files.  Errors are reported on stderr.
+ *
+ * @param src Full path to source file.
+ * @param dest Full path to the destination file.
+ * @param force True to force overwriting the destination if it
+ *              already exists, false otherwise.
+ * @param verbose True to output verbose messages to stdout during the
+ *                copy operation, false otherwise.
+ * @return 0 on success, -1 on error.
+ */
 int copyfile(const char *src, const char *dest, bool force, bool verbose) {
     FILE *in = NULL, *out = NULL;
     int out_fd;                 /* use open() to test if file exists, then

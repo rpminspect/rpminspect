@@ -17,6 +17,15 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+/**
+ * @file files.c
+ * @author David Cantrell &lt;dcantrell@redhat.com&gt;
+ * @author David Shea &lt;dshea@redhat.com&gt;
+ * @date 2019-2020
+ * @brief Package extraction and file gathering functions.
+ * @copyright GPL-3.0-or-later
+ */
+
 #include <assert.h>
 #include <errno.h>
 #include <regex.h>
@@ -37,6 +46,15 @@
 
 #include "rpminspect.h"
 
+/**
+ * @brief Free rpmfile_t memory.
+ *
+ * Free the memory allocated for an rpmfile_t list.  Passing NULL to
+ * this function has no effect.  The function will free each struct
+ * member in each list entry and then free the entire list.
+ *
+ * @param files Pointer to the rpmfile_t to free.
+ */
 void free_files(rpmfile_t *files)
 {
     rpmfile_entry_t *entry;
@@ -58,8 +76,20 @@ void free_files(rpmfile_t *files)
     free(files);
 }
 
-/* Extract the RPM, with path "pkg" and extracted header "hdr", to output_dir.
- * Either output_dir or the directory immediately above it must exist.
+/**
+ * @brief Extract the RPM package specified to a working directory.
+ *
+ * Given a path to an RPM package and its Header, construct an
+ * extraction path and extract all of the payload members to that
+ * directory.  The function reads the payload member information from
+ * the Header and uses libarchive to perform the actual payload
+ * extraction.  Returns an rpmfile_t list of all the payload members.
+ * The caller is responsible for freeing this returned list.
+ *
+ * @param pkg Path to the RPM package to extract.
+ * @param hdr RPM Header for the specified package.
+ * @return rpmfile_t list of all payload members.  The caller is
+ *                   responsible for freeing this list.
  */
 rpmfile_t *extract_rpm(const char *pkg, Header hdr)
 {
@@ -274,32 +304,22 @@ cleanup:
     return file_list;
 }
 
-const char * get_file_path(const rpmfile_entry_t *file)
-{
-    rpmtd td;
-    const char *result = NULL;
-
-    td = rpmtdNew();
-    assert(td != NULL);
-
-    if (headerGet(file->rpm_header, RPMTAG_FILENAMES, td, HEADERGET_MINMEM | HEADERGET_EXT) != 1) {
-        fprintf(stderr, _("*** Unable to read RPMTAG_FILENAMES for %s\n"), file->fullpath);
-        goto cleanup;
-    }
-
-    if (rpmtdSetIndex(td, file->idx) == -1) {
-        fprintf(stderr, _("*** Invalid file index for %s\n"), file->fullpath);
-        goto cleanup;
-    }
-
-    result = rpmtdGetString(td);
-
-cleanup:
-    rpmtdFree(td);
-
-    return result;
-}
-
+/**
+ * @brief Match specified file to the include or exclude regular expression.
+ *
+ * Utility function to help determine if an rpmfile_entry_t would be
+ * included or excluded per the specified regular expression.  You
+ * must pass in either an include_regex or an exclude_regex.  Passing
+ * NULL for both causes the function to return true.  Passing both
+ * causes it to ignore the exclude_regex and only honor the
+ * include_regex.
+ *
+ * @param file rpmfile_entry_t to match.
+ * @param include_regex regex_t to match file paths to include.
+ * @param exclude_regex regex_t to match file paths to exclude.
+ * @return True if the non-NULL regular expression matched the
+ *         rpmfile_entry_t localpath.
+ */
 bool process_file_path(const rpmfile_entry_t *file, regex_t *include_regex, regex_t *exclude_regex)
 {
     /* If include is set, the path must match the regex */
@@ -315,15 +335,22 @@ bool process_file_path(const rpmfile_entry_t *file, regex_t *include_regex, rege
     return true;
 }
 
-/* Helper for find_file_peers. Returns a hash table keyed by the localpath fields of
- * the file list, with the rpmfile_entry_t items as values.
+/**
+ * @brief Helper for find_file_peers.
+ *
+ * Returns a hash table keyed by the localpath fields of the file
+ * list, with the rpmfile_entry_t items as values.
  *
  * The list cannot be empty.
  *
- * The keys and values use the same pointers as the rpmfile_entry_t and should not
- * be separately freed. The hash table itself must be hdestroy_r'd and freed by the caller.
+ * The keys and values use the same pointers as the rpmfile_entry_t
+ * and should not be separately freed. The hash table itself must be
+ * hdestroy_r'd and freed by the caller.
+ *
+ * @param list rpmfile_t list to convert to a hash table.
+ @ @return Hash table of files in the rpmfile_t list.
  */
-static struct hsearch_data * files_to_table(rpmfile_t *list)
+static struct hsearch_data *files_to_table(rpmfile_t *list)
 {
     struct hsearch_data *table;
     ENTRY e;
@@ -373,7 +400,12 @@ static struct hsearch_data * files_to_table(rpmfile_t *list)
     return table;
 }
 
-/* Helper for find_one_peer */
+/**
+ * @brief Helper for find_one_peer
+ *
+ * @param file rpmfile_entry_t to set peer_file on.
+ * @param eptr Hash table entry with the peer_file data.
+ */
 static void set_peer(rpmfile_entry_t *file, ENTRY *eptr)
 {
     rpmfile_entry_t *peer;
@@ -387,12 +419,25 @@ static void set_peer(rpmfile_entry_t *file, ENTRY *eptr)
     return;
 }
 
-/* For the given file from "before", attempt to find a matching file in "after".
+/**
+ * @brief For the given file from "before", attempt to find a matching
+ * file in "after".
  *
- * Any time a match is found, the hash table ENTRY's value field will be set
- * to NULL so that the match cannot be used again. For the purposes of adding
- * tests to match peers, this means that attempts must be made in order from
- * best match to worst match.
+ * Any time a match is found, the hash table ENTRY's value field will
+ * be set to NULL so that the match cannot be used again. For the
+ * purposes of adding tests to match peers, this means that attempts
+ * must be made in order from best match to worst match.
+ *
+ * In cases where the peer found has changed paths or subpackages,
+ * this function will modify the probably_moved_path and
+ * probably_moved_subpackage booleans as appropriate.  The purpose of
+ * this is to allow inspection functions to both know the probably
+ * file peer but also if it moved or not between builds.  This helps
+ * with the reporting messages.
+ *
+ * @param file rpmfile_entry_t with missing peer_file.
+ * @param after After build rpmfile_t list.
+ * @param after_table Hash table of after build rpmfile_t localpaths.
  */
 static void find_one_peer(rpmfile_entry_t *file, rpmfile_t *after, struct hsearch_data *after_table)
 {
@@ -520,8 +565,19 @@ static void find_one_peer(rpmfile_entry_t *file, rpmfile_t *after, struct hsearc
     return;
 }
 
-/* Find matching files between the before and after lists, and populate the "peer_file" members of the entries.
- * Returns 0 on success, -1 on failure.
+/**
+ * @brief Find matching files between the before and after lists.
+ *
+ * Scan the before build and look for matching peer files in the after
+ * build.  The peer_file members are populated with each other's
+ * entries.  That is, the before build's peer_file will point to the
+ * after build file and the after build peer_file will point to the
+ * before build file.  If an rpmfile_entry_t peer_file is NULL, it
+ * means it has no peer that could be found.
+ *
+ * @param before Before build package's rpmfile_t list.
+ * @param after After build package's rpmfile_t list.
+ * @return 0 on success, -1 on failure.
  */
 void find_file_peers(rpmfile_t *before, rpmfile_t *after)
 {
@@ -550,9 +606,15 @@ void find_file_peers(rpmfile_t *before, rpmfile_t *after)
     return;
 }
 
-/*
- * Return the cached capabilities(7) of the file.  Otherwise get it first,
- * save it, then return it.
+/**
+ * @brief Return the capabilities(7) of the specified rpmfile_entry_t.
+ *
+ * If the capabilities(7) of the specified file are cached, return
+ * that.  Otherwise get and cache the capabilities, then return the
+ * cached value.
+ *
+ * @param file rpmfile_entry_t specifying the file.
+ * @return cap_t containing the capabilities(7) of the file.
  */
 cap_t get_cap(rpmfile_entry_t *file)
 {
@@ -589,12 +651,23 @@ cap_t get_cap(rpmfile_entry_t *file)
     return file->cap;
 }
 
-/*
- * Returns true if the given path is a debug or build file.
+/**
+ * @brief Determine if a path is a debug or build path.
+ *
+ * Returns true if the specified path contains any of:
+ *     - BUILD_ID_DIR
+ *     - DEBUG_PATH
+ *     - DEBUG_SRC_PATH
+ * A NULL path returns false.
+ *
+ * @return True if the path contains any of the name substrings, false
+ *         otherwise.
  */
 bool is_debug_or_build_path(const char *path)
 {
-    assert(path != NULL);
+    if (path == NULL) {
+        return false;
+    }
 
     if (strstr(path, BUILD_ID_DIR) || strstr(path, DEBUG_PATH) || strstr(path, DEBUG_SRC_PATH)) {
         return true;
