@@ -258,3 +258,30 @@ class LostKmodAliasesKoji(TestCompareKoji):
         self.label = 'kernel-modules'
         self.result = 'VERIFY'
         self.waiver_auth = 'Anyone'
+
+# Kernel module changing paths
+class KmodChangingPathCompareRPMs(TestCompareRPMs):
+    @unittest.skipUnless(have_kernel_devel, "Need kernel devel files")
+    def setUp(self):
+        TestCompareRPMs.setUp(self)
+
+        self.before_rpm.add_installed_file('/usr/lib/modules/' + kver + '/extra/drivers/derp.ko', rpmfluff.SourceFile('derp.ko', get_derp_kmod_depends(self.rpminspect)))
+        self.after_rpm.add_installed_file('/usr/lib/modules/' + kver + '/extra/drivers/derpy-stuff/derp.ko', rpmfluff.SourceFile('derp.ko', get_derp_kmod_depends(self.rpminspect)))
+
+        self.inspection = 'kmod'
+        self.label = 'kernel-modules'
+        self.result = 'OK'
+        self.waiver_auth = 'Not Waivable'
+
+class KmodChangingPathCompareKoji(TestCompareKoji):
+    @unittest.skipUnless(have_kernel_devel, "Need kernel devel files")
+    def setUp(self):
+        TestCompareKoji.setUp(self)
+
+        self.before_rpm.add_installed_file('/usr/lib/modules/' + kver + '/extra/drivers/derp.ko', rpmfluff.SourceFile('derp.ko', get_derp_kmod_depends(self.rpminspect)))
+        self.after_rpm.add_installed_file('/usr/lib/modules/' + kver + '/extra/drivers/derpy-stuff/derp.ko', rpmfluff.SourceFile('derp.ko', get_derp_kmod_depends(self.rpminspect)))
+
+        self.inspection = 'kmod'
+        self.label = 'kernel-modules'
+        self.result = 'OK'
+        self.waiver_auth = 'Not Waivable'
