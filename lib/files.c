@@ -383,6 +383,8 @@ static void set_peer(rpmfile_entry_t *file, ENTRY *eptr)
 
     file->peer_file = peer;
     peer->peer_file = file;
+
+    return;
 }
 
 /* For the given file from "before", attempt to find a matching file in "after".
@@ -392,22 +394,27 @@ static void set_peer(rpmfile_entry_t *file, ENTRY *eptr)
  * tests to match peers, this means that attempts must be made in order from
  * best match to worst match.
  */
-static void find_one_peer(rpmfile_entry_t *file, Header after_header, struct hsearch_data *after_table)
+static void find_one_peer(rpmfile_entry_t *file, rpmfile_t *after, struct hsearch_data *after_table)
 {
     ENTRY e;
-    ENTRY *eptr;
+    ENTRY *eptr = NULL;
     int hsearch_result;
-
-    const char *before_version;
-    const char *after_version;
+    rpmfile_entry_t *after_file = NULL;
+    const char *before_version = NULL;
+    const char *after_version = NULL;
     bool has_version;
+    const char *before_release = NULL;
+    const char *after_release = NULL;
+    char *before_vr = NULL;
+    char *after_vr = NULL;
+    char *search_path = NULL;
 
-    const char *before_release;
-    const char *after_release;
-    char *before_vr;
-    char *after_vr;
+    assert(file != NULL);
+    assert(after != NULL);
+    assert(after_table != NULL);
 
-    char *search_path;
+    /* used in a number of matching checks below */
+    after_file = TAILQ_FIRST(after);
 
     /* Start with the obvious case: the paths match */
     e.key = file->localpath;
@@ -421,7 +428,7 @@ static void find_one_peer(rpmfile_entry_t *file, Header after_header, struct hse
 
     /* Try substituting the version strings */
     before_version = headerGetString(file->rpm_header, RPMTAG_VERSION);
-    after_version = headerGetString(after_header, RPMTAG_VERSION);
+    after_version = headerGetString(after_file->rpm_header, RPMTAG_VERSION);
 
     /* If the path doesn't have a version in it we can skip these substitutions */
     has_version = (strstr(file->localpath, before_version) != NULL);
@@ -443,7 +450,7 @@ static void find_one_peer(rpmfile_entry_t *file, Header after_header, struct hse
     /* Try substituting version-release */
     if (has_version) {
         before_release = headerGetString(file->rpm_header, RPMTAG_RELEASE);
-        after_release = headerGetString(after_header, RPMTAG_RELEASE);
+        after_release = headerGetString(after_file->rpm_header, RPMTAG_RELEASE);
 
         xasprintf(&before_vr, "%s-%s", before_version, before_release);
         xasprintf(&after_vr, "%s-%s", after_version, after_release);
@@ -468,6 +475,49 @@ static void find_one_peer(rpmfile_entry_t *file, Header after_header, struct hse
             free(after_vr);
         }
     }
+
+    /* See if this file peer probably moved */
+    if (file->peer_file == NULL && S_ISREG(file->st.st_mode)) {
+        /* .build-id files can be ignored, they always move */
+        if (strstr(file->localpath, BUILD_ID_DIR)) {
+            return;
+        }
+
+        /* match the basename with a leading '/' */
+        xasprintf(&search_path, "/%s", basename(file->localpath));
+        assert(search_path);
+        DEBUG_PRINT("search_path=|%s|\n", search_path);
+
+        /* look for a possible match for files that move paths */
+        /*
+         * This is a best guess that checks the following:
+         * - basename (but with a leading '/')
+         * - MIME type
+         *
+         * This may need refinement down the road to check other things.
+         */
+        TAILQ_FOREACH(after_file, after, items) {
+            if (strsuffix(after_file->localpath, search_path) && !strcmp(get_mime_type(file), get_mime_type(after_file))) {
+                DEBUG_PRINT("%s probably moved to %s\n", file->localpath, after_file->localpath);
+
+                e.key = after_file->localpath;
+                eptr = NULL;
+                hsearch_result = hsearch_r(e, FIND, &eptr, after_table);
+
+                if (hsearch_result != 0) {
+                    set_peer(file, eptr);
+                    file->probably_moved_path = true;
+                    file->peer_file->probably_moved_path = true;
+                    free(search_path);
+                    return;
+                }
+            }
+        }
+
+        free(search_path);
+    }
+
+    return;
 }
 
 /* Find matching files between the before and after lists, and populate the "peer_file" members of the entries.
@@ -476,8 +526,7 @@ static void find_one_peer(rpmfile_entry_t *file, Header after_header, struct hse
 void find_file_peers(rpmfile_t *before, rpmfile_t *after)
 {
     struct hsearch_data *after_table = NULL;
-    rpmfile_entry_t *iter;
-    rpmfile_entry_t *after_entry;
+    rpmfile_entry_t *before_entry = NULL;
 
     assert(before != NULL);
     assert(after != NULL);
@@ -487,19 +536,18 @@ void find_file_peers(rpmfile_t *before, rpmfile_t *after)
         return;
     }
 
-    after_entry = TAILQ_FIRST(after);
-
     /* Create a hash table of the after list, mapping path(char *) to rpmfile_entry_t */
     after_table = files_to_table(after);
     assert(after_table);
 
-    TAILQ_FOREACH(iter, before, items) {
-        find_one_peer(iter, after_entry->rpm_header, after_table);
+    /* Match peers */
+    TAILQ_FOREACH(before_entry, before, items) {
+        find_one_peer(before_entry, after, after_table);
     }
-
 
     hdestroy_r(after_table);
     free(after_table);
+    return;
 }
 
 /*
