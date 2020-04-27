@@ -61,6 +61,13 @@ typedef TAILQ_HEAD(string_entry_s, _string_entry_t) string_list_t;
  * idx is the index for this file into the RPM array tags such as RPMTAG_FILESIZES.
  *
  * type is the MIME type string that you would get from 'file --mime-type'.
+ *
+ * cap is the getcap() value for the file.
+ *
+ * checksum is a string containing the human-readable checksum digest
+ *
+ * probably_moved_path is true if the file moved path locations between the before
+ * after after build, false otherwise
  */
 typedef struct _rpmfile_entry_t {
     Header rpm_header;
@@ -72,6 +79,7 @@ typedef struct _rpmfile_entry_t {
     char *checksum;
     cap_t cap;
     struct _rpmfile_entry_t *peer_file;
+    bool probably_moved_path;
     TAILQ_ENTRY(_rpmfile_entry_t) items;
 } rpmfile_entry_t;
 
