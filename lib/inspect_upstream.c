@@ -25,9 +25,7 @@
 
 /* Global variables */
 static string_list_t *source = NULL;
-static severity_t sev;
-static waiverauth_t waiver;
-static const char *remedy = NULL;
+static struct result_params params;
 
 /*
  * Get the SOURCE tag from the RPM header and read in all of
@@ -106,8 +104,6 @@ static bool upstream_driver(struct rpminspect *ri, rpmfile_entry_t *file)
     char *after_sum = NULL;
     char *diff_output = NULL;
     char *diff_head = NULL;
-    char *shortname = NULL;
-    char *msg = NULL;
     int exitcode;
 
     /* If we are not looking at a Source file, bail. */
@@ -116,12 +112,13 @@ static bool upstream_driver(struct rpminspect *ri, rpmfile_entry_t *file)
     }
 
     /* Compare digests of source archive */
-    shortname = basename(file->fullpath);
+    params.file = basename(file->fullpath);
 
-    /* Report what was found */
     if (file->peer_file == NULL) {
-        xasprintf(&msg, _("New upstream source file `%s` appeared"), shortname)
-        add_result(ri, sev, waiver, HEADER_UPSTREAM, msg, NULL, remedy);
+        xasprintf(&params.msg, _("New upstream source file `%s` appeared"), params.file)
+        params.verb = VERB_ADDED;
+        params.noun = _("source file ${FILE}");
+        add_result(ri, &params);
         result = false;
     } else {
         /* compare checksums to see if the upstream sources changed */
@@ -144,8 +141,10 @@ static bool upstream_driver(struct rpminspect *ri, rpmfile_entry_t *file)
             }
 
             /* report the changed file */
-            xasprintf(&msg, _("Upstream source file `%s` changed content"), shortname);
-            add_result(ri, sev, waiver, HEADER_UPSTREAM, msg, diff_head, remedy);
+            xasprintf(&params.msg, _("Upstream source file `%s` changed content"), params.file);
+            params.verb = VERB_CHANGED;
+            params.noun = _("checksum of ${FILE}");
+            add_result(ri, &params);
             result = false;
 
             /* clean up */
@@ -153,7 +152,7 @@ static bool upstream_driver(struct rpminspect *ri, rpmfile_entry_t *file)
         }
     }
 
-    free(msg);
+    free(params.msg);
     return result;
 }
 
@@ -167,9 +166,11 @@ bool inspect_upstream(struct rpminspect *ri)
     const char *av = NULL;
     rpmpeer_entry_t *peer = NULL;
     rpmfile_entry_t *file = NULL;
-    char *msg = NULL;
 
     assert(ri != NULL);
+
+    memset(&params, 0, sizeof(params));
+    params.header = HEADER_UPSTREAM;
 
     /* Initialize before and after versions */
     TAILQ_FOREACH(peer, ri->peers, items) {
@@ -196,14 +197,14 @@ bool inspect_upstream(struct rpminspect *ri)
     /* Set result type based on version difference */
     if (strcmp(bv, av)) {
         /* versions changed */
-        sev = RESULT_INFO;
-        waiver = NOT_WAIVABLE;
-        remedy = NULL;
+        params.severity = RESULT_INFO;
+        params.waiverauth = NOT_WAIVABLE;
+        params.remedy = NULL;
     } else {
         /* versions are the same, likely maintenance */
-        sev = RESULT_VERIFY;
-        waiver = WAIVABLE_BY_ANYONE;
-        remedy = REMEDY_UPSTREAM;
+        params.severity = RESULT_VERIFY;
+        params.waiverauth = WAIVABLE_BY_ANYONE;
+        params.remedy = REMEDY_UPSTREAM;
     }
 
     /* Run the main inspection */
@@ -229,10 +230,10 @@ bool inspect_upstream(struct rpminspect *ri)
         if (peer->before_files) {
             TAILQ_FOREACH(file, peer->before_files, items) {
                 if (file->peer_file == NULL) {
-                    xasprintf(&msg, _("Source RPM member `%s` removed"), basename(file->fullpath));
-                    add_result(ri, sev, waiver, HEADER_UPSTREAM, msg, NULL, remedy);
+                    xasprintf(&params.msg, _("Source RPM member `%s` removed"), basename(file->fullpath));
+                    add_result(ri, &params);
+                    free(params.msg);
                     result = false;
-                    free(msg);
                 }
             }
         }
@@ -240,7 +241,9 @@ bool inspect_upstream(struct rpminspect *ri)
 
     /* Sound the everything-is-ok alarm if everything is, in fact, ok */
     if (result) {
-        add_result(ri, RESULT_OK, NOT_WAIVABLE, HEADER_UPSTREAM, NULL, NULL, NULL);
+        params.severity = RESULT_OK;
+        params.waiverauth = NOT_WAIVABLE;
+        add_result(ri, &params);
     }
 
     /* Our static list of SourceN: spec file members, dump it */

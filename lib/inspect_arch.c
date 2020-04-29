@@ -33,7 +33,7 @@ bool inspect_arch(struct rpminspect *ri) {
     string_entry_t *entry = NULL;
     string_list_t *lost = NULL;
     string_list_t *gain = NULL;
-    char *msg = NULL;
+    struct result_params params;
 
     assert(ri != NULL);
 
@@ -44,6 +44,10 @@ bool inspect_arch(struct rpminspect *ri) {
     after_arches = calloc(1, sizeof(*after_arches));
     assert(after_arches != NULL);
     TAILQ_INIT(after_arches);
+
+    memset(&params, 0, sizeof(params));
+    params.waiverauth = WAIVABLE_BY_ANYONE;
+    params.header = HEADER_ARCH;
 
     /* Gather up all the architectures */
     TAILQ_FOREACH(peer, ri->peers, items) {
@@ -67,9 +71,14 @@ bool inspect_arch(struct rpminspect *ri) {
     /* Report results */
     if (lost != NULL && !TAILQ_EMPTY(lost)) {
         TAILQ_FOREACH(entry, lost, items) {
-            xasprintf(&msg, _("Architecture '%s' has disappeared"), entry->data);
-            add_result(ri, RESULT_VERIFY, WAIVABLE_BY_ANYONE, HEADER_ARCH, msg, NULL, REMEDY_ARCH_LOST);
-            free(msg);
+            params.severity = RESULT_VERIFY;
+            params.remedy = REMEDY_ARCH_LOST;
+            params.verb = VERB_REMOVED;
+            params.noun = _("lost ${ARCH}");
+            params.arch = entry->data;
+            xasprintf(&params.msg, _("Architecture '%s' has disappeared"), entry->data);
+            add_result(ri, &params);
+            free(params.msg);
         }
 
         result = false;
@@ -78,9 +87,14 @@ bool inspect_arch(struct rpminspect *ri) {
 
     if (gain != NULL && !TAILQ_EMPTY(gain)) {
         TAILQ_FOREACH(entry, gain, items) {
-            xasprintf(&msg, _("Architecture '%s' has appeared"), entry->data);
-            add_result(ri, RESULT_INFO, WAIVABLE_BY_ANYONE, HEADER_ARCH, msg, NULL, REMEDY_ARCH_GAIN);
-            free(msg);
+            params.severity = RESULT_INFO;
+            params.remedy = REMEDY_ARCH_GAIN;
+            params.verb = VERB_ADDED;
+            params.noun = _("gained ${ARCH}");
+            params.arch = entry->data;
+            xasprintf(&params.msg, _("Architecture '%s' has appeared"), entry->data);
+            add_result(ri, &params);
+            free(params.msg);
         }
 
         result = false;

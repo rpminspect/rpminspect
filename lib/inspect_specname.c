@@ -28,10 +28,10 @@ static bool seen = false;
 
 static bool specname_driver(struct rpminspect *ri, rpmfile_entry_t *file) {
     char *specfile = NULL;
-    char *msg = NULL;
     char *dot = NULL;
     char *desc = NULL;
     char *primary = NULL;
+    struct result_params params;
 
     /* Skip binary packages */
     if (!headerIsSource(file->rpm_header)) {
@@ -69,6 +69,14 @@ static bool specname_driver(struct rpminspect *ri, rpmfile_entry_t *file) {
      * but it's not named in the expected way.
      */
     if (!specgood) {
+        /* Set up result parameters */
+        memset(&params, 0, sizeof(params));
+        params.severity = RESULT_BAD;
+        params.waiverauth = NOT_WAIVABLE;
+        params.header = HEADER_SPECNAME;
+        params.remedy = REMEDY_SPECNAME;
+        params.file = file->localpath;
+
         if (ri->specmatch == MATCH_FULL) {
             desc = _("exactly match");
         } else if (ri->specmatch == MATCH_PREFIX) {
@@ -77,9 +85,9 @@ static bool specname_driver(struct rpminspect *ri, rpmfile_entry_t *file) {
             desc = _("end with");
         }
 
-        xasprintf(&msg, _("Spec filename does not %s the primary name %s; got '%s'"), desc, primary, file->localpath);
-        add_result(ri, RESULT_BAD, WAIVABLE_BY_ANYONE, HEADER_SPECNAME, msg, NULL, REMEDY_SPECNAME);
-        free(msg);
+        xasprintf(&params.msg, _("Spec filename does not %s the primary name %s; got '%s'"), desc, primary, file->localpath);
+        add_result(ri, &params);
+        free(params.msg);
     }
 
     free(primary);
@@ -92,17 +100,23 @@ static bool specname_driver(struct rpminspect *ri, rpmfile_entry_t *file) {
  * Main driver for the 'specname' inspection.
  */
 bool inspect_specname(struct rpminspect *ri) {
-    char *msg = NULL;
+    struct result_params params;
 
     assert(ri != NULL);
     foreach_peer_file(ri, specname_driver);
 
+    memset(&params, 0, sizeof(params));
+    params.waiverauth = NOT_WAIVABLE;
+    params.header = HEADER_SPECNAME;
+
     if (specgood) {
-        add_result(ri, RESULT_OK, NOT_WAIVABLE, HEADER_SPECNAME, NULL, NULL, NULL);
+        params.severity = RESULT_OK;
+        add_result(ri, &params);
     } else if (!seen) {
-        xasprintf(&msg, _("The specname inspection is only for source packages, skipping."));
-        add_result(ri, RESULT_INFO, NOT_WAIVABLE, HEADER_SPECNAME, msg, NULL, NULL);
-        free(msg);
+        params.severity = RESULT_INFO;
+        xasprintf(&params.msg, _("The specname inspection is only for source packages, skipping."));
+        add_result(ri, &params);
+        free(params.msg);
     }
 
     return specgood;

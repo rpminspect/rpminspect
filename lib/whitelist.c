@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2019  Red Hat, Inc.
+ * Copyright (C) 2019-2020  Red Hat, Inc.
  * Author(s):  David Cantrell <dcantrell@redhat.com>
  *
  * This program is free software: you can redistribute it and/or modify
@@ -25,27 +25,34 @@
  */
 bool on_stat_whitelist(struct rpminspect *ri, const rpmfile_entry_t *file, const char *header, const char *remedy)
 {
-    const char *arch = NULL;
     stat_whitelist_entry_t *wlentry = NULL;
-    char *msg = NULL;
+    struct result_params params;
 
     assert(ri != NULL);
     assert(file != NULL);
 
-    arch = get_rpm_header_arch(file->rpm_header);
+    memset(&params, 0, sizeof(params));
+    params.header = header;
+    params.arch = get_rpm_header_arch(file->rpm_header);
+    params.file = file->localpath;
+    params.remedy = remedy;
 
     if (init_stat_whitelist(ri)) {
         TAILQ_FOREACH(wlentry, ri->stat_whitelist, items) {
             if (!strcmp(file->localpath, wlentry->filename)) {
                 if (file->st.st_mode == wlentry->mode) {
-                    xasprintf(&msg, _("%s on %s carries mode %04o, but is on the stat whitelist"), file->localpath, arch, file->st.st_mode);
-                    add_result(ri, RESULT_INFO, WAIVABLE_BY_ANYONE, header, msg, NULL, remedy);
-                    free(msg);
+                    xasprintf(&params.msg, _("%s on %s carries mode %04o, but is on the stat whitelist"), file->localpath, params.arch, file->st.st_mode);
+                    params.severity = RESULT_INFO;
+                    params.waiverauth = WAIVABLE_BY_ANYONE;
+                    add_result(ri, &params);
+                    free(params.msg);
                     return true;
                 } else {
-                    xasprintf(&msg, _("%s on %s carries mode %04o, is on the stat whitelist but expected mode %04o"), file->localpath, arch, file->st.st_mode, wlentry->mode);
-                    add_result(ri, RESULT_VERIFY, WAIVABLE_BY_SECURITY, header, msg, NULL, remedy);
-                    free(msg);
+                    xasprintf(&params.msg, _("%s on %s carries mode %04o, is on the stat whitelist but expected mode %04o"), file->localpath, params.arch, file->st.st_mode, wlentry->mode);
+                    params.severity = RESULT_VERIFY;
+                    params.waiverauth = WAIVABLE_BY_SECURITY;
+                    add_result(ri, &params);
+                    free(params.msg);
                     return true;
                 }
             }
@@ -53,9 +60,11 @@ bool on_stat_whitelist(struct rpminspect *ri, const rpmfile_entry_t *file, const
     }
 
     /* catch anything not on the stat-whitelist */
-    xasprintf(&msg, _("%s on %s carries insecure mode %04o, Security Team review may be required"), file->localpath, arch, file->st.st_mode);
-    add_result(ri, RESULT_BAD, WAIVABLE_BY_SECURITY, header, msg, NULL, remedy);
-    free(msg);
+    xasprintf(&params.msg, _("%s on %s carries insecure mode %04o, Security Team review may be required"), file->localpath, params.arch, file->st.st_mode);
+    params.severity = RESULT_BAD;
+    params.waiverauth = WAIVABLE_BY_SECURITY;
+    add_result(ri, &params);
+    free(params.msg);
     return true;
 }
 

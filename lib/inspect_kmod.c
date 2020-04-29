@@ -24,31 +24,36 @@
 
 #include "rpminspect.h"
 
-static severity_t sev = RESULT_INFO;
-static waiverauth_t waiver = NOT_WAIVABLE;
+static struct result_params params;
 
 static void lost_alias(const char *alias, const string_list_t *before_modules, const string_list_t *after_modules, void *user_data)
 {
     struct rpminspect *ri = (struct rpminspect *) user_data;
     string_entry_t *entry = NULL;
-    char *msg = NULL;
 
     assert(alias != NULL);
     assert(before_modules != NULL);
     assert(after_modules != NULL);
     assert(ri != NULL);
 
+    params.remedy = REMEDY_KMOD_ALIAS;
+    params.noun = _("${FILE} kernel module alias");
+
     TAILQ_FOREACH(entry, before_modules, items) {
-        xasprintf(&msg, _("Kernel module '%s' lost alias '%s'"), entry->data, alias);
-        add_result(ri, sev, waiver, HEADER_KMOD, msg, NULL, REMEDY_KMOD_ALIAS);
-        free(msg);
+        xasprintf(&params.msg, _("Kernel module '%s' lost alias '%s'"), entry->data, alias);
+        params.verb = VERB_REMOVED;
+        params.file = entry->data;
+        add_result(ri, &params);
+        free(params.msg);
     }
 
     if (!TAILQ_EMPTY(after_modules)) {
         TAILQ_FOREACH(entry, after_modules, items) {
-            xasprintf(&msg, _("Kernel module '%s' gained alias '%s'"), entry->data, alias);
-            add_result(ri, sev, waiver, HEADER_KMOD, msg, NULL, REMEDY_KMOD_ALIAS);
-            free(msg);
+            xasprintf(&params.msg, _("Kernel module '%s' gained alias '%s'"), entry->data, alias);
+            params.verb = VERB_ADDED;
+            params.file = entry->data;
+            add_result(ri, &params);
+            free(params.msg);
         }
     }
 
@@ -77,7 +82,6 @@ static bool kmod_driver(struct rpminspect *ri, rpmfile_entry_t *file)
     const char *aftername = NULL;
     const char *beforever = NULL;
     const char *afterver = NULL;
-    char *msg = NULL;
 
     assert(ri != NULL);
     assert(file != NULL);
@@ -130,8 +134,8 @@ static bool kmod_driver(struct rpminspect *ri, rpmfile_entry_t *file)
 
     if (!strcmp(beforename, aftername) && !strcmp(afterver, beforever)) {
         /* Package name and version are the same, kmod params lost are bad */
-        sev = RESULT_VERIFY;
-        waiver = WAIVABLE_BY_ANYONE;
+        params.severity = RESULT_VERIFY;
+        params.waiverauth = WAIVABLE_BY_ANYONE;
     }
 
     /* Read in the kernel modules */
@@ -195,9 +199,13 @@ static bool kmod_driver(struct rpminspect *ri, rpmfile_entry_t *file)
     /* Report parameters */
     if (lost != NULL && !TAILQ_EMPTY(lost)) {
         TAILQ_FOREACH(entry, lost, items) {
-            xasprintf(&msg, _("Kernel module %s removes parameter '%s'"), file->localpath, entry->data);
-            add_result(ri, sev, waiver, HEADER_KMOD, msg, NULL, REMEDY_KMOD_PARM);
-            free(msg);
+            xasprintf(&params.msg, _("Kernel module %s removes parameter '%s'"), file->localpath, entry->data);
+            params.remedy = REMEDY_KMOD_PARM;
+            params.verb = VERB_REMOVED;
+            params.noun = _("${FILE} kernel module parameter");
+            params.file = file->localpath;
+            add_result(ri, &params);
+            free(params.msg);
         }
 
         list_free(lost, free);
@@ -206,9 +214,15 @@ static bool kmod_driver(struct rpminspect *ri, rpmfile_entry_t *file)
 
     if (gain != NULL && !TAILQ_EMPTY(gain)) {
         TAILQ_FOREACH(entry, gain, items) {
-            xasprintf(&msg, _("Kernel module %s adds parameter '%s'"), file->localpath, entry->data);
-            add_result(ri, RESULT_INFO, NOT_WAIVABLE, HEADER_KMOD, msg, NULL, NULL);
-            free(msg);
+            xasprintf(&params.msg, _("Kernel module %s adds parameter '%s'"), file->localpath, entry->data);
+            params.severity = RESULT_INFO;
+            params.waiverauth = NOT_WAIVABLE;
+            params.remedy = NULL;
+            params.verb = VERB_ADDED;
+            params.noun = _("${FILE} kernel module parameter");
+            params.file = file->localpath;
+            add_result(ri, &params);
+            free(params.msg);
         }
 
         list_free(gain, free);
@@ -221,9 +235,13 @@ static bool kmod_driver(struct rpminspect *ri, rpmfile_entry_t *file)
     /* Report dependencies */
     if (lost != NULL && !TAILQ_EMPTY(lost)) {
         TAILQ_FOREACH(entry, lost, items) {
-            xasprintf(&msg, _("Kernel module %s removes dependency '%s'"), file->localpath, entry->data);
-            add_result(ri, sev, waiver, HEADER_KMOD, msg, NULL, REMEDY_KMOD_DEPS);
-            free(msg);
+            xasprintf(&params.msg, _("Kernel module %s removes dependency '%s'"), file->localpath, entry->data);
+            params.remedy = REMEDY_KMOD_DEPS;
+            params.verb = VERB_REMOVED;
+            params.noun = _("${FILE} kernel module dependency");
+            params.file = file->localpath;
+            add_result(ri, &params);
+            free(params.msg);
         }
 
         list_free(lost, free);
@@ -232,9 +250,13 @@ static bool kmod_driver(struct rpminspect *ri, rpmfile_entry_t *file)
 
     if (gain != NULL && !TAILQ_EMPTY(gain)) {
         TAILQ_FOREACH(entry, gain, items) {
-            xasprintf(&msg, _("Kernel module %s adds dependency '%s'"), file->localpath, entry->data);
-            add_result(ri, sev, waiver, HEADER_KMOD, msg, NULL, REMEDY_KMOD_DEPS);
-            free(msg);
+            xasprintf(&params.msg, _("Kernel module %s adds dependency '%s'"), file->localpath, entry->data);
+            params.remedy = REMEDY_KMOD_DEPS;
+            params.verb = VERB_ADDED;
+            params.noun = _("${FILE} kernel module parameter");
+            params.file = file->localpath;
+            add_result(ri, &params);
+            free(params.msg);
         }
 
         list_free(gain, free);
@@ -270,11 +292,17 @@ bool inspect_kmod(struct rpminspect *ri) {
     assert(ri != NULL);
 
     /* run the kmod inspection across all RPM files */
+    memset(&params, 0, sizeof(params));
+    params.severity = RESULT_INFO;
+    params.waiverauth = NOT_WAIVABLE;
+    params.header = HEADER_KMOD;
     result = foreach_peer_file(ri, kmod_driver);
 
     /* if everything was fine, just say so */
     if (result) {
-        add_result(ri, RESULT_OK, NOT_WAIVABLE, HEADER_KMOD, NULL, NULL, NULL);
+        params.severity = RESULT_OK;
+        params.waiverauth = NOT_WAIVABLE;
+        add_result(ri, &params);
     }
 
     return result;

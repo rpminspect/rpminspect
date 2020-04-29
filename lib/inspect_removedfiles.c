@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2019  Red Hat, Inc.
+ * Copyright (C) 2019-2020  Red Hat, Inc.
  * Author(s):  David Cantrell <dcantrell@redhat.com>
  *
  * This program is free software: you can redistribute it and/or modify
@@ -27,22 +27,16 @@
 
 #include "rpminspect.h"
 
-static void add_removedfiles_result(struct rpminspect *ri, const char *msg, char *errors,
-                                    const severity_t severity, const waiverauth_t waiver)
+static void add_removedfiles_result(struct rpminspect *ri, struct result_params *params)
 {
-    char *tmp = NULL;
-
     assert(ri != NULL);
-    assert(msg != NULL);
+    assert(params != NULL);
 
-    if (waiver == WAIVABLE_BY_SECURITY) {
-        xasprintf(&tmp, _("%s.  Removing security policy related files requires inspection by the Security Response Team."), msg);
-    } else {
-        tmp = strdup(msg);
+    if (params->waiverauth == WAIVABLE_BY_SECURITY) {
+        params->msg = strappend(params->msg, _("; Removing security policy related files requires inspection by the Security Response Team."));
     }
 
-    add_result(ri, severity, waiver, HEADER_REMOVEDFILES, tmp, errors, REMEDY_REMOVEDFILES);
-    free(tmp);
+    add_result(ri, params);
     return;
 }
 
@@ -56,10 +50,8 @@ static bool removedfiles_driver(struct rpminspect *ri, rpmfile_entry_t *file)
     char *type = NULL;
     const char *arch = NULL;
     char *soname = NULL;
-    char *msg = NULL;
     string_entry_t *entry = NULL;
-    severity_t severity = RESULT_VERIFY;
-    waiverauth_t waiver = WAIVABLE_BY_ANYONE;
+    struct result_params params;
 
     /* Any entry with a peer has not been removed. */
     if (file->peer_file) {
@@ -85,6 +77,15 @@ static bool removedfiles_driver(struct rpminspect *ri, rpmfile_entry_t *file)
     type = get_mime_type(file);
     arch = get_rpm_header_arch(file->rpm_header);
 
+    /* Set up result parameters */
+    memset(&params, 0, sizeof(params));
+    params.severity = RESULT_VERIFY;
+    params.waiverauth = WAIVABLE_BY_ANYONE;
+    params.header = HEADER_REMOVEDFILES;
+    params.remedy = REMEDY_REMOVEDFILES;
+    params.arch = arch;
+    params.file = file->localpath;
+
     /* Set the waiver type if this is a file of security concern */
     if (ri->security_path_prefix) {
         TAILQ_FOREACH(entry, ri->security_path_prefix, items) {
@@ -93,8 +94,8 @@ static bool removedfiles_driver(struct rpminspect *ri, rpmfile_entry_t *file)
             }
 
             if (strprefix(entry->data, file->localpath)) {
-                severity = RESULT_BAD;
-                waiver = WAIVABLE_BY_SECURITY;
+                params.severity = RESULT_BAD;
+                params.waiverauth = WAIVABLE_BY_SECURITY;
                 break;
             }
         }
@@ -105,21 +106,21 @@ static bool removedfiles_driver(struct rpminspect *ri, rpmfile_entry_t *file)
      */
     if (is_elf(file->fullpath) && !strcmp(type, "application/x-pie-executable")) {
         soname = get_elf_soname(file->fullpath);
-        severity = RESULT_BAD;
+        params.severity = RESULT_BAD;
 
         if (soname) {
-            xasprintf(&msg, _("ABI break: Library %s with SONAME '%s' removed from %s"), file->localpath, soname, arch);
+            xasprintf(&params.msg, _("ABI break: Library %s with SONAME '%s' removed from %s"), file->localpath, soname, arch);
             free(soname);
         } else {
-            xasprintf(&msg, _("ABI break: Library %s removed from %s"), file->localpath, arch);
+            xasprintf(&params.msg, _("ABI break: Library %s removed from %s"), file->localpath, arch);
         }
 
-        add_removedfiles_result(ri, msg, NULL, severity, waiver);
-        free(msg);
+        add_removedfiles_result(ri, &params);
+        free(params.msg);
     } else {
-        xasprintf(&msg, _("%s removed from %s"), file->localpath, arch);
-        add_removedfiles_result(ri, msg, NULL, severity, waiver);
-        free(msg);
+        xasprintf(&params.msg, _("%s removed from %s"), file->localpath, arch);
+        add_removedfiles_result(ri, &params);
+        free(params.msg);
     }
 
     return result;
@@ -131,6 +132,7 @@ bool inspect_removedfiles(struct rpminspect *ri)
     rpmpeer_entry_t *peer = NULL;
     rpmfile_entry_t *file = NULL;
     const char *name = NULL;
+    struct result_params params;
 
     assert(ri != NULL);
 
@@ -167,7 +169,11 @@ bool inspect_removedfiles(struct rpminspect *ri)
     }
 
     if (result) {
-        add_result(ri, RESULT_OK, NOT_WAIVABLE, HEADER_REMOVEDFILES, NULL, NULL, NULL);
+        memset(&params, 0, sizeof(params));
+        params.severity = RESULT_OK;
+        params.waiverauth = NOT_WAIVABLE;
+        params.header = HEADER_REMOVEDFILES;
+        add_result(ri, &params);
     }
 
     return result;

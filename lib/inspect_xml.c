@@ -150,10 +150,8 @@ static bool is_xml(const char *path)
 
 static bool xml_driver(struct rpminspect *ri, rpmfile_entry_t *file)
 {
-    char *errors = NULL;
-    char *msg = NULL;
-    const char *arch = NULL;
     bool result = true;
+    struct result_params params;
 
     /* Skip source packages */
     if (headerIsSource(file->rpm_header)) {
@@ -182,28 +180,41 @@ static bool xml_driver(struct rpminspect *ri, rpmfile_entry_t *file)
         return true;
     }
 
-    arch = get_rpm_header_arch(file->rpm_header);
-    result = is_xml_well_formed(file->fullpath, &errors);
+    /* Set up result parameters */
+    memset(&params, 0, sizeof(params));
+    params.severity = RESULT_VERIFY;
+    params.waiverauth = WAIVABLE_BY_ANYONE;
+    params.header = HEADER_XML;
+    params.remedy = REMEDY_XML;
+    params.arch = get_rpm_header_arch(file->rpm_header);
+    params.file = file->localpath;
+
+    result = is_xml_well_formed(file->fullpath, &params.details);
 
     if (!result) {
-        xasprintf(&msg, _("File %s is a malformed XML file on %s"), file->localpath, arch);
-        add_result(ri, RESULT_VERIFY, WAIVABLE_BY_ANYONE, HEADER_XML, msg, errors, REMEDY_XML);
-        free(msg);
+        xasprintf(&params.msg, _("File %s is a malformed XML file on %s"), file->localpath, params.arch);
+        add_result(ri, &params);
+        free(params.msg);
+        free(params.details);
     }
 
-    free(errors);
     return result;
 }
 
 bool inspect_xml(struct rpminspect *ri)
 {
     bool result;
+    struct result_params params;
 
     assert(ri != NULL);
     result = foreach_peer_file(ri, xml_driver);
 
     if (result) {
-        add_result(ri, RESULT_OK, NOT_WAIVABLE, HEADER_XML, NULL, NULL, NULL);
+        memset(&params, 0, sizeof(params));
+        params.severity = RESULT_OK;
+        params.waiverauth = NOT_WAIVABLE;
+        params.header = HEADER_XML;
+        add_result(ri, &params);
     }
 
     return result;

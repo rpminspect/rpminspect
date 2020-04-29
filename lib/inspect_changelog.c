@@ -239,16 +239,13 @@ static bool check_src_rpm_changelog(struct rpminspect *ri, const rpmpeer_entry_t
     char *after_nevr = NULL;
     string_list_t *before_changelog = NULL;
     string_list_t *after_changelog = NULL;
-    char *msg = NULL;
     string_entry_t *before = NULL;
     string_entry_t *after = NULL;
     char *before_output = NULL;
     char *after_output = NULL;
     char *diff_output = NULL;
-    char *full_diff_output = NULL;
     int exitcode = 0;
-    severity_t sev = RESULT_OK;
-    waiverauth_t waiver = NOT_WAIVABLE;
+    struct result_params params;
 
     assert(ri != NULL);
     assert(peer != NULL);
@@ -274,40 +271,53 @@ static bool check_src_rpm_changelog(struct rpminspect *ri, const rpmpeer_entry_t
 
     /* Compare the changelogs */
     if (before_output && after_output) {
-        full_diff_output = run_cmd(&exitcode, DIFF_CMD, "-u", before_output, after_output, NULL);
+        diff_output = run_cmd(&exitcode, DIFF_CMD, "-u", before_output, after_output, NULL);
     }
+
+    /* Set up result parameters */
+    memset(&params, 0, sizeof(params));
+    params.header = HEADER_CHANGELOG;
+    params.severity = RESULT_OK;
+    params.waiverauth = NOT_WAIVABLE;
+    params.noun = _("%%changelog");
 
     if (exitcode) {
         /* Skip past the diff(1) header lines */
-        diff_output = skip_diff_headers(full_diff_output);
+        params.details = skip_diff_headers(diff_output);
 
         /* Perform checks */
         if (before_changelog && (after_changelog == NULL || TAILQ_EMPTY(after_changelog))) {
-            xasprintf(&msg, "%%changelog lost between the %s and %s builds", before_nevr, after_nevr);
-            sev = RESULT_VERIFY;
-            waiver = WAIVABLE_BY_ANYONE;
+            xasprintf(&params.msg, "%%changelog lost between the %s and %s builds", before_nevr, after_nevr);
+            params.severity = RESULT_VERIFY;
+            params.waiverauth = WAIVABLE_BY_ANYONE;
+            params.verb = VERB_REMOVED;
         } else if ((before_changelog == NULL || TAILQ_EMPTY(before_changelog)) && after_changelog) {
-            xasprintf(&msg, "Gained %%changelog between the %s and %s builds", before_nevr, after_nevr);
-            sev = RESULT_INFO;
-            waiver = NOT_WAIVABLE;
+            xasprintf(&params.msg, "Gained %%changelog between the %s and %s builds", before_nevr, after_nevr);
+            params.severity = RESULT_INFO;
+            params.waiverauth = NOT_WAIVABLE;
+            params.verb = VERB_ADDED;
         } else if ((before_changelog == NULL || TAILQ_EMPTY(before_changelog)) && (after_changelog == NULL || TAILQ_EMPTY(after_changelog))) {
-            xasprintf(&msg, "No %%changelog present in the %s build", after_nevr);
-            sev = RESULT_BAD;
-            waiver = WAIVABLE_BY_ANYONE;
+            xasprintf(&params.msg, "No %%changelog present in the %s build", after_nevr);
+            params.severity = RESULT_BAD;
+            params.waiverauth = WAIVABLE_BY_ANYONE;
+            params.verb = VERB_FAILED;
         }
     } else if (before_changelog == NULL || after_changelog == NULL) {
         if (before_changelog == NULL && after_changelog != NULL) {
-            xasprintf(&msg, "Gained %%changelog between the %s and %s builds", before_nevr, after_nevr);
-            sev = RESULT_INFO;
-            waiver = NOT_WAIVABLE;
+            xasprintf(&params.msg, "Gained %%changelog between the %s and %s builds", before_nevr, after_nevr);
+            params.severity = RESULT_INFO;
+            params.waiverauth = NOT_WAIVABLE;
+            params.verb = VERB_ADDED;
         } else if (before_changelog != NULL && after_changelog == NULL) {
-            xasprintf(&msg, "%%changelog lost between the %s and %s builds", before_nevr, after_nevr);
-            sev = RESULT_VERIFY;
-            waiver = WAIVABLE_BY_ANYONE;
+            xasprintf(&params.msg, "%%changelog lost between the %s and %s builds", before_nevr, after_nevr);
+            params.severity = RESULT_VERIFY;
+            params.waiverauth = WAIVABLE_BY_ANYONE;
+            params.verb = VERB_REMOVED;
         } else if (before_changelog == NULL && after_changelog == NULL) {
-            xasprintf(&msg, "No %%changelog present in the %s build", after_nevr);
-            sev = RESULT_BAD;
-            waiver = WAIVABLE_BY_ANYONE;
+            xasprintf(&params.msg, "No %%changelog present in the %s build", after_nevr);
+            params.severity = RESULT_BAD;
+            params.waiverauth = WAIVABLE_BY_ANYONE;
+            params.verb = VERB_FAILED;
         }
     } else if (before && after && !strcmp(before->data, after->data)) {
         /*
@@ -318,15 +328,16 @@ static bool check_src_rpm_changelog(struct rpminspect *ri, const rpmpeer_entry_t
         if (strcmp(headerGetString(peer->before_hdr, RPMTAG_NAME), headerGetString(peer->after_hdr, RPMTAG_NAME)) ||
             strcmp(headerGetString(peer->before_hdr, RPMTAG_VERSION), headerGetString(peer->after_hdr, RPMTAG_VERSION)) ||
             (get_before_rel(ri) && get_after_rel(ri) && strcmp(get_before_rel(ri), get_after_rel(ri)))) {
-            xasprintf(&msg, "No new %%changelog entry in the %s build", after_nevr);
-            sev = RESULT_BAD;
-            waiver = WAIVABLE_BY_ANYONE;
+            xasprintf(&params.msg, "No new %%changelog entry in the %s build", after_nevr);
+            params.severity = RESULT_BAD;
+            params.waiverauth = WAIVABLE_BY_ANYONE;
+            params.verb = VERB_FAILED;
         }
     }
 
-    if (msg) {
-        add_result(ri, sev, waiver, HEADER_CHANGELOG, msg, diff_output, REMEDY_CHANGELOG);
-        free(msg);
+    if (params.msg) {
+        add_result(ri, &params);
+        free(params.msg);
         result = false;
     }
 
@@ -337,7 +348,7 @@ static bool check_src_rpm_changelog(struct rpminspect *ri, const rpmpeer_entry_t
     free(after_nevr);
     free(before_output);
     free(after_output);
-    free(full_diff_output);
+    free(diff_output);
 
     return result;
 }
@@ -360,10 +371,9 @@ static bool check_bin_rpm_changelog(struct rpminspect *ri, const rpmpeer_entry_t
     char *before_output = NULL;
     char *after_output = NULL;
     char *diff_output = NULL;
-    char *full_diff_output = NULL;
     int exitcode = 0;
     string_entry_t *entry = NULL;
-    severity_t severity = RESULT_INFO;
+    struct result_params params;
 
     assert(ri != NULL);
     assert(peer != NULL);
@@ -382,38 +392,55 @@ static bool check_bin_rpm_changelog(struct rpminspect *ri, const rpmpeer_entry_t
 
     /* Compare the changelogs */
     if (before_output && after_output) {
-        full_diff_output = run_cmd(&exitcode, DIFF_CMD, "-u", before_output, after_output, NULL);
+        diff_output = run_cmd(&exitcode, DIFF_CMD, "-u", before_output, after_output, NULL);
     }
+
+    /* Set up result parameters */
+    memset(&params, 0, sizeof(params));
+    params.severity = RESULT_INFO;
+    params.header = HEADER_CHANGELOG;
+    params.verb = VERB_CHANGED;
+    params.noun = _("%%changelog");
 
     if (exitcode) {
         /* Skip past the diff(1) header lines */
-        diff_output = skip_diff_headers(full_diff_output);
+        params.details = skip_diff_headers(diff_output);
 
         /* Differences found, see what kind */
-        severity = get_diff_severity(diff_output);
+        params.severity = get_diff_severity(diff_output);
 
-        if (severity == RESULT_INFO) {
-            xasprintf(&msg, "%%changelog contains new text in the %s build", after_nevr);
-            add_result(ri, severity, NOT_WAIVABLE, HEADER_CHANGELOG, msg, diff_output, NULL);
+        if (params.severity == RESULT_INFO) {
+            xasprintf(&params.msg, "%%changelog contains new text in the %s build", after_nevr);
+            params.waiverauth = NOT_WAIVABLE;
+            add_result(ri, &params);
         } else {
             xasprintf(&msg, "%%changelog modified between the %s and %s builds", before_nevr, after_nevr);
-            add_result(ri, severity, WAIVABLE_BY_ANYONE, HEADER_CHANGELOG, msg, diff_output, REMEDY_CHANGELOG);
+            params.waiverauth = WAIVABLE_BY_ANYONE;
+            params.remedy = REMEDY_CHANGELOG;
+            add_result(ri, &params);
         }
 
-        free(msg);
+        free(params.msg);
         result = false;
     }
 
-    free(full_diff_output);
+    free(diff_output);
     free(before_output);
     free(after_output);
 
     /* Check for bad words */
     TAILQ_FOREACH(entry, after_changelog, items) {
         if (has_bad_word(entry->data, ri->badwords)) {
-            xasprintf(&msg, "%%changelog entry has unprofessional language in the %s build", after_nevr);
-            add_result(ri, RESULT_BAD, WAIVABLE_BY_ANYONE, HEADER_CHANGELOG, msg, entry->data, REMEDY_CHANGELOG);
-            free(msg);
+            xasprintf(&params.msg, "%%changelog entry has unprofessional language in the %s build", after_nevr);
+            params.severity = RESULT_BAD;
+            params.waiverauth = WAIVABLE_BY_ANYONE;
+            params.remedy = REMEDY_CHANGELOG;
+            params.details = entry->data;
+            params.verb = VERB_FAILED;
+            xasprintf(&params.noun, "'%s' in %%changelog", entry->data);
+            add_result(ri, &params);
+            free(params.msg);
+            free(params.noun);
             result = false;
         }
     }
@@ -437,6 +464,7 @@ bool inspect_changelog(struct rpminspect *ri)
     rpmpeer_entry_t *peer = NULL;
     rpmpeer_entry_t *src = NULL;
     rpmpeer_entry_t *bin = NULL;
+    struct result_params params;
 
     assert(ri != NULL);
 
@@ -471,7 +499,11 @@ bool inspect_changelog(struct rpminspect *ri)
     }
 
     if (src_result && bin_result) {
-        add_result(ri, RESULT_OK, NOT_WAIVABLE, HEADER_CHANGELOG, NULL, NULL, NULL);
+        memset(&params, 0, sizeof(params));
+        params.severity = RESULT_OK;
+        params.waiverauth = NOT_WAIVABLE;
+        params.header = HEADER_CHANGELOG;
+        add_result(ri, &params);
         return true;
     } else {
         return false;

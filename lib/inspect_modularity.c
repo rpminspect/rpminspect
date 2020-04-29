@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2019  Red Hat, Inc.
+ * Copyright (C) 2019-2020  Red Hat, Inc.
  * Author(s):  David Cantrell <dcantrell@redhat.com>
  *
  * This program is free software: you can redistribute it and/or modify
@@ -28,26 +28,33 @@ static bool modularity_driver(struct rpminspect *ri, rpmfile_entry_t *file) {
     rpmTagType tt;
     rpmTagVal tv;
     const char *modularitylabel = NULL;
-    char *msg = NULL;
+    struct result_params params;
 
     assert(ri != NULL);
     assert(file != NULL);
 
+    /* Set up the result parameters */
+    memset(&params, 0, sizeof(params));
+    params.severity = RESULT_BAD;
+    params.waiverauth = NOT_WAIVABLE;
+    params.header = HEADER_MODULARITY;
+    params.remedy = REMEDY_MODULARITY;
+
     /* Build the message we'll use for errors */
-    xasprintf(&msg, _("Package \"%s\" is part of a module but lacks the '%%{modularitylabel}' header tag."), headerGetString(file->rpm_header, RPMTAG_NAME));
+    xasprintf(&params.msg, _("Package \"%s\" is part of a module but lacks the '%%{modularitylabel}' header tag."), headerGetString(file->rpm_header, RPMTAG_NAME));
 
     /* Find how to find the header */
     tv = rpmTagGetValue("modularitylabel");
     if (tv == -1) {
-        add_result(ri, RESULT_BAD, NOT_WAIVABLE, HEADER_MODULARITY, msg, NULL, REMEDY_MODULARITY);
-        free(msg);
+        add_result(ri, &params);
+        free(params.msg);
         return false;
     }
 
     tt = rpmTagGetTagType(tv);
     if (tt == RPM_NULL_TYPE) {
-        add_result(ri, RESULT_BAD, NOT_WAIVABLE, HEADER_MODULARITY, msg, NULL, REMEDY_MODULARITY);
-        free(msg);
+        add_result(ri, &params);
+        free(params.msg);
         return false;
     }
 
@@ -55,12 +62,12 @@ static bool modularity_driver(struct rpminspect *ri, rpmfile_entry_t *file) {
     modularitylabel = headerGetString(file->rpm_header, tv);
 
     if (modularitylabel == NULL) {
-        add_result(ri, RESULT_BAD, NOT_WAIVABLE, HEADER_MODULARITY, msg, NULL, REMEDY_MODULARITY);
-        free(msg);
+        add_result(ri, &params);
+        free(params.msg);
         return false;
     }
 
-    free(msg);
+    free(params.msg);
     return result;
 }
 
@@ -69,6 +76,7 @@ static bool modularity_driver(struct rpminspect *ri, rpmfile_entry_t *file) {
  */
 bool inspect_modularity(struct rpminspect *ri) {
     bool result = false;
+    struct result_params params;
 
     assert(ri != NULL);
 
@@ -79,7 +87,11 @@ bool inspect_modularity(struct rpminspect *ri) {
     result = foreach_peer_file(ri, modularity_driver);
 
     if (result) {
-        add_result(ri, RESULT_OK, WAIVABLE_BY_ANYONE, HEADER_MODULARITY, NULL, NULL, NULL);
+        memset(&params, 0, sizeof(params));
+        params.severity = RESULT_OK;
+        params.waiverauth = WAIVABLE_BY_ANYONE;
+        params.header = HEADER_MODULARITY;
+        add_result(ri, &params);
     }
 
     return result;

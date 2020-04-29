@@ -107,9 +107,8 @@ static bool shellsyntax_driver(struct rpminspect *ri, rpmfile_entry_t *file)
     char *before_errors = NULL;
     int before_exitcode = -1;
     char *errors = NULL;
-    char *msg = NULL;
-    char *tmp = NULL;
     bool extglob = false;
+    struct result_params params;
 
     /* Ignore files in the SRPM */
     if (headerIsSource(file->rpm_header)) {
@@ -134,19 +133,28 @@ static bool shellsyntax_driver(struct rpminspect *ri, rpmfile_entry_t *file)
         return true;
     }
 
+    /* Set up the result parameters */
+    memset(&params, 0, sizeof(params));
+    params.header = HEADER_SHELLSYNTAX;
+    params.arch = arch;
+    params.file = file->localpath;
+
     if (file->peer_file) {
         before_shell = get_shell(ri, file->peer_file->fullpath);
         DEBUG_PRINT("before_shell=|%s|\n", before_shell);
 
         if (!before_shell) {
-            xasprintf(&msg, _("%s is a shell script but was not before on %s"), file->localpath, arch);
+            xasprintf(&params.msg, _("%s is a shell script but was not before on %s"), file->localpath, arch);
         } else if (strcmp(shell, before_shell)) {
-            xasprintf(&msg, _("%s is a %s script but was a %s script before on %s"), file->localpath, shell, before_shell, arch);
+            xasprintf(&params.msg, _("%s is a %s script but was a %s script before on %s"), file->localpath, shell, before_shell, arch);
         }
 
-        if (msg) {
-            add_result(ri, RESULT_INFO, NOT_WAIVABLE, HEADER_SHELLSYNTAX, msg, NULL, REMEDY_SHELLSYNTAX_GAINED_SHELL);
-            free(msg);
+        if (params.msg) {
+            params.severity = RESULT_INFO;
+            params.waiverauth = NOT_WAIVABLE;
+            params.remedy = REMEDY_SHELLSYNTAX_GAINED_SHELL;
+            add_result(ri, &params);
+            free(params.msg);
         }
     }
 
@@ -174,36 +182,54 @@ static bool shellsyntax_driver(struct rpminspect *ri, rpmfile_entry_t *file)
     /* Report */
     if (before_shell) {
         if ((!before_exitcode || before_errors == NULL) && (exitcode || errors)) {
-            xasprintf(&msg, _("%s is no longer a valid %s script on %s"), file->localpath, shell, arch);
-            add_result(ri, RESULT_BAD, WAIVABLE_BY_ANYONE, HEADER_SHELLSYNTAX, msg, errors, REMEDY_SHELLSYNTAX_BAD);
-            free(msg);
+            xasprintf(&params.msg, _("%s is no longer a valid %s script on %s"), file->localpath, shell, arch);
+            params.severity = RESULT_BAD;
+            params.waiverauth = WAIVABLE_BY_ANYONE;
+            params.remedy = REMEDY_SHELLSYNTAX_BAD;
+            params.details = errors;
+            add_result(ri, &params);
+            free(params.msg);
             result = false;
         } else if ((before_exitcode || before_errors) && (!exitcode && errors == NULL)) {
-            xasprintf(&msg, _("%s became a valid %s script on %s"), file->localpath, shell, arch);
+            xasprintf(&params.msg, _("%s became a valid %s script on %s"), file->localpath, shell, arch);
 
             if (extglob) {
-                xasprintf(&tmp, _("%s. The script fails with '-n' but passes with '-O extglob'; be sure 'shopt extglob' is set in the script."), msg);
-                free(msg);
-                msg = tmp;
+                params.msg = strappend(params.msg, _(". The script fails with '-n' but passes with '-O extglob'; be sure 'shopt extglob' is set in the script."));
             }
 
-            add_result(ri, RESULT_INFO, NOT_WAIVABLE, HEADER_SHELLSYNTAX, msg, before_errors, NULL);
-            free(msg);
+            params.severity = RESULT_INFO;
+            params.waiverauth = NOT_WAIVABLE;
+            params.details = before_errors;
+            params.remedy = NULL;
+            add_result(ri, &params);
+            free(params.msg);
         } else if ((before_exitcode || before_errors) && (exitcode || errors)) {
-            xasprintf(&msg, _("%s is not a valid %s script on %s"), file->localpath, shell, arch);
-            add_result(ri, RESULT_BAD, WAIVABLE_BY_ANYONE, HEADER_SHELLSYNTAX, msg, errors, REMEDY_SHELLSYNTAX_BAD);
-            free(msg);
+            xasprintf(&params.msg, _("%s is not a valid %s script on %s"), file->localpath, shell, arch);
+            params.severity = RESULT_BAD;
+            params.waiverauth = WAIVABLE_BY_ANYONE;
+            params.remedy = REMEDY_SHELLSYNTAX_BAD;
+            params.details = errors;
+            add_result(ri, &params);
+            free(params.msg);
             result = false;
         }
     } else {
         if ((!exitcode || errors == NULL) && extglob) {
-            xasprintf(&msg, _("%s fails with '-n' but passes with '-O extglob'; be sure 'shopt extglob' is set in the script on %s"), file->localpath, arch);
-            add_result(ri, RESULT_INFO, NOT_WAIVABLE, HEADER_SHELLSYNTAX, msg, NULL, NULL);
-            free(msg);
+            xasprintf(&params.msg, _("%s fails with '-n' but passes with '-O extglob'; be sure 'shopt extglob' is set in the script on %s"), file->localpath, arch);
+            params.severity = RESULT_INFO;
+            params.waiverauth = NOT_WAIVABLE;
+            params.details = NULL;
+            params.remedy = NULL;
+            add_result(ri, &params);
+            free(params.msg);
         } else if (exitcode || errors) {
-            xasprintf(&msg, _("%s is not a valid %s script on %s"), file->localpath, shell, arch);
-            add_result(ri, RESULT_BAD, WAIVABLE_BY_ANYONE, HEADER_SHELLSYNTAX, msg, errors, REMEDY_SHELLSYNTAX_BAD);
-            free(msg);
+            xasprintf(&params.msg, _("%s is not a valid %s script on %s"), file->localpath, shell, arch);
+            params.severity = RESULT_BAD;
+            params.waiverauth = WAIVABLE_BY_ANYONE;
+            params.details = errors;
+            params.remedy = REMEDY_SHELLSYNTAX_BAD;
+            add_result(ri, &params);
+            free(params.msg);
             result = false;
         }
     }
@@ -218,13 +244,18 @@ static bool shellsyntax_driver(struct rpminspect *ri, rpmfile_entry_t *file)
  */
 bool inspect_shellsyntax(struct rpminspect *ri) {
     bool result;
+    struct result_params params;
 
     assert(ri != NULL);
 
     result = foreach_peer_file(ri, shellsyntax_driver);
 
     if (result) {
-        add_result(ri, RESULT_OK, NOT_WAIVABLE, HEADER_SHELLSYNTAX, NULL, NULL, NULL);
+        memset(&params, 0, sizeof(params));
+        params.severity = RESULT_OK;
+        params.waiverauth = NOT_WAIVABLE;
+        params.header = HEADER_SHELLSYNTAX;
+        add_result(ri, &params);
     }
 
     return result;

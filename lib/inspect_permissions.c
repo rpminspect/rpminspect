@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2019  Red Hat, Inc.
+ * Copyright (C) 2019-2020  Red Hat, Inc.
  * Author(s):  David Cantrell <dcantrell@redhat.com>
  *
  * This program is free software: you can redistribute it and/or modify
@@ -27,13 +27,12 @@ static bool permissions_driver(struct rpminspect *ri, rpmfile_entry_t *file)
 {
     bool result = true;
     const char *arch = NULL;
-    char *msg = NULL;
-    severity_t sev = RESULT_VERIFY;
     const char *what = _("changed");
     mode_t before_mode;
     mode_t after_mode;
     mode_t mode_diff;
     bool whitelisted = false;
+    struct result_params params;
 
     assert(ri != NULL);
     assert(file != NULL);
@@ -51,6 +50,12 @@ static bool permissions_driver(struct rpminspect *ri, rpmfile_entry_t *file)
     /* We need the architecture for reporting */
     arch = get_rpm_header_arch(file->rpm_header);
 
+    /* Set up result parameters */
+    memset(&params, 0, sizeof(params));
+    params.severity = RESULT_VERIFY;
+    params.header = HEADER_PERMISSIONS;
+    params.arch = arch;
+
     /* Local working copies for display */
     before_mode = file->peer_file->st.st_mode & 0777;
     after_mode = file->st.st_mode & 0777;
@@ -63,28 +68,32 @@ static bool permissions_driver(struct rpminspect *ri, rpmfile_entry_t *file)
         /* if setuid/setgid or new mode is more open */
         if (!whitelisted) {
             if (!(before_mode & (S_ISUID|S_ISGID)) && (after_mode & (S_ISUID|S_ISGID))) {
-                sev = RESULT_BAD;
+                params.severity = RESULT_BAD;
                 what = _("changed setuid/setgid");
             } else if (S_ISDIR(file->st.st_mode) && !S_ISLNK(file->st.st_mode)) {
                 if (((mode_diff & S_ISVTX) && !(after_mode & S_ISVTX)) || ((after_mode & mode_diff) != 0)) {
-                    sev = RESULT_BAD;
+                    params.severity = RESULT_BAD;
                     what = _("relaxed");
                 }
             }
         }
 
-        xasprintf(&msg, _("%s %s permissions from %04o to %04o on %s"), file->localpath, what, before_mode, after_mode, arch);
-        add_result(ri, sev, WAIVABLE_BY_ANYONE, HEADER_PERMISSIONS, msg, NULL, NULL);
-        free(msg);
+        xasprintf(&params.msg, _("%s %s permissions from %04o to %04o on %s"), file->localpath, what, before_mode, after_mode, arch);
+        params.waiverauth = WAIVABLE_BY_ANYONE;
+        params.file = file->localpath;
+        add_result(ri, &params);
+        free(params.msg);
 
         result = false;
     }
 
     /* check for world-writability */
     if (!whitelisted && (!S_ISLNK(file->st.st_mode) && !S_ISDIR(file->st.st_mode) && (after_mode & (S_IWOTH|S_ISVTX)))) {
-        xasprintf(&msg, _("%s (%s) is world-writable on %s"), file->localpath, get_mime_type(file), arch);
-        add_result(ri, RESULT_BAD, WAIVABLE_BY_SECURITY, HEADER_PERMISSIONS, msg, NULL, NULL);
-        free(msg);
+        xasprintf(&params.msg, _("%s (%s) is world-writable on %s"), file->localpath, get_mime_type(file), arch);
+        params.severity = RESULT_BAD;
+        params.waiverauth = WAIVABLE_BY_SECURITY;
+        add_result(ri, &params);
+        free(params.msg);
         result = false;
     }
 
@@ -96,6 +105,7 @@ static bool permissions_driver(struct rpminspect *ri, rpmfile_entry_t *file)
  */
 bool inspect_permissions(struct rpminspect *ri) {
     bool result;
+    struct result_params params;
 
     assert(ri != NULL);
 
@@ -104,7 +114,11 @@ bool inspect_permissions(struct rpminspect *ri) {
 
     /* if everything was fine, just say so */
     if (result) {
-        add_result(ri, RESULT_OK, NOT_WAIVABLE, HEADER_PERMISSIONS, NULL, NULL, NULL);
+        memset(&params, 0, sizeof(params));
+        params.severity = RESULT_OK;
+        params.waiverauth = NOT_WAIVABLE;
+        params.header = HEADER_PERMISSIONS;
+        add_result(ri, &params);
     }
 
     return result;

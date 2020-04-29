@@ -31,9 +31,7 @@ static bool filesize_driver(struct rpminspect *ri, rpmfile_entry_t *file)
     bool result = true;
     const char *arch = NULL;
     off_t change;
-    char *msg = NULL;
-    severity_t sev = RESULT_INFO;
-    waiverauth_t waiver = NOT_WAIVABLE;
+    struct result_params params;
 
     assert(ri != NULL);
     assert(file != NULL);
@@ -61,44 +59,59 @@ static bool filesize_driver(struct rpminspect *ri, rpmfile_entry_t *file)
     /* We need the architecture for reporting */
     arch = get_rpm_header_arch(file->rpm_header);
 
+    /* Set up result parameters */
+    memset(&params, 0, sizeof(params));
+    params.severity = RESULT_INFO;
+    params.waiverauth = NOT_WAIVABLE;
+    params.header = HEADER_FILESIZE;
+    params.arch = arch;
+    params.file = file->localpath;
+
     /* Size checks and messaging */
     if (file->st.st_size > 0 && file->peer_file->st.st_size == 0) {
         /* became non-empty */
-        xasprintf(&msg, _("%s became a non-empty file on %s"), file->localpath, arch);
-        sev = RESULT_VERIFY;
-        waiver = WAIVABLE_BY_ANYONE;
+        xasprintf(&params.msg, _("%s became a non-empty file on %s"), file->localpath, arch);
+        params.severity = RESULT_VERIFY;
+        params.waiverauth = WAIVABLE_BY_ANYONE;
+        params.verb = VERB_CHANGED;
+        params.noun = _("non-empty ${FILE}");
         result = false;
     } else if (file->st.st_size == 0 && file->peer_file->st.st_size > 0) {
         /* became empty */
-        xasprintf(&msg, _("%s became an empty file on %s"), file->localpath, arch);
-        sev = RESULT_VERIFY;
-        waiver = WAIVABLE_BY_ANYONE;
+        xasprintf(&params.msg, _("%s became an empty file on %s"), file->localpath, arch);
+        params.severity = RESULT_VERIFY;
+        params.waiverauth = WAIVABLE_BY_ANYONE;
+        params.verb = VERB_CHANGED;
+        params.noun = _("empty ${FILE}");
         result = false;
     } else {
         change = ((file->st.st_size - file->peer_file->st.st_size) / file->peer_file->st.st_size) * 100;
-        sev = RESULT_INFO;
-        waiver = NOT_WAIVABLE;
+        params.severity = RESULT_INFO;
+        params.waiverauth = NOT_WAIVABLE;
 
         if (threshold > 0 && (labs(change) >= threshold)) {
             /* change is at or above our reporting change threshold for VERIFY */
-            sev = RESULT_VERIFY;
-            waiver = WAIVABLE_BY_ANYONE;
+            params.severity = RESULT_VERIFY;
+            params.waiverauth = WAIVABLE_BY_ANYONE;
+            params.verb = VERB_CHANGED;
             result = false;
         }
 
         if (change > 0) {
             /* file grew */
-            xasprintf(&msg, _("%s grew by +%ld%% on %s"), file->localpath, change, arch);
+            xasprintf(&params.msg, _("%s grew by +%ld%% on %s"), file->localpath, change, arch);
+            params.noun = _("${FILE} size grew");
         } else if (change < 0) {
             /* file shrank */
-            xasprintf(&msg, _("%s shrank by -%ld%% on %s"), file->localpath, change, arch);
+            xasprintf(&params.msg, _("%s shrank by -%ld%% on %s"), file->localpath, change, arch);
+            params.noun = _("${FILE} size shrank");
         }
     }
 
     /* Reporting */
-    if (msg) {
-        add_result(ri, sev, waiver, HEADER_FILESIZE, msg, NULL, NULL);
-        free(msg);
+    if (params.msg) {
+        add_result(ri, &params);
+        free(params.msg);
     }
 
     return result;
@@ -109,6 +122,7 @@ static bool filesize_driver(struct rpminspect *ri, rpmfile_entry_t *file)
  */
 bool inspect_filesize(struct rpminspect *ri) {
     bool result;
+    struct result_params params;
 
     assert(ri != NULL);
 
@@ -128,7 +142,11 @@ bool inspect_filesize(struct rpminspect *ri) {
 
     /* if everything was fine, just say so */
     if (result) {
-        add_result(ri, RESULT_OK, NOT_WAIVABLE, HEADER_FILESIZE, NULL, NULL, NULL);
+        memset(&params, 0, sizeof(params));
+        params.severity = RESULT_OK;
+        params.waiverauth = NOT_WAIVABLE;
+        params.header = HEADER_FILESIZE;
+        add_result(ri, &params);
     }
 
     return result;

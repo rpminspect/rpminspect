@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2019  Red Hat, Inc.
+ * Copyright (C) 2019-2020  Red Hat, Inc.
  * Author(s):  David Cantrell <dcantrell@redhat.com>
  *
  * This program is free software: you can redistribute it and/or modify
@@ -46,14 +46,19 @@ void free_results(results_t *results) {
     while (!TAILQ_EMPTY(results)) {
         entry = TAILQ_FIRST(results);
         TAILQ_REMOVE(results, entry, items);
-        free(entry->header);
-        entry->header = NULL;
         free(entry->msg);
         entry->msg = NULL;
         free(entry->details);
         entry->details = NULL;
-        free(entry->remedy);
+        free(entry->noun);
+        entry->noun = NULL;
+
+        /* these are all consts */
+        entry->header = NULL;
         entry->remedy = NULL;
+        entry->arch = NULL;
+        entry->file = NULL;
+
         free(entry);
     }
 
@@ -73,12 +78,13 @@ void free_results(results_t *results) {
  *
  * Pass NULL for any optional strings that you have no data for.
  */
-void add_result_entry(results_t **results, severity_t severity, waiverauth_t waiverauth, const char *header, char *msg, char *details, const char *remedy)
+void add_result_entry(results_t **results, struct result_params *params)
 {
     results_entry_t *entry = NULL;
 
-    assert(severity >= 0);
-    assert(header != NULL);
+    assert(params != NULL);
+    assert(params->severity >= 0);
+    assert(params->header != NULL);
 
     if (*results == NULL) {
         *results = init_results();
@@ -87,20 +93,34 @@ void add_result_entry(results_t **results, severity_t severity, waiverauth_t wai
     entry = calloc(1, sizeof(*entry));
     assert(entry != NULL);
 
-    entry->severity = severity;
-    entry->waiverauth = waiverauth;
-    entry->header = strdup(header);
+    entry->severity = params->severity;
+    entry->waiverauth = params->waiverauth;
+    entry->header = strdup(params->header);
 
-    if (msg != NULL) {
-        entry->msg = strdup(msg);
+    if (params->msg != NULL) {
+        entry->msg = strdup(params->msg);
     }
 
-    if (details != NULL) {
-        entry->details = strdup(details);
+    if (params->details != NULL) {
+        entry->details = strdup(params->details);
     }
 
-    if (remedy != NULL) {
-        entry->remedy = strdup(remedy);
+    if (params->remedy != NULL) {
+        entry->remedy = strdup(params->remedy);
+    }
+
+    entry->verb = params->verb;
+
+    if (params->noun != NULL) {
+        entry->noun = strdup(params->noun);
+    }
+
+    if (params->arch != NULL) {
+        entry->arch = strdup(params->arch);
+    }
+
+    if (params->file != NULL) {
+        entry->file = strdup(params->file);
     }
 
     TAILQ_INSERT_TAIL(*results, entry, items);
@@ -110,15 +130,16 @@ void add_result_entry(results_t **results, severity_t severity, waiverauth_t wai
 /*
  * Shortcut to call add_result_entry() by giving the struct rpminspect.
  */
-void add_result(struct rpminspect *ri, severity_t severity, waiverauth_t waiverauth, const char *header, char *msg, char *details, const char *remedy)
+void add_result(struct rpminspect *ri, struct result_params *params)
 {
     assert(ri != NULL);
-    assert(severity >= 0);
+    assert(params != NULL);
+    assert(params->severity >= 0);
 
-    if (severity > ri->worst_result) {
-        ri->worst_result = severity;
+    if (params->severity > ri->worst_result) {
+        ri->worst_result = params->severity;
     }
 
-    add_result_entry(&ri->results, severity, waiverauth, header, msg, details, remedy);
+    add_result_entry(&ri->results, params);
     return;
 }

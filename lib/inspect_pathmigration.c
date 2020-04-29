@@ -30,7 +30,7 @@ static bool pathmigration_driver(struct rpminspect *ri, rpmfile_entry_t *file)
     string_entry_t *entry = NULL;
     char *old = NULL;
     const char *arch = NULL;
-    char *msg = NULL;
+    struct result_params params;
 
     /* Ignore files in the SRPM */
     if (headerIsSource(file->rpm_header)) {
@@ -39,6 +39,14 @@ static bool pathmigration_driver(struct rpminspect *ri, rpmfile_entry_t *file)
 
     /* Used for reporting */
     arch = get_rpm_header_arch(file->rpm_header);
+
+    /* Set up result parameters */
+    memset(&params, 0, sizeof(params));
+    params.severity = RESULT_VERIFY;
+    params.waiverauth = WAIVABLE_BY_ANYONE;
+    params.header = HEADER_PATHMIGRATION;
+    params.remedy = REMEDY_PATHMIGRATION;
+    params.arch = arch;
 
     /* Check for each path migration, break early if we find a match */
     TAILQ_FOREACH(entry, ri->pathmigration_keys, items) {
@@ -63,9 +71,10 @@ static bool pathmigration_driver(struct rpminspect *ri, rpmfile_entry_t *file)
 
         /* Check to see if we found a path that should be migrated */
         if (strprefix(file->localpath, old)) {
-            xasprintf(&msg, "File %s found should be in %s on %s", file->localpath, (char *) eptr->data, arch);
-            add_result(ri, RESULT_VERIFY, WAIVABLE_BY_ANYONE, HEADER_PATHMIGRATION, msg, NULL, REMEDY_PATHMIGRATION);
-            free(msg);
+            xasprintf(&params.msg, "File %s found should be in %s on %s", file->localpath, (char *) eptr->data, arch);
+            params.file = file->localpath;
+            add_result(ri, &params);
+            free(params.msg);
             result = false;
         }
 
@@ -84,6 +93,7 @@ static bool pathmigration_driver(struct rpminspect *ri, rpmfile_entry_t *file)
  */
 bool inspect_pathmigration(struct rpminspect *ri) {
     bool result = true;
+    struct result_params params;
 
     assert(ri != NULL);
 
@@ -93,7 +103,11 @@ bool inspect_pathmigration(struct rpminspect *ri) {
     }
 
     if (result) {
-        add_result(ri, RESULT_OK, NOT_WAIVABLE, HEADER_PATHMIGRATION, NULL, NULL, NULL);
+        memset(&params, 0, sizeof(params));
+        params.severity = RESULT_OK;
+        params.waiverauth = NOT_WAIVABLE;
+        params.header = HEADER_PATHMIGRATION;
+        add_result(ri, &params);
     }
 
     return result;
