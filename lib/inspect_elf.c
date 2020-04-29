@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2019  Red Hat, Inc.
+ * Copyright (C) 2019-2020  Red Hat, Inc.
  * Author(s):  David Shea <dshea@redhat.com>
  *             David Cantrell <dcantrell@redhat.com>
  *
@@ -482,10 +482,8 @@ static bool inspect_elf_execstack(struct rpminspect *ri, Elf *after_elf, Elf *be
     Elf64_Half elf_type;
     uint64_t execstack_flags;
     bool result = false;
-    char *msg = NULL;
-
     bool before_execstack = false;
-    severity_t severity;
+    struct result_params params;
 
     /* If there is no executable code, there is no executable stack */
     if (!has_executable_program(after_elf)) {
@@ -499,23 +497,33 @@ static bool inspect_elf_execstack(struct rpminspect *ri, Elf *after_elf, Elf *be
         before_execstack = is_stack_executable(before_elf, get_execstack_flags(before_elf));
     }
 
+    /* Set up result parameters */
+    memset(&params, 0, sizeof(params));
+    params.waiverauth = WAIVABLE_BY_SECURITY;
+    params.header = HEADER_ELF;
+    params.arch = arch;
+    params.file = localpath;
+
     /* Check if execstack information is present */
     if (!is_execstack_present(after_elf)) {
         if (elf_type == ET_REL) {
             /* Missing .note.GNU-stack will result in an executable stack */
             if (before_execstack) {
-                xasprintf(&msg, _("Object still has executable stack (no GNU-stack note): %s on %s"), localpath, arch);
-                severity = RESULT_VERIFY;
+                xasprintf(&params.msg, _("Object still has executable stack (no GNU-stack note): %s on %s"), localpath, arch);
+                params.severity = RESULT_VERIFY;
             } else {
-                xasprintf(&msg, _("Object has executable stack (no GNU-stack note): %s on %s"), localpath, arch);
-                severity = RESULT_BAD;
+                xasprintf(&params.msg, _("Object has executable stack (no GNU-stack note): %s on %s"), localpath, arch);
+                params.severity = RESULT_BAD;
             }
         } else {
-            xasprintf(&msg, _("Program built without GNU_STACK: %s on %s"), localpath, arch);
-            severity = RESULT_BAD;
+            xasprintf(&params.msg, _("Program built without GNU_STACK: %s on %s"), localpath, arch);
+            params.severity = RESULT_BAD;
         }
 
-        add_result(ri, severity, WAIVABLE_BY_SECURITY, HEADER_ELF, msg, NULL, REMEDY_ELF_EXECSTACK_MISSING);
+        params.remedy = REMEDY_ELF_EXECSTACK_MISSING;
+        params.verb = VERB_CHANGED;
+        params.noun = _("GNU_STACK on ${FILE}");
+        add_result(ri, &params);
         goto cleanup;
     }
 
@@ -524,13 +532,17 @@ static bool inspect_elf_execstack(struct rpminspect *ri, Elf *after_elf, Elf *be
 
     if (!is_execstack_valid(after_elf, execstack_flags)) {
         if (elf_type == ET_REL) {
-            xasprintf(&msg, _("File %s has invalid execstack flags %lX on %s"), localpath, execstack_flags, arch);
-
-            add_result(ri, RESULT_BAD, WAIVABLE_BY_SECURITY, HEADER_ELF, msg, NULL, REMEDY_ELF_EXECSTACK_INVALID);
+            xasprintf(&params.msg, _("File %s has invalid execstack flags %lX on %s"), localpath, execstack_flags, arch);
         } else {
-            xasprintf(&msg, _("File %s has unrecognized GNU_STACK '%s' (expected RW or RWE) on %s"), localpath, pflags_to_str(execstack_flags), arch);
+            xasprintf(&params.msg, _("File %s has unrecognized GNU_STACK '%s' (expected RW or RWE) on %s"), localpath, pflags_to_str(execstack_flags), arch);
+        }
 
-            add_result(ri, RESULT_BAD, WAIVABLE_BY_SECURITY, HEADER_ELF, msg, NULL, REMEDY_ELF_EXECSTACK_INVALID);
+        if (params.msg) {
+            params.severity = RESULT_BAD;
+            params.remedy = REMEDY_ELF_EXECSTACK_INVALID;
+            params.verb = VERB_FAILED;
+            params.noun = _("execstack on ${FILE}");
+            add_result(ri, &params);
         }
 
         goto cleanup;
@@ -540,30 +552,33 @@ static bool inspect_elf_execstack(struct rpminspect *ri, Elf *after_elf, Elf *be
     if (is_stack_executable(after_elf, execstack_flags)) {
         if (elf_type == ET_REL) {
             if (before_execstack) {
-                xasprintf(&msg, _("Object still has executable stack (GNU-stack note = X): %s on %s"), localpath, arch);
-                severity = RESULT_VERIFY;
+                xasprintf(&params.msg, _("Object still has executable stack (GNU-stack note = X): %s on %s"), localpath, arch);
+                params.severity = RESULT_VERIFY;
             } else {
-                xasprintf(&msg, _("Object has executable stack (GNU-stack note = X): %s on %s"), localpath, arch);
-                severity = RESULT_BAD;
+                xasprintf(&params.msg, _("Object has executable stack (GNU-stack note = X): %s on %s"), localpath, arch);
+                params.severity = RESULT_BAD;
             }
         } else {
             if (before_execstack) {
-                xasprintf(&msg, _("Stack is still executable: %s on %s"), localpath, arch);
-                severity = RESULT_VERIFY;
+                xasprintf(&params.msg, _("Stack is still executable: %s on %s"), localpath, arch);
+                params.severity = RESULT_VERIFY;
             } else {
-                xasprintf(&msg, _("Stack is executable: %s on %s"), localpath, arch);
-                severity = RESULT_BAD;
+                xasprintf(&params.msg, _("Stack is executable: %s on %s"), localpath, arch);
+                params.severity = RESULT_BAD;
             }
         }
 
-        add_result(ri, severity, WAIVABLE_BY_SECURITY, HEADER_ELF, msg, NULL, REMEDY_ELF_EXECSTACK_EXECUTABLE);
+        params.remedy = REMEDY_ELF_EXECSTACK_EXECUTABLE;
+        params.verb = VERB_FAILED;
+        params.noun = _("execstack on ${FILE}");
+        add_result(ri, &params);
         goto cleanup;
     }
 
     result = true;
 
 cleanup:
-    free(msg);
+    free(params.msg);
 
     return result;
 }
@@ -574,19 +589,29 @@ static bool check_relro(struct rpminspect *ri, Elf *before_elf, Elf *after_elf, 
     bool before_bind_now = has_bind_now(before_elf);
     bool after_relro = has_relro(after_elf);
     bool after_bind_now = has_bind_now(after_elf);
-    char *msg = NULL;
+    struct result_params params;
+
+    memset(&params, 0, sizeof(params));
 
     if (before_relro && before_bind_now && after_relro && !after_bind_now) {
         /* full relro in before, partial relro in after */
-        xasprintf(&msg, _("%s lost full GNU_RELRO security protection on %s"), localpath, arch);
+        xasprintf(&params.msg, _("%s lost full GNU_RELRO security protection on %s"), localpath, arch);
     } else if (before_relro && !after_relro) {
         /* partial or full relro in before, no relro in after */
-        xasprintf(&msg, _("%s lost GNU_RELRO security protection on %s"), localpath, arch);
+        xasprintf(&params.msg, _("%s lost GNU_RELRO security protection on %s"), localpath, arch);
     }
 
-    if (msg != NULL) {
-        add_result(ri, RESULT_BAD, WAIVABLE_BY_SECURITY, HEADER_ELF, msg, NULL, REMEDY_ELF_GNU_RELRO);
-        free(msg);
+    if (params.msg != NULL) {
+        params.severity = RESULT_BAD;
+        params.waiverauth = WAIVABLE_BY_SECURITY;
+        params.header = HEADER_ELF;
+        params.remedy = REMEDY_ELF_GNU_RELRO;
+        params.arch = arch;
+        params.file = localpath;
+        params.verb = VERB_REMOVED;
+        params.noun = _("GNU_RELRO on ${FILE}");
+        add_result(ri, &params);
+        free(params.msg);
         return false;
     }
 
@@ -610,7 +635,7 @@ static bool check_fortified(struct rpminspect *ri, Elf *before_elf, Elf *after_e
     size_t output_size;
     int output_result;
 
-    char *msg;
+    struct result_params params;
     bool result = true;
 
     /* ignore unused variable warnings if assert is disabled */
@@ -684,9 +709,19 @@ static bool check_fortified(struct rpminspect *ri, Elf *before_elf, Elf *after_e
     output_result = fclose(output_stream);
     assert(output_result == 0);
 
-    xasprintf(&msg, _("%s may have lost -D_FORTIFY_SOURCE on %s"), localpath, arch);
-    add_result(ri, RESULT_VERIFY, WAIVABLE_BY_SECURITY, HEADER_ELF, msg, output_buffer, REMEDY_ELF_FORTIFY_SOURCE);
-    free(msg);
+    memset(&params, 0, sizeof(params));
+    xasprintf(&params.msg, _("%s may have lost -D_FORTIFY_SOURCE on %s"), localpath, arch);
+    params.header = HEADER_ELF;
+    params.severity = RESULT_VERIFY;
+    params.waiverauth = WAIVABLE_BY_SECURITY;
+    params.details = output_buffer;
+    params.remedy = REMEDY_ELF_FORTIFY_SOURCE;
+    params.arch = arch;
+    params.file = localpath;
+    params.verb = VERB_REMOVED;
+    params.noun = _("-D_FORTIFY_SOURCE on ${FILE}");
+    add_result(ri, &params);
+    free(params.msg);
 
 cleanup:
     list_free(before_fortifiable, NULL);
@@ -707,10 +742,8 @@ static bool check_ipv6(struct rpminspect *ri, Elf *after_elf, const char *localp
     string_list_t *used_symbols = NULL;
     string_list_t *sorted_used = NULL;
     string_entry_t *iter = NULL;
-
-    char *msg = NULL;
+    struct result_params params;
     bool result = true;
-
     FILE *output_stream = NULL;
     char *output_buffer = NULL;
     size_t output_size = 0;
@@ -754,9 +787,17 @@ static bool check_ipv6(struct rpminspect *ri, Elf *after_elf, const char *localp
     output_result = fclose(output_stream);
     assert(output_result == 0);
 
-    xasprintf(&msg, _("%s may use functions unsuitable for IPv6 support on %s"), localpath, arch);
-    add_result(ri, RESULT_VERIFY, WAIVABLE_BY_ANYONE, HEADER_ELF, msg, output_buffer, REMEDY_ELF_IPV6);
-    free(msg);
+    memset(&params, 0, sizeof(params));
+    xasprintf(&params.msg, _("%s may use functions unsuitable for IPv6 support on %s"), localpath, arch);
+    params.severity = RESULT_VERIFY;
+    params.waiverauth = WAIVABLE_BY_ANYONE;
+    params.header = HEADER_ELF;
+    params.remedy = REMEDY_ELF_IPV6;
+    params.details = output_buffer;
+    params.verb = VERB_FAILED;
+    params.noun = _("IPv6 functions used in ${FILE}");
+    add_result(ri, &params);
+    free(params.msg);
 
 cleanup:
     list_free(after_symbols, NULL);
@@ -856,18 +897,14 @@ static bool elf_archive_tests(struct rpminspect *ri, Elf *after_elf, int after_e
     string_list_t *after_no_pic = NULL;
     string_list_t *before_pic = NULL;
     string_list_t *before_all = NULL;
-
     string_list_t *after_lost_pic = NULL;
     string_list_t *after_new = NULL;
-
     string_entry_t *iter;
-
     FILE *output_stream;
     char *screendump = NULL;
     size_t screendump_size;
     int output_result;
-
-    char *msg = NULL;
+    struct result_params params;
     bool result = true;
 
     /* ignore unused variable warnings if assert is disabled */
@@ -948,8 +985,19 @@ static bool elf_archive_tests(struct rpminspect *ri, Elf *after_elf, int after_e
     assert(output_result == 0);
 
     if (!result) {
-        xasprintf(&msg, _("%s lost -fPIC on %s"), localpath, arch);
-        add_result(ri, RESULT_BAD, WAIVABLE_BY_SECURITY, HEADER_ELF, msg, screendump, REMEDY_ELF_FPIC);
+        memset(&params, 0, sizeof(params));
+        xasprintf(&params.msg, _("%s lost -fPIC on %s"), localpath, arch);
+        params.severity = RESULT_BAD;
+        params.waiverauth = WAIVABLE_BY_SECURITY;
+        params.header = HEADER_ELF;
+        params.remedy = REMEDY_ELF_FPIC;
+        params.details = screendump;
+        params.arch = arch;
+        params.file = localpath;
+        params.verb = VERB_REMOVED;
+        params.noun = _("-fPIC on ${FILE}");
+        add_result(ri, &params);
+        free(params.msg);
     }
 
 cleanup:
@@ -961,15 +1009,23 @@ cleanup:
     list_free(before_all, free);
 
     free(screendump);
-    free(msg);
 
     return result;
 }
 
 static bool elf_regular_tests(struct rpminspect *ri, Elf *after_elf, Elf *before_elf, const char *localpath, const char *arch)
 {
-    char *msg = NULL;
     bool result = true;
+    struct result_params params;
+
+    memset(&params, 0, sizeof(params));
+    params.severity = RESULT_BAD;
+    params.header = HEADER_ELF;
+    params.waiverauth = WAIVABLE_BY_SECURITY;
+    params.remedy = REMEDY_ELF_TEXTREL;
+    params.arch = arch;
+    params.file = localpath;
+    params.noun = _("TEXTREL relocations on ${FILE}");
 
     if (!inspect_elf_execstack(ri, after_elf, before_elf, localpath, arch)) {
         result = false;
@@ -978,16 +1034,17 @@ static bool elf_regular_tests(struct rpminspect *ri, Elf *after_elf, Elf *before
     if (has_textrel(after_elf)) {
         /* Only complain for baseline (no before), or for gaining TEXTREL between before and after. */
         if (before_elf && !has_textrel(before_elf)) {
-            xasprintf(&msg, _("%s acquired TEXTREL relocations on %s"), localpath, arch);
+            xasprintf(&params.msg, _("%s acquired TEXTREL relocations on %s"), localpath, arch);
+            params.verb = VERB_ADDED;
         } else if (!before_elf) {
-            xasprintf(&msg, _("%s has TEXTREL relocations on %s"), localpath, arch);
+            xasprintf(&params.msg, _("%s has TEXTREL relocations on %s"), localpath, arch);
+            params.verb = VERB_FAILED;
         }
 
-        if (msg != NULL) {
-            add_result(ri, RESULT_BAD, WAIVABLE_BY_SECURITY, HEADER_ELF, msg, NULL, REMEDY_ELF_TEXTREL);
+        if (params.msg != NULL) {
+            add_result(ri, &params);
             result = false;
-            free(msg);
-            msg = NULL;
+            free(params.msg);
         }
     }
 
@@ -1065,13 +1122,18 @@ static bool elf_driver(struct rpminspect *ri, rpmfile_entry_t *after)
 bool inspect_elf(struct rpminspect *ri)
 {
     bool result;
+    struct result_params params;
 
     init_elf_data();
     result = foreach_peer_file(ri, elf_driver);
     free_elf_data();
 
     if (result) {
-        add_result(ri, RESULT_OK, NOT_WAIVABLE, HEADER_ELF, NULL, NULL, NULL);
+        memset(&params, 0, sizeof(params));
+        params.severity = RESULT_OK;
+        params.waiverauth = NOT_WAIVABLE;
+        params.header = HEADER_ELF;
+        add_result(ri, &params);
     }
 
     return result;

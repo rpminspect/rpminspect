@@ -103,8 +103,7 @@ static int find_file(const char *fpath, __attribute__((unused)) const struct sta
  * Called by desktop_driver() to determine if a found file is one we want to
  * look at.  Returns true if it is, false otherwise.
  */
-static bool is_desktop_entry_file(const char *desktop_entry_files_dir,
-                                  const rpmfile_entry_t *file)
+static bool is_desktop_entry_file(const char *desktop_entry_files_dir, const rpmfile_entry_t *file)
 {
     assert(desktop_entry_files_dir != NULL);
     assert(file != NULL);
@@ -141,7 +140,6 @@ static bool validate_desktop_contents(struct rpminspect *ri, const rpmfile_entry
     bool result = true;
     FILE *fp = NULL;
     size_t len;
-    char *msg = NULL;
     char *buf = NULL;
     char *tmp = NULL;
     char *walk = NULL;
@@ -150,6 +148,7 @@ static bool validate_desktop_contents(struct rpminspect *ri, const rpmfile_entry
     char *exectoken = NULL;
     struct stat sb;
     bool found = false;
+    struct result_params params;
 
     assert(ri != NULL);
     assert(file != NULL);
@@ -167,6 +166,16 @@ static bool validate_desktop_contents(struct rpminspect *ri, const rpmfile_entry
     /* Get the package architecture and the extraction subtree */
     arch = get_rpm_header_arch(file->rpm_header);
 
+    /* Set up result parameters */
+    memset(&params, 0, sizeof(params));
+    params.severity = RESULT_VERIFY;
+    params.waiverauth = WAIVABLE_BY_ANYONE;
+    params.header = HEADER_DESKTOP;
+    params.remedy = REMEDY_DESKTOP;
+    params.arch = arch;
+    params.file = file->localpath;
+
+    /* Get the directory tree to walk */
     tmp = strdup(file->fullpath);
     walk = tmp + (strlen(file->fullpath) - strlen(file->localpath));
     *walk = '\0';
@@ -226,15 +235,15 @@ static bool validate_desktop_contents(struct rpminspect *ri, const rpmfile_entry
                 }
 
                 if (!(sb.st_mode & S_IXOTH)) {
-                    xasprintf(&msg, _("Desktop file %s on %s references executable %s but %s is not executable by all"), file->localpath, arch, tmp, tmp);
-                    add_result(ri, RESULT_VERIFY, WAIVABLE_BY_ANYONE, HEADER_DESKTOP, msg, NULL, REMEDY_DESKTOP);
-                    free(msg);
+                    xasprintf(&params.msg, _("Desktop file %s on %s references executable %s but %s is not executable by all"), file->localpath, arch, tmp, tmp);
+                    add_result(ri, &params);
+                    free(params.msg);
                     result = false;
                 }
             } else {
-                xasprintf(&msg, _("Desktop file %s on %s references executable %s but no subpackages contain an executable of that name"), file->localpath, arch, tmp);
-                add_result(ri, RESULT_VERIFY, WAIVABLE_BY_ANYONE, HEADER_DESKTOP, msg, NULL, REMEDY_DESKTOP);
-                free(msg);
+                xasprintf(&params.msg, _("Desktop file %s on %s references executable %s but no subpackages contain an executable of that name"), file->localpath, arch, tmp);
+                add_result(ri, &params);
+                free(params.msg);
                 result = false;
             }
 
@@ -262,17 +271,17 @@ static bool validate_desktop_contents(struct rpminspect *ri, const rpmfile_entry
                 }
 
                 if (!(sb.st_mode & S_IROTH)) {
-                    xasprintf(&msg, _("Desktop file %s on %s references icon %s but %s is not readable by all"), file->localpath, arch, tmp, tmp);
-                    add_result(ri, RESULT_VERIFY, WAIVABLE_BY_ANYONE, HEADER_DESKTOP, msg, NULL, REMEDY_DESKTOP);
-                    free(msg);
+                    xasprintf(&params.msg, _("Desktop file %s on %s references icon %s but %s is not readable by all"), file->localpath, arch, tmp, tmp);
+                    add_result(ri, &params);
+                    free(params.msg);
                     result = false;
                 }
             }
 
             if (!found) {
-                xasprintf(&msg, _("Desktop file %s on %s references icon %s but no subpackages contain %s"), file->localpath, arch, tmp, tmp);
-                add_result(ri, RESULT_VERIFY, WAIVABLE_BY_ANYONE, HEADER_DESKTOP, msg, NULL, REMEDY_DESKTOP);
-                free(msg);
+                xasprintf(&params.msg, _("Desktop file %s on %s references icon %s but no subpackages contain %s"), file->localpath, arch, tmp, tmp);
+                add_result(ri, &params);
+                free(params.msg);
                 result = false;
             }
 
@@ -298,11 +307,10 @@ static bool desktop_driver(struct rpminspect *ri, rpmfile_entry_t *file)
 {
     bool result = true;
     int after_code;
-    char *after_out = NULL;
     char *before_out = NULL;
-    char *msg = NULL;
     const char *arch = NULL;
     char *tmpbuf = NULL;
+    struct result_params params;
 
     /*
      * Is this a file we should look at?
@@ -312,11 +320,14 @@ static bool desktop_driver(struct rpminspect *ri, rpmfile_entry_t *file)
         return true;
     }
 
+    /* Get result parameters ready */
+    memset(&params, 0, sizeof(params));
+
     /* Validate the desktop file */
-    after_out = run_cmd(&after_code, DESKTOP_FILE_VALIDATE_CMD, file->fullpath, NULL);
-    tmpbuf = strreplace(after_out, file->fullpath, file->localpath);
-    free(after_out);
-    after_out = tmpbuf;
+    params.details = run_cmd(&after_code, DESKTOP_FILE_VALIDATE_CMD, file->fullpath, NULL);
+    tmpbuf = strreplace(params.details, file->fullpath, file->localpath);
+    free(params.details);
+    params.details = tmpbuf;
 
     if (file->peer_file && is_desktop_entry_file(ri->desktop_entry_files_dir, file->peer_file)) {
         /* if we have a before peer, validate the corresponding desktop file */
@@ -332,20 +343,29 @@ static bool desktop_driver(struct rpminspect *ri, rpmfile_entry_t *file)
 
     /* Report validation results */
     arch = get_rpm_header_arch(file->rpm_header);
+    params.severity = (after_code == 0) ? RESULT_INFO : RESULT_BAD;
+    params.waiverauth = WAIVABLE_BY_ANYONE;
+    params.header = HEADER_DESKTOP;
+    params.remedy = REMEDY_DESKTOP;
+    params.arch = arch;
+    params.file = file->localpath;
+    params.verb = VERB_CHANGED;
+    params.noun = _("${FILE}");
 
-    if (file->peer_file && before_out == NULL && after_out != NULL) {
-        xasprintf(&msg, _("File %s is no longer a valid desktop entry file on %s; desktop-file-validate reports:"), file->localpath, arch);
-        add_result(ri, (after_code == 0) ? RESULT_INFO : RESULT_BAD, WAIVABLE_BY_ANYONE, HEADER_DESKTOP, msg, after_out, REMEDY_DESKTOP);
-    } else if (file->peer_file == NULL && after_out != NULL) {
-        xasprintf(&msg, _("New file %s is not a valid desktop file on %s; desktop-file-validate reports:"), file->localpath, arch);
-        add_result(ri, (after_code == 0) ? RESULT_INFO : RESULT_BAD, WAIVABLE_BY_ANYONE, HEADER_DESKTOP, msg, after_out, REMEDY_DESKTOP);
-    } else if (after_out != NULL) {
-        xasprintf(&msg, _("File %s is not a valid desktop file on %s; desktop-file-validate reports:"), file->localpath, arch);
-        add_result(ri, (after_code == 0) ? RESULT_INFO : RESULT_BAD, WAIVABLE_BY_ANYONE, HEADER_DESKTOP, msg, after_out, REMEDY_DESKTOP);
+    if (file->peer_file && before_out == NULL && params.details != NULL) {
+        xasprintf(&params.msg, _("File %s is no longer a valid desktop entry file on %s; desktop-file-validate reports:"), file->localpath, arch);
+    } else if (file->peer_file == NULL && params.details != NULL) {
+        xasprintf(&params.msg, _("New file %s is not a valid desktop file on %s; desktop-file-validate reports:"), file->localpath, arch);
+    } else if (params.details != NULL) {
+        xasprintf(&params.msg, _("File %s is not a valid desktop file on %s; desktop-file-validate reports:"), file->localpath, arch);
     }
 
-    free(msg);
-    free(after_out);
+    if (params.msg) {
+        add_result(ri, &params);
+        free(params.msg);
+    }
+
+    free(params.details);
     free(before_out);
 
     /* Validate the contents of the desktop entry file */
@@ -362,6 +382,7 @@ static bool desktop_driver(struct rpminspect *ri, rpmfile_entry_t *file)
 bool inspect_desktop(struct rpminspect *ri)
 {
     bool result;
+    struct result_params params;
 
     assert(ri != NULL);
     assert(ri->peers != NULL);
@@ -375,7 +396,11 @@ bool inspect_desktop(struct rpminspect *ri)
     result = foreach_peer_file(ri, desktop_driver);
 
     if (result) {
-        add_result(ri, RESULT_OK, NOT_WAIVABLE, HEADER_DESKTOP, NULL, NULL, NULL);
+        memset(&params, 0, sizeof(params));
+        params.severity = RESULT_OK;
+        params.waiverauth = NOT_WAIVABLE;
+        params.header = HEADER_DESKTOP;
+        add_result(ri, &params);
     }
 
     return result;

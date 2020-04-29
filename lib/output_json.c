@@ -32,7 +32,7 @@ void output_json(const results_t *results, const char *dest) {
     int r = 0;
     int len = 0;
     FILE *fp = NULL;
-    char *header = NULL;
+    const char *header = NULL;
     struct json_object *j = NULL;
     struct json_object *ji = NULL;
     struct json_object *jr = NULL;

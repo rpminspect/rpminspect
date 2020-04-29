@@ -30,11 +30,11 @@ static bool capabilities_driver(struct rpminspect *ri, rpmfile_entry_t *file)
     cap_t beforecap = NULL;
     char *after = NULL;
     char *before = NULL;
-    char *msg = NULL;
     const char *pkg = NULL;
     const char *arch = NULL;
     const char *name = NULL;
     caps_filelist_entry_t *flcaps = NULL;
+    struct result_params params;
 
     assert(ri != NULL);
     assert(file != NULL);
@@ -62,16 +62,29 @@ static bool capabilities_driver(struct rpminspect *ri, rpmfile_entry_t *file)
     /* The architecture is used in reporting */
     arch = get_rpm_header_arch(file->rpm_header);
 
+    /* Set up result parameters */
+    memset(&params, 0, sizeof(params));
+    params.header = HEADER_CAPABILITIES;
+    params.arch = arch;
+    params.file = file->localpath;
+
     /* Report if the caps are different */
     if (after && before && strcmp(after, before)) {
-        xasprintf(&msg, _("File capabilities for %s changed from '%s' to '%s' on %s\n"), file->localpath, before, after, arch);
-        add_result(ri, RESULT_VERIFY, WAIVABLE_BY_SECURITY, HEADER_CAPABILITIES, msg, NULL, REMEDY_CAPABILITIES);
-        free(msg);
+        xasprintf(&params.msg, _("File capabilities for %s changed from '%s' to '%s' on %s\n"), file->localpath, before, after, arch);
+        params.severity = RESULT_VERIFY;
+        params.waiverauth = WAIVABLE_BY_SECURITY;
+        params.remedy = REMEDY_CAPABILITIES;
+        params.verb = VERB_CHANGED;
+        params.noun = _("${FILE} capabilities");
+        add_result(ri, &params);
+        free(params.msg);
         result = false;
     } else if (after && before && !strcmp(after, before)) {
-        xasprintf(&msg, _("File capabilities found for %s: '%s' on %s\n"), file->localpath, after, arch);
-        add_result(ri, RESULT_INFO, NOT_WAIVABLE, HEADER_CAPABILITIES, msg, NULL, NULL);
-        free(msg);
+        xasprintf(&params.msg, _("File capabilities found for %s: '%s' on %s\n"), file->localpath, after, arch);
+        params.severity = RESULT_INFO;
+        params.waiverauth = NOT_WAIVABLE;
+        add_result(ri, &params);
+        free(params.msg);
     }
 
     /* If we have after caps, check it against the whitelist and report */
@@ -84,24 +97,41 @@ static bool capabilities_driver(struct rpminspect *ri, rpmfile_entry_t *file)
 
     if (after && flcaps) {
         if (!strcmp(after, flcaps->caps)) {
-            xasprintf(&msg, _("File capabilities whitelist entry found for %s: '%s' on %s, matches package\n"), file->localpath, flcaps->caps, arch);
-            add_result(ri, RESULT_INFO, NOT_WAIVABLE, HEADER_CAPABILITIES, msg, NULL, NULL);
-            free(msg);
+            xasprintf(&params.msg, _("File capabilities whitelist entry found for %s: '%s' on %s, matches package\n"), file->localpath, flcaps->caps, arch);
+            params.severity = RESULT_INFO;
+            params.waiverauth = NOT_WAIVABLE;
+            add_result(ri, &params);
+            free(params.msg);
         } else {
-            xasprintf(&msg, _("File capabilities whitelist mismatch for %s: expected '%s', got '%s'\n"), file->localpath, flcaps->caps, arch);
-            add_result(ri, RESULT_BAD, WAIVABLE_BY_SECURITY, HEADER_CAPABILITIES, msg, NULL, REMEDY_CAPABILITIES);
-            free(msg);
+            xasprintf(&params.msg, _("File capabilities whitelist mismatch for %s: expected '%s', got '%s'\n"), file->localpath, flcaps->caps, arch);
+            params.severity = RESULT_BAD;
+            params.waiverauth = WAIVABLE_BY_SECURITY;
+            params.remedy = REMEDY_CAPABILITIES;
+            params.verb = VERB_FAILED;
+            params.noun = _("${FILE} capabilities whitelist");
+            add_result(ri, &params);
+            free(params.msg);
             result = false;
         }
     } else if (after && !flcaps) {
-        xasprintf(&msg, _("File capabilities for %s not found on the capabilities whitelist on %s\n"), file->localpath, arch);
-        add_result(ri, RESULT_BAD, WAIVABLE_BY_SECURITY, HEADER_CAPABILITIES, msg, NULL, REMEDY_CAPABILITIES);
-        free(msg);
+        xasprintf(&params.msg, _("File capabilities for %s not found on the capabilities whitelist on %s\n"), file->localpath, arch);
+        params.severity = RESULT_BAD;
+        params.waiverauth = WAIVABLE_BY_SECURITY;
+        params.remedy = REMEDY_CAPABILITIES;
+        params.verb = VERB_REMOVED;
+        params.noun = _("${FILE} capabilities whitelist");
+        add_result(ri, &params);
+        free(params.msg);
         result = false;
     } else if (!after && flcaps) {
-        xasprintf(&msg, _("File capabilities expected for %s but not found on %s: expected '%s'\n"), file->localpath, arch, flcaps->caps);
-        add_result(ri, RESULT_BAD, WAIVABLE_BY_SECURITY, HEADER_CAPABILITIES, msg, NULL, REMEDY_CAPABILITIES);
-        free(msg);
+        xasprintf(&params.msg, _("File capabilities expected for %s but not found on %s: expected '%s'\n"), file->localpath, arch, flcaps->caps);
+        params.severity = RESULT_BAD;
+        params.waiverauth = WAIVABLE_BY_SECURITY;
+        params.remedy = REMEDY_CAPABILITIES;
+        params.verb = VERB_FAILED;
+        params.noun = _("${FILE} capabilities whitelist");
+        add_result(ri, &params);
+        free(params.msg);
         result = false;
     }
 
@@ -113,6 +143,7 @@ static bool capabilities_driver(struct rpminspect *ri, rpmfile_entry_t *file)
  */
 bool inspect_capabilities(struct rpminspect *ri) {
     bool result;
+    struct result_params params;
 
     assert(ri != NULL);
 
@@ -121,7 +152,11 @@ bool inspect_capabilities(struct rpminspect *ri) {
 
     /* if everything was fine, just say so */
     if (result) {
-        add_result(ri, RESULT_OK, NOT_WAIVABLE, HEADER_CAPABILITIES, NULL, NULL, NULL);
+        memset(&params, 0, sizeof(params));
+        params.severity = RESULT_OK;
+        params.waiverauth = NOT_WAIVABLE;
+        params.header = HEADER_CAPABILITIES;
+        add_result(ri, &params);
     }
 
     return result;

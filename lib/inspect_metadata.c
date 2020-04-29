@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2019  Red Hat, Inc.
+ * Copyright (C) 2019-2020  Red Hat, Inc.
  * Author(s):  David Cantrell <dcantrell@redhat.com>
  *
  * This program is free software: you can redistribute it and/or modify
@@ -35,25 +35,32 @@ static bool valid_peers(struct rpminspect *ri, const Header before_hdr, const He
     const char *after_description = NULL;
     const char *after_name = NULL;
     char *after_nevra = NULL;
-    char *msg = NULL;
-    char *dump = NULL;
+    struct result_params params;
 
     assert(ri != NULL);
 
     after_nevra = get_nevra(after_hdr);
 
+    /* Set up result parameters */
+    memset(&params, 0, sizeof(params));
+    params.header = HEADER_METADATA;
+
     after_vendor = headerGetString(after_hdr, RPMTAG_VENDOR);
     if (ri->vendor == NULL) {
-        xasprintf(&msg, _("Vendor not set in rpminspect.conf, ignoring Package Vendor \"%s\" in %s"), after_vendor, after_nevra);
-        add_result(ri, RESULT_INFO, NOT_WAIVABLE, HEADER_METADATA, msg, NULL, REMEDY_VENDOR);
-        free(msg);
+        xasprintf(&params.msg, _("Vendor not set in rpminspect.conf, ignoring Package Vendor \"%s\" in %s"), after_vendor, after_nevra);
+        params.severity = RESULT_INFO;
+        params.waiverauth = NOT_WAIVABLE;
+        params.remedy = REMEDY_VENDOR;
+        add_result(ri, &params);
+        free(params.msg);
     } else if (after_vendor && strcmp(after_vendor, ri->vendor)) {
-        xasprintf(&msg, _("Package Vendor \"%s\" is not \"%s\" in %s"), after_vendor, ri->vendor, after_nevra);
-
-        add_result(ri, RESULT_BAD, NOT_WAIVABLE, HEADER_METADATA, msg, NULL, REMEDY_VENDOR);
+        xasprintf(&params.msg, _("Package Vendor \"%s\" is not \"%s\" in %s"), after_vendor, ri->vendor, after_nevra);
+        params.severity = RESULT_BAD;
+        params.waiverauth = NOT_WAIVABLE;
+        params.remedy = REMEDY_VENDOR;
+        add_result(ri, &params);
+        free(params.msg);
         ret = false;
-
-        free(msg);
     }
 
     after_buildhost = headerGetString(after_hdr, RPMTAG_BUILDHOST);
@@ -68,37 +75,40 @@ static bool valid_peers(struct rpminspect *ri, const Header before_hdr, const He
         }
 
         if (!valid_subdomain) {
-            xasprintf(&msg, _("Package Build Host \"%s\" is not within an expected build host subdomain in %s"), after_buildhost, after_nevra);
-
-            add_result(ri, RESULT_BAD, NOT_WAIVABLE, HEADER_METADATA, msg, NULL, REMEDY_BUILDHOST);
+            xasprintf(&params.msg, _("Package Build Host \"%s\" is not within an expected build host subdomain in %s"), after_buildhost, after_nevra);
+            params.severity = RESULT_BAD;
+            params.waiverauth = NOT_WAIVABLE;
+            params.remedy = REMEDY_BUILDHOST;
+            add_result(ri, &params);
+            free(params.msg);
             ret = false;
-
-            free(msg);
         }
     }
 
     after_summary = headerGetString(after_hdr, RPMTAG_SUMMARY);
     if (after_summary && has_bad_word(after_summary, ri->badwords)) {
-        xasprintf(&msg, _("Package Summary contains unprofessional language in %s"), after_nevra);
-        xasprintf(&dump, _("Summary: %s"), after_summary);
-
-        add_result(ri, RESULT_BAD, NOT_WAIVABLE, HEADER_METADATA, msg, dump, REMEDY_BADWORDS);
+        xasprintf(&params.msg, _("Package Summary contains unprofessional language in %s"), after_nevra);
+        xasprintf(&params.details, _("Summary: %s"), after_summary);
+        params.severity = RESULT_BAD;
+        params.waiverauth = NOT_WAIVABLE;
+        params.remedy = REMEDY_BADWORDS;
+        add_result(ri, &params);
+        free(params.msg);
+        free(params.details);
         ret = false;
-
-        free(msg);
-        free(dump);
     }
 
     after_description = headerGetString(after_hdr, RPMTAG_DESCRIPTION);
     if (after_description && has_bad_word(after_description, ri->badwords)) {
-        xasprintf(&msg, _("Package Description contains unprofessional language in %s:"), after_nevra);
-        xasprintf(&dump, "%s", after_description);
-
-        add_result(ri, RESULT_BAD, NOT_WAIVABLE, HEADER_METADATA, msg, dump, REMEDY_BADWORDS);
+        xasprintf(&params.msg, _("Package Description contains unprofessional language in %s:"), after_nevra);
+        xasprintf(&params.details, "%s", after_description);
+        params.severity = RESULT_BAD;
+        params.waiverauth = NOT_WAIVABLE;
+        params.remedy = REMEDY_BADWORDS;
+        add_result(ri, &params);
+        free(params.msg);
+        free(params.details);
         ret = false;
-
-        free(msg);
-        free(dump);
     }
 
     free(after_nevra);
@@ -108,42 +118,46 @@ static bool valid_peers(struct rpminspect *ri, const Header before_hdr, const He
         const char *before_summary = headerGetString(before_hdr, RPMTAG_SUMMARY);
         const char *before_description = headerGetString(before_hdr, RPMTAG_DESCRIPTION);
         after_name = headerGetString(after_hdr, RPMTAG_NAME);
-        msg = NULL;
+        params.msg = NULL;
 
         if (before_vendor == NULL && after_vendor) {
-            xasprintf(&msg, _("Gained Package Vendor \"%s\" in %s"), after_vendor, after_name);
+            xasprintf(&params.msg, _("Gained Package Vendor \"%s\" in %s"), after_vendor, after_name);
         } else if (before_vendor && after_vendor == NULL) {
-            xasprintf(&msg, _("Lost Package Vendor \"%s\" in %s"), before_vendor, after_name);
+            xasprintf(&params.msg, _("Lost Package Vendor \"%s\" in %s"), before_vendor, after_name);
         } else if (before_vendor && after_vendor && strcmp(before_vendor, after_vendor)) {
-            xasprintf(&msg, _("Package Vendor changed from \"%s\" to \"%s\" in %s"), before_vendor, after_vendor, after_name);
+            xasprintf(&params.msg, _("Package Vendor changed from \"%s\" to \"%s\" in %s"), before_vendor, after_vendor, after_name);
         }
 
-        if (msg) {
-            add_result(ri, RESULT_VERIFY, WAIVABLE_BY_ANYONE, HEADER_METADATA, msg, NULL, NULL);
+        if (params.msg) {
+            params.severity = RESULT_VERIFY;
+            params.waiverauth = WAIVABLE_BY_ANYONE;
+            params.remedy = NULL;
+            add_result(ri, &params);
+            free(params.msg);
             ret = false;
-
-            free(msg);
         }
 
         if (strcmp(before_summary, after_summary)) {
-            xasprintf(&msg, _("Package Summary change from \"%s\" to \"%s\" in %s"), before_summary, after_summary, after_name);
-
-            add_result(ri, RESULT_VERIFY, WAIVABLE_BY_ANYONE, HEADER_METADATA, msg, NULL, NULL);
+            xasprintf(&params.msg, _("Package Summary change from \"%s\" to \"%s\" in %s"), before_summary, after_summary, after_name);
+            params.severity = RESULT_VERIFY;
+            params.waiverauth = WAIVABLE_BY_ANYONE;
+            params.remedy = NULL;
+            add_result(ri, &params);
+            free(params.msg);
             ret = false;
-
-            free(msg);
         }
 
         if (strcmp(before_description, after_description)) {
-            xasprintf(&msg, _("Package Description changed in %s"), after_name);
-            xasprintf(&dump, _("from:\n\n%s\n\nto:\n\n%s"), before_description, after_description);
-
-            add_result(ri, RESULT_VERIFY, WAIVABLE_BY_ANYONE, HEADER_METADATA, msg, dump, NULL);
+            xasprintf(&params.msg, _("Package Description changed in %s"), after_name);
+            xasprintf(&params.details, _("from:\n\n%s\n\nto:\n\n%s"), before_description, after_description);
+            params.severity = RESULT_VERIFY;
+            params.waiverauth = WAIVABLE_BY_ANYONE;
+            params.remedy = NULL;
+            add_result(ri, &params);
+            free(params.msg);
+            free(params.details);
             ret = false;
-
-            free(msg);
-            free(dump);
-        }
+       }
     }
 
     return ret;
@@ -155,6 +169,7 @@ static bool valid_peers(struct rpminspect *ri, const Header before_hdr, const He
 bool inspect_metadata(struct rpminspect *ri) {
     bool good = true;
     rpmpeer_entry_t *peer = NULL;
+    struct result_params params;
 
     assert(ri != NULL);
     assert(ri->peers != NULL);
@@ -181,7 +196,11 @@ bool inspect_metadata(struct rpminspect *ri) {
     }
 
     if (good) {
-        add_result(ri, RESULT_OK, NOT_WAIVABLE, HEADER_METADATA, NULL, NULL, NULL);
+        memset(&params, 0, sizeof(params));
+        params.severity = RESULT_OK;
+        params.waiverauth = NOT_WAIVABLE;
+        params.header = HEADER_METADATA;
+        add_result(ri, &params);
     }
 
     return good;

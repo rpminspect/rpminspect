@@ -44,9 +44,8 @@ static bool dt_needed_driver(struct rpminspect *ri, rpmfile_entry_t *file)
     string_list_t *removed = NULL;
     string_list_t *added = NULL;
     string_entry_t *entry = NULL;
-    char *msg = NULL;
     char *tmp = NULL;
-    char *dump = NULL;
+    struct result_params params;
 
     assert(ri != NULL);
     assert(file != NULL);
@@ -96,10 +95,21 @@ static bool dt_needed_driver(struct rpminspect *ri, rpmfile_entry_t *file)
         goto done;
     }
 
+    /* Set up result parameters */
+    memset(&params, 0, sizeof(params));
+    params.severity = RESULT_VERIFY;
+    params.waiverauth = WAIVABLE_BY_ANYONE;
+    params.header = HEADER_DT_NEEDED;
+    params.remedy = REMEDY_DT_NEEDED;
+    params.arch = arch;
+    params.file = file->localpath;
+
     if ((before_elf = get_elf(file->fullpath, &before_fd)) == NULL) {
-        xasprintf(&msg, _("%s was an ELF file and now is not on %s"), file->localpath, arch);
-        add_result(ri, RESULT_VERIFY, WAIVABLE_BY_ANYONE, HEADER_DT_NEEDED, msg, NULL, REMEDY_DT_NEEDED);
-        free(msg);
+        xasprintf(&params.msg, _("%s was an ELF file and now is not on %s"), file->localpath, arch);
+        params.verb = VERB_CHANGED;
+        params.noun = _("ELF file ${FILE} on ${ARCH}");
+        add_result(ri, &params);
+        free(params.msg);
         result = false;
         goto done;
     }
@@ -107,9 +117,11 @@ static bool dt_needed_driver(struct rpminspect *ri, rpmfile_entry_t *file)
     before_type = get_elf_type(before_elf);
 
     if (before_type != ET_EXEC && before_type != ET_DYN) {
-        xasprintf(&msg, _("%s was a dynamic ELF file and now is not on %s"), file->localpath, arch);
-        add_result(ri, RESULT_VERIFY, WAIVABLE_BY_ANYONE, HEADER_DT_NEEDED, msg, NULL, REMEDY_DT_NEEDED);
-        free(msg);
+        xasprintf(&params.msg, _("%s was a dynamic ELF file and now is not on %s"), file->localpath, arch);
+        params.verb = VERB_CHANGED;
+        params.noun = _("ELF file ${FILE} on ${ARCH}");
+        add_result(ri, &params);
+        free(params.msg);
         result = false;
         goto done;
     }
@@ -149,32 +161,36 @@ static bool dt_needed_driver(struct rpminspect *ri, rpmfile_entry_t *file)
 
     /* Report out any findings */
     if (removed != NULL && !TAILQ_EMPTY(removed)) {
-        xasprintf(&msg, _("DT_NEEDED symbol(s) removed from %s on %s"), file->localpath, arch);
+        xasprintf(&params.msg, _("DT_NEEDED symbol(s) removed from %s on %s"), file->localpath, arch);
+        params.verb = VERB_REMOVED;
+        params.noun = _("DT_NEEDED symbol(s) in ${FILE}");
 
         TAILQ_FOREACH(entry, removed, items) {
             xasprintf(&tmp, "%s\n", entry->data);
-            free(dump);
-            dump = tmp;
+            free(params.details);
+            params.details = tmp;
         }
 
-        add_result(ri, RESULT_VERIFY, WAIVABLE_BY_ANYONE, HEADER_DT_NEEDED, msg, dump, REMEDY_DT_NEEDED);
-        free(msg);
-        free(dump);
+        add_result(ri, &params);
+        free(params.msg);
+        free(params.details);
         result = false;
     }
 
     if (added != NULL && !TAILQ_EMPTY(added)) {
-        xasprintf(&msg, _("DT_NEEDED symbol(s) added to %s on %s"), file->localpath, arch);
+        xasprintf(&params.msg, _("DT_NEEDED symbol(s) added to %s on %s"), file->localpath, arch);
+        params.verb = VERB_ADDED;
+        params.noun = _("DT_NEEDED symbol(s) in ${FILE}");
 
         TAILQ_FOREACH(entry, added, items) {
             xasprintf(&tmp, "%s\n", entry->data);
-            free(dump);
-            dump = tmp;
+            free(params.details);
+            params.details = tmp;
         }
 
-        add_result(ri, RESULT_VERIFY, WAIVABLE_BY_ANYONE, HEADER_DT_NEEDED, msg, dump, REMEDY_DT_NEEDED);
-        free(msg);
-        free(dump);
+        add_result(ri, &params);
+        free(params.msg);
+        free(params.details);
         result = false;
     }
 
@@ -202,6 +218,7 @@ done:
  */
 bool inspect_dt_needed(struct rpminspect *ri) {
     bool result;
+    struct result_params params;
 
     assert(ri != NULL);
 
@@ -210,7 +227,11 @@ bool inspect_dt_needed(struct rpminspect *ri) {
 
     /* if everything was fine, just say so */
     if (result) {
-        add_result(ri, RESULT_OK, NOT_WAIVABLE, HEADER_DT_NEEDED, NULL, NULL, NULL);
+        memset(&params, 0, sizeof(params));
+        params.severity = RESULT_OK;
+        params.waiverauth = NOT_WAIVABLE;
+        params.header = HEADER_DT_NEEDED;
+        add_result(ri, &params);
     }
 
     return result;

@@ -119,13 +119,44 @@ typedef enum _waiverauth_t {
     WAIVABLE_BY_SECURITY = 2
 } waiverauth_t;
 
+typedef enum _verb_t {
+    VERB_NIL = 0,       /* not used, same as "not set" */
+    VERB_ADDED = 1,     /* new file or metadata */
+    VERB_REMOVED = 2,   /* removed file or metadata */
+    VERB_CHANGED = 3,   /* changed file or metadata */
+    VERB_FAILED = 4     /* check failing */
+} verb_t;
+
+/*
+ * struct to make it easier to make multiple calls to add_result()
+ * See the results_entry_t for details.
+ */
+struct result_params {
+    severity_t severity;
+    waiverauth_t waiverauth;
+    const char *header;
+    char *msg;
+    char *details;
+    const char *remedy;
+    verb_t verb;
+    char *noun;
+    const char *arch;
+    const char *file;
+};
+
 typedef struct _results_entry_t {
     severity_t severity;      /* see results.h */
     waiverauth_t waiverauth;  /* who can waive an inspection result */
-    char *header;             /* header string for reporting */
+    const char *header;       /* header string for reporting */
     char *msg;                /* the result message */
     char *details;            /* details (optional, can be NULL) */
-    char *remedy;             /* suggested correction for the result */
+    const char *remedy;       /* suggested correction for the result */
+    verb_t verb;              /* verb indicating what happened */
+    char *noun;               /* noun impacted by 'verb', one line
+                                 (e.g., a file path or an RPM dependency
+                                        string) */
+    const char *arch;         /* architecture impacted (${ARCH}) */
+    const char *file;         /* file impacted (${FILE}) */
     TAILQ_ENTRY(_results_entry_t) items;
 } results_entry_t;
 

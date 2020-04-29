@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2019  Red Hat, Inc.
+ * Copyright (C) 2019-2020  Red Hat, Inc.
  * Author(s):  David Cantrell <dcantrell@redhat.com>
  *
  * This program is free software: you can redistribute it and/or modify
@@ -43,10 +43,13 @@ bool is_payload_empty(rpmfile_t *filelist) {
 bool inspect_emptyrpm(struct rpminspect *ri) {
     bool good = true;
     rpmpeer_entry_t *peer = NULL;
-    char *msg = NULL;
+    struct result_params params;
 
     assert(ri != NULL);
     assert(ri->peers != NULL);
+
+    memset(&params, 0, sizeof(params));
+    params.header = HEADER_EMPTYRPM;
 
     /*
      * The emptyrpm inspection looks for any packages missing payloads.
@@ -61,26 +64,38 @@ bool inspect_emptyrpm(struct rpminspect *ri) {
          * is intentional, sometimes not.
          */
         if (peer->before_rpm != NULL && peer->after_rpm == NULL) {
-            xasprintf(&msg, _("Existing subpackage %s is now missing"), headerGetString(peer->before_hdr, RPMTAG_NAME));
-            add_result(ri, RESULT_VERIFY, WAIVABLE_BY_ANYONE, HEADER_EMPTYRPM, msg, NULL, REMEDY_EMPTYRPM);
-            free(msg);
+            xasprintf(&params.msg, _("Existing subpackage %s is now missing"), headerGetString(peer->before_hdr, RPMTAG_NAME));
+            params.severity = RESULT_VERIFY;
+            params.waiverauth = WAIVABLE_BY_ANYONE;
+            params.remedy = REMEDY_EMPTYRPM;
+            add_result(ri, &params);
+            free(params.msg);
             good = false;
             continue;
         }
 
         if (is_payload_empty(peer->after_files)) {
             if (peer->before_rpm == NULL) {
-                xasprintf(&msg, _("New package %s is empty (no payloads)"), basename(peer->after_rpm));
-                add_result(ri, RESULT_VERIFY, WAIVABLE_BY_ANYONE, HEADER_EMPTYRPM, msg, NULL, REMEDY_EMPTYRPM);
-                free(msg);
+                xasprintf(&params.msg, _("New package %s is empty (no payloads)"), basename(peer->after_rpm));
+                params.severity = RESULT_VERIFY;
+                params.waiverauth = WAIVABLE_BY_ANYONE;
+                params.remedy = REMEDY_EMPTYRPM;
+                add_result(ri, &params);
+                free(params.msg);
             } else if (is_payload_empty(peer->before_files)) {
-                xasprintf(&msg, _("Package %s continues to be empty (no payloads)"), basename(peer->after_rpm));
-                add_result(ri, RESULT_INFO, NOT_WAIVABLE, HEADER_EMPTYRPM, msg, NULL, REMEDY_EMPTYRPM);
-                free(msg);
+                xasprintf(&params.msg, _("Package %s continues to be empty (no payloads)"), basename(peer->after_rpm));
+                params.severity = RESULT_INFO;
+                params.waiverauth = NOT_WAIVABLE;
+                params.remedy = REMEDY_EMPTYRPM;
+                add_result(ri, &params);
+                free(params.msg);
             } else {
-                xasprintf(&msg, _("Package %s became empty (no payloads)"), basename(peer->after_rpm));
-                add_result(ri, RESULT_VERIFY, WAIVABLE_BY_ANYONE, HEADER_EMPTYRPM, msg, NULL, REMEDY_EMPTYRPM);
-                free(msg);
+                xasprintf(&params.msg, _("Package %s became empty (no payloads)"), basename(peer->after_rpm));
+                params.severity = RESULT_VERIFY;
+                params.waiverauth = WAIVABLE_BY_ANYONE;
+                params.remedy = REMEDY_EMPTYRPM;
+                add_result(ri, &params);
+                free(params.msg);
             }
 
             good = false;
@@ -88,7 +103,9 @@ bool inspect_emptyrpm(struct rpminspect *ri) {
     }
 
     if (good) {
-        add_result(ri, RESULT_OK, NOT_WAIVABLE, HEADER_EMPTYRPM, NULL, NULL, NULL);
+        params.severity = RESULT_OK;
+        params.waiverauth = NOT_WAIVABLE;
+        add_result(ri, &params);
     }
 
     return good;

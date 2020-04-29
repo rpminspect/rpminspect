@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2019  Red Hat, Inc.
+ * Copyright (C) 2019-2020  Red Hat, Inc.
  * Author(s):  David Cantrell <dcantrell@redhat.com>
  *
  * This program is free software: you can redistribute it and/or modify
@@ -28,8 +28,8 @@ static bool disttag_driver(struct rpminspect *ri, rpmfile_entry_t *file) {
     FILE *fp = NULL;
     size_t len = 0;
     char *buf = NULL;
-    char *msg = NULL;
     char *specfile = NULL;
+    struct result_params params;
 
     /* Skip binary packages */
     if (!headerIsSource(file->rpm_header)) {
@@ -80,24 +80,38 @@ static bool disttag_driver(struct rpminspect *ri, rpmfile_entry_t *file) {
         fflush(stderr);
     }
 
+    /* Set up the result parameters */
+    memset(&params, 0, sizeof(params));
+    params.severity = RESULT_BAD;
+    params.waiverauth = NOT_WAIVABLE;
+    params.header = HEADER_DISTTAG;
+    params.remedy = REMEDY_DISTTAG;
+    params.details = buf;
+    params.arch = get_rpm_header_arch(file->rpm_header);
+    params.file = file->localpath;
+
     /* Check the line if we found it */
     if (buf == NULL) {
-        msg = strdup(_("The %s file is missing the Release: tag."));
-        add_result(ri, RESULT_BAD, NOT_WAIVABLE, HEADER_DISTTAG, msg, buf, REMEDY_DISTTAG);
-        free(msg);
+        xasprintf(&params.msg, _("The %s file is missing the Release: tag."), file->localpath);
+        params.verb = VERB_REMOVED;
+        params.noun = _("Release: tag");
+        add_result(ri, &params);
         result = false;
     } else if (strstr(buf, "dist") && !strstr(buf, "%{?dist}")) {
-        msg = strdup(_("The dist tag should be of the form '%%{?dist}' in the Release tag."));
-        add_result(ri, RESULT_BAD, NOT_WAIVABLE, HEADER_DISTTAG, msg, buf, REMEDY_DISTTAG);
-        free(msg);
+        params.msg = strdup(_("The dist tag should be of the form '%%{?dist}' in the Release tag."));
+        params.verb = VERB_FAILED;
+        params.noun = _("'%%{?dist}' tag");
+        add_result(ri, &params);
         result = false;
     } else if (!strstr(buf, "%{?dist}")) {
-        msg = strdup(_("The Release: tag does not seem to contain a '%%{?dist}' tag."));
-        add_result(ri, RESULT_BAD, NOT_WAIVABLE, HEADER_DISTTAG, msg, buf, REMEDY_DISTTAG);
-        free(msg);
+        params.msg = strdup(_("The Release: tag does not seem to contain a '%%{?dist}' tag."));
+        params.verb = VERB_REMOVED;
+        params.noun = _("'%%{?dist}' tag");
+        add_result(ri, &params);
         result = false;
     }
 
+    free(params.msg);
     free(buf);
     return result;
 }
@@ -110,6 +124,7 @@ bool inspect_disttag(struct rpminspect *ri) {
     bool src = false;
     rpmpeer_entry_t *peer = NULL;
     rpmfile_entry_t *file = NULL;
+    struct result_params params;
 
     assert(ri != NULL);
 
@@ -134,11 +149,19 @@ bool inspect_disttag(struct rpminspect *ri) {
         }
     }
 
+    /* Set up result parameters */
+    memset(&params, 0, sizeof(params));
+    params.waiverauth = NOT_WAIVABLE;
+    params.header = HEADER_DISTTAG;
+
     /* If we never saw an SRPM, tell the user. */
     if (result && src) {
-        add_result(ri, RESULT_OK, NOT_WAIVABLE, HEADER_DISTTAG, NULL, NULL, NULL);
+        params.severity = RESULT_OK;
+        add_result(ri, &params);
     } else if (!src) {
-        add_result(ri, RESULT_INFO, NOT_WAIVABLE, HEADER_DISTTAG, _("Specified package is not a source RPM, skipping."), NULL, NULL);
+        params.severity = RESULT_INFO;
+        params.msg = _("Specified package is not a source RPM, skipping.");
+        add_result(ri, &params);
     }
 
     return result;

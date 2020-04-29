@@ -31,22 +31,17 @@
  * Called by changedfiles_driver() to add additional information for
  * files marked as security concerns.
  */
-static void add_changedfiles_result(struct rpminspect *ri, const char *msg, char *errors,
-                                    const severity_t severity, const waiverauth_t waiver)
+static void add_changedfiles_result(struct rpminspect *ri, struct result_params *params)
 {
-    char *tmp = NULL;
-
     assert(ri != NULL);
-    assert(msg != NULL);
+    assert(params != NULL);
 
-    if (waiver == WAIVABLE_BY_SECURITY) {
-        xasprintf(&tmp, _("%s.  Changes to security policy related files require inspection by the Security Response Team."), msg);
-    } else {
-        tmp = strdup(msg);
+    if (params->waiverauth == WAIVABLE_BY_SECURITY) {
+        params->msg = strappend(params->msg, _("  Changes to security policy related files require inspection by the Security Response Team."));
+        assert(params->msg != NULL);
     }
 
-    add_result(ri, severity, waiver, HEADER_CHANGEDFILES, tmp, errors, REMEDY_CHANGEDFILES);
-    free(tmp);
+    add_result(ri, params);
     return;
 }
 
@@ -98,24 +93,21 @@ static bool changedfiles_driver(struct rpminspect *ri, rpmfile_entry_t *file)
     char *type = NULL;
     char *before_sum = NULL;
     char *after_sum = NULL;
-    char *msg = NULL;
     char *errors = NULL;
     char *short_errors = NULL;
     char *skip_line = NULL;
     char *needle = NULL;
     char *part_errors = NULL;
-    char *refined_errors = NULL;
     int exitcode;
     bool possible_header = false;
     string_entry_t *entry = NULL;
-    severity_t severity = RESULT_VERIFY;
-    waiverauth_t waiver = WAIVABLE_BY_ANYONE;
     char *before_tmp = NULL;
     char *after_tmp = NULL;
     int fd;
     char magic[4];
     const char *bv = NULL;
     const char *av = NULL;
+    struct result_params params;
 
     assert(ri != NULL);
     assert(file != NULL);
@@ -141,6 +133,17 @@ static bool changedfiles_driver(struct rpminspect *ri, rpmfile_entry_t *file)
         return true;
     }
 
+    /* The architecture is used in reporting messages */
+    arch = get_rpm_header_arch(file->rpm_header);
+
+    /* Set up the result parameters */
+    memset(&params, 0, sizeof(params));
+    params.severity = RESULT_VERIFY;
+    params.waiverauth = WAIVABLE_BY_ANYONE;
+    params.header = HEADER_CHANGEDFILES;
+    params.arch = arch;
+    params.file = file->localpath;
+
     /* Set the waiver type if this is a file of security concern */
     if (ri->security_path_prefix) {
         TAILQ_FOREACH(entry, ri->security_path_prefix, items) {
@@ -149,8 +152,8 @@ static bool changedfiles_driver(struct rpminspect *ri, rpmfile_entry_t *file)
             }
 
             if (strprefix(file->localpath, entry->data)) {
-                severity = RESULT_BAD;
-                waiver = WAIVABLE_BY_SECURITY;
+                params.severity = RESULT_BAD;
+                params.waiverauth = WAIVABLE_BY_SECURITY;
                 break;
             }
         }
@@ -163,12 +166,9 @@ static bool changedfiles_driver(struct rpminspect *ri, rpmfile_entry_t *file)
     bv = headerGetString(file->peer_file->rpm_header, RPMTAG_VERSION);
     av = headerGetString(file->rpm_header, RPMTAG_VERSION);
 
-    if (!strcmp(bv, av) && waiver != WAIVABLE_BY_SECURITY) {
+    if (!strcmp(bv, av) && params.waiverauth != WAIVABLE_BY_SECURITY) {
         return true;
     }
-
-    /* The architecture is used in reporting messages */
-    arch = get_rpm_header_arch(file->rpm_header);
 
     /* Get the MIME type of the file, will need that */
     type = get_mime_type(file);
@@ -220,27 +220,33 @@ static bool changedfiles_driver(struct rpminspect *ri, rpmfile_entry_t *file)
      * compression levels changed between builds.
      */
     if (!strcmp(type, "application/x-gzip")) {
-        errors = run_cmd(&exitcode, ZCMP_CMD, file->peer_file->fullpath, file->fullpath, NULL);
+        params.details = run_cmd(&exitcode, ZCMP_CMD, file->peer_file->fullpath, file->fullpath, NULL);
 
         if (exitcode) {
-            xasprintf(&msg, _("Compressed gzip file %s changed content on %s"), file->localpath, arch);
-            add_changedfiles_result(ri, msg, errors, severity, waiver);
+            xasprintf(&params.msg, _("Compressed gzip file %s changed content on %s."), file->localpath, arch);
+            params.verb = VERB_CHANGED;
+            params.noun = file->localpath;
+            add_changedfiles_result(ri, &params);
             result = false;
         }
     } else if (!strcmp(type, "application/x-bzip2")) {
-        errors = run_cmd(&exitcode, BZCMP_CMD, file->peer_file->fullpath, file->fullpath, NULL);
+        params.details = run_cmd(&exitcode, BZCMP_CMD, file->peer_file->fullpath, file->fullpath, NULL);
 
         if (exitcode) {
-            xasprintf(&msg, _("Compressed bzip2 file %s changed content on %s"), file->localpath, arch);
-            add_changedfiles_result(ri, msg, errors, severity, waiver);
+            xasprintf(&params.msg, _("Compressed bzip2 file %s changed content on %s."), file->localpath, arch);
+            params.verb = VERB_CHANGED;
+            params.noun = file->localpath;
+            add_changedfiles_result(ri, &params);
             result = false;
         }
     } else if (!strcmp(type, "application/x-xz")) {
-        errors = run_cmd(&exitcode, XZCMP_CMD, file->peer_file->fullpath, file->fullpath, NULL);
+        params.details = run_cmd(&exitcode, XZCMP_CMD, file->peer_file->fullpath, file->fullpath, NULL);
 
         if (exitcode) {
-            xasprintf(&msg, _("Compressed xz file %s changed content on %s"), file->localpath, arch);
-            add_changedfiles_result(ri, msg, errors, severity, waiver);
+            xasprintf(&params.msg, _("Compressed xz file %s changed content on %s."), file->localpath, arch);
+            params.verb = VERB_CHANGED;
+            params.noun = file->localpath;
+            add_changedfiles_result(ri, &params);
             result = false;
         }
     }
@@ -266,16 +272,16 @@ static bool changedfiles_driver(struct rpminspect *ri, rpmfile_entry_t *file)
             part_errors = strstr(errors, needle);
 
             if (part_errors) {
-                xasprintf(&refined_errors, "eu-elfcmp: %s", part_errors);
+                xasprintf(&params.details, "eu-elfcmp: %s", part_errors);
             } else {
                 /* unknown output format from eu-elfcmp */
-                refined_errors = strdup(errors);
+                params.details = strdup(errors);
             }
 
-            xasprintf(&msg, _("ELF file %s changed content on %s"), file->localpath, arch);
-            add_changedfiles_result(ri, msg, refined_errors, severity, waiver);
+            xasprintf(&params.msg, _("ELF file %s changed content on %s."), file->localpath, arch);
+            add_changedfiles_result(ri, &params);
             free(needle);
-            free(refined_errors);
+            free(params.details);
             result = false;
         }
     }
@@ -299,30 +305,45 @@ static bool changedfiles_driver(struct rpminspect *ri, rpmfile_entry_t *file)
          */
 
         /* First, unformat the mo files */
-        errors = run_and_capture(ri->workdir, &after_tmp, MSGUNFMT_CMD, file->fullpath, &exitcode);
+        params.details = run_and_capture(ri->workdir, &after_tmp, MSGUNFMT_CMD, file->fullpath, &exitcode);
 
         if (exitcode) {
-            xasprintf(&msg, _("Error running msgunfmt on %s on %s"), file->localpath, arch);
-            add_result(ri, RESULT_BAD, NOT_WAIVABLE, HEADER_CHANGEDFILES, msg, errors, REMEDY_CHANGEDFILES);
+            xasprintf(&params.msg, _("Error running msgunfmt on %s on %s"), file->localpath, arch);
+            params.severity = RESULT_BAD;
+            params.waiverauth = NOT_WAIVABLE;
+            params.remedy = REMEDY_CHANGEDFILES;
+            params.verb = VERB_FAILED;
+            params.noun = _("msgunfmt on ${FILE}");
+            add_result(ri, &params);
             result = false;
             goto done;
         }
 
-        errors = run_and_capture(ri->workdir, &before_tmp, MSGUNFMT_CMD, file->peer_file->fullpath, &exitcode);
+        params.details = run_and_capture(ri->workdir, &before_tmp, MSGUNFMT_CMD, file->peer_file->fullpath, &exitcode);
 
         if (exitcode) {
-            xasprintf(&msg, _("Error running msgunfmt on %s on %s"), file->peer_file->localpath, arch);
-            add_result(ri, RESULT_BAD, NOT_WAIVABLE, HEADER_CHANGEDFILES, msg, errors, REMEDY_CHANGEDFILES);
+            xasprintf(&params.msg, _("Error running msgunfmt on %s on %s"), file->peer_file->localpath, arch);
+            params.severity = RESULT_BAD;
+            params.waiverauth = NOT_WAIVABLE;
+            params.remedy = REMEDY_CHANGEDFILES;
+            params.verb = VERB_FAILED;
+            params.noun = _("msgunfmt on ${FILE}");
+            add_result(ri, &params);
             result = false;
             goto done;
         }
 
         /* Now diff the mo content */
-        errors = run_cmd(&exitcode, DIFF_CMD, "-u", before_tmp, after_tmp, NULL);
+        params.details = run_cmd(&exitcode, DIFF_CMD, "-u", before_tmp, after_tmp, NULL);
 
         if (exitcode) {
-            xasprintf(&msg, _("Message catalog %s changed content on %s"), file->localpath, arch);
-            add_result(ri, RESULT_VERIFY, WAIVABLE_BY_ANYONE, HEADER_CHANGEDFILES, msg, errors, REMEDY_CHANGEDFILES);
+            xasprintf(&params.msg, _("Message catalog %s changed content on %s"), file->localpath, arch);
+            params.severity = RESULT_VERIFY;
+            params.waiverauth = WAIVABLE_BY_ANYONE;
+            params.remedy = REMEDY_CHANGEDFILES;
+            params.verb = VERB_CHANGED;
+            params.noun = _("${FILE}");
+            add_result(ri, &params);
             result = false;
         }
 
@@ -389,8 +410,13 @@ static bool changedfiles_driver(struct rpminspect *ri, rpmfile_entry_t *file)
                 }
             }
 
-            xasprintf(&msg, _("Public header file %s changed content on %s, Please make sure this does not change the ABI exported by this package.  The output of `diff -uw` follows."), file->localpath, arch);
-            add_result(ri, RESULT_VERIFY, WAIVABLE_BY_ANYONE, HEADER_CHANGEDFILES, msg, short_errors, REMEDY_CHANGEDFILES);
+            xasprintf(&params.msg, _("Public header file %s changed content on %s, Please make sure this does not change the ABI exported by this package.  The output of `diff -uw` follows."), file->localpath, arch);
+            params.severity = RESULT_VERIFY;
+            params.waiverauth = WAIVABLE_BY_ANYONE;
+            params.details = short_errors;
+            params.verb = VERB_CHANGED;
+            params.noun = _("${FILE}");
+            add_result(ri, &params);
             result = false;
         }
     }
@@ -404,13 +430,16 @@ static bool changedfiles_driver(struct rpminspect *ri, rpmfile_entry_t *file)
     after_sum = checksum(file);
 
     if (strcmp(before_sum, after_sum)) {
-        xasprintf(&msg, _("File %s changed content on %s"), file->localpath, arch);
-        add_changedfiles_result(ri, msg, errors, severity, waiver);
+        xasprintf(&params.msg, _("File %s changed content on %s."), file->localpath, arch);
+        params.verb = VERB_CHANGED;
+        params.noun = _("${FILE}");
+        add_changedfiles_result(ri, &params);
         result = false;
     }
 
 done:
-    free(msg);
+    free(params.msg);
+    free(params.details);
     free(errors);
     free(before_tmp);
     free(after_tmp);
@@ -421,11 +450,16 @@ done:
 bool inspect_changedfiles(struct rpminspect *ri)
 {
     bool result;
+    struct result_params params;
 
     result = foreach_peer_file(ri, changedfiles_driver);
 
     if (result) {
-        add_result(ri, RESULT_OK, NOT_WAIVABLE, HEADER_CHANGEDFILES, NULL, NULL, NULL);
+        memset(&params, 0, sizeof(params));
+        params.severity = RESULT_OK;
+        params.waiverauth = NOT_WAIVABLE;
+        params.header = HEADER_CHANGEDFILES;
+        add_result(ri, &params);
     }
 
     return result;

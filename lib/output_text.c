@@ -34,7 +34,7 @@ void output_text(const results_t *results, const char *dest) {
     bool displayed_header = false;
     bool first = true;
     FILE *fp = NULL;
-    char *header = NULL;
+    const char *header = NULL;
     char *msg = NULL;
     size_t width = tty_width();
 

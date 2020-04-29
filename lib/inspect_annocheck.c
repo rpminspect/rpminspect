@@ -34,8 +34,7 @@ static bool annocheck_driver(struct rpminspect *ri, rpmfile_entry_t *file)
     int after_exit;
     char *before_out = NULL;
     int before_exit;
-    char *msg = NULL;
-    severity_t severity = RESULT_INFO;
+    struct result_params params;
 
     assert(ri != NULL);
     assert(file != NULL);
@@ -52,6 +51,15 @@ static bool annocheck_driver(struct rpminspect *ri, rpmfile_entry_t *file)
     if (!is_elf(file->fullpath) || (!is_elf(file->fullpath) && file->peer_file && !is_elf(file->peer_file->fullpath))) {
         return result;
     }
+
+    /* Set up the result parameters */
+    memset(&params, 0, sizeof(params));
+    params.severity = RESULT_INFO;
+    params.waiverauth = WAIVABLE_BY_ANYONE;
+    params.header = HEADER_ANNOCHECK;
+    params.remedy = REMEDY_ANNOCHECK;
+    params.arch = arch;
+    params.file = file->localpath;
 
     /* Run each annocheck test and report the results */
     TAILQ_FOREACH(entry, ri->annocheck_keys, items) {
@@ -76,26 +84,29 @@ static bool annocheck_driver(struct rpminspect *ri, rpmfile_entry_t *file)
         /* Build a reporting message if we need to */
         if (before_out && after_out) {
             if (before_exit == 0 && after_exit == 0) {
-                xasprintf(&msg, _("annocheck '%s' test passes for %s on %s"), entry->data, file->localpath, arch);
+                xasprintf(&params.msg, _("annocheck '%s' test passes for %s on %s"), entry->data, file->localpath, arch);
             } else if (before_exit == 1 && after_exit == 0) {
-                xasprintf(&msg, _("annocheck '%s' test now passes for %s on %s"), entry->data, file->localpath, arch);
+                xasprintf(&params.msg, _("annocheck '%s' test now passes for %s on %s"), entry->data, file->localpath, arch);
             } else if (before_exit == 0 && after_exit == 1) {
-                xasprintf(&msg, _("annocheck '%s' test now fails for %s on %s"), entry->data, file->localpath, arch);
-                severity = RESULT_VERIFY;
+                xasprintf(&params.msg, _("annocheck '%s' test now fails for %s on %s"), entry->data, file->localpath, arch);
+                params.severity = RESULT_VERIFY;
+                params.verb = VERB_CHANGED;
             }
         } else if (after_out) {
             if (after_exit == 0) {
-                xasprintf(&msg, _("annocheck '%s' test passes for %s on %s"), entry->data, file->localpath, arch);
+                xasprintf(&params.msg, _("annocheck '%s' test passes for %s on %s"), entry->data, file->localpath, arch);
             } else if (after_exit == 1) {
-                xasprintf(&msg, _("annocheck '%s' test fails for %s on %s"), entry->data, file->localpath, arch);
-                severity = RESULT_VERIFY;
+                xasprintf(&params.msg, _("annocheck '%s' test fails for %s on %s"), entry->data, file->localpath, arch);
+                params.severity = RESULT_VERIFY;
+                params.verb = VERB_CHANGED;
             }
         }
 
         /* Report the results */
-        if (msg) {
-            add_result(ri, severity, WAIVABLE_BY_ANYONE, HEADER_ANNOCHECK, msg, after_out, REMEDY_ANNOCHECK);
-            free(msg);
+        if (params.msg) {
+            params.details = after_out;
+            add_result(ri, &params);
+            free(params.msg);
             result = false;
         }
 
@@ -114,6 +125,7 @@ static bool annocheck_driver(struct rpminspect *ri, rpmfile_entry_t *file)
  */
 bool inspect_annocheck(struct rpminspect *ri) {
     bool result;
+    struct result_params params;
 
     assert(ri != NULL);
 
@@ -127,7 +139,11 @@ bool inspect_annocheck(struct rpminspect *ri) {
 
     /* if everything was fine, just say so */
     if (result) {
-        add_result(ri, RESULT_OK, NOT_WAIVABLE, HEADER_ANNOCHECK, NULL, NULL, NULL);
+        memset(&params, 0, sizeof(params));
+        params.severity = RESULT_OK;
+        params.waiverauth = NOT_WAIVABLE;
+        params.header = HEADER_ANNOCHECK;
+        add_result(ri, &params);
     }
 
     return result;

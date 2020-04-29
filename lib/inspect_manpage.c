@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2019  Red Hat, Inc.
+ * Copyright (C) 2019-2020  Red Hat, Inc.
  * Author(s):  David Shea <dshea@redhat.com>
  *             David Cantrell <dcantrell@redhat.com>
  *
@@ -257,8 +257,7 @@ static bool manpage_driver(struct rpminspect *ri, rpmfile_entry_t *file)
 {
     char *manpage_errors;
     bool result = true;
-    const char *arch;
-    char *msg = NULL;
+    struct result_params params;
 
     /* Skip source packages */
     if (headerIsSource(file->rpm_header)) {
@@ -274,39 +273,56 @@ static bool manpage_driver(struct rpminspect *ri, rpmfile_entry_t *file)
         return true;
     }
 
-    arch = get_rpm_header_arch(file->rpm_header);
+    /* Set up result parameters */
+    memset(&params, 0, sizeof(params));
+    params.severity = RESULT_VERIFY;
+    params.waiverauth = WAIVABLE_BY_ANYONE;
+    params.header = HEADER_MAN;
+    params.arch = get_rpm_header_arch(file->rpm_header);
+    params.file = file->localpath;
+    params.verb = VERB_FAILED;
+    params.noun = _("${FILE}");
 
     if ((manpage_errors = inspect_manpage_validity(file->fullpath, file->localpath)) != NULL) {
-        xasprintf(&msg, _("Man page checker reported problems with %s on %s"), file->localpath, arch);
+        xasprintf(&params.msg, _("Man page checker reported problems with %s on %s"), file->localpath, params.arch);
+        params.remedy = REMEDY_MAN_ERRORS;
+        params.details = manpage_errors;
 
-        add_result(ri, RESULT_VERIFY, WAIVABLE_BY_ANYONE, HEADER_MAN, msg, manpage_errors, REMEDY_MAN_ERRORS);
+        add_result(ri, &params);
 
         result = false;
         free(manpage_errors);
     }
 
     if (!inspect_manpage_path(file->fullpath)) {
-        xasprintf(&msg, _("Man page %s has incorrect path on %s"), file->localpath, arch);
+        xasprintf(&params.msg, _("Man page %s has incorrect path on %s"), file->localpath, params.arch);
+        params.remedy = REMEDY_MAN_PATH;
+        params.details = NULL;
 
-        add_result(ri, RESULT_VERIFY, WAIVABLE_BY_ANYONE, HEADER_MAN, msg, NULL, REMEDY_MAN_PATH);
+        add_result(ri, &params);
 
         result = false;
     }
 
-    free(msg);
+    free(params.msg);
     return result;
 }
 
 bool inspect_manpage(struct rpminspect *ri)
 {
     bool result;
+    struct result_params params;
 
     inspect_manpage_alloc();
     result = foreach_peer_file(ri, manpage_driver);
     inspect_manpage_free();
 
     if (result) {
-        add_result(ri, RESULT_OK, NOT_WAIVABLE, HEADER_MAN, NULL, NULL, NULL);
+        memset(&params, 0, sizeof(params));
+        params.severity = RESULT_OK;
+        params.waiverauth = NOT_WAIVABLE;
+        params.header = HEADER_MAN;
+        add_result(ri, &params);
     }
 
     return result;

@@ -198,7 +198,6 @@ int add_peer(rpmpeer_t **, int, bool, const char *, Header);
 /* files.c */
 void free_files(rpmfile_t *files);
 rpmfile_t * extract_rpm(const char *, Header);
-const char * get_file_path(const rpmfile_entry_t *file);
 bool process_file_path(const rpmfile_entry_t *, regex_t *, regex_t *);
 void find_file_peers(rpmfile_t *, rpmfile_t *);
 cap_t get_cap(rpmfile_entry_t *);
@@ -210,8 +209,8 @@ size_t tty_width(void);
 /* results.c */
 results_t *init_results(void);
 void free_results(results_t *);
-void add_result_entry(results_t **, severity_t, waiverauth_t, const char *, char *, char *, const char *);
-void add_result(struct rpminspect *, severity_t, waiverauth_t, const char *, char *, char *, const char *);
+void add_result_entry(results_t **, struct result_params *);
+void add_result(struct rpminspect *, struct result_params *);
 
 /* output.c */
 const char *format_desc(unsigned int);
