@@ -96,7 +96,7 @@ static bool dt_needed_driver(struct rpminspect *ri, rpmfile_entry_t *file)
     }
 
     /* Set up result parameters */
-    memset(&params, 0, sizeof(params));
+    init_result_params(&params);
     params.severity = RESULT_VERIFY;
     params.waiverauth = WAIVABLE_BY_ANYONE;
     params.header = HEADER_DT_NEEDED;
@@ -227,7 +227,7 @@ bool inspect_dt_needed(struct rpminspect *ri) {
 
     /* if everything was fine, just say so */
     if (result) {
-        memset(&params, 0, sizeof(params));
+        init_result_params(&params);
         params.severity = RESULT_OK;
         params.waiverauth = NOT_WAIVABLE;
         params.header = HEADER_DT_NEEDED;

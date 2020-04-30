@@ -81,7 +81,7 @@ static bool disttag_driver(struct rpminspect *ri, rpmfile_entry_t *file) {
     }
 
     /* Set up the result parameters */
-    memset(&params, 0, sizeof(params));
+    init_result_params(&params);
     params.severity = RESULT_BAD;
     params.waiverauth = NOT_WAIVABLE;
     params.header = HEADER_DISTTAG;
@@ -150,7 +150,7 @@ bool inspect_disttag(struct rpminspect *ri) {
     }
 
     /* Set up result parameters */
-    memset(&params, 0, sizeof(params));
+    init_result_params(&params);
     params.waiverauth = NOT_WAIVABLE;
     params.header = HEADER_DISTTAG;
 

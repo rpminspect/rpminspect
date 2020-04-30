@@ -70,7 +70,7 @@ static bool specname_driver(struct rpminspect *ri, rpmfile_entry_t *file) {
      */
     if (!specgood) {
         /* Set up result parameters */
-        memset(&params, 0, sizeof(params));
+        init_result_params(&params);
         params.severity = RESULT_BAD;
         params.waiverauth = NOT_WAIVABLE;
         params.header = HEADER_SPECNAME;
@@ -105,7 +105,7 @@ bool inspect_specname(struct rpminspect *ri) {
     assert(ri != NULL);
     foreach_peer_file(ri, specname_driver);
 
-    memset(&params, 0, sizeof(params));
+    init_result_params(&params);
     params.waiverauth = NOT_WAIVABLE;
     params.header = HEADER_SPECNAME;
 

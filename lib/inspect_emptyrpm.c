@@ -48,7 +48,7 @@ bool inspect_emptyrpm(struct rpminspect *ri) {
     assert(ri != NULL);
     assert(ri->peers != NULL);
 
-    memset(&params, 0, sizeof(params));
+    init_result_params(&params);
     params.header = HEADER_EMPTYRPM;
 
     /*

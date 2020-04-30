@@ -498,7 +498,7 @@ static bool inspect_elf_execstack(struct rpminspect *ri, Elf *after_elf, Elf *be
     }
 
     /* Set up result parameters */
-    memset(&params, 0, sizeof(params));
+    init_result_params(&params);
     params.waiverauth = WAIVABLE_BY_SECURITY;
     params.header = HEADER_ELF;
     params.arch = arch;
@@ -591,7 +591,7 @@ static bool check_relro(struct rpminspect *ri, Elf *before_elf, Elf *after_elf, 
     bool after_bind_now = has_bind_now(after_elf);
     struct result_params params;
 
-    memset(&params, 0, sizeof(params));
+    init_result_params(&params);
 
     if (before_relro && before_bind_now && after_relro && !after_bind_now) {
         /* full relro in before, partial relro in after */
@@ -709,7 +709,7 @@ static bool check_fortified(struct rpminspect *ri, Elf *before_elf, Elf *after_e
     output_result = fclose(output_stream);
     assert(output_result == 0);
 
-    memset(&params, 0, sizeof(params));
+    init_result_params(&params);
     xasprintf(&params.msg, _("%s may have lost -D_FORTIFY_SOURCE on %s"), localpath, arch);
     params.header = HEADER_ELF;
     params.severity = RESULT_VERIFY;
@@ -787,7 +787,7 @@ static bool check_ipv6(struct rpminspect *ri, Elf *after_elf, const char *localp
     output_result = fclose(output_stream);
     assert(output_result == 0);
 
-    memset(&params, 0, sizeof(params));
+    init_result_params(&params);
     xasprintf(&params.msg, _("%s may use functions unsuitable for IPv6 support on %s"), localpath, arch);
     params.severity = RESULT_VERIFY;
     params.waiverauth = WAIVABLE_BY_ANYONE;
@@ -985,7 +985,7 @@ static bool elf_archive_tests(struct rpminspect *ri, Elf *after_elf, int after_e
     assert(output_result == 0);
 
     if (!result) {
-        memset(&params, 0, sizeof(params));
+        init_result_params(&params);
         xasprintf(&params.msg, _("%s lost -fPIC on %s"), localpath, arch);
         params.severity = RESULT_BAD;
         params.waiverauth = WAIVABLE_BY_SECURITY;
@@ -1018,7 +1018,7 @@ static bool elf_regular_tests(struct rpminspect *ri, Elf *after_elf, Elf *before
     bool result = true;
     struct result_params params;
 
-    memset(&params, 0, sizeof(params));
+    init_result_params(&params);
     params.severity = RESULT_BAD;
     params.header = HEADER_ELF;
     params.waiverauth = WAIVABLE_BY_SECURITY;
@@ -1129,7 +1129,7 @@ bool inspect_elf(struct rpminspect *ri)
     free_elf_data();
 
     if (result) {
-        memset(&params, 0, sizeof(params));
+        init_result_params(&params);
         params.severity = RESULT_OK;
         params.waiverauth = NOT_WAIVABLE;
         params.header = HEADER_ELF;

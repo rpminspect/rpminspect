@@ -274,7 +274,7 @@ static bool manpage_driver(struct rpminspect *ri, rpmfile_entry_t *file)
     }
 
     /* Set up result parameters */
-    memset(&params, 0, sizeof(params));
+    init_result_params(&params);
     params.severity = RESULT_VERIFY;
     params.waiverauth = WAIVABLE_BY_ANYONE;
     params.header = HEADER_MAN;
@@ -318,7 +318,7 @@ bool inspect_manpage(struct rpminspect *ri)
     inspect_manpage_free();
 
     if (result) {
-        memset(&params, 0, sizeof(params));
+        init_result_params(&params);
         params.severity = RESULT_OK;
         params.waiverauth = NOT_WAIVABLE;
         params.header = HEADER_MAN;

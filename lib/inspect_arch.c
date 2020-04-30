@@ -45,7 +45,7 @@ bool inspect_arch(struct rpminspect *ri) {
     assert(after_arches != NULL);
     TAILQ_INIT(after_arches);
 
-    memset(&params, 0, sizeof(params));
+    init_result_params(&params);
     params.waiverauth = WAIVABLE_BY_ANYONE;
     params.header = HEADER_ARCH;
 

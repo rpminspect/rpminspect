@@ -22,6 +22,27 @@
 #include "rpminspect.h"
 
 /*
+ * Initialize a struct result_params.
+ */
+void init_result_params(struct result_params *params)
+{
+    assert(params != NULL);
+
+    params->severity = RESULT_OK;
+    params->waiverauth = NOT_WAIVABLE;
+    params->header = NULL;
+    params->msg = NULL;
+    params->details = NULL;
+    params->remedy = NULL;
+    params->verb = VERB_NIL;
+    params->noun = NULL;
+    params->arch = NULL;
+    params->file = NULL;
+
+    return;
+}
+
+/*
  * Initialize a new results_t list.
  */
 results_t *init_results(void) {

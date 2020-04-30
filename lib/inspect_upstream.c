@@ -169,7 +169,7 @@ bool inspect_upstream(struct rpminspect *ri)
 
     assert(ri != NULL);
 
-    memset(&params, 0, sizeof(params));
+    init_result_params(&params);
     params.header = HEADER_UPSTREAM;
 
     /* Initialize before and after versions */

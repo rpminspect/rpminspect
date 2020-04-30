@@ -207,6 +207,7 @@ bool is_debug_or_build_path(const char *);
 size_t tty_width(void);
 
 /* results.c */
+void init_result_params(struct result_params *);
 results_t *init_results(void);
 void free_results(results_t *);
 void add_result_entry(results_t **, struct result_params *);
