@@ -292,7 +292,7 @@ bool inspect_kmod(struct rpminspect *ri) {
     assert(ri != NULL);
 
     /* run the kmod inspection across all RPM files */
-    memset(&params, 0, sizeof(params));
+    init_result_params(&params);
     params.severity = RESULT_INFO;
     params.waiverauth = NOT_WAIVABLE;
     params.header = HEADER_KMOD;

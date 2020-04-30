@@ -66,7 +66,7 @@ bool inspect_subpackages(struct rpminspect *ri) {
     gain = list_difference(after_pkgs, before_pkgs);
 
     /* Set up result parameters */
-    memset(&params, 0, sizeof(params));
+    init_result_params(&params);
     params.waiverauth = WAIVABLE_BY_ANYONE;
     params.header = HEADER_SUBPACKAGES;
 

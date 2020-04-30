@@ -53,7 +53,7 @@ static bool annocheck_driver(struct rpminspect *ri, rpmfile_entry_t *file)
     }
 
     /* Set up the result parameters */
-    memset(&params, 0, sizeof(params));
+    init_result_params(&params);
     params.severity = RESULT_INFO;
     params.waiverauth = WAIVABLE_BY_ANYONE;
     params.header = HEADER_ANNOCHECK;
@@ -139,7 +139,7 @@ bool inspect_annocheck(struct rpminspect *ri) {
 
     /* if everything was fine, just say so */
     if (result) {
-        memset(&params, 0, sizeof(params));
+        init_result_params(&params);
         params.severity = RESULT_OK;
         params.waiverauth = NOT_WAIVABLE;
         params.header = HEADER_ANNOCHECK;

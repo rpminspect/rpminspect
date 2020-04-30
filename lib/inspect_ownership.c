@@ -97,7 +97,7 @@ static bool ownership_driver(struct rpminspect *ri, rpmfile_entry_t *file) {
     group = get_header_value(file, RPMTAG_FILEGROUPNAME);
 
     /* Set up result parameters */
-    memset(&params, 0, sizeof(params));
+    init_result_params(&params);
     params.header = HEADER_OWNERSHIP;
     params.arch = arch;
     params.file = file->localpath;
@@ -279,7 +279,7 @@ bool inspect_ownership(struct rpminspect *ri) {
     result = foreach_peer_file(ri, ownership_driver);
 
     if (result) {
-        memset(&params, 0, sizeof(params));
+        init_result_params(&params);
         params.severity = RESULT_OK;
         params.waiverauth = NOT_WAIVABLE;
         params.header = HEADER_OWNERSHIP;

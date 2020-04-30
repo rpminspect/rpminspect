@@ -31,7 +31,7 @@ bool on_stat_whitelist(struct rpminspect *ri, const rpmfile_entry_t *file, const
     assert(ri != NULL);
     assert(file != NULL);
 
-    memset(&params, 0, sizeof(params));
+    init_result_params(&params);
     params.header = header;
     params.arch = get_rpm_header_arch(file->rpm_header);
     params.file = file->localpath;

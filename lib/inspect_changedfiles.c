@@ -137,7 +137,7 @@ static bool changedfiles_driver(struct rpminspect *ri, rpmfile_entry_t *file)
     arch = get_rpm_header_arch(file->rpm_header);
 
     /* Set up the result parameters */
-    memset(&params, 0, sizeof(params));
+    init_result_params(&params);
     params.severity = RESULT_VERIFY;
     params.waiverauth = WAIVABLE_BY_ANYONE;
     params.header = HEADER_CHANGEDFILES;
@@ -455,7 +455,7 @@ bool inspect_changedfiles(struct rpminspect *ri)
     result = foreach_peer_file(ri, changedfiles_driver);
 
     if (result) {
-        memset(&params, 0, sizeof(params));
+        init_result_params(&params);
         params.severity = RESULT_OK;
         params.waiverauth = NOT_WAIVABLE;
         params.header = HEADER_CHANGEDFILES;

@@ -477,7 +477,7 @@ bool inspect_license(struct rpminspect *ri)
     assert(ri != NULL);
     assert(ri->peers != NULL);
 
-    memset(&params, 0, sizeof(params));
+    init_result_params(&params);
     params.header = HEADER_LICENSE;
     params.waiverauth = NOT_WAIVABLE;
 

@@ -275,7 +275,7 @@ static bool check_src_rpm_changelog(struct rpminspect *ri, const rpmpeer_entry_t
     }
 
     /* Set up result parameters */
-    memset(&params, 0, sizeof(params));
+    init_result_params(&params);
     params.header = HEADER_CHANGELOG;
     params.severity = RESULT_OK;
     params.waiverauth = NOT_WAIVABLE;
@@ -396,7 +396,7 @@ static bool check_bin_rpm_changelog(struct rpminspect *ri, const rpmpeer_entry_t
     }
 
     /* Set up result parameters */
-    memset(&params, 0, sizeof(params));
+    init_result_params(&params);
     params.severity = RESULT_INFO;
     params.header = HEADER_CHANGELOG;
     params.verb = VERB_CHANGED;
@@ -499,7 +499,7 @@ bool inspect_changelog(struct rpminspect *ri)
     }
 
     if (src_result && bin_result) {
-        memset(&params, 0, sizeof(params));
+        init_result_params(&params);
         params.severity = RESULT_OK;
         params.waiverauth = NOT_WAIVABLE;
         params.header = HEADER_CHANGELOG;

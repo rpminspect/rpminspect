@@ -42,7 +42,7 @@ static bool valid_peers(struct rpminspect *ri, const Header before_hdr, const He
     after_nevra = get_nevra(after_hdr);
 
     /* Set up result parameters */
-    memset(&params, 0, sizeof(params));
+    init_result_params(&params);
     params.header = HEADER_METADATA;
 
     after_vendor = headerGetString(after_hdr, RPMTAG_VENDOR);
@@ -196,7 +196,7 @@ bool inspect_metadata(struct rpminspect *ri) {
     }
 
     if (good) {
-        memset(&params, 0, sizeof(params));
+        init_result_params(&params);
         params.severity = RESULT_OK;
         params.waiverauth = NOT_WAIVABLE;
         params.header = HEADER_METADATA;

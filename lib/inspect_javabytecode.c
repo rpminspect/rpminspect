@@ -104,7 +104,7 @@ static bool check_class_file(struct rpminspect *ri, const char *fullpath,
     assert(fullpath != NULL);
     assert(localpath != NULL);
 
-    memset(&params, 0, sizeof(params));
+    init_result_params(&params);
     params.severity = RESULT_BAD;
     params.waiverauth = WAIVABLE_BY_ANYONE;
     params.header = HEADER_JAVABYTECODE;
@@ -290,7 +290,7 @@ bool inspect_javabytecode(struct rpminspect *ri)
     }
 
     if (result) {
-        memset(&params, 0, sizeof(params));
+        init_result_params(&params);
         params.severity = RESULT_OK;
         params.waiverauth = NOT_WAIVABLE;
         params.header = HEADER_JAVABYTECODE;
