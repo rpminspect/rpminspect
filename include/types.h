@@ -33,6 +33,20 @@
 #ifndef _LIBRPMINSPECT_TYPES_H
 #define _LIBRPMINSPECT_TYPES_H
 
+/**
+ * @brief Callback function to pass to foreach_peer_file.
+ *
+ * Given the program's main struct rpminspect and a single
+ * rpmfile_entry_t, perform a defined action and return true if the
+ * action was successful and false otherwise.  This is used for
+ * callback functions in inspection functions.  You can iterate over
+ * each file in a package and perform the inspection.  True means
+ * everything passed, false means something failed.  Since the
+ * callback received the struct rpminspect, you can add results as the
+ * program returns and not worry about losing inspection details.
+ */
+typedef bool (*foreach_peer_file_func)(struct rpminspect *, rpmfile_entry_t *);
+
 /*
  * List of strings. Used by some of the inspections.
  */

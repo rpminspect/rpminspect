@@ -16,145 +16,368 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-/*
- * This header includes constants and other defaults.
+/**
+ * @file constants.h
+ * @author David Cantrell &lt;dcantrell@redhat.com&gt;
+ * @date 2018-2020
+ * @brief Constants and other defaults for librpminspect.
+ * @copyright GPL-3.0-or-later
  */
 
 #ifndef _LIBRPMINSPECT_CONSTANTS_H
 #define _LIBRPMINSPECT_CONSTANTS_H
 
-/*
+/**
+ * @defgroup CONSTANTS Constants and Other Defaults
+ *
+ * @{
+ */
+
+/**
+ * @defgroup CONFIG Configuration defaults
+ *
+ * @{
+ */
+
+/**
+ * @def SOFTWARE_NAME
  * Software name.  Used in Koji XMLRPC calls and logging.
  */
 #define SOFTWARE_NAME "librpminspect"
 
-/*
- * Constant pathnames we need to use throughout the source.
+/**
+ * @def CFGFILE
+ * Default configuration file path.
  */
 #define CFGFILE "/etc/rpminspect/rpminspect.conf"
 
-/*
+/**
+ * @def CFG_PROFILE_DIR
  * Configuration profiles that overlay CFGFILE live here.
  */
 #define CFG_PROFILE_DIR "/etc/rpminspect/profiles"
 
-/*
- * Defaults, when the configuration file does not provide a
- * value we can use.
+/**
+ * @def DEFAULT_WORKDIR
+ * Default working directory location.  rpminspect will create
+ * subdirectories within this directory so multiple concurrent jobs
+ * can run.
  */
 #define DEFAULT_WORKDIR "/var/tmp/rpminspect"
 
-/*
- * Default location for the vendor-specific data.
+/**
+ * @def VENDOR_DATA_DIR
+ * Default location for the vendor-specific data.  These files are
+ * provided by the vendor-specific rpminspect-data package.
  */
 #define VENDOR_DATA_DIR "/usr/share/rpminspect"
 
-/*
- * Standard location for the license database.  Can be changed
- * in the configuration file.
+/**
+ * @def LICENSE_DB_FILE
+ * Default license database filename in the VENDOR_DATA_DIR/licenses/
+ * subdirectory.
  */
 #define LICENSE_DB_FILE "generic.json"
 
-/*
+/**
+ * @def INSPECTIONS
  * Name of the [inspections] section in the config file.
  */
 #define INSPECTIONS "inspections"
 
-/*
- * Names of subdirectories in VENDOR_DATA_DIR.  Used to build
- * filenames to vendor data files.  These subdirectories cannot
- * be changed at runtime, only the VENDOR_DATA_DIR.
+/** @} */
+
+/**
+ * @defgroup VENDOR_DATA_SUBDIRS Vendor Data Subdirectories
+ *
+ * @{
+ */
+
+/**
+ * @def ABI_CHECKING_WHITELIST_DIR
+ * Name of the ABI checking whitelist subdirectory in VENDOR_DATA_DIR.
  */
 #define ABI_CHECKING_WHITELIST_DIR "abi-checking-whitelist"
+
+/**
+ * @def CAPABILITIES_DIR
+ * Name of the capabilities(7) subdirectory in VENDOR_DATA_DIR.
+ */
 #define CAPABILITIES_DIR "capabilities"
+
+/**
+ * @def LICENSES_DIR
+ * Name of the license database subdirectory in VENDOR_DATA_DIR.
+ */
 #define LICENSES_DIR "licenses"
+
+/**
+ * @def STAT_WHITELIST_DIR
+ * Name of the stat(2) whitelist subdirectory in VENDOR_DATA_DIR.
+ */
 #define STAT_WHITELIST_DIR "stat-whitelist"
+
+/**
+ * @def VERSION_WHITELIST_DIR
+ * Name of the package version whitelist subdirectory in
+ * VENDOR_DATA_DIR.
+ */
 #define VERSION_WHITELIST_DIR "version-whitelist"
 
-/*
+/** @} */
+
+/**
+ * @defgroup DESKTOP Desktop Constants
+ * Constants related to desktop files.  Paths and where to find icons,
+ * for instance.
+ * @{
+ */
+
+/**
+ * @def DESKTOP_ENTRY_FILES_DIR
  * Standard location for desktop entry files.
  */
 #define DESKTOP_ENTRY_FILES_DIR "/usr/share/applications"
 
-/*
- * Standard locations for desktop icons.
+/**
+ * @def DESKTOP_ICON_PATHS
+ * Standard locations for desktop icons.  This is a space-delimited
+ * string of path names.
  */
 #define DESKTOP_ICON_PATHS "/usr/share/pixmaps /usr/share/icons"
 
-/*
- * Commands used by different inspections
+/** @} */
+
+/**
+ * @defgroup COMMANDS Commands used by different inspections
  * Avoid explicit paths, rpminspect assumes these commands are
  * available in the $PATH.
+ *
+ * @{
+ */
+
+/**
+ * @def ZCMP_CMD
+ * Executable providing zcmp(1)
  */
 #define ZCMP_CMD "zcmp"
+
+/**
+ * @def BZCMP_CMD
+ * Executable providing bzcmp(1)
+ */
 #define BZCMP_CMD "bzcmp"
+
+/**
+ * @def XZCMP_CMD
+ * Executable providing xzcmp(1)
+ */
 #define XZCMP_CMD "xzcmp"
+
+/**
+ * @def ELFCMP_CMD
+ * Executable providing elfcmp(1)
+ */
 #define ELFCMP_CMD "eu-elfcmp --ignore-build-id --hash-inexact"
+
+/**
+ * @def MSGUNFMT_CMD
+ * Executable providing msgunfmt(1)
+ */
 #define MSGUNFMT_CMD "msgunfmt"
+
+/**
+ * @def DIFF_CMD
+ * Executable providing diff(1).  NOTE: This should be GNU diff or
+ * 100% compatible.
+ */
 #define DIFF_CMD "diff"
+
+/**
+ * @def DESKTOP_FILE_VALIDATE_CMD
+ * Executable providing desktop-file-validate(1)
+ */
 #define DESKTOP_FILE_VALIDATE_CMD "desktop-file-validate"
+
+/**
+ * @def ANNOCHECK_CMD
+ * Executable providing annocheck(1)
+ */
 #define ANNOCHECK_CMD "annocheck"
 
-/*
- * Architecture name of special RPMs (from Koji)
+/** @} */
+
+/**
+ * @defgroup SYSTEM System defaults
+ *
+ * @{
+ */
+
+/**
+ * @def SRPM_ARCH_NAME
+ * The architecture name Koji uses for source RPMs.
  */
 #define SRPM_ARCH_NAME "src"
+
+/**
+ * @def RPM_NOARCH_NAME
+ * The architecture name Koji uses for binary RPMs built with
+ * 'BuildArch: noarch'
+ */
 #define RPM_NOARCH_NAME "noarch"
 
-/*
- * Path prefixes for executable files
+/**
+ * @def BIN_PATHS
+ * Space delimited string of paths where executable files may reside.
  */
 #define BIN_PATHS "/bin /sbin /usr/bin /usr/sbin"
 
-/*
+/**
+ * @def BIN_OWNER
  * Executable file owner
  */
 #define BIN_OWNER "root"
 
-/*
+/**
+ * @def BIN_GROUP
  * Executable file group
  */
 #define BIN_GROUP "root"
 
-/*
- * List of shells to use for syntax checking
- * (only the basename is needed)
+/**
+ * @def SHELLS
+ * Space delimited list of shells to use for syntax checking (only the
+ * basename is needed).  All shells listed must support the '-n'
+ * option for syntax checking.  The shell should exit 0 if the syntax
+ * checker passes, non-zero otherwise.  The 'rc' shell is an exception
+ * and has special handling in the 'shellsyntax' inspection.
  */
 #define SHELLS "sh ksh zsh csh tcsh rc bash"
 
-/*
- * File extensions
- */
-#define RPM_FILENAME_EXTENSION ".rpm"
-#define SPEC_FILENAME_EXTENSION ".spec"
-#define JAR_FILENAME_EXTENSION ".jar"
-#define CLASS_FILENAME_EXTENSION ".class"
-#define EGGINFO_FILENAME_EXTENSION ".egg-info"
-#define GZIPPED_FILENAME_EXTENSION ".gz"
-#define DESKTOP_FILENAME_EXTENSION ".desktop"
-#define DIRECTORY_FILENAME_EXTENSION ".directory"
-#define MO_FILENAME_EXTENSION ".mo"
-#define PYTHON_PYC_FILE_EXTENSION ".pyc"
-#define PYTHON_PYO_FILE_EXTENSION ".pyo"
-#define KERNEL_MODULE_FILENAME_EXTENSION ".ko"
-#define SVG_FILENAME_EXTENSION ".svg"
-
-/*
- * Build ID
+/**
+ * @def BUILD_ID_DIR
+ * Build ID subdirectory name
  */
 #define BUILD_ID_DIR "/.build-id/"
 
 /*
- * Debug packages and paths
+ * @def DEBUGINFO_SUFFIX
+ * debuginfo package name suffix string
  */
 #define DEBUGINFO_SUFFIX "-debuginfo"
+
+/**
+ * @def DEBUGSOURCE_SUFFIX
+ * debugsource package name suffix string
+ */
 #define DEBUGSOURCE_SUFFIX "-debugsource"
+
+/**
+ * @def DEBUG_PATH
+ * debuginfo installed path
+ */
 #define DEBUG_PATH "/usr/lib/debug/"
+
+/**
+ * @def DEBUG_SRC_PATH
+ * debugsource installed path
+ */
 #define DEBUG_SRC_PATH "/usr/src/debug/"
 
-/*
- * Kernel modules subdirectory
+/**
+ * @def KERNEL_MODULES_DIR
+ * Linux loadable kernel modules subdirectory
  */
 #define KERNEL_MODULES_DIR "/lib/modules/"
+
+/** @} */
+
+/**
+ * @defgroup EXTENSIONS File extensions
+ *
+ * @{
+ */
+
+/**
+ * @def RPM_FILENAME_EXTENSION
+ * RPM filename extension
+ */
+#define RPM_FILENAME_EXTENSION ".rpm"
+
+/**
+ * @def SPEC_FILENAME_EXTENSION
+ * RPM spec filename extension
+ */
+#define SPEC_FILENAME_EXTENSION ".spec"
+
+/**
+ * @def JAR_FILENAME_EXTENSION
+ * Java jar filename extension
+ */
+#define JAR_FILENAME_EXTENSION ".jar"
+
+/**
+ * @def CLASS_FILENAME_EXTENSION
+ * Java class filename extension
+ */
+#define CLASS_FILENAME_EXTENSION ".class"
+
+/**
+ * @def EGGINFO_FILENAME_EXTENSION
+ * Python egg-info filename extension
+ */
+#define EGGINFO_FILENAME_EXTENSION ".egg-info"
+
+/**
+ * @def GZIPPED_FILENAME_EXTENSION
+ * Gzip filename extension
+ */
+#define GZIPPED_FILENAME_EXTENSION ".gz"
+
+/**
+ * @def DESKTOP_FILENAME_EXTENSION
+ * Desktop filename extension
+ */
+#define DESKTOP_FILENAME_EXTENSION ".desktop"
+
+/**
+ * @def DIRECTORY_FILENAME_EXTENSION
+ * Directory filename extension
+ */
+#define DIRECTORY_FILENAME_EXTENSION ".directory"
+
+/**
+ * @def MO_FILENAME_EXTENSION
+ * Machine object filename extension (compiled translation data)
+ */
+#define MO_FILENAME_EXTENSION ".mo"
+
+/**
+ * @def PYTHON_PYC_FILE_EXTENSION
+ * Python bytecode filename extension
+ */
+#define PYTHON_PYC_FILE_EXTENSION ".pyc"
+
+/**
+ * @def PYTHON_PYO_FILE_EXTENSION
+ * Python optimized bytecode filename extension
+ */
+#define PYTHON_PYO_FILE_EXTENSION ".pyo"
+
+/**
+ * @def KERNEL_MODULE_FILENAME_EXTENSION
+ * Linux loadable kernel module filename extension
+ */
+#define KERNEL_MODULE_FILENAME_EXTENSION ".ko"
+
+/**
+ * @def SVG_FILENAME_EXTENSION
+ * Scalable vector graphics filename extension
+ */
+#define SVG_FILENAME_EXTENSION ".svg"
+
+/** @} */
+
+/** @} */
 
 #endif

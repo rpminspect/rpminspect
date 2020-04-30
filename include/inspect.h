@@ -16,8 +16,21 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-/*
- * This header defines the test functions provided by librpminspect.
+/**
+ * @file inspect.h
+ * @author David Cantrell &lt;dcantrell@redhat.com&gt;
+ * @date 2019-2020
+ * @brief Test functions provided by librpminspect and result constants.
+ * @copyright GPL-3.0-or-later
+ *
+ * All inspection drivers use the same prototype.  They return a bool
+ * and take one parameter:  a struct rpminspect pointer.  Inspection
+ * drivers are named as "inspect_NAME" where NAME is the short name
+ * specified in the inspections array (see inspect.c).  The source
+ * code filename should also match the driver function name.
+ *
+ * Add any helper functions you need in order to keep the inspection
+ * driver simple.
  */
 
 #include <stdint.h>
@@ -31,118 +44,299 @@
 #ifndef _LIBRPMINSPECT_INSPECT_H
 #define _LIBRPMINSPECT_INSPECT_H
 
-/*
- * Inspection drivers (and their helpers)
+/**
+ * @defgroup INSPECT General inspection utility functions.
  *
- * All inspection drivers use the same prototype.  They return a bool
- * and take one parameter:  a struct rpminspect pointer.  Inspection
- * drivers are named as "inspect_NAME" where NAME is the short name
- * specified in the inspections array (see inspect.c).  The source
- * code filename should also match the driver function name.
- *
- * Add any helper functions you need in order to keep the inspection
- * driver simple.
+ * @{
  */
 
-/* inspect.c */
-typedef bool (*foreach_peer_file_func)(struct rpminspect *, rpmfile_entry_t *);
-bool foreach_peer_file(struct rpminspect *, foreach_peer_file_func);
-const char *inspection_desc(const uint64_t);
+/**
+ * @brief Iterate over each file in each package in a build.
+ *
+ * Inspect each "after" file in each peer of an inspection.  If the
+ * foreach_peer_file_func returns false for any file, the result will
+ * be false.  foreach_peer_file_func is run on each file even if an
+ * earlier file fails. This allows for multiple errors to be collected
+ * for a single inspection.
+ *
+ * @param ri Pointer to the struct rpminspect used for the program.
+ * @param callback Callback function to iterate over each file.
+ */
+bool foreach_peer_file(struct rpminspect *ri, foreach_peer_file_func callback);
 
-/* inspect_elf.c */
-void init_elf_data(void);
-void free_elf_data(void);
-bool has_executable_program(Elf *);
-bool is_execstack_present(Elf *);
-uint64_t get_execstack_flags(Elf *);
-bool is_execstack_valid(Elf *, uint64_t);
-bool is_stack_executable(Elf *, uint64_t);
-bool has_textrel(Elf *);
-bool has_relro(Elf *);
-bool has_bind_now(Elf *);
-string_list_t * get_fortified_symbols(Elf *);
-string_list_t * get_fortifiable_symbols(Elf *);
-bool is_pic_ok(Elf *);
-bool inspect_elf(struct rpminspect *);
+/**
+ * @brief Return inspection description string given its ID.
+ *
+ * Return the long description for the specified inspection.
+ *
+ * @param id Inspection ID constant.
+ */
+const char *inspection_desc(const uint64_t id);
 
-/* inspect_license.c */
-bool inspect_license(struct rpminspect *);
+/** @} */
 
-/* inspect_emptyrpm.c */
-bool is_payload_empty(rpmfile_t *);
-bool inspect_emptyrpm(struct rpminspect *);
+/**
+ * @defgroup INSPECTIONS Individual inspection functions
+ *
+ * @{
+ */
 
-/* inspect_xml.c */
-bool inspect_xml(struct rpminspect *);
+/**
+ * @brief Perform the 'elf' inspection.
+ *
+ * Perform several checks on ELF files. First, check that ELF objects
+ * do not contain an executable stack. Second, check that ELF objects
+ * do not contain text relocations. When comparing builds, check that
+ * the ELF objects in the after build did not lose a PT_GNU_RELRO
+ * segment. When comparing builds, check that the ELF objects in the
+ * after build did not lose -D_FORTIFY_SOURCE. Lastly, if there is a
+ * list of forbidden library functions, make sure nothing uses them.
+ *
+ * @param ri Pointer to the struct rpminspect for the program.
+ */
+bool inspect_elf(struct rpminspect *ri);
 
-/* inspect_manpage.c */
-bool inspect_manpage(struct rpminspect *);
+/**
+ * @brief Perform the 'license' inspection.
+ *
+ * Verify the string specified in the License tag of the RPM metadata
+ * describes permissible software licenses as defined by the license
+ * database. Also checks to see if the License tag contains any
+ * unprofessional words as defined in the configuration file.
+ *
+ * @param ri Pointer to the struct rpminspect for the program.
+ */
+bool inspect_license(struct rpminspect *ri);
 
-/* inspect_metadata.c */
-bool inspect_metadata(struct rpminspect *);
+/**
+ * @brief Perform the 'emptyrpm' inspection.
+ *
+ * Check all binary RPMs in the before and after builds for any empty
+ * payloads. Packages that lost payload data from the before build to
+ * the after build are reported as well as any packages in the after
+ * build that exist but have no payload data.
+ *
+ * @param ri Pointer to the struct rpminspect for the program.
+ */
+bool inspect_emptyrpm(struct rpminspect *ri);
 
-/* inspect_desktop.c */
-bool inspect_desktop(struct rpminspect *);
+/**
+ * @brief Perform the 'xml' inspection.
+ *
+ *
+ *
+ * @param ri Pointer to the struct rpminspect for the program.
+ */
+bool inspect_xml(struct rpminspect *ri);
 
-/* inspect_disttag.c */
-bool inspect_disttag(struct rpminspect *);
+/**
+ * @brief
+ *
+ *
+ *
+ * @param ri Pointer to the struct rpminspect for the program.
+ */
+bool inspect_manpage(struct rpminspect *ri);
 
-/* inspect_specname.c */
-bool inspect_specname(struct rpminspect *);
+/**
+ * @brief
+ *
+ *
+ *
+ * @param ri Pointer to the struct rpminspect for the program.
+ */
+bool inspect_metadata(struct rpminspect *ri);
 
-/* inspect_modularity.c */
-bool inspect_modularity(struct rpminspect *);
+/**
+ * @brief
+ *
+ *
+ *
+ * @param ri Pointer to the struct rpminspect for the program.
+ */
+bool inspect_desktop(struct rpminspect *ri);
 
-/* inspect_javabytecode.c */
-bool inspect_javabytecode(struct rpminspect *);
+/**
+ * @brief
+ *
+ *
+ *
+ * @param ri Pointer to the struct rpminspect for the program.
+ */
+bool inspect_disttag(struct rpminspect *ri);
 
-/* inspect_changedfiles.c */
-bool inspect_changedfiles(struct rpminspect *);
+/**
+ * @brief
+ *
+ *
+ *
+ * @param ri Pointer to the struct rpminspect for the program.
+ */
+bool inspect_specname(struct rpminspect *ri);
 
-/* inspect_removedfiles.c */
-bool inspect_removedfiles(struct rpminspect *);
+/**
+ * @brief
+ *
+ *
+ *
+ * @param ri Pointer to the struct rpminspect for the program.
+ */
+bool inspect_modularity(struct rpminspect *ri);
 
-/* inspect_addedfiles.c */
-bool inspect_addedfiles(struct rpminspect *);
+/**
+ * @brief
+ *
+ *
+ *
+ * @param ri Pointer to the struct rpminspect for the program.
+ */
+bool inspect_javabytecode(struct rpminspect *ri);
 
-/* inspect_upstream.c */
-bool inspect_upstream(struct rpminspect *);
+/**
+ * @brief
+ *
+ *
+ *
+ * @param ri Pointer to the struct rpminspect for the program.
+ */
+bool inspect_changedfiles(struct rpminspect *ri);
 
-/* inspect_ownership.c */
-bool inspect_ownership(struct rpminspect *);
+/**
+ * @brief
+ *
+ *
+ *
+ * @param ri Pointer to the struct rpminspect for the program.
+ */
+bool inspect_removedfiles(struct rpminspect *ri);
 
-/* inspect_shellsyntax.c */
-bool inspect_shellsyntax(struct rpminspect *);
+/**
+ * @brief
+ *
+ *
+ *
+ * @param ri Pointer to the struct rpminspect for the program.
+ */
+bool inspect_addedfiles(struct rpminspect *ri);
 
-/* inspect_annocheck.c */
-bool inspect_annocheck(struct rpminspect *);
+/**
+ * @brief
+ *
+ *
+ *
+ * @param ri Pointer to the struct rpminspect for the program.
+ */
+bool inspect_upstream(struct rpminspect *ri);
 
-/* inspect_dt_needed.c */
-bool inspect_dt_needed(struct rpminspect *);
+/**
+ * @brief
+ *
+ *
+ *
+ * @param ri Pointer to the struct rpminspect for the program.
+ */
+bool inspect_ownership(struct rpminspect *ri);
 
-/* inspect_filesize.c */
-bool inspect_filesize(struct rpminspect *);
+/**
+ * @brief
+ *
+ *
+ *
+ * @param ri Pointer to the struct rpminspect for the program.
+ */
+bool inspect_shellsyntax(struct rpminspect *ri);
 
-/* inspect_permissions.c */
-bool inspect_permissions(struct rpminspect *);
+/**
+ * @brief
+ *
+ *
+ *
+ * @param ri Pointer to the struct rpminspect for the program.
+ */
+bool inspect_annocheck(struct rpminspect *ri);
 
-/* inspect_capabilities.c */
-bool inspect_capabilities(struct rpminspect *);
+/**
+ * @brief
+ *
+ *
+ *
+ * @param ri Pointer to the struct rpminspect for the program.
+ */
+bool inspect_dt_needed(struct rpminspect *ri);
 
-/* inspect_kmod.c */
-bool inspect_kmod(struct rpminspect *);
+/**
+ * @brief
+ *
+ *
+ *
+ * @param ri Pointer to the struct rpminspect for the program.
+ */
+bool inspect_filesize(struct rpminspect *ri);
 
-/* inspect_arch.c */
-bool inspect_arch(struct rpminspect *);
+/**
+ * @brief
+ *
+ *
+ *
+ * @param ri Pointer to the struct rpminspect for the program.
+ */
+bool inspect_permissions(struct rpminspect *ri);
 
-/* inspect_subpackages.c */
-bool inspect_subpackages(struct rpminspect *);
+/**
+ * @brief
+ *
+ *
+ *
+ * @param ri Pointer to the struct rpminspect for the program.
+ */
+bool inspect_capabilities(struct rpminspect *ri);
 
-/* inspect_changelog.c */
-bool inspect_changelog(struct rpminspect *);
+/**
+ * @brief
+ *
+ *
+ *
+ * @param ri Pointer to the struct rpminspect for the program.
+ */
+bool inspect_kmod(struct rpminspect *ri);
 
-/* inspect_pathmigration.c */
-bool inspect_pathmigration(struct rpminspect *);
+/**
+ * @brief
+ *
+ *
+ *
+ * @param ri Pointer to the struct rpminspect for the program.
+ */
+bool inspect_arch(struct rpminspect *ri);
+
+/**
+ * @brief
+ *
+ *
+ *
+ * @param ri Pointer to the struct rpminspect for the program.
+ */
+bool inspect_subpackages(struct rpminspect *ri);
+
+/**
+ * @brief
+ *
+ *
+ *
+ * @param ri Pointer to the struct rpminspect for the program.
+ */
+bool inspect_changelog(struct rpminspect *ri);
+
+/**
+ * @brief
+ *
+ *
+ *
+ * @param ri Pointer to the struct rpminspect for the program.
+ */
+bool inspect_pathmigration(struct rpminspect *ri);
+
+/** @} */
 
 /*
  * Inspections are referenced by flag.  These flags are set in bitfields
