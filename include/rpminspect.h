@@ -257,4 +257,17 @@ const char *get_after_rel(struct rpminspect *);
 /* builds.c */
 int gather_builds(struct rpminspect *, bool);
 
+/* inspect_elf.c */
+bool is_execstack_valid(Elf *elf, uint64_t flags);
+bool is_stack_executable(Elf *elf, uint64_t flags);
+bool is_pic_ok(Elf *elf);
+bool has_bind_now(Elf *elf);
+bool has_executable_program(Elf *elf);
+bool has_relro(Elf *elf);
+uint64_t get_execstack_flags(Elf *elf);
+bool is_execstack_present(Elf *elf);
+bool has_textrel(Elf *elf);
+void free_elf_data(void);
+void init_elf_data(void);
+
 #endif
