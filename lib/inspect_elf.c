@@ -17,6 +17,14 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+/**
+ * @file inspect_elf.c
+ * @author David Cantrell &lt;dcantrell@redhat.com&gt;
+ * @date 2019-2020
+ * @brief 'elf' inspection
+ * @copyright GPL-3.0-or-later
+ */
+
 #include <assert.h>
 #include <fcntl.h>
 #include <search.h>
@@ -46,7 +54,7 @@ static struct hsearch_data *fortifiable_table = NULL;
 static bool is_fortified(const char *symbol);
 static bool is_fortifiable(const char *symbol);
 
-void init_elf_data(void)
+static void init_elf_data(void)
 {
     void *dl;
     struct link_map *info;
@@ -152,7 +160,7 @@ void init_elf_data(void)
     }
 }
 
-void free_elf_data(void)
+static void free_elf_data(void)
 {
     if (fortifiable_table != NULL) {
         hdestroy_r(fortifiable_table);
@@ -166,12 +174,16 @@ void free_elf_data(void)
     }
 }
 
-/* Check whether the given object file has information about
- * the stack settings. This is contained in the GNU_STACK program
- * header for ET_EXEC and ET_DYN, and in the .note.GNU-stack
- * section for ET_REL
+/**
+ * @brief Check if execstack is present.
+ *
+ * Check whether the given object file has information about the stack
+ * settings. This is contained in the GNU_STACK program header for
+ * ET_EXEC and ET_DYN, and in the .note.GNU-stack section for ET_REL
+ *
+ * @param elf ELF object to check
  */
-bool is_execstack_present(Elf *elf)
+static bool is_execstack_present(Elf *elf)
 {
     GElf_Phdr phdr;
 
@@ -186,11 +198,15 @@ bool is_execstack_present(Elf *elf)
     }
 }
 
-/* Return the flags value from the execstack data.
+/**
+ * @brief Return the flags value from the execstack data.
+ *
  * This is either the p_flags from the GNU_STACK program header entry
  * or the sh_flags from the .note.GNU-stack section.
+ *
+ * @param ELF object to check
  */
-uint64_t get_execstack_flags(Elf *elf)
+static uint64_t get_execstack_flags(Elf *elf)
 {
     GElf_Phdr phdr;
     Elf_Scn *scn;
@@ -217,11 +233,16 @@ uint64_t get_execstack_flags(Elf *elf)
     }
 }
 
-/* Return true if this object has a SHT_PROGBITS section with SHF_EXECINSTR set.
- * This is a way of filtering out the ET_REL DWARF objects in /usr/lib/debug/.dwz,
- * which have no executable code.
+/**
+ * @brief Return true if this object has a SHT_PROGBITS section with
+ * SHF_EXECINSTR set.
+ *
+ * This is a way of filtering out the ET_REL DWARF objects in
+ * /usr/lib/debug/.dwz, which have no executable code.
+ *
+ * @param elf ELF object to check
  */
-bool has_executable_program(Elf *elf)
+static bool has_executable_program(Elf *elf)
 {
     Elf_Scn *scn = NULL;
     GElf_Shdr shdr;
@@ -235,13 +256,19 @@ bool has_executable_program(Elf *elf)
     return false;
 }
 
-/* Check whether the given object's execstack information makes sense.
+/**
+ * @brief Check whether the given object's execstack information makes
+ * sense.
+ *
  * For ET_EXEC and ET_DYN, PF_W and PF_R must be set. For ET_REL,
  * nothing other than SHF_EXECINSTR should be set.
  * flags is the value returned by get_execstack_flags. The Elf pointer
  * is still required to figure out which flags they are.
+ *
+ * @param elf ELF object to check
+ * @param flags segment flags to look for
  */
-bool is_execstack_valid(Elf *elf, uint64_t flags)
+static bool is_execstack_valid(Elf *elf, uint64_t flags)
 {
     switch (get_elf_type(elf)) {
         case ET_REL:
@@ -256,8 +283,15 @@ bool is_execstack_valid(Elf *elf, uint64_t flags)
     }
 }
 
-/* Like above, but return true if the relevant executable bit is set */
-bool is_stack_executable(Elf *elf, uint64_t flags)
+/**
+ * @brief Like is_stack_valid but only look for executable flag.
+ *
+ * Return true if the relevant executable bit is set.
+ *
+ * @param elf ELF object to check
+ * @param flags segment flags to look for
+ */
+static bool is_stack_executable(Elf *elf, uint64_t flags)
 {
     switch (get_elf_type(elf)) {
         case ET_REL:
@@ -270,21 +304,33 @@ bool is_stack_executable(Elf *elf, uint64_t flags)
     }
 }
 
-/* Return true if this object has a DT_TEXTREL entry */
-bool has_textrel(Elf *elf)
+/**
+ * @brief Return true if this object has a DT_TEXTREL entry
+ *
+ * @param elf ELF object to check
+ */
+static bool has_textrel(Elf *elf)
 {
     return have_dynamic_tag(elf, DT_TEXTREL);
 }
 
-/* true if there is a PT_GNU_RELRO phdr */
-bool has_relro(Elf *elf)
+/**
+ * @brief true if there is a PT_GNU_RELRO phdr
+ *
+ * @param elf ELF object to check
+ */
+static bool has_relro(Elf *elf)
 {
     GElf_Phdr phdr;
     return (get_elf_phdr(elf, PT_GNU_RELRO, &phdr) != NULL);
 }
 
-/* true if there is a DT_BIND_NOW entry */
-bool has_bind_now(Elf *elf)
+/**
+ * @brief true if there is a DT_BIND_NOW entry
+ *
+ * @param elf ELF object to check
+ */
+static bool has_bind_now(Elf *elf)
 {
     return have_dynamic_tag(elf, DT_BIND_NOW);
 }
@@ -310,19 +356,31 @@ static bool is_fortifiable(const char *symbol)
     return eptr != NULL;
 }
 
-/* Return a list of fortified symbols found linked in the given ELF object */
-string_list_t * get_fortified_symbols(Elf *elf)
+/**
+ * @brief Return a list of fortified symbols found linked in the given
+ * ELF object
+ *
+ * @param elf ELF object to check
+ */
+static string_list_t * get_fortified_symbols(Elf *elf)
 {
     return get_elf_imported_functions(elf, is_fortified);
 }
 
-/* Return a list of linked symbols that could have been fortified but are not */
-string_list_t * get_fortifiable_symbols(Elf *elf)
+/**
+ * @brief Return a list of linked symbols that could have been
+ * fortified but are not
+ *
+ * @param elf ELF object to check
+ */
+static string_list_t * get_fortifiable_symbols(Elf *elf)
 {
     return get_elf_imported_functions(elf, is_fortifiable);
 }
 
-/* Check the referenced symbol for global binding. */
+/**
+ * @brief Check the referenced symbol for global binding.
+ */
 static bool is_global_reloc(GElf_Shdr *symtab_shdr, Elf_Data *symtab_data, Elf_Data *symtab_xdata, uint64_t r_sym)
 {
     GElf_Sym sym;
@@ -347,19 +405,27 @@ static bool is_global_reloc(GElf_Shdr *symtab_shdr, Elf_Data *symtab_data, Elf_D
     return false;
 }
 
-/* Given the ET_REL object, return whether we think it was compiled with -fPIC */
-/* This is kind of iffy. Whether the relocations in a given ELF object are PIC or
- * not depend on the type of relocation encoded in r_info, and all of the relocation
- * types are processor specific. This code uses the function is_pic_reloc, which is
- * generated by pic_bits.sh, which just greps the R_<arch>_* constants for the the
- * ones that include "PLT" or "GOT" in the macro name.
+/**
+ * @brief Given the ET_REL object, return whether we think it was
+ * compiled with -fPIC
+ *
+ * This is kind of iffy. Whether the relocations in a given ELF object
+ * are PIC or not depend on the type of relocation encoded in r_info,
+ * and all of the relocation types are processor specific. This code
+ * uses the function is_pic_reloc, which is generated by pic_bits.sh,
+ * which just greps the R_<arch>_* constants for the the ones that
+ * include "PLT" or "GOT" in the macro name.
  *
  * All together, the idea is:
  *   * iterate over all relocations
- *   * if the relocation is for a symbol of binding other than STB_GLOBAL, it's probably fine
- *   * otherwise, if the relocation type doesn't pass is_pic_reloc, return false.
+ *   * if the relocation is for a symbol of binding other than
+       STB_GLOBAL, it's probably fine
+ *   * otherwise, if the relocation type doesn't pass is_pic_reloc,
+       return false.
+ *
+ * @param elf ELF object to check
  */
-bool is_pic_ok(Elf *elf)
+static bool is_pic_ok(Elf *elf)
 {
     GElf_Ehdr ehdr;
     Elf_Scn *rel_section;
@@ -618,8 +684,16 @@ static bool check_relro(struct rpminspect *ri, Elf *before_elf, Elf *after_elf, 
     return true;
 }
 
-/* Check for binaries that had fortified symbols in before, and have no fortified symbols in after.
+/**
+ * @brief Check for binaries that had fortified symbols in before, and have no fortified symbols in after.
+ *
  * This could indicate a loss of hardening build flags.
+ *
+ * @param ri The struct rpminspect pointer for the run of the program
+ * @param before_elf ELF object from the before build
+ * @param after_elf ELF object from the after build
+ * @param localpath Filename of the ELF object in question, relative to an installed system
+ * @param arch Architecture of the ELF object
  */
 static bool check_fortified(struct rpminspect *ri, Elf *before_elf, Elf *after_elf, const char *localpath, const char *arch)
 {
@@ -734,8 +808,16 @@ cleanup:
     return result;
 }
 
-/* Check for binaries that use blacklisted functions which don't support IPv6.
- * This could indicate broken support for IPv6. */
+/**
+ * @brief Check for binaries that use blacklisted functions which don't support IPv6.
+ *
+ * This could indicate broken support for IPv6.
+ *
+ * @param ri The struct rpminspect pointer for the run of the program
+ * @param after_elf ELF object from the after build
+ * @param localpath Filename of the ELF object in question, relative to an installed system
+ * @param arch Architecture of the ELF object
+ */
 static bool check_ipv6(struct rpminspect *ri, Elf *after_elf, const char *localpath, const char *arch)
 {
     string_list_t *after_symbols = NULL;
@@ -807,7 +889,13 @@ cleanup:
     return result;
 }
 
-/* Helper for elf_archive_tests; add the archive member to the list if compiled *without* -fPIC */
+/**
+ * @brief Helper for elf_archive_tests; add the archive member to the
+ * list if compiled *without* -fPIC
+ *
+ * @param elf ELF object to check
+ * @param user_data List of ELF archives compiled without -fPIC
+ */
 static bool find_no_pic(Elf *elf, string_list_t **user_data)
 {
     string_list_t *no_pic_list = *user_data;
@@ -836,7 +924,13 @@ static bool find_no_pic(Elf *elf, string_list_t **user_data)
     return true;
 }
 
-/* Helper for elf_archive_tests, add the archive member to the list if compiled *with* -fPIC */
+/**
+ * @brief Helper for elf_archive_tests, add the archive member to the
+ * list if compiled *with* -fPIC
+ *
+ * @param elf ELF object to check
+ * @param user_data List of ELF archives compiled with -fPIC
+ */
 static bool find_pic(Elf *elf, string_list_t **user_data)
 {
     string_list_t *pic_list = *user_data;
@@ -865,7 +959,12 @@ static bool find_pic(Elf *elf, string_list_t **user_data)
     return true;
 }
 
-/* Helper for elf_archive_tests, get all archive member names */
+/**
+ * @brief Helper for elf_archive_tests, get all archive member names
+ *
+ * @param elf ELF object to check
+ * @param user_data List of ELF archives
+ */
 static bool find_all(Elf *elf, string_list_t **user_data)
 {
     string_list_t *all_list = *user_data;
@@ -1119,6 +1218,19 @@ static bool elf_driver(struct rpminspect *ri, rpmfile_entry_t *after)
     return result;
 }
 
+/**
+ * @brief Perform the 'elf' inspection.
+ *
+ * Perform several checks on ELF files. First, check that ELF objects
+ * do not contain an executable stack. Second, check that ELF objects
+ * do not contain text relocations. When comparing builds, check that
+ * the ELF objects in the after build did not lose a PT_GNU_RELRO
+ * segment. When comparing builds, check that the ELF objects in the
+ * after build did not lose -D_FORTIFY_SOURCE. Lastly, if there is a
+ * list of forbidden library functions, make sure nothing uses them.
+ *
+ * @param ri Pointer to the struct rpminspect for the program.
+ */
 bool inspect_elf(struct rpminspect *ri)
 {
     bool result;

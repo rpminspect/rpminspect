@@ -74,12 +74,17 @@ struct inspect inspections[] = {
     { 0, NULL, false, NULL }
 };
 
-/*
- * Inspect each "after" file in each peer of an inspection.
- * If the foreach_peer_file_func returns false for any file, the
- * result will be false.  foreach_peer_file_func is run on each file
- * even if an earlier file fails. This allows for multiple errors to
- * be collected for a single inspection.
+/**
+ * @brief Iterate over each file in each package in a build.
+ *
+ * Inspect each "after" file in each peer of an inspection.  If the
+ * foreach_peer_file_func returns false for any file, the result will
+ * be false.  foreach_peer_file_func is run on each file even if an
+ * earlier file fails. This allows for multiple errors to be collected
+ * for a single inspection.
+ *
+ * @param ri Pointer to the struct rpminspect used for the program.
+ * @param callback Callback function to iterate over each file.
  */
 bool foreach_peer_file(struct rpminspect *ri, foreach_peer_file_func check_fn)
 {
@@ -106,8 +111,12 @@ bool foreach_peer_file(struct rpminspect *ri, foreach_peer_file_func check_fn)
     return result;
 }
 
-/*
+/**
+ * @brief Return inspection description string given its ID.
+ *
  * Return the long description for the specified inspection.
+ *
+ * @param id Inspection ID constant.
  */
 const char *inspection_desc(const uint64_t inspection)
 {
