@@ -150,7 +150,7 @@ static char *inspect_manpage_validity(const char *path, const char *localpath)
     struct mparse *parser = NULL;
     int fd = -1;
     char magic[2];
-    int parseopts = MPARSE_MAN | MPARSE_UTF8 | MPARSE_LATIN1;
+    int parseopts = MPARSE_UTF8 | MPARSE_LATIN1;
 #ifndef NEWLIBMANDOC
     struct roff_man *man = NULL;
     enum mandoclevel result_tmp;
