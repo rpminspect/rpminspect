@@ -54,7 +54,7 @@ static struct hsearch_data *fortifiable_table = NULL;
 static bool is_fortified(const char *symbol);
 static bool is_fortifiable(const char *symbol);
 
-static void init_elf_data(void)
+void init_elf_data(void)
 {
     void *dl;
     struct link_map *info;
@@ -160,7 +160,7 @@ static void init_elf_data(void)
     }
 }
 
-static void free_elf_data(void)
+void free_elf_data(void)
 {
     if (fortifiable_table != NULL) {
         hdestroy_r(fortifiable_table);
@@ -183,7 +183,7 @@ static void free_elf_data(void)
  *
  * @param elf ELF object to check
  */
-static bool is_execstack_present(Elf *elf)
+bool is_execstack_present(Elf *elf)
 {
     GElf_Phdr phdr;
 
@@ -206,7 +206,7 @@ static bool is_execstack_present(Elf *elf)
  *
  * @param ELF object to check
  */
-static uint64_t get_execstack_flags(Elf *elf)
+uint64_t get_execstack_flags(Elf *elf)
 {
     GElf_Phdr phdr;
     Elf_Scn *scn;
@@ -242,7 +242,7 @@ static uint64_t get_execstack_flags(Elf *elf)
  *
  * @param elf ELF object to check
  */
-static bool has_executable_program(Elf *elf)
+bool has_executable_program(Elf *elf)
 {
     Elf_Scn *scn = NULL;
     GElf_Shdr shdr;
@@ -268,7 +268,7 @@ static bool has_executable_program(Elf *elf)
  * @param elf ELF object to check
  * @param flags segment flags to look for
  */
-static bool is_execstack_valid(Elf *elf, uint64_t flags)
+bool is_execstack_valid(Elf *elf, uint64_t flags)
 {
     switch (get_elf_type(elf)) {
         case ET_REL:
@@ -291,7 +291,7 @@ static bool is_execstack_valid(Elf *elf, uint64_t flags)
  * @param elf ELF object to check
  * @param flags segment flags to look for
  */
-static bool is_stack_executable(Elf *elf, uint64_t flags)
+bool is_stack_executable(Elf *elf, uint64_t flags)
 {
     switch (get_elf_type(elf)) {
         case ET_REL:
@@ -309,7 +309,7 @@ static bool is_stack_executable(Elf *elf, uint64_t flags)
  *
  * @param elf ELF object to check
  */
-static bool has_textrel(Elf *elf)
+bool has_textrel(Elf *elf)
 {
     return have_dynamic_tag(elf, DT_TEXTREL);
 }
@@ -319,7 +319,7 @@ static bool has_textrel(Elf *elf)
  *
  * @param elf ELF object to check
  */
-static bool has_relro(Elf *elf)
+bool has_relro(Elf *elf)
 {
     GElf_Phdr phdr;
     return (get_elf_phdr(elf, PT_GNU_RELRO, &phdr) != NULL);
@@ -330,7 +330,7 @@ static bool has_relro(Elf *elf)
  *
  * @param elf ELF object to check
  */
-static bool has_bind_now(Elf *elf)
+bool has_bind_now(Elf *elf)
 {
     return have_dynamic_tag(elf, DT_BIND_NOW);
 }
@@ -425,7 +425,7 @@ static bool is_global_reloc(GElf_Shdr *symtab_shdr, Elf_Data *symtab_data, Elf_D
  *
  * @param elf ELF object to check
  */
-static bool is_pic_ok(Elf *elf)
+bool is_pic_ok(Elf *elf)
 {
     GElf_Ehdr ehdr;
     Elf_Scn *rel_section;
