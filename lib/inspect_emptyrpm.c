@@ -16,6 +16,14 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+/**
+ * @file inspect_emptyrpm.c
+ * @author David Cantrell &lt;dcantrell@redhat.com&gt;
+ * @date 2019-2020
+ * @brief 'emptyrpm' inspection
+ * @copyright GPL-3.0-or-later
+ */
+
 #include <stdbool.h>
 #include <string.h>
 #include <assert.h>
@@ -23,12 +31,15 @@
 #include <archive_entry.h>
 #include "rpminspect.h"
 
-/*
- * Given the filelist for an rpm, is the payload empty?
- * All we do here is count the payload entries.  If we have more than zero, the
- * payload is not empty.
+/**
+ * @brief True if the payload is empty, false otherwise.
+ *
+ * All we do here is count the payload entries.  If we have more than
+ * zero, the payload is not empty.
+ *
+ * @param filelist List of files in the RPM payload.
  */
-bool is_payload_empty(rpmfile_t *filelist) {
+static bool is_payload_empty(rpmfile_t *filelist) {
     if (filelist == NULL) {
         return true;
     }
@@ -37,8 +48,15 @@ bool is_payload_empty(rpmfile_t *filelist) {
     return TAILQ_EMPTY(filelist);
 }
 
-/*
- * Main driver for the 'emptyrpm' inspection.
+/**
+ * @brief Perform the 'emptyrpm' inspection.
+ *
+ * Check all binary RPMs in the before and after builds for any empty
+ * payloads. Packages that lost payload data from the before build to
+ * the after build are reported as well as any packages in the after
+ * build that exist but have no payload data.
+ *
+ * @param ri Pointer to the struct rpminspect for the program.
  */
 bool inspect_emptyrpm(struct rpminspect *ri) {
     bool good = true;

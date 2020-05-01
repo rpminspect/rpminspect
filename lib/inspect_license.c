@@ -16,6 +16,14 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+/**
+ * @file inspect_license.c
+ * @author David Cantrell &lt;dcantrell@redhat.com&gt;
+ * @date 2019-2020
+ * @brief 'license' inspection
+ * @copyright GPL-3.0-or-later
+ */
+
 #include <assert.h>
 #include <errno.h>
 #include <stdbool.h>
@@ -462,8 +470,15 @@ static void free_licensedb(void)
     return;
 }
 
-/*
- * Main driver for the 'license' inspection.
+/**
+ * @brief Perform the 'license' inspection.
+ *
+ * Verify the string specified in the License tag of the RPM metadata
+ * describes permissible software licenses as defined by the license
+ * database. Also checks to see if the License tag contains any
+ * unprofessional words as defined in the configuration file.
+ *
+ * @param ri Pointer to the struct rpminspect for the program.
  */
 bool inspect_license(struct rpminspect *ri)
 {
