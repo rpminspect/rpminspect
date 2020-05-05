@@ -132,6 +132,62 @@ bool have_elf_section(Elf *elf, int64_t section, const char *name)
     return get_elf_section(elf, section, name, NULL, NULL) != NULL;
 }
 
+/**
+ * @brief Given an ELF starting section, collect all section names.
+ *
+ * Sometimes you want to look at section names and do partial string
+ * comparisons.  This function will collect all section names that
+ * exist given a starting section.  The caller is responsible for
+ * freeing the memory allocated with the returned list.
+ *
+ * @param elf The ELF object to scan.
+ * @param start The starting ELF section (optional).
+ * @return A string_list_t list of all ELF section names found, NULL
+ *         indicates none found.
+ */
+string_list_t *get_elf_section_names(Elf *elf, size_t start)
+{
+    size_t shstrndx;
+    Elf_Scn *scn = NULL;
+    GElf_Shdr shdr;
+    char *section_name = NULL;
+    string_list_t *names = NULL;
+    string_entry_t *entry = NULL;
+
+    assert(elf != NULL);
+
+    if (elf_getshdrstrndx(elf, &shstrndx) != 0) {
+        return NULL;
+    }
+
+    names = calloc(1, sizeof(*names));
+    TAILQ_INIT(names);
+
+    /* get the starting section */
+    scn = elf_getscn(elf, start);
+    assert(scn != NULL);
+
+    /* iterate over the sections collecting the names */
+    while ((scn = elf_nextscn(elf, scn)) != NULL) {
+        /* get this header information */
+        if (gelf_getshdr(scn, &shdr) != &shdr) {
+            list_free(names, free);
+            return NULL;
+        }
+
+        section_name = elf_strptr(elf, shstrndx, shdr.sh_name);
+
+        /* copy this section name in to the list */
+        if (section_name != NULL) {
+            entry = calloc(1, sizeof(*entry));
+            entry->data = strdup(section_name);
+            TAILQ_INSERT_TAIL(names, entry, items);
+        }
+    }
+
+    return names;
+}
+
 /*
  * Look through an ELF object by section for a section by the given ID and
  * the specified name.  At least one parameter is required.  To not specify

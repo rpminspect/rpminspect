@@ -33,6 +33,7 @@ Elf * get_elf_archive(const char *, int *);
 Elf64_Half get_elf_type(Elf *);
 bool is_elf(const char *);
 bool have_elf_section(Elf *, int64_t, const char *);
+string_list_t *get_elf_section_names(Elf *elf, size_t start);
 Elf_Scn * get_elf_section(Elf *, int64_t, const char *, Elf_Scn *, GElf_Shdr *);
 Elf_Scn * get_elf_extended_section(Elf *, Elf_Scn *, GElf_Shdr *);
 GElf_Phdr * get_elf_phdr(Elf *, Elf64_Word, GElf_Phdr *);
