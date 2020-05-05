@@ -117,7 +117,7 @@ void free_mapping(struct hsearch_data *, string_list_t *);
 void free_rpminspect(struct rpminspect *);
 
 /* listfuncs.c */
-char *list_to_string(const string_list_t *);
+char *list_to_string(const string_list_t *, const char *);
 char **list_to_array(const string_list_t *);
 struct hsearch_data * list_to_table(const string_list_t *);
 string_list_t * list_difference(const string_list_t *, const string_list_t *);
