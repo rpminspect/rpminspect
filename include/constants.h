@@ -376,6 +376,12 @@
  */
 #define SVG_FILENAME_EXTENSION ".svg"
 
+/**
+ * @def STATIC_LIB_FILENAME_EXTENSION
+ * Static ELF library filename extension
+ */
+#define STATIC_LIB_FILENAME_EXTENSION ".a"
+
 /** @} */
 
 /** @} */

@@ -61,6 +61,7 @@ struct inspect inspections[] = {
     { INSPECT_SUBPACKAGES, "subpackages", false, &inspect_subpackages },
     { INSPECT_CHANGELOG, "changelog", false, &inspect_changelog },
     { INSPECT_PATHMIGRATION, "pathmigration", true, &inspect_pathmigration },
+    { INSPECT_LTO, "LTO", true, &inspect_lto },
 
     /*
      * { INSPECT_TYPE (add to inspect.h),
@@ -173,6 +174,8 @@ const char *inspection_desc(const uint64_t inspection)
             return _(DESC_SUBPACKAGES);
         case INSPECT_CHANGELOG:
             return _(DESC_CHANGELOG);
+        case INSPECT_LTO:
+            return _(DESC_LTO);
         default:
             return NULL;
     }
