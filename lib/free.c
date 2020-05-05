@@ -155,6 +155,7 @@ void free_rpminspect(struct rpminspect *ri) {
     free_mapping(ri->pathmigration, ri->pathmigration_keys);
     free_mapping(ri->products, ri->product_keys);
     list_free(ri->ignores, free);
+    list_free(ri->lto_symbol_name_prefixes, free);
 
     free_rpmpeer(ri->peers);
 

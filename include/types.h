@@ -338,6 +338,9 @@ struct rpminspect {
     /* Optional: file size change threshold for inc/dec reporting (%) */
     char *size_threshold;
 
+    /* Optional: ELF LTO symbol prefixes */
+    string_list_t *lto_symbol_name_prefixes;
+
     /* Spec filename matching type */
     specname_match_t specmatch;
     specname_primary_t specprimary;
