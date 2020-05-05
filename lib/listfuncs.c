@@ -28,12 +28,25 @@
 
 string_list_t *sorted_list = NULL;
 
-/*
- * Given a string_list_t, join all entries in to a newline delimited
- * string.  Caller is responsible for freeing the result.
+/**
+ * @brief Join all members of a string_list_t in to a single string.
+ *
+ * Given a string_list_t, combine all the members in to a newly
+ * allocated string.  An optional delimiter can be provided by passing
+ * a string as the delimiter argument.  If NULL given as the
+ * delimited, all strings will be concatenated together.  Caller is
+ * responsible for freeing memory allocated by this function.
+ *
+ * @param list string_list_t containing members to join
+ * @param delimiter Optional delimiter string to put between each list
+ *        member (NULL to disable)
+ * @return Newly allocated string of concatenated list members; caller
+ *         must free.
  */
-char *list_to_string(const string_list_t *list)
+char *list_to_string(const string_list_t *list, const char *delimiter)
 {
+    size_t len = 0;
+    size_t pos = 1;
     char *s = NULL;
     string_entry_t *entry = NULL;
 
@@ -41,9 +54,25 @@ char *list_to_string(const string_list_t *list)
         return NULL;
     }
 
+    len = list_len(list);
+
     TAILQ_FOREACH(entry, list, items) {
         s = strappend(s, entry->data);
+
+        if (delimiter != NULL) {
+            s = strappend(s, delimiter);
+        }
+
+        /* if next iteration is last element, stop the loop */
+        pos++;
+        if (pos == len) {
+            break;
+        }
     }
+
+    /* handle the last element outside loop to avoid a trailing delimiter */
+    entry = TAILQ_LAST(list, string_entry_s);
+    s = strappend(s, entry->data);
 
     return s;
 }
