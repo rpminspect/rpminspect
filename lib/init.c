@@ -571,6 +571,11 @@ static int read_cfgfile(dictionary *cfg, struct rpminspect *ri, const char *file
         ri->size_threshold = strdup(tmp);
     }
 
+    tmp = iniparser_getstring(cfg, "lto:lto_symbol_name_prefixes", NULL);
+    if (tmp) {
+        parse_list(tmp, &ri->lto_symbol_name_prefixes);
+    }
+
     tmp = iniparser_getstring(cfg, "specname:match", NULL);
     if (tmp) {
         if (!strcasecmp(tmp, "full")) {
