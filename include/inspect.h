@@ -336,6 +336,18 @@ bool inspect_changelog(struct rpminspect *ri);
  */
 bool inspect_pathmigration(struct rpminspect *ri);
 
+/**
+ * @brief Main driver for the 'lto' inspection.
+ *
+ * LTO (Link Time Optimization) bytecode is not stable from one
+ * release of gcc to the next.  This inspection checks ELF .o and .a
+ * files to ensure all LTO bytecode has been stripped.
+ *
+ * @param ri Pointer to the struct rpminspect for the program.
+ * @return True if the inspection passed, false otherwise.
+ */
+bool inspect_lto(struct rpminspect *ri);
+
 /** @} */
 
 /*
@@ -373,6 +385,7 @@ bool inspect_pathmigration(struct rpminspect *ri);
 #define INSPECT_SUBPACKAGES                 (((uint64_t) 1) << 25)
 #define INSPECT_CHANGELOG                   (((uint64_t) 1) << 26)
 #define INSPECT_PATHMIGRATION               (((uint64_t) 1) << 27)
+#define INSPECT_LTO                         (((uint64_t) 1) << 28)
 
 /* Long descriptions for the inspections */
 #define DESC_LICENSE "Verify the string specified in the License tag of the RPM metadata describes permissible software licenses as defined by the license database. Also checks to see if the License tag contains any unprofessional words as defined in the configuration file."
@@ -426,5 +439,7 @@ bool inspect_pathmigration(struct rpminspect *ri);
 #define DESC_SUBPACKAGES "Report RPM subpackages that appear and disappear between the before and after builds."
 
 #define DESC_CHANGELOG "Ensure packages contain an entry in the %changelog for the version built.  Reports any other differences in the existing changelog between builds and that the new entry contains new text entries."
+
+#define DESC_LTO "Link Time Optimization (LTO) produces smaller and faster shared ELF executables and libraries.  LTO bytecode is not stable from one release of gcc to the next.  As such, LTO bytecode should not be present in .a and .o ELF objects shipped in packages.  This inspection looks for LTO bytecode in ELF relocatable objects and reports if any is present."
 
 #endif

@@ -53,6 +53,7 @@
 #define HEADER_SUBPACKAGES   "subpackages"
 #define HEADER_CHANGELOG     "changelog"
 #define HEADER_PATHMIGRATION "path-migration"
+#define HEADER_LTO           "LTO"
 
 /*
  * Inspection remedies
@@ -158,5 +159,8 @@
 
 /* pathmigration */
 #define REMEDY_PATHMIGRATION _("Files should not be installed in old directory names.  Modify the package to install the affected file to the preferred directory.")
+
+/* lto */
+#define REMEDY_LTO _("ELF .o and .a files should not carry LTO (Link Time Optimization) bytecode.  Make sure you have stripped LTO bytecode from those files at install time.")
 
 #endif

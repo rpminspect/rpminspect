@@ -35,6 +35,7 @@ librpminspect_sources = [
     'inspect_javabytecode.c',
     'inspect_kmod.c',
     'inspect_license.c',
+    'inspect_lto.c',
     'inspect_manpage.c',
     'inspect_metadata.c',
     'inspect_modularity.c',
