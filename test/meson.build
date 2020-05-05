@@ -112,6 +112,7 @@ if python.found()
         'test_emptyrpm.py',
         'test_kmod.py',
         'test_license.py',
+        'test_lto.py',
         'test_manpage.py',
         'test_metadata.py',
         'test_ownership.py',
