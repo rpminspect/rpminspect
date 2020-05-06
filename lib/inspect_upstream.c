@@ -153,6 +153,7 @@ static bool upstream_driver(struct rpminspect *ri, rpmfile_entry_t *file)
     }
 
     free(params.msg);
+    params.msg = NULL;
     return result;
 }
 

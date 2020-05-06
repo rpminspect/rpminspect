@@ -206,6 +206,7 @@ static bool kmod_driver(struct rpminspect *ri, rpmfile_entry_t *file)
             params.file = file->localpath;
             add_result(ri, &params);
             free(params.msg);
+            params.msg = NULL;
         }
 
         list_free(lost, free);
@@ -223,6 +224,7 @@ static bool kmod_driver(struct rpminspect *ri, rpmfile_entry_t *file)
             params.file = file->localpath;
             add_result(ri, &params);
             free(params.msg);
+            params.msg = NULL;
         }
 
         list_free(gain, free);
@@ -242,6 +244,7 @@ static bool kmod_driver(struct rpminspect *ri, rpmfile_entry_t *file)
             params.file = file->localpath;
             add_result(ri, &params);
             free(params.msg);
+            params.msg = NULL;
         }
 
         list_free(lost, free);
@@ -257,6 +260,7 @@ static bool kmod_driver(struct rpminspect *ri, rpmfile_entry_t *file)
             params.file = file->localpath;
             add_result(ri, &params);
             free(params.msg);
+            params.msg = NULL;
         }
 
         list_free(gain, free);
