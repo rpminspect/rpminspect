@@ -281,7 +281,6 @@ static bool changedfiles_driver(struct rpminspect *ri, rpmfile_entry_t *file)
             xasprintf(&params.msg, _("ELF file %s changed content on %s."), file->localpath, arch);
             add_changedfiles_result(ri, &params);
             free(needle);
-            free(params.details);
             result = false;
         }
     }
