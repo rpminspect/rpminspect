@@ -119,6 +119,7 @@ if python.found()
         'test_pathmigration.py',
         'test_shellsyntax.py',
         'test_specname.py',
+        'test_symlinks.py',
         'test_xml.py'
         ]
 
