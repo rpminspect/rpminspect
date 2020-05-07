@@ -33,7 +33,6 @@ Unranked tests categories to migrate (might also decide to skip them):
 *   dist tag check from rpmpatches.c (this is 'disttag' in rpminspect)
 *   license check from rpmpatches.c (this is 'license' in rpminspect)
  TEST_STRIP
- TEST_SYMLINK
  TEST_TRIGGERS
  TEST_TYPES
  TEST_VIRUS
@@ -74,6 +73,7 @@ Test categories that have been migrated:
                  to forbidden_path_prefixes in the config file and
                  those are caught by 'addedfiles')
 *TEST_SIZE (filesize)
+*TEST_SYMLINK (symlinks)
 
 
 Test categories excluded (see MISSING):

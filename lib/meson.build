@@ -46,6 +46,7 @@ librpminspect_sources = [
     'inspect_shellsyntax.c',
     'inspect_specname.c',
     'inspect_subpackages.c',
+    'inspect_symlinks.c',
     'inspect_upstream.c',
     'inspect_xml.c',
     'koji.c',
