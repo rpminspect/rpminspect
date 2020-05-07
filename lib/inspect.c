@@ -62,6 +62,7 @@ struct inspect inspections[] = {
     { INSPECT_CHANGELOG, "changelog", false, &inspect_changelog },
     { INSPECT_PATHMIGRATION, "pathmigration", true, &inspect_pathmigration },
     { INSPECT_LTO, "LTO", true, &inspect_lto },
+    { INSPECT_SYMLINKS, "symlinks", true, &inspect_symlinks },
 
     /*
      * { INSPECT_TYPE (add to inspect.h),
@@ -176,6 +177,8 @@ const char *inspection_desc(const uint64_t inspection)
             return _(DESC_CHANGELOG);
         case INSPECT_LTO:
             return _(DESC_LTO);
+        case INSPECT_SYMLINKS:
+            return _(DESC_SYMLINKS);
         default:
             return NULL;
     }

@@ -54,6 +54,7 @@
 #define HEADER_CHANGELOG     "changelog"
 #define HEADER_PATHMIGRATION "path-migration"
 #define HEADER_LTO           "LTO"
+#define HEADER_SYMLINKS      "symlinks"
 
 /*
  * Inspection remedies
@@ -162,5 +163,8 @@
 
 /* lto */
 #define REMEDY_LTO _("ELF .o and .a files should not carry LTO (Link Time Optimization) bytecode.  Make sure you have stripped LTO bytecode from those files at install time.")
+
+/* symlinks */
+#define REMEDY_SYMLINKS _("Make sure symlinks point to a valid destination in one of the subpackages of the build; dangling symlinks are not allowed.  If you are comparing builds and have a non-symlink turn in to a symlink, ensure this is deliberate.  NOTE:  You cannot turn a directory in to a symlink due to RPM limitations.");
 
 #endif
