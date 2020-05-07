@@ -319,7 +319,7 @@ char *strwaiverauth(const waiverauth_t waiverauth) {
  *
  * Replaces all matches.
  */
-char * strreplace(const char *s, const char *find, const char *replace)
+char *strreplace(const char *s, const char *find, const char *replace)
 {
     const char *find_start;
     size_t find_len;
@@ -439,4 +439,35 @@ string_list_t *strsplit(const char *s, const char *delim)
 
     free(walk);
     return list;
+}
+
+/**
+ * @brief Return a string description of the file type given its
+ *        stat(2) mode.
+ *
+ * Return a string describing the file type from the struct stat
+ * st_mode.  Do not free the string returned.
+ *
+ * @param mode The file mode from stat(2).
+ * @return String describing the file type; do not free.
+ */
+const char *strtype(const mode_t mode)
+{
+    if (S_ISREG(mode)) {
+        return _("regular file");
+    } else if (S_ISDIR(mode)) {
+        return _("directory");
+    } else if (S_ISCHR(mode)) {
+        return _("character device");
+    } else if (S_ISBLK(mode)) {
+        return _("block device");
+    } else if (S_ISFIFO(mode)) {
+        return _("FIFO (named pipe)");
+    } else if (S_ISLNK(mode)) {
+        return _("symbolic link");
+    } else if (S_ISSOCK(mode)) {
+        return _("socket");
+    } else {
+        return _("UNKNOWN");
+    }
 }

@@ -175,6 +175,7 @@ char *strwaiverauth(const waiverauth_t);
 char *strreplace(const char *, const char *, const char *);
 char *strappend(char *, const char *);
 string_list_t *strsplit(const char *, const char *);
+const char *strtype(const mode_t mode);
 
 /* badwords.c */
 bool has_bad_word(const char *, const string_list_t *);
