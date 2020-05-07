@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2019  Red Hat, Inc.
+ * Copyright (C) 2019-2020  Red Hat, Inc.
  * Red Hat Author(s):  David Shea <dshea@redhat.com>
  *                     David Cantrell <dcantrell@redhat.com>
  *
@@ -53,6 +53,10 @@ void free_rpmpeer(rpmpeer_t *peers) {
         entry->before_rpm = NULL;
         free(entry->after_rpm);
         entry->after_rpm = NULL;
+        free(entry->before_root);
+        entry->before_root = NULL;
+        free(entry->after_root);
+        entry->after_root = NULL;
         free_files(entry->before_files);
         entry->before_files = NULL;
         free_files(entry->after_files);
@@ -130,8 +134,9 @@ int add_peer(rpmpeer_t **peers, int whichbuild, bool fetch_only, const char *pkg
 
         if (fetch_only) {
             peer->before_files = NULL;
+            peer->after_root = NULL;
         } else {
-            peer->before_files = extract_rpm(pkg, hdr);
+            peer->before_files = extract_rpm(pkg, hdr, &peer->before_root);
         }
     } else if (whichbuild == AFTER_BUILD) {
         peer->after_hdr = hdr;
@@ -139,8 +144,9 @@ int add_peer(rpmpeer_t **peers, int whichbuild, bool fetch_only, const char *pkg
 
         if (fetch_only) {
             peer->after_files = NULL;
+            peer->after_root = NULL;
         } else {
-            peer->after_files = extract_rpm(pkg, hdr);
+            peer->after_files = extract_rpm(pkg, hdr, &peer->after_root);
         }
     }
 

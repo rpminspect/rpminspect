@@ -91,7 +91,7 @@ void free_files(rpmfile_t *files)
  * @return rpmfile_t list of all payload members.  The caller is
  *                   responsible for freeing this list.
  */
-rpmfile_t *extract_rpm(const char *pkg, Header hdr)
+rpmfile_t *extract_rpm(const char *pkg, Header hdr, char **output_dir)
 {
     rpmtd td = NULL;
     rpm_count_t td_size;
@@ -104,7 +104,6 @@ rpmfile_t *extract_rpm(const char *pkg, Header hdr)
     int *rpm_indices = NULL;
 
     char *hardlinkpath = NULL;
-    char *output_dir = NULL;
     struct archive *archive = NULL;
     struct archive_entry *entry = NULL;
     const char *archive_path;
@@ -126,13 +125,13 @@ rpmfile_t *extract_rpm(const char *pkg, Header hdr)
      * If some joker hands us a file that doesn't end in .rpm, slap a ".d" on the end instead.
      */
     if (strsuffix(pkg, RPM_FILENAME_EXTENSION)) {
-        xasprintf(&output_dir, "%.*s", (int) strlen(pkg) - 4, pkg);
+        xasprintf(output_dir, "%.*s", (int) strlen(pkg) - 4, pkg);
     } else {
-        xasprintf(&output_dir, "%s.d", pkg);
+        xasprintf(output_dir, "%s.d", pkg);
     }
 
-    if (mkdir(output_dir, S_IRWXU | S_IRGRP | S_IXGRP | S_IROTH | S_IXOTH) == -1) {
-        fprintf(stderr, _("*** Unable to create directory %s: %s\n"), output_dir, strerror(errno));
+    if (mkdir(*output_dir, S_IRWXU | S_IRGRP | S_IXGRP | S_IROTH | S_IXOTH) == -1) {
+        fprintf(stderr, _("*** Unable to create directory %s: %s\n"), *output_dir, strerror(errno));
         return NULL;
     }
 
@@ -258,7 +257,7 @@ rpmfile_t *extract_rpm(const char *pkg, Header hdr)
         }
 
         /* Prepend output_dir to the path name */
-        xasprintf(&file_entry->fullpath, "%s/%s", output_dir, archive_path);
+        xasprintf(&file_entry->fullpath, "%s/%s", *output_dir, archive_path);
         archive_entry_set_pathname(entry, file_entry->fullpath);
 
         /* Ensure the resulting file is user-rw and global-unwritable */
@@ -274,7 +273,7 @@ rpmfile_t *extract_rpm(const char *pkg, Header hdr)
 
         /* If this is a hard link, update the hardlink destination path */
         if (archive_entry_nlink(entry) > 1) {
-            xasprintf(&hardlinkpath, "%s/%s", output_dir, archive_entry_hardlink(entry));
+            xasprintf(&hardlinkpath, "%s/%s", *output_dir, archive_entry_hardlink(entry));
             archive_entry_set_link(entry, hardlinkpath);
             free(hardlinkpath);
         }
@@ -298,7 +297,6 @@ cleanup:
     }
 
     free(rpm_indices);
-    free(output_dir);
     rpmtdFree(td);
 
     return file_list;

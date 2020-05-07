@@ -197,7 +197,7 @@ int add_peer(rpmpeer_t **, int, bool, const char *, Header);
 
 /* files.c */
 void free_files(rpmfile_t *files);
-rpmfile_t * extract_rpm(const char *, Header);
+rpmfile_t * extract_rpm(const char *, Header, char **output_dir);
 bool process_file_path(const rpmfile_entry_t *, regex_t *, regex_t *);
 void find_file_peers(rpmfile_t *, rpmfile_t *);
 cap_t get_cap(rpmfile_entry_t *);
