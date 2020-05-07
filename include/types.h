@@ -95,6 +95,8 @@ typedef struct _rpmpeer_entry_t {
     Header after_hdr;         /* RPM header of the after package */
     char *before_rpm;         /* full path to the before RPM */
     char *after_rpm;          /* full path to the after RPM */
+    char *before_root;        /* full path to the before RPM extracted root dir */
+    char *after_root;         /* full path to the after RPM extracted root dir */
     rpmfile_t *before_files;  /* list of files in the payload of the before RPM */
     rpmfile_t *after_files;   /* list of files in the payload of the after RPM */
     TAILQ_ENTRY(_rpmpeer_entry_t) items;
