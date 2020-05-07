@@ -116,7 +116,7 @@ void add_result_entry(results_t **results, struct result_params *params)
 
     entry->severity = params->severity;
     entry->waiverauth = params->waiverauth;
-    entry->header = strdup(params->header);
+    entry->header = params->header;
 
     if (params->msg != NULL) {
         entry->msg = strdup(params->msg);
@@ -127,7 +127,7 @@ void add_result_entry(results_t **results, struct result_params *params)
     }
 
     if (params->remedy != NULL) {
-        entry->remedy = strdup(params->remedy);
+        entry->remedy = params->remedy;
     }
 
     entry->verb = params->verb;
