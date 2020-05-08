@@ -97,13 +97,13 @@ static bool symlinks_driver(struct rpminspect *ri, rpmfile_entry_t *file) {
     if (file->peer_file && !S_ISLNK(file->peer_file->st.st_mode)) {
         if (S_ISDIR(file->peer_file->st.st_mode)) {
             /* Some RPM versions cannot handle this on an upgrade */
-            params.severity = RESULT_BAD;
+            params.remedy = REMEDY_SYMLINKS_DIRECTORY;
             xasprintf(&params.msg, _("Directory %s became a symbolic link (to %s) in %s on %s; this is not allowed!"), file->peer_file->localpath, file->localpath, name, arch);
         } else {
-            params.severity = RESULT_VERIFY;
             xasprintf(&params.msg, _("%s %s became a symbolic link (to %s) in %s on %s"), strtype(file->peer_file->st.st_mode), file->peer_file->localpath, file->localpath, name, arch);
         }
 
+        params.severity = RESULT_VERIFY;
         add_result(ri, &params);
         free(params.msg);
         result = false;
@@ -251,11 +251,13 @@ static bool symlinks_driver(struct rpminspect *ri, rpmfile_entry_t *file) {
 
     /* not found?  report */
     if (!found) {
-        params.severity = RESULT_VERIFY;
         xasprintf(&params.msg, _("%s %s %s a dangling symbolic link in %s on %s"), strtype(file->st.st_mode), file->localpath, (file->peer_file) ? "became" : "is", name, arch);
 
         if (linkerr == ELOOP || linkerr == ENAMETOOLONG) {
+            params.severity = RESULT_BAD;
             params.details = strerror(linkerr);
+        } else {
+            params.severity = RESULT_VERIFY;
         }
 
         add_result(ri, &params);

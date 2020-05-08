@@ -473,7 +473,7 @@ class TooManySymlinkLevelsRPMs(TestRPMs):
 
         self.inspection = 'symlinks'
         self.label = 'symlinks'
-        self.result = 'VERIFY'
+        self.result = 'BAD'
         self.waiver_auth = 'Anyone'
 
 class TooManySymlinkLevelsKoji(TestKoji):
@@ -489,7 +489,7 @@ class TooManySymlinkLevelsKoji(TestKoji):
 
         self.inspection = 'symlinks'
         self.label = 'symlinks'
-        self.result = 'VERIFY'
+        self.result = 'BAD'
         self.waiver_auth = 'Anyone'
 
 class TooManySymlinkLevelsCompareRPMs(TestCompareRPMs):
@@ -505,7 +505,7 @@ class TooManySymlinkLevelsCompareRPMs(TestCompareRPMs):
 
         self.inspection = 'symlinks'
         self.label = 'symlinks'
-        self.result = 'VERIFY'
+        self.result = 'BAD'
         self.waiver_auth = 'Anyone'
 
 class TooManySymlinkLevelsCompareKoji(TestCompareKoji):
@@ -521,10 +521,10 @@ class TooManySymlinkLevelsCompareKoji(TestCompareKoji):
 
         self.inspection = 'symlinks'
         self.label = 'symlinks'
-        self.result = 'VERIFY'
+        self.result = 'BAD'
         self.waiver_auth = 'Anyone'
 
-# Directory becomes a symlink (BAD)
+# Directory becomes a symlink (VERIFY)
 class DirectoryBecomesSymlinkCompareRPMs(TestCompareRPMs):
     def setUp(self):
         TestCompareRPMs.setUp(self)
@@ -537,7 +537,7 @@ class DirectoryBecomesSymlinkCompareRPMs(TestCompareRPMs):
 
         self.inspection = 'symlinks'
         self.label = 'symlinks'
-        self.result = 'BAD'
+        self.result = 'VERIFY'
         self.waiver_auth = 'Anyone'
 
 class DirectoryBecomesSymlinkCompareKoji(TestCompareKoji):
@@ -552,7 +552,7 @@ class DirectoryBecomesSymlinkCompareKoji(TestCompareKoji):
 
         self.inspection = 'symlinks'
         self.label = 'symlinks'
-        self.result = 'BAD'
+        self.result = 'VERIFY'
         self.waiver_auth = 'Anyone'
 
 # Non-directory becomes a symlink (VERIFY)
