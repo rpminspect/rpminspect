@@ -140,6 +140,78 @@ static void token_append(char **dest, const char *token)
 }
 
 /*
+ * Given a license expression without parens, check it.
+ */
+static bool is_valid_expression(const char *s, struct result_params *params, results_t **rq)
+{
+    bool result = true;
+    char *tagtokens = NULL;
+    char *tagcopy = NULL;
+    char *token = NULL;
+    char *lic = NULL;
+
+    assert(s != NULL);
+    assert(params != NULL);
+
+    /* see if the entire substring matches */
+    if (check_license_abbrev(s)) {
+        DEBUG_PRINT("APPROVED: |%s|\n", s);
+        return true;
+    }
+
+    /* fall back on checking each individual token */
+    tagtokens = tagcopy = strdup(s);
+
+    while ((token = strsep(&tagtokens, " ")) != NULL) {
+        if (!strcmp(token, "")) {
+            continue;
+        }
+
+        if (!strcasecmp(token, "and") || !strcasecmp(token, "or")) {
+            if (lic == NULL) {
+                continue;
+            }
+
+            if (!check_license_abbrev(lic)) {
+                result = false;
+
+                xasprintf(&params->msg, "%s is not an approved license", lic);
+                add_result_entry(rq, params);
+                free(params->msg);
+            } else {
+                DEBUG_PRINT("APPROVED: |%s|\n", lic);
+            }
+
+            free(lic);
+            lic = NULL;
+        } else if (lic == NULL) {
+            lic = strdup(token);
+        } else {
+            token_append(&lic, token);
+        }
+    }
+
+    /* check final token */
+    if (lic) {
+        if (!check_license_abbrev(lic)) {
+            result = false;
+
+            xasprintf(&params->msg, "%s is not an approved license", lic);
+            add_result_entry(rq, params);
+            free(params->msg);
+        } else {
+            DEBUG_PRINT("APPROVED: |%s|\n", lic);
+        }
+    }
+
+    /* cleanup */
+    free(lic);
+    free(tagcopy);
+
+    return result;
+}
+
+/*
  * RPM License tags in the spec file permit parentheses to group licenses
  * together that need to be used together.  The License tag also permits
  * the use of boolean 'and' and 'or' keywords.  The only thing of note for
@@ -159,21 +231,12 @@ static void token_append(char **dest, const char *token)
  */
 static bool is_valid_license(struct rpminspect *ri, struct result_params *params, const char *licensedb, const char *tag)
 {
-    int tok_seen = 0;
-    int paren_tok_seen = 0;
-    int valid = 0;
-    int paren_valid = 0;
+    bool result = true;
     int balance = 0;
     size_t i = 0;
     char *tagtokens = NULL;
     char *tagcopy = NULL;
     char *token = NULL;
-    char *lic = NULL;
-    char *paren_lic = NULL;
-    bool good_token = false;
-    bool good_paren_token = false;
-    bool collect = true;
-    int paren = 0;
     results_t *rq = NULL;
     results_entry_t *entry = NULL;
 
@@ -217,156 +280,30 @@ static bool is_valid_license(struct rpminspect *ri, struct result_params *params
 
     /* First try to match the entire string */
     if (check_license_abbrev(tag)) {
+        DEBUG_PRINT("APPROVED: |%s|\n", tag);
         return true;
     }
 
     /* tokenize the license tag and validate each license */
     tagtokens = tagcopy = strdup(tag);
-    DEBUG_PRINT("tag=|%s|\n", tag);
 
-    while ((token = strsep(&tagtokens, " ")) != NULL) {
-        /* skip over empty strings */
-        if (strlen(token) == 0) {
+    while ((token = strsep(&tagtokens, "()")) != NULL) {
+        if (!strcmp(token, "")) {
             continue;
         }
 
-        /* build up a license substring if we see parens */
-        if (strprefix(token, "(")) {
-            paren++;
-        }
-
-        if (strsuffix(token, ")")) {
-            paren--;
-
-            if (!paren) {
-                collect = true;
-            }
-        }
-
-        /* keep collecting the license string until we see a boolean */
-        if (!strcasecmp(token, "and") || !strcasecmp(token, "or")) {
-            collect = false;
-        }
-
-        /* Ignore leading and trailing parens */
-        while (*token == '(') {
-            token++;
-        }
-
-        if (strsuffix(token, ")")) {
-            token[strcspn(token, ")")] = 0;
-            token_append(&paren_lic, token);
-        }
-
-        DEBUG_PRINT("lic=|%s|, paren_lic=|%s|, paren=%d, token=|%s|\n", lic, paren_lic, paren, token);
-
-        /* Abbreviated licenses may contain spaces, so rebuild it */
-        if (collect) {
-            token_append(&lic, token);
-        }
-
-        /* If inside parens, gather the boolean tokens too */
-        if (paren) {
-            token_append(&paren_lic, token);
-        }
-
-        if (collect) {
-            continue;
-        }
-
-        /* iterate over the license database to match this license tag */
-        if (lic) {
-            good_token = check_license_abbrev(lic);
-            tok_seen++;
-
-            if (paren) {
-                paren_tok_seen++;
-            }
-
-            DEBUG_PRINT("    lic=|%s|, tok_seen=%d, paren_tok_seen=%d\n", lic, tok_seen, paren_tok_seen);
-
-            if (good_token) {
-                valid++;
-                DEBUG_PRINT("APPROVED lic=|%s|, paren_valid=%d, tok_seen=%d, valid=%d\n", lic, paren_valid, tok_seen, valid);
-            } else {
-                xasprintf(&params->msg, "%s is not an approved license", lic);
-                add_result_entry(&rq, params);
-                free(params->msg);
-            }
-        }
-
-        if (!good_token && paren_lic) {
-            good_paren_token = check_license_abbrev(paren_lic);
-
-            if (good_paren_token) {
-                DEBUG_PRINT("APPROVED paren_lic=|%s|, paren_valid=%d, tok_seen=%d, valid=%d\n", paren_lic, paren_valid, tok_seen, valid);
-                tok_seen = tok_seen - paren_tok_seen;
-                paren_valid++;
-            } else {
-                xasprintf(&params->msg, "%s is not an approved license", paren_lic);
-                add_result_entry(&rq, params);
-                free(params->msg);
-            }
-        }
-
-        free(lic);
-        lic = NULL;
-
-        if (!paren) {
-            free(paren_lic);
-            paren_lic = NULL;
-            paren_tok_seen = 0;
-        }
-
-        collect = true;
-    }
-
-    /* check the last license abbreviation */
-    if (lic) {
-        good_token = check_license_abbrev(lic);
-        tok_seen++;
-
-        if (paren) {
-            paren_tok_seen++;
-        }
-
-        DEBUG_PRINT("    lic=|%s|, tok_seen=%d, paren_tok_seen=%d\n", lic, tok_seen, paren_tok_seen);
-
-        if (good_token) {
-            valid++;
-            DEBUG_PRINT("APPROVED lic=|%s|, paren_valid=%d, tok_seen=%d, valid=%d\n", lic, paren_valid, tok_seen, valid);
-        } else {
-            xasprintf(&params->msg, "%s is not an approved license", lic);
-            add_result_entry(&rq, params);
-            free(params->msg);
+        if (!is_valid_expression(token, params, &rq)) {
+            result = false;
         }
     }
 
-    if (!good_token && paren_lic) {
-        good_paren_token = check_license_abbrev(paren_lic);
-
-        if (good_paren_token) {
-            DEBUG_PRINT("APPROVED paren_lic=|%s|, paren_valid=%d, tok_seen=%d, valid=%d\n", paren_lic, paren_valid, tok_seen, valid);
-            tok_seen = tok_seen - paren_tok_seen;
-            paren_valid++;
-        } else {
-            xasprintf(&params->msg, "%s is not an approved license", paren_lic);
-            add_result_entry(&rq, params);
-            free(params->msg);
-        }
-    }
-
-    /* cleanup */
     free(tagcopy);
-    free(lic);
 
     /*
      * license tag is approved if number of seen tags equals
      * number of valid tags
      */
-    DEBUG_PRINT("tok_seen=%d, paren=%d, paren_valid=%d, valid=%d\n", tok_seen, paren, paren_valid, valid);
-
-    if (tok_seen == (valid + paren_valid)) {
+    if (result) {
         free_results(rq);
         return true;
     } else {
@@ -391,6 +328,8 @@ static bool is_valid_license(struct rpminspect *ri, struct result_params *params
 
         return false;
     }
+
+    return false;
 }
 
 /*
