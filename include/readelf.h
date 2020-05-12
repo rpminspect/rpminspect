@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2019  Red Hat, Inc.
+ * Copyright (C) 2019-2020  Red Hat, Inc.
  * Red Hat Author(s):  David Shea <dshea@redhat.com>
  *                     David Cantrell <dcantrell@redhat.com>
  *
@@ -28,22 +28,23 @@
 
 #include "types.h"
 
-Elf * get_elf(const char *, int *);
-Elf * get_elf_archive(const char *, int *);
-Elf64_Half get_elf_type(Elf *);
+Elf *get_elf(const char *, int *);
+Elf *get_elf_archive(const char *, int *);
+GElf_Half get_elf_type(Elf *);
+GElf_Half get_elf_machine(Elf *);
 bool is_elf(const char *);
 bool have_elf_section(Elf *, int64_t, const char *);
 string_list_t *get_elf_section_names(Elf *elf, size_t start);
-Elf_Scn * get_elf_section(Elf *, int64_t, const char *, Elf_Scn *, GElf_Shdr *);
-Elf_Scn * get_elf_extended_section(Elf *, Elf_Scn *, GElf_Shdr *);
-GElf_Phdr * get_elf_phdr(Elf *, Elf64_Word, GElf_Phdr *);
+Elf_Scn *get_elf_section(Elf *, int64_t, const char *, Elf_Scn *, GElf_Shdr *);
+Elf_Scn *get_elf_extended_section(Elf *, Elf_Scn *, GElf_Shdr *);
+GElf_Phdr *get_elf_phdr(Elf *, Elf64_Word, GElf_Phdr *);
 char *get_elf_soname(const char *);
 
 bool have_dynamic_tag(Elf *, const Elf64_Sxword);
 bool get_dynamic_tags(Elf *, const Elf64_Sxword, GElf_Dyn **, size_t *, GElf_Shdr *);
 
-string_list_t * get_elf_imported_functions(Elf *, bool (*)(const char *));
-string_list_t * get_elf_exported_functions(Elf *, bool (*)(const char *));
+string_list_t *get_elf_imported_functions(Elf *, bool (*)(const char *));
+string_list_t *get_elf_exported_functions(Elf *, bool (*)(const char *));
 
 typedef bool (*elf_ar_action)(Elf *, string_list_t **);
 void elf_archive_iterate(int, Elf *, elf_ar_action, string_list_t **);

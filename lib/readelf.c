@@ -27,6 +27,7 @@
 #include <sys/queue.h>
 #include <sys/stat.h>
 #include <unistd.h>
+#include <errno.h>
 
 #include <gelf.h>
 #include <libelf.h>
@@ -35,18 +36,34 @@
 #include "readelf.h"
 #include "rpminspect.h"
 
-Elf64_Half get_elf_type(Elf *elf)
+GElf_Half get_elf_type(Elf *elf)
 {
     GElf_Ehdr ehdr;
-    GElf_Ehdr *eh = NULL;
 
-    /* ignore unused variable warnings if assert is disabled */
-    (void) eh;
+    assert(elf != NULL);
 
-    eh = gelf_getehdr(elf, &ehdr);
-    assert(eh != NULL);
+    if (gelf_getehdr(elf, &ehdr) == NULL) {
+        fprintf(stderr, "*** gelf_getehdr() failure (%d): %s\n", errno, strerror(errno));
+        fflush(stderr);
+        return ET_NONE;
+    }
 
     return ehdr.e_type;
+}
+
+GElf_Half get_elf_machine(Elf *elf)
+{
+    GElf_Ehdr ehdr;
+
+    assert(elf != NULL);
+
+    if (gelf_getehdr(elf, &ehdr) == NULL) {
+        fprintf(stderr, "*** gelf_getehdr() failure (%d): %s\n", errno, strerror(errno));
+        fflush(stderr);
+        return ET_NONE;
+    }
+
+    return ehdr.e_machine;
 }
 
 static Elf * get_elf_with_kind(const char *fullpath, int *out_fd, Elf_Kind kind)
