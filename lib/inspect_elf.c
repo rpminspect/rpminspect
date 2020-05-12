@@ -1011,7 +1011,13 @@ static bool elf_archive_tests(struct rpminspect *ri, Elf *after_elf, int after_e
 
     /* comparison-only, skip if no before */
     if (!before_elf) {
-        return result;
+        return true;
+    }
+
+    /* skip kernel eBPF machine type objects */
+    if (get_elf_machine(after_elf) == EM_BPF) {
+        DEBUG_PRINT("eBPF object encountered (%s), skipping\n", localpath);
+        return true;
     }
 
     after_no_pic = calloc(1, sizeof(*after_no_pic));
@@ -1125,6 +1131,12 @@ static bool elf_regular_tests(struct rpminspect *ri, Elf *after_elf, Elf *before
     params.arch = arch;
     params.file = localpath;
     params.noun = _("TEXTREL relocations on ${FILE}");
+
+    /* skip kernel eBPF machine type objects */
+    if (get_elf_machine(after_elf) == EM_BPF) {
+        DEBUG_PRINT("eBPF object encountered (%s), skipping\n", localpath);
+        return true;
+    }
 
     if (!inspect_elf_execstack(ri, after_elf, before_elf, localpath, arch)) {
         result = false;
