@@ -208,5 +208,15 @@
     "spdx_abbrev": "",
     "spdx_name": "",
     "url": "https://old.calculate-linux.org/packages/licenses/inner-net"
+  },
+  "Creative Commons Zero 1.0 Universal": {
+    "approved": "yes",
+    "fedora_abbrev": "CC0",
+    "fedora_name": "Creative Commons Zero 1.0 Universal",
+    "id": "158",
+    "license_text": "",
+    "spdx_abbrev": "CC0-1.0",
+    "spdx_name": "Creative Commons Zero v1.0 Universal",
+    "url": "http://creativecommons.org/publicdomain/zero/1.0/legalcode"
   }
 }

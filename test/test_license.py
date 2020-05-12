@@ -246,3 +246,12 @@ class ValidGlibcLicenseTagKoji(TestKoji):
         self.inspection = 'license'
         self.label = 'license'
         self.result = 'INFO'
+
+# Valid perl-HTTP-Message License tag on Koji build (OK)
+class ValidPerlHTTPMessageLicenseTagKoji(TestKoji):
+    def setUp(self):
+        TestKoji.setUp(self)
+        self.rpm.addLicense("(GPL+ or Artistic) and CC0")
+        self.inspection = 'license'
+        self.label = 'license'
+        self.result = 'INFO'
