@@ -33,8 +33,8 @@ static bool dt_needed_driver(struct rpminspect *ri, rpmfile_entry_t *file)
     int before_fd = -1;
     Elf *after_elf = NULL;
     Elf *before_elf = NULL;
-    Elf64_Half after_type;
-    Elf64_Half before_type;
+    GElf_Half after_type;
+    GElf_Half before_type;
     size_t i;
     GElf_Dyn *dyn = NULL;
     size_t sz = 0;
