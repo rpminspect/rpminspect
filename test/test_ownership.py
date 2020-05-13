@@ -321,13 +321,14 @@ class SlashBinOwnedByBinCompareRPMs(TestCompareRPMs):
         TestCompareRPMs.setUp(self)
 
         # add file owned by root
-        self.before_rpm.add_installed_file(installPath='bin/testscript',
+        self.after_rpm.add_installed_file(installPath='bin/testscript',
                                     sourceFile=rpmfluff.SourceFile('testscript.sh', script_source),
                                     owner="bin")
 
         self.inspection = 'ownership'
         self.label = 'ownership'
         self.result = 'BAD'
+        self.waiver_auth = 'Anyone'
 
 # File in /sbin owned by 'bin' is BAD when comparing RPMs
 class SlashSbinOwnedByBinCompareRPMs(TestCompareRPMs):
@@ -335,13 +336,14 @@ class SlashSbinOwnedByBinCompareRPMs(TestCompareRPMs):
         TestCompareRPMs.setUp(self)
 
         # add file owned by root
-        self.before_rpm.add_installed_file(installPath='sbin/testscript',
+        self.after_rpm.add_installed_file(installPath='sbin/testscript',
                                     sourceFile=rpmfluff.SourceFile('testscript.sh', script_source),
                                     owner="bin")
 
         self.inspection = 'ownership'
         self.label = 'ownership'
         self.result = 'BAD'
+        self.waiver_auth = 'Anyone'
 
 # File in /usr/bin owned by 'bin' is BAD when comparing RPMs
 class SlashUsrSlashBinOwnedByBinCompareRPMs(TestCompareRPMs):
@@ -349,13 +351,14 @@ class SlashUsrSlashBinOwnedByBinCompareRPMs(TestCompareRPMs):
         TestCompareRPMs.setUp(self)
 
         # add file owned by root
-        self.before_rpm.add_installed_file(installPath='usr/bin/testscript',
+        self.after_rpm.add_installed_file(installPath='usr/bin/testscript',
                                     sourceFile=rpmfluff.SourceFile('testscript.sh', script_source),
                                     owner="bin")
 
         self.inspection = 'ownership'
         self.label = 'ownership'
         self.result = 'BAD'
+        self.waiver_auth = 'Anyone'
 
 # File in /usr/sbin owned by 'bin' is BAD when comparing RPMs
 class SlashUsrSlashSbinOwnedByBinCompareRPMs(TestCompareRPMs):
@@ -363,13 +366,14 @@ class SlashUsrSlashSbinOwnedByBinCompareRPMs(TestCompareRPMs):
         TestCompareRPMs.setUp(self)
 
         # add file owned by root
-        self.before_rpm.add_installed_file(installPath='usr/sbin/testscript',
+        self.after_rpm.add_installed_file(installPath='usr/sbin/testscript',
                                     sourceFile=rpmfluff.SourceFile('testscript.sh', script_source),
                                     owner="bin")
 
         self.inspection = 'ownership'
         self.label = 'ownership'
         self.result = 'BAD'
+        self.waiver_auth = 'Anyone'
 
 # File in /bin owned by 'root' is OK when comparing Koji builds
 class SlashBinOwnedByRootCompareKoji(TestCompareKoji):
@@ -377,7 +381,7 @@ class SlashBinOwnedByRootCompareKoji(TestCompareKoji):
         TestCompareKoji.setUp(self)
 
         # add file owned by root
-        self.before_rpm.add_installed_file(installPath='bin/testscript',
+        self.after_rpm.add_installed_file(installPath='bin/testscript',
                                     sourceFile=rpmfluff.SourceFile('testscript.sh', script_source),
                                     owner="root")
 
@@ -391,7 +395,7 @@ class SlashSbinOwnedByRootCompareKoji(TestCompareKoji):
         TestCompareKoji.setUp(self)
 
         # add file owned by root
-        self.before_rpm.add_installed_file(installPath='sbin/testscript',
+        self.after_rpm.add_installed_file(installPath='sbin/testscript',
                                     sourceFile=rpmfluff.SourceFile('testscript.sh', script_source),
                                     owner="root")
 
@@ -405,7 +409,7 @@ class SlashUsrSlashBinOwnedByRootCompareKoji(TestCompareKoji):
         TestCompareKoji.setUp(self)
 
         # add file owned by root
-        self.before_rpm.add_installed_file(installPath='usr/bin/testscript',
+        self.after_rpm.add_installed_file(installPath='usr/bin/testscript',
                                     sourceFile=rpmfluff.SourceFile('testscript.sh', script_source),
                                     owner="root")
 
@@ -419,7 +423,7 @@ class SlashUsrSlashSbinOwnedByRootCompareKoji(TestCompareKoji):
         TestCompareKoji.setUp(self)
 
         # add file owned by root
-        self.before_rpm.add_installed_file(installPath='usr/sbin/testscript',
+        self.after_rpm.add_installed_file(installPath='usr/sbin/testscript',
                                     sourceFile=rpmfluff.SourceFile('testscript.sh', script_source),
                                     owner="root")
 
@@ -433,13 +437,14 @@ class SlashBinOwnedByBinCompareKoji(TestCompareKoji):
         TestCompareKoji.setUp(self)
 
         # add file owned by root
-        self.before_rpm.add_installed_file(installPath='bin/testscript',
+        self.after_rpm.add_installed_file(installPath='bin/testscript',
                                     sourceFile=rpmfluff.SourceFile('testscript.sh', script_source),
                                     owner="bin")
 
         self.inspection = 'ownership'
         self.label = 'ownership'
         self.result = 'BAD'
+        self.waiver_auth = 'Anyone'
 
 # File in /sbin owned by 'bin' is BAD when comparing Koji builds
 class SlashSbinOwnedByBinCompareKoji(TestCompareKoji):
@@ -447,13 +452,14 @@ class SlashSbinOwnedByBinCompareKoji(TestCompareKoji):
         TestCompareKoji.setUp(self)
 
         # add file owned by root
-        self.before_rpm.add_installed_file(installPath='sbin/testscript',
+        self.after_rpm.add_installed_file(installPath='sbin/testscript',
                                     sourceFile=rpmfluff.SourceFile('testscript.sh', script_source),
                                     owner="bin")
 
         self.inspection = 'ownership'
         self.label = 'ownership'
         self.result = 'BAD'
+        self.waiver_auth = 'Anyone'
 
 # File in /usr/bin owned by 'bin' is BAD when comparing Koji builds
 class SlashUsrSlashBinOwnedByBinCompareKoji(TestCompareKoji):
@@ -461,13 +467,14 @@ class SlashUsrSlashBinOwnedByBinCompareKoji(TestCompareKoji):
         TestCompareKoji.setUp(self)
 
         # add file owned by root
-        self.before_rpm.add_installed_file(installPath='usr/bin/testscript',
+        self.after_rpm.add_installed_file(installPath='usr/bin/testscript',
                                     sourceFile=rpmfluff.SourceFile('testscript.sh', script_source),
                                     owner="bin")
 
         self.inspection = 'ownership'
         self.label = 'ownership'
         self.result = 'BAD'
+        self.waiver_auth = 'Anyone'
 
 # File in /usr/sbin owned by 'bin' is BAD when comparing Koji builds
 class SlashUsrSlashSbinOwnedByBinCompareKoji(TestCompareKoji):
@@ -475,13 +482,14 @@ class SlashUsrSlashSbinOwnedByBinCompareKoji(TestCompareKoji):
         TestCompareKoji.setUp(self)
 
         # add file owned by root
-        self.before_rpm.add_installed_file(installPath='usr/sbin/testscript',
+        self.after_rpm.add_installed_file(installPath='usr/sbin/testscript',
                                     sourceFile=rpmfluff.SourceFile('testscript.sh', script_source),
                                     owner="bin")
 
         self.inspection = 'ownership'
         self.label = 'ownership'
         self.result = 'BAD'
+        self.waiver_auth = 'Anyone'
 
 #############
 # bin group #
@@ -781,13 +789,14 @@ class SlashBinOwnedByGroupBinCompareRPMs(TestCompareRPMs):
         TestCompareRPMs.setUp(self)
 
         # add file owned by root
-        self.before_rpm.add_installed_file(installPath='bin/testscript',
+        self.after_rpm.add_installed_file(installPath='bin/testscript',
                                     sourceFile=rpmfluff.SourceFile('testscript.sh', script_source),
                                     group="bin")
 
         self.inspection = 'ownership'
         self.label = 'ownership'
         self.result = 'BAD'
+        self.waiver_auth = 'Anyone'
 
 # File in /sbin owned by group 'bin' is BAD when comparing RPMs
 class SlashSbinOwnedByGroupBinCompareRPMs(TestCompareRPMs):
@@ -795,13 +804,14 @@ class SlashSbinOwnedByGroupBinCompareRPMs(TestCompareRPMs):
         TestCompareRPMs.setUp(self)
 
         # add file owned by root
-        self.before_rpm.add_installed_file(installPath='sbin/testscript',
+        self.after_rpm.add_installed_file(installPath='sbin/testscript',
                                     sourceFile=rpmfluff.SourceFile('testscript.sh', script_source),
                                     group="bin")
 
         self.inspection = 'ownership'
         self.label = 'ownership'
         self.result = 'BAD'
+        self.waiver_auth = 'Anyone'
 
 # File in /usr/bin owned by group 'bin' is BAD when comparing RPMs
 class SlashUsrSlashBinOwnedByGroupBinCompareRPMs(TestCompareRPMs):
@@ -809,13 +819,14 @@ class SlashUsrSlashBinOwnedByGroupBinCompareRPMs(TestCompareRPMs):
         TestCompareRPMs.setUp(self)
 
         # add file owned by root
-        self.before_rpm.add_installed_file(installPath='usr/bin/testscript',
+        self.after_rpm.add_installed_file(installPath='usr/bin/testscript',
                                     sourceFile=rpmfluff.SourceFile('testscript.sh', script_source),
                                     group="bin")
 
         self.inspection = 'ownership'
         self.label = 'ownership'
         self.result = 'BAD'
+        self.waiver_auth = 'Anyone'
 
 # File in /usr/sbin owned by group 'bin' is BAD when comparing RPMs
 class SlashUsrSlashSbinOwnedByGroupBinCompareRPMs(TestCompareRPMs):
@@ -838,7 +849,7 @@ class SlashBinOwnedByGroupRootCompareKoji(TestCompareKoji):
         TestCompareKoji.setUp(self)
 
         # add file owned by root
-        self.before_rpm.add_installed_file(installPath='bin/testscript',
+        self.after_rpm.add_installed_file(installPath='bin/testscript',
                                     sourceFile=rpmfluff.SourceFile('testscript.sh', script_source),
                                     group="root")
 
@@ -852,7 +863,7 @@ class SlashSbinOwnedByGroupRootCompareKoji(TestCompareKoji):
         TestCompareKoji.setUp(self)
 
         # add file owned by root
-        self.before_rpm.add_installed_file(installPath='sbin/testscript',
+        self.after_rpm.add_installed_file(installPath='sbin/testscript',
                                     sourceFile=rpmfluff.SourceFile('testscript.sh', script_source),
                                     group="root")
 
@@ -867,7 +878,7 @@ class SlashUsrSlashBinOwnedByGroupRootCompareKoji(TestCompareKoji):
         TestCompareKoji.setUp(self)
 
         # add file owned by root
-        self.before_rpm.add_installed_file(installPath='usr/bin/testscript',
+        self.after_rpm.add_installed_file(installPath='usr/bin/testscript',
                                     sourceFile=rpmfluff.SourceFile('testscript.sh', script_source),
                                     group="root")
 
@@ -882,7 +893,7 @@ class SlashUsrSlashSbinOwnedByGroupRootCompareKoji(TestCompareKoji):
         TestCompareKoji.setUp(self)
 
         # add file owned by root
-        self.before_rpm.add_installed_file(installPath='usr/sbin/testscript',
+        self.after_rpm.add_installed_file(installPath='usr/sbin/testscript',
                                     sourceFile=rpmfluff.SourceFile('testscript.sh', script_source),
                                     group="root")
 
@@ -896,13 +907,14 @@ class SlashBinOwnedByGroupBinCompareKoji(TestCompareKoji):
         TestCompareKoji.setUp(self)
 
         # add file owned by root
-        self.before_rpm.add_installed_file(installPath='bin/testscript',
+        self.after_rpm.add_installed_file(installPath='bin/testscript',
                                     sourceFile=rpmfluff.SourceFile('testscript.sh', script_source),
                                     group="bin")
 
         self.inspection = 'ownership'
         self.label = 'ownership'
         self.result = 'BAD'
+        self.waiver_auth = 'Anyone'
 
 # File in /sbin owned by group 'bin' is BAD when comparing Koji builds
 class SlashSbinOwnedByGroupBinCompareKoji(TestCompareKoji):
@@ -910,13 +922,14 @@ class SlashSbinOwnedByGroupBinCompareKoji(TestCompareKoji):
         TestCompareKoji.setUp(self)
 
         # add file owned by root
-        self.before_rpm.add_installed_file(installPath='sbin/testscript',
+        self.after_rpm.add_installed_file(installPath='sbin/testscript',
                                     sourceFile=rpmfluff.SourceFile('testscript.sh', script_source),
                                     group="bin")
 
         self.inspection = 'ownership'
         self.label = 'ownership'
         self.result = 'BAD'
+        self.waiver_auth = 'Anyone'
 
 # File in /usr/bin owned by group 'bin' is BAD when comparing Koji
 # builds
@@ -925,13 +938,14 @@ class SlashUsrSlashBinOwnedByGroupBinCompareKoji(TestCompareKoji):
         TestCompareKoji.setUp(self)
 
         # add file owned by root
-        self.before_rpm.add_installed_file(installPath='usr/bin/testscript',
+        self.after_rpm.add_installed_file(installPath='usr/bin/testscript',
                                     sourceFile=rpmfluff.SourceFile('testscript.sh', script_source),
                                     group="bin")
 
         self.inspection = 'ownership'
         self.label = 'ownership'
         self.result = 'BAD'
+        self.waiver_auth = 'Anyone'
 
 # File in /usr/sbin owned by group 'bin' is BAD when comparing Koji
 # builds
@@ -940,13 +954,14 @@ class SlashUsrSlashSbinOwnedByGroupBinCompareKoji(TestCompareKoji):
         TestCompareKoji.setUp(self)
 
         # add file owned by root
-        self.before_rpm.add_installed_file(installPath='usr/sbin/testscript',
+        self.after_rpm.add_installed_file(installPath='usr/sbin/testscript',
                                     sourceFile=rpmfluff.SourceFile('testscript.sh', script_source),
                                     group="bin")
 
         self.inspection = 'ownership'
         self.label = 'ownership'
         self.result = 'BAD'
+        self.waiver_auth = 'Anyone'
 
 ###################
 # Forbidden owner #
@@ -1064,13 +1079,14 @@ class SlashBinOwnedByGroupMockCompareKoji(TestCompareKoji):
         TestCompareKoji.setUp(self)
 
         # add file owned by root
-        self.before_rpm.add_installed_file(installPath='bin/testscript',
+        self.after_rpm.add_installed_file(installPath='bin/testscript',
                                     sourceFile=rpmfluff.SourceFile('testscript.sh', script_source),
                                     group="mock")
 
         self.inspection = 'ownership'
         self.label = 'ownership'
         self.result = 'BAD'
+        self.waiver_auth = 'Anyone'
 
 ###################################
 # CAP_SETUID and world executable #
@@ -1081,136 +1097,163 @@ class CapSETUIDWithOtherExecRPMs(TestRPMs):
     def setUp(self):
         TestRPMs.setUp(self)
 
-        # add file owned by root
-        self.rpm.add_installed_file(installPath='bin/testscript',
-                                    sourceFile=rpmfluff.SourceFile('testscript.sh', script_source),
-                                    owner="root")
-
-        # now set the setuid capability and set o+x
-        self.rpm.section_install += "( setcap 'cap_setuid+ep' /bin/testscript ; chmod o+x /bin/testscript )\n"
+        # add file owned by root w/ setuid capability and g+x mode
+        # (basically duplicate add_installed_file() here because we
+        # need to use the %caps macro)
+        installPath = 'bin/testscript'
+        sourceId = self.rpm.add_source(rpmfluff.SourceFile('testscript.sh', script_source))
+        self.rpm.create_parent_dirs(installPath)
+        self.rpm.section_install += "install -D %%{SOURCE%i} $RPM_BUILD_ROOT/%s\n" % (sourceId, self.rpm.escape_path(installPath))
+        sub = self.rpm.get_subpackage(None)
+        sub.section_files += "%%attr(0707,root,bin) %%caps(cap_setuid=ep) /%s\n" % installPath
 
         self.inspection = 'ownership'
         self.label = 'ownership'
         self.result = 'BAD'
+        self.waiver_auth = 'Anyone'
 
 # File with CAP_SETUID and o+x is BAD in Koji build
 class CapSETUIDWithOtherExecKoji(TestKoji):
     def setUp(self):
         TestKoji.setUp(self)
 
-        # add file owned by root
-        self.rpm.add_installed_file(installPath='bin/testscript',
-                                    sourceFile=rpmfluff.SourceFile('testscript.sh', script_source),
-                                    owner="root")
-
-        # now set the setuid capability and set o+x
-        self.rpm.section_install += "( setcap 'cap_setuid+ep' /bin/testscript ; chmod o+x /bin/testscript )\n"
+        # add file owned by root w/ setuid capability and g+x mode
+        # (basically duplicate add_installed_file() here because we
+        # need to use the %caps macro)
+        installPath = 'bin/testscript'
+        sourceId = self.rpm.add_source(rpmfluff.SourceFile('testscript.sh', script_source))
+        self.rpm.create_parent_dirs(installPath)
+        self.rpm.section_install += "install -D %%{SOURCE%i} $RPM_BUILD_ROOT/%s\n" % (sourceId, self.rpm.escape_path(installPath))
+        sub = self.rpm.get_subpackage(None)
+        sub.section_files += "%%attr(0707,root,bin) %%caps(cap_setuid=ep) /%s\n" % installPath
 
         self.inspection = 'ownership'
         self.label = 'ownership'
         self.result = 'BAD'
+        self.waiver_auth = 'Anyone'
 
 # File with CAP_SETUID and o+x is BAD when comparing RPMs
 class CapSETUIDWithOtherExecCompareRPMs(TestCompareRPMs):
     def setUp(self):
         TestCompareRPMs.setUp(self)
 
-        # add file owned by root
-        self.before_rpm.add_installed_file(installPath='bin/testscript',
-                                    sourceFile=rpmfluff.SourceFile('testscript.sh', script_source),
-                                    owner="root")
-
-        # now set the setuid capability and set o+x
-        self.after_rpm.section_install += "( setcap 'cap_setuid+ep' /bin/testscript ; chmod o+x /bin/testscript )\n"
+        # add file owned by root w/ setuid capability and o+x mode
+        # (basically duplicate add_installed_file() here because we
+        # need to use the %caps macro)
+        installPath = 'bin/testscript'
+        sourceId = self.after_rpm.add_source(rpmfluff.SourceFile('testscript.sh', script_source))
+        self.after_rpm.create_parent_dirs(installPath)
+        self.after_rpm.section_install += "install -D %%{SOURCE%i} $RPM_BUILD_ROOT/%s\n" % (sourceId, self.after_rpm.escape_path(installPath))
+        sub = self.after_rpm.get_subpackage(None)
+        sub.section_files += "%%attr(0707,root,bin) %%caps(cap_setuid=ep) /%s\n" % installPath
 
         self.inspection = 'ownership'
         self.label = 'ownership'
         self.result = 'BAD'
+        self.waiver_auth = 'Anyone'
 
 # File with CAP_SETUID and o+x is BAD when comparing Koji builds
 class CapSETUIDWithOtherExecCompareKoji(TestCompareKoji):
     def setUp(self):
         TestCompareKoji.setUp(self)
 
-        # add file owned by root
-        self.before_rpm.add_installed_file(installPath='bin/testscript',
-                                    sourceFile=rpmfluff.SourceFile('testscript.sh', script_source),
-                                    owner="root")
-
-        # now set the setuid capability and set o+x
-        self.after_rpm.section_install += "( setcap 'cap_setuid+ep' /bin/testscript ; chmod o+x /bin/testscript )\n"
+        # add file owned by root w/ setuid capability and o+x mode
+        # (basically duplicate add_installed_file() here because we
+        # need to use the %caps macro)
+        installPath = 'bin/testscript'
+        sourceId = self.after_rpm.add_source(rpmfluff.SourceFile('testscript.sh', script_source))
+        self.after_rpm.create_parent_dirs(installPath)
+        self.after_rpm.section_install += "install -D %%{SOURCE%i} $RPM_BUILD_ROOT/%s\n" % (sourceId, self.after_rpm.escape_path(installPath))
+        sub = self.after_rpm.get_subpackage(None)
+        sub.section_files += "%%attr(0707,root,bin) %%caps(cap_setuid=ep) /%s\n" % installPath
 
         self.inspection = 'ownership'
         self.label = 'ownership'
         self.result = 'BAD'
+        self.waiver_auth = 'Anyone'
 
 #################################
 # CAP_SETUID and group writable #
 #################################
 
 # File with CAP_SETUID and g+w is BAD in RPMs
+# The installed file needs to be owned by a group other than
+# bin_group, have execute permissions for owner/group/other, carry
+# group write permissions, and carry the CAP_SETUID effective
+# capability.
 class CapSETUIDWithGroupExecRPMs(TestRPMs):
     def setUp(self):
         TestRPMs.setUp(self)
 
-        # add file owned by root
-        self.rpm.add_installed_file(installPath='bin/testscript',
-                                    sourceFile=rpmfluff.SourceFile('testscript.sh', script_source),
-                                    owner="root")
-
-        # now set the setuid capability and set g+w
-        self.rpm.section_install += "( setcap 'cap_setuid+ep' /bin/testscript ; chmod g+w /bin/testscript )\n"
+        # add file owned by root w/ setuid capability and g+x mode
+        # (basically duplicate add_installed_file() here because we
+        # need to use the %caps macro)
+        installPath = 'bin/testscript'
+        sourceId = self.rpm.add_source(rpmfluff.SourceFile('testscript.sh', script_source))
+        self.rpm.create_parent_dirs(installPath)
+        self.rpm.section_install += "install -D %%{SOURCE%i} $RPM_BUILD_ROOT/%s\n" % (sourceId, self.rpm.escape_path(installPath))
+        sub = self.rpm.get_subpackage(None)
+        sub.section_files += "%%attr(0770,root,bin) %%caps(cap_setuid=ep) /%s\n" % installPath
 
         self.inspection = 'ownership'
         self.label = 'ownership'
         self.result = 'BAD'
+        self.waiver_auth = 'Anyone'
 
 # File with CAP_SETUID and g+w is BAD in Koji build
 class CapSETUIDWithGroupExecKoji(TestKoji):
     def setUp(self):
         TestKoji.setUp(self)
 
-        # add file owned by root
-        self.rpm.add_installed_file(installPath='bin/testscript',
-                                    sourceFile=rpmfluff.SourceFile('testscript.sh', script_source),
-                                    owner="root")
-
-        # now set the setuid capability and set g+w
-        self.rpm.section_install += "( setcap 'cap_setuid+ep' /bin/testscript ; chmod g+w /bin/testscript )\n"
+        # add file owned by root w/ setuid capability and g+x mode
+        # (basically duplicate add_installed_file() here because we
+        # need to use the %caps macro)
+        installPath = 'bin/testscript'
+        sourceId = self.rpm.add_source(rpmfluff.SourceFile('testscript.sh', script_source))
+        self.rpm.create_parent_dirs(installPath)
+        self.rpm.section_install += "install -D %%{SOURCE%i} $RPM_BUILD_ROOT/%s\n" % (sourceId, self.rpm.escape_path(installPath))
+        sub = self.rpm.get_subpackage(None)
+        sub.section_files += "%%attr(0770,root,bin) %%caps(cap_setuid=ep) /%s\n" % installPath
 
         self.inspection = 'ownership'
         self.label = 'ownership'
         self.result = 'BAD'
+        self.waiver_auth = 'Anyone'
 
 # File with CAP_SETUID and g+w is BAD when comparing RPMs
 class CapSETUIDWithGroupExecCompareRPMs(TestCompareRPMs):
     def setUp(self):
         TestCompareRPMs.setUp(self)
 
-        # add file owned by root
-        self.after_rpm.add_installed_file(installPath='bin/testscript',
-                                    sourceFile=rpmfluff.SourceFile('testscript.sh', script_source),
-                                    owner="root")
-
-        # now set the setuid capability and set g+w
-        self.after_rpm.section_install += "( setcap 'cap_setuid+ep' /bin/testscript ; chmod g+w /bin/testscript )\n"
+        # add file owned by root w/ setuid capability and g+x mode
+        # (basically duplicate add_installed_file() here because we
+        # need to use the %caps macro)
+        installPath = 'bin/testscript'
+        sourceId = self.after_rpm.add_source(rpmfluff.SourceFile('testscript.sh', script_source))
+        self.after_rpm.create_parent_dirs(installPath)
+        self.after_rpm.section_install += "install -D %%{SOURCE%i} $RPM_BUILD_ROOT/%s\n" % (sourceId, self.after_rpm.escape_path(installPath))
+        sub = self.after_rpm.get_subpackage(None)
+        sub.section_files += "%%attr(0770,root,bin) %%caps(cap_setuid=ep) /%s\n" % installPath
 
         self.inspection = 'ownership'
         self.label = 'ownership'
         self.result = 'BAD'
+        self.waiver_auth = 'Anyone'
 
 # File with CAP_SETUID and g+w is BAD when comparing Koji builds
 class CapSETUIDWithGroupExecCompareKoji(TestCompareKoji):
     def setUp(self):
         TestCompareKoji.setUp(self)
 
-        # add file owned by root
-        self.after_rpm.add_installed_file(installPath='bin/testscript',
-                                    sourceFile=rpmfluff.SourceFile('testscript.sh', script_source),
-                                    owner="root")
-
-        # now set the setuid capability and set g+w
-        self.after_rpm.section_install += "( setcap 'cap_setuid+ep' /bin/testscript ; chmod g+w /bin/testscript )\n"
+        # add file owned by root w/ setuid capability and g+x mode
+        # (basically duplicate add_installed_file() here because we
+        # need to use the %caps macro)
+        installPath = 'bin/testscript'
+        sourceId = self.after_rpm.add_source(rpmfluff.SourceFile('testscript.sh', script_source))
+        self.after_rpm.create_parent_dirs(installPath)
+        self.after_rpm.section_install += "install -D %%{SOURCE%i} $RPM_BUILD_ROOT/%s\n" % (sourceId, self.after_rpm.escape_path(installPath))
+        sub = self.after_rpm.get_subpackage(None)
+        sub.section_files += "%%attr(0770,root,bin) %%caps(cap_setuid=ep) /%s\n" % installPath
 
         self.inspection = 'ownership'
         self.label = 'ownership'
@@ -1226,69 +1269,65 @@ class FileOwnerChangedCompareRPMs(TestCompareRPMs):
     def setUp(self):
         TestCompareRPMs.setUp(self)
 
-        # add file owned by root
-        self.after_rpm.add_installed_file(installPath='bin/testscript',
-                                    sourceFile=rpmfluff.SourceFile('testscript.sh', script_source),
-                                    owner="root")
+        # Start with root owner
+        self.before_rpm.add_installed_file('bin/testscript', rpmfluff.SourceFile('testscript.sh', script_source), mode="0755", owner="root")
 
-        # Change ownership to bin
-        self.after_rpm.section_install += "chown bin /bin/testscript\n"
+        # Switch to bin owner
+        self.after_rpm.add_installed_file('bin/testscript', rpmfluff.SourceFile('testscript.sh', script_source), mode="0755", owner="bin")
 
         self.inspection = 'ownership'
         self.label = 'ownership'
-        self.result = 'VERIFY'
+        self.result = 'BAD'
+        self.waiver_auth = 'Anyone'
 
 # File owner changed is VERIFY when comparing Koji builds
 class FileOwnerChangedCompareKoji(TestCompareKoji):
     def setUp(self):
         TestCompareKoji.setUp(self)
 
-        # add file owned by root
-        self.rpm.add_installed_file(installPath='bin/testscript',
-                                    sourceFile=rpmfluff.SourceFile('testscript.sh', script_source),
-                                    owner="root")
+        # Start with root owner
+        self.before_rpm.add_installed_file('bin/testscript', rpmfluff.SourceFile('testscript.sh', script_source), mode="0755", owner="root")
 
-        # Change ownership to bin
-        self.after_rpm.section_install += "chown bin /bin/testscript\n"
+        # Switch to bin owner
+        self.after_rpm.add_installed_file('bin/testscript', rpmfluff.SourceFile('testscript.sh', script_source), mode="0755", owner="bin")
 
         self.inspection = 'ownership'
         self.label = 'ownership'
-        self.result = 'VERIFY'
+        self.result = 'BAD'
+        self.waiver_auth = 'Anyone'
 
 #################
 # Group changed #
 #################
 
 # File group changed is VERIFY when comparing RPMs
-class FileOwnerChangedCompareRPMs(TestCompareRPMs):
+class FileGroupChangedCompareRPMs(TestCompareRPMs):
     def setUp(self):
         TestCompareRPMs.setUp(self)
 
-        # add file with root group
-        self.before_rpm.add_installed_file(installPath='bin/testscript',
-                                    sourceFile=rpmfluff.SourceFile('testscript.sh', script_source),
-                                    group="root")
+        # Start with root owner
+        self.before_rpm.add_installed_file('bin/testscript', rpmfluff.SourceFile('testscript.sh', script_source), mode="0755", group="root")
 
-        # change group to bin
-        self.after_rpm.section_install += "chgrp bin /bin/testscript\n"
+        # Switch to bin owner
+        self.after_rpm.add_installed_file('bin/testscript', rpmfluff.SourceFile('testscript.sh', script_source), mode="0755", group="bin")
 
         self.inspection = 'ownership'
         self.label = 'ownership'
-        self.result = 'VERIFY'
+        self.result = 'BAD'
+        self.waiver_auth = 'Anyone'
 
 # File group changed is VERIFY when comparing Koji builds
-class FileOwnerChangedCompareKoji(TestCompareKoji):
+class FileGroupChangedCompareKoji(TestCompareKoji):
     def setUp(self):
         TestCompareKoji.setUp(self)
 
-        # add file with root group
-        self.before_rpm.add_installed_file(installPath='bin/testscript',
-                                    sourceFile=rpmfluff.SourceFile('testscript.sh', script_source),
-                                    group="root")
+        # Start with root owner
+        self.before_rpm.add_installed_file('bin/testscript', rpmfluff.SourceFile('testscript.sh', script_source), mode="0755", group="root")
 
-        # change group to bin
-        self.after_rpm.section_install += "chgrp bin /bin/testscript\n"
+        # Switch to bin owner
+        self.after_rpm.add_installed_file('bin/testscript', rpmfluff.SourceFile('testscript.sh', script_source), mode="0755", group="bin")
 
         self.inspection = 'ownership'
         self.label = 'ownership'
-        self.result = 'VERIFY'
+        self.result = 'BAD'
+        self.waiver_auth = 'Anyone'
