@@ -390,10 +390,9 @@ char *strappend(char *first, const char *second)
         return NULL;
     }
 
-    first = realloc(first, strlen(first) + strlen(second) + 2);
+    first = realloc(first, strlen(first) + strlen(second) + 1);
     assert(first != NULL);
     first = strcat(first, second);
-    first = strcat(first, "\n");
     return first;
 }
 
