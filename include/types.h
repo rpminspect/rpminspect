@@ -459,11 +459,27 @@ typedef TAILQ_HEAD(koji_rpmlist_s, _koji_rpmlist_entry_t) koji_rpmlist_t;
  * List of build IDs from a Koji build.
  */
 typedef struct _koji_buildlist_entry_t {
-    /* the main identifier in koji */
     int build_id;
-
-    /* the name of the build */
     char *package_name;
+    char *owner_name;
+    int task_id;
+    int state;
+    char *nvr;
+    char *start_time;
+    int creation_event_id;
+    char *creation_time;
+    char *epoch;
+    int tag_id;
+    char *completion_time;
+    char *tag_name;
+    char *version;
+    int volume_id;
+    char *release;
+    int package_id;
+    int owner_id;
+    int id;
+    char *volume_name;
+    char *name;
 
     /* List of RPMs in this build */
     koji_rpmlist_t *rpms;
@@ -519,11 +535,15 @@ struct koji_build {
      */
     char *original_url;
 
+    /* Content Generator information (currently not used in rpminspect) */
+    int cg_id;
+    char *cg_name;
+
     /* Module metadata -- only if this build is a module */
     char *modulemd_str;
     char *module_name;
     char *module_stream;
-    char *module_build_service_id;
+    int module_build_service_id;
     char *module_version;
     char *module_context;
     char *module_content_koji_tag;
