@@ -501,7 +501,7 @@ static int download_build(const struct rpminspect *ri, struct koji_build *build)
                 xasprintf(&dst, "%s/%s/%s/%s", workri->worksubdir, build_desc[whichbuild], rpm->arch, pkg);
             }
 
-            if (workri->buildtype == KOJI_BUILD_MODULE) {
+            if (build->volume_name == NULL || !strcmp(build->volume_name, "DEFAULT")) {
                 srcfmt = "%s/%s/%s/%s/%s/%s/%s";
             } else {
                 srcfmt = "%s/vol/%s/packages/%s/%s/%s/%s/%s";
