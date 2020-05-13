@@ -60,7 +60,7 @@ GElf_Half get_elf_machine(Elf *elf)
     if (gelf_getehdr(elf, &ehdr) == NULL) {
         fprintf(stderr, "*** gelf_getehdr() failure (%d): %s\n", errno, strerror(errno));
         fflush(stderr);
-        return ET_NONE;
+        return EM_NONE;
     }
 
     return ehdr.e_machine;
