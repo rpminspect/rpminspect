@@ -975,7 +975,7 @@ class SlashBinOwnedByMockRPMs(TestRPMs):
         # add file owned by root
         self.rpm.add_installed_file(installPath='bin/testscript',
                                     sourceFile=rpmfluff.SourceFile('testscript.sh', script_source),
-                                    owner="mock")
+                                    owner="mockbuild")
 
         self.inspection = 'ownership'
         self.label = 'ownership'
@@ -990,7 +990,7 @@ class SlashBinOwnedByMockKoji(TestKoji):
         # add file owned by root
         self.rpm.add_installed_file(installPath='bin/testscript',
                                     sourceFile=rpmfluff.SourceFile('testscript.sh', script_source),
-                                    owner="mock")
+                                    owner="mockbuild")
 
         self.inspection = 'ownership'
         self.label = 'ownership'
@@ -1003,13 +1003,14 @@ class SlashBinOwnedByMockCompareRPMs(TestCompareRPMs):
         TestCompareRPMs.setUp(self)
 
         # add file owned by root
-        self.before_rpm.add_installed_file(installPath='bin/testscript',
+        self.after_rpm.add_installed_file(installPath='bin/testscript',
                                     sourceFile=rpmfluff.SourceFile('testscript.sh', script_source),
-                                    owner="mock")
+                                    owner="mockbuild")
 
         self.inspection = 'ownership'
         self.label = 'ownership'
         self.result = 'BAD'
+        self.waiver_auth = 'Anyone'
 
 # File owned by 'mockbuild' is BAD when comparing Koji builds
 class SlashBinOwnedByMockCompareKoji(TestCompareKoji):
@@ -1017,13 +1018,14 @@ class SlashBinOwnedByMockCompareKoji(TestCompareKoji):
         TestCompareKoji.setUp(self)
 
         # add file owned by root
-        self.before_rpm.add_installed_file(installPath='bin/testscript',
+        self.after_rpm.add_installed_file(installPath='bin/testscript',
                                     sourceFile=rpmfluff.SourceFile('testscript.sh', script_source),
-                                    owner="mock")
+                                    owner="mockbuild")
 
         self.inspection = 'ownership'
         self.label = 'ownership'
         self.result = 'BAD'
+        self.waiver_auth = 'Anyone'
 
 ###################
 # Forbidden group #
@@ -1037,7 +1039,7 @@ class SlashBinOwnedByGroupMockRPMs(TestRPMs):
         # add file owned by root
         self.rpm.add_installed_file(installPath='bin/testscript',
                                     sourceFile=rpmfluff.SourceFile('testscript.sh', script_source),
-                                    group="mock")
+                                    group="mockbuild")
 
         self.inspection = 'ownership'
         self.label = 'ownership'
@@ -1052,7 +1054,7 @@ class SlashBinOwnedByGroupMockKoji(TestKoji):
         # add file owned by root
         self.rpm.add_installed_file(installPath='bin/testscript',
                                     sourceFile=rpmfluff.SourceFile('testscript.sh', script_source),
-                                    group="mock")
+                                    group="mockbuild")
 
         self.inspection = 'ownership'
         self.label = 'ownership'
@@ -1065,13 +1067,14 @@ class SlashBinOwnedByGroupMockCompareRPMs(TestCompareRPMs):
         TestCompareRPMs.setUp(self)
 
         # add file owned by root
-        self.before_rpm.add_installed_file(installPath='bin/testscript',
+        self.after_rpm.add_installed_file(installPath='bin/testscript',
                                     sourceFile=rpmfluff.SourceFile('testscript.sh', script_source),
-                                    group="mock")
+                                    group="mockbuild")
 
         self.inspection = 'ownership'
         self.label = 'ownership'
         self.result = 'BAD'
+        self.waiver_auth = 'Anyone'
 
 # File owned by group 'mockbuild' is BAD when comparing Koji builds
 class SlashBinOwnedByGroupMockCompareKoji(TestCompareKoji):
@@ -1081,7 +1084,7 @@ class SlashBinOwnedByGroupMockCompareKoji(TestCompareKoji):
         # add file owned by root
         self.after_rpm.add_installed_file(installPath='bin/testscript',
                                     sourceFile=rpmfluff.SourceFile('testscript.sh', script_source),
-                                    group="mock")
+                                    group="mockbuild")
 
         self.inspection = 'ownership'
         self.label = 'ownership'
