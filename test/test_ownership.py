@@ -73,7 +73,7 @@ class SlashUsrSlashBinOwnedByRootRPMs(TestRPMs):
         self.result = 'OK'
 
 # File in /usr/sbin owned by 'root' is OK in RPMs
-class SlashUserSlashSbinOwnedByRootRPMs(TestRPMs):
+class SlashUsrSlashSbinOwnedByRootRPMs(TestRPMs):
     def setUp(self):
         TestRPMs.setUp(self)
 
@@ -132,7 +132,7 @@ class SlashUsrSlashBinOwnedByBinRPMs(TestRPMs):
         self.waiver_auth = 'Anyone'
 
 # File in /usr/sbin owned by 'bin' is BAD in RPMs
-class SlashUserSlashSbinOwnedByBinRPMs(TestRPMs):
+class SlashUsrSlashSbinOwnedByBinRPMs(TestRPMs):
     def setUp(self):
         TestRPMs.setUp(self)
 
@@ -207,7 +207,7 @@ class SlashBinOwnedByBinKoji(TestKoji):
     def setUp(self):
         TestKoji.setUp(self)
 
-        # add file owned by root
+        # add file owned by bin
         self.rpm.add_installed_file(installPath='bin/testscript',
                                     sourceFile=rpmfluff.SourceFile('testscript.sh', script_source),
                                     owner="bin")
@@ -218,46 +218,49 @@ class SlashBinOwnedByBinKoji(TestKoji):
         self.waiver_auth = 'Anyone'
 
 # File in /sbin owned by 'bin' is BAD in Koji build
-class SlashSbinOwnedByRootKoji(TestKoji):
+class SlashSbinOwnedByBinKoji(TestKoji):
     def setUp(self):
         TestKoji.setUp(self)
 
-        # add file owned by root
+        # add file owned by bin
         self.rpm.add_installed_file(installPath='sbin/testscript',
                                     sourceFile=rpmfluff.SourceFile('testscript.sh', script_source),
                                     owner="bin")
 
         self.inspection = 'ownership'
         self.label = 'ownership'
-        self.result = 'OK'
+        self.result = 'BAD'
+        self.waiver_auth = 'Anyone'
 
 # File in /usr/bin owned by 'bin' is BAD in Koji build
-class SlashUsrSlashBinOwnedByRootKoji(TestKoji):
+class SlashUsrSlashBinOwnedByBinKoji(TestKoji):
     def setUp(self):
         TestKoji.setUp(self)
 
-        # add file owned by root
+        # add file owned by bin
         self.rpm.add_installed_file(installPath='usr/bin/testscript',
                                     sourceFile=rpmfluff.SourceFile('testscript.sh', script_source),
                                     owner="bin")
 
         self.inspection = 'ownership'
         self.label = 'ownership'
-        self.result = 'OK'
+        self.result = 'BAD'
+        self.waiver_auth = 'Anyone'
 
 # File in /usr/sbin owned by 'bin' is BAD in Koji build
-class SlashUsrSlashSbinOwnedByRootKoji(TestKoji):
+class SlashUsrSlashSbinOwnedByBinKoji(TestKoji):
     def setUp(self):
         TestKoji.setUp(self)
 
-        # add file owned by root
+        # add file owned by bin
         self.rpm.add_installed_file(installPath='bin/testscript',
                                     sourceFile=rpmfluff.SourceFile('testscript.sh', script_source),
                                     owner="bin")
 
         self.inspection = 'ownership'
         self.label = 'ownership'
-        self.result = 'OK'
+        self.result = 'BAD'
+        self.waiver_auth = 'Anyone'
 
 # File in /bin owned by 'root' is OK when comparing RPMs
 class SlashBinOwnedByRootCompareRPMs(TestCompareRPMs):
@@ -1267,7 +1270,7 @@ class CapSETUIDWithGroupExecCompareKoji(TestCompareKoji):
 # Owner changed #
 #################
 
-# File owner changed is VERIFY when comparing RPMs
+# File owner changed is BAD when comparing RPMs
 class FileOwnerChangedCompareRPMs(TestCompareRPMs):
     def setUp(self):
         TestCompareRPMs.setUp(self)
@@ -1283,7 +1286,7 @@ class FileOwnerChangedCompareRPMs(TestCompareRPMs):
         self.result = 'BAD'
         self.waiver_auth = 'Anyone'
 
-# File owner changed is VERIFY when comparing Koji builds
+# File owner changed is BAD when comparing Koji builds
 class FileOwnerChangedCompareKoji(TestCompareKoji):
     def setUp(self):
         TestCompareKoji.setUp(self)
@@ -1303,7 +1306,7 @@ class FileOwnerChangedCompareKoji(TestCompareKoji):
 # Group changed #
 #################
 
-# File group changed is VERIFY when comparing RPMs
+# File group changed is BAD when comparing RPMs
 class FileGroupChangedCompareRPMs(TestCompareRPMs):
     def setUp(self):
         TestCompareRPMs.setUp(self)
