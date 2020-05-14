@@ -351,6 +351,9 @@ int main(int argc, char **argv) {
     rpmpeer_entry_t *peer = NULL;
     const char *after_rel = NULL;
     const char *before_rel = NULL;
+    struct result_params params;
+    size_t cmdlen = 0;
+    char *tail = NULL;
 
     /* Be friendly to "rpminspect ... 2>&1 | tee" use case */
     setlinebuf(stdout);
@@ -679,6 +682,32 @@ int main(int argc, char **argv) {
         rpmFreeRpmrc();
         exit(RI_PROGRAM_ERROR);
     }
+
+    /* add command information to the results output */
+    init_result_params(&params);
+    params.severity = RESULT_INFO;
+    params.header = HEADER_RPMINSPECT;
+    params.msg = _("command line");
+
+    for (i = 0; i < argc; i++) {
+        cmdlen += strlen(argv[i]) + 1;
+    }
+
+    params.details = malloc(cmdlen + 1);
+    assert(params.details != NULL);
+    tail = params.details;
+
+    for (i = 0; i < argc; i++) {
+        if (i != 0) {
+            tail = stpcpy(tail, " ");
+        }
+
+        tail = stpcpy(tail, argv[i]);
+    }
+
+    add_result_entry(&ri.results, &params);
+    ri.worst_result = params.severity;
+    free(params.details);
 
     /* perform the selected inspections */
     if (!fetch_only) {
