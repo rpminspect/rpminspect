@@ -48,7 +48,7 @@ void init_result_params(struct result_params *params)
 results_t *init_results(void) {
     results_t *results = NULL;
 
-    results = calloc(1, sizeof(*(results)));
+    results = calloc(1, sizeof(*results));
     assert(results != NULL);
     TAILQ_INIT(results);
     return results;
@@ -73,17 +73,21 @@ void free_results(results_t *results) {
         entry->details = NULL;
         free(entry->noun);
         entry->noun = NULL;
+        free(entry->arch);
+        entry->arch = NULL;
+        free(entry->file);
+        entry->file = NULL;
 
         /* these are all consts */
         entry->header = NULL;
         entry->remedy = NULL;
-        entry->arch = NULL;
-        entry->file = NULL;
 
         free(entry);
+        entry = NULL;
     }
 
     free(results);
+    results = NULL;
 
     return;
 }

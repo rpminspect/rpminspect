@@ -141,7 +141,7 @@ struct result_params {
     char *details;
     const char *remedy;
     verb_t verb;
-    char *noun;
+    const char *noun;
     const char *arch;
     const char *file;
 };
@@ -157,8 +157,8 @@ typedef struct _results_entry_t {
     char *noun;               /* noun impacted by 'verb', one line
                                  (e.g., a file path or an RPM dependency
                                         string) */
-    const char *arch;         /* architecture impacted (${ARCH}) */
-    const char *file;         /* file impacted (${FILE}) */
+    char *arch;               /* architecture impacted (${ARCH}) */
+    char *file;               /* file impacted (${FILE}) */
     TAILQ_ENTRY(_results_entry_t) items;
 } results_entry_t;
 

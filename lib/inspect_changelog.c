@@ -437,10 +437,9 @@ static bool check_bin_rpm_changelog(struct rpminspect *ri, const rpmpeer_entry_t
             params.remedy = REMEDY_CHANGELOG;
             params.details = entry->data;
             params.verb = VERB_FAILED;
-            xasprintf(&params.noun, "'%s' in %%changelog", entry->data);
+            params.noun = entry->data;
             add_result(ri, &params);
             free(params.msg);
-            free(params.noun);
             result = false;
         }
     }
