@@ -367,7 +367,6 @@ static bool check_bin_rpm_changelog(struct rpminspect *ri, const rpmpeer_entry_t
     char *after_nevr = NULL;
     string_list_t *before_changelog = NULL;
     string_list_t *after_changelog = NULL;
-    char *msg = NULL;
     char *before_output = NULL;
     char *after_output = NULL;
     char *diff_output = NULL;
@@ -414,7 +413,7 @@ static bool check_bin_rpm_changelog(struct rpminspect *ri, const rpmpeer_entry_t
             params.waiverauth = NOT_WAIVABLE;
             add_result(ri, &params);
         } else {
-            xasprintf(&msg, "%%changelog modified between the %s and %s builds", before_nevr, after_nevr);
+            xasprintf(&params.msg, "%%changelog modified between the %s and %s builds", before_nevr, after_nevr);
             params.waiverauth = WAIVABLE_BY_ANYONE;
             params.remedy = REMEDY_CHANGELOG;
             add_result(ri, &params);
@@ -437,10 +436,9 @@ static bool check_bin_rpm_changelog(struct rpminspect *ri, const rpmpeer_entry_t
             params.remedy = REMEDY_CHANGELOG;
             params.details = entry->data;
             params.verb = VERB_FAILED;
-            xasprintf(&params.noun, "'%s' in %%changelog", entry->data);
+            params.noun = entry->data;
             add_result(ri, &params);
             free(params.msg);
-            free(params.noun);
             result = false;
         }
     }

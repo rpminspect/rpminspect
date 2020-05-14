@@ -262,6 +262,8 @@ static void curl_helper(const bool verbose, const char *src, const char *dst) {
     assert(src != NULL);
     assert(dst != NULL);
 
+    DEBUG_PRINT("src=|%s|\ndst=|%s|\n", src, dst);
+
     /* initialize curl */
     if (!(c = curl_easy_init())) {
         fprintf(stderr, _("*** curl_easy_init() failed\n"));
@@ -321,6 +323,7 @@ static int download_build(const struct rpminspect *ri, struct koji_build *build)
     koji_buildlist_entry_t *buildentry = NULL;
     koji_rpmlist_entry_t *rpm = NULL;
     char *src = NULL;
+    char *srcfmt = NULL;
     char *dst = NULL;
     char *pkg = NULL;
     FILE *fp = NULL;
@@ -349,9 +352,9 @@ static int download_build(const struct rpminspect *ri, struct koji_build *build)
         if (ri->buildtype == KOJI_BUILD_MODULE) {
             /* Create destination directory */
             if (fetch_only) {
-                dst = strdup(workri->worksubdir);
+                xasprintf(&dst, "%s/files", workri->worksubdir);
             } else {
-                xasprintf(&dst, "%s/%s", workri->worksubdir, build_desc[whichbuild]);
+                xasprintf(&dst, "%s/%s/files", workri->worksubdir, build_desc[whichbuild]);
             }
 
             if (mkdirp(dst, mode)) {
@@ -360,10 +363,8 @@ static int download_build(const struct rpminspect *ri, struct koji_build *build)
                 return -1;
             }
 
-            free(dst);
-
             /* Get the main metadata file */
-            xasprintf(&dst, "%s/%s/modulemd.txt", workri->worksubdir, build_desc[whichbuild]);
+            dst = strappend(dst, "/modulemd.txt");
             xasprintf(&src, "%s/packages/%s/%s/%s/files/module/modulemd.txt", workri->kojimbs, build->package_name, build->version, build->release);
             curl_helper(workri->verbose, src, dst);
             free(src);
@@ -501,11 +502,22 @@ static int download_build(const struct rpminspect *ri, struct koji_build *build)
             }
 
             if (build->volume_name == NULL || !strcmp(build->volume_name, "DEFAULT")) {
-                xasprintf(&src, "%s/packages/%s/%s/%s/%s/%s", (workri->buildtype == KOJI_BUILD_MODULE) ? workri->kojimbs : workri->kojiursine, buildentry->package_name, build->version, build->release, rpm->arch, pkg);
+                srcfmt = "%s/%s/%s/%s/%s/%s/%s";
             } else {
-                xasprintf(&src, "%s/vol/%s/packages/%s/%s/%s/%s/%s", (workri->buildtype == KOJI_BUILD_MODULE) ? workri->kojimbs : workri->kojiursine, build->volume_name, buildentry->package_name, build->version, build->release, rpm->arch, pkg);
+                srcfmt = "%s/vol/%s/packages/%s/%s/%s/%s/%s";
             }
 
+            /* construct the source download url */
+            xasprintf(&src, srcfmt,
+                      (workri->buildtype == KOJI_BUILD_MODULE) ? workri->kojimbs : workri->kojiursine,
+                      (build->volume_name == NULL || !strcmp(build->volume_name, "DEFAULT")) ? "packages" : build->volume_name,
+                      buildentry->package_name,
+                      (buildentry->version == NULL) ? rpm->version : buildentry->version,
+                      (buildentry->release == NULL) ? rpm->release : buildentry->release,
+                      rpm->arch,
+                      pkg);
+
+            /* download the package */
             curl_helper(workri->verbose, src, dst);
 
             /* gather the RPM header */
