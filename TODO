@@ -101,8 +101,6 @@ inspections lack integration tests:
     removedfiles (compare only)
     addedfiles (compare only)
     upstream (compare only)
-    ownership
-    shellsyntax
     annocheck
     DT_NEEDED
     filesize
