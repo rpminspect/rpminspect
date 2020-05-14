@@ -26,6 +26,7 @@
 /*
  * Inspection headers
  */
+#define HEADER_RPMINSPECT    "rpminspect"
 #define HEADER_METADATA      "header-metadata"
 #define HEADER_EMPTYRPM      "empty-payload"
 #define HEADER_LICENSE       "license"
