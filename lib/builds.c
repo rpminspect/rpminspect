@@ -229,10 +229,8 @@ static int copytree(const char *fpath, const struct stat *sb,
         }
 
         /* Gather the RPM header for packages */
-        if (strsuffix(bufpath, RPM_FILENAME_EXTENSION)) {
-            if (get_rpm_info(bufpath)) {
-                ret = -1;
-            }
+        if (strsuffix(bufpath, RPM_FILENAME_EXTENSION) && get_rpm_info(bufpath)) {
+            ret = -1;
         }
     } else {
         fprintf(stderr, _("*** unknown directory member encountered: %s\n"), fpath);
@@ -521,7 +519,7 @@ static int download_build(const struct rpminspect *ri, struct koji_build *build)
             curl_helper(workri->verbose, src, dst);
 
             /* gather the RPM header */
-            if (get_rpm_info(dst)) {
+            if (strsuffix(dst, RPM_FILENAME_EXTENSION) && get_rpm_info(dst)) {
                 fprintf(stderr, _("*** error reading RPM: %s\n"), dst);
                 fflush(stderr);
                 return -1;
@@ -606,7 +604,7 @@ static int download_task(const struct rpminspect *ri, struct koji_task *task)
             curl_helper(workri->verbose, src, dst);
 
             /* gather the RPM header */
-            if (get_rpm_info(dst)) {
+            if (strsuffix(dst, RPM_FILENAME_EXTENSION) && get_rpm_info(dst)) {
                 fprintf(stderr, _("*** error reading RPM: %s\n"), dst);
                 fflush(stderr);
                 return -1;
@@ -629,7 +627,7 @@ static int download_task(const struct rpminspect *ri, struct koji_task *task)
             curl_helper(workri->verbose, src, dst);
 
             /* gather the RPM header */
-            if (get_rpm_info(dst)) {
+            if (strsuffix(dst, RPM_FILENAME_EXTENSION) && get_rpm_info(dst)) {
                 fprintf(stderr, _("*** error reading RPM: %s\n"), dst);
                 fflush(stderr);
                 return -1;
