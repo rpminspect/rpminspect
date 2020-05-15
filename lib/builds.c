@@ -49,7 +49,7 @@ static char *build_desc[] = { "before", "after" };
 
 /* Local prototypes */
 static void set_worksubdir(struct rpminspect *, workdir_t, const struct koji_build *, const struct koji_task *);
-static int get_rpm_info(const char *);
+static void get_rpm_info(const char *);
 static void prune_local(const int);
 static int copytree(const char *, const struct stat *, int, struct FTW *);
 static int download_build(const struct rpminspect *, struct koji_build *);
@@ -115,24 +115,24 @@ static void set_worksubdir(struct rpminspect *ri, workdir_t wd,
 /*
  * Collect package peer information.
  */
-static int get_rpm_info(const char *pkg) {
-    int ret = 0;
+static void get_rpm_info(const char *pkg)
+{
     Header h;
     const char *arch = NULL;
 
     h = get_rpm_header(workri, pkg);
 
     if (h == NULL) {
-        return ret;
+        return;
     }
 
     arch = get_rpm_header_arch(h);
 
     if (allowed_arch(workri, arch)) {
-        ret = add_peer(&workri->peers, whichbuild, fetch_only, pkg, h);
+        add_peer(&workri->peers, whichbuild, fetch_only, pkg, h);
     }
 
-    return ret;
+    return;
 }
 
 /*
@@ -175,8 +175,8 @@ static void prune_local(const int whichbuild) {
 /*
  * Used to recursively copy a build tree over to the working directory.
  */
-static int copytree(const char *fpath, const struct stat *sb,
-                    int tflag, struct FTW *ftwbuf) {
+static int copytree(const char *fpath, const struct stat *sb, int tflag, struct FTW *ftwbuf)
+{
     static int toptrim = 0;
     char *workfpath = NULL;
     char *bufpath = NULL;
@@ -229,9 +229,7 @@ static int copytree(const char *fpath, const struct stat *sb,
         }
 
         /* Gather the RPM header for packages */
-        if (strsuffix(bufpath, RPM_FILENAME_EXTENSION) && get_rpm_info(bufpath)) {
-            ret = -1;
-        }
+        get_rpm_info(bufpath);
     } else {
         fprintf(stderr, _("*** unknown directory member encountered: %s\n"), fpath);
         ret = -1;
@@ -519,11 +517,7 @@ static int download_build(const struct rpminspect *ri, struct koji_build *build)
             curl_helper(workri->verbose, src, dst);
 
             /* gather the RPM header */
-            if (strsuffix(dst, RPM_FILENAME_EXTENSION) && get_rpm_info(dst)) {
-                fprintf(stderr, _("*** error reading RPM: %s\n"), dst);
-                fflush(stderr);
-                return -1;
-            }
+            get_rpm_info(dst);
 
             /* start over */
             free(src);
@@ -604,11 +598,7 @@ static int download_task(const struct rpminspect *ri, struct koji_task *task)
             curl_helper(workri->verbose, src, dst);
 
             /* gather the RPM header */
-            if (strsuffix(dst, RPM_FILENAME_EXTENSION) && get_rpm_info(dst)) {
-                fprintf(stderr, _("*** error reading RPM: %s\n"), dst);
-                fflush(stderr);
-                return -1;
-            }
+            get_rpm_info(dst);
 
             free(dst);
             free(src);
@@ -627,11 +617,7 @@ static int download_task(const struct rpminspect *ri, struct koji_task *task)
             curl_helper(workri->verbose, src, dst);
 
             /* gather the RPM header */
-            if (strsuffix(dst, RPM_FILENAME_EXTENSION) && get_rpm_info(dst)) {
-                fprintf(stderr, _("*** error reading RPM: %s\n"), dst);
-                fflush(stderr);
-                return -1;
-            }
+            get_rpm_info(dst);
 
             free(dst);
             free(src);
