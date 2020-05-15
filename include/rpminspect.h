@@ -194,7 +194,7 @@ const char *get_rpm_header_arch(Header);
 /* peers.c */
 rpmpeer_t *init_rpmpeer(void);
 void free_rpmpeer(rpmpeer_t *);
-int add_peer(rpmpeer_t **, int, bool, const char *, Header);
+void add_peer(rpmpeer_t **, int, bool, const char *, Header);
 
 /* files.c */
 void free_files(rpmfile_t *files);

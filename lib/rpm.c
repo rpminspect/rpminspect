@@ -91,7 +91,6 @@ Header get_rpm_header(struct rpminspect *ri, const char *pkg)
     Fclose(fd);
 
     if (result != RPMRC_OK) {
-        fprintf(stderr, _("*** error reading package header for %s\n"), pkg);
         return NULL;
     }
 

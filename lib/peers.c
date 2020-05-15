@@ -72,7 +72,8 @@ void free_rpmpeer(rpmpeer_t *peers) {
 /*
  * Add the specified package as a peer in the list of packages.
  */
-int add_peer(rpmpeer_t **peers, int whichbuild, bool fetch_only, const char *pkg, Header hdr) {
+void add_peer(rpmpeer_t **peers, int whichbuild, bool fetch_only, const char *pkg, Header hdr)
+{
     rpmpeer_entry_t *peer = NULL;
     bool found = false;
     const char *newname = NULL;
@@ -124,7 +125,7 @@ int add_peer(rpmpeer_t **peers, int whichbuild, bool fetch_only, const char *pkg
         if ((peer = calloc(1, sizeof(*peer))) == NULL) {
             fprintf(stderr, _("*** failed to allocate new peer peer\n"));
             fflush(stderr);
-            return 1;
+            return;
         }
     }
 
@@ -158,5 +159,5 @@ int add_peer(rpmpeer_t **peers, int whichbuild, bool fetch_only, const char *pkg
         find_file_peers(peer->before_files, peer->after_files);
     }
 
-    return 0;
+    return;
 }
