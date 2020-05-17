@@ -424,7 +424,12 @@ static void set_peer(rpmfile_entry_t *file, ENTRY *eptr)
  * Any time a match is found, the hash table ENTRY's value field will
  * be set to NULL so that the match cannot be used again. For the
  * purposes of adding tests to match peers, this means that attempts
- * must be made in order from best match to worst match.
+ * must be made in order from best match to worst match. This is an
+ * important thing to note. To see if a file from the hash table can
+ * be used, we need to check that hsearch_r() returns non-zero *and*
+ * the value of eptr->data is not NULL. If an entry is still there but
+ * eptr->data is now NULL it means we have already matched it with
+ * another peer.
  *
  * In cases where the peer found has changed paths or subpackages,
  * this function will modify the probably_moved_path and
@@ -464,7 +469,7 @@ static void find_one_peer(rpmfile_entry_t *file, rpmfile_t *after, struct hsearc
     eptr = NULL;
     hsearch_result = hsearch_r(e, FIND, &eptr, after_table);
 
-    if (hsearch_result != 0) {
+    if (hsearch_result != 0 && eptr->data != NULL) {
         set_peer(file, eptr);
         return;
     }
@@ -484,7 +489,7 @@ static void find_one_peer(rpmfile_entry_t *file, rpmfile_t *after, struct hsearc
         hsearch_result = hsearch_r(e, FIND, &eptr, after_table);
         free(search_path);
 
-        if (hsearch_result != 0) {
+        if (hsearch_result != 0 && eptr->data != NULL) {
             set_peer(file, eptr);
             return;
         }
@@ -509,7 +514,7 @@ static void find_one_peer(rpmfile_entry_t *file, rpmfile_t *after, struct hsearc
             hsearch_result = hsearch_r(e, FIND, &eptr, after_table);
             free(search_path);
 
-            if (hsearch_result != 0) {
+            if (hsearch_result != 0 && eptr->data != NULL) {
                 set_peer(file, eptr);
                 return;
             }
@@ -547,7 +552,7 @@ static void find_one_peer(rpmfile_entry_t *file, rpmfile_t *after, struct hsearc
                 eptr = NULL;
                 hsearch_result = hsearch_r(e, FIND, &eptr, after_table);
 
-                if (hsearch_result != 0) {
+                if (hsearch_result != 0 && eptr->data != NULL) {
                     set_peer(file, eptr);
                     file->probably_moved_path = true;
                     file->peer_file->probably_moved_path = true;
