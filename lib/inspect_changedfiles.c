@@ -417,6 +417,9 @@ static bool changedfiles_driver(struct rpminspect *ri, rpmfile_entry_t *file)
             params.noun = _("${FILE}");
             add_result(ri, &params);
             result = false;
+
+            /* details is not allocated here, freeing errors will take care of it */
+            params.details = NULL;
         }
     }
 
