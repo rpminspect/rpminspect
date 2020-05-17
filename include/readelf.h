@@ -25,8 +25,14 @@
 #include <gelf.h>
 #include <stdbool.h>
 #include <stdint.h>
+#include <elf.h>
 
 #include "types.h"
+
+/* Older systems might lack this definition */
+#ifndef EM_BPF
+#define EM_BPF 247 /* Linux BPF -- in-kernel virtual machine */
+#endif
 
 Elf *get_elf(const char *, int *);
 Elf *get_elf_archive(const char *, int *);
