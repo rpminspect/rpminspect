@@ -100,7 +100,6 @@ inspections lack integration tests:
     changedfiles (compare only)
     removedfiles (compare only)
     addedfiles (compare only)
-    upstream (compare only)
     annocheck
     DT_NEEDED
     filesize
