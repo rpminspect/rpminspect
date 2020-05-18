@@ -192,8 +192,15 @@ bool inspect_upstream(struct rpminspect *ri)
         }
     }
 
-    assert(bv != NULL);
-    assert(av != NULL);
+    /* If no versions found, we are not looking at source packages */
+    if (bv == NULL || av == NULL) {
+        params.severity = RESULT_INFO;
+        params.waiverauth = NOT_WAIVABLE;
+        xasprintf(&params.msg, _("No source packages available, skipping inspection."));
+        add_result(ri, &params);
+        free(params.msg);
+        return result;
+    }
 
     /* Set result type based on version difference */
     if (strcmp(bv, av)) {
