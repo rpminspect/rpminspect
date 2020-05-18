@@ -183,14 +183,16 @@ bool inspect_upstream(struct rpminspect *ri)
             continue;
         }
 
-        TAILQ_FOREACH(file, peer->after_files, items) {
-            if (strsuffix(file->localpath, SPEC_FILENAME_EXTENSION)) {
-                bv = headerGetString(file->peer_file->rpm_header, RPMTAG_VERSION);
-                av = headerGetString(file->rpm_header, RPMTAG_VERSION);
-                break;
-            }
+        if (headerIsSource(peer->before_hdr) && !bv) {
+            bv = headerGetString(peer->before_hdr, RPMTAG_VERSION);
+        }
+
+        if (headerIsSource(peer->after_hdr) && !av) {
+            av = headerGetString(peer->after_hdr, RPMTAG_VERSION);
         }
     }
+
+    DEBUG_PRINT("bv=|%s|, av=|%s|\n", bv, av);
 
     /* If no versions found, we are not looking at source packages */
     if (bv == NULL || av == NULL) {
