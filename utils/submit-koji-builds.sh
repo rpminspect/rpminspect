@@ -96,6 +96,9 @@ if [ $? -eq 1 ]; then
     exit 1
 fi
 
+GIT_USERNAME="$(git config user.name)"
+GIT_USEREMAIL="$(git config user.email)"
+
 cd ${CWD}
 ${CWD}/utils/mkrpmchangelog.sh > ${WRKDIR}/newchangelog
 
@@ -105,6 +108,8 @@ cd ${PROJECT}
 
 for branch in ${BRANCHES} ; do
     git clean -d -x -f
+    git config user.name "${GIT_USERNAME}"
+    git config user.email "${GIT_USEREMAIL}"
 
     # make sure we are on the right branch
     ${VENDORPKG} switch-branch ${branch}
@@ -128,7 +133,7 @@ for branch in ${BRANCHES} ; do
 
     # commit changes
     git add sources changelog ${PROJECT}.spec
-    ${VENDORPKG} ci -c -p
+    ${VENDORPKG} ci -c -p -s
     git clean -d -x -f
 
     # build
