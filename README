@@ -243,12 +243,9 @@ Releasing
 ---------
 
 The 'make release' command creates a new release.  The command handles
-the version number change, tests, git tag, repo push, and release
-entry on GitHub.  The release process _should_ attach the tarball and
-signature to the Github release entry, but if it doesn't it usually
-means there's a problem with the utils/release.sh script talking with
-the Github API.  In those cases, you can edit the entry and attach the
-files manually.
+the version number change, tests, git tag, and repo push.  Release
+entries on GitHub are created manually.  The signed archive is
+attached manually to the release entry.
 
 The 'make koji' command submits official builds for Fedora and EPEL.
 
