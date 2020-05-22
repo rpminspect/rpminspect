@@ -160,5 +160,3 @@ These are things I intend to get to over time:
 
     * Parallelize libarchive unpacking of payloads; just fork off
       enough jobs for each package; set a rate limit in rpminspect.conf
-
-    * Replace iniparser usage with yacc grammar

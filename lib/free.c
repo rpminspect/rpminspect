@@ -131,6 +131,13 @@ void free_rpminspect(struct rpminspect *ri) {
     free_regex(ri->xml_path_include);
     free_regex(ri->xml_path_exclude);
 
+    free(ri->elf_path_include_pattern);
+    free(ri->elf_path_exclude_pattern);
+    free(ri->manpage_path_include_pattern);
+    free(ri->manpage_path_exclude_pattern);
+    free(ri->xml_path_include_pattern);
+    free(ri->xml_path_exclude_pattern);
+
     free(ri->desktop_entry_files_dir);
     free(ri->vendor);
     list_free(ri->buildhost_subdomain, free);

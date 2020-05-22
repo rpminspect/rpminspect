@@ -54,7 +54,7 @@ in defaults.
 .PP
 .TP
 .B \-c FILE, \-\-config=FILE
-Configuration file to use (default: /etc/rpminspect/rpminspect.conf)
+Configuration file to use (default: /etc/rpminspect/rpminspect.yaml)
 .TP
 .B \-p NAME, \-\-profile=NAME
 Configuration profile to use.  A configuration profile provides
@@ -67,13 +67,9 @@ files are optional overlays.
 .RS
 .PP
 The format of a profile configuration file is the same as
-rpminspect.conf, just call it NAME.conf and place it in
+rpminspect.yaml, just call it NAME.yaml and place it in
 /etc/rpminspect/profiles).  For example, the profile 'scl' should have
-a configuration file named /etc/rpminspect/profiles/scl.conf.
-.PP
-All but the [common] section can appear in profile configuration
-files.  Profile configuration files must end with .conf for rpminspect
-to find them.
+a configuration file named /etc/rpminspect/profiles/scl.yaml.
 .RE
 .TP
 .B \-r STR, \-\-release=STR

@@ -23,6 +23,7 @@ import subprocess
 import tempfile
 import unittest
 import json
+import yaml
 import rpmfluff
 
 # NVRs to use for the fake test packages
@@ -56,7 +57,7 @@ class RequiresRpminspect(unittest.TestCase):
             raise MissingRpminspect
 
         # ensure we have the sample configuration file
-        if not os.path.isfile(os.environ['RPMINSPECT_CONF']) or not os.access(os.environ['RPMINSPECT_CONF'], os.R_OK):
+        if not os.path.isfile(os.environ['RPMINSPECT_YAML']) or not os.access(os.environ['RPMINSPECT_YAML'], os.R_OK):
             raise MissingRpminspectConf
 
         # set in configFile()
@@ -93,32 +94,38 @@ class RequiresRpminspect(unittest.TestCase):
         (handle, self.conffile) = tempfile.mkstemp()
         os.close(handle)
 
-        shutil.copyfile(os.environ['RPMINSPECT_CONF'], self.conffile)
+        shutil.copyfile(os.environ['RPMINSPECT_YAML'], self.conffile)
 
-        f = open(os.environ['RPMINSPECT_CONF'], "r+")
-        conflines = f.readlines()
-        f.close()
-
-        f = open(self.conffile, "w+")
+        instream = open(os.environ['RPMINSPECT_YAML'], "r")
 
         # modify settings for the test suite based on where it's running
-        for line in conflines:
-            if line.startswith("vendor_data_dir"):
-                # point to our test vendor data
-                f.write("vendor_data_dir = \"%s\"\n" % os.environ['RPMINSPECT_TEST_DATA_PATH'])
-            elif line.startswith("licensedb"):
-                f.write("licensedb = \"test.json\"\n")
-            elif line.startswith("buildhost_subdomain"):
-                if self.buildhost_subdomain:
-                    f.write("buildhost_subdomain = \"%s\"\n" % self.buildhost_subdomain)
-                else:
-                    hn = socket.getfqdn()
-                    if hn.startswith("localhost"):
-                        f.write("buildhost_subdomain = \"localhost %s\"\n" % hn)
-            else:
-                f.write(line)
+        cfg = yaml.full_load(instream)
+        instream.close()
 
-        f.close()
+        cfg['vendor']['vendor_data_dir'] = os.environ['RPMINSPECT_TEST_DATA_PATH']
+        cfg['vendor']['licensedb'] = 'test.json'
+
+        if self.buildhost_subdomain:
+            cfg['metadata']['buildhost_subdomain'] = [self.buildhost_subdomain]
+        else:
+            hn = socket.getfqdn()
+            hnd = None
+
+            if hn.index('.') != -1:
+                hnd = '.' + hn.split('.', 1)[1]
+
+            if hn.startswith("localhost"):
+                cfg['metadata']['buildhost_subdomain'] = ['localhost', hn]
+            else:
+                cfg['metadata']['buildhost_subdomain'] = [hn]
+
+            if hnd:
+                cfg['metadata']['buildhost_subdomain'].append(hnd)
+
+        # write the temporary config file for the test suite
+        outstream = open(self.conffile, "w")
+        outstream.write(yaml.dump(cfg).replace('- ', '  - '))
+        outstream.close()
 
     def tearDown(self):
         os.unlink(self.conffile)

@@ -129,6 +129,7 @@ void list_free(string_list_t *, list_entry_data_free_func);
 size_t list_len(const string_list_t *);
 string_list_t * list_sort(const string_list_t *);
 string_list_t * list_copy(const string_list_t *);
+string_list_t *list_from_array(const char **);
 
 /* local.c */
 bool is_local_build(const char *);
@@ -246,6 +247,7 @@ bool process_inspection_flag(const char *, const bool, uint64_t *);
 
 /* debug.c */
 void set_debug_mode(bool);
+void dump_cfg(const struct rpminspect *);
 
 /* readfile.c */
 string_list_t *read_file(const char *);
@@ -270,5 +272,18 @@ bool is_execstack_present(Elf *elf);
 bool has_textrel(Elf *elf);
 void free_elf_data(void);
 void init_elf_data(void);
+
+/* bytes.c */
+/**
+ * Given a byte array of a specified length, convert it to a NUL
+ * terminated string and return a pointer to the string to the caller.
+ * The caller is responsible for freeing the memory associated with
+ * this string.
+ *
+ * @param array The byte array to convert.
+ * @param len Number of elements in the byte array.
+ * @return Newly allocated string representation of the byte array.
+ */
+char *bytes_to_str(unsigned char *array, size_t len);
 
 #endif

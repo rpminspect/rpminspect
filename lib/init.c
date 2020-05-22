@@ -22,22 +22,93 @@
 #include <limits.h>
 #include <assert.h>
 #include <search.h>
-#include <iniparser.h>
+#include <errno.h>
+#include <yaml.h>
 #include "rpminspect.h"
 
-static int add_regex(dictionary *cfg, const char *key, regex_t **regex_out)
+/* List defaults (not in constants.h to avoid cpp shenanigans) */
+
+/**
+ * @def BIN_PATHS
+ * NULL terminated array of strings of paths where executable files
+ * may reside.
+ */
+const char *BIN_PATHS[] = {"/bin", "/sbin", "/usr/bin", "/usr/sbin", NULL};
+
+/**
+ * @def SHELLS
+ * NULL terminated array of strings of shells to use for syntax
+ * checking (only the basename is needed).  All shells listed must
+ * support the '-n' option for syntax checking.  The shell should exit
+ * 0 if the syntax checker passes, non-zero otherwise.  The 'rc' shell
+ * is an exception and has special handling in the 'shellsyntax'
+ * inspection.
+ */
+const char *SHELLS[] = {"sh", "ksh", "zsh", "csh", "tcsh", "rc", "bash", NULL};
+
+/* States used while reading the YAML config files */
+enum {
+    SYMBOL_NULL,
+    SYMBOL_KEY,
+    SYMBOL_VALUE,
+    SYMBOL_ENTRY
+};
+
+/*
+ * Sections of the config file.  The YAML reading loop determines if
+ * these have been specified in the right order and in allowed
+ * sections.  These values are used for state transitions while
+ * reading the file.
+ */
+enum {
+    BLOCK_NULL,
+    BLOCK_ADDEDFILES,
+    BLOCK_ANNOCHECK,
+    BLOCK_BADWORDS,
+    BLOCK_BIN_PATHS,
+    BLOCK_BUILDHOST_SUBDOMAIN,
+    BLOCK_CHANGEDFILES,
+    BLOCK_COMMON,
+    BLOCK_DESKTOP,
+    BLOCK_ELF,
+    BLOCK_FILESIZE,
+    BLOCK_FORBIDDEN_GROUPS,
+    BLOCK_FORBIDDEN_OWNERS,
+    BLOCK_FORBIDDEN_PATH_PREFIXES,
+    BLOCK_FORBIDDEN_PATH_SUFFIXES,
+    BLOCK_FORBIDDEN_DIRECTORIES,
+    BLOCK_HEADER_FILE_EXTENSIONS,
+    BLOCK_IGNORE,
+    BLOCK_INSPECTIONS,
+    BLOCK_IPV6_BLACKLIST,
+    BLOCK_JAVABYTECODE,
+    BLOCK_KOJI,
+    BLOCK_LTO,
+    BLOCK_LTO_SYMBOL_NAME_PREFIXES,
+    BLOCK_MANPAGE,
+    BLOCK_METADATA,
+    BLOCK_OWNERSHIP,
+    BLOCK_PATHMIGRATION,
+    BLOCK_PRODUCTS,
+    BLOCK_SECURITY_PATH_PREFIX,
+    BLOCK_SHELLS,
+    BLOCK_SHELLSYNTAX,
+    BLOCK_SPECNAME,
+    BLOCK_VENDOR,
+    BLOCK_XML
+};
+
+static int add_regex(const char *pattern, regex_t **regex_out)
 {
-    const char *pattern;
     int reg_result;
     char *errbuf = NULL;
     size_t errbuf_size;
 
-    assert(regex_out);
-
-    pattern = iniparser_getstring(cfg, key, NULL);
-    if ((pattern == NULL) || (*pattern == '\0')) {
+    if (pattern == NULL || *pattern == '\0') {
         return 0;
     }
+
+    assert(regex_out);
 
     free_regex(*regex_out);
     *regex_out = calloc(1, sizeof(regex_t));
@@ -61,142 +132,117 @@ static int add_regex(dictionary *cfg, const char *key, regex_t **regex_out)
     return 0;
 }
 
-static void parse_list(const char *tmp, string_list_t **list)
+/**
+ * Given a string_list_t and a string, add the string to the list.  If
+ * the list is NULL, initialize it to start a new list.  Caller is
+ * responsible for freeing all memory associated with the list.
+ *
+ * @param list Pointer to a string_list_t to add entry to.
+ * @param s String to add to the string_list_t.
+ */
+void add_entry(string_list_t **list, const char *s)
 {
-    char *walk = NULL;
-    char *start = NULL;
-    char *token = NULL;
     string_entry_t *entry = NULL;
 
-    assert(tmp != NULL);
+    assert(list != NULL);
+    assert(s != NULL);
 
-    /* make a copy of the string for splitting */
-    start = walk = strdup(tmp);
-
-    /* split up the string and turn it in to a list */
-    list_free(*list, free);
-    *list = calloc(1, sizeof(*(*list)));
-    assert(*list != NULL);
-    TAILQ_INIT(*list);
-
-    while ((token = strsep(&walk, " \t")) != NULL) {
-        if (*token == '\0') {
-            continue;
-        }
-
-        entry = calloc(1, sizeof(*entry));
-        assert(entry != NULL);
-
-        entry->data = strdup(token);
-        assert(entry->data != NULL);
-
-        TAILQ_INSERT_TAIL(*list, entry, items);
+    if (*list == NULL) {
+        *list = calloc(1, sizeof(*(*list)));
+        assert(*list != NULL);
+        TAILQ_INIT(*list);
     }
 
-    /* clean up */
-    free(start);
+    entry = calloc(1, sizeof(*entry));
+    assert(entry != NULL);
+
+    entry->data = strdup(s);
+    assert(entry->data != NULL);
+
+    TAILQ_INSERT_TAIL(*list, entry, items);
+
     return;
 }
 
-/*
- * Read in a hash table mapping from the config file.  Example:
- *        [section]
- *        key = value
- *        key = value
- * We use these for the jvm and products, maybe other things.
+/**
+ * Given a pair_list_t, initialize a new hash table (clearing the old
+ * one if necessary) and migrate the data from the list to the hash
+ * table.  Clear the incoming hash table list.  The caller is
+ * responsible for freeing all memory allocated to these structures.
+ * Also note this function is destructive and will clear and
+ * reinitialize all parameters.
+ *
+ * NOTE: The incoming table entries will be removed and freed as the
+ * data is migrated to the table and keys.  Before return, the
+ * incoming table list will be freed.  The actual key and value
+ * strings in each incoming table entry are not freed since they just
+ * migrate over to the new structures, but the entries themselves are
+ * removed and freed from the incoming table.
+ *
+ * @param incoming_table List of key=value pairs to turn in to a hash table.
+ * @param table Destination hash table.
+ * @param keys Destination list of hash table keys.
  */
-#if _INIPARSER == 3  /* w/ v4.x lib, cfg and section come in as const pointers */
-static void read_mapping(dictionary *cfg, char *section, struct hsearch_data **table, string_list_t **keys)
-#else
-static void read_mapping(const dictionary *cfg, const char *section, struct hsearch_data **table, string_list_t **keys)
-#endif
+void process_table(pair_list_t *incoming_table, struct hsearch_data **table, string_list_t **keys)
 {
-    size_t len = 0;
-    int nk = 0;
-#if _INIPARSER == 3
-    char **k = NULL;
-#else
-    const char **k = NULL;
-#endif
-    const char *v = NULL;
+    int len = 0;
     ENTRY e;
     ENTRY *eptr;
     string_entry_t *entry = NULL;
+    pair_entry_t *pair = NULL;
 
-    assert(cfg != NULL);
-    assert(section != NULL);
+    assert(incoming_table != NULL);
 
-    len = strlen(section);
-    nk = iniparser_getsecnkeys(cfg, section);
+    /* clear out any existing data */
+    free_mapping(*table, *keys);
 
-    if (nk > 0) {
-#if _INIPARSER == 4
-        k = calloc(nk, len);
-        assert(k != NULL);
-#endif
-
-#if _INIPARSER == 3
-        if ((k = iniparser_getseckeys(cfg, section)) == NULL) {
-#else
-        if (iniparser_getseckeys(cfg, section, k) == NULL) {
-            free(k);
-            k = NULL;
-#endif
-            nk = 0;
-        }
+    /* length of the incoming list */
+    TAILQ_FOREACH(pair, incoming_table, items) {
+        len++;
     }
 
-    if (nk > 0) {
-        free_mapping(*table, *keys);
+    /* set up new data structures */
+    *table = calloc(1, sizeof(**table));
+    assert(*table != NULL);
 
-        *table = calloc(1, sizeof(**table));
-        assert(*table != NULL);
-
-        if (hcreate_r(nk, *table) == 0) {
-            free(*table);
-            *table = NULL;
-#if _INIPARSER == 4
-            free(k);
-            k = NULL;
-#endif
-            nk = 0;
-        } else {
-            *keys = calloc(1, sizeof(**keys));
-            assert(*keys != NULL);
-            TAILQ_INIT(*keys);
-        }
+    if (hcreate_r(len * 1.25, *table) == 0) {
+        free(*table);
+        *table = NULL;
+        fprintf(stderr, "*** hcreate_r() failure in process_table()\n");
+        fflush(stderr);
     }
 
-    while (nk > 0) {
-        v = iniparser_getstring(cfg, k[nk - 1], NULL);
+    *keys = calloc(1, sizeof(**keys));
+    assert(*keys != NULL);
+    TAILQ_INIT(*keys);
 
-        if (v == NULL) {
-            nk--;
-            continue;
-        }
+    /*
+     * migrate the list to the table
+     * NOTE: This will remove and free each incoming table entry, but does
+     * not free the key and value strings since those just migrate to the
+     * hash table.  The caller needs to free the entire incoming table on
+     * return of this function.
+     */
+    while (!TAILQ_EMPTY(incoming_table)) {
+        pair = TAILQ_FIRST(incoming_table);
 
-        /*
-         * This grabs the key string, but advances past the block name.
-         * The key is stored in the tailq for the ability to free it
-         * later.  We have to dupe it because the iniparser data will
-         * go away.
-         */
+        /* save the key */
         entry = calloc(1, sizeof(*entry));
         assert(entry != NULL);
-        entry->data = strdup((char *) k[nk - 1] + len + 1);
+        entry->data = pair->key;
         TAILQ_INSERT_TAIL(*keys, entry, items);
 
+        /* add the hash table entry */
         e.key = entry->data;
-        e.data = strdup((char *) v);
+        e.data = pair->value;
         hsearch_r(e, ENTER, &eptr, *table);
-        nk--;
 
-        DEBUG_PRINT("k=|%s|, v=|%s|\n", entry->data, v);
+        /* delete this incoming entry */
+        TAILQ_REMOVE(incoming_table, pair, items);
+        free(pair);
     }
 
-#if _INIPARSER == 4
-    free(k);
-#endif
+    free(incoming_table);
     return;
 }
 
@@ -336,285 +382,447 @@ static mode_t parse_mode(const char *input) {
  * Read either the main configuration file or a configuration file
  * overlay (profile) and populate the struct rpminspect members.
  */
-static int read_cfgfile(dictionary *cfg, struct rpminspect *ri, const char *filename, const bool overlay)
+static int read_cfgfile(struct rpminspect *ri, const char *filename)
 {
-    size_t len = 0;
-    int nk = 0;
-    const char **k = NULL;
-    const char *v = NULL;
-    const char *tmp = NULL;
-    const char *inspection = NULL;
+    FILE *fp = NULL;
+    yaml_parser_t parser;
+    yaml_token_t token;
+    bool read_stream = false;
+    bool read_list = false;
+    int symbol = SYMBOL_NULL;
+    int block = BLOCK_NULL;
+    int group = BLOCK_NULL;
+    int oldblock = BLOCK_NULL;
+    char *key = NULL;
+    char *t = NULL;
     bool exclude = false;
+    bool read_incoming_table = false;
+    pair_list_t *incoming_table = NULL;
+    pair_entry_t *incoming_pair = NULL;
+    struct hsearch_data **dest_table = NULL;
+    string_list_t **dest_keys = NULL;
 
-    assert(cfg != NULL);
     assert(ri != NULL);
     assert(filename != NULL);
 
-    /* These settings can only appear in the main config file */
-    if (!overlay) {
-        tmp = iniparser_getstring(cfg, "common:workdir", NULL);
-        if (tmp) {
-            free(ri->workdir);
-            ri->workdir = strdup(tmp);
-        }
-
-        tmp = iniparser_getstring(cfg, "common:profiledir", NULL);
-        if (tmp) {
-            free(ri->profiledir);
-            ri->profiledir = strdup(tmp);
-        }
-    }
-
-    tmp = iniparser_getstring(cfg, "koji:hub", NULL);
-    if (tmp) {
-        free(ri->kojihub);
-        ri->kojihub = strdup(tmp);
-    }
-
-    tmp = iniparser_getstring(cfg, "koji:download_ursine", NULL);
-    if (tmp) {
-        free(ri->kojiursine);
-        ri->kojiursine = strdup(tmp);
-    }
-
-    tmp = iniparser_getstring(cfg, "koji:download_mbs", NULL);
-    if (tmp) {
-        free(ri->kojimbs);
-        ri->kojimbs = strdup(tmp);
-    }
-
-    tmp = iniparser_getstring(cfg, "vendor:vendor_data_dir", NULL);
-    if (tmp) {
-        free(ri->vendor_data_dir);
-        ri->vendor_data_dir = strdup(tmp);
-    }
-
-    tmp = iniparser_getstring(cfg, "vendor:licensedb", NULL);
-    if (tmp) {
-        free(ri->licensedb);
-        ri->licensedb = strdup(tmp);
-    }
-
-    tmp = iniparser_getstring(cfg, "vendor:favor_release", NULL);
-    if (tmp) {
-        if (!strcasecmp(tmp, "none")) {
-            ri->favor_release = FAVOR_NONE;
-        } else if (!strcasecmp(tmp, "oldest")) {
-            ri->favor_release = FAVOR_OLDEST;
-        } else if (!strcasecmp(tmp, "newest")) {
-            ri->favor_release = FAVOR_NEWEST;
-        }
-    }
-
-    /* read optional [inspections] section to enable/disable inspections */
-    len = strlen(INSPECTIONS);
-    nk = iniparser_getsecnkeys(cfg, INSPECTIONS);
-
-    if (nk > 0) {
-        k = calloc(nk, len);
-        assert(k != NULL);
-
-#if _INIPARSER == 3
-        if (iniparser_getseckeys(cfg, INSPECTIONS) == NULL) {
-#else
-        if (iniparser_getseckeys(cfg, INSPECTIONS, k) == NULL) {
-#endif
-            free(k);
-            nk = 0;
-        }
-    }
-
-    while (nk > 0) {
-        v = iniparser_getstring(cfg, k[nk - 1], NULL);
-
-        if (v == NULL) {
-            nk--;
-            continue;
-        }
-
-        inspection = k[nk - 1] + len + 1;
-
-        if (!strcasecmp(v, "on")) {
-            exclude = false;
-        } else if (!strcasecmp(v, "off")) {
-            exclude = true;
-        } else {
-            fprintf(stderr, _("*** Invalid [%s] line: %s = %s (ignoring)\n"), INSPECTIONS, inspection, v);
-            fflush(stderr);
-            nk--;
-            continue;
-        }
-
-        if (!process_inspection_flag(inspection, exclude, &ri->tests)) {
-            fprintf(stderr, _("*** Unknown inspection: `%s`\n"), inspection);
-            fflush(stderr);
-            exit(RI_PROGRAM_ERROR);
-        }
-
-        nk--;
-    }
-
-    free(k);
-
-    /* Settings for all of the different inspections */
-    tmp = iniparser_getstring(cfg, "settings:badwords", NULL);
-    if (tmp) {
-        parse_list(tmp, &ri->badwords);
-    }
-
-    tmp = iniparser_getstring(cfg, "settings:vendor", NULL);
-    if (tmp) {
-        free(ri->vendor);
-        ri->vendor = strdup(tmp);
-    }
-
-    tmp = iniparser_getstring(cfg, "settings:buildhost_subdomain", NULL);
-    if (tmp) {
-        parse_list(tmp, &ri->buildhost_subdomain);
-    }
-
-    tmp = iniparser_getstring(cfg, "settings:security_path_prefix", NULL);
-    if (tmp) {
-        parse_list(tmp, &ri->security_path_prefix);
-    }
-
-    tmp = iniparser_getstring(cfg, "settings:header_file_extensions", NULL);
-    if (tmp) {
-        parse_list(tmp, &ri->header_file_extensions);
-    }
-
-    tmp = iniparser_getstring(cfg, "settings:forbidden_path_prefixes", NULL);
-    if (tmp) {
-        parse_list(tmp, &ri->forbidden_path_prefixes);
-    }
-
-    tmp = iniparser_getstring(cfg, "settings:forbidden_path_suffixes", NULL);
-    if (tmp) {
-        parse_list(tmp, &ri->forbidden_path_suffixes);
-    }
-
-    tmp = iniparser_getstring(cfg, "settings:forbidden_directories", NULL);
-    if (tmp) {
-        parse_list(tmp, &ri->forbidden_directories);
-    }
-
-    tmp = iniparser_getstring(cfg, "settings:elf_ipv6_blacklist", NULL);
-    if (tmp) {
-        parse_list(tmp, &ri->ipv6_blacklist);
-    }
-
-    /* If any of the regular expressions fail to compile, stop and return failure */
-    if (add_regex(cfg, "settings:elf_path_include", &ri->elf_path_include) != 0) {
+    /* prepare a YAML parser */
+    if (!yaml_parser_initialize(&parser)) {
+        fprintf(stderr, _("*** error initializing YAML parser for module metadata, unable to filter\n"));
+        fflush(stderr);
         return -1;
     }
 
-    if (add_regex(cfg, "settings:elf_path_exclude", &ri->elf_path_exclude) != 0) {
+    /* open the config file */
+    if ((fp = fopen(filename, "r")) == NULL) {
+        fprintf(stderr, _("*** error opening %s: %s\n"), filename, strerror(errno));
+        fflush(stderr);
         return -1;
     }
 
-    if (add_regex(cfg, "settings:manpage_path_include", &ri->manpage_path_include) != 0) {
-        return -1;
-    }
+    /* tell the YAML parser to read the config file */
+    yaml_parser_set_input_file(&parser, fp);
 
-    if (add_regex(cfg, "settings:manpage_path_exclude", &ri->manpage_path_exclude) != 0) {
-        return -1;
-    }
+    do {
+        yaml_parser_scan(&parser, &token);
 
-    if (add_regex(cfg, "settings:xml_path_include", &ri->xml_path_include) != 0) {
-        return -1;
-    }
+        switch (token.type) {
+            case YAML_STREAM_START_TOKEN:
+                /* begin reading the config file */
+                read_stream = true;
+                break;
+            case YAML_STREAM_END_TOKEN:
+                /* stop reading the config file */
+                read_stream = false;
+                break;
+            case YAML_KEY_TOKEN:
+                symbol = SYMBOL_KEY;
+                break;
+            case YAML_VALUE_TOKEN:
+                symbol = SYMBOL_VALUE;
+                break;
+            case YAML_BLOCK_SEQUENCE_START_TOKEN:
+                read_list = true;
+                break;
+            case YAML_BLOCK_ENTRY_TOKEN:
+                if (read_list) {
+                    symbol = SYMBOL_ENTRY;
+                }
 
-    if (add_regex(cfg, "settings:xml_path_exclude", &ri->xml_path_exclude) != 0) {
-        return -1;
-    }
+                break;
+            case YAML_BLOCK_END_TOKEN:
+                if (read_list) {
+                    read_list = false;
+                }
 
-    tmp = iniparser_getstring(cfg, "settings:desktop_entry_files_dir", NULL);
-    if (tmp) {
-        free(ri->desktop_entry_files_dir);
-        ri->desktop_entry_files_dir = strdup(tmp);
-    }
+                /*
+                 * blocks under groups should be closed first but if
+                 * there is no block set, we are closing the group
+                 */
+                if (group != BLOCK_NULL && block != BLOCK_NULL) {
+                    block = BLOCK_NULL;
+                } else if (group != BLOCK_NULL && block == BLOCK_NULL) {
+                    group = BLOCK_NULL;
+                }
 
-    tmp = iniparser_getstring(cfg, "settings:bin_paths", NULL);
-    if (tmp) {
-        parse_list(tmp, &ri->bin_paths);
-    }
+                break;
+            case YAML_BLOCK_MAPPING_START_TOKEN:
+                break;
+            case YAML_SCALAR_TOKEN:
+                /* convert the value to a string for comparison and copying */
+                t = bytes_to_str(token.data.scalar.value, token.data.scalar.length);
 
-    tmp = iniparser_getstring(cfg, "settings:bin_owner", NULL);
-    if (tmp) {
-        free(ri->bin_owner);
-        ri->bin_owner = strdup(tmp);
-    }
+                /* determine which config file block we are in */
+                if (key && read_stream) {
+                    if (!strcmp(key, "common")) {
+                        block = BLOCK_COMMON;
+                    } else if (!strcmp(key, "koji")) {
+                        block = BLOCK_KOJI;
+                    } else if (!strcmp(key, "vendor")) {
+                        block = BLOCK_VENDOR;
+                    } else if (!strcmp(key, "inspections")) {
+                        block = BLOCK_INSPECTIONS;
+                    } else if (!strcmp(key, "products")) {
+                        block = BLOCK_PRODUCTS;
+                    } else if (!strcmp(key, "ignore")) {
+                        block = BLOCK_IGNORE;
+                    } else if (!strcmp(key, "security_path_prefix")) {
+                        block = BLOCK_SECURITY_PATH_PREFIX;
+                    } else if (!strcmp(key, "badwords")) {
+                        block = BLOCK_BADWORDS;
+                    } else if (!strcmp(key, "metadata")) {
+                        group = BLOCK_METADATA;
+                    } else if (group == BLOCK_METADATA && !strcmp(key, "buildhost_subdomain")) {
+                        block = BLOCK_BUILDHOST_SUBDOMAIN;
+                    } else if (!strcmp(key, "elf")) {
+                        group = BLOCK_ELF;
+                    } else if (group == BLOCK_ELF && !strcmp(key, "ipv6_blacklist")) {
+                        block = BLOCK_IPV6_BLACKLIST;
+                    } else if (!strcmp(key, "manpage")) {
+                        block = BLOCK_MANPAGE;
+                    } else if (!strcmp(key, "xml")) {
+                        block = BLOCK_XML;
+                    } else if (!strcmp(key, "desktop")) {
+                        block = BLOCK_DESKTOP;
+                    } else if (!strcmp(key, "changedfiles")) {
+                        group = BLOCK_CHANGEDFILES;
+                    } else if (group == BLOCK_CHANGEDFILES && !strcmp(key, "header_file_extensions")) {
+                        block = BLOCK_HEADER_FILE_EXTENSIONS;
+                    } else if (!strcmp(key, "addedfiles")) {
+                        group = BLOCK_ADDEDFILES;
+                    } else if (group == BLOCK_ADDEDFILES) {
+                        if (!strcmp(key, "forbidden_path_prefixes")) {
+                            block = BLOCK_FORBIDDEN_PATH_PREFIXES;
+                        } else if (!strcmp(key, "forbidden_path_suffixes")) {
+                            block = BLOCK_FORBIDDEN_PATH_SUFFIXES;
+                        } else if (!strcmp(key, "forbidden_directories")) {
+                            block = BLOCK_FORBIDDEN_DIRECTORIES;
+                        }
+                    } else if (!strcmp(key, "ownership")) {
+                        group = BLOCK_OWNERSHIP;
+                    } else if (group == BLOCK_OWNERSHIP) {
+                        if (!strcmp(key, "bin_paths")) {
+                            block = BLOCK_BIN_PATHS;
+                        } else if (!strcmp(key, "forbidden_owners")) {
+                            block = BLOCK_FORBIDDEN_OWNERS;
+                        } else if (!strcmp(key, "forbidden_groups")) {
+                            block = BLOCK_FORBIDDEN_GROUPS;
+                        }
+                    } else if (!strcmp(key, "shellsyntax")) {
+                        group = BLOCK_SHELLSYNTAX;
+                    } else if (group == BLOCK_SHELLSYNTAX && !strcmp(key, "shells")) {
+                        block = BLOCK_SHELLS;
+                    } else if (!strcmp(key, "filesize")) {
+                        block = BLOCK_FILESIZE;
+                    } else if (!strcmp(key, "lto")) {
+                        group = BLOCK_LTO;
+                    } else if (group == BLOCK_LTO && !strcmp(key, "lto_symbol_name_prefixes")) {
+                        block = BLOCK_LTO_SYMBOL_NAME_PREFIXES;
+                    } else if (!strcmp(key, "specname")) {
+                        block = BLOCK_SPECNAME;
+                    } else if (!strcmp(key, "annocheck")) {
+                        block = BLOCK_ANNOCHECK;
+                    } else if (!strcmp(key, "javabytecode")) {
+                        block = BLOCK_JAVABYTECODE;
+                    } else if (!strcmp(key, "pathmigration")) {
+                        block = BLOCK_PATHMIGRATION;
+                    }
+                }
 
-    tmp = iniparser_getstring(cfg, "settings:bin_group", NULL);
-    if (tmp) {
-        free(ri->bin_group);
-        ri->bin_group = strdup(tmp);
-    }
+                if (symbol == SYMBOL_KEY) {
+                    /* save keys because they determine where values go */
+                    free(key);
+                    key = strdup(t);
+                } else if (symbol == SYMBOL_VALUE) {
+                    /* process any block that was a hash table */
+                    if (block != oldblock && read_incoming_table) {
+                        process_table(incoming_table, dest_table, dest_keys);
 
-    tmp = iniparser_getstring(cfg, "settings:forbidden_owners", NULL);
-    if (tmp) {
-        parse_list(tmp, &ri->forbidden_owners);
-    }
+                        /* reset the incoming table (process_table already removed entries) */
+                        incoming_table = NULL;
+                        read_incoming_table = false;
 
-    tmp = iniparser_getstring(cfg, "settings:forbidden_groups", NULL);
-    if (tmp) {
-        parse_list(tmp, &ri->forbidden_groups);
-    }
+                        /* reset the destination table and keys for incoming hash tables */
+                        dest_table = NULL;
+                        dest_keys = NULL;
+                    }
 
-    tmp = iniparser_getstring(cfg, "settings:shells", NULL);
-    if (tmp) {
-        parse_list(tmp, &ri->shells);
-    }
+                    /* sort values in to the right settings based on the block */
+                    if (block == BLOCK_COMMON) {
+                        if (!strcmp(key, "workdir")) {
+                            free(ri->workdir);
+                            ri->workdir = strdup(t);
+                        } else if (!strcmp(key, "profiledir")) {
+                            free(ri->profiledir);
+                            ri->profiledir = strdup(t);
+                        }
+                    } else if (block == BLOCK_KOJI) {
+                        if (!strcmp(key, "hub")) {
+                            free(ri->kojihub);
+                            ri->kojihub = strdup(t);
+                        } else if (!strcmp(key, "download_ursine")) {
+                            free(ri->kojiursine);
+                            ri->kojiursine = strdup(t);
+                        } else if (!strcmp(key, "download_mbs")) {
+                            free(ri->kojimbs);
+                            ri->kojimbs = strdup(t);
+                        }
+                    } else if (group == BLOCK_METADATA) {
+                        /*
+                         * this block needs to come before BLOCK_VENDOR
+                         * the key 'vendor' is used in two places
+                         */
+                        if (!strcmp(key, "vendor")) {
+                            free(ri->vendor);
+                            ri->vendor = strdup(t);
+                        }
+                    } else if (block == BLOCK_VENDOR) {
+                        if (!strcmp(key, "vendor_data_dir")) {
+                            free(ri->vendor_data_dir);
+                            ri->vendor_data_dir = strdup(t);
+                        } else if (!strcmp(key, "licensedb")) {
+                            free(ri->licensedb);
+                            ri->licensedb = strdup(t);
+                        } else if (!strcmp(key, "favor_release")) {
+                            if (!strcasecmp(t, "none")) {
+                                ri->favor_release = FAVOR_NONE;
+                            } else if (!strcasecmp(t, "oldest")) {
+                                ri->favor_release = FAVOR_OLDEST;
+                            } else if (!strcasecmp(t, "newest")) {
+                                ri->favor_release = FAVOR_NEWEST;
+                            }
+                        }
+                    } else if (block == BLOCK_SPECNAME) {
+                        if (!strcmp(key, "match")) {
+                            if (!strcasecmp(t, "full")) {
+                                ri->specmatch = MATCH_FULL;
+                            } else if (!strcasecmp(t, "prefix")) {
+                                ri->specmatch = MATCH_PREFIX;
+                            } else if (!strcasecmp(t, "suffix")) {
+                                ri->specmatch = MATCH_SUFFIX;
+                            } else {
+                                ri->specmatch = MATCH_FULL;
+                                fprintf(stderr, "*** unknown specname match setting '%s', defaulting to 'full'\n", t);
+                                fflush(stderr);
+                            }
+                        } else if (!strcmp(key, "primary")) {
+                            if (!strcasecmp(t, "name")) {
+                                ri->specprimary = PRIMARY_NAME;
+                            } else if (!strcasecmp(t, "filename")) {
+                                ri->specprimary = PRIMARY_FILENAME;
+                            } else {
+                                ri->specprimary = PRIMARY_NAME;
+                                fprintf(stderr, "*** unknown specname primary setting '%s', defaulting to 'name'\n", t);
+                                fflush(stderr);
+                            }
+                        }
+                    } else if (group == BLOCK_ELF) {
+                        if (!strcmp(key, "include_path")) {
+                            if (debug_mode) {
+                                free(ri->elf_path_include_pattern);
+                                ri->elf_path_include_pattern = strdup(t);
+                            }
 
-    tmp = iniparser_getstring(cfg, "settings:size_threshold", NULL);
-    if (tmp) {
-        ri->size_threshold = strdup(tmp);
-    }
+                            if (add_regex(t, &ri->elf_path_include) != 0) {
+                                fprintf(stderr, "*** error reading elf include path\n");
+                                fflush(stderr);
+                            }
+                        } else if (!strcmp(key, "exclude_path")) {
+                            if (debug_mode) {
+                                free(ri->elf_path_exclude_pattern);
+                                ri->elf_path_exclude_pattern = strdup(t);
+                            }
 
-    tmp = iniparser_getstring(cfg, "lto:lto_symbol_name_prefixes", NULL);
-    if (tmp) {
-        parse_list(tmp, &ri->lto_symbol_name_prefixes);
-    }
+                            if (add_regex(t, &ri->elf_path_exclude) != 0) {
+                                fprintf(stderr, "*** error reading elf exclude path\n");
+                                fflush(stderr);
+                            }
+                        }
+                    } else if (block == BLOCK_MANPAGE) {
+                        if (!strcmp(key, "include_path")) {
+                            if (debug_mode) {
+                                free(ri->manpage_path_include_pattern);
+                                ri->manpage_path_include_pattern = strdup(t);
+                            }
 
-    tmp = iniparser_getstring(cfg, "specname:match", NULL);
-    if (tmp) {
-        if (!strcasecmp(tmp, "full")) {
-            ri->specmatch = MATCH_FULL;
-        } else if (!strcasecmp(tmp, "prefix")) {
-            ri->specmatch = MATCH_PREFIX;
-        } else if (!strcasecmp(tmp, "suffix")) {
-            ri->specmatch = MATCH_SUFFIX;
-        } else {
-            fprintf(stderr, _("*** Invalid specname:match setting in %s: %s\n"), filename, tmp);
-            fprintf(stderr, _("*** Defaulting to 'full' matching.\n"));
-            ri->specmatch = MATCH_FULL;
+                            if (add_regex(t, &ri->manpage_path_include) != 0) {
+                                fprintf(stderr, "*** error reading man page include path\n");
+                                fflush(stderr);
+                            }
+                        } else if (!strcmp(key, "exclude_path")) {
+                            if (debug_mode) {
+                                free(ri->manpage_path_exclude_pattern);
+                                ri->manpage_path_exclude_pattern = strdup(t);
+                            }
+
+                            if (add_regex(t, &ri->manpage_path_exclude) != 0) {
+                                fprintf(stderr, "*** error reading man page exclude path\n");
+                                fflush(stderr);
+                            }
+                        }
+                    } else if (block == BLOCK_XML) {
+                        if (!strcmp(key, "include_path")) {
+                            if (debug_mode) {
+                                free(ri->xml_path_include_pattern);
+                                ri->xml_path_include_pattern = strdup(t);
+                            }
+
+                            if (add_regex(t, &ri->xml_path_include) != 0) {
+                                fprintf(stderr, "*** error reading xml include path\n");
+                                fflush(stderr);
+                            }
+                        } else if (!strcmp(key, "exclude_path")) {
+                            if (debug_mode) {
+                                free(ri->xml_path_exclude_pattern);
+                                ri->xml_path_exclude_pattern = strdup(t);
+                            }
+
+                            if (add_regex(t, &ri->xml_path_exclude) != 0) {
+                                fprintf(stderr, "*** error reading xml exclude path\n");
+                                fflush(stderr);
+                            }
+                        }
+                    } else if (block == BLOCK_DESKTOP) {
+                        if (!strcmp(key, "desktop_entry_files_dir")) {
+                            free(ri->desktop_entry_files_dir);
+                            ri->desktop_entry_files_dir = strdup(t);
+                        }
+                    } else if (group == BLOCK_OWNERSHIP) {
+                        if (!strcmp(key, "bin_owner")) {
+                            free(ri->bin_owner);
+                            ri->bin_owner = strdup(t);
+                        } else if (!strcmp(key, "bin_group")) {
+                            free(ri->bin_group);
+                            ri->bin_group = strdup(t);
+                        }
+                    } else if (block == BLOCK_FILESIZE) {
+                        if (!strcmp(key, "size_threshold")) {
+                            free(ri->size_threshold);
+                            ri->size_threshold = strdup(t);
+                        }
+                    } else if (block == BLOCK_ANNOCHECK || block == BLOCK_JAVABYTECODE || block == BLOCK_PATHMIGRATION || block == BLOCK_PRODUCTS) {
+                        if (incoming_table == NULL) {
+                            incoming_table = calloc(1, sizeof(*incoming_table));
+                            assert(incoming_table != NULL);
+                            TAILQ_INIT(incoming_table);
+                        }
+
+                        incoming_pair = calloc(1, sizeof(*incoming_pair));
+                        incoming_pair->key = strdup(key);
+                        incoming_pair->value = strdup(t);
+                        TAILQ_INSERT_TAIL(incoming_table, incoming_pair, items);
+
+                        read_incoming_table = true;
+                        oldblock = block;
+
+                        if (block == BLOCK_ANNOCHECK) {
+                            dest_table = &ri->annocheck;
+                            dest_keys = &ri->annocheck_keys;
+                        } else if (block == BLOCK_JAVABYTECODE) {
+                            dest_table = &ri->jvm;
+                            dest_keys = &ri->jvm_keys;
+                        } else if (block == BLOCK_PATHMIGRATION) {
+                            dest_table = &ri->pathmigration;
+                            dest_keys = &ri->pathmigration_keys;
+                        } else if (block == BLOCK_PRODUCTS) {
+                            dest_table = &ri->products;
+                            dest_keys = &ri->product_keys;
+                        }
+                    } else if (block == BLOCK_INSPECTIONS) {
+                        if (!strcasecmp(t, "on")) {
+                            exclude = false;
+                        } else if (!strcasecmp(t, "off")) {
+                            exclude = true;
+                        } else {
+                            exclude = false;
+                            fprintf(stderr, "*** inspection flag must be 'on' or 'off', ignoring for '%s'\n", key);
+                            fflush(stderr);
+                        }
+
+                        if (!process_inspection_flag(key, exclude, &ri->tests)) {
+                            fprintf(stderr, _("*** Unknown inspection: `%s`\n"), key);
+                            fflush(stderr);
+                            exit(RI_PROGRAM_ERROR);
+                        }
+                    }
+                } else if (symbol == SYMBOL_ENTRY) {
+                    if (block == BLOCK_BADWORDS) {
+                        add_entry(&ri->badwords, t);
+                    } else if (block == BLOCK_SECURITY_PATH_PREFIX) {
+                        add_entry(&ri->security_path_prefix, t);
+                    } else if (block == BLOCK_BUILDHOST_SUBDOMAIN) {
+                        add_entry(&ri->buildhost_subdomain, t);
+                    } else if (block == BLOCK_HEADER_FILE_EXTENSIONS) {
+                        add_entry(&ri->header_file_extensions, t);
+                    } else if (block == BLOCK_FORBIDDEN_PATH_PREFIXES) {
+                        add_entry(&ri->forbidden_path_prefixes, t);
+                    } else if (block == BLOCK_FORBIDDEN_PATH_SUFFIXES) {
+                        add_entry(&ri->forbidden_path_suffixes, t);
+                    } else if (block == BLOCK_FORBIDDEN_DIRECTORIES) {
+                        add_entry(&ri->forbidden_directories, t);
+                    } else if (block == BLOCK_IPV6_BLACKLIST) {
+                        add_entry(&ri->ipv6_blacklist, t);
+                    } else if (block == BLOCK_BIN_PATHS) {
+                        add_entry(&ri->bin_paths, t);
+                    } else if (block == BLOCK_FORBIDDEN_OWNERS) {
+                        add_entry(&ri->forbidden_owners, t);
+                    } else if (block == BLOCK_FORBIDDEN_GROUPS) {
+                        add_entry(&ri->forbidden_groups, t);
+                    } else if (block == BLOCK_IGNORE) {
+                        add_entry(&ri->ignores, t);
+                    } else if (block == BLOCK_SHELLS) {
+                        add_entry(&ri->shells, t);
+                    } else if (block == BLOCK_LTO_SYMBOL_NAME_PREFIXES) {
+                        add_entry(&ri->lto_symbol_name_prefixes, t);
+                    }
+                }
+
+                free(t);
+                break;
+            default:
+                break;
         }
-    }
 
-    tmp = iniparser_getstring(cfg, "specname:primary", NULL);
-    if (tmp) {
-        if (!strcasecmp(tmp, "name")) {
-            ri->specprimary = PRIMARY_NAME;
-        } else if (!strcasecmp(tmp, "filename")) {
-            ri->specprimary = PRIMARY_FILENAME;
-        } else {
-            fprintf(stderr, _("*** Invalid specname:primary setting in %s: %s\n"), filename, tmp);
-            fprintf(stderr, _("*** Defaulting to 'name' primary setting.\n"));
-            ri->specprimary = PRIMARY_NAME;
+        if (token.type != YAML_STREAM_END_TOKEN) {
+            yaml_token_delete(&token);
         }
+    } while (token.type != YAML_STREAM_END_TOKEN);
+
+    /* destroy the YAML parser, close the input file */
+    yaml_parser_delete(&parser);
+
+    if (fclose(fp) != 0) {
+        fprintf(stderr, _("*** error ening %s: %s\n"), filename, strerror(errno));
+        fflush(stderr);
+        return -1;
     }
 
-    /* if a jvm major versions exist, collect those in to a hash table */
-    read_mapping(cfg, "javabytecode", &ri->jvm, &ri->jvm_keys);
+    /* process any final block that was a hash table */
+    if (read_incoming_table) {
+        process_table(incoming_table, dest_table, dest_keys);
+    }
 
-    /* if an annocheck section exists, collect those in to a hash table */
-    read_mapping(cfg, "annocheck", &ri->annocheck, &ri->annocheck_keys);
-
-    /* if a pathmigration section exists, collect those in to a hash table */
-    read_mapping(cfg, "pathmigration", &ri->pathmigration, &ri->pathmigration_keys);
-
-    /* if a products section exists, collect those in to a hash table */
-    read_mapping(cfg, "products", &ri->products, &ri->product_keys);
+    /* clean up */
+    free(key);
 
     return 0;
 }
@@ -847,7 +1055,6 @@ bool init_caps_whitelist(struct rpminspect *ri)
 int init_rpminspect(struct rpminspect *ri, const char *cfgfile, const char *profile)
 {
     int ret = 0;
-    dictionary *cfg = NULL;
     char *tmp = NULL;
     char *filename = NULL;
 
@@ -862,10 +1069,10 @@ int init_rpminspect(struct rpminspect *ri, const char *cfgfile, const char *prof
     ri->favor_release = FAVOR_NONE;
     ri->tests = ~0;
     ri->desktop_entry_files_dir = strdup(DESKTOP_ENTRY_FILES_DIR);
-    parse_list(BIN_PATHS, &ri->bin_paths);
+    ri->bin_paths = list_from_array(BIN_PATHS);
     ri->bin_owner = strdup(BIN_OWNER);
     ri->bin_group = strdup(BIN_GROUP);
-    parse_list(SHELLS, &ri->shells);
+    ri->shells = list_from_array(SHELLS);
     ri->specmatch = MATCH_FULL;
     ri->specprimary = PRIMARY_NAME;
 
@@ -880,12 +1087,8 @@ int init_rpminspect(struct rpminspect *ri, const char *cfgfile, const char *prof
         return 0;
     }
 
-    /* Load the configuration file and get a dictionary */
-    cfg = iniparser_load(ri->cfgfile);
-
     /* Read the main configuration file to get things started */
-    ret = read_cfgfile(cfg, ri, ri->cfgfile, false);
-    iniparser_freedict(cfg);
+    ret = read_cfgfile(ri, ri->cfgfile);
 
     if (ret) {
         fprintf(stderr, _("*** error reading '%s'\n"), ri->cfgfile);
@@ -894,16 +1097,16 @@ int init_rpminspect(struct rpminspect *ri, const char *cfgfile, const char *prof
 
     /* If a profile is specified, read an overlay config file */
     if (profile) {
-        xasprintf(&tmp, "%s/%s.conf", ri->profiledir, profile);
+        xasprintf(&tmp, "%s/%s.yaml", ri->profiledir, profile);
         filename = realpath(tmp, NULL);
 
         if ((filename == NULL) || (access(filename, F_OK|R_OK) == -1)) {
             fprintf(stderr, _("*** Unable to read profile '%s' from %s\n"), profile, filename);
         } else {
-            cfg = iniparser_load(filename);
-            ret = read_cfgfile(cfg, ri, filename, true);
-            iniparser_freedict(cfg);
+            ret = read_cfgfile(ri, filename);
         }
+
+        free(tmp);
     }
 
     /* the rest of the members are used at runtime */

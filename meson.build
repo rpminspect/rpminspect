@@ -1,6 +1,6 @@
 project('rpminspect',
         'c',
-        version : '0.13',
+        version : '1.0',
         default_options : [
             'c_std=c99',
             'warning_level=2',
@@ -70,19 +70,6 @@ if cc.has_header('mandoc_parse.h')
     add_project_arguments('-DNEWLIBMANDOC', language : 'c')
 else
     message('using libmandoc < 1.14.5 API')
-endif
-
-# libiniparser
-if not cc.has_function('iniparser_load', args : ['-liniparser'], dependencies : [zlib])
-    error('*** unable to find iniparser_load() in libiniparser')
-endif
-
-iniparser = declare_dependency(link_args : ['-liniparser'])
-
-if not cc.has_function('iniparser_getlongint', args : ['-liniparser'], dependencies : [zlib])
-    add_project_arguments('-D_INIPARSER=3', language : 'c')
-else
-    add_project_arguments('-D_INIPARSER=4', language : 'c')
 endif
 
 # libmagic

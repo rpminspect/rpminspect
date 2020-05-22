@@ -44,6 +44,17 @@ typedef struct _string_entry_t {
 typedef TAILQ_HEAD(string_entry_s, _string_entry_t) string_list_t;
 
 /*
+ * List of string pairs. Used to later convert in to a newly allocated hash table.
+ */
+typedef struct _pair_entry_t {
+    char *key;
+    char *value;
+    TAILQ_ENTRY(_pair_entry_t) items;
+} pair_entry_t;
+
+typedef TAILQ_HEAD(pair_entry_s, _pair_entry_t) pair_list_t;
+
+/*
  * A file is information about a file in an RPM payload.
  *
  * If fullpath is not NULL, it is the absolute path of the unpacked file.
@@ -321,6 +332,14 @@ struct rpminspect {
     regex_t *manpage_path_exclude;
     regex_t *xml_path_include;
     regex_t *xml_path_exclude;
+
+    /* copies of regex pattern strings used for debug mode output */
+    char *elf_path_include_pattern;
+    char *elf_path_exclude_pattern;
+    char *manpage_path_include_pattern;
+    char *manpage_path_exclude_pattern;
+    char *xml_path_include_pattern;
+    char *xml_path_exclude_pattern;
 
     /* Where desktop entry files live */
     char *desktop_entry_files_dir;

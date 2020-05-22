@@ -431,7 +431,7 @@ bool inspect_symlinks(struct rpminspect *ri);
 
 #define DESC_OWNERSHIP "Report files and directories owned by unexpected users and groups. Check to make sure executables are owned by the correct user and group. If a before and after build have been specified, also report ownership changes."
 
-#define DESC_SHELLSYNTAX "For all shell scripts in the build, perform a syntax check on it using the shell defined in its #! line (shell must also be listed in rpminspect.conf's shell setting). If the syntax check returns non-zero, report it to the user and return a combined stdout and stderr. If comparing two builds, perform the previous check but also report if a previously bad script is now passing the syntax check."
+#define DESC_SHELLSYNTAX "For all shell scripts in the build, perform a syntax check on it using the shell defined in its #! line (shell must also be listed in shell section of the configuration data). If the syntax check returns non-zero, report it to the user and return a combined stdout and stderr. If comparing two builds, perform the previous check but also report if a previously bad script is now passing the syntax check."
 
 #define DESC_ANNOCHECK "Perform annocheck tests defined in the configuration file on all ELF files in the build.  A single build specified will perform an analysis only.  Two builds specified will compare the test results between the before and after build.  If no annocheck tests are defined in the configuration file, this inspection is skipped."
 

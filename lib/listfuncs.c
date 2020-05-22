@@ -469,3 +469,34 @@ string_list_t * list_copy(const string_list_t *list)
 
     return result;
 }
+
+/**
+ * Given a NULL terminated array of strings, create a newly allocated
+ * string_list_t containing all of the array members.  Returned the
+ * new list.  Caller is responsible for freeing memory allocated by
+ * this function.
+ *
+ * @param array NULL terminated array of strings.
+ * @return Newly allocated string_list_t representing the array.
+ */
+string_list_t *list_from_array(const char **array)
+{
+    int i = 0;
+    string_list_t *list = NULL;
+    string_entry_t *entry = NULL;
+
+    assert(array != NULL);
+
+    list = calloc(1, sizeof(*list));
+    assert(list != NULL);
+    TAILQ_INIT(list);
+
+    for (i = 0; array[i] != NULL; i++) {
+        entry = calloc(1, sizeof(*entry));
+        assert(entry != NULL);
+        entry->data = strdup(array[i]);
+        TAILQ_INSERT_TAIL(list, entry, items);
+    }
+
+    return list;
+}

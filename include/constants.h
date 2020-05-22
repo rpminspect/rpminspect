@@ -49,7 +49,7 @@
  * @def CFGFILE
  * Default configuration file path.
  */
-#define CFGFILE "/etc/rpminspect/rpminspect.conf"
+#define CFGFILE "/etc/rpminspect/rpminspect.yaml"
 
 /**
  * @def CFG_PROFILE_DIR
@@ -227,12 +227,6 @@
 #define RPM_NOARCH_NAME "noarch"
 
 /**
- * @def BIN_PATHS
- * Space delimited string of paths where executable files may reside.
- */
-#define BIN_PATHS "/bin /sbin /usr/bin /usr/sbin"
-
-/**
  * @def BIN_OWNER
  * Executable file owner
  */
@@ -243,16 +237,6 @@
  * Executable file group
  */
 #define BIN_GROUP "root"
-
-/**
- * @def SHELLS
- * Space delimited list of shells to use for syntax checking (only the
- * basename is needed).  All shells listed must support the '-n'
- * option for syntax checking.  The shell should exit 0 if the syntax
- * checker passes, non-zero otherwise.  The 'rc' shell is an exception
- * and has special handling in the 'shellsyntax' inspection.
- */
-#define SHELLS "sh ksh zsh csh tcsh rc bash"
 
 /**
  * @def BUILD_ID_DIR
