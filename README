@@ -98,10 +98,6 @@ meson and ninja, plus the following libraries:
           https://mandoc.bsd.lv/
           ISC license
 
-    * iniparser
-          http://ndevilla.free.fr/iniparser/
-          MIT license
-
     * libyaml
           https://github.com/yaml/libyaml
           MIT license
@@ -233,7 +229,7 @@ To prepare a virtual environment for testing simple run:
     . my_test_env/bin/activate
     pip install meson ninja rpm-py-installer rpmfluff setuptools
     export RPMINSPECT=$PWD/build/src/rpminspect
-    export RPMINSPECT_CONF=$PWD/data/rpminspect.conf
+    export RPMINSPECT_YAML=$PWD/data/rpminspect.yaml
     export RPMINSPECT_TEST_DATA_PATH=$PWD/test/data
 
 To run all tests, execute the command:

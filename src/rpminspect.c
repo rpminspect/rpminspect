@@ -334,7 +334,6 @@ int main(int argc, char **argv) {
     bool fetch_only = false;
     bool keep = false;
     bool list = false;
-    bool debug = false;
     bool verbose = false;
     int mode = S_IRWXU | S_IRGRP | S_IXGRP | S_IROTH | S_IXOTH;
     bool found = false;
@@ -454,7 +453,7 @@ int main(int argc, char **argv) {
                 keep = true;
                 break;
             case 'd':
-                debug = true;
+                set_debug_mode(true);
                 break;
             case 'v':
                 verbose = true;
@@ -539,7 +538,6 @@ int main(int argc, char **argv) {
     free(profile);
 
     /* various options from the command line */
-    set_debug_mode(debug);
     ri.verbose = verbose;
     ri.product_release = release;
     ri.threshold = getseverity(threshold);
@@ -580,6 +578,9 @@ int main(int argc, char **argv) {
         free(ri.workdir);
         ri.workdir = strdup(r);
     }
+
+    /* Display the configuration settings for this run */
+    dump_cfg(&ri);
 
     /*
      * we should exactly one more argument (single build) or two arguments

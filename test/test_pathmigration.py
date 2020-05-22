@@ -20,8 +20,8 @@ import os
 import rpmfluff
 from baseclass import *
 
-# These tests rely on the [pathmigration] section in src/rpminspect.conf
-# in the source tree.
+# These tests rely on the [pathmigration] section in
+# data/rpminspect.yaml in the source tree.
 
 ########
 # /bin #

@@ -1,0 +1,400 @@
+#
+# rpminspect configuration file
+# See rpminspect.yaml(5) for more information.
+#
+
+---
+common:
+    # Directory where individual rpminspect jobs will expand packages
+    # and generate all of the test output.  This needs to be a
+    # location with plenty of storage space.
+    workdir: /var/tmp/rpminspect
+
+    # Location of runtime profile configuration files.  These are files
+    # that contain overrides for the settings in rpminspect.yaml (except
+    # for the [common] section).  Profiles are referred to by NAME and
+    # the file would be NAME.yaml.  Any profile used at runtime must
+    # exist in the profile directory.
+    profiledir: /etc/rpminspect/profiles
+
+koji:
+    # The root URL of the XMLRPC API provided by the Koji hub
+    hub: http://koji-hub.example.com/api/v1
+
+    # The download URL for regular packages built in Koji
+    download_ursine: http://download.example.com/downloadroot
+
+    # The download URL for modular packages built in Koji
+    download_mbs: http://download.example.com/downloadroot
+
+vendor:
+    # Where the vendor data files can be found.  The
+    # rpminspect-data-generic package provides a template of where
+    # these files should live.
+    #
+    # These settings name the specific subdirectories.  The files
+    # within them depend on the data file being read.  Most will have
+    # filenames matching the product release (which is usually the
+    # %{disttag} value for the builds.
+
+    # Main directory for the vendor-specific data.
+    vendor_data_dir: /usr/share/rpminspect
+
+    # Location of the license database file under the 'licenses/'
+    # subdirectory in the vendor_data_dir.  This database is used
+    # by the 'license' inspection.
+    licensedb: approved.json
+
+    # Which product release string to favor.  By default, rpminspect
+    # expects the product release strings for the before and after
+    # builds to match.  You can change this here to:
+    #
+    #     oldest  Favor the oldest product release string.
+    #     newest  Favor the newest product release string.
+    #     none    Default behavior, require matching release strings.
+    #
+    # If this is set to anything other than 'none', rpminspect will
+    # use strverscmp() to compare the strings and return the one that
+    # matches based on the rule here.  Setting this any value other
+    # than the ones listed here will be ignored and the default
+    # behavior will remain in effect.
+    #
+    # The product release string tells rpminspect which vendor data
+    # files to use from the vendor_data_dir.
+    #favor_release: none
+
+#inspections:
+    # By default all inspections are enabled.  You can enable and
+    # disable inspections using the command line -T and -E options, or
+    # you can add them to this section in the config file.  The format
+    # is:
+    #
+    #     inspection_name: [on|off]
+    #
+    # The default is enabled, so it is really only necessary to list
+    # the inspections to disable.  Here is a list of all inspections
+    # with a disable setting that you can uncomment to turn off
+    # certain ones.
+    #
+    #addedfiles: off
+    #annocheck: off
+    #arch: off
+    #capabilities: off
+    #changedfiles: off
+    #changelog: off
+    #desktop: off
+    #disttag: off
+    #DT_NEEDED: off
+    #elf: off
+    #emptyrpm: off
+    #filesize: off
+    #javabytecode: off
+    #kmod: off
+    #license: off
+    #LTO: off
+    #manpage: off
+    #metadata: off
+    #modularity: off
+    #ownership: off
+    #pathmigration: off
+    #permissions: off
+    #removedfiles: off
+    #shellsyntax: off
+    #specname: off
+    #subpackages: off
+    #symlinks: off
+    #upstream: off
+    #xml: off
+
+#products:
+    # Product release string matches.  rpminspect uses product release
+    # strings to determine what metadata files to use from the
+    # rpminspect-data package.  By default, rpminspect tries to figure
+    # out the product by extracting the dist tag portion of the
+    # Release tag in the RPM.  If you are comparing two builds, the
+    # product release string needs to match.  If they do not match,
+    # you have two options:
+    #
+    # 1) Specify the "-r" option and give rpminspect a product release
+    #    string.
+    # 2) Rely on the product release string regexps in rpminspect.yaml
+    #
+    # Some products may have a variety of dist tags, so you can
+    # construct a regular expression to match them.  For example,
+    # let's say your dist tags are ".fc31, .fc31server, .fc31laptop".
+    # You want to use "fc31" for all of these, so you can add a rule
+    # here that looks like:
+    #
+    #     - fc31: ^\.fc31.*$
+    #
+    # And rpminspect will match the longer ones to fc31.  By default
+    # there is no product release regexp mapping enabled.
+    #- fc31: ^\.fc31.*$
+
+ignore:
+    # Sometimes you want certain files or directories ignored by
+    # rpminspect.  This section lets you list paths--glob(3) syntax
+    # allowed--that you want rpminspect to ignore for all inspections.
+    #
+    # This is an array of glob(3) compatible strings to match paths
+    # to ignore.
+    - /usr/lib/python?.?/site-packages/__pycache__
+    - /usr/lib/python?.?/site-packages/*/*.pyc
+
+security_path_prefix:
+    # Optional: Path prefixes for files with security concerns.  This
+    # is an array of directory names.  This setting is used by multiple
+    # inspections.
+    - /etc/sudoers.d/
+    - /etc/polkit-1/
+    - /usr/share/polkit-1/actions/
+
+badwords:
+    # List of unprofessional or prohibited words.  rpminspect will
+    # check for these words via a case-insensitive regular expression
+    # test in various string data, such as the license tag and package
+    # description.  Please only list individual words and not phrases
+    # as the test is meant to capture substrings for instances where
+    # some care needs to be taken for phrasing or name abbreviations.
+    #
+    # This is an array, so each prohibited word needs to be a separate
+    # array entry in YAML syntax.
+    #
+    # The bad words list is used by multiple inspections.
+    - badword
+    - anotherbadword
+    - reallybadword
+
+metadata:
+    # Required Vendor string.  This is part of the RPM header and is
+    # the value expected in packages checked by rpminspect.
+    vendor: Vendorco Ltd.
+
+    # Allowed build host subdomain.  The RPM header contains information about
+    # where the package was built.  rpminspect verifies the hostnames are in
+    # the expected subdomain listed below.
+    #
+    # This is an array of allowed subdomains.
+    buildhost_subdomain:
+        - localhost
+        - .localdomain
+        - .example.com
+
+elf:
+    # File paths to include in or exclude from specific tests. Each
+    # value is a POSIX extended regular expression. Individual tests
+    # may apply additional filters (e.g., ELF tests only run on ELF
+    # files)
+    #
+    # For ELF, skip the kernel, kernel modules, and two additional
+    # paths for ppc/ppc64: crtsavres.o is linked against kernel
+    # modules, and kernel-wrapper is a boot wrapper that should not be
+    # inspected.
+    #
+    # These are regular expressions used by regexp(3).
+    #include_path:
+    exclude_path: (^(/boot/vmlinu|/lib/modules|/lib64/modules).*)|(.*/powerpc/lib/crtsavres.o$)|(^/usr/lib(64)?/kernel-wrapper$)
+
+    # Blacklist of functions which indicate broken support for
+    # IPv6. Depending on how they are used, their usage could be
+    # benign but it requires manual inspection.
+    #
+    # This is an array of forbidden function names.
+    ipv6_blacklist:
+        - gethostbyname
+        - gethostbyname2
+        - gethostbyaddr
+        - inet_addr
+        - inet_aton
+        - inet_nsap_addr
+        - inet_ntoa
+        - inet_nsap_ntoa
+        - inet_makeaddr
+        - inet_netof
+        - inet_network
+        - inet_neta
+        - inet_net_ntop
+        - inet_net_pton
+        - rcmd
+        - rexec
+        - rresvport
+
+manpage:
+    # Regular expression matching man page installation directories.
+    include_path: ^(/usr|/usr/local)/share/man/.*
+
+    # Regular expression matching directories to ignore during the
+    # man page inspection.
+    #exclude_path:
+
+xml:
+    # Regular expression matching directories to include in the xml
+    # expression.
+    #include_path:
+
+    # Regular expression matching directories to ignore during the xml
+    # inspection. Skip JSP and RHTML files, which contain a mix of XML
+    # and code.
+    exclude_path: .*(\.jsp|\.rhtml)$
+
+desktop:
+    # Where desktop entry files live
+    desktop_entry_files_dir: /usr/share/applications
+
+changedfiles:
+    # Optional: Filename extensions expected for C and C++ header files
+    header_file_extensions:
+        - .h
+        - .hh
+        - .hxx
+        - .hpp
+        - .H
+
+addedfiles:
+    # Optional: Forbidden path prefixes, space delimited list.
+    forbidden_path_prefixes:
+        - tmp/
+        - var/tmp
+        - etc/init.d
+        - etc/xinetd.d
+
+    # Optional: Forbidden path suffixes.
+    forbidden_path_suffixes:
+        - '~'
+        - .orig
+
+    # Optional: Forbidden directories.
+    forbidden_directories:
+        - __MACOSX
+        - CVS
+        - .svn
+        - .hg
+        - .git
+
+ownership:
+    # Path prefixes where executable files live
+    bin_paths:
+        - /bin
+        - /sbin
+        - /usr/bin
+        - /usr/sbin
+
+    # Owner name for executable files
+    bin_owner: root
+
+    # Group name for executable files
+    bin_group: root
+
+    # Optional: List of forbidden file owners
+    forbidden_owners:
+        - mockbuild
+
+    # Optional: List of forbidden file groups
+    forbidden_groups:
+        - mockbuild
+
+shellsyntax:
+    # List of shells used to perform syntax checking (must support -n)
+    # This is used by the shellsyntax inspection.  For every shell
+    # script encountered in the build, the program will get the name
+    # of the shell from the #! line and check to see if it's in this
+    # list.  If it is, it performs a -n check on the script and if
+    # that returns non-zero, it gets reported out.  NOTE: Each shell
+    # listed must be listed by basename only and must support the '-n'
+    # option for syntax checking.
+    shells:
+        - sh
+        - ksh
+        - zsh
+        - csh
+        - tcsh
+        - rc
+        - bash
+
+filesize:
+    # File size reporting threshold percentage.  What percentage
+    # change warrants reporting a VERIFY result?  This change can be
+    # file size increase or decrease.  The default is 20%
+    size_threshold: 20
+
+lto:
+    # Link Time Optimization symbol name prefixes. Symbols are checked
+    # on ELF .o and .a files and if found, a result is generated
+    # indicating .o and .a files should not carry LTO symbols since
+    # the information is not portable between different versions of
+    # gcc.
+    lto_symbol_name_prefixes:
+        - .gnu.lto_
+        - .gnu.debuglto_
+        - __gnu_lto_v1
+
+specname:
+    # Spec filename test matching type.
+    # The spec filename should match the %{name} defined in the spec
+    # file.  For example.  If the spec file sets "Name: someprogram"
+    # then the spec file should be named "someprogram.spec".  There
+    # are cases where the spec file may vary slightly from that, so
+    # you can set the match type here.  It can be 'prefix', 'full', or
+    # 'suffix'.  Here are some examples using the someprogram example
+    # above:
+    #
+    #     %{name}          specname           Match Type     Passes?
+    #     someprogram      someprogram.spec   full           yes
+    #     someprogram      some_program.spec  full           no
+    #     my-someprogram   someprogram.spec   full           no
+    #     my-someprogram   someprogram.spec   prefix         no
+    #     my-someprogram   someprogram.spec   suffix         yes
+    #     someprogram-opt  someprogram.spec   prefix         yes
+    #
+    # By default this inspection uses 'full' matching.
+    match: full
+    #match: prefix
+    #match: suffix
+
+    # Where should rpminspect get the primary name value?  The
+    # filename without the .spec extension or the package's %{name}
+    # value?  By default this is the %{name}.
+    primary: name
+    #primary: filename
+
+annocheck:
+    # annocheck(1) tests to run.  The left side of the colon is the
+    # test name you want to use and the right side are the arguments
+    # to the annocheck executable before giving it the full path to
+    # the filename.
+    #
+    # This section is optional.  If no annocheck tests are defined
+    # here, rpminspect will skip the annocheck inspection.
+    - hardened: --skip-glibcxx-assertions --skip-stack-realign --ignore-unknown --enable-builtby
+    - built-by: --disable-hardened --enable-builtby --ignore-unknown
+
+javabytecode:
+    # Minimum major JVM version number for each product release.  The
+    # key should be the product release string that you will use
+    # consistently throughout the run of rpminspect (e.g., a dist tag
+    # for Fedora).  The value is the JVM major version.  For example:
+    #     fc30: 53
+    # You should also always specify a default, like this:
+    #     default: 53
+    # If the product release string is not found, the javabytecode
+    # test will use the default entry.  You can have as many entries
+    # as you want in this section.
+    - default: 52
+
+pathmigration:
+    # Path migrations.  Over time the established best practices or
+    # packaging policies change.  Directories we once used are now
+    # replaced by a new directory.  The 'pathmigration' inspection
+    # looks for any old path names and if found reports what they
+    # should be.  Under this config section use the left side of the
+    # colon to note the old path and the right side of the colon to
+    # note the new path.  For example:
+    #
+    #    - /bin: /usr/bin
+    #
+    # Any package containing a file in /bin will have a failure
+    # reporting that file should be in /usr/bin.
+    - /bin: /usr/bin
+    - /sbin: /usr/sbin
+    - /lib: /usr/lib
+    - /lib64: /usr/lib64

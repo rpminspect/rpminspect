@@ -70,8 +70,8 @@
 
 /* license */
 #define REMEDY_LICENSE _("The License tag must contain an approved license string as defined by the distribution (e.g., GPLv2+).  If the license in question is approved, the license database needs updating in the rpminspect-data package.")
-#define REMEDY_LICENSEDB _("Make sure the licensedb setting in the rpminspect.conf file is set to a valid licensedb file.  This is also commonly due to a missing vendor specific rpminspect-data package on the system.")
-#define REMEDY_UNAPPROVED_LICENSE _("The specified license abbreviation is not listed as approved in the license database.  The license database is specified in the rpminspect.conf file.  Check this file and send a pull request to the appropriate upstream project to update the database.  If the license is listed in the database but marked unapproved, you may need to work with the legal team regarding options for this software.")
+#define REMEDY_LICENSEDB _("Make sure the licensedb setting in the rpminspect configuration is set to a valid licensedb file.  This is also commonly due to a missing vendor specific rpminspect-data package on the system.")
+#define REMEDY_UNAPPROVED_LICENSE _("The specified license abbreviation is not listed as approved in the license database.  The license database is specified in the rpminspect configuration file.  Check this file and send a pull request to the appropriate upstream project to update the database.  If the license is listed in the database but marked unapproved, you may need to work with the legal team regarding options for this software.")
 
 /* elf */
 #define REMEDY_ELF_TEXTREL _("Ensure all object files are compiled with -fPIC")
@@ -119,10 +119,10 @@
 
 /* ownership */
 #define REMEDY_OWNERSHIP_DEFATTR _("Make sure the %%files section includes the %%defattr macro.")
-#define REMEDY_OWNERSHIP_BIN_OWNER _("Bin path files must be owned by the bin_owner set in rpminspect.conf, which is usually root.")
-#define REMEDY_OWNERSHIP_BIN_GROUP _("Bin path files must be owned by the bin_group set in rpminspect.conf, which is usually root.")
-#define REMEDY_OWNERSHIP_IXOTH _("Either chgrp the file to the bin_group set in rpminspect.conf or remove the world execute bit on the file (chmod o-x).")
-#define REMEDY_OWNERSHIP_IWGRP _("Either chgrp the file to the bin_group set in rpminspect.conf or remove the group write bit on the file (chmod g-w).")
+#define REMEDY_OWNERSHIP_BIN_OWNER _("Bin path files must be owned by the bin_owner set in the rpminspect configuration, which is usually root.")
+#define REMEDY_OWNERSHIP_BIN_GROUP _("Bin path files must be owned by the bin_group set in the rpminspect configuration, which is usually root.")
+#define REMEDY_OWNERSHIP_IXOTH _("Either chgrp the file to the bin_group set in the rpminspect configuration or remove the world execute bit on the file (chmod o-x).")
+#define REMEDY_OWNERSHIP_IWGRP _("Either chgrp the file to the bin_group set in the rpminspect configuration or remove the group write bit on the file (chmod g-w).")
 #define REMEDY_OWNERSHIP_CHANGED _("Verify the ownership changes are expected. If not, adjust the package build process to set correct owner and group information.")
 
 /* shellsyntax */

@@ -12,6 +12,7 @@ inspect_elf_bits_dep = declare_dependency(sources : [inspect_elf_bits_c])
 librpminspect_sources = [
     'badwords.c',
     'builds.c',
+    'bytes.c',
     'checksums.c',
     'copyfile.c',
     'debug.c',
@@ -92,7 +93,6 @@ librpminspect = library(
         openssl,
         libcap,
         mandoc,
-        iniparser,
         magic,
         dl,
     ]
