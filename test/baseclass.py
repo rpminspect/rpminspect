@@ -111,7 +111,7 @@ class RequiresRpminspect(unittest.TestCase):
             hn = socket.getfqdn()
             hnd = None
 
-            if hn.index('.') != -1:
+            if hn.find('.') != -1:
                 hnd = '.' + hn.split('.', 1)[1]
 
             if hn.startswith("localhost"):
