@@ -92,7 +92,6 @@ static char *get_shell(const struct rpminspect *ri, const char *fullpath)
     }
 
     free(start);
-    DEBUG_PRINT("shell=|%s|\n", shell);
     return shell;
 }
 
@@ -127,11 +126,12 @@ static bool shellsyntax_driver(struct rpminspect *ri, rpmfile_entry_t *file)
 
     /* Get the shell from the #! line */
     shell = get_shell(ri, file->fullpath);
-    DEBUG_PRINT("shell=|%s|\n", shell);
 
     if (!shell) {
         return true;
     }
+
+    DEBUG_PRINT("shell=|%s|\n", shell);
 
     /* Set up the result parameters */
     init_result_params(&params);
