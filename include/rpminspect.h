@@ -23,7 +23,6 @@
 #include <stdbool.h>
 #include <sys/types.h>
 #include <sys/capability.h>
-#include <iniparser.h>
 #include <regex.h>
 #include <rpm/header.h>
 
