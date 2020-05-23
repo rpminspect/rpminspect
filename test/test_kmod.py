@@ -42,7 +42,7 @@ if not have_kernel_devel:
     (out, err) = proc.communicate()
     if proc.returncode == 0:
         for kver in out.splitlines():
-            kmakefile = os.path.join('/lib/modules', kver, 'build/Makefile')
+            kmakefile = os.path.join('/lib/modules', str(kver), 'build/Makefile')
             if os.path.isfile(kmakefile):
                 have_kernel_devel = True
                 break
