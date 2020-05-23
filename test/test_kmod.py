@@ -16,18 +16,43 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 #
 
+import glob
 import os
 import shutil
+import subprocess
 import unittest
 import rpmfluff
 from baseclass import TestCompareRPMs, TestCompareKoji
 
-# Kernel version where the tests are running, will be used
-# for module building during the tests.
-kver = os.uname()[2]
+# We try to use the running kernel, but failing that we look at what version we have
+# installed with build files and go with that.  The kernel version is necessary for
+# kmod tests below.
+have_kernel_devel = False
 
-# All of these tests require the kernel devel package installed
-have_kernel_devel = os.path.isfile(os.path.join('/lib/modules', kver, 'build/Makefile'))
+# Try the running kernel
+kver = os.uname()[2]
+kmakefile = os.path.join('/lib/modules', kver, 'build/Makefile')
+if not have_kernel_devel and os.path.isfile(kmakefile):
+    have_kernel_devel = True
+
+# Try the installed RPMs
+if not have_kernel_devel:
+    args = ["rpm", "-q", "--queryformat='%{version}-%{release}.%{arch}\n'", "kernel-devel"]
+    proc = subprocess.Popen(args, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    (out, err) = proc.communicate()
+    if proc.returncode == 0:
+        for kver in out.splitlines():
+            kmakefile = os.path.join('/lib/modules', kver, 'build/Makefile')
+            if os.path.isfile(kmakefile):
+                have_kernel_devel = True
+                break
+
+# Lastly, try just finding the first file in /lib/modules
+if not have_kernel_devel:
+    makefiles = glob.glob("/lib/modules/*/build/Makefile"):
+    if len(makefiles) > 0:
+        kver = makefiles[0].split('/')[3]
+        have_kernel_devel = True
 
 # Support functions to build the kernel modules we need
 def build_module(rpminspect, build_ext=None, extra_cflags=None):
