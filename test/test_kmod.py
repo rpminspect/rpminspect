@@ -49,7 +49,7 @@ if not have_kernel_devel:
 
 # Lastly, try just finding the first file in /lib/modules
 if not have_kernel_devel:
-    makefiles = glob.glob("/lib/modules/*/build/Makefile"):
+    makefiles = glob.glob("/lib/modules/*/build/Makefile")
     if len(makefiles) > 0:
         kver = makefiles[0].split('/')[3]
         have_kernel_devel = True
