@@ -1,5 +1,5 @@
 # Set up an environment for running the tests.
-FROM fedora:31
+FROM fedora:rawhide
 RUN dnf -y install 'dnf-command(builddep)'
 RUN dnf -y install ksh rc tcsh zsh
 
