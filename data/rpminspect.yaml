@@ -327,6 +327,7 @@ lto:
         - .gnu.lto_
         - .gnu.debuglto_
         - __gnu_lto_v1
+        - __gnu_lto_slim
 
 specname:
     # Spec filename test matching type.
@@ -365,8 +366,7 @@ annocheck:
     #
     # This section is optional.  If no annocheck tests are defined
     # here, rpminspect will skip the annocheck inspection.
-    - hardened: --skip-glibcxx-assertions --skip-stack-realign --ignore-unknown --enable-builtby
-    - built-by: --disable-hardened --enable-builtby --ignore-unknown
+    - hardened: --ignore-unknown --verbose
 
 javabytecode:
     # Minimum major JVM version number for each product release.  The
