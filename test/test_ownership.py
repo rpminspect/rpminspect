@@ -1,7 +1,7 @@
 #
 # Copyright (C) 2020  Red Hat, Inc.
 # Author(s):  David Cantrell <dcantrell@redhat.com>
-#                   Jim Bair <jbair@redhat.com>
+#             Jim Bair <jbair@redhat.com>
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -17,14 +17,15 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 #
 
+import os
 import rpmfluff
 
 from baseclass import TestRPMs, TestKoji
 from baseclass import TestCompareRPMs, TestCompareKoji
 
-script_source = '''#!/bin/sh
-echo This is a script
-'''
+# Read in the built rpminspect executable for use in these test RPMs
+with open(os.environ['RPMINSPECT'], mode='rb') as f:
+    ri_bytes = f.read()
 
 #############
 # bin owner #
@@ -39,8 +40,8 @@ class SlashBinOwnedByRootRPMs(TestRPMs):
         TestRPMs.setUp(self)
 
         # add file owned by root
-        self.rpm.add_installed_file(installPath='bin/testscript',
-                                    sourceFile=rpmfluff.SourceFile('testscript.sh', script_source),
+        self.rpm.add_installed_file(installPath='bin/rpminspect',
+                                    sourceFile=rpmfluff.SourceFile('rpminspect', ri_bytes),
                                     owner="root")
 
         self.inspection = 'ownership'
@@ -56,8 +57,8 @@ class SlashSbinOwnedByRootRPMs(TestRPMs):
         TestRPMs.setUp(self)
 
         # add file owned by root
-        self.rpm.add_installed_file(installPath='sbin/testscript',
-                                    sourceFile=rpmfluff.SourceFile('testscript.sh', script_source),
+        self.rpm.add_installed_file(installPath='sbin/rpminspect',
+                                    sourceFile=rpmfluff.SourceFile('rpminspect', ri_bytes),
                                     owner="root")
 
         self.inspection = 'ownership'
@@ -73,8 +74,8 @@ class SlashUsrSlashBinOwnedByRootRPMs(TestRPMs):
         TestRPMs.setUp(self)
 
         # add file owned by root
-        self.rpm.add_installed_file(installPath='usr/bin/testscript',
-                                    sourceFile=rpmfluff.SourceFile('testscript.sh', script_source),
+        self.rpm.add_installed_file(installPath='usr/bin/rpminspect',
+                                    sourceFile=rpmfluff.SourceFile('rpminspect', ri_bytes),
                                     owner="root")
 
         self.inspection = 'ownership'
@@ -90,8 +91,8 @@ class SlashUsrSlashSbinOwnedByRootRPMs(TestRPMs):
         TestRPMs.setUp(self)
 
         # add file owned by root
-        self.rpm.add_installed_file(installPath='usr/sbin/testscript',
-                                    sourceFile=rpmfluff.SourceFile('testscript.sh', script_source),
+        self.rpm.add_installed_file(installPath='usr/sbin/rpminspect',
+                                    sourceFile=rpmfluff.SourceFile('rpminspect', ri_bytes),
                                     owner="root")
 
         self.inspection = 'ownership'
@@ -107,8 +108,8 @@ class SlashBinOwnedByBinRPMs(TestRPMs):
         TestRPMs.setUp(self)
 
         # add file owned by root
-        self.rpm.add_installed_file(installPath='bin/testscript',
-                                    sourceFile=rpmfluff.SourceFile('testscript.sh', script_source),
+        self.rpm.add_installed_file(installPath='bin/rpminspect',
+                                    sourceFile=rpmfluff.SourceFile('rpminspect', ri_bytes),
                                     owner="bin")
 
         self.inspection = 'ownership'
@@ -125,8 +126,8 @@ class SlashSbinOwnedByBinRPMs(TestRPMs):
         TestRPMs.setUp(self)
 
         # add file owned by root
-        self.rpm.add_installed_file(installPath='sbin/testscript',
-                                    sourceFile=rpmfluff.SourceFile('testscript.sh', script_source),
+        self.rpm.add_installed_file(installPath='sbin/rpminspect',
+                                    sourceFile=rpmfluff.SourceFile('rpminspect', ri_bytes),
                                     owner="bin")
 
         self.inspection = 'ownership'
@@ -143,8 +144,8 @@ class SlashUsrSlashBinOwnedByBinRPMs(TestRPMs):
         TestRPMs.setUp(self)
 
         # add file owned by root
-        self.rpm.add_installed_file(installPath='usr/bin/testscript',
-                                    sourceFile=rpmfluff.SourceFile('testscript.sh', script_source),
+        self.rpm.add_installed_file(installPath='usr/bin/rpminspect',
+                                    sourceFile=rpmfluff.SourceFile('rpminspect', ri_bytes),
                                     owner="bin")
 
         self.inspection = 'ownership'
@@ -161,8 +162,8 @@ class SlashUsrSlashSbinOwnedByBinRPMs(TestRPMs):
         TestRPMs.setUp(self)
 
         # add file owned by root
-        self.rpm.add_installed_file(installPath='usr/sbin/testscript',
-                                    sourceFile=rpmfluff.SourceFile('testscript.sh', script_source),
+        self.rpm.add_installed_file(installPath='usr/sbin/rpminspect',
+                                    sourceFile=rpmfluff.SourceFile('rpminspect', ri_bytes),
                                     owner="bin")
 
         self.inspection = 'ownership'
@@ -179,8 +180,8 @@ class SlashBinOwnedByRootKoji(TestKoji):
         TestKoji.setUp(self)
 
         # add file owned by root
-        self.rpm.add_installed_file(installPath='bin/testscript',
-                                    sourceFile=rpmfluff.SourceFile('testscript.sh', script_source),
+        self.rpm.add_installed_file(installPath='bin/rpminspect',
+                                    sourceFile=rpmfluff.SourceFile('rpminspect', ri_bytes),
                                     owner="root")
 
         self.inspection = 'ownership'
@@ -196,8 +197,8 @@ class SlashSbinOwnedByRootKoji(TestKoji):
         TestKoji.setUp(self)
 
         # add file owned by root
-        self.rpm.add_installed_file(installPath='sbin/testscript',
-                                    sourceFile=rpmfluff.SourceFile('testscript.sh', script_source),
+        self.rpm.add_installed_file(installPath='sbin/rpminspect',
+                                    sourceFile=rpmfluff.SourceFile('rpminspect', ri_bytes),
                                     owner="root")
 
         self.inspection = 'ownership'
@@ -213,8 +214,8 @@ class SlashUsrSlashBinOwnedByRootKoji(TestKoji):
         TestKoji.setUp(self)
 
         # add file owned by root
-        self.rpm.add_installed_file(installPath='usr/bin/testscript',
-                                    sourceFile=rpmfluff.SourceFile('testscript.sh', script_source),
+        self.rpm.add_installed_file(installPath='usr/bin/rpminspect',
+                                    sourceFile=rpmfluff.SourceFile('rpminspect', ri_bytes),
                                     owner="root")
 
         self.inspection = 'ownership'
@@ -230,8 +231,8 @@ class SlashUsrSlashSbinOwnedByRootKoji(TestKoji):
         TestKoji.setUp(self)
 
         # add file owned by root
-        self.rpm.add_installed_file(installPath='usr/sbin/testscript',
-                                    sourceFile=rpmfluff.SourceFile('testscript.sh', script_source),
+        self.rpm.add_installed_file(installPath='usr/sbin/rpminspect',
+                                    sourceFile=rpmfluff.SourceFile('rpminspect', ri_bytes),
                                     owner="root")
 
         self.inspection = 'ownership'
@@ -247,8 +248,8 @@ class SlashBinOwnedByBinKoji(TestKoji):
         TestKoji.setUp(self)
 
         # add file owned by bin
-        self.rpm.add_installed_file(installPath='bin/testscript',
-                                    sourceFile=rpmfluff.SourceFile('testscript.sh', script_source),
+        self.rpm.add_installed_file(installPath='bin/rpminspect',
+                                    sourceFile=rpmfluff.SourceFile('rpminspect', ri_bytes),
                                     owner="bin")
 
         self.inspection = 'ownership'
@@ -265,8 +266,8 @@ class SlashSbinOwnedByBinKoji(TestKoji):
         TestKoji.setUp(self)
 
         # add file owned by bin
-        self.rpm.add_installed_file(installPath='sbin/testscript',
-                                    sourceFile=rpmfluff.SourceFile('testscript.sh', script_source),
+        self.rpm.add_installed_file(installPath='sbin/rpminspect',
+                                    sourceFile=rpmfluff.SourceFile('rpminspect', ri_bytes),
                                     owner="bin")
 
         self.inspection = 'ownership'
@@ -283,8 +284,8 @@ class SlashUsrSlashBinOwnedByBinKoji(TestKoji):
         TestKoji.setUp(self)
 
         # add file owned by bin
-        self.rpm.add_installed_file(installPath='usr/bin/testscript',
-                                    sourceFile=rpmfluff.SourceFile('testscript.sh', script_source),
+        self.rpm.add_installed_file(installPath='usr/bin/rpminspect',
+                                    sourceFile=rpmfluff.SourceFile('rpminspect', ri_bytes),
                                     owner="bin")
 
         self.inspection = 'ownership'
@@ -301,8 +302,8 @@ class SlashUsrSlashSbinOwnedByBinKoji(TestKoji):
         TestKoji.setUp(self)
 
         # add file owned by bin
-        self.rpm.add_installed_file(installPath='bin/testscript',
-                                    sourceFile=rpmfluff.SourceFile('testscript.sh', script_source),
+        self.rpm.add_installed_file(installPath='bin/rpminspect',
+                                    sourceFile=rpmfluff.SourceFile('rpminspect', ri_bytes),
                                     owner="bin")
 
         self.inspection = 'ownership'
@@ -319,8 +320,8 @@ class SlashBinOwnedByRootCompareRPMs(TestCompareRPMs):
         TestCompareRPMs.setUp(self)
 
         # add file owned by root
-        self.after_rpm.add_installed_file(installPath='bin/testscript',
-                                          sourceFile=rpmfluff.SourceFile('testscript.sh', script_source),
+        self.after_rpm.add_installed_file(installPath='bin/rpminspect',
+                                          sourceFile=rpmfluff.SourceFile('rpminspect', ri_bytes),
                                           owner="root")
 
         self.inspection = 'ownership'
@@ -336,8 +337,8 @@ class SlashSbinOwnedByRootCompareRPMs(TestCompareRPMs):
         TestCompareRPMs.setUp(self)
 
         # add file owned by root
-        self.after_rpm.add_installed_file(installPath='sbin/testscript',
-                                          sourceFile=rpmfluff.SourceFile('testscript.sh', script_source),
+        self.after_rpm.add_installed_file(installPath='sbin/rpminspect',
+                                          sourceFile=rpmfluff.SourceFile('rpminspect', ri_bytes),
                                           owner="root")
 
         self.inspection = 'ownership'
@@ -353,8 +354,8 @@ class SlashUsrSlashBinOwnedByRootCompareRPMs(TestCompareRPMs):
         TestCompareRPMs.setUp(self)
 
         # add file owned by root
-        self.after_rpm.add_installed_file(installPath='usr/bin/testscript',
-                                          sourceFile=rpmfluff.SourceFile('testscript.sh', script_source),
+        self.after_rpm.add_installed_file(installPath='usr/bin/rpminspect',
+                                          sourceFile=rpmfluff.SourceFile('rpminspect', ri_bytes),
                                           owner="root")
 
         self.inspection = 'ownership'
@@ -370,8 +371,8 @@ class SlashUsrSlashSbinOwnedByRootCompareRPMs(TestCompareRPMs):
         TestCompareRPMs.setUp(self)
 
         # add file owned by root
-        self.after_rpm.add_installed_file(installPath='usr/sbin/testscript',
-                                          sourceFile=rpmfluff.SourceFile('testscript.sh', script_source),
+        self.after_rpm.add_installed_file(installPath='usr/sbin/rpminspect',
+                                          sourceFile=rpmfluff.SourceFile('rpminspect', ri_bytes),
                                           owner="root")
 
         self.inspection = 'ownership'
@@ -387,8 +388,8 @@ class SlashBinOwnedByBinCompareRPMs(TestCompareRPMs):
         TestCompareRPMs.setUp(self)
 
         # add file owned by root
-        self.after_rpm.add_installed_file(installPath='bin/testscript',
-                                          sourceFile=rpmfluff.SourceFile('testscript.sh', script_source),
+        self.after_rpm.add_installed_file(installPath='bin/rpminspect',
+                                          sourceFile=rpmfluff.SourceFile('rpminspect', ri_bytes),
                                           owner="bin")
 
         self.inspection = 'ownership'
@@ -405,8 +406,8 @@ class SlashSbinOwnedByBinCompareRPMs(TestCompareRPMs):
         TestCompareRPMs.setUp(self)
 
         # add file owned by root
-        self.after_rpm.add_installed_file(installPath='sbin/testscript',
-                                          sourceFile=rpmfluff.SourceFile('testscript.sh', script_source),
+        self.after_rpm.add_installed_file(installPath='sbin/rpminspect',
+                                          sourceFile=rpmfluff.SourceFile('rpminspect', ri_bytes),
                                           owner="bin")
 
         self.inspection = 'ownership'
@@ -423,8 +424,8 @@ class SlashUsrSlashBinOwnedByBinCompareRPMs(TestCompareRPMs):
         TestCompareRPMs.setUp(self)
 
         # add file owned by root
-        self.after_rpm.add_installed_file(installPath='usr/bin/testscript',
-                                          sourceFile=rpmfluff.SourceFile('testscript.sh', script_source),
+        self.after_rpm.add_installed_file(installPath='usr/bin/rpminspect',
+                                          sourceFile=rpmfluff.SourceFile('rpminspect', ri_bytes),
                                           owner="bin")
 
         self.inspection = 'ownership'
@@ -441,8 +442,8 @@ class SlashUsrSlashSbinOwnedByBinCompareRPMs(TestCompareRPMs):
         TestCompareRPMs.setUp(self)
 
         # add file owned by root
-        self.after_rpm.add_installed_file(installPath='usr/sbin/testscript',
-                                          sourceFile=rpmfluff.SourceFile('testscript.sh', script_source),
+        self.after_rpm.add_installed_file(installPath='usr/sbin/rpminspect',
+                                          sourceFile=rpmfluff.SourceFile('rpminspect', ri_bytes),
                                           owner="bin")
 
         self.inspection = 'ownership'
@@ -459,8 +460,8 @@ class SlashBinOwnedByRootCompareKoji(TestCompareKoji):
         TestCompareKoji.setUp(self)
 
         # add file owned by root
-        self.after_rpm.add_installed_file(installPath='bin/testscript',
-                                          sourceFile=rpmfluff.SourceFile('testscript.sh', script_source),
+        self.after_rpm.add_installed_file(installPath='bin/rpminspect',
+                                          sourceFile=rpmfluff.SourceFile('rpminspect', ri_bytes),
                                           owner="root")
 
         self.inspection = 'ownership'
@@ -476,8 +477,8 @@ class SlashSbinOwnedByRootCompareKoji(TestCompareKoji):
         TestCompareKoji.setUp(self)
 
         # add file owned by root
-        self.after_rpm.add_installed_file(installPath='sbin/testscript',
-                                          sourceFile=rpmfluff.SourceFile('testscript.sh', script_source),
+        self.after_rpm.add_installed_file(installPath='sbin/rpminspect',
+                                          sourceFile=rpmfluff.SourceFile('rpminspect', ri_bytes),
                                           owner="root")
 
         self.inspection = 'ownership'
@@ -493,8 +494,8 @@ class SlashUsrSlashBinOwnedByRootCompareKoji(TestCompareKoji):
         TestCompareKoji.setUp(self)
 
         # add file owned by root
-        self.after_rpm.add_installed_file(installPath='usr/bin/testscript',
-                                          sourceFile=rpmfluff.SourceFile('testscript.sh', script_source),
+        self.after_rpm.add_installed_file(installPath='usr/bin/rpminspect',
+                                          sourceFile=rpmfluff.SourceFile('rpminspect', ri_bytes),
                                           owner="root")
 
         self.inspection = 'ownership'
@@ -510,8 +511,8 @@ class SlashUsrSlashSbinOwnedByRootCompareKoji(TestCompareKoji):
         TestCompareKoji.setUp(self)
 
         # add file owned by root
-        self.after_rpm.add_installed_file(installPath='usr/sbin/testscript',
-                                          sourceFile=rpmfluff.SourceFile('testscript.sh', script_source),
+        self.after_rpm.add_installed_file(installPath='usr/sbin/rpminspect',
+                                          sourceFile=rpmfluff.SourceFile('rpminspect', ri_bytes),
                                           owner="root")
 
         self.inspection = 'ownership'
@@ -527,8 +528,8 @@ class SlashBinOwnedByBinCompareKoji(TestCompareKoji):
         TestCompareKoji.setUp(self)
 
         # add file owned by root
-        self.after_rpm.add_installed_file(installPath='bin/testscript',
-                                          sourceFile=rpmfluff.SourceFile('testscript.sh', script_source),
+        self.after_rpm.add_installed_file(installPath='bin/rpminspect',
+                                          sourceFile=rpmfluff.SourceFile('rpminspect', ri_bytes),
                                           owner="bin")
 
         self.inspection = 'ownership'
@@ -545,8 +546,8 @@ class SlashSbinOwnedByBinCompareKoji(TestCompareKoji):
         TestCompareKoji.setUp(self)
 
         # add file owned by root
-        self.after_rpm.add_installed_file(installPath='sbin/testscript',
-                                          sourceFile=rpmfluff.SourceFile('testscript.sh', script_source),
+        self.after_rpm.add_installed_file(installPath='sbin/rpminspect',
+                                          sourceFile=rpmfluff.SourceFile('rpminspect', ri_bytes),
                                           owner="bin")
 
         self.inspection = 'ownership'
@@ -563,8 +564,8 @@ class SlashUsrSlashBinOwnedByBinCompareKoji(TestCompareKoji):
         TestCompareKoji.setUp(self)
 
         # add file owned by root
-        self.after_rpm.add_installed_file(installPath='usr/bin/testscript',
-                                          sourceFile=rpmfluff.SourceFile('testscript.sh', script_source),
+        self.after_rpm.add_installed_file(installPath='usr/bin/rpminspect',
+                                          sourceFile=rpmfluff.SourceFile('rpminspect', ri_bytes),
                                           owner="bin")
 
         self.inspection = 'ownership'
@@ -581,8 +582,8 @@ class SlashUsrSlashSbinOwnedByBinCompareKoji(TestCompareKoji):
         TestCompareKoji.setUp(self)
 
         # add file owned by root
-        self.after_rpm.add_installed_file(installPath='usr/sbin/testscript',
-                                          sourceFile=rpmfluff.SourceFile('testscript.sh', script_source),
+        self.after_rpm.add_installed_file(installPath='usr/sbin/rpminspect',
+                                          sourceFile=rpmfluff.SourceFile('rpminspect', ri_bytes),
                                           owner="bin")
 
         self.inspection = 'ownership'
@@ -603,8 +604,8 @@ class SlashBinOwnedByGroupRootRPMs(TestRPMs):
         TestRPMs.setUp(self)
 
         # add file owned by root
-        self.rpm.add_installed_file(installPath='bin/testscript',
-                                    sourceFile=rpmfluff.SourceFile('testscript.sh', script_source),
+        self.rpm.add_installed_file(installPath='bin/rpminspect',
+                                    sourceFile=rpmfluff.SourceFile('rpminspect', ri_bytes),
                                     group="root")
 
         self.inspection = 'ownership'
@@ -620,8 +621,8 @@ class SlashSbinOwnedByGroupRootRPMs(TestRPMs):
         TestRPMs.setUp(self)
 
         # add file owned by root
-        self.rpm.add_installed_file(installPath='sbin/testscript',
-                                    sourceFile=rpmfluff.SourceFile('testscript.sh', script_source),
+        self.rpm.add_installed_file(installPath='sbin/rpminspect',
+                                    sourceFile=rpmfluff.SourceFile('rpminspect', ri_bytes),
                                     group="root")
 
         self.inspection = 'ownership'
@@ -637,8 +638,8 @@ class SlashUsrSlashBinOwnedByGroupRootRPMs(TestRPMs):
         TestRPMs.setUp(self)
 
         # add file owned by root
-        self.rpm.add_installed_file(installPath='usr/bin/testscript',
-                                    sourceFile=rpmfluff.SourceFile('testscript.sh', script_source),
+        self.rpm.add_installed_file(installPath='usr/bin/rpminspect',
+                                    sourceFile=rpmfluff.SourceFile('rpminspect', ri_bytes),
                                     group="root")
 
         self.inspection = 'ownership'
@@ -654,8 +655,8 @@ class SlashUsrSlashSbinOwnedByGroupRootRPMs(TestRPMs):
         TestRPMs.setUp(self)
 
         # add file owned by root
-        self.rpm.add_installed_file(installPath='usr/sbin/testscript',
-                                    sourceFile=rpmfluff.SourceFile('testscript.sh', script_source),
+        self.rpm.add_installed_file(installPath='usr/sbin/rpminspect',
+                                    sourceFile=rpmfluff.SourceFile('rpminspect', ri_bytes),
                                     group="root")
 
         self.inspection = 'ownership'
@@ -671,8 +672,8 @@ class SlashBinOwnedByGroupBinRPMs(TestRPMs):
         TestRPMs.setUp(self)
 
         # add file owned by root
-        self.rpm.add_installed_file(installPath='bin/testscript',
-                                    sourceFile=rpmfluff.SourceFile('testscript.sh', script_source),
+        self.rpm.add_installed_file(installPath='bin/rpminspect',
+                                    sourceFile=rpmfluff.SourceFile('rpminspect', ri_bytes),
                                     group="bin")
 
         self.inspection = 'ownership'
@@ -689,8 +690,8 @@ class SlashSbinOwnedByGroupBinRPMs(TestRPMs):
         TestRPMs.setUp(self)
 
         # add file owned by root
-        self.rpm.add_installed_file(installPath='sbin/testscript',
-                                    sourceFile=rpmfluff.SourceFile('testscript.sh', script_source),
+        self.rpm.add_installed_file(installPath='sbin/rpminspect',
+                                    sourceFile=rpmfluff.SourceFile('rpminspect', ri_bytes),
                                     group="bin")
 
         self.inspection = 'ownership'
@@ -707,8 +708,8 @@ class SlashiUsrSlashBinOwnedByGroupBinRPMs(TestRPMs):
         TestRPMs.setUp(self)
 
         # add file owned by root
-        self.rpm.add_installed_file(installPath='usr/bin/testscript',
-                                    sourceFile=rpmfluff.SourceFile('testscript.sh', script_source),
+        self.rpm.add_installed_file(installPath='usr/bin/rpminspect',
+                                    sourceFile=rpmfluff.SourceFile('rpminspect', ri_bytes),
                                     group="bin")
 
         self.inspection = 'ownership'
@@ -725,8 +726,8 @@ class SlashUsrSlashSbinOwnedByGroupBinRPMs(TestRPMs):
         TestRPMs.setUp(self)
 
         # add file owned by root
-        self.rpm.add_installed_file(installPath='usr/sbin/testscript',
-                                    sourceFile=rpmfluff.SourceFile('testscript.sh', script_source),
+        self.rpm.add_installed_file(installPath='usr/sbin/rpminspect',
+                                    sourceFile=rpmfluff.SourceFile('rpminspect', ri_bytes),
                                     group="bin")
 
         self.inspection = 'ownership'
@@ -743,8 +744,8 @@ class SlashBinOwnedByGroupRootKoji(TestKoji):
         TestKoji.setUp(self)
 
         # add file owned by root
-        self.rpm.add_installed_file(installPath='bin/testscript',
-                                    sourceFile=rpmfluff.SourceFile('testscript.sh', script_source),
+        self.rpm.add_installed_file(installPath='bin/rpminspect',
+                                    sourceFile=rpmfluff.SourceFile('rpminspect', ri_bytes),
                                     group="root")
 
         self.inspection = 'ownership'
@@ -760,8 +761,8 @@ class SlashSbinOwnedByGroupRootKoji(TestKoji):
         TestKoji.setUp(self)
 
         # add file owned by root
-        self.rpm.add_installed_file(installPath='sbin/testscript',
-                                    sourceFile=rpmfluff.SourceFile('testscript.sh', script_source),
+        self.rpm.add_installed_file(installPath='sbin/rpminspect',
+                                    sourceFile=rpmfluff.SourceFile('rpminspect', ri_bytes),
                                     group="root")
 
         self.inspection = 'ownership'
@@ -777,8 +778,8 @@ class SlashUsrSlashBinOwnedByGroupRootKoji(TestKoji):
         TestKoji.setUp(self)
 
         # add file owned by root
-        self.rpm.add_installed_file(installPath='usr/bin/testscript',
-                                    sourceFile=rpmfluff.SourceFile('testscript.sh', script_source),
+        self.rpm.add_installed_file(installPath='usr/bin/rpminspect',
+                                    sourceFile=rpmfluff.SourceFile('rpminspect', ri_bytes),
                                     group="root")
 
         self.inspection = 'ownership'
@@ -794,8 +795,8 @@ class SlashUsrSlashSbinOwnedByGroupRootKoji(TestKoji):
         TestKoji.setUp(self)
 
         # add file owned by root
-        self.rpm.add_installed_file(installPath='usr/sbin/testscript',
-                                    sourceFile=rpmfluff.SourceFile('testscript.sh', script_source),
+        self.rpm.add_installed_file(installPath='usr/sbin/rpminspect',
+                                    sourceFile=rpmfluff.SourceFile('rpminspect', ri_bytes),
                                     group="root")
 
         self.inspection = 'ownership'
@@ -811,8 +812,8 @@ class SlashBinOwnedByGroupBinKoji(TestKoji):
         TestKoji.setUp(self)
 
         # add file owned by root
-        self.rpm.add_installed_file(installPath='bin/testscript',
-                                    sourceFile=rpmfluff.SourceFile('testscript.sh', script_source),
+        self.rpm.add_installed_file(installPath='bin/rpminspect',
+                                    sourceFile=rpmfluff.SourceFile('rpminspect', ri_bytes),
                                     group="bin")
 
         self.inspection = 'ownership'
@@ -829,8 +830,8 @@ class SlashSbinOwnedByGroupBinKoji(TestKoji):
         TestKoji.setUp(self)
 
         # add file owned by root
-        self.rpm.add_installed_file(installPath='sbin/testscript',
-                                    sourceFile=rpmfluff.SourceFile('testscript.sh', script_source),
+        self.rpm.add_installed_file(installPath='sbin/rpminspect',
+                                    sourceFile=rpmfluff.SourceFile('rpminspect', ri_bytes),
                                     group="bin")
 
         self.inspection = 'ownership'
@@ -847,8 +848,8 @@ class SlashUsrSlashBinOwnedByGroupBinKoji(TestKoji):
         TestKoji.setUp(self)
 
         # add file owned by root
-        self.rpm.add_installed_file(installPath='usr/bin/testscript',
-                                    sourceFile=rpmfluff.SourceFile('testscript.sh', script_source),
+        self.rpm.add_installed_file(installPath='usr/bin/rpminspect',
+                                    sourceFile=rpmfluff.SourceFile('rpminspect', ri_bytes),
                                     group="bin")
 
         self.inspection = 'ownership'
@@ -865,8 +866,8 @@ class SlashUsrSlashSbinOwnedByGroupBinKoji(TestKoji):
         TestKoji.setUp(self)
 
         # add file owned by root
-        self.rpm.add_installed_file(installPath='usr/sbin/testscript',
-                                    sourceFile=rpmfluff.SourceFile('testscript.sh', script_source),
+        self.rpm.add_installed_file(installPath='usr/sbin/rpminspect',
+                                    sourceFile=rpmfluff.SourceFile('rpminspect', ri_bytes),
                                     group="bin")
 
         self.inspection = 'ownership'
@@ -883,8 +884,8 @@ class SlashBinOwnedByGroupRootCompareRPMs(TestCompareRPMs):
         TestCompareRPMs.setUp(self)
 
         # add file owned by root
-        self.after_rpm.add_installed_file(installPath='bin/testscript',
-                                          sourceFile=rpmfluff.SourceFile('testscript.sh', script_source),
+        self.after_rpm.add_installed_file(installPath='bin/rpminspect',
+                                          sourceFile=rpmfluff.SourceFile('rpminspect', ri_bytes),
                                           group="root")
 
         self.inspection = 'ownership'
@@ -900,8 +901,8 @@ class SlashSbinOwnedByGroupRootCompareRPMs(TestCompareRPMs):
         TestCompareRPMs.setUp(self)
 
         # add file owned by root
-        self.after_rpm.add_installed_file(installPath='sbin/testscript',
-                                          sourceFile=rpmfluff.SourceFile('testscript.sh', script_source),
+        self.after_rpm.add_installed_file(installPath='sbin/rpminspect',
+                                          sourceFile=rpmfluff.SourceFile('rpminspect', ri_bytes),
                                           group="root")
 
         self.inspection = 'ownership'
@@ -917,8 +918,8 @@ class SlashUsrSlashBinOwnedByGroupRootCompareRPMs(TestCompareRPMs):
         TestCompareRPMs.setUp(self)
 
         # add file owned by root
-        self.after_rpm.add_installed_file(installPath='usr/bin/testscript',
-                                          sourceFile=rpmfluff.SourceFile('testscript.sh', script_source),
+        self.after_rpm.add_installed_file(installPath='usr/bin/rpminspect',
+                                          sourceFile=rpmfluff.SourceFile('rpminspect', ri_bytes),
                                           group="root")
 
         self.inspection = 'ownership'
@@ -934,8 +935,8 @@ class SlashUsrSlashSbinOwnedByGroupRootCompareRPMs(TestCompareRPMs):
         TestCompareRPMs.setUp(self)
 
         # add file owned by root
-        self.after_rpm.add_installed_file(installPath='usr/sbin/testscript',
-                                          sourceFile=rpmfluff.SourceFile('testscript.sh', script_source),
+        self.after_rpm.add_installed_file(installPath='usr/sbin/rpminspect',
+                                          sourceFile=rpmfluff.SourceFile('rpminspect', ri_bytes),
                                           group="root")
 
         self.inspection = 'ownership'
@@ -951,8 +952,8 @@ class SlashBinOwnedByGroupBinCompareRPMs(TestCompareRPMs):
         TestCompareRPMs.setUp(self)
 
         # add file owned by root
-        self.after_rpm.add_installed_file(installPath='bin/testscript',
-                                          sourceFile=rpmfluff.SourceFile('testscript.sh', script_source),
+        self.after_rpm.add_installed_file(installPath='bin/rpminspect',
+                                          sourceFile=rpmfluff.SourceFile('rpminspect', ri_bytes),
                                           group="bin")
 
         self.inspection = 'ownership'
@@ -969,8 +970,8 @@ class SlashSbinOwnedByGroupBinCompareRPMs(TestCompareRPMs):
         TestCompareRPMs.setUp(self)
 
         # add file owned by root
-        self.after_rpm.add_installed_file(installPath='sbin/testscript',
-                                          sourceFile=rpmfluff.SourceFile('testscript.sh', script_source),
+        self.after_rpm.add_installed_file(installPath='sbin/rpminspect',
+                                          sourceFile=rpmfluff.SourceFile('rpminspect', ri_bytes),
                                           group="bin")
 
         self.inspection = 'ownership'
@@ -987,8 +988,8 @@ class SlashUsrSlashBinOwnedByGroupBinCompareRPMs(TestCompareRPMs):
         TestCompareRPMs.setUp(self)
 
         # add file owned by root
-        self.after_rpm.add_installed_file(installPath='usr/bin/testscript',
-                                          sourceFile=rpmfluff.SourceFile('testscript.sh', script_source),
+        self.after_rpm.add_installed_file(installPath='usr/bin/rpminspect',
+                                          sourceFile=rpmfluff.SourceFile('rpminspect', ri_bytes),
                                           group="bin")
 
         self.inspection = 'ownership'
@@ -1005,8 +1006,8 @@ class SlashUsrSlashSbinOwnedByGroupBinCompareRPMs(TestCompareRPMs):
         TestCompareRPMs.setUp(self)
 
         # add file owned by root
-        self.after_rpm.add_installed_file(installPath='usr/sbin/testscript',
-                                          sourceFile=rpmfluff.SourceFile('testscript.sh', script_source),
+        self.after_rpm.add_installed_file(installPath='usr/sbin/rpminspect',
+                                          sourceFile=rpmfluff.SourceFile('rpminspect', ri_bytes),
                                           group="bin")
 
         self.inspection = 'ownership'
@@ -1023,8 +1024,8 @@ class SlashBinOwnedByGroupRootCompareKoji(TestCompareKoji):
         TestCompareKoji.setUp(self)
 
         # add file owned by root
-        self.after_rpm.add_installed_file(installPath='bin/testscript',
-                                          sourceFile=rpmfluff.SourceFile('testscript.sh', script_source),
+        self.after_rpm.add_installed_file(installPath='bin/rpminspect',
+                                          sourceFile=rpmfluff.SourceFile('rpminspect', ri_bytes),
                                           group="root")
 
         self.inspection = 'ownership'
@@ -1040,8 +1041,8 @@ class SlashSbinOwnedByGroupRootCompareKoji(TestCompareKoji):
         TestCompareKoji.setUp(self)
 
         # add file owned by root
-        self.after_rpm.add_installed_file(installPath='sbin/testscript',
-                                          sourceFile=rpmfluff.SourceFile('testscript.sh', script_source),
+        self.after_rpm.add_installed_file(installPath='sbin/rpminspect',
+                                          sourceFile=rpmfluff.SourceFile('rpminspect', ri_bytes),
                                           group="root")
 
         self.inspection = 'ownership'
@@ -1057,8 +1058,8 @@ class SlashUsrSlashBinOwnedByGroupRootCompareKoji(TestCompareKoji):
         TestCompareKoji.setUp(self)
 
         # add file owned by root
-        self.after_rpm.add_installed_file(installPath='usr/bin/testscript',
-                                          sourceFile=rpmfluff.SourceFile('testscript.sh', script_source),
+        self.after_rpm.add_installed_file(installPath='usr/bin/rpminspect',
+                                          sourceFile=rpmfluff.SourceFile('rpminspect', ri_bytes),
                                           group="root")
 
         self.inspection = 'ownership'
@@ -1074,8 +1075,8 @@ class SlashUsrSlashSbinOwnedByGroupRootCompareKoji(TestCompareKoji):
         TestCompareKoji.setUp(self)
 
         # add file owned by root
-        self.after_rpm.add_installed_file(installPath='usr/sbin/testscript',
-                                          sourceFile=rpmfluff.SourceFile('testscript.sh', script_source),
+        self.after_rpm.add_installed_file(installPath='usr/sbin/rpminspect',
+                                          sourceFile=rpmfluff.SourceFile('rpminspect', ri_bytes),
                                           group="root")
 
         self.inspection = 'ownership'
@@ -1091,8 +1092,8 @@ class SlashBinOwnedByGroupBinCompareKoji(TestCompareKoji):
         TestCompareKoji.setUp(self)
 
         # add file owned by root
-        self.after_rpm.add_installed_file(installPath='bin/testscript',
-                                          sourceFile=rpmfluff.SourceFile('testscript.sh', script_source),
+        self.after_rpm.add_installed_file(installPath='bin/rpminspect',
+                                          sourceFile=rpmfluff.SourceFile('rpminspect', ri_bytes),
                                           group="bin")
 
         self.inspection = 'ownership'
@@ -1109,8 +1110,8 @@ class SlashSbinOwnedByGroupBinCompareKoji(TestCompareKoji):
         TestCompareKoji.setUp(self)
 
         # add file owned by root
-        self.after_rpm.add_installed_file(installPath='sbin/testscript',
-                                          sourceFile=rpmfluff.SourceFile('testscript.sh', script_source),
+        self.after_rpm.add_installed_file(installPath='sbin/rpminspect',
+                                          sourceFile=rpmfluff.SourceFile('rpminspect', ri_bytes),
                                           group="bin")
 
         self.inspection = 'ownership'
@@ -1127,8 +1128,8 @@ class SlashUsrSlashBinOwnedByGroupBinCompareKoji(TestCompareKoji):
         TestCompareKoji.setUp(self)
 
         # add file owned by root
-        self.after_rpm.add_installed_file(installPath='usr/bin/testscript',
-                                          sourceFile=rpmfluff.SourceFile('testscript.sh', script_source),
+        self.after_rpm.add_installed_file(installPath='usr/bin/rpminspect',
+                                          sourceFile=rpmfluff.SourceFile('rpminspect', ri_bytes),
                                           group="bin")
 
         self.inspection = 'ownership'
@@ -1145,8 +1146,8 @@ class SlashUsrSlashSbinOwnedByGroupBinCompareKoji(TestCompareKoji):
         TestCompareKoji.setUp(self)
 
         # add file owned by root
-        self.after_rpm.add_installed_file(installPath='usr/sbin/testscript',
-                                          sourceFile=rpmfluff.SourceFile('testscript.sh', script_source),
+        self.after_rpm.add_installed_file(installPath='usr/sbin/rpminspect',
+                                          sourceFile=rpmfluff.SourceFile('rpminspect', ri_bytes),
                                           group="bin")
 
         self.inspection = 'ownership'
@@ -1166,8 +1167,8 @@ class SlashBinOwnedByMockRPMs(TestRPMs):
         TestRPMs.setUp(self)
 
         # add file owned by root
-        self.rpm.add_installed_file(installPath='bin/testscript',
-                                    sourceFile=rpmfluff.SourceFile('testscript.sh', script_source),
+        self.rpm.add_installed_file(installPath='bin/rpminspect',
+                                    sourceFile=rpmfluff.SourceFile('rpminspect', ri_bytes),
                                     owner="mockbuild")
 
         self.inspection = 'ownership'
@@ -1183,8 +1184,8 @@ class SlashBinOwnedByMockKoji(TestKoji):
         TestKoji.setUp(self)
 
         # add file owned by root
-        self.rpm.add_installed_file(installPath='bin/testscript',
-                                    sourceFile=rpmfluff.SourceFile('testscript.sh', script_source),
+        self.rpm.add_installed_file(installPath='bin/rpminspect',
+                                    sourceFile=rpmfluff.SourceFile('rpminspect', ri_bytes),
                                     owner="mockbuild")
 
         self.inspection = 'ownership'
@@ -1201,8 +1202,8 @@ class SlashBinOwnedByMockCompareRPMs(TestCompareRPMs):
         TestCompareRPMs.setUp(self)
 
         # add file owned by root
-        self.after_rpm.add_installed_file(installPath='bin/testscript',
-                                          sourceFile=rpmfluff.SourceFile('testscript.sh', script_source),
+        self.after_rpm.add_installed_file(installPath='bin/rpminspect',
+                                          sourceFile=rpmfluff.SourceFile('rpminspect', ri_bytes),
                                           owner="mockbuild")
 
         self.inspection = 'ownership'
@@ -1219,8 +1220,8 @@ class SlashBinOwnedByMockCompareKoji(TestCompareKoji):
         TestCompareKoji.setUp(self)
 
         # add file owned by root
-        self.after_rpm.add_installed_file(installPath='bin/testscript',
-                                          sourceFile=rpmfluff.SourceFile('testscript.sh', script_source),
+        self.after_rpm.add_installed_file(installPath='bin/rpminspect',
+                                          sourceFile=rpmfluff.SourceFile('rpminspect', ri_bytes),
                                           owner="mockbuild")
 
         self.inspection = 'ownership'
@@ -1241,8 +1242,8 @@ class SlashBinOwnedByGroupMockRPMs(TestRPMs):
         TestRPMs.setUp(self)
 
         # add file owned by root
-        self.rpm.add_installed_file(installPath='bin/testscript',
-                                    sourceFile=rpmfluff.SourceFile('testscript.sh', script_source),
+        self.rpm.add_installed_file(installPath='bin/rpminspect',
+                                    sourceFile=rpmfluff.SourceFile('rpminspect', ri_bytes),
                                     group="mockbuild")
 
         self.inspection = 'ownership'
@@ -1259,8 +1260,8 @@ class SlashBinOwnedByGroupMockKoji(TestKoji):
         TestKoji.setUp(self)
 
         # add file owned by root
-        self.rpm.add_installed_file(installPath='bin/testscript',
-                                    sourceFile=rpmfluff.SourceFile('testscript.sh', script_source),
+        self.rpm.add_installed_file(installPath='bin/rpminspect',
+                                    sourceFile=rpmfluff.SourceFile('rpminspect', ri_bytes),
                                     group="mockbuild")
 
         self.inspection = 'ownership'
@@ -1277,8 +1278,8 @@ class SlashBinOwnedByGroupMockCompareRPMs(TestCompareRPMs):
         TestCompareRPMs.setUp(self)
 
         # add file owned by root
-        self.after_rpm.add_installed_file(installPath='bin/testscript',
-                                          sourceFile=rpmfluff.SourceFile('testscript.sh', script_source),
+        self.after_rpm.add_installed_file(installPath='bin/rpminspect',
+                                          sourceFile=rpmfluff.SourceFile('rpminspect', ri_bytes),
                                           group="mockbuild")
 
         self.inspection = 'ownership'
@@ -1295,8 +1296,8 @@ class SlashBinOwnedByGroupMockCompareKoji(TestCompareKoji):
         TestCompareKoji.setUp(self)
 
         # add file owned by root
-        self.after_rpm.add_installed_file(installPath='bin/testscript',
-                                          sourceFile=rpmfluff.SourceFile('testscript.sh', script_source),
+        self.after_rpm.add_installed_file(installPath='bin/rpminspect',
+                                          sourceFile=rpmfluff.SourceFile('rpminspect', ri_bytes),
                                           group="mockbuild")
 
         self.inspection = 'ownership'
@@ -1319,8 +1320,8 @@ class CapSETUIDWithOtherExecRPMs(TestRPMs):
         # add file owned by root w/ setuid capability and g+x mode
         # (basically duplicate add_installed_file() here because we
         # need to use the %caps macro)
-        installPath = 'bin/testscript'
-        sourceId = self.rpm.add_source(rpmfluff.SourceFile('testscript.sh', script_source))
+        installPath = 'bin/rpminspect'
+        sourceId = self.rpm.add_source(rpmfluff.SourceFile('rpminspect', ri_bytes))
         self.rpm.create_parent_dirs(installPath)
         self.rpm.section_install += "install -D %%{SOURCE%i} $RPM_BUILD_ROOT/%s\n" % (sourceId, self.rpm.escape_path(installPath))
         sub = self.rpm.get_subpackage(None)
@@ -1342,8 +1343,8 @@ class CapSETUIDWithOtherExecKoji(TestKoji):
         # add file owned by root w/ setuid capability and g+x mode
         # (basically duplicate add_installed_file() here because we
         # need to use the %caps macro)
-        installPath = 'bin/testscript'
-        sourceId = self.rpm.add_source(rpmfluff.SourceFile('testscript.sh', script_source))
+        installPath = 'bin/rpminspect'
+        sourceId = self.rpm.add_source(rpmfluff.SourceFile('rpminspect', ri_bytes))
         self.rpm.create_parent_dirs(installPath)
         self.rpm.section_install += "install -D %%{SOURCE%i} $RPM_BUILD_ROOT/%s\n" % (sourceId, self.rpm.escape_path(installPath))
         sub = self.rpm.get_subpackage(None)
@@ -1365,8 +1366,8 @@ class CapSETUIDWithOtherExecCompareRPMs(TestCompareRPMs):
         # add file owned by root w/ setuid capability and o+x mode
         # (basically duplicate add_installed_file() here because we
         # need to use the %caps macro)
-        installPath = 'bin/testscript'
-        sourceId = self.after_rpm.add_source(rpmfluff.SourceFile('testscript.sh', script_source))
+        installPath = 'bin/rpminspect'
+        sourceId = self.after_rpm.add_source(rpmfluff.SourceFile('rpminspect', ri_bytes))
         self.after_rpm.create_parent_dirs(installPath)
         self.after_rpm.section_install += "install -D %%{SOURCE%i} $RPM_BUILD_ROOT/%s\n" % (sourceId, self.after_rpm.escape_path(installPath))
         sub = self.after_rpm.get_subpackage(None)
@@ -1388,8 +1389,8 @@ class CapSETUIDWithOtherExecCompareKoji(TestCompareKoji):
         # add file owned by root w/ setuid capability and o+x mode
         # (basically duplicate add_installed_file() here because we
         # need to use the %caps macro)
-        installPath = 'bin/testscript'
-        sourceId = self.after_rpm.add_source(rpmfluff.SourceFile('testscript.sh', script_source))
+        installPath = 'bin/rpminspect'
+        sourceId = self.after_rpm.add_source(rpmfluff.SourceFile('rpminspect', ri_bytes))
         self.after_rpm.create_parent_dirs(installPath)
         self.after_rpm.section_install += "install -D %%{SOURCE%i} $RPM_BUILD_ROOT/%s\n" % (sourceId, self.after_rpm.escape_path(installPath))
         sub = self.after_rpm.get_subpackage(None)
@@ -1415,8 +1416,8 @@ class CapSETUIDWithGroupExecRPMs(TestRPMs):
         # add file owned by root w/ setuid capability and g+x mode
         # (basically duplicate add_installed_file() here because we
         # need to use the %caps macro)
-        installPath = 'bin/testscript'
-        sourceId = self.rpm.add_source(rpmfluff.SourceFile('testscript.sh', script_source))
+        installPath = 'bin/rpminspect'
+        sourceId = self.rpm.add_source(rpmfluff.SourceFile('rpminspect', ri_bytes))
         self.rpm.create_parent_dirs(installPath)
         self.rpm.section_install += "install -D %%{SOURCE%i} $RPM_BUILD_ROOT/%s\n" % (sourceId, self.rpm.escape_path(installPath))
         sub = self.rpm.get_subpackage(None)
@@ -1438,8 +1439,8 @@ class CapSETUIDWithGroupExecKoji(TestKoji):
         # add file owned by root w/ setuid capability and g+x mode
         # (basically duplicate add_installed_file() here because we
         # need to use the %caps macro)
-        installPath = 'bin/testscript'
-        sourceId = self.rpm.add_source(rpmfluff.SourceFile('testscript.sh', script_source))
+        installPath = 'bin/rpminspect'
+        sourceId = self.rpm.add_source(rpmfluff.SourceFile('rpminspect', ri_bytes))
         self.rpm.create_parent_dirs(installPath)
         self.rpm.section_install += "install -D %%{SOURCE%i} $RPM_BUILD_ROOT/%s\n" % (sourceId, self.rpm.escape_path(installPath))
         sub = self.rpm.get_subpackage(None)
@@ -1461,8 +1462,8 @@ class CapSETUIDWithGroupExecCompareRPMs(TestCompareRPMs):
         # add file owned by root w/ setuid capability and g+x mode
         # (basically duplicate add_installed_file() here because we
         # need to use the %caps macro)
-        installPath = 'bin/testscript'
-        sourceId = self.after_rpm.add_source(rpmfluff.SourceFile('testscript.sh', script_source))
+        installPath = 'bin/rpminspect'
+        sourceId = self.after_rpm.add_source(rpmfluff.SourceFile('rpminspect', ri_bytes))
         self.after_rpm.create_parent_dirs(installPath)
         self.after_rpm.section_install += "install -D %%{SOURCE%i} $RPM_BUILD_ROOT/%s\n" % (sourceId, self.after_rpm.escape_path(installPath))
         sub = self.after_rpm.get_subpackage(None)
@@ -1484,8 +1485,8 @@ class CapSETUIDWithGroupExecCompareKoji(TestCompareKoji):
         # add file owned by root w/ setuid capability and g+x mode
         # (basically duplicate add_installed_file() here because we
         # need to use the %caps macro)
-        installPath = 'bin/testscript'
-        sourceId = self.after_rpm.add_source(rpmfluff.SourceFile('testscript.sh', script_source))
+        installPath = 'bin/rpminspect'
+        sourceId = self.after_rpm.add_source(rpmfluff.SourceFile('rpminspect', ri_bytes))
         self.after_rpm.create_parent_dirs(installPath)
         self.after_rpm.section_install += "install -D %%{SOURCE%i} $RPM_BUILD_ROOT/%s\n" % (sourceId, self.after_rpm.escape_path(installPath))
         sub = self.after_rpm.get_subpackage(None)
@@ -1508,13 +1509,13 @@ class FileOwnerChangedCompareRPMs(TestCompareRPMs):
         TestCompareRPMs.setUp(self)
 
         # Start with root opwner
-        self.before_rpm.add_installed_file(installPath='bin/testscript',
-                                           sourceFile=rpmfluff.SourceFile('testscript.sh', script_source),
+        self.before_rpm.add_installed_file(installPath='bin/rpminspect',
+                                           sourceFile=rpmfluff.SourceFile('rpminspect', ri_bytes),
                                            mode="0755", owner="root")
 
         # Switch to bin owner
-        self.after_rpm.add_installed_file(installPath='bin/testscript',
-                                          sourceFile=rpmfluff.SourceFile('testscript.sh', script_source),
+        self.after_rpm.add_installed_file(installPath='bin/rpminspect',
+                                          sourceFile=rpmfluff.SourceFile('rpminspect', ri_bytes),
                                           mode="0755", owner="bin")
 
         self.inspection = 'ownership'
@@ -1524,20 +1525,20 @@ class FileOwnerChangedCompareRPMs(TestCompareRPMs):
 
 class FileOwnerChangedCompareKoji(TestCompareKoji):
     """
-    When comparing RPMs from Koji builds, check that 
+    When comparing RPMs from Koji builds, check that
     file ownership changing fails.
     """
     def setUp(self):
         TestCompareKoji.setUp(self)
 
         # Start with root opwner
-        self.before_rpm.add_installed_file(installPath='bin/testscript',
-                                           sourceFile=rpmfluff.SourceFile('testscript.sh', script_source),
+        self.before_rpm.add_installed_file(installPath='bin/rpminspect',
+                                           sourceFile=rpmfluff.SourceFile('rpminspect', ri_bytes),
                                            mode="0755", owner="root")
 
         # Switch to bin owner
-        self.after_rpm.add_installed_file(installPath='bin/testscript',
-                                          sourceFile=rpmfluff.SourceFile('testscript.sh', script_source),
+        self.after_rpm.add_installed_file(installPath='bin/rpminspect',
+                                          sourceFile=rpmfluff.SourceFile('rpminspect', ri_bytes),
                                           mode="0755", owner="bin")
 
         self.inspection = 'ownership'
@@ -1557,13 +1558,13 @@ class FileGroupChangedCompareRPMs(TestCompareRPMs):
         TestCompareRPMs.setUp(self)
 
         # Start with root group
-        self.before_rpm.add_installed_file(installPath='bin/testscript',
-                                           sourceFile=rpmfluff.SourceFile('testscript.sh', script_source),
+        self.before_rpm.add_installed_file(installPath='bin/rpminspect',
+                                           sourceFile=rpmfluff.SourceFile('rpminspect', ri_bytes),
                                            mode="0755", group="root")
 
         # Switch to bin group
-        self.after_rpm.add_installed_file(installPath='bin/testscript',
-                                          sourceFile=rpmfluff.SourceFile('testscript.sh', script_source),
+        self.after_rpm.add_installed_file(installPath='bin/rpminspect',
+                                          sourceFile=rpmfluff.SourceFile('rpminspect', ri_bytes),
                                           mode="0755", group="bin")
 
         self.inspection = 'ownership'
@@ -1580,13 +1581,13 @@ class FileGroupChangedCompareKoji(TestCompareKoji):
         TestCompareKoji.setUp(self)
 
         # Start with root group
-        self.before_rpm.add_installed_file(installPath='bin/testscript',
-                                           sourceFile=rpmfluff.SourceFile('testscript.sh', script_source),
+        self.before_rpm.add_installed_file(installPath='bin/rpminspect',
+                                           sourceFile=rpmfluff.SourceFile('rpminspect', self.rpminspect),
                                            mode="0755", group="root")
 
         # Switch to bin group
-        self.after_rpm.add_installed_file(installPath='bin/testscript',
-                                          sourceFile=rpmfluff.SourceFile('testscript.sh', script_source),
+        self.after_rpm.add_installed_file(installPath='bin/rpminspect',
+                                          sourceFile=rpmfluff.SourceFile('rpminspect', self.rpminspect),
                                           mode="0755", group="bin")
 
         self.inspection = 'ownership'
