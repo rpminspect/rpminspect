@@ -69,6 +69,8 @@ static bool find_lto_symbols(Elf *elf, string_list_t **user_data)
 
     if (names != NULL) {
         TAILQ_FOREACH(entry, names, items) {
+            DEBUG_PRINT("entry->data=|%s|\n", entry->data);
+
             TAILQ_FOREACH(prefix, lto_symbol_name_prefixes, items) {
                 DEBUG_PRINT("lto_symbol_name_prefix=|%s|\n", prefix->data);
 
