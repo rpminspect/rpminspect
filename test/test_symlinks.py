@@ -21,9 +21,9 @@ import unittest
 import rpmfluff
 from baseclass import TestRPMs, TestKoji, TestCompareRPMs, TestCompareKoji
 
-script_source = '''#!/bin/sh
-echo This is a script
-'''
+# Read in the built rpminspect executable for use in these test RPMs
+with open(os.environ['RPMINSPECT'], mode='rb') as f:
+    ri_bytes = f.read()
 
 # Absolute symlink exists (OK)
 class AbsoluteSymlinkExistsRPMs(TestRPMs):
@@ -32,7 +32,7 @@ class AbsoluteSymlinkExistsRPMs(TestRPMs):
 
         # add file and symlink
         self.rpm.add_installed_file(installPath='usr/bin/testscript',
-                                    sourceFile=rpmfluff.SourceFile('testscript.sh', script_source),
+                                    sourceFile=rpmfluff.SourceFile('rpminspect', ri_bytes),
                                     mode="0755")
         self.rpm.add_installed_symlink('usr/sbin/testscript', '/usr/bin/testscript')
 
@@ -46,10 +46,10 @@ class AbsoluteSymlinkExistsKoji(TestKoji):
         TestKoji.setUp(self)
 
         # add file and symlink
-        self.rpm.add_installed_file(installPath='usr/bin/testscript',
-                                    sourceFile=rpmfluff.SourceFile('testscript.sh', script_source),
+        self.rpm.add_installed_file(installPath='usr/bin/rpminspect',
+                                    sourceFile=rpmfluff.SourceFile('rpminspect', ri_bytes),
                                     mode="0755")
-        self.rpm.add_installed_symlink('usr/sbin/testscript', '/usr/bin/testscript')
+        self.rpm.add_installed_symlink('usr/sbin/rpminspect', '/usr/bin/rpminspect')
 
         self.inspection = 'symlinks'
         self.label = 'symlinks'
@@ -61,10 +61,10 @@ class AbsoluteSymlinkExistsCompareRPMs(TestCompareRPMs):
         TestCompareRPMs.setUp(self)
 
         # add file and symlink
-        self.after_rpm.add_installed_file(installPath='usr/bin/testscript',
-                                          sourceFile=rpmfluff.SourceFile('testscript.sh', script_source),
+        self.after_rpm.add_installed_file(installPath='usr/bin/rpminspect',
+                                          sourceFile=rpmfluff.SourceFile('rpminspect', ri_bytes),
                                           mode="0755")
-        self.after_rpm.add_installed_symlink('usr/sbin/testscript', '/usr/bin/testscript')
+        self.after_rpm.add_installed_symlink('usr/sbin/rpminspect', '/usr/bin/rpminspect')
 
         self.inspection = 'symlinks'
         self.label = 'symlinks'
@@ -76,10 +76,10 @@ class AbsoluteSymlinkExistsCompareKoji(TestCompareKoji):
         TestCompareKoji.setUp(self)
 
         # add file and symlink
-        self.after_rpm.add_installed_file(installPath='usr/bin/testscript',
-                                          sourceFile=rpmfluff.SourceFile('testscript.sh', script_source),
+        self.after_rpm.add_installed_file(installPath='usr/bin/rpminspect',
+                                          sourceFile=rpmfluff.SourceFile('rpminspect', ri_bytes),
                                           mode="0755")
-        self.after_rpm.add_installed_symlink('usr/sbin/testscript', '/usr/bin/testscript')
+        self.after_rpm.add_installed_symlink('usr/sbin/rpminspect', '/usr/bin/rpminspect')
 
         self.inspection = 'symlinks'
         self.label = 'symlinks'
@@ -92,10 +92,10 @@ class RelativeSymlinkExistsParentDirRPMs(TestRPMs):
         TestRPMs.setUp(self)
 
         # add file and symlink
-        self.rpm.add_installed_file(installPath='usr/bin/testscript',
-                                    sourceFile=rpmfluff.SourceFile('testscript.sh', script_source),
+        self.rpm.add_installed_file(installPath='usr/bin/rpminspect',
+                                    sourceFile=rpmfluff.SourceFile('rpminspect', ri_bytes),
                                     mode="0755")
-        self.rpm.add_installed_symlink('usr/sbin/testscript', '../bin/testscript')
+        self.rpm.add_installed_symlink('usr/sbin/rpminspect', '../bin/rpminspect')
 
         self.inspection = 'symlinks'
         self.label = 'symlinks'
@@ -107,10 +107,10 @@ class RelativeSymlinkExistsParentDirKoji(TestKoji):
         TestKoji.setUp(self)
 
         # add file and symlink
-        self.rpm.add_installed_file(installPath='usr/bin/testscript',
-                                    sourceFile=rpmfluff.SourceFile('testscript.sh', script_source),
+        self.rpm.add_installed_file(installPath='usr/bin/rpminspect',
+                                    sourceFile=rpmfluff.SourceFile('rpminspect', ri_bytes),
                                     mode="0755")
-        self.rpm.add_installed_symlink('usr/sbin/testscript', '../bin/testscript')
+        self.rpm.add_installed_symlink('usr/sbin/rpminspect', '../bin/rpminspect')
 
         self.inspection = 'symlinks'
         self.label = 'symlinks'
@@ -122,10 +122,10 @@ class RelativeSymlinkExistsParentDirCompareRPMs(TestCompareRPMs):
         TestCompareRPMs.setUp(self)
 
         # add file and symlink
-        self.after_rpm.add_installed_file(installPath='usr/bin/testscript',
-                                          sourceFile=rpmfluff.SourceFile('testscript.sh', script_source),
+        self.after_rpm.add_installed_file(installPath='usr/bin/rpminspect',
+                                          sourceFile=rpmfluff.SourceFile('rpminspect', ri_bytes),
                                           mode="0755")
-        self.after_rpm.add_installed_symlink('usr/sbin/testscript', '../bin/testscript')
+        self.after_rpm.add_installed_symlink('usr/sbin/rpminspect', '../bin/rpminspect')
 
         self.inspection = 'symlinks'
         self.label = 'symlinks'
@@ -137,10 +137,10 @@ class RelativeSymlinkExistsParentDirCompareKoji(TestCompareKoji):
         TestCompareKoji.setUp(self)
 
         # add file and symlink
-        self.after_rpm.add_installed_file(installPath='usr/bin/testscript',
-                                          sourceFile=rpmfluff.SourceFile('testscript.sh', script_source),
+        self.after_rpm.add_installed_file(installPath='usr/bin/rpminspect',
+                                          sourceFile=rpmfluff.SourceFile('rpminspect', ri_bytes),
                                           mode="0755")
-        self.after_rpm.add_installed_symlink('usr/sbin/testscript', '../bin/testscript')
+        self.after_rpm.add_installed_symlink('usr/sbin/rpminspect', '../bin/rpminspect')
 
         self.inspection = 'symlinks'
         self.label = 'symlinks'
@@ -153,10 +153,10 @@ class RelativeSymlinkExistsCurrentDirRPMs(TestRPMs):
         TestRPMs.setUp(self)
 
         # add file and symlink
-        self.rpm.add_installed_file(installPath='usr/bin/testscript',
-                                    sourceFile=rpmfluff.SourceFile('testscript.sh', script_source),
+        self.rpm.add_installed_file(installPath='usr/bin/rpminspect',
+                                    sourceFile=rpmfluff.SourceFile('rpminspect', ri_bytes),
                                     mode="0755")
-        self.rpm.add_installed_symlink('usr/bin/anothertestscript', 'testscript')
+        self.rpm.add_installed_symlink('usr/bin/anotherrpminspect', 'rpminspect')
 
         self.inspection = 'symlinks'
         self.label = 'symlinks'
@@ -168,10 +168,10 @@ class RelativeSymlinkExistsCurrentDirKoji(TestKoji):
         TestKoji.setUp(self)
 
         # add file and symlink
-        self.rpm.add_installed_file(installPath='usr/bin/testscript',
-                                    sourceFile=rpmfluff.SourceFile('testscript.sh', script_source),
+        self.rpm.add_installed_file(installPath='usr/bin/rpminspect',
+                                    sourceFile=rpmfluff.SourceFile('rpminspect', ri_bytes),
                                     mode="0755")
-        self.rpm.add_installed_symlink('usr/bin/anothertestscript', 'testscript')
+        self.rpm.add_installed_symlink('usr/bin/anotherrpminspect', 'rpminspect')
 
         self.inspection = 'symlinks'
         self.label = 'symlinks'
@@ -183,10 +183,10 @@ class RelativeSymlinkExistsCurrentDirCompareRPMs(TestCompareRPMs):
         TestCompareRPMs.setUp(self)
 
         # add file and symlink
-        self.after_rpm.add_installed_file(installPath='usr/bin/testscript',
-                                          sourceFile=rpmfluff.SourceFile('testscript.sh', script_source),
+        self.after_rpm.add_installed_file(installPath='usr/bin/rpminspect',
+                                          sourceFile=rpmfluff.SourceFile('rpminspect', ri_bytes),
                                           mode="0755")
-        self.after_rpm.add_installed_symlink('usr/bin/anothertestscript', 'testscript')
+        self.after_rpm.add_installed_symlink('usr/bin/anotherrpminspect', 'rpminspect')
 
         self.inspection = 'symlinks'
         self.label = 'symlinks'
@@ -198,10 +198,10 @@ class RelativeSymlinkExistsCurrentDirCompareKoji(TestCompareKoji):
         TestCompareKoji.setUp(self)
 
         # add file and symlink
-        self.after_rpm.add_installed_file(installPath='usr/bin/testscript',
-                                          sourceFile=rpmfluff.SourceFile('testscript.sh', script_source),
+        self.after_rpm.add_installed_file(installPath='usr/bin/rpminspect',
+                                          sourceFile=rpmfluff.SourceFile('rpminspect', ri_bytes),
                                           mode="0755")
-        self.after_rpm.add_installed_symlink('usr/bin/anothertestscript', 'testscript')
+        self.after_rpm.add_installed_symlink('usr/bin/anotherrpminspect', 'rpminspect')
 
         self.inspection = 'symlinks'
         self.label = 'symlinks'
@@ -214,11 +214,11 @@ class SymlinkExistsMultiplePackagesRPMS(TestRPMs):
         TestRPMs.setUp(self)
 
         # add file and symlink
-        self.rpm.add_installed_file(installPath='usr/bin/testscript',
-                                    sourceFile=rpmfluff.SourceFile('testscript.sh', script_source),
+        self.rpm.add_installed_file(installPath='usr/bin/rpminspect',
+                                    sourceFile=rpmfluff.SourceFile('rpminspect', ri_bytes),
                                     mode="0755")
         subpackage = self.rpm.add_subpackage('symlinks')
-        self.rpm.add_installed_symlink('usr/bin/anothertestscript', 'testscript', subpackageSuffix='symlinks')
+        self.rpm.add_installed_symlink('usr/bin/anotherrpminspect', 'rpminspect', subpackageSuffix='symlinks')
 
         self.inspection = 'symlinks'
         self.label = 'symlinks'
@@ -230,11 +230,11 @@ class SymlinkExistsMultiplePackagesKoji(TestKoji):
         TestKoji.setUp(self)
 
         # add file and symlink
-        self.rpm.add_installed_file(installPath='usr/bin/testscript',
-                                    sourceFile=rpmfluff.SourceFile('testscript.sh', script_source),
+        self.rpm.add_installed_file(installPath='usr/bin/rpminspect',
+                                    sourceFile=rpmfluff.SourceFile('rpminspect', ri_bytes),
                                     mode="0755")
         subpackage = self.rpm.add_subpackage('symlinks')
-        self.rpm.add_installed_symlink('usr/bin/anothertestscript', 'testscript', subpackageSuffix='symlinks')
+        self.rpm.add_installed_symlink('usr/bin/anotherrpminspect', 'rpminspect', subpackageSuffix='symlinks')
 
         self.inspection = 'symlinks'
         self.label = 'symlinks'
@@ -246,11 +246,11 @@ class SymlinkExistsMultiplePackagesCompareRPMs(TestCompareRPMs):
         TestCompareRPMs.setUp(self)
 
         # add file and symlink
-        self.after_rpm.add_installed_file(installPath='usr/bin/testscript',
-                                          sourceFile=rpmfluff.SourceFile('testscript.sh', script_source),
+        self.after_rpm.add_installed_file(installPath='usr/bin/rpminspect',
+                                          sourceFile=rpmfluff.SourceFile('rpminspect', ri_bytes),
                                           mode="0755")
         subpackage = self.after_rpm.add_subpackage('symlinks')
-        self.after_rpm.add_installed_symlink('usr/bin/anothertestscript', 'testscript', subpackageSuffix='symlinks')
+        self.after_rpm.add_installed_symlink('usr/bin/anotherrpminspect', 'rpminspect', subpackageSuffix='symlinks')
 
         self.inspection = 'symlinks'
         self.label = 'symlinks'
@@ -262,11 +262,11 @@ class SymlinkExistsMultiplePackagesCompareKoji(TestCompareKoji):
         TestCompareKoji.setUp(self)
 
         # add file and symlink
-        self.after_rpm.add_installed_file(installPath='usr/bin/testscript',
-                                          sourceFile=rpmfluff.SourceFile('testscript.sh', script_source),
+        self.after_rpm.add_installed_file(installPath='usr/bin/rpminspect',
+                                          sourceFile=rpmfluff.SourceFile('rpminspect', ri_bytes),
                                           mode="0755")
         subpackage = self.after_rpm.add_subpackage('symlinks')
-        self.after_rpm.add_installed_symlink('usr/bin/anothertestscript', 'testscript', subpackageSuffix='symlinks')
+        self.after_rpm.add_installed_symlink('usr/bin/anotherrpminspect', 'rpminspect', subpackageSuffix='symlinks')
 
         self.inspection = 'symlinks'
         self.label = 'symlinks'
@@ -279,10 +279,10 @@ class AbsoluteSymlinkDangingRPMs(TestRPMs):
         TestRPMs.setUp(self)
 
         # add file and symlink
-        self.rpm.add_installed_file(installPath='usr/bin/testscript',
-                                    sourceFile=rpmfluff.SourceFile('testscript.sh', script_source),
+        self.rpm.add_installed_file(installPath='usr/bin/rpminspect',
+                                    sourceFile=rpmfluff.SourceFile('rpminspect', ri_bytes),
                                     mode="0755")
-        self.rpm.add_installed_symlink('usr/sbin/testscript', '/usr/bin/anothertestscript')
+        self.rpm.add_installed_symlink('usr/sbin/rpminspect', '/usr/bin/anotherrpminspect')
 
         self.inspection = 'symlinks'
         self.label = 'symlinks'
@@ -294,10 +294,10 @@ class AbsoluteSymlinkDangingKoji(TestKoji):
         TestRPMs.setUp(self)
 
         # add file and symlink
-        self.rpm.add_installed_file(installPath='usr/bin/testscript',
-                                    sourceFile=rpmfluff.SourceFile('testscript.sh', script_source),
+        self.rpm.add_installed_file(installPath='usr/bin/rpminspect',
+                                    sourceFile=rpmfluff.SourceFile('rpminspect', ri_bytes),
                                     mode="0755")
-        self.rpm.add_installed_symlink('usr/sbin/testscript', '/usr/bin/anothertestscript')
+        self.rpm.add_installed_symlink('usr/sbin/rpminspect', '/usr/bin/anotherrpminspect')
 
         self.inspection = 'symlinks'
         self.label = 'symlinks'
@@ -309,10 +309,10 @@ class AbsoluteSymlinkDangingCompareRPMs(TestCompareRPMs):
         TestCompareRPMs.setUp(self)
 
         # add file and symlink
-        self.after_rpm.add_installed_file(installPath='usr/bin/testscript',
-                                          sourceFile=rpmfluff.SourceFile('testscript.sh', script_source),
+        self.after_rpm.add_installed_file(installPath='usr/bin/rpminspect',
+                                          sourceFile=rpmfluff.SourceFile('rpminspect', ri_bytes),
                                           mode="0755")
-        self.after_rpm.add_installed_symlink('usr/sbin/testscript', '/usr/bin/anothertestscript')
+        self.after_rpm.add_installed_symlink('usr/sbin/rpminspect', '/usr/bin/anotherrpminspect')
 
         self.inspection = 'symlinks'
         self.label = 'symlinks'
@@ -324,10 +324,10 @@ class AbsoluteSymlinkDangingCompareKoji(TestCompareKoji):
         TestCompareKoji.setUp(self)
 
         # add file and symlink
-        self.after_rpm.add_installed_file(installPath='usr/bin/testscript',
-                                          sourceFile=rpmfluff.SourceFile('testscript.sh', script_source),
+        self.after_rpm.add_installed_file(installPath='usr/bin/rpminspect',
+                                          sourceFile=rpmfluff.SourceFile('rpminspect', ri_bytes),
                                           mode="0755")
-        self.after_rpm.add_installed_symlink('usr/sbin/testscript', '/usr/bin/anothertestscript')
+        self.after_rpm.add_installed_symlink('usr/sbin/rpminspect', '/usr/bin/anotherrpminspect')
 
         self.inspection = 'symlinks'
         self.label = 'symlinks'
@@ -340,10 +340,10 @@ class RelativeSymlinkDanglingParentDirRPMs(TestRPMs):
         TestRPMs.setUp(self)
 
         # add file and symlink
-        self.rpm.add_installed_file(installPath='usr/bin/testscript',
-                                    sourceFile=rpmfluff.SourceFile('testscript.sh', script_source),
+        self.rpm.add_installed_file(installPath='usr/bin/rpminspect',
+                                    sourceFile=rpmfluff.SourceFile('rpminspect', ri_bytes),
                                     mode="0755")
-        self.rpm.add_installed_symlink('usr/sbin/testscript', '../bin/anothertestscript')
+        self.rpm.add_installed_symlink('usr/sbin/rpminspect', '../bin/anotherrpminspect')
 
         self.inspection = 'symlinks'
         self.label = 'symlinks'
@@ -355,10 +355,10 @@ class RelativeSymlinkDanglingParentDirKoji(TestKoji):
         TestKoji.setUp(self)
 
         # add file and symlink
-        self.rpm.add_installed_file(installPath='usr/bin/testscript',
-                                    sourceFile=rpmfluff.SourceFile('testscript.sh', script_source),
+        self.rpm.add_installed_file(installPath='usr/bin/rpminspect',
+                                    sourceFile=rpmfluff.SourceFile('rpminspect', ri_bytes),
                                     mode="0755")
-        self.rpm.add_installed_symlink('usr/sbin/testscript', '../bin/anothertestscript')
+        self.rpm.add_installed_symlink('usr/sbin/rpminspect', '../bin/anotherrpminspect')
 
         self.inspection = 'symlinks'
         self.label = 'symlinks'
@@ -370,10 +370,10 @@ class RelativeSymlinkDanglingParentDirRPMs(TestCompareRPMs):
         TestCompareRPMs.setUp(self)
 
         # add file and symlink
-        self.after_rpm.add_installed_file(installPath='usr/bin/testscript',
-                                          sourceFile=rpmfluff.SourceFile('testscript.sh', script_source),
+        self.after_rpm.add_installed_file(installPath='usr/bin/rpminspect',
+                                          sourceFile=rpmfluff.SourceFile('rpminspect', ri_bytes),
                                           mode="0755")
-        self.after_rpm.add_installed_symlink('usr/sbin/testscript', '../bin/anothertestscript')
+        self.after_rpm.add_installed_symlink('usr/sbin/rpminspect', '../bin/anotherrpminspect')
 
         self.inspection = 'symlinks'
         self.label = 'symlinks'
@@ -385,10 +385,10 @@ class RelativeSymlinkDanglingParentDirKoji(TestCompareKoji):
         TestCompareKoji.setUp(self)
 
         # add file and symlink
-        self.after_rpm.add_installed_file(installPath='usr/bin/testscript',
-                                          sourceFile=rpmfluff.SourceFile('testscript.sh', script_source),
+        self.after_rpm.add_installed_file(installPath='usr/bin/rpminspect',
+                                          sourceFile=rpmfluff.SourceFile('rpminspect', ri_bytes),
                                           mode="0755")
-        self.after_rpm.add_installed_symlink('usr/sbin/testscript', '../bin/anothertestscript')
+        self.after_rpm.add_installed_symlink('usr/sbin/rpminspect', '../bin/anotherrpminspect')
 
         self.inspection = 'symlinks'
         self.label = 'symlinks'
@@ -401,10 +401,10 @@ class RelativeSymlinkDanglingCurrentDirRPMs(TestRPMs):
         TestRPMs.setUp(self)
 
         # add file and symlink
-        self.rpm.add_installed_file(installPath='usr/bin/testscript',
-                                    sourceFile=rpmfluff.SourceFile('testscript.sh', script_source),
+        self.rpm.add_installed_file(installPath='usr/bin/rpminspect',
+                                    sourceFile=rpmfluff.SourceFile('rpminspect', ri_bytes),
                                     mode="0755")
-        self.rpm.add_installed_symlink('usr/bin/anothertestscript', 'originaltestscript')
+        self.rpm.add_installed_symlink('usr/bin/anotherrpminspect', 'originalrpminspect')
 
         self.inspection = 'symlinks'
         self.label = 'symlinks'
@@ -416,10 +416,10 @@ class RelativeSymlinkDanglingCurrentDirKoji(TestKoji):
         TestKoji.setUp(self)
 
         # add file and symlink
-        self.rpm.add_installed_file(installPath='usr/bin/testscript',
-                                    sourceFile=rpmfluff.SourceFile('testscript.sh', script_source),
+        self.rpm.add_installed_file(installPath='usr/bin/rpminspect',
+                                    sourceFile=rpmfluff.SourceFile('rpminspect', ri_bytes),
                                     mode="0755")
-        self.rpm.add_installed_symlink('usr/bin/anothertestscript', 'originaltestscript')
+        self.rpm.add_installed_symlink('usr/bin/anotherrpminspect', 'originalrpminspect')
 
         self.inspection = 'symlinks'
         self.label = 'symlinks'
@@ -431,10 +431,10 @@ class RelativeSymlinkDanglingCurrentDirCompareRPMs(TestCompareRPMs):
         TestCompareRPMs.setUp(self)
 
         # add file and symlink
-        self.after_rpm.add_installed_file(installPath='usr/bin/testscript',
-                                          sourceFile=rpmfluff.SourceFile('testscript.sh', script_source),
+        self.after_rpm.add_installed_file(installPath='usr/bin/rpminspect',
+                                          sourceFile=rpmfluff.SourceFile('rpminspect', ri_bytes),
                                           mode="0755")
-        self.after_rpm.add_installed_symlink('usr/bin/anothertestscript', 'originaltestscript')
+        self.after_rpm.add_installed_symlink('usr/bin/anotherrpminspect', 'originalrpminspect')
 
         self.inspection = 'symlinks'
         self.label = 'symlinks'
@@ -446,10 +446,10 @@ class RelativeSymlinkDanglingCurrentDirCompareKoji(TestCompareKoji):
         TestCompareKoji.setUp(self)
 
         # add file and symlink
-        self.after_rpm.add_installed_file(installPath='usr/bin/testscript',
-                                          sourceFile=rpmfluff.SourceFile('testscript.sh', script_source),
+        self.after_rpm.add_installed_file(installPath='usr/bin/rpminspect',
+                                          sourceFile=rpmfluff.SourceFile('rpminspect', ri_bytes),
                                           mode="0755")
-        self.after_rpm.add_installed_symlink('usr/bin/anothertestscript', 'originaltestscript')
+        self.after_rpm.add_installed_symlink('usr/bin/anotherrpminspect', 'originalrpminspect')
 
         self.inspection = 'symlinks'
         self.label = 'symlinks'
@@ -465,11 +465,11 @@ class TooManySymlinkLevelsRPMs(TestRPMs):
         TestRPMs.setUp(self)
 
         # add file and symlink
-        self.rpm.add_installed_file(installPath='usr/bin/testscript',
-                                    sourceFile=rpmfluff.SourceFile('testscript.sh', script_source),
+        self.rpm.add_installed_file(installPath='usr/bin/rpminspect',
+                                    sourceFile=rpmfluff.SourceFile('rpminspect', ri_bytes),
                                     mode="0755")
         self.rpm.add_installed_symlink('usr/bin/bin', '.')
-        self.rpm.add_installed_symlink('usr/bin/anothertestscript', 'bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/testscript')
+        self.rpm.add_installed_symlink('usr/bin/anotherrpminspect', 'bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/rpminspect')
 
         self.inspection = 'symlinks'
         self.label = 'symlinks'
@@ -481,11 +481,11 @@ class TooManySymlinkLevelsKoji(TestKoji):
         TestKoji.setUp(self)
 
         # add file and symlink
-        self.rpm.add_installed_file(installPath='usr/bin/testscript',
-                                    sourceFile=rpmfluff.SourceFile('testscript.sh', script_source),
+        self.rpm.add_installed_file(installPath='usr/bin/rpminspect',
+                                    sourceFile=rpmfluff.SourceFile('rpminspect', ri_bytes),
                                     mode="0755")
         self.rpm.add_installed_symlink('usr/bin/bin', '.')
-        self.rpm.add_installed_symlink('usr/bin/anothertestscript', 'bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/testscript')
+        self.rpm.add_installed_symlink('usr/bin/anotherrpminspect', 'bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/rpminspect')
 
         self.inspection = 'symlinks'
         self.label = 'symlinks'
@@ -497,11 +497,11 @@ class TooManySymlinkLevelsCompareRPMs(TestCompareRPMs):
         TestCompareRPMs.setUp(self)
 
         # add file and symlink
-        self.after_rpm.add_installed_file(installPath='usr/bin/testscript',
-                                          sourceFile=rpmfluff.SourceFile('testscript.sh', script_source),
+        self.after_rpm.add_installed_file(installPath='usr/bin/rpminspect',
+                                          sourceFile=rpmfluff.SourceFile('rpminspect', ri_bytes),
                                           mode="0755")
         self.after_rpm.add_installed_symlink('usr/bin/bin', '.')
-        self.after_rpm.add_installed_symlink('usr/bin/anothertestscript', 'bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/testscript')
+        self.after_rpm.add_installed_symlink('usr/bin/anotherrpminspect', 'bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/rpminspect')
 
         self.inspection = 'symlinks'
         self.label = 'symlinks'
@@ -513,11 +513,11 @@ class TooManySymlinkLevelsCompareKoji(TestCompareKoji):
         TestCompareKoji.setUp(self)
 
         # add file and symlink
-        self.after_rpm.add_installed_file(installPath='usr/bin/testscript',
-                                          sourceFile=rpmfluff.SourceFile('testscript.sh', script_source),
+        self.after_rpm.add_installed_file(installPath='usr/bin/rpminspect',
+                                          sourceFile=rpmfluff.SourceFile('rpminspect', ri_bytes),
                                           mode="0755")
         self.after_rpm.add_installed_symlink('usr/bin/bin', '.')
-        self.after_rpm.add_installed_symlink('usr/bin/anothertestscript', 'bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/testscript')
+        self.after_rpm.add_installed_symlink('usr/bin/anotherrpminspect', 'bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/rpminspect')
 
         self.inspection = 'symlinks'
         self.label = 'symlinks'
@@ -561,16 +561,16 @@ class NonDirectoryBecomesSymlinkCompareRPMs(TestCompareRPMs):
         TestCompareRPMs.setUp(self)
 
         # add files and symlinks
-        self.before_rpm.add_installed_file(installPath='usr/bin/testscript',
-                                           sourceFile=rpmfluff.SourceFile('testscript.sh', script_source),
+        self.before_rpm.add_installed_file(installPath='usr/bin/rpminspect',
+                                           sourceFile=rpmfluff.SourceFile('rpminspect', ri_bytes),
                                            mode="0755")
-        self.before_rpm.add_installed_file(installPath='usr/bin/anothertestscript',
-                                           sourceFile=rpmfluff.SourceFile('testscript.sh', script_source),
+        self.before_rpm.add_installed_file(installPath='usr/bin/anotherrpminspect',
+                                           sourceFile=rpmfluff.SourceFile('rpminspect', ri_bytes),
                                            mode="0755")
-        self.after_rpm.add_installed_file(installPath='usr/bin/testscript',
-                                           sourceFile=rpmfluff.SourceFile('testscript.sh', script_source),
+        self.after_rpm.add_installed_file(installPath='usr/bin/rpminspect',
+                                           sourceFile=rpmfluff.SourceFile('rpminspect', ri_bytes),
                                            mode="0755")
-        self.after_rpm.add_installed_symlink('usr/bin/anothertestscript', 'testscript')
+        self.after_rpm.add_installed_symlink('usr/bin/anotherrpminspect', 'rpminspect')
 
         self.inspection = 'symlinks'
         self.label = 'symlinks'
@@ -582,16 +582,16 @@ class NonDirectoryBecomesSymlinkCompareKoji(TestCompareKoji):
         TestCompareKoji.setUp(self)
 
         # add files and symlinks
-        self.before_rpm.add_installed_file(installPath='usr/bin/testscript',
-                                           sourceFile=rpmfluff.SourceFile('testscript.sh', script_source),
+        self.before_rpm.add_installed_file(installPath='usr/bin/rpminspect',
+                                           sourceFile=rpmfluff.SourceFile('rpminspect', ri_bytes),
                                            mode="0755")
-        self.before_rpm.add_installed_file(installPath='usr/bin/anothertestscript',
-                                           sourceFile=rpmfluff.SourceFile('testscript.sh', script_source),
+        self.before_rpm.add_installed_file(installPath='usr/bin/anotherrpminspect',
+                                           sourceFile=rpmfluff.SourceFile('rpminspect', ri_bytes),
                                            mode="0755")
-        self.after_rpm.add_installed_file(installPath='usr/bin/testscript',
-                                           sourceFile=rpmfluff.SourceFile('testscript.sh', script_source),
+        self.after_rpm.add_installed_file(installPath='usr/bin/rpminspect',
+                                           sourceFile=rpmfluff.SourceFile('rpminspect', ri_bytes),
                                            mode="0755")
-        self.after_rpm.add_installed_symlink('usr/bin/anothertestscript', 'testscript')
+        self.after_rpm.add_installed_symlink('usr/bin/anotherrpminspect', 'rpminspect')
 
         self.inspection = 'symlinks'
         self.label = 'symlinks'
