@@ -65,7 +65,7 @@ static bool find_lto_symbols(Elf *elf, string_list_t **user_data)
     specifics = calloc(1, sizeof(*specifics));
     TAILQ_INIT(specifics);
 
-    names = get_elf_section_names(elf, SHT_SYMTAB);
+    names = get_elf_section_names(elf, SHT_PROGBITS);
 
     if (names != NULL) {
         TAILQ_FOREACH(entry, names, items) {
