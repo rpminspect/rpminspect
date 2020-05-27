@@ -503,6 +503,10 @@ class TooManySymlinkLevelsCompareRPMs(TestCompareRPMs):
         self.after_rpm.add_installed_symlink('usr/bin/bin', '.')
         self.after_rpm.add_installed_symlink('usr/bin/anotherrpminspect', 'bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/rpminspect')
 
+        # disable check-buildroot rpmbuild script to avoid stat errors
+        # on our big symlink
+        self.after_rpm.section_install += 'QA_SKIP_BUILD_ROOT=1\nexport QA_SKIP_BUILD_ROOT\n'
+
         self.inspection = 'symlinks'
         self.label = 'symlinks'
         self.result = 'BAD'
@@ -518,6 +522,10 @@ class TooManySymlinkLevelsCompareKoji(TestCompareKoji):
                                           mode="0755")
         self.after_rpm.add_installed_symlink('usr/bin/bin', '.')
         self.after_rpm.add_installed_symlink('usr/bin/anotherrpminspect', 'bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/rpminspect')
+
+        # disable check-buildroot rpmbuild script to avoid stat errors
+        # on our big symlink
+        self.after_rpm.section_install += 'QA_SKIP_BUILD_ROOT=1\nexport QA_SKIP_BUILD_ROOT\n'
 
         self.inspection = 'symlinks'
         self.label = 'symlinks'
