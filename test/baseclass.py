@@ -136,6 +136,9 @@ class TestSRPM(RequiresRpminspect):
         RequiresRpminspect.setUp(self)
         self.rpm = rpmfluff.SimpleRpmBuild(AFTER_NAME, AFTER_VER, AFTER_REL)
 
+        # turn off all rpmbuild post processing stuff for the purposes of testing
+        self.rpm.header += "\n%global __os_install_post %{nil}\n"
+
         # the inheriting class needs to override these
         self.inspection = None
         self.label = None
@@ -197,6 +200,10 @@ class TestCompareSRPM(RequiresRpminspect):
         RequiresRpminspect.setUp(self)
         self.before_rpm = rpmfluff.SimpleRpmBuild(BEFORE_NAME, BEFORE_VER, BEFORE_REL)
         self.after_rpm = rpmfluff.SimpleRpmBuild(AFTER_NAME, AFTER_VER, AFTER_REL)
+
+        # turn off all rpmbuild post processing stuff for the purposes of testing
+        self.before_rpm.header += "\n%global __os_install_post %{nil}\n"
+        self.after_rpm.header += "\n%global __os_install_post %{nil}\n"
 
         # the inheriting class needs to override these
         self.inspection = None
