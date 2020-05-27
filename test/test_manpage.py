@@ -22,7 +22,12 @@ from baseclass import *
 class ManPageCorrectSectionRPM(TestRPMs):
     def setUp(self):
         TestRPMs.setUp(self)
-        self.rpm.add_manpage()
+
+        # force a gzip here since we have disabled brp scripts
+        manpage = 'usr/share/man/man1/foo.1'
+        self.rpm.add_manpage(installPath=manpage)
+        self.rpm.section_install += 'gzip -9 $RPM_BUILD_ROOT/%s\n' % self.rpm.escape_path(manpage)
+
         self.inspection = 'manpage'
         self.label = 'man-pages'
         self.result = 'OK'
@@ -31,7 +36,12 @@ class ManPageCorrectSectionRPM(TestRPMs):
 class ManPageCorrectSectionKoji(TestKoji):
     def setUp(self):
         TestKoji.setUp(self)
-        self.rpm.add_manpage()
+
+        # force a gzip here since we have disabled brp scripts
+        manpage = 'usr/share/man/man1/foo.1'
+        self.rpm.add_manpage(installPath=manpage)
+        self.rpm.section_install += 'gzip -9 $RPM_BUILD_ROOT/%s\n' % self.rpm.escape_path(manpage)
+
         self.inspection = 'manpage'
         self.label = 'man-pages'
         self.result = 'OK'
@@ -40,8 +50,14 @@ class ManPageCorrectSectionKoji(TestKoji):
 class ManPageCorrectSectionCompareRPMs(TestCompareRPMs):
     def setUp(self):
         TestCompareRPMs.setUp(self)
-        self.before_rpm.add_manpage()
+
+        # force a gzip here since we have disabled brp scripts
+        manpage = 'usr/share/man/man1/foo.1'
+        self.before_rpm.add_manpage(installPath=manpage)
+        self.before_rpm.section_install += 'gzip -9 $RPM_BUILD_ROOT/%s\n' % self.before_rpm.escape_path(manpage)
         self.after_rpm.add_manpage()
+        self.after_rpm.section_install += 'gzip -9 $RPM_BUILD_ROOT/%s\n' % self.before_rpm.escape_path(manpage)
+
         self.inspection = 'manpage'
         self.label = 'man-pages'
         self.result = 'OK'
@@ -50,8 +66,14 @@ class ManPageCorrectSectionCompareRPMs(TestCompareRPMs):
 class ManPageCorrectSectionCompareKoji(TestCompareKoji):
     def setUp(self):
         TestCompareKoji.setUp(self)
-        self.before_rpm.add_manpage()
+
+        # force a gzip here since we have disabled brp scripts
+        manpage = 'usr/share/man/man1/foo.1'
+        self.before_rpm.add_manpage(installPath=manpage)
+        self.before_rpm.section_install += 'gzip -9 $RPM_BUILD_ROOT/%s\n' % self.before_rpm.escape_path(manpage)
         self.after_rpm.add_manpage()
+        self.after_rpm.section_install += 'gzip -9 $RPM_BUILD_ROOT/%s\n' % self.before_rpm.escape_path(manpage)
+
         self.inspection = 'manpage'
         self.label = 'man-pages'
         self.result = 'OK'
