@@ -16,17 +16,13 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 #
 
+import os
 import unittest
 from baseclass import *
 
-# Example source files used by the tests below
-scriptA_source = '''#!/bin/sh
-echo This is a script
-'''
-
-scriptB_source = '''#!/bin/sh
-echo This is a slightly different script, but still important
-'''
+# Read in the built rpminspect executable for use in these test RPMs
+with open(os.environ['RPMINSPECT'], mode='rb') as f:
+    ri_bytes = f.read()
 
 ###################################
 # Single SRPM, RPM, or Koji build #
@@ -120,12 +116,11 @@ class SameVerChangeUpstreamCompareSRPM(TestCompareSRPM):
         self.after_rpm = rpmfluff.SimpleRpmBuild(BEFORE_NAME, BEFORE_VER, AFTER_REL)
 
         # add the same installed target file with different sources
-        self.before_rpm.add_installed_file(installPath='bin/testscript',
-                                           sourceFile=rpmfluff.SourceFile('testscript.sh', scriptA_source),
+        self.before_rpm.add_installed_file(installPath='bin/rpminspect',
+                                           sourceFile=rpmfluff.SourceFile('rpminspect', ri_bytes),
                                            mode="0755")
-        self.after_rpm.add_installed_file(installPath='bin/testscript',
-                                          sourceFile=rpmfluff.SourceFile('testscript.sh', scriptB_source),
-                                          mode="0755")
+        self.after_rpm.add_simple_compilation(installPath="bin/rpminspect")
+        self.after_rpm.section_install += "chmod 0755 $RPM_BUILD_ROOT/bin/rpminspect\n"
 
         # what we are checking
         self.inspection = 'upstream'
@@ -146,8 +141,8 @@ class SameVerRemoveUpstreamCompareSRPM(TestCompareSRPM):
         self.after_rpm = rpmfluff.SimpleRpmBuild(BEFORE_NAME, BEFORE_VER, AFTER_REL)
 
         # simulate a removed source file by not including it in the after rpm
-        self.before_rpm.add_installed_file(installPath='bin/testscript',
-                                           sourceFile=rpmfluff.SourceFile('testscript.sh', scriptA_source),
+        self.before_rpm.add_installed_file(installPath='bin/rpminspect',
+                                           sourceFile=rpmfluff.SourceFile('rpminspect', ri_bytes),
                                            mode="0755")
 
         # what we are checking
@@ -185,12 +180,11 @@ class SameVerChangeUpstreamCompareKoji(TestCompareKoji):
         self.after_rpm = rpmfluff.SimpleRpmBuild(BEFORE_NAME, BEFORE_VER, AFTER_REL)
 
         # add the same installed target file with different sources
-        self.before_rpm.add_installed_file(installPath='bin/testscript',
-                                           sourceFile=rpmfluff.SourceFile('testscript.sh', scriptA_source),
+        self.before_rpm.add_installed_file(installPath='bin/rpminspect',
+                                           sourceFile=rpmfluff.SourceFile('rpminspect', ri_bytes),
                                            mode="0755")
-        self.after_rpm.add_installed_file(installPath='bin/testscript',
-                                          sourceFile=rpmfluff.SourceFile('testscript.sh', scriptB_source),
-                                          mode="0755")
+        self.after_rpm.add_simple_compilation(installPath="bin/rpminspect")
+        self.after_rpm.section_install += "chmod 0755 $RPM_BUILD_ROOT/bin/rpminspect\n"
 
         # what we are checking
         self.inspection = 'upstream'
@@ -211,8 +205,8 @@ class SameVerRemoveUpstreamCompareKoji(TestCompareKoji):
         self.after_rpm = rpmfluff.SimpleRpmBuild(BEFORE_NAME, BEFORE_VER, AFTER_REL)
 
         # simulate a removed source file by not including it in the after rpm
-        self.before_rpm.add_installed_file(installPath='bin/testscript',
-                                           sourceFile=rpmfluff.SourceFile('testscript.sh', scriptA_source),
+        self.before_rpm.add_installed_file(installPath='bin/rpminspect',
+                                           sourceFile=rpmfluff.SourceFile('rpminspect', ri_bytes),
                                            mode="0755")
 
         # what we are checking
