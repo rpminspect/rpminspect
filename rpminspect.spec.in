@@ -37,6 +37,7 @@ BuildRequires:  gettext-devel
 #BuildRequires: glibc-devel.i686
 #BuildRequires: CUnit
 #BuildRequires: CUnit-devel
+#BuildRequires: kernel-core
 #BuildRequires: kernel-devel
 #BuildRequires: libgcc.i686
 #BuildRequires: python3-pyyaml
