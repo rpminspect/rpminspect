@@ -505,7 +505,7 @@ class TooManySymlinkLevelsCompareRPMs(TestCompareRPMs):
 
         # disable check-buildroot rpmbuild script to avoid stat errors
         # on our big symlink
-        self.after_rpm.section_install += 'QA_SKIP_BUILD_ROOT=1\nexport QA_SKIP_BUILD_ROOT\n'
+        self.after_rpm.header += "\n%global __arch_install_post %{nil}\n"
 
         self.inspection = 'symlinks'
         self.label = 'symlinks'
@@ -525,7 +525,7 @@ class TooManySymlinkLevelsCompareKoji(TestCompareKoji):
 
         # disable check-buildroot rpmbuild script to avoid stat errors
         # on our big symlink
-        self.after_rpm.section_install += 'QA_SKIP_BUILD_ROOT=1\nexport QA_SKIP_BUILD_ROOT\n'
+        self.after_rpm.header += "\n%global __arch_install_post %{nil}\n"
 
         self.inspection = 'symlinks'
         self.label = 'symlinks'
