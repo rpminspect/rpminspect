@@ -50,8 +50,7 @@ static void add_changedfiles_result(struct rpminspect *ri, struct result_params 
  * in this function.  Caller is responsible for removing the temporary
  * file.
  */
-static char *run_and_capture(const char *where, char **output, char *cmd,
-                             const char *fullpath, int *exitcode)
+static char *run_and_capture(const char *where, char **output, char *cmd, const char *fullpath, int *exitcode)
 {
     int fd;
 
@@ -107,6 +106,7 @@ static bool changedfiles_driver(struct rpminspect *ri, rpmfile_entry_t *file)
     char magic[4];
     const char *bv = NULL;
     const char *av = NULL;
+    bool rebase = false;
     struct result_params params;
 
     assert(ri != NULL);
@@ -133,12 +133,25 @@ static bool changedfiles_driver(struct rpminspect *ri, rpmfile_entry_t *file)
         return true;
     }
 
+    /*
+     * Determine if we are running on a rebased package or just a
+     * package update.
+     */
+    bv = headerGetString(file->peer_file->rpm_header, RPMTAG_VERSION);
+    av = headerGetString(file->rpm_header, RPMTAG_VERSION);
+
+    if (strcmp(bv, av)) {
+        rebase = true;
+    } else {
+        rebase = false;
+    }
+
     /* The architecture is used in reporting messages */
     arch = get_rpm_header_arch(file->rpm_header);
 
     /* Set up the result parameters */
     init_result_params(&params);
-    params.severity = RESULT_VERIFY;
+    params.severity = rebase ? RESULT_INFO : RESULT_VERIFY;
     params.waiverauth = WAIVABLE_BY_ANYONE;
     params.header = HEADER_CHANGEDFILES;
     params.arch = arch;
@@ -157,17 +170,6 @@ static bool changedfiles_driver(struct rpminspect *ri, rpmfile_entry_t *file)
                 break;
             }
         }
-    }
-
-    /*
-     * Only run this inspection for builds that change versions or
-     * the waiver type is WAIVABLE_BY_SECURITY.
-     */
-    bv = headerGetString(file->peer_file->rpm_header, RPMTAG_VERSION);
-    av = headerGetString(file->rpm_header, RPMTAG_VERSION);
-
-    if (!strcmp(bv, av) && params.waiverauth != WAIVABLE_BY_SECURITY) {
-        return true;
     }
 
     /* Get the MIME type of the file, will need that */
@@ -337,7 +339,7 @@ static bool changedfiles_driver(struct rpminspect *ri, rpmfile_entry_t *file)
 
         if (exitcode) {
             xasprintf(&params.msg, _("Message catalog %s changed content on %s"), file->localpath, arch);
-            params.severity = RESULT_VERIFY;
+            params.severity = rebase ? RESULT_INFO : RESULT_VERIFY;
             params.waiverauth = WAIVABLE_BY_ANYONE;
             params.remedy = REMEDY_CHANGEDFILES;
             params.verb = VERB_CHANGED;
@@ -409,8 +411,14 @@ static bool changedfiles_driver(struct rpminspect *ri, rpmfile_entry_t *file)
                 }
             }
 
-            xasprintf(&params.msg, _("Public header file %s changed content on %s, Please make sure this does not change the ABI exported by this package.  The output of `diff -uw` follows."), file->localpath, arch);
-            params.severity = RESULT_VERIFY;
+            if (rebase) {
+                xasprintf(&params.msg, _("Public header file %s changed content on %s.  The output of `diff -uw` folloes."), file->localpath, arch);
+                params.severity = RESULT_INFO;
+            } else {
+                xasprintf(&params.msg, _("Public header file %s changed content on %s.  Please make sure this does not change the ABI exported by this package.  The output of `diff -uw` follows."), file->localpath, arch);
+                params.severity = RESULT_VERIFY;
+            }
+
             params.waiverauth = WAIVABLE_BY_ANYONE;
             params.details = short_errors;
             params.verb = VERB_CHANGED;
