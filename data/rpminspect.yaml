@@ -375,11 +375,11 @@ javabytecode:
     # for Fedora).  The value is the JVM major version.  For example:
     #     fc30: 53
     # You should also always specify a default, like this:
-    #     default: 53
+    #     default: 43
     # If the product release string is not found, the javabytecode
     # test will use the default entry.  You can have as many entries
     # as you want in this section.
-    - default: 52
+    - default: 43
 
 pathmigration:
     # Path migrations.  Over time the established best practices or
