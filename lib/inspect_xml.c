@@ -71,14 +71,19 @@ static bool is_xml_well_formed(const char *path, char **errors)
         DEBUG_PRINT("path=|%s|, ctxt->valid=%d, ctxt->errNo=%d\n", path, ctxt->valid, ctxt->errNo);
     }
 
-    if (!ctxt->valid) {
-        if (errors != NULL) {
-            *errors = strdup(ctxt->lastError.message);
-        }
-
-        result = false;
-    } else {
+    /* an unparsed entity is ok in this check */
+    if (ctxt->errNo == XML_ERR_UNDECLARED_ENTITY || ctxt->errNo == XML_WAR_UNDECLARED_ENTITY) {
         result = true;
+    } else {
+        if (!ctxt->valid) {
+            if (errors != NULL) {
+                *errors = strdup(ctxt->lastError.message);
+            }
+
+            result = false;
+        } else {
+            result = true;
+        }
     }
 
     if (doc != NULL) {
