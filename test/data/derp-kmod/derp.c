@@ -24,6 +24,7 @@
 #include <linux/kernel.h>
 #include <linux/proc_fs.h>
 #include <linux/seq_file.h>
+#include <linux/version.h>
 
 MODULE_AUTHOR("David Cantrell <dcantrell@redhat.com>");
 MODULE_DESCRIPTION("derp testing module");
@@ -58,6 +59,7 @@ static int derp_proc_open(struct inode *inode, struct file *file)
     return single_open(file, derp_proc_show, NULL);
 }
 
+#if LINUX_VERSION_CODE < KERNEL_VERSION(5,6,0)
 static const struct file_operations derp_proc_fops = {
     .owner   = THIS_MODULE,
     .open    = derp_proc_open,
@@ -65,6 +67,14 @@ static const struct file_operations derp_proc_fops = {
     .llseek  = seq_lseek,
     .release = single_release,
 };
+#else
+static const struct proc_ops derp_proc_fops = {
+    .owner        = THIS_MODULE,
+    .proc_open    = derp_proc_open,
+    .proc_read    = seq_read,
+    .proc_lseek   = seq_lseek,
+    .proc_release = single_release,
+#endif
 
 static int __init derp_init(void)
 {
