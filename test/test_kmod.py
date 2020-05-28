@@ -28,12 +28,14 @@ from baseclass import TestCompareRPMs, TestCompareKoji
 # installed with build files and go with that.  The kernel version is necessary for
 # kmod tests below.
 have_kernel_devel = False
+kernel_build_dir = None
 
 # Try the running kernel
 kver = os.uname()[2]
 kmakefile = os.path.join('/lib/modules', kver, 'build/Makefile')
 if not have_kernel_devel and os.path.isfile(kmakefile):
     have_kernel_devel = True
+    kernel_build_dir = os.path.dirname(kmakefile)
 
 # Try the installed RPMs
 if not have_kernel_devel:
@@ -45,6 +47,7 @@ if not have_kernel_devel:
             kmakefile = os.path.join('/lib/modules', str(kver), 'build/Makefile')
             if os.path.isfile(kmakefile):
                 have_kernel_devel = True
+                kernel_build_dir = os.path.dirname(kmakefile)
                 break
 
 # Lastly, try just finding the first file in /lib/modules
@@ -53,6 +56,7 @@ if not have_kernel_devel:
     if len(makefiles) > 0:
         kver = makefiles[0].split('/')[3]
         have_kernel_devel = True
+        kernel_build_dir = os.path.join('/lib', 'modules', kver, 'build')
 
 # Support functions to build the kernel modules we need
 def build_module(rpminspect, build_ext=None, extra_cflags=None):
@@ -79,9 +83,9 @@ def build_module(rpminspect, build_ext=None, extra_cflags=None):
     os.chdir(moddir)
 
     if extra_cflags is None:
-        cmd = "make -s"
+        cmd = "make -s KERNEL_BUILD_DIR=" + kernel_build_dir
     else:
-        cmd = "make -s EXTRA_CFLAGS=" + extra_cflags
+        cmd = "make -s KERNEL_BUILD_DIR=" + kernel_build_dir + " EXTRA_CFLAGS=" + extra_cflags
 
     os.system(cmd)
     os.chdir(cwd)
