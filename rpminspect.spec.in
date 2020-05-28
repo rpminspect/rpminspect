@@ -155,7 +155,7 @@ control files.
 %license COPYING
 %{_datadir}/rpminspect
 %dir %{_sysconfdir}/rpminspect
-%config(noreplace) %{_sysconfdir}/rpminspect/rpminspect.conf
+%config(noreplace) %{_sysconfdir}/rpminspect/rpminspect.yaml
 
 
 %changelog
