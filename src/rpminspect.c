@@ -353,6 +353,7 @@ int main(int argc, char **argv) {
     struct result_params params;
     size_t cmdlen = 0;
     char *tail = NULL;
+    bool ires = false;
 
     /* Be friendly to "rpminspect ... 2>&1 | tee" use case */
     setlinebuf(stdout);
@@ -749,7 +750,18 @@ int main(int argc, char **argv) {
                 continue;
             }
 
-            inspections[i].driver(&ri);
+            if (verbose) {
+                xasprintf(&r, _("Running %s inspection..."), inspections[i].name);
+                assert(r != NULL);
+                printf("%-36s", r);
+                free(r);
+            }
+
+            ires = inspections[i].driver(&ri);
+
+            if (verbose) {
+                printf("%5s\n", ires ? _("pass") : _("FAIL"));
+            }
         }
 
         /* output the results */
