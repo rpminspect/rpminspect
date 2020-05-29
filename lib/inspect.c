@@ -125,61 +125,61 @@ const char *inspection_desc(const uint64_t inspection)
 {
     switch (inspection) {
         case INSPECT_LICENSE:
-            return _(DESC_LICENSE);
+            return DESC_LICENSE;
         case INSPECT_EMPTYRPM:
-            return _(DESC_EMPTYRPM);
+            return DESC_EMPTYRPM;
         case INSPECT_METADATA:
-            return _(DESC_METADATA);
+            return DESC_METADATA;
         case INSPECT_MANPAGE:
-            return _(DESC_MANPAGE);
+            return DESC_MANPAGE;
         case INSPECT_XML:
-            return _(DESC_XML);
+            return DESC_XML;
         case INSPECT_ELF:
-            return _(DESC_ELF);
+            return DESC_ELF;
         case INSPECT_DESKTOP:
-            return _(DESC_DESKTOP);
+            return DESC_DESKTOP;
         case INSPECT_DISTTAG:
-            return _(DESC_DISTTAG);
+            return DESC_DISTTAG;
         case INSPECT_SPECNAME:
-            return _(DESC_SPECNAME);
+            return DESC_SPECNAME;
         case INSPECT_MODULARITY:
-            return _(DESC_MODULARITY);
+            return DESC_MODULARITY;
         case INSPECT_JAVABYTECODE:
-            return _(DESC_JAVABYTECODE);
+            return DESC_JAVABYTECODE;
         case INSPECT_CHANGEDFILES:
-            return _(DESC_CHANGEDFILES);
+            return DESC_CHANGEDFILES;
         case INSPECT_REMOVEDFILES:
-            return _(DESC_REMOVEDFILES);
+            return DESC_REMOVEDFILES;
         case INSPECT_ADDEDFILES:
-            return _(DESC_ADDEDFILES);
+            return DESC_ADDEDFILES;
         case INSPECT_UPSTREAM:
-            return _(DESC_UPSTREAM);
+            return DESC_UPSTREAM;
         case INSPECT_OWNERSHIP:
-            return _(DESC_OWNERSHIP);
+            return DESC_OWNERSHIP;
         case INSPECT_SHELLSYNTAX:
-            return _(DESC_SHELLSYNTAX);
+            return DESC_SHELLSYNTAX;
         case INSPECT_ANNOCHECK:
-            return _(DESC_ANNOCHECK);
+            return DESC_ANNOCHECK;
         case INSPECT_DT_NEEDED:
-            return _(DESC_DT_NEEDED);
+            return DESC_DT_NEEDED;
         case INSPECT_FILESIZE:
-            return _(DESC_FILESIZE);
+            return DESC_FILESIZE;
         case INSPECT_PERMISSIONS:
-            return _(DESC_PERMISSIONS);
+            return DESC_PERMISSIONS;
         case INSPECT_CAPABILITIES:
-            return _(DESC_CAPABILITIES);
+            return DESC_CAPABILITIES;
         case INSPECT_KMOD:
-            return _(DESC_KMOD);
+            return DESC_KMOD;
         case INSPECT_ARCH:
-            return _(DESC_ARCH);
+            return DESC_ARCH;
         case INSPECT_SUBPACKAGES:
-            return _(DESC_SUBPACKAGES);
+            return DESC_SUBPACKAGES;
         case INSPECT_CHANGELOG:
-            return _(DESC_CHANGELOG);
+            return DESC_CHANGELOG;
         case INSPECT_LTO:
-            return _(DESC_LTO);
+            return DESC_LTO;
         case INSPECT_SYMLINKS:
-            return _(DESC_SYMLINKS);
+            return DESC_SYMLINKS;
         default:
             return NULL;
     }

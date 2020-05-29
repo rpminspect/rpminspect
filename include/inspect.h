@@ -410,62 +410,62 @@ bool inspect_lostpayload(struct rpminspect *ri);
 #define INSPECT_LOSTPAYLOAD                 (((uint64_t) 1) << 30)
 
 /* Long descriptions for the inspections */
-#define DESC_LICENSE "Verify the string specified in the License tag of the RPM metadata describes permissible software licenses as defined by the license database. Also checks to see if the License tag contains any unprofessional words as defined in the configuration file."
+#define DESC_LICENSE _("Verify the string specified in the License tag of the RPM metadata describes permissible software licenses as defined by the license database. Also checks to see if the License tag contains any unprofessional words as defined in the configuration file.")
 
-#define DESC_EMPTYRPM "Check all binary RPMs in the build for any empty payloads. When comparing two builds, report new packages in the after build with empty payloads."
+#define DESC_EMPTYRPM _("Check all binary RPMs in the build for any empty payloads. When comparing two builds, report new packages in the after build with empty payloads.")
 
-#define DESC_LOSTPAYLOAD "Check all binary RPMs in the before and after builds for any empty payloads. Packages that lost payload data from the before build to the after build are reported."
+#define DESC_LOSTPAYLOAD _("Check all binary RPMs in the before and after builds for any empty payloads. Packages that lost payload data from the before build to the after build are reported.")
 
-#define DESC_METADATA "Perform some RPM header checks. First, check that the Vendor contains the expected string as defined in the configuration file. Second, check that the build host is in the expected subdomain as defined in the configuration file. Third, check the Summary string for any unprofessional words. Fourth, check the Description for any unprofessional words. Lastly, if there is a before build specified, check for differences between the before and after build values of the previous RPM header values and report them."
+#define DESC_METADATA _("Perform some RPM header checks. First, check that the Vendor contains the expected string as defined in the configuration file. Second, check that the build host is in the expected subdomain as defined in the configuration file. Third, check the Summary string for any unprofessional words. Fourth, check the Description for any unprofessional words. Lastly, if there is a before build specified, check for differences between the before and after build values of the previous RPM header values and report them.")
 
-#define DESC_MANPAGE "Perform some checks on man pages in the RPM payload. First, check that each man page is compressed. Second, check that each man page contains valid content. Lastly, check that each man page is installed to the correct path."
+#define DESC_MANPAGE _("Perform some checks on man pages in the RPM payload. First, check that each man page is compressed. Second, check that each man page contains valid content. Lastly, check that each man page is installed to the correct path.")
 
-#define DESC_XML "Check that XML files included in the RPM payload are well-formed."
+#define DESC_XML _("Check that XML files included in the RPM payload are well-formed.")
 
-#define DESC_ELF "Perform several checks on ELF files. First, check that ELF objects do not contain an executable stack. Second, check that ELF objects do not contain text relocations. When comparing builds, check that the ELF objects in the after build did not lose a PT_GNU_RELRO segment. When comparing builds, check that the ELF objects in the after build did not lose -D_FORTIFY_SOURCE. Lastly, if there is a list of forbidden library functions, make sure nothing uses them."
+#define DESC_ELF _("Perform several checks on ELF files. First, check that ELF objects do not contain an executable stack. Second, check that ELF objects do not contain text relocations. When comparing builds, check that the ELF objects in the after build did not lose a PT_GNU_RELRO segment. When comparing builds, check that the ELF objects in the after build did not lose -D_FORTIFY_SOURCE. Lastly, if there is a list of forbidden library functions, make sure nothing uses them.")
 
-#define DESC_DESKTOP "Perform syntax and file reference checks on *.desktop files. Syntax errors and invalid file references are reported as errors."
+#define DESC_DESKTOP _("Perform syntax and file reference checks on *.desktop files. Syntax errors and invalid file references are reported as errors.")
 
-#define DESC_DISTTAG "Check that the 'Release' tag in the RPM spec file includes the %{?dist} directive."
+#define DESC_DISTTAG _("Check that the 'Release' tag in the RPM spec file includes the %{?dist} directive.")
 
-#define DESC_SPECNAME "Ensure the spec file name conforms to the NAME.spec naming format."
+#define DESC_SPECNAME _("Ensure the spec file name conforms to the NAME.spec naming format.")
 
-#define DESC_MODULARITY "Ensure compliance with modularity build and packaging policies (only valid for module builds, no-op otherwise)."
+#define DESC_MODULARITY _("Ensure compliance with modularity build and packaging policies (only valid for module builds, no-op otherwise).")
 
-#define DESC_JAVABYTECODE "Check minimum required Java bytecode version in class files, report bytecode version changes between builds, and report if bytecode versions are exceeded.  The bytecode version is vendor specific to releases and defined in the configuration file."
+#define DESC_JAVABYTECODE _("Check minimum required Java bytecode version in class files, report bytecode version changes between builds, and report if bytecode versions are exceeded.  The bytecode version is vendor specific to releases and defined in the configuration file.")
 
-#define DESC_CHANGEDFILES "Report changed files from the before build to the after build.  Certain file changes will raise additional warnings if the concern is more critical than just reporting changes (e.g., a suspected security impact).  Any gzip, bzip2, or xz compressed files will have their uncompressed content compared only, which will allow changes through in the compression level used.  Message catalog files (.mo) are unpacked and compared using diff(1).  Public C and C++ header files are preprocessed and compared using diff(1).  Any changes with diff output are included in the results."
+#define DESC_CHANGEDFILES _("Report changed files from the before build to the after build.  Certain file changes will raise additional warnings if the concern is more critical than just reporting changes (e.g., a suspected security impact).  Any gzip, bzip2, or xz compressed files will have their uncompressed content compared only, which will allow changes through in the compression level used.  Message catalog files (.mo) are unpacked and compared using diff(1).  Public C and C++ header files are preprocessed and compared using diff(1).  Any changes with diff output are included in the results.")
 
-#define DESC_REMOVEDFILES "Report removed files from the before build to the after build.  Shared libraries get additional reporting output as they may be unexpected dependency removals.  Files removed with a security path prefix generated special reporting in case a security review is required.  Source RPMs and debuginfo files are ignored by this inspection."
+#define DESC_REMOVEDFILES _("Report removed files from the before build to the after build.  Shared libraries get additional reporting output as they may be unexpected dependency removals.  Files removed with a security path prefix generated special reporting in case a security review is required.  Source RPMs and debuginfo files are ignored by this inspection.")
 
-#define DESC_ADDEDFILES "Report added files from the before build to the after build.  Debuginfo files are ignored as are files that match the patterns defined in the configuration file.  Files added to security paths generate special reporting in case a security review is required.  New setuid and setgid files raise a security warning unless the file is in the whitelist."
+#define DESC_ADDEDFILES _("Report added files from the before build to the after build.  Debuginfo files are ignored as are files that match the patterns defined in the configuration file.  Files added to security paths generate special reporting in case a security review is required.  New setuid and setgid files raise a security warning unless the file is in the whitelist.")
 
-#define DESC_UPSTREAM "Report Source archives defined in the RPM spec file changing content between the before and after build. If the source archives change and the package is on the version-whitelist, the change is reported as informational. Otherwise the change is reported as a rebase of the package and requires inspection."
+#define DESC_UPSTREAM _("Report Source archives defined in the RPM spec file changing content between the before and after build. If the source archives change and the package is on the version-whitelist, the change is reported as informational. Otherwise the change is reported as a rebase of the package and requires inspection.")
 
-#define DESC_OWNERSHIP "Report files and directories owned by unexpected users and groups. Check to make sure executables are owned by the correct user and group. If a before and after build have been specified, also report ownership changes."
+#define DESC_OWNERSHIP _("Report files and directories owned by unexpected users and groups. Check to make sure executables are owned by the correct user and group. If a before and after build have been specified, also report ownership changes.")
 
-#define DESC_SHELLSYNTAX "For all shell scripts in the build, perform a syntax check on it using the shell defined in its #! line (shell must also be listed in shell section of the configuration data). If the syntax check returns non-zero, report it to the user and return a combined stdout and stderr. If comparing two builds, perform the previous check but also report if a previously bad script is now passing the syntax check."
+#define DESC_SHELLSYNTAX _("For all shell scripts in the build, perform a syntax check on it using the shell defined in its #! line (shell must also be listed in shell section of the configuration data). If the syntax check returns non-zero, report it to the user and return a combined stdout and stderr. If comparing two builds, perform the previous check but also report if a previously bad script is now passing the syntax check.")
 
-#define DESC_ANNOCHECK "Perform annocheck tests defined in the configuration file on all ELF files in the build.  A single build specified will perform an analysis only.  Two builds specified will compare the test results between the before and after build.  If no annocheck tests are defined in the configuration file, this inspection is skipped."
+#define DESC_ANNOCHECK _("Perform annocheck tests defined in the configuration file on all ELF files in the build.  A single build specified will perform an analysis only.  Two builds specified will compare the test results between the before and after build.  If no annocheck tests are defined in the configuration file, this inspection is skipped.")
 
-#define DESC_DT_NEEDED "Compare DT_NEEDED entries in dynamic ELF executables and shared libraries between the before and after build and report changes."
+#define DESC_DT_NEEDED _("Compare DT_NEEDED entries in dynamic ELF executables and shared libraries between the before and after build and report changes.")
 
-#define DESC_FILESIZE "Report file size changes between builds.  If empty files became non-empty or non-empty files became empty, report those as results needing verification.  Report file change percentages as info-only."
+#define DESC_FILESIZE _("Report file size changes between builds.  If empty files became non-empty or non-empty files became empty, report those as results needing verification.  Report file change percentages as info-only.")
 
-#define DESC_PERMISSIONS "Report stat(2) mode changes between builds.  Checks against the stat-whitelist for the product release specified or determined.  Any setuid or setgid changes will raise a message requiring Security Team review."
+#define DESC_PERMISSIONS _("Report stat(2) mode changes between builds.  Checks against the stat-whitelist for the product release specified or determined.  Any setuid or setgid changes will raise a message requiring Security Team review.")
 
-#define DESC_CAPABILITIES "Report capabilities(7) changes between builds.  Checks against the capabilities whitelist for the product release specified or determined.  Any capabilities changes not whitelisted will raise a message requiring Security Team review."
+#define DESC_CAPABILITIES _("Report capabilities(7) changes between builds.  Checks against the capabilities whitelist for the product release specified or determined.  Any capabilities changes not whitelisted will raise a message requiring Security Team review.")
 
-#define DESC_KMOD "Report kernel module parameter, dependency, PCI ID, or symbol differences between builds.  Added and removed parameters are reported and if the package version is unchanged, these messages are reported as failures.  The same is true module dependencies, PCI IDs, and symbols"
+#define DESC_KMOD _("Report kernel module parameter, dependency, PCI ID, or symbol differences between builds.  Added and removed parameters are reported and if the package version is unchanged, these messages are reported as failures.  The same is true module dependencies, PCI IDs, and symbols")
 
-#define DESC_ARCH "Report RPM architectures that appear and disappear between the before and after builds."
+#define DESC_ARCH _("Report RPM architectures that appear and disappear between the before and after builds.")
 
-#define DESC_SUBPACKAGES "Report RPM subpackages that appear and disappear between the before and after builds."
+#define DESC_SUBPACKAGES _("Report RPM subpackages that appear and disappear between the before and after builds.")
 
-#define DESC_CHANGELOG "Ensure packages contain an entry in the %changelog for the version built.  Reports any other differences in the existing changelog between builds and that the new entry contains new text entries."
+#define DESC_CHANGELOG _("Ensure packages contain an entry in the %changelog for the version built.  Reports any other differences in the existing changelog between builds and that the new entry contains new text entries.")
 
-#define DESC_LTO "Link Time Optimization (LTO) produces smaller and faster shared ELF executables and libraries.  LTO bytecode is not stable from one release of gcc to the next.  As such, LTO bytecode should not be present in .a and .o ELF objects shipped in packages.  This inspection looks for LTO bytecode in ELF relocatable objects and reports if any is present."
+#define DESC_LTO _("Link Time Optimization (LTO) produces smaller and faster shared ELF executables and libraries.  LTO bytecode is not stable from one release of gcc to the next.  As such, LTO bytecode should not be present in .a and .o ELF objects shipped in packages.  This inspection looks for LTO bytecode in ELF relocatable objects and reports if any is present.")
 
-#define DESC_SYMLINKS "Symbolic links must be resolvable on the installed system.  This inspection ensures absolute and relative symlinks are valid.  It also checks for any symlink usage that will cause problems for RPM."
+#define DESC_SYMLINKS _("Symbolic links must be resolvable on the installed system.  This inspection ensures absolute and relative symlinks are valid.  It also checks for any symlink usage that will cause problems for RPM.")
 
 #endif
