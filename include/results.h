@@ -29,6 +29,7 @@
 #define HEADER_RPMINSPECT    "rpminspect"
 #define HEADER_METADATA      "header-metadata"
 #define HEADER_EMPTYRPM      "empty-payload"
+#define HEADER_LOSTPAYLOAD   "lost-payload"
 #define HEADER_LICENSE       "license"
 #define HEADER_ELF           "elf-object-properties"
 #define HEADER_MAN           "man-pages"
@@ -67,6 +68,9 @@
 
 /* emptyrpm */
 #define REMEDY_EMPTYRPM _("Check to see if you eliminated a subpackage but still have the %%package and/or the %%files section for it.")
+
+/* lostpayload */
+#define REMEDY_LOSTPAYLOAD _("Check to see if you eliminated a subpackage but still have the %%package and/or the %%files section for it.")
 
 /* license */
 #define REMEDY_LICENSE _("The License tag must contain an approved license string as defined by the distribution (e.g., GPLv2+).  If the license in question is approved, the license database needs updating in the rpminspect-data package.")

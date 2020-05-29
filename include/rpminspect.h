@@ -203,6 +203,7 @@ bool process_file_path(const rpmfile_entry_t *, regex_t *, regex_t *);
 void find_file_peers(rpmfile_t *, rpmfile_t *);
 cap_t get_cap(rpmfile_entry_t *);
 bool is_debug_or_build_path(const char *);
+bool is_payload_empty(rpmfile_t *);
 
 /* tty.c */
 size_t tty_width(void);

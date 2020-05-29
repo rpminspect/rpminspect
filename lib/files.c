@@ -678,3 +678,20 @@ bool is_debug_or_build_path(const char *path)
 
     return false;
 }
+
+/**
+ * @brief True if the payload is empty, false otherwise.
+ *
+ * All we do here is count the payload entries.  If we have more than
+ * zero, the payload is not empty.
+ *
+ * @param filelist List of files in the RPM payload.
+ */
+bool is_payload_empty(rpmfile_t *filelist) {
+    if (filelist == NULL) {
+        return true;
+    }
+
+    /* Make sure the file list has at least one entry */
+    return TAILQ_EMPTY(filelist);
+}
