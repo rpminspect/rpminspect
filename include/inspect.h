@@ -358,6 +358,16 @@ bool inspect_lto(struct rpminspect *ri);
  */
 bool inspect_symlinks(struct rpminspect *ri);
 
+/**
+ * @brief Main driver for the 'lostpayload' inspection.
+ *
+ *
+ *
+ * @param ri Pointer to the struct rpminspect for the program.
+ * @return True if the inspection passed, false otherwise.
+ */
+bool inspect_lostpayload(struct rpminspect *ri);
+
 /** @} */
 
 /*
@@ -397,11 +407,14 @@ bool inspect_symlinks(struct rpminspect *ri);
 #define INSPECT_PATHMIGRATION               (((uint64_t) 1) << 27)
 #define INSPECT_LTO                         (((uint64_t) 1) << 28)
 #define INSPECT_SYMLINKS                    (((uint64_t) 1) << 29)
+#define INSPECT_LOSTPAYLOAD                 (((uint64_t) 1) << 30)
 
 /* Long descriptions for the inspections */
 #define DESC_LICENSE "Verify the string specified in the License tag of the RPM metadata describes permissible software licenses as defined by the license database. Also checks to see if the License tag contains any unprofessional words as defined in the configuration file."
 
-#define DESC_EMPTYRPM "Check all binary RPMs in the before and after builds for any empty payloads. Packages that lost payload data from the before build to the after build are reported as well as any packages in the after build that exist but have no payload data."
+#define DESC_EMPTYRPM "Check all binary RPMs in the build for any empty payloads. When comparing two builds, report new packages in the after build with empty payloads."
+
+#define DESC_LOSTPAYLOAD "Check all binary RPMs in the before and after builds for any empty payloads. Packages that lost payload data from the before build to the after build are reported."
 
 #define DESC_METADATA "Perform some RPM header checks. First, check that the Vendor contains the expected string as defined in the configuration file. Second, check that the build host is in the expected subdomain as defined in the configuration file. Third, check the Summary string for any unprofessional words. Fourth, check the Description for any unprofessional words. Lastly, if there is a before build specified, check for differences between the before and after build values of the previous RPM header values and report them."
 

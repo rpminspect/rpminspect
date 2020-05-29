@@ -32,29 +32,11 @@
 #include "rpminspect.h"
 
 /**
- * @brief True if the payload is empty, false otherwise.
- *
- * All we do here is count the payload entries.  If we have more than
- * zero, the payload is not empty.
- *
- * @param filelist List of files in the RPM payload.
- */
-static bool is_payload_empty(rpmfile_t *filelist) {
-    if (filelist == NULL) {
-        return true;
-    }
-
-    /* Make sure the file list has at least one entry */
-    return TAILQ_EMPTY(filelist);
-}
-
-/**
  * @brief Perform the 'emptyrpm' inspection.
  *
- * Check all binary RPMs in the before and after builds for any empty
- * payloads. Packages that lost payload data from the before build to
- * the after build are reported as well as any packages in the after
- * build that exist but have no payload data.
+ * Report any packages that appear in the build that contain new
+ * payload.  When comparing two builds, only report new empty payload
+ * packages.
  *
  * @param ri Pointer to the struct rpminspect for the program.
  */
@@ -70,51 +52,20 @@ bool inspect_emptyrpm(struct rpminspect *ri) {
     params.header = HEADER_EMPTYRPM;
 
     /*
-     * The emptyrpm inspection looks for any packages missing payloads.
-     * These could be packages that lost their payloads from the before
-     * build to the after build or new packages that lack any payloads.
+     * The emptyrpm inspection looks for any packages missing
+     * payloads.  These are packages (or new packages when comparing)
+     * that lack any payloads.
      */
 
     /* Check the binary peers */
     TAILQ_FOREACH(peer, ri->peers, items) {
-        /*
-         * Subpackages may disappear in subsequent builds.  Sometimes this
-         * is intentional, sometimes not.
-         */
-        if (peer->before_rpm != NULL && peer->after_rpm == NULL) {
-            xasprintf(&params.msg, _("Existing subpackage %s is now missing"), headerGetString(peer->before_hdr, RPMTAG_NAME));
+        if (is_payload_empty(peer->after_files) && peer->before_rpm == NULL) {
+            xasprintf(&params.msg, _("New package %s is empty (no payloads)"), basename(peer->after_rpm));
             params.severity = RESULT_VERIFY;
             params.waiverauth = WAIVABLE_BY_ANYONE;
             params.remedy = REMEDY_EMPTYRPM;
             add_result(ri, &params);
             free(params.msg);
-            good = false;
-            continue;
-        }
-
-        if (is_payload_empty(peer->after_files)) {
-            if (peer->before_rpm == NULL) {
-                xasprintf(&params.msg, _("New package %s is empty (no payloads)"), basename(peer->after_rpm));
-                params.severity = RESULT_VERIFY;
-                params.waiverauth = WAIVABLE_BY_ANYONE;
-                params.remedy = REMEDY_EMPTYRPM;
-                add_result(ri, &params);
-                free(params.msg);
-            } else if (is_payload_empty(peer->before_files)) {
-                xasprintf(&params.msg, _("Package %s continues to be empty (no payloads)"), basename(peer->after_rpm));
-                params.severity = RESULT_INFO;
-                params.waiverauth = NOT_WAIVABLE;
-                params.remedy = REMEDY_EMPTYRPM;
-                add_result(ri, &params);
-                free(params.msg);
-            } else {
-                xasprintf(&params.msg, _("Package %s became empty (no payloads)"), basename(peer->after_rpm));
-                params.severity = RESULT_VERIFY;
-                params.waiverauth = WAIVABLE_BY_ANYONE;
-                params.remedy = REMEDY_EMPTYRPM;
-                add_result(ri, &params);
-                free(params.msg);
-            }
 
             good = false;
         }

@@ -36,6 +36,7 @@ bool debug_mode = false;
 struct inspect inspections[] = {
     { INSPECT_LICENSE, "license", true, &inspect_license },
     { INSPECT_EMPTYRPM, "emptyrpm", true, &inspect_emptyrpm },
+    { INSPECT_LOSTPAYLOAD, "lostpayload", false, &inspect_lostpayload },
     { INSPECT_METADATA, "metadata", true, &inspect_metadata },
     { INSPECT_MANPAGE, "manpage", true, &inspect_manpage },
     { INSPECT_XML, "xml", true, &inspect_xml },
