@@ -1,5 +1,13 @@
+include/constants.h
+include/inspect.h
+include/output.h
+include/readelf.h
+include/results.h
+include/rpminspect.h
+include/types.h
 lib/badwords.c
 lib/builds.c
+lib/bytes.c
 lib/checksums.c
 lib/copyfile.c
 lib/debug.c
@@ -23,6 +31,7 @@ lib/inspect_filesize.c
 lib/inspect_javabytecode.c
 lib/inspect_kmod.c
 lib/inspect_license.c
+lib/inspect_lostpayload.c
 lib/inspect_lto.c
 lib/inspect_manpage.c
 lib/inspect_metadata.c
@@ -45,7 +54,6 @@ lib/magic.c
 lib/mkdirp.c
 lib/output.c
 lib/output_json.c
-lib/output_simple.c
 lib/output_text.c
 lib/peers.c
 lib/readelf.c
