@@ -128,6 +128,8 @@ const char *inspection_desc(const uint64_t inspection)
             return DESC_LICENSE;
         case INSPECT_EMPTYRPM:
             return DESC_EMPTYRPM;
+        case INSPECT_LOSTPAYLOAD:
+            return DESC_LOSTPAYLOAD;
         case INSPECT_METADATA:
             return DESC_METADATA;
         case INSPECT_MANPAGE:
