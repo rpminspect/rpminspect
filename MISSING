@@ -26,8 +26,9 @@ TEST_UPSTREAM (only the rebase keyword check)
     keywords and approval settings are things that should be done by
     other tools and processes.  Once the bug is approved and the
     developer submits the build, rebase or not, rpminspect should be
-    free to run.  rhpkg can implement rules and we can implement
-    additional gating checks for package rebases if we desire.
+    free to run.  rhpkg or another tool can implement rules and we can
+    implement additional gating checks for package rebases if we
+    desire.
 
 TEST_ELFLINT
     This test runs elflint(1) on ELF files.  We already have the
