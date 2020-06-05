@@ -34,46 +34,44 @@ bool debug_mode = false;
  */
 
 struct inspect inspections[] = {
-    { INSPECT_LICENSE, "license", true, &inspect_license },
-    { INSPECT_EMPTYRPM, "emptyrpm", true, &inspect_emptyrpm },
-    { INSPECT_LOSTPAYLOAD, "lostpayload", false, &inspect_lostpayload },
-    { INSPECT_METADATA, "metadata", true, &inspect_metadata },
-    { INSPECT_MANPAGE, "manpage", true, &inspect_manpage },
-    { INSPECT_XML, "xml", true, &inspect_xml },
-    { INSPECT_ELF, "elf", true, &inspect_elf },
-    { INSPECT_DESKTOP, "desktop", true, &inspect_desktop },
-    { INSPECT_DISTTAG, "disttag", true, &inspect_disttag },
-    { INSPECT_SPECNAME, "specname", true, &inspect_specname },
-    { INSPECT_MODULARITY, "modularity", true, &inspect_modularity },
-    { INSPECT_JAVABYTECODE, "javabytecode", true, &inspect_javabytecode },
-    { INSPECT_CHANGEDFILES, "changedfiles", false, &inspect_changedfiles },
-    { INSPECT_REMOVEDFILES, "removedfiles", false, &inspect_removedfiles },
-    { INSPECT_ADDEDFILES, "addedfiles", false, &inspect_addedfiles },
-    { INSPECT_UPSTREAM, "upstream", false, &inspect_upstream },
-    { INSPECT_OWNERSHIP, "ownership", true, &inspect_ownership },
-    { INSPECT_SHELLSYNTAX, "shellsyntax", true, &inspect_shellsyntax },
-    { INSPECT_ANNOCHECK, "annocheck", true, &inspect_annocheck },
-    { INSPECT_DT_NEEDED, "DT_NEEDED", false, &inspect_dt_needed },
-    { INSPECT_FILESIZE, "filesize", false, &inspect_filesize },
-    { INSPECT_PERMISSIONS, "permissions", false, &inspect_permissions },
-    { INSPECT_CAPABILITIES, "capabilities", true, &inspect_capabilities },
-    { INSPECT_KMOD, "kmod", false, &inspect_kmod },
-    { INSPECT_ARCH, "arch", false, &inspect_arch },
-    { INSPECT_SUBPACKAGES, "subpackages", false, &inspect_subpackages },
-    { INSPECT_CHANGELOG, "changelog", false, &inspect_changelog },
-    { INSPECT_PATHMIGRATION, "pathmigration", true, &inspect_pathmigration },
-    { INSPECT_LTO, "LTO", true, &inspect_lto },
-    { INSPECT_SYMLINKS, "symlinks", true, &inspect_symlinks },
-
     /*
      * { INSPECT_TYPE (add to inspect.h),
      *   "short name",
-     *   bool--true if for single build, false is before&after required,
+     *   bool--true if for single build, false if before&after required,
      *   &function_pointer },
      *
      * NOTE: long descriptions are inspect.h and returned by inspection_desc()
      */
-
+    { INSPECT_LICENSE,       "license",       true,  &inspect_license },
+    { INSPECT_EMPTYRPM,      "emptyrpm",      true,  &inspect_emptyrpm },
+    { INSPECT_LOSTPAYLOAD,   "lostpayload",   false, &inspect_lostpayload },
+    { INSPECT_METADATA,      "metadata",      true,  &inspect_metadata },
+    { INSPECT_MANPAGE,       "manpage",       true,  &inspect_manpage },
+    { INSPECT_XML,           "xml",           true,  &inspect_xml },
+    { INSPECT_ELF,           "elf",           true,  &inspect_elf },
+    { INSPECT_DESKTOP,       "desktop",       true,  &inspect_desktop },
+    { INSPECT_DISTTAG,       "disttag",       true,  &inspect_disttag },
+    { INSPECT_SPECNAME,      "specname",      true,  &inspect_specname },
+    { INSPECT_MODULARITY,    "modularity",    true,  &inspect_modularity },
+    { INSPECT_JAVABYTECODE,  "javabytecode",  true,  &inspect_javabytecode },
+    { INSPECT_CHANGEDFILES,  "changedfiles",  false, &inspect_changedfiles },
+    { INSPECT_REMOVEDFILES,  "removedfiles",  false, &inspect_removedfiles },
+    { INSPECT_ADDEDFILES,    "addedfiles",    false, &inspect_addedfiles },
+    { INSPECT_UPSTREAM,      "upstream",      false, &inspect_upstream },
+    { INSPECT_OWNERSHIP,     "ownership",     true,  &inspect_ownership },
+    { INSPECT_SHELLSYNTAX,   "shellsyntax",   true,  &inspect_shellsyntax },
+    { INSPECT_ANNOCHECK,     "annocheck",     true,  &inspect_annocheck },
+    { INSPECT_DT_NEEDED,     "DT_NEEDED",     false, &inspect_dt_needed },
+    { INSPECT_FILESIZE,      "filesize",      false, &inspect_filesize },
+    { INSPECT_PERMISSIONS,   "permissions",   false, &inspect_permissions },
+    { INSPECT_CAPABILITIES,  "capabilities",  true,  &inspect_capabilities },
+    { INSPECT_KMOD,          "kmod",          false, &inspect_kmod },
+    { INSPECT_ARCH,          "arch",          false, &inspect_arch },
+    { INSPECT_SUBPACKAGES,   "subpackages",   false, &inspect_subpackages },
+    { INSPECT_CHANGELOG,     "changelog",     false, &inspect_changelog },
+    { INSPECT_PATHMIGRATION, "pathmigration", true,  &inspect_pathmigration },
+    { INSPECT_LTO,           "LTO",           true,  &inspect_lto },
+    { INSPECT_SYMLINKS,      "symlinks",      true,  &inspect_symlinks },
     { 0, NULL, false, NULL }
 };
 
@@ -178,6 +176,8 @@ const char *inspection_desc(const uint64_t inspection)
             return DESC_SUBPACKAGES;
         case INSPECT_CHANGELOG:
             return DESC_CHANGELOG;
+        case INSPECT_PATHMIGRATION:
+            return DESC_PATHMIGRATION;
         case INSPECT_LTO:
             return DESC_LTO;
         case INSPECT_SYMLINKS:
