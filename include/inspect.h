@@ -456,13 +456,15 @@ bool inspect_lostpayload(struct rpminspect *ri);
 
 #define DESC_CAPABILITIES _("Report capabilities(7) changes between builds.  Checks against the capabilities whitelist for the product release specified or determined.  Any capabilities changes not whitelisted will raise a message requiring Security Team review.")
 
-#define DESC_KMOD _("Report kernel module parameter, dependency, PCI ID, or symbol differences between builds.  Added and removed parameters are reported and if the package version is unchanged, these messages are reported as failures.  The same is true module dependencies, PCI IDs, and symbols")
+#define DESC_KMOD _("Report kernel module parameter, dependency, PCI ID, or symbol differences between builds.  Added and removed parameters are reported and if the package version is unchanged, these messages are reported as failures.  The same is true module dependencies, PCI IDs, and symbols.")
 
 #define DESC_ARCH _("Report RPM architectures that appear and disappear between the before and after builds.")
 
 #define DESC_SUBPACKAGES _("Report RPM subpackages that appear and disappear between the before and after builds.")
 
 #define DESC_CHANGELOG _("Ensure packages contain an entry in the %changelog for the version built.  Reports any other differences in the existing changelog between builds and that the new entry contains new text entries.")
+
+#define DESC_PATHMIGRATION _("Report files that are packaged in directories that are no longer used by the product.  Usually this means a package has not been updated to account for path migrations.  The main examples are /bin migrating to /usr/bin and /sbin migrating to /usr/sbin.")
 
 #define DESC_LTO _("Link Time Optimization (LTO) produces smaller and faster shared ELF executables and libraries.  LTO bytecode is not stable from one release of gcc to the next.  As such, LTO bytecode should not be present in .a and .o ELF objects shipped in packages.  This inspection looks for LTO bytecode in ELF relocatable objects and reports if any is present.")
 
