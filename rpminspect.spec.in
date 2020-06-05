@@ -41,6 +41,7 @@ BuildRequires:  gettext-devel
 #BuildRequires: kernel-devel
 #BuildRequires: libgcc.i686
 #BuildRequires: python3-pyyaml
+#BuildRequires: python3-rpm
 
 %description
 Build deviation and compliance tool.  This program runs a number of tests
