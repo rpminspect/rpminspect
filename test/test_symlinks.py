@@ -17,24 +17,15 @@
 #
 
 import os
-import subprocess
 import unittest
+import rpm
 import rpmfluff
 from baseclass import TestRPMs, TestKoji, TestCompareRPMs, TestCompareKoji
 
-class RpmException(Exception):
-    """For failures running rpm(1)."""
-    pass
-
 # more recent versions of RPM prevent dangling and too long symlinks
-args = ["rpm", "--version"]
-proc = subprocess.Popen(args, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-(out, err) = proc.communicate()
-if proc.returncode != 0:
-    raise RpmException
-
-# b'RPM version 4.15.90' -> (4, 15, 90)
-(rpm_major, rpm_minor, rpm_update) = tuple(map(lambda x: int(x), out.decode(encoding='UTF-8').strip().split()[-1].split('.')))
+# b'4.15.90' -> (4, 15, 90)
+# b'4.16.0-beta' -> (4, 16, 0)
+(rpm_major, rpm_minor, rpm_update) = tuple(map(lambda x: int(x), rpm.__version__.strip().split('-')[0].split('.')))
 
 if rpm_major < 4 or (rpm_major == 4 and rpm_minor < 15) or (rpm_major == 4 and rpm_minor == 15 and rpm_update < 90):
     rpm_handles_symlinks = False
