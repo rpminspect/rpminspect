@@ -11,5 +11,5 @@ RUN sed -i -e 's|%%VERSION%%|1.0|g' -e 's|%%RPMDATE%%|$(date +"%a %b %d %Y")|g' 
 RUN dnf -y builddep --spec rpminspect.spec
 
 # Add additional test dependencies
-RUN dnf -y install CUnit CUnit-devel valgrind gcovr python3-pyyaml python3-pip rpm-build desktop-file-utils glibc.i686 glibc-devel.i686 kernel-core kernel-devel make
+RUN dnf -y install CUnit CUnit-devel valgrind gcovr python3-pyyaml python3-pip python3-devel rpm-build desktop-file-utils glibc.i686 glibc-devel.i686 kernel-core kernel-devel make
 RUN pip-3 install cpp-coveralls rpmfluff
