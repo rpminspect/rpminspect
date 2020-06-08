@@ -285,7 +285,7 @@ class SymlinkExistsMultiplePackagesCompareKoji(TestCompareKoji):
         self.waiver_auth = 'Not Waivable'
 
 # Absolute symlink is dangling (VERIFY)
-class AbsoluteSymlinkDangingRPMs(TestRPMs):
+class AbsoluteSymlinkDanglingRPMs(TestRPMs):
     def setUp(self):
         TestRPMs.setUp(self)
 
@@ -297,10 +297,10 @@ class AbsoluteSymlinkDangingRPMs(TestRPMs):
 
         self.inspection = 'symlinks'
         self.label = 'symlinks'
-        self.result = 'VERIFY'
+        self.result = 'INFO'
         self.waiver_auth = 'Anyone'
 
-class AbsoluteSymlinkDangingKoji(TestKoji):
+class AbsoluteSymlinkDanglingKoji(TestKoji):
     def setUp(self):
         TestRPMs.setUp(self)
 
@@ -312,10 +312,10 @@ class AbsoluteSymlinkDangingKoji(TestKoji):
 
         self.inspection = 'symlinks'
         self.label = 'symlinks'
-        self.result = 'VERIFY'
+        self.result = 'INFO'
         self.waiver_auth = 'Anyone'
 
-class AbsoluteSymlinkDangingCompareRPMs(TestCompareRPMs):
+class AbsoluteSymlinkDanglingCompareRPMs(TestCompareRPMs):
     def setUp(self):
         TestCompareRPMs.setUp(self)
 
@@ -327,10 +327,10 @@ class AbsoluteSymlinkDangingCompareRPMs(TestCompareRPMs):
 
         self.inspection = 'symlinks'
         self.label = 'symlinks'
-        self.result = 'VERIFY'
+        self.result = 'INFO'
         self.waiver_auth = 'Anyone'
 
-class AbsoluteSymlinkDangingCompareKoji(TestCompareKoji):
+class AbsoluteSymlinkDanglingCompareKoji(TestCompareKoji):
     def setUp(self):
         TestCompareKoji.setUp(self)
 
@@ -342,7 +342,7 @@ class AbsoluteSymlinkDangingCompareKoji(TestCompareKoji):
 
         self.inspection = 'symlinks'
         self.label = 'symlinks'
-        self.result = 'VERIFY'
+        self.result = 'INFO'
         self.waiver_auth = 'Anyone'
 
 # Relative symlink with ../ is dangling (VERIFY)
@@ -358,7 +358,7 @@ class RelativeSymlinkDanglingParentDirRPMs(TestRPMs):
 
         self.inspection = 'symlinks'
         self.label = 'symlinks'
-        self.result = 'VERIFY'
+        self.result = 'INFO'
         self.waiver_auth = 'Anyone'
 
 class RelativeSymlinkDanglingParentDirKoji(TestKoji):
@@ -373,7 +373,7 @@ class RelativeSymlinkDanglingParentDirKoji(TestKoji):
 
         self.inspection = 'symlinks'
         self.label = 'symlinks'
-        self.result = 'VERIFY'
+        self.result = 'INFO'
         self.waiver_auth = 'Anyone'
 
 class RelativeSymlinkDanglingParentDirRPMs(TestCompareRPMs):
@@ -388,7 +388,7 @@ class RelativeSymlinkDanglingParentDirRPMs(TestCompareRPMs):
 
         self.inspection = 'symlinks'
         self.label = 'symlinks'
-        self.result = 'VERIFY'
+        self.result = 'INFO'
         self.waiver_auth = 'Anyone'
 
 class RelativeSymlinkDanglingParentDirKoji(TestCompareKoji):
@@ -403,7 +403,7 @@ class RelativeSymlinkDanglingParentDirKoji(TestCompareKoji):
 
         self.inspection = 'symlinks'
         self.label = 'symlinks'
-        self.result = 'VERIFY'
+        self.result = 'INFO'
         self.waiver_auth = 'Anyone'
 
 # Relative symlink in current directory is dangling (VERIFY)
@@ -419,7 +419,7 @@ class RelativeSymlinkDanglingCurrentDirRPMs(TestRPMs):
 
         self.inspection = 'symlinks'
         self.label = 'symlinks'
-        self.result = 'VERIFY'
+        self.result = 'INFO'
         self.waiver_auth = 'Anyone'
 
 class RelativeSymlinkDanglingCurrentDirKoji(TestKoji):
@@ -434,7 +434,7 @@ class RelativeSymlinkDanglingCurrentDirKoji(TestKoji):
 
         self.inspection = 'symlinks'
         self.label = 'symlinks'
-        self.result = 'VERIFY'
+        self.result = 'INFO'
         self.waiver_auth = 'Anyone'
 
 class RelativeSymlinkDanglingCurrentDirCompareRPMs(TestCompareRPMs):
@@ -449,7 +449,7 @@ class RelativeSymlinkDanglingCurrentDirCompareRPMs(TestCompareRPMs):
 
         self.inspection = 'symlinks'
         self.label = 'symlinks'
-        self.result = 'VERIFY'
+        self.result = 'INFO'
         self.waiver_auth = 'Anyone'
 
 class RelativeSymlinkDanglingCurrentDirCompareKoji(TestCompareKoji):
@@ -464,7 +464,7 @@ class RelativeSymlinkDanglingCurrentDirCompareKoji(TestCompareKoji):
 
         self.inspection = 'symlinks'
         self.label = 'symlinks'
-        self.result = 'VERIFY'
+        self.result = 'INFO'
         self.waiver_auth = 'Anyone'
 
 # Too many symlink cycles (VERIFY)
