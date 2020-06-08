@@ -256,13 +256,16 @@ static bool symlinks_driver(struct rpminspect *ri, rpmfile_entry_t *file) {
         if (linkerr == ELOOP || linkerr == ENAMETOOLONG) {
             params.severity = RESULT_BAD;
             params.details = strerror(linkerr);
+            result = false;
         } else {
-            params.severity = RESULT_VERIFY;
+            /* XXX - try to find a way to find link destinations in
+               Require'd packages (#145); report as INFO for now */
+            params.severity = RESULT_INFO;
+            result = true;
         }
 
         add_result(ri, &params);
         free(params.msg);
-        result = false;
     }
 
     /* return to D-station */
