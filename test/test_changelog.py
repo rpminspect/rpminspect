@@ -40,8 +40,10 @@ class LostChangeLogCompareRPMs(TestCompareRPMs):
         self.after_rpm.section_changelog = None
         self.inspection = 'changelog'
         self.label = 'changelog'
-        self.result = 'VERIFY'
-        self.waiver_auth = 'Anyone'
+        # this is INFO because it's only comapring the binary RPMs,
+        # the other checks are for SRPMs
+        self.result = 'INFO'
+        self.waiver_auth = 'Not Waivable'
 
 class LostChangeLogCompareKoji(TestCompareKoji):
     def setUp(self):
@@ -119,9 +121,7 @@ class SameChangeLogCompareKoji(TestCompareKoji):
 
 # In the binary RPM:
 # 1) Change some lines in the after build's %changelog.  The test should
-#    report that as VERIFY.  If the number of add and delete lines in the
-#    diff are balanced, this is reported as INFO.  There have to be more
-#    delete lines than add lines to get VERIFY.
+#    report that as INFO.
 class BalancedChangeLogEditCompareKoji(TestCompareKoji):
     def setUp(self):
         TestCompareKoji.setUp(self)
@@ -154,8 +154,8 @@ class UnbalancedChangeLogEditCompareKoji(TestCompareKoji):
 
         self.inspection = 'changelog'
         self.label = 'changelog'
-        self.result = 'VERIFY'
-        self.waiver_auth = 'Anyone'
+        self.result = 'INFO'
+        self.waiver_auth = 'Not Waivable'
 
 # 2) Only add a new entry to the %changelog in the after build.  This
 #    should report as INFO.
@@ -221,20 +221,20 @@ class AddChangeLogEntryCompareKoji(TestCompareKoji):
 
 # 3) Add unprofessional language to the after build %changelog and make
 #    sure that is reported as BAD.
-#class UnprofessinalChangeLogEntryCompareKoji(TestCompareKoji):
-#    def setUp(self):
-#        TestCompareKoji.setUp(self)
-#
-#        # create a change with a bad word
-#        today = datetime.date.today().strftime("%a %b %d %Y")
-#        after_prefix = "* %s Packie McPackerson <packie@mcpackerson.io> - 47.7-1\n- Upgrade to the latest and anotherbadword greatest\n\n" % today
-#        suffix = "* %s Packie McPackerson <packie@mcpackerson.io> - 1.0\n- Initial package\n" % today
-#
-#        # modify the changelog
-#        self.before_rpm.section_changelog = suffix
-#        self.after_rpm.section_changelog = after_prefix + suffix
-#
-#        self.inspection = 'changelog'
-#        self.label = 'changelog'
-#        self.result = 'BAD'
-#        self.waiver_auth = 'Not Waivable'
+class UnprofessinalChangeLogEntryCompareKoji(TestCompareKoji):
+    def setUp(self):
+        TestCompareKoji.setUp(self)
+
+        # create a change with a bad word
+        today = datetime.date.today().strftime("%a %b %d %Y")
+        after_prefix = "* %s Packie McPackerson <packie@mcpackerson.io> - 47.7-1\n- Upgrade to the latest and reallybadword greatest\n\n" % today
+        suffix = "* %s Packie McPackerson <packie@mcpackerson.io> - 1.0\n- Initial package\n" % today
+
+        # modify the changelog
+        self.before_rpm.section_changelog = after_prefix + suffix
+        self.after_rpm.section_changelog = after_prefix + suffix
+
+        self.inspection = 'changelog'
+        self.label = 'changelog'
+        self.result = 'BAD'
+        self.waiver_auth = 'Not Waivable'

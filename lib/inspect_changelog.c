@@ -25,6 +25,8 @@
 
 #include "rpminspect.h"
 
+static struct result_params params;
+
 /*
  * Given an RPM header, read the %changelog and reconstruct it as
  * a string_list_t where each entry is a changelog entry.
@@ -183,46 +185,6 @@ static char *skip_diff_headers(char *diff_output)
 }
 
 /*
- * Analyze the 'diff -u' output and determine the severity of the result.
- */
-static severity_t get_diff_severity(const char *diff_output)
-{
-    char *diff_head = NULL;
-    char *diff_walk = NULL;
-    char *line = NULL;
-    long int add = 0;
-    long int del = 0;
-    severity_t sev = RESULT_OK;
-
-    if (diff_output == NULL) {
-        return RESULT_INFO;
-    }
-
-    diff_head = diff_walk = strdup(diff_output);
-
-    while ((line = strsep(&diff_walk, "\n")) != NULL) {
-        DEBUG_PRINT("line=|%s|\n", line);
-
-        if (strlen(line) >= 2) {
-            if (line[0] == '+') {
-                add++;
-            } else if (line[0] == '-') {
-                del++;
-            }
-        }
-    }
-
-    if (del > add) {
-        sev = RESULT_VERIFY;
-    } else {
-        sev = RESULT_INFO;
-    }
-
-    free(diff_head);
-    return sev;
-}
-
-/*
  * Perform %changelog checks on the SRPM packages between builds. Do
  * the following:
  *     - Report if the %changelog was removed in the after build but
@@ -245,7 +207,6 @@ static bool check_src_rpm_changelog(struct rpminspect *ri, const rpmpeer_entry_t
     char *after_output = NULL;
     char *diff_output = NULL;
     int exitcode = 0;
-    struct result_params params;
 
     assert(ri != NULL);
     assert(peer != NULL);
@@ -338,6 +299,10 @@ static bool check_src_rpm_changelog(struct rpminspect *ri, const rpmpeer_entry_t
     if (params.msg) {
         add_result(ri, &params);
         free(params.msg);
+    }
+
+    /* INFO messages are not failures */
+    if (params.severity == RESULT_VERIFY || params.severity == RESULT_BAD) {
         result = false;
     }
 
@@ -356,9 +321,8 @@ static bool check_src_rpm_changelog(struct rpminspect *ri, const rpmpeer_entry_t
 /*
  * Perform %changelog checks on a single RPM packages between builds.
  * Do the following:
- *     - Report changed/removed lines as VERIFY
- *     - Report only added lines as INFO
- *     * Check for unprofessional language and report as VERIFY
+ *     - Report changed/removed lines or added lines as INFO
+ *     * Check for unprofessional language and report as BAD
  */
 static bool check_bin_rpm_changelog(struct rpminspect *ri, const rpmpeer_entry_t *peer)
 {
@@ -372,7 +336,6 @@ static bool check_bin_rpm_changelog(struct rpminspect *ri, const rpmpeer_entry_t
     char *diff_output = NULL;
     int exitcode = 0;
     string_entry_t *entry = NULL;
-    struct result_params params;
 
     assert(ri != NULL);
     assert(peer != NULL);
@@ -404,23 +367,11 @@ static bool check_bin_rpm_changelog(struct rpminspect *ri, const rpmpeer_entry_t
     if (exitcode) {
         /* Skip past the diff(1) header lines */
         params.details = skip_diff_headers(diff_output);
-
-        /* Differences found, see what kind */
-        params.severity = get_diff_severity(diff_output);
-
-        if (params.severity == RESULT_INFO) {
-            xasprintf(&params.msg, "%%changelog contains new text in the %s build", after_nevr);
-            params.waiverauth = NOT_WAIVABLE;
-            add_result(ri, &params);
-        } else {
-            xasprintf(&params.msg, "%%changelog modified between the %s and %s builds", before_nevr, after_nevr);
-            params.waiverauth = WAIVABLE_BY_ANYONE;
-            params.remedy = REMEDY_CHANGELOG;
-            add_result(ri, &params);
-        }
-
+        params.severity = RESULT_INFO;
+        params.waiverauth = NOT_WAIVABLE;
+        xasprintf(&params.msg, "%%changelog modified between the %s and %s builds", before_nevr, after_nevr);
+        add_result(ri, &params);
         free(params.msg);
-        result = false;
     }
 
     free(diff_output);
@@ -432,7 +383,7 @@ static bool check_bin_rpm_changelog(struct rpminspect *ri, const rpmpeer_entry_t
         if (has_bad_word(entry->data, ri->badwords)) {
             xasprintf(&params.msg, "%%changelog entry has unprofessional language in the %s build", after_nevr);
             params.severity = RESULT_BAD;
-            params.waiverauth = WAIVABLE_BY_ANYONE;
+            params.waiverauth = NOT_WAIVABLE;
             params.remedy = REMEDY_CHANGELOG;
             params.details = entry->data;
             params.verb = VERB_FAILED;
@@ -462,7 +413,6 @@ bool inspect_changelog(struct rpminspect *ri)
     rpmpeer_entry_t *peer = NULL;
     rpmpeer_entry_t *src = NULL;
     rpmpeer_entry_t *bin = NULL;
-    struct result_params params;
 
     assert(ri != NULL);
 
@@ -497,11 +447,14 @@ bool inspect_changelog(struct rpminspect *ri)
     }
 
     if (src_result && bin_result) {
-        init_result_params(&params);
-        params.severity = RESULT_OK;
-        params.waiverauth = NOT_WAIVABLE;
-        params.header = HEADER_CHANGELOG;
-        add_result(ri, &params);
+        if (params.severity == RESULT_OK) {
+            init_result_params(&params);
+            params.severity = RESULT_OK;
+            params.waiverauth = NOT_WAIVABLE;
+            params.header = HEADER_CHANGELOG;
+            add_result(ri, &params);
+        }
+
         return true;
     } else {
         return false;
