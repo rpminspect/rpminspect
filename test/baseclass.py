@@ -46,6 +46,26 @@ class MissingRpminspect(Exception):
 class MissingRpminspectConf(Exception):
     pass
 
+# This function is called to check the JSON results to make sure we
+# have at least one result that matches the result and waiver_auth we
+# were expecting.
+def check_results(results, label, result, waiver_auth):
+    ret = False
+
+    if results == {} or results == [] or results is None:
+        return False
+
+    if label not in results:
+        return False
+
+    for r in results[label]:
+        if 'result' in r and 'waiver authorization' in r:
+            if r['result'] == result and r['waiver authorization'] == waiver_auth:
+                ret = True
+                break
+
+    return ret
+
 # Base test case class that ensures we have 'rpminspect'
 # as an executable command.
 class RequiresRpminspect(unittest.TestCase):
@@ -188,8 +208,7 @@ class TestSRPM(RequiresRpminspect):
             self.dumpResults()
 
         self.assertEqual(self.p.returncode, self.exitcode)
-        self.assertEqual(self.results[self.label][0]['result'], self.result)
-        self.assertEqual(self.results[self.label][0]['waiver authorization'], self.waiver_auth)
+        self.assertTrue(check_results(self.results, self.label, self.result, self.waiver_auth))
 
     def tearDown(self):
         shutil.rmtree(self.rpm.get_base_dir(), ignore_errors=True)
@@ -257,8 +276,7 @@ class TestCompareSRPM(RequiresRpminspect):
             self.dumpResults()
 
         self.assertEqual(self.p.returncode, self.exitcode)
-        self.assertEqual(self.results[self.label][0]['result'], self.result)
-        self.assertEqual(self.results[self.label][0]['waiver authorization'], self.waiver_auth)
+        self.assertTrue(check_results(self.results, self.label, self.result, self.waiver_auth))
 
     def tearDown(self):
         shutil.rmtree(self.before_rpm.get_base_dir(), ignore_errors=True)
@@ -354,8 +372,7 @@ class TestCompareRPMs(TestCompareSRPM):
                 self.dumpResults()
 
             self.assertEqual(self.p.returncode, self.exitcode)
-            self.assertEqual(self.results[self.label][0]['result'], self.result)
-            self.assertEqual(self.results[self.label][0]['waiver authorization'], self.waiver_auth)
+            self.assertTrue(check_results(self.results, self.label, self.result, self.waiver_auth))
 
     def tearDown(self):
         shutil.rmtree(self.before_rpm.get_base_dir(), ignore_errors=True)
@@ -414,8 +431,7 @@ class TestKoji(TestSRPM):
                 self.dumpResults()
 
             self.assertEqual(self.p.returncode, self.exitcode)
-            self.assertEqual(self.results[self.label][0]['result'], self.result)
-            self.assertEqual(self.results[self.label][0]['waiver authorization'], self.waiver_auth)
+            self.assertTrue(check_results(self.results, self.label, self.result, self.waiver_auth))
 
     def tearDown(self):
         shutil.rmtree(self.rpm.get_base_dir(), ignore_errors=True)
@@ -484,8 +500,7 @@ class TestCompareKoji(TestCompareSRPM):
                 self.dumpResults()
 
             self.assertEqual(self.p.returncode, self.exitcode)
-            self.assertEqual(self.results[self.label][0]['result'], self.result)
-            self.assertEqual(self.results[self.label][0]['waiver authorization'], self.waiver_auth)
+            self.assertTrue(check_results(self.results, self.label, self.result, self.waiver_auth))
 
     def tearDown(self):
         shutil.rmtree(self.before_rpm.get_base_dir(), ignore_errors=True)
