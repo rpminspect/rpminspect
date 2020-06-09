@@ -34,7 +34,7 @@
 #include <ar.h>
 
 #include "readelf.h"
-7#include "rpminspect.h"
+#include "rpminspect.h"
 
 static GElf_Half _get_elf_helper(Elf *elf, int fd, elfinfo_t type, GElf_Half fail)
 {
