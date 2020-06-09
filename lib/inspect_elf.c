@@ -1015,7 +1015,7 @@ static bool elf_archive_tests(struct rpminspect *ri, Elf *after_elf, int after_e
     }
 
     /* skip kernel eBPF machine type objects */
-    if (get_elf_machine(after_elf) == EM_BPF) {
+    if (get_elf_machine(after_elf, after_elf_fd) == EM_BPF) {
         DEBUG_PRINT("eBPF object encountered (%s), skipping\n", localpath);
         return true;
     }
@@ -1133,7 +1133,7 @@ static bool elf_regular_tests(struct rpminspect *ri, Elf *after_elf, Elf *before
     params.noun = _("TEXTREL relocations on ${FILE}");
 
     /* skip kernel eBPF machine type objects */
-    if (get_elf_machine(after_elf) == EM_BPF) {
+    if (get_elf_machine(after_elf, -1) == EM_BPF) {
         DEBUG_PRINT("eBPF object encountered (%s), skipping\n", localpath);
         return true;
     }

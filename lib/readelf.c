@@ -34,36 +34,57 @@
 #include <ar.h>
 
 #include "readelf.h"
-#include "rpminspect.h"
+7#include "rpminspect.h"
+
+static GElf_Half _get_elf_helper(Elf *elf, int fd, elfinfo_t type, GElf_Half fail)
+{
+    GElf_Ehdr ehdr;
+    GElf_Half ret;
+    Elf_Kind kind;
+    Elf *object_elf = NULL;
+
+    assert(elf != NULL);
+    kind = elf_kind(elf);
+
+    if (kind == ELF_K_AR) {
+        object_elf = elf_begin(fd, ELF_C_READ_MMAP_PRIVATE, elf);
+        assert(object_elf != NULL);
+    } else {
+        object_elf = elf;
+    }
+
+    if (gelf_getehdr(elf, &ehdr) == NULL) {
+        fprintf(stderr, "*** gelf_getehdr() failure (%d): %s\n", errno, strerror(errno));
+        fflush(stderr);
+        ret = fail;
+    }
+
+    if (kind == ELF_K_AR) {
+        /* rewind .a files */
+        elf_rand(elf, SARMAG);
+    }
+
+    if (type == ELF_TYPE) {
+        ret = ehdr.e_type;
+    } else if (type == ELF_MACHINE) {
+        ret = ehdr.e_machine;
+    } else {
+        fprintf(stderr, "*** unknown elftype_t %d in %s\n", type, __func__);
+        ret = -1;
+    }
+
+    return ret;
+}
 
 GElf_Half get_elf_type(Elf *elf)
 {
-    GElf_Ehdr ehdr;
-
-    assert(elf != NULL);
-
-    if (gelf_getehdr(elf, &ehdr) == NULL) {
-        fprintf(stderr, "*** gelf_getehdr() failure (%d): %s\n", errno, strerror(errno));
-        fflush(stderr);
-        return ET_NONE;
-    }
-
-    return ehdr.e_type;
+    return _get_elf_helper(elf, -1, ELF_TYPE, ET_NONE);
 }
 
-GElf_Half get_elf_machine(Elf *elf)
+/* fd is only required for .a files, pass -1 for fd as a no-op */
+GElf_Half get_elf_machine(Elf *elf, int fd)
 {
-    GElf_Ehdr ehdr;
-
-    assert(elf != NULL);
-
-    if (gelf_getehdr(elf, &ehdr) == NULL) {
-        fprintf(stderr, "*** gelf_getehdr() failure (%d): %s\n", errno, strerror(errno));
-        fflush(stderr);
-        return EM_NONE;
-    }
-
-    return ehdr.e_machine;
+    return _get_elf_helper(elf, fd, ELF_MACHINE, EM_NONE);
 }
 
 static Elf * get_elf_with_kind(const char *fullpath, int *out_fd, Elf_Kind kind)
