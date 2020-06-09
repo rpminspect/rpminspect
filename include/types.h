@@ -413,6 +413,9 @@ struct rpminspect {
     char *before_rel;               /* before Release w/o %{?dist} */
     char *after_rel;                /* after Release w/o ${?dist} */
 
+    /* spec file macros */
+    pair_list_t *macros;
+
     /* inspection results */
     results_t *results;
 };
