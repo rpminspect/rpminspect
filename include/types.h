@@ -673,4 +673,10 @@ typedef enum _workdir_t {
  */
 typedef bool (*foreach_peer_file_func)(struct rpminspect *, rpmfile_entry_t *);
 
+/* Types of ELF information we can return */
+typedef enum _elfinfo_t {
+    ELF_TYPE    = 0,
+    ELF_MACHINE = 1
+} elfinfo_t;
+
 #endif
