@@ -1014,12 +1014,6 @@ static bool elf_archive_tests(struct rpminspect *ri, Elf *after_elf, int after_e
         return true;
     }
 
-    /* skip kernel eBPF machine type objects */
-    if (get_elf_machine(after_elf, after_elf_fd) == EM_BPF) {
-        DEBUG_PRINT("eBPF object encountered (%s), skipping\n", localpath);
-        return true;
-    }
-
     after_no_pic = calloc(1, sizeof(*after_no_pic));
     assert(after_no_pic != NULL);
 
@@ -1051,7 +1045,7 @@ static bool elf_archive_tests(struct rpminspect *ri, Elf *after_elf, int after_e
     after_lost_pic = list_intersection(after_no_pic, before_pic);
     assert(after_lost_pic != NULL);
 
-    if (TAILQ_FIRST(after_lost_pic) == NULL) {
+    if (after_lost_pic != NULL && list_len(after_lost_pic) > 0) {
         result = false;
 
         output_result = fprintf(output_stream, _("The following objects lost -fPIC:\n"));
@@ -1074,7 +1068,7 @@ static bool elf_archive_tests(struct rpminspect *ri, Elf *after_elf, int after_e
         goto cleanup;
     }
 
-    if (TAILQ_FIRST(after_new) == NULL) {
+    if (after_new != NULL && list_len(after_new) > 0) {
         result = false;
 
         output_result = fprintf(output_stream, _("The following new objects were built without -fPIC:\n"));
@@ -1133,7 +1127,7 @@ static bool elf_regular_tests(struct rpminspect *ri, Elf *after_elf, Elf *before
     params.noun = _("TEXTREL relocations on ${FILE}");
 
     /* skip kernel eBPF machine type objects */
-    if (get_elf_machine(after_elf, -1) == EM_BPF) {
+    if (get_elf_machine(after_elf) == EM_BPF) {
         DEBUG_PRINT("eBPF object encountered (%s), skipping\n", localpath);
         return true;
     }
