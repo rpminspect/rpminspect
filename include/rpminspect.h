@@ -113,6 +113,7 @@ int init_rpminspect(struct rpminspect *, const char *, const char *);
 /* free.c */
 void free_regex(regex_t *);
 void free_mapping(struct hsearch_data *, string_list_t *);
+void free_pair(pair_list_t *);
 void free_rpminspect(struct rpminspect *);
 
 /* listfuncs.c */
@@ -259,6 +260,10 @@ const char *get_after_rel(struct rpminspect *);
 
 /* builds.c */
 int gather_builds(struct rpminspect *, bool);
+
+/* macros.c */
+string_list_t *get_macros(const char *);
+int get_specfile_macros(struct rpminspect *, const char *);
 
 /* inspect_elf.c */
 bool is_execstack_valid(Elf *elf, uint64_t flags);

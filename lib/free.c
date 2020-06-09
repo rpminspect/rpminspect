@@ -180,6 +180,7 @@ void free_rpminspect(struct rpminspect *ri) {
 
     free(ri->before_rel);
     free(ri->after_rel);
+    free_pair(ri->macros);
 
     free_results(ri->results);
 
