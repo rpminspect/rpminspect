@@ -23,12 +23,117 @@
 
 #include "rpminspect.h"
 
+static void append_macros(string_list_t **macros, const char *s)
+{
+    bool found = false;
+    string_list_t *new_macros = NULL;
+    string_entry_t *entry = NULL;
+    string_entry_t *macro = NULL;
+
+    if (s == NULL) {
+        return;
+    }
+
+    new_macros = get_macros(s);
+
+    while (!TAILQ_EMPTY(new_macros)) {
+        /* take the first new macro */
+        entry = TAILQ_FIRST(new_macros);
+        TAILQ_REMOVE(new_macros, entry, items);
+
+        /* look for this macro in the list */
+        found = false;
+
+        TAILQ_FOREACH(macro, *macros, items) {
+            if (!strcmp(macro->data, entry->data)) {
+                found = true;
+                break;
+            }
+        }
+
+        /* add the macro to the list if not found */
+        if (found) {
+            free(entry->data);
+            free(entry);
+        } else {
+            TAILQ_INSERT_TAIL(*macros, entry, items);
+        }
+    }
+
+    free(new_macros);
+    return;
+}
+
+static bool check_release_macros(const int macrocount, const pair_list_t *macros, const char *release, const char *disttag)
+{
+    bool ret = false;
+    string_list_t *tag_macros = NULL;
+    string_entry_t *macro = NULL;
+    pair_entry_t *pair = NULL;
+    int found = 0;
+    int valid = 0;
+
+    if (macrocount == 0 || release == NULL || disttag == NULL) {
+        return false;
+    }
+
+    /* get an initial list of macros from the Release string */
+    tag_macros = get_macros(release);
+
+    if (tag_macros == NULL) {
+        return false;
+    } else if (TAILQ_EMPTY(tag_macros)) {
+        list_free(tag_macros, free);
+        return false;
+    }
+
+    /* iterate over macros until we have no more */
+    while (!TAILQ_EMPTY(tag_macros)) {
+        /* take the first one from the list */
+        macro = TAILQ_FIRST(tag_macros);
+        TAILQ_REMOVE(tag_macros, macro, items);
+
+        /* check this macro value for the dist tag */
+        found = valid = 0;
+
+        TAILQ_FOREACH(pair, macros, items) {
+            if (!strcmp(pair->key, macro->data)) {
+                found++;
+
+                /* collect any new macros in this macro value */
+                append_macros(&tag_macros, pair->value);
+
+                if (strstr(pair->value, SPEC_DISTTAG)) {
+                    valid++;
+                }
+            }
+        }
+
+        /* clean up the macro we removed */
+        free(macro->data);
+        free(macro);
+
+        /* end early if we have found the dist tag */
+        if (found == valid) {
+            ret = true;
+            break;
+        }
+    }
+
+    /* clean up */
+    list_free(tag_macros, free);
+
+    return ret;
+}
+
 static bool disttag_driver(struct rpminspect *ri, rpmfile_entry_t *file) {
     bool result = true;
     FILE *fp = NULL;
     size_t len = 0;
     char *buf = NULL;
+    char *release = NULL;
     char *specfile = NULL;
+    int macrocount = 0;
     struct result_params params;
 
     /* Skip binary packages */
@@ -48,6 +153,9 @@ static bool disttag_driver(struct rpminspect *ri, rpmfile_entry_t *file) {
     /* We're done with this */
     free(specfile);
 
+    /* Read in spec file macros */
+    macrocount = get_specfile_macros(ri, file->fullpath);
+
     /* Check for the %{?dist} macro in the Release value */
     fp = fopen(file->fullpath, "r");
 
@@ -62,12 +170,12 @@ static bool disttag_driver(struct rpminspect *ri, rpmfile_entry_t *file) {
         buf[strcspn(buf, "\r\n")] = 0;
 
         /* we made it to the changelog, nothing left of value */
-        if (strprefix(buf, "%changelog")) {
+        if (strprefix(buf, SPEC_SECTION_CHANGELOG)) {
             break;
         }
 
         /* found the line to check */
-        if (strprefix(buf, "Release:")) {
+        if (strprefix(buf, SPEC_TAG_RELEASE)) {
             break;
         }
 
@@ -80,31 +188,39 @@ static bool disttag_driver(struct rpminspect *ri, rpmfile_entry_t *file) {
         fflush(stderr);
     }
 
+    /* Only look at the value on the Release: line */
+    release = strchr(buf, ' ');
+    assert(release != NULL);
+
+    while (*release == ' ' && *release != '\0') {
+        release++;
+    }
+
     /* Set up the result parameters */
     init_result_params(&params);
     params.severity = RESULT_BAD;
     params.waiverauth = NOT_WAIVABLE;
     params.header = HEADER_DISTTAG;
     params.remedy = REMEDY_DISTTAG;
-    params.details = buf;
+    params.details = release;
     params.arch = get_rpm_header_arch(file->rpm_header);
     params.file = file->localpath;
 
     /* Check the line if we found it */
-    if (buf == NULL) {
-        xasprintf(&params.msg, _("The %s file is missing the Release: tag."), file->localpath);
+    if (release == NULL) {
+        xasprintf(&params.msg, _("The %s file is missing the %s tag."), file->localpath, SPEC_TAG_RELEASE);
         params.verb = VERB_REMOVED;
         params.noun = _("Release: tag");
         add_result(ri, &params);
         result = false;
-    } else if (strstr(buf, "dist") && !strstr(buf, "%{?dist}")) {
-        params.msg = strdup(_("The dist tag should be of the form '%%{?dist}' in the Release tag."));
+    } else if (strstr(release, "dist") && !strstr(release, SPEC_DISTTAG)) {
+        xasprintf(&params.msg, _("The dist tag should be of the form '%s' in the %s tag or in a macro used in the %s tag."), SPEC_DISTTAG, SPEC_TAG_RELEASE, SPEC_TAG_RELEASE);
         params.verb = VERB_FAILED;
         params.noun = _("'%%{?dist}' tag");
         add_result(ri, &params);
         result = false;
-    } else if (!strstr(buf, "%{?dist}")) {
-        params.msg = strdup(_("The Release: tag does not seem to contain a '%%{?dist}' tag."));
+    } else if (!check_release_macros(macrocount, ri->macros, release, SPEC_DISTTAG) && !strstr(release, SPEC_DISTTAG)) {
+        xasprintf(&params.msg, _("The %s tag does not seem to contain '%s' or a macro that expands to include the '%s' tag."), SPEC_TAG_RELEASE, SPEC_DISTTAG, SPEC_DISTTAG);
         params.verb = VERB_REMOVED;
         params.noun = _("'%%{?dist}' tag");
         add_result(ri, &params);
