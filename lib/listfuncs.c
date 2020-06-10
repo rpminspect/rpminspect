@@ -163,11 +163,11 @@ string_list_t * list_difference(const string_list_t *a, const string_list_t *b)
     string_entry_t *entry;
 
     /* Simple cases */
-    if (a == NULL && b == NULL) {
+    if ((a == NULL || TAILQ_EMPTY(a)) && (b == NULL || TAILQ_EMPTY(b))) {
         return NULL;
-    } else if (a == NULL && b != NULL) {
+    } else if ((a == NULL || TAILQ_EMPTY(a)) && (b != NULL && !TAILQ_EMPTY(b))) {
         return list_copy(b);
-    } else if (a != NULL && b == NULL) {
+    } else if ((a != NULL && !TAILQ_EMPTY(a)) && (b == NULL || TAILQ_EMPTY(b))) {
         return list_copy(a);
     }
 

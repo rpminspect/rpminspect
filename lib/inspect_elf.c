@@ -899,25 +899,26 @@ cleanup:
 static bool find_no_pic(Elf *elf, string_list_t **user_data)
 {
     string_list_t *no_pic_list = *user_data;
-    string_entry_t *entry;
-    Elf_Arhdr *arhdr;
+    string_entry_t *entry = NULL;
+    Elf_Arhdr *arhdr = NULL;
+
+    assert(no_pic_list != NULL);
 
     if ((arhdr = elf_getarhdr(elf)) == NULL) {
         return true;
     }
 
+    assert(arhdr->ar_name != NULL);
+
     /* Skip the / entry */
-    if (!strcmp(arhdr->ar_name, "/")) {
+    if (strprefix(arhdr->ar_name, "/")) {
         return true;
     }
 
     if (!is_pic_ok(elf)) {
         entry = calloc(1, sizeof(*entry));
         assert(entry != NULL);
-
         entry->data = strdup(arhdr->ar_name);
-        assert(entry->data != NULL);
-
         TAILQ_INSERT_TAIL(no_pic_list, entry, items);
     }
 
@@ -934,25 +935,26 @@ static bool find_no_pic(Elf *elf, string_list_t **user_data)
 static bool find_pic(Elf *elf, string_list_t **user_data)
 {
     string_list_t *pic_list = *user_data;
-    string_entry_t *entry;
-    Elf_Arhdr *arhdr;
+    string_entry_t *entry = NULL;
+    Elf_Arhdr *arhdr = NULL;
+
+    assert(pic_list != NULL);
 
     if ((arhdr = elf_getarhdr(elf)) == NULL) {
         return true;
     }
 
+    assert(arhdr->ar_name != NULL);
+
     /* Skip the / entry */
-    if (!strcmp(arhdr->ar_name, "/")) {
+    if (strprefix(arhdr->ar_name, "/")) {
         return true;
     }
 
     if (is_pic_ok(elf)) {
         entry = calloc(1, sizeof(*entry));
         assert(entry != NULL);
-
         entry->data = strdup(arhdr->ar_name);
-        assert(entry->data != NULL);
-
         TAILQ_INSERT_TAIL(pic_list, entry, items);
     }
 
@@ -968,24 +970,23 @@ static bool find_pic(Elf *elf, string_list_t **user_data)
 static bool find_all(Elf *elf, string_list_t **user_data)
 {
     string_list_t *all_list = *user_data;
-    string_entry_t *entry;
-    Elf_Arhdr *arhdr;
+    string_entry_t *entry = NULL;
+    Elf_Arhdr *arhdr = NULL;
 
     if ((arhdr = elf_getarhdr(elf)) == NULL) {
         return true;
     }
 
+    assert(arhdr->ar_name != NULL);
+
     /* Skip the / entry */
-    if (!strcmp(arhdr->ar_name, "/")) {
+    if (strprefix(arhdr->ar_name, "/")) {
         return true;
     }
 
     entry = calloc(1, sizeof(*entry));
     assert(entry != NULL);
-
     entry->data = strdup(arhdr->ar_name);
-    assert(entry->data != NULL);
-
     TAILQ_INSERT_TAIL(all_list, entry, items);
 
     return true;
@@ -1016,7 +1017,6 @@ static bool elf_archive_tests(struct rpminspect *ri, Elf *after_elf, int after_e
 
     after_no_pic = calloc(1, sizeof(*after_no_pic));
     assert(after_no_pic != NULL);
-
     TAILQ_INIT(after_no_pic);
     elf_archive_iterate(after_elf_fd, after_elf, find_no_pic, &after_no_pic);
 
@@ -1036,16 +1036,16 @@ static bool elf_archive_tests(struct rpminspect *ri, Elf *after_elf, int after_e
     output_stream = open_memstream(&screendump, &screendump_size);
     assert(output_stream != NULL);
 
+    /* Report objects that lost -fPIC */
     before_pic = calloc(1, sizeof(*before_pic));
     assert(before_pic != NULL);
 
     TAILQ_INIT(before_pic);
     elf_archive_iterate(before_elf_fd, before_elf, find_pic, &before_pic);
 
-    after_lost_pic = list_intersection(after_no_pic, before_pic);
-    assert(after_lost_pic != NULL);
+    after_lost_pic = list_difference(before_pic, after_no_pic);
 
-    if (after_lost_pic != NULL && list_len(after_lost_pic) > 0) {
+    if (after_lost_pic && list_len(after_lost_pic) > 0) {
         result = false;
 
         output_result = fprintf(output_stream, _("The following objects lost -fPIC:\n"));
@@ -1057,6 +1057,7 @@ static bool elf_archive_tests(struct rpminspect *ri, Elf *after_elf, int after_e
         }
     }
 
+    /* Report new objects built without -fPIC */
     before_all = calloc(1, sizeof(*before_all));
     assert(before_all != NULL);
 
@@ -1064,11 +1065,8 @@ static bool elf_archive_tests(struct rpminspect *ri, Elf *after_elf, int after_e
     elf_archive_iterate(before_elf_fd, before_elf, find_all, &before_all);
 
     after_new = list_difference(after_no_pic, before_all);
-    if (after_new == NULL) {
-        goto cleanup;
-    }
 
-    if (after_new != NULL && list_len(after_new) > 0) {
+    if (after_new && list_len(after_new) > 0) {
         result = false;
 
         output_result = fprintf(output_stream, _("The following new objects were built without -fPIC:\n"));
@@ -1085,7 +1083,7 @@ static bool elf_archive_tests(struct rpminspect *ri, Elf *after_elf, int after_e
 
     if (!result) {
         init_result_params(&params);
-        xasprintf(&params.msg, _("%s lost -fPIC on %s"), localpath, arch);
+        xasprintf(&params.msg, _("%s has objects built without -fPIC on %s"), localpath, arch);
         params.severity = RESULT_BAD;
         params.waiverauth = WAIVABLE_BY_SECURITY;
         params.header = HEADER_ELF;
