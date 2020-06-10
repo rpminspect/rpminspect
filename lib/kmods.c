@@ -210,7 +210,7 @@ bool compare_module_dependencies(const struct kmod_list *before, const struct km
     difference = list_symmetric_difference(before_depends_list, after_depends_list);
 
     /* If the list is empty, everything is fine, free everything. */
-    if (TAILQ_EMPTY(difference)) {
+    if (difference == NULL || TAILQ_EMPTY(difference)) {
         DEBUG_PRINT("no kernel module deps differences\n");
 
         list_free(difference, NULL);
