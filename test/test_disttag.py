@@ -16,8 +16,78 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 #
 
+import os
+import sys
+import shutil
+import tempfile
 import unittest
-from baseclass import TestSRPM, TestRPMs, TestKoji
+from baseclass import *
+
+good_spec_file = '''# Used to test macro expansion in the Release field.
+
+%define main_release 4.7
+
+%if "x%{?pre_release}" != "x"
+ %define rpminspect_release 0.%{main_release}.%{pre_release}%{?dist}
+ %else
+ %define rpminspect_release %{main_release}%{?dist}
+%endif
+
+Name:    example
+Version: 0.1
+Release: %{rpminspect_release}
+Summary: Example summary
+License: GPLv3+
+URL:     http://www.example.net/
+
+Source0: rpminspect
+
+%description
+Example description.
+
+%prep
+
+%build
+
+%install
+install -D -m 0755 %{SOURCE0} %{buildroot}%{_bindir}/rpminspect
+
+%files
+%{_bindir}/rpminspect
+'''
+
+bad_spec_file = '''# Used to test macro expansion in the Release field.
+
+%define main_release 4.7
+
+%if "x%{?pre_release}" != "x"
+ %define rpminspect_release 0.%{main_release}.%{pre_release}
+ %else
+ %define rpminspect_release %{main_release}
+%endif
+
+Name:    example
+Version: 0.1
+Release: %{rpminspect_release}
+Summary: Example summary
+License: GPLv3+
+URL:     http://www.example.net/
+
+Source0: rpminspect
+
+%description
+Example description.
+
+%prep
+
+%build
+
+%install
+install -D -m 0755 %{SOURCE0} %{buildroot}%{_bindir}/rpminspect
+
+%files
+%{_bindir}/rpminspect
+'''
 
 # Verify missing %{?dist} in Release fails on SRPM (BAD)
 class MissingDistTagSRPM(TestSRPM):
@@ -82,3 +152,84 @@ class DistTagKojiBuild(TestKoji):
         self.rpm.release = '1%{?dist}'
         self.inspection = 'disttag'
         self.label = 'dist-tag'
+
+########################################################################
+# The test cases below do not use rpmfluff due to limitations in that  #
+# Python module.  Instead these test cases inherit RequiresRpminspect  #
+# and then invoke rpmbuild manually to construct SRPM files for use to #
+# test rpminspect.  At some point rpmfluff may support the macro       #
+# expansion style we need to use here, but until then we can just test #
+# things this way.                                                     #
+########################################################################
+
+# Macros in the Release value with macros expanding to %{?dist} (OK)
+class DistTagInMacroSRPM(RequiresRpminspect):
+    def setUp(self):
+        RequiresRpminspect.setUp(self)
+
+        # create a temporary directory to build an SRPM
+        self.tmpdir = tempfile.TemporaryDirectory()
+
+        # copy things in to the temporary directory
+        shutil.copyfile(self.rpminspect, os.path.join(self.tmpdir.name, 'rpminspect'))
+        self.specfile = os.path.join(self.tmpdir.name, 'rpminspect.spec')
+        sf = open(self.specfile, "w")
+        sf.write(good_spec_file)
+        sf.close()
+
+        # create the test SRPM (undefine dist to make a predictable
+        # SRPM filename)
+        args = ["rpmbuild", "--undefine", "dist",
+                "--define", "_topdir %s" % self.tmpdir.name,
+                "--define", "_builddir %s" % self.tmpdir.name,
+                "--define", "_rpmdir %s" % self.tmpdir.name,
+                "--define", "_sourcedir %s" % self.tmpdir.name,
+                "--define", "_specdir %s" % self.tmpdir.name,
+                "--define", "_srcrpmdir %s" % self.tmpdir.name,
+                "--define", "_buildrootdir %s" % self.tmpdir.name,
+                "-bs", os.path.join(self.tmpdir.name, 'rpminspect.spec')]
+        p = subprocess.Popen(args, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        (out, err) = p.communicate()
+        self.srpm = os.path.join(self.tmpdir.name, 'example-0.1-4.7.src.rpm')
+
+        # the inspection we are checking
+        self.exitcode = 0
+        self.inspection = 'disttag'
+        self.label = 'dist-tag'
+        self.result = 'OK'
+        self.waiver_auth = 'Not Waivable'
+
+    def runTest(self):
+        self.configFile()
+
+        if not self.inspection:
+            return
+
+        args = [self.rpminspect, '-d', '-c', self.conffile, '-F', 'json', '-r', 'GENERIC']
+        args += ['-T', self.inspection]
+        args += [self.srpm]
+
+        self.p = subprocess.Popen(args,
+                                  stdout=subprocess.PIPE,
+                                  stderr=subprocess.PIPE)
+        (self.out, self.err) = self.p.communicate()
+
+        try:
+            self.results = json.loads(self.out)
+        except json.decoder.JSONDecodeError:
+            self.dumpResults()
+
+        # anything not OK or INFO is a non-zero return
+        if self.result not in ['OK', 'INFO'] and self.exitcode == 0:
+            self.exitcode = 1
+
+        # dump stdout and stderr if these do not match
+        if self.p.returncode != self.exitcode:
+            self.dumpResults()
+
+        self.assertEqual(self.p.returncode, self.exitcode)
+        self.assertTrue(check_results(self.results, self.label, self.result, self.waiver_auth))
+
+    def tearDown(self):
+        self.tmpdir.cleanup()
+        RequiresRpminspect.tearDown(self)
