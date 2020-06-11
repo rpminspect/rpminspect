@@ -419,11 +419,13 @@ static bool is_global_reloc(GElf_Shdr *symtab_shdr, Elf_Data *symtab_data, Elf_D
  * All together, the idea is:
  *   * iterate over all relocations
  *   * if the relocation is for a symbol of binding other than
-       STB_GLOBAL, it's probably fine
+ *     STB_GLOBAL, it's probably fine
  *   * otherwise, if the relocation type doesn't pass is_pic_reloc,
-       return false.
+ *     return false.
  *
  * @param elf ELF object to check
+ * @return True if the object was probably built with -fPIC, False
+ *         otherwise.
  */
 bool is_pic_ok(Elf *elf)
 {
@@ -444,6 +446,9 @@ bool is_pic_ok(Elf *elf)
 
     size_t entry_size;
     size_t i;
+
+    bool sht_rel_result = false;
+    bool sht_rela_result = false;
 
     if (gelf_getehdr(elf, &ehdr) == NULL) {
         return true;
@@ -466,6 +471,7 @@ bool is_pic_ok(Elf *elf)
 
     /* Look for a SHT_RELA section first */
     rel_section = get_elf_section(elf, SHT_RELA, ".rela.text", NULL, &rel_shdr);
+    rel_data = NULL;
 
     if (rel_section != NULL) {
         while ((rel_data = elf_getdata(rel_section, rel_data)) != NULL) {
@@ -478,9 +484,8 @@ bool is_pic_ok(Elf *elf)
                     continue;
                 }
 
-                if (is_global_reloc(&symtab_shdr, symtab_data, xndxdata, GELF_R_SYM(rela.r_info)) &&
-                        !is_pic_reloc(ehdr.e_machine, GELF_R_TYPE(rela.r_info))) {
-                    return false;
+                if (is_global_reloc(&symtab_shdr, symtab_data, xndxdata, GELF_R_SYM(rela.r_info)) || is_pic_reloc(ehdr.e_machine, GELF_R_TYPE(rela.r_info))) {
+                    sht_rela_result = true;
                 }
             }
         }
@@ -501,15 +506,14 @@ bool is_pic_ok(Elf *elf)
                     continue;
                 }
 
-                if (is_global_reloc(&symtab_shdr, symtab_data, xndxdata, GELF_R_SYM(rel.r_info)) &&
-                        !is_pic_reloc(ehdr.e_machine, GELF_R_TYPE(rel.r_info))) {
-                    return false;
+                if (is_global_reloc(&symtab_shdr, symtab_data, xndxdata, GELF_R_SYM(rel.r_info)) || is_pic_reloc(ehdr.e_machine, GELF_R_TYPE(rel.r_info))) {
+                    sht_rela_result = true;
                 }
             }
         }
     }
 
-    return true;
+    return (sht_rel_result || sht_rela_result);
 }
 
 static const char * pflags_to_str(uint64_t flags)
@@ -919,6 +923,7 @@ static bool find_no_pic(Elf *elf, string_list_t **user_data)
         entry = calloc(1, sizeof(*entry));
         assert(entry != NULL);
         entry->data = strdup(arhdr->ar_name);
+        DEBUG_PRINT("arhdr->ar_name=|%s|\n", arhdr->ar_name);
         TAILQ_INSERT_TAIL(no_pic_list, entry, items);
     }
 
@@ -955,6 +960,7 @@ static bool find_pic(Elf *elf, string_list_t **user_data)
         entry = calloc(1, sizeof(*entry));
         assert(entry != NULL);
         entry->data = strdup(arhdr->ar_name);
+        DEBUG_PRINT("arhdr->ar_name=|%s|\n", arhdr->ar_name);
         TAILQ_INSERT_TAIL(pic_list, entry, items);
     }
 
@@ -1020,11 +1026,6 @@ static bool elf_archive_tests(struct rpminspect *ri, Elf *after_elf, int after_e
     TAILQ_INIT(after_no_pic);
     elf_archive_iterate(after_elf_fd, after_elf, find_no_pic, &after_no_pic);
 
-    /* If everything in after looks ok, we're done */
-    if (TAILQ_EMPTY(after_no_pic)) {
-        goto cleanup;
-    }
-
     /* Gather data for two possible messages:
      *   - Objects in after that had -fPIC in before
      *   - Objects in after that are completely new
@@ -1043,7 +1044,7 @@ static bool elf_archive_tests(struct rpminspect *ri, Elf *after_elf, int after_e
     TAILQ_INIT(before_pic);
     elf_archive_iterate(before_elf_fd, before_elf, find_pic, &before_pic);
 
-    after_lost_pic = list_difference(before_pic, after_no_pic);
+    after_lost_pic = list_intersection(before_pic, after_no_pic);
 
     if (after_lost_pic && list_len(after_lost_pic) > 0) {
         result = false;
@@ -1097,7 +1098,6 @@ static bool elf_archive_tests(struct rpminspect *ri, Elf *after_elf, int after_e
         free(params.msg);
     }
 
-cleanup:
     list_free(after_lost_pic, NULL);
     list_free(after_new, NULL);
 
