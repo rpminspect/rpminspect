@@ -75,6 +75,11 @@ static bool symlinks_driver(struct rpminspect *ri, rpmfile_entry_t *file) {
         return true;
     }
 
+    /* skip debug paths */
+    if (is_debug_or_build_path(file->localpath)) {
+        return true;
+    }
+
     /* only applies to symbolic links */
     if (!S_ISLNK(file->st.st_mode)) {
         return true;
