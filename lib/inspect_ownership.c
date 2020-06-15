@@ -18,8 +18,14 @@
 
 #include <stdio.h>
 #include <string.h>
+#include <unistd.h>
+#include <limits.h>
+#include <sys/types.h>
+#include <pwd.h>
+#include <grp.h>
 #include <errno.h>
 #include <assert.h>
+#include <err.h>
 #include <sys/capability.h>
 
 #include "rpminspect.h"
@@ -73,6 +79,12 @@ static bool ownership_driver(struct rpminspect *ri, rpmfile_entry_t *file) {
     const char *arch = NULL;
     char *owner = NULL;
     char *group = NULL;
+    struct passwd pw;
+    struct passwd *pwp = NULL;
+    char pbuf[sysconf(_SC_GETPW_R_SIZE_MAX)];
+    struct group gr;
+    struct group *grp = NULL;
+    char gbuf[sysconf(_SC_GETGR_R_SIZE_MAX)];
     char *before_owner = NULL;
     char *before_group = NULL;
     string_entry_t *entry = NULL;
@@ -95,6 +107,21 @@ static bool ownership_driver(struct rpminspect *ri, rpmfile_entry_t *file) {
     /* Get the owner and group of the file */
     owner = get_header_value(file, RPMTAG_FILEUSERNAME);
     group = get_header_value(file, RPMTAG_FILEGROUPNAME);
+
+    /*
+     * Look up the ID values of the owner and name and put those in
+     * the struct stat
+     */
+    if (getpwnam_r(owner, &pw, pbuf, sizeof(pbuf), &pwp)) {
+        err(2, "getpwnam_r");
+    }
+
+    if (getgrnam_r(group, &gr, gbuf, sizeof(gbuf), &grp)) {
+        err(2, "getgrnam_r");
+    }
+
+    file->st.st_uid = pw.pw_uid;
+    file->st.st_gid = gr.gr_gid;
 
     /* Set up result parameters */
     init_result_params(&params);
@@ -144,7 +171,7 @@ static bool ownership_driver(struct rpminspect *ri, rpmfile_entry_t *file) {
             bin = true;
 
             /* Check the owner */
-            if (strcmp(owner, ri->bin_owner)) {
+            if (strcmp(owner, ri->bin_owner) && !on_stat_whitelist_owner(ri, file, owner, HEADER_OWNERSHIP, NULL)) {
                 xasprintf(&params.msg, _("File %s has owner `%s` on %s, but should be `%s`"), file->localpath, owner, arch, ri->bin_owner);
                 params.severity = RESULT_BAD;
                 params.waiverauth = WAIVABLE_BY_ANYONE;
@@ -187,7 +214,7 @@ static bool ownership_driver(struct rpminspect *ri, rpmfile_entry_t *file) {
                         free(params.msg);
                         result = false;
                     }
-                } else {
+                } else if (!on_stat_whitelist_group(ri, file, group, HEADER_OWNERSHIP, NULL)) {
                     xasprintf(&params.msg, _("File %s has group `%s` on %s, but should be `%s`"), file->localpath, group, arch, ri->bin_group);
                     params.severity = RESULT_BAD;
                     params.waiverauth = WAIVABLE_BY_ANYONE;
