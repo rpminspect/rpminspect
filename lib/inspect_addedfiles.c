@@ -152,7 +152,7 @@ static bool addedfiles_driver(struct rpminspect *ri, rpmfile_entry_t *file)
 
     /* Check for any new setuid or setgid files */
     if (!S_ISDIR(file->st.st_mode) && (file->st.st_mode & (S_ISUID|S_ISGID))) {
-        on_stat_whitelist(ri, file, HEADER_ADDEDFILES, REMEDY_ADDEDFILES);
+        on_stat_whitelist_mode(ri, file, HEADER_ADDEDFILES, REMEDY_ADDEDFILES);
         goto done;
     }
 

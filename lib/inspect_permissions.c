@@ -63,7 +63,7 @@ static bool permissions_driver(struct rpminspect *ri, rpmfile_entry_t *file)
 
     /* Compare the modes */
     if (before_mode != after_mode) {
-        whitelisted = on_stat_whitelist(ri, file, HEADER_PERMISSIONS, NULL);
+        whitelisted = on_stat_whitelist_mode(ri, file, HEADER_PERMISSIONS, NULL);
 
         /* if setuid/setgid or new mode is more open */
         if (!whitelisted) {
