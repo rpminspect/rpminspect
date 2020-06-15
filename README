@@ -135,7 +135,6 @@ there are a number of userspace programs required:
     /usr/bin/zcmp
     /usr/bin/bzcmp
     /usr/bin/xzcmp
-    /usr/bin/eu-elfcmp
     /usr/bin/msgunfmt
     /usr/bin/diff
 
