@@ -16,12 +16,26 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+#include <unistd.h>
+#include <limits.h>
+#include <sys/types.h>
+#include <pwd.h>
+#include <grp.h>
 #include <assert.h>
+#include <err.h>
 #include "rpminspect.h"
 
-/*
- * Check for the given path on the stat-whitelist.  Report accordingly.
- * Returns true if the path is on the whitelist, false if it isn't.
+/**
+ * @brief Check for the given path on the stat-whitelist.  If found,
+ * check the st_mode value and report accordingly.
+ *
+ * @param ri The main struct rpminspect for the program.
+ * @param file The file to find on the whitelist.
+ * @param header The header string to use for results reporting if the
+ *               file is found.
+ * @param remedy The remedy string to use for results reporting if the
+ *               file is found.
+ * @return True if the file is on the whitelist, false otherwise.
  */
 bool on_stat_whitelist_mode(struct rpminspect *ri, const rpmfile_entry_t *file, const char *header, const char *remedy)
 {
@@ -68,6 +82,129 @@ bool on_stat_whitelist_mode(struct rpminspect *ri, const rpmfile_entry_t *file, 
         params.waiverauth = WAIVABLE_BY_SECURITY;
         add_result(ri, &params);
         free(params.msg);
+    }
+
+    return false;
+}
+
+/**
+ * @brief Check for the given path on the stat-whitelist.  If found,
+ * check the st_uid value and report accordingly.
+ *
+ * @param ri The main struct rpminspect for the program.
+ * @param file The file to find on the whitelist.
+ * @param header The header string to use for results reporting if the
+ *               file is found.
+ * @param remedy The remedy string to use for results reporting if the
+ *               file is found.
+ * @return True if the file is on the whitelist, false otherwise.
+ */
+bool on_stat_whitelist_owner(struct rpminspect *ri, const rpmfile_entry_t *file, const char *owner, const char *header, const char *remedy)
+{
+    struct passwd pw;
+    struct passwd *pwp = NULL;
+    char buf[sysconf(_SC_GETPW_R_SIZE_MAX)];
+    stat_whitelist_entry_t *wlentry = NULL;
+    struct result_params params;
+
+    assert(ri != NULL);
+    assert(file != NULL);
+    assert(owner != NULL);
+
+    init_result_params(&params);
+    params.header = header;
+    params.arch = get_rpm_header_arch(file->rpm_header);
+    params.file = file->localpath;
+    params.remedy = remedy;
+
+    if (init_stat_whitelist(ri)) {
+        TAILQ_FOREACH(wlentry, ri->stat_whitelist, items) {
+            if (!strcmp(file->localpath, wlentry->filename)) {
+                /* get the UID of the file on the whitelist */
+                if (getpwnam_r(wlentry->owner, &pw, buf, sizeof(buf), &pwp)) {
+                    err(2, "getpwnam_r");
+                }
+
+                if ((file->st.st_uid == pw.pw_uid) && !strcmp(owner, wlentry->owner)) {
+                    xasprintf(&params.msg, _("%s on %s carries owner %s (UID %d) and is on the stat whitelist"), file->localpath, params.arch, wlentry->owner, pw.pw_uid);
+                    params.severity = RESULT_INFO;
+                    params.waiverauth = WAIVABLE_BY_ANYONE;
+                    add_result(ri, &params);
+                    free(params.msg);
+                    return true;
+                } else {
+                    xasprintf(&params.msg, _("%s on %s carries owner %s (UID %d), but is on the stat whitelist with expected owner %s (UID %d)"), file->localpath, params.arch, owner, file->st.st_uid, wlentry->owner, pw.pw_uid);
+                    params.severity = RESULT_VERIFY;
+                    params.waiverauth = WAIVABLE_BY_SECURITY;
+                    add_result(ri, &params);
+                    free(params.msg);
+                    return true;
+                }
+
+                break;
+            }
+        }
+    }
+
+    return false;
+}
+
+/**
+ * @brief Check for the given path on the stat-whitelist.  If found,
+ * check the st_gid value and report accordingly.
+ *
+ * @param ri The main struct rpminspect for the program.
+ * @param file The file to find on the whitelist.
+ * @param header The header string to use for results reporting if the
+ *               file is found.
+ * @param remedy The remedy string to use for results reporting if the
+ *               file is found.
+ * @return True if the file is on the whitelist, false otherwise.
+ */
+bool on_stat_whitelist_group(struct rpminspect *ri, const rpmfile_entry_t *file, const char *group, const char *header, const char *remedy)
+{
+    struct group gr;
+    struct group *grp = NULL;
+    char buf[sysconf(_SC_GETGR_R_SIZE_MAX)];
+    stat_whitelist_entry_t *wlentry = NULL;
+    struct result_params params;
+
+    assert(ri != NULL);
+    assert(file != NULL);
+
+    init_result_params(&params);
+    params.header = header;
+    params.arch = get_rpm_header_arch(file->rpm_header);
+    params.file = file->localpath;
+    params.remedy = remedy;
+
+    if (init_stat_whitelist(ri)) {
+        TAILQ_FOREACH(wlentry, ri->stat_whitelist, items) {
+            if (!strcmp(file->localpath, wlentry->filename)) {
+                /* get the GID of the file on the whitelist */
+                if (getgrnam_r(wlentry->group, &gr, buf, sizeof(buf), &grp)) {
+                    err(2, "getgrgid_r");
+                }
+
+                if ((file->st.st_gid == gr.gr_gid) && !strcmp(group, gr.gr_name)) {
+                    xasprintf(&params.msg, _("%s on %s carries group %s (GID %d) and is on the stat whitelist"), file->localpath, params.arch, wlentry->group, gr.gr_gid);
+                    params.severity = RESULT_INFO;
+                    params.waiverauth = WAIVABLE_BY_ANYONE;
+                    add_result(ri, &params);
+                    free(params.msg);
+                    return true;
+                } else {
+                    xasprintf(&params.msg, _("%s on %s carries group %s (GID %d), but is on the stat whitelist with expected group %s (GID %d)"), file->localpath, params.arch, group, file->st.st_gid, wlentry->group, gr.gr_gid);
+                    params.severity = RESULT_VERIFY;
+                    params.waiverauth = WAIVABLE_BY_SECURITY;
+                    add_result(ri, &params);
+                    free(params.msg);
+                    return true;
+                }
+
+                break;
+            }
+        }
     }
 
     return false;

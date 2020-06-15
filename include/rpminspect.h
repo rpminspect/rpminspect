@@ -241,8 +241,8 @@ char *run_cmd(int *, const char *, ...);
 
 /* whitelist.c */
 bool on_stat_whitelist_mode(struct rpminspect *, const rpmfile_entry_t *, const char *, const char *);
-bool on_stat_whitelist_owner(struct rpminspect *, const rpmfile_entry_t *, const char *, const char *);
-bool on_stat_whitelist_group(struct rpminspect *, const rpmfile_entry_t *, const char *, const char *);
+bool on_stat_whitelist_owner(struct rpminspect *, const rpmfile_entry_t *, const char *, const char *, const char *);
+bool on_stat_whitelist_group(struct rpminspect *, const rpmfile_entry_t *, const char *, const char *, const char *);
 caps_filelist_entry_t *get_caps_whitelist_entry(struct rpminspect *, const char *, const char *);
 
 /* flags.c */
