@@ -23,7 +23,7 @@
  * Check for the given path on the stat-whitelist.  Report accordingly.
  * Returns true if the path is on the whitelist, false if it isn't.
  */
-bool on_stat_whitelist(struct rpminspect *ri, const rpmfile_entry_t *file, const char *header, const char *remedy)
+bool on_stat_whitelist_mode(struct rpminspect *ri, const rpmfile_entry_t *file, const char *header, const char *remedy)
 {
     stat_whitelist_entry_t *wlentry = NULL;
     struct result_params params;
@@ -55,17 +55,22 @@ bool on_stat_whitelist(struct rpminspect *ri, const rpmfile_entry_t *file, const
                     free(params.msg);
                     return true;
                 }
+
+                break;
             }
         }
     }
 
-    /* catch anything not on the stat-whitelist */
-    xasprintf(&params.msg, _("%s on %s carries insecure mode %04o, Security Team review may be required"), file->localpath, params.arch, file->st.st_mode);
-    params.severity = RESULT_BAD;
-    params.waiverauth = WAIVABLE_BY_SECURITY;
-    add_result(ri, &params);
-    free(params.msg);
-    return true;
+    /* catch anything not on the stat-whitelist with setuid/setgid */
+    if ((file->st.st_mode & S_ISUID) || (file->st.st_mode & S_ISGID)) {
+        xasprintf(&params.msg, _("%s on %s carries insecure mode %04o, Security Team review may be required"), file->localpath, params.arch, file->st.st_mode);
+        params.severity = RESULT_BAD;
+        params.waiverauth = WAIVABLE_BY_SECURITY;
+        add_result(ri, &params);
+        free(params.msg);
+    }
+
+    return false;
 }
 
 /*
