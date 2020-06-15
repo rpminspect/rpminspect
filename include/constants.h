@@ -175,12 +175,6 @@
 #define XZCMP_CMD "xzcmp"
 
 /**
- * @def ELFCMP_CMD
- * Executable providing elfcmp(1)
- */
-#define ELFCMP_CMD "eu-elfcmp --ignore-build-id --hash-inexact"
-
-/**
  * @def MSGUNFMT_CMD
  * Executable providing msgunfmt(1)
  */

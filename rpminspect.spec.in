@@ -58,7 +58,6 @@ Requires:       desktop-file-utils
 Requires:       gzip
 Requires:       bzip2
 Requires:       xz
-Requires:       elfutils
 Requires:       gettext
 Requires:       diffutils
 

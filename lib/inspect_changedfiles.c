@@ -95,8 +95,6 @@ static bool changedfiles_driver(struct rpminspect *ri, rpmfile_entry_t *file)
     char *errors = NULL;
     char *short_errors = NULL;
     char *skip_line = NULL;
-    char *needle = NULL;
-    char *part_errors = NULL;
     int exitcode;
     bool possible_header = false;
     string_entry_t *entry = NULL;
@@ -175,18 +173,19 @@ static bool changedfiles_driver(struct rpminspect *ri, rpmfile_entry_t *file)
     /* Get the MIME type of the file, will need that */
     type = get_mime_type(file);
 
+    /* ELF content changing is handled by other inspections */
+    if (!strcmp(type, "application/x-pie-executable") || !strcmp(type, "application/x-executable") || !strcmp(type, "application/x-object")) {
+        return true;
+    }
+
     /* Skip Java class files and JAR files (handled elsewhere) */
-    if ((!strcmp(type, "application/zip") &&
-         strsuffix(file->fullpath, JAR_FILENAME_EXTENSION)) ||
-        (!strcmp(type, "application/x-java-applet") &&
-         strsuffix(file->fullpath, CLASS_FILENAME_EXTENSION))) {
+    if ((!strcmp(type, "application/zip") && strsuffix(file->fullpath, JAR_FILENAME_EXTENSION)) ||
+        (!strcmp(type, "application/x-java-applet") && strsuffix(file->fullpath, CLASS_FILENAME_EXTENSION))) {
         return true;
     }
 
     /* Skip Python bytecode files (these always change) */
-    if (!strcmp(type, "application/octet-stream") &&
-        (strsuffix(file->fullpath, PYTHON_PYC_FILE_EXTENSION) ||
-         strsuffix(file->fullpath, PYTHON_PYO_FILE_EXTENSION))) {
+    if (!strcmp(type, "application/octet-stream") && (strsuffix(file->fullpath, PYTHON_PYC_FILE_EXTENSION) || strsuffix(file->fullpath, PYTHON_PYO_FILE_EXTENSION))) {
         /* Double check that this is a Python bytecode file */
         fd = open(file->fullpath, O_RDONLY | O_CLOEXEC | O_LARGEFILE);
 
@@ -249,40 +248,6 @@ static bool changedfiles_driver(struct rpminspect *ri, rpmfile_entry_t *file)
             params.verb = VERB_CHANGED;
             params.noun = file->localpath;
             add_changedfiles_result(ri, &params);
-            result = false;
-        }
-    }
-
-    if (!result) {
-        goto done;
-    }
-
-    /*
-     * Compare ELF objects and report any changes.
-     */
-    if (!strcmp(type, "application/x-pie-executable") ||
-        !strcmp(type, "application/x-executable") ||
-        !strcmp(type, "application/x-object")) {
-        errors = run_cmd(&exitcode, ELFCMP_CMD, file->peer_file->fullpath, file->fullpath, NULL);
-
-        if (exitcode) {
-            /*
-             * Clean up eu-elfcmp results.  Strike the fullpaths and only show
-             * the localpath once.  Keep the eu-elfcmp: prefix.
-             */
-            xasprintf(&needle, _("%s differ:"), file->localpath);
-            part_errors = strstr(errors, needle);
-
-            if (part_errors) {
-                xasprintf(&params.details, "eu-elfcmp: %s", part_errors);
-            } else {
-                /* unknown output format from eu-elfcmp */
-                params.details = strdup(errors);
-            }
-
-            xasprintf(&params.msg, _("ELF file %s changed content on %s."), file->localpath, arch);
-            add_changedfiles_result(ri, &params);
-            free(needle);
             result = false;
         }
     }

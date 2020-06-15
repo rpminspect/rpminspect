@@ -32,8 +32,8 @@ TEST_UPSTREAM (only the rebase keyword check)
 
 TEST_ELFLINT
     This test runs elflint(1) on ELF files.  We already have the
-    existing ELF tests using eu-elfcmp, libelf, and annocheck so this
-    one is more or less redundant.
+    existing ELF tests using libelf and annocheck so this one is more
+    or less redundant.
 
 TEST_MULTILIB
     At one point in time we built distributions on multilib platforms
