@@ -110,22 +110,18 @@ static bool ownership_driver(struct rpminspect *ri, rpmfile_entry_t *file) {
     group = get_header_value(file, RPMTAG_FILEGROUPNAME);
 
     /*
-     * Look up the ID values of the owner and name and put those in
-     * the struct stat
+     * Try to look up the ID values of the owner and name and put
+     * those in the struct stat
      */
     r = getpwnam_r(owner, &pw, pbuf, sizeof(pbuf), &pwp);
 
-    if (r || (r && pwp == NULL)) {
-        err(RI_PROGRAM_ERROR, "%s: getpwnam_r", __func__);
-    } else {
+    if (r == 0 && pwp != NULL) {
         file->st.st_uid = pw.pw_uid;
     }
 
     r = getgrnam_r(group, &gr, gbuf, sizeof(gbuf), &grp);
 
-    if (r || (r && grp == NULL)) {
-        err(RI_PROGRAM_ERROR, "%s: getgrnam_r", __func__);
-    } else {
+    if (r == 0 && grp != NULL) {
         file->st.st_gid = gr.gr_gid;
     }
 
