@@ -79,7 +79,6 @@ static bool ownership_driver(struct rpminspect *ri, rpmfile_entry_t *file) {
     const char *arch = NULL;
     char *owner = NULL;
     char *group = NULL;
-    int r = 0;
     struct passwd pw;
     struct passwd *pwp = NULL;
     char pbuf[sysconf(_SC_GETPW_R_SIZE_MAX)];
@@ -113,22 +112,14 @@ static bool ownership_driver(struct rpminspect *ri, rpmfile_entry_t *file) {
      * Look up the ID values of the owner and name and put those in
      * the struct stat
      */
-    r = getpwnam_r(owner, &pw, pbuf, sizeof(pbuf), &pwp);
-
-    if (r || (pwp == NULL)) {
-        DEBUG_PRINT("owner=|%s|\n", owner);
-        fprintf(stderr, "%s (%d): %s\n", __func__, errno, strerror(errno));
-//        err(2, "getpwnam_r, %d", errno);
+    if (getpwnam_r(owner, &pw, pbuf, sizeof(pbuf), &pwp)) {
+        err(RI_PROGRAM_ERROR, "%s: getpwnam_r", __func__);
     } else {
         file->st.st_uid = pw.pw_uid;
     }
 
-    r = getgrnam_r(group, &gr, gbuf, sizeof(gbuf), &grp);
-
-    if (r || (grp == NULL)) {
-        DEBUG_PRINT("group=|%s|\n", group);
-        fprintf(stderr, "%s (%d): %s\n", __func__, errno, strerror(errno));
-//        err(2, "getgrnam_r, %d", errno);
+    if (getgrnam_r(group, &gr, gbuf, sizeof(gbuf), &grp)) {
+        err(RI_PROGRAM_ERROR, "%s: getgrnam_r", __func__);
     } else {
         file->st.st_gid = gr.gr_gid;
     }
