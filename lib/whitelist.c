@@ -122,7 +122,7 @@ bool on_stat_whitelist_owner(struct rpminspect *ri, const rpmfile_entry_t *file,
             if (!strcmp(file->localpath, wlentry->filename)) {
                 /* get the UID of the file on the whitelist */
                 if (getpwnam_r(wlentry->owner, &pw, buf, sizeof(buf), &pwp)) {
-                    err(2, "getpwnam_r");
+                    err(2, "getpwnam_r, %d", errno);
                 }
 
                 if ((file->st.st_uid == pw.pw_uid) && !strcmp(owner, wlentry->owner)) {
@@ -183,7 +183,7 @@ bool on_stat_whitelist_group(struct rpminspect *ri, const rpmfile_entry_t *file,
             if (!strcmp(file->localpath, wlentry->filename)) {
                 /* get the GID of the file on the whitelist */
                 if (getgrnam_r(wlentry->group, &gr, buf, sizeof(buf), &grp)) {
-                    err(2, "getgrgid_r");
+                    err(2, "getgrgid_r, %d", errno);
                 }
 
                 if ((file->st.st_gid == gr.gr_gid) && !strcmp(group, gr.gr_name)) {
