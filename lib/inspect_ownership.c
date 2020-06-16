@@ -114,14 +114,15 @@ static bool ownership_driver(struct rpminspect *ri, rpmfile_entry_t *file) {
      */
     if (getpwnam_r(owner, &pw, pbuf, sizeof(pbuf), &pwp)) {
         err(2, "getpwnam_r, %d", errno);
+    } else {
+        file->st.st_uid = pw.pw_uid;
     }
 
     if (getgrnam_r(group, &gr, gbuf, sizeof(gbuf), &grp)) {
         err(2, "getgrnam_r, %d", errno);
+    } else {
+        file->st.st_gid = gr.gr_gid;
     }
-
-    file->st.st_uid = pw.pw_uid;
-    file->st.st_gid = gr.gr_gid;
 
     /* Set up result parameters */
     init_result_params(&params);
