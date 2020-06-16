@@ -104,6 +104,7 @@ bool on_stat_whitelist_owner(struct rpminspect *ri, const rpmfile_entry_t *file,
 {
     struct passwd pw;
     struct passwd *pwp = NULL;
+    int r = 0;
     char buf[sysconf(_SC_GETPW_R_SIZE_MAX)];
     stat_whitelist_entry_t *wlentry = NULL;
     struct result_params params;
@@ -122,7 +123,9 @@ bool on_stat_whitelist_owner(struct rpminspect *ri, const rpmfile_entry_t *file,
         TAILQ_FOREACH(wlentry, ri->stat_whitelist, items) {
             if (!strcmp(file->localpath, wlentry->filename)) {
                 /* get the UID of the file on the whitelist */
-                if (getpwnam_r(wlentry->owner, &pw, buf, sizeof(buf), &pwp)) {
+                r = getpwnam_r(wlentry->owner, &pw, buf, sizeof(buf), &pwp);
+
+                if (r || (pwp == NULL)) {
                     DEBUG_PRINT("wlentry->owner=|%s|\n", wlentry->owner);
                     fprintf(stderr, "%s (%d): %s\n", __func__, errno, strerror(errno));
 //                    err(2, "getpwnam_r, %d", errno);
@@ -175,6 +178,7 @@ bool on_stat_whitelist_group(struct rpminspect *ri, const rpmfile_entry_t *file,
 {
     struct group gr;
     struct group *grp = NULL;
+    int r = 0;
     char buf[sysconf(_SC_GETGR_R_SIZE_MAX)];
     stat_whitelist_entry_t *wlentry = NULL;
     struct result_params params;
@@ -192,7 +196,9 @@ bool on_stat_whitelist_group(struct rpminspect *ri, const rpmfile_entry_t *file,
         TAILQ_FOREACH(wlentry, ri->stat_whitelist, items) {
             if (!strcmp(file->localpath, wlentry->filename)) {
                 /* get the GID of the file on the whitelist */
-                if (getgrnam_r(wlentry->group, &gr, buf, sizeof(buf), &grp)) {
+                r = getgrnam_r(wlentry->group, &gr, buf, sizeof(buf), &grp);
+
+                if (r || (grp == NULL)) {
                     DEBUG_PRINT("wlentry->group=|%s|\n", wlentry->group);
                     fprintf(stderr, "%s (%d): %s\n", __func__, errno, strerror(errno));
 //                    err(2, "getgrgid_r, %d", errno);
