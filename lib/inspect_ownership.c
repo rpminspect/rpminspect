@@ -113,11 +113,11 @@ static bool ownership_driver(struct rpminspect *ri, rpmfile_entry_t *file) {
      * the struct stat
      */
     if (getpwnam_r(owner, &pw, pbuf, sizeof(pbuf), &pwp)) {
-        err(2, "getpwnam_r");
+        err(2, "getpwnam_r, %d", errno);
     }
 
     if (getgrnam_r(group, &gr, gbuf, sizeof(gbuf), &grp)) {
-        err(2, "getgrnam_r");
+        err(2, "getgrnam_r, %d", errno);
     }
 
     file->st.st_uid = pw.pw_uid;
