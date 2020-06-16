@@ -50,11 +50,13 @@ lib/kmods.c
 lib/koji.c
 lib/listfuncs.c
 lib/local.c
+lib/macros.c
 lib/magic.c
 lib/mkdirp.c
 lib/output.c
 lib/output_json.c
 lib/output_text.c
+lib/pairfuncs.c
 lib/peers.c
 lib/readelf.c
 lib/readfile.c
