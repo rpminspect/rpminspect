@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: rpminspect\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-05-29 16:17-0400\n"
+"POT-Creation-Date: 2020-06-16 12:38-0400\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -198,7 +198,7 @@ msgid ""
 "Report kernel module parameter, dependency, PCI ID, or symbol differences "
 "between builds.  Added and removed parameters are reported and if the "
 "package version is unchanged, these messages are reported as failures.  The "
-"same is true module dependencies, PCI IDs, and symbols"
+"same is true module dependencies, PCI IDs, and symbols."
 msgstr ""
 
 #: include/inspect.h:461
@@ -223,6 +223,14 @@ msgstr ""
 
 #: include/inspect.h:467
 msgid ""
+"Report files that are packaged in directories that are no longer used by the "
+"product.  Usually this means a package has not been updated to account for "
+"path migrations.  The main examples are /bin migrating to /usr/bin and /sbin "
+"migrating to /usr/sbin."
+msgstr ""
+
+#: include/inspect.h:469
+msgid ""
 "Link Time Optimization (LTO) produces smaller and faster shared ELF "
 "executables and libraries.  LTO bytecode is not stable from one release of "
 "gcc to the next.  As such, LTO bytecode should not be present in .a and .o "
@@ -230,7 +238,7 @@ msgid ""
 "ELF relocatable objects and reports if any is present."
 msgstr ""
 
-#: include/inspect.h:469
+#: include/inspect.h:471
 msgid ""
 "Symbolic links must be resolvable on the installed system.  This inspection "
 "ensures absolute and relative symlinks are valid.  It also checks for any "
@@ -836,12 +844,12 @@ msgstr ""
 msgid "*** From this invalid line:\n"
 msgstr ""
 
-#: lib/init.c:1094
+#: lib/init.c:1093
 #, c-format
 msgid "*** error reading '%s'\n"
 msgstr ""
 
-#: lib/init.c:1104
+#: lib/init.c:1103
 #, c-format
 msgid "*** Unable to read profile '%s' from %s\n"
 msgstr ""
@@ -971,96 +979,86 @@ msgstr ""
 msgid "*** unable to close temporary file: %s\n"
 msgstr ""
 
-#: lib/inspect_changedfiles.c:194
+#: lib/inspect_changedfiles.c:193
 #, c-format
 msgid "unable to open(2) %s on %s for reading: %s\n"
 msgstr ""
 
-#: lib/inspect_changedfiles.c:199
+#: lib/inspect_changedfiles.c:198
 #, c-format
 msgid "unable to read(2) %s on %s: %s\n"
 msgstr ""
 
-#: lib/inspect_changedfiles.c:204
+#: lib/inspect_changedfiles.c:203
 #, c-format
 msgid "unable to close(2) %s on %s: %s\n"
 msgstr ""
 
-#: lib/inspect_changedfiles.c:228
+#: lib/inspect_changedfiles.c:227
 #, c-format
 msgid "Compressed gzip file %s changed content on %s."
 msgstr ""
 
-#: lib/inspect_changedfiles.c:238
+#: lib/inspect_changedfiles.c:237
 #, c-format
 msgid "Compressed bzip2 file %s changed content on %s."
 msgstr ""
 
-#: lib/inspect_changedfiles.c:248
+#: lib/inspect_changedfiles.c:247
 #, c-format
 msgid "Compressed xz file %s changed content on %s."
 msgstr ""
 
-#: lib/inspect_changedfiles.c:273
-#, c-format
-msgid "%s differ:"
-msgstr ""
-
-#: lib/inspect_changedfiles.c:283
-#, c-format
-msgid "ELF file %s changed content on %s."
-msgstr ""
-
-#: lib/inspect_changedfiles.c:312 lib/inspect_changedfiles.c:326
+#: lib/inspect_changedfiles.c:277 lib/inspect_changedfiles.c:291
 #, c-format
 msgid "Error running msgunfmt on %s on %s"
 msgstr ""
 
-#: lib/inspect_changedfiles.c:317 lib/inspect_changedfiles.c:331
+#: lib/inspect_changedfiles.c:282 lib/inspect_changedfiles.c:296
 msgid "msgunfmt on ${FILE}"
 msgstr ""
 
-#: lib/inspect_changedfiles.c:341
+#: lib/inspect_changedfiles.c:306
 #, c-format
 msgid "Message catalog %s changed content on %s"
 msgstr ""
 
-#: lib/inspect_changedfiles.c:346 lib/inspect_changedfiles.c:425
-#: lib/inspect_changedfiles.c:445 lib/inspect_desktop.c:353
+#: lib/inspect_changedfiles.c:311 lib/inspect_changedfiles.c:390
+#: lib/inspect_changedfiles.c:410 lib/inspect_desktop.c:353
 #: lib/inspect_manpage.c:284
 msgid "${FILE}"
 msgstr ""
 
-#: lib/inspect_changedfiles.c:353 lib/inspect_changedfiles.c:359
+#: lib/inspect_changedfiles.c:318 lib/inspect_changedfiles.c:324
 #, c-format
 msgid "*** Unable to remove temporary file %s: %s\n"
 msgstr ""
 
-#: lib/inspect_changedfiles.c:415
+#: lib/inspect_changedfiles.c:380
 #, c-format
 msgid ""
 "Public header file %s changed content on %s.  The output of `diff -uw` "
 "folloes."
 msgstr ""
 
-#: lib/inspect_changedfiles.c:418
+#: lib/inspect_changedfiles.c:383
 #, c-format
 msgid ""
 "Public header file %s changed content on %s.  Please make sure this does not "
 "change the ABI exported by this package.  The output of `diff -uw` follows."
 msgstr ""
 
-#: lib/inspect_changedfiles.c:443
+#: lib/inspect_changedfiles.c:408
 #, c-format
 msgid "File %s changed content on %s."
 msgstr ""
 
-#: lib/inspect_changelog.c:282 lib/inspect_changelog.c:402
+#: lib/inspect_changelog.c:243 lib/inspect_changelog.c:365
 #, c-format
 msgid "%%changelog"
 msgstr ""
 
-#: lib/inspect_desktop.c:189 lib/inspect_disttag.c:55
+#: lib/inspect_desktop.c:189 lib/inspect_disttag.c:163
 #: lib/inspect_shellsyntax.c:50
 #, c-format
 msgid "error opening %s for reading: %s\n"
@@ -1095,7 +1093,7 @@ msgstr ""
 msgid "Desktop file %s on %s references icon %s but no subpackages contain %s"
 msgstr ""
 
-#: lib/inspect_desktop.c:297 lib/inspect_disttag.c:79
+#: lib/inspect_desktop.c:297 lib/inspect_disttag.c:187
 #: lib/inspect_shellsyntax.c:59
 #, c-format
 msgid "error closing %s: %s\n"
@@ -1120,31 +1118,35 @@ msgid ""
 "File %s is not a valid desktop file on %s; desktop-file-validate reports:"
 msgstr ""
 
-#: lib/inspect_disttag.c:95
+#: lib/inspect_disttag.c:211
 #, c-format
-msgid "The %s file is missing the Release: tag."
+msgid "The %s file is missing the %s tag."
 msgstr ""
 
-#: lib/inspect_disttag.c:97
+#: lib/inspect_disttag.c:213
 msgid "Release: tag"
 msgstr ""
 
-#: lib/inspect_disttag.c:101
+#: lib/inspect_disttag.c:217
 #, c-format
-msgid "The dist tag should be of the form '%%{?dist}' in the Release tag."
+msgid ""
+"The dist tag should be of the form '%s' in the %s tag or in a macro used in "
+"the %s tag."
 msgstr ""
 
-#: lib/inspect_disttag.c:103 lib/inspect_disttag.c:109
+#: lib/inspect_disttag.c:219 lib/inspect_disttag.c:225
 #, c-format
 msgid "'%%{?dist}' tag"
 msgstr ""
 
-#: lib/inspect_disttag.c:107
+#: lib/inspect_disttag.c:223
 #, c-format
-msgid "The Release: tag does not seem to contain a '%%{?dist}' tag."
+msgid ""
+"The %s tag does not seem to contain '%s' or a macro that expands to include "
+"the '%s' tag."
 msgstr ""
 
-#: lib/inspect_disttag.c:163
+#: lib/inspect_disttag.c:279
 msgid "Specified package is not a source RPM, skipping."
 msgstr ""
 
@@ -1176,135 +1178,135 @@ msgstr ""
 msgid "DT_NEEDED symbol(s) added to %s on %s"
 msgstr ""
 
-#: lib/inspect_elf.c:578
+#: lib/inspect_elf.c:579
 #, c-format
 msgid "Object still has executable stack (no GNU-stack note): %s on %s"
 msgstr ""
 
-#: lib/inspect_elf.c:581
+#: lib/inspect_elf.c:582
 #, c-format
 msgid "Object has executable stack (no GNU-stack note): %s on %s"
 msgstr ""
 
-#: lib/inspect_elf.c:585
+#: lib/inspect_elf.c:586
 #, c-format
 msgid "Program built without GNU_STACK: %s on %s"
 msgstr ""
 
-#: lib/inspect_elf.c:591
+#: lib/inspect_elf.c:592
 msgid "GNU_STACK on ${FILE}"
 msgstr ""
 
-#: lib/inspect_elf.c:601
+#: lib/inspect_elf.c:602
 #, c-format
 msgid "File %s has invalid execstack flags %lX on %s"
 msgstr ""
 
-#: lib/inspect_elf.c:603
+#: lib/inspect_elf.c:604
 #, c-format
 msgid "File %s has unrecognized GNU_STACK '%s' (expected RW or RWE) on %s"
 msgstr ""
 
-#: lib/inspect_elf.c:610 lib/inspect_elf.c:639
+#: lib/inspect_elf.c:611 lib/inspect_elf.c:640
 msgid "execstack on ${FILE}"
 msgstr ""
 
-#: lib/inspect_elf.c:621
+#: lib/inspect_elf.c:622
 #, c-format
 msgid "Object still has executable stack (GNU-stack note = X): %s on %s"
 msgstr ""
 
-#: lib/inspect_elf.c:624
+#: lib/inspect_elf.c:625
 #, c-format
 msgid "Object has executable stack (GNU-stack note = X): %s on %s"
 msgstr ""
 
-#: lib/inspect_elf.c:629
+#: lib/inspect_elf.c:630
 #, c-format
 msgid "Stack is still executable: %s on %s"
 msgstr ""
 
-#: lib/inspect_elf.c:632
+#: lib/inspect_elf.c:633
 #, c-format
 msgid "Stack is executable: %s on %s"
 msgstr ""
 
-#: lib/inspect_elf.c:664
+#: lib/inspect_elf.c:665
 #, c-format
 msgid "%s lost full GNU_RELRO security protection on %s"
 msgstr ""
 
-#: lib/inspect_elf.c:667
+#: lib/inspect_elf.c:668
 #, c-format
 msgid "%s lost GNU_RELRO security protection on %s"
 msgstr ""
 
-#: lib/inspect_elf.c:678
+#: lib/inspect_elf.c:679
 msgid "GNU_RELRO on ${FILE}"
 msgstr ""
 
-#: lib/inspect_elf.c:757
+#: lib/inspect_elf.c:758
 #, c-format
 msgid "Fortified symbols lost:\n"
 msgstr ""
 
-#: lib/inspect_elf.c:770
+#: lib/inspect_elf.c:771
 #, c-format
 msgid "Fortifiable symbols present:\n"
 msgstr ""
 
-#: lib/inspect_elf.c:787
+#: lib/inspect_elf.c:788
 #, c-format
 msgid "%s may have lost -D_FORTIFY_SOURCE on %s"
 msgstr ""
 
-#: lib/inspect_elf.c:796
+#: lib/inspect_elf.c:797
 msgid "-D_FORTIFY_SOURCE on ${FILE}"
 msgstr ""
 
-#: lib/inspect_elf.c:858
+#: lib/inspect_elf.c:859
 #, c-format
 msgid "IPv4-only symbols used:\n"
 msgstr ""
 
-#: lib/inspect_elf.c:873
+#: lib/inspect_elf.c:874
 #, c-format
 msgid "%s may use functions unsuitable for IPv6 support on %s"
 msgstr ""
 
-#: lib/inspect_elf.c:880
+#: lib/inspect_elf.c:881
 msgid "IPv6 functions used in ${FILE}"
 msgstr ""
 
-#: lib/inspect_elf.c:1057
+#: lib/inspect_elf.c:1061
 #, c-format
 msgid "The following objects lost -fPIC:\n"
 msgstr ""
 
-#: lib/inspect_elf.c:1080
+#: lib/inspect_elf.c:1082
 #, c-format
 msgid "The following new objects were built without -fPIC:\n"
 msgstr ""
 
-#: lib/inspect_elf.c:1094
+#: lib/inspect_elf.c:1096
 #, c-format
-msgid "%s lost -fPIC on %s"
+msgid "%s has objects built without -fPIC on %s"
 msgstr ""
 
-#: lib/inspect_elf.c:1103
+#: lib/inspect_elf.c:1105
 msgid "-fPIC on ${FILE}"
 msgstr ""
 
-#: lib/inspect_elf.c:1133
+#: lib/inspect_elf.c:1135
 msgid "TEXTREL relocations on ${FILE}"
 msgstr ""
 
-#: lib/inspect_elf.c:1148
+#: lib/inspect_elf.c:1150
 #, c-format
 msgid "%s acquired TEXTREL relocations on %s"
 msgstr ""
 
-#: lib/inspect_elf.c:1151
+#: lib/inspect_elf.c:1153
 #, c-format
 msgid "%s has TEXTREL relocations on %s"
 msgstr ""
@@ -1636,50 +1638,50 @@ msgid ""
 "header tag."
 msgstr ""
 
-#: lib/inspect_ownership.c:54
+#: lib/inspect_ownership.c:60
 #, c-format
 msgid "*** unable to find tag %d for %s\n"
 msgstr ""
 
-#: lib/inspect_ownership.c:113
+#: lib/inspect_ownership.c:142
 #, c-format
 msgid "File %s has forbidden owner `%s` on %s"
 msgstr ""
 
-#: lib/inspect_ownership.c:129
+#: lib/inspect_ownership.c:158
 #, c-format
 msgid "File %s has forbidden group `%s` on %s"
 msgstr ""
 
-#: lib/inspect_ownership.c:148
+#: lib/inspect_ownership.c:177
 #, c-format
 msgid "File %s has owner `%s` on %s, but should be `%s`"
 msgstr ""
 
-#: lib/inspect_ownership.c:164
+#: lib/inspect_ownership.c:193
 #, c-format
 msgid "*** unable to get capabilities for %s\n"
 msgstr ""
 
-#: lib/inspect_ownership.c:172
+#: lib/inspect_ownership.c:201
 #, c-format
 msgid ""
 "File %s on %s has CAP_SETUID capability but group `%s` and is world "
 "executable"
 msgstr ""
 
-#: lib/inspect_ownership.c:182
+#: lib/inspect_ownership.c:211
 #, c-format
 msgid ""
 "File %s on %s has CAP_SETUID capability but group `%s` and is group writable"
 msgstr ""
 
-#: lib/inspect_ownership.c:191
+#: lib/inspect_ownership.c:220
 #, c-format
 msgid "File %s has group `%s` on %s, but should be `%s`"
 msgstr ""
 
-#: lib/inspect_ownership.c:252
+#: lib/inspect_ownership.c:281
 #, c-format
 msgid "File %s changed %s from `%s` to `%s` on %s"
 msgstr ""
@@ -1805,23 +1807,23 @@ msgstr ""
 msgid "Subpackage '%s' has appeared on '%s'"
 msgstr ""
 
-#: lib/inspect_symlinks.c:101
+#: lib/inspect_symlinks.c:106
 #, c-format
 msgid ""
 "Directory %s became a symbolic link (to %s) in %s on %s; this is not allowed!"
 msgstr ""
 
-#: lib/inspect_symlinks.c:103
+#: lib/inspect_symlinks.c:108
 #, c-format
 msgid "%s %s became a symbolic link (to %s) in %s on %s"
 msgstr ""
 
-#: lib/inspect_symlinks.c:121
+#: lib/inspect_symlinks.c:126
 #, c-format
 msgid "An error occurred reading symbolic link %s in %s on %s."
 msgstr ""
 
-#: lib/inspect_symlinks.c:254
+#: lib/inspect_symlinks.c:259
 #, c-format
 msgid "%s %s %s a dangling symbolic link in %s on %s"
 msgstr ""
@@ -1940,12 +1942,12 @@ msgstr ""
 msgid "*** failed to allocate new peer peer\n"
 msgstr ""
 
-#: lib/readelf.c:80
+#: lib/readelf.c:89
 #, c-format
 msgid "libelf version mismatch\n"
 msgstr ""
 
-#: lib/readelf.c:89
+#: lib/readelf.c:98
 #, c-format
 msgid "Unable to stat %s\n"
 msgstr ""
@@ -2048,21 +2050,59 @@ msgstr ""
 msgid "*** error opening %s\n"
 msgstr ""
 
-#: lib/whitelist.c:44
+#: lib/whitelist.c:59
 #, c-format
 msgid "%s on %s carries mode %04o, but is on the stat whitelist"
 msgstr ""
 
-#: lib/whitelist.c:51
+#: lib/whitelist.c:66
 #, c-format
 msgid ""
 "%s on %s carries mode %04o, is on the stat whitelist but expected mode %04o"
 msgstr ""
 
-#: lib/whitelist.c:63
+#: lib/whitelist.c:81
 #, c-format
 msgid ""
 "%s on %s carries insecure mode %04o, Security Team review may be required"
+msgstr ""
+
+#: lib/whitelist.c:130
+#, c-format
+msgid "%s on %s carries owner %s (UID %d) and is on the stat whitelist"
+msgstr ""
+
+#: lib/whitelist.c:137
+#, c-format
+msgid ""
+"%s on %s carries owner %s (UID %d) and is on the stat whitelist, but the UID "
+"cannot be verified"
+msgstr ""
+
+#: lib/whitelist.c:144
+#, c-format
+msgid ""
+"%s on %s carries owner %s (UID %d), but is on the stat whitelist with "
+"expected owner %s (UID %d)"
+msgstr ""
+
+#: lib/whitelist.c:198
+#, c-format
+msgid "%s on %s carries group %s (GID %d) and is on the stat whitelist"
+msgstr ""
+
+#: lib/whitelist.c:205
+#, c-format
+msgid ""
+"%s on %s carries group %s (GID %d) and is on the stat whitelist, but the GID "
+"cannot be verified"
+msgstr ""
+
+#: lib/whitelist.c:212
+#, c-format
+msgid ""
+"%s on %s carries group %s (GID %d), but is on the stat whitelist with "
+"expected group %s (GID %d)"
 msgstr ""
 
 #: src/rpminspect.c:48
