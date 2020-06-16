@@ -23,6 +23,7 @@
 #include <grp.h>
 #include <assert.h>
 #include <err.h>
+#include <errno.h>
 #include "rpminspect.h"
 
 /**
@@ -125,9 +126,16 @@ bool on_stat_whitelist_owner(struct rpminspect *ri, const rpmfile_entry_t *file,
                     err(2, "getpwnam_r, %d", errno);
                 }
 
-                if ((file->st.st_uid == pw.pw_uid) && !strcmp(owner, wlentry->owner)) {
-                    xasprintf(&params.msg, _("%s on %s carries owner %s (UID %d) and is on the stat whitelist"), file->localpath, params.arch, wlentry->owner, pw.pw_uid);
+                if (pwp && (file->st.st_uid == pw.pw_uid) && !strcmp(owner, wlentry->owner)) {
+                    xasprintf(&params.msg, _("%s on %s carries owner %s (UID %d) and is on the stat whitelist"), file->localpath, params.arch, wlentry->owner, file->st.st_uid);
                     params.severity = RESULT_INFO;
+                    params.waiverauth = WAIVABLE_BY_ANYONE;
+                    add_result(ri, &params);
+                    free(params.msg);
+                    return true;
+                } else if (pwp == NULL) {
+                    xasprintf(&params.msg, _("%s on %s carries owner %s (UID %d) and is on the stat whitelist, but the UID cannot be verified"), file->localpath, params.arch, wlentry->owner, file->st.st_uid);
+                    params.severity = RESULT_VERIFY;
                     params.waiverauth = WAIVABLE_BY_ANYONE;
                     add_result(ri, &params);
                     free(params.msg);
@@ -186,9 +194,16 @@ bool on_stat_whitelist_group(struct rpminspect *ri, const rpmfile_entry_t *file,
                     err(2, "getgrgid_r, %d", errno);
                 }
 
-                if ((file->st.st_gid == gr.gr_gid) && !strcmp(group, gr.gr_name)) {
-                    xasprintf(&params.msg, _("%s on %s carries group %s (GID %d) and is on the stat whitelist"), file->localpath, params.arch, wlentry->group, gr.gr_gid);
+                if (grp && (file->st.st_gid == gr.gr_gid) && !strcmp(group, gr.gr_name)) {
+                    xasprintf(&params.msg, _("%s on %s carries group %s (GID %d) and is on the stat whitelist"), file->localpath, params.arch, wlentry->group, file->st.st_gid);
                     params.severity = RESULT_INFO;
+                    params.waiverauth = WAIVABLE_BY_ANYONE;
+                    add_result(ri, &params);
+                    free(params.msg);
+                    return true;
+                } else if (grp == NULL) {
+                    xasprintf(&params.msg, _("%s on %s carries group %s (GID %d) and is on the stat whitelist, but the GID cannot be verified"), file->localpath, params.arch, wlentry->group, file->st.st_gid);
+                    params.severity = RESULT_VERIFY;
                     params.waiverauth = WAIVABLE_BY_ANYONE;
                     add_result(ri, &params);
                     free(params.msg);
