@@ -44,7 +44,6 @@ static GElf_Half _get_elf_helper(Elf *elf, elfinfo_t type, GElf_Half fail)
 
     assert(elf != NULL);
     kind = elf_kind(elf);
-    DEBUG_PRINT("kind=%d\n", kind);
     assert(kind == ELF_K_ELF);
 
     if (gelf_getehdr(elf, &ehdr) == NULL) {
@@ -230,7 +229,9 @@ Elf_Scn * get_elf_section(Elf *elf, int64_t section, const char *name, Elf_Scn *
         return NULL;
     }
 
-    assert(shdr != NULL);
+    if (shdr == NULL) {
+        return NULL;
+    }
 
     /* we have an ELF object, iterate over the sections */
     while ((scn = elf_nextscn(elf, scn)) != NULL) {
@@ -408,8 +409,7 @@ char *get_elf_soname(const char *filepath) {
     return soname;
 }
 
-static string_list_t * get_elf_symbol_list(Elf *elf, bool (*filter)(const char *),
-        uint32_t sh_type, const char *table_name)
+static string_list_t * get_elf_symbol_list(Elf *elf, bool (*filter)(const char *), uint32_t sh_type, const char *table_name)
 {
     Elf_Scn *scn;
     GElf_Shdr shdr;
