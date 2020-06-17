@@ -67,10 +67,10 @@
 #define REMEDY_BADWORDS _("Unprofessional language as defined in the configuration file was found in the text shown.  Remove or change the offending words and rebuild.")
 
 /* emptyrpm */
-#define REMEDY_EMPTYRPM _("Check to see if you eliminated a subpackage but still have the %%package and/or the %%files section for it.")
+#define REMEDY_EMPTYRPM _("Check to see if you eliminated a subpackage but still have the %package and/or the %files section for it.")
 
 /* lostpayload */
-#define REMEDY_LOSTPAYLOAD _("Check to see if you eliminated a subpackage but still have the %%package and/or the %%files section for it.")
+#define REMEDY_LOSTPAYLOAD _("Check to see if you eliminated a subpackage but still have the %package and/or the %files section for it.")
 
 /* license */
 #define REMEDY_LICENSE _("The License tag must contain an approved license string as defined by the distribution (e.g., GPLv2+).  If the license in question is approved, the license database needs updating in the rpminspect-data package.")
@@ -98,13 +98,13 @@
 #define REMEDY_DESKTOP _("Refer to the Desktop Entry Specification at https://standards.freedesktop.org/desktop-entry-spec/latest/ for help correcting the errors and warnings")
 
 /* disttag */
-#define REMEDY_DISTTAG _("The Release: tag in the spec file must include a '%%{?dist}' string.  Please add this to the spec file per the distribution packaging guidelines.")
+#define REMEDY_DISTTAG _("The Release: tag in the spec file must include a '%{?dist}' string.  Please add this to the spec file per the distribution packaging guidelines.")
 
 /* specname */
 #define REMEDY_SPECNAME _("The spec file name does not match the expected NAME.spec format.  Rename the spec file to conform to this policy.")
 
 /* modularity */
-#define REMEDY_MODULARITY _("This package is part of a module but is missing the %{modularitylabel} header tag.  Add this as a %%define in the spec file and rebuild.")
+#define REMEDY_MODULARITY _("This package is part of a module but is missing the %{modularitylabel} header tag.  Add this as a %define in the spec file and rebuild.")
 
 /* javabytecode */
 #define REMEDY_JAVABYTECODE _("The Java bytecode version for one or more class files in the build was not met for the product release.  Ensure you are using the correct JDK for the build.")
@@ -122,7 +122,7 @@
 #define REMEDY_UPSTREAM _("Unexpected changed source archive content.  The version of the package did not change between builds, but the source archive content did.  This may be deliberate, but needs inspection.")
 
 /* ownership */
-#define REMEDY_OWNERSHIP_DEFATTR _("Make sure the %%files section includes the %%defattr macro.")
+#define REMEDY_OWNERSHIP_DEFATTR _("Make sure the %files section includes the %defattr macro.")
 #define REMEDY_OWNERSHIP_BIN_OWNER _("Bin path files must be owned by the bin_owner set in the rpminspect configuration, which is usually root.")
 #define REMEDY_OWNERSHIP_BIN_GROUP _("Bin path files must be owned by the bin_group set in the rpminspect configuration, which is usually root.")
 #define REMEDY_OWNERSHIP_IXOTH _("Either chgrp the file to the bin_group set in the rpminspect configuration or remove the world execute bit on the file (chmod o-x).")
@@ -171,6 +171,6 @@
 
 /* symlinks */
 #define REMEDY_SYMLINKS _("Make sure symlinks point to a valid destination in one of the subpackages of the build; dangling symlinks are not allowed.  If you are comparing builds and have a non-symlink turn in to a symlink, ensure this is deliberate.  NOTE:  You cannot turn a directory in to a symlink due to RPM limitations.");
-#define REMEDY_SYMLINKS_DIRECTORY _("Make sure symlinks point to a valid destination in one of the subpackages of the build; dangling symlinks are not allowed.  If you are comparing builds and have a non-symlink turn in to a symlink, ensure this is deliberate.  NOTE:  You cannot turn a directory in to a symlink due to RPM limitations.  If you absolutely must do that, make sure you include the %%pretrans scriptlet for replacing a directory.  See the packaging guidelines for 'Scriptlet to replace a directory' for more information.");
+#define REMEDY_SYMLINKS_DIRECTORY _("Make sure symlinks point to a valid destination in one of the subpackages of the build; dangling symlinks are not allowed.  If you are comparing builds and have a non-symlink turn in to a symlink, ensure this is deliberate.  NOTE:  You cannot turn a directory in to a symlink due to RPM limitations.  If you absolutely must do that, make sure you include the %pretrans scriptlet for replacing a directory.  See the packaging guidelines for 'Scriptlet to replace a directory' for more information.");
 
 #endif
