@@ -87,6 +87,11 @@ int get_specfile_macros(struct rpminspect *ri, const char *specfile)
             continue;
         }
 
+        /* skip multiline macros */
+        if (strsuffix(specline->data, "\\")) {
+            continue;
+        }
+
         /* trim line endings */
         specline->data[strcspn(specline->data, "\r\n")] = 0;
 
