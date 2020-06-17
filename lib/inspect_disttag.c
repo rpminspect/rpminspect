@@ -16,6 +16,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+#include <ctype.h>
 #include <stdio.h>
 #include <string.h>
 #include <errno.h>
@@ -189,10 +190,10 @@ static bool disttag_driver(struct rpminspect *ri, rpmfile_entry_t *file) {
     }
 
     /* Only look at the value on the Release: line */
-    release = strchr(buf, ' ');
+    release = buf + strlen(SPEC_TAG_RELEASE);
     assert(release != NULL);
 
-    while (*release == ' ' && *release != '\0') {
+    while (isspace(*release) && *release != '\0') {
         release++;
     }
 
