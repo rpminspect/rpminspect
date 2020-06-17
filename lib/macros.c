@@ -16,8 +16,10 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+#include <regex.h>
 #include <assert.h>
 #include <sys/queue.h>
+#include <err.h>
 #include "rpminspect.h"
 
 /**
@@ -41,6 +43,10 @@ int get_specfile_macros(struct rpminspect *ri, const char *specfile)
     string_list_t *fields = NULL;
     string_entry_t *entry = NULL;
     pair_entry_t *pair = NULL;
+    int reg_result = 0;
+    char *buf = NULL;
+    regex_t macro_regex;
+    char reg_error[BUFSIZ];
 
     assert(ri != NULL);
     assert(specfile != NULL);
@@ -58,6 +64,17 @@ int get_specfile_macros(struct rpminspect *ri, const char *specfile)
     spec = read_file(specfile);
     assert(spec != NULL);
 
+    /* Use a regular expression to match macro lines we will break down */
+    xasprintf(&buf, "^\\s*%%(%s|%s)\\s+\\w+\\s+.*[\\w\\S]+$", SPEC_MACRO_DEFINE, SPEC_MACRO_GLOBAL);
+    reg_result = regcomp(&macro_regex, buf, REG_EXTENDED);
+    free(buf);
+
+    if (reg_result != 0) {
+        regerror(reg_result, &macro_regex, reg_error, sizeof(reg_error));
+        warn("%s: %s", __func__, reg_error);
+        return 0;
+    }
+
     /* find all the macro lines */
     TAILQ_FOREACH(specline, spec, items) {
         /* we made it to the changelog, ignore everything from here on */
@@ -66,7 +83,7 @@ int get_specfile_macros(struct rpminspect *ri, const char *specfile)
         }
 
         /* skip non-macro definition lines */
-        if (!strstr(specline->data, SPEC_MACRO_DEFINE" ") && !strstr(specline->data, SPEC_MACRO_GLOBAL" ")) {
+        if (regexec(&macro_regex, specline->data, 0, NULL, 0) != 0) {
             continue;
         }
 
@@ -74,6 +91,7 @@ int get_specfile_macros(struct rpminspect *ri, const char *specfile)
         specline->data[strcspn(specline->data, "\r\n")] = 0;
 
         /* break up fields */
+        DEBUG_PRINT("specline->data: |%s|\n", specline->data);
         fields = strsplit(specline->data, " ");
 
         if (list_len(fields) != 3) {
@@ -96,7 +114,11 @@ int get_specfile_macros(struct rpminspect *ri, const char *specfile)
 
         /* verify the first element is %define or %global */
         entry = TAILQ_FIRST(fields);
-        assert((strcmp(entry->data, SPEC_MACRO_DEFINE) == 0 || strcmp(entry->data, SPEC_MACRO_GLOBAL) == 0));
+
+        if (strcmp(entry->data, SPEC_MACRO_DEFINE) && strcmp(entry->data, SPEC_MACRO_GLOBAL)) {
+            err(RI_PROGRAM_ERROR, "unexpected macro line: %s", specline->data);
+        }
+
         TAILQ_REMOVE(fields, entry, items);
         free(entry->data);
         free(entry);
@@ -128,6 +150,7 @@ int get_specfile_macros(struct rpminspect *ri, const char *specfile)
 
     /* clean up */
     list_free(spec, free);
+    regfree(&macro_regex);
 
     return n;
 }
