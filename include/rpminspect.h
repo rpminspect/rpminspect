@@ -293,4 +293,16 @@ void init_elf_data(void);
  */
 char *bytes_to_str(unsigned char *array, size_t len);
 
+/* ignore.c */
+/**
+ * @brief Given a path and struct rpminspect, determine if the path
+ * should be ignored or not.
+ *
+ * @param ri The struct rpminspect for the program.  @param path The
+ * relative path to check (i.e., localpath).  @param root The root
+ * directory, optional (pass NULL to use '/').  @return True if path
+ * should be ignored, false otherwise.
+ */
+bool ignore_path(const struct rpminspect *ri, const char *path, const char *root);
+
 #endif
