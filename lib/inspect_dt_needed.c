@@ -223,7 +223,7 @@ bool inspect_dt_needed(struct rpminspect *ri) {
     assert(ri != NULL);
 
     /* run the DT_NEEDED test across all ELF files */
-    result = foreach_peer_file(ri, dt_needed_driver);
+    result = foreach_peer_file(ri, dt_needed_driver, true);
 
     /* if everything was fine, just say so */
     if (result) {

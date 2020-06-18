@@ -148,7 +148,7 @@ bool inspect_capabilities(struct rpminspect *ri) {
     assert(ri != NULL);
 
     /* run the capabilities inspection across all RPM files */
-    result = foreach_peer_file(ri, capabilities_driver);
+    result = foreach_peer_file(ri, capabilities_driver, true);
 
     /* if everything was fine, just say so */
     if (result) {
