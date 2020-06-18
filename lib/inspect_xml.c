@@ -212,7 +212,7 @@ bool inspect_xml(struct rpminspect *ri)
     struct result_params params;
 
     assert(ri != NULL);
-    result = foreach_peer_file(ri, xml_driver);
+    result = foreach_peer_file(ri, xml_driver, true);
 
     if (result) {
         init_result_params(&params);

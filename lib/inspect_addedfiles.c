@@ -173,7 +173,7 @@ bool inspect_addedfiles(struct rpminspect *ri)
     bool result;
     struct result_params params;
 
-    result = foreach_peer_file(ri, addedfiles_driver);
+    result = foreach_peer_file(ri, addedfiles_driver, false);
 
     if (result) {
         init_result_params(&params);

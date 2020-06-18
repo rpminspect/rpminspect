@@ -427,7 +427,7 @@ bool inspect_changedfiles(struct rpminspect *ri)
     bool result;
     struct result_params params;
 
-    result = foreach_peer_file(ri, changedfiles_driver);
+    result = foreach_peer_file(ri, changedfiles_driver, true);
 
     if (result) {
         init_result_params(&params);

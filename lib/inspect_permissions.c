@@ -110,7 +110,7 @@ bool inspect_permissions(struct rpminspect *ri) {
     assert(ri != NULL);
 
     /* run the permissions inspection across all RPM files */
-    result = foreach_peer_file(ri, permissions_driver);
+    result = foreach_peer_file(ri, permissions_driver, true);
 
     /* if everything was fine, just say so */
     if (result) {

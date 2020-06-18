@@ -99,7 +99,7 @@ bool inspect_pathmigration(struct rpminspect *ri) {
 
     /* Only run the inspection if path migrations are specified */
     if (ri->pathmigration_keys && !TAILQ_EMPTY(ri->pathmigration_keys)) {
-        result = foreach_peer_file(ri, pathmigration_driver);
+        result = foreach_peer_file(ri, pathmigration_driver, true);
     }
 
     if (result) {

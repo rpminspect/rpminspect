@@ -209,7 +209,7 @@ bool inspect_lto(struct rpminspect *ri) {
 
     if (ri->lto_symbol_name_prefixes != NULL) {
         lto_symbol_name_prefixes = ri->lto_symbol_name_prefixes;
-        result = foreach_peer_file(ri, lto_driver);
+        result = foreach_peer_file(ri, lto_driver, true);
     }
 
     if (result) {

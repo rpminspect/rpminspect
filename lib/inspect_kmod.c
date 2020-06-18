@@ -300,7 +300,7 @@ bool inspect_kmod(struct rpminspect *ri) {
     params.severity = RESULT_INFO;
     params.waiverauth = NOT_WAIVABLE;
     params.header = HEADER_KMOD;
-    result = foreach_peer_file(ri, kmod_driver);
+    result = foreach_peer_file(ri, kmod_driver, true);
 
     /* if everything was fine, just say so */
     if (result) {
