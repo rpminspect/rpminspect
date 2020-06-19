@@ -32,6 +32,7 @@
 #include <unistd.h>
 #include <libgen.h>
 #include <errno.h>
+#include <err.h>
 #include "rpminspect.h"
 
 /**
@@ -54,11 +55,12 @@
 static bool symlinks_driver(struct rpminspect *ri, rpmfile_entry_t *file) {
     bool result = true;
     ssize_t len = 0;
-    char linktarget[PATH_MAX];
-    char reltarget[PATH_MAX];
+    char localpath[PATH_MAX + 1];
+    char linktarget[PATH_MAX + 1];
+    char reltarget[PATH_MAX + 1];
     char *target = NULL;
     int linkerr = 0;
-    char cwd[PATH_MAX];
+    char cwd[PATH_MAX + 1];
     bool found = false;
     rpmpeer_entry_t *peer = NULL;
     const char *name = NULL;
@@ -158,7 +160,9 @@ static bool symlinks_driver(struct rpminspect *ri, rpmfile_entry_t *file) {
          * Canonicalize the link without looking at the filesystem.  Trim
          * the target of leading slashes.
          */
-        tail = stpcpy(reltarget, dirname(file->localpath));
+        tmp = strncpy(localpath, file->localpath, PATH_MAX);
+        assert(tmp != NULL);
+        tail = stpcpy(reltarget, dirname(localpath));
         assert(reltarget != NULL);
         DEBUG_PRINT("    reltarget=|%s|, target=|%s|\n", reltarget, target);
 
@@ -169,6 +173,20 @@ static bool symlinks_driver(struct rpminspect *ri, rpmfile_entry_t *file) {
             } else if (strprefix(target, "./")) {
                 /* skip current directory references */
                 target += 2;
+            } else if (strprefix(target, "../") && !strcmp(reltarget, "")) {
+                /* relative symlink cannot be resolved */
+                xasprintf(&params.msg, _("%s %s has too many levels of redirects and cannot be resolved in %s on %s"), strtype(file->st.st_mode), file->localpath, name, arch);
+                xasprintf(&params.details, "%s -> %s", file->localpath, linktarget);
+                params.severity = RESULT_VERIFY;
+                add_result(ri, &params);
+                free(params.msg);
+                free(params.details);
+
+                if (chdir(cwd) == -1) {
+                    warn("%s: chdir to %s", __func__, cwd);
+                }
+
+                return false;
             } else if (strprefix(target, "../")) {
                 /* back up a directory level */
                 tmp = rindex(reltarget, '/');
@@ -275,8 +293,7 @@ static bool symlinks_driver(struct rpminspect *ri, rpmfile_entry_t *file) {
 
     /* return to D-station */
     if (chdir(cwd) == -1) {
-        fprintf(stderr, "*** unable to chdir to %s: %s\n", cwd, strerror(errno));
-        fflush(stderr);
+        warn("%s: chdir to %s", __func__, cwd);
     }
 
     return result;
