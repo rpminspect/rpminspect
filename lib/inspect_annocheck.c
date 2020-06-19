@@ -48,6 +48,11 @@ static bool annocheck_driver(struct rpminspect *ri, rpmfile_entry_t *file)
         return true;
     }
 
+    /* Ignore debug and build paths */
+    if (is_debug_or_build_path(file->localpath)) {
+        return true;
+    }
+
     /* We need the architecture for reporting */
     arch = get_rpm_header_arch(file->rpm_header);
 
