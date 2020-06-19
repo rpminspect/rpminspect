@@ -1,0 +1,21 @@
+regress/
+
+The scripts found in this directory are used periodically to perform
+long tests.  They are not guaranteed to always work since each time
+they are used they may require some tweaking.  All of the scripts use
+$RPMINSPECT from the environment as the command to run for rpminspect.
+If that is not set in the calling environment, it defaults to
+'rpminspect'.  The script does not try to use the built rpminspect in
+the source tree.
+
+SCRIPTS IN THIS DIRECTORY:
+
+indiv-inspections-kernel.sh
+    Run an rpminspect comparison against the two most recent COMPLETE
+    kernel builds in the most recent Fedora tag in Koji.  Each
+    inspection is run separately, timed, and stdout/stderr combined in
+    to a log file in this directory.
+
+    Purpose: To see that each inspection runs without crashing for
+    kernel comparisons as well as getting a ballpark figure on typical
+    execution time for each inspection during kernel comparisons.
