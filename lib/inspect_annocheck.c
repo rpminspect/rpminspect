@@ -30,6 +30,10 @@ static bool annocheck_driver(struct rpminspect *ri, rpmfile_entry_t *file)
     string_entry_t *entry = NULL;
     ENTRY e;
     ENTRY *eptr;
+    char *wrkdir = NULL;
+    size_t fl = 0;
+    size_t ll = 0;
+    char *tmp_out = NULL;
     char *after_out = NULL;
     int after_exit;
     char *before_out = NULL;
@@ -104,6 +108,20 @@ static bool annocheck_driver(struct rpminspect *ri, rpmfile_entry_t *file)
 
         /* Report the results */
         if (params.msg) {
+            /* trim the working directory from the details if it exists */
+            fl = strlen(file->fullpath);
+            ll = strlen(file->localpath);
+
+            if (fl > ll) {
+                wrkdir = strndup(file->fullpath, fl - ll);
+            }
+
+            if (wrkdir) {
+                tmp_out = strreplace(after_out, wrkdir, NULL);
+                free(after_out);
+                after_out = tmp_out;
+            }
+
             params.details = after_out;
             add_result(ri, &params);
             free(params.msg);
