@@ -138,8 +138,9 @@ ignore:
     #
     # This is an array of glob(3) compatible strings to match paths
     # to ignore.
-    - /usr/lib/python?.?/site-packages/__pycache__
-    - /usr/lib/python?.?/site-packages/*/*.pyc
+    - /usr/lib*/python?.?/site-packages/__pycache__
+    - /usr/lib*/python?.?/site-packages/*/*.pyc
+    - /usr/lib*/python?.?/site-packages/*/*.pyo
 
 security_path_prefix:
     # Optional: Path prefixes for files with security concerns.  This
