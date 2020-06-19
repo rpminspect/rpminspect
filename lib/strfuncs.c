@@ -313,11 +313,19 @@ char *strwaiverauth(const waiverauth_t waiverauth) {
     return NULL;
 }
 
-/*
- * Given a string s, find the substring "find", and return a newly allocated string
- * with "find" replaced with "replace".
+/**
+ * @brief Given a string s, find the substring "find", and return a
+ * newly allocated string with "find" replaced with "replace".  If
+ * "replace" is NULL, this function will delete "find" from the string
+ * s and return the new string.  The caller is responsible for freeing
+ * the returned string.
  *
- * Replaces all matches.
+ * @param s The string to replace substrings in.
+ * @param find The substring to find in s.
+ * @param replace The substring to replace find with.  If NULL, find
+ * is removed from s in the result.
+ * @return Newly allocated string with modifications made; caller must
+ * free this result.
  */
 char *strreplace(const char *s, const char *find, const char *replace)
 {
@@ -332,7 +340,6 @@ char *strreplace(const char *s, const char *find, const char *replace)
     }
 
     assert(find);
-    assert(replace);
 
     find_len = strlen(find);
     remainder = s;
@@ -355,7 +362,12 @@ char *strreplace(const char *s, const char *find, const char *replace)
              * Print the string up to the start of the match, then the
              * "replace" string.  Reset remainder to the end of the match.
              */
-            xasprintf(&tmp, "%s%.*s%s", result ? result : "", (int) (find_start - remainder), remainder, replace);
+            if (replace) {
+                xasprintf(&tmp, "%s%.*s%s", result ? result : "", (int) (find_start - remainder), remainder, replace);
+            } else {
+                xasprintf(&tmp, "%s%.*s", result ? result : "", (int) (find_start - remainder), remainder);
+            }
+
             free(result);
             result = tmp;
 
