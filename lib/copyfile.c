@@ -62,7 +62,7 @@ int copyfile(const char *src, const char *dest, bool force, bool verbose) {
     int success = 0;
     char *destpath = NULL;
     char *destdir = NULL;
-    char linkdest[PATH_MAX];
+    char linkdest[PATH_MAX + 1];
     int oflags = O_WRONLY | O_CREAT | O_EXCL;
     mode_t mode = (S_IRWXU | S_IRGRP | S_IROTH) ^ S_IXUSR;
     struct stat sb;
