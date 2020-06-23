@@ -23,12 +23,22 @@ BuildRequires:  elfutils-devel
 BuildRequires:  kmod-devel
 BuildRequires:  libcurl-devel
 BuildRequires:  zlib-devel
-BuildRequires:  libmandoc-devel >= 1.14.5
 BuildRequires:  libyaml-devel
 BuildRequires:  file-devel
 BuildRequires:  openssl-devel
 BuildRequires:  libcap-devel
 BuildRequires:  gettext-devel
+
+# This block can be removed when all targeted platforms have 1.14.5.
+# The 1.14.5 mandoc package has libmandoc.a and fixes for some known
+# problems, which we want for librpminspect.  Fedora <= 30 and EPEL <=
+# 7 do not currently have this build.  When they do, reduce this block
+# to a single BuildRequires line.
+%if 0%{?rhel} >= 8 || 0%{?epel} >= 8 || 0%{?fedora} >= 31
+BuildRequires:  libmandoc-devel >= 1.14.5
+%else
+BuildRequires:  libmandoc-devel
+%endif
 
 # The test suite requires additional packages, but they are not used
 # in the package building systems.  They are noted here for reference
