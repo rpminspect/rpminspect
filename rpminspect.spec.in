@@ -23,7 +23,7 @@ BuildRequires:  elfutils-devel
 BuildRequires:  kmod-devel
 BuildRequires:  libcurl-devel
 BuildRequires:  zlib-devel
-BuildRequires:  libmandoc-devel
+BuildRequires:  libmandoc-devel >= 1.14.5
 BuildRequires:  libyaml-devel
 BuildRequires:  file-devel
 BuildRequires:  openssl-devel
