@@ -10,6 +10,10 @@ ifeq ($(NINJA),)
 NINJA := $(error "Unable to find a suitable `ninja' command in the PATH")
 endif
 
+# Take additional command line argument as a positional parameter for
+# the Makefile target
+TARGET_ARG = `arg="$(filter-out $@,$(MAKECMDGOALS))" && echo $${arg:-${1}}`
+
 all: setup
 	$(NINJA) -C $(MESON_BUILD_DIR) -v
 
@@ -17,7 +21,7 @@ setup:
 	meson setup $(MESON_BUILD_DIR)
 
 check: setup
-	@test_name="$(filter-out $@,$(MAKECMDGOALS))" ; \
+	@test_name="$(call TARGET_ARG,)" ; \
 	if [ -z "$${test_name}" ]; then \
 		meson test -C $(MESON_BUILD_DIR) -v ; \
 	else \
@@ -84,3 +88,7 @@ help:
 	@echo
 	@echo "Generate SRPM of the latest release and do all Koji builds:"
 	@echo "    make koji"
+
+# Quiet errors about target arguments not being targets
+%:
+	@true
