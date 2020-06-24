@@ -17,7 +17,20 @@ setup:
 	meson setup $(MESON_BUILD_DIR)
 
 check: setup
-	meson test -C $(MESON_BUILD_DIR) -v
+	@test_name="$(filter-out $@,$(MAKECMDGOALS))" ; \
+	if [ -z "$${test_name}" ]; then \
+		meson test -C $(MESON_BUILD_DIR) -v ; \
+	else \
+		test_script="test_$${test_name}.py" ; \
+		if [ ! -f "$(topdir)/test/$${test_script}" ]; then \
+			echo "*** test/$${test_script} does not exist." >&2 ; \
+			exit 1 ; \
+		fi ; \
+		env RPMINSPECT=$(topdir)/build/src/rpminspect \
+		    RPMINSPECT_YAML=$(topdir)/data/rpminspect.yaml \
+		    RPMINSPECT_TEST_DATA_PATH=$(topdir)/test/data \
+		python3 -Bm unittest discover -v $(topdir)/test/ $${test_script} ; \
+	fi
 
 update-pot: setup
 	find src -type f -name "*.c" > po/POTFILES.new
@@ -62,6 +75,9 @@ help:
 	@echo
 	@echo "To run the test suite:"
 	@echo "    make check"
+	@echo
+	@echo "To run a single test script (e.g., test_elf.py):"
+	@echo "    make check elf"
 	@echo
 	@echo "Make a new release on Github:"
 	@echo "    make release"
