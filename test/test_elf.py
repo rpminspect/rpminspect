@@ -27,6 +27,15 @@ fortify_src = open(datadir + '/fortify.c').read()
 # Source code used for the forbidden IPv6 function tests
 forbidden_ipv6_src = open(datadir + '/forbidden-ipv6.c').read()
 
+# Simple source file for library tests
+test_library_source = """#include <math.h>
+
+double exponent(double x, double y)
+{
+    return pow(x, y);
+}
+"""
+
 # Program built with noexecstack
 class WithoutExecStackRPM(TestRPMs):
     def setUp(self):
@@ -222,7 +231,7 @@ class LostPICCompareRPMs(TestCompareRPMs):
 
         installPath = "usr/lib/libsimple.a"
 
-        self.before_rpm.add_source(rpmfluff.SourceFile('simple.c', rpmfluff.simple_library_source))
+        self.before_rpm.add_source(rpmfluff.SourceFile('simple.c', test_library_source))
         self.before_rpm.section_build += "gcc -m32 -fPIC -c simple.c\n"
         self.before_rpm.section_build += "ar -crs libsimple.a simple.o\n"
         self.before_rpm.create_parent_dirs(installPath)
@@ -231,7 +240,7 @@ class LostPICCompareRPMs(TestCompareRPMs):
         sub.section_files += "/%s\n" % installPath
         self.before_rpm.add_payload_check(installPath, None)
 
-        self.after_rpm.add_source(rpmfluff.SourceFile('simple.c', rpmfluff.simple_library_source))
+        self.after_rpm.add_source(rpmfluff.SourceFile('simple.c', test_library_source))
         self.after_rpm.section_build += "gcc -m32 -c simple.c\n"
         self.after_rpm.section_build += "ar -crs libsimple.a simple.o\n"
         self.after_rpm.create_parent_dirs(installPath)
@@ -251,7 +260,7 @@ class LostPICCompareKoji(TestCompareKoji):
 
         installPath = "usr/lib/libsimple.a"
 
-        self.before_rpm.add_source(rpmfluff.SourceFile('simple.c', rpmfluff.simple_library_source))
+        self.before_rpm.add_source(rpmfluff.SourceFile('simple.c', test_library_source))
         self.before_rpm.section_build += "gcc -m32 -fPIC -c simple.c\n"
         self.before_rpm.section_build += "ar -crs libsimple.a simple.o\n"
         self.before_rpm.create_parent_dirs(installPath)
@@ -260,7 +269,7 @@ class LostPICCompareKoji(TestCompareKoji):
         sub.section_files += "/%s\n" % installPath
         self.before_rpm.add_payload_check(installPath, None)
 
-        self.after_rpm.add_source(rpmfluff.SourceFile('simple.c', rpmfluff.simple_library_source))
+        self.after_rpm.add_source(rpmfluff.SourceFile('simple.c', test_library_source))
         self.after_rpm.section_build += "gcc -m32 -c simple.c\n"
         self.after_rpm.section_build += "ar -crs libsimple.a simple.o\n"
         self.after_rpm.create_parent_dirs(installPath)

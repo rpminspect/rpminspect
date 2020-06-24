@@ -923,7 +923,6 @@ static bool find_no_pic(Elf *elf, string_list_t **user_data)
         entry = calloc(1, sizeof(*entry));
         assert(entry != NULL);
         entry->data = strdup(arhdr->ar_name);
-        DEBUG_PRINT("arhdr->ar_name=|%s|\n", arhdr->ar_name);
         TAILQ_INSERT_TAIL(no_pic_list, entry, items);
     }
 
@@ -960,7 +959,6 @@ static bool find_pic(Elf *elf, string_list_t **user_data)
         entry = calloc(1, sizeof(*entry));
         assert(entry != NULL);
         entry->data = strdup(arhdr->ar_name);
-        DEBUG_PRINT("arhdr->ar_name=|%s|\n", arhdr->ar_name);
         TAILQ_INSERT_TAIL(pic_list, entry, items);
     }
 
@@ -1021,10 +1019,21 @@ static bool elf_archive_tests(struct rpminspect *ri, Elf *after_elf, int after_e
         return true;
     }
 
+    /* initialize the list of objects in the after build without PIC */
     after_no_pic = calloc(1, sizeof(*after_no_pic));
     assert(after_no_pic != NULL);
     TAILQ_INIT(after_no_pic);
     elf_archive_iterate(after_elf_fd, after_elf, find_no_pic, &after_no_pic);
+
+    /* initialize the list of objects in the before build with PIC */
+    before_pic = calloc(1, sizeof(*before_pic));
+    assert(before_pic != NULL);
+    TAILQ_INIT(before_pic);
+    elf_archive_iterate(before_elf_fd, before_elf, find_pic, &before_pic);
+
+    if (TAILQ_EMPTY(after_no_pic) && TAILQ_EMPTY(before_pic)) {
+        goto cleanup;
+    }
 
     /* Gather data for two possible messages:
      *   - Objects in after that had -fPIC in before
@@ -1038,12 +1047,6 @@ static bool elf_archive_tests(struct rpminspect *ri, Elf *after_elf, int after_e
     assert(output_stream != NULL);
 
     /* Report objects that lost -fPIC */
-    before_pic = calloc(1, sizeof(*before_pic));
-    assert(before_pic != NULL);
-
-    TAILQ_INIT(before_pic);
-    elf_archive_iterate(before_elf_fd, before_elf, find_pic, &before_pic);
-
     after_lost_pic = list_intersection(before_pic, after_no_pic);
 
     if (after_lost_pic && list_len(after_lost_pic) > 0) {
@@ -1098,6 +1101,7 @@ static bool elf_archive_tests(struct rpminspect *ri, Elf *after_elf, int after_e
         free(params.msg);
     }
 
+cleanup:
     list_free(after_lost_pic, NULL);
     list_free(after_new, NULL);
 
