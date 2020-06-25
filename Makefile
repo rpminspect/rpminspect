@@ -40,7 +40,7 @@ update-pot: setup
 	find src -type f -name "*.c" > po/POTFILES.new
 	find lib -type f -name "*.c" >> po/POTFILES.new
 	find include -type f -name "*.h" >> po/POTFILES.new
-	sort po/POTFILES.new | uniq > po/POTFILES
+	sort -u po/POTFILES.new > po/POTFILES
 	rm -f po/POTFILES.new
 	$(NINJA) -C $(MESON_BUILD_DIR) rpminspect-pot
 
