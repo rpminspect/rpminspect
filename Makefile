@@ -47,8 +47,11 @@ update-pot: setup
 srpm:
 	$(topdir)/utils/srpm.sh
 
-release:
+new-release:
 	$(topdir)/utils/release.sh -A
+
+release:
+	$(topdir)/utils/release.sh -t -p
 
 koji: srpm
 	$(topdir)/utils/submit-koji-builds.sh $$(ls -1 $(topdir)/*.tar.*) $$(basename $(topdir))
@@ -69,7 +72,8 @@ help:
 	@echo "    check        Run 'meson test -C $(MESON_BUILD_DIR) -v'"
 	@echo "    update-pot   Update po/POTFILES and po/rpminspect.pot"
 	@echo "    srpm         Generate an SRPM package of the latest release"
-	@echo "    release      Run 'utils/release.sh -A' to make a new release"
+	@echo "    release      Tag and push current tree as a release."
+	@echo "    new-release  Bump version, tag, and push current tree as release."
 	@echo "    koji         Run 'make srpm' then 'utils/submit-koji-builds.sh'"
 	@echo "    clean        Run 'rm -rf $(MESON_BUILD_DIR)'"
 	@echo "    instreqs     Install required build and runtime packages"
@@ -84,7 +88,8 @@ help:
 	@echo "    make check elf"
 	@echo
 	@echo "Make a new release on Github:"
-	@echo "    make release"
+	@echo "    make release         # just tags and pushes"
+	@echo "    make new-release     # bumps version number, tags, and pushes"
 	@echo
 	@echo "Generate SRPM of the latest release and do all Koji builds:"
 	@echo "    make koji"
