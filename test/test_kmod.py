@@ -61,7 +61,7 @@ if not have_kernel_devel:
 # Support functions to build the kernel modules we need
 def build_module(rpminspect, build_ext=None, extra_cflags=None):
     build = os.path.dirname(rpminspect)
-    srcdir = os.path.realpath(os.path.join(build, '..', '..', 'test', 'data', 'derp-kmod'))
+    srcdir = os.path.realpath(os.path.join(os.environ['RPMINSPECT_TEST_DATA_PATH'], 'derp-kmod'))
 
     if build_ext is None:
         moddir = os.path.join(build, 'derp-kmod')
