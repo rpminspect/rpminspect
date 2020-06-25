@@ -71,9 +71,11 @@ Requires:       xz
 Requires:       gettext
 Requires:       diffutils
 
-# These are required for libxml2 DTD validation
-Requires:       xhtml1-dtds
-Requires:       html401-dtds
+# If these are present, the xml inspection can try DTD validation.
+%if 0%{?rhel} >= 8 || 0%{?fedora}
+Suggests:       xhtml1-dtds
+Suggests:       html401-dtds
+%endif
 
 # These programs are only required for the 'shellsyntax' functionality.
 # You can use rpminspect without these installed, just disable the
