@@ -37,6 +37,6 @@ install_subdir(
 
 # Install the configuration file
 install_data(
-    sources : 'rpminspect.yaml',
-    install_dir : get_option('sysconfdir') + '/rpminspect'
+    sources : 'generic.yaml',
+    install_dir : get_option('datadir') + '/rpminspect'
 )

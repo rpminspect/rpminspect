@@ -99,7 +99,7 @@ endif
 if python.found()
     test_env = environment()
     test_env.set('RPMINSPECT', rpminspect_prog.full_path())
-    test_env.set('RPMINSPECT_YAML', meson.source_root() + '/data/rpminspect.yaml')
+    test_env.set('RPMINSPECT_YAML', meson.source_root() + '/data/generic.yaml')
     test_env.set('RPMINSPECT_TEST_DATA_PATH', meson.source_root() + '/test/data')
 
     test_suites = [
