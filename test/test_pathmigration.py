@@ -21,7 +21,7 @@ import rpmfluff
 from baseclass import *
 
 # These tests rely on the [pathmigration] section in
-# data/rpminspect.yaml in the source tree.
+# data/generic.yaml in the source tree.
 
 ########
 # /bin #

@@ -15,7 +15,7 @@ common:
     # for the [common] section).  Profiles are referred to by NAME and
     # the file would be NAME.yaml.  Any profile used at runtime must
     # exist in the profile directory.
-    profiledir: /etc/rpminspect/profiles
+    profiledir: /usr/share/rpminspect/profiles/generic
 
 koji:
     # The root URL of the XMLRPC API provided by the Koji hub
@@ -43,7 +43,7 @@ vendor:
     # Location of the license database file under the 'licenses/'
     # subdirectory in the vendor_data_dir.  This database is used
     # by the 'license' inspection.
-    licensedb: approved.json
+    licensedb: generic.json
 
     # Which product release string to favor.  By default, rpminspect
     # expects the product release strings for the before and after

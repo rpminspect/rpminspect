@@ -63,7 +63,6 @@ against the defined parameters.
 %package -n librpminspect
 Summary:        Library providing RPM test API and functionality
 Group:          Development/Tools
-Requires:       rpminspect-data >= 1.0
 Requires:       desktop-file-utils
 Requires:       gzip
 Requires:       bzip2
@@ -114,7 +113,6 @@ programs wanting to incorporate RPM test functionality.
 Summary:         Header files and development libraries for librpminspect
 Group:           Development/Tools
 Requires:        librpminspect%{?_isa} = %{version}-%{release}
-Requires:        rpminspect-data >= 1.0
 
 %description -n librpminspect-devel
 The header files and development library links required to build software
@@ -124,7 +122,6 @@ using librpminspect.
 %package -n rpminspect-data-generic
 Summary:         Template data files used to drive rpminspect tests
 Group:           Development/Tools
-Provides:        rpminspect-data >= 1.0
 
 %description -n rpminspect-data-generic
 The rpminspect-data-generic package is meant as a template to build your
@@ -166,8 +163,6 @@ control files.
 %files -n rpminspect-data-generic
 %license COPYING
 %{_datadir}/rpminspect
-%dir %{_sysconfdir}/rpminspect
-%config(noreplace) %{_sysconfdir}/rpminspect/rpminspect.yaml
 
 
 %changelog

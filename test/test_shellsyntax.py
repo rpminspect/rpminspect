@@ -28,8 +28,7 @@ import rpmfluff
 # tests for examples on how to use it as well.
 
 # NOTE: We are only going to test the list of default shells as
-# specified in rpminspect.yaml.  See data/rpminspect.yaml for more
-# info.
+# specified in generic.yaml.  See data/rpminspect.yaml for more info.
 
 ###################################################################
 # sh - Bourne/POSIX shell syntax only                             #
