@@ -23,6 +23,7 @@
 #include <assert.h>
 #include <search.h>
 #include <errno.h>
+#include <err.h>
 #include <yaml.h>
 #include "rpminspect.h"
 
@@ -1049,49 +1050,67 @@ bool init_caps_whitelist(struct rpminspect *ri)
 
 /*
  * Initialize a struct rpminspect.  Called by applications using
- * librpminspect before they began calling library functions.
- * Return 0 on success, -1 on failure.
+ * librpminspect before they began calling library functions.  If ri
+ * passed in is NULL, the function will allocate and initialize a new
+ * struct rpminspect.  The caller is responsible for freeing the
+ * struct rpminspect.  Return 0 on success, -1 on failure.
  */
-int init_rpminspect(struct rpminspect *ri, const char *cfgfile, const char *profile)
+struct rpminspect *init_rpminspect(struct rpminspect *ri, const char *cfgfile, const char *profile)
 {
-    int ret = 0;
+    int i = 0;
     char *tmp = NULL;
     char *filename = NULL;
+    string_entry_t *cfg = NULL;
 
-    assert(ri != NULL);
-    memset(ri, 0, sizeof(*ri));
+    /* Only initialize if we were given NULL for ri */
+    if (ri == NULL) {
+        ri = calloc(1, sizeof(*ri));
+        assert(ri != NULL);
 
-    /* Initialize the struct before reading files */
-    ri->workdir = strdup(DEFAULT_WORKDIR);
-    ri->profiledir = strdup(CFG_PROFILE_DIR);
-    ri->vendor_data_dir = strdup(VENDOR_DATA_DIR);
-    ri->licensedb = strdup(LICENSE_DB_FILE);
-    ri->favor_release = FAVOR_NONE;
-    ri->tests = ~0;
-    ri->desktop_entry_files_dir = strdup(DESKTOP_ENTRY_FILES_DIR);
-    ri->bin_paths = list_from_array(BIN_PATHS);
-    ri->bin_owner = strdup(BIN_OWNER);
-    ri->bin_group = strdup(BIN_GROUP);
-    ri->shells = list_from_array(SHELLS);
-    ri->specmatch = MATCH_FULL;
-    ri->specprimary = PRIMARY_NAME;
+        /* Initialize the struct before reading files */
+        ri->workdir = strdup(DEFAULT_WORKDIR);
+        ri->vendor_data_dir = strdup(VENDOR_DATA_DIR);
+        ri->favor_release = FAVOR_NONE;
+        ri->tests = ~0;
+        ri->desktop_entry_files_dir = strdup(DESKTOP_ENTRY_FILES_DIR);
+        ri->bin_paths = list_from_array(BIN_PATHS);
+        ri->bin_owner = strdup(BIN_OWNER);
+        ri->bin_group = strdup(BIN_GROUP);
+        ri->shells = list_from_array(SHELLS);
+        ri->specmatch = MATCH_FULL;
+        ri->specprimary = PRIMARY_NAME;
 
-    /* Store full path to the config file */
-    ri->cfgfile = realpath(cfgfile, NULL);
-
-    /* In case we have a missing configuration file, defaults all the way */
-    if ((ri->cfgfile == NULL) || (access(ri->cfgfile, F_OK|R_OK) == -1)) {
-        free(ri->cfgfile);
-        ri->cfgfile = NULL;
-        return 0;
+        /* Store full paths to all config files read */
+        ri->cfgfiles = calloc(1, sizeof(ri->cfgfiles));
+        assert(ri->cfgfiles != NULL);
+        TAILQ_INIT(ri->cfgfiles);
     }
 
-    /* Read the main configuration file to get things started */
-    ret = read_cfgfile(ri, ri->cfgfile);
+    /* Read in the config file if we have it */
+    if (cfgfile) {
+        cfg = calloc(1, sizeof(cfg));
+        assert(cfg != NULL);
+        cfg->data = realpath(cfgfile, NULL);
 
-    if (ret) {
-        fprintf(stderr, _("*** error reading '%s'\n"), ri->cfgfile);
-        return ret;
+        /* In case we have a missing configuration file */
+        if ((cfg->data == NULL) || (access(cfg->data, F_OK|R_OK) == -1)) {
+            free(cfg->data);
+            free(cfg);
+            return NULL;
+        }
+
+        /* Read the main configuration file to get things started */
+        i = read_cfgfile(ri, cfg->data);
+
+        if (i) {
+            warn(_("*** error reading '%s'\n"), cfg->data);
+            free(cfg->data);
+            free(cfg);
+            return NULL;
+        }
+
+        /* Store this config file as one we read in */
+        TAILQ_INSERT_TAIL(ri->cfgfiles, cfg, items);
     }
 
     /* If a profile is specified, read an overlay config file */
@@ -1100,9 +1119,14 @@ int init_rpminspect(struct rpminspect *ri, const char *cfgfile, const char *prof
         filename = realpath(tmp, NULL);
 
         if ((filename == NULL) || (access(filename, F_OK|R_OK) == -1)) {
-            fprintf(stderr, _("*** Unable to read profile '%s' from %s\n"), profile, filename);
+            warn(_("*** Unable to read profile '%s' from %s\n"), profile, filename);
         } else {
-            ret = read_cfgfile(ri, filename);
+            i = read_cfgfile(ri, filename);
+
+            if (i) {
+                warn(_("*** error reading '%s'\n"), filename);
+                return NULL;
+            }
         }
 
         free(tmp);
@@ -1114,5 +1138,5 @@ int init_rpminspect(struct rpminspect *ri, const char *cfgfile, const char *prof
     ri->threshold = RESULT_VERIFY;
     ri->worst_result = RESULT_OK;
 
-    return 0;
+    return ri;
 }
