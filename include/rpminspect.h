@@ -108,7 +108,7 @@ enum checksum { NULLSUM, MD5SUM, SHA1SUM, SHA256SUM };
 /* init.c */
 bool init_stat_whitelist(struct rpminspect *);
 bool init_caps_whitelist(struct rpminspect *);
-int init_rpminspect(struct rpminspect *, const char *, const char *);
+struct rpminspect *init_rpminspect(struct rpminspect *, const char *, const char *);
 
 /* free.c */
 void free_regex(regex_t *);

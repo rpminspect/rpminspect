@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2019  Red Hat, Inc.
+ * Copyright (C) 2019-2020  Red Hat, Inc.
  * Author(s):  David Cantrell <dcantrell@redhat.com>
  *
  * This program is free software: you can redistribute it and/or modify
@@ -29,10 +29,11 @@ int clean_test_init(void) {
 }
 
 void test_init_rpminspect(void) {
-    struct rpminspect ri;
+    struct rpminspect *ri = NULL;
 
-    RI_ASSERT_EQUAL(init_rpminspect(&ri, NULL, NULL), 0);
-    free_rpminspect(&ri);
+    ri = init_rpminspect(ri, NULL, NULL);
+    RI_ASSERT_PTR_NOT_NULL(ri);
+    free_rpminspect(ri);
     return;
 }
 

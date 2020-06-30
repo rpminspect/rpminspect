@@ -270,7 +270,7 @@ typedef TAILQ_HEAD(header_cache_entry_s, _header_cache_entry_t) header_cache_t;
  * their program.  You need to free this struct on exit.
  */
 struct rpminspect {
-    char *cfgfile;             /* full path to configuration file */
+    string_list_t *cfgfiles;   /* list of full path config files read (in order) */
     char *workdir;             /* full path to working directory */
     char *profiledir;          /* full path to profiles directory */
     char *worksubdir;          /* within workdir, where these builds go */

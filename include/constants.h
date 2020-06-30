@@ -46,16 +46,16 @@
 #define SOFTWARE_NAME "librpminspect"
 
 /**
- * @def CFGFILE
- * Default configuration file path.
+ * @def CFGFILE_DIR
+ * Configuration file directory.
  */
-#define CFGFILE "/etc/rpminspect/rpminspect.yaml"
+#define CFGFILE_DIR "/usr/share/rpminspect"
 
 /**
- * @def CFG_PROFILE_DIR
- * Configuration profiles that overlay CFGFILE live here.
+ * @def CFGFILE
+ * Default configuration file.
  */
-#define CFG_PROFILE_DIR "/etc/rpminspect/profiles"
+#define CFGFILE "rpminspect.yaml"
 
 /**
  * @def DEFAULT_WORKDIR
@@ -71,13 +71,6 @@
  * provided by the vendor-specific rpminspect-data package.
  */
 #define VENDOR_DATA_DIR "/usr/share/rpminspect"
-
-/**
- * @def LICENSE_DB_FILE
- * Default license database filename in the VENDOR_DATA_DIR/licenses/
- * subdirectory.
- */
-#define LICENSE_DB_FILE "generic.json"
 
 /**
  * @def INSPECTIONS
@@ -138,13 +131,6 @@
  * Standard location for desktop entry files.
  */
 #define DESKTOP_ENTRY_FILES_DIR "/usr/share/applications"
-
-/**
- * @def DESKTOP_ICON_PATHS
- * Standard locations for desktop icons.  This is a space-delimited
- * string of path names.
- */
-#define DESKTOP_ICON_PATHS "/usr/share/pixmaps /usr/share/icons"
 
 /** @} */
 

@@ -32,9 +32,6 @@
 
 #include "rpminspect.h"
 
-/* Global librpminspect state */
-struct rpminspect ri;
-
 void sigabrt_handler(__attribute__ ((unused)) int i)
 {
     rpmFreeRpmrc();
@@ -49,7 +46,6 @@ static void usage(const char *progname)
     printf(_("Usage: %s [OPTIONS] [before build] [after build]\n"), progname);
     printf(_("Options:\n"));
     printf(_("  -c FILE, --config=FILE   Configuration file to use\n"));
-    printf(_("                             (default: %s)\n"), CFGFILE);
     printf(_("  -p NAME, --profile=NAME  Configuration profile to use\n"));
     printf(_("  -T LIST, --tests=LIST    List of tests to run\n"));
     printf(_("                             (default: ALL)\n"));
@@ -85,7 +81,7 @@ static void usage(const char *progname)
  * Release value.  Trim any trailing '/' characters in case the user is
  * specifying a build from a local path.
  */
-static char *get_product_release(const favor_release_t favor_release, const char *before, const char *after)
+static char *get_product_release(const string_list_t *keys, struct hsearch_data *products, const favor_release_t favor_release, const char *before, const char *after)
 {
     int c;
     char *pos = NULL;
@@ -157,13 +153,13 @@ static char *get_product_release(const favor_release_t favor_release, const char
          */
         c = strcmp(before_product, after_product);
 
-        if (c && (ri.product_keys != NULL)) {
+        if (c && (keys != NULL)) {
             /* after_product and before_product are refreshed in the loop */
             free(after_product);
             free(before_product);
 
             /* Try to see if a product mapping matches our strings */
-            TAILQ_FOREACH(entry, ri.product_keys, items) {
+            TAILQ_FOREACH(entry, keys, items) {
                 /* refresh after_product */
                 xasprintf(&needle, ".%s", entry->data);
                 after_product = strstr(after, needle);
@@ -176,7 +172,7 @@ static char *get_product_release(const favor_release_t favor_release, const char
 
                 /* find this product in the hash table */
                 e.key = entry->data;
-                hsearch_r(e, FIND, &eptr, ri.products);
+                hsearch_r(e, FIND, &eptr, products);
 
                 /* if the config file entry is empty, just ignore it */
                 if (eptr == NULL) {
@@ -320,6 +316,7 @@ int main(int argc, char **argv) {
         { 0, 0, 0, 0 }
     };
     char *cfgfile = NULL;
+    char *tmp_cfgfile = NULL;
     char *profile = NULL;
     char *archopt = NULL;
     char *walk = NULL;
@@ -354,6 +351,7 @@ int main(int argc, char **argv) {
     size_t cmdlen = 0;
     char *tail = NULL;
     bool ires = false;
+    struct rpminspect *ri = NULL;
 
     /* Be friendly to "rpminspect ... 2>&1 | tee" use case */
     setlinebuf(stdout);
@@ -517,31 +515,51 @@ int main(int argc, char **argv) {
      *  - Using the user-passed value and sanity-checking it,
      *  - Using the global default if it exists, or
      *  - Telling the user they need to install a required dependency.
+     *
+     * This loop also handles reading in multiple configuration files
+     * for overrides.
      */
-    if (cfgfile != NULL && access(cfgfile, F_OK|R_OK) == -1) {
-        fprintf(stderr, _("Specified config file (%s) is unreadable.\n"), cfgfile);
+    xasprintf(&tmp_cfgfile, "%s/%s", CFGFILE_DIR, CFGFILE);
+
+    if (cfgfile == NULL && (access(tmp_cfgfile, F_OK|R_OK) == -1) && (access(CFGFILE, F_OK|R_OK) == -1)) {
+        fprintf(stderr, _("Please specify a configuration file using '-c' or supply ./%s\n"), CFGFILE);
         exit(RI_PROGRAM_ERROR);
-    } else if (cfgfile == NULL && access(CFGFILE, F_OK|R_OK) == 0) {
-        cfgfile = strdup(CFGFILE);
-    } else if (cfgfile == NULL) {
-        fprintf(stderr, _("Unable to read the default config file (%s).\n"), CFGFILE);
-        fprintf(stderr, _("Have you installed an rpminspect-data package for your distro?\n"));
-        exit(RI_PROGRAM_ERROR);
+    } else if (cfgfile == NULL && (access(tmp_cfgfile, F_OK|R_OK) == 0)) {
+        /* /usr/share/rpminspect/rpminspect.yaml if it exists */
+        ri = init_rpminspect(ri, tmp_cfgfile, profile);
+
+        if (ri == NULL) {
+            fprintf(stderr, _("Failed to read configuration file %s\n"), tmp_cfgfile);
+            exit(RI_PROGRAM_ERROR);
+        }
+    } else if (access(cfgfile, F_OK|R_OK) == 0) {
+        /* -c configuration file if it exists */
+        ri = init_rpminspect(ri, cfgfile, profile);
+
+        if (ri == NULL) {
+            fprintf(stderr, _("Failed to read configuration file %s\n"), cfgfile);
+            exit(RI_PROGRAM_ERROR);
+        }
     }
 
-    /* Initialize librpminspect */
-    if (init_rpminspect(&ri, cfgfile, profile) != 0) {
-        fprintf(stderr, _("Failed to read configuration file\n"));
-        exit(RI_PROGRAM_ERROR);
+    /* ./rpminspect.yaml if it exists */
+    if (access(CFGFILE, F_OK|R_OK) == 0) {
+        ri = init_rpminspect(ri, CFGFILE, profile);
+
+        if (ri == NULL) {
+            fprintf(stderr, _("Failed to read configuration file %s\n"), CFGFILE);
+            exit(RI_PROGRAM_ERROR);
+        }
     }
 
+    free(tmp_cfgfile);
     free(cfgfile);
     free(profile);
 
     /* various options from the command line */
-    ri.verbose = verbose;
-    ri.product_release = release;
-    ri.threshold = getseverity(threshold);
+    ri->verbose = verbose;
+    ri->product_release = release;
+    ri->threshold = getseverity(threshold);
 
     /*
      * any inspection selections on the command line can override
@@ -549,15 +567,15 @@ int main(int argc, char **argv) {
      */
     if (inspection_opt) {
         if (exclude) {
-            ri.tests = ~0;
+            ri->tests = ~0;
         } else {
-            ri.tests = 0;
+            ri->tests = 0;
         }
 
         tmp = insoptarg;
 
         while ((inspection = strsep(&insoptarg, ",")) != NULL) {
-            found = process_inspection_flag(inspection, exclude, &ri.tests);
+            found = process_inspection_flag(inspection, exclude, &ri->tests);
             check_found(found, inspection, progname);
         }
 
@@ -566,8 +584,8 @@ int main(int argc, char **argv) {
 
     /* the user specified a working directory */
     if (workdir != NULL) {
-        free(ri.workdir);
-        ri.workdir = workdir;
+        free(ri->workdir);
+        ri->workdir = workdir;
     }
 
     /* no workdir specified, but fetch only requested, default to cwd */
@@ -576,12 +594,12 @@ int main(int argc, char **argv) {
         r = getcwd(cwd, PATH_MAX);
         assert(r != NULL);
 
-        free(ri.workdir);
-        ri.workdir = strdup(r);
+        free(ri->workdir);
+        ri->workdir = strdup(r);
     }
 
     /* Display the configuration settings for this run */
-    dump_cfg(&ri);
+    dump_cfg(ri);
 
     /*
      * we should exactly one more argument (single build) or two arguments
@@ -589,28 +607,28 @@ int main(int argc, char **argv) {
      */
     if (optind == (argc - 1)) {
         /* only a single build specified */
-        ri.after = strdup(argv[optind]);
+        ri->after = strdup(argv[optind]);
     } else if ((optind + 1) == (argc - 1)) {
         /* we got a before and after build */
-        ri.before = strdup(argv[optind]);
-        ri.after = strdup(argv[optind + 1]);
+        ri->before = strdup(argv[optind]);
+        ri->after = strdup(argv[optind + 1]);
     } else {
         /* user gave us too many arguments */
         fprintf(stderr, _("*** Invalid before and after build specification.\n"));
         fprintf(stderr, _("*** See `%s --help` for more information.\n"), progname);
         fflush(stderr);
-        free_rpminspect(&ri);
+        free_rpminspect(ri);
         return RI_PROGRAM_ERROR;
     }
 
     /*
      * Fetch-only mode can only work with a single build
      */
-    if (fetch_only && ri.before) {
+    if (fetch_only && ri->before) {
         fprintf(stderr, _("*** Fetch only mode takes a single build specification.\n"));
         fprintf(stderr, _("*** See `%s --help` for more information.\n"), progname);
         fflush(stderr);
-        free_rpminspect(&ri);
+        free_rpminspect(ri);
         return RI_PROGRAM_ERROR;
     }
 
@@ -624,12 +642,12 @@ int main(int argc, char **argv) {
     /* if an architecture list is specified, validate it */
     if (archopt) {
         /* initialize the list of allowed architectures */
-        ri.arches = calloc(1, sizeof(*ri.arches));
-        assert(ri.arches != NULL);
-        TAILQ_INIT(ri.arches);
+        ri->arches = calloc(1, sizeof(*ri->arches));
+        assert(ri->arches != NULL);
+        TAILQ_INIT(ri->arches);
 
         /* get a list of valid architectures */
-        valid_arches = get_all_arches(&ri);
+        valid_arches = get_all_arches(ri);
 
         /* collect the specified architectures */
         walk = archopt;
@@ -660,7 +678,7 @@ int main(int argc, char **argv) {
             entry->data = strdup(token);
             assert(entry->data != NULL);
 
-            TAILQ_INSERT_TAIL(ri.arches, entry, items);
+            TAILQ_INSERT_TAIL(ri->arches, entry, items);
         }
 
         /* clean up */
@@ -669,16 +687,16 @@ int main(int argc, char **argv) {
     }
 
     /* create the working directory */
-    if (mkdirp(ri.workdir, mode)) {
-        fprintf(stderr, _("*** Unable to create directory %s: %s\n"), ri.workdir, strerror(errno));
+    if (mkdirp(ri->workdir, mode)) {
+        fprintf(stderr, _("*** Unable to create directory %s: %s\n"), ri->workdir, strerror(errno));
         fflush(stderr);
-        free_rpminspect(&ri);
+        free_rpminspect(ri);
         rpmFreeRpmrc();
         return RI_PROGRAM_ERROR;
     }
 
     /* validate and gather the builds specified */
-    if (gather_builds(&ri, fetch_only)) {
+    if (gather_builds(ri, fetch_only)) {
         fprintf(stderr, _("*** Failed to gather specified builds.\n"));
         fflush(stderr);
         rpmFreeRpmrc();
@@ -707,46 +725,46 @@ int main(int argc, char **argv) {
         tail = stpcpy(tail, argv[i]);
     }
 
-    add_result_entry(&ri.results, &params);
-    ri.worst_result = params.severity;
+    add_result_entry(&ri->results, &params);
+    ri->worst_result = params.severity;
     free(params.details);
 
     /* perform the selected inspections */
     if (!fetch_only) {
         /* Determine product release unless the user specified one. */
-        if (ri.product_release == NULL) {
-            if (ri.peers == NULL || TAILQ_EMPTY(ri.peers)) {
+        if (ri->product_release == NULL) {
+            if (ri->peers == NULL || TAILQ_EMPTY(ri->peers)) {
                 fprintf(stderr, _("*** No peers, ensure packages exist for specified architecture(s).\n"));
                 fflush(stderr);
-                free_rpminspect(&ri);
+                free_rpminspect(ri);
                 return RI_PROGRAM_ERROR;
             }
 
-            peer = TAILQ_FIRST(ri.peers);
+            peer = TAILQ_FIRST(ri->peers);
             after_rel = headerGetString(peer->after_hdr, RPMTAG_RELEASE);
 
-            if (ri.before) {
+            if (ri->before) {
                 before_rel = headerGetString(peer->before_hdr, RPMTAG_RELEASE);
             }
 
-            ri.product_release = get_product_release(ri.favor_release, before_rel, after_rel);
-            DEBUG_PRINT("product_release=%s\n", ri.product_release);
+            ri->product_release = get_product_release(ri->product_keys, ri->products, ri->favor_release, before_rel, after_rel);
+            DEBUG_PRINT("product_release=%s\n", ri->product_release);
 
-            if (ri.product_release == NULL) {
+            if (ri->product_release == NULL) {
                 fflush(stderr);
-                free_rpminspect(&ri);
+                free_rpminspect(ri);
                 return RI_PROGRAM_ERROR;
             }
         }
 
         for (i = 0; inspections[i].flag != 0; i++) {
             /* test not selected by user */
-            if (!(ri.tests & inspections[i].flag)) {
+            if (!(ri->tests & inspections[i].flag)) {
                 continue;
             }
 
             /* inspection requires before/after builds and we have one */
-            if (ri.before == NULL && !inspections[i].single_build) {
+            if (ri->before == NULL && !inspections[i].single_build) {
                 continue;
             }
 
@@ -757,7 +775,7 @@ int main(int argc, char **argv) {
                 free(r);
             }
 
-            ires = inspections[i].driver(&ri);
+            ires = inspections[i].driver(ri);
 
             if (verbose) {
                 printf("%5s\n", ires ? _("pass") : _("FAIL"));
@@ -769,27 +787,27 @@ int main(int argc, char **argv) {
             formatidx = 0;                 /* default to 'text' output */
         }
 
-        if (ri.results != NULL) {
-            formats[formatidx].driver(ri.results, output);
+        if (ri->results != NULL) {
+            formats[formatidx].driver(ri->results, output);
         }
     }
 
     /* Set exit code based on result threshold */
-    if (ri.worst_result >= ri.threshold) {
+    if (ri->worst_result >= ri->threshold) {
         ret = RI_INSPECTION_FAILURE;
     }
 
     /* Clean up */
     if (keep) {
-        printf(_("\nKeeping working directory: %s\n"), ri.worksubdir);
+        printf(_("\nKeeping working directory: %s\n"), ri->worksubdir);
     } else {
-        if (rmtree(ri.workdir, true, true)) {
-           fprintf(stderr, _("*** Error removing directory %s: %s\n"), ri.workdir, strerror(errno));
+        if (rmtree(ri->workdir, true, true)) {
+           fprintf(stderr, _("*** Error removing directory %s: %s\n"), ri->workdir, strerror(errno));
            fflush(stderr);
         }
     }
 
-    free_rpminspect(&ri);
+    free_rpminspect(ri);
     rpmFreeRpmrc();
 
     return ret;
