@@ -100,6 +100,7 @@ static bool annocheck_driver(struct rpminspect *ri, rpmfile_entry_t *file)
                 xasprintf(&params.msg, _("annocheck '%s' test now fails for %s on %s"), entry->data, file->localpath, arch);
                 params.severity = RESULT_VERIFY;
                 params.verb = VERB_CHANGED;
+                result = false;
             }
         } else if (after_out) {
             if (after_exit == 0) {
@@ -108,6 +109,7 @@ static bool annocheck_driver(struct rpminspect *ri, rpmfile_entry_t *file)
                 xasprintf(&params.msg, _("annocheck '%s' test fails for %s on %s"), entry->data, file->localpath, arch);
                 params.severity = RESULT_VERIFY;
                 params.verb = VERB_CHANGED;
+                result = false;
             }
         }
 
@@ -130,7 +132,6 @@ static bool annocheck_driver(struct rpminspect *ri, rpmfile_entry_t *file)
             params.details = after_out;
             add_result(ri, &params);
             free(params.msg);
-            result = false;
         }
 
         /* Cleanup */
