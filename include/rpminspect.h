@@ -305,4 +305,33 @@ char *bytes_to_str(unsigned char *array, size_t len);
  */
 bool ignore_path(const struct rpminspect *ri, const char *path, const char *root);
 
+/* paths.c */
+/**
+ * @brief Return the before build debuginfo package path where the
+ * package was extracted for rpminspect.  The path must match the
+ * architecture provided.
+ *
+ * IMPORTANT: Do not free the returned string.
+ *
+ * @param ri The struct rpminspect for the program.
+ * @param binarch The required debuginfo architecture.
+ * @return Full path to the extract before build debuginfo package, or
+ * NULL if not found.
+ */
+const char *get_before_debuginfo_path(struct rpminspect *ri, const char *binarch);
+
+/**
+ * @brief Return the after build debuginfo package path where the
+ * package was extracted for rpminspect.  The path must match the
+ * architecture provided.
+ *
+ * IMPORTANT: Do not free the returned string.
+ *
+ * @param ri The struct rpminspect for the program.
+ * @param binarch The required debuginfo architecture.
+ * @return Full path to the extract after build debuginfo package, or
+ * NULL if not found.
+ */
+const char *get_after_debuginfo_path(struct rpminspect *ri, const char *binarch);
+
 #endif
