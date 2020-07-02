@@ -73,6 +73,7 @@ struct inspect inspections[] = {
     { INSPECT_LTO,           "LTO",           true,  &inspect_lto },
     { INSPECT_SYMLINKS,      "symlinks",      true,  &inspect_symlinks },
     { INSPECT_FILES,         "%files",        true,  &inspect_files },
+    { INSPECT_TYPES,         "types",         false, &inspect_types },
     { 0, NULL, false, NULL }
 };
 
@@ -193,6 +194,8 @@ const char *inspection_desc(const uint64_t inspection)
             return DESC_SYMLINKS;
         case INSPECT_FILES:
             return DESC_FILES;
+        case INSPECT_TYPES:
+            return DESC_TYPES;
         default:
             return NULL;
     }

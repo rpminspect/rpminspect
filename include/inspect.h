@@ -381,6 +381,16 @@ bool inspect_lostpayload(struct rpminspect *ri);
  */
 bool inspect_files(struct rpminspect *ri);
 
+/**
+ * @brief Main driver for the 'types' inspection.
+ *
+ *
+ *
+ * @param ri Pointer to the struct rpminspect for the program.
+ * @return True if the inspection passed, false otherwise.
+ */
+bool inspect_types(struct rpminspect *ri);
+
 /** @} */
 
 /*
@@ -422,6 +432,7 @@ bool inspect_files(struct rpminspect *ri);
 #define INSPECT_SYMLINKS                    (((uint64_t) 1) << 29)
 #define INSPECT_LOSTPAYLOAD                 (((uint64_t) 1) << 30)
 #define INSPECT_FILES                       (((uint64_t) 1) << 31)
+#define INSPECT_TYPES                       (((uint64_t) 1) << 32)
 
 /* Long descriptions for the inspections */
 #define DESC_LICENSE _("Verify the string specified in the License tag of the RPM metadata describes permissible software licenses as defined by the license database. Also checks to see if the License tag contains any unprofessional words as defined in the configuration file.")
@@ -485,5 +496,7 @@ bool inspect_files(struct rpminspect *ri);
 #define DESC_SYMLINKS _("Symbolic links must be resolvable on the installed system.  This inspection ensures absolute and relative symlinks are valid.  It also checks for any symlink usage that will cause problems for RPM.")
 
 #define DESC_FILES _("Check %files sections in the spec file for any forbidden path references.")
+
+#define DESC_TYPES _("Compare MIME types of files between builds and report any changes for verification.")
 
 #endif
