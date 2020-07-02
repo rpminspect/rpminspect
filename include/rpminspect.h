@@ -237,7 +237,7 @@ char *compute_checksum(const char *, mode_t *, enum checksum);
 char *checksum(rpmfile_entry_t *);
 
 /* runcmd.c */
-char *run_cmd(int *, const char *, ...);
+char *run_cmd(int *, const char *, ...) __attribute__((__sentinel__));
 
 /* whitelist.c */
 bool on_stat_whitelist_mode(struct rpminspect *, const rpmfile_entry_t *, const char *, const char *);
