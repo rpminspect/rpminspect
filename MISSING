@@ -45,3 +45,10 @@ TEST_MULTILIB
     can be validated by all the existing checks, but there is no reason
     to ensure the 32-bit and 64-bit builds of a package have matching
     content.
+
+TEST_SPECFILE ($RPM_OPT_FLAGS check on x86 builds)
+    In the past our spec files varied wildly across the distribution.
+    There were efforts to normalize compiler flags used.  Early on we
+    were trying to ensure the 32-bit x86 builds were using more
+    optimizations than standard i386 builds.  This check is not really
+    relevant anymore, so it has been dropped.
