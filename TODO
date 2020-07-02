@@ -31,7 +31,6 @@ Unranked tests categories to migrate (might also decide to skip them):
  TEST_SCRIPT
  TEST_STRIP
  TEST_TRIGGERS
- TEST_TYPES
  TEST_VIRUS
 
 
@@ -72,6 +71,7 @@ Test categories that have been migrated:
 *TEST_SIZE (filesize)
 *TEST_SYMLINK (symlinks)
 *TEST_SPECFILE (disttag, license, and %files)
+*TEST_TYPES (types)
 
 
 Test categories excluded (see MISSING):
@@ -81,6 +81,7 @@ Test categories excluded (see MISSING):
  TEST_UPSTREAM (only the rebase keyword check)
  TEST_ELFLINT
  TEST_MULTILIB
+ TEST_SPECFILE (only the 32-bit x86 $RPM_OPT_FLAGS check)
 
 
 +============+
@@ -106,6 +107,9 @@ inspections lack integration tests:
     arch
     subpackages
     pathmigration
+    types
+
+Need unit tests for run_cmd() verifying NULL as the last parameter.
 
 
 +=======+
@@ -158,3 +162,4 @@ These are things I intend to get to over time:
 
     * Parallelize libarchive unpacking of payloads; just fork off
       enough jobs for each package; set a rate limit in rpminspect.conf
+          * Likely complicated by the peer matching code
