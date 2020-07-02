@@ -86,6 +86,8 @@ enum {
     BLOCK_KOJI,
     BLOCK_LTO,
     BLOCK_LTO_SYMBOL_NAME_PREFIXES,
+    BLOCK_FILES,
+    BLOCK_FORBIDDEN_PATHS,
     BLOCK_MANPAGE,
     BLOCK_METADATA,
     BLOCK_OWNERSHIP,
@@ -546,6 +548,10 @@ static int read_cfgfile(struct rpminspect *ri, const char *filename)
                         block = BLOCK_JAVABYTECODE;
                     } else if (!strcmp(key, "pathmigration")) {
                         block = BLOCK_PATHMIGRATION;
+                    } else if (!strcmp(key, "files")) {
+                        group = BLOCK_FILES;
+                    } else if (group == BLOCK_FILES && !strcmp(key, "forbidden_paths")) {
+                        block = BLOCK_FORBIDDEN_PATHS;
                     }
                 }
 
@@ -794,6 +800,8 @@ static int read_cfgfile(struct rpminspect *ri, const char *filename)
                         add_entry(&ri->shells, t);
                     } else if (block == BLOCK_LTO_SYMBOL_NAME_PREFIXES) {
                         add_entry(&ri->lto_symbol_name_prefixes, t);
+                    } else if (block == BLOCK_FORBIDDEN_PATHS) {
+                        add_entry(&ri->forbidden_paths, t);
                     }
                 }
 

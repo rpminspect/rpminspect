@@ -33,6 +33,7 @@ librpminspect_sources = [
     'inspect_dt_needed.c',
     'inspect_elf.c',
     'inspect_emptyrpm.c',
+    'inspect_files.c',
     'inspect_filesize.c',
     'inspect_javabytecode.c',
     'inspect_kmod.c',

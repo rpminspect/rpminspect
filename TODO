@@ -29,9 +29,6 @@ Unranked tests categories to migrate (might also decide to skip them):
  TEST_REQUIRES
  TEST_RPATH
  TEST_SCRIPT
- TEST_SPECFILE
-*   dist tag check from rpmpatches.c (this is 'disttag' in rpminspect)
-*   license check from rpmpatches.c (this is 'license' in rpminspect)
  TEST_STRIP
  TEST_TRIGGERS
  TEST_TYPES
@@ -74,6 +71,7 @@ Test categories that have been migrated:
                  those are caught by 'addedfiles')
 *TEST_SIZE (filesize)
 *TEST_SYMLINK (symlinks)
+*TEST_SPECFILE (disttag, license, and %files)
 
 
 Test categories excluded (see MISSING):

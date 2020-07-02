@@ -351,6 +351,7 @@
 #define SPEC_MACRO_DEFINE "%define"
 #define SPEC_MACRO_GLOBAL "%global"
 #define SPEC_SECTION_CHANGELOG "%changelog"
+#define SPEC_SECTION_FILES "%files"
 #define SPEC_TAG_RELEASE "Release:"
 #define SPEC_DISTTAG "%{?dist}"
 
