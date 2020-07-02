@@ -385,6 +385,9 @@ struct rpminspect {
     /* list of paths to ignore (these strings allow glob(3) syntax) */
     string_list_t *ignores;
 
+    /* list of forbidden path references for %files sections */
+    string_list_t *forbidden_paths;
+
     /* Options specified by the user */
     char *before;              /* before build ID arg given on cmdline */
     char *after;               /* after build ID arg given on cmdline */

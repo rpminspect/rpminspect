@@ -371,6 +371,16 @@ bool inspect_symlinks(struct rpminspect *ri);
  */
 bool inspect_lostpayload(struct rpminspect *ri);
 
+/**
+ * @brief Main driver for the '%files' inspection.
+ *
+ *
+ *
+ * @param ri Pointer to the struct rpminspect for the program.
+ * @return True if the inspection passed, false otherwise.
+ */
+bool inspect_files(struct rpminspect *ri);
+
 /** @} */
 
 /*
@@ -411,6 +421,7 @@ bool inspect_lostpayload(struct rpminspect *ri);
 #define INSPECT_LTO                         (((uint64_t) 1) << 28)
 #define INSPECT_SYMLINKS                    (((uint64_t) 1) << 29)
 #define INSPECT_LOSTPAYLOAD                 (((uint64_t) 1) << 30)
+#define INSPECT_FILES                       (((uint64_t) 1) << 31)
 
 /* Long descriptions for the inspections */
 #define DESC_LICENSE _("Verify the string specified in the License tag of the RPM metadata describes permissible software licenses as defined by the license database. Also checks to see if the License tag contains any unprofessional words as defined in the configuration file.")
@@ -472,5 +483,7 @@ bool inspect_lostpayload(struct rpminspect *ri);
 #define DESC_LTO _("Link Time Optimization (LTO) produces smaller and faster shared ELF executables and libraries.  LTO bytecode is not stable from one release of gcc to the next.  As such, LTO bytecode should not be present in .a and .o ELF objects shipped in packages.  This inspection looks for LTO bytecode in ELF relocatable objects and reports if any is present.")
 
 #define DESC_SYMLINKS _("Symbolic links must be resolvable on the installed system.  This inspection ensures absolute and relative symlinks are valid.  It also checks for any symlink usage that will cause problems for RPM.")
+
+#define DESC_FILES _("Check %files sections in the spec file for any forbidden path references.")
 
 #endif

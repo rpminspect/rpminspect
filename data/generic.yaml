@@ -399,3 +399,11 @@ pathmigration:
     - /sbin: /usr/sbin
     - /lib: /usr/lib
     - /lib64: /usr/lib64
+
+files:
+    # %files sections in spec files.  Some checks are performed on
+    # these sections.  The settings here control those checks.
+    #
+    # Path references that are not permitted in a %files section.
+    forbidden_paths:
+        - /usr/lib
