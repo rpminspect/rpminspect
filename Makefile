@@ -31,7 +31,7 @@ check: setup
 			exit 1 ; \
 		fi ; \
 		env RPMINSPECT=$(topdir)/build/src/rpminspect \
-		    RPMINSPECT_YAML=$(topdir)/data/rpminspect.yaml \
+		    RPMINSPECT_YAML=$(topdir)/data/generic.yaml \
 		    RPMINSPECT_TEST_DATA_PATH=$(topdir)/test/data \
 		python3 -Bm unittest discover -v $(topdir)/test/ $${test_script} ; \
 	fi
