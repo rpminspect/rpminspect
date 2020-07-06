@@ -228,7 +228,7 @@ To prepare a virtual environment for testing simple run:
     . my_test_env/bin/activate
     pip-3 install meson ninja rpm-py-installer rpmfluff setuptools
     export RPMINSPECT=$PWD/build/src/rpminspect
-    export RPMINSPECT_YAML=$PWD/data/rpminspect.yaml
+    export RPMINSPECT_YAML=$PWD/data/generic.yaml
     export RPMINSPECT_TEST_DATA_PATH=$PWD/test/data
 
 To run all tests, execute the command:
