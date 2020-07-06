@@ -103,6 +103,7 @@ vendor:
     #specname: off
     #subpackages: off
     #symlinks: off
+    #types: off
     #upstream: off
     #xml: off
 
