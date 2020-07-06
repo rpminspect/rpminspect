@@ -33,6 +33,11 @@ static bool types_driver(struct rpminspect *ri, rpmfile_entry_t *file)
     assert(ri != NULL);
     assert(file != NULL);
 
+    /* Skip debuginfo and debugsource packages */
+    if (is_debug_or_build_path(file->localpath)) {
+        return true;
+    }
+
     /* Files without a peer have to be ignored */
     if (file->peer_file == NULL) {
         return true;
@@ -49,6 +54,8 @@ static bool types_driver(struct rpminspect *ri, rpmfile_entry_t *file)
     /* Get the MIME types */
     bt = get_mime_type(file->peer_file);
     at = get_mime_type(file);
+
+    DEBUG_PRINT("before_type=|%s|, after_type=|%s| -- %s\n", bt, at, file->localpath);
 
     /* Compare */
     if (strcmp(bt, at)) {
