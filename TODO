@@ -107,7 +107,6 @@ inspections lack integration tests:
     arch
     subpackages
     pathmigration
-    types
 
 Need unit tests for run_cmd() verifying NULL as the last parameter.
 

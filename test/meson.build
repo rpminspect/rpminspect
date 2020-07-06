@@ -122,6 +122,7 @@ if python.found()
         'test_shellsyntax.py',
         'test_specname.py',
         'test_symlinks.py',
+        'test_types.py',
         'test_upstream.py',
         'test_xml.py'
         ]
