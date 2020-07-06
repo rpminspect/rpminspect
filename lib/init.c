@@ -154,6 +154,13 @@ void add_entry(string_list_t **list, const char *s)
         *list = calloc(1, sizeof(*(*list)));
         assert(*list != NULL);
         TAILQ_INIT(*list);
+    } else {
+        /* do not add entry if it exists in the list */
+        TAILQ_FOREACH(entry, *list, items) {
+            if (!strcmp(entry->data, s)) {
+                return;
+            }
+        }
     }
 
     entry = calloc(1, sizeof(*entry));
