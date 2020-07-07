@@ -1,4 +1,4 @@
-name: rpminspect CI on Fedora
+name: CI on Fedora
 
 on:
     push:
@@ -23,5 +23,5 @@ jobs:
               run: meson setup build
             - name: build
               run: ninja -C build
-            - name: check
-              run: meson check -C build
+            - name: test
+              run: meson test -C build -v
