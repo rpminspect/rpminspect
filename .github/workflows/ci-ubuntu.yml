@@ -13,7 +13,7 @@ jobs:
         steps:
             - uses: actions/checkout@v2
             - name: Install Build Dependencies
-              run: sudo apt-get install meson gettext
+              run: sudo apt-get install meson gettext libjson-c-dev libxmlrpc-core-c3-dev librpm-dev libarchive-dev libelf-dev libkmod-dev libcurl4-openssl-dev zlib1g-dev libyaml-dev libssl-dev libcap-dev
             - name: setup
               run: meson setup build
             - name: build
