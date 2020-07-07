@@ -89,6 +89,8 @@ librpminspect = library(
         inspect_elf_bits_dep,
         jsonc,
         xmlrpc,
+        xmlrpc_util,
+        xmlrpc_client,
         libxml,
         rpm,
         libarchive,
