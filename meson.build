@@ -22,9 +22,6 @@ endif
 
 # Dependencies that use pkg-config
 jsonc = dependency('json-c', required : true)
-xmlrpc = dependency('xmlrpc', required : true)
-xmlrpc_util = dependency('xmlrpc_util', required : true)
-xmlrpc_client = dependency('xmlrpc_client', required : true)
 libxml = dependency('libxml-2.0', required : true)
 rpm = dependency('rpm', required : true)
 libarchive = dependency('libarchive', required : true)
@@ -48,6 +45,41 @@ else
 endif
 
 # Other dependencies
+
+# Find the xmlrpc-c libraries
+xmlrpc = dependency('xmlrpc xmlrpc_util')
+
+if not xmlrpc.found()
+    xmlrpc_cmd = find_program('xmlrpc-c-config', required : true)
+    xmlrpc_libs_cmd = run_command(xmlrpc_cmd, '--libs')
+    xmlrpc_cflags_cmd = run_command(xmlrpc_cmd, '--cflags')
+
+    if xmlrpc_libs_cmd.returncode() == 0 and xmlrpc_cflags_cmd.returncode() == 0
+        xmlrpc = declare_dependency(compile_args: xmlrpc_cflags_cmd.stdout().strip().split(),
+                                    link_args: xmlrpc_libs_cmd.stdout().strip(),split())
+    endif
+endif
+
+if not xmlrpc.found()
+    error('*** unable to find libxmlrpc')
+endif
+
+xmlrpc_client = dependency('xmlrpc_client')
+
+if not xmlrpc_client.found()
+    xmlrpc_cmd = find_program('xmlrpc-c-config', required : true)
+    xmlrpc_client_libs_cmd = run_command(xmlrpc_cmd, 'client', '--libs')
+    xmlrpc_client_cflags_cmd = run_command(xmlrpc_cmd, 'client', '--cflags')
+
+    if xmlrpc_client_libs_cmd.returncode() == 0 and xmlrpc_client_cflags_cmd.returncode() == 0
+        xmlrpc = declare_dependency(compile_args: xmlrpc_client_cflags_cmd.stdout().strip().split(),
+                                    link_args: xmlrpc_client_libs_cmd.stdout().strip(),split())
+    endif
+endif
+
+if not xmlrpc_client.found()
+    error('*** unable to find libxmlrpc_client')
+endif
 
 # libmandoc (favor static one over shared one)
 mandoc = cc.find_library('mandoc', required : false, static : true)
