@@ -4,7 +4,6 @@ option('tests',
        description : 'Run the test suite')
 
 option('nls',
-       type : 'feature',
-       value : 'auto',
-       yield : true,
+       type: 'boolean',
+       value: true,
        description : 'Enable native language support (translations)')
