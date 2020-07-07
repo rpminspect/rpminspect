@@ -26,10 +26,11 @@ jobs:
             - name: test
               run: meson test -C build -v
             - name: coverage
-              run: ninja -C build coverage
+              run: |
+                  ninja -C build coverage
+                  coveralls -b build --gcov-options '\-lp'
 
             - name: Coveralls
               uses: coverallsapp/github-action@master
               with:
                   github-token: ${{ secrets.GITHUB_TOKEN }}
-                  path-to-lcov: "./build/meson-logs/coverage.txt"
