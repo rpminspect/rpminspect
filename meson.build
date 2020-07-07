@@ -36,9 +36,8 @@ libcap = dependency('libcap', required : true)
 # Test suite dependencies
 run_tests = get_option('tests')
 if run_tests
-    cunit = dependency('cunit', method : 'pkg-config', required : false)
-    pymod = import('python')
-    python = pymod.find_installation('python3', required: false)
+    cunit = dependency('cunit', method : 'pkg-config', required : true)
+    python = find_program('python3', required : false)
 else
     cunit = disabler()
     python = disabler()
@@ -47,34 +46,28 @@ endif
 # Other dependencies
 
 # Find the xmlrpc-c libraries
-xmlrpc = dependency('xmlrpc xmlrpc_util')
+xmlrpc_cmd = find_program('xmlrpc-c-config', required : true)
+xmlrpc_libs_cmd = run_command(xmlrpc_cmd, '--libs')
+xmlrpc_cflags_cmd = run_command(xmlrpc_cmd, '--cflags')
 
-if not xmlrpc.found()
-    xmlrpc_cmd = find_program('xmlrpc-c-config', required : true)
-    xmlrpc_libs_cmd = run_command(xmlrpc_cmd, '--libs')
-    xmlrpc_cflags_cmd = run_command(xmlrpc_cmd, '--cflags')
-
-    if xmlrpc_libs_cmd.returncode() == 0 and xmlrpc_cflags_cmd.returncode() == 0
-        xmlrpc = declare_dependency(compile_args: xmlrpc_cflags_cmd.stdout().strip().split(),
-                                    link_args: xmlrpc_libs_cmd.stdout().strip(),split())
-    endif
+if xmlrpc_libs_cmd.returncode() == 0 and xmlrpc_cflags_cmd.returncode() == 0
+    xmlrpc = declare_dependency(compile_args: xmlrpc_cflags_cmd.stdout().strip().split(),
+                                link_args: xmlrpc_libs_cmd.stdout().strip().split())
+    message('Declared dependency xmlrpc')
 endif
 
 if not xmlrpc.found()
     error('*** unable to find libxmlrpc')
 endif
 
-xmlrpc_client = dependency('xmlrpc_client')
+xmlrpc_cmd = find_program('xmlrpc-c-config', required : true)
+xmlrpc_client_libs_cmd = run_command(xmlrpc_cmd, 'client', '--libs')
+xmlrpc_client_cflags_cmd = run_command(xmlrpc_cmd, 'client', '--cflags')
 
-if not xmlrpc_client.found()
-    xmlrpc_cmd = find_program('xmlrpc-c-config', required : true)
-    xmlrpc_client_libs_cmd = run_command(xmlrpc_cmd, 'client', '--libs')
-    xmlrpc_client_cflags_cmd = run_command(xmlrpc_cmd, 'client', '--cflags')
-
-    if xmlrpc_client_libs_cmd.returncode() == 0 and xmlrpc_client_cflags_cmd.returncode() == 0
-        xmlrpc = declare_dependency(compile_args: xmlrpc_client_cflags_cmd.stdout().strip().split(),
-                                    link_args: xmlrpc_client_libs_cmd.stdout().strip(),split())
-    endif
+if xmlrpc_client_libs_cmd.returncode() == 0 and xmlrpc_client_cflags_cmd.returncode() == 0
+    xmlrpc_client = declare_dependency(compile_args: xmlrpc_client_cflags_cmd.stdout().strip().split(),
+                                       link_args: xmlrpc_client_libs_cmd.stdout().strip().split())
+    message('Declared dependency xmlrpc_client')
 endif
 
 if not xmlrpc_client.found()
