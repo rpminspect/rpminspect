@@ -12,6 +12,8 @@ jobs:
 
         steps:
             - uses: actions/checkout@v2
+            - name: Install Build Dependencies
+              run: sudo apt-get install meson
             - name: setup
               run: meson setup build
             - name: build
