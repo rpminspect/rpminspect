@@ -1,0 +1,5 @@
+buttons:
+  - title: CI on Fedora
+    action: "ci_fedora"
+    description: Run CI tests on Fedora
+    confirm: true
