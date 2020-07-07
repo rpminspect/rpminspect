@@ -16,7 +16,7 @@ jobs:
               run: |
                   sudo dpkg --add-architecture i386
                   sudo apt-get update
-                  sudo apt-get -y install gcc meson gettext pkg-config libjson-c-dev libxml2-dev libzstd-dev librpm-dev libarchive-dev libelf-dev libkmod-dev libcurl4-openssl-dev libyaml-dev libssl-dev libcap-dev libcunit1-dev ksh rc tcsh zsh valgrind gcovr python3-pip libffi-dev rpm desktop-file-utils sssd python3-rpm gcc-multilib
+                  sudo apt-get -y install gcc meson gettext pkg-config libjson-c-dev libxml2-dev libzstd-dev librpm-dev libarchive-dev libelf-dev libkmod-dev libcurl4-openssl-dev libyaml-dev libssl-dev libcap-dev libcunit1-dev ksh rc tcsh zsh valgrind gcovr python3-setuptools python3-pip libffi-dev rpm desktop-file-utils sssd python3-rpm gcc-multilib
                   sudo apt-get -y install linux-headers-$(uname -r)
                   sudo apt-get -y install libc-dev:i386
                   sudo pip3 install cpp-coveralls rpmfluff PyYAML
