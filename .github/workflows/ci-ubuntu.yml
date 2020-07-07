@@ -14,8 +14,8 @@ jobs:
             - uses: actions/checkout@v2
             - name: Install Build Dependencies
               run: ./.github/ubuntu-pkgs.sh
-	    - name: Build and Install libmandoc
-	      run: ./.github/install-libmandoc.sh
+            - name: Build and Install libmandoc
+              run: ./.github/install-libmandoc.sh
             - name: setup
               run: meson setup build
             - name: build
