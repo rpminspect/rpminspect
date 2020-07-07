@@ -1,4 +1,4 @@
-name: rpminspect CI on Ubuntu
+name: CI on Ubuntu
 
 on:
     push:
@@ -13,12 +13,42 @@ jobs:
         steps:
             - uses: actions/checkout@v2
             - name: Install Build Dependencies
-              run: ./.github/ubuntu-pkgs.sh
-            - name: Build and Install libmandoc
-              run: ./.github/install-libmandoc.sh
+              run: |
+                  sudo dpkg --add-architecture i386
+                  sudo apt-get update
+                  sudo apt-get -y install gcc meson gettext pkg-config libjson-c-dev libxml2-dev libzstd-dev librpm-dev libarchive-dev libelf-dev libkmod-dev libcurl4-openssl-dev libyaml-dev libssl-dev libcap-dev libcunit1-dev ksh rc tcsh zsh valgrind gcovr python3-pip libffi-dev rpm desktop-file-utils sssd python3-rpm gcc-multilib
+                  sudo apt-get -y install linux-headers-$(uname -r)
+                  sudo apt-get -y install libc-dev:i386
+                  sudo pip3 install cpp-coveralls rpmfluff PyYAML
+            - name: Build and Install libmandoc (Ubuntu lacks libmandoc.a and the headers)
+              run: |
+                  curl -O https://mandoc.bsd.lv/snapshots/mandoc.tar.gz
+                  SUBDIR="$(tar -tvf mandoc.tar.gz | head -n 1 | rev | cut -d ' ' -f 1 | rev)"
+                  tar -xvf mandoc.tar.gz
+                  cd ${SUBDIR}
+                  echo 'PREFIX=/usr/local'                     >  configure.local
+                  echo 'BINDIR=/usr/local/bin'                >> configure.local
+                  echo 'SBINDIR=/usr/local/sbin'              >> configure.local
+                  echo 'MANDIR=/usr/local/share/man'          >> configure.local
+                  echo 'INCLUDEDIR=/usr/local/include'        >> configure.local
+                  echo 'LIBDIR=/usr/local/lib'                >> configure.local
+                  echo 'LN="ln -sf"'                          >> configure.local
+                  echo 'MANM_MANCONF=mandoc.conf'             >> configure.local
+                  echo 'INSTALL_PROGRAM="install -D -m 0755"' >> configure.local
+                  echo 'INSTALL_LIB="install -D -m 0755"'     >> configure.local
+                  echo 'INSTALL_HDR="install -D -m 0644"'     >> configure.local
+                  echo 'INSTALL_MAN="install -D -m 0644"'     >> configure.local
+                  echo 'INSTALL_DATA="install -D -m 0644"'    >> configure.local
+                  echo 'INSTALL_LIBMANDOC=1'                  >> configure.local
+                  echo 'CFLAGS="-g -fPIC"'                    >> configure.local
+                  ./configure
+                  make
+                  sudo make lib-install
+                  cd ..
+                  rm -rf mandoc.tar.gz ${SUBDIR}
             - name: setup
               run: meson setup build
             - name: build
-              run: ninja -C build
-            - name: check
-              run: meson check -C build
+              run: ninja -C build -v
+            - name: test
+              run: meson test -C build -v
