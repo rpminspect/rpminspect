@@ -22,7 +22,9 @@ endif
 
 # Dependencies that use pkg-config
 jsonc = dependency('json-c', required : true)
-xmlrpc = dependency('xmlrpc xmlrpc_util xmlrpc_client', version : '>=1.32.5', required : true)
+xmlrpc = dependency('xmlrpc', version : '>=1.32.5', required : true)
+xmlrpc_util = dependency('xmlrpc_util', version : '>=1.32.5', required : true)
+xmlrpc_client = dependency('xmlrpc_client', version : '>=1.32.5', required : true)
 libxml = dependency('libxml-2.0', required : true)
 rpm = dependency('rpm', required : true)
 libarchive = dependency('libarchive', required : true)
