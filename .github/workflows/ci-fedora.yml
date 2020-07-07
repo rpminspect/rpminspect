@@ -20,8 +20,16 @@ jobs:
                   dnf -y install rpm-build valgrind gcovr python3-pip python3-devel libffi-devel make sssd-client
                   pip-3 install cpp-coveralls rpmfluff
             - name: setup
-              run: meson setup build
+              run: meson setup build --werror -Db_coverage=true
             - name: build
-              run: ninja -C build
+              run: ninja -C build -v
             - name: test
               run: meson test -C build -v
+            - name: coverage
+              run: ninja -C build coverage
+
+            - name: Coveralls
+              uses: coverallsapp/github-action@master
+              with:
+                  github-token: ${{ secrets.GITHUB_TOKEN }}
+                  path-to-lcov: "./build/meson-logs/coverage.txt"
