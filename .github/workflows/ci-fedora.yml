@@ -17,7 +17,7 @@ jobs:
               run: |
                   dnf -y install 'dnf-command(builddep)'
                   dnf -y install $(grep Requires: rpminspect.spec.in | awk '{ print $2; }' | grep -v '%' | sort -u)
-                  dnf -y install rpm-build valgrind gcovr python3-pip python3-devel libffi-devel make sssd-client
+                  dnf -y install git rpm-build valgrind gcovr python3-pip python3-devel libffi-devel make sssd-client
                   pip-3 install cpp-coveralls rpmfluff
             - name: setup
               run: meson setup build --werror -Db_coverage=true
