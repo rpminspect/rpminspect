@@ -1,0 +1,27 @@
+name: rpminspect CI on Fedora
+
+on:
+    push:
+        branches: [ master ]
+    pull_request:
+        branches: [ master ]
+
+jobs:
+    build:
+        runs-on: ubuntu-latest
+        container: fedora:latest
+
+        steps:
+            - uses: actions/checkout@v2
+            - name: Install Build Dependencies
+              run: |
+                  dnf -y install 'dnf-command(builddep)'
+                  dnf -y install $(grep Requires: rpminspect.spec.in | awk '{ print $2; }' | grep -v '%' | sort -u)
+                  dnf -y install valgrind gcovr python3-pip python3-devel libffi-devel make sssd-client
+                  pip-3 install cpp-coveralls rpmfluff
+            - name: setup
+              run: meson setup build
+            - name: build
+              run: ninja -C build
+            - name: check
+              run: meson check -C build
