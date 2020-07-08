@@ -22,6 +22,7 @@
 #include <string.h>
 #include <limits.h>
 #include <errno.h>
+#include <err.h>
 #include <archive.h>
 #include <archive_entry.h>
 
@@ -145,8 +146,9 @@ int unpack_archive(const char *archive, const char *dest, const bool force) {
     }
 
     /* change to dest */
-    getcwd(cwd, PATH_MAX);
-    assert(cwd != NULL);
+    if (getcwd(cwd, PATH_MAX) == NULL) {
+        err(RI_PROGRAM_ERROR, "getcwd()");
+    }
 
     if (chdir(dest) != 0) {
         fprintf(stderr, "%s (%d): %s\n", __func__, __LINE__, strerror(errno));

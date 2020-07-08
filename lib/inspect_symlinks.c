@@ -133,8 +133,10 @@ static bool symlinks_driver(struct rpminspect *ri, rpmfile_entry_t *file) {
 
     /* save current directory */
     memset(cwd, '\0', sizeof(cwd));
-    getcwd(cwd, PATH_MAX);
-    assert(cwd != NULL);
+
+    if (getcwd(cwd, PATH_MAX) == NULL) {
+        err(RI_PROGRAM_ERROR, "getcwd()");
+    }
 
     memset(reltarget, '\0', sizeof(reltarget));
 

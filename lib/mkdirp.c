@@ -23,6 +23,7 @@
 #include <string.h>
 #include <assert.h>
 #include <errno.h>
+#include <err.h>
 #include <sys/stat.h>
 #include <sys/types.h>
 #include <unistd.h>
@@ -42,8 +43,7 @@ int mkdirp(char *path, mode_t mode) {
         start = p = strdup(path);
     } else {
         if ((cwd = getcwd(NULL, 0)) == NULL) {
-            fprintf(stderr, _("*** error getting current directory: %s\n"), strerror(errno));
-            fflush(stderr);
+            warn("getcwd()");
             return -1;
         }
 
