@@ -23,6 +23,7 @@
 #include <stdbool.h>
 #include <limits.h>
 #include <errno.h>
+#include <err.h>
 
 #include "rpminspect.h"
 
@@ -57,8 +58,10 @@ bool is_local_build(const char *build) {
     }
 
     memset(cwd, '\0', sizeof(cwd));
-    r = getcwd(cwd, PATH_MAX);
-    assert(r != NULL);
+
+    if (getcwd(cwd, PATH_MAX) == NULL) {
+        err(RI_PROGRAM_ERROR, "getcwd()");
+    }
 
     if (chdir(build) == -1) {
         fprintf(stderr, "%s (%d): %s\n", __func__, __LINE__, strerror(errno));
