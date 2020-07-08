@@ -17,6 +17,12 @@ vendor-specific rpminspect-data package.  The rpminspect-data-generic
 package in this source tree provides a template for constructing the
 vendor-specific data package.
 
+Status
+------
+
+![CI on Fedora](https://github.com/rpminspect/rpminspect/workflows/CI%20on%20Fedora/badge.svg)
+![CI on CentOS 8](https://github.com/rpminspect/rpminspect/workflows/CI%20on%20CentOS%208/badge.svg)
+![CI on Ubuntu](https://github.com/rpminspect/rpminspect/workflows/CI%20on%20Ubuntu/badge.svg)
 
 Build Types Support
 -------------------
