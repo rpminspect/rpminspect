@@ -8,23 +8,40 @@ on:
 
 jobs:
     build:
+        # This job runs in a Docker container of Fedora rawhide but
+        # the host is 'ubuntu-latest' since that's what GitHub Actions
+        # offers that's Linux.
         runs-on: ubuntu-latest
         container: fedora:latest
 
+        # All of these steps run from within the main source
+        # directory, so think of that as your $PWD
         steps:
+            # This means clone the git repo
             - uses: actions/checkout@v2
+
+            # Within the container, install the build dependencies and
+            # test suite dependencies
             - name: Install Build Dependencies
               run: |
                   dnf -y install 'dnf-command(builddep)'
                   dnf -y install $(grep Requires: rpminspect.spec.in | awk '{ print $2; }' | grep -v '%' | sort -u)
                   dnf -y install lcov git rpm-build valgrind gcovr python3-pip python3-devel libffi-devel make sssd-client
                   pip-3 install cpp-coveralls rpmfluff
+
+            # Set up the source tree to build
             - name: setup
               run: meson setup build --werror -Db_buildtype=debug -Db_coverage=true
+
+            # Compile the software
             - name: build
               run: ninja -C build -v
+
+            # Run the test suite
             - name: test
               run: meson test -C build -v
+
+            # Generate code coverage reports (requires
+            # -Db_coverage=true on 'meson setup')
             - name: coverage
-              run: |
-                  ninja -C build coverage
+              run: ninja -C build coverage
