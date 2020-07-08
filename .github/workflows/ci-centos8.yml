@@ -22,7 +22,7 @@ jobs:
 
             # CentOS does not provide everything we need, enable EPEL
             - name: Add EPEL
-              run: sudo dnf -y install epel-release
+              run: dnf -y install epel-release
 
             # Within the container, install the build dependencies and
             # test suite dependencies
