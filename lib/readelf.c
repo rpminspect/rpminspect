@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2019  Red Hat, Inc.
+ * Copyright (C) 2019-2020  Red Hat, Inc.
  * Author(s):  David Cantrell <dcantrell@redhat.com>
  *             David Shea <dshea@redhat.com>
  *
@@ -298,7 +298,7 @@ bool get_dynamic_tags(Elf *elf, const Elf64_Sxword tag, GElf_Dyn **out, size_t *
     while ((data = elf_getdata(dyn_section, data)) != NULL) {
         entry_size = gelf_fsize(elf, data->d_type, 1, EV_CURRENT);
 
-        for (i = 0; i < shdr.sh_size / entry_size; i++) {
+        for (i = 0; i < (shdr.sh_size / entry_size); i++) {
             if (gelf_getdyn(data, i, &dyn) == NULL) {
                 continue;
             }
@@ -320,11 +320,52 @@ bool get_dynamic_tags(Elf *elf, const Elf64_Sxword tag, GElf_Dyn **out, size_t *
                 memcpy(dyn_tmp + *out_size, &dyn, sizeof(GElf_Dyn));
                 *out = dyn_tmp;
                 (*out_size)++;
-           }
+            }
         }
     }
 
     return found;
+}
+
+/**
+ * Check for the specified DT_FLAG flag in d_val for the Elf object.
+ *
+ * @param elf The ELF object to check
+ * @param flag The flag value to look for
+ * @return True if DT_FLAGS contains the flag, false otherwise.
+ */
+bool have_dynamic_flag(Elf *elf, const Elf64_Sxword flag)
+{
+    Elf_Scn *dyn_section;
+    GElf_Shdr shdr;
+    Elf_Data *data = NULL;
+    GElf_Dyn dyn;
+    size_t entry_size;
+    size_t i;
+
+    assert(elf != NULL);
+
+    dyn_section = get_elf_section(elf, SHT_DYNAMIC, ".dynamic", NULL, &shdr);
+
+    if (dyn_section == NULL) {
+        return false;
+    }
+
+    while ((data = elf_getdata(dyn_section, data)) != NULL) {
+        entry_size = gelf_fsize(elf, data->d_type, 1, EV_CURRENT);
+
+        for (i = 0; i < (shdr.sh_size / entry_size); i++) {
+            if (gelf_getdyn(data, i, &dyn) == NULL) {
+                continue;
+            }
+
+            if (dyn.d_tag == DT_FLAGS && (dyn.d_un.d_val & flag)) {
+                return true;
+            }
+        }
+    }
+
+    return false;
 }
 
 /* For the given SHT_SYMTAB section, look for a corresponding SHT_SYMTAB_SHNDX section */
@@ -429,7 +470,7 @@ static string_list_t * get_elf_symbol_list(Elf *elf, bool (*filter)(const char *
     string_list_t *list;
     string_entry_t *entry;
 
-    list = malloc(sizeof(*list));
+    list = calloc(1, sizeof(*list));
     assert(list != NULL);
     TAILQ_INIT(list);
 

@@ -140,7 +140,7 @@ class FulltoPartialRELROCompareRPMs(TestCompareRPMs):
     def setUp(self):
         TestCompareRPMs.setUp(self)
         self.before_rpm.add_simple_compilation(compileFlags='-Wl,-z,relro,-z,now')
-        self.after_rpm.add_simple_compilation(compileFlags='-Wl,-z,relro')
+        self.after_rpm.add_simple_compilation(compileFlags='-Wl,-z,relro,-z,lazy')
         self.inspection = 'elf'
         self.label = 'elf-object-properties'
         self.waiver_auth = 'Security'
@@ -150,7 +150,7 @@ class FulltoPartialRELROCompareKoji(TestCompareKoji):
     def setUp(self):
         TestCompareKoji.setUp(self)
         self.before_rpm.add_simple_compilation(compileFlags='-Wl,-z,relro,-z,now')
-        self.after_rpm.add_simple_compilation(compileFlags='-Wl,-z,relro')
+        self.after_rpm.add_simple_compilation(compileFlags='-Wl,-z,relro,-z,lazy')
         self.inspection = 'elf'
         self.label = 'elf-object-properties'
         self.waiver_auth = 'Security'
@@ -163,9 +163,9 @@ class LostFortifySourceCompareRPMs(TestCompareRPMs):
 
         # Enabling FORTIFY_SOURCE requires -O1 or higher
         self.before_rpm.add_simple_compilation(sourceContent=fortify_src,
-                                               compileFlags='-O2 -D_FORTIFY_SOURCE')
+                                               compileFlags='-fno-stack-protector -O2 -D_FORTIFY_SOURCE')
         self.after_rpm.add_simple_compilation(sourceContent=fortify_src,
-                                              compileFlags='-O2')
+                                              compileFlags='-fno-stack-protector -O2 -D_FORTIFY_SOURCE=0')
         self.inspection = 'elf'
         self.label = 'elf-object-properties'
         self.waiver_auth = 'Security'
@@ -177,9 +177,9 @@ class LostFortifySourceCompareKoji(TestCompareKoji):
 
         # Enabling FORTIFY_SOURCE requires -O1 or higher
         self.before_rpm.add_simple_compilation(sourceContent=fortify_src,
-                                               compileFlags='-O2 -D_FORTIFY_SOURCE')
+                                               compileFlags='-fno-stack-protector -O2 -D_FORTIFY_SOURCE')
         self.after_rpm.add_simple_compilation(sourceContent=fortify_src,
-                                              compileFlags='-O2')
+                                              compileFlags='-fno-stack-protector -O2 -D_FORTIFY_SOURCE=0')
         self.inspection = 'elf'
         self.label = 'elf-object-properties'
         self.waiver_auth = 'Security'
@@ -292,7 +292,7 @@ class HasTEXTRELRPMs(TestRPMs):
 
         # Can't use rpmfluff here because it always adds -fPIC
         self.rpm.add_source(rpmfluff.SourceFile('simple.c', rpmfluff.simple_library_source))
-        self.rpm.section_build += 'gcc -m32 -shared -Wl,-z,noexecstack -o libsimple.so simple.c\n'
+        self.rpm.section_build += 'gcc -m32 -fno-pic -shared -Wl,-z,noexecstack -o libsimple.so simple.c\n'
         self.rpm.create_parent_dirs(installPath)
         self.rpm.section_install += 'cp libsimple.so $RPM_BUILD_ROOT/%s\n' % installPath
         sub = self.rpm.get_subpackage(None)
@@ -320,7 +320,7 @@ class HasTEXTRELCompareRPMs(TestCompareRPMs):
         self.before_rpm.add_payload_check(installPath, None)
 
         self.after_rpm.add_source(rpmfluff.SourceFile('simple.c', rpmfluff.simple_library_source))
-        self.after_rpm.section_build += 'gcc -m32 -shared -Wl,-z,noexecstack -o libsimple.so simple.c\n'
+        self.after_rpm.section_build += 'gcc -m32 -fno-pic -shared -Wl,-z,noexecstack -o libsimple.so simple.c\n'
         self.after_rpm.create_parent_dirs(installPath)
         self.after_rpm.section_install += 'cp libsimple.so $RPM_BUILD_ROOT/%s\n' % installPath
         sub = self.after_rpm.get_subpackage(None)
@@ -348,7 +348,7 @@ class HasTEXTRELCompareKoji(TestCompareKoji):
         self.before_rpm.add_payload_check(installPath, None)
 
         self.after_rpm.add_source(rpmfluff.SourceFile('simple.c', rpmfluff.simple_library_source))
-        self.after_rpm.section_build += 'gcc -m32 -shared -Wl,-z,noexecstack -o libsimple.so simple.c\n'
+        self.after_rpm.section_build += 'gcc -m32 -fno-pic -shared -Wl,-z,noexecstack -o libsimple.so simple.c\n'
         self.after_rpm.create_parent_dirs(installPath)
         self.after_rpm.section_install += 'cp libsimple.so $RPM_BUILD_ROOT/%s\n' % installPath
         sub = self.after_rpm.get_subpackage(None)
