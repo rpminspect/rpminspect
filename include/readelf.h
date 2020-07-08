@@ -47,6 +47,7 @@ GElf_Phdr *get_elf_phdr(Elf *, Elf64_Word, GElf_Phdr *);
 char *get_elf_soname(const char *);
 
 bool have_dynamic_tag(Elf *, const Elf64_Sxword);
+bool have_dynamic_flag(Elf *elf, const Elf64_Sxword flag);
 bool get_dynamic_tags(Elf *, const Elf64_Sxword, GElf_Dyn **, size_t *, GElf_Shdr *);
 
 string_list_t *get_elf_imported_functions(Elf *, bool (*)(const char *));

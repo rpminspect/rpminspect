@@ -102,8 +102,9 @@ void init_elf_data(void)
         return;
     }
 
-    /* Get a list of all fortified symbols exported by glibc */
-    libc_fortified = get_elf_exported_functions(libc_elf, is_fortified);
+    /* Get a list of all fortified symbols in glibc */
+    /* Use .dynsym because libc on some platforms may be stripped of .symtab */
+    libc_fortified = get_elf_imported_functions(libc_elf, is_fortified);
 
     if (libc_fortified == NULL) {
         elf_end(libc_elf);
@@ -311,7 +312,7 @@ bool is_stack_executable(Elf *elf, uint64_t flags)
  */
 bool has_textrel(Elf *elf)
 {
-    return have_dynamic_tag(elf, DT_TEXTREL);
+    return have_dynamic_tag(elf, DT_TEXTREL) || have_dynamic_flag(elf, DF_TEXTREL);
 }
 
 /**
@@ -332,7 +333,7 @@ bool has_relro(Elf *elf)
  */
 bool has_bind_now(Elf *elf)
 {
-    return have_dynamic_tag(elf, DT_BIND_NOW);
+    return have_dynamic_tag(elf, DT_BIND_NOW) || have_dynamic_flag(elf, DF_BIND_NOW);
 }
 
 static bool is_fortified(const char *symbol)
