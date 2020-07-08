@@ -8,10 +8,17 @@ on:
 
 jobs:
     build:
+        # This job runs directly on the Ubuntu host provided by GitHub Actions
         runs-on: ubuntu-latest
 
+        # All of these steps run from within the main source
+        # directory, so think of that as your $PWD
         steps:
+            # This means clone the git repo
             - uses: actions/checkout@v2
+
+            # Within the container, install the build dependencies and
+            # test suite dependencies
             - name: Install Build Dependencies
               run: |
                   sudo dpkg --add-architecture i386
@@ -20,6 +27,9 @@ jobs:
                   sudo apt-get -y install linux-headers-$(uname -r)
                   sudo apt-get -y install libc-dev:i386
                   sudo pip3 install cpp-coveralls rpmfluff PyYAML
+
+            # The mandoc package on Ubuntu lacks libmandoc.a and
+            # header files, which we need to build rpminspect
             - name: Build and Install libmandoc (Ubuntu lacks libmandoc.a and the headers)
               run: |
                   curl -O https://mandoc.bsd.lv/snapshots/mandoc.tar.gz
@@ -46,9 +56,20 @@ jobs:
                   sudo make lib-install
                   cd ..
                   rm -rf mandoc.tar.gz ${SUBDIR}
+
+            # Set up the source tree to build
             - name: setup
-              run: meson setup build
+              run: meson setup build --werror -Db_buildtype=debug -Db_coverage=true
+
+            # Compile the software
             - name: build
               run: ninja -C build -v
+
+            # Run the test suite
             - name: test
               run: meson test -C build -v
+
+            # Generate code coverage reports (requires
+            # -Db_coverage=true on 'meson setup')
+            - name: coverage
+              run: ninja -C build coverage
