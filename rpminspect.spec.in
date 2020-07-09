@@ -40,25 +40,6 @@ BuildRequires:  libmandoc-devel >= 1.14.5
 BuildRequires:  libmandoc-devel
 %endif
 
-# The test suite requires additional packages, but they are not used
-# in the package building systems.  They are noted here for reference
-# by the Makefile and other developers.
-#
-# NOTE: Some test suite dependencies are not available as RPMs, but
-# are installed via pip or some other method from the files listed in
-# .github/workflows/.
-#BuildRequires: glibc.i686
-#BuildRequires: glibc-devel.i686
-#BuildRequires: CUnit
-#BuildRequires: CUnit-devel
-#BuildRequires: kernel-devel
-#BuildRequires: libgcc.i686
-#BuildRequires: python3-rpm
-#%if 0%{?rhel} >= 8 || 0%{?epel} >= 8 || 0%{?fedora} >= 31
-#BuildRequires: kernel-core
-#BuildRequires: python3-pyyaml
-#%endif
-
 %description
 Build deviation and compliance tool.  This program runs a number of tests
 against one or two builds of source RPM files.  The built artifacts are
