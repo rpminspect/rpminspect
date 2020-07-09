@@ -19,7 +19,7 @@ libxml2-dev
 libxmlrpc-core-c3-dev
 libyaml-dev
 libzstd-dev
-linux-headers-`uname -r`
+linux-headers-$(shell uname -r)
 meson
 pkg-config
 python3-pip
