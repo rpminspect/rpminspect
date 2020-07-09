@@ -10,6 +10,41 @@ ifeq ($(NINJA),)
 NINJA := $(error "Unable to find a suitable `ninja' command in the PATH")
 endif
 
+# Additional packages required to run the test suite, varies by OS
+OS = $(shell $(TOPDIR)/scripts/determine-os.sh)
+PKG_CMD = $(error "*** unable to determine host operating system")
+REQS = $(shell grep -iE "(Requires|Suggests):" rpminspect.spec.in | grep -v rpminspect | awk '{ print $$2; }' ORS=' ')
+
+ifeq ($(OS),fedora)
+PKG_CMD = dnf install -y
+PIP_CMD = pip-3 install
+REQS += glibc.i686 glibc-devel.i686 CUnit CUnit-devel kernel-devel \
+        libgcc.i686 git rpm-build valgrind libffi-devel make \
+        sssd-client python3-pip python3-devel python3-rpm \
+        kernel-core python3-pyyaml gcovr
+PIP_REQS = cpp-coveralls rpmfluff
+endif
+
+ifeq ($(OS),centos8)
+PKG_CMD = dnf --enablerepo=PowerTools install -y
+PIP_CMD = pip-3 install -I
+REQS += glibc.i686 glibc-devel.i686 CUnit CUnit-devel kernel-devel \
+        libgcc.i686 git rpm-build valgrind libffi-devel make \
+        sssd-client python3-pip python3-devel python3-rpm \
+        kernel-core python3-pyyaml
+PIP_REQS = cpp-coveralls rpmfluff gcovr PyYAML
+endif
+
+ifeq ($(OS),centos7)
+PKG_CMD = yum install -y
+PIP_CMD = pip-3 install
+REQS += glibc.i686 glibc-devel.i686 CUnit CUnit-devel kernel-devel \
+        libgcc.i686 git rpm-build valgrind libffi-devel make \
+        sssd-client python36-pip python36-devel python36-rpm \
+        kernel-core
+PIP_REQS = cpp-coveralls rpmfluff gcovr PyYAML
+endif
+
 # Take additional command line argument as a positional parameter for
 # the Makefile target
 TARGET_ARG = `arg="$(filter-out $@,$(MAKECMDGOALS))" && echo $${arg:-${1}}`
@@ -60,7 +95,8 @@ clean:
 	-rm -rf $(MESON_BUILD_DIR)
 
 instreqs:
-	yum install -y $(shell grep -iE "(Requires|Suggests):" rpminspect.spec.in | grep -v rpminspect | awk '{ print $$2; }' ORS=' ') 
+	$(PKG_CMD) $(REQS)
+	$(PIP_CMD) $(PIP_REQS)
 
 help:
 	@echo "rpminspect helper Makefile"

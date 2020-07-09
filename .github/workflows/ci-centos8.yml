@@ -27,11 +27,7 @@ jobs:
             # Within the container, install the build dependencies and
             # test suite dependencies
             - name: Install Build Dependencies
-              run: |
-                  dnf -y install 'dnf-command(builddep)'
-                  dnf --enablerepo=PowerTools -y install $(grep Requires: rpminspect.spec.in | awk '{ print $2; }' | grep -v '%' | sort -u)
-                  dnf --enablerepo=PowerTools -y install git rpm-build valgrind python3-pip python3-devel libffi-devel make sssd-client
-                  pip-3 install -I cpp-coveralls rpmfluff gcovr PyYAML
+              run: make instreqs
 
             # Set up the source tree to build
             - name: setup
