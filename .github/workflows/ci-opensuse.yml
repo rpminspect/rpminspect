@@ -8,11 +8,11 @@ on:
 
 jobs:
     build:
-        # This job runs in a Docker container of OpenSUSE but the host
-        # is 'ubuntu-latest' since that's what GitHub Actions offers
-        # that's Linux.
+        # This job runs in a Docker container of OpenSUSE Leap but the
+        # host is 'ubuntu-latest' since that's what GitHub Actions
+        # offers that's Linux.
         runs-on: ubuntu-latest
-        container: opensuse:latest
+        container: opensuse/leap:latest
 
         # All of these steps run from within the main source
         # directory, so think of that as your $PWD
