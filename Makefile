@@ -11,12 +11,8 @@ NINJA = $(error "*** unable to find a suitable `ninja' command in the PATH")
 endif
 
 # Additional packages required to run the test suite, varies by OS
-OS := $(shell $(topdir)/utils/determine-os.sh)
+OS = $(shell $(topdir)/utils/determine-os.sh)
 PKG_CMD = $(error "*** unable to determine host operating system")
-REQS = $(shell grep -iE "(Requires|Suggests):" rpminspect.spec.in | grep -v rpminspect | awk '{ print $$2; }' ORS=' ')
-
-REQS += $(shell awk 'NF' $(topdir)/osdep/$(OS)/reqs.txt 2>/dev/null | grep -v '^#')
-PIP_REQS = $(shell awk 'NF' $(topdir)/osdep/$(OS)/pip.txt 2>/dev/null | grep -v '^#')
 
 ifeq ($(OS),fedora)
 PKG_CMD = dnf install -y
@@ -92,8 +88,8 @@ ifeq ($(OS),ubuntu)
 	dpkg --add-architecture i386
 	apt-get update
 endif
-	$(PKG_CMD) $(REQS)
-	$(PIP_CMD) $(PIP_REQS)
+	$(PKG_CMD) $$(grep -v ^# $(topdir)/osdep/$(OS)/reqs.txt 2>/dev/null | awk 'NF' ORS=' ')
+	$(PIP_CMD) $$(grep -v ^# $(topdir)/osdep/$(OS)/pip.txt 2>/dev/null | awk 'NF' ORS=' ')
 
 help:
 	@echo "rpminspect helper Makefile"
