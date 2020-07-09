@@ -22,12 +22,14 @@ jobs:
 
             # CentOS does not provide everything we need, enable EPEL
             - name: Add EPEL
-              run: dnf -y install epel-release
+              run: dnf install -y epel-release
 
             # Within the container, install the build dependencies and
             # test suite dependencies
             - name: Install Build Dependencies
-              run: make instreqs
+              run: |
+                  dnf install -y make
+                  make instreqs
 
             # Set up the source tree to build
             - name: setup
