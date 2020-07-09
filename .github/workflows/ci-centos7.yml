@@ -31,7 +31,7 @@ jobs:
                   rpm --import /etc/pki/rpm-gpg/*
                   yum install -y $(grep Requires: rpminspect.spec.in | awk '{ print $2; }' | grep -v '%' | sort -u)
                   yum install -y git rpm-build valgrind python3-pip python3-devel libffi-devel make sssd-client
-                  pip-3 install -I cpp-coveralls rpmfluff gcovr PyYAML
+                  pip-3 install cpp-coveralls rpmfluff gcovr PyYAML
 
             # Set up the source tree to build
             - name: setup
