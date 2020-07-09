@@ -15,8 +15,8 @@ OS = $(shell $(topdir)/utils/determine-os.sh)
 PKG_CMD = $(error "*** unable to determine host operating system")
 REQS = $(shell grep -iE "(Requires|Suggests):" rpminspect.spec.in | grep -v rpminspect | awk '{ print $$2; }' ORS=' ')
 
-REQS += $(shell grep -v '^$$' $(topdir)/osdep/$(OS)/reqs.txt 2>/dev/null | grep -v '^#')
-PIP_REQS = $(shell grep -v '^$$' $(topdir)/osdep/$(OS)/pip.txt 2>/dev/null | grep -v '^#')
+REQS += $(shell grep -v '^$' $(topdir)/osdep/$(OS)/reqs.txt 2>/dev/null | grep -v '^#')
+PIP_REQS = $(shell grep -v '^$' $(topdir)/osdep/$(OS)/pip.txt 2>/dev/null | grep -v '^#')
 
 ifeq ($(OS),fedora)
 PKG_CMD = dnf install -y
