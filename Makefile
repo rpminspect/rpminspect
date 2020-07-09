@@ -14,25 +14,7 @@ endif
 OS = $(shell $(topdir)/utils/determine-os.sh)
 PKG_CMD = $(error "*** unable to determine host operating system")
 
-ifeq ($(OS),fedora)
-PKG_CMD = dnf install -y
-PIP_CMD = pip-3 install
-endif
-
-ifeq ($(OS),centos8)
-PKG_CMD = dnf --enablerepo=PowerTools install -y
-PIP_CMD = pip-3 install -I
-endif
-
-ifeq ($(OS),centos7)
-PKG_CMD = yum install -y
-PIP_CMD = pip-3 install
-endif
-
-ifeq ($(OS),ubuntu)
-PKG_CMD = apt-get -y install
-PIP_CMD = pip3 install -I
-endif
+-include $(topdir)/osdep/$(OS)/defs.mk
 
 # Take additional command line argument as a positional parameter for
 # the Makefile target
@@ -84,12 +66,14 @@ clean:
 	-rm -rf $(MESON_BUILD_DIR)
 
 instreqs:
-ifeq ($(OS),ubuntu)
-	dpkg --add-architecture i386
-	apt-get update
-endif
+	if [ -x $(topdir)/osdep/$(OS)/pre.sh ]; then \
+		$(topdir)/osdep/$(OS)/pre.sh ; \
+	fi
 	$(PKG_CMD) $$(grep -v ^# $(topdir)/osdep/$(OS)/reqs.txt 2>/dev/null | awk 'NF' ORS=' ')
 	$(PIP_CMD) $$(grep -v ^# $(topdir)/osdep/$(OS)/pip.txt 2>/dev/null | awk 'NF' ORS=' ')
+	if [ -x $(topdir)/osdep/$(OS)/post.sh ]; then \
+		$(topdir)/osdep/$(OS)/post.sh ; \
+	fi
 
 help:
 	@echo "rpminspect helper Makefile"
