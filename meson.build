@@ -75,12 +75,18 @@ if not xmlrpc_client.found()
 endif
 
 # libmandoc (favor static one over shared one)
-mandoc = cc.find_library('mandoc', required : false, static : true)
+mandoc = cc.find_library('mandoc',
+                         dirs : [ '/usr/lib', '/usr/lib64', '/usr/local/lib' ],
+                         required : false,
+                         static : true)
 
 if mandoc.found()
     message('found static libmandoc')
 else
-    mandoc = cc.find_library('mandoc', required : false, static : false)
+    mandoc = cc.find_library('mandoc',
+                             dirs : [ '/usr/lib', '/usr/lib64', '/usr/local/lib' ],
+                             required : false,
+                             static : true)
 
     if mandoc.found()
         message('found shared libmandoc')

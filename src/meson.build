@@ -11,6 +11,7 @@ rpminspect_prog = executable(
         libcurl,
         yaml,
         rpm,
+        libkmod,
     ]
 )
 
