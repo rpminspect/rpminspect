@@ -29,6 +29,7 @@ jobs:
             - name: Install Build Dependencies
               run: |
                   rpm --import /etc/pki/rpm-gpg/*
+                  yum install -y make
                   make instreqs
 
             # Set up the source tree to build
