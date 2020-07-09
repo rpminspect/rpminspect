@@ -15,46 +15,27 @@ OS = $(shell $(topdir)/utils/determine-os.sh)
 PKG_CMD = $(error "*** unable to determine host operating system")
 REQS = $(shell grep -iE "(Requires|Suggests):" rpminspect.spec.in | grep -v rpminspect | awk '{ print $$2; }' ORS=' ')
 
+REQS += $(shell grep -v '^$$' $(topdir)/osdep/$(OS)/reqs.txt 2>/dev/null | grep -v '^#')
+PIP_REQS = $(shell grep -v '^$$' $(topdir)/osdep/$(OS)/pip.txt 2>/dev/null | grep -v '^#')
+
 ifeq ($(OS),fedora)
 PKG_CMD = dnf install -y
 PIP_CMD = pip-3 install
-REQS += glibc.i686 glibc-devel.i686 CUnit CUnit-devel kernel-devel \
-        libgcc.i686 git rpm-build valgrind libffi-devel make \
-        sssd-client python3-pip python3-devel python3-rpm \
-        kernel-core python3-pyyaml gcovr
-PIP_REQS = cpp-coveralls rpmfluff
 endif
 
 ifeq ($(OS),centos8)
 PKG_CMD = dnf --enablerepo=PowerTools install -y
 PIP_CMD = pip-3 install -I
-REQS += glibc.i686 glibc-devel.i686 CUnit CUnit-devel kernel-devel \
-        libgcc.i686 git rpm-build valgrind libffi-devel make \
-        sssd-client python3-pip python3-devel python3-rpm \
-        kernel-core python3-pyyaml
-PIP_REQS = cpp-coveralls rpmfluff gcovr PyYAML
 endif
 
 ifeq ($(OS),centos7)
 PKG_CMD = yum install -y
 PIP_CMD = pip-3 install
-REQS += glibc.i686 glibc-devel.i686 CUnit CUnit-devel kernel-devel \
-        libgcc.i686 git rpm-build valgrind libffi-devel make \
-        sssd-client python36-pip python36-devel python36-rpm \
-        kernel-core
-PIP_REQS = cpp-coveralls rpmfluff gcovr PyYAML
 endif
 
 ifeq ($(OS),ubuntu)
 PKG_CMD = apt-get -y install
 PIP_CMD = pip3 install -I
-REQS = gcc meson gettext pkg-config libjson-c-dev libxml2-dev libzstd-dev \
-       librpm-dev libarchive-dev libelf-dev libkmod-dev libcurl4-openssl-dev \
-       libyaml-dev libssl-dev libcap-dev libxmlrpc-core-c3-dev libcunit1-dev \
-       ksh rc tcsh zsh valgrind gcovr python3-setuptools python3-pip \
-       libffi-dev rpm desktop-file-utils sssd python3-rpm gcc-multilib \
-       linux-headers libc-dev:i386
-PIP_REQS = cpp-coveralls rpmfluff PyYAML
 endif
 
 # Take additional command line argument as a positional parameter for

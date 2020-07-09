@@ -1,0 +1,18 @@
+# NOTE: This list already contains the BuildRequires from the spec file.
+
+glibc.i686
+glibc-devel.i686
+CUnit
+CUnit-devel
+kernel-devel
+libgcc.i686
+git
+rpm-build
+valgrind
+libffi-devel
+make
+sssd-client
+python36-pip
+python36-devel
+python36-rpm
+kernel-core
