@@ -10,7 +10,7 @@ if cunit.found()
         ['lib/test-badwords.c',
          'lib/test-main.c'],
         include_directories : inc,
-        dependencies : [ cunit ],
+        dependencies : [ cunit, libkmod ],
         c_args : '-D_BUILDDIR_="@0@"'.format(meson.current_build_dir()),
         link_with : [ librpminspect ],
     )
@@ -20,7 +20,7 @@ if cunit.found()
         ['lib/test-koji.c',
          'lib/test-main.c'],
         include_directories : inc,
-        dependencies : [ cunit ],
+        dependencies : [ cunit, libkmod ],
         c_args : '-D_BUILDDIR_="@0@"'.format(meson.current_build_dir()),
         link_with : [ librpminspect ],
     )
@@ -30,7 +30,7 @@ if cunit.found()
         ['lib/test-tty.c',
          'lib/test-main.c'],
         include_directories : inc,
-        dependencies : [ cunit ],
+        dependencies : [ cunit, libkmod ],
         c_args : '-D_BUILDDIR_="@0@"'.format(meson.current_build_dir()),
         link_with : [ librpminspect ],
     )
@@ -40,7 +40,7 @@ if cunit.found()
         ['lib/test-strfuncs.c',
          'lib/test-main.c'],
         include_directories : inc,
-        dependencies : [ cunit ],
+        dependencies : [ cunit, libkmod ],
         c_args : '-D_BUILDDIR_="@0@"'.format(meson.current_build_dir()),
         link_with : [ librpminspect ],
     )
@@ -50,7 +50,7 @@ if cunit.found()
         ['lib/test-init.c',
          'lib/test-main.c'],
         include_directories : inc,
-        dependencies : [ cunit ],
+        dependencies : [ cunit, libkmod ],
         c_args : '-D_BUILDDIR_="@0@"'.format(meson.current_build_dir()),
         link_with : [ librpminspect ],
     )
@@ -63,6 +63,7 @@ if cunit.found()
         dependencies : [
             cunit,
             libelf,
+            libkmod,
         ],
         c_args : '-D_BUILDDIR_="@0@"'.format(meson.current_build_dir()),
         link_with : [ librpminspect ],
