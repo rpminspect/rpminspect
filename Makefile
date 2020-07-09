@@ -11,7 +11,7 @@ NINJA = $(error "*** unable to find a suitable `ninja' command in the PATH")
 endif
 
 # Additional packages required to run the test suite, varies by OS
-OS = $(shell $(TOPDIR)/scripts/determine-os.sh)
+OS = $(shell $(TOPDIR)/utils/determine-os.sh)
 PKG_CMD = $(error "*** unable to determine host operating system")
 REQS = $(shell grep -iE "(Requires|Suggests):" rpminspect.spec.in | grep -v rpminspect | awk '{ print $$2; }' ORS=' ')
 
