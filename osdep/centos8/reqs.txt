@@ -16,7 +16,6 @@ glibc-devel
 glibc-devel.i686
 glibc.i686
 gzip
-html401-dtds
 json-c-devel
 kernel-core
 kernel-devel
