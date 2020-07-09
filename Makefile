@@ -7,7 +7,7 @@ ifeq ($(NINJA),)
 NINJA := $(shell which ninja-build 2>/dev/null)
 endif
 ifeq ($(NINJA),)
-NINJA := $(error "Unable to find a suitable `ninja' command in the PATH")
+NINJA = $(error "*** unable to find a suitable `ninja' command in the PATH")
 endif
 
 # Additional packages required to run the test suite, varies by OS
@@ -43,6 +43,18 @@ REQS += glibc.i686 glibc-devel.i686 CUnit CUnit-devel kernel-devel \
         sssd-client python36-pip python36-devel python36-rpm \
         kernel-core
 PIP_REQS = cpp-coveralls rpmfluff gcovr PyYAML
+endif
+
+ifeq ($(OS),ubuntu)
+PKG_CMD = apt-get -y install
+PIP_CMD = pip3 install -I
+REQS = gcc meson gettext pkg-config libjson-c-dev libxml2-dev libzstd-dev \
+       librpm-dev libarchive-dev libelf-dev libkmod-dev libcurl4-openssl-dev \
+       libyaml-dev libssl-dev libcap-dev libxmlrpc-core-c3-dev libcunit1-dev \
+       ksh rc tcsh zsh valgrind gcovr python3-setuptools python3-pip \
+       libffi-dev rpm desktop-file-utils sssd python3-rpm gcc-multilib \
+       linux-headers libc-dev:i386
+PIP_REQS = cpp-coveralls rpmfluff PyYAML
 endif
 
 # Take additional command line argument as a positional parameter for
@@ -95,6 +107,10 @@ clean:
 	-rm -rf $(MESON_BUILD_DIR)
 
 instreqs:
+ifeq ($(OS),ubuntu)
+	dpkg --add-architecture i386
+	apt-get update
+endif
 	$(PKG_CMD) $(REQS)
 	$(PIP_CMD) $(PIP_REQS)
 

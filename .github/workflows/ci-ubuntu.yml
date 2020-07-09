@@ -20,13 +20,7 @@ jobs:
             # Within the container, install the build dependencies and
             # test suite dependencies
             - name: Install Build Dependencies
-              run: |
-                  sudo dpkg --add-architecture i386
-                  sudo apt-get update
-                  sudo apt-get -y install gcc meson gettext pkg-config libjson-c-dev libxml2-dev libzstd-dev librpm-dev libarchive-dev libelf-dev libkmod-dev libcurl4-openssl-dev libyaml-dev libssl-dev libcap-dev libxmlrpc-core-c3-dev libcunit1-dev ksh rc tcsh zsh valgrind gcovr python3-setuptools python3-pip libffi-dev rpm desktop-file-utils sssd python3-rpm gcc-multilib
-                  sudo apt-get -y install linux-headers-$(uname -r)
-                  sudo apt-get -y install libc-dev:i386
-                  sudo pip3 install -I cpp-coveralls rpmfluff PyYAML
+              run: sudo make instreqs
 
             # The mandoc package on Ubuntu lacks libmandoc.a and
             # header files, which we need to build rpminspect
@@ -36,7 +30,7 @@ jobs:
                   SUBDIR="$(tar -tvf mandoc.tar.gz | head -n 1 | rev | cut -d ' ' -f 1 | rev)"
                   tar -xvf mandoc.tar.gz
                   cd ${SUBDIR}
-                  echo 'PREFIX=/usr/local'                     >  configure.local
+                  echo 'PREFIX=/usr/local'                     > configure.local
                   echo 'BINDIR=/usr/local/bin'                >> configure.local
                   echo 'SBINDIR=/usr/local/sbin'              >> configure.local
                   echo 'MANDIR=/usr/local/share/man'          >> configure.local
