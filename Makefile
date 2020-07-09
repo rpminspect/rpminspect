@@ -14,7 +14,7 @@ endif
 OS = $(shell $(topdir)/utils/determine-os.sh)
 PKG_CMD = $(error "*** unable to determine host operating system")
 
--include $(topdir)/osdep/$(OS)/defs.mk
+-include $(topdir)/osdeps/$(OS)/defs.mk
 
 # Take additional command line argument as a positional parameter for
 # the Makefile target
@@ -66,13 +66,13 @@ clean:
 	-rm -rf $(MESON_BUILD_DIR)
 
 instreqs:
-	if [ -x $(topdir)/osdep/$(OS)/pre.sh ]; then \
-		$(topdir)/osdep/$(OS)/pre.sh ; \
+	if [ -x $(topdir)/osdeps/$(OS)/pre.sh ]; then \
+		$(topdir)/osdeps/$(OS)/pre.sh ; \
 	fi
-	$(PKG_CMD) $$(grep -v ^# $(topdir)/osdep/$(OS)/reqs.txt 2>/dev/null | awk 'NF' ORS=' ')
-	$(PIP_CMD) $$(grep -v ^# $(topdir)/osdep/$(OS)/pip.txt 2>/dev/null | awk 'NF' ORS=' ')
-	if [ -x $(topdir)/osdep/$(OS)/post.sh ]; then \
-		$(topdir)/osdep/$(OS)/post.sh ; \
+	$(PKG_CMD) $$(grep -v ^# $(topdir)/osdeps/$(OS)/reqs.txt 2>/dev/null | awk 'NF' ORS=' ')
+	$(PIP_CMD) $$(grep -v ^# $(topdir)/osdeps/$(OS)/pip.txt 2>/dev/null | awk 'NF' ORS=' ')
+	if [ -x $(topdir)/osdeps/$(OS)/post.sh ]; then \
+		$(topdir)/osdeps/$(OS)/post.sh ; \
 	fi
 
 help:
