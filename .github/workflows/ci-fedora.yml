@@ -23,7 +23,9 @@ jobs:
             # Within the container, install the build dependencies and
             # test suite dependencies
             - name: Install Build Dependencies
-              run: make instreqs
+              run: |
+                  dnf install -y 'dnf-command(builddep)'
+                  make instreqs
 
             # Set up the source tree to build
             - name: setup
