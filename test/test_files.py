@@ -19,118 +19,162 @@
 import rpmfluff
 from baseclass import TestSRPM, TestKoji, TestCompareSRPM, TestCompareKoji
 
+
 class ValidFilesSectionSRPM(TestSRPM):
     def setUp(self):
         TestSRPM.setUp(self)
 
         # add a library and proper %files reference
-        libraryName = 'libfoo.so'
-        sourceFileName = 'foo.c'
-        _sourceId = self.rpm.add_source(rpmfluff.SourceFile(sourceFileName, rpmfluff.simple_library_source))
-        self.rpm.section_build += "gcc --shared -fPIC -o %s %s %s\n" % (libraryName, '', sourceFileName)
-        self.rpm.section_install += "install -D -m 0755 %s %%{buildroot}%%{_libdir}/%s\n" % (libraryName, libraryName)
+        libraryName = "libfoo.so"
+        sourceFileName = "foo.c"
+        _sourceId = self.rpm.add_source(
+            rpmfluff.SourceFile(sourceFileName, rpmfluff.simple_library_source)
+        )
+        self.rpm.section_build += "gcc --shared -fPIC -o %s %s %s\n" % (
+            libraryName,
+            "",
+            sourceFileName,
+        )
+        self.rpm.section_install += (
+            "install -D -m 0755 %s %%{buildroot}%%{_libdir}/%s\n"
+            % (libraryName, libraryName)
+        )
         sub = self.rpm.get_subpackage(None)
         sub.section_files += "%%{_libdir}/%s\n" % libraryName
 
         # the inspection results expected
-        self.inspection = '%files'
-        self.label = '%files'
-        self.result = 'OK'
-        self.waiver_auth = 'Not Waivable'
+        self.inspection = "%files"
+        self.label = "%files"
+        self.result = "OK"
+        self.waiver_auth = "Not Waivable"
+
 
 class ValidFilesSectionKoji(TestKoji):
     def setUp(self):
         TestKoji.setUp(self)
 
         # add a library and proper %files reference
-        libraryName = 'libfoo.so'
-        sourceFileName = 'foo.c'
-        _sourceId = self.rpm.add_source(rpmfluff.SourceFile(sourceFileName, rpmfluff.simple_library_source))
-        self.rpm.section_build += "gcc --shared -fPIC -o %s %s %s\n" % (libraryName, '', sourceFileName)
-        self.rpm.section_install += "install -D -m 0755 %s %%{buildroot}%%{_libdir}/%s\n" % (libraryName, libraryName)
+        libraryName = "libfoo.so"
+        sourceFileName = "foo.c"
+        _sourceId = self.rpm.add_source(
+            rpmfluff.SourceFile(sourceFileName, rpmfluff.simple_library_source)
+        )
+        self.rpm.section_build += "gcc --shared -fPIC -o %s %s %s\n" % (
+            libraryName,
+            "",
+            sourceFileName,
+        )
+        self.rpm.section_install += (
+            "install -D -m 0755 %s %%{buildroot}%%{_libdir}/%s\n"
+            % (libraryName, libraryName)
+        )
         sub = self.rpm.get_subpackage(None)
         sub.section_files += "%%{_libdir}/%s\n" % libraryName
 
         # the inspection results expected
-        self.inspection = '%files'
-        self.label = '%files'
-        self.result = 'OK'
-        self.waiver_auth = 'Not Waivable'
+        self.inspection = "%files"
+        self.label = "%files"
+        self.result = "OK"
+        self.waiver_auth = "Not Waivable"
+
 
 class ValidFilesSectionCompareSRPM(TestCompareSRPM):
     def setUp(self):
         TestCompareSRPM.setUp(self)
 
         # add a library and proper %files reference
-        libraryName = 'libfoo.so'
-        sourceFileName = 'foo.c'
-        _sourceId = self.after_rpm.add_source(rpmfluff.SourceFile(sourceFileName, rpmfluff.simple_library_source))
-        self.after_rpm.section_build += "gcc --shared -fPIC -o %s %s %s\n" % (libraryName, '', sourceFileName)
-        self.after_rpm.section_install += "install -D -m 0755 %s %%{buildroot}%%{_libdir}/%s\n" % (libraryName, libraryName)
+        libraryName = "libfoo.so"
+        sourceFileName = "foo.c"
+        _sourceId = self.after_rpm.add_source(
+            rpmfluff.SourceFile(sourceFileName, rpmfluff.simple_library_source)
+        )
+        self.after_rpm.section_build += "gcc --shared -fPIC -o %s %s %s\n" % (
+            libraryName,
+            "",
+            sourceFileName,
+        )
+        self.after_rpm.section_install += (
+            "install -D -m 0755 %s %%{buildroot}%%{_libdir}/%s\n"
+            % (libraryName, libraryName)
+        )
         sub = self.after_rpm.get_subpackage(None)
         sub.section_files += "%%{_libdir}/%s\n" % libraryName
 
         # the inspection results expected
-        self.inspection = '%files'
-        self.label = '%files'
-        self.result = 'OK'
-        self.waiver_auth = 'Not Waivable'
+        self.inspection = "%files"
+        self.label = "%files"
+        self.result = "OK"
+        self.waiver_auth = "Not Waivable"
+
 
 class ValidFilesSectionCompareKoji(TestCompareKoji):
     def setUp(self):
         TestCompareKoji.setUp(self)
 
         # add a library and proper %files reference
-        libraryName = 'libfoo.so'
-        sourceFileName = 'foo.c'
-        _sourceId = self.after_rpm.add_source(rpmfluff.SourceFile(sourceFileName, rpmfluff.simple_library_source))
-        self.after_rpm.section_build += "gcc --shared -fPIC -o %s %s %s\n" % (libraryName, '', sourceFileName)
-        self.after_rpm.section_install += "install -D -m 0755 %s %%{buildroot}%%{_libdir}/%s\n" % (libraryName, libraryName)
+        libraryName = "libfoo.so"
+        sourceFileName = "foo.c"
+        _sourceId = self.after_rpm.add_source(
+            rpmfluff.SourceFile(sourceFileName, rpmfluff.simple_library_source)
+        )
+        self.after_rpm.section_build += "gcc --shared -fPIC -o %s %s %s\n" % (
+            libraryName,
+            "",
+            sourceFileName,
+        )
+        self.after_rpm.section_install += (
+            "install -D -m 0755 %s %%{buildroot}%%{_libdir}/%s\n"
+            % (libraryName, libraryName)
+        )
         sub = self.after_rpm.get_subpackage(None)
         sub.section_files += "%%{_libdir}/%s\n" % libraryName
 
         # the inspection results expected
-        self.inspection = '%files'
-        self.label = '%files'
-        self.result = 'OK'
-        self.waiver_auth = 'Not Waivable'
+        self.inspection = "%files"
+        self.label = "%files"
+        self.result = "OK"
+        self.waiver_auth = "Not Waivable"
+
 
 class InvalidFilesSectionSRPM(TestSRPM):
     def setUp(self):
         TestSRPM.setUp(self)
         self.rpm.add_simple_library()
 
-        self.inspection = '%files'
-        self.label = '%files'
-        self.result = 'VERIFY'
-        self.waiver_auth = 'Anyone'
+        self.inspection = "%files"
+        self.label = "%files"
+        self.result = "VERIFY"
+        self.waiver_auth = "Anyone"
+
 
 class InvalidFilesSectionKoji(TestKoji):
     def setUp(self):
         TestKoji.setUp(self)
         self.rpm.add_simple_library()
 
-        self.inspection = '%files'
-        self.label = '%files'
-        self.result = 'VERIFY'
-        self.waiver_auth = 'Anyone'
+        self.inspection = "%files"
+        self.label = "%files"
+        self.result = "VERIFY"
+        self.waiver_auth = "Anyone"
+
 
 class InvalidFilesSectionCompareSRPM(TestCompareSRPM):
     def setUp(self):
         TestCompareSRPM.setUp(self)
         self.after_rpm.add_simple_library()
 
-        self.inspection = '%files'
-        self.label = '%files'
-        self.result = 'VERIFY'
-        self.waiver_auth = 'Anyone'
+        self.inspection = "%files"
+        self.label = "%files"
+        self.result = "VERIFY"
+        self.waiver_auth = "Anyone"
+
 
 class InvalidFilesSectionCompareKoji(TestCompareKoji):
     def setUp(self):
         TestCompareKoji.setUp(self)
         self.after_rpm.add_simple_library()
 
-        self.inspection = '%files'
-        self.label = '%files'
-        self.result = 'VERIFY'
-        self.waiver_auth = 'Anyone'
+        self.inspection = "%files"
+        self.label = "%files"
+        self.result = "VERIFY"
+        self.waiver_auth = "Anyone"

@@ -75,12 +75,12 @@ def load_json_report(path):
     return data
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     if len(sys.argv) < 2:
         print("Error: provide the rpminspect json report path")
         sys.exit(1)
     template = load_jinja_template()
     data = load_json_report(os.path.expanduser(sys.argv[1]))
     html_report = template.render(data=data)
-    open("rpminspect.html", 'w').write(html_report)
+    open("rpminspect.html", "w").write(html_report)
     print("Wrote rpminspect.html.")

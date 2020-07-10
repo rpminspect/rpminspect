@@ -23,42 +23,46 @@ class HasPayloadSRPM(TestSRPM):
     def setUp(self):
         TestSRPM.setUp(self)
         self.rpm.add_simple_payload_file()
-        self.inspection = 'emptyrpm'
-        self.label = 'empty-payload'
-        self.result = 'OK'
+        self.inspection = "emptyrpm"
+        self.label = "empty-payload"
+        self.result = "OK"
+
 
 # Regular RPMs have payload (OK)
 class HasPayloadRPMs(TestRPMs):
     def setUp(self):
         TestRPMs.setUp(self)
         self.rpm.add_simple_payload_file()
-        self.inspection = 'emptyrpm'
-        self.label = 'empty-payload'
-        self.result = 'OK'
+        self.inspection = "emptyrpm"
+        self.label = "empty-payload"
+        self.result = "OK"
+
 
 # Regular Koji build has payload (OK)
 class HasPayloadKojiBuild(TestKoji):
     def setUp(self):
         TestKoji.setUp(self)
         self.rpm.add_simple_payload_file()
-        self.inspection = 'emptyrpm'
-        self.label = 'empty-payload'
-        self.result = 'OK'
+        self.inspection = "emptyrpm"
+        self.label = "empty-payload"
+        self.result = "OK"
+
 
 # Regular package has empty payload (VERIFY)
 class PkgHasEmptyPayload(TestRPMs):
     def setUp(self):
         TestRPMs.setUp(self)
-        self.inspection = 'emptyrpm'
-        self.label = 'empty-payload'
-        self.result = 'VERIFY'
-        self.waiver_auth = 'Anyone'
+        self.inspection = "emptyrpm"
+        self.label = "empty-payload"
+        self.result = "VERIFY"
+        self.waiver_auth = "Anyone"
+
 
 # Packages in Koji build have empty payloads (VERIFY)
 class KojiBuildHaveEmptyPayloads(TestKoji):
     def setUp(self):
         TestKoji.setUp(self)
-        self.inspection = 'emptyrpm'
-        self.label = 'empty-payload'
-        self.result = 'VERIFY'
-        self.waiver_auth = 'Anyone'
+        self.inspection = "emptyrpm"
+        self.label = "empty-payload"
+        self.result = "VERIFY"
+        self.waiver_auth = "Anyone"

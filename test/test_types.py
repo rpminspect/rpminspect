@@ -23,15 +23,17 @@ rpminspect_sh = """#!/bin/sh
 echo nope
 """
 
+
 class SameTypeCompareSRPM(TestCompareSRPM):
     def setUp(self):
         TestCompareSRPM.setUp(self)
         self.before_rpm.add_simple_compilation(installPath="/usr/bin/rpminspect")
         self.after_rpm.add_simple_compilation(installPath="/usr/bin/rpminspect")
 
-        self.inspection = 'types'
-        self.label = 'types'
-        self.result = 'OK'
+        self.inspection = "types"
+        self.label = "types"
+        self.result = "OK"
+
 
 class SameTypeCompareRPMs(TestCompareRPMs):
     def setUp(self):
@@ -39,9 +41,10 @@ class SameTypeCompareRPMs(TestCompareRPMs):
         self.before_rpm.add_simple_compilation(installPath="/usr/bin/rpminspect")
         self.after_rpm.add_simple_compilation(installPath="/usr/bin/rpminspect")
 
-        self.inspection = 'types'
-        self.label = 'types'
-        self.result = 'OK'
+        self.inspection = "types"
+        self.label = "types"
+        self.result = "OK"
+
 
 class SameTypeCompareKoji(TestCompareKoji):
     def setUp(self):
@@ -49,45 +52,60 @@ class SameTypeCompareKoji(TestCompareKoji):
         self.before_rpm.add_simple_compilation(installPath="/usr/bin/rpminspect")
         self.after_rpm.add_simple_compilation(installPath="/usr/bin/rpminspect")
 
-        self.inspection = 'types'
-        self.label = 'types'
-        self.result = 'OK'
+        self.inspection = "types"
+        self.label = "types"
+        self.result = "OK"
+
 
 class ChangedTypeCompareSRPM(TestCompareSRPM):
     def setUp(self):
         TestCompareSRPM.setUp(self)
-        self.before_rpm.add_installed_file('/usr/share/vaporware/rpminspect',
-                                           rpmfluff.SourceFile('rpminspect.source', rpminspect_sh))
-        self.after_rpm.add_installed_file('/usr/share/vaporware/rpminspect',
-                                          rpmfluff.GeneratedSourceFile("rpminspect.source", rpmfluff.make_png()))
+        self.before_rpm.add_installed_file(
+            "/usr/share/vaporware/rpminspect",
+            rpmfluff.SourceFile("rpminspect.source", rpminspect_sh),
+        )
+        self.after_rpm.add_installed_file(
+            "/usr/share/vaporware/rpminspect",
+            rpmfluff.GeneratedSourceFile("rpminspect.source", rpmfluff.make_png()),
+        )
 
-        self.inspection = 'types'
-        self.label = 'types'
-        self.result = 'VERIFY'
-        self.waiver_auth = 'Anyone'
+        self.inspection = "types"
+        self.label = "types"
+        self.result = "VERIFY"
+        self.waiver_auth = "Anyone"
+
 
 class ChangedTypeCompareRPMs(TestCompareRPMs):
     def setUp(self):
         TestCompareSRPM.setUp(self)
-        self.before_rpm.add_installed_file('/usr/share/vaporware/rpminspect',
-                                           rpmfluff.SourceFile('rpminspect.sh', rpminspect_sh))
-        self.after_rpm.add_installed_file('/usr/share/vaporware/rpminspect',
-                                          rpmfluff.GeneratedSourceFile("rpminspect.png", rpmfluff.make_png()))
+        self.before_rpm.add_installed_file(
+            "/usr/share/vaporware/rpminspect",
+            rpmfluff.SourceFile("rpminspect.sh", rpminspect_sh),
+        )
+        self.after_rpm.add_installed_file(
+            "/usr/share/vaporware/rpminspect",
+            rpmfluff.GeneratedSourceFile("rpminspect.png", rpmfluff.make_png()),
+        )
 
-        self.inspection = 'types'
-        self.label = 'types'
-        self.result = 'VERIFY'
-        self.waiver_auth = 'Anyone'
+        self.inspection = "types"
+        self.label = "types"
+        self.result = "VERIFY"
+        self.waiver_auth = "Anyone"
+
 
 class ChangedTypeCompareKoji(TestCompareKoji):
     def setUp(self):
         TestCompareSRPM.setUp(self)
-        self.before_rpm.add_installed_file('/usr/share/vaporware/rpminspect',
-                                           rpmfluff.SourceFile('rpminspect.sh', rpminspect_sh))
-        self.after_rpm.add_installed_file('/usr/share/vaporware/rpminspect',
-                                          rpmfluff.GeneratedSourceFile("rpminspect.png", rpmfluff.make_png()))
+        self.before_rpm.add_installed_file(
+            "/usr/share/vaporware/rpminspect",
+            rpmfluff.SourceFile("rpminspect.sh", rpminspect_sh),
+        )
+        self.after_rpm.add_installed_file(
+            "/usr/share/vaporware/rpminspect",
+            rpmfluff.GeneratedSourceFile("rpminspect.png", rpmfluff.make_png()),
+        )
 
-        self.inspection = 'types'
-        self.label = 'types'
-        self.result = 'VERIFY'
-        self.waiver_auth = 'Anyone'
+        self.inspection = "types"
+        self.label = "types"
+        self.result = "VERIFY"
+        self.waiver_auth = "Anyone"
