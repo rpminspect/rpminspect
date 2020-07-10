@@ -180,7 +180,7 @@ class ChangingVendorCompareRPMs(TestCompareRPMs):
 
 
 # Verify changing Vendor reports verify on Koji build (VERIFY)
-class LosingVendorCompareKojiBuild(TestCompareKoji):
+class LosingVendorCompareKojiBeforeAfterBuild(TestCompareKoji):
     def setUp(self):
         TestCompareKoji.setUp(self)
         self.before_rpm.addVendor("Amalgamated Amalgamations LLC")

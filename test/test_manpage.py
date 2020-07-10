@@ -242,7 +242,7 @@ class ManPageWrongSectionCompareRPMs(TestCompareRPMs):
 
 
 # Man page in wrong section subdirectory in compare Koji (VERIFY)
-class ManPageWrongSectionCompareRPMs(TestCompareKoji):
+class ManPageWrongSectionCompareKoji(TestCompareKoji):
     def setUp(self):
         TestCompareKoji.setUp(self)
         self.before_rpm.add_manpage(
