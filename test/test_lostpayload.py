@@ -16,7 +16,8 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 #
 
-from baseclass import *
+from baseclass import TestCompareKoji
+
 
 # New package has empty payload across Koji builds (VERIFY)
 class NewPkgHasEmptyPayload(TestCompareKoji):

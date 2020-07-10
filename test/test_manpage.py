@@ -16,7 +16,10 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 #
 
-from baseclass import *
+import rpmfluff
+
+from baseclass import TestRPMs, TestKoji, TestCompareRPMs, TestCompareKoji
+
 
 # Man page in the correct section subdirectory in RPM (OK)
 class ManPageCorrectSectionRPM(TestRPMs):
