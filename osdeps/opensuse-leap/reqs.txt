@@ -1,6 +1,7 @@
 bash
 bzip2
 cunit-devel
+curl
 desktop-file-utils
 diffutils
 file-devel
