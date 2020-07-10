@@ -21,7 +21,6 @@
 #
 
 PATH=/bin:/usr/bin
-CWD="$(pwd)"
 
 # Start the changelog block
 version="$(grep version meson.build | head -n 1 | cut -d "'" -f 2)"

@@ -99,12 +99,12 @@ fi
 GIT_USERNAME="$(git config user.name)"
 GIT_USEREMAIL="$(git config user.email)"
 
-cd ${CWD}
+cd ${CWD} || exit
 ${CWD}/utils/mkrpmchangelog.sh > ${WRKDIR}/newchangelog
 
-cd ${WRKDIR}
+cd ${WRKDIR} || exit
 ${VENDORPKG} co ${PROJECT}
-cd ${PROJECT}
+cd ${PROJECT} || exit
 
 for branch in ${BRANCHES} ; do
     git clean -d -x -f

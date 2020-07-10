@@ -22,9 +22,8 @@
 
 PATH=/usr/bin
 CWD="$(pwd)"
-CURL="curl -L --progress-bar"
 PROG="$(basename $0)"
-PROJECT="$(basename $(realpath ${CWD}))"
+PROJECT="$(basename "$(realpath ${CWD})")"
 
 # Command line options
 OPT_BUMPVER=
@@ -143,9 +142,9 @@ fi
 # Generate the dist artifact and sign it
 meson setup build
 ninja -v -C build dist
-cd build/meson-dist
+cd build/meson-dist || exit
 gpg --detach-sign --armor ${PROJECT}-${VERSION}.tar.xz
-cd ${CWD}
+cd ${CWD} || exit
 
 # Push the changes
 if [ "${OPT_PUSH}" = "y" ]; then
