@@ -267,7 +267,8 @@ class ValidGlibcLicenseTagKoji(TestKoji):
     def setUp(self):
         TestKoji.setUp(self)
         self.rpm.addLicense(
-            "LGPLv2+ and LGPLv2+ with exceptions and GPLv2+ and GPLv2+ with exceptions and BSD and Inner-Net and ISC and Public Domain and GFDL"
+            "LGPLv2+ and LGPLv2+ with exceptions and GPLv2+ and GPLv2+ with exceptions "
+            "and BSD and Inner-Net and ISC and Public Domain and GFDL"
         )
         self.inspection = "license"
         self.label = "license"

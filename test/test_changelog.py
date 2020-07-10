@@ -100,8 +100,8 @@ class SameChangeLogCompareSRPM(TestCompareSRPM):
         # create a simple changelog and duplicate it
         today = datetime.date.today().strftime("%a %b %d %Y")
         clog = (
-            "* %s Packie McPackerson <packie@mcpackerson.io> - 47.7-1\n- Upgrade to the latest and greatest\n"
-            % today
+            "* %s Packie McPackerson <packie@mcpackerson.io> - 47.7-1\n"
+            "- Upgrade to the latest and greatest\n" % today
         )
 
         # modify the changelogs
@@ -121,8 +121,8 @@ class SameChangeLogCompareKoji(TestCompareKoji):
         # create a simple changelog and duplicate it
         today = datetime.date.today().strftime("%a %b %d %Y")
         clog = (
-            "* %s Packie McPackerson <packie@mcpackerson.io> - 47.7-1\n- Upgrade to the latest and greatest\n"
-            % today
+            "* %s Packie McPackerson <packie@mcpackerson.io> - 47.7-1\n"
+            "- Upgrade to the latest and greatest\n" % today
         )
 
         # modify the changelogs
@@ -145,16 +145,16 @@ class BalancedChangeLogEditCompareKoji(TestCompareKoji):
         # create a simple prefix that will result in a one line edit script
         today = datetime.date.today().strftime("%a %b %d %Y")
         before_prefix = (
-            "* %s Packie McPackerson <packie@mcpackerson.io> - 47.7-1\n- Upgrade to the latest and greatest\n\n"
-            % today
+            "* %s Packie McPackerson <packie@mcpackerson.io> - 47.7-1\n"
+            "- Upgrade to the latest and greatest\n\n" % today
         )
         after_prefix = (
-            "* %s Packie McPackerson <packie@mcpackerson.io> - 7.47-1\n- Upgrade to the latest and greatest\n\n"
-            % today
+            "* %s Packie McPackerson <packie@mcpackerson.io> - 7.47-1\n"
+            "- Upgrade to the latest and greatest\n\n" % today
         )
         suffix = (
-            "* %s Packie McPackerson <packie@mcpackerson.io> - 1.0\n- Initial package\n"
-            % today
+            "* %s Packie McPackerson <packie@mcpackerson.io> - 1.0\n"
+            "- Initial package\n" % today
         )
 
         # modify the changelogs
@@ -174,8 +174,8 @@ class UnbalancedChangeLogEditCompareKoji(TestCompareKoji):
         # create a simple prefix that will result in a multiline removal
         today = datetime.date.today().strftime("%a %b %d %Y")
         before_prefix = (
-            "* %s Packie McPackerson <packie@mcpackerson.io> - 47.7-1\n- Upgrade to the latest and greatest\n\n"
-            % today
+            "* %s Packie McPackerson <packie@mcpackerson.io> - 47.7-1\n"
+            "- Upgrade to the latest and greatest\n\n" % today
         )
 
         # modify the changelog
@@ -198,8 +198,8 @@ class AddChangeLogEntryCompareSRPM(TestCompareSRPM):
         # create a simple prefix that will result in a new entry
         today = datetime.date.today().strftime("%a %b %d %Y")
         after_prefix = (
-            "* %s Packie McPackerson <packie@mcpackerson.io> - 47.7-1\n- Upgrade to the latest and greatest\n\n"
-            % today
+            "* %s Packie McPackerson <packie@mcpackerson.io> - 47.7-1\n"
+            "- Upgrade to the latest and greatest\n\n" % today
         )
         suffix = (
             "* %s Packie McPackerson <packie@mcpackerson.io> - 1.0\n- Initial package\n"
@@ -229,8 +229,8 @@ class AddChangeLogEntryCompareRPMs(TestCompareRPMs):
         # create a simple prefix that will result in a new entry
         today = datetime.date.today().strftime("%a %b %d %Y")
         after_prefix = (
-            "* %s Packie McPackerson <packie@mcpackerson.io> - 47.7-1\n- Upgrade to the latest and greatest\n\n"
-            % today
+            "* %s Packie McPackerson <packie@mcpackerson.io> - 47.7-1\n"
+            "- Upgrade to the latest and greatest\n\n" % today
         )
         suffix = (
             "* %s Packie McPackerson <packie@mcpackerson.io> - 1.0\n- Initial package\n"
@@ -254,8 +254,8 @@ class AddChangeLogEntryCompareKoji(TestCompareKoji):
         # create a simple prefix that will result in a new entry
         today = datetime.date.today().strftime("%a %b %d %Y")
         after_prefix = (
-            "* %s Packie McPackerson <packie@mcpackerson.io> - 47.7-1\n- Upgrade to the latest and greatest\n\n"
-            % today
+            "* %s Packie McPackerson <packie@mcpackerson.io> - 47.7-1\n"
+            "- Upgrade to the latest and greatest\n\n" % today
         )
         suffix = (
             "* %s Packie McPackerson <packie@mcpackerson.io> - 1.0\n- Initial package\n"
@@ -281,8 +281,8 @@ class UnprofessinalChangeLogEntryCompareKoji(TestCompareKoji):
         # create a change with a bad word
         today = datetime.date.today().strftime("%a %b %d %Y")
         after_prefix = (
-            "* %s Packie McPackerson <packie@mcpackerson.io> - 47.7-1\n- Upgrade to the latest and reallybadword greatest\n\n"
-            % today
+            "* %s Packie McPackerson <packie@mcpackerson.io> - 47.7-1\n"
+            "- Upgrade to the latest and reallybadword greatest\n\n" % today
         )
         suffix = (
             "* %s Packie McPackerson <packie@mcpackerson.io> - 1.0\n- Initial package\n"
