@@ -1011,7 +1011,7 @@ class CshWellMalformedCompareKoji(TestCompareKoji):
 #     https://en.wikipedia.org/wiki/Tcsh                       #
 ################################################################
 
-valid_tcsh = """#!/bin/tcsh
+valid_tcsh = r"""#!/bin/tcsh
 # test if we have two arguments, exit with warning if we don't
 if ($# != 2) then
   echo "Usage $0 oldextension newextension"
@@ -1028,7 +1028,7 @@ end
 """
 
 
-invalid_tcsh = """#!/bin/tcsh
+invalid_tcsh = r"""#!/bin/tcsh
 # test if we have two arguments, exit with warning if we don't
 if [[ $? != 0 ]] then
  echo "That didn't work!"
@@ -1499,13 +1499,13 @@ class RcWellMalformedCompareKoji(TestCompareKoji):
 #################################################################
 
 
-valid_bash = """#!/bin/bash
+valid_bash = r"""#!/bin/bash
 echo "A-$(echo B-$(echo C-$(echo D)))"
 some_var=${DEFAULT_VAL}
 
-log() {  # classic logger 
+log() {  # classic logger
    local prefix="[$(date +%Y/%m/%d\ %H:%M:%S)]: "
-   echo "${prefix} $@" >&2 
+   echo "${prefix} $@" >&2
 }
 
 
@@ -1517,13 +1517,13 @@ done
 """
 
 
-invalid_bash = """#!/bin/bash
+invalid_bash = r"""#!/bin/bash
 echo "A-$(echo B-$(echo C-$(echo D)))"
 some_var=${DEFAULT_VAL}
 
-log() {  # classic logger 
+log() {  # classic logger
    local prefix="[$(date +%Y/%m/%d\ %H:%M:%S)]: "
-   echo "${prefix} $@" >&2 
+   echo "${prefix} $@" >&2
 
 
 log "INFO" "a message"
@@ -1533,9 +1533,9 @@ for ((i=0; i<3; i++)); do
 """
 
 
-valid_bash_extglob = """#!/bin/bash
+valid_bash_extglob = r"""#!/bin/bash
 echo !(*/)
-readonly DEFAULT_VAL=${DEFAULT_VAL:-7} 
+readonly DEFAULT_VAL=${DEFAULT_VAL:-7}
 
 t="abc123"
 [[ "$t" == abc* ]]    # true (globbing)
