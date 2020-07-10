@@ -151,7 +151,7 @@ class LosingVendorCompareKojiBuild(TestCompareKoji):
         self.inspection = "metadata"
         self.label = "header-metadata"
         self.waiver_auth = "Anyone"
-        self.result = "OK"
+        self.result = "VERIFY"
 
 
 # Verify changing Vendor reports verify on SRPM (VERIFY)
