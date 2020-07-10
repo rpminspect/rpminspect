@@ -615,7 +615,9 @@ class TooManySymlinkLevelsRPMs(TestRPMs):
         self.rpm.add_installed_symlink("usr/bin/bin", ".")
         self.rpm.add_installed_symlink(
             "usr/bin/anotherrpminspect",
-            "bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/rpminspect",
+            "bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin"
+            "/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bi"
+            "n/bin/bin/bin/bin/bin/bin/bin/rpminspect",
         )
 
         self.inspection = "symlinks"
@@ -642,7 +644,9 @@ class TooManySymlinkLevelsKoji(TestKoji):
         self.rpm.add_installed_symlink("usr/bin/bin", ".")
         self.rpm.add_installed_symlink(
             "usr/bin/anotherrpminspect",
-            "bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/rpminspect",
+            "bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin"
+            "/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bi"
+            "n/bin/bin/bin/bin/bin/bin/bin/rpminspect",
         )
 
         self.inspection = "symlinks"
@@ -669,7 +673,9 @@ class TooManySymlinkLevelsCompareRPMs(TestCompareRPMs):
         self.after_rpm.add_installed_symlink("usr/bin/bin", ".")
         self.after_rpm.add_installed_symlink(
             "usr/bin/anotherrpminspect",
-            "bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/rpminspect",
+            "bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin"
+            "/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bi"
+            "n/bin/bin/bin/bin/bin/bin/bin/rpminspect",
         )
 
         # disable check-buildroot rpmbuild script to avoid stat errors
@@ -700,7 +706,9 @@ class TooManySymlinkLevelsCompareKoji(TestCompareKoji):
         self.after_rpm.add_installed_symlink("usr/bin/bin", ".")
         self.after_rpm.add_installed_symlink(
             "usr/bin/anotherrpminspect",
-            "bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/rpminspect",
+            "bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin"
+            "/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bi"
+            "n/bin/bin/bin/bin/bin/bin/bin/rpminspect",
         )
 
         # disable check-buildroot rpmbuild script to avoid stat errors
