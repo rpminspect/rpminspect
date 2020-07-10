@@ -122,7 +122,7 @@ control files.
 
 
 %build
-%meson
+%meson -Dtests=false
 %meson_build
 
 
@@ -131,7 +131,7 @@ control files.
 
 
 %files
-%doc AUTHORS README TODO
+%doc AUTHORS README.md TODO
 %license COPYING
 %{_bindir}/rpminspect
 %{_mandir}/man1/rpminspect.1*
