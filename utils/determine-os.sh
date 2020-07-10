@@ -5,7 +5,6 @@
 #
 
 PATH=/bin:/usr/bin
-CWD="$(pwd)"
 VERSION_ID=0
 
 if [ -r /etc/os-release ]; then
