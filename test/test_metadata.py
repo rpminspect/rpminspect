@@ -16,7 +16,15 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 #
 
-from baseclass import *
+from baseclass import (
+    TestSRPM,
+    TestRPMs,
+    TestKoji,
+    TestCompareSRPM,
+    TestCompareKoji,
+    TestCompareRPMs,
+)
+
 
 # Verify valid Vendor passes on an SRPM (OK)
 class ValidVendorSRPM(TestSRPM):

@@ -16,7 +16,9 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 #
 
-from baseclass import *
+import rpmfluff
+
+from baseclass import TestRPMs, TestKoji, TestCompareRPMs, TestCompareKoji
 
 valid_xml = """<?xml version='1.0'?>
 <!DOCTYPE greeting [

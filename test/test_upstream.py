@@ -18,7 +18,19 @@
 
 import os
 import unittest
-from baseclass import *
+
+import rpmfluff
+
+from baseclass import (
+    TestSRPM,
+    TestRPMs,
+    TestKoji,
+    TestCompareSRPM,
+    TestCompareKoji,
+    BEFORE_NAME,
+    BEFORE_VER,
+    AFTER_REL,
+)
 
 # Read in the built rpminspect executable for use in these test RPMs
 with open(os.environ["RPMINSPECT"], mode="rb") as f:

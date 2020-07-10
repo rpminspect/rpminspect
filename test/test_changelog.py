@@ -17,7 +17,9 @@
 #
 
 import datetime
-from baseclass import *
+
+from baseclass import TestCompareSRPM, TestCompareRPMs, TestCompareKoji
+
 
 # changelog tests only apply to before & after build comparisons.
 # Perform the following each as a separate test:
