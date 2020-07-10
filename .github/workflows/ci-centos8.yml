@@ -17,14 +17,14 @@ jobs:
         # All of these steps run from within the main source
         # directory, so think of that as your $PWD
         steps:
+            # This means clone the git repo
+            - uses: actions/checkout@v2
+
             # Update the image
             - name: dnf upgrade
             - run: |
                   dnf -y upgrade
                   dnf clean all
-
-            # This means clone the git repo
-            - uses: actions/checkout@v2
 
             # CentOS does not provide everything we need, enable EPEL
             - name: Add EPEL
