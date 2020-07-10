@@ -18,7 +18,7 @@ jobs:
         # directory, so think of that as your $PWD
         steps:
             # Install required packages for the git checkout action
-            - name: Install tar
+            - name: Install required git checkout packages
               run: zypper install -y tar gzip
 
             # This means clone the git repo
