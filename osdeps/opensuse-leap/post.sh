@@ -1,5 +1,6 @@
 #!/bin/sh
 PATH=/bin:/usr/bin:/sbin:/usr/sbin
+CWD="$(pwd)"
 
 # The mandoc package on OpenSUSE lacks libmandoc.a and
 # header files, which we need to build rpminspect
@@ -27,3 +28,26 @@ make
 make lib-install
 cd ${CWD}
 rm -rf mandoc.tar.gz ${SUBDIR}
+
+# Download 'rc' from Fedora because OpenSUSE does not provide it
+cat << "EOF" > /etc/yum/repos.d/fedora.repo
+[fedora]
+name=Fedora
+metalink=https://mirrors.fedoraproject.org/metalink?repo=fedora-rawhide&arch=$basearch
+enabled=1
+metadata_expire=7d
+rep_gpgcheck=0
+type=rpm
+gpgcheck=0
+EOF
+
+mkdir -p ${CWD}/fedora-rpms
+yum install -y --downloadonly --downloaddir=${CWD}/fedora-rpms rc
+cd ${CWD}/fedora-rpms
+for pkg in *.rpm ; do
+    rpm2cpio ${pkg} | cpio -id
+done
+cp -av ${CWD}/fedora-rpms/usr/* /usr/local
+cd ${CWD}
+rm -rf fedora-rpms
+ldconfig
