@@ -23,37 +23,40 @@ class NewPkgHasEmptyPayload(TestCompareKoji):
     def setUp(self):
         TestCompareKoji.setUp(self)
         self.before_rpm.add_simple_payload_file()
-        self.after_rpm.add_subpackage(self.after_rpm.name + '-newthing')
-        self.inspection = 'lostpayload'
-        self.label = 'lost-payload'
-        self.result = 'VERIFY'
-        self.waiver_auth = 'Anyone'
+        self.after_rpm.add_subpackage(self.after_rpm.name + "-newthing")
+        self.inspection = "lostpayload"
+        self.label = "lost-payload"
+        self.result = "VERIFY"
+        self.waiver_auth = "Anyone"
+
 
 # Packages continue to be empty (INFO)
 class PkgStillHasEmptyPayload(TestCompareKoji):
     def setUp(self):
         TestCompareKoji.setUp(self)
-        self.inspection = 'lostpayload'
-        self.label = 'lost-payload'
-        self.result = 'INFO'
+        self.inspection = "lostpayload"
+        self.label = "lost-payload"
+        self.result = "INFO"
+
 
 # Package lost payload across Koji builds (VERIFY)
 class PkgLostPayload(TestCompareKoji):
     def setUp(self):
         TestCompareKoji.setUp(self)
         self.before_rpm.add_simple_payload_file()
-        self.inspection = 'lostpayload'
-        self.label = 'lost-payload'
-        self.result = 'VERIFY'
-        self.waiver_auth = 'Anyone'
+        self.inspection = "lostpayload"
+        self.label = "lost-payload"
+        self.result = "VERIFY"
+        self.waiver_auth = "Anyone"
+
 
 # Existing package is now missing across Koji builds (VERIFY)
 class ExistingPkgMissing(TestCompareKoji):
     def setUp(self):
         TestCompareKoji.setUp(self)
         self.before_rpm.add_simple_payload_file()
-        self.before_rpm.add_subpackage(self.before_rpm.name + '-newthing')
-        self.inspection = 'lostpayload'
-        self.label = 'lost-payload'
-        self.result = 'VERIFY'
-        self.waiver_auth = 'Anyone'
+        self.before_rpm.add_subpackage(self.before_rpm.name + "-newthing")
+        self.inspection = "lostpayload"
+        self.label = "lost-payload"
+        self.result = "VERIFY"
+        self.waiver_auth = "Anyone"

@@ -69,152 +69,186 @@ class ShWellFormedRPM(TestRPMs):
     """
     Valid /bin/sh script is OK for RPMs
     """
+
     def setUp(self):
         TestRPMs.setUp(self)
 
-        self.rpm.add_installed_file('/usr/share/data/valid_sh.sh',
-                                    rpmfluff.SourceFile('valid_sh.sh', valid_sh))
-        self.inspection = 'shellsyntax'
-        self.label = 'shell-syntax'
-        self.result = 'OK'
+        self.rpm.add_installed_file(
+            "/usr/share/data/valid_sh.sh", rpmfluff.SourceFile("valid_sh.sh", valid_sh)
+        )
+        self.inspection = "shellsyntax"
+        self.label = "shell-syntax"
+        self.result = "OK"
 
 
 class ShMalformedRPM(TestRPMs):
     """
     Invalid /bin/sh script is BAD for RPMs
     """
+
     def setUp(self):
         TestRPMs.setUp(self)
 
-        self.rpm.add_installed_file('/usr/share/data/invalid_sh.sh',
-                                    rpmfluff.SourceFile('invalid_sh.sh', invalid_sh))
-        self.inspection = 'shellsyntax'
-        self.label = 'shell-syntax'
-        self.result = 'BAD'
-        self.waiver_auth = 'Anyone'
+        self.rpm.add_installed_file(
+            "/usr/share/data/invalid_sh.sh",
+            rpmfluff.SourceFile("invalid_sh.sh", invalid_sh),
+        )
+        self.inspection = "shellsyntax"
+        self.label = "shell-syntax"
+        self.result = "BAD"
+        self.waiver_auth = "Anyone"
 
 
 class ShWellFormedKoji(TestKoji):
     """
     Valid /bin/sh script is OK for Koji build
     """
+
     def setUp(self):
         TestKoji.setUp(self)
 
-        self.rpm.add_installed_file('/usr/share/data/valid_sh.sh',
-                                    rpmfluff.SourceFile('valid_sh.sh', valid_sh))
-        self.inspection = 'shellsyntax'
-        self.label = 'shell-syntax'
-        self.result = 'OK'
+        self.rpm.add_installed_file(
+            "/usr/share/data/valid_sh.sh", rpmfluff.SourceFile("valid_sh.sh", valid_sh)
+        )
+        self.inspection = "shellsyntax"
+        self.label = "shell-syntax"
+        self.result = "OK"
 
 
 class ShMalformedKoji(TestKoji):
     """
     Invalid /bin/sh script is BAD for Koji build
     """
+
     def setUp(self):
         TestKoji.setUp(self)
 
-        self.rpm.add_installed_file('/usr/share/data/invalid_sh.sh',
-                                    rpmfluff.SourceFile('invalid_sh.sh', invalid_sh))
-        self.inspection = 'shellsyntax'
-        self.label = 'shell-syntax'
-        self.result = 'BAD'
-        self.waiver_auth = 'Anyone'
+        self.rpm.add_installed_file(
+            "/usr/share/data/invalid_sh.sh",
+            rpmfluff.SourceFile("invalid_sh.sh", invalid_sh),
+        )
+        self.inspection = "shellsyntax"
+        self.label = "shell-syntax"
+        self.result = "BAD"
+        self.waiver_auth = "Anyone"
 
 
 class ShWellFormedCompareRPMs(TestCompareRPMs):
     """
     Valid /bin/sh script is OK for comparing RPMs
     """
+
     def setUp(self):
         TestCompareRPMs.setUp(self)
-        self.before_rpm.add_installed_file('/usr/share/data/valid_sh.sh',
-                                           rpmfluff.SourceFile('valid_sh.sh', valid_sh))
-        self.after_rpm.add_installed_file('/usr/share/data/valid_sh.sh',
-                                          rpmfluff.SourceFile('valid_sh.sh', valid_sh))
-        self.inspection = 'shellsyntax'
-        self.label = 'shell-syntax'
-        self.result = 'OK'
+        self.before_rpm.add_installed_file(
+            "/usr/share/data/valid_sh.sh", rpmfluff.SourceFile("valid_sh.sh", valid_sh)
+        )
+        self.after_rpm.add_installed_file(
+            "/usr/share/data/valid_sh.sh", rpmfluff.SourceFile("valid_sh.sh", valid_sh)
+        )
+        self.inspection = "shellsyntax"
+        self.label = "shell-syntax"
+        self.result = "OK"
 
 
 class ShMalformedCompareRPMs(TestCompareRPMs):
     """
     Invalid /bin/sh script is BAD for comparing RPMs
     """
+
     def setUp(self):
         TestCompareRPMs.setUp(self)
-        self.before_rpm.add_installed_file('/usr/share/data/invalid_sh.sh',
-                                           rpmfluff.SourceFile('invalid_sh.sh', invalid_sh))
-        self.after_rpm.add_installed_file('/usr/share/data/invalid_sh.sh',
-                                          rpmfluff.SourceFile('invalid_sh.sh', invalid_sh))
-        self.inspection = 'shellsyntax'
-        self.label = 'shell-syntax'
-        self.result = 'BAD'
-        self.waiver_auth = 'Anyone'
+        self.before_rpm.add_installed_file(
+            "/usr/share/data/invalid_sh.sh",
+            rpmfluff.SourceFile("invalid_sh.sh", invalid_sh),
+        )
+        self.after_rpm.add_installed_file(
+            "/usr/share/data/invalid_sh.sh",
+            rpmfluff.SourceFile("invalid_sh.sh", invalid_sh),
+        )
+        self.inspection = "shellsyntax"
+        self.label = "shell-syntax"
+        self.result = "BAD"
+        self.waiver_auth = "Anyone"
 
 
 class ShWellFormedCompareKoji(TestCompareKoji):
     """
     Valid /bin/sh script is OK for comparing Koji builds
     """
+
     def setUp(self):
         TestCompareKoji.setUp(self)
-        self.before_rpm.add_installed_file('/usr/share/data/valid_sh.sh',
-                                           rpmfluff.SourceFile('valid_sh.sh', valid_sh))
-        self.after_rpm.add_installed_file('/usr/share/data/valid_sh.sh',
-                                          rpmfluff.SourceFile('valid_sh.sh', valid_sh))
-        self.inspection = 'shellsyntax'
-        self.label = 'shell-syntax'
-        self.result = 'OK'
+        self.before_rpm.add_installed_file(
+            "/usr/share/data/valid_sh.sh", rpmfluff.SourceFile("valid_sh.sh", valid_sh)
+        )
+        self.after_rpm.add_installed_file(
+            "/usr/share/data/valid_sh.sh", rpmfluff.SourceFile("valid_sh.sh", valid_sh)
+        )
+        self.inspection = "shellsyntax"
+        self.label = "shell-syntax"
+        self.result = "OK"
 
 
 class ShMalformedCompareKoji(TestCompareKoji):
     """
     Invalid /bin/sh script is BAD for comparing Koji builds
     """
+
     def setUp(self):
         TestCompareKoji.setUp(self)
-        self.before_rpm.add_installed_file('/usr/share/data/invalid_sh.sh',
-                                           rpmfluff.SourceFile('invalid_sh.sh', invalid_sh))
-        self.after_rpm.add_installed_file('/usr/share/data/invalid_sh.sh',
-                                          rpmfluff.SourceFile('invalid_sh.sh', invalid_sh))
-        self.inspection = 'shellsyntax'
-        self.label = 'shell-syntax'
-        self.result = 'BAD'
-        self.waiver_auth = 'Anyone'
+        self.before_rpm.add_installed_file(
+            "/usr/share/data/invalid_sh.sh",
+            rpmfluff.SourceFile("invalid_sh.sh", invalid_sh),
+        )
+        self.after_rpm.add_installed_file(
+            "/usr/share/data/invalid_sh.sh",
+            rpmfluff.SourceFile("invalid_sh.sh", invalid_sh),
+        )
+        self.inspection = "shellsyntax"
+        self.label = "shell-syntax"
+        self.result = "BAD"
+        self.waiver_auth = "Anyone"
 
 
 class ShWellMalformedCompareRPMs(TestCompareRPMs):
     """
     Valid /bin/sh script in before, invalid in after is BAD when comparing RPMs
     """
+
     def setUp(self):
         TestCompareRPMs.setUp(self)
-        self.before_rpm.add_installed_file('/usr/share/data/valid_sh.sh',
-                                           rpmfluff.SourceFile('valid_sh.sh', valid_sh))
-        self.after_rpm.add_installed_file('/usr/share/data/invalid_sh.sh',
-                                          rpmfluff.SourceFile('invalid_sh.sh', invalid_sh))
-        self.inspection = 'shellsyntax'
-        self.label = 'shell-syntax'
-        self.result = 'BAD'
-        self.waiver_auth = 'Anyone'
+        self.before_rpm.add_installed_file(
+            "/usr/share/data/valid_sh.sh", rpmfluff.SourceFile("valid_sh.sh", valid_sh)
+        )
+        self.after_rpm.add_installed_file(
+            "/usr/share/data/invalid_sh.sh",
+            rpmfluff.SourceFile("invalid_sh.sh", invalid_sh),
+        )
+        self.inspection = "shellsyntax"
+        self.label = "shell-syntax"
+        self.result = "BAD"
+        self.waiver_auth = "Anyone"
 
 
 class ShWellMalformedCompareKoji(TestCompareKoji):
     """
     Valid /bin/sh script in before, invalid in after is BAD when comparing Koji builds
     """
+
     def setUp(self):
         TestCompareKoji.setUp(self)
-        self.before_rpm.add_installed_file('/usr/share/data/valid_sh.sh',
-                                           rpmfluff.SourceFile('valid_sh.sh', valid_sh))
-        self.after_rpm.add_installed_file('/usr/share/data/invalid_sh.sh',
-                                          rpmfluff.SourceFile('invalid_sh.sh', invalid_sh))
-        self.inspection = 'shellsyntax'
-        self.label = 'shell-syntax'
-        self.result = 'BAD'
-        self.waiver_auth = 'Anyone'
+        self.before_rpm.add_installed_file(
+            "/usr/share/data/valid_sh.sh", rpmfluff.SourceFile("valid_sh.sh", valid_sh)
+        )
+        self.after_rpm.add_installed_file(
+            "/usr/share/data/invalid_sh.sh",
+            rpmfluff.SourceFile("invalid_sh.sh", invalid_sh),
+        )
+        self.inspection = "shellsyntax"
+        self.label = "shell-syntax"
+        self.result = "BAD"
+        self.waiver_auth = "Anyone"
 
 
 ##################################################################
@@ -275,152 +309,194 @@ class KshWellFormedRPM(TestRPMs):
     """
     Valid /bin/ksh script is OK for RPMs
     """
+
     def setUp(self):
         TestRPMs.setUp(self)
 
-        self.rpm.add_installed_file('/usr/share/data/valid_ksh.sh',
-                                    rpmfluff.SourceFile('valid_ksh.sh', valid_ksh))
-        self.inspection = 'shellsyntax'
-        self.label = 'shell-syntax'
-        self.result = 'OK'
+        self.rpm.add_installed_file(
+            "/usr/share/data/valid_ksh.sh",
+            rpmfluff.SourceFile("valid_ksh.sh", valid_ksh),
+        )
+        self.inspection = "shellsyntax"
+        self.label = "shell-syntax"
+        self.result = "OK"
 
 
 class KshMalformedRPM(TestRPMs):
     """
     Invalid /bin/ksh script is BAD for RPMs
     """
+
     def setUp(self):
         TestRPMs.setUp(self)
 
-        self.rpm.add_installed_file('/usr/share/data/invalid_ksh.sh',
-                                    rpmfluff.SourceFile('invalid_ksh.sh', invalid_ksh))
-        self.inspection = 'shellsyntax'
-        self.label = 'shell-syntax'
-        self.result = 'BAD'
-        self.waiver_auth = 'Anyone'
+        self.rpm.add_installed_file(
+            "/usr/share/data/invalid_ksh.sh",
+            rpmfluff.SourceFile("invalid_ksh.sh", invalid_ksh),
+        )
+        self.inspection = "shellsyntax"
+        self.label = "shell-syntax"
+        self.result = "BAD"
+        self.waiver_auth = "Anyone"
 
 
 class KshWellFormedKoji(TestKoji):
     """
     Valid /bin/ksh script is OK for Koji build
     """
+
     def setUp(self):
         TestKoji.setUp(self)
 
-        self.rpm.add_installed_file('/usr/share/data/valid_ksh.sh',
-                                    rpmfluff.SourceFile('valid_ksh.sh', valid_ksh))
-        self.inspection = 'shellsyntax'
-        self.label = 'shell-syntax'
-        self.result = 'OK'
+        self.rpm.add_installed_file(
+            "/usr/share/data/valid_ksh.sh",
+            rpmfluff.SourceFile("valid_ksh.sh", valid_ksh),
+        )
+        self.inspection = "shellsyntax"
+        self.label = "shell-syntax"
+        self.result = "OK"
 
 
 class KshMalformedKoji(TestKoji):
     """
     Invalid /bin/ksh script is BAD for Koji build
     """
+
     def setUp(self):
         TestKoji.setUp(self)
 
-        self.rpm.add_installed_file('/usr/share/data/invalid_ksh.sh',
-                                    rpmfluff.SourceFile('invalid_ksh.sh', invalid_ksh))
-        self.inspection = 'shellsyntax'
-        self.label = 'shell-syntax'
-        self.result = 'BAD'
-        self.waiver_auth = 'Anyone'
+        self.rpm.add_installed_file(
+            "/usr/share/data/invalid_ksh.sh",
+            rpmfluff.SourceFile("invalid_ksh.sh", invalid_ksh),
+        )
+        self.inspection = "shellsyntax"
+        self.label = "shell-syntax"
+        self.result = "BAD"
+        self.waiver_auth = "Anyone"
 
 
 class KshWellFormedCompareRPMs(TestCompareRPMs):
     """
     Valid /bin/ksh script is OK for comparing RPMs
     """
+
     def setUp(self):
         TestCompareRPMs.setUp(self)
-        self.before_rpm.add_installed_file('/usr/share/data/valid_ksh.sh',
-                                           rpmfluff.SourceFile('valid_ksh.sh', valid_ksh))
-        self.after_rpm.add_installed_file('/usr/share/data/valid_ksh.sh',
-                                          rpmfluff.SourceFile('valid_sh.sh', valid_ksh))
-        self.inspection = 'shellsyntax'
-        self.label = 'shell-syntax'
-        self.result = 'OK'
+        self.before_rpm.add_installed_file(
+            "/usr/share/data/valid_ksh.sh",
+            rpmfluff.SourceFile("valid_ksh.sh", valid_ksh),
+        )
+        self.after_rpm.add_installed_file(
+            "/usr/share/data/valid_ksh.sh",
+            rpmfluff.SourceFile("valid_sh.sh", valid_ksh),
+        )
+        self.inspection = "shellsyntax"
+        self.label = "shell-syntax"
+        self.result = "OK"
 
 
 class KshMalformedCompareRPMs(TestCompareRPMs):
     """
     Invalid /bin/ksh script is BAD for comparing RPMs
     """
+
     def setUp(self):
         TestCompareRPMs.setUp(self)
-        self.before_rpm.add_installed_file('/usr/share/data/invalid_ksh.sh',
-                                           rpmfluff.SourceFile('invalid_ksh.sh', invalid_ksh))
-        self.after_rpm.add_installed_file('/usr/share/data/invalid_ksh.sh',
-                                          rpmfluff.SourceFile('invalid_ksh.sh', invalid_ksh))
-        self.inspection = 'shellsyntax'
-        self.label = 'shell-syntax'
-        self.result = 'BAD'
-        self.waiver_auth = 'Anyone'
+        self.before_rpm.add_installed_file(
+            "/usr/share/data/invalid_ksh.sh",
+            rpmfluff.SourceFile("invalid_ksh.sh", invalid_ksh),
+        )
+        self.after_rpm.add_installed_file(
+            "/usr/share/data/invalid_ksh.sh",
+            rpmfluff.SourceFile("invalid_ksh.sh", invalid_ksh),
+        )
+        self.inspection = "shellsyntax"
+        self.label = "shell-syntax"
+        self.result = "BAD"
+        self.waiver_auth = "Anyone"
 
 
 class KshWellFormedCompareKoji(TestCompareKoji):
     """
     Valid /bin/ksh script is OK for comparing Koji builds
     """
+
     def setUp(self):
         TestCompareKoji.setUp(self)
-        self.before_rpm.add_installed_file('/usr/share/data/valid_ksh.sh',
-                                           rpmfluff.SourceFile('valid_ksh.sh', valid_ksh))
-        self.after_rpm.add_installed_file('/usr/share/data/valid_ksh.sh',
-                                          rpmfluff.SourceFile('valid_ksh.sh', valid_ksh))
-        self.inspection = 'shellsyntax'
-        self.label = 'shell-syntax'
-        self.result = 'OK'
+        self.before_rpm.add_installed_file(
+            "/usr/share/data/valid_ksh.sh",
+            rpmfluff.SourceFile("valid_ksh.sh", valid_ksh),
+        )
+        self.after_rpm.add_installed_file(
+            "/usr/share/data/valid_ksh.sh",
+            rpmfluff.SourceFile("valid_ksh.sh", valid_ksh),
+        )
+        self.inspection = "shellsyntax"
+        self.label = "shell-syntax"
+        self.result = "OK"
 
 
 class KshMalformedCompareKoji(TestCompareKoji):
     """
     Invalid /bin/ksh script is BAD for comparing Koji builds
     """
+
     def setUp(self):
         TestCompareKoji.setUp(self)
-        self.before_rpm.add_installed_file('/usr/share/data/invalid_ksh.sh',
-                                           rpmfluff.SourceFile('invalid_ksh.sh', invalid_ksh))
-        self.after_rpm.add_installed_file('/usr/share/data/invalid_ksh.sh',
-                                          rpmfluff.SourceFile('invalid_ksh.sh', invalid_ksh))
-        self.inspection = 'shellsyntax'
-        self.label = 'shell-syntax'
-        self.result = 'BAD'
-        self.waiver_auth = 'Anyone'
+        self.before_rpm.add_installed_file(
+            "/usr/share/data/invalid_ksh.sh",
+            rpmfluff.SourceFile("invalid_ksh.sh", invalid_ksh),
+        )
+        self.after_rpm.add_installed_file(
+            "/usr/share/data/invalid_ksh.sh",
+            rpmfluff.SourceFile("invalid_ksh.sh", invalid_ksh),
+        )
+        self.inspection = "shellsyntax"
+        self.label = "shell-syntax"
+        self.result = "BAD"
+        self.waiver_auth = "Anyone"
 
 
 class KshWellMalformedCompareRPMs(TestCompareRPMs):
     """
     Valid /bin/ksh script in before, invalid in after is BAD when comparing RPMs
     """
+
     def setUp(self):
         TestCompareRPMs.setUp(self)
-        self.before_rpm.add_installed_file('/usr/share/data/valid_ksh.sh',
-                                           rpmfluff.SourceFile('valid_ksh.sh', valid_ksh))
-        self.after_rpm.add_installed_file('/usr/share/data/invalid_ksh.sh',
-                                          rpmfluff.SourceFile('invalid_ksh.sh', invalid_ksh))
-        self.inspection = 'shellsyntax'
-        self.label = 'shell-syntax'
-        self.result = 'BAD'
-        self.waiver_auth = 'Anyone'
+        self.before_rpm.add_installed_file(
+            "/usr/share/data/valid_ksh.sh",
+            rpmfluff.SourceFile("valid_ksh.sh", valid_ksh),
+        )
+        self.after_rpm.add_installed_file(
+            "/usr/share/data/invalid_ksh.sh",
+            rpmfluff.SourceFile("invalid_ksh.sh", invalid_ksh),
+        )
+        self.inspection = "shellsyntax"
+        self.label = "shell-syntax"
+        self.result = "BAD"
+        self.waiver_auth = "Anyone"
 
 
 class KshWellMalformedCompareKoji(TestCompareKoji):
     """
     Valid /bin/ksh script in before, invalid in after is BAD when comparing Koji builds
     """
+
     def setUp(self):
         TestCompareKoji.setUp(self)
-        self.before_rpm.add_installed_file('/usr/share/data/valid_ksh.sh',
-                                           rpmfluff.SourceFile('valid_ksh.sh', valid_ksh))
-        self.after_rpm.add_installed_file('/usr/share/data/invalid_sh.sh',
-                                          rpmfluff.SourceFile('invalid_ksh.sh', invalid_ksh))
-        self.inspection = 'shellsyntax'
-        self.label = 'shell-syntax'
-        self.result = 'BAD'
-        self.waiver_auth = 'Anyone'
+        self.before_rpm.add_installed_file(
+            "/usr/share/data/valid_ksh.sh",
+            rpmfluff.SourceFile("valid_ksh.sh", valid_ksh),
+        )
+        self.after_rpm.add_installed_file(
+            "/usr/share/data/invalid_sh.sh",
+            rpmfluff.SourceFile("invalid_ksh.sh", invalid_ksh),
+        )
+        self.inspection = "shellsyntax"
+        self.label = "shell-syntax"
+        self.result = "BAD"
+        self.waiver_auth = "Anyone"
 
 
 ###################################################################
@@ -477,152 +553,194 @@ class ZshWellFormedRPM(TestRPMs):
     """
     Valid /bin/zsh script is OK for RPMs
     """
+
     def setUp(self):
         TestRPMs.setUp(self)
 
-        self.rpm.add_installed_file('/usr/share/data/valid_zsh.sh',
-                                    rpmfluff.SourceFile('valid_zsh.sh', valid_zsh))
-        self.inspection = 'shellsyntax'
-        self.label = 'shell-syntax'
-        self.result = 'OK'
+        self.rpm.add_installed_file(
+            "/usr/share/data/valid_zsh.sh",
+            rpmfluff.SourceFile("valid_zsh.sh", valid_zsh),
+        )
+        self.inspection = "shellsyntax"
+        self.label = "shell-syntax"
+        self.result = "OK"
 
 
 class ZshMalformedRPM(TestRPMs):
     """
     Invalid /bin/zsh script is BAD for RPMs
     """
+
     def setUp(self):
         TestRPMs.setUp(self)
 
-        self.rpm.add_installed_file('/usr/share/data/invalid_zsh.sh',
-                                    rpmfluff.SourceFile('invalid_zsh.sh', invalid_zsh))
-        self.inspection = 'shellsyntax'
-        self.label = 'shell-syntax'
-        self.result = 'BAD'
-        self.waiver_auth = 'Anyone'
+        self.rpm.add_installed_file(
+            "/usr/share/data/invalid_zsh.sh",
+            rpmfluff.SourceFile("invalid_zsh.sh", invalid_zsh),
+        )
+        self.inspection = "shellsyntax"
+        self.label = "shell-syntax"
+        self.result = "BAD"
+        self.waiver_auth = "Anyone"
 
 
 class ZshWellFormedKoji(TestKoji):
     """
     Valid /bin/zsh script is OK for Koji build
     """
+
     def setUp(self):
         TestKoji.setUp(self)
 
-        self.rpm.add_installed_file('/usr/share/data/valid_zsh.sh',
-                                    rpmfluff.SourceFile('valid_zsh.sh', valid_zsh))
-        self.inspection = 'shellsyntax'
-        self.label = 'shell-syntax'
-        self.result = 'OK'
+        self.rpm.add_installed_file(
+            "/usr/share/data/valid_zsh.sh",
+            rpmfluff.SourceFile("valid_zsh.sh", valid_zsh),
+        )
+        self.inspection = "shellsyntax"
+        self.label = "shell-syntax"
+        self.result = "OK"
 
 
 class ZshMalformedKoji(TestKoji):
     """
     Invalid /bin/zsh script is BAD for Koji build
     """
+
     def setUp(self):
         TestKoji.setUp(self)
 
-        self.rpm.add_installed_file('/usr/share/data/invalid_zsh.sh',
-                                    rpmfluff.SourceFile('invalid_zsh.sh', invalid_zsh))
-        self.inspection = 'shellsyntax'
-        self.label = 'shell-syntax'
-        self.result = 'BAD'
-        self.waiver_auth = 'Anyone'
+        self.rpm.add_installed_file(
+            "/usr/share/data/invalid_zsh.sh",
+            rpmfluff.SourceFile("invalid_zsh.sh", invalid_zsh),
+        )
+        self.inspection = "shellsyntax"
+        self.label = "shell-syntax"
+        self.result = "BAD"
+        self.waiver_auth = "Anyone"
 
 
 class ZshWellFormedCompareRPMs(TestCompareRPMs):
     """
     Valid /bin/zsh script is OK for comparing RPMs
     """
+
     def setUp(self):
         TestCompareRPMs.setUp(self)
-        self.before_rpm.add_installed_file('/usr/share/data/valid_zsh.sh',
-                                           rpmfluff.SourceFile('valid_zsh.sh', valid_zsh))
-        self.after_rpm.add_installed_file('/usr/share/data/valid_zsh.sh',
-                                          rpmfluff.SourceFile('valid_zsh.sh', valid_zsh))
-        self.inspection = 'shellsyntax'
-        self.label = 'shell-syntax'
-        self.result = 'OK'
+        self.before_rpm.add_installed_file(
+            "/usr/share/data/valid_zsh.sh",
+            rpmfluff.SourceFile("valid_zsh.sh", valid_zsh),
+        )
+        self.after_rpm.add_installed_file(
+            "/usr/share/data/valid_zsh.sh",
+            rpmfluff.SourceFile("valid_zsh.sh", valid_zsh),
+        )
+        self.inspection = "shellsyntax"
+        self.label = "shell-syntax"
+        self.result = "OK"
 
 
 class ZshMalformedCompareRPMs(TestCompareRPMs):
     """
     Invalid /bin/zsh script is BAD for comparing RPMs
     """
+
     def setUp(self):
         TestCompareRPMs.setUp(self)
-        self.before_rpm.add_installed_file('/usr/share/data/invalid_zsh.sh',
-                                           rpmfluff.SourceFile('invalid_zsh.sh', invalid_zsh))
-        self.after_rpm.add_installed_file('/usr/share/data/invalid_zsh.sh',
-                                          rpmfluff.SourceFile('invalid_zsh.sh', invalid_zsh))
-        self.inspection = 'shellsyntax'
-        self.label = 'shell-syntax'
-        self.result = 'BAD'
-        self.waiver_auth = 'Anyone'
+        self.before_rpm.add_installed_file(
+            "/usr/share/data/invalid_zsh.sh",
+            rpmfluff.SourceFile("invalid_zsh.sh", invalid_zsh),
+        )
+        self.after_rpm.add_installed_file(
+            "/usr/share/data/invalid_zsh.sh",
+            rpmfluff.SourceFile("invalid_zsh.sh", invalid_zsh),
+        )
+        self.inspection = "shellsyntax"
+        self.label = "shell-syntax"
+        self.result = "BAD"
+        self.waiver_auth = "Anyone"
 
 
 class ZshWellFormedCompareKoji(TestCompareKoji):
     """
     Valid /bin/zsh script is OK for comparing Koji builds
     """
+
     def setUp(self):
         TestCompareKoji.setUp(self)
-        self.before_rpm.add_installed_file('/usr/share/data/valid_zsh.sh',
-                                           rpmfluff.SourceFile('valid_zsh.sh', valid_zsh))
-        self.after_rpm.add_installed_file('/usr/share/data/valid_zsh.sh',
-                                          rpmfluff.SourceFile('valid_zsh.sh', valid_zsh))
-        self.inspection = 'shellsyntax'
-        self.label = 'shell-syntax'
-        self.result = 'OK'
+        self.before_rpm.add_installed_file(
+            "/usr/share/data/valid_zsh.sh",
+            rpmfluff.SourceFile("valid_zsh.sh", valid_zsh),
+        )
+        self.after_rpm.add_installed_file(
+            "/usr/share/data/valid_zsh.sh",
+            rpmfluff.SourceFile("valid_zsh.sh", valid_zsh),
+        )
+        self.inspection = "shellsyntax"
+        self.label = "shell-syntax"
+        self.result = "OK"
 
 
 class ZshMalformedCompareKoji(TestCompareKoji):
     """
     Invalid /bin/zsh script is BAD for comparing Koji builds
     """
+
     def setUp(self):
         TestCompareKoji.setUp(self)
-        self.before_rpm.add_installed_file('/usr/share/data/invalid_zsh.sh',
-                                           rpmfluff.SourceFile('invalid_zsh.sh', invalid_zsh))
-        self.after_rpm.add_installed_file('/usr/share/data/invalid_zsh.sh',
-                                          rpmfluff.SourceFile('invalid_zsh.sh', invalid_zsh))
-        self.inspection = 'shellsyntax'
-        self.label = 'shell-syntax'
-        self.result = 'BAD'
-        self.waiver_auth = 'Anyone'
+        self.before_rpm.add_installed_file(
+            "/usr/share/data/invalid_zsh.sh",
+            rpmfluff.SourceFile("invalid_zsh.sh", invalid_zsh),
+        )
+        self.after_rpm.add_installed_file(
+            "/usr/share/data/invalid_zsh.sh",
+            rpmfluff.SourceFile("invalid_zsh.sh", invalid_zsh),
+        )
+        self.inspection = "shellsyntax"
+        self.label = "shell-syntax"
+        self.result = "BAD"
+        self.waiver_auth = "Anyone"
 
 
 class ZshWellMalformedCompareRPMs(TestCompareRPMs):
     """
     VValid /bin/zsh script in before, invalid in after is BAD when comparing RPMs
     """
+
     def setUp(self):
         TestCompareRPMs.setUp(self)
-        self.before_rpm.add_installed_file('/usr/share/data/valid_zsh.sh',
-                                           rpmfluff.SourceFile('valid_zsh.sh', valid_zsh))
-        self.after_rpm.add_installed_file('/usr/share/data/invalid_zsh.sh',
-                                          rpmfluff.SourceFile('invalid_zsh.sh', invalid_zsh))
-        self.inspection = 'shellsyntax'
-        self.label = 'shell-syntax'
-        self.result = 'BAD'
-        self.waiver_auth = 'Anyone'
+        self.before_rpm.add_installed_file(
+            "/usr/share/data/valid_zsh.sh",
+            rpmfluff.SourceFile("valid_zsh.sh", valid_zsh),
+        )
+        self.after_rpm.add_installed_file(
+            "/usr/share/data/invalid_zsh.sh",
+            rpmfluff.SourceFile("invalid_zsh.sh", invalid_zsh),
+        )
+        self.inspection = "shellsyntax"
+        self.label = "shell-syntax"
+        self.result = "BAD"
+        self.waiver_auth = "Anyone"
 
 
 class ZshWellMalformedCompareKoji(TestCompareKoji):
     """
     Valid /bin/zsh script in before, invalid in after is BAD when comparing Koji builds
     """
+
     def setUp(self):
         TestCompareKoji.setUp(self)
-        self.before_rpm.add_installed_file('/usr/share/data/valid_zsh.sh',
-                                           rpmfluff.SourceFile('valid_zsh.sh', valid_zsh))
-        self.after_rpm.add_installed_file('/usr/share/data/invalid_zsh.sh',
-                                          rpmfluff.SourceFile('invalid_zsh.sh', invalid_zsh))
-        self.inspection = 'shellsyntax'
-        self.label = 'shell-syntax'
-        self.result = 'BAD'
-        self.waiver_auth = 'Anyone'
+        self.before_rpm.add_installed_file(
+            "/usr/share/data/valid_zsh.sh",
+            rpmfluff.SourceFile("valid_zsh.sh", valid_zsh),
+        )
+        self.after_rpm.add_installed_file(
+            "/usr/share/data/invalid_zsh.sh",
+            rpmfluff.SourceFile("invalid_zsh.sh", invalid_zsh),
+        )
+        self.inspection = "shellsyntax"
+        self.label = "shell-syntax"
+        self.result = "BAD"
+        self.waiver_auth = "Anyone"
 
 
 #################################################################
@@ -696,152 +814,194 @@ class CshWellFormedRPM(TestRPMs):
     """
     Valid /bin/csh script is OK for RPMs
     """
+
     def setUp(self):
         TestRPMs.setUp(self)
 
-        self.rpm.add_installed_file('/usr/share/data/valid_csh.sh',
-                                    rpmfluff.SourceFile('valid_csh.sh', valid_csh))
-        self.inspection = 'shellsyntax'
-        self.label = 'shell-syntax'
-        self.result = 'OK'
+        self.rpm.add_installed_file(
+            "/usr/share/data/valid_csh.sh",
+            rpmfluff.SourceFile("valid_csh.sh", valid_csh),
+        )
+        self.inspection = "shellsyntax"
+        self.label = "shell-syntax"
+        self.result = "OK"
 
 
 class CshMalformedRPM(TestRPMs):
     """
     Invalid /bin/csh script is BAD for RPMs
     """
+
     def setUp(self):
         TestRPMs.setUp(self)
 
-        self.rpm.add_installed_file('/usr/share/data/invalid_csh.sh',
-                                    rpmfluff.SourceFile('invalid_csh.sh', invalid_csh))
-        self.inspection = 'shellsyntax'
-        self.label = 'shell-syntax'
-        self.result = 'BAD'
-        self.waiver_auth = 'Anyone'
+        self.rpm.add_installed_file(
+            "/usr/share/data/invalid_csh.sh",
+            rpmfluff.SourceFile("invalid_csh.sh", invalid_csh),
+        )
+        self.inspection = "shellsyntax"
+        self.label = "shell-syntax"
+        self.result = "BAD"
+        self.waiver_auth = "Anyone"
 
 
 class CshWellFormedKoji(TestKoji):
     """
     Valid /bin/csh script is OK for Koji build
     """
+
     def setUp(self):
         TestKoji.setUp(self)
 
-        self.rpm.add_installed_file('/usr/share/data/valid_csh.sh',
-                                    rpmfluff.SourceFile('valid_csh.sh', valid_csh))
-        self.inspection = 'shellsyntax'
-        self.label = 'shell-syntax'
-        self.result = 'OK'
+        self.rpm.add_installed_file(
+            "/usr/share/data/valid_csh.sh",
+            rpmfluff.SourceFile("valid_csh.sh", valid_csh),
+        )
+        self.inspection = "shellsyntax"
+        self.label = "shell-syntax"
+        self.result = "OK"
 
 
 class CshMalformedKoji(TestKoji):
     """
     Invalid /bin/csh script is BAD for Koji build
     """
+
     def setUp(self):
         TestKoji.setUp(self)
 
-        self.rpm.add_installed_file('/usr/share/data/invalid_csh.sh',
-                                    rpmfluff.SourceFile('invalid_csh.sh', invalid_csh))
-        self.inspection = 'shellsyntax'
-        self.label = 'shell-syntax'
-        self.result = 'BAD'
-        self.waiver_auth = 'Anyone'
+        self.rpm.add_installed_file(
+            "/usr/share/data/invalid_csh.sh",
+            rpmfluff.SourceFile("invalid_csh.sh", invalid_csh),
+        )
+        self.inspection = "shellsyntax"
+        self.label = "shell-syntax"
+        self.result = "BAD"
+        self.waiver_auth = "Anyone"
 
 
 class CshWellFormedCompareRPMs(TestCompareRPMs):
     """
     Valid /bin/csh script is OK for comparing RPMs
     """
+
     def setUp(self):
         TestCompareRPMs.setUp(self)
-        self.before_rpm.add_installed_file('/usr/share/data/valid_csh.sh',
-                                           rpmfluff.SourceFile('valid_csh.sh', valid_csh))
-        self.after_rpm.add_installed_file('/usr/share/data/valid_csh.sh',
-                                          rpmfluff.SourceFile('valid_csh.sh', valid_csh))
-        self.inspection = 'shellsyntax'
-        self.label = 'shell-syntax'
-        self.result = 'OK'
+        self.before_rpm.add_installed_file(
+            "/usr/share/data/valid_csh.sh",
+            rpmfluff.SourceFile("valid_csh.sh", valid_csh),
+        )
+        self.after_rpm.add_installed_file(
+            "/usr/share/data/valid_csh.sh",
+            rpmfluff.SourceFile("valid_csh.sh", valid_csh),
+        )
+        self.inspection = "shellsyntax"
+        self.label = "shell-syntax"
+        self.result = "OK"
 
 
 class CshMalformedCompareRPMs(TestCompareRPMs):
     """
     Invalid /bin/csh script is BAD for comparing RPMs
     """
+
     def setUp(self):
         TestCompareRPMs.setUp(self)
-        self.before_rpm.add_installed_file('/usr/share/data/invalid_csh.sh',
-                                           rpmfluff.SourceFile('invalid_csh.sh', invalid_csh))
-        self.after_rpm.add_installed_file('/usr/share/data/invalid_csh.sh',
-                                          rpmfluff.SourceFile('invalid_csh.sh', invalid_csh))
-        self.inspection = 'shellsyntax'
-        self.label = 'shell-syntax'
-        self.result = 'BAD'
-        self.waiver_auth = 'Anyone'
+        self.before_rpm.add_installed_file(
+            "/usr/share/data/invalid_csh.sh",
+            rpmfluff.SourceFile("invalid_csh.sh", invalid_csh),
+        )
+        self.after_rpm.add_installed_file(
+            "/usr/share/data/invalid_csh.sh",
+            rpmfluff.SourceFile("invalid_csh.sh", invalid_csh),
+        )
+        self.inspection = "shellsyntax"
+        self.label = "shell-syntax"
+        self.result = "BAD"
+        self.waiver_auth = "Anyone"
 
 
 class CshWellFormedCompareKoji(TestCompareKoji):
     """
     Valid /bin/csh script is OK for comparing Koji builds
     """
+
     def setUp(self):
         TestCompareKoji.setUp(self)
-        self.before_rpm.add_installed_file('/usr/share/data/valid_csh.sh',
-                                           rpmfluff.SourceFile('valid_csh.sh', valid_csh))
-        self.after_rpm.add_installed_file('/usr/share/data/valid_csh.sh',
-                                          rpmfluff.SourceFile('valid_csh.sh', valid_csh))
-        self.inspection = 'shellsyntax'
-        self.label = 'shell-syntax'
-        self.result = 'OK'
+        self.before_rpm.add_installed_file(
+            "/usr/share/data/valid_csh.sh",
+            rpmfluff.SourceFile("valid_csh.sh", valid_csh),
+        )
+        self.after_rpm.add_installed_file(
+            "/usr/share/data/valid_csh.sh",
+            rpmfluff.SourceFile("valid_csh.sh", valid_csh),
+        )
+        self.inspection = "shellsyntax"
+        self.label = "shell-syntax"
+        self.result = "OK"
 
 
 class CshMalformedCompareKoji(TestCompareKoji):
     """
     Invalid /bin/csh script is BAD for comparing Koji builds
     """
+
     def setUp(self):
         TestCompareKoji.setUp(self)
-        self.before_rpm.add_installed_file('/usr/share/data/invalid_csh.sh',
-                                           rpmfluff.SourceFile('invalid_csh.sh', invalid_csh))
-        self.after_rpm.add_installed_file('/usr/share/data/invalid_csh.sh',
-                                          rpmfluff.SourceFile('invalid_csh.sh', invalid_csh))
-        self.inspection = 'shellsyntax'
-        self.label = 'shell-syntax'
-        self.result = 'BAD'
-        self.waiver_auth = 'Anyone'
+        self.before_rpm.add_installed_file(
+            "/usr/share/data/invalid_csh.sh",
+            rpmfluff.SourceFile("invalid_csh.sh", invalid_csh),
+        )
+        self.after_rpm.add_installed_file(
+            "/usr/share/data/invalid_csh.sh",
+            rpmfluff.SourceFile("invalid_csh.sh", invalid_csh),
+        )
+        self.inspection = "shellsyntax"
+        self.label = "shell-syntax"
+        self.result = "BAD"
+        self.waiver_auth = "Anyone"
 
 
 class CshWellMalformedCompareRPMs(TestCompareRPMs):
     """
     Valid /bin/csh script in before, invalid in after is BAD when comparing RPMs
     """
+
     def setUp(self):
         TestCompareRPMs.setUp(self)
-        self.before_rpm.add_installed_file('/usr/share/data/valid_csh.sh',
-                                           rpmfluff.SourceFile('valid_csh.sh', valid_csh))
-        self.after_rpm.add_installed_file('/usr/share/data/invalid_csh.sh',
-                                          rpmfluff.SourceFile('invalid_csh.sh', invalid_csh))
-        self.inspection = 'shellsyntax'
-        self.label = 'shell-syntax'
-        self.result = 'BAD'
-        self.waiver_auth = 'Anyone'
+        self.before_rpm.add_installed_file(
+            "/usr/share/data/valid_csh.sh",
+            rpmfluff.SourceFile("valid_csh.sh", valid_csh),
+        )
+        self.after_rpm.add_installed_file(
+            "/usr/share/data/invalid_csh.sh",
+            rpmfluff.SourceFile("invalid_csh.sh", invalid_csh),
+        )
+        self.inspection = "shellsyntax"
+        self.label = "shell-syntax"
+        self.result = "BAD"
+        self.waiver_auth = "Anyone"
 
 
 class CshWellMalformedCompareKoji(TestCompareKoji):
     """
     Valid /bin/csh script in before, invalid in after is BAD when comparing Koji builds
     """
+
     def setUp(self):
         TestCompareKoji.setUp(self)
-        self.before_rpm.add_installed_file('/usr/share/data/valid_csh.sh',
-                                           rpmfluff.SourceFile('valid_csh.sh', valid_csh))
-        self.after_rpm.add_installed_file('/usr/share/data/invalid_csh.sh',
-                                          rpmfluff.SourceFile('invalid_csh.sh', invalid_csh))
-        self.inspection = 'shellsyntax'
-        self.label = 'shell-syntax'
-        self.result = 'BAD'
-        self.waiver_auth = 'Anyone'
+        self.before_rpm.add_installed_file(
+            "/usr/share/data/valid_csh.sh",
+            rpmfluff.SourceFile("valid_csh.sh", valid_csh),
+        )
+        self.after_rpm.add_installed_file(
+            "/usr/share/data/invalid_csh.sh",
+            rpmfluff.SourceFile("invalid_csh.sh", invalid_csh),
+        )
+        self.inspection = "shellsyntax"
+        self.label = "shell-syntax"
+        self.result = "BAD"
+        self.waiver_auth = "Anyone"
 
 
 ################################################################
@@ -887,152 +1047,194 @@ class TcshWellFormedRPM(TestRPMs):
     """
     Valid /bin/tcsh script is OK for RPMs
     """
+
     def setUp(self):
         TestRPMs.setUp(self)
 
-        self.rpm.add_installed_file('/usr/share/data/valid_tcsh.sh',
-                                    rpmfluff.SourceFile('valid_tcsh.sh', valid_tcsh))
-        self.inspection = 'shellsyntax'
-        self.label = 'shell-syntax'
-        self.result = 'OK'
+        self.rpm.add_installed_file(
+            "/usr/share/data/valid_tcsh.sh",
+            rpmfluff.SourceFile("valid_tcsh.sh", valid_tcsh),
+        )
+        self.inspection = "shellsyntax"
+        self.label = "shell-syntax"
+        self.result = "OK"
 
 
 class TcshMalformedRPM(TestRPMs):
     """
     Invalid /bin/tcsh script is BAD for RPMs
     """
+
     def setUp(self):
         TestRPMs.setUp(self)
 
-        self.rpm.add_installed_file('/usr/share/data/invalid_tcsh.sh',
-                                    rpmfluff.SourceFile('invalid_tcsh.sh', invalid_tcsh))
-        self.inspection = 'shellsyntax'
-        self.label = 'shell-syntax'
-        self.result = 'BAD'
-        self.waiver_auth = 'Anyone'
+        self.rpm.add_installed_file(
+            "/usr/share/data/invalid_tcsh.sh",
+            rpmfluff.SourceFile("invalid_tcsh.sh", invalid_tcsh),
+        )
+        self.inspection = "shellsyntax"
+        self.label = "shell-syntax"
+        self.result = "BAD"
+        self.waiver_auth = "Anyone"
 
 
 class TcshWellFormedKoji(TestKoji):
     """
     Valid /bin/tcsh script is OK for Koji build
     """
+
     def setUp(self):
         TestKoji.setUp(self)
 
-        self.rpm.add_installed_file('/usr/share/data/valid_tcsh.sh',
-                                    rpmfluff.SourceFile('valid_tcsh.sh', valid_tcsh))
-        self.inspection = 'shellsyntax'
-        self.label = 'shell-syntax'
-        self.result = 'OK'
+        self.rpm.add_installed_file(
+            "/usr/share/data/valid_tcsh.sh",
+            rpmfluff.SourceFile("valid_tcsh.sh", valid_tcsh),
+        )
+        self.inspection = "shellsyntax"
+        self.label = "shell-syntax"
+        self.result = "OK"
 
 
 class TcshMalformedKoji(TestKoji):
     """
     Invalid /bin/tcsh script is BAD for Koji build
     """
+
     def setUp(self):
         TestKoji.setUp(self)
 
-        self.rpm.add_installed_file('/usr/share/data/invalid_tcsh.sh',
-                                    rpmfluff.SourceFile('invalid_tcsh.sh', invalid_tcsh))
-        self.inspection = 'shellsyntax'
-        self.label = 'shell-syntax'
-        self.result = 'BAD'
-        self.waiver_auth = 'Anyone'
+        self.rpm.add_installed_file(
+            "/usr/share/data/invalid_tcsh.sh",
+            rpmfluff.SourceFile("invalid_tcsh.sh", invalid_tcsh),
+        )
+        self.inspection = "shellsyntax"
+        self.label = "shell-syntax"
+        self.result = "BAD"
+        self.waiver_auth = "Anyone"
 
 
 class TcshWellFormedCompareRPMs(TestCompareRPMs):
     """
     Valid /bin/tcsh script is OK for comparing RPMs
     """
+
     def setUp(self):
         TestCompareRPMs.setUp(self)
-        self.before_rpm.add_installed_file('/usr/share/data/valid_tcsh.sh',
-                                           rpmfluff.SourceFile('valid_tcsh.sh', valid_tcsh))
-        self.after_rpm.add_installed_file('/usr/share/data/valid_tcsh.sh',
-                                          rpmfluff.SourceFile('valid_tcsh.sh', valid_tcsh))
-        self.inspection = 'shellsyntax'
-        self.label = 'shell-syntax'
-        self.result = 'OK'
+        self.before_rpm.add_installed_file(
+            "/usr/share/data/valid_tcsh.sh",
+            rpmfluff.SourceFile("valid_tcsh.sh", valid_tcsh),
+        )
+        self.after_rpm.add_installed_file(
+            "/usr/share/data/valid_tcsh.sh",
+            rpmfluff.SourceFile("valid_tcsh.sh", valid_tcsh),
+        )
+        self.inspection = "shellsyntax"
+        self.label = "shell-syntax"
+        self.result = "OK"
 
 
 class TcshMalformedCompareRPMs(TestCompareRPMs):
     """
     Invalid /bin/tcsh script is BAD for comparing RPMs
     """
+
     def setUp(self):
         TestCompareRPMs.setUp(self)
-        self.before_rpm.add_installed_file('/usr/share/data/invalid_tcsh.sh',
-                                           rpmfluff.SourceFile('invalid_tcsh.sh', invalid_tcsh))
-        self.after_rpm.add_installed_file('/usr/share/data/invalid_tcsh.sh',
-                                          rpmfluff.SourceFile('invalid_tcsh.sh', invalid_tcsh))
-        self.inspection = 'shellsyntax'
-        self.label = 'shell-syntax'
-        self.result = 'BAD'
-        self.waiver_auth = 'Anyone'
+        self.before_rpm.add_installed_file(
+            "/usr/share/data/invalid_tcsh.sh",
+            rpmfluff.SourceFile("invalid_tcsh.sh", invalid_tcsh),
+        )
+        self.after_rpm.add_installed_file(
+            "/usr/share/data/invalid_tcsh.sh",
+            rpmfluff.SourceFile("invalid_tcsh.sh", invalid_tcsh),
+        )
+        self.inspection = "shellsyntax"
+        self.label = "shell-syntax"
+        self.result = "BAD"
+        self.waiver_auth = "Anyone"
 
 
 class TcshWellFormedCompareKoji(TestCompareKoji):
     """
     Valid /bin/tcsh script is OK for comparing Koji builds
     """
+
     def setUp(self):
         TestCompareKoji.setUp(self)
-        self.before_rpm.add_installed_file('/usr/share/data/valid_tcsh.sh',
-                                           rpmfluff.SourceFile('valid_tcsh.sh', valid_tcsh))
-        self.after_rpm.add_installed_file('/usr/share/data/valid_tcsh.sh',
-                                          rpmfluff.SourceFile('valid_tcsh.sh', valid_tcsh))
-        self.inspection = 'shellsyntax'
-        self.label = 'shell-syntax'
-        self.result = 'OK'
+        self.before_rpm.add_installed_file(
+            "/usr/share/data/valid_tcsh.sh",
+            rpmfluff.SourceFile("valid_tcsh.sh", valid_tcsh),
+        )
+        self.after_rpm.add_installed_file(
+            "/usr/share/data/valid_tcsh.sh",
+            rpmfluff.SourceFile("valid_tcsh.sh", valid_tcsh),
+        )
+        self.inspection = "shellsyntax"
+        self.label = "shell-syntax"
+        self.result = "OK"
 
 
 class TcshMalformedCompareKoji(TestCompareKoji):
     """
     Invalid /bin/tcsh script is BAD for comparing Koji builds
     """
+
     def setUp(self):
         TestCompareKoji.setUp(self)
-        self.before_rpm.add_installed_file('/usr/share/data/invalid_tcsh.sh',
-                                           rpmfluff.SourceFile('invalid_tcsh.sh', invalid_tcsh))
-        self.after_rpm.add_installed_file('/usr/share/data/invalid_tcsh.sh',
-                                          rpmfluff.SourceFile('invalid_tcsh.sh', invalid_tcsh))
-        self.inspection = 'shellsyntax'
-        self.label = 'shell-syntax'
-        self.result = 'BAD'
-        self.waiver_auth = 'Anyone'
+        self.before_rpm.add_installed_file(
+            "/usr/share/data/invalid_tcsh.sh",
+            rpmfluff.SourceFile("invalid_tcsh.sh", invalid_tcsh),
+        )
+        self.after_rpm.add_installed_file(
+            "/usr/share/data/invalid_tcsh.sh",
+            rpmfluff.SourceFile("invalid_tcsh.sh", invalid_tcsh),
+        )
+        self.inspection = "shellsyntax"
+        self.label = "shell-syntax"
+        self.result = "BAD"
+        self.waiver_auth = "Anyone"
 
 
 class TcshWellMalformedCompareRPMs(TestCompareRPMs):
     """
     Valid /bin/tcsh script in before, invalid in after is BAD when comparing RPMs
     """
+
     def setUp(self):
         TestCompareRPMs.setUp(self)
-        self.before_rpm.add_installed_file('/usr/share/data/valid_tcsh.sh',
-                                           rpmfluff.SourceFile('valid_tcsh.sh', valid_tcsh))
-        self.after_rpm.add_installed_file('/usr/share/data/invalid_tcsh.sh',
-                                          rpmfluff.SourceFile('invalid_tcsh.sh', invalid_tcsh))
-        self.inspection = 'shellsyntax'
-        self.label = 'shell-syntax'
-        self.result = 'BAD'
-        self.waiver_auth = 'Anyone'
+        self.before_rpm.add_installed_file(
+            "/usr/share/data/valid_tcsh.sh",
+            rpmfluff.SourceFile("valid_tcsh.sh", valid_tcsh),
+        )
+        self.after_rpm.add_installed_file(
+            "/usr/share/data/invalid_tcsh.sh",
+            rpmfluff.SourceFile("invalid_tcsh.sh", invalid_tcsh),
+        )
+        self.inspection = "shellsyntax"
+        self.label = "shell-syntax"
+        self.result = "BAD"
+        self.waiver_auth = "Anyone"
 
 
 class TcshWellMalformedCompareKoji(TestCompareKoji):
     """
     Valid /bin/tcsh script in before, invalid in after is BAD when comparing Koji builds
     """
+
     def setUp(self):
         TestCompareKoji.setUp(self)
-        self.before_rpm.add_installed_file('/usr/share/data/valid_tcsh.sh',
-                                           rpmfluff.SourceFile('valid_tcsh.sh', valid_tcsh))
-        self.after_rpm.add_installed_file('/usr/share/data/invalid_tcsh.sh',
-                                          rpmfluff.SourceFile('invalid_tcsh.sh', invalid_tcsh))
-        self.inspection = 'shellsyntax'
-        self.label = 'shell-syntax'
-        self.result = 'BAD'
-        self.waiver_auth = 'Anyone'
+        self.before_rpm.add_installed_file(
+            "/usr/share/data/valid_tcsh.sh",
+            rpmfluff.SourceFile("valid_tcsh.sh", valid_tcsh),
+        )
+        self.after_rpm.add_installed_file(
+            "/usr/share/data/invalid_tcsh.sh",
+            rpmfluff.SourceFile("invalid_tcsh.sh", invalid_tcsh),
+        )
+        self.inspection = "shellsyntax"
+        self.label = "shell-syntax"
+        self.result = "BAD"
+        self.waiver_auth = "Anyone"
 
 
 #################################################################
@@ -1100,152 +1302,186 @@ class RcWellFormedRPM(TestRPMs):
     """
     Valid /bin/rc script is OK for RPMs
     """
+
     def setUp(self):
         TestRPMs.setUp(self)
 
-        self.rpm.add_installed_file('/usr/share/data/valid_rc.sh',
-                                    rpmfluff.SourceFile('valid_rc.sh', valid_rc))
-        self.inspection = 'shellsyntax'
-        self.label = 'shell-syntax'
-        self.result = 'OK'
+        self.rpm.add_installed_file(
+            "/usr/share/data/valid_rc.sh", rpmfluff.SourceFile("valid_rc.sh", valid_rc)
+        )
+        self.inspection = "shellsyntax"
+        self.label = "shell-syntax"
+        self.result = "OK"
 
 
 class RcMalformedRPM(TestRPMs):
     """
     Invalid /bin/rc script is BAD for RPMs
     """
+
     def setUp(self):
         TestRPMs.setUp(self)
 
-        self.rpm.add_installed_file('/usr/share/data/invalid_rc.sh',
-                                    rpmfluff.SourceFile('invalid_rc.sh', invalid_rc))
-        self.inspection = 'shellsyntax'
-        self.label = 'shell-syntax'
-        self.result = 'BAD'
-        self.waiver_auth = 'Anyone'
+        self.rpm.add_installed_file(
+            "/usr/share/data/invalid_rc.sh",
+            rpmfluff.SourceFile("invalid_rc.sh", invalid_rc),
+        )
+        self.inspection = "shellsyntax"
+        self.label = "shell-syntax"
+        self.result = "BAD"
+        self.waiver_auth = "Anyone"
 
 
 class RcWellFormedKoji(TestKoji):
     """
     Valid /bin/rc script is OK for Koji build
     """
+
     def setUp(self):
         TestKoji.setUp(self)
 
-        self.rpm.add_installed_file('/usr/share/data/valid_rc.sh',
-                                    rpmfluff.SourceFile('valid_rc.sh', valid_rc))
-        self.inspection = 'shellsyntax'
-        self.label = 'shell-syntax'
-        self.result = 'OK'
+        self.rpm.add_installed_file(
+            "/usr/share/data/valid_rc.sh", rpmfluff.SourceFile("valid_rc.sh", valid_rc)
+        )
+        self.inspection = "shellsyntax"
+        self.label = "shell-syntax"
+        self.result = "OK"
 
 
 class RcMalformedKoji(TestKoji):
     """
     Invalid /bin/rc script is BAD for Koji build
     """
+
     def setUp(self):
         TestKoji.setUp(self)
 
-        self.rpm.add_installed_file('/usr/share/data/invalid_rc.sh',
-                                    rpmfluff.SourceFile('invalid_rc.sh', invalid_rc))
-        self.inspection = 'shellsyntax'
-        self.label = 'shell-syntax'
-        self.result = 'BAD'
-        self.waiver_auth = 'Anyone'
+        self.rpm.add_installed_file(
+            "/usr/share/data/invalid_rc.sh",
+            rpmfluff.SourceFile("invalid_rc.sh", invalid_rc),
+        )
+        self.inspection = "shellsyntax"
+        self.label = "shell-syntax"
+        self.result = "BAD"
+        self.waiver_auth = "Anyone"
 
 
 class RcWellFormedCompareRPMs(TestCompareRPMs):
     """
     Valid /bin/rc script is OK for comparing RPMs
     """
+
     def setUp(self):
         TestCompareRPMs.setUp(self)
-        self.before_rpm.add_installed_file('/usr/share/data/valid_rc.sh',
-                                           rpmfluff.SourceFile('valid_rc.sh', valid_rc))
-        self.after_rpm.add_installed_file('/usr/share/data/valid_rc.sh',
-                                          rpmfluff.SourceFile('valid_rc.sh', valid_rc))
-        self.inspection = 'shellsyntax'
-        self.label = 'shell-syntax'
-        self.result = 'OK'
+        self.before_rpm.add_installed_file(
+            "/usr/share/data/valid_rc.sh", rpmfluff.SourceFile("valid_rc.sh", valid_rc)
+        )
+        self.after_rpm.add_installed_file(
+            "/usr/share/data/valid_rc.sh", rpmfluff.SourceFile("valid_rc.sh", valid_rc)
+        )
+        self.inspection = "shellsyntax"
+        self.label = "shell-syntax"
+        self.result = "OK"
 
 
 class RcMalformedCompareRPMs(TestCompareRPMs):
     """
     Invalid /bin/rc script is BAD for comparing RPMs
     """
+
     def setUp(self):
         TestCompareRPMs.setUp(self)
-        self.before_rpm.add_installed_file('/usr/share/data/invalid_rc.sh',
-                                           rpmfluff.SourceFile('invalid_rc.sh', invalid_rc))
-        self.after_rpm.add_installed_file('/usr/share/data/invalid_rc.sh',
-                                          rpmfluff.SourceFile('invalid_rc.sh', invalid_rc))
-        self.inspection = 'shellsyntax'
-        self.label = 'shell-syntax'
-        self.result = 'BAD'
-        self.waiver_auth = 'Anyone'
+        self.before_rpm.add_installed_file(
+            "/usr/share/data/invalid_rc.sh",
+            rpmfluff.SourceFile("invalid_rc.sh", invalid_rc),
+        )
+        self.after_rpm.add_installed_file(
+            "/usr/share/data/invalid_rc.sh",
+            rpmfluff.SourceFile("invalid_rc.sh", invalid_rc),
+        )
+        self.inspection = "shellsyntax"
+        self.label = "shell-syntax"
+        self.result = "BAD"
+        self.waiver_auth = "Anyone"
 
 
 class RcWellFormedCompareKoji(TestCompareKoji):
     """
     Valid /bin/rc script is OK for comparing Koji builds
     """
+
     def setUp(self):
         TestCompareKoji.setUp(self)
-        self.before_rpm.add_installed_file('/usr/share/data/valid_rc.sh',
-                                           rpmfluff.SourceFile('valid_rc.sh', valid_rc))
-        self.after_rpm.add_installed_file('/usr/share/data/valid_rc.sh',
-                                          rpmfluff.SourceFile('valid_rc.sh', valid_rc))
-        self.inspection = 'shellsyntax'
-        self.label = 'shell-syntax'
-        self.result = 'OK'
+        self.before_rpm.add_installed_file(
+            "/usr/share/data/valid_rc.sh", rpmfluff.SourceFile("valid_rc.sh", valid_rc)
+        )
+        self.after_rpm.add_installed_file(
+            "/usr/share/data/valid_rc.sh", rpmfluff.SourceFile("valid_rc.sh", valid_rc)
+        )
+        self.inspection = "shellsyntax"
+        self.label = "shell-syntax"
+        self.result = "OK"
 
 
 class RcMalformedCompareKoji(TestCompareKoji):
     """
     Invalid /bin/rc script is BAD for comparing Koji builds
     """
+
     def setUp(self):
         TestCompareKoji.setUp(self)
-        self.before_rpm.add_installed_file('/usr/share/data/invalid_rc.sh',
-                                           rpmfluff.SourceFile('invalid_rc.sh', invalid_rc))
-        self.after_rpm.add_installed_file('/usr/share/data/invalid_rc.sh',
-                                          rpmfluff.SourceFile('invalid_rc.sh', invalid_rc))
-        self.inspection = 'shellsyntax'
-        self.label = 'shell-syntax'
-        self.result = 'BAD'
-        self.waiver_auth = 'Anyone'
+        self.before_rpm.add_installed_file(
+            "/usr/share/data/invalid_rc.sh",
+            rpmfluff.SourceFile("invalid_rc.sh", invalid_rc),
+        )
+        self.after_rpm.add_installed_file(
+            "/usr/share/data/invalid_rc.sh",
+            rpmfluff.SourceFile("invalid_rc.sh", invalid_rc),
+        )
+        self.inspection = "shellsyntax"
+        self.label = "shell-syntax"
+        self.result = "BAD"
+        self.waiver_auth = "Anyone"
 
 
 class RcWellMalformedCompareRPMs(TestCompareRPMs):
     """
     Valid /bin/rc script in before, invalid in after is BAD when comparing RPMs
     """
+
     def setUp(self):
         TestCompareRPMs.setUp(self)
-        self.before_rpm.add_installed_file('/usr/share/data/valid_rc.sh',
-                                           rpmfluff.SourceFile('valid_rc.sh', valid_rc))
-        self.after_rpm.add_installed_file('/usr/share/data/invalid_rc.sh',
-                                          rpmfluff.SourceFile('invalid_rc.sh', invalid_rc))
-        self.inspection = 'shellsyntax'
-        self.label = 'shell-syntax'
-        self.result = 'BAD'
-        self.waiver_auth = 'Anyone'
+        self.before_rpm.add_installed_file(
+            "/usr/share/data/valid_rc.sh", rpmfluff.SourceFile("valid_rc.sh", valid_rc)
+        )
+        self.after_rpm.add_installed_file(
+            "/usr/share/data/invalid_rc.sh",
+            rpmfluff.SourceFile("invalid_rc.sh", invalid_rc),
+        )
+        self.inspection = "shellsyntax"
+        self.label = "shell-syntax"
+        self.result = "BAD"
+        self.waiver_auth = "Anyone"
 
 
 class RcWellMalformedCompareKoji(TestCompareKoji):
     """
     Valid /bin/rc script in before, invalid in after is BAD when comparing Koji builds
     """
+
     def setUp(self):
         TestCompareKoji.setUp(self)
-        self.before_rpm.add_installed_file('/usr/share/data/valid_rc.sh',
-                                           rpmfluff.SourceFile('valid_rc.sh', valid_rc))
-        self.after_rpm.add_installed_file('/usr/share/data/invalid_rc.sh',
-                                          rpmfluff.SourceFile('invalid_rc.sh', invalid_rc))
-        self.inspection = 'shellsyntax'
-        self.label = 'shell-syntax'
-        self.result = 'BAD'
-        self.waiver_auth = 'Anyone'
+        self.before_rpm.add_installed_file(
+            "/usr/share/data/valid_rc.sh", rpmfluff.SourceFile("valid_rc.sh", valid_rc)
+        )
+        self.after_rpm.add_installed_file(
+            "/usr/share/data/invalid_rc.sh",
+            rpmfluff.SourceFile("invalid_rc.sh", invalid_rc),
+        )
+        self.inspection = "shellsyntax"
+        self.label = "shell-syntax"
+        self.result = "BAD"
+        self.waiver_auth = "Anyone"
 
 
 #################################################################
@@ -1316,207 +1552,265 @@ class BashWellFormedRPM(TestRPMs):
     """
     Valid /bin/bash script is OK for RPMs
     """
+
     def setUp(self):
         TestRPMs.setUp(self)
 
-        self.rpm.add_installed_file('/usr/share/data/valid_bash.sh',
-                                    rpmfluff.SourceFile('valid_bash.sh', valid_bash))
-        self.inspection = 'shellsyntax'
-        self.label = 'shell-syntax'
-        self.result = 'OK'
+        self.rpm.add_installed_file(
+            "/usr/share/data/valid_bash.sh",
+            rpmfluff.SourceFile("valid_bash.sh", valid_bash),
+        )
+        self.inspection = "shellsyntax"
+        self.label = "shell-syntax"
+        self.result = "OK"
 
 
 class BashMalformedRPM(TestRPMs):
     """
     Invalid /bin/bash script is BAD for RPMs
     """
+
     def setUp(self):
         TestRPMs.setUp(self)
 
-        self.rpm.add_installed_file('/usr/share/data/invalid_bash.sh',
-                                    rpmfluff.SourceFile('invalid_bash.sh', invalid_bash))
-        self.inspection = 'shellsyntax'
-        self.label = 'shell-syntax'
-        self.result = 'BAD'
-        self.waiver_auth = 'Anyone'
+        self.rpm.add_installed_file(
+            "/usr/share/data/invalid_bash.sh",
+            rpmfluff.SourceFile("invalid_bash.sh", invalid_bash),
+        )
+        self.inspection = "shellsyntax"
+        self.label = "shell-syntax"
+        self.result = "BAD"
+        self.waiver_auth = "Anyone"
 
 
 class BashExtglobWellFormedRPM(TestRPMs):
     """
     Valid but requires 'extglob' script is OK for RPMs
     """
+
     def setUp(self):
         TestRPMs.setUp(self)
 
-        self.rpm.add_installed_file('/usr/share/data/valid_bash_extglob.sh',
-                                    rpmfluff.SourceFile('valid_bash_extglob.sh', valid_bash_extglob))
-        self.inspection = 'shellsyntax'
-        self.label = 'shell-syntax'
-        self.result = 'INFO'
+        self.rpm.add_installed_file(
+            "/usr/share/data/valid_bash_extglob.sh",
+            rpmfluff.SourceFile("valid_bash_extglob.sh", valid_bash_extglob),
+        )
+        self.inspection = "shellsyntax"
+        self.label = "shell-syntax"
+        self.result = "INFO"
 
 
 class BashWellFormedKoji(TestKoji):
     """
     Valid /bin/bash script is OK for Koji build
     """
+
     def setUp(self):
         TestKoji.setUp(self)
 
-        self.rpm.add_installed_file('/usr/share/data/valid_bash.sh',
-                                    rpmfluff.SourceFile('valid_bash.sh', valid_bash))
-        self.inspection = 'shellsyntax'
-        self.label = 'shell-syntax'
-        self.result = 'OK'
+        self.rpm.add_installed_file(
+            "/usr/share/data/valid_bash.sh",
+            rpmfluff.SourceFile("valid_bash.sh", valid_bash),
+        )
+        self.inspection = "shellsyntax"
+        self.label = "shell-syntax"
+        self.result = "OK"
 
 
 class BashMalformedKoji(TestKoji):
     """
     Invalid /bin/bash script is BAD for Koji build
     """
+
     def setUp(self):
         TestKoji.setUp(self)
 
-        self.rpm.add_installed_file('/usr/share/data/invalid_bash.sh',
-                                    rpmfluff.SourceFile('invalid_bash.sh', invalid_bash))
-        self.inspection = 'shellsyntax'
-        self.label = 'shell-syntax'
-        self.result = 'BAD'
-        self.waiver_auth = 'Anyone'
+        self.rpm.add_installed_file(
+            "/usr/share/data/invalid_bash.sh",
+            rpmfluff.SourceFile("invalid_bash.sh", invalid_bash),
+        )
+        self.inspection = "shellsyntax"
+        self.label = "shell-syntax"
+        self.result = "BAD"
+        self.waiver_auth = "Anyone"
 
 
 class BashExtglobWellFormedKoji(TestKoji):
     """
     Valid but requires 'extglob' script is OK for Koji build
     """
+
     def setUp(self):
         TestKoji.setUp(self)
 
-        self.rpm.add_installed_file('/usr/share/data/valid_bash_extglob.sh',
-                                    rpmfluff.SourceFile('valid_bash_extglob.sh', valid_bash_extglob))
-        self.inspection = 'shellsyntax'
-        self.label = 'shell-syntax'
-        self.result = 'INFO'
+        self.rpm.add_installed_file(
+            "/usr/share/data/valid_bash_extglob.sh",
+            rpmfluff.SourceFile("valid_bash_extglob.sh", valid_bash_extglob),
+        )
+        self.inspection = "shellsyntax"
+        self.label = "shell-syntax"
+        self.result = "INFO"
 
 
 class BashWellFormedCompareRPMs(TestCompareRPMs):
     """
     Valid /bin/bash script is OK for comparing RPMs
     """
+
     def setUp(self):
         TestCompareRPMs.setUp(self)
-        self.before_rpm.add_installed_file('/usr/share/data/valid_bash.sh',
-                                           rpmfluff.SourceFile('valid_bash.sh', valid_bash))
-        self.after_rpm.add_installed_file('/usr/share/data/valid_bash.sh',
-                                          rpmfluff.SourceFile('valid_sh.sh', valid_bash))
-        self.inspection = 'shellsyntax'
-        self.label = 'shell-syntax'
-        self.result = 'OK'
+        self.before_rpm.add_installed_file(
+            "/usr/share/data/valid_bash.sh",
+            rpmfluff.SourceFile("valid_bash.sh", valid_bash),
+        )
+        self.after_rpm.add_installed_file(
+            "/usr/share/data/valid_bash.sh",
+            rpmfluff.SourceFile("valid_sh.sh", valid_bash),
+        )
+        self.inspection = "shellsyntax"
+        self.label = "shell-syntax"
+        self.result = "OK"
 
 
 class BashMalformedCompareRPMs(TestCompareRPMs):
     """
     Invalid /bin/bash script is BAD for comparing RPMs
     """
+
     def setUp(self):
         TestCompareRPMs.setUp(self)
-        self.before_rpm.add_installed_file('/usr/share/data/invalid_bash.sh',
-                                           rpmfluff.SourceFile('invalid_bash.sh', invalid_bash))
-        self.after_rpm.add_installed_file('/usr/share/data/invalid_bash.sh',
-                                          rpmfluff.SourceFile('invalid_bash.sh', invalid_bash))
-        self.inspection = 'shellsyntax'
-        self.label = 'shell-syntax'
-        self.result = 'BAD'
-        self.waiver_auth = 'Anyone'
+        self.before_rpm.add_installed_file(
+            "/usr/share/data/invalid_bash.sh",
+            rpmfluff.SourceFile("invalid_bash.sh", invalid_bash),
+        )
+        self.after_rpm.add_installed_file(
+            "/usr/share/data/invalid_bash.sh",
+            rpmfluff.SourceFile("invalid_bash.sh", invalid_bash),
+        )
+        self.inspection = "shellsyntax"
+        self.label = "shell-syntax"
+        self.result = "BAD"
+        self.waiver_auth = "Anyone"
 
 
 class BashExtglobWellFormedCompareRPMs(TestCompareRPMs):
     """
     Valid but requires 'extglob' script is OK for comparing RPMs
     """
+
     def setUp(self):
         TestCompareRPMs.setUp(self)
-        self.before_rpm.add_installed_file('/usr/share/data/valid_bash_extglob.sh',
-                                           rpmfluff.SourceFile('valid_bash_extglob.sh', valid_bash_extglob))
-        self.after_rpm.add_installed_file('/usr/share/data/valid_bash_extglob.sh',
-                                          rpmfluff.SourceFile('valid_bash_extglob.sh', valid_bash_extglob))
-        self.inspection = 'shellsyntax'
-        self.label = 'shell-syntax'
-        self.result = 'INFO'
+        self.before_rpm.add_installed_file(
+            "/usr/share/data/valid_bash_extglob.sh",
+            rpmfluff.SourceFile("valid_bash_extglob.sh", valid_bash_extglob),
+        )
+        self.after_rpm.add_installed_file(
+            "/usr/share/data/valid_bash_extglob.sh",
+            rpmfluff.SourceFile("valid_bash_extglob.sh", valid_bash_extglob),
+        )
+        self.inspection = "shellsyntax"
+        self.label = "shell-syntax"
+        self.result = "INFO"
 
 
 class BashWellFormedCompareKoji(TestCompareKoji):
     """
     Valid /bin/bash script is OK for comparing Koji builds
     """
+
     def setUp(self):
         TestCompareKoji.setUp(self)
-        self.before_rpm.add_installed_file('/usr/share/data/valid_bash.sh',
-                                           rpmfluff.SourceFile('valid_bash.sh', valid_bash))
-        self.after_rpm.add_installed_file('/usr/share/data/valid_bash.sh',
-                                          rpmfluff.SourceFile('valid_bash.sh', valid_bash))
-        self.inspection = 'shellsyntax'
-        self.label = 'shell-syntax'
-        self.result = 'OK'
+        self.before_rpm.add_installed_file(
+            "/usr/share/data/valid_bash.sh",
+            rpmfluff.SourceFile("valid_bash.sh", valid_bash),
+        )
+        self.after_rpm.add_installed_file(
+            "/usr/share/data/valid_bash.sh",
+            rpmfluff.SourceFile("valid_bash.sh", valid_bash),
+        )
+        self.inspection = "shellsyntax"
+        self.label = "shell-syntax"
+        self.result = "OK"
 
 
 class BashMalformedCompareKoji(TestCompareKoji):
     """
     Invalid /bin/bash script is BAD for comparing Koji builds
     """
+
     def setUp(self):
         TestCompareKoji.setUp(self)
-        self.before_rpm.add_installed_file('/usr/share/data/invalid_bash.sh',
-                                           rpmfluff.SourceFile('invalid_bash.sh', invalid_bash))
-        self.after_rpm.add_installed_file('/usr/share/data/invalid_bash.sh',
-                                          rpmfluff.SourceFile('invalid_bash.sh', invalid_bash))
-        self.inspection = 'shellsyntax'
-        self.label = 'shell-syntax'
-        self.result = 'BAD'
-        self.waiver_auth = 'Anyone'
+        self.before_rpm.add_installed_file(
+            "/usr/share/data/invalid_bash.sh",
+            rpmfluff.SourceFile("invalid_bash.sh", invalid_bash),
+        )
+        self.after_rpm.add_installed_file(
+            "/usr/share/data/invalid_bash.sh",
+            rpmfluff.SourceFile("invalid_bash.sh", invalid_bash),
+        )
+        self.inspection = "shellsyntax"
+        self.label = "shell-syntax"
+        self.result = "BAD"
+        self.waiver_auth = "Anyone"
 
 
 class BashExtglobWellFormedCompareKoji(TestCompareKoji):
     """
     Valid but requires 'extglob' script is OK for comparing Koji builds
     """
+
     def setUp(self):
         TestCompareKoji.setUp(self)
-        self.before_rpm.add_installed_file('/usr/share/data/valid_bash_extglob.sh',
-                                           rpmfluff.SourceFile('valid_bash_extglob.sh', valid_bash_extglob))
-        self.after_rpm.add_installed_file('/usr/share/data/valid_bash_extglob.sh',
-                                          rpmfluff.SourceFile('valid_bash_extglob.sh', valid_bash_extglob))
-        self.inspection = 'shellsyntax'
-        self.label = 'shell-syntax'
-        self.result = 'INFO'
+        self.before_rpm.add_installed_file(
+            "/usr/share/data/valid_bash_extglob.sh",
+            rpmfluff.SourceFile("valid_bash_extglob.sh", valid_bash_extglob),
+        )
+        self.after_rpm.add_installed_file(
+            "/usr/share/data/valid_bash_extglob.sh",
+            rpmfluff.SourceFile("valid_bash_extglob.sh", valid_bash_extglob),
+        )
+        self.inspection = "shellsyntax"
+        self.label = "shell-syntax"
+        self.result = "INFO"
 
 
 class BashWellMalformedCompareRPMs(TestCompareRPMs):
     """
     Valid /bin/bash script in before, invalid in after is BAD when comparing RPMs
     """
+
     def setUp(self):
         TestCompareRPMs.setUp(self)
-        self.before_rpm.add_installed_file('/usr/share/data/valid_bash.sh',
-                                           rpmfluff.SourceFile('valid_bash.sh', valid_bash))
-        self.after_rpm.add_installed_file('/usr/share/data/invalid_bash.sh',
-                                          rpmfluff.SourceFile('invalid_bash.sh', invalid_bash))
-        self.inspection = 'shellsyntax'
-        self.label = 'shell-syntax'
-        self.result = 'BAD'
-        self.waiver_auth = 'Anyone'
+        self.before_rpm.add_installed_file(
+            "/usr/share/data/valid_bash.sh",
+            rpmfluff.SourceFile("valid_bash.sh", valid_bash),
+        )
+        self.after_rpm.add_installed_file(
+            "/usr/share/data/invalid_bash.sh",
+            rpmfluff.SourceFile("invalid_bash.sh", invalid_bash),
+        )
+        self.inspection = "shellsyntax"
+        self.label = "shell-syntax"
+        self.result = "BAD"
+        self.waiver_auth = "Anyone"
 
 
 class BashWellMalformedCompareKoji(TestCompareKoji):
     """
     Valid /bin/bash script in before, invalid in after is BAD when comparing Koji builds
     """
+
     def setUp(self):
         TestCompareKoji.setUp(self)
-        self.before_rpm.add_installed_file('/usr/share/data/valid_bash.sh',
-                                           rpmfluff.SourceFile('valid_bash.sh', valid_bash))
-        self.after_rpm.add_installed_file('/usr/share/data/invalid_sh.sh',
-                                          rpmfluff.SourceFile('invalid_bash.sh', invalid_bash))
-        self.inspection = 'shellsyntax'
-        self.label = 'shell-syntax'
-        self.result = 'BAD'
-        self.waiver_auth = 'Anyone'
+        self.before_rpm.add_installed_file(
+            "/usr/share/data/valid_bash.sh",
+            rpmfluff.SourceFile("valid_bash.sh", valid_bash),
+        )
+        self.after_rpm.add_installed_file(
+            "/usr/share/data/invalid_sh.sh",
+            rpmfluff.SourceFile("invalid_bash.sh", invalid_bash),
+        )
+        self.inspection = "shellsyntax"
+        self.label = "shell-syntax"
+        self.result = "BAD"
+        self.waiver_auth = "Anyone"

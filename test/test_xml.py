@@ -37,90 +37,115 @@ invalid_xml = """<?xml version='1.0'?>
 class XMLWellFormedRPM(TestRPMs):
     def setUp(self):
         TestRPMs.setUp(self)
-        self.rpm.add_installed_file('/usr/share/data/valid.xml',
-                                    rpmfluff.SourceFile('valid.xml', valid_xml))
-        self.inspection = 'xml'
-        self.label = 'xml-files'
-        self.result = 'OK'
+        self.rpm.add_installed_file(
+            "/usr/share/data/valid.xml", rpmfluff.SourceFile("valid.xml", valid_xml)
+        )
+        self.inspection = "xml"
+        self.label = "xml-files"
+        self.result = "OK"
+
 
 # XML file is well formed in Koji build (OK)
 class XMLWellFormedKoji(TestKoji):
     def setUp(self):
         TestKoji.setUp(self)
-        self.rpm.add_installed_file('/usr/share/data/valid.xml',
-                                    rpmfluff.SourceFile('valid.xml', valid_xml))
-        self.inspection = 'xml'
-        self.label = 'xml-files'
-        self.result = 'OK'
+        self.rpm.add_installed_file(
+            "/usr/share/data/valid.xml", rpmfluff.SourceFile("valid.xml", valid_xml)
+        )
+        self.inspection = "xml"
+        self.label = "xml-files"
+        self.result = "OK"
+
 
 # XML file is well formed in compare RPMs (OK)
 class XMLWellFormedCompareRPMs(TestCompareRPMs):
     def setUp(self):
         TestCompareRPMs.setUp(self)
-        self.before_rpm.add_installed_file('/usr/share/data/valid.xml',
-                                           rpmfluff.SourceFile('valid.xml', valid_xml))
-        self.after_rpm.add_installed_file('/usr/share/data/valid.xml',
-                                          rpmfluff.SourceFile('valid.xml', valid_xml))
-        self.inspection = 'xml'
-        self.label = 'xml-files'
-        self.result = 'OK'
+        self.before_rpm.add_installed_file(
+            "/usr/share/data/valid.xml", rpmfluff.SourceFile("valid.xml", valid_xml)
+        )
+        self.after_rpm.add_installed_file(
+            "/usr/share/data/valid.xml", rpmfluff.SourceFile("valid.xml", valid_xml)
+        )
+        self.inspection = "xml"
+        self.label = "xml-files"
+        self.result = "OK"
+
 
 # XML file is well formed in compare Koji builds (OK)
 class XMLWellFormedCompareKoji(TestCompareKoji):
     def setUp(self):
         TestCompareKoji.setUp(self)
-        self.before_rpm.add_installed_file('/usr/share/data/valid.xml',
-                                           rpmfluff.SourceFile('valid.xml', valid_xml))
-        self.after_rpm.add_installed_file('/usr/share/data/valid.xml',
-                                          rpmfluff.SourceFile('valid.xml', valid_xml))
-        self.inspection = 'xml'
-        self.label = 'xml-files'
-        self.result = 'OK'
+        self.before_rpm.add_installed_file(
+            "/usr/share/data/valid.xml", rpmfluff.SourceFile("valid.xml", valid_xml)
+        )
+        self.after_rpm.add_installed_file(
+            "/usr/share/data/valid.xml", rpmfluff.SourceFile("valid.xml", valid_xml)
+        )
+        self.inspection = "xml"
+        self.label = "xml-files"
+        self.result = "OK"
+
 
 # XML file is malformed in RPM (VERIFY)
 class XMLMalformedRPM(TestRPMs):
     def setUp(self):
         TestRPMs.setUp(self)
-        self.rpm.add_installed_file('/usr/share/data/invalid.xml',
-                                    rpmfluff.SourceFile('invalid.xml', invalid_xml))
-        self.inspection = 'xml'
-        self.label = 'xml-files'
-        self.result = 'VERIFY'
-        self.waiver_auth = 'Anyone'
+        self.rpm.add_installed_file(
+            "/usr/share/data/invalid.xml",
+            rpmfluff.SourceFile("invalid.xml", invalid_xml),
+        )
+        self.inspection = "xml"
+        self.label = "xml-files"
+        self.result = "VERIFY"
+        self.waiver_auth = "Anyone"
+
 
 # XML file is malformed in Koji build (VERIFY)
 class XMLMalformedKoji(TestKoji):
     def setUp(self):
         TestKoji.setUp(self)
-        self.rpm.add_installed_file('/usr/share/data/invalid.xml',
-                                    rpmfluff.SourceFile('invalid.xml', invalid_xml))
-        self.inspection = 'xml'
-        self.label = 'xml-files'
-        self.result = 'VERIFY'
-        self.waiver_auth = 'Anyone'
+        self.rpm.add_installed_file(
+            "/usr/share/data/invalid.xml",
+            rpmfluff.SourceFile("invalid.xml", invalid_xml),
+        )
+        self.inspection = "xml"
+        self.label = "xml-files"
+        self.result = "VERIFY"
+        self.waiver_auth = "Anyone"
+
 
 # XML file is malformed in compare RPMs (VERIFY)
 class XMLMalformedCompareRPMs(TestCompareRPMs):
     def setUp(self):
         TestCompareRPMs.setUp(self)
-        self.before_rpm.add_installed_file('/usr/share/data/invalid.xml',
-                                           rpmfluff.SourceFile('invalid.xml', invalid_xml))
-        self.after_rpm.add_installed_file('/usr/share/data/invalid.xml',
-                                          rpmfluff.SourceFile('invalid.xml', invalid_xml))
-        self.inspection = 'xml'
-        self.label = 'xml-files'
-        self.result = 'VERIFY'
-        self.waiver_auth = 'Anyone'
+        self.before_rpm.add_installed_file(
+            "/usr/share/data/invalid.xml",
+            rpmfluff.SourceFile("invalid.xml", invalid_xml),
+        )
+        self.after_rpm.add_installed_file(
+            "/usr/share/data/invalid.xml",
+            rpmfluff.SourceFile("invalid.xml", invalid_xml),
+        )
+        self.inspection = "xml"
+        self.label = "xml-files"
+        self.result = "VERIFY"
+        self.waiver_auth = "Anyone"
+
 
 # XML file is malformed in compare Koji builds (VERIFY)
 class XMLMalformedCompareKoji(TestCompareKoji):
     def setUp(self):
         TestCompareKoji.setUp(self)
-        self.before_rpm.add_installed_file('/usr/share/data/invalid.xml',
-                                           rpmfluff.SourceFile('invalid.xml', invalid_xml))
-        self.after_rpm.add_installed_file('/usr/share/data/invalid.xml',
-                                          rpmfluff.SourceFile('invalid.xml', invalid_xml))
-        self.inspection = 'xml'
-        self.label = 'xml-files'
-        self.result = 'VERIFY'
-        self.waiver_auth = 'Anyone'
+        self.before_rpm.add_installed_file(
+            "/usr/share/data/invalid.xml",
+            rpmfluff.SourceFile("invalid.xml", invalid_xml),
+        )
+        self.after_rpm.add_installed_file(
+            "/usr/share/data/invalid.xml",
+            rpmfluff.SourceFile("invalid.xml", invalid_xml),
+        )
+        self.inspection = "xml"
+        self.label = "xml-files"
+        self.result = "VERIFY"
+        self.waiver_auth = "Anyone"

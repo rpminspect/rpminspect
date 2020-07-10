@@ -29,30 +29,33 @@ class LostChangeLogCompareSRPM(TestCompareSRPM):
     def setUp(self):
         TestCompareSRPM.setUp(self)
         self.after_rpm.section_changelog = None
-        self.inspection = 'changelog'
-        self.label = 'changelog'
-        self.result = 'VERIFY'
-        self.waiver_auth = 'Anyone'
+        self.inspection = "changelog"
+        self.label = "changelog"
+        self.result = "VERIFY"
+        self.waiver_auth = "Anyone"
+
 
 class LostChangeLogCompareRPMs(TestCompareRPMs):
     def setUp(self):
         TestCompareRPMs.setUp(self)
         self.after_rpm.section_changelog = None
-        self.inspection = 'changelog'
-        self.label = 'changelog'
+        self.inspection = "changelog"
+        self.label = "changelog"
         # this is INFO because it's only comapring the binary RPMs,
         # the other checks are for SRPMs
-        self.result = 'INFO'
-        self.waiver_auth = 'Not Waivable'
+        self.result = "INFO"
+        self.waiver_auth = "Not Waivable"
+
 
 class LostChangeLogCompareKoji(TestCompareKoji):
     def setUp(self):
         TestCompareKoji.setUp(self)
         self.after_rpm.section_changelog = None
-        self.inspection = 'changelog'
-        self.label = 'changelog'
-        self.result = 'VERIFY'
-        self.waiver_auth = 'Anyone'
+        self.inspection = "changelog"
+        self.label = "changelog"
+        self.result = "VERIFY"
+        self.waiver_auth = "Anyone"
+
 
 # 2) Prevent a %changelog in the before build but add one in the after
 #    build.  The test should report that as INFO.
@@ -60,28 +63,31 @@ class GainedChangeLogCompareSRPM(TestCompareSRPM):
     def setUp(self):
         TestCompareSRPM.setUp(self)
         self.before_rpm.section_changelog = None
-        self.inspection = 'changelog'
-        self.label = 'changelog'
-        self.result = 'INFO'
-        self.waiver_auth = 'Not Waivable'
+        self.inspection = "changelog"
+        self.label = "changelog"
+        self.result = "INFO"
+        self.waiver_auth = "Not Waivable"
+
 
 class GainedChangeLogCompareRPMs(TestCompareRPMs):
     def setUp(self):
         TestCompareRPMs.setUp(self)
         self.before_rpm.section_changelog = None
-        self.inspection = 'changelog'
-        self.label = 'changelog'
-        self.result = 'INFO'
-        self.waiver_auth = 'Not Waivable'
+        self.inspection = "changelog"
+        self.label = "changelog"
+        self.result = "INFO"
+        self.waiver_auth = "Not Waivable"
+
 
 class GainedChangeLogCompareKoji(TestCompareKoji):
     def setUp(self):
         TestCompareKoji.setUp(self)
         self.before_rpm.section_changelog = None
-        self.inspection = 'changelog'
-        self.label = 'changelog'
-        self.result = 'INFO'
-        self.waiver_auth = 'Not Waivable'
+        self.inspection = "changelog"
+        self.label = "changelog"
+        self.result = "INFO"
+        self.waiver_auth = "Not Waivable"
+
 
 # 3) If the first entries in the changelog as the same in the before and
 #    after build, the test should report it as BAD.
@@ -91,16 +97,20 @@ class SameChangeLogCompareSRPM(TestCompareSRPM):
 
         # create a simple changelog and duplicate it
         today = datetime.date.today().strftime("%a %b %d %Y")
-        clog = "* %s Packie McPackerson <packie@mcpackerson.io> - 47.7-1\n- Upgrade to the latest and greatest\n" % today
+        clog = (
+            "* %s Packie McPackerson <packie@mcpackerson.io> - 47.7-1\n- Upgrade to the latest and greatest\n"
+            % today
+        )
 
         # modify the changelogs
         self.before_rpm.section_changelog = clog
         self.after_rpm.section_changelog = clog
 
-        self.inspection = 'changelog'
-        self.label = 'changelog'
-        self.result = 'BAD'
-        self.waiver_auth = 'Anyone'
+        self.inspection = "changelog"
+        self.label = "changelog"
+        self.result = "BAD"
+        self.waiver_auth = "Anyone"
+
 
 class SameChangeLogCompareKoji(TestCompareKoji):
     def setUp(self):
@@ -108,16 +118,20 @@ class SameChangeLogCompareKoji(TestCompareKoji):
 
         # create a simple changelog and duplicate it
         today = datetime.date.today().strftime("%a %b %d %Y")
-        clog = "* %s Packie McPackerson <packie@mcpackerson.io> - 47.7-1\n- Upgrade to the latest and greatest\n" % today
+        clog = (
+            "* %s Packie McPackerson <packie@mcpackerson.io> - 47.7-1\n- Upgrade to the latest and greatest\n"
+            % today
+        )
 
         # modify the changelogs
         self.before_rpm.section_changelog = clog
         self.after_rpm.section_changelog = clog
 
-        self.inspection = 'changelog'
-        self.label = 'changelog'
-        self.result = 'BAD'
-        self.waiver_auth = 'Anyone'
+        self.inspection = "changelog"
+        self.label = "changelog"
+        self.result = "BAD"
+        self.waiver_auth = "Anyone"
+
 
 # In the binary RPM:
 # 1) Change some lines in the after build's %changelog.  The test should
@@ -128,18 +142,28 @@ class BalancedChangeLogEditCompareKoji(TestCompareKoji):
 
         # create a simple prefix that will result in a one line edit script
         today = datetime.date.today().strftime("%a %b %d %Y")
-        before_prefix = "* %s Packie McPackerson <packie@mcpackerson.io> - 47.7-1\n- Upgrade to the latest and greatest\n\n" % today
-        after_prefix = "* %s Packie McPackerson <packie@mcpackerson.io> - 7.47-1\n- Upgrade to the latest and greatest\n\n" % today
-        suffix = "* %s Packie McPackerson <packie@mcpackerson.io> - 1.0\n- Initial package\n" % today
+        before_prefix = (
+            "* %s Packie McPackerson <packie@mcpackerson.io> - 47.7-1\n- Upgrade to the latest and greatest\n\n"
+            % today
+        )
+        after_prefix = (
+            "* %s Packie McPackerson <packie@mcpackerson.io> - 7.47-1\n- Upgrade to the latest and greatest\n\n"
+            % today
+        )
+        suffix = (
+            "* %s Packie McPackerson <packie@mcpackerson.io> - 1.0\n- Initial package\n"
+            % today
+        )
 
         # modify the changelogs
         self.before_rpm.section_changelog = before_prefix + suffix
         self.after_rpm.section_changelog = after_prefix + suffix
 
-        self.inspection = 'changelog'
-        self.label = 'changelog'
-        self.result = 'INFO'
-        self.waiver_auth = 'Not Waivable'
+        self.inspection = "changelog"
+        self.label = "changelog"
+        self.result = "INFO"
+        self.waiver_auth = "Not Waivable"
+
 
 class UnbalancedChangeLogEditCompareKoji(TestCompareKoji):
     def setUp(self):
@@ -147,15 +171,21 @@ class UnbalancedChangeLogEditCompareKoji(TestCompareKoji):
 
         # create a simple prefix that will result in a multiline removal
         today = datetime.date.today().strftime("%a %b %d %Y")
-        before_prefix = "* %s Packie McPackerson <packie@mcpackerson.io> - 47.7-1\n- Upgrade to the latest and greatest\n\n" % today
+        before_prefix = (
+            "* %s Packie McPackerson <packie@mcpackerson.io> - 47.7-1\n- Upgrade to the latest and greatest\n\n"
+            % today
+        )
 
         # modify the changelog
-        self.before_rpm.section_changelog = before_prefix + self.before_rpm.section_changelog
+        self.before_rpm.section_changelog = (
+            before_prefix + self.before_rpm.section_changelog
+        )
 
-        self.inspection = 'changelog'
-        self.label = 'changelog'
-        self.result = 'INFO'
-        self.waiver_auth = 'Not Waivable'
+        self.inspection = "changelog"
+        self.label = "changelog"
+        self.result = "INFO"
+        self.waiver_auth = "Not Waivable"
+
 
 # 2) Only add a new entry to the %changelog in the after build.  This
 #    should report as INFO.
@@ -165,8 +195,14 @@ class AddChangeLogEntryCompareSRPM(TestCompareSRPM):
 
         # create a simple prefix that will result in a new entry
         today = datetime.date.today().strftime("%a %b %d %Y")
-        after_prefix = "* %s Packie McPackerson <packie@mcpackerson.io> - 47.7-1\n- Upgrade to the latest and greatest\n\n" % today
-        suffix = "* %s Packie McPackerson <packie@mcpackerson.io> - 1.0\n- Initial package\n" % today
+        after_prefix = (
+            "* %s Packie McPackerson <packie@mcpackerson.io> - 47.7-1\n- Upgrade to the latest and greatest\n\n"
+            % today
+        )
+        suffix = (
+            "* %s Packie McPackerson <packie@mcpackerson.io> - 1.0\n- Initial package\n"
+            % today
+        )
 
         # modify the changelogs
         self.before_rpm.section_changelog = suffix
@@ -178,10 +214,11 @@ class AddChangeLogEntryCompareSRPM(TestCompareSRPM):
         # reason for that is to account for macro expansion failures.
         # We want to check here for OK anyway because any other return
         # indicates a failure in the SRPM only changelog inspection.
-        self.inspection = 'changelog'
-        self.label = 'changelog'
-        self.result = 'OK'
-        self.waiver_auth = 'Not Waivable'
+        self.inspection = "changelog"
+        self.label = "changelog"
+        self.result = "OK"
+        self.waiver_auth = "Not Waivable"
+
 
 class AddChangeLogEntryCompareRPMs(TestCompareRPMs):
     def setUp(self):
@@ -189,17 +226,24 @@ class AddChangeLogEntryCompareRPMs(TestCompareRPMs):
 
         # create a simple prefix that will result in a new entry
         today = datetime.date.today().strftime("%a %b %d %Y")
-        after_prefix = "* %s Packie McPackerson <packie@mcpackerson.io> - 47.7-1\n- Upgrade to the latest and greatest\n\n" % today
-        suffix = "* %s Packie McPackerson <packie@mcpackerson.io> - 1.0\n- Initial package\n" % today
+        after_prefix = (
+            "* %s Packie McPackerson <packie@mcpackerson.io> - 47.7-1\n- Upgrade to the latest and greatest\n\n"
+            % today
+        )
+        suffix = (
+            "* %s Packie McPackerson <packie@mcpackerson.io> - 1.0\n- Initial package\n"
+            % today
+        )
 
         # modify the changelogs
         self.before_rpm.section_changelog = suffix
         self.after_rpm.section_changelog = after_prefix + suffix
 
-        self.inspection = 'changelog'
-        self.label = 'changelog'
-        self.result = 'INFO'
-        self.waiver_auth = 'Not Waivable'
+        self.inspection = "changelog"
+        self.label = "changelog"
+        self.result = "INFO"
+        self.waiver_auth = "Not Waivable"
+
 
 class AddChangeLogEntryCompareKoji(TestCompareKoji):
     def setUp(self):
@@ -207,17 +251,24 @@ class AddChangeLogEntryCompareKoji(TestCompareKoji):
 
         # create a simple prefix that will result in a new entry
         today = datetime.date.today().strftime("%a %b %d %Y")
-        after_prefix = "* %s Packie McPackerson <packie@mcpackerson.io> - 47.7-1\n- Upgrade to the latest and greatest\n\n" % today
-        suffix = "* %s Packie McPackerson <packie@mcpackerson.io> - 1.0\n- Initial package\n" % today
+        after_prefix = (
+            "* %s Packie McPackerson <packie@mcpackerson.io> - 47.7-1\n- Upgrade to the latest and greatest\n\n"
+            % today
+        )
+        suffix = (
+            "* %s Packie McPackerson <packie@mcpackerson.io> - 1.0\n- Initial package\n"
+            % today
+        )
 
         # modify the changelogs
         self.before_rpm.section_changelog = suffix
         self.after_rpm.section_changelog = after_prefix + suffix
 
-        self.inspection = 'changelog'
-        self.label = 'changelog'
-        self.result = 'INFO'
-        self.waiver_auth = 'Not Waivable'
+        self.inspection = "changelog"
+        self.label = "changelog"
+        self.result = "INFO"
+        self.waiver_auth = "Not Waivable"
+
 
 # 3) Add unprofessional language to the after build %changelog and make
 #    sure that is reported as BAD.
@@ -227,14 +278,20 @@ class UnprofessinalChangeLogEntryCompareKoji(TestCompareKoji):
 
         # create a change with a bad word
         today = datetime.date.today().strftime("%a %b %d %Y")
-        after_prefix = "* %s Packie McPackerson <packie@mcpackerson.io> - 47.7-1\n- Upgrade to the latest and reallybadword greatest\n\n" % today
-        suffix = "* %s Packie McPackerson <packie@mcpackerson.io> - 1.0\n- Initial package\n" % today
+        after_prefix = (
+            "* %s Packie McPackerson <packie@mcpackerson.io> - 47.7-1\n- Upgrade to the latest and reallybadword greatest\n\n"
+            % today
+        )
+        suffix = (
+            "* %s Packie McPackerson <packie@mcpackerson.io> - 1.0\n- Initial package\n"
+            % today
+        )
 
         # modify the changelog
         self.before_rpm.section_changelog = after_prefix + suffix
         self.after_rpm.section_changelog = after_prefix + suffix
 
-        self.inspection = 'changelog'
-        self.label = 'changelog'
-        self.result = 'BAD'
-        self.waiver_auth = 'Not Waivable'
+        self.inspection = "changelog"
+        self.label = "changelog"
+        self.result = "BAD"
+        self.waiver_auth = "Not Waivable"

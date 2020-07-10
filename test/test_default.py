@@ -28,51 +28,57 @@ class DefaultSRPM(TestSRPM):
     """
     Verify rpminspect runs against an SRPM
     """
+
     def setUp(self):
         TestSRPM.setUp(self)
-        self.result = 'OK'
+        self.result = "OK"
 
 
 class DefaultRPMs(TestRPMs):
     """
     Verify rpminspect runs against an RPM
     """
+
     def setUp(self):
         TestRPMs.setUp(self)
-        self.result = 'OK'
+        self.result = "OK"
 
 
 class DefaultKoji(TestKoji):
     """
     Verify rpminspect runs against a Koji build
     """
+
     def setUp(self):
         TestKoji.setUp(self)
-        self.result = 'OK'
+        self.result = "OK"
 
 
 class DefaultCompareSRPM(TestCompareSRPM):
     """
     Verify rpminspect runs against two SRPMs
     """
+
     def setUp(self):
         TestCompareSRPM.setUp(self)
-        self.result = 'OK'
+        self.result = "OK"
 
 
 class DefaultCompareRPMs(TestCompareRPMs):
     """
     Verify rpminspect runs against two RPMs
     """
+
     def setUp(self):
         TestCompareRPMs.setUp(self)
-        self.result = 'OK'
+        self.result = "OK"
 
 
 class DefaultCompareKoji(TestCompareKoji):
     """
     Verify rpminspect runs against two Koji builds
     """
+
     def setUp(self):
         TestCompareKoji.setUp(self)
-        self.result = 'OK'
+        self.result = "OK"

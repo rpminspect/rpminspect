@@ -24,13 +24,16 @@ class ManPageCorrectSectionRPM(TestRPMs):
         TestRPMs.setUp(self)
 
         # force a gzip here since we have disabled brp scripts
-        manpage = 'usr/share/man/man1/foo.1'
+        manpage = "usr/share/man/man1/foo.1"
         self.rpm.add_manpage(installPath=manpage)
-        self.rpm.section_install += 'gzip -9 $RPM_BUILD_ROOT/%s\n' % self.rpm.escape_path(manpage)
+        self.rpm.section_install += (
+            "gzip -9 $RPM_BUILD_ROOT/%s\n" % self.rpm.escape_path(manpage)
+        )
 
-        self.inspection = 'manpage'
-        self.label = 'man-pages'
-        self.result = 'OK'
+        self.inspection = "manpage"
+        self.label = "man-pages"
+        self.result = "OK"
+
 
 # Man page in the correct section subdirectory in Koji build (OK)
 class ManPageCorrectSectionKoji(TestKoji):
@@ -38,13 +41,16 @@ class ManPageCorrectSectionKoji(TestKoji):
         TestKoji.setUp(self)
 
         # force a gzip here since we have disabled brp scripts
-        manpage = 'usr/share/man/man1/foo.1'
+        manpage = "usr/share/man/man1/foo.1"
         self.rpm.add_manpage(installPath=manpage)
-        self.rpm.section_install += 'gzip -9 $RPM_BUILD_ROOT/%s\n' % self.rpm.escape_path(manpage)
+        self.rpm.section_install += (
+            "gzip -9 $RPM_BUILD_ROOT/%s\n" % self.rpm.escape_path(manpage)
+        )
 
-        self.inspection = 'manpage'
-        self.label = 'man-pages'
-        self.result = 'OK'
+        self.inspection = "manpage"
+        self.label = "man-pages"
+        self.result = "OK"
+
 
 # Man page in the correct section subdirectory in compare RPMs (OK)
 class ManPageCorrectSectionCompareRPMs(TestCompareRPMs):
@@ -52,15 +58,20 @@ class ManPageCorrectSectionCompareRPMs(TestCompareRPMs):
         TestCompareRPMs.setUp(self)
 
         # force a gzip here since we have disabled brp scripts
-        manpage = 'usr/share/man/man1/foo.1'
+        manpage = "usr/share/man/man1/foo.1"
         self.before_rpm.add_manpage(installPath=manpage)
-        self.before_rpm.section_install += 'gzip -9 $RPM_BUILD_ROOT/%s\n' % self.before_rpm.escape_path(manpage)
+        self.before_rpm.section_install += (
+            "gzip -9 $RPM_BUILD_ROOT/%s\n" % self.before_rpm.escape_path(manpage)
+        )
         self.after_rpm.add_manpage()
-        self.after_rpm.section_install += 'gzip -9 $RPM_BUILD_ROOT/%s\n' % self.before_rpm.escape_path(manpage)
+        self.after_rpm.section_install += (
+            "gzip -9 $RPM_BUILD_ROOT/%s\n" % self.before_rpm.escape_path(manpage)
+        )
 
-        self.inspection = 'manpage'
-        self.label = 'man-pages'
-        self.result = 'OK'
+        self.inspection = "manpage"
+        self.label = "man-pages"
+        self.result = "OK"
+
 
 # Man page in the correct section subdirectory in compare Koji (OK)
 class ManPageCorrectSectionCompareKoji(TestCompareKoji):
@@ -68,15 +79,20 @@ class ManPageCorrectSectionCompareKoji(TestCompareKoji):
         TestCompareKoji.setUp(self)
 
         # force a gzip here since we have disabled brp scripts
-        manpage = 'usr/share/man/man1/foo.1'
+        manpage = "usr/share/man/man1/foo.1"
         self.before_rpm.add_manpage(installPath=manpage)
-        self.before_rpm.section_install += 'gzip -9 $RPM_BUILD_ROOT/%s\n' % self.before_rpm.escape_path(manpage)
+        self.before_rpm.section_install += (
+            "gzip -9 $RPM_BUILD_ROOT/%s\n" % self.before_rpm.escape_path(manpage)
+        )
         self.after_rpm.add_manpage()
-        self.after_rpm.section_install += 'gzip -9 $RPM_BUILD_ROOT/%s\n' % self.before_rpm.escape_path(manpage)
+        self.after_rpm.section_install += (
+            "gzip -9 $RPM_BUILD_ROOT/%s\n" % self.before_rpm.escape_path(manpage)
+        )
 
-        self.inspection = 'manpage'
-        self.label = 'man-pages'
-        self.result = 'OK'
+        self.inspection = "manpage"
+        self.label = "man-pages"
+        self.result = "OK"
+
 
 # Man page not gzipped in RPM (VERIFY)
 class ManPageNotGzippedRPM(TestRPMs):
@@ -89,13 +105,17 @@ class ManPageNotGzippedRPM(TestRPMs):
         self.rpm.header += "%global __brp_compress /bin/true\n"
 
         # add an uncompressed man page
-        self.rpm.add_installed_file('usr/local/share/man/man1/foo.1', rpmfluff.SourceFile('foo.1', rpmfluff.sample_man_page))
+        self.rpm.add_installed_file(
+            "usr/local/share/man/man1/foo.1",
+            rpmfluff.SourceFile("foo.1", rpmfluff.sample_man_page),
+        )
 
         # the test
-        self.inspection = 'manpage'
-        self.label = 'man-pages'
-        self.result = 'VERIFY'
-        self.waiver_auth = 'Anyone'
+        self.inspection = "manpage"
+        self.label = "man-pages"
+        self.result = "VERIFY"
+        self.waiver_auth = "Anyone"
+
 
 # Man page not gzipped in Koji build (VERIFY)
 class ManPageNotGzippedKoji(TestKoji):
@@ -108,13 +128,17 @@ class ManPageNotGzippedKoji(TestKoji):
         self.rpm.header += "%global __brp_compress /bin/true\n"
 
         # add an uncompressed man page
-        self.rpm.add_installed_file('usr/local/share/man/man1/foo.1', rpmfluff.SourceFile('foo.1', rpmfluff.sample_man_page))
+        self.rpm.add_installed_file(
+            "usr/local/share/man/man1/foo.1",
+            rpmfluff.SourceFile("foo.1", rpmfluff.sample_man_page),
+        )
 
         # the test
-        self.inspection = 'manpage'
-        self.label = 'man-pages'
-        self.result = 'VERIFY'
-        self.waiver_auth = 'Anyone'
+        self.inspection = "manpage"
+        self.label = "man-pages"
+        self.result = "VERIFY"
+        self.waiver_auth = "Anyone"
+
 
 # Man page not gzipped in compare RPMs (VERIFY)
 class ManPageNotGzippedCompareRPMs(TestCompareRPMs):
@@ -128,14 +152,21 @@ class ManPageNotGzippedCompareRPMs(TestCompareRPMs):
         self.after_rpm.header += "%global __brp_compress /bin/true\n"
 
         # add an uncompressed man page
-        self.before_rpm.add_installed_file('usr/local/share/man/man1/foo.1', rpmfluff.SourceFile('foo.1', rpmfluff.sample_man_page))
-        self.after_rpm.add_installed_file('usr/local/share/man/man1/foo.1', rpmfluff.SourceFile('foo.1', rpmfluff.sample_man_page))
+        self.before_rpm.add_installed_file(
+            "usr/local/share/man/man1/foo.1",
+            rpmfluff.SourceFile("foo.1", rpmfluff.sample_man_page),
+        )
+        self.after_rpm.add_installed_file(
+            "usr/local/share/man/man1/foo.1",
+            rpmfluff.SourceFile("foo.1", rpmfluff.sample_man_page),
+        )
 
         # the test
-        self.inspection = 'manpage'
-        self.label = 'man-pages'
-        self.result = 'VERIFY'
-        self.waiver_auth = 'Anyone'
+        self.inspection = "manpage"
+        self.label = "man-pages"
+        self.result = "VERIFY"
+        self.waiver_auth = "Anyone"
+
 
 # Man page not gzipped in compare Koji (VERIFY)
 class ManPageNotGzippedCompareKoji(TestCompareKoji):
@@ -149,56 +180,79 @@ class ManPageNotGzippedCompareKoji(TestCompareKoji):
         self.after_rpm.header += "%global __brp_compress /bin/true\n"
 
         # add an uncompressed man page
-        self.before_rpm.add_installed_file('usr/local/share/man/man1/foo.1', rpmfluff.SourceFile('foo.1', rpmfluff.sample_man_page))
-        self.after_rpm.add_installed_file('usr/local/share/man/man1/foo.1', rpmfluff.SourceFile('foo.1', rpmfluff.sample_man_page))
+        self.before_rpm.add_installed_file(
+            "usr/local/share/man/man1/foo.1",
+            rpmfluff.SourceFile("foo.1", rpmfluff.sample_man_page),
+        )
+        self.after_rpm.add_installed_file(
+            "usr/local/share/man/man1/foo.1",
+            rpmfluff.SourceFile("foo.1", rpmfluff.sample_man_page),
+        )
 
         # the test
-        self.inspection = 'manpage'
-        self.label = 'man-pages'
-        self.result = 'VERIFY'
-        self.waiver_auth = 'Anyone'
+        self.inspection = "manpage"
+        self.label = "man-pages"
+        self.result = "VERIFY"
+        self.waiver_auth = "Anyone"
+
 
 # Man page in wrong section subdirectory in RPM (VERIFY)
 class ManPageWrongSectionRPM(TestRPMs):
     def setUp(self):
         TestRPMs.setUp(self)
-        self.rpm.add_manpage(sourceFileName='foo.8', installPath='usr/share/man/man1/foo.8.gz')
-        self.inspection = 'manpage'
-        self.label = 'man-pages'
-        self.result = 'VERIFY'
-        self.waiver_auth = 'Anyone'
+        self.rpm.add_manpage(
+            sourceFileName="foo.8", installPath="usr/share/man/man1/foo.8.gz"
+        )
+        self.inspection = "manpage"
+        self.label = "man-pages"
+        self.result = "VERIFY"
+        self.waiver_auth = "Anyone"
+
 
 # Man page in wrong section subdirectory in Koji build (VERIFY)
 class ManPageWrongSectionKoji(TestKoji):
     def setUp(self):
         TestKoji.setUp(self)
-        self.rpm.add_manpage(sourceFileName='foo.8', installPath='usr/share/man/man1/foo.8.gz')
-        self.inspection = 'manpage'
-        self.label = 'man-pages'
-        self.result = 'VERIFY'
-        self.waiver_auth = 'Anyone'
+        self.rpm.add_manpage(
+            sourceFileName="foo.8", installPath="usr/share/man/man1/foo.8.gz"
+        )
+        self.inspection = "manpage"
+        self.label = "man-pages"
+        self.result = "VERIFY"
+        self.waiver_auth = "Anyone"
+
 
 # Man page in wrong section subdirectory in compare RPMs (VERIFY)
 class ManPageWrongSectionCompareRPMs(TestCompareRPMs):
     def setUp(self):
         TestCompareRPMs.setUp(self)
-        self.before_rpm.add_manpage(sourceFileName='foo.8', installPath='usr/share/man/man1/foo.8.gz')
-        self.after_rpm.add_manpage(sourceFileName='foo.8', installPath='usr/share/man/man1/foo.8.gz')
-        self.inspection = 'manpage'
-        self.label = 'man-pages'
-        self.result = 'VERIFY'
-        self.waiver_auth = 'Anyone'
+        self.before_rpm.add_manpage(
+            sourceFileName="foo.8", installPath="usr/share/man/man1/foo.8.gz"
+        )
+        self.after_rpm.add_manpage(
+            sourceFileName="foo.8", installPath="usr/share/man/man1/foo.8.gz"
+        )
+        self.inspection = "manpage"
+        self.label = "man-pages"
+        self.result = "VERIFY"
+        self.waiver_auth = "Anyone"
+
 
 # Man page in wrong section subdirectory in compare Koji (VERIFY)
 class ManPageWrongSectionCompareRPMs(TestCompareKoji):
     def setUp(self):
         TestCompareKoji.setUp(self)
-        self.before_rpm.add_manpage(sourceFileName='foo.8', installPath='usr/share/man/man1/foo.8.gz')
-        self.after_rpm.add_manpage(sourceFileName='foo.8', installPath='usr/share/man/man1/foo.8.gz')
-        self.inspection = 'manpage'
-        self.label = 'man-pages'
-        self.result = 'VERIFY'
-        self.waiver_auth = 'Anyone'
+        self.before_rpm.add_manpage(
+            sourceFileName="foo.8", installPath="usr/share/man/man1/foo.8.gz"
+        )
+        self.after_rpm.add_manpage(
+            sourceFileName="foo.8", installPath="usr/share/man/man1/foo.8.gz"
+        )
+        self.inspection = "manpage"
+        self.label = "man-pages"
+        self.result = "VERIFY"
+        self.waiver_auth = "Anyone"
+
 
 # Invalid man page syntax in RPM (VERIFY)
 class InvalidManPageRPM(TestRPMs):
@@ -206,13 +260,17 @@ class InvalidManPageRPM(TestRPMs):
         TestRPMs.setUp(self)
 
         # add a bad man page
-        self.rpm.add_installed_file('/usr/share/man/man1/foo.1.gz', rpmfluff.GeneratedSourceFile('foo.1', rpmfluff.make_png()))
+        self.rpm.add_installed_file(
+            "/usr/share/man/man1/foo.1.gz",
+            rpmfluff.GeneratedSourceFile("foo.1", rpmfluff.make_png()),
+        )
 
         # the test
-        self.inspection = 'manpage'
-        self.label = 'man-pages'
-        self.result = 'VERIFY'
-        self.waiver_auth = 'Anyone'
+        self.inspection = "manpage"
+        self.label = "man-pages"
+        self.result = "VERIFY"
+        self.waiver_auth = "Anyone"
+
 
 # Invalid man page syntax in Koji build (VERIFY)
 class InvalidManPageKoji(TestKoji):
@@ -220,13 +278,17 @@ class InvalidManPageKoji(TestKoji):
         TestKoji.setUp(self)
 
         # add a bad man page
-        self.rpm.add_installed_file('/usr/share/man/man1/foo.1.gz', rpmfluff.GeneratedSourceFile('foo.1', rpmfluff.make_png()))
+        self.rpm.add_installed_file(
+            "/usr/share/man/man1/foo.1.gz",
+            rpmfluff.GeneratedSourceFile("foo.1", rpmfluff.make_png()),
+        )
 
         # the test
-        self.inspection = 'manpage'
-        self.label = 'man-pages'
-        self.result = 'VERIFY'
-        self.waiver_auth = 'Anyone'
+        self.inspection = "manpage"
+        self.label = "man-pages"
+        self.result = "VERIFY"
+        self.waiver_auth = "Anyone"
+
 
 # Invalid man page syntax in compare RPMs (VERIFY)
 class InvalidManPageCompareRPMs(TestCompareRPMs):
@@ -234,14 +296,21 @@ class InvalidManPageCompareRPMs(TestCompareRPMs):
         TestCompareRPMs.setUp(self)
 
         # add a bad man page
-        self.before_rpm.add_installed_file('/usr/share/man/man1/foo.1.gz', rpmfluff.GeneratedSourceFile('foo.1', rpmfluff.make_png()))
-        self.after_rpm.add_installed_file('/usr/share/man/man1/foo.1.gz', rpmfluff.GeneratedSourceFile('foo.1', rpmfluff.make_png()))
+        self.before_rpm.add_installed_file(
+            "/usr/share/man/man1/foo.1.gz",
+            rpmfluff.GeneratedSourceFile("foo.1", rpmfluff.make_png()),
+        )
+        self.after_rpm.add_installed_file(
+            "/usr/share/man/man1/foo.1.gz",
+            rpmfluff.GeneratedSourceFile("foo.1", rpmfluff.make_png()),
+        )
 
         # the test
-        self.inspection = 'manpage'
-        self.label = 'man-pages'
-        self.result = 'VERIFY'
-        self.waiver_auth = 'Anyone'
+        self.inspection = "manpage"
+        self.label = "man-pages"
+        self.result = "VERIFY"
+        self.waiver_auth = "Anyone"
+
 
 # Invalid man page syntax in compare Koji (VERIFY)
 class InvalidManPageCompareKoji(TestCompareKoji):
@@ -249,11 +318,17 @@ class InvalidManPageCompareKoji(TestCompareKoji):
         TestCompareKoji.setUp(self)
 
         # add a bad man page
-        self.before_rpm.add_installed_file('/usr/share/man/man1/foo.1.gz', rpmfluff.GeneratedSourceFile('foo.1', rpmfluff.make_png()))
-        self.after_rpm.add_installed_file('/usr/share/man/man1/foo.1.gz', rpmfluff.GeneratedSourceFile('foo.1', rpmfluff.make_png()))
+        self.before_rpm.add_installed_file(
+            "/usr/share/man/man1/foo.1.gz",
+            rpmfluff.GeneratedSourceFile("foo.1", rpmfluff.make_png()),
+        )
+        self.after_rpm.add_installed_file(
+            "/usr/share/man/man1/foo.1.gz",
+            rpmfluff.GeneratedSourceFile("foo.1", rpmfluff.make_png()),
+        )
 
         # the test
-        self.inspection = 'manpage'
-        self.label = 'man-pages'
-        self.result = 'VERIFY'
-        self.waiver_auth = 'Anyone'
+        self.inspection = "manpage"
+        self.label = "man-pages"
+        self.result = "VERIFY"
+        self.waiver_auth = "Anyone"

@@ -20,7 +20,7 @@ import os
 import rpmfluff
 from baseclass import *
 
-good_desktop_file = '''[Desktop Entry]
+good_desktop_file = """[Desktop Entry]
 Name=Hello World
 Name[de]=Hello World
 Name[pl]=Hello World
@@ -36,9 +36,9 @@ Icon=hello-world
 Categories=Graphics;
 StartupNotify=true
 MimeType=application/x-extension-fcstd;
-'''
+"""
 
-bad_desktop_file = '''[Desktop Entry]
+bad_desktop_file = """[Desktop Entry]
 Name=Hello World
 Name[de]=Hello World
 Name[pl]=Hello World
@@ -54,9 +54,9 @@ Icon=hello-world
 Catesdfghdrfhwesgories=Graphics;
 StartupNotify=true
 MimeType=application/x-extension-fcstd;
-'''
+"""
 
-good_exec_args_desktop_file = '''[Desktop Entry]
+good_exec_args_desktop_file = """[Desktop Entry]
 Name=Hello World
 Name[de]=Hello World
 Name[pl]=Hello World
@@ -72,7 +72,7 @@ Icon=hello-world
 Categories=Graphics;
 StartupNotify=true
 MimeType=application/x-extension-fcstd;
-'''
+"""
 
 # Valid desktop file passes in RPM (OK)
 class ValidDesktopFileRPM(TestRPMs):
@@ -83,14 +83,21 @@ class ValidDesktopFileRPM(TestRPMs):
         self.rpm.add_simple_compilation()
 
         # Adds /usr/share/icons/hello-world.png
-        self.rpm.add_installed_file("/usr/share/icons/hello-world.png", rpmfluff.GeneratedSourceFile("hello-world.png", rpmfluff.make_png()))
+        self.rpm.add_installed_file(
+            "/usr/share/icons/hello-world.png",
+            rpmfluff.GeneratedSourceFile("hello-world.png", rpmfluff.make_png()),
+        )
 
         # Adds /usr/share/applications/hello-world.desktop
-        self.rpm.add_installed_file("/usr/share/applications/hello-world.desktop", rpmfluff.SourceFile('hello-world.desktop', good_desktop_file))
+        self.rpm.add_installed_file(
+            "/usr/share/applications/hello-world.desktop",
+            rpmfluff.SourceFile("hello-world.desktop", good_desktop_file),
+        )
 
-        self.inspection = 'desktop'
-        self.label = 'desktop-entry-files'
-        self.result = 'OK'
+        self.inspection = "desktop"
+        self.label = "desktop-entry-files"
+        self.result = "OK"
+
 
 # Valid desktop file passes in Koji build (OK)
 class ValidDesktopFileKoji(TestKoji):
@@ -101,14 +108,21 @@ class ValidDesktopFileKoji(TestKoji):
         self.rpm.add_simple_compilation()
 
         # Adds /usr/share/icons/hello-world.png
-        self.rpm.add_installed_file("/usr/share/icons/hello-world.png", rpmfluff.GeneratedSourceFile("hello-world.png", rpmfluff.make_png()))
+        self.rpm.add_installed_file(
+            "/usr/share/icons/hello-world.png",
+            rpmfluff.GeneratedSourceFile("hello-world.png", rpmfluff.make_png()),
+        )
 
         # Adds /usr/share/applications/hello-world.desktop
-        self.rpm.add_installed_file("/usr/share/applications/hello-world.desktop", rpmfluff.SourceFile('hello-world.desktop', good_desktop_file))
+        self.rpm.add_installed_file(
+            "/usr/share/applications/hello-world.desktop",
+            rpmfluff.SourceFile("hello-world.desktop", good_desktop_file),
+        )
 
-        self.inspection = 'desktop'
-        self.label = 'desktop-entry-files'
-        self.result = 'OK'
+        self.inspection = "desktop"
+        self.label = "desktop-entry-files"
+        self.result = "OK"
+
 
 # Valid desktop file passes in RPM compare (OK)
 class ValidDesktopFileCompareRPM(TestCompareRPMs):
@@ -120,16 +134,29 @@ class ValidDesktopFileCompareRPM(TestCompareRPMs):
         self.after_rpm.add_simple_compilation()
 
         # Adds /usr/share/icons/hello-world.png
-        self.before_rpm.add_installed_file("/usr/share/icons/hello-world.png", rpmfluff.GeneratedSourceFile("hello-world.png", rpmfluff.make_png()))
-        self.after_rpm.add_installed_file("/usr/share/icons/hello-world.png", rpmfluff.GeneratedSourceFile("hello-world.png", rpmfluff.make_png()))
+        self.before_rpm.add_installed_file(
+            "/usr/share/icons/hello-world.png",
+            rpmfluff.GeneratedSourceFile("hello-world.png", rpmfluff.make_png()),
+        )
+        self.after_rpm.add_installed_file(
+            "/usr/share/icons/hello-world.png",
+            rpmfluff.GeneratedSourceFile("hello-world.png", rpmfluff.make_png()),
+        )
 
         # Adds /usr/share/applications/hello-world.desktop
-        self.before_rpm.add_installed_file("/usr/share/applications/hello-world.desktop", rpmfluff.SourceFile('hello-world.desktop', good_desktop_file))
-        self.after_rpm.add_installed_file("/usr/share/applications/hello-world.desktop", rpmfluff.SourceFile('hello-world.desktop', good_desktop_file))
+        self.before_rpm.add_installed_file(
+            "/usr/share/applications/hello-world.desktop",
+            rpmfluff.SourceFile("hello-world.desktop", good_desktop_file),
+        )
+        self.after_rpm.add_installed_file(
+            "/usr/share/applications/hello-world.desktop",
+            rpmfluff.SourceFile("hello-world.desktop", good_desktop_file),
+        )
 
-        self.inspection = 'desktop'
-        self.label = 'desktop-entry-files'
-        self.result = 'OK'
+        self.inspection = "desktop"
+        self.label = "desktop-entry-files"
+        self.result = "OK"
+
 
 # Valid desktop file passes in Koji build compare (OK)
 class ValidDesktopFileCompareKoji(TestCompareKoji):
@@ -141,16 +168,29 @@ class ValidDesktopFileCompareKoji(TestCompareKoji):
         self.after_rpm.add_simple_compilation()
 
         # Adds /usr/share/icons/hello-world.png
-        self.before_rpm.add_installed_file("/usr/share/icons/hello-world.png", rpmfluff.GeneratedSourceFile("hello-world.png", rpmfluff.make_png()))
-        self.after_rpm.add_installed_file("/usr/share/icons/hello-world.png", rpmfluff.GeneratedSourceFile("hello-world.png", rpmfluff.make_png()))
+        self.before_rpm.add_installed_file(
+            "/usr/share/icons/hello-world.png",
+            rpmfluff.GeneratedSourceFile("hello-world.png", rpmfluff.make_png()),
+        )
+        self.after_rpm.add_installed_file(
+            "/usr/share/icons/hello-world.png",
+            rpmfluff.GeneratedSourceFile("hello-world.png", rpmfluff.make_png()),
+        )
 
         # Adds /usr/share/applications/hello-world.desktop
-        self.before_rpm.add_installed_file("/usr/share/applications/hello-world.desktop", rpmfluff.SourceFile('hello-world.desktop', good_desktop_file))
-        self.after_rpm.add_installed_file("/usr/share/applications/hello-world.desktop", rpmfluff.SourceFile('hello-world.desktop', good_desktop_file))
+        self.before_rpm.add_installed_file(
+            "/usr/share/applications/hello-world.desktop",
+            rpmfluff.SourceFile("hello-world.desktop", good_desktop_file),
+        )
+        self.after_rpm.add_installed_file(
+            "/usr/share/applications/hello-world.desktop",
+            rpmfluff.SourceFile("hello-world.desktop", good_desktop_file),
+        )
 
-        self.inspection = 'desktop'
-        self.label = 'desktop-entry-files'
-        self.result = 'OK'
+        self.inspection = "desktop"
+        self.label = "desktop-entry-files"
+        self.result = "OK"
+
 
 # Desktop file with missing icon in RPM (VERIFY)
 class DesktopFileMissingIconRPM(TestRPMs):
@@ -161,12 +201,16 @@ class DesktopFileMissingIconRPM(TestRPMs):
         self.rpm.add_simple_compilation()
 
         # Adds /usr/share/applications/hello-world.desktop
-        self.rpm.add_installed_file("/usr/share/applications/hello-world.desktop", rpmfluff.SourceFile('hello-world.desktop', good_desktop_file))
+        self.rpm.add_installed_file(
+            "/usr/share/applications/hello-world.desktop",
+            rpmfluff.SourceFile("hello-world.desktop", good_desktop_file),
+        )
 
-        self.inspection = 'desktop'
-        self.label = 'desktop-entry-files'
-        self.result = 'VERIFY'
-        self.waiver_auth = 'Anyone'
+        self.inspection = "desktop"
+        self.label = "desktop-entry-files"
+        self.result = "VERIFY"
+        self.waiver_auth = "Anyone"
+
 
 # Desktop file with missing icon in RPM compare (VERIFY)
 class DesktopFileMissingIconCompareRPM(TestCompareRPMs):
@@ -178,13 +222,20 @@ class DesktopFileMissingIconCompareRPM(TestCompareRPMs):
         self.after_rpm.add_simple_compilation()
 
         # Adds /usr/share/applications/hello-world.desktop
-        self.before_rpm.add_installed_file("/usr/share/applications/hello-world.desktop", rpmfluff.SourceFile('hello-world.desktop', good_desktop_file))
-        self.after_rpm.add_installed_file("/usr/share/applications/hello-world.desktop", rpmfluff.SourceFile('hello-world.desktop', good_desktop_file))
+        self.before_rpm.add_installed_file(
+            "/usr/share/applications/hello-world.desktop",
+            rpmfluff.SourceFile("hello-world.desktop", good_desktop_file),
+        )
+        self.after_rpm.add_installed_file(
+            "/usr/share/applications/hello-world.desktop",
+            rpmfluff.SourceFile("hello-world.desktop", good_desktop_file),
+        )
 
-        self.inspection = 'desktop'
-        self.label = 'desktop-entry-files'
-        self.result = 'VERIFY'
-        self.waiver_auth = 'Anyone'
+        self.inspection = "desktop"
+        self.label = "desktop-entry-files"
+        self.result = "VERIFY"
+        self.waiver_auth = "Anyone"
+
 
 # Desktop file with missing icon in Koji build (VERIFY)
 class DesktopFileMissingIconKoji(TestKoji):
@@ -195,12 +246,16 @@ class DesktopFileMissingIconKoji(TestKoji):
         self.rpm.add_simple_compilation()
 
         # Adds /usr/share/applications/hello-world.desktop
-        self.rpm.add_installed_file("/usr/share/applications/hello-world.desktop", rpmfluff.SourceFile('hello-world.desktop', good_desktop_file))
+        self.rpm.add_installed_file(
+            "/usr/share/applications/hello-world.desktop",
+            rpmfluff.SourceFile("hello-world.desktop", good_desktop_file),
+        )
 
-        self.inspection = 'desktop'
-        self.label = 'desktop-entry-files'
-        self.result = 'VERIFY'
-        self.waiver_auth = 'Anyone'
+        self.inspection = "desktop"
+        self.label = "desktop-entry-files"
+        self.result = "VERIFY"
+        self.waiver_auth = "Anyone"
+
 
 # Desktop file with missing icon in Koji build compare (VERIFY)
 class DesktopFileMissingIconCompareKoji(TestCompareKoji):
@@ -212,13 +267,20 @@ class DesktopFileMissingIconCompareKoji(TestCompareKoji):
         self.after_rpm.add_simple_compilation()
 
         # Adds /usr/share/applications/hello-world.desktop
-        self.before_rpm.add_installed_file("/usr/share/applications/hello-world.desktop", rpmfluff.SourceFile('hello-world.desktop', good_desktop_file))
-        self.after_rpm.add_installed_file("/usr/share/applications/hello-world.desktop", rpmfluff.SourceFile('hello-world.desktop', good_desktop_file))
+        self.before_rpm.add_installed_file(
+            "/usr/share/applications/hello-world.desktop",
+            rpmfluff.SourceFile("hello-world.desktop", good_desktop_file),
+        )
+        self.after_rpm.add_installed_file(
+            "/usr/share/applications/hello-world.desktop",
+            rpmfluff.SourceFile("hello-world.desktop", good_desktop_file),
+        )
 
-        self.inspection = 'desktop'
-        self.label = 'desktop-entry-files'
-        self.result = 'VERIFY'
-        self.waiver_auth = 'Anyone'
+        self.inspection = "desktop"
+        self.label = "desktop-entry-files"
+        self.result = "VERIFY"
+        self.waiver_auth = "Anyone"
+
 
 # Invalid desktop file fails desktop-file-validate in RPM (BAD)
 class DesktopFileValidateFailsRPM(TestRPMs):
@@ -229,15 +291,22 @@ class DesktopFileValidateFailsRPM(TestRPMs):
         self.rpm.add_simple_compilation()
 
         # Adds /usr/share/icons/hello-world.png
-        self.rpm.add_installed_file("/usr/share/icons/hello-world.png", rpmfluff.GeneratedSourceFile("hello-world.png", rpmfluff.make_png()))
+        self.rpm.add_installed_file(
+            "/usr/share/icons/hello-world.png",
+            rpmfluff.GeneratedSourceFile("hello-world.png", rpmfluff.make_png()),
+        )
 
         # Adds /usr/share/applications/hello-world.desktop
-        self.rpm.add_installed_file("/usr/share/applications/hello-world.desktop", rpmfluff.SourceFile('hello-world.desktop', bad_desktop_file))
+        self.rpm.add_installed_file(
+            "/usr/share/applications/hello-world.desktop",
+            rpmfluff.SourceFile("hello-world.desktop", bad_desktop_file),
+        )
 
-        self.inspection = 'desktop'
-        self.label = 'desktop-entry-files'
-        self.result = 'BAD'
-        self.waiver_auth = 'Anyone'
+        self.inspection = "desktop"
+        self.label = "desktop-entry-files"
+        self.result = "BAD"
+        self.waiver_auth = "Anyone"
+
 
 # Invalid desktop file fails desktop-file-validate in Koji build (BAD)
 class DesktopFileValidateFailsKoji(TestKoji):
@@ -248,15 +317,22 @@ class DesktopFileValidateFailsKoji(TestKoji):
         self.rpm.add_simple_compilation()
 
         # Adds /usr/share/icons/hello-world.png
-        self.rpm.add_installed_file("/usr/share/icons/hello-world.png", rpmfluff.GeneratedSourceFile("hello-world.png", rpmfluff.make_png()))
+        self.rpm.add_installed_file(
+            "/usr/share/icons/hello-world.png",
+            rpmfluff.GeneratedSourceFile("hello-world.png", rpmfluff.make_png()),
+        )
 
         # Adds /usr/share/applications/hello-world.desktop
-        self.rpm.add_installed_file("/usr/share/applications/hello-world.desktop", rpmfluff.SourceFile('hello-world.desktop', bad_desktop_file))
+        self.rpm.add_installed_file(
+            "/usr/share/applications/hello-world.desktop",
+            rpmfluff.SourceFile("hello-world.desktop", bad_desktop_file),
+        )
 
-        self.inspection = 'desktop'
-        self.label = 'desktop-entry-files'
-        self.result = 'BAD'
-        self.waiver_auth = 'Anyone'
+        self.inspection = "desktop"
+        self.label = "desktop-entry-files"
+        self.result = "BAD"
+        self.waiver_auth = "Anyone"
+
 
 # Invalid desktop file fails desktop-file-validate in RPM compare (BAD)
 class DesktopFileValidateFailsCompareRPM(TestCompareRPMs):
@@ -268,17 +344,30 @@ class DesktopFileValidateFailsCompareRPM(TestCompareRPMs):
         self.after_rpm.add_simple_compilation()
 
         # Adds /usr/share/icons/hello-world.png
-        self.before_rpm.add_installed_file("/usr/share/icons/hello-world.png", rpmfluff.GeneratedSourceFile("hello-world.png", rpmfluff.make_png()))
-        self.after_rpm.add_installed_file("/usr/share/icons/hello-world.png", rpmfluff.GeneratedSourceFile("hello-world.png", rpmfluff.make_png()))
+        self.before_rpm.add_installed_file(
+            "/usr/share/icons/hello-world.png",
+            rpmfluff.GeneratedSourceFile("hello-world.png", rpmfluff.make_png()),
+        )
+        self.after_rpm.add_installed_file(
+            "/usr/share/icons/hello-world.png",
+            rpmfluff.GeneratedSourceFile("hello-world.png", rpmfluff.make_png()),
+        )
 
         # Adds /usr/share/applications/hello-world.desktop
-        self.before_rpm.add_installed_file("/usr/share/applications/hello-world.desktop", rpmfluff.SourceFile('hello-world.desktop', bad_desktop_file))
-        self.after_rpm.add_installed_file("/usr/share/applications/hello-world.desktop", rpmfluff.SourceFile('hello-world.desktop', bad_desktop_file))
+        self.before_rpm.add_installed_file(
+            "/usr/share/applications/hello-world.desktop",
+            rpmfluff.SourceFile("hello-world.desktop", bad_desktop_file),
+        )
+        self.after_rpm.add_installed_file(
+            "/usr/share/applications/hello-world.desktop",
+            rpmfluff.SourceFile("hello-world.desktop", bad_desktop_file),
+        )
 
-        self.inspection = 'desktop'
-        self.label = 'desktop-entry-files'
-        self.result = 'BAD'
-        self.waiver_auth = 'Anyone'
+        self.inspection = "desktop"
+        self.label = "desktop-entry-files"
+        self.result = "BAD"
+        self.waiver_auth = "Anyone"
+
 
 # Invalid desktop file fails desktop-file-validate in Koji build compare (BAD)
 class DesktopFileValidateFailsCompareKoji(TestCompareKoji):
@@ -290,17 +379,30 @@ class DesktopFileValidateFailsCompareKoji(TestCompareKoji):
         self.after_rpm.add_simple_compilation()
 
         # Adds /usr/share/icons/hello-world.png
-        self.before_rpm.add_installed_file("/usr/share/icons/hello-world.png", rpmfluff.GeneratedSourceFile("hello-world.png", rpmfluff.make_png()))
-        self.after_rpm.add_installed_file("/usr/share/icons/hello-world.png", rpmfluff.GeneratedSourceFile("hello-world.png", rpmfluff.make_png()))
+        self.before_rpm.add_installed_file(
+            "/usr/share/icons/hello-world.png",
+            rpmfluff.GeneratedSourceFile("hello-world.png", rpmfluff.make_png()),
+        )
+        self.after_rpm.add_installed_file(
+            "/usr/share/icons/hello-world.png",
+            rpmfluff.GeneratedSourceFile("hello-world.png", rpmfluff.make_png()),
+        )
 
         # Adds /usr/share/applications/hello-world.desktop
-        self.before_rpm.add_installed_file("/usr/share/applications/hello-world.desktop", rpmfluff.SourceFile('hello-world.desktop', bad_desktop_file))
-        self.after_rpm.add_installed_file("/usr/share/applications/hello-world.desktop", rpmfluff.SourceFile('hello-world.desktop', bad_desktop_file))
+        self.before_rpm.add_installed_file(
+            "/usr/share/applications/hello-world.desktop",
+            rpmfluff.SourceFile("hello-world.desktop", bad_desktop_file),
+        )
+        self.after_rpm.add_installed_file(
+            "/usr/share/applications/hello-world.desktop",
+            rpmfluff.SourceFile("hello-world.desktop", bad_desktop_file),
+        )
 
-        self.inspection = 'desktop'
-        self.label = 'desktop-entry-files'
-        self.result = 'BAD'
-        self.waiver_auth = 'Anyone'
+        self.inspection = "desktop"
+        self.label = "desktop-entry-files"
+        self.result = "BAD"
+        self.waiver_auth = "Anyone"
+
 
 # Desktop file with Exec with arguments in RPM (OK)
 class DesktopFileExecArgsRPM(TestRPMs):
@@ -311,14 +413,21 @@ class DesktopFileExecArgsRPM(TestRPMs):
         self.rpm.add_simple_compilation()
 
         # Adds /usr/share/icons/hello-world.png
-        self.rpm.add_installed_file("/usr/share/icons/hello-world.png", rpmfluff.GeneratedSourceFile("hello-world.png", rpmfluff.make_png()))
+        self.rpm.add_installed_file(
+            "/usr/share/icons/hello-world.png",
+            rpmfluff.GeneratedSourceFile("hello-world.png", rpmfluff.make_png()),
+        )
 
         # Adds /usr/share/applications/hello-world.desktop
-        self.rpm.add_installed_file("/usr/share/applications/hello-world.desktop", rpmfluff.SourceFile('hello-world.desktop', good_exec_args_desktop_file))
+        self.rpm.add_installed_file(
+            "/usr/share/applications/hello-world.desktop",
+            rpmfluff.SourceFile("hello-world.desktop", good_exec_args_desktop_file),
+        )
 
-        self.inspection = 'desktop'
-        self.label = 'desktop-entry-files'
-        self.result = 'OK'
+        self.inspection = "desktop"
+        self.label = "desktop-entry-files"
+        self.result = "OK"
+
 
 # Desktop file with Exec with arguments in Koji build (OK)
 class DesktopFileExecArgsKoji(TestKoji):
@@ -329,14 +438,21 @@ class DesktopFileExecArgsKoji(TestKoji):
         self.rpm.add_simple_compilation()
 
         # Adds /usr/share/icons/hello-world.png
-        self.rpm.add_installed_file("/usr/share/icons/hello-world.png", rpmfluff.GeneratedSourceFile("hello-world.png", rpmfluff.make_png()))
+        self.rpm.add_installed_file(
+            "/usr/share/icons/hello-world.png",
+            rpmfluff.GeneratedSourceFile("hello-world.png", rpmfluff.make_png()),
+        )
 
         # Adds /usr/share/applications/hello-world.desktop
-        self.rpm.add_installed_file("/usr/share/applications/hello-world.desktop", rpmfluff.SourceFile('hello-world.desktop', good_exec_args_desktop_file))
+        self.rpm.add_installed_file(
+            "/usr/share/applications/hello-world.desktop",
+            rpmfluff.SourceFile("hello-world.desktop", good_exec_args_desktop_file),
+        )
 
-        self.inspection = 'desktop'
-        self.label = 'desktop-entry-files'
-        self.result = 'OK'
+        self.inspection = "desktop"
+        self.label = "desktop-entry-files"
+        self.result = "OK"
+
 
 # Desktop file with Exec with arguments in RPM compare (OK)
 class DesktopFileExecArgsCompareRPM(TestCompareRPMs):
@@ -348,16 +464,29 @@ class DesktopFileExecArgsCompareRPM(TestCompareRPMs):
         self.after_rpm.add_simple_compilation()
 
         # Adds /usr/share/icons/hello-world.png
-        self.before_rpm.add_installed_file("/usr/share/icons/hello-world.png", rpmfluff.GeneratedSourceFile("hello-world.png", rpmfluff.make_png()))
-        self.after_rpm.add_installed_file("/usr/share/icons/hello-world.png", rpmfluff.GeneratedSourceFile("hello-world.png", rpmfluff.make_png()))
+        self.before_rpm.add_installed_file(
+            "/usr/share/icons/hello-world.png",
+            rpmfluff.GeneratedSourceFile("hello-world.png", rpmfluff.make_png()),
+        )
+        self.after_rpm.add_installed_file(
+            "/usr/share/icons/hello-world.png",
+            rpmfluff.GeneratedSourceFile("hello-world.png", rpmfluff.make_png()),
+        )
 
         # Adds /usr/share/applications/hello-world.desktop
-        self.before_rpm.add_installed_file("/usr/share/applications/hello-world.desktop", rpmfluff.SourceFile('hello-world.desktop', good_exec_args_desktop_file))
-        self.after_rpm.add_installed_file("/usr/share/applications/hello-world.desktop", rpmfluff.SourceFile('hello-world.desktop', good_exec_args_desktop_file))
+        self.before_rpm.add_installed_file(
+            "/usr/share/applications/hello-world.desktop",
+            rpmfluff.SourceFile("hello-world.desktop", good_exec_args_desktop_file),
+        )
+        self.after_rpm.add_installed_file(
+            "/usr/share/applications/hello-world.desktop",
+            rpmfluff.SourceFile("hello-world.desktop", good_exec_args_desktop_file),
+        )
 
-        self.inspection = 'desktop'
-        self.label = 'desktop-entry-files'
-        self.result = 'OK'
+        self.inspection = "desktop"
+        self.label = "desktop-entry-files"
+        self.result = "OK"
+
 
 # Desktop file with Exec with arguments in Koji build compare (OK)
 class DesktopFileExecArgsCompareKoji(TestCompareKoji):
@@ -369,16 +498,29 @@ class DesktopFileExecArgsCompareKoji(TestCompareKoji):
         self.after_rpm.add_simple_compilation()
 
         # Adds /usr/share/icons/hello-world.png
-        self.before_rpm.add_installed_file("/usr/share/icons/hello-world.png", rpmfluff.GeneratedSourceFile("hello-world.png", rpmfluff.make_png()))
-        self.after_rpm.add_installed_file("/usr/share/icons/hello-world.png", rpmfluff.GeneratedSourceFile("hello-world.png", rpmfluff.make_png()))
+        self.before_rpm.add_installed_file(
+            "/usr/share/icons/hello-world.png",
+            rpmfluff.GeneratedSourceFile("hello-world.png", rpmfluff.make_png()),
+        )
+        self.after_rpm.add_installed_file(
+            "/usr/share/icons/hello-world.png",
+            rpmfluff.GeneratedSourceFile("hello-world.png", rpmfluff.make_png()),
+        )
 
         # Adds /usr/share/applications/hello-world.desktop
-        self.before_rpm.add_installed_file("/usr/share/applications/hello-world.desktop", rpmfluff.SourceFile('hello-world.desktop', good_exec_args_desktop_file))
-        self.after_rpm.add_installed_file("/usr/share/applications/hello-world.desktop", rpmfluff.SourceFile('hello-world.desktop', good_exec_args_desktop_file))
+        self.before_rpm.add_installed_file(
+            "/usr/share/applications/hello-world.desktop",
+            rpmfluff.SourceFile("hello-world.desktop", good_exec_args_desktop_file),
+        )
+        self.after_rpm.add_installed_file(
+            "/usr/share/applications/hello-world.desktop",
+            rpmfluff.SourceFile("hello-world.desktop", good_exec_args_desktop_file),
+        )
 
-        self.inspection = 'desktop'
-        self.label = 'desktop-entry-files'
-        self.result = 'OK'
+        self.inspection = "desktop"
+        self.label = "desktop-entry-files"
+        self.result = "OK"
+
 
 # Desktop file without world readable Icon in RPM (VERIFY)
 class DesktopFileNotWorldReadableIconRPM(TestRPMs):
@@ -389,15 +531,23 @@ class DesktopFileNotWorldReadableIconRPM(TestRPMs):
         self.rpm.add_simple_compilation()
 
         # Adds /usr/share/icons/hello-world.png
-        self.rpm.add_installed_file("/usr/share/icons/hello-world.png", rpmfluff.GeneratedSourceFile("hello-world.png", rpmfluff.make_png()), mode="0600")
+        self.rpm.add_installed_file(
+            "/usr/share/icons/hello-world.png",
+            rpmfluff.GeneratedSourceFile("hello-world.png", rpmfluff.make_png()),
+            mode="0600",
+        )
 
         # Adds /usr/share/applications/hello-world.desktop
-        self.rpm.add_installed_file("/usr/share/applications/hello-world.desktop", rpmfluff.SourceFile('hello-world.desktop', good_desktop_file))
+        self.rpm.add_installed_file(
+            "/usr/share/applications/hello-world.desktop",
+            rpmfluff.SourceFile("hello-world.desktop", good_desktop_file),
+        )
 
-        self.inspection = 'desktop'
-        self.label = 'desktop-entry-files'
-        self.result = 'VERIFY'
-        self.waiver_auth = 'Anyone'
+        self.inspection = "desktop"
+        self.label = "desktop-entry-files"
+        self.result = "VERIFY"
+        self.waiver_auth = "Anyone"
+
 
 # Desktop file without world readable Icon in Koji build (VERIFY)
 class DesktopFileNotWorldReadableIconKoji(TestKoji):
@@ -408,15 +558,23 @@ class DesktopFileNotWorldReadableIconKoji(TestKoji):
         self.rpm.add_simple_compilation()
 
         # Adds /usr/share/icons/hello-world.png
-        self.rpm.add_installed_file("/usr/share/icons/hello-world.png", rpmfluff.GeneratedSourceFile("hello-world.png", rpmfluff.make_png()), mode="0600")
+        self.rpm.add_installed_file(
+            "/usr/share/icons/hello-world.png",
+            rpmfluff.GeneratedSourceFile("hello-world.png", rpmfluff.make_png()),
+            mode="0600",
+        )
 
         # Adds /usr/share/applications/hello-world.desktop
-        self.rpm.add_installed_file("/usr/share/applications/hello-world.desktop", rpmfluff.SourceFile('hello-world.desktop', good_desktop_file))
+        self.rpm.add_installed_file(
+            "/usr/share/applications/hello-world.desktop",
+            rpmfluff.SourceFile("hello-world.desktop", good_desktop_file),
+        )
 
-        self.inspection = 'desktop'
-        self.label = 'desktop-entry-files'
-        self.result = 'VERIFY'
-        self.waiver_auth = 'Anyone'
+        self.inspection = "desktop"
+        self.label = "desktop-entry-files"
+        self.result = "VERIFY"
+        self.waiver_auth = "Anyone"
+
 
 # Desktop file without world readable Icon in RPM compare (VERIFY)
 class DesktopFileNotWorldReadableIconCompareRPM(TestCompareRPMs):
@@ -428,17 +586,32 @@ class DesktopFileNotWorldReadableIconCompareRPM(TestCompareRPMs):
         self.after_rpm.add_simple_compilation()
 
         # Adds /usr/share/icons/hello-world.png
-        self.before_rpm.add_installed_file("/usr/share/icons/hello-world.png", rpmfluff.GeneratedSourceFile("hello-world.png", rpmfluff.make_png()), mode="0600")
-        self.after_rpm.add_installed_file("/usr/share/icons/hello-world.png", rpmfluff.GeneratedSourceFile("hello-world.png", rpmfluff.make_png()), mode="0600")
+        self.before_rpm.add_installed_file(
+            "/usr/share/icons/hello-world.png",
+            rpmfluff.GeneratedSourceFile("hello-world.png", rpmfluff.make_png()),
+            mode="0600",
+        )
+        self.after_rpm.add_installed_file(
+            "/usr/share/icons/hello-world.png",
+            rpmfluff.GeneratedSourceFile("hello-world.png", rpmfluff.make_png()),
+            mode="0600",
+        )
 
         # Adds /usr/share/applications/hello-world.desktop
-        self.before_rpm.add_installed_file("/usr/share/applications/hello-world.desktop", rpmfluff.SourceFile('hello-world.desktop', good_desktop_file))
-        self.after_rpm.add_installed_file("/usr/share/applications/hello-world.desktop", rpmfluff.SourceFile('hello-world.desktop', good_desktop_file))
+        self.before_rpm.add_installed_file(
+            "/usr/share/applications/hello-world.desktop",
+            rpmfluff.SourceFile("hello-world.desktop", good_desktop_file),
+        )
+        self.after_rpm.add_installed_file(
+            "/usr/share/applications/hello-world.desktop",
+            rpmfluff.SourceFile("hello-world.desktop", good_desktop_file),
+        )
 
-        self.inspection = 'desktop'
-        self.label = 'desktop-entry-files'
-        self.result = 'VERIFY'
-        self.waiver_auth = 'Anyone'
+        self.inspection = "desktop"
+        self.label = "desktop-entry-files"
+        self.result = "VERIFY"
+        self.waiver_auth = "Anyone"
+
 
 # Desktop file without world readable Icon in Koji build compare (VERIFY)
 class DesktopFileNotWorldReadableIconCompareKoji(TestCompareKoji):
@@ -450,17 +623,32 @@ class DesktopFileNotWorldReadableIconCompareKoji(TestCompareKoji):
         self.after_rpm.add_simple_compilation()
 
         # Adds /usr/share/icons/hello-world.png
-        self.before_rpm.add_installed_file("/usr/share/icons/hello-world.png", rpmfluff.GeneratedSourceFile("hello-world.png", rpmfluff.make_png()), mode="0600")
-        self.after_rpm.add_installed_file("/usr/share/icons/hello-world.png", rpmfluff.GeneratedSourceFile("hello-world.png", rpmfluff.make_png()), mode="0600")
+        self.before_rpm.add_installed_file(
+            "/usr/share/icons/hello-world.png",
+            rpmfluff.GeneratedSourceFile("hello-world.png", rpmfluff.make_png()),
+            mode="0600",
+        )
+        self.after_rpm.add_installed_file(
+            "/usr/share/icons/hello-world.png",
+            rpmfluff.GeneratedSourceFile("hello-world.png", rpmfluff.make_png()),
+            mode="0600",
+        )
 
         # Adds /usr/share/applications/hello-world.desktop
-        self.before_rpm.add_installed_file("/usr/share/applications/hello-world.desktop", rpmfluff.SourceFile('hello-world.desktop', good_desktop_file))
-        self.after_rpm.add_installed_file("/usr/share/applications/hello-world.desktop", rpmfluff.SourceFile('hello-world.desktop', good_desktop_file))
+        self.before_rpm.add_installed_file(
+            "/usr/share/applications/hello-world.desktop",
+            rpmfluff.SourceFile("hello-world.desktop", good_desktop_file),
+        )
+        self.after_rpm.add_installed_file(
+            "/usr/share/applications/hello-world.desktop",
+            rpmfluff.SourceFile("hello-world.desktop", good_desktop_file),
+        )
 
-        self.inspection = 'desktop'
-        self.label = 'desktop-entry-files'
-        self.result = 'VERIFY'
-        self.waiver_auth = 'Anyone'
+        self.inspection = "desktop"
+        self.label = "desktop-entry-files"
+        self.result = "VERIFY"
+        self.waiver_auth = "Anyone"
+
 
 # Desktop file with invalid Exec file in RPM (VERIFY)
 class DesktopFileInvalidExecRPM(TestRPMs):
@@ -468,15 +656,22 @@ class DesktopFileInvalidExecRPM(TestRPMs):
         TestRPMs.setUp(self)
 
         # Adds /usr/share/icons/hello-world.png
-        self.rpm.add_installed_file("/usr/share/icons/hello-world.png", rpmfluff.GeneratedSourceFile("hello-world.png", rpmfluff.make_png()))
+        self.rpm.add_installed_file(
+            "/usr/share/icons/hello-world.png",
+            rpmfluff.GeneratedSourceFile("hello-world.png", rpmfluff.make_png()),
+        )
 
         # Adds /usr/share/applications/hello-world.desktop
-        self.rpm.add_installed_file("/usr/share/applications/hello-world.desktop", rpmfluff.SourceFile('hello-world.desktop', good_desktop_file))
+        self.rpm.add_installed_file(
+            "/usr/share/applications/hello-world.desktop",
+            rpmfluff.SourceFile("hello-world.desktop", good_desktop_file),
+        )
 
-        self.inspection = 'desktop'
-        self.label = 'desktop-entry-files'
-        self.result = 'VERIFY'
-        self.waiver_auth = 'Anyone'
+        self.inspection = "desktop"
+        self.label = "desktop-entry-files"
+        self.result = "VERIFY"
+        self.waiver_auth = "Anyone"
+
 
 # Desktop file with invalid Exec file in Koji build (VERIFY)
 class DesktopFileInvalidExecRPMs(TestKoji):
@@ -484,15 +679,22 @@ class DesktopFileInvalidExecRPMs(TestKoji):
         TestKoji.setUp(self)
 
         # Adds /usr/share/icons/hello-world.png
-        self.rpm.add_installed_file("/usr/share/icons/hello-world.png", rpmfluff.GeneratedSourceFile("hello-world.png", rpmfluff.make_png()))
+        self.rpm.add_installed_file(
+            "/usr/share/icons/hello-world.png",
+            rpmfluff.GeneratedSourceFile("hello-world.png", rpmfluff.make_png()),
+        )
 
         # Adds /usr/share/applications/hello-world.desktop
-        self.rpm.add_installed_file("/usr/share/applications/hello-world.desktop", rpmfluff.SourceFile('hello-world.desktop', good_desktop_file))
+        self.rpm.add_installed_file(
+            "/usr/share/applications/hello-world.desktop",
+            rpmfluff.SourceFile("hello-world.desktop", good_desktop_file),
+        )
 
-        self.inspection = 'desktop'
-        self.label = 'desktop-entry-files'
-        self.result = 'VERIFY'
-        self.waiver_auth = 'Anyone'
+        self.inspection = "desktop"
+        self.label = "desktop-entry-files"
+        self.result = "VERIFY"
+        self.waiver_auth = "Anyone"
+
 
 # Desktop file with invalid Exec file in RPM compare (VERIFY)
 class DesktopFileInvalidExecCompareRPM(TestCompareRPMs):
@@ -500,17 +702,30 @@ class DesktopFileInvalidExecCompareRPM(TestCompareRPMs):
         TestCompareRPMs.setUp(self)
 
         # Adds /usr/share/icons/hello-world.png
-        self.before_rpm.add_installed_file("/usr/share/icons/hello-world.png", rpmfluff.GeneratedSourceFile("hello-world.png", rpmfluff.make_png()))
-        self.after_rpm.add_installed_file("/usr/share/icons/hello-world.png", rpmfluff.GeneratedSourceFile("hello-world.png", rpmfluff.make_png()))
+        self.before_rpm.add_installed_file(
+            "/usr/share/icons/hello-world.png",
+            rpmfluff.GeneratedSourceFile("hello-world.png", rpmfluff.make_png()),
+        )
+        self.after_rpm.add_installed_file(
+            "/usr/share/icons/hello-world.png",
+            rpmfluff.GeneratedSourceFile("hello-world.png", rpmfluff.make_png()),
+        )
 
         # Adds /usr/share/applications/hello-world.desktop
-        self.before_rpm.add_installed_file("/usr/share/applications/hello-world.desktop", rpmfluff.SourceFile('hello-world.desktop', good_desktop_file))
-        self.after_rpm.add_installed_file("/usr/share/applications/hello-world.desktop", rpmfluff.SourceFile('hello-world.desktop', good_desktop_file))
+        self.before_rpm.add_installed_file(
+            "/usr/share/applications/hello-world.desktop",
+            rpmfluff.SourceFile("hello-world.desktop", good_desktop_file),
+        )
+        self.after_rpm.add_installed_file(
+            "/usr/share/applications/hello-world.desktop",
+            rpmfluff.SourceFile("hello-world.desktop", good_desktop_file),
+        )
 
-        self.inspection = 'desktop'
-        self.label = 'desktop-entry-files'
-        self.result = 'VERIFY'
-        self.waiver_auth = 'Anyone'
+        self.inspection = "desktop"
+        self.label = "desktop-entry-files"
+        self.result = "VERIFY"
+        self.waiver_auth = "Anyone"
+
 
 # Desktop file with invalid Exec file in Koji compare (VERIFY)
 class DesktopFileInvalidExecCompareKoji(TestCompareKoji):
@@ -518,17 +733,30 @@ class DesktopFileInvalidExecCompareKoji(TestCompareKoji):
         TestCompareKoji.setUp(self)
 
         # Adds /usr/share/icons/hello-world.png
-        self.before_rpm.add_installed_file("/usr/share/icons/hello-world.png", rpmfluff.GeneratedSourceFile("hello-world.png", rpmfluff.make_png()))
-        self.after_rpm.add_installed_file("/usr/share/icons/hello-world.png", rpmfluff.GeneratedSourceFile("hello-world.png", rpmfluff.make_png()))
+        self.before_rpm.add_installed_file(
+            "/usr/share/icons/hello-world.png",
+            rpmfluff.GeneratedSourceFile("hello-world.png", rpmfluff.make_png()),
+        )
+        self.after_rpm.add_installed_file(
+            "/usr/share/icons/hello-world.png",
+            rpmfluff.GeneratedSourceFile("hello-world.png", rpmfluff.make_png()),
+        )
 
         # Adds /usr/share/applications/hello-world.desktop
-        self.before_rpm.add_installed_file("/usr/share/applications/hello-world.desktop", rpmfluff.SourceFile('hello-world.desktop', good_desktop_file))
-        self.after_rpm.add_installed_file("/usr/share/applications/hello-world.desktop", rpmfluff.SourceFile('hello-world.desktop', good_desktop_file))
+        self.before_rpm.add_installed_file(
+            "/usr/share/applications/hello-world.desktop",
+            rpmfluff.SourceFile("hello-world.desktop", good_desktop_file),
+        )
+        self.after_rpm.add_installed_file(
+            "/usr/share/applications/hello-world.desktop",
+            rpmfluff.SourceFile("hello-world.desktop", good_desktop_file),
+        )
 
-        self.inspection = 'desktop'
-        self.label = 'desktop-entry-files'
-        self.result = 'VERIFY'
-        self.waiver_auth = 'Anyone'
+        self.inspection = "desktop"
+        self.label = "desktop-entry-files"
+        self.result = "VERIFY"
+        self.waiver_auth = "Anyone"
+
 
 # Desktop file without world executable Exec file in RPM (VERIFY)
 class DesktopFileWithoutWorldExecutableExecRPM(TestRPMs):
@@ -540,15 +768,22 @@ class DesktopFileWithoutWorldExecutableExecRPM(TestRPMs):
         self.rpm.add_mode("/usr/bin/hello-world", "0700")
 
         # Adds /usr/share/icons/hello-world.png
-        self.rpm.add_installed_file("/usr/share/icons/hello-world.png", rpmfluff.GeneratedSourceFile("hello-world.png", rpmfluff.make_png()))
+        self.rpm.add_installed_file(
+            "/usr/share/icons/hello-world.png",
+            rpmfluff.GeneratedSourceFile("hello-world.png", rpmfluff.make_png()),
+        )
 
         # Adds /usr/share/applications/hello-world.desktop
-        self.rpm.add_installed_file("/usr/share/applications/hello-world.desktop", rpmfluff.SourceFile('hello-world.desktop', good_desktop_file))
+        self.rpm.add_installed_file(
+            "/usr/share/applications/hello-world.desktop",
+            rpmfluff.SourceFile("hello-world.desktop", good_desktop_file),
+        )
 
-        self.inspection = 'desktop'
-        self.label = 'desktop-entry-files'
-        self.result = 'VERIFY'
-        self.waiver_auth = 'Anyone'
+        self.inspection = "desktop"
+        self.label = "desktop-entry-files"
+        self.result = "VERIFY"
+        self.waiver_auth = "Anyone"
+
 
 # Desktop file without world executable Exec file in Koji build (VERIFY)
 class DesktopFileWithoutWorldExecutableExecKoji(TestKoji):
@@ -560,15 +795,22 @@ class DesktopFileWithoutWorldExecutableExecKoji(TestKoji):
         self.rpm.add_mode("/usr/bin/hello-world", "0700")
 
         # Adds /usr/share/icons/hello-world.png
-        self.rpm.add_installed_file("/usr/share/icons/hello-world.png", rpmfluff.GeneratedSourceFile("hello-world.png", rpmfluff.make_png()))
+        self.rpm.add_installed_file(
+            "/usr/share/icons/hello-world.png",
+            rpmfluff.GeneratedSourceFile("hello-world.png", rpmfluff.make_png()),
+        )
 
         # Adds /usr/share/applications/hello-world.desktop
-        self.rpm.add_installed_file("/usr/share/applications/hello-world.desktop", rpmfluff.SourceFile('hello-world.desktop', good_desktop_file))
+        self.rpm.add_installed_file(
+            "/usr/share/applications/hello-world.desktop",
+            rpmfluff.SourceFile("hello-world.desktop", good_desktop_file),
+        )
 
-        self.inspection = 'desktop'
-        self.label = 'desktop-entry-files'
-        self.result = 'VERIFY'
-        self.waiver_auth = 'Anyone'
+        self.inspection = "desktop"
+        self.label = "desktop-entry-files"
+        self.result = "VERIFY"
+        self.waiver_auth = "Anyone"
+
 
 # Desktop file without world executable Exec file in RPM compare (VERIFY)
 class DesktopFileWithoutWorldExecutableExecCompareRPM(TestCompareRPMs):
@@ -582,17 +824,30 @@ class DesktopFileWithoutWorldExecutableExecCompareRPM(TestCompareRPMs):
         self.after_rpm.add_mode("/usr/bin/hello-world", "0700")
 
         # Adds /usr/share/icons/hello-world.png
-        self.before_rpm.add_installed_file("/usr/share/icons/hello-world.png", rpmfluff.GeneratedSourceFile("hello-world.png", rpmfluff.make_png()))
-        self.after_rpm.add_installed_file("/usr/share/icons/hello-world.png", rpmfluff.GeneratedSourceFile("hello-world.png", rpmfluff.make_png()))
+        self.before_rpm.add_installed_file(
+            "/usr/share/icons/hello-world.png",
+            rpmfluff.GeneratedSourceFile("hello-world.png", rpmfluff.make_png()),
+        )
+        self.after_rpm.add_installed_file(
+            "/usr/share/icons/hello-world.png",
+            rpmfluff.GeneratedSourceFile("hello-world.png", rpmfluff.make_png()),
+        )
 
         # Adds /usr/share/applications/hello-world.desktop
-        self.before_rpm.add_installed_file("/usr/share/applications/hello-world.desktop", rpmfluff.SourceFile('hello-world.desktop', good_desktop_file))
-        self.after_rpm.add_installed_file("/usr/share/applications/hello-world.desktop", rpmfluff.SourceFile('hello-world.desktop', good_desktop_file))
+        self.before_rpm.add_installed_file(
+            "/usr/share/applications/hello-world.desktop",
+            rpmfluff.SourceFile("hello-world.desktop", good_desktop_file),
+        )
+        self.after_rpm.add_installed_file(
+            "/usr/share/applications/hello-world.desktop",
+            rpmfluff.SourceFile("hello-world.desktop", good_desktop_file),
+        )
 
-        self.inspection = 'desktop'
-        self.label = 'desktop-entry-files'
-        self.result = 'VERIFY'
-        self.waiver_auth = 'Anyone'
+        self.inspection = "desktop"
+        self.label = "desktop-entry-files"
+        self.result = "VERIFY"
+        self.waiver_auth = "Anyone"
+
 
 # Desktop file without world executable Exec file in Koji build compare (VERIFY)
 class DesktopFileWithoutWorldExecutableExecCompareKoji(TestCompareKoji):
@@ -606,14 +861,26 @@ class DesktopFileWithoutWorldExecutableExecCompareKoji(TestCompareKoji):
         self.after_rpm.add_mode("/usr/bin/hello-world", "0700")
 
         # Adds /usr/share/icons/hello-world.png
-        self.before_rpm.add_installed_file("/usr/share/icons/hello-world.png", rpmfluff.GeneratedSourceFile("hello-world.png", rpmfluff.make_png()))
-        self.after_rpm.add_installed_file("/usr/share/icons/hello-world.png", rpmfluff.GeneratedSourceFile("hello-world.png", rpmfluff.make_png()))
+        self.before_rpm.add_installed_file(
+            "/usr/share/icons/hello-world.png",
+            rpmfluff.GeneratedSourceFile("hello-world.png", rpmfluff.make_png()),
+        )
+        self.after_rpm.add_installed_file(
+            "/usr/share/icons/hello-world.png",
+            rpmfluff.GeneratedSourceFile("hello-world.png", rpmfluff.make_png()),
+        )
 
         # Adds /usr/share/applications/hello-world.desktop
-        self.before_rpm.add_installed_file("/usr/share/applications/hello-world.desktop", rpmfluff.SourceFile('hello-world.desktop', good_desktop_file))
-        self.after_rpm.add_installed_file("/usr/share/applications/hello-world.desktop", rpmfluff.SourceFile('hello-world.desktop', good_desktop_file))
+        self.before_rpm.add_installed_file(
+            "/usr/share/applications/hello-world.desktop",
+            rpmfluff.SourceFile("hello-world.desktop", good_desktop_file),
+        )
+        self.after_rpm.add_installed_file(
+            "/usr/share/applications/hello-world.desktop",
+            rpmfluff.SourceFile("hello-world.desktop", good_desktop_file),
+        )
 
-        self.inspection = 'desktop'
-        self.label = 'desktop-entry-files'
-        self.result = 'VERIFY'
-        self.waiver_auth = 'Anyone'
+        self.inspection = "desktop"
+        self.label = "desktop-entry-files"
+        self.result = "VERIFY"
+        self.waiver_auth = "Anyone"
