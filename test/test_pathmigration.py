@@ -25,6 +25,7 @@ from baseclass import TestRPMs, TestCompareRPMs, TestKoji, TestCompareKoji
 # /bin #
 ########
 
+
 # File in /bin in RPM (VERIFY)
 class SlashBinFileRPM(TestRPMs):
     def setUp(self):

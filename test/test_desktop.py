@@ -74,6 +74,7 @@ StartupNotify=true
 MimeType=application/x-extension-fcstd;
 """
 
+
 # Valid desktop file passes in RPM (OK)
 class ValidDesktopFileRPM(TestRPMs):
     def setUp(self):

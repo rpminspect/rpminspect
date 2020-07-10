@@ -42,6 +42,7 @@ else:
 with open(os.environ["RPMINSPECT"], mode="rb") as f:
     ri_bytes = f.read()
 
+
 # Absolute symlink exists (OK)
 class AbsoluteSymlinkExistsRPMs(TestRPMs):
     def setUp(self):

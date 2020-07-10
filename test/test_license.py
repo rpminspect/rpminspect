@@ -17,7 +17,9 @@
 #
 
 import unittest
+
 from baseclass import TestSRPM, TestRPMs, TestKoji
+
 
 # Empty License tag fails on SRPM (BAD)
 class EmptyLicenseTagSRPM(TestSRPM):
