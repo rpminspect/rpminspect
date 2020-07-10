@@ -473,7 +473,7 @@ class RelativeSymlinkDanglingParentDirKoji(TestKoji):
         self.waiver_auth = "Anyone"
 
 
-class RelativeSymlinkDanglingParentDirRPMs(TestCompareRPMs):
+class RelativeSymlinkDanglingParentDirAfterRPMs(TestCompareRPMs):
     def setUp(self):
         TestCompareRPMs.setUp(self)
 
@@ -493,7 +493,7 @@ class RelativeSymlinkDanglingParentDirRPMs(TestCompareRPMs):
         self.waiver_auth = "Anyone"
 
 
-class RelativeSymlinkDanglingParentDirKoji(TestCompareKoji):
+class RelativeSymlinkDanglingParentDirAfterKoji(TestCompareKoji):
     def setUp(self):
         TestCompareKoji.setUp(self)
 
