@@ -17,7 +17,7 @@
 #
 
 import subprocess
-import unittest
+
 from baseclass import RequiresRpminspect
 
 # Verify --help gives help output

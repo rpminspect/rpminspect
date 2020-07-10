@@ -17,7 +17,6 @@
 #
 
 import os
-import unittest
 
 import rpmfluff
 

@@ -17,7 +17,7 @@
 #
 
 import os
-import unittest
+
 from baseclass import TestRPMs, TestKoji, TestCompareRPMs, TestCompareKoji
 
 datadir = os.environ["RPMINSPECT_TEST_DATA_PATH"]
