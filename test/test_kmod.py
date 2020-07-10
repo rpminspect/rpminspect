@@ -63,6 +63,7 @@ if not have_kernel_devel:
         have_kernel_devel = True
         kernel_build_dir = os.path.join("/lib", "modules", kver, "build")
 
+
 # Support functions to build the kernel modules we need
 def build_module(rpminspect, build_ext=None, extra_cflags=None):
     build = os.path.dirname(rpminspect)

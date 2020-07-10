@@ -17,6 +17,7 @@
 #
 
 import rpmfluff
+
 from baseclass import TestSRPM, TestKoji, TestCompareSRPM, TestCompareKoji
 
 

@@ -17,7 +17,9 @@
 #
 
 import unittest
+
 from baseclass import TestSRPM, TestRPMs, TestKoji
+
 
 # Verify spec filename matches package name on SRPM (OK)
 class SpecNameSRPM(TestSRPM):

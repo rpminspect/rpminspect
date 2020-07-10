@@ -20,6 +20,7 @@ import subprocess
 
 from baseclass import RequiresRpminspect
 
+
 # Verify --help gives help output
 class RpminspectHelp(RequiresRpminspect):
     def runTest(self):

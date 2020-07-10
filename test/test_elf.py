@@ -39,6 +39,7 @@ double exponent(double x, double y)
 }
 """
 
+
 # Program built with noexecstack
 class WithoutExecStackRPM(TestRPMs):
     def setUp(self):
