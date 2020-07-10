@@ -133,7 +133,7 @@ bool inspect_files(struct rpminspect *ri) {
 
     /* find the after build SRPM */
     TAILQ_FOREACH(peer, ri->peers, items) {
-        if (headerIsSource(peer->after_hdr)) {
+        if (headerIsSource(peer->after_hdr) && peer->after_files) {
             /* find the after build spec file */
             TAILQ_FOREACH(file, peer->after_files, items) {
                 if (strsuffix(file->localpath, SPEC_FILENAME_EXTENSION)) {
