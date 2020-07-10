@@ -13,6 +13,7 @@ git
 glibc-devel-32bit
 gzip
 html-dtd
+kernel-default-devel
 kernel-devel
 ksh
 libarchive-devel
