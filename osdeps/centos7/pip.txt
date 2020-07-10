@@ -1,3 +1,4 @@
 cpp-coveralls
+rpmfluff==0.5.7
 gcovr
 PyYAML
