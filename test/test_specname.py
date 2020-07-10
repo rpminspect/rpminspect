@@ -23,26 +23,29 @@ from baseclass import TestSRPM, TestRPMs, TestKoji
 class SpecNameSRPM(TestSRPM):
     def setUp(self):
         TestSRPM.setUp(self)
-        self.inspection = 'specname'
-        self.label = 'spec-file-name'
-        self.result = 'OK'
+        self.inspection = "specname"
+        self.label = "spec-file-name"
+        self.result = "OK"
+
 
 # Verify spec filename matches package name on Koji build (OK)
 class SpecNameKojiBuild(TestKoji):
     def setUp(self):
         TestKoji.setUp(self)
-        self.inspection = 'specname'
-        self.label = 'spec-file-name'
-        self.result = 'OK'
+        self.inspection = "specname"
+        self.label = "spec-file-name"
+        self.result = "OK"
+
 
 # Verify spec filename test on binary RPMs fails (BAD)
 class SpecNameRPMs(TestRPMs):
     def setUp(self):
         TestRPMs.setUp(self)
-        self.inspection = 'specname'
-        self.label = 'spec-file-name'
-        self.result = 'INFO'
-        self.waiver_auth = 'Not Waivable'
+        self.inspection = "specname"
+        self.label = "spec-file-name"
+        self.result = "INFO"
+        self.waiver_auth = "Not Waivable"
+
 
 # Verify spec filename not matching package name fails (BAD)
 class BadSpecNameSRPM(TestSRPM):
@@ -50,10 +53,11 @@ class BadSpecNameSRPM(TestSRPM):
     def setUp(self):
         TestSRPM.setUp(self)
         self.rpm.addSpecBasename("badspecname")
-        self.inspection = 'specname'
-        self.label = 'spec-file-name'
-        self.result = 'BAD'
-        self.waiver_auth = 'Not Waivable'
+        self.inspection = "specname"
+        self.label = "spec-file-name"
+        self.result = "BAD"
+        self.waiver_auth = "Not Waivable"
+
 
 # Verify spec filename not matching package name fails on Koji build (BAD)
 class BadSpecNameKojiBuild(TestKoji):
@@ -61,7 +65,7 @@ class BadSpecNameKojiBuild(TestKoji):
     def setUp(self):
         TestKoji.setUp(self)
         self.rpm.addSpecBasename("badspecname")
-        self.inspection = 'specname'
-        self.label = 'spec-file-name'
-        self.result = 'BAD'
-        self.waiver_auth = 'Not Waivable'
+        self.inspection = "specname"
+        self.label = "spec-file-name"
+        self.result = "BAD"
+        self.waiver_auth = "Not Waivable"

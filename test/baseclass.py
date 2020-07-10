@@ -62,9 +62,8 @@ def check_results(results, label, result, waiver_auth):
         return False
 
     for r in results[label]:
-        if 'result' in r and 'waiver authorization' in r:
-            if r['result'] == result and r[
-                    'waiver authorization'] == waiver_auth:
+        if "result" in r and "waiver authorization" in r:
+            if r["result"] == result and r["waiver authorization"] == waiver_auth:
                 ret = True
                 break
 
@@ -76,15 +75,17 @@ def check_results(results, label, result, waiver_auth):
 class RequiresRpminspect(unittest.TestCase):
     def setUp(self):
         # make sure we have the program
-        self.rpminspect = os.environ['RPMINSPECT']
+        self.rpminspect = os.environ["RPMINSPECT"]
 
         if not os.path.isfile(self.rpminspect) or not os.access(
-                self.rpminspect, os.X_OK):
+            self.rpminspect, os.X_OK
+        ):
             raise MissingRpminspect
 
         # ensure we have the sample configuration file
-        if not os.path.isfile(os.environ['RPMINSPECT_YAML']) or \
-           not os.access(os.environ['RPMINSPECT_YAML'], os.R_OK):
+        if not os.path.isfile(os.environ["RPMINSPECT_YAML"]) or not os.access(
+            os.environ["RPMINSPECT_YAML"], os.R_OK
+        ):
             raise MissingRpminspectConf
 
         # set in configFile()
@@ -99,12 +100,12 @@ class RequiresRpminspect(unittest.TestCase):
         try:
             o = json.dumps(json.loads(self.out), sort_keys=True, indent=4)
         except Exception:
-            o = str(self.out, 'utf-8')
+            o = str(self.out, "utf-8")
 
         try:
             e = json.dumps(json.loads(self.err), sort_keys=True, indent=4)
         except Exception:
-            e = str(self.err, 'utf-8')
+            e = str(self.err, "utf-8")
 
         print("\n\ninspection=%s\n" % self.inspection)
 
@@ -121,38 +122,37 @@ class RequiresRpminspect(unittest.TestCase):
         (handle, self.conffile) = tempfile.mkstemp()
         os.close(handle)
 
-        shutil.copyfile(os.environ['RPMINSPECT_YAML'], self.conffile)
+        shutil.copyfile(os.environ["RPMINSPECT_YAML"], self.conffile)
 
-        instream = open(os.environ['RPMINSPECT_YAML'], "r")
+        instream = open(os.environ["RPMINSPECT_YAML"], "r")
 
         # modify settings for the test suite based on where it's running
         cfg = yaml.full_load(instream)
         instream.close()
 
-        cfg['vendor']['vendor_data_dir'] = os.environ[
-            'RPMINSPECT_TEST_DATA_PATH']
-        cfg['vendor']['licensedb'] = 'test.json'
+        cfg["vendor"]["vendor_data_dir"] = os.environ["RPMINSPECT_TEST_DATA_PATH"]
+        cfg["vendor"]["licensedb"] = "test.json"
 
         if self.buildhost_subdomain:
-            cfg['metadata']['buildhost_subdomain'] = [self.buildhost_subdomain]
+            cfg["metadata"]["buildhost_subdomain"] = [self.buildhost_subdomain]
         else:
             hn = socket.getfqdn()
             hnd = None
 
-            if hn.find('.') != -1:
-                hnd = '.' + hn.split('.', 1)[1]
+            if hn.find(".") != -1:
+                hnd = "." + hn.split(".", 1)[1]
 
             if hn.startswith("localhost"):
-                cfg['metadata']['buildhost_subdomain'] = ['localhost', hn]
+                cfg["metadata"]["buildhost_subdomain"] = ["localhost", hn]
             else:
-                cfg['metadata']['buildhost_subdomain'] = [hn]
+                cfg["metadata"]["buildhost_subdomain"] = [hn]
 
             if hnd:
-                cfg['metadata']['buildhost_subdomain'].append(hnd)
+                cfg["metadata"]["buildhost_subdomain"].append(hnd)
 
         # write the temporary config file for the test suite
         outstream = open(self.conffile, "w")
-        outstream.write(yaml.dump(cfg).replace('- ', '  - '))
+        outstream.write(yaml.dump(cfg).replace("- ", "  - "))
         outstream.close()
 
     def tearDown(self):
@@ -174,8 +174,8 @@ class TestSRPM(RequiresRpminspect):
 
         # defaults
         self.exitcode = 0
-        self.result = 'OK'
-        self.waiver_auth = 'Not Waivable'
+        self.result = "OK"
+        self.waiver_auth = "Not Waivable"
 
     def configFile(self):
         RequiresRpminspect.configFile(self)
@@ -189,21 +189,25 @@ class TestSRPM(RequiresRpminspect):
         self.rpm.do_make()
 
         args = [
-            self.rpminspect, '-d', '-c', self.conffile, '-F', 'json', '-r',
-            'GENERIC'
+            self.rpminspect,
+            "-d",
+            "-c",
+            self.conffile,
+            "-F",
+            "json",
+            "-r",
+            "GENERIC",
         ]
         if self.inspection:
-            args.append('-T')
+            args.append("-T")
             args.append(self.inspection)
 
         if KEEP_RESULTS:
-            args.append('-k')
+            args.append("-k")
 
         args.append(self.rpm.get_built_srpm())
 
-        self.p = subprocess.Popen(args,
-                                  stdout=subprocess.PIPE,
-                                  stderr=subprocess.PIPE)
+        self.p = subprocess.Popen(args, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         (self.out, self.err) = self.p.communicate()
 
         try:
@@ -212,7 +216,7 @@ class TestSRPM(RequiresRpminspect):
             self.dumpResults()
 
         # anything not OK or INFO is a non-zero return
-        if self.result not in ['OK', 'INFO'] and self.exitcode == 0:
+        if self.result not in ["OK", "INFO"] and self.exitcode == 0:
             self.exitcode = 1
 
         # dump stdout and stderr if these do not match
@@ -221,8 +225,8 @@ class TestSRPM(RequiresRpminspect):
 
         self.assertEqual(self.p.returncode, self.exitcode)
         self.assertTrue(
-            check_results(self.results, self.label, self.result,
-                          self.waiver_auth))
+            check_results(self.results, self.label, self.result, self.waiver_auth)
+        )
 
     def tearDown(self):
         shutil.rmtree(self.rpm.get_base_dir(), ignore_errors=True)
@@ -232,10 +236,8 @@ class TestSRPM(RequiresRpminspect):
 class TestCompareSRPM(RequiresRpminspect):
     def setUp(self):
         RequiresRpminspect.setUp(self)
-        self.before_rpm = rpmfluff.SimpleRpmBuild(BEFORE_NAME, BEFORE_VER,
-                                                  BEFORE_REL)
-        self.after_rpm = rpmfluff.SimpleRpmBuild(AFTER_NAME, AFTER_VER,
-                                                 AFTER_REL)
+        self.before_rpm = rpmfluff.SimpleRpmBuild(BEFORE_NAME, BEFORE_VER, BEFORE_REL)
+        self.after_rpm = rpmfluff.SimpleRpmBuild(AFTER_NAME, AFTER_VER, AFTER_REL)
 
         # turn off all rpmbuild post processing stuff for the purposes of testing
         self.before_rpm.header += "\n%global __os_install_post %{nil}\n"
@@ -247,8 +249,8 @@ class TestCompareSRPM(RequiresRpminspect):
 
         # defaults
         self.exitcode = 0
-        self.result = 'OK'
-        self.waiver_auth = 'Not Waivable'
+        self.result = "OK"
+        self.waiver_auth = "Not Waivable"
 
     def configFile(self):
         RequiresRpminspect.configFile(self)
@@ -263,23 +265,27 @@ class TestCompareSRPM(RequiresRpminspect):
         self.after_rpm.do_make()
 
         args = [
-            self.rpminspect, '-d', '-c', self.conffile, '-F', 'json', '-r',
-            'GENERIC'
+            self.rpminspect,
+            "-d",
+            "-c",
+            self.conffile,
+            "-F",
+            "json",
+            "-r",
+            "GENERIC",
         ]
 
         if self.inspection:
-            args.append('-T')
+            args.append("-T")
             args.append(self.inspection)
 
         if KEEP_RESULTS:
-            args.append('-k')
+            args.append("-k")
 
         args.append(self.before_rpm.get_built_srpm())
         args.append(self.after_rpm.get_built_srpm())
 
-        self.p = subprocess.Popen(args,
-                                  stdout=subprocess.PIPE,
-                                  stderr=subprocess.PIPE)
+        self.p = subprocess.Popen(args, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         (self.out, self.err) = self.p.communicate()
 
         try:
@@ -288,7 +294,7 @@ class TestCompareSRPM(RequiresRpminspect):
             self.dumpResults()
 
         # anything not OK or INFO is a non-zero return
-        if self.result not in ['OK', 'INFO'] and self.exitcode == 0:
+        if self.result not in ["OK", "INFO"] and self.exitcode == 0:
             self.exitcode = 1
 
         # dump stdout and stderr if these do not match
@@ -297,8 +303,8 @@ class TestCompareSRPM(RequiresRpminspect):
 
         self.assertEqual(self.p.returncode, self.exitcode)
         self.assertTrue(
-            check_results(self.results, self.label, self.result,
-                          self.waiver_auth))
+            check_results(self.results, self.label, self.result, self.waiver_auth)
+        )
 
     def tearDown(self):
         shutil.rmtree(self.before_rpm.get_base_dir(), ignore_errors=True)
@@ -316,27 +322,33 @@ class TestRPMs(TestSRPM):
         self.rpm.do_make()
 
         # anything not OK or INFO is a non-zero return
-        if self.result not in ['OK', 'INFO'] and self.exitcode == 0:
+        if self.result not in ["OK", "INFO"] and self.exitcode == 0:
             self.exitcode = 1
 
         for a in self.rpm.get_build_archs():
             args = [
-                self.rpminspect, '-d', '-c', self.conffile, '-F', 'json', '-r',
-                'GENERIC'
+                self.rpminspect,
+                "-d",
+                "-c",
+                self.conffile,
+                "-F",
+                "json",
+                "-r",
+                "GENERIC",
             ]
 
             if self.inspection:
-                args.append('-T')
+                args.append("-T")
                 args.append(self.inspection)
 
             if KEEP_RESULTS:
-                args.append('-k')
+                args.append("-k")
 
             args.append(self.rpm.get_built_rpm(a))
 
-            self.p = subprocess.Popen(args,
-                                      stdout=subprocess.PIPE,
-                                      stderr=subprocess.PIPE)
+            self.p = subprocess.Popen(
+                args, stdout=subprocess.PIPE, stderr=subprocess.PIPE
+            )
             (self.out, self.err) = self.p.communicate()
 
             try:
@@ -349,11 +361,10 @@ class TestRPMs(TestSRPM):
                 self.dumpResults()
 
             self.assertEqual(self.p.returncode, self.exitcode)
-            self.assertEqual(self.results[self.label][0]['result'],
-                             self.result)
+            self.assertEqual(self.results[self.label][0]["result"], self.result)
             self.assertEqual(
-                self.results[self.label][0]['waiver authorization'],
-                self.waiver_auth)
+                self.results[self.label][0]["waiver authorization"], self.waiver_auth
+            )
 
     def tearDown(self):
         shutil.rmtree(self.rpm.get_base_dir(), ignore_errors=True)
@@ -371,28 +382,34 @@ class TestCompareRPMs(TestCompareSRPM):
         self.after_rpm.do_make()
 
         # anything not OK or INFO is a non-zero return
-        if self.result not in ['OK', 'INFO'] and self.exitcode == 0:
+        if self.result not in ["OK", "INFO"] and self.exitcode == 0:
             self.exitcode = 1
 
         for a in self.before_rpm.get_build_archs():
             args = [
-                self.rpminspect, '-d', '-c', self.conffile, '-F', 'json', '-r',
-                'GENERIC'
+                self.rpminspect,
+                "-d",
+                "-c",
+                self.conffile,
+                "-F",
+                "json",
+                "-r",
+                "GENERIC",
             ]
 
             if self.inspection:
-                args.append('-T')
+                args.append("-T")
                 args.append(self.inspection)
 
             if KEEP_RESULTS:
-                args.append('-k')
+                args.append("-k")
 
             args.append(self.before_rpm.get_built_rpm(a))
             args.append(self.after_rpm.get_built_rpm(a))
 
-            self.p = subprocess.Popen(args,
-                                      stdout=subprocess.PIPE,
-                                      stderr=subprocess.PIPE)
+            self.p = subprocess.Popen(
+                args, stdout=subprocess.PIPE, stderr=subprocess.PIPE
+            )
             (self.out, self.err) = self.p.communicate()
 
             try:
@@ -406,8 +423,8 @@ class TestCompareRPMs(TestCompareSRPM):
 
             self.assertEqual(self.p.returncode, self.exitcode)
             self.assertTrue(
-                check_results(self.results, self.label, self.result,
-                              self.waiver_auth))
+                check_results(self.results, self.label, self.result, self.waiver_auth)
+            )
 
     def tearDown(self):
         shutil.rmtree(self.before_rpm.get_base_dir(), ignore_errors=True)
@@ -428,32 +445,38 @@ class TestKoji(TestSRPM):
         # copy everything in to place as if Koji built it
         with tempfile.TemporaryDirectory() as kojidir:
             # copy over the SRPM to the fake koji build
-            srcdir = kojidir + '/src'
+            srcdir = kojidir + "/src"
             os.makedirs(srcdir, exist_ok=True)
             shutil.copy(self.rpm.get_built_srpm(), srcdir)
 
             # copy over the built RPMs to the fake koji build
             for a in self.rpm.get_build_archs():
-                adir = kojidir + '/' + a
+                adir = kojidir + "/" + a
                 os.makedirs(adir, exist_ok=True)
                 shutil.copy(self.rpm.get_built_rpm(a), adir)
 
             args = [
-                self.rpminspect, '-d', '-c', self.conffile, '-F', 'json', '-r',
-                'GENERIC'
+                self.rpminspect,
+                "-d",
+                "-c",
+                self.conffile,
+                "-F",
+                "json",
+                "-r",
+                "GENERIC",
             ]
             if self.inspection:
-                args.append('-T')
+                args.append("-T")
                 args.append(self.inspection)
 
             if KEEP_RESULTS:
-                args.append('-k')
+                args.append("-k")
 
             args.append(kojidir)
 
-            self.p = subprocess.Popen(args,
-                                      stdout=subprocess.PIPE,
-                                      stderr=subprocess.PIPE)
+            self.p = subprocess.Popen(
+                args, stdout=subprocess.PIPE, stderr=subprocess.PIPE
+            )
             (self.out, self.err) = self.p.communicate()
 
             try:
@@ -462,7 +485,7 @@ class TestKoji(TestSRPM):
                 self.dumpResults()
 
             # anything not OK or INFO is a non-zero return
-            if self.result not in ['OK', 'INFO'] and self.exitcode == 0:
+            if self.result not in ["OK", "INFO"] and self.exitcode == 0:
                 self.exitcode = 1
 
             # dump stdout and stderr if these do not match
@@ -471,8 +494,8 @@ class TestKoji(TestSRPM):
 
             self.assertEqual(self.p.returncode, self.exitcode)
             self.assertTrue(
-                check_results(self.results, self.label, self.result,
-                              self.waiver_auth))
+                check_results(self.results, self.label, self.result, self.waiver_auth)
+            )
 
     def tearDown(self):
         shutil.rmtree(self.rpm.get_base_dir(), ignore_errors=True)
@@ -493,8 +516,8 @@ class TestCompareKoji(TestCompareSRPM):
         # copy everything in to place as if Koji built it
         with tempfile.TemporaryDirectory() as kojidir:
             # copy over the SRPM to the fake koji build
-            beforesrcdir = kojidir + '/before/src'
-            aftersrcdir = kojidir + '/after/src'
+            beforesrcdir = kojidir + "/before/src"
+            aftersrcdir = kojidir + "/after/src"
             os.makedirs(beforesrcdir, exist_ok=True)
             os.makedirs(aftersrcdir, exist_ok=True)
             shutil.copy(self.before_rpm.get_built_srpm(), beforesrcdir)
@@ -502,33 +525,39 @@ class TestCompareKoji(TestCompareSRPM):
 
             # copy over the built RPMs to the fake koji build
             for a in self.before_rpm.get_build_archs():
-                adir = kojidir + '/before/' + a
+                adir = kojidir + "/before/" + a
                 os.makedirs(adir, exist_ok=True)
                 shutil.copy(self.before_rpm.get_built_rpm(a), adir)
 
             for a in self.after_rpm.get_build_archs():
-                adir = kojidir + '/after/' + a
+                adir = kojidir + "/after/" + a
                 os.makedirs(adir, exist_ok=True)
                 shutil.copy(self.after_rpm.get_built_rpm(a), adir)
 
             args = [
-                self.rpminspect, '-d', '-c', self.conffile, '-F', 'json', '-r',
-                AFTER_REL
+                self.rpminspect,
+                "-d",
+                "-c",
+                self.conffile,
+                "-F",
+                "json",
+                "-r",
+                AFTER_REL,
             ]
 
             if self.inspection:
-                args.append('-T')
+                args.append("-T")
                 args.append(self.inspection)
 
             if KEEP_RESULTS:
-                args.append('-k')
+                args.append("-k")
 
-            args.append(kojidir + '/before')
-            args.append(kojidir + '/after')
+            args.append(kojidir + "/before")
+            args.append(kojidir + "/after")
 
-            self.p = subprocess.Popen(args,
-                                      stdout=subprocess.PIPE,
-                                      stderr=subprocess.PIPE)
+            self.p = subprocess.Popen(
+                args, stdout=subprocess.PIPE, stderr=subprocess.PIPE
+            )
             (self.out, self.err) = self.p.communicate()
 
             try:
@@ -537,7 +566,7 @@ class TestCompareKoji(TestCompareSRPM):
                 self.dumpResults()
 
             # anything not OK or INFO is a non-zero return
-            if self.result not in ['OK', 'INFO'] and self.exitcode == 0:
+            if self.result not in ["OK", "INFO"] and self.exitcode == 0:
                 self.exitcode = 1
 
             # dump stdout and stderr if these do not match
@@ -546,8 +575,8 @@ class TestCompareKoji(TestCompareSRPM):
 
             self.assertEqual(self.p.returncode, self.exitcode)
             self.assertTrue(
-                check_results(self.results, self.label, self.result,
-                              self.waiver_auth))
+                check_results(self.results, self.label, self.result, self.waiver_auth)
+            )
 
     def tearDown(self):
         shutil.rmtree(self.before_rpm.get_base_dir(), ignore_errors=True)

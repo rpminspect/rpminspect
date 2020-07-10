@@ -20,10 +20,10 @@ import os
 import unittest
 from baseclass import TestRPMs, TestKoji, TestCompareRPMs, TestCompareKoji
 
-datadir = os.environ['RPMINSPECT_TEST_DATA_PATH']
+datadir = os.environ["RPMINSPECT_TEST_DATA_PATH"]
 
 # Source code used for the -flto tests
-lto_src = open(datadir + '/lto.c').read()
+lto_src = open(datadir + "/lto.c").read()
 
 # NOTE: The add_simple_compilation() calls to rpmfluff use '-o a.out' in
 # the compileFlags due to a limitation in rpmfluff.  It always tries to
@@ -36,46 +36,58 @@ lto_src = open(datadir + '/lto.c').read()
 class NoLTOSymbolsRelocRPMs(TestRPMs):
     def setUp(self):
         TestRPMs.setUp(self)
-        self.rpm.add_simple_compilation(sourceContent=lto_src,
-                                        compileFlags='-c -fno-lto -o a.out',
-                                        installPath='usr/lib/lto.o')
-        self.inspection = 'lto'
-        self.label = 'LTO'
-        self.result = 'OK'
-        self.waiver_auth = 'Not Waivable'
+        self.rpm.add_simple_compilation(
+            sourceContent=lto_src,
+            compileFlags="-c -fno-lto -o a.out",
+            installPath="usr/lib/lto.o",
+        )
+        self.inspection = "lto"
+        self.label = "LTO"
+        self.result = "OK"
+        self.waiver_auth = "Not Waivable"
+
 
 class NoLTOSymbolsRelocKoji(TestKoji):
     def setUp(self):
         TestKoji.setUp(self)
-        self.rpm.add_simple_compilation(sourceContent=lto_src,
-                                        compileFlags='-c -fno-lto -o a.out',
-                                        installPath='usr/lib/lto.o')
-        self.inspection = 'lto'
-        self.label = 'LTO'
-        self.result = 'OK'
-        self.waiver_auth = 'Not Waivable'
+        self.rpm.add_simple_compilation(
+            sourceContent=lto_src,
+            compileFlags="-c -fno-lto -o a.out",
+            installPath="usr/lib/lto.o",
+        )
+        self.inspection = "lto"
+        self.label = "LTO"
+        self.result = "OK"
+        self.waiver_auth = "Not Waivable"
+
 
 class NoLTOSymbolsRelocCompareRPMs(TestCompareRPMs):
     def setUp(self):
         TestCompareRPMs.setUp(self)
-        self.after_rpm.add_simple_compilation(sourceContent=lto_src,
-                                              compileFlags='-c -fno-lto -o a.out',
-                                              installPath='usr/lib/lto.o')
-        self.inspection = 'lto'
-        self.label = 'LTO'
-        self.result = 'OK'
-        self.waiver_auth = 'Not Waivable'
+        self.after_rpm.add_simple_compilation(
+            sourceContent=lto_src,
+            compileFlags="-c -fno-lto -o a.out",
+            installPath="usr/lib/lto.o",
+        )
+        self.inspection = "lto"
+        self.label = "LTO"
+        self.result = "OK"
+        self.waiver_auth = "Not Waivable"
+
 
 class NoLTOSymbolsRelocCompareKoji(TestCompareKoji):
     def setUp(self):
         TestCompareKoji.setUp(self)
-        self.after_rpm.add_simple_compilation(sourceContent=lto_src,
-                                              compileFlags='-c -fno-lto -o a.out',
-                                              installPath='usr/lib/lto.o')
-        self.inspection = 'lto'
-        self.label = 'LTO'
-        self.result = 'OK'
-        self.waiver_auth = 'Not Waivable'
+        self.after_rpm.add_simple_compilation(
+            sourceContent=lto_src,
+            compileFlags="-c -fno-lto -o a.out",
+            installPath="usr/lib/lto.o",
+        )
+        self.inspection = "lto"
+        self.label = "LTO"
+        self.result = "OK"
+        self.waiver_auth = "Not Waivable"
+
 
 # No LTO symbols in .a files (OK)
 class NoLTOSymbolsStaticLibRPMs(TestRPMs):
@@ -83,121 +95,153 @@ class NoLTOSymbolsStaticLibRPMs(TestRPMs):
         TestRPMs.setUp(self)
 
         # first create an object file
-        self.rpm.add_simple_compilation(sourceContent=lto_src,
-                                        compileFlags='-c -fno-lto -o a.out',
-                                        installPath='usr/lib/lto.o')
+        self.rpm.add_simple_compilation(
+            sourceContent=lto_src,
+            compileFlags="-c -fno-lto -o a.out",
+            installPath="usr/lib/lto.o",
+        )
 
         # now also create it as a .a file
-        self.rpm.section_install += "( cd $RPM_BUILD_ROOT/usr/lib ; ar r liblto.a lto.o )\n"
+        self.rpm.section_install += (
+            "( cd $RPM_BUILD_ROOT/usr/lib ; ar r liblto.a lto.o )\n"
+        )
         sub = self.rpm.get_subpackage(None)
-        sub.section_files += '/usr/lib/liblto.a\n'
+        sub.section_files += "/usr/lib/liblto.a\n"
 
-        self.inspection = 'lto'
-        self.label = 'LTO'
-        self.result = 'OK'
-        self.waiver_auth = 'Not Waivable'
+        self.inspection = "lto"
+        self.label = "LTO"
+        self.result = "OK"
+        self.waiver_auth = "Not Waivable"
+
 
 class NoLTOSymbolsStaticLibKoji(TestKoji):
     def setUp(self):
         TestKoji.setUp(self)
 
         # first create an object file
-        self.rpm.add_simple_compilation(sourceContent=lto_src,
-                                        compileFlags='-c -fno-lto -o a.out',
-                                        installPath='usr/lib/lto.o')
+        self.rpm.add_simple_compilation(
+            sourceContent=lto_src,
+            compileFlags="-c -fno-lto -o a.out",
+            installPath="usr/lib/lto.o",
+        )
 
         # now also create it as a .a file
-        self.rpm.section_install += "( cd $RPM_BUILD_ROOT/usr/lib ; ar r liblto.a lto.o )\n"
+        self.rpm.section_install += (
+            "( cd $RPM_BUILD_ROOT/usr/lib ; ar r liblto.a lto.o )\n"
+        )
         sub = self.rpm.get_subpackage(None)
-        sub.section_files += '/usr/lib/liblto.a\n'
+        sub.section_files += "/usr/lib/liblto.a\n"
 
-        self.inspection = 'lto'
-        self.label = 'LTO'
-        self.result = 'OK'
-        self.waiver_auth = 'Not Waivable'
+        self.inspection = "lto"
+        self.label = "LTO"
+        self.result = "OK"
+        self.waiver_auth = "Not Waivable"
+
 
 class NoLTOSymbolsStaticLibCompareRPMs(TestCompareRPMs):
     def setUp(self):
         TestCompareRPMs.setUp(self)
 
         # first create an object file
-        self.after_rpm.add_simple_compilation(sourceContent=lto_src,
-                                              compileFlags='-c -fno-lto -o a.out',
-                                              installPath='usr/lib/lto.o')
+        self.after_rpm.add_simple_compilation(
+            sourceContent=lto_src,
+            compileFlags="-c -fno-lto -o a.out",
+            installPath="usr/lib/lto.o",
+        )
 
         # now also create it as a .a file
-        self.after_rpm.section_install += "( cd $RPM_BUILD_ROOT/usr/lib ; ar r liblto.a lto.o )\n"
+        self.after_rpm.section_install += (
+            "( cd $RPM_BUILD_ROOT/usr/lib ; ar r liblto.a lto.o )\n"
+        )
         sub = self.after_rpm.get_subpackage(None)
-        sub.section_files += '/usr/lib/liblto.a\n'
+        sub.section_files += "/usr/lib/liblto.a\n"
 
-        self.inspection = 'lto'
-        self.label = 'LTO'
-        self.result = 'OK'
-        self.waiver_auth = 'Not Waivable'
+        self.inspection = "lto"
+        self.label = "LTO"
+        self.result = "OK"
+        self.waiver_auth = "Not Waivable"
+
 
 class NoLTOSymbolsStaticLibCompareKoji(TestCompareKoji):
     def setUp(self):
         TestCompareKoji.setUp(self)
 
         # first create an object file
-        self.after_rpm.add_simple_compilation(sourceContent=lto_src,
-                                              compileFlags='-c -fno-lto -o a.out',
-                                              installPath='usr/lib/lto.o')
+        self.after_rpm.add_simple_compilation(
+            sourceContent=lto_src,
+            compileFlags="-c -fno-lto -o a.out",
+            installPath="usr/lib/lto.o",
+        )
 
         # now also create it as a .a file
-        self.after_rpm.section_install += "( cd $RPM_BUILD_ROOT/usr/lib ; ar r liblto.a lto.o )\n"
+        self.after_rpm.section_install += (
+            "( cd $RPM_BUILD_ROOT/usr/lib ; ar r liblto.a lto.o )\n"
+        )
         sub = self.after_rpm.get_subpackage(None)
-        sub.section_files += '/usr/lib/liblto.a\n'
+        sub.section_files += "/usr/lib/liblto.a\n"
 
-        self.inspection = 'lto'
-        self.label = 'LTO'
-        self.result = 'OK'
-        self.waiver_auth = 'Not Waivable'
+        self.inspection = "lto"
+        self.label = "LTO"
+        self.result = "OK"
+        self.waiver_auth = "Not Waivable"
+
 
 # LTO symbols present in .o files (BAD)
 class LTOSymbolsRelocRPMs(TestRPMs):
     def setUp(self):
         TestRPMs.setUp(self)
-        self.rpm.add_simple_compilation(sourceContent=lto_src,
-                                        compileFlags='-c -flto -o a.out',
-                                        installPath='usr/lib/lto.o')
-        self.inspection = 'lto'
-        self.label = 'LTO'
-        self.result = 'BAD'
-        self.waiver_auth = 'Not Waivable'
+        self.rpm.add_simple_compilation(
+            sourceContent=lto_src,
+            compileFlags="-c -flto -o a.out",
+            installPath="usr/lib/lto.o",
+        )
+        self.inspection = "lto"
+        self.label = "LTO"
+        self.result = "BAD"
+        self.waiver_auth = "Not Waivable"
+
 
 class LTOSymbolsRelocKoji(TestKoji):
     def setUp(self):
         TestKoji.setUp(self)
-        self.rpm.add_simple_compilation(sourceContent=lto_src,
-                                        compileFlags='-c -flto -o a.out',
-                                        installPath='usr/lib/lto.o')
-        self.inspection = 'lto'
-        self.label = 'LTO'
-        self.result = 'BAD'
-        self.waiver_auth = 'Not Waivable'
+        self.rpm.add_simple_compilation(
+            sourceContent=lto_src,
+            compileFlags="-c -flto -o a.out",
+            installPath="usr/lib/lto.o",
+        )
+        self.inspection = "lto"
+        self.label = "LTO"
+        self.result = "BAD"
+        self.waiver_auth = "Not Waivable"
+
 
 class LTOSymbolsRelocCompareRPMs(TestCompareRPMs):
     def setUp(self):
         TestCompareRPMs.setUp(self)
-        self.after_rpm.add_simple_compilation(sourceContent=lto_src,
-                                              compileFlags='-c -flto -o a.out',
-                                              installPath='usr/lib/lto.o')
-        self.inspection = 'lto'
-        self.label = 'LTO'
-        self.result = 'BAD'
-        self.waiver_auth = 'Not Waivable'
+        self.after_rpm.add_simple_compilation(
+            sourceContent=lto_src,
+            compileFlags="-c -flto -o a.out",
+            installPath="usr/lib/lto.o",
+        )
+        self.inspection = "lto"
+        self.label = "LTO"
+        self.result = "BAD"
+        self.waiver_auth = "Not Waivable"
+
 
 class LTOSymbolsRelocCompareKoji(TestCompareKoji):
     def setUp(self):
         TestCompareKoji.setUp(self)
-        self.after_rpm.add_simple_compilation(sourceContent=lto_src,
-                                              compileFlags='-c -flto -o a.out',
-                                              installPath='usr/lib/lto.o')
-        self.inspection = 'lto'
-        self.label = 'LTO'
-        self.result = 'BAD'
-        self.waiver_auth = 'Not Waivable'
+        self.after_rpm.add_simple_compilation(
+            sourceContent=lto_src,
+            compileFlags="-c -flto -o a.out",
+            installPath="usr/lib/lto.o",
+        )
+        self.inspection = "lto"
+        self.label = "LTO"
+        self.result = "BAD"
+        self.waiver_auth = "Not Waivable"
+
 
 # LTO symbols present in .a files (BAD)
 class LTOSymbolsStaticLibRPMs(TestRPMs):
@@ -205,73 +249,92 @@ class LTOSymbolsStaticLibRPMs(TestRPMs):
         TestRPMs.setUp(self)
 
         # first create an object file
-        self.rpm.add_simple_compilation(sourceContent=lto_src,
-                                        compileFlags='-c -flto -o a.out',
-                                        installPath='usr/lib/lto.o')
+        self.rpm.add_simple_compilation(
+            sourceContent=lto_src,
+            compileFlags="-c -flto -o a.out",
+            installPath="usr/lib/lto.o",
+        )
 
         # now also create it as a .a file
-        self.rpm.section_install += "( cd $RPM_BUILD_ROOT/usr/lib ; ar r liblto.a lto.o )\n"
+        self.rpm.section_install += (
+            "( cd $RPM_BUILD_ROOT/usr/lib ; ar r liblto.a lto.o )\n"
+        )
         sub = self.rpm.get_subpackage(None)
-        sub.section_files += '/usr/lib/liblto.a\n'
+        sub.section_files += "/usr/lib/liblto.a\n"
 
-        self.inspection = 'lto'
-        self.label = 'LTO'
-        self.result = 'BAD'
-        self.waiver_auth = 'Not Waivable'
+        self.inspection = "lto"
+        self.label = "LTO"
+        self.result = "BAD"
+        self.waiver_auth = "Not Waivable"
+
 
 class LTOSymbolsStaticLibKoji(TestKoji):
     def setUp(self):
         TestKoji.setUp(self)
 
         # first create an object file
-        self.rpm.add_simple_compilation(sourceContent=lto_src,
-                                        compileFlags='-c -flto -o a.out',
-                                        installPath='usr/lib/lto.o')
+        self.rpm.add_simple_compilation(
+            sourceContent=lto_src,
+            compileFlags="-c -flto -o a.out",
+            installPath="usr/lib/lto.o",
+        )
 
         # now also create it as a .a file
-        self.rpm.section_install += "( cd $RPM_BUILD_ROOT/usr/lib ; ar r liblto.a lto.o )\n"
+        self.rpm.section_install += (
+            "( cd $RPM_BUILD_ROOT/usr/lib ; ar r liblto.a lto.o )\n"
+        )
         sub = self.rpm.get_subpackage(None)
-        sub.section_files += '/usr/lib/liblto.a\n'
+        sub.section_files += "/usr/lib/liblto.a\n"
 
-        self.inspection = 'lto'
-        self.label = 'LTO'
-        self.result = 'BAD'
-        self.waiver_auth = 'Not Waivable'
+        self.inspection = "lto"
+        self.label = "LTO"
+        self.result = "BAD"
+        self.waiver_auth = "Not Waivable"
+
 
 class LTOSymbolsStaticLibCompareRPMs(TestCompareRPMs):
     def setUp(self):
         TestCompareRPMs.setUp(self)
 
         # first create an object file
-        self.after_rpm.add_simple_compilation(sourceContent=lto_src,
-                                              compileFlags='-c -flto -o a.out',
-                                              installPath='usr/lib/lto.o')
+        self.after_rpm.add_simple_compilation(
+            sourceContent=lto_src,
+            compileFlags="-c -flto -o a.out",
+            installPath="usr/lib/lto.o",
+        )
 
         # now also create it as a .a file
-        self.after_rpm.section_install += "( cd $RPM_BUILD_ROOT/usr/lib ; ar r liblto.a lto.o )\n"
+        self.after_rpm.section_install += (
+            "( cd $RPM_BUILD_ROOT/usr/lib ; ar r liblto.a lto.o )\n"
+        )
         sub = self.after_rpm.get_subpackage(None)
-        sub.section_files += '/usr/lib/liblto.a\n'
+        sub.section_files += "/usr/lib/liblto.a\n"
 
-        self.inspection = 'lto'
-        self.label = 'LTO'
-        self.result = 'BAD'
-        self.waiver_auth = 'Not Waivable'
+        self.inspection = "lto"
+        self.label = "LTO"
+        self.result = "BAD"
+        self.waiver_auth = "Not Waivable"
+
 
 class LTOSymbolsStaticLibCompareKoji(TestCompareKoji):
     def setUp(self):
         TestCompareKoji.setUp(self)
 
         # first create an object file
-        self.after_rpm.add_simple_compilation(sourceContent=lto_src,
-                                              compileFlags='-c -flto -o a.out',
-                                              installPath='usr/lib/lto.o')
+        self.after_rpm.add_simple_compilation(
+            sourceContent=lto_src,
+            compileFlags="-c -flto -o a.out",
+            installPath="usr/lib/lto.o",
+        )
 
         # now also create it as a .a file
-        self.after_rpm.section_install += "( cd $RPM_BUILD_ROOT/usr/lib ; ar r liblto.a lto.o )\n"
+        self.after_rpm.section_install += (
+            "( cd $RPM_BUILD_ROOT/usr/lib ; ar r liblto.a lto.o )\n"
+        )
         sub = self.after_rpm.get_subpackage(None)
-        sub.section_files += '/usr/lib/liblto.a\n'
+        sub.section_files += "/usr/lib/liblto.a\n"
 
-        self.inspection = 'lto'
-        self.label = 'LTO'
-        self.result = 'BAD'
-        self.waiver_auth = 'Not Waivable'
+        self.inspection = "lto"
+        self.label = "LTO"
+        self.result = "BAD"
+        self.waiver_auth = "Not Waivable"

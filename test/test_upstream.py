@@ -21,26 +21,28 @@ import unittest
 from baseclass import *
 
 # Read in the built rpminspect executable for use in these test RPMs
-with open(os.environ['RPMINSPECT'], mode='rb') as f:
+with open(os.environ["RPMINSPECT"], mode="rb") as f:
     ri_bytes = f.read()
 
 ###################################
 # Single SRPM, RPM, or Koji build #
 ###################################
 
+
 class SkipUpstreamSRPM(TestSRPM):
     """
     Test that single source RPM runs skip the upstream inspection.
     """
+
     def setUp(self):
         TestSRPM.setUp(self)
 
         # tell it to pass '-T upstream' to rpminspect
-        self.inspection = 'upstream'
+        self.inspection = "upstream"
 
         # since it should skip, only look for our diagnostic output
-        self.label = 'rpminspect'
-        self.result = 'INFO'
+        self.label = "rpminspect"
+        self.result = "INFO"
 
     def runTest(self):
         TestSRPM.runTest(self)
@@ -48,19 +50,21 @@ class SkipUpstreamSRPM(TestSRPM):
         # make sure 'upstream' is not in the results
         self.assertFalse(self.inspection in self.results.keys())
 
+
 class SkipUpstreamRPMs(TestRPMs):
     """
     Test that single binary RPM runs skip the upstream inspection.
     """
+
     def setUp(self):
         TestRPMs.setUp(self)
 
         # tell it to pass '-T upstream' to rpminspect
-        self.inspection = 'upstream'
+        self.inspection = "upstream"
 
         # since it should skip, only look for our diagnostic output
-        self.label = 'rpminspect'
-        self.result = 'INFO'
+        self.label = "rpminspect"
+        self.result = "INFO"
 
     def runTest(self):
         TestRPMs.runTest(self)
@@ -68,19 +72,21 @@ class SkipUpstreamRPMs(TestRPMs):
         # make sure 'upstream' is not in the results
         self.assertFalse(self.inspection in self.results.keys())
 
+
 class SkipUpstreamKoji(TestKoji):
     """
     Test that single Koji build runs skip the upstream inspection.
     """
+
     def setUp(self):
         TestKoji.setUp(self)
 
         # tell it to pass '-T upstream' to rpminspect
-        self.inspection = 'upstream'
+        self.inspection = "upstream"
 
         # since it should skip, only look for our diagnostic output
-        self.label = 'rpminspect'
-        self.result = 'INFO'
+        self.label = "rpminspect"
+        self.result = "INFO"
 
     def runTest(self):
         TestKoji.runTest(self)
@@ -88,20 +94,24 @@ class SkipUpstreamKoji(TestKoji):
         # make sure 'upstream' is not in the results
         self.assertFalse(self.inspection in self.results.keys())
 
+
 ##########################
 # Source RPM comparisons #
 ##########################
+
 
 class DiffVerUpstreamCompareSRPM(TestCompareSRPM):
     """
     Test that comparing two SRPMs with different versions gives an OK
     result in the upstream inspection.
     """
+
     def setUp(self):
         TestCompareSRPM.setUp(self)
-        self.inspection = 'upstream'
-        self.label = 'upstream'
-        self.result = 'OK'
+        self.inspection = "upstream"
+        self.label = "upstream"
+        self.result = "OK"
+
 
 class SameVerChangeUpstreamCompareSRPM(TestCompareSRPM):
     """
@@ -109,6 +119,7 @@ class SameVerChangeUpstreamCompareSRPM(TestCompareSRPM):
     Source files in the package gives a VERIFY result in the upstream
     inspection.
     """
+
     def setUp(self):
         TestCompareSRPM.setUp(self)
 
@@ -116,17 +127,20 @@ class SameVerChangeUpstreamCompareSRPM(TestCompareSRPM):
         self.after_rpm = rpmfluff.SimpleRpmBuild(BEFORE_NAME, BEFORE_VER, AFTER_REL)
 
         # add the same installed target file with different sources
-        self.before_rpm.add_installed_file(installPath='bin/rpminspect',
-                                           sourceFile=rpmfluff.SourceFile('rpminspect', ri_bytes),
-                                           mode="0755")
+        self.before_rpm.add_installed_file(
+            installPath="bin/rpminspect",
+            sourceFile=rpmfluff.SourceFile("rpminspect", ri_bytes),
+            mode="0755",
+        )
         self.after_rpm.add_simple_compilation(installPath="bin/rpminspect")
         self.after_rpm.section_install += "chmod 0755 $RPM_BUILD_ROOT/bin/rpminspect\n"
 
         # what we are checking
-        self.inspection = 'upstream'
-        self.label = 'upstream'
-        self.result = 'VERIFY'
-        self.waiver_auth = 'Anyone'
+        self.inspection = "upstream"
+        self.label = "upstream"
+        self.result = "VERIFY"
+        self.waiver_auth = "Anyone"
+
 
 class SameVerRemoveUpstreamCompareSRPM(TestCompareSRPM):
     """
@@ -134,6 +148,7 @@ class SameVerRemoveUpstreamCompareSRPM(TestCompareSRPM):
     a Source file in the package gives a VERIFY result in the upstream
     inspection.
     """
+
     def setUp(self):
         TestCompareSRPM.setUp(self)
 
@@ -141,19 +156,23 @@ class SameVerRemoveUpstreamCompareSRPM(TestCompareSRPM):
         self.after_rpm = rpmfluff.SimpleRpmBuild(BEFORE_NAME, BEFORE_VER, AFTER_REL)
 
         # simulate a removed source file by not including it in the after rpm
-        self.before_rpm.add_installed_file(installPath='bin/rpminspect',
-                                           sourceFile=rpmfluff.SourceFile('rpminspect', ri_bytes),
-                                           mode="0755")
+        self.before_rpm.add_installed_file(
+            installPath="bin/rpminspect",
+            sourceFile=rpmfluff.SourceFile("rpminspect", ri_bytes),
+            mode="0755",
+        )
 
         # what we are checking
-        self.inspection = 'upstream'
-        self.label = 'upstream'
-        self.result = 'VERIFY'
-        self.waiver_auth = 'Anyone'
+        self.inspection = "upstream"
+        self.label = "upstream"
+        self.result = "VERIFY"
+        self.waiver_auth = "Anyone"
+
 
 ##########################
 # Koji build comparisons #
 ##########################
+
 
 class DiffVerUpstreamCompareKoji(TestCompareKoji):
     """
@@ -161,11 +180,13 @@ class DiffVerUpstreamCompareKoji(TestCompareKoji):
     an OK result in the upstream inspection.
 
     """
+
     def setUp(self):
         TestCompareKoji.setUp(self)
-        self.inspection = 'upstream'
-        self.label = 'upstream'
-        self.result = 'OK'
+        self.inspection = "upstream"
+        self.label = "upstream"
+        self.result = "OK"
+
 
 class SameVerChangeUpstreamCompareKoji(TestCompareKoji):
     """
@@ -173,6 +194,7 @@ class SameVerChangeUpstreamCompareKoji(TestCompareKoji):
     Source files in the package gives a VERIFY result in the upstream
     inspection.
     """
+
     def setUp(self):
         TestCompareKoji.setUp(self)
 
@@ -180,17 +202,20 @@ class SameVerChangeUpstreamCompareKoji(TestCompareKoji):
         self.after_rpm = rpmfluff.SimpleRpmBuild(BEFORE_NAME, BEFORE_VER, AFTER_REL)
 
         # add the same installed target file with different sources
-        self.before_rpm.add_installed_file(installPath='bin/rpminspect',
-                                           sourceFile=rpmfluff.SourceFile('rpminspect', ri_bytes),
-                                           mode="0755")
+        self.before_rpm.add_installed_file(
+            installPath="bin/rpminspect",
+            sourceFile=rpmfluff.SourceFile("rpminspect", ri_bytes),
+            mode="0755",
+        )
         self.after_rpm.add_simple_compilation(installPath="bin/rpminspect")
         self.after_rpm.section_install += "chmod 0755 $RPM_BUILD_ROOT/bin/rpminspect\n"
 
         # what we are checking
-        self.inspection = 'upstream'
-        self.label = 'upstream'
-        self.result = 'VERIFY'
-        self.waiver_auth = 'Anyone'
+        self.inspection = "upstream"
+        self.label = "upstream"
+        self.result = "VERIFY"
+        self.waiver_auth = "Anyone"
+
 
 class SameVerRemoveUpstreamCompareKoji(TestCompareKoji):
     """
@@ -198,6 +223,7 @@ class SameVerRemoveUpstreamCompareKoji(TestCompareKoji):
     a Source file in the package gives a VERIFY result in the upstream
     inspection.
     """
+
     def setUp(self):
         TestCompareKoji.setUp(self)
 
@@ -205,12 +231,14 @@ class SameVerRemoveUpstreamCompareKoji(TestCompareKoji):
         self.after_rpm = rpmfluff.SimpleRpmBuild(BEFORE_NAME, BEFORE_VER, AFTER_REL)
 
         # simulate a removed source file by not including it in the after rpm
-        self.before_rpm.add_installed_file(installPath='bin/rpminspect',
-                                           sourceFile=rpmfluff.SourceFile('rpminspect', ri_bytes),
-                                           mode="0755")
+        self.before_rpm.add_installed_file(
+            installPath="bin/rpminspect",
+            sourceFile=rpmfluff.SourceFile("rpminspect", ri_bytes),
+            mode="0755",
+        )
 
         # what we are checking
-        self.inspection = 'upstream'
-        self.label = 'upstream'
-        self.result = 'VERIFY'
-        self.waiver_auth = 'Anyone'
+        self.inspection = "upstream"
+        self.label = "upstream"
+        self.result = "VERIFY"
+        self.waiver_auth = "Anyone"

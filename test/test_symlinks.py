@@ -25,15 +25,21 @@ from baseclass import TestRPMs, TestKoji, TestCompareRPMs, TestCompareKoji
 # more recent versions of RPM prevent dangling and too long symlinks
 # b'4.15.90' -> (4, 15, 90)
 # b'4.16.0-beta' -> (4, 16, 0)
-(rpm_major, rpm_minor, rpm_update) = tuple(map(lambda x: int(x), rpm.__version__.strip().split('-')[0].split('.')))
+(rpm_major, rpm_minor, rpm_update) = tuple(
+    map(lambda x: int(x), rpm.__version__.strip().split("-")[0].split("."))
+)
 
-if rpm_major < 4 or (rpm_major == 4 and rpm_minor < 15) or (rpm_major == 4 and rpm_minor == 15 and rpm_update < 90):
+if (
+    rpm_major < 4
+    or (rpm_major == 4 and rpm_minor < 15)
+    or (rpm_major == 4 and rpm_minor == 15 and rpm_update < 90)
+):
     rpm_handles_symlinks = False
 else:
     rpm_handles_symlinks = True
 
 # Read in the built rpminspect executable for use in these test RPMs
-with open(os.environ['RPMINSPECT'], mode='rb') as f:
+with open(os.environ["RPMINSPECT"], mode="rb") as f:
     ri_bytes = f.read()
 
 # Absolute symlink exists (OK)
@@ -42,60 +48,76 @@ class AbsoluteSymlinkExistsRPMs(TestRPMs):
         TestRPMs.setUp(self)
 
         # add file and symlink
-        self.rpm.add_installed_file(installPath='usr/bin/testscript',
-                                    sourceFile=rpmfluff.SourceFile('rpminspect', ri_bytes),
-                                    mode="0755")
-        self.rpm.add_installed_symlink('usr/sbin/testscript', '/usr/bin/testscript')
+        self.rpm.add_installed_file(
+            installPath="usr/bin/testscript",
+            sourceFile=rpmfluff.SourceFile("rpminspect", ri_bytes),
+            mode="0755",
+        )
+        self.rpm.add_installed_symlink("usr/sbin/testscript", "/usr/bin/testscript")
 
-        self.inspection = 'symlinks'
-        self.label = 'symlinks'
-        self.result = 'OK'
-        self.waiver_auth = 'Not Waivable'
+        self.inspection = "symlinks"
+        self.label = "symlinks"
+        self.result = "OK"
+        self.waiver_auth = "Not Waivable"
+
 
 class AbsoluteSymlinkExistsKoji(TestKoji):
     def setUp(self):
         TestKoji.setUp(self)
 
         # add file and symlink
-        self.rpm.add_installed_file(installPath='usr/bin/rpminspect',
-                                    sourceFile=rpmfluff.SourceFile('rpminspect', ri_bytes),
-                                    mode="0755")
-        self.rpm.add_installed_symlink('usr/sbin/rpminspect', '/usr/bin/rpminspect')
+        self.rpm.add_installed_file(
+            installPath="usr/bin/rpminspect",
+            sourceFile=rpmfluff.SourceFile("rpminspect", ri_bytes),
+            mode="0755",
+        )
+        self.rpm.add_installed_symlink("usr/sbin/rpminspect", "/usr/bin/rpminspect")
 
-        self.inspection = 'symlinks'
-        self.label = 'symlinks'
-        self.result = 'OK'
-        self.waiver_auth = 'Not Waivable'
+        self.inspection = "symlinks"
+        self.label = "symlinks"
+        self.result = "OK"
+        self.waiver_auth = "Not Waivable"
+
 
 class AbsoluteSymlinkExistsCompareRPMs(TestCompareRPMs):
     def setUp(self):
         TestCompareRPMs.setUp(self)
 
         # add file and symlink
-        self.after_rpm.add_installed_file(installPath='usr/bin/rpminspect',
-                                          sourceFile=rpmfluff.SourceFile('rpminspect', ri_bytes),
-                                          mode="0755")
-        self.after_rpm.add_installed_symlink('usr/sbin/rpminspect', '/usr/bin/rpminspect')
+        self.after_rpm.add_installed_file(
+            installPath="usr/bin/rpminspect",
+            sourceFile=rpmfluff.SourceFile("rpminspect", ri_bytes),
+            mode="0755",
+        )
+        self.after_rpm.add_installed_symlink(
+            "usr/sbin/rpminspect", "/usr/bin/rpminspect"
+        )
 
-        self.inspection = 'symlinks'
-        self.label = 'symlinks'
-        self.result = 'OK'
-        self.waiver_auth = 'Not Waivable'
+        self.inspection = "symlinks"
+        self.label = "symlinks"
+        self.result = "OK"
+        self.waiver_auth = "Not Waivable"
+
 
 class AbsoluteSymlinkExistsCompareKoji(TestCompareKoji):
     def setUp(self):
         TestCompareKoji.setUp(self)
 
         # add file and symlink
-        self.after_rpm.add_installed_file(installPath='usr/bin/rpminspect',
-                                          sourceFile=rpmfluff.SourceFile('rpminspect', ri_bytes),
-                                          mode="0755")
-        self.after_rpm.add_installed_symlink('usr/sbin/rpminspect', '/usr/bin/rpminspect')
+        self.after_rpm.add_installed_file(
+            installPath="usr/bin/rpminspect",
+            sourceFile=rpmfluff.SourceFile("rpminspect", ri_bytes),
+            mode="0755",
+        )
+        self.after_rpm.add_installed_symlink(
+            "usr/sbin/rpminspect", "/usr/bin/rpminspect"
+        )
 
-        self.inspection = 'symlinks'
-        self.label = 'symlinks'
-        self.result = 'OK'
-        self.waiver_auth = 'Not Waivable'
+        self.inspection = "symlinks"
+        self.label = "symlinks"
+        self.result = "OK"
+        self.waiver_auth = "Not Waivable"
+
 
 # Relative symlink with ../ exists (OK)
 class RelativeSymlinkExistsParentDirRPMs(TestRPMs):
@@ -103,60 +125,72 @@ class RelativeSymlinkExistsParentDirRPMs(TestRPMs):
         TestRPMs.setUp(self)
 
         # add file and symlink
-        self.rpm.add_installed_file(installPath='usr/bin/rpminspect',
-                                    sourceFile=rpmfluff.SourceFile('rpminspect', ri_bytes),
-                                    mode="0755")
-        self.rpm.add_installed_symlink('usr/sbin/rpminspect', '../bin/rpminspect')
+        self.rpm.add_installed_file(
+            installPath="usr/bin/rpminspect",
+            sourceFile=rpmfluff.SourceFile("rpminspect", ri_bytes),
+            mode="0755",
+        )
+        self.rpm.add_installed_symlink("usr/sbin/rpminspect", "../bin/rpminspect")
 
-        self.inspection = 'symlinks'
-        self.label = 'symlinks'
-        self.result = 'OK'
-        self.waiver_auth = 'Not Waivable'
+        self.inspection = "symlinks"
+        self.label = "symlinks"
+        self.result = "OK"
+        self.waiver_auth = "Not Waivable"
+
 
 class RelativeSymlinkExistsParentDirKoji(TestKoji):
     def setUp(self):
         TestKoji.setUp(self)
 
         # add file and symlink
-        self.rpm.add_installed_file(installPath='usr/bin/rpminspect',
-                                    sourceFile=rpmfluff.SourceFile('rpminspect', ri_bytes),
-                                    mode="0755")
-        self.rpm.add_installed_symlink('usr/sbin/rpminspect', '../bin/rpminspect')
+        self.rpm.add_installed_file(
+            installPath="usr/bin/rpminspect",
+            sourceFile=rpmfluff.SourceFile("rpminspect", ri_bytes),
+            mode="0755",
+        )
+        self.rpm.add_installed_symlink("usr/sbin/rpminspect", "../bin/rpminspect")
 
-        self.inspection = 'symlinks'
-        self.label = 'symlinks'
-        self.result = 'OK'
-        self.waiver_auth = 'Not Waivable'
+        self.inspection = "symlinks"
+        self.label = "symlinks"
+        self.result = "OK"
+        self.waiver_auth = "Not Waivable"
+
 
 class RelativeSymlinkExistsParentDirCompareRPMs(TestCompareRPMs):
     def setUp(self):
         TestCompareRPMs.setUp(self)
 
         # add file and symlink
-        self.after_rpm.add_installed_file(installPath='usr/bin/rpminspect',
-                                          sourceFile=rpmfluff.SourceFile('rpminspect', ri_bytes),
-                                          mode="0755")
-        self.after_rpm.add_installed_symlink('usr/sbin/rpminspect', '../bin/rpminspect')
+        self.after_rpm.add_installed_file(
+            installPath="usr/bin/rpminspect",
+            sourceFile=rpmfluff.SourceFile("rpminspect", ri_bytes),
+            mode="0755",
+        )
+        self.after_rpm.add_installed_symlink("usr/sbin/rpminspect", "../bin/rpminspect")
 
-        self.inspection = 'symlinks'
-        self.label = 'symlinks'
-        self.result = 'OK'
-        self.waiver_auth = 'Not Waivable'
+        self.inspection = "symlinks"
+        self.label = "symlinks"
+        self.result = "OK"
+        self.waiver_auth = "Not Waivable"
+
 
 class RelativeSymlinkExistsParentDirCompareKoji(TestCompareKoji):
     def setUp(self):
         TestCompareKoji.setUp(self)
 
         # add file and symlink
-        self.after_rpm.add_installed_file(installPath='usr/bin/rpminspect',
-                                          sourceFile=rpmfluff.SourceFile('rpminspect', ri_bytes),
-                                          mode="0755")
-        self.after_rpm.add_installed_symlink('usr/sbin/rpminspect', '../bin/rpminspect')
+        self.after_rpm.add_installed_file(
+            installPath="usr/bin/rpminspect",
+            sourceFile=rpmfluff.SourceFile("rpminspect", ri_bytes),
+            mode="0755",
+        )
+        self.after_rpm.add_installed_symlink("usr/sbin/rpminspect", "../bin/rpminspect")
 
-        self.inspection = 'symlinks'
-        self.label = 'symlinks'
-        self.result = 'OK'
-        self.waiver_auth = 'Not Waivable'
+        self.inspection = "symlinks"
+        self.label = "symlinks"
+        self.result = "OK"
+        self.waiver_auth = "Not Waivable"
+
 
 # Relative symlink in current directory exists (OK)
 class RelativeSymlinkExistsCurrentDirRPMs(TestRPMs):
@@ -164,60 +198,72 @@ class RelativeSymlinkExistsCurrentDirRPMs(TestRPMs):
         TestRPMs.setUp(self)
 
         # add file and symlink
-        self.rpm.add_installed_file(installPath='usr/bin/rpminspect',
-                                    sourceFile=rpmfluff.SourceFile('rpminspect', ri_bytes),
-                                    mode="0755")
-        self.rpm.add_installed_symlink('usr/bin/anotherrpminspect', 'rpminspect')
+        self.rpm.add_installed_file(
+            installPath="usr/bin/rpminspect",
+            sourceFile=rpmfluff.SourceFile("rpminspect", ri_bytes),
+            mode="0755",
+        )
+        self.rpm.add_installed_symlink("usr/bin/anotherrpminspect", "rpminspect")
 
-        self.inspection = 'symlinks'
-        self.label = 'symlinks'
-        self.result = 'OK'
-        self.waiver_auth = 'Not Waivable'
+        self.inspection = "symlinks"
+        self.label = "symlinks"
+        self.result = "OK"
+        self.waiver_auth = "Not Waivable"
+
 
 class RelativeSymlinkExistsCurrentDirKoji(TestKoji):
     def setUp(self):
         TestKoji.setUp(self)
 
         # add file and symlink
-        self.rpm.add_installed_file(installPath='usr/bin/rpminspect',
-                                    sourceFile=rpmfluff.SourceFile('rpminspect', ri_bytes),
-                                    mode="0755")
-        self.rpm.add_installed_symlink('usr/bin/anotherrpminspect', 'rpminspect')
+        self.rpm.add_installed_file(
+            installPath="usr/bin/rpminspect",
+            sourceFile=rpmfluff.SourceFile("rpminspect", ri_bytes),
+            mode="0755",
+        )
+        self.rpm.add_installed_symlink("usr/bin/anotherrpminspect", "rpminspect")
 
-        self.inspection = 'symlinks'
-        self.label = 'symlinks'
-        self.result = 'OK'
-        self.waiver_auth = 'Not Waivable'
+        self.inspection = "symlinks"
+        self.label = "symlinks"
+        self.result = "OK"
+        self.waiver_auth = "Not Waivable"
+
 
 class RelativeSymlinkExistsCurrentDirCompareRPMs(TestCompareRPMs):
     def setUp(self):
         TestCompareRPMs.setUp(self)
 
         # add file and symlink
-        self.after_rpm.add_installed_file(installPath='usr/bin/rpminspect',
-                                          sourceFile=rpmfluff.SourceFile('rpminspect', ri_bytes),
-                                          mode="0755")
-        self.after_rpm.add_installed_symlink('usr/bin/anotherrpminspect', 'rpminspect')
+        self.after_rpm.add_installed_file(
+            installPath="usr/bin/rpminspect",
+            sourceFile=rpmfluff.SourceFile("rpminspect", ri_bytes),
+            mode="0755",
+        )
+        self.after_rpm.add_installed_symlink("usr/bin/anotherrpminspect", "rpminspect")
 
-        self.inspection = 'symlinks'
-        self.label = 'symlinks'
-        self.result = 'OK'
-        self.waiver_auth = 'Not Waivable'
+        self.inspection = "symlinks"
+        self.label = "symlinks"
+        self.result = "OK"
+        self.waiver_auth = "Not Waivable"
+
 
 class RelativeSymlinkExistsCurrentDirCompareKoji(TestCompareKoji):
     def setUp(self):
         TestCompareKoji.setUp(self)
 
         # add file and symlink
-        self.after_rpm.add_installed_file(installPath='usr/bin/rpminspect',
-                                          sourceFile=rpmfluff.SourceFile('rpminspect', ri_bytes),
-                                          mode="0755")
-        self.after_rpm.add_installed_symlink('usr/bin/anotherrpminspect', 'rpminspect')
+        self.after_rpm.add_installed_file(
+            installPath="usr/bin/rpminspect",
+            sourceFile=rpmfluff.SourceFile("rpminspect", ri_bytes),
+            mode="0755",
+        )
+        self.after_rpm.add_installed_symlink("usr/bin/anotherrpminspect", "rpminspect")
 
-        self.inspection = 'symlinks'
-        self.label = 'symlinks'
-        self.result = 'OK'
-        self.waiver_auth = 'Not Waivable'
+        self.inspection = "symlinks"
+        self.label = "symlinks"
+        self.result = "OK"
+        self.waiver_auth = "Not Waivable"
+
 
 # Symlink that exists spans subpackages (OK)
 class SymlinkExistsMultiplePackagesRPMS(TestRPMs):
@@ -225,64 +271,84 @@ class SymlinkExistsMultiplePackagesRPMS(TestRPMs):
         TestRPMs.setUp(self)
 
         # add file and symlink
-        self.rpm.add_installed_file(installPath='usr/bin/rpminspect',
-                                    sourceFile=rpmfluff.SourceFile('rpminspect', ri_bytes),
-                                    mode="0755")
-        subpackage = self.rpm.add_subpackage('symlinks')
-        self.rpm.add_installed_symlink('usr/bin/anotherrpminspect', 'rpminspect', subpackageSuffix='symlinks')
+        self.rpm.add_installed_file(
+            installPath="usr/bin/rpminspect",
+            sourceFile=rpmfluff.SourceFile("rpminspect", ri_bytes),
+            mode="0755",
+        )
+        subpackage = self.rpm.add_subpackage("symlinks")
+        self.rpm.add_installed_symlink(
+            "usr/bin/anotherrpminspect", "rpminspect", subpackageSuffix="symlinks"
+        )
 
-        self.inspection = 'symlinks'
-        self.label = 'symlinks'
-        self.result = 'OK'
-        self.waiver_auth = 'Not Waivable'
+        self.inspection = "symlinks"
+        self.label = "symlinks"
+        self.result = "OK"
+        self.waiver_auth = "Not Waivable"
+
 
 class SymlinkExistsMultiplePackagesKoji(TestKoji):
     def setUp(self):
         TestKoji.setUp(self)
 
         # add file and symlink
-        self.rpm.add_installed_file(installPath='usr/bin/rpminspect',
-                                    sourceFile=rpmfluff.SourceFile('rpminspect', ri_bytes),
-                                    mode="0755")
-        subpackage = self.rpm.add_subpackage('symlinks')
-        self.rpm.add_installed_symlink('usr/bin/anotherrpminspect', 'rpminspect', subpackageSuffix='symlinks')
+        self.rpm.add_installed_file(
+            installPath="usr/bin/rpminspect",
+            sourceFile=rpmfluff.SourceFile("rpminspect", ri_bytes),
+            mode="0755",
+        )
+        subpackage = self.rpm.add_subpackage("symlinks")
+        self.rpm.add_installed_symlink(
+            "usr/bin/anotherrpminspect", "rpminspect", subpackageSuffix="symlinks"
+        )
 
-        self.inspection = 'symlinks'
-        self.label = 'symlinks'
-        self.result = 'OK'
-        self.waiver_auth = 'Not Waivable'
+        self.inspection = "symlinks"
+        self.label = "symlinks"
+        self.result = "OK"
+        self.waiver_auth = "Not Waivable"
+
 
 class SymlinkExistsMultiplePackagesCompareRPMs(TestCompareRPMs):
     def setUp(self):
         TestCompareRPMs.setUp(self)
 
         # add file and symlink
-        self.after_rpm.add_installed_file(installPath='usr/bin/rpminspect',
-                                          sourceFile=rpmfluff.SourceFile('rpminspect', ri_bytes),
-                                          mode="0755")
-        subpackage = self.after_rpm.add_subpackage('symlinks')
-        self.after_rpm.add_installed_symlink('usr/bin/anotherrpminspect', 'rpminspect', subpackageSuffix='symlinks')
+        self.after_rpm.add_installed_file(
+            installPath="usr/bin/rpminspect",
+            sourceFile=rpmfluff.SourceFile("rpminspect", ri_bytes),
+            mode="0755",
+        )
+        subpackage = self.after_rpm.add_subpackage("symlinks")
+        self.after_rpm.add_installed_symlink(
+            "usr/bin/anotherrpminspect", "rpminspect", subpackageSuffix="symlinks"
+        )
 
-        self.inspection = 'symlinks'
-        self.label = 'symlinks'
-        self.result = 'OK'
-        self.waiver_auth = 'Not Waivable'
+        self.inspection = "symlinks"
+        self.label = "symlinks"
+        self.result = "OK"
+        self.waiver_auth = "Not Waivable"
+
 
 class SymlinkExistsMultiplePackagesCompareKoji(TestCompareKoji):
     def setUp(self):
         TestCompareKoji.setUp(self)
 
         # add file and symlink
-        self.after_rpm.add_installed_file(installPath='usr/bin/rpminspect',
-                                          sourceFile=rpmfluff.SourceFile('rpminspect', ri_bytes),
-                                          mode="0755")
-        subpackage = self.after_rpm.add_subpackage('symlinks')
-        self.after_rpm.add_installed_symlink('usr/bin/anotherrpminspect', 'rpminspect', subpackageSuffix='symlinks')
+        self.after_rpm.add_installed_file(
+            installPath="usr/bin/rpminspect",
+            sourceFile=rpmfluff.SourceFile("rpminspect", ri_bytes),
+            mode="0755",
+        )
+        subpackage = self.after_rpm.add_subpackage("symlinks")
+        self.after_rpm.add_installed_symlink(
+            "usr/bin/anotherrpminspect", "rpminspect", subpackageSuffix="symlinks"
+        )
 
-        self.inspection = 'symlinks'
-        self.label = 'symlinks'
-        self.result = 'OK'
-        self.waiver_auth = 'Not Waivable'
+        self.inspection = "symlinks"
+        self.label = "symlinks"
+        self.result = "OK"
+        self.waiver_auth = "Not Waivable"
+
 
 # Absolute symlink is dangling (VERIFY)
 class AbsoluteSymlinkDanglingRPMs(TestRPMs):
@@ -290,60 +356,80 @@ class AbsoluteSymlinkDanglingRPMs(TestRPMs):
         TestRPMs.setUp(self)
 
         # add file and symlink
-        self.rpm.add_installed_file(installPath='usr/bin/rpminspect',
-                                    sourceFile=rpmfluff.SourceFile('rpminspect', ri_bytes),
-                                    mode="0755")
-        self.rpm.add_installed_symlink('usr/sbin/rpminspect', '/usr/bin/anotherrpminspect')
+        self.rpm.add_installed_file(
+            installPath="usr/bin/rpminspect",
+            sourceFile=rpmfluff.SourceFile("rpminspect", ri_bytes),
+            mode="0755",
+        )
+        self.rpm.add_installed_symlink(
+            "usr/sbin/rpminspect", "/usr/bin/anotherrpminspect"
+        )
 
-        self.inspection = 'symlinks'
-        self.label = 'symlinks'
-        self.result = 'INFO'
-        self.waiver_auth = 'Anyone'
+        self.inspection = "symlinks"
+        self.label = "symlinks"
+        self.result = "INFO"
+        self.waiver_auth = "Anyone"
+
 
 class AbsoluteSymlinkDanglingKoji(TestKoji):
     def setUp(self):
         TestRPMs.setUp(self)
 
         # add file and symlink
-        self.rpm.add_installed_file(installPath='usr/bin/rpminspect',
-                                    sourceFile=rpmfluff.SourceFile('rpminspect', ri_bytes),
-                                    mode="0755")
-        self.rpm.add_installed_symlink('usr/sbin/rpminspect', '/usr/bin/anotherrpminspect')
+        self.rpm.add_installed_file(
+            installPath="usr/bin/rpminspect",
+            sourceFile=rpmfluff.SourceFile("rpminspect", ri_bytes),
+            mode="0755",
+        )
+        self.rpm.add_installed_symlink(
+            "usr/sbin/rpminspect", "/usr/bin/anotherrpminspect"
+        )
 
-        self.inspection = 'symlinks'
-        self.label = 'symlinks'
-        self.result = 'INFO'
-        self.waiver_auth = 'Anyone'
+        self.inspection = "symlinks"
+        self.label = "symlinks"
+        self.result = "INFO"
+        self.waiver_auth = "Anyone"
+
 
 class AbsoluteSymlinkDanglingCompareRPMs(TestCompareRPMs):
     def setUp(self):
         TestCompareRPMs.setUp(self)
 
         # add file and symlink
-        self.after_rpm.add_installed_file(installPath='usr/bin/rpminspect',
-                                          sourceFile=rpmfluff.SourceFile('rpminspect', ri_bytes),
-                                          mode="0755")
-        self.after_rpm.add_installed_symlink('usr/sbin/rpminspect', '/usr/bin/anotherrpminspect')
+        self.after_rpm.add_installed_file(
+            installPath="usr/bin/rpminspect",
+            sourceFile=rpmfluff.SourceFile("rpminspect", ri_bytes),
+            mode="0755",
+        )
+        self.after_rpm.add_installed_symlink(
+            "usr/sbin/rpminspect", "/usr/bin/anotherrpminspect"
+        )
 
-        self.inspection = 'symlinks'
-        self.label = 'symlinks'
-        self.result = 'INFO'
-        self.waiver_auth = 'Anyone'
+        self.inspection = "symlinks"
+        self.label = "symlinks"
+        self.result = "INFO"
+        self.waiver_auth = "Anyone"
+
 
 class AbsoluteSymlinkDanglingCompareKoji(TestCompareKoji):
     def setUp(self):
         TestCompareKoji.setUp(self)
 
         # add file and symlink
-        self.after_rpm.add_installed_file(installPath='usr/bin/rpminspect',
-                                          sourceFile=rpmfluff.SourceFile('rpminspect', ri_bytes),
-                                          mode="0755")
-        self.after_rpm.add_installed_symlink('usr/sbin/rpminspect', '/usr/bin/anotherrpminspect')
+        self.after_rpm.add_installed_file(
+            installPath="usr/bin/rpminspect",
+            sourceFile=rpmfluff.SourceFile("rpminspect", ri_bytes),
+            mode="0755",
+        )
+        self.after_rpm.add_installed_symlink(
+            "usr/sbin/rpminspect", "/usr/bin/anotherrpminspect"
+        )
 
-        self.inspection = 'symlinks'
-        self.label = 'symlinks'
-        self.result = 'INFO'
-        self.waiver_auth = 'Anyone'
+        self.inspection = "symlinks"
+        self.label = "symlinks"
+        self.result = "INFO"
+        self.waiver_auth = "Anyone"
+
 
 # Relative symlink with ../ is dangling (VERIFY)
 class RelativeSymlinkDanglingParentDirRPMs(TestRPMs):
@@ -351,60 +437,80 @@ class RelativeSymlinkDanglingParentDirRPMs(TestRPMs):
         TestRPMs.setUp(self)
 
         # add file and symlink
-        self.rpm.add_installed_file(installPath='usr/bin/rpminspect',
-                                    sourceFile=rpmfluff.SourceFile('rpminspect', ri_bytes),
-                                    mode="0755")
-        self.rpm.add_installed_symlink('usr/sbin/rpminspect', '../bin/anotherrpminspect')
+        self.rpm.add_installed_file(
+            installPath="usr/bin/rpminspect",
+            sourceFile=rpmfluff.SourceFile("rpminspect", ri_bytes),
+            mode="0755",
+        )
+        self.rpm.add_installed_symlink(
+            "usr/sbin/rpminspect", "../bin/anotherrpminspect"
+        )
 
-        self.inspection = 'symlinks'
-        self.label = 'symlinks'
-        self.result = 'INFO'
-        self.waiver_auth = 'Anyone'
+        self.inspection = "symlinks"
+        self.label = "symlinks"
+        self.result = "INFO"
+        self.waiver_auth = "Anyone"
+
 
 class RelativeSymlinkDanglingParentDirKoji(TestKoji):
     def setUp(self):
         TestKoji.setUp(self)
 
         # add file and symlink
-        self.rpm.add_installed_file(installPath='usr/bin/rpminspect',
-                                    sourceFile=rpmfluff.SourceFile('rpminspect', ri_bytes),
-                                    mode="0755")
-        self.rpm.add_installed_symlink('usr/sbin/rpminspect', '../bin/anotherrpminspect')
+        self.rpm.add_installed_file(
+            installPath="usr/bin/rpminspect",
+            sourceFile=rpmfluff.SourceFile("rpminspect", ri_bytes),
+            mode="0755",
+        )
+        self.rpm.add_installed_symlink(
+            "usr/sbin/rpminspect", "../bin/anotherrpminspect"
+        )
 
-        self.inspection = 'symlinks'
-        self.label = 'symlinks'
-        self.result = 'INFO'
-        self.waiver_auth = 'Anyone'
+        self.inspection = "symlinks"
+        self.label = "symlinks"
+        self.result = "INFO"
+        self.waiver_auth = "Anyone"
+
 
 class RelativeSymlinkDanglingParentDirRPMs(TestCompareRPMs):
     def setUp(self):
         TestCompareRPMs.setUp(self)
 
         # add file and symlink
-        self.after_rpm.add_installed_file(installPath='usr/bin/rpminspect',
-                                          sourceFile=rpmfluff.SourceFile('rpminspect', ri_bytes),
-                                          mode="0755")
-        self.after_rpm.add_installed_symlink('usr/sbin/rpminspect', '../bin/anotherrpminspect')
+        self.after_rpm.add_installed_file(
+            installPath="usr/bin/rpminspect",
+            sourceFile=rpmfluff.SourceFile("rpminspect", ri_bytes),
+            mode="0755",
+        )
+        self.after_rpm.add_installed_symlink(
+            "usr/sbin/rpminspect", "../bin/anotherrpminspect"
+        )
 
-        self.inspection = 'symlinks'
-        self.label = 'symlinks'
-        self.result = 'INFO'
-        self.waiver_auth = 'Anyone'
+        self.inspection = "symlinks"
+        self.label = "symlinks"
+        self.result = "INFO"
+        self.waiver_auth = "Anyone"
+
 
 class RelativeSymlinkDanglingParentDirKoji(TestCompareKoji):
     def setUp(self):
         TestCompareKoji.setUp(self)
 
         # add file and symlink
-        self.after_rpm.add_installed_file(installPath='usr/bin/rpminspect',
-                                          sourceFile=rpmfluff.SourceFile('rpminspect', ri_bytes),
-                                          mode="0755")
-        self.after_rpm.add_installed_symlink('usr/sbin/rpminspect', '../bin/anotherrpminspect')
+        self.after_rpm.add_installed_file(
+            installPath="usr/bin/rpminspect",
+            sourceFile=rpmfluff.SourceFile("rpminspect", ri_bytes),
+            mode="0755",
+        )
+        self.after_rpm.add_installed_symlink(
+            "usr/sbin/rpminspect", "../bin/anotherrpminspect"
+        )
 
-        self.inspection = 'symlinks'
-        self.label = 'symlinks'
-        self.result = 'INFO'
-        self.waiver_auth = 'Anyone'
+        self.inspection = "symlinks"
+        self.label = "symlinks"
+        self.result = "INFO"
+        self.waiver_auth = "Anyone"
+
 
 # Relative symlink in current directory is dangling (VERIFY)
 class RelativeSymlinkDanglingCurrentDirRPMs(TestRPMs):
@@ -412,140 +518,200 @@ class RelativeSymlinkDanglingCurrentDirRPMs(TestRPMs):
         TestRPMs.setUp(self)
 
         # add file and symlink
-        self.rpm.add_installed_file(installPath='usr/bin/rpminspect',
-                                    sourceFile=rpmfluff.SourceFile('rpminspect', ri_bytes),
-                                    mode="0755")
-        self.rpm.add_installed_symlink('usr/bin/anotherrpminspect', 'originalrpminspect')
+        self.rpm.add_installed_file(
+            installPath="usr/bin/rpminspect",
+            sourceFile=rpmfluff.SourceFile("rpminspect", ri_bytes),
+            mode="0755",
+        )
+        self.rpm.add_installed_symlink(
+            "usr/bin/anotherrpminspect", "originalrpminspect"
+        )
 
-        self.inspection = 'symlinks'
-        self.label = 'symlinks'
-        self.result = 'INFO'
-        self.waiver_auth = 'Anyone'
+        self.inspection = "symlinks"
+        self.label = "symlinks"
+        self.result = "INFO"
+        self.waiver_auth = "Anyone"
+
 
 class RelativeSymlinkDanglingCurrentDirKoji(TestKoji):
     def setUp(self):
         TestKoji.setUp(self)
 
         # add file and symlink
-        self.rpm.add_installed_file(installPath='usr/bin/rpminspect',
-                                    sourceFile=rpmfluff.SourceFile('rpminspect', ri_bytes),
-                                    mode="0755")
-        self.rpm.add_installed_symlink('usr/bin/anotherrpminspect', 'originalrpminspect')
+        self.rpm.add_installed_file(
+            installPath="usr/bin/rpminspect",
+            sourceFile=rpmfluff.SourceFile("rpminspect", ri_bytes),
+            mode="0755",
+        )
+        self.rpm.add_installed_symlink(
+            "usr/bin/anotherrpminspect", "originalrpminspect"
+        )
 
-        self.inspection = 'symlinks'
-        self.label = 'symlinks'
-        self.result = 'INFO'
-        self.waiver_auth = 'Anyone'
+        self.inspection = "symlinks"
+        self.label = "symlinks"
+        self.result = "INFO"
+        self.waiver_auth = "Anyone"
+
 
 class RelativeSymlinkDanglingCurrentDirCompareRPMs(TestCompareRPMs):
     def setUp(self):
         TestCompareRPMs.setUp(self)
 
         # add file and symlink
-        self.after_rpm.add_installed_file(installPath='usr/bin/rpminspect',
-                                          sourceFile=rpmfluff.SourceFile('rpminspect', ri_bytes),
-                                          mode="0755")
-        self.after_rpm.add_installed_symlink('usr/bin/anotherrpminspect', 'originalrpminspect')
+        self.after_rpm.add_installed_file(
+            installPath="usr/bin/rpminspect",
+            sourceFile=rpmfluff.SourceFile("rpminspect", ri_bytes),
+            mode="0755",
+        )
+        self.after_rpm.add_installed_symlink(
+            "usr/bin/anotherrpminspect", "originalrpminspect"
+        )
 
-        self.inspection = 'symlinks'
-        self.label = 'symlinks'
-        self.result = 'INFO'
-        self.waiver_auth = 'Anyone'
+        self.inspection = "symlinks"
+        self.label = "symlinks"
+        self.result = "INFO"
+        self.waiver_auth = "Anyone"
+
 
 class RelativeSymlinkDanglingCurrentDirCompareKoji(TestCompareKoji):
     def setUp(self):
         TestCompareKoji.setUp(self)
 
         # add file and symlink
-        self.after_rpm.add_installed_file(installPath='usr/bin/rpminspect',
-                                          sourceFile=rpmfluff.SourceFile('rpminspect', ri_bytes),
-                                          mode="0755")
-        self.after_rpm.add_installed_symlink('usr/bin/anotherrpminspect', 'originalrpminspect')
+        self.after_rpm.add_installed_file(
+            installPath="usr/bin/rpminspect",
+            sourceFile=rpmfluff.SourceFile("rpminspect", ri_bytes),
+            mode="0755",
+        )
+        self.after_rpm.add_installed_symlink(
+            "usr/bin/anotherrpminspect", "originalrpminspect"
+        )
 
-        self.inspection = 'symlinks'
-        self.label = 'symlinks'
-        self.result = 'INFO'
-        self.waiver_auth = 'Anyone'
+        self.inspection = "symlinks"
+        self.label = "symlinks"
+        self.result = "INFO"
+        self.waiver_auth = "Anyone"
+
 
 # Too many symlink cycles (VERIFY)
 # To trigger an ELOOP on symlink resolution, you need to have more
 # than 40 levels of symlink redirection, per path_resolution(7).  I use 47
 # levels here just to make sure.
 class TooManySymlinkLevelsRPMs(TestRPMs):
-    @unittest.skipIf(rpm_handles_symlinks, "rpm %d.%d.%d detected, prevents ELOOP symlink errors" % (rpm_major, rpm_minor, rpm_update))
+    @unittest.skipIf(
+        rpm_handles_symlinks,
+        "rpm %d.%d.%d detected, prevents ELOOP symlink errors"
+        % (rpm_major, rpm_minor, rpm_update),
+    )
     def setUp(self):
         TestRPMs.setUp(self)
 
         # add file and symlink
-        self.rpm.add_installed_file(installPath='usr/bin/rpminspect',
-                                    sourceFile=rpmfluff.SourceFile('rpminspect', ri_bytes),
-                                    mode="0755")
-        self.rpm.add_installed_symlink('usr/bin/bin', '.')
-        self.rpm.add_installed_symlink('usr/bin/anotherrpminspect', 'bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/rpminspect')
+        self.rpm.add_installed_file(
+            installPath="usr/bin/rpminspect",
+            sourceFile=rpmfluff.SourceFile("rpminspect", ri_bytes),
+            mode="0755",
+        )
+        self.rpm.add_installed_symlink("usr/bin/bin", ".")
+        self.rpm.add_installed_symlink(
+            "usr/bin/anotherrpminspect",
+            "bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/rpminspect",
+        )
 
-        self.inspection = 'symlinks'
-        self.label = 'symlinks'
-        self.result = 'BAD'
-        self.waiver_auth = 'Anyone'
+        self.inspection = "symlinks"
+        self.label = "symlinks"
+        self.result = "BAD"
+        self.waiver_auth = "Anyone"
+
 
 class TooManySymlinkLevelsKoji(TestKoji):
-    @unittest.skipIf(rpm_handles_symlinks, "rpm %d.%d.%d detected, prevents ELOOP symlink errors" % (rpm_major, rpm_minor, rpm_update))
+    @unittest.skipIf(
+        rpm_handles_symlinks,
+        "rpm %d.%d.%d detected, prevents ELOOP symlink errors"
+        % (rpm_major, rpm_minor, rpm_update),
+    )
     def setUp(self):
         TestKoji.setUp(self)
 
         # add file and symlink
-        self.rpm.add_installed_file(installPath='usr/bin/rpminspect',
-                                    sourceFile=rpmfluff.SourceFile('rpminspect', ri_bytes),
-                                    mode="0755")
-        self.rpm.add_installed_symlink('usr/bin/bin', '.')
-        self.rpm.add_installed_symlink('usr/bin/anotherrpminspect', 'bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/rpminspect')
+        self.rpm.add_installed_file(
+            installPath="usr/bin/rpminspect",
+            sourceFile=rpmfluff.SourceFile("rpminspect", ri_bytes),
+            mode="0755",
+        )
+        self.rpm.add_installed_symlink("usr/bin/bin", ".")
+        self.rpm.add_installed_symlink(
+            "usr/bin/anotherrpminspect",
+            "bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/rpminspect",
+        )
 
-        self.inspection = 'symlinks'
-        self.label = 'symlinks'
-        self.result = 'BAD'
-        self.waiver_auth = 'Anyone'
+        self.inspection = "symlinks"
+        self.label = "symlinks"
+        self.result = "BAD"
+        self.waiver_auth = "Anyone"
+
 
 class TooManySymlinkLevelsCompareRPMs(TestCompareRPMs):
-    @unittest.skipIf(rpm_handles_symlinks, "rpm %d.%d.%d detected, prevents ELOOP symlink errors" % (rpm_major, rpm_minor, rpm_update))
+    @unittest.skipIf(
+        rpm_handles_symlinks,
+        "rpm %d.%d.%d detected, prevents ELOOP symlink errors"
+        % (rpm_major, rpm_minor, rpm_update),
+    )
     def setUp(self):
         TestCompareRPMs.setUp(self)
 
         # add file and symlink
-        self.after_rpm.add_installed_file(installPath='usr/bin/rpminspect',
-                                          sourceFile=rpmfluff.SourceFile('rpminspect', ri_bytes),
-                                          mode="0755")
-        self.after_rpm.add_installed_symlink('usr/bin/bin', '.')
-        self.after_rpm.add_installed_symlink('usr/bin/anotherrpminspect', 'bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/rpminspect')
+        self.after_rpm.add_installed_file(
+            installPath="usr/bin/rpminspect",
+            sourceFile=rpmfluff.SourceFile("rpminspect", ri_bytes),
+            mode="0755",
+        )
+        self.after_rpm.add_installed_symlink("usr/bin/bin", ".")
+        self.after_rpm.add_installed_symlink(
+            "usr/bin/anotherrpminspect",
+            "bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/rpminspect",
+        )
 
         # disable check-buildroot rpmbuild script to avoid stat errors
         # on our big symlink
         self.after_rpm.header += "\n%global __arch_install_post %{nil}\n"
 
-        self.inspection = 'symlinks'
-        self.label = 'symlinks'
-        self.result = 'BAD'
-        self.waiver_auth = 'Anyone'
+        self.inspection = "symlinks"
+        self.label = "symlinks"
+        self.result = "BAD"
+        self.waiver_auth = "Anyone"
+
 
 class TooManySymlinkLevelsCompareKoji(TestCompareKoji):
-    @unittest.skipIf(rpm_handles_symlinks, "rpm %d.%d.%d detected, prevents ELOOP symlink errors" % (rpm_major, rpm_minor, rpm_update))
+    @unittest.skipIf(
+        rpm_handles_symlinks,
+        "rpm %d.%d.%d detected, prevents ELOOP symlink errors"
+        % (rpm_major, rpm_minor, rpm_update),
+    )
     def setUp(self):
         TestCompareKoji.setUp(self)
 
         # add file and symlink
-        self.after_rpm.add_installed_file(installPath='usr/bin/rpminspect',
-                                          sourceFile=rpmfluff.SourceFile('rpminspect', ri_bytes),
-                                          mode="0755")
-        self.after_rpm.add_installed_symlink('usr/bin/bin', '.')
-        self.after_rpm.add_installed_symlink('usr/bin/anotherrpminspect', 'bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/rpminspect')
+        self.after_rpm.add_installed_file(
+            installPath="usr/bin/rpminspect",
+            sourceFile=rpmfluff.SourceFile("rpminspect", ri_bytes),
+            mode="0755",
+        )
+        self.after_rpm.add_installed_symlink("usr/bin/bin", ".")
+        self.after_rpm.add_installed_symlink(
+            "usr/bin/anotherrpminspect",
+            "bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/bin/rpminspect",
+        )
 
         # disable check-buildroot rpmbuild script to avoid stat errors
         # on our big symlink
         self.after_rpm.header += "\n%global __arch_install_post %{nil}\n"
 
-        self.inspection = 'symlinks'
-        self.label = 'symlinks'
-        self.result = 'BAD'
-        self.waiver_auth = 'Anyone'
+        self.inspection = "symlinks"
+        self.label = "symlinks"
+        self.result = "BAD"
+        self.waiver_auth = "Anyone"
+
 
 # Directory becomes a symlink (VERIFY)
 class DirectoryBecomesSymlinkCompareRPMs(TestCompareRPMs):
@@ -553,30 +719,36 @@ class DirectoryBecomesSymlinkCompareRPMs(TestCompareRPMs):
         TestCompareRPMs.setUp(self)
 
         # add directories and symlinks
-        self.before_rpm.add_installed_directory('usr/share/testdirectory')
-        self.before_rpm.add_installed_directory('usr/share/actualdirectory')
-        self.after_rpm.add_installed_symlink('usr/share/testdirectory', 'actualdirectory')
-        self.after_rpm.add_installed_directory('usr/share/actualdirectory')
+        self.before_rpm.add_installed_directory("usr/share/testdirectory")
+        self.before_rpm.add_installed_directory("usr/share/actualdirectory")
+        self.after_rpm.add_installed_symlink(
+            "usr/share/testdirectory", "actualdirectory"
+        )
+        self.after_rpm.add_installed_directory("usr/share/actualdirectory")
 
-        self.inspection = 'symlinks'
-        self.label = 'symlinks'
-        self.result = 'VERIFY'
-        self.waiver_auth = 'Anyone'
+        self.inspection = "symlinks"
+        self.label = "symlinks"
+        self.result = "VERIFY"
+        self.waiver_auth = "Anyone"
+
 
 class DirectoryBecomesSymlinkCompareKoji(TestCompareKoji):
     def setUp(self):
         TestCompareKoji.setUp(self)
 
         # add directories and symlinks
-        self.before_rpm.add_installed_directory('usr/share/testdirectory')
-        self.before_rpm.add_installed_directory('usr/share/actualdirectory')
-        self.after_rpm.add_installed_symlink('usr/share/testdirectory', 'actualdirectory')
-        self.after_rpm.add_installed_directory('usr/share/actualdirectory')
+        self.before_rpm.add_installed_directory("usr/share/testdirectory")
+        self.before_rpm.add_installed_directory("usr/share/actualdirectory")
+        self.after_rpm.add_installed_symlink(
+            "usr/share/testdirectory", "actualdirectory"
+        )
+        self.after_rpm.add_installed_directory("usr/share/actualdirectory")
 
-        self.inspection = 'symlinks'
-        self.label = 'symlinks'
-        self.result = 'VERIFY'
-        self.waiver_auth = 'Anyone'
+        self.inspection = "symlinks"
+        self.label = "symlinks"
+        self.result = "VERIFY"
+        self.waiver_auth = "Anyone"
+
 
 # Non-directory becomes a symlink (VERIFY)
 class NonDirectoryBecomesSymlinkCompareRPMs(TestCompareRPMs):
@@ -584,39 +756,52 @@ class NonDirectoryBecomesSymlinkCompareRPMs(TestCompareRPMs):
         TestCompareRPMs.setUp(self)
 
         # add files and symlinks
-        self.before_rpm.add_installed_file(installPath='usr/bin/rpminspect',
-                                           sourceFile=rpmfluff.SourceFile('rpminspect', ri_bytes),
-                                           mode="0755")
-        self.before_rpm.add_installed_file(installPath='usr/bin/anotherrpminspect',
-                                           sourceFile=rpmfluff.SourceFile('rpminspect', ri_bytes),
-                                           mode="0755")
-        self.after_rpm.add_installed_file(installPath='usr/bin/rpminspect',
-                                           sourceFile=rpmfluff.SourceFile('rpminspect', ri_bytes),
-                                           mode="0755")
-        self.after_rpm.add_installed_symlink('usr/bin/anotherrpminspect', 'rpminspect')
+        self.before_rpm.add_installed_file(
+            installPath="usr/bin/rpminspect",
+            sourceFile=rpmfluff.SourceFile("rpminspect", ri_bytes),
+            mode="0755",
+        )
+        self.before_rpm.add_installed_file(
+            installPath="usr/bin/anotherrpminspect",
+            sourceFile=rpmfluff.SourceFile("rpminspect", ri_bytes),
+            mode="0755",
+        )
+        self.after_rpm.add_installed_file(
+            installPath="usr/bin/rpminspect",
+            sourceFile=rpmfluff.SourceFile("rpminspect", ri_bytes),
+            mode="0755",
+        )
+        self.after_rpm.add_installed_symlink("usr/bin/anotherrpminspect", "rpminspect")
 
-        self.inspection = 'symlinks'
-        self.label = 'symlinks'
-        self.result = 'VERIFY'
-        self.waiver_auth = 'Anyone'
+        self.inspection = "symlinks"
+        self.label = "symlinks"
+        self.result = "VERIFY"
+        self.waiver_auth = "Anyone"
+
 
 class NonDirectoryBecomesSymlinkCompareKoji(TestCompareKoji):
     def setUp(self):
         TestCompareKoji.setUp(self)
 
         # add files and symlinks
-        self.before_rpm.add_installed_file(installPath='usr/bin/rpminspect',
-                                           sourceFile=rpmfluff.SourceFile('rpminspect', ri_bytes),
-                                           mode="0755")
-        self.before_rpm.add_installed_file(installPath='usr/bin/anotherrpminspect',
-                                           sourceFile=rpmfluff.SourceFile('rpminspect', ri_bytes),
-                                           mode="0755")
-        self.after_rpm.add_installed_file(installPath='usr/bin/rpminspect',
-                                           sourceFile=rpmfluff.SourceFile('rpminspect', ri_bytes),
-                                           mode="0755")
-        self.after_rpm.add_installed_symlink('usr/bin/anotherrpminspect', 'rpminspect')
+        self.before_rpm.add_installed_file(
+            installPath="usr/bin/rpminspect",
+            sourceFile=rpmfluff.SourceFile("rpminspect", ri_bytes),
+            mode="0755",
+        )
+        self.before_rpm.add_installed_file(
+            installPath="usr/bin/anotherrpminspect",
+            sourceFile=rpmfluff.SourceFile("rpminspect", ri_bytes),
+            mode="0755",
+        )
+        self.after_rpm.add_installed_file(
+            installPath="usr/bin/rpminspect",
+            sourceFile=rpmfluff.SourceFile("rpminspect", ri_bytes),
+            mode="0755",
+        )
+        self.after_rpm.add_installed_symlink("usr/bin/anotherrpminspect", "rpminspect")
 
-        self.inspection = 'symlinks'
-        self.label = 'symlinks'
-        self.result = 'VERIFY'
-        self.waiver_auth = 'Anyone'
+        self.inspection = "symlinks"
+        self.label = "symlinks"
+        self.result = "VERIFY"
+        self.waiver_auth = "Anyone"

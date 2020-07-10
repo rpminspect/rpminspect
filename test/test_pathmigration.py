@@ -35,10 +35,11 @@ class SlashBinFileRPM(TestRPMs):
         # Adds /bin/hello-world
         self.rpm.add_simple_compilation(installPath="bin/hello-world")
 
-        self.inspection = 'pathmigration'
-        self.label = 'path-migration'
-        self.result = 'VERIFY'
-        self.waiver_auth = 'Anyone'
+        self.inspection = "pathmigration"
+        self.label = "path-migration"
+        self.result = "VERIFY"
+        self.waiver_auth = "Anyone"
+
 
 # File in /bin in compare RPM (VERIFY)
 class SlashBinFileCompareRPMs(TestCompareRPMs):
@@ -49,10 +50,11 @@ class SlashBinFileCompareRPMs(TestCompareRPMs):
         self.before_rpm.add_simple_compilation(installPath="bin/hello-world")
         self.after_rpm.add_simple_compilation(installPath="bin/hello-world")
 
-        self.inspection = 'pathmigration'
-        self.label = 'path-migration'
-        self.result = 'VERIFY'
-        self.waiver_auth = 'Anyone'
+        self.inspection = "pathmigration"
+        self.label = "path-migration"
+        self.result = "VERIFY"
+        self.waiver_auth = "Anyone"
+
 
 # File in /bin in Koji build (VERIFY)
 class SlashBinFileKoji(TestKoji):
@@ -62,10 +64,11 @@ class SlashBinFileKoji(TestKoji):
         # Adds /bin/hello-world
         self.rpm.add_simple_compilation(installPath="bin/hello-world")
 
-        self.inspection = 'pathmigration'
-        self.label = 'path-migration'
-        self.result = 'VERIFY'
-        self.waiver_auth = 'Anyone'
+        self.inspection = "pathmigration"
+        self.label = "path-migration"
+        self.result = "VERIFY"
+        self.waiver_auth = "Anyone"
+
 
 # File in /bin in compare Koji build (VERIFY)
 class SlashBinFileCompareKoji(TestCompareKoji):
@@ -76,10 +79,11 @@ class SlashBinFileCompareKoji(TestCompareKoji):
         self.before_rpm.add_simple_compilation(installPath="bin/hello-world")
         self.after_rpm.add_simple_compilation(installPath="bin/hello-world")
 
-        self.inspection = 'pathmigration'
-        self.label = 'path-migration'
-        self.result = 'VERIFY'
-        self.waiver_auth = 'Anyone'
+        self.inspection = "pathmigration"
+        self.label = "path-migration"
+        self.result = "VERIFY"
+        self.waiver_auth = "Anyone"
+
 
 #########
 # /sbin #
@@ -93,10 +97,11 @@ class SlashSbinFileRPM(TestRPMs):
         # Adds /sbin/hello-world
         self.rpm.add_simple_compilation(installPath="sbin/hello-world")
 
-        self.inspection = 'pathmigration'
-        self.label = 'path-migration'
-        self.result = 'VERIFY'
-        self.waiver_auth = 'Anyone'
+        self.inspection = "pathmigration"
+        self.label = "path-migration"
+        self.result = "VERIFY"
+        self.waiver_auth = "Anyone"
+
 
 # File in /sbin in compare RPM (VERIFY)
 class SlashSbinFileCompareRPMs(TestCompareRPMs):
@@ -107,10 +112,11 @@ class SlashSbinFileCompareRPMs(TestCompareRPMs):
         self.before_rpm.add_simple_compilation(installPath="sbin/hello-world")
         self.after_rpm.add_simple_compilation(installPath="sbin/hello-world")
 
-        self.inspection = 'pathmigration'
-        self.label = 'path-migration'
-        self.result = 'VERIFY'
-        self.waiver_auth = 'Anyone'
+        self.inspection = "pathmigration"
+        self.label = "path-migration"
+        self.result = "VERIFY"
+        self.waiver_auth = "Anyone"
+
 
 # File in /sbin in Koji build (VERIFY)
 class SlashSbinFileKoji(TestKoji):
@@ -120,10 +126,11 @@ class SlashSbinFileKoji(TestKoji):
         # Adds /sbin/hello-world
         self.rpm.add_simple_compilation(installPath="sbin/hello-world")
 
-        self.inspection = 'pathmigration'
-        self.label = 'path-migration'
-        self.result = 'VERIFY'
-        self.waiver_auth = 'Anyone'
+        self.inspection = "pathmigration"
+        self.label = "path-migration"
+        self.result = "VERIFY"
+        self.waiver_auth = "Anyone"
+
 
 # File in /sbin in compare Koji build (VERIFY)
 class SlashSbinFileCompareKoji(TestCompareKoji):
@@ -134,10 +141,11 @@ class SlashSbinFileCompareKoji(TestCompareKoji):
         self.before_rpm.add_simple_compilation(installPath="sbin/hello-world")
         self.after_rpm.add_simple_compilation(installPath="sbin/hello-world")
 
-        self.inspection = 'pathmigration'
-        self.label = 'path-migration'
-        self.result = 'VERIFY'
-        self.waiver_auth = 'Anyone'
+        self.inspection = "pathmigration"
+        self.label = "path-migration"
+        self.result = "VERIFY"
+        self.waiver_auth = "Anyone"
+
 
 ########
 # /lib #
@@ -151,10 +159,11 @@ class SlashLibFileRPM(TestRPMs):
         # Adds /lib/libfoo.so
         self.rpm.add_simple_compilation(installPath="lib/libfoo.so")
 
-        self.inspection = 'pathmigration'
-        self.label = 'path-migration'
-        self.result = 'VERIFY'
-        self.waiver_auth = 'Anyone'
+        self.inspection = "pathmigration"
+        self.label = "path-migration"
+        self.result = "VERIFY"
+        self.waiver_auth = "Anyone"
+
 
 # File in /lib in compare RPM (VERIFY)
 class SlashLibFileCompareRPMs(TestCompareRPMs):
@@ -165,10 +174,11 @@ class SlashLibFileCompareRPMs(TestCompareRPMs):
         self.before_rpm.add_simple_compilation(installPath="lib/libfoo.so")
         self.after_rpm.add_simple_compilation(installPath="lib/libfoo.so")
 
-        self.inspection = 'pathmigration'
-        self.label = 'path-migration'
-        self.result = 'VERIFY'
-        self.waiver_auth = 'Anyone'
+        self.inspection = "pathmigration"
+        self.label = "path-migration"
+        self.result = "VERIFY"
+        self.waiver_auth = "Anyone"
+
 
 # File in /lib in Koji build (VERIFY)
 class SlashLibFileKoji(TestKoji):
@@ -178,10 +188,11 @@ class SlashLibFileKoji(TestKoji):
         # Adds /lib/libfoo.so
         self.rpm.add_simple_compilation(installPath="lib/libfoo.so")
 
-        self.inspection = 'pathmigration'
-        self.label = 'path-migration'
-        self.result = 'VERIFY'
-        self.waiver_auth = 'Anyone'
+        self.inspection = "pathmigration"
+        self.label = "path-migration"
+        self.result = "VERIFY"
+        self.waiver_auth = "Anyone"
+
 
 # File in /lib in compare Koji build (VERIFY)
 class SlashLibFileCompareKoji(TestCompareKoji):
@@ -192,10 +203,11 @@ class SlashLibFileCompareKoji(TestCompareKoji):
         self.before_rpm.add_simple_compilation(installPath="lib/libfoo.so")
         self.after_rpm.add_simple_compilation(installPath="lib/libfoo.so")
 
-        self.inspection = 'pathmigration'
-        self.label = 'path-migration'
-        self.result = 'VERIFY'
-        self.waiver_auth = 'Anyone'
+        self.inspection = "pathmigration"
+        self.label = "path-migration"
+        self.result = "VERIFY"
+        self.waiver_auth = "Anyone"
+
 
 ##########
 # /lib64 #
@@ -209,10 +221,11 @@ class SlashLib64FileRPM(TestRPMs):
         # Adds /lib64/libfoo.so
         self.rpm.add_simple_compilation(installPath="lib64/libfoo.so")
 
-        self.inspection = 'pathmigration'
-        self.label = 'path-migration'
-        self.result = 'VERIFY'
-        self.waiver_auth = 'Anyone'
+        self.inspection = "pathmigration"
+        self.label = "path-migration"
+        self.result = "VERIFY"
+        self.waiver_auth = "Anyone"
+
 
 # File in /lib64 in compare RPM (VERIFY)
 class SlashLib64FileCompareRPMs(TestCompareRPMs):
@@ -223,10 +236,11 @@ class SlashLib64FileCompareRPMs(TestCompareRPMs):
         self.before_rpm.add_simple_compilation(installPath="lib64/libfoo.so")
         self.after_rpm.add_simple_compilation(installPath="lib64/libfoo.so")
 
-        self.inspection = 'pathmigration'
-        self.label = 'path-migration'
-        self.result = 'VERIFY'
-        self.waiver_auth = 'Anyone'
+        self.inspection = "pathmigration"
+        self.label = "path-migration"
+        self.result = "VERIFY"
+        self.waiver_auth = "Anyone"
+
 
 # File in /lib64 in Koji build (VERIFY)
 class SlashLib64FileKoji(TestKoji):
@@ -236,10 +250,11 @@ class SlashLib64FileKoji(TestKoji):
         # Adds /lib64/libfoo.so
         self.rpm.add_simple_compilation(installPath="lib64/libfoo.so")
 
-        self.inspection = 'pathmigration'
-        self.label = 'path-migration'
-        self.result = 'VERIFY'
-        self.waiver_auth = 'Anyone'
+        self.inspection = "pathmigration"
+        self.label = "path-migration"
+        self.result = "VERIFY"
+        self.waiver_auth = "Anyone"
+
 
 # File in /lib64 in compare Koji build (VERIFY)
 class SlashLib64FileCompareKoji(TestCompareKoji):
@@ -250,7 +265,7 @@ class SlashLib64FileCompareKoji(TestCompareKoji):
         self.before_rpm.add_simple_compilation(installPath="lib64/libfoo.so")
         self.after_rpm.add_simple_compilation(installPath="lib64/libfoo.so")
 
-        self.inspection = 'pathmigration'
-        self.label = 'path-migration'
-        self.result = 'VERIFY'
-        self.waiver_auth = 'Anyone'
+        self.inspection = "pathmigration"
+        self.label = "path-migration"
+        self.result = "VERIFY"
+        self.waiver_auth = "Anyone"
