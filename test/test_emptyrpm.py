@@ -16,7 +16,8 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 #
 
-from baseclass import *
+from baseclass import TestKoji, TestRPMs, TestSRPM
+
 
 # Regular SRPM has payload (OK)
 class HasPayloadSRPM(TestSRPM):

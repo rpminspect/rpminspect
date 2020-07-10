@@ -18,7 +18,7 @@
 
 import os
 import rpmfluff
-from baseclass import *
+from baseclass import TestRPMs, TestCompareRPMs, TestKoji, TestCompareKoji
 
 # These tests rely on the [pathmigration] section in
 # data/generic.yaml in the source tree.

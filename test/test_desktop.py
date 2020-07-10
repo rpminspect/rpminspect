@@ -18,7 +18,8 @@
 
 import os
 import rpmfluff
-from baseclass import *
+
+from baseclass import TestRPMs, TestKoji, TestCompareRPMs, TestCompareKoji
 
 good_desktop_file = """[Desktop Entry]
 Name=Hello World
