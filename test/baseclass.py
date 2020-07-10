@@ -39,12 +39,15 @@ AFTER_REL = "2"
 # suite but will make a big mess)
 KEEP_RESULTS = False
 
+
 # Exceptions used by the test suite
 class MissingRpminspect(Exception):
     pass
 
+
 class MissingRpminspectConf(Exception):
     pass
+
 
 # This function is called to check the JSON results to make sure we
 # have at least one result that matches the result and waiver_auth we
@@ -60,11 +63,13 @@ def check_results(results, label, result, waiver_auth):
 
     for r in results[label]:
         if 'result' in r and 'waiver authorization' in r:
-            if r['result'] == result and r['waiver authorization'] == waiver_auth:
+            if r['result'] == result and r[
+                    'waiver authorization'] == waiver_auth:
                 ret = True
                 break
 
     return ret
+
 
 # Base test case class that ensures we have 'rpminspect'
 # as an executable command.
@@ -73,11 +78,13 @@ class RequiresRpminspect(unittest.TestCase):
         # make sure we have the program
         self.rpminspect = os.environ['RPMINSPECT']
 
-        if not os.path.isfile(self.rpminspect) or not os.access(self.rpminspect, os.X_OK):
+        if not os.path.isfile(self.rpminspect) or not os.access(
+                self.rpminspect, os.X_OK):
             raise MissingRpminspect
 
         # ensure we have the sample configuration file
-        if not os.path.isfile(os.environ['RPMINSPECT_YAML']) or not os.access(os.environ['RPMINSPECT_YAML'], os.R_OK):
+        if not os.path.isfile(os.environ['RPMINSPECT_YAML']) or \
+           not os.access(os.environ['RPMINSPECT_YAML'], os.R_OK):
             raise MissingRpminspectConf
 
         # set in configFile()
@@ -91,12 +98,12 @@ class RequiresRpminspect(unittest.TestCase):
         # give that a try here but default to a string conversion.
         try:
             o = json.dumps(json.loads(self.out), sort_keys=True, indent=4)
-        except:
+        except Exception:
             o = str(self.out, 'utf-8')
 
         try:
             e = json.dumps(json.loads(self.err), sort_keys=True, indent=4)
-        except:
+        except Exception:
             e = str(self.err, 'utf-8')
 
         print("\n\ninspection=%s\n" % self.inspection)
@@ -122,7 +129,8 @@ class RequiresRpminspect(unittest.TestCase):
         cfg = yaml.full_load(instream)
         instream.close()
 
-        cfg['vendor']['vendor_data_dir'] = os.environ['RPMINSPECT_TEST_DATA_PATH']
+        cfg['vendor']['vendor_data_dir'] = os.environ[
+            'RPMINSPECT_TEST_DATA_PATH']
         cfg['vendor']['licensedb'] = 'test.json'
 
         if self.buildhost_subdomain:
@@ -149,6 +157,7 @@ class RequiresRpminspect(unittest.TestCase):
 
     def tearDown(self):
         os.unlink(self.conffile)
+
 
 # Base test case class that tests on the SRPM package only
 class TestSRPM(RequiresRpminspect):
@@ -179,7 +188,10 @@ class TestSRPM(RequiresRpminspect):
 
         self.rpm.do_make()
 
-        args = [self.rpminspect, '-d', '-c', self.conffile, '-F', 'json', '-r', 'GENERIC']
+        args = [
+            self.rpminspect, '-d', '-c', self.conffile, '-F', 'json', '-r',
+            'GENERIC'
+        ]
         if self.inspection:
             args.append('-T')
             args.append(self.inspection)
@@ -208,17 +220,22 @@ class TestSRPM(RequiresRpminspect):
             self.dumpResults()
 
         self.assertEqual(self.p.returncode, self.exitcode)
-        self.assertTrue(check_results(self.results, self.label, self.result, self.waiver_auth))
+        self.assertTrue(
+            check_results(self.results, self.label, self.result,
+                          self.waiver_auth))
 
     def tearDown(self):
         shutil.rmtree(self.rpm.get_base_dir(), ignore_errors=True)
+
 
 # Base test case class that compares a before and after SRPM
 class TestCompareSRPM(RequiresRpminspect):
     def setUp(self):
         RequiresRpminspect.setUp(self)
-        self.before_rpm = rpmfluff.SimpleRpmBuild(BEFORE_NAME, BEFORE_VER, BEFORE_REL)
-        self.after_rpm = rpmfluff.SimpleRpmBuild(AFTER_NAME, AFTER_VER, AFTER_REL)
+        self.before_rpm = rpmfluff.SimpleRpmBuild(BEFORE_NAME, BEFORE_VER,
+                                                  BEFORE_REL)
+        self.after_rpm = rpmfluff.SimpleRpmBuild(AFTER_NAME, AFTER_VER,
+                                                 AFTER_REL)
 
         # turn off all rpmbuild post processing stuff for the purposes of testing
         self.before_rpm.header += "\n%global __os_install_post %{nil}\n"
@@ -245,7 +262,10 @@ class TestCompareSRPM(RequiresRpminspect):
         self.before_rpm.do_make()
         self.after_rpm.do_make()
 
-        args = [self.rpminspect, '-d', '-c', self.conffile, '-F', 'json', '-r', 'GENERIC']
+        args = [
+            self.rpminspect, '-d', '-c', self.conffile, '-F', 'json', '-r',
+            'GENERIC'
+        ]
 
         if self.inspection:
             args.append('-T')
@@ -276,11 +296,14 @@ class TestCompareSRPM(RequiresRpminspect):
             self.dumpResults()
 
         self.assertEqual(self.p.returncode, self.exitcode)
-        self.assertTrue(check_results(self.results, self.label, self.result, self.waiver_auth))
+        self.assertTrue(
+            check_results(self.results, self.label, self.result,
+                          self.waiver_auth))
 
     def tearDown(self):
         shutil.rmtree(self.before_rpm.get_base_dir(), ignore_errors=True)
         shutil.rmtree(self.after_rpm.get_base_dir(), ignore_errors=True)
+
 
 # Base test case class that tests the binary RPMs
 class TestRPMs(TestSRPM):
@@ -297,7 +320,10 @@ class TestRPMs(TestSRPM):
             self.exitcode = 1
 
         for a in self.rpm.get_build_archs():
-            args = [self.rpminspect, '-d', '-c', self.conffile, '-F', 'json', '-r', 'GENERIC']
+            args = [
+                self.rpminspect, '-d', '-c', self.conffile, '-F', 'json', '-r',
+                'GENERIC'
+            ]
 
             if self.inspection:
                 args.append('-T')
@@ -323,11 +349,15 @@ class TestRPMs(TestSRPM):
                 self.dumpResults()
 
             self.assertEqual(self.p.returncode, self.exitcode)
-            self.assertEqual(self.results[self.label][0]['result'], self.result)
-            self.assertEqual(self.results[self.label][0]['waiver authorization'], self.waiver_auth)
+            self.assertEqual(self.results[self.label][0]['result'],
+                             self.result)
+            self.assertEqual(
+                self.results[self.label][0]['waiver authorization'],
+                self.waiver_auth)
 
     def tearDown(self):
         shutil.rmtree(self.rpm.get_base_dir(), ignore_errors=True)
+
 
 # Base test case class that compares before and after built RPMs
 class TestCompareRPMs(TestCompareSRPM):
@@ -345,7 +375,10 @@ class TestCompareRPMs(TestCompareSRPM):
             self.exitcode = 1
 
         for a in self.before_rpm.get_build_archs():
-            args = [self.rpminspect, '-d', '-c', self.conffile, '-F', 'json', '-r', 'GENERIC']
+            args = [
+                self.rpminspect, '-d', '-c', self.conffile, '-F', 'json', '-r',
+                'GENERIC'
+            ]
 
             if self.inspection:
                 args.append('-T')
@@ -372,11 +405,14 @@ class TestCompareRPMs(TestCompareSRPM):
                 self.dumpResults()
 
             self.assertEqual(self.p.returncode, self.exitcode)
-            self.assertTrue(check_results(self.results, self.label, self.result, self.waiver_auth))
+            self.assertTrue(
+                check_results(self.results, self.label, self.result,
+                              self.waiver_auth))
 
     def tearDown(self):
         shutil.rmtree(self.before_rpm.get_base_dir(), ignore_errors=True)
         shutil.rmtree(self.after_rpm.get_base_dir(), ignore_errors=True)
+
 
 # Base test case class that tests a fake Koji build
 class TestKoji(TestSRPM):
@@ -402,7 +438,10 @@ class TestKoji(TestSRPM):
                 os.makedirs(adir, exist_ok=True)
                 shutil.copy(self.rpm.get_built_rpm(a), adir)
 
-            args = [self.rpminspect, '-d', '-c', self.conffile, '-F', 'json', '-r', 'GENERIC']
+            args = [
+                self.rpminspect, '-d', '-c', self.conffile, '-F', 'json', '-r',
+                'GENERIC'
+            ]
             if self.inspection:
                 args.append('-T')
                 args.append(self.inspection)
@@ -431,10 +470,13 @@ class TestKoji(TestSRPM):
                 self.dumpResults()
 
             self.assertEqual(self.p.returncode, self.exitcode)
-            self.assertTrue(check_results(self.results, self.label, self.result, self.waiver_auth))
+            self.assertTrue(
+                check_results(self.results, self.label, self.result,
+                              self.waiver_auth))
 
     def tearDown(self):
         shutil.rmtree(self.rpm.get_base_dir(), ignore_errors=True)
+
 
 # Base test case class that compares before and after Koji builds
 class TestCompareKoji(TestCompareSRPM):
@@ -469,7 +511,10 @@ class TestCompareKoji(TestCompareSRPM):
                 os.makedirs(adir, exist_ok=True)
                 shutil.copy(self.after_rpm.get_built_rpm(a), adir)
 
-            args = [self.rpminspect, '-d', '-c', self.conffile, '-F', 'json', '-r', AFTER_REL]
+            args = [
+                self.rpminspect, '-d', '-c', self.conffile, '-F', 'json', '-r',
+                AFTER_REL
+            ]
 
             if self.inspection:
                 args.append('-T')
@@ -500,7 +545,9 @@ class TestCompareKoji(TestCompareSRPM):
                 self.dumpResults()
 
             self.assertEqual(self.p.returncode, self.exitcode)
-            self.assertTrue(check_results(self.results, self.label, self.result, self.waiver_auth))
+            self.assertTrue(
+                check_results(self.results, self.label, self.result,
+                              self.waiver_auth))
 
     def tearDown(self):
         shutil.rmtree(self.before_rpm.get_base_dir(), ignore_errors=True)
