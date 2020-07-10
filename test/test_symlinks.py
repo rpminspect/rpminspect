@@ -276,7 +276,7 @@ class SymlinkExistsMultiplePackagesRPMS(TestRPMs):
             sourceFile=rpmfluff.SourceFile("rpminspect", ri_bytes),
             mode="0755",
         )
-        subpackage = self.rpm.add_subpackage("symlinks")
+        self.rpm.add_subpackage("symlinks")
         self.rpm.add_installed_symlink(
             "usr/bin/anotherrpminspect", "rpminspect", subpackageSuffix="symlinks"
         )
@@ -297,7 +297,7 @@ class SymlinkExistsMultiplePackagesKoji(TestKoji):
             sourceFile=rpmfluff.SourceFile("rpminspect", ri_bytes),
             mode="0755",
         )
-        subpackage = self.rpm.add_subpackage("symlinks")
+        self.rpm.add_subpackage("symlinks")
         self.rpm.add_installed_symlink(
             "usr/bin/anotherrpminspect", "rpminspect", subpackageSuffix="symlinks"
         )
@@ -318,7 +318,7 @@ class SymlinkExistsMultiplePackagesCompareRPMs(TestCompareRPMs):
             sourceFile=rpmfluff.SourceFile("rpminspect", ri_bytes),
             mode="0755",
         )
-        subpackage = self.after_rpm.add_subpackage("symlinks")
+        self.after_rpm.add_subpackage("symlinks")
         self.after_rpm.add_installed_symlink(
             "usr/bin/anotherrpminspect", "rpminspect", subpackageSuffix="symlinks"
         )
@@ -339,7 +339,7 @@ class SymlinkExistsMultiplePackagesCompareKoji(TestCompareKoji):
             sourceFile=rpmfluff.SourceFile("rpminspect", ri_bytes),
             mode="0755",
         )
-        subpackage = self.after_rpm.add_subpackage("symlinks")
+        self.after_rpm.add_subpackage("symlinks")
         self.after_rpm.add_installed_symlink(
             "usr/bin/anotherrpminspect", "rpminspect", subpackageSuffix="symlinks"
         )
