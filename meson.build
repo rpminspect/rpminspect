@@ -86,7 +86,7 @@ else
     mandoc = cc.find_library('mandoc',
                              dirs : [ '/usr/lib', '/usr/lib64', '/usr/local/lib' ],
                              required : false,
-                             static : true)
+                             static : false)
 
     if mandoc.found()
         message('found shared libmandoc')
