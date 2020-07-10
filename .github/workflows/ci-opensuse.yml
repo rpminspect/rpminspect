@@ -17,9 +17,9 @@ jobs:
         # All of these steps run from within the main source
         # directory, so think of that as your $PWD
         steps:
-            # OpenSUSE does not provide tar by default
+            # Install required packages for the git checkout action
             - name: Install tar
-              run: zypper install -y tar
+              run: zypper install -y tar gzip
 
             # This means clone the git repo
             - uses: actions/checkout@v2
