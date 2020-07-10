@@ -27,9 +27,7 @@ elif [ -r /etc/redhat-release ] && [ "${ID}" = "rhel" ]; then
     else
         echo "unknown"
     fi
-elif [ -r /etc/SuSE-release ] && [ "${ID}" = "opensuse-leap" ]; then
-    echo "${ID}"
-elif [ "${ID}" = "ubuntu" ]; then
+elif [ "${ID}" = "opensuse-leap" ] || [ "${ID}" = "ubuntu" ]; then
     echo "${ID}"
 else
     echo "unknown"
