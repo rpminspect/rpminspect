@@ -32,6 +32,7 @@ lto_src = open(datadir + "/lto.c").read()
 # rpmfluff will fail.  This does not impact ELF executables which is the
 # more common use.
 
+
 # No LTO symbols in .o files (OK)
 class NoLTOSymbolsRelocRPMs(TestRPMs):
     def setUp(self):

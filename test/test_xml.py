@@ -35,6 +35,7 @@ invalid_xml = """<?xml version='1.0'?>
 <nonClosingElement variable="value">
 """
 
+
 # XML file is well formed in RPM (OK)
 class XMLWellFormedRPM(TestRPMs):
     def setUp(self):
