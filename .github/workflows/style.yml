@@ -1,4 +1,4 @@
-name: Python Style Checks
+name: Style Checks
 
 on:
     push:
@@ -7,7 +7,15 @@ on:
         branches: [master]
 
 jobs:
-    python_style:
+    shellcheck:
+        runs-on: ubuntu-latest
+        # Ubuntu's ShellCheck is old enough to not have --severity
+        container: fedora:latest
+        steps:
+            - uses: actions/checkout@v2
+            - run: dnf install -y ShellCheck
+            - run: shellcheck --severity=warning **/*.sh
+    python:
         runs-on: ubuntu-latest
         strategy:
             matrix:
