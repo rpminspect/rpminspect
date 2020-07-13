@@ -42,7 +42,9 @@ jobs:
             # Generate code coverage reports (requires
             # -Db_coverage=true on 'meson setup')
             - name: coverage
-              run: ninja -C build coverage
+              run: |
+                  ninja -C build coverage
+                  curl -s https://codecov.io/bash | bash
 
     ubuntu:
         # This job runs directly on the Ubuntu host provided by GitHub Actions
@@ -74,7 +76,9 @@ jobs:
             # Generate code coverage reports (requires
             # -Db_coverage=true on 'meson setup')
             - name: coverage
-              run: ninja -C build coverage
+              run: |
+                  ninja -C build coverage
+                  curl -s https://codecov.io/bash | bash
 
     opensuse-leap:
         # This job runs in a Docker container of OpenSUSE Leap but the
@@ -115,7 +119,9 @@ jobs:
             # Generate code coverage reports (requires
             # -Db_coverage=true on 'meson setup')
             - name: coverage
-              run: ninja -C build coverage
+              run: |
+                  ninja -C build coverage
+                  curl -s https://codecov.io/bash | bash
 
     centos8:
         # This job runs in a Docker container of the latest CentOS 8
@@ -162,7 +168,9 @@ jobs:
             # Generate code coverage reports (requires
             # -Db_coverage=true on 'meson setup')
             - name: coverage
-              run: ninja -C build coverage
+              run: |
+                  ninja -C build coverage
+                  curl -s https://codecov.io/bash | bash
 
     centos7:
         # This job runs in a Docker container of the latest CentOS 7
@@ -210,4 +218,6 @@ jobs:
             # Generate code coverage reports (requires
             # -Db_coverage=true on 'meson setup')
             - name: coverage
-              run: ninja -C build coverage
+              run: |
+                  ninja -C build coverage
+                  curl -s https://codecov.io/bash | bash
