@@ -66,7 +66,7 @@ void free_mapping(struct hsearch_data *table, string_list_t *keys)
  */
 void free_rpminspect(struct rpminspect *ri) {
     fileinfo_entry_t *fientry = NULL;
-    caps_whitelist_entry_t *cwlentry = NULL;
+    caps_entry_t *entry = NULL;
     caps_filelist_entry_t *cflentry = NULL;
     header_cache_entry_t *hentry = NULL;
 
@@ -99,17 +99,17 @@ void free_rpminspect(struct rpminspect *ri) {
         free(ri->fileinfo);
     }
 
-    if (ri->caps_whitelist) {
-        while (!TAILQ_EMPTY(ri->caps_whitelist)) {
-            cwlentry = TAILQ_FIRST(ri->caps_whitelist);
-            TAILQ_REMOVE(ri->caps_whitelist, cwlentry, items);
+    if (ri->caps) {
+        while (!TAILQ_EMPTY(ri->caps)) {
+            entry = TAILQ_FIRST(ri->caps);
+            TAILQ_REMOVE(ri->caps, entry, items);
 
-            free(cwlentry->pkg);
+            free(entry->pkg);
 
-            if (cwlentry->files) {
-                while (!TAILQ_EMPTY(cwlentry->files)) {
-                    cflentry = TAILQ_FIRST(cwlentry->files);
-                    TAILQ_REMOVE(cwlentry->files, cflentry, items);
+            if (entry->files) {
+                while (!TAILQ_EMPTY(entry->files)) {
+                    cflentry = TAILQ_FIRST(entry->files);
+                    TAILQ_REMOVE(entry->files, cflentry, items);
 
                     free(cflentry->path);
                     free(cflentry->caps);
@@ -119,7 +119,7 @@ void free_rpminspect(struct rpminspect *ri) {
             }
         }
 
-        free(ri->caps_whitelist);
+        free(ri->caps);
     }
 
     list_free(ri->badwords, free);

@@ -222,33 +222,33 @@ bool match_fileinfo_group(struct rpminspect *ri, const rpmfile_entry_t *file, co
 }
 
 /*
- * Return the caps_whitelist entry that matches the package and filepath.  If
- * it doesn't exist on the list, return NULL.  This function will take care of
- * initializing the caps_whitelist if necessary.
+ * Return the caps list entry that matches the package and filepath.
+ * If it doesn't exist on the list, return NULL.  This function will
+ * take care of initializing the caps list if necessary.
  */
-caps_filelist_entry_t *get_caps_whitelist_entry(struct rpminspect *ri, const char *pkg, const char *filepath)
+caps_filelist_entry_t *get_caps_entry(struct rpminspect *ri, const char *pkg, const char *filepath)
 {
-    caps_whitelist_entry_t *wlentry = NULL;
+    caps_entry_t *entry = NULL;
     caps_filelist_entry_t *flentry = NULL;
 
     assert(ri != NULL);
     assert(pkg != NULL);
     assert(filepath != NULL);
 
-    if (init_caps_whitelist(ri)) {
-        /* Look for the package in the caps whitelist */
-        TAILQ_FOREACH(wlentry, ri->caps_whitelist, items) {
-            if (!strcmp(wlentry->pkg, pkg)) {
+    if (init_caps(ri)) {
+        /* Look for the package in the caps list */
+        TAILQ_FOREACH(entry, ri->caps, items) {
+            if (!strcmp(entry->pkg, pkg)) {
                 break;
             }
         }
 
-        if (wlentry == NULL) {
+        if (entry == NULL) {
             return NULL;
         }
 
         /* Look for this file's entry for that package */
-        TAILQ_FOREACH(flentry, wlentry->files, items) {
+        TAILQ_FOREACH(flentry, entry->files, items) {
             if (strsuffix(flentry->path, filepath)) {
                 break;
             }

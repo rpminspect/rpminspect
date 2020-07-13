@@ -107,7 +107,7 @@ enum checksum { NULLSUM, MD5SUM, SHA1SUM, SHA256SUM };
 
 /* init.c */
 bool init_fileinfo(struct rpminspect *);
-bool init_caps_whitelist(struct rpminspect *);
+bool init_caps(struct rpminspect *);
 struct rpminspect *init_rpminspect(struct rpminspect *, const char *, const char *);
 
 /* free.c */
@@ -243,7 +243,7 @@ char *run_cmd(int *, const char *, ...) __attribute__((__sentinel__));
 bool match_fileinfo_mode(struct rpminspect *, const rpmfile_entry_t *, const char *, const char *);
 bool match_fileinfo_owner(struct rpminspect *, const rpmfile_entry_t *, const char *, const char *, const char *);
 bool match_fileinfo_group(struct rpminspect *, const rpmfile_entry_t *, const char *, const char *, const char *);
-caps_filelist_entry_t *get_caps_whitelist_entry(struct rpminspect *, const char *, const char *);
+caps_filelist_entry_t *get_caps_entry(struct rpminspect *, const char *, const char *);
 
 /* flags.c */
 bool process_inspection_flag(const char *, const bool, uint64_t *);

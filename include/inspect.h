@@ -479,7 +479,7 @@ bool inspect_types(struct rpminspect *ri);
 
 #define DESC_PERMISSIONS _("Report stat(2) mode changes between builds.  Checks against the fileinfo list for the product release specified or determined.  Any setuid or setgid changes will raise a message requiring Security Team review.")
 
-#define DESC_CAPABILITIES _("Report capabilities(7) changes between builds.  Checks against the capabilities whitelist for the product release specified or determined.  Any capabilities changes not whitelisted will raise a message requiring Security Team review.")
+#define DESC_CAPABILITIES _("Report capabilities(7) changes between builds.  Checks against the capabilities list for the product release specified or determined.  Any capabilities changes not listed will raise a message requiring Security Team review.")
 
 #define DESC_KMOD _("Report kernel module parameter, dependency, PCI ID, or symbol differences between builds.  Added and removed parameters are reported and if the package version is unchanged, these messages are reported as failures.  The same is true module dependencies, PCI IDs, and symbols.")
 

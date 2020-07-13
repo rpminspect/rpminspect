@@ -956,10 +956,10 @@ bool init_fileinfo(struct rpminspect *ri) {
 }
 
 /*
- * Initialize the caps-whitelist for the given product release.  If
- * the file cannot be found, return false.
+ * Initialize the caps list for the given product release.  If the
+ * file cannot be found, return false.
  */
-bool init_caps_whitelist(struct rpminspect *ri)
+bool init_caps(struct rpminspect *ri)
 {
     char *filename = NULL;
     FILE *input = NULL;
@@ -967,9 +967,9 @@ bool init_caps_whitelist(struct rpminspect *ri)
     size_t len = 0;
     ssize_t nread = 0;
     char *token = NULL;
-    caps_whitelist_field_t field = PACKAGE;
+    caps_field_t field = PACKAGE;
     caps_filelist_t *files = NULL;
-    caps_whitelist_entry_t *entry = NULL;
+    caps_entry_t *entry = NULL;
     caps_filelist_entry_t *filelist_entry = NULL;
 
     assert(ri != NULL);
@@ -977,11 +977,11 @@ bool init_caps_whitelist(struct rpminspect *ri)
     assert(ri->product_release != NULL);
 
     /* already initialized */
-    if (ri->caps_whitelist) {
+    if (ri->caps) {
         return true;
     }
 
-    /* the actual caps-whitelist file */
+    /* the actual caps list file */
     xasprintf(&filename, "%s/%s/%s", ri->vendor_data_dir, CAPABILITIES_DIR, ri->product_release);
     assert(filename != NULL);
     input = fopen(filename, "r");
@@ -992,11 +992,11 @@ bool init_caps_whitelist(struct rpminspect *ri)
     }
 
     /* initialize the list */
-    ri->caps_whitelist = calloc(1, sizeof(*(ri->caps_whitelist)));
-    assert(ri->caps_whitelist != NULL);
-    TAILQ_INIT(ri->caps_whitelist);
+    ri->caps = calloc(1, sizeof(*(ri->caps)));
+    assert(ri->caps != NULL);
+    TAILQ_INIT(ri->caps);
 
-    /* add all the entries to the caps-whitelist */
+    /* add all the entries to the caps list */
     while ((nread = getline(&line, &len, input)) != -1) {
         /* skip blank lines and comments */
         if (*line == '#' || *line == '\n' || *line == '\r') {
@@ -1018,14 +1018,14 @@ bool init_caps_whitelist(struct rpminspect *ri)
             /* take action on each field */
             if (field == PACKAGE) {
                 /* this package may exist in the list */
-                TAILQ_FOREACH(entry, ri->caps_whitelist, items) {
+                TAILQ_FOREACH(entry, ri->caps, items) {
                     if (!strcmp(entry->pkg, token)) {
                         files = entry->files;
                         break;
                     }
                 }
 
-                if (TAILQ_EMPTY(ri->caps_whitelist) || files == NULL) {
+                if (TAILQ_EMPTY(ri->caps) || files == NULL) {
                     /* new package for the list */
                     entry = calloc(1, sizeof(*entry));
                     assert(entry != NULL);
@@ -1033,7 +1033,7 @@ bool init_caps_whitelist(struct rpminspect *ri)
                     entry->files = calloc(1, sizeof(*entry->files));
                     assert(entry->files != NULL);
                     TAILQ_INIT(entry->files);
-                    TAILQ_INSERT_TAIL(ri->caps_whitelist, entry, items);
+                    TAILQ_INSERT_TAIL(ri->caps, entry, items);
                     files = entry->files;
                 }
 

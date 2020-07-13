@@ -87,9 +87,9 @@ static bool capabilities_driver(struct rpminspect *ri, rpmfile_entry_t *file)
         free(params.msg);
     }
 
-    /* If we have after caps, check it against the whitelist and report */
+    /* If we have after caps, check it against the caps list and report */
     pkg = headerGetString(file->rpm_header, RPMTAG_NAME);
-    flcaps = get_caps_whitelist_entry(ri, pkg, file->localpath);
+    flcaps = get_caps_entry(ri, pkg, file->localpath);
 
     if (!after && !flcaps) {
         return true;
@@ -97,29 +97,29 @@ static bool capabilities_driver(struct rpminspect *ri, rpmfile_entry_t *file)
 
     if (after && flcaps) {
         if (!strcmp(after, flcaps->caps)) {
-            xasprintf(&params.msg, _("File capabilities whitelist entry found for %s: '%s' on %s, matches package\n"), file->localpath, flcaps->caps, arch);
+            xasprintf(&params.msg, _("File capabilities list entry found for %s: '%s' on %s, matches package\n"), file->localpath, flcaps->caps, arch);
             params.severity = RESULT_INFO;
             params.waiverauth = NOT_WAIVABLE;
             add_result(ri, &params);
             free(params.msg);
         } else {
-            xasprintf(&params.msg, _("File capabilities whitelist mismatch for %s: expected '%s', got '%s'\n"), file->localpath, flcaps->caps, arch);
+            xasprintf(&params.msg, _("File capabilities list mismatch for %s: expected '%s', got '%s'\n"), file->localpath, flcaps->caps, arch);
             params.severity = RESULT_BAD;
             params.waiverauth = WAIVABLE_BY_SECURITY;
             params.remedy = REMEDY_CAPABILITIES;
             params.verb = VERB_FAILED;
-            params.noun = _("${FILE} capabilities whitelist");
+            params.noun = _("${FILE} capabilities list");
             add_result(ri, &params);
             free(params.msg);
             result = false;
         }
     } else if (after && !flcaps) {
-        xasprintf(&params.msg, _("File capabilities for %s not found on the capabilities whitelist on %s\n"), file->localpath, arch);
+        xasprintf(&params.msg, _("File capabilities for %s not found on the capabilities list on %s\n"), file->localpath, arch);
         params.severity = RESULT_BAD;
         params.waiverauth = WAIVABLE_BY_SECURITY;
         params.remedy = REMEDY_CAPABILITIES;
         params.verb = VERB_REMOVED;
-        params.noun = _("${FILE} capabilities whitelist");
+        params.noun = _("${FILE} capabilities list");
         add_result(ri, &params);
         free(params.msg);
         result = false;
@@ -129,7 +129,7 @@ static bool capabilities_driver(struct rpminspect *ri, rpmfile_entry_t *file)
         params.waiverauth = WAIVABLE_BY_SECURITY;
         params.remedy = REMEDY_CAPABILITIES;
         params.verb = VERB_FAILED;
-        params.noun = _("${FILE} capabilities whitelist");
+        params.noun = _("${FILE} capabilities list");
         add_result(ri, &params);
         free(params.msg);
         result = false;
