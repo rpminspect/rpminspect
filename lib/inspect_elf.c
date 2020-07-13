@@ -814,7 +814,7 @@ cleanup:
 }
 
 /**
- * @brief Check for binaries that use blacklisted functions which don't support IPv6.
+ * @brief Check for binaries that use forbidden functions which don't support IPv6.
  *
  * This could indicate broken support for IPv6.
  *
@@ -836,20 +836,20 @@ static bool check_ipv6(struct rpminspect *ri, Elf *after_elf, const char *localp
     size_t output_size = 0;
     int output_result = 0;
 
-    if (!ri->ipv6_blacklist) {
+    if (!ri->forbidden_ipv6_functions) {
         /* Since we don't have a list of IPv6 files to compare against, pass
          * the check. */
         goto cleanup;
     }
 
     /* Don't filter the list -- filtering requires knowledge of the
-     * blacklisted functions. Since we can't pass custom arguments to
+     * forbidden functions. Since we can't pass custom arguments to
      * the filter, return them all and filter them locally. */
     after_symbols = get_elf_imported_functions(after_elf, NULL);
     assert(after_symbols != NULL);
 
-    /* Get a list of symbols that are blacklisted that we used. */
-    used_symbols = list_intersection(ri->ipv6_blacklist, after_symbols);
+    /* Get a list of forbidden symbols that we used. */
+    used_symbols = list_intersection(ri->forbidden_ipv6_functions, after_symbols);
     if (!used_symbols || TAILQ_EMPTY(used_symbols)) {
         goto cleanup;
     }

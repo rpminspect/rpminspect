@@ -150,7 +150,7 @@ void dump_cfg(const struct rpminspect *ri)
         }
     }
 
-    if (ri->elf_path_include_pattern || ri->elf_path_exclude_pattern || (ri->ipv6_blacklist && !TAILQ_EMPTY(ri->ipv6_blacklist))) {
+    if (ri->elf_path_include_pattern || ri->elf_path_exclude_pattern || (ri->forbidden_ipv6_functions && !TAILQ_EMPTY(ri->forbidden_ipv6_functions))) {
         fprintf(stderr, "    elf:\n");
         if (ri->elf_path_include_pattern) {
             fprintf(stderr, "        include_path: %s\n", ri->elf_path_include_pattern);
@@ -158,9 +158,9 @@ void dump_cfg(const struct rpminspect *ri)
         if (ri->elf_path_exclude_pattern) {
             fprintf(stderr, "        exclude_path: %s\n", ri->elf_path_exclude_pattern);
         }
-        if (ri->ipv6_blacklist && !TAILQ_EMPTY(ri->ipv6_blacklist)) {
-            fprintf(stderr, "        ipv6_blacklist:\n");
-            TAILQ_FOREACH(entry, ri->ipv6_blacklist, items) {
+        if (ri->forbidden_ipv6_functions && !TAILQ_EMPTY(ri->forbidden_ipv6_functions)) {
+            fprintf(stderr, "        forbidden_ipv6_functions:\n");
+            TAILQ_FOREACH(entry, ri->forbidden_ipv6_functions, items) {
                 fprintf(stderr, "            - %s\n", entry->data);
             }
         }

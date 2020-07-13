@@ -197,12 +197,12 @@ elf:
     #include_path:
     exclude_path: (^(/boot/vmlinu|/lib/modules|/lib64/modules).*)|(.*/powerpc/lib/crtsavres.o$)|(^/usr/lib(64)?/kernel-wrapper$)
 
-    # Blacklist of functions which indicate broken support for
-    # IPv6. Depending on how they are used, their usage could be
-    # benign but it requires manual inspection.
+    # Functions which indicate broken support for IPv6. Depending on
+    # how they are used, their usage could be benign but it requires
+    # manual inspection.
     #
     # This is an array of forbidden function names.
-    ipv6_blacklist:
+    forbidden_ipv6_functions:
         - gethostbyname
         - gethostbyname2
         - gethostbyaddr

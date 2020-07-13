@@ -81,7 +81,7 @@ enum {
     BLOCK_HEADER_FILE_EXTENSIONS,
     BLOCK_IGNORE,
     BLOCK_INSPECTIONS,
-    BLOCK_IPV6_BLACKLIST,
+    BLOCK_FORBIDDEN_IPV6_FUNCTIONS,
     BLOCK_JAVABYTECODE,
     BLOCK_KOJI,
     BLOCK_LTO,
@@ -505,8 +505,8 @@ static int read_cfgfile(struct rpminspect *ri, const char *filename)
                         block = BLOCK_BUILDHOST_SUBDOMAIN;
                     } else if (!strcmp(key, "elf")) {
                         group = BLOCK_ELF;
-                    } else if (group == BLOCK_ELF && !strcmp(key, "ipv6_blacklist")) {
-                        block = BLOCK_IPV6_BLACKLIST;
+                    } else if (group == BLOCK_ELF && !strcmp(key, "forbidden_ipv6_functions")) {
+                        block = BLOCK_FORBIDDEN_IPV6_FUNCTIONS;
                     } else if (!strcmp(key, "manpage")) {
                         block = BLOCK_MANPAGE;
                     } else if (!strcmp(key, "xml")) {
@@ -793,8 +793,8 @@ static int read_cfgfile(struct rpminspect *ri, const char *filename)
                         add_entry(&ri->forbidden_path_suffixes, t);
                     } else if (block == BLOCK_FORBIDDEN_DIRECTORIES) {
                         add_entry(&ri->forbidden_directories, t);
-                    } else if (block == BLOCK_IPV6_BLACKLIST) {
-                        add_entry(&ri->ipv6_blacklist, t);
+                    } else if (block == BLOCK_FORBIDDEN_IPV6_FUNCTIONS) {
+                        add_entry(&ri->forbidden_ipv6_functions, t);
                     } else if (block == BLOCK_BIN_PATHS) {
                         add_entry(&ri->bin_paths, t);
                     } else if (block == BLOCK_FORBIDDEN_OWNERS) {
