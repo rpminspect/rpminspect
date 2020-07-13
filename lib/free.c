@@ -65,7 +65,7 @@ void free_mapping(struct hsearch_data *table, string_list_t *keys)
  * librpminspect before they exit.
  */
 void free_rpminspect(struct rpminspect *ri) {
-    stat_whitelist_entry_t *swlentry = NULL;
+    fileinfo_entry_t *fientry = NULL;
     caps_whitelist_entry_t *cwlentry = NULL;
     caps_filelist_entry_t *cflentry = NULL;
     header_cache_entry_t *hentry = NULL;
@@ -84,19 +84,19 @@ void free_rpminspect(struct rpminspect *ri) {
     free(ri->vendor_data_dir);
     free(ri->licensedb);
 
-    if (ri->stat_whitelist) {
-        while (!TAILQ_EMPTY(ri->stat_whitelist)) {
-            swlentry = TAILQ_FIRST(ri->stat_whitelist);
-            TAILQ_REMOVE(ri->stat_whitelist, swlentry, items);
+    if (ri->fileinfo) {
+        while (!TAILQ_EMPTY(ri->fileinfo)) {
+            fientry = TAILQ_FIRST(ri->fileinfo);
+            TAILQ_REMOVE(ri->fileinfo, fientry, items);
 
-            free(swlentry->owner);
-            free(swlentry->group);
-            free(swlentry->filename);
+            free(fientry->owner);
+            free(fientry->group);
+            free(fientry->filename);
 
-            free(swlentry);
+            free(fientry);
         }
 
-        free(ri->stat_whitelist);
+        free(ri->fileinfo);
     }
 
     if (ri->caps_whitelist) {

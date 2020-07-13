@@ -844,10 +844,10 @@ static int read_cfgfile(struct rpminspect *ri, const char *filename)
 }
 
 /*
- * Initialize the stat-whitelist for the given product release.  If
- * the file cannot be found, return false.
+ * Initialize the fileinfo list for the given product release.  If the
+ * file cannot be found, return false.
  */
-bool init_stat_whitelist(struct rpminspect *ri) {
+bool init_fileinfo(struct rpminspect *ri) {
     char *filename = NULL;
     FILE *input = NULL;
     char *line = NULL;
@@ -855,20 +855,20 @@ bool init_stat_whitelist(struct rpminspect *ri) {
     ssize_t nread = 0;
     char *token = NULL;
     char *fnpart = NULL;
-    stat_whitelist_field_t field = MODE;
-    stat_whitelist_entry_t *entry = NULL;
+    fileinfo_field_t field = MODE;
+    fileinfo_entry_t *entry = NULL;
 
     assert(ri != NULL);
     assert(ri->vendor_data_dir != NULL);
     assert(ri->product_release != NULL);
 
     /* already initialized */
-    if (ri->stat_whitelist) {
+    if (ri->fileinfo) {
         return true;
     }
 
-    /* the actual stat-whitelist file */
-    xasprintf(&filename, "%s/%s/%s", ri->vendor_data_dir, STAT_WHITELIST_DIR, ri->product_release);
+    /* the actual fileinfo file */
+    xasprintf(&filename, "%s/%s/%s", ri->vendor_data_dir, FILEINFO_DIR, ri->product_release);
     assert(filename != NULL);
 
     input = fopen(filename, "r");
@@ -879,11 +879,11 @@ bool init_stat_whitelist(struct rpminspect *ri) {
     }
 
     /* initialize the list */
-    ri->stat_whitelist = calloc(1, sizeof(*(ri->stat_whitelist)));
-    assert(ri->stat_whitelist != NULL);
-    TAILQ_INIT(ri->stat_whitelist);
+    ri->fileinfo = calloc(1, sizeof(*(ri->fileinfo)));
+    assert(ri->fileinfo != NULL);
+    TAILQ_INIT(ri->fileinfo);
 
-    /* add all the entries to the stat-whitelist */
+    /* add all the entries to the fileinfo list */
     while ((nread = getline(&line, &len, input)) != -1) {
         /* skip blank lines and comments */
         if (*line == '#' || *line == '\n' || *line == '\r') {
@@ -922,8 +922,8 @@ bool init_stat_whitelist(struct rpminspect *ri) {
                 }
 
                 if (*token == '\0') {
-                    /* this is an invalid entry in the stat-whitelist */
-                    fprintf(stderr, _("*** Invalid filename in the stat-whitelist: %s\n"), fnpart);
+                    /* this is an invalid entry in the fileinfo list */
+                    fprintf(stderr, _("*** Invalid filename in the fileinfo list: %s\n"), fnpart);
                     fprintf(stderr, _("*** From this invalid line:\n"));
                     fprintf(stderr, "***     %s\n", line);
 
@@ -943,7 +943,7 @@ bool init_stat_whitelist(struct rpminspect *ri) {
 
         /* add the entry */
         if (entry != NULL) {
-            TAILQ_INSERT_TAIL(ri->stat_whitelist, entry, items);
+            TAILQ_INSERT_TAIL(ri->fileinfo, entry, items);
         }
 
         /* clean up */

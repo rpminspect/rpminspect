@@ -463,7 +463,7 @@ bool inspect_types(struct rpminspect *ri);
 
 #define DESC_REMOVEDFILES _("Report removed files from the before build to the after build.  Shared libraries get additional reporting output as they may be unexpected dependency removals.  Files removed with a security path prefix generated special reporting in case a security review is required.  Source RPMs and debuginfo files are ignored by this inspection.")
 
-#define DESC_ADDEDFILES _("Report added files from the before build to the after build.  Debuginfo files are ignored as are files that match the patterns defined in the configuration file.  Files added to security paths generate special reporting in case a security review is required.  New setuid and setgid files raise a security warning unless the file is in the whitelist.")
+#define DESC_ADDEDFILES _("Report added files from the before build to the after build.  Debuginfo files are ignored as are files that match the patterns defined in the configuration file.  Files added to security paths generate special reporting in case a security review is required.  New setuid and setgid files raise a security warning unless the file is in the fileinfo list.")
 
 #define DESC_UPSTREAM _("Report Source archives defined in the RPM spec file changing content between the before and after build. If the source archives change and the package is on the version-whitelist, the change is reported as informational. Otherwise the change is reported as a rebase of the package and requires inspection.")
 
@@ -477,7 +477,7 @@ bool inspect_types(struct rpminspect *ri);
 
 #define DESC_FILESIZE _("Report file size changes between builds.  If empty files became non-empty or non-empty files became empty, report those as results needing verification.  Report file change percentages as info-only.")
 
-#define DESC_PERMISSIONS _("Report stat(2) mode changes between builds.  Checks against the stat-whitelist for the product release specified or determined.  Any setuid or setgid changes will raise a message requiring Security Team review.")
+#define DESC_PERMISSIONS _("Report stat(2) mode changes between builds.  Checks against the fileinfo list for the product release specified or determined.  Any setuid or setgid changes will raise a message requiring Security Team review.")
 
 #define DESC_CAPABILITIES _("Report capabilities(7) changes between builds.  Checks against the capabilities whitelist for the product release specified or determined.  Any capabilities changes not whitelisted will raise a message requiring Security Team review.")
 

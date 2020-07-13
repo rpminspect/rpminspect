@@ -27,20 +27,20 @@
 #include "rpminspect.h"
 
 /**
- * @brief Check for the given path on the stat-whitelist.  If found,
+ * @brief Check for the given path on the fileinfo list.  If found,
  * check the st_mode value and report accordingly.
  *
  * @param ri The main struct rpminspect for the program.
- * @param file The file to find on the whitelist.
+ * @param file The file to find on the fileinfo list.
  * @param header The header string to use for results reporting if the
  *               file is found.
  * @param remedy The remedy string to use for results reporting if the
  *               file is found.
- * @return True if the file is on the whitelist, false otherwise.
+ * @return True if the file is on the fileinfo list, false otherwise.
  */
-bool on_stat_whitelist_mode(struct rpminspect *ri, const rpmfile_entry_t *file, const char *header, const char *remedy)
+bool match_fileinfo_mode(struct rpminspect *ri, const rpmfile_entry_t *file, const char *header, const char *remedy)
 {
-    stat_whitelist_entry_t *wlentry = NULL;
+    fileinfo_entry_t *fientry = NULL;
     struct result_params params;
 
     assert(ri != NULL);
@@ -52,18 +52,18 @@ bool on_stat_whitelist_mode(struct rpminspect *ri, const rpmfile_entry_t *file, 
     params.file = file->localpath;
     params.remedy = remedy;
 
-    if (init_stat_whitelist(ri)) {
-        TAILQ_FOREACH(wlentry, ri->stat_whitelist, items) {
-            if (!strcmp(file->localpath, wlentry->filename)) {
-                if (file->st.st_mode == wlentry->mode) {
-                    xasprintf(&params.msg, _("%s on %s carries mode %04o, but is on the stat whitelist"), file->localpath, params.arch, file->st.st_mode);
+    if (init_fileinfo(ri)) {
+        TAILQ_FOREACH(fientry, ri->fileinfo, items) {
+            if (!strcmp(file->localpath, fientry->filename)) {
+                if (file->st.st_mode == fientry->mode) {
+                    xasprintf(&params.msg, _("%s on %s carries mode %04o, but is on the fileinfo list"), file->localpath, params.arch, file->st.st_mode);
                     params.severity = RESULT_INFO;
                     params.waiverauth = WAIVABLE_BY_ANYONE;
                     add_result(ri, &params);
                     free(params.msg);
                     return true;
                 } else {
-                    xasprintf(&params.msg, _("%s on %s carries mode %04o, is on the stat whitelist but expected mode %04o"), file->localpath, params.arch, file->st.st_mode, wlentry->mode);
+                    xasprintf(&params.msg, _("%s on %s carries mode %04o, is on the fileinfo list but expected mode %04o"), file->localpath, params.arch, file->st.st_mode, fientry->mode);
                     params.severity = RESULT_VERIFY;
                     params.waiverauth = WAIVABLE_BY_SECURITY;
                     add_result(ri, &params);
@@ -76,7 +76,7 @@ bool on_stat_whitelist_mode(struct rpminspect *ri, const rpmfile_entry_t *file, 
         }
     }
 
-    /* catch anything not on the stat-whitelist with setuid/setgid */
+    /* catch anything not on the fileinfo list with setuid/setgid */
     if ((file->st.st_mode & S_ISUID) || (file->st.st_mode & S_ISGID)) {
         xasprintf(&params.msg, _("%s on %s carries insecure mode %04o, Security Team review may be required"), file->localpath, params.arch, file->st.st_mode);
         params.severity = RESULT_BAD;
@@ -89,23 +89,23 @@ bool on_stat_whitelist_mode(struct rpminspect *ri, const rpmfile_entry_t *file, 
 }
 
 /**
- * @brief Check for the given path on the stat-whitelist.  If found,
+ * @brief Check for the given path on the fileinfo list.  If found,
  * check the st_uid value and report accordingly.
  *
  * @param ri The main struct rpminspect for the program.
- * @param file The file to find on the whitelist.
+ * @param file The file to find on the fileinfo list.
  * @param header The header string to use for results reporting if the
  *               file is found.
  * @param remedy The remedy string to use for results reporting if the
  *               file is found.
- * @return True if the file is on the whitelist, false otherwise.
+ * @return True if the file is on the fileinfo list, false otherwise.
  */
-bool on_stat_whitelist_owner(struct rpminspect *ri, const rpmfile_entry_t *file, const char *owner, const char *header, const char *remedy)
+bool match_fileinfo_owner(struct rpminspect *ri, const rpmfile_entry_t *file, const char *owner, const char *header, const char *remedy)
 {
     struct passwd pw;
     struct passwd *pwp = NULL;
     char buf[sysconf(_SC_GETPW_R_SIZE_MAX)];
-    stat_whitelist_entry_t *wlentry = NULL;
+    fileinfo_entry_t *fientry = NULL;
     struct result_params params;
 
     assert(ri != NULL);
@@ -118,28 +118,28 @@ bool on_stat_whitelist_owner(struct rpminspect *ri, const rpmfile_entry_t *file,
     params.file = file->localpath;
     params.remedy = remedy;
 
-    if (init_stat_whitelist(ri)) {
-        TAILQ_FOREACH(wlentry, ri->stat_whitelist, items) {
-            if (!strcmp(file->localpath, wlentry->filename)) {
-                /* get the UID of the file on the whitelist */
-                getpwnam_r(wlentry->owner, &pw, buf, sizeof(buf), &pwp);
+    if (init_fileinfo(ri)) {
+        TAILQ_FOREACH(fientry, ri->fileinfo, items) {
+            if (!strcmp(file->localpath, fientry->filename)) {
+                /* get the UID of the file on the fileinfo list */
+                getpwnam_r(fientry->owner, &pw, buf, sizeof(buf), &pwp);
 
-                if (pwp && (file->st.st_uid == pw.pw_uid) && !strcmp(owner, wlentry->owner)) {
-                    xasprintf(&params.msg, _("%s on %s carries owner %s (UID %d) and is on the stat whitelist"), file->localpath, params.arch, wlentry->owner, file->st.st_uid);
+                if (pwp && (file->st.st_uid == pw.pw_uid) && !strcmp(owner, fientry->owner)) {
+                    xasprintf(&params.msg, _("%s on %s carries owner %s (UID %d) and is on the fileinfo list"), file->localpath, params.arch, fientry->owner, file->st.st_uid);
                     params.severity = RESULT_INFO;
                     params.waiverauth = WAIVABLE_BY_ANYONE;
                     add_result(ri, &params);
                     free(params.msg);
                     return true;
                 } else if (pwp == NULL) {
-                    xasprintf(&params.msg, _("%s on %s carries owner %s (UID %d) and is on the stat whitelist, but the UID cannot be verified"), file->localpath, params.arch, wlentry->owner, file->st.st_uid);
+                    xasprintf(&params.msg, _("%s on %s carries owner %s (UID %d) and is on the fileinfo list, but the UID cannot be verified"), file->localpath, params.arch, fientry->owner, file->st.st_uid);
                     params.severity = RESULT_VERIFY;
                     params.waiverauth = WAIVABLE_BY_ANYONE;
                     add_result(ri, &params);
                     free(params.msg);
                     return true;
                 } else {
-                    xasprintf(&params.msg, _("%s on %s carries owner %s (UID %d), but is on the stat whitelist with expected owner %s (UID %d)"), file->localpath, params.arch, owner, file->st.st_uid, wlentry->owner, pw.pw_uid);
+                    xasprintf(&params.msg, _("%s on %s carries owner %s (UID %d), but is on the fileinfo list with expected owner %s (UID %d)"), file->localpath, params.arch, owner, file->st.st_uid, fientry->owner, pw.pw_uid);
                     params.severity = RESULT_VERIFY;
                     params.waiverauth = WAIVABLE_BY_SECURITY;
                     add_result(ri, &params);
@@ -156,23 +156,23 @@ bool on_stat_whitelist_owner(struct rpminspect *ri, const rpmfile_entry_t *file,
 }
 
 /**
- * @brief Check for the given path on the stat-whitelist.  If found,
+ * @brief Check for the given path on the fileinfo list.  If found,
  * check the st_gid value and report accordingly.
  *
  * @param ri The main struct rpminspect for the program.
- * @param file The file to find on the whitelist.
+ * @param file The file to find on the fileinfo list.
  * @param header The header string to use for results reporting if the
  *               file is found.
  * @param remedy The remedy string to use for results reporting if the
  *               file is found.
- * @return True if the file is on the whitelist, false otherwise.
+ * @return True if the file is on the fileinfo list, false otherwise.
  */
-bool on_stat_whitelist_group(struct rpminspect *ri, const rpmfile_entry_t *file, const char *group, const char *header, const char *remedy)
+bool match_fileinfo_group(struct rpminspect *ri, const rpmfile_entry_t *file, const char *group, const char *header, const char *remedy)
 {
     struct group gr;
     struct group *grp = NULL;
     char buf[sysconf(_SC_GETGR_R_SIZE_MAX)];
-    stat_whitelist_entry_t *wlentry = NULL;
+    fileinfo_entry_t *fientry = NULL;
     struct result_params params;
 
     assert(ri != NULL);
@@ -184,28 +184,28 @@ bool on_stat_whitelist_group(struct rpminspect *ri, const rpmfile_entry_t *file,
     params.file = file->localpath;
     params.remedy = remedy;
 
-    if (init_stat_whitelist(ri)) {
-        TAILQ_FOREACH(wlentry, ri->stat_whitelist, items) {
-            if (!strcmp(file->localpath, wlentry->filename)) {
-                /* get the GID of the file on the whitelist */
-                getgrnam_r(wlentry->group, &gr, buf, sizeof(buf), &grp);
+    if (init_fileinfo(ri)) {
+        TAILQ_FOREACH(fientry, ri->fileinfo, items) {
+            if (!strcmp(file->localpath, fientry->filename)) {
+                /* get the GID of the file on the fileinfo list */
+                getgrnam_r(fientry->group, &gr, buf, sizeof(buf), &grp);
 
                 if (grp && (file->st.st_gid == gr.gr_gid) && !strcmp(group, gr.gr_name)) {
-                    xasprintf(&params.msg, _("%s on %s carries group %s (GID %d) and is on the stat whitelist"), file->localpath, params.arch, wlentry->group, file->st.st_gid);
+                    xasprintf(&params.msg, _("%s on %s carries group %s (GID %d) and is on the fileinfo list"), file->localpath, params.arch, fientry->group, file->st.st_gid);
                     params.severity = RESULT_INFO;
                     params.waiverauth = WAIVABLE_BY_ANYONE;
                     add_result(ri, &params);
                     free(params.msg);
                     return true;
                 } else if (grp == NULL) {
-                    xasprintf(&params.msg, _("%s on %s carries group %s (GID %d) and is on the stat whitelist, but the GID cannot be verified"), file->localpath, params.arch, wlentry->group, file->st.st_gid);
+                    xasprintf(&params.msg, _("%s on %s carries group %s (GID %d) and is on the fileinfo list, but the GID cannot be verified"), file->localpath, params.arch, fientry->group, file->st.st_gid);
                     params.severity = RESULT_VERIFY;
                     params.waiverauth = WAIVABLE_BY_ANYONE;
                     add_result(ri, &params);
                     free(params.msg);
                     return true;
                 } else {
-                    xasprintf(&params.msg, _("%s on %s carries group %s (GID %d), but is on the stat whitelist with expected group %s (GID %d)"), file->localpath, params.arch, group, file->st.st_gid, wlentry->group, gr.gr_gid);
+                    xasprintf(&params.msg, _("%s on %s carries group %s (GID %d), but is on the fileinfo list with expected group %s (GID %d)"), file->localpath, params.arch, group, file->st.st_gid, fientry->group, gr.gr_gid);
                     params.severity = RESULT_VERIFY;
                     params.waiverauth = WAIVABLE_BY_SECURITY;
                     add_result(ri, &params);

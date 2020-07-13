@@ -105,10 +105,10 @@
 #define LICENSES_DIR "licenses"
 
 /**
- * @def STAT_WHITELIST_DIR
- * Name of the stat(2) whitelist subdirectory in VENDOR_DATA_DIR.
+ * @def FILEINFO_DIR
+ * Name of the fileinfo (stat(2)) list subdirectory in VENDOR_DATA_DIR.
  */
-#define STAT_WHITELIST_DIR "stat-whitelist"
+#define FILEINFO_DIR "fileinfo"
 
 /**
  * @def VERSION_WHITELIST_DIR

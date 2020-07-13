@@ -16,6 +16,7 @@ librpminspect_sources = [
     'checksums.c',
     'copyfile.c',
     'debug.c',
+    'fileinfo.c',
     'files.c',
     'flags.c',
     'free.c',
@@ -77,7 +78,6 @@ librpminspect_sources = [
     'strfuncs.c',
     'tty.c',
     'unpack.c',
-    'whitelist.c',
 ]
 librpminspect = library(
     'rpminspect',

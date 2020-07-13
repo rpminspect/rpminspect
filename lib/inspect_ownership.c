@@ -173,7 +173,7 @@ static bool ownership_driver(struct rpminspect *ri, rpmfile_entry_t *file) {
             bin = true;
 
             /* Check the owner */
-            if (strcmp(owner, ri->bin_owner) && !on_stat_whitelist_owner(ri, file, owner, HEADER_OWNERSHIP, NULL)) {
+            if (strcmp(owner, ri->bin_owner) && !match_fileinfo_owner(ri, file, owner, HEADER_OWNERSHIP, NULL)) {
                 xasprintf(&params.msg, _("File %s has owner `%s` on %s, but should be `%s`"), file->localpath, owner, arch, ri->bin_owner);
                 params.severity = RESULT_BAD;
                 params.waiverauth = WAIVABLE_BY_ANYONE;
@@ -216,7 +216,7 @@ static bool ownership_driver(struct rpminspect *ri, rpmfile_entry_t *file) {
                         free(params.msg);
                         result = false;
                     }
-                } else if (!on_stat_whitelist_group(ri, file, group, HEADER_OWNERSHIP, NULL)) {
+                } else if (!match_fileinfo_group(ri, file, group, HEADER_OWNERSHIP, NULL)) {
                     xasprintf(&params.msg, _("File %s has group `%s` on %s, but should be `%s`"), file->localpath, group, arch, ri->bin_group);
                     params.severity = RESULT_BAD;
                     params.waiverauth = WAIVABLE_BY_ANYONE;
