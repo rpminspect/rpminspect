@@ -85,7 +85,7 @@ static bool filesize_driver(struct rpminspect *ri, rpmfile_entry_t *file)
         params.noun = _("empty ${FILE}");
         result = false;
     } else {
-        change = ((file->st.st_size - file->peer_file->st.st_size) / file->peer_file->st.st_size) * 100;
+        change = ((file->st.st_size - file->peer_file->st.st_size) * 100 / file->peer_file->st.st_size);
         params.severity = RESULT_INFO;
         params.waiverauth = NOT_WAIVABLE;
 
