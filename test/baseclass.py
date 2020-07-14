@@ -177,9 +177,6 @@ class TestSRPM(RequiresRpminspect):
         self.result = "OK"
         self.waiver_auth = "Not Waivable"
 
-    def configFile(self):
-        RequiresRpminspect.configFile(self)
-
     def runTest(self):
         self.configFile()
 
@@ -251,9 +248,6 @@ class TestCompareSRPM(RequiresRpminspect):
         self.exitcode = 0
         self.result = "OK"
         self.waiver_auth = "Not Waivable"
-
-    def configFile(self):
-        RequiresRpminspect.configFile(self)
 
     def runTest(self):
         self.configFile()
