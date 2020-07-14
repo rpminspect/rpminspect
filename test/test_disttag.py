@@ -199,9 +199,7 @@ class DistTagInMacroSRPM(RequiresRpminspect):
             self.dumpResults()
 
         self.assertEqual(self.p.returncode, self.exitcode)
-        self.assertTrue(
-            check_results(self.results, self.label, self.result, self.waiver_auth)
-        )
+        check_results(self.results, self.label, self.result, self.waiver_auth)
 
     def tearDown(self):
         self.tmpdir.cleanup()
@@ -293,9 +291,7 @@ class TabbedDistTagInMacroSRPM(RequiresRpminspect):
             self.dumpResults()
 
         self.assertEqual(self.p.returncode, self.exitcode)
-        self.assertTrue(
-            check_results(self.results, self.label, self.result, self.waiver_auth)
-        )
+        check_results(self.results, self.label, self.result, self.waiver_auth)
 
     def tearDown(self):
         self.tmpdir.cleanup()
