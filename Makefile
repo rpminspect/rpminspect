@@ -27,6 +27,9 @@ endif
 # the Makefile target
 TARGET_ARG = `arg="$(filter-out $@,$(MAKECMDGOALS))" && echo $${arg:-${1}}`
 
+# regexp of email addresses of primary authors on the project
+PRIMARY_AUTHORS = dcantrell@redhat.com
+
 all: setup
 	$(NINJA) -C $(MESON_BUILD_DIR) -v
 
@@ -82,6 +85,17 @@ instreqs:
 		$(topdir)/osdeps/$(OS)/post.sh ; \
 	fi
 
+authors:
+	echo "Primary Authors" > AUTHORS.md
+	echo "===============" >> AUTHORS.md
+	echo >> AUTHORS.md
+	git log --pretty="%an <%ae>" | sort -u | grep -E "$(PRIMARY_AUTHORS)" | sed -e 's|^|- |g' | sed G >> AUTHORS.md
+	echo >> AUTHORS.md
+	echo "Contributors" >> AUTHORS.md
+	echo "============" >> AUTHORS.md
+	echo >> AUTHORS.md
+	git log --pretty="%an <%ae>" | sort -u | grep -vE "$(PRIMARY_AUTHORS)" | sed -e 's|^|- |g' | sed G >> AUTHORS.md
+
 help:
 	@echo "rpminspect helper Makefile"
 	@echo "The source tree uses meson(1) for building and testing, but this Makefile"
@@ -97,6 +111,7 @@ help:
 	@echo "    koji         Run 'make srpm' then 'utils/submit-koji-builds.sh'"
 	@echo "    clean        Run 'rm -rf $(MESON_BUILD_DIR)'"
 	@echo "    instreqs     Install required build and runtime packages"
+	@echo "    authors      Generate a new AUTHORS.md file"
 	@echo
 	@echo "To build:"
 	@echo "    make"
