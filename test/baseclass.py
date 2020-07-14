@@ -162,7 +162,7 @@ class RequiresRpminspect(unittest.TestCase):
 # Base test case class that tests on the SRPM package only
 class TestSRPM(RequiresRpminspect):
     def setUp(self):
-        RequiresRpminspect.setUp(self)
+        super().setUp()
         self.rpm = rpmfluff.SimpleRpmBuild(AFTER_NAME, AFTER_VER, AFTER_REL)
 
         # turn off all rpmbuild post processing stuff for the purposes of testing
@@ -232,7 +232,7 @@ class TestSRPM(RequiresRpminspect):
 # Base test case class that compares a before and after SRPM
 class TestCompareSRPM(RequiresRpminspect):
     def setUp(self):
-        RequiresRpminspect.setUp(self)
+        super().setUp()
         self.before_rpm = rpmfluff.SimpleRpmBuild(BEFORE_NAME, BEFORE_VER, BEFORE_REL)
         self.after_rpm = rpmfluff.SimpleRpmBuild(AFTER_NAME, AFTER_VER, AFTER_REL)
 
