@@ -87,10 +87,10 @@
  */
 
 /**
- * @def ABI_CHECKING_WHITELIST_DIR
- * Name of the ABI checking whitelist subdirectory in VENDOR_DATA_DIR.
+ * @def ABI_DIR
+ * Name of the ABI checking subdirectory in VENDOR_DATA_DIR.
  */
-#define ABI_CHECKING_WHITELIST_DIR "abi-checking-whitelist"
+#define ABI_DIR "abi"
 
 /**
  * @def CAPABILITIES_DIR

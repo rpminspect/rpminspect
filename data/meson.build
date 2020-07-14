@@ -1,7 +1,7 @@
 # Install data files
 install_subdir(
-    'abi-checking-whitelist',
-    install_dir : get_option('datadir') + '/rpminspect/abi-checking-whitelist',
+    'abi',
+    install_dir : get_option('datadir') + '/rpminspect/abi',
     strip_directory : true
 )
 
