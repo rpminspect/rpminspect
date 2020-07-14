@@ -49,12 +49,18 @@ static bool removedfiles_driver(struct rpminspect *ri, rpmfile_entry_t *file)
     bool result = false;
     char *type = NULL;
     const char *arch = NULL;
+    bool rebase = false;
     char *soname = NULL;
     string_entry_t *entry = NULL;
     struct result_params params;
 
     /* Any entry with a peer has not been removed. */
     if (file->peer_file) {
+        return true;
+    }
+
+    /* Skip moved files */
+    if (file->moved_path && file->peer_file->moved_path) {
         return true;
     }
 
@@ -76,15 +82,22 @@ static bool removedfiles_driver(struct rpminspect *ri, rpmfile_entry_t *file)
     /* Collect the RPM architecture and file MIME type */
     type = get_mime_type(file);
     arch = get_rpm_header_arch(file->rpm_header);
+    rebase = is_rebase(ri);
 
     /* Set up result parameters */
     init_result_params(&params);
-    params.severity = RESULT_VERIFY;
-    params.waiverauth = WAIVABLE_BY_ANYONE;
     params.header = HEADER_REMOVEDFILES;
-    params.remedy = REMEDY_REMOVEDFILES;
     params.arch = arch;
     params.file = file->localpath;
+
+    if (rebase) {
+        params.severity = RESULT_INFO;
+        params.waiverauth = NOT_WAIVABLE;
+    } else {
+        params.severity = RESULT_VERIFY;
+        params.waiverauth = WAIVABLE_BY_ANYONE;
+        params.remedy = REMEDY_REMOVEDFILES;
+    }
 
     /* Set the waiver type if this is a file of security concern */
     if (ri->security_path_prefix) {

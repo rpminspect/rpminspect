@@ -57,28 +57,35 @@ typedef TAILQ_HEAD(pair_entry_s, _pair_entry_t) pair_list_t;
 /*
  * A file is information about a file in an RPM payload.
  *
- * If fullpath is not NULL, it is the absolute path of the unpacked file.
- * Not every file is unpacked (e.g., block and char special files are skipped).
- * The ownership and permissions of the unpacked file may not match the
- * intended owner and mode from the RPM metadata.
+ * If fullpath is not NULL, it is the absolute path of the unpacked
+ * file.  Not every file is unpacked (e.g., block and char special
+ * files are skipped).  The ownership and permissions of the unpacked
+ * file may not match the intended owner and mode from the RPM
+ * metadata.
  *
- * "localpath" is file path from the RPM payload, and "st" is the metadata about the file,
- * as described by the RPM payload. localpath and st may not necessarily match
- * the description of the file in the RPM header.
+ * "localpath" is file path from the RPM payload, and "st" is the
+ * metadata about the file, as described by the RPM payload. localpath
+ * and st may not necessarily match the description of the file in the
+ * RPM header.
  *
- * The rpm_header field is shared by multiple files. Each file entry must
- * call headerFree to dereference the header.
+ * The rpm_header field is shared by multiple files. Each file entry
+ * must call headerFree to dereference the header.
  *
- * idx is the index for this file into the RPM array tags such as RPMTAG_FILESIZES.
+ * idx is the index for this file into the RPM array tags such as
+ * RPMTAG_FILESIZES.
  *
- * type is the MIME type string that you would get from 'file --mime-type'.
+ * type is the MIME type string that you would get from 'file
+ * --mime-type'.
  *
  * cap is the getcap() value for the file.
  *
  * checksum is a string containing the human-readable checksum digest
  *
- * probably_moved_path is true if the file moved path locations between the before
- * after after build, false otherwise
+ * moved_path is true if the file moved path locations between the
+ * before and after build, false otherwise
+ *
+ * moved_subpackage is true if the file moved between subpackages
+ * between the before and after build, false otherwise.
  */
 typedef struct _rpmfile_entry_t {
     Header rpm_header;
@@ -90,7 +97,8 @@ typedef struct _rpmfile_entry_t {
     char *checksum;
     cap_t cap;
     struct _rpmfile_entry_t *peer_file;
-    bool probably_moved_path;
+    bool moved_path;
+    bool moved_subpackage;
     TAILQ_ENTRY(_rpmfile_entry_t) items;
 } rpmfile_entry_t;
 
@@ -254,14 +262,14 @@ typedef struct _header_cache_entry_t {
     TAILQ_ENTRY(_header_cache_entry_t) items;
 } header_cache_entry_t;
 
+typedef TAILQ_HEAD(header_cache_entry_s, _header_cache_entry_t) header_cache_t;
+
 /* Product release string favoring */
 typedef enum _favor_release_t {
     FAVOR_NONE = 0,
     FAVOR_OLDEST = 1,
     FAVOR_NEWEST = 2
 } favor_release_t;
-
-typedef TAILQ_HEAD(header_cache_entry_s, _header_cache_entry_t) header_cache_t;
 
 /*
  * Configuration and state instance for librpminspect run.
@@ -415,6 +423,7 @@ struct rpminspect {
     header_cache_t *header_cache;   /* RPM header cache */
     char *before_rel;               /* before Release w/o %{?dist} */
     char *after_rel;                /* after Release w/o ${?dist} */
+    int rebase_build;               /* indicates if this is a rebased build */
 
     /* spec file macros */
     pair_list_t *macros;

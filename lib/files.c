@@ -432,11 +432,11 @@ static void set_peer(rpmfile_entry_t *file, ENTRY *eptr)
  * another peer.
  *
  * In cases where the peer found has changed paths or subpackages,
- * this function will modify the probably_moved_path and
- * probably_moved_subpackage booleans as appropriate.  The purpose of
- * this is to allow inspection functions to both know the probably
- * file peer but also if it moved or not between builds.  This helps
- * with the reporting messages.
+ * this function will modify the moved_path and moved_subpackage
+ * booleans as appropriate.  The purpose of this is to allow
+ * inspection functions to both know the probably file peer but also
+ * if it moved or not between builds.  This helps with the reporting
+ * messages.
  *
  * @param file rpmfile_entry_t with missing peer_file.
  * @param after After build rpmfile_t list.
@@ -524,28 +524,31 @@ static void find_one_peer(rpmfile_entry_t *file, rpmfile_t *after, struct hsearc
         }
     }
 
-    /* See if this file peer probably moved */
+    /* See if this file peer moved */
     if (file->peer_file == NULL && S_ISREG(file->st.st_mode)) {
         /* .build-id files can be ignored, they always move */
         if (strstr(file->localpath, BUILD_ID_DIR)) {
             return;
         }
 
-        /* match the basename with a leading '/' */
-        xasprintf(&search_path, "/%s", basename(file->localpath));
-        assert(search_path);
-        DEBUG_PRINT("search_path=|%s|\n", search_path);
-
-        /* look for a possible match for files that move paths */
-        /*
-         * This is a best guess that checks the following:
-         * - basename (but with a leading '/')
-         * - MIME type
-         *
-         * This may need refinement down the road to check other things.
-         */
+        /* look for a possible match for files that move locations */
         TAILQ_FOREACH(after_file, after, items) {
-            if (strsuffix(after_file->localpath, search_path) && !strcmp(get_mime_type(file), get_mime_type(after_file))) {
+            /* skip files with peers */
+            if (after_file->peer_file) {
+                continue;
+            }
+
+            /* match files that move between subpackages */
+            /*
+             * This is a best guess that checks the following:
+             * - localpath
+             * - MIME type
+             *
+             * This may need refinement down the road to check other things.
+             */
+            if (strsuffix(after_file->localpath, file->localpath) &&
+                !strcmp(get_mime_type(file), get_mime_type(after_file)) &&
+                strcmp(headerGetString(file->rpm_header, RPMTAG_NAME), headerGetString(after_file->rpm_header, RPMTAG_NAME))) {
                 DEBUG_PRINT("%s probably moved to %s\n", file->localpath, after_file->localpath);
 
                 e.key = after_file->localpath;
@@ -554,15 +557,13 @@ static void find_one_peer(rpmfile_entry_t *file, rpmfile_t *after, struct hsearc
 
                 if (hsearch_result != 0 && eptr->data != NULL) {
                     set_peer(file, eptr);
-                    file->probably_moved_path = true;
-                    file->peer_file->probably_moved_path = true;
-                    free(search_path);
+                    DEBUG_PRINT("moved subpackage\n");
+                    file->moved_subpackage = true;
+                    file->peer_file->moved_subpackage = true;
                     return;
                 }
             }
         }
-
-        free(search_path);
     }
 
     return;

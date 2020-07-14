@@ -36,6 +36,7 @@ static bool addedfiles_driver(struct rpminspect *ri, rpmfile_entry_t *file)
     char *subpath = NULL;
     char *localpath = NULL;
     const char *arch = NULL;
+    bool rebase = false;
     string_entry_t *entry = NULL;
     struct result_params params;
 
@@ -46,6 +47,11 @@ static bool addedfiles_driver(struct rpminspect *ri, rpmfile_entry_t *file)
 
     /* Ignore source RPMs */
     if (headerIsSource(file->rpm_header)) {
+        return true;
+    }
+
+    /* Skip moved files */
+    if (file->moved_path && file->peer_file->moved_path) {
         return true;
     }
 
@@ -72,6 +78,9 @@ static bool addedfiles_driver(struct rpminspect *ri, rpmfile_entry_t *file)
 
     /* The architecture is used in reporting messages */
     arch = get_rpm_header_arch(file->rpm_header);
+
+    /* Is this a rebased build or not? */
+    rebase = is_rebase(ri);
 
     /* Set up the result parameters */
     init_result_params(&params);
@@ -157,8 +166,14 @@ static bool addedfiles_driver(struct rpminspect *ri, rpmfile_entry_t *file)
     }
 
     /* Default for new files */
-    params.severity = RESULT_VERIFY;
-    params.waiverauth = WAIVABLE_BY_SECURITY;
+    if (rebase) {
+        params.severity = RESULT_INFO;
+        params.waiverauth = NOT_WAIVABLE;
+    } else {
+        params.severity = RESULT_VERIFY;
+        params.waiverauth = WAIVABLE_BY_ANYONE;
+    }
+
     xasprintf(&params.msg, _("`%s` added on %s"), file->localpath, arch);
     add_result(ri, &params);
 

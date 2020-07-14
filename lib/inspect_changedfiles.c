@@ -102,8 +102,6 @@ static bool changedfiles_driver(struct rpminspect *ri, rpmfile_entry_t *file)
     char *after_tmp = NULL;
     int fd;
     char magic[4];
-    const char *bv = NULL;
-    const char *av = NULL;
     bool rebase = false;
     struct result_params params;
 
@@ -135,14 +133,7 @@ static bool changedfiles_driver(struct rpminspect *ri, rpmfile_entry_t *file)
      * Determine if we are running on a rebased package or just a
      * package update.
      */
-    bv = headerGetString(file->peer_file->rpm_header, RPMTAG_VERSION);
-    av = headerGetString(file->rpm_header, RPMTAG_VERSION);
-
-    if (strcmp(bv, av)) {
-        rebase = true;
-    } else {
-        rebase = false;
-    }
+    rebase = is_rebase(ri);
 
     /* The architecture is used in reporting messages */
     arch = get_rpm_header_arch(file->rpm_header);

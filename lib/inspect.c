@@ -55,6 +55,7 @@ struct inspect inspections[] = {
     { INSPECT_MODULARITY,    "modularity",    true,  &inspect_modularity },
     { INSPECT_JAVABYTECODE,  "javabytecode",  true,  &inspect_javabytecode },
     { INSPECT_CHANGEDFILES,  "changedfiles",  false, &inspect_changedfiles },
+    { INSPECT_MOVEDFILES,    "movedfiles",    false, &inspect_movedfiles },
     { INSPECT_REMOVEDFILES,  "removedfiles",  false, &inspect_removedfiles },
     { INSPECT_ADDEDFILES,    "addedfiles",    false, &inspect_addedfiles },
     { INSPECT_UPSTREAM,      "upstream",      false, &inspect_upstream },

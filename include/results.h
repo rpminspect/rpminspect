@@ -40,6 +40,7 @@
 #define HEADER_MODULARITY    "modularity"
 #define HEADER_JAVABYTECODE  "java-bytecode"
 #define HEADER_CHANGEDFILES  "changed-files"
+#define HEADER_MOVEDFILES    "moved-files"
 #define HEADER_REMOVEDFILES  "removed-files"
 #define HEADER_ADDEDFILES    "added-files"
 #define HEADER_UPSTREAM      "upstream"
@@ -114,11 +115,14 @@
 /* changedfiles */
 #define REMEDY_CHANGEDFILES _("Unexpected file changes were found.  Verify these changes are correct.  If they are not, adjust the build to prevent file changes.")
 
+/* movedfiles */
+#define REMEDY_MOVEDFILES _("Unexpected file moves were found.  Verify these changes are correct.  If they are not, adjust the build to prevent the file moves between builds.")
+
 /* removedfiles */
-#define REMEDY_REMOVEDFILES _("Unexpected file removals were found.  Verify these changes are correct.  If they are not, adjust the build to prevent the file removals.")
+#define REMEDY_REMOVEDFILES _("Unexpected file removals were found.  Verify these changes are correct.  If they are not, adjust the build to prevent the file removals between builds.")
 
 /* addedfiles */
-#define REMEDY_ADDEDFILES _("Unexpected file additions were found.  Verify these changes are correct.  If they are not, adjust the build to prevent the file additions.")
+#define REMEDY_ADDEDFILES _("Unexpected file additions were found.  Verify these changes are correct.  If they are not, adjust the build to prevent the file additions between builds.")
 
 /* upstream */
 #define REMEDY_UPSTREAM _("Unexpected changed source archive content.  The version of the package did not change between builds, but the source archive content did.  This may be deliberate, but needs inspection.")

@@ -211,6 +211,15 @@ bool inspect_changedfiles(struct rpminspect *ri);
  *
  * @param ri Pointer to the struct rpminspect for the program.
  */
+bool inspect_movedfiles(struct rpminspect *ri);
+
+/**
+ * @brief
+ *
+ *
+ *
+ * @param ri Pointer to the struct rpminspect for the program.
+ */
 bool inspect_removedfiles(struct rpminspect *ri);
 
 /**
@@ -413,26 +422,27 @@ bool inspect_types(struct rpminspect *ri);
 #define INSPECT_MODULARITY                  (((uint64_t) 1) << 10)
 #define INSPECT_JAVABYTECODE                (((uint64_t) 1) << 11)
 #define INSPECT_CHANGEDFILES                (((uint64_t) 1) << 12)
-#define INSPECT_REMOVEDFILES                (((uint64_t) 1) << 13)
-#define INSPECT_ADDEDFILES                  (((uint64_t) 1) << 14)
-#define INSPECT_UPSTREAM                    (((uint64_t) 1) << 15)
-#define INSPECT_OWNERSHIP                   (((uint64_t) 1) << 16)
-#define INSPECT_SHELLSYNTAX                 (((uint64_t) 1) << 17)
-#define INSPECT_ANNOCHECK                   (((uint64_t) 1) << 18)
-#define INSPECT_DT_NEEDED                   (((uint64_t) 1) << 19)
-#define INSPECT_FILESIZE                    (((uint64_t) 1) << 20)
-#define INSPECT_PERMISSIONS                 (((uint64_t) 1) << 21)
-#define INSPECT_CAPABILITIES                (((uint64_t) 1) << 22)
-#define INSPECT_KMOD                        (((uint64_t) 1) << 23)
-#define INSPECT_ARCH                        (((uint64_t) 1) << 24)
-#define INSPECT_SUBPACKAGES                 (((uint64_t) 1) << 25)
-#define INSPECT_CHANGELOG                   (((uint64_t) 1) << 26)
-#define INSPECT_PATHMIGRATION               (((uint64_t) 1) << 27)
-#define INSPECT_LTO                         (((uint64_t) 1) << 28)
-#define INSPECT_SYMLINKS                    (((uint64_t) 1) << 29)
-#define INSPECT_LOSTPAYLOAD                 (((uint64_t) 1) << 30)
-#define INSPECT_FILES                       (((uint64_t) 1) << 31)
-#define INSPECT_TYPES                       (((uint64_t) 1) << 32)
+#define INSPECT_MOVEDFILES                  (((uint64_t) 1) << 13)
+#define INSPECT_REMOVEDFILES                (((uint64_t) 1) << 14)
+#define INSPECT_ADDEDFILES                  (((uint64_t) 1) << 15)
+#define INSPECT_UPSTREAM                    (((uint64_t) 1) << 16)
+#define INSPECT_OWNERSHIP                   (((uint64_t) 1) << 17)
+#define INSPECT_SHELLSYNTAX                 (((uint64_t) 1) << 18)
+#define INSPECT_ANNOCHECK                   (((uint64_t) 1) << 19)
+#define INSPECT_DT_NEEDED                   (((uint64_t) 1) << 20)
+#define INSPECT_FILESIZE                    (((uint64_t) 1) << 21)
+#define INSPECT_PERMISSIONS                 (((uint64_t) 1) << 22)
+#define INSPECT_CAPABILITIES                (((uint64_t) 1) << 23)
+#define INSPECT_KMOD                        (((uint64_t) 1) << 24)
+#define INSPECT_ARCH                        (((uint64_t) 1) << 25)
+#define INSPECT_SUBPACKAGES                 (((uint64_t) 1) << 26)
+#define INSPECT_CHANGELOG                   (((uint64_t) 1) << 27)
+#define INSPECT_PATHMIGRATION               (((uint64_t) 1) << 28)
+#define INSPECT_LTO                         (((uint64_t) 1) << 29)
+#define INSPECT_SYMLINKS                    (((uint64_t) 1) << 30)
+#define INSPECT_LOSTPAYLOAD                 (((uint64_t) 1) << 31)
+#define INSPECT_FILES                       (((uint64_t) 1) << 32)
+#define INSPECT_TYPES                       (((uint64_t) 1) << 33)
 
 /* Long descriptions for the inspections */
 #define DESC_LICENSE _("Verify the string specified in the License tag of the RPM metadata describes permissible software licenses as defined by the license database. Also checks to see if the License tag contains any unprofessional words as defined in the configuration file.")
@@ -461,9 +471,11 @@ bool inspect_types(struct rpminspect *ri);
 
 #define DESC_CHANGEDFILES _("Report changed files from the before build to the after build.  Certain file changes will raise additional warnings if the concern is more critical than just reporting changes (e.g., a suspected security impact).  Any gzip, bzip2, or xz compressed files will have their uncompressed content compared only, which will allow changes through in the compression level used.  Message catalog files (.mo) are unpacked and compared using diff(1).  Public C and C++ header files are preprocessed and compared using diff(1).  Any changes with diff output are included in the results.")
 
-#define DESC_REMOVEDFILES _("Report removed files from the before build to the after build.  Shared libraries get additional reporting output as they may be unexpected dependency removals.  Files removed with a security path prefix generated special reporting in case a security review is required.  Source RPMs and debuginfo files are ignored by this inspection.")
+#define DESC_MOVEDFILES _("Report files that have moved installation paths or across subpackages between builds.  Files moved with a security path prefix generate special reporting in case a security review is required.  Rebased packages report these findings at the INFO level while non-rebased packages report them at the VERIFY level or higher.")
 
-#define DESC_ADDEDFILES _("Report added files from the before build to the after build.  Debuginfo files are ignored as are files that match the patterns defined in the configuration file.  Files added to security paths generate special reporting in case a security review is required.  New setuid and setgid files raise a security warning unless the file is in the fileinfo list.")
+#define DESC_REMOVEDFILES _("Report removed files from the before build to the after build.  Shared libraries get additional reporting output as they may be unexpected dependency removals.  Files removed with a security path prefix generate special reporting in case a security review is required.  Source RPMs and debuginfo files are ignored by this inspection.  Rebased packages report these findings at the INFO level while non-rebased packages report them at the VERIFY level or higher.")
+
+#define DESC_ADDEDFILES _("Report added files from the before build to the after build.  Debuginfo files are ignored as are files that match the patterns defined in the configuration file.  Files added to security paths generate special reporting in case a security review is required.  New setuid and setgid files raise a security warning unless the file is in the fileinfo list.  Rebased packages report these findings at the INFO level while non-rebased packages report them at the VERIFY level or higher.")
 
 #define DESC_UPSTREAM _("Report Source archives defined in the RPM spec file changing content between the before and after build. If the source archives change and the package is on the rebaseable list, the change is reported as informational. Otherwise the change is reported as a rebase of the package and requires inspection.")
 

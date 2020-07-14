@@ -334,4 +334,16 @@ const char *get_before_debuginfo_path(struct rpminspect *ri, const char *binarch
  */
 const char *get_after_debuginfo_path(struct rpminspect *ri, const char *binarch);
 
+/* rebase.c */
+/**
+ * @brief Determine if the program is inspecting a rebase build.  That
+ * is, the package name of the before and after build match but the
+ * versions are different.  If there is no before package, then this
+ * function returns true.
+ *
+ * @param ri The struct rpminspect structure for the program.
+ * @return True if the packages are a rebase, false otherwise
+ */
+bool is_rebase(struct rpminspect *ri);
+
 #endif
