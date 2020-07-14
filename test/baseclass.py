@@ -308,7 +308,7 @@ class TestCompareSRPM(RequiresRpminspect):
 # Base test case class that tests the binary RPMs
 class TestRPMs(TestSRPM):
     def runTest(self):
-        TestSRPM.configFile(self)
+        self.configFile()
 
         if not self.inspection and not self.label:
             return
@@ -367,7 +367,7 @@ class TestRPMs(TestSRPM):
 # Base test case class that compares before and after built RPMs
 class TestCompareRPMs(TestCompareSRPM):
     def runTest(self):
-        TestCompareSRPM.configFile(self)
+        self.configFile()
 
         if not self.inspection and not self.label:
             return
@@ -428,7 +428,7 @@ class TestCompareRPMs(TestCompareSRPM):
 # Base test case class that tests a fake Koji build
 class TestKoji(TestSRPM):
     def runTest(self):
-        TestSRPM.configFile(self)
+        self.configFile()
 
         if not self.inspection:
             return
@@ -498,7 +498,7 @@ class TestKoji(TestSRPM):
 # Base test case class that compares before and after Koji builds
 class TestCompareKoji(TestCompareSRPM):
     def runTest(self):
-        TestCompareSRPM.configFile(self)
+        self.configFile()
 
         if not self.inspection:
             return
