@@ -112,6 +112,7 @@ if python.found()
         'test_elf.py',
         'test_emptyrpm.py',
         'test_files.py',
+        'test_filesize.py',
         'test_kmod.py',
         'test_license.py',
         'test_lostpayload.py',
