@@ -1,0 +1,19 @@
+#
+# List of regular expressions to match file names, a valid message
+# digest (MD5, SHA-1, or SHA-256) of the packaged file, and whether or
+# not it is allowed.
+#
+#
+#<filename regexp>  <message digest>                           <allow/deny>
+#
+# Example:
+#^example.*$        358922f032dc9f78d80baeb211beaab96cba1119   deny
+#
+#
+# Blank lines and lines beginning with '#' are ignored.  Columns need
+# to be delimited by whitespace characters.  The third column needs to
+# be the keyword 'allow' or 'deny'.  In most cases this file will have
+# lines denying inclusion of files, but you may need to add specific
+# 'allow' lines for regexp exceptions based on another rule.  The
+# 'allow' or 'deny' keyword is case-insensitive.
+#

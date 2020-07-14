@@ -116,6 +116,13 @@
  */
 #define REBASEABLE_DIR "rebaseable"
 
+/**
+ * @def POLITICS_DIR
+ * Name of the VENDOR_DATA_DIR subdirectory with political related
+ * file inclusion and exclusion rules.
+ */
+#define POLITICS_DIR "politics"
+
 /** @} */
 
 /**

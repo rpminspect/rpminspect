@@ -18,8 +18,8 @@ install_subdir(
 )
 
 install_subdir(
-    'political-whitelist',
-    install_dir : get_option('datadir') + '/rpminspect/political-whitelist',
+    'politics',
+    install_dir : get_option('datadir') + '/rpminspect/politics',
     strip_directory : true
 )
 
