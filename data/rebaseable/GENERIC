@@ -1,0 +1,14 @@
+#
+# List of rebaseable packages.  This file lists package names that
+# should not have a version number check performed.  That is, we are
+# ok with always rebasing these packages.  The version number check is
+# meant to flag packages that have been rebased for verification, but
+# some packages are provided by the distributor and rebasing is
+# standard practice during development.
+#
+# One package name per line.  Leading and trailing whitespace is ignored.
+# Blank lines and lines beginning with '#' are ignored.
+#
+# Example (commented out):
+#firefox
+#

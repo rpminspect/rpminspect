@@ -30,8 +30,8 @@ install_subdir(
 )
 
 install_subdir(
-    'version-whitelist',
-    install_dir : get_option('datadir') + '/rpminspect/version-whitelist',
+    'rebaseable',
+    install_dir : get_option('datadir') + '/rpminspect/rebaseable',
     strip_directory : true
 )
 

@@ -111,11 +111,10 @@
 #define FILEINFO_DIR "fileinfo"
 
 /**
- * @def VERSION_WHITELIST_DIR
- * Name of the package version whitelist subdirectory in
- * VENDOR_DATA_DIR.
+ * @def REBASEABLE_DIR
+ * Name of the VENDOR_DATA_DIR subdirectory listing rebaseable packages.
  */
-#define VERSION_WHITELIST_DIR "version-whitelist"
+#define REBASEABLE_DIR "rebaseable"
 
 /** @} */
 

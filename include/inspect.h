@@ -465,7 +465,7 @@ bool inspect_types(struct rpminspect *ri);
 
 #define DESC_ADDEDFILES _("Report added files from the before build to the after build.  Debuginfo files are ignored as are files that match the patterns defined in the configuration file.  Files added to security paths generate special reporting in case a security review is required.  New setuid and setgid files raise a security warning unless the file is in the fileinfo list.")
 
-#define DESC_UPSTREAM _("Report Source archives defined in the RPM spec file changing content between the before and after build. If the source archives change and the package is on the version-whitelist, the change is reported as informational. Otherwise the change is reported as a rebase of the package and requires inspection.")
+#define DESC_UPSTREAM _("Report Source archives defined in the RPM spec file changing content between the before and after build. If the source archives change and the package is on the rebaseable list, the change is reported as informational. Otherwise the change is reported as a rebase of the package and requires inspection.")
 
 #define DESC_OWNERSHIP _("Report files and directories owned by unexpected users and groups. Check to make sure executables are owned by the correct user and group. If a before and after build have been specified, also report ownership changes.")
 
