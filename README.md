@@ -1,4 +1,3 @@
-==========
 rpminspect
 ==========
 
@@ -6,9 +5,11 @@ RPM build deviation analysis tools.  rpminspect looks at the output of
 an RPM build (e.g., the output of a Koji build) and examines the
 contents of the build artifacts to report:
 
-    * Policy compliance
-    * Changes from a previous build to the current build
-    * General correctness and best practices
+* Policy compliance
+
+* Changes from a previous build to the current build
+
+* General correctness and best practices
 
 rpminspect is the frontend tool, and librpminspect provides the
 inspection engine and inspections.  The program is configured through
@@ -20,9 +21,8 @@ vendor-specific data package.
 Status
 ------
 
-![CI on Fedora](https://github.com/rpminspect/rpminspect/workflows/CI%20on%20Fedora/badge.svg)
-![CI on CentOS 8](https://github.com/rpminspect/rpminspect/workflows/CI%20on%20CentOS%208/badge.svg)
-![CI on Ubuntu](https://github.com/rpminspect/rpminspect/workflows/CI%20on%20Ubuntu/badge.svg)
+![CI](https://github.com/rpminspect/rpminspect/workflows/CI/badge.svg)
+![Style Checks](https://github.com/rpminspect/rpminspect/workflows/Style%20Checks/badge.svg)
 
 Build Types Support
 -------------------
@@ -31,10 +31,11 @@ rpminspect expects its input to either be local RPM packages or a Koji
 build.  Koji produces certain types of builds that are not supported
 by rpminspect.  Right now, the following input types are supported:
 
-    * Local RPM packages (source or binary)
-    * Koji builds (i.e., an SRPM run with 'rpmbuild -ba' on all specified
-                   architectures)
-    * Modules (https://docs.fedoraproject.org/en-US/modularity/)
+* Local RPM packages (source or binary)
+
+* Koji builds (i.e., an SRPM run with 'rpmbuild -ba' on all specified architectures)
+
+* Modules (https://docs.fedoraproject.org/en-US/modularity/)
 
 See https://pagure.io/koji for more information on Koji.
 
