@@ -11,9 +11,11 @@ lib/bytes.c
 lib/checksums.c
 lib/copyfile.c
 lib/debug.c
+lib/fileinfo.c
 lib/files.c
 lib/flags.c
 lib/free.c
+lib/ignore.c
 lib/init.c
 lib/inspect_addedfiles.c
 lib/inspect_annocheck.c
@@ -27,6 +29,7 @@ lib/inspect_disttag.c
 lib/inspect_dt_needed.c
 lib/inspect_elf.c
 lib/inspect_emptyrpm.c
+lib/inspect_files.c
 lib/inspect_filesize.c
 lib/inspect_javabytecode.c
 lib/inspect_kmod.c
@@ -36,6 +39,7 @@ lib/inspect_lto.c
 lib/inspect_manpage.c
 lib/inspect_metadata.c
 lib/inspect_modularity.c
+lib/inspect_movedfiles.c
 lib/inspect_ownership.c
 lib/inspect_pathmigration.c
 lib/inspect_permissions.c
@@ -44,6 +48,7 @@ lib/inspect_shellsyntax.c
 lib/inspect_specname.c
 lib/inspect_subpackages.c
 lib/inspect_symlinks.c
+lib/inspect_types.c
 lib/inspect_upstream.c
 lib/inspect_xml.c
 lib/kmods.c
@@ -57,9 +62,11 @@ lib/output.c
 lib/output_json.c
 lib/output_text.c
 lib/pairfuncs.c
+lib/paths.c
 lib/peers.c
 lib/readelf.c
 lib/readfile.c
+lib/rebase.c
 lib/release.c
 lib/results.c
 lib/rmtree.c
@@ -68,5 +75,4 @@ lib/runcmd.c
 lib/strfuncs.c
 lib/tty.c
 lib/unpack.c
-lib/whitelist.c
 src/rpminspect.c
