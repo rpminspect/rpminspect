@@ -103,7 +103,7 @@ static bool filesize_driver(struct rpminspect *ri, rpmfile_entry_t *file)
             params.noun = _("${FILE} size grew");
         } else if (change < 0) {
             /* file shrank */
-            xasprintf(&params.msg, _("%s shrank by -%ld%% on %s"), file->localpath, change, arch);
+            xasprintf(&params.msg, _("%s shrank by %ld%% on %s"), file->localpath, change, arch);
             params.noun = _("${FILE} size shrank");
         }
     }
