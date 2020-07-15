@@ -131,7 +131,7 @@ control files.
 
 
 %files
-%doc AUTHORS README.md TODO
+%doc AUTHORS.md README.md TODO
 %license COPYING
 %{_bindir}/rpminspect
 %{_mandir}/man1/rpminspect.1*
