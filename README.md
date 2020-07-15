@@ -69,64 +69,27 @@ Build Requirements
 A typical Linux system with a toolchain for building C software using
 meson and ninja, plus the following libraries:
 
-    * json-c
-          http://json-c.github.io/json-c/
-          MIT license
-
-    * xmlrpc-c
-          http://xmlrpc-c.sourceforge.net/
-          BSD and MIT licenses
-
-    * libxml-2.0
-          http://xmlsoft.org/
-          MIT license
-
-    * rpm
-          https://github.com/rpm-software-management/rpm
-          GPL-2.0-or-later license
-
-    * libarchive
-          https://www.libarchive.org/
-          BSD license
-
-    * elfutils
-          https://sourceware.org/elfutils/
-          GPL-3.0-or-later license
-
-    * kmod
-          https://git.kernel.org/pub/scm/utils/kernel/kmod/kmod.git
-          GPL-2.0-or-later license
-
-    * zlib
-          https://www.zlib.net/
-          Zlib and BSL-1.0 licenses
-
-    * mandoc (formerly mdocml)
-          https://mandoc.bsd.lv/
-          ISC license
-
-    * libyaml
-          https://github.com/yaml/libyaml
-          MIT license
-
-    * file (for libmagic)
-          http://www.darwinsys.com/file/
-          BSD license
-
-    * OpenSSL or LibreSSL
-          https://www.openssl.org/
-              OpenSSL license
-          http://www.libressl.org/
-              OpenSSL and ISC licenses
-
-    * libcap
-          https://sites.google.com/site/fullycapable/
-          BSD-3-Clause
+| Requirement         | URL                                                       | License                      |
+|---------------------|-----------------------------------------------------------|------------------------------|
+| json-c              | http://json-c.github.io/json-c                            | MIT                          |
+| xmlrpc-c            | http://xmlrpc-c.sourceforge.net/                          | BSD and MIT                  |
+| libxml-2.0          | http://xmlsoft.org/                                       | MIT                          |
+| rpm                 | https://github.com/rpm-software-management/rpm            | GPL-2.0-or-later             |
+| libarchive          | https://www.libarchive.org/                               | BSD                          |
+| elfutils            | https://sourceware.org/elfutils/                          | GPL-3.0-or-later             |
+| kmod                | https://git.kernel.org/pub/scm/utils/kernel/kmod/kmod.git | GPL-2.0-or-later             |
+| zlib                | https://www.zlib.net/                                     | Zlib and BSL-1.0             |
+| mandoc              | https://mandoc.bsd.lv/                                    | ISC                          |
+| libyaml             | https://github.com/yaml/libyaml                           | MIT                          |
+| file (for libmagic) | http://www.darwinsys.com/file/                            | BSD                          |
+| OpenSSL or LibreSSL | https://www.openssl.org/ or http://www.libressl.org/      | OpenSSL or (OpenSSL and ISC) |
+| libcap              | https://sites.google.com/site/fullycapable/               | BSD-3-Clause                 |
 
 Additionally, the unit test suite requires the following packages:
 
-    * CUnit (including headers)
-          http://cunit.sourceforge.net/
+| Requirement         | URL                                                       | License                      |
+|---------------------|-----------------------------------------------------------|------------------------------|
+| CUnit               | http://cunit.sourceforge.net/                             | LGPL-2.0-or-later            |
 
 Most distributions include the above projects in prebuilt and packaged
 form.  If those are available, you should use those packages.
@@ -358,41 +321,39 @@ Contributing
 Patches are welcome, as are bug reports.  There is a lot to do in this
 project.  Some things to keep in mind:
 
-    * Please follow the existing coding style in files you modify.
-      Things like variable and function naming, spacing, and
-      indentation.  I want to avoid wildly varying coding styles
-      throughout the tree.
+* Please follow the existing coding style in files you modify.  Things
+  like variable and function naming, spacing, and indentation.  I want
+  to avoid wildly varying coding styles throughout the tree.
 
-    * New inspections in librpminspect need to be in the form of an
-      inspect_NAME.c file with a driver added to the main struct.  You
-      may add static and non-static support functions to your
-      inspect_NAME.c file and expose those as part of the
-      librpminspect API.  If the support functions are generic enough,
-      feel free to start a new source file.
+* New inspections in librpminspect need to be in the form of an
+  inspect_NAME.c file with a driver added to the main struct.  You may
+  add static and non-static support functions to your inspect_NAME.c
+  file and expose those as part of the librpminspect API.  If the
+  support functions are generic enough, feel free to start a new
+  source file.
 
-    * Test cases or updates to existing test cases need to accompany
-      patches and new code submissions.
+* Test cases or updates to existing test cases need to accompany
+  patches and new code submissions.
 
-    * Use the standard C library whenever possible.  Code using glib,
-      libbsd or any other type of generic utility library is going to
-      be reviewed and likely rejected until it is modified to use the
-      standard C library.
+* Use the standard C library whenever possible.  Code using glib,
+  libbsd or any other type of generic utility library is going to be
+  reviewed and likely rejected until it is modified to use the
+  standard C library.
 
-    * That said, inspections should make use of available libraries
-      for performing their work.  When given the option between a
-      library and forking and executing a program, please use the
-      library.
+* That said, inspections should make use of available libraries for
+  performing their work.  When given the option between a library and
+  forking and executing a program, please use the library.
 
-    * Alternative libraries intended to replace a build requirement
-      are ok so long as meson.build and meson_options.txt are modified
-      to conditionalize the choices.  For example:
+* Alternative libraries intended to replace a build requirement are ok
+  so long as meson.build and meson_options.txt are modified to
+  conditionalize the choices.  For example:
 
-          -Djson_lib=other_json_lib
+      -Djson_lib=other_json_lib
 
-      If this requires modification in the code, try to minimize the use
-      of cpp macros.
+  If this requires modification in the code, try to minimize the use
+  of cpp macros.
 
-    * See the TODO file for a current list of things that need work.
+* See the TODO file for a current list of things that need work.
 
 
 Licensing and Copyright
