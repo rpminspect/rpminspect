@@ -93,7 +93,6 @@ static bool symlinks_driver(struct rpminspect *ri, rpmfile_entry_t *file) {
 
     /* initialize the result parameters */
     init_result_params(&params);
-    params.waiverauth = WAIVABLE_BY_ANYONE;
     params.header = HEADER_SYMLINKS;
     params.remedy = REMEDY_SYMLINKS;
     params.verb = VERB_FAILED;
@@ -111,6 +110,7 @@ static bool symlinks_driver(struct rpminspect *ri, rpmfile_entry_t *file) {
         }
 
         params.severity = RESULT_VERIFY;
+        params.waiverauth = WAIVABLE_BY_ANYONE;
         add_result(ri, &params);
         free(params.msg);
         result = false;
@@ -124,6 +124,7 @@ static bool symlinks_driver(struct rpminspect *ri, rpmfile_entry_t *file) {
     if (len == -1) {
         /* a read error on the link here prevents further analysis */
         params.severity = RESULT_BAD;
+        params.waiverauth = WAIVABLE_BY_ANYONE;
         params.details = strerror(errno);
         xasprintf(&params.msg, _("An error occurred reading symbolic link %s in %s on %s."), file->localpath, name, arch);
         add_result(ri, &params);
@@ -280,12 +281,14 @@ static bool symlinks_driver(struct rpminspect *ri, rpmfile_entry_t *file) {
 
         if (linkerr == ELOOP || linkerr == ENAMETOOLONG) {
             params.severity = RESULT_BAD;
+            params.waiverauth = WAIVABLE_BY_ANYONE;
             params.details = strerror(linkerr);
             result = false;
         } else {
             /* XXX - try to find a way to find link destinations in
                Require'd packages (#145); report as INFO for now */
             params.severity = RESULT_INFO;
+            params.waiverauth = NOT_WAIVABLE;
             result = true;
         }
 

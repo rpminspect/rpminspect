@@ -40,13 +40,14 @@ static bool movedfiles_driver(struct rpminspect *ri, rpmfile_entry_t *file) {
     rebase = is_rebase(ri);
 
     init_result_params(&params);
-    params.waiverauth = WAIVABLE_BY_ANYONE;
     params.header = HEADER_MOVEDFILES;
 
     if (rebase) {
         params.severity = RESULT_INFO;
+        params.waiverauth = NOT_WAIVABLE;
     } else {
         params.severity = RESULT_VERIFY;
+        params.waiverauth = WAIVABLE_BY_ANYONE;
     }
 
     xasprintf(&params.msg, "%s probably moved to %s on %s\n", file->peer_file->localpath, file->localpath, get_rpm_header_arch(file->rpm_header));

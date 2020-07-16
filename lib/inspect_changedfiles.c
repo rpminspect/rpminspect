@@ -141,7 +141,7 @@ static bool changedfiles_driver(struct rpminspect *ri, rpmfile_entry_t *file)
     /* Set up the result parameters */
     init_result_params(&params);
     params.severity = rebase ? RESULT_INFO : RESULT_VERIFY;
-    params.waiverauth = WAIVABLE_BY_ANYONE;
+    params.waiverauth = (params.severity == RESULT_INFO) ? NOT_WAIVABLE : WAIVABLE_BY_ANYONE;
     params.header = HEADER_CHANGEDFILES;
     params.arch = arch;
     params.file = file->localpath;
@@ -296,7 +296,7 @@ static bool changedfiles_driver(struct rpminspect *ri, rpmfile_entry_t *file)
         if (exitcode) {
             xasprintf(&params.msg, _("Message catalog %s changed content on %s"), file->localpath, arch);
             params.severity = rebase ? RESULT_INFO : RESULT_VERIFY;
-            params.waiverauth = WAIVABLE_BY_ANYONE;
+            params.waiverauth = (params.severity == RESULT_INFO) ? NOT_WAIVABLE : WAIVABLE_BY_ANYONE;
             params.remedy = REMEDY_CHANGEDFILES;
             params.verb = VERB_CHANGED;
             params.noun = _("${FILE}");
@@ -370,12 +370,13 @@ static bool changedfiles_driver(struct rpminspect *ri, rpmfile_entry_t *file)
             if (rebase) {
                 xasprintf(&params.msg, _("Public header file %s changed content on %s.  The output of `diff -uw` folloes."), file->localpath, arch);
                 params.severity = RESULT_INFO;
+                params.waiverauth = NOT_WAIVABLE;
             } else {
                 xasprintf(&params.msg, _("Public header file %s changed content on %s.  Please make sure this does not change the ABI exported by this package.  The output of `diff -uw` follows."), file->localpath, arch);
                 params.severity = RESULT_VERIFY;
+                params.waiverauth = WAIVABLE_BY_ANYONE;
             }
 
-            params.waiverauth = WAIVABLE_BY_ANYONE;
             params.details = short_errors;
             params.verb = VERB_CHANGED;
             params.noun = _("${FILE}");

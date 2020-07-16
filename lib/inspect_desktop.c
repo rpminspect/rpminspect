@@ -343,8 +343,15 @@ static bool desktop_driver(struct rpminspect *ri, rpmfile_entry_t *file)
 
     /* Report validation results */
     arch = get_rpm_header_arch(file->rpm_header);
-    params.severity = (after_code == 0) ? RESULT_INFO : RESULT_BAD;
-    params.waiverauth = WAIVABLE_BY_ANYONE;
+
+    if (after_code == 0) {
+        params.severity = RESULT_INFO;
+        params.waiverauth = NOT_WAIVABLE;
+    } else {
+        params.severity = RESULT_BAD;
+        params.waiverauth = WAIVABLE_BY_ANYONE;
+    }
+
     params.header = HEADER_DESKTOP;
     params.remedy = REMEDY_DESKTOP;
     params.arch = arch;

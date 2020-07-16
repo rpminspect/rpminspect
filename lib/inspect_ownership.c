@@ -265,6 +265,7 @@ static bool ownership_driver(struct rpminspect *ri, rpmfile_entry_t *file) {
             /* Change the severity depending on what happened */
             xasprintf(&params.msg, "%s:%s", owner, group);
             params.severity = RESULT_VERIFY;
+            params.waiverauth = WAIVABLE_BY_ANYONE;
 
             if (bin &&
                 ((!strcmp(owner, ri->bin_owner) && !strcmp(what, "owner")) ||
@@ -275,11 +276,11 @@ static bool ownership_driver(struct rpminspect *ri, rpmfile_entry_t *file) {
                  * just make it an informational message.
                  */
                 params.severity = RESULT_INFO;
+                params.waiverauth = NOT_WAIVABLE;
             }
 
             free(params.msg);
             xasprintf(&params.msg, _("File %s changed %s from `%s` to `%s` on %s"), file->localpath, what, before_val, after_val, arch);
-            params.waiverauth = WAIVABLE_BY_ANYONE;
             params.remedy = REMEDY_OWNERSHIP_CHANGED;
             add_result(ri, &params);
             free(params.msg);

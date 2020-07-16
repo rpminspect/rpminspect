@@ -360,6 +360,7 @@ static bool check_bin_rpm_changelog(struct rpminspect *ri, const rpmpeer_entry_t
     /* Set up result parameters */
     init_result_params(&params);
     params.severity = RESULT_INFO;
+    params.waiverauth = NOT_WAIVABLE;
     params.header = HEADER_CHANGELOG;
     params.verb = VERB_CHANGED;
     params.noun = _("%%changelog");
