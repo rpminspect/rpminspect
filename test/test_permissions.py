@@ -22,6 +22,214 @@ from baseclass import TestSRPM, TestRPMs, TestKoji
 from baseclass import TestCompareSRPM, TestCompareRPMs, TestCompareKoji
 
 
+class ExecutableWithSetUIDSRPM(TestSRPM):
+    """Assert when a setuid file is in a package,
+       OK result occurs when testing the SRPM.
+    """
+
+    def setUp(self):
+        super().setUp()
+
+        self.rpm.add_installed_file(
+            "/usr/bin/mount", rpmfluff.SourceFile("file", "a" * 5), mode="4755"
+        )
+
+        self.inspection = "permissions"
+        self.label = "permissions"
+        self.result = "OK"
+
+
+class ExecutableWithSetUIDRPMs(TestRPMs):
+    """Assert when a setuid file is in a package and it's on the fileinfo list,
+       INFO result occurs when testing the RPMs.
+    """
+
+    def setUp(self):
+        super().setUp()
+
+        self.rpm.add_installed_file(
+            "/usr/bin/mount", rpmfluff.SourceFile("file", "a" * 5), mode="4755"
+        )
+
+        self.inspection = "permissions"
+        self.label = "permissions"
+        self.result = "INFO"
+
+
+class ExecutableWithSetUIDKoji(TestKoji):
+    """Assert when a setuid file is in a package and it's on the fileinfo list,
+       INFO result occurs when testing the RPMs.
+    """
+
+    def setUp(self):
+        super().setUp()
+
+        self.rpm.add_installed_file(
+            "/usr/bin/mount", rpmfluff.SourceFile("file", "a" * 5), mode="4755"
+        )
+
+        self.inspection = "permissions"
+        self.label = "permissions"
+        self.result = "INFO"
+
+
+class ExecutableWithSetUIDCompareSRPM(TestCompareSRPM):
+    """Assert when a setuid file is in a package,
+       OK result occurs when testing the SRPM.
+    """
+
+    def setUp(self):
+        super().setUp()
+
+        self.after_rpm.add_installed_file(
+            "/usr/bin/mount", rpmfluff.SourceFile("file", "a" * 5), mode="4755"
+        )
+
+        self.inspection = "permissions"
+        self.label = "permissions"
+        self.result = "OK"
+
+
+class ExecutableWithSetUIDCompareRPMs(TestCompareRPMs):
+    """Assert when a setuid file is in a package and it's on the fileinfo list,
+       INFO result occurs when testing the RPMs.
+    """
+
+    def setUp(self):
+        super().setUp()
+
+        self.after_rpm.add_installed_file(
+            "/usr/bin/mount", rpmfluff.SourceFile("file", "a" * 5), mode="4755"
+        )
+
+        self.inspection = "permissions"
+        self.label = "permissions"
+        self.result = "INFO"
+
+
+class ExecutableWithSetUIDCompareKoji(TestCompareKoji):
+    """Assert when a setuid file is in a package and it's on the fileinfo list,
+       INFO result occurs when testing the RPMs.
+    """
+
+    def setUp(self):
+        super().setUp()
+
+        self.after_rpm.add_installed_file(
+            "/usr/bin/mount", rpmfluff.SourceFile("file", "a" * 5), mode="4755"
+        )
+
+        self.inspection = "permissions"
+        self.label = "permissions"
+        self.result = "INFO"
+
+
+class UnapprovedExecutableWithSetUIDSRPM(TestSRPM):
+    """Assert when a setuid file is in a package,
+       OK result occurs when testing the SRPM.
+    """
+
+    def setUp(self):
+        super().setUp()
+
+        self.rpm.add_installed_file(
+            "/usr/bin/trojan", rpmfluff.SourceFile("file", "a" * 5), mode="4755"
+        )
+
+        self.inspection = "permissions"
+        self.label = "permissions"
+        self.result = "OK"
+
+
+class UnapprovedExecutableWithSetUIDRPMs(TestRPMs):
+    """Assert when a setuid file is in a package and it's on the fileinfo list,
+       INFO result occurs when testing the RPMs.
+    """
+
+    def setUp(self):
+        super().setUp()
+
+        self.rpm.add_installed_file(
+            "/usr/bin/trojan", rpmfluff.SourceFile("file", "a" * 5), mode="4755"
+        )
+
+        self.inspection = "permissions"
+        self.label = "permissions"
+        self.result = "BAD"
+        self.waiver_auth = "Security"
+
+
+class UnapprovedExecutableWithSetUIDKoji(TestKoji):
+    """Assert when a setuid file is in a package and it's on the fileinfo list,
+       INFO result occurs when testing the RPMs.
+    """
+
+    def setUp(self):
+        super().setUp()
+
+        self.rpm.add_installed_file(
+            "/usr/bin/trojan", rpmfluff.SourceFile("file", "a" * 5), mode="4755"
+        )
+
+        self.inspection = "permissions"
+        self.label = "permissions"
+        self.result = "BAD"
+        self.waiver_auth = "Security"
+
+
+class UnapprovedExecutableWithSetUIDCompareSRPM(TestCompareSRPM):
+    """Assert when a setuid file is in a package,
+       OK result occurs when testing the SRPM.
+    """
+
+    def setUp(self):
+        super().setUp()
+
+        self.after_rpm.add_installed_file(
+            "/usr/bin/trojan", rpmfluff.SourceFile("file", "a" * 5), mode="4755"
+        )
+
+        self.inspection = "permissions"
+        self.label = "permissions"
+        self.result = "OK"
+
+
+class UnapprovedExecutableWithSetUIDCompareRPMs(TestCompareRPMs):
+    """Assert when a setuid file is in a package and it's on the fileinfo list,
+       INFO result occurs when testing the RPMs.
+    """
+
+    def setUp(self):
+        super().setUp()
+
+        self.after_rpm.add_installed_file(
+            "/usr/bin/trojan", rpmfluff.SourceFile("file", "a" * 5), mode="4755"
+        )
+
+        self.inspection = "permissions"
+        self.label = "permissions"
+        self.result = "BAD"
+        self.waiver_auth = "Security"
+
+
+class UnapprovedExecutableWithSetUIDCompareKoji(TestCompareKoji):
+    """Assert when a setuid file is in a package and it's on the fileinfo list,
+       INFO result occurs when testing the RPMs.
+    """
+
+    def setUp(self):
+        super().setUp()
+
+        self.after_rpm.add_installed_file(
+            "/usr/bin/trojan", rpmfluff.SourceFile("file", "a" * 5), mode="4755"
+        )
+
+        self.inspection = "permissions"
+        self.label = "permissions"
+        self.result = "BAD"
+        self.waiver_auth = "Security"
+
+
 class FileIWOTHProhibitedSRPM(TestSRPM):
     """Assert when a world-writable file is in a package,
        OK result occurs when testing the SRPM.
