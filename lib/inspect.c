@@ -64,7 +64,7 @@ struct inspect inspections[] = {
     { INSPECT_ANNOCHECK,     "annocheck",     true,  &inspect_annocheck },
     { INSPECT_DT_NEEDED,     "DT_NEEDED",     false, &inspect_dt_needed },
     { INSPECT_FILESIZE,      "filesize",      false, &inspect_filesize },
-    { INSPECT_PERMISSIONS,   "permissions",   false, &inspect_permissions },
+    { INSPECT_PERMISSIONS,   "permissions",   true,  &inspect_permissions },
     { INSPECT_CAPABILITIES,  "capabilities",  true,  &inspect_capabilities },
     { INSPECT_KMOD,          "kmod",          false, &inspect_kmod },
     { INSPECT_ARCH,          "arch",          false, &inspect_arch },

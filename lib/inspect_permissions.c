@@ -37,11 +37,6 @@ static bool permissions_driver(struct rpminspect *ri, rpmfile_entry_t *file)
     assert(ri != NULL);
     assert(file != NULL);
 
-    /* Files without a peer have to be ignored */
-    if (file->peer_file == NULL) {
-        return true;
-    }
-
     /* Ignore files in the SRPM */
     if (headerIsSource(file->rpm_header)) {
         return true;
@@ -57,24 +52,29 @@ static bool permissions_driver(struct rpminspect *ri, rpmfile_entry_t *file)
     params.arch = arch;
 
     /* Local working copies for display */
-    before_mode = file->peer_file->st.st_mode & 0777;
     after_mode = file->st.st_mode & 0777;
-    mode_diff = before_mode ^ after_mode;
+
+DEBUG_PRINT("here\n");
 
     /* Compare the modes */
-    if (before_mode != after_mode) {
-        allowed = match_fileinfo_mode(ri, file, HEADER_PERMISSIONS, NULL);
+    if (file->peer_file) {
+        before_mode = file->peer_file->st.st_mode & 0777;
+    } else {
+        memset(&before_mode, 0, sizeof(before_mode));
+    }
 
-        /* if setuid/setgid or new mode is more open */
-        if (!allowed) {
-            if (!(before_mode & (S_ISUID|S_ISGID)) && (after_mode & (S_ISUID|S_ISGID))) {
+    mode_diff = before_mode ^ after_mode;
+    allowed = match_fileinfo_mode(ri, file, HEADER_PERMISSIONS, NULL);
+
+    /* if setuid/setgid or new mode is more open */
+    if (file->peer_file && !allowed) {
+        if (!(before_mode & (S_ISUID|S_ISGID)) && (after_mode & (S_ISUID|S_ISGID))) {
+            params.severity = RESULT_BAD;
+            what = _("changed setuid/setgid");
+        } else if (S_ISDIR(file->st.st_mode) && !S_ISLNK(file->st.st_mode)) {
+            if (((mode_diff & S_ISVTX) && !(after_mode & S_ISVTX)) || ((after_mode & mode_diff) != 0)) {
                 params.severity = RESULT_BAD;
-                what = _("changed setuid/setgid");
-            } else if (S_ISDIR(file->st.st_mode) && !S_ISLNK(file->st.st_mode)) {
-                if (((mode_diff & S_ISVTX) && !(after_mode & S_ISVTX)) || ((after_mode & mode_diff) != 0)) {
-                    params.severity = RESULT_BAD;
-                    what = _("relaxed");
-                }
+                what = _("relaxed");
             }
         }
 
@@ -88,7 +88,7 @@ static bool permissions_driver(struct rpminspect *ri, rpmfile_entry_t *file)
     }
 
     /* check for world-writability */
-    if (!allowed && (!S_ISLNK(file->st.st_mode) && !S_ISDIR(file->st.st_mode) && (after_mode & (S_IWOTH|S_ISVTX)))) {
+    if (!allowed && !S_ISLNK(file->st.st_mode) && ((after_mode & (S_IWOTH|S_ISVTX)) || (after_mode & S_IWOTH))) {
         xasprintf(&params.msg, _("%s (%s) is world-writable on %s"), file->localpath, get_mime_type(file), arch);
         params.severity = RESULT_BAD;
         params.waiverauth = WAIVABLE_BY_SECURITY;
