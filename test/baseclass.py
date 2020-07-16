@@ -554,7 +554,7 @@ class TestCompareKoji(TestCompareSRPM):
                 "-F",
                 "json",
                 "-r",
-                AFTER_REL,
+                "GENERIC",
             ]
 
             if self.inspection:
