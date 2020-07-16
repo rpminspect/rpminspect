@@ -54,8 +54,6 @@ static bool permissions_driver(struct rpminspect *ri, rpmfile_entry_t *file)
     /* Local working copies for display */
     after_mode = file->st.st_mode & 0777;
 
-DEBUG_PRINT("here\n");
-
     /* Compare the modes */
     if (file->peer_file) {
         before_mode = file->peer_file->st.st_mode & 0777;
@@ -97,14 +95,14 @@ DEBUG_PRINT("here\n");
         result = false;
     }
 
-    return result;
+    return (result && allowed);
 }
 
 /*
  * Main driver for the 'permissions' inspection.
  */
 bool inspect_permissions(struct rpminspect *ri) {
-    bool result;
+    bool result = false;
     struct result_params params;
 
     assert(ri != NULL);
