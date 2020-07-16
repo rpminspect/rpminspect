@@ -15,8 +15,14 @@ the specifics will be noted during the work in progress.
 Mandatory test categories to migrate (top is highest priority):
 ---------------------------------------------------------------
  TEST_ABI
- TEST_FILEMOVE
  TEST_CONFIG
+
+ - Need to enable 'rebaseable' list checking in the upstream
+   inspection.  Per product release.
+
+ - Add a 'rebase' inspection that just fails if packages are being
+   rebased but not on the rebaseable list.  This should be off by
+   default but then enabled in a maintenance profile.
 
 
 Unranked tests categories to migrate (might also decide to skip them):
@@ -72,6 +78,7 @@ Test categories that have been migrated:
 *TEST_SYMLINK (symlinks)
 *TEST_SPECFILE (disttag, license, and %files)
 *TEST_TYPES (types)
+*TEST_FILEMOVE (movedfiles)
 
 
 Test categories excluded (see MISSING):
@@ -101,8 +108,6 @@ inspections lack integration tests:
     addedfiles (compare only)
     annocheck
     DT_NEEDED
-    filesize
-    permissions
     capabilities
     arch
     subpackages
