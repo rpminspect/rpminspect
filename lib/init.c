@@ -1096,14 +1096,14 @@ struct rpminspect *init_rpminspect(struct rpminspect *ri, const char *cfgfile, c
         ri->specprimary = PRIMARY_NAME;
 
         /* Store full paths to all config files read */
-        ri->cfgfiles = calloc(1, sizeof(ri->cfgfiles));
+        ri->cfgfiles = calloc(1, sizeof(*ri->cfgfiles));
         assert(ri->cfgfiles != NULL);
         TAILQ_INIT(ri->cfgfiles);
     }
 
     /* Read in the config file if we have it */
     if (cfgfile) {
-        cfg = calloc(1, sizeof(cfg));
+        cfg = calloc(1, sizeof(*cfg));
         assert(cfg != NULL);
         cfg->data = realpath(cfgfile, NULL);
 
