@@ -3,7 +3,7 @@ Version:        %%VERSION%%
 Release:        1%{?dist}
 Summary:        Build deviation compliance tool
 Group:          Development/Tools
-License:        GPLv3+ and LGPLv2+ and ASL 2.0
+License:        GPLv3+ and LGPLv2+ and ASL 2.0 and CC-BY
 URL:            https://github.com/rpminspect/rpminspect
 Source0:        https://github.com/rpminspect/rpminspect/releases/download/v%%VERSION%%/%%TARBALL%%
 Source1:        changelog
@@ -138,17 +138,18 @@ control files.
 
 
 %files -n librpminspect
-%license COPYING
+%license COPYING.LIB LICENSE-2.0.txt
 %{_libdir}/librpminspect.so.*
 
 
 %files -n librpminspect-devel
+%license COPYING.LIB
 %{_includedir}/librpminspect
 %{_libdir}/librpminspect.so
 
 
 %files -n rpminspect-data-generic
-%license COPYING
+%license CC-BY-4.0.txt
 %{_datadir}/rpminspect
 
 
