@@ -1,4 +1,6 @@
 #
+# SPDX-License-Identifier: CC-BY-4.0
+#
 # st_mode verification list.  All files installed with setuid or setgid
 # permissions must be listed here with the expected permissions (st_mode),
 # expected owner, and expected group.  Blank lines and lines beginning with '#'

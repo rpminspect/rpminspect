@@ -1,4 +1,6 @@
 #
+# SPDX-License-Identifier: CC-BY-4.0
+#
 # List of rebaseable packages.  This file lists package names that
 # should not have a version number check performed.  That is, we are
 # ok with always rebasing these packages.  The version number check is
