@@ -46,7 +46,7 @@ jobs:
                   ninja -C build coverage
                   curl -s https://codecov.io/bash | bash
 
-    fedora-stable:
+    fedora:
         # This job runs in a Docker container of the latest Fedora
         # stable release but the host is 'ubuntu-latest' since that's
         # what GitHub Actions offers that's Linux.

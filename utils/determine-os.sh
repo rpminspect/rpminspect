@@ -12,7 +12,11 @@ if [ -r /etc/os-release ]; then
 fi
 
 if [ -r /etc/fedora-release ] && [ "${ID}" = "fedora" ]; then
-    echo "${ID}"
+    if grep -q -i rawhide /etc/fedora-release >/dev/null 2>&1 ; then
+        echo "${ID}-rawhide"
+    else
+        echo "${ID}"
+    fi
 elif [ -r /etc/centos-release ] && [ "${ID}" = "centos" ]; then
     if [ ${VERSION_ID} -eq 7 ] || [ ${VERSION_ID} -eq 8 ]; then
         echo "${ID}${VERSION_ID}"
