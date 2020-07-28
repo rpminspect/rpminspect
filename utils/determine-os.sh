@@ -11,8 +11,6 @@ if [ -r /etc/os-release ]; then
     . /etc/os-release
 fi
 
-echo "ID=|$ID|"
-
 if [ -r /etc/fedora-release ] && [ "${ID}" = "fedora" ]; then
     if grep -q -i rawhide /etc/fedora-release >/dev/null 2>&1 ; then
         echo "${ID}-rawhide"
@@ -32,7 +30,7 @@ elif [ -r /etc/redhat-release ] && [ "${ID}" = "rhel" ]; then
     else
         echo "unknown"
     fi
-elif [ "${ID}" = "opensuse-leap" ] || [ "${ID}" = "ubuntu" ]; then
+elif [ "${ID}" = "opensuse-leap" ] || [ "${ID}" = "ubuntu" ] || [ "${ID}" = "debian" ]; then
     echo "${ID}"
 else
     echo "unknown"
