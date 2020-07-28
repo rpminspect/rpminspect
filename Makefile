@@ -77,12 +77,12 @@ clean:
 
 instreqs:
 	if [ -x $(topdir)/osdeps/$(OS)/pre.sh ]; then \
-		$(topdir)/osdeps/$(OS)/pre.sh ; \
+		env OSDEPS=$(topdir)/osdeps/$(OS) $(topdir)/osdeps/$(OS)/pre.sh ; \
 	fi
 	$(PKG_CMD) $$(grep -v ^# $(topdir)/osdeps/$(OS)/reqs.txt 2>/dev/null | awk 'NF' ORS=' ')
 	$(PIP_CMD) $$(grep -v ^# $(topdir)/osdeps/$(OS)/pip.txt 2>/dev/null | awk 'NF' ORS=' ')
 	if [ -x $(topdir)/osdeps/$(OS)/post.sh ]; then \
-		$(topdir)/osdeps/$(OS)/post.sh ; \
+		env OSDEPS=$(topdir)/osdeps/$(OS) $(topdir)/osdeps/$(OS)/post.sh ; \
 	fi
 
 authors:
