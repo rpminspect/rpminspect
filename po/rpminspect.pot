@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: rpminspect\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-07-15 14:00-0400\n"
+"POT-Creation-Date: 2020-07-28 10:24-0400\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -804,55 +804,55 @@ msgstr ""
 msgid "*** chmod() error on %s: %s\n"
 msgstr ""
 
-#: lib/fileinfo.c:59
+#: lib/fileinfo.c:63
 #, c-format
 msgid "%s on %s carries mode %04o, but is on the fileinfo list"
 msgstr ""
 
-#: lib/fileinfo.c:66
+#: lib/fileinfo.c:70
 #, c-format
 msgid ""
 "%s on %s carries mode %04o, is on the fileinfo list but expected mode %04o"
 msgstr ""
 
-#: lib/fileinfo.c:81
+#: lib/fileinfo.c:85
 #, c-format
 msgid ""
 "%s on %s carries insecure mode %04o, Security Team review may be required"
 msgstr ""
 
-#: lib/fileinfo.c:128
+#: lib/fileinfo.c:132
 #, c-format
 msgid "%s on %s carries owner %s (UID %d) and is on the fileinfo list"
 msgstr ""
 
-#: lib/fileinfo.c:135
+#: lib/fileinfo.c:139
 #, c-format
 msgid ""
 "%s on %s carries owner %s (UID %d) and is on the fileinfo list, but the UID "
 "cannot be verified"
 msgstr ""
 
-#: lib/fileinfo.c:142
+#: lib/fileinfo.c:146
 #, c-format
 msgid ""
 "%s on %s carries owner %s (UID %d), but is on the fileinfo list with "
 "expected owner %s (UID %d)"
 msgstr ""
 
-#: lib/fileinfo.c:194
+#: lib/fileinfo.c:198
 #, c-format
 msgid "%s on %s carries group %s (GID %d) and is on the fileinfo list"
 msgstr ""
 
-#: lib/fileinfo.c:201
+#: lib/fileinfo.c:205
 #, c-format
 msgid ""
 "%s on %s carries group %s (GID %d) and is on the fileinfo list, but the GID "
 "cannot be verified"
 msgstr ""
 
-#: lib/fileinfo.c:208
+#: lib/fileinfo.c:212
 #, c-format
 msgid ""
 "%s on %s carries group %s (GID %d), but is on the fileinfo list with "
@@ -1123,8 +1123,8 @@ msgstr ""
 msgid "Message catalog %s changed content on %s"
 msgstr ""
 
-#: lib/inspect_changedfiles.c:302 lib/inspect_changedfiles.c:381
-#: lib/inspect_changedfiles.c:401 lib/inspect_desktop.c:353
+#: lib/inspect_changedfiles.c:302 lib/inspect_changedfiles.c:382
+#: lib/inspect_changedfiles.c:402 lib/inspect_desktop.c:360
 #: lib/inspect_manpage.c:284
 msgid "${FILE}"
 msgstr ""
@@ -1141,19 +1141,19 @@ msgid ""
 "folloes."
 msgstr ""
 
-#: lib/inspect_changedfiles.c:374
+#: lib/inspect_changedfiles.c:375
 #, c-format
 msgid ""
 "Public header file %s changed content on %s.  Please make sure this does not "
 "change the ABI exported by this package.  The output of `diff -uw` follows."
 msgstr ""
 
-#: lib/inspect_changedfiles.c:399
+#: lib/inspect_changedfiles.c:400
 #, c-format
 msgid "File %s changed content on %s."
 msgstr ""
 
-#: lib/inspect_changelog.c:243 lib/inspect_changelog.c:365
+#: lib/inspect_changelog.c:243 lib/inspect_changelog.c:366
 #, c-format
 msgid "%%changelog"
 msgstr ""
@@ -1199,20 +1199,20 @@ msgstr ""
 msgid "error closing %s: %s\n"
 msgstr ""
 
-#: lib/inspect_desktop.c:356
+#: lib/inspect_desktop.c:363
 #, c-format
 msgid ""
 "File %s is no longer a valid desktop entry file on %s; desktop-file-validate "
 "reports:"
 msgstr ""
 
-#: lib/inspect_desktop.c:358
+#: lib/inspect_desktop.c:365
 #, c-format
 msgid ""
 "New file %s is not a valid desktop file on %s; desktop-file-validate reports:"
 msgstr ""
 
-#: lib/inspect_desktop.c:360
+#: lib/inspect_desktop.c:367
 #, c-format
 msgid ""
 "File %s is not a valid desktop file on %s; desktop-file-validate reports:"
@@ -1455,7 +1455,7 @@ msgstr ""
 
 #: lib/inspect_filesize.c:106
 #, c-format
-msgid "%s shrank by -%ld%% on %s"
+msgid "%s shrank by %ld%% on %s"
 msgstr ""
 
 #: lib/inspect_filesize.c:107
@@ -1791,7 +1791,7 @@ msgstr ""
 msgid "File %s has group `%s` on %s, but should be `%s`"
 msgstr ""
 
-#: lib/inspect_ownership.c:281
+#: lib/inspect_ownership.c:283
 #, c-format
 msgid "File %s changed %s from `%s` to `%s` on %s"
 msgstr ""
@@ -1800,20 +1800,20 @@ msgstr ""
 msgid "changed"
 msgstr ""
 
-#: lib/inspect_permissions.c:72
+#: lib/inspect_permissions.c:71
 msgid "changed setuid/setgid"
 msgstr ""
 
-#: lib/inspect_permissions.c:76
+#: lib/inspect_permissions.c:75
 msgid "relaxed"
 msgstr ""
 
-#: lib/inspect_permissions.c:81
+#: lib/inspect_permissions.c:79
 #, c-format
 msgid "%s %s permissions from %04o to %04o on %s"
 msgstr ""
 
-#: lib/inspect_permissions.c:92
+#: lib/inspect_permissions.c:90
 #, c-format
 msgid "%s (%s) is world-writable on %s"
 msgstr ""
@@ -1903,12 +1903,12 @@ msgstr ""
 msgid "The specname inspection is only for source packages, skipping."
 msgstr ""
 
-#: lib/inspect_subpackages.c:80
+#: lib/inspect_subpackages.c:79
 #, c-format
 msgid "Subpackage '%s' has disappeared on '%s'"
 msgstr ""
 
-#: lib/inspect_subpackages.c:86 lib/inspect_subpackages.c:107
+#: lib/inspect_subpackages.c:86 lib/inspect_subpackages.c:108
 msgid "subpackage ${FILE}"
 msgstr ""
 
@@ -1917,29 +1917,29 @@ msgstr ""
 msgid "Subpackage '%s' has appeared on '%s'"
 msgstr ""
 
-#: lib/inspect_symlinks.c:108
+#: lib/inspect_symlinks.c:107
 #, c-format
 msgid ""
 "Directory %s became a symbolic link (to %s) in %s on %s; this is not allowed!"
 msgstr ""
 
-#: lib/inspect_symlinks.c:110
+#: lib/inspect_symlinks.c:109
 #, c-format
 msgid "%s %s became a symbolic link (to %s) in %s on %s"
 msgstr ""
 
-#: lib/inspect_symlinks.c:128
+#: lib/inspect_symlinks.c:129
 #, c-format
 msgid "An error occurred reading symbolic link %s in %s on %s."
 msgstr ""
 
-#: lib/inspect_symlinks.c:180
+#: lib/inspect_symlinks.c:181
 #, c-format
 msgid ""
 "%s %s has too many levels of redirects and cannot be resolved in %s on %s"
 msgstr ""
 
-#: lib/inspect_symlinks.c:279
+#: lib/inspect_symlinks.c:280
 #, c-format
 msgid "%s %s %s a dangling symbolic link in %s on %s"
 msgstr ""
