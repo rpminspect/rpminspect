@@ -101,7 +101,7 @@ jobs:
             # Within the container, install the build dependencies and
             # test suite dependencies
             - name: Install Build Dependencies
-              run: sudo make instreqs
+              run: make instreqs
 
             # Set up the source tree to build
             - name: setup
@@ -135,7 +135,7 @@ jobs:
             # Within the container, install the build dependencies and
             # test suite dependencies
             - name: Install Build Dependencies
-              run: sudo make instreqs
+              run: make instreqs
 
             # Set up the source tree to build
             - name: setup
