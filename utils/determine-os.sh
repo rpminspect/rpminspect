@@ -11,6 +11,8 @@ if [ -r /etc/os-release ]; then
     . /etc/os-release
 fi
 
+echo "ID=|$ID|"
+
 if [ -r /etc/fedora-release ] && [ "${ID}" = "fedora" ]; then
     if grep -q -i rawhide /etc/fedora-release >/dev/null 2>&1 ; then
         echo "${ID}-rawhide"
