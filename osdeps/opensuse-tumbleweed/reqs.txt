@@ -7,7 +7,6 @@ diffutils
 file-devel
 gcc
 gcc-32bit
-gcovr
 gettext-tools
 git
 glibc-devel-32bit
