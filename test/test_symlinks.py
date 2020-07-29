@@ -23,11 +23,14 @@ import rpmfluff
 from baseclass import TestRPMs, TestKoji, TestCompareRPMs, TestCompareKoji
 
 # more recent versions of RPM prevent dangling and too long symlinks
-# b'4.15.90' -> (4, 15, 90)
-# b'4.16.0-beta' -> (4, 16, 0)
-(rpm_major, rpm_minor, rpm_update) = tuple(
-    map(lambda x: int(x), rpm.__version__.strip().split("-")[0].split("."))
-)
+# b'4.15.90' -> [4, 15, 90]
+# b'4.16.0-beta' -> [4, 16, 0]
+# b'4.14.2.1' -> [4, 14, 2, 1]
+# Ignore the fourth position and beyond on the version number.
+rpmver = list(map(lambda x: int(x), rpm.__version__.strip().split("-")[0].split(".")))
+rpm_major = rpmver[0]
+rpm_minor = rpmver[1]
+rpm_update = rpmver[2]
 
 if (
     rpm_major < 4
