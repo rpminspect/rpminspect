@@ -23,6 +23,12 @@ echo 'INSTALL_MAN="install -D -m 0644"'     >> configure.local
 echo 'INSTALL_DATA="install -D -m 0644"'    >> configure.local
 echo 'INSTALL_LIBMANDOC=1'                  >> configure.local
 echo 'CFLAGS="-g -fPIC"'                    >> configure.local
+
+# unusual workarounds for executable on OpenSUSE Tumbleweed
+sed -i -e 's|@echo|@/bin/echo|g' configure
+sed -i -e 's|^int dummy;$|extern int dummy;|g' compat_getline.c
+sed -i -e 's|^int dummy;$|extern int dummy;|g' compat_err.c
+
 ./configure
 make
 make lib-install
