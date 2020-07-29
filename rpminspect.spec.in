@@ -3,6 +3,11 @@ Version:        %%VERSION%%
 Release:        1%{?dist}
 Summary:        Build deviation compliance tool
 Group:          Development/Tools
+# librpminspect is licensed under the LGPLv3+, but 5 source files in
+# the library are from an Apache 2.0 licensed project.  The
+# rpminspect(1) command line tool is licensed under the GPLv3+.  And
+# the rpminspect-data-generic package is licensed under the CC-BY-4.0
+# license.
 License:        GPLv3+ and LGPLv2+ and ASL 2.0 and CC-BY
 URL:            https://github.com/rpminspect/rpminspect
 Source0:        https://github.com/rpminspect/rpminspect/releases/download/v%%VERSION%%/%%TARBALL%%
