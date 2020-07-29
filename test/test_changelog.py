@@ -30,7 +30,18 @@ from baseclass import TestCompareSRPM, TestCompareRPMs, TestCompareKoji
 class LostChangeLogCompareSRPM(TestCompareSRPM):
     def setUp(self):
         TestCompareSRPM.setUp(self)
+
+        # create a simple changelog
+        today = datetime.date.today().strftime("%a %b %d %Y")
+        clog = (
+            "* %s Packie McPackerson <packie@mcpackerson.io> - 47.7-1\n"
+            "- Upgrade to the latest and greatest\n" % today
+        )
+
+        # modify the changelogs
+        self.before_rpm.section_changelog = clog
         self.after_rpm.section_changelog = None
+
         self.inspection = "changelog"
         self.label = "changelog"
         self.result = "VERIFY"
@@ -40,7 +51,18 @@ class LostChangeLogCompareSRPM(TestCompareSRPM):
 class LostChangeLogCompareRPMs(TestCompareRPMs):
     def setUp(self):
         TestCompareRPMs.setUp(self)
+
+        # create a simple changelog
+        today = datetime.date.today().strftime("%a %b %d %Y")
+        clog = (
+            "* %s Packie McPackerson <packie@mcpackerson.io> - 47.7-1\n"
+            "- Upgrade to the latest and greatest\n" % today
+        )
+
+        # modify the changelogs
+        self.before_rpm.section_changelog = clog
         self.after_rpm.section_changelog = None
+
         self.inspection = "changelog"
         self.label = "changelog"
         # this is INFO because it's only comapring the binary RPMs,
@@ -52,7 +74,18 @@ class LostChangeLogCompareRPMs(TestCompareRPMs):
 class LostChangeLogCompareKoji(TestCompareKoji):
     def setUp(self):
         TestCompareKoji.setUp(self)
+
+        # create a simple changelog
+        today = datetime.date.today().strftime("%a %b %d %Y")
+        clog = (
+            "* %s Packie McPackerson <packie@mcpackerson.io> - 47.7-1\n"
+            "- Upgrade to the latest and greatest\n" % today
+        )
+
+        # modify the changelogs
+        self.before_rpm.section_changelog = clog
         self.after_rpm.section_changelog = None
+
         self.inspection = "changelog"
         self.label = "changelog"
         self.result = "VERIFY"
@@ -64,7 +97,18 @@ class LostChangeLogCompareKoji(TestCompareKoji):
 class GainedChangeLogCompareSRPM(TestCompareSRPM):
     def setUp(self):
         TestCompareSRPM.setUp(self)
+
+        # create a simple changelog
+        today = datetime.date.today().strftime("%a %b %d %Y")
+        clog = (
+            "* %s Packie McPackerson <packie@mcpackerson.io> - 47.7-1\n"
+            "- Upgrade to the latest and greatest\n" % today
+        )
+
+        # modify the changelogs
         self.before_rpm.section_changelog = None
+        self.after_rpm.section_changelog = clog
+
         self.inspection = "changelog"
         self.label = "changelog"
         self.result = "INFO"
@@ -74,7 +118,18 @@ class GainedChangeLogCompareSRPM(TestCompareSRPM):
 class GainedChangeLogCompareRPMs(TestCompareRPMs):
     def setUp(self):
         TestCompareRPMs.setUp(self)
+
+        # create a simple changelog
+        today = datetime.date.today().strftime("%a %b %d %Y")
+        clog = (
+            "* %s Packie McPackerson <packie@mcpackerson.io> - 47.7-1\n"
+            "- Upgrade to the latest and greatest\n" % today
+        )
+
+        # modify the changelogs
         self.before_rpm.section_changelog = None
+        self.after_rpm.section_changelog = clog
+
         self.inspection = "changelog"
         self.label = "changelog"
         self.result = "INFO"
@@ -84,7 +139,18 @@ class GainedChangeLogCompareRPMs(TestCompareRPMs):
 class GainedChangeLogCompareKoji(TestCompareKoji):
     def setUp(self):
         TestCompareKoji.setUp(self)
+
+        # create a simple changelog
+        today = datetime.date.today().strftime("%a %b %d %Y")
+        clog = (
+            "* %s Packie McPackerson <packie@mcpackerson.io> - 47.7-1\n"
+            "- Upgrade to the latest and greatest\n" % today
+        )
+
+        # modify the changelogs
         self.before_rpm.section_changelog = None
+        self.after_rpm.section_changelog = clog
+
         self.inspection = "changelog"
         self.label = "changelog"
         self.result = "INFO"
@@ -185,8 +251,8 @@ class UnbalancedChangeLogEditCompareKoji(TestCompareKoji):
 
         self.inspection = "changelog"
         self.label = "changelog"
-        self.result = "INFO"
-        self.waiver_auth = "Not Waivable"
+        self.result = "VERIFY"
+        self.waiver_auth = "Anyone"
 
 
 # 2) Only add a new entry to the %changelog in the after build.  This
