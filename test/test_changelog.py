@@ -239,20 +239,27 @@ class UnbalancedChangeLogEditCompareKoji(TestCompareKoji):
 
         # create a simple prefix that will result in a multiline removal
         today = datetime.date.today().strftime("%a %b %d %Y")
-        before_prefix = (
+        prefix = (
+            "* %s Packie McPackerson <packie@mcpackerson.io> - 47.7-2\n"
+            "- Another upgrade\n\n" % today
+        )
+        clog = (
             "* %s Packie McPackerson <packie@mcpackerson.io> - 47.7-1\n"
             "- Upgrade to the latest and greatest\n\n" % today
         )
+        suffix = (
+            "* %s Packie McPackerson <packie@mcpackerson.io> - 1.0\n"
+            "- Initial package\n" % today
+        )
 
         # modify the changelog
-        self.before_rpm.section_changelog = (
-            before_prefix + self.before_rpm.section_changelog
-        )
+        self.before_rpm.section_changelog = clog + suffix
+        self.after_rpm.section_changelog = prefix + suffix
 
         self.inspection = "changelog"
         self.label = "changelog"
-        self.result = "VERIFY"
-        self.waiver_auth = "Anyone"
+        self.result = "INFO"
+        self.waiver_auth = "Not Waivable"
 
 
 # 2) Only add a new entry to the %changelog in the after build.  This
