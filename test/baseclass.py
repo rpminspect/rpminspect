@@ -586,13 +586,16 @@ class TestCompareKoji(TestCompareSRPM):
                 self.dumpResults()
 
             self.assertEqual(self.p.returncode, self.exitcode)
-            check_results(
-                self.results,
-                self.label,
-                self.result,
-                self.waiver_auth,
-                message=self.message,
-            )
+            try:
+                check_results(
+                    self.results,
+                    self.label,
+                    self.result,
+                    self.waiver_auth,
+                    message=self.message,
+                )
+            except AssertionError:
+                self.dumpResults()
 
     def tearDown(self):
         shutil.rmtree(self.before_rpm.get_base_dir(), ignore_errors=True)
