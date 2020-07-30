@@ -25,13 +25,11 @@ jsonc = dependency('json-c', required : true)
 libxml = dependency('libxml-2.0', required : true)
 rpm = dependency('rpm', required : true)
 libarchive = dependency('libarchive', required : true)
-libelf = dependency('libelf', required : true)
 libkmod = dependency('libkmod', required : true)
 libcurl = dependency('libcurl', required : true)
 zlib = dependency('zlib', required : true)
 yaml = dependency('yaml-0.1', required : true)
 openssl = dependency('openssl', required : true)
-libcap = dependency('libcap', required : true)
 
 # Test suite dependencies
 run_tests = get_option('tests')
@@ -45,7 +43,18 @@ endif
 
 # Other dependencies
 
-# Find the xmlrpc-c libraries
+# libelf
+libelf = dependency('libelf', method : 'pkg-config', required : false)
+
+if not libelf.found() and cc.has_function('elf_begin', args : ['-lelf'])
+    libelf = declare_dependency(link_args : ['-lelf'])
+endif
+
+if not libelf.found()
+    error('*** unable to find libelf')
+endif
+
+# xmlrpc-c
 xmlrpc_cmd = find_program('xmlrpc-c-config', required : true)
 xmlrpc_libs_cmd = run_command(xmlrpc_cmd, '--libs')
 xmlrpc_cflags_cmd = run_command(xmlrpc_cmd, '--cflags')
@@ -111,6 +120,17 @@ if not cc.has_function('magic_open', args : ['-lmagic'])
 endif
 
 magic = declare_dependency(link_args : ['-lmagic'])
+
+# libcap
+libcap = dependency('libcap', method : 'pkg-config', required : false)
+
+if not libcap.found() and cc.has_function('cap_to_text', args : ['-lcap'])
+    libcap = declare_dependency(link_args : ['-lcap'])
+endif
+
+if not libcap.found()
+    error('*** unable to find libcap')
+endif
 
 # dlopen
 if not cc.has_function('dlopen', args : ['-ldl'], dependencies : [zlib])
