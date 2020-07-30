@@ -358,15 +358,17 @@ jobs:
             - name: pacman --noconfirm -Syu
               run: pacman --noconfirm -Syu
 
-            # Within the container, install the build dependencies and
-            # test suite dependencies
-            - name: Install Build Dependencies
-              run: |
-                  pacman --noconfirm -S make
-                  make instreqs
+            # Install Build Dependencies - Part I
+            - name: Install Build Dependencies - Part I
+              run: pacman --noconfirm -S make git
 
             # This means clone the git repo
             - uses: actions/checkout@v2
+
+            # Within the container, install the build dependencies and
+            # test suite dependencies
+            - name: Install Build Dependencies - Part II
+              run: make instreqs
 
             # Set up the source tree to build
             - name: setup
