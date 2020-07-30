@@ -162,6 +162,8 @@ const char *inspection_desc(const uint64_t inspection)
             return DESC_JAVABYTECODE;
         case INSPECT_CHANGEDFILES:
             return DESC_CHANGEDFILES;
+        case INSPECT_MOVEDFILES:
+            return DESC_MOVEDFILES;
         case INSPECT_REMOVEDFILES:
             return DESC_REMOVEDFILES;
         case INSPECT_ADDEDFILES:
