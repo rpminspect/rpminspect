@@ -355,8 +355,8 @@ jobs:
         # directory, so think of that as your $PWD
         steps:
             # Update the image
-            - name: pacman -Syu
-              run: pacman -Syu
+            - name: pacman --noconfirm -Syu
+              run: pacman --noconfirm -Syu
 
             # Within the container, install the build dependencies and
             # test suite dependencies
