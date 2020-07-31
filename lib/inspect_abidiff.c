@@ -84,7 +84,6 @@ static string_list_t *get_suppressions(const struct rpminspect *ri)
 static void get_debuginfo_dirs(const struct rpminspect *ri)
 {
     rpmpeer_entry_t *peer = NULL;
-    rpmfile_entry_t *file = NULL;
     string_entry_t *entry = NULL;
     const char *name = NULL;
     char *tmp = NULL;
@@ -166,7 +165,6 @@ static void get_debuginfo_dirs(const struct rpminspect *ri)
 static void get_include_dirs(const struct rpminspect *ri)
 {
     rpmpeer_entry_t *peer = NULL;
-    rpmfile_entry_t *file = NULL;
     string_entry_t *entry = NULL;
     char *tmp = NULL;
     struct stat sb;
@@ -237,7 +235,7 @@ static void get_include_dirs(const struct rpminspect *ri)
 }
 
 static bool abidiff_driver(struct rpminspect *ri, rpmfile_entry_t *file) {
-    bool rebase = false;
+//    bool rebase = false;
     struct result_params params;
 
     assert(ri != NULL);
@@ -273,7 +271,7 @@ static bool abidiff_driver(struct rpminspect *ri, rpmfile_entry_t *file) {
 
 
     /* determine if this is a rebase build */
-    rebase = is_rebase(ri);
+//    rebase = is_rebase(ri);
 
     init_result_params(&params);
     params.header = HEADER_ABIDIFF;
