@@ -340,6 +340,8 @@ struct rpminspect {
     string_list_t *forbidden_ipv6_functions;
 
     /* Optional: if not NULL, contains list of architectures */
+    /* if not specified on the command line, this becomes the list of
+       all architectures downloaded */
     string_list_t *arches;
 
     regex_t *elf_path_include;
