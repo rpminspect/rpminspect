@@ -27,11 +27,16 @@
 #include <stdint.h>
 #include <stdbool.h>
 #include <search.h>
-#include <sys/queue.h>
 #include <sys/stat.h>
 #include <sys/capability.h>
 #include <rpm/rpmlib.h>
 #include <libkmod.h>
+
+#ifdef _COMPAT_QUEUE
+#include "compat/queue.h"
+#else
+#include <sys/queue.h>
+#endif
 
 #ifndef _LIBRPMINSPECT_TYPES_H
 #define _LIBRPMINSPECT_TYPES_H
@@ -398,6 +403,9 @@ struct rpminspect {
 
     /* list of forbidden path references for %files sections */
     string_list_t *forbidden_paths;
+
+    /* name of the optional ABI suppression file in the SRPM */
+    char *suppression_file;
 
     /* Options specified by the user */
     char *before;              /* before build ID arg given on cmdline */

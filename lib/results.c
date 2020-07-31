@@ -19,8 +19,13 @@
  * SPDX-License-Identifier: LGPL-3.0-or-later
  */
 
-#include <sys/queue.h>
 #include <assert.h>
+
+#ifdef _COMPAT_QUEUE
+#include "compat/queue.h"
+#else
+#include <sys/queue.h>
+#endif
 
 #include "rpminspect.h"
 

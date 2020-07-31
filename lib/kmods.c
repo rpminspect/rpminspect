@@ -26,8 +26,13 @@
 #include <stdbool.h>
 #include <stdlib.h>
 #include <string.h>
-#include <sys/queue.h>
 #include <libkmod.h>
+
+#ifdef _COMPAT_QUEUE
+#include "compat/queue.h"
+#else
+#include <sys/queue.h>
+#endif
 
 #include "inspect.h"
 #include "rpminspect.h"

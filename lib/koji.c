@@ -23,9 +23,15 @@
 #include <stdbool.h>
 #include <assert.h>
 #include <limits.h>
-#include <sys/queue.h>
 #include <xmlrpc-c/client.h>
 #include <xmlrpc-c/client_global.h>
+
+#ifdef _COMPAT_QUEUE
+#include "compat/queue.h"
+#else
+#include <sys/queue.h>
+#endif
+
 #include "rpminspect.h"
 
 /*

@@ -21,9 +21,14 @@
 
 #include <regex.h>
 #include <stdlib.h>
-#include <sys/queue.h>
 #include <search.h>
 #include "rpminspect.h"
+
+#ifdef _COMPAT_QUEUE
+#include "compat/queue.h"
+#else
+#include <sys/queue.h>
+#endif
 
 void free_regex(regex_t *regex)
 {
@@ -168,6 +173,7 @@ void free_rpminspect(struct rpminspect *ri) {
     list_free(ri->ignores, free);
     list_free(ri->lto_symbol_name_prefixes, free);
     list_free(ri->forbidden_paths, free);
+    free(ri->suppression_file);
 
     free_rpmpeer(ri->peers);
 

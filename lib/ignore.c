@@ -23,9 +23,14 @@
 #include <stdbool.h>
 #include <string.h>
 #include <glob.h>
-#include <sys/queue.h>
 #include <assert.h>
 #include <err.h>
+
+#ifdef _COMPAT_QUEUE
+#include "compat/queue.h"
+#else
+#include <sys/queue.h>
+#endif
 
 #include "rpminspect.h"
 

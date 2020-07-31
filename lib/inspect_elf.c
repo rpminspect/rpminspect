@@ -33,7 +33,6 @@
 #include <search.h>
 #include <stdbool.h>
 #include <stdio.h>
-#include <sys/queue.h>
 #include <sys/types.h>
 
 #include <dlfcn.h>
@@ -42,6 +41,12 @@
 
 #include <gelf.h>
 #include <libelf.h>
+
+#ifdef _COMPAT_QUEUE
+#include "compat/queue.h"
+#else
+#include <sys/queue.h>
+#endif
 
 #include "inspect.h"
 #include "readelf.h"

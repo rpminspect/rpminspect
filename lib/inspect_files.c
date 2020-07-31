@@ -22,8 +22,14 @@
 #include <stdlib.h>
 #include <stdbool.h>
 #include <assert.h>
-#include <sys/queue.h>
 #include <rpm/header.h>
+
+#ifdef _COMPAT_QUEUE
+#include "compat/queue.h"
+#else
+#include <sys/queue.h>
+#endif
+
 #include "rpminspect.h"
 
 /* All of the macros that can appear in a %files section */
