@@ -39,10 +39,15 @@
 
 /* Globals */
 static string_list_t *suppressions = NULL;
+
+//static struct hsearch_data *debug_info_dir1_table;
+//static string_list_t *debug_info_dir1_keys;
+
 static string_list_t *debug_info_dir1 = NULL;
 static string_list_t *debug_info_dir2 = NULL;
 static string_list_t *headers_dir1 = NULL;
 static string_list_t *headers_dir2 = NULL;
+static string_list_t *firstargs = NULL;
 
 static string_list_t *get_suppressions(const struct rpminspect *ri)
 {
@@ -71,8 +76,8 @@ static string_list_t *get_suppressions(const struct rpminspect *ri)
                 }
 
                 entry = calloc(1, sizeof(*entry));
-                entry->data = strdup(file->fullpath);
-                DEBUG_PRINT("suppression option: |%s|\n", entry->data);
+                xasprintf(&entry->data, "--suppressions %s", file->fullpath);
+                assert(entry->data != NULL);
                 TAILQ_INSERT_TAIL(list, entry, items);
             }
         }
@@ -96,8 +101,6 @@ static void get_debuginfo_dirs(const struct rpminspect *ri)
             continue;
         }
 
-        free(tmp);
-
         /* debuginfo dirs from the before build go in debug_info_dir1 */
         if (peer->before_files && !TAILQ_EMPTY(peer->before_files)) {
             name = headerGetString(peer->before_hdr, RPMTAG_NAME);
@@ -107,8 +110,14 @@ static void get_debuginfo_dirs(const struct rpminspect *ri)
                 assert(tmp != NULL);
                 memset(&sb, 0, sizeof(sb));
 
+                if (access(tmp, R_OK) == -1) {
+                    free(tmp);
+                    continue;
+                }
+
                 if (lstat(tmp, &sb) == -1) {
                     warn("lstat()");
+                    free(tmp);
                     continue;
                 }
 
@@ -119,15 +128,14 @@ static void get_debuginfo_dirs(const struct rpminspect *ri)
                     }
 
                     entry = calloc(1, sizeof(*entry));
-                    entry->data = strdup(tmp);
+                    xasprintf(&entry->data, "--debug-info-dir1 %s", tmp);
+                    assert(entry->data != NULL);
                     TAILQ_INSERT_TAIL(debug_info_dir1, entry, items);
                 }
 
                 free(tmp);
             }
         }
-
-        free(tmp);
 
         /* debuginfo dirs from the after build go in debug_info_dir2 */
         if (peer->after_files && !TAILQ_EMPTY(peer->after_files)) {
@@ -138,8 +146,14 @@ static void get_debuginfo_dirs(const struct rpminspect *ri)
                 assert(tmp != NULL);
                 memset(&sb, 0, sizeof(sb));
 
+                if (access(tmp, R_OK) == -1) {
+                    free(tmp);
+                    continue;
+                }
+
                 if (lstat(tmp, &sb) == -1) {
                     warn("lstat()");
+                    free(tmp);
                     continue;
                 }
 
@@ -150,7 +164,8 @@ static void get_debuginfo_dirs(const struct rpminspect *ri)
                     }
 
                     entry = calloc(1, sizeof(*entry));
-                    entry->data = strdup(tmp);
+                    xasprintf(&entry->data, "--debug-info-dir2 %s", tmp);
+                    assert(entry->data != NULL);
                     TAILQ_INSERT_TAIL(debug_info_dir2, entry, items);
                 }
 
@@ -176,16 +191,20 @@ static void get_include_dirs(const struct rpminspect *ri)
             continue;
         }
 
-        free(tmp);
-
         /* include dirs from the before build go in headers_dir1 */
         if (peer->before_files && !TAILQ_EMPTY(peer->before_files)) {
             xasprintf(&tmp, "%s%s", peer->before_root, ri->include_path);
             assert(tmp != NULL);
             memset(&sb, 0, sizeof(sb));
 
+            if (access(tmp, R_OK) == -1) {
+                free(tmp);
+                continue;
+            }
+
             if (lstat(tmp, &sb) == -1) {
                 warn("lstat()");
+                free(tmp);
                 continue;
             }
 
@@ -196,14 +215,13 @@ static void get_include_dirs(const struct rpminspect *ri)
                 }
 
                 entry = calloc(1, sizeof(*entry));
-                entry->data = strdup(tmp);
+                xasprintf(&entry->data, "--headers-dir1 %s", tmp);
+                assert(entry->data != NULL);
                 TAILQ_INSERT_TAIL(headers_dir1, entry, items);
             }
 
             free(tmp);
         }
-
-        free(tmp);
 
         /* include dirs from the after build go in headers_dir2 */
         if (peer->after_files && !TAILQ_EMPTY(peer->after_files)) {
@@ -211,8 +229,14 @@ static void get_include_dirs(const struct rpminspect *ri)
             assert(tmp != NULL);
             memset(&sb, 0, sizeof(sb));
 
+            if (access(tmp, R_OK) == -1) {
+                free(tmp);
+                continue;
+            }
+
             if (lstat(tmp, &sb) == -1) {
                 warn("lstat()");
+                free(tmp);
                 continue;
             }
 
@@ -223,7 +247,8 @@ static void get_include_dirs(const struct rpminspect *ri)
                 }
 
                 entry = calloc(1, sizeof(*entry));
-                entry->data = strdup(tmp);
+                xasprintf(&entry->data, "--headers-dir2 %s", tmp);
+                assert(entry->data != NULL);
                 TAILQ_INSERT_TAIL(headers_dir2, entry, items);
             }
 
@@ -236,6 +261,11 @@ static void get_include_dirs(const struct rpminspect *ri)
 
 static bool abidiff_driver(struct rpminspect *ri, rpmfile_entry_t *file) {
 //    bool rebase = false;
+    string_list_t *argv = NULL;
+    string_entry_t *before = NULL;
+    string_entry_t *after = NULL;
+    int exitcode;
+    char *details = NULL;
     struct result_params params;
 
     assert(ri != NULL);
@@ -257,8 +287,55 @@ static bool abidiff_driver(struct rpminspect *ri, rpmfile_entry_t *file) {
     }
 
     /* build the abidiff command */
+    argv = calloc(1, sizeof(*argv));
+    assert(argv != NULL);
+    TAILQ_INIT(argv);
+
+    TAILQ_CONCAT(argv, firstargs, items);
+
+    if (suppressions && !TAILQ_EMPTY(suppressions)) {
+        TAILQ_CONCAT(argv, suppressions, items);
+    }
+
+    if (debug_info_dir1 && !TAILQ_EMPTY(debug_info_dir1)) {
+        TAILQ_CONCAT(argv, debug_info_dir1, items);
+    }
+
+    if (debug_info_dir2 && !TAILQ_EMPTY(debug_info_dir2)) {
+        TAILQ_CONCAT(argv, debug_info_dir2, items);
+    }
+
+    if (headers_dir1 && !TAILQ_EMPTY(headers_dir1)) {
+        TAILQ_CONCAT(argv, headers_dir1, items);
+    }
+
+    if (headers_dir2 && !TAILQ_EMPTY(headers_dir2)) {
+        TAILQ_CONCAT(argv, headers_dir2, items);
+    }
+
+    before = calloc(1, sizeof(*before));
+    assert(before != NULL);
+    before->data = file->peer_file->fullpath;
+    TAILQ_INSERT_TAIL(argv, before, items);
+
+    after = calloc(1, sizeof(*after));
+    assert(after != NULL);
+    after->data = file->fullpath;
+    TAILQ_INSERT_TAIL(argv, after, items);
+
+    /* run abidiff */
+    details = sl_run_cmd(&exitcode, argv);
+    free(details);
+
+
+
+    details = list_to_string(argv, " ");
+    DEBUG_PRINT("|%s|\n", details);
+    free(details);
+
 
 /*
+ * XXX
  * rough idea:
  * for each ELF file pair:
  *     build an abidiff command line (point to debug info and header files)
@@ -279,6 +356,10 @@ static bool abidiff_driver(struct rpminspect *ri, rpmfile_entry_t *file) {
 
 
 
+    /* cleanup */
+    list_free(argv, NULL);
+    free(before);
+    free(after);
 
     return true;
 }
@@ -288,6 +369,7 @@ static bool abidiff_driver(struct rpminspect *ri, rpmfile_entry_t *file) {
  */
 bool inspect_abidiff(struct rpminspect *ri) {
     bool result = false;
+    string_entry_t *entry = NULL;
     struct result_params params;
 
     assert(ri != NULL);
@@ -301,6 +383,23 @@ bool inspect_abidiff(struct rpminspect *ri) {
     /* get the header dirs */
     get_include_dirs(ri);
 
+    /* build the list of first command line arguments */
+    firstargs = calloc(1, sizeof(*firstargs));
+    assert(firstargs != NULL);
+    TAILQ_INIT(firstargs);
+
+    entry = calloc(1, sizeof(*entry));
+    assert(entry != NULL);
+    entry->data = strdup(ABIDIFF_CMD);
+    TAILQ_INSERT_TAIL(firstargs, entry, items);
+
+    if (ri->abidiff_extra_args) {
+        entry = calloc(1, sizeof(*entry));
+        assert(entry != NULL);
+        entry->data = strdup(ri->abidiff_extra_args);
+        TAILQ_INSERT_TAIL(firstargs, entry, items);
+    }
+
     /* run the main inspection */
     result = foreach_peer_file(ri, abidiff_driver, true);
 
@@ -310,6 +409,7 @@ bool inspect_abidiff(struct rpminspect *ri) {
     list_free(debug_info_dir2, free);
     list_free(headers_dir1, free);
     list_free(headers_dir2, free);
+    list_free(firstargs, free);
 
     /* report the inspection results */
     init_result_params(&params);
