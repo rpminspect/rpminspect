@@ -78,36 +78,40 @@ vendor:
     # with a disable setting that you can uncomment to turn off
     # certain ones.
     #
-    #addedfiles: off
-    #annocheck: off
-    #arch: off
-    #capabilities: off
-    #changedfiles: off
-    #changelog: off
+    #license: off
+    #emptyrpm: off
+    #lostpayload: off
+    #metadata: off
+    #manpage: off
+    #xml: off
+    #elf: off
     #desktop: off
     #disttag: off
-    #DT_NEEDED: off
-    #elf: off
-    #emptyrpm: off
-    #filesize: off
-    #javabytecode: off
-    #kmod: off
-    #license: off
-    #LTO: off
-    #manpage: off
-    #metadata: off
-    #modularity: off
-    #ownership: off
-    #pathmigration: off
-    #permissions: off
-    #removedfiles: off
-    #shellsyntax: off
     #specname: off
-    #subpackages: off
-    #symlinks: off
-    #types: off
+    #modularity: off
+    #javabytecode: off
+    #changedfiles: off
+    #movedfiles: off
+    #removedfiles: off
+    #addedfiles: off
     #upstream: off
-    #xml: off
+    #ownership: off
+    #shellsyntax: off
+    #annocheck: off
+    #DT_NEEDED: off
+    #filesize: off
+    #permissions: off
+    #capabilities: off
+    #kmod: off
+    #arch: off
+    #subpackages: off
+    #changelog: off
+    #pathmigration: off
+    #LTO: off
+    #symlinks: off
+    #%files: off
+    #types: off
+    #abidiff: off
 
 #products:
     # Product release string matches.  rpminspect uses product release
@@ -410,3 +414,20 @@ files:
     # Path references that are not permitted in a %files section.
     forbidden_paths:
         - /usr/lib
+
+abidiff:
+    # The name of the optional ABI suppression file that SRPMs can
+    # include.  This file is used with abidiff(1) in the abidiff
+    # inspection.  It is passed using the --suppressions option on
+    # that command.
+    suppression_file: .abignore
+
+    # Location where debuginfo files live in RPM packages.
+    debuginfo_path: /usr/lib/debug/
+
+    # Location of header files in RPM packages.
+    include_path: /usr/include/
+
+    # Extra arguments for the abidiff(1) program.  These are put on
+    # the command line before the two files being compared.
+    #abidiff_extra_args:

@@ -403,6 +403,16 @@ bool inspect_files(struct rpminspect *ri);
  */
 bool inspect_types(struct rpminspect *ri);
 
+/**
+ * @brief Main driver for the 'abidiff' inspection.
+ *
+ *
+ *
+ * @param ri Pointer to the struct rpminspect for the program.
+ * @return True if the inspection passed, false otherwise.
+ */
+bool inspect_abidiff(struct rpminspect *ri);
+
 /** @} */
 
 /*
@@ -446,6 +456,7 @@ bool inspect_types(struct rpminspect *ri);
 #define INSPECT_LOSTPAYLOAD                 (((uint64_t) 1) << 31)
 #define INSPECT_FILES                       (((uint64_t) 1) << 32)
 #define INSPECT_TYPES                       (((uint64_t) 1) << 33)
+#define INSPECT_ABIDIFF                     (((uint64_t) 1) << 34)
 
 /* Long descriptions for the inspections */
 #define DESC_LICENSE _("Verify the string specified in the License tag of the RPM metadata describes permissible software licenses as defined by the license database. Also checks to see if the License tag contains any unprofessional words as defined in the configuration file.")
@@ -513,5 +524,7 @@ bool inspect_types(struct rpminspect *ri);
 #define DESC_FILES _("Check %files sections in the spec file for any forbidden path references.")
 
 #define DESC_TYPES _("Compare MIME types of files between builds and report any changes for verification.")
+
+#define DESC_ABIDIFF _("When comparing two builds or two packages, compare ELF files using abidiff(1) from the libabigail project.  Differences are reported.  If the package is a rebase and not on the rebaseable list and the rebase inspection is enabled, ABI differences are reported as failures.  The assumption here is that rpminspect is comparing builds for maintenance purposes and you do not want to introduce any ABI changes for users.  If you do not care about that, turn off the rebase inspection or add the package name to the rebaseable list.")
 
 #endif

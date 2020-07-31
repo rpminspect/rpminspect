@@ -63,6 +63,7 @@
 #define HEADER_SYMLINKS      "symlinks"
 #define HEADER_FILES         "%files"
 #define HEADER_TYPES         "types"
+#define HEADER_ABIDIFF       "abidiff"
 
 /*
  * Inspection remedies
@@ -187,5 +188,8 @@
 
 /* types */
 #define REMEDY_TYPES _("In many cases the changing MIME type is deliberate.  Verify that the change is intended and if necessary fix the spec file so the correct file is included in the built package.")
+
+/* abidiff */
+#define REMEDY_ABIDIFF _("ABI changes introduced during maintenance updates can lead to problems for users.  See the abidiff(1) documentationa and the distribution ABI policies to determine if this detected change is allowed.")
 
 #endif

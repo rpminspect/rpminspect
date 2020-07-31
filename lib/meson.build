@@ -24,6 +24,7 @@ librpminspect_sources = [
     'init.c',
     'inspect.c',
     'inspect_addedfiles.c',
+    'inspect_abidiff.c',
     'inspect_annocheck.c',
     'inspect_arch.c',
     'inspect_capabilities.c',

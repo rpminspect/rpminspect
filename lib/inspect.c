@@ -83,6 +83,7 @@ struct inspect inspections[] = {
     { INSPECT_SYMLINKS,      "symlinks",      true,  &inspect_symlinks },
     { INSPECT_FILES,         "%files",        true,  &inspect_files },
     { INSPECT_TYPES,         "types",         false, &inspect_types },
+    { INSPECT_ABIDIFF,       "abidiff",       false, &inspect_abidiff },
     { 0, NULL, false, NULL }
 };
 
@@ -207,6 +208,8 @@ const char *inspection_desc(const uint64_t inspection)
             return DESC_FILES;
         case INSPECT_TYPES:
             return DESC_TYPES;
+        case INSPECT_ABIDIFF:
+            return DESC_ABIDIFF;
         default:
             return NULL;
     }

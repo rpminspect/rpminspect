@@ -174,6 +174,9 @@ void free_rpminspect(struct rpminspect *ri) {
     list_free(ri->lto_symbol_name_prefixes, free);
     list_free(ri->forbidden_paths, free);
     free(ri->suppression_file);
+    free(ri->debuginfo_path);
+    free(ri->include_path);
+    free(ri->abidiff_extra_args);
 
     free_rpmpeer(ri->peers);
 

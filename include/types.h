@@ -407,6 +407,15 @@ struct rpminspect {
     /* name of the optional ABI suppression file in the SRPM */
     char *suppression_file;
 
+    /* path where debuginfo files are found in packages */
+    char *debuginfo_path;
+
+    /* path where header filesa re found in packages */
+    char *include_path;
+
+    /* extra arguments for abidiff(1) */
+    char *abidiff_extra_args;
+
     /* Options specified by the user */
     char *before;              /* before build ID arg given on cmdline */
     char *after;               /* after build ID arg given on cmdline */

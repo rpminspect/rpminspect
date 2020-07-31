@@ -194,6 +194,12 @@
  */
 #define ANNOCHECK_CMD "annocheck"
 
+/**
+ * @def ABIDIFF_CMD
+ * Executable providing abidiff(1)
+ */
+#define ABIDIFF_CMD "abidiff"
+
 /** @} */
 
 /**
@@ -262,6 +268,18 @@
  * Linux loadable kernel modules subdirectory
  */
 #define KERNEL_MODULES_DIR "/lib/modules/"
+
+/**
+ * @def ABIDIFF_SUPPRESSION_FILE
+ * Default ABI suppression file in SRPMs
+ */
+#define ABI_SUPPRESSION_FILE ".abignore"
+
+/**
+ * @def INCLUDE_PATH
+ * Default header file path.
+ */
+#define INCLUDE_PATH "/usr/include/"
 
 /** @} */
 
