@@ -240,6 +240,7 @@ char *compute_checksum(const char *, mode_t *, enum checksum);
 char *checksum(rpmfile_entry_t *);
 
 /* runcmd.c */
+char *sl_run_cmd(int *exitcode, string_list_t *list);
 char *run_cmd(int *, const char *, ...) __attribute__((__sentinel__));
 
 /* fileinfo.c */

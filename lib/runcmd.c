@@ -44,9 +44,8 @@
  * all of the subsequent arguments need to be strings because they all
  * get concatenated together.
  */
-char *run_cmd(int *exitcode, const char *cmd, ...)
+char *sl_run_cmd(int *exitcode, string_list_t *list)
 {
-    va_list ap;
     int status;
     char *output = NULL;
     char *tail = NULL;
@@ -54,25 +53,21 @@ char *run_cmd(int *exitcode, const char *cmd, ...)
     char *buf = NULL;
     FILE *cmdfp = NULL;
     char *built = NULL;
-    char *element = NULL;
+    string_entry_t *entry = NULL;
 
-    assert(cmd != NULL);
+    assert(list != NULL);
 
-    /* Allocate a large buffer to use for building the command */
-    built = strdup(cmd);
-    assert(built != NULL);
-
-    /* Add the remaining elements */
-    va_start(ap, cmd);
-
-    while ((element = va_arg(ap, char *)) != NULL) {
-        xasprintf(&output, "%s %s", built, element);
-        assert(output != NULL);
-        free(built);
-        built = output;
+    /* build the command line */
+    TAILQ_FOREACH(entry, list, items) {
+        if (built == NULL) {
+            built = strdup(entry->data);
+        } else {
+            xasprintf(&output, "%s %s", built, entry->data);
+            assert(output != NULL);
+            free(built);
+            built = output;
+        }
     }
-
-    va_end(ap);
 
     /* always combine stdout and stderr */
     xasprintf(&output, "%s 2>&1", built);
@@ -141,5 +136,48 @@ char *run_cmd(int *exitcode, const char *cmd, ...)
     }
 
     free(built);
+    return output;
+}
+
+/*
+ * Wrapper for sl_run_cmd() that lets you pass in varargs instead of a
+ * string_list_t.
+ */
+char *run_cmd(int *exitcode, const char *cmd, ...)
+{
+    va_list ap;
+    char *output = NULL;
+    char *element = NULL;
+    string_list_t *list = NULL;
+    string_entry_t *entry = NULL;
+
+    assert(cmd != NULL);
+
+    /* convert varargs to a string_list_t */
+    list = calloc(1, sizeof(*list));
+    assert(list != NULL);
+    TAILQ_INIT(list);
+
+    entry = calloc(1, sizeof(*entry));
+    assert(entry != NULL);
+    entry->data = strdup(cmd);
+    TAILQ_INSERT_TAIL(list, entry, items);
+
+    /* Add the remaining elements */
+    va_start(ap, cmd);
+
+    while ((element = va_arg(ap, char *)) != NULL) {
+        entry = calloc(1, sizeof(*entry));
+        assert(entry != NULL);
+        entry->data = strdup(element);
+        TAILQ_INSERT_TAIL(list, entry, items);
+    }
+
+    va_end(ap);
+
+    /* run the command */
+    output = sl_run_cmd(exitcode, list);
+    list_free(list, free);
+
     return output;
 }
