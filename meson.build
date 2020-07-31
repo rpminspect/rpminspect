@@ -139,6 +139,12 @@ endif
 
 dl = declare_dependency(link_args : ['-ldl'])
 
+# Check for sys/queue.h
+if not cc.has_header('sys/queue.h')
+    message('<sys/queue.h> not found, using bundled copy')
+    add_project_arguments('-D_COMPAT_QUEUE', language : 'c')
+endif
+
 # Header files for builds
 inc = include_directories('include')
 
