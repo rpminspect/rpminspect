@@ -105,6 +105,7 @@ static bool inspect_manpage_path(const char *path)
     /* 0 is the whole match, 1 is the directory section, 2 is the filename section */
     regmatch_t section_matches[3];
 
+    int pos;
     char directory_section[128];
     char filename_section[128];
 
@@ -131,12 +132,11 @@ static bool inspect_manpage_path(const char *path)
         return false;
     }
 
-    snprintf(directory_section, sizeof(directory_section), "%.*s",
-             section_matches[1].rm_eo - section_matches[1].rm_so,
-             path + section_matches[1].rm_so);
-    snprintf(filename_section, sizeof(filename_section), "%.*s",
-             section_matches[2].rm_eo - section_matches[2].rm_so,
-             path + section_matches[2].rm_so);
+    pos = section_matches[1].rm_eo - section_matches[1].rm_so;
+    snprintf(directory_section, sizeof(directory_section), "%.*s", pos, path + section_matches[1].rm_so);
+
+    pos = section_matches[2].rm_eo - section_matches[2].rm_so;
+    snprintf(filename_section, sizeof(filename_section), "%.*s", pos, path + section_matches[2].rm_so);
 
     return strprefix(filename_section, directory_section);
 }
