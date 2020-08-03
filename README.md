@@ -222,7 +222,7 @@ The 'make koji' command submits official builds for Fedora and EPEL.
 How To Use
 ----------
 
-SETUP
+### Setup
 
 Make sure you have installed the program and corresponding data file
 collection.  Fedora users can use yum:
@@ -247,7 +247,7 @@ The aim should be the vendor-specific data packages providing
 everything a developer needs to run rpminspect locally for that
 product successfully.
 
-USAGE
+### Usage
 
 rpminspect runs from the command line.  The inputs must be local RPM
 packages, a Koji build specification (NVR), a Koji module
@@ -359,8 +359,15 @@ project.  Some things to keep in mind:
 Licensing and Copyright
 -----------------------
 
-The project is available under the GNU General Public License version
-3 or, at your option, any later version.  Several contributions have
-been under the Apache License 2.0, and the GPLv3+ allows for that.
+The program, the test suite, and developer tools in this source tree
+are available under the GNU General Public License version 3 or, at
+your option, any later version.  The librpminspect library is
+available under the GNU Lesser General Public Licesen version 3 or, at
+your option, any later version.
+
+Some source files in the project carry Apache License 2.0 licenses or
+BSD licenses.  Both of these cases are allowed under the GPLv3 and
+LGPLv3.  The combined work is licensed as described in the previous
+paragraph.
 
 Copyright statements are in the boilerplates of each source file.
