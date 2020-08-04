@@ -351,6 +351,6 @@ const char *get_after_debuginfo_path(struct rpminspect *ri, const char *binarch)
 bool is_rebase(struct rpminspect *ri);
 
 /* arches.c */
-string_list_t *get_arches(struct rpminspect *ri);
+void init_arches(struct rpminspect *ri);
 
 #endif

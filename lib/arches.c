@@ -26,11 +26,11 @@
 #include "rpminspect.h"
 
 /*
- * Return a list of architectures we have packages for.  If the list
- * is NULL, figure it out by looking at all the peers and cache the
- * value.
+ * Initialize the 'arches' list if the user did not specify it.
+ * Contains a list of all architectures represented by the builds
+ * specified.
  */
-string_list_t *get_arches(struct rpminspect *ri)
+void init_arches(struct rpminspect *ri)
 {
     rpmpeer_entry_t *peer = NULL;
     string_entry_t *entry = NULL;
@@ -40,7 +40,7 @@ string_list_t *get_arches(struct rpminspect *ri)
     assert(ri != NULL);
 
     if (ri->arches) {
-        return ri->arches;
+        return;
     }
 
     ri->arches = calloc(1, sizeof(*ri->arches));
@@ -48,6 +48,10 @@ string_list_t *get_arches(struct rpminspect *ri)
     TAILQ_INIT(ri->arches);
 
     TAILQ_FOREACH(peer, ri->peers, items) {
+        if (!peer->after_hdr) {
+            continue;
+        }
+
         arch = get_rpm_header_arch(peer->after_hdr);
 
         if (arch == NULL) {
@@ -71,5 +75,5 @@ string_list_t *get_arches(struct rpminspect *ri)
         }
     }
 
-    return ri->arches;
+    return;
 }

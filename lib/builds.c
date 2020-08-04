@@ -768,5 +768,11 @@ int gather_builds(struct rpminspect *ri, bool fo) {
         return -1;
     }
 
+    /*
+     * init the arches list if the user did not specify it (we have
+     * builds now)
+     */
+    init_arches(ri);
+
     return 0;
 }
