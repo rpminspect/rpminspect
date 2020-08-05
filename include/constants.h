@@ -264,6 +264,13 @@
 #define DEBUG_SRC_PATH "/usr/src/debug/"
 
 /**
+ * @def DEBUG_SUBSTRING
+ * The substring that can appear in filenames installed with debugging
+ * information.
+ */
+#define DEBUG_SUBSTRING "debug"
+
+/**
  * @def KERNEL_MODULES_DIR
  * Linux loadable kernel modules subdirectory
  */
@@ -372,6 +379,16 @@
  * Static ELF library filename extension
  */
 #define STATIC_LIB_FILENAME_EXTENSION ".a"
+
+/**
+ * @def ELF_LIB_EXTENSION
+ * ELF shared library extension.  Note that this extension appears in
+ * the middle of ELF library filenames because a version number comes
+ * after it.  For files that end with just '.so', we do not care so
+ * much because rpminspect will match the files correctly.  That's why
+ * this extension ends with a period.
+ */
+#define ELF_LIB_EXTENSION ".so."
 
 /** @} */
 

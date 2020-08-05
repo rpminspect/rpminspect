@@ -31,7 +31,9 @@
 
 #include <assert.h>
 #include <errno.h>
+#include <err.h>
 #include <regex.h>
+#include <ctype.h>
 #include <search.h>
 #include <stdio.h>
 #include <string.h>
@@ -421,6 +423,123 @@ static void set_peer(rpmfile_entry_t *file, ENTRY *eptr)
 }
 
 /**
+ * @brief Helper for find_one_peer.  Turns version numbers embedded in
+ * certain filenames to generic placeholders.  For example, it would
+ * make these changes:
+ *
+ *     /usr/lib/libNAME.so.1.2.3 -> /usr/lib/libNAME.so.?.?.?
+ *     /usr/lib/debug/usr/lib/libNAME.so.1.2.3-1.47.2-5.x86_64.debug -> /usr/lib/debug/usr/lib/libNAME.so.?.?.?-?.?.?-?.x86_64.debug
+ *
+ * The purpose of these changes is to make finding file peers easier
+ * between different versions of packages.
+ *
+ * @param s The string containing version substrings to convert.
+ * @param ignore Optional string specifying a token string to ignore.
+ * @return The newly created string with generic version number
+ * substrings.  This string must be freed by the caller.
+ */
+static char *comparable_version_substrings(const char *s, const char *ignore)
+{
+    char *orig = NULL;
+    char *inner_orig = NULL;
+    char *outer_orig = NULL;
+    int reg_result = 0;
+    char *outer_token = NULL;
+    char *inner_token = NULL;
+    regex_t num_regex;
+    char reg_error[BUFSIZ];
+    char *result = NULL;
+    int ignore_result = false;
+    size_t i = 0;
+    bool first = true;
+    bool same = true;
+
+    assert(s != NULL);
+
+    /* match number segments of the tail using a regex */
+    reg_result = regcomp(&num_regex, "^[0-9_-]+$", REG_EXTENDED);
+
+    if (reg_result != 0) {
+        regerror(reg_result, &num_regex, reg_error, sizeof(reg_error));
+        warn("regcomp(): %s", reg_error);
+        return NULL;
+    }
+
+    /* make a copy of the input */
+    orig = outer_orig = strdup(s);
+
+    /* iterate over the string tokens */
+    while ((outer_token = strsep(&outer_orig, "/")) != NULL) {
+        if (!strcmp(outer_token, "")) {
+            continue;
+        }
+
+        first = true;
+
+        if (result == NULL) {
+            result = strdup("/");
+        } else {
+            result = strappend(result, "/");
+        }
+
+        /* the outer tokens are directory parts, see if there's a versioned one */
+        if (!regexec(&num_regex, outer_token, 0, NULL, 0) || strcmp(outer_token, "lib64")) {
+            inner_orig = strdup(outer_token);
+
+            /* there is, break down this token in to version number parts */
+            while ((inner_token = strsep(&outer_token, ".")) != NULL) {
+                /* if the caller provided an ignore string, check it */
+                if (ignore == NULL) {
+                    ignore_result = 0;
+                } else {
+                    ignore_result = strcmp(inner_token, ignore);
+                }
+
+                /* add back the version number delimiters */
+                if (first) {
+                    first = false;
+                } else {
+                    result = strappend(result, ".");
+                }
+
+                /* make the version substring generic */
+                same = true;
+
+                if (!regexec(&num_regex, inner_token, 0, NULL, 0) || (strcmp(inner_token, DEBUG_SUBSTRING) && ignore_result)) {
+                    for (i = 0; i < strlen(inner_token); i++) {
+                        if (isdigit(inner_token[i])) {
+                            inner_token[i] = '?';
+                        } else {
+                            same = false;
+                        }
+                    }
+                } else {
+                    same = false;
+                }
+
+                /* append the inner token */
+                if (same) {
+                    result = strappend(result, "?");
+                } else {
+                    result = strappend(result, inner_token);
+                }
+            }
+
+            free(inner_orig);
+        } else {
+            /* nothing special, just append the outer token */
+            result = strappend(result, outer_token);
+        }
+    }
+
+    /* clean up */
+    free(orig);
+    regfree(&num_regex);
+
+    return result;
+}
+
+/**
  * @brief For the given file from "before", attempt to find a matching
  * file in "after".
  *
@@ -459,6 +578,10 @@ static void find_one_peer(rpmfile_entry_t *file, rpmfile_t *after, struct hsearc
     char *before_vr = NULL;
     char *after_vr = NULL;
     char *search_path = NULL;
+    char *before_elf = NULL;
+    char *after_elf = NULL;
+    const char *arch = NULL;
+    const char *after_arch = NULL;
 
     assert(file != NULL);
     assert(after != NULL);
@@ -534,6 +657,10 @@ static void find_one_peer(rpmfile_entry_t *file, rpmfile_t *after, struct hsearc
             return;
         }
 
+        /* we need the build architecture of the file */
+        arch = get_rpm_header_arch(file->rpm_header);
+        assert(arch != NULL);
+
         /* look for a possible match for files that move locations */
         TAILQ_FOREACH(after_file, after, items) {
             /* skip files with peers */
@@ -541,17 +668,25 @@ static void find_one_peer(rpmfile_entry_t *file, rpmfile_t *after, struct hsearc
                 continue;
             }
 
+            /* if the build architectures differ, skip */
+            after_arch = get_rpm_header_arch(after_file->rpm_header);
+            assert(after_arch != NULL);
+
+            if (strcmp(arch, after_arch)) {
+                continue;
+            }
+
             /* match files that move between subpackages */
-            /*
-             * This is a best guess that checks the following:
-             * - localpath
-             * - MIME type
-             *
-             * This may need refinement down the road to check other things.
-             */
             if (strsuffix(after_file->localpath, file->localpath) &&
                 !strcmp(get_mime_type(file), get_mime_type(after_file)) &&
                 strcmp(headerGetString(file->rpm_header, RPMTAG_NAME), headerGetString(after_file->rpm_header, RPMTAG_NAME))) {
+                /*
+                 * This is a best guess that checks the following:
+                 * - localpath
+                 * - MIME type
+                 *
+                 * This may need refinement down the road to check other things.
+                 */
                 DEBUG_PRINT("%s probably moved to %s\n", file->localpath, after_file->localpath);
 
                 e.key = after_file->localpath;
@@ -565,6 +700,38 @@ static void find_one_peer(rpmfile_entry_t *file, rpmfile_t *after, struct hsearc
                     file->peer_file->moved_subpackage = true;
                     return;
                 }
+            } else if (is_elf(file->fullpath) && is_elf(after_file->fullpath)) {
+                /*
+                 * Try to match libraries that have changed versions.
+                 * The idea is to look for ELF files that carry a
+                 * '.so.*' substring and then soft match.  Care has to
+                 * be taken to ensure '.so.1' does not match up with
+                 * '.so.2.0', so some things like counting periods
+                 * will probably have to be done.
+                 */
+                if (!strstr(file->localpath, ELF_LIB_EXTENSION) || !strstr(after_file->localpath, ELF_LIB_EXTENSION)) {
+                    continue;
+                }
+
+                /* create generic version number paths */
+                before_elf = comparable_version_substrings(file->localpath, arch);
+                after_elf = comparable_version_substrings(after_file->localpath, arch);
+
+                /* see if these generic paths match */
+                if (!strcmp(before_elf, after_elf)) {
+                    DEBUG_PRINT("%s probably replaced by %s\n", file->localpath, after_file->localpath);
+
+                    e.key = after_file->localpath;
+                    eptr = NULL;
+                    hsearch_result = hsearch_r(e, FIND, &eptr, after_table);
+
+                    if (hsearch_result != 0 && eptr->data != NULL) {
+                        set_peer(file, eptr);
+                    }
+                }
+
+                free(before_elf);
+                free(after_elf);
             }
         }
     }
