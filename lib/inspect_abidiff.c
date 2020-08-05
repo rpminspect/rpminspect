@@ -38,17 +38,48 @@
 #include "rpminspect.h"
 
 /* Globals */
-static string_list_t *suppressions = NULL;
-
-//static struct hsearch_data *debug_info_dir1_table;
-//static string_list_t *debug_info_dir1_keys;
-
-static string_list_t *debug_info_dir1 = NULL;
-static string_list_t *debug_info_dir2 = NULL;
-static string_list_t *headers_dir1 = NULL;
-static string_list_t *headers_dir2 = NULL;
 static string_list_t *firstargs = NULL;
+static string_list_t *suppressions = NULL;
+static struct hsearch_data *debug_info_dir1_table;
+static struct hsearch_data *debug_info_dir2_table;
+static struct hsearch_data *headers_dir1_table;
+static struct hsearch_data *headers_dir2_table;
 
+/*
+ * Free one of the command line option tables.
+ */
+static void free_argv_table(struct rpminspect *ri, struct hsearch_data *table)
+{
+    ENTRY e;
+    ENTRY *eptr;
+    string_entry_t *entry = NULL;
+
+    assert(ri != NULL);
+    assert(ri->arches != NULL);
+
+    if (table == NULL) {
+        return;
+    }
+
+    TAILQ_FOREACH(entry, ri->arches, items) {
+        e.key = entry->data;
+        hsearch_r(e, FIND, &eptr, table);
+
+        if (eptr != NULL) {
+            list_free(eptr->data, free);
+        }
+    }
+
+    hdestroy_r(table);
+    free(table);
+
+    return;
+}
+
+/*
+ * Get any .abignore files that exist in SRPM files in the build.
+ * These are passed to every invocation of abidiff(1) if they exist.
+ */
 static string_list_t *get_suppressions(const struct rpminspect *ri)
 {
     rpmpeer_entry_t *peer = NULL;
@@ -86,173 +117,266 @@ static string_list_t *get_suppressions(const struct rpminspect *ri)
     return list;
 }
 
-static void get_debuginfo_dirs(const struct rpminspect *ri)
+/*
+ * Checks to see if the given path is a readable directory.
+ */
+static bool usable_dir(const char *path)
 {
-    rpmpeer_entry_t *peer = NULL;
-    string_entry_t *entry = NULL;
-    const char *name = NULL;
-    char *tmp = NULL;
     struct stat sb;
 
-    assert(ri != NULL);
+    if (path == NULL) {
+        return false;
+    }
 
+    if (access(path, R_OK) == -1) {
+        return false;
+    }
+
+    memset(&sb, 0, sizeof(sb));
+
+    if (lstat(path, &sb) == -1) {
+        warn("lstat()");
+        return false;
+    }
+
+    if (!S_ISDIR(sb.st_mode)) {
+        return false;
+    }
+
+    return true;
+}
+
+/*
+ * Gather paths.  This goes in a hash table where the key is the arch
+ * name and the value is a string_list_t of the debug_info_dir1/2 or
+ * header_dir1/2 arguments to abidiff(1).
+ */
+static void get_dirs(struct rpminspect *ri)
+{
+    rpmpeer_entry_t *peer = NULL;
+    string_list_t *list = NULL;
+    string_entry_t *entry = NULL;
+    const char *name = NULL;
+    const char *arch = NULL;
+    char *tmp = NULL;
+    size_t num_arches = 0;
+    int result = 0;
+    ENTRY e;
+    ENTRY *eptr;
+
+    assert(ri != NULL);
+    assert(ri->arches != NULL);
+
+    /* size of our architecture list */
+    num_arches = list_len(ri->arches);
+
+    /* initialize our hash tables */
+    if (debug_info_dir1_table == NULL) {
+        debug_info_dir1_table = calloc(1, sizeof(*debug_info_dir1_table));
+        assert(debug_info_dir1_table != NULL);
+        result = hcreate_r(num_arches * 1.25, debug_info_dir1_table);
+        assert(result != 0);
+    }
+
+    if (debug_info_dir2_table == NULL) {
+        debug_info_dir2_table = calloc(1, sizeof(*debug_info_dir2_table));
+        assert(debug_info_dir2_table != NULL);
+        result = hcreate_r(num_arches * 1.25, debug_info_dir2_table);
+        assert(result != 0);
+    }
+
+    if (headers_dir1_table == NULL) {
+        headers_dir1_table = calloc(1, sizeof(*headers_dir1_table));
+        assert(headers_dir1_table != NULL);
+        result = hcreate_r(num_arches * 1.25, headers_dir1_table);
+        assert(result != 0);
+    }
+
+    if (headers_dir2_table == NULL) {
+        headers_dir2_table = calloc(1, sizeof(*headers_dir2_table));
+        assert(headers_dir2_table != NULL);
+        result = hcreate_r(num_arches * 1.25, headers_dir2_table);
+        assert(result != 0);
+    }
+
+    /* collect each path argument by arch */
     TAILQ_FOREACH(peer, ri->peers, items) {
         if (headerIsSource(peer->before_hdr) || headerIsSource(peer->after_hdr)) {
             continue;
         }
 
-        /* debuginfo dirs from the before build go in debug_info_dir1 */
+        /* paths from the before build go in the 'dir1' tables */
         if (peer->before_files && !TAILQ_EMPTY(peer->before_files)) {
             name = headerGetString(peer->before_hdr, RPMTAG_NAME);
 
             if (strsuffix(name, DEBUGINFO_SUFFIX)) {
+                /* if this is a debuginfo package, find the debuginfo dir */
                 xasprintf(&tmp, "%s%s", peer->before_root, ri->debuginfo_path);
                 assert(tmp != NULL);
-                memset(&sb, 0, sizeof(sb));
 
-                if (access(tmp, R_OK) == -1) {
+                if (!usable_dir(tmp)) {
                     free(tmp);
                     continue;
                 }
 
-                if (lstat(tmp, &sb) == -1) {
-                    warn("lstat()");
-                    free(tmp);
-                    continue;
-                }
-
-                if (S_ISDIR(sb.st_mode)) {
-                    if (debug_info_dir1 == NULL) {
-                        debug_info_dir1 = calloc(1, sizeof(*debug_info_dir1));
-                        TAILQ_INIT(debug_info_dir1);
-                    }
-
-                    entry = calloc(1, sizeof(*entry));
-                    xasprintf(&entry->data, "--debug-info-dir1 %s", tmp);
-                    assert(entry->data != NULL);
-                    TAILQ_INSERT_TAIL(debug_info_dir1, entry, items);
-                }
-
+                /* prepare the new list entry */
+                entry = calloc(1, sizeof(*entry));
+                assert(entry != NULL);
+                xasprintf(&entry->data, "--debug-info-dir1 %s", tmp);
+                assert(entry->data != NULL);
                 free(tmp);
+
+                /* we have the debug info dir, add it */
+                arch = get_rpm_header_arch(peer->before_hdr);
+                e.key = (char *) arch;
+                hsearch_r(e, FIND, &eptr, debug_info_dir1_table);
+
+                if (eptr == NULL) {
+                    /* does not exist in the table, create it and add it */
+                    list = calloc(1, sizeof(*list));
+                    assert(list != NULL);
+                    TAILQ_INIT(list);
+                    TAILQ_INSERT_TAIL(list, entry, items);
+
+                    e.key = (char *) arch;
+                    e.data = list;
+
+                    if (!hsearch_r(e, ENTER, &eptr, debug_info_dir1_table)) {
+                        err(RI_PROGRAM_ERROR, "hsearch_r()");
+                    }
+                } else {
+                    /* list exists, add another entry */
+                    list = (string_list_t *) eptr->data;
+                    TAILQ_INSERT_TAIL(list, entry, items);
+                }
+            } else {
+                /* gather the header paths */
+                xasprintf(&tmp, "%s%s", peer->before_root, ri->include_path);
+                assert(tmp != NULL);
+
+                if (!usable_dir(tmp)) {
+                    free(tmp);
+                    continue;
+                }
+
+                /* prepare the new list entry */
+                entry = calloc(1, sizeof(*entry));
+                assert(entry != NULL);
+                xasprintf(&entry->data, "--headers-dir1 %s", tmp);
+                assert(entry->data != NULL);
+                free(tmp);
+
+                /* we have the headers dir, add it */
+                arch = get_rpm_header_arch(peer->before_hdr);
+                e.key = (char *) arch;
+                hsearch_r(e, FIND, &eptr, headers_dir1_table);
+
+                if (eptr == NULL) {
+                    /* does not exist in the table, create it and add it */
+                    list = calloc(1, sizeof(*list));
+                    assert(list != NULL);
+                    TAILQ_INIT(list);
+                    TAILQ_INSERT_TAIL(list, entry, items);
+
+                    e.key = (char *) arch;
+                    e.data = list;
+
+                    if (!hsearch_r(e, ENTER, &eptr, headers_dir1_table)) {
+                        err(RI_PROGRAM_ERROR, "hsearch_r()");
+                    }
+                } else {
+                    /* list exists, add another entry */
+                    list = (string_list_t *) eptr->data;
+                    TAILQ_INSERT_TAIL(list, entry, items);
+                }
             }
         }
 
-        /* debuginfo dirs from the after build go in debug_info_dir2 */
+        /* paths from the after build go in the 'dir2' tables */
         if (peer->after_files && !TAILQ_EMPTY(peer->after_files)) {
             name = headerGetString(peer->after_hdr, RPMTAG_NAME);
 
             if (strsuffix(name, DEBUGINFO_SUFFIX)) {
+                /* if this is a debuginfo package, find the debuginfo dir */
                 xasprintf(&tmp, "%s%s", peer->after_root, ri->debuginfo_path);
                 assert(tmp != NULL);
-                memset(&sb, 0, sizeof(sb));
 
-                if (access(tmp, R_OK) == -1) {
+                if (!usable_dir(tmp)) {
                     free(tmp);
                     continue;
                 }
 
-                if (lstat(tmp, &sb) == -1) {
-                    warn("lstat()");
-                    free(tmp);
-                    continue;
-                }
-
-                if (S_ISDIR(sb.st_mode)) {
-                    if (debug_info_dir2 == NULL) {
-                        debug_info_dir2 = calloc(1, sizeof(*debug_info_dir2));
-                        TAILQ_INIT(debug_info_dir2);
-                    }
-
-                    entry = calloc(1, sizeof(*entry));
-                    xasprintf(&entry->data, "--debug-info-dir2 %s", tmp);
-                    assert(entry->data != NULL);
-                    TAILQ_INSERT_TAIL(debug_info_dir2, entry, items);
-                }
-
-                free(tmp);
-            }
-        }
-    }
-
-    return;
-}
-
-static void get_include_dirs(const struct rpminspect *ri)
-{
-    rpmpeer_entry_t *peer = NULL;
-    string_entry_t *entry = NULL;
-    char *tmp = NULL;
-    struct stat sb;
-
-    assert(ri != NULL);
-
-    TAILQ_FOREACH(peer, ri->peers, items) {
-        if (headerIsSource(peer->before_hdr) || headerIsSource(peer->after_hdr)) {
-            continue;
-        }
-
-        /* include dirs from the before build go in headers_dir1 */
-        if (peer->before_files && !TAILQ_EMPTY(peer->before_files)) {
-            xasprintf(&tmp, "%s%s", peer->before_root, ri->include_path);
-            assert(tmp != NULL);
-            memset(&sb, 0, sizeof(sb));
-
-            if (access(tmp, R_OK) == -1) {
-                free(tmp);
-                continue;
-            }
-
-            if (lstat(tmp, &sb) == -1) {
-                warn("lstat()");
-                free(tmp);
-                continue;
-            }
-
-            if (S_ISDIR(sb.st_mode)) {
-                if (headers_dir1 == NULL) {
-                    headers_dir1 = calloc(1, sizeof(*headers_dir1));
-                    TAILQ_INIT(headers_dir1);
-                }
-
+                /* prepare the new list entry */
                 entry = calloc(1, sizeof(*entry));
-                xasprintf(&entry->data, "--headers-dir1 %s", tmp);
+                assert(entry != NULL);
+                xasprintf(&entry->data, "--debug-info-dir2 %s", tmp);
                 assert(entry->data != NULL);
-                TAILQ_INSERT_TAIL(headers_dir1, entry, items);
-            }
-
-            free(tmp);
-        }
-
-        /* include dirs from the after build go in headers_dir2 */
-        if (peer->after_files && !TAILQ_EMPTY(peer->after_files)) {
-            xasprintf(&tmp, "%s%s", peer->after_root, ri->include_path);
-            assert(tmp != NULL);
-            memset(&sb, 0, sizeof(sb));
-
-            if (access(tmp, R_OK) == -1) {
                 free(tmp);
-                continue;
-            }
 
-            if (lstat(tmp, &sb) == -1) {
-                warn("lstat()");
-                free(tmp);
-                continue;
-            }
+                /* we have the debug info dir, add it */
+                arch = get_rpm_header_arch(peer->after_hdr);
+                e.key = (char *) arch;
+                hsearch_r(e, FIND, &eptr, debug_info_dir2_table);
 
-            if (S_ISDIR(sb.st_mode)) {
-                if (headers_dir2 == NULL) {
-                    headers_dir2 = calloc(1, sizeof(*headers_dir2));
-                    TAILQ_INIT(headers_dir2);
+                if (eptr == NULL) {
+                    /* does not exist in the table, create it and add it */
+                    list = calloc(1, sizeof(*list));
+                    assert(list != NULL);
+                    TAILQ_INIT(list);
+                    TAILQ_INSERT_TAIL(list, entry, items);
+
+                    e.key = (char *) arch;
+                    e.data = list;
+
+                    if (!hsearch_r(e, ENTER, &eptr, debug_info_dir2_table)) {
+                        err(RI_PROGRAM_ERROR, "hsearch_r()");
+                    }
+                } else {
+                    /* list exists, add another entry */
+                    list = (string_list_t *) eptr->data;
+                    TAILQ_INSERT_TAIL(list, entry, items);
+                }
+            } else {
+                /* gather the header paths */
+                xasprintf(&tmp, "%s%s", peer->after_root, ri->include_path);
+                assert(tmp != NULL);
+
+                if (!usable_dir(tmp)) {
+                    free(tmp);
+                    continue;
                 }
 
+                /* prepare the new list entry */
                 entry = calloc(1, sizeof(*entry));
+                assert(entry != NULL);
                 xasprintf(&entry->data, "--headers-dir2 %s", tmp);
                 assert(entry->data != NULL);
-                TAILQ_INSERT_TAIL(headers_dir2, entry, items);
-            }
+                free(tmp);
 
-            free(tmp);
+                /* we have the headers dir, add it */
+                arch = get_rpm_header_arch(peer->after_hdr);
+                e.key = (char *) arch;
+                hsearch_r(e, FIND, &eptr, headers_dir2_table);
+
+                if (eptr == NULL) {
+                    /* does not exist in the table, create it and add it */
+                    list = calloc(1, sizeof(*list));
+                    assert(list != NULL);
+                    TAILQ_INIT(list);
+                    TAILQ_INSERT_TAIL(list, entry, items);
+
+                    e.key = (char *) arch;
+                    e.data = list;
+
+                    if (!hsearch_r(e, ENTER, &eptr, headers_dir2_table)) {
+                        err(RI_PROGRAM_ERROR, "hsearch_r()");
+                    }
+                } else {
+                    /* list exists, add another entry */
+                    list = (string_list_t *) eptr->data;
+                    TAILQ_INSERT_TAIL(list, entry, items);
+                }
+            }
         }
     }
 
@@ -262,14 +386,22 @@ static void get_include_dirs(const struct rpminspect *ri)
 static bool abidiff_driver(struct rpminspect *ri, rpmfile_entry_t *file) {
 //    bool rebase = false;
     string_list_t *argv = NULL;
+    string_list_t *local_suppressions = NULL;
+    string_list_t *local_d1 = NULL;
+    string_list_t *local_d2 = NULL;
+    string_list_t *arglist = NULL;
     string_entry_t *before = NULL;
     string_entry_t *after = NULL;
+    const char *arch = NULL;
+    ENTRY e;
+    ENTRY *eptr;
     int exitcode;
     char *details = NULL;
     struct result_params params;
 
     assert(ri != NULL);
     assert(file != NULL);
+    assert(firstargs != NULL);
 
     /* skip source packages */
     if (headerIsSource(file->rpm_header)) {
@@ -282,50 +414,73 @@ static bool abidiff_driver(struct rpminspect *ri, rpmfile_entry_t *file) {
     }
 
     /* skip anything that is not an ELF file */
-    if (!S_ISREG(file->st.st_mode) && !is_elf(file->fullpath)) {
+    if (!S_ISREG(file->st.st_mode) || !is_elf(file->fullpath)) {
         return true;
     }
 
-    /* build the abidiff command */
-    argv = calloc(1, sizeof(*argv));
-    assert(argv != NULL);
-    TAILQ_INIT(argv);
+    /* get the package architecture */
+    arch = get_rpm_header_arch(file->rpm_header);
 
-    TAILQ_CONCAT(argv, firstargs, items);
+    /* build the abidiff command */
+    argv = list_copy(firstargs);
 
     if (suppressions && !TAILQ_EMPTY(suppressions)) {
-        TAILQ_CONCAT(argv, suppressions, items);
+        local_suppressions = list_copy(suppressions);
+        TAILQ_CONCAT(argv, local_suppressions, items);
     }
 
-    if (debug_info_dir1 && !TAILQ_EMPTY(debug_info_dir1)) {
-        TAILQ_CONCAT(argv, debug_info_dir1, items);
+    e.key = (char *) arch;
+    hsearch_r(e, FIND, &eptr, debug_info_dir1_table);
+
+    if (eptr != NULL) {
+        arglist = (string_list_t *) eptr->data;
+
+        if (arglist && !TAILQ_EMPTY(arglist)) {
+            local_d1 = list_copy(arglist);
+            TAILQ_CONCAT(argv, local_d1, items);
+        }
     }
 
-    if (debug_info_dir2 && !TAILQ_EMPTY(debug_info_dir2)) {
-        TAILQ_CONCAT(argv, debug_info_dir2, items);
+    e.key = (char *) arch;
+    hsearch_r(e, FIND, &eptr, debug_info_dir2_table);
+
+    if (eptr != NULL) {
+        arglist = (string_list_t *) eptr->data;
+
+        if (arglist && !TAILQ_EMPTY(arglist)) {
+            local_d2 = list_copy(arglist);
+            TAILQ_CONCAT(argv, local_d2, items);
+        }
     }
 
-    if (headers_dir1 && !TAILQ_EMPTY(headers_dir1)) {
-        TAILQ_CONCAT(argv, headers_dir1, items);
-    }
+//    if (headers_dir1 && !TAILQ_EMPTY(headers_dir1)) {
+//        TAILQ_CONCAT(argv, headers_dir1, items);
+//    }
 
-    if (headers_dir2 && !TAILQ_EMPTY(headers_dir2)) {
-        TAILQ_CONCAT(argv, headers_dir2, items);
-    }
+//    if (headers_dir2 && !TAILQ_EMPTY(headers_dir2)) {
+//        TAILQ_CONCAT(argv, headers_dir2, items);
+//    }
 
     before = calloc(1, sizeof(*before));
     assert(before != NULL);
-    before->data = file->peer_file->fullpath;
+    before->data = strdup(file->peer_file->fullpath);
+    assert(before->data != NULL);
     TAILQ_INSERT_TAIL(argv, before, items);
 
     after = calloc(1, sizeof(*after));
     assert(after != NULL);
-    after->data = file->fullpath;
+    after->data = strdup(file->fullpath);
+    assert(after->data != NULL);
     TAILQ_INSERT_TAIL(argv, after, items);
 
     /* run abidiff */
     details = sl_run_cmd(&exitcode, argv);
     free(details);
+
+
+
+
+
 
 
 
@@ -357,9 +512,10 @@ static bool abidiff_driver(struct rpminspect *ri, rpmfile_entry_t *file) {
 
 
     /* cleanup */
-    list_free(argv, NULL);
-    free(before);
-    free(after);
+    list_free(argv, free);
+    free(local_suppressions);
+    free(local_d1);
+    free(local_d2);
 
     return true;
 }
@@ -377,11 +533,8 @@ bool inspect_abidiff(struct rpminspect *ri) {
     /* if there's a .abignore file in the after SRPM, we need to use it */
     suppressions = get_suppressions(ri);
 
-    /* get the debug info dirs */
-    get_debuginfo_dirs(ri);
-
-    /* get the header dirs */
-    get_include_dirs(ri);
+    /* get the debug info and header dirs */
+    get_dirs(ri);
 
     /* build the list of first command line arguments */
     firstargs = calloc(1, sizeof(*firstargs));
@@ -404,12 +557,12 @@ bool inspect_abidiff(struct rpminspect *ri) {
     result = foreach_peer_file(ri, abidiff_driver, true);
 
     /* clean up */
-    list_free(suppressions, free);
-    list_free(debug_info_dir1, free);
-    list_free(debug_info_dir2, free);
-    list_free(headers_dir1, free);
-    list_free(headers_dir2, free);
     list_free(firstargs, free);
+    list_free(suppressions, free);
+    free_argv_table(ri, debug_info_dir1_table);
+    free_argv_table(ri, debug_info_dir2_table);
+    free_argv_table(ri, headers_dir1_table);
+    free_argv_table(ri, headers_dir2_table);
 
     /* report the inspection results */
     init_result_params(&params);
