@@ -104,6 +104,7 @@ if python.found()
     test_env.set('RPMINSPECT_TEST_DATA_PATH', meson.source_root() + '/test/data')
 
     test_suites = [
+        'test_addedfiles.py',
         'test_changelog.py',
         'test_command.py',
         'test_default.py',
