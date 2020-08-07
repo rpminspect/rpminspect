@@ -20,6 +20,11 @@ import os
 
 import rpmfluff
 
+try:
+    from rpmfluff import simple_library_source
+except ImportError:
+    from rpmfluff.samples import simple_library_source
+
 from baseclass import TestRPMs, TestKoji, TestCompareRPMs, TestCompareKoji
 
 datadir = os.environ["RPMINSPECT_TEST_DATA_PATH"]
@@ -332,7 +337,7 @@ class HasTEXTRELRPMs(TestRPMs):
 
         # Can't use rpmfluff here because it always adds -fPIC
         self.rpm.add_source(
-            rpmfluff.SourceFile("simple.c", rpmfluff.simple_library_source)
+            rpmfluff.SourceFile("simple.c", simple_library_source)
         )
         self.rpm.section_build += (
             "gcc -m32 -fno-pic -shared -Wl,-z,noexecstack -o libsimple.so simple.c\n"
@@ -357,7 +362,7 @@ class HasTEXTRELCompareRPMs(TestCompareRPMs):
 
         # Can't use rpmfluff here because it always adds -fPIC
         self.before_rpm.add_source(
-            rpmfluff.SourceFile("simple.c", rpmfluff.simple_library_source)
+            rpmfluff.SourceFile("simple.c", simple_library_source)
         )
         self.before_rpm.section_build += (
             "gcc -m32 -fPIC -shared -Wl,-z,noexecstack -o libsimple.so simple.c\n"
@@ -371,7 +376,7 @@ class HasTEXTRELCompareRPMs(TestCompareRPMs):
         self.before_rpm.add_payload_check(installPath, None)
 
         self.after_rpm.add_source(
-            rpmfluff.SourceFile("simple.c", rpmfluff.simple_library_source)
+            rpmfluff.SourceFile("simple.c", simple_library_source)
         )
         self.after_rpm.section_build += (
             "gcc -m32 -fno-pic -shared -Wl,-z,noexecstack -o libsimple.so simple.c\n"
@@ -398,7 +403,7 @@ class HasTEXTRELCompareKoji(TestCompareKoji):
 
         # Can't use rpmfluff here because it always adds -fPIC
         self.before_rpm.add_source(
-            rpmfluff.SourceFile("simple.c", rpmfluff.simple_library_source)
+            rpmfluff.SourceFile("simple.c", simple_library_source)
         )
         self.before_rpm.section_build += (
             "gcc -m32 -fPIC -shared -Wl,-z,noexecstack -o libsimple.so simple.c\n"
@@ -412,7 +417,7 @@ class HasTEXTRELCompareKoji(TestCompareKoji):
         self.before_rpm.add_payload_check(installPath, None)
 
         self.after_rpm.add_source(
-            rpmfluff.SourceFile("simple.c", rpmfluff.simple_library_source)
+            rpmfluff.SourceFile("simple.c", simple_library_source)
         )
         self.after_rpm.section_build += (
             "gcc -m32 -fno-pic -shared -Wl,-z,noexecstack -o libsimple.so simple.c\n"

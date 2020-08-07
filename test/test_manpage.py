@@ -18,6 +18,11 @@
 
 import rpmfluff
 
+try:
+    from rpmfluff import sample_man_page
+except ImportError:
+    from rpmfluff.samples import sample_man_page
+
 from baseclass import TestRPMs, TestKoji, TestCompareRPMs, TestCompareKoji
 
 
@@ -110,7 +115,7 @@ class ManPageNotGzippedRPM(TestRPMs):
         # add an uncompressed man page
         self.rpm.add_installed_file(
             "usr/local/share/man/man1/foo.1",
-            rpmfluff.SourceFile("foo.1", rpmfluff.sample_man_page),
+            rpmfluff.SourceFile("foo.1", sample_man_page),
         )
 
         # the test
@@ -133,7 +138,7 @@ class ManPageNotGzippedKoji(TestKoji):
         # add an uncompressed man page
         self.rpm.add_installed_file(
             "usr/local/share/man/man1/foo.1",
-            rpmfluff.SourceFile("foo.1", rpmfluff.sample_man_page),
+            rpmfluff.SourceFile("foo.1", sample_man_page),
         )
 
         # the test
@@ -157,11 +162,11 @@ class ManPageNotGzippedCompareRPMs(TestCompareRPMs):
         # add an uncompressed man page
         self.before_rpm.add_installed_file(
             "usr/local/share/man/man1/foo.1",
-            rpmfluff.SourceFile("foo.1", rpmfluff.sample_man_page),
+            rpmfluff.SourceFile("foo.1", sample_man_page),
         )
         self.after_rpm.add_installed_file(
             "usr/local/share/man/man1/foo.1",
-            rpmfluff.SourceFile("foo.1", rpmfluff.sample_man_page),
+            rpmfluff.SourceFile("foo.1", sample_man_page),
         )
 
         # the test
@@ -185,11 +190,11 @@ class ManPageNotGzippedCompareKoji(TestCompareKoji):
         # add an uncompressed man page
         self.before_rpm.add_installed_file(
             "usr/local/share/man/man1/foo.1",
-            rpmfluff.SourceFile("foo.1", rpmfluff.sample_man_page),
+            rpmfluff.SourceFile("foo.1", sample_man_page),
         )
         self.after_rpm.add_installed_file(
             "usr/local/share/man/man1/foo.1",
-            rpmfluff.SourceFile("foo.1", rpmfluff.sample_man_page),
+            rpmfluff.SourceFile("foo.1", sample_man_page),
         )
 
         # the test

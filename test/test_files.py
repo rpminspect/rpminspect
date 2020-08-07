@@ -18,6 +18,11 @@
 
 import rpmfluff
 
+try:
+    from rpmfluff import simple_library_source
+except ImportError:
+    from rpmfluff.samples import simple_library_source
+
 from baseclass import TestSRPM, TestKoji, TestCompareSRPM, TestCompareKoji
 
 
@@ -29,7 +34,7 @@ class ValidFilesSectionSRPM(TestSRPM):
         libraryName = "libfoo.so"
         sourceFileName = "foo.c"
         self.rpm.add_source(
-            rpmfluff.SourceFile(sourceFileName, rpmfluff.simple_library_source)
+            rpmfluff.SourceFile(sourceFileName, simple_library_source)
         )
         self.rpm.section_build += "gcc --shared -fPIC -o %s %s %s\n" % (
             libraryName,
@@ -58,7 +63,7 @@ class ValidFilesSectionKoji(TestKoji):
         libraryName = "libfoo.so"
         sourceFileName = "foo.c"
         self.rpm.add_source(
-            rpmfluff.SourceFile(sourceFileName, rpmfluff.simple_library_source)
+            rpmfluff.SourceFile(sourceFileName, simple_library_source)
         )
         self.rpm.section_build += "gcc --shared -fPIC -o %s %s %s\n" % (
             libraryName,
@@ -87,7 +92,7 @@ class ValidFilesSectionCompareSRPM(TestCompareSRPM):
         libraryName = "libfoo.so"
         sourceFileName = "foo.c"
         self.after_rpm.add_source(
-            rpmfluff.SourceFile(sourceFileName, rpmfluff.simple_library_source)
+            rpmfluff.SourceFile(sourceFileName, simple_library_source)
         )
         self.after_rpm.section_build += "gcc --shared -fPIC -o %s %s %s\n" % (
             libraryName,
@@ -116,7 +121,7 @@ class ValidFilesSectionCompareKoji(TestCompareKoji):
         libraryName = "libfoo.so"
         sourceFileName = "foo.c"
         self.after_rpm.add_source(
-            rpmfluff.SourceFile(sourceFileName, rpmfluff.simple_library_source)
+            rpmfluff.SourceFile(sourceFileName, simple_library_source)
         )
         self.after_rpm.section_build += "gcc --shared -fPIC -o %s %s %s\n" % (
             libraryName,
