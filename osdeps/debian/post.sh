@@ -4,7 +4,7 @@ PATH=/bin:/usr/bin:/sbin:/usr/sbin
 # Install kernel headers for the running kernel
 apt-get -y install linux-headers-$(uname -r)
 
-# The mandoc package on Ubuntu lacks libmandoc.a and
+# The mandoc package on Debian lacks libmandoc.a and
 # header files, which we need to build rpminspect
 curl -O https://mandoc.bsd.lv/snapshots/mandoc.tar.gz
 SUBDIR="$(tar -tvf mandoc.tar.gz | head -n 1 | rev | cut -d ' ' -f 1 | rev)"
@@ -25,6 +25,10 @@ echo 'INSTALL_MAN="install -D -m 0644"'     >> configure.local
 echo 'INSTALL_DATA="install -D -m 0644"'    >> configure.local
 echo 'INSTALL_LIBMANDOC=1'                  >> configure.local
 echo 'CFLAGS="-g -fPIC"'                    >> configure.local
+
+# unusual workarounds for executable on Debian
+sed -i -e 's|@echo|@/bin/echo|g' configure
+
 ./configure
 make
 make lib-install
