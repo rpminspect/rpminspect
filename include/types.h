@@ -713,4 +713,46 @@ typedef enum _elfinfo_t {
     ELF_MACHINE = 1
 } elfinfo_t;
 
+/*
+ * Exit status for abidiff and abicompat tools.  It's actually a bit
+ * mask.  The value of each enumerator is a power of two.
+ *
+ * (This is lifted from abg-tools-utils.h in libabigail because it
+ * cannot be included directly because libabigail is C++.)
+ */
+enum abidiff_status {
+  /*
+   * This is for when the compared ABIs are equal.
+   * Its numerical value is 0.
+   */
+  ABIDIFF_OK = 0,
+
+  /*
+   * This bit is set if there an application error.
+   * Its numerical value is 1.
+   */
+  ABIDIFF_ERROR = 1,
+
+  /*
+   * This bit is set if the tool is invoked in an non appropriate
+   * manner.
+   * Its numerical value is 2.
+   */
+  ABIDIFF_USAGE_ERROR = 1 << 1,
+
+  /*
+   * This bit is set if the ABIs being compared are different.
+   * Its numerical value is 4.
+   */
+  ABIDIFF_ABI_CHANGE = 1 << 2,
+
+  /*
+   * This bit is set if the ABIs being compared are different *and*
+   * are incompatible.
+   *
+   * Its numerical value is 8.
+   */
+  ABIDIFF_ABI_INCOMPATIBLE_CHANGE = 1 << 3
+};
+
 #endif

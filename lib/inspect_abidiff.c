@@ -384,20 +384,27 @@ static void get_dirs(struct rpminspect *ri)
 }
 
 static bool abidiff_driver(struct rpminspect *ri, rpmfile_entry_t *file) {
-//    bool rebase = false;
+    bool rebase = false;
     string_list_t *argv = NULL;
     string_list_t *local_suppressions = NULL;
     string_list_t *local_d1 = NULL;
     string_list_t *local_d2 = NULL;
+    string_list_t *local_h1 = NULL;
+    string_list_t *local_h2 = NULL;
     string_list_t *arglist = NULL;
     string_entry_t *before = NULL;
     string_entry_t *after = NULL;
     const char *arch = NULL;
+    const char *name = NULL;
     ENTRY e;
     ENTRY *eptr;
-    int exitcode;
+    int exitcode = 0;
+    int status = 0;
+    char *cmd = NULL;
     char *details = NULL;
     struct result_params params;
+    bool report = false;
+    int abi_compat_level = 0;
 
     assert(ri != NULL);
     assert(file != NULL);
@@ -429,6 +436,7 @@ static bool abidiff_driver(struct rpminspect *ri, rpmfile_entry_t *file) {
         TAILQ_CONCAT(argv, local_suppressions, items);
     }
 
+    /* debug dir args */
     e.key = (char *) arch;
     hsearch_r(e, FIND, &eptr, debug_info_dir1_table);
 
@@ -453,20 +461,41 @@ static bool abidiff_driver(struct rpminspect *ri, rpmfile_entry_t *file) {
         }
     }
 
-//    if (headers_dir1 && !TAILQ_EMPTY(headers_dir1)) {
-//        TAILQ_CONCAT(argv, headers_dir1, items);
-//    }
+    /* header dir args */
+/* XXX - not supported yet in abidiff
+    e.key = (char *) arch;
+    hsearch_r(e, FIND, &eptr, headers_dir1_table);
 
-//    if (headers_dir2 && !TAILQ_EMPTY(headers_dir2)) {
-//        TAILQ_CONCAT(argv, headers_dir2, items);
-//    }
+    if (eptr != NULL) {
+        arglist = (string_list_t *) eptr->data;
 
+        if (arglist && !TAILQ_EMPTY(arglist)) {
+            local_h1 = list_copy(arglist);
+            TAILQ_CONCAT(argv, local_h1, items);
+        }
+    }
+
+    e.key = (char *) arch;
+    hsearch_r(e, FIND, &eptr, headers_dir2_table);
+
+    if (eptr != NULL) {
+        arglist = (string_list_t *) eptr->data;
+
+        if (arglist && !TAILQ_EMPTY(arglist)) {
+            local_h2 = list_copy(arglist);
+            TAILQ_CONCAT(argv, local_h2, items);
+        }
+    }
+*/
+
+    /* the before build */
     before = calloc(1, sizeof(*before));
     assert(before != NULL);
     before->data = strdup(file->peer_file->fullpath);
     assert(before->data != NULL);
     TAILQ_INSERT_TAIL(argv, before, items);
 
+    /* the after build */
     after = calloc(1, sizeof(*after));
     assert(after != NULL);
     after->data = strdup(file->fullpath);
@@ -475,47 +504,85 @@ static bool abidiff_driver(struct rpminspect *ri, rpmfile_entry_t *file) {
 
     /* run abidiff */
     details = sl_run_cmd(&exitcode, argv);
-    free(details);
-
-
-
-
-
-
-
-
-    details = list_to_string(argv, " ");
-    DEBUG_PRINT("|%s|\n", details);
-    free(details);
-
-
-/*
- * XXX
- * rough idea:
- * for each ELF file pair:
- *     build an abidiff command line (point to debug info and header files)
- *         any srpm with a .abignore file needs to be added as --suppressions on the command line (use full path to file)
- *     run abidiff
- *     report abidiff result:
- *         for failures, check against abi whitelist
- *         anything that is an ABI break in level 1 or 2 is a failure, every other break is info only if it's in the whitelist
- */
-
 
     /* determine if this is a rebase build */
-//    rebase = is_rebase(ri);
+    rebase = is_rebase(ri);
 
+    /* report the results */
     init_result_params(&params);
     params.header = HEADER_ABIDIFF;
+    params.waiverauth = WAIVABLE_BY_ANYONE;
+    params.remedy = REMEDY_ABIDIFF;
+    params.arch = arch;
 
+    if (!WIFEXITED(exitcode)) {
+        cmd = list_to_string(argv, " ");
+        xasprintf(&details, "Command: %s", cmd);
+        params.msg = _("ABI comparison ended unexpectedly.");
+        params.verb = VERB_FAILED;
+        params.noun = ABIDIFF_CMD;
+        report = true;
+    } else {
+        status = WEXITSTATUS(exitcode);
 
+        if ((status & ABIDIFF_ERROR) || (status & ABIDIFF_USAGE_ERROR)) {
+            params.severity = RESULT_VERIFY;
+            params.verb = VERB_FAILED;
+            params.noun = ABIDIFF_CMD;
+            report = true;
+        }
 
+        if (!rebase && (status & ABIDIFF_ABI_CHANGE)) {
+            params.severity = RESULT_VERIFY;
+            params.verb = VERB_CHANGED;
+            params.noun = _("ABI");
+            report = true;
+        }
+
+        if (!rebase && (status & ABIDIFF_ABI_INCOMPATIBLE_CHANGE)) {
+            params.severity = RESULT_BAD;
+            params.verb = VERB_CHANGED;
+            params.noun = _("ABI");
+            report = true;
+        }
+
+/* XXX check the abi compat list to set abi_compat_level */
+
+        if (report) {
+            name = headerGetString(file->rpm_header, RPMTAG_NAME);
+
+            if (!strcmp(file->peer_file->localpath, file->localpath)) {
+                if (abi_compat_level) {
+                    xasprintf(&params.msg, _("old vs. new version of %s in package %s with ABI compatibility level %d"), file->localpath, name, abi_compat_level);
+                } else {
+                    xasprintf(&params.msg, _("old vs. new version of %s in package %s"), file->localpath, name);
+                }
+            } else {
+                if (abi_compat_level) {
+                    xasprintf(&params.msg, _("from %s to %s in package %s with ABI compatibility level %d"), file->peer_file->localpath, file->localpath, name, abi_compat_level);
+                } else {
+                    xasprintf(&params.msg, _("from %s to %s in package %s"), file->peer_file->localpath, file->localpath, name);
+                }
+            }
+        }
+    }
+
+    if (report) {
+        params.file = file->localpath;
+        params.details = details;
+        add_result(ri, &params);
+        free(params.msg);
+    }
 
     /* cleanup */
     list_free(argv, free);
     free(local_suppressions);
     free(local_d1);
     free(local_d2);
+    free(local_h1);
+    free(local_h2);
+    free(cmd);
+    free(details);
 
     return true;
 }
