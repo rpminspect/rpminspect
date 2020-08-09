@@ -29,7 +29,9 @@
 #include <errno.h>
 #include <assert.h>
 #include <err.h>
+#ifdef _LINUX
 #include <sys/capability.h>
+#endif
 
 #include "rpminspect.h"
 
@@ -96,8 +98,10 @@ static bool ownership_driver(struct rpminspect *ri, rpmfile_entry_t *file) {
     char *before_val = NULL;
     char *after_val = NULL;
     char *what = NULL;
+#ifdef _LINUX
     cap_t cap = NULL;
     cap_flag_value_t have_setuid = CAP_CLEAR;
+#endif
     struct result_params params;
 
     /* Skip source packages */
@@ -186,6 +190,7 @@ static bool ownership_driver(struct rpminspect *ri, rpmfile_entry_t *file) {
                 result = false;
             }
 
+#ifdef _LINUX
             /* Check the group - special handling */
             if (strcmp(group, ri->bin_group)) {
                 /* Gather capabilities(7) for the file we need */
@@ -232,6 +237,7 @@ static bool ownership_driver(struct rpminspect *ri, rpmfile_entry_t *file) {
 
             break;
         }
+#endif
     }
 
     /*

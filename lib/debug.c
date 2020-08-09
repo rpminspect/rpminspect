@@ -29,7 +29,12 @@
 
 #include <stdio.h>
 #include <assert.h>
+
 #include "rpminspect.h"
+
+#ifdef _DARWIN
+#include "hsearch_r.h"
+#endif
 
 /**
  * @brief Set the global debugging mode.

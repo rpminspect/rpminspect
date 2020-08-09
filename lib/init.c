@@ -28,7 +28,12 @@
 #include <errno.h>
 #include <err.h>
 #include <yaml.h>
+
 #include "rpminspect.h"
+
+#ifdef _DARWIN
+#include "hsearch_r.h"
+#endif
 
 /* List defaults (not in constants.h to avoid cpp shenanigans) */
 

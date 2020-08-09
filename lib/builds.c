@@ -35,6 +35,7 @@
 #include <sys/stat.h>
 #include <dirent.h>
 #include <unistd.h>
+#include <libgen.h>
 #include <errno.h>
 #include <rpm/rpmlib.h>
 #include <curl/curl.h>

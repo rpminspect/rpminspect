@@ -22,12 +22,17 @@
 #include <regex.h>
 #include <stdlib.h>
 #include <search.h>
+
 #include "rpminspect.h"
 
 #ifdef _COMPAT_QUEUE
 #include "compat/queue.h"
 #else
 #include <sys/queue.h>
+#endif
+
+#ifdef _DARWIN
+#include "hsearch_r.h"
 #endif
 
 void free_regex(regex_t *regex)

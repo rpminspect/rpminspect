@@ -28,9 +28,13 @@
 #include <stdbool.h>
 #include <search.h>
 #include <sys/stat.h>
-#include <sys/capability.h>
 #include <rpm/rpmlib.h>
 #include <libkmod.h>
+
+#ifndef _DARWIN
+#include <sys/capability.h>
+#include "hsearch_r.h"
+#endif
 
 #ifdef _COMPAT_QUEUE
 #include "compat/queue.h"
@@ -103,7 +107,9 @@ typedef struct _rpmfile_entry_t {
     int idx;
     char *type;
     char *checksum;
+#ifndef _DARWIN
     cap_t cap;
+#endif
     struct _rpmfile_entry_t *peer_file;
     bool moved_path;
     bool moved_subpackage;

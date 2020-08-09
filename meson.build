@@ -14,6 +14,12 @@ cc = meson.get_compiler('c')
 add_global_arguments('-D_GNU_SOURCE', language : 'c')
 add_global_arguments('-DPACKAGE_VERSION="@0@"'.format(meson.project_version()), language : 'c')
 
+if build_machine.system() == 'linux'
+    add_project_arguments('-D_LINUX', language : 'c')
+elif build_machine.system() == 'darwin'
+    add_project_arguments('-D_DARWIN', language : 'c')
+endif
+
 # Translations
 if find_program('xgettext', required : get_option('nls')).found()
     add_global_arguments('-DGETTEXT_DOMAIN="' + meson.project_name() + '"', language : 'c')
@@ -122,14 +128,16 @@ endif
 magic = declare_dependency(link_args : ['-lmagic'])
 
 # libcap
-libcap = dependency('libcap', method : 'pkg-config', required : false)
+if build_machine.system() == 'linux'
+    libcap = dependency('libcap', method : 'pkg-config', required : false)
 
-if not libcap.found() and cc.has_function('cap_to_text', args : ['-lcap'])
-    libcap = declare_dependency(link_args : ['-lcap'])
-endif
+    if not libcap.found() and cc.has_function('cap_to_text', args : ['-lcap'])
+        libcap = declare_dependency(link_args : ['-lcap'])
+    endif
 
-if not libcap.found()
-    error('*** unable to find libcap')
+    if not libcap.found()
+        error('*** unable to find libcap')
+    endif
 endif
 
 # dlopen

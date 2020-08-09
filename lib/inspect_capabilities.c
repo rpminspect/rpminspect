@@ -28,6 +28,9 @@
 
 static bool capabilities_driver(struct rpminspect *ri, rpmfile_entry_t *file)
 {
+#ifdef _DARWIN
+    return true;
+#else
     bool result = true;
     cap_t aftercap = NULL;
     cap_t beforecap = NULL;
@@ -139,6 +142,7 @@ static bool capabilities_driver(struct rpminspect *ri, rpmfile_entry_t *file)
     }
 
     return result;
+#endif
 }
 
 /*

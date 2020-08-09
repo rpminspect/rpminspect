@@ -25,9 +25,12 @@
 
 #include <stdbool.h>
 #include <sys/types.h>
-#include <sys/capability.h>
 #include <regex.h>
 #include <rpm/header.h>
+
+#ifndef _DARWIN
+#include <sys/capability.h>
+#endif
 
 #include "constants.h"
 #include "types.h"
@@ -205,7 +208,10 @@ void free_files(rpmfile_t *files);
 rpmfile_t * extract_rpm(const char *, Header, char **output_dir);
 bool process_file_path(const rpmfile_entry_t *, regex_t *, regex_t *);
 void find_file_peers(rpmfile_t *, rpmfile_t *);
+#ifndef _DARWIN
 cap_t get_cap(rpmfile_entry_t *);
+#endif
+
 bool is_debug_or_build_path(const char *);
 bool is_payload_empty(rpmfile_t *);
 

@@ -28,7 +28,14 @@
 #include <gelf.h>
 #include <stdbool.h>
 #include <stdint.h>
+
+#ifdef _LINUX
 #include <elf.h>
+#endif
+
+#ifdef _DARWIN
+#include <elf_repl.h>
+#endif
 
 #include "types.h"
 

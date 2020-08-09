@@ -41,7 +41,10 @@
 #include <sys/types.h>
 #include <unistd.h>
 #include <libgen.h>
+
+#ifdef _LINUX
 #include <sys/capability.h>
+#endif
 
 #include <rpm/header.h>
 #include <rpm/rpmtd.h>
@@ -50,6 +53,10 @@
 #include <archive_entry.h>
 
 #include "rpminspect.h"
+
+#ifdef _DARWIN
+#include "hsearch_r.h"
+#endif
 
 /**
  * @brief Free rpmfile_t memory.
@@ -790,6 +797,7 @@ void find_file_peers(rpmfile_t *before, rpmfile_t *after)
  * @param file rpmfile_entry_t specifying the file.
  * @return cap_t containing the capabilities(7) of the file.
  */
+#ifdef _LINUX
 cap_t get_cap(rpmfile_entry_t *file)
 {
     int fd;
@@ -824,6 +832,7 @@ cap_t get_cap(rpmfile_entry_t *file)
 
     return file->cap;
 }
+#endif
 
 /**
  * @brief Determine if a path is a debug or build path.

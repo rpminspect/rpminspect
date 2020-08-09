@@ -1,9 +1,18 @@
+# Find appropriate 'elf.h' to use
+if build_machine.system() == 'linux'
+    elf_header = '/usr/include/elf.h'
+elif build_machine.system() == 'darwin'
+    # requires 'brew install libelf'
+    elf_header_cmd = run_command('find', '/usr/local/Cellar/libelf', '-name', '"elf_repl.h"')
+    elf_header = elf_header_cmd.stdout().strip()
+endif
+
 # Generate inspect_elf_bits.c
 inspect_elf_bits_c = custom_target(
     'inspect_elf_bits.c',
     output : 'inspect_elf_bits.c',
     input : 'pic_bits.sh',
-    command : ['@INPUT@', '@OUTPUT@'],
+    command : ['@INPUT@', elf_header, '@OUTPUT@'],
 )
 
 inspect_elf_bits_dep = declare_dependency(sources : [inspect_elf_bits_c])
@@ -83,29 +92,39 @@ librpminspect_sources = [
     'tty.c',
     'unpack.c',
 ]
+
+if build_machine.system() == 'darwin'
+    librpminspect_sources += [ 'hsearch_r.c' ]
+endif
+
+deps = [
+    inspect_elf_bits_dep,
+    jsonc,
+    xmlrpc,
+    xmlrpc_client,
+    libxml,
+    rpm,
+    libarchive,
+    libelf,
+    libkmod,
+    libcurl,
+    zlib,
+    yaml,
+    openssl,
+    mandoc,
+    magic,
+    dl,
+]
+
+if build_machine.system() == 'linux'
+    deps += [ libcap ]
+endif
+
 librpminspect = library(
     'rpminspect',
     librpminspect_sources,
     include_directories : inc,
     version : '0.5.0',
     install : true,
-    dependencies : [
-        inspect_elf_bits_dep,
-        jsonc,
-        xmlrpc,
-        xmlrpc_client,
-        libxml,
-        rpm,
-        libarchive,
-        libelf,
-        libkmod,
-        libcurl,
-        zlib,
-        yaml,
-        openssl,
-        libcap,
-        mandoc,
-        magic,
-        dl,
-    ]
+    dependencies : deps
 )
