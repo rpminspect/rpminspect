@@ -388,3 +388,36 @@ jobs:
               run: |
                   ninja -C build coverage
                   curl -s https://codecov.io/bash | bash
+
+    macos-latest:
+        runs-on: macos-latest
+
+        # All of these steps run from within the main source
+        # directory, so think of that as your $PWD
+        steps:
+            # This means clone the git repo
+            - uses: actions/checkout@v2
+
+            # Within the container, install the build dependencies and
+            # test suite dependencies
+            - name: Install Build Dependencies
+              run: make instreqs
+
+            # Set up the source tree to build
+            - name: setup
+              run: env PKG_CONFIG_PATH=/usr/local/opt/zlib/lib/pkgconfig:/usr/local/opt/libarchive/lib/pkgconfig:/usr/local/opt/openssl/lib/pkgconfig meson setup build --werror -Db_buildtype=debug -Db_coverage=true
+
+            # Compile the software
+            - name: build
+              run: ninja -C build -v
+
+            # Run the test suite
+            - name: test
+              run: meson test -C build -v
+
+            # Generate code coverage reports (requires
+            # -Db_coverage=true on 'meson setup')
+            - name: coverage
+              run: |
+                  ninja -C build coverage
+                  curl -s https://codecov.io/bash | bash
