@@ -1,0 +1,7 @@
+# https://hub.docker.com/r/tibux/slackware-sbopkg
+# A Slackware Docker image that is set up for building packages
+
+Use tibux/slackware-sbopkg
+
+
+Then use sbopkg to build and install additional dependencies

@@ -1,0 +1,4 @@
+python3
+meson
+xmlrpc-c
+ninja

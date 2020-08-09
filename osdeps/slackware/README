@@ -1,0 +1,20 @@
+Slackware Notes
+
+* The elfutils and libcap packages lack pkg-config scripts, whereas
+  other distributions include those.  This is a minor gripe, but meson
+  relies on them if they are there.
+
+* We use what we can from the official Slackware packages, then use
+  SlackBuilds.org to fill in the missing parts.  The reqs.txt listing
+  is the list of packages from SlackBuilds.org.  The pre.sh script
+  installs requirements that come from official Slackware packages.
+
+* There is a mandoc package on SlackBuilds.org, but it lacks libmandoc
+  and header files.  Our post.sh script builds and installs mandoc to
+  /usr/local
+
+* Slackware packages do not carry any dependency information, so all
+  requirements have to be explicitly listed.  However, the
+  installation order does not usually matter.
+
+* 
