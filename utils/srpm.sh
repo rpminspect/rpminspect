@@ -1,6 +1,6 @@
 #!/bin/sh
 #
-# Copyright (C) 2019 David Cantrell <david.l.cantrell@gmail.com>
+# Copyright (C) 2019-2020 David Cantrell <david.l.cantrell@gmail.com>
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -19,13 +19,13 @@
 PATH=/usr/bin
 CWD="$(pwd)"
 
-if [ ! -f ${CWD}/.copr/Makefile ]; then
+if [ ! -f "${CWD}"/.copr/Makefile ]; then
     echo "*** Missing .copr/Makefile, exiting." >&2
     exit 1
 fi
 
-if [ ! -f ${CWD}/changelog ]; then
-    ${CWD}/utils/mkrpmchangelog.sh --copr > ${CWD}/changelog
+if [ ! -f "${CWD}"/changelog ]; then
+    "${CWD}"/utils/mkrpmchangelog.sh --copr > "${CWD}"/changelog
 fi
 
-make -f ${CWD}/.copr/Makefile srpm outdir=${CWD} BUILDTYPE=release
+make -f "${CWD}"/.copr/Makefile srpm outdir="${CWD}" BUILDTYPE=release

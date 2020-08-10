@@ -22,8 +22,8 @@
 
 PATH=/usr/bin
 CWD="$(pwd)"
-PROG="$(basename $0)"
-PROJECT="$(basename "$(realpath ${CWD})")"
+PROG="$(basename "$0")"
+PROJECT="$(basename "$(realpath "${CWD}")")"
 
 # Command line options
 OPT_BUMPVER=
@@ -56,6 +56,7 @@ usage() {
 # Handle command line options
 OPTS=$(getopt -o 'btpAh' --long 'bumpver,tag,push,all,help' -n "${PROG}" -- "$@")
 
+# shellcheck disable=SC2181
 if [ $? -ne 0 ]; then
     echo "Terminating..." >&2
     exit 1
@@ -100,7 +101,7 @@ while true ; do
 done
 
 # This must be a git project
-if [ ! -d ${CWD}/.git ] && [ ! -f ${CWD}/.git/config ]; then
+if [ ! -d "${CWD}"/.git ] && [ ! -f "${CWD}"/.git/config ]; then
     echo "*** Missing .git subdirectory." >&2
     exit 1
 fi
@@ -112,7 +113,7 @@ if [ ! -f "${CWD}/meson.build" ] && [ ! -f "${CWD}/${PROJECT}.spec.in" ]; then
 fi
 
 # Fail if the git index is unclean
-if [ ! -z "$(git status --porcelain)" ]; then
+if [ -n "$(git status --porcelain)" ]; then
     echo "*** git index is not clean:" >&2
     git status --porcelain | sed -e 's|^|*** |g' >&2
     exit 1
@@ -120,12 +121,12 @@ fi
 
 # Increment the version number and commit that change
 VERSION="$(grep 'version :' meson.build | grep -E "'[0-9]+\.[0-9]+'" | cut -d "'" -f 2)"
-CURMAJ="$(echo ${VERSION} | cut -d '.' -f 1)"
-CURMIN="$(echo ${VERSION} | cut -d '.' -f 2)"
+CURMAJ="$(echo "${VERSION}" | cut -d '.' -f 1)"
+CURMIN="$(echo "${VERSION}" | cut -d '.' -f 2)"
 
 if [ "${OPT_BUMPVER}" = "y" ]; then
     OLDVERSION="${VERSION}"
-    NEWMIN="$(expr ${CURMIN} + 1)"
+    NEWMIN="$(("${CURMIN}" + 1))"
     VERSION="${CURMAJ}.${NEWMIN}"
     sed -i -e "s|'${OLDVERSION}'|'${VERSION}'|g" meson.build
     git add meson.build
@@ -136,15 +137,15 @@ fi
 
 # Now tag the release
 if [ "${OPT_TAG}" = "y" ]; then
-    git tag -s -a -m "Tag release v${VERSION}" v${VERSION}
+    git tag -s -a -m "Tag release v${VERSION}" v"${VERSION}"
 fi
 
 # Generate the dist artifact and sign it
 meson setup build
 ninja -v -C build dist
 cd build/meson-dist || exit
-gpg --detach-sign --armor ${PROJECT}-${VERSION}.tar.xz
-cd ${CWD} || exit
+gpg --detach-sign --armor "${PROJECT}"-"${VERSION}".tar.xz
+cd "${CWD}" || exit
 
 # Push the changes
 if [ "${OPT_PUSH}" = "y" ]; then
