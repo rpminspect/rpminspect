@@ -755,4 +755,21 @@ enum abidiff_status {
   ABIDIFF_ABI_INCOMPATIBLE_CHANGE = 1 << 3
 };
 
+/*
+ * ABI compatibility level types
+ */
+typedef struct _abi_entry_t {
+    int level;
+    struct hsearch_data *pkgs;
+    string_list_t *keys;
+    TAILQ_ENTRY(_abi_entry_t) items;
+} abi_entry_t;
+
+typedef TAILQ_HEAD(abi_entry_s, _abi_entry_t) abi_list_t;
+
+typedef struct _abi_pkg_entry_t {
+    bool all;
+    string_list_t *dsos;
+} abi_pkg_entry_t;
+
 #endif

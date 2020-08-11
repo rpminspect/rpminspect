@@ -44,6 +44,7 @@ static struct hsearch_data *debug_info_dir1_table;
 static struct hsearch_data *debug_info_dir2_table;
 static struct hsearch_data *headers_dir1_table;
 static struct hsearch_data *headers_dir2_table;
+static abi_list_t *abi = NULL;
 
 /*
  * Free one of the command line option tables.
@@ -597,6 +598,9 @@ bool inspect_abidiff(struct rpminspect *ri) {
 
     assert(ri != NULL);
 
+    /* get the ABI compat level data if there is any */
+    abi = read_abi(ri->vendor_data_dir, ri->product_release);
+
     /* if there's a .abignore file in the after SRPM, we need to use it */
     suppressions = get_suppressions(ri);
 
@@ -624,6 +628,7 @@ bool inspect_abidiff(struct rpminspect *ri) {
     result = foreach_peer_file(ri, abidiff_driver, true);
 
     /* clean up */
+    free_abi(abi);
     list_free(firstargs, free);
     list_free(suppressions, free);
     free_argv_table(ri, debug_info_dir1_table);

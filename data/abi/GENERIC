@@ -20,11 +20,39 @@
 # check or the keyword "all-dsos".  For example:
 #
 #     glibc=all-dsos
-#     zlib=libz.so.1
+#     zlib=libz.so
 #
 # All DSOs in the glibc package would be examined while only the libz.so.1
 # DSO from the zlib package would be examined.  Explicit paths are not
-# required, but can be used to further refine the check.
+# required, but can be used to further refine the check (see below).
+#
+# If specifying a list of DSOs, library names must be comma-delimited.
+# The name may either be an explicit path beginning with '/' or a file
+# basename.  If the name does not begin with '/', it is assumed to be
+# a basename.  In either case, matching checks the string prefix only
+# rather than the entire string.  For example:
+#
+#     openssl=libcrypt.so,libssl.so
+#
+# Will match 'libcrypt.so*' and 'libssl.so*' in any subdirectory in
+# the openssl package and its subpackages.  This example:
+#
+#     openssl=/usr/lib/libcrypt.so,/usr/lib/libssl.so
+#
+# Will match 'libcrypt.so*' and 'libssl.so*' but only if they appear
+# in '/usr/lib' in the openssl package or any of its subpackages.
+#
+# If the string 'all-dsos' appears in a list of DSOs, then the other
+# names are ignored and all DSOs in the package are used instead.
+#
+# LIMITATIONS:
+# * Entries are of the format PACKAGE_NAME=LIST with no whitespace
+#   around the equal sign.
+# * The package name and list of DSOs should not use the '='.
+# * LIST is either the case-insensitive string "all-dsos" or a
+#   comma-delimited list of DSO names as described above.  There
+#   should be no whitespace around the comma.
+# * DSO names should not contain "," in their names.
 #
 # Full example (commented out):
 #

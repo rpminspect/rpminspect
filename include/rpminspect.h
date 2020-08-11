@@ -353,4 +353,9 @@ bool is_rebase(struct rpminspect *ri);
 /* arches.c */
 void init_arches(struct rpminspect *ri);
 
+/* abi.c */
+size_t count_abi_entries(const char *abifile);
+abi_list_t *read_abi(const char *vendor_data_dir, const char *product_release);
+void free_abi(abi_list_t *list);
+
 #endif
