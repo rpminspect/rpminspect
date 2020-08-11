@@ -336,9 +336,7 @@ class HasTEXTRELRPMs(TestRPMs):
         installPath = "usr/lib/libfoo.so"
 
         # Can't use rpmfluff here because it always adds -fPIC
-        self.rpm.add_source(
-            rpmfluff.SourceFile("simple.c", simple_library_source)
-        )
+        self.rpm.add_source(rpmfluff.SourceFile("simple.c", simple_library_source))
         self.rpm.section_build += (
             "gcc -m32 -fno-pic -shared -Wl,-z,noexecstack -o libsimple.so simple.c\n"
         )
