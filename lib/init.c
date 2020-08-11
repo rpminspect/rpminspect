@@ -972,6 +972,10 @@ bool init_fileinfo(struct rpminspect *ri) {
         field = MODE;
     }
 
+    if (fclose(input) == -1) {
+        warn("fclose()");
+    }
+
     return true;
 }
 
