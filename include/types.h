@@ -418,6 +418,9 @@ struct rpminspect {
     /* extra arguments for abidiff(1) */
     char *abidiff_extra_args;
 
+    /* ABI compat level security reporting threshold */
+    long int abi_security_threshold;
+
     /* Options specified by the user */
     char *before;              /* before build ID arg given on cmdline */
     char *after;               /* after build ID arg given on cmdline */

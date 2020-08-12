@@ -431,3 +431,10 @@ abidiff:
     # Extra arguments for the abidiff(1) program.  These are put on
     # the command line before the two files being compared.
     #abidiff_extra_args:
+
+    # Security severity reporting level.  ABI compatibility levels at
+    # and below this number will cause abidiff(1) findings to report
+    # with a security severity.  For example, setting this to '2' will
+    # cause packages and DSOs at ABI compatibility levels 1 and 2 to
+    # report abidiff(1) findings with a security severity.
+    security_level_threshold: 2

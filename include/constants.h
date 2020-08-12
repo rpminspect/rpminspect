@@ -401,4 +401,9 @@
 
 /** @} */
 
+/*
+ * Default ABI compat level security reporting threshold
+ */
+#define DEFAULT_ABI_SECURITY_THRESHOLD 2
+
 #endif

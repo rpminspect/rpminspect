@@ -796,6 +796,13 @@ static int read_cfgfile(struct rpminspect *ri, const char *filename)
                         } else if (!strcmp(key, "abidiff_extra_args")) {
                             free(ri->abidiff_extra_args);
                             ri->abidiff_extra_args = strdup(t);
+                        } else if (!strcmp(key, "security_level_threshold")) {
+                            ri->abi_security_threshold = strtol(t, 0, 10);
+
+                            if ((ri->abi_security_threshold == LONG_MIN || ri->abi_security_threshold == LONG_MAX) && errno == ERANGE) {
+                                warn("strtol()");
+                                ri->abi_security_threshold = DEFAULT_ABI_SECURITY_THRESHOLD;
+                            }
                         }
                     }
                 } else if (symbol == SYMBOL_ENTRY) {
@@ -1121,6 +1128,7 @@ struct rpminspect *init_rpminspect(struct rpminspect *ri, const char *cfgfile, c
         ri->suppression_file = strdup(ABI_SUPPRESSION_FILE);
         ri->debuginfo_path = strdup(DEBUG_PATH);
         ri->include_path = strdup(INCLUDE_PATH);
+        ri->abi_security_threshold = DEFAULT_ABI_SECURITY_THRESHOLD;
 
         /* Store full paths to all config files read */
         ri->cfgfiles = calloc(1, sizeof(*ri->cfgfiles));
