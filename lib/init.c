@@ -736,8 +736,12 @@ static int read_cfgfile(struct rpminspect *ri, const char *filename)
                         }
                     } else if (block == BLOCK_FILESIZE) {
                         if (!strcmp(key, "size_threshold")) {
-                            free(ri->size_threshold);
-                            ri->size_threshold = strdup(t);
+                            ri->size_threshold = strtol(t, 0, 10);
+
+                            if ((ri->size_threshold == LONG_MIN || ri->size_threshold == LONG_MAX) && errno == ERANGE) {
+                                warn("strtol()");
+                                ri->size_threshold = 0;
+                            }
                         }
                     } else if (block == BLOCK_ANNOCHECK || block == BLOCK_JAVABYTECODE || block == BLOCK_PATHMIGRATION || block == BLOCK_PRODUCTS) {
                         if (incoming_table == NULL) {

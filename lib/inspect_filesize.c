@@ -27,8 +27,6 @@
 
 #include "rpminspect.h"
 
-static long int threshold = 0;
-
 static bool filesize_driver(struct rpminspect *ri, rpmfile_entry_t *file)
 {
     bool result = true;
@@ -92,7 +90,7 @@ static bool filesize_driver(struct rpminspect *ri, rpmfile_entry_t *file)
         params.severity = RESULT_INFO;
         params.waiverauth = NOT_WAIVABLE;
 
-        if (threshold > 0 && (labs(change) >= threshold)) {
+        if (ri->size_threshold > 0 && (labs(change) >= ri->size_threshold)) {
             /* change is at or above our reporting change threshold for VERIFY */
             params.severity = RESULT_VERIFY;
             params.waiverauth = WAIVABLE_BY_ANYONE;
@@ -128,17 +126,6 @@ bool inspect_filesize(struct rpminspect *ri) {
     struct result_params params;
 
     assert(ri != NULL);
-
-    /* if there is a size reporting threshold, get it */
-    if (ri->size_threshold) {
-        threshold = strtol(ri->size_threshold, 0, 10);
-
-        if ((threshold == LONG_MIN || threshold == LONG_MAX) && errno == ERANGE) {
-            /* unable to use the threshold, ignore */
-            DEBUG_PRINT("unable to use size_threshold=|%s|\n", ri->size_threshold);
-            threshold = 0;
-        }
-    }
 
     /* run the size inspection across all RPM files */
     result = foreach_peer_file(ri, filesize_driver, true);

@@ -262,7 +262,7 @@ void dump_cfg(const struct rpminspect *ri)
 
     if (ri->size_threshold) {
         fprintf(stderr, "    filesize:\n");
-        fprintf(stderr, "        size_threshold: %s\n", ri->size_threshold);
+        fprintf(stderr, "        size_threshold: %ld\n", ri->size_threshold);
     }
 
     if (ri->lto_symbol_name_prefixes && !TAILQ_EMPTY(ri->lto_symbol_name_prefixes)) {

@@ -375,7 +375,7 @@ struct rpminspect {
     string_list_t *shells;
 
     /* Optional: file size change threshold for inc/dec reporting (%) */
-    char *size_threshold;
+    long int size_threshold;
 
     /* Optional: ELF LTO symbol prefixes */
     string_list_t *lto_symbol_name_prefixes;

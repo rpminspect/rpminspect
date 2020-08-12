@@ -165,7 +165,6 @@ void free_rpminspect(struct rpminspect *ri) {
     list_free(ri->forbidden_owners, free);
     list_free(ri->forbidden_groups, free);
     list_free(ri->shells, free);
-    free(ri->size_threshold);
     free_mapping(ri->jvm, ri->jvm_keys);
     free_mapping(ri->annocheck, ri->annocheck_keys);
     free_mapping(ri->pathmigration, ri->pathmigration_keys);
