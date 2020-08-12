@@ -55,6 +55,13 @@ bool is_rebase(struct rpminspect *ri)
     assert(ri != NULL);
     assert(ri->peers != NULL);
 
+    /* disabled with the -n command line option */
+    if (!ri->rebase_detection) {
+        ri->rebase_build = -1;
+        return false;
+    }
+
+    /*  run the rebase detection */
     if (ri->rebase_build == 0) {
         ri->rebase_build = -1;
 
@@ -81,6 +88,7 @@ bool is_rebase(struct rpminspect *ri)
         }
     }
 
+    /* is it a rebase or not or did an error occur? */
     if (ri->rebase_build == -1) {
         return false;
     } else if (ri->rebase_build == 1) {

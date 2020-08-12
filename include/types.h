@@ -426,6 +426,8 @@ struct rpminspect {
     char *after;               /* after build ID arg given on cmdline */
     uint64_t tests;            /* which tests to run (default: ALL) */
     bool verbose;              /* verbose inspection output? */
+    bool rebase_detection;     /* Is rebase detection enabled for
+                                  builds? (default true) */
 
     /* Failure threshold */
     severity_t threshold;

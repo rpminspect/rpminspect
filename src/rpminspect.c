@@ -53,6 +53,7 @@ static void usage(const char *progname)
     printf(_("                             (default: none)\n"));
     printf(_("  -a LIST, --arches=LIST   List of architectures to check\n"));
     printf(_("  -r STR, --release=STR    Product release string\n"));
+    printf(_("  -n, --no-rebase          Disable build rebase detection\n"));
     printf(_("  -o FILE, --output=FILE   Write results to FILE\n"));
     printf(_("                             (default: stdout)\n"));
     printf(_("  -F TYPE, --format=TYPE   Format output results as TYPE\n"));
@@ -294,7 +295,7 @@ int main(int argc, char **argv) {
     int idx = 0;
     int ret = RI_INSPECTION_SUCCESS;
     glob_t expand;
-    char *short_options = "c:p:T:E:a:r:o:F:lw:t:fkdv\?V";
+    char *short_options = "c:p:T:E:a:r:no:F:lw:t:fkdv\?V";
     struct option long_options[] = {
         { "config", required_argument, 0, 'c' },
         { "profile", required_argument, 0, 'p' },
@@ -302,6 +303,7 @@ int main(int argc, char **argv) {
         { "exclude", required_argument, 0, 'E' },
         { "arches", required_argument, 0, 'a' },
         { "release", required_argument, 0, 'r' },
+        { "no-rebase", no_argument, 0, 'n' },
         { "list", no_argument, 0, 'l' },
         { "output", required_argument, 0, 'o' },
         { "format", required_argument, 0, 'F' },
@@ -326,6 +328,7 @@ int main(int argc, char **argv) {
     char *r = NULL;
     char *output = NULL;
     char *release = NULL;
+    bool rebase_detection = true;
     char *threshold = NULL;
     int formatidx = -1;
     bool fetch_only = false;
@@ -400,6 +403,9 @@ int main(int argc, char **argv) {
                 break;
             case 'r':
                 release = strdup(optarg);
+                break;
+            case 'n':
+                rebase_detection = false;
                 break;
             case 'o':
                 output = strdup(optarg);
@@ -560,6 +566,7 @@ int main(int argc, char **argv) {
     ri->verbose = verbose;
     ri->product_release = release;
     ri->threshold = getseverity(threshold);
+    ri->rebase_detection = rebase_detection;
 
     /*
      * any inspection selections on the command line can override
