@@ -26,6 +26,7 @@
 #include <sys/stat.h>
 #include <unistd.h>
 #include <err.h>
+#include <limits.h>
 #include <rpm/header.h>
 #include <rpm/rpmtag.h>
 
@@ -384,7 +385,71 @@ static void get_dirs(struct rpminspect *ri)
     return;
 }
 
+static severity_t check_abi(const severity_t sev, const long int threshold, const char *path, const char *pkg)
+{
+    ENTRY e;
+    ENTRY *eptr;
+    abi_pkg_entry_t *pkgentry = NULL;
+    abi_entry_t *entry = NULL;
+    string_entry_t *dsoentry = NULL;
+    char pathcopy[PATH_MAX + 1];
+    char *basefn = NULL;
+
+    /* no ABI compat level data */
+    if (abi == NULL) {
+        return sev;
+    }
+
+    assert(path != NULL);
+    assert(pkg != NULL);
+
+    /* iterate over the ABI compat level structure */
+    TAILQ_FOREACH(entry, abi, items) {
+        /* look for an entry for this package at this level */
+        e.key = (char *) pkg;
+        hsearch_r(e, FIND, &eptr, entry->pkgs);
+
+        /* not found, continue */
+        if (eptr == NULL) {
+            continue;
+        }
+
+        /* we have a entry at this level for this package */
+        pkgentry = (abi_pkg_entry_t *) eptr->data;
+
+        /* is the ABI level above the threshold? */
+        if (entry->level > threshold) {
+            if (pkgentry->all) {
+                return RESULT_INFO;
+            } else {
+                /* do specific matching on the DSO name */
+                TAILQ_FOREACH(dsoentry, pkgentry->dsos, items) {
+                    if ((dsoentry->data[0] == '/') && strprefix(path, dsoentry->data)) {
+                        return RESULT_INFO;
+                    } else {
+                        /* do a soft match against the file basename */
+                        basefn = strncpy(pathcopy, path, PATH_MAX);
+                        assert(basefn != NULL);
+                        basefn = basename(pathcopy);
+                        assert(basefn != NULL);
+
+                        if (strprefix(basefn, dsoentry->data)) {
+                            return RESULT_INFO;
+                        }
+                    }
+                }
+            }
+        }
+
+        /* this far means a match was found, stop looking */
+        break;
+    }
+
+    return sev;
+}
+
 static bool abidiff_driver(struct rpminspect *ri, rpmfile_entry_t *file) {
+    bool result = true;
     bool rebase = false;
     string_list_t *argv = NULL;
     string_list_t *local_suppressions = NULL;
@@ -547,22 +612,23 @@ static bool abidiff_driver(struct rpminspect *ri, rpmfile_entry_t *file) {
             report = true;
         }
 
-/* XXX check the abi compat list to set abi_compat_level */
+        /* check the ABI compat level list */
+        name = headerGetString(file->rpm_header, RPMTAG_NAME);
+        params.severity = check_abi(params.severity, ri->abi_security_threshold, file->localpath, name);
 
+        /* add additional details */
         if (report) {
-            name = headerGetString(file->rpm_header, RPMTAG_NAME);
-
             if (!strcmp(file->peer_file->localpath, file->localpath)) {
                 if (abi_compat_level) {
-                    xasprintf(&params.msg, _("old vs. new version of %s in package %s with ABI compatibility level %d"), file->localpath, name, abi_compat_level);
+                    xasprintf(&params.msg, _("Comparing old vs. new version of %s in package %s with ABI compatibility level %d on %s revealed ABI differences."), file->localpath, name, abi_compat_level, arch);
                 } else {
-                    xasprintf(&params.msg, _("old vs. new version of %s in package %s"), file->localpath, name);
+                    xasprintf(&params.msg, _("Comparing old vs. new version of %s in package %s on %s revealed ABI differences."), file->localpath, name, arch);
                 }
             } else {
                 if (abi_compat_level) {
-                    xasprintf(&params.msg, _("from %s to %s in package %s with ABI compatibility level %d"), file->peer_file->localpath, file->localpath, name, abi_compat_level);
+                    xasprintf(&params.msg, _("Comparing from %s to %s in package %s with ABI compatibility level %d on %s revealed ABI differences."), file->peer_file->localpath, file->localpath, name, abi_compat_level, arch);
                 } else {
-                    xasprintf(&params.msg, _("from %s to %s in package %s"), file->peer_file->localpath, file->localpath, name);
+                    xasprintf(&params.msg, _("Comparing from %s to %s in package %s on %s revealed ABI differences."), file->peer_file->localpath, file->localpath, name, arch);
                 }
             }
         }
@@ -573,6 +639,7 @@ static bool abidiff_driver(struct rpminspect *ri, rpmfile_entry_t *file) {
         params.details = details;
         add_result(ri, &params);
         free(params.msg);
+        result = false;
     }
 
     /* cleanup */
@@ -585,7 +652,7 @@ static bool abidiff_driver(struct rpminspect *ri, rpmfile_entry_t *file) {
     free(cmd);
     free(details);
 
-    return true;
+    return result;
 }
 
 /*
@@ -637,11 +704,10 @@ bool inspect_abidiff(struct rpminspect *ri) {
     free_argv_table(ri, headers_dir2_table);
 
     /* report the inspection results */
-    init_result_params(&params);
-    params.waiverauth = NOT_WAIVABLE;
-    params.header = HEADER_ABIDIFF;
-
     if (result) {
+        init_result_params(&params);
+        params.waiverauth = NOT_WAIVABLE;
+        params.header = HEADER_ABIDIFF;
         params.severity = RESULT_OK;
         add_result(ri, &params);
     }
