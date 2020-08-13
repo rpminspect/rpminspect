@@ -10,6 +10,7 @@ json-c
 ksh
 lib32-gcc-libs
 lib32-glibc
+libabigail
 libyaml
 linux-headers
 meson

@@ -16,6 +16,7 @@ html-dtd
 kernel-default-devel
 kernel-devel
 ksh
+libabigail
 libarchive-devel
 libcap-devel
 libcurl-devel
@@ -30,9 +31,9 @@ libyaml-devel
 make
 meson
 ninja
+python3-PyYAML
 python3-devel
 python3-pip
-python3-PyYAML
 python3-rpm
 rpm-build
 rpm-devel
