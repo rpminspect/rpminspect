@@ -1,8 +1,8 @@
+CUnit
+CUnit-devel
 annobin
 bash
 bzip2
-CUnit
-CUnit-devel
 dash
 desktop-file-utils
 diffutils
@@ -23,6 +23,7 @@ kernel-core
 kernel-devel
 kmod-devel
 ksh
+libabigail
 libarchive-devel
 libcap-devel
 libcurl-devel
