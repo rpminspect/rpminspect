@@ -4,7 +4,7 @@ gcc-multilib
 gcovr
 gettext
 ksh
-libabigail
+libabigail-dev
 libarchive-dev
 libc-dev:i386
 libcap-dev
@@ -16,6 +16,7 @@ libjson-c-dev
 libkmod-dev
 librpm-dev
 libssl-dev
+libterm-readline-perl-perl
 libxml2-dev
 libxmlrpc-core-c3-dev
 libyaml-dev
