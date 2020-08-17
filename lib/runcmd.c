@@ -181,3 +181,34 @@ char *run_cmd(int *exitcode, const char *cmd, ...)
 
     return output;
 }
+
+/*
+ * Free one of the command line option tables.
+ */
+void free_argv_table(struct rpminspect *ri, struct hsearch_data *table)
+{
+    ENTRY e;
+    ENTRY *eptr;
+    string_entry_t *entry = NULL;
+
+    assert(ri != NULL);
+    assert(ri->arches != NULL);
+
+    if (table == NULL) {
+        return;
+    }
+
+    TAILQ_FOREACH(entry, ri->arches, items) {
+        e.key = entry->data;
+        hsearch_r(e, FIND, &eptr, table);
+
+        if (eptr != NULL) {
+            list_free(eptr->data, free);
+        }
+    }
+
+    hdestroy_r(table);
+    free(table);
+
+    return;
+}

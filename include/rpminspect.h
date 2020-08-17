@@ -242,6 +242,7 @@ char *checksum(rpmfile_entry_t *);
 /* runcmd.c */
 char *sl_run_cmd(int *exitcode, string_list_t *list);
 char *run_cmd(int *, const char *, ...) __attribute__((__sentinel__));
+void free_argv_table(struct rpminspect *ri, struct hsearch_data *table);
 
 /* fileinfo.c */
 bool match_fileinfo_mode(struct rpminspect *, const rpmfile_entry_t *, const char *, const char *);

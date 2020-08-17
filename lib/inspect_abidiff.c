@@ -48,37 +48,6 @@ static struct hsearch_data *headers_dir2_table;
 static abi_list_t *abi = NULL;
 
 /*
- * Free one of the command line option tables.
- */
-static void free_argv_table(struct rpminspect *ri, struct hsearch_data *table)
-{
-    ENTRY e;
-    ENTRY *eptr;
-    string_entry_t *entry = NULL;
-
-    assert(ri != NULL);
-    assert(ri->arches != NULL);
-
-    if (table == NULL) {
-        return;
-    }
-
-    TAILQ_FOREACH(entry, ri->arches, items) {
-        e.key = entry->data;
-        hsearch_r(e, FIND, &eptr, table);
-
-        if (eptr != NULL) {
-            list_free(eptr->data, free);
-        }
-    }
-
-    hdestroy_r(table);
-    free(table);
-
-    return;
-}
-
-/*
  * Get any .abignore files that exist in SRPM files in the build.
  * These are passed to every invocation of abidiff(1) if they exist.
  */
