@@ -46,7 +46,11 @@ rm -rf rc
 
 # Install libabigail from AUR
 cd ${CWD}
-pacman -S --needed base-devel
-git clone https://aur.archlinux.org/libabigail-git.git
-cd libabigail-git
-makepkg -si
+git clone git://sourceware.org/git/libabigail.git
+cd libabigail
+TAG="$(git tag -l | grep ^libabigail- | grep -v '\.rc' | sort -n | tail -n 1)"
+git checkout -b ${TAG} ${TAG}
+autoreconf -f -i -v
+./configure --prefix=/usr/local
+make
+make install
