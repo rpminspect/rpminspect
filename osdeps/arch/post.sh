@@ -43,3 +43,10 @@ make
 make install
 cd ${CWD}
 rm -rf rc
+
+# Install libabigail from AUR
+cd ${CWD}
+pacman -S --needed base-devel
+git clone https://aur.archlinux.org/libabigail-git.git
+cd libabigail-git
+makepkg -si
