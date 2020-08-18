@@ -1,10 +1,10 @@
+abigail-tools
 desktop-file-utils
 gcc
 gcc-multilib
 gcovr
 gettext
 ksh
-libabigail-dev
 libarchive-dev
 libc-dev:i386
 libcap-dev
