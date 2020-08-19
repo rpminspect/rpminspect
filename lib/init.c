@@ -803,7 +803,7 @@ static int read_cfgfile(struct rpminspect *ri, const char *filename)
                         } else if (!strcmp(key, "include_path")) {
                             free(ri->abidiff_include_path);
                             ri->abidiff_include_path = strdup(t);
-                        } else if (!strcmp(key, "abidiff_extra_args")) {
+                        } else if (!strcmp(key, "extra_args")) {
                             free(ri->abidiff_extra_args);
                             ri->abidiff_extra_args = strdup(t);
                         } else if (!strcmp(key, "security_level_threshold")) {
@@ -821,7 +821,7 @@ static int read_cfgfile(struct rpminspect *ri, const char *filename)
                         } else if (!strcmp(key, "debuginfo_path")) {
                             free(ri->kmidiff_debuginfo_path);
                             ri->kmidiff_debuginfo_path = strdup(t);
-                        } else if (!strcmp(key, "abidiff_extra_args")) {
+                        } else if (!strcmp(key, "extra_args")) {
                             free(ri->kmidiff_extra_args);
                             ri->kmidiff_extra_args = strdup(t);
                         }
