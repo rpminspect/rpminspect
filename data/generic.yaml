@@ -430,7 +430,7 @@ abidiff:
 
     # Extra arguments for the abidiff(1) program.  These are put on
     # the command line before the two files being compared.
-    #abidiff_extra_args:
+    #extra_args:
 
     # Security severity reporting level.  ABI compatibility levels at
     # and below this number will cause abidiff(1) findings to report
@@ -451,4 +451,11 @@ kmidiff:
 
     # Extra arguments for the kmidiff(1) program.  These are put on
     # the command line before the two files being compared.
-    #kmidiff_extra_args:
+    #extra_args:
+
+    # Possible kernel executable file names.  Usually this is
+    # 'vmlinux' or 'vmlinuz', but it could be anything depending on
+    # the preferences of the vendor.
+    kernel_filenames:
+        - vmlinux
+        - vmlinuz
