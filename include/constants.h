@@ -199,6 +199,17 @@
  * Executable providing abidiff(1)
  */
 #define ABIDIFF_CMD "abidiff"
+#define ABI_SUPPRESSIONS "--suppressions"
+#define ABI_DEBUG_INFO_DIR1 "--debug-info-dir1"
+#define ABI_DEBUG_INFO_DIR2 "--debug-info-dir2"
+#define ABI_HEADERS_DIR1 "--headers-dir1"
+#define ABI_HEADERS_DIR2 "--headers-dir2"
+
+/**
+ * @def KMIDIFF_CMD
+ * Executable providing kmidiff(1)
+ */
+#define KMIDIFF_CMD "kmidiff"
 
 /** @} */
 

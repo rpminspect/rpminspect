@@ -26,6 +26,59 @@
 #include "rpminspect.h"
 
 /*
+ * Helper to add entries to abi argument tables.
+ */
+static void add_abi_argument(struct hsearch_data *table, const char *arg, const char *path, const Header hdr)
+{
+    string_list_t *list = NULL;
+    string_entry_t *entry = NULL;
+    const char *arch = NULL;
+    ENTRY e;
+    ENTRY *eptr;
+
+    assert(table != NULL);
+    assert(arg != NULL);
+    assert(path != NULL);
+    assert(hdr != NULL);
+
+    if (!usable_path(path)) {
+        return;
+    }
+
+    /* prepare the new list entry */
+    entry = calloc(1, sizeof(*entry));
+    assert(entry != NULL);
+    xasprintf(&entry->data, "%s %s", arg, path);
+    assert(entry->data != NULL);
+
+    /* we have the dir, add it */
+    arch = get_rpm_header_arch(hdr);
+    e.key = (char *) arch;
+    hsearch_r(e, FIND, &eptr, table);
+
+    if (eptr == NULL) {
+        /* does not exist in the table, create it and add it */
+        list = calloc(1, sizeof(*list));
+        assert(list != NULL);
+        TAILQ_INIT(list);
+        TAILQ_INSERT_TAIL(list, entry, items);
+
+        e.key = (char *) arch;
+        e.data = list;
+
+        if (!hsearch_r(e, ENTER, &eptr, table)) {
+            err(RI_PROGRAM_ERROR, "hsearch_r()");
+        }
+    } else {
+        /* list exists, add another entry */
+        list = (string_list_t *) eptr->data;
+        TAILQ_INSERT_TAIL(list, entry, items);
+    }
+
+    return;
+}
+
+/*
  * Count ABI entries in the named ABI compat level file.
  */
 size_t count_abi_entries(const char *abifile)
@@ -73,8 +126,6 @@ size_t count_abi_entries(const char *abifile)
     return count;
 }
 
-
-
 /*
  * @brief Given a vendor data dir and product release string, look for
  * an ABI compatibility level file.  If found, read it in and return
@@ -90,7 +141,7 @@ abi_list_t *read_abi(const char *vendor_data_dir, const char *product_release)
     ssize_t nread = 0;
     int found_level = 0;
     size_t table_size = 1;
-    bool skip_entries = true;
+    bool skip_entries = false;
     abi_list_t *list = NULL;
     abi_entry_t *entry = NULL;
     abi_pkg_entry_t *pkgentry = NULL;
@@ -326,4 +377,105 @@ void free_abi(abi_list_t *list)
 
     free(list);
     return;
+}
+
+/*
+ * Get any .abignore files that exist in SRPM files in the build.
+ * These are passed to every invocation of abidiff(1) if they exist.
+ */
+string_list_t *get_abi_suppressions(const struct rpminspect *ri, const char *suppression_file)
+{
+    rpmpeer_entry_t *peer = NULL;
+    rpmfile_entry_t *file = NULL;
+    string_list_t *list = NULL;
+    string_entry_t *entry = NULL;
+
+    assert(ri != NULL);
+    assert(suppression_file != NULL);
+
+    TAILQ_FOREACH(peer, ri->peers, items) {
+        if (!headerIsSource(peer->after_hdr)) {
+            continue;
+        }
+
+        if (peer->after_files == NULL || TAILQ_EMPTY(peer->after_files)) {
+            continue;
+        }
+
+        TAILQ_FOREACH(file, peer->after_files, items) {
+            if (!strcmp(file->localpath, suppression_file)) {
+                if (list == NULL) {
+                    list = calloc(1, sizeof(*list));
+                    TAILQ_INIT(list);
+                }
+
+                entry = calloc(1, sizeof(*entry));
+                xasprintf(&entry->data, "%s %s", ABI_SUPPRESSIONS, file->fullpath);
+                assert(entry->data != NULL);
+                TAILQ_INSERT_TAIL(list, entry, items);
+            }
+        }
+    }
+
+    return list;
+}
+
+/*
+ * Gather paths.  This goes in a hash table where the key is the arch
+ * name and the value is a string_list_t of the debug_info_dir1/2 or
+ * header_dir1/2 arguments to abidiff(1) or kmidiff(1).
+ */
+struct hsearch_data *get_abi_dir_arg(struct rpminspect *ri, const size_t size, const char *suffix, const char *arg, const char *path, const int type)
+{
+    int result = 0;
+    rpmpeer_entry_t *peer = NULL;
+    const char *name = NULL;
+    char *tmp = NULL;
+    struct hsearch_data *table = NULL;
+    Header h;
+
+    assert(ri != NULL);
+    assert(size > 0);
+    assert(arg != NULL);
+    assert(path != NULL);
+
+    /* initialize the table */
+    table = calloc(1, sizeof(*table));
+    assert(table != NULL);
+    result = hcreate_r(size * 1.25, table);
+    assert(result != 0);
+
+    /* collect each path argument by arch */
+    TAILQ_FOREACH(peer, ri->peers, items) {
+        if (headerIsSource(peer->before_hdr) || headerIsSource(peer->after_hdr)) {
+            continue;
+        }
+
+        if (type == BEFORE_BUILD && peer->before_files && !TAILQ_EMPTY(peer->before_files)) {
+            h = peer->before_hdr;
+            name = headerGetString(h, RPMTAG_NAME);
+
+            if (suffix && strsuffix(name, suffix)) {
+                xasprintf(&tmp, "%s%s", peer->before_root, path);
+            } else {
+                xasprintf(&tmp, "%s%s", peer->before_root, path);
+            }
+        } else if (type == AFTER_BUILD && peer->after_files && !TAILQ_EMPTY(peer->after_files)) {
+            h = peer->after_hdr;
+            name = headerGetString(h, RPMTAG_NAME);
+
+            if (suffix && strsuffix(name, suffix)) {
+                xasprintf(&tmp, "%s%s", peer->after_root, path);
+            } else {
+                xasprintf(&tmp, "%s%s", peer->after_root, path);
+            }
+        }
+
+        if (tmp) {
+            add_abi_argument(table, arg, tmp, h);
+            free(tmp);
+        }
+    }
+
+    return table;
 }

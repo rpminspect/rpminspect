@@ -338,6 +338,7 @@ const char *get_before_debuginfo_path(struct rpminspect *ri, const char *binarch
  * NULL if not found.
  */
 const char *get_after_debuginfo_path(struct rpminspect *ri, const char *binarch);
+bool usable_path(const char *path);
 
 /* rebase.c */
 /**
@@ -358,5 +359,7 @@ void init_arches(struct rpminspect *ri);
 size_t count_abi_entries(const char *abifile);
 abi_list_t *read_abi(const char *vendor_data_dir, const char *product_release);
 void free_abi(abi_list_t *list);
+string_list_t *get_abi_suppressions(const struct rpminspect *ri, const char *suppression_file);
+struct hsearch_data *get_abi_dir_arg(struct rpminspect *ri, const size_t size, const char *suffix, const char *arg, const char *path, const int type);
 
 #endif

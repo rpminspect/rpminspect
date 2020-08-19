@@ -20,6 +20,7 @@
  */
 
 #include <assert.h>
+#include <err.h>
 #include <rpm/header.h>
 #include <rpm/rpmtag.h>
 
@@ -121,4 +122,33 @@ const char *get_after_debuginfo_path(struct rpminspect *ri, const char *binarch)
     }
 
     return NULL;
+}
+
+/*
+ * Checks to see if the given path is a readable directory.
+ */
+bool usable_path(const char *path)
+{
+    struct stat sb;
+
+    if (path == NULL) {
+        return false;
+    }
+
+    if (access(path, R_OK) == -1) {
+        return false;
+    }
+
+    memset(&sb, 0, sizeof(sb));
+
+    if (lstat(path, &sb) == -1) {
+        warn("lstat()");
+        return false;
+    }
+
+    if (!S_ISDIR(sb.st_mode)) {
+        return false;
+    }
+
+    return true;
 }

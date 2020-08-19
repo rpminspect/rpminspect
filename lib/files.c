@@ -575,11 +575,9 @@ static void find_one_peer(rpmfile_entry_t *file, rpmfile_t *after, struct hsearc
     bool has_version;
     const char *before_release = NULL;
     const char *after_release = NULL;
-    char *before_vr = NULL;
-    char *after_vr = NULL;
+    char *before_tmp = NULL;
+    char *after_tmp = NULL;
     char *search_path = NULL;
-    char *before_elf = NULL;
-    char *after_elf = NULL;
     const char *arch = NULL;
     const char *after_arch = NULL;
 
@@ -626,14 +624,14 @@ static void find_one_peer(rpmfile_entry_t *file, rpmfile_t *after, struct hsearc
         before_release = headerGetString(file->rpm_header, RPMTAG_RELEASE);
         after_release = headerGetString(after_file->rpm_header, RPMTAG_RELEASE);
 
-        xasprintf(&before_vr, "%s-%s", before_version, before_release);
-        xasprintf(&after_vr, "%s-%s", after_version, after_release);
+        xasprintf(&before_tmp, "%s-%s", before_version, before_release);
+        xasprintf(&after_tmp, "%s-%s", after_version, after_release);
 
-        if (strcmp(before_vr, after_vr) != 0) {
-            search_path = strreplace(file->localpath, before_vr, after_vr);
+        if (strcmp(before_tmp, after_tmp) != 0) {
+            search_path = strreplace(file->localpath, before_tmp, after_tmp);
 
-            free(before_vr);
-            free(after_vr);
+            free(before_tmp);
+            free(after_tmp);
 
             e.key = search_path;
             eptr = NULL;
@@ -645,8 +643,8 @@ static void find_one_peer(rpmfile_entry_t *file, rpmfile_t *after, struct hsearc
                 return;
             }
         } else {
-            free(before_vr);
-            free(after_vr);
+            free(before_tmp);
+            free(after_tmp);
         }
     }
 
@@ -700,7 +698,8 @@ static void find_one_peer(rpmfile_entry_t *file, rpmfile_t *after, struct hsearc
                     file->peer_file->moved_subpackage = true;
                     return;
                 }
-            } else if (is_elf(file->fullpath) && is_elf(after_file->fullpath)) {
+            } else if ((S_ISREG(file->st.st_mode) && S_ISREG(after_file->st.st_mode)) ||
+                       (is_elf(file->fullpath) && is_elf(after_file->fullpath))) {
                 /*
                  * Try to match libraries that have changed versions.
                  * The idea is to look for ELF files that carry a
@@ -708,17 +707,20 @@ static void find_one_peer(rpmfile_entry_t *file, rpmfile_t *after, struct hsearc
                  * be taken to ensure '.so.1' does not match up with
                  * '.so.2.0', so some things like counting periods
                  * will probably have to be done.
+                 *
+                 * Also try to match kernel modules between builds.
                  */
-                if (!strstr(file->localpath, ELF_LIB_EXTENSION) || !strstr(after_file->localpath, ELF_LIB_EXTENSION)) {
+                if (!(strstr(file->localpath, ELF_LIB_EXTENSION) && strstr(after_file->localpath, ELF_LIB_EXTENSION)) &&
+                    !(strstr(file->fullpath, KERNEL_MODULES_DIR) && strstr(after_file->fullpath, KERNEL_MODULES_DIR))) {
                     continue;
                 }
 
                 /* create generic version number paths */
-                before_elf = comparable_version_substrings(file->localpath, arch);
-                after_elf = comparable_version_substrings(after_file->localpath, arch);
+                before_tmp = comparable_version_substrings(file->localpath, arch);
+                after_tmp = comparable_version_substrings(after_file->localpath, arch);
 
                 /* see if these generic paths match */
-                if (!strcmp(before_elf, after_elf)) {
+                if (!strcmp(before_tmp, after_tmp)) {
                     DEBUG_PRINT("%s probably replaced by %s\n", file->localpath, after_file->localpath);
 
                     e.key = after_file->localpath;
@@ -730,8 +732,8 @@ static void find_one_peer(rpmfile_entry_t *file, rpmfile_t *after, struct hsearc
                     }
                 }
 
-                free(before_elf);
-                free(after_elf);
+                free(before_tmp);
+                free(after_tmp);
             }
         }
     }

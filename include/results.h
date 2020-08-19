@@ -64,6 +64,7 @@
 #define HEADER_FILES         "%files"
 #define HEADER_TYPES         "types"
 #define HEADER_ABIDIFF       "abidiff"
+#define HEADER_KMIDIFF       "kmidiff"
 
 /*
  * Inspection remedies
@@ -190,6 +191,9 @@
 #define REMEDY_TYPES _("In many cases the changing MIME type is deliberate.  Verify that the change is intended and if necessary fix the spec file so the correct file is included in the built package.")
 
 /* abidiff */
-#define REMEDY_ABIDIFF _("ABI changes introduced during maintenance updates can lead to problems for users.  See the abidiff(1) documentationa and the distribution ABI policies to determine if this detected change is allowed.")
+#define REMEDY_ABIDIFF _("ABI changes introduced during maintenance updates can lead to problems for users.  See the abidiff(1) documentation and the distribution ABI policies to determine if this detected change is allowed.")
+
+/* kmidiff */
+#define REMEDY_KMIDIFF _("Kernel Module Interface introduced during maintenance updates can lead to problems for users.  See the libabigail documentation and the distribution KMI policy to determine if this detected change is allowed.")
 
 #endif

@@ -84,6 +84,7 @@ struct inspect inspections[] = {
     { INSPECT_FILES,         "%files",        true,  &inspect_files },
     { INSPECT_TYPES,         "types",         false, &inspect_types },
     { INSPECT_ABIDIFF,       "abidiff",       false, &inspect_abidiff },
+    { INSPECT_KMIDIFF,       "kmidiff",       false, &inspect_kmidiff },
     { 0, NULL, false, NULL }
 };
 
@@ -210,6 +211,8 @@ const char *inspection_desc(const uint64_t inspection)
             return DESC_TYPES;
         case INSPECT_ABIDIFF:
             return DESC_ABIDIFF;
+        case INSPECT_KMIDIFF:
+            return DESC_KMIDIFF;
         default:
             return NULL;
     }

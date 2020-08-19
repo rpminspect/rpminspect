@@ -407,19 +407,28 @@ struct rpminspect {
     string_list_t *forbidden_paths;
 
     /* name of the optional ABI suppression file in the SRPM */
-    char *suppression_file;
+    char *abidiff_suppression_file;
 
     /* path where debuginfo files are found in packages */
-    char *debuginfo_path;
+    char *abidiff_debuginfo_path;
 
     /* path where header filesa re found in packages */
-    char *include_path;
+    char *abidiff_include_path;
 
     /* extra arguments for abidiff(1) */
     char *abidiff_extra_args;
 
     /* ABI compat level security reporting threshold */
     long int abi_security_threshold;
+
+    /* name of the optional ABI suppression file in the SRPM */
+    char *kmidiff_suppression_file;
+
+    /* path where debuginfo files are found in packages */
+    char *kmidiff_debuginfo_path;
+
+    /* extra arguments for kmidiff(1) */
+    char *kmidiff_extra_args;
 
     /* Options specified by the user */
     char *before;              /* before build ID arg given on cmdline */

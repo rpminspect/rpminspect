@@ -40,6 +40,7 @@ librpminspect_sources = [
     'inspect_files.c',
     'inspect_filesize.c',
     'inspect_javabytecode.c',
+    'inspect_kmidiff.c',
     'inspect_kmod.c',
     'inspect_license.c',
     'inspect_lostpayload.c',

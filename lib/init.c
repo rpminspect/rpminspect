@@ -87,6 +87,7 @@ enum {
     BLOCK_INSPECTIONS,
     BLOCK_FORBIDDEN_IPV6_FUNCTIONS,
     BLOCK_JAVABYTECODE,
+    BLOCK_KMIDIFF,
     BLOCK_KOJI,
     BLOCK_LTO,
     BLOCK_LTO_SYMBOL_NAME_PREFIXES,
@@ -565,6 +566,8 @@ static int read_cfgfile(struct rpminspect *ri, const char *filename)
                         block = BLOCK_FORBIDDEN_PATHS;
                     } else if (!strcmp(key, "abidiff")) {
                         block = BLOCK_ABIDIFF;
+                    } else if (!strcmp(key, "kmidiff")) {
+                        block = BLOCK_KMIDIFF;
                     }
                 }
 
@@ -789,14 +792,14 @@ static int read_cfgfile(struct rpminspect *ri, const char *filename)
                         }
                     } else if (block == BLOCK_ABIDIFF) {
                         if (!strcmp(key, "suppression_file")) {
-                            free(ri->suppression_file);
-                            ri->suppression_file = strdup(t);
+                            free(ri->abidiff_suppression_file);
+                            ri->abidiff_suppression_file = strdup(t);
                         } else if (!strcmp(key, "debuginfo_path")) {
-                            free(ri->debuginfo_path);
-                            ri->debuginfo_path = strdup(t);
+                            free(ri->abidiff_debuginfo_path);
+                            ri->abidiff_debuginfo_path = strdup(t);
                         } else if (!strcmp(key, "include_path")) {
-                            free(ri->include_path);
-                            ri->include_path = strdup(t);
+                            free(ri->abidiff_include_path);
+                            ri->abidiff_include_path = strdup(t);
                         } else if (!strcmp(key, "abidiff_extra_args")) {
                             free(ri->abidiff_extra_args);
                             ri->abidiff_extra_args = strdup(t);
@@ -807,6 +810,17 @@ static int read_cfgfile(struct rpminspect *ri, const char *filename)
                                 warn("strtol()");
                                 ri->abi_security_threshold = DEFAULT_ABI_SECURITY_THRESHOLD;
                             }
+                        }
+                    } else if (block == BLOCK_KMIDIFF) {
+                        if (!strcmp(key, "suppression_file")) {
+                            free(ri->kmidiff_suppression_file);
+                            ri->kmidiff_suppression_file = strdup(t);
+                        } else if (!strcmp(key, "debuginfo_path")) {
+                            free(ri->kmidiff_debuginfo_path);
+                            ri->kmidiff_debuginfo_path = strdup(t);
+                        } else if (!strcmp(key, "abidiff_extra_args")) {
+                            free(ri->kmidiff_extra_args);
+                            ri->kmidiff_extra_args = strdup(t);
                         }
                     }
                 } else if (symbol == SYMBOL_ENTRY) {
@@ -1129,10 +1143,12 @@ struct rpminspect *init_rpminspect(struct rpminspect *ri, const char *cfgfile, c
         ri->shells = list_from_array(SHELLS);
         ri->specmatch = MATCH_FULL;
         ri->specprimary = PRIMARY_NAME;
-        ri->suppression_file = strdup(ABI_SUPPRESSION_FILE);
-        ri->debuginfo_path = strdup(DEBUG_PATH);
-        ri->include_path = strdup(INCLUDE_PATH);
+        ri->abidiff_suppression_file = strdup(ABI_SUPPRESSION_FILE);
+        ri->abidiff_debuginfo_path = strdup(DEBUG_PATH);
+        ri->abidiff_include_path = strdup(INCLUDE_PATH);
         ri->abi_security_threshold = DEFAULT_ABI_SECURITY_THRESHOLD;
+        ri->kmidiff_suppression_file = strdup(ABI_SUPPRESSION_FILE);
+        ri->kmidiff_debuginfo_path = strdup(DEBUG_PATH);
 
         /* Store full paths to all config files read */
         ri->cfgfiles = calloc(1, sizeof(*ri->cfgfiles));

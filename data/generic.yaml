@@ -438,3 +438,17 @@ abidiff:
     # cause packages and DSOs at ABI compatibility levels 1 and 2 to
     # report abidiff(1) findings with a security severity.
     security_level_threshold: 2
+
+kmidiff:
+    # The name of the optional ABI suppression file that SRPMs can
+    # include.  This file is used with kmidiff(1) in the kmidiff
+    # inspection.  It is passed using the --suppressions option on
+    # that command.
+    suppression_file: .abignore
+
+    # Location where debuginfo files live in RPM packages.
+    debuginfo_path: /usr/lib/debug/
+
+    # Extra arguments for the kmidiff(1) program.  These are put on
+    # the command line before the two files being compared.
+    #kmidiff_extra_args:
