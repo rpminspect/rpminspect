@@ -433,6 +433,10 @@ struct rpminspect {
     /* list of valid kernel executable filenames (e.g., "vmlinux") */
     string_list_t *kernel_filenames;
 
+    /* kmidiff compat level ignore file pattern */
+    /* the pattern can include ${ARCH} which has the architecture substituted */
+    char *kmi_ignore_pattern;
+
     /* Options specified by the user */
     char *before;              /* before build ID arg given on cmdline */
     char *after;               /* after build ID arg given on cmdline */

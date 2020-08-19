@@ -305,6 +305,13 @@
  */
 #define KERNEL_FILENAMES { "vmlinux", "vmlinuz", NULL }
 
+/**
+ * @def KMI_IGNORE_PATTERN
+ * File pattern used to find the KMI ignore list for kmidiff.
+ * The substring '${ARCH}' will be replaced with the package architecture.
+ */
+#define KMI_IGNORE_PATTERN "/lib/modules/kabi-current/kabi_whitelist_${ARCH}"
+
 /** @} */
 
 /**

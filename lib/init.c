@@ -824,6 +824,9 @@ static int read_cfgfile(struct rpminspect *ri, const char *filename)
                         } else if (!strcmp(key, "extra_args")) {
                             free(ri->kmidiff_extra_args);
                             ri->kmidiff_extra_args = strdup(t);
+                        } else if (!strcmp(key, "kmi_ignore_pattern")) {
+                            free(ri->kmi_ignore_pattern);
+                            ri->kmi_ignore_pattern = strdup(t);
                         }
                     }
                 } else if (symbol == SYMBOL_ENTRY) {
