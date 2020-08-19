@@ -87,6 +87,7 @@ enum {
     BLOCK_INSPECTIONS,
     BLOCK_FORBIDDEN_IPV6_FUNCTIONS,
     BLOCK_JAVABYTECODE,
+    BLOCK_KERNEL_FILENAMES,
     BLOCK_KMIDIFF,
     BLOCK_KOJI,
     BLOCK_LTO,
@@ -567,7 +568,9 @@ static int read_cfgfile(struct rpminspect *ri, const char *filename)
                     } else if (!strcmp(key, "abidiff")) {
                         block = BLOCK_ABIDIFF;
                     } else if (!strcmp(key, "kmidiff")) {
-                        block = BLOCK_KMIDIFF;
+                        group = BLOCK_KMIDIFF;
+                    } else if (group == BLOCK_KMIDIFF && !strcmp(key, "kernel_filenames")) {
+                        block = BLOCK_KERNEL_FILENAMES;
                     }
                 }
 
@@ -811,7 +814,7 @@ static int read_cfgfile(struct rpminspect *ri, const char *filename)
                                 ri->abi_security_threshold = DEFAULT_ABI_SECURITY_THRESHOLD;
                             }
                         }
-                    } else if (block == BLOCK_KMIDIFF) {
+                    } else if (group == BLOCK_KMIDIFF) {
                         if (!strcmp(key, "suppression_file")) {
                             free(ri->kmidiff_suppression_file);
                             ri->kmidiff_suppression_file = strdup(t);
@@ -854,6 +857,8 @@ static int read_cfgfile(struct rpminspect *ri, const char *filename)
                         add_entry(&ri->lto_symbol_name_prefixes, t);
                     } else if (block == BLOCK_FORBIDDEN_PATHS) {
                         add_entry(&ri->forbidden_paths, t);
+                    } else if (block == BLOCK_KERNEL_FILENAMES) {
+                        add_entry(&ri->kernel_filenames, t);
                     }
                 }
 
@@ -1124,6 +1129,7 @@ struct rpminspect *init_rpminspect(struct rpminspect *ri, const char *cfgfile, c
     int i = 0;
     char *tmp = NULL;
     char *filename = NULL;
+    char *kernelnames[] = KERNEL_FILENAMES;
     string_entry_t *cfg = NULL;
 
     /* Only initialize if we were given NULL for ri */
@@ -1200,6 +1206,20 @@ struct rpminspect *init_rpminspect(struct rpminspect *ri, const char *cfgfile, c
         }
 
         free(tmp);
+    }
+
+    /* Initialize some lists if we did not get any config file data */
+    if (ri->kernel_filenames == NULL) {
+        ri->kernel_filenames = calloc(1, sizeof(*ri->kernel_filenames));
+        assert(ri->kernel_filenames != NULL);
+        TAILQ_INIT(ri->kernel_filenames);
+
+        for(i = 0; kernelnames[i] != NULL; i++) {
+            cfg = calloc(1, sizeof(*cfg));
+            cfg->data = strdup(kernelnames[i]);
+            assert(cfg->data != NULL);
+            TAILQ_INSERT_TAIL(ri->kernel_filenames, cfg, items);
+        }
     }
 
     /* the rest of the members are used at runtime */

@@ -299,6 +299,12 @@
  */
 #define INCLUDE_PATH "/usr/include/"
 
+/**
+ * @def KERNEL_FILENAMES
+ * Default array of kernel executable filename possibilities.
+ */
+#define KERNEL_FILENAMES { "vmlinux", "vmlinuz", NULL }
+
 /** @} */
 
 /**
