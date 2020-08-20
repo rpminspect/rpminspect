@@ -356,6 +356,7 @@ bool is_rebase(struct rpminspect *ri);
 void init_arches(struct rpminspect *ri);
 
 /* abi.c */
+void add_abi_argument(struct hsearch_data *table, const char *arg, const char *path, const Header hdr);
 size_t count_abi_entries(const char *abifile);
 abi_list_t *read_abi(const char *vendor_data_dir, const char *product_release);
 void free_abi(abi_list_t *list);

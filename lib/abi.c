@@ -28,7 +28,7 @@
 /*
  * Helper to add entries to abi argument tables.
  */
-static void add_abi_argument(struct hsearch_data *table, const char *arg, const char *path, const Header hdr)
+void add_abi_argument(struct hsearch_data *table, const char *arg, const char *path, const Header hdr)
 {
     string_list_t *list = NULL;
     string_entry_t *entry = NULL;
@@ -279,6 +279,12 @@ abi_list_t *read_abi(const char *vendor_data_dir, const char *product_release)
                 TAILQ_INIT(entry->keys);
             }
 
+            if (foundkey) {
+                free(line);
+                line = NULL;
+                continue;
+            }
+
             /* make sure we have the hash table entry */
             if (pkgentry == NULL) {
                 pkgentry = calloc(1, sizeof(*pkgentry));
@@ -304,28 +310,26 @@ abi_list_t *read_abi(const char *vendor_data_dir, const char *product_release)
             }
 
             /* if this was a new package, add it */
-            if (!foundkey) {
-                /* ensure we have a hash table */
-                if (entry->pkgs == NULL) {
-                    entry->pkgs = calloc(1, sizeof(*(entry->pkgs)));
-                    r = hcreate_r(table_size * 1.25, entry->pkgs);
-                    assert(r != 0);
-                }
-
-                /* add this new hash table entry */
-                e.key = pkg;
-                e.data = pkgentry;
-
-                if (!hsearch_r(e, ENTER, &eptr, entry->pkgs)) {
-                    warn("unable to add %s to the ABI compatibility level %d structure", pkg, entry->level);
-                }
-
-                /* hash table keys */
-                keyentry = calloc(1, sizeof(*keyentry));
-                assert(keyentry != NULL);
-                keyentry->data = strdup(pkg);
-                TAILQ_INSERT_TAIL(entry->keys, keyentry, items);
+            /* ensure we have a hash table */
+            if (entry->pkgs == NULL) {
+                entry->pkgs = calloc(1, sizeof(*(entry->pkgs)));
+                r = hcreate_r(table_size * 1.25, entry->pkgs);
+                assert(r != 0);
             }
+
+            /* add this new hash table entry */
+            e.key = pkg;
+            e.data = pkgentry;
+
+            if (!hsearch_r(e, ENTER, &eptr, entry->pkgs)) {
+                warn("unable to add %s to the ABI compatibility level %d structure", pkg, entry->level);
+            }
+
+            /* hash table keys */
+            keyentry = calloc(1, sizeof(*keyentry));
+            assert(keyentry != NULL);
+            keyentry->data = strdup(pkg);
+            TAILQ_INSERT_TAIL(entry->keys, keyentry, items);
         }
 
         /* clean up */
@@ -431,6 +435,7 @@ struct hsearch_data *get_abi_dir_arg(struct rpminspect *ri, const size_t size, c
     rpmpeer_entry_t *peer = NULL;
     const char *name = NULL;
     char *tmp = NULL;
+    char *root = NULL;
     struct hsearch_data *table = NULL;
     Header h;
 
@@ -452,29 +457,26 @@ struct hsearch_data *get_abi_dir_arg(struct rpminspect *ri, const size_t size, c
         }
 
         if (type == BEFORE_BUILD && peer->before_files && !TAILQ_EMPTY(peer->before_files)) {
+            root = peer->before_root;
             h = peer->before_hdr;
             name = headerGetString(h, RPMTAG_NAME);
 
-            if (suffix && strsuffix(name, suffix)) {
-                xasprintf(&tmp, "%s%s", peer->before_root, path);
-            } else {
-                xasprintf(&tmp, "%s%s", peer->before_root, path);
-            }
         } else if (type == AFTER_BUILD && peer->after_files && !TAILQ_EMPTY(peer->after_files)) {
+            root = peer->after_root;
             h = peer->after_hdr;
             name = headerGetString(h, RPMTAG_NAME);
-
-            if (suffix && strsuffix(name, suffix)) {
-                xasprintf(&tmp, "%s%s", peer->after_root, path);
-            } else {
-                xasprintf(&tmp, "%s%s", peer->after_root, path);
-            }
+        } else {
+            continue;
         }
 
-        if (tmp) {
-            add_abi_argument(table, arg, tmp, h);
-            free(tmp);
+        if (suffix && strsuffix(name, suffix)) {
+            xasprintf(&tmp, "%s%s", root, path);
+        } else {
+            xasprintf(&tmp, "%s%s", root, path);
         }
+
+        add_abi_argument(table, arg, tmp, h);
+        free(tmp);
     }
 
     return table;

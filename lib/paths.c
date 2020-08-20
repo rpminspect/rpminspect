@@ -142,7 +142,7 @@ bool usable_path(const char *path)
     memset(&sb, 0, sizeof(sb));
 
     if (lstat(path, &sb) == -1) {
-        warn("lstat()");
+        warn("lstat(%s)", path);
         return false;
     }
 
