@@ -103,6 +103,10 @@ const char *get_after_debuginfo_path(struct rpminspect *ri, const char *binarch)
 
     /* try to find a debuginfo package */
     TAILQ_FOREACH(peer, ri->peers, items) {
+        if (peer->after_hdr == NULL) {
+            continue;
+        }
+
         arch = get_rpm_header_arch(peer->after_hdr);
         assert(arch != NULL);
 
