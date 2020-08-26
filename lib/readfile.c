@@ -21,6 +21,8 @@
 
 #include <assert.h>
 #include <errno.h>
+#include <err.h>
+#include <sys/mman.h>
 
 #include "rpminspect.h"
 
@@ -31,35 +33,55 @@
  */
 string_list_t *read_file(const char *path)
 {
-    FILE *fp = NULL;
+    int r = 0;
+    int fd = 0;
+    off_t len = 0;
     string_list_t *data = NULL;
-    string_entry_t *entry = NULL;
     char *buf = NULL;
-    size_t buflen = 0;
 
     assert(path != NULL);
-    fp = fopen(path, "r");
 
-    if (fp == NULL) {
-        fprintf(stderr, "*** %s (%d): %s\n", __func__, __LINE__, strerror(errno));
+    /* open the file for reading */
+    fd = open(path, O_RDONLY);
+
+    if (fd == -1) {
+        warn("unable to open %s", path);
+        r = close(fd);
+        assert(r != -1);
         return NULL;
     }
 
-    data = calloc(1, sizeof(*data));
-    assert(data != NULL);
-    TAILQ_INIT(data);
+    /* find the file length */
+    len = lseek(fd, 0, SEEK_END);
 
-    while (getline(&buf, &buflen, fp) != -1) {
-        entry = calloc(1, sizeof(*entry));
-        entry->data = buf;
-        TAILQ_INSERT_TAIL(data, entry, items);
-        buf = NULL;
-    }
-
-    if (fclose(fp) == -1) {
-        fprintf(stderr, "*** %s (%d): %s\n", __func__, __LINE__, strerror(errno));
+    if (len == -1) {
+        warn("unable to find end of %s", path);
+        r = close(fd);
+        assert(r != -1);
         return NULL;
     }
+
+    /* map the contents of the file */
+    buf = mmap(NULL, len, PROT_READ, MAP_PRIVATE, fd, 0);
+
+    if (buf == MAP_FAILED) {
+        warn("unable to read %s", path);
+        r = close(fd);
+        assert(r != -1);
+        return NULL;
+    }
+
+    /* the actual file close we care about */
+    if (close(fd) == -1) {
+        warn("unable to close %s", path);
+    }
+
+    /* break up the file in to lines */
+    data = strsplit(buf, "\n\r");
+
+    /* unmap */
+    r = munmap(buf, len);
+    assert(r == 0);
 
     return data;
 }
