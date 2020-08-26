@@ -419,6 +419,7 @@ char *strappend(char *first, const char *second)
 string_list_t *strsplit(const char *s, const char *delim)
 {
     char *walk = NULL;
+    char *walkp = NULL;
     char *token = NULL;
     string_list_t *list = NULL;
     string_entry_t *entry = NULL;
@@ -428,7 +429,8 @@ string_list_t *strsplit(const char *s, const char *delim)
     }
 
     walk = strdup(s);
-    assert(s != NULL);
+    assert(walk != NULL);
+    walkp = walk;
 
     list = calloc(1, sizeof(*list));
     assert(list != NULL);
@@ -451,7 +453,7 @@ string_list_t *strsplit(const char *s, const char *delim)
         TAILQ_INSERT_TAIL(list, entry, items);
     }
 
-    free(walk);
+    free(walkp);
     return list;
 }
 
