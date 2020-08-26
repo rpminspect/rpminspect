@@ -54,6 +54,9 @@ void add_abi_argument(struct hsearch_data *table, const char *arg, const char *p
     /* we have the dir, add it */
     arch = get_rpm_header_arch(hdr);
     e.key = (char *) arch;
+    assert(e.key != NULL);
+    e.data = NULL;
+    eptr = NULL;
     hsearch_r(e, FIND, &eptr, table);
 
     if (eptr == NULL) {
@@ -65,6 +68,7 @@ void add_abi_argument(struct hsearch_data *table, const char *arg, const char *p
 
         e.key = (char *) arch;
         e.data = list;
+        eptr = NULL;
 
         if (!hsearch_r(e, ENTER, &eptr, table)) {
             err(RI_PROGRAM_ERROR, "hsearch_r()");
@@ -81,46 +85,30 @@ void add_abi_argument(struct hsearch_data *table, const char *arg, const char *p
 /*
  * Count ABI entries in the named ABI compat level file.
  */
-size_t count_abi_entries(const char *abifile)
+size_t count_abi_entries(const string_list_t *contents)
 {
     size_t count = 0;
-    FILE *input = NULL;
-    char *line = NULL;
-    size_t len = 0;
-    ssize_t nread = 0;
+    string_entry_t *entry = NULL;
 
-    assert(abifile != NULL);
-    input = fopen(abifile, "r");
-
-    if (input == NULL) {
+    if (list_len(contents) == 0) {
         return 0;
     }
 
-    while ((nread = getline(&line, &len, input)) != -1) {
+    TAILQ_FOREACH(entry, contents, items) {
         /* skip blank lines, comments, and level definitions */
-        if (*line == '#' || *line == '\n' || *line == '\r') {
-            free(line);
-            line = NULL;
+        if (*entry->data == '#' || *entry->data == '\n' || *entry->data == '\r') {
             continue;
         }
 
         /* trim line ending characters */
-        line[strcspn(line, "\r\n")] = '\0';
+        entry->data[strcspn(entry->data, "\r\n")] = '\0';
 
         /* determine if we are reading a new level or not */
-        if (strprefix(line, "[") && strsuffix(line, "]") && strcasestr(line, "level-")) {
-            free(line);
-            line = NULL;
+        if (strprefix(entry->data, "[") && strsuffix(entry->data, "]") && strcasestr(entry->data, "level-")) {
             continue;
         }
 
         count++;
-        free(line);
-        line = NULL;
-    }
-
-    if (fclose(input) == -1) {
-        warn("fclose()");
     }
 
     return count;
@@ -135,10 +123,13 @@ size_t count_abi_entries(const char *abifile)
 abi_list_t *read_abi(const char *vendor_data_dir, const char *product_release)
 {
     char *abifile = NULL;
-    FILE *input = NULL;
-    char *line = NULL;
-    size_t len = 0;
-    ssize_t nread = 0;
+    string_list_t *contents = NULL;
+    string_entry_t *line = NULL;
+    string_list_t *linekv = NULL;
+    string_list_t *dsos = NULL;
+    string_entry_t *pkg = NULL;
+    string_entry_t *dso = NULL;
+    string_entry_t *dsoval = NULL;
     int found_level = 0;
     size_t table_size = 1;
     bool skip_entries = false;
@@ -146,9 +137,6 @@ abi_list_t *read_abi(const char *vendor_data_dir, const char *product_release)
     abi_entry_t *entry = NULL;
     abi_pkg_entry_t *pkgentry = NULL;
     string_entry_t *keyentry = NULL;
-    char *pkg = NULL;
-    char *dso = NULL;
-    char *dsoval = NULL;
     bool foundkey = false;
     int r = 0;
     ENTRY e;
@@ -158,57 +146,43 @@ abi_list_t *read_abi(const char *vendor_data_dir, const char *product_release)
     assert(vendor_data_dir != NULL);
     assert(product_release != NULL);
 
-    /* build the ABI compat level file to read */
+    /* read the ABI compat level file to read */
     xasprintf(&abifile, "%s/%s/%s", vendor_data_dir, ABI_DIR, product_release);
     assert(abifile != NULL);
+    contents = read_file(abifile);
+    free(abifile);
 
-    if (access(abifile, R_OK)) {
+    if (contents == NULL) {
         /* this product release lacks an ABI compat level file */
-        free(abifile);
         return NULL;
     }
 
     /* we need a line count of the file */
-    table_size = count_abi_entries(abifile);
+    table_size = count_abi_entries(contents);
 
     if (table_size == 0) {
         warn("count_abi_entries()");
-        free(abifile);
+        list_free(contents, free);
         return NULL;
     }
-
-    /* open the ABI compat level file */
-    if ((input = fopen(abifile, "r")) == NULL) {
-        warn("fopen()");
-        free(abifile);
-        return NULL;
-    }
-
-    /* don't need this anymore */
-    free(abifile);
 
     /* read in the ABI compat levels */
-    while ((nread = getline(&line, &len, input)) != -1) {
+    TAILQ_FOREACH(line, contents, items) {
         /* skip blank lines and comments */
-        if (*line == '#' || *line == '\n' || *line == '\r') {
-            free(line);
-            line = NULL;
+        if (line->data == NULL || *line->data == '#' || *line->data == '\n' || *line->data == '\r' || !strcmp(line->data, "")) {
             continue;
         }
 
-        /* trim line ending characters */
-        line[strcspn(line, "\r\n")] = '\0';
-
         /* determine if we are reading a new level or not */
-        if (strprefix(line, "[") && strsuffix(line, "]") && strcasestr(line, "level-")) {
+        if (strprefix(line->data, "[") && strsuffix(line->data, "]") && strcasestr(line->data, "level-")) {
             /* new compat level section */
 
             /*
              * get the compat level we found and make sure we have
              * seen it before
              */
-            if (sscanf(line + 7, "%d]", &found_level) == EOF) {
-                warn("malformed ABI level identifier: %s", line);
+            if (sscanf(line->data + 7, "%d]", &found_level) == EOF) {
+                warn("malformed ABI level identifier: %s", line->data);
                 skip_entries = true;
             }
 
@@ -218,8 +192,6 @@ abi_list_t *read_abi(const char *vendor_data_dir, const char *product_release)
             }
 
             if (skip_entries) {
-                free(line);
-                line = NULL;
                 continue;
             }
 
@@ -241,15 +213,16 @@ abi_list_t *read_abi(const char *vendor_data_dir, const char *product_release)
             /* looking at an abi package entry line */
 
             /* split in to package and DSO list first */
-            pkg = strsep(&line, "=");
-            dso = strsep(&line, "=");
+            linekv = strsplit(line->data, "=");
 
-            if (pkg == NULL || dso == NULL || strsep(&line, "=") != NULL) {
-                warn("malformed ABI level entry: %s", line);
-                free(line);
-                line = NULL;
+            if (list_len(linekv) != 2) {
+                warn("malformed ABI level entry: %s", line->data);
+                list_free(linekv, free);
                 continue;
             }
+
+            pkg = TAILQ_FIRST(linekv);
+            dso = TAILQ_NEXT(pkg, items);
 
             /* try to find this package in the ABI compat level table */
             foundkey = false;
@@ -257,7 +230,7 @@ abi_list_t *read_abi(const char *vendor_data_dir, const char *product_release)
             if (entry->keys) {
                 /* package name may already exist in the key list */
                 TAILQ_FOREACH(keyentry, entry->keys, items) {
-                    if (!strcmp(keyentry->data, pkg)) {
+                    if (!strcmp(keyentry->data, pkg->data)) {
                         foundkey = true;
                         break;
                     }
@@ -265,7 +238,7 @@ abi_list_t *read_abi(const char *vendor_data_dir, const char *product_release)
 
                 /* package name exists, look for the hash table entry */
                 if (foundkey && entry->pkgs) {
-                    e.key = pkg;
+                    e.key = pkg->data;
                     hsearch_r(e, FIND, &eptr, entry->pkgs);
 
                     if (eptr != NULL) {
@@ -280,8 +253,7 @@ abi_list_t *read_abi(const char *vendor_data_dir, const char *product_release)
             }
 
             if (foundkey) {
-                free(line);
-                line = NULL;
+                list_free(linekv, free);
                 continue;
             }
 
@@ -292,24 +264,42 @@ abi_list_t *read_abi(const char *vendor_data_dir, const char *product_release)
             }
 
             /* collect all the DSO values */
-            while ((dsoval = strsep(&dso, ",")) != NULL) {
-                if (!strcasecmp(dsoval, "all-dsos")) {
+            dsos = strsplit(dso->data, ",\n\r");
+
+            if (dsos == NULL) {
+                warn("malformed DSO list: %s", dso->data);
+                list_free(linekv, free);
+                free(pkgentry);
+                continue;
+            }
+
+            TAILQ_FOREACH(dsoval, dsos, items) {
+                if (!strcasecmp(dsoval->data, "all-dsos")) {
                     pkgentry->all = true;
                 } else {
                     if (pkgentry->dsos == NULL) {
-                        pkgentry->dsos = calloc(1, sizeof(*pkgentry->dsos));
+                        pkgentry->dsos = calloc(1, sizeof(*(pkgentry->dsos)));
                         assert(pkgentry->dsos != NULL);
                         TAILQ_INIT(pkgentry->dsos);
                     }
 
                     keyentry = calloc(1, sizeof(*keyentry));
                     assert(keyentry != NULL);
-                    keyentry->data = strdup(dsoval);
+                    keyentry->data = strdup(dsoval->data);
+                    assert(keyentry->data != NULL);
                     TAILQ_INSERT_TAIL(pkgentry->dsos, keyentry, items);
                 }
             }
 
             /* if this was a new package, add it */
+
+            /* hash table keys */
+            keyentry = calloc(1, sizeof(*keyentry));
+            assert(keyentry != NULL);
+            keyentry->data = strdup(pkg->data);
+            assert(keyentry->data != NULL);
+            TAILQ_INSERT_TAIL(entry->keys, keyentry, items);
+
             /* ensure we have a hash table */
             if (entry->pkgs == NULL) {
                 entry->pkgs = calloc(1, sizeof(*(entry->pkgs)));
@@ -318,29 +308,22 @@ abi_list_t *read_abi(const char *vendor_data_dir, const char *product_release)
             }
 
             /* add this new hash table entry */
-            e.key = pkg;
+            e.key = keyentry->data;
             e.data = pkgentry;
+            eptr = NULL;
 
             if (!hsearch_r(e, ENTER, &eptr, entry->pkgs)) {
-                warn("unable to add %s to the ABI compatibility level %d structure", pkg, entry->level);
+                warn("unable to add %s to the ABI compatibility level %d structure", pkg->data, entry->level);
             }
 
-            /* hash table keys */
-            keyentry = calloc(1, sizeof(*keyentry));
-            assert(keyentry != NULL);
-            keyentry->data = strdup(pkg);
-            TAILQ_INSERT_TAIL(entry->keys, keyentry, items);
+            /* clean up */
+            list_free(linekv, free);
+            list_free(dsos, free);
         }
-
-        /* clean up */
-        free(line);
-        line = NULL;
     }
 
     /* clean up */
-    if (fclose(input) == -1) {
-        warn("fclose()");
-    }
+    list_free(contents, free);
 
     return list;
 }
@@ -360,23 +343,25 @@ void free_abi(abi_list_t *list)
         return;
     }
 
-    TAILQ_FOREACH(entry, list, items) {
-        if (entry->keys && entry->pkgs) {
-            TAILQ_FOREACH(key, entry->keys, items) {
-                e.key = key->data;
-                hsearch_r(e, FIND, &eptr, entry->pkgs);
+    while (!TAILQ_EMPTY(list)) {
+        entry = TAILQ_FIRST(list);
+        TAILQ_REMOVE(list, entry, items);
 
-                if (eptr != NULL) {
-                    pkgentry = (abi_pkg_entry_t *) eptr->data;
-                    assert(pkgentry != NULL);
-                    list_free(pkgentry->dsos, free);
-                }
+        TAILQ_FOREACH(key, entry->keys, items) {
+            e.key = key->data;
+            eptr = NULL;
+            hsearch_r(e, FIND, &eptr, entry->pkgs);
+
+            if (eptr != NULL) {
+                pkgentry = (abi_pkg_entry_t *) eptr->data;
+                list_free(pkgentry->dsos, free);
             }
-
-            list_free(entry->keys, free);
-            hdestroy_r(entry->pkgs);
-            free(entry->pkgs);
         }
+
+        list_free(entry->keys, free);
+        hdestroy_r(entry->pkgs);
+        free(entry->pkgs);
+        free(entry);
     }
 
     free(list);
