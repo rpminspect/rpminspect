@@ -29,7 +29,8 @@
 /*
  * Open and read the contents of a file line by line in to a string_list_t.
  * Each line is a separate entry.  Caller must call listfree() on the list
- * returned.
+ * returned.  NULL returned indicates the file could not be read.  An empty
+ * file still returns an empty string_list_t that must be freed.
  */
 string_list_t *read_file(const char *path)
 {
@@ -45,9 +46,6 @@ string_list_t *read_file(const char *path)
     fd = open(path, O_RDONLY);
 
     if (fd == -1) {
-        warn("unable to open %s", path);
-        r = close(fd);
-        assert(r != -1);
         return NULL;
     }
 
