@@ -47,7 +47,7 @@ static struct hsearch_data *headers_dir1_table;
 static struct hsearch_data *headers_dir2_table;
 static abi_list_t *abi = NULL;
 
-static severity_t check_abi(const severity_t sev, const long int threshold, const char *path, const char *pkg)
+static severity_t check_abi(const severity_t sev, const long int threshold, const char *path, const char *pkg, long int *compat)
 {
     ENTRY e;
     ENTRY *eptr;
@@ -78,6 +78,7 @@ static severity_t check_abi(const severity_t sev, const long int threshold, cons
 
         /* we have a entry at this level for this package */
         pkgentry = (abi_pkg_entry_t *) eptr->data;
+        *compat = entry->level;
 
         /* is the ABI level above the threshold? */
         if (entry->level > threshold) {
@@ -120,8 +121,7 @@ static bool abidiff_driver(struct rpminspect *ri, rpmfile_entry_t *file) {
     string_list_t *local_h1 = NULL;
     string_list_t *local_h2 = NULL;
     string_list_t *arglist = NULL;
-    string_entry_t *before = NULL;
-    string_entry_t *after = NULL;
+    string_entry_t *entry = NULL;
     const char *arch = NULL;
     const char *name = NULL;
     ENTRY e;
@@ -132,7 +132,7 @@ static bool abidiff_driver(struct rpminspect *ri, rpmfile_entry_t *file) {
     char *details = NULL;
     struct result_params params;
     bool report = false;
-    int abi_compat_level = 0;
+    long int compat_level = 0;
 
     assert(ri != NULL);
     assert(file != NULL);
@@ -217,18 +217,18 @@ static bool abidiff_driver(struct rpminspect *ri, rpmfile_entry_t *file) {
 */
 
     /* the before build */
-    before = calloc(1, sizeof(*before));
-    assert(before != NULL);
-    before->data = strdup(file->peer_file->fullpath);
-    assert(before->data != NULL);
-    TAILQ_INSERT_TAIL(argv, before, items);
+    entry = calloc(1, sizeof(*entry));
+    assert(entry != NULL);
+    entry->data = strdup(file->peer_file->fullpath);
+    assert(entry->data != NULL);
+    TAILQ_INSERT_TAIL(argv, entry, items);
 
     /* the after build */
-    after = calloc(1, sizeof(*after));
-    assert(after != NULL);
-    after->data = strdup(file->fullpath);
-    assert(after->data != NULL);
-    TAILQ_INSERT_TAIL(argv, after, items);
+    entry = calloc(1, sizeof(*entry));
+    assert(entry != NULL);
+    entry->data = strdup(file->fullpath);
+    assert(entry->data != NULL);
+    TAILQ_INSERT_TAIL(argv, entry, items);
 
     /* run abidiff */
     details = sl_run_cmd(&exitcode, argv);
@@ -276,19 +276,19 @@ static bool abidiff_driver(struct rpminspect *ri, rpmfile_entry_t *file) {
 
         /* check the ABI compat level list */
         name = headerGetString(file->rpm_header, RPMTAG_NAME);
-        params.severity = check_abi(params.severity, ri->abi_security_threshold, file->localpath, name);
+        params.severity = check_abi(params.severity, ri->abi_security_threshold, file->localpath, name, &compat_level);
 
         /* add additional details */
         if (report) {
             if (!strcmp(file->peer_file->localpath, file->localpath)) {
-                if (abi_compat_level) {
-                    xasprintf(&params.msg, _("Comparing old vs. new version of %s in package %s with ABI compatibility level %d on %s revealed ABI differences."), file->localpath, name, abi_compat_level, arch);
+                if (compat_level) {
+                    xasprintf(&params.msg, _("Comparing old vs. new version of %s in package %s with ABI compatibility level %ld on %s revealed ABI differences."), file->localpath, name, compat_level, arch);
                 } else {
                     xasprintf(&params.msg, _("Comparing old vs. new version of %s in package %s on %s revealed ABI differences."), file->localpath, name, arch);
                 }
             } else {
-                if (abi_compat_level) {
-                    xasprintf(&params.msg, _("Comparing from %s to %s in package %s with ABI compatibility level %d on %s revealed ABI differences."), file->peer_file->localpath, file->localpath, name, abi_compat_level, arch);
+                if (compat_level) {
+                    xasprintf(&params.msg, _("Comparing from %s to %s in package %s with ABI compatibility level %ld on %s revealed ABI differences."), file->peer_file->localpath, file->localpath, name, compat_level, arch);
                 } else {
                     xasprintf(&params.msg, _("Comparing from %s to %s in package %s on %s revealed ABI differences."), file->peer_file->localpath, file->localpath, name, arch);
                 }
