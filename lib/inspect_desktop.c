@@ -22,6 +22,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <errno.h>
+#include <err.h>
 #include <libgen.h>
 #include <ftw.h>
 #include <assert.h>
@@ -141,8 +142,8 @@ static bool is_desktop_entry_file(const char *desktop_entry_files_dir, const rpm
 static bool validate_desktop_contents(struct rpminspect *ri, const rpmfile_entry_t *file)
 {
     bool result = true;
-    FILE *fp = NULL;
-    size_t len;
+    string_list_t *contents = NULL;
+    string_entry_t *entry = NULL;
     char *buf = NULL;
     char *tmp = NULL;
     char *walk = NULL;
@@ -185,12 +186,10 @@ static bool validate_desktop_contents(struct rpminspect *ri, const rpmfile_entry
     allpkgtrees = strdup(dirname(tmp));
     free(tmp);
 
-    /* Open the desktop entry file */
-    fp = fopen(file->fullpath, "r");
+    /* Read the desktop entry file */
+    contents = read_file(file->fullpath);
 
-    if (fp == NULL) {
-        fprintf(stderr, _("error opening %s for reading: %s\n"), file->fullpath, strerror(errno));
-        fflush(stderr);
+    if (contents == NULL) {
         return false;
     }
 
@@ -198,7 +197,8 @@ static bool validate_desktop_contents(struct rpminspect *ri, const rpmfile_entry
      * Iterate over the entire file line by line looking for Exec= and Icon=
      * lines.  When found, validate the value after the '='.
      */
-    while (getline(&buf, &len, fp) != -1) {
+    TAILQ_FOREACH(entry, contents, items) {
+        buf = entry->data;
         filetype = FILETYPE_NULL;
 
         if (strprefix(buf, "Exec=")) {
@@ -231,9 +231,8 @@ static bool validate_desktop_contents(struct rpminspect *ri, const rpmfile_entry
              */
             if (nftw(allpkgtrees, find_file, 25, FTW_MOUNT|FTW_PHYS) == 1) {
                 if (lstat(file_to_find, &sb) == -1) {
-                    fprintf(stderr, _("error stat'ing %s: %s\n"), file_to_find, strerror(errno));
-                    fflush(stderr);
-                    free(buf);
+                    warn("stat()");
+                    list_free(contents, free);
                     return false;
                 }
 
@@ -267,9 +266,8 @@ static bool validate_desktop_contents(struct rpminspect *ri, const rpmfile_entry
                 found = true;
 
                 if (lstat(file_to_find, &sb) == -1) {
-                    fprintf(stderr, _("error stat'ing %s: %s\n"), file_to_find, strerror(errno));
-                    fflush(stderr);
-                    free(buf);
+                    warn("stat()");
+                    list_free(contents, free);
                     return false;
                 }
 
@@ -290,19 +288,11 @@ static bool validate_desktop_contents(struct rpminspect *ri, const rpmfile_entry
 
             free(file_to_find);
         }
-
-        free(buf);
-        buf = NULL;
     }
 
-    /* Close the desktop entry file */
-    if (fclose(fp) == -1) {
-        fprintf(stderr, _("error closing %s: %s\n"), file->fullpath, strerror(errno));
-        fflush(stderr);
-        result = false;
-    }
-
+    list_free(contents, free);
     free(allpkgtrees);
+
     return result;
 }
 
