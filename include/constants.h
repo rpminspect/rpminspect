@@ -210,6 +210,8 @@
  * Executable providing kmidiff(1)
  */
 #define KMIDIFF_CMD "kmidiff"
+#define KMIDIFF_VMLINUX1 "--vmlinux1"
+#define KMIDIFF_VMLINUX2 "--vmlinux2"
 
 /** @} */
 
