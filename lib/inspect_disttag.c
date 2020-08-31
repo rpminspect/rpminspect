@@ -132,8 +132,8 @@ static bool check_release_macros(const int macrocount, const pair_list_t *macros
 
 static bool disttag_driver(struct rpminspect *ri, rpmfile_entry_t *file) {
     bool result = true;
-    FILE *fp = NULL;
-    size_t len = 0;
+    string_list_t *contents = NULL;
+    string_entry_t *entry = NULL;
     char *buf = NULL;
     char *release = NULL;
     char *specfile = NULL;
@@ -161,15 +161,15 @@ static bool disttag_driver(struct rpminspect *ri, rpmfile_entry_t *file) {
     macrocount = get_specfile_macros(ri, file->fullpath);
 
     /* Check for the %{?dist} macro in the Release value */
-    fp = fopen(file->fullpath, "r");
+    contents = read_file(file->fullpath);
 
-    if (fp == NULL) {
-        fprintf(stderr, _("error opening %s for reading: %s\n"), file->fullpath, strerror(errno));
-        fflush(stderr);
+    if (contents == NULL) {
         return true;
     }
 
-    while (getline(&buf, &len, fp) != -1) {
+    TAILQ_FOREACH(entry, contents, items) {
+        buf = entry->data;
+
         /* trim line endings */
         buf[strcspn(buf, "\r\n")] = 0;
 
@@ -182,14 +182,6 @@ static bool disttag_driver(struct rpminspect *ri, rpmfile_entry_t *file) {
         if (strprefix(buf, SPEC_TAG_RELEASE)) {
             break;
         }
-
-        free(buf);
-        buf = NULL;
-    }
-
-    if (fclose(fp) == -1) {
-        fprintf(stderr, _("error closing %s: %s\n"), file->fullpath, strerror(errno));
-        fflush(stderr);
     }
 
     /* Only look at the value on the Release: line */
@@ -232,7 +224,7 @@ static bool disttag_driver(struct rpminspect *ri, rpmfile_entry_t *file) {
     }
 
     free(params.msg);
-    free(buf);
+    list_free(contents, free);
     return result;
 }
 
