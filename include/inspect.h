@@ -536,8 +536,8 @@ bool inspect_kmidiff(struct rpminspect *ri);
 
 #define DESC_TYPES _("Compare MIME types of files between builds and report any changes for verification.")
 
-#define DESC_ABIDIFF _("When comparing two builds or two packages, compare ELF files using abidiff(1) from the libabigail project.  Differences are reported.  If the package is a rebase and not on the rebaseable list and the rebase inspection is enabled, ABI differences are reported as failures.  The assumption here is that rpminspect is comparing builds for maintenance purposes and you do not want to introduce any ABI changes for users.  If you do not care about that, turn off the rebase inspection or add the package name to the rebaseable list.")
+#define DESC_ABIDIFF _("When comparing two builds or two packages, compare ELF files using abidiff(1) from the libabigail project.  Differences are reported.  If the package is a rebase and not on the rebaseable list and the rebase inspection is enabled, ABI differences are reported as failures.  The assumption here is that rpminspect is comparing builds for maintenance purposes and you do not want to introduce any ABI changes for users.  If you do not care about that, turn off the abidiff inspection or add the package name to the rebaseable list.")
 
-#define DESC_KMIDIFF _("kmidiff compares the binary Kernel Module Interfaces of two Linux Kernel trees.  The binary KMI is the interface that the Linux Kernel exposes to its modules.  The trees we are interested in here are the result of the build of the Linux Kernel source tree.  If the builds compared are not considered a rebase, an incompatible change reported by kmidiff is reported for verification.")
+#define DESC_KMIDIFF _("kmidiff compares the binary Kernel Module Interfaces of two Linux kernel trees.  The binary KMI is the interface that the Linux kernel exposes to its modules.  The trees we are interested in here are the result of the build of the Linux kernel source tree.  If the builds compared are not considered a rebase, an incompatible change reported by kmidiff is reported for verification.")
 
 #endif
