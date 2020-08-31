@@ -902,14 +902,13 @@ static int read_cfgfile(struct rpminspect *ri, const char *filename)
  */
 bool init_fileinfo(struct rpminspect *ri) {
     char *filename = NULL;
-    FILE *input = NULL;
+    string_list_t *contents = NULL;
+    string_entry_t *entry = NULL;
     char *line = NULL;
-    size_t len = 0;
-    ssize_t nread = 0;
     char *token = NULL;
     char *fnpart = NULL;
     fileinfo_field_t field = MODE;
-    fileinfo_entry_t *entry = NULL;
+    fileinfo_entry_t *fientry = NULL;
 
     assert(ri != NULL);
     assert(ri->vendor_data_dir != NULL);
@@ -923,13 +922,8 @@ bool init_fileinfo(struct rpminspect *ri) {
     /* the actual fileinfo file */
     xasprintf(&filename, "%s/%s/%s", ri->vendor_data_dir, FILEINFO_DIR, ri->product_release);
     assert(filename != NULL);
-
-    input = fopen(filename, "r");
+    contents = read_file(filename);
     free(filename);
-
-    if (input == NULL) {
-        return false;
-    }
 
     /* initialize the list */
     ri->fileinfo = calloc(1, sizeof(*(ri->fileinfo)));
@@ -937,20 +931,20 @@ bool init_fileinfo(struct rpminspect *ri) {
     TAILQ_INIT(ri->fileinfo);
 
     /* add all the entries to the fileinfo list */
-    while ((nread = getline(&line, &len, input)) != -1) {
-        /* skip blank lines and comments */
-        if (*line == '#' || *line == '\n' || *line == '\r') {
-            free(line);
-            line = NULL;
-            continue;
-        }
+    TAILQ_FOREACH(entry, contents, items) {
+        line = entry->data;
 
         /* trim line ending characters */
         line[strcspn(line, "\r\n")] = '\0';
 
+        /* skip blank lines and comments */
+        if (line == NULL || *line == '#' || *line == '\n' || *line == '\r' || !strcmp(line, "")) {
+            continue;
+        }
+
         /* initialize a new list entry */
-        entry = calloc(1, sizeof(*entry));
-        assert(entry != NULL);
+        fientry = calloc(1, sizeof(*fientry));
+        assert(fientry != NULL);
 
         /* read the fields */
         while ((token = strsep(&line, " \t")) != NULL) {
@@ -961,11 +955,11 @@ bool init_fileinfo(struct rpminspect *ri) {
 
             /* copy the field in to the correct struct member */
             if (field == MODE) {
-                entry->mode = parse_mode(token);
+                fientry->mode = parse_mode(token);
             } else if (field == OWNER) {
-                entry->owner = strdup(token);
+                fientry->owner = strdup(token);
             } else if (field == GROUP) {
-                entry->group = strdup(token);
+                fientry->group = strdup(token);
             } else if (field == FILENAME) {
                 fnpart = token;
 
@@ -980,12 +974,12 @@ bool init_fileinfo(struct rpminspect *ri) {
                     fprintf(stderr, _("*** From this invalid line:\n"));
                     fprintf(stderr, "***     %s\n", line);
 
-                    free(entry->owner);
-                    free(entry->group);
-                    free(entry);
+                    free(fientry->owner);
+                    free(fientry->group);
+                    free(fientry);
                     entry = NULL;
                 } else {
-                    entry->filename = strdup(token);
+                    fientry->filename = strdup(token);
                 }
 
                 break;     /* nothing should come after this field */
@@ -995,19 +989,15 @@ bool init_fileinfo(struct rpminspect *ri) {
         }
 
         /* add the entry */
-        if (entry != NULL) {
-            TAILQ_INSERT_TAIL(ri->fileinfo, entry, items);
+        if (fientry != NULL) {
+            TAILQ_INSERT_TAIL(ri->fileinfo, fientry, items);
         }
 
         /* clean up */
-        free(line);
-        line = NULL;
         field = MODE;
     }
 
-    if (fclose(input) == -1) {
-        warn("fclose()");
-    }
+    list_free(contents, free);
 
     return true;
 }
@@ -1019,14 +1009,13 @@ bool init_fileinfo(struct rpminspect *ri) {
 bool init_caps(struct rpminspect *ri)
 {
     char *filename = NULL;
-    FILE *input = NULL;
     char *line = NULL;
-    size_t len = 0;
-    ssize_t nread = 0;
     char *token = NULL;
+    string_list_t *contents = NULL;
+    string_entry_t *entry = NULL;
     caps_field_t field = PACKAGE;
     caps_filelist_t *files = NULL;
-    caps_entry_t *entry = NULL;
+    caps_entry_t *centry = NULL;
     caps_filelist_entry_t *filelist_entry = NULL;
 
     assert(ri != NULL);
@@ -1041,10 +1030,10 @@ bool init_caps(struct rpminspect *ri)
     /* the actual caps list file */
     xasprintf(&filename, "%s/%s/%s", ri->vendor_data_dir, CAPABILITIES_DIR, ri->product_release);
     assert(filename != NULL);
-    input = fopen(filename, "r");
+    contents = read_file(filename);
     free(filename);
 
-    if (input == NULL) {
+    if (contents == NULL) {
         return false;
     }
 
@@ -1054,11 +1043,11 @@ bool init_caps(struct rpminspect *ri)
     TAILQ_INIT(ri->caps);
 
     /* add all the entries to the caps list */
-    while ((nread = getline(&line, &len, input)) != -1) {
+    TAILQ_FOREACH(entry, contents, items) {
+        line = entry->data;
+
         /* skip blank lines and comments */
         if (*line == '#' || *line == '\n' || *line == '\r') {
-            free(line);
-            line = NULL;
             continue;
         }
 
@@ -1075,23 +1064,23 @@ bool init_caps(struct rpminspect *ri)
             /* take action on each field */
             if (field == PACKAGE) {
                 /* this package may exist in the list */
-                TAILQ_FOREACH(entry, ri->caps, items) {
-                    if (!strcmp(entry->pkg, token)) {
-                        files = entry->files;
+                TAILQ_FOREACH(centry, ri->caps, items) {
+                    if (!strcmp(centry->pkg, token)) {
+                        files = centry->files;
                         break;
                     }
                 }
 
                 if (TAILQ_EMPTY(ri->caps) || files == NULL) {
                     /* new package for the list */
-                    entry = calloc(1, sizeof(*entry));
-                    assert(entry != NULL);
-                    entry->pkg = strdup(token);
-                    entry->files = calloc(1, sizeof(*entry->files));
-                    assert(entry->files != NULL);
-                    TAILQ_INIT(entry->files);
-                    TAILQ_INSERT_TAIL(ri->caps, entry, items);
-                    files = entry->files;
+                    centry = calloc(1, sizeof(*centry));
+                    assert(centry != NULL);
+                    centry->pkg = strdup(token);
+                    centry->files = calloc(1, sizeof(*centry->files));
+                    assert(centry->files != NULL);
+                    TAILQ_INIT(centry->files);
+                    TAILQ_INSERT_TAIL(ri->caps, centry, items);
+                    files = centry->files;
                 }
 
                 filelist_entry = calloc(1, sizeof(*filelist_entry));
@@ -1111,11 +1100,11 @@ bool init_caps(struct rpminspect *ri)
         }
 
         /* clean up */
-        free(line);
-        line = NULL;
         files = NULL;
         field = PACKAGE;
     }
+
+    list_free(contents, free);
 
     return true;
 }
