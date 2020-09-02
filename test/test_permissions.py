@@ -23,8 +23,9 @@ from baseclass import TestCompareSRPM, TestCompareRPMs, TestCompareKoji
 
 
 class ExecutableWithSetUIDSRPM(TestSRPM):
-    """Assert when a setuid file is in a package,
-       OK result occurs when testing the SRPM.
+    """
+    Assert when a setuid file is in a package,
+    OK result occurs when testing the SRPM.
     """
 
     def setUp(self):
@@ -40,8 +41,9 @@ class ExecutableWithSetUIDSRPM(TestSRPM):
 
 
 class ExecutableWithSetUIDRPMs(TestRPMs):
-    """Assert when a setuid file is in a package and it's on the fileinfo list,
-       INFO result occurs when testing the RPMs.
+    """
+    Assert when a setuid file is in a package and it's on the fileinfo list,
+    INFO result occurs when testing the RPMs.
     """
 
     def setUp(self):
@@ -57,8 +59,9 @@ class ExecutableWithSetUIDRPMs(TestRPMs):
 
 
 class ExecutableWithSetUIDKoji(TestKoji):
-    """Assert when a setuid file is in a package and it's on the fileinfo list,
-       INFO result occurs when testing the RPMs.
+    """
+    Assert when a setuid file is in a package and it's on the fileinfo list,
+    INFO result occurs when testing the RPMs.
     """
 
     def setUp(self):
@@ -74,8 +77,9 @@ class ExecutableWithSetUIDKoji(TestKoji):
 
 
 class ExecutableWithSetUIDCompareSRPM(TestCompareSRPM):
-    """Assert when a setuid file is in a package,
-       OK result occurs when testing the SRPM.
+    """
+    Assert when a setuid file is in a package,
+    OK result occurs when testing the SRPM.
     """
 
     def setUp(self):
@@ -91,8 +95,9 @@ class ExecutableWithSetUIDCompareSRPM(TestCompareSRPM):
 
 
 class ExecutableWithSetUIDCompareRPMs(TestCompareRPMs):
-    """Assert when a setuid file is in a package and it's on the fileinfo list,
-       INFO result occurs when testing the RPMs.
+    """
+    Assert when a setuid file is in a package and it's on the fileinfo list,
+    INFO result occurs when testing the RPMs.
     """
 
     def setUp(self):
@@ -108,8 +113,9 @@ class ExecutableWithSetUIDCompareRPMs(TestCompareRPMs):
 
 
 class ExecutableWithSetUIDCompareKoji(TestCompareKoji):
-    """Assert when a setuid file is in a package and it's on the fileinfo list,
-       INFO result occurs when testing the RPMs.
+    """
+    Assert when a setuid file is in a package and it's on the fileinfo list,
+    INFO result occurs when testing the RPMs.
     """
 
     def setUp(self):
@@ -125,8 +131,9 @@ class ExecutableWithSetUIDCompareKoji(TestCompareKoji):
 
 
 class UnapprovedExecutableWithSetUIDSRPM(TestSRPM):
-    """Assert when a setuid file is in a package,
-       OK result occurs when testing the SRPM.
+    """
+    Assert when a setuid file is in a package,
+    OK result occurs when testing the SRPM.
     """
 
     def setUp(self):
@@ -142,8 +149,9 @@ class UnapprovedExecutableWithSetUIDSRPM(TestSRPM):
 
 
 class UnapprovedExecutableWithSetUIDRPMs(TestRPMs):
-    """Assert when a setuid file is in a package and it's on the fileinfo list,
-       INFO result occurs when testing the RPMs.
+    """
+    Assert when a setuid file is in a package and it's on the fileinfo list,
+    INFO result occurs when testing the RPMs.
     """
 
     def setUp(self):
@@ -160,8 +168,9 @@ class UnapprovedExecutableWithSetUIDRPMs(TestRPMs):
 
 
 class UnapprovedExecutableWithSetUIDKoji(TestKoji):
-    """Assert when a setuid file is in a package and it's on the fileinfo list,
-       INFO result occurs when testing the RPMs.
+    """
+    Assert when a setuid file is in a package and it's on the fileinfo list,
+    INFO result occurs when testing the RPMs.
     """
 
     def setUp(self):
@@ -178,8 +187,9 @@ class UnapprovedExecutableWithSetUIDKoji(TestKoji):
 
 
 class UnapprovedExecutableWithSetUIDCompareSRPM(TestCompareSRPM):
-    """Assert when a setuid file is in a package,
-       OK result occurs when testing the SRPM.
+    """
+    Assert when a setuid file is in a package,
+    OK result occurs when testing the SRPM.
     """
 
     def setUp(self):
@@ -195,8 +205,9 @@ class UnapprovedExecutableWithSetUIDCompareSRPM(TestCompareSRPM):
 
 
 class UnapprovedExecutableWithSetUIDCompareRPMs(TestCompareRPMs):
-    """Assert when a setuid file is in a package and it's on the fileinfo list,
-       INFO result occurs when testing the RPMs.
+    """
+    Assert when a setuid file is in a package and it's on the fileinfo list,
+    INFO result occurs when testing the RPMs.
     """
 
     def setUp(self):
@@ -213,8 +224,9 @@ class UnapprovedExecutableWithSetUIDCompareRPMs(TestCompareRPMs):
 
 
 class UnapprovedExecutableWithSetUIDCompareKoji(TestCompareKoji):
-    """Assert when a setuid file is in a package and it's on the fileinfo list,
-       INFO result occurs when testing the RPMs.
+    """
+    Assert when a setuid file is in a package and it's on the fileinfo list,
+    INFO result occurs when testing the RPMs.
     """
 
     def setUp(self):
@@ -231,8 +243,9 @@ class UnapprovedExecutableWithSetUIDCompareKoji(TestCompareKoji):
 
 
 class FileIWOTHProhibitedSRPM(TestSRPM):
-    """Assert when a world-writable file is in a package,
-       OK result occurs when testing the SRPM.
+    """
+    Assert when a world-writable file is in a package,
+    OK result occurs when testing the SRPM.
     """
 
     def setUp(self):
@@ -248,8 +261,9 @@ class FileIWOTHProhibitedSRPM(TestSRPM):
 
 
 class FileIWOTHProhibitedRPMs(TestRPMs):
-    """Assert when a world-writable file is in a package,
-       BAD result occurs requiring a Security waiver.
+    """
+    Assert when a world-writable file is in a package,
+    BAD result occurs requiring a Security waiver.
     """
 
     def setUp(self):
@@ -266,8 +280,9 @@ class FileIWOTHProhibitedRPMs(TestRPMs):
 
 
 class FileIWOTHProhibitedKoji(TestKoji):
-    """Assert when a world-writable file is in a package,
-       BAD result occurs requiring a Security waiver.
+    """
+    Assert when a world-writable file is in a package,
+    BAD result occurs requiring a Security waiver.
     """
 
     def setUp(self):
@@ -284,8 +299,9 @@ class FileIWOTHProhibitedKoji(TestKoji):
 
 
 class FileIWOTHProhibitedCompareSRPM(TestCompareSRPM):
-    """Assert when a world-writable file is in a package,
-       OK result occurs when testing the SRPMs.
+    """
+    Assert when a world-writable file is in a package,
+    OK result occurs when testing the SRPMs.
     """
 
     def setUp(self):
@@ -301,8 +317,9 @@ class FileIWOTHProhibitedCompareSRPM(TestCompareSRPM):
 
 
 class FileIWOTHProhibitedCompareRPMs(TestCompareRPMs):
-    """Assert when a world-writable file is in a package,
-       BAD result occurs requiring a Security waiver.
+    """
+    Assert when a world-writable file is in a package,
+    BAD result occurs requiring a Security waiver.
     """
 
     def setUp(self):
@@ -319,8 +336,9 @@ class FileIWOTHProhibitedCompareRPMs(TestCompareRPMs):
 
 
 class FileIWOTHProhibitedCompareKoji(TestCompareKoji):
-    """Assert when a world-writable file is in a package,
-       BAD result occurs requiring a Security waiver.
+    """
+    Assert when a world-writable file is in a package,
+    BAD result occurs requiring a Security waiver.
     """
 
     def setUp(self):
@@ -337,8 +355,9 @@ class FileIWOTHProhibitedCompareKoji(TestCompareKoji):
 
 
 class FileIWOTHandISVTXProhibitedSRPM(TestSRPM):
-    """Assert when a world-writable file with the sticky bit is in a package,
-       OK result occurs when testing the SRPM.
+    """
+    Assert when a world-writable file with the sticky bit is in a package,
+    OK result occurs when testing the SRPM.
     """
 
     def setUp(self):
@@ -354,8 +373,9 @@ class FileIWOTHandISVTXProhibitedSRPM(TestSRPM):
 
 
 class FileIWOTHandISVTXProhibitedRPMs(TestRPMs):
-    """Assert when a world-writable file with the sticky bit is in a package,
-       BAD result occurs requiring a Security waiver.
+    """
+    Assert when a world-writable file with the sticky bit is in a package,
+    BAD result occurs requiring a Security waiver.
     """
 
     def setUp(self):
@@ -372,8 +392,9 @@ class FileIWOTHandISVTXProhibitedRPMs(TestRPMs):
 
 
 class FileIWOTHandISVTXProhibitedKoji(TestKoji):
-    """Assert when a world-writable file with the sticky bit is in a package,
-       BAD result occurs requiring a Security waiver.
+    """
+    Assert when a world-writable file with the sticky bit is in a package,
+    BAD result occurs requiring a Security waiver.
     """
 
     def setUp(self):
@@ -390,8 +411,9 @@ class FileIWOTHandISVTXProhibitedKoji(TestKoji):
 
 
 class FileIWOTHandISVTXProhibitedCompareSRPM(TestCompareSRPM):
-    """Assert when a world-writable file with the sticky bit is in a package,
-       OK result occurs when testing the SRPMs.
+    """
+    Assert when a world-writable file with the sticky bit is in a package,
+    OK result occurs when testing the SRPMs.
     """
 
     def setUp(self):
@@ -407,8 +429,9 @@ class FileIWOTHandISVTXProhibitedCompareSRPM(TestCompareSRPM):
 
 
 class FileIWOTHandISVTXProhibitedCompareRPMs(TestCompareRPMs):
-    """Assert when a world-writable file with the sticky bit is in a package,
-       BAD result occurs requiring a Security waiver.
+    """
+    Assert when a world-writable file with the sticky bit is in a package,
+    BAD result occurs requiring a Security waiver.
     """
 
     def setUp(self):
@@ -425,8 +448,9 @@ class FileIWOTHandISVTXProhibitedCompareRPMs(TestCompareRPMs):
 
 
 class FileIWOTHandISVTXProhibitedCompareKoji(TestCompareKoji):
-    """Assert when a world-writable file with the sticky bit is in a package,
-       BAD result occurs requiring a Security waiver.
+    """
+    Assert when a world-writable file with the sticky bit is in a package,
+    BAD result occurs requiring a Security waiver.
     """
 
     def setUp(self):
@@ -443,8 +467,9 @@ class FileIWOTHandISVTXProhibitedCompareKoji(TestCompareKoji):
 
 
 class DirIWOTHProhibitedSRPM(TestSRPM):
-    """Assert when a world-writable dir is in a package,
-       OK result occures when testing the SRPM.
+    """
+    Assert when a world-writable dir is in a package,
+    OK result occures when testing the SRPM.
     """
 
     def setUp(self):
@@ -458,8 +483,9 @@ class DirIWOTHProhibitedSRPM(TestSRPM):
 
 
 class DirIWOTHProhibitedRPMs(TestRPMs):
-    """Assert when a world-writable dir is in a package,
-       BAD result occurs requiring a Security waiver.
+    """
+    Assert when a world-writable dir is in a package,
+    BAD result occurs requiring a Security waiver.
     """
 
     def setUp(self):
@@ -474,8 +500,9 @@ class DirIWOTHProhibitedRPMs(TestRPMs):
 
 
 class DirIWOTHProhibitedKoji(TestKoji):
-    """Assert when a world-writable dir is in a package,
-       BAD result occurs requiring a Security waiver.
+    """
+    Assert when a world-writable dir is in a package,
+    BAD result occurs requiring a Security waiver.
     """
 
     def setUp(self):
@@ -490,8 +517,9 @@ class DirIWOTHProhibitedKoji(TestKoji):
 
 
 class DirIWOTHProhibitedCompareSRPM(TestCompareSRPM):
-    """Assert when a world-writable dir is in a package,
-       OK result occures when testing the SRPMs.
+    """
+    Assert when a world-writable dir is in a package,
+    OK result occures when testing the SRPMs.
     """
 
     def setUp(self):
@@ -505,8 +533,9 @@ class DirIWOTHProhibitedCompareSRPM(TestCompareSRPM):
 
 
 class DirIWOTHProhibitedCompareRPMs(TestCompareRPMs):
-    """Assert when a world-writable dir is in a package,
-       BAD result occurs requiring a Security waiver.
+    """
+    Assert when a world-writable dir is in a package,
+    BAD result occurs requiring a Security waiver.
     """
 
     def setUp(self):
@@ -521,8 +550,9 @@ class DirIWOTHProhibitedCompareRPMs(TestCompareRPMs):
 
 
 class DirIWOTHProhibitedCompareKoji(TestCompareKoji):
-    """Assert when a world-writable dir is in a package,
-       BAD result occurs requiring a Security waiver.
+    """
+    Assert when a world-writable dir is in a package,
+    BAD result occurs requiring a Security waiver.
     """
 
     def setUp(self):
@@ -537,8 +567,9 @@ class DirIWOTHProhibitedCompareKoji(TestCompareKoji):
 
 
 class DirIWOTHandISVTXProhibitedSRPM(TestSRPM):
-    """Assert when a world-writable dir with the sticky bit is in a package,
-       OK result occures when testing the SRPM.
+    """
+    Assert when a world-writable dir with the sticky bit is in a package,
+    OK result occures when testing the SRPM.
     """
 
     def setUp(self):
@@ -552,8 +583,9 @@ class DirIWOTHandISVTXProhibitedSRPM(TestSRPM):
 
 
 class DirIWOTHandISVTXProhibitedRPMs(TestRPMs):
-    """Assert when a world-writable dir with the sticky bit is in a package,
-       BAD result occurs requiring a Security waiver.
+    """
+    Assert when a world-writable dir with the sticky bit is in a package,
+    BAD result occurs requiring a Security waiver.
     """
 
     def setUp(self):
@@ -568,8 +600,9 @@ class DirIWOTHandISVTXProhibitedRPMs(TestRPMs):
 
 
 class DirIWOTHandISVTXProhibitedKoji(TestKoji):
-    """Assert when a world-writable dir with the sticky bit is in a package,
-       BAD result occurs requiring a Security waiver.
+    """
+    Assert when a world-writable dir with the sticky bit is in a package,
+    BAD result occurs requiring a Security waiver.
     """
 
     def setUp(self):
@@ -584,8 +617,9 @@ class DirIWOTHandISVTXProhibitedKoji(TestKoji):
 
 
 class DirIWOTHandISVTXProhibitedCompareSRPM(TestCompareSRPM):
-    """Assert when a world-writable dir with the sticky bit is in a package,
-       OK result occures when testing the SRPMs.
+    """
+    Assert when a world-writable dir with the sticky bit is in a package,
+    OK result occures when testing the SRPMs.
     """
 
     def setUp(self):
@@ -599,8 +633,9 @@ class DirIWOTHandISVTXProhibitedCompareSRPM(TestCompareSRPM):
 
 
 class DirIWOTHandISVTXProhibitedCompareRPMs(TestCompareRPMs):
-    """Assert when a world-writable dir with the sticky bit is in a package,
-       BAD result occurs requiring a Security waiver.
+    """
+    Assert when a world-writable dir with the sticky bit is in a package,
+    BAD result occurs requiring a Security waiver.
     """
 
     def setUp(self):
@@ -615,8 +650,9 @@ class DirIWOTHandISVTXProhibitedCompareRPMs(TestCompareRPMs):
 
 
 class DirIWOTHandISVTXProhibitedCompareKoji(TestCompareKoji):
-    """Assert when a world-writable dir with the sticky bit is in a package,
-       BAD result occurs requiring a Security waiver.
+    """
+    Assert when a world-writable dir with the sticky bit is in a package,
+    BAD result occurs requiring a Security waiver.
     """
 
     def setUp(self):
