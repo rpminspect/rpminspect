@@ -42,6 +42,7 @@ Elf *get_elf_archive(const char *, int *);
 GElf_Half get_elf_type(Elf *);
 GElf_Half get_elf_machine(Elf *);
 bool is_elf(const char *);
+bool is_elf_shared_library(const char *);
 bool have_elf_section(Elf *, int64_t, const char *);
 string_list_t *get_elf_section_names(Elf *elf, size_t start);
 Elf_Scn *get_elf_section(Elf *, int64_t, const char *, Elf_Scn *, GElf_Shdr *);

@@ -148,8 +148,8 @@ static bool abidiff_driver(struct rpminspect *ri, rpmfile_entry_t *file) {
         return true;
     }
 
-    /* skip anything that is not an ELF file */
-    if (!S_ISREG(file->st.st_mode) || !is_elf(file->fullpath)) {
+    /* skip anything that is not an ELF shared library file.  */
+    if (!S_ISREG(file->st.st_mode) || !is_elf_shared_library(file->fullpath)) {
         return true;
     }
 
