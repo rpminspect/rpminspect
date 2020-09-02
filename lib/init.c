@@ -925,6 +925,10 @@ bool init_fileinfo(struct rpminspect *ri) {
     contents = read_file(filename);
     free(filename);
 
+    if (contents == NULL) {
+        return false;
+    }
+
     /* initialize the list */
     ri->fileinfo = calloc(1, sizeof(*(ri->fileinfo)));
     assert(ri->fileinfo != NULL);
@@ -932,13 +936,16 @@ bool init_fileinfo(struct rpminspect *ri) {
 
     /* add all the entries to the fileinfo list */
     TAILQ_FOREACH(entry, contents, items) {
-        line = entry->data;
+        if (entry->data == NULL) {
+            continue;
+        }
 
         /* trim line ending characters */
+        line = entry->data;
         line[strcspn(line, "\r\n")] = '\0';
 
         /* skip blank lines and comments */
-        if (line == NULL || *line == '#' || *line == '\n' || *line == '\r' || !strcmp(line, "")) {
+        if (*line == '#' || *line == '\n' || *line == '\r' || !strcmp(line, "")) {
             continue;
         }
 
@@ -1044,15 +1051,18 @@ bool init_caps(struct rpminspect *ri)
 
     /* add all the entries to the caps list */
     TAILQ_FOREACH(entry, contents, items) {
-        line = entry->data;
-
-        /* skip blank lines and comments */
-        if (*line == '#' || *line == '\n' || *line == '\r') {
+        if (entry->data == NULL) {
             continue;
         }
 
         /* trim line ending characters */
+        line = entry->data;
         line[strcspn(line, "\r\n")] = '\0';
+
+        /* skip blank lines and comments */
+        if (*line == '#' || *line == '\n' || *line == '\r' || !strcmp(line, "")) {
+            continue;
+        }
 
         /* read the fields */
         while ((token = strsep(&line, " \t")) != NULL) {
