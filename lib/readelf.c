@@ -160,6 +160,23 @@ bool is_elf(const char *fullpath) {
     return true;
 }
 
+/*
+ * Return true if a specified file is an ELF shared library file, that
+ * is, of type ET_DYN.
+ */
+bool is_elf_shared_library(const char *fullpath)
+{
+    int fd = 0;
+    Elf *elf = NULL;
+
+    elf = get_elf(fullpath, &fd);
+    if (elf && get_elf_type(elf) == ET_DYN) {
+        return true;
+    }
+
+    return false;
+}
+
 bool have_elf_section(Elf *elf, int64_t section, const char *name)
 {
     return get_elf_section(elf, section, name, NULL, NULL) != NULL;
