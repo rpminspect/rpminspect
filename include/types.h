@@ -437,6 +437,18 @@ struct rpminspect {
     /* the pattern can include ${ARCH} which has the architecture substituted */
     char *kmi_ignore_pattern;
 
+    /*
+     * directory where kernel ABI (KABI) files are kept (in any
+     * subpackage in a kernel build)
+     */
+    char *kabi_dir;
+
+    /*
+     * name of KABI files in kabi_dir, can use $ARCH or ${ARCH} for
+     * architecture
+     */
+    char *kabi_filename;
+
     /* Options specified by the user */
     char *before;              /* before build ID arg given on cmdline */
     char *after;               /* after build ID arg given on cmdline */

@@ -44,10 +44,101 @@ static string_list_t *suppressions = NULL;
 static struct hsearch_data *debug_info_dir1_table;
 static struct hsearch_data *debug_info_dir2_table;
 static bool found_kernel_image = false;
+static char *kabi_dir = NULL;
 
 /* Pointers to root extracted package paths (do not free these) */
 static const char *before_root = NULL;
 static const char *after_root = NULL;
+
+/**
+ * Given a build, search for the dir path in all extracted packages.
+ * If we don't find one, the path will remain NULL and no kabi will be
+ * used during kmidiff runs.
+ */
+static void get_kabi_dir(struct rpminspect *ri)
+{
+    rpmpeer_entry_t *peer = NULL;
+    rpmfile_entry_t *file = NULL;
+    struct stat sbuf;
+
+    assert(ri != NULL);
+
+    /* nothing to do if kabi_path is not defined in the configuration */
+    if (ri->kabi_dir == NULL) {
+        return;
+    }
+
+    /* look for first matching path */
+    TAILQ_FOREACH(peer, ri->peers, items) {
+        if (peer->after_files == NULL || TAILQ_EMPTY(peer->after_files)) {
+            continue;
+        }
+
+        TAILQ_FOREACH(file, peer->after_files, items) {
+            /* use stat(2) here because we want to read what symlinks point to */
+            if (stat(file->fullpath, &sbuf) != 0) {
+                warn("stat()");
+                continue;
+            }
+
+            if (!S_ISDIR(sbuf.st_mode)) {
+                continue;
+            }
+
+            /* found the kabi directory in this package */
+            if (!strcmp(file->localpath, ri->kabi_dir)) {
+                kabi_dir = strdup(file->fullpath);
+                break;
+            }
+        }
+
+        if (kabi_dir) {
+            break;
+        }
+    }
+
+    return;
+}
+
+/*
+ * Return a full path to the appropriate kabi file or NULL if it doesn't exist.
+ * Caller must free the returned string.
+ */
+static char *get_kabi_file(const struct rpminspect *ri, const char *arch)
+{
+    char *template = NULL;
+    char *kabi = NULL;
+
+    assert(ri != NULL);
+
+    if (kabi_dir == NULL || ri->kabi_filename == NULL) {
+        return NULL;
+    }
+
+    /* build the template */
+    assert(arch != NULL);
+    xasprintf(&template, "%s/%s", kabi_dir, ri->kabi_filename);
+    assert(template != NULL);
+
+    /* replace variables */
+    kabi = strreplace(template, "${ARCH}", arch);
+
+    if (strstr(kabi, "$ARCH")) {
+        free(kabi);
+        kabi = strreplace(template, "$ARCH", arch);
+    }
+
+    /* let's see if this is actually a file */
+    if (access(kabi, R_OK)) {
+        warn("%s", kabi);
+        free(kabi);
+        kabi = NULL;
+    }
+
+    /* we're done */
+    free(template);
+    return kabi;
+}
 
 static bool kmidiff_driver(struct rpminspect *ri, rpmfile_entry_t *file)
 {
@@ -63,6 +154,7 @@ static bool kmidiff_driver(struct rpminspect *ri, rpmfile_entry_t *file)
     string_list_t *arglist = NULL;
     const char *arch = NULL;
     const char *name = NULL;
+    char *kabi = NULL;
     ENTRY e;
     ENTRY *eptr;
     int exitcode = 0;
@@ -124,9 +216,19 @@ static bool kmidiff_driver(struct rpminspect *ri, rpmfile_entry_t *file)
 
     /* get the package architecture */
     arch = get_rpm_header_arch(file->rpm_header);
+    kabi = get_kabi_file(ri, arch);
 
     /* build the kmidiff command */
     argv = list_copy(firstargs);
+
+    if (kabi) {
+        entry = calloc(1, sizeof(*entry));
+        assert(entry != NULL);
+        xasprintf(&entry->data, "%s %s", KMIDIFF_KMI_WHITELIST, kabi);
+        assert(entry->data != NULL);
+        TAILQ_INSERT_TAIL(argv, entry, items);
+        free(kabi);
+    }
 
     if (suppressions && !TAILQ_EMPTY(suppressions)) {
         local_suppressions = list_copy(suppressions);
@@ -277,6 +379,9 @@ bool inspect_kmidiff(struct rpminspect *ri) {
 
     assert(ri != NULL);
 
+    /* get the kabi path if that exists in this build */
+    get_kabi_dir(ri);
+
     /* if there's a .abignore file in the after SRPM, we need to use it */
     suppressions = get_abi_suppressions(ri, ri->kmidiff_suppression_file);
 
@@ -335,6 +440,7 @@ bool inspect_kmidiff(struct rpminspect *ri) {
     /* clean up */
     list_free(firstargs, free);
     list_free(suppressions, free);
+    free(kabi_dir);
     free_argv_table(ri, debug_info_dir1_table);
     free_argv_table(ri, debug_info_dir2_table);
 

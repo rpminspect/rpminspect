@@ -469,3 +469,25 @@ kmidiff:
     # the setting is commented out in this file, then rpminspect will
     # run kmidiff without passing the --kmi-whitelist option.
     kmi_ignore_pattern: /lib/modules/kabi-current/kabi_whitelist_${ARCH}
+
+    # The kernel ABI (KABI) is defined in a set of per-architecture
+    # files.  These are usually provided in a subpackage of a kernel
+    # build, but they do not have to be.  This setting defines the
+    # subdirectory where KABI files can be found when performing the
+    # kmidiff inspection.  rpminspect will search all subpackages in
+    # the builds it is comparing to find this directory.
+    #
+    # NOTE: This directory is relative to the installed location.  It
+    # can be a symlink.  It should not contain any ../ path references
+    # and it should not end with a slash.  This value will combined
+    # with the kabi_filename to contain a full file path.
+    kabi_dir: /lib/modules/kabi-current
+
+    # The kernel ABI (KABI) filenames in the kabi_dir.  It is common
+    # to store these per architecture.  You can use $ARCH or ${ARCH}
+    # to note where the architecture appears in the filename and
+    # rpminspect will substitute in the applicable architecture
+    # string.
+    #
+    # NOTE:  This filename is relative to kabi_dir.
+    kabi_filename: kabi_whitelist_${ARCH}

@@ -827,6 +827,12 @@ static int read_cfgfile(struct rpminspect *ri, const char *filename)
                         } else if (!strcmp(key, "kmi_ignore_pattern")) {
                             free(ri->kmi_ignore_pattern);
                             ri->kmi_ignore_pattern = strdup(t);
+                        } else if (!strcmp(key, "kabi_dir")) {
+                            free(ri->kabi_dir);
+                            ri->kabi_dir = strdup(t);
+                        } else if (!strcmp(key, "kabi_filename")) {
+                            free(ri->kabi_filename);
+                            ri->kabi_filename = strdup(t);
                         }
                     }
                 } else if (symbol == SYMBOL_ENTRY) {

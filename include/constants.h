@@ -212,6 +212,7 @@
 #define KMIDIFF_CMD "kmidiff"
 #define KMIDIFF_VMLINUX1 "--vmlinux1"
 #define KMIDIFF_VMLINUX2 "--vmlinux2"
+#define KMIDIFF_KMI_WHITELIST "--kmi-whitelist"
 
 /** @} */
 
