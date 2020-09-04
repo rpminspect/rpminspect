@@ -433,10 +433,6 @@ struct rpminspect {
     /* list of valid kernel executable filenames (e.g., "vmlinux") */
     string_list_t *kernel_filenames;
 
-    /* kmidiff compat level ignore file pattern */
-    /* the pattern can include ${ARCH} which has the architecture substituted */
-    char *kmi_ignore_pattern;
-
     /*
      * directory where kernel ABI (KABI) files are kept (in any
      * subpackage in a kernel build)

@@ -180,7 +180,6 @@ void free_rpminspect(struct rpminspect *ri) {
     free(ri->kmidiff_debuginfo_path);
     free(ri->kmidiff_extra_args);
     list_free(ri->kernel_filenames, free);
-    free(ri->kmi_ignore_pattern);
     free(ri->kabi_dir);
     free(ri->kabi_filename);
 

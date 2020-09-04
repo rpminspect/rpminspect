@@ -460,16 +460,6 @@ kmidiff:
         - vmlinux
         - vmlinuz
 
-    # Kernel Module Interface ignore file pattern used to find the
-    # architecture-specific file.  The variable ${ARCH} becomes the
-    # kernel architecture the program is examining.  This file needs
-    # to exist in some package in the kernel build.  rpminspect will
-    # search all subpackages for a file matching this pattern to pass
-    # to kmidiff for the inspection.  If this file does not exist or
-    # the setting is commented out in this file, then rpminspect will
-    # run kmidiff without passing the --kmi-whitelist option.
-    kmi_ignore_pattern: /lib/modules/kabi-current/kabi_whitelist_${ARCH}
-
     # The kernel ABI (KABI) is defined in a set of per-architecture
     # files.  These are usually provided in a subpackage of a kernel
     # build, but they do not have to be.  This setting defines the
