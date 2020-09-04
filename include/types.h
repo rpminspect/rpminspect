@@ -31,12 +31,7 @@
 #include <sys/capability.h>
 #include <rpm/rpmlib.h>
 #include <libkmod.h>
-
-#ifdef _COMPAT_QUEUE
-#include "compat/queue.h"
-#else
-#include <sys/queue.h>
-#endif
+#include "queue.h"
 
 #ifndef _LIBRPMINSPECT_TYPES_H
 #define _LIBRPMINSPECT_TYPES_H

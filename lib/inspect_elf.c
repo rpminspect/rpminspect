@@ -42,12 +42,7 @@
 #include <gelf.h>
 #include <libelf.h>
 
-#ifdef _COMPAT_QUEUE
-#include "compat/queue.h"
-#else
-#include <sys/queue.h>
-#endif
-
+#include "queue.h"
 #include "inspect.h"
 #include "readelf.h"
 #include "rpminspect.h"

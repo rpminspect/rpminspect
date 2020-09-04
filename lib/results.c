@@ -20,13 +20,7 @@
  */
 
 #include <assert.h>
-
-#ifdef _COMPAT_QUEUE
-#include "compat/queue.h"
-#else
-#include <sys/queue.h>
-#endif
-
+#include "queue.h"
 #include "rpminspect.h"
 
 /*

@@ -35,12 +35,7 @@
 #include <libelf.h>
 #include <ar.h>
 
-#ifdef _COMPAT_QUEUE
-#include "compat/queue.h"
-#else
-#include <sys/queue.h>
-#endif
-
+#include "queue.h"
 #include "readelf.h"
 #include "rpminspect.h"
 

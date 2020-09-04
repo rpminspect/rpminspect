@@ -22,13 +22,8 @@
 #include <regex.h>
 #include <stdlib.h>
 #include <search.h>
+#include "queue.h"
 #include "rpminspect.h"
-
-#ifdef _COMPAT_QUEUE
-#include "compat/queue.h"
-#else
-#include <sys/queue.h>
-#endif
 
 void free_regex(regex_t *regex)
 {

@@ -22,13 +22,7 @@
 #include <assert.h>
 #include <stdbool.h>
 #include <stddef.h>
-
-#ifdef _COMPAT_QUEUE
-#include "compat/queue.h"
-#else
-#include <sys/queue.h>
-#endif
-
+#include "queue.h"
 #include "rpminspect.h"
 #include "inspect.h"
 

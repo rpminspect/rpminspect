@@ -32,13 +32,7 @@
 #include <assert.h>
 #include <elf.h>
 #include <rpm/header.h>
-
-#ifdef _COMPAT_QUEUE
-#include "compat/queue.h"
-#else
-#include <sys/queue.h>
-#endif
-
+#include "queue.h"
 #include "rpminspect.h"
 
 static string_list_t *lto_symbol_name_prefixes = NULL;
