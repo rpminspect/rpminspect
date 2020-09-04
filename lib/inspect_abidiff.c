@@ -128,8 +128,10 @@ static bool abidiff_driver(struct rpminspect *ri, rpmfile_entry_t *file) {
     ENTRY *eptr;
     int exitcode = 0;
     int status = 0;
+    char *tmp = NULL;
     char *cmd = NULL;
     char *details = NULL;
+    char *output = NULL;
     struct result_params params;
     bool report = false;
     long int compat_level = 0;
@@ -231,7 +233,14 @@ static bool abidiff_driver(struct rpminspect *ri, rpmfile_entry_t *file) {
     TAILQ_INSERT_TAIL(argv, entry, items);
 
     /* run abidiff */
-    details = sl_run_cmd(&exitcode, argv);
+    output = sl_run_cmd(&exitcode, argv);
+
+    /* generate a reporting string for the command run */
+    cmd = list_to_string(argv, " ");
+    tmp = strreplace(cmd, ri->worksubdir, NULL);
+    assert(tmp != NULL);
+    free(cmd);
+    cmd = tmp;
 
     /* determine if this is a rebase build */
     rebase = is_rebase(ri);
@@ -244,8 +253,7 @@ static bool abidiff_driver(struct rpminspect *ri, rpmfile_entry_t *file) {
     params.arch = arch;
 
     if (!WIFEXITED(exitcode)) {
-        cmd = list_to_string(argv, " ");
-        xasprintf(&details, "Command: %s", cmd);
+        xasprintf(&details, _("Command: %s"), cmd);
         params.msg = _("ABI comparison ended unexpectedly.");
         params.verb = VERB_FAILED;
         params.noun = ABIDIFF_CMD;
@@ -298,7 +306,7 @@ static bool abidiff_driver(struct rpminspect *ri, rpmfile_entry_t *file) {
 
     if (report) {
         params.file = file->localpath;
-        params.details = details;
+        xasprintf(&params.details, _("Command: %s\n\n%s"), cmd, output);
         add_result(ri, &params);
         free(params.msg);
         result = false;
@@ -313,6 +321,7 @@ static bool abidiff_driver(struct rpminspect *ri, rpmfile_entry_t *file) {
     free(local_h2);
     free(cmd);
     free(details);
+    free(output);
 
     return result;
 }
