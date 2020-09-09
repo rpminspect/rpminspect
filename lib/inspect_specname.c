@@ -120,6 +120,11 @@ bool inspect_specname(struct rpminspect *ri) {
         xasprintf(&params.msg, _("The specname inspection is only for source packages, skipping."));
         add_result(ri, &params);
         free(params.msg);
+
+        /*
+         * There's no reason to fail this test for an informational message.
+         */
+        specgood = true;
     }
 
     return specgood;
