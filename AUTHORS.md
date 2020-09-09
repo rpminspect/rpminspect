@@ -11,11 +11,13 @@ Contributors
 
 - Danilo C. L. de Paula <ddepaula@redhat.com>
 
-- Davide Cavalca <dcavalca@fb.com>
-
 - David Shea <dshea@redhat.com>
 
+- Davide Cavalca <dcavalca@fb.com>
+
 - Denys Vlasenko <dvlasenk@redhat.com>
+
+- Dodji Seketeli <dodji@seketeli.org>
 
 - Fabien Boucher <fboucher@redhat.com>
 
