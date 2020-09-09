@@ -45,6 +45,7 @@
  */
 bool inspect_lostpayload(struct rpminspect *ri) {
     bool good = true;
+    bool messaged = false;
     rpmpeer_entry_t *peer = NULL;
     struct result_params params;
 
@@ -74,6 +75,7 @@ bool inspect_lostpayload(struct rpminspect *ri) {
             add_result(ri, &params);
             free(params.msg);
             good = false;
+            messaged = true;
             continue;
         }
 
@@ -92,13 +94,14 @@ bool inspect_lostpayload(struct rpminspect *ri) {
                 params.remedy = REMEDY_LOSTPAYLOAD;
                 add_result(ri, &params);
                 free(params.msg);
+                good = false;
             }
 
-            good = false;
+            messaged = true;
         }
     }
 
-    if (good) {
+    if (!messaged) {
         params.severity = RESULT_OK;
         params.waiverauth = NOT_WAIVABLE;
         add_result(ri, &params);
