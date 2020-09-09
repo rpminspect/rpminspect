@@ -255,6 +255,7 @@ bool inspect_upstream(struct rpminspect *ri)
     if (result) {
         params.severity = RESULT_OK;
         params.waiverauth = NOT_WAIVABLE;
+        params.remedy = NULL;
         add_result(ri, &params);
     }
 
