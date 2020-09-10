@@ -229,7 +229,7 @@ static bool validate_desktop_contents(struct rpminspect *ri, const rpmfile_entry
              * found and is valid.  If found, the nftw() helper replaces
              * file_to_find with the full path to where it was found.
              */
-            if (nftw(allpkgtrees, find_file, 25, FTW_MOUNT|FTW_PHYS) == 1) {
+            if (nftw(allpkgtrees, find_file, FOPEN_MAX, FTW_MOUNT|FTW_PHYS) == 1) {
                 if (lstat(file_to_find, &sb) == -1) {
                     warn("stat()");
                     list_free(contents, free);
@@ -262,7 +262,7 @@ static bool validate_desktop_contents(struct rpminspect *ri, const rpmfile_entry
              * found and is valid.  If found, the nftw() helper replaces
              * file_to_find with the full path to where it was found.
              */
-            if (nftw(allpkgtrees, find_file, 25, FTW_MOUNT|FTW_PHYS) == 1) {
+            if (nftw(allpkgtrees, find_file, FOPEN_MAX, FTW_MOUNT|FTW_PHYS) == 1) {
                 found = true;
 
                 if (lstat(file_to_find, &sb) == -1) {

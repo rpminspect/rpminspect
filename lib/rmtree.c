@@ -64,7 +64,7 @@ int rmtree(const char *path, const bool ignore_errors, const bool contentsonly) 
         }
     }
 
-    status = nftw(path, rmtree_entry, 25, flags);
+    status = nftw(path, rmtree_entry, FOPEN_MAX, flags);
 
     if (contentsonly) {
         return status;

@@ -196,7 +196,7 @@ static bool javabytecode_driver(struct rpminspect *ri, rpmfile_entry_t *file, co
         prefixlen = strlen(tmppath);
         jarfile = file->localpath;
         jar_ri = ri;
-        jarstatus = nftw(tmppath, jar_walker, 25, FTW_MOUNT | FTW_PHYS);
+        jarstatus = nftw(tmppath, jar_walker, FOPEN_MAX, FTW_MOUNT | FTW_PHYS);
 
         if (jarstatus != 0) {
             /* we errored somewhere, just report it */

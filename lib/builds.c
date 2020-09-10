@@ -27,6 +27,7 @@
  * @copyright LGPL-3.0-or-later
  */
 
+#include <stdio.h>
 #include <stdbool.h>
 #include <ctype.h>
 #include <assert.h>
@@ -687,7 +688,7 @@ int gather_builds(struct rpminspect *ri, bool fo) {
             set_worksubdir(ri, LOCAL_WORKDIR, NULL, NULL);
 
             /* copy after tree */
-            if (nftw(ri->after, copytree, 15, FTW_PHYS) == -1) {
+            if (nftw(ri->after, copytree, FOPEN_MAX, FTW_PHYS) == -1) {
                 fprintf(stderr, _("*** error gathering build %s: %s\n"), ri->after, strerror(errno));
                 fflush(stderr);
                 return -1;
@@ -734,7 +735,7 @@ int gather_builds(struct rpminspect *ri, bool fo) {
         set_worksubdir(ri, LOCAL_WORKDIR, NULL, NULL);
 
         /* copy before tree */
-        if (nftw(ri->before, copytree, 15, FTW_PHYS) == -1) {
+        if (nftw(ri->before, copytree, FOPEN_MAX, FTW_PHYS) == -1) {
             fprintf(stderr, _("*** error gathering build %s: %s\n"), ri->before, strerror(errno));
             fflush(stderr);
             return -1;
