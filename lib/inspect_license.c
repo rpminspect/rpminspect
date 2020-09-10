@@ -145,7 +145,7 @@ static void token_append(char **dest, const char *token)
 /*
  * Given a license expression without parens, check it.
  */
-static bool is_valid_expression(const char *s, struct result_params *params, results_t **rq)
+static bool is_valid_expression(const char *s, const char *nevra, struct result_params *params, results_t **rq)
 {
     bool result = true;
     char *tagtokens = NULL;
@@ -178,7 +178,7 @@ static bool is_valid_expression(const char *s, struct result_params *params, res
             if (!check_license_abbrev(lic)) {
                 result = false;
 
-                xasprintf(&params->msg, "%s is not an approved license", lic);
+                xasprintf(&params->msg, _("Unapproved license in %s: %s"), nevra, lic);
                 add_result_entry(rq, params);
                 free(params->msg);
             } else {
@@ -199,7 +199,7 @@ static bool is_valid_expression(const char *s, struct result_params *params, res
         if (!check_license_abbrev(lic)) {
             result = false;
 
-            xasprintf(&params->msg, "%s is not an approved license", lic);
+            xasprintf(&params->msg, _("Unapproved license in %s: %s"), nevra, lic);
             add_result_entry(rq, params);
             free(params->msg);
         } else {
@@ -232,7 +232,7 @@ static bool is_valid_expression(const char *s, struct result_params *params, res
  * 4) The function returns true if all license tags are approved in the
  *    database.  Any single tag that is unapproved results in false.
  */
-static bool is_valid_license(struct rpminspect *ri, struct result_params *params, const char *licensedb, const char *tag)
+static bool is_valid_license(struct rpminspect *ri, struct result_params *params, const char *licensedb, const char *nevra, const char *tag)
 {
     bool result = true;
     int balance = 0;
@@ -246,6 +246,7 @@ static bool is_valid_license(struct rpminspect *ri, struct result_params *params
     assert(ri != NULL);
     assert(params != NULL);
     assert(licensedb != NULL);
+    assert(nevra != NULL);
     assert(tag != NULL);
 
     /* Set up the result parameters */
@@ -295,7 +296,7 @@ static bool is_valid_license(struct rpminspect *ri, struct result_params *params
             continue;
         }
 
-        if (!is_valid_expression(token, params, &rq)) {
+        if (!is_valid_expression(token, nevra, params, &rq)) {
             result = false;
         }
     }
@@ -362,7 +363,7 @@ static int check_peer_license(struct rpminspect *ri, struct result_params *param
         ret = 1;
     } else {
         /* is the license tag valid or not */
-        valid = is_valid_license(ri, params, actual_licensedb, license);
+        valid = is_valid_license(ri, params, actual_licensedb, nevra, license);
 
         if (valid) {
             xasprintf(&params->msg, _("Valid License Tag in %s: %s"), nevra, license);
