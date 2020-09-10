@@ -147,6 +147,7 @@ bool is_elf(const char *fullpath) {
     elf = get_elf(fullpath, &fd);
 
     if (elf == NULL) {
+        close(fd);
         return false;
     }
 
@@ -161,15 +162,18 @@ bool is_elf(const char *fullpath) {
  */
 bool is_elf_shared_library(const char *fullpath)
 {
+    bool result = false;
     int fd = 0;
     Elf *elf = NULL;
 
     elf = get_elf(fullpath, &fd);
+
     if (elf && get_elf_type(elf) == ET_DYN) {
-        return true;
+        result = true;
     }
 
-    return false;
+    close(fd);
+    return result;
 }
 
 bool have_elf_section(Elf *elf, int64_t section, const char *name)
@@ -452,6 +456,7 @@ char *get_elf_soname(const char *filepath) {
     assert(filepath != NULL);
 
     if ((e = get_elf(filepath, &fd)) == NULL) {
+        close(fd);
         return NULL;
     }
 
