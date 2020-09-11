@@ -117,7 +117,7 @@ for branch in ${BRANCHES} ; do
     ${VENDORPKG} new-sources "${TARBALL}"
 
     # extract any changelog entries that appeared in the spec file
-    sed -n '/^%changelog/,/^%include\ \%{SOURCE1}/p' rpminspect.spec | \
+    sed -n '/^%changelog/,/^%include\ \%{SOURCE1}/p' "${PROJECT}".spec | \
         grep -vE '^(%changelog|%include)' | \
         sed -e :a -e '/./,$!d;/^\n*$/{$d;N;};/\n$/ba' > cl
     [ -s cl ] || rm -f cl
@@ -127,7 +127,6 @@ for branch in ${BRANCHES} ; do
         if [ -f cl ]; then
             echo >> changelog
             cat changelog >> cl
-            rm -f cl
         else
             mv changelog cl
         fi
