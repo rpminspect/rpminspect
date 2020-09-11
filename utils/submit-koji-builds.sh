@@ -66,7 +66,7 @@ if [ ! -f "${TARBALL}" ]; then
     exit 1
 fi
 
-if tar tf "${TARBALL}" >/dev/null 2>&1 ; then
+if ! tar tf "${TARBALL}" >/dev/null 2>&1 ; then
     echo "*** $(basename "${TARBALL}") is not a tar archive" >&2
     exit 1
 fi
