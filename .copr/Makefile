@@ -39,6 +39,12 @@ ifeq ($(BUILDTYPE),release)
 TARBALL_BASENAME = $(PKG)-$(VER)
 endif
 
+ifeq ($(BUILDTYPE),release)
+CHANGELOG_CMD = $(topdir)/utils/mkrpmchangelog.sh
+else
+CHANGELOG_CMD = $(topdir)/utils/mkrpmchangelog.sh --copr
+endif
+
 srpm:
 	$(topdir)/.copr/instpkgs.sh $(SPEC_TEMPLATE)
 	sed -e 's|%%VERSION%%|$(VER)|g' < "$(SPEC_TEMPLATE)" > "$(SPEC)"
@@ -53,7 +59,7 @@ endif
 		--output='$(topdir)/$(TARBALL_BASENAME).tar' \
 		--prefix='$(TARBALL_BASENAME)/' HEAD $(topdir)
 	xz -9f $(topdir)/$(TARBALL_BASENAME).tar
-	cd $(topdir) ; $(topdir)/utils/mkrpmchangelog.sh --copr > changelog
+	cd $(topdir) ; $(CHANGELOG_CMD) > changelog
 	rpmbuild \
 		-bs --nodeps \
 		--define "_sourcedir $(topdir)" \
