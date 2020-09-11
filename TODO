@@ -112,6 +112,8 @@ inspections lack integration tests:
     arch
     subpackages
     pathmigration
+    abidiff
+    kmidiff
 
 Need unit tests for run_cmd() verifying NULL as the last parameter.
 
@@ -151,6 +153,8 @@ Documentation
 Developer guide
 Testing guide
 User guide
+
+Make sure rpminspect.1 is current and correct.
 
 Also rpminspect.conf.5 documenting the configuration file and the
 profile configuration files.
