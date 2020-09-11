@@ -47,7 +47,7 @@ failure() {
 }
 
 # Packages to diff to consider this build stable-enough
-packages='zsh kernel python3 mutt emacs tmux elfutils'
+packages="zsh kernel python3 mutt emacs tmux elfutils"
 
 # Validate programs we need are present
 reqs='rpmbuild koji'
@@ -60,7 +60,7 @@ done
 
 # Find our build environment (fc32 for example)
 dist=$(rpmbuild --eval "%{dist}")
-if [ -z "${dist}" ] || [ "${dist}" = '%{dist}' ]; then
+if [ -z "${dist}" ] || [ "${dist}" = "%{dist}" ]; then
     echo "ERROR: Unable to find build environment." >&2
     exit 1
 fi
@@ -68,17 +68,22 @@ fi
 # Run comparison against the latest packages, or fail
 for package in ${packages}; do
     builds=$(koji list-builds --package="${package}" --state=COMPLETE | grep "${dist}" | tail -n 2 | cut -d ' ' -f 1 | xargs)
+
     if [ -z "${builds}" ]; then
         echo "ERROR: Unable to find builds for ${package}" >&2
         exit 1
     fi
+
     echo "INFO: Comparing ${builds}"
+
     if [ -z "${CFG}" ]; then
-        ${RPMINSPECT} -a x86_64,noarch -v -o "${package}".log "${builds}"
+        ${RPMINSPECT} -a x86_64,noarch,src -v -o "${package}".log "${builds}"
     else
-        ${RPMINSPECT} -c "${CFG}" -a x86_64,noarch -v -o "${package}".log "${builds}"
+        ${RPMINSPECT} -c "${CFG}" -a x86_64,noarch,src -v -o "${package}".log "${builds}"
     fi
+
     [ $? -lt 2 ] || exit 1
+
     echo "INFO: Comparison complete: ${package}.log"
 done
 
