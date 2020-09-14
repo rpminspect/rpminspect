@@ -56,23 +56,29 @@ static char *get_header_value(const rpmfile_entry_t *file, rpmTag tag)
     assert(file != NULL);
     assert(file->idx >= 0);
 
-    /* get the tag */
+    /* new header transaction */
     td = rpmtdNew();
 
+    /* find the header tag we want to extract values from */
     if (!headerGet(file->rpm_header, tag, td, flags)) {
-        fprintf(stderr, _("*** unable to find tag %d for %s\n"), tag, file->fullpath);
-        abort();
+        warn(_("*** unable to find tag %s for %s"), rpmTagGetName(tag), file->fullpath);
+        rpmtdFree(td);
+        return ret;
     }
 
-    /* walk the tag and cram everything in to a list */
-    while ((val = rpmtdNextString(td)) != NULL) {
-        if (rpmtdGetIndex(td) == file->idx) {
-            ret = strdup(val);
-            break;
-        }
+    /* set the array index */
+    if (rpmtdSetIndex(td, file->idx) == -1) {
+        warn(_("*** file index %d is out of bounds for %s"), file->idx, file->fullpath);
+        rpmtdFree(td);
+        return ret;
     }
 
+    /* get the tag we are looking for and copy the value */
+    val = rpmtdGetString(td);
+    assert(val != NULL);
+    ret = strdup(val);
     rpmtdFree(td);
+
     return ret;
 }
 
