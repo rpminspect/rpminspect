@@ -165,8 +165,7 @@ static bool upstream_driver(struct rpminspect *ri, rpmfile_entry_t *file)
 bool inspect_upstream(struct rpminspect *ri)
 {
     bool result = true;
-    const char *bv = NULL;
-    const char *av = NULL;
+    bool have_source = false;
     rpmpeer_entry_t *peer = NULL;
     rpmfile_entry_t *file = NULL;
 
@@ -175,29 +174,16 @@ bool inspect_upstream(struct rpminspect *ri)
     init_result_params(&params);
     params.header = HEADER_UPSTREAM;
 
-    /* Initialize before and after versions */
+    /* Check for source package */
     TAILQ_FOREACH(peer, ri->peers, items) {
-        if (bv && av) {
+        if (headerIsSource(peer->before_hdr) && headerIsSource(peer->after_hdr)) {
+            have_source = true;
             break;
-        }
-
-        if (!headerIsSource(peer->after_hdr)) {
-            continue;
-        }
-
-        if (headerIsSource(peer->before_hdr) && !bv) {
-            bv = headerGetString(peer->before_hdr, RPMTAG_VERSION);
-        }
-
-        if (headerIsSource(peer->after_hdr) && !av) {
-            av = headerGetString(peer->after_hdr, RPMTAG_VERSION);
         }
     }
 
-    DEBUG_PRINT("bv=|%s|, av=|%s|\n", bv, av);
-
     /* If no versions found, we are not looking at source packages */
-    if (bv == NULL || av == NULL) {
+    if (!have_source) {
         params.severity = RESULT_INFO;
         params.waiverauth = NOT_WAIVABLE;
         xasprintf(&params.msg, _("No source packages available, skipping inspection."));
@@ -207,7 +193,7 @@ bool inspect_upstream(struct rpminspect *ri)
     }
 
     /* Set result type based on version difference */
-    if (strcmp(bv, av)) {
+    if (is_rebase(ri)) {
         /* versions changed */
         params.severity = RESULT_INFO;
         params.waiverauth = NOT_WAIVABLE;
