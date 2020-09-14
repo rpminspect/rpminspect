@@ -99,6 +99,7 @@ typedef struct _rpmfile_entry_t {
     char *type;
     char *checksum;
     cap_t cap;
+    uint64_t flags;
     struct _rpmfile_entry_t *peer_file;
     bool moved_path;
     bool moved_subpackage;

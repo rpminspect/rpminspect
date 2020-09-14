@@ -45,11 +45,52 @@
 
 #include <rpm/header.h>
 #include <rpm/rpmtd.h>
+#include <rpm/rpmfiles.h>
 
 #include <archive.h>
 #include <archive_entry.h>
 
 #include "rpminspect.h"
+
+/**
+ * @brief Given an RPM Header and index, return the RPMTAG_FILEFLAGS entry.
+ *
+ * @param h RPM Header
+ * @param i Index of the RPMTAG_FILEFLAGS entry
+ * @return rpmFlags value for the given file index
+ */
+static uint64_t get_rpmtag_fileflags(const Header h, const int i)
+{
+    uint64_t flags = 0;
+    rpmtd td = NULL;
+    rpmFlags tdflags = HEADERGET_MINMEM | HEADERGET_EXT | HEADERGET_ARGV;
+
+    assert(h != NULL);
+    assert(i >= 0);
+
+    /* new header transaction */
+    td = rpmtdNew();
+
+    /* find the header tag we want to extract values from */
+    if (!headerGet(h, RPMTAG_FILEFLAGS, td, tdflags)) {
+        warn(_("unable to find tag RPMTAG_FILEFLAGS"));
+        rpmtdFree(td);
+        return flags;
+    }
+
+    /* set the array index */
+    if (rpmtdSetIndex(td, i) == -1) {
+        warn(_("file index %d is out of bounds"), i);
+        rpmtdFree(td);
+        return flags;
+    }
+
+    /* get the tag we are looking for and copy the value */
+    flags = rpmtdGetNumber(td);
+    rpmtdFree(td);
+
+    return flags;
+}
 
 /**
  * @brief Free rpmfile_t memory.
@@ -250,6 +291,7 @@ rpmfile_t *extract_rpm(const char *pkg, Header hdr, char **output_dir)
         file_entry->localpath = strdup(archive_path);
         assert(file_entry->localpath);
 
+        file_entry->flags = get_rpmtag_fileflags(hdr, file_entry->idx);
         file_entry->type = NULL;
         file_entry->checksum = NULL;
         file_entry->cap = NULL;
