@@ -512,8 +512,8 @@ static int download_build(const struct rpminspect *ri, struct koji_build *build)
                       (workri->buildtype == KOJI_BUILD_MODULE) ? workri->kojimbs : workri->kojiursine,
                       (build->volume_name == NULL || !strcmp(build->volume_name, "DEFAULT")) ? "packages" : build->volume_name,
                       (buildentry->package_name == NULL) ? build->name : buildentry->package_name,
-                      (buildentry->version == NULL) ? rpm->version : buildentry->version,
-                      (buildentry->release == NULL) ? rpm->release : buildentry->release,
+                      (buildentry->version == NULL) ? build->version : buildentry->version,
+                      (buildentry->release == NULL) ? build->release : buildentry->release,
                       rpm->arch,
                       pkg);
 
