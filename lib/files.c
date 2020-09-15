@@ -45,7 +45,7 @@
 
 #include <rpm/header.h>
 #include <rpm/rpmtd.h>
-#include <rpm/rpmfiles.h>
+#include <rpm/rpmfi.h>
 
 #include <archive.h>
 #include <archive_entry.h>
