@@ -32,6 +32,7 @@ librpminspect_sources = [
     'inspect_capabilities.c',
     'inspect_changedfiles.c',
     'inspect_changelog.c',
+    'inspect_config.c',
     'inspect_desktop.c',
     'inspect_disttag.c',
     'inspect_dt_needed.c',

@@ -79,6 +79,7 @@ struct inspect inspections[] = {
     { INSPECT_TYPES,         "types",         false, &inspect_types },
     { INSPECT_ABIDIFF,       "abidiff",       false, &inspect_abidiff },
     { INSPECT_KMIDIFF,       "kmidiff",       false, &inspect_kmidiff },
+    { INSPECT_CONFIG,        "config",        false, &inspect_config },
     { 0, NULL, false, NULL }
 };
 
@@ -207,6 +208,8 @@ const char *inspection_desc(const uint64_t inspection)
             return DESC_ABIDIFF;
         case INSPECT_KMIDIFF:
             return DESC_KMIDIFF;
+        case INSPECT_CONFIG:
+            return DESC_CONFIG;
         default:
             return NULL;
     }

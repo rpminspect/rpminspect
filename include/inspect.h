@@ -423,6 +423,16 @@ bool inspect_abidiff(struct rpminspect *ri);
  */
 bool inspect_kmidiff(struct rpminspect *ri);
 
+/**
+ * @brief Main driver for the 'config' inspection.
+ *
+ *
+ *
+ * @param ri Pointer to the struct rpminspect for the program.
+ * @return True if the inspection passed, false otherwise.
+ */
+bool inspect_config(struct rpminspect *ri);
+
 /** @} */
 
 /*
@@ -468,6 +478,7 @@ bool inspect_kmidiff(struct rpminspect *ri);
 #define INSPECT_TYPES                       (((uint64_t) 1) << 33)
 #define INSPECT_ABIDIFF                     (((uint64_t) 1) << 34)
 #define INSPECT_KMIDIFF                     (((uint64_t) 1) << 35)
+#define INSPECT_CONFIG                      (((uint64_t) 1) << 36)
 
 /* Long descriptions for the inspections */
 #define DESC_LICENSE _("Verify the string specified in the License tag of the RPM metadata describes permissible software licenses as defined by the license database. Also checks to see if the License tag contains any unprofessional words as defined in the configuration file.")
@@ -539,5 +550,7 @@ bool inspect_kmidiff(struct rpminspect *ri);
 #define DESC_ABIDIFF _("When comparing two builds or two packages, compare ELF files using abidiff(1) from the libabigail project.  Differences are reported.  If the package is a rebase and not on the rebaseable list and the rebase inspection is enabled, ABI differences are reported as failures.  The assumption here is that rpminspect is comparing builds for maintenance purposes and you do not want to introduce any ABI changes for users.  If you do not care about that, turn off the abidiff inspection or add the package name to the rebaseable list.")
 
 #define DESC_KMIDIFF _("kmidiff compares the binary Kernel Module Interfaces of two Linux kernel trees.  The binary KMI is the interface that the Linux kernel exposes to its modules.  The trees we are interested in here are the result of the build of the Linux kernel source tree.  If the builds compared are not considered a rebase, an incompatible change reported by kmidiff is reported for verification.")
+
+#define DESC_CONFIG _("Check for and report differences in configuration files marked with %config in the spec file.  If changes are whitespace or formatting only, the result is reported at the INFO level.  Content and location changes are reporting at the VERIFY level unless the comparison is between rebased packages.")
 
 #endif

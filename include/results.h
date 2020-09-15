@@ -65,6 +65,7 @@
 #define HEADER_TYPES         "types"
 #define HEADER_ABIDIFF       "abidiff"
 #define HEADER_KMIDIFF       "kmidiff"
+#define HEADER_CONFIG        "config"
 
 /*
  * Inspection remedies
@@ -195,5 +196,8 @@
 
 /* kmidiff */
 #define REMEDY_KMIDIFF _("Kernel Module Interface introduced during maintenance updates can lead to problems for users.  See the libabigail documentation and the distribution KMI policy to determine if this detected change is allowed.")
+
+/* config */
+#define REMEDY_CONFIG _("Changes to %config should be done carefully.  Make sure you have installed the correct file and in the correct location.  If a package is restructuring configuration files, make sure the package can handle upgrading an existing package -or- honor the old file locations.")
 
 #endif
