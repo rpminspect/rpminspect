@@ -66,6 +66,7 @@
 #define HEADER_ABIDIFF       "abidiff"
 #define HEADER_KMIDIFF       "kmidiff"
 #define HEADER_CONFIG        "config"
+#define HEADER_DOC           "doc"
 
 /*
  * Inspection remedies
@@ -199,5 +200,8 @@
 
 /* config */
 #define REMEDY_CONFIG _("Changes to %config should be done carefully.  Make sure you have installed the correct file and in the correct location.  If a package is restructuring configuration files, make sure the package can handle upgrading an existing package -or- honor the old file locations.")
+
+/* doc */
+#define REMEDY_DOC _("Changes found among the %doc files.  Verify these changes are intended if the package is not a rebase.  Sometimes upstream projects rename or move documentation files and the spec file needs to account for those changes.")
 
 #endif

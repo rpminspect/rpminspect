@@ -433,6 +433,16 @@ bool inspect_kmidiff(struct rpminspect *ri);
  */
 bool inspect_config(struct rpminspect *ri);
 
+/**
+ * @brief Main driver for the 'doc' inspection.
+ *
+ *
+ *
+ * @param ri Pointer to the struct rpminspect for the program.
+ * @return True if the inspection passed, false otherwise.
+ */
+bool inspect_doc(struct rpminspect *ri);
+
 /** @} */
 
 /*
@@ -479,6 +489,7 @@ bool inspect_config(struct rpminspect *ri);
 #define INSPECT_ABIDIFF                     (((uint64_t) 1) << 34)
 #define INSPECT_KMIDIFF                     (((uint64_t) 1) << 35)
 #define INSPECT_CONFIG                      (((uint64_t) 1) << 36)
+#define INSPECT_DOC                         (((uint64_t) 1) << 37)
 
 /* Long descriptions for the inspections */
 #define DESC_LICENSE _("Verify the string specified in the License tag of the RPM metadata describes permissible software licenses as defined by the license database. Also checks to see if the License tag contains any unprofessional words as defined in the configuration file.")
@@ -552,5 +563,7 @@ bool inspect_config(struct rpminspect *ri);
 #define DESC_KMIDIFF _("kmidiff compares the binary Kernel Module Interfaces of two Linux kernel trees.  The binary KMI is the interface that the Linux kernel exposes to its modules.  The trees we are interested in here are the result of the build of the Linux kernel source tree.  If the builds compared are not considered a rebase, an incompatible change reported by kmidiff is reported for verification.")
 
 #define DESC_CONFIG _("Check for and report differences in configuration files marked with %config in the spec file.  If changes are whitespace or formatting only, the result is reported at the INFO level.  Content and location changes are reporting at the VERIFY level unless the comparison is between rebased packages.")
+
+#define DESC_DOC _("Report changes in %doc marked files.  Files that have been added or removed as documentation files, for instance.")
 
 #endif
