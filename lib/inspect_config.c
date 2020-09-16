@@ -154,15 +154,19 @@ static bool config_driver(struct rpminspect *ri, rpmfile_entry_t *file)
             }
 
             if (result == false) {
-                xasprintf(&params.msg, _("%%config file change for %s in %s on %s%s\n"), file->localpath, name, arch, minor);
+                xasprintf(&params.msg, _("%%config file content change for %s in %s on %s%s\n"), file->localpath, name, arch, minor);
                 params.details = diff_output;
                 add_result(ri, &params);
                 free(params.msg);
             }
         }
     } else if (before_config != after_config) {
-        xasprintf(&params.msg, _("%%config file change for %s in %s on %s (%s -> %s)\n"), file->localpath, name, arch,
-                  (before_config ? _("marked as %%config") : _("not marked as %%config")), (after_config ? _("marked as %%config") : _("not marked as %%config")));
+        xasprintf(&params.msg, _("%%doc file change for %s in %s on %s (%smarked as %%doc -> %smarked as %%doc)\n"), file->localpath, name, arch,
+                  (before_config ? "" : _("not ")), (after_config ? "" : _("not ")));
+
+
+        xasprintf(&params.msg, _("%%config file change for %s in %s on %s (%smarked as %%config -> %smarked as %%config)\n"), file->localpath, name, arch,
+                  (before_config ? "" : _("not ")), (after_config ? "" : _("not ")));
         add_result(ri, &params);
         free(params.msg);
         result = false;
