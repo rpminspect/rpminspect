@@ -50,7 +50,7 @@ failure() {
 packages="zsh kernel python3 mutt emacs tmux elfutils"
 
 # Validate programs we need are present
-reqs='rpmbuild koji'
+reqs="rpmbuild koji"
 for req in $reqs; do
     if ! $req --help > /dev/null 2>&1; then
         echo "ERROR: Required program $req missing." >&2
@@ -67,7 +67,7 @@ fi
 
 # Run comparison against the latest packages, or fail
 for package in ${packages}; do
-    builds=$(koji list-builds --package="${package}" --state=COMPLETE | grep "${dist}" | tail -n 2 | cut -d ' ' -f 1 | xargs)
+    builds=$(koji list-builds --package="${package}" --state=COMPLETE | grep "${dist}" | cut -d ' ' -f 1 | sort -n | tail -n 2 | xargs)
 
     if [ -z "${builds}" ]; then
         echo "ERROR: Unable to find builds for ${package}" >&2
@@ -78,11 +78,13 @@ for package in ${packages}; do
 
     if [ -z "${CFG}" ]; then
         ${RPMINSPECT} -a x86_64,noarch,src -v -o "${package}".log "${builds}"
+        ret=$?
     else
         ${RPMINSPECT} -c "${CFG}" -a x86_64,noarch,src -v -o "${package}".log "${builds}"
+        ret=$?
     fi
 
-    [ $? -lt 2 ] || exit 1
+    [ ${ret} -lt 2 ] || exit 1
 
     echo "INFO: Comparison complete: ${package}.log"
 done
