@@ -78,40 +78,42 @@ vendor:
     # with a disable setting that you can uncomment to turn off
     # certain ones.
     #
-    #license: off
-    #emptyrpm: off
-    #lostpayload: off
-    #metadata: off
-    #manpage: off
-    #xml: off
-    #elf: off
+    #abidiff: off
+    #addedfiles: off
+    #annocheck: off
+    #arch: off
+    #capabilities: off
+    #changedfiles: off
+    #changelog: off
+    #config: off
     #desktop: off
     #disttag: off
-    #specname: off
-    #modularity: off
-    #javabytecode: off
-    #changedfiles: off
-    #movedfiles: off
-    #removedfiles: off
-    #addedfiles: off
-    #upstream: off
-    #ownership: off
-    #shellsyntax: off
-    #annocheck: off
+    #doc: off
     #DT_NEEDED: off
-    #filesize: off
-    #permissions: off
-    #capabilities: off
-    #kmod: off
-    #arch: off
-    #subpackages: off
-    #changelog: off
-    #pathmigration: off
-    #LTO: off
-    #symlinks: off
+    #elf: off
+    #emptyrpm: off
     #%files: off
+    #filesize: off
+    #javabytecode: off
+    #kmod: off
+    #license: off
+    #lostpayload: off
+    #LTO: off
+    #manpage: off
+    #metadata: off
+    #modularity: off
+    #movedfiles: off
+    #ownership: off
+    #pathmigration: off
+    #permissions: off
+    #removedfiles: off
+    #shellsyntax: off
+    #specname: off
+    #subpackages: off
+    #symlinks: off
     #types: off
-    #abidiff: off
+    #upstream: off
+    #xml: off
 
 #products:
     # Product release string matches.  rpminspect uses product release
