@@ -47,8 +47,8 @@ class ValidFilesSectionSRPM(TestSRPM):
         sub.section_files += "%%{_libdir}/%s\n" % libraryName
 
         # the inspection results expected
-        self.inspection = "%files"
-        self.label = "%files"
+        self.inspection = "files"
+        self.label = "files"
         self.result = "OK"
         self.waiver_auth = "Not Waivable"
 
@@ -74,8 +74,8 @@ class ValidFilesSectionKoji(TestKoji):
         sub.section_files += "%%{_libdir}/%s\n" % libraryName
 
         # the inspection results expected
-        self.inspection = "%files"
-        self.label = "%files"
+        self.inspection = "files"
+        self.label = "files"
         self.result = "OK"
         self.waiver_auth = "Not Waivable"
 
@@ -103,8 +103,8 @@ class ValidFilesSectionCompareSRPM(TestCompareSRPM):
         sub.section_files += "%%{_libdir}/%s\n" % libraryName
 
         # the inspection results expected
-        self.inspection = "%files"
-        self.label = "%files"
+        self.inspection = "files"
+        self.label = "files"
         self.result = "OK"
         self.waiver_auth = "Not Waivable"
 
@@ -132,8 +132,8 @@ class ValidFilesSectionCompareKoji(TestCompareKoji):
         sub.section_files += "%%{_libdir}/%s\n" % libraryName
 
         # the inspection results expected
-        self.inspection = "%files"
-        self.label = "%files"
+        self.inspection = "files"
+        self.label = "files"
         self.result = "OK"
         self.waiver_auth = "Not Waivable"
 
@@ -143,8 +143,8 @@ class InvalidFilesSectionSRPM(TestSRPM):
         TestSRPM.setUp(self)
         self.rpm.add_simple_library()
 
-        self.inspection = "%files"
-        self.label = "%files"
+        self.inspection = "files"
+        self.label = "files"
         self.result = "VERIFY"
         self.waiver_auth = "Anyone"
 
@@ -154,8 +154,8 @@ class InvalidFilesSectionKoji(TestKoji):
         TestKoji.setUp(self)
         self.rpm.add_simple_library()
 
-        self.inspection = "%files"
-        self.label = "%files"
+        self.inspection = "files"
+        self.label = "files"
         self.result = "VERIFY"
         self.waiver_auth = "Anyone"
 
@@ -165,8 +165,8 @@ class InvalidFilesSectionCompareSRPM(TestCompareSRPM):
         TestCompareSRPM.setUp(self)
         self.after_rpm.add_simple_library()
 
-        self.inspection = "%files"
-        self.label = "%files"
+        self.inspection = "files"
+        self.label = "files"
         self.result = "VERIFY"
         self.waiver_auth = "Anyone"
 
@@ -176,7 +176,7 @@ class InvalidFilesSectionCompareKoji(TestCompareKoji):
         TestCompareKoji.setUp(self)
         self.after_rpm.add_simple_library()
 
-        self.inspection = "%files"
-        self.label = "%files"
+        self.inspection = "files"
+        self.label = "files"
         self.result = "VERIFY"
         self.waiver_auth = "Anyone"

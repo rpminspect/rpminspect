@@ -75,7 +75,7 @@ struct inspect inspections[] = {
     { INSPECT_PATHMIGRATION, "pathmigration", true,  &inspect_pathmigration },
     { INSPECT_LTO,           "LTO",           true,  &inspect_lto },
     { INSPECT_SYMLINKS,      "symlinks",      true,  &inspect_symlinks },
-    { INSPECT_FILES,         "%files",        true,  &inspect_files },
+    { INSPECT_FILES,         "files",         true,  &inspect_files },
     { INSPECT_TYPES,         "types",         false, &inspect_types },
     { INSPECT_ABIDIFF,       "abidiff",       false, &inspect_abidiff },
     { INSPECT_KMIDIFF,       "kmidiff",       false, &inspect_kmidiff },

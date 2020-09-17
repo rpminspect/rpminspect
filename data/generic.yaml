@@ -92,7 +92,7 @@ vendor:
     #DT_NEEDED: off
     #elf: off
     #emptyrpm: off
-    #%files: off
+    #files: off
     #filesize: off
     #javabytecode: off
     #kmod: off

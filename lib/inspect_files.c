@@ -157,7 +157,7 @@ bool inspect_files(struct rpminspect *ri) {
         add_result(ri, &params);
     } else if (!src) {
         params.severity = RESULT_INFO;
-        xasprintf(&params.msg, _("The %%files inspection is only for source packages, skipping."));
+        xasprintf(&params.msg, _("The files inspection is only for source packages, skipping."));
         add_result(ri, &params);
         free(params.msg);
     }

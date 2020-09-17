@@ -73,7 +73,7 @@ Test categories that have been migrated:
                  those are caught by 'addedfiles')
 *TEST_SIZE (filesize)
 *TEST_SYMLINK (symlinks)
-*TEST_SPECFILE (disttag, license, and %files)
+*TEST_SPECFILE (disttag, license, and files)
 *TEST_TYPES (types)
 *TEST_FILEMOVE (movedfiles)
 *TEST_ABI (abidiff and kmidiff)

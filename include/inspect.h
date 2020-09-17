@@ -384,7 +384,7 @@ bool inspect_symlinks(struct rpminspect *ri);
 bool inspect_lostpayload(struct rpminspect *ri);
 
 /**
- * @brief Main driver for the '%files' inspection.
+ * @brief Main driver for the 'files' inspection.
  *
  *
  *
