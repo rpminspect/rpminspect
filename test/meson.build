@@ -108,6 +108,7 @@ if python.found()
         'test_addedfiles.py',
         'test_changelog.py',
         'test_command.py',
+        'test_config.py',
         'test_default.py',
         'test_desktop.py',
         'test_disttag.py',
