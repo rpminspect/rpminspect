@@ -46,7 +46,7 @@ class SkipUpstreamSRPM(TestSRPM):
     """
 
     def setUp(self):
-        TestSRPM.setUp(self)
+        super().setUp()
 
         # tell it to pass '-T upstream' to rpminspect
         self.inspection = "upstream"
@@ -56,7 +56,7 @@ class SkipUpstreamSRPM(TestSRPM):
         self.result = "INFO"
 
     def runTest(self):
-        TestSRPM.runTest(self)
+        super().runTest()
 
         # make sure 'upstream' is not in the results
         self.assertFalse(self.inspection in self.results.keys())
@@ -68,7 +68,7 @@ class SkipUpstreamRPMs(TestRPMs):
     """
 
     def setUp(self):
-        TestRPMs.setUp(self)
+        super().setUp()
 
         # tell it to pass '-T upstream' to rpminspect
         self.inspection = "upstream"
@@ -78,7 +78,7 @@ class SkipUpstreamRPMs(TestRPMs):
         self.result = "INFO"
 
     def runTest(self):
-        TestRPMs.runTest(self)
+        super().runTest()
 
         # make sure 'upstream' is not in the results
         self.assertFalse(self.inspection in self.results.keys())
@@ -90,7 +90,7 @@ class SkipUpstreamKoji(TestKoji):
     """
 
     def setUp(self):
-        TestKoji.setUp(self)
+        super().setUp()
 
         # tell it to pass '-T upstream' to rpminspect
         self.inspection = "upstream"
@@ -100,7 +100,7 @@ class SkipUpstreamKoji(TestKoji):
         self.result = "INFO"
 
     def runTest(self):
-        TestKoji.runTest(self)
+        super().runTest()
 
         # make sure 'upstream' is not in the results
         self.assertFalse(self.inspection in self.results.keys())
@@ -118,7 +118,7 @@ class DiffVerUpstreamCompareSRPM(TestCompareSRPM):
     """
 
     def setUp(self):
-        TestCompareSRPM.setUp(self)
+        super().setUp()
         self.inspection = "upstream"
         self.label = "upstream"
         self.result = "OK"
@@ -132,10 +132,8 @@ class SameVerChangeUpstreamCompareSRPM(TestCompareSRPM):
     """
 
     def setUp(self):
-        TestCompareSRPM.setUp(self)
-
         # recreate the after RPM with the same version as the before
-        self.after_rpm = rpmfluff.SimpleRpmBuild(BEFORE_NAME, BEFORE_VER, AFTER_REL)
+        super().setUp(after=(BEFORE_NAME, BEFORE_VER, AFTER_REL))
 
         # add the same installed target file with different sources
         self.before_rpm.add_installed_file(
@@ -161,10 +159,8 @@ class SameVerRemoveUpstreamCompareSRPM(TestCompareSRPM):
     """
 
     def setUp(self):
-        TestCompareSRPM.setUp(self)
-
         # recreate the after RPM with the same version as the before
-        self.after_rpm = rpmfluff.SimpleRpmBuild(BEFORE_NAME, BEFORE_VER, AFTER_REL)
+        super().setUp(after=(BEFORE_NAME, BEFORE_VER, AFTER_REL))
 
         # simulate a removed source file by not including it in the after rpm
         self.before_rpm.add_installed_file(
@@ -193,7 +189,7 @@ class DiffVerUpstreamCompareKoji(TestCompareKoji):
     """
 
     def setUp(self):
-        TestCompareKoji.setUp(self)
+        super().setUp()
         self.inspection = "upstream"
         self.label = "upstream"
         self.result = "OK"
@@ -207,10 +203,8 @@ class SameVerChangeUpstreamCompareKoji(TestCompareKoji):
     """
 
     def setUp(self):
-        TestCompareKoji.setUp(self)
-
         # recreate the after RPM with the same version as the before
-        self.after_rpm = rpmfluff.SimpleRpmBuild(BEFORE_NAME, BEFORE_VER, AFTER_REL)
+        super().setUp(after=(BEFORE_NAME, BEFORE_VER, AFTER_REL))
 
         # add the same installed target file with different sources
         self.before_rpm.add_installed_file(
@@ -236,10 +230,8 @@ class SameVerRemoveUpstreamCompareKoji(TestCompareKoji):
     """
 
     def setUp(self):
-        TestCompareKoji.setUp(self)
-
         # recreate the after RPM with the same version as the before
-        self.after_rpm = rpmfluff.SimpleRpmBuild(BEFORE_NAME, BEFORE_VER, AFTER_REL)
+        super().setUp(after=(BEFORE_NAME, BEFORE_VER, AFTER_REL))
 
         # simulate a removed source file by not including it in the after rpm
         self.before_rpm.add_installed_file(
