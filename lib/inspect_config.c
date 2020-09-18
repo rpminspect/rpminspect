@@ -38,7 +38,6 @@ static bool config_driver(struct rpminspect *ri, rpmfile_entry_t *file)
     int exitcode;
     const char *name = NULL;
     const char *arch = NULL;
-    const char *minor = NULL;
     struct result_params params;
 
     assert(ri != NULL);
@@ -70,19 +69,20 @@ static bool config_driver(struct rpminspect *ri, rpmfile_entry_t *file)
     params.header = HEADER_CONFIG;
     params.arch = arch;
     params.file = file->localpath;
-    params.waiverauth = WAIVABLE_BY_ANYONE;
     params.remedy = REMEDY_CONFIG;
     params.verb = VERB_CHANGED;
     params.noun = _("%config ${FILE}");
 
     if (is_rebase(ri)) {
         params.severity = RESULT_INFO;
+        params.waiverauth = NOT_WAIVABLE;
     } else {
         params.severity = RESULT_VERIFY;
+        params.waiverauth = WAIVABLE_BY_ANYONE;
     }
 
     /* verify %config values */
-    before_config = file->flags & RPMFILE_CONFIG;
+    before_config = file->peer_file->flags & RPMFILE_CONFIG;
     after_config = file->flags & RPMFILE_CONFIG;
 
     if (before_config == after_config) {
@@ -123,48 +123,57 @@ static bool config_driver(struct rpminspect *ri, rpmfile_entry_t *file)
                 xasprintf(&params.msg, _("%%config file %s went from actual file to symlink (pointing to %s) in %s on %s"), file->localpath, after_dest, name, arch);
                 add_result(ri, &params);
                 free(params.msg);
-                result = false;
+
+                if (params.severity == RESULT_VERIFY) {
+                    result = false;
+                }
             } else if (S_ISLNK(file->peer_file->st.st_mode) && !S_ISLNK(file->st.st_mode)) {
                 xasprintf(&params.msg, _("%%config file %s was a symlink (pointing to %s), became an actual file in %s on %s"), file->peer_file->localpath, before_dest, name, arch);
                 add_result(ri, &params);
                 free(params.msg);
-                result = false;
+
+                if (params.severity == RESULT_VERIFY) {
+                    result = false;
+                }
             } else if (strcmp(before_dest, after_dest)) {
                 xasprintf(&params.msg, _("Symlink value for %%config file %s changed in %s on %s."), file->localpath, name, arch);
                 xasprintf(&params.details, "  - %s\n  + %s\n", before_dest, after_dest);
                 add_result(ri, &params);
                 free(params.msg);
                 free(params.details);
-                result = false;
+
+                if (params.severity == RESULT_VERIFY) {
+                    result = false;
+                }
             }
         } else {
             /* compare the files */
             diff_output = run_cmd(&exitcode, DIFF_CMD, "-q", file->peer_file->fullpath, file->fullpath, NULL);
 
-            if (exitcode == 1) {
+            if (exitcode) {
                 /* the files differ, see if it's only whitespace changes */
-                result = false;
                 free(diff_output);
-                diff_output = run_cmd(&exitcode, DIFF_CMD, "-u", "-w", "-I^#.*", file->peer_file->fullpath, file->fullpath, NULL);
+                params.details = run_cmd(&exitcode, DIFF_CMD, "-u", "-w", "-I^#.*", file->peer_file->fullpath, file->fullpath, NULL);
 
                 if (exitcode == 0) {
+                    xasprintf(&params.msg, _("%%config file content change for %s in %s on %s (comments/whitespace only)"), file->localpath, name, arch);
                     params.severity = RESULT_INFO;
-                    minor = _(" (comments/whitespace only)");
+                    params.waiverauth = NOT_WAIVABLE;
+                    result = true;
+                } else {
+                    xasprintf(&params.msg, _("%%config file content change for %s in %s on %s"), file->localpath, name, arch);
+
+                    if (params.severity == RESULT_VERIFY) {
+                        result = false;
+                    }
                 }
             }
 
-            if (result == false) {
-                xasprintf(&params.msg, _("%%config file content change for %s in %s on %s%s\n"), file->localpath, name, arch, minor);
-                params.details = diff_output;
-                add_result(ri, &params);
-                free(params.msg);
-            }
+            add_result(ri, &params);
+            free(params.msg);
+            free(params.details);
         }
     } else if (before_config != after_config) {
-        xasprintf(&params.msg, _("%%doc file change for %s in %s on %s (%smarked as %%doc -> %smarked as %%doc)\n"), file->localpath, name, arch,
-                  (before_config ? "" : _("not ")), (after_config ? "" : _("not ")));
-
-
         xasprintf(&params.msg, _("%%config file change for %s in %s on %s (%smarked as %%config -> %smarked as %%config)\n"), file->localpath, name, arch,
                   (before_config ? "" : _("not ")), (after_config ? "" : _("not ")));
         add_result(ri, &params);
