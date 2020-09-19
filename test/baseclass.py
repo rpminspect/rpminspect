@@ -216,7 +216,7 @@ class TestSRPM(RequiresRpminspect):
             "-r",
             "GENERIC",
             "-o",
-            self.outputfile
+            self.outputfile,
         ]
 
         if self.inspection:
@@ -233,7 +233,7 @@ class TestSRPM(RequiresRpminspect):
 
         try:
             with open(self.outputfile) as f:
-                self.results = json.loads(f.read().encode('utf-8'))
+                self.results = json.loads(f.read().encode("utf-8"))
         except json.decoder.JSONDecodeError:
             self.dumpResults()
 
@@ -306,7 +306,7 @@ class TestCompareSRPM(RequiresRpminspect):
             "-r",
             "GENERIC",
             "-o",
-            self.outputfile
+            self.outputfile,
         ]
 
         if self.inspection:
@@ -324,7 +324,7 @@ class TestCompareSRPM(RequiresRpminspect):
 
         try:
             with open(self.outputfile) as f:
-                self.results = json.loads(f.read().encode('utf-8'))
+                self.results = json.loads(f.read().encode("utf-8"))
         except json.decoder.JSONDecodeError:
             self.dumpResults()
 
@@ -375,7 +375,7 @@ class TestRPMs(TestSRPM):
                 "-r",
                 "GENERIC",
                 "-o",
-                self.outputfile
+                self.outputfile,
             ]
 
             if self.inspection:
@@ -394,7 +394,7 @@ class TestRPMs(TestSRPM):
 
             try:
                 with open(self.outputfile) as f:
-                    self.results = json.loads(f.read().encode('utf-8'))
+                    self.results = json.loads(f.read().encode("utf-8"))
             except json.decoder.JSONDecodeError:
                 self.dumpResults()
 
@@ -438,7 +438,7 @@ class TestCompareRPMs(TestCompareSRPM):
                 "-r",
                 "GENERIC",
                 "-o",
-                self.outputfile
+                self.outputfile,
             ]
 
             if self.inspection:
@@ -458,7 +458,7 @@ class TestCompareRPMs(TestCompareSRPM):
 
             try:
                 with open(self.outputfile) as f:
-                    self.results = json.loads(f.read().encode('utf-8'))
+                    self.results = json.loads(f.read().encode("utf-8"))
             except json.decoder.JSONDecodeError:
                 self.dumpResults()
 
@@ -514,7 +514,7 @@ class TestKoji(TestSRPM):
                 "-r",
                 "GENERIC",
                 "-o",
-                self.outputfile
+                self.outputfile,
             ]
             if self.inspection:
                 args.append("-T")
@@ -531,9 +531,8 @@ class TestKoji(TestSRPM):
             (self.out, self.err) = self.p.communicate()
 
             try:
-                self.results = u""
                 with open(self.outputfile) as f:
-                    self.results = json.loads(f.read().encode('utf-8'))
+                    self.results = json.loads(f.read().encode("utf-8"))
             except json.decoder.JSONDecodeError:
                 self.dumpResults()
 
@@ -601,7 +600,7 @@ class TestCompareKoji(TestCompareSRPM):
                 "-r",
                 "GENERIC",
                 "-o",
-                self.outputfile
+                self.outputfile,
             ]
 
             if self.inspection:
@@ -620,9 +619,8 @@ class TestCompareKoji(TestCompareSRPM):
             (self.out, self.err) = self.p.communicate()
 
             try:
-                self.results = u""
                 with open(self.outputfile) as f:
-                    self.results = json.loads(f.read().encode('utf-8'))
+                    self.results = json.loads(f.read().encode("utf-8"))
             except json.decoder.JSONDecodeError:
                 self.dumpResults()
 

@@ -53,7 +53,7 @@ linux
 #winnt
 #darwin
 #hurd
-"""
+"""  # noqa: W291
 
 kernel_conf_with_content_changes = """#
 # Select operating system kernel
@@ -72,6 +72,7 @@ vmlinuz
 #hurd
 """
 
+
 # %config becomes not a %config file in non-rebase comparison (VERIFY)
 class ConfigBecomesNonConfigCompareRPMs(TestCompareRPMs):
     def setUp(self):
@@ -80,19 +81,20 @@ class ConfigBecomesNonConfigCompareRPMs(TestCompareRPMs):
         self.before_rpm.add_installed_file(
             "/etc/kernel.conf",
             rpmfluff.SourceFile("kernel.conf", kernel_conf),
-            isConfig=True
+            isConfig=True,
         )
 
         self.after_rpm.add_installed_file(
             "/etc/kernel.conf",
             rpmfluff.SourceFile("kernel.conf", kernel_conf),
-            isConfig=False
+            isConfig=False,
         )
 
         self.inspection = "config"
         self.label = "config"
         self.result = "VERIFY"
         self.waiver_auth = "Anyone"
+
 
 class ConfigBecomesNonConfigCompareKoji(TestCompareKoji):
     def setUp(self):
@@ -101,19 +103,20 @@ class ConfigBecomesNonConfigCompareKoji(TestCompareKoji):
         self.before_rpm.add_installed_file(
             "/etc/kernel.conf",
             rpmfluff.SourceFile("kernel.conf", kernel_conf),
-            isConfig=True
+            isConfig=True,
         )
 
         self.after_rpm.add_installed_file(
             "/etc/kernel.conf",
             rpmfluff.SourceFile("kernel.conf", kernel_conf),
-            isConfig=False
+            isConfig=False,
         )
 
         self.inspection = "config"
         self.label = "config"
         self.result = "VERIFY"
         self.waiver_auth = "Anyone"
+
 
 # %config becomes not a %config file in rebase comparison (INFO)
 class ConfigBecomesNonConfigRebaseCompareRPMs(TestCompareRPMs):
@@ -123,19 +126,20 @@ class ConfigBecomesNonConfigRebaseCompareRPMs(TestCompareRPMs):
         self.before_rpm.add_installed_file(
             "/etc/kernel.conf",
             rpmfluff.SourceFile("kernel.conf", kernel_conf),
-            isConfig=True
+            isConfig=True,
         )
 
         self.after_rpm.add_installed_file(
             "/etc/kernel.conf",
             rpmfluff.SourceFile("kernel.conf", kernel_conf),
-            isConfig=False
+            isConfig=False,
         )
 
         self.inspection = "config"
         self.label = "config"
         self.result = "INFO"
         self.waiver_auth = "Not Waivable"
+
 
 class ConfigBecomesNonConfigRebaseCompareKoji(TestCompareKoji):
     def setUp(self):
@@ -144,19 +148,20 @@ class ConfigBecomesNonConfigRebaseCompareKoji(TestCompareKoji):
         self.before_rpm.add_installed_file(
             "/etc/kernel.conf",
             rpmfluff.SourceFile("kernel.conf", kernel_conf),
-            isConfig=True
+            isConfig=True,
         )
 
         self.after_rpm.add_installed_file(
             "/etc/kernel.conf",
             rpmfluff.SourceFile("kernel.conf", kernel_conf),
-            isConfig=False
+            isConfig=False,
         )
 
         self.inspection = "config"
         self.label = "config"
         self.result = "INFO"
         self.waiver_auth = "Not Waivable"
+
 
 # not a %config becomes a %config file in non-rebase comparison (VERIFY)
 class NonConfigBecomesConfigCompareRPMs(TestCompareRPMs):
@@ -166,19 +171,20 @@ class NonConfigBecomesConfigCompareRPMs(TestCompareRPMs):
         self.before_rpm.add_installed_file(
             "/etc/kernel.conf",
             rpmfluff.SourceFile("kernel.conf", kernel_conf),
-            isConfig=False
+            isConfig=False,
         )
 
         self.after_rpm.add_installed_file(
             "/etc/kernel.conf",
             rpmfluff.SourceFile("kernel.conf", kernel_conf),
-            isConfig=True
+            isConfig=True,
         )
 
         self.inspection = "config"
         self.label = "config"
         self.result = "VERIFY"
         self.waiver_auth = "Anyone"
+
 
 class NonConfigBecomesConfigCompareKoji(TestCompareKoji):
     def setUp(self):
@@ -187,19 +193,20 @@ class NonConfigBecomesConfigCompareKoji(TestCompareKoji):
         self.before_rpm.add_installed_file(
             "/etc/kernel.conf",
             rpmfluff.SourceFile("kernel.conf", kernel_conf),
-            isConfig=False
+            isConfig=False,
         )
 
         self.after_rpm.add_installed_file(
             "/etc/kernel.conf",
             rpmfluff.SourceFile("kernel.conf", kernel_conf),
-            isConfig=True
+            isConfig=True,
         )
 
         self.inspection = "config"
         self.label = "config"
         self.result = "VERIFY"
         self.waiver_auth = "Anyone"
+
 
 # not a %config becomes a %config file in rebase comparison (INFO)
 class NonConfigBecomesConfigRebaseCompareRPMs(TestCompareRPMs):
@@ -209,19 +216,20 @@ class NonConfigBecomesConfigRebaseCompareRPMs(TestCompareRPMs):
         self.before_rpm.add_installed_file(
             "/etc/kernel.conf",
             rpmfluff.SourceFile("kernel.conf", kernel_conf),
-            isConfig=False
+            isConfig=False,
         )
 
         self.after_rpm.add_installed_file(
             "/etc/kernel.conf",
             rpmfluff.SourceFile("kernel.conf", kernel_conf),
-            isConfig=True
+            isConfig=True,
         )
 
         self.inspection = "config"
         self.label = "config"
         self.result = "INFO"
         self.waiver_auth = "Not Waivable"
+
 
 class NonConfigBecomesConfigRebaseCompareKoji(TestCompareKoji):
     def setUp(self):
@@ -230,19 +238,20 @@ class NonConfigBecomesConfigRebaseCompareKoji(TestCompareKoji):
         self.before_rpm.add_installed_file(
             "/etc/kernel.conf",
             rpmfluff.SourceFile("kernel.conf", kernel_conf),
-            isConfig=False
+            isConfig=False,
         )
 
         self.after_rpm.add_installed_file(
             "/etc/kernel.conf",
             rpmfluff.SourceFile("kernel.conf", kernel_conf),
-            isConfig=True
+            isConfig=True,
         )
 
         self.inspection = "config"
         self.label = "config"
         self.result = "INFO"
         self.waiver_auth = "Not Waivable"
+
 
 # whitespace %config differences (OK)
 class ConfigChangesWhitespaceCompareRPMs(TestCompareRPMs):
@@ -252,19 +261,20 @@ class ConfigChangesWhitespaceCompareRPMs(TestCompareRPMs):
         self.before_rpm.add_installed_file(
             "/etc/kernel.conf",
             rpmfluff.SourceFile("kernel.conf", kernel_conf),
-            isConfig=True
+            isConfig=True,
         )
 
         self.after_rpm.add_installed_file(
             "/etc/kernel.conf",
             rpmfluff.SourceFile("kernel.conf", kernel_conf_with_whitespace_changes),
-            isConfig=True
+            isConfig=True,
         )
 
         self.inspection = "config"
         self.label = "config"
         self.result = "INFO"
         self.waiver_auth = "Not Waivable"
+
 
 class ConfigChangesWhitespaceCompareKoji(TestCompareKoji):
     def setUp(self):
@@ -273,19 +283,20 @@ class ConfigChangesWhitespaceCompareKoji(TestCompareKoji):
         self.before_rpm.add_installed_file(
             "/etc/kernel.conf",
             rpmfluff.SourceFile("kernel.conf", kernel_conf),
-            isConfig=True
+            isConfig=True,
         )
 
         self.after_rpm.add_installed_file(
             "/etc/kernel.conf",
             rpmfluff.SourceFile("kernel.conf", kernel_conf_with_whitespace_changes),
-            isConfig=True
+            isConfig=True,
         )
 
         self.inspection = "config"
         self.label = "config"
         self.result = "INFO"
         self.waiver_auth = "Not Waivable"
+
 
 class ConfigChangesWhitespaceRebaseCompareRPMs(TestCompareRPMs):
     def setUp(self):
@@ -294,19 +305,20 @@ class ConfigChangesWhitespaceRebaseCompareRPMs(TestCompareRPMs):
         self.before_rpm.add_installed_file(
             "/etc/kernel.conf",
             rpmfluff.SourceFile("kernel.conf", kernel_conf),
-            isConfig=True
+            isConfig=True,
         )
 
         self.after_rpm.add_installed_file(
             "/etc/kernel.conf",
             rpmfluff.SourceFile("kernel.conf", kernel_conf_with_whitespace_changes),
-            isConfig=True
+            isConfig=True,
         )
 
         self.inspection = "config"
         self.label = "config"
         self.result = "INFO"
         self.waiver_auth = "Not Waivable"
+
 
 class ConfigChangesWhitespaceRebaseCompareKoji(TestCompareKoji):
     def setUp(self):
@@ -315,19 +327,20 @@ class ConfigChangesWhitespaceRebaseCompareKoji(TestCompareKoji):
         self.before_rpm.add_installed_file(
             "/etc/kernel.conf",
             rpmfluff.SourceFile("kernel.conf", kernel_conf),
-            isConfig=True
+            isConfig=True,
         )
 
         self.after_rpm.add_installed_file(
             "/etc/kernel.conf",
             rpmfluff.SourceFile("kernel.conf", kernel_conf_with_whitespace_changes),
-            isConfig=True
+            isConfig=True,
         )
 
         self.inspection = "config"
         self.label = "config"
         self.result = "INFO"
         self.waiver_auth = "Not Waivable"
+
 
 # %config content differences (VERIFY)
 class ConfigChangesContentCompareRPMs(TestCompareRPMs):
@@ -337,19 +350,20 @@ class ConfigChangesContentCompareRPMs(TestCompareRPMs):
         self.before_rpm.add_installed_file(
             "/etc/kernel.conf",
             rpmfluff.SourceFile("kernel.conf", kernel_conf),
-            isConfig=True
+            isConfig=True,
         )
 
         self.after_rpm.add_installed_file(
             "/etc/kernel.conf",
             rpmfluff.SourceFile("kernel.conf", kernel_conf_with_content_changes),
-            isConfig=True
+            isConfig=True,
         )
 
         self.inspection = "config"
         self.label = "config"
         self.result = "VERIFY"
         self.waiver_auth = "Anyone"
+
 
 class ConfigChangesContentCompareKoji(TestCompareKoji):
     def setUp(self):
@@ -358,19 +372,20 @@ class ConfigChangesContentCompareKoji(TestCompareKoji):
         self.before_rpm.add_installed_file(
             "/etc/kernel.conf",
             rpmfluff.SourceFile("kernel.conf", kernel_conf),
-            isConfig=True
+            isConfig=True,
         )
 
         self.after_rpm.add_installed_file(
             "/etc/kernel.conf",
             rpmfluff.SourceFile("kernel.conf", kernel_conf_with_content_changes),
-            isConfig=True
+            isConfig=True,
         )
 
         self.inspection = "config"
         self.label = "config"
         self.result = "VERIFY"
         self.waiver_auth = "Anyone"
+
 
 class ConfigChangesContentRebaseCompareRPMs(TestCompareRPMs):
     def setUp(self):
@@ -379,19 +394,20 @@ class ConfigChangesContentRebaseCompareRPMs(TestCompareRPMs):
         self.before_rpm.add_installed_file(
             "/etc/kernel.conf",
             rpmfluff.SourceFile("kernel.conf", kernel_conf),
-            isConfig=True
+            isConfig=True,
         )
 
         self.after_rpm.add_installed_file(
             "/etc/kernel.conf",
             rpmfluff.SourceFile("kernel.conf", kernel_conf_with_content_changes),
-            isConfig=True
+            isConfig=True,
         )
 
         self.inspection = "config"
         self.label = "config"
         self.result = "INFO"
         self.waiver_auth = "Not Waivable"
+
 
 class ConfigChangesContentRebaseCompareKoji(TestCompareKoji):
     def setUp(self):
@@ -400,19 +416,20 @@ class ConfigChangesContentRebaseCompareKoji(TestCompareKoji):
         self.before_rpm.add_installed_file(
             "/etc/kernel.conf",
             rpmfluff.SourceFile("kernel.conf", kernel_conf),
-            isConfig=True
+            isConfig=True,
         )
 
         self.after_rpm.add_installed_file(
             "/etc/kernel.conf",
             rpmfluff.SourceFile("kernel.conf", kernel_conf_with_content_changes),
-            isConfig=True
+            isConfig=True,
         )
 
         self.inspection = "config"
         self.label = "config"
         self.result = "INFO"
         self.waiver_auth = "Not Waivable"
+
 
 # %config to/from file/symlink before and after (VERIFY)
 class ConfigChangeFromFileToSymlinkCompareRPMs(TestCompareRPMs):
@@ -422,24 +439,23 @@ class ConfigChangeFromFileToSymlinkCompareRPMs(TestCompareRPMs):
         self.before_rpm.add_installed_file(
             "/etc/kernel.conf",
             rpmfluff.SourceFile("kernel.conf", kernel_conf),
-            isConfig=True
+            isConfig=True,
         )
 
         self.after_rpm.add_installed_file(
             "/etc/actualkernel.conf",
             rpmfluff.SourceFile("actualkernel.conf", kernel_conf),
-            isConfig=True
+            isConfig=True,
         )
         self.after_rpm.add_installed_symlink(
-            "/etc/kernel.conf",
-            "/etc/actualkernel.conf",
-            isConfig=True
+            "/etc/kernel.conf", "/etc/actualkernel.conf", isConfig=True,
         )
 
         self.inspection = "config"
         self.label = "config"
         self.result = "VERIFY"
         self.waiver_auth = "Anyone"
+
 
 class ConfigChangeFromFileToSymlinkCompareKoji(TestCompareKoji):
     def setUp(self):
@@ -448,24 +464,23 @@ class ConfigChangeFromFileToSymlinkCompareKoji(TestCompareKoji):
         self.before_rpm.add_installed_file(
             "/etc/kernel.conf",
             rpmfluff.SourceFile("kernel.conf", kernel_conf),
-            isConfig=True
+            isConfig=True,
         )
 
         self.after_rpm.add_installed_file(
             "/etc/actualkernel.conf",
             rpmfluff.SourceFile("actualkernel.conf", kernel_conf),
-            isConfig=True
+            isConfig=True,
         )
         self.after_rpm.add_installed_symlink(
-            "/etc/kernel.conf",
-            "/etc/actualkernel.conf",
-            isConfig=True
+            "/etc/kernel.conf", "/etc/actualkernel.conf", isConfig=True,
         )
 
         self.inspection = "config"
         self.label = "config"
         self.result = "VERIFY"
         self.waiver_auth = "Anyone"
+
 
 class ConfigChangeFromSymlinkToFileCompareRPMs(TestCompareRPMs):
     def setUp(self):
@@ -474,24 +489,23 @@ class ConfigChangeFromSymlinkToFileCompareRPMs(TestCompareRPMs):
         self.before_rpm.add_installed_file(
             "/etc/actualkernel.conf",
             rpmfluff.SourceFile("actualkernel.conf", kernel_conf),
-            isConfig=True
+            isConfig=True,
         )
         self.before_rpm.add_installed_symlink(
-            "/etc/kernel.conf",
-            "/etc/actualkernel.conf",
-            isConfig=True
+            "/etc/kernel.conf", "/etc/actualkernel.conf", isConfig=True,
         )
 
         self.after_rpm.add_installed_file(
             "/etc/kernel.conf",
             rpmfluff.SourceFile("kernel.conf", kernel_conf),
-            isConfig=True
+            isConfig=True,
         )
 
         self.inspection = "config"
         self.label = "config"
         self.result = "VERIFY"
         self.waiver_auth = "Anyone"
+
 
 class ConfigChangeFromSymlinkToFileCompareKoji(TestCompareKoji):
     def setUp(self):
@@ -500,24 +514,23 @@ class ConfigChangeFromSymlinkToFileCompareKoji(TestCompareKoji):
         self.before_rpm.add_installed_file(
             "/etc/actualkernel.conf",
             rpmfluff.SourceFile("actualkernel.conf", kernel_conf),
-            isConfig=True
+            isConfig=True,
         )
         self.before_rpm.add_installed_symlink(
-            "/etc/kernel.conf",
-            "/etc/actualkernel.conf",
-            isConfig=True
+            "/etc/kernel.conf", "/etc/actualkernel.conf", isConfig=True,
         )
 
         self.after_rpm.add_installed_file(
             "/etc/kernel.conf",
             rpmfluff.SourceFile("kernel.conf", kernel_conf),
-            isConfig=True
+            isConfig=True,
         )
 
         self.inspection = "config"
         self.label = "config"
         self.result = "VERIFY"
         self.waiver_auth = "Anyone"
+
 
 # %config to/from file/symlink before and after rebase (INFO)
 class ConfigChangeFromFileToSymlinkRebaseCompareRPMs(TestCompareRPMs):
@@ -527,24 +540,23 @@ class ConfigChangeFromFileToSymlinkRebaseCompareRPMs(TestCompareRPMs):
         self.before_rpm.add_installed_file(
             "/etc/kernel.conf",
             rpmfluff.SourceFile("kernel.conf", kernel_conf),
-            isConfig=True
+            isConfig=True,
         )
 
         self.after_rpm.add_installed_file(
             "/etc/actualkernel.conf",
             rpmfluff.SourceFile("actualkernel.conf", kernel_conf),
-            isConfig=True
+            isConfig=True,
         )
         self.after_rpm.add_installed_symlink(
-            "/etc/kernel.conf",
-            "/etc/actualkernel.conf",
-            isConfig=True
+            "/etc/kernel.conf", "/etc/actualkernel.conf", isConfig=True,
         )
 
         self.inspection = "config"
         self.label = "config"
         self.result = "INFO"
         self.waiver_auth = "Not Waivable"
+
 
 class ConfigChangeFromFileToSymlinkRebaseCompareKoji(TestCompareKoji):
     def setUp(self):
@@ -553,24 +565,23 @@ class ConfigChangeFromFileToSymlinkRebaseCompareKoji(TestCompareKoji):
         self.before_rpm.add_installed_file(
             "/etc/kernel.conf",
             rpmfluff.SourceFile("kernel.conf", kernel_conf),
-            isConfig=True
+            isConfig=True,
         )
 
         self.after_rpm.add_installed_file(
             "/etc/actualkernel.conf",
             rpmfluff.SourceFile("actualkernel.conf", kernel_conf),
-            isConfig=True
+            isConfig=True,
         )
         self.after_rpm.add_installed_symlink(
-            "/etc/kernel.conf",
-            "/etc/actualkernel.conf",
-            isConfig=True
+            "/etc/kernel.conf", "/etc/actualkernel.conf", isConfig=True,
         )
 
         self.inspection = "config"
         self.label = "config"
         self.result = "INFO"
         self.waiver_auth = "Not Waivable"
+
 
 class ConfigChangeFromSymlinkToFileRebaseCompareRPMs(TestCompareRPMs):
     def setUp(self):
@@ -579,24 +590,23 @@ class ConfigChangeFromSymlinkToFileRebaseCompareRPMs(TestCompareRPMs):
         self.before_rpm.add_installed_file(
             "/etc/actualkernel.conf",
             rpmfluff.SourceFile("actualkernel.conf", kernel_conf),
-            isConfig=True
+            isConfig=True,
         )
         self.before_rpm.add_installed_symlink(
-            "/etc/kernel.conf",
-            "/etc/actualkernel.conf",
-            isConfig=True
+            "/etc/kernel.conf", "/etc/actualkernel.conf", isConfig=True,
         )
 
         self.after_rpm.add_installed_file(
             "/etc/kernel.conf",
             rpmfluff.SourceFile("kernel.conf", kernel_conf),
-            isConfig=True
+            isConfig=True,
         )
 
         self.inspection = "config"
         self.label = "config"
         self.result = "INFO"
         self.waiver_auth = "Not Waivable"
+
 
 class ConfigChangeFromSymlinkToFileRebaseCompareKoji(TestCompareKoji):
     def setUp(self):
@@ -605,24 +615,23 @@ class ConfigChangeFromSymlinkToFileRebaseCompareKoji(TestCompareKoji):
         self.before_rpm.add_installed_file(
             "/etc/actualkernel.conf",
             rpmfluff.SourceFile("actualkernel.conf", kernel_conf),
-            isConfig=True
+            isConfig=True,
         )
         self.before_rpm.add_installed_symlink(
-            "/etc/kernel.conf",
-            "/etc/actualkernel.conf",
-            isConfig=True
+            "/etc/kernel.conf", "/etc/actualkernel.conf", isConfig=True,
         )
 
         self.after_rpm.add_installed_file(
             "/etc/kernel.conf",
             rpmfluff.SourceFile("kernel.conf", kernel_conf),
-            isConfig=True
+            isConfig=True,
         )
 
         self.inspection = "config"
         self.label = "config"
         self.result = "INFO"
         self.waiver_auth = "Not Waivable"
+
 
 # different symlink destinations before and after (VERIFY)
 class ConfigSymlinkChangedValueCompareRPMs(TestCompareRPMs):
@@ -632,29 +641,26 @@ class ConfigSymlinkChangedValueCompareRPMs(TestCompareRPMs):
         self.before_rpm.add_installed_file(
             "/etc/actualkernel.conf",
             rpmfluff.SourceFile("actualkernel.conf", kernel_conf),
-            isConfig=True
+            isConfig=True,
         )
         self.before_rpm.add_installed_symlink(
-            "/etc/kernel.conf",
-            "/etc/actualkernel.conf",
-            isConfig=True
+            "/etc/kernel.conf", "/etc/actualkernel.conf", isConfig=True,
         )
 
         self.after_rpm.add_installed_file(
             "/etc/realkernel.conf",
             rpmfluff.SourceFile("kernel.conf", kernel_conf),
-            isConfig=True
+            isConfig=True,
         )
         self.after_rpm.add_installed_symlink(
-            "/etc/kernel.conf",
-            "/etc/realkernel.conf",
-            isConfig=True
+            "/etc/kernel.conf", "/etc/realkernel.conf", isConfig=True,
         )
 
         self.inspection = "config"
         self.label = "config"
         self.result = "VERIFY"
         self.waiver_auth = "Anyone"
+
 
 class ConfigSymlinkChangedValueCompareKoji(TestCompareKoji):
     def setUp(self):
@@ -663,29 +669,26 @@ class ConfigSymlinkChangedValueCompareKoji(TestCompareKoji):
         self.before_rpm.add_installed_file(
             "/etc/actualkernel.conf",
             rpmfluff.SourceFile("actualkernel.conf", kernel_conf),
-            isConfig=True
+            isConfig=True,
         )
         self.before_rpm.add_installed_symlink(
-            "/etc/kernel.conf",
-            "/etc/actualkernel.conf",
-            isConfig=True
+            "/etc/kernel.conf", "/etc/actualkernel.conf", isConfig=True,
         )
 
         self.after_rpm.add_installed_file(
             "/etc/realkernel.conf",
             rpmfluff.SourceFile("kernel.conf", kernel_conf),
-            isConfig=True
+            isConfig=True,
         )
         self.after_rpm.add_installed_symlink(
-            "/etc/kernel.conf",
-            "/etc/realkernel.conf",
-            isConfig=True
+            "/etc/kernel.conf", "/etc/realkernel.conf", isConfig=True,
         )
 
         self.inspection = "config"
         self.label = "config"
         self.result = "VERIFY"
         self.waiver_auth = "Anyone"
+
 
 # different symlink destinations before and after rebase (INFO)
 class ConfigSymlinkChangedValueRebaseCompareRPMs(TestCompareRPMs):
@@ -695,29 +698,26 @@ class ConfigSymlinkChangedValueRebaseCompareRPMs(TestCompareRPMs):
         self.before_rpm.add_installed_file(
             "/etc/actualkernel.conf",
             rpmfluff.SourceFile("actualkernel.conf", kernel_conf),
-            isConfig=True
+            isConfig=True,
         )
         self.before_rpm.add_installed_symlink(
-            "/etc/kernel.conf",
-            "/etc/actualkernel.conf",
-            isConfig=True
+            "/etc/kernel.conf", "/etc/actualkernel.conf", isConfig=True,
         )
 
         self.after_rpm.add_installed_file(
             "/etc/realkernel.conf",
             rpmfluff.SourceFile("kernel.conf", kernel_conf),
-            isConfig=True
+            isConfig=True,
         )
         self.after_rpm.add_installed_symlink(
-            "/etc/kernel.conf",
-            "/etc/realkernel.conf",
-            isConfig=True
+            "/etc/kernel.conf", "/etc/realkernel.conf", isConfig=True,
         )
 
         self.inspection = "config"
         self.label = "config"
         self.result = "INFO"
         self.waiver_auth = "Not Waivable"
+
 
 class ConfigSymlinkChangedValueRebaseCompareKoji(TestCompareKoji):
     def setUp(self):
@@ -726,23 +726,19 @@ class ConfigSymlinkChangedValueRebaseCompareKoji(TestCompareKoji):
         self.before_rpm.add_installed_file(
             "/etc/actualkernel.conf",
             rpmfluff.SourceFile("actualkernel.conf", kernel_conf),
-            isConfig=True
+            isConfig=True,
         )
         self.before_rpm.add_installed_symlink(
-            "/etc/kernel.conf",
-            "/etc/actualkernel.conf",
-            isConfig=True
+            "/etc/kernel.conf", "/etc/actualkernel.conf", isConfig=True
         )
 
         self.after_rpm.add_installed_file(
             "/etc/realkernel.conf",
             rpmfluff.SourceFile("kernel.conf", kernel_conf),
-            isConfig=True
+            isConfig=True,
         )
         self.after_rpm.add_installed_symlink(
-            "/etc/kernel.conf",
-            "/etc/realkernel.conf",
-            isConfig=True
+            "/etc/kernel.conf", "/etc/realkernel.conf", isConfig=True,
         )
 
         self.inspection = "config"
