@@ -3,7 +3,7 @@ PATH=/bin:/usr/bin:/sbin:/usr/sbin
 CWD="$(pwd)"
 
 # There is no mandoc package in Arch Linux
-curl -O https://mandoc.bsd.lv/snapshots/mandoc.tar.gz
+curl -O http://mandoc.bsd.lv/snapshots/mandoc.tar.gz
 SUBDIR="$(tar -tvf mandoc.tar.gz | head -n 1 | rev | cut -d ' ' -f 1 | rev)"
 tar -xvf mandoc.tar.gz
 cd ${SUBDIR}

@@ -6,7 +6,7 @@ apt-get -y install linux-headers-$(uname -r)
 
 # The mandoc package on Ubuntu lacks libmandoc.a and
 # header files, which we need to build rpminspect
-curl -O https://mandoc.bsd.lv/snapshots/mandoc.tar.gz
+curl -O http://mandoc.bsd.lv/snapshots/mandoc.tar.gz
 SUBDIR="$(tar -tvf mandoc.tar.gz | head -n 1 | rev | cut -d ' ' -f 1 | rev)"
 tar -xvf mandoc.tar.gz
 cd ${SUBDIR}
