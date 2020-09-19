@@ -448,7 +448,9 @@ class ConfigChangeFromFileToSymlinkCompareRPMs(TestCompareRPMs):
             isConfig=True,
         )
         self.after_rpm.add_installed_symlink(
-            "/etc/kernel.conf", "/etc/actualkernel.conf", isConfig=True,
+            "/etc/kernel.conf",
+            "/etc/actualkernel.conf",
+            isConfig=True,
         )
 
         self.inspection = "config"
