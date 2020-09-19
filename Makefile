@@ -52,6 +52,12 @@ check: setup
 		python3 -Bm unittest discover -v $(topdir)/test/ $${test_script} ; \
 	fi
 
+flake8:
+	python3 -m flake8
+
+black:
+	python3 -m black --check --diff $(topdir)/test/
+
 update-pot: setup
 	find src -type f -name "*.c" > po/POTFILES.new
 	find lib -type f -name "*.c" >> po/POTFILES.new
