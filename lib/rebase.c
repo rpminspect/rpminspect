@@ -51,6 +51,7 @@ bool is_rebase(struct rpminspect *ri)
     const char *an = NULL;
     const char *bv = NULL;
     const char *av = NULL;
+    string_entry_t *entry = NULL;
 
     assert(ri != NULL);
     assert(ri->peers != NULL);
@@ -84,6 +85,15 @@ bool is_rebase(struct rpminspect *ri)
                 if (!strcmp(bn, an) && strcmp(bv, av)) {
                     ri->rebase_build = 1;
                 }
+            }
+        }
+    }
+
+    /* if the package name is on the rebaseable list, it's valid */
+    if (init_rebaseable(ri)) {
+        TAILQ_FOREACH(entry, ri->rebaseable, items) {
+            if (!strcmp(entry->data, bn) && !strcmp(entry->data, an)) {
+                return true;
             }
         }
     }
