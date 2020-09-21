@@ -35,7 +35,7 @@ And even an additional last line.
 readme_with_whitespace_changes = """This is a README file.
 With multiple lines.             
 And one last line.
-"""
+"""  # noqa: W291
 
 
 # %doc becomes not a %doc file in non-rebase comparison (INFO)
