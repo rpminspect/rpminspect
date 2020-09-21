@@ -112,6 +112,7 @@ if python.found()
         'test_default.py',
         'test_desktop.py',
         'test_disttag.py',
+        'test_doc.py',
         'test_elf.py',
         'test_emptyrpm.py',
         'test_files.py',
