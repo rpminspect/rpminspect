@@ -295,6 +295,7 @@ struct rpminspect {
     /* Populated at runtime for the product release */
     fileinfo_t *fileinfo;
     caps_t *caps;
+    string_list_t *rebaseable;
 
     /* Koji information (from config file) */
     char *kojihub;             /* URL of Koji hub */

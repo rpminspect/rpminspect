@@ -125,6 +125,7 @@ void free_rpminspect(struct rpminspect *ri) {
         free(ri->caps);
     }
 
+    list_free(ri->rebaseable, free);
     list_free(ri->badwords, free);
 
     free_regex(ri->elf_path_include);

@@ -111,6 +111,7 @@ enum checksum { NULLSUM, MD5SUM, SHA1SUM, SHA256SUM };
 /* init.c */
 bool init_fileinfo(struct rpminspect *);
 bool init_caps(struct rpminspect *);
+bool init_rebaseable(struct rpminspect *);
 struct rpminspect *init_rpminspect(struct rpminspect *, const char *, const char *);
 
 /* free.c */

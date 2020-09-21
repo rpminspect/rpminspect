@@ -1123,6 +1123,70 @@ bool init_caps(struct rpminspect *ri)
 }
 
 /*
+ * Initialize the rebaseable list for the given product release and
+ * cache it.  Return the cached list.  If the file cannot be found,
+ * return false.
+ */
+bool init_rebaseable(struct rpminspect *ri)
+{
+    char *filename = NULL;
+    string_list_t *contents = NULL;
+    string_entry_t *entry = NULL;
+    char *line = NULL;
+    string_entry_t *newentry = NULL;
+
+    assert(ri != NULL);
+    assert(ri->vendor_data_dir != NULL);
+    assert(ri->product_release != NULL);
+
+    /* already initialized */
+    if (ri->rebaseable) {
+        return true;
+    }
+
+    /* the actual rebaseable list file */
+    xasprintf(&filename, "%s/%s/%s", ri->vendor_data_dir, REBASEABLE_DIR, ri->product_release);
+    assert(filename != NULL);
+    contents = read_file(filename);
+    free(filename);
+
+    if (contents == NULL) {
+        return false;
+    }
+
+    /* initialize the list */
+    ri->rebaseable = calloc(1, sizeof(*(ri->rebaseable)));
+    assert(ri->rebaseable != NULL);
+    TAILQ_INIT(ri->rebaseable);
+
+    /* add all the entries to the caps list */
+    TAILQ_FOREACH(entry, contents, items) {
+        if (entry->data == NULL) {
+            continue;
+        }
+
+        /* trim line ending characters */
+        line = entry->data;
+        line[strcspn(line, "\r\n")] = '\0';
+
+        /* skip blank lines and comments */
+        if (*line == '#' || *line == '\n' || *line == '\r' || !strcmp(line, "")) {
+            continue;
+        }
+
+        /* add the entry to the actual list */
+        newentry = calloc(1, sizeof(newentry));
+        assert(newentry != NULL);
+        newentry->data = strdup(line);
+        TAILQ_INSERT_TAIL(ri->rebaseable, newentry, items);
+    }
+
+    list_free(contents, free);
+
+    return true;
+}
+
+/*
  * Initialize a struct rpminspect.  Called by applications using
  * librpminspect before they began calling library functions.  If ri
  * passed in is NULL, the function will allocate and initialize a new

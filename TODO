@@ -12,16 +12,6 @@ the specifics will be noted during the work in progress.
 ! means the work is in-progress
 
 
-Mandatory test categories to migrate (top is highest priority):
----------------------------------------------------------------
- - Need to enable 'rebaseable' list checking in the upstream
-   inspection.  Per product release.
-
- - Add a 'rebase' inspection that just fails if packages are being
-   rebased but not on the rebaseable list.  This should be off by
-   default but then enabled in a maintenance profile.
-
-
 Unranked tests categories to migrate (might also decide to skip them):
 ----------------------------------------------------------------------
 !TEST_METADATA
@@ -45,6 +35,10 @@ Questions:
       files that contain 'taiwan' in the filename.  If they are not on
       the taiwan_flag_whitelist, they raise a VERIFY result that
       anyone can waive.
+
+    - Add a 'rebase' inspection that just fails if packages are being
+      rebased but not on the rebaseable list.  This should be off by
+      default but then enabled in a maintenance profile.  Maybe???
 
 
 Test categories that have been migrated:
