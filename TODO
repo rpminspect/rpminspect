@@ -16,6 +16,7 @@ Unranked tests categories to migrate (might also decide to skip them):
 ----------------------------------------------------------------------
 !TEST_METADATA
     need to get the fedora_without_redhat test implemented from checker
+    for the summary and description (call this the 'substring' inspection)
 !TEST_PATCHES
     completed License tag test (as INSPECT_LICENSE)
  TEST_POLITICS
@@ -28,9 +29,6 @@ Unranked tests categories to migrate (might also decide to skip them):
 
 
 Questions:
-    - Check for strings and filenames with 'fedora' without mention of
-      'redhat'?  I say no because it's subjective and seems pointless.
-
     - Do we need the politics check?  All it does is look for image
       files that contain 'taiwan' in the filename.  If they are not on
       the taiwan_flag_whitelist, they raise a VERIFY result that
