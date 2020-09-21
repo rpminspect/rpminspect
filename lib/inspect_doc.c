@@ -26,6 +26,8 @@
 
 #include "rpminspect.h"
 
+static bool reported = false;
+
 static bool doc_driver(struct rpminspect *ri, rpmfile_entry_t *file)
 {
     bool result = true;
@@ -35,7 +37,6 @@ static bool doc_driver(struct rpminspect *ri, rpmfile_entry_t *file)
     int exitcode;
     const char *name = NULL;
     const char *arch = NULL;
-    const char *minor = NULL;
     struct result_params params;
 
     assert(ri != NULL);
@@ -67,44 +68,43 @@ static bool doc_driver(struct rpminspect *ri, rpmfile_entry_t *file)
     params.header = HEADER_DOC;
     params.arch = arch;
     params.file = file->localpath;
-    params.waiverauth = WAIVABLE_BY_ANYONE;
     params.remedy = REMEDY_DOC;
     params.verb = VERB_CHANGED;
     params.noun = _("%doc ${FILE}");
 
     if (is_rebase(ri)) {
         params.severity = RESULT_INFO;
+        params.waiverauth = NOT_WAIVABLE;
     } else {
         params.severity = RESULT_VERIFY;
+        params.waiverauth = WAIVABLE_BY_ANYONE;
     }
 
     /* verify %doc values */
-    before_doc = file->flags & RPMFILE_CONFIG;
-    after_doc = file->flags & RPMFILE_CONFIG;
+    before_doc = file->peer_file->flags & RPMFILE_DOC;
+    after_doc = file->flags & RPMFILE_DOC;
 
     if (before_doc == after_doc) {
         /* compare the files */
         diff_output = run_cmd(&exitcode, DIFF_CMD, "-q", file->peer_file->fullpath, file->fullpath, NULL);
 
-        if (exitcode == 1) {
+        if (exitcode) {
             /* the files differ, see if it's only whitespace changes */
             result = false;
             free(diff_output);
             diff_output = run_cmd(&exitcode, DIFF_CMD, "-u", "-w", "-I^#.*", file->peer_file->fullpath, file->fullpath, NULL);
-
-            if (exitcode == 0) {
-                minor = _(" (comments/whitespace only)");
-            }
         }
 
-        if (result == false) {
+        if (!result) {
             /* always report content changes on %doc files as INFO */
             params.severity = RESULT_INFO;
+            params.waiverauth = NOT_WAIVABLE;
 
-            xasprintf(&params.msg, _("%%doc file content change for %s in %s on %s%s\n"), file->localpath, name, arch, minor);
+            xasprintf(&params.msg, _("%%doc file content change for %s in %s on %s%s\n"), file->localpath, name, arch, (exitcode == 0) ? _(" (comments/whitespace only)") : "");
             params.details = diff_output;
             add_result(ri, &params);
             free(params.msg);
+            reported = true;
         }
     } else if (before_doc != after_doc) {
         xasprintf(&params.msg, _("%%doc file change for %s in %s on %s (%smarked as %%doc -> %smarked as %%doc)\n"), file->localpath, name, arch,
@@ -112,6 +112,7 @@ static bool doc_driver(struct rpminspect *ri, rpmfile_entry_t *file)
         add_result(ri, &params);
         free(params.msg);
         result = false;
+        reported = true;
     }
 
     return result;
@@ -128,7 +129,7 @@ bool inspect_doc(struct rpminspect *ri) {
 
     result = foreach_peer_file(ri, doc_driver, true);
 
-    if (result) {
+    if (result && !reported) {
         init_result_params(&params);
         params.severity = RESULT_OK;
         params.waiverauth = NOT_WAIVABLE;
