@@ -26,6 +26,8 @@
 
 #include "rpminspect.h"
 
+static bool reported = false;
+
 static bool config_driver(struct rpminspect *ri, rpmfile_entry_t *file)
 {
     bool result = true;
@@ -123,6 +125,7 @@ static bool config_driver(struct rpminspect *ri, rpmfile_entry_t *file)
                 xasprintf(&params.msg, _("%%config file %s went from actual file to symlink (pointing to %s) in %s on %s"), file->localpath, after_dest, name, arch);
                 add_result(ri, &params);
                 free(params.msg);
+                reported = true;
 
                 if (params.severity == RESULT_VERIFY) {
                     result = false;
@@ -131,6 +134,7 @@ static bool config_driver(struct rpminspect *ri, rpmfile_entry_t *file)
                 xasprintf(&params.msg, _("%%config file %s was a symlink (pointing to %s), became an actual file in %s on %s"), file->peer_file->localpath, before_dest, name, arch);
                 add_result(ri, &params);
                 free(params.msg);
+                reported = true;
 
                 if (params.severity == RESULT_VERIFY) {
                     result = false;
@@ -141,6 +145,7 @@ static bool config_driver(struct rpminspect *ri, rpmfile_entry_t *file)
                 add_result(ri, &params);
                 free(params.msg);
                 free(params.details);
+                reported = true;
 
                 if (params.severity == RESULT_VERIFY) {
                     result = false;
@@ -172,6 +177,7 @@ static bool config_driver(struct rpminspect *ri, rpmfile_entry_t *file)
             add_result(ri, &params);
             free(params.msg);
             free(params.details);
+            reported = true;
         }
     } else if (before_config != after_config) {
         xasprintf(&params.msg, _("%%config file change for %s in %s on %s (%smarked as %%config -> %smarked as %%config)\n"), file->localpath, name, arch,
@@ -179,6 +185,7 @@ static bool config_driver(struct rpminspect *ri, rpmfile_entry_t *file)
         add_result(ri, &params);
         free(params.msg);
         result = false;
+        reported = true;
     }
 
     return result;
@@ -195,7 +202,7 @@ bool inspect_config(struct rpminspect *ri) {
 
     result = foreach_peer_file(ri, config_driver, true);
 
-    if (result) {
+    if (result && !reported) {
         init_result_params(&params);
         params.severity = RESULT_OK;
         params.waiverauth = NOT_WAIVABLE;
