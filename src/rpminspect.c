@@ -67,6 +67,7 @@ static void usage(const char *progname)
     printf(_("                             (implies -k)\n"));
     printf(_("  -k, --keep               Do not remove the comparison working files\n"));
     printf(_("  -d, --debug              Debugging mode output\n"));
+    printf(_("  -D, --dump-config        Dump configuration settings used (in YAML format)\n"));
     printf(_("  -v, --verbose            Verbose inspection output\n"));
     printf(_("                           when finished, display full path\n"));
     printf(_("  -?, --help               Display usage information\n"));
@@ -295,7 +296,7 @@ int main(int argc, char **argv) {
     int idx = 0;
     int ret = RI_INSPECTION_SUCCESS;
     glob_t expand;
-    char *short_options = "c:p:T:E:a:r:no:F:lw:t:fkdv\?V";
+    char *short_options = "c:p:T:E:a:r:no:F:lw:t:fkdDv\?V";
     struct option long_options[] = {
         { "config", required_argument, 0, 'c' },
         { "profile", required_argument, 0, 'p' },
@@ -312,6 +313,7 @@ int main(int argc, char **argv) {
         { "fetch-only", no_argument, 0, 'f' },
         { "keep", no_argument, 0, 'k' },
         { "debug", no_argument, 0, 'd' },
+        { "dump-config", no_argument, 0, 'D' },
         { "verbose", no_argument, 0, 'v' },
         { "help", no_argument, 0, '?' },
         { "version", no_argument, 0, 'V' },
@@ -335,6 +337,7 @@ int main(int argc, char **argv) {
     bool keep = false;
     bool list = false;
     bool verbose = false;
+    bool dump_config = false;
     int mode = S_IRWXU | S_IRGRP | S_IXGRP | S_IROTH | S_IXOTH;
     bool found = false;
     char *inspection = NULL;
@@ -459,6 +462,9 @@ int main(int argc, char **argv) {
                 break;
             case 'd':
                 set_debug_mode(true);
+                break;
+            case 'D':
+                dump_config = true;
                 break;
             case 'v':
                 verbose = true;
@@ -606,7 +612,9 @@ int main(int argc, char **argv) {
     }
 
     /* Display the configuration settings for this run */
-    dump_cfg(ri);
+    if (dump_config) {
+        dump_cfg(ri);
+    }
 
     /*
      * we should exactly one more argument (single build) or two arguments

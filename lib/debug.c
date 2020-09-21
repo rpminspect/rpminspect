@@ -60,10 +60,6 @@ void dump_cfg(const struct rpminspect *ri)
     ENTRY e;
     ENTRY *eptr;
 
-    if (!debug_mode) {
-        return;
-    }
-
     assert(ri != NULL);
 
     fprintf(stderr, "Program Configuration\n==========\n");
