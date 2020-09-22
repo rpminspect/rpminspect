@@ -25,13 +25,11 @@
 PATH=/bin:/usr/bin
 CMD="$(basename "${0}")"
 RPMINSPECT="${1}"
-CFG="${2}"
 
 usage() {
-    echo "Usage: ${CMD} [exec] [cfg]"
+    echo "Usage: ${CMD} [exec]"
     echo "Arguments:"
     echo "    exec     Full path to 'rpminspect' executable"
-    echo "    cfg      Full path to rpminspect configuration file (optional)"
 }
 
 if [ ! -x "${RPMINSPECT}" ]; then
@@ -65,6 +63,18 @@ if [ -z "${dist}" ] || [ "${dist}" = "%{dist}" ]; then
     exit 1
 fi
 
+# Set up rpminspect-data-fedora environment
+trap 'rm -rf "${TMPDATADIR}"' EXIT
+TMPDATADIR="$(mktemp -d)"
+cd ${TMPDATADIR}
+git clone https://github.com/rpminspect/rpminspect-data-fedora.git
+cd rpminspect-data-fedora
+CONF="${TMPDATADIR}/rpminspect-data-fedora/fedora.yaml"
+PROFILES="${TMPDATADIR}/rpminspect-data-fedora/profiles/fedora"
+TMPCONF="$(mktemp -p ${TMPDATADIR} -t rpminspect.yaml.XXXXXX)"
+sed -e "s|profiledir:.*$|profiledir: ${PROFILES}|g" < ${CONF} > ${TMPCONF}
+sed -i -e "s|vendor_data_dir:.*$|vendor_data_dir: $(dirname ${CONF})|g" ${TMPCONF}
+
 # Run comparison against the latest packages, or fail
 for package in ${packages}; do
     builds=$(koji list-builds --package="${package}" --state=COMPLETE | grep "${dist}" | cut -d ' ' -f 1 | sort -n | tail -n 2 | xargs)
@@ -76,18 +86,11 @@ for package in ${packages}; do
 
     echo "INFO: Comparing ${builds}"
 
-    if [ -z "${CFG}" ]; then
-        ${RPMINSPECT} -a x86_64,noarch,src -v -o "${package}".log "${builds}"
-        ret=$?
-    else
-        ${RPMINSPECT} -c "${CFG}" -a x86_64,noarch,src -v -o "${package}".log "${builds}"
-        ret=$?
-    fi
-
+    ${RPMINSPECT} -c "${TMPCONF}" -a x86_64,noarch,src -v -o "${package}".log ${builds}
+    ret=$?
     [ ${ret} -lt 2 ] || exit 1
 
     echo "INFO: Comparison complete: ${package}.log"
 done
 
-# All done, no errors
 exit 0

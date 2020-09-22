@@ -1,0 +1,32 @@
+name: Gate
+
+on:
+    push:
+        branches: [ master ]
+    pull_request:
+        branches: [ master ]
+
+jobs:
+    fedora:
+        # This job runs in a Docker container of the latest Fedora
+        # stable release but the host is 'ubuntu-latest' since that's
+        # what GitHub Actions offers that's Linux.
+        runs-on: ubuntu-latest
+        container: fedora:latest
+
+        # All of these steps run from within the main source
+        # directory, so think of that as your $PWD
+        steps:
+            # This means clone the git repo
+            - uses: actions/checkout@v2
+
+            # Within the container, install the build dependencies and
+            # test suite dependencies
+            - name: Install Build Dependencies
+              run: |
+                  dnf install -y make
+                  make instreqs
+
+            # Set up the source tree to build
+            - name: gate
+              run: make gate

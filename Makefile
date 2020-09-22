@@ -58,6 +58,9 @@ flake8:
 black:
 	python3 -m black --check --diff $(topdir)/test/
 
+gate: all
+	$(topdir)/utils/gate.sh $(topdir)/build/src/rpminspect
+
 update-pot: setup
 	find src -type f -name "*.c" > po/POTFILES.new
 	find lib -type f -name "*.c" >> po/POTFILES.new
