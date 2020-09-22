@@ -82,8 +82,6 @@ run_rpminspect() {
 # Run comparison against the latest packages, or fail
 for package in ${packages}; do
     builds=$(koji list-builds --package="${package}" --state=COMPLETE | grep "${dist}" | cut -d ' ' -f 1 | sort -n | tail -n 2 | xargs)
-    before=$(echo "${builds}" | cut -d ' ' -f 1)
-    after=$(echo "${builds}" | cut -d ' ' -f 2)
 
     if [ -z "${builds}" ]; then
         echo "ERROR: Unable to find builds for ${package}" >&2
