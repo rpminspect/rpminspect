@@ -24,7 +24,7 @@ jobs:
             # test suite dependencies
             - name: Install Build Dependencies
               run: |
-                  dnf install -y make
+                  dnf install -y make fedora-packager
                   make instreqs
 
             # Set up the source tree to build
