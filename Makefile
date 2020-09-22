@@ -2,12 +2,9 @@ MESON_BUILD_DIR = build
 topdir := $(shell realpath $(dir $(lastword $(MAKEFILE_LIST))))
 
 # ninja may be called something else
-NINJA := $(shell which ninja 2>/dev/null)
+NINJA := $(shell $(topdir)/utils/find-ninja.sh)
 ifeq ($(NINJA),)
-NINJA := $(shell which ninja-build 2>/dev/null)
-endif
-ifeq ($(NINJA),)
-NINJA = $(error "*** unable to find a suitable `ninja' command in the PATH")
+NINJA = $(error "*** unable to find a suitable `ninja' command")
 endif
 
 # Additional packages required to run the test suite, varies by OS
