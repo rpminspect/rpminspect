@@ -13,7 +13,7 @@ contents of the build artifacts to report:
 
 rpminspect is the frontend tool, and librpminspect provides the
 inspection engine and inspections.  The program is configured through
-the rpminspect.conf file and runtime data is provided by a
+the a configuration file and runtime data is provided by a
 vendor-specific rpminspect-data package.  The rpminspect-data-generic
 package in this source tree provides a template for constructing the
 vendor-specific data package.
@@ -23,6 +23,7 @@ Status
 
 ![CI](https://github.com/rpminspect/rpminspect/workflows/CI/badge.svg)
 ![Style Checks](https://github.com/rpminspect/rpminspect/workflows/Style%20Checks/badge.svg)
+![Gate](https://github.com/rpminspect/rpminspect/workflows/Gate/badge.svg)
 
 Build Types Support
 -------------------
@@ -120,10 +121,11 @@ programs:
     yum install desktop-file-utils gzip bzip2 xz elfutils gettext diffutils
 
 The 'shellsyntax' inspection uses the actual shell programs listed in
-the shells setting in the rpminspect.conf.  Since this can vary by
-system, you should make sure they are available in the system PATH.
-Or you can just not use the shellsyntax inspection.  The spec file for
-rpminspect includes weak dependencies on the default list of shells:
+the shells setting in the rpminspect configuration file.  Since this
+can vary by system, you should make sure they are available in the
+system PATH.  Or you can just not use the shellsyntax inspection.  The
+spec file for rpminspect includes weak dependencies on the default
+list of shells:
 
     yum install dash ksh zsh tcsh rc bash /usr/bin/annocheck
 
@@ -231,11 +233,11 @@ collection.  Fedora users can use yum:
 
 The first package is the actual program.  The rpminspect-data-fedora
 package delivers data files used by the various inspections performed
-by rpminspect.  It also delivers the rpminspect.conf configuration
-file.  Have a look at this file and make sure it works for your
-environment.  The idea is to support per-vendor data packages
-efficiently.  For example, if CentOS needs different settings, it
-should provide a rpminspect-data-centos package.
+by rpminspect.  It also delivers the rpminspect configuration file.
+Have a look at this file and make sure it works for your environment.
+The idea is to support per-vendor data packages efficiently.  For
+example, if CentOS needs different settings, it should provide a
+rpminspect-data-centos package.
 
 Ideally, the configuration file should not need changing.  If you do
 find mistakes, please file an issue or send a pull request to the
