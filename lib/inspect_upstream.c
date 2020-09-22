@@ -114,7 +114,7 @@ static bool upstream_driver(struct rpminspect *ri, rpmfile_entry_t *file)
     }
 
     /* Compare digests of source archive */
-    params.file = basename(file->fullpath);
+    params.file = file->localpath;
 
     if (file->peer_file == NULL) {
         xasprintf(&params.msg, _("New upstream source file `%s` appeared"), params.file)
@@ -228,7 +228,7 @@ bool inspect_upstream(struct rpminspect *ri)
         if (peer->before_files) {
             TAILQ_FOREACH(file, peer->before_files, items) {
                 if (file->peer_file == NULL) {
-                    xasprintf(&params.msg, _("Source RPM member `%s` removed"), basename(file->fullpath));
+                    xasprintf(&params.msg, _("Source file `%s` removed"), file->localpath);
                     add_result(ri, &params);
                     free(params.msg);
                     result = false;
