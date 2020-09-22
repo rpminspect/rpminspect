@@ -66,18 +66,24 @@ fi
 # Set up rpminspect-data-fedora environment
 trap 'rm -rf "${TMPDATADIR}"' EXIT
 TMPDATADIR="$(mktemp -d)"
-cd ${TMPDATADIR}
+cd "${TMPDATADIR}" || exit 1
 git clone https://github.com/rpminspect/rpminspect-data-fedora.git
-cd rpminspect-data-fedora
+cd rpminspect-data-fedora || exit 1
 CONF="${TMPDATADIR}/rpminspect-data-fedora/fedora.yaml"
 PROFILES="${TMPDATADIR}/rpminspect-data-fedora/profiles/fedora"
-TMPCONF="$(mktemp -p ${TMPDATADIR} -t rpminspect.yaml.XXXXXX)"
-sed -e "s|profiledir:.*$|profiledir: ${PROFILES}|g" < ${CONF} > ${TMPCONF}
-sed -i -e "s|vendor_data_dir:.*$|vendor_data_dir: $(dirname ${CONF})|g" ${TMPCONF}
+TMPCONF="$(mktemp -p "${TMPDATADIR}" -t rpminspect.yaml.XXXXXX)"
+sed -e "s|profiledir:.*$|profiledir: ${PROFILES}|g" < "${CONF}" > "${TMPCONF}"
+sed -i -e "s|vendor_data_dir:.*$|vendor_data_dir: $(dirname "${CONF}")|g" "${TMPCONF}"
+
+run_rpminspect() {
+    ${RPMINSPECT} -c "${TMPCONF}" -a x86_64,noarch,src -v "$@";
+}
 
 # Run comparison against the latest packages, or fail
 for package in ${packages}; do
     builds=$(koji list-builds --package="${package}" --state=COMPLETE | grep "${dist}" | cut -d ' ' -f 1 | sort -n | tail -n 2 | xargs)
+    before=$(echo "${builds}" | cut -d ' ' -f 1)
+    after=$(echo "${builds}" | cut -d ' ' -f 2)
 
     if [ -z "${builds}" ]; then
         echo "ERROR: Unable to find builds for ${package}" >&2
@@ -86,7 +92,8 @@ for package in ${packages}; do
 
     echo "INFO: Comparing ${builds}"
 
-    ${RPMINSPECT} -c "${TMPCONF}" -a x86_64,noarch,src -v -o "${package}".log ${builds}
+    opts="-o ${package}.log ${builds}"
+    run_rpminspect ${opts}
     ret=$?
     [ ${ret} -lt 2 ] || exit 1
 
