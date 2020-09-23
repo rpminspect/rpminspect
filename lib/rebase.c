@@ -92,7 +92,7 @@ bool is_rebase(struct rpminspect *ri)
     /* if the package name is on the rebaseable list, it's valid */
     if (init_rebaseable(ri)) {
         TAILQ_FOREACH(entry, ri->rebaseable, items) {
-            if (!strcmp(entry->data, bn) && !strcmp(entry->data, an)) {
+            if ((bn && !strcmp(entry->data, bn)) && (an && !strcmp(entry->data, an))) {
                 return true;
             }
         }
