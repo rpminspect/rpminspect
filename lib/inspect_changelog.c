@@ -133,6 +133,7 @@ static char *create_changelog(const string_list_t *changelog, const char *where)
 
     if (fd == -1) {
         fprintf(stderr, "*** unable to create temporary file %s: %s\n", output, strerror(errno));
+        free(output);
         return NULL;
     }
 
@@ -141,6 +142,7 @@ static char *create_changelog(const string_list_t *changelog, const char *where)
     if (logfp == NULL) {
         fprintf(stderr, "*** unable to open temporary file %s for writing: %s\n", output, strerror(errno));
         close(fd);
+        free(output);
         return NULL;
     }
 
@@ -151,6 +153,7 @@ static char *create_changelog(const string_list_t *changelog, const char *where)
     if (fclose(logfp) != 0) {
         fprintf(stderr, "*** unable to close writing to temporary file %s: %s\n", output, strerror(errno));
         close(fd);
+        free(output);
         return NULL;
     }
 
