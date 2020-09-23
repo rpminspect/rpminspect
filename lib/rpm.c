@@ -175,3 +175,47 @@ const char *get_rpm_header_arch(Header h)
         return headerGetString(h, RPMTAG_ARCH);
     }
 }
+
+/**
+ * @brief Given an RPM header and a tag constant, retrieve the tag
+ * value and add each array element as a member of a newly allocated
+ * string_list_t.  The caller is responsible for freeing the retruned
+ * string_list_t.  The tag constant must be a string array in the RPM
+ * header.  If the tag cannot be found or is empty, this function
+ * returns NULL.
+ *
+ * @param hdr RPM header
+ * @param tag RPM header tag constant (e.g., RPMTAG_SOURCE)
+ * @return Newly allocated string_list_t containg tag values.
+ */
+string_list_t *get_rpm_header_string_array(Header hdr, rpmTagVal tag)
+{
+    string_list_t *list = NULL;
+    rpmtd td = NULL;
+    rpmFlags flags = HEADERGET_MINMEM | HEADERGET_EXT | HEADERGET_ARGV;
+    string_entry_t *entry = NULL;
+    const char *val = NULL;
+
+    assert(hdr != NULL);
+
+    td = rpmtdNew();
+
+    if (!headerGet(hdr, tag, td, flags)) {
+        return NULL;
+    }
+
+    /* walk the tag and cram everything in to a list */
+    list = calloc(1, sizeof(*list));
+    assert(list != NULL);
+    TAILQ_INIT(list);
+
+    while ((val = rpmtdNextString(td)) != NULL) {
+        entry = calloc(1, sizeof(*entry));
+        assert(entry != NULL);
+        entry->data = strdup(val);
+        TAILQ_INSERT_TAIL(list, entry, items);
+    }
+
+    rpmtdFree(td);
+    return list;
+}
