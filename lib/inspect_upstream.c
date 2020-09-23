@@ -27,46 +27,8 @@
 
 /* Global variables */
 static string_list_t *source = NULL;
+static bool initialized = false;
 static struct result_params params;
-
-/*
- * Get the SOURCE tag from the RPM header and read in all of
- * the values from that tag and put them in the 'source' list.
- *
- * False is returned if the package lacks any Source entries.
- */
-static bool init_source(const rpmfile_entry_t *file)
-{
-    rpmtd td = NULL;
-    rpmFlags flags = HEADERGET_MINMEM | HEADERGET_EXT | HEADERGET_ARGV;
-    string_entry_t *entry = NULL;
-    const char *val = NULL;
-
-    assert(file != NULL);
-
-    /* get the SOURCE tag */
-    td = rpmtdNew();
-
-    if (!headerGet(file->rpm_header, RPMTAG_SOURCE, td, flags)) {
-        /* source packages that lack Source files are allowed */
-        return false;
-    }
-
-    /* walk the SOURCE tag and cram everything in to a list */
-    source = calloc(1, sizeof(*source));
-    assert(source != NULL);
-    TAILQ_INIT(source);
-
-    while ((val = rpmtdNextString(td)) != NULL) {
-        entry = calloc(1, sizeof(*entry));
-        assert(entry != NULL);
-        entry->data = strdup(val);
-        TAILQ_INSERT_TAIL(source, entry, items);
-    }
-
-    rpmtdFree(td);
-    return true;
-}
 
 /* Returns true if this file is a Source file */
 static bool is_source(const rpmfile_entry_t *file)
@@ -78,11 +40,14 @@ static bool is_source(const rpmfile_entry_t *file)
     assert(file != NULL);
 
     /* Initialize the source list once for the run */
+    if (!initialized) {
+        source = get_rpm_header_string_array(file->rpm_header, RPMTAG_SOURCE);
+        initialized = true;
+    }
+
     if (source == NULL) {
-        if (!init_source(file)) {
-            /* source package lacks any Source archives */
-            return false;
-        }
+        /* source package lacks any Source archives */
+        return false;
     }
 
     /* The RPM header stores basenames */
