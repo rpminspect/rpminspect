@@ -195,6 +195,7 @@ char *get_rpmtag_str(Header, rpmTagVal);
 char *get_nevr(Header);
 char *get_nevra(Header);
 const char *get_rpm_header_arch(Header);
+string_list_t *get_rpm_header_string_array(Header h, rpmTagVal tag);
 
 /* peers.c */
 rpmpeer_t *init_rpmpeer(void);
