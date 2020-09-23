@@ -138,7 +138,7 @@ int unpack_archive(const char *archive, const char *dest, const bool force) {
     archive_read_support_filter_all(input);
 #endif
     archive_read_support_format_all(input);
-    r = archive_read_open_filename(input, archive, 10240);
+    r = archive_read_open_filename(input, archive, 16384);
 
     if (r != ARCHIVE_OK) {
         fprintf(stderr, _("*** error opening %s\n"), archive);
