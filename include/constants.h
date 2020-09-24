@@ -183,6 +183,12 @@
 #define DIFF_CMD "diff"
 
 /**
+ * @def DIFFSTAT_CMD
+ * Executable providing diffstat(1).
+ */
+#define DIFFSTAT_CMD "diffstat"
+
+/**
  * @def DESKTOP_FILE_VALIDATE_CMD
  * Executable providing desktop-file-validate(1)
  */
@@ -432,5 +438,15 @@
  * Default ABI compat level security reporting threshold
  */
 #define DEFAULT_ABI_SECURITY_THRESHOLD 2
+
+/*
+ * Default file count reporting threshold for 'patches'
+ */
+#define DEFAULT_PATCH_FILE_THRESHOLD 20
+
+/*
+ * Default line count reporting threshold for 'patches'
+ */
+#define DEFAULT_PATCH_LINE_THRESHOLD 5000
 
 #endif

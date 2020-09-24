@@ -97,6 +97,8 @@ enum {
     BLOCK_MANPAGE,
     BLOCK_METADATA,
     BLOCK_OWNERSHIP,
+    BLOCK_PATCHES,
+    BLOCK_PATCH_FILENAMES,
     BLOCK_PATHMIGRATION,
     BLOCK_PRODUCTS,
     BLOCK_SECURITY_PATH_PREFIX,
@@ -571,6 +573,10 @@ static int read_cfgfile(struct rpminspect *ri, const char *filename)
                         group = BLOCK_KMIDIFF;
                     } else if (group == BLOCK_KMIDIFF && !strcmp(key, "kernel_filenames")) {
                         block = BLOCK_KERNEL_FILENAMES;
+                    } else if (!strcmp(key, "patches")) {
+                        group = BLOCK_PATCHES;
+                    } else if (group == BLOCK_PATCHES && !strcmp(key, "patch_ignore_list")) {
+                        block = BLOCK_PATCH_FILENAMES;
                     }
                 }
 
@@ -831,6 +837,22 @@ static int read_cfgfile(struct rpminspect *ri, const char *filename)
                             free(ri->kabi_filename);
                             ri->kabi_filename = strdup(t);
                         }
+                    } else if (group == BLOCK_PATCHES) {
+                        if (!strcmp(key, "file_count_threshold")) {
+                            ri->patch_file_threshold = strtol(t, 0, 10);
+
+                            if ((ri->patch_file_threshold == LONG_MIN || ri->patch_file_threshold == LONG_MAX) && errno == ERANGE) {
+                                warn("strtol()");
+                                ri->patch_file_threshold = DEFAULT_PATCH_FILE_THRESHOLD;
+                            }
+                        } else if (!strcmp(key, "line_count_threshold")) {
+                            ri->patch_line_threshold = strtol(t, 0, 10);
+
+                            if ((ri->patch_line_threshold == LONG_MIN || ri->patch_line_threshold == LONG_MAX) && errno == ERANGE) {
+                                warn("strtol()");
+                                ri->patch_line_threshold = DEFAULT_PATCH_LINE_THRESHOLD;
+                            }
+                        }
                     }
                 } else if (symbol == SYMBOL_ENTRY) {
                     if (block == BLOCK_BADWORDS) {
@@ -865,6 +887,8 @@ static int read_cfgfile(struct rpminspect *ri, const char *filename)
                         add_entry(&ri->forbidden_paths, t);
                     } else if (block == BLOCK_KERNEL_FILENAMES) {
                         add_entry(&ri->kernel_filenames, t);
+                    } else if (block == BLOCK_PATCH_FILENAMES) {
+                        add_entry(&ri->patch_ignore_list, t);
                     }
                 }
 
@@ -1224,6 +1248,8 @@ struct rpminspect *init_rpminspect(struct rpminspect *ri, const char *cfgfile, c
         ri->abi_security_threshold = DEFAULT_ABI_SECURITY_THRESHOLD;
         ri->kmidiff_suppression_file = strdup(ABI_SUPPRESSION_FILE);
         ri->kmidiff_debuginfo_path = strdup(DEBUG_PATH);
+        ri->patch_file_threshold = DEFAULT_PATCH_FILE_THRESHOLD;
+        ri->patch_line_threshold = DEFAULT_PATCH_LINE_THRESHOLD;
 
         /* Store full paths to all config files read */
         ri->cfgfiles = calloc(1, sizeof(*ri->cfgfiles));
