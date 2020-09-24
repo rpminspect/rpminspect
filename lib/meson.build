@@ -52,6 +52,7 @@ librpminspect_sources = [
     'inspect_modularity.c',
     'inspect_movedfiles.c',
     'inspect_ownership.c',
+    'inspect_patches.c',
     'inspect_pathmigration.c',
     'inspect_permissions.c',
     'inspect_removedfiles.c',

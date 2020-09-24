@@ -104,6 +104,7 @@ vendor:
     #modularity: off
     #movedfiles: off
     #ownership: off
+    #patches: off
     #pathmigration: off
     #permissions: off
     #removedfiles: off
@@ -483,3 +484,22 @@ kmidiff:
     #
     # NOTE:  This filename is relative to kabi_dir.
     kabi_filename: kabi_whitelist_${ARCH}
+
+patches:
+    # List of patch files to ignore in the 'patches' inspection.
+    # These should match the name as specified on a PatchN: line in
+    # the spec file.
+    #ignore_list:
+    #    - example.patch
+
+    # Reporting threshold for number of files that a patch modifies.
+    # If a patch modifies more than this number of files, the
+    # reporting message will mention it explicitly.  The default is
+    # 20 files.
+    file_count_threshold: 20
+
+    # Reporting theshold for number of lines that a patch modifies.
+    # If a patch modifies more than this number of lines, the
+    # reporting message will mention it explicitly.  The default is
+    # 5000 lines.
+    line_count_threshold: 5000

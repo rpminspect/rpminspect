@@ -430,6 +430,15 @@ struct rpminspect {
     /* list of valid kernel executable filenames (e.g., "vmlinux") */
     string_list_t *kernel_filenames;
 
+    /* list of patches to ignore in the 'patches' inspection */
+    string_list_t *patch_ignore_list;
+
+    /* file count reporting threshold in the 'patches' inspection */
+    long int patch_file_threshold;
+
+    /* line count reporting threshold in the 'patches' inspection */
+    long int patch_line_threshold;
+
     /*
      * directory where kernel ABI (KABI) files are kept (in any
      * subpackage in a kernel build)
@@ -797,5 +806,13 @@ typedef struct _abi_pkg_entry_t {
     bool all;
     string_list_t *dsos;
 } abi_pkg_entry_t;
+
+/*
+ * diffstat(1) findings for reporting in the patches inspection
+ */
+typedef struct _diffstat_t {
+    long int files;
+    long int lines;
+} diffstat_t;
 
 #endif

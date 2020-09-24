@@ -61,6 +61,7 @@ Requires:       bzip2
 Requires:       xz
 Requires:       gettext
 Requires:       diffutils
+Requires:       diffstat
 
 # If these are present, the xml inspection can try DTD validation.
 %if 0%{?rhel} >= 8 || 0%{?fedora}

@@ -178,6 +178,7 @@ void free_rpminspect(struct rpminspect *ri) {
     list_free(ri->kernel_filenames, free);
     free(ri->kabi_dir);
     free(ri->kabi_filename);
+    list_free(ri->patch_ignore_list, free);
 
     free_rpmpeer(ri->peers);
 

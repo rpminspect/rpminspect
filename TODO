@@ -17,8 +17,6 @@ Unranked tests categories to migrate (might also decide to skip them):
 !TEST_METADATA
     need to get the fedora_without_redhat test implemented from checker
     for the summary and description (call this the 'substring' inspection)
-!TEST_PATCHES
-    completed License tag test (as INSPECT_LICENSE)
  TEST_POLITICS
  TEST_REQUIRES
  TEST_RPATH
@@ -70,6 +68,7 @@ Test categories that have been migrated:
 *TEST_FILEMOVE (movedfiles)
 *TEST_ABI (abidiff and kmidiff)
 *TEST_CONFIG (config and doc)
+*TEST_PATCHES (patches)
 
 
 Test categories excluded (see MISSING):
