@@ -100,14 +100,14 @@ Runtime Requirements
 --------------------
 
 In addition to the libraries that will be linked in to librpminspect,
-there are a number of userspace programs required:
+there are a number of userspace programs used:
 
-    /usr/bin/desktop-file-validate
-    /usr/bin/zcmp
-    /usr/bin/bzcmp
-    /usr/bin/xzcmp
+    /usr/bin/desktop-file-validate [optional]
     /usr/bin/msgunfmt
     /usr/bin/diff
+    /usr/bin/abidiff [optional]
+    /usr/bin/kmidiff [optional]
+    /usr/bin/annocheck [optional]
 
 The provided spec file template uses the Fedora locations for these
 files, but in the program, they must be on the runtime system.
@@ -118,7 +118,7 @@ packages.
 In Fedora, for example, you can run the following to install these
 programs:
 
-    yum install desktop-file-utils gzip bzip2 xz elfutils gettext diffutils
+    yum install desktop-file-utils gettext diffutils libabigail /usr/bin/annocheck
 
 The 'shellsyntax' inspection uses the actual shell programs listed in
 the shells setting in the rpminspect configuration file.  Since this
@@ -127,7 +127,7 @@ system PATH.  Or you can just not use the shellsyntax inspection.  The
 spec file for rpminspect includes weak dependencies on the default
 list of shells:
 
-    yum install dash ksh zsh tcsh rc bash /usr/bin/annocheck
+    yum install dash ksh zsh tcsh rc bash
 
 An even easier option is to use the developer setup method described
 in the next section.
