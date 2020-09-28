@@ -3,6 +3,11 @@ name: Gate
 on:
     push:
         branches: [ master ]
+        paths:
+        - 'lib/**'
+        - 'src/**'
+        - 'include/**'
+        - 'test/**'
 
 jobs:
     fedora:
