@@ -26,6 +26,7 @@
 #include <unistd.h>
 #include <string.h>
 #include <errno.h>
+#include <err.h>
 #include <assert.h>
 
 #include "rpminspect.h"
@@ -103,6 +104,9 @@ static bool changedfiles_driver(struct rpminspect *ri, rpmfile_entry_t *file)
     string_entry_t *entry = NULL;
     char *before_tmp = NULL;
     char *after_tmp = NULL;
+    char *before_uncompressed_file = NULL;
+    char *after_uncompressed_file = NULL;
+    char *comptype = NULL;
     int fd;
     char magic[4];
     bool rebase = false;
@@ -210,40 +214,44 @@ static bool changedfiles_driver(struct rpminspect *ri, rpmfile_entry_t *file)
     /*
      * Compare compressed files
      *
-     * Use the 'cmp' program for each compression format supported to
-     * compare the contents.  This will result in a pass even if the
-     * compression levels changed between builds.
+     * Don't assume compressed files are text, so just perform a byte
+     * comparison and report if the uncompressed content has changed
+     * between builds.  The idea here is that the before and after
+     * build could change the compression ratios or other properties
+     * but the uncompressed content would be the same.
      */
-    if (!strcmp(type, "application/x-gzip")) {
-        params.details = run_cmd(&exitcode, ZCMP_CMD, file->peer_file->fullpath, file->fullpath, NULL);
+    if (!strcmp(type, "application/x-gzip") ||
+        !strcmp(type, "application/x-bzip2") ||
+        !strcmp(type, "application/x-xz")) {
+        /* uncompress the files to temporary files for comparison */
+        before_uncompressed_file = uncompress_file(ri, file->peer_file->fullpath, HEADER_CHANGEDFILES);
+        assert(before_uncompressed_file != NULL);
 
-        if (exitcode) {
-            xasprintf(&params.msg, _("Compressed gzip file %s changed content on %s."), file->localpath, arch);
+        after_uncompressed_file = uncompress_file(ri, file->fullpath, HEADER_CHANGEDFILES);
+        assert(after_uncompressed_file != NULL);
+
+        /* perform a byte comparison of the uncompressed files */
+        exitcode = filecmp(before_uncompressed_file, after_uncompressed_file);
+
+        if (exitcode == -1) {
+            /* an error occurred uncompressing the files */
+            warn("filecmp(%s, %s)", before_uncompressed_file, after_uncompressed_file);
+        } else if (exitcode == 1) {
+            /* the files are different, report */
+            comptype = strreplace(type, "application/x-", NULL);
+            assert(comptype != NULL);
+
+            xasprintf(&params.msg, _("Compressed %s file %s changed content on %s."), comptype, file->localpath, arch);
             params.verb = VERB_CHANGED;
             params.noun = file->localpath;
             add_changedfiles_result(ri, &params);
             result = false;
-        }
-    } else if (!strcmp(type, "application/x-bzip2")) {
-        params.details = run_cmd(&exitcode, BZCMP_CMD, file->peer_file->fullpath, file->fullpath, NULL);
 
-        if (exitcode) {
-            xasprintf(&params.msg, _("Compressed bzip2 file %s changed content on %s."), file->localpath, arch);
-            params.verb = VERB_CHANGED;
-            params.noun = file->localpath;
-            add_changedfiles_result(ri, &params);
-            result = false;
+            free(comptype);
         }
-    } else if (!strcmp(type, "application/x-xz")) {
-        params.details = run_cmd(&exitcode, XZCMP_CMD, file->peer_file->fullpath, file->fullpath, NULL);
 
-        if (exitcode) {
-            xasprintf(&params.msg, _("Compressed xz file %s changed content on %s."), file->localpath, arch);
-            params.verb = VERB_CHANGED;
-            params.noun = file->localpath;
-            add_changedfiles_result(ri, &params);
-            result = false;
-        }
+        free(before_uncompressed_file);
+        free(after_uncompressed_file);
     }
 
     if (!result) {
