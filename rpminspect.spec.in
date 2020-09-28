@@ -56,9 +56,6 @@ against the defined parameters.
 Summary:        Library providing RPM test API and functionality
 Group:          Development/Tools
 Requires:       desktop-file-utils
-Requires:       gzip
-Requires:       bzip2
-Requires:       xz
 Requires:       gettext
 Requires:       diffutils
 Requires:       diffstat

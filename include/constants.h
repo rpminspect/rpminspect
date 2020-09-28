@@ -152,24 +152,6 @@
  */
 
 /**
- * @def ZCMP_CMD
- * Executable providing zcmp(1)
- */
-#define ZCMP_CMD "zcmp"
-
-/**
- * @def BZCMP_CMD
- * Executable providing bzcmp(1)
- */
-#define BZCMP_CMD "bzcmp"
-
-/**
- * @def XZCMP_CMD
- * Executable providing xzcmp(1)
- */
-#define XZCMP_CMD "xzcmp"
-
-/**
  * @def MSGUNFMT_CMD
  * Executable providing msgunfmt(1)
  */

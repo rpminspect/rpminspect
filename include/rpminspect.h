@@ -260,6 +260,7 @@ void set_debug_mode(bool);
 void dump_cfg(const struct rpminspect *);
 
 /* readfile.c */
+void *read_file_bytes(const char *path, off_t *len);
 string_list_t *read_file(const char *);
 
 /* release.c */
@@ -367,5 +368,8 @@ struct hsearch_data *get_abi_dir_arg(struct rpminspect *ri, const size_t size, c
 
 /* uncompress.c */
 char *uncompress_file(struct rpminspect *ri, const char *infile, const char *subdir);
+
+/* filecmp.c */
+int filecmp(const char *x, const char *y);
 
 #endif
