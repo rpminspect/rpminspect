@@ -125,7 +125,9 @@ char *uncompress_file(struct rpminspect *ri, const char *infile, const char *sub
     archive_read_support_compression_gzip(input);
     archive_read_support_compression_grzip(input);
     archive_read_support_compression_lrzip(input);
+#ifdef ARCHIVE_FILTER_LZ4
     archive_read_support_compression_lz4(input);
+#endif
     archive_read_support_compression_lzma(input);
     archive_read_support_compression_lzop(input);
     archive_read_support_compression_none(input);
@@ -135,7 +137,9 @@ char *uncompress_file(struct rpminspect *ri, const char *infile, const char *sub
     archive_read_support_filter_gzip(input);
     archive_read_support_filter_grzip(input);
     archive_read_support_filter_lrzip(input);
+#ifdef ARCHIVE_FILTER_LZ4
     archive_read_support_filter_lz4(input);
+#endif
     archive_read_support_filter_lzma(input);
     archive_read_support_filter_lzop(input);
     archive_read_support_filter_none(input);
