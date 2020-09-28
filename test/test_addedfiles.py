@@ -21,7 +21,7 @@ import rpmfluff
 from baseclass import TestCompareRPMs
 
 
-class TestFileSizeGrowsAtThreshold(TestCompareRPMs):
+class FileSizeGrowsAtThreshold(TestCompareRPMs):
     """Assert when a file grows by exactly the configured threshold, VERIFY result occurs."""
 
     def setUp(self):
@@ -41,7 +41,7 @@ class TestFileSizeGrowsAtThreshold(TestCompareRPMs):
         self.waiver_auth = "Anyone"
 
 
-class TestFileSizeGrowsAboveThreshold(TestCompareRPMs):
+class FileSizeGrowsAboveThreshold(TestCompareRPMs):
     """Assert when a file grows by more than the configured threshold, VERIFY result occurs."""
 
     def setUp(self):
@@ -61,7 +61,7 @@ class TestFileSizeGrowsAboveThreshold(TestCompareRPMs):
         self.waiver_auth = "Anyone"
 
 
-class TestFileSizeGrowsBelowThreshold(TestCompareRPMs):
+class FileSizeGrowsBelowThreshold(TestCompareRPMs):
     """Assert when a file grows by less than the configured threshold, an INFO result occurs."""
 
     def setUp(self):

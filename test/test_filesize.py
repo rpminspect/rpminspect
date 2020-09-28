@@ -22,7 +22,7 @@ import rpmfluff
 from baseclass import TestCompareRPMs
 
 
-class TestFileSizeGrowsAtThreshold(TestCompareRPMs):
+class FileSizeGrowsAtThreshold(TestCompareRPMs):
     """Assert when a file grows by exactly the configured threshold, VERIFY result occurs."""
 
     def setUp(self):
@@ -43,7 +43,7 @@ class TestFileSizeGrowsAtThreshold(TestCompareRPMs):
         self.message = f"/some/file grew by +20% on {platform.machine()}"
 
 
-class TestFileSizeGrowsAboveThreshold(TestCompareRPMs):
+class FileSizeGrowsAboveThreshold(TestCompareRPMs):
     """Assert when a file grows by more than the configured threshold, VERIFY result occurs."""
 
     def setUp(self):
@@ -64,7 +64,7 @@ class TestFileSizeGrowsAboveThreshold(TestCompareRPMs):
         self.message = f"/some/file grew by +100% on {platform.machine()}"
 
 
-class TestFileSizeGrowsBelowThreshold(TestCompareRPMs):
+class FileSizeGrowsBelowThreshold(TestCompareRPMs):
     """Assert when a file grows by less than the configured threshold, an INFO result occurs."""
 
     def setUp(self):
@@ -84,7 +84,7 @@ class TestFileSizeGrowsBelowThreshold(TestCompareRPMs):
         self.message = f"/some/file grew by +10% on {platform.machine()}"
 
 
-class TestEmptyFileSizeGrows(TestCompareRPMs):
+class EmptyFileSizeGrows(TestCompareRPMs):
     """Assert when an empty file grows by, VERIFY result occurs."""
 
     def setUp(self):
@@ -104,7 +104,7 @@ class TestEmptyFileSizeGrows(TestCompareRPMs):
         self.message = f"/some/file became a non-empty file on {platform.machine()}"
 
 
-class TestFileSizeShrinksAtThreshold(TestCompareRPMs):
+class FileSizeShrinksAtThreshold(TestCompareRPMs):
     """Assert when a file shrinks by exactly the configured threshold, VERIFY result occurs."""
 
     def setUp(self):
@@ -124,7 +124,7 @@ class TestFileSizeShrinksAtThreshold(TestCompareRPMs):
         self.message = f"/some/file shrank by -20% on {platform.machine()}"
 
 
-class TestFileSizeShrinksAboveThreshold(TestCompareRPMs):
+class FileSizeShrinksAboveThreshold(TestCompareRPMs):
     """Assert when a file shrinks by more than the configured threshold, VERIFY result occurs."""
 
     def setUp(self):
@@ -144,7 +144,7 @@ class TestFileSizeShrinksAboveThreshold(TestCompareRPMs):
         self.message = f"/some/file shrank by -80% on {platform.machine()}"
 
 
-class TestFileSizeShrinksBelowThreshold(TestCompareRPMs):
+class FileSizeShrinksBelowThreshold(TestCompareRPMs):
     """Assert when a file shrinks by less than the configured threshold, an INFO result occurs."""
 
     def setUp(self):
@@ -164,7 +164,7 @@ class TestFileSizeShrinksBelowThreshold(TestCompareRPMs):
         self.message = f"/some/file shrank by -10% on {platform.machine()}"
 
 
-class TestFileSizeShrinksToEmpty(TestCompareRPMs):
+class FileSizeShrinksToEmpty(TestCompareRPMs):
     """Assert when a file shrinks to an empty file, VERIFY result occurs."""
 
     def setUp(self):
