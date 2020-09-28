@@ -365,4 +365,7 @@ void free_abi(abi_list_t *list);
 string_list_t *get_abi_suppressions(const struct rpminspect *ri, const char *suppression_file);
 struct hsearch_data *get_abi_dir_arg(struct rpminspect *ri, const size_t size, const char *suffix, const char *arg, const char *path, const int type);
 
+/* uncompress.c */
+char *uncompress_file(struct rpminspect *ri, const char *infile, const char *subdir);
+
 #endif

@@ -86,6 +86,7 @@ librpminspect_sources = [
     'runcmd.c',
     'strfuncs.c',
     'tty.c',
+    'uncompress.c',
     'unpack.c',
 ]
 librpminspect = library(
