@@ -3,8 +3,19 @@ name: CI
 on:
     push:
         branches: [ master ]
+        paths:
+        - 'lib/**'
+        - 'src/**'
+        - 'include/**'
+        - 'test/**'
+
     pull_request:
         branches: [ master ]
+        paths:
+        - 'lib/**'
+        - 'src/**'
+        - 'include/**'
+        - 'test/**'
 
 jobs:
     fedora-rawhide:

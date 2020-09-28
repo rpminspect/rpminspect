@@ -3,6 +3,11 @@ name: Extra CI
 on:
     push:
         branches: [ master ]
+        paths:
+        - 'lib/**'
+        - 'src/**'
+        - 'include/**'
+        - 'test/**'
 
 jobs:
     debian-testing:
