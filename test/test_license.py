@@ -23,7 +23,7 @@ from baseclass import TestSRPM, TestRPMs, TestKoji
 
 # Empty License tag fails on SRPM (BAD)
 class EmptyLicenseTagSRPM(TestSRPM):
-    @unittest.skip("requires self.license=None support in rpmfluff")
+    @unittest.skip("rpmbuild actually prevents this, but leave the test in case we need it in the future")
     def setUp(self):
         TestSRPM.setUp(self)
         self.rpm.license = ""
@@ -34,7 +34,7 @@ class EmptyLicenseTagSRPM(TestSRPM):
 
 # Empty License tag fails on RPMs (BAD)
 class EmptyLicenseTagRPMs(TestRPMs):
-    @unittest.skip("requires self.license=None support in rpmfluff")
+    @unittest.skip("rpmbuild actually prevents this, but leave the test in case we need it in the future")
     def setUp(self):
         TestRPMs.setUp(self)
         self.rpm.license = ""
@@ -45,7 +45,7 @@ class EmptyLicenseTagRPMs(TestRPMs):
 
 # Empty License tag fails on Koji build (BAD)
 class EmptyLicenseTagKoji(TestKoji):
-    @unittest.skip("requires self.license=None support in rpmfluff")
+    @unittest.skip("rpmbuild actually prevents this, but leave the test in case we need it in the future")
     def setUp(self):
         TestKoji.setUp(self)
         self.rpm.license = ""
