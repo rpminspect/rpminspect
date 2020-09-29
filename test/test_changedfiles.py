@@ -23,6 +23,7 @@ from baseclass import TestCompareRPMs, TestCompareKoji
 
 datadir = os.environ["RPMINSPECT_TEST_DATA_PATH"] + '/compression/'
 
+
 # gzip file does not change between builds despite having different
 # compression ratios
 class GzipFileNoChangeRPMs(TestCompareRPMs):
@@ -37,13 +38,16 @@ class GzipFileNoChangeRPMs(TestCompareRPMs):
             after_src = f.read()
 
         # create the test packages
-        self.before_rpm.add_installed_file("/usr/etc/firmware.gz", rpmfluff.SourceFile("firmware.gz", before_src))
-        self.after_rpm.add_installed_file("/usr/etc/firmware.gz", rpmfluff.SourceFile("firmware.gz", after_src))
+        self.before_rpm.add_installed_file("/usr/etc/firmware.gz",
+                                           rpmfluff.SourceFile("firmware.gz", before_src))
+        self.after_rpm.add_installed_file("/usr/etc/firmware.gz",
+                                          rpmfluff.SourceFile("firmware.gz", after_src))
 
         self.inspection = "changedfiles"
         self.label = "changed-files"
         self.result = "OK"
         self.waiver_auth = "Not Waivable"
+
 
 class GzipFileNoChangeKoji(TestCompareKoji):
     def setUp(self):
@@ -57,13 +61,16 @@ class GzipFileNoChangeKoji(TestCompareKoji):
             after_src = f.read()
 
         # create the test packages
-        self.before_rpm.add_installed_file("/usr/etc/firmware.gz", rpmfluff.SourceFile("firmware.gz", before_src))
-        self.after_rpm.add_installed_file("/usr/etc/firmware.gz", rpmfluff.SourceFile("firmware.gz", after_src))
+        self.before_rpm.add_installed_file("/usr/etc/firmware.gz",
+                                           rpmfluff.SourceFile("firmware.gz", before_src))
+        self.after_rpm.add_installed_file("/usr/etc/firmware.gz",
+                                          rpmfluff.SourceFile("firmware.gz", after_src))
 
         self.inspection = "changedfiles"
         self.label = "changed-files"
         self.result = "OK"
         self.waiver_auth = "Not Waivable"
+
 
 # gzip file changes between builds and has different compression ratios
 class GzipFileChangesRPMs(TestCompareRPMs):
@@ -78,13 +85,16 @@ class GzipFileChangesRPMs(TestCompareRPMs):
             after_src = f.read()
 
         # create the test packages
-        self.before_rpm.add_installed_file("/usr/etc/firmware.gz", rpmfluff.SourceFile("firmware.gz", before_src))
-        self.after_rpm.add_installed_file("/usr/etc/firmware.gz", rpmfluff.SourceFile("firmware.gz", after_src))
+        self.before_rpm.add_installed_file("/usr/etc/firmware.gz",
+                                           rpmfluff.SourceFile("firmware.gz", before_src))
+        self.after_rpm.add_installed_file("/usr/etc/firmware.gz",
+                                          rpmfluff.SourceFile("firmware.gz", after_src))
 
         self.inspection = "changedfiles"
         self.label = "changed-files"
         self.result = "VERIFY"
         self.waiver_auth = "Anyone"
+
 
 class GzipFileChangesKoji(TestCompareKoji):
     def setUp(self):
@@ -98,13 +108,16 @@ class GzipFileChangesKoji(TestCompareKoji):
             after_src = f.read()
 
         # create the test packages
-        self.before_rpm.add_installed_file("/usr/etc/firmware.gz", rpmfluff.SourceFile("firmware.gz", before_src))
-        self.after_rpm.add_installed_file("/usr/etc/firmware.gz", rpmfluff.SourceFile("firmware.gz", after_src))
+        self.before_rpm.add_installed_file("/usr/etc/firmware.gz",
+                                           rpmfluff.SourceFile("firmware.gz", before_src))
+        self.after_rpm.add_installed_file("/usr/etc/firmware.gz",
+                                          rpmfluff.SourceFile("firmware.gz", after_src))
 
         self.inspection = "changedfiles"
         self.label = "changed-files"
         self.result = "VERIFY"
         self.waiver_auth = "Anyone"
+
 
 # bzip2 file does not change between builds despite having different
 # compression ratios
@@ -120,13 +133,16 @@ class Bzip2FileNoChangeRPMs(TestCompareRPMs):
             after_src = f.read()
 
         # create the test packages
-        self.before_rpm.add_installed_file("/usr/etc/firmware.bz2", rpmfluff.SourceFile("firmware.bz2", before_src))
-        self.after_rpm.add_installed_file("/usr/etc/firmware.bz2", rpmfluff.SourceFile("firmware.bz2", after_src))
+        self.before_rpm.add_installed_file("/usr/etc/firmware.bz2",
+                                           rpmfluff.SourceFile("firmware.bz2", before_src))
+        self.after_rpm.add_installed_file("/usr/etc/firmware.bz2",
+                                          rpmfluff.SourceFile("firmware.bz2", after_src))
 
         self.inspection = "changedfiles"
         self.label = "changed-files"
         self.result = "OK"
         self.waiver_auth = "Not Waivable"
+
 
 class Bzip2FileNoChangeKoji(TestCompareKoji):
     def setUp(self):
@@ -140,13 +156,16 @@ class Bzip2FileNoChangeKoji(TestCompareKoji):
             after_src = f.read()
 
         # create the test packages
-        self.before_rpm.add_installed_file("/usr/etc/firmware.bz2", rpmfluff.SourceFile("firmware.bz2", before_src))
-        self.after_rpm.add_installed_file("/usr/etc/firmware.bz2", rpmfluff.SourceFile("firmware.bz2", after_src))
+        self.before_rpm.add_installed_file("/usr/etc/firmware.bz2",
+                                           rpmfluff.SourceFile("firmware.bz2", before_src))
+        self.after_rpm.add_installed_file("/usr/etc/firmware.bz2",
+                                          rpmfluff.SourceFile("firmware.bz2", after_src))
 
         self.inspection = "changedfiles"
         self.label = "changed-files"
         self.result = "OK"
         self.waiver_auth = "Not Waivable"
+
 
 # bzip2 file changes between builds and has different compression ratios
 class Bzip2FileChangesRPMs(TestCompareRPMs):
@@ -161,13 +180,16 @@ class Bzip2FileChangesRPMs(TestCompareRPMs):
             after_src = f.read()
 
         # create the test packages
-        self.before_rpm.add_installed_file("/usr/etc/firmware.bz2", rpmfluff.SourceFile("firmware.bz2", before_src))
-        self.after_rpm.add_installed_file("/usr/etc/firmware.bz2", rpmfluff.SourceFile("firmware.bz2", after_src))
+        self.before_rpm.add_installed_file("/usr/etc/firmware.bz2",
+                                           rpmfluff.SourceFile("firmware.bz2", before_src))
+        self.after_rpm.add_installed_file("/usr/etc/firmware.bz2",
+                                          rpmfluff.SourceFile("firmware.bz2", after_src))
 
         self.inspection = "changedfiles"
         self.label = "changed-files"
         self.result = "VERIFY"
         self.waiver_auth = "Anyone"
+
 
 class Bzip2FileChangesKoji(TestCompareKoji):
     def setUp(self):
@@ -181,13 +203,16 @@ class Bzip2FileChangesKoji(TestCompareKoji):
             after_src = f.read()
 
         # create the test packages
-        self.before_rpm.add_installed_file("/usr/etc/firmware.bz2", rpmfluff.SourceFile("firmware.bz2", before_src))
-        self.after_rpm.add_installed_file("/usr/etc/firmware.bz2", rpmfluff.SourceFile("firmware.bz2", after_src))
+        self.before_rpm.add_installed_file("/usr/etc/firmware.bz2",
+                                           rpmfluff.SourceFile("firmware.bz2", before_src))
+        self.after_rpm.add_installed_file("/usr/etc/firmware.bz2",
+                                          rpmfluff.SourceFile("firmware.bz2", after_src))
 
         self.inspection = "changedfiles"
         self.label = "changed-files"
         self.result = "VERIFY"
         self.waiver_auth = "Anyone"
+
 
 # xz file does not change between builds despite having different
 # compression ratios
@@ -203,13 +228,16 @@ class XzFileNoChangeRPMs(TestCompareRPMs):
             after_src = f.read()
 
         # create the test packages
-        self.before_rpm.add_installed_file("/usr/etc/firmware.xz", rpmfluff.SourceFile("firmware.xz", before_src))
-        self.after_rpm.add_installed_file("/usr/etc/firmware.xz", rpmfluff.SourceFile("firmware.xz", after_src))
+        self.before_rpm.add_installed_file("/usr/etc/firmware.xz",
+                                           rpmfluff.SourceFile("firmware.xz", before_src))
+        self.after_rpm.add_installed_file("/usr/etc/firmware.xz",
+                                          rpmfluff.SourceFile("firmware.xz", after_src))
 
         self.inspection = "changedfiles"
         self.label = "changed-files"
         self.result = "OK"
         self.waiver_auth = "Not Waivable"
+
 
 class XzFileNoChangeKoji(TestCompareKoji):
     def setUp(self):
@@ -223,13 +251,16 @@ class XzFileNoChangeKoji(TestCompareKoji):
             after_src = f.read()
 
         # create the test packages
-        self.before_rpm.add_installed_file("/usr/etc/firmware.xz", rpmfluff.SourceFile("firmware.xz", before_src))
-        self.after_rpm.add_installed_file("/usr/etc/firmware.xz", rpmfluff.SourceFile("firmware.xz", after_src))
+        self.before_rpm.add_installed_file("/usr/etc/firmware.xz",
+                                           rpmfluff.SourceFile("firmware.xz", before_src))
+        self.after_rpm.add_installed_file("/usr/etc/firmware.xz",
+                                          rpmfluff.SourceFile("firmware.xz", after_src))
 
         self.inspection = "changedfiles"
         self.label = "changed-files"
         self.result = "OK"
         self.waiver_auth = "Not Waivable"
+
 
 # xz file changes between builds and has different compression ratios
 class XzFileChangesRPMs(TestCompareRPMs):
@@ -244,13 +275,16 @@ class XzFileChangesRPMs(TestCompareRPMs):
             after_src = f.read()
 
         # create the test packages
-        self.before_rpm.add_installed_file("/usr/etc/firmware.xz", rpmfluff.SourceFile("firmware.xz", before_src))
-        self.after_rpm.add_installed_file("/usr/etc/firmware.xz", rpmfluff.SourceFile("firmware.xz", after_src))
+        self.before_rpm.add_installed_file("/usr/etc/firmware.xz",
+                                           rpmfluff.SourceFile("firmware.xz", before_src))
+        self.after_rpm.add_installed_file("/usr/etc/firmware.xz",
+                                          rpmfluff.SourceFile("firmware.xz", after_src))
 
         self.inspection = "changedfiles"
         self.label = "changed-files"
         self.result = "VERIFY"
         self.waiver_auth = "Anyone"
+
 
 class XzFileChangesKoji(TestCompareKoji):
     def setUp(self):
@@ -264,8 +298,10 @@ class XzFileChangesKoji(TestCompareKoji):
             after_src = f.read()
 
         # create the test packages
-        self.before_rpm.add_installed_file("/usr/etc/firmware.xz", rpmfluff.SourceFile("firmware.xz", before_src))
-        self.after_rpm.add_installed_file("/usr/etc/firmware.xz", rpmfluff.SourceFile("firmware.xz", after_src))
+        self.before_rpm.add_installed_file("/usr/etc/firmware.xz",
+                                           rpmfluff.SourceFile("firmware.xz", before_src))
+        self.after_rpm.add_installed_file("/usr/etc/firmware.xz",
+                                          rpmfluff.SourceFile("firmware.xz", after_src))
 
         self.inspection = "changedfiles"
         self.label = "changed-files"
