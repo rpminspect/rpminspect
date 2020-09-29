@@ -23,7 +23,7 @@ from baseclass import TestSRPM, TestCompareSRPM
 from baseclass import AFTER_NAME, AFTER_REL
 
 # test data
-patch_file = '''--- fortify.c.orig      2020-09-22 14:45:41.592625821 -0400
+patch_file = """--- fortify.c.orig      2020-09-22 14:45:41.592625821 -0400
 +++ fortify.c   2020-09-29 10:43:21.829954365 -0400
 @@ -1,13 +1,20 @@
  #include <stdio.h>
@@ -47,9 +47,9 @@ patch_file = '''--- fortify.c.orig      2020-09-22 14:45:41.592625821 -0400
 +
 +    return EXIT_SUCCESS;
  }
-'''
+"""
 
-patch_file_changed = '''--- fortify.c.orig      2020-09-22 14:45:41.592625821 -0400
+patch_file_changed = """--- fortify.c.orig      2020-09-22 14:45:41.592625821 -0400
 +++ fortify.c   2020-09-29 10:51:05.922483632 -0400
 @@ -1,13 +1,18 @@
  #include <stdio.h>
@@ -71,9 +71,9 @@ patch_file_changed = '''--- fortify.c.orig      2020-09-22 14:45:41.592625821 -0
 +
 +    return EXIT_SUCCESS;
  }
-'''
+"""
 
-patch_file_threshold = '''diff --git a/test/data/forbidden-ipv6.c b/test/data/forbidden-ipv6.c
+patch_file_threshold = """diff --git a/test/data/forbidden-ipv6.c b/test/data/forbidden-ipv6.c
 index 12295de..dd2a9e9 100644
 --- a/test/data/forbidden-ipv6.c
 +++ b/test/data/forbidden-ipv6.c
@@ -149,7 +149,7 @@ index ffc4206..12e7808 100644
 -    return x / y;
 +    return (x / y);
  }
-'''  # noqa: W293
+"""  # noqa: W293
 
 
 # patch under 4 bytes (BAD)
@@ -195,8 +195,12 @@ class PatchChangedNotRebaseCompare(TestCompareSRPM):
     def setUp(self):
         super().setUp()
 
-        self.before_rpm.add_patch(rpmfluff.SourceFile("some.patch", patch_file), False)
-        self.after_rpm.add_patch(rpmfluff.SourceFile("some.patch", patch_file_changed), False)
+        self.before_rpm.add_patch(
+            rpmfluff.SourceFile("some.patch", patch_file), False
+        )
+        self.after_rpm.add_patch(
+            rpmfluff.SourceFile("some.patch", patch_file_changed), False
+        )
 
         self.inspection = "patches"
         self.label = "patches"
@@ -208,8 +212,12 @@ class PatchChangedInRebaseCompare(TestCompareSRPM):
     def setUp(self):
         super().setUp(after=(AFTER_NAME, "47.0", AFTER_REL))
 
-        self.before_rpm.add_patch(rpmfluff.SourceFile("some.patch", patch_file), False)
-        self.after_rpm.add_patch(rpmfluff.SourceFile("some.patch", patch_file_changed), False)
+        self.before_rpm.add_patch(
+            rpmfluff.SourceFile("some.patch", patch_file), False
+        )
+        self.after_rpm.add_patch(
+            rpmfluff.SourceFile("some.patch", patch_file_changed), False
+        )
 
         self.inspection = "patches"
         self.label = "patches"
@@ -222,7 +230,9 @@ class PatchAddedNotRebaseCompare(TestCompareSRPM):
     def setUp(self):
         super().setUp()
 
-        self.after_rpm.add_patch(rpmfluff.SourceFile("some.patch", patch_file), False)
+        self.after_rpm.add_patch(
+            rpmfluff.SourceFile("some.patch", patch_file), False
+        )
 
         self.inspection = "patches"
         self.label = "patches"
@@ -235,7 +245,9 @@ class PatchAddedInRebaseCompare(TestCompareSRPM):
     def setUp(self):
         super().setUp(after=(AFTER_NAME, "47.0", AFTER_REL))
 
-        self.after_rpm.add_patch(rpmfluff.SourceFile("some.patch", patch_file), False)
+        self.after_rpm.add_patch(
+            rpmfluff.SourceFile("some.patch", patch_file), False
+        )
 
         self.inspection = "patches"
         self.label = "patches"
@@ -249,7 +261,9 @@ class PatchTouchesTooManyFiles(TestSRPM):
         super().setUp()
 
         # add the large patch
-        self.rpm.add_patch(rpmfluff.SourceFile("some.patch", patch_file_threshold), False)
+        self.rpm.add_patch(
+            rpmfluff.SourceFile("some.patch", patch_file_threshold), False
+        )
 
         self.inspection = "patches"
         self.label = "patches"
@@ -276,7 +290,9 @@ class PatchTouchesTooManyFilesCompare(TestCompareSRPM):
         super().setUp()
 
         # add the large patch
-        self.after_rpm.add_patch(rpmfluff.SourceFile("some.patch", patch_file_threshold), False)
+        self.after_rpm.add_patch(
+            rpmfluff.SourceFile("some.patch", patch_file_threshold), False
+        )
 
         self.inspection = "patches"
         self.label = "patches"
@@ -304,7 +320,9 @@ class PatchTouchesTooManyLines(TestSRPM):
         super().setUp()
 
         # add the large patch
-        self.rpm.add_patch(rpmfluff.SourceFile("some.patch", patch_file_threshold), False)
+        self.rpm.add_patch(
+            rpmfluff.SourceFile("some.patch", patch_file_threshold), False
+        )
 
         self.inspection = "patches"
         self.label = "patches"
@@ -331,7 +349,9 @@ class PatchTouchesTooManyLinesCompare(TestCompareSRPM):
         super().setUp()
 
         # add the large patch
-        self.after_rpm.add_patch(rpmfluff.SourceFile("some.patch", patch_file_threshold), False)
+        self.after_rpm.add_patch(
+            rpmfluff.SourceFile("some.patch", patch_file_threshold), False
+        )
 
         self.inspection = "patches"
         self.label = "patches"
