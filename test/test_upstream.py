@@ -133,7 +133,7 @@ class SameVerChangeUpstreamCompareSRPM(TestCompareSRPM):
 
     def setUp(self):
         # recreate the after RPM with the same version as the before
-        super().setUp(after=(BEFORE_NAME, BEFORE_VER, AFTER_REL))
+        super().setUp(same=True)
 
         # add the same installed target file with different sources
         self.before_rpm.add_installed_file(
@@ -160,7 +160,7 @@ class SameVerRemoveUpstreamCompareSRPM(TestCompareSRPM):
 
     def setUp(self):
         # recreate the after RPM with the same version as the before
-        super().setUp(after=(BEFORE_NAME, BEFORE_VER, AFTER_REL))
+        super().setUp(same=True)
 
         # simulate a removed source file by not including it in the after rpm
         self.before_rpm.add_installed_file(
@@ -204,7 +204,7 @@ class SameVerChangeUpstreamCompareKoji(TestCompareKoji):
 
     def setUp(self):
         # recreate the after RPM with the same version as the before
-        super().setUp(after=(BEFORE_NAME, BEFORE_VER, AFTER_REL))
+        super().setUp(same=True)
 
         # add the same installed target file with different sources
         self.before_rpm.add_installed_file(
@@ -231,7 +231,7 @@ class SameVerRemoveUpstreamCompareKoji(TestCompareKoji):
 
     def setUp(self):
         # recreate the after RPM with the same version as the before
-        super().setUp(after=(BEFORE_NAME, BEFORE_VER, AFTER_REL))
+        super().setUp(same=True)
 
         # simulate a removed source file by not including it in the after rpm
         self.before_rpm.add_installed_file(
