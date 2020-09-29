@@ -120,31 +120,34 @@ char *uncompress_file(struct rpminspect *ri, const char *infile, const char *sub
 
     /* initialize only compression filters in libarchive */
 #if ARCHIVE_VERSION_NUMBER < 3000000
-#ifdef ARCHIVE_FILTER_BZIP2
+#ifdef ARCHIVE_COMPRESSION_BZIP2
     archive_read_support_compression_bzip2(input);
 #endif
-#ifdef ARCHIVE_FILTER_COMPRESS
+#ifdef ARCHIVE_COMPRESSION_COMPRESS
     archive_read_support_compression_compress(input);
 #endif
-#ifdef ARCHIVE_FILTER_GZIP
+#ifdef ARCHIVE_COMPRESSION_GZIP
     archive_read_support_compression_gzip(input);
 #endif
-#ifdef ARCHIVE_FILTER_GRZIP
+#ifdef ARCHIVE_COMPRESSION_GRZIP
     archive_read_support_compression_grzip(input);
 #endif
-#ifdef ARCHIVE_FILTER_LRZIP
+#ifdef ARCHIVE_COMPRESSION_LRZIP
     archive_read_support_compression_lrzip(input);
 #endif
-#ifdef ARCHIVE_FILTER_LZ4
+#ifdef ARCHIVE_COMPRESSION_LZ4
     archive_read_support_compression_lz4(input);
 #endif
-#ifdef ARCHIVE_FILTER_LZMA
+#ifdef ARCHIVE_COMPRESSION_LZMA
     archive_read_support_compression_lzma(input);
 #endif
-#ifdef ARCHIVE_FILTER_LZOP
+#ifdef ARCHIVE_COMPRESSION_LZOP
     archive_read_support_compression_lzop(input);
 #endif
-#ifdef ARCHIVE_FILTER_NONE
+#ifdef ARCHIVE_COMPRESSION_XZ
+    archive_read_support_compression_xz(input);
+#endif
+#ifdef ARCHIVE_COMPRESSION_NONE
     archive_read_support_compression_none(input);
 #endif
 #else /* ARCHIVE_VERSION_NUMBER */
@@ -171,6 +174,9 @@ char *uncompress_file(struct rpminspect *ri, const char *infile, const char *sub
 #endif
 #ifdef ARCHIVE_FILTER_LZOP
     archive_read_support_filter_lzop(input);
+#endif
+#ifdef ARCHIVE_FILTER_XZ
+    archive_read_support_filter_xz(input);
 #endif
 #ifdef ARCHIVE_FILTER_NONE
     archive_read_support_filter_none(input);
