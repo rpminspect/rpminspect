@@ -20,7 +20,6 @@ import yaml
 import rpmfluff
 
 from baseclass import TestSRPM, TestCompareSRPM
-from baseclass import AFTER_NAME, AFTER_REL
 
 # test data
 patch_file = """--- fortify.c.orig      2020-09-22 14:45:41.592625821 -0400
@@ -208,7 +207,7 @@ class PatchChangedNotRebaseCompare(TestCompareSRPM):
 
 class PatchChangedInRebaseCompare(TestCompareSRPM):
     def setUp(self):
-        super().setUp(after=(AFTER_NAME, "47.0", AFTER_REL))
+        super().setUp(rebase=True)
 
         self.before_rpm.add_patch(rpmfluff.SourceFile("some.patch", patch_file), False)
         self.after_rpm.add_patch(
@@ -237,7 +236,7 @@ class PatchAddedNotRebaseCompare(TestCompareSRPM):
 # patch added in a rebase (INFO)
 class PatchAddedInRebaseCompare(TestCompareSRPM):
     def setUp(self):
-        super().setUp(after=(AFTER_NAME, "47.0", AFTER_REL))
+        super().setUp(rebase=True)
 
         self.after_rpm.add_patch(rpmfluff.SourceFile("some.patch", patch_file), False)
 

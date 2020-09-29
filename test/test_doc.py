@@ -19,7 +19,7 @@
 import rpmfluff
 
 from baseclass import TestCompareRPMs, TestCompareKoji
-from baseclass import AFTER_NAME, AFTER_REL
+from baseclass import AFTER_NAME
 
 readme = """This is a README file.
 With multiple lines.
@@ -86,7 +86,7 @@ class DocBecomesNonDocCompareKoji(TestCompareKoji):
 # %doc becomes not a %doc file in rebase comparison (INFO)
 class DocBecomesNonDocRebaseCompareRPMs(TestCompareRPMs):
     def setUp(self):
-        super().setUp(after=(AFTER_NAME, "47.0", AFTER_REL))
+        super().setUp(rebase=True)
 
         self.before_rpm.add_installed_file(
             "/opt/sfw/documentation/%s/README" % AFTER_NAME,
@@ -108,7 +108,7 @@ class DocBecomesNonDocRebaseCompareRPMs(TestCompareRPMs):
 
 class DocBecomesNonDocRebaseCompareKoji(TestCompareKoji):
     def setUp(self):
-        super().setUp(after=(AFTER_NAME, "47.0", AFTER_REL))
+        super().setUp(rebase=True)
 
         self.before_rpm.add_installed_file(
             "/opt/sfw/documentation/%s/README" % AFTER_NAME,
@@ -176,7 +176,7 @@ class NonDocBecomesDocCompareKoji(TestCompareKoji):
 # not a %doc becomes a %doc file in rebase comparison (INFO)
 class NonDocBecomesDocRebaseCompareRPMs(TestCompareRPMs):
     def setUp(self):
-        super().setUp(after=(AFTER_NAME, "47.0", AFTER_REL))
+        super().setUp(rebase=True)
 
         self.before_rpm.add_installed_file(
             "/opt/sfw/documentation/%s/README" % AFTER_NAME,
@@ -198,7 +198,7 @@ class NonDocBecomesDocRebaseCompareRPMs(TestCompareRPMs):
 
 class NonDocBecomesDocRebaseCompareKoji(TestCompareKoji):
     def setUp(self):
-        super().setUp(after=(AFTER_NAME, "47.0", AFTER_REL))
+        super().setUp(rebase=True)
 
         self.before_rpm.add_installed_file(
             "/opt/sfw/documentation/%s/README" % AFTER_NAME,
@@ -265,7 +265,7 @@ class DocChangesWhitespaceCompareKoji(TestCompareKoji):
 
 class DocChangesWhitespaceRebaseCompareRPMs(TestCompareRPMs):
     def setUp(self):
-        super().setUp(after=(AFTER_NAME, "47.0", AFTER_REL))
+        super().setUp(rebase=True)
 
         self.before_rpm.add_installed_file(
             "/opt/sfw/documentation/%s/README" % AFTER_NAME,
@@ -287,7 +287,7 @@ class DocChangesWhitespaceRebaseCompareRPMs(TestCompareRPMs):
 
 class DocChangesWhitespaceRebaseCompareKoji(TestCompareKoji):
     def setUp(self):
-        super().setUp(after=(AFTER_NAME, "47.0", AFTER_REL))
+        super().setUp(rebase=True)
 
         self.before_rpm.add_installed_file(
             "/opt/sfw/documentation/%s/README" % AFTER_NAME,
@@ -354,7 +354,7 @@ class DocChangesContentCompareKoji(TestCompareKoji):
 
 class DocChangesContentRebaseCompareRPMs(TestCompareRPMs):
     def setUp(self):
-        super().setUp(after=(AFTER_NAME, "47.0", AFTER_REL))
+        super().setUp(rebase=True)
 
         self.before_rpm.add_installed_file(
             "/opt/sfw/documentation/%s/README" % AFTER_NAME,
@@ -376,7 +376,7 @@ class DocChangesContentRebaseCompareRPMs(TestCompareRPMs):
 
 class DocChangesContentRebaseCompareKoji(TestCompareKoji):
     def setUp(self):
-        super().setUp(after=(AFTER_NAME, "47.0", AFTER_REL))
+        super().setUp(rebase=True)
 
         self.before_rpm.add_installed_file(
             "/opt/sfw/documentation/%s/README" % AFTER_NAME,

@@ -33,6 +33,7 @@ BEFORE_REL = "1"
 
 AFTER_NAME = BEFORE_NAME
 AFTER_VER = "0.1"
+AFTER_REBASE_VER = "47.0"
 AFTER_REL = "2"
 
 # Set this to True to keep rpminspect results (useful to debug the test
@@ -254,25 +255,22 @@ class TestSRPM(RequiresRpminspect):
 
 # Base test case class that compares a before and after SRPM
 class TestCompareSRPM(RequiresRpminspect):
-    def setUp(self, before=None, after=None):
+    def setUp(self, rebase=False, same=False):
         super().setUp()
 
-        if before is None:
-            before_name = BEFORE_NAME
-            before_ver = BEFORE_VER
-            before_rel = BEFORE_REL
+        if rebase:
+            after_ver = AFTER_REBASE_VER
         else:
-            (before_name, before_ver, before_rel) = before
-
-        if after is None:
-            after_name = AFTER_NAME
             after_ver = AFTER_VER
-            after_rel = AFTER_REL
-        else:
-            (after_name, after_ver, after_rel) = after
 
-        self.before_rpm = rpmfluff.SimpleRpmBuild(before_name, before_ver, before_rel)
-        self.after_rpm = rpmfluff.SimpleRpmBuild(after_name, after_ver, after_rel)
+        if same:
+            after_name = BEFORE_NAME
+            after_ver = BEFORE_VER
+        else:
+            after_name = AFTER_NAME
+
+        self.before_rpm = rpmfluff.SimpleRpmBuild(BEFORE_NAME, BEFORE_VER, BEFORE_REL)
+        self.after_rpm = rpmfluff.SimpleRpmBuild(after_name, after_ver, AFTER_REL)
 
         # turn off all rpmbuild post processing stuff for the purposes of testing
         self.before_rpm.header += "\n%global __os_install_post %{nil}\n"

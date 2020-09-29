@@ -19,7 +19,6 @@
 import rpmfluff
 
 from baseclass import TestCompareRPMs, TestCompareKoji
-from baseclass import AFTER_NAME, AFTER_REL
 
 kernel_conf = """#
 # Select operating system kernel
@@ -121,7 +120,7 @@ class ConfigBecomesNonConfigCompareKoji(TestCompareKoji):
 # %config becomes not a %config file in rebase comparison (INFO)
 class ConfigBecomesNonConfigRebaseCompareRPMs(TestCompareRPMs):
     def setUp(self):
-        super().setUp(after=(AFTER_NAME, "47.0", AFTER_REL))
+        super().setUp(rebase=True)
 
         self.before_rpm.add_installed_file(
             "/etc/kernel.conf",
@@ -143,7 +142,7 @@ class ConfigBecomesNonConfigRebaseCompareRPMs(TestCompareRPMs):
 
 class ConfigBecomesNonConfigRebaseCompareKoji(TestCompareKoji):
     def setUp(self):
-        super().setUp(after=(AFTER_NAME, "47.0", AFTER_REL))
+        super().setUp(rebase=True)
 
         self.before_rpm.add_installed_file(
             "/etc/kernel.conf",
@@ -211,7 +210,7 @@ class NonConfigBecomesConfigCompareKoji(TestCompareKoji):
 # not a %config becomes a %config file in rebase comparison (INFO)
 class NonConfigBecomesConfigRebaseCompareRPMs(TestCompareRPMs):
     def setUp(self):
-        super().setUp(after=(AFTER_NAME, "47.0", AFTER_REL))
+        super().setUp(rebase=True)
 
         self.before_rpm.add_installed_file(
             "/etc/kernel.conf",
@@ -233,7 +232,7 @@ class NonConfigBecomesConfigRebaseCompareRPMs(TestCompareRPMs):
 
 class NonConfigBecomesConfigRebaseCompareKoji(TestCompareKoji):
     def setUp(self):
-        super().setUp(after=(AFTER_NAME, "47.0", AFTER_REL))
+        super().setUp(rebase=True)
 
         self.before_rpm.add_installed_file(
             "/etc/kernel.conf",
@@ -300,7 +299,7 @@ class ConfigChangesWhitespaceCompareKoji(TestCompareKoji):
 
 class ConfigChangesWhitespaceRebaseCompareRPMs(TestCompareRPMs):
     def setUp(self):
-        super().setUp(after=(AFTER_NAME, "47.0", AFTER_REL))
+        super().setUp(rebase=True)
 
         self.before_rpm.add_installed_file(
             "/etc/kernel.conf",
@@ -322,7 +321,7 @@ class ConfigChangesWhitespaceRebaseCompareRPMs(TestCompareRPMs):
 
 class ConfigChangesWhitespaceRebaseCompareKoji(TestCompareKoji):
     def setUp(self):
-        super().setUp(after=(AFTER_NAME, "47.0", AFTER_REL))
+        super().setUp(rebase=True)
 
         self.before_rpm.add_installed_file(
             "/etc/kernel.conf",
@@ -389,7 +388,7 @@ class ConfigChangesContentCompareKoji(TestCompareKoji):
 
 class ConfigChangesContentRebaseCompareRPMs(TestCompareRPMs):
     def setUp(self):
-        super().setUp(after=(AFTER_NAME, "47.0", AFTER_REL))
+        super().setUp(rebase=True)
 
         self.before_rpm.add_installed_file(
             "/etc/kernel.conf",
@@ -411,7 +410,7 @@ class ConfigChangesContentRebaseCompareRPMs(TestCompareRPMs):
 
 class ConfigChangesContentRebaseCompareKoji(TestCompareKoji):
     def setUp(self):
-        super().setUp(after=(AFTER_NAME, "47.0", AFTER_REL))
+        super().setUp(rebase=True)
 
         self.before_rpm.add_installed_file(
             "/etc/kernel.conf",
@@ -543,7 +542,7 @@ class ConfigChangeFromSymlinkToFileCompareKoji(TestCompareKoji):
 # %config to/from file/symlink before and after rebase (INFO)
 class ConfigChangeFromFileToSymlinkRebaseCompareRPMs(TestCompareRPMs):
     def setUp(self):
-        super().setUp(after=(AFTER_NAME, "47.0", AFTER_REL))
+        super().setUp(rebase=True)
 
         self.before_rpm.add_installed_file(
             "/etc/kernel.conf",
@@ -570,7 +569,7 @@ class ConfigChangeFromFileToSymlinkRebaseCompareRPMs(TestCompareRPMs):
 
 class ConfigChangeFromFileToSymlinkRebaseCompareKoji(TestCompareKoji):
     def setUp(self):
-        super().setUp(after=(AFTER_NAME, "47.0", AFTER_REL))
+        super().setUp(rebase=True)
 
         self.before_rpm.add_installed_file(
             "/etc/kernel.conf",
@@ -597,7 +596,7 @@ class ConfigChangeFromFileToSymlinkRebaseCompareKoji(TestCompareKoji):
 
 class ConfigChangeFromSymlinkToFileRebaseCompareRPMs(TestCompareRPMs):
     def setUp(self):
-        super().setUp(after=(AFTER_NAME, "47.0", AFTER_REL))
+        super().setUp(rebase=True)
 
         self.before_rpm.add_installed_file(
             "/etc/actualkernel.conf",
@@ -624,7 +623,7 @@ class ConfigChangeFromSymlinkToFileRebaseCompareRPMs(TestCompareRPMs):
 
 class ConfigChangeFromSymlinkToFileRebaseCompareKoji(TestCompareKoji):
     def setUp(self):
-        super().setUp(after=(AFTER_NAME, "47.0", AFTER_REL))
+        super().setUp(rebase=True)
 
         self.before_rpm.add_installed_file(
             "/etc/actualkernel.conf",
@@ -717,7 +716,7 @@ class ConfigSymlinkChangedValueCompareKoji(TestCompareKoji):
 # different symlink destinations before and after rebase (INFO)
 class ConfigSymlinkChangedValueRebaseCompareRPMs(TestCompareRPMs):
     def setUp(self):
-        super().setUp(after=(AFTER_NAME, "47.0", AFTER_REL))
+        super().setUp(rebase=True)
 
         self.before_rpm.add_installed_file(
             "/etc/actualkernel.conf",
@@ -749,7 +748,7 @@ class ConfigSymlinkChangedValueRebaseCompareRPMs(TestCompareRPMs):
 
 class ConfigSymlinkChangedValueRebaseCompareKoji(TestCompareKoji):
     def setUp(self):
-        super().setUp(after=(AFTER_NAME, "47.0", AFTER_REL))
+        super().setUp(rebase=True)
 
         self.before_rpm.add_installed_file(
             "/etc/actualkernel.conf",

@@ -17,7 +17,6 @@
 #
 
 from baseclass import TestCompareRPMs, TestCompareKoji
-from baseclass import AFTER_NAME, AFTER_REL
 
 # Simple source files for library ABI tests
 old_library_source = """#include <math.h>
@@ -66,7 +65,7 @@ class AbidiffNoRebaseNoABIChangeKoji(TestCompareKoji):
 # Test two builds that are a rebase and do not break the ABI (OK)
 class AbidiffRebaseNoABIChangeRPMs(TestCompareRPMs):
     def setUp(self):
-        super().setUp(after=(AFTER_NAME, "47.0", AFTER_REL))
+        super().setUp(rebase=True)
 
         # turn off all rpmbuild post processing stuff for the purposes of testing
         self.before_rpm.header += "\n%global __os_install_post %{nil}\n"
@@ -84,7 +83,7 @@ class AbidiffRebaseNoABIChangeRPMs(TestCompareRPMs):
 
 class AbidiffRebaseNoABIChangeKoji(TestCompareKoji):
     def setUp(self):
-        super().setUp(after=(AFTER_NAME, "47.0", AFTER_REL))
+        super().setUp(rebase=True)
 
         self.before_rpm.add_simple_library()
         self.after_rpm.add_simple_library()
@@ -103,7 +102,7 @@ class AbidiffRebaseNoABIChangeKoji(TestCompareKoji):
 # Test two builds that are a rebase and break the ABI (OK)
 class AbidiffRebaseWithABIChangeRPMs(TestCompareRPMs):
     def setUp(self):
-        super().setUp(after=(AFTER_NAME, "47.0", AFTER_REL))
+        super().setUp(rebase=True)
 
         # turn off all rpmbuild post processing stuff for the purposes of testing
         self.before_rpm.header += "\n%global __os_install_post %{nil}\n"
@@ -121,7 +120,7 @@ class AbidiffRebaseWithABIChangeRPMs(TestCompareRPMs):
 
 class AbidiffRebaseWithABIChangeKoji(TestCompareKoji):
     def setUp(self):
-        super().setUp(after=(AFTER_NAME, "47.0", AFTER_REL))
+        super().setUp(rebase=True)
 
         # turn off all rpmbuild post processing stuff for the purposes of testing
         self.before_rpm.header += "\n%global __os_install_post %{nil}\n"
