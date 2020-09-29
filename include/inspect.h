@@ -577,7 +577,7 @@ bool inspect_patches(struct rpminspect *ri);
 
 #define DESC_DOC _("Report changes in %doc marked files.  Files that have been added or removed as documentation files, for instance.")
 
-#define DESC_PATCHES _("Inspects all patches defined in the spec file and reports changes between builds.  At the INFO level, rpminspect reports a diffstat(1) and patch size changes.  If thresholds are reached regarding a change in the patch size or the number of files the patch touches, rpminspect reports the change at the VERIFY level unless the comparison is for a rebase.  The configuration file can also list patch names that rpminspect should ignore during the inspection.")
+#define DESC_PATCHES _("Inspects all patches defined in the spec file and reports changes between builds.  At the INFO level, rpminspect reports diffstat(1) and patch size changes.  If thresholds are reached regarding a change in the patch size or the number of files the patch touches, rpminspect reports the change at the VERIFY level unless the comparison is for a rebase.  The configuration file can also list patch names that rpminspect should ignore during the inspection.")
 
 
 #endif
