@@ -220,9 +220,9 @@ static bool changedfiles_driver(struct rpminspect *ri, rpmfile_entry_t *file)
      * build could change the compression ratios or other properties
      * but the uncompressed content would be the same.
      */
-    if (!strcmp(type, "application/x-gzip") ||
-        !strcmp(type, "application/x-bzip2") ||
-        !strcmp(type, "application/x-xz")) {
+    if (!strcmp(type, "application/x-gzip") || !strcmp(type, "application/gzip") ||
+        !strcmp(type, "application/x-bzip2") || !strcmp(type, "application/bzip2") ||
+        !strcmp(type, "application/x-xz") || !strcmp(type, "application/xz")) {
         /* uncompress the files to temporary files for comparison */
         before_uncompressed_file = uncompress_file(ri, file->peer_file->fullpath, HEADER_CHANGEDFILES);
         assert(before_uncompressed_file != NULL);
@@ -238,24 +238,29 @@ static bool changedfiles_driver(struct rpminspect *ri, rpmfile_entry_t *file)
             warn("filecmp(%s, %s)", before_uncompressed_file, after_uncompressed_file);
         } else if (exitcode == 1) {
             /* the files are different, report */
-            comptype = strreplace(type, "application/x-", NULL);
-            assert(comptype != NULL);
+            if (rindex(type, '/')) {
+                comptype = rindex(type, '/') + 1;
+                assert(comptype != NULL);
+            }
+
+            if (rindex(type, '-')) {
+                comptype = rindex(comptype, '-') + 1;
+                assert(comptype != NULL);
+            }
 
             xasprintf(&params.msg, _("Compressed %s file %s changed content on %s."), comptype, file->localpath, arch);
             params.verb = VERB_CHANGED;
             params.noun = file->localpath;
             add_changedfiles_result(ri, &params);
             result = false;
-
-            free(comptype);
         }
 
         free(before_uncompressed_file);
         free(after_uncompressed_file);
-    }
 
-    if (!result) {
-        goto done;
+        if (!result || !exitcode) {
+            goto done;
+        }
     }
 
     /*
