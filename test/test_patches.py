@@ -16,7 +16,6 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 #
 
-import os
 import yaml
 import rpmfluff
 
@@ -150,7 +149,8 @@ index ffc4206..12e7808 100644
 -    return x / y;
 +    return (x / y);
  }
-'''
+'''  # noqa: W293
+
 
 # patch under 4 bytes (BAD)
 class PatchUnderFourBytes(TestSRPM):
@@ -170,6 +170,7 @@ class PatchUnderFourBytes(TestSRPM):
         self.result = "BAD"
         self.waiver_auth = "Anyone"
 
+
 class PatchUnderFourBytesCompare(TestCompareSRPM):
     def setUp(self):
         super().setUp()
@@ -188,6 +189,7 @@ class PatchUnderFourBytesCompare(TestCompareSRPM):
         self.result = "BAD"
         self.waiver_auth = "Anyone"
 
+
 # patch changed (INFO)
 class PatchChangedNotRebaseCompare(TestCompareSRPM):
     def setUp(self):
@@ -201,6 +203,7 @@ class PatchChangedNotRebaseCompare(TestCompareSRPM):
         self.result = "INFO"
         self.waiver_auth = "Not Waivable"
 
+
 class PatchChangedInRebaseCompare(TestCompareSRPM):
     def setUp(self):
         super().setUp(after=(AFTER_NAME, "47.0", AFTER_REL))
@@ -212,6 +215,7 @@ class PatchChangedInRebaseCompare(TestCompareSRPM):
         self.label = "patches"
         self.result = "INFO"
         self.waiver_auth = "Not Waivable"
+
 
 # patch added not a rebase (VERIFY)
 class PatchAddedNotRebaseCompare(TestCompareSRPM):
@@ -225,6 +229,7 @@ class PatchAddedNotRebaseCompare(TestCompareSRPM):
         self.result = "VERIFY"
         self.waiver_auth = "Anyone"
 
+
 # patch added in a rebase (INFO)
 class PatchAddedInRebaseCompare(TestCompareSRPM):
     def setUp(self):
@@ -236,6 +241,7 @@ class PatchAddedInRebaseCompare(TestCompareSRPM):
         self.label = "patches"
         self.result = "INFO"
         self.waiver_auth = "Not Waivable"
+
 
 # patch touches too many files (VERIFY)
 class PatchTouchesTooManyFiles(TestSRPM):
@@ -264,6 +270,7 @@ class PatchTouchesTooManyFiles(TestSRPM):
         outstream.write(yaml.dump(cfg).replace("- ", "  - "))
         outstream.close()
 
+
 class PatchTouchesTooManyFilesCompare(TestCompareSRPM):
     def setUp(self):
         super().setUp()
@@ -289,6 +296,7 @@ class PatchTouchesTooManyFilesCompare(TestCompareSRPM):
         outstream = open(self.conffile, "w")
         outstream.write(yaml.dump(cfg).replace("- ", "  - "))
         outstream.close()
+
 
 # patch touches too many lines (VERIFY)
 class PatchTouchesTooManyLines(TestSRPM):
@@ -316,6 +324,7 @@ class PatchTouchesTooManyLines(TestSRPM):
         outstream = open(self.conffile, "w")
         outstream.write(yaml.dump(cfg).replace("- ", "  - "))
         outstream.close()
+
 
 class PatchTouchesTooManyLinesCompare(TestCompareSRPM):
     def setUp(self):
