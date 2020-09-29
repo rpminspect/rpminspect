@@ -195,9 +195,7 @@ class PatchChangedNotRebaseCompare(TestCompareSRPM):
     def setUp(self):
         super().setUp()
 
-        self.before_rpm.add_patch(
-            rpmfluff.SourceFile("some.patch", patch_file), False
-        )
+        self.before_rpm.add_patch(rpmfluff.SourceFile("some.patch", patch_file), False)
         self.after_rpm.add_patch(
             rpmfluff.SourceFile("some.patch", patch_file_changed), False
         )
@@ -212,9 +210,7 @@ class PatchChangedInRebaseCompare(TestCompareSRPM):
     def setUp(self):
         super().setUp(after=(AFTER_NAME, "47.0", AFTER_REL))
 
-        self.before_rpm.add_patch(
-            rpmfluff.SourceFile("some.patch", patch_file), False
-        )
+        self.before_rpm.add_patch(rpmfluff.SourceFile("some.patch", patch_file), False)
         self.after_rpm.add_patch(
             rpmfluff.SourceFile("some.patch", patch_file_changed), False
         )
@@ -230,9 +226,7 @@ class PatchAddedNotRebaseCompare(TestCompareSRPM):
     def setUp(self):
         super().setUp()
 
-        self.after_rpm.add_patch(
-            rpmfluff.SourceFile("some.patch", patch_file), False
-        )
+        self.after_rpm.add_patch(rpmfluff.SourceFile("some.patch", patch_file), False)
 
         self.inspection = "patches"
         self.label = "patches"
@@ -245,9 +239,7 @@ class PatchAddedInRebaseCompare(TestCompareSRPM):
     def setUp(self):
         super().setUp(after=(AFTER_NAME, "47.0", AFTER_REL))
 
-        self.after_rpm.add_patch(
-            rpmfluff.SourceFile("some.patch", patch_file), False
-        )
+        self.after_rpm.add_patch(rpmfluff.SourceFile("some.patch", patch_file), False)
 
         self.inspection = "patches"
         self.label = "patches"
