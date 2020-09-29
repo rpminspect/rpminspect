@@ -21,7 +21,7 @@ import rpmfluff
 
 from baseclass import TestCompareRPMs, TestCompareKoji
 
-datadir = os.environ["RPMINSPECT_TEST_DATA_PATH"] + '/compression/'
+datadir = os.environ["RPMINSPECT_TEST_DATA_PATH"] + "/compression/"
 
 
 # gzip file does not change between builds despite having different
@@ -31,17 +31,19 @@ class GzipFileNoChangeRPMs(TestCompareRPMs):
         super().setUp()
 
         # two files with the same data, but compressed differently
-        with open(datadir + 'test1-low.gz', 'rb') as f:
+        with open(datadir + "test1-low.gz", "rb") as f:
             before_src = f.read()
 
-        with open(datadir + 'test1-high.gz', 'rb') as f:
+        with open(datadir + "test1-high.gz", "rb") as f:
             after_src = f.read()
 
         # create the test packages
-        self.before_rpm.add_installed_file("/usr/etc/firmware.gz",
-                                           rpmfluff.SourceFile("firmware.gz", before_src))
-        self.after_rpm.add_installed_file("/usr/etc/firmware.gz",
-                                          rpmfluff.SourceFile("firmware.gz", after_src))
+        self.before_rpm.add_installed_file(
+            "/usr/etc/firmware.gz", rpmfluff.SourceFile("firmware.gz", before_src)
+        )
+        self.after_rpm.add_installed_file(
+            "/usr/etc/firmware.gz", rpmfluff.SourceFile("firmware.gz", after_src)
+        )
 
         self.inspection = "changedfiles"
         self.label = "changed-files"
@@ -54,17 +56,19 @@ class GzipFileNoChangeKoji(TestCompareKoji):
         super().setUp()
 
         # two files with the same data, but compressed differently
-        with open(datadir + 'test1-low.gz', 'rb') as f:
+        with open(datadir + "test1-low.gz", "rb") as f:
             before_src = f.read()
 
-        with open(datadir + 'test1-high.gz', 'rb') as f:
+        with open(datadir + "test1-high.gz", "rb") as f:
             after_src = f.read()
 
         # create the test packages
-        self.before_rpm.add_installed_file("/usr/etc/firmware.gz",
-                                           rpmfluff.SourceFile("firmware.gz", before_src))
-        self.after_rpm.add_installed_file("/usr/etc/firmware.gz",
-                                          rpmfluff.SourceFile("firmware.gz", after_src))
+        self.before_rpm.add_installed_file(
+            "/usr/etc/firmware.gz", rpmfluff.SourceFile("firmware.gz", before_src)
+        )
+        self.after_rpm.add_installed_file(
+            "/usr/etc/firmware.gz", rpmfluff.SourceFile("firmware.gz", after_src)
+        )
 
         self.inspection = "changedfiles"
         self.label = "changed-files"
@@ -78,17 +82,19 @@ class GzipFileChangesRPMs(TestCompareRPMs):
         super().setUp()
 
         # two files with the same data, but compressed differently
-        with open(datadir + 'test1-low.gz', 'rb') as f:
+        with open(datadir + "test1-low.gz", "rb") as f:
             before_src = f.read()
 
-        with open(datadir + 'test2-low.gz', 'rb') as f:
+        with open(datadir + "test2-low.gz", "rb") as f:
             after_src = f.read()
 
         # create the test packages
-        self.before_rpm.add_installed_file("/usr/etc/firmware.gz",
-                                           rpmfluff.SourceFile("firmware.gz", before_src))
-        self.after_rpm.add_installed_file("/usr/etc/firmware.gz",
-                                          rpmfluff.SourceFile("firmware.gz", after_src))
+        self.before_rpm.add_installed_file(
+            "/usr/etc/firmware.gz", rpmfluff.SourceFile("firmware.gz", before_src)
+        )
+        self.after_rpm.add_installed_file(
+            "/usr/etc/firmware.gz", rpmfluff.SourceFile("firmware.gz", after_src)
+        )
 
         self.inspection = "changedfiles"
         self.label = "changed-files"
@@ -101,17 +107,19 @@ class GzipFileChangesKoji(TestCompareKoji):
         super().setUp()
 
         # two files with the same data, but compressed differently
-        with open(datadir + 'test1-low.gz', 'rb') as f:
+        with open(datadir + "test1-low.gz", "rb") as f:
             before_src = f.read()
 
-        with open(datadir + 'test2-low.gz', 'rb') as f:
+        with open(datadir + "test2-low.gz", "rb") as f:
             after_src = f.read()
 
         # create the test packages
-        self.before_rpm.add_installed_file("/usr/etc/firmware.gz",
-                                           rpmfluff.SourceFile("firmware.gz", before_src))
-        self.after_rpm.add_installed_file("/usr/etc/firmware.gz",
-                                          rpmfluff.SourceFile("firmware.gz", after_src))
+        self.before_rpm.add_installed_file(
+            "/usr/etc/firmware.gz", rpmfluff.SourceFile("firmware.gz", before_src)
+        )
+        self.after_rpm.add_installed_file(
+            "/usr/etc/firmware.gz", rpmfluff.SourceFile("firmware.gz", after_src)
+        )
 
         self.inspection = "changedfiles"
         self.label = "changed-files"
@@ -126,17 +134,19 @@ class Bzip2FileNoChangeRPMs(TestCompareRPMs):
         super().setUp()
 
         # two files with the same data, but compressed differently
-        with open(datadir + 'test1-low.bz2', 'rb') as f:
+        with open(datadir + "test1-low.bz2", "rb") as f:
             before_src = f.read()
 
-        with open(datadir + 'test1-high.bz2', 'rb') as f:
+        with open(datadir + "test1-high.bz2", "rb") as f:
             after_src = f.read()
 
         # create the test packages
-        self.before_rpm.add_installed_file("/usr/etc/firmware.bz2",
-                                           rpmfluff.SourceFile("firmware.bz2", before_src))
-        self.after_rpm.add_installed_file("/usr/etc/firmware.bz2",
-                                          rpmfluff.SourceFile("firmware.bz2", after_src))
+        self.before_rpm.add_installed_file(
+            "/usr/etc/firmware.bz2", rpmfluff.SourceFile("firmware.bz2", before_src)
+        )
+        self.after_rpm.add_installed_file(
+            "/usr/etc/firmware.bz2", rpmfluff.SourceFile("firmware.bz2", after_src)
+        )
 
         self.inspection = "changedfiles"
         self.label = "changed-files"
@@ -149,17 +159,19 @@ class Bzip2FileNoChangeKoji(TestCompareKoji):
         super().setUp()
 
         # two files with the same data, but compressed differently
-        with open(datadir + 'test1-low.bz2', 'rb') as f:
+        with open(datadir + "test1-low.bz2", "rb") as f:
             before_src = f.read()
 
-        with open(datadir + 'test1-high.bz2', 'rb') as f:
+        with open(datadir + "test1-high.bz2", "rb") as f:
             after_src = f.read()
 
         # create the test packages
-        self.before_rpm.add_installed_file("/usr/etc/firmware.bz2",
-                                           rpmfluff.SourceFile("firmware.bz2", before_src))
-        self.after_rpm.add_installed_file("/usr/etc/firmware.bz2",
-                                          rpmfluff.SourceFile("firmware.bz2", after_src))
+        self.before_rpm.add_installed_file(
+            "/usr/etc/firmware.bz2", rpmfluff.SourceFile("firmware.bz2", before_src)
+        )
+        self.after_rpm.add_installed_file(
+            "/usr/etc/firmware.bz2", rpmfluff.SourceFile("firmware.bz2", after_src)
+        )
 
         self.inspection = "changedfiles"
         self.label = "changed-files"
@@ -173,17 +185,19 @@ class Bzip2FileChangesRPMs(TestCompareRPMs):
         super().setUp()
 
         # two files with the same data, but compressed differently
-        with open(datadir + 'test1-low.bz2', 'rb') as f:
+        with open(datadir + "test1-low.bz2", "rb") as f:
             before_src = f.read()
 
-        with open(datadir + 'test2-low.bz2', 'rb') as f:
+        with open(datadir + "test2-low.bz2", "rb") as f:
             after_src = f.read()
 
         # create the test packages
-        self.before_rpm.add_installed_file("/usr/etc/firmware.bz2",
-                                           rpmfluff.SourceFile("firmware.bz2", before_src))
-        self.after_rpm.add_installed_file("/usr/etc/firmware.bz2",
-                                          rpmfluff.SourceFile("firmware.bz2", after_src))
+        self.before_rpm.add_installed_file(
+            "/usr/etc/firmware.bz2", rpmfluff.SourceFile("firmware.bz2", before_src)
+        )
+        self.after_rpm.add_installed_file(
+            "/usr/etc/firmware.bz2", rpmfluff.SourceFile("firmware.bz2", after_src)
+        )
 
         self.inspection = "changedfiles"
         self.label = "changed-files"
@@ -196,17 +210,19 @@ class Bzip2FileChangesKoji(TestCompareKoji):
         super().setUp()
 
         # two files with the same data, but compressed differently
-        with open(datadir + 'test1-low.bz2', 'rb') as f:
+        with open(datadir + "test1-low.bz2", "rb") as f:
             before_src = f.read()
 
-        with open(datadir + 'test2-low.bz2', 'rb') as f:
+        with open(datadir + "test2-low.bz2", "rb") as f:
             after_src = f.read()
 
         # create the test packages
-        self.before_rpm.add_installed_file("/usr/etc/firmware.bz2",
-                                           rpmfluff.SourceFile("firmware.bz2", before_src))
-        self.after_rpm.add_installed_file("/usr/etc/firmware.bz2",
-                                          rpmfluff.SourceFile("firmware.bz2", after_src))
+        self.before_rpm.add_installed_file(
+            "/usr/etc/firmware.bz2", rpmfluff.SourceFile("firmware.bz2", before_src)
+        )
+        self.after_rpm.add_installed_file(
+            "/usr/etc/firmware.bz2", rpmfluff.SourceFile("firmware.bz2", after_src)
+        )
 
         self.inspection = "changedfiles"
         self.label = "changed-files"
@@ -221,17 +237,19 @@ class XzFileNoChangeRPMs(TestCompareRPMs):
         super().setUp()
 
         # two files with the same data, but compressed differently
-        with open(datadir + 'test2-low.xz', 'rb') as f:
+        with open(datadir + "test2-low.xz", "rb") as f:
             before_src = f.read()
 
-        with open(datadir + 'test2-high.xz', 'rb') as f:
+        with open(datadir + "test2-high.xz", "rb") as f:
             after_src = f.read()
 
         # create the test packages
-        self.before_rpm.add_installed_file("/usr/etc/firmware.xz",
-                                           rpmfluff.SourceFile("firmware.xz", before_src))
-        self.after_rpm.add_installed_file("/usr/etc/firmware.xz",
-                                          rpmfluff.SourceFile("firmware.xz", after_src))
+        self.before_rpm.add_installed_file(
+            "/usr/etc/firmware.xz", rpmfluff.SourceFile("firmware.xz", before_src)
+        )
+        self.after_rpm.add_installed_file(
+            "/usr/etc/firmware.xz", rpmfluff.SourceFile("firmware.xz", after_src)
+        )
 
         self.inspection = "changedfiles"
         self.label = "changed-files"
@@ -244,17 +262,19 @@ class XzFileNoChangeKoji(TestCompareKoji):
         super().setUp()
 
         # two files with the same data, but compressed differently
-        with open(datadir + 'test1-low.xz', 'rb') as f:
+        with open(datadir + "test1-low.xz", "rb") as f:
             before_src = f.read()
 
-        with open(datadir + 'test1-high.xz', 'rb') as f:
+        with open(datadir + "test1-high.xz", "rb") as f:
             after_src = f.read()
 
         # create the test packages
-        self.before_rpm.add_installed_file("/usr/etc/firmware.xz",
-                                           rpmfluff.SourceFile("firmware.xz", before_src))
-        self.after_rpm.add_installed_file("/usr/etc/firmware.xz",
-                                          rpmfluff.SourceFile("firmware.xz", after_src))
+        self.before_rpm.add_installed_file(
+            "/usr/etc/firmware.xz", rpmfluff.SourceFile("firmware.xz", before_src)
+        )
+        self.after_rpm.add_installed_file(
+            "/usr/etc/firmware.xz", rpmfluff.SourceFile("firmware.xz", after_src)
+        )
 
         self.inspection = "changedfiles"
         self.label = "changed-files"
@@ -268,17 +288,19 @@ class XzFileChangesRPMs(TestCompareRPMs):
         super().setUp()
 
         # two files with the same data, but compressed differently
-        with open(datadir + 'test1-low.xz', 'rb') as f:
+        with open(datadir + "test1-low.xz", "rb") as f:
             before_src = f.read()
 
-        with open(datadir + 'test2-low.xz', 'rb') as f:
+        with open(datadir + "test2-low.xz", "rb") as f:
             after_src = f.read()
 
         # create the test packages
-        self.before_rpm.add_installed_file("/usr/etc/firmware.xz",
-                                           rpmfluff.SourceFile("firmware.xz", before_src))
-        self.after_rpm.add_installed_file("/usr/etc/firmware.xz",
-                                          rpmfluff.SourceFile("firmware.xz", after_src))
+        self.before_rpm.add_installed_file(
+            "/usr/etc/firmware.xz", rpmfluff.SourceFile("firmware.xz", before_src)
+        )
+        self.after_rpm.add_installed_file(
+            "/usr/etc/firmware.xz", rpmfluff.SourceFile("firmware.xz", after_src)
+        )
 
         self.inspection = "changedfiles"
         self.label = "changed-files"
@@ -291,17 +313,19 @@ class XzFileChangesKoji(TestCompareKoji):
         super().setUp()
 
         # two files with the same data, but compressed differently
-        with open(datadir + 'test1-low.xz', 'rb') as f:
+        with open(datadir + "test1-low.xz", "rb") as f:
             before_src = f.read()
 
-        with open(datadir + 'test2-low.xz', 'rb') as f:
+        with open(datadir + "test2-low.xz", "rb") as f:
             after_src = f.read()
 
         # create the test packages
-        self.before_rpm.add_installed_file("/usr/etc/firmware.xz",
-                                           rpmfluff.SourceFile("firmware.xz", before_src))
-        self.after_rpm.add_installed_file("/usr/etc/firmware.xz",
-                                          rpmfluff.SourceFile("firmware.xz", after_src))
+        self.before_rpm.add_installed_file(
+            "/usr/etc/firmware.xz", rpmfluff.SourceFile("firmware.xz", before_src)
+        )
+        self.after_rpm.add_installed_file(
+            "/usr/etc/firmware.xz", rpmfluff.SourceFile("firmware.xz", after_src)
+        )
 
         self.inspection = "changedfiles"
         self.label = "changed-files"
