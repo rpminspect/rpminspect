@@ -28,15 +28,10 @@ WRKDIR="$(mktemp -d)"
 
 # The list of tools that may or may not be installed locally but
 # that the script needs.  Extend this list if needed.
-TOOLS="klist fedpkg"
+TOOLS="klist"
 
 # What dist-git interaction tool we are using, e.g. Fedora is 'fedpkg'
 VENDORPKG="fedpkg"
-
-# Allow the calling environment to override the list of dist-git branches
-if [ -z "${BRANCHES}" ]; then
-    BRANCHES="master"
-fi
 
 cleanup() {
     rm -rf "${WRKDIR}"
@@ -45,7 +40,7 @@ cleanup() {
 trap cleanup EXIT
 
 # Verify specific tools are available
-for tool in ${TOOLS} ; do
+for tool in ${TOOLS} ${VENDORPKG} ; do
     ${tool} >/dev/null 2>&1
     if [ $? -eq 127 ]; then
         echo "*** Missing '${tool}', perhaps 'yum install -y /usr/bin/${tool}'" >&2
@@ -104,6 +99,11 @@ cd "${CWD}" || exit
 cd "${WRKDIR}" || exit
 ${VENDORPKG} co "${PROJECT}"
 cd "${PROJECT}" || exit
+
+# Allow the calling environment to override the list of dist-git branches
+if [ -z "${BRANCHES}" ]; then
+    BRANCHES="$(git branch -r | grep -vE "(HEAD)" | cut -d '/' -f 2 | sort | xargs)"
+fi
 
 for branch in ${BRANCHES} ; do
     git clean -d -x -f
