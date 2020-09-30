@@ -105,7 +105,7 @@ static char *get_product_release(const string_list_t *keys, struct hsearch_data 
 
     pos = rindex(after, '.');
     if (!pos) {
-        fprintf(stderr, _("*** Product release for after build (%s) is empty\n"), after);
+        warnx(_("*** Product release for after build (%s) is empty"), after);
         return NULL;
     }
 
@@ -116,7 +116,7 @@ static char *get_product_release(const string_list_t *keys, struct hsearch_data 
     pos += 1;
     after_product = strdup(pos);
     if (!after_product) {
-        fprintf(stderr, _("*** Product release for after build (%s) is empty\n"), after);
+        warnx(_("*** Product release for after build (%s) is empty"), after);
         free(after_product);
         return NULL;
     }
@@ -131,7 +131,7 @@ static char *get_product_release(const string_list_t *keys, struct hsearch_data 
         pos = rindex(before, '.');
 
         if (!pos) {
-            fprintf(stderr, _("*** Product release for before build (%s) is empty\n"), before);
+            warnx(_("*** Product release for before build (%s) is empty"), before);
             free(after_product);
             return NULL;
         }
@@ -140,7 +140,7 @@ static char *get_product_release(const string_list_t *keys, struct hsearch_data 
         before_product = strdup(pos);
 
         if (!before_product) {
-            fprintf(stderr, _("*** Product release for before build (%s) is empty\n"), before);
+            warnx(_("*** Product release for before build (%s) is empty"), before);
             free(after_product);
             return NULL;
         }
@@ -187,7 +187,7 @@ static char *get_product_release(const string_list_t *keys, struct hsearch_data 
 
                 if (result != 0) {
                     regerror(result, &product_regex, reg_error, sizeof(reg_error));
-                    fprintf(stderr, _("*** unable to compile product release regular expression: %s\n"), reg_error);
+                    warnx(_("*** unable to compile product release regular expression: %s"), reg_error);
                     free(before_product);
                     free(after_product);
                     return NULL;
@@ -246,7 +246,7 @@ static char *get_product_release(const string_list_t *keys, struct hsearch_data 
     }
 
     if (!matched) {
-        fprintf(stderr, _("*** Unable to determine product release for %s and %s\n"), before, after);
+        warnx(_("*** Unable to determine product release for %s and %s"), before, after);
         free(before_product);
         free(after_product);
         after_product = NULL;
@@ -263,10 +263,8 @@ static void check_inspection_options(const bool inspection_opt, const char *prog
     assert(progname != NULL);
 
     if (inspection_opt) {
-        fprintf(stderr, _("*** The -T and -E options are mutually exclusive\n"));
-        fprintf(stderr, _("*** See `%s --help` for more information.\n"), progname);
-        fflush(stderr);
-        exit(RI_PROGRAM_ERROR);
+        warnx(_("*** The -T and -E options are mutually exclusive"));
+        errx(RI_PROGRAM_ERROR, _("*** See `%s --help` for more information."), progname);
     }
 
     return;
@@ -282,10 +280,8 @@ static void check_found(const bool found, const char *inspection, const char *pr
     assert(progname != NULL);
 
     if (!found) {
-        fprintf(stderr, _("*** Unknown inspection: `%s`\n"), inspection);
-        fprintf(stderr, _("*** See `%s --help` for more information.\n"), progname);
-        fflush(stderr);
-        exit(RI_PROGRAM_ERROR);
+        warnx(_("*** Unknown inspection: `%s`"), inspection);
+        errx(RI_PROGRAM_ERROR, _("*** See `%s --help` for more information."), progname);
     }
 
     return;
@@ -424,9 +420,7 @@ int main(int argc, char **argv) {
                 }
 
                 if (formatidx < 0) {
-                    fprintf(stderr, _("*** Invalid output format: `%s`.\n"), optarg);
-                    fflush(stderr);
-                    return RI_PROGRAM_ERROR;
+                    errx(RI_PROGRAM_ERROR, _("*** Invalid output format: `%s`."), optarg);
                 }
 
                 break;
@@ -441,9 +435,7 @@ int main(int argc, char **argv) {
                     if (j == 0 && expand.gl_pathc == 1) {
                         workdir = strdup(expand.gl_pathv[0]);
                     } else {
-                        fprintf(stderr, _("*** Unable to expand workdir: `%s`: %s"), optarg, strerror(errno));
-                        fflush(stderr);
-                        return RI_PROGRAM_ERROR;
+                        errx(RI_PROGRAM_ERROR, _("*** Unable to expand workdir: `%s`"), optarg);
                     }
 
                     globfree(&expand);
@@ -477,9 +469,7 @@ int main(int argc, char **argv) {
                 printf(_("%s version %s\n"), progname, PACKAGE_VERSION);
                 exit(0);
             default:
-                fprintf(stderr, _("?? getopt returned character code 0%o ??\n"), c);
-                fflush(stderr);
-                exit(RI_PROGRAM_ERROR);
+                errx(RI_PROGRAM_ERROR, _("?? getopt returned character code 0%o ??"), c);
         }
     }
 
@@ -535,23 +525,20 @@ int main(int argc, char **argv) {
     xasprintf(&tmp_cfgfile, "%s/%s", CFGFILE_DIR, CFGFILE);
 
     if (cfgfile == NULL && (access(tmp_cfgfile, F_OK|R_OK) == -1) && (access(CFGFILE, F_OK|R_OK) == -1)) {
-        fprintf(stderr, _("Please specify a configuration file using '-c' or supply ./%s\n"), CFGFILE);
-        exit(RI_PROGRAM_ERROR);
+        errx(RI_PROGRAM_ERROR, _("Please specify a configuration file using '-c' or supply ./%s"), CFGFILE);
     } else if (cfgfile == NULL && (access(tmp_cfgfile, F_OK|R_OK) == 0)) {
         /* /usr/share/rpminspect/rpminspect.yaml if it exists */
         ri = init_rpminspect(ri, tmp_cfgfile, profile);
 
         if (ri == NULL) {
-            fprintf(stderr, _("Failed to read configuration file %s\n"), tmp_cfgfile);
-            exit(RI_PROGRAM_ERROR);
+            errx(RI_PROGRAM_ERROR, _("Failed to read configuration file %s"), tmp_cfgfile);
         }
     } else if (access(cfgfile, F_OK|R_OK) == 0) {
         /* -c configuration file if it exists */
         ri = init_rpminspect(ri, cfgfile, profile);
 
         if (ri == NULL) {
-            fprintf(stderr, _("Failed to read configuration file %s\n"), cfgfile);
-            exit(RI_PROGRAM_ERROR);
+            errx(RI_PROGRAM_ERROR, _("Failed to read configuration file %s"), cfgfile);
         }
     }
 
@@ -560,8 +547,7 @@ int main(int argc, char **argv) {
         ri = init_rpminspect(ri, CFGFILE, profile);
 
         if (ri == NULL) {
-            fprintf(stderr, _("Failed to read configuration file %s\n"), CFGFILE);
-            exit(RI_PROGRAM_ERROR);
+            errx(RI_PROGRAM_ERROR, _("Failed to read configuration file %s"), CFGFILE);
         }
     }
 
@@ -630,29 +616,23 @@ int main(int argc, char **argv) {
         ri->after = strdup(argv[optind + 1]);
     } else {
         /* user gave us too many arguments */
-        fprintf(stderr, _("*** Invalid before and after build specification.\n"));
-        fprintf(stderr, _("*** See `%s --help` for more information.\n"), progname);
-        fflush(stderr);
         free_rpminspect(ri);
-        return RI_PROGRAM_ERROR;
+        warnx(_("*** Invalid before and after build specification."));
+        errx(RI_PROGRAM_ERROR, _("*** See `%s --help` for more information."), progname);
     }
 
     /*
      * Fetch-only mode can only work with a single build
      */
     if (fetch_only && ri->before) {
-        fprintf(stderr, _("*** Fetch only mode takes a single build specification.\n"));
-        fprintf(stderr, _("*** See `%s --help` for more information.\n"), progname);
-        fflush(stderr);
         free_rpminspect(ri);
-        return RI_PROGRAM_ERROR;
+        warnx(_("*** Fetch only mode takes a single build specification."));
+        errx(RI_PROGRAM_ERROR, _("*** See `%s --help` for more information."), progname);
     }
 
     /* initialize librpm, we'll be using it */
     if (init_librpm() != RPMRC_OK) {
-        fprintf(stderr, _("*** unable to read RPM configuration\n"));
-        fflush(stderr);
-        return RI_PROGRAM_ERROR;
+        errx(RI_PROGRAM_ERROR, _("*** unable to read RPM configuration"));
     }
 
     /* if an architecture list is specified, validate it */
@@ -680,11 +660,9 @@ int main(int argc, char **argv) {
             }
 
             if (!found) {
-                fprintf(stderr, _("*** Unsupported architecture specified: `%s`\n"), token);
-                fprintf(stderr, _("*** See `%s --help` for more information.\n"), progname);
-                fflush(stderr);
                 rpmFreeRpmrc();
-                return RI_PROGRAM_ERROR;
+                warnx(_("*** Unsupported architecture specified: `%s`"), token);
+                errx(RI_PROGRAM_ERROR, _("*** See `%s --help` for more information."), progname);
             }
 
             /* architecture is valid, save it */
@@ -704,19 +682,15 @@ int main(int argc, char **argv) {
 
     /* create the working directory */
     if (mkdirp(ri->workdir, mode)) {
-        fprintf(stderr, _("*** Unable to create directory %s: %s\n"), ri->workdir, strerror(errno));
-        fflush(stderr);
         free_rpminspect(ri);
         rpmFreeRpmrc();
-        return RI_PROGRAM_ERROR;
+        errx(RI_PROGRAM_ERROR, _("*** Unable to create directory %s"), ri->workdir);
     }
 
     /* validate and gather the builds specified */
     if (gather_builds(ri, fetch_only)) {
-        fprintf(stderr, _("*** Failed to gather specified builds.\n"));
-        fflush(stderr);
         rpmFreeRpmrc();
-        exit(RI_PROGRAM_ERROR);
+        errx(RI_PROGRAM_ERROR, _("*** Failed to gather specified builds."));
     }
 
     /* add command information to the results output */
@@ -750,28 +724,24 @@ int main(int argc, char **argv) {
         /* Determine product release unless the user specified one. */
         if (ri->product_release == NULL) {
             if (ri->peers == NULL || TAILQ_EMPTY(ri->peers)) {
-                fprintf(stderr, _("*** No peers, ensure packages exist for specified architecture(s).\n"));
-                fflush(stderr);
                 free_rpminspect(ri);
-                return RI_PROGRAM_ERROR;
+                errx(RI_PROGRAM_ERROR, _("*** No peers, ensure packages exist for specified architecture(s)."));
             }
 
             peer = TAILQ_FIRST(ri->peers);
             after_rel = headerGetString(peer->after_hdr, RPMTAG_RELEASE);
 
             if (after_rel == NULL) {
-                warn("invalid after RPM");
                 free_rpminspect(ri);
-                return RI_PROGRAM_ERROR;
+                err(RI_PROGRAM_ERROR, _("invalid after RPM"));
             }
 
             if (ri->before) {
                 before_rel = headerGetString(peer->before_hdr, RPMTAG_RELEASE);
 
                 if (before_rel == NULL) {
-                    warn("invalid before RPM");
                     free_rpminspect(ri);
-                    return RI_PROGRAM_ERROR;
+                    err(RI_PROGRAM_ERROR, _("invalid before RPM"));
                 }
             }
 
@@ -779,7 +749,6 @@ int main(int argc, char **argv) {
             DEBUG_PRINT("product_release=%s\n", ri->product_release);
 
             if (ri->product_release == NULL) {
-                fflush(stderr);
                 free_rpminspect(ri);
                 return RI_PROGRAM_ERROR;
             }
@@ -830,8 +799,7 @@ int main(int argc, char **argv) {
         printf(_("\nKeeping working directory: %s\n"), ri->worksubdir);
     } else {
         if (rmtree(ri->workdir, true, true)) {
-           fprintf(stderr, _("*** Error removing directory %s: %s\n"), ri->workdir, strerror(errno));
-           fflush(stderr);
+           warn(_("*** Error removing directory %s"), ri->workdir);
         }
     }
 
