@@ -21,6 +21,7 @@
 #include <getopt.h>
 #include <assert.h>
 #include <errno.h>
+#include <err.h>
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <sys/ioctl.h>
@@ -758,8 +759,20 @@ int main(int argc, char **argv) {
             peer = TAILQ_FIRST(ri->peers);
             after_rel = headerGetString(peer->after_hdr, RPMTAG_RELEASE);
 
+            if (after_rel == NULL) {
+                warn("invalid after RPM");
+                free_rpminspect(ri);
+                return RI_PROGRAM_ERROR;
+            }
+
             if (ri->before) {
                 before_rel = headerGetString(peer->before_hdr, RPMTAG_RELEASE);
+
+                if (before_rel == NULL) {
+                    warn("invalid before RPM");
+                    free_rpminspect(ri);
+                    return RI_PROGRAM_ERROR;
+                }
             }
 
             ri->product_release = get_product_release(ri->product_keys, ri->products, ri->favor_release, before_rel, after_rel);
