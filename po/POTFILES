@@ -15,6 +15,7 @@ lib/bytes.c
 lib/checksums.c
 lib/copyfile.c
 lib/debug.c
+lib/filecmp.c
 lib/fileinfo.c
 lib/files.c
 lib/flags.c
@@ -29,8 +30,10 @@ lib/inspect_arch.c
 lib/inspect_capabilities.c
 lib/inspect_changedfiles.c
 lib/inspect_changelog.c
+lib/inspect_config.c
 lib/inspect_desktop.c
 lib/inspect_disttag.c
+lib/inspect_doc.c
 lib/inspect_dt_needed.c
 lib/inspect_elf.c
 lib/inspect_emptyrpm.c
@@ -47,6 +50,7 @@ lib/inspect_metadata.c
 lib/inspect_modularity.c
 lib/inspect_movedfiles.c
 lib/inspect_ownership.c
+lib/inspect_patches.c
 lib/inspect_pathmigration.c
 lib/inspect_permissions.c
 lib/inspect_removedfiles.c
@@ -80,5 +84,6 @@ lib/rpm.c
 lib/runcmd.c
 lib/strfuncs.c
 lib/tty.c
+lib/uncompress.c
 lib/unpack.c
 src/rpminspect.c
