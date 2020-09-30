@@ -18,7 +18,7 @@
 .SH NAME
 rpminspect \- compare package builds
 .SH SYNOPSIS
-.B rpminspect
+.B rpminspect -c FILE
 [
 .B OPTIONS
 ]
@@ -29,58 +29,67 @@ rpminspect \- compare package builds
 .SH DESCRIPTION
 .PP
 rpminspect is a tool designed to help developers maintain build policy
-compliance and consistency among releases.  The tool is intended to provide
-output alerting the developer to any changes in the built packages that
-significantly differ from a previous build; the implication being the
-previous build has already been made available to users.
+compliance and consistency among releases.  The tool has two primary
+modes of operation.  The first is what can be considered an analysis
+mode.  This runs against a single RPM or Koji build (a build being a
+source RPM and all of its built packages for multiple architectures).
+The analysis mode checks for package consistency and compliance.
+Various inspections can be configured via the configuration file,
+profile in use, or local rpminspect.yaml file.  The other mode is
+build comparison.  This mode performs all of the same inspections as
+analysis mode as well as comparisons between a before and after
+package or build.  There is no explicit option to run rpminspect in
+either mode; the mode of operation is determined by specifying either
+one or two inputs.  One input means analysis mode, two inputs means
+comparison mode.
 .PP
 rpminspect originated at Red Hat as an auditing tool used to ensure
 builds complied with certain release rules and policies.  Over time it
 grew to incorporate other checks, such as making sure debugging
-symbols are accurate.  Users are encouraged to contribute tests for
-new functionality as well as bug fixes.
+symbols are accurate and various security policies were followed.
+Users are encouraged to contribute tests for new functionality as well
+as bug fixes.
 .PP
 The software is made available as this command line program and an
-accompanying library.  This is intentional.  Our findings over time have
-shown that simple tools with a flexible design are more easy to integrate
-in to continuous integration systems.  The library allows development of
-other frontends should anyone ever be interested in that.  The thought
-is that most developers will interact with rpminspect through the command
-line.  Everything about an rpminspect run is configurable at runtime
-through command line options as well as a configuration file.  The command
-line options override the configuration file which overrides the compiled
-in defaults.
+accompanying library.  This is intentional.  Our findings over time
+have shown that simple tools with a flexible design are more easy to
+integrate in to continuous integration systems.  The library allows
+development of other frontends should anyone ever be interested in
+doing that.  The thought is that most developers will interact with
+rpminspect through the command line.  Everything about an rpminspect
+run is configurable at runtime through command line options as well as
+a configuration file.  The command line options override the
+configuration file which overrides the compiled in defaults.
 .SH OPTIONS
 .PP
 .TP
 .B \-c FILE, \-\-config=FILE
-Configuration file to use (default: /etc/rpminspect/rpminspect.yaml)
+Configuration file.  This is the only required option.  The
+configuration file is generally provided by a product vendor in the
+form of /usr/share/rpminspect/VENDOR.yaml.  Wrapper scripts are common
+to prevent the need to specify the configuration file on the command
+line (e.g., rpminspect-fedora runs rpminspect with the fedora.yaml
+configuration file).
 .TP
 .B \-p NAME, \-\-profile=NAME
-Configuration profile to use.  A configuration profile provides
-overrides to the main configuration file.  The idea is the main
-configuration is loaded, then if you specify a profile name rpminspect
-will load that configuration file and any values specified will
-override what came from the default configuration file.  Think of the
-main configuration file as the common one and profile configuration
-files are optional overlays.
+Optional configuration profile to use.  A configuration profile
+provides overrides to the main configuration file.  The idea is the
+main configuration is loaded, then if you specify a profile name
+rpminspect will load that configuration file and any values specified
+will override what came from the default configuration file.  Think of
+the main configuration file as the common one and profile
+configuration files are optional overlays.  Profiles must be in
+the 'profiledir' directory and follow the naming scheme of
+PROFILE.yaml.  It is common for vendors to provide a set of profiles
+in addition to a main configuration file.
 .RS
 .PP
-The format of a profile configuration file is the same as
-rpminspect.yaml, just call it NAME.yaml and place it in
-/etc/rpminspect/profiles).  For example, the profile 'scl' should have
-a configuration file named /etc/rpminspect/profiles/scl.yaml.
+The format of a profile configuration file is the same as the
+configuration file, just call it NAME.yaml and place it in
+the 'profiledir' for the appropriate vendor.  For example, the
+profile 'scl' for Fedora should have a configuration file named
+/usr/share/rpminspect/profiles/fedora/scl.yaml.
 .RE
-.TP
-.B \-r STR, \-\-release=STR
-String identifying the product release for the specified build or builds.
-Normally rpminspect will determine this by looking for a "dist tag" at
-the end of the NVR.  For build comparisons, the determined product releases
-must match in order for rpminspect to continue.  If you want to compare
-builds from different products, you will need to specify a product release
-manually.  You will also need to specify the product release if the builds
-you are comparing lack any kind of product release identifier at the end
-of the NVR.
 .TP
 .B \-T LIST, \-\-tests=LIST
 If specified, this option assumes all inspections are disabled except the
@@ -99,18 +108,52 @@ name ALL to explicitly say skip all inspections, though that makes the
 program do nothing.  NOTE:  This option is mutually exclusive with
 the \-T option.
 .TP
-.B \-l, \-\-list
-List available output formats and inspections
-.TP
 .B \-a LIST, \-\-arches=LIST
-Comma-separated list of architectures to inspect packages on.  By default
-rpminspect will gather all available architectures for the builds you
-specify, but you may want to restrict a run to just x86_64 or just
-aarch64.  You can do that with this option.  If you do specify this
-option, be sure to include the 'src' architecture to inspect source
-packages.  The architectures you list here are validated against the
-available architectures in the Koji hub and any invalid ones will report
-an error.
+Comma-separated list of architectures to inspect packages on.  By
+default rpminspect will gather all available architectures for the
+builds you specify, but you may want to restrict a run to just x86_64
+or just aarch64.  You can do that with this option.  If you do specify
+this option, be sure to include the 'src' architecture to inspect
+source packages and 'noarch' to include noarch packages.  The
+architectures you list here are validated against the available
+architectures in the Koji hub and any invalid ones will report an
+error.
+.RS
+.PP
+For the purposes of RPM packaging, both 'noarch' and 'src' are
+considered architectures.  Please keep that in mind when using this
+option.
+.RE
+.TP
+.B \-r STR, \-\-release=STR
+String identifying the product release for the specified build or builds.
+Normally rpminspect will determine this by looking for a "dist tag" at
+the end of the NVR.  For build comparisons, the determined product releases
+must match in order for rpminspect to continue.  If you want to compare
+builds from different products, you will need to specify a product release
+manually.  You will also need to specify the product release if the builds
+you are comparing lack any kind of product release identifier at the end
+of the NVR.
+.RS
+.PP
+rpminspect can be configured to favor the newest or oldest product
+release string in case they do not match.  This may be useful when
+comparing builds from one product release to another.
+.RE
+.TP
+.B \-n, \-\-no-rebase
+Disable rebased build detection.  When comparing two builds or two
+packages, rpminspect will look at the package names, version numbers,
+and release numbers.  If the names and versions match but the releases
+vary, the package is not considered a rebase because the assumption is
+this is a maintenance type build on an existing package.  Non-rebase
+comparisons enforce more strict rules for certain inspections.  If the
+package names match but the version numbers differ, rpminspect
+considers the comparison to be between rebased builds.  Rebased
+comparisons relax those strict rules in order to eliminate a lot of
+false positives in the output.  If you want to always disable the
+rebase checking and enforce the strict rules, you can pass this
+option.
 .TP
 .B \-o FILE, \-\-output=FILE
 Write the results to the name output file.  By default, results go to
@@ -118,13 +161,7 @@ stdout.
 .TP
 .B \-F TYPE, \-\-format=TYPE
 Write the inspection results in the TYPE format.  The default format
-is text.  Available formats can be seen with the \-l option.
-.TP
-.B \-w PATH, \-\-workdir=PATH
-Temporary working directory to use (default: /var/tmp/rpminspect).  You
-can specify a tilde (~) character in the PATH specification and rpminspect
-will expand it.  Keep in mind that the PATH you specify with ~ must exist
-in order for expansion to work.
+is text.  Available formats can be seen with the \-l option
 .TP
 .B \-t TAG, \-\-threshold=TAG
 Result threshold that triggers a non-zero exit code.  By default this is
@@ -133,21 +170,38 @@ to any of the valid result codes.  Available result codes are OK, INFO,
 WAIVED, VERIFY, or BAD.  The argument expects the result threshold specified
 as a string.  Case does not matter.
 .TP
+.B \-l, \-\-list
+List available output formats and inspections
+.TP
+.B \-w PATH, \-\-workdir=PATH
+Temporary working directory to use (default: /var/tmp/rpminspect).  You
+can specify a tilde (~) character in the PATH specification and rpminspect
+will expand it.  Keep in mind that the PATH you specify with ~ must exist
+in order for expansion to work.
+.TP
 .B \-f, \-\-fetch\-only
-Only download builds, do not perform any inspections (implies \-k).
-This option is intended as a convenience for developers as well as for
-easier integration in to different CI workflows.  Note that this
-option does not change the working directory (\-w) to the current
-working directory.  If this is undesirable, use the \-w option to set
-it to a different location.  For example, to download to the current
-working directory you can pass "\-w $(pwd)".
+Only download files in specified builds, do not perform any
+inspections (implies \-k).  This option is intended as a convenience
+for developers as well as for easier integration in to different CI
+workflows.  Note that this option does not change the working
+directory (\-w) to the current working directory.  If this is
+undesirable, use the \-w option to set it to a different location.
+For example, to download to the current working directory you can pass
+"\-w $(pwd)".
 .TP
 .B \-k, \-\-keep
-Do not remove temporary working files before exit.
+Do not remove temporary working files before exit.  Useful at times
+for debugging.
 .TP
 .B \-d, \-\-debug
 Enable debugging mode.  This mode generates additional output on
 stdout and stderr.
+.TP
+.B \-D, \-\-dump-config
+Dump configuration settings in use in YAML format.  The output of this
+option will be the combined settings after reading the configuration
+file, any profile specified, and any local configuration file.  Useful
+for debugging to ensure settings have been read in correctly.
 .TP
 .B \-v, \-\-verbose
 Verbose inspection output.  By default, only warnings or failures are
@@ -163,37 +217,42 @@ Display version information.
 .SH USAGE
 .PP
 rpminspect requires very little to run.  Assuming you meet the runtime
-requirements to either build the software from source or you have installed
-it on your operating system, you are ready to use it.  The only required
-argument is a build, which we will call the after_build.  It is possible
-to run rpminspect against a single build and perform the policy checks
-against the packages in it.  If two builds are specified, the policy checks
-are performed, but the builds are also compared.
+requirements to either build the software from source or you have
+installed it on your operating system, you are ready to use it.  The
+only required arguments are the '-c' option to specify the
+configuration file and at least one input.  The input may be an RPM
+package (local or remote), a Koji build (either local or remote), or a
+Koji scratch build task ID.  When provided with a single input,
+rpminspect runs in analysis mode.  When two inputs are provided, it
+performs all of the analysis checks as well as comparison checks.
 .PP
-Use the -l option to list available inspections.  By default, all inspections
-will be run.  You can restrict the program to a subset of inspections by
-listing their short names and separating them with commas (no spaces).  Or
-you can list inspections to skip by listing the short name prefixed with a
-`!' in the same comma-delimited list.
+Use the -l option to list available inspections (add -v to get
+detailed descriptions of the inspections).  By default, all
+inspections will be run.  You can restrict the program to a subset of
+inspections by listing their short names and separating them with
+commas (no spaces).  Or you can list inspections to skip by listing
+the short name prefixed with a `!' in the same comma-delimited list.
 .PP
-Builds may be local RPM packages, regular Koji builds specified using Koji
-syntax (the NVR or name, version, and release of a package with hyphens
-separating each part), Koji module builds, locally cached Koji builds
-(regular or module), Koji scratch builds, or locally cached Koji scratch
-builds.  Any valid Koji build identifier works when specifying Koji builds,
-such as the build ID number or the package NVR.  The only exception to this
-rule is scratch builds.  You must use the Koji task ID number for scratch
-builds.  For more information on Koji build specification, please see the
-Koji documentation.
+Builds may be local RPM packages, regular Koji builds specified using
+Koji syntax (the NVR or name, version, and release of a package with
+hyphens separating each part), Koji module builds, locally cached Koji
+builds (regular or module), Koji scratch builds (task ID number), or
+locally cached Koji scratch builds.  Any valid Koji build identifier
+works when specifying Koji builds, such as the build ID number or the
+package NVR.  The only exception to this rule is scratch builds.  You
+must use the Koji task ID number for scratch builds.  For more
+information on Koji build specification, please see the Koji
+documentation.
 .PP
-If you specify a directory tree containing the output of a properly structured
-Koji build, rpminspect can use that directly.  This may be useful for multiple
-runs of rpminspect against a specific previous build where you are trying to
-fix something in a new build compared against the old one.
+If you specify a directory tree containing the output of a properly
+structured Koji build, rpminspect can use that directly.  This may be
+useful for multiple runs of rpminspect against a specific previous
+build where you are trying to fix something in a new build compared
+against the old one.
 .PP
-Local RPM packages may be specified directly too if you just want to use
-rpminspect on a single RPM.  You may specify a single RPM package or two if you
-want rpminspect to perform the comparison inspections.
+Local RPM packages may be specified directly too if you just want to
+use rpminspect on a single RPM.  You may specify a single RPM package
+or two if you want rpminspect to perform the comparison inspections.
 .PP
 Examples:
 .IP
@@ -210,6 +269,12 @@ rpminspect \-E disttag \-a ppc64le zsh-5.7.1-3.fc31 zsh-5.7.1-4.fc31
 The end result of running rpminspect is a report on standard output explaining
 what was found.  Descriptions of actions developers can take are provided in
 the findings.
+.SH EXIT STATUS
+rpminspect exits 0 if all inspections pass, 1 if at least one
+inspection did not pass, or 2 if a program error occurred.
+.SH BUGS
+Please report bugs at https://github.com/rpminspect/rpminspect using
+the Issues tab.
 .SH SEE ALSO
 .na
 .nh
