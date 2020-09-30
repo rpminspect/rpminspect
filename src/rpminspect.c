@@ -439,8 +439,27 @@ int main(int argc, char **argv) {
                     }
 
                     globfree(&expand);
+                } else if (index(optarg, '/') == NULL || !strprefix(optarg, "./") || !strprefix(optarg, "../")) {
+                    /* relative path specified with no leading dir spec */
+
+                    /* get current dir */
+                    memset(cwd, '\0', sizeof(cwd));
+                    r = getcwd(cwd, PATH_MAX);
+                    assert(r != NULL);
+
+                    /* combine current dir and option */
+                    xasprintf(&tmp, "%s/%s", r, optarg);
+                    assert(tmp != NULL);
+
+                    /* canonicalize the path */
+                    workdir = realpath(tmp, NULL);
+
+                    /* clean up */
+                    free(tmp);
+                    tmp = NULL;
                 } else {
-                    workdir = strdup(optarg);
+                    /* canonicalize the path specified */
+                    workdir = realpath(optarg, NULL);
                 }
 
                 break;
