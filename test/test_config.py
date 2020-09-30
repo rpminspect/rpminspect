@@ -447,7 +447,9 @@ class ConfigChangeFromFileToSymlinkCompareRPMs(TestCompareRPMs):
             isConfig=True,
         )
         self.after_rpm.add_installed_symlink(
-            "/etc/kernel.conf", "/etc/actualkernel.conf", isConfig=True,
+            "/etc/kernel.conf",
+            "/etc/actualkernel.conf",
+            isConfig=True,
         )
 
         self.inspection = "config"
@@ -472,7 +474,9 @@ class ConfigChangeFromFileToSymlinkCompareKoji(TestCompareKoji):
             isConfig=True,
         )
         self.after_rpm.add_installed_symlink(
-            "/etc/kernel.conf", "/etc/actualkernel.conf", isConfig=True,
+            "/etc/kernel.conf",
+            "/etc/actualkernel.conf",
+            isConfig=True,
         )
 
         self.inspection = "config"
@@ -491,7 +495,9 @@ class ConfigChangeFromSymlinkToFileCompareRPMs(TestCompareRPMs):
             isConfig=True,
         )
         self.before_rpm.add_installed_symlink(
-            "/etc/kernel.conf", "/etc/actualkernel.conf", isConfig=True,
+            "/etc/kernel.conf",
+            "/etc/actualkernel.conf",
+            isConfig=True,
         )
 
         self.after_rpm.add_installed_file(
@@ -516,7 +522,9 @@ class ConfigChangeFromSymlinkToFileCompareKoji(TestCompareKoji):
             isConfig=True,
         )
         self.before_rpm.add_installed_symlink(
-            "/etc/kernel.conf", "/etc/actualkernel.conf", isConfig=True,
+            "/etc/kernel.conf",
+            "/etc/actualkernel.conf",
+            isConfig=True,
         )
 
         self.after_rpm.add_installed_file(
@@ -548,7 +556,9 @@ class ConfigChangeFromFileToSymlinkRebaseCompareRPMs(TestCompareRPMs):
             isConfig=True,
         )
         self.after_rpm.add_installed_symlink(
-            "/etc/kernel.conf", "/etc/actualkernel.conf", isConfig=True,
+            "/etc/kernel.conf",
+            "/etc/actualkernel.conf",
+            isConfig=True,
         )
 
         self.inspection = "config"
@@ -573,7 +583,9 @@ class ConfigChangeFromFileToSymlinkRebaseCompareKoji(TestCompareKoji):
             isConfig=True,
         )
         self.after_rpm.add_installed_symlink(
-            "/etc/kernel.conf", "/etc/actualkernel.conf", isConfig=True,
+            "/etc/kernel.conf",
+            "/etc/actualkernel.conf",
+            isConfig=True,
         )
 
         self.inspection = "config"
@@ -592,7 +604,9 @@ class ConfigChangeFromSymlinkToFileRebaseCompareRPMs(TestCompareRPMs):
             isConfig=True,
         )
         self.before_rpm.add_installed_symlink(
-            "/etc/kernel.conf", "/etc/actualkernel.conf", isConfig=True,
+            "/etc/kernel.conf",
+            "/etc/actualkernel.conf",
+            isConfig=True,
         )
 
         self.after_rpm.add_installed_file(
@@ -617,7 +631,9 @@ class ConfigChangeFromSymlinkToFileRebaseCompareKoji(TestCompareKoji):
             isConfig=True,
         )
         self.before_rpm.add_installed_symlink(
-            "/etc/kernel.conf", "/etc/actualkernel.conf", isConfig=True,
+            "/etc/kernel.conf",
+            "/etc/actualkernel.conf",
+            isConfig=True,
         )
 
         self.after_rpm.add_installed_file(
@@ -643,7 +659,9 @@ class ConfigSymlinkChangedValueCompareRPMs(TestCompareRPMs):
             isConfig=True,
         )
         self.before_rpm.add_installed_symlink(
-            "/etc/kernel.conf", "/etc/actualkernel.conf", isConfig=True,
+            "/etc/kernel.conf",
+            "/etc/actualkernel.conf",
+            isConfig=True,
         )
 
         self.after_rpm.add_installed_file(
@@ -652,7 +670,9 @@ class ConfigSymlinkChangedValueCompareRPMs(TestCompareRPMs):
             isConfig=True,
         )
         self.after_rpm.add_installed_symlink(
-            "/etc/kernel.conf", "/etc/realkernel.conf", isConfig=True,
+            "/etc/kernel.conf",
+            "/etc/realkernel.conf",
+            isConfig=True,
         )
 
         self.inspection = "config"
@@ -671,7 +691,9 @@ class ConfigSymlinkChangedValueCompareKoji(TestCompareKoji):
             isConfig=True,
         )
         self.before_rpm.add_installed_symlink(
-            "/etc/kernel.conf", "/etc/actualkernel.conf", isConfig=True,
+            "/etc/kernel.conf",
+            "/etc/actualkernel.conf",
+            isConfig=True,
         )
 
         self.after_rpm.add_installed_file(
@@ -680,7 +702,9 @@ class ConfigSymlinkChangedValueCompareKoji(TestCompareKoji):
             isConfig=True,
         )
         self.after_rpm.add_installed_symlink(
-            "/etc/kernel.conf", "/etc/realkernel.conf", isConfig=True,
+            "/etc/kernel.conf",
+            "/etc/realkernel.conf",
+            isConfig=True,
         )
 
         self.inspection = "config"
@@ -700,7 +724,9 @@ class ConfigSymlinkChangedValueRebaseCompareRPMs(TestCompareRPMs):
             isConfig=True,
         )
         self.before_rpm.add_installed_symlink(
-            "/etc/kernel.conf", "/etc/actualkernel.conf", isConfig=True,
+            "/etc/kernel.conf",
+            "/etc/actualkernel.conf",
+            isConfig=True,
         )
 
         self.after_rpm.add_installed_file(
@@ -709,7 +735,9 @@ class ConfigSymlinkChangedValueRebaseCompareRPMs(TestCompareRPMs):
             isConfig=True,
         )
         self.after_rpm.add_installed_symlink(
-            "/etc/kernel.conf", "/etc/realkernel.conf", isConfig=True,
+            "/etc/kernel.conf",
+            "/etc/realkernel.conf",
+            isConfig=True,
         )
 
         self.inspection = "config"
@@ -737,7 +765,9 @@ class ConfigSymlinkChangedValueRebaseCompareKoji(TestCompareKoji):
             isConfig=True,
         )
         self.after_rpm.add_installed_symlink(
-            "/etc/kernel.conf", "/etc/realkernel.conf", isConfig=True,
+            "/etc/kernel.conf",
+            "/etc/realkernel.conf",
+            isConfig=True,
         )
 
         self.inspection = "config"
