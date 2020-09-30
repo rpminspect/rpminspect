@@ -631,6 +631,47 @@ static int download_task(const struct rpminspect *ri, struct koji_task *task)
     return 0;
 }
 
+/*
+ * Given a remote RPM, download it to our working directory.
+ */
+static int download_rpm(const char *rpm)
+{
+    char *pkg = NULL;
+    char *dstdir = NULL;
+    char *dst = NULL;
+
+    assert(rpm != NULL);
+
+    /* the RPM filename */
+    pkg = basename(rpm);
+
+    /* create the destination directory */
+    if (fetch_only) {
+        dstdir = strdup(workri->worksubdir);
+    } else {
+        xasprintf(&dstdir, "%s/%s", workri->worksubdir, build_desc[whichbuild]);
+    }
+
+    if (mkdirp(dstdir, mode)) {
+        fprintf(stderr, _("*** error creating directory %s: %s\n"), dstdir, strerror(errno));
+        fflush(stderr);
+        return -1;
+    }
+
+    /* download the package */
+    xasprintf(&dst, "%s/%s", dstdir, pkg);
+    curl_helper(workri->verbose, rpm, dst);
+
+    /* gather the RPM header */
+    get_rpm_info(dst);
+
+    /* clean up */
+    free(dst);
+    free(dstdir);
+
+    return 0;
+}
+
 /* Returns true if the string specifies a task ID, which is just an int */
 static bool is_task_id(const char *id)
 {
@@ -647,6 +688,38 @@ static bool is_task_id(const char *id)
     }
 
     return true;
+}
+
+/*
+ * Returns true if a string contains a valid URL to an RPM, false
+ * otherwise.  The check isn't perfect because it just looks at the
+ * ending of the URL for ".rpm"
+ */
+static bool is_remote_rpm(const char *url)
+{
+    CURL *c = NULL;
+    CURLcode r = -1;
+
+    assert(url != NULL);
+
+    if (!strsuffix(url, RPM_FILENAME_EXTENSION)) {
+        return false;
+    }
+
+    c = curl_easy_init();
+
+    if (c) {
+        curl_easy_setopt(c, CURLOPT_URL, url);
+        curl_easy_setopt(c, CURLOPT_NOBODY, 1);
+        r = curl_easy_perform(c);
+        curl_easy_cleanup(c);
+    }
+
+    if (r == CURLE_OK) {
+        return true;
+    } else {
+        return false;
+    }
 }
 
 /**
@@ -696,6 +769,14 @@ int gather_builds(struct rpminspect *ri, bool fo) {
 
             /* clean up */
             prune_local(whichbuild);
+        } else if (is_remote_rpm(ri->after)) {
+            set_worksubdir(ri, LOCAL_WORKDIR, NULL, NULL);
+
+            if (download_rpm(ri->after)) {
+                fprintf(stderr, _("*** error downloading RPM %s\n"), ri->after);
+                fflush(stderr);
+                return -1;
+            }
         } else if (is_task_id(ri->after) && (task = get_koji_task(ri, ri->after)) != NULL) {
             set_worksubdir(ri, TASK_WORKDIR, NULL, task);
 
@@ -743,6 +824,14 @@ int gather_builds(struct rpminspect *ri, bool fo) {
 
         /* clean up */
         prune_local(whichbuild);
+    } else if (is_remote_rpm(ri->before)) {
+        set_worksubdir(ri, LOCAL_WORKDIR, NULL, NULL);
+
+        if (download_rpm(ri->before)) {
+            fprintf(stderr, _("*** error downloading RPM %s\n"), ri->before);
+            fflush(stderr);
+            return -1;
+        }
     } else if (is_task_id(ri->before) && (task = get_koji_task(ri, ri->before)) != NULL) {
         set_worksubdir(ri, TASK_WORKDIR, NULL, task);
 
