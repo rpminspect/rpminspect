@@ -26,9 +26,6 @@ from baseclass import (
     TestKoji,
     TestCompareSRPM,
     TestCompareKoji,
-    BEFORE_NAME,
-    BEFORE_VER,
-    AFTER_REL,
 )
 
 # Read in the built rpminspect executable for use in these test RPMs
