@@ -82,6 +82,7 @@ struct inspect inspections[] = {
     { INSPECT_CONFIG,        "config",        false, &inspect_config },
     { INSPECT_DOC,           "doc",           false, &inspect_doc },
     { INSPECT_PATCHES,       "patches",       true,  &inspect_patches },
+    { INSPECT_VIRUS,         "virus",         true,  &inspect_virus },
     { 0, NULL, false, NULL }
 };
 
@@ -216,6 +217,8 @@ const char *inspection_desc(const uint64_t inspection)
             return DESC_DOC;
         case INSPECT_PATCHES:
             return DESC_PATCHES;
+        case INSPECT_VIRUS:
+            return DESC_VIRUS;
         default:
             return NULL;
     }

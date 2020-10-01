@@ -23,10 +23,9 @@ Unranked tests categories to migrate (might also decide to skip them):
  TEST_SCRIPT
  TEST_STRIP
  TEST_TRIGGERS
- TEST_VIRUS
 
 
-Questions:
+Other:
     - Do we need the politics check?  All it does is look for image
       files that contain 'taiwan' in the filename.  If they are not on
       the taiwan_flag_whitelist, they raise a VERIFY result that
@@ -35,6 +34,12 @@ Questions:
     - Add a 'rebase' inspection that just fails if packages are being
       rebased but not on the rebaseable list.  This should be off by
       default but then enabled in a maintenance profile.  Maybe???
+
+    - Unify the error and debug reporting using consistent functions
+      and messaging.  (e.g., warn() and err())
+
+    - Add a section to the configuration file to specify external
+      commands and their full paths.
 
 
 Test categories that have been migrated:
@@ -69,6 +74,7 @@ Test categories that have been migrated:
 *TEST_ABI (abidiff and kmidiff)
 *TEST_CONFIG (config and doc)
 *TEST_PATCHES (patches)
+*TEST_VIRUS (virus)
 
 
 Test categories excluded (see MISSING):
