@@ -63,6 +63,7 @@ librpminspect_sources = [
     'inspect_symlinks.c',
     'inspect_types.c',
     'inspect_upstream.c',
+    'inspect_virus.c',
     'inspect_xml.c',
     'koji.c',
     'kmods.c',
@@ -113,6 +114,7 @@ librpminspect = library(
         libcap,
         mandoc,
         magic,
+        clamav,
         dl,
     ]
 )

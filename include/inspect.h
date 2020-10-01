@@ -453,6 +453,15 @@ bool inspect_doc(struct rpminspect *ri);
  */
 bool inspect_patches(struct rpminspect *ri);
 
+/**
+ * @brief Main driver for the 'virus' inspection.
+ *
+ *
+ * @param ri Pointer to the struct rpminspect for the program.
+ * @return True if the inspection passed, false otherwise.
+ */
+bool inspect_virus(struct rpminspect *ri);
+
 /** @} */
 
 /*
@@ -501,6 +510,7 @@ bool inspect_patches(struct rpminspect *ri);
 #define INSPECT_CONFIG                      (((uint64_t) 1) << 36)
 #define INSPECT_DOC                         (((uint64_t) 1) << 37)
 #define INSPECT_PATCHES                     (((uint64_t) 1) << 38)
+#define INSPECT_VIRUS                       (((uint64_t) 1) << 39)
 
 /* Long descriptions for the inspections */
 #define DESC_LICENSE _("Verify the string specified in the License tag of the RPM metadata describes permissible software licenses as defined by the license database. Also checks to see if the License tag contains any unprofessional words as defined in the configuration file.")
@@ -579,5 +589,6 @@ bool inspect_patches(struct rpminspect *ri);
 
 #define DESC_PATCHES _("Inspects all patches defined in the spec file and reports changes between builds.  At the INFO level, rpminspect reports diffstat(1) and patch size changes.  If thresholds are reached regarding a change in the patch size or the number of files the patch touches, rpminspect reports the change at the VERIFY level unless the comparison is for a rebase.  The configuration file can also list patch names that rpminspect should ignore during the inspection.")
 
+#define DESC_VIRUS _("Performs a virus scan on every file in the build using libclamav.  Anything found by libclamav will fail the inspection.  The ignore_path rules are not used in this inspection.  All files are scanned.")
 
 #endif

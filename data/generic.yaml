@@ -114,6 +114,7 @@ vendor:
     #symlinks: off
     #types: off
     #upstream: off
+    #virus: off
     #xml: off
 
 #products:

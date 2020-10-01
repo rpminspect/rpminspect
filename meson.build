@@ -30,6 +30,7 @@ libcurl = dependency('libcurl', required : true)
 zlib = dependency('zlib', required : true)
 yaml = dependency('yaml-0.1', required : true)
 openssl = dependency('openssl', required : true)
+clamav = dependency('libclamav', required : true)
 
 # Test suite dependencies
 run_tests = get_option('tests')

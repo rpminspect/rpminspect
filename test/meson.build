@@ -132,6 +132,7 @@ if python.found()
         'test_symlinks.py',
         'test_types.py',
         'test_upstream.py',
+        'test_virus.py',
         'test_xml.py'
         ]
 

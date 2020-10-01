@@ -68,6 +68,7 @@
 #define HEADER_CONFIG        "config"
 #define HEADER_DOC           "doc"
 #define HEADER_PATCHES       "patches"
+#define HEADER_VIRUS         "virus"
 
 /*
  * Inspection remedies
@@ -207,5 +208,8 @@
 
 /* patches */
 #define REMEDY_PATCHES_CORRUPT _("An invalid patch file was found.  This is usually the result of generating a collection of patches by comparing two trees.  When files disappear that can lead to zero length patches in the resulting collection.  Check to see if the source package has any zero length or otherwise invalid patches and correct the problem.")
+
+/* virus */
+#define REMEDY_VIRUS _("ClamAV has found a virus in the named file.  This may be a false positive, but you should manually inspect the file in question to ensure it is clean.  This may be a problem with the ClamAV database or detection.  If you are sure the file in question is clean, please file a bug with rpminspect for further help.")
 
 #endif
