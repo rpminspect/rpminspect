@@ -60,6 +60,7 @@ lib/inspect_subpackages.c
 lib/inspect_symlinks.c
 lib/inspect_types.c
 lib/inspect_upstream.c
+lib/inspect_virus.c
 lib/inspect_xml.c
 lib/kmods.c
 lib/koji.c
