@@ -1,4 +1,6 @@
 bash
+clamav
+clamav-devel
 cunit-devel
 curl
 desktop-file-utils

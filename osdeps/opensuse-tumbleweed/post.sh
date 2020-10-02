@@ -57,3 +57,6 @@ cp -av ${CWD}/fedora-rpms/usr/* /usr/local
 cd ${CWD}
 rm -rf fedora-rpms
 ldconfig
+
+# Update clamav database
+freshclam
