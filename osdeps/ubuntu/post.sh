@@ -32,4 +32,5 @@ cd ..
 rm -rf mandoc.tar.gz ${SUBDIR}
 
 # Update the clamav database
+systemctl stop clamav-freshclam.service
 freshclam
