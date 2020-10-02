@@ -16,3 +16,5 @@ cd "${PYDIR}"
 [ -f "${OSDEPS}/meson.patch" ] || exit 3
 patch -p0 < "${OSDEPS}/meson.patch"
 
+# Update the clamav database
+freshclam

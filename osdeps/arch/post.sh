@@ -54,3 +54,6 @@ autoreconf -f -i -v
 ./configure --prefix=/usr/local
 make
 make install
+
+# Update the clamav database
+freshclam

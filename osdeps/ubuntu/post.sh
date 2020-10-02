@@ -30,3 +30,6 @@ make
 make lib-install
 cd ..
 rm -rf mandoc.tar.gz ${SUBDIR}
+
+# Update the clamav database
+freshclam

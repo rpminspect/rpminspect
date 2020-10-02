@@ -8,3 +8,6 @@ cd rpmfluff
 git checkout -b ${TAG} ${TAG}
 SITE_PACKAGES="$(python3 -c "import sysconfig ; print(sysconfig.get_paths()['purelib'])")"
 install -D -m 0644 rpmfluff.py ${SITE_PACKAGES}/rpmfluff.py
+
+# Update clamav database
+freshclam

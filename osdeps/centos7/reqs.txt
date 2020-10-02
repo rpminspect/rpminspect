@@ -4,6 +4,7 @@ annobin
 bash
 clamav-data
 clamav-devel
+clamav-update
 dash
 desktop-file-utils
 diffutils

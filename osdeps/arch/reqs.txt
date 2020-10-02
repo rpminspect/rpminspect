@@ -1,6 +1,7 @@
 autoconf
 automake
 bison
+clamav
 cunit
 desktop-file-utils
 gcc
