@@ -13,7 +13,7 @@ jobs:
         container: fedora:latest
         steps:
             - uses: actions/checkout@v2
-            - run: dnf install -y ShellCheck
+            - run: dnf install -y ShellCheck xz
             - run: shellcheck --severity=warning **/*.sh
     python:
         runs-on: ubuntu-latest
