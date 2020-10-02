@@ -141,13 +141,16 @@ Elf * get_elf_archive(const char *fullpath, int *out_fd)
  * Return true if a specified file is ELF, false otherwise.
  */
 bool is_elf(const char *fullpath) {
-    int fd;
+    int fd = 0;
     Elf *elf;
 
     elf = get_elf(fullpath, &fd);
 
     if (elf == NULL) {
-        close(fd);
+        if (fd) {
+            close(fd);
+        }
+
         return false;
     }
 

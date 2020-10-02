@@ -201,6 +201,7 @@ string_list_t *get_rpm_header_string_array(Header hdr, rpmTagVal tag)
     td = rpmtdNew();
 
     if (!headerGet(hdr, tag, td, flags)) {
+        rpmtdFree(td);
         return NULL;
     }
 

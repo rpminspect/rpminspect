@@ -884,11 +884,11 @@ struct koji_build *get_koji_build(struct rpminspect *ri, const char *buildspec)
                 /* Get the key as a string */
                 xmlrpc_decompose_value(&env, k, "s", &key);
                 xmlrpc_abort_on_fault(&env);
-                xmlrpc_DECREF(k);
 
                 /* Skip nil values */
                 if (xmlrpc_value_type(value) == XMLRPC_TYPE_NIL) {
                     xmlrpc_DECREF(value);
+                    xmlrpc_DECREF(k);
                     continue;
                 }
 
@@ -922,7 +922,9 @@ struct koji_build *get_koji_build(struct rpminspect *ri, const char *buildspec)
                 }
 
                 xmlrpc_DECREF(value);
+                xmlrpc_DECREF(k);
                 free(key);
+                key = NULL;
             }
 
             /* add this rpm to the list */
