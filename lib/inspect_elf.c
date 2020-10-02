@@ -874,6 +874,7 @@ static bool check_ipv6(struct rpminspect *ri, Elf *after_elf, const char *localp
         assert(output_result > 0);
     }
 
+    fflush(output_stream);
     output_result = fclose(output_stream);
     assert(output_result == 0);
 
@@ -888,6 +889,7 @@ static bool check_ipv6(struct rpminspect *ri, Elf *after_elf, const char *localp
     params.noun = _("IPv6 functions used in ${FILE}");
     add_result(ri, &params);
     free(params.msg);
+    free(output_buffer);
 
 cleanup:
     list_free(after_symbols, NULL);

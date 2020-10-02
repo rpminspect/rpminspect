@@ -72,7 +72,7 @@ void *read_file_bytes(const char *path, off_t *len)
     }
 
     /* break up the file in to lines */
-    data = calloc(1, *len);
+    data = calloc(1, *len + 1);
     assert(data != NULL);
     data = memcpy(data, buf, *len);
     assert(data != NULL);
