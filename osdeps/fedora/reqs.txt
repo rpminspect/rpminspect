@@ -2,7 +2,8 @@ CUnit
 CUnit-devel
 annobin
 bash
-bzip2
+clamav-data
+clamav-devel
 dash
 desktop-file-utils
 diffutils
@@ -16,7 +17,6 @@ git
 glibc-devel
 glibc-devel.i686
 glibc.i686
-gzip
 html401-dtds
 json-c-devel
 kernel-core
@@ -48,6 +48,5 @@ tcsh
 valgrind
 xhtml1-dtds
 xmlrpc-c-devel
-xz
 zlib-devel
 zsh
