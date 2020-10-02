@@ -1,5 +1,4 @@
 bash
-bzip2
 cunit-devel
 curl
 desktop-file-utils
@@ -11,7 +10,6 @@ gcovr
 gettext-tools
 git
 glibc-devel-32bit
-gzip
 html-dtd
 kernel-default-devel
 kernel-devel
@@ -42,7 +40,6 @@ tcsh
 valgrind
 xhtml-dtd
 xmlrpc-c-devel
-xz
 yum
 yum-downloadonly
 zlib-devel
