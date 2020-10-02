@@ -35,7 +35,9 @@ static bool virus_driver(struct rpminspect *ri, rpmfile_entry_t *file)
 {
     bool result = true;
     int r = 0;
+#ifndef CL_SCAN_STDOPT
     struct cl_scan_options opts;
+#endif
     const char *virus = NULL;
 
     /* only check regular files */
@@ -72,6 +74,7 @@ static bool virus_driver(struct rpminspect *ri, rpmfile_entry_t *file)
         clamav_ready = true;
     }
 
+#ifndef CL_SCAN_STDOPT
     /* set up the clamav scan options */
     memset(&opts, 0, sizeof(opts));
     opts.general = CL_SCAN_GENERAL_ALLMATCHES | CL_SCAN_GENERAL_COLLECT_METADATA;
@@ -79,6 +82,10 @@ static bool virus_driver(struct rpminspect *ri, rpmfile_entry_t *file)
 
     /* scan the file */
     r = cl_scanfile(file->fullpath, &virus, NULL, engine, &opts);
+#else
+    /* scan the file */
+    r = cl_scanfile(file->fullpath, &virus, NULL, engine, CL_SCAN_STDOPT);
+#endif
 
     if (r == CL_VIRUS) {
         params.arch = get_rpm_header_arch(file->rpm_header);
