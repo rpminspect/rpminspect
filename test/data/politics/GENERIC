@@ -1,0 +1,5 @@
+# By default any file with 'sealand' in the name is denied.
+*sealand*           *                                                                         deny
+
+# We have one exception, the sealand-motto.txt file is allowed.
+*sealand*           5e2e10c284aeca848f7efaf1046996465e3b244450427ee9a9457da99e525dd3          allow
