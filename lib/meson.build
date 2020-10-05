@@ -56,6 +56,7 @@ librpminspect_sources = [
     'inspect_patches.c',
     'inspect_pathmigration.c',
     'inspect_permissions.c',
+    'inspect_politics.c',
     'inspect_removedfiles.c',
     'inspect_shellsyntax.c',
     'inspect_specname.c',

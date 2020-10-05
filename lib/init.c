@@ -1211,6 +1211,107 @@ bool init_rebaseable(struct rpminspect *ri)
 }
 
 /*
+ * Initialize the politics list for the given product release.  If the
+ * file cannot be found, return false.
+ */
+bool init_politics(struct rpminspect *ri) {
+    char *filename = NULL;
+    string_list_t *contents = NULL;
+    string_entry_t *entry = NULL;
+    char *line = NULL;
+    char *token = NULL;
+    politics_entry_t *pentry = NULL;
+    politics_field_t field = PATTERN;
+
+    assert(ri != NULL);
+    assert(ri->vendor_data_dir != NULL);
+    assert(ri->product_release != NULL);
+
+    /* already initialized */
+    if (ri->politics) {
+        return true;
+    }
+
+    /* the actual politics file */
+    xasprintf(&filename, "%s/%s/%s", ri->vendor_data_dir, POLITICS_DIR, ri->product_release);
+    assert(filename != NULL);
+    contents = read_file(filename);
+    free(filename);
+
+    if (contents == NULL) {
+        return false;
+    }
+
+    /* initialize the list */
+    ri->politics = calloc(1, sizeof(*(ri->politics)));
+    assert(ri->politics != NULL);
+    TAILQ_INIT(ri->politics);
+
+    /* add all the entries to the politics list */
+    TAILQ_FOREACH(entry, contents, items) {
+        if (entry->data == NULL) {
+            continue;
+        }
+
+        /* trim line ending characters */
+        line = entry->data;
+        line[strcspn(line, "\r\n")] = '\0';
+
+        /* skip blank lines and comments */
+        if (*line == '#' || *line == '\n' || *line == '\r' || !strcmp(line, "")) {
+            continue;
+        }
+
+        /* initialize a new list entry */
+        pentry = calloc(1, sizeof(*pentry));
+        assert(pentry != NULL);
+
+        /* read the fields */
+        while ((token = strsep(&line, " \t")) != NULL) {
+            /* might be lots of space between fields */
+            if (*token == '\0') {
+                continue;
+            }
+
+            /* copy the field in to the correct struct member */
+            if (field == PATTERN) {
+                pentry->pattern = strdup(token);
+            } else if (field == DIGEST) {
+                pentry->digest = strdup(token);
+            } else if (field == PERMISSION) {
+                /*
+                 * The permission column is either "allow" or "deny".
+                 * The general assumption is that entries in this file
+                 * will be for denial, so default to that and only do
+                 * a case-insensitive search for 'allow' to allow the
+                 * file. */
+                if (!strcasecmp(token, "allow")) {
+                    pentry->allowed = true;
+                } else {
+                    pentry->allowed = false;
+                }
+
+                break;     /* nothing should come after this field */
+            }
+
+            field++;
+        }
+
+        /* add the entry */
+        if (pentry != NULL) {
+            TAILQ_INSERT_TAIL(ri->politics, pentry, items);
+        }
+
+        /* clean up */
+        field = PATTERN;
+    }
+
+    list_free(contents, free);
+
+    return true;
+}
+
+/*
  * Initialize a struct rpminspect.  Called by applications using
  * librpminspect before they began calling library functions.  If ri
  * passed in is NULL, the function will allocate and initialize a new
