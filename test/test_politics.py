@@ -22,8 +22,8 @@ from baseclass import TestSRPM, TestRPMs, TestKoji
 from baseclass import TestCompareSRPM, TestCompareRPMs, TestCompareKoji
 
 # NOTE: keep the newline here so the computed SHA-256 digest matches test/data/politics/GENERIC
-sealand_motto = '''E Mare, Libertas
-'''
+sealand_motto = """E Mare, Libertas
+"""
 
 
 # package contains allowed politically sensitive file (INFO)
@@ -32,7 +32,8 @@ class AllowedPoliticallySensitiveFileSRPM(TestSRPM):
         super().setUp()
 
         self.rpm.add_installed_file(
-            "/usr/share/sealand-motto.txt", rpmfluff.SourceFile("sealand-motto.txt", sealand_motto)
+            "/usr/share/sealand-motto.txt",
+            rpmfluff.SourceFile("sealand-motto.txt", sealand_motto),
         )
 
         self.inspection = "politics"
@@ -46,7 +47,8 @@ class AllowedPoliticallySensitiveFileRPMs(TestRPMs):
         super().setUp()
 
         self.rpm.add_installed_file(
-            "/usr/share/sealand-motto.txt", rpmfluff.SourceFile("sealand-motto.txt", sealand_motto)
+            "/usr/share/sealand-motto.txt",
+            rpmfluff.SourceFile("sealand-motto.txt", sealand_motto),
         )
 
         self.inspection = "politics"
@@ -60,7 +62,8 @@ class AllowedPoliticallySensitiveFileKoji(TestKoji):
         super().setUp()
 
         self.rpm.add_installed_file(
-            "/usr/share/sealand-motto.txt", rpmfluff.SourceFile("sealand-motto.txt", sealand_motto)
+            "/usr/share/sealand-motto.txt",
+            rpmfluff.SourceFile("sealand-motto.txt", sealand_motto),
         )
 
         self.inspection = "politics"
@@ -74,7 +77,8 @@ class AllowedPoliticallySensitiveFileCompareSRPM(TestCompareSRPM):
         super().setUp()
 
         self.after_rpm.add_installed_file(
-            "/usr/share/sealand-motto.txt", rpmfluff.SourceFile("sealand-motto.txt", sealand_motto)
+            "/usr/share/sealand-motto.txt",
+            rpmfluff.SourceFile("sealand-motto.txt", sealand_motto),
         )
 
         self.inspection = "politics"
@@ -88,7 +92,8 @@ class AllowedPoliticallySensitiveFileCompareRPMs(TestCompareRPMs):
         super().setUp()
 
         self.after_rpm.add_installed_file(
-            "/usr/share/sealand-motto.txt", rpmfluff.SourceFile("sealand-motto.txt", sealand_motto)
+            "/usr/share/sealand-motto.txt",
+            rpmfluff.SourceFile("sealand-motto.txt", sealand_motto),
         )
 
         self.inspection = "politics"
@@ -102,7 +107,8 @@ class AllowedPoliticallySensitiveFileCompareKoji(TestCompareKoji):
         super().setUp()
 
         self.after_rpm.add_installed_file(
-            "/usr/share/sealand-motto.txt", rpmfluff.SourceFile("sealand-motto.txt", sealand_motto)
+            "/usr/share/sealand-motto.txt",
+            rpmfluff.SourceFile("sealand-motto.txt", sealand_motto),
         )
 
         self.inspection = "politics"
@@ -117,7 +123,8 @@ class ForbiddenPoliticallySensitiveFileSRPM(TestSRPM):
         super().setUp()
 
         self.rpm.add_installed_file(
-            "/usr/share/most-of-sealand-is.txt", rpmfluff.SourceFile("most-of-sealand-is.txt", "water")
+            "/usr/share/most-of-sealand-is.txt",
+            rpmfluff.SourceFile("most-of-sealand-is.txt", "water"),
         )
 
         self.inspection = "politics"
@@ -131,7 +138,8 @@ class ForbiddenPoliticallySensitiveFileRPMs(TestRPMs):
         super().setUp()
 
         self.rpm.add_installed_file(
-            "/usr/share/most-of-sealand-is.txt", rpmfluff.SourceFile("most-of-sealand-is.txt", "water")
+            "/usr/share/most-of-sealand-is.txt",
+            rpmfluff.SourceFile("most-of-sealand-is.txt", "water"),
         )
 
         self.inspection = "politics"
@@ -145,7 +153,8 @@ class ForbiddenPoliticallySensitiveFileKoji(TestKoji):
         super().setUp()
 
         self.rpm.add_installed_file(
-            "/usr/share/most-of-sealand-is.txt", rpmfluff.SourceFile("most-of-sealand-is.txt", "water")
+            "/usr/share/most-of-sealand-is.txt",
+            rpmfluff.SourceFile("most-of-sealand-is.txt", "water"),
         )
 
         self.inspection = "politics"
@@ -159,7 +168,8 @@ class ForbiddenPoliticallySensitiveFileCompareSRPM(TestCompareSRPM):
         super().setUp()
 
         self.after_rpm.add_installed_file(
-            "/usr/share/most-of-sealand-is.txt", rpmfluff.SourceFile("most-of-sealand-is.txt", "water")
+            "/usr/share/most-of-sealand-is.txt",
+            rpmfluff.SourceFile("most-of-sealand-is.txt", "water"),
         )
 
         self.inspection = "politics"
@@ -173,7 +183,8 @@ class ForbiddenPoliticallySensitiveFileCompareRPMs(TestCompareRPMs):
         super().setUp()
 
         self.after_rpm.add_installed_file(
-            "/usr/share/most-of-sealand-is.txt", rpmfluff.SourceFile("most-of-sealand-is.txt", "water")
+            "/usr/share/most-of-sealand-is.txt",
+            rpmfluff.SourceFile("most-of-sealand-is.txt", "water"),
         )
 
         self.inspection = "politics"
@@ -187,7 +198,8 @@ class ForbiddenPoliticallySensitiveFileCompareKoji(TestCompareKoji):
         super().setUp()
 
         self.after_rpm.add_installed_file(
-            "/usr/share/most-of-sealand-is.txt", rpmfluff.SourceFile("most-of-sealand-is.txt", "water")
+            "/usr/share/most-of-sealand-is.txt",
+            rpmfluff.SourceFile("most-of-sealand-is.txt", "water"),
         )
 
         self.inspection = "politics"
