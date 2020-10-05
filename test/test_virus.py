@@ -16,11 +16,14 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 #
 
+import timeout_decorator
+
 from baseclass import TestSRPM, TestRPMs, TestKoji
 from baseclass import TestCompareSRPM, TestCompareRPMs, TestCompareKoji
 
 
 # package that does not contain a virus (OK)
+@timeout_decorator.timeout(500)
 class HasNoVirusSRPM(TestSRPM):
     def setUp(self):
         super().setUp()
@@ -35,6 +38,7 @@ class HasNoVirusSRPM(TestSRPM):
         self.waiver_auth = "Not Waivable"
 
 
+@timeout_decorator.timeout(500)
 class HasNoVirusRPMs(TestRPMs):
     def setUp(self):
         super().setUp()
@@ -49,6 +53,7 @@ class HasNoVirusRPMs(TestRPMs):
         self.waiver_auth = "Not Waivable"
 
 
+@timeout_decorator.timeout(500)
 class HasNoVirusKoji(TestKoji):
     def setUp(self):
         super().setUp()
@@ -63,6 +68,7 @@ class HasNoVirusKoji(TestKoji):
         self.waiver_auth = "Not Waivable"
 
 
+@timeout_decorator.timeout(500)
 class HasNoVirusCompareSRPM(TestCompareSRPM):
     def setUp(self):
         super().setUp()
@@ -80,6 +86,7 @@ class HasNoVirusCompareSRPM(TestCompareSRPM):
         self.waiver_auth = "Not Waivable"
 
 
+@timeout_decorator.timeout(500)
 class HasNoVirusCompareRPMs(TestCompareRPMs):
     def setUp(self):
         super().setUp()
@@ -97,6 +104,7 @@ class HasNoVirusCompareRPMs(TestCompareRPMs):
         self.waiver_auth = "Not Waivable"
 
 
+@timeout_decorator.timeout(500)
 class HasNoVirusCompareKoji(TestCompareKoji):
     def setUp(self):
         super().setUp()
@@ -115,6 +123,7 @@ class HasNoVirusCompareKoji(TestCompareKoji):
 
 
 # package that contains a virus (BAD)
+@timeout_decorator.timeout(500)
 class HasVirusSRPM(TestSRPM):
     def setUp(self):
         super().setUp()
@@ -127,6 +136,7 @@ class HasVirusSRPM(TestSRPM):
         self.waiver_auth = "Anyone"
 
 
+@timeout_decorator.timeout(500)
 class HasVirusRPMs(TestRPMs):
     def setUp(self):
         super().setUp()
@@ -139,6 +149,7 @@ class HasVirusRPMs(TestRPMs):
         self.waiver_auth = "Anyone"
 
 
+@timeout_decorator.timeout(500)
 class HasVirusKoji(TestKoji):
     def setUp(self):
         super().setUp()
@@ -151,6 +162,7 @@ class HasVirusKoji(TestKoji):
         self.waiver_auth = "Anyone"
 
 
+@timeout_decorator.timeout(500)
 class HasVirusCompareSRPM(TestCompareSRPM):
     def setUp(self):
         super().setUp()
@@ -168,6 +180,7 @@ class HasVirusCompareSRPM(TestCompareSRPM):
         self.waiver_auth = "Anyone"
 
 
+@timeout_decorator.timeout(500)
 class HasVirusCompareRPMs(TestCompareRPMs):
     def setUp(self):
         super().setUp()
@@ -185,6 +198,7 @@ class HasVirusCompareRPMs(TestCompareRPMs):
         self.waiver_auth = "Anyone"
 
 
+@timeout_decorator.timeout(500)
 class HasVirusCompareKoji(TestCompareKoji):
     def setUp(self):
         super().setUp()
