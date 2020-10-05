@@ -250,7 +250,7 @@ class TestSRPM(RequiresRpminspect):
         check_results(self.results, self.label, self.result, self.waiver_auth)
 
     def tearDown(self):
-        shutil.rmtree(self.rpm.get_base_dir(), ignore_errors=True)
+        self.rpm.clean()
 
 
 # Base test case class that compares a before and after SRPM
@@ -344,8 +344,8 @@ class TestCompareSRPM(RequiresRpminspect):
         )
 
     def tearDown(self):
-        shutil.rmtree(self.before_rpm.get_base_dir(), ignore_errors=True)
-        shutil.rmtree(self.after_rpm.get_base_dir(), ignore_errors=True)
+        self.before_rpm.clean()
+        self.after_rpm.clean()
 
 
 # Base test case class that tests the binary RPMs
@@ -407,7 +407,7 @@ class TestRPMs(TestSRPM):
             )
 
     def tearDown(self):
-        shutil.rmtree(self.rpm.get_base_dir(), ignore_errors=True)
+        self.rpm.clean()
 
 
 # Base test case class that compares before and after built RPMs
@@ -474,8 +474,8 @@ class TestCompareRPMs(TestCompareSRPM):
             )
 
     def tearDown(self):
-        shutil.rmtree(self.before_rpm.get_base_dir(), ignore_errors=True)
-        shutil.rmtree(self.after_rpm.get_base_dir(), ignore_errors=True)
+        self.before_rpm.clean()
+        self.after_rpm.clean()
 
 
 # Base test case class that tests a fake Koji build
@@ -552,7 +552,7 @@ class TestKoji(TestSRPM):
             )
 
     def tearDown(self):
-        shutil.rmtree(self.rpm.get_base_dir(), ignore_errors=True)
+        self.rpm.clean()
 
 
 # Base test case class that compares before and after Koji builds
@@ -643,5 +643,5 @@ class TestCompareKoji(TestCompareSRPM):
                 self.dumpResults()
 
     def tearDown(self):
-        shutil.rmtree(self.before_rpm.get_base_dir(), ignore_errors=True)
-        shutil.rmtree(self.after_rpm.get_base_dir(), ignore_errors=True)
+        self.before_rpm.clean()
+        self.after_rpm.clean()
