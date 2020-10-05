@@ -17,7 +17,6 @@ Unranked tests categories to migrate (might also decide to skip them):
 !TEST_METADATA
     need to get the fedora_without_redhat test implemented from checker
     for the summary and description (call this the 'substring' inspection)
- TEST_POLITICS
  TEST_REQUIRES
  TEST_RPATH
  TEST_SCRIPT
@@ -26,11 +25,6 @@ Unranked tests categories to migrate (might also decide to skip them):
 
 
 Other:
-    - Do we need the politics check?  All it does is look for image
-      files that contain 'taiwan' in the filename.  If they are not on
-      the taiwan_flag_whitelist, they raise a VERIFY result that
-      anyone can waive.
-
     - Add a 'rebase' inspection that just fails if packages are being
       rebased but not on the rebaseable list.  This should be off by
       default but then enabled in a maintenance profile.  Maybe???
@@ -75,6 +69,7 @@ Test categories that have been migrated:
 *TEST_CONFIG (config and doc)
 *TEST_PATCHES (patches)
 *TEST_VIRUS (virus)
+*TEST_POLITICS (politics)
 
 
 Test categories excluded (see MISSING):
@@ -152,8 +147,8 @@ Documentation
 Developer guide
 Testing guide
 User guide
+    Use Doxygen for the C source but tie that in with Sphinx so
+    publishing can be done on readthedocs.io
 
-Make sure rpminspect.1 is current and correct.
-
-Also rpminspect.conf.5 documenting the configuration file and the
+Also rpminspect.yaml.5 documenting the configuration file and the
 profile configuration files.

@@ -69,9 +69,10 @@ void free_mapping(struct hsearch_data *table, string_list_t *keys)
  */
 void free_rpminspect(struct rpminspect *ri) {
     fileinfo_entry_t *fientry = NULL;
-    caps_entry_t *entry = NULL;
+    caps_entry_t *centry = NULL;
     caps_filelist_entry_t *cflentry = NULL;
     header_cache_entry_t *hentry = NULL;
+    politics_entry_t *pentry = NULL;
 
     if (ri == NULL) {
         return;
@@ -104,15 +105,15 @@ void free_rpminspect(struct rpminspect *ri) {
 
     if (ri->caps) {
         while (!TAILQ_EMPTY(ri->caps)) {
-            entry = TAILQ_FIRST(ri->caps);
-            TAILQ_REMOVE(ri->caps, entry, items);
+            centry = TAILQ_FIRST(ri->caps);
+            TAILQ_REMOVE(ri->caps, centry, items);
 
-            free(entry->pkg);
+            free(centry->pkg);
 
-            if (entry->files) {
-                while (!TAILQ_EMPTY(entry->files)) {
-                    cflentry = TAILQ_FIRST(entry->files);
-                    TAILQ_REMOVE(entry->files, cflentry, items);
+            if (centry->files) {
+                while (!TAILQ_EMPTY(centry->files)) {
+                    cflentry = TAILQ_FIRST(centry->files);
+                    TAILQ_REMOVE(centry->files, cflentry, items);
 
                     free(cflentry->path);
                     free(cflentry->caps);
@@ -126,6 +127,19 @@ void free_rpminspect(struct rpminspect *ri) {
     }
 
     list_free(ri->rebaseable, free);
+
+    if (ri->politics) {
+        while (!TAILQ_EMPTY(ri->politics)) {
+            pentry = TAILQ_FIRST(ri->politics);
+            TAILQ_REMOVE(ri->politics, pentry, items);
+
+            free(pentry->pattern);
+            free(pentry->digest);
+        }
+
+        free(ri->politics);
+    }
+
     list_free(ri->badwords, free);
 
     free_regex(ri->elf_path_include);

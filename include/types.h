@@ -276,6 +276,24 @@ typedef enum _favor_release_t {
 } favor_release_t;
 
 /*
+ * Politics list
+ */
+typedef struct _politics_entry_t {
+    char *pattern;
+    char *digest;
+    bool allowed;
+    TAILQ_ENTRY(_politics_entry_t) items;
+} politics_entry_t;
+
+typedef TAILQ_HEAD(politics_entry_s, _politics_entry_t) politics_list_t;
+
+typedef enum _politics_field_t {
+    PATTERN = 0,
+    DIGEST = 1,
+    PERMISSION = 2,
+} politics_field_t;
+
+/*
  * Configuration and state instance for librpminspect run.
  * Applications using librpminspect should initialize the
  * library and retain this structure through the run of
@@ -296,6 +314,7 @@ struct rpminspect {
     fileinfo_t *fileinfo;
     caps_t *caps;
     string_list_t *rebaseable;
+    politics_list_t *politics;
 
     /* Koji information (from config file) */
     char *kojihub;             /* URL of Koji hub */
