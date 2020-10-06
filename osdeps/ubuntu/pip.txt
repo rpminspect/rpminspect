@@ -1,4 +1,4 @@
 cpp-coveralls
 rpmfluff
 PyYAML
-timeout
+timeout-decorator
