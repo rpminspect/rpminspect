@@ -105,7 +105,7 @@ static bool politics_driver(struct rpminspect *ri, rpmfile_entry_t *file)
             }
 
             /* get the digest */
-            if (type == SHA256SUM && !strcmp(pentry->digest, checksum(file))) {
+            if (type == DEFAULT_MESSAGE_DIGEST && !strcmp(pentry->digest, checksum(file))) {
                 matched = true;
                 allowed = pentry->allowed;
             } else {
