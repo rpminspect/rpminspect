@@ -104,7 +104,15 @@ enum { BEFORE_BUILD, AFTER_BUILD };
 /*
  * Supported checksum types.
  */
-enum checksum { NULLSUM, MD5SUM, SHA1SUM, SHA256SUM };
+enum checksum {
+    NULLSUM,
+    MD5SUM,
+    SHA1SUM,
+    SHA224SUM,
+    SHA256SUM,
+    SHA384SUM,
+    SHA512SUM
+};
 
 /* Common functions */
 
