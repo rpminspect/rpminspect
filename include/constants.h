@@ -431,4 +431,10 @@
  */
 #define DEFAULT_PATCH_LINE_THRESHOLD 5000
 
+/*
+ * Default message digest to use internally.  The definition comes
+ * from an enum in rpminspect.h
+ */
+#define DEFAULT_MESSAGE_DIGEST SHA256SUM
+
 #endif

@@ -1,7 +1,7 @@
 /* {{{ Apache License version 2.0
  */
 /*
- * Copyright 2004-2019 David Shea <david@reallylongword.org>
+ * Copyright 2004-2020 David Shea <david@reallylongword.org>
  *                     Chris Lumens <chris@bangmoney.org>
  *                     David Cantrell <david.l.cantrell@gmail.com>
  *
@@ -24,7 +24,7 @@
  * @author David Cantrell &lt;david.l.cantrell@gmail.com&gt;
  * @author Chris Lumens &lt;chris@bangmoney.org&gt;
  * @author David Shea &lt;david@reallylongword.org&gt;
- * @date 2004-2019
+ * @date 2004-2020
  * @brief Calculate an MD5, SHA-1, SHA-224, SHA-256, SHA-384, or SHA-512 checksum for a file.
  * @copyright Apache-2.0
  */
@@ -205,6 +205,6 @@ char *checksum(rpmfile_entry_t *file)
         return file->checksum;
     }
 
-    file->checksum = compute_checksum(file->fullpath, &file->st.st_mode, SHA256SUM);
+    file->checksum = compute_checksum(file->fullpath, &file->st.st_mode, DEFAULT_MESSAGE_DIGEST);
     return file->checksum;
 }
