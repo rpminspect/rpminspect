@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2019  Red Hat, Inc.
+ * Copyright (C) 2019-2020  Red Hat, Inc.
  * Author(s):  David Cantrell <dcantrell@redhat.com>
  *
  * This program is free software: you can redistribute it and/or
@@ -27,6 +27,7 @@
 #include <string.h>
 #include <errno.h>
 #include <assert.h>
+#include <err.h>
 
 #include "rpminspect.h"
 
@@ -82,8 +83,7 @@ char *sl_run_cmd(int *exitcode, string_list_t *list)
     cmdfp = popen(built, "r");
 
     if (cmdfp == NULL) {
-        fprintf(stderr, _("error running `%s`: %s\n"), built, strerror(errno));
-        fflush(stderr);
+        warn(_("error running `%s`"), built);
         free(built);
         return false;
     }
@@ -118,8 +118,7 @@ char *sl_run_cmd(int *exitcode, string_list_t *list)
     }
 
     if (status == -1) {
-        fprintf(stderr, _("error closing `%s`: %s\n"), built, strerror(errno));
-        fflush(stderr);
+        warn(_("error closing `%s`"), built);
         free(built);
         free(output);
         return NULL;

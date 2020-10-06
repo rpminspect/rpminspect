@@ -22,6 +22,7 @@
 
 #include <stdbool.h>
 #include <assert.h>
+#include <err.h>
 #include <rpm/rpmlib.h>
 #include <rpm/rpmts.h>
 #include <rpm/header.h>
@@ -74,8 +75,7 @@ Header get_rpm_header(struct rpminspect *ri, const char *pkg)
     fd = Fopen(pkg, "r.ufdio");
 
     if (fd == NULL || Ferror(fd)) {
-        fprintf(stderr, _("*** Fopen() failed for %s: %s\n"), pkg, Fstrerror(fd));
-        fflush(stderr);
+        warnx(_("Fopen() failed for %s: %s"), pkg, Fstrerror(fd));
 
         if (fd) {
             Fclose(fd);
