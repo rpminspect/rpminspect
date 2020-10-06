@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2019  Red Hat, Inc.
+ * Copyright (C) 2019-2020  Red Hat, Inc.
  * Author(s):  David Cantrell <dcantrell@redhat.com>
  *
  * This program is free software: you can redistribute it and/or
@@ -22,6 +22,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <assert.h>
+#include <err.h>
 #include <magic.h>
 
 #include "rpminspect.h"
@@ -50,14 +51,12 @@ char *get_mime_type(rpmfile_entry_t *file) {
     cookie = magic_open(MAGIC_MIME | MAGIC_CHECK);
 
     if (cookie == NULL) {
-        fprintf(stderr, _("*** Unable to initialize the magic library\n"));
-        fflush(stderr);
+        warnx(_("unable to initialize the magic library"));
         return ret;
     }
 
     if (magic_load(cookie, NULL) != 0) {
-        fprintf(stderr, _("*** Unable to load the magic database: %s\n"), magic_error(cookie));
-        fflush(stderr);
+        warnx(_("unable to load the magic database: %s"), magic_error(cookie));
         magic_close(cookie);
         return ret;
     }
