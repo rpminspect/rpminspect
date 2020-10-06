@@ -2,4 +2,4 @@ cpp-coveralls
 rpmfluff
 PyYAML
 gcovr
-timeout
+timeout-decorator
