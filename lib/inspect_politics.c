@@ -91,8 +91,14 @@ static bool politics_driver(struct rpminspect *ri, rpmfile_entry_t *file)
                 type = MD5SUM;
             } else if (strlen(pentry->digest) == (SHA_DIGEST_LENGTH * 2)) {
                 type = SHA1SUM;
+            } else if (strlen(pentry->digest) == (SHA224_DIGEST_LENGTH * 2)) {
+                type = SHA224SUM;
             } else if (strlen(pentry->digest) == (SHA256_DIGEST_LENGTH * 2)) {
                 type = SHA256SUM;
+            } else if (strlen(pentry->digest) == (SHA384_DIGEST_LENGTH * 2)) {
+                type = SHA384SUM;
+            } else if (strlen(pentry->digest) == (SHA512_DIGEST_LENGTH * 2)) {
+                type = SHA512SUM;
             } else {
                 warnx(_("unknown digest type for pattern %s: %s"), pentry->pattern, pentry->digest);
                 continue;

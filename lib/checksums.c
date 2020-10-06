@@ -25,7 +25,7 @@
  * @author Chris Lumens &lt;chris@bangmoney.org&gt;
  * @author David Shea &lt;david@reallylongword.org&gt;
  * @date 2004-2019
- * @brief Calculate an MD5, SHA-1, or SHA-256 checksum for a file.
+ * @brief Calculate an MD5, SHA-1, SHA-224, SHA-256, SHA-384, or SHA-512 checksum for a file.
  * @copyright Apache-2.0
  */
 
@@ -67,6 +67,7 @@ char *compute_checksum(const char *filename, mode_t *st_mode, enum checksum type
     MD5_CTX md5c;
     SHA_CTX sha1c;
     SHA256_CTX sha256c;
+    SHA512_CTX sha512c;
 
     /* if the user did not provide a mode_t, get it */
     if (st_mode == NULL) {
@@ -99,8 +100,10 @@ char *compute_checksum(const char *filename, mode_t *st_mode, enum checksum type
         MD5_Init(&md5c);
     } else if (type == SHA1SUM) {
         SHA1_Init(&sha1c);
-    } else if (type == SHA256SUM) {
+    } else if (type == SHA224SUM || type == SHA256SUM) {
         SHA256_Init(&sha256c);
+    } else if (type == SHA384SUM || type == SHA512SUM) {
+        SHA512_Init(&sha512c);
     }
 
     /* read in the file to generate the requested checksum */
@@ -122,8 +125,10 @@ char *compute_checksum(const char *filename, mode_t *st_mode, enum checksum type
             MD5_Update(&md5c, buf, len);
         } else if (type == SHA1SUM) {
             SHA1_Update(&sha1c, buf, len);
-        } else if (type == SHA256SUM) {
+        } else if (type == SHA224SUM || type == SHA256SUM) {
             SHA256_Update(&sha256c, buf, len);
+        } else if (type == SHA384SUM || type == SHA512SUM) {
+            SHA512_Update(&sha512c, buf, len);
         }
 
         if ((len = read(input, buf, sizeof(buf))) == -1) {
@@ -142,13 +147,26 @@ char *compute_checksum(const char *filename, mode_t *st_mode, enum checksum type
     /* finalize the correct context type and determine the loop length */
     if (type == MD5SUM) {
         MD5_Final(digest, &md5c);
-        len = MD5_DIGEST_LENGTH;
     } else if (type == SHA1SUM) {
         SHA1_Final(digest, &sha1c);
-        len = SHA_DIGEST_LENGTH;
-    } else if (type == SHA256SUM) {
+    } else if (type == SHA224SUM || type == SHA256SUM) {
         SHA256_Final(digest, &sha256c);
+    } else if (type == SHA384SUM || type == SHA512SUM) {
+        SHA512_Final(digest, &sha512c);
+    }
+
+    if (type == MD5SUM) {
+        len = MD5_DIGEST_LENGTH;
+    } else if (type == SHA1SUM) {
+        len = SHA_DIGEST_LENGTH;
+    } else if (type == SHA224SUM) {
+        len = SHA224_DIGEST_LENGTH;
+    } else if (type == SHA256SUM) {
         len = SHA256_DIGEST_LENGTH;
+    } else if (type == SHA384SUM) {
+        len = SHA384_DIGEST_LENGTH;
+    } else if (type == SHA512SUM) {
+        len = SHA512_DIGEST_LENGTH;
     }
 
     /* this is our human readable digest, caller must free */
