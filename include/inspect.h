@@ -277,7 +277,7 @@ bool inspect_annocheck(struct rpminspect *ri);
  *
  * @param ri Pointer to the struct rpminspect for the program.
  */
-bool inspect_dt_needed(struct rpminspect *ri);
+bool inspect_dsodeps(struct rpminspect *ri);
 
 /**
  * @brief
@@ -500,7 +500,7 @@ bool inspect_politics(struct rpminspect *ri);
 #define INSPECT_OWNERSHIP                   (((uint64_t) 1) << 17)
 #define INSPECT_SHELLSYNTAX                 (((uint64_t) 1) << 18)
 #define INSPECT_ANNOCHECK                   (((uint64_t) 1) << 19)
-#define INSPECT_DT_NEEDED                   (((uint64_t) 1) << 20)
+#define INSPECT_DSODEPS                     (((uint64_t) 1) << 20)
 #define INSPECT_FILESIZE                    (((uint64_t) 1) << 21)
 #define INSPECT_PERMISSIONS                 (((uint64_t) 1) << 22)
 #define INSPECT_CAPABILITIES                (((uint64_t) 1) << 23)
@@ -563,7 +563,7 @@ bool inspect_politics(struct rpminspect *ri);
 
 #define DESC_ANNOCHECK _("Perform annocheck tests defined in the configuration file on all ELF files in the build.  A single build specified will perform an analysis only.  Two builds specified will compare the test results between the before and after build.  If no annocheck tests are defined in the configuration file, this inspection is skipped.")
 
-#define DESC_DT_NEEDED _("Compare DT_NEEDED entries in dynamic ELF executables and shared libraries between the before and after build and report changes.")
+#define DESC_DSODEPS _("Compare DT_NEEDED entries in dynamic ELF executables and shared libraries between the before and after build and report changes.")
 
 #define DESC_FILESIZE _("Report file size changes between builds.  If empty files became non-empty or non-empty files became empty, report those as results needing verification.  Report file change percentages as info-only.")
 
