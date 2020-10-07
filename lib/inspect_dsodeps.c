@@ -26,7 +26,7 @@
 
 #include "rpminspect.h"
 
-static bool dt_needed_driver(struct rpminspect *ri, rpmfile_entry_t *file)
+static bool dsodeps_driver(struct rpminspect *ri, rpmfile_entry_t *file)
 {
     bool result = true;
     const char *bv = NULL;
@@ -102,8 +102,8 @@ static bool dt_needed_driver(struct rpminspect *ri, rpmfile_entry_t *file)
     init_result_params(&params);
     params.severity = RESULT_VERIFY;
     params.waiverauth = WAIVABLE_BY_ANYONE;
-    params.header = HEADER_DT_NEEDED;
-    params.remedy = REMEDY_DT_NEEDED;
+    params.header = HEADER_DSODEPS;
+    params.remedy = REMEDY_DSODEPS;
     params.arch = arch;
     params.file = file->localpath;
 
@@ -217,23 +217,23 @@ done:
 }
 
 /*
- * Main driver for the 'DT_NEEDED' inspection.
+ * Main driver for the dsodeps inspection.
  */
-bool inspect_dt_needed(struct rpminspect *ri) {
+bool inspect_dsodeps(struct rpminspect *ri) {
     bool result;
     struct result_params params;
 
     assert(ri != NULL);
 
-    /* run the DT_NEEDED test across all ELF files */
-    result = foreach_peer_file(ri, dt_needed_driver, true);
+    /* run the dsodeps test across all ELF files */
+    result = foreach_peer_file(ri, dsodeps_driver, true);
 
     /* if everything was fine, just say so */
     if (result) {
         init_result_params(&params);
         params.severity = RESULT_OK;
         params.waiverauth = NOT_WAIVABLE;
-        params.header = HEADER_DT_NEEDED;
+        params.header = HEADER_DSODEPS;
         add_result(ri, &params);
     }
 

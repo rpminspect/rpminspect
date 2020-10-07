@@ -89,7 +89,7 @@ vendor:
     #desktop: off
     #disttag: off
     #doc: off
-    #DT_NEEDED: off
+    #dsodeps: off
     #elf: off
     #emptyrpm: off
     #files: off

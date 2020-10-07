@@ -64,7 +64,7 @@ struct inspect inspections[] = {
     { INSPECT_OWNERSHIP,     "ownership",     true,  &inspect_ownership },
     { INSPECT_SHELLSYNTAX,   "shellsyntax",   true,  &inspect_shellsyntax },
     { INSPECT_ANNOCHECK,     "annocheck",     true,  &inspect_annocheck },
-    { INSPECT_DT_NEEDED,     "DT_NEEDED",     false, &inspect_dt_needed },
+    { INSPECT_DSODEPS,       "dsodeps",       false, &inspect_dsodeps },
     { INSPECT_FILESIZE,      "filesize",      false, &inspect_filesize },
     { INSPECT_PERMISSIONS,   "permissions",   true,  &inspect_permissions },
     { INSPECT_CAPABILITIES,  "capabilities",  true,  &inspect_capabilities },
@@ -182,8 +182,8 @@ const char *inspection_desc(const uint64_t inspection)
             return DESC_SHELLSYNTAX;
         case INSPECT_ANNOCHECK:
             return DESC_ANNOCHECK;
-        case INSPECT_DT_NEEDED:
-            return DESC_DT_NEEDED;
+        case INSPECT_DSODEPS:
+            return DESC_DSODEPS;
         case INSPECT_FILESIZE:
             return DESC_FILESIZE;
         case INSPECT_PERMISSIONS:
