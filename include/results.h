@@ -59,7 +59,7 @@
 #define HEADER_SUBPACKAGES   "subpackages"
 #define HEADER_CHANGELOG     "changelog"
 #define HEADER_PATHMIGRATION "path-migration"
-#define HEADER_LTO           "LTO"
+#define HEADER_LTO           "lto"
 #define HEADER_SYMLINKS      "symlinks"
 #define HEADER_FILES         "files"
 #define HEADER_TYPES         "types"

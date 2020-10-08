@@ -73,7 +73,7 @@ struct inspect inspections[] = {
     { INSPECT_SUBPACKAGES,   "subpackages",   false, &inspect_subpackages },
     { INSPECT_CHANGELOG,     "changelog",     false, &inspect_changelog },
     { INSPECT_PATHMIGRATION, "pathmigration", true,  &inspect_pathmigration },
-    { INSPECT_LTO,           "LTO",           true,  &inspect_lto },
+    { INSPECT_LTO,           "lto",           true,  &inspect_lto },
     { INSPECT_SYMLINKS,      "symlinks",      true,  &inspect_symlinks },
     { INSPECT_FILES,         "files",         true,  &inspect_files },
     { INSPECT_TYPES,         "types",         false, &inspect_types },

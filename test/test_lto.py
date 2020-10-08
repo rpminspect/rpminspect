@@ -43,7 +43,7 @@ class NoLTOSymbolsRelocRPMs(TestRPMs):
             installPath="usr/lib/lto.o",
         )
         self.inspection = "lto"
-        self.label = "LTO"
+        self.label = "lto"
         self.result = "OK"
         self.waiver_auth = "Not Waivable"
 
@@ -57,7 +57,7 @@ class NoLTOSymbolsRelocKoji(TestKoji):
             installPath="usr/lib/lto.o",
         )
         self.inspection = "lto"
-        self.label = "LTO"
+        self.label = "lto"
         self.result = "OK"
         self.waiver_auth = "Not Waivable"
 
@@ -71,7 +71,7 @@ class NoLTOSymbolsRelocCompareRPMs(TestCompareRPMs):
             installPath="usr/lib/lto.o",
         )
         self.inspection = "lto"
-        self.label = "LTO"
+        self.label = "lto"
         self.result = "OK"
         self.waiver_auth = "Not Waivable"
 
@@ -85,7 +85,7 @@ class NoLTOSymbolsRelocCompareKoji(TestCompareKoji):
             installPath="usr/lib/lto.o",
         )
         self.inspection = "lto"
-        self.label = "LTO"
+        self.label = "lto"
         self.result = "OK"
         self.waiver_auth = "Not Waivable"
 
@@ -110,7 +110,7 @@ class NoLTOSymbolsStaticLibRPMs(TestRPMs):
         sub.section_files += "/usr/lib/liblto.a\n"
 
         self.inspection = "lto"
-        self.label = "LTO"
+        self.label = "lto"
         self.result = "OK"
         self.waiver_auth = "Not Waivable"
 
@@ -134,7 +134,7 @@ class NoLTOSymbolsStaticLibKoji(TestKoji):
         sub.section_files += "/usr/lib/liblto.a\n"
 
         self.inspection = "lto"
-        self.label = "LTO"
+        self.label = "lto"
         self.result = "OK"
         self.waiver_auth = "Not Waivable"
 
@@ -158,7 +158,7 @@ class NoLTOSymbolsStaticLibCompareRPMs(TestCompareRPMs):
         sub.section_files += "/usr/lib/liblto.a\n"
 
         self.inspection = "lto"
-        self.label = "LTO"
+        self.label = "lto"
         self.result = "OK"
         self.waiver_auth = "Not Waivable"
 
@@ -182,7 +182,7 @@ class NoLTOSymbolsStaticLibCompareKoji(TestCompareKoji):
         sub.section_files += "/usr/lib/liblto.a\n"
 
         self.inspection = "lto"
-        self.label = "LTO"
+        self.label = "lto"
         self.result = "OK"
         self.waiver_auth = "Not Waivable"
 
@@ -197,7 +197,7 @@ class LTOSymbolsRelocRPMs(TestRPMs):
             installPath="usr/lib/lto.o",
         )
         self.inspection = "lto"
-        self.label = "LTO"
+        self.label = "lto"
         self.result = "BAD"
         self.waiver_auth = "Not Waivable"
 
@@ -211,7 +211,7 @@ class LTOSymbolsRelocKoji(TestKoji):
             installPath="usr/lib/lto.o",
         )
         self.inspection = "lto"
-        self.label = "LTO"
+        self.label = "lto"
         self.result = "BAD"
         self.waiver_auth = "Not Waivable"
 
@@ -225,7 +225,7 @@ class LTOSymbolsRelocCompareRPMs(TestCompareRPMs):
             installPath="usr/lib/lto.o",
         )
         self.inspection = "lto"
-        self.label = "LTO"
+        self.label = "lto"
         self.result = "BAD"
         self.waiver_auth = "Not Waivable"
 
@@ -239,7 +239,7 @@ class LTOSymbolsRelocCompareKoji(TestCompareKoji):
             installPath="usr/lib/lto.o",
         )
         self.inspection = "lto"
-        self.label = "LTO"
+        self.label = "lto"
         self.result = "BAD"
         self.waiver_auth = "Not Waivable"
 
@@ -264,7 +264,7 @@ class LTOSymbolsStaticLibRPMs(TestRPMs):
         sub.section_files += "/usr/lib/liblto.a\n"
 
         self.inspection = "lto"
-        self.label = "LTO"
+        self.label = "lto"
         self.result = "BAD"
         self.waiver_auth = "Not Waivable"
 
@@ -288,7 +288,7 @@ class LTOSymbolsStaticLibKoji(TestKoji):
         sub.section_files += "/usr/lib/liblto.a\n"
 
         self.inspection = "lto"
-        self.label = "LTO"
+        self.label = "lto"
         self.result = "BAD"
         self.waiver_auth = "Not Waivable"
 
@@ -312,7 +312,7 @@ class LTOSymbolsStaticLibCompareRPMs(TestCompareRPMs):
         sub.section_files += "/usr/lib/liblto.a\n"
 
         self.inspection = "lto"
-        self.label = "LTO"
+        self.label = "lto"
         self.result = "BAD"
         self.waiver_auth = "Not Waivable"
 
@@ -336,6 +336,6 @@ class LTOSymbolsStaticLibCompareKoji(TestCompareKoji):
         sub.section_files += "/usr/lib/liblto.a\n"
 
         self.inspection = "lto"
-        self.label = "LTO"
+        self.label = "lto"
         self.result = "BAD"
         self.waiver_auth = "Not Waivable"
