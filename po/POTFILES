@@ -34,7 +34,7 @@ lib/inspect_config.c
 lib/inspect_desktop.c
 lib/inspect_disttag.c
 lib/inspect_doc.c
-lib/inspect_dt_needed.c
+lib/inspect_dsodeps.c
 lib/inspect_elf.c
 lib/inspect_emptyrpm.c
 lib/inspect_files.c
@@ -53,6 +53,7 @@ lib/inspect_ownership.c
 lib/inspect_patches.c
 lib/inspect_pathmigration.c
 lib/inspect_permissions.c
+lib/inspect_politics.c
 lib/inspect_removedfiles.c
 lib/inspect_shellsyntax.c
 lib/inspect_specname.c

@@ -907,8 +907,7 @@ static int read_cfgfile(struct rpminspect *ri, const char *filename)
     yaml_parser_delete(&parser);
 
     if (fclose(fp) != 0) {
-        fprintf(stderr, _("*** error ening %s: %s\n"), filename, strerror(errno));
-        fflush(stderr);
+        warn(_("fclose(%s)"), filename);
         return -1;
     }
 
