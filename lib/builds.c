@@ -37,6 +37,7 @@
 #include <dirent.h>
 #include <unistd.h>
 #include <errno.h>
+#include <err.h>
 #include <rpm/rpmlib.h>
 #include <curl/curl.h>
 #include <yaml.h>
@@ -431,9 +432,7 @@ static int download_build(const struct rpminspect *ri, struct koji_build *build)
                 yaml_parser_delete(&parser);
 
                 if (fclose(fp) != 0) {
-                    fprintf(stderr, _("*** error ening %s: %s\n"), dst, strerror(errno));
-                    fflush(stderr);
-                    abort();
+                    err(RI_PROGRAM_ERROR, _("fclose()"));
                 }
             }
 
