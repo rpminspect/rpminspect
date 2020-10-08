@@ -2,8 +2,9 @@
 # SPDX-License-Identifier: CC-BY-4.0
 #
 # List of glob(7) patterns to match file names, a valid message digest
-# (MD5, SHA-1, or SHA-256) of the packaged file or '*' to indicate all
-# files should match, and whether or not it is allowed.
+# (MD5, SHA-1, SHA-224, SHA-256, SHA-384, or SHA-512) of the packaged
+# file or '*' to indicate all files should match, and whether or not
+# it is allowed.
 #
 #
 #<filename pattern>  <message digest>                           <allow/deny>
