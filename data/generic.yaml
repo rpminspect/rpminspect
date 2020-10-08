@@ -98,7 +98,7 @@ vendor:
     #kmod: off
     #license: off
     #lostpayload: off
-    #LTO: off
+    #lto: off
     #manpage: off
     #metadata: off
     #modularity: off
