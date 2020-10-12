@@ -308,6 +308,7 @@ static bool patches_driver(struct rpminspect *ri, rpmfile_entry_t *file)
             params.details = NULL;
 
             reported = true;
+            result = !(params.severity >= RESULT_VERIFY);
         }
     } else if (exitcode) {
         warn("unable to run %s on %s", DIFFSTAT_CMD, file->localpath);
@@ -388,7 +389,7 @@ bool inspect_patches(struct rpminspect *ri)
         /* Iterate over the SRPM files */
         TAILQ_FOREACH(file, peer->after_files, items) {
             if (!patches_driver(ri, file)) {
-                result = false;
+                result = !(params.severity >= RESULT_VERIFY);
             }
         }
 
@@ -399,7 +400,7 @@ bool inspect_patches(struct rpminspect *ri)
                     xasprintf(&params.msg, _("Patch file `%s` removed"), file->localpath);
                     add_result(ri, &params);
                     free(params.msg);
-                    result = false;
+                    result = !(params.severity >= RESULT_VERIFY);
                 }
             }
         }
