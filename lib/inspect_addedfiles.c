@@ -35,6 +35,7 @@
  */
 static bool addedfiles_driver(struct rpminspect *ri, rpmfile_entry_t *file)
 {
+    bool result = true;
     const char *name = NULL;
     char *subpath = NULL;
     char *localpath = NULL;
@@ -116,6 +117,7 @@ static bool addedfiles_driver(struct rpminspect *ri, rpmfile_entry_t *file)
             if (strprefix(localpath, subpath)) {
                 xasprintf(&params.msg, _("Packages should not contain not files or directories starting with `%s` on %s: %s"), entry->data, arch, file->localpath);
                 add_result(ri, &params);
+                result = !(params.severity >= RESULT_VERIFY);
                 goto done;
             }
         }
@@ -127,6 +129,7 @@ static bool addedfiles_driver(struct rpminspect *ri, rpmfile_entry_t *file)
             if (strsuffix(file->localpath, entry->data)) {
                 xasprintf(&params.msg, _("Packages should not contain files or directories ending with `%s` on %s: %s"), entry->data, arch, file->localpath);
                 add_result(ri, &params);
+                result = !(params.severity >= RESULT_VERIFY);
                 goto done;
             }
         }
@@ -138,6 +141,7 @@ static bool addedfiles_driver(struct rpminspect *ri, rpmfile_entry_t *file)
             if (!strcmp(file->localpath, entry->data)) {
                 xasprintf(&params.msg, _("Forbidden directory `%s` found on %s"), entry->data, arch);
                 add_result(ri, &params);
+                result = !(params.severity >= RESULT_VERIFY);
                 goto done;
             }
         }
@@ -157,6 +161,7 @@ static bool addedfiles_driver(struct rpminspect *ri, rpmfile_entry_t *file)
                 params.waiverauth = WAIVABLE_BY_SECURITY;
                 xasprintf(&params.msg, _("New security-related file `%s` added on %s requires inspection by the Security Team"), file->localpath, arch);
                 add_result(ri, &params);
+                result = !(params.severity >= RESULT_VERIFY);
                 goto done;
             }
         }
@@ -179,11 +184,12 @@ static bool addedfiles_driver(struct rpminspect *ri, rpmfile_entry_t *file)
 
     xasprintf(&params.msg, _("`%s` added on %s"), file->localpath, arch);
     add_result(ri, &params);
+    result = !(params.severity >= RESULT_VERIFY);
 
 done:
     free(params.msg);
 
-    return false;
+    return result;
 }
 
 bool inspect_addedfiles(struct rpminspect *ri)
