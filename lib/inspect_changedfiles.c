@@ -31,6 +31,8 @@
 
 #include "rpminspect.h"
 
+static bool reported = false;
+
 /*
  * Called by changedfiles_driver() to add additional information for
  * files marked as security concerns.
@@ -46,6 +48,7 @@ static void add_changedfiles_result(struct rpminspect *ri, struct result_params 
     }
 
     add_result(ri, params);
+    reported = true;
     return;
 }
 
@@ -71,14 +74,12 @@ static char *run_and_capture(const char *where, char **output, char *cmd, const 
     fd = mkstemp(*output);
 
     if (fd == -1) {
-        fprintf(stderr, _("*** unable to create temporary file: %s\n"), strerror(errno));
-        fflush(stderr);
+        warn(_("mkstemp()"));
         return false;
     }
 
     if (close(fd) == -1) {
-        fprintf(stderr, _("*** unable to close temporary file: %s\n"), strerror(errno));
-        fflush(stderr);
+        warn(_("close()"));
         return false;
     }
 
@@ -91,7 +92,6 @@ static char *run_and_capture(const char *where, char **output, char *cmd, const 
  */
 static bool changedfiles_driver(struct rpminspect *ri, rpmfile_entry_t *file)
 {
-    bool result = true;
     const char *arch = NULL;
     char *type = NULL;
     char *before_sum = NULL;
@@ -188,17 +188,17 @@ static bool changedfiles_driver(struct rpminspect *ri, rpmfile_entry_t *file)
         fd = open(file->fullpath, O_RDONLY | O_CLOEXEC | O_LARGEFILE);
 
         if (fd == -1) {
-            fprintf(stderr, _("unable to open(2) %s on %s for reading: %s\n"), file->localpath, arch, strerror(errno));
+            warn(_("open()"));
             return true;
         }
 
         if (read(fd, magic, sizeof(magic)) != sizeof(magic)) {
-            fprintf(stderr, _("unable to read(2) %s on %s: %s\n"), file->localpath, arch, strerror(errno));
+            warn(_("read()"));
             return true;
         }
 
         if (close(fd) == -1) {
-            fprintf(stderr, _("unable to close(2) %s on %s: %s\n"), file->localpath, arch, strerror(errno));
+            warn(_("close()"));
             return true;
         }
 
@@ -235,7 +235,7 @@ static bool changedfiles_driver(struct rpminspect *ri, rpmfile_entry_t *file)
 
         if (exitcode == -1) {
             /* an error occurred uncompressing the files */
-            warn("filecmp(%s, %s)", before_uncompressed_file, after_uncompressed_file);
+            warnx(_("filecmp(%s, %s)"), before_uncompressed_file, after_uncompressed_file);
         } else if (exitcode == 1) {
             /* the files are different, report */
             if (rindex(type, '/')) {
@@ -252,13 +252,12 @@ static bool changedfiles_driver(struct rpminspect *ri, rpmfile_entry_t *file)
             params.verb = VERB_CHANGED;
             params.noun = file->localpath;
             add_changedfiles_result(ri, &params);
-            result = false;
         }
 
         free(before_uncompressed_file);
         free(after_uncompressed_file);
 
-        if (!result || !exitcode) {
+        if (exitcode == 0 || exitcode == 1) {
             goto done;
         }
     }
@@ -288,7 +287,7 @@ static bool changedfiles_driver(struct rpminspect *ri, rpmfile_entry_t *file)
             params.verb = VERB_FAILED;
             params.noun = _("msgunfmt on ${FILE}");
             add_result(ri, &params);
-            result = false;
+            reported = true;
             goto done;
         }
 
@@ -302,12 +301,21 @@ static bool changedfiles_driver(struct rpminspect *ri, rpmfile_entry_t *file)
             params.verb = VERB_FAILED;
             params.noun = _("msgunfmt on ${FILE}");
             add_result(ri, &params);
-            result = false;
+            reported = true;
             goto done;
         }
 
         /* Now diff the mo content */
         params.details = run_cmd(&exitcode, DIFF_CMD, "-u", before_tmp, after_tmp, NULL);
+
+        /* Remove the temporary files */
+        if (unlink(before_tmp) == -1) {
+            warn(_("unlink(%s)"), before_tmp);
+        }
+
+        if (unlink(after_tmp) == -1) {
+            warn(_("unlink(%s)"), after_tmp);
+        }
 
         if (exitcode) {
             xasprintf(&params.msg, _("Message catalog %s changed content on %s"), file->localpath, arch);
@@ -317,25 +325,9 @@ static bool changedfiles_driver(struct rpminspect *ri, rpmfile_entry_t *file)
             params.verb = VERB_CHANGED;
             params.noun = _("${FILE}");
             add_result(ri, &params);
-            result = false;
+            reported = true;
+            goto done;
         }
-
-        /* Remove the temporary files */
-        if (unlink(before_tmp) == -1) {
-            fprintf(stderr, _("*** Unable to remove temporary file %s: %s\n"), before_tmp, strerror(errno));
-            fflush(stderr);
-            result = false;
-        }
-
-        if (unlink(after_tmp) == -1) {
-            fprintf(stderr, _("*** Unable to remove temporary file %s: %s\n"), after_tmp, strerror(errno));
-            fflush(stderr);
-            result = false;
-        }
-    }
-
-    if (!result) {
-        goto done;
     }
 
     /*
@@ -397,15 +389,13 @@ static bool changedfiles_driver(struct rpminspect *ri, rpmfile_entry_t *file)
             params.verb = VERB_CHANGED;
             params.noun = _("${FILE}");
             add_result(ri, &params);
-            result = false;
+            reported = true;
 
             /* details is not allocated here, freeing errors will take care of it */
             params.details = NULL;
-        }
-    }
 
-    if (!result) {
-        goto done;
+            goto done;
+        }
     }
 
     /* Finally, anything that gets down to here just compare checksums. */
@@ -417,7 +407,6 @@ static bool changedfiles_driver(struct rpminspect *ri, rpmfile_entry_t *file)
         params.verb = VERB_CHANGED;
         params.noun = _("${FILE}");
         add_changedfiles_result(ri, &params);
-        result = false;
     }
 
 done:
@@ -427,7 +416,11 @@ done:
     free(before_tmp);
     free(after_tmp);
 
-    return result;
+    if (params.severity >= RESULT_VERIFY && reported) {
+        return false;
+    } else {
+        return true;
+    }
 }
 
 bool inspect_changedfiles(struct rpminspect *ri)
@@ -437,7 +430,7 @@ bool inspect_changedfiles(struct rpminspect *ri)
 
     result = foreach_peer_file(ri, changedfiles_driver, true);
 
-    if (result) {
+    if (result && !reported) {
         init_result_params(&params);
         params.severity = RESULT_OK;
         params.waiverauth = NOT_WAIVABLE;
