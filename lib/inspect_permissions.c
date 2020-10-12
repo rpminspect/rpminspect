@@ -98,7 +98,7 @@ static bool permissions_driver(struct rpminspect *ri, rpmfile_entry_t *file)
         result = false;
     }
 
-    return (result && allowed);
+    return result;
 }
 
 /*
