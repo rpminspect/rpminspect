@@ -49,7 +49,7 @@ static void add_removedfiles_result(struct rpminspect *ri, struct result_params 
  */
 static bool removedfiles_driver(struct rpminspect *ri, rpmfile_entry_t *file)
 {
-    bool result = false;
+    bool result = true;
     char *type = NULL;
     const char *arch = NULL;
     bool rebase = false;
@@ -132,10 +132,12 @@ static bool removedfiles_driver(struct rpminspect *ri, rpmfile_entry_t *file)
         }
 
         add_removedfiles_result(ri, &params);
+        result = !(params.severity >= RESULT_VERIFY);
         free(params.msg);
     } else {
         xasprintf(&params.msg, _("%s removed from %s"), file->localpath, arch);
         add_removedfiles_result(ri, &params);
+        result = !(params.severity >= RESULT_VERIFY);
         free(params.msg);
     }
 
