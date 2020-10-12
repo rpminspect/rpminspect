@@ -105,13 +105,14 @@ static bool doc_driver(struct rpminspect *ri, rpmfile_entry_t *file)
             add_result(ri, &params);
             free(params.msg);
             reported = true;
+            result = true;
         }
     } else if (before_doc != after_doc) {
         xasprintf(&params.msg, _("%%doc file change for %s in %s on %s (%smarked as %%doc -> %smarked as %%doc)\n"), file->localpath, name, arch,
                   (before_doc ? "" : _("not ")), (after_doc ? "" : _("not ")));
         add_result(ri, &params);
         free(params.msg);
-        result = false;
+        result = !(params.severity >= RESULT_VERIFY);
         reported = true;
     }
 
