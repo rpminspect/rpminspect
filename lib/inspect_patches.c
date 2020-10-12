@@ -290,16 +290,25 @@ static bool patches_driver(struct rpminspect *ri, rpmfile_entry_t *file)
             params.waiverauth = WAIVABLE_BY_ANYONE;
         }
 
-        xasprintf(&params.msg, _("%s touches %ld file%s and as many as %ld line%s"), file->localpath, ds.files, (ds.files > 1) ? "s" : "", ds.lines, (ds.lines > 1) ? "s" : "");
-        params.verb = VERB_CHANGED;
-        params.noun = _("patch changes ${FILE}");
-        add_result(ri, &params);
-        free(params.msg);
-        free(params.details);
-        params.msg = NULL;
-        params.details = NULL;
+        if (ds.files > 0 || ds.lines > 0) {
+            if (ds.files == 0 && ds.lines > 0) {
+                xasprintf(&params.msg, _("%s touches as many as %ld line%s"), file->localpath, ds.lines, (ds.lines > 1) ? "s" : "");
+            } else if (ds.files > 0 && ds.lines == 0) {
+                xasprintf(&params.msg, _("%s touches %ld file%s"), file->localpath, ds.files, (ds.files > 1) ? "s" : "");
+            } else {
+                xasprintf(&params.msg, _("%s touches %ld file%s and %s%ld line%s"), file->localpath, ds.files, (ds.files > 1) ? "s" : "", (ds.lines > 1) ? _("as many as ") : "", ds.lines, (ds.lines > 1) ? "s" : "");
+            }
 
-        reported = true;
+            params.verb = VERB_CHANGED;
+            params.noun = _("patch changes ${FILE}");
+            add_result(ri, &params);
+            free(params.msg);
+            free(params.details);
+            params.msg = NULL;
+            params.details = NULL;
+
+            reported = true;
+        }
     } else if (exitcode) {
         warn("unable to run %s on %s", DIFFSTAT_CMD, file->localpath);
         free(params.details);
