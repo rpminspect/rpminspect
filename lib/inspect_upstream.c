@@ -28,6 +28,7 @@
 /* Global variables */
 static string_list_t *source = NULL;
 static bool initialized = false;
+static bool reported = false;
 static struct result_params params;
 
 /* Returns true if this file is a Source file */
@@ -86,7 +87,8 @@ static bool upstream_driver(struct rpminspect *ri, rpmfile_entry_t *file)
         params.verb = VERB_ADDED;
         params.noun = _("source file ${FILE}");
         add_result(ri, &params);
-        result = false;
+        result = !(params.severity >= RESULT_VERIFY);
+        reported = true;
     } else {
         /* compare checksums to see if the upstream sources changed */
         before_sum = checksum(file->peer_file);
@@ -112,7 +114,8 @@ static bool upstream_driver(struct rpminspect *ri, rpmfile_entry_t *file)
             params.verb = VERB_CHANGED;
             params.noun = _("checksum of ${FILE}");
             add_result(ri, &params);
-            result = false;
+            result = !(params.severity >= RESULT_VERIFY);
+            reported = true;
 
             /* clean up */
             free(diff_output);
@@ -121,6 +124,7 @@ static bool upstream_driver(struct rpminspect *ri, rpmfile_entry_t *file)
 
     free(params.msg);
     params.msg = NULL;
+
     return result;
 }
 
@@ -196,16 +200,18 @@ bool inspect_upstream(struct rpminspect *ri)
                     xasprintf(&params.msg, _("Source file `%s` removed"), file->localpath);
                     add_result(ri, &params);
                     free(params.msg);
-                    result = false;
+                    result = !(params.severity >= RESULT_VERIFY);
+                    reported = true;
                 }
             }
         }
     }
 
     /* Sound the everything-is-ok alarm if everything is, in fact, ok */
-    if (result) {
+    if (result && !reported) {
         params.severity = RESULT_OK;
         params.waiverauth = NOT_WAIVABLE;
+        params.msg = NULL;
         params.remedy = NULL;
         add_result(ri, &params);
     }
