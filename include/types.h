@@ -30,7 +30,7 @@
 #include <sys/stat.h>
 #include <sys/capability.h>
 #include <rpm/rpmlib.h>
-#include <rpm/rpmfiles.h>
+#include <rpm/rpmfi.h>
 #include <libkmod.h>
 #include "queue.h"
 
