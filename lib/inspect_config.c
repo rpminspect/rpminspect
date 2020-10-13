@@ -31,7 +31,6 @@ static bool reported = false;
 static bool config_driver(struct rpminspect *ri, rpmfile_entry_t *file)
 {
     bool result = true;
-    bool rebase = false;
     rpmfileAttrs before_config = 0;
     rpmfileAttrs after_config = 0;
     ssize_t n = 0;
@@ -81,9 +80,7 @@ static bool config_driver(struct rpminspect *ri, rpmfile_entry_t *file)
     params.verb = VERB_CHANGED;
     params.noun = _("%config ${FILE}");
 
-    rebase = is_rebase(ri);
-
-    if (rebase) {
+    if (is_rebase(ri)) {
         params.severity = RESULT_INFO;
         params.waiverauth = NOT_WAIVABLE;
     } else {
@@ -166,29 +163,20 @@ static bool config_driver(struct rpminspect *ri, rpmfile_entry_t *file)
             if (exitcode == -1) {
                 warnx(_("filecmp(%s, %s)"), file->peer_file->fullpath, file->fullpath);
             } else if (exitcode == 1) {
-                if (rebase) {
-                    /* files differ, but it's a rebase so just note they changed */
-                    xasprintf(&params.msg, _("%%config file content change for %s in %s on %s"), file->localpath, name, arch);
+                /* the files differ and not a rebase, see if it's only whitespace changes */
+                free(diff_output);
+                params.details = run_cmd(&exitcode, DIFF_CMD, "-u", "-w", "-I^#.*", file->peer_file->fullpath, file->fullpath, NULL);
+
+                if (exitcode == 0) {
+                    xasprintf(&params.msg, _("%%config file content change for %s in %s on %s (comments/whitespace only)"), file->localpath, name, arch);
                     params.severity = RESULT_INFO;
                     params.waiverauth = NOT_WAIVABLE;
-                    params.details = NULL;
                     result = true;
                 } else {
-                    /* the files differ and not a rebase, see if it's only whitespace changes */
-                    free(diff_output);
-                    params.details = run_cmd(&exitcode, DIFF_CMD, "-u", "-w", "-I^#.*", file->peer_file->fullpath, file->fullpath, NULL);
+                    xasprintf(&params.msg, _("%%config file content change for %s in %s on %s"), file->localpath, name, arch);
 
-                    if (exitcode == 0) {
-                        xasprintf(&params.msg, _("%%config file content change for %s in %s on %s (comments/whitespace only)"), file->localpath, name, arch);
-                        params.severity = RESULT_INFO;
-                        params.waiverauth = NOT_WAIVABLE;
-                        result = true;
-                    } else {
-                        xasprintf(&params.msg, _("%%config file content change for %s in %s on %s"), file->localpath, name, arch);
-
-                        if (params.severity == RESULT_VERIFY) {
-                            result = false;
-                        }
+                    if (params.severity == RESULT_VERIFY) {
+                        result = false;
                     }
                 }
 
