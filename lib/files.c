@@ -53,41 +53,33 @@
 #include "rpminspect.h"
 
 /**
- * @brief Given an RPM Header and index, return the RPMTAG_FILEFLAGS entry.
+ * @brief Given an RPM Header and index, return the RPMTAG_FILEFLAGS
+ * entry.
  *
  * @param h RPM Header
  * @param i Index of the RPMTAG_FILEFLAGS entry
- * @return rpmFlags value for the given file index
+ * @return rpmfileAttrs value for the given file index
  */
-static uint64_t get_rpmtag_fileflags(const Header h, const int i)
+static rpmfileAttrs get_rpmtag_fileflags(const Header h, const int i)
 {
-    uint64_t flags = 0;
-    rpmtd td = NULL;
-    rpmFlags tdflags = HEADERGET_MINMEM | HEADERGET_EXT | HEADERGET_ARGV;
+    rpmfileAttrs flags = 0;
+    struct rpmtd_s td;
+    struct rpmtd_s filenames;
+    int idx = -1;
 
     assert(h != NULL);
     assert(i >= 0);
 
-    /* new header transaction */
-    td = rpmtdNew();
+    if (headerGet(h, RPMTAG_BASENAMES, &filenames, HEADERGET_MINMEM)) {
+        if (headerGet(h, RPMTAG_FILEFLAGS, &td, HEADERGET_MINMEM)) {
+            idx = rpmtdSetIndex(&td, i);
+            assert(idx != -1);
+            flags = *(rpmtdGetUint32(&td));
+            rpmtdFreeData(&td);
+        }
 
-    /* find the header tag we want to extract values from */
-    if (!headerGet(h, RPMTAG_FILEFLAGS, td, tdflags)) {
-        warn(_("unable to find tag RPMTAG_FILEFLAGS"));
-        rpmtdFree(td);
-        return flags;
+        rpmtdFreeData(&filenames);
     }
-
-    /* set the array index */
-    if (rpmtdSetIndex(td, i) == -1) {
-        warn(_("file index %d is out of bounds"), i);
-        rpmtdFree(td);
-        return flags;
-    }
-
-    /* get the tag we are looking for and copy the value */
-    flags = rpmtdGetNumber(td);
-    rpmtdFree(td);
 
     return flags;
 }

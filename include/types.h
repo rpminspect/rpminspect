@@ -30,6 +30,7 @@
 #include <sys/stat.h>
 #include <sys/capability.h>
 #include <rpm/rpmlib.h>
+#include <rpm/rpmfiles.h>
 #include <libkmod.h>
 #include "queue.h"
 
@@ -99,7 +100,7 @@ typedef struct _rpmfile_entry_t {
     char *type;
     char *checksum;
     cap_t cap;
-    uint64_t flags;
+    rpmfileAttrs flags;
     struct _rpmfile_entry_t *peer_file;
     bool moved_path;
     bool moved_subpackage;
