@@ -31,8 +31,8 @@ static bool reported = false;
 static bool doc_driver(struct rpminspect *ri, rpmfile_entry_t *file)
 {
     bool result = true;
-    uint64_t before_doc;
-    uint64_t after_doc;
+    rpmfileAttrs before_doc = 0;
+    rpmfileAttrs after_doc = 0;
     char *diff_output = NULL;
     int exitcode;
     const char *name = NULL;
@@ -81,21 +81,20 @@ static bool doc_driver(struct rpminspect *ri, rpmfile_entry_t *file)
     }
 
     /* verify %doc values */
-    before_doc = file->peer_file->flags & RPMFILE_DOC;
-    after_doc = file->flags & RPMFILE_DOC;
+    before_doc |= file->peer_file->flags & RPMFILE_DOC;
+    after_doc |= file->flags & RPMFILE_DOC;
 
-    if (before_doc == after_doc) {
+    if (before_doc && after_doc) {
         /* compare the files */
-        diff_output = run_cmd(&exitcode, DIFF_CMD, "-q", file->peer_file->fullpath, file->fullpath, NULL);
+        exitcode = filecmp(file->peer_file->fullpath, file->fullpath);
 
-        if (exitcode) {
+        if (exitcode == -1) {
+            warnx(_("filecmp(%s, %s)"), file->peer_file->fullpath, file->fullpath);
+        } else if (exitcode == 1) {
             /* the files differ, see if it's only whitespace changes */
-            result = false;
             free(diff_output);
             diff_output = run_cmd(&exitcode, DIFF_CMD, "-u", "-w", "-I^#.*", file->peer_file->fullpath, file->fullpath, NULL);
-        }
 
-        if (!result) {
             /* always report content changes on %doc files as INFO */
             params.severity = RESULT_INFO;
             params.waiverauth = NOT_WAIVABLE;
@@ -107,7 +106,7 @@ static bool doc_driver(struct rpminspect *ri, rpmfile_entry_t *file)
             reported = true;
             result = true;
         }
-    } else if (before_doc != after_doc) {
+    } else if (before_doc || after_doc) {
         xasprintf(&params.msg, _("%%doc file change for %s in %s on %s (%smarked as %%doc -> %smarked as %%doc)\n"), file->localpath, name, arch,
                   (before_doc ? "" : _("not ")), (after_doc ? "" : _("not ")));
         add_result(ri, &params);
