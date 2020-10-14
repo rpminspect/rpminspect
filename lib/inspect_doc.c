@@ -57,6 +57,15 @@ static bool doc_driver(struct rpminspect *ri, rpmfile_entry_t *file)
         return true;
     }
 
+    /*
+     * rpm marks man pages with RPMFILE_DOC, but we check those in the
+     * man page inspection.  Exclude them here.
+     */
+    if (process_file_path(file, ri->manpage_path_include, ri->manpage_path_exclude) ||
+        process_file_path(file->peer_file, ri->manpage_path_include, ri->manpage_path_exclude)) {
+        return true;
+    }
+
     /* the package name is used for reporting */
     name = headerGetString(file->rpm_header, RPMTAG_NAME);
 
