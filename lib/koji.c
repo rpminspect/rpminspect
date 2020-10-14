@@ -1227,30 +1227,3 @@ string_list_t *get_all_arches(const struct rpminspect *ri)
 
     return arches;
 }
-
-/*
- * Checks an RPM architecture against the user-specified list.
- * If the user did not specify a list of architectures, return
- * true.  If the user specified a list, only return true if the
- * RPM architecture is in the specified list.  The function
- * returns false if the architecture is not allowed.
- */
-bool allowed_arch(const struct rpminspect *ri, const char *rpmarch)
-{
-    string_entry_t *arch = NULL;
-
-    assert(ri != NULL);
-    assert(rpmarch != NULL);
-
-    if (ri->arches == NULL) {
-        return true;
-    }
-
-    TAILQ_FOREACH(arch, ri->arches, items) {
-        if (!strcmp(rpmarch, arch->data)) {
-            return true;
-        }
-    }
-
-    return false;
-}
