@@ -160,9 +160,7 @@ static bool config_driver(struct rpminspect *ri, rpmfile_entry_t *file)
             /* compare the files */
             exitcode = filecmp(file->peer_file->fullpath, file->fullpath);
 
-            if (exitcode == -1) {
-                warnx(_("filecmp(%s, %s)"), file->peer_file->fullpath, file->fullpath);
-            } else if (exitcode == 1) {
+            if (exitcode) {
                 /* the files differ and not a rebase, see if it's only whitespace changes */
                 free(diff_output);
                 params.details = run_cmd(&exitcode, DIFF_CMD, "-u", "-w", "-I^#.*", file->peer_file->fullpath, file->fullpath, NULL);

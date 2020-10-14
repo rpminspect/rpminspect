@@ -93,9 +93,7 @@ static bool doc_driver(struct rpminspect *ri, rpmfile_entry_t *file)
         /* compare the files */
         exitcode = filecmp(file->peer_file->fullpath, file->fullpath);
 
-        if (exitcode == -1) {
-            warnx(_("filecmp(%s, %s)"), file->peer_file->fullpath, file->fullpath);
-        } else if (exitcode == 1) {
+        if (exitcode) {
             /* the files differ, see if it's only whitespace changes */
             free(diff_output);
             diff_output = run_cmd(&exitcode, DIFF_CMD, "-u", "-w", "-I^#.*", file->peer_file->fullpath, file->fullpath, NULL);
