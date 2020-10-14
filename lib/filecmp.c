@@ -44,10 +44,7 @@ int filecmp(const char *x, const char *y)
 
     /* read in the files */
     xbuf = read_file_bytes(x, &xlen);
-    assert(xbuf != NULL);
-
     ybuf = read_file_bytes(y, &ylen);
-    assert(ybuf != NULL);
 
     /* they are different if the sizes read are different */
     if (xlen != ylen) {
