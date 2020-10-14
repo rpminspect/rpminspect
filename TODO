@@ -32,9 +32,6 @@ Other:
     - Unify the error and debug reporting using consistent functions
       and messaging.  (e.g., warn() and err())
 
-    - Add a section to the configuration file to specify external
-      commands and their full paths.
-
 
 Test categories that have been migrated:
 ----------------------------------------

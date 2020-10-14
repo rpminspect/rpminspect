@@ -159,6 +159,15 @@ void free_rpminspect(struct rpminspect *ri) {
 
     free(ri->desktop_entry_files_dir);
     free(ri->vendor);
+
+    free(ri->commands.diff);
+    free(ri->commands.diffstat);
+    free(ri->commands.msgunfmt);
+    free(ri->commands.desktop_file_validate);
+    free(ri->commands.annocheck);
+    free(ri->commands.abidiff);
+    free(ri->commands.kmidiff);
+
     list_free(ri->buildhost_subdomain, free);
     list_free(ri->security_path_prefix, free);
     list_free(ri->header_file_extensions, free);

@@ -230,13 +230,13 @@ static bool patches_driver(struct rpminspect *ri, rpmfile_entry_t *file)
      * This just reports patches that change content.  It uses the INFO reporting level.
      */
     if (comparison && file->peer_file) {
-        params.details = run_cmd(&exitcode, DIFF_CMD, "-q", before_patch, after_patch, NULL);
+        params.details = run_cmd(&exitcode, ri->commands.diff, "-q", before_patch, after_patch, NULL);
         free(params.details);
         params.details = NULL;
 
         if (exitcode) {
             /* the files differ, see if it's only whitespace changes */
-            params.details = run_cmd(&exitcode, DIFF_CMD, "-u", "-w", "-I^#.*", before_patch, after_patch, NULL);
+            params.details = run_cmd(&exitcode, ri->commands.diff, "-u", "-w", "-I^#.*", before_patch, after_patch, NULL);
 
             if (exitcode) {
                 /* more than whitespace changed */
@@ -280,7 +280,7 @@ static bool patches_driver(struct rpminspect *ri, rpmfile_entry_t *file)
     /*
      * Collect diffstat(1) data and report based on thresholds.
      */
-    params.details = run_cmd(&exitcode, DIFFSTAT_CMD, after_patch, NULL);
+    params.details = run_cmd(&exitcode, ri->commands.diffstat, after_patch, NULL);
 
     if (exitcode == 0 && params.details != NULL) {
         ds = get_diffstat_counts(params.details);
@@ -311,7 +311,7 @@ static bool patches_driver(struct rpminspect *ri, rpmfile_entry_t *file)
             result = !(params.severity >= RESULT_VERIFY);
         }
     } else if (exitcode) {
-        warn("unable to run %s on %s", DIFFSTAT_CMD, file->localpath);
+        warn("unable to run %s on %s", ri->commands.diffstat, file->localpath);
         free(params.details);
         params.details = NULL;
     }

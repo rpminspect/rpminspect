@@ -250,7 +250,7 @@ static bool abidiff_driver(struct rpminspect *ri, rpmfile_entry_t *file) {
         xasprintf(&details, _("Command: %s"), cmd);
         params.msg = _("ABI comparison ended unexpectedly.");
         params.verb = VERB_FAILED;
-        params.noun = ABIDIFF_CMD;
+        params.noun = ri->commands.abidiff;
         report = true;
     } else {
         status = WEXITSTATUS(exitcode);
@@ -258,7 +258,7 @@ static bool abidiff_driver(struct rpminspect *ri, rpmfile_entry_t *file) {
         if ((status & ABIDIFF_ERROR) || (status & ABIDIFF_USAGE_ERROR)) {
             params.severity = RESULT_VERIFY;
             params.verb = VERB_FAILED;
-            params.noun = ABIDIFF_CMD;
+            params.noun = ri->commands.abidiff;
             report = true;
         }
 
@@ -355,7 +355,7 @@ bool inspect_abidiff(struct rpminspect *ri) {
 
     entry = calloc(1, sizeof(*entry));
     assert(entry != NULL);
-    entry->data = strdup(ABIDIFF_CMD);
+    entry->data = strdup(ri->commands.abidiff);
     TAILQ_INSERT_TAIL(firstargs, entry, items);
 
     if (ri->abidiff_extra_args) {

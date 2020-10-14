@@ -317,14 +317,14 @@ static bool desktop_driver(struct rpminspect *ri, rpmfile_entry_t *file)
     init_result_params(&params);
 
     /* Validate the desktop file */
-    params.details = run_cmd(&after_code, DESKTOP_FILE_VALIDATE_CMD, file->fullpath, NULL);
+    params.details = run_cmd(&after_code, ri->commands.desktop_file_validate, file->fullpath, NULL);
     tmpbuf = strreplace(params.details, file->fullpath, file->localpath);
     free(params.details);
     params.details = tmpbuf;
 
     if (file->peer_file && is_desktop_entry_file(ri->desktop_entry_files_dir, file->peer_file)) {
         /* if we have a before peer, validate the corresponding desktop file */
-        before_out = run_cmd(NULL, DESKTOP_FILE_VALIDATE_CMD, file->peer_file->fullpath, NULL);
+        before_out = run_cmd(NULL, ri->commands.desktop_file_validate, file->peer_file->fullpath, NULL);
         tmpbuf = strreplace(before_out, file->peer_file->fullpath, file->peer_file->localpath);
         free(before_out);
         before_out = tmpbuf;

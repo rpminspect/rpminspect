@@ -272,7 +272,7 @@ static bool changedfiles_driver(struct rpminspect *ri, rpmfile_entry_t *file)
          */
 
         /* First, unformat the mo files */
-        params.details = run_and_capture(ri->workdir, &after_tmp, MSGUNFMT_CMD, file->fullpath, &exitcode);
+        params.details = run_and_capture(ri->workdir, &after_tmp, ri->commands.msgunfmt, file->fullpath, &exitcode);
 
         if (exitcode) {
             xasprintf(&params.msg, _("Error running msgunfmt on %s on %s"), file->localpath, arch);
@@ -286,7 +286,7 @@ static bool changedfiles_driver(struct rpminspect *ri, rpmfile_entry_t *file)
             goto done;
         }
 
-        params.details = run_and_capture(ri->workdir, &before_tmp, MSGUNFMT_CMD, file->peer_file->fullpath, &exitcode);
+        params.details = run_and_capture(ri->workdir, &before_tmp, ri->commands.msgunfmt, file->peer_file->fullpath, &exitcode);
 
         if (exitcode) {
             xasprintf(&params.msg, _("Error running msgunfmt on %s on %s"), file->peer_file->localpath, arch);
@@ -301,7 +301,7 @@ static bool changedfiles_driver(struct rpminspect *ri, rpmfile_entry_t *file)
         }
 
         /* Now diff the mo content */
-        params.details = run_cmd(&exitcode, DIFF_CMD, "-u", before_tmp, after_tmp, NULL);
+        params.details = run_cmd(&exitcode, ri->commands.diff, "-u", before_tmp, after_tmp, NULL);
 
         /* Remove the temporary files */
         if (unlink(before_tmp) == -1) {
@@ -343,7 +343,7 @@ static bool changedfiles_driver(struct rpminspect *ri, rpmfile_entry_t *file)
 
     if (!strcmp(type, "text/x-c") && possible_header) {
         /* Now diff the header content */
-        errors = run_cmd(&exitcode, DIFF_CMD, "-u", "-w", "--label", file->localpath, file->peer_file->fullpath, file->fullpath, NULL);
+        errors = run_cmd(&exitcode, ri->commands.diff, "-u", "-w", "--label", file->localpath, file->peer_file->fullpath, file->fullpath, NULL);
 
         if (exitcode) {
             /*

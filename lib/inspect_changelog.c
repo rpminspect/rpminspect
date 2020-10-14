@@ -238,7 +238,7 @@ static bool check_src_rpm_changelog(struct rpminspect *ri, const rpmpeer_entry_t
 
     /* Compare the changelogs */
     if (before_output && after_output) {
-        diff_output = run_cmd(&exitcode, DIFF_CMD, "-u", before_output, after_output, NULL);
+        diff_output = run_cmd(&exitcode, ri->commands.diff, "-u", before_output, after_output, NULL);
     }
 
     /* Set up result parameters */
@@ -360,7 +360,7 @@ static bool check_bin_rpm_changelog(struct rpminspect *ri, const rpmpeer_entry_t
 
     /* Compare the changelogs */
     if (before_output && after_output) {
-        diff_output = run_cmd(&exitcode, DIFF_CMD, "-u", before_output, after_output, NULL);
+        diff_output = run_cmd(&exitcode, ri->commands.diff, "-u", before_output, after_output, NULL);
     }
 
     /* Set up result parameters */
