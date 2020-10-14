@@ -233,10 +233,7 @@ static bool changedfiles_driver(struct rpminspect *ri, rpmfile_entry_t *file)
         /* perform a byte comparison of the uncompressed files */
         exitcode = filecmp(before_uncompressed_file, after_uncompressed_file);
 
-        if (exitcode == -1) {
-            /* an error occurred uncompressing the files */
-            warnx(_("filecmp(%s, %s)"), before_uncompressed_file, after_uncompressed_file);
-        } else if (exitcode == 1) {
+        if (exitcode) {
             /* the files are different, report */
             if (rindex(type, '/')) {
                 comptype = rindex(type, '/') + 1;
@@ -257,9 +254,7 @@ static bool changedfiles_driver(struct rpminspect *ri, rpmfile_entry_t *file)
         free(before_uncompressed_file);
         free(after_uncompressed_file);
 
-        if (exitcode == 0 || exitcode == 1) {
-            goto done;
-        }
+        goto done;
     }
 
     /*
