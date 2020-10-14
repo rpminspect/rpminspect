@@ -73,6 +73,7 @@ enum {
     BLOCK_BIN_PATHS,
     BLOCK_BUILDHOST_SUBDOMAIN,
     BLOCK_CHANGEDFILES,
+    BLOCK_COMMANDS,
     BLOCK_COMMON,
     BLOCK_DESKTOP,
     BLOCK_ELF,
@@ -497,6 +498,8 @@ static int read_cfgfile(struct rpminspect *ri, const char *filename)
                         block = BLOCK_KOJI;
                     } else if (!strcmp(key, "vendor")) {
                         block = BLOCK_VENDOR;
+                    } else if (!strcmp(key, "commands")) {
+                        block = BLOCK_COMMANDS;
                     } else if (!strcmp(key, "inspections")) {
                         block = BLOCK_INSPECTIONS;
                     } else if (!strcmp(key, "products")) {
@@ -617,6 +620,29 @@ static int read_cfgfile(struct rpminspect *ri, const char *filename)
                         } else if (!strcmp(key, "download_mbs")) {
                             free(ri->kojimbs);
                             ri->kojimbs = strdup(t);
+                        }
+                    } else if (block == BLOCK_COMMON) {
+                        if (!strcmp(key, "diff")) {
+                            free(ri->commands.diff);
+                            ri->commands.diff = strdup(t);
+                        } else if (!strcmp(key, "diffstat")) {
+                            free(ri->commands.diffstat);
+                            ri->commands.diffstat = strdup(t);
+                        } else if (!strcmp(key, "msgunfmt")) {
+                            free(ri->commands.msgunfmt);
+                            ri->commands.msgunfmt = strdup(t);
+                        } else if (!strcmp(key, "desktop-file-validate")) {
+                            free(ri->commands.desktop_file_validate);
+                            ri->commands.desktop_file_validate = strdup(t);
+                        } else if (!strcmp(key, "annocheck")) {
+                            free(ri->commands.annocheck);
+                            ri->commands.annocheck = strdup(t);
+                        } else if (!strcmp(key, "abidiff")) {
+                            free(ri->commands.abidiff);
+                            ri->commands.abidiff = strdup(t);
+                        } else if (!strcmp(key, "kmidiff")) {
+                            free(ri->commands.kmidiff);
+                            ri->commands.kmidiff = strdup(t);
                         }
                     } else if (group == BLOCK_METADATA) {
                         /*
@@ -1350,6 +1376,15 @@ struct rpminspect *init_rpminspect(struct rpminspect *ri, const char *cfgfile, c
         ri->kmidiff_debuginfo_path = strdup(DEBUG_PATH);
         ri->patch_file_threshold = DEFAULT_PATCH_FILE_THRESHOLD;
         ri->patch_line_threshold = DEFAULT_PATCH_LINE_THRESHOLD;
+
+        /* Initialize commands */
+        ri->commands.diff = strdup(DIFF_CMD);
+        ri->commands.diffstat = strdup(DIFFSTAT_CMD);
+        ri->commands.msgunfmt = strdup(MSGUNFMT_CMD);
+        ri->commands.desktop_file_validate = strdup(DESKTOP_FILE_VALIDATE_CMD);
+        ri->commands.annocheck = strdup(ANNOCHECK_CMD);
+        ri->commands.abidiff = strdup(ABIDIFF_CMD);
+        ri->commands.kmidiff = strdup(KMIDIFF_CMD);
 
         /* Store full paths to all config files read */
         ri->cfgfiles = calloc(1, sizeof(*ri->cfgfiles));

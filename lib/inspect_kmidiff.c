@@ -308,7 +308,7 @@ static bool kmidiff_driver(struct rpminspect *ri, rpmfile_entry_t *file)
         xasprintf(&details, _("Command: %s"), cmd);
         params.msg = _("KMI comparison ended unexpectedly.");
         params.verb = VERB_FAILED;
-        params.noun = KMIDIFF_CMD;
+        params.noun = ri->commands.kmidiff;
         report = true;
     } else {
         status = WEXITSTATUS(exitcode);
@@ -316,7 +316,7 @@ static bool kmidiff_driver(struct rpminspect *ri, rpmfile_entry_t *file)
         if ((status & ABIDIFF_ERROR) || (status & ABIDIFF_USAGE_ERROR)) {
             params.severity = RESULT_VERIFY;
             params.verb = VERB_FAILED;
-            params.noun = KMIDIFF_CMD;
+            params.noun = ri->commands.kmidiff;
             report = true;
         }
 
@@ -400,7 +400,7 @@ bool inspect_kmidiff(struct rpminspect *ri) {
 
     entry = calloc(1, sizeof(*entry));
     assert(entry != NULL);
-    entry->data = strdup(KMIDIFF_CMD);
+    entry->data = strdup(ri->commands.kmidiff);
     TAILQ_INSERT_TAIL(firstargs, entry, items);
 
     if (ri->kmidiff_extra_args) {

@@ -294,6 +294,17 @@ typedef enum _politics_field_t {
     PERMISSION = 2,
 } politics_field_t;
 
+/* Commands used by rpminspect at runtime. */
+struct command_paths {
+    char *diff;
+    char *diffstat;
+    char *msgunfmt;
+    char *desktop_file_validate;
+    char *annocheck;
+    char *abidiff;
+    char *kmidiff;
+};
+
 /*
  * Configuration and state instance for librpminspect run.
  * Applications using librpminspect should initialize the
@@ -305,6 +316,9 @@ struct rpminspect {
     char *workdir;             /* full path to working directory */
     char *profiledir;          /* full path to profiles directory */
     char *worksubdir;          /* within workdir, where these builds go */
+
+    /* Commands */
+    struct command_paths commands;
 
     /* Vendor data */
     char *vendor_data_dir;     /* main vendor data directory */

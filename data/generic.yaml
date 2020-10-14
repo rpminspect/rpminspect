@@ -29,6 +29,32 @@ koji:
     # The download URL for modular packages built in Koji
     download_mbs: http://download.example.com/downloadroot
 
+commands:
+    # External helper commands used by rpminspect.  Defaults are noted.
+
+    # diff(1) command, must support -u, -w, and -I options as defined
+    # in GNU diff.
+    #diff: /usr/bin/diff
+
+    # diffstat(1) command.
+    # https://invisible-island.net/diffstat/
+    #diffstat: /usr/bin/diffstat
+
+    # msgunfmt(1) as found in GNU gettext
+    #msgunfmt: /usr/bin/msgunfmt
+
+    # desktop-file-validate(1) from the desktop-file-utils project at
+    # Freedesktop.org
+    #desktop-file-validate: /usr/bin/desktop-file-validate
+
+    # annocheck(1) from the annobin project:
+    # https://sourceware.org/git/annobin.git
+    #annocheck: /usr/bin/annocheck
+
+    # abidiff(1) and kmidiff(1) from libabigail
+    #abidiff: /usr/bin/abidiff
+    #kmidiff: /usr/bin/kmidiff
+
 vendor:
     # Where the vendor data files can be found.  The
     # rpminspect-data-generic package provides a template of where

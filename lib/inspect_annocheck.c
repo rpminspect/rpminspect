@@ -86,9 +86,9 @@ static bool annocheck_driver(struct rpminspect *ri, rpmfile_entry_t *file)
 
         /* Run the test on the file */
         if (get_after_debuginfo_path(ri, arch) == NULL) {
-            xasprintf(&cmd, "%s %s %s", ANNOCHECK_CMD, (char *) eptr->data, file->fullpath);
+            xasprintf(&cmd, "%s %s %s", ri->commands.annocheck, (char *) eptr->data, file->fullpath);
         } else {
-            xasprintf(&cmd, "%s %s --debug-dir=%s %s", ANNOCHECK_CMD, (char *) eptr->data, get_after_debuginfo_path(ri, arch), file->fullpath);
+            xasprintf(&cmd, "%s %s --debug-dir=%s %s", ri->commands.annocheck, (char *) eptr->data, get_after_debuginfo_path(ri, arch), file->fullpath);
         }
 
         DEBUG_PRINT("%s\n", cmd);
@@ -98,9 +98,9 @@ static bool annocheck_driver(struct rpminspect *ri, rpmfile_entry_t *file)
         /* If we have a before build, run the command on that */
         if (file->peer_file) {
             if (get_before_debuginfo_path(ri, arch) == NULL) {
-                xasprintf(&cmd, "%s %s %s", ANNOCHECK_CMD, (char *) eptr->data, file->peer_file->fullpath);
+                xasprintf(&cmd, "%s %s %s", ri->commands.annocheck, (char *) eptr->data, file->peer_file->fullpath);
             } else {
-                xasprintf(&cmd, "%s %s --debug-dir=%s %s", ANNOCHECK_CMD, (char *) eptr->data, get_before_debuginfo_path(ri, arch), file->peer_file->fullpath);
+                xasprintf(&cmd, "%s %s --debug-dir=%s %s", ri->commands.annocheck, (char *) eptr->data, get_before_debuginfo_path(ri, arch), file->peer_file->fullpath);
             }
 
             DEBUG_PRINT("%s\n", cmd);
