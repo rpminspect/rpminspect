@@ -52,6 +52,11 @@ static bool doc_driver(struct rpminspect *ri, rpmfile_entry_t *file)
         return true;
     }
 
+    /* only compare regular files and symlinks */
+    if (S_ISDIR(file->st.st_mode) || S_ISCHR(file->st.st_mode) || S_ISBLK(file->st.st_mode) || S_ISFIFO(file->st.st_mode) || S_ISSOCK(file->st.st_mode)) {
+        return true;
+    }
+
     /* the package name is used for reporting */
     name = headerGetString(file->rpm_header, RPMTAG_NAME);
 
