@@ -123,20 +123,15 @@ static void set_worksubdir(struct rpminspect *ri, workdir_t wd,
 static void get_rpm_info(const char *pkg)
 {
     Header h;
-    const char *arch = NULL;
 
+    assert(pkg != NULL);
     h = get_rpm_header(workri, pkg);
 
     if (h == NULL) {
         return;
     }
 
-    arch = get_rpm_header_arch(h);
-
-    if (allowed_arch(workri, arch)) {
-        add_peer(&workri->peers, whichbuild, fetch_only, pkg, h);
-    }
-
+    add_peer(&workri->peers, whichbuild, fetch_only, pkg, h);
     return;
 }
 
@@ -442,6 +437,11 @@ static int download_build(const struct rpminspect *ri, struct koji_build *build)
 
         /* Iterate over the list of packages for this build */
         TAILQ_FOREACH(rpm, buildentry->rpms, items) {
+            /* skip arches the user wishes to exclude */
+            if (!allowed_arch(ri, rpm->arch)) {
+                continue;
+            }
+
             /* create the destination directory */
             if (fetch_only) {
                 xasprintf(&dst, "%s/%s", workri->worksubdir, rpm->arch);
@@ -575,39 +575,46 @@ static int download_task(const struct rpminspect *ri, struct koji_task *task)
         free(dst);
 
         /* download SRPMs */
-        TAILQ_FOREACH(entry, descendent->srpms, items) {
-            pkg = basename(entry->data);
+        if (allowed_arch(ri, "src")) {
+            TAILQ_FOREACH(entry, descendent->srpms, items) {
+                pkg = basename(entry->data);
 
-            if (fetch_only) {
-                xasprintf(&dst, "%s/src", workri->worksubdir);
-            } else {
-                xasprintf(&dst, "%s/%s/src", workri->worksubdir, build_desc[whichbuild]);
+                if (fetch_only) {
+                    xasprintf(&dst, "%s/src", workri->worksubdir);
+                } else {
+                    xasprintf(&dst, "%s/%s/src", workri->worksubdir, build_desc[whichbuild]);
+                }
+
+                if (mkdirp(dst, mode)) {
+                    fprintf(stderr, _("*** error creating directory %s: %s\n"), dst, strerror(errno));
+                    fflush(stderr);
+                    return -1;
+                }
+
+                len = strlen(dst);
+                dst = realloc(dst, len + strlen(pkg) + 2);
+                tail = dst + len;
+                tail = stpcpy(tail, "/");
+                tail = stpcpy(tail, pkg);
+                assert(dst != NULL);
+
+                xasprintf(&src, "%s/work/%s", workri->kojiursine, entry->data);
+                curl_helper(workri->verbose, src, dst);
+
+                /* gather the RPM header */
+                get_rpm_info(dst);
+
+                free(dst);
+                free(src);
             }
-
-            if (mkdirp(dst, mode)) {
-                fprintf(stderr, _("*** error creating directory %s: %s\n"), dst, strerror(errno));
-                fflush(stderr);
-                return -1;
-            }
-
-            len = strlen(dst);
-            dst = realloc(dst, len + strlen(pkg) + 2);
-            tail = dst + len;
-            tail = stpcpy(tail, "/");
-            tail = stpcpy(tail, pkg);
-            assert(dst != NULL);
-
-            xasprintf(&src, "%s/work/%s", workri->kojiursine, entry->data);
-            curl_helper(workri->verbose, src, dst);
-
-            /* gather the RPM header */
-            get_rpm_info(dst);
-
-            free(dst);
-            free(src);
         }
 
         TAILQ_FOREACH(entry, descendent->rpms, items) {
+            /* skip arches the user wishes to exclude */
+            if (!allowed_arch(ri, descendent->task->arch)) {
+                continue;
+            }
+
             pkg = basename(entry->data);
 
             if (fetch_only) {
