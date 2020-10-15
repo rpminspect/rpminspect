@@ -83,9 +83,9 @@ char *list_to_string(const string_list_t *list, const char *delimiter)
 /*
  * Lightweight conversion of a string_list_t to an array of pointers
  * to the entry->data strings.  The caller should take care to only
- * free the entry->data pointers once; either with listfree(list,
+ * free the entry->data pointers once; either with list_free(list,
  * free) or by iterating this array and calling free() on each.  If
- * the latter, then listfree() should still be used on list, but pass
+ * the latter, then list_free() should still be used on list, but pass
  * NULL as the free func.
  */
 char **list_to_array(const string_list_t *list)
@@ -444,7 +444,7 @@ size_t list_len(const string_list_t *list)
 
 /*
  * Returns a malloc'ed copy of the given list.  Caller must use
- * listfree(list, free) on the returned list.
+ * list_free(list, free) on the returned list.
  */
 string_list_t * list_copy(const string_list_t *list)
 {

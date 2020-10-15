@@ -104,7 +104,6 @@ static bool doc_driver(struct rpminspect *ri, rpmfile_entry_t *file)
 
         if (exitcode) {
             /* the files differ, see if it's only whitespace changes */
-            free(diff_output);
             diff_output = run_cmd(&exitcode, ri->commands.diff, "-u", "-w", "-I^#.*", file->peer_file->fullpath, file->fullpath, NULL);
 
             /* always report content changes on %doc files as INFO */
@@ -115,6 +114,7 @@ static bool doc_driver(struct rpminspect *ri, rpmfile_entry_t *file)
             params.details = diff_output;
             add_result(ri, &params);
             free(params.msg);
+            free(diff_output);
             reported = true;
             result = true;
         }

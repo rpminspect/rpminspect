@@ -355,6 +355,7 @@ void free_abi(abi_list_t *list)
             if (eptr != NULL) {
                 pkgentry = (abi_pkg_entry_t *) eptr->data;
                 list_free(pkgentry->dsos, free);
+                free(pkgentry);
             }
         }
 

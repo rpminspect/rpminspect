@@ -120,7 +120,11 @@ void free_rpminspect(struct rpminspect *ri) {
 
                     free(cflentry);
                 }
+
+                free(centry->files);
             }
+
+            free(centry);
         }
 
         free(ri->caps);
@@ -135,6 +139,7 @@ void free_rpminspect(struct rpminspect *ri) {
 
             free(pentry->pattern);
             free(pentry->digest);
+            free(pentry);
         }
 
         free(ri->politics);

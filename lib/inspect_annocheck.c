@@ -144,6 +144,7 @@ static bool annocheck_driver(struct rpminspect *ri, rpmfile_entry_t *file)
             if (wrkdir) {
                 tmp_out = strreplace(after_out, wrkdir, NULL);
                 free(after_out);
+                free(wrkdir);
                 after_out = tmp_out;
             }
 

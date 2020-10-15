@@ -1224,7 +1224,7 @@ bool init_rebaseable(struct rpminspect *ri)
         }
 
         /* add the entry to the actual list */
-        newentry = calloc(1, sizeof(newentry));
+        newentry = calloc(1, sizeof(*newentry));
         assert(newentry != NULL);
         newentry->data = strdup(line);
         TAILQ_INSERT_TAIL(ri->rebaseable, newentry, items);
