@@ -176,6 +176,7 @@ bool is_elf_shared_library(const char *fullpath)
     }
 
     close(fd);
+    elf_end(elf);
     return result;
 }
 

@@ -86,9 +86,9 @@ char *uncompress_file(struct rpminspect *ri, const char *infile, const char *sub
             free(outfile);
             return NULL;
         }
-
-        free(outfile);
     }
+
+    free(outfile);
 
     /* create the output file that will be uncompressed */
     base = rindex(infile, '/') + 1;
