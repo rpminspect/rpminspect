@@ -71,7 +71,6 @@ static void get_kabi_dir(struct rpminspect *ri)
         TAILQ_FOREACH(file, peer->after_files, items) {
             /* use stat(2) here because we want to read what symlinks point to */
             if (stat(file->fullpath, &sbuf) != 0) {
-                warn("stat()");
                 continue;
             }
 
