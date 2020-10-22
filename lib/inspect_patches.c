@@ -358,6 +358,7 @@ bool inspect_patches(struct rpminspect *ri)
         xasprintf(&params.msg, _("No source packages available, skipping inspection."));
         add_result(ri, &params);
         free(params.msg);
+        reported = true;
         return result;
     }
 
@@ -400,6 +401,7 @@ bool inspect_patches(struct rpminspect *ri)
                     xasprintf(&params.msg, _("Patch file `%s` removed"), file->localpath);
                     add_result(ri, &params);
                     free(params.msg);
+                    reported = true;
                     result = !(params.severity >= RESULT_VERIFY);
                 }
             }
@@ -408,9 +410,10 @@ bool inspect_patches(struct rpminspect *ri)
 
     /* Sound the everything-is-ok alarm if everything is, in fact, ok */
     if (result && !reported) {
+        init_result_params(&params);
+        params.header = HEADER_PATCHES;
         params.severity = RESULT_OK;
         params.waiverauth = NOT_WAIVABLE;
-        params.remedy = NULL;
         add_result(ri, &params);
     }
 
