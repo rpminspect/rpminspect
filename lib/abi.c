@@ -227,7 +227,7 @@ abi_list_t *read_abi(const char *vendor_data_dir, const char *product_release)
             /* try to find this package in the ABI compat level table */
             foundkey = false;
 
-            if (entry->keys) {
+            if (entry->keys != NULL && !TAILQ_EMPTY(entry->keys)) {
                 /* package name may already exist in the key list */
                 TAILQ_FOREACH(keyentry, entry->keys, items) {
                     if (!strcmp(keyentry->data, pkg->data)) {
@@ -241,7 +241,7 @@ abi_list_t *read_abi(const char *vendor_data_dir, const char *product_release)
                     e.key = pkg->data;
                     hsearch_r(e, FIND, &eptr, entry->pkgs);
 
-                    if (eptr != NULL) {
+                    if (eptr != NULL && eptr->data != NULL) {
                         pkgentry = (abi_pkg_entry_t *) eptr->data;
                     }
                 }
@@ -250,11 +250,6 @@ abi_list_t *read_abi(const char *vendor_data_dir, const char *product_release)
                 entry->keys = calloc(1, sizeof(*entry->keys));
                 assert(entry->keys != NULL);
                 TAILQ_INIT(entry->keys);
-            }
-
-            if (foundkey) {
-                list_free(linekv, free);
-                continue;
             }
 
             /* split all the DSO values */
@@ -294,26 +289,28 @@ abi_list_t *read_abi(const char *vendor_data_dir, const char *product_release)
             /* if this was a new package, add it */
 
             /* hash table keys */
-            keyentry = calloc(1, sizeof(*keyentry));
-            assert(keyentry != NULL);
-            keyentry->data = strdup(pkg->data);
-            assert(keyentry->data != NULL);
-            TAILQ_INSERT_TAIL(entry->keys, keyentry, items);
+            if (!foundkey && (pkgentry->all || pkgentry->dsos != NULL)) {
+                keyentry = calloc(1, sizeof(*keyentry));
+                assert(keyentry != NULL);
+                keyentry->data = strdup(pkg->data);
+                assert(keyentry->data != NULL);
+                TAILQ_INSERT_TAIL(entry->keys, keyentry, items);
 
-            /* ensure we have a hash table */
-            if (entry->pkgs == NULL) {
-                entry->pkgs = calloc(1, sizeof(*(entry->pkgs)));
-                r = hcreate_r(table_size * 1.25, entry->pkgs);
-                assert(r != 0);
-            }
+                /* ensure we have a hash table */
+                if (entry->pkgs == NULL) {
+                    entry->pkgs = calloc(1, sizeof(*(entry->pkgs)));
+                    r = hcreate_r(table_size * 1.25, entry->pkgs);
+                    assert(r != 0);
+                }
 
-            /* add this new hash table entry */
-            e.key = keyentry->data;
-            e.data = pkgentry;
-            eptr = NULL;
+                /* add this new hash table entry */
+                e.key = keyentry->data;
+                e.data = pkgentry;
+                eptr = NULL;
 
-            if (!hsearch_r(e, ENTER, &eptr, entry->pkgs)) {
-                warn("unable to add %s to the ABI compatibility level %d structure", pkg->data, entry->level);
+                if (!hsearch_r(e, ENTER, &eptr, entry->pkgs)) {
+                    warn("unable to add %s to the ABI compatibility level %d structure", pkg->data, entry->level);
+                }
             }
 
             /* clean up */
@@ -355,8 +352,6 @@ void free_abi(abi_list_t *list)
             if ((eptr != NULL) && (eptr->data != NULL)) {
                 pkgentry = (abi_pkg_entry_t *) eptr->data;
                 list_free(pkgentry->dsos, free);
-                free(eptr->data);
-                eptr->data = NULL;
             }
         }
 
