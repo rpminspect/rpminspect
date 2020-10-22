@@ -257,6 +257,15 @@ abi_list_t *read_abi(const char *vendor_data_dir, const char *product_release)
                 continue;
             }
 
+            /* split all the DSO values */
+            dsos = strsplit(dso->data, ",\n\r");
+
+            if (dsos == NULL) {
+                warn("malformed DSO list: %s", dso->data);
+                list_free(linekv, free);
+                continue;
+            }
+
             /* make sure we have the hash table entry */
             if (pkgentry == NULL) {
                 pkgentry = calloc(1, sizeof(*pkgentry));
@@ -264,15 +273,6 @@ abi_list_t *read_abi(const char *vendor_data_dir, const char *product_release)
             }
 
             /* collect all the DSO values */
-            dsos = strsplit(dso->data, ",\n\r");
-
-            if (dsos == NULL) {
-                warn("malformed DSO list: %s", dso->data);
-                list_free(linekv, free);
-                free(pkgentry);
-                continue;
-            }
-
             TAILQ_FOREACH(dsoval, dsos, items) {
                 if (!strcasecmp(dsoval->data, "all-dsos")) {
                     pkgentry->all = true;
@@ -352,10 +352,11 @@ void free_abi(abi_list_t *list)
             eptr = NULL;
             hsearch_r(e, FIND, &eptr, entry->pkgs);
 
-            if (eptr != NULL) {
+            if ((eptr != NULL) && (eptr->data != NULL)) {
                 pkgentry = (abi_pkg_entry_t *) eptr->data;
                 list_free(pkgentry->dsos, free);
-                free(pkgentry);
+                free(eptr->data);
+                eptr->data = NULL;
             }
         }
 
