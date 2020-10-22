@@ -100,6 +100,8 @@ static bool find_lto_symbols(Elf *elf, string_list_t **user_data)
         specifics = NULL;
     }
 
+    list_free(names, free);
+
     return true;
 }
 
