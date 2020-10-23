@@ -432,10 +432,11 @@ pathmigration:
     #
     # Any package containing a file in /bin will have a failure
     # reporting that file should be in /usr/bin.
-    - /bin: /usr/bin
-    - /sbin: /usr/sbin
-    - /lib: /usr/lib
-    - /lib64: /usr/lib64
+    migrated_paths:
+        - /bin:   /usr/bin
+        - /sbin:  /usr/sbin
+        - /lib:   /usr/lib
+        - /lib64: /usr/lib64
 
     # All rules have exceptions.  List paths here to exclude from the
     # pathmigration rules.

@@ -97,6 +97,7 @@ enum {
     BLOCK_FORBIDDEN_PATHS,
     BLOCK_MANPAGE,
     BLOCK_METADATA,
+    BLOCK_MIGRATED_PATHS,
     BLOCK_OWNERSHIP,
     BLOCK_PATCHES,
     BLOCK_PATCH_FILENAMES,
@@ -185,7 +186,7 @@ void add_entry(string_list_t **list, const char *s)
 }
 
 /**
- * Given a pair_list_t, initialize a new hash table (clearing the old
+ * Given a key and value, initialize a new hash table (clearing the old
  * one if necessary) and migrate the data from the list to the hash
  * table.  Clear the incoming hash table list.  The caller is
  * responsible for freeing all memory allocated to these structures.
@@ -203,66 +204,58 @@ void add_entry(string_list_t **list, const char *s)
  * @param table Destination hash table.
  * @param keys Destination list of hash table keys.
  */
-void process_table(pair_list_t *incoming_table, struct hsearch_data **table, string_list_t **keys)
+static void process_table(char *key, char *value, struct hsearch_data **table, string_list_t **keys)
 {
-    int len = 0;
     ENTRY e;
     ENTRY *eptr;
     string_entry_t *entry = NULL;
-    pair_entry_t *pair = NULL;
 
-    assert(incoming_table != NULL);
+    assert(key != NULL);
+    assert(value != NULL);
 
-    /* clear out any existing data */
-    free_mapping(*table, *keys);
+    /* set up new data structures if we need to */
+    if (*table == NULL) {
+        *table = calloc(1, sizeof(**table));
+        assert(*table != NULL);
 
-    /* length of the incoming list */
-    TAILQ_FOREACH(pair, incoming_table, items) {
-        len++;
+        /* XXX -- fix with later hashmap implementation */
+        if (hcreate_r(BUFSIZ * 1.25, *table) == 0) {
+            free(*table);
+            *table = NULL;
+            warn(_("hcreate_r() failure in %s"), __func__);
+        }
     }
 
-    /* set up new data structures */
-    *table = calloc(1, sizeof(**table));
-    assert(*table != NULL);
-
-    if (hcreate_r(len * 1.25, *table) == 0) {
-        free(*table);
-        *table = NULL;
-        fprintf(stderr, "*** hcreate_r() failure in process_table()\n");
-        fflush(stderr);
+    if (*keys == NULL) {
+        *keys = calloc(1, sizeof(**keys));
+        assert(*keys != NULL);
+        TAILQ_INIT(*keys);
     }
 
-    *keys = calloc(1, sizeof(**keys));
-    assert(*keys != NULL);
-    TAILQ_INIT(*keys);
+DEBUG_PRINT("adding key=|%s|, value=|%s|\n", key, value);
 
-    /*
-     * migrate the list to the table
-     * NOTE: This will remove and free each incoming table entry, but does
-     * not free the key and value strings since those just migrate to the
-     * hash table.  The caller needs to free the entire incoming table on
-     * return of this function.
-     */
-    while (!TAILQ_EMPTY(incoming_table)) {
-        pair = TAILQ_FIRST(incoming_table);
+    /* add the new key/value pair to the table */
+    e.key = key;
+    eptr = NULL;
+    hsearch_r(e, FIND, &eptr, *table);
 
-        /* save the key */
+    if (eptr == NULL) {
+        /* key does not exist, add it */
         entry = calloc(1, sizeof(*entry));
         assert(entry != NULL);
-        entry->data = pair->key;
+        entry->data = strdup(key);
         TAILQ_INSERT_TAIL(*keys, entry, items);
 
-        /* add the hash table entry */
+        /* add to the hash table */
         e.key = entry->data;
-        e.data = pair->value;
+        e.data = strdup(value);
         hsearch_r(e, ENTER, &eptr, *table);
-
-        /* delete this incoming entry */
-        TAILQ_REMOVE(incoming_table, pair, items);
-        free(pair);
+    } else {
+        /* entry found, replace it in the hash table */
+        free(eptr->data);
+        eptr->data = strdup(value);
     }
 
-    free(incoming_table);
     return;
 }
 
@@ -412,15 +405,10 @@ static int read_cfgfile(struct rpminspect *ri, const char *filename)
     int symbol = SYMBOL_NULL;
     int block = BLOCK_NULL;
     int group = BLOCK_NULL;
-    int oldblock = BLOCK_NULL;
     char *key = NULL;
     char *t = NULL;
     bool exclude = false;
-    bool read_incoming_table = false;
-    pair_list_t *incoming_table = NULL;
-    pair_entry_t *incoming_pair = NULL;
-    struct hsearch_data **dest_table = NULL;
-    string_list_t **dest_keys = NULL;
+    bool map = false;
 
     assert(ri != NULL);
     assert(filename != NULL);
@@ -477,11 +465,16 @@ static int read_cfgfile(struct rpminspect *ri, const char *filename)
                 /*
                  * blocks under groups should be closed first but if
                  * there is no block set, we are closing the group
+                 * NOTE: nested maps are handled differently, that
+                 * needs to be toggled on and off explicitly in the
+                 * YAML_SCALAR_TOKEN handler below.
                  */
-                if (group != BLOCK_NULL && block != BLOCK_NULL) {
-                    block = BLOCK_NULL;
-                } else if (group != BLOCK_NULL && block == BLOCK_NULL) {
-                    group = BLOCK_NULL;
+                if (!map) {
+                    if (group != BLOCK_NULL && block != BLOCK_NULL) {
+                        block = BLOCK_NULL;
+                    } else if (group != BLOCK_NULL && block == BLOCK_NULL) {
+                        group = BLOCK_NULL;
+                    }
                 }
 
                 break;
@@ -566,9 +559,15 @@ static int read_cfgfile(struct rpminspect *ri, const char *filename)
                     } else if (!strcmp(key, "javabytecode")) {
                         block = BLOCK_JAVABYTECODE;
                     } else if (!strcmp(key, "pathmigration")) {
-                        block = BLOCK_PATHMIGRATION;
-                    } else if (block == BLOCK_PATHMIGRATION && !strcmp(key, "excluded_paths")) {
-                        block = BLOCK_PATHMIGRATION_EXCLUDED_PATHS;
+                        group = BLOCK_PATHMIGRATION;
+                    } else if (group == BLOCK_PATHMIGRATION) {
+                        if (!strcmp(key, "migrated_paths")) {
+                            block = BLOCK_MIGRATED_PATHS;
+                            map = true;
+                        } else if (!strcmp(key, "excluded_paths")) {
+                            block = BLOCK_PATHMIGRATION_EXCLUDED_PATHS;
+                            map = false;
+                        }
                     } else if (!strcmp(key, "files")) {
                         group = BLOCK_FILES;
                     } else if (group == BLOCK_FILES && !strcmp(key, "forbidden_paths")) {
@@ -591,19 +590,6 @@ static int read_cfgfile(struct rpminspect *ri, const char *filename)
                     free(key);
                     key = strdup(t);
                 } else if (symbol == SYMBOL_VALUE) {
-                    /* process any block that was a hash table */
-                    if (block != oldblock && read_incoming_table) {
-                        process_table(incoming_table, dest_table, dest_keys);
-
-                        /* reset the incoming table (process_table already removed entries) */
-                        incoming_table = NULL;
-                        read_incoming_table = false;
-
-                        /* reset the destination table and keys for incoming hash tables */
-                        dest_table = NULL;
-                        dest_keys = NULL;
-                    }
-
                     /* sort values in to the right settings based on the block */
                     if (block == BLOCK_COMMON) {
                         if (!strcmp(key, "workdir")) {
@@ -784,34 +770,14 @@ static int read_cfgfile(struct rpminspect *ri, const char *filename)
                                 ri->size_threshold = 0;
                             }
                         }
-                    } else if (block == BLOCK_ANNOCHECK || block == BLOCK_JAVABYTECODE || block == BLOCK_PATHMIGRATION || block == BLOCK_PRODUCTS) {
-                        if (incoming_table == NULL) {
-                            incoming_table = calloc(1, sizeof(*incoming_table));
-                            assert(incoming_table != NULL);
-                            TAILQ_INIT(incoming_table);
-                        }
-
-                        incoming_pair = calloc(1, sizeof(*incoming_pair));
-                        incoming_pair->key = strdup(key);
-                        incoming_pair->value = strdup(t);
-                        TAILQ_INSERT_TAIL(incoming_table, incoming_pair, items);
-
-                        read_incoming_table = true;
-                        oldblock = block;
-
-                        if (block == BLOCK_ANNOCHECK) {
-                            dest_table = &ri->annocheck;
-                            dest_keys = &ri->annocheck_keys;
-                        } else if (block == BLOCK_JAVABYTECODE) {
-                            dest_table = &ri->jvm;
-                            dest_keys = &ri->jvm_keys;
-                        } else if (block == BLOCK_PATHMIGRATION) {
-                            dest_table = &ri->pathmigration;
-                            dest_keys = &ri->pathmigration_keys;
-                        } else if (block == BLOCK_PRODUCTS) {
-                            dest_table = &ri->products;
-                            dest_keys = &ri->product_keys;
-                        }
+                    } else if (block == BLOCK_ANNOCHECK) {
+                        process_table(key, t, &ri->annocheck, &ri->annocheck_keys);
+                    } else if (block == BLOCK_JAVABYTECODE) {
+                        process_table(key, t, &ri->jvm, &ri->jvm_keys);
+                    } else if (block == BLOCK_MIGRATED_PATHS) {
+                        process_table(key, t, &ri->pathmigration, &ri->pathmigration_keys);
+                    } else if (block == BLOCK_PRODUCTS) {
+                        process_table(key, t, &ri->products, &ri->product_keys);
                     } else if (block == BLOCK_INSPECTIONS) {
                         if (!strcasecmp(t, "on")) {
                             exclude = false;
@@ -940,11 +906,6 @@ static int read_cfgfile(struct rpminspect *ri, const char *filename)
     if (fclose(fp) != 0) {
         warn(_("fclose(%s)"), filename);
         return -1;
-    }
-
-    /* process any final block that was a hash table */
-    if (read_incoming_table) {
-        process_table(incoming_table, dest_table, dest_keys);
     }
 
     /* clean up */
