@@ -426,6 +426,7 @@ struct rpminspect {
     /* hash table of path migrations */
     struct hsearch_data *pathmigration;
     string_list_t *pathmigration_keys;
+    string_list_t *pathmigration_excluded_paths;
 
     /* hash table of product release regexps */
     struct hsearch_data *products;

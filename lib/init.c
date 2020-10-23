@@ -101,6 +101,7 @@ enum {
     BLOCK_PATCHES,
     BLOCK_PATCH_FILENAMES,
     BLOCK_PATHMIGRATION,
+    BLOCK_PATHMIGRATION_EXCLUDED_PATHS,
     BLOCK_PRODUCTS,
     BLOCK_SECURITY_PATH_PREFIX,
     BLOCK_SHELLS,
@@ -566,6 +567,8 @@ static int read_cfgfile(struct rpminspect *ri, const char *filename)
                         block = BLOCK_JAVABYTECODE;
                     } else if (!strcmp(key, "pathmigration")) {
                         block = BLOCK_PATHMIGRATION;
+                    } else if (block == BLOCK_PATHMIGRATION && !strcmp(key, "excluded_paths")) {
+                        block = BLOCK_PATHMIGRATION_EXCLUDED_PATHS;
                     } else if (!strcmp(key, "files")) {
                         group = BLOCK_FILES;
                     } else if (group == BLOCK_FILES && !strcmp(key, "forbidden_paths")) {
@@ -915,6 +918,8 @@ static int read_cfgfile(struct rpminspect *ri, const char *filename)
                         add_entry(&ri->kernel_filenames, t);
                     } else if (block == BLOCK_PATCH_FILENAMES) {
                         add_entry(&ri->patch_ignore_list, t);
+                    } else if (block == BLOCK_PATHMIGRATION_EXCLUDED_PATHS) {
+                        add_entry(&ri->pathmigration_excluded_paths, t);
                     }
                 }
 
