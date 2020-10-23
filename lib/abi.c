@@ -289,7 +289,7 @@ abi_list_t *read_abi(const char *vendor_data_dir, const char *product_release)
             /* if this was a new package, add it */
 
             /* hash table keys */
-            if (!foundkey && (pkgentry->all || pkgentry->dsos != NULL)) {
+            if (!foundkey) {
                 keyentry = calloc(1, sizeof(*keyentry));
                 assert(keyentry != NULL);
                 keyentry->data = strdup(pkg->data);
@@ -316,6 +316,7 @@ abi_list_t *read_abi(const char *vendor_data_dir, const char *product_release)
             /* clean up */
             list_free(linekv, free);
             list_free(dsos, free);
+            pkgentry = NULL;          /* for the next loop iteration */
         }
     }
 
@@ -352,6 +353,7 @@ void free_abi(abi_list_t *list)
             if ((eptr != NULL) && (eptr->data != NULL)) {
                 pkgentry = (abi_pkg_entry_t *) eptr->data;
                 list_free(pkgentry->dsos, free);
+                free(pkgentry);
             }
         }
 
