@@ -40,6 +40,31 @@ static bool pathmigration_driver(struct rpminspect *ri, rpmfile_entry_t *file)
         return true;
     }
 
+    /* Skip files beginning with an excluded path */
+    if (ri->pathmigration_excluded_paths && !TAILQ_EMPTY(ri->pathmigration_excluded_paths)) {
+        TAILQ_FOREACH(entry, ri->pathmigration_excluded_paths, items) {
+            /* check in case of an exact match */
+            if (!strcmp(file->localpath, entry->data)) {
+                return true;
+            }
+
+            /* ensure the path prefixes end with '/' */
+            if (strsuffix(entry->data, "/")) {
+                old = strdup(entry->data);
+            } else {
+                xasprintf(&old, "%s/", entry->data);
+            }
+
+            /* if matched, return */
+            if (strprefix(file->localpath, entry->data)) {
+                free(old);
+                return true;
+            }
+
+            free(old);
+        }
+    }
+
     /* Used for reporting */
     arch = get_rpm_header_arch(file->rpm_header);
 
@@ -63,7 +88,6 @@ static bool pathmigration_driver(struct rpminspect *ri, rpmfile_entry_t *file)
         /*
          * Make sure the old path name ends with a slash.
          */
-
         if (strsuffix(entry->data, "/")) {
             old = strdup(entry->data);
         } else {
