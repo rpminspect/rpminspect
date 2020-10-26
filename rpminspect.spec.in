@@ -11,8 +11,8 @@ Group:          Development/Tools
 License:        GPLv3+ and LGPLv2+ and ASL 2.0 and CC-BY
 URL:            https://github.com/rpminspect/rpminspect
 Source0:        https://github.com/rpminspect/rpminspect/releases/download/v%%VERSION%%/%%TARBALL%%
-Source1:        changelog
-
+Source1:        https://github.com/rpminspect/rpminspect/releases/download/v%%VERSION%%/%%TARBALL%%.asc
+Source2:        changelog
 Requires:       librpminspect%{?_isa} = %{version}-%{release}
 
 BuildRequires:  meson
@@ -175,4 +175,4 @@ control files.
 
 
 %changelog
-%include %{SOURCE1}
+%include %{SOURCE2}
