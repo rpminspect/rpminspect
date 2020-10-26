@@ -112,9 +112,10 @@ for branch in ${BRANCHES} ; do
 
     # make sure we are on the right branch
     ${VENDORPKG} switch-branch ${branch}
+    git pull
 
     # add the new source archive
-    ${VENDORPKG} new-sources "${TARBALL}"
+    ${VENDORPKG} new-sources "${TARBALL}" "${TARBALL}".asc
 
     # extract any changelog entries that appeared in the spec file
     sed -n '/^%changelog/,/^%include\ \%{SOURCE1}/p' "${PROJECT}".spec | \
