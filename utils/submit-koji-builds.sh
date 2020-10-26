@@ -20,7 +20,8 @@
 
 # Arguments:
 #     $1    Path to the release tarball to build
-#     $2    The name of the project in dist-git
+#     $2    Path to the detached signature for the release tarball
+#     $3    The name of the project in dist-git
 
 PATH=/usr/bin
 CWD="$(pwd)"
@@ -63,6 +64,26 @@ fi
 
 if ! tar tf "${TARBALL}" >/dev/null 2>&1 ; then
     echo "*** $(basename "${TARBALL}") is not a tar archive" >&2
+    exit 1
+fi
+
+shift
+
+# Need tarball signature
+if [ $# -eq 0 ]; then
+    echo "*** Missing detached signature of release tarball" >&2
+    exit 1
+fi
+
+TARBALL_ASC="$(realpath "$1")"
+
+if [ ! -f "${TARBALL_ASC}" ]; then
+    echo "*** $(basename "${TARBALL_ASC}") does not exist" >&2
+    exit 1
+fi
+
+if [ ! "$(file -b --mime-type "${TARBALL_ASC}")" = "application/pgp-signature" ]; then
+    echo "*** $(basename "${TARBALL_ASC}") is not a gpg signature" >&2
     exit 1
 fi
 
@@ -115,7 +136,7 @@ for branch in ${BRANCHES} ; do
     git pull
 
     # add the new source archive
-    ${VENDORPKG} new-sources "${TARBALL}" "${TARBALL}".asc
+    ${VENDORPKG} new-sources "${TARBALL}"
 
     # extract any changelog entries that appeared in the spec file
     sed -n '/^%changelog/,/^%include\ \%{SOURCE1}/p' "${PROJECT}".spec | \
