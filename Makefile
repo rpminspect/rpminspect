@@ -133,7 +133,9 @@ help:
 	@echo "    make new-release     # bumps version number, tags, and pushes"
 	@echo
 	@echo "Generate SRPM of the latest release and do all Koji builds:"
-	@echo "    make koji"
+	@echo "    env BRANCHES=\"master f31 f32 f33 epel7 epel8\" make koji"
+	@echo "NOTE: You must set the BRANCHES environment variable for the koji target"
+	@echo "otherwise it will just build for the master branch."
 
 # Quiet errors about target arguments not being targets
 %:
