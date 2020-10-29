@@ -232,8 +232,6 @@ static void process_table(char *key, char *value, struct hsearch_data **table, s
         TAILQ_INIT(*keys);
     }
 
-DEBUG_PRINT("adding key=|%s|, value=|%s|\n", key, value);
-
     /* add the new key/value pair to the table */
     e.key = key;
     eptr = NULL;
