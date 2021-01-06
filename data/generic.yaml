@@ -121,6 +121,7 @@ vendor:
     #files: off
     #filesize: off
     #javabytecode: off
+    #kmidiff: off
     #kmod: off
     #license: off
     #lostpayload: off
@@ -133,6 +134,7 @@ vendor:
     #patches: off
     #pathmigration: off
     #permissions: off
+    #politics: off
     #removedfiles: off
     #shellsyntax: off
     #specname: off
