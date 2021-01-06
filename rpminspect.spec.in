@@ -63,20 +63,20 @@ Requires:       clamav-data
 
 # If these are present, the xml inspection can try DTD validation.
 %if 0%{?rhel} >= 8 || 0%{?fedora}
-Suggests:       xhtml1-dtds
-Suggests:       html401-dtds
+Recommends:     xhtml1-dtds
+Recommends:     html401-dtds
 %endif
 
 # These programs are only required for the 'shellsyntax' functionality.
 # You can use rpminspect without these installed, just disable the
 # shellsyntax inspection.
 %if 0%{?rhel} >= 8 || 0%{?epel} >= 8 || 0%{?fedora}
-Suggests:       dash
-Suggests:       ksh
-Suggests:       zsh
-Suggests:       tcsh
-Suggests:       rc
-Suggests:       bash
+Recommends:     dash
+Recommends:     ksh
+Recommends:     zsh
+Recommends:     tcsh
+Recommends:     rc
+Recommends:     bash
 %else
 Requires:       dash
 Requires:       ksh
@@ -89,7 +89,7 @@ Requires:       bash
 # The annocheck program is used by the annocheck inspection.  If it is
 # not present, you can disable the annocheck inspection.
 %if 0%{?rhel} >= 8 || 0%{?epel} >= 8 || 0%{?fedora}
-Suggests:       /usr/bin/annocheck
+Recommends:     /usr/bin/annocheck
 %else
 Requires:       /usr/bin/annocheck
 %endif
@@ -97,7 +97,7 @@ Requires:       /usr/bin/annocheck
 # The abidiff program is used by the abidiff inspection.  If it is not
 # present, you can disable the abidiff inspection.
 %if 0%{?rhel} >= 8 || 0%{?epel} >= 8 || 0%{?fedora}
-Suggests:       /usr/bin/abidiff
+Recommends:     /usr/bin/abidiff
 %else
 Requires:       /usr/bin/abidiff
 %endif
@@ -105,7 +105,7 @@ Requires:       /usr/bin/abidiff
 # The kmidiff program is used by the kmidiff inspection.  If it is not
 # present, you can disable the kmidiff inspection.
 %if 0%{?rhel} >= 8 || 0%{?epel} >= 8 || 0%{?fedora}
-Suggests:       /usr/bin/kmidiff
+Recommends:     /usr/bin/kmidiff
 %else
 Requires:       /usr/bin/kmidiff
 %endif
