@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2014 David Shea <david@reallylongword.org>
+ * Copyright 2003-2021 David Shea <david@reallylongword.org>
  *                     David Cantrell <david.l.cantrell@gmail.com>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -50,7 +50,7 @@ int rmtree(const char *path, const bool ignore_errors, const bool contentsonly) 
         if (ignore_errors) {
             return 0;
         } else {
-            fprintf(stderr, "%s (%d): %s\n", __func__, __LINE__, strerror(errno));
+            warn("stat(%s)", path);
             return 1;
         }
     }
@@ -59,7 +59,7 @@ int rmtree(const char *path, const bool ignore_errors, const bool contentsonly) 
         if (ignore_errors) {
             return 0;
         } else {
-            fprintf(stderr, _("%s is not a directory.\n"), path);
+            warn("%s is not a directory", path);
             return 2;
         }
     }
