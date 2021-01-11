@@ -89,25 +89,25 @@ Requires:       bash
 # The annocheck program is used by the annocheck inspection.  If it is
 # not present, you can disable the annocheck inspection.
 %if 0%{?rhel} >= 8 || 0%{?epel} >= 8 || 0%{?fedora}
-Recommends:     /usr/bin/annocheck
+Recommends:     annobin-annocheck
 %else
-Requires:       /usr/bin/annocheck
+Requires:       annobin-annocheck
 %endif
 
 # The abidiff program is used by the abidiff inspection.  If it is not
 # present, you can disable the abidiff inspection.
 %if 0%{?rhel} >= 8 || 0%{?epel} >= 8 || 0%{?fedora}
-Recommends:     /usr/bin/abidiff
+Recommends:     libabigail >= 1.8
 %else
-Requires:       /usr/bin/abidiff
+Requires:       libabigail >= 1.8
 %endif
 
 # The kmidiff program is used by the kmidiff inspection.  If it is not
 # present, you can disable the kmidiff inspection.
 %if 0%{?rhel} >= 8 || 0%{?epel} >= 8 || 0%{?fedora}
-Recommends:     /usr/bin/kmidiff
+Recommends:     libabigail >= 1.8
 %else
-Requires:       /usr/bin/kmidiff
+Requires:       libabigail >= 1.8
 %endif
 
 %description -n librpminspect
