@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2019-2020  Red Hat, Inc.
+ * Copyright (C) 2019-2021  Red Hat, Inc.
  * Author(s):  David Cantrell <dcantrell@redhat.com>
  *             David Shea <dshea@redhat.com>
  *
@@ -30,6 +30,7 @@
 #include <sys/stat.h>
 #include <unistd.h>
 #include <errno.h>
+#include <err.h>
 
 #include <gelf.h>
 #include <libelf.h>
@@ -50,8 +51,7 @@ static GElf_Half _get_elf_helper(Elf *elf, elfinfo_t type, GElf_Half fail)
     assert(kind == ELF_K_ELF);
 
     if (gelf_getehdr(elf, &ehdr) == NULL) {
-        fprintf(stderr, "*** gelf_getehdr() failure (%d): %s\n", errno, strerror(errno));
-        fflush(stderr);
+        warn("gelf_getehdr()");
         ret = fail;
     }
 
@@ -60,7 +60,7 @@ static GElf_Half _get_elf_helper(Elf *elf, elfinfo_t type, GElf_Half fail)
     } else if (type == ELF_MACHINE) {
         ret = ehdr.e_machine;
     } else {
-        fprintf(stderr, "*** unknown elftype_t %d in %s\n", type, __func__);
+        warn("unknown elftype_t %d", type);
         ret = -1;
     }
 
@@ -88,7 +88,7 @@ static Elf * get_elf_with_kind(const char *fullpath, int *out_fd, Elf_Kind kind)
     /* library version check */
     if (!initialized) {
         if (elf_version(EV_CURRENT) == EV_NONE) {
-            fprintf(stderr, _("libelf version mismatch\n"));
+            warn(_("libelf version mismatch\n"));
             return NULL;
         }
 
@@ -97,7 +97,7 @@ static Elf * get_elf_with_kind(const char *fullpath, int *out_fd, Elf_Kind kind)
 
     /* make sure this is a regular file */
     if (lstat(fullpath, &sbuf) != 0) {
-        fprintf(stderr, _("Unable to stat %s\n"), fullpath);
+        warn("lstat(%s)", fullpath);
         return NULL;
     }
 

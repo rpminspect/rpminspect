@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2019-2020  Red Hat, Inc.
+ * Copyright (C) 2019-2021  Red Hat, Inc.
  * Red Hat Author(s):  David Shea <dshea@redhat.com>
  *                     David Cantrell <dcantrell@redhat.com>
  *
@@ -126,8 +126,7 @@ void add_peer(rpmpeer_t **peers, int whichbuild, bool fetch_only, const char *pk
     /* Add the peer if it doesn't already exist, otherwise add it */
     if (!found) {
         if ((peer = calloc(1, sizeof(*peer))) == NULL) {
-            fprintf(stderr, _("*** failed to allocate new peer peer\n"));
-            fflush(stderr);
+            warn("calloc() new peer");
             return;
         }
     }
