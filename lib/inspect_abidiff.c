@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2020  Red Hat, Inc.
+ * Copyright (C) 2020-2021  Red Hat, Inc.
  * Author(s):  David Cantrell <dcantrell@redhat.com>
  *
  * This program is free software: you can redistribute it and/or
@@ -186,7 +186,6 @@ static bool abidiff_driver(struct rpminspect *ri, rpmfile_entry_t *file) {
     }
 
     /* header dir args */
-/* XXX - not supported yet in abidiff
     e.key = (char *) arch;
     hsearch_r(e, FIND, &eptr, headers_dir1_table);
 
@@ -210,7 +209,6 @@ static bool abidiff_driver(struct rpminspect *ri, rpmfile_entry_t *file) {
             TAILQ_CONCAT(argv, local_h2, items);
         }
     }
-*/
 
     /* the before build */
     entry = calloc(1, sizeof(*entry));
