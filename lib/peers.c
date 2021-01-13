@@ -22,6 +22,7 @@
 
 #include <stdbool.h>
 #include <assert.h>
+#include <err.h>
 
 #include "rpminspect.h"
 
