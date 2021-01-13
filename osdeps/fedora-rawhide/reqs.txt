@@ -11,6 +11,8 @@ diffutils
 elfutils-devel
 file-devel
 gcc
+gcc-c++
+gcc-plugin-devel
 gcovr
 gettext
 gettext-devel
