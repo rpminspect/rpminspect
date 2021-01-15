@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/sh -x
 PATH=/bin:/usr/bin:/sbin:/usr/sbin
 CWD="$(pwd)"
 
@@ -31,7 +31,7 @@ rm -rf mandoc.tar.gz ${SUBDIR}
 
 # Download 'rc' source from Debian and build it locally
 # OpenSUSE Leap lacks the rc shell as an installable package
-RC_URL=http://ftp.debian.org/debian/pool/main/r/rc/
+RC_URL=http://ftp.debian.org/debian/pool/main/r/rc
 ARCHIVE="$(curl -s -L ${RC_URL} | html2text | grep "\.orig\.tar" | cut -d '[' -f 2 | cut -d ']' -f 1 | sort -u | tail -n 1)"
 curl -O -L ${RC_URL}/${ARCHIVE}
 SUBDIR="$(tar -tvf ${ARCHIVE} | head -n 1 | rev | cut -d ' ' -f 1 | rev)"
