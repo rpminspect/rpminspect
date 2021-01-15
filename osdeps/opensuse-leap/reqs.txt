@@ -13,6 +13,7 @@ gettext-tools
 git
 glibc-devel-32bit
 html-dtd
+html2text
 kernel-default-devel
 kernel-devel
 ksh

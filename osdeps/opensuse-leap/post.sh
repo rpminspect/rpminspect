@@ -29,28 +29,18 @@ make lib-install
 cd ${CWD}
 rm -rf mandoc.tar.gz ${SUBDIR}
 
-# Download 'rc' from Fedora because OpenSUSE does not provide it
-cat << "EOF" > /etc/yum/repos.d/fedora.repo
-[fedora]
-name=Fedora
-metalink=https://mirrors.fedoraproject.org/metalink?repo=fedora-rawhide&arch=$basearch
-enabled=1
-metadata_expire=7d
-rep_gpgcheck=0
-type=rpm
-gpgcheck=0
-EOF
-
-mkdir -p ${CWD}/fedora-rpms
-yum install -y --downloadonly --downloaddir=${CWD}/fedora-rpms rc
-cd ${CWD}/fedora-rpms
-for pkg in *.rpm ; do
-    rpm2cpio ${pkg} | cpio -id
-done
-cp -av ${CWD}/fedora-rpms/usr/* /usr/local
+# Download 'rc' source from Debian and build it locally
+# OpenSUSE Leap lacks the rc shell as an installable package
+RC_URL=http://ftp.debian.org/debian/pool/main/r/rc/
+ARCHIVE="$(curl -o - ${RC_URL} | html2text | grep "\.orig\.tar" | cut -d '[' -f 2 | cut -d ']' -f 1 | sort -u | tail -n 1)"
+curl -O ${RC_URL}/${ARCHIVE}
+SUBDIR="$(tar -tvf ${ARCHIVE} | head -n 1 | rev | cut -d ' ' -f 1 | rev)"
+cd ${SUBDIR}
+./configure --prefix=/usr/local
+make
+make install
 cd ${CWD}
-rm -rf fedora-rpms
-ldconfig
+rm -rf ${ARCHIVE} ${SUBDIR}
 
 # Update the clamav database
 freshclam
