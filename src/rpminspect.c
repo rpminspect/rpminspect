@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2019-2020  Red Hat, Inc.
+ * Copyright (C) 2019-2021  Red Hat, Inc.
  * Author(s):  David Cantrell <dcantrell@redhat.com>
  *
  * This program is free software: you can redistribute it and/or modify
@@ -323,6 +323,7 @@ int main(int argc, char **argv) {
     char *walk = NULL;
     char *token = NULL;
     char *workdir = NULL;
+    struct stat sbuf;
     char cwd[PATH_MAX + 1];
     char *r = NULL;
     char *output = NULL;
@@ -439,7 +440,7 @@ int main(int argc, char **argv) {
                     }
 
                     globfree(&expand);
-                } else if (index(optarg, '/') == NULL || !strprefix(optarg, "./") || !strprefix(optarg, "../")) {
+                } else if (index(optarg, '/') == NULL && (!strprefix(optarg, "./") || !strprefix(optarg, "../"))) {
                     /* relative path specified with no leading dir spec */
 
                     /* get current dir */
@@ -451,15 +452,23 @@ int main(int argc, char **argv) {
                     xasprintf(&tmp, "%s/%s", r, optarg);
                     assert(tmp != NULL);
 
-                    /* canonicalize the path */
-                    workdir = realpath(tmp, NULL);
+                    /* canonicalize the path if it exists */
+                    if (stat(tmp, &sbuf) == 0) {
+                        workdir = realpath(tmp, NULL);
+                        free(tmp);
+                    } else {
+                        workdir = tmp;
+                    }
 
                     /* clean up */
-                    free(tmp);
                     tmp = NULL;
                 } else {
-                    /* canonicalize the path specified */
-                    workdir = realpath(optarg, NULL);
+                    /* canonicalize the path specified if it exists */
+                    if (stat(optarg, &sbuf) == 0) {
+                        workdir = realpath(optarg, NULL);
+                    } else {
+                        workdir = strdup(optarg);
+                    }
                 }
 
                 break;
