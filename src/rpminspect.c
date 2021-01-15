@@ -440,28 +440,6 @@ int main(int argc, char **argv) {
                     }
 
                     globfree(&expand);
-                } else if (index(optarg, '/') == NULL && (!strprefix(optarg, "./") || !strprefix(optarg, "../"))) {
-                    /* relative path specified with no leading dir spec */
-
-                    /* get current dir */
-                    memset(cwd, '\0', sizeof(cwd));
-                    r = getcwd(cwd, PATH_MAX);
-                    assert(r != NULL);
-
-                    /* combine current dir and option */
-                    xasprintf(&tmp, "%s/%s", r, optarg);
-                    assert(tmp != NULL);
-
-                    /* canonicalize the path if it exists */
-                    if (stat(tmp, &sbuf) == 0) {
-                        workdir = realpath(tmp, NULL);
-                        free(tmp);
-                    } else {
-                        workdir = tmp;
-                    }
-
-                    /* clean up */
-                    tmp = NULL;
                 } else {
                     /* canonicalize the path specified if it exists */
                     if (stat(optarg, &sbuf) == 0) {
