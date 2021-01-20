@@ -79,6 +79,17 @@ bool foreach_peer_file(struct rpminspect *ri, foreach_peer_file_func callback, b
  */
 const char *inspection_desc(const uint64_t id);
 
+
+/**
+ * @brief Return inspection description string given its results
+ * header.
+ *
+ * Return the long description for the specified inspection.
+ *
+ * @param header Inspection header string.
+ */
+const char *inspection_header_to_desc(const char *header);
+
 /** @} */
 
 /**
