@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2019-2020  Red Hat, Inc.
+ * Copyright (C) 2019-2021  Red Hat, Inc.
  * Author(s):  David Cantrell <dcantrell@redhat.com>
  *
  * This program is free software: you can redistribute it and/or
@@ -35,7 +35,7 @@
 #define HEADER_LOSTPAYLOAD   "lost-payload"
 #define HEADER_LICENSE       "license"
 #define HEADER_ELF           "elf-object-properties"
-#define HEADER_MAN           "man-pages"
+#define HEADER_MANPAGE       "man-pages"
 #define HEADER_XML           "xml-files"
 #define HEADER_DESKTOP       "desktop-entry-files"
 #define HEADER_DISTTAG       "dist-tag"

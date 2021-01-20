@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2019-2020  Red Hat, Inc.
+ * Copyright (C) 2019-2021  Red Hat, Inc.
  * Author(s):  David Shea <dshea@redhat.com>
  *             David Cantrell <dcantrell@redhat.com>
  *
@@ -280,7 +280,7 @@ static bool manpage_driver(struct rpminspect *ri, rpmfile_entry_t *file)
     init_result_params(&params);
     params.severity = RESULT_VERIFY;
     params.waiverauth = WAIVABLE_BY_ANYONE;
-    params.header = HEADER_MAN;
+    params.header = HEADER_MANPAGE;
     params.arch = get_rpm_header_arch(file->rpm_header);
     params.file = file->localpath;
     params.verb = VERB_FAILED;
@@ -324,7 +324,7 @@ bool inspect_manpage(struct rpminspect *ri)
         init_result_params(&params);
         params.severity = RESULT_OK;
         params.waiverauth = NOT_WAIVABLE;
-        params.header = HEADER_MAN;
+        params.header = HEADER_MANPAGE;
         add_result(ri, &params);
     }
 
