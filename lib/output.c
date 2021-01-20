@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2019  Red Hat, Inc.
+ * Copyright (C) 2019-2021  Red Hat, Inc.
  * Author(s):  David Cantrell <dcantrell@redhat.com>
  *
  * This program is free software: you can redistribute it and/or
@@ -27,8 +27,9 @@
  */
 
 struct format formats[] = {
-    { FORMAT_TEXT, "text", &output_text },
-    { FORMAT_JSON, "json", &output_json },
+    { FORMAT_TEXT,  "text",  &output_text },
+    { FORMAT_JSON,  "json",  &output_json },
+    { FORMAT_XUNIT, "xunit", &output_xunit },
     { -1, NULL, NULL }
 };
 
@@ -39,6 +40,8 @@ const char *format_desc(unsigned int format)
             return _("Plain text suitable for the console and piping through paging programs.");
         case FORMAT_JSON:
             return _("Results organized as a JSON data structure suitable for reading by web applications and other frontend tools.");
+        case FORMAT_XUNIT:
+            return _("Results organized as an XUnit data structure suitable for use with Jenkins and other XUnit-enabled services.");
         default:
             return NULL;
     }

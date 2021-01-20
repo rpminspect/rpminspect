@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2019  Red Hat, Inc.
+ * Copyright (C) 2019-2021  Red Hat, Inc.
  * Author(s):  David Cantrell <dcantrell@redhat.com>
  *
  * This program is free software: you can redistribute it and/or
@@ -26,7 +26,8 @@
  * Output formats are reference by a constant.
  */
 
-#define FORMAT_TEXT 0
-#define FORMAT_JSON 1
+#define FORMAT_TEXT  0
+#define FORMAT_JSON  1
+#define FORMAT_XUNIT 2
 
 #endif

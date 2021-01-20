@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2019-2021  Red Hat, Inc.
+ * Copyright (C) 2021  Red Hat, Inc.
  * Author(s):  David Cantrell <dcantrell@redhat.com>
  *
  * This program is free software: you can redistribute it and/or
@@ -20,26 +20,32 @@
  */
 
 #include <stdio.h>
-#include <string.h>
-#include <errno.h>
+#include <err.h>
 #include <assert.h>
 
 #include "rpminspect.h"
 
 /*
- * Output a results_t in plain text format.
+ * Output a results_t in XUnit format.  This can be consumed by Jenkins or
+ * other services that can read in XUnit data (e.g., GitHub).
  */
-void output_text(const results_t *results, const char *dest, __attribute__((unused)) const severity_t threshold) {
+void output_xunit(const results_t *results, const char *dest, const severity_t threshold) {
     results_entry_t *result = NULL;
     int r = 0;
     int count = 0;
-    int len = 0;
-    bool displayed_header = false;
-    bool first = true;
+    int total = 0;
+    int failures = 0;
     FILE *fp = NULL;
     const char *header = NULL;
-    char *msg = NULL;
-    size_t width = tty_width();
+
+    /* count up total test cases and total failures */
+    TAILQ_FOREACH(result, results, items) {
+        if (header == NULL || strcmp(header, result->header)) {
+            total++;
+        }
+
+        header = result->header;
+    }
 
     /* default to stdout unless a filename was specified */
     if (dest == NULL) {
@@ -48,53 +54,38 @@ void output_text(const results_t *results, const char *dest, __attribute__((unus
         fp = fopen(dest, "w");
 
         if (fp == NULL) {
-            fprintf(stderr, _("*** Error opening %s for writing: %s\n"), dest, strerror(errno));
-            fflush(stderr);
+            warn(_("opening %s for writing"), dest);
             return;
         }
     }
 
+    header = NULL;
+    fprintf(fp, "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n");
+    fprintf(fp, "<testsuite tests=\"%d\" failures=\"%d\" errors=\"0\" skipped=\"0\">\n", total, failures);
+
     /* output the results */
     TAILQ_FOREACH(result, results, items) {
         if (header == NULL || strcmp(header, result->header)) {
+            if (header != NULL) {
+                fprintf(fp, "    </testcase>\n");
+            }
+
+            fprintf(fp, "    <testcase name=\"/%s\" classname=\"rpminspect\">\n", result->header);
             header = result->header;
-            displayed_header = false;
             count = 1;
         }
 
-        if (first) {
-            first = false;
-        } else {
-            fprintf(fp, "\n");
+        if (result->severity >= threshold) {
+            fprintf(fp, "        <failure message=\"%s\">%s</failure>\n", result->msg, inspection_header_to_desc(result->header));
         }
 
-        if (!displayed_header) {
-            len = strlen(header) + 1;
-            fprintf(fp, "%s:\n", header);
-
-            for (r = 0; r < len; r++) {
-                fprintf(fp, "-");
-            }
-
-            fprintf(fp, "\n");
-            displayed_header = true;
-        }
+        fprintf(fp, "        <system-out>\n");
 
         if (result->msg != NULL) {
-            xasprintf(&msg, "%d) %s\n", count++, result->msg);
-
-            if (width) {
-                printwrap(msg, width, 0, fp);
-            } else {
-                fprintf(fp, "%s", msg);
-            }
-
-            fprintf(fp, "\n");
-            free(msg);
+            fprintf(fp, "%d) %s\n\n", count++, result->msg);
         }
 
         fprintf(fp, _("Result: %s\n"), strseverity(result->severity));
-
         fprintf(fp, _("Waiver Authorization: %s\n\n"), strwaiverauth(result->waiverauth));
 
         if (result->details != NULL) {
@@ -102,21 +93,18 @@ void output_text(const results_t *results, const char *dest, __attribute__((unus
         }
 
         if (result->remedy != NULL) {
-            xasprintf(&msg, _("Suggested Remedy:\n%s"), result->remedy);
-
-            if (width) {
-                printwrap(msg, width, 0, fp);
-            } else {
-                fprintf(fp, "%s", msg);
-            }
-
-            free(msg);
+            fprintf(fp, _("Suggested Remedy:\n%s"), result->remedy);
         }
 
-        fprintf(fp, "\n");
+        fprintf(fp, "        </system-out>\n");
     }
 
     /* tidy up and return */
+    if (header != NULL) {
+        fprintf(fp, "    </testcase>\n");
+    }
+
+    fprintf(fp, "</testsuite>\n");
     r = fflush(fp);
     assert(r == 0);
 
