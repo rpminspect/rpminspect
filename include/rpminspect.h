@@ -234,10 +234,13 @@ void add_result(struct rpminspect *, struct result_params *);
 const char *format_desc(unsigned int);
 
 /* output_text.c */
-void output_text(const results_t *, const char *);
+void output_text(const results_t *, const char *, const severity_t);
 
 /* output_json.c */
-void output_json(const results_t *, const char *);
+void output_json(const results_t *, const char *, const severity_t);
+
+/* output_xunit.c */
+void output_xunit(const results_t *, const char *, const severity_t);
 
 /* unpack.c */
 int unpack_archive(const char *, const char *, const bool);

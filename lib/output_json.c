@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2019  Red Hat, Inc.
+ * Copyright (C) 2019-2021  Red Hat, Inc.
  * Author(s):  David Cantrell <dcantrell@redhat.com>
  *
  * This program is free software: you can redistribute it and/or
@@ -30,7 +30,7 @@
 /*
  * Output a results_t in JSON format.
  */
-void output_json(const results_t *results, const char *dest) {
+void output_json(const results_t *results, const char *dest, __attribute__((unused)) const severity_t threshold) {
     results_entry_t *result = NULL;
     int r = 0;
     int len = 0;

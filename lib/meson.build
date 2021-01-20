@@ -76,6 +76,7 @@ librpminspect_sources = [
     'output.c',
     'output_json.c',
     'output_text.c',
+    'output_xunit.c',
     'pairfuncs.c',
     'paths.c',
     'peers.c',
