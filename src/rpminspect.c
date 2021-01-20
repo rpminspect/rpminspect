@@ -791,7 +791,7 @@ int main(int argc, char **argv) {
         }
 
         if (ri->results != NULL) {
-            formats[formatidx].driver(ri->results, output);
+            formats[formatidx].driver(ri->results, output, ri->threshold);
         }
     }
 
