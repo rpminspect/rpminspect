@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2019-2020  Red Hat, Inc.
+ * Copyright (C) 2019-2021  Red Hat, Inc.
  * Author(s):  David Shea <dshea@redhat.com>
  *             David Cantrell <dcantrell@redhat.com>
  *
@@ -23,7 +23,7 @@
 /**
  * @file inspect_elf.c
  * @author David Cantrell &lt;dcantrell@redhat.com&gt;
- * @date 2019-2020
+ * @date 2019-2021
  * @brief 'elf' inspection
  * @copyright LGPL-3.0-or-later
  */
@@ -50,133 +50,8 @@
 /* defined in inspect_elf_bits.c. See pic_bits.sh */
 bool is_pic_reloc(Elf64_Half, Elf64_Xword);
 
-/* Used by the fortified symbol checks */
-static string_list_t *fortifiable = NULL;
-static struct hsearch_data *fortifiable_table = NULL;
-
-static bool is_fortified(const char *symbol);
-static bool is_fortifiable(const char *symbol);
-
-void init_elf_data(void)
-{
-    void *dl;
-    struct link_map *info;
-    char *libc_path;
-    Elf *libc_elf;
-    int libc_fd;
-    string_list_t *libc_fortified;
-
-    string_entry_t *entry;
-    string_entry_t *iter;
-    size_t symbol_len;
-    size_t nentries;
-    ENTRY e;
-    ENTRY *eptr;
-
-    /*
-     * Use libdl to get the path to libc.so.6 so we can open it.
-     * This is kind of lame, but avoids having to hardcode library paths
-     * or call an external program or worry about 32 vs. 64-bit.
-     */
-    dl = dlopen(LIBC_SO, RTLD_LAZY);
-
-    if (dl == NULL) {
-        return;
-    }
-
-    if (dlinfo(dl, RTLD_DI_LINKMAP, &info) != 0) {
-        dlclose(dl);
-        return;
-    }
-
-    /* get_elf only operates on regular files, use realpath to resolve any symlinks */
-    libc_path = realpath(info->l_name, NULL);
-
-    if (libc_path == NULL) {
-        dlclose(dl);
-        return;
-    }
-
-    libc_elf = get_elf(libc_path, &libc_fd);
-    free(libc_path);
-    dlclose(dl);
-
-    if (libc_elf == NULL) {
-        return;
-    }
-
-    /* Get a list of all fortified symbols in glibc */
-    /* Use .dynsym because libc on some platforms may be stripped of .symtab */
-    libc_fortified = get_elf_imported_functions(libc_elf, is_fortified);
-
-    if (libc_fortified == NULL) {
-        elf_end(libc_elf);
-        close(libc_fd);
-        return;
-    }
-
-    fortifiable = malloc(sizeof(*fortifiable));
-    assert(fortifiable != NULL);
-    TAILQ_INIT(fortifiable);
-
-    /* the symbols will be of the form, e.g., "__asprintf_chk". Turn that into "asprintf". */
-    nentries = 0;
-    TAILQ_FOREACH(iter, libc_fortified, items) {
-        /* Skip this one */
-        if (!strcmp(iter->data, "__chk_fail")) {
-            continue;
-        }
-
-        symbol_len = strlen(iter->data);
-
-        entry = calloc(1, sizeof(*entry));
-        assert(entry != NULL);
-        /* minus 2 underscores, minus for _chk, plus \0 */
-        entry->data = calloc(symbol_len - 5, 1);
-        assert(entry->data != NULL);
-
-        /* strip off underscores, stop before _chk, \0 already present */
-        strncpy(entry->data, iter->data + 2, symbol_len - 6);
-        TAILQ_INSERT_TAIL(fortifiable, entry, items);
-        nentries++;
-    }
-
-    list_free(libc_fortified, NULL);
-    elf_end(libc_elf);
-    close(libc_fd);
-
-    /* The fortifiable tailq is to keep track of what all's been malloced.
-     * Copy into a hash table for fast lookups.
-     */
-    fortifiable_table = calloc(1, sizeof(*fortifiable_table));
-    assert(fortifiable_table != NULL);
-
-    if (hcreate_r(nentries, fortifiable_table) == 0) {
-        free(fortifiable_table);
-        fortifiable_table = NULL;
-        return;
-    }
-
-    TAILQ_FOREACH(iter, fortifiable, items) {
-        e.key = iter->data;
-        e.data = iter->data;
-        hsearch_r(e, ENTER, &eptr, fortifiable_table);
-    }
-}
-
-void free_elf_data(void)
-{
-    if (fortifiable_table != NULL) {
-        hdestroy_r(fortifiable_table);
-        free(fortifiable_table);
-        fortifiable_table = NULL;
-    }
-
-    if (fortifiable != NULL) {
-        list_free(fortifiable, free);
-        fortifiable = NULL;
-    }
-}
+/* used by callback functions that need access to ri */
+static struct rpminspect *rip = NULL;
 
 /**
  * @brief Check if execstack is present.
@@ -339,24 +214,12 @@ bool has_bind_now(Elf *elf)
     return have_dynamic_tag(elf, DT_BIND_NOW) || have_dynamic_flag(elf, DF_BIND_NOW);
 }
 
-static bool is_fortified(const char *symbol)
-{
-    /* Besides the fortified versions of functions, look for the function
-     * that gets calls on buffer overflow
-     */
-    if (!strcmp(symbol, "__chk_fail")) {
-        return true;
-    }
-
-    return (strprefix(symbol, "__") && strsuffix(symbol, "_chk"));
-}
-
 static bool is_fortifiable(const char *symbol)
 {
     ENTRY e;
     ENTRY *eptr;
     e.key = (char *) symbol;
-    hsearch_r(e, FIND, &eptr, fortifiable_table);
+    hsearch_r(e, FIND, &eptr, rip->fortifiable_table);
     return eptr != NULL;
 }
 
@@ -1250,9 +1113,9 @@ bool inspect_elf(struct rpminspect *ri)
     bool result;
     struct result_params params;
 
-    init_elf_data();
+    init_elf_data(ri);
+    rip = ri;
     result = foreach_peer_file(ri, elf_driver, true);
-    free_elf_data();
 
     if (result) {
         init_result_params(&params);

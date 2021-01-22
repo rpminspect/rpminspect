@@ -517,6 +517,10 @@ struct rpminspect {
     char *after_rel;                /* after Release w/o ${?dist} */
     int rebase_build;               /* indicates if this is a rebased build */
 
+    /* used by ELF symbol checks */
+    string_list_t *fortifiable;
+    struct hsearch_data *fortifiable_table;
+
     /* spec file macros */
     pair_list_t *macros;
 

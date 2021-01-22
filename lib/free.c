@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2019-2020  Red Hat, Inc.
+ * Copyright (C) 2019-2021  Red Hat, Inc.
  * Author(s):  David Cantrell <dcantrell@redhat.com>
  *
  * This program is free software: you can redistribute it and/or
@@ -228,6 +228,13 @@ void free_rpminspect(struct rpminspect *ri) {
     free_pair(ri->macros);
 
     free_results(ri->results);
+
+    if (ri->fortifiable_table != NULL) {
+        hdestroy_r(ri->fortifiable_table);
+        free(ri->fortifiable_table);
+    }
+
+    list_free(ri->fortifiable, free);
 
     return;
 }
