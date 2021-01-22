@@ -32,6 +32,10 @@
 #include <errno.h>
 #include <err.h>
 
+#include <dlfcn.h>
+#include <gnu/lib-names.h>
+#include <link.h>
+
 #include <gelf.h>
 #include <libelf.h>
 #include <ar.h>
@@ -39,6 +43,132 @@
 #include "queue.h"
 #include "readelf.h"
 #include "rpminspect.h"
+
+bool is_fortified(const char *symbol)
+{
+    /* Besides the fortified versions of functions, look for the
+     * function that gets calls on buffer overflow
+     */
+    if (!strcmp(symbol, "__chk_fail")) {
+        return true;
+    }
+
+    return (strprefix(symbol, "__") && strsuffix(symbol, "_chk"));
+}
+
+void init_elf_data(struct rpminspect *ri)
+{
+    void *dl;
+    struct link_map *info;
+    char *libc_path;
+    Elf *libc_elf;
+    int libc_fd;
+    string_list_t *libc_fortified;
+
+    string_entry_t *entry;
+    string_entry_t *iter;
+    size_t symbol_len;
+    size_t nentries;
+    ENTRY e;
+    ENTRY *eptr;
+
+    assert(ri != NULL);
+
+    /*
+     * Use libdl to get the path to libc.so.6 so we can open it.
+     * This is kind of lame, but avoids having to hardcode library paths
+     * or call an external program or worry about 32 vs. 64-bit.
+     */
+    dl = dlopen(LIBC_SO, RTLD_LAZY);
+
+    if (dl == NULL) {
+        return;
+    }
+
+    if (dlinfo(dl, RTLD_DI_LINKMAP, &info) != 0) {
+        dlclose(dl);
+        return;
+    }
+
+    /* get_elf only operates on regular files, use realpath to resolve any symlinks */
+    libc_path = realpath(info->l_name, NULL);
+
+    if (libc_path == NULL) {
+        dlclose(dl);
+        return;
+    }
+
+    libc_elf = get_elf(libc_path, &libc_fd);
+    free(libc_path);
+    dlclose(dl);
+
+    if (libc_elf == NULL) {
+        return;
+    }
+
+    /* Get a list of all fortified symbols in glibc */
+    /* Use .dynsym because libc on some platforms may be stripped of .symtab */
+    if (ri->fortifiable == NULL) {
+        libc_fortified = get_elf_imported_functions(libc_elf, is_fortified);
+
+        if (libc_fortified == NULL) {
+            elf_end(libc_elf);
+            close(libc_fd);
+            return;
+        }
+
+        ri->fortifiable = malloc(sizeof(*ri->fortifiable));
+        assert(ri->fortifiable != NULL);
+        TAILQ_INIT(ri->fortifiable);
+
+        /* the symbols will be of the form, e.g., "__asprintf_chk". Turn that into "asprintf". */
+        nentries = 0;
+        TAILQ_FOREACH(iter, libc_fortified, items) {
+            /* Skip this one */
+            if (!strcmp(iter->data, "__chk_fail")) {
+                continue;
+            }
+
+            symbol_len = strlen(iter->data);
+
+            entry = calloc(1, sizeof(*entry));
+            assert(entry != NULL);
+            /* minus 2 underscores, minus for _chk, plus \0 */
+            entry->data = calloc(symbol_len - 5, 1);
+            assert(entry->data != NULL);
+
+            /* strip off underscores, stop before _chk, \0 already present */
+            strncpy(entry->data, iter->data + 2, symbol_len - 6);
+            TAILQ_INSERT_TAIL(ri->fortifiable, entry, items);
+            nentries++;
+        }
+
+        list_free(libc_fortified, NULL);
+        elf_end(libc_elf);
+        close(libc_fd);
+
+        /* The fortifiable tailq is to keep track of what all's been malloced.
+         * Copy into a hash table for fast lookups.
+         */
+        assert(ri->fortifiable_table == NULL);
+        ri->fortifiable_table = calloc(1, sizeof(*ri->fortifiable_table));
+        assert(ri->fortifiable_table != NULL);
+
+        if (hcreate_r(nentries, ri->fortifiable_table) == 0) {
+            free(ri->fortifiable_table);
+            ri->fortifiable_table = NULL;
+            return;
+        }
+
+        TAILQ_FOREACH(iter, ri->fortifiable, items) {
+            e.key = iter->data;
+            e.data = iter->data;
+            hsearch_r(e, ENTER, &eptr, ri->fortifiable_table);
+        }
+    }
+
+    return;
+}
 
 static GElf_Half _get_elf_helper(Elf *elf, elfinfo_t type, GElf_Half fail)
 {

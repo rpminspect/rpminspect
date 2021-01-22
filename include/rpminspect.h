@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2019-2020  Red Hat, Inc.
+ * Copyright (C) 2019-2021  Red Hat, Inc.
  * Author(s):  David Cantrell <dcantrell@redhat.com>
  *
  * This program is free software: you can redistribute it and/or
@@ -288,6 +288,11 @@ string_list_t *get_macros(const char *);
 int get_specfile_macros(struct rpminspect *, const char *);
 
 /* inspect_elf.c */
+/*
+ * NOTE: these functions are not static so we can more easily have
+ * unit tests for them in the test suite.
+ */
+bool is_execstack_present(Elf *elf);
 bool is_execstack_valid(Elf *elf, uint64_t flags);
 bool is_stack_executable(Elf *elf, uint64_t flags);
 bool is_pic_ok(Elf *elf);
@@ -295,10 +300,7 @@ bool has_bind_now(Elf *elf);
 bool has_executable_program(Elf *elf);
 bool has_relro(Elf *elf);
 uint64_t get_execstack_flags(Elf *elf);
-bool is_execstack_present(Elf *elf);
 bool has_textrel(Elf *elf);
-void free_elf_data(void);
-void init_elf_data(void);
 
 /* bytes.c */
 /**
