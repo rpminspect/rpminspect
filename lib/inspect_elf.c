@@ -680,89 +680,6 @@ cleanup:
 }
 
 /**
- * @brief Check for binaries that use forbidden functions which don't support IPv6.
- *
- * This could indicate broken support for IPv6.
- *
- * @param ri The struct rpminspect pointer for the run of the program
- * @param after_elf ELF object from the after build
- * @param localpath Filename of the ELF object in question, relative to an installed system
- * @param arch Architecture of the ELF object
- */
-static bool check_ipv6(struct rpminspect *ri, Elf *after_elf, const char *localpath, const char *arch)
-{
-    string_list_t *after_symbols = NULL;
-    string_list_t *used_symbols = NULL;
-    string_list_t *sorted_used = NULL;
-    string_entry_t *iter = NULL;
-    struct result_params params;
-    bool result = true;
-    FILE *output_stream = NULL;
-    char *output_buffer = NULL;
-    size_t output_size = 0;
-    int output_result = 0;
-
-    if (!ri->forbidden_ipv6_functions) {
-        /* Since we don't have a list of IPv6 files to compare against, pass
-         * the check. */
-        goto cleanup;
-    }
-
-    /* Don't filter the list -- filtering requires knowledge of the
-     * forbidden functions. Since we can't pass custom arguments to
-     * the filter, return them all and filter them locally. */
-    after_symbols = get_elf_imported_functions(after_elf, NULL);
-    assert(after_symbols != NULL);
-
-    /* Get a list of forbidden symbols that we used. */
-    used_symbols = list_intersection(ri->forbidden_ipv6_functions, after_symbols);
-    if (!used_symbols || TAILQ_EMPTY(used_symbols)) {
-        goto cleanup;
-    }
-
-    /* At this point, we're using offending symbols. Build the results. */
-    result = false;
-
-    output_stream = open_memstream(&output_buffer, &output_size);
-    assert(output_stream != NULL);
-
-    output_result = fprintf(output_stream, _("IPv4-only symbols used:\n"));
-    assert(output_result > 0);
-
-    sorted_used = list_sort(used_symbols);
-    assert(sorted_used != NULL);
-
-    TAILQ_FOREACH(iter, sorted_used, items) {
-        output_result = fprintf(output_stream, "\t%s\n", iter->data);
-        assert(output_result > 0);
-    }
-
-    fflush(output_stream);
-    output_result = fclose(output_stream);
-    assert(output_result == 0);
-
-    init_result_params(&params);
-    xasprintf(&params.msg, _("%s may use functions unsuitable for IPv6 support on %s"), localpath, arch);
-    params.severity = RESULT_VERIFY;
-    params.waiverauth = WAIVABLE_BY_ANYONE;
-    params.header = HEADER_ELF;
-    params.remedy = REMEDY_ELF_IPV6;
-    params.details = output_buffer;
-    params.verb = VERB_FAILED;
-    params.noun = _("IPv6 functions used in ${FILE}");
-    add_result(ri, &params);
-    free(params.msg);
-    free(output_buffer);
-
-cleanup:
-    list_free(after_symbols, NULL);
-    list_free(used_symbols, NULL);
-    list_free(sorted_used, NULL);
-
-    return result;
-}
-
-/**
  * @brief Helper for elf_archive_tests; add the archive member to the
  * list if compiled *without* -fPIC
  *
@@ -1035,9 +952,6 @@ static bool elf_regular_tests(struct rpminspect *ri, Elf *after_elf, Elf *before
             result = false;
         }
     }
-
-    /* Check if we potentially violate IPv6 support. */
-    check_ipv6(ri, after_elf, localpath, arch);
 
     return result;
 }
