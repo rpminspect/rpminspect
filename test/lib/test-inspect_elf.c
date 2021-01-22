@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2019  Red Hat, Inc.
+ * Copyright (C) 2019-2021  Red Hat, Inc.
  * Author(s):  David Cantrell <dcantrell@redhat.com>
  *
  * This program is free software: you can redistribute it and/or modify
@@ -23,18 +23,25 @@
 #include "rpminspect.h"
 #include "test-main.h"
 
-int init_test_inspect_elf(void) {
-    init_elf_data();
+int init_test_inspect_elf(void)
+{
+    int r = 0;
+    struct rpminspect *ri = NULL;
+
+    ri = init_rpminspect(NULL, NULL, NULL);
+    init_elf_data(ri);
 
     if (elf_version(EV_CURRENT) == EV_NONE) {
-        return -1;
+        r = -1;
     }
 
-    return 0;
+    free_rpminspect(ri);
+
+    return r;
 }
 
 int clean_test_inspect_elf(void) {
-    free_elf_data();
+    /* NO OP */
     return 0;
 }
 
