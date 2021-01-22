@@ -30,6 +30,7 @@ librpminspect_sources = [
     'inspect_abidiff.c',
     'inspect_annocheck.c',
     'inspect_arch.c',
+    'inspect_badfuncs.c',
     'inspect_capabilities.c',
     'inspect_changedfiles.c',
     'inspect_changelog.c',

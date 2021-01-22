@@ -84,6 +84,7 @@ struct inspect inspections[] = {
     { INSPECT_PATCHES,       "patches",       true,  &inspect_patches },
     { INSPECT_VIRUS,         "virus",         true,  &inspect_virus },
     { INSPECT_POLITICS,      "politics",      true,  &inspect_politics },
+    { INSPECT_BADFUNCS,      "badfuncs",      true,  &inspect_badfuncs },
     { 0, NULL, false, NULL }
 };
 
@@ -222,6 +223,8 @@ const char *inspection_desc(const uint64_t inspection)
             return DESC_VIRUS;
         case INSPECT_POLITICS:
             return DESC_POLITICS;
+        case INSPECT_BADFUNCS:
+            return DESC_BADFUNCS;
         default:
             return NULL;
     }
@@ -317,6 +320,8 @@ const char *inspection_header_to_desc(const char *header)
         i = INSPECT_VIRUS;
     } else if (!strcmp(header, HEADER_POLITICS)) {
         i = INSPECT_POLITICS;
+    } else if (!strcmp(header, HEADER_BADFUNCS)) {
+        i = INSPECT_BADFUNCS;
     }
 
     return inspection_desc(i);

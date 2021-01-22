@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2020  Red Hat, Inc.
+ * Copyright (C) 2020-2021  Red Hat, Inc.
  * Author(s):  David Cantrell <dcantrell@redhat.com>
  *
  * This program is free software: you can redistribute it and/or
@@ -149,7 +149,7 @@ void dump_cfg(const struct rpminspect *ri)
         }
     }
 
-    if (ri->elf_path_include_pattern || ri->elf_path_exclude_pattern || (ri->forbidden_ipv6_functions && !TAILQ_EMPTY(ri->forbidden_ipv6_functions))) {
+    if (ri->elf_path_include_pattern || ri->elf_path_exclude_pattern || (ri->bad_functions && !TAILQ_EMPTY(ri->bad_functions))) {
         fprintf(stderr, "    elf:\n");
         if (ri->elf_path_include_pattern) {
             fprintf(stderr, "        include_path: %s\n", ri->elf_path_include_pattern);
@@ -157,9 +157,9 @@ void dump_cfg(const struct rpminspect *ri)
         if (ri->elf_path_exclude_pattern) {
             fprintf(stderr, "        exclude_path: %s\n", ri->elf_path_exclude_pattern);
         }
-        if (ri->forbidden_ipv6_functions && !TAILQ_EMPTY(ri->forbidden_ipv6_functions)) {
-            fprintf(stderr, "        forbidden_ipv6_functions:\n");
-            TAILQ_FOREACH(entry, ri->forbidden_ipv6_functions, items) {
+        if (ri->bad_functions && !TAILQ_EMPTY(ri->bad_functions)) {
+            fprintf(stderr, "        bad_functions:\n");
+            TAILQ_FOREACH(entry, ri->bad_functions, items) {
                 fprintf(stderr, "            - %s\n", entry->data);
             }
         }

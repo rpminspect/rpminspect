@@ -70,6 +70,7 @@
 #define HEADER_PATCHES       "patches"
 #define HEADER_VIRUS         "virus"
 #define HEADER_POLITICS      "politics"
+#define HEADER_BADFUNCS      "bad-functions"
 
 /*
  * Inspection remedies
@@ -215,5 +216,8 @@
 
 /* politics */
 #define REMEDY_POLITICS _("A file with potential politically sensitive content was found in the package.  If this file is permitted, it should be added to the rpminspect vendor data package for the product.")
+
+/* badfuncs */
+#define REMEDY_BADFUNCS _("Forbidden symbols were found in an ELF file in the package.  The configuration settings for rpminspect indicate the named symbols are forbidden in packages.  If this is deliberate, you may want to disable the badfuncs inspection.  If it is not deliberate, check the man pages for the named symbols to see what API functions have replaced the forbidden symbols.  Usually a function is marked as deprecated but still provided in order to allow for backwards compatibility.  Whenever possible the deprecated functions should not be used.")
 
 #endif

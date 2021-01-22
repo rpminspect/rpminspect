@@ -482,6 +482,15 @@ bool inspect_virus(struct rpminspect *ri);
  */
 bool inspect_politics(struct rpminspect *ri);
 
+/**
+ * @brief Main driver for the 'badfuncs' inspection.
+ *
+ *
+ * @param ri Pointer to the struct rpminspect for the program.
+ * @return True if the inspection passed, false otherwise.
+ */
+bool inspect_badfuncs(struct rpminspect *ri);
+
 /** @} */
 
 /*
@@ -532,6 +541,7 @@ bool inspect_politics(struct rpminspect *ri);
 #define INSPECT_PATCHES                     (((uint64_t) 1) << 38)
 #define INSPECT_VIRUS                       (((uint64_t) 1) << 39)
 #define INSPECT_POLITICS                    (((uint64_t) 1) << 40)
+#define INSPECT_BADFUNCS                    (((uint64_t) 1) << 41)
 
 /* Long descriptions for the inspections */
 #define DESC_LICENSE _("Verify the string specified in the License tag of the RPM metadata describes permissible software licenses as defined by the license database. Also checks to see if the License tag contains any unprofessional words as defined in the configuration file.")
@@ -613,5 +623,7 @@ bool inspect_politics(struct rpminspect *ri);
 #define DESC_VIRUS _("Performs a virus scan on every file in the build using libclamav.  Anything found by libclamav will fail the inspection.  The ignore_path rules are not used in this inspection.  All files are scanned.")
 
 #define DESC_POLITICS _("Check for known politically sensitive files in packages and report if they are allowed or prohibited.  The rules come from the politics/ subdirectory in the rpminspect-data package for the product.  Files in politics/ subdirectory map to the product release string.  The rules in each file define the politically sensitive allow and deny rules for that release.")
+
+#define DESC_BADFUNCS _("Check for forbidden functions in ELF files.  Forbidden functions are defined in the runtime configuration files.  Usually this inspection is used to catch built packages that make use of deprecated API functions if you wish built packages to conform to replacement APIs.")
 
 #endif
