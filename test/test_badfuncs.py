@@ -17,14 +17,6 @@
 #
 
 import os
-
-import rpmfluff
-
-try:
-    from rpmfluff import simple_library_source
-except ImportError:
-    from rpmfluff.samples import simple_library_source
-
 from baseclass import TestRPMs, TestKoji, TestCompareRPMs, TestCompareKoji
 
 datadir = os.environ["RPMINSPECT_TEST_DATA_PATH"]
