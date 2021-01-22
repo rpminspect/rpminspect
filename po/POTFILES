@@ -27,6 +27,7 @@ lib/inspect_abidiff.c
 lib/inspect_addedfiles.c
 lib/inspect_annocheck.c
 lib/inspect_arch.c
+lib/inspect_badfuncs.c
 lib/inspect_capabilities.c
 lib/inspect_changedfiles.c
 lib/inspect_changelog.c
@@ -55,6 +56,7 @@ lib/inspect_pathmigration.c
 lib/inspect_permissions.c
 lib/inspect_politics.c
 lib/inspect_removedfiles.c
+lib/inspect_runpath.c
 lib/inspect_shellsyntax.c
 lib/inspect_specname.c
 lib/inspect_subpackages.c
@@ -73,6 +75,7 @@ lib/mkdirp.c
 lib/output.c
 lib/output_json.c
 lib/output_text.c
+lib/output_xunit.c
 lib/pairfuncs.c
 lib/paths.c
 lib/peers.c
