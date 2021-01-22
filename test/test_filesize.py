@@ -40,7 +40,7 @@ class FileSizeGrowsAtThreshold(TestCompareRPMs):
         self.label = "filesize"
         self.result = "VERIFY"
         self.waiver_auth = "Anyone"
-        self.message = f"/some/file grew by +20% on {platform.machine()}"
+        self.message = f"/some/file grew by 20% on {platform.machine()}"
 
 
 class FileSizeGrowsAboveThreshold(TestCompareRPMs):
@@ -61,7 +61,7 @@ class FileSizeGrowsAboveThreshold(TestCompareRPMs):
         self.label = "filesize"
         self.result = "VERIFY"
         self.waiver_auth = "Anyone"
-        self.message = f"/some/file grew by +100% on {platform.machine()}"
+        self.message = f"/some/file grew by 100% on {platform.machine()}"
 
 
 class FileSizeGrowsBelowThreshold(TestCompareRPMs):
@@ -81,7 +81,7 @@ class FileSizeGrowsBelowThreshold(TestCompareRPMs):
         self.label = "filesize"
         self.result = "INFO"
         self.waiver_auth = "Not Waivable"
-        self.message = f"/some/file grew by +10% on {platform.machine()}"
+        self.message = f"/some/file grew by 10% on {platform.machine()}"
 
 
 class EmptyFileSizeGrows(TestCompareRPMs):
@@ -121,7 +121,7 @@ class FileSizeShrinksAtThreshold(TestCompareRPMs):
         self.label = "filesize"
         self.result = "VERIFY"
         self.waiver_auth = "Anyone"
-        self.message = f"/some/file shrank by -20% on {platform.machine()}"
+        self.message = f"/some/file shrank by 20% on {platform.machine()}"
 
 
 class FileSizeShrinksAboveThreshold(TestCompareRPMs):
@@ -141,7 +141,7 @@ class FileSizeShrinksAboveThreshold(TestCompareRPMs):
         self.label = "filesize"
         self.result = "VERIFY"
         self.waiver_auth = "Anyone"
-        self.message = f"/some/file shrank by -80% on {platform.machine()}"
+        self.message = f"/some/file shrank by 80% on {platform.machine()}"
 
 
 class FileSizeShrinksBelowThreshold(TestCompareRPMs):
@@ -161,7 +161,7 @@ class FileSizeShrinksBelowThreshold(TestCompareRPMs):
         self.label = "filesize"
         self.result = "INFO"
         self.waiver_auth = "Not Waivable"
-        self.message = f"/some/file shrank by -10% on {platform.machine()}"
+        self.message = f"/some/file shrank by 10% on {platform.machine()}"
 
 
 class FileSizeShrinksToEmpty(TestCompareRPMs):
