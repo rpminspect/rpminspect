@@ -69,6 +69,7 @@ enum {
     BLOCK_ABIDIFF,
     BLOCK_ADDEDFILES,
     BLOCK_ANNOCHECK,
+    BLOCK_BADFUNCS,
     BLOCK_BADWORDS,
     BLOCK_BIN_PATHS,
     BLOCK_BUILDHOST_SUBDOMAIN,
@@ -86,7 +87,6 @@ enum {
     BLOCK_HEADER_FILE_EXTENSIONS,
     BLOCK_IGNORE,
     BLOCK_INSPECTIONS,
-    BLOCK_FORBIDDEN_IPV6_FUNCTIONS,
     BLOCK_JAVABYTECODE,
     BLOCK_KERNEL_FILENAMES,
     BLOCK_KMIDIFF,
@@ -500,6 +500,8 @@ static int read_cfgfile(struct rpminspect *ri, const char *filename)
                         block = BLOCK_IGNORE;
                     } else if (!strcmp(key, "security_path_prefix")) {
                         block = BLOCK_SECURITY_PATH_PREFIX;
+                    } else if (!strcmp(key, "badfuncs")) {
+                        block = BLOCK_BADFUNCS;
                     } else if (!strcmp(key, "badwords")) {
                         block = BLOCK_BADWORDS;
                     } else if (!strcmp(key, "metadata")) {
@@ -508,8 +510,6 @@ static int read_cfgfile(struct rpminspect *ri, const char *filename)
                         block = BLOCK_BUILDHOST_SUBDOMAIN;
                     } else if (!strcmp(key, "elf")) {
                         group = BLOCK_ELF;
-                    } else if (group == BLOCK_ELF && !strcmp(key, "forbidden_ipv6_functions")) {
-                        block = BLOCK_FORBIDDEN_IPV6_FUNCTIONS;
                     } else if (!strcmp(key, "manpage")) {
                         block = BLOCK_MANPAGE;
                     } else if (!strcmp(key, "xml")) {
@@ -848,7 +848,9 @@ static int read_cfgfile(struct rpminspect *ri, const char *filename)
                         }
                     }
                 } else if (symbol == SYMBOL_ENTRY) {
-                    if (block == BLOCK_BADWORDS) {
+                    if (block == BLOCK_BADFUNCS) {
+                        add_entry(&ri->bad_functions, t);
+                    } else if (block == BLOCK_BADWORDS) {
                         add_entry(&ri->badwords, t);
                     } else if (block == BLOCK_SECURITY_PATH_PREFIX) {
                         add_entry(&ri->security_path_prefix, t);
@@ -862,8 +864,6 @@ static int read_cfgfile(struct rpminspect *ri, const char *filename)
                         add_entry(&ri->forbidden_path_suffixes, t);
                     } else if (block == BLOCK_FORBIDDEN_DIRECTORIES) {
                         add_entry(&ri->forbidden_directories, t);
-                    } else if (block == BLOCK_FORBIDDEN_IPV6_FUNCTIONS) {
-                        add_entry(&ri->forbidden_ipv6_functions, t);
                     } else if (block == BLOCK_BIN_PATHS) {
                         add_entry(&ri->bin_paths, t);
                     } else if (block == BLOCK_FORBIDDEN_OWNERS) {

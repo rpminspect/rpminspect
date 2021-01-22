@@ -365,10 +365,10 @@ struct rpminspect {
     string_list_t *forbidden_directories;
 
     /*
-     * Optional: if not NULL, contains a list of functions known to have
-     * IPv6-compatibility issues.
+     * Optional: if not NULL, contains a list of forbidden function
+     * names.
      */
-    string_list_t *forbidden_ipv6_functions;
+    string_list_t *bad_functions;
 
     /* Optional: if not NULL, contains list of architectures */
     /* if not specified on the command line, this becomes the list of

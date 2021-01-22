@@ -108,6 +108,7 @@ vendor:
     #addedfiles: off
     #annocheck: off
     #arch: off
+    #badfuncs: off
     #capabilities: off
     #changedfiles: off
     #changelog: off
@@ -234,30 +235,6 @@ elf:
     # These are regular expressions used by regexp(3).
     #include_path:
     exclude_path: (^(/boot/vmlinu|/lib/modules|/lib64/modules).*)|(.*/powerpc/lib/crtsavres.o$)|(^/usr/lib(64)?/kernel-wrapper$)
-
-    # Functions which indicate broken support for IPv6. Depending on
-    # how they are used, their usage could be benign but it requires
-    # manual inspection.
-    #
-    # This is an array of forbidden function names.
-    forbidden_ipv6_functions:
-        - gethostbyname
-        - gethostbyname2
-        - gethostbyaddr
-        - inet_addr
-        - inet_aton
-        - inet_nsap_addr
-        - inet_ntoa
-        - inet_nsap_ntoa
-        - inet_makeaddr
-        - inet_netof
-        - inet_network
-        - inet_neta
-        - inet_net_ntop
-        - inet_net_pton
-        - rcmd
-        - rexec
-        - rresvport
 
 manpage:
     # Regular expression matching man page installation directories.
@@ -538,3 +515,29 @@ patches:
     # reporting message will mention it explicitly.  The default is
     # 5000 lines.
     line_count_threshold: 5000
+
+badfuncs:
+    # Shared function names prohibited from executables and libraries.
+    # The function names listed here are generally ones provided by
+    # the system, but are deprecated in favor of more modern
+    # alternatives.  As a rule we do not want to make use of those but
+    # only provide them to users for backwards compatibility.
+
+    # This is an array of forbidden function names.
+    - gethostbyname
+    - gethostbyname2
+    - gethostbyaddr
+    - inet_addr
+    - inet_aton
+    - inet_nsap_addr
+    - inet_ntoa
+    - inet_nsap_ntoa
+    - inet_makeaddr
+    - inet_netof
+    - inet_network
+    - inet_neta
+    - inet_net_ntop
+    - inet_net_pton
+    - rcmd
+    - rexec
+    - rresvport
