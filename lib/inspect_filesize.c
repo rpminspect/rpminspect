@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2019-2020  Red Hat, Inc.
+ * Copyright (C) 2019-2021  Red Hat, Inc.
  * Author(s):  David Cantrell <dcantrell@redhat.com>
  *
  * This program is free software: you can redistribute it and/or
@@ -20,6 +20,7 @@
  */
 
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 #include <limits.h>
 #include <errno.h>
@@ -44,6 +45,11 @@ static bool filesize_driver(struct rpminspect *ri, rpmfile_entry_t *file)
 
     /* Ignore files in the SRPM */
     if (headerIsSource(file->rpm_header)) {
+        return true;
+    }
+
+    /* Ignore debug and build paths */
+    if (is_debug_or_build_path(file->localpath)) {
         return true;
     }
 
@@ -100,11 +106,11 @@ static bool filesize_driver(struct rpminspect *ri, rpmfile_entry_t *file)
 
         if (change > 0) {
             /* file grew */
-            xasprintf(&params.msg, _("%s grew by +%ld%% on %s"), file->localpath, change, arch);
+            xasprintf(&params.msg, _("%s grew by %ld%% on %s"), file->localpath, labs(change), arch);
             params.noun = _("${FILE} size grew");
         } else if (change < 0) {
             /* file shrank */
-            xasprintf(&params.msg, _("%s shrank by %ld%% on %s"), file->localpath, change, arch);
+            xasprintf(&params.msg, _("%s shrank by %ld%% on %s"), file->localpath, labs(change), arch);
             params.noun = _("${FILE} size shrank");
         }
     }
