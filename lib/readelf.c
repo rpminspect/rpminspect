@@ -247,39 +247,35 @@ string_list_t *get_elf_section_names(Elf *elf, size_t start)
  * a section number, pass in -1.  To not specify a section name, pass
  * in NULL.
  */
-Elf_Scn * get_elf_section(Elf *elf, int64_t section, const char *name, Elf_Scn *start, GElf_Shdr *shdr)
+Elf_Scn * get_elf_section(Elf *elf, int64_t section, const char *name, Elf_Scn *start, GElf_Shdr *out_shdr)
 {
     size_t shstrndx;
     char *section_name = NULL;
     Elf_Scn *scn = start;
+    GElf_Shdr shdr;
+    GElf_Shdr *shdrp = (out_shdr != NULL ? out_shdr : &shdr);
 
     if (elf_getshdrstrndx(elf, &shstrndx) != 0) {
-        return NULL;
-    }
-
-    if (shdr == NULL) {
         return NULL;
     }
 
     /* we have an ELF object, iterate over the sections */
     while ((scn = elf_nextscn(elf, scn)) != NULL) {
         /* get this header information */
-        if (gelf_getshdr(scn, shdr) != shdr) {
-            shdr = NULL;
+        if (gelf_getshdr(scn, shdrp) != shdrp) {
             return NULL;
         }
 
-        section_name = elf_strptr(elf, shstrndx, shdr->sh_name);
+        section_name = elf_strptr(elf, shstrndx, shdrp->sh_name);
 
         /* Check if this section matches the requested type and name */
-        if (((section < 0) || (shdr->sh_type == (GElf_Word) section)) &&
+        if (((section < 0) || (shdrp->sh_type == (GElf_Word) section)) &&
             ((name == NULL) || ((section_name != NULL) &&
                                 !strcmp(name, section_name)))) {
             return scn;
         }
     }
 
-    shdr = NULL;
     return NULL;
 }
 
