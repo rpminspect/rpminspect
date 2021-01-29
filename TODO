@@ -28,8 +28,6 @@ Other:
     - Check for presence of required external program in abidiff,
       kmidiff, and other functions that fork and exec another program.
 
-    - Update the dump_config function to match current config file options.
-
     - Add a 'rebase' inspection that just fails if packages are being
       rebased but not on the rebaseable list.  This should be off by
       default but then enabled in a maintenance profile.  Maybe???

@@ -465,15 +465,6 @@ struct rpminspect {
     /* list of valid kernel executable filenames (e.g., "vmlinux") */
     string_list_t *kernel_filenames;
 
-    /* list of patches to ignore in the 'patches' inspection */
-    string_list_t *patch_ignore_list;
-
-    /* file count reporting threshold in the 'patches' inspection */
-    long int patch_file_threshold;
-
-    /* line count reporting threshold in the 'patches' inspection */
-    long int patch_line_threshold;
-
     /*
      * directory where kernel ABI (KABI) files are kept (in any
      * subpackage in a kernel build)
@@ -485,6 +476,15 @@ struct rpminspect {
      * architecture
      */
     char *kabi_filename;
+
+    /* list of patches to ignore in the 'patches' inspection */
+    string_list_t *patch_ignore_list;
+
+    /* file count reporting threshold in the 'patches' inspection */
+    long int patch_file_threshold;
+
+    /* line count reporting threshold in the 'patches' inspection */
+    long int patch_line_threshold;
 
     /* Options specified by the user */
     char *before;              /* before build ID arg given on cmdline */
