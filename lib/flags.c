@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2019-2020  Red Hat, Inc.
+ * Copyright (C) 2019-2021  Red Hat, Inc.
  * Author(s):  David Cantrell <dcantrell@redhat.com>
  *
  * This program is free software: you can redistribute it and/or
@@ -71,7 +71,7 @@ bool process_inspection_flag(const char *inspection, const bool exclude, uint64_
         }
     }
 
-    for (i = 0; inspections[i].flag != 0; i++) {
+    for (i = 0; inspections[i].name != NULL; i++) {
         if (!strcasecmp(inspection, inspections[i].name)) {
             /* user specified a valid inspection */
             if (exclude) {
