@@ -501,7 +501,7 @@ int main(int argc, char **argv) {
         /* list the inspections available */
         printf(_("\nAvailable inspections:\n"));
 
-        for (i = 0; inspections[i].flag != 0; i++) {
+        for (i = 0; inspections[i].name != NULL; i++) {
             if (i > 0 && verbose) {
                 printf("\n");
             }
@@ -760,7 +760,7 @@ int main(int argc, char **argv) {
             }
         }
 
-        for (i = 0; inspections[i].flag != 0; i++) {
+        for (i = 0; inspections[i].name != NULL; i++) {
             /* test not selected by user */
             if (!(ri->tests & inspections[i].flag)) {
                 continue;

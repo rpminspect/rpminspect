@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2019-2020  Red Hat, Inc.
+ * Copyright (C) 2019-2021  Red Hat, Inc.
  * Author(s):  David Cantrell <dcantrell@redhat.com>
  *
  * This program is free software: you can redistribute it and/or
@@ -483,7 +483,7 @@ static int read_cfgfile(struct rpminspect *ri, const char *filename)
                 t = bytes_to_str(token.data.scalar.value, token.data.scalar.length);
 
                 /* determine which config file block we are in */
-                if (key && read_stream) {
+                if (key && read_stream && block != BLOCK_INSPECTIONS) {
                     if (!strcmp(key, "common")) {
                         block = BLOCK_COMMON;
                     } else if (!strcmp(key, "koji")) {
