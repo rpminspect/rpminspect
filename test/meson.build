@@ -69,6 +69,16 @@ if cunit.found()
         link_with : [ librpminspect ],
     )
 
+    test_abspath = executable(
+        'test-abspath',
+        ['lib/test-abspath.c',
+         'lib/test-main.c'],
+        include_directories : inc,
+        dependencies : [ cunit, libkmod ],
+        c_args : '-D_BUILDDIR_="@0@"'.format(meson.current_build_dir()),
+        link_with : [ librpminspect ],
+    )
+
     # Support program used by test-inspect-elf
     execstack_prog = executable(
         'execstack',
@@ -92,6 +102,7 @@ if cunit.found()
          test_inspect_elf,
          depends : [execstack_prog, noexecstack_prog]
     )
+    test('test-abspath', test_abspath)
 else
     warning('CUnit not found, skipping unit test suite')
 endif
