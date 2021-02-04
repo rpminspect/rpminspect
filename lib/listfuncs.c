@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2019-2020  Red Hat, Inc.
+ * Copyright (C) 2019-2021  Red Hat, Inc.
  * Author(s):  David Shea <dshea@redhat.com>
  *             David Cantrell <dcantrell@redhat.com>
  *
@@ -48,8 +48,7 @@ string_list_t *sorted_list = NULL;
  */
 char *list_to_string(const string_list_t *list, const char *delimiter)
 {
-    size_t len = 0;
-    size_t pos = 1;
+    size_t pos = 0;
     char *s = NULL;
     string_entry_t *entry = NULL;
 
@@ -57,25 +56,14 @@ char *list_to_string(const string_list_t *list, const char *delimiter)
         return NULL;
     }
 
-    len = list_len(list);
-
     TAILQ_FOREACH(entry, list, items) {
-        s = strappend(s, entry->data);
-
-        if (delimiter != NULL) {
+        if (pos > 0 && delimiter != NULL) {
             s = strappend(s, delimiter);
         }
 
-        /* if next iteration is last element, stop the loop */
+        s = strappend(s, entry->data);
         pos++;
-        if (pos == len) {
-            break;
-        }
     }
-
-    /* handle the last element outside loop to avoid a trailing delimiter */
-    entry = TAILQ_LAST(list, string_entry_s);
-    s = strappend(s, entry->data);
 
     return s;
 }
