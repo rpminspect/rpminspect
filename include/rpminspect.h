@@ -386,4 +386,7 @@ char *uncompress_file(struct rpminspect *ri, const char *infile, const char *sub
 /* filecmp.c */
 int filecmp(const char *x, const char *y);
 
+/* abspath.c */
+char *abspath(const char *path);
+
 #endif

@@ -1,6 +1,7 @@
 /*
- * Copyright (C) 2019  Red Hat, Inc.
+ * Copyright (C) 2019-2021  Red Hat, Inc.
  * Author(s):  David Shea <dshea@redhat.com>
+ *             David Cantrell <dcantrell@redhat.com>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -73,5 +74,11 @@ CU_BOOL RI_assert_impl(CU_BOOL, unsigned int, const char *, const char *, ...)
 
 #define RI_ASSERT_STRING_EQUAL(actual, expected)        _RI_ASSERT_STR(expected, ==, actual)
 #define RI_ASSERT_STRING_NOT_EQUAL(actual, expected)    _RI_ASSERT_STR(expected, !=, actual)
+
+#define ASSERT_AND_FREE(expr, expected) {\
+    char *actual = (expr);\
+    RI_ASSERT_STRING_EQUAL(actual, expected);\
+    free(actual);\
+}
 
 #endif
