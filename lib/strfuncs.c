@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2018-2020  Red Hat, Inc.
+ * Copyright (C) 2018-2021  Red Hat, Inc.
  * Author(s):  David Cantrell <dcantrell@redhat.com>
  *
  * This program is free software: you can redistribute it and/or
@@ -391,15 +391,15 @@ char *strreplace(const char *s, const char *find, const char *replace)
 }
 
 /*
- * Append the second string to the first and returned the result.
+ * Append the second string to the first and return the result.
  * Memory is allocated or reallocated and the first argument is
  * modified.  Caller is responsible for freeing memory.
  */
 char *strappend(char *first, const char *second)
 {
-    if (first && second == NULL) {
+    if (first != NULL && second == NULL) {
         return first;
-    } else if (first == NULL && second) {
+    } else if (first == NULL && second != NULL) {
         return strdup(second);
     } else if (first == NULL && second == NULL) {
         return NULL;
@@ -412,7 +412,7 @@ char *strappend(char *first, const char *second)
 }
 
 /*
- * Split given string on delimeter.  Put each substring in a
+ * Split given string on delimiter.  Put each substring in a
  * string_list_t as a separate entry, return the list.  Caller
  * must free the list.
  */
