@@ -208,6 +208,9 @@ void free_rpminspect(struct rpminspect *ri) {
     free(ri->kabi_dir);
     free(ri->kabi_filename);
     list_free(ri->patch_ignore_list, free);
+    list_free(ri->runpath_allowed_prefixes, free);
+    list_free(ri->runpath_allowed_origin_prefixes, free);
+    list_free(ri->runpath_origin_prefix_trim, free);
 
     free_rpmpeer(ri->peers);
 

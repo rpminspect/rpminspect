@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2019-2020  Red Hat, Inc.
+ * Copyright (C) 2019-2021  Red Hat, Inc.
  * Author(s):  David Cantrell <dcantrell@redhat.com>
  *
  * This program is free software: you can redistribute it and/or
@@ -79,12 +79,8 @@ static bool dsodeps_driver(struct rpminspect *ri, rpmfile_entry_t *file)
     av = headerGetString(file->rpm_header, RPMTAG_VERSION);
 
     if (strcmp(bv, av)) {
-      return true;
+        return true;
     }
-
-    /* The architecture is used in reporting messages */
-    arch = get_rpm_header_arch(file->rpm_header);
-    assert(arch != NULL);
 
     /* If we lack dynamic or shared ELF files, we're done */
     if ((after_elf = get_elf(file->fullpath, &after_fd)) == NULL) {
@@ -97,6 +93,10 @@ static bool dsodeps_driver(struct rpminspect *ri, rpmfile_entry_t *file)
         result = false;
         goto done;
     }
+
+    /* The architecture is used in reporting messages */
+    arch = get_rpm_header_arch(file->rpm_header);
+    assert(arch != NULL);
 
     /* Set up result parameters */
     init_result_params(&params);

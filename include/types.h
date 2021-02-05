@@ -486,6 +486,11 @@ struct rpminspect {
     /* line count reporting threshold in the 'patches' inspection */
     long int patch_line_threshold;
 
+    /* runpath inspection lists */
+    string_list_t *runpath_allowed_prefixes;
+    string_list_t *runpath_allowed_origin_prefixes;
+    string_list_t *runpath_origin_prefix_trim;
+
     /* Options specified by the user */
     char *before;              /* before build ID arg given on cmdline */
     char *after;               /* after build ID arg given on cmdline */

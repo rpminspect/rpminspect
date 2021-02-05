@@ -84,7 +84,6 @@ void *read_file_bytes(const char *path, off_t *len)
     return data;
 }
 
-
 /*
  * Open and read the contents of a file line by line in to a string_list_t.
  * Each line is a separate entry.  Caller must call listfree() on the list

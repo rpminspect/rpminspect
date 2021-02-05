@@ -85,6 +85,7 @@ struct inspect inspections[] = {
     { INSPECT_VIRUS,         "virus",         true,  &inspect_virus },
     { INSPECT_POLITICS,      "politics",      true,  &inspect_politics },
     { INSPECT_BADFUNCS,      "badfuncs",      true,  &inspect_badfuncs },
+    { INSPECT_RUNPATH,       "runpath",       true,  &inspect_runpath },
     { 0, NULL, false, NULL }
 };
 
@@ -225,6 +226,8 @@ const char *inspection_desc(const uint64_t inspection)
             return DESC_POLITICS;
         case INSPECT_BADFUNCS:
             return DESC_BADFUNCS;
+        case INSPECT_RUNPATH:
+            return DESC_RUNPATH;
         default:
             return NULL;
     }
