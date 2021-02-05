@@ -137,6 +137,7 @@ vendor:
     #permissions: off
     #politics: off
     #removedfiles: off
+    #runpath: off
     #shellsyntax: off
     #specname: off
     #subpackages: off
@@ -541,3 +542,37 @@ badfuncs:
     - rcmd
     - rexec
     - rresvport
+
+runpath:
+    # Allowed DT_RUNPATH and DT_RPATH prefixes when the value is an
+    # explicit directory.  The path is resolved if "../" is found and
+    # the resulting resolved path is compared against this list.
+    #
+    # NOTE: The prefixes are compared as strings, so the trailing
+    # slash has significance.  For instance, "/lib" specified below
+    # will match paths beginning with "/lib/" and "/lib64/".  Keep
+    # that in mind when adjusting this list.
+    allowed_prefixes:
+        - /usr/lib
+        - /usr/src/kernels/
+        - /lib
+
+    # Allowed DT_RUNPATH and DT_RPATH prefixes when the value begins
+    # with $ORIGIN and "../" entries are resolved.  This list of
+    # prefixes is allowed after trimming the leading "$ORIGIN" value
+    # and the optional 'origin_trim' string if one is found.
+    #
+    # NOTE: The same trailing slash consideration applies here that
+    # applies to the 'absolute_prefixes' list.
+    allowed_origin_prefixes:
+        - /
+        - /usr/
+        - /lib/
+
+    # Optional list of regular expressions to trim after an $ORIGIN
+    # entry in DT_RPATH or DT_RUNPATH.  If any of these regular
+    # expressions match, the matching substring is trimmed after
+    # "$ORIGIN" is trimmed and the remaining substring is validated
+    # against the 'origin_prefixes' list.
+    origin_prefix_trim:
+        - ^(opt/rh/[^/]+/root/)

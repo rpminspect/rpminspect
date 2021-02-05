@@ -104,6 +104,10 @@ enum {
     BLOCK_PATHMIGRATION,
     BLOCK_PATHMIGRATION_EXCLUDED_PATHS,
     BLOCK_PRODUCTS,
+    BLOCK_RUNPATH,
+    BLOCK_RUNPATH_ALLOWED_PREFIXES,
+    BLOCK_RUNPATH_ALLOWED_ORIGIN_PREFIXES,
+    BLOCK_RUNPATH_ORIGIN_PREFIX_TRIM,
     BLOCK_SECURITY_PATH_PREFIX,
     BLOCK_SHELLS,
     BLOCK_SHELLSYNTAX,
@@ -580,6 +584,16 @@ static int read_cfgfile(struct rpminspect *ri, const char *filename)
                         group = BLOCK_PATCHES;
                     } else if (group == BLOCK_PATCHES && !strcmp(key, "patch_ignore_list")) {
                         block = BLOCK_PATCH_FILENAMES;
+                    } else if (!strcmp(key, "runpath")) {
+                        group = BLOCK_RUNPATH;
+                    } else if (group == BLOCK_RUNPATH) {
+                        if (!strcmp(key, "allowed_prefixes")) {
+                            block = BLOCK_RUNPATH_ALLOWED_PREFIXES;
+                        } else if (!strcmp(key, "allowed_origin_prefixes")) {
+                            block = BLOCK_RUNPATH_ALLOWED_ORIGIN_PREFIXES;
+                        } else if (!strcmp(key, "origin_prefix_trim")) {
+                            block = BLOCK_RUNPATH_ORIGIN_PREFIX_TRIM;
+                        }
                     }
                 }
 
@@ -884,6 +898,12 @@ static int read_cfgfile(struct rpminspect *ri, const char *filename)
                         add_entry(&ri->patch_ignore_list, t);
                     } else if (block == BLOCK_PATHMIGRATION_EXCLUDED_PATHS) {
                         add_entry(&ri->pathmigration_excluded_paths, t);
+                    } else if (block == BLOCK_RUNPATH_ALLOWED_PREFIXES) {
+                        add_entry(&ri->runpath_allowed_prefixes, t);
+                    } else if (block == BLOCK_RUNPATH_ALLOWED_ORIGIN_PREFIXES) {
+                        add_entry(&ri->runpath_allowed_origin_prefixes, t);
+                    } else if (block == BLOCK_RUNPATH_ORIGIN_PREFIX_TRIM) {
+                        add_entry(&ri->runpath_origin_prefix_trim, t);
                     }
                 }
 

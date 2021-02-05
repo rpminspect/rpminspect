@@ -71,6 +71,7 @@
 #define HEADER_VIRUS         "virus"
 #define HEADER_POLITICS      "politics"
 #define HEADER_BADFUNCS      "bad-functions"
+#define HEADER_RUNPATH       "runpath"
 
 /*
  * Inspection remedies
@@ -219,5 +220,8 @@
 
 /* badfuncs */
 #define REMEDY_BADFUNCS _("Forbidden symbols were found in an ELF file in the package.  The configuration settings for rpminspect indicate the named symbols are forbidden in packages.  If this is deliberate, you may want to disable the badfuncs inspection.  If it is not deliberate, check the man pages for the named symbols to see what API functions have replaced the forbidden symbols.  Usually a function is marked as deprecated but still provided in order to allow for backwards compatibility.  Whenever possible the deprecated functions should not be used.")
+
+/* runpath */
+#define REMEDY_RUNPATH _("Either DT_RPATH or DT_RUNPATH properties were found on ELF shared objects in this package.  The use of DT_RPATH and DT_RUNPATH is discouraged except in certain situations.  Check to see that you a disabling rpath during the %%build stage of the spec file.  If you are unable to do this easily, you can try using a program such as patchelf to remove these properties from the ELF files.")
 
 #endif

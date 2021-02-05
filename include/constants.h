@@ -437,4 +437,9 @@
  */
 #define DEFAULT_MESSAGE_DIGEST SHA256SUM
 
+/*
+ * The value of the DT_RPATH or DT_RUNPATH $ORIGIN string.
+ */
+#define RUNPATH_ORIGIN_STR "$ORIGIN"
+
 #endif
