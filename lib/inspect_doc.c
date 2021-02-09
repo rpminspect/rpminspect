@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2020  Red Hat, Inc.
+ * Copyright (C) 2020-2021  Red Hat, Inc.
  * Author(s):  David Cantrell <dcantrell@redhat.com>
  *
  * This program is free software: you can redistribute it and/or
@@ -111,7 +111,12 @@ static bool doc_driver(struct rpminspect *ri, rpmfile_entry_t *file)
             params.waiverauth = NOT_WAIVABLE;
 
             xasprintf(&params.msg, _("%%doc file content change for %s in %s on %s%s\n"), file->localpath, name, arch, (exitcode == 0) ? _(" (comments/whitespace only)") : "");
-            params.details = diff_output;
+
+            /* only add the diff output for text content */
+            if (strprefix(get_mime_type(file->peer_file), "text/") && strprefix(get_mime_type(file), "text/")) {
+                params.details = diff_output;
+            }
+
             add_result(ri, &params);
             free(params.msg);
             free(diff_output);
