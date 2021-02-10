@@ -390,6 +390,81 @@ char *strreplace(const char *s, const char *find, const char *replace)
     return result;
 }
 
+/**
+ * @brief A variant on the idea of strreplace() that just escapes XML
+ * special characters so the input string can be used as a CDATA
+ * value.  The special characters are <, >, ", ', and &.  The caller
+ * is responsible for freeing the returned string.
+ *
+ * @param s The string to escape XML special characters in.
+ * @return Newly allocated string with modifications made; caller must
+ * free this result.
+ */
+char *strxmlescape(const char *s)
+{
+    size_t len = 0;
+    const char *walk = NULL;
+    char *scopy = NULL;
+    char *tmp = NULL;
+    char *result = NULL;
+
+    if (s == NULL) {
+        return 0;
+    }
+
+    /* first, figure out how long the new string will be */
+    scopy = strdup(s);
+    assert(scopy != NULL);
+    walk = scopy;
+
+    while (*walk != '\0') {
+        if (*walk == '<' || *walk == '<') {
+            len += 4;
+        } else if (*walk == '&') {
+            len += 5;
+        } else if (*walk == '"' || *walk == '\'') {
+            len += 6;
+        } else {
+            len++;
+        }
+
+        walk++;
+    }
+
+    /* handle the trailing NUL */
+    len++;
+
+    /* allocate a buffer for the new string */
+    result = calloc(1, len);
+    assert(result != NULL);
+
+    /* go through the string again to build the new string */
+    walk = scopy;
+    tmp = result;
+
+    while (*walk != '\0') {
+        if (*walk == '<') {
+            tmp = stpcpy(tmp, "&lt;");
+        } else if (*walk == '>') {
+            tmp = stpcpy(tmp, "&gt;");
+        } else if (*walk == '&') {
+            tmp = stpcpy(tmp, "&amp;");
+        } else if (*walk == '"') {
+            tmp = stpcpy(tmp, "&quot;");
+        } else if (*walk == '\'') {
+            tmp = stpcpy(tmp, "&apos;");
+        } else {
+            *tmp = *walk;
+            tmp++;
+        }
+
+        walk++;
+    }
+
+    free(scopy);
+    return result;
+}
+
 /*
  * Append the second string to the first and return the result.
  * Memory is allocated or reallocated and the first argument is
