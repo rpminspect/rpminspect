@@ -37,6 +37,9 @@ void output_xunit(const results_t *results, const char *dest, const severity_t t
     int failures = 0;
     FILE *fp = NULL;
     const char *header = NULL;
+    char *msg = NULL;
+    char *rawcdata = NULL;
+    char *cdata = NULL;
 
     /* count up total test cases and total failures */
     TAILQ_FOREACH(result, results, items) {
@@ -79,24 +82,32 @@ void output_xunit(const results_t *results, const char *dest, const severity_t t
             fprintf(fp, "        <failure message=\"%s\">%s</failure>\n", result->msg, inspection_header_to_desc(result->header));
         }
 
-        fprintf(fp, "        <system-out>\n");
-
+        /* prepare the system out message */
         if (result->msg != NULL) {
-            fprintf(fp, "%d) %s\n\n", count++, result->msg);
+            xasprintf(&msg, "%d) %s\n\n", count++, result->msg);
         }
 
-        fprintf(fp, _("Result: %s\n"), strseverity(result->severity));
-        fprintf(fp, _("Waiver Authorization: %s\n\n"), strwaiverauth(result->waiverauth));
+        xasprintf(&rawcdata, _("Result: %s\nWaiver Authorization: %s\n\n"), strseverity(result->severity), strwaiverauth(result->waiverauth));
+        msg = strappend(msg, rawcdata);
+        free(rawcdata);
 
         if (result->details != NULL) {
-            fprintf(fp, _("Details:\n%s\n\n"), result->details);
+            xasprintf(&rawcdata, _("Details:\n%s\n\n"), result->details);
+            msg = strappend(msg, rawcdata);
+            free(rawcdata);
         }
 
         if (result->remedy != NULL) {
-            fprintf(fp, _("Suggested Remedy:\n%s"), result->remedy);
+            xasprintf(&rawcdata, _("Suggested Remedy:\n%s"), result->remedy);
+            msg = strappend(msg, rawcdata);
+            free(rawcdata);
         }
 
-        fprintf(fp, "        </system-out>\n");
+        /* escape the string for XML CDATA use */
+        cdata = strxmlescape(msg);
+        fprintf(fp, "        <system-out><![CDATA[%s]]></system-out>\n", cdata);
+        free(cdata);
+        free(msg);
     }
 
     /* tidy up and return */
