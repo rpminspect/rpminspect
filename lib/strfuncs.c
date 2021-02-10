@@ -403,8 +403,7 @@ char *strreplace(const char *s, const char *find, const char *replace)
 char *strxmlescape(const char *s)
 {
     size_t len = 0;
-    const char *walk = NULL;
-    char *scopy = NULL;
+    const char *walk = s;
     char *tmp = NULL;
     char *result = NULL;
 
@@ -412,37 +411,16 @@ char *strxmlescape(const char *s)
         return 0;
     }
 
-    /* first, figure out how long the new string will be */
-    scopy = strdup(s);
-    assert(scopy != NULL);
-    walk = scopy;
-
-    while (*walk != '\0') {
-        if (*walk == '<' || *walk == '<') {
-            len += 4;
-        } else if (*walk == '&') {
-            len += 5;
-        } else if (*walk == '"' || *walk == '\'') {
-            len += 6;
-        } else {
-            len++;
-        }
-
-        walk++;
-    }
-
-    /* handle the trailing NUL */
-    len++;
-
     /* allocate a buffer for the new string */
+    len = BUFSIZ;
     result = calloc(1, len);
     assert(result != NULL);
 
-    /* go through the string again to build the new string */
-    walk = scopy;
+    /* go through the string to build the new string */
     tmp = result;
 
     while (*walk != '\0') {
+        /* escape special XML characters, otherwise copy as-is */
         if (*walk == '<') {
             tmp = stpcpy(tmp, "&lt;");
         } else if (*walk == '>') {
@@ -454,14 +432,24 @@ char *strxmlescape(const char *s)
         } else if (*walk == '\'') {
             tmp = stpcpy(tmp, "&apos;");
         } else {
-            *tmp = *walk;
-            tmp++;
+            tmp = stpncpy(tmp, walk, 1);
         }
 
+        /* grow the buffer if we need more space */
+        if ((len - strlen(result)) <= 8) {
+            len += BUFSIZ;
+            result = realloc(result, len);
+            assert(result != NULL);
+        }
+
+        /* next character */
         walk++;
     }
 
-    free(scopy);
+    /* shrink down the buffer to just the size we need */
+    result = realloc(result, strlen(result) + 1);
+    assert(result != NULL);
+
     return result;
 }
 
