@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2019  Red Hat, Inc.
+ * Copyright (C) 2019-2021  Red Hat, Inc.
  * Author(s):  David Cantrell <dcantrell@redhat.com>
  *
  * This program is free software: you can redistribute it and/or modify
@@ -75,6 +75,15 @@ void test_strreplace(void) {
             "mreplacetch severreplacel substrings in severreplacel plreplaceces");
 }
 
+void test_strxmlescape(void) {
+    ASSERT_AND_FREE(strxmlescape("<"), "&lt;");
+    ASSERT_AND_FREE(strxmlescape(">"), "&gt;");
+    ASSERT_AND_FREE(strxmlescape("\""), "&quot;");
+    ASSERT_AND_FREE(strxmlescape("'"), "&apos;");
+    ASSERT_AND_FREE(strxmlescape("&"), "&amp;");
+    ASSERT_AND_FREE(strxmlescape("<lorem> & <ipsum> & \"dolor'"), "&lt;lorem&gt; &amp; &lt;ipsum&gt; &amp; &quot;dolor&apos;");
+}
+
 CU_pSuite get_suite(void) {
     CU_pSuite pSuite = NULL;
 
@@ -90,7 +99,8 @@ CU_pSuite get_suite(void) {
         CU_add_test(pSuite, "test printwrap()", test_printwrap) == NULL ||
         CU_add_test(pSuite, "test strseverity()", test_strseverity) == NULL ||
         CU_add_test(pSuite, "test strwaiverauth()", test_strwaiverauth) == NULL ||
-        CU_add_test(pSuite, "test strreplace()", test_strreplace) == NULL) {
+        CU_add_test(pSuite, "test strreplace()", test_strreplace) == NULL ||
+        CU_add_test(pSuite, "test strxmlescape()", test_strxmlescape) == NULL) {
         return NULL;
     }
 
