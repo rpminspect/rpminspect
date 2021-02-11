@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2020  Red Hat, Inc.
+# Copyright (C) 2020-2021  Red Hat, Inc.
 # Author(s):  David Cantrell <dcantrell@redhat.com>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -23,7 +23,7 @@ from baseclass import TestRPMs, TestKoji, TestCompareRPMs, TestCompareKoji
 datadir = os.environ["RPMINSPECT_TEST_DATA_PATH"]
 
 # Source code used for the -flto tests
-lto_src = open(datadir + "/lto.c").read()
+lto_src = open(datadir + "/mathlib.c").read()
 
 # NOTE: The add_simple_compilation() calls to rpmfluff use '-o a.out' in
 # the compileFlags due to a limitation in rpmfluff.  It always tries to

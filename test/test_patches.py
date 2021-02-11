@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2020  Red Hat, Inc.
+# Copyright (C) 2020-2021  Red Hat, Inc.
 # Author(s):  David Cantrell <dcantrell@redhat.com>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -120,10 +120,10 @@ index d81ab48..d6f5c88 100644
 +
 +    return EXIT_SUCCESS;
  }
-diff --git a/test/data/lto.c b/test/data/lto.c
+diff --git a/test/data/mathlib.c b/test/data/mathlib.c
 index ffc4206..12e7808 100644
---- a/test/data/lto.c
-+++ b/test/data/lto.c
+--- a/test/data/mathlib.c
++++ b/test/data/mathlib.c
 @@ -1,19 +1,19 @@
  double add(double x, double y)
  {
