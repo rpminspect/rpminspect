@@ -140,6 +140,7 @@ if python.found()
         'test_patches.py',
         'test_pathmigration.py',
         'test_politics.py',
+        'test_runpath.py',
         'test_shellsyntax.py',
         'test_specname.py',
         'test_symlinks.py',

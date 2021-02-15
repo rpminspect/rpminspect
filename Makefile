@@ -42,10 +42,16 @@ all: setup
 setup:
 	meson setup $(MESON_BUILD_DIR)
 
+# NOTE: Set QA_RPATHS=64 so that check-rpaths is disabled during the
+# rpmfluff rpmbuild operations.  We want to let bad DT_RPATH values
+# through for the test suite so that rpminspect can catch them.  The
+# only way to disable check-rpaths in rpmbuild is to use this
+# environment variable -or- remove the script(s) from /usr/lib/rpm.
+# The environment variable is easier.
 check: setup
 	@test_name="$(call TARGET_ARG,)" ; \
 	if [ -z "$${test_name}" ]; then \
-		meson test -C $(MESON_BUILD_DIR) -v ; \
+		env QA_RPATHS=64 meson test -C $(MESON_BUILD_DIR) -v ; \
 	else \
 		test_script="test_$${test_name}.py" ; \
 		if [ ! -f "$(topdir)/test/$${test_script}" ]; then \
@@ -55,6 +61,7 @@ check: setup
 		env RPMINSPECT=$(topdir)/build/src/rpminspect \
 		    RPMINSPECT_YAML=$(topdir)/data/generic.yaml \
 		    RPMINSPECT_TEST_DATA_PATH=$(topdir)/test/data \
+		    QA_RPATHS=64 \
 		python3 -Bm unittest discover -v $(topdir)/test/ $${test_script} ; \
 	fi
 
