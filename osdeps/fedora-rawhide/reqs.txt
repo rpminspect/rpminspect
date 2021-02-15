@@ -1,10 +1,10 @@
-CUnit
-CUnit-devel
 annobin
 bash
 clamav-data
 clamav-devel
 clamav-update
+CUnit
+CUnit-devel
 dash
 desktop-file-utils
 diffutils
@@ -39,6 +39,7 @@ make
 meson
 ninja-build
 openssl-devel
+patchelf
 python3-devel
 python3-pip
 python3-pyyaml
