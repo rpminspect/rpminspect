@@ -44,6 +44,10 @@ char *abspath(const char *path)
         return NULL;
     }
 
+    if (!strcmp(path, "")) {
+        return strdup(path);
+    }
+
     /* split path in to tokens */
     tokens = strsplit(path, "/");
     assert(tokens != NULL);
