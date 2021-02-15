@@ -461,6 +461,36 @@ void dump_cfg(const struct rpminspect *ri)
         }
     }
 
+    if ((ri->runpath_allowed_prefixes && !TAILQ_EMPTY(ri->runpath_allowed_prefixes)) ||
+        (ri->runpath_allowed_origin_prefixes && !TAILQ_EMPTY(ri->runpath_allowed_origin_prefixes)) ||
+        (ri->runpath_origin_prefix_trim && !TAILQ_EMPTY(ri->runpath_origin_prefix_trim))) {
+        fprintf(stderr, "    runpath:\n");
+
+        if (ri->runpath_allowed_prefixes && !TAILQ_EMPTY(ri->runpath_allowed_prefixes)) {
+            fprintf(stderr, "        allowed_prefixes:\n");
+
+            TAILQ_FOREACH(entry, ri->runpath_allowed_prefixes, items) {
+                fprintf(stderr, "            - %s\n", entry->data);
+            }
+        }
+
+        if (ri->runpath_allowed_origin_prefixes && !TAILQ_EMPTY(ri->runpath_allowed_origin_prefixes)) {
+            fprintf(stderr, "        allowed_origin_prefixes:\n");
+
+            TAILQ_FOREACH(entry, ri->runpath_allowed_origin_prefixes, items) {
+                fprintf(stderr, "            - %s\n", entry->data);
+            }
+        }
+
+        if (ri->runpath_origin_prefix_trim && !TAILQ_EMPTY(ri->runpath_origin_prefix_trim)) {
+            fprintf(stderr, "        origin_prefix_trim:\n");
+
+            TAILQ_FOREACH(entry, ri->runpath_origin_prefix_trim, items) {
+                fprintf(stderr, "            - %s\n", entry->data);
+            }
+        }
+    }
+
     fprintf(stderr, "==========\n");
 
     return;
