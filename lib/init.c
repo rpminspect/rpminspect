@@ -410,7 +410,6 @@ static int read_cfgfile(struct rpminspect *ri, const char *filename)
     char *key = NULL;
     char *t = NULL;
     bool exclude = false;
-    bool map = false;
 
     assert(ri != NULL);
     assert(filename != NULL);
@@ -460,23 +459,8 @@ static int read_cfgfile(struct rpminspect *ri, const char *filename)
 
                 break;
             case YAML_BLOCK_END_TOKEN:
-                if (read_list) {
+                if (read_list && block == BLOCK_NULL && group != BLOCK_NULL) {
                     read_list = false;
-                }
-
-                /*
-                 * blocks under groups should be closed first but if
-                 * there is no block set, we are closing the group
-                 * NOTE: nested maps are handled differently, that
-                 * needs to be toggled on and off explicitly in the
-                 * YAML_SCALAR_TOKEN handler below.
-                 */
-                if (!map) {
-                    if (group != BLOCK_NULL && block != BLOCK_NULL) {
-                        block = BLOCK_NULL;
-                    } else if (group != BLOCK_NULL && block == BLOCK_NULL) {
-                        group = BLOCK_NULL;
-                    }
                 }
 
                 break;
@@ -490,42 +474,117 @@ static int read_cfgfile(struct rpminspect *ri, const char *filename)
                 if (key && read_stream && block != BLOCK_INSPECTIONS) {
                     if (!strcmp(key, "common")) {
                         block = BLOCK_COMMON;
+                        group = BLOCK_NULL;
                     } else if (!strcmp(key, "koji")) {
                         block = BLOCK_KOJI;
-                    } else if (!strcmp(key, "vendor")) {
+                        group = BLOCK_NULL;
+                    } else if (!strcmp(key, "vendor") && group != BLOCK_METADATA) {
                         block = BLOCK_VENDOR;
+                        group = BLOCK_NULL;
                     } else if (!strcmp(key, "commands")) {
                         block = BLOCK_COMMANDS;
+                        group = BLOCK_NULL;
                     } else if (!strcmp(key, "inspections")) {
                         block = BLOCK_INSPECTIONS;
+                        group = BLOCK_NULL;
                     } else if (!strcmp(key, "products")) {
                         block = BLOCK_PRODUCTS;
+                        group = BLOCK_NULL;
                     } else if (!strcmp(key, "ignore")) {
                         block = BLOCK_IGNORE;
+                        group = BLOCK_NULL;
                     } else if (!strcmp(key, "security_path_prefix")) {
                         block = BLOCK_SECURITY_PATH_PREFIX;
+                        group = BLOCK_NULL;
                     } else if (!strcmp(key, "badfuncs")) {
                         block = BLOCK_BADFUNCS;
+                        group = BLOCK_NULL;
                     } else if (!strcmp(key, "badwords")) {
                         block = BLOCK_BADWORDS;
+                        group = BLOCK_NULL;
                     } else if (!strcmp(key, "metadata")) {
+                        block = BLOCK_NULL;
                         group = BLOCK_METADATA;
-                    } else if (group == BLOCK_METADATA && !strcmp(key, "buildhost_subdomain")) {
-                        block = BLOCK_BUILDHOST_SUBDOMAIN;
                     } else if (!strcmp(key, "elf")) {
+                        block = BLOCK_NULL;
                         group = BLOCK_ELF;
                     } else if (!strcmp(key, "manpage")) {
                         block = BLOCK_MANPAGE;
+                        group = BLOCK_NULL;
                     } else if (!strcmp(key, "xml")) {
                         block = BLOCK_XML;
+                        group = BLOCK_NULL;
                     } else if (!strcmp(key, "desktop")) {
                         block = BLOCK_DESKTOP;
+                        group = BLOCK_NULL;
                     } else if (!strcmp(key, "changedfiles")) {
+                        block = BLOCK_NULL;
                         group = BLOCK_CHANGEDFILES;
-                    } else if (group == BLOCK_CHANGEDFILES && !strcmp(key, "header_file_extensions")) {
-                        block = BLOCK_HEADER_FILE_EXTENSIONS;
                     } else if (!strcmp(key, "addedfiles")) {
+                        block = BLOCK_NULL;
                         group = BLOCK_ADDEDFILES;
+                    } else if (!strcmp(key, "ownership")) {
+                        block = BLOCK_NULL;
+                        group = BLOCK_OWNERSHIP;
+                    } else if (!strcmp(key, "shellsyntax")) {
+                        block = BLOCK_NULL;
+                        group = BLOCK_SHELLSYNTAX;
+                    } else if (!strcmp(key, "filesize")) {
+                        block = BLOCK_FILESIZE;
+                        group = BLOCK_NULL;
+                    } else if (!strcmp(key, "lto")) {
+                        block = BLOCK_NULL;
+                        group = BLOCK_LTO;
+                    } else if (!strcmp(key, "specname")) {
+                        block = BLOCK_SPECNAME;
+                        group = BLOCK_NULL;
+                    } else if (!strcmp(key, "annocheck")) {
+                        block = BLOCK_ANNOCHECK;
+                        group = BLOCK_NULL;
+                    } else if (!strcmp(key, "javabytecode")) {
+                        block = BLOCK_JAVABYTECODE;
+                        group = BLOCK_NULL;
+                    } else if (!strcmp(key, "pathmigration")) {
+                        block = BLOCK_NULL;
+                        group = BLOCK_PATHMIGRATION;
+                    } else if (!strcmp(key, "files")) {
+                        block = BLOCK_NULL;
+                        group = BLOCK_FILES;
+                    } else if (!strcmp(key, "abidiff")) {
+                        block = BLOCK_ABIDIFF;
+                        group = BLOCK_NULL;
+                    } else if (!strcmp(key, "kmidiff")) {
+                        block = BLOCK_NULL;
+                        group = BLOCK_KMIDIFF;
+                    } else if (!strcmp(key, "patches")) {
+                        block = BLOCK_NULL;
+                        group = BLOCK_PATCHES;
+                    } else if (!strcmp(key, "runpath")) {
+                        block = BLOCK_NULL;
+                        group = BLOCK_RUNPATH;
+                    }
+                }
+
+                if (symbol == SYMBOL_KEY) {
+                    /* save keys because they determine where values go */
+                    free(key);
+                    key = strdup(t);
+
+                    /* handle group subsection blocks here rather than above */
+                    if (group == BLOCK_PATHMIGRATION) {
+                        if (!strcmp(key, "migrated_paths")) {
+                            block = BLOCK_MIGRATED_PATHS;
+                        } else if (!strcmp(key, "excluded_paths")) {
+                            block = BLOCK_PATHMIGRATION_EXCLUDED_PATHS;
+                        }
+                    } else if (group == BLOCK_METADATA) {
+                        if (!strcmp(key, "buildhost_subdomain")) {
+                            block = BLOCK_BUILDHOST_SUBDOMAIN;
+                        }
+                    } else if (group == BLOCK_CHANGEDFILES) {
+                        if (!strcmp(key, "header_file_extensions")) {
+                            block = BLOCK_HEADER_FILE_EXTENSIONS;
+                        }
                     } else if (group == BLOCK_ADDEDFILES) {
                         if (!strcmp(key, "forbidden_path_prefixes")) {
                             block = BLOCK_FORBIDDEN_PATH_PREFIXES;
@@ -534,8 +593,6 @@ static int read_cfgfile(struct rpminspect *ri, const char *filename)
                         } else if (!strcmp(key, "forbidden_directories")) {
                             block = BLOCK_FORBIDDEN_DIRECTORIES;
                         }
-                    } else if (!strcmp(key, "ownership")) {
-                        group = BLOCK_OWNERSHIP;
                     } else if (group == BLOCK_OWNERSHIP) {
                         if (!strcmp(key, "bin_paths")) {
                             block = BLOCK_BIN_PATHS;
@@ -544,48 +601,26 @@ static int read_cfgfile(struct rpminspect *ri, const char *filename)
                         } else if (!strcmp(key, "forbidden_groups")) {
                             block = BLOCK_FORBIDDEN_GROUPS;
                         }
-                    } else if (!strcmp(key, "shellsyntax")) {
-                        group = BLOCK_SHELLSYNTAX;
-                    } else if (group == BLOCK_SHELLSYNTAX && !strcmp(key, "shells")) {
-                        block = BLOCK_SHELLS;
-                    } else if (!strcmp(key, "filesize")) {
-                        block = BLOCK_FILESIZE;
-                    } else if (!strcmp(key, "lto")) {
-                        group = BLOCK_LTO;
-                    } else if (group == BLOCK_LTO && !strcmp(key, "lto_symbol_name_prefixes")) {
-                        block = BLOCK_LTO_SYMBOL_NAME_PREFIXES;
-                    } else if (!strcmp(key, "specname")) {
-                        block = BLOCK_SPECNAME;
-                    } else if (!strcmp(key, "annocheck")) {
-                        block = BLOCK_ANNOCHECK;
-                    } else if (!strcmp(key, "javabytecode")) {
-                        block = BLOCK_JAVABYTECODE;
-                    } else if (!strcmp(key, "pathmigration")) {
-                        group = BLOCK_PATHMIGRATION;
-                    } else if (group == BLOCK_PATHMIGRATION) {
-                        if (!strcmp(key, "migrated_paths")) {
-                            block = BLOCK_MIGRATED_PATHS;
-                            map = true;
-                        } else if (!strcmp(key, "excluded_paths")) {
-                            block = BLOCK_PATHMIGRATION_EXCLUDED_PATHS;
-                            map = false;
+                    } else if (group == BLOCK_SHELLSYNTAX) {
+                        if (!strcmp(key, "shells")) {
+                            block = BLOCK_SHELLS;
                         }
-                    } else if (!strcmp(key, "files")) {
-                        group = BLOCK_FILES;
-                    } else if (group == BLOCK_FILES && !strcmp(key, "forbidden_paths")) {
-                        block = BLOCK_FORBIDDEN_PATHS;
-                    } else if (!strcmp(key, "abidiff")) {
-                        block = BLOCK_ABIDIFF;
-                    } else if (!strcmp(key, "kmidiff")) {
-                        group = BLOCK_KMIDIFF;
-                    } else if (group == BLOCK_KMIDIFF && !strcmp(key, "kernel_filenames")) {
-                        block = BLOCK_KERNEL_FILENAMES;
-                    } else if (!strcmp(key, "patches")) {
-                        group = BLOCK_PATCHES;
-                    } else if (group == BLOCK_PATCHES && !strcmp(key, "patch_ignore_list")) {
-                        block = BLOCK_PATCH_FILENAMES;
-                    } else if (!strcmp(key, "runpath")) {
-                        group = BLOCK_RUNPATH;
+                    } else if (group == BLOCK_LTO) {
+                        if (!strcmp(key, "lto_symbol_name_prefixes")) {
+                            block = BLOCK_LTO_SYMBOL_NAME_PREFIXES;
+                        }
+                    } else if (group == BLOCK_FILES) {
+                        if (!strcmp(key, "forbidden_paths")) {
+                            block = BLOCK_FORBIDDEN_PATHS;
+                        }
+                    } else if (group == BLOCK_KMIDIFF) {
+                        if (!strcmp(key, "kernel_filenames")) {
+                            block = BLOCK_KERNEL_FILENAMES;
+                        }
+                    } else if (group == BLOCK_PATCHES) {
+                        if (!strcmp(key, "patch_ignore_list")) {
+                            block = BLOCK_PATCH_FILENAMES;
+                        }
                     } else if (group == BLOCK_RUNPATH) {
                         if (!strcmp(key, "allowed_prefixes")) {
                             block = BLOCK_RUNPATH_ALLOWED_PREFIXES;
@@ -595,12 +630,6 @@ static int read_cfgfile(struct rpminspect *ri, const char *filename)
                             block = BLOCK_RUNPATH_ORIGIN_PREFIX_TRIM;
                         }
                     }
-                }
-
-                if (symbol == SYMBOL_KEY) {
-                    /* save keys because they determine where values go */
-                    free(key);
-                    key = strdup(t);
                 } else if (symbol == SYMBOL_VALUE) {
                     /* sort values in to the right settings based on the block */
                     if (block == BLOCK_COMMON) {
