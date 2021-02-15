@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2020  Red Hat, Inc.
+ * Copyright (C) 2020-2021  Red Hat, Inc.
  * Author(s):  David Cantrell <dcantrell@redhat.com>
  *
  * This program is free software: you can redistribute it and/or
@@ -75,7 +75,8 @@ bool is_rebase(struct rpminspect *ri)
 
         if (peer) {
             if (peer->before_hdr == NULL) {
-                ri->rebase_build = 1;
+                /* no previous build cannot be a rebased build */
+                ri->rebase_build = -1;
             } else {
                 bn = headerGetString(peer->before_hdr, RPMTAG_NAME);
                 an = headerGetString(peer->after_hdr, RPMTAG_NAME);
