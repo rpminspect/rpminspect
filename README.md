@@ -143,8 +143,8 @@ packages installed:
     make instreqs
 
 This target will install all BuildRequires, Requires, and Suggests
-including the ones commented out in the spec file template that are
-required for the test suite.
+dependencies from the spec file template, but also the additional test
+suite requirements listed in the files in the osdeps/ subdirectory.
 
 If you are working on a distribution other than Fedora/RHEL/CentOS,
 then have a look at the rpminspect.spec.in template for the packages
