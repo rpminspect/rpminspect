@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2019-2020  Red Hat, Inc.
+ * Copyright (C) 2019-2021  Red Hat, Inc.
  * Author(s):  David Cantrell <dcantrell@redhat.com>
  *
  * This program is free software: you can redistribute it and/or
@@ -325,6 +325,8 @@ const char *inspection_header_to_desc(const char *header)
         i = INSPECT_POLITICS;
     } else if (!strcmp(header, HEADER_BADFUNCS)) {
         i = INSPECT_BADFUNCS;
+    } else if (!strcmp(header, HEADER_RUNPATH)) {
+        i = INSPECT_RUNPATH;
     }
 
     return inspection_desc(i);
