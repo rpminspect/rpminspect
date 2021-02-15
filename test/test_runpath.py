@@ -38,6 +38,7 @@ class ValidRPATH1RPMs(TestRPMs):
         self.result = "OK"
         self.waiver_auth = "Not Waivable"
 
+
 class ValidRPATH1Koji(TestKoji):
     def setUp(self):
         TestKoji.setUp(self)
@@ -49,6 +50,7 @@ class ValidRPATH1Koji(TestKoji):
         self.label = "runpath"
         self.result = "OK"
         self.waiver_auth = "Not Waivable"
+
 
 class ValidRPATH1CompareRPMs(TestCompareRPMs):
     def setUp(self):
@@ -62,6 +64,7 @@ class ValidRPATH1CompareRPMs(TestCompareRPMs):
         self.result = "OK"
         self.waiver_auth = "Not Waivable"
 
+
 class ValidRPATH1CompareKoji(TestCompareKoji):
     def setUp(self):
         TestCompareKoji.setUp(self)
@@ -73,6 +76,7 @@ class ValidRPATH1CompareKoji(TestCompareKoji):
         self.label = "runpath"
         self.result = "OK"
         self.waiver_auth = "Not Waivable"
+
 
 ######################################################################
 # /usr/bin/program DT_RPATH or DT_RUNPATH set to "$ORIGIN/" --> pass #
@@ -89,6 +93,7 @@ class ValidRPATH2RPMs(TestRPMs):
         self.result = "OK"
         self.waiver_auth = "Not Waivable"
 
+
 class ValidRPATH2Koji(TestKoji):
     def setUp(self):
         TestKoji.setUp(self)
@@ -100,6 +105,7 @@ class ValidRPATH2Koji(TestKoji):
         self.label = "runpath"
         self.result = "OK"
         self.waiver_auth = "Not Waivable"
+
 
 class ValidRPATH2CompareRPMs(TestCompareRPMs):
     def setUp(self):
@@ -113,6 +119,7 @@ class ValidRPATH2CompareRPMs(TestCompareRPMs):
         self.result = "OK"
         self.waiver_auth = "Not Waivable"
 
+
 class ValidRPATH2CompareKoji(TestCompareKoji):
     def setUp(self):
         TestCompareKoji.setUp(self)
@@ -125,6 +132,7 @@ class ValidRPATH2CompareKoji(TestCompareKoji):
         self.result = "OK"
         self.waiver_auth = "Not Waivable"
 
+
 ###############################################################################################
 # /usr/bin/program DT_RPATH or DT_RUNPATH set to "$ORIGIN/../lib/jli:$ORIGIN/../lib" --> pass #
 ###############################################################################################
@@ -133,48 +141,56 @@ class ValidRPATH3RPMs(TestRPMs):
         TestRPMs.setUp(self)
 
         self.rpm.add_simple_compilation()
-        self.rpm.section_build += "patchelf --set-rpath '$ORIGIN/../lib/jli:$ORIGIN/../lib' a.out\n"
+        self.rpm.section_build += (
+            "patchelf --set-rpath '$ORIGIN/../lib/jli:$ORIGIN/../lib' a.out\n"
+        )
 
         self.inspection = "runpath"
         self.label = "runpath"
         self.result = "OK"
         self.waiver_auth = "Not Waivable"
+
 
 class ValidRPATH3Koji(TestKoji):
     def setUp(self):
         TestKoji.setUp(self)
 
         self.rpm.add_simple_compilation()
-        self.rpm.section_build += "patchelf --set-rpath '$ORIGIN/../lib/jli:$ORIGIN/../lib' a.out\n"
+        self.rpm.section_build += (
+            "patchelf --set-rpath '$ORIGIN/../lib/jli:$ORIGIN/../lib' a.out\n"
+        )
 
         self.inspection = "runpath"
         self.label = "runpath"
         self.result = "OK"
         self.waiver_auth = "Not Waivable"
+
 
 class ValidRPATH3CompareRPMs(TestCompareRPMs):
     def setUp(self):
         TestCompareRPMs.setUp(self)
 
         self.after_rpm.add_simple_compilation()
-        self.after_rpm.section_build += "patchelf --set-rpath '$ORIGIN/../lib/jli:$ORIGIN/../lib' a.out\n"
+        self.after_rpm.section_build += "patchelf --set-rpath '$ORIGIN/../lib/jli:$ORIGIN/../lib' a.out\n"  # noqa: E501
 
         self.inspection = "runpath"
         self.label = "runpath"
         self.result = "OK"
         self.waiver_auth = "Not Waivable"
+
 
 class ValidRPATH3CompareKoji(TestCompareKoji):
     def setUp(self):
         TestCompareKoji.setUp(self)
 
         self.after_rpm.add_simple_compilation()
-        self.after_rpm.section_build += "patchelf --set-rpath '$ORIGIN/../lib/jli:$ORIGIN/../lib' a.out\n"
+        self.after_rpm.section_build += "patchelf --set-rpath '$ORIGIN/../lib/jli:$ORIGIN/../lib' a.out\n"  # noqa: E501
 
         self.inspection = "runpath"
         self.label = "runpath"
         self.result = "OK"
         self.waiver_auth = "Not Waivable"
+
 
 ##############################################################################
 # /usr/bin/program DT_RPATH or DT_RUNPATH set to "$ORIGIN/../lib64" --> pass #
@@ -191,6 +207,7 @@ class ValidRPATH4RPMs(TestRPMs):
         self.result = "OK"
         self.waiver_auth = "Not Waivable"
 
+
 class ValidRPATH4Koji(TestKoji):
     def setUp(self):
         TestKoji.setUp(self)
@@ -203,29 +220,36 @@ class ValidRPATH4Koji(TestKoji):
         self.result = "OK"
         self.waiver_auth = "Not Waivable"
 
+
 class ValidRPATH4CompareRPMs(TestCompareRPMs):
     def setUp(self):
         TestCompareRPMs.setUp(self)
 
         self.after_rpm.add_simple_compilation()
-        self.after_rpm.section_build += "patchelf --set-rpath '$ORIGIN/../lib64' a.out\n"
+        self.after_rpm.section_build += (
+            "patchelf --set-rpath '$ORIGIN/../lib64' a.out\n"
+        )
 
         self.inspection = "runpath"
         self.label = "runpath"
         self.result = "OK"
         self.waiver_auth = "Not Waivable"
+
 
 class ValidRPATH4CompareKoji(TestCompareKoji):
     def setUp(self):
         TestCompareKoji.setUp(self)
 
         self.after_rpm.add_simple_compilation()
-        self.after_rpm.section_build += "patchelf --set-rpath '$ORIGIN/../lib64' a.out\n"
+        self.after_rpm.section_build += (
+            "patchelf --set-rpath '$ORIGIN/../lib64' a.out\n"
+        )
 
         self.inspection = "runpath"
         self.label = "runpath"
         self.result = "OK"
         self.waiver_auth = "Not Waivable"
+
 
 ####################################################################################
 # /usr/bin/program DT_RPATH or DT_RUNPATH set to "$ORIGIN:$ORIGIN/../lib" --> pass #
@@ -235,48 +259,60 @@ class ValidRPATH5RPMs(TestRPMs):
         TestRPMs.setUp(self)
 
         self.rpm.add_simple_compilation()
-        self.rpm.section_build += "patchelf --set-rpath '$ORIGIN:$ORIGIN/../lib' a.out\n"
+        self.rpm.section_build += (
+            "patchelf --set-rpath '$ORIGIN:$ORIGIN/../lib' a.out\n"
+        )
 
         self.inspection = "runpath"
         self.label = "runpath"
         self.result = "OK"
         self.waiver_auth = "Not Waivable"
+
 
 class ValidRPATH5Koji(TestKoji):
     def setUp(self):
         TestKoji.setUp(self)
 
         self.rpm.add_simple_compilation()
-        self.rpm.section_build += "patchelf --set-rpath '$ORIGIN:$ORIGIN/../lib' a.out\n"
+        self.rpm.section_build += (
+            "patchelf --set-rpath '$ORIGIN:$ORIGIN/../lib' a.out\n"
+        )
 
         self.inspection = "runpath"
         self.label = "runpath"
         self.result = "OK"
         self.waiver_auth = "Not Waivable"
+
 
 class ValidRPATH5CompareRPMs(TestCompareRPMs):
     def setUp(self):
         TestCompareRPMs.setUp(self)
 
         self.after_rpm.add_simple_compilation()
-        self.after_rpm.section_build += "patchelf --set-rpath '$ORIGIN:$ORIGIN/../lib' a.out\n"
+        self.after_rpm.section_build += (
+            "patchelf --set-rpath '$ORIGIN:$ORIGIN/../lib' a.out\n"
+        )
 
         self.inspection = "runpath"
         self.label = "runpath"
         self.result = "OK"
         self.waiver_auth = "Not Waivable"
+
 
 class ValidRPATH5CompareKoji(TestCompareKoji):
     def setUp(self):
         TestCompareKoji.setUp(self)
 
         self.after_rpm.add_simple_compilation()
-        self.after_rpm.section_build += "patchelf --set-rpath '$ORIGIN:$ORIGIN/../lib' a.out\n"
+        self.after_rpm.section_build += (
+            "patchelf --set-rpath '$ORIGIN:$ORIGIN/../lib' a.out\n"
+        )
 
         self.inspection = "runpath"
         self.label = "runpath"
         self.result = "OK"
         self.waiver_auth = "Not Waivable"
+
 
 ################################################################################################
 # /usr/bin/program DT_RPATH or DT_RUNPATH set to "/builddir/build/BUILD/jq-1.6/.libs" --> FAIL #
@@ -286,99 +322,107 @@ class InvalidRPATH1RPMs(TestRPMs):
         TestRPMs.setUp(self)
 
         self.rpm.add_simple_compilation()
-        self.rpm.section_build += "patchelf --set-rpath '/builddir/build/BUILD/jq-1.6/.libs' a.out\n"
+        self.rpm.section_build += "patchelf --set-rpath '/builddir/build/BUILD/jq-1.6/.libs' a.out\n"  # noqa: E501
 
         self.inspection = "runpath"
         self.label = "runpath"
         self.result = "VERIFY"
         self.waiver_auth = "Anyone"
+
 
 class InvalidRPATH1Koji(TestKoji):
     def setUp(self):
         TestKoji.setUp(self)
 
         self.rpm.add_simple_compilation()
-        self.rpm.section_build += "patchelf --set-rpath '/builddir/build/BUILD/jq-1.6/.libs' a.out\n"
+        self.rpm.section_build += "patchelf --set-rpath '/builddir/build/BUILD/jq-1.6/.libs' a.out\n"  # noqa: E501
 
         self.inspection = "runpath"
         self.label = "runpath"
         self.result = "VERIFY"
         self.waiver_auth = "Anyone"
+
 
 class InvalidRPATH1CompareRPMs(TestCompareRPMs):
     def setUp(self):
         TestCompareRPMs.setUp(self)
 
         self.after_rpm.add_simple_compilation()
-        self.after_rpm.section_build += "patchelf --set-rpath '/builddir/build/BUILD/jq-1.6/.libs' a.out\n"
+        self.after_rpm.section_build += "patchelf --set-rpath '/builddir/build/BUILD/jq-1.6/.libs' a.out\n"  # noqa: E501
 
         self.inspection = "runpath"
         self.label = "runpath"
         self.result = "VERIFY"
         self.waiver_auth = "Anyone"
+
 
 class InvalidRPATH1CompareKoji(TestCompareKoji):
     def setUp(self):
         TestCompareKoji.setUp(self)
 
         self.after_rpm.add_simple_compilation()
-        self.after_rpm.section_build += "patchelf --set-rpath '/builddir/build/BUILD/jq-1.6/.libs' a.out\n"
+        self.after_rpm.section_build += "patchelf --set-rpath '/builddir/build/BUILD/jq-1.6/.libs' a.out\n"  # noqa: E501
 
         self.inspection = "runpath"
         self.label = "runpath"
         self.result = "VERIFY"
         self.waiver_auth = "Anyone"
 
-#########################################################################################################################
-# /usr/bin/program DT_RPATH or DT_RUNPATH set to "/builddir/build/BUILD/texlive-base-20200327/source/inst/lib" --> FAIL #
-#########################################################################################################################
+
+#########################################################################################################################  # noqa: E266,E501
+# /usr/bin/program DT_RPATH or DT_RUNPATH set to "/builddir/build/BUILD/texlive-base-20200327/source/inst/lib" --> FAIL #  # noqa: E501
+#########################################################################################################################  # noqa: E266,E501
 class InvalidRPATH2RPMs(TestRPMs):
     def setUp(self):
         TestRPMs.setUp(self)
 
         self.rpm.add_simple_compilation()
-        self.rpm.section_build += "patchelf --set-rpath '/builddir/build/BUILD/texlive-base-20200327/source/inst/lib' a.out\n"
+        self.rpm.section_build += "patchelf --set-rpath '/builddir/build/BUILD/texlive-base-20200327/source/inst/lib' a.out\n"  # noqa: E501
 
         self.inspection = "runpath"
         self.label = "runpath"
         self.result = "VERIFY"
         self.waiver_auth = "Anyone"
+
 
 class InvalidRPATH2Koji(TestKoji):
     def setUp(self):
         TestKoji.setUp(self)
 
         self.rpm.add_simple_compilation()
-        self.rpm.section_build += "patchelf --set-rpath '/builddir/build/BUILD/texlive-base-20200327/source/inst/lib' a.out\n"
+        self.rpm.section_build += "patchelf --set-rpath '/builddir/build/BUILD/texlive-base-20200327/source/inst/lib' a.out\n"  # noqa: E501
 
         self.inspection = "runpath"
         self.label = "runpath"
         self.result = "VERIFY"
         self.waiver_auth = "Anyone"
+
 
 class InvalidRPATH2CompareRPMs(TestCompareRPMs):
     def setUp(self):
         TestCompareRPMs.setUp(self)
 
         self.after_rpm.add_simple_compilation()
-        self.after_rpm.section_build += "patchelf --set-rpath '/builddir/build/BUILD/texlive-base-20200327/source/inst/lib' a.out\n"
+        self.after_rpm.section_build += "patchelf --set-rpath '/builddir/build/BUILD/texlive-base-20200327/source/inst/lib' a.out\n"  # noqa: E501
 
         self.inspection = "runpath"
         self.label = "runpath"
         self.result = "VERIFY"
         self.waiver_auth = "Anyone"
+
 
 class InvalidRPATH2CompareKoji(TestCompareKoji):
     def setUp(self):
         TestCompareKoji.setUp(self)
 
         self.after_rpm.add_simple_compilation()
-        self.after_rpm.section_build += "patchelf --set-rpath '/builddir/build/BUILD/texlive-base-20200327/source/inst/lib' a.out\n"
+        self.after_rpm.section_build += "patchelf --set-rpath '/builddir/build/BUILD/texlive-base-20200327/source/inst/lib' a.out\n"  # noqa: E501
 
         self.inspection = "runpath"
         self.label = "runpath"
         self.result = "VERIFY"
         self.waiver_auth = "Anyone"
+
 
 ##############################################################################
 # /usr/bin/program DT_RPATH or DT_RUNPATH set to "/usr/lib/systemd" --> pass #
@@ -395,6 +439,7 @@ class ValidRPATH6RPMs(TestRPMs):
         self.result = "OK"
         self.waiver_auth = "Not Waivable"
 
+
 class ValidRPATH6Koji(TestKoji):
     def setUp(self):
         TestKoji.setUp(self)
@@ -407,29 +452,36 @@ class ValidRPATH6Koji(TestKoji):
         self.result = "OK"
         self.waiver_auth = "Not Waivable"
 
+
 class ValidRPATH6CompareRPMs(TestCompareRPMs):
     def setUp(self):
         TestCompareRPMs.setUp(self)
 
         self.after_rpm.add_simple_compilation()
-        self.after_rpm.section_build += "patchelf --set-rpath '/usr/lib/systemd' a.out\n"
+        self.after_rpm.section_build += (
+            "patchelf --set-rpath '/usr/lib/systemd' a.out\n"
+        )
 
         self.inspection = "runpath"
         self.label = "runpath"
         self.result = "OK"
         self.waiver_auth = "Not Waivable"
+
 
 class ValidRPATH6CompareKoji(TestCompareKoji):
     def setUp(self):
         TestCompareKoji.setUp(self)
 
         self.after_rpm.add_simple_compilation()
-        self.after_rpm.section_build += "patchelf --set-rpath '/usr/lib/systemd' a.out\n"
+        self.after_rpm.section_build += (
+            "patchelf --set-rpath '/usr/lib/systemd' a.out\n"
+        )
 
         self.inspection = "runpath"
         self.label = "runpath"
         self.result = "OK"
         self.waiver_auth = "Not Waivable"
+
 
 ########################################################################
 # /usr/bin/program DT_RPATH or DT_RUNPATH set to "/usr/lib64" --> pass #
@@ -446,6 +498,7 @@ class ValidRPATH7RPMs(TestRPMs):
         self.result = "OK"
         self.waiver_auth = "Not Waivable"
 
+
 class ValidRPATH7Koji(TestKoji):
     def setUp(self):
         TestKoji.setUp(self)
@@ -457,6 +510,7 @@ class ValidRPATH7Koji(TestKoji):
         self.label = "runpath"
         self.result = "OK"
         self.waiver_auth = "Not Waivable"
+
 
 class ValidRPATH7CompareRPMs(TestCompareRPMs):
     def setUp(self):
@@ -470,6 +524,7 @@ class ValidRPATH7CompareRPMs(TestCompareRPMs):
         self.result = "OK"
         self.waiver_auth = "Not Waivable"
 
+
 class ValidRPATH7CompareKoji(TestCompareKoji):
     def setUp(self):
         TestCompareKoji.setUp(self)
@@ -481,6 +536,7 @@ class ValidRPATH7CompareKoji(TestCompareKoji):
         self.label = "runpath"
         self.result = "OK"
         self.waiver_auth = "Not Waivable"
+
 
 #############################################################################
 # /usr/bin/program DT_RPATH or DT_RUNPATH set to "/usr/lib64/sssd" --> pass #
@@ -497,6 +553,7 @@ class ValidRPATH8RPMs(TestRPMs):
         self.result = "OK"
         self.waiver_auth = "Not Waivable"
 
+
 class ValidRPATH8Koji(TestKoji):
     def setUp(self):
         TestKoji.setUp(self)
@@ -508,6 +565,7 @@ class ValidRPATH8Koji(TestKoji):
         self.label = "runpath"
         self.result = "OK"
         self.waiver_auth = "Not Waivable"
+
 
 class ValidRPATH8CompareRPMs(TestCompareRPMs):
     def setUp(self):
@@ -521,6 +579,7 @@ class ValidRPATH8CompareRPMs(TestCompareRPMs):
         self.result = "OK"
         self.waiver_auth = "Not Waivable"
 
+
 class ValidRPATH8CompareKoji(TestCompareKoji):
     def setUp(self):
         TestCompareKoji.setUp(self)
@@ -533,6 +592,7 @@ class ValidRPATH8CompareKoji(TestCompareKoji):
         self.result = "OK"
         self.waiver_auth = "Not Waivable"
 
+
 #################################################################################################
 # /usr/bin/program DT_RPATH or DT_RUNPATH set to "/usr/lib64:/usr/lib64/firebird/intl" --> pass #
 #################################################################################################
@@ -541,48 +601,52 @@ class ValidRPATH9RPMs(TestRPMs):
         TestRPMs.setUp(self)
 
         self.rpm.add_simple_compilation()
-        self.rpm.section_build += "patchelf --set-rpath '/usr/lib64:/usr/lib64/firebird/intl' a.out\n"
+        self.rpm.section_build += "patchelf --set-rpath '/usr/lib64:/usr/lib64/firebird/intl' a.out\n"  # noqa: E501
 
         self.inspection = "runpath"
         self.label = "runpath"
         self.result = "OK"
         self.waiver_auth = "Not Waivable"
+
 
 class ValidRPATH9Koji(TestKoji):
     def setUp(self):
         TestKoji.setUp(self)
 
         self.rpm.add_simple_compilation()
-        self.rpm.section_build += "patchelf --set-rpath '/usr/lib64:/usr/lib64/firebird/intl' a.out\n"
+        self.rpm.section_build += "patchelf --set-rpath '/usr/lib64:/usr/lib64/firebird/intl' a.out\n"  # noqa: E501
 
         self.inspection = "runpath"
         self.label = "runpath"
         self.result = "OK"
         self.waiver_auth = "Not Waivable"
+
 
 class ValidRPATH9CompareRPMs(TestCompareRPMs):
     def setUp(self):
         TestCompareRPMs.setUp(self)
 
         self.after_rpm.add_simple_compilation()
-        self.after_rpm.section_build += "patchelf --set-rpath '/usr/lib64:/usr/lib64/firebird/intl' a.out\n"
+        self.after_rpm.section_build += "patchelf --set-rpath '/usr/lib64:/usr/lib64/firebird/intl' a.out\n"  # noqa: E501
 
         self.inspection = "runpath"
         self.label = "runpath"
         self.result = "OK"
         self.waiver_auth = "Not Waivable"
+
 
 class ValidRPATH9CompareKoji(TestCompareKoji):
     def setUp(self):
         TestCompareKoji.setUp(self)
 
         self.after_rpm.add_simple_compilation()
-        self.after_rpm.section_build += "patchelf --set-rpath '/usr/lib64:/usr/lib64/firebird/intl' a.out\n"
+        self.after_rpm.section_build += "patchelf --set-rpath '/usr/lib64:/usr/lib64/firebird/intl' a.out\n"  # noqa: E501
 
         self.inspection = "runpath"
         self.label = "runpath"
         self.result = "OK"
         self.waiver_auth = "Not Waivable"
+
 
 ###############################################################################
 # /usr/bin/program DT_RPATH or DT_RUNPATH set to "/usr/libexec/sudo" --> pass #
@@ -599,6 +663,7 @@ class ValidRPATH10RPMs(TestRPMs):
         self.result = "OK"
         self.waiver_auth = "Not Waivable"
 
+
 class ValidRPATH10Koji(TestKoji):
     def setUp(self):
         TestKoji.setUp(self)
@@ -611,75 +676,85 @@ class ValidRPATH10Koji(TestKoji):
         self.result = "OK"
         self.waiver_auth = "Not Waivable"
 
+
 class ValidRPATH10CompareRPMs(TestCompareRPMs):
     def setUp(self):
         TestCompareRPMs.setUp(self)
 
         self.after_rpm.add_simple_compilation()
-        self.after_rpm.section_build += "patchelf --set-rpath '/usr/libexec/sudo' a.out\n"
+        self.after_rpm.section_build += (
+            "patchelf --set-rpath '/usr/libexec/sudo' a.out\n"
+        )
 
         self.inspection = "runpath"
         self.label = "runpath"
         self.result = "OK"
         self.waiver_auth = "Not Waivable"
+
 
 class ValidRPATH10CompareKoji(TestCompareKoji):
     def setUp(self):
         TestCompareKoji.setUp(self)
 
         self.after_rpm.add_simple_compilation()
-        self.after_rpm.section_build += "patchelf --set-rpath '/usr/libexec/sudo' a.out\n"
+        self.after_rpm.section_build += (
+            "patchelf --set-rpath '/usr/libexec/sudo' a.out\n"
+        )
 
         self.inspection = "runpath"
         self.label = "runpath"
         self.result = "OK"
         self.waiver_auth = "Not Waivable"
 
-##################################################################################################################################
-# /usr/bin/program DT_RPATH or DT_RUNPATH set to "/lib64:$ORIGIN/../etc:$ORIGIN/usr/lib64/:/builddir/build/BUILD/lib64" --> FAIL #
-##################################################################################################################################
+
+##################################################################################################################################  # noqa: E266, E501
+# /usr/bin/program DT_RPATH or DT_RUNPATH set to "/lib64:$ORIGIN/../etc:$ORIGIN/usr/lib64/:/builddir/build/BUILD/lib64" --> FAIL #  # noqa: E501
+##################################################################################################################################  # noqa: E266, E501
 class InvalidRPATH3RPMs(TestRPMs):
     def setUp(self):
         TestRPMs.setUp(self)
 
         self.rpm.add_simple_compilation()
-        self.rpm.section_build += "patchelf --set-rpath '/lib64:$ORIGIN/../etc:$ORIGIN/usr/lib64/:/builddir/build/BUILD/lib64' a.out\n"
+        self.rpm.section_build += "patchelf --set-rpath '/lib64:$ORIGIN/../etc:$ORIGIN/usr/lib64/:/builddir/build/BUILD/lib64' a.out\n"  # noqa: E501
 
         self.inspection = "runpath"
         self.label = "runpath"
         self.result = "VERIFY"
         self.waiver_auth = "Anyone"
+
 
 class InvalidRPATH3Koji(TestKoji):
     def setUp(self):
         TestKoji.setUp(self)
 
         self.rpm.add_simple_compilation()
-        self.rpm.section_build += "patchelf --set-rpath '/lib64:$ORIGIN/../etc:$ORIGIN/usr/lib64/:/builddir/build/BUILD/lib64' a.out\n"
+        self.rpm.section_build += "patchelf --set-rpath '/lib64:$ORIGIN/../etc:$ORIGIN/usr/lib64/:/builddir/build/BUILD/lib64' a.out\n"  # noqa: E501
 
         self.inspection = "runpath"
         self.label = "runpath"
         self.result = "VERIFY"
         self.waiver_auth = "Anyone"
+
 
 class InvalidRPATH3CompareRPMs(TestCompareRPMs):
     def setUp(self):
         TestCompareRPMs.setUp(self)
 
         self.after_rpm.add_simple_compilation()
-        self.after_rpm.section_build += "patchelf --set-rpath '/lib64:$ORIGIN/../etc:$ORIGIN/usr/lib64/:/builddir/build/BUILD/lib64' a.out\n"
+        self.after_rpm.section_build += "patchelf --set-rpath '/lib64:$ORIGIN/../etc:$ORIGIN/usr/lib64/:/builddir/build/BUILD/lib64' a.out\n"  # noqa: E501
 
         self.inspection = "runpath"
         self.label = "runpath"
         self.result = "VERIFY"
         self.waiver_auth = "Anyone"
 
+
 class InvalidRPATH3CompareKoji(TestCompareKoji):
     def setUp(self):
         TestCompareKoji.setUp(self)
 
         self.after_rpm.add_simple_compilation()
-        self.after_rpm.section_build += "patchelf --set-rpath '/lib64:$ORIGIN/../etc:$ORIGIN/usr/lib64/:/builddir/build/BUILD/lib64' a.out\n"
+        self.after_rpm.section_build += "patchelf --set-rpath '/lib64:$ORIGIN/../etc:$ORIGIN/usr/lib64/:/builddir/build/BUILD/lib64' a.out\n"  # noqa: E501
 
         self.inspection = "runpath"
         self.label = "runpath"
