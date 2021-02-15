@@ -1,10 +1,10 @@
-CUnit
-CUnit-devel
 annobin
 bash
 clamav-data
 clamav-devel
 clamav-update
+CUnit
+CUnit-devel
 dash
 desktop-file-utils
 diffutils
@@ -36,6 +36,7 @@ make
 meson
 ninja-build
 openssl-devel
+patchelf
 python36-devel
 python36-pip
 python36-rpm
