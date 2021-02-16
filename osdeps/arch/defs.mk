@@ -1,2 +1,2 @@
 PKG_CMD = pacman --noconfirm -S
-PIP_CMD = pip3 install
+PIP_CMD = env CRYPTOGRAPHY_DONT_BUILD_RUST=1 pip3 install
