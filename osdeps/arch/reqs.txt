@@ -14,6 +14,7 @@ lib32-glibc
 libyaml
 linux-headers
 meson
+patchelf
 pkg-config
 python
 python-pip

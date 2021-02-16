@@ -286,7 +286,9 @@ jobs:
         steps:
             # Update the image
             - name: pacman --noconfirm -Syu
-              run: pacman --noconfirm -Syu
+              run: |
+                  mkdir -p /var/lib/pacman/
+                  pacman --noconfirm -Syu
 
             # Install Build Dependencies - Part I
             - name: Install Build Dependencies - Part I
