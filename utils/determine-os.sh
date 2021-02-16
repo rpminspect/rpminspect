@@ -7,7 +7,7 @@
 PATH=/bin:/usr/bin
 VERSION_ID=0
 
-if [ -r /etc/os-release ]; then
+if [ -r /etc/os-release ] || [ -L /etc/os-release ]; then
     # shellcheck disable=SC1091
     . /etc/os-release
 fi
