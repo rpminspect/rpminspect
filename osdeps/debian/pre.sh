@@ -7,5 +7,5 @@ apt-get -y install lib32gcc-s1
 apt-get update
 
 # install and update pip and setuptools
-apt-get install python3-pip python3-setuptools
+apt-get -y install python3-pip python3-setuptools
 pip3 install --upgrade pip setuptools
