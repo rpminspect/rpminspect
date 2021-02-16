@@ -31,6 +31,7 @@ libyaml-devel
 make
 meson
 ninja
+patchelf
 python3-PyYAML
 python3-devel
 python3-pip

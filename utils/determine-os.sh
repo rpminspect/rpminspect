@@ -22,14 +22,14 @@ elif [ -r /etc/centos-release ] && [ "${ID}" = "centos" ]; then
     if [ ${VERSION_ID} -eq 7 ] || [ ${VERSION_ID} -eq 8 ]; then
         echo "${ID}${VERSION_ID}"
     else
-        echo "unknown"
+        echo "unknown OS: ${ID}" >&2
     fi
 elif [ -r /etc/redhat-release ] && [ "${ID}" = "rhel" ]; then
     v="$(echo "${VERSION_ID}" | cut -d '.' -f 1)"
     if [ "${v}" = "7" ] || [ "${v}" = "8" ]; then
         echo "${ID}${v}"
     else
-        echo "unknown"
+        echo "unknown OS: ${ID}" >&2
     fi
 elif [ "${ID}" = "opensuse-leap" ] || [ "${ID}" = "opensuse-tumbleweed" ]; then
     echo "${ID}"
@@ -40,5 +40,5 @@ elif [ "${ID}" = "slackware" ]; then
 elif [ "${ID}" = "arch" ]; then
     echo "${ID}"
 else
-    echo "unknown"
+    echo "unknown OS: ${ID}" >&2
 fi

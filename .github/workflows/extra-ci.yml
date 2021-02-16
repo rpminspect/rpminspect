@@ -66,9 +66,9 @@ jobs:
             # test suite dependencies
             - name: Install Build Dependencies
               run: |
-                  apt-get update
-                  apt-get -y install make
-                  make instreqs
+                  sudo apt-get update
+                  sudo apt-get -y install make
+                  sudo make instreqs
 
             # Set up the source tree to build
             - name: setup
