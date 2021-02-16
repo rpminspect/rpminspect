@@ -94,7 +94,7 @@ jobs:
         # host is 'ubuntu-latest' since that's what GitHub Actions
         # offers that's Linux.
         runs-on: ubuntu-latest
-        container: opensuse/leap:latest
+        container: opensuse/leap
 
         # All of these steps run from within the main source
         # directory, so think of that as your $PWD
@@ -137,7 +137,7 @@ jobs:
         # but the host is 'ubuntu-latest' since that's what GitHub
         # Actions offers that's Linux.
         runs-on: ubuntu-latest
-        container: opensuse/tumbleweed:latest
+        container: opensuse/tumbleweed
 
         # All of these steps run from within the main source
         # directory, so think of that as your $PWD
@@ -279,7 +279,7 @@ jobs:
         # but the host is 'ubuntu-latest' since that's what GitHub
         # Actions offers that's Linux.
         runs-on: ubuntu-latest
-        container: archlinux:latest
+        container: archlinux/archlinux:base-devel
 
         # All of these steps run from within the main source
         # directory, so think of that as your $PWD
