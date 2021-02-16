@@ -24,12 +24,14 @@ libxmlrpc-core-c3-dev
 libyaml-dev
 libzstd-dev
 meson
+patchelf
 pkg-config
 python3-pip
 python3-rpm
 python3-setuptools
 rc
 rpm
+rustc
 sssd
 tcsh
 valgrind

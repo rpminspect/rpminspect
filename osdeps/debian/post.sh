@@ -36,4 +36,8 @@ cd ..
 rm -rf mandoc.tar.gz ${SUBDIR}
 
 # Update clamav database
+if pgrep freshclam >/dev/null 2>&1 ; then
+    pkill -KILL freshclam
+fi
+
 freshclam

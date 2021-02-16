@@ -16,6 +16,7 @@ libelf-dev
 libffi-dev
 libjson-c-dev
 libkmod-dev
+libmagic-dev
 librpm-dev
 libssl-dev
 libterm-readline-perl-perl
@@ -24,6 +25,7 @@ libxmlrpc-core-c3-dev
 libyaml-dev
 libzstd-dev
 meson
+patchelf
 pkg-config
 python3-pip
 python3-rpm
