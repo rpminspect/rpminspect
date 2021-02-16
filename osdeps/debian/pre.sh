@@ -1,5 +1,6 @@
 #!/bin/sh
-PATH=/bin:/usr/bin:/sbin:/usr/sbin
+PATH=/usr/local/bin:/bin:/usr/bin:/usr/local/sbin:/sbin:/usr/sbin
+
 dpkg --add-architecture i386
 apt-get -y install libterm-readline-perl-perl
 apt-get -y install lib32gcc-s1
