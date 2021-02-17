@@ -207,6 +207,8 @@ static bool runpath_driver(struct rpminspect *ri, rpmfile_entry_t *file)
     GElf_Half type;
     string_list_t *rpath = NULL;
     string_list_t *runpath = NULL;
+    const char *arch = NULL;
+    struct result_params params;
 
     assert(ri != NULL);
     assert(file != NULL);
@@ -245,6 +247,26 @@ static bool runpath_driver(struct rpminspect *ri, rpmfile_entry_t *file)
     /* No entries to check, just return successfully */
     if ((rpath == NULL || TAILQ_EMPTY(rpath)) && (runpath == NULL || TAILQ_EMPTY(runpath))) {
         return true;
+    }
+
+    /* We should never have both */
+    if ((rpath && !TAILQ_EMPTY(rpath)) && (runpath && !TAILQ_EMPTY(runpath))) {
+        arch = get_rpm_header_arch(file->rpm_header);
+        assert(arch != NULL);
+
+        init_result_params(&params);
+        params.severity = RESULT_BAD;
+        params.waiverauth = NOT_WAIVABLE;
+        params.remedy = REMEDY_RUNPATH_BOTH;
+        params.file = file->localpath;
+        params.verb = VERB_FAILED;
+        params.noun = _("both DT_RPATH and DT_RUNPATH in ${FILE}");
+
+        xasprintf(&params.msg, _("%s has both DT_RPATH and DT_RUNPATH on %s; this is not allowed"), file->localpath, arch);
+        add_result(ri, &params);
+        free(params.msg);
+
+        result = false;
     }
 
     /* Check DT_RPATH */
