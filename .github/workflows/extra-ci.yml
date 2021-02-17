@@ -339,7 +339,7 @@ jobs:
               run: emerge --sync
 
             # Install Build Dependencies - Part I
-              name: emerge dev-vcs/git
+            - name: emerge dev-vcs/git
               run: emerge dev-vcs/git
 
             # This means clone the git repo
