@@ -79,7 +79,12 @@ char *abspath(const char *path)
 
     /* generate the final path string */
     p = list_to_string(newpath, "/");
-    xasprintf(&r, "/%s", p);
+
+    if (p) {
+        xasprintf(&r, "/%s", p);
+    } else {
+        r = strdup("/");
+    }
 
     /* clean up */
     list_free(tokens, free);
