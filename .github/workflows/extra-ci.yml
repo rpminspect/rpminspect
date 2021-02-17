@@ -326,7 +326,7 @@ jobs:
         # Linux but the host is 'ubuntu-latest' since that's what
         # GitHub Actions offers that's Linux.
         runs-on: ubuntu-latest
-        container: gentoo/gentoo
+        container: gentoo/stage3
 
         # All of these steps run from within the main source
         # directory, so think of that as your $PWD
