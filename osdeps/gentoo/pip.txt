@@ -1,0 +1,4 @@
+cpp-coveralls
+PyYAML
+rpmfluff
+timeout-decorator

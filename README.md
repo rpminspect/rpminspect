@@ -24,6 +24,7 @@ Status
 ![CI](https://github.com/rpminspect/rpminspect/workflows/CI/badge.svg)
 ![Style Checks](https://github.com/rpminspect/rpminspect/workflows/Style%20Checks/badge.svg)
 ![Gate](https://github.com/rpminspect/rpminspect/workflows/Gate/badge.svg)
+![Extra CI](https://github.com/rpminspect/rpminspect/workflows/Extra%20CI/badge.svg)
 
 Build Types Support
 -------------------

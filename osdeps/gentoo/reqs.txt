@@ -1,0 +1,17 @@
+app-antivirus/clamav
+app-arch/rpm
+app-shells/dash
+app-shells/ksh
+app-shells/tcsh
+app-shells/zsh
+dev-libs/json-c
+dev-libs/libyaml
+dev-libs/xmlrpc-c
+dev-python/pip
+dev-util/cunit
+dev-util/desktop-file-utils
+dev-util/gcovr
+dev-util/libabigail
+dev-util/patchelf
+dev-util/valgrind
+sys-devel/gettext
