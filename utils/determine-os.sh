@@ -39,6 +39,8 @@ elif [ "${ID}" = "slackware" ]; then
     echo "${ID}"
 elif [ "${ID}" = "arch" ]; then
     echo "${ID}"
+elif [ "${ID}" = "gentoo" ]; then
+    echo "${ID}"
 else
     echo "unknown OS: ${ID}" >&2
 fi
