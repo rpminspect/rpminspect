@@ -331,6 +331,17 @@ jobs:
         # All of these steps run from within the main source
         # directory, so think of that as your $PWD
         steps:
+            # Update package repos
+            # (avoid running 'emerge -uDN world' because the Docker
+            # image is likely up to date enough for the purposes of
+            # CI)
+            - name: Portage sync
+              run: |
+                  cd /tmp
+                  wget http://distfiles.gentoo.org/snapshots/portage-latest.tar.bz2
+                  cd /usr
+                  bzip2 -dc /tmp/portage-latest.tar.bz2 | tar -xvf -
+
             # Install Build Dependencies - Part I
             - name: emerge dev-vcs/git
               run: emerge dev-vcs/git
