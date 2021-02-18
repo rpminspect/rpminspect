@@ -796,7 +796,9 @@ class ValidRPATH11CompareRPMs(TestCompareRPMs):
         TestCompareRPMs.setUp(self)
 
         self.after_rpm.add_simple_compilation()
-        self.after_rpm.section_build += "patchelf --set-rpath '/usr/src/kernels/' a.out\n"
+        self.after_rpm.section_build += (
+            "patchelf --set-rpath '/usr/src/kernels/' a.out\n"
+        )
 
         self.inspection = "runpath"
         self.label = "runpath"
@@ -809,7 +811,9 @@ class ValidRPATH11CompareKoji(TestCompareKoji):
         TestCompareKoji.setUp(self)
 
         self.after_rpm.add_simple_compilation()
-        self.after_rpm.section_build += "patchelf --set-rpath '/usr/src/kernels/' a.out\n"
+        self.after_rpm.section_build += (
+            "patchelf --set-rpath '/usr/src/kernels/' a.out\n"
+        )
 
         self.inspection = "runpath"
         self.label = "runpath"
