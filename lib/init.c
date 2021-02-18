@@ -105,8 +105,8 @@ enum {
     BLOCK_PATHMIGRATION_EXCLUDED_PATHS,
     BLOCK_PRODUCTS,
     BLOCK_RUNPATH,
-    BLOCK_RUNPATH_ALLOWED_PREFIXES,
-    BLOCK_RUNPATH_ALLOWED_ORIGIN_PREFIXES,
+    BLOCK_RUNPATH_ALLOWED_PATHS,
+    BLOCK_RUNPATH_ALLOWED_ORIGIN_PATHS,
     BLOCK_RUNPATH_ORIGIN_PREFIX_TRIM,
     BLOCK_SECURITY_PATH_PREFIX,
     BLOCK_SHELLS,
@@ -622,10 +622,10 @@ static int read_cfgfile(struct rpminspect *ri, const char *filename)
                             block = BLOCK_PATCH_FILENAMES;
                         }
                     } else if (group == BLOCK_RUNPATH) {
-                        if (!strcmp(key, "allowed_prefixes")) {
-                            block = BLOCK_RUNPATH_ALLOWED_PREFIXES;
-                        } else if (!strcmp(key, "allowed_origin_prefixes")) {
-                            block = BLOCK_RUNPATH_ALLOWED_ORIGIN_PREFIXES;
+                        if (!strcmp(key, "allowed_paths")) {
+                            block = BLOCK_RUNPATH_ALLOWED_PATHS;
+                        } else if (!strcmp(key, "allowed_origin_paths")) {
+                            block = BLOCK_RUNPATH_ALLOWED_ORIGIN_PATHS;
                         } else if (!strcmp(key, "origin_prefix_trim")) {
                             block = BLOCK_RUNPATH_ORIGIN_PREFIX_TRIM;
                         }
@@ -927,10 +927,10 @@ static int read_cfgfile(struct rpminspect *ri, const char *filename)
                         add_entry(&ri->patch_ignore_list, t);
                     } else if (block == BLOCK_PATHMIGRATION_EXCLUDED_PATHS) {
                         add_entry(&ri->pathmigration_excluded_paths, t);
-                    } else if (block == BLOCK_RUNPATH_ALLOWED_PREFIXES) {
-                        add_entry(&ri->runpath_allowed_prefixes, t);
-                    } else if (block == BLOCK_RUNPATH_ALLOWED_ORIGIN_PREFIXES) {
-                        add_entry(&ri->runpath_allowed_origin_prefixes, t);
+                    } else if (block == BLOCK_RUNPATH_ALLOWED_PATHS) {
+                        add_entry(&ri->runpath_allowed_paths, t);
+                    } else if (block == BLOCK_RUNPATH_ALLOWED_ORIGIN_PATHS) {
+                        add_entry(&ri->runpath_allowed_origin_paths, t);
                     } else if (block == BLOCK_RUNPATH_ORIGIN_PREFIX_TRIM) {
                         add_entry(&ri->runpath_origin_prefix_trim, t);
                     }
