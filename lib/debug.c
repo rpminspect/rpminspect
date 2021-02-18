@@ -461,23 +461,23 @@ void dump_cfg(const struct rpminspect *ri)
         }
     }
 
-    if ((ri->runpath_allowed_prefixes && !TAILQ_EMPTY(ri->runpath_allowed_prefixes)) ||
-        (ri->runpath_allowed_origin_prefixes && !TAILQ_EMPTY(ri->runpath_allowed_origin_prefixes)) ||
+    if ((ri->runpath_allowed_paths && !TAILQ_EMPTY(ri->runpath_allowed_paths)) ||
+        (ri->runpath_allowed_origin_paths && !TAILQ_EMPTY(ri->runpath_allowed_origin_paths)) ||
         (ri->runpath_origin_prefix_trim && !TAILQ_EMPTY(ri->runpath_origin_prefix_trim))) {
         fprintf(stderr, "    runpath:\n");
 
-        if (ri->runpath_allowed_prefixes && !TAILQ_EMPTY(ri->runpath_allowed_prefixes)) {
-            fprintf(stderr, "        allowed_prefixes:\n");
+        if (ri->runpath_allowed_paths && !TAILQ_EMPTY(ri->runpath_allowed_paths)) {
+            fprintf(stderr, "        allowed_paths:\n");
 
-            TAILQ_FOREACH(entry, ri->runpath_allowed_prefixes, items) {
+            TAILQ_FOREACH(entry, ri->runpath_allowed_paths, items) {
                 fprintf(stderr, "            - %s\n", entry->data);
             }
         }
 
-        if (ri->runpath_allowed_origin_prefixes && !TAILQ_EMPTY(ri->runpath_allowed_origin_prefixes)) {
-            fprintf(stderr, "        allowed_origin_prefixes:\n");
+        if (ri->runpath_allowed_origin_paths && !TAILQ_EMPTY(ri->runpath_allowed_origin_paths)) {
+            fprintf(stderr, "        allowed_origin_paths:\n");
 
-            TAILQ_FOREACH(entry, ri->runpath_allowed_origin_prefixes, items) {
+            TAILQ_FOREACH(entry, ri->runpath_allowed_origin_paths, items) {
                 fprintf(stderr, "            - %s\n", entry->data);
             }
         }

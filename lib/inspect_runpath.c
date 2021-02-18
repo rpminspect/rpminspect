@@ -162,25 +162,27 @@ static bool check_runpath(struct rpminspect *ri, const rpmfile_entry_t *file, co
                 }
 
                 /* use this list of allowed values */
-                allowed = ri->runpath_allowed_origin_prefixes;
+                allowed = ri->runpath_allowed_origin_paths;
             } else {
                 working_path = entry->data;
 
                 /* use this list of allowed values */
-                allowed = ri->runpath_allowed_prefixes;
+                allowed = ri->runpath_allowed_paths;
             }
 
             if (!valid && working_path && allowed) {
                 /* canonicalize the path string */
                 working_path = abspath(working_path);
 
-                /* check for the working path in the allowed path prefixes */
+                /* check for the working path in the allowed paths */
                 TAILQ_FOREACH(prefix, allowed, items) {
-                    if (!strcmp(working_path, prefix->data) || strprefix(working_path, prefix->data)) {
+                    if (!strcmp(working_path, prefix->data)) {
                         valid = true;
                         break;
                     }
                 }
+
+                free(working_path);
             }
 
             if (!valid) {

@@ -487,8 +487,8 @@ struct rpminspect {
     long int patch_line_threshold;
 
     /* runpath inspection lists */
-    string_list_t *runpath_allowed_prefixes;
-    string_list_t *runpath_allowed_origin_prefixes;
+    string_list_t *runpath_allowed_paths;
+    string_list_t *runpath_allowed_origin_paths;
     string_list_t *runpath_origin_prefix_trim;
 
     /* Options specified by the user */
