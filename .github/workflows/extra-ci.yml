@@ -331,13 +331,6 @@ jobs:
         # All of these steps run from within the main source
         # directory, so think of that as your $PWD
         steps:
-            # Update package repos
-            # (avoid running 'emerge -uDN world' because the Docker
-            # image is likely up to date enough for the purposes of
-            # CI)
-            - name: emerge --sync
-              run: emerge --sync
-
             # Install Build Dependencies - Part I
             - name: emerge dev-vcs/git
               run: emerge dev-vcs/git
