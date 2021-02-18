@@ -335,12 +335,8 @@ jobs:
             # (avoid running 'emerge -uDN world' because the Docker
             # image is likely up to date enough for the purposes of
             # CI)
-            - name: Portage sync
-              run: |
-                  cd /tmp
-                  wget http://distfiles.gentoo.org/snapshots/portage-latest.tar.bz2
-                  cd /usr
-                  bzip2 -dc /tmp/portage-latest.tar.bz2 | tar -xvf -
+            - name: emerge-webrsync
+              run: emerge-webrsync
 
             # Install Build Dependencies - Part I
             - name: emerge dev-vcs/git
