@@ -232,14 +232,15 @@ static bool runpath_driver(struct rpminspect *ri, rpmfile_entry_t *file)
 
     /* If we lack dynamic or shared ELF files, we're done */
     if ((elf = get_elf(file->fullpath, &fd)) == NULL) {
-        return true;
+        result = true;
+        goto cleanup;
     }
 
     type = get_elf_type(elf);
 
     if (type != ET_EXEC && type != ET_DYN) {
         result = false;
-        goto done;
+        goto cleanup;
     }
 
     /* Gather any DT_RPATH and DT_RUNPATH entries */
@@ -248,7 +249,8 @@ static bool runpath_driver(struct rpminspect *ri, rpmfile_entry_t *file)
 
     /* No entries to check, just return successfully */
     if ((rpath == NULL || TAILQ_EMPTY(rpath)) && (runpath == NULL || TAILQ_EMPTY(runpath))) {
-        return true;
+        result = true;
+        goto cleanup;
     }
 
     /* We should never have both */
@@ -281,7 +283,7 @@ static bool runpath_driver(struct rpminspect *ri, rpmfile_entry_t *file)
         result = false;
     }
 
-done:
+cleanup:
     if (elf && fd != -1) {
         elf_end(elf);
         close(fd);

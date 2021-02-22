@@ -86,7 +86,8 @@ static bool badfuncs_driver(struct rpminspect *ri, rpmfile_entry_t *after)
     }
 
     if (after_elf == NULL) {
-        return true;
+        result = true;
+        goto cleanup;
     }
 
     /* Don't filter the list -- filtering requires knowledge of the
