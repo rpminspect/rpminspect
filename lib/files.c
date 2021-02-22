@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2019-2020  Red Hat, Inc.
+ * Copyright (C) 2019-2021  Red Hat, Inc.
  * Red Hat Author(s):  David Shea <dshea@redhat.com>
  *                     David Cantrell <dcantrell@redhat.com>
  *
@@ -24,7 +24,7 @@
  * @file files.c
  * @author David Cantrell &lt;dcantrell@redhat.com&gt;
  * @author David Shea &lt;dshea@redhat.com&gt;
- * @date 2019-2020
+ * @date 2019-2021
  * @brief Package extraction and file gathering functions.
  * @copyright LGPL-3.0-or-later
  */
@@ -34,7 +34,6 @@
 #include <err.h>
 #include <regex.h>
 #include <ctype.h>
-#include <search.h>
 #include <stdio.h>
 #include <string.h>
 #include <sys/stat.h>
@@ -51,6 +50,20 @@
 #include <archive_entry.h>
 
 #include "rpminspect.h"
+#include "uthash.h"
+
+/*
+ * hash table used for file entries
+ * Not all values are used each time this hash table is implemeneted.
+ * See below.  One place uses the path and index and another place
+ * uses the path and rpmfile.
+ */
+struct file_data {
+    char *path;                  /* key, the localpath of the file */
+    int index;                   /* RPM header index of this file */
+    rpmfile_entry_t *rpmfile;    /* rpmfile_entry_t for this file */
+    UT_hash_handle hh;           /* makes this structure hashable */
+};
 
 /**
  * @brief Given an RPM Header and index, return the RPMTAG_FILEFLAGS
@@ -132,14 +145,11 @@ void free_files(rpmfile_t *files)
 rpmfile_t *extract_rpm(const char *pkg, Header hdr, char **output_dir)
 {
     rpmtd td = NULL;
-    rpm_count_t td_size;
 
     const char *rpm_path;
-    struct hsearch_data path_table = { 0 };
-    bool path_table_initialized = false;
-    ENTRY e;
-    ENTRY *eptr;
-    int *rpm_indices = NULL;
+    struct file_data *path_table = NULL;
+    struct file_data *path_entry = NULL;
+    struct file_data *tmp_entry = NULL;
 
     char *hardlinkpath = NULL;
     struct archive *archive = NULL;
@@ -169,7 +179,7 @@ rpmfile_t *extract_rpm(const char *pkg, Header hdr, char **output_dir)
     }
 
     if (mkdir(*output_dir, S_IRWXU | S_IRGRP | S_IXGRP | S_IROTH | S_IXOTH) == -1) {
-        fprintf(stderr, _("*** Unable to create directory %s: %s\n"), *output_dir, strerror(errno));
+        warn(_("*** mkdir(%s)"), *output_dir);
         return NULL;
     }
 
@@ -191,37 +201,22 @@ rpmfile_t *extract_rpm(const char *pkg, Header hdr, char **output_dir)
     }
 
     /*
-     * Allocate the hash table, and allocate an array of ints to store the index data
+     * Populate the hash table, and allocate an array of ints to store the index data
      * that the hash table entries will point to.
      */
-    td_size = rpmtdCount(td);
-
-    if (hcreate_r(td_size * 1.25, &path_table) == 0) {
-        fprintf(stderr, _("*** Unable to allocate hash table: %s\n"), strerror(errno));
-        goto cleanup;
-    }
-
-    path_table_initialized = true;
-
-    rpm_indices = calloc(td_size, sizeof(int));
-    assert(rpm_indices != NULL);
-
-    for (i = 0; i < (int) td_size; i++) {
+    for (i = 0; i < (int) rpmtdCount(td); i++) {
         rpm_path = rpmtdNextString(td);
 
         if (rpm_path == NULL) {
-            fprintf(stderr, _("*** Error reading RPM metadata for %s\n"), pkg);
+            warn(_("*** error reading RPM metadata for %s"), pkg);
             goto cleanup;
         }
 
-        rpm_indices[i] = i;
-        e.key = (char *) rpm_path;
-        e.data = rpm_indices + i;
-
-        if (hsearch_r(e, ENTER, &eptr, &path_table) == 0) {
-            fprintf(stderr, _("*** Error populating hash table: %s\n"), strerror(errno));
-            goto cleanup;
-        }
+        path_entry = calloc(1, sizeof(*path_entry));
+        assert(path_entry != NULL);
+        path_entry->path = strdup(rpm_path);
+        path_entry->index = i;
+        HASH_ADD_KEYPTR(hh, path_table, path_entry->path, strlen(path_entry->path), path_entry);
     }
 
     /* Open the file with libarchive */
@@ -236,7 +231,7 @@ rpmfile_t *extract_rpm(const char *pkg, Header hdr, char **output_dir)
     archive_read_support_format_all(archive);
 
     if (archive_read_open_filename(archive, pkg, 10240) != ARCHIVE_OK) {
-        fprintf(stderr, _("*** Unable to open %s with libarchive: %s\n"), pkg, archive_error_string(archive));
+        warn(_("*** unable to open %s with libarchive: %s"), pkg, archive_error_string(archive));
         goto cleanup;
     }
 
@@ -251,7 +246,7 @@ rpmfile_t *extract_rpm(const char *pkg, Header hdr, char **output_dir)
         }
 
         if (archive_result != ARCHIVE_OK) {
-            fprintf(stderr, _("*** Error reading from archive %s: %s\n"), pkg, archive_error_string(archive));
+            warn(_("*** error reading from archive %s: %s"), pkg, archive_error_string(archive));
             free_files(file_list);
             file_list = NULL;
             goto cleanup;
@@ -264,9 +259,10 @@ rpmfile_t *extract_rpm(const char *pkg, Header hdr, char **output_dir)
             archive_path += 1;
         }
 
-        e.key = (char *) archive_path;
-        if (hsearch_r(e, FIND, &eptr, &path_table) == 0) {
-            fprintf(stderr, _("*** Payload path %s not in RPM metadata\n"), archive_path);
+        HASH_FIND_STR(path_table, archive_path, path_entry);
+
+        if (path_entry == NULL) {
+            warn(_("*** payload path %s not in RPM metadata"), archive_path);
             free_files(file_list);
             file_list = NULL;
             goto cleanup;
@@ -278,7 +274,7 @@ rpmfile_t *extract_rpm(const char *pkg, Header hdr, char **output_dir)
 
         file_entry->rpm_header = hdr;
         memcpy(&file_entry->st, archive_entry_stat(entry), sizeof(struct stat));
-        file_entry->idx = *((int *)eptr->data);
+        file_entry->idx = path_entry->index;
 
         file_entry->localpath = strdup(archive_path);
         assert(file_entry->localpath);
@@ -319,7 +315,7 @@ rpmfile_t *extract_rpm(const char *pkg, Header hdr, char **output_dir)
 
         /* Write the file to disk */
         if (archive_read_extract(archive, entry, archive_flags) != ARCHIVE_OK) {
-            fprintf(stderr, _("*** Error extracting %s: %s\n"), pkg, archive_error_string(archive));
+            warn(_("*** error extracting %s: %s"), pkg, archive_error_string(archive));
             free_files(file_list);
             file_list = NULL;
             goto cleanup;
@@ -327,15 +323,16 @@ rpmfile_t *extract_rpm(const char *pkg, Header hdr, char **output_dir)
     }
 
 cleanup:
-    if (path_table_initialized) {
-        hdestroy_r(&path_table);
+    HASH_ITER(hh, path_table, path_entry, tmp_entry) {
+        HASH_DEL(path_table, path_entry);
+        free(path_entry->path);
+        free(path_entry);
     }
 
     if (archive != NULL) {
         archive_read_free(archive);
     }
 
-    free(rpm_indices);
     rpmtdFree(td);
 
     return file_list;
@@ -382,56 +379,31 @@ bool process_file_path(const rpmfile_entry_t *file, regex_t *include_regex, rege
  *
  * The keys and values use the same pointers as the rpmfile_entry_t
  * and should not be separately freed. The hash table itself must be
- * hdestroy_r'd and freed by the caller.
+ * destroyed and freed by the caller.  NOTE: The path value in the
+ * returned hash table is not malloc'ed.  Only each hash table entry
+ * is malloc'ed, so take care free'ing.
  *
  * @param list rpmfile_t list to convert to a hash table.
- @ @return Hash table of files in the rpmfile_t list.
+ * @return Hash table of files in the rpmfile_t list.
  */
-static struct hsearch_data *files_to_table(rpmfile_t *list)
+static struct file_data *files_to_table(rpmfile_t *list)
 {
-    struct hsearch_data *table;
-    ENTRY e;
-    ENTRY *eptr;
+    struct file_data *table = NULL;
+    struct file_data *entry = NULL;
+    rpmfile_entry_t *iter = NULL;
 
-    rpmfile_entry_t *iter;
-
-    rpmtd td;
-    rpm_count_t td_size;
-
-    /* Use the length of RPMTAG_FILENAMES for the hash table size */
-    td = rpmtdNew();
-    assert(td != NULL);
+    assert(list != NULL);
+    assert(!TAILQ_EMPTY(list));
 
     iter = TAILQ_FIRST(list);
     assert(iter);
 
-    if (headerGet(iter->rpm_header, RPMTAG_FILENAMES, td, HEADERGET_MINMEM | HEADERGET_EXT) != 1) {
-        fprintf(stderr, _("***Unable to read RPMTAG_FILENAMES\n"));
-        return NULL;
-    }
-
-    td_size = rpmtdCount(td);
-    rpmtdFree(td);
-
-    table = calloc(1, sizeof(*table));
-    assert(table);
-
-    if (hcreate_r(td_size * 1.25, table) == 0) {
-        fprintf(stderr, _("*** Unable to allocate hash table: %s\n"), strerror(errno));
-        free(table);
-        return NULL;
-    }
-
     TAILQ_FOREACH(iter, list, items) {
-        e.key = iter->localpath;
-        e.data = iter;
-
-        if (hsearch_r(e, ENTER, &eptr, table) == 0) {
-            fprintf(stderr, _("*** Unable to add %s to hash table: %s\n"), iter->localpath, strerror(errno));
-            hdestroy_r(table);
-            free(table);
-            return NULL;
-        }
+        entry = calloc(1, sizeof(*entry));
+        assert(entry != NULL);
+        entry->path = iter->localpath;
+        entry->rpmfile = iter;
+        HASH_ADD_KEYPTR(hh, table, entry->path, strlen(entry->path), entry);
     }
 
     return table;
@@ -441,14 +413,14 @@ static struct hsearch_data *files_to_table(rpmfile_t *list)
  * @brief Helper for find_one_peer
  *
  * @param file rpmfile_entry_t to set peer_file on.
- * @param eptr Hash table entry with the peer_file data.
+ * @param entry Hash table entry with the peer_file data.
  */
-static void set_peer(rpmfile_entry_t *file, ENTRY *eptr)
+static void set_peer(rpmfile_entry_t *file, struct file_data *entry)
 {
-    rpmfile_entry_t *peer;
+    rpmfile_entry_t *peer = NULL;
 
-    peer = eptr->data;
-    eptr->data = NULL;
+    peer = entry->rpmfile;
+    entry->rpmfile = NULL;
 
     file->peer_file = peer;
     peer->peer_file = file;
@@ -598,11 +570,9 @@ static char *comparable_version_substrings(const char *s, const char *ignore)
  * @param after After build rpmfile_t list.
  * @param after_table Hash table of after build rpmfile_t localpaths.
  */
-static void find_one_peer(rpmfile_entry_t *file, rpmfile_t *after, struct hsearch_data *after_table)
+static void find_one_peer(rpmfile_entry_t *file, rpmfile_t *after, struct file_data *after_table)
 {
-    ENTRY e;
-    ENTRY *eptr = NULL;
-    int hsearch_result;
+    struct file_data *entry = NULL;
     rpmfile_entry_t *after_file = NULL;
     const char *before_version = NULL;
     const char *after_version = NULL;
@@ -623,12 +593,10 @@ static void find_one_peer(rpmfile_entry_t *file, rpmfile_t *after, struct hsearc
     after_file = TAILQ_FIRST(after);
 
     /* Start with the obvious case: the paths match */
-    e.key = file->localpath;
-    eptr = NULL;
-    hsearch_result = hsearch_r(e, FIND, &eptr, after_table);
+    HASH_FIND_STR(after_table, file->localpath, entry);
 
-    if (hsearch_result != 0 && eptr->data != NULL) {
-        set_peer(file, eptr);
+    if (entry) {
+        set_peer(file, entry);
         return;
     }
 
@@ -641,14 +609,11 @@ static void find_one_peer(rpmfile_entry_t *file, rpmfile_t *after, struct hsearc
 
     if (has_version && (strcmp(before_version, after_version) != 0)) {
         search_path = strreplace(file->localpath, before_version, after_version);
-
-        e.key = search_path;
-        eptr = NULL;
-        hsearch_result = hsearch_r(e, FIND, &eptr, after_table);
+        HASH_FIND_STR(after_table, search_path, entry);
         free(search_path);
 
-        if (hsearch_result != 0 && eptr->data != NULL) {
-            set_peer(file, eptr);
+        if (entry) {
+            set_peer(file, entry);
             return;
         }
     }
@@ -667,13 +632,11 @@ static void find_one_peer(rpmfile_entry_t *file, rpmfile_t *after, struct hsearc
             free(before_tmp);
             free(after_tmp);
 
-            e.key = search_path;
-            eptr = NULL;
-            hsearch_result = hsearch_r(e, FIND, &eptr, after_table);
+            HASH_FIND_STR(after_table, search_path, entry);
             free(search_path);
 
-            if (hsearch_result != 0 && eptr->data != NULL) {
-                set_peer(file, eptr);
+            if (entry) {
+                set_peer(file, entry);
                 return;
             }
         } else {
@@ -721,12 +684,10 @@ static void find_one_peer(rpmfile_entry_t *file, rpmfile_t *after, struct hsearc
                  */
                 DEBUG_PRINT("%s probably moved to %s\n", file->localpath, after_file->localpath);
 
-                e.key = after_file->localpath;
-                eptr = NULL;
-                hsearch_result = hsearch_r(e, FIND, &eptr, after_table);
+                HASH_FIND_STR(after_table, after_file->localpath, entry);
 
-                if (hsearch_result != 0 && eptr->data != NULL) {
-                    set_peer(file, eptr);
+                if (entry) {
+                    set_peer(file, entry);
                     DEBUG_PRINT("moved subpackage\n");
                     file->moved_subpackage = true;
                     file->peer_file->moved_subpackage = true;
@@ -756,13 +717,10 @@ static void find_one_peer(rpmfile_entry_t *file, rpmfile_t *after, struct hsearc
                 /* see if these generic paths match */
                 if (!strcmp(before_tmp, after_tmp)) {
                     DEBUG_PRINT("%s probably replaced by %s\n", file->localpath, after_file->localpath);
+                    HASH_FIND_STR(after_table, after_file->localpath, entry);
 
-                    e.key = after_file->localpath;
-                    eptr = NULL;
-                    hsearch_result = hsearch_r(e, FIND, &eptr, after_table);
-
-                    if (hsearch_result != 0 && eptr->data != NULL) {
-                        set_peer(file, eptr);
+                    if (entry) {
+                        set_peer(file, entry);
                     }
                 }
 
@@ -791,7 +749,9 @@ static void find_one_peer(rpmfile_entry_t *file, rpmfile_t *after, struct hsearc
  */
 void find_file_peers(rpmfile_t *before, rpmfile_t *after)
 {
-    struct hsearch_data *after_table = NULL;
+    struct file_data *after_table = NULL;
+    struct file_data *entry = NULL;
+    struct file_data *tmp_entry = NULL;
     rpmfile_entry_t *before_entry = NULL;
 
     assert(before != NULL);
@@ -811,8 +771,12 @@ void find_file_peers(rpmfile_t *before, rpmfile_t *after)
         find_one_peer(before_entry, after, after_table);
     }
 
-    hdestroy_r(after_table);
-    free(after_table);
+    /* Clean up the hash table */
+    HASH_ITER(hh, after_table, entry, tmp_entry) {
+        HASH_DEL(after_table, entry);
+        free(entry);
+    }
+
     return;
 }
 
