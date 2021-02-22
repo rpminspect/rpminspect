@@ -7,5 +7,6 @@ install_headers(
     'results.h',
     'rpminspect.h',
     'types.h',
+    'uthash.h',
     subdir : 'librpminspect'
 )
