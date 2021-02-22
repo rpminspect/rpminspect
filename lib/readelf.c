@@ -103,7 +103,7 @@ void init_elf_data(struct rpminspect *ri)
     dlclose(dl);
 
     if (libc_elf == NULL) {
-        return;
+        goto cleanup;
     }
 
     /* Get a list of all fortified symbols in glibc */
@@ -112,9 +112,7 @@ void init_elf_data(struct rpminspect *ri)
         libc_fortified = get_elf_imported_functions(libc_elf, is_fortified);
 
         if (libc_fortified == NULL) {
-            elf_end(libc_elf);
-            close(libc_fd);
-            return;
+            goto cleanup;
         }
 
         ri->fortifiable = malloc(sizeof(*ri->fortifiable));
@@ -157,7 +155,7 @@ void init_elf_data(struct rpminspect *ri)
         if (hcreate_r(nentries, ri->fortifiable_table) == 0) {
             free(ri->fortifiable_table);
             ri->fortifiable_table = NULL;
-            return;
+            goto cleanup;
         }
 
         TAILQ_FOREACH(iter, ri->fortifiable, items) {
@@ -165,6 +163,12 @@ void init_elf_data(struct rpminspect *ri)
             e.data = iter->data;
             hsearch_r(e, ENTER, &eptr, ri->fortifiable_table);
         }
+    }
+
+cleanup:
+    if (libc_elf && libc_fd != -1) {
+        elf_end(libc_elf);
+        close(libc_fd);
     }
 
     return;
@@ -207,7 +211,7 @@ GElf_Half get_elf_machine(Elf *elf)
     return _get_elf_helper(elf, ELF_MACHINE, EM_NONE);
 }
 
-static Elf * get_elf_with_kind(const char *fullpath, int *out_fd, Elf_Kind kind)
+static Elf *get_elf_with_kind(const char *fullpath, int *out_fd, Elf_Kind kind)
 {
     int fd;
     Elf *elf = NULL;
