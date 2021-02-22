@@ -367,7 +367,7 @@ tools in this source tree are available under the GNU General Public
 License version 3 or, at your option, any later version.
 
 The librpminspect library (include/ and lib/) is available under the
-GNU Lesser General Public Licesen version 3 or, at your option, any
+GNU Lesser General Public License version 3 or, at your option, any
 later version.
 
 The data files (data/) are licensed under the Creative Commons
