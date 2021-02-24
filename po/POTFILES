@@ -7,7 +7,9 @@ include/readelf.h
 include/results.h
 include/rpminspect.h
 include/types.h
+include/uthash.h
 lib/abi.c
+lib/abspath.c
 lib/arches.c
 lib/badwords.c
 lib/builds.c
@@ -22,12 +24,12 @@ lib/flags.c
 lib/free.c
 lib/ignore.c
 lib/init.c
-lib/inspect.c
 lib/inspect_abidiff.c
 lib/inspect_addedfiles.c
 lib/inspect_annocheck.c
 lib/inspect_arch.c
 lib/inspect_badfuncs.c
+lib/inspect.c
 lib/inspect_capabilities.c
 lib/inspect_changedfiles.c
 lib/inspect_changelog.c
