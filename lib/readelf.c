@@ -142,8 +142,6 @@ void init_elf_data(struct rpminspect *ri)
         }
 
         list_free(libc_fortified, NULL);
-        elf_end(libc_elf);
-        close(libc_fd);
 
         /* The fortifiable tailq is to keep track of what all's been malloced.
          * Copy into a hash table for fast lookups.
