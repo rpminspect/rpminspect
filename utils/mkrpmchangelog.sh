@@ -39,6 +39,9 @@ else
         # shellcheck disable=SC2181
         [ $? -eq 0 ] && continue
 
+        # trim the git commit summary prefixes
+        line="$(echo "${line}" | cut -d ']' -f 2 | xargs)"
+
         first=1
         echo "${line}" | sed -e 's|%|%%|g' | fold -s -w 70 | \
         while read -r subline ; do
