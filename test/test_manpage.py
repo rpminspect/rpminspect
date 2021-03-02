@@ -350,7 +350,9 @@ class EmptyManPageRPM(TestRPMs):
         # add an empty but gzipped man page
         self.rpm.section_build += "touch foo.1\n"
         self.rpm.section_build += "gzip -9 foo.1\n"
-        self.rpm.section_install += "install -D -m 0644 foo.1.gz %{buildroot}%{_mandir}/man1/foo.1.gz\n"
+        self.rpm.section_install += (
+            "install -D -m 0644 foo.1.gz %{buildroot}%{_mandir}/man1/foo.1.gz\n"
+        )
         sub = self.rpm.get_subpackage(None)
         sub.section_files += "%{_mandir}/man1/foo.1.gz\n"
 
@@ -369,7 +371,9 @@ class EmptyManPageKoji(TestKoji):
         # add an empty but gzipped man page
         self.rpm.section_build += "touch foo.1\n"
         self.rpm.section_build += "gzip -9 foo.1\n"
-        self.rpm.section_install += "install -D -m 0644 foo.1.gz %{buildroot}%{_mandir}/man1/foo.1.gz\n"
+        self.rpm.section_install += (
+            "install -D -m 0644 foo.1.gz %{buildroot}%{_mandir}/man1/foo.1.gz\n"
+        )
         sub = self.rpm.get_subpackage(None)
         sub.section_files += "%{_mandir}/man1/foo.1.gz\n"
 
@@ -388,7 +392,9 @@ class EmptyManPageCompareRPMs(TestCompareRPMs):
         # add an empty but gzipped man page
         self.after_rpm.section_build += "touch foo.1\n"
         self.after_rpm.section_build += "gzip -9 foo.1\n"
-        self.after_rpm.section_install += "install -D -m 0644 foo.1.gz %{buildroot}%{_mandir}/man1/foo.1.gz\n"
+        self.rpm.section_install += (
+            "install -D -m 0644 foo.1.gz %{buildroot}%{_mandir}/man1/foo.1.gz\n"
+        )
         sub = self.after_rpm.get_subpackage(None)
         sub.section_files += "%{_mandir}/man1/foo.1.gz\n"
 
@@ -407,7 +413,9 @@ class EmptyManPageCompareKoji(TestCompareKoji):
         # add an empty but gzipped man page
         self.after_rpm.section_build += "touch foo.1\n"
         self.after_rpm.section_build += "gzip -9 foo.1\n"
-        self.after_rpm.section_install += "install -D -m 0644 foo.1.gz %{buildroot}%{_mandir}/man1/foo.1.gz\n"
+        self.rpm.section_install += (
+            "install -D -m 0644 foo.1.gz %{buildroot}%{_mandir}/man1/foo.1.gz\n"
+        )
         sub = self.after_rpm.get_subpackage(None)
         sub.section_files += "%{_mandir}/man1/foo.1.gz\n"
 
