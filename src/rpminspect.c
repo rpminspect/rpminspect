@@ -699,17 +699,25 @@ int main(int argc, char **argv) {
         errx(RI_PROGRAM_ERROR, _("*** Failed to gather specified builds."));
     }
 
-    /* add command information to the results output */
+    /* general information in the results */
     init_result_params(&params);
     params.severity = RESULT_INFO;
     params.header = HEADER_RPMINSPECT;
+
+    /* add version information to the results output */
+    params.msg = _("version");
+    xasprintf(&params.details, "%s version %s", progname, PACKAGE_VERSION);
+    add_result_entry(&ri->results, &params);
+    free(params.details);
+
+    /* add command line information to the results output */
     params.msg = _("command line");
 
     for (i = 0; i < argc; i++) {
         cmdlen += strlen(argv[i]) + 1;
     }
 
-    params.details = malloc(cmdlen + 1);
+    params.details = calloc(1, cmdlen + 1);
     assert(params.details != NULL);
     tail = params.details;
 
@@ -722,8 +730,10 @@ int main(int argc, char **argv) {
     }
 
     add_result_entry(&ri->results, &params);
-    ri->worst_result = params.severity;
     free(params.details);
+
+    /* make sure the worst result is set before running inspections */
+    ri->worst_result = params.severity;
 
     /* perform the selected inspections */
     if (!fetch_only) {
