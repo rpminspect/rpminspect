@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2019-2020  Red Hat, Inc.
+# Copyright (C) 2019-2021  Red Hat, Inc.
 # Author(s):  David Cantrell <dcantrell@redhat.com>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -334,6 +334,82 @@ class InvalidManPageCompareKoji(TestCompareKoji):
             "/usr/share/man/man1/foo.1.gz",
             rpmfluff.GeneratedSourceFile("foo.1", rpmfluff.make_png()),
         )
+
+        # the test
+        self.inspection = "manpage"
+        self.label = "man-pages"
+        self.result = "VERIFY"
+        self.waiver_auth = "Anyone"
+
+
+# Empty but compressed man page RPM build (VERIFY)
+class EmptyManPageRPM(TestRPMs):
+    def setUp(self):
+        TestRPMs.setUp(self)
+
+        # add an empty but gzipped man page
+        self.rpm.section_build += "touch foo.1\n"
+        self.rpm.section_build += "gzip -9 foo.1\n"
+        self.rpm.section_install += "install -D -m 0644 foo.1.gz %{buildroot}%{_mandir}/man1/foo.1.gz\n"
+        sub = self.rpm.get_subpackage(None)
+        sub.section_files += "%{_mandir}/man1/foo.1.gz\n"
+
+        # the test
+        self.inspection = "manpage"
+        self.label = "man-pages"
+        self.result = "VERIFY"
+        self.waiver_auth = "Anyone"
+
+
+# Empty but compressed man page Koji build (VERIFY)
+class EmptyManPageKoji(TestKoji):
+    def setUp(self):
+        TestKoji.setUp(self)
+
+        # add an empty but gzipped man page
+        self.rpm.section_build += "touch foo.1\n"
+        self.rpm.section_build += "gzip -9 foo.1\n"
+        self.rpm.section_install += "install -D -m 0644 foo.1.gz %{buildroot}%{_mandir}/man1/foo.1.gz\n"
+        sub = self.rpm.get_subpackage(None)
+        sub.section_files += "%{_mandir}/man1/foo.1.gz\n"
+
+        # the test
+        self.inspection = "manpage"
+        self.label = "man-pages"
+        self.result = "VERIFY"
+        self.waiver_auth = "Anyone"
+
+
+# Empty but compressed man page compare RPM builds (VERIFY)
+class EmptyManPageCompareRPMs(TestCompareRPMs):
+    def setUp(self):
+        TestCompareRPMs.setUp(self)
+
+        # add an empty but gzipped man page
+        self.after_rpm.section_build += "touch foo.1\n"
+        self.after_rpm.section_build += "gzip -9 foo.1\n"
+        self.after_rpm.section_install += "install -D -m 0644 foo.1.gz %{buildroot}%{_mandir}/man1/foo.1.gz\n"
+        sub = self.after_rpm.get_subpackage(None)
+        sub.section_files += "%{_mandir}/man1/foo.1.gz\n"
+
+        # the test
+        self.inspection = "manpage"
+        self.label = "man-pages"
+        self.result = "VERIFY"
+        self.waiver_auth = "Anyone"
+
+
+# Empty but compressed man page compare Koji builds (VERIFY)
+class EmptyManPageCompareKoji(TestCompareKoji):
+    def setUp(self):
+        TestCompareKoji.setUp(self)
+
+        # add an empty but gzipped man page
+        self.after_rpm.section_build += "touch foo.1\n"
+        self.after_rpm.section_build += "gzip -9 foo.1\n"
+        self.after_rpm.section_install += "install -D -m 0644 foo.1.gz %{buildroot}%{_mandir}/man1/foo.1.gz\n"
+        sub = self.after_rpm.get_subpackage(None)
+        sub.section_files += "%{_mandir}/man1/foo.1.gz\n"
 
         # the test
         self.inspection = "manpage"
