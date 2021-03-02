@@ -43,6 +43,7 @@
 char *uncompress_file(struct rpminspect *ri, const char *infile, const char *subdir)
 {
     int fd = -1;
+    FILE *fp = NULL;
     struct stat sb;
     char *outfile = NULL;
     char *base = NULL;
@@ -71,9 +72,8 @@ char *uncompress_file(struct rpminspect *ri, const char *infile, const char *sub
     r = stat(outfile, &sb);
 
     if ((r == -1) && (errno != ENOENT)) {
-        warn("stat(%s)", outfile);
-        free(outfile);
-        return NULL;
+        warn("stat()");
+        goto error1;
     }
 
     /*
@@ -82,9 +82,8 @@ char *uncompress_file(struct rpminspect *ri, const char *infile, const char *sub
      */
     if (errno == ENOENT) {
         if (mkdirp(outfile, mode) == -1) {
-            warn("mkdirp(%s)", outfile);
-            free(outfile);
-            return NULL;
+            warn("mkdirp()");
+            goto error1;
         }
     }
 
@@ -106,8 +105,7 @@ char *uncompress_file(struct rpminspect *ri, const char *infile, const char *sub
 
     if (fd == -1) {
         warn("mkstemp()");
-        free(outfile);
-        return NULL;
+        goto error1;
     }
 
     /*
@@ -195,43 +193,65 @@ char *uncompress_file(struct rpminspect *ri, const char *infile, const char *sub
 
     if (r != ARCHIVE_OK) {
         warn("archive_read_open_filename()");
-        close(fd);
-        free(outfile);
-        return NULL;
+        goto error2;
     }
 
     r = archive_read_next_header(input, &entry);
 
-    if (r != ARCHIVE_OK) {
+    if (r == ARCHIVE_WARN || r == ARCHIVE_FAILED || r == ARCHIVE_FATAL) {
         warn("archive_read_next_header()");
-        close(fd);
-        free(outfile);
-        return NULL;
+        goto error2;
     }
 
-    while (1) {
-        size = archive_read_data(input, buf, BUFSIZ);
+    if (r == ARCHIVE_OK) {
+        while (1) {
+            size = archive_read_data(input, buf, BUFSIZ);
 
-        if (size == 0) {
-            break;
+            if (size == 0) {
+                break;
+            }
+
+            if (write(fd, buf, size) == -1) {
+                warn("write()");
+                goto error2;
+            }
+        }
+    } else {
+        /* we hit an EOF or non-existent file, write an empty file */
+        fp = fdopen(fd, "w");
+
+        if (fp == NULL) {
+            warn("fdopen()");
+            goto error2;
         }
 
-        if (write(fd, buf, size) == -1) {
-            warn("write()");
-            close(fd);
-            free(outfile);
-            return NULL;
+        /*
+         * NOTE: calling fclose() closes the underlying file
+         * descriptor, so after this call make no calls to close() on
+         * the fd
+         */
+        if (fclose(fp) == -1) {
+            warn("fclose()");
+            goto error2;
         }
+
+        fd = 0;
     }
 
     archive_read_free(input);
 
     /* close up our uncompressed file */
-    if (close(fd) == -1) {
+    if (fd && close(fd) == -1) {
         warn("close()");
-        free(outfile);
-        return NULL;
+        goto error1;
     }
 
     return outfile;
+
+error2:
+    close(fd);
+
+error1:
+    free(outfile);
+    return NULL;
 }

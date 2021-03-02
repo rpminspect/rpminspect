@@ -31,6 +31,7 @@
 #include <sys/stat.h>
 #include <sys/types.h>
 #include <unistd.h>
+#include <err.h>
 
 #include <rpm/header.h>
 #include <rpm/rpmtag.h>
@@ -258,8 +259,12 @@ end:
 
 static bool manpage_driver(struct rpminspect *ri, rpmfile_entry_t *file)
 {
+    int r = 0;
+    char *uncompressed_man_page = NULL;
+    struct stat sb;
     char *manpage_errors;
     bool result = true;
+    const char *pkg = NULL;
     struct result_params params;
 
     /* Skip source packages */
@@ -276,6 +281,9 @@ static bool manpage_driver(struct rpminspect *ri, rpmfile_entry_t *file)
         return true;
     }
 
+    /* the package name is used for reporting */
+    pkg = headerGetString(file->rpm_header, RPMTAG_NAME);
+
     /* Set up result parameters */
     init_result_params(&params);
     params.severity = RESULT_VERIFY;
@@ -286,28 +294,46 @@ static bool manpage_driver(struct rpminspect *ri, rpmfile_entry_t *file)
     params.verb = VERB_FAILED;
     params.noun = _("${FILE}");
 
+    /* check for empty man pages */
+    uncompressed_man_page = uncompress_file(ri, file->fullpath, HEADER_MANPAGE);
+    if (uncompressed_man_page != NULL) {
+        r = stat(uncompressed_man_page, &sb);
+
+        if (r == 0 && sb.st_size == 0) {
+            xasprintf(&params.msg, _("Man page %s is possibly empty on %s in %s"), file->localpath, params.arch, pkg);
+            params.remedy = REMEDY_MAN_ERRORS;
+            params.details = NULL;
+            add_result(ri, &params);
+            result = false;
+            free(params.msg);
+        } else if (r == -1) {
+            warn(_("stat()"));
+        }
+
+        free(uncompressed_man_page);
+    }
+
+    /* check man page validity */
     if ((manpage_errors = inspect_manpage_validity(file->fullpath, file->localpath)) != NULL) {
-        xasprintf(&params.msg, _("Man page checker reported problems with %s on %s"), file->localpath, params.arch);
+        xasprintf(&params.msg, _("Man page checker reported problems with %s on %s in %s"), file->localpath, params.arch, pkg);
         params.remedy = REMEDY_MAN_ERRORS;
         params.details = manpage_errors;
-
         add_result(ri, &params);
-
-        result = false;
+        free(params.msg);
         free(manpage_errors);
+        result = false;
     }
 
+    /* check man page location on the filesystem */
     if (!inspect_manpage_path(file->fullpath)) {
-        xasprintf(&params.msg, _("Man page %s has incorrect path on %s"), file->localpath, params.arch);
+        xasprintf(&params.msg, _("Man page %s has incorrect path on %s in %s"), file->localpath, params.arch, pkg);
         params.remedy = REMEDY_MAN_PATH;
         params.details = NULL;
-
         add_result(ri, &params);
-
+        free(params.msg);
         result = false;
     }
 
-    free(params.msg);
     return result;
 }
 
