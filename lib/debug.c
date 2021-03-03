@@ -57,8 +57,8 @@ void dump_cfg(const struct rpminspect *ri)
 {
     int i = 0;
     string_entry_t *entry = NULL;
-    ENTRY e;
-    ENTRY *eptr;
+    string_map_t *hentry = NULL;
+    string_map_t *tmp_hentry = NULL;
 
     assert(ri != NULL);
 
@@ -140,16 +140,11 @@ void dump_cfg(const struct rpminspect *ri)
         printf("    %s: %s\n", inspections[i].name, (ri->tests & inspections[i].flag) ? "on" : "off");
     }
 
-    if (ri->product_keys && !TAILQ_EMPTY(ri->product_keys)) {
-        printf("products:\n");
+    if (ri->products) {
+        fprintf(stderr, "products:\n");
 
-        TAILQ_FOREACH(entry, ri->product_keys, items) {
-            e.key = entry->data;
-            hsearch_r(e, FIND, &eptr, ri->products);
-
-            if ((eptr != NULL) && (eptr->data != NULL)) {
-                printf("    - %s: %s\n", entry->data, (char *) eptr->data);
-            }
+        HASH_ITER(hh, ri->products, hentry, tmp_hentry) {
+            fprintf(stderr, "    - %s: %s\n", hentry->key, hentry->value);
         }
     }
 
@@ -329,45 +324,30 @@ void dump_cfg(const struct rpminspect *ri)
     printf("    match: %s\n", (ri->specmatch == MATCH_FULL) ? "full" : (ri->specmatch == MATCH_PREFIX) ? "prefix" : (ri->specmatch == MATCH_SUFFIX) ? "suffix" : "?");
     printf("    primary: %s\n", (ri->specprimary == PRIMARY_NAME) ? "name" : (ri->specprimary == PRIMARY_FILENAME) ? "filename" : "?");
 
-    if (ri->annocheck_keys && !TAILQ_EMPTY(ri->annocheck_keys)) {
-        printf("annocheck:\n");
+    if (ri->annocheck) {
+        fprintf(stderr, "annocheck:\n");
 
-        TAILQ_FOREACH(entry, ri->annocheck_keys, items) {
-            e.key = entry->data;
-            hsearch_r(e, FIND, &eptr, ri->annocheck);
-
-            if ((eptr != NULL) && (eptr->data != NULL)) {
-                printf("    - %s: %s\n", entry->data, (char *) eptr->data);
-            }
+        HASH_ITER(hh, ri->annocheck, hentry, tmp_hentry) {
+            fprintf(stderr, "    - %s: %s\n", hentry->key, hentry->value);
         }
     }
 
-    if (ri->jvm_keys && !TAILQ_EMPTY(ri->jvm_keys)) {
-        printf("javabytecode:\n");
+    if (ri->jvm) {
+        fprintf(stderr, "javabytecode:\n");
 
-        TAILQ_FOREACH(entry, ri->jvm_keys, items) {
-            e.key = entry->data;
-            hsearch_r(e, FIND, &eptr, ri->jvm);
-
-            if ((eptr != NULL) && (eptr->data != NULL)) {
-                printf("    - %s: %s\n", entry->data, (char *) eptr->data);
-            }
+        HASH_ITER(hh, ri->jvm, hentry, tmp_hentry) {
+            fprintf(stderr, "    - %s: %s\n", hentry->key, hentry->value);
         }
     }
 
-    if ((ri->pathmigration_keys && !TAILQ_EMPTY(ri->pathmigration_keys)) || (ri->pathmigration_excluded_paths && !TAILQ_EMPTY(ri->pathmigration_excluded_paths))) {
-        printf("pathmigration:\n");
+    if (ri->pathmigration || (ri->pathmigration_excluded_paths && !TAILQ_EMPTY(ri->pathmigration_excluded_paths))) {
+        fprintf(stderr, "pathmigration:\n");
 
-        if (ri->pathmigration_keys && !TAILQ_EMPTY(ri->pathmigration_keys)) {
-            printf("    migrated_paths:\n");
+        if (ri->pathmigration) {
+            fprintf(stderr, "    migrated_paths:\n");
 
-            TAILQ_FOREACH(entry, ri->pathmigration_keys, items) {
-                e.key = entry->data;
-                hsearch_r(e, FIND, &eptr, ri->pathmigration);
-
-                if ((eptr != NULL) && (eptr->data != NULL)) {
-                    printf("        - %s: %s\n", entry->data, (char *) eptr->data);
-                }
+            HASH_ITER(hh, ri->pathmigration, hentry, tmp_hentry) {
+                fprintf(stderr, "        - %s: %s\n", hentry->key, hentry->value);
             }
         }
 

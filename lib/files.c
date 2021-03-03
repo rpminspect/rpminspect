@@ -389,7 +389,7 @@ bool process_file_path(const rpmfile_entry_t *file, regex_t *include_regex, rege
 static struct file_data *files_to_table(rpmfile_t *list)
 {
     struct file_data *table = NULL;
-    struct file_data *entry = NULL;
+    struct file_data *fentry = NULL;
     rpmfile_entry_t *iter = NULL;
 
     assert(list != NULL);
@@ -399,11 +399,11 @@ static struct file_data *files_to_table(rpmfile_t *list)
     assert(iter);
 
     TAILQ_FOREACH(iter, list, items) {
-        entry = calloc(1, sizeof(*entry));
-        assert(entry != NULL);
-        entry->path = iter->localpath;
-        entry->rpmfile = iter;
-        HASH_ADD_KEYPTR(hh, table, entry->path, strlen(entry->path), entry);
+        fentry = calloc(1, sizeof(*fentry));
+        assert(fentry != NULL);
+        fentry->path = iter->localpath;
+        fentry->rpmfile = iter;
+        HASH_ADD_KEYPTR(hh, table, fentry->path, strlen(fentry->path), fentry);
     }
 
     return table;
@@ -415,12 +415,12 @@ static struct file_data *files_to_table(rpmfile_t *list)
  * @param file rpmfile_entry_t to set peer_file on.
  * @param entry Hash table entry with the peer_file data.
  */
-static void set_peer(rpmfile_entry_t *file, struct file_data *entry)
+static void set_peer(rpmfile_entry_t *file, struct file_data *fentry)
 {
     rpmfile_entry_t *peer = NULL;
 
-    peer = entry->rpmfile;
-    entry->rpmfile = NULL;
+    peer = fentry->rpmfile;
+    fentry->rpmfile = NULL;
 
     file->peer_file = peer;
     peer->peer_file = file;
@@ -549,15 +549,12 @@ static char *comparable_version_substrings(const char *s, const char *ignore)
  * @brief For the given file from "before", attempt to find a matching
  * file in "after".
  *
- * Any time a match is found, the hash table ENTRY's value field will
+ * Any time a match is found, the hash table entry's value field will
  * be set to NULL so that the match cannot be used again. For the
  * purposes of adding tests to match peers, this means that attempts
  * must be made in order from best match to worst match. This is an
- * important thing to note. To see if a file from the hash table can
- * be used, we need to check that hsearch_r() returns non-zero *and*
- * the value of eptr->data is not NULL. If an entry is still there but
- * eptr->data is now NULL it means we have already matched it with
- * another peer.
+ * important thing to note.  If an entry is still there but the value
+ * is now NULL it means we have already matched it with another peer.
  *
  * In cases where the peer found has changed paths or subpackages,
  * this function will modify the moved_path and moved_subpackage

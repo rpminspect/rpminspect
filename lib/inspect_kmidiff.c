@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2020  Red Hat, Inc.
+ * Copyright (C) 2020-2021  Red Hat, Inc.
  * Author(s):  David Cantrell <dcantrell@redhat.com>
  *
  * This program is free software: you can redistribute it and/or
@@ -35,8 +35,8 @@
 /* Globals */
 static string_list_t *firstargs = NULL;
 static string_list_t *suppressions = NULL;
-static struct hsearch_data *debug_info_dir1_table;
-static struct hsearch_data *debug_info_dir2_table;
+static string_list_map_t *debug_info_dir1_table;
+static string_list_map_t *debug_info_dir2_table;
 static bool found_kernel_image = false;
 static char *kabi_dir = NULL;
 
@@ -144,12 +144,10 @@ static bool kmidiff_driver(struct rpminspect *ri, rpmfile_entry_t *file)
     string_list_t *local_d2 = NULL;
     string_list_t *local_h1 = NULL;
     string_list_t *local_h2 = NULL;
-    string_list_t *arglist = NULL;
     const char *arch = NULL;
     const char *name = NULL;
+    string_list_map_t *hentry = NULL;
     char *kabi = NULL;
-    ENTRY e;
-    ENTRY *eptr;
     int exitcode = 0;
     int status = 0;
     int i = 0;
@@ -231,28 +229,18 @@ static bool kmidiff_driver(struct rpminspect *ri, rpmfile_entry_t *file)
     }
 
     /* debug dir args */
-    e.key = (char *) arch;
-    hsearch_r(e, FIND, &eptr, debug_info_dir1_table);
+    HASH_FIND_STR(debug_info_dir1_table, arch, hentry);
 
-    if (eptr != NULL) {
-        arglist = (string_list_t *) eptr->data;
-
-        if (arglist && !TAILQ_EMPTY(arglist)) {
-            local_d1 = list_copy(arglist);
-            TAILQ_CONCAT(argv, local_d1, items);
-        }
+    if (hentry != NULL && hentry->value && !TAILQ_EMPTY(hentry->value)) {
+        local_d1 = list_copy(hentry->value);
+        TAILQ_CONCAT(argv, local_d1, items);
     }
 
-    e.key = (char *) arch;
-    hsearch_r(e, FIND, &eptr, debug_info_dir2_table);
+    HASH_FIND_STR(debug_info_dir2_table, arch, hentry);
 
-    if (eptr != NULL) {
-        arglist = (string_list_t *) eptr->data;
-
-        if (arglist && !TAILQ_EMPTY(arglist)) {
-            local_d2 = list_copy(arglist);
-            TAILQ_CONCAT(argv, local_d2, items);
-        }
+    if (hentry != NULL && hentry->value && !TAILQ_EMPTY(hentry->value)) {
+        local_d2 = list_copy(hentry->value);
+        TAILQ_CONCAT(argv, local_d2, items);
     }
 
     /* the before kernel image */

@@ -125,14 +125,14 @@ struct rpminspect *init_rpminspect(struct rpminspect *, const char *, const char
 
 /* free.c */
 void free_regex(regex_t *);
-void free_mapping(struct hsearch_data *, string_list_t *);
+void free_string_map(string_map_t *);
 void free_pair(pair_list_t *);
 void free_rpminspect(struct rpminspect *);
 
 /* listfuncs.c */
 char *list_to_string(const string_list_t *, const char *);
 char **list_to_array(const string_list_t *);
-struct hsearch_data * list_to_table(const string_list_t *);
+string_map_t * list_to_table(const string_list_t *);
 string_list_t * list_difference(const string_list_t *, const string_list_t *);
 string_list_t * list_intersection(const string_list_t *, const string_list_t *);
 string_list_t * list_union(const string_list_t *, const string_list_t *);
@@ -257,7 +257,7 @@ char *checksum(rpmfile_entry_t *);
 /* runcmd.c */
 char *sl_run_cmd(int *exitcode, string_list_t *list);
 char *run_cmd(int *, const char *, ...) __attribute__((__sentinel__));
-void free_argv_table(struct rpminspect *ri, struct hsearch_data *table);
+void free_argv_table(struct rpminspect *ri, string_list_map_t *table);
 
 /* fileinfo.c */
 bool match_fileinfo_mode(struct rpminspect *, const rpmfile_entry_t *, const char *, const char *);
@@ -374,12 +374,12 @@ bool is_rebase(struct rpminspect *ri);
 void init_arches(struct rpminspect *ri);
 
 /* abi.c */
-void add_abi_argument(struct hsearch_data *table, const char *arg, const char *path, const Header hdr);
+void add_abi_argument(string_list_map_t *table, const char *arg, const char *path, const Header hdr);
 size_t count_abi_entries(const string_list_t *contents);
 abi_list_t *read_abi(const char *vendor_data_dir, const char *product_release);
 void free_abi(abi_list_t *list);
 string_list_t *get_abi_suppressions(const struct rpminspect *ri, const char *suppression_file);
-struct hsearch_data *get_abi_dir_arg(struct rpminspect *ri, const size_t size, const char *suffix, const char *arg, const char *path, const int type);
+string_list_map_t *get_abi_dir_arg(struct rpminspect *ri, const size_t size, const char *suffix, const char *arg, const char *path, const int type);
 
 /* uncompress.c */
 char *uncompress_file(struct rpminspect *ri, const char *infile, const char *subdir);

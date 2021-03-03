@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2020  Red Hat, Inc.
+ * Copyright (C) 2020-2021  Red Hat, Inc.
  * Author(s):  David Cantrell <dcantrell@redhat.com>
  *
  * This program is free software: you can redistribute it and/or
@@ -28,8 +28,8 @@
 static bool pathmigration_driver(struct rpminspect *ri, rpmfile_entry_t *file)
 {
     bool result = true;
-    ENTRY e;
-    ENTRY *eptr = NULL;
+    string_map_t *hentry = NULL;
+    string_map_t *tmp_hentry = NULL;
     string_entry_t *entry = NULL;
     char *old = NULL;
     const char *arch = NULL;
@@ -77,28 +77,21 @@ static bool pathmigration_driver(struct rpminspect *ri, rpmfile_entry_t *file)
     params.arch = arch;
 
     /* Check for each path migration, break early if we find a match */
-    TAILQ_FOREACH(entry, ri->pathmigration_keys, items) {
-        e.key = entry->data;
-        hsearch_r(e, FIND, &eptr, ri->pathmigration);
-
-        if (eptr == NULL) {
-            continue;
-        }
-
+    HASH_ITER(hh, ri->pathmigration, hentry, tmp_hentry) {
         /*
          * Make sure the old path name ends with a slash.
          */
-        if (strsuffix(entry->data, "/")) {
-            old = strdup(entry->data);
+        if (strsuffix(hentry->value, "/")) {
+            old = strdup(hentry->value);
         } else {
-            xasprintf(&old, "%s/", entry->data);
+            xasprintf(&old, "%s/", hentry->value);
         }
 
         DEBUG_PRINT("old=|%s|, file->localpath=|%s|\n", old, file->localpath);
 
         /* Check to see if we found a path that should be migrated */
         if (strprefix(file->localpath, old)) {
-            xasprintf(&params.msg, "File %s found should be in %s on %s", file->localpath, (char *) eptr->data, arch);
+            xasprintf(&params.msg, "File %s found should be in %s on %s", file->localpath, hentry->value, arch);
             params.file = file->localpath;
             add_result(ri, &params);
             free(params.msg);
@@ -125,7 +118,7 @@ bool inspect_pathmigration(struct rpminspect *ri) {
     assert(ri != NULL);
 
     /* Only run the inspection if path migrations are specified */
-    if (ri->pathmigration_keys && !TAILQ_EMPTY(ri->pathmigration_keys)) {
+    if (ri->pathmigration) {
         result = foreach_peer_file(ri, pathmigration_driver, true);
     }
 

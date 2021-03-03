@@ -35,10 +35,10 @@
 /* Globals */
 static string_list_t *firstargs = NULL;
 static string_list_t *suppressions = NULL;
-static struct hsearch_data *debug_info_dir1_table;
-static struct hsearch_data *debug_info_dir2_table;
-static struct hsearch_data *headers_dir1_table;
-static struct hsearch_data *headers_dir2_table;
+static string_list_map_t *debug_info_dir1_table;
+static string_list_map_t *debug_info_dir2_table;
+static string_list_map_t *headers_dir1_table;
+static string_list_map_t *headers_dir2_table;
 static abi_list_t *abi = NULL;
 
 static severity_t check_abi(const severity_t sev, const long int threshold, const char *path, const char *pkg, long int *compat)
@@ -114,12 +114,10 @@ static bool abidiff_driver(struct rpminspect *ri, rpmfile_entry_t *file) {
     string_list_t *local_d2 = NULL;
     string_list_t *local_h1 = NULL;
     string_list_t *local_h2 = NULL;
-    string_list_t *arglist = NULL;
     string_entry_t *entry = NULL;
     const char *arch = NULL;
     const char *name = NULL;
-    ENTRY e;
-    ENTRY *eptr;
+    string_list_map_t *hentry = NULL;
     int exitcode = 0;
     int status = 0;
     char *tmp = NULL;
@@ -161,53 +159,33 @@ static bool abidiff_driver(struct rpminspect *ri, rpmfile_entry_t *file) {
     }
 
     /* debug dir args */
-    e.key = (char *) arch;
-    hsearch_r(e, FIND, &eptr, debug_info_dir1_table);
+    HASH_FIND_STR(debug_info_dir1_table, arch, hentry);
 
-    if (eptr != NULL) {
-        arglist = (string_list_t *) eptr->data;
-
-        if (arglist && !TAILQ_EMPTY(arglist)) {
-            local_d1 = list_copy(arglist);
-            TAILQ_CONCAT(argv, local_d1, items);
-        }
+    if (hentry != NULL && hentry->value && !TAILQ_EMPTY(hentry->value)) {
+        local_d1 = list_copy(hentry->value);
+        TAILQ_CONCAT(argv, local_d1, items);
     }
 
-    e.key = (char *) arch;
-    hsearch_r(e, FIND, &eptr, debug_info_dir2_table);
+    HASH_FIND_STR(debug_info_dir2_table, arch, hentry);
 
-    if (eptr != NULL) {
-        arglist = (string_list_t *) eptr->data;
-
-        if (arglist && !TAILQ_EMPTY(arglist)) {
-            local_d2 = list_copy(arglist);
-            TAILQ_CONCAT(argv, local_d2, items);
-        }
+    if (hentry != NULL && hentry->value && !TAILQ_EMPTY(hentry->value)) {
+        local_d2 = list_copy(hentry->value);
+        TAILQ_CONCAT(argv, local_d2, items);
     }
 
     /* header dir args */
-    e.key = (char *) arch;
-    hsearch_r(e, FIND, &eptr, headers_dir1_table);
+    HASH_FIND_STR(headers_dir1_table, arch, hentry);
 
-    if (eptr != NULL) {
-        arglist = (string_list_t *) eptr->data;
-
-        if (arglist && !TAILQ_EMPTY(arglist)) {
-            local_h1 = list_copy(arglist);
-            TAILQ_CONCAT(argv, local_h1, items);
-        }
+    if (hentry != NULL && hentry->value && !TAILQ_EMPTY(hentry->value)) {
+        local_h1 = list_copy(hentry->value);
+        TAILQ_CONCAT(argv, local_h1, items);
     }
 
-    e.key = (char *) arch;
-    hsearch_r(e, FIND, &eptr, headers_dir2_table);
+    HASH_FIND_STR(headers_dir2_table, arch, hentry);
 
-    if (eptr != NULL) {
-        arglist = (string_list_t *) eptr->data;
-
-        if (arglist && !TAILQ_EMPTY(arglist)) {
-            local_h2 = list_copy(arglist);
-            TAILQ_CONCAT(argv, local_h2, items);
-        }
+    if (hentry != NULL && hentry->value && !TAILQ_EMPTY(hentry->value)) {
+        local_h2 = list_copy(hentry->value);
+        TAILQ_CONCAT(argv, local_h2, items);
     }
 
     /* the before build */

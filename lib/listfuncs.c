@@ -22,7 +22,6 @@
 
 #include <assert.h>
 #include <errno.h>
-#include <search.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -95,63 +94,37 @@ char **list_to_array(const string_list_t *list)
     return array;
 }
 
-/* Convert given string_list_t in a hsearch_data hash table. */
-struct hsearch_data * list_to_table(const string_list_t *list)
+/* Convert given string_list_t in a strhash hash table. */
+string_map_t *list_to_table(const string_list_t *list)
 {
-    struct hsearch_data *table;
-    size_t table_size = 0;
-    ENTRY e;
-    ENTRY *eptr;
-
+    string_map_t *table = NULL;
+    string_map_t *hentry = NULL;
     const string_entry_t *iter;
 
     if (list == NULL) {
         return NULL;
     }
 
-    /* Iterate over the list once to get the size */
-    table_size = list_len(list);
-
-    if (table_size == 0) {
-        table_size = 1;
-    }
-
     /* Allocate the table */
-    table = calloc(1, sizeof(*table));
-    assert(table != NULL);
-
-    if (!hcreate_r(table_size, table)) {
-        fprintf(stderr, _("Unable to create hash table: %s\n"), strerror(errno));
-        free(table);
-        return NULL;
-    }
-
     TAILQ_FOREACH(iter, list, items) {
-        e.key = iter->data;
-        e.data = iter->data;
-
-        if (!hsearch_r(e, ENTER, &eptr, table)) {
-            fprintf(stderr, _("Unable to add entry to hash table: %s\n"), strerror(errno));
-            hdestroy_r(table);
-            free(table);
-            return NULL;
-        }
+        hentry = calloc(1, sizeof(*hentry));
+        assert(hentry != NULL);
+        hentry->key = strdup(iter->data);
+        hentry->value = strdup(iter->data);
+        HASH_ADD_KEYPTR(hh, table, hentry->key, strlen(hentry->key), hentry);
     }
 
     return table;
 }
 
 /* Return a new list of entries that are in list a but are not in list b */
-string_list_t * list_difference(const string_list_t *a, const string_list_t *b)
+string_list_t *list_difference(const string_list_t *a, const string_list_t *b)
 {
-    struct hsearch_data *b_table;
-
-    ENTRY e;
-    ENTRY *eptr;
-
-    const string_entry_t *iter;
-    string_list_t *ret;
-    string_entry_t *entry;
+    string_map_t *b_table = NULL;
+    string_map_t *hentry = NULL;
+    const string_entry_t *iter = NULL;
+    string_list_t *ret = NULL;
+    string_entry_t *entry = NULL;
 
     /* Simple cases */
     if ((a == NULL || TAILQ_EMPTY(a)) && (b == NULL || TAILQ_EMPTY(b))) {
@@ -164,41 +137,36 @@ string_list_t * list_difference(const string_list_t *a, const string_list_t *b)
 
     /* Copy list b into a hash table */
     b_table = list_to_table(b);
-    ret = malloc(sizeof(*ret));
+    ret = calloc(1, sizeof(*ret));
     assert(ret != NULL);
     TAILQ_INIT(ret);
 
     /* Iterate through list a looking for things not in list b */
     TAILQ_FOREACH(iter, a, items) {
-        e.key = iter->data;
-        hsearch_r(e, FIND, &eptr, b_table);
+        HASH_FIND_STR(b_table, iter->data, hentry);
 
-        if (eptr == NULL) {
+        if (hentry == NULL) {
             entry = calloc(1, sizeof(*entry));
             assert(entry != NULL);
-            entry->data = iter->data;
+            entry->data = strdup(iter->data);
             TAILQ_INSERT_TAIL(ret, entry, items);
         }
     }
 
     /* Free the hash table */
-    hdestroy_r(b_table);
-    free(b_table);
+    free_string_map(b_table);
 
     return ret;
 }
 
 /* Return a new list of entries that are both in list a and list b */
-string_list_t * list_intersection(const string_list_t *a, const string_list_t *b)
+string_list_t *list_intersection(const string_list_t *a, const string_list_t *b)
 {
-    struct hsearch_data *b_table;
-
-    ENTRY e;
-    ENTRY *eptr;
-
-    const string_entry_t *iter;
-    string_list_t *ret;
-    string_entry_t *entry;
+    string_map_t *b_table = NULL;
+    string_map_t *hentry = NULL;
+    const string_entry_t *iter = NULL;
+    string_list_t *ret = NULL;
+    string_entry_t *entry = NULL;
 
     /* Copy list b into a hash table */
     b_table = list_to_table(b);
@@ -207,94 +175,78 @@ string_list_t * list_intersection(const string_list_t *a, const string_list_t *b
         return NULL;
     }
 
-    ret = malloc(sizeof(*ret));
+    ret = calloc(1, sizeof(*ret));
     assert(ret != NULL);
     TAILQ_INIT(ret);
 
     /* Iterate through list a looking for things in list b */
     TAILQ_FOREACH(iter, a, items) {
-        e.key = iter->data;
-        hsearch_r(e, FIND, &eptr, b_table);
+        HASH_FIND_STR(b_table, iter->data, hentry);
 
-        if (eptr != NULL) {
+        if (hentry != NULL) {
             entry = calloc(1, sizeof(*entry));
             assert(entry != NULL);
-            entry->data = iter->data;
+            entry->data = strdup(iter->data);
             TAILQ_INSERT_TAIL(ret, entry, items);
         }
     }
 
     /* Free the hash table */
-    hdestroy_r(b_table);
-    free(b_table);
+    free_string_map(b_table);
 
     return ret;
 }
 
 /* Return a new list of entries that are in either list a or list b */
-string_list_t * list_union(const string_list_t *a, const string_list_t *b)
+string_list_t *list_union(const string_list_t *a, const string_list_t *b)
 {
-    struct hsearch_data u_table;
-    size_t u_table_size = 0;
+    string_map_t *u_table = NULL;
+    string_map_t *hentry = NULL;
+    const string_entry_t *iter = NULL;
+    string_list_t *ret = NULL;
+    string_entry_t *entry = NULL;
 
-    const string_entry_t *iter;
-    string_list_t *ret;
-    string_entry_t *entry;
-
-    ENTRY e;
-    ENTRY *eptr;
-
-    ret = malloc(sizeof(*ret));
+    ret = calloc(1, sizeof(*ret));
     assert(ret != NULL);
     TAILQ_INIT(ret);
-
-    u_table_size += list_len(a);
-    u_table_size += list_len(b);
-
-    if (u_table_size == 0) {
-        u_table_size = 1;
-    }
-
-    memset(&u_table, 0, sizeof(u_table));
-
-    if (!hcreate_r(u_table_size, &u_table)) {
-        fprintf(stderr, _("Unable to create hash table: %s\n"), strerror(errno));
-        return NULL;
-    }
 
     /*
      * Iterate over both lists, adding each entry to u_table. If it's not already in
      * u_table, add it to the list to be returned.
      */
     TAILQ_FOREACH(iter, a, items) {
-        e.key = iter->data;
-        e.data = iter->data;
-        hsearch_r(e, FIND, &eptr, &u_table);
+        HASH_FIND_STR(u_table, iter->data, hentry);
 
-        if (eptr == NULL) {
-            hsearch_r(e, ENTER, &eptr, &u_table);
+        if (hentry == NULL) {
+            hentry = calloc(1, sizeof(*hentry));
+            assert(hentry != NULL);
+            hentry->key = strdup(iter->data);
+            HASH_ADD_KEYPTR(hh, u_table, hentry->key, strlen(hentry->key), hentry);
+
             entry = calloc(1, sizeof(*entry));
             assert(entry != NULL);
-            entry->data = iter->data;
+            entry->data = strdup(iter->data);
             TAILQ_INSERT_TAIL(ret, entry, items);
         }
     }
 
     TAILQ_FOREACH(iter, b, items) {
-        e.key = iter->data;
-        e.data = iter->data;
-        hsearch_r(e, FIND, &eptr, &u_table);
+        HASH_FIND_STR(u_table, iter->data, hentry);
 
-        if (eptr == NULL) {
-            hsearch_r(e, ENTER, &eptr, &u_table);
+        if (hentry == NULL) {
+            hentry = calloc(1, sizeof(*hentry));
+            assert(hentry != NULL);
+            hentry->key = strdup(iter->data);
+            HASH_ADD_KEYPTR(hh, u_table, hentry->key, strlen(hentry->key), hentry);
+
             entry = calloc(1, sizeof(*entry));
             assert(entry != NULL);
-            entry->data = iter->data;
+            entry->data = strdup(iter->data);
             TAILQ_INSERT_TAIL(ret, entry, items);
         }
     }
 
-    hdestroy_r(&u_table);
+    free_string_map(u_table);
 
     return ret;
 }

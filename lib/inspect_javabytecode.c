@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2019-2020  Red Hat, Inc.
+ * Copyright (C) 2019-2021  Red Hat, Inc.
  * Author(s):  David Cantrell <dcantrell@redhat.com>
  *
  * This program is free software: you can redistribute it and/or
@@ -28,6 +28,7 @@
 #include <sys/stat.h>
 #include <fcntl.h>
 #include <errno.h>
+#include <err.h>
 #include <ftw.h>
 #include <byteswap.h>
 #include <assert.h>
@@ -228,9 +229,7 @@ bool inspect_javabytecode(struct rpminspect *ri)
     rpmpeer_entry_t *peer = NULL;
     rpmfile_entry_t *file = NULL;
     char *container = NULL;
-    ENTRY e;
-    ENTRY *eptr;
-    char *prod = NULL;
+    string_map_t *hentry = NULL;
     struct result_params params;
 
     assert(ri != NULL);
@@ -240,31 +239,26 @@ bool inspect_javabytecode(struct rpminspect *ri)
      * Get the major JVM version for this product release.
      */
     if (ri->jvm == NULL) {
-        fprintf(stderr, _("*** missing JVM version to product release mapping\n"));
-        fflush(stderr);
+        warn(_("*** missing JVM version to product release mapping"));
         return false;
     }
 
-    e.key = ri->product_release;
-    hsearch_r(e, FIND, &eptr, ri->jvm);
+    /* look up the JVM major version; fall back on default if not found */
+    HASH_FIND_STR(ri->jvm, ri->product_release, hentry);
 
-    if (eptr == NULL) {
-        prod = strdup("default");
-        e.key = prod;
-        hsearch_r(e, FIND, &eptr, ri->jvm);
-        free(prod);
+    if (hentry == NULL) {
+        HASH_FIND_STR(ri->jvm, "default", hentry);
     }
 
-    if (eptr == NULL) {
-        fprintf(stderr, _("*** missing JVM version to product release mapping\n"));
-        fflush(stderr);
+    if (hentry == NULL) {
+        warn(_("*** missing JVM version to product release mapping"));
         return false;
     }
 
-    supported_major = strtol(eptr->data, NULL, 10);
+    supported_major = strtol(hentry->value, NULL, 10);
+
     if (errno == ERANGE) {
-        fprintf(stderr, _("*** invalid JVM major version: %s: %s\n"), (char *) eptr->data, strerror(errno));
-        fflush(stderr);
+        warn(_("*** invalid JVM major version"));
         return false;
     }
 
