@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2020  Red Hat, Inc.
+ * Copyright (C) 2020-2021  Red Hat, Inc.
  * Author(s):  David Cantrell <dcantrell@redhat.com>
  *
  * This program is free software: you can redistribute it and/or
@@ -79,6 +79,12 @@ static bool virus_driver(struct rpminspect *ri, rpmfile_entry_t *file)
     memset(&opts, 0, sizeof(opts));
     opts.general = CL_SCAN_GENERAL_ALLMATCHES | CL_SCAN_GENERAL_COLLECT_METADATA;
     opts.parse = ~0;
+
+    /* disable broken ELF detection */
+    opts.parse &= ~CL_SCAN_HEURISTIC_BROKEN;
+
+    /* disable max limit detection (filesize, etc) */
+    opts.parse &= ~CL_SCAN_HEURISTIC_EXCEEDS_MAX;
 
     /* scan the file */
     r = cl_scanfile(file->fullpath, &virus, NULL, engine, &opts);
