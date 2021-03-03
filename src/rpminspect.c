@@ -621,10 +621,14 @@ int main(int argc, char **argv) {
         ri->before = strdup(argv[optind]);
         ri->after = strdup(argv[optind + 1]);
     } else {
-        /* user gave us too many arguments */
         free_rpminspect(ri);
-        warnx(_("*** Invalid before and after build specification."));
-        errx(RI_PROGRAM_ERROR, _("*** See `%s --help` for more information."), progname);
+
+        if (dump_config) {
+            return RI_INSPECTION_SUCCESS;
+        } else {
+            warnx(_("*** Invalid before and after build specification."));
+            errx(RI_PROGRAM_ERROR, _("*** See `%s --help` for more information."), progname);
+        }
     }
 
     /*
