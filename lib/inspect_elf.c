@@ -30,7 +30,6 @@
 
 #include <assert.h>
 #include <fcntl.h>
-#include <search.h>
 #include <stdbool.h>
 #include <stdio.h>
 #include <sys/types.h>
@@ -216,11 +215,11 @@ bool has_bind_now(Elf *elf)
 
 static bool is_fortifiable(const char *symbol)
 {
-    ENTRY e;
-    ENTRY *eptr;
-    e.key = (char *) symbol;
-    hsearch_r(e, FIND, &eptr, rip->fortifiable_table);
-    return eptr != NULL;
+    string_map_t *hentry = NULL;
+
+    assert(symbol != NULL);
+    HASH_FIND_STR(rip->fortifiable, symbol, hentry);
+    return hentry != NULL;
 }
 
 /**

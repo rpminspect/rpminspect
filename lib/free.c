@@ -21,7 +21,6 @@
 
 #include <regex.h>
 #include <stdlib.h>
-#include <search.h>
 #include "queue.h"
 #include "rpminspect.h"
 
@@ -35,29 +34,20 @@ void free_regex(regex_t *regex)
     free(regex);
 }
 
-void free_mapping(struct hsearch_data *table, string_list_t *keys)
+void free_string_map(string_map_t *table)
 {
-    ENTRY e;
-    ENTRY *eptr;
-    string_entry_t *entry = NULL;
+    string_map_t *entry = NULL;
+    string_map_t *tmp_entry = NULL;
 
-    if (table != NULL && keys != NULL) {
-        /* look up each key and free the memory for the value */
-        TAILQ_FOREACH(entry, keys, items) {
-            e.key = entry->data;
-            hsearch_r(e, FIND, &eptr, table);
+    if (table == NULL) {
+        return;
+    }
 
-            if (eptr != NULL) {
-                free(eptr->data);
-            }
-        }
-
-        /* destroy the hash table */
-        hdestroy_r(table);
-        free(table);
-
-        /* destroy the list of keys */
-        list_free(keys, free);
+    HASH_ITER(hh, table, entry, tmp_entry) {
+        HASH_DEL(table, entry);
+        free(entry->key);
+        free(entry->value);
+        free(entry);
     }
 
     return;
@@ -189,11 +179,11 @@ void free_rpminspect(struct rpminspect *ri) {
     list_free(ri->forbidden_owners, free);
     list_free(ri->forbidden_groups, free);
     list_free(ri->shells, free);
-    free_mapping(ri->jvm, ri->jvm_keys);
-    free_mapping(ri->annocheck, ri->annocheck_keys);
-    free_mapping(ri->pathmigration, ri->pathmigration_keys);
+    free_string_map(ri->jvm);
+    free_string_map(ri->annocheck);
+    free_string_map(ri->pathmigration);
     list_free(ri->pathmigration_excluded_paths, free);
-    free_mapping(ri->products, ri->product_keys);
+    free_string_map(ri->products);
     list_free(ri->ignores, free);
     list_free(ri->lto_symbol_name_prefixes, free);
     list_free(ri->forbidden_paths, free);
@@ -232,12 +222,7 @@ void free_rpminspect(struct rpminspect *ri) {
 
     free_results(ri->results);
 
-    if (ri->fortifiable_table != NULL) {
-        hdestroy_r(ri->fortifiable_table);
-        free(ri->fortifiable_table);
-    }
-
-    list_free(ri->fortifiable, free);
+    free_string_map(ri->fortifiable);
 
     return;
 }

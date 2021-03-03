@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2020  Red Hat, Inc.
+ * Copyright (C) 2020-2021  Red Hat, Inc.
  * Author(s):  David Cantrell <dcantrell@redhat.com>
  *
  * This program is free software: you can redistribute it and/or
@@ -22,21 +22,20 @@
 #include <unistd.h>
 #include <assert.h>
 #include <err.h>
-#include <search.h>
 #include "rpminspect.h"
 
 /*
  * Helper to add entries to abi argument tables.
  */
-void add_abi_argument(struct hsearch_data *table, const char *arg, const char *path, const Header hdr)
+void add_abi_argument(string_list_map_t *table, const char *arg, const char *path, const Header hdr)
 {
-    string_list_t *list = NULL;
     string_entry_t *entry = NULL;
-    const char *arch = NULL;
-    ENTRY e;
-    ENTRY *eptr;
+    string_list_map_t *hentry = NULL;
 
-    assert(table != NULL);
+    if (table == NULL) {
+        return;
+    }
+
     assert(arg != NULL);
     assert(path != NULL);
     assert(hdr != NULL);
@@ -51,32 +50,25 @@ void add_abi_argument(struct hsearch_data *table, const char *arg, const char *p
     xasprintf(&entry->data, "%s %s", arg, path);
     assert(entry->data != NULL);
 
-    /* we have the dir, add it */
-    arch = get_rpm_header_arch(hdr);
-    e.key = (char *) arch;
-    assert(e.key != NULL);
-    e.data = NULL;
-    eptr = NULL;
-    hsearch_r(e, FIND, &eptr, table);
+    /* look up the entry in the hash table */
+    HASH_FIND_STR(table, get_rpm_header_arch(hdr), hentry);
 
-    if (eptr == NULL) {
+    if (hentry == NULL) {
         /* does not exist in the table, create it and add it */
-        list = calloc(1, sizeof(*list));
-        assert(list != NULL);
-        TAILQ_INIT(list);
-        TAILQ_INSERT_TAIL(list, entry, items);
+        hentry = calloc(1, sizeof(*hentry));
+        assert(hentry != NULL);
 
-        e.key = (char *) arch;
-        e.data = list;
-        eptr = NULL;
+        hentry->key = strdup(get_rpm_header_arch(hdr));
 
-        if (!hsearch_r(e, ENTER, &eptr, table)) {
-            err(RI_PROGRAM_ERROR, "hsearch_r()");
-        }
+        hentry->value = calloc(1, sizeof(*hentry->value));
+        assert(hentry->value != NULL);
+        TAILQ_INIT(hentry->value);
+        TAILQ_INSERT_TAIL(hentry->value, entry, items);
+
+        HASH_ADD_KEYPTR(hh, table, hentry->key, strlen(hentry->key), hentry);
     } else {
         /* list exists, add another entry */
-        list = (string_list_t *) eptr->data;
-        TAILQ_INSERT_TAIL(list, entry, items);
+        TAILQ_INSERT_TAIL(hentry->value, entry, items);
     }
 
     return;
@@ -413,26 +405,19 @@ string_list_t *get_abi_suppressions(const struct rpminspect *ri, const char *sup
  * name and the value is a string_list_t of the debug_info_dir1/2 or
  * header_dir1/2 arguments to abidiff(1) or kmidiff(1).
  */
-struct hsearch_data *get_abi_dir_arg(struct rpminspect *ri, const size_t size, const char *suffix, const char *arg, const char *path, const int type)
+string_list_map_t *get_abi_dir_arg(struct rpminspect *ri, const size_t size, const char *suffix, const char *arg, const char *path, const int type)
 {
-    int result = 0;
     rpmpeer_entry_t *peer = NULL;
     const char *name = NULL;
     char *tmp = NULL;
     char *root = NULL;
-    struct hsearch_data *table = NULL;
+    string_list_map_t *table = NULL;
     Header h;
 
     assert(ri != NULL);
     assert(size > 0);
     assert(arg != NULL);
     assert(path != NULL);
-
-    /* initialize the table */
-    table = calloc(1, sizeof(*table));
-    assert(table != NULL);
-    result = hcreate_r(size * 1.25, table);
-    assert(result != 0);
 
     /* collect each path argument by arch */
     TAILQ_FOREACH(peer, ri->peers, items) {

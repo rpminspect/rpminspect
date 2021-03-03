@@ -58,19 +58,15 @@ bool is_fortified(const char *symbol)
 
 void init_elf_data(struct rpminspect *ri)
 {
-    void *dl;
-    struct link_map *info;
-    char *libc_path;
-    Elf *libc_elf;
+    void *dl = NULL;
+    struct link_map *info = NULL;
+    char *libc_path = NULL;
+    Elf *libc_elf = NULL;
     int libc_fd;
-    string_list_t *libc_fortified;
-
-    string_entry_t *entry;
-    string_entry_t *iter;
+    string_list_t *libc_fortified = NULL;
+    string_entry_t *iter = NULL;
+    string_map_t *hentry = NULL;
     size_t symbol_len;
-    size_t nentries;
-    ENTRY e;
-    ENTRY *eptr;
 
     assert(ri != NULL);
 
@@ -115,12 +111,7 @@ void init_elf_data(struct rpminspect *ri)
             goto cleanup;
         }
 
-        ri->fortifiable = malloc(sizeof(*ri->fortifiable));
-        assert(ri->fortifiable != NULL);
-        TAILQ_INIT(ri->fortifiable);
-
         /* the symbols will be of the form, e.g., "__asprintf_chk". Turn that into "asprintf". */
-        nentries = 0;
         TAILQ_FOREACH(iter, libc_fortified, items) {
             /* Skip this one */
             if (!strcmp(iter->data, "__chk_fail")) {
@@ -129,38 +120,18 @@ void init_elf_data(struct rpminspect *ri)
 
             symbol_len = strlen(iter->data);
 
-            entry = calloc(1, sizeof(*entry));
-            assert(entry != NULL);
+            hentry = calloc(1, sizeof(*hentry));
+            assert(hentry != NULL);
             /* minus 2 underscores, minus for _chk, plus \0 */
-            entry->data = calloc(symbol_len - 5, 1);
-            assert(entry->data != NULL);
+            hentry->key = calloc(symbol_len - 5, 1);
+            assert(hentry->key != NULL);
 
             /* strip off underscores, stop before _chk, \0 already present */
-            strncpy(entry->data, iter->data + 2, symbol_len - 6);
-            TAILQ_INSERT_TAIL(ri->fortifiable, entry, items);
-            nentries++;
+            strncpy(hentry->key, iter->data + 2, symbol_len - 6);
+            HASH_ADD_KEYPTR(hh, ri->fortifiable, hentry->key, strlen(hentry->key), hentry);
         }
 
         list_free(libc_fortified, NULL);
-
-        /* The fortifiable tailq is to keep track of what all's been malloced.
-         * Copy into a hash table for fast lookups.
-         */
-        assert(ri->fortifiable_table == NULL);
-        ri->fortifiable_table = calloc(1, sizeof(*ri->fortifiable_table));
-        assert(ri->fortifiable_table != NULL);
-
-        if (hcreate_r(nentries, ri->fortifiable_table) == 0) {
-            free(ri->fortifiable_table);
-            ri->fortifiable_table = NULL;
-            goto cleanup;
-        }
-
-        TAILQ_FOREACH(iter, ri->fortifiable, items) {
-            e.key = iter->data;
-            e.data = iter->data;
-            hsearch_r(e, ENTER, &eptr, ri->fortifiable_table);
-        }
     }
 
 cleanup:

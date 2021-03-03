@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2019-2020  Red Hat, Inc.
+ * Copyright (C) 2019-2021  Red Hat, Inc.
  * Author(s):  David Cantrell <dcantrell@redhat.com>
  *
  * This program is free software: you can redistribute it and/or
@@ -32,8 +32,8 @@ static bool annocheck_driver(struct rpminspect *ri, rpmfile_entry_t *file)
     const char *arch = NULL;
     char *cmd = NULL;
     string_entry_t *entry = NULL;
-    ENTRY e;
-    ENTRY *eptr;
+    string_map_t *hentry = NULL;
+    string_map_t *tmp_hentry = NULL;
     char *wrkdir = NULL;
     size_t fl = 0;
     size_t ll = 0;
@@ -75,20 +75,12 @@ static bool annocheck_driver(struct rpminspect *ri, rpmfile_entry_t *file)
     params.file = file->localpath;
 
     /* Run each annocheck test and report the results */
-    TAILQ_FOREACH(entry, ri->annocheck_keys, items) {
-        /* Get the command options for this test */
-        e.key = entry->data;
-        hsearch_r(e, FIND, &eptr, ri->annocheck);
-
-        if (eptr == NULL) {
-            continue;
-        }
-
+    HASH_ITER(hh, ri->annocheck, hentry, tmp_hentry) {
         /* Run the test on the file */
         if (get_after_debuginfo_path(ri, arch) == NULL) {
-            xasprintf(&cmd, "%s %s %s", ri->commands.annocheck, (char *) eptr->data, file->fullpath);
+            xasprintf(&cmd, "%s %s %s", ri->commands.annocheck, hentry->value, file->fullpath);
         } else {
-            xasprintf(&cmd, "%s %s --debug-dir=%s %s", ri->commands.annocheck, (char *) eptr->data, get_after_debuginfo_path(ri, arch), file->fullpath);
+            xasprintf(&cmd, "%s %s --debug-dir=%s %s", ri->commands.annocheck, hentry->value, get_after_debuginfo_path(ri, arch), file->fullpath);
         }
 
         DEBUG_PRINT("%s\n", cmd);
@@ -98,9 +90,9 @@ static bool annocheck_driver(struct rpminspect *ri, rpmfile_entry_t *file)
         /* If we have a before build, run the command on that */
         if (file->peer_file) {
             if (get_before_debuginfo_path(ri, arch) == NULL) {
-                xasprintf(&cmd, "%s %s %s", ri->commands.annocheck, (char *) eptr->data, file->peer_file->fullpath);
+                xasprintf(&cmd, "%s %s %s", ri->commands.annocheck, hentry->value, file->peer_file->fullpath);
             } else {
-                xasprintf(&cmd, "%s %s --debug-dir=%s %s", ri->commands.annocheck, (char *) eptr->data, get_before_debuginfo_path(ri, arch), file->peer_file->fullpath);
+                xasprintf(&cmd, "%s %s --debug-dir=%s %s", ri->commands.annocheck, hentry->value, get_before_debuginfo_path(ri, arch), file->peer_file->fullpath);
             }
 
             DEBUG_PRINT("%s\n", cmd);

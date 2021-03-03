@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2019-2020  Red Hat, Inc.
+ * Copyright (C) 2019-2021  Red Hat, Inc.
  * Author(s):  David Cantrell <dcantrell@redhat.com>
  *
  * This program is free software: you can redistribute it and/or
@@ -184,11 +184,10 @@ char *run_cmd(int *exitcode, const char *cmd, ...)
 /*
  * Free one of the command line option tables.
  */
-void free_argv_table(struct rpminspect *ri, struct hsearch_data *table)
+void free_argv_table(struct rpminspect *ri, string_list_map_t *table)
 {
-    ENTRY e;
-    ENTRY *eptr;
-    string_entry_t *entry = NULL;
+    string_list_map_t *hentry = NULL;
+    string_list_map_t *tmp_hentry = NULL;
 
     assert(ri != NULL);
     assert(ri->arches != NULL);
@@ -197,17 +196,11 @@ void free_argv_table(struct rpminspect *ri, struct hsearch_data *table)
         return;
     }
 
-    TAILQ_FOREACH(entry, ri->arches, items) {
-        e.key = entry->data;
-        hsearch_r(e, FIND, &eptr, table);
-
-        if (eptr != NULL) {
-            list_free(eptr->data, free);
-        }
+    HASH_ITER(hh, table, hentry, tmp_hentry) {
+        HASH_DEL(table, hentry);
+        free(hentry->key);
+        list_free(hentry->value, free);
     }
-
-    hdestroy_r(table);
-    free(table);
 
     return;
 }

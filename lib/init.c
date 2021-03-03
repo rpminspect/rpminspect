@@ -24,7 +24,6 @@
 #include <string.h>
 #include <limits.h>
 #include <assert.h>
-#include <search.h>
 #include <errno.h>
 #include <err.h>
 #include <yaml.h>
@@ -206,56 +205,28 @@ void add_entry(string_list_t **list, const char *s)
  *
  * @param incoming_table List of key=value pairs to turn in to a hash table.
  * @param table Destination hash table.
- * @param keys Destination list of hash table keys.
  */
-static void process_table(char *key, char *value, struct hsearch_data **table, string_list_t **keys)
+static void process_table(char *key, char *value, string_map_t **table)
 {
-    ENTRY e;
-    ENTRY *eptr;
-    string_entry_t *entry = NULL;
+    string_map_t *entry = NULL;
 
     assert(key != NULL);
     assert(value != NULL);
 
-    /* set up new data structures if we need to */
-    if (*table == NULL) {
-        *table = calloc(1, sizeof(**table));
-        assert(*table != NULL);
+    /* look for the key first */
+    HASH_FIND_STR(*table, key, entry);
 
-        /* XXX -- fix with later hashmap implementation */
-        if (hcreate_r(BUFSIZ * 1.25, *table) == 0) {
-            free(*table);
-            *table = NULL;
-            warn(_("hcreate_r() failure in %s"), __func__);
-        }
-    }
-
-    if (*keys == NULL) {
-        *keys = calloc(1, sizeof(**keys));
-        assert(*keys != NULL);
-        TAILQ_INIT(*keys);
-    }
-
-    /* add the new key/value pair to the table */
-    e.key = key;
-    eptr = NULL;
-    hsearch_r(e, FIND, &eptr, *table);
-
-    if (eptr == NULL) {
-        /* key does not exist, add it */
+    if (entry == NULL) {
+        /* add the new key/value pair to the table */
         entry = calloc(1, sizeof(*entry));
         assert(entry != NULL);
-        entry->data = strdup(key);
-        TAILQ_INSERT_TAIL(*keys, entry, items);
-
-        /* add to the hash table */
-        e.key = entry->data;
-        e.data = strdup(value);
-        hsearch_r(e, ENTER, &eptr, *table);
+        entry->key = strdup(key);
+        entry->value = strdup(value);
+        HASH_ADD_KEYPTR(hh, *table, entry->key, strlen(entry->key), entry);
     } else {
-        /* entry found, replace it in the hash table */
-        free(eptr->data);
-        eptr->data = strdup(value);
+        /* entry found, replace the value */
+        free(entry->value);
+        entry->value = strdup(value);
     }
 
     return;
@@ -812,13 +783,13 @@ static int read_cfgfile(struct rpminspect *ri, const char *filename)
                             }
                         }
                     } else if (block == BLOCK_ANNOCHECK) {
-                        process_table(key, t, &ri->annocheck, &ri->annocheck_keys);
+                        process_table(key, t, &ri->annocheck);
                     } else if (block == BLOCK_JAVABYTECODE) {
-                        process_table(key, t, &ri->jvm, &ri->jvm_keys);
+                        process_table(key, t, &ri->jvm);
                     } else if (block == BLOCK_MIGRATED_PATHS) {
-                        process_table(key, t, &ri->pathmigration, &ri->pathmigration_keys);
+                        process_table(key, t, &ri->pathmigration);
                     } else if (block == BLOCK_PRODUCTS) {
-                        process_table(key, t, &ri->products, &ri->product_keys);
+                        process_table(key, t, &ri->products);
                     } else if (block == BLOCK_INSPECTIONS) {
                         if (!strcasecmp(t, "on")) {
                             exclude = false;

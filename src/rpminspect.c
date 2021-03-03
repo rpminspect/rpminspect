@@ -84,7 +84,7 @@ static void usage(const char *progname)
  * Release value.  Trim any trailing '/' characters in case the user is
  * specifying a build from a local path.
  */
-static char *get_product_release(const string_list_t *keys, struct hsearch_data *products, const favor_release_t favor_release, const char *before, const char *after)
+static char *get_product_release(string_map_t *products, const favor_release_t favor_release, const char *before, const char *after)
 {
     int c;
     char *pos = NULL;
@@ -92,8 +92,8 @@ static char *get_product_release(const string_list_t *keys, struct hsearch_data 
     char *after_product = NULL;
     char *needle = NULL;
     string_entry_t *entry = NULL;
-    ENTRY e;
-    ENTRY *eptr;
+    string_map_t *hentry = NULL;
+    string_map_t *tmp_hentry = NULL;
     regex_t product_regex;
     int result;
     char reg_error[BUFSIZ];
@@ -156,15 +156,15 @@ static char *get_product_release(const string_list_t *keys, struct hsearch_data 
          */
         c = strcmp(before_product, after_product);
 
-        if (c && (keys != NULL)) {
+        if (c && (products != NULL)) {
             /* after_product and before_product are refreshed in the loop */
             free(after_product);
             free(before_product);
 
             /* Try to see if a product mapping matches our strings */
-            TAILQ_FOREACH(entry, keys, items) {
+            HASH_ITER(hh, products, hentry, tmp_hentry) {
                 /* refresh after_product */
-                xasprintf(&needle, ".%s", entry->data);
+                xasprintf(&needle, ".%s", hentry->key);
                 after_product = strstr(after, needle);
                 before_product = strstr(before, needle);
                 free(needle);
@@ -173,17 +173,8 @@ static char *get_product_release(const string_list_t *keys, struct hsearch_data 
                     continue;
                 }
 
-                /* find this product in the hash table */
-                e.key = entry->data;
-                hsearch_r(e, FIND, &eptr, products);
-
-                /* if the config file entry is empty, just ignore it */
-                if (eptr == NULL) {
-                    continue;
-                }
-
                 /* build a regex for this product release string */
-                result = regcomp(&product_regex, eptr->data, 0);
+                result = regcomp(&product_regex, hentry->value, 0);
 
                 if (result != 0) {
                     regerror(result, &product_regex, reg_error, sizeof(reg_error));
@@ -765,7 +756,7 @@ int main(int argc, char **argv) {
                 }
             }
 
-            ri->product_release = get_product_release(ri->product_keys, ri->products, ri->favor_release, before_rel, after_rel);
+            ri->product_release = get_product_release(ri->products, ri->favor_release, before_rel, after_rel);
             DEBUG_PRINT("product_release=%s\n", ri->product_release);
 
             if (ri->product_release == NULL) {

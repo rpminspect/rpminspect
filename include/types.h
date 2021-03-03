@@ -33,6 +33,7 @@
 #include <rpm/rpmfi.h>
 #include <libkmod.h>
 #include "queue.h"
+#include "uthash.h"
 
 #ifndef _LIBRPMINSPECT_TYPES_H
 #define _LIBRPMINSPECT_TYPES_H
@@ -305,6 +306,20 @@ struct command_paths {
     char *kmidiff;
 };
 
+/* Hash table used for key/value situations where each is a string. */
+typedef struct _string_map_t {
+    char *key;
+    char *value;
+    UT_hash_handle hh;
+} string_map_t;
+
+/* Hash table with a string key and a string_list_t value. */
+typedef struct _string_list_map_t {
+    char *key;
+    string_list_t *value;
+    UT_hash_handle hh;
+} string_list_map_t;
+
 /*
  * Configuration and state instance for librpminspect run.
  * Applications using librpminspect should initialize the
@@ -416,21 +431,17 @@ struct rpminspect {
     specname_primary_t specprimary;
 
     /* hash table of product release -> JVM major versions */
-    struct hsearch_data *jvm;
-    string_list_t *jvm_keys;
+    string_map_t *jvm;
 
     /* hash table of annocheck tests */
-    struct hsearch_data *annocheck;
-    string_list_t *annocheck_keys;
+    string_map_t *annocheck;
 
     /* hash table of path migrations */
-    struct hsearch_data *pathmigration;
-    string_list_t *pathmigration_keys;
+    string_map_t *pathmigration;
     string_list_t *pathmigration_excluded_paths;
 
     /* hash table of product release regexps */
-    struct hsearch_data *products;
-    string_list_t *product_keys;
+    string_map_t *products;
 
     /* list of paths to ignore (these strings allow glob(3) syntax) */
     string_list_t *ignores;
@@ -523,8 +534,7 @@ struct rpminspect {
     int rebase_build;               /* indicates if this is a rebased build */
 
     /* used by ELF symbol checks */
-    string_list_t *fortifiable;
-    struct hsearch_data *fortifiable_table;
+    string_map_t *fortifiable;
 
     /* spec file macros */
     pair_list_t *macros;
