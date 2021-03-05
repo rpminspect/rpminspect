@@ -14,9 +14,6 @@ the specifics will be noted during the work in progress.
 
 Unranked tests categories to migrate (might also decide to skip them):
 ----------------------------------------------------------------------
-!TEST_METADATA
-    need to get the fedora_without_redhat test implemented from checker
-    for the summary and description (call this the 'substring' inspection)
  TEST_REQUIRES
  TEST_SCRIPT
  TEST_STRIP
@@ -70,6 +67,8 @@ Test categories that have been migrated:
 *TEST_VIRUS (virus)
 *TEST_POLITICS (politics)
 *TEST_RPATH (runpath)
+*TEST_METADATA (only checks for bad words, valid license, valid vendor,
+                and valid buildhost)
 
 
 Test categories excluded (see MISSING):
@@ -80,6 +79,7 @@ Test categories excluded (see MISSING):
  TEST_ELFLINT
  TEST_MULTILIB
  TEST_SPECFILE (only the 32-bit x86 $RPM_OPT_FLAGS check)
+ TEST_METADATA (the 'fedora without red hat' string check)
 
 
 +============+

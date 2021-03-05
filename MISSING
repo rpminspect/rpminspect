@@ -52,3 +52,11 @@ TEST_SPECFILE ($RPM_OPT_FLAGS check on x86 builds)
     were trying to ensure the 32-bit x86 builds were using more
     optimizations than standard i386 builds.  This check is not really
     relevant anymore, so it has been dropped.
+
+TEST_METADATA (the 'fedora without red hat' string check)
+    The substring check of the Summary string and package descriptions
+    for any mention of 'Fedora' (case insensitive) without also
+    mentioning 'Red Hat' (case insensitive) is a branding matter.  The
+    check itself was not foolproof and did not take in to account word
+    boundaries of pathnames.  This kind of check is out of scope for
+    rpminspect as it provides no technical or security benefit.
