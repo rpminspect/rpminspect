@@ -760,18 +760,10 @@ typedef void (*modinfo_to_entries)(string_list_t *, const struct kmod_list *);
 typedef void (*module_alias_callback)(const char *, const string_list_t *, const string_list_t *, void *);
 
 /* mapping of an alias string to a module name */
-struct alias_entry_t {
+typedef struct _kernel_alias_data_t {
     char *alias;
-    char *module;
-    TAILQ_ENTRY(alias_entry_t) items;
-};
-
-TAILQ_HEAD(alias_list_t, alias_entry_t);
-
-typedef struct _kernel_alias_data {
-    size_t num_aliases;
-    struct alias_list_t *alias_list;
-    struct hsearch_data *alias_table;
+    string_list_t *modules;
+    UT_hash_handle hh;
 } kernel_alias_data_t;
 
 /* Types of workdirs */
