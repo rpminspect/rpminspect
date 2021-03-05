@@ -2,9 +2,20 @@ name: Style Checks
 
 on:
     push:
-        branches: [master]
+        branches: [ master ]
+        paths:
+        - 'lib/**'
+        - 'src/**'
+        - 'include/**'
+        - 'test/**'
+
     pull_request:
-        branches: [master]
+        branches: [ master ]
+        paths:
+        - 'lib/**'
+        - 'src/**'
+        - 'include/**'
+        - 'test/**'
 
 jobs:
     shellcheck:
