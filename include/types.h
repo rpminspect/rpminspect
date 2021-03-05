@@ -26,7 +26,6 @@
 #include <regex.h>
 #include <stdint.h>
 #include <stdbool.h>
-#include <search.h>
 #include <sys/stat.h>
 #include <sys/capability.h>
 #include <rpm/rpmlib.h>
@@ -839,19 +838,13 @@ enum abidiff_status {
 /*
  * ABI compatibility level types
  */
-typedef struct _abi_entry_t {
+typedef struct _abi_t {
+    char *pkg;
     int level;
-    struct hsearch_data *pkgs;
-    string_list_t *keys;
-    TAILQ_ENTRY(_abi_entry_t) items;
-} abi_entry_t;
-
-typedef TAILQ_HEAD(abi_entry_s, _abi_entry_t) abi_list_t;
-
-typedef struct _abi_pkg_entry_t {
     bool all;
     string_list_t *dsos;
-} abi_pkg_entry_t;
+    UT_hash_handle hh;
+} abi_t;
 
 /*
  * diffstat(1) findings for reporting in the patches inspection

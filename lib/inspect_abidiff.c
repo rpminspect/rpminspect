@@ -30,6 +30,7 @@
 #include <rpm/header.h>
 #include <rpm/rpmtag.h>
 #include "queue.h"
+#include "uthash.h"
 #include "rpminspect.h"
 
 /* Globals */
@@ -39,14 +40,11 @@ static string_list_map_t *debug_info_dir1_table;
 static string_list_map_t *debug_info_dir2_table;
 static string_list_map_t *headers_dir1_table;
 static string_list_map_t *headers_dir2_table;
-static abi_list_t *abi = NULL;
+static abi_t *abi = NULL;
 
 static severity_t check_abi(const severity_t sev, const long int threshold, const char *path, const char *pkg, long int *compat)
 {
-    ENTRY e;
-    ENTRY *eptr;
-    abi_pkg_entry_t *pkgentry = NULL;
-    abi_entry_t *entry = NULL;
+    abi_t *entry = NULL;
     string_entry_t *dsoentry = NULL;
     char pathcopy[PATH_MAX + 1];
     char *basefn = NULL;
@@ -59,47 +57,38 @@ static severity_t check_abi(const severity_t sev, const long int threshold, cons
     assert(path != NULL);
     assert(pkg != NULL);
 
-    /* iterate over the ABI compat level structure */
-    TAILQ_FOREACH(entry, abi, items) {
-        /* look for an entry for this package at this level */
-        e.key = (char *) pkg;
-        hsearch_r(e, FIND, &eptr, entry->pkgs);
+    /* look for this package in the ABI table */
+    HASH_FIND_STR(abi, pkg, entry);
 
-        /* not found, continue */
-        if (eptr == NULL) {
-            continue;
-        }
+    if (entry == NULL) {
+        /* package not found, no ABI checking */
+        return sev;
+    }
 
-        /* we have a entry at this level for this package */
-        pkgentry = (abi_pkg_entry_t *) eptr->data;
-        *compat = entry->level;
+    *compat = entry->level;
 
-        /* is the ABI level above the threshold? */
-        if (entry->level > threshold) {
-            if (pkgentry->all) {
-                return RESULT_INFO;
-            } else {
-                /* do specific matching on the DSO name */
-                TAILQ_FOREACH(dsoentry, pkgentry->dsos, items) {
-                    if ((dsoentry->data[0] == '/') && strprefix(path, dsoentry->data)) {
+    /* is the ABI level above the threshold? */
+    if (entry->level > threshold) {
+        if (entry->all) {
+            return RESULT_INFO;
+        } else {
+            /* do specific matching on the DSO name */
+            TAILQ_FOREACH(dsoentry, entry->dsos, items) {
+                if ((dsoentry->data[0] == '/') && strprefix(path, dsoentry->data)) {
+                    return RESULT_INFO;
+                } else {
+                    /* do a soft match against the file basename */
+                    basefn = strncpy(pathcopy, path, PATH_MAX);
+                    assert(basefn != NULL);
+                    basefn = basename(pathcopy);
+                    assert(basefn != NULL);
+
+                    if (strprefix(basefn, dsoentry->data)) {
                         return RESULT_INFO;
-                    } else {
-                        /* do a soft match against the file basename */
-                        basefn = strncpy(pathcopy, path, PATH_MAX);
-                        assert(basefn != NULL);
-                        basefn = basename(pathcopy);
-                        assert(basefn != NULL);
-
-                        if (strprefix(basefn, dsoentry->data)) {
-                            return RESULT_INFO;
-                        }
                     }
                 }
             }
         }
-
-        /* this far means a match was found, stop looking */
-        break;
     }
 
     return sev;
