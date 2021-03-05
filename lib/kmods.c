@@ -22,12 +22,12 @@
 
 #include <assert.h>
 #include <fnmatch.h>
-#include <search.h>
 #include <stdbool.h>
 #include <stdlib.h>
 #include <string.h>
 #include <libkmod.h>
 #include "queue.h"
+#include "uthash.h"
 #include "inspect.h"
 #include "rpminspect.h"
 
@@ -238,22 +238,15 @@ bool compare_module_dependencies(const struct kmod_list *before, const struct km
  */
 kernel_alias_data_t *gather_module_aliases(const char *module_name, const struct kmod_list *modinfo_list)
 {
-    kernel_alias_data_t *ret = NULL;
+    kernel_alias_data_t *r = NULL;
+    kernel_alias_data_t *kentry = NULL;
+    string_entry_t *mentry = NULL;
     const struct kmod_list *iter = NULL;
-    const char *key;
-    const char *value;
-    struct alias_entry_t *alias_entry;
+    const char *key = NULL;
+    const char *value = NULL;
 
-    assert(module_name);
-    assert(modinfo_list);
-
-    ret = calloc(1, sizeof(*ret));
-    assert(ret);
-
-    ret->alias_list = calloc(1, sizeof(*(ret->alias_list)));
-    assert(ret->alias_list);
-
-    TAILQ_INIT(ret->alias_list);
+    assert(module_name != NULL);
+    assert(modinfo_list != NULL);
 
     kmod_list_foreach(iter, modinfo_list) {
         /* Only gather pci aliases */
@@ -269,155 +262,85 @@ kernel_alias_data_t *gather_module_aliases(const char *module_name, const struct
             continue;
         }
 
-        alias_entry = calloc(1, sizeof(*alias_entry));
-        assert(alias_entry);
+        mentry = calloc(1, sizeof(*mentry));
+        assert(mentry != NULL);
+        mentry->data = strdup(module_name);
+        assert(mentry->data != NULL);
 
-        alias_entry->alias = strdup(value);
-        assert(alias_entry->alias);
+        HASH_FIND_STR(r, value, kentry);
 
-        alias_entry->module = strdup(module_name);
-        assert(alias_entry->module);
+        if (kentry == NULL) {
+            kentry = calloc(1, sizeof(*kentry));
+            assert(kentry != NULL);
 
-        ret->num_aliases++;
-        TAILQ_INSERT_TAIL(ret->alias_list, alias_entry, items);
+            kentry->alias = strdup(value);
+            assert(kentry->alias != NULL);
+
+            kentry->modules = calloc(1, sizeof(*kentry->modules));
+            assert(kentry->modules != NULL);
+            TAILQ_INIT(kentry->modules);
+
+            TAILQ_INSERT_TAIL(kentry->modules, mentry, items);
+            HASH_ADD_KEYPTR(hh, r, kentry->alias, strlen(kentry->alias), kentry);
+        } else {
+            TAILQ_INSERT_TAIL(kentry->modules, mentry, items);
+        }
     }
 
-    return ret;
+    return r;
 }
 
 /* Free the kernel_alias_data struct created by gather_module_aliases */
 void free_module_aliases(kernel_alias_data_t *data)
 {
-    struct alias_entry_t *alias_entry;
-    ENTRY e;
-    ENTRY *eptr;
+    kernel_alias_data_t *entry = NULL;
+    kernel_alias_data_t *tmp_entry = NULL;
 
     if (data == NULL) {
         return;
     }
 
-    while (!TAILQ_EMPTY(data->alias_list)) {
-        alias_entry = TAILQ_FIRST(data->alias_list);
-        TAILQ_REMOVE(data->alias_list, alias_entry, items);
-
-        if (data->alias_table != NULL) {
-            e.key = alias_entry->alias;
-            hsearch_r(e, FIND, &eptr, data->alias_table);
-
-            if ((eptr != NULL) && (eptr->data != NULL)) {
-                list_free((string_list_t *) eptr->data, free);
-                eptr->data = NULL;
-            }
-        }
-
-        free(alias_entry->alias);
-        free(alias_entry->module);
-        free(alias_entry);
-    }
-
-    free(data->alias_list);
-
-    if (data->alias_table != NULL) {
-        hdestroy_r(data->alias_table);
-        free(data->alias_table);
+    HASH_ITER(hh, data, entry, tmp_entry) {
+        HASH_DEL(data, entry);
+        free(entry->alias);
+        list_free(entry->modules, free);
+        free(entry);
     }
 
     free(data);
     return;
 }
 
-static void finalize_module_aliases(kernel_alias_data_t *data)
+static string_list_t *wildcard_alias_search(const char *alias, kernel_alias_data_t *data)
 {
-    struct alias_entry_t *alias_entry;
-    struct alias_entry_t *tmp;
-    ENTRY e;
-    ENTRY *eptr;
-    string_entry_t *module_entry;
-    int result;
+    string_list_t *r = NULL;
+    string_entry_t *iter = NULL;
+    string_entry_t *entry = NULL;
+    kernel_alias_data_t *kentry = NULL;
+    kernel_alias_data_t *tmp_kentry = NULL;
 
-    /* ignore unused variable warnings if assert is disabled */
-    (void) result;
+    assert(alias != NULL);
+    assert(data != NULL);
 
-    assert(data);
+    r = calloc(1, sizeof(*r));
+    assert(r != NULL);
+    TAILQ_INIT(r);
 
-    data->alias_table = calloc(1, sizeof(*(data->alias_table)));
-    assert(data->alias_table);
+    HASH_ITER(hh, data, kentry, tmp_kentry) {
+        if (fnmatch(kentry->alias, alias, 0) == 0) {
+            TAILQ_FOREACH(iter, kentry->modules, items) {
+                entry = calloc(1, sizeof(*entry));
+                assert(entry != NULL);
 
-    /*
-     * The glibc man page for hcreate recommends a size 25% greater than
-     * the number of elements, so use that
-     */
-    result = hcreate_r(data->num_aliases * 1.25, data->alias_table);
-    assert(result != 0);
+                entry->data = strdup(iter->data);
+                assert(entry->data != NULL);
 
-    alias_entry = TAILQ_FIRST(data->alias_list);
-    while (alias_entry != NULL) {
-        /* Create a new entry for the alias -> module-list mapping */
-        module_entry = calloc(1, sizeof(*module_entry));
-        assert(module_entry);
-
-        module_entry->data = strdup(alias_entry->module);
-        assert(module_entry->data);
-
-        /* Find or insert the alias */
-        e.key = alias_entry->alias;
-        e.data = NULL;
-        result = hsearch_r(e, ENTER, &eptr, data->alias_table);
-        assert(result != 0);
-
-        if (eptr->data != NULL) {
-            /* The alias was already in the table. First, add this module name to the list in "data" */
-            TAILQ_INSERT_TAIL((string_list_t *) eptr->data, module_entry, items);
-
-            /* Now delete this duplicate alias entry from alias_list */
-            tmp = TAILQ_NEXT(alias_entry, items);
-            TAILQ_REMOVE(data->alias_list, alias_entry, items);
-
-            free(alias_entry->alias);
-            free(alias_entry->module);
-            free(alias_entry);
-
-            /* Advance past the deleted entry */
-            alias_entry = tmp;
-        } else {
-            /* The alias was not in the table, start a new module name list */
-            eptr->data = calloc(1, sizeof(string_list_t));
-            assert(eptr->data);
-
-            TAILQ_INIT((string_list_t *) eptr->data);
-            TAILQ_INSERT_TAIL((string_list_t *) eptr->data, module_entry, items);
-
-            /* Advance to the next entry */
-            alias_entry = TAILQ_NEXT(alias_entry, items);
+                TAILQ_INSERT_TAIL(r, entry, items);
+            }
         }
     }
 
-    return;
-}
-
-static string_list_t * wildcard_alias_search(const char *alias, const struct alias_list_t *after_aliases)
-{
-    string_list_t *result;
-    string_entry_t *entry;
-    struct alias_entry_t *iter;
-
-    result = calloc(1, sizeof(*result));
-    assert(result);
-    TAILQ_INIT(result);
-
-    TAILQ_FOREACH(iter, after_aliases, items) {
-        if (fnmatch(iter->alias, alias, 0) == 0) {
-            entry = calloc(1, sizeof(*entry));
-            assert(entry);
-
-            entry->data = strdup(iter->module);
-            assert(entry->data);
-
-            TAILQ_INSERT_TAIL(result, entry, items);
-        }
-    }
-
-    return result;
+    return r;
 }
 
 /*
@@ -443,17 +366,17 @@ static string_list_t * wildcard_alias_search(const char *alias, const struct ali
  */
 bool compare_module_aliases(kernel_alias_data_t *before, kernel_alias_data_t *after, module_alias_callback callback, void *user_data)
 {
-    struct alias_entry_t *iter;
-    string_list_t *before_modules;
-    string_list_t *after_modules;
-    string_list_t *difference;
+    kernel_alias_data_t *iter = NULL;
+    kernel_alias_data_t *tmp_iter = NULL;
+    kernel_alias_data_t *after_entry = NULL;
+    string_list_t *before_modules = NULL;
+    string_list_t *after_modules = NULL;
+    string_list_t *difference = NULL;
     string_list_t empty;
-    ENTRY e;
-    ENTRY *eptr;
-    bool wildcard_search;
+    bool wildcard_search = false;
     bool result = true;
 
-    assert(callback);
+    assert(callback != NULL);
 
     /* Before empty, nothing to check for */
     if (before == NULL) {
@@ -465,19 +388,9 @@ bool compare_module_aliases(kernel_alias_data_t *before, kernel_alias_data_t *af
         TAILQ_INIT(&empty);
     }
 
-    /* Gather the lists of aliases into hash tables, mapping an alias string to a string_list_t of module names. */
-    finalize_module_aliases(before);
-
-    if (after != NULL) {
-        finalize_module_aliases(after);
-    }
-
     /* For each alias in before, look for the matching alias in after */
-    TAILQ_FOREACH(iter, before->alias_list, items) {
-        e.key = iter->alias;
-        hsearch_r(e, FIND, &eptr, before->alias_table);
-        assert(eptr != NULL);
-        before_modules = (string_list_t *) eptr->data;
+    HASH_ITER(hh, before, iter, tmp_iter) {
+        before_modules = iter->modules;
 
         /*
          * If the after list was NULL, no need to do a wildcard search. Just call the
@@ -488,20 +401,20 @@ bool compare_module_aliases(kernel_alias_data_t *before, kernel_alias_data_t *af
             continue;
         }
 
-        hsearch_r(e, FIND, &eptr, after->alias_table);
+        HASH_FIND_STR(after, iter->alias, after_entry);
         wildcard_search = false;
 
         /* No match found, do a wildcard search */
-        if (eptr == NULL) {
-            after_modules = wildcard_alias_search(iter->alias, after->alias_list);
+        if (after_entry == NULL) {
+            after_modules = wildcard_alias_search(iter->alias, after);
             wildcard_search = true;
         } else {
-            after_modules = (string_list_t *) eptr->data;
+            after_modules = after_entry->modules;
             difference = list_difference(before_modules, after_modules);
 
             /* If the lists differ, do a wildcard search */
             if (difference != NULL && !TAILQ_EMPTY(difference)) {
-                after_modules = wildcard_alias_search(iter->alias, after->alias_list);
+                after_modules = wildcard_alias_search(iter->alias, after);
                 wildcard_search = true;
             }
 
