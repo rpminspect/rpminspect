@@ -25,8 +25,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <search.h>
-
+#include "uthash.h"
 #include "rpminspect.h"
 
 string_list_t *sorted_list = NULL;
@@ -307,32 +306,9 @@ void list_free(string_list_t *list, list_entry_data_free_func free_func)
     return;
 }
 
-static int compare_entries(const void *data1, const void *data2)
+static int compare_entries(string_map_t *data1, string_map_t *data2)
 {
-    const string_entry_t *entry1 = (const string_entry_t *) data1;
-    const string_entry_t *entry2 = (const string_entry_t *) data2;
-
-    return strcmp(entry1->data, entry2->data);
-}
-
-/* tdestroy can't just take NULL for the free_node parameter, it has to have a no-op function */
-static void do_nothing(void *nodep __attribute__((unused)))
-{
-    return;
-}
-
-/* define the twalk action as a nested function so we can get to the sorted_list */
-static void walk_action(const void *nodep, const VISIT which, const int depth __attribute__((unused)))
-{
-    string_entry_t *entry = *((string_entry_t **) nodep);
-    string_entry_t *sorted_entry;
-
-    if ((which == postorder) || (which == leaf)) {
-        sorted_entry = calloc(1, sizeof(*sorted_entry));
-        assert(sorted_entry != NULL);
-        sorted_entry->data = entry->data;
-        TAILQ_INSERT_TAIL(sorted_list, sorted_entry, items);
-    }
+    return strcmp(data1->key, data2->key);
 }
 
 /*
@@ -341,28 +317,42 @@ static void walk_action(const void *nodep, const VISIT which, const int depth __
  * The data pointers used by the sorted list entries are the same as those
  * used in the original list.
  */
-string_list_t * list_sort(const string_list_t *list)
+string_list_t *list_sort(const string_list_t *list)
 {
-    string_entry_t *iter;
-    void *tree = NULL;
+    string_list_t *sorted_list = NULL;
+    string_entry_t *iter = NULL;
+    string_map_t *map = NULL;
+    string_map_t *entry = NULL;
+    string_map_t *tmp_entry = NULL;
 
-    /* copy entries into a tree to sort */
+    /* create a sorted hash table of the entries */
     TAILQ_FOREACH(iter, list, items) {
-        if (tsearch(iter, &tree, compare_entries) == NULL) {
-            goto cleanup;
-        }
+        entry = calloc(1, sizeof(*entry));
+        assert(entry != NULL);
+        entry->key = strdup(iter->data);
+        assert(entry->key != NULL);
+        HASH_ADD_KEYPTR_INORDER(hh, map, &entry->key, strlen(entry->key), entry, compare_entries);
     }
 
-    /* walk the tree to create a new sorted list */
-    sorted_list = malloc(sizeof(*sorted_list));
+    /* build a new string_list_t from the sorted hash table */
+    sorted_list = calloc(1, sizeof(*sorted_list));
     assert(sorted_list != NULL);
     TAILQ_INIT(sorted_list);
-    twalk(tree, walk_action);
 
-cleanup:
-    /* Free the tree */
-    tdestroy(tree, do_nothing);
+    HASH_ITER(hh, map, entry, tmp_entry) {
+        HASH_DEL(map, entry);
 
+        iter = calloc(1, sizeof(*iter));
+        assert(iter != NULL);
+        iter->data = strdup(entry->key);
+        assert(iter->data != NULL);
+        TAILQ_INSERT_TAIL(sorted_list, iter, items);
+
+        free(entry->key);
+        free(entry);
+    }
+
+    free(map);
     return sorted_list;
 }
 
