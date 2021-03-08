@@ -2,7 +2,7 @@
 #
 # Build new releases in Koji
 #
-# Copyright (C) 2019-2020 David Cantrell <david.l.cantrell@gmail.com>
+# Copyright © 2019 David Cantrell <david.l.cantrell@gmail.com>
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by

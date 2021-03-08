@@ -6,7 +6,7 @@
 # give a general idea of expected runtime on the inspections and
 # downloading.
 #
-# Copyright (C) 2020 David Cantrell <dcantrell@redhat.com>
+# Copyright © 2020 David Cantrell <dcantrell@redhat.com>
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
