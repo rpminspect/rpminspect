@@ -4,7 +4,7 @@
 # git commits for the project.  Requires consistent usage of
 # tagging for releases.
 #
-# Copyright (C) 2019-2020 David Cantrell <david.l.cantrell@gmail.com>
+# Copyright © 2019 David Cantrell <david.l.cantrell@gmail.com>
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by

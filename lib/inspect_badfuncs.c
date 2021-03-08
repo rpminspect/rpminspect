@@ -1,7 +1,7 @@
 /*
- * Copyright (C) 2021  Red Hat, Inc.
- * Author(s):  David Shea <dshea@redhat.com>
- *             David Cantrell <dcantrell@redhat.com>
+ * Copyright © 2021 Red Hat, Inc.
+ * Author(s): David Shea <dshea@redhat.com>
+ *            David Cantrell <dcantrell@redhat.com>
  *
  * This program is free software: you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public License

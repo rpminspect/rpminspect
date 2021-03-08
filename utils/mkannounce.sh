@@ -4,7 +4,7 @@
 # blog post.  Groups git log summaries by category and only includes
 # those log entries that have a category marking.
 #
-# Copyright (C) 2021 David Cantrell <david.l.cantrell@gmail.com>
+# Copyright © 2021 David Cantrell <david.l.cantrell@gmail.com>
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
