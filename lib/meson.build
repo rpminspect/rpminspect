@@ -1,12 +1,15 @@
 # Generate inspect_elf_bits.c
+
+pic_bits = find_program('pic_bits.sh')
+
 inspect_elf_bits_c = custom_target(
-    'inspect_elf_bits.c',
+    'inspect_elf_bits_c',
     output : 'inspect_elf_bits.c',
-    input : 'pic_bits.sh',
-    command : ['@INPUT@', '@OUTPUT@'],
+    command : [ pic_bits, '@OUTPUT@' ],
+    install : false
 )
 
-inspect_elf_bits_dep = declare_dependency(sources : [inspect_elf_bits_c])
+inspect_elf_bits_dep = declare_dependency(sources : [ inspect_elf_bits_c ])
 
 # Build librpminspect
 librpminspect_sources = [
