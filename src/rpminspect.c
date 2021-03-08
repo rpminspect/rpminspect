@@ -91,7 +91,6 @@ static char *get_product_release(string_map_t *products, const favor_release_t f
     char *before_product = NULL;
     char *after_product = NULL;
     char *needle = NULL;
-    string_entry_t *entry = NULL;
     string_map_t *hentry = NULL;
     string_map_t *tmp_hentry = NULL;
     regex_t product_regex;
@@ -197,7 +196,7 @@ static char *get_product_release(string_map_t *products, const favor_release_t f
 
                 if (before_matches[0].rm_so > -1 && after_matches[0].rm_so > -1) {
                     matched = true;
-                    after_product = strdup(entry->data);
+                    after_product = strdup(hentry->key);
                 }
 
                 regfree(&product_regex);
