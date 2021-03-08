@@ -81,13 +81,13 @@ static bool pathmigration_driver(struct rpminspect *ri, rpmfile_entry_t *file)
         /*
          * Make sure the old path name ends with a slash.
          */
-        if (strsuffix(hentry->value, "/")) {
-            old = strdup(hentry->value);
+        if (strsuffix(hentry->key, "/")) {
+            old = strdup(hentry->key);
         } else {
-            xasprintf(&old, "%s/", hentry->value);
+            xasprintf(&old, "%s/", hentry->key);
         }
 
-        DEBUG_PRINT("old=|%s|, file->localpath=|%s|\n", old, file->localpath);
+        DEBUG_PRINT("hentry->key=|%s|, hentry->value=|%s|, old=|%s|, file->localpath=|%s|\n", hentry->key, hentry->value, old, file->localpath);
 
         /* Check to see if we found a path that should be migrated */
         if (strprefix(file->localpath, old)) {
