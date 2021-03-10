@@ -7,7 +7,6 @@ gcovr
 gettext
 ksh
 libarchive-dev
-libc-dev:i386
 libcap-dev
 libclamav-dev
 libcunit1-dev

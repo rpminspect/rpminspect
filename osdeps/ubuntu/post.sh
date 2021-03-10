@@ -1,6 +1,11 @@
 #!/bin/sh
 PATH=/bin:/usr/bin:/sbin:/usr/sbin
 
+# Install 32-bit development files on x86_64 systems
+if [ "$(uname -m)" = "x86_64" ]; then
+    apt-get -y install libc-dev:i386
+fi
+
 # Install kernel headers for the running kernel
 apt-get -y install linux-headers-$(uname -r)
 

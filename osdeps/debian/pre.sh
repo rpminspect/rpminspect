@@ -1,7 +1,10 @@
 #!/bin/sh
 PATH=/usr/local/bin:/bin:/usr/bin:/usr/local/sbin:/sbin:/usr/sbin
 
-dpkg --add-architecture i386
+if [ "$(uname -a)" = "x86_64" ]; then
+    dpkg --add-architecture i386
+fi
+
 apt-get -y install libterm-readline-perl-perl
 apt-get -y install lib32gcc-s1
 apt-get update
