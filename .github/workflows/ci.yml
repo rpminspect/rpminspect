@@ -18,6 +18,7 @@ on:
         - 'test/**'
 
 jobs:
+    # Fedora rawhide on x86_64
     fedora-rawhide:
         # This job runs in a Docker container of Fedora rawhide but
         # the host is 'ubuntu-latest' since that's what GitHub Actions
@@ -48,6 +49,7 @@ jobs:
                   ninja -C build -v
                   curl -s https://codecov.io/bash | bash
 
+    # Fedora stable release on x86_64
     fedora:
         # This job runs in a Docker container of the latest Fedora
         # stable release but the host is 'ubuntu-latest' since that's
@@ -85,4 +87,50 @@ jobs:
             - name: coverage
               run: |
                   ninja -C build coverage
+                  curl -s https://codecov.io/bash | bash
+
+    # Non-x86_64 architectures for Fedora, Ubuntu, Debian, Arch, and Alpine
+    other_arches:
+        # GitHub Actions offers Ubuntu to run the job.
+        runs-on: ubuntu-latest
+        name: Build and test on ${{ matrix.distro }} ${{ matrix.arch }}
+
+        # Run steps on a matrix of arch/distro combinations
+        strategy:
+            matrix:
+                include:
+                    - arch: ppc64le
+                    - distro: fedora_latest
+
+        # All of these steps run from within the main source
+        # directory, so think of that as your $PWD
+        steps:
+            # This means clone the git repo
+            - uses: actions/checkout@v2.1.0
+            - uses: uraimo/run-on-arch-action@v2.0.5
+              name: Build and test on ${{ matrix.distro }} ${{ matrix.arch }}
+              id: build_and_test
+              with:
+                  arch: ${{ matrix.arch }}
+                  distro: ${{ matrix.distro }}
+
+            # Within the container, install the build dependencies and
+            # test suite dependencies
+            - name: Install Build Dependencies
+              run: |
+                  case "${{ matrix.distro }}" in
+                      fedora*)
+                          dnf install -y make
+                          make instreqs
+                          ;;
+                  esac
+
+            # Set up the source tree to build
+            - name: setup
+              run: meson setup build --werror -Db_buildtype=debug -Db_coverage=true
+
+            # Compile the software
+            - name: build
+              run: |
+                  ninja -C build -v
                   curl -s https://codecov.io/bash | bash
