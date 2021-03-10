@@ -138,7 +138,7 @@ static int add_regex(const char *pattern, regex_t **regex_out)
         assert(errbuf != NULL);
 
         regerror(reg_result, *regex_out, errbuf, errbuf_size);
-        fprintf(stderr, _("*** Unable to compile regular expression %s: %s\n"), pattern, errbuf);
+        warn(errbuf);
 
         /* Clean up and return error */
         free(errbuf);
@@ -243,7 +243,7 @@ static mode_t parse_mode(const char *input) {
     assert(input != NULL);
 
     if (strlen(input) != 10) {
-        fprintf(stderr, _("*** Invalid input string `%s`\n"), input);
+        warn(_("*** Invalid input string `%s`"), input);
         return mode;
     }
 
@@ -270,7 +270,7 @@ static mode_t parse_mode(const char *input) {
         mode |= S_IFWHT;
 #endif
     } else if (i != '-') {
-        fprintf(stderr, _("*** Invalid mode string: %s\n"), input);
+        warnx(_("*** Invalid mode string: %s"), input);
         return mode;
     }
 
@@ -279,7 +279,7 @@ static mode_t parse_mode(const char *input) {
     if (i == 'r') {
         mode |= S_IRUSR;
     } else if (i != '-') {
-        fprintf(stderr, _("*** Invalid mode string: %s\n"), input);
+        warnx(_("*** Invalid mode string: %s"), input);
         return mode;
     }
 
@@ -287,7 +287,7 @@ static mode_t parse_mode(const char *input) {
     if (i == 'w') {
         mode |= S_IWUSR;
     } else if (i != '-') {
-        fprintf(stderr, _("*** Invalid mode string: %s\n"), input);
+        warnx(_("*** Invalid mode string: %s"), input);
         return mode;
     }
 
@@ -299,7 +299,7 @@ static mode_t parse_mode(const char *input) {
     } else if (i == 's') {
         mode |= S_IXUSR | S_ISUID;
     } else if (i != '-') {
-        fprintf(stderr, _("*** Invalid mode string: %s\n"), input);
+        warnx(_("*** Invalid mode string: %s"), input);
         return mode;
     }
 
@@ -308,7 +308,7 @@ static mode_t parse_mode(const char *input) {
     if (i == 'r') {
         mode |= S_IRGRP;
     } else if (i != '-') {
-        fprintf(stderr, _("*** Invalid mode string: %s\n"), input);
+        warnx(_("*** Invalid mode string: %s"), input);
         return mode;
     }
 
@@ -316,7 +316,7 @@ static mode_t parse_mode(const char *input) {
     if (i == 'w') {
         mode |= S_IWGRP;
     } else if (i != '-') {
-        fprintf(stderr, _("*** Invalid mode string: %s\n"), input);
+        warnx(_("*** Invalid mode string: %s"), input);
         return mode;
     }
 
@@ -328,7 +328,7 @@ static mode_t parse_mode(const char *input) {
     } else if (i == 's') {
         mode |= S_IXGRP | S_ISGID;
     } else if (i != '-') {
-        fprintf(stderr, _("*** Invalid mode string: %s\n"), input);
+        warnx(_("*** Invalid mode string: %s"), input);
         return mode;
     }
 
@@ -337,7 +337,7 @@ static mode_t parse_mode(const char *input) {
     if (i == 'r') {
         mode |= S_IROTH;
     } else if (i != '-') {
-        fprintf(stderr, _("*** Invalid mode string: %s\n"), input);
+        warnx(_("*** Invalid mode string: %s"), input);
         return mode;
     }
 
@@ -345,7 +345,7 @@ static mode_t parse_mode(const char *input) {
     if (i == 'w') {
         mode |= S_IWOTH;
     } else if (i != '-') {
-        fprintf(stderr, _("*** Invalid mode string: %s\n"), input);
+        warnx(_("*** Invalid mode string: %s"), input);
         return mode;
     }
 
@@ -357,7 +357,7 @@ static mode_t parse_mode(const char *input) {
     } else if (i == 't') {
         mode |= S_IXOTH | S_ISVTX;
     } else if (i != '-') {
-        fprintf(stderr, _("*** Invalid mode string: %s\n"), input);
+        warnx(_("*** Invalid mode string: %s"), input);
         return mode;
     }
 
@@ -387,15 +387,13 @@ static int read_cfgfile(struct rpminspect *ri, const char *filename)
 
     /* prepare a YAML parser */
     if (!yaml_parser_initialize(&parser)) {
-        fprintf(stderr, _("*** error initializing YAML parser for module metadata, unable to filter\n"));
-        fflush(stderr);
+        warn(_("yaml_parser_initialize()"));
         return -1;
     }
 
     /* open the config file */
     if ((fp = fopen(filename, "r")) == NULL) {
-        fprintf(stderr, _("*** error opening %s: %s\n"), filename, strerror(errno));
-        fflush(stderr);
+        warn(_("fopen()"));
         return -1;
     }
 
@@ -680,8 +678,7 @@ static int read_cfgfile(struct rpminspect *ri, const char *filename)
                                 ri->specmatch = MATCH_SUFFIX;
                             } else {
                                 ri->specmatch = MATCH_FULL;
-                                fprintf(stderr, "*** unknown specname match setting '%s', defaulting to 'full'\n", t);
-                                fflush(stderr);
+                                warnx(_("*** unknown specname match setting '%s', defaulting to 'full'"), t);
                             }
                         } else if (!strcmp(key, "primary")) {
                             if (!strcasecmp(t, "name")) {
@@ -690,8 +687,7 @@ static int read_cfgfile(struct rpminspect *ri, const char *filename)
                                 ri->specprimary = PRIMARY_FILENAME;
                             } else {
                                 ri->specprimary = PRIMARY_NAME;
-                                fprintf(stderr, "*** unknown specname primary setting '%s', defaulting to 'name'\n", t);
-                                fflush(stderr);
+                                warnx(_("*** unknown specname primary setting '%s', defaulting to 'name'"), t);
                             }
                         }
                     } else if (group == BLOCK_ELF) {
@@ -702,8 +698,7 @@ static int read_cfgfile(struct rpminspect *ri, const char *filename)
                             }
 
                             if (add_regex(t, &ri->elf_path_include) != 0) {
-                                fprintf(stderr, "*** error reading elf include path\n");
-                                fflush(stderr);
+                                warn(_("*** error reading elf include path"));
                             }
                         } else if (!strcmp(key, "exclude_path")) {
                             if (debug_mode) {
@@ -712,8 +707,7 @@ static int read_cfgfile(struct rpminspect *ri, const char *filename)
                             }
 
                             if (add_regex(t, &ri->elf_path_exclude) != 0) {
-                                fprintf(stderr, "*** error reading elf exclude path\n");
-                                fflush(stderr);
+                                warn(_("*** error reading elf exclude path"));
                             }
                         }
                     } else if (block == BLOCK_MANPAGE) {
@@ -724,8 +718,7 @@ static int read_cfgfile(struct rpminspect *ri, const char *filename)
                             }
 
                             if (add_regex(t, &ri->manpage_path_include) != 0) {
-                                fprintf(stderr, "*** error reading man page include path\n");
-                                fflush(stderr);
+                                warn(_("*** error reading man page include path"));
                             }
                         } else if (!strcmp(key, "exclude_path")) {
                             if (debug_mode) {
@@ -734,8 +727,7 @@ static int read_cfgfile(struct rpminspect *ri, const char *filename)
                             }
 
                             if (add_regex(t, &ri->manpage_path_exclude) != 0) {
-                                fprintf(stderr, "*** error reading man page exclude path\n");
-                                fflush(stderr);
+                                warn(_("*** error reading man page exclude path"));
                             }
                         }
                     } else if (block == BLOCK_XML) {
@@ -746,8 +738,7 @@ static int read_cfgfile(struct rpminspect *ri, const char *filename)
                             }
 
                             if (add_regex(t, &ri->xml_path_include) != 0) {
-                                fprintf(stderr, "*** error reading xml include path\n");
-                                fflush(stderr);
+                                warn(_("*** error reading xml include path"));
                             }
                         } else if (!strcmp(key, "exclude_path")) {
                             if (debug_mode) {
@@ -756,8 +747,7 @@ static int read_cfgfile(struct rpminspect *ri, const char *filename)
                             }
 
                             if (add_regex(t, &ri->xml_path_exclude) != 0) {
-                                fprintf(stderr, "*** error reading xml exclude path\n");
-                                fflush(stderr);
+                                warn(_("*** error reading xml exclude path"));
                             }
                         }
                     } else if (block == BLOCK_DESKTOP) {
@@ -797,14 +787,11 @@ static int read_cfgfile(struct rpminspect *ri, const char *filename)
                             exclude = true;
                         } else {
                             exclude = false;
-                            fprintf(stderr, "*** inspection flag must be 'on' or 'off', ignoring for '%s'\n", key);
-                            fflush(stderr);
+                            warnx(_("*** inspection flag must be 'on' or 'off', ignoring for '%s'"), key);
                         }
 
                         if (!process_inspection_flag(key, exclude, &ri->tests)) {
-                            fprintf(stderr, _("*** Unknown inspection: `%s`\n"), key);
-                            fflush(stderr);
-                            exit(RI_PROGRAM_ERROR);
+                            err(RI_PROGRAM_ERROR, _("*** Unknown inspection: `%s`"), key);
                         }
                     } else if (block == BLOCK_ABIDIFF) {
                         if (!strcmp(key, "suppression_file")) {
@@ -1013,9 +1000,9 @@ bool init_fileinfo(struct rpminspect *ri) {
 
                 if (*token == '\0') {
                     /* this is an invalid entry in the fileinfo list */
-                    fprintf(stderr, _("*** Invalid filename in the fileinfo list: %s\n"), fnpart);
-                    fprintf(stderr, _("*** From this invalid line:\n"));
-                    fprintf(stderr, "***     %s\n", line);
+                    warnx(_("*** Invalid filename in the fileinfo list: %s"), fnpart);
+                    warnx(_("*** From this invalid line:"));
+                    warnx(_("***     %s"), line);
 
                     free(fientry->owner);
                     free(fientry->group);
