@@ -3,276 +3,70 @@ name: Extra CI
 on:
     push:
         branches: [ master ]
-        paths:
-        - '.github/**'
-        - 'osdeps/**'
-        - 'lib/**'
-        - 'src/**'
-        - 'include/**'
-        - 'test/**'
+        paths-ignore:
+        - 'contrib/**'
+        - 'data/**'
+        - 'doc/**'
+        - 'po/**'
+        - 'regress/**'
+        - 'utils/**'
 
 jobs:
-    debian-testing:
-        # This job runs in a Docker container of the latest Debian
-        # testing release but the host is 'ubuntu-latest' since that's
-        # what GitHub Actions offers that's Linux.
+    x86_64:
+        # Use containers on their ubuntu latest image
         runs-on: ubuntu-latest
-        container: debian:testing
+
+        # Set up the matrix of distributions to test
+        strategy:
+            matrix:
+                container: ["debian:testing", "debian:stable", "ubuntu", "opensuse/leap", "centos:centos8", "centos:centos7", "gentoo/stage3"]
+
+        container:
+            image: ${{ matrix.container }}
 
         # All of these steps run from within the main source
         # directory, so think of that as your $PWD
         steps:
-            # This means clone the git repo
-            - uses: actions/checkout@v2
-
-            # Within the container, install the build dependencies and
-            # test suite dependencies
-            - name: Install Build Dependencies
+            # Requirements before the git clone can happen
+            - name: git clone requirements
               run: |
-                  apt-get update
-                  apt-get -y install make
+                  case "${{ matrix.container }}" in
+                      opensuse*)
+                          zypper install -y tar gzip
+                          ;;
+                      gentoo*)
+                          emerge-webrsync
+                          emerge dev-vcs/git
+                          ;;
+                  esac
+
+            # This means clone the git repo
+            - uses: actions/checkout@v2.1.0
+
+            # Within the container, install the dependencies, build,
+            # and run the test suite
+            - name: Build and run the test suite
+              run: |
+                  case "${{ matrix.container }}" in
+                      debian*|ubuntu*)
+                          apt-get update
+                          apt-get -y install make
+                          ;;
+                      centos*)
+                          rpm --import /etc/pkg/rpm-gpg/*
+                          dnf install -y epel-release make
+                          ;;
+                      opensuse*)
+                          zypper install -y make
+                          ;;
+                  esac
                   make instreqs
-
-            # Set up the source tree to build
-            - name: setup
-              run: meson setup build --werror -Db_buildtype=debug -Db_coverage=true
-
-            # Compile the software
-            - name: build
-              run: ninja -C build -v
-
-            # Run the test suite
-            - name: test
-              run: meson test -C build -v
-
-            # Generate code coverage reports (requires
-            # -Db_coverage=true on 'meson setup')
-            - name: coverage
-              run: |
+                  meson setup build --werror -Db_buildtype=debug -Db_coverage=true
+                  ninja -C build -v
+                  meson test -C build -v
                   ninja -C build coverage
                   curl -s https://codecov.io/bash | bash
 
-    ubuntu:
-        # This job runs directly on the Ubuntu host provided by GitHub Actions
-        runs-on: ubuntu-latest
-
-        # All of these steps run from within the main source
-        # directory, so think of that as your $PWD
-        steps:
-            # This means clone the git repo
-            - uses: actions/checkout@v2
-
-            # Within the container, install the build dependencies and
-            # test suite dependencies
-            - name: Install Build Dependencies
-              run: |
-                  sudo apt-get update
-                  sudo apt-get -y install make
-                  sudo make instreqs
-
-            # Set up the source tree to build
-            - name: setup
-              run: meson setup build --werror -Db_buildtype=debug -Db_coverage=true
-
-            # Compile the software
-            - name: build
-              run: ninja -C build -v
-
-            # Run the test suite
-            - name: test
-              run: meson test -C build -v
-
-            # Generate code coverage reports (requires
-            # -Db_coverage=true on 'meson setup')
-            - name: coverage
-              run: |
-                  ninja -C build coverage
-                  curl -s https://codecov.io/bash | bash
-
-    opensuse-leap:
-        # This job runs in a Docker container of OpenSUSE Leap but the
-        # host is 'ubuntu-latest' since that's what GitHub Actions
-        # offers that's Linux.
-        runs-on: ubuntu-latest
-        container: opensuse/leap
-
-        # All of these steps run from within the main source
-        # directory, so think of that as your $PWD
-        steps:
-            # Install required packages for the git checkout action
-            - name: Install required git checkout packages
-              run: zypper install -y tar gzip
-
-            # This means clone the git repo
-            - uses: actions/checkout@v2
-
-            # Within the container, install the build dependencies and
-            # test suite dependencies
-            - name: Install Build Dependencies
-              run: |
-                  zypper install -y make
-                  make instreqs
-
-            # Set up the source tree to build
-            - name: setup
-              run: meson setup build --werror -Db_buildtype=debug -Db_coverage=true
-
-            # Compile the software
-            - name: build
-              run: ninja -C build -v
-
-            # Run the test suite
-            - name: test
-              run: meson test -C build -v
-
-            # Generate code coverage reports (requires
-            # -Db_coverage=true on 'meson setup')
-            - name: coverage
-              run: |
-                  ninja -C build coverage
-                  curl -s https://codecov.io/bash | bash
-
-#    opensuse-tumbleweed:
-#        # This job runs in a Docker container of OpenSUSE Tumbleweed
-#        # but the host is 'ubuntu-latest' since that's what GitHub
-#        # Actions offers that's Linux.
-#        runs-on: ubuntu-latest
-#        container: opensuse/tumbleweed
-#
-#        # All of these steps run from within the main source
-#        # directory, so think of that as your $PWD
-#        steps:
-#            # Install required packages for the git checkout action
-#            - name: Install required git checkout packages
-#              run: zypper install -y git busybox systemd-sysvinit tar gzip
-#
-#            # This means clone the git repo
-#            - uses: actions/checkout@v2
-#
-#            # Within the container, install the build dependencies and
-#            # test suite dependencies
-#            - name: Install Build Dependencies
-#              run: |
-#                  zypper install -y make
-#                  make instreqs
-#
-#            # Set up the source tree to build
-#            - name: setup
-#              run: meson setup build --werror -Db_buildtype=debug -Db_coverage=true
-#
-#            # Compile the software
-#            - name: build
-#              run: ninja -C build -v
-#
-#            # Run the test suite
-#            - name: test
-#              run: meson test -C build -v
-#
-#            # Generate code coverage reports (requires
-#            # -Db_coverage=true on 'meson setup')
-#            - name: coverage
-#              run: |
-#                  ninja -C build coverage
-#                  curl -s https://codecov.io/bash | bash
-
-    centos8:
-        # This job runs in a Docker container of the latest CentOS 8
-        # but the host is 'ubuntu-latest' since that's what GitHub
-        # Actions offers that's Linux.
-        runs-on: ubuntu-latest
-        container: centos:centos8
-
-        # All of these steps run from within the main source
-        # directory, so think of that as your $PWD
-        steps:
-            # Update the image
-            - name: dnf upgrade
-              run: |
-                  dnf -y upgrade
-                  dnf clean all
-
-            # This means clone the git repo
-            - uses: actions/checkout@v2
-
-            # CentOS does not provide everything we need, enable EPEL
-            - name: Add EPEL
-              run: dnf install -y epel-release
-
-            # Within the container, install the build dependencies and
-            # test suite dependencies
-            - name: Install Build Dependencies
-              run: |
-                  dnf install -y make
-                  make instreqs
-
-            # Set up the source tree to build
-            - name: setup
-              run: meson setup build --werror -Db_buildtype=debug -Db_coverage=true
-
-            # Compile the software
-            - name: build
-              run: ninja -C build -v
-
-            # Run the test suite
-            - name: test
-              run: meson test -C build -v
-
-            # Generate code coverage reports (requires
-            # -Db_coverage=true on 'meson setup')
-            - name: coverage
-              run: |
-                  ninja -C build coverage
-                  curl -s https://codecov.io/bash | bash
-
-    centos7:
-        # This job runs in a Docker container of the latest CentOS 7
-        # but the host is 'ubuntu-latest' since that's what GitHub
-        # Actions offers that's Linux.
-        runs-on: ubuntu-latest
-        container: centos:centos7
-
-        # All of these steps run from within the main source
-        # directory, so think of that as your $PWD
-        steps:
-            # Update the image
-            - name: yum update
-              run: |
-                  yum -y update
-                  yum clean all
-
-            # This means clone the git repo
-            - uses: actions/checkout@v2
-
-            # CentOS does not provide everything we need, enable EPEL
-            - name: Add EPEL
-              run: yum install -y epel-release
-
-            # Within the container, install the build dependencies and
-            # test suite dependencies
-            - name: Install Build Dependencies
-              run: |
-                  rpm --import /etc/pki/rpm-gpg/*
-                  yum install -y make
-                  make instreqs
-
-            # Set up the source tree to build
-            - name: setup
-              run: meson setup build --werror -Db_buildtype=debug -Db_coverage=true
-
-            # Compile the software
-            - name: build
-              run: ninja -C build -v
-
-            # Run the test suite
-            - name: test
-              run: meson test -C build -v
-
-            # Generate code coverage reports (requires
-            # -Db_coverage=true on 'meson setup')
-            - name: coverage
-              run: |
-                  ninja -C build coverage
-                  curl -s https://codecov.io/bash | bash
 
 #    archlinux:
 #        # This job runs in a Docker container of the latest Arch Linux
@@ -321,50 +115,47 @@ jobs:
 #                  ninja -C build coverage
 #                  curl -s https://codecov.io/bash | bash
 
-    gentoo:
-        # This job runs in a Docker container of the latest Gentoo
-        # Linux but the host is 'ubuntu-latest' since that's what
-        # GitHub Actions offers that's Linux.
-        runs-on: ubuntu-latest
-        container: gentoo/stage3
 
-        # All of these steps run from within the main source
-        # directory, so think of that as your $PWD
-        steps:
-            # Update package repos
-            # (avoid running 'emerge -uDN world' because the Docker
-            # image is likely up to date enough for the purposes of
-            # CI)
-            - name: emerge-webrsync
-              run: emerge-webrsync
 
-            # Install Build Dependencies - Part I
-            - name: emerge dev-vcs/git
-              run: emerge dev-vcs/git
-
-            # This means clone the git repo
-            - uses: actions/checkout@v2
-
-            # Within the container, install the build dependencies and
-            # test suite dependencies
-            - name: Install Build Dependencies - Part II
-              run: make instreqs
-
-            # Set up the source tree to build
-            - name: setup
-              run: meson setup build --werror -Db_buildtype=debug -Db_coverage=true
-
-            # Compile the software
-            - name: build
-              run: ninja -C build -v
-
-            # Run the test suite
-            - name: test
-              run: meson test -C build -v
-
-            # Generate code coverage reports (requires
-            # -Db_coverage=true on 'meson setup')
-            - name: coverage
-              run: |
-                  ninja -C build coverage
-                  curl -s https://codecov.io/bash | bash
+#    opensuse-tumbleweed:
+#        # This job runs in a Docker container of OpenSUSE Tumbleweed
+#        # but the host is 'ubuntu-latest' since that's what GitHub
+#        # Actions offers that's Linux.
+#        runs-on: ubuntu-latest
+#        container: opensuse/tumbleweed
+#
+#        # All of these steps run from within the main source
+#        # directory, so think of that as your $PWD
+#        steps:
+#            # Install required packages for the git checkout action
+#            - name: Install required git checkout packages
+#              run: zypper install -y git busybox systemd-sysvinit tar gzip
+#
+#            # This means clone the git repo
+#            - uses: actions/checkout@v2
+#
+#            # Within the container, install the build dependencies and
+#            # test suite dependencies
+#            - name: Install Build Dependencies
+#              run: |
+#                  zypper install -y make
+#                  make instreqs
+#
+#            # Set up the source tree to build
+#            - name: setup
+#              run: meson setup build --werror -Db_buildtype=debug -Db_coverage=true
+#
+#            # Compile the software
+#            - name: build
+#              run: ninja -C build -v
+#
+#            # Run the test suite
+#            - name: test
+#              run: meson test -C build -v
+#
+#            # Generate code coverage reports (requires
+#            # -Db_coverage=true on 'meson setup')
+#            - name: coverage
+#              run: |
+#                  ninja -C build coverage
+#                  curl -s https://codecov.io/bash | bash
