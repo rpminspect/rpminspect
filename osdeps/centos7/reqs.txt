@@ -15,8 +15,6 @@ gettext
 gettext-devel
 git
 glibc-devel
-glibc-devel.i686
-glibc.i686
 html401-dtds
 json-c-devel
 kernel-core
@@ -28,7 +26,6 @@ libarchive-devel
 libcap-devel
 libcurl-devel
 libffi-devel
-libgcc.i686
 libmandoc-devel
 libxml2-devel
 libyaml-devel
