@@ -53,8 +53,8 @@ jobs:
                           apt-get -y install make
                           ;;
                       centos*)
-                          rpm --import /etc/pkg/rpm-gpg/*
-                          dnf install -y epel-release make
+                          yum install -y epel-release make
+                          rpm --import /etc/pki/rpm-gpg/*
                           ;;
                       opensuse*)
                           zypper install -y make
