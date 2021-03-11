@@ -76,13 +76,8 @@ jobs:
         # Run steps on a matrix of arch/distro combinations
         strategy:
             matrix:
-                include:
-                    - arch: aarch64
-                      distro: fedora_latest
-                    - arch: ppc64le
-                      distro: fedora_latest
-                    - arch: s390x
-                      distro: fedora_latest
+                arch: ["aarch64", "ppc64le", "s390x"]
+                distro: ["fedora_latest"]
 
         # All of these steps run from within the main source
         # directory, so think of that as your $PWD
@@ -90,7 +85,6 @@ jobs:
             # This means clone the git repo
             - uses: actions/checkout@v2.1.0
             - uses: uraimo/run-on-arch-action@v2.0.5
-              name: buildtest
               id: buildtest
               timeout-minutes: 500
               with:
@@ -119,7 +113,7 @@ jobs:
                       make instreqs
                       meson setup build --werror -Db_buildtype=debug -Db_coverage=true
                       ninja -C build -v
-                      /bin/ls -1 tests/test_*.py | while read tname ; do
+                      /bin/ls -1 test/test_*.py | while read tname ; do
                           tname="$(basename ${tname} .py | cut -d '_' -f 2)"
                           make check ${tname} || exit 1
                       done
