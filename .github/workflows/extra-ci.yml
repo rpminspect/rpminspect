@@ -19,8 +19,8 @@ jobs:
         # Set up the matrix of distributions to test
         strategy:
             matrix:
-#                container: ["ubuntu", "opensuse/leap", "centos:centos7", "gentoo/stage3"]
-                container: ["centos:centos8", "debian:stable", "debian:stable"]
+#                container: ["ubuntu", "opensuse/leap", "gentoo/stage3"]
+                container: ["centos:centos8", "centos:centos7", "debian:stable", "debian:testing"]
 
         container:
             image: ${{ matrix.container }}
