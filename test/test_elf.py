@@ -17,6 +17,8 @@
 #
 
 import os
+import subprocess
+import unittest
 
 import rpmfluff
 
@@ -40,6 +42,25 @@ double exponent(double x, double y)
     return pow(x, y);
 }
 """
+
+# Figure out if the system is 32-bit capable or not
+have_gcc_multilib = False
+args = ["gcc", "-print-multi-lib"]
+proc = subprocess.Popen(args, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+(out, err) = proc.communicate()
+
+if proc.returncode == 0 and str(out).find('@m32') != -1:
+    have_gcc_multilib = True
+
+
+# Simple way to figure out if we are musl or glibc
+have_musl_libc = False
+args = ["patchelf", "--print-interpreter", "/sbin/init"]
+proc = subprocess.Popen(args, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+(out, err) = proc.communicate()
+
+if proc.returncode == 0 and str(out).find('ld-musl') != -1:
+    have_musl_libc = True
 
 
 # Program built with noexecstack
@@ -176,6 +197,7 @@ class FulltoPartialRELROCompareKoji(TestCompareKoji):
 
 # Program lost -D_FORTIFY_SOURCE
 class LostFortifySourceCompareRPMs(TestCompareRPMs):
+    @unittest.skipIf(have_musl_libc, "musl libc lacks _FORTIFY_SOURCE support")
     def setUp(self):
         TestCompareRPMs.setUp(self)
 
@@ -195,6 +217,7 @@ class LostFortifySourceCompareRPMs(TestCompareRPMs):
 
 
 class LostFortifySourceCompareKoji(TestCompareKoji):
+    @unittest.skipIf(have_musl_libc, "musl libc lacks _FORTIFY_SOURCE support")
     def setUp(self):
         TestCompareKoji.setUp(self)
 
@@ -284,6 +307,7 @@ class LostPICCompareKoji(TestCompareKoji):
 
 # Program has or gained TEXTREL relocations (32-bit arches only)
 class HasTEXTRELRPMs(TestRPMs):
+    @unittest.skipUnless(have_gcc_multilib, "gcc lacks multilib (-m32) support")
     def setUp(self):
         TestRPMs.setUp(self)
 
@@ -307,6 +331,7 @@ class HasTEXTRELRPMs(TestRPMs):
 
 
 class HasTEXTRELCompareRPMs(TestCompareRPMs):
+    @unittest.skipUnless(have_gcc_multilib, "gcc lacks multilib (-m32) support")
     def setUp(self):
         TestCompareRPMs.setUp(self)
 
@@ -348,6 +373,7 @@ class HasTEXTRELCompareRPMs(TestCompareRPMs):
 
 
 class HasTEXTRELCompareKoji(TestCompareKoji):
+    @unittest.skipUnless(have_gcc_multilib, "gcc lacks multilib (-m32) support")
     def setUp(self):
         TestCompareKoji.setUp(self)
 
