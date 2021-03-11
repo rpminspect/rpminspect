@@ -49,7 +49,7 @@ args = ["gcc", "-print-multi-lib"]
 proc = subprocess.Popen(args, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 (out, err) = proc.communicate()
 
-if proc.returncode == 0 and str(out).find('@m32') != -1:
+if proc.returncode == 0 and str(out).find("@m32") != -1:
     have_gcc_multilib = True
 
 
@@ -59,7 +59,7 @@ args = ["patchelf", "--print-interpreter", "/sbin/init"]
 proc = subprocess.Popen(args, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 (out, err) = proc.communicate()
 
-if proc.returncode == 0 and str(out).find('ld-musl') != -1:
+if proc.returncode == 0 and str(out).find("ld-musl") != -1:
     have_musl_libc = True
 
 
@@ -238,6 +238,7 @@ class LostFortifySourceCompareKoji(TestCompareKoji):
 
 # Program lost -fPIC in after (BAD, WAIVABLE_BY_SECURITY)
 class LostPICCompareRPMs(TestCompareRPMs):
+    @unittest.skipUnless(have_gcc_multilib, "gcc lacks multilib (-m32) support")
     def setUp(self):
         TestCompareRPMs.setUp(self)
 
@@ -272,6 +273,7 @@ class LostPICCompareRPMs(TestCompareRPMs):
 
 
 class LostPICCompareKoji(TestCompareKoji):
+    @unittest.skipUnless(have_gcc_multilib, "gcc lacks multilib (-m32) support")
     def setUp(self):
         TestCompareKoji.setUp(self)
 
