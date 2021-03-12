@@ -2,7 +2,6 @@ abigail-tools
 clamav
 desktop-file-utils
 gcc
-gcc-multilib
 gcovr
 gettext
 ksh
