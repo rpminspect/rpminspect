@@ -4,7 +4,7 @@ PATH=/bin:/usr/bin:/sbin:/usr/sbin
 # Install 32-bit development files on 64-bit systems when available
 case "$(uname -m)" in
     x86_64)
-        apt-get -y install gcc-multilib libc-dev:i386
+        apt-get -y install gcc-multilib libc6-dev:i386
         ;;
     s390x)
         apt-get -y install gcc-multilib
