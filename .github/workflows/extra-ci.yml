@@ -77,7 +77,7 @@ jobs:
         strategy:
             matrix:
                 arch: ["aarch64", "ppc64le", "s390x"]
-                distro: ["fedora_latest", "stretch", "buster"]
+                distro: ["fedora_latest", "stretch"]
 
         # All of these steps run from within the main source
         # directory, so think of that as your $PWD
