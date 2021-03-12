@@ -77,7 +77,7 @@ jobs:
         strategy:
             matrix:
                 arch: ["aarch64", "ppc64le", "s390x"]
-                distro: ["fedora_latest"]
+                distro: ["fedora_latest", "stretch", "buster"]
 
         # All of these steps run from within the main source
         # directory, so think of that as your $PWD
@@ -108,16 +108,21 @@ jobs:
                               ;;
                       esac
 
-                  # Build the software and run the test suite
+                  # Build the software but skip the test.  The test
+                  # suite takes way too long to run in the emulated
+                  # environment.  If you want to run it in this
+                  # emulated environment, you need to do it this way:
+                  #
+                  #    /bin/ls -1 test/test_*.py | while read tname ; do
+                  #        tname="$(basename ${tname} .py | cut -d '_' -f 2)"
+                  #        make check ${tname} || exit 1
+                  #    done
+                  #    curl -s https://codecov.io/bash | bash
+                  #
                   run: |
                       make instreqs
                       meson setup build --werror -Db_buildtype=debug -Db_coverage=true
                       ninja -C build -v
-                      /bin/ls -1 test/test_*.py | while read tname ; do
-                          tname="$(basename ${tname} .py | cut -d '_' -f 2)"
-                          make check ${tname} || exit 1
-                      done
-                      curl -s https://codecov.io/bash | bash
 
 
 #    archlinux:
