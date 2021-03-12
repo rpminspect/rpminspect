@@ -44,7 +44,7 @@ make install
 cd ${CWD}
 rm -rf rc
 
-# Install libabigail from AUR
+# Install libabigail from git
 cd ${CWD}
 git clone git://sourceware.org/git/libabigail.git
 cd libabigail
