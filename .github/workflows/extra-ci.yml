@@ -20,7 +20,8 @@ jobs:
         strategy:
             matrix:
 #                container: ["ubuntu"]
-                container: ["centos:centos8", "centos:centos7", "debian:stable", "debian:testing", "opensuse/leap", "gentoo/stage3"]
+#                container: ["centos:centos8", "centos:centos7", "debian:stable", "debian:testing", "opensuse/leap", "gentoo/stage3"]
+                container: ["centos:centos8", "centos:centos7", "opensuse/leap", "gentoo/stage3"]
 
         container:
             image: ${{ matrix.container }}
@@ -77,7 +78,7 @@ jobs:
         strategy:
             matrix:
                 arch: ["aarch64", "ppc64le", "s390x"]
-                distro: ["fedora_latest", "stretch"]
+                distro: ["fedora_latest"]
 
         # All of these steps run from within the main source
         # directory, so think of that as your $PWD
