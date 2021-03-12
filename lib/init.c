@@ -378,6 +378,7 @@ static int read_cfgfile(struct rpminspect *ri, const char *filename)
     int symbol = SYMBOL_NULL;
     int block = BLOCK_NULL;
     int group = BLOCK_NULL;
+    unsigned int level = 0;
     char *key = NULL;
     char *t = NULL;
     bool exclude = false;
@@ -432,8 +433,28 @@ static int read_cfgfile(struct rpminspect *ri, const char *filename)
                     read_list = false;
                 }
 
+                /*
+                 * Go back up a level until we are at level 1.  The
+                 * variable is initialized to 0 though we don't really
+                 * use that level.  libyaml throws out two
+                 * YAML_BLOCK_END_TOKENs when reading a stream.  The
+                 * first one can be ignored so level 1 becomes our
+                 * effective top level.
+                 */
+                if (level > 1) {
+                    level--;
+                }
+
+                /* At the top?  Reset all block indicators. */
+                if (level == 1) {
+                    block = BLOCK_NULL;
+                    group = BLOCK_NULL;
+                }
+
                 break;
             case YAML_BLOCK_MAPPING_START_TOKEN:
+                /* YAML is all endless blocks */
+                level++;
                 break;
             case YAML_SCALAR_TOKEN:
                 /* convert the value to a string for comparison and copying */
