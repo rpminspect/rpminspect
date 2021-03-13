@@ -445,10 +445,9 @@ static int read_cfgfile(struct rpminspect *ri, const char *filename)
                     level--;
                 }
 
-                /* At the top?  Reset all block indicators. */
+                /* At the top?  Reset block indicator. */
                 if (level == 1) {
                     block = BLOCK_NULL;
-                    group = BLOCK_NULL;
                 }
 
                 break;
@@ -478,8 +477,8 @@ static int read_cfgfile(struct rpminspect *ri, const char *filename)
                         block = BLOCK_INSPECTIONS;
                         group = BLOCK_NULL;
                     } else if (!strcmp(key, "products")) {
-                        block = BLOCK_PRODUCTS;
-                        group = BLOCK_NULL;
+                        block = BLOCK_NULL;
+                        group = BLOCK_PRODUCTS;
                     } else if (!strcmp(key, "ignore")) {
                         block = BLOCK_IGNORE;
                         group = BLOCK_NULL;
@@ -561,11 +560,11 @@ static int read_cfgfile(struct rpminspect *ri, const char *filename)
                     key = strdup(t);
 
                     /* handle group subsection blocks here rather than above */
-                    if (group == BLOCK_PATHMIGRATION) {
+                    if (group == BLOCK_PATHMIGRATION || group == BLOCK_MIGRATED_PATHS || group == BLOCK_PATHMIGRATION_EXCLUDED_PATHS) {
                         if (!strcmp(key, "migrated_paths")) {
-                            block = BLOCK_MIGRATED_PATHS;
+                            group = BLOCK_MIGRATED_PATHS;
                         } else if (!strcmp(key, "excluded_paths")) {
-                            block = BLOCK_PATHMIGRATION_EXCLUDED_PATHS;
+                            group = BLOCK_PATHMIGRATION_EXCLUDED_PATHS;
                         }
                     } else if (group == BLOCK_METADATA) {
                         if (!strcmp(key, "buildhost_subdomain")) {
@@ -797,9 +796,9 @@ static int read_cfgfile(struct rpminspect *ri, const char *filename)
                         process_table(key, t, &ri->annocheck);
                     } else if (block == BLOCK_JAVABYTECODE) {
                         process_table(key, t, &ri->jvm);
-                    } else if (block == BLOCK_MIGRATED_PATHS) {
+                    } else if (group == BLOCK_MIGRATED_PATHS) {
                         process_table(key, t, &ri->pathmigration);
-                    } else if (block == BLOCK_PRODUCTS) {
+                    } else if (group == BLOCK_PRODUCTS) {
                         process_table(key, t, &ri->products);
                     } else if (block == BLOCK_INSPECTIONS) {
                         if (!strcasecmp(t, "on")) {
@@ -904,7 +903,7 @@ static int read_cfgfile(struct rpminspect *ri, const char *filename)
                         add_entry(&ri->kernel_filenames, t);
                     } else if (block == BLOCK_PATCH_FILENAMES) {
                         add_entry(&ri->patch_ignore_list, t);
-                    } else if (block == BLOCK_PATHMIGRATION_EXCLUDED_PATHS) {
+                    } else if (group == BLOCK_PATHMIGRATION_EXCLUDED_PATHS) {
                         add_entry(&ri->pathmigration_excluded_paths, t);
                     } else if (block == BLOCK_RUNPATH_ALLOWED_PATHS) {
                         add_entry(&ri->runpath_allowed_paths, t);
