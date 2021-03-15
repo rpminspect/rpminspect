@@ -36,6 +36,7 @@
 #include <sys/types.h>
 #include <fcntl.h>
 #include <errno.h>
+#include <err.h>
 #include <assert.h>
 #include <openssl/md5.h>
 #include <openssl/sha.h>
@@ -83,8 +84,7 @@ char *compute_checksum(const char *filename, mode_t *st_mode, enum checksum type
     /* don't calculate the checksum of a device node */
     if (S_ISCHR(*mode) || S_ISBLK(*mode) ||
         S_ISFIFO(*mode) || S_ISSOCK(*mode)) {
-        fprintf(stderr, _("*** Cannot calculate checksum on devices or fifos: %s\n"), filename);
-        fflush(stderr);
+        warnx(_("%s is a FIFO"), filename);
         return NULL;
     }
 
@@ -108,14 +108,12 @@ char *compute_checksum(const char *filename, mode_t *st_mode, enum checksum type
 
     /* read in the file to generate the requested checksum */
     if ((input = open(filename, O_RDONLY)) == -1) {
-        fprintf(stderr, _("*** Unable to open %s: %s\n"), filename, strerror(errno));
-        fflush(stderr);
+        warn("open()");
         return NULL;
     }
 
     if ((len = read(input, buf, sizeof(buf))) == -1) {
-        fprintf(stderr, "%s (%d): %s\n", __func__, __LINE__, strerror(errno));
-        fflush(stderr);
+        warn("read()");
         return NULL;
     }
 
@@ -132,15 +130,13 @@ char *compute_checksum(const char *filename, mode_t *st_mode, enum checksum type
         }
 
         if ((len = read(input, buf, sizeof(buf))) == -1) {
-            fprintf(stderr, "%s (%d): %s\n", __func__, __LINE__, strerror(errno));
-            fflush(stderr);
+            warn("read()");
             return NULL;
         }
     }
 
     if (close(input) == -1) {
-        fprintf(stderr, "%s (%d): %s\n", __func__, __LINE__, strerror(errno));
-        fflush(stderr);
+        warn("close()");
         return NULL;
     }
 
@@ -171,8 +167,7 @@ char *compute_checksum(const char *filename, mode_t *st_mode, enum checksum type
 
     /* this is our human readable digest, caller must free */
     if ((ret = calloc(len + 1, sizeof(char *))) == NULL) {
-        fprintf(stderr, "%s (%d): %s\n", __func__, __LINE__, strerror(errno));
-        fflush(stderr);
+        warn("calloc()");
         return NULL;
     }
 

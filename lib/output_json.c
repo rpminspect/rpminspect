@@ -22,6 +22,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <errno.h>
+#include <err.h>
 #include <assert.h>
 #include <json.h>
 
@@ -95,8 +96,7 @@ void output_json(const results_t *results, const char *dest, __attribute__((unus
         fp = fopen(dest, "w");
 
         if (fp == NULL) {
-            fprintf(stderr, _("*** Error opening %s for writing: %s\n"), dest, strerror(errno));
-            fflush(stderr);
+            warn(_("error opening %s for writing"), dest);
             return;
         }
     }

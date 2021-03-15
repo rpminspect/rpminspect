@@ -179,7 +179,7 @@ rpmfile_t *extract_rpm(const char *pkg, Header hdr, char **output_dir)
     }
 
     if (mkdir(*output_dir, S_IRWXU | S_IRGRP | S_IXGRP | S_IROTH | S_IXOTH) == -1) {
-        warn(_("*** mkdir(%s)"), *output_dir);
+        warn("mkdir()");
         return NULL;
     }
 
@@ -208,7 +208,7 @@ rpmfile_t *extract_rpm(const char *pkg, Header hdr, char **output_dir)
         rpm_path = rpmtdNextString(td);
 
         if (rpm_path == NULL) {
-            warn(_("*** error reading RPM metadata for %s"), pkg);
+            warn("rpmtdNextString()");
             goto cleanup;
         }
 
@@ -231,7 +231,7 @@ rpmfile_t *extract_rpm(const char *pkg, Header hdr, char **output_dir)
     archive_read_support_format_all(archive);
 
     if (archive_read_open_filename(archive, pkg, 10240) != ARCHIVE_OK) {
-        warn(_("*** unable to open %s with libarchive: %s"), pkg, archive_error_string(archive));
+        warn("archive_read_open_filename()");
         goto cleanup;
     }
 
@@ -246,7 +246,7 @@ rpmfile_t *extract_rpm(const char *pkg, Header hdr, char **output_dir)
         }
 
         if (archive_result != ARCHIVE_OK) {
-            warn(_("*** error reading from archive %s: %s"), pkg, archive_error_string(archive));
+            warn("archive_read_next_header()");
             free_files(file_list);
             file_list = NULL;
             goto cleanup;
@@ -315,7 +315,7 @@ rpmfile_t *extract_rpm(const char *pkg, Header hdr, char **output_dir)
 
         /* Write the file to disk */
         if (archive_read_extract(archive, entry, archive_flags) != ARCHIVE_OK) {
-            warn(_("*** error extracting %s: %s"), pkg, archive_error_string(archive));
+            warn("archive_read_extract()");
             free_files(file_list);
             file_list = NULL;
             goto cleanup;
@@ -809,14 +809,14 @@ cap_t get_cap(rpmfile_entry_t *file)
 
     /* Gather capabilities(7) for the file we need */
     if ((fd = open(file->fullpath, O_RDONLY)) == -1) {
-        fprintf(stderr, _("*** unable to open() %s on %s: %s\n"), file->localpath, arch, strerror(errno));
+        warn("open()");
         return NULL;
     }
 
     file->cap = cap_get_fd(fd);
 
     if (close(fd) == -1) {
-        fprintf(stderr, _("*** unable to close() %s on %s: %s\n"), file->localpath, arch, strerror(errno));
+        warn("close()");
     }
 
     return file->cap;

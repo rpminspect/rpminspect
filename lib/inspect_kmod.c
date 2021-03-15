@@ -23,6 +23,7 @@
 #include <string.h>
 #include <libgen.h>
 #include <errno.h>
+#include <err.h>
 #include <assert.h>
 
 #include "rpminspect.h"
@@ -145,7 +146,7 @@ static bool kmod_driver(struct rpminspect *ri, rpmfile_entry_t *file)
     kctx = kmod_new(NULL, NULL);
 
     if (kctx == NULL) {
-        fprintf(stderr, _("*** kmod_new() failure\n"));
+        warn("kmod_new()");
         return false;
     }
 
@@ -162,7 +163,7 @@ static bool kmod_driver(struct rpminspect *ri, rpmfile_entry_t *file)
     kctx = kmod_new(NULL, NULL);
 
     if (kctx == NULL) {
-        fprintf(stderr, _("*** kmod_new() failure\n"));
+        warn("kmod_new()");
         return false;
     }
 
@@ -179,7 +180,7 @@ static bool kmod_driver(struct rpminspect *ri, rpmfile_entry_t *file)
     /* Gather module parameters */
     err = kmod_module_get_info(beforekmod, &beforeinfo);
     if (err < 0) {
-        fprintf(stderr, _("*** error reading before kernel module %s\n"), file->peer_file->fullpath);
+        warn("kmod_module_get_info()");
         kmod_module_unref(beforekmod);
         kmod_module_unref(afterkmod);
         kmod_unref(kctx);
@@ -188,7 +189,7 @@ static bool kmod_driver(struct rpminspect *ri, rpmfile_entry_t *file)
 
     err = kmod_module_get_info(afterkmod, &afterinfo);
     if (err < 0) {
-        fprintf(stderr, _("*** error reading after kernel module %s\n"), file->peer_file->fullpath);
+        warn("kmod_module_get_info()");
         kmod_module_info_free_list(beforeinfo);
         kmod_module_unref(beforekmod);
         kmod_module_unref(afterkmod);

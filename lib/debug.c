@@ -141,10 +141,10 @@ void dump_cfg(const struct rpminspect *ri)
     }
 
     if (ri->products) {
-        fprintf(stderr, "products:\n");
+        printf("products:\n");
 
         HASH_ITER(hh, ri->products, hentry, tmp_hentry) {
-            fprintf(stderr, "    - %s: %s\n", hentry->key, hentry->value);
+            printf("    - %s: %s\n", hentry->key, hentry->value);
         }
     }
 
@@ -325,29 +325,29 @@ void dump_cfg(const struct rpminspect *ri)
     printf("    primary: %s\n", (ri->specprimary == PRIMARY_NAME) ? "name" : (ri->specprimary == PRIMARY_FILENAME) ? "filename" : "?");
 
     if (ri->annocheck) {
-        fprintf(stderr, "annocheck:\n");
+        printf("annocheck:\n");
 
         HASH_ITER(hh, ri->annocheck, hentry, tmp_hentry) {
-            fprintf(stderr, "    - %s: %s\n", hentry->key, hentry->value);
+            printf("    - %s: %s\n", hentry->key, hentry->value);
         }
     }
 
     if (ri->jvm) {
-        fprintf(stderr, "javabytecode:\n");
+        printf("javabytecode:\n");
 
         HASH_ITER(hh, ri->jvm, hentry, tmp_hentry) {
-            fprintf(stderr, "    - %s: %s\n", hentry->key, hentry->value);
+            printf("    - %s: %s\n", hentry->key, hentry->value);
         }
     }
 
     if (ri->pathmigration || (ri->pathmigration_excluded_paths && !TAILQ_EMPTY(ri->pathmigration_excluded_paths))) {
-        fprintf(stderr, "pathmigration:\n");
+        printf("pathmigration:\n");
 
         if (ri->pathmigration) {
-            fprintf(stderr, "    migrated_paths:\n");
+            printf("    migrated_paths:\n");
 
             HASH_ITER(hh, ri->pathmigration, hentry, tmp_hentry) {
-                fprintf(stderr, "        - %s: %s\n", hentry->key, hentry->value);
+                printf("        - %s: %s\n", hentry->key, hentry->value);
             }
         }
 

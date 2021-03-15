@@ -22,6 +22,7 @@
 #include <stdlib.h>
 #include <stdbool.h>
 #include <assert.h>
+#include <err.h>
 #include <limits.h>
 #include <xmlrpc-c/client.h>
 #include <xmlrpc-c/client_global.h>
@@ -35,9 +36,7 @@
 static void xmlrpc_abort_on_fault(xmlrpc_env *env)
 {
     if (env->fault_occurred) {
-        fprintf(stderr, _("XML-RPC Fault: %s (%d)\n"), env->fault_string, env->fault_code);
-        fflush(stderr);
-        abort();
+        errx(RI_PROGRAM_ERROR, _("XML-RPC Fault: %s (%d)"), env->fault_string, env->fault_code);
     }
 }
 

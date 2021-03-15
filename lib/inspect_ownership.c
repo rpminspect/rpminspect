@@ -199,7 +199,7 @@ static bool ownership_driver(struct rpminspect *ri, rpmfile_entry_t *file) {
 
                 if (cap) {
                     if (cap_get_flag(cap, CAP_SETUID, CAP_EFFECTIVE, &have_setuid) == -1) {
-                        fprintf(stderr, _("*** unable to get capabilities for %s\n"), file->localpath);
+                        warnx("cap_get_flag()");
                         have_setuid = CAP_CLEAR;
                     }
                 }

@@ -28,9 +28,6 @@ Other:
       rebased but not on the rebaseable list.  This should be off by
       default but then enabled in a maintenance profile.  Maybe???
 
-    - Unify the error and debug reporting using consistent functions
-      and messaging.  (e.g., warn() and err())
-
 
 Test categories that have been migrated:
 ----------------------------------------

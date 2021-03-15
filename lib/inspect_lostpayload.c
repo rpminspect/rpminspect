@@ -30,8 +30,6 @@
 #include <stdbool.h>
 #include <string.h>
 #include <assert.h>
-#include <archive.h>
-#include <archive_entry.h>
 #include "rpminspect.h"
 
 /**
