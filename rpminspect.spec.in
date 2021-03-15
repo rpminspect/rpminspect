@@ -94,20 +94,13 @@ Recommends:     annobin-annocheck
 Requires:       annobin-annocheck
 %endif
 
-# The abidiff program is used by the abidiff inspection.  If it is not
-# present, you can disable the abidiff inspection.
+# The abidiff and kmidiff inspections require a external executable by
+# the same name, as provided by libabigail.  If it is not present on
+# the system, you can disable the relevant inspections.
 %if 0%{?rhel} >= 8 || 0%{?epel} >= 8 || 0%{?fedora}
-Recommends:     libabigail >= 1.8
+Recommends:     libabigail >= 1.8.2
 %else
-Requires:       libabigail >= 1.8
-%endif
-
-# The kmidiff program is used by the kmidiff inspection.  If it is not
-# present, you can disable the kmidiff inspection.
-%if 0%{?rhel} >= 8 || 0%{?epel} >= 8 || 0%{?fedora}
-Recommends:     libabigail >= 1.8
-%else
-Requires:       libabigail >= 1.8
+Requires:       libabigail >= 1.8.2
 %endif
 
 %description -n librpminspect
