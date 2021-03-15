@@ -52,7 +52,7 @@ static int copy_data(struct archive *ar, struct archive *aw) {
         r = archive_write_data_block(aw, buf, s, o);
 
         if (r != ARCHIVE_OK) {
-            warnx("%s", archive_error_string(aw));
+            warnx("archive_write_data_block(): %s", archive_error_string(aw));
             return r;
         }
     }
@@ -68,7 +68,7 @@ static int extract_entry(struct archive *input, struct archive *output, struct a
     r = archive_write_header(output, entry);
 
     if (r != ARCHIVE_OK) {
-        warnx("%s", archive_error_string(output));
+        warnx("archive_write_header(): %s", archive_error_string(output));
         ret = -1;
     } else if (archive_entry_size(entry) > 0) {
         if (copy_data(input, output) != ARCHIVE_OK) {
@@ -76,7 +76,7 @@ static int extract_entry(struct archive *input, struct archive *output, struct a
         }
 
         if (r != ARCHIVE_OK) {
-            warnx("%s", archive_error_string(output));
+            warnx("archive_write_header(): %s", archive_error_string(output));
         } else if (r < ARCHIVE_WARN) {
             ret = -1;
         }
@@ -85,7 +85,7 @@ static int extract_entry(struct archive *input, struct archive *output, struct a
     r = archive_write_finish_entry(output);
 
     if (r != ARCHIVE_OK) {
-        warnx("%s", archive_error_string(output));
+        warnx("archive_write_finish_entry(): %s", archive_error_string(output));
     } else if (r < ARCHIVE_WARN) {
         ret = -1;
     }
@@ -125,7 +125,7 @@ int unpack_archive(const char *archive, const char *dest, const bool force) {
         if (errno == ENOENT) {
             return 0;
         } else {
-            warn(_("realpath(%s)"), archive);
+            warn("realpath()");
             return -1;
         }
     }
@@ -141,7 +141,7 @@ int unpack_archive(const char *archive, const char *dest, const bool force) {
     r = archive_read_open_filename(input, archive, 16384);
 
     if (r != ARCHIVE_OK) {
-        warnx(_("error opening %s"), archive);
+        warn("archive_read_open_filename(): %s", archive_error_string(input));
         return -1;
     }
 
@@ -151,7 +151,7 @@ int unpack_archive(const char *archive, const char *dest, const bool force) {
     }
 
     if (chdir(dest) != 0) {
-        warn(_("chdir(%s)"), dest);
+        warn("chdir()");
         return -1;
     }
 
@@ -163,7 +163,7 @@ int unpack_archive(const char *archive, const char *dest, const bool force) {
     /* extract each archive member */
     while ((r = archive_read_next_header(input, &entry)) != ARCHIVE_EOF) {
         if (r != ARCHIVE_OK) {
-            warnx("%s", archive_error_string(input));
+            warnx("archive_read_next_header(): %s", archive_error_string(input));
         } else if (r < ARCHIVE_WARN) {
             ret = -1;
         }
@@ -182,7 +182,7 @@ int unpack_archive(const char *archive, const char *dest, const bool force) {
 
     /* change back to original directory */
     if (chdir(cwd) != 0) {
-        warn(_("chdir(%s)"), cwd);
+        warn("chdir()");
         return -1;
     }
 

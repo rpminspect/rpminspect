@@ -243,7 +243,7 @@ static mode_t parse_mode(const char *input) {
     assert(input != NULL);
 
     if (strlen(input) != 10) {
-        warn(_("*** Invalid input string `%s`"), input);
+        warn(_("invalid input string `%s`"), input);
         return mode;
     }
 
@@ -270,7 +270,7 @@ static mode_t parse_mode(const char *input) {
         mode |= S_IFWHT;
 #endif
     } else if (i != '-') {
-        warnx(_("*** Invalid mode string: %s"), input);
+        warnx(_("*** invalid mode string: %s"), input);
         return mode;
     }
 
@@ -279,7 +279,7 @@ static mode_t parse_mode(const char *input) {
     if (i == 'r') {
         mode |= S_IRUSR;
     } else if (i != '-') {
-        warnx(_("*** Invalid mode string: %s"), input);
+        warnx(_("*** invalid mode string: %s"), input);
         return mode;
     }
 
@@ -287,7 +287,7 @@ static mode_t parse_mode(const char *input) {
     if (i == 'w') {
         mode |= S_IWUSR;
     } else if (i != '-') {
-        warnx(_("*** Invalid mode string: %s"), input);
+        warnx(_("*** invalid mode string: %s"), input);
         return mode;
     }
 
@@ -299,7 +299,7 @@ static mode_t parse_mode(const char *input) {
     } else if (i == 's') {
         mode |= S_IXUSR | S_ISUID;
     } else if (i != '-') {
-        warnx(_("*** Invalid mode string: %s"), input);
+        warnx(_("*** invalid mode string: %s"), input);
         return mode;
     }
 
@@ -308,7 +308,7 @@ static mode_t parse_mode(const char *input) {
     if (i == 'r') {
         mode |= S_IRGRP;
     } else if (i != '-') {
-        warnx(_("*** Invalid mode string: %s"), input);
+        warnx(_("*** invalid mode string: %s"), input);
         return mode;
     }
 
@@ -316,7 +316,7 @@ static mode_t parse_mode(const char *input) {
     if (i == 'w') {
         mode |= S_IWGRP;
     } else if (i != '-') {
-        warnx(_("*** Invalid mode string: %s"), input);
+        warnx(_("*** invalid mode string: %s"), input);
         return mode;
     }
 
@@ -328,7 +328,7 @@ static mode_t parse_mode(const char *input) {
     } else if (i == 's') {
         mode |= S_IXGRP | S_ISGID;
     } else if (i != '-') {
-        warnx(_("*** Invalid mode string: %s"), input);
+        warnx(_("*** invalid mode string: %s"), input);
         return mode;
     }
 
@@ -337,7 +337,7 @@ static mode_t parse_mode(const char *input) {
     if (i == 'r') {
         mode |= S_IROTH;
     } else if (i != '-') {
-        warnx(_("*** Invalid mode string: %s"), input);
+        warnx(_("*** invalid mode string: %s"), input);
         return mode;
     }
 
@@ -345,7 +345,7 @@ static mode_t parse_mode(const char *input) {
     if (i == 'w') {
         mode |= S_IWOTH;
     } else if (i != '-') {
-        warnx(_("*** Invalid mode string: %s"), input);
+        warnx(_("*** invalid mode string: %s"), input);
         return mode;
     }
 
@@ -357,7 +357,7 @@ static mode_t parse_mode(const char *input) {
     } else if (i == 't') {
         mode |= S_IXOTH | S_ISVTX;
     } else if (i != '-') {
-        warnx(_("*** Invalid mode string: %s"), input);
+        warnx(_("*** invalid mode string: %s"), input);
         return mode;
     }
 
@@ -388,13 +388,13 @@ static int read_cfgfile(struct rpminspect *ri, const char *filename)
 
     /* prepare a YAML parser */
     if (!yaml_parser_initialize(&parser)) {
-        warn(_("yaml_parser_initialize()"));
+        warn("yaml_parser_initialize()");
         return -1;
     }
 
     /* open the config file */
     if ((fp = fopen(filename, "r")) == NULL) {
-        warn(_("fopen()"));
+        warn("fopen()");
         return -1;
     }
 
@@ -718,7 +718,7 @@ static int read_cfgfile(struct rpminspect *ri, const char *filename)
                             }
 
                             if (add_regex(t, &ri->elf_path_include) != 0) {
-                                warn(_("*** error reading elf include path"));
+                                warn(_("error reading elf include path"));
                             }
                         } else if (!strcmp(key, "exclude_path")) {
                             if (debug_mode) {
@@ -727,7 +727,7 @@ static int read_cfgfile(struct rpminspect *ri, const char *filename)
                             }
 
                             if (add_regex(t, &ri->elf_path_exclude) != 0) {
-                                warn(_("*** error reading elf exclude path"));
+                                warn(_("error reading elf exclude path"));
                             }
                         }
                     } else if (block == BLOCK_MANPAGE) {
@@ -738,7 +738,7 @@ static int read_cfgfile(struct rpminspect *ri, const char *filename)
                             }
 
                             if (add_regex(t, &ri->manpage_path_include) != 0) {
-                                warn(_("*** error reading man page include path"));
+                                warn(_("error reading man page include path"));
                             }
                         } else if (!strcmp(key, "exclude_path")) {
                             if (debug_mode) {
@@ -747,7 +747,7 @@ static int read_cfgfile(struct rpminspect *ri, const char *filename)
                             }
 
                             if (add_regex(t, &ri->manpage_path_exclude) != 0) {
-                                warn(_("*** error reading man page exclude path"));
+                                warn(_("error reading man page exclude path"));
                             }
                         }
                     } else if (block == BLOCK_XML) {
@@ -758,7 +758,7 @@ static int read_cfgfile(struct rpminspect *ri, const char *filename)
                             }
 
                             if (add_regex(t, &ri->xml_path_include) != 0) {
-                                warn(_("*** error reading xml include path"));
+                                warn(_("error reading xml include path"));
                             }
                         } else if (!strcmp(key, "exclude_path")) {
                             if (debug_mode) {
@@ -767,7 +767,7 @@ static int read_cfgfile(struct rpminspect *ri, const char *filename)
                             }
 
                             if (add_regex(t, &ri->xml_path_exclude) != 0) {
-                                warn(_("*** error reading xml exclude path"));
+                                warn(_("error reading xml exclude path"));
                             }
                         }
                     } else if (block == BLOCK_DESKTOP) {
@@ -929,7 +929,7 @@ static int read_cfgfile(struct rpminspect *ri, const char *filename)
     yaml_parser_delete(&parser);
 
     if (fclose(fp) != 0) {
-        warn(_("fclose(%s)"), filename);
+        warn("fclose()");
         return -1;
     }
 
@@ -1416,7 +1416,7 @@ struct rpminspect *init_rpminspect(struct rpminspect *ri, const char *cfgfile, c
         filename = realpath(tmp, NULL);
 
         if ((filename == NULL) || (access(filename, F_OK|R_OK) == -1)) {
-            warn(_("*** Unable to read profile '%s' from %s\n"), profile, filename);
+            warn(_("*** unable to read profile '%s' from %s\n"), profile, filename);
         } else {
             i = read_cfgfile(ri, filename);
 

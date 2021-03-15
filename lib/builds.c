@@ -82,15 +82,11 @@ static void set_worksubdir(struct rpminspect *ri, workdir_t wd,
         } else if (task != NULL) {
             xasprintf(&ri->worksubdir, "%s/scratch-%d", ri->workdir, task->id);
         } else {
-            fprintf(stderr, _("*** no Koji build or task specified in set_worksubdir()\n"));
-            fflush(stderr);
-            abort();
+            errx(RI_PROGRAM_ERROR, _("no koji build or task specified"));
         }
 
         if (mkdirp(ri->worksubdir, mode)) {
-            fprintf(stderr, _("*** unable to create download directory %s: %s\n"), ri->worksubdir, strerror(errno));
-            fflush(stderr);
-            abort();
+            err(RI_PROGRAM_ERROR, _("unable to create download directory %s"), ri->worksubdir);
         }
     } else {
         if (wd == LOCAL_WORKDIR) {
@@ -102,15 +98,11 @@ static void set_worksubdir(struct rpminspect *ri, workdir_t wd,
             assert(build != NULL);
             xasprintf(&ri->worksubdir, "%s/%s-%s.XXXXXX", ri->workdir, build->name, build->version);
         } else {
-            fprintf(stderr, _("*** unknown workdir type: %d\n"), wd);
-            fflush(stderr);
-            abort();
+            errx(RI_PROGRAM_ERROR, _("unknown workdir type %d"), wd);
         }
 
         if (mkdtemp(ri->worksubdir) == NULL) {
-            fprintf(stderr, _("*** unable to create local work subdirectory: %s\n"), strerror(errno));
-            fflush(stderr);
-            abort();
+            err(RI_PROGRAM_ERROR, "mkdtemp()");
         }
     }
 
@@ -162,8 +154,7 @@ static void prune_local(const int whichbuild) {
     }
 
     if (closedir(d) == -1) {
-        fprintf(stderr, _("*** unable to close directory: %s: %s\n"), lpath, strerror(errno));
-        fflush(stderr);
+        warn("closedir()");
         return;
     }
 
@@ -196,7 +187,7 @@ static int copytree(const char *fpath, const struct stat *sb, int tflag, struct 
 
     /* Ignore unreadable things */
     if (tflag == FTW_DNR || tflag == FTW_NS || tflag == FTW_SLN) {
-        fprintf(stderr, _("*** unable to read %s, skipping\n"), fpath);
+        warnx(_("unable to read %s, skipping"), fpath);
         return 0;
     }
 
@@ -207,7 +198,7 @@ static int copytree(const char *fpath, const struct stat *sb, int tflag, struct 
 
     if (S_ISDIR(sb->st_mode)) {
         if (mkdirp(bufpath, mode)) {
-            fprintf(stderr, _("*** error creating directory %s: %s\n"), bufpath, strerror(errno));
+            warn("mkdirp()");
             ret = -1;
         }
     } else if (S_ISREG(sb->st_mode) || S_ISLNK(sb->st_mode)) {
@@ -224,14 +215,14 @@ static int copytree(const char *fpath, const struct stat *sb, int tflag, struct 
         }
 
         if (copyfile(copysrc, bufpath, true, false)) {
-            fprintf(stderr, _("*** error copying file %s: %s\n"), bufpath, strerror(errno));
+            warn("copyfile()");
             ret = -1;
         }
 
         /* Gather the RPM header for packages */
         get_rpm_info(bufpath);
     } else {
-        fprintf(stderr, _("*** unknown directory member encountered: %s\n"), fpath);
+        warnx(_("unknown directory member encountered: %s"), fpath);
         ret = -1;
     }
 
@@ -262,8 +253,7 @@ static void curl_helper(const bool verbose, const char *src, const char *dst) {
 
     /* initialize curl */
     if (!(c = curl_easy_init())) {
-        fprintf(stderr, _("*** curl_easy_init() failed\n"));
-        fflush(stderr);
+        warn("curl_easy_init()");
         return;
     }
 
@@ -278,9 +268,7 @@ static void curl_helper(const bool verbose, const char *src, const char *dst) {
     fp = fopen(dst, "wb");
 
     if (fp == NULL) {
-        fprintf(stderr, _("*** error opening %s: %s\n"), dst, strerror(errno));
-        fflush(stderr);
-        abort();
+        err(RI_PROGRAM_ERROR, "fopen()");
     }
 
     curl_easy_setopt(c, CURLOPT_URL, src);
@@ -292,16 +280,13 @@ static void curl_helper(const bool verbose, const char *src, const char *dst) {
     cc = curl_easy_perform(c);
 
     if (fclose(fp) != 0) {
-        fprintf(stderr, _("*** error closing %s: %s\n"), dst, strerror(errno));
-        fflush(stderr);
-        abort();
+        err(RI_PROGRAM_ERROR, "fclose()");
     }
 
     /* remove output file if there was a download error (e.g., 404) */
     if (cc != CURLE_OK) {
         if (unlink(dst)) {
-            fprintf(stderr, _("*** unable to unlink %s: %s\n"), dst, strerror(errno));
-            fflush(stderr);
+            warn("unlink()");
         }
     }
 
@@ -354,8 +339,7 @@ static int download_build(const struct rpminspect *ri, struct koji_build *build)
             }
 
             if (mkdirp(dst, mode)) {
-                fprintf(stderr, _("*** error creating directory %s: %s\n"), dst, strerror(errno));
-                fflush(stderr);
+                warn("mkdirp()");
                 return -1;
             }
 
@@ -369,15 +353,12 @@ static int download_build(const struct rpminspect *ri, struct koji_build *build)
             if (filter == NULL) {
                 /* prepare a YAML parser */
                 if (!yaml_parser_initialize(&parser)) {
-                    fprintf(stderr, _("*** error initializing YAML parser for module metadata, unable to filter\n"));
-                    fflush(stderr);
+                    warn("yaml_parser_initialize()");
                 }
 
                 /* open the modulemd file */
                 if ((fp = fopen(dst, "r")) == NULL) {
-                    fprintf(stderr, _("*** error opening %s: %s\n"), dst, strerror(errno));
-                    fflush(stderr);
-                    abort();
+                    err(RI_PROGRAM_ERROR, "fopen()");
                 }
 
                 /* initialize a string list for the loop */
@@ -450,8 +431,7 @@ static int download_build(const struct rpminspect *ri, struct koji_build *build)
             }
 
             if (mkdirp(dst, mode)) {
-                fprintf(stderr, _("*** error creating directory %s: %s\n"), dst, strerror(errno));
-                fflush(stderr);
+                warn("mkdirp()");
                 return -1;
             }
 
@@ -567,8 +547,7 @@ static int download_task(const struct rpminspect *ri, struct koji_task *task)
         }
 
         if (mkdirp(dst, mode)) {
-            fprintf(stderr, _("*** error creating directory %s: %s\n"), dst, strerror(errno));
-            fflush(stderr);
+            warn("mkdirp()");
             return -1;
         }
 
@@ -586,8 +565,7 @@ static int download_task(const struct rpminspect *ri, struct koji_task *task)
                 }
 
                 if (mkdirp(dst, mode)) {
-                    fprintf(stderr, _("*** error creating directory %s: %s\n"), dst, strerror(errno));
-                    fflush(stderr);
+                    warn("mkdirp()");
                     return -1;
                 }
 
@@ -659,8 +637,7 @@ static int download_rpm(const char *rpm)
     }
 
     if (mkdirp(dstdir, mode)) {
-        fprintf(stderr, _("*** error creating directory %s: %s\n"), dstdir, strerror(errno));
-        fflush(stderr);
+        warn("mkdirp()");
         return -1;
     }
 
@@ -759,8 +736,7 @@ int gather_builds(struct rpminspect *ri, bool fo) {
 
         if (is_local_build(ri->after) || is_local_rpm(ri, ri->after)) {
             if (fetch_only) {
-                fprintf(stderr, _("*** `%s' already exists\n"), ri->after);
-                fflush(stderr);
+                warnx(_("`%s' already exists"), ri->after);
                 return -1;
             }
 
@@ -768,8 +744,7 @@ int gather_builds(struct rpminspect *ri, bool fo) {
 
             /* copy after tree */
             if (nftw(ri->after, copytree, FOPEN_MAX, FTW_PHYS) == -1) {
-                fprintf(stderr, _("*** error gathering build %s: %s\n"), ri->after, strerror(errno));
-                fflush(stderr);
+                warn("nftw()");
                 return -1;
             }
 
@@ -779,16 +754,14 @@ int gather_builds(struct rpminspect *ri, bool fo) {
             set_worksubdir(ri, LOCAL_WORKDIR, NULL, NULL);
 
             if (download_rpm(ri->after)) {
-                fprintf(stderr, _("*** error downloading RPM %s\n"), ri->after);
-                fflush(stderr);
+                warn("download_rpm()");
                 return -1;
             }
         } else if (is_task_id(ri->after) && (task = get_koji_task(ri, ri->after)) != NULL) {
             set_worksubdir(ri, TASK_WORKDIR, NULL, task);
 
             if (download_task(ri, task)) {
-                fprintf(stderr, _("*** error downloading task %s\n"), ri->after);
-                fflush(stderr);
+                warn("download_task()");
                 return -1;
             }
 
@@ -797,15 +770,13 @@ int gather_builds(struct rpminspect *ri, bool fo) {
             set_worksubdir(ri, BUILD_WORKDIR, build, NULL);
 
             if (download_build(ri, build)) {
-                fprintf(stderr, _("*** error downloading build %s\n"), ri->after);
-                fflush(stderr);
+                warn("download_build()");
                 return -1;
             }
 
             free_koji_build(build);
         } else {
-            fprintf(stderr, _("*** unable to find after build: %s\n"), ri->after);
-            fflush(stderr);
+            warnx(_("unable to find after build: %s"), ri->after);
             return -2;
         }
     }
@@ -823,8 +794,7 @@ int gather_builds(struct rpminspect *ri, bool fo) {
 
         /* copy before tree */
         if (nftw(ri->before, copytree, FOPEN_MAX, FTW_PHYS) == -1) {
-            fprintf(stderr, _("*** error gathering build %s: %s\n"), ri->before, strerror(errno));
-            fflush(stderr);
+            warn("nftw()");
             return -1;
         }
 
@@ -834,16 +804,14 @@ int gather_builds(struct rpminspect *ri, bool fo) {
         set_worksubdir(ri, LOCAL_WORKDIR, NULL, NULL);
 
         if (download_rpm(ri->before)) {
-            fprintf(stderr, _("*** error downloading RPM %s\n"), ri->before);
-            fflush(stderr);
+            warn("download_rpm()");
             return -1;
         }
     } else if (is_task_id(ri->before) && (task = get_koji_task(ri, ri->before)) != NULL) {
         set_worksubdir(ri, TASK_WORKDIR, NULL, task);
 
         if (download_task(ri, task)) {
-            fprintf(stderr, _("*** error downloading task %s\n"), ri->before);
-            fflush(stderr);
+            warn("download_task()");
             return -1;
         }
 
@@ -852,15 +820,13 @@ int gather_builds(struct rpminspect *ri, bool fo) {
         set_worksubdir(ri, BUILD_WORKDIR, build, NULL);
 
         if (download_build(ri, build)) {
-            fprintf(stderr, _("*** error downloading build %s\n"), ri->before);
-            fflush(stderr);
+            warn("download_build()");
             return -1;
         }
 
         free_koji_build(build);
     } else {
-        fprintf(stderr, _("*** unable to find before build: %s\n"), ri->before);
-        fflush(stderr);
+        warnx(_("unable to find before build: %s"), ri->before);
         return -1;
     }
 

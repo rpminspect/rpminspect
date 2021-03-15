@@ -51,8 +51,7 @@ bool is_local_build(const char *build) {
     }
 
     if (stat(build, &sb) == -1) {
-        fprintf(stderr, "%s (%d): %s\n", __func__, __LINE__, strerror(errno));
-        fflush(stderr);
+        warn("stat()");
         return false;
     }
 
@@ -67,14 +66,12 @@ bool is_local_build(const char *build) {
     }
 
     if (chdir(build) == -1) {
-        fprintf(stderr, "%s (%d): %s\n", __func__, __LINE__, strerror(errno));
-        fflush(stderr);
+        warn("chdir()");
         return false;
     }
 
     if (chdir(cwd) == -1) {
-        fprintf(stderr, "%s (%d): %s\n", __func__, __LINE__, strerror(errno));
-        fflush(stderr);
+        warn("chdir()");
         return false;
     }
 

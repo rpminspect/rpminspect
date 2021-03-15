@@ -63,17 +63,17 @@ static short get_jvm_major(const char *filename, const char *localpath,
         fd = open(filename, O_RDONLY | O_CLOEXEC | O_LARGEFILE);
 
         if (fd == -1) {
-            fprintf(stderr, _("unable to open(2) %s from %s for reading: %s\n"), localpath, container, strerror(errno));
+            warn("open()");
             return -1;
         }
 
         if (read(fd, magic, sizeof(magic)) != sizeof(magic)) {
-            fprintf(stderr, _("unable to read(2) %s from %s: %s\n"), localpath, container, strerror(errno));
+            warn("read()");
             return -1;
         }
 
         if (close(fd) == -1) {
-            fprintf(stderr, _("unable to close(2) %s from %s: %s\n"), localpath, container, strerror(errno));
+            warn("close()");
             return -1;
         }
 
@@ -180,9 +180,11 @@ static bool javabytecode_driver(struct rpminspect *ri, rpmfile_entry_t *file, co
 
         /* create a temporary directory to unpack this file */
         xasprintf(&tmppath, "%s/jar.XXXXXX", ri->workdir);
+        tmppath = mkdtemp(tmppath);
 
-        if ((tmppath = mkdtemp(tmppath)) == NULL) {
-            fprintf(stderr, _("*** unable to create a temporary directory for %s: %s\n"), file->fullpath, strerror(errno));
+        if (tmppath == NULL) {
+            warn("mkdtemp()");
+            free(tmppath);
             return false;
         }
 
@@ -201,7 +203,7 @@ static bool javabytecode_driver(struct rpminspect *ri, rpmfile_entry_t *file, co
 
         if (jarstatus != 0) {
             /* we errored somewhere, just report it */
-            fprintf(stderr, _("*** error walking the unpacked directory tree for %s\n"), file->fullpath);
+            warn("nftw()");
         }
 
         /* clean up */

@@ -103,7 +103,7 @@ static bool virus_driver(struct rpminspect *ri, rpmfile_entry_t *file)
 
         result = false;
     } else if (r != CL_CLEAN) {
-        warnx(_("cl_scanfile(%s): %s"), file->localpath, cl_strerror(r));
+        warnx("cl_scanfile(%s): %s", file->localpath, cl_strerror(r));
     }
 
     return result;
@@ -118,7 +118,7 @@ bool inspect_virus(struct rpminspect *ri)
     r = cl_init(CL_INIT_DEFAULT);
 
     if (r != CL_SUCCESS) {
-        warnx(_("cl_init(): %s"), cl_strerror(r));
+        warnx("cl_init(): %s", cl_strerror(r));
         return false;
     }
 

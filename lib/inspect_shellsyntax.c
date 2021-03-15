@@ -22,6 +22,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <errno.h>
+#include <err.h>
 #include <assert.h>
 
 #include "rpminspect.h"
@@ -50,8 +51,7 @@ static char *get_shell(const struct rpminspect *ri, const char *fullpath)
     fp = fopen(fullpath, "r");
 
     if (fp == NULL) {
-        fprintf(stderr, _("error opening %s for reading: %s\n"), fullpath, strerror(errno));
-        fflush(stderr);
+        warn("fopen()");
         return NULL;
     }
 
@@ -59,13 +59,11 @@ static char *get_shell(const struct rpminspect *ri, const char *fullpath)
     start = buf;
 
     if (fclose(fp) == -1) {
-        fprintf(stderr, _("error closing %s: %s\n"), fullpath, strerror(errno));
-        fflush(stderr);
+        warn("fclose()");
     }
 
     if (r == -1) {
-        fprintf(stderr, _("error reading first line from %s: %s\n"), fullpath, strerror(errno));
-        fflush(stderr);
+        warn("getline()");
     } else if (!strncmp(buf, "#!", 2)) {
         /* trim newlines */
         buf[strcspn(buf, "\n")] = '\0';

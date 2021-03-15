@@ -29,6 +29,7 @@
 
 #include <assert.h>
 #include <errno.h>
+#include <err.h>
 #include <stdbool.h>
 #include <string.h>
 #include <sys/mman.h>
@@ -54,8 +55,7 @@ static struct json_object *read_licensedb(const char *licensedb)
     fd = open(licensedb, O_RDONLY);
 
     if (fd == -1) {
-        fprintf(stderr, _("*** Unable to open license db %s: %s\n"), licensedb, strerror(errno));
-        fflush(stderr);
+        warn(_("unable to open license db %s"), licensedb);
         return NULL;
     }
 
