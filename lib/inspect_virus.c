@@ -23,6 +23,8 @@
 #include <string.h>
 #include <assert.h>
 #include <err.h>
+#include <dirent.h>
+#include <sys/types.h>
 #include <clamav.h>
 #include "rpminspect.h"
 
@@ -103,7 +105,7 @@ static bool virus_driver(struct rpminspect *ri, rpmfile_entry_t *file)
 
         result = false;
     } else if (r != CL_CLEAN) {
-        warnx("cl_scanfile(%s): %s", file->localpath, cl_strerror(r));
+        warnx(_("cl_scanfile(%s): %s"), file->localpath, cl_strerror(r));
     }
 
     return result;
@@ -111,6 +113,12 @@ static bool virus_driver(struct rpminspect *ri, rpmfile_entry_t *file)
 
 bool inspect_virus(struct rpminspect *ri)
 {
+    char *dbver = NULL;
+    const char *dbpath = NULL;
+    DIR *d = NULL;
+    struct dirent *de = NULL;
+    char *cvdpath = NULL;
+    struct cl_cvd *cvd = NULL;
     bool result = false;
     int r = 0;
 
@@ -118,19 +126,71 @@ bool inspect_virus(struct rpminspect *ri)
     r = cl_init(CL_INIT_DEFAULT);
 
     if (r != CL_SUCCESS) {
-        warnx("cl_init(): %s", cl_strerror(r));
+        warnx(_("cl_init(): %s"), cl_strerror(r));
         return false;
     }
 
     /* set up result parameters */
     init_result_params(&params);
+
+    /* display version information about clamav */
+    params.severity = RESULT_INFO;
+    params.waiverauth = NOT_WAIVABLE;
+    params.header = HEADER_VIRUS;
+    xasprintf(&params.msg, _("clamav version information"));
+
+    dbpath = cl_retdbdir();
+    assert(dbpath != NULL);
+
+    xasprintf(&params.details, _("clamav version %s"), cl_retver());
+
+    d = opendir(dbpath);
+
+    if (d == NULL) {
+        err(EXIT_FAILURE, "opendir()");
+    }
+
+    errno = 0;
+
+    while ((de = readdir(d)) != NULL) {
+        if (!strcmp(de->d_name, ".") || !strcmp(de->d_name, "..") || !strsuffix(de->d_name, ".cvd")) {
+            continue;
+        }
+
+        params.details = strappend(params.details, "\n");
+        assert(params.details != NULL);
+
+        xasprintf(&cvdpath, "%s/%s", dbpath, de->d_name);
+        assert(cvdpath != NULL);
+        cvd = cl_cvdhead(cvdpath);
+
+        xasprintf(&dbver, _("%s version %u (%s)"), cvdpath, cvd->version, cvd->time);
+        assert(dbver != NULL);
+        params.details = strappend(params.details, dbver);
+        assert(params.details != NULL);
+
+        cl_cvdfree(cvd);
+        free(cvdpath);
+        free(dbver);
+    }
+
+    if (errno != 0) {
+        err(EXIT_FAILURE, "readdir()");
+    }
+
+    if (closedir(d) == -1) {
+        warn("closedir()");
+    }
+
+    add_result(ri, &params);
+    free(params.msg);
+
+    /* run the virus check on each file */
     params.severity = RESULT_BAD;
     params.waiverauth = WAIVABLE_BY_ANYONE;
     params.header = HEADER_VIRUS;
     params.verb = VERB_FAILED;
-    params.noun = _("virus in ${FILE}");
-
-    /* run the virus check on each file */
+    params.noun = _("virus or malware in ${FILE}");
     result = foreach_peer_file(ri, virus_driver, false);
 
     /* hope the result is always this */
