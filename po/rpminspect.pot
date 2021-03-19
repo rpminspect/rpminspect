@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: rpminspect\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-02-24 15:38-0500\n"
+"POT-Creation-Date: 2021-03-19 16:23-0400\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -782,194 +782,65 @@ msgid ""
 msgstr ""
 
 #: lib/builds.c:85
-#, c-format
-msgid "*** no Koji build or task specified in set_worksubdir()\n"
+msgid "no koji build or task specified"
 msgstr ""
 
-#: lib/builds.c:91
+#: lib/builds.c:89
 #, c-format
-msgid "*** unable to create download directory %s: %s\n"
+msgid "unable to create download directory %s"
 msgstr ""
 
-#: lib/builds.c:105
+#: lib/builds.c:101
 #, c-format
-msgid "*** unknown workdir type: %d\n"
+msgid "unknown workdir type %d"
 msgstr ""
 
-#: lib/builds.c:111
+#: lib/builds.c:190
 #, c-format
-msgid "*** unable to create local work subdirectory: %s\n"
+msgid "unable to read %s, skipping"
 msgstr ""
 
-#: lib/builds.c:165
+#: lib/builds.c:225
 #, c-format
-msgid "*** unable to close directory: %s: %s\n"
+msgid "unknown directory member encountered: %s"
 msgstr ""
 
-#: lib/builds.c:199
-#, c-format
-msgid "*** unable to read %s, skipping\n"
-msgstr ""
-
-#: lib/builds.c:210 lib/builds.c:357 lib/builds.c:453 lib/builds.c:570
-#: lib/builds.c:589 lib/builds.c:662
-#, c-format
-msgid "*** error creating directory %s: %s\n"
-msgstr ""
-
-#: lib/builds.c:227
-#, c-format
-msgid "*** error copying file %s: %s\n"
-msgstr ""
-
-#: lib/builds.c:234
-#, c-format
-msgid "*** unknown directory member encountered: %s\n"
-msgstr ""
-
-#: lib/builds.c:265
-#, c-format
-msgid "*** curl_easy_init() failed\n"
-msgstr ""
-
-#: lib/builds.c:274
+#: lib/builds.c:264
 #, c-format
 msgid "Downloading %s...\n"
 msgstr ""
 
-#: lib/builds.c:281 lib/builds.c:378 lib/init.c:426
-#, c-format
-msgid "*** error opening %s: %s\n"
-msgstr ""
-
-#: lib/builds.c:295
-#, c-format
-msgid "*** error closing %s: %s\n"
-msgstr ""
-
-#: lib/builds.c:303
-#, c-format
-msgid "*** unable to unlink %s: %s\n"
-msgstr ""
-
-#: lib/builds.c:372 lib/init.c:419
-#, c-format
-msgid ""
-"*** error initializing YAML parser for module metadata, unable to filter\n"
-msgstr ""
-
-#: lib/builds.c:430
+#: lib/builds.c:411
 msgid "fclose()"
 msgstr ""
 
-#: lib/builds.c:762
+#: lib/builds.c:739
 #, c-format
-msgid "*** `%s' already exists\n"
+msgid "`%s' already exists"
 msgstr ""
 
-#: lib/builds.c:771 lib/builds.c:826
+#: lib/builds.c:779
 #, c-format
-msgid "*** error gathering build %s: %s\n"
+msgid "unable to find after build: %s"
 msgstr ""
 
-#: lib/builds.c:782 lib/builds.c:837
+#: lib/builds.c:829
 #, c-format
-msgid "*** error downloading RPM %s\n"
+msgid "unable to find before build: %s"
 msgstr ""
 
-#: lib/builds.c:790 lib/builds.c:845
+#: lib/checksums.c:87
 #, c-format
-msgid "*** error downloading task %s\n"
+msgid "%s is a FIFO"
 msgstr ""
 
-#: lib/builds.c:800 lib/builds.c:855
+#: lib/copyfile.c:115
 #, c-format
-msgid "*** error downloading build %s\n"
+msgid "%s already exists"
 msgstr ""
 
-#: lib/builds.c:807
-#, c-format
-msgid "*** unable to find after build: %s\n"
-msgstr ""
-
-#: lib/builds.c:862
-#, c-format
-msgid "*** unable to find before build: %s\n"
-msgstr ""
-
-#: lib/checksums.c:86
-#, c-format
-msgid "*** Cannot calculate checksum on devices or fifos: %s\n"
-msgstr ""
-
-#: lib/checksums.c:111 lib/copyfile.c:152
-#, c-format
-msgid "*** Unable to open %s: %s\n"
-msgstr ""
-
-#: lib/copyfile.c:75
-#, c-format
-msgid "*** Unable to stat %s: %s\n"
-msgstr ""
-
-#: lib/copyfile.c:85
-#, c-format
-msgid "*** Unable to create directory %s: %s\n"
-msgstr ""
-
-#: lib/copyfile.c:95
-#, c-format
-msgid "*** Unable to read symlink info on %s: %s\n"
-msgstr ""
-
-#: lib/copyfile.c:101
-#, c-format
-msgid "*** Unable to create symlink %s: %s\n"
-msgstr ""
-
-#: lib/copyfile.c:111
-#, c-format
-msgid "*** Unable to open %s for reading: %s\n"
-msgstr ""
-
-#: lib/copyfile.c:119
-#, c-format
-msgid "*** %s already exists"
-msgstr ""
-
-#: lib/copyfile.c:125
-#, c-format
-msgid ", overwriting\n"
-msgstr ""
-
-#: lib/copyfile.c:130
-#, c-format
-msgid "*** Unable to remove %s: %s\n"
-msgstr ""
-
-#: lib/copyfile.c:135
-#, c-format
-msgid "*** Still unable to open %s, giving up\n"
-msgstr ""
-
-#: lib/copyfile.c:145
-#, c-format
-msgid "*** Unable to open %s for writing: %s\n"
-msgstr ""
-
-#: lib/copyfile.c:159 lib/copyfile.c:168
-#, c-format
-msgid "*** Error writing to %s: %s\n"
-msgstr ""
-
-#: lib/copyfile.c:182
-#, c-format
-msgid "*** chown() error on %s: %s\n"
-msgstr ""
-
-#: lib/copyfile.c:189
-#, c-format
-msgid "*** chmod() error on %s: %s\n"
+#: lib/copyfile.c:120
+msgid ", overwriting"
 msgstr ""
 
 #: lib/fileinfo.c:66
@@ -1027,137 +898,130 @@ msgid ""
 "expected group %s (GID %d)"
 msgstr ""
 
-#: lib/files.c:182
-#, c-format
-msgid "*** mkdir(%s)"
-msgstr ""
-
-#: lib/files.c:211
-#, c-format
-msgid "*** error reading RPM metadata for %s"
-msgstr ""
-
-#: lib/files.c:234
-#, c-format
-msgid "*** unable to open %s with libarchive: %s"
-msgstr ""
-
-#: lib/files.c:249
-#, c-format
-msgid "*** error reading from archive %s: %s"
-msgstr ""
-
 #: lib/files.c:265
 #, c-format
 msgid "*** payload path %s not in RPM metadata"
 msgstr ""
 
-#: lib/files.c:318
+#: lib/init.c:246
 #, c-format
-msgid "*** error extracting %s: %s"
+msgid "invalid input string `%s`"
 msgstr ""
 
-#: lib/files.c:815
+#: lib/init.c:273 lib/init.c:282 lib/init.c:290 lib/init.c:302 lib/init.c:311
+#: lib/init.c:319 lib/init.c:331 lib/init.c:340 lib/init.c:348 lib/init.c:360
 #, c-format
-msgid "*** unable to open() %s on %s: %s\n"
+msgid "*** invalid mode string: %s"
 msgstr ""
 
-#: lib/files.c:822
+#: lib/init.c:701
 #, c-format
-msgid "*** unable to close() %s on %s: %s\n"
+msgid "*** unknown specname match setting '%s', defaulting to 'full'"
 msgstr ""
 
-#: lib/init.c:142
+#: lib/init.c:710
 #, c-format
-msgid "*** Unable to compile regular expression %s: %s\n"
+msgid "*** unknown specname primary setting '%s', defaulting to 'name'"
 msgstr ""
 
-#: lib/init.c:229
-#, c-format
-msgid "hcreate_r() failure in %s"
+#: lib/init.c:721
+msgid "error reading elf include path"
 msgstr ""
 
-#: lib/init.c:275
-#, c-format
-msgid "*** Invalid input string `%s`\n"
+#: lib/init.c:730
+msgid "error reading elf exclude path"
 msgstr ""
 
-#: lib/init.c:302 lib/init.c:311 lib/init.c:319 lib/init.c:331 lib/init.c:340
-#: lib/init.c:348 lib/init.c:360 lib/init.c:369 lib/init.c:377 lib/init.c:389
-#, c-format
-msgid "*** Invalid mode string: %s\n"
+#: lib/init.c:741
+msgid "error reading man page include path"
 msgstr ""
 
-#: lib/init.c:834
-#, c-format
-msgid "*** Unknown inspection: `%s`\n"
+#: lib/init.c:750
+msgid "error reading man page exclude path"
 msgstr ""
 
-#: lib/init.c:954
-#, c-format
-msgid "fclose(%s)"
+#: lib/init.c:761
+msgid "error reading xml include path"
 msgstr ""
 
-#: lib/init.c:1045
-#, c-format
-msgid "*** Invalid filename in the fileinfo list: %s\n"
+#: lib/init.c:770
+msgid "error reading xml exclude path"
 msgstr ""
 
-#: lib/init.c:1046
+#: lib/init.c:810
 #, c-format
-msgid "*** From this invalid line:\n"
+msgid "*** inspection flag must be 'on' or 'off', ignoring for '%s'"
 msgstr ""
 
-#: lib/init.c:1425 lib/init.c:1446
+#: lib/init.c:814 src/rpminspect.c:273
+#, c-format
+msgid "*** Unknown inspection: `%s`"
+msgstr ""
+
+#: lib/init.c:1023
+#, c-format
+msgid "*** Invalid filename in the fileinfo list: %s"
+msgstr ""
+
+#: lib/init.c:1024
+msgid "*** From this invalid line:"
+msgstr ""
+
+#: lib/init.c:1025
+#, c-format
+msgid "***     %s"
+msgstr ""
+
+#: lib/init.c:1403 lib/init.c:1424
 #, c-format
 msgid "*** error reading '%s'\n"
 msgstr ""
 
-#: lib/init.c:1441
+#: lib/init.c:1419
 #, c-format
-msgid "*** Unable to read profile '%s' from %s\n"
+msgid "*** unable to read profile '%s' from %s\n"
 msgstr ""
 
-#: lib/inspect_abidiff.c:248 lib/inspect_kmidiff.c:307
+#: lib/inspect_abidiff.c:215 lib/inspect_kmidiff.c:295
 #, c-format
 msgid "Command: %s"
 msgstr ""
 
-#: lib/inspect_abidiff.c:249
+#: lib/inspect_abidiff.c:216
 msgid "ABI comparison ended unexpectedly."
 msgstr ""
 
-#: lib/inspect_abidiff.c:266 lib/inspect_abidiff.c:273
+#: lib/inspect_abidiff.c:233 lib/inspect_abidiff.c:240
 msgid "ABI"
 msgstr ""
 
-#: lib/inspect_abidiff.c:285
+#: lib/inspect_abidiff.c:252
 #, c-format
 msgid ""
 "Comparing old vs. new version of %s in package %s with ABI compatibility "
 "level %ld on %s revealed ABI differences."
 msgstr ""
 
-#: lib/inspect_abidiff.c:287
+#: lib/inspect_abidiff.c:254
 #, c-format
 msgid ""
 "Comparing old vs. new version of %s in package %s on %s revealed ABI "
 "differences."
 msgstr ""
 
-#: lib/inspect_abidiff.c:291
+#: lib/inspect_abidiff.c:258
 #, c-format
 msgid ""
 "Comparing from %s to %s in package %s with ABI compatibility level %ld on %s "
 "revealed ABI differences."
 msgstr ""
 
-#: lib/inspect_abidiff.c:293
+#: lib/inspect_abidiff.c:260
 #, c-format
 msgid "Comparing from %s to %s in package %s on %s revealed ABI differences."
 msgstr ""
 
-#: lib/inspect_abidiff.c:301 lib/inspect_kmidiff.c:351
+#: lib/inspect_abidiff.c:268 lib/inspect_kmidiff.c:339
 #, c-format
 msgid ""
 "Command: %s\n"
@@ -1195,22 +1059,22 @@ msgstr ""
 msgid "`%s` added on %s"
 msgstr ""
 
-#: lib/inspect_annocheck.c:114 lib/inspect_annocheck.c:125
+#: lib/inspect_annocheck.c:105 lib/inspect_annocheck.c:116
 #, c-format
 msgid "annocheck '%s' test passes for %s on %s"
 msgstr ""
 
-#: lib/inspect_annocheck.c:116
+#: lib/inspect_annocheck.c:107
 #, c-format
 msgid "annocheck '%s' test now passes for %s on %s"
 msgstr ""
 
-#: lib/inspect_annocheck.c:118
+#: lib/inspect_annocheck.c:109
 #, c-format
 msgid "annocheck '%s' test now fails for %s on %s"
 msgstr ""
 
-#: lib/inspect_annocheck.c:127
+#: lib/inspect_annocheck.c:118
 #, c-format
 msgid "annocheck '%s' test fails for %s on %s"
 msgstr ""
@@ -1293,22 +1157,6 @@ msgid ""
 "Security Response Team."
 msgstr ""
 
-#: lib/inspect_changedfiles.c:77
-msgid "mkstemp()"
-msgstr ""
-
-#: lib/inspect_changedfiles.c:82 lib/inspect_changedfiles.c:201
-msgid "close()"
-msgstr ""
-
-#: lib/inspect_changedfiles.c:191
-msgid "open()"
-msgstr ""
-
-#: lib/inspect_changedfiles.c:196
-msgid "read()"
-msgstr ""
-
 #: lib/inspect_changedfiles.c:248
 #, c-format
 msgid "Compressed %s file %s changed content on %s."
@@ -1323,11 +1171,6 @@ msgstr ""
 msgid "msgunfmt on ${FILE}"
 msgstr ""
 
-#: lib/inspect_changedfiles.c:308 lib/inspect_changedfiles.c:312
-#, c-format
-msgid "unlink(%s)"
-msgstr ""
-
 #: lib/inspect_changedfiles.c:316
 #, c-format
 msgid "Message catalog %s changed content on %s"
@@ -1335,7 +1178,7 @@ msgstr ""
 
 #: lib/inspect_changedfiles.c:321 lib/inspect_changedfiles.c:385
 #: lib/inspect_changedfiles.c:403 lib/inspect_desktop.c:353
-#: lib/inspect_manpage.c:287
+#: lib/inspect_manpage.c:293
 msgid "${FILE}"
 msgstr ""
 
@@ -1358,7 +1201,7 @@ msgstr ""
 msgid "File %s changed content on %s."
 msgstr ""
 
-#: lib/inspect_changelog.c:249 lib/inspect_changelog.c:372
+#: lib/inspect_changelog.c:250 lib/inspect_changelog.c:373
 #, c-format
 msgid "%%changelog"
 msgstr ""
@@ -1533,126 +1376,126 @@ msgstr ""
 msgid "DT_NEEDED symbol(s) added to %s on %s"
 msgstr ""
 
-#: lib/inspect_elf.c:449
+#: lib/inspect_elf.c:448
 #, c-format
 msgid "Object still has executable stack (no GNU-stack note): %s on %s"
 msgstr ""
 
-#: lib/inspect_elf.c:452
+#: lib/inspect_elf.c:451
 #, c-format
 msgid "Object has executable stack (no GNU-stack note): %s on %s"
 msgstr ""
 
-#: lib/inspect_elf.c:456
+#: lib/inspect_elf.c:455
 #, c-format
 msgid "Program built without GNU_STACK: %s on %s"
 msgstr ""
 
-#: lib/inspect_elf.c:462
+#: lib/inspect_elf.c:461
 msgid "GNU_STACK on ${FILE}"
 msgstr ""
 
-#: lib/inspect_elf.c:472
+#: lib/inspect_elf.c:471
 #, c-format
 msgid "File %s has invalid execstack flags %lX on %s"
 msgstr ""
 
-#: lib/inspect_elf.c:474
+#: lib/inspect_elf.c:473
 #, c-format
 msgid "File %s has unrecognized GNU_STACK '%s' (expected RW or RWE) on %s"
 msgstr ""
 
-#: lib/inspect_elf.c:481 lib/inspect_elf.c:510
+#: lib/inspect_elf.c:480 lib/inspect_elf.c:509
 msgid "execstack on ${FILE}"
 msgstr ""
 
-#: lib/inspect_elf.c:492
+#: lib/inspect_elf.c:491
 #, c-format
 msgid "Object still has executable stack (GNU-stack note = X): %s on %s"
 msgstr ""
 
-#: lib/inspect_elf.c:495
+#: lib/inspect_elf.c:494
 #, c-format
 msgid "Object has executable stack (GNU-stack note = X): %s on %s"
 msgstr ""
 
-#: lib/inspect_elf.c:500
+#: lib/inspect_elf.c:499
 #, c-format
 msgid "Stack is still executable: %s on %s"
 msgstr ""
 
-#: lib/inspect_elf.c:503
+#: lib/inspect_elf.c:502
 #, c-format
 msgid "Stack is executable: %s on %s"
 msgstr ""
 
-#: lib/inspect_elf.c:535
+#: lib/inspect_elf.c:534
 #, c-format
 msgid "%s lost full GNU_RELRO security protection on %s"
 msgstr ""
 
-#: lib/inspect_elf.c:538
+#: lib/inspect_elf.c:537
 #, c-format
 msgid "%s lost GNU_RELRO security protection on %s"
 msgstr ""
 
-#: lib/inspect_elf.c:549
+#: lib/inspect_elf.c:548
 msgid "GNU_RELRO on ${FILE}"
 msgstr ""
 
-#: lib/inspect_elf.c:628
+#: lib/inspect_elf.c:627
 #, c-format
 msgid "Fortified symbols lost:\n"
 msgstr ""
 
-#: lib/inspect_elf.c:641
+#: lib/inspect_elf.c:640
 #, c-format
 msgid "Fortifiable symbols present:\n"
 msgstr ""
 
-#: lib/inspect_elf.c:658
+#: lib/inspect_elf.c:657
 #, c-format
 msgid "%s may have lost -D_FORTIFY_SOURCE on %s"
 msgstr ""
 
-#: lib/inspect_elf.c:667
+#: lib/inspect_elf.c:666
 msgid "-D_FORTIFY_SOURCE on ${FILE}"
 msgstr ""
 
-#: lib/inspect_elf.c:841
+#: lib/inspect_elf.c:840
 #, c-format
 msgid "The following objects lost -fPIC:\n"
 msgstr ""
 
-#: lib/inspect_elf.c:862
+#: lib/inspect_elf.c:861
 #, c-format
 msgid "The following new objects were built without -fPIC:\n"
 msgstr ""
 
-#: lib/inspect_elf.c:876
+#: lib/inspect_elf.c:875
 #, c-format
 msgid "%s has objects built without -fPIC on %s"
 msgstr ""
 
-#: lib/inspect_elf.c:885
+#: lib/inspect_elf.c:884
 msgid "-fPIC on ${FILE}"
 msgstr ""
 
-#: lib/inspect_elf.c:915
+#: lib/inspect_elf.c:914
 msgid "TEXTREL relocations on ${FILE}"
 msgstr ""
 
-#: lib/inspect_elf.c:930
+#: lib/inspect_elf.c:929
 #, c-format
 msgid "%s acquired TEXTREL relocations on %s"
 msgstr ""
 
-#: lib/inspect_elf.c:933
+#: lib/inspect_elf.c:932
 #, c-format
 msgid "%s has TEXTREL relocations on %s"
 msgstr ""
 
-#: lib/inspect_emptyrpm.c:66
+#: lib/inspect_emptyrpm.c:64
 #, c-format
 msgid "New package %s is empty (no payloads)"
 msgstr ""
@@ -1702,142 +1545,100 @@ msgstr ""
 msgid "${FILE} size shrank"
 msgstr ""
 
-#: lib/inspect_javabytecode.c:65
-#, c-format
-msgid "unable to open(2) %s from %s for reading: %s\n"
-msgstr ""
-
-#: lib/inspect_javabytecode.c:70
-#, c-format
-msgid "unable to read(2) %s from %s: %s\n"
-msgstr ""
-
-#: lib/inspect_javabytecode.c:75
-#, c-format
-msgid "unable to close(2) %s from %s: %s\n"
-msgstr ""
-
-#: lib/inspect_javabytecode.c:122
+#: lib/inspect_javabytecode.c:123
 #, c-format
 msgid ""
 "File %s (%s), Java byte code version %d is incorrect (wrong endianness? "
 "corrupted file? space JDK?)"
 msgstr ""
 
-#: lib/inspect_javabytecode.c:127
+#: lib/inspect_javabytecode.c:128
 #, c-format
 msgid ""
 "File %s (%s), Java byte code version %d greater than supported major version "
 "%d for product release %s"
 msgstr ""
 
-#: lib/inspect_javabytecode.c:142
+#: lib/inspect_javabytecode.c:143
 #, c-format
 msgid "Java byte code version changed from %d to %d in %s from %s"
 msgstr ""
 
-#: lib/inspect_javabytecode.c:184
-#, c-format
-msgid "*** unable to create a temporary directory for %s: %s\n"
+#: lib/inspect_javabytecode.c:244 lib/inspect_javabytecode.c:256
+msgid "*** missing JVM version to product release mapping"
 msgstr ""
 
-#: lib/inspect_javabytecode.c:203
-#, c-format
-msgid "*** error walking the unpacked directory tree for %s\n"
+#: lib/inspect_javabytecode.c:263
+msgid "*** invalid JVM major version"
 msgstr ""
 
-#: lib/inspect_javabytecode.c:243 lib/inspect_javabytecode.c:259
-#, c-format
-msgid "*** missing JVM version to product release mapping\n"
-msgstr ""
-
-#: lib/inspect_javabytecode.c:266
-#, c-format
-msgid "*** invalid JVM major version: %s: %s\n"
-msgstr ""
-
-#: lib/inspect_kmidiff.c:308
+#: lib/inspect_kmidiff.c:296
 msgid "KMI comparison ended unexpectedly."
 msgstr ""
 
-#: lib/inspect_kmidiff.c:325 lib/inspect_kmidiff.c:332
+#: lib/inspect_kmidiff.c:313 lib/inspect_kmidiff.c:320
 msgid "KMI"
 msgstr ""
 
-#: lib/inspect_kmidiff.c:342
+#: lib/inspect_kmidiff.c:330
 #, c-format
 msgid ""
 "Comparing old vs. new version of %s in package %s on %s revealed Kernel "
 "Module Interface (KMI) differences."
 msgstr ""
 
-#: lib/inspect_kmidiff.c:344
+#: lib/inspect_kmidiff.c:332
 #, c-format
 msgid ""
 "Comparing from %s to %s in package %s on %s revealed Kernel Module Interface "
 "(KMI) differences."
 msgstr ""
 
-#: lib/inspect_kmod.c:43
+#: lib/inspect_kmod.c:44
 msgid "${FILE} kernel module alias"
 msgstr ""
 
-#: lib/inspect_kmod.c:46
+#: lib/inspect_kmod.c:47
 #, c-format
 msgid "Kernel module '%s' lost alias '%s'"
 msgstr ""
 
-#: lib/inspect_kmod.c:55
+#: lib/inspect_kmod.c:56
 #, c-format
 msgid "Kernel module '%s' gained alias '%s'"
 msgstr ""
 
-#: lib/inspect_kmod.c:148 lib/inspect_kmod.c:165
-#, c-format
-msgid "*** kmod_new() failure\n"
-msgstr ""
-
-#: lib/inspect_kmod.c:182
-#, c-format
-msgid "*** error reading before kernel module %s\n"
-msgstr ""
-
-#: lib/inspect_kmod.c:191
-#, c-format
-msgid "*** error reading after kernel module %s\n"
-msgstr ""
-
-#: lib/inspect_kmod.c:205
+#: lib/inspect_kmod.c:206
 #, c-format
 msgid "Kernel module %s removes parameter '%s'"
 msgstr ""
 
-#: lib/inspect_kmod.c:208 lib/inspect_kmod.c:226 lib/inspect_kmod.c:262
+#: lib/inspect_kmod.c:209 lib/inspect_kmod.c:227 lib/inspect_kmod.c:263
 msgid "${FILE} kernel module parameter"
 msgstr ""
 
-#: lib/inspect_kmod.c:221
+#: lib/inspect_kmod.c:222
 #, c-format
 msgid "Kernel module %s adds parameter '%s'"
 msgstr ""
 
-#: lib/inspect_kmod.c:243
+#: lib/inspect_kmod.c:244
 #, c-format
 msgid "Kernel module %s removes dependency '%s'"
 msgstr ""
 
-#: lib/inspect_kmod.c:246
+#: lib/inspect_kmod.c:247
 msgid "${FILE} kernel module dependency"
 msgstr ""
 
-#: lib/inspect_kmod.c:259
+#: lib/inspect_kmod.c:260
 #, c-format
 msgid "Kernel module %s adds dependency '%s'"
 msgstr ""
 
-#: lib/inspect_license.c:57
+#: lib/inspect_license.c:58
 #, c-format
-msgid "*** Unable to open license db %s: %s\n"
+msgid "unable to open license db %s"
 msgstr ""
 
 #: lib/inspect_license.c:181 lib/inspect_license.c:202
@@ -1865,17 +1666,17 @@ msgstr ""
 msgid "Missing license database: %s: %s"
 msgstr ""
 
-#: lib/inspect_lostpayload.c:71
+#: lib/inspect_lostpayload.c:69
 #, c-format
 msgid "Existing subpackage %s is now missing"
 msgstr ""
 
-#: lib/inspect_lostpayload.c:84
+#: lib/inspect_lostpayload.c:82
 #, c-format
 msgid "Package %s continues to be empty (no payloads)"
 msgstr ""
 
-#: lib/inspect_lostpayload.c:91
+#: lib/inspect_lostpayload.c:89
 #, c-format
 msgid "Package %s became empty (no payloads)"
 msgstr ""
@@ -1892,49 +1693,54 @@ msgid ""
 "%s contains symbol [%s] on %s; this is not portable across compiler versions"
 msgstr ""
 
-#: lib/inspect_manpage.c:57
+#: lib/inspect_manpage.c:58
 #, c-format
 msgid "Error parsing %s:%d:%d: %s: %s: %s\n"
 msgstr ""
 
-#: lib/inspect_manpage.c:88
+#: lib/inspect_manpage.c:87
 #, c-format
-msgid "Unable to compile man page path regular expression: %s\n"
+msgid "unable to compile man page path regular expression: %s"
 msgstr ""
 
-#: lib/inspect_manpage.c:186
+#: lib/inspect_manpage.c:185
 #, c-format
 msgid "Unable to open man page %s\n"
 msgstr ""
 
-#: lib/inspect_manpage.c:194
+#: lib/inspect_manpage.c:193
 #, c-format
 msgid "Man page %s does not end in %s\n"
 msgstr ""
 
-#: lib/inspect_manpage.c:197
+#: lib/inspect_manpage.c:196
 #, c-format
 msgid "Unable to read man page %s\n"
 msgstr ""
 
-#: lib/inspect_manpage.c:202
+#: lib/inspect_manpage.c:201
 #, c-format
 msgid "man page with %s suffix is not really compressed with gzip\n"
 msgstr ""
 
-#: lib/inspect_manpage.c:238
+#: lib/inspect_manpage.c:237
 #, c-format
 msgid "Errors found validating %s\n"
 msgstr ""
 
-#: lib/inspect_manpage.c:290
-#, c-format
-msgid "Man page checker reported problems with %s on %s"
-msgstr ""
-
 #: lib/inspect_manpage.c:301
 #, c-format
-msgid "Man page %s has incorrect path on %s"
+msgid "Man page %s is possibly empty on %s in %s"
+msgstr ""
+
+#: lib/inspect_manpage.c:316
+#, c-format
+msgid "Man page checker reported problems with %s on %s in %s"
+msgstr ""
+
+#: lib/inspect_manpage.c:327
+#, c-format
+msgid "Man page %s has incorrect path on %s in %s"
 msgstr ""
 
 #: lib/inspect_metadata.c:55
@@ -2038,11 +1844,6 @@ msgstr ""
 #: lib/inspect_ownership.c:186
 #, c-format
 msgid "File %s has owner `%s` on %s, but should be `%s`"
-msgstr ""
-
-#: lib/inspect_ownership.c:202
-#, c-format
-msgid "*** unable to get capabilities for %s\n"
 msgstr ""
 
 #: lib/inspect_ownership.c:210
@@ -2199,11 +2000,6 @@ msgstr ""
 msgid "unable to compile $ORIGIN root prefix regular expression: %s"
 msgstr ""
 
-#: lib/inspect_runpath.c:147
-#, c-format
-msgid "regexec(): %s"
-msgstr ""
-
 #: lib/inspect_runpath.c:189
 #, c-format
 msgid "%s has an invalid-looking %s on %s: %s"
@@ -2222,53 +2018,38 @@ msgstr ""
 msgid "%s has both DT_RPATH and DT_RUNPATH on %s; this is not allowed"
 msgstr ""
 
-#: lib/inspect_shellsyntax.c:53
-#, c-format
-msgid "error opening %s for reading: %s\n"
-msgstr ""
-
-#: lib/inspect_shellsyntax.c:62
-#, c-format
-msgid "error closing %s: %s\n"
-msgstr ""
-
-#: lib/inspect_shellsyntax.c:67
-#, c-format
-msgid "error reading first line from %s: %s\n"
-msgstr ""
-
-#: lib/inspect_shellsyntax.c:150
+#: lib/inspect_shellsyntax.c:148
 #, c-format
 msgid "%s is a shell script but was not before on %s"
 msgstr ""
 
-#: lib/inspect_shellsyntax.c:152
+#: lib/inspect_shellsyntax.c:150
 #, c-format
 msgid "%s is a %s script but was a %s script before on %s"
 msgstr ""
 
-#: lib/inspect_shellsyntax.c:188
+#: lib/inspect_shellsyntax.c:186
 #, c-format
 msgid "%s is no longer a valid %s script on %s"
 msgstr ""
 
-#: lib/inspect_shellsyntax.c:197
+#: lib/inspect_shellsyntax.c:195
 #, c-format
 msgid "%s became a valid %s script on %s"
 msgstr ""
 
-#: lib/inspect_shellsyntax.c:200
+#: lib/inspect_shellsyntax.c:198
 msgid ""
 ". The script fails with '-n' but passes with '-O extglob'; be sure 'shopt "
 "extglob' is set in the script."
 msgstr ""
 
-#: lib/inspect_shellsyntax.c:210 lib/inspect_shellsyntax.c:229
+#: lib/inspect_shellsyntax.c:208 lib/inspect_shellsyntax.c:227
 #, c-format
 msgid "%s is not a valid %s script on %s"
 msgstr ""
 
-#: lib/inspect_shellsyntax.c:221
+#: lib/inspect_shellsyntax.c:219
 #, c-format
 msgid ""
 "%s fails with '-n' but passes with '-O extglob'; be sure 'shopt extglob' is "
@@ -2332,7 +2113,7 @@ msgid ""
 "%s %s has too many levels of redirects and cannot be resolved in %s on %s"
 msgstr ""
 
-#: lib/inspect_symlinks.c:283
+#: lib/inspect_symlinks.c:282
 #, c-format
 msgid "%s %s %s a dangling symbolic link in %s on %s"
 msgstr ""
@@ -2369,37 +2150,51 @@ msgstr ""
 msgid "Source file `%s` removed"
 msgstr ""
 
-#: lib/inspect_virus.c:54
+#: lib/inspect_virus.c:56
 msgid "cl_engine_new() returned NULL, check clamav library"
 msgstr ""
 
-#: lib/inspect_virus.c:62
+#: lib/inspect_virus.c:64
 #, c-format
 msgid "cl_load(): %s"
 msgstr ""
 
-#: lib/inspect_virus.c:70
+#: lib/inspect_virus.c:72
 #, c-format
 msgid "cl_engine_compile(): %s"
 msgstr ""
 
-#: lib/inspect_virus.c:94
+#: lib/inspect_virus.c:102
 #, c-format
 msgid "Virus detected in %s in the %s package on %s: %s"
 msgstr ""
 
-#: lib/inspect_virus.c:100
+#: lib/inspect_virus.c:108
 #, c-format
 msgid "cl_scanfile(%s): %s"
 msgstr ""
 
-#: lib/inspect_virus.c:115
+#: lib/inspect_virus.c:129
 #, c-format
 msgid "cl_init(): %s"
 msgstr ""
 
-#: lib/inspect_virus.c:125
-msgid "virus in ${FILE}"
+#: lib/inspect_virus.c:140
+msgid "clamav version information"
+msgstr ""
+
+#: lib/inspect_virus.c:145
+#, c-format
+msgid "clamav version %s"
+msgstr ""
+
+#: lib/inspect_virus.c:167
+#, c-format
+msgid "%s version %u (%s)"
+msgstr ""
+
+#: lib/inspect_virus.c:193
+msgid "virus or malware in ${FILE}"
 msgstr ""
 
 #: lib/inspect_xml.c:203
@@ -2407,19 +2202,9 @@ msgstr ""
 msgid "File %s is a malformed XML file on %s"
 msgstr ""
 
-#: lib/koji.c:38
+#: lib/koji.c:39
 #, c-format
-msgid "XML-RPC Fault: %s (%d)\n"
-msgstr ""
-
-#: lib/listfuncs.c:124 lib/listfuncs.c:261
-#, c-format
-msgid "Unable to create hash table: %s\n"
-msgstr ""
-
-#: lib/listfuncs.c:134
-#, c-format
-msgid "Unable to add entry to hash table: %s\n"
+msgid "XML-RPC Fault: %s (%d)"
 msgstr ""
 
 #: lib/magic.c:54
@@ -2452,9 +2237,9 @@ msgid ""
 "and other XUnit-enabled services."
 msgstr ""
 
-#: lib/output_json.c:98 lib/output_text.c:51
+#: lib/output_json.c:99 lib/output_text.c:52
 #, c-format
-msgid "*** Error opening %s for writing: %s\n"
+msgid "error opening %s for writing"
 msgstr ""
 
 #: lib/output_text.c:96
@@ -2497,7 +2282,7 @@ msgid ""
 "\n"
 msgstr ""
 
-#: lib/readelf.c:223
+#: lib/readelf.c:194
 msgid "libelf version mismatch\n"
 msgstr ""
 
@@ -2582,21 +2367,6 @@ msgstr ""
 
 #: lib/strfuncs.c:550
 msgid "UNKNOWN"
-msgstr ""
-
-#: lib/unpack.c:128
-#, c-format
-msgid "realpath(%s)"
-msgstr ""
-
-#: lib/unpack.c:144
-#, c-format
-msgid "error opening %s"
-msgstr ""
-
-#: lib/unpack.c:154 lib/unpack.c:185
-#, c-format
-msgid "chdir(%s)"
 msgstr ""
 
 #: src/rpminspect.c:46
@@ -2761,146 +2531,145 @@ msgid ""
 "See the rpminspect(1) man page for more information.\n"
 msgstr ""
 
-#: src/rpminspect.c:108 src/rpminspect.c:119
+#: src/rpminspect.c:107 src/rpminspect.c:118
 #, c-format
 msgid "*** Product release for after build (%s) is empty"
 msgstr ""
 
-#: src/rpminspect.c:134 src/rpminspect.c:143
+#: src/rpminspect.c:133 src/rpminspect.c:142
 #, c-format
 msgid "*** Product release for before build (%s) is empty"
 msgstr ""
 
-#: src/rpminspect.c:190
+#: src/rpminspect.c:180
 #, c-format
 msgid "*** unable to compile product release regular expression: %s"
 msgstr ""
 
-#: src/rpminspect.c:249
+#: src/rpminspect.c:239
 #, c-format
 msgid "*** Unable to determine product release for %s and %s"
 msgstr ""
 
-#: src/rpminspect.c:266
+#: src/rpminspect.c:256
 msgid "*** The -T and -E options are mutually exclusive"
 msgstr ""
 
-#: src/rpminspect.c:267 src/rpminspect.c:284 src/rpminspect.c:627
-#: src/rpminspect.c:636 src/rpminspect.c:671
+#: src/rpminspect.c:257 src/rpminspect.c:274 src/rpminspect.c:620
+#: src/rpminspect.c:630 src/rpminspect.c:665
 #, c-format
 msgid "*** See `%s --help` for more information."
 msgstr ""
 
-#: src/rpminspect.c:283
-#, c-format
-msgid "*** Unknown inspection: `%s`"
-msgstr ""
-
-#: src/rpminspect.c:424
+#: src/rpminspect.c:414
 #, c-format
 msgid "*** Invalid output format: `%s`."
 msgstr ""
 
-#: src/rpminspect.c:439
+#: src/rpminspect.c:429
 #, c-format
 msgid "*** Unable to expand workdir: `%s`"
 msgstr ""
 
-#: src/rpminspect.c:475
+#: src/rpminspect.c:465
 #, c-format
 msgid "%s version %s\n"
 msgstr ""
 
-#: src/rpminspect.c:478
+#: src/rpminspect.c:468
 #, c-format
 msgid "?? getopt returned character code 0%o ??"
 msgstr ""
 
-#: src/rpminspect.c:485
+#: src/rpminspect.c:475
 #, c-format
 msgid "Available output formats:\n"
 msgstr ""
 
-#: src/rpminspect.c:502
+#: src/rpminspect.c:492
 #, c-format
 msgid ""
 "\n"
 "Available inspections:\n"
 msgstr ""
 
-#: src/rpminspect.c:534
+#: src/rpminspect.c:524
 #, c-format
 msgid "Please specify a configuration file using '-c' or supply ./%s"
 msgstr ""
 
-#: src/rpminspect.c:540 src/rpminspect.c:547 src/rpminspect.c:556
+#: src/rpminspect.c:530 src/rpminspect.c:537 src/rpminspect.c:546
 #, c-format
 msgid "Failed to read configuration file %s"
 msgstr ""
 
-#: src/rpminspect.c:626
+#: src/rpminspect.c:619
 msgid "*** Invalid before and after build specification."
 msgstr ""
 
-#: src/rpminspect.c:635
+#: src/rpminspect.c:629
 msgid "*** Fetch only mode takes a single build specification."
 msgstr ""
 
-#: src/rpminspect.c:641
+#: src/rpminspect.c:635
 msgid "*** unable to read RPM configuration"
 msgstr ""
 
-#: src/rpminspect.c:670
+#: src/rpminspect.c:664
 #, c-format
 msgid "*** Unsupported architecture specified: `%s`"
 msgstr ""
 
-#: src/rpminspect.c:693
+#: src/rpminspect.c:687
 #, c-format
 msgid "*** Unable to create directory %s"
 msgstr ""
 
-#: src/rpminspect.c:699
+#: src/rpminspect.c:693
 msgid "*** Failed to gather specified builds."
 msgstr ""
 
-#: src/rpminspect.c:706
+#: src/rpminspect.c:702
+msgid "version"
+msgstr ""
+
+#: src/rpminspect.c:708
 msgid "command line"
 msgstr ""
 
-#: src/rpminspect.c:734
+#: src/rpminspect.c:738
 msgid "*** No peers, ensure packages exist for specified architecture(s)."
 msgstr ""
 
-#: src/rpminspect.c:742
+#: src/rpminspect.c:746
 msgid "invalid after RPM"
 msgstr ""
 
-#: src/rpminspect.c:750
+#: src/rpminspect.c:754
 msgid "invalid before RPM"
 msgstr ""
 
-#: src/rpminspect.c:775
+#: src/rpminspect.c:779
 #, c-format
 msgid "Running %s inspection..."
 msgstr ""
 
-#: src/rpminspect.c:784
+#: src/rpminspect.c:788
 msgid "pass"
 msgstr ""
 
-#: src/rpminspect.c:784
+#: src/rpminspect.c:788
 msgid "FAIL"
 msgstr ""
 
-#: src/rpminspect.c:805
+#: src/rpminspect.c:809
 #, c-format
 msgid ""
 "\n"
 "Keeping working directory: %s\n"
 msgstr ""
 
-#: src/rpminspect.c:808
+#: src/rpminspect.c:812
 #, c-format
 msgid "*** Error removing directory %s"
 msgstr ""
