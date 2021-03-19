@@ -3,14 +3,15 @@ project('rpminspect',
         version : '1.4',
         default_options : [
             'c_std=c99',
-            'warning_level=2',
+            'warning_level=3',
+            'werror=true',
             'buildtype=debugoptimized'
         ],
         license : 'GPL-3.0-or-later AND LGPL-3.0-or-later AND Apache-2.0')
 
 cc = meson.get_compiler('c')
 
-# Pull in all the usual glibc defines
+# Compiler options
 add_global_arguments('-D_GNU_SOURCE', language : 'c')
 add_global_arguments('-DPACKAGE_VERSION="@0@"'.format(meson.project_version()), language : 'c')
 
