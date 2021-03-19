@@ -138,7 +138,7 @@ static int add_regex(const char *pattern, regex_t **regex_out)
         assert(errbuf != NULL);
 
         regerror(reg_result, *regex_out, errbuf, errbuf_size);
-        warn(errbuf);
+        warn("%s", errbuf);
 
         /* Clean up and return error */
         free(errbuf);
