@@ -537,6 +537,7 @@ struct koji_build *get_koji_build(struct rpminspect *ri, const char *buildspec)
         /* server side error which means Koji protocol error */
         xmlrpc_env_clean(&env);
         xmlrpc_client_cleanup();
+        free_koji_build(build);
         return NULL;
     } else {
         xmlrpc_abort_on_fault(&env);
@@ -547,6 +548,7 @@ struct koji_build *get_koji_build(struct rpminspect *ri, const char *buildspec)
         xmlrpc_DECREF(result);
         xmlrpc_env_clean(&env);
         xmlrpc_client_cleanup();
+        free_koji_build(build);
         return NULL;
     }
 
