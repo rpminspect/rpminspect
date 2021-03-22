@@ -71,6 +71,13 @@
 bool foreach_peer_file(struct rpminspect *ri, foreach_peer_file_func callback, bool use_ignore);
 
 /**
+ * @brief Return inspection ID given its name string.
+ *
+ * @param name Inspection name.
+ */
+uint64_t inspection_id(const char *name);
+
+/**
  * @brief Return inspection description string given its ID.
  *
  * Return the long description for the specified inspection.
@@ -510,6 +517,7 @@ bool inspect_runpath(struct rpminspect *ri);
  * command line.
  */
 
+#define INSPECT_NULL                        ((uint64_t) 0)
 #define INSPECT_LICENSE                     (((uint64_t) 1) << 1)
 #define INSPECT_EMPTYRPM                    (((uint64_t) 1) << 2)
 #define INSPECT_METADATA                    (((uint64_t) 1) << 3)
@@ -552,6 +560,50 @@ bool inspect_runpath(struct rpminspect *ri);
 #define INSPECT_POLITICS                    (((uint64_t) 1) << 40)
 #define INSPECT_BADFUNCS                    (((uint64_t) 1) << 41)
 #define INSPECT_RUNPATH                     (((uint64_t) 1) << 42)
+
+/* Inspection names */
+#define NAME_LICENSE                        "license"
+#define NAME_EMPTYRPM                       "emptyrpm"
+#define NAME_METADATA                       "metadata"
+#define NAME_MANPAGE                        "manpage"
+#define NAME_XML                            "xml"
+#define NAME_ELF                            "elf"
+#define NAME_DESKTOP                        "desktop"
+#define NAME_DISTTAG                        "disttag"
+#define NAME_SPECNAME                       "specname"
+#define NAME_MODULARITY                     "modularity"
+#define NAME_JAVABYTECODE                   "javabytecode"
+#define NAME_CHANGEDFILES                   "changedfiles"
+#define NAME_MOVEDFILES                     "movedfiles"
+#define NAME_REMOVEDFILES                   "removedfiles"
+#define NAME_ADDEDFILES                     "addedfiles"
+#define NAME_UPSTREAM                       "upstream"
+#define NAME_OWNERSHIP                      "ownership"
+#define NAME_SHELLSYNTAX                    "shellsyntax"
+#define NAME_ANNOCHECK                      "annocheck"
+#define NAME_DSODEPS                        "dsodeps"
+#define NAME_FILESIZE                       "filesize"
+#define NAME_PERMISSIONS                    "permissions"
+#define NAME_CAPABILITIES                   "capabilities"
+#define NAME_KMOD                           "kmod"
+#define NAME_ARCH                           "arch"
+#define NAME_SUBPACKAGES                    "subpackages"
+#define NAME_CHANGELOG                      "changelog"
+#define NAME_PATHMIGRATION                  "pathmigration"
+#define NAME_LTO                            "lto"
+#define NAME_SYMLINKS                       "symlinks"
+#define NAME_LOSTPAYLOAD                    "lostpayload"
+#define NAME_FILES                          "files"
+#define NAME_TYPES                          "types"
+#define NAME_ABIDIFF                        "abidiff"
+#define NAME_KMIDIFF                        "kmidiff"
+#define NAME_CONFIG                         "config"
+#define NAME_DOC                            "doc"
+#define NAME_PATCHES                        "patches"
+#define NAME_VIRUS                          "virus"
+#define NAME_POLITICS                       "politics"
+#define NAME_BADFUNCS                       "badfuncs"
+#define NAME_RUNPATH                        "runpath"
 
 /* Long descriptions for the inspections */
 #define DESC_LICENSE _("Verify the string specified in the License tag of the RPM metadata describes permissible software licenses as defined by the license database. Also checks to see if the License tag contains any unprofessional words as defined in the configuration file.")

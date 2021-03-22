@@ -485,70 +485,70 @@ static int read_cfgfile(struct rpminspect *ri, const char *filename)
                     } else if (!strcmp(key, "security_path_prefix")) {
                         block = BLOCK_SECURITY_PATH_PREFIX;
                         group = BLOCK_NULL;
-                    } else if (!strcmp(key, "badfuncs")) {
+                    } else if (!strcmp(key, NAME_BADFUNCS)) {
                         block = BLOCK_BADFUNCS;
                         group = BLOCK_NULL;
                     } else if (!strcmp(key, "badwords")) {
                         block = BLOCK_BADWORDS;
                         group = BLOCK_NULL;
-                    } else if (!strcmp(key, "metadata")) {
+                    } else if (!strcmp(key, NAME_METADATA)) {
                         block = BLOCK_NULL;
                         group = BLOCK_METADATA;
-                    } else if (!strcmp(key, "elf")) {
+                    } else if (!strcmp(key, NAME_ELF)) {
                         block = BLOCK_NULL;
                         group = BLOCK_ELF;
-                    } else if (!strcmp(key, "manpage")) {
+                    } else if (!strcmp(key, NAME_MANPAGE)) {
                         block = BLOCK_MANPAGE;
                         group = BLOCK_NULL;
-                    } else if (!strcmp(key, "xml")) {
+                    } else if (!strcmp(key, NAME_XML)) {
                         block = BLOCK_XML;
                         group = BLOCK_NULL;
-                    } else if (!strcmp(key, "desktop")) {
+                    } else if (!strcmp(key, NAME_DESKTOP)) {
                         block = BLOCK_DESKTOP;
                         group = BLOCK_NULL;
-                    } else if (!strcmp(key, "changedfiles")) {
+                    } else if (!strcmp(key, NAME_CHANGEDFILES)) {
                         block = BLOCK_NULL;
                         group = BLOCK_CHANGEDFILES;
-                    } else if (!strcmp(key, "addedfiles")) {
+                    } else if (!strcmp(key, NAME_ADDEDFILES)) {
                         block = BLOCK_NULL;
                         group = BLOCK_ADDEDFILES;
-                    } else if (!strcmp(key, "ownership")) {
+                    } else if (!strcmp(key, NAME_OWNERSHIP)) {
                         block = BLOCK_NULL;
                         group = BLOCK_OWNERSHIP;
-                    } else if (!strcmp(key, "shellsyntax")) {
+                    } else if (!strcmp(key, NAME_SHELLSYNTAX)) {
                         block = BLOCK_NULL;
                         group = BLOCK_SHELLSYNTAX;
-                    } else if (!strcmp(key, "filesize")) {
+                    } else if (!strcmp(key, NAME_FILESIZE)) {
                         block = BLOCK_FILESIZE;
                         group = BLOCK_NULL;
-                    } else if (!strcmp(key, "lto")) {
+                    } else if (!strcmp(key, NAME_LTO)) {
                         block = BLOCK_NULL;
                         group = BLOCK_LTO;
-                    } else if (!strcmp(key, "specname")) {
+                    } else if (!strcmp(key, NAME_SPECNAME)) {
                         block = BLOCK_SPECNAME;
                         group = BLOCK_NULL;
-                    } else if (!strcmp(key, "annocheck")) {
+                    } else if (!strcmp(key, NAME_ANNOCHECK)) {
                         block = BLOCK_ANNOCHECK;
                         group = BLOCK_NULL;
-                    } else if (!strcmp(key, "javabytecode")) {
+                    } else if (!strcmp(key, NAME_JAVABYTECODE)) {
                         block = BLOCK_JAVABYTECODE;
                         group = BLOCK_NULL;
-                    } else if (!strcmp(key, "pathmigration")) {
+                    } else if (!strcmp(key, NAME_PATHMIGRATION)) {
                         block = BLOCK_NULL;
                         group = BLOCK_PATHMIGRATION;
-                    } else if (!strcmp(key, "files")) {
+                    } else if (!strcmp(key, NAME_FILES)) {
                         block = BLOCK_NULL;
                         group = BLOCK_FILES;
-                    } else if (!strcmp(key, "abidiff")) {
+                    } else if (!strcmp(key, NAME_ABIDIFF)) {
                         block = BLOCK_ABIDIFF;
                         group = BLOCK_NULL;
-                    } else if (!strcmp(key, "kmidiff")) {
+                    } else if (!strcmp(key, NAME_KMIDIFF)) {
                         block = BLOCK_NULL;
                         group = BLOCK_KMIDIFF;
-                    } else if (!strcmp(key, "patches")) {
+                    } else if (!strcmp(key, NAME_PATCHES)) {
                         block = BLOCK_NULL;
                         group = BLOCK_PATCHES;
-                    } else if (!strcmp(key, "runpath")) {
+                    } else if (!strcmp(key, NAME_RUNPATH)) {
                         block = BLOCK_NULL;
                         group = BLOCK_RUNPATH;
                     }
