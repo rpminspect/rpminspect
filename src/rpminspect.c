@@ -208,6 +208,7 @@ static char *get_product_release(string_map_t *products, const favor_release_t f
         } else if (!c) {
             matched = true;
             free(before_product);
+            before_product = NULL;
         }
     } else {
         matched = true;
@@ -224,6 +225,7 @@ static char *get_product_release(string_map_t *products, const favor_release_t f
                 after_product = before_product;
             } else {
                 free(before_product);
+                before_product = NULL;
             }
         } else if (favor_release == FAVOR_NEWEST) {
             if (c >= 0) {
@@ -231,6 +233,7 @@ static char *get_product_release(string_map_t *products, const favor_release_t f
                 after_product = before_product;
             } else {
                 free(before_product);
+                before_product = NULL;
             }
         }
     }

@@ -57,17 +57,15 @@ static void set_worksubdir(struct rpminspect *, workdir_t, const struct koji_bui
 static void get_rpm_info(const char *);
 static void prune_local(const int);
 static int copytree(const char *, const struct stat *, int, struct FTW *);
-static int download_build(const struct rpminspect *, struct koji_build *);
-static int download_task(const struct rpminspect *, struct koji_task *);
+static int download_build(const struct rpminspect *, const struct koji_build *);
+static int download_task(const struct rpminspect *, const struct koji_task *);
 static void curl_helper(const bool, const char *, const char *);
 
 /*
  * Set the working subdirectory for this particular run based on whether
  * this is a remote build or a local build.
  */
-static void set_worksubdir(struct rpminspect *ri, workdir_t wd,
-                           const struct koji_build *build,
-                           const struct koji_task *task)
+static void set_worksubdir(struct rpminspect *ri, workdir_t wd, const struct koji_build *build, const struct koji_task *task)
 {
     assert(ri != NULL);
     assert(wd != NULL_WORKDIR);
@@ -299,7 +297,7 @@ static void curl_helper(const bool verbose, const char *src, const char *dst) {
  * Given a remote artifact specification in a Koji build, download it
  * to our working directory.
  */
-static int download_build(const struct rpminspect *ri, struct koji_build *build)
+static int download_build(const struct rpminspect *ri, const struct koji_build *build)
 {
     koji_buildlist_entry_t *buildentry = NULL;
     koji_rpmlist_entry_t *rpm = NULL;
@@ -519,7 +517,7 @@ static int download_build(const struct rpminspect *ri, struct koji_build *build)
  * Given a remote artifact specification in a Koji task, download it
  * to our working directory.
  */
-static int download_task(const struct rpminspect *ri, struct koji_task *task)
+static int download_task(const struct rpminspect *ri, const struct koji_task *task)
 {
     size_t len;
     char *pkg = NULL;
@@ -762,6 +760,7 @@ int gather_builds(struct rpminspect *ri, bool fo) {
 
             if (download_task(ri, task)) {
                 warn("download_task()");
+                free_koji_task(task);
                 return -1;
             }
 
@@ -771,6 +770,7 @@ int gather_builds(struct rpminspect *ri, bool fo) {
 
             if (download_build(ri, build)) {
                 warn("download_build()");
+                free_koji_build(build);
                 return -1;
             }
 
@@ -812,6 +812,7 @@ int gather_builds(struct rpminspect *ri, bool fo) {
 
         if (download_task(ri, task)) {
             warn("download_task()");
+            free_koji_task(task);
             return -1;
         }
 
@@ -821,6 +822,7 @@ int gather_builds(struct rpminspect *ri, bool fo) {
 
         if (download_build(ri, build)) {
             warn("download_build()");
+            free_koji_build(build);
             return -1;
         }
 
