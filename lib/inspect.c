@@ -135,6 +135,104 @@ bool foreach_peer_file(struct rpminspect *ri, foreach_peer_file_func check_fn, b
 }
 
 /**
+ * @brief Return inspection ID given its name string.
+ *
+ * @param name Inspection name.
+ */
+uint64_t inspection_id(const char *name)
+{
+    if (name == NULL) {
+        return INSPECT_NULL;
+    } else if (!strcmp(name, NAME_LICENSE)) {
+        return INSPECT_LICENSE;
+    } else if (!strcmp(name, NAME_EMPTYRPM)) {
+        return INSPECT_EMPTYRPM;
+    } else if (!strcmp(name, NAME_LOSTPAYLOAD)) {
+        return INSPECT_LOSTPAYLOAD;
+    } else if (!strcmp(name, NAME_METADATA)) {
+        return INSPECT_METADATA;
+    } else if (!strcmp(name, NAME_MANPAGE)) {
+        return INSPECT_MANPAGE;
+    } else if (!strcmp(name, NAME_XML)) {
+        return INSPECT_XML;
+    } else if (!strcmp(name, NAME_ELF)) {
+        return INSPECT_ELF;
+    } else if (!strcmp(name, NAME_DESKTOP)) {
+        return INSPECT_DESKTOP;
+    } else if (!strcmp(name, NAME_DISTTAG)) {
+        return INSPECT_DISTTAG;
+    } else if (!strcmp(name, NAME_SPECNAME)) {
+        return INSPECT_SPECNAME;
+    } else if (!strcmp(name, NAME_MODULARITY)) {
+        return INSPECT_MODULARITY;
+    } else if (!strcmp(name, NAME_JAVABYTECODE)) {
+        return INSPECT_JAVABYTECODE;
+    } else if (!strcmp(name, NAME_CHANGEDFILES)) {
+        return INSPECT_CHANGEDFILES;
+    } else if (!strcmp(name, NAME_MOVEDFILES)) {
+        return INSPECT_MOVEDFILES;
+    } else if (!strcmp(name, NAME_REMOVEDFILES)) {
+        return INSPECT_REMOVEDFILES;
+    } else if (!strcmp(name, NAME_ADDEDFILES)) {
+        return INSPECT_ADDEDFILES;
+    } else if (!strcmp(name, NAME_UPSTREAM)) {
+        return INSPECT_UPSTREAM;
+    } else if (!strcmp(name, NAME_OWNERSHIP)) {
+        return INSPECT_OWNERSHIP;
+    } else if (!strcmp(name, NAME_SHELLSYNTAX)) {
+        return INSPECT_SHELLSYNTAX;
+    } else if (!strcmp(name, NAME_ANNOCHECK)) {
+        return INSPECT_ANNOCHECK;
+    } else if (!strcmp(name, NAME_DSODEPS)) {
+        return INSPECT_DSODEPS;
+    } else if (!strcmp(name, NAME_FILESIZE)) {
+        return INSPECT_FILESIZE;
+    } else if (!strcmp(name, NAME_PERMISSIONS)) {
+        return INSPECT_PERMISSIONS;
+    } else if (!strcmp(name, NAME_CAPABILITIES)) {
+        return INSPECT_CAPABILITIES;
+    } else if (!strcmp(name, NAME_KMOD)) {
+        return INSPECT_KMOD;
+    } else if (!strcmp(name, NAME_ARCH)) {
+        return INSPECT_ARCH;
+    } else if (!strcmp(name, NAME_SUBPACKAGES)) {
+        return INSPECT_SUBPACKAGES;
+    } else if (!strcmp(name, NAME_CHANGELOG)) {
+        return INSPECT_CHANGELOG;
+    } else if (!strcmp(name, NAME_PATHMIGRATION)) {
+        return INSPECT_PATHMIGRATION;
+    } else if (!strcmp(name, NAME_LTO)) {
+        return INSPECT_LTO;
+    } else if (!strcmp(name, NAME_SYMLINKS)) {
+        return INSPECT_SYMLINKS;
+    } else if (!strcmp(name, NAME_FILES)) {
+        return INSPECT_FILES;
+    } else if (!strcmp(name, NAME_TYPES)) {
+        return INSPECT_TYPES;
+    } else if (!strcmp(name, NAME_ABIDIFF)) {
+        return INSPECT_ABIDIFF;
+    } else if (!strcmp(name, NAME_KMIDIFF)) {
+        return INSPECT_KMIDIFF;
+    } else if (!strcmp(name, NAME_CONFIG)) {
+        return INSPECT_CONFIG;
+    } else if (!strcmp(name, NAME_DOC)) {
+        return INSPECT_DOC;
+    } else if (!strcmp(name, NAME_PATCHES)) {
+        return INSPECT_PATCHES;
+    } else if (!strcmp(name, NAME_VIRUS)) {
+        return INSPECT_VIRUS;
+    } else if (!strcmp(name, NAME_POLITICS)) {
+        return INSPECT_POLITICS;
+    } else if (!strcmp(name, NAME_BADFUNCS)) {
+        return INSPECT_BADFUNCS;
+    } else if (!strcmp(name, NAME_RUNPATH)) {
+        return INSPECT_RUNPATH;
+    } else {
+        return INSPECT_NULL;
+    }
+}
+
+/**
  * @brief Return inspection description string given its ID.
  *
  * Return the long description for the specified inspection.
