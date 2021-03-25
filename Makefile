@@ -91,6 +91,9 @@ new-release:
 release:
 	$(topdir)/utils/release.sh -t -p
 
+announce:
+	@$(topdir)/utils/mkannounce.sh --stable
+
 koji: srpm
 	@if [ ! -f $(RELEASED_TARBALL) ]; then \
 		echo "*** Missing $(RELEASED_TARBALL), be sure to have run 'make release'" >&2 ; \
