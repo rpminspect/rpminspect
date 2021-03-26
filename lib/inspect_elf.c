@@ -23,7 +23,7 @@
 /**
  * @file inspect_elf.c
  * @author David Cantrell &lt;dcantrell@redhat.com&gt;
- * @date 2019-2021
+ * @date 2019
  * @brief 'elf' inspection
  * @copyright LGPL-3.0-or-later
  */
@@ -33,6 +33,8 @@
 #include <stdbool.h>
 #include <stdio.h>
 #include <sys/types.h>
+#include <err.h>
+#include <inttypes.h>
 
 #include <dlfcn.h>
 #include <gnu/lib-names.h>
@@ -87,8 +89,10 @@ bool is_execstack_present(Elf *elf)
 uint64_t get_execstack_flags(Elf *elf)
 {
     GElf_Phdr phdr;
-    Elf_Scn *scn;
+    Elf_Scn *scn = NULL;
     GElf_Shdr shdr;
+
+    assert(elf != NULL);
 
     switch (get_elf_type(elf)) {
         case ET_REL:
@@ -382,7 +386,7 @@ bool is_pic_ok(Elf *elf)
     return (sht_rel_result || sht_rela_result);
 }
 
-static const char * pflags_to_str(uint64_t flags)
+static const char *pflags_to_str(uint64_t flags)
 {
     /* enough space for RWX?\0 */
     static char output[5];
@@ -413,10 +417,30 @@ static const char * pflags_to_str(uint64_t flags)
     return output;
 }
 
+static void add_execstack_flag_str(string_list_t *list, const char *s)
+{
+    string_entry_t *entry = NULL;
+
+    if (s == NULL) {
+        return;
+    }
+
+    assert(list != NULL);
+    entry = calloc(1, sizeof(*entry));
+    assert(entry != NULL);
+    entry->data = strdup(s);
+    assert(entry->data != NULL);
+    TAILQ_INSERT_TAIL(list, entry, items);
+
+    return;
+}
+
 static bool inspect_elf_execstack(struct rpminspect *ri, Elf *after_elf, Elf *before_elf, const char *localpath, const char *arch)
 {
     Elf64_Half elf_type;
     uint64_t execstack_flags;
+    string_list_t *flaglist = NULL;
+    char *fs = NULL;
     bool result = false;
     bool before_execstack = false;
     struct result_params params;
@@ -468,7 +492,45 @@ static bool inspect_elf_execstack(struct rpminspect *ri, Elf *after_elf, Elf *be
 
     if (!is_execstack_valid(after_elf, execstack_flags)) {
         if (elf_type == ET_REL) {
-            xasprintf(&params.msg, _("File %s has invalid execstack flags %lX on %s"), localpath, execstack_flags, arch);
+            flaglist = calloc(1, sizeof(*flaglist));
+            assert(flaglist != NULL);
+            TAILQ_INIT(flaglist);
+
+            if (execstack_flags & SHF_WRITE) {
+                add_execstack_flag_str(flaglist, "SHF_WRITE");
+            } else if (execstack_flags & SHF_ALLOC) {
+                add_execstack_flag_str(flaglist, "SHF_ALLOC");
+            } else if (execstack_flags & SHF_MERGE) {
+                add_execstack_flag_str(flaglist, "SHF_MERGE");
+            } else if (execstack_flags & SHF_STRINGS) {
+                add_execstack_flag_str(flaglist, "SHF_STRINGS");
+            } else if (execstack_flags & SHF_INFO_LINK) {
+                add_execstack_flag_str(flaglist, "SHF_INFO_LINK");
+            } else if (execstack_flags & SHF_LINK_ORDER) {
+                add_execstack_flag_str(flaglist, "SHF_LINK_ORDER");
+            } else if (execstack_flags & SHF_OS_NONCONFORMING) {
+                add_execstack_flag_str(flaglist, "SHF_OS_NONCONFORMING");
+            } else if (execstack_flags & SHF_GROUP) {
+                add_execstack_flag_str(flaglist, "SHF_GROUP");
+            } else if (execstack_flags & SHF_TLS) {
+                add_execstack_flag_str(flaglist, "SHF_TLS");
+            } else if (execstack_flags & SHF_COMPRESSED) {
+                add_execstack_flag_str(flaglist, "SHF_COMPRESSED");
+            } else if (execstack_flags & SHF_MASKOS) {
+                add_execstack_flag_str(flaglist, "SHF_MASKOS");
+            } else if (execstack_flags & SHF_MASKPROC) {
+                add_execstack_flag_str(flaglist, "SHF_MASKPROC");
+            } else if (execstack_flags & SHF_ORDERED) {
+                add_execstack_flag_str(flaglist, "SHF_ORDERED");
+            } else if (execstack_flags & SHF_EXCLUDE) {
+                add_execstack_flag_str(flaglist, "SHF_EXCLUDE");
+            }
+
+            fs = list_to_string(flaglist, ", ");
+            xasprintf(&params.msg, _("File %s has invalid execstack flags (%s) on %s"), localpath, fs, arch);
+
+            free(fs);
+            list_free(flaglist, free);
         } else {
             xasprintf(&params.msg, _("File %s has unrecognized GNU_STACK '%s' (expected RW or RWE) on %s"), localpath, pflags_to_str(execstack_flags), arch);
         }
