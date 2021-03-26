@@ -165,6 +165,8 @@ static bool patches_driver(struct rpminspect *ri, rpmfile_entry_t *file)
     char *details = NULL;
     diffstat_t ds;
     struct stat sb;
+    long unsigned int oldsize = 0;
+    long unsigned int newsize = 0;
 
     /* If we are not looking at a Patch file, bail. */
     if (!is_patch(file)) {
@@ -240,7 +242,9 @@ static bool patches_driver(struct rpminspect *ri, rpmfile_entry_t *file)
 
             if (exitcode) {
                 /* more than whitespace changed */
-                xasprintf(&params.msg, _("%s changed (%ld bytes -> %ld bytes)"), file->localpath, file->peer_file->st.st_size, file->st.st_size);
+                oldsize = file->peer_file->st.st_size;
+                newsize = file->st.st_size;
+                xasprintf(&params.msg, _("%s changed (%ld bytes -> %ld bytes)"), file->localpath, oldsize, newsize);
                 params.severity = RESULT_INFO;
                 params.waiverauth = NOT_WAIVABLE;
                 params.verb = VERB_CHANGED;
