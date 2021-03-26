@@ -96,7 +96,7 @@ static bool filesize_driver(struct rpminspect *ri, rpmfile_entry_t *file)
         params.severity = RESULT_INFO;
         params.waiverauth = NOT_WAIVABLE;
 
-        if (ri->size_threshold > 0 && (labs(change) >= ri->size_threshold)) {
+        if (ri->size_threshold > 0 && (llabs(change) >= ri->size_threshold)) {
             /* change is at or above our reporting change threshold for VERIFY */
             params.severity = RESULT_VERIFY;
             params.waiverauth = WAIVABLE_BY_ANYONE;
@@ -106,11 +106,11 @@ static bool filesize_driver(struct rpminspect *ri, rpmfile_entry_t *file)
 
         if (change > 0) {
             /* file grew */
-            xasprintf(&params.msg, _("%s grew by %ld%% on %s"), file->localpath, labs(change), arch);
+            xasprintf(&params.msg, _("%s grew by %lld%% on %s"), file->localpath, llabs(change), arch);
             params.noun = _("${FILE} size grew");
         } else if (change < 0) {
             /* file shrank */
-            xasprintf(&params.msg, _("%s shrank by %ld%% on %s"), file->localpath, labs(change), arch);
+            xasprintf(&params.msg, _("%s shrank by %lld%% on %s"), file->localpath, llabs(change), arch);
             params.noun = _("${FILE} size shrank");
         }
     }
