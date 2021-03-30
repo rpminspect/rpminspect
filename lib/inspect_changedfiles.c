@@ -106,7 +106,10 @@ static bool changedfiles_driver(struct rpminspect *ri, rpmfile_entry_t *file)
     char *after_tmp = NULL;
     char *before_uncompressed_file = NULL;
     char *after_uncompressed_file = NULL;
+    rpmfile_entry_t *bun = NULL;
+    rpmfile_entry_t *aun = NULL;
     char *comptype = NULL;
+    char *s = NULL;
     int fd;
     char magic[4];
     bool rebase = false;
@@ -122,6 +125,11 @@ static bool changedfiles_driver(struct rpminspect *ri, rpmfile_entry_t *file)
 
     /* Skip files without a peer, other inspections handle new/missing files */
     if (!file->peer_file) {
+        return true;
+    }
+
+    /* Ignore debuginfo and debugsource paths */
+    if (is_debug_or_build_path(file->localpath)) {
         return true;
     }
 
@@ -147,8 +155,8 @@ static bool changedfiles_driver(struct rpminspect *ri, rpmfile_entry_t *file)
 
     /* Set up the result parameters */
     init_result_params(&params);
-    params.severity = rebase ? RESULT_INFO : RESULT_VERIFY;
-    params.waiverauth = (params.severity == RESULT_INFO) ? NOT_WAIVABLE : WAIVABLE_BY_ANYONE;
+    params.severity = RESULT_INFO;
+    params.waiverauth = NOT_WAIVABLE;
     params.header = HEADER_CHANGEDFILES;
     params.arch = arch;
     params.file = file->localpath;
@@ -172,7 +180,7 @@ static bool changedfiles_driver(struct rpminspect *ri, rpmfile_entry_t *file)
     type = get_mime_type(file);
 
     /* ELF content changing is handled by other inspections */
-    if (!strcmp(type, "application/x-pie-executable") || !strcmp(type, "application/x-executable") || !strcmp(type, "application/x-object")) {
+    if (is_elf(file->fullpath)) {
         return true;
     }
 
@@ -230,11 +238,36 @@ static bool changedfiles_driver(struct rpminspect *ri, rpmfile_entry_t *file)
         after_uncompressed_file = uncompress_file(ri, file->fullpath, HEADER_CHANGEDFILES);
         assert(after_uncompressed_file != NULL);
 
-        /* perform a byte comparison of the uncompressed files */
-        exitcode = filecmp(before_uncompressed_file, after_uncompressed_file);
+        /* we can use diff on text files, so try that first */
+        bun = calloc(1, sizeof(*bun));
+        assert(bun != NULL);
+        aun = calloc(1, sizeof(*aun));
+        assert(aun != NULL);
+
+        bun->fullpath = strdup(before_uncompressed_file);
+        aun->fullpath = strdup(after_uncompressed_file);
+
+        if (is_text_file(bun) && is_text_file(aun)) {
+            /* uncompressed files are text, use diff */
+            params.details = run_cmd(&exitcode, ri->commands.diff, "-u", before_uncompressed_file, after_uncompressed_file, NULL);
+
+            /* clean up the diff headers */
+            if (exitcode) {
+                s = strreplace(params.details, before_uncompressed_file, file->peer_file->localpath);
+                free(params.details);
+                params.details = s;
+
+                s = strreplace(params.details, after_uncompressed_file, file->localpath);
+                free(params.details);
+                params.details = s;
+            }
+        } else {
+            /* perform a byte comparison of the uncompressed files */
+            exitcode = filecmp(before_uncompressed_file, after_uncompressed_file);
+        }
 
         if (exitcode) {
-            /* the files are different, report */
+            /* get a reporting type for the message */
             if (rindex(type, '/')) {
                 comptype = rindex(type, '/') + 1;
                 assert(comptype != NULL);
@@ -245,11 +278,20 @@ static bool changedfiles_driver(struct rpminspect *ri, rpmfile_entry_t *file)
                 assert(comptype != NULL);
             }
 
+            /* the files are different, report */
             xasprintf(&params.msg, _("Compressed %s file %s changed content on %s."), comptype, file->localpath, arch);
             params.verb = VERB_CHANGED;
             params.noun = file->localpath;
-            add_changedfiles_result(ri, &params);
         }
+
+        /* cleanup */
+        free(bun->fullpath);
+        free(bun->type);
+        free(bun);
+
+        free(aun->fullpath);
+        free(aun->type);
+        free(aun);
 
         free(before_uncompressed_file);
         free(after_uncompressed_file);
@@ -260,8 +302,7 @@ static bool changedfiles_driver(struct rpminspect *ri, rpmfile_entry_t *file)
     /*
      * Compare gettext .mo files and report any changes.
      */
-    if (!strcmp(type, "application/x-gettext-translation") &&
-        strsuffix(file->localpath, MO_FILENAME_EXTENSION)) {
+    if (!strcmp(type, "application/x-gettext-translation") && strsuffix(file->localpath, MO_FILENAME_EXTENSION)) {
         /*
          * This one is somewhat complicated.  We run msgunfmt on the mo files,
          * but first we have to make temporary files for that output.  Then
@@ -314,8 +355,8 @@ static bool changedfiles_driver(struct rpminspect *ri, rpmfile_entry_t *file)
 
         if (exitcode) {
             xasprintf(&params.msg, _("Message catalog %s changed content on %s"), file->localpath, arch);
-            params.severity = rebase ? RESULT_INFO : RESULT_VERIFY;
-            params.waiverauth = (params.severity == RESULT_INFO) ? NOT_WAIVABLE : WAIVABLE_BY_ANYONE;
+            params.severity = RESULT_VERIFY;
+            params.waiverauth = WAIVABLE_BY_ANYONE;
             params.remedy = REMEDY_CHANGEDFILES;
             params.verb = VERB_CHANGED;
             params.noun = _("${FILE}");
@@ -397,8 +438,10 @@ static bool changedfiles_driver(struct rpminspect *ri, rpmfile_entry_t *file)
     before_sum = checksum(file->peer_file);
     after_sum = checksum(file);
 
-    if (strcmp(before_sum, after_sum)) {
-        xasprintf(&params.msg, _("File %s changed content on %s."), file->localpath, arch);
+    if (strcmp(before_sum, after_sum) && !rebase) {
+        xasprintf(&params.msg, _("File %s changed content on %s.  Please verify this change was deliberate for a non-rebased build."), file->localpath, arch);
+        params.severity = RESULT_VERIFY;
+        params.waiverauth = WAIVABLE_BY_ANYONE;
         params.verb = VERB_CHANGED;
         params.noun = _("${FILE}");
         add_changedfiles_result(ri, &params);
