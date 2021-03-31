@@ -4,6 +4,7 @@ clamav-devel
 cunit-devel
 curl
 desktop-file-utils
+diffstat
 diffutils
 file-devel
 gcc
