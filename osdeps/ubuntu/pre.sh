@@ -11,4 +11,4 @@ apt-get -y update
 
 # install and update pip and setuptools
 apt-get install python3-pip python3-setuptools python3-testresources
-pip3 install --upgrade pip setuptools testresources
+pip install --upgrade pip setuptools testresources
