@@ -220,7 +220,7 @@ class PatchChangedInRebaseCompare(TestCompareSRPM):
         self.waiver_auth = "Not Waivable"
 
 
-# patch added not a rebase (VERIFY)
+# patch added not a rebase (INFO)
 class PatchAddedNotRebaseCompare(TestCompareSRPM):
     def setUp(self):
         super().setUp()
@@ -229,8 +229,8 @@ class PatchAddedNotRebaseCompare(TestCompareSRPM):
 
         self.inspection = "patches"
         self.label = "patches"
-        self.result = "VERIFY"
-        self.waiver_auth = "Anyone"
+        self.result = "INFO"
+        self.waiver_auth = "Not Waivable"
 
 
 # patch added in a rebase (INFO)
