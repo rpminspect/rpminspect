@@ -3,7 +3,7 @@ project('rpminspect',
         version : '1.5',
         default_options : [
             'c_std=c99',
-            'warning_level=3',
+            'warning_level=2',
             'werror=true',
             'buildtype=debugoptimized'
         ],
