@@ -142,10 +142,12 @@ class AbidiffNoRebaseWithABIChangeRPMs(TestCompareRPMs):
         super().setUp()
 
         self.before_rpm.add_simple_library(
-            sourceContent=old_library_source, compileFlags="-g -Wl,-soname,libcrashy.so.1"
+            sourceContent=old_library_source,
+            compileFlags="-g -Wl,-soname,libcrashy.so.1",
         )
         self.after_rpm.add_simple_library(
-            sourceContent=new_library_source, compileFlags="-g -Wl,-soname,libcrashy.so.1"
+            sourceContent=new_library_source,
+            compileFlags="-g -Wl,-soname,libcrashy.so.1",
         )
 
         self.inspection = "abidiff"
@@ -159,10 +161,12 @@ class AbidiffNoRebaseWithABIChangeKoji(TestCompareKoji):
         super().setUp()
 
         self.before_rpm.add_simple_library(
-            sourceContent=old_library_source, compileFlags="-g -Wl,-soname,libcrashy.so.1"
+            sourceContent=old_library_source,
+            compileFlags="-g -Wl,-soname,libcrashy.so.1",
         )
         self.after_rpm.add_simple_library(
-            sourceContent=new_library_source, compileFlags="-g -Wl,-soname,libcrashy.so.1"
+            sourceContent=new_library_source,
+            compileFlags="-g -Wl,-soname,libcrashy.so.1",
         )
 
         self.inspection = "abidiff"
