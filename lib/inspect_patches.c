@@ -289,9 +289,12 @@ static bool patches_driver(struct rpminspect *ri, rpmfile_entry_t *file)
     if (exitcode == 0 && params.details != NULL) {
         ds = get_diffstat_counts(params.details);
 
-        if ((ds.files > ri->patch_file_threshold) || (ds.lines > ri->patch_line_threshold)) {
+        if (!is_rebase(ri) && ((ds.files > ri->patch_file_threshold) || (ds.lines > ri->patch_line_threshold))) {
             params.severity = RESULT_VERIFY;
             params.waiverauth = WAIVABLE_BY_ANYONE;
+        } else {
+            params.severity = RESULT_INFO;
+            params.waiverauth = NOT_WAIVABLE;
         }
 
         if (ds.files > 0 || ds.lines > 0) {
@@ -366,18 +369,10 @@ bool inspect_patches(struct rpminspect *ri)
         return result;
     }
 
-    /* Set result type based on version difference */
-    if (is_rebase(ri) || !comparison) {
-        /* versions changed */
-        params.severity = RESULT_INFO;
-        params.waiverauth = NOT_WAIVABLE;
-        params.remedy = NULL;
-    } else {
-        /* versions are the same, likely maintenance */
-        params.severity = RESULT_VERIFY;
-        params.waiverauth = WAIVABLE_BY_ANYONE;
-        params.remedy = NULL;
-    }
+    /* Set default parameters */
+    params.severity = RESULT_INFO;
+    params.waiverauth = NOT_WAIVABLE;
+    params.remedy = NULL;
 
     /* Run the main inspection */
     TAILQ_FOREACH(peer, ri->peers, items) {
