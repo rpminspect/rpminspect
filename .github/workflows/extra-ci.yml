@@ -20,8 +20,7 @@ jobs:
         strategy:
             matrix:
 #                container: ["ubuntu"]
-#                container: ["centos:centos8", "centos:centos7", "debian:stable", "debian:testing", "opensuse/leap", "gentoo/stage3"]
-                container: ["centos:centos8", "centos:centos7", "opensuse/leap", "gentoo/stage3"]
+                container: ["centos:centos8", "centos:centos7", "debian:stable", "debian:testing", "opensuse/leap", "gentoo/stage3"]
 
         container:
             image: ${{ matrix.container }}
