@@ -33,6 +33,7 @@ TOOLS="klist"
 
 # What dist-git interaction tool we are using, e.g. Fedora is 'fedpkg'
 VENDORPKG="fedpkg"
+VENDORKOJI="koji"
 
 cleanup() {
     rm -rf "${WRKDIR}"
@@ -41,7 +42,7 @@ cleanup() {
 trap cleanup EXIT
 
 # Verify specific tools are available
-for tool in ${TOOLS} ${VENDORPKG} ; do
+for tool in ${TOOLS} ${VENDORPKG} ${VENDORKOJI} ; do
     ${tool} >/dev/null 2>&1
     if [ $? -eq 127 ]; then
         echo "*** Missing '${tool}', perhaps 'yum install -y /usr/bin/${tool}'" >&2
@@ -131,8 +132,13 @@ for branch in ${BRANCHES} ; do
     git config user.name "${GIT_USERNAME}"
     git config user.email "${GIT_USEREMAIL}"
 
+    # skip this branch if we lack build targets
+    if ! ${VENDORKOJI} list-targets | grep -q "${branch}" >/dev/null 2>&1 ; then
+        continue
+    fi
+
     # make sure we are on the right branch
-    ${VENDORPKG} switch-branch ${branch}
+    ${VENDORPKG} switch-branch "${branch}"
     git pull
 
     # add the new source archive
