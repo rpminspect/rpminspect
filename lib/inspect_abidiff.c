@@ -131,6 +131,11 @@ static bool abidiff_driver(struct rpminspect *ri, rpmfile_entry_t *file) {
         return true;
     }
 
+    /* Ignore debuginfo and debugsource paths */
+    if (is_debug_or_build_path(file->localpath)) {
+        return true;
+    }
+
     /* skip anything that is not an ELF shared library file.  */
     if (!S_ISREG(file->st.st_mode) || !is_elf_shared_library(file->fullpath)) {
         return true;
