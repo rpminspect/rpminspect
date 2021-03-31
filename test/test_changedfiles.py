@@ -98,8 +98,8 @@ class GzipFileChangesRPMs(TestCompareRPMs):
 
         self.inspection = "changedfiles"
         self.label = "changed-files"
-        self.result = "VERIFY"
-        self.waiver_auth = "Anyone"
+        self.result = "OK"
+        self.waiver_auth = "Not Waivable"
 
 
 class GzipFileChangesKoji(TestCompareKoji):
@@ -123,8 +123,8 @@ class GzipFileChangesKoji(TestCompareKoji):
 
         self.inspection = "changedfiles"
         self.label = "changed-files"
-        self.result = "VERIFY"
-        self.waiver_auth = "Anyone"
+        self.result = "OK"
+        self.waiver_auth = "Not Waivable"
 
 
 # bzip2 file does not change between builds despite having different
@@ -201,8 +201,8 @@ class Bzip2FileChangesRPMs(TestCompareRPMs):
 
         self.inspection = "changedfiles"
         self.label = "changed-files"
-        self.result = "VERIFY"
-        self.waiver_auth = "Anyone"
+        self.result = "OK"
+        self.waiver_auth = "Not Waivable"
 
 
 class Bzip2FileChangesKoji(TestCompareKoji):
@@ -226,8 +226,8 @@ class Bzip2FileChangesKoji(TestCompareKoji):
 
         self.inspection = "changedfiles"
         self.label = "changed-files"
-        self.result = "VERIFY"
-        self.waiver_auth = "Anyone"
+        self.result = "OK"
+        self.waiver_auth = "Not Waivable"
 
 
 # xz file does not change between builds despite having different
@@ -304,8 +304,8 @@ class XzFileChangesRPMs(TestCompareRPMs):
 
         self.inspection = "changedfiles"
         self.label = "changed-files"
-        self.result = "VERIFY"
-        self.waiver_auth = "Anyone"
+        self.result = "OK"
+        self.waiver_auth = "Not Waivable"
 
 
 class XzFileChangesKoji(TestCompareKoji):
@@ -329,5 +329,5 @@ class XzFileChangesKoji(TestCompareKoji):
 
         self.inspection = "changedfiles"
         self.label = "changed-files"
-        self.result = "VERIFY"
-        self.waiver_auth = "Anyone"
+        self.result = "OK"
+        self.waiver_auth = "Not Waivable"
