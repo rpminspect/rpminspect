@@ -71,27 +71,27 @@ Build Requirements
 A typical Linux system with a toolchain for building C software using
 meson and ninja, plus the following libraries:
 
-| Requirement         | URL                                                       | License                      |
-|---------------------|-----------------------------------------------------------|------------------------------|
-| json-c              | http://json-c.github.io/json-c                            | MIT                          |
-| xmlrpc-c            | http://xmlrpc-c.sourceforge.net/                          | BSD and MIT                  |
-| libxml-2.0          | http://xmlsoft.org/                                       | MIT                          |
-| rpm                 | https://github.com/rpm-software-management/rpm            | GPL-2.0-or-later             |
-| libarchive          | https://www.libarchive.org/                               | BSD                          |
-| elfutils            | https://sourceware.org/elfutils/                          | GPL-3.0-or-later             |
-| kmod                | https://git.kernel.org/pub/scm/utils/kernel/kmod/kmod.git | GPL-2.0-or-later             |
-| zlib                | https://www.zlib.net/                                     | Zlib and BSL-1.0             |
-| mandoc              | https://mandoc.bsd.lv/                                    | ISC                          |
-| libyaml             | https://github.com/yaml/libyaml                           | MIT                          |
-| file (for libmagic) | http://www.darwinsys.com/file/                            | BSD                          |
-| OpenSSL or LibreSSL | https://www.openssl.org/ or http://www.libressl.org/      | OpenSSL or (OpenSSL and ISC) |
-| libcap              | https://sites.google.com/site/fullycapable/               | BSD-3-Clause                 |
+| Requirement           | URL                                                       | License                      |
+|-----------------------|-----------------------------------------------------------|------------------------------|
+| json-c                | http://json-c.github.io/json-c                            | MIT                          |
+| xmlrpc-c              | http://xmlrpc-c.sourceforge.net/                          | BSD and MIT                  |
+| libxml-2.0            | http://xmlsoft.org/                                       | MIT                          |
+| rpm (for librpm)      | https://github.com/rpm-software-management/rpm            | GPL-2.0-or-later             |
+| libarchive            | https://www.libarchive.org/                               | BSD                          |
+| elfutils (for libelf) | https://sourceware.org/elfutils/                          | LGPL-3.0-or-later            |
+| kmod                  | https://git.kernel.org/pub/scm/utils/kernel/kmod/kmod.git | GPL-2.0-or-later             |
+| zlib                  | https://www.zlib.net/                                     | Zlib and BSL-1.0             |
+| mandoc                | https://mandoc.bsd.lv/                                    | ISC                          |
+| libyaml               | https://github.com/yaml/libyaml                           | MIT                          |
+| file (for libmagic)   | http://www.darwinsys.com/file/                            | BSD                          |
+| OpenSSL or LibreSSL   | https://www.openssl.org/ or http://www.libressl.org/      | OpenSSL or (OpenSSL and ISC) |
+| libcap                | https://sites.google.com/site/fullycapable/               | BSD-3-Clause                 |
 
 Additionally, the unit test suite requires the following packages:
 
-| Requirement         | URL                                                       | License                      |
-|---------------------|-----------------------------------------------------------|------------------------------|
-| CUnit               | http://cunit.sourceforge.net/                             | LGPL-2.0-or-later            |
+| Requirement           | URL                                                       | License                      |
+|-----------------------|-----------------------------------------------------------|------------------------------|
+| CUnit                 | http://cunit.sourceforge.net/                             | LGPL-2.0-or-later            |
 
 Most distributions include the above projects in prebuilt and packaged
 form.  If those are available, you should use those packages.
