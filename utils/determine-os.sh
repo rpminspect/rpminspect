@@ -31,16 +31,13 @@ elif [ -r /etc/redhat-release ] && [ "${ID}" = "rhel" ]; then
     else
         echo "unknown OS: ${ID}" >&2
     fi
-elif [ "${ID}" = "opensuse-leap" ] || [ "${ID}" = "opensuse-tumbleweed" ]; then
-    echo "${ID}"
-elif [ "${ID}" = "ubuntu" ] || [ "${ID}" = "debian" ]; then
-    echo "${ID}"
-elif [ "${ID}" = "slackware" ]; then
-    echo "${ID}"
-elif [ "${ID}" = "arch" ]; then
-    echo "${ID}"
-elif [ "${ID}" = "gentoo" ]; then
-    echo "${ID}"
 else
-    echo "unknown OS: ${ID}" >&2
+    case "${ID}" in
+        opensuse-leap|opensuse-tumbleweed|ubuntu|debian|slackware|arch|gentoo|alpine)
+            echo "${ID}"
+            ;;
+        *)
+            echo "unknown OS: ${ID}" >&2
+            ;;
+    esac
 fi
