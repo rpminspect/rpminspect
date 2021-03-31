@@ -20,7 +20,7 @@ jobs:
         strategy:
             matrix:
                 #container: ["alpine:latest"]
-                container: ["centos:centos8", "centos:centos7", "ubuntu", "debian:stable", "debian:testing", "opensuse/leap", "opensuse/tumbleweed", "archlinux/archlinux:base-devel", "gentoo/stage3"]
+                container: ["centos:centos8", "centos:centos7", "ubuntu:latest", "debian:stable", "debian:testing", "opensuse/leap", "opensuse/tumbleweed", "archlinux/archlinux:base-devel", "gentoo/stage3"]
 
         container:
             image: ${{ matrix.container }}
