@@ -1,5 +1,6 @@
 abigail-tools
 clamav
+diffstat
 desktop-file-utils
 gcc
 gcc-multilib
