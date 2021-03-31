@@ -271,13 +271,16 @@ bool is_elf_shared_library(const char *fullpath)
     bool result = false;
     int fd = 0;
     Elf *elf = NULL;
+    char *soname = NULL;
 
     elf = get_elf(fullpath, &fd);
+    soname = get_elf_soname(fullpath);
 
-    if (elf && get_elf_type(elf) == ET_DYN) {
+    if (elf && get_elf_type(elf) == ET_DYN && soname != NULL) {
         result = true;
     }
 
+    free(soname);
     close(fd);
     elf_end(elf);
     return result;
@@ -546,6 +549,7 @@ GElf_Phdr * get_elf_phdr(Elf *elf, Elf64_Word type, GElf_Phdr *out)
 
 /*
  * Returns the SONAME of the given file or NULL if unable.
+ * Caller must free the returned string.
  */
 char *get_elf_soname(const char *filepath) {
     char *soname = NULL;
