@@ -230,7 +230,10 @@ static bool changedfiles_driver(struct rpminspect *ri, rpmfile_entry_t *file)
      */
     if (!strcmp(type, "application/x-gzip") || !strcmp(type, "application/gzip") ||
         !strcmp(type, "application/x-bzip2") || !strcmp(type, "application/bzip2") ||
-        !strcmp(type, "application/x-xz") || !strcmp(type, "application/xz")) {
+        !strcmp(type, "application/x-xz") || !strcmp(type, "application/xz") ||
+        (!strcmp(type, "application/octet-stream") && (strsuffix(file->localpath, ".gz") ||        /* this is a workaround for bad/old versions of libmagic */
+                                                       strsuffix(file->localpath, ".bz2") ||
+                                                       strsuffix(file->localpath, ".xz")))) {
         /* uncompress the files to temporary files for comparison */
         before_uncompressed_file = uncompress_file(ri, file->peer_file->fullpath, HEADER_CHANGEDFILES);
         assert(before_uncompressed_file != NULL);
