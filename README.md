@@ -21,10 +21,10 @@ vendor-specific data package.
 Status
 ------
 
-![CI](https://github.com/rpminspect/rpminspect/workflows/CI/badge.svg)
-![Style Checks](https://github.com/rpminspect/rpminspect/workflows/Style%20Checks/badge.svg)
-![Gate](https://github.com/rpminspect/rpminspect/workflows/Gate/badge.svg)
-![Extra CI](https://github.com/rpminspect/rpminspect/workflows/Extra%20CI/badge.svg)
+[![CI](https://github.com/rpminspect/rpminspect/actions/workflows/ci.yml/badge.svg)](https://github.com/rpminspect/rpminspect/actions/workflows/ci.yml)
+[![Python Checks](https://github.com/rpminspect/rpminspect/actions/workflows/python.yml/badge.svg)](https://github.com/rpminspect/rpminspect/actions/workflows/python.yml)
+[![ShellCheck](https://github.com/rpminspect/rpminspect/actions/workflows/shellcheck.yml/badge.svg)](https://github.com/rpminspect/rpminspect/actions/workflows/shellcheck.yml)
+[![Extra CI](https://github.com/rpminspect/rpminspect/actions/workflows/extra-ci.yml/badge.svg)](https://github.com/rpminspect/rpminspect/actions/workflows/extra-ci.yml)
 
 Build Types Support
 -------------------
