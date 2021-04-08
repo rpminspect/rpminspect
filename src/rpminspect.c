@@ -282,7 +282,9 @@ static void check_found(const bool found, const char *inspection, const char *pr
 
 int main(int argc, char **argv) {
     char *progname = basename(argv[0]);
-    int c, i, j;
+    int c = 0;
+    int i = 0;
+    int j = 0;
     int idx = 0;
     int ret = RI_INSPECTION_SUCCESS;
     glob_t expand;
@@ -603,34 +605,28 @@ int main(int argc, char **argv) {
     }
 
     /*
-     * we should exactly one more argument (single build) or two arguments
-     * (a before and after build)
+     * We should exactly one more argument (single build) or two arguments
+     * (a before and after build).  Except for fetch-only we can take a
+     * list of builds.
      */
-    if (optind == (argc - 1)) {
-        /* only a single build specified */
-        ri->after = strdup(argv[optind]);
-    } else if ((optind + 1) == (argc - 1)) {
-        /* we got a before and after build */
-        ri->before = strdup(argv[optind]);
-        ri->after = strdup(argv[optind + 1]);
-    } else {
-        free_rpminspect(ri);
-
-        if (dump_config) {
-            return RI_INSPECTION_SUCCESS;
+    if (!fetch_only) {
+        if (optind == (argc - 1)) {
+            /* only a single build specified */
+            ri->after = strdup(argv[optind]);
+        } else if ((optind + 1) == (argc - 1)) {
+            /* we got a before and after build */
+            ri->before = strdup(argv[optind]);
+            ri->after = strdup(argv[optind + 1]);
         } else {
-            warnx(_("*** Invalid before and after build specification."));
-            errx(RI_PROGRAM_ERROR, _("*** See `%s --help` for more information."), progname);
-        }
-    }
+            free_rpminspect(ri);
 
-    /*
-     * Fetch-only mode can only work with a single build
-     */
-    if (fetch_only && ri->before) {
-        free_rpminspect(ri);
-        warnx(_("*** Fetch only mode takes a single build specification."));
-        errx(RI_PROGRAM_ERROR, _("*** See `%s --help` for more information."), progname);
+            if (dump_config) {
+                return RI_INSPECTION_SUCCESS;
+            } else {
+                warnx(_("*** Invalid before and after build specification."));
+                errx(RI_PROGRAM_ERROR, _("*** See `%s --help` for more information."), progname);
+            }
+        }
     }
 
     /* initialize librpm, we'll be using it */
@@ -691,9 +687,25 @@ int main(int argc, char **argv) {
     }
 
     /* validate and gather the builds specified */
-    if (gather_builds(ri, fetch_only)) {
-        rpmFreeRpmrc();
-        errx(RI_PROGRAM_ERROR, _("*** Failed to gather specified builds."));
+    if (fetch_only) {
+        /* iterate over each specified build and fetch it */
+        for (i = optind; i < argc; i++) {
+            ri->after = strdup(argv[i]);
+            assert(ri->after != NULL);
+
+            if (gather_builds(ri, true)) {
+                rpmFreeRpmrc();
+                errx(RI_PROGRAM_ERROR, _("*** failed to gather specified builds."));
+            }
+
+            free(ri->after);
+            ri->after = NULL;
+        }
+    } else {
+        if (gather_builds(ri, false)) {
+            rpmFreeRpmrc();
+            errx(RI_PROGRAM_ERROR, _("*** failed to gather specified builds."));
+        }
     }
 
     /* general information in the results */
