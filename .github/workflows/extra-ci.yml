@@ -41,16 +41,21 @@ jobs:
                           pacman --noconfirm -Syu
                           pacman --noconfirm -S git
                           ;;
-                      opensuse*)
-                          zypper install -y tar gzip
+                      centos*)
+                          yum install -y epel-release
+                          rpm --import /etc/pki/rpm-gpg/*
+                          yum install -y git
+                          ;;
+                      debian*|ubuntu*)
+                          apt-get update
+                          apt-get -y install git
                           ;;
                       gentoo*)
                           emerge-webrsync
                           emerge dev-vcs/git
                           ;;
-                      debian*|ubuntu*)
-                          apt-get update
-                          apt-get -y install git
+                      opensuse*)
+                          zypper install -y tar gzip
                           ;;
                   esac
 
@@ -68,13 +73,12 @@ jobs:
                       archlinux*)
                           pacman --noconfirm -S make
                           ;;
+                      centos*)
+                          yum install -y make
+                          ;;
                       debian*|ubuntu*)
                           apt-get update
                           apt-get -y install make
-                          ;;
-                      centos*)
-                          yum install -y epel-release make
-                          rpm --import /etc/pki/rpm-gpg/*
                           ;;
                       opensuse*)
                           zypper install -y make
