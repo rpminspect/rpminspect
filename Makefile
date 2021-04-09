@@ -14,14 +14,14 @@ endif
 # Additional packages required to run the test suite, varies by OS
 OS = $(shell $(topdir)/utils/determine-os.sh)
 
-ifeq ($(OS),unknown)
+ifeq ($(OS),)
 OS = $(error "*** unable to determine host operating system")
 endif
 
 -include $(topdir)/osdeps/$(OS)/defs.mk
 
 ifeq ($(PKG_CMD),)
-PKG_CMD = $(error "*** unable to determine host operating system")
+PKG_CMD = $(error "*** unable to determine host operating system package command")
 endif
 
 # Take additional command line argument as a positional parameter for
