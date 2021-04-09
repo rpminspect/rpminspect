@@ -43,7 +43,7 @@ static void add_changedfiles_result(struct rpminspect *ri, struct result_params 
     assert(params != NULL);
 
     if (params->waiverauth == WAIVABLE_BY_SECURITY) {
-        params->msg = strappend(params->msg, _("  Changes to security policy related files require inspection by the Security Response Team."));
+        params->msg = strappend(params->msg, _("  Changes to security policy related files require inspection by the Security Response Team."), NULL);
         assert(params->msg != NULL);
     }
 

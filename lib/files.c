@@ -485,7 +485,7 @@ static char *comparable_version_substrings(const char *s, const char *ignore)
         if (result == NULL) {
             result = strdup("/");
         } else {
-            result = strappend(result, "/");
+            result = strappend(result, "/", NULL);
         }
 
         /* the outer tokens are directory parts, see if there's a versioned one */
@@ -505,7 +505,7 @@ static char *comparable_version_substrings(const char *s, const char *ignore)
                 if (first) {
                     first = false;
                 } else {
-                    result = strappend(result, ".");
+                    result = strappend(result, ".", NULL);
                 }
 
                 /* make the version substring generic */
@@ -525,16 +525,16 @@ static char *comparable_version_substrings(const char *s, const char *ignore)
 
                 /* append the inner token */
                 if (same) {
-                    result = strappend(result, "?");
+                    result = strappend(result, "?", NULL);
                 } else {
-                    result = strappend(result, inner_token);
+                    result = strappend(result, inner_token, NULL);
                 }
             }
 
             free(inner_orig);
         } else {
             /* nothing special, just append the outer token */
-            result = strappend(result, outer_token);
+            result = strappend(result, outer_token, NULL);
         }
     }
 

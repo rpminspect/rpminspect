@@ -157,16 +157,14 @@ bool inspect_virus(struct rpminspect *ri)
             continue;
         }
 
-        params.details = strappend(params.details, "\n");
-        assert(params.details != NULL);
-
         xasprintf(&cvdpath, "%s/%s", dbpath, de->d_name);
         assert(cvdpath != NULL);
         cvd = cl_cvdhead(cvdpath);
 
         xasprintf(&dbver, _("%s version %u (%s)"), cvdpath, cvd->version, cvd->time);
         assert(dbver != NULL);
-        params.details = strappend(params.details, dbver);
+
+        params.details = strappend(params.details, "\n", dbver, NULL);
         assert(params.details != NULL);
 
         cl_cvdfree(cvd);

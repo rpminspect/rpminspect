@@ -342,7 +342,7 @@ static int download_build(const struct rpminspect *ri, const struct koji_build *
             }
 
             /* Get the main metadata file */
-            dst = strappend(dst, "/modulemd.txt");
+            dst = strappend(dst, "/modulemd.txt", NULL);
             xasprintf(&src, "%s/packages/%s/%s/%s/files/module/modulemd.txt", workri->kojimbs, build->package_name, build->version, build->release);
             curl_helper(workri->verbose, src, dst);
             free(src);

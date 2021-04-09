@@ -23,6 +23,7 @@
 #include <string.h>
 #include <ctype.h>
 #include <assert.h>
+#include <stdarg.h>
 #include <rpm/header.h>
 #include <rpm/rpmtag.h>
 #include "rpminspect.h"
@@ -31,9 +32,7 @@
  * Helper function for printwrap().  Handles printing the specified word with
  * the optional indentation and a space for the next word.
  */
-static int printword(const char *word, const size_t width,
-                     const unsigned int indent, const size_t lw,
-                     bool first, FILE *dest) {
+static int printword(const char *word, const size_t width, const unsigned int indent, const size_t lw, bool first, FILE *dest) {
     int ret = 0;
 
     if ((strlen(word) + lw) >= width) {
@@ -224,8 +223,7 @@ bool versioned_match(const char *str1, Header h1, const char *str2, Header h2)
         }
 
         /* Check that the portions of the string before the version match */
-        if (((nextversion1 - str1) != (nextversion2 - str2)) ||
-                (strncmp(str1, str2, nextversion1 - str1) != 0)) {
+        if (((nextversion1 - str1) != (nextversion2 - str2)) || (strncmp(str1, str2, nextversion1 - str1) != 0)) {
             result = false;
             goto cleanup;
         }
@@ -454,24 +452,31 @@ char *strxmlescape(const char *s)
 }
 
 /*
- * Append the second string to the first and return the result.
- * Memory is allocated or reallocated and the first argument is
+ * Append one or more strings to dest and return the result.  All
+ * items to append must be of type 'char *'.  Terminate the list with
+ * NULL.  Memory is allocated or reallocated and the first argument is
  * modified.  Caller is responsible for freeing memory.
  */
-char *strappend(char *first, const char *second)
+char *strappend(char *dest, ...)
 {
-    if (first != NULL && second == NULL) {
-        return first;
-    } else if (first == NULL && second != NULL) {
-        return strdup(second);
-    } else if (first == NULL && second == NULL) {
+    va_list sl;
+    char *s = NULL;
+
+    if (dest == NULL) {
         return NULL;
     }
 
-    first = realloc(first, strlen(first) + strlen(second) + 1);
-    assert(first != NULL);
-    first = strcat(first, second);
-    return first;
+    va_start(sl, dest);
+
+    while ((s = va_arg(sl, char *)) != NULL) {
+        dest = realloc(dest, strlen(dest) + strlen(s) + 1);
+        assert(dest != NULL);
+        dest = strcat(dest, s);
+    }
+
+    va_end(sl);
+
+    return dest;
 }
 
 /*
