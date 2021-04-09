@@ -48,6 +48,10 @@ jobs:
                           emerge-webrsync
                           emerge dev-vcs/git
                           ;;
+                      debian*|ubuntu*)
+                          apt-get update
+                          apt-get -y install git
+                          ;;
                   esac
 
             # This means clone the git repo
