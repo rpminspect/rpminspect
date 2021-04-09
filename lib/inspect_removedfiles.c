@@ -36,7 +36,7 @@ static void add_removedfiles_result(struct rpminspect *ri, struct result_params 
     assert(params != NULL);
 
     if (params->waiverauth == WAIVABLE_BY_SECURITY) {
-        params->msg = strappend(params->msg, _("; Removing security policy related files requires inspection by the Security Response Team."));
+        params->msg = strappend(params->msg, _("; Removing security policy related files requires inspection by the Security Response Team."), NULL);
     }
 
     add_result(ri, params);

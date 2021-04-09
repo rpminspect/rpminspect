@@ -55,12 +55,15 @@ char *list_to_string(const string_list_t *list, const char *delimiter)
         return NULL;
     }
 
+    s = strdup("");
+    assert(s != NULL);
+
     TAILQ_FOREACH(entry, list, items) {
         if (pos > 0 && delimiter != NULL) {
-            s = strappend(s, delimiter);
+            s = strappend(s, delimiter, NULL);
         }
 
-        s = strappend(s, entry->data);
+        s = strappend(s, entry->data, NULL);
         pos++;
     }
 

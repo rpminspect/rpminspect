@@ -88,18 +88,18 @@ void output_xunit(const results_t *results, const char *dest, const severity_t t
         }
 
         xasprintf(&rawcdata, _("Result: %s\nWaiver Authorization: %s\n\n"), strseverity(result->severity), strwaiverauth(result->waiverauth));
-        msg = strappend(msg, rawcdata);
+        msg = strappend(msg, rawcdata, NULL);
         free(rawcdata);
 
         if (result->details != NULL) {
             xasprintf(&rawcdata, _("Details:\n%s\n\n"), result->details);
-            msg = strappend(msg, rawcdata);
+            msg = strappend(msg, rawcdata, NULL);
             free(rawcdata);
         }
 
         if (result->remedy != NULL) {
             xasprintf(&rawcdata, _("Suggested Remedy:\n%s"), result->remedy);
-            msg = strappend(msg, rawcdata);
+            msg = strappend(msg, rawcdata, NULL);
             free(rawcdata);
         }
 

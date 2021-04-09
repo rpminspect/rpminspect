@@ -195,7 +195,7 @@ static bool shellsyntax_driver(struct rpminspect *ri, rpmfile_entry_t *file)
             xasprintf(&params.msg, _("%s became a valid %s script on %s"), file->localpath, shell, arch);
 
             if (extglob) {
-                params.msg = strappend(params.msg, _(". The script fails with '-n' but passes with '-O extglob'; be sure 'shopt extglob' is set in the script."));
+                params.msg = strappend(params.msg, _(". The script fails with '-n' but passes with '-O extglob'; be sure 'shopt extglob' is set in the script."), NULL);
             }
 
             params.severity = RESULT_INFO;

@@ -188,7 +188,7 @@ severity_t getseverity(const char *);
 char *strwaiverauth(const waiverauth_t);
 char *strreplace(const char *, const char *, const char *);
 char *strxmlescape(const char *);
-char *strappend(char *, const char *);
+char *strappend(char *, ...);
 string_list_t *strsplit(const char *, const char *);
 const char *strtype(const mode_t mode);
 
