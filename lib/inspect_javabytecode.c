@@ -241,7 +241,7 @@ bool inspect_javabytecode(struct rpminspect *ri)
      * Get the major JVM version for this product release.
      */
     if (ri->jvm == NULL) {
-        warn(_("*** missing JVM version to product release mapping"));
+        warnx(_("*** missing JVM version to product release mapping"));
         return false;
     }
 
@@ -253,14 +253,14 @@ bool inspect_javabytecode(struct rpminspect *ri)
     }
 
     if (hentry == NULL) {
-        warn(_("*** missing JVM version to product release mapping"));
+        warnx(_("*** missing JVM version to product release mapping"));
         return false;
     }
 
     supported_major = strtol(hentry->value, NULL, 10);
 
     if (errno == ERANGE) {
-        warn(_("*** invalid JVM major version"));
+        warn(_("strtol"));
         return false;
     }
 
