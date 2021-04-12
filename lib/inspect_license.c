@@ -49,6 +49,10 @@ static int liclen = 0;
 static struct json_object *read_licensedb(const char *licensedb)
 {
     int fd = 0;
+    struct json_tokener *tok = NULL;
+    struct json_object *r = NULL;
+    enum json_tokener_error jerr;
+    int len = 0;
 
     assert(licensedb != NULL);
 
@@ -63,7 +67,20 @@ static struct json_object *read_licensedb(const char *licensedb)
     licdata = mmap(NULL, liclen, PROT_READ, MAP_PRIVATE, fd, 0);
     close(fd);
 
-    return json_tokener_parse(licdata);
+    tok = json_tokener_new();
+    assert(tok != NULL);
+
+    len = strlen(licdata);
+    r = json_tokener_parse_ex(tok, licdata, len);
+    jerr = json_tokener_get_error(tok);
+
+    if (jerr != json_tokener_success) {
+        warnx("json_tokener_parse_ex(): %s", json_tokener_error_desc(jerr));
+    }
+
+    json_tokener_free(tok);
+
+    return r;
 }
 
 /*
@@ -158,7 +175,6 @@ static bool is_valid_expression(const char *s, const char *nevra, struct result_
 
     /* see if the entire substring matches */
     if (check_license_abbrev(s)) {
-        DEBUG_PRINT("APPROVED: |%s|\n", s);
         return true;
     }
 
@@ -284,7 +300,6 @@ static bool is_valid_license(struct rpminspect *ri, struct result_params *params
 
     /* First try to match the entire string */
     if (check_license_abbrev(tag)) {
-        DEBUG_PRINT("APPROVED: |%s|\n", tag);
         return true;
     }
 
