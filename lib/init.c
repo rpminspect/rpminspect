@@ -528,11 +528,11 @@ static int read_cfgfile(struct rpminspect *ri, const char *filename)
                         block = BLOCK_SPECNAME;
                         group = BLOCK_NULL;
                     } else if (!strcmp(key, NAME_ANNOCHECK)) {
-                        block = BLOCK_ANNOCHECK;
-                        group = BLOCK_NULL;
+                        block = BLOCK_NULL;
+                        group = BLOCK_ANNOCHECK;
                     } else if (!strcmp(key, NAME_JAVABYTECODE)) {
-                        block = BLOCK_JAVABYTECODE;
-                        group = BLOCK_NULL;
+                        block = BLOCK_NULL;
+                        group = BLOCK_JAVABYTECODE;
                     } else if (!strcmp(key, NAME_PATHMIGRATION)) {
                         block = BLOCK_NULL;
                         group = BLOCK_PATHMIGRATION;
@@ -792,9 +792,9 @@ static int read_cfgfile(struct rpminspect *ri, const char *filename)
                                 ri->size_threshold = 0;
                             }
                         }
-                    } else if (block == BLOCK_ANNOCHECK) {
+                    } else if (group == BLOCK_ANNOCHECK) {
                         process_table(key, t, &ri->annocheck);
-                    } else if (block == BLOCK_JAVABYTECODE) {
+                    } else if (group == BLOCK_JAVABYTECODE) {
                         process_table(key, t, &ri->jvm);
                     } else if (group == BLOCK_MIGRATED_PATHS) {
                         process_table(key, t, &ri->pathmigration);
