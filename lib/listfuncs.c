@@ -140,9 +140,6 @@ string_list_t *list_difference(const string_list_t *a, const string_list_t *b)
 
     /* Copy list b into a hash table */
     b_table = list_to_table(b);
-    ret = calloc(1, sizeof(*ret));
-    assert(ret != NULL);
-    TAILQ_INIT(ret);
 
     /* Iterate through list a looking for things not in list b */
     TAILQ_FOREACH(iter, a, items) {
@@ -152,6 +149,13 @@ string_list_t *list_difference(const string_list_t *a, const string_list_t *b)
             entry = calloc(1, sizeof(*entry));
             assert(entry != NULL);
             entry->data = strdup(iter->data);
+
+            if (ret == NULL) {
+                ret = calloc(1, sizeof(*ret));
+                assert(ret != NULL);
+                TAILQ_INIT(ret);
+            }
+
             TAILQ_INSERT_TAIL(ret, entry, items);
         }
     }
@@ -178,10 +182,6 @@ string_list_t *list_intersection(const string_list_t *a, const string_list_t *b)
         return NULL;
     }
 
-    ret = calloc(1, sizeof(*ret));
-    assert(ret != NULL);
-    TAILQ_INIT(ret);
-
     /* Iterate through list a looking for things in list b */
     TAILQ_FOREACH(iter, a, items) {
         HASH_FIND_STR(b_table, iter->data, hentry);
@@ -190,6 +190,13 @@ string_list_t *list_intersection(const string_list_t *a, const string_list_t *b)
             entry = calloc(1, sizeof(*entry));
             assert(entry != NULL);
             entry->data = strdup(iter->data);
+
+            if (ret == NULL) {
+                ret = calloc(1, sizeof(*ret));
+                assert(ret != NULL);
+                TAILQ_INIT(ret);
+            }
+
             TAILQ_INSERT_TAIL(ret, entry, items);
         }
     }
@@ -209,10 +216,6 @@ string_list_t *list_union(const string_list_t *a, const string_list_t *b)
     string_list_t *ret = NULL;
     string_entry_t *entry = NULL;
 
-    ret = calloc(1, sizeof(*ret));
-    assert(ret != NULL);
-    TAILQ_INIT(ret);
-
     /*
      * Iterate over both lists, adding each entry to u_table. If it's not already in
      * u_table, add it to the list to be returned.
@@ -229,6 +232,13 @@ string_list_t *list_union(const string_list_t *a, const string_list_t *b)
             entry = calloc(1, sizeof(*entry));
             assert(entry != NULL);
             entry->data = strdup(iter->data);
+
+            if (ret == NULL) {
+                ret = calloc(1, sizeof(*ret));
+                assert(ret != NULL);
+                TAILQ_INIT(ret);
+            }
+
             TAILQ_INSERT_TAIL(ret, entry, items);
         }
     }
@@ -245,6 +255,13 @@ string_list_t *list_union(const string_list_t *a, const string_list_t *b)
             entry = calloc(1, sizeof(*entry));
             assert(entry != NULL);
             entry->data = strdup(iter->data);
+
+            if (ret == NULL) {
+                ret = calloc(1, sizeof(*ret));
+                assert(ret != NULL);
+                TAILQ_INIT(ret);
+            }
+
             TAILQ_INSERT_TAIL(ret, entry, items);
         }
     }
@@ -257,9 +274,9 @@ string_list_t *list_union(const string_list_t *a, const string_list_t *b)
 /* Return a new list of entries that in either list a or list b, but not both */
 string_list_t * list_symmetric_difference(const string_list_t *a, const string_list_t *b)
 {
-    string_list_t *a_minus_b;
-    string_list_t *b_minus_a;
-    string_list_t *combination;
+    string_list_t *a_minus_b = NULL;
+    string_list_t *b_minus_a = NULL;
+    string_list_t *combination = NULL;
 
     a_minus_b = list_difference(a, b);
 
@@ -288,7 +305,7 @@ string_list_t * list_symmetric_difference(const string_list_t *a, const string_l
  */
 void list_free(string_list_t *list, list_entry_data_free_func free_func)
 {
-    string_entry_t *entry;
+    string_entry_t *entry = NULL;
 
     if (list == NULL) {
         return;
@@ -338,10 +355,6 @@ string_list_t *list_sort(const string_list_t *list)
     }
 
     /* build a new string_list_t from the sorted hash table */
-    sorted_list = calloc(1, sizeof(*sorted_list));
-    assert(sorted_list != NULL);
-    TAILQ_INIT(sorted_list);
-
     HASH_ITER(hh, map, entry, tmp_entry) {
         HASH_DEL(map, entry);
 
@@ -349,6 +362,13 @@ string_list_t *list_sort(const string_list_t *list)
         assert(iter != NULL);
         iter->data = strdup(entry->key);
         assert(iter->data != NULL);
+
+        if (sorted_list == NULL) {
+            sorted_list = calloc(1, sizeof(*sorted_list));
+            assert(sorted_list != NULL);
+            TAILQ_INIT(sorted_list);
+        }
+
         TAILQ_INSERT_TAIL(sorted_list, iter, items);
 
         free(entry->key);
@@ -362,7 +382,7 @@ string_list_t *list_sort(const string_list_t *list)
 /* Returns the number of entries in the list */
 size_t list_len(const string_list_t *list)
 {
-    string_entry_t *iter;
+    string_entry_t *iter = NULL;
     size_t len = 0;
 
     if (list == NULL || TAILQ_EMPTY(list)) {
@@ -382,17 +402,13 @@ size_t list_len(const string_list_t *list)
  */
 string_list_t * list_copy(const string_list_t *list)
 {
-    const string_entry_t *iter;
-    string_list_t *result;
-    string_entry_t *entry;
+    const string_entry_t *iter = NULL;
+    string_list_t *result = NULL;
+    string_entry_t *entry = NULL;
 
     if (list == NULL) {
         return NULL;
     }
-
-    result = malloc(sizeof(*result));
-    assert(result != NULL);
-    TAILQ_INIT(result);
 
     TAILQ_FOREACH(iter, list, items) {
         entry = calloc(1, sizeof(*entry));
@@ -400,6 +416,12 @@ string_list_t * list_copy(const string_list_t *list)
 
         entry->data = strdup(iter->data);
         assert(entry->data != NULL);
+
+        if (result == NULL) {
+            result = calloc(1, sizeof(*result));
+            assert(result != NULL);
+            TAILQ_INIT(result);
+        }
 
         TAILQ_INSERT_TAIL(result, entry, items);
     }
@@ -424,14 +446,17 @@ string_list_t *list_from_array(const char **array)
 
     assert(array != NULL);
 
-    list = calloc(1, sizeof(*list));
-    assert(list != NULL);
-    TAILQ_INIT(list);
-
     for (i = 0; array[i] != NULL; i++) {
         entry = calloc(1, sizeof(*entry));
         assert(entry != NULL);
         entry->data = strdup(array[i]);
+
+        if (list == NULL) {
+            list = calloc(1, sizeof(*list));
+            assert(list != NULL);
+            TAILQ_INIT(list);
+        }
+
         TAILQ_INSERT_TAIL(list, entry, items);
     }
 
