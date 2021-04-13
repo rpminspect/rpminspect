@@ -69,6 +69,8 @@ echo "#include <elf.h>" >> $1
 echo "#include \"rpminspect.h\"" >> $1
 echo "bool is_pic_reloc(Elf64_Half machine, Elf64_Xword rel_type)" >> $1
 echo "{" >> $1
+echo "    DEBUG_PRINT(\"machine=%d, rel_type=%ld\n\", machine, rel_type);" >> $1
+echo >> $1
 echo "    switch (machine) {" >> $1
 
 # get a list of the EM_* arch lines:

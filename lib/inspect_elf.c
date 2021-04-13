@@ -361,6 +361,10 @@ bool is_pic_ok(Elf *elf)
         }
     }
 
+    if (sht_rela_result) {
+        return sht_rela_result;
+    }
+
     /* Try again with SHT_REL */
     rel_section = get_elf_section(elf, SHT_REL, ".rel.text", NULL, &rel_shdr);
     rel_data = NULL;
@@ -377,13 +381,13 @@ bool is_pic_ok(Elf *elf)
                 }
 
                 if (is_global_reloc(&symtab_shdr, symtab_data, xndxdata, GELF_R_SYM(rel.r_info)) || is_pic_reloc(ehdr.e_machine, GELF_R_TYPE(rel.r_info))) {
-                    sht_rela_result = true;
+                    sht_rel_result = true;
                 }
             }
         }
     }
 
-    return (sht_rel_result || sht_rela_result);
+    return sht_rel_result;
 }
 
 static const char *pflags_to_str(uint64_t flags)
@@ -753,8 +757,6 @@ static bool find_no_pic(Elf *elf, string_list_t **user_data)
     string_entry_t *entry = NULL;
     Elf_Arhdr *arhdr = NULL;
 
-    assert(no_pic_list != NULL);
-
     if ((arhdr = elf_getarhdr(elf)) == NULL) {
         return true;
     }
@@ -770,6 +772,13 @@ static bool find_no_pic(Elf *elf, string_list_t **user_data)
         entry = calloc(1, sizeof(*entry));
         assert(entry != NULL);
         entry->data = strdup(arhdr->ar_name);
+
+        if (no_pic_list == NULL) {
+            no_pic_list = calloc(1, sizeof(*no_pic_list));
+            assert(no_pic_list != NULL);
+            TAILQ_INIT(no_pic_list);
+        }
+
         TAILQ_INSERT_TAIL(no_pic_list, entry, items);
     }
 
@@ -789,8 +798,6 @@ static bool find_pic(Elf *elf, string_list_t **user_data)
     string_entry_t *entry = NULL;
     Elf_Arhdr *arhdr = NULL;
 
-    assert(pic_list != NULL);
-
     if ((arhdr = elf_getarhdr(elf)) == NULL) {
         return true;
     }
@@ -806,6 +813,13 @@ static bool find_pic(Elf *elf, string_list_t **user_data)
         entry = calloc(1, sizeof(*entry));
         assert(entry != NULL);
         entry->data = strdup(arhdr->ar_name);
+
+        if (pic_list == NULL) {
+            pic_list = calloc(1, sizeof(*pic_list));
+            assert(pic_list != NULL);
+            TAILQ_INIT(pic_list);
+        }
+
         TAILQ_INSERT_TAIL(pic_list, entry, items);
     }
 
@@ -843,7 +857,7 @@ static bool find_all(Elf *elf, string_list_t **user_data)
     return true;
 }
 
-static bool elf_archive_tests(struct rpminspect *ri, Elf *after_elf, int after_elf_fd, Elf *before_elf, int before_elf_fd, const char *localpath, const char *arch)
+static bool elf_archive_tests(struct rpminspect *ri, Elf *after_elf, int after_elf_fd, Elf *before_elf, int before_elf_fd, const char *localpath, const char *arch, const char *name)
 {
     string_list_t *after_no_pic = NULL;
     string_list_t *before_pic = NULL;
@@ -867,18 +881,12 @@ static bool elf_archive_tests(struct rpminspect *ri, Elf *after_elf, int after_e
     }
 
     /* initialize the list of objects in the after build without PIC */
-    after_no_pic = calloc(1, sizeof(*after_no_pic));
-    assert(after_no_pic != NULL);
-    TAILQ_INIT(after_no_pic);
     elf_archive_iterate(after_elf_fd, after_elf, find_no_pic, &after_no_pic);
 
     /* initialize the list of objects in the before build with PIC */
-    before_pic = calloc(1, sizeof(*before_pic));
-    assert(before_pic != NULL);
-    TAILQ_INIT(before_pic);
     elf_archive_iterate(before_elf_fd, before_elf, find_pic, &before_pic);
 
-    if (TAILQ_EMPTY(after_no_pic) && TAILQ_EMPTY(before_pic)) {
+    if (after_no_pic == NULL && before_pic == NULL) {
         goto cleanup;
     }
 
@@ -894,17 +902,19 @@ static bool elf_archive_tests(struct rpminspect *ri, Elf *after_elf, int after_e
     assert(output_stream != NULL);
 
     /* Report objects that lost -fPIC */
-    after_lost_pic = list_intersection(before_pic, after_no_pic);
+    if (before_pic && !TAILQ_EMPTY(before_pic)) {
+        after_lost_pic = list_intersection(before_pic, after_no_pic);
 
-    if (after_lost_pic && list_len(after_lost_pic) > 0) {
-        result = false;
+        if (after_lost_pic && !TAILQ_EMPTY(after_lost_pic)) {
+            result = false;
 
-        output_result = fprintf(output_stream, _("The following objects lost -fPIC:\n"));
-        assert(output_result > 0);
-
-        TAILQ_FOREACH(iter, after_lost_pic, items) {
-            output_result = fprintf(output_stream, "\t%s\n", iter->data);
+            output_result = fprintf(output_stream, _("The following objects lost -fPIC:\n"));
             assert(output_result > 0);
+
+            TAILQ_FOREACH(iter, after_lost_pic, items) {
+                output_result = fprintf(output_stream, "\t%s\n", iter->data);
+                assert(output_result > 0);
+            }
         }
     }
 
@@ -934,7 +944,7 @@ static bool elf_archive_tests(struct rpminspect *ri, Elf *after_elf, int after_e
 
     if (!result) {
         init_result_params(&params);
-        xasprintf(&params.msg, _("%s has objects built without -fPIC on %s"), localpath, arch);
+        xasprintf(&params.msg, _("%s in %s has objects built without -fPIC on %s"), localpath, name, arch);
         params.severity = RESULT_BAD;
         params.waiverauth = WAIVABLE_BY_SECURITY;
         params.header = HEADER_ELF;
@@ -961,7 +971,7 @@ cleanup:
     return result;
 }
 
-static bool elf_regular_tests(struct rpminspect *ri, Elf *after_elf, Elf *before_elf, const char *localpath, const char *arch)
+static bool elf_regular_tests(struct rpminspect *ri, Elf *after_elf, Elf *before_elf, const char *localpath, const char *arch, const char *name)
 {
     bool result = true;
     struct result_params params;
@@ -988,10 +998,10 @@ static bool elf_regular_tests(struct rpminspect *ri, Elf *after_elf, Elf *before
     if (has_textrel(after_elf)) {
         /* Only complain for baseline (no before), or for gaining TEXTREL between before and after. */
         if (before_elf && !has_textrel(before_elf)) {
-            xasprintf(&params.msg, _("%s acquired TEXTREL relocations on %s"), localpath, arch);
+            xasprintf(&params.msg, _("%s in %s acquired TEXTREL relocations on %s"), localpath, name, arch);
             params.verb = VERB_ADDED;
         } else if (!before_elf) {
-            xasprintf(&params.msg, _("%s has TEXTREL relocations on %s"), localpath, arch);
+            xasprintf(&params.msg, _("%s in %s has TEXTREL relocations on %s"), localpath, name, arch);
             params.verb = VERB_FAILED;
         }
 
@@ -1019,7 +1029,8 @@ static bool elf_regular_tests(struct rpminspect *ri, Elf *after_elf, Elf *before
 
 static bool elf_driver(struct rpminspect *ri, rpmfile_entry_t *after)
 {
-    const char *arch;
+    const char *arch = NULL;
+    const char *name = NULL;
     Elf *after_elf = NULL;
     Elf *before_elf = NULL;
     int after_elf_fd = -1;
@@ -1040,6 +1051,7 @@ static bool elf_driver(struct rpminspect *ri, rpmfile_entry_t *after)
     }
 
     arch = get_rpm_header_arch(after->rpm_header);
+    name = headerGetString(after->rpm_header, RPMTAG_NAME);
 
     /* Is this an archive or a regular ELF file? */
     if ((after_elf = get_elf_archive(after->fullpath, &after_elf_fd)) != NULL) {
@@ -1047,15 +1059,14 @@ static bool elf_driver(struct rpminspect *ri, rpmfile_entry_t *after)
             before_elf = get_elf_archive(after->peer_file->fullpath, &before_elf_fd);
         }
 
-        result = elf_archive_tests(ri, after_elf, after_elf_fd, before_elf, before_elf_fd, after->localpath, arch);
+        result = elf_archive_tests(ri, after_elf, after_elf_fd, before_elf, before_elf_fd, after->localpath, arch, name);
     } else if ((after_elf = get_elf(after->fullpath, &after_elf_fd)) != NULL) {
         if (after->peer_file != NULL) {
             before_elf = get_elf(after->peer_file->fullpath, &before_elf_fd);
         }
 
-        result = elf_regular_tests(ri, after_elf, before_elf, after->localpath, arch);
+        result = elf_regular_tests(ri, after_elf, before_elf, after->localpath, arch, name);
     }
-
 
     if (after_elf) {
         elf_end(after_elf);
@@ -1085,7 +1096,7 @@ static bool elf_driver(struct rpminspect *ri, rpmfile_entry_t *after)
  */
 bool inspect_elf(struct rpminspect *ri)
 {
-    bool result;
+    bool result = false;
     struct result_params params;
 
     init_elf_data(ri);
