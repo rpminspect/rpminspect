@@ -2,6 +2,7 @@ autoconf
 automake
 bison
 clamav
+cpp-coveralls
 cunit
 desktop-file-utils
 diffstat
