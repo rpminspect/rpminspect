@@ -744,9 +744,8 @@ cleanup:
  * @param elf ELF object to check
  * @param user_data List of ELF archives compiled without -fPIC
  */
-bool find_no_pic(Elf *elf, string_list_t **user_data)
+bool find_no_pic(Elf *elf, string_list_t **no_pic_list)
 {
-    string_list_t *no_pic_list = *user_data;
     string_entry_t *entry = NULL;
     Elf_Arhdr *arhdr = NULL;
 
@@ -766,13 +765,13 @@ bool find_no_pic(Elf *elf, string_list_t **user_data)
         assert(entry != NULL);
         entry->data = strdup(arhdr->ar_name);
 
-        if (no_pic_list == NULL) {
-            no_pic_list = calloc(1, sizeof(*no_pic_list));
-            assert(no_pic_list != NULL);
-            TAILQ_INIT(no_pic_list);
+        if (*no_pic_list == NULL) {
+            *no_pic_list = calloc(1, sizeof(**no_pic_list));
+            assert(*no_pic_list != NULL);
+            TAILQ_INIT(*no_pic_list);
         }
 
-        TAILQ_INSERT_TAIL(no_pic_list, entry, items);
+        TAILQ_INSERT_TAIL(*no_pic_list, entry, items);
     }
 
     return true;
@@ -785,9 +784,8 @@ bool find_no_pic(Elf *elf, string_list_t **user_data)
  * @param elf ELF object to check
  * @param user_data List of ELF archives compiled with -fPIC
  */
-bool find_pic(Elf *elf, string_list_t **user_data)
+bool find_pic(Elf *elf, string_list_t **pic_list)
 {
-    string_list_t *pic_list = *user_data;
     string_entry_t *entry = NULL;
     Elf_Arhdr *arhdr = NULL;
 
@@ -807,13 +805,13 @@ bool find_pic(Elf *elf, string_list_t **user_data)
         assert(entry != NULL);
         entry->data = strdup(arhdr->ar_name);
 
-        if (pic_list == NULL) {
-            pic_list = calloc(1, sizeof(*pic_list));
-            assert(pic_list != NULL);
-            TAILQ_INIT(pic_list);
+        if (*pic_list == NULL) {
+            *pic_list = calloc(1, sizeof(**pic_list));
+            assert(*pic_list != NULL);
+            TAILQ_INIT(*pic_list);
         }
 
-        TAILQ_INSERT_TAIL(pic_list, entry, items);
+        TAILQ_INSERT_TAIL(*pic_list, entry, items);
     }
 
     return true;
@@ -825,9 +823,8 @@ bool find_pic(Elf *elf, string_list_t **user_data)
  * @param elf ELF object to check
  * @param user_data List of ELF archives
  */
-bool find_all(Elf *elf, string_list_t **user_data)
+bool find_all(Elf *elf, string_list_t **all_list)
 {
-    string_list_t *all_list = *user_data;
     string_entry_t *entry = NULL;
     Elf_Arhdr *arhdr = NULL;
 
@@ -846,13 +843,13 @@ bool find_all(Elf *elf, string_list_t **user_data)
     assert(entry != NULL);
     entry->data = strdup(arhdr->ar_name);
 
-    if (all_list == NULL) {
-        all_list = calloc(1, sizeof(*all_list));
-        assert(all_list != NULL);
-        TAILQ_INIT(all_list);
+    if (*all_list == NULL) {
+        *all_list = calloc(1, sizeof(**all_list));
+        assert(*all_list != NULL);
+        TAILQ_INIT(*all_list);
     }
 
-    TAILQ_INSERT_TAIL(all_list, entry, items);
+    TAILQ_INSERT_TAIL(*all_list, entry, items);
 
     return true;
 }
@@ -884,9 +881,6 @@ static bool elf_archive_tests(struct rpminspect *ri, Elf *after_elf, int after_e
     elf_archive_iterate(after_elf_fd, after_elf, find_no_pic, &after_no_pic);
 
     /* initialize the list of objects in the before build with PIC */
-    before_pic = calloc(1, sizeof(*before_pic));
-    assert(before_pic != NULL);
-    TAILQ_INIT(before_pic);
     elf_archive_iterate(before_elf_fd, before_elf, find_pic, &before_pic);
 
     if (after_no_pic == NULL || before_pic == NULL) {
