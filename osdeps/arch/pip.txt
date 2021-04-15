@@ -1,4 +1,0 @@
-rpmfluff
-PyYAML
-gcovr
-timeout-decorator
