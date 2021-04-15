@@ -317,9 +317,6 @@ bool is_pic_ok(Elf *elf)
     size_t entry_size;
     size_t i;
 
-    bool sht_rel_result = false;
-    bool sht_rela_result = false;
-
     if (gelf_getehdr(elf, &ehdr) == NULL) {
         return true;
     }
@@ -355,14 +352,10 @@ bool is_pic_ok(Elf *elf)
                 }
 
                 if (is_global_reloc(&symtab_shdr, symtab_data, xndxdata, GELF_R_SYM(rela.r_info)) || is_pic_reloc(ehdr.e_machine, GELF_R_TYPE(rela.r_info))) {
-                    sht_rela_result = true;
+                    return true;
                 }
             }
         }
-    }
-
-    if (sht_rela_result) {
-        return sht_rela_result;
     }
 
     /* Try again with SHT_REL */
@@ -380,14 +373,14 @@ bool is_pic_ok(Elf *elf)
                     continue;
                 }
 
-                if (is_global_reloc(&symtab_shdr, symtab_data, xndxdata, GELF_R_SYM(rel.r_info)) || is_pic_reloc(ehdr.e_machine, GELF_R_TYPE(rel.r_info))) {
-                    sht_rel_result = true;
+                if (is_global_reloc(&symtab_shdr, symtab_data, xndxdata, GELF_R_SYM(rela.r_info)) || is_pic_reloc(ehdr.e_machine, GELF_R_TYPE(rel.r_info))) {
+                    return true;
                 }
             }
         }
     }
 
-    return sht_rel_result;
+    return false;
 }
 
 static const char *pflags_to_str(uint64_t flags)
@@ -751,7 +744,7 @@ cleanup:
  * @param elf ELF object to check
  * @param user_data List of ELF archives compiled without -fPIC
  */
-static bool find_no_pic(Elf *elf, string_list_t **user_data)
+bool find_no_pic(Elf *elf, string_list_t **user_data)
 {
     string_list_t *no_pic_list = *user_data;
     string_entry_t *entry = NULL;
@@ -792,7 +785,7 @@ static bool find_no_pic(Elf *elf, string_list_t **user_data)
  * @param elf ELF object to check
  * @param user_data List of ELF archives compiled with -fPIC
  */
-static bool find_pic(Elf *elf, string_list_t **user_data)
+bool find_pic(Elf *elf, string_list_t **user_data)
 {
     string_list_t *pic_list = *user_data;
     string_entry_t *entry = NULL;
@@ -832,7 +825,7 @@ static bool find_pic(Elf *elf, string_list_t **user_data)
  * @param elf ELF object to check
  * @param user_data List of ELF archives
  */
-static bool find_all(Elf *elf, string_list_t **user_data)
+bool find_all(Elf *elf, string_list_t **user_data)
 {
     string_list_t *all_list = *user_data;
     string_entry_t *entry = NULL;
@@ -852,6 +845,13 @@ static bool find_all(Elf *elf, string_list_t **user_data)
     entry = calloc(1, sizeof(*entry));
     assert(entry != NULL);
     entry->data = strdup(arhdr->ar_name);
+
+    if (all_list == NULL) {
+        all_list = calloc(1, sizeof(*all_list));
+        assert(all_list != NULL);
+        TAILQ_INIT(all_list);
+    }
+
     TAILQ_INSERT_TAIL(all_list, entry, items);
 
     return true;
@@ -884,10 +884,13 @@ static bool elf_archive_tests(struct rpminspect *ri, Elf *after_elf, int after_e
     elf_archive_iterate(after_elf_fd, after_elf, find_no_pic, &after_no_pic);
 
     /* initialize the list of objects in the before build with PIC */
+    before_pic = calloc(1, sizeof(*before_pic));
+    assert(before_pic != NULL);
+    TAILQ_INIT(before_pic);
     elf_archive_iterate(before_elf_fd, before_elf, find_pic, &before_pic);
 
-    if (after_no_pic == NULL && before_pic == NULL) {
-        goto cleanup;
+    if (after_no_pic == NULL || before_pic == NULL) {
+        return true;
     }
 
     /* Gather data for two possible messages:
@@ -902,27 +905,21 @@ static bool elf_archive_tests(struct rpminspect *ri, Elf *after_elf, int after_e
     assert(output_stream != NULL);
 
     /* Report objects that lost -fPIC */
-    if (before_pic && !TAILQ_EMPTY(before_pic)) {
-        after_lost_pic = list_intersection(before_pic, after_no_pic);
+    after_lost_pic = list_intersection(before_pic, after_no_pic);
 
-        if (after_lost_pic && !TAILQ_EMPTY(after_lost_pic)) {
-            result = false;
+    if (after_lost_pic && !TAILQ_EMPTY(after_lost_pic)) {
+        result = false;
 
-            output_result = fprintf(output_stream, _("The following objects lost -fPIC:\n"));
+        output_result = fprintf(output_stream, _("The following objects lost -fPIC:\n"));
+        assert(output_result > 0);
+
+        TAILQ_FOREACH(iter, after_lost_pic, items) {
+            output_result = fprintf(output_stream, "\t%s\n", iter->data);
             assert(output_result > 0);
-
-            TAILQ_FOREACH(iter, after_lost_pic, items) {
-                output_result = fprintf(output_stream, "\t%s\n", iter->data);
-                assert(output_result > 0);
-            }
         }
     }
 
     /* Report new objects built without -fPIC */
-    before_all = calloc(1, sizeof(*before_all));
-    assert(before_all != NULL);
-
-    TAILQ_INIT(before_all);
     elf_archive_iterate(before_elf_fd, before_elf, find_all, &before_all);
 
     after_new = list_difference(after_no_pic, before_all);
@@ -958,7 +955,6 @@ static bool elf_archive_tests(struct rpminspect *ri, Elf *after_elf, int after_e
         free(params.msg);
     }
 
-cleanup:
     list_free(after_lost_pic, NULL);
     list_free(after_new, NULL);
 

@@ -302,6 +302,9 @@ bool has_executable_program(Elf *elf);
 bool has_relro(Elf *elf);
 uint64_t get_execstack_flags(Elf *elf);
 bool has_textrel(Elf *elf);
+bool find_no_pic(Elf *elf, string_list_t **user_data);
+bool find_pic(Elf *elf, string_list_t **user_data);
+bool find_all(Elf *elf, string_list_t **user_data);
 
 /* bytes.c */
 /**
