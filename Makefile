@@ -112,8 +112,12 @@ instreqs:
 	if [ -x $(topdir)/osdeps/$(OS)/pre.sh ]; then \
 		env OSDEPS=$(topdir)/osdeps/$(OS) $(topdir)/osdeps/$(OS)/pre.sh ; \
 	fi
-	$(PKG_CMD) $$(grep -v ^# $(topdir)/osdeps/$(OS)/reqs.txt 2>/dev/null | awk 'NF' ORS=' ')
-	$(PIP_CMD) $$(grep -v ^# $(topdir)/osdeps/$(OS)/pip.txt 2>/dev/null | awk 'NF' ORS=' ')
+	if [ -f $(topdir)/osdeps/$(OS)/reqs.txt ]; then \
+		$(PKG_CMD) $$(grep -v ^# $(topdir)/osdeps/$(OS)/reqs.txt 2>/dev/null | awk 'NF' ORS=' ') ; \
+	fi
+	if [ -f $(topdir)/osdeps/$(OS)/pip.txt ]; then \
+		$(PIP_CMD) $$(grep -v ^# $(topdir)/osdeps/$(OS)/pip.txt 2>/dev/null | awk 'NF' ORS=' ') ; \
+	fi
 	if [ -x $(topdir)/osdeps/$(OS)/post.sh ]; then \
 		env OSDEPS=$(topdir)/osdeps/$(OS) $(topdir)/osdeps/$(OS)/post.sh ; \
 	fi
