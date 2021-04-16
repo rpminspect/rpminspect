@@ -1,4 +1,7 @@
+autoconf
+automake
 bash
+bison
 clamav
 clamav-devel
 cunit-devel

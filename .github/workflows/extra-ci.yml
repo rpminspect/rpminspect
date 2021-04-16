@@ -20,13 +20,18 @@ jobs:
         strategy:
             matrix:
                 #container: ["alpine:latest"]
+
+                # This one frequently breaks.  Like installing
+                # packages doesn't work.  I am not convinced
+                # tumbleweed is useful in the CI environment.
+                #container: ["opensuse/tumbleweed"]
+
                 container: ["centos:centos8",
                             "centos:centos7",
                             "ubuntu:latest",
                             "debian:stable",
                             "debian:testing",
                             "opensuse/leap",
-                            "opensuse/tumbleweed",
                             "archlinux/archlinux:base-devel",
                             "gentoo/stage3"]
 
@@ -63,7 +68,7 @@ jobs:
                           emerge dev-vcs/git
                           ;;
                       opensuse*)
-                          zypper install -y tar gzip
+                          zypper install -y git
                           ;;
                   esac
 
