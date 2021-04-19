@@ -157,7 +157,7 @@ static int add_regex(const char *pattern, regex_t **regex_out)
  * @param list Pointer to a string_list_t to add entry to.
  * @param s String to add to the string_list_t.
  */
-void add_entry(string_list_t **list, const char *s)
+static void add_entry(string_list_t **list, const char *s)
 {
     string_entry_t *entry = NULL;
 
@@ -184,6 +184,99 @@ void add_entry(string_list_t **list, const char *s)
     assert(entry->data != NULL);
 
     TAILQ_INSERT_TAIL(*list, entry, items);
+
+    return;
+}
+
+/*
+ * Given an inspection identifier from the config file reader and a
+ * list value, add it to the per-inspection list of ignores.
+ */
+static void add_ignore(string_list_map_t **table, int i, char *s)
+{
+    char *inspection = NULL;
+    string_list_map_t *entry = NULL;
+    string_entry_t *ignore = NULL;
+
+    assert(s != NULL);
+    assert(inspection != BLOCK_NULL);
+
+    /*
+     * determine the inspection first.  we do not allow all
+     * inspections to have per-inspection ignore lists.  invalid ones
+     * are reported out.
+     */
+    if (i == BLOCK_ELF) {
+        inspection = NAME_ELF;
+    } else if (i == BLOCK_MANPAGE) {
+        inspection = NAME_MANPAGE;
+    } else if (i == BLOCK_XML) {
+        inspection = NAME_XML;
+    } else if (i == BLOCK_DESKTOP) {
+        inspection = NAME_DESKTOP;
+    } else if (i == BLOCK_CHANGEDFILES) {
+        inspection = NAME_CHANGEDFILES;
+    } else if (i == BLOCK_ADDEDFILES) {
+        inspection = NAME_ADDEDFILES;
+    } else if (i == BLOCK_OWNERSHIP) {
+        inspection = NAME_OWNERSHIP;
+    } else if (i == BLOCK_SHELLSYNTAX) {
+        inspection = NAME_SHELLSYNTAX;
+    } else if (i == BLOCK_FILESIZE) {
+        inspection = NAME_FILESIZE;
+    } else if (i == BLOCK_LTO) {
+        inspection = NAME_LTO;
+    } else if (i == BLOCK_ANNOCHECK) {
+        inspection = NAME_ANNOCHECK;
+    } else if (i == BLOCK_JAVABYTECODE) {
+        inspection = NAME_JAVABYTECODE;
+    } else if (i == BLOCK_PATHMIGRATION) {
+        inspection = NAME_PATHMIGRATION;
+    } else if (i == BLOCK_FILES) {
+        inspection = NAME_FILES;
+    } else if (i == BLOCK_ABIDIFF) {
+        inspection = NAME_ABIDIFF;
+    } else if (i == BLOCK_KMIDIFF) {
+        inspection = NAME_KMIDIFF;
+    } else if (i == BLOCK_BADFUNCS) {
+        inspection = NAME_BADFUNCS;
+    } else if (i == BLOCK_RUNPATH) {
+        inspection = NAME_RUNPATH;
+    } else {
+        warnx(_("*** ignore found in %d, value `%s'"), i, s);
+        return;
+    }
+
+    /* create the entry for the value list */
+    ignore = calloc(1, sizeof(*ignore));
+    assert(ignore != NULL);
+    ignore->data = strdup(s);
+    assert(ignore->data != NULL);
+
+    /* look for the list first, add if not found */
+    HASH_FIND_STR(*table, inspection, entry);
+
+    if (entry == NULL) {
+        /* start a new entry for this inspection */
+        entry = calloc(1, sizeof(*entry));
+        assert(entry != NULL);
+        entry->key = strdup(inspection);
+        entry->value = calloc(1, sizeof(*entry->value));
+        assert(entry->value != NULL);
+        TAILQ_INIT(entry->value);
+        TAILQ_INSERT_TAIL(entry->value, ignore, items);
+        HASH_ADD_KEYPTR(hh, *table, entry->key, strlen(entry->key), entry);
+    } else {
+        /* on the off chance we have an empty list of values */
+        if (entry->value == NULL) {
+            entry->value = calloc(1, sizeof(*entry->value));
+            assert(entry->value != NULL);
+            TAILQ_INIT(entry->value);
+        }
+
+        /* add to existing ignore list */
+        TAILQ_INSERT_TAIL(entry->value, ignore, items);
+    }
 
     return;
 }
@@ -565,6 +658,8 @@ static int read_cfgfile(struct rpminspect *ri, const char *filename)
                             group = BLOCK_MIGRATED_PATHS;
                         } else if (!strcmp(key, "excluded_paths")) {
                             group = BLOCK_PATHMIGRATION_EXCLUDED_PATHS;
+                        } else if (!strcmp(key, "ignore")) {
+                            group = BLOCK_IGNORE;
                         }
                     } else if (group == BLOCK_METADATA) {
                         if (!strcmp(key, "buildhost_subdomain")) {
@@ -573,6 +668,8 @@ static int read_cfgfile(struct rpminspect *ri, const char *filename)
                     } else if (group == BLOCK_CHANGEDFILES) {
                         if (!strcmp(key, "header_file_extensions")) {
                             block = BLOCK_HEADER_FILE_EXTENSIONS;
+                        } else if (!strcmp(key, "ignore")) {
+                            block = BLOCK_IGNORE;
                         }
                     } else if (group == BLOCK_ADDEDFILES) {
                         if (!strcmp(key, "forbidden_path_prefixes")) {
@@ -581,6 +678,8 @@ static int read_cfgfile(struct rpminspect *ri, const char *filename)
                             block = BLOCK_FORBIDDEN_PATH_SUFFIXES;
                         } else if (!strcmp(key, "forbidden_directories")) {
                             block = BLOCK_FORBIDDEN_DIRECTORIES;
+                        } else if (!strcmp(key, "ignore")) {
+                            block = BLOCK_IGNORE;
                         }
                     } else if (group == BLOCK_OWNERSHIP) {
                         if (!strcmp(key, "bin_paths")) {
@@ -589,22 +688,32 @@ static int read_cfgfile(struct rpminspect *ri, const char *filename)
                             block = BLOCK_FORBIDDEN_OWNERS;
                         } else if (!strcmp(key, "forbidden_groups")) {
                             block = BLOCK_FORBIDDEN_GROUPS;
+                        } else if (!strcmp(key, "ignore")) {
+                            block = BLOCK_IGNORE;
                         }
                     } else if (group == BLOCK_SHELLSYNTAX) {
                         if (!strcmp(key, "shells")) {
                             block = BLOCK_SHELLS;
+                        } else if (!strcmp(key, "ignore")) {
+                            block = BLOCK_IGNORE;
                         }
                     } else if (group == BLOCK_LTO) {
                         if (!strcmp(key, "lto_symbol_name_prefixes")) {
                             block = BLOCK_LTO_SYMBOL_NAME_PREFIXES;
+                        } else if (!strcmp(key, "ignore")) {
+                            block = BLOCK_IGNORE;
                         }
                     } else if (group == BLOCK_FILES) {
                         if (!strcmp(key, "forbidden_paths")) {
                             block = BLOCK_FORBIDDEN_PATHS;
+                        } else if (!strcmp(key, "ignore")) {
+                            block = BLOCK_IGNORE;
                         }
                     } else if (group == BLOCK_KMIDIFF) {
                         if (!strcmp(key, "kernel_filenames")) {
                             block = BLOCK_KERNEL_FILENAMES;
+                        } else if (!strcmp(key, "ignore")) {
+                            block = BLOCK_IGNORE;
                         }
                     } else if (group == BLOCK_PATCHES) {
                         if (!strcmp(key, "patch_ignore_list")) {
@@ -617,6 +726,42 @@ static int read_cfgfile(struct rpminspect *ri, const char *filename)
                             block = BLOCK_RUNPATH_ALLOWED_ORIGIN_PATHS;
                         } else if (!strcmp(key, "origin_prefix_trim")) {
                             block = BLOCK_RUNPATH_ORIGIN_PREFIX_TRIM;
+                        }
+                    } else if (group == BLOCK_ELF) {
+                        if (!strcmp(key, "ignore")) {
+                            block = BLOCK_IGNORE;
+                        }
+                    } else if (group == BLOCK_MANPAGE) {
+                        if (!strcmp(key, "ignore")) {
+                            block = BLOCK_IGNORE;
+                        }
+                    } else if (group == BLOCK_XML) {
+                        if (!strcmp(key, "ignore")) {
+                            block = BLOCK_IGNORE;
+                        }
+                    } else if (group == BLOCK_DESKTOP) {
+                        if (!strcmp(key, "ignore")) {
+                            block = BLOCK_IGNORE;
+                        }
+                    } else if (group == BLOCK_FILESIZE) {
+                        if (!strcmp(key, "ignore")) {
+                            block = BLOCK_IGNORE;
+                        }
+                    } else if (group == BLOCK_ANNOCHECK) {
+                        if (!strcmp(key, "ignore")) {
+                            block = BLOCK_IGNORE;
+                        }
+                    } else if (group == BLOCK_JAVABYTECODE) {
+                        if (!strcmp(key, "ignore")) {
+                            block = BLOCK_IGNORE;
+                        }
+                    } else if (group == BLOCK_BADFUNCS) {
+                        if (!strcmp(key, "ignore")) {
+                            block = BLOCK_IGNORE;
+                        }
+                    } else if (group == BLOCK_RUNPATH) {
+                        if (!strcmp(key, "ignore")) {
+                            block = BLOCK_IGNORE;
                         }
                     }
                 } else if (symbol == SYMBOL_VALUE) {
@@ -892,7 +1037,11 @@ static int read_cfgfile(struct rpminspect *ri, const char *filename)
                     } else if (block == BLOCK_FORBIDDEN_GROUPS) {
                         add_entry(&ri->forbidden_groups, t);
                     } else if (block == BLOCK_IGNORE) {
-                        add_entry(&ri->ignores, t);
+                        if (group == BLOCK_NULL) {
+                            add_entry(&ri->ignores, t);
+                        } else {
+                            add_ignore(&ri->inspection_ignores, group, t);
+                        }
                     } else if (block == BLOCK_SHELLS) {
                         add_entry(&ri->shells, t);
                     } else if (block == BLOCK_LTO_SYMBOL_NAME_PREFIXES) {
