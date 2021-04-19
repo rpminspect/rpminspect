@@ -485,9 +485,6 @@ static int read_cfgfile(struct rpminspect *ri, const char *filename)
                     } else if (!strcmp(key, "security_path_prefix")) {
                         block = BLOCK_SECURITY_PATH_PREFIX;
                         group = BLOCK_NULL;
-                    } else if (!strcmp(key, NAME_BADFUNCS)) {
-                        block = BLOCK_BADFUNCS;
-                        group = BLOCK_NULL;
                     } else if (!strcmp(key, "badwords")) {
                         block = BLOCK_BADWORDS;
                         group = BLOCK_NULL;
@@ -498,14 +495,14 @@ static int read_cfgfile(struct rpminspect *ri, const char *filename)
                         block = BLOCK_NULL;
                         group = BLOCK_ELF;
                     } else if (!strcmp(key, NAME_MANPAGE)) {
-                        block = BLOCK_MANPAGE;
-                        group = BLOCK_NULL;
+                        block = BLOCK_NULL;
+                        group = BLOCK_MANPAGE;
                     } else if (!strcmp(key, NAME_XML)) {
-                        block = BLOCK_XML;
-                        group = BLOCK_NULL;
+                        block = BLOCK_NULL;
+                        group = BLOCK_XML;
                     } else if (!strcmp(key, NAME_DESKTOP)) {
-                        block = BLOCK_DESKTOP;
-                        group = BLOCK_NULL;
+                        block = BLOCK_NULL;
+                        group = BLOCK_DESKTOP;
                     } else if (!strcmp(key, NAME_CHANGEDFILES)) {
                         block = BLOCK_NULL;
                         group = BLOCK_CHANGEDFILES;
@@ -519,8 +516,8 @@ static int read_cfgfile(struct rpminspect *ri, const char *filename)
                         block = BLOCK_NULL;
                         group = BLOCK_SHELLSYNTAX;
                     } else if (!strcmp(key, NAME_FILESIZE)) {
-                        block = BLOCK_FILESIZE;
-                        group = BLOCK_NULL;
+                        block = BLOCK_NULL;
+                        group = BLOCK_FILESIZE;
                     } else if (!strcmp(key, NAME_LTO)) {
                         block = BLOCK_NULL;
                         group = BLOCK_LTO;
@@ -540,14 +537,17 @@ static int read_cfgfile(struct rpminspect *ri, const char *filename)
                         block = BLOCK_NULL;
                         group = BLOCK_FILES;
                     } else if (!strcmp(key, NAME_ABIDIFF)) {
-                        block = BLOCK_ABIDIFF;
-                        group = BLOCK_NULL;
+                        block = BLOCK_NULL;
+                        group = BLOCK_ABIDIFF;
                     } else if (!strcmp(key, NAME_KMIDIFF)) {
                         block = BLOCK_NULL;
                         group = BLOCK_KMIDIFF;
                     } else if (!strcmp(key, NAME_PATCHES)) {
                         block = BLOCK_NULL;
                         group = BLOCK_PATCHES;
+                    } else if (!strcmp(key, NAME_BADFUNCS)) {
+                        block = BLOCK_BADFUNCS;
+                        group = BLOCK_NULL;
                     } else if (!strcmp(key, NAME_RUNPATH)) {
                         block = BLOCK_NULL;
                         group = BLOCK_RUNPATH;
@@ -730,7 +730,7 @@ static int read_cfgfile(struct rpminspect *ri, const char *filename)
                                 warn(_("error reading elf exclude path"));
                             }
                         }
-                    } else if (block == BLOCK_MANPAGE) {
+                    } else if (group == BLOCK_MANPAGE) {
                         if (!strcmp(key, "include_path")) {
                             if (debug_mode) {
                                 free(ri->manpage_path_include_pattern);
@@ -750,7 +750,7 @@ static int read_cfgfile(struct rpminspect *ri, const char *filename)
                                 warn(_("error reading man page exclude path"));
                             }
                         }
-                    } else if (block == BLOCK_XML) {
+                    } else if (group == BLOCK_XML) {
                         if (!strcmp(key, "include_path")) {
                             if (debug_mode) {
                                 free(ri->xml_path_include_pattern);
@@ -770,7 +770,7 @@ static int read_cfgfile(struct rpminspect *ri, const char *filename)
                                 warn(_("error reading xml exclude path"));
                             }
                         }
-                    } else if (block == BLOCK_DESKTOP) {
+                    } else if (group == BLOCK_DESKTOP) {
                         if (!strcmp(key, "desktop_entry_files_dir")) {
                             free(ri->desktop_entry_files_dir);
                             ri->desktop_entry_files_dir = strdup(t);
@@ -783,7 +783,7 @@ static int read_cfgfile(struct rpminspect *ri, const char *filename)
                             free(ri->bin_group);
                             ri->bin_group = strdup(t);
                         }
-                    } else if (block == BLOCK_FILESIZE) {
+                    } else if (group == BLOCK_FILESIZE) {
                         if (!strcmp(key, "size_threshold")) {
                             ri->size_threshold = strtol(t, 0, 10);
 
@@ -813,7 +813,7 @@ static int read_cfgfile(struct rpminspect *ri, const char *filename)
                         if (!process_inspection_flag(key, exclude, &ri->tests)) {
                             err(RI_PROGRAM_ERROR, _("*** Unknown inspection: `%s`"), key);
                         }
-                    } else if (block == BLOCK_ABIDIFF) {
+                    } else if (group == BLOCK_ABIDIFF) {
                         if (!strcmp(key, "suppression_file")) {
                             free(ri->abidiff_suppression_file);
                             ri->abidiff_suppression_file = strdup(t);
