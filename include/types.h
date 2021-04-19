@@ -501,6 +501,13 @@ struct rpminspect {
     string_list_t *runpath_allowed_origin_paths;
     string_list_t *runpath_origin_prefix_trim;
 
+    /* optional per-inspection ignore lists */
+    /*
+     * NOTE: the 'ignores' struct member is a global list of ignore
+     * globs.  This hash table provides per-inspection ignore globs.
+     */
+    string_list_map_t *inspection_ignores;
+
     /* Options specified by the user */
     char *before;              /* before build ID arg given on cmdline */
     char *after;               /* after build ID arg given on cmdline */

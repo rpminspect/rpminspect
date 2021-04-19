@@ -126,6 +126,7 @@ struct rpminspect *init_rpminspect(struct rpminspect *, const char *, const char
 /* free.c */
 void free_regex(regex_t *);
 void free_string_map(string_map_t *);
+void free_string_list_map(string_list_map_t *);
 void free_pair(pair_list_t *);
 void free_rpminspect(struct rpminspect *);
 

@@ -53,6 +53,25 @@ void free_string_map(string_map_t *table)
     return;
 }
 
+void free_string_list_map(string_list_map_t *table)
+{
+    string_list_map_t *entry = NULL;
+    string_list_map_t *tmp_entry = NULL;
+
+    if (table == NULL) {
+        return;
+    }
+
+    HASH_ITER(hh, table, entry, tmp_entry) {
+        HASH_DEL(table, entry);
+        free(entry->key);
+        list_free(entry->value, free);
+        free(entry);
+    }
+
+    return;
+}
+
 /*
  * Free a struct rpminspect.  Called by applications using
  * librpminspect before they exit.
@@ -201,6 +220,7 @@ void free_rpminspect(struct rpminspect *ri) {
     list_free(ri->runpath_allowed_paths, free);
     list_free(ri->runpath_allowed_origin_paths, free);
     list_free(ri->runpath_origin_prefix_trim, free);
+    free_string_list_map(ri->inspection_ignores);
 
     free_rpmpeer(ri->peers);
 
