@@ -700,6 +700,8 @@ int main(int argc, char **argv) {
 
             free(ri->after);
             ri->after = NULL;
+            free(ri->worksubdir);
+            ri->worksubdir = NULL;
         }
     } else {
         if (gather_builds(ri, false)) {
@@ -820,11 +822,13 @@ int main(int argc, char **argv) {
     }
 
     /* Clean up */
-    if (keep) {
-        printf(_("\nKeeping working directory: %s\n"), ri->worksubdir);
-    } else {
-        if (rmtree(ri->workdir, true, true)) {
-           warn(_("*** Error removing directory %s"), ri->workdir);
+    if (!fetch_only) {
+        if (keep) {
+            printf(_("\nKeeping working directory: %s\n"), ri->worksubdir);
+        } else {
+            if (rmtree(ri->workdir, true, true)) {
+                warn(_("*** Error removing directory %s"), ri->workdir);
+            }
         }
     }
 
