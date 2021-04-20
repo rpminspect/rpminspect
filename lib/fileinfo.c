@@ -22,11 +22,10 @@
 #include <unistd.h>
 #include <limits.h>
 #include <sys/types.h>
-#include <pwd.h>
-#include <grp.h>
 #include <assert.h>
 #include <err.h>
 #include <errno.h>
+#include <rpm/header.h>
 #include "rpminspect.h"
 
 /**
@@ -46,12 +45,14 @@ bool match_fileinfo_mode(struct rpminspect *ri, const rpmfile_entry_t *file, con
     fileinfo_entry_t *fientry = NULL;
     mode_t interesting = S_ISUID | S_ISGID | S_ISVTX | S_IRWXU | S_IRWXG | S_IRWXO;
     mode_t perms = 0;
+    const char *pkg = NULL;
     struct result_params params;
 
     assert(ri != NULL);
     assert(file != NULL);
 
     perms = file->st.st_mode & interesting;
+    pkg = headerGetString(file->rpm_header, RPMTAG_NAME);
 
     init_result_params(&params);
     params.header = header;
@@ -63,14 +64,14 @@ bool match_fileinfo_mode(struct rpminspect *ri, const rpmfile_entry_t *file, con
         TAILQ_FOREACH(fientry, ri->fileinfo, items) {
             if (!strcmp(file->localpath, fientry->filename)) {
                 if (file->st.st_mode == fientry->mode) {
-                    xasprintf(&params.msg, _("%s on %s carries mode %04o, but is on the fileinfo list"), file->localpath, params.arch, perms);
+                    xasprintf(&params.msg, _("%s in %s on %s carries mode %04o, but is on the fileinfo list"), file->localpath, pkg, params.arch, perms);
                     params.severity = RESULT_INFO;
                     params.waiverauth = NOT_WAIVABLE;
                     add_result(ri, &params);
                     free(params.msg);
                     return true;
                 } else {
-                    xasprintf(&params.msg, _("%s on %s carries mode %04o, is on the fileinfo list but expected mode %04o"), file->localpath, params.arch, perms, fientry->mode);
+                    xasprintf(&params.msg, _("%s in %s on %s carries mode %04o, is on the fileinfo list but expected mode %04o"), file->localpath, pkg, params.arch, perms, fientry->mode);
                     params.severity = RESULT_VERIFY;
                     params.waiverauth = WAIVABLE_BY_SECURITY;
                     add_result(ri, &params);
@@ -85,7 +86,7 @@ bool match_fileinfo_mode(struct rpminspect *ri, const rpmfile_entry_t *file, con
 
     /* catch anything not on the fileinfo list with setuid/setgid */
     if ((perms & S_ISUID) || (perms & S_ISGID)) {
-        xasprintf(&params.msg, _("%s on %s carries insecure mode %04o, Security Team review may be required"), file->localpath, params.arch, perms);
+        xasprintf(&params.msg, _("%s in %s on %s carries insecure mode %04o, Security Team review may be required"), file->localpath, pkg, params.arch, perms);
         params.severity = RESULT_BAD;
         params.waiverauth = WAIVABLE_BY_SECURITY;
         add_result(ri, &params);
@@ -101,6 +102,7 @@ bool match_fileinfo_mode(struct rpminspect *ri, const rpmfile_entry_t *file, con
  *
  * @param ri The main struct rpminspect for the program.
  * @param file The file to find on the fileinfo list.
+ * @param owner The file owner from the RPM header.
  * @param header The header string to use for results reporting if the
  *               file is found.
  * @param remedy The remedy string to use for results reporting if the
@@ -109,15 +111,15 @@ bool match_fileinfo_mode(struct rpminspect *ri, const rpmfile_entry_t *file, con
  */
 bool match_fileinfo_owner(struct rpminspect *ri, const rpmfile_entry_t *file, const char *owner, const char *header, const char *remedy)
 {
-    struct passwd pw;
-    struct passwd *pwp = NULL;
-    char buf[sysconf(_SC_GETPW_R_SIZE_MAX)];
     fileinfo_entry_t *fientry = NULL;
+    const char *pkg = NULL;
     struct result_params params;
 
     assert(ri != NULL);
     assert(file != NULL);
     assert(owner != NULL);
+
+    pkg = headerGetString(file->rpm_header, RPMTAG_NAME);
 
     init_result_params(&params);
     params.header = header;
@@ -128,25 +130,15 @@ bool match_fileinfo_owner(struct rpminspect *ri, const rpmfile_entry_t *file, co
     if (init_fileinfo(ri)) {
         TAILQ_FOREACH(fientry, ri->fileinfo, items) {
             if (!strcmp(file->localpath, fientry->filename)) {
-                /* get the UID of the file on the fileinfo list */
-                getpwnam_r(fientry->owner, &pw, buf, sizeof(buf), &pwp);
-
-                if (pwp && (file->st.st_uid == pw.pw_uid) && !strcmp(owner, fientry->owner)) {
-                    xasprintf(&params.msg, _("%s on %s carries owner %s (UID %d) and is on the fileinfo list"), file->localpath, params.arch, fientry->owner, file->st.st_uid);
+                if (!strcmp(owner, fientry->owner)) {
+                    xasprintf(&params.msg, _("%s in %s on %s carries owner '%s' and is on the fileinfo list"), file->localpath, pkg, params.arch, fientry->owner);
                     params.severity = RESULT_INFO;
                     params.waiverauth = NOT_WAIVABLE;
                     add_result(ri, &params);
                     free(params.msg);
                     return true;
-                } else if (pwp == NULL) {
-                    xasprintf(&params.msg, _("%s on %s carries owner %s (UID %d) and is on the fileinfo list, but the UID cannot be verified"), file->localpath, params.arch, fientry->owner, file->st.st_uid);
-                    params.severity = RESULT_VERIFY;
-                    params.waiverauth = WAIVABLE_BY_ANYONE;
-                    add_result(ri, &params);
-                    free(params.msg);
-                    return true;
                 } else {
-                    xasprintf(&params.msg, _("%s on %s carries owner %s (UID %d), but is on the fileinfo list with expected owner %s (UID %d)"), file->localpath, params.arch, owner, file->st.st_uid, fientry->owner, pw.pw_uid);
+                    xasprintf(&params.msg, _("%s in %s on %s carries owner '%s', but is on the fileinfo list with expected owner '%s'"), file->localpath, pkg, params.arch, owner, fientry->owner);
                     params.severity = RESULT_VERIFY;
                     params.waiverauth = WAIVABLE_BY_SECURITY;
                     add_result(ri, &params);
@@ -168,6 +160,7 @@ bool match_fileinfo_owner(struct rpminspect *ri, const rpmfile_entry_t *file, co
  *
  * @param ri The main struct rpminspect for the program.
  * @param file The file to find on the fileinfo list.
+ * @param group The file group from the RPM header.
  * @param header The header string to use for results reporting if the
  *               file is found.
  * @param remedy The remedy string to use for results reporting if the
@@ -176,14 +169,14 @@ bool match_fileinfo_owner(struct rpminspect *ri, const rpmfile_entry_t *file, co
  */
 bool match_fileinfo_group(struct rpminspect *ri, const rpmfile_entry_t *file, const char *group, const char *header, const char *remedy)
 {
-    struct group gr;
-    struct group *grp = NULL;
-    char buf[sysconf(_SC_GETGR_R_SIZE_MAX)];
     fileinfo_entry_t *fientry = NULL;
+    const char *pkg = NULL;
     struct result_params params;
 
     assert(ri != NULL);
     assert(file != NULL);
+
+    pkg = headerGetString(file->rpm_header, RPMTAG_NAME);
 
     init_result_params(&params);
     params.header = header;
@@ -194,25 +187,15 @@ bool match_fileinfo_group(struct rpminspect *ri, const rpmfile_entry_t *file, co
     if (init_fileinfo(ri)) {
         TAILQ_FOREACH(fientry, ri->fileinfo, items) {
             if (!strcmp(file->localpath, fientry->filename)) {
-                /* get the GID of the file on the fileinfo list */
-                getgrnam_r(fientry->group, &gr, buf, sizeof(buf), &grp);
-
-                if (grp && (file->st.st_gid == gr.gr_gid) && !strcmp(group, gr.gr_name)) {
-                    xasprintf(&params.msg, _("%s on %s carries group %s (GID %d) and is on the fileinfo list"), file->localpath, params.arch, fientry->group, file->st.st_gid);
+                if (!strcmp(group, fientry->group)) {
+                    xasprintf(&params.msg, _("%s in %s on %s carries group '%s' and is on the fileinfo list"), file->localpath, pkg, params.arch, fientry->group);
                     params.severity = RESULT_INFO;
                     params.waiverauth = NOT_WAIVABLE;
                     add_result(ri, &params);
                     free(params.msg);
                     return true;
-                } else if (grp == NULL) {
-                    xasprintf(&params.msg, _("%s on %s carries group %s (GID %d) and is on the fileinfo list, but the GID cannot be verified"), file->localpath, params.arch, fientry->group, file->st.st_gid);
-                    params.severity = RESULT_VERIFY;
-                    params.waiverauth = WAIVABLE_BY_ANYONE;
-                    add_result(ri, &params);
-                    free(params.msg);
-                    return true;
                 } else {
-                    xasprintf(&params.msg, _("%s on %s carries group %s (GID %d), but is on the fileinfo list with expected group %s (GID %d)"), file->localpath, params.arch, group, file->st.st_gid, fientry->group, gr.gr_gid);
+                    xasprintf(&params.msg, _("%s in %s on %s carries group '%s', but is on the fileinfo list with expected group '%s'"), file->localpath, pkg, params.arch, group, fientry->group);
                     params.severity = RESULT_VERIFY;
                     params.waiverauth = WAIVABLE_BY_SECURITY;
                     add_result(ri, &params);
