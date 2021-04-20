@@ -231,6 +231,7 @@ static int copytree(const char *fpath, const struct stat *sb, int tflag, struct 
     return ret;
 }
 
+#ifdef CURLOPT_XFERINFOFUNCTION
 /*
  * libcurl progress callback function
  */
@@ -238,6 +239,7 @@ static int download_progress(__attribute__((unused)) void *p, __attribute__((unu
 {
     return 0;
 }
+#endif
 
 /*
  * Download helper for libcurl
@@ -267,8 +269,10 @@ static void curl_helper(const bool verbose, const char *src, const char *dst) {
     curl_easy_setopt(c, CURLOPT_FOLLOWLOCATION, 1L);
 
     if (verbose) {
+#ifdef CURLOPT_XFERINFOFUNCTION
         /* enable the download progress bar */
         curl_easy_setopt(c, CURLOPT_XFERINFOFUNCTION, download_progress);
+#endif
 
         printf(_("Downloading %s...\n"), src);
     }
