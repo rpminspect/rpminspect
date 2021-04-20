@@ -24,8 +24,6 @@
 #include <unistd.h>
 #include <limits.h>
 #include <sys/types.h>
-#include <pwd.h>
-#include <grp.h>
 #include <errno.h>
 #include <assert.h>
 #include <err.h>
@@ -88,13 +86,6 @@ static bool ownership_driver(struct rpminspect *ri, rpmfile_entry_t *file) {
     const char *arch = NULL;
     char *owner = NULL;
     char *group = NULL;
-    int r = 0;
-    struct passwd pw;
-    struct passwd *pwp = NULL;
-    char pbuf[sysconf(_SC_GETPW_R_SIZE_MAX)];
-    struct group gr;
-    struct group *grp = NULL;
-    char gbuf[sysconf(_SC_GETGR_R_SIZE_MAX)];
     char *before_owner = NULL;
     char *before_group = NULL;
     string_entry_t *entry = NULL;
@@ -117,22 +108,6 @@ static bool ownership_driver(struct rpminspect *ri, rpmfile_entry_t *file) {
     /* Get the owner and group of the file */
     owner = get_header_value(file, RPMTAG_FILEUSERNAME);
     group = get_header_value(file, RPMTAG_FILEGROUPNAME);
-
-    /*
-     * Try to look up the ID values of the owner and name and put
-     * those in the struct stat
-     */
-    r = getpwnam_r(owner, &pw, pbuf, sizeof(pbuf), &pwp);
-
-    if (r == 0 && pwp != NULL) {
-        file->st.st_uid = pw.pw_uid;
-    }
-
-    r = getgrnam_r(group, &gr, gbuf, sizeof(gbuf), &grp);
-
-    if (r == 0 && grp != NULL) {
-        file->st.st_gid = gr.gr_gid;
-    }
 
     /* Set up result parameters */
     init_result_params(&params);
