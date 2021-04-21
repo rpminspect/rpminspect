@@ -336,7 +336,7 @@ bool inspect_abidiff(struct rpminspect *ri) {
     }
 
     /* run the main inspection */
-    result = foreach_peer_file(ri, abidiff_driver, true);
+    result = foreach_peer_file(ri, NAME_ABIDIFF, abidiff_driver, true);
 
     /* clean up */
     free_abi(abi);

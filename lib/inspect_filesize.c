@@ -134,7 +134,7 @@ bool inspect_filesize(struct rpminspect *ri) {
     assert(ri != NULL);
 
     /* run the size inspection across all RPM files */
-    result = foreach_peer_file(ri, filesize_driver, true);
+    result = foreach_peer_file(ri, NAME_FILESIZE, filesize_driver, true);
 
     /* if everything was fine, just say so */
     if (result) {

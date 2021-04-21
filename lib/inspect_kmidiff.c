@@ -406,7 +406,7 @@ bool inspect_kmidiff(struct rpminspect *ri) {
 
         TAILQ_FOREACH(file, peer->after_files, items) {
             /* Ignore files we should be ignoring */
-            if (ignore_path(ri, file->localpath, peer->after_root)) {
+            if (ignore_path(ri, NAME_KMIDIFF, file->localpath, peer->after_root)) {
                 continue;
             }
 

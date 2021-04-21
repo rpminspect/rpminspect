@@ -169,7 +169,7 @@ bool inspect_annocheck(struct rpminspect *ri) {
     }
 
     /* run the annocheck tests across all ELF files */
-    result = foreach_peer_file(ri, annocheck_driver, true);
+    result = foreach_peer_file(ri, NAME_ANNOCHECK, annocheck_driver, true);
 
     /* if everything was fine, just say so */
     if (result) {

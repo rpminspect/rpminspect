@@ -63,12 +63,13 @@
  * for a single inspection.
  *
  * @param ri Pointer to the struct rpminspect used for the program.
+ * @param inspection Name of the currently running inspection.
  * @param callback Callback function to iterate over each file.
  * @param use_ignore True to skip files that match entries in the
  *        ignore section of the configuration file, false otherwise.
  * @return True if the check_fn passed for each file, false otherwise.
  */
-bool foreach_peer_file(struct rpminspect *ri, foreach_peer_file_func callback, bool use_ignore);
+bool foreach_peer_file(struct rpminspect *ri, const char *inspection, foreach_peer_file_func check_fn, bool use_ignore);
 
 /**
  * @brief Return inspection ID given its name string.

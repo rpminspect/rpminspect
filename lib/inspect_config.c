@@ -205,7 +205,7 @@ bool inspect_config(struct rpminspect *ri) {
 
     assert(ri != NULL);
 
-    result = foreach_peer_file(ri, config_driver, true);
+    result = foreach_peer_file(ri, NAME_CONFIG, config_driver, true);
 
     if (result && !reported) {
         init_result_params(&params);

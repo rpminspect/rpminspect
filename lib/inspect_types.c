@@ -90,7 +90,7 @@ bool inspect_types(struct rpminspect *ri) {
     assert(ri != NULL);
 
     /* run the types inspection across all RPM files */
-    foreach_peer_file(ri, types_driver, true);
+    foreach_peer_file(ri, NAME_TYPES, types_driver, true);
 
     /* if everything was fine, just say so */
     if (result) {
