@@ -87,7 +87,7 @@ bool inspect_modularity(struct rpminspect *ri) {
         return true;
     }
 
-    result = foreach_peer_file(ri, modularity_driver, true);
+    result = foreach_peer_file(ri, NAME_MODULARITY, modularity_driver, true);
 
     if (result) {
         init_result_params(&params);

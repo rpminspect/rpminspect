@@ -99,12 +99,13 @@ struct inspect inspections[] = {
  * for a single inspection.
  *
  * @param ri Pointer to the struct rpminspect used for the program.
+ * @param inspection Name of currently running inspection.
  * @param callback Callback function to iterate over each file.
  * @param use_ignore True to skip files that match entries in the
  *        ignore section of the configuration file, false otherwise.
  * @return True if the check_fn passed for each file, false otherwise.
  */
-bool foreach_peer_file(struct rpminspect *ri, foreach_peer_file_func check_fn, bool use_ignore)
+bool foreach_peer_file(struct rpminspect *ri, const char *inspection, foreach_peer_file_func check_fn, bool use_ignore)
 {
     rpmpeer_entry_t *peer;
     rpmfile_entry_t *file;
@@ -121,7 +122,7 @@ bool foreach_peer_file(struct rpminspect *ri, foreach_peer_file_func check_fn, b
 
         TAILQ_FOREACH(file, peer->after_files, items) {
             /* Ignore files we should be ignoring */
-            if (use_ignore && ignore_path(ri, file->localpath, peer->after_root)) {
+            if (use_ignore && ignore_path(ri, inspection, file->localpath, peer->after_root)) {
                 continue;
             }
 

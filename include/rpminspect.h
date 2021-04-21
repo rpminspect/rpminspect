@@ -330,7 +330,7 @@ char *bytes_to_str(unsigned char *array, size_t len);
  * directory, optional (pass NULL to use '/').  @return True if path
  * should be ignored, false otherwise.
  */
-bool ignore_path(const struct rpminspect *ri, const char *path, const char *root);
+bool ignore_path(const struct rpminspect *ri, const char *inspection, const char *path, const char *root);
 
 /* paths.c */
 /**

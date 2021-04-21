@@ -249,7 +249,7 @@ bool inspect_shellsyntax(struct rpminspect *ri) {
 
     assert(ri != NULL);
 
-    result = foreach_peer_file(ri, shellsyntax_driver, true);
+    result = foreach_peer_file(ri, NAME_SHELLSYNTAX, shellsyntax_driver, true);
 
     if (result) {
         init_result_params(&params);

@@ -162,7 +162,7 @@ bool inspect_politics(struct rpminspect *ri)
 
     /* run the politics check on each file */
     if (init_politics(ri)) {
-        result = foreach_peer_file(ri, politics_driver, false);
+        result = foreach_peer_file(ri, NAME_POLITICS, politics_driver, false);
     }
 
     /* hope the result is always this */

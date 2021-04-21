@@ -36,25 +36,74 @@
  * @copyright LGPL-3.0-or-later
  */
 
-/**
- * @brief Given a path and struct rpminspect, determine if the path should be ignored or not.
- *
- * @param ri The struct rpminspect for the program.
- * @param path The relative path to check (i.e., localpath).
- * @param root The root directory, optional (pass NULL to use '/').
- * @return True if path should be ignored, false otherwise.
+/*
+ * Helper function for glob(7) matching in ignore_path()
  */
-bool ignore_path(const struct rpminspect *ri, const char *path, const char *root)
+static bool match_path(const char *pattern, const char *root, const char *needle)
 {
     bool match = false;
-    string_entry_t *entry = NULL;
+    int r = 0;
     int gflags = GLOB_NOSORT | GLOB_PERIOD | GLOB_BRACE;
     char *globpath = NULL;
     char *globsub = NULL;
     glob_t found;
     size_t len = 0;
-    int r = 0;
     size_t i = 0;
+
+    assert(pattern != NULL);
+    assert(needle != NULL);
+
+    if (root != NULL) {
+        len = strlen(root);
+    }
+
+    if (root == NULL) {
+        globpath = strdup(pattern);
+    } else {
+        xasprintf(&globpath, "%s%s", root, pattern);
+    }
+
+    r = glob(globpath, gflags, NULL, &found);
+
+    if (r == GLOB_NOSPACE || r == GLOB_ABORTED) {
+        warn("glob()");
+    }
+
+    if (r != 0) {
+        free(globpath);
+        return false;
+    }
+
+    for (i = 0; i < found.gl_pathc; i++) {
+        globsub = found.gl_pathv[i] + len;
+
+        if (!strcmp(globsub, needle)) {
+            match = true;
+            break;
+        }
+    }
+
+    free(globpath);
+    globfree(&found);
+
+    return match;
+}
+
+
+/**
+ * @brief Given a path and struct rpminspect, determine if the path should be ignored or not.
+ *
+ * @param ri The struct rpminspect for the program.
+ * @param inspection The name of the inspection currently running.
+ * @param path The relative path to check (i.e., localpath).
+ * @param root The root directory, optional (pass NULL to use '/').
+ * @return True if path should be ignored, false otherwise.
+ */
+bool ignore_path(const struct rpminspect *ri, const char *inspection, const char *path, const char *root)
+{
+    bool match = false;
+    string_entry_t *entry = NULL;
+    string_list_map_t *mapentry = NULL;
 
     assert(ri != NULL);
 
@@ -62,46 +111,33 @@ bool ignore_path(const struct rpminspect *ri, const char *path, const char *root
         return true;
     }
 
-    if (ri->ignores == NULL || TAILQ_EMPTY(ri->ignores)) {
-        return false;
-    }
+    /* first, handle the global ignores */
+    if (ri->ignores != NULL && !TAILQ_EMPTY(ri->ignores)) {
+        TAILQ_FOREACH(entry, ri->ignores, items) {
+            match = match_path(entry->data, root, path);
 
-    if (root) {
-        len = strlen(root);
-    }
-
-    TAILQ_FOREACH(entry, ri->ignores, items) {
-        if (root == NULL) {
-            globpath = strdup(entry->data);
-        } else {
-            xasprintf(&globpath, "%s%s", root, entry->data);
-        }
-
-        r = glob(globpath, gflags, NULL, &found);
-
-        if (r == GLOB_NOSPACE || r == GLOB_ABORTED) {
-            warn("%s: glob()", __func__);
-        }
-
-        if (r != 0) {
-            free(globpath);
-            continue;
-        }
-
-        for (i = 0; i < found.gl_pathc; i++) {
-            globsub = found.gl_pathv[i] + len;
-
-            if (!strcmp(globsub, path)) {
-                match = true;
+            if (match) {
                 break;
             }
         }
+    }
 
-        free(globpath);
-        globfree(&found);
+    if (match) {
+        return match;
+    }
 
-        if (match) {
-            break;
+    /* second, handle the per-inspection ignores */
+    if (ri->inspection_ignores != NULL) {
+        HASH_FIND_STR(ri->inspection_ignores, inspection, mapentry);
+
+        if (mapentry != NULL && mapentry->value != NULL && !TAILQ_EMPTY(mapentry->value)) {
+            TAILQ_FOREACH(entry, mapentry->value, items) {
+                match = match_path(entry->data, root, path);
+
+                if (match) {
+                    return match;
+                }
+            }
         }
     }
 

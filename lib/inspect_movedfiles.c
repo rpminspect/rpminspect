@@ -68,7 +68,7 @@ bool inspect_movedfiles(struct rpminspect *ri) {
 
     assert(ri != NULL);
 
-    result = foreach_peer_file(ri, movedfiles_driver, true);
+    result = foreach_peer_file(ri, NAME_MOVEDFILES, movedfiles_driver, true);
 
     init_result_params(&params);
     params.waiverauth = NOT_WAIVABLE;

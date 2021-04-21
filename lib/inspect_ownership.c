@@ -290,7 +290,7 @@ bool inspect_ownership(struct rpminspect *ri) {
     struct result_params params;
 
     assert(ri != NULL);
-    result = foreach_peer_file(ri, ownership_driver, true);
+    result = foreach_peer_file(ri, NAME_OWNERSHIP, ownership_driver, true);
 
     if (result) {
         init_result_params(&params);

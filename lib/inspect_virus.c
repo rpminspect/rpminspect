@@ -189,7 +189,7 @@ bool inspect_virus(struct rpminspect *ri)
     params.header = HEADER_VIRUS;
     params.verb = VERB_FAILED;
     params.noun = _("virus or malware in ${FILE}");
-    result = foreach_peer_file(ri, virus_driver, false);
+    result = foreach_peer_file(ri, NAME_VIRUS, virus_driver, false);
 
     /* hope the result is always this */
     if (result) {

@@ -226,7 +226,7 @@ bool inspect_dsodeps(struct rpminspect *ri) {
     assert(ri != NULL);
 
     /* run the dsodeps test across all ELF files */
-    result = foreach_peer_file(ri, dsodeps_driver, true);
+    result = foreach_peer_file(ri, NAME_DSODEPS, dsodeps_driver, true);
 
     /* if everything was fine, just say so */
     if (result) {
