@@ -199,7 +199,7 @@ static void add_ignore(string_list_map_t **table, int i, char *s)
     string_entry_t *ignore = NULL;
 
     assert(s != NULL);
-    assert(inspection != BLOCK_NULL);
+    assert(i != BLOCK_NULL);
 
     /*
      * determine the inspection first.  we do not allow all
@@ -551,7 +551,6 @@ static int read_cfgfile(struct rpminspect *ri, const char *filename)
             case YAML_SCALAR_TOKEN:
                 /* convert the value to a string for comparison and copying */
                 t = bytes_to_str(token.data.scalar.value, token.data.scalar.length);
-
                 /* determine which config file block we are in */
                 if (key && read_stream && block != BLOCK_INSPECTIONS) {
                     if (!strcmp(key, "common")) {
@@ -572,7 +571,31 @@ static int read_cfgfile(struct rpminspect *ri, const char *filename)
                     } else if (!strcmp(key, "products")) {
                         block = BLOCK_NULL;
                         group = BLOCK_PRODUCTS;
-                    } else if (!strcmp(key, "ignore")) {
+                    /*
+                     * All of these groups are listed here explicitly
+                     * because we have a top-level 'ignore' block and
+                     * then all of these blocks all an 'ignore'
+                     * subblock.  We have to handle things this way so
+                     * the config file parses correctly.
+                     */
+                    } else if (!strcmp(key, "ignore") && (group != BLOCK_ELF &&
+                                                          group != BLOCK_MANPAGE &&
+                                                          group != BLOCK_XML &&
+                                                          group != BLOCK_DESKTOP &&
+                                                          group != BLOCK_CHANGEDFILES &&
+                                                          group != BLOCK_ADDEDFILES &&
+                                                          group != BLOCK_OWNERSHIP &&
+                                                          group != BLOCK_SHELLSYNTAX &&
+                                                          group != BLOCK_FILESIZE &&
+                                                          group != BLOCK_LTO &&
+                                                          group != BLOCK_ANNOCHECK &&
+                                                          group != BLOCK_JAVABYTECODE &&
+                                                          group != BLOCK_PATHMIGRATION &&
+                                                          group != BLOCK_FILES &&
+                                                          group != BLOCK_ABIDIFF &&
+                                                          group != BLOCK_KMIDIFF &&
+                                                          group != BLOCK_BADFUNCS &&
+                                                          group != BLOCK_RUNPATH)) {
                         block = BLOCK_IGNORE;
                         group = BLOCK_NULL;
                     } else if (!strcmp(key, "security_path_prefix")) {
@@ -1037,6 +1060,12 @@ static int read_cfgfile(struct rpminspect *ri, const char *filename)
                     } else if (block == BLOCK_FORBIDDEN_GROUPS) {
                         add_entry(&ri->forbidden_groups, t);
                     } else if (block == BLOCK_IGNORE) {
+                        /*
+                         * BLOCK_NULL means we're reading the
+                         * top-level 'ignore' block.  Any other group
+                         * means we are reading the optional 'ignore'
+                         * subblock for an inspection.
+                         */
                         if (group == BLOCK_NULL) {
                             add_entry(&ri->ignores, t);
                         } else {
@@ -1597,6 +1626,39 @@ struct rpminspect *init_rpminspect(struct rpminspect *ri, const char *cfgfile, c
     ri->peers = init_rpmpeer();
     ri->threshold = RESULT_VERIFY;
     ri->worst_result = RESULT_OK;
+
+    /* debugging output only to make sure we captured ignores */
+    if (ri->ignores && !TAILQ_EMPTY(ri->ignores)) {
+        string_entry_t *se = NULL;
+
+        DEBUG_PRINT("global ignores:\n");
+
+        TAILQ_FOREACH(se, ri->ignores, items) {
+            DEBUG_PRINT("    - %s\n", se->data);
+        }
+    } else {
+        DEBUG_PRINT("no global ignores defined\n");
+    }
+
+    if (ri->inspection_ignores) {
+        string_list_map_t *e = NULL;
+        string_list_map_t *te = NULL;
+        string_entry_t *se = NULL;
+
+        DEBUG_PRINT("per-inspection ignores:\n");
+
+        HASH_ITER(hh, ri->inspection_ignores, e, te) {
+            DEBUG_PRINT("    %s:\n", e->key);
+
+            if (e->value && !TAILQ_EMPTY(e->value)) {
+                TAILQ_FOREACH(se, e->value, items) {
+                    DEBUG_PRINT("        - %s\n", se->data);
+                }
+            }
+        }
+    } else {
+        DEBUG_PRINT("no per-inspection ignores defined\n");
+    }
 
     return ri;
 }
