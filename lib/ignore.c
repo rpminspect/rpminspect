@@ -62,6 +62,10 @@ bool ignore_path(const struct rpminspect *ri, const char *path, const char *root
         return true;
     }
 
+    if (ri->ignores == NULL || TAILQ_EMPTY(ri->ignores)) {
+        return false;
+    }
+
     if (root) {
         len = strlen(root);
     }
