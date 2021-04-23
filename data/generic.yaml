@@ -160,10 +160,10 @@ vendor:
     # 2) Rely on the product release string regexps in rpminspect.yaml
     #
     # Some products may have a variety of dist tags, so you can
-    # construct a regular expression to match them.  For example,
-    # let's say your dist tags are ".fc31, .fc31server, .fc31laptop".
-    # You want to use "fc31" for all of these, so you can add a rule
-    # here that looks like:
+    # construct a regular expression (man 7 regex) to match them.  For
+    # example, let's say your dist tags are ".fc31, .fc31server,
+    # .fc31laptop".  You want to use "fc31" for all of these, so you
+    # can add a rule here that looks like:
     #
     #     - fc31: ^\.fc31.*$
     #
@@ -223,16 +223,17 @@ metadata:
 
 elf:
     # File paths to include in or exclude from specific tests. Each
-    # value is a POSIX extended regular expression. Individual tests
-    # may apply additional filters (e.g., ELF tests only run on ELF
-    # files)
+    # value is a POSIX extended regular expression (man 7
+    # regex). Individual tests may apply additional filters (e.g., ELF
+    # tests only run on ELF files)
     #
     # For ELF, skip the kernel, kernel modules, and two additional
     # paths for ppc/ppc64: crtsavres.o is linked against kernel
     # modules, and kernel-wrapper is a boot wrapper that should not be
     # inspected.
     #
-    # These are regular expressions used by regexp(3).
+    # These are regular expressions used by regex(3).  See regex(7)
+    # for more info.
     #include_path:
     exclude_path: (^(/boot/vmlinu|/lib/modules|/lib64/modules).*)|(.*/powerpc/lib/crtsavres.o$)|(^/usr/lib(64)?/kernel-wrapper$)
 
@@ -244,11 +245,12 @@ elf:
     #    - /usr/lib*/libexample.so*
 
 manpage:
-    # Regular expression matching man page installation directories.
+    # Regular expression (man 7 regex) matching man page installation
+    # directories.
     include_path: ^(/usr|/usr/local)/share/man/.*
 
-    # Regular expression matching directories to ignore during the
-    # man page inspection.
+    # Regular expression (man 7 regex) matching directories to ignore
+    # during the man page inspection.
     #exclude_path:
 
     # Optional list of glob(7) specifications to match files to ignore
@@ -259,13 +261,13 @@ manpage:
     #    - /usr/lib*/libexample.so*
 
 xml:
-    # Regular expression matching directories to include in the xml
-    # expression.
+    # Regular expression (man 7 regex) matching directories to include
+    # in the xml expression.
     #include_path:
 
-    # Regular expression matching directories to ignore during the xml
-    # inspection. Skip JSP and RHTML files, which contain a mix of XML
-    # and code.
+    # Regular expression (man 7 regex) matching directories to ignore
+    # during the xml inspection. Skip JSP and RHTML files, which
+    # contain a mix of XML and code.
     exclude_path: .*(\.jsp|\.rhtml)$
 
     # Optional list of glob(7) specifications to match files to ignore
@@ -688,11 +690,11 @@ runpath:
         - /lib
         - /lib64
 
-    # Optional list of regular expressions to trim after an $ORIGIN
-    # entry in DT_RPATH or DT_RUNPATH.  If any of these regular
-    # expressions match, the matching substring is trimmed after
-    # "$ORIGIN" is trimmed and the remaining substring is validated
-    # against the 'allowed_origin_paths' list.
+    # Optional list of regular expressions (man 7 regex) to trim after
+    # an $ORIGIN entry in DT_RPATH or DT_RUNPATH.  If any of these
+    # regular expressions match, the matching substring is trimmed
+    # after "$ORIGIN" is trimmed and the remaining substring is
+    # validated against the 'allowed_origin_paths' list.
     origin_prefix_trim:
         - ^(opt/rh/[^/]+/root/)
 
