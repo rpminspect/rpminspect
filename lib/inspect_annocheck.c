@@ -38,9 +38,9 @@ static bool annocheck_driver(struct rpminspect *ri, rpmfile_entry_t *file)
     size_t ll = 0;
     char *tmp_out = NULL;
     char *after_out = NULL;
-    int after_exit;
+    int after_exit = 0;
     char *before_out = NULL;
-    int before_exit;
+    int before_exit = 0;
     struct result_params params;
 
     assert(ri != NULL);
@@ -103,9 +103,9 @@ static bool annocheck_driver(struct rpminspect *ri, rpmfile_entry_t *file)
         if (before_out && after_out) {
             if (before_exit == 0 && after_exit == 0) {
                 xasprintf(&params.msg, _("annocheck '%s' test passes for %s on %s"), hentry->key, file->localpath, arch);
-            } else if (before_exit == 1 && after_exit == 0) {
+            } else if (before_exit && after_exit == 0) {
                 xasprintf(&params.msg, _("annocheck '%s' test now passes for %s on %s"), hentry->key, file->localpath, arch);
-            } else if (before_exit == 0 && after_exit == 1) {
+            } else if (before_exit == 0 && after_exit) {
                 xasprintf(&params.msg, _("annocheck '%s' test now fails for %s on %s"), hentry->key, file->localpath, arch);
                 params.severity = RESULT_VERIFY;
                 params.verb = VERB_CHANGED;
@@ -114,7 +114,7 @@ static bool annocheck_driver(struct rpminspect *ri, rpmfile_entry_t *file)
         } else if (after_out) {
             if (after_exit == 0) {
                 xasprintf(&params.msg, _("annocheck '%s' test passes for %s on %s"), hentry->key, file->localpath, arch);
-            } else if (after_exit == 1) {
+            } else if (after_exit) {
                 xasprintf(&params.msg, _("annocheck '%s' test fails for %s on %s"), hentry->key, file->localpath, arch);
                 params.severity = RESULT_VERIFY;
                 params.verb = VERB_CHANGED;
