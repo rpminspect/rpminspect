@@ -953,11 +953,15 @@ static int read_cfgfile(struct rpminspect *ri, const char *filename)
                         }
                     } else if (group == BLOCK_FILESIZE) {
                         if (!strcmp(key, "size_threshold")) {
-                            ri->size_threshold = strtol(t, 0, 10);
+                            if (!strcasecmp(t, "info") || !strcasecmp(t, "info-only") || !strcasecmp(t, "info_only")) {
+                                ri->size_threshold = -1;
+                            } else {
+                                ri->size_threshold = strtol(t, 0, 10);
 
-                            if ((ri->size_threshold == LONG_MIN || ri->size_threshold == LONG_MAX) && errno == ERANGE) {
-                                warn("strtol()");
-                                ri->size_threshold = 0;
+                                if ((ri->size_threshold == LONG_MIN || ri->size_threshold == LONG_MAX) && errno == ERANGE) {
+                                    warn("strtol()");
+                                    ri->size_threshold = 0;
+                                }
                             }
                         }
                     } else if (group == BLOCK_ANNOCHECK) {
