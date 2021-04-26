@@ -244,6 +244,13 @@ elf:
     #ignore:
     #    - /usr/lib*/libexample.so*
 
+#emptyrpm:
+    # Optional list of packages in a build that will contain an empty
+    # payload.  Useful for SRPMs that build metapackages that will
+    # always have an empty payload.
+    #expected_empty:
+    #    - metapackagename
+
 manpage:
     # Regular expression (man 7 regex) matching man page installation
     # directories.

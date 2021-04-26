@@ -32,6 +32,26 @@
 #include <assert.h>
 #include "rpminspect.h"
 
+static bool is_expected_empty(const struct rpminspect *ri, const char *p)
+{
+    string_entry_t *entry = NULL;
+
+    assert(ri != NULL);
+    assert(p != NULL);
+
+    if (ri->expected_empty_rpms == NULL || TAILQ_EMPTY(ri->expected_empty_rpms)) {
+        return false;
+    }
+
+    TAILQ_FOREACH(entry, ri->expected_empty_rpms, items) {
+        if (!strcmp(p, entry->data)) {
+            return true;
+        }
+    }
+
+    return false;
+}
+
 /**
  * @brief Perform the 'emptyrpm' inspection.
  *
@@ -44,6 +64,8 @@
 bool inspect_emptyrpm(struct rpminspect *ri) {
     bool good = true;
     rpmpeer_entry_t *peer = NULL;
+    const char *name = NULL;
+    char *bn = NULL;
     struct result_params params;
 
     assert(ri != NULL);
@@ -61,10 +83,23 @@ bool inspect_emptyrpm(struct rpminspect *ri) {
     /* Check the binary peers */
     TAILQ_FOREACH(peer, ri->peers, items) {
         if (is_payload_empty(peer->after_files) && peer->before_rpm == NULL) {
-            xasprintf(&params.msg, _("New package %s is empty (no payloads)"), basename(peer->after_rpm));
-            params.severity = RESULT_VERIFY;
-            params.waiverauth = WAIVABLE_BY_ANYONE;
-            params.remedy = REMEDY_EMPTYRPM;
+            name = headerGetString(peer->after_hdr, RPMTAG_NAME);
+            assert(name != NULL);
+            bn = basename(peer->after_rpm);
+            assert(bn != NULL);
+
+            if (is_expected_empty(ri, name)) {
+                xasprintf(&params.msg, _("New package %s is empty (no payloads); this is expected per the configuration file"), bn);
+                params.severity = RESULT_INFO;
+                params.waiverauth = NOT_WAIVABLE;
+                params.remedy = NULL;
+            } else {
+                xasprintf(&params.msg, _("New package %s is empty (no payloads)"), basename(peer->after_rpm));
+                params.severity = RESULT_VERIFY;
+                params.waiverauth = WAIVABLE_BY_ANYONE;
+                params.remedy = REMEDY_EMPTYRPM;
+            }
+
             add_result(ri, &params);
             free(params.msg);
 

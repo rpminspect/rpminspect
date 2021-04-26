@@ -508,6 +508,9 @@ struct rpminspect {
      */
     string_list_map_t *inspection_ignores;
 
+    /* Optional list of expected RPMs with empty payloads */
+    string_list_t *expected_empty_rpms;
+
     /* Options specified by the user */
     char *before;              /* before build ID arg given on cmdline */
     char *after;               /* after build ID arg given on cmdline */

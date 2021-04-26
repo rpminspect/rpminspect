@@ -221,6 +221,7 @@ void free_rpminspect(struct rpminspect *ri) {
     list_free(ri->runpath_allowed_origin_paths, free);
     list_free(ri->runpath_origin_prefix_trim, free);
     free_string_list_map(ri->inspection_ignores);
+    list_free(ri->expected_empty_rpms, free);
 
     free_rpmpeer(ri->peers);
 
