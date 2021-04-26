@@ -193,7 +193,7 @@ static char *inspect_manpage_validity(const char *path, const char *localpath)
         fprintf(error_stream, _("Man page %s does not end in %s\n"), path, GZIPPED_FILENAME_EXTENSION);
     } else {
         if (read(fd, magic, sizeof(magic)) != sizeof(magic)) {
-            fprintf(error_stream, _("Unable to read man page %s\n"), path);
+            fprintf(error_stream, "read(): %s\n", strerror(errno));
             goto end;
         }
 
@@ -202,8 +202,13 @@ static char *inspect_manpage_validity(const char *path, const char *localpath)
         }
 
         /* Reset the fd and continue */
-        lseek(fd, 0, SEEK_SET);
+        if (lseek(fd, 0, SEEK_SET) == -1) {
+            fprintf(error_stream, "lseek(): %s\n", strerror(errno));
+            goto end;
+        }
     }
+
+    mparse_reset(parser);
 
     /* Parse the file */
 #ifdef NEWLIBMANDOC
