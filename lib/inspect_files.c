@@ -24,6 +24,7 @@
 #include <assert.h>
 #include <rpm/header.h>
 #include "queue.h"
+#include "uthash.h"
 #include "rpminspect.h"
 
 /* All of the macros that can appear in a %files section */
@@ -56,6 +57,8 @@ static bool files_driver(struct rpminspect *ri, rpmfile_entry_t *file) {
     string_list_t *spec = NULL;
     string_entry_t *specline = NULL;
     string_entry_t *path = NULL;
+    string_list_map_t *mapentry = NULL;
+    bool ignore = false;
 
     assert(ri != NULL);
     assert(file != NULL);
@@ -100,13 +103,29 @@ static bool files_driver(struct rpminspect *ri, rpmfile_entry_t *file) {
 
         /* check for forbidden references */
         if (in_files && *specline->data != '#') {
-            TAILQ_FOREACH(path, ri->forbidden_paths, items) {
-                if (strstr(specline->data, path->data)) {
-                    xasprintf(&params.msg, _("Forbidden path reference (%s) on line %ld of %s"), path->data, line, file->localpath);
-                    params.details = specline->data;
-                    add_result(ri, &params);
-                    free(params.msg);
-                    result = false;
+            /* skip if this path is something we should ignore */
+            if (ri->inspection_ignores != NULL) {
+                HASH_FIND_STR(ri->inspection_ignores, NAME_FILES, mapentry);
+
+                if (mapentry != NULL && mapentry->value != NULL && !TAILQ_EMPTY(mapentry->value)) {
+                    TAILQ_FOREACH(path, mapentry->value, items) {
+                        if (strprefix(specline->data, path->data)) {
+                            ignore = true;
+                            break;
+                        }
+                    }
+                }
+            }
+
+            if (!ignore) {
+                TAILQ_FOREACH(path, ri->forbidden_paths, items) {
+                    if (strprefix(specline->data, path->data)) {
+                        xasprintf(&params.msg, _("Forbidden path reference (%s) on line %ld of %s"), path->data, line, file->localpath);
+                        params.details = specline->data;
+                        add_result(ri, &params);
+                        free(params.msg);
+                        result = false;
+                    }
                 }
             }
         }

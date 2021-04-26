@@ -523,12 +523,13 @@ files:
     forbidden_paths:
         - /usr/lib
 
-    # Optional list of glob(7) specifications to match files to ignore
-    # for this inspection.  The format of this list is the same as the
-    # global 'ignore' list.  The difference is the items specified
-    # here will only be used during this inspection.
+    # Optional list of path prefixes to ignore when checking for
+    # forbidden paths in the %files section.  For example, a package
+    # may need to provide files in /usr/lib/dracut but anything else
+    # in /usr/lib is forbidden.  In that case, list /usr/lib/dracut/
+    # in the ignore list here.
     #ignore:
-    #    - /usr/lib*/libexample.so*
+    #    - /usr/lib/dracut/
 
 abidiff:
     # The name of the optional ABI suppression file that SRPMs can
