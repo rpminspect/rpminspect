@@ -112,7 +112,9 @@ enum {
     BLOCK_SHELLSYNTAX,
     BLOCK_SPECNAME,
     BLOCK_VENDOR,
-    BLOCK_XML
+    BLOCK_XML,
+    BLOCK_EMPTYRPM,
+    BLOCK_EXPECTED_EMPTY_RPMS
 };
 
 static int add_regex(const char *pattern, regex_t **regex_out)
@@ -667,6 +669,9 @@ static int read_cfgfile(struct rpminspect *ri, const char *filename)
                     } else if (!strcmp(key, NAME_RUNPATH)) {
                         block = BLOCK_NULL;
                         group = BLOCK_RUNPATH;
+                    } else if (!strcmp(key, NAME_EMPTYRPM)) {
+                        block = BLOCK_NULL;
+                        group = BLOCK_EMPTYRPM;
                     }
                 }
 
@@ -778,13 +783,18 @@ static int read_cfgfile(struct rpminspect *ri, const char *filename)
                         if (!strcmp(key, "ignore")) {
                             block = BLOCK_IGNORE;
                         }
-                    } else if (group == BLOCK_BADFUNCS) {
+                    } else if (block == BLOCK_BADFUNCS) {
                         if (!strcmp(key, "ignore")) {
+                            group = BLOCK_BADFUNCS;
                             block = BLOCK_IGNORE;
                         }
                     } else if (group == BLOCK_RUNPATH) {
                         if (!strcmp(key, "ignore")) {
                             block = BLOCK_IGNORE;
+                        }
+                    } else if (group == BLOCK_EMPTYRPM) {
+                        if (!strcmp(key, "expected_empty")) {
+                            block = BLOCK_EXPECTED_EMPTY_RPMS;
                         }
                     }
                 } else if (symbol == SYMBOL_VALUE) {
@@ -1093,6 +1103,8 @@ static int read_cfgfile(struct rpminspect *ri, const char *filename)
                         add_entry(&ri->runpath_allowed_origin_paths, t);
                     } else if (block == BLOCK_RUNPATH_ORIGIN_PREFIX_TRIM) {
                         add_entry(&ri->runpath_origin_prefix_trim, t);
+                    } else if (block == BLOCK_EXPECTED_EMPTY_RPMS) {
+                        add_entry(&ri->expected_empty_rpms, t);
                     }
                 }
 
