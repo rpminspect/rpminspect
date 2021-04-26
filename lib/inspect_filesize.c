@@ -115,6 +115,11 @@ static bool filesize_driver(struct rpminspect *ri, rpmfile_entry_t *file)
         }
     }
 
+    /* info reporting if user configured that */
+    if (ri->size_threshold == -1) {
+        params.severity = RESULT_INFO;
+    }
+
     /* Reporting */
     if (params.msg) {
         add_result(ri, &params);

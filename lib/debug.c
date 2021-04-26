@@ -309,7 +309,15 @@ void dump_cfg(const struct rpminspect *ri)
     }
 
     if (ri->size_threshold) {
-        printf("filesize:\n    size_threshold: %ld\n", ri->size_threshold);
+        printf("filesize:\n    size_threshold: ");
+
+        if (ri->size_threshold == -1) {
+            printf("info");
+        } else {
+            printf("%ld", ri->size_threshold);
+        }
+
+        printf("\n");
     }
 
     if (ri->lto_symbol_name_prefixes && !TAILQ_EMPTY(ri->lto_symbol_name_prefixes)) {
