@@ -89,9 +89,9 @@ Requires:       bash
 # The annocheck program is used by the annocheck inspection.  If it is
 # not present, you can disable the annocheck inspection.
 %if 0%{?rhel} >= 8 || 0%{?epel} >= 8 || 0%{?fedora}
-Recommends:     annobin-annocheck
+Recommends:     /usr/bin/annocheck
 %else
-Requires:       annobin-annocheck
+Requires:       /usr/bin/annocheck
 %endif
 
 # The abidiff and kmidiff inspections require a external executable by
