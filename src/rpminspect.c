@@ -314,6 +314,7 @@ int main(int argc, char **argv) {
     char *cfgfile = NULL;
     char *tmp_cfgfile = NULL;
     char *profile = NULL;
+    bool initialized = false;
     char *archopt = NULL;
     char *walk = NULL;
     char *token = NULL;
@@ -525,11 +526,10 @@ int main(int argc, char **argv) {
      */
     xasprintf(&tmp_cfgfile, "%s/%s", CFGFILE_DIR, CFGFILE);
 
-    if (cfgfile == NULL && (access(tmp_cfgfile, F_OK|R_OK) == -1) && (access(CFGFILE, F_OK|R_OK) == -1)) {
-        errx(RI_PROGRAM_ERROR, _("Please specify a configuration file using '-c' or supply ./%s"), CFGFILE);
-    } else if (cfgfile == NULL && (access(tmp_cfgfile, F_OK|R_OK) == 0)) {
-        /* /usr/share/rpminspect/rpminspect.yaml if it exists */
+    if (cfgfile == NULL && (access(tmp_cfgfile, F_OK|R_OK) == 0)) {
+        /* /usr/share/rpminspect/rpminspect.yaml exists */
         ri = init_rpminspect(ri, tmp_cfgfile, profile);
+        initialized = true;
 
         if (ri == NULL) {
             errx(RI_PROGRAM_ERROR, _("Failed to read configuration file %s"), tmp_cfgfile);
@@ -537,23 +537,31 @@ int main(int argc, char **argv) {
     } else if (access(cfgfile, F_OK|R_OK) == 0) {
         /* -c configuration file if it exists */
         ri = init_rpminspect(ri, cfgfile, profile);
+        initialized = true;
 
         if (ri == NULL) {
             errx(RI_PROGRAM_ERROR, _("Failed to read configuration file %s"), cfgfile);
         }
     }
 
+    free(tmp_cfgfile);
+    free(cfgfile);
+
     /* ./rpminspect.yaml if it exists */
     if (access(CFGFILE, F_OK|R_OK) == 0) {
         ri = init_rpminspect(ri, CFGFILE, profile);
+        initialized = true;
 
         if (ri == NULL) {
             errx(RI_PROGRAM_ERROR, _("Failed to read configuration file %s"), CFGFILE);
         }
     }
 
-    free(tmp_cfgfile);
-    free(cfgfile);
+
+    if (!initialized) {
+        errx(RI_PROGRAM_ERROR, _("Please specify a configuration file using '-c' or supply ./%s"), CFGFILE);
+    }
+
     free(profile);
 
     /* various options from the command line */
