@@ -31,6 +31,9 @@ class ManPageCorrectSectionRPM(TestRPMs):
     def setUp(self):
         TestRPMs.setUp(self)
 
+        # disable automatic man page compression in rpmbuild
+        self.rpm.header += "%global __brp_compress /bin/true\n"
+
         # force a gzip here since we have disabled brp scripts
         manpage = "usr/share/man/man1/foo.1"
         self.rpm.add_manpage(installPath=manpage)
@@ -48,6 +51,9 @@ class ManPageCorrectSectionKoji(TestKoji):
     def setUp(self):
         TestKoji.setUp(self)
 
+        # disable automatic man page compression in rpmbuild
+        self.rpm.header += "%global __brp_compress /bin/true\n"
+
         # force a gzip here since we have disabled brp scripts
         manpage = "usr/share/man/man1/foo.1"
         self.rpm.add_manpage(installPath=manpage)
@@ -64,6 +70,10 @@ class ManPageCorrectSectionKoji(TestKoji):
 class ManPageCorrectSectionCompareRPMs(TestCompareRPMs):
     def setUp(self):
         TestCompareRPMs.setUp(self)
+
+        # disable automatic man page compression in rpmbuild
+        self.before_rpm.header += "%global __brp_compress /bin/true\n"
+        self.after_rpm.header += "%global __brp_compress /bin/true\n"
 
         # force a gzip here since we have disabled brp scripts
         manpage = "usr/share/man/man1/foo.1"
@@ -85,6 +95,10 @@ class ManPageCorrectSectionCompareRPMs(TestCompareRPMs):
 class ManPageCorrectSectionCompareKoji(TestCompareKoji):
     def setUp(self):
         TestCompareKoji.setUp(self)
+
+        # disable automatic man page compression in rpmbuild
+        self.before_rpm.header += "%global __brp_compress /bin/true\n"
+        self.after_rpm.header += "%global __brp_compress /bin/true\n"
 
         # force a gzip here since we have disabled brp scripts
         manpage = "usr/share/man/man1/foo.1"
@@ -267,6 +281,9 @@ class InvalidManPageRPM(TestRPMs):
     def setUp(self):
         TestRPMs.setUp(self)
 
+        # disable automatic man page compression in rpmbuild
+        self.rpm.header += "%global __brp_compress /bin/true\n"
+
         # add a bad man page
         self.rpm.add_installed_file(
             "/usr/share/man/man1/foo.1.gz",
@@ -285,6 +302,9 @@ class InvalidManPageKoji(TestKoji):
     def setUp(self):
         TestKoji.setUp(self)
 
+        # disable automatic man page compression in rpmbuild
+        self.rpm.header += "%global __brp_compress /bin/true\n"
+
         # add a bad man page
         self.rpm.add_installed_file(
             "/usr/share/man/man1/foo.1.gz",
@@ -302,6 +322,10 @@ class InvalidManPageKoji(TestKoji):
 class InvalidManPageCompareRPMs(TestCompareRPMs):
     def setUp(self):
         TestCompareRPMs.setUp(self)
+
+        # disable automatic man page compression in rpmbuild
+        self.before_rpm.header += "%global __brp_compress /bin/true\n"
+        self.after_rpm.header += "%global __brp_compress /bin/true\n"
 
         # add a bad man page
         self.before_rpm.add_installed_file(
@@ -325,6 +349,10 @@ class InvalidManPageCompareKoji(TestCompareKoji):
     def setUp(self):
         TestCompareKoji.setUp(self)
 
+        # disable automatic man page compression in rpmbuild
+        self.before_rpm.header += "%global __brp_compress /bin/true\n"
+        self.after_rpm.header += "%global __brp_compress /bin/true\n"
+
         # add a bad man page
         self.before_rpm.add_installed_file(
             "/usr/share/man/man1/foo.1.gz",
@@ -347,6 +375,9 @@ class EmptyManPageRPM(TestRPMs):
     def setUp(self):
         TestRPMs.setUp(self)
 
+        # disable automatic man page compression in rpmbuild
+        self.rpm.header += "%global __brp_compress /bin/true\n"
+
         # add an empty but gzipped man page
         self.rpm.section_build += "touch foo.1\n"
         self.rpm.section_build += "gzip -9 foo.1\n"
@@ -367,6 +398,9 @@ class EmptyManPageRPM(TestRPMs):
 class EmptyManPageKoji(TestKoji):
     def setUp(self):
         TestKoji.setUp(self)
+
+        # disable automatic man page compression in rpmbuild
+        self.rpm.header += "%global __brp_compress /bin/true\n"
 
         # add an empty but gzipped man page
         self.rpm.section_build += "touch foo.1\n"
@@ -389,6 +423,9 @@ class EmptyManPageCompareRPMs(TestCompareRPMs):
     def setUp(self):
         TestCompareRPMs.setUp(self)
 
+        # disable automatic man page compression in rpmbuild
+        self.after_rpm.header += "%global __brp_compress /bin/true\n"
+
         # add an empty but gzipped man page
         self.after_rpm.section_build += "touch foo.1\n"
         self.after_rpm.section_build += "gzip -9 foo.1\n"
@@ -409,6 +446,9 @@ class EmptyManPageCompareRPMs(TestCompareRPMs):
 class EmptyManPageCompareKoji(TestCompareKoji):
     def setUp(self):
         TestCompareKoji.setUp(self)
+
+        # disable automatic man page compression in rpmbuild
+        self.after_rpm.header += "%global __brp_compress /bin/true\n"
 
         # add an empty but gzipped man page
         self.after_rpm.section_build += "touch foo.1\n"
