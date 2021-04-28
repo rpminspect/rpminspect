@@ -79,7 +79,7 @@ static bool is_xml_well_formed(const char *path, char **errors)
         result = true;
     } else {
         if (!ctxt->valid) {
-            if (errors != NULL) {
+            if (errors != NULL && ctxt->lastError.message) {
                 *errors = strdup(ctxt->lastError.message);
             }
 
