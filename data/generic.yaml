@@ -397,6 +397,10 @@ filesize:
     # File size reporting threshold percentage.  What percentage
     # change warrants reporting a VERIFY result?  This change can be
     # file size increase or decrease.  The default is 20%
+    #
+    # NOTE: you can set this to the keyword 'info' (without the single
+    # quotes) to have rpminspect report all filesize changes but at
+    # the INFO reporting level
     size_threshold: 20
 
     # Optional list of glob(7) specifications to match files to ignore
