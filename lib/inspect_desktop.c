@@ -47,6 +47,9 @@ static const char *icon_extensions[] = { ".png", ".svg", ".xpm", NULL };
 static int find_file(const char *fpath, __attribute__((unused)) const struct stat *sb, int tflag, __attribute__((unused)) struct FTW *ftwbuf)
 {
     int i = 0;
+    char *bn = NULL;
+    char *last = NULL;
+    char *tmpicon = NULL;
 
     /* Only looking at regular files */
     /*
@@ -78,15 +81,36 @@ static int find_file(const char *fpath, __attribute__((unused)) const struct sta
      */
     if (filetype == FILETYPE_ICON) {
         if (strsuffix(fpath, file_to_find)) {
-            while (icon_extensions[i] != NULL) {
+            for (i = 0; icon_extensions[i] != NULL; i++) {
                 if (strsuffix(fpath, icon_extensions[i])) {
                     free(file_to_find);
                     file_to_find = strdup(fpath);
                     return 1;
                 }
-
-                i++;
             }
+        } else {
+            /* handle icon specs without an extension */
+            bn = strdup(file_to_find);
+            assert(bn != NULL);
+            last = basename(bn);
+            assert(last != NULL);
+
+            for (i = 0; icon_extensions[i] != NULL; i++) {
+                xasprintf(&tmpicon, "%s%s", last, icon_extensions[i]);
+                assert(tmpicon != NULL);
+
+                if (strsuffix(fpath, tmpicon)) {
+                    free(file_to_find);
+                    file_to_find = strdup(fpath);
+                    free(bn);
+                    free(tmpicon);
+                    return 1;
+                }
+
+                free(tmpicon);
+            }
+
+            free(bn);
         }
     }
 
