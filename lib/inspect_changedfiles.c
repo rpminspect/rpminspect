@@ -139,8 +139,7 @@ static bool changedfiles_driver(struct rpminspect *ri, rpmfile_entry_t *file)
     }
 
     /* Skip files in the debug path and debug source path */
-    if (strprefix(file->localpath, DEBUG_PATH) ||
-        strprefix(file->localpath, DEBUG_SRC_PATH)) {
+    if (strprefix(file->localpath, DEBUG_PATH) || strprefix(file->localpath, DEBUG_SRC_PATH)) {
         return true;
     }
 
@@ -236,37 +235,49 @@ static bool changedfiles_driver(struct rpminspect *ri, rpmfile_entry_t *file)
                                                        strsuffix(file->localpath, ".xz")))) {
         /* uncompress the files to temporary files for comparison */
         before_uncompressed_file = uncompress_file(ri, file->peer_file->fullpath, HEADER_CHANGEDFILES);
-        assert(before_uncompressed_file != NULL);
-
         after_uncompressed_file = uncompress_file(ri, file->fullpath, HEADER_CHANGEDFILES);
-        assert(after_uncompressed_file != NULL);
 
-        /* we can use diff on text files, so try that first */
-        bun = calloc(1, sizeof(*bun));
-        assert(bun != NULL);
-        aun = calloc(1, sizeof(*aun));
-        assert(aun != NULL);
-
-        bun->fullpath = strdup(before_uncompressed_file);
-        aun->fullpath = strdup(after_uncompressed_file);
-
-        if (is_text_file(bun) && is_text_file(aun)) {
-            /* uncompressed files are text, use diff */
-            params.details = run_cmd(&exitcode, ri->commands.diff, "-u", before_uncompressed_file, after_uncompressed_file, NULL);
-
-            /* clean up the diff headers */
-            if (exitcode) {
-                s = strreplace(params.details, before_uncompressed_file, file->peer_file->localpath);
-                free(params.details);
-                params.details = s;
-
-                s = strreplace(params.details, after_uncompressed_file, file->localpath);
-                free(params.details);
-                params.details = s;
-            }
+        /* we may not have been able to uncompress */
+        if (before_uncompressed_file == NULL || after_uncompressed_file == NULL) {
+            /* perform a byte comparison of the compressed files */
+            exitcode = filecmp(file->peer_file->fullpath, file->fullpath);
         } else {
-            /* perform a byte comparison of the uncompressed files */
-            exitcode = filecmp(before_uncompressed_file, after_uncompressed_file);
+            /* we can use diff on text files, so try that first */
+            bun = calloc(1, sizeof(*bun));
+            assert(bun != NULL);
+            aun = calloc(1, sizeof(*aun));
+            assert(aun != NULL);
+
+            bun->fullpath = strdup(before_uncompressed_file);
+            aun->fullpath = strdup(after_uncompressed_file);
+
+            if (is_text_file(bun) && is_text_file(aun)) {
+                /* uncompressed files are text, use diff */
+                params.details = run_cmd(&exitcode, ri->commands.diff, "-u", before_uncompressed_file, after_uncompressed_file, NULL);
+
+                /* clean up the diff headers */
+                if (exitcode) {
+                    s = strreplace(params.details, before_uncompressed_file, file->peer_file->localpath);
+                    free(params.details);
+                    params.details = s;
+
+                    s = strreplace(params.details, after_uncompressed_file, file->localpath);
+                    free(params.details);
+                    params.details = s;
+                }
+            } else {
+                /* perform a byte comparison of the uncompressed files */
+                exitcode = filecmp(before_uncompressed_file, after_uncompressed_file);
+            }
+
+            /* clean up */
+            free(bun->fullpath);
+            free(bun->type);
+            free(bun);
+
+            free(aun->fullpath);
+            free(aun->type);
+            free(aun);
         }
 
         if (exitcode) {
@@ -288,14 +299,6 @@ static bool changedfiles_driver(struct rpminspect *ri, rpmfile_entry_t *file)
         }
 
         /* cleanup */
-        free(bun->fullpath);
-        free(bun->type);
-        free(bun);
-
-        free(aun->fullpath);
-        free(aun->type);
-        free(aun);
-
         free(before_uncompressed_file);
         free(after_uncompressed_file);
 
