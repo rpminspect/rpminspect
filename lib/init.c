@@ -1643,6 +1643,7 @@ struct rpminspect *init_rpminspect(struct rpminspect *ri, const char *cfgfile, c
     ri->threshold = RESULT_VERIFY;
     ri->worst_result = RESULT_OK;
 
+#if 0
     /* debugging output only to make sure we captured ignores */
     if (ri->ignores && !TAILQ_EMPTY(ri->ignores)) {
         string_entry_t *se = NULL;
@@ -1675,6 +1676,7 @@ struct rpminspect *init_rpminspect(struct rpminspect *ri, const char *cfgfile, c
     } else {
         DEBUG_PRINT("no per-inspection ignores defined\n");
     }
+#endif
 
     return ri;
 }
