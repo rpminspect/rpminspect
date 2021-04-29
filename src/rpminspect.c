@@ -834,9 +834,8 @@ int main(int argc, char **argv) {
         if (keep) {
             printf(_("\nKeeping working directory: %s\n"), ri->worksubdir);
         } else {
-            if (rmtree(ri->workdir, true, true)) {
-                warn(_("*** Error removing directory %s"), ri->workdir);
-            }
+            /* remove the working directories we can */
+            (void) rmtree(ri->workdir, true, true);
         }
     }
 
