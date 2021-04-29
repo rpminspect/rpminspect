@@ -65,13 +65,11 @@ static bool is_xml_well_formed(const char *path, char **errors)
     ctxt = xmlNewParserCtxt();
     assert(ctxt != NULL);
     doc = xmlCtxtReadFile(ctxt, path, NULL, XML_PARSE_RECOVER | XML_PARSE_NONET | XML_PARSE_DTDVALID);
-    DEBUG_PRINT("path=|%s|, ctxt->valid=%d, ctxt->errNo=%d\n", path, ctxt->valid, ctxt->errNo);
 
     /* try again if no DTD specified */
     if (!ctxt->valid && ctxt->errNo == XML_DTD_NO_DTD) {
         xmlFreeDoc(doc);
         doc = xmlCtxtReadFile(ctxt, path, NULL, XML_PARSE_RECOVER | XML_PARSE_NONET);
-        DEBUG_PRINT("path=|%s|, ctxt->valid=%d, ctxt->errNo=%d\n", path, ctxt->valid, ctxt->errNo);
     }
 
     /* an unparsed entity is ok in this check */
