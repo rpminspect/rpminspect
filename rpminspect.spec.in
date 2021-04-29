@@ -33,17 +33,8 @@ BuildRequires:  openssl-devel
 BuildRequires:  libcap-devel
 BuildRequires:  gettext-devel
 BuildRequires:  clamav-devel
-
-# This block can be removed when all targeted platforms have 1.14.5.
-# The 1.14.5 mandoc package has libmandoc.a and fixes for some known
-# problems, which we want for librpminspect.  Fedora <= 30 and EPEL <=
-# 7 do not currently have this build.  When they do, reduce this block
-# to a single BuildRequires line.
-%if 0%{?rhel} >= 8 || 0%{?epel} >= 8 || 0%{?fedora} >= 31
 BuildRequires:  libmandoc-devel >= 1.14.5
-%else
-BuildRequires:  libmandoc-devel
-%endif
+
 
 %description
 Build deviation and compliance tool.  This program runs a number of tests
