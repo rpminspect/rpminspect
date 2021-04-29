@@ -44,12 +44,9 @@ static const char *icon_extensions[] = { ".png", ".svg", ".xpm", NULL };
 /*
  * Helper used by nftw() in validate_desktop_contents()
  */
-static int find_file(const char *fpath, __attribute__((unused)) const struct stat *sb,
-                     int tflag, __attribute__((unused)) struct FTW *ftwbuf)
+static int find_file(const char *fpath, __attribute__((unused)) const struct stat *sb, int tflag, __attribute__((unused)) struct FTW *ftwbuf)
 {
     int i = 0;
-    char *tmpbuf = NULL;
-    char *last = NULL;
 
     /* Only looking at regular files */
     /*
@@ -80,26 +77,19 @@ static int find_file(const char *fpath, __attribute__((unused)) const struct sta
      * will pass.
      */
     if (filetype == FILETYPE_ICON) {
-        tmpbuf = strdup(fpath);
-        last = basename(tmpbuf);
-
-        if (last != NULL) {
-            if (strprefix(last, file_to_find)) {
-                while (icon_extensions[i] != NULL) {
-                    if (strsuffix(last, icon_extensions[i]) && strstr(last, ".")) {
-                        free(tmpbuf);
-                        free(file_to_find);
-                        file_to_find = strdup(fpath);
-                        return 1;
-                    }
-
-                    i++;
+        if (strsuffix(fpath, file_to_find)) {
+            while (icon_extensions[i] != NULL) {
+                if (strsuffix(fpath, icon_extensions[i])) {
+                    free(file_to_find);
+                    file_to_find = strdup(fpath);
+                    return 1;
                 }
+
+                i++;
             }
         }
     }
 
-    free(tmpbuf);
     return 0;
 }
 
