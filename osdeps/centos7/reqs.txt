@@ -27,7 +27,6 @@ libarchive-devel
 libcap-devel
 libcurl-devel
 libffi-devel
-libmandoc-devel
 libxml2-devel
 libyaml-devel
 make
