@@ -27,7 +27,6 @@
 
 /* Global variables */
 static string_list_t *source = NULL;
-static bool initialized = false;
 static bool reported = false;
 static struct result_params params;
 
@@ -40,13 +39,7 @@ static bool is_source(const rpmfile_entry_t *file)
 
     assert(file != NULL);
 
-    /* Initialize the source list once for the run */
-    if (!initialized) {
-        source = get_rpm_header_string_array(file->rpm_header, RPMTAG_SOURCE);
-        initialized = true;
-    }
-
-    if (source == NULL) {
+    if (source == NULL || TAILQ_EMPTY(source)) {
         /* source package lacks any Source archives */
         return false;
     }
@@ -137,6 +130,9 @@ bool inspect_upstream(struct rpminspect *ri)
     bool have_source = false;
     rpmpeer_entry_t *peer = NULL;
     rpmfile_entry_t *file = NULL;
+    string_list_t *before_source = NULL;
+    string_list_t *removed = NULL;
+    string_entry_t *entry = NULL;
 
     assert(ri != NULL);
 
@@ -181,8 +177,14 @@ bool inspect_upstream(struct rpminspect *ri)
             continue;
         }
 
+        /* Get the list of source files from each build */
+        before_source = get_rpm_header_string_array(peer->before_hdr, RPMTAG_SOURCE);
+        source = get_rpm_header_string_array(peer->after_hdr, RPMTAG_SOURCE);
+
         /* On the off chance the SRPM is empty, just ignore */
-        if (peer->after_files == NULL || TAILQ_EMPTY(peer->after_files)) {
+        if ((before_source == NULL || TAILQ_EMPTY(before_source)) || (source == NULL || TAILQ_EMPTY(source))) {
+            list_free(before_source, free);
+            list_free(source, free);
             continue;
         }
 
@@ -194,17 +196,21 @@ bool inspect_upstream(struct rpminspect *ri)
         }
 
         /* Report any removed source files from the SRPM */
-        if (peer->before_files) {
-            TAILQ_FOREACH(file, peer->before_files, items) {
-                if (file->peer_file == NULL) {
-                    xasprintf(&params.msg, _("Source file `%s` removed"), file->localpath);
-                    add_result(ri, &params);
-                    free(params.msg);
-                    result = !(params.severity >= RESULT_VERIFY);
-                    reported = true;
-                }
+        removed = list_difference(source, before_source);
+
+        if (removed != NULL && !TAILQ_EMPTY(removed)) {
+            TAILQ_FOREACH(entry, removed, items) {
+                xasprintf(&params.msg, _("Source file `%s` removed"), entry->data);
+                add_result(ri, &params);
+                free(params.msg);
+                result = !(params.severity >= RESULT_VERIFY);
+                reported = true;
             }
         }
+
+        list_free(removed, free);
+        list_free(before_source, free);
+        list_free(source, free);
     }
 
     /* Sound the everything-is-ok alarm if everything is, in fact, ok */
@@ -215,9 +221,6 @@ bool inspect_upstream(struct rpminspect *ri)
         params.remedy = NULL;
         add_result(ri, &params);
     }
-
-    /* Our static list of SourceN: spec file members, dump it */
-    list_free(source, free);
 
     return result;
 }
