@@ -181,13 +181,6 @@ bool inspect_upstream(struct rpminspect *ri)
         before_source = get_rpm_header_string_array(peer->before_hdr, RPMTAG_SOURCE);
         source = get_rpm_header_string_array(peer->after_hdr, RPMTAG_SOURCE);
 
-        /* On the off chance the SRPM is empty, just ignore */
-        if ((before_source == NULL || TAILQ_EMPTY(before_source)) || (source == NULL || TAILQ_EMPTY(source))) {
-            list_free(before_source, free);
-            list_free(source, free);
-            continue;
-        }
-
         /* Iterate over the SRPM files */
         TAILQ_FOREACH(file, peer->after_files, items) {
             if (!upstream_driver(ri, file)) {
