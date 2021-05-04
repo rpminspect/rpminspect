@@ -326,7 +326,6 @@ static int download_build(const struct rpminspect *ri, const struct koji_build *
     int in_filter = 0;
     string_list_t *filter = NULL;
     string_entry_t *filtered_rpm = NULL;
-    bool filtered = false;
 
     assert(build != NULL);
     assert(build->builds != NULL);
@@ -470,16 +469,7 @@ static int download_build(const struct rpminspect *ri, const struct koji_build *
 
             /* for module builds, filter out packages */
             if (workri->buildtype == KOJI_BUILD_MODULE && filter != NULL) {
-                filtered = false;
-
-                TAILQ_FOREACH(filtered_rpm, filter, items) {
-                    if (!strcmp(filtered_rpm->data, rpm->name)) {
-                        filtered = true;
-                        break;
-                    }
-                }
-
-                if (filtered) {
+                if (list_contains(filter, rpm->name)) {
                     continue;
                 }
             }

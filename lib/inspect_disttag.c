@@ -29,10 +29,8 @@
 
 static void append_macros(string_list_t **macros, const char *s)
 {
-    bool found = false;
     string_list_t *new_macros = NULL;
     string_entry_t *entry = NULL;
-    string_entry_t *macro = NULL;
 
     if (s == NULL) {
         return;
@@ -45,18 +43,8 @@ static void append_macros(string_list_t **macros, const char *s)
         entry = TAILQ_FIRST(new_macros);
         TAILQ_REMOVE(new_macros, entry, items);
 
-        /* look for this macro in the list */
-        found = false;
-
-        TAILQ_FOREACH(macro, *macros, items) {
-            if (!strcmp(macro->data, entry->data)) {
-                found = true;
-                break;
-            }
-        }
-
         /* add the macro to the list if not found */
-        if (found) {
+        if (list_contains(*macros, entry->data)) {
             free(entry->data);
             free(entry);
         } else {

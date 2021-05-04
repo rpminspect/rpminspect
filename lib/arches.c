@@ -58,14 +58,7 @@ void init_arches(struct rpminspect *ri)
             continue;
         }
 
-        found = false;
-
-        TAILQ_FOREACH(entry, ri->arches, items) {
-            if (!strcmp(arch, entry->data)) {
-                found = true;
-                break;
-            }
-        }
+        found = list_contains(ri->arches, arch);
 
         if (!found) {
             entry = calloc(1, sizeof(*entry));
@@ -87,8 +80,6 @@ void init_arches(struct rpminspect *ri)
  */
 bool allowed_arch(const struct rpminspect *ri, const char *rpmarch)
 {
-    string_entry_t *arch = NULL;
-
     assert(ri != NULL);
     assert(rpmarch != NULL);
 
@@ -96,11 +87,5 @@ bool allowed_arch(const struct rpminspect *ri, const char *rpmarch)
         return true;
     }
 
-    TAILQ_FOREACH(arch, ri->arches, items) {
-        if (!strcmp(rpmarch, arch->data)) {
-            return true;
-        }
-    }
-
-    return false;
+    return list_contains(ri->arches, rpmarch);
 }

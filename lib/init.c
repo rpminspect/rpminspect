@@ -172,10 +172,8 @@ static void add_entry(string_list_t **list, const char *s)
         TAILQ_INIT(*list);
     } else {
         /* do not add entry if it exists in the list */
-        TAILQ_FOREACH(entry, *list, items) {
-            if (!strcmp(entry->data, s)) {
-                return;
-            }
+        if (list_contains(*list, s)) {
+            return;
         }
     }
 

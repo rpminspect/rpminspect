@@ -42,7 +42,6 @@ static char *get_shell(const struct rpminspect *ri, const char *fullpath)
     char *start = NULL;
     size_t len;
     int r = 0;
-    string_entry_t *entry = NULL;
 
     assert(ri != NULL);
     assert(ri->shells != NULL);
@@ -84,11 +83,8 @@ static char *get_shell(const struct rpminspect *ri, const char *fullpath)
         walk = basename(buf);
 
         /* is it a shell we care about? */
-        TAILQ_FOREACH(entry, ri->shells, items) {
-            if (!strcmp(walk, entry->data)) {
-                shell = strdup(walk);
-                break;
-            }
+        if (list_contains(ri->shells, walk)) {
+            shell = strdup(walk);
         }
     }
 

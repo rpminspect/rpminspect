@@ -175,12 +175,7 @@ static bool check_runpath(struct rpminspect *ri, const rpmfile_entry_t *file, co
                 working_path = abspath(working_path);
 
                 /* check for the working path in the allowed paths */
-                TAILQ_FOREACH(prefix, allowed, items) {
-                    if (!strcmp(working_path, prefix->data)) {
-                        valid = true;
-                        break;
-                    }
-                }
+                valid = list_contains(allowed, working_path);
 
                 free(working_path);
             }

@@ -79,10 +79,8 @@ static bool find_lto_symbols(Elf *elf, string_list_t **user_data)
 
                 if (strprefix(entry->data, prefix->data)) {
                     /* don't add the symbol if we already have it */
-                    TAILQ_FOREACH(found, specifics, items) {
-                        if (!strcmp(found->data, entry->data)) {
-                            break;
-                        }
+                    if (list_contains(specifics, entry->data)) {
+                        break;
                     }
 
                     /* add this symbol to the list */

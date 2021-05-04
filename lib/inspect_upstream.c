@@ -35,7 +35,6 @@ static bool is_source(const rpmfile_entry_t *file)
 {
     bool ret = false;
     char *shortname = NULL;
-    string_entry_t *entry = NULL;
 
     assert(file != NULL);
 
@@ -48,10 +47,8 @@ static bool is_source(const rpmfile_entry_t *file)
     shortname = rindex(file->fullpath, '/') + 1;
 
     /* See if this file is a Source file */
-    TAILQ_FOREACH(entry, source, items) {
-        if (!strcmp(shortname, entry->data)) {
-            return true;
-        }
+    if (list_contains(source, shortname)) {
+        return true;
     }
 
     return ret;
@@ -128,6 +125,7 @@ bool inspect_upstream(struct rpminspect *ri)
 {
     bool result = true;
     bool have_source = false;
+    const char *name = NULL;
     rpmpeer_entry_t *peer = NULL;
     rpmfile_entry_t *file = NULL;
     string_list_t *before_source = NULL;
@@ -157,8 +155,11 @@ bool inspect_upstream(struct rpminspect *ri)
         return result;
     }
 
+    name = headerGetString(peer->after_hdr, RPMTAG_NAME);
+    assert(name != NULL);
+
     /* Set result type based on version difference */
-    if (is_rebase(ri)) {
+    if (is_rebase(ri) || (init_rebaseable(ri) && list_contains(ri->rebaseable, name))) {
         /* versions changed */
         params.severity = RESULT_INFO;
         params.waiverauth = NOT_WAIVABLE;
@@ -189,7 +190,7 @@ bool inspect_upstream(struct rpminspect *ri)
         }
 
         /* Report any removed source files from the SRPM */
-        removed = list_difference(source, before_source);
+        removed = list_difference(before_source, source);
 
         if (removed != NULL && !TAILQ_EMPTY(removed)) {
             TAILQ_FOREACH(entry, removed, items) {

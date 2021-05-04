@@ -34,8 +34,6 @@
 
 static bool is_expected_empty(const struct rpminspect *ri, const char *p)
 {
-    string_entry_t *entry = NULL;
-
     assert(ri != NULL);
     assert(p != NULL);
 
@@ -43,13 +41,7 @@ static bool is_expected_empty(const struct rpminspect *ri, const char *p)
         return false;
     }
 
-    TAILQ_FOREACH(entry, ri->expected_empty_rpms, items) {
-        if (!strcmp(p, entry->data)) {
-            return true;
-        }
-    }
-
-    return false;
+    return list_contains(ri->expected_empty_rpms, p);
 }
 
 /**

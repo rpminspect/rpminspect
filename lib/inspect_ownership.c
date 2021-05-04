@@ -120,35 +120,25 @@ static bool ownership_driver(struct rpminspect *ri, rpmfile_entry_t *file) {
      */
 
     /* Report forbidden file owners */
-    if (ri->forbidden_owners) {
-        TAILQ_FOREACH(entry, ri->forbidden_owners, items) {
-            if (!strcmp(owner, entry->data)) {
-                xasprintf(&params.msg, _("File %s has forbidden owner `%s` on %s"), file->localpath, owner, arch);
-                params.severity = RESULT_BAD;
-                params.waiverauth = WAIVABLE_BY_ANYONE;
-                params.remedy = REMEDY_OWNERSHIP_DEFATTR;
-                add_result(ri, &params);
-                free(params.msg);
-                result = false;
-                break;
-            }
-        }
+    if (ri->forbidden_owners && list_contains(ri->forbidden_owners, owner)) {
+        xasprintf(&params.msg, _("File %s has forbidden owner `%s` on %s"), file->localpath, owner, arch);
+        params.severity = RESULT_BAD;
+        params.waiverauth = WAIVABLE_BY_ANYONE;
+        params.remedy = REMEDY_OWNERSHIP_DEFATTR;
+        add_result(ri, &params);
+        free(params.msg);
+        result = false;
     }
 
     /* Report forbidden file groups */
-    if (ri->forbidden_groups) {
-        TAILQ_FOREACH(entry, ri->forbidden_groups, items) {
-            if (!strcmp(group, entry->data)) {
-                xasprintf(&params.msg, _("File %s has forbidden group `%s` on %s"), file->localpath, owner, arch);
-                params.severity = RESULT_BAD;
-                params.waiverauth = WAIVABLE_BY_ANYONE;
-                params.remedy = REMEDY_OWNERSHIP_DEFATTR;
-                add_result(ri, &params);
-                free(params.msg);
-                result = false;
-                break;
-            }
-        }
+    if (ri->forbidden_groups && list_contains(ri->forbidden_groups, group)) {
+        xasprintf(&params.msg, _("File %s has forbidden group `%s` on %s"), file->localpath, owner, arch);
+        params.severity = RESULT_BAD;
+        params.waiverauth = WAIVABLE_BY_ANYONE;
+        params.remedy = REMEDY_OWNERSHIP_DEFATTR;
+        add_result(ri, &params);
+        free(params.msg);
+        result = false;
     }
 
     /* Report files in bin paths not under the bin owner or group */
