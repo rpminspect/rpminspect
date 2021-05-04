@@ -44,9 +44,7 @@ static struct result_params params;
 /* Returns true if this file is a Patch file */
 static bool is_patch(const rpmfile_entry_t *file)
 {
-    bool ret = false;
     char *shortname = NULL;
-    string_entry_t *entry = NULL;
 
     assert(file != NULL);
 
@@ -65,13 +63,7 @@ static bool is_patch(const rpmfile_entry_t *file)
     shortname = rindex(file->fullpath, '/') + 1;
 
     /* See if this file is a Patch file */
-    TAILQ_FOREACH(entry, patches, items) {
-        if (!strcmp(shortname, entry->data)) {
-            return true;
-        }
-    }
-
-    return ret;
+    return list_contains(patches, shortname);
 }
 
 /*
@@ -158,7 +150,6 @@ static diffstat_t get_diffstat_counts(const char *summary)
 static bool patches_driver(struct rpminspect *ri, rpmfile_entry_t *file)
 {
     bool result = true;
-    string_entry_t *entry = NULL;
     char *before_patch = NULL;
     char *after_patch = NULL;
     int exitcode;
@@ -177,12 +168,8 @@ static bool patches_driver(struct rpminspect *ri, rpmfile_entry_t *file)
     params.file = file->localpath;
 
     /* If this patch is on the ignore list, skip */
-    if (ri->patch_ignore_list != NULL && !TAILQ_EMPTY(ri->patch_ignore_list)) {
-        TAILQ_FOREACH(entry, ri->patch_ignore_list, items) {
-            if (!strcmp(file->localpath, entry->data)) {
-                return true;
-            }
-        }
+    if (list_contains(ri->patch_ignore_list, file->localpath)) {
+        return true;
     }
 
     /* patches may be compressed, so uncompress them here for diff(1) */

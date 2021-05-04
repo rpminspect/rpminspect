@@ -144,6 +144,7 @@ size_t list_len(const string_list_t *);
 string_list_t * list_sort(const string_list_t *);
 string_list_t * list_copy(const string_list_t *);
 string_list_t *list_from_array(const char **);
+bool list_contains(const string_list_t *, const char *);
 
 /* local.c */
 bool is_local_build(const char *);

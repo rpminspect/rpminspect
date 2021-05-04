@@ -42,12 +42,12 @@ static bool pathmigration_driver(struct rpminspect *ri, rpmfile_entry_t *file)
 
     /* Skip files beginning with an excluded path */
     if (ri->pathmigration_excluded_paths && !TAILQ_EMPTY(ri->pathmigration_excluded_paths)) {
-        TAILQ_FOREACH(entry, ri->pathmigration_excluded_paths, items) {
-            /* check in case of an exact match */
-            if (!strcmp(file->localpath, entry->data)) {
-                return true;
-            }
+        /* check in case of an exact match */
+        if (list_contains(ri->pathmigration_excluded_paths, file->localpath)) {
+            return true;
+        }
 
+        TAILQ_FOREACH(entry, ri->pathmigration_excluded_paths, items) {
             /* ensure the path prefixes end with '/' */
             if (strsuffix(entry->data, "/")) {
                 old = strdup(entry->data);

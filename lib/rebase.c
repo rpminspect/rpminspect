@@ -51,7 +51,6 @@ bool is_rebase(struct rpminspect *ri)
     const char *an = NULL;
     const char *bv = NULL;
     const char *av = NULL;
-    string_entry_t *entry = NULL;
 
     assert(ri != NULL);
     assert(ri->peers != NULL);
@@ -91,12 +90,8 @@ bool is_rebase(struct rpminspect *ri)
     }
 
     /* if the package name is on the rebaseable list, it's valid */
-    if (init_rebaseable(ri)) {
-        TAILQ_FOREACH(entry, ri->rebaseable, items) {
-            if ((bn && !strcmp(entry->data, bn)) && (an && !strcmp(entry->data, an))) {
-                return true;
-            }
-        }
+    if (init_rebaseable(ri) && list_contains(ri->rebaseable, bn) && list_contains(ri->rebaseable, an)) {
+        return true;
     }
 
     /* is it a rebase or not or did an error occur? */
