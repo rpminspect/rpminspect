@@ -31,6 +31,8 @@
 bool inspect_arch(struct rpminspect *ri) {
     bool result = true;
     rpmpeer_entry_t *peer = NULL;
+    const char *before_arch = NULL;
+    const char *after_arch = NULL;
     string_list_t *before_arches = NULL;
     string_list_t *after_arches = NULL;
     string_entry_t *entry = NULL;
@@ -54,17 +56,35 @@ bool inspect_arch(struct rpminspect *ri) {
 
     /* Gather up all the architectures */
     TAILQ_FOREACH(peer, ri->peers, items) {
-        if (peer->before_hdr) {
-            entry = calloc(1, sizeof(*entry));
-            entry->data = strdup(headerGetString(peer->before_hdr, RPMTAG_ARCH));
-            TAILQ_INSERT_TAIL(before_arches, entry, items);
+        if (peer->before_hdr == NULL || peer->after_hdr == NULL) {
+            /* missing peer packages; handled by other inspections */
+            continue;
         }
 
-        if (peer->after_hdr) {
-            entry = calloc(1, sizeof(*entry));
-            entry->data = strdup(headerGetString(peer->after_hdr, RPMTAG_ARCH));
-            TAILQ_INSERT_TAIL(after_arches, entry, items);
+        before_arch = headerGetString(peer->before_hdr, RPMTAG_ARCH);
+        after_arch = headerGetString(peer->after_hdr, RPMTAG_ARCH);
+
+        /*
+         * loss of a noarch package is not something this inspection
+         * needs to be concerned with.  this inspection checks for
+         * loss of a target machine architecture as provided by the
+         * before build
+         */
+        if (!strcmp(before_arch, "noarch") || !strcmp(after_arch, "noarch")) {
+            continue;
         }
+
+        entry = calloc(1, sizeof(*entry));
+        assert(entry != NULL);
+        entry->data = strdup(before_arch);
+        assert(entry->data != NULL);
+        TAILQ_INSERT_TAIL(before_arches, entry, items);
+
+        entry = calloc(1, sizeof(*entry));
+        assert(entry != NULL);
+        entry->data = strdup(after_arch);
+        assert(entry->data != NULL);
+        TAILQ_INSERT_TAIL(after_arches, entry, items);
     }
 
     /* Compute what was lost and gained */

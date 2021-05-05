@@ -174,7 +174,7 @@ bool inspect_upstream(struct rpminspect *ri)
     /* Run the main inspection */
     TAILQ_FOREACH(peer, ri->peers, items) {
         /* Only look at the files in SRPMs */
-        if (!headerIsSource(peer->after_hdr)) {
+        if (peer->after_rpm == NULL || !headerIsSource(peer->after_hdr)) {
             continue;
         }
 
