@@ -196,7 +196,9 @@ string_list_t *get_rpm_header_string_array(Header hdr, rpmTagVal tag)
     string_entry_t *entry = NULL;
     const char *val = NULL;
 
-    assert(hdr != NULL);
+    if (hdr == NULL) {
+        return NULL;
+    }
 
     td = rpmtdNew();
 

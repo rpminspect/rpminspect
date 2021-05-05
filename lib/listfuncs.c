@@ -476,6 +476,10 @@ bool list_contains(const string_list_t *list, const char *s)
         return false;
     }
 
+    if (s == NULL) {
+        return false;
+    }
+
     TAILQ_FOREACH(entry, list, items) {
         if (!strcmp(entry->data, s)) {
             return true;

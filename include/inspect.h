@@ -657,7 +657,7 @@ bool inspect_runpath(struct rpminspect *ri);
 
 #define DESC_KMOD _("Report kernel module parameter, dependency, PCI ID, or symbol differences between builds.  Added and removed parameters are reported and if the package version is unchanged, these messages are reported as failures.  The same is true module dependencies, PCI IDs, and symbols.")
 
-#define DESC_ARCH _("Report RPM architectures that appear and disappear between the before and after builds.")
+#define DESC_ARCH _("Report RPM architectures that appear and disappear between the before and after builds.  This inspection does not report the loss of noarch packages.  The purpose of this inspection is to report the loss of target machine architectures as provided in the before build and not seeing them in the after build.")
 
 #define DESC_SUBPACKAGES _("Report RPM subpackages that appear and disappear between the before and after builds.")
 
