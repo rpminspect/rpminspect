@@ -169,6 +169,7 @@ static bool validate_desktop_contents(struct rpminspect *ri, const rpmfile_entry
     struct result_params params;
     char *key_exec = NULL;
     char *key_icon = NULL;
+    char *key_tryexec = NULL;
 
     assert(ri != NULL);
     assert(file != NULL);
@@ -233,6 +234,12 @@ static bool validate_desktop_contents(struct rpminspect *ri, const rpmfile_entry
             tmp[strcspn(tmp, "\n")] = 0;
 
             key_icon = tmp;
+        } else if (strprefix(buf, "TryExec=")) {
+            /* Take everything after the key and trim newlines */
+            tmp = buf + 5;
+            tmp[strcspn(tmp, "\n")] = 0;
+
+            key_tryexec = tmp;
         }
     }
 
@@ -268,6 +275,20 @@ static bool validate_desktop_contents(struct rpminspect *ri, const rpmfile_entry
                 free(params.msg);
                 result = false;
             }
+        } else if (key_tryexec != NULL) {
+            /*
+             * At this point, nftw() did not find the executable.
+             * However, since there is TryExec in the desktop file,
+             * then the desktop file may be ignored by menu
+             * implementations. Hence, report it only as "INFO"
+             * result, as this is acceptable.
+             */
+            xasprintf(&params.msg, _("Desktop file %s on %s references executable %s; no subpackages contain an executable of that name, however it has a TryExec key so it may be ignored in case %s does not exist"), file->localpath, arch, tmp, key_tryexec);
+            params.severity = RESULT_INFO;
+            params.waiverauth = NOT_WAIVABLE;
+            add_result(ri, &params);
+            free(params.msg);
+            result = false;
         } else {
             xasprintf(&params.msg, _("Desktop file %s on %s references executable %s but no subpackages contain an executable of that name"), file->localpath, arch, tmp);
             params.severity = RESULT_VERIFY;
