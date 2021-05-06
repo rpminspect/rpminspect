@@ -168,6 +168,7 @@ static bool validate_desktop_contents(struct rpminspect *ri, const rpmfile_entry
     bool found = false;
     struct result_params params;
     char *key_exec = NULL;
+    char *key_icon = NULL;
 
     assert(ri != NULL);
     assert(file != NULL);
@@ -230,42 +231,10 @@ static bool validate_desktop_contents(struct rpminspect *ri, const rpmfile_entry
 
             key_exec = tmp;
         } else if (strprefix(buf, "Icon=")) {
-            filetype = FILETYPE_ICON;
             tmp = buf + 5;
             tmp[strcspn(tmp, "\n")] = 0;
-            file_to_find = strdup(tmp);
-            found = false;
 
-            /*
-             * If we get 1 back from nftw(), it means the icon was
-             * found and is valid.  If found, the nftw() helper replaces
-             * file_to_find with the full path to where it was found.
-             */
-            if (nftw(allpkgtrees, find_file, FOPEN_MAX, FTW_MOUNT|FTW_PHYS) == 1) {
-                found = true;
-
-                if (lstat(file_to_find, &sb) == -1) {
-                    warn("stat()");
-                    list_free(contents, free);
-                    return false;
-                }
-
-                if (!(sb.st_mode & S_IROTH)) {
-                    xasprintf(&params.msg, _("Desktop file %s on %s references icon %s but %s is not readable by all"), file->localpath, arch, tmp, tmp);
-                    add_result(ri, &params);
-                    free(params.msg);
-                    result = false;
-                }
-            }
-
-            if (!found) {
-                xasprintf(&params.msg, _("Desktop file %s on %s references icon %s but no subpackages contain %s"), file->localpath, arch, tmp, tmp);
-                add_result(ri, &params);
-                free(params.msg);
-                result = false;
-            }
-
-            free(file_to_find);
+            key_icon = tmp;
         }
     }
 
@@ -301,6 +270,43 @@ static bool validate_desktop_contents(struct rpminspect *ri, const rpmfile_entry
             }
         } else {
             xasprintf(&params.msg, _("Desktop file %s on %s references executable %s but no subpackages contain an executable of that name"), file->localpath, arch, tmp);
+            add_result(ri, &params);
+            free(params.msg);
+            result = false;
+        }
+
+        free(file_to_find);
+    }
+
+    if (key_icon != NULL) {
+        filetype = FILETYPE_ICON;
+        file_to_find = strdup(key_icon);
+        found = false;
+
+        /*
+         * If we get 1 back from nftw(), it means the icon was
+         * found and is valid.  If found, the nftw() helper replaces
+         * file_to_find with the full path to where it was found.
+         */
+        if (nftw(allpkgtrees, find_file, FOPEN_MAX, FTW_MOUNT|FTW_PHYS) == 1) {
+            found = true;
+
+            if (lstat(file_to_find, &sb) == -1) {
+                warn("stat()");
+                list_free(contents, free);
+                return false;
+            }
+
+            if (!(sb.st_mode & S_IROTH)) {
+                xasprintf(&params.msg, _("Desktop file %s on %s references icon %s but %s is not readable by all"), file->localpath, arch, tmp, tmp);
+                add_result(ri, &params);
+                free(params.msg);
+                result = false;
+            }
+        }
+
+        if (!found) {
+            xasprintf(&params.msg, _("Desktop file %s on %s references icon %s but no subpackages contain %s"), file->localpath, arch, tmp, tmp);
             add_result(ri, &params);
             free(params.msg);
             result = false;
