@@ -167,6 +167,7 @@ static bool validate_desktop_contents(struct rpminspect *ri, const rpmfile_entry
     struct stat sb;
     bool found = false;
     struct result_params params;
+    char *key_exec = NULL;
 
     assert(ri != NULL);
     assert(file != NULL);
@@ -216,8 +217,6 @@ static bool validate_desktop_contents(struct rpminspect *ri, const rpmfile_entry
         filetype = FILETYPE_NULL;
 
         if (strprefix(buf, "Exec=")) {
-            filetype = FILETYPE_EXECUTABLE;
-
             /* Take everything after the key and trim newlines */
             tmp = buf + 5;
             tmp[strcspn(tmp, "\n")] = 0;
@@ -229,41 +228,7 @@ static bool validate_desktop_contents(struct rpminspect *ri, const rpmfile_entry
                 *exectoken = '\0';
             }
 
-            /* Figure out how to look for the file */
-            if (*tmp == '/') {
-                /* value is absolute, take as-is */
-                file_to_find = strdup(tmp);
-            } else {
-                /* everything else would be in /usr/bin */
-                xasprintf(&file_to_find, "/usr/bin/%s", tmp);
-            }
-
-            /*
-             * If we get 1 back from nftw(), it means the executable was
-             * found and is valid.  If found, the nftw() helper replaces
-             * file_to_find with the full path to where it was found.
-             */
-            if (nftw(allpkgtrees, find_file, FOPEN_MAX, FTW_MOUNT|FTW_PHYS) == 1) {
-                if (lstat(file_to_find, &sb) == -1) {
-                    warn("stat()");
-                    list_free(contents, free);
-                    return false;
-                }
-
-                if (!(sb.st_mode & S_IXOTH)) {
-                    xasprintf(&params.msg, _("Desktop file %s on %s references executable %s but %s is not executable by all"), file->localpath, arch, tmp, tmp);
-                    add_result(ri, &params);
-                    free(params.msg);
-                    result = false;
-                }
-            } else {
-                xasprintf(&params.msg, _("Desktop file %s on %s references executable %s but no subpackages contain an executable of that name"), file->localpath, arch, tmp);
-                add_result(ri, &params);
-                free(params.msg);
-                result = false;
-            }
-
-            free(file_to_find);
+            key_exec = tmp;
         } else if (strprefix(buf, "Icon=")) {
             filetype = FILETYPE_ICON;
             tmp = buf + 5;
@@ -302,6 +267,46 @@ static bool validate_desktop_contents(struct rpminspect *ri, const rpmfile_entry
 
             free(file_to_find);
         }
+    }
+
+    if (key_exec != NULL) {
+        filetype = FILETYPE_EXECUTABLE;
+
+        /* Figure out how to look for the file */
+        if (*key_exec == '/') {
+            /* value is absolute, take as-is */
+            file_to_find = strdup(key_exec);
+        } else {
+            /* everything else would be in /usr/bin */
+            xasprintf(&file_to_find, "/usr/bin/%s", key_exec);
+        }
+
+        /*
+         * If we get 1 back from nftw(), it means the executable was
+         * found and is valid.  If found, the nftw() helper replaces
+         * file_to_find with the full path to where it was found.
+         */
+        if (nftw(allpkgtrees, find_file, FOPEN_MAX, FTW_MOUNT|FTW_PHYS) == 1) {
+            if (lstat(file_to_find, &sb) == -1) {
+                warn("stat()");
+                list_free(contents, free);
+                return false;
+            }
+
+            if (!(sb.st_mode & S_IXOTH)) {
+                xasprintf(&params.msg, _("Desktop file %s on %s references executable %s but %s is not executable by all"), file->localpath, arch, tmp, tmp);
+                add_result(ri, &params);
+                free(params.msg);
+                result = false;
+            }
+        } else {
+            xasprintf(&params.msg, _("Desktop file %s on %s references executable %s but no subpackages contain an executable of that name"), file->localpath, arch, tmp);
+            add_result(ri, &params);
+            free(params.msg);
+            result = false;
+        }
+
+        free(file_to_find);
     }
 
     list_free(contents, free);
