@@ -58,7 +58,9 @@ def check_results(results, inspection, result, waiver_auth, message=None):
         raise AssertionError("JSON test result is empty")
 
     if inspection not in results:
-        raise AssertionError(f'The inspection "{inspection}" is missing from results "{results}"')
+        raise AssertionError(
+            f'The inspection "{inspection}" is missing from results "{results}"'
+        )
 
     for r in results[inspection]:
         if "result" in r and "waiver authorization" in r:
@@ -251,7 +253,9 @@ class TestSRPM(RequiresRpminspect):
             self.dumpResults()
 
         self.assertEqual(self.p.returncode, self.exitcode)
-        check_results(self.results, self.result_inspection, self.result, self.waiver_auth)
+        check_results(
+            self.results, self.result_inspection, self.result, self.waiver_auth
+        )
 
     def tearDown(self):
         self.rpm.clean()
@@ -411,9 +415,12 @@ class TestRPMs(TestSRPM):
                 self.dumpResults()
 
             self.assertEqual(self.p.returncode, self.exitcode)
-            self.assertEqual(self.results[self.result_inspection][0]["result"], self.result)
             self.assertEqual(
-                self.results[self.result_inspection][0]["waiver authorization"], self.waiver_auth
+                self.results[self.result_inspection][0]["result"], self.result
+            )
+            self.assertEqual(
+                self.results[self.result_inspection][0]["waiver authorization"],
+                self.waiver_auth,
             )
 
     def tearDown(self):
