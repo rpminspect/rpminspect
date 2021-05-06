@@ -53,7 +53,8 @@ static bool is_expected_empty(const struct rpminspect *ri, const char *p)
  *
  * @param ri Pointer to the struct rpminspect for the program.
  */
-bool inspect_emptyrpm(struct rpminspect *ri) {
+bool inspect_emptyrpm(struct rpminspect *ri)
+{
     bool good = true;
     rpmpeer_entry_t *peer = NULL;
     const char *name = NULL;
@@ -74,6 +75,11 @@ bool inspect_emptyrpm(struct rpminspect *ri) {
 
     /* Check the binary peers */
     TAILQ_FOREACH(peer, ri->peers, items) {
+        /* only check built RPMs, not the source RPM */
+        if (headerIsSource(peer->after_hdr)) {
+            continue;
+        }
+
         if (is_payload_empty(peer->after_files) && peer->before_rpm == NULL) {
             name = headerGetString(peer->after_hdr, RPMTAG_NAME);
             assert(name != NULL);
