@@ -188,8 +188,6 @@ static bool validate_desktop_contents(struct rpminspect *ri, const rpmfile_entry
 
     /* Set up result parameters */
     init_result_params(&params);
-    params.severity = RESULT_VERIFY;
-    params.waiverauth = WAIVABLE_BY_ANYONE;
     params.header = NAME_DESKTOP;
     params.remedy = REMEDY_DESKTOP;
     params.arch = arch;
@@ -264,12 +262,16 @@ static bool validate_desktop_contents(struct rpminspect *ri, const rpmfile_entry
 
             if (!(sb.st_mode & S_IXOTH)) {
                 xasprintf(&params.msg, _("Desktop file %s on %s references executable %s but %s is not executable by all"), file->localpath, arch, tmp, tmp);
+                params.severity = RESULT_VERIFY;
+                params.waiverauth = WAIVABLE_BY_ANYONE;
                 add_result(ri, &params);
                 free(params.msg);
                 result = false;
             }
         } else {
             xasprintf(&params.msg, _("Desktop file %s on %s references executable %s but no subpackages contain an executable of that name"), file->localpath, arch, tmp);
+            params.severity = RESULT_VERIFY;
+            params.waiverauth = WAIVABLE_BY_ANYONE;
             add_result(ri, &params);
             free(params.msg);
             result = false;
@@ -299,6 +301,8 @@ static bool validate_desktop_contents(struct rpminspect *ri, const rpmfile_entry
 
             if (!(sb.st_mode & S_IROTH)) {
                 xasprintf(&params.msg, _("Desktop file %s on %s references icon %s but %s is not readable by all"), file->localpath, arch, tmp, tmp);
+                params.severity = RESULT_VERIFY;
+                params.waiverauth = WAIVABLE_BY_ANYONE;
                 add_result(ri, &params);
                 free(params.msg);
                 result = false;
@@ -307,6 +311,8 @@ static bool validate_desktop_contents(struct rpminspect *ri, const rpmfile_entry
 
         if (!found) {
             xasprintf(&params.msg, _("Desktop file %s on %s references icon %s but no subpackages contain %s"), file->localpath, arch, tmp, tmp);
+            params.severity = RESULT_VERIFY;
+            params.waiverauth = WAIVABLE_BY_ANYONE;
             add_result(ri, &params);
             free(params.msg);
             result = false;
