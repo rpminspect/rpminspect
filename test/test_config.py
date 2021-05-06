@@ -90,7 +90,6 @@ class ConfigBecomesNonConfigCompareRPMs(TestCompareRPMs):
         )
 
         self.inspection = "config"
-        self.label = "config"
         self.result = "VERIFY"
         self.waiver_auth = "Anyone"
 
@@ -112,7 +111,6 @@ class ConfigBecomesNonConfigCompareKoji(TestCompareKoji):
         )
 
         self.inspection = "config"
-        self.label = "config"
         self.result = "VERIFY"
         self.waiver_auth = "Anyone"
 
@@ -135,7 +133,6 @@ class ConfigBecomesNonConfigRebaseCompareRPMs(TestCompareRPMs):
         )
 
         self.inspection = "config"
-        self.label = "config"
         self.result = "INFO"
         self.waiver_auth = "Not Waivable"
 
@@ -157,7 +154,6 @@ class ConfigBecomesNonConfigRebaseCompareKoji(TestCompareKoji):
         )
 
         self.inspection = "config"
-        self.label = "config"
         self.result = "INFO"
         self.waiver_auth = "Not Waivable"
 
@@ -180,7 +176,6 @@ class NonConfigBecomesConfigCompareRPMs(TestCompareRPMs):
         )
 
         self.inspection = "config"
-        self.label = "config"
         self.result = "VERIFY"
         self.waiver_auth = "Anyone"
 
@@ -202,7 +197,6 @@ class NonConfigBecomesConfigCompareKoji(TestCompareKoji):
         )
 
         self.inspection = "config"
-        self.label = "config"
         self.result = "VERIFY"
         self.waiver_auth = "Anyone"
 
@@ -225,7 +219,6 @@ class NonConfigBecomesConfigRebaseCompareRPMs(TestCompareRPMs):
         )
 
         self.inspection = "config"
-        self.label = "config"
         self.result = "INFO"
         self.waiver_auth = "Not Waivable"
 
@@ -247,7 +240,6 @@ class NonConfigBecomesConfigRebaseCompareKoji(TestCompareKoji):
         )
 
         self.inspection = "config"
-        self.label = "config"
         self.result = "INFO"
         self.waiver_auth = "Not Waivable"
 
@@ -270,7 +262,6 @@ class ConfigChangesWhitespaceCompareRPMs(TestCompareRPMs):
         )
 
         self.inspection = "config"
-        self.label = "config"
         self.result = "INFO"
         self.waiver_auth = "Not Waivable"
 
@@ -292,7 +283,6 @@ class ConfigChangesWhitespaceCompareKoji(TestCompareKoji):
         )
 
         self.inspection = "config"
-        self.label = "config"
         self.result = "INFO"
         self.waiver_auth = "Not Waivable"
 
@@ -314,7 +304,6 @@ class ConfigChangesWhitespaceRebaseCompareRPMs(TestCompareRPMs):
         )
 
         self.inspection = "config"
-        self.label = "config"
         self.result = "INFO"
         self.waiver_auth = "Not Waivable"
 
@@ -336,7 +325,6 @@ class ConfigChangesWhitespaceRebaseCompareKoji(TestCompareKoji):
         )
 
         self.inspection = "config"
-        self.label = "config"
         self.result = "INFO"
         self.waiver_auth = "Not Waivable"
 
@@ -359,7 +347,6 @@ class ConfigChangesContentCompareRPMs(TestCompareRPMs):
         )
 
         self.inspection = "config"
-        self.label = "config"
         self.result = "VERIFY"
         self.waiver_auth = "Anyone"
 
@@ -381,7 +368,6 @@ class ConfigChangesContentCompareKoji(TestCompareKoji):
         )
 
         self.inspection = "config"
-        self.label = "config"
         self.result = "VERIFY"
         self.waiver_auth = "Anyone"
 
@@ -403,7 +389,6 @@ class ConfigChangesContentRebaseCompareRPMs(TestCompareRPMs):
         )
 
         self.inspection = "config"
-        self.label = "config"
         self.result = "INFO"
         self.waiver_auth = "Not Waivable"
 
@@ -425,7 +410,6 @@ class ConfigChangesContentRebaseCompareKoji(TestCompareKoji):
         )
 
         self.inspection = "config"
-        self.label = "config"
         self.result = "INFO"
         self.waiver_auth = "Not Waivable"
 
@@ -453,7 +437,6 @@ class ConfigChangeFromFileToSymlinkCompareRPMs(TestCompareRPMs):
         )
 
         self.inspection = "config"
-        self.label = "config"
         self.result = "VERIFY"
         self.waiver_auth = "Anyone"
 
@@ -480,7 +463,6 @@ class ConfigChangeFromFileToSymlinkCompareKoji(TestCompareKoji):
         )
 
         self.inspection = "config"
-        self.label = "config"
         self.result = "VERIFY"
         self.waiver_auth = "Anyone"
 
@@ -507,7 +489,6 @@ class ConfigChangeFromSymlinkToFileCompareRPMs(TestCompareRPMs):
         )
 
         self.inspection = "config"
-        self.label = "config"
         self.result = "VERIFY"
         self.waiver_auth = "Anyone"
 
@@ -534,7 +515,6 @@ class ConfigChangeFromSymlinkToFileCompareKoji(TestCompareKoji):
         )
 
         self.inspection = "config"
-        self.label = "config"
         self.result = "VERIFY"
         self.waiver_auth = "Anyone"
 
@@ -562,7 +542,6 @@ class ConfigChangeFromFileToSymlinkRebaseCompareRPMs(TestCompareRPMs):
         )
 
         self.inspection = "config"
-        self.label = "config"
         self.result = "INFO"
         self.waiver_auth = "Not Waivable"
 
@@ -589,7 +568,6 @@ class ConfigChangeFromFileToSymlinkRebaseCompareKoji(TestCompareKoji):
         )
 
         self.inspection = "config"
-        self.label = "config"
         self.result = "INFO"
         self.waiver_auth = "Not Waivable"
 
@@ -616,7 +594,6 @@ class ConfigChangeFromSymlinkToFileRebaseCompareRPMs(TestCompareRPMs):
         )
 
         self.inspection = "config"
-        self.label = "config"
         self.result = "INFO"
         self.waiver_auth = "Not Waivable"
 
@@ -643,7 +620,6 @@ class ConfigChangeFromSymlinkToFileRebaseCompareKoji(TestCompareKoji):
         )
 
         self.inspection = "config"
-        self.label = "config"
         self.result = "INFO"
         self.waiver_auth = "Not Waivable"
 
@@ -676,7 +652,6 @@ class ConfigSymlinkChangedValueCompareRPMs(TestCompareRPMs):
         )
 
         self.inspection = "config"
-        self.label = "config"
         self.result = "VERIFY"
         self.waiver_auth = "Anyone"
 
@@ -708,7 +683,6 @@ class ConfigSymlinkChangedValueCompareKoji(TestCompareKoji):
         )
 
         self.inspection = "config"
-        self.label = "config"
         self.result = "VERIFY"
         self.waiver_auth = "Anyone"
 
@@ -741,7 +715,6 @@ class ConfigSymlinkChangedValueRebaseCompareRPMs(TestCompareRPMs):
         )
 
         self.inspection = "config"
-        self.label = "config"
         self.result = "INFO"
         self.waiver_auth = "Not Waivable"
 
@@ -771,6 +744,5 @@ class ConfigSymlinkChangedValueRebaseCompareKoji(TestCompareKoji):
         )
 
         self.inspection = "config"
-        self.label = "config"
         self.result = "INFO"
         self.waiver_auth = "Not Waivable"

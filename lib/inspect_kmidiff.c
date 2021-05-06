@@ -286,7 +286,7 @@ static bool kmidiff_driver(struct rpminspect *ri, rpmfile_entry_t *file)
 
     /* report the results */
     init_result_params(&params);
-    params.header = HEADER_KMIDIFF;
+    params.header = NAME_KMIDIFF;
     params.waiverauth = WAIVABLE_BY_ANYONE;
     params.remedy = REMEDY_KMIDIFF;
     params.arch = arch;
@@ -438,7 +438,7 @@ bool inspect_kmidiff(struct rpminspect *ri) {
     if (result) {
         init_result_params(&params);
         params.waiverauth = NOT_WAIVABLE;
-        params.header = HEADER_KMIDIFF;
+        params.header = NAME_KMIDIFF;
         params.severity = RESULT_OK;
         add_result(ri, &params);
     }

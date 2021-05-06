@@ -72,7 +72,7 @@ static bool pathmigration_driver(struct rpminspect *ri, rpmfile_entry_t *file)
     init_result_params(&params);
     params.severity = RESULT_VERIFY;
     params.waiverauth = WAIVABLE_BY_ANYONE;
-    params.header = HEADER_PATHMIGRATION;
+    params.header = NAME_PATHMIGRATION;
     params.remedy = REMEDY_PATHMIGRATION;
     params.arch = arch;
 
@@ -126,7 +126,7 @@ bool inspect_pathmigration(struct rpminspect *ri) {
         init_result_params(&params);
         params.severity = RESULT_OK;
         params.waiverauth = NOT_WAIVABLE;
-        params.header = HEADER_PATHMIGRATION;
+        params.header = NAME_PATHMIGRATION;
         add_result(ri, &params);
     }
 

@@ -127,7 +127,7 @@ static bool badfuncs_driver(struct rpminspect *ri, rpmfile_entry_t *after)
     xasprintf(&params.msg, _("%s may use forbidden functions on %s"), after->localpath, arch);
     params.severity = RESULT_VERIFY;
     params.waiverauth = WAIVABLE_BY_ANYONE;
-    params.header = HEADER_BADFUNCS;
+    params.header = NAME_BADFUNCS;
     params.remedy = REMEDY_BADFUNCS;
     params.details = output_buffer;
     params.verb = VERB_FAILED;
@@ -174,7 +174,7 @@ bool inspect_badfuncs(struct rpminspect *ri)
         init_result_params(&params);
         params.severity = RESULT_OK;
         params.waiverauth = NOT_WAIVABLE;
-        params.header = HEADER_BADFUNCS;
+        params.header = NAME_BADFUNCS;
         add_result(ri, &params);
     }
 

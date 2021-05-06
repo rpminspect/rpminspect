@@ -37,7 +37,6 @@ class FileSizeGrowsAtThreshold(TestCompareRPMs):
         )
 
         self.inspection = "filesize"
-        self.label = "filesize"
         self.result = "VERIFY"
         self.waiver_auth = "Anyone"
         self.message = f"/some/file grew by 20% on {platform.machine()}"
@@ -58,7 +57,6 @@ class FileSizeGrowsAboveThreshold(TestCompareRPMs):
         )
 
         self.inspection = "filesize"
-        self.label = "filesize"
         self.result = "VERIFY"
         self.waiver_auth = "Anyone"
         self.message = f"/some/file grew by 100% on {platform.machine()}"
@@ -78,7 +76,6 @@ class FileSizeGrowsBelowThreshold(TestCompareRPMs):
         )
 
         self.inspection = "filesize"
-        self.label = "filesize"
         self.result = "INFO"
         self.waiver_auth = "Not Waivable"
         self.message = f"/some/file grew by 10% on {platform.machine()}"
@@ -98,7 +95,6 @@ class EmptyFileSizeGrows(TestCompareRPMs):
         )
 
         self.inspection = "filesize"
-        self.label = "filesize"
         self.result = "VERIFY"
         self.waiver_auth = "Anyone"
         self.message = f"/some/file became a non-empty file on {platform.machine()}"
@@ -118,7 +114,6 @@ class FileSizeShrinksAtThreshold(TestCompareRPMs):
         )
 
         self.inspection = "filesize"
-        self.label = "filesize"
         self.result = "VERIFY"
         self.waiver_auth = "Anyone"
         self.message = f"/some/file shrank by 20% on {platform.machine()}"
@@ -138,7 +133,6 @@ class FileSizeShrinksAboveThreshold(TestCompareRPMs):
         )
 
         self.inspection = "filesize"
-        self.label = "filesize"
         self.result = "VERIFY"
         self.waiver_auth = "Anyone"
         self.message = f"/some/file shrank by 80% on {platform.machine()}"
@@ -158,7 +152,6 @@ class FileSizeShrinksBelowThreshold(TestCompareRPMs):
         )
 
         self.inspection = "filesize"
-        self.label = "filesize"
         self.result = "INFO"
         self.waiver_auth = "Not Waivable"
         self.message = f"/some/file shrank by 10% on {platform.machine()}"
@@ -176,7 +169,6 @@ class FileSizeShrinksToEmpty(TestCompareRPMs):
         self.after_rpm.add_installed_file("/some/file", rpmfluff.SourceFile("file", ""))
 
         self.inspection = "filesize"
-        self.label = "filesize"
         self.result = "VERIFY"
         self.waiver_auth = "Anyone"
         self.message = f"/some/file became an empty file on {platform.machine()}"

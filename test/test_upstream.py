@@ -49,7 +49,7 @@ class SkipUpstreamSRPM(TestSRPM):
         self.inspection = "upstream"
 
         # since it should skip, only look for our diagnostic output
-        self.label = "rpminspect"
+        self.result_inspection = "rpminspect"
         self.result = "INFO"
 
     def runTest(self):
@@ -71,7 +71,7 @@ class SkipUpstreamRPMs(TestRPMs):
         self.inspection = "upstream"
 
         # since it should skip, only look for our diagnostic output
-        self.label = "rpminspect"
+        self.result_inspection = "rpminspect"
         self.result = "INFO"
 
     def runTest(self):
@@ -93,7 +93,7 @@ class SkipUpstreamKoji(TestKoji):
         self.inspection = "upstream"
 
         # since it should skip, only look for our diagnostic output
-        self.label = "rpminspect"
+        self.result_inspection = "rpminspect"
         self.result = "INFO"
 
     def runTest(self):
@@ -117,7 +117,6 @@ class DiffVerUpstreamCompareSRPM(TestCompareSRPM):
     def setUp(self):
         super().setUp()
         self.inspection = "upstream"
-        self.label = "upstream"
         self.result = "OK"
 
 
@@ -143,7 +142,6 @@ class SameVerChangeUpstreamCompareSRPM(TestCompareSRPM):
 
         # what we are checking
         self.inspection = "upstream"
-        self.label = "upstream"
         self.result = "VERIFY"
         self.waiver_auth = "Anyone"
 
@@ -168,7 +166,6 @@ class SameVerRemoveUpstreamCompareSRPM(TestCompareSRPM):
 
         # what we are checking
         self.inspection = "upstream"
-        self.label = "upstream"
         self.result = "VERIFY"
         self.waiver_auth = "Anyone"
 
@@ -188,7 +185,6 @@ class DiffVerUpstreamCompareKoji(TestCompareKoji):
     def setUp(self):
         super().setUp()
         self.inspection = "upstream"
-        self.label = "upstream"
         self.result = "OK"
 
 
@@ -214,7 +210,6 @@ class SameVerChangeUpstreamCompareKoji(TestCompareKoji):
 
         # what we are checking
         self.inspection = "upstream"
-        self.label = "upstream"
         self.result = "VERIFY"
         self.waiver_auth = "Anyone"
 
@@ -239,6 +234,5 @@ class SameVerRemoveUpstreamCompareKoji(TestCompareKoji):
 
         # what we are checking
         self.inspection = "upstream"
-        self.label = "upstream"
         self.result = "VERIFY"
         self.waiver_auth = "Anyone"

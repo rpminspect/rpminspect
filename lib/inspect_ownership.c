@@ -111,7 +111,7 @@ static bool ownership_driver(struct rpminspect *ri, rpmfile_entry_t *file) {
 
     /* Set up result parameters */
     init_result_params(&params);
-    params.header = HEADER_OWNERSHIP;
+    params.header = NAME_OWNERSHIP;
     params.arch = arch;
     params.file = file->localpath;
 
@@ -147,7 +147,7 @@ static bool ownership_driver(struct rpminspect *ri, rpmfile_entry_t *file) {
             bin = true;
 
             /* Check the owner */
-            if (strcmp(owner, ri->bin_owner) && !match_fileinfo_owner(ri, file, owner, HEADER_OWNERSHIP, NULL)) {
+            if (strcmp(owner, ri->bin_owner) && !match_fileinfo_owner(ri, file, owner, NAME_OWNERSHIP, NULL)) {
                 xasprintf(&params.msg, _("File %s has owner `%s` on %s, but should be `%s`"), file->localpath, owner, arch, ri->bin_owner);
                 params.severity = RESULT_BAD;
                 params.waiverauth = WAIVABLE_BY_ANYONE;
@@ -190,7 +190,7 @@ static bool ownership_driver(struct rpminspect *ri, rpmfile_entry_t *file) {
                         free(params.msg);
                         result = false;
                     }
-                } else if (!match_fileinfo_group(ri, file, group, HEADER_OWNERSHIP, NULL)) {
+                } else if (!match_fileinfo_group(ri, file, group, NAME_OWNERSHIP, NULL)) {
                     xasprintf(&params.msg, _("File %s has group `%s` on %s, but should be `%s`"), file->localpath, group, arch, ri->bin_group);
                     params.severity = RESULT_BAD;
                     params.waiverauth = WAIVABLE_BY_ANYONE;
@@ -286,7 +286,7 @@ bool inspect_ownership(struct rpminspect *ri) {
         init_result_params(&params);
         params.severity = RESULT_OK;
         params.waiverauth = NOT_WAIVABLE;
-        params.header = HEADER_OWNERSHIP;
+        params.header = NAME_OWNERSHIP;
         add_result(ri, &params);
     }
 

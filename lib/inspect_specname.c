@@ -76,7 +76,7 @@ static bool specname_driver(struct rpminspect *ri, rpmfile_entry_t *file) {
         init_result_params(&params);
         params.severity = RESULT_BAD;
         params.waiverauth = NOT_WAIVABLE;
-        params.header = HEADER_SPECNAME;
+        params.header = NAME_SPECNAME;
         params.remedy = REMEDY_SPECNAME;
         params.file = file->localpath;
 
@@ -110,7 +110,7 @@ bool inspect_specname(struct rpminspect *ri) {
 
     init_result_params(&params);
     params.waiverauth = NOT_WAIVABLE;
-    params.header = HEADER_SPECNAME;
+    params.header = NAME_SPECNAME;
 
     if (specgood) {
         params.severity = RESULT_OK;

@@ -721,7 +721,7 @@ int main(int argc, char **argv) {
     /* general information in the results */
     init_result_params(&params);
     params.severity = RESULT_INFO;
-    params.header = HEADER_RPMINSPECT;
+    params.header = COMMAND_NAME;
 
     /* add version information to the results output */
     params.msg = _("version");

@@ -73,7 +73,7 @@ static bool config_driver(struct rpminspect *ri, rpmfile_entry_t *file)
 
     /* set up result parameters */
     init_result_params(&params);
-    params.header = HEADER_CONFIG;
+    params.header = NAME_CONFIG;
     params.arch = arch;
     params.file = file->localpath;
     params.remedy = REMEDY_CONFIG;
@@ -211,7 +211,7 @@ bool inspect_config(struct rpminspect *ri) {
         init_result_params(&params);
         params.severity = RESULT_OK;
         params.waiverauth = NOT_WAIVABLE;
-        params.header = HEADER_CONFIG;
+        params.header = NAME_CONFIG;
         add_result(ri, &params);
     }
 

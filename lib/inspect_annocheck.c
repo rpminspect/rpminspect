@@ -68,7 +68,7 @@ static bool annocheck_driver(struct rpminspect *ri, rpmfile_entry_t *file)
     init_result_params(&params);
     params.severity = RESULT_INFO;
     params.waiverauth = NOT_WAIVABLE;
-    params.header = HEADER_ANNOCHECK;
+    params.header = NAME_ANNOCHECK;
     params.remedy = REMEDY_ANNOCHECK;
     params.arch = arch;
     params.file = file->localpath;
@@ -176,7 +176,7 @@ bool inspect_annocheck(struct rpminspect *ri) {
         init_result_params(&params);
         params.severity = RESULT_OK;
         params.waiverauth = NOT_WAIVABLE;
-        params.header = HEADER_ANNOCHECK;
+        params.header = NAME_ANNOCHECK;
         add_result(ri, &params);
     }
 

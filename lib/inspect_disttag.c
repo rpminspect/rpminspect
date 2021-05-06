@@ -184,7 +184,7 @@ static bool disttag_driver(struct rpminspect *ri, rpmfile_entry_t *file) {
     init_result_params(&params);
     params.severity = RESULT_BAD;
     params.waiverauth = NOT_WAIVABLE;
-    params.header = HEADER_DISTTAG;
+    params.header = NAME_DISTTAG;
     params.remedy = REMEDY_DISTTAG;
     params.details = release;
     params.arch = get_rpm_header_arch(file->rpm_header);
@@ -252,7 +252,7 @@ bool inspect_disttag(struct rpminspect *ri) {
     /* Set up result parameters */
     init_result_params(&params);
     params.waiverauth = NOT_WAIVABLE;
-    params.header = HEADER_DISTTAG;
+    params.header = NAME_DISTTAG;
 
     /* If we never saw an SRPM, tell the user. */
     if (result && src) {

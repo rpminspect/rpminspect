@@ -53,14 +53,14 @@ class MissingRpminspectConf(Exception):
 # This function is called to check the JSON results to make sure we
 # have at least one result that matches the result and waiver_auth we
 # were expecting.
-def check_results(results, label, result, waiver_auth, message=None):
+def check_results(results, inspection, result, waiver_auth, message=None):
     if results == {} or results == [] or results is None:
         raise AssertionError("JSON test result is empty")
 
-    if label not in results:
-        raise AssertionError(f'The label "{label}" is missing from results "{results}"')
+    if inspection not in results:
+        raise AssertionError(f'The inspection "{inspection}" is missing from results "{results}"')
 
-    for r in results[label]:
+    for r in results[inspection]:
         if "result" in r and "waiver authorization" in r:
             if r["result"] == result and r["waiver authorization"] == waiver_auth:
                 if message and r.get("message") != message:
@@ -71,7 +71,7 @@ def check_results(results, label, result, waiver_auth, message=None):
     else:
         raise AssertionError(
             f"Expected result={result} with waiver authorization={waiver_auth} in "
-            f"{json.dumps(results[label], sort_keys=True, indent=4)}"
+            f"{json.dumps(results[inspection], sort_keys=True, indent=4)}"
         )
 
 
@@ -192,7 +192,7 @@ class TestSRPM(RequiresRpminspect):
 
         # the inheriting class needs to override these
         self.inspection = None
-        self.label = None
+        self.result_inspection = None
 
         # defaults
         self.exitcode = 0
@@ -204,6 +204,9 @@ class TestSRPM(RequiresRpminspect):
 
         if not self.inspection:
             return
+
+        if not self.result_inspection:
+            self.result_inspection = self.inspection
 
         self.rpm.do_make()
 
@@ -248,7 +251,7 @@ class TestSRPM(RequiresRpminspect):
             self.dumpResults()
 
         self.assertEqual(self.p.returncode, self.exitcode)
-        check_results(self.results, self.label, self.result, self.waiver_auth)
+        check_results(self.results, self.result_inspection, self.result, self.waiver_auth)
 
     def tearDown(self):
         self.rpm.clean()
@@ -279,7 +282,7 @@ class TestCompareSRPM(RequiresRpminspect):
 
         # the inheriting class needs to override these
         self.inspection = None
-        self.label = None
+        self.result_inspection = None
 
         # defaults
         self.exitcode = 0
@@ -291,6 +294,9 @@ class TestCompareSRPM(RequiresRpminspect):
 
         if not self.inspection:
             return
+
+        if not self.result_inspection:
+            self.result_inspection = self.inspection
 
         self.before_rpm.do_make()
         self.after_rpm.do_make()
@@ -338,7 +344,7 @@ class TestCompareSRPM(RequiresRpminspect):
         self.assertEqual(self.p.returncode, self.exitcode)
         check_results(
             self.results,
-            self.label,
+            self.result_inspection,
             self.result,
             self.waiver_auth,
             message=self.message,
@@ -354,8 +360,11 @@ class TestRPMs(TestSRPM):
     def runTest(self):
         self.configFile()
 
-        if not self.inspection and not self.label:
+        if not self.inspection:
             return
+
+        if not self.result_inspection:
+            self.result_inspection = self.inspection
 
         self.rpm.do_make()
 
@@ -402,9 +411,9 @@ class TestRPMs(TestSRPM):
                 self.dumpResults()
 
             self.assertEqual(self.p.returncode, self.exitcode)
-            self.assertEqual(self.results[self.label][0]["result"], self.result)
+            self.assertEqual(self.results[self.result_inspection][0]["result"], self.result)
             self.assertEqual(
-                self.results[self.label][0]["waiver authorization"], self.waiver_auth
+                self.results[self.result_inspection][0]["waiver authorization"], self.waiver_auth
             )
 
     def tearDown(self):
@@ -416,8 +425,11 @@ class TestCompareRPMs(TestCompareSRPM):
     def runTest(self):
         self.configFile()
 
-        if not self.inspection and not self.label:
+        if not self.inspection:
             return
+
+        if not self.result_inspection:
+            self.result_inspection = self.inspection
 
         self.before_rpm.do_make()
         self.after_rpm.do_make()
@@ -468,7 +480,7 @@ class TestCompareRPMs(TestCompareSRPM):
             self.assertEqual(self.p.returncode, self.exitcode)
             check_results(
                 self.results,
-                self.label,
+                self.result_inspection,
                 self.result,
                 self.waiver_auth,
                 message=self.message,
@@ -486,6 +498,9 @@ class TestKoji(TestSRPM):
 
         if not self.inspection:
             return
+
+        if not self.result_inspection:
+            self.result_inspection = self.inspection
 
         # generate the build
         self.rpm.do_make()
@@ -546,7 +561,7 @@ class TestKoji(TestSRPM):
             self.assertEqual(self.p.returncode, self.exitcode)
             check_results(
                 self.results,
-                self.label,
+                self.result_inspection,
                 self.result,
                 self.waiver_auth,
                 message=self.message,
@@ -563,6 +578,9 @@ class TestCompareKoji(TestCompareSRPM):
 
         if not self.inspection:
             return
+
+        if not self.result_inspection:
+            self.result_inspection = self.inspection
 
         # generate the build
         self.before_rpm.do_make()
@@ -635,7 +653,7 @@ class TestCompareKoji(TestCompareSRPM):
             try:
                 check_results(
                     self.results,
-                    self.label,
+                    self.result_inspection,
                     self.result,
                     self.waiver_auth,
                     message=self.message,

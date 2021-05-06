@@ -36,7 +36,6 @@ class ExecutableWithSetUIDSRPM(TestSRPM):
         )
 
         self.inspection = "permissions"
-        self.label = "permissions"
         self.result = "OK"
 
 
@@ -54,7 +53,6 @@ class ExecutableWithSetUIDRPMs(TestRPMs):
         )
 
         self.inspection = "permissions"
-        self.label = "permissions"
         self.result = "INFO"
 
 
@@ -72,7 +70,6 @@ class ExecutableWithSetUIDKoji(TestKoji):
         )
 
         self.inspection = "permissions"
-        self.label = "permissions"
         self.result = "INFO"
 
 
@@ -90,7 +87,6 @@ class ExecutableWithSetUIDCompareSRPM(TestCompareSRPM):
         )
 
         self.inspection = "permissions"
-        self.label = "permissions"
         self.result = "OK"
 
 
@@ -108,7 +104,6 @@ class ExecutableWithSetUIDCompareRPMs(TestCompareRPMs):
         )
 
         self.inspection = "permissions"
-        self.label = "permissions"
         self.result = "INFO"
 
 
@@ -126,7 +121,6 @@ class ExecutableWithSetUIDCompareKoji(TestCompareKoji):
         )
 
         self.inspection = "permissions"
-        self.label = "permissions"
         self.result = "INFO"
 
 
@@ -144,7 +138,6 @@ class UnapprovedExecutableWithSetUIDSRPM(TestSRPM):
         )
 
         self.inspection = "permissions"
-        self.label = "permissions"
         self.result = "OK"
 
 
@@ -162,7 +155,6 @@ class UnapprovedExecutableWithSetUIDRPMs(TestRPMs):
         )
 
         self.inspection = "permissions"
-        self.label = "permissions"
         self.result = "BAD"
         self.waiver_auth = "Security"
 
@@ -181,7 +173,6 @@ class UnapprovedExecutableWithSetUIDKoji(TestKoji):
         )
 
         self.inspection = "permissions"
-        self.label = "permissions"
         self.result = "BAD"
         self.waiver_auth = "Security"
 
@@ -200,7 +191,6 @@ class UnapprovedExecutableWithSetUIDCompareSRPM(TestCompareSRPM):
         )
 
         self.inspection = "permissions"
-        self.label = "permissions"
         self.result = "OK"
 
 
@@ -218,7 +208,6 @@ class UnapprovedExecutableWithSetUIDCompareRPMs(TestCompareRPMs):
         )
 
         self.inspection = "permissions"
-        self.label = "permissions"
         self.result = "BAD"
         self.waiver_auth = "Security"
 
@@ -237,7 +226,6 @@ class UnapprovedExecutableWithSetUIDCompareKoji(TestCompareKoji):
         )
 
         self.inspection = "permissions"
-        self.label = "permissions"
         self.result = "BAD"
         self.waiver_auth = "Security"
 
@@ -256,7 +244,6 @@ class FileIWOTHProhibitedSRPM(TestSRPM):
         )
 
         self.inspection = "permissions"
-        self.label = "permissions"
         self.result = "OK"
 
 
@@ -274,7 +261,6 @@ class FileIWOTHProhibitedRPMs(TestRPMs):
         )
 
         self.inspection = "permissions"
-        self.label = "permissions"
         self.result = "BAD"
         self.waiver_auth = "Security"
 
@@ -293,7 +279,6 @@ class FileIWOTHProhibitedKoji(TestKoji):
         )
 
         self.inspection = "permissions"
-        self.label = "permissions"
         self.result = "BAD"
         self.waiver_auth = "Security"
 
@@ -312,7 +297,6 @@ class FileIWOTHProhibitedCompareSRPM(TestCompareSRPM):
         )
 
         self.inspection = "permissions"
-        self.label = "permissions"
         self.result = "OK"
 
 
@@ -330,7 +314,6 @@ class FileIWOTHProhibitedCompareRPMs(TestCompareRPMs):
         )
 
         self.inspection = "permissions"
-        self.label = "permissions"
         self.result = "BAD"
         self.waiver_auth = "Security"
 
@@ -349,7 +332,6 @@ class FileIWOTHProhibitedCompareKoji(TestCompareKoji):
         )
 
         self.inspection = "permissions"
-        self.label = "permissions"
         self.result = "BAD"
         self.waiver_auth = "Security"
 
@@ -368,7 +350,6 @@ class FileIWOTHandISVTXProhibitedSRPM(TestSRPM):
         )
 
         self.inspection = "permissions"
-        self.label = "permissions"
         self.result = "OK"
 
 
@@ -386,7 +367,6 @@ class FileIWOTHandISVTXProhibitedRPMs(TestRPMs):
         )
 
         self.inspection = "permissions"
-        self.label = "permissions"
         self.result = "BAD"
         self.waiver_auth = "Security"
 
@@ -405,7 +385,6 @@ class FileIWOTHandISVTXProhibitedKoji(TestKoji):
         )
 
         self.inspection = "permissions"
-        self.label = "permissions"
         self.result = "BAD"
         self.waiver_auth = "Security"
 
@@ -424,7 +403,6 @@ class FileIWOTHandISVTXProhibitedCompareSRPM(TestCompareSRPM):
         )
 
         self.inspection = "permissions"
-        self.label = "permissions"
         self.result = "OK"
 
 
@@ -442,7 +420,6 @@ class FileIWOTHandISVTXProhibitedCompareRPMs(TestCompareRPMs):
         )
 
         self.inspection = "permissions"
-        self.label = "permissions"
         self.result = "BAD"
         self.waiver_auth = "Security"
 
@@ -461,7 +438,6 @@ class FileIWOTHandISVTXProhibitedCompareKoji(TestCompareKoji):
         )
 
         self.inspection = "permissions"
-        self.label = "permissions"
         self.result = "BAD"
         self.waiver_auth = "Security"
 
@@ -478,7 +454,6 @@ class DirIWOTHProhibitedSRPM(TestSRPM):
         self.rpm.add_installed_directory("/usr/share/dumping-ground", mode="0757")
 
         self.inspection = "permissions"
-        self.label = "permissions"
         self.result = "OK"
 
 
@@ -494,7 +469,6 @@ class DirIWOTHProhibitedRPMs(TestRPMs):
         self.rpm.add_installed_directory("/usr/share/dumping-ground", mode="0757")
 
         self.inspection = "permissions"
-        self.label = "permissions"
         self.result = "BAD"
         self.waiver_auth = "Security"
 
@@ -511,7 +485,6 @@ class DirIWOTHProhibitedKoji(TestKoji):
         self.rpm.add_installed_directory("/usr/share/dumping-ground", mode="0757")
 
         self.inspection = "permissions"
-        self.label = "permissions"
         self.result = "BAD"
         self.waiver_auth = "Security"
 
@@ -528,7 +501,6 @@ class DirIWOTHProhibitedCompareSRPM(TestCompareSRPM):
         self.after_rpm.add_installed_directory("/usr/share/dumping-ground", mode="0757")
 
         self.inspection = "permissions"
-        self.label = "permissions"
         self.result = "OK"
 
 
@@ -544,7 +516,6 @@ class DirIWOTHProhibitedCompareRPMs(TestCompareRPMs):
         self.after_rpm.add_installed_directory("/usr/share/dumping-ground", mode="0757")
 
         self.inspection = "permissions"
-        self.label = "permissions"
         self.result = "BAD"
         self.waiver_auth = "Security"
 
@@ -561,7 +532,6 @@ class DirIWOTHProhibitedCompareKoji(TestCompareKoji):
         self.after_rpm.add_installed_directory("/usr/share/dumping-ground", mode="0757")
 
         self.inspection = "permissions"
-        self.label = "permissions"
         self.result = "BAD"
         self.waiver_auth = "Security"
 
@@ -578,7 +548,6 @@ class DirIWOTHandISVTXProhibitedSRPM(TestSRPM):
         self.rpm.add_installed_directory("/usr/share/dumping-ground", mode="1757")
 
         self.inspection = "permissions"
-        self.label = "permissions"
         self.result = "OK"
 
 
@@ -594,7 +563,6 @@ class DirIWOTHandISVTXProhibitedRPMs(TestRPMs):
         self.rpm.add_installed_directory("/usr/share/dumping-ground", mode="1757")
 
         self.inspection = "permissions"
-        self.label = "permissions"
         self.result = "BAD"
         self.waiver_auth = "Security"
 
@@ -611,7 +579,6 @@ class DirIWOTHandISVTXProhibitedKoji(TestKoji):
         self.rpm.add_installed_directory("/usr/share/dumping-ground", mode="1757")
 
         self.inspection = "permissions"
-        self.label = "permissions"
         self.result = "BAD"
         self.waiver_auth = "Security"
 
@@ -628,7 +595,6 @@ class DirIWOTHandISVTXProhibitedCompareSRPM(TestCompareSRPM):
         self.after_rpm.add_installed_directory("/usr/share/dumping-ground", mode="1757")
 
         self.inspection = "permissions"
-        self.label = "permissions"
         self.result = "OK"
 
 
@@ -644,7 +610,6 @@ class DirIWOTHandISVTXProhibitedCompareRPMs(TestCompareRPMs):
         self.after_rpm.add_installed_directory("/usr/share/dumping-ground", mode="1757")
 
         self.inspection = "permissions"
-        self.label = "permissions"
         self.result = "BAD"
         self.waiver_auth = "Security"
 
@@ -661,6 +626,5 @@ class DirIWOTHandISVTXProhibitedCompareKoji(TestCompareKoji):
         self.after_rpm.add_installed_directory("/usr/share/dumping-ground", mode="1757")
 
         self.inspection = "permissions"
-        self.label = "permissions"
         self.result = "BAD"
         self.waiver_auth = "Security"

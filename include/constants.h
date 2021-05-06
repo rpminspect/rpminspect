@@ -43,6 +43,12 @@
  */
 
 /**
+ * @def COMMAND_NAME
+ * The standard name for the rpminspect command.
+ */
+#define COMMAND_NAME "rpminspect"
+
+/**
  * @def SOFTWARE_NAME
  * Software name.  Used in Koji XMLRPC calls and logging.
  */

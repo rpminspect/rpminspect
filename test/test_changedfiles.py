@@ -46,7 +46,6 @@ class GzipFileNoChangeRPMs(TestCompareRPMs):
         )
 
         self.inspection = "changedfiles"
-        self.label = "changed-files"
         self.result = "OK"
         self.waiver_auth = "Not Waivable"
 
@@ -71,7 +70,6 @@ class GzipFileNoChangeKoji(TestCompareKoji):
         )
 
         self.inspection = "changedfiles"
-        self.label = "changed-files"
         self.result = "OK"
         self.waiver_auth = "Not Waivable"
 
@@ -97,7 +95,6 @@ class GzipFileChangesRPMs(TestCompareRPMs):
         )
 
         self.inspection = "changedfiles"
-        self.label = "changed-files"
         self.result = "OK"
         self.waiver_auth = "Not Waivable"
 
@@ -122,7 +119,6 @@ class GzipFileChangesKoji(TestCompareKoji):
         )
 
         self.inspection = "changedfiles"
-        self.label = "changed-files"
         self.result = "OK"
         self.waiver_auth = "Not Waivable"
 
@@ -149,7 +145,6 @@ class Bzip2FileNoChangeRPMs(TestCompareRPMs):
         )
 
         self.inspection = "changedfiles"
-        self.label = "changed-files"
         self.result = "OK"
         self.waiver_auth = "Not Waivable"
 
@@ -174,7 +169,6 @@ class Bzip2FileNoChangeKoji(TestCompareKoji):
         )
 
         self.inspection = "changedfiles"
-        self.label = "changed-files"
         self.result = "OK"
         self.waiver_auth = "Not Waivable"
 
@@ -200,7 +194,6 @@ class Bzip2FileChangesRPMs(TestCompareRPMs):
         )
 
         self.inspection = "changedfiles"
-        self.label = "changed-files"
         self.result = "OK"
         self.waiver_auth = "Not Waivable"
 
@@ -225,7 +218,6 @@ class Bzip2FileChangesKoji(TestCompareKoji):
         )
 
         self.inspection = "changedfiles"
-        self.label = "changed-files"
         self.result = "OK"
         self.waiver_auth = "Not Waivable"
 
@@ -252,7 +244,6 @@ class XzFileNoChangeRPMs(TestCompareRPMs):
         )
 
         self.inspection = "changedfiles"
-        self.label = "changed-files"
         self.result = "OK"
         self.waiver_auth = "Not Waivable"
 
@@ -277,7 +268,6 @@ class XzFileNoChangeKoji(TestCompareKoji):
         )
 
         self.inspection = "changedfiles"
-        self.label = "changed-files"
         self.result = "OK"
         self.waiver_auth = "Not Waivable"
 
@@ -303,7 +293,6 @@ class XzFileChangesRPMs(TestCompareRPMs):
         )
 
         self.inspection = "changedfiles"
-        self.label = "changed-files"
         self.result = "OK"
         self.waiver_auth = "Not Waivable"
 
@@ -328,6 +317,5 @@ class XzFileChangesKoji(TestCompareKoji):
         )
 
         self.inspection = "changedfiles"
-        self.label = "changed-files"
         self.result = "OK"
         self.waiver_auth = "Not Waivable"

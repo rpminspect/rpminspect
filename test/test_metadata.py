@@ -32,7 +32,6 @@ class ValidVendorSRPM(TestSRPM):
         TestSRPM.setUp(self)
         self.rpm.addVendor("Vendorco Ltd.")
         self.inspection = "metadata"
-        self.label = "header-metadata"
         self.result = "OK"
 
 
@@ -42,7 +41,6 @@ class ValidVendorRPMs(TestRPMs):
         TestRPMs.setUp(self)
         self.rpm.addVendor("Vendorco Ltd.")
         self.inspection = "metadata"
-        self.label = "header-metadata"
         self.result = "OK"
 
 
@@ -52,7 +50,6 @@ class ValidVendorKojiBuild(TestKoji):
         TestKoji.setUp(self)
         self.rpm.addVendor("Vendorco Ltd.")
         self.inspection = "metadata"
-        self.label = "header-metadata"
         self.result = "OK"
 
 
@@ -62,7 +59,6 @@ class InvalidVendorSRPM(TestSRPM):
         TestSRPM.setUp(self)
         self.rpm.addVendor("Amalgamated Amalgamations LLC")
         self.inspection = "metadata"
-        self.label = "header-metadata"
         self.result = "BAD"
 
 
@@ -72,7 +68,6 @@ class InvalidVendorRPMs(TestRPMs):
         TestRPMs.setUp(self)
         self.rpm.addVendor("Amalgamated Amalgamations LLC")
         self.inspection = "metadata"
-        self.label = "header-metadata"
         self.result = "BAD"
 
 
@@ -82,7 +77,6 @@ class InvalidVendorKojiBuild(TestKoji):
         TestKoji.setUp(self)
         self.rpm.addVendor("Amalgamated Amalgamations LLC")
         self.inspection = "metadata"
-        self.label = "header-metadata"
         self.result = "BAD"
 
 
@@ -92,7 +86,6 @@ class GainingVendorCompareSRPM(TestCompareSRPM):
         TestCompareSRPM.setUp(self)
         self.after_rpm.addVendor("Vendorco Ltd.")
         self.inspection = "metadata"
-        self.label = "header-metadata"
         self.result = "VERIFY"
         self.waiver_auth = "Anyone"
 
@@ -103,7 +96,6 @@ class GainingVendorCompareRPMs(TestCompareRPMs):
         TestCompareRPMs.setUp(self)
         self.after_rpm.addVendor("Vendorco Ltd.")
         self.inspection = "metadata"
-        self.label = "header-metadata"
         self.result = "VERIFY"
         self.waiver_auth = "Anyone"
 
@@ -114,7 +106,6 @@ class GainingVendorCompareKojiBuild(TestCompareKoji):
         TestCompareKoji.setUp(self)
         self.after_rpm.addVendor("Vendorco Ltd.")
         self.inspection = "metadata"
-        self.label = "header-metadata"
         self.result = "VERIFY"
         self.waiver_auth = "Anyone"
 
@@ -125,7 +116,6 @@ class LosingVendorCompareSRPM(TestCompareSRPM):
         TestCompareSRPM.setUp(self)
         self.before_rpm.addVendor("Vendorco Ltd.")
         self.inspection = "metadata"
-        self.label = "header-metadata"
         self.waiver_auth = "Anyone"
         self.result = "VERIFY"
         self.waiver_auth = "Anyone"
@@ -137,7 +127,6 @@ class LosingVendorCompareRPMs(TestCompareRPMs):
         TestCompareRPMs.setUp(self)
         self.before_rpm.addVendor("Vendorco Ltd.")
         self.inspection = "metadata"
-        self.label = "header-metadata"
         self.waiver_auth = "Anyone"
         self.result = "VERIFY"
         self.waiver_auth = "Anyone"
@@ -149,7 +138,6 @@ class LosingVendorCompareKojiBuild(TestCompareKoji):
         TestCompareKoji.setUp(self)
         self.before_rpm.addVendor("Vendorco Ltd.")
         self.inspection = "metadata"
-        self.label = "header-metadata"
         self.waiver_auth = "Anyone"
         self.result = "VERIFY"
 
@@ -161,7 +149,6 @@ class ChangingVendorCompareSRPM(TestCompareSRPM):
         self.before_rpm.addVendor("Amalgamated Amalgamations LLC")
         self.after_rpm.addVendor("Vendorco Ltd.")
         self.inspection = "metadata"
-        self.label = "header-metadata"
         self.waiver_auth = "Anyone"
         self.result = "VERIFY"
         self.waiver_auth = "Anyone"
@@ -174,7 +161,6 @@ class ChangingVendorCompareRPMs(TestCompareRPMs):
         self.before_rpm.addVendor("Amalgamated Amalgamations LLC")
         self.after_rpm.addVendor("Vendorco Ltd.")
         self.inspection = "metadata"
-        self.label = "header-metadata"
         self.result = "VERIFY"
         self.waiver_auth = "Anyone"
 
@@ -186,7 +172,6 @@ class LosingVendorCompareKojiBeforeAfterBuild(TestCompareKoji):
         self.before_rpm.addVendor("Amalgamated Amalgamations LLC")
         self.after_rpm.addVendor("Vendorco Ltd.")
         self.inspection = "metadata"
-        self.label = "header-metadata"
         self.result = "VERIFY"
         self.waiver_auth = "Anyone"
 
@@ -198,7 +183,6 @@ class InvalidBuildhostSubdomainSRPM(TestSRPM):
         self.buildhost_subdomain = ".totallylegitbuilder.com"
         self.rpm.addVendor("Vendorco Ltd.")
         self.inspection = "metadata"
-        self.label = "header-metadata"
         self.result = "BAD"
 
 
@@ -209,7 +193,6 @@ class InvalidBuildhostSubdomainRPMs(TestRPMs):
         self.buildhost_subdomain = ".totallylegitbuilder.com"
         self.rpm.addVendor("Vendorco Ltd.")
         self.inspection = "metadata"
-        self.label = "header-metadata"
         self.result = "BAD"
 
 
@@ -220,7 +203,6 @@ class InvalidBuildhostSubdomainKojiBuild(TestKoji):
         self.buildhost_subdomain = ".totallylegitbuilder.com"
         self.rpm.addVendor("Vendorco Ltd.")
         self.inspection = "metadata"
-        self.label = "header-metadata"
         self.result = "BAD"
 
 
@@ -230,7 +212,6 @@ class CleanSummarySRPM(TestSRPM):
         TestSRPM.setUp(self)
         self.rpm.add_summary("Lorem ipsum dolor sit amet")
         self.inspection = "metadata"
-        self.label = "header-metadata"
         self.result = "OK"
 
 
@@ -240,7 +221,6 @@ class CleanSummaryRPMs(TestRPMs):
         TestRPMs.setUp(self)
         self.rpm.add_summary("Lorem ipsum dolor sit amet")
         self.inspection = "metadata"
-        self.label = "header-metadata"
         self.result = "OK"
 
 
@@ -250,7 +230,6 @@ class CleanSummaryKojiBuild(TestKoji):
         TestKoji.setUp(self)
         self.rpm.add_summary("Lorem ipsum dolor sit amet")
         self.inspection = "metadata"
-        self.label = "header-metadata"
         self.result = "OK"
 
 
@@ -260,7 +239,6 @@ class DirtySummarySRPM(TestSRPM):
         TestSRPM.setUp(self)
         self.rpm.add_summary("Lorem ipsum reallybadword dolor sit amet")
         self.inspection = "metadata"
-        self.label = "header-metadata"
         self.result = "BAD"
 
 
@@ -270,7 +248,6 @@ class DirtySummaryRPMs(TestRPMs):
         TestRPMs.setUp(self)
         self.rpm.add_summary("Lorem ipsum reallybadword dolor sit amet")
         self.inspection = "metadata"
-        self.label = "header-metadata"
         self.result = "BAD"
 
 
@@ -280,7 +257,6 @@ class DirtySummaryKojiBuild(TestKoji):
         TestKoji.setUp(self)
         self.rpm.add_summary("Lorem ipsum reallybadword dolor sit amet")
         self.inspection = "metadata"
-        self.label = "header-metadata"
         self.result = "BAD"
 
 
@@ -291,7 +267,6 @@ class ChangingSummaryCompareSRPM(TestCompareSRPM):
         self.before_rpm.add_summary("Lorem ipsum dolor sit amet")
         self.after_rpm.add_summary("Lorem ipsum")
         self.inspection = "metadata"
-        self.label = "header-metadata"
         self.result = "VERIFY"
         self.waiver_auth = "Anyone"
 
@@ -303,7 +278,6 @@ class ChangingSummaryCompareRPMs(TestCompareRPMs):
         self.before_rpm.add_summary("Lorem ipsum dolor sit amet")
         self.after_rpm.add_summary("Lorem ipsum")
         self.inspection = "metadata"
-        self.label = "header-metadata"
         self.result = "VERIFY"
         self.waiver_auth = "Anyone"
 
@@ -315,7 +289,6 @@ class ChangingSummaryCompareKojiBuild(TestCompareKoji):
         self.before_rpm.add_summary("Lorem ipsum dolor sit amet")
         self.after_rpm.add_summary("Lorem ipsum")
         self.inspection = "metadata"
-        self.label = "header-metadata"
         self.result = "VERIFY"
         self.waiver_auth = "Anyone"
 
@@ -333,7 +306,6 @@ class CleanDescriptionSRPM(TestSRPM):
             "sunt in culpa qui officia deserunt mollit anim id est laborum."
         )
         self.inspection = "metadata"
-        self.label = "header-metadata"
         self.result = "OK"
 
 
@@ -350,7 +322,6 @@ class CleanDescriptionRPMs(TestRPMs):
             "sunt in culpa qui officia deserunt mollit anim id est laborum."
         )
         self.inspection = "metadata"
-        self.label = "header-metadata"
         self.result = "OK"
 
 
@@ -367,7 +338,6 @@ class CleanDescriptionKojiBuild(TestKoji):
             "sunt in culpa qui officia deserunt mollit anim id est laborum."
         )
         self.inspection = "metadata"
-        self.label = "header-metadata"
         self.result = "OK"
 
 
@@ -384,7 +354,6 @@ class DirtyDescriptionSRPM(TestSRPM):
             "sunt in culpa qui officia deserunt mollit anim id est laborum."
         )
         self.inspection = "metadata"
-        self.label = "header-metadata"
         self.result = "BAD"
 
 
@@ -401,7 +370,6 @@ class DirtyDescriptionRPMs(TestRPMs):
             "sunt in culpa qui officia deserunt mollit anim id est laborum."
         )
         self.inspection = "metadata"
-        self.label = "header-metadata"
         self.result = "BAD"
 
 
@@ -418,7 +386,6 @@ class DirtyDescriptionKojiBuild(TestKoji):
             "sunt in culpa qui officia deserunt mollit anim id est laborum."
         )
         self.inspection = "metadata"
-        self.label = "header-metadata"
         self.result = "BAD"
 
 
@@ -436,7 +403,6 @@ class ChangingDescriptionCompareSRPM(TestCompareSRPM):
         )
         self.after_rpm.add_description("Lorem ipsum dolor sit amet")
         self.inspection = "metadata"
-        self.label = "header-metadata"
         self.result = "VERIFY"
         self.waiver_auth = "Anyone"
 
@@ -455,7 +421,6 @@ class ChangingDescriptionCompareRPMs(TestCompareRPMs):
         )
         self.after_rpm.add_description("Lorem ipsum dolor sit amet")
         self.inspection = "metadata"
-        self.label = "header-metadata"
         self.result = "VERIFY"
         self.waiver_auth = "Anyone"
 
@@ -474,6 +439,5 @@ class ChangingDescriptionCompareKojiBuild(TestCompareKoji):
         )
         self.after_rpm.add_description("Lorem ipsum dolor sit amet")
         self.inspection = "metadata"
-        self.label = "header-metadata"
         self.result = "VERIFY"
         self.waiver_auth = "Anyone"

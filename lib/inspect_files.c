@@ -72,7 +72,7 @@ static bool files_driver(struct rpminspect *ri, rpmfile_entry_t *file) {
     init_result_params(&params);
     params.severity = RESULT_VERIFY;
     params.waiverauth = WAIVABLE_BY_ANYONE;
-    params.header = HEADER_FILES;
+    params.header = NAME_FILES;
     params.remedy = REMEDY_FILES;
     params.file = file->localpath;
 
@@ -169,7 +169,7 @@ bool inspect_files(struct rpminspect *ri) {
 
     init_result_params(&params);
     params.waiverauth = NOT_WAIVABLE;
-    params.header = HEADER_FILES;
+    params.header = NAME_FILES;
 
     if (result && src) {
         params.severity = RESULT_OK;

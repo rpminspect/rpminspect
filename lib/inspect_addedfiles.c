@@ -90,7 +90,7 @@ static bool addedfiles_driver(struct rpminspect *ri, rpmfile_entry_t *file)
     init_result_params(&params);
     params.severity = RESULT_BAD;
     params.waiverauth = WAIVABLE_BY_ANYONE;
-    params.header = HEADER_ADDEDFILES;
+    params.header = NAME_ADDEDFILES;
     params.remedy = REMEDY_ADDEDFILES;
     params.arch = arch;
     params.file = file->localpath;
@@ -169,7 +169,7 @@ static bool addedfiles_driver(struct rpminspect *ri, rpmfile_entry_t *file)
 
     /* Check for any new setuid or setgid files */
     if (!S_ISDIR(file->st.st_mode) && (file->st.st_mode & (S_ISUID|S_ISGID))) {
-        match_fileinfo_mode(ri, file, HEADER_ADDEDFILES, REMEDY_ADDEDFILES);
+        match_fileinfo_mode(ri, file, NAME_ADDEDFILES, REMEDY_ADDEDFILES);
         goto done;
     }
 
@@ -203,7 +203,7 @@ bool inspect_addedfiles(struct rpminspect *ri)
         init_result_params(&params);
         params.severity = RESULT_OK;
         params.waiverauth = NOT_WAIVABLE;
-        params.header = HEADER_ADDEDFILES;
+        params.header = NAME_ADDEDFILES;
         add_result(ri, &params);
     }
 

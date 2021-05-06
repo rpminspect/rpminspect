@@ -33,7 +33,6 @@ class HasNoVirusSRPM(TestSRPM):
         )
 
         self.inspection = "virus"
-        self.label = "virus"
         self.result = "OK"
         self.waiver_auth = "Not Waivable"
 
@@ -48,7 +47,6 @@ class HasNoVirusRPMs(TestRPMs):
         )
 
         self.inspection = "virus"
-        self.label = "virus"
         self.result = "OK"
         self.waiver_auth = "Not Waivable"
 
@@ -63,7 +61,6 @@ class HasNoVirusKoji(TestKoji):
         )
 
         self.inspection = "virus"
-        self.label = "virus"
         self.result = "OK"
         self.waiver_auth = "Not Waivable"
 
@@ -81,7 +78,6 @@ class HasNoVirusCompareSRPM(TestCompareSRPM):
         )
 
         self.inspection = "virus"
-        self.label = "virus"
         self.result = "OK"
         self.waiver_auth = "Not Waivable"
 
@@ -99,7 +95,6 @@ class HasNoVirusCompareRPMs(TestCompareRPMs):
         )
 
         self.inspection = "virus"
-        self.label = "virus"
         self.result = "OK"
         self.waiver_auth = "Not Waivable"
 
@@ -117,7 +112,6 @@ class HasNoVirusCompareKoji(TestCompareKoji):
         )
 
         self.inspection = "virus"
-        self.label = "virus"
         self.result = "OK"
         self.waiver_auth = "Not Waivable"
 
@@ -131,7 +125,6 @@ class HasVirusSRPM(TestSRPM):
         self.rpm.add_fake_virus("usr/lib/whte_rbt.obj", "whte_rbt.pas", mode="0755")
 
         self.inspection = "virus"
-        self.label = "virus"
         self.result = "BAD"
         self.waiver_auth = "Anyone"
 
@@ -144,7 +137,6 @@ class HasVirusRPMs(TestRPMs):
         self.rpm.add_fake_virus("usr/lib/whte_rbt.obj", "whte_rbt.pas", mode="0755")
 
         self.inspection = "virus"
-        self.label = "virus"
         self.result = "BAD"
         self.waiver_auth = "Anyone"
 
@@ -157,7 +149,6 @@ class HasVirusKoji(TestKoji):
         self.rpm.add_fake_virus("usr/lib/whte_rbt.obj", "whte_rbt.pas", mode="0755")
 
         self.inspection = "virus"
-        self.label = "virus"
         self.result = "BAD"
         self.waiver_auth = "Anyone"
 
@@ -175,7 +166,6 @@ class HasVirusCompareSRPM(TestCompareSRPM):
         )
 
         self.inspection = "virus"
-        self.label = "virus"
         self.result = "BAD"
         self.waiver_auth = "Anyone"
 
@@ -193,7 +183,6 @@ class HasVirusCompareRPMs(TestCompareRPMs):
         )
 
         self.inspection = "virus"
-        self.label = "virus"
         self.result = "BAD"
         self.waiver_auth = "Anyone"
 
@@ -211,6 +200,5 @@ class HasVirusCompareKoji(TestCompareKoji):
         )
 
         self.inspection = "virus"
-        self.label = "virus"
         self.result = "BAD"
         self.waiver_auth = "Anyone"

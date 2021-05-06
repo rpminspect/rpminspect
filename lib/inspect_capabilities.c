@@ -67,7 +67,7 @@ static bool capabilities_driver(struct rpminspect *ri, rpmfile_entry_t *file)
 
     /* Set up result parameters */
     init_result_params(&params);
-    params.header = HEADER_CAPABILITIES;
+    params.header = NAME_CAPABILITIES;
     params.arch = arch;
     params.file = file->localpath;
 
@@ -158,7 +158,7 @@ bool inspect_capabilities(struct rpminspect *ri) {
         init_result_params(&params);
         params.severity = RESULT_OK;
         params.waiverauth = NOT_WAIVABLE;
-        params.header = HEADER_CAPABILITIES;
+        params.header = NAME_CAPABILITIES;
         add_result(ri, &params);
     }
 

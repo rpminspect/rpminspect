@@ -96,7 +96,6 @@ class ValidDesktopFileRPM(TestRPMs):
         )
 
         self.inspection = "desktop"
-        self.label = "desktop-entry-files"
         self.result = "OK"
 
 
@@ -121,7 +120,6 @@ class ValidDesktopFileKoji(TestKoji):
         )
 
         self.inspection = "desktop"
-        self.label = "desktop-entry-files"
         self.result = "OK"
 
 
@@ -155,7 +153,6 @@ class ValidDesktopFileCompareRPM(TestCompareRPMs):
         )
 
         self.inspection = "desktop"
-        self.label = "desktop-entry-files"
         self.result = "OK"
 
 
@@ -189,7 +186,6 @@ class ValidDesktopFileCompareKoji(TestCompareKoji):
         )
 
         self.inspection = "desktop"
-        self.label = "desktop-entry-files"
         self.result = "OK"
 
 
@@ -208,7 +204,6 @@ class DesktopFileMissingIconRPM(TestRPMs):
         )
 
         self.inspection = "desktop"
-        self.label = "desktop-entry-files"
         self.result = "VERIFY"
         self.waiver_auth = "Anyone"
 
@@ -233,7 +228,6 @@ class DesktopFileMissingIconCompareRPM(TestCompareRPMs):
         )
 
         self.inspection = "desktop"
-        self.label = "desktop-entry-files"
         self.result = "VERIFY"
         self.waiver_auth = "Anyone"
 
@@ -253,7 +247,6 @@ class DesktopFileMissingIconKoji(TestKoji):
         )
 
         self.inspection = "desktop"
-        self.label = "desktop-entry-files"
         self.result = "VERIFY"
         self.waiver_auth = "Anyone"
 
@@ -278,7 +271,6 @@ class DesktopFileMissingIconCompareKoji(TestCompareKoji):
         )
 
         self.inspection = "desktop"
-        self.label = "desktop-entry-files"
         self.result = "VERIFY"
         self.waiver_auth = "Anyone"
 
@@ -304,7 +296,6 @@ class DesktopFileValidateFailsRPM(TestRPMs):
         )
 
         self.inspection = "desktop"
-        self.label = "desktop-entry-files"
         self.result = "BAD"
         self.waiver_auth = "Anyone"
 
@@ -330,7 +321,6 @@ class DesktopFileValidateFailsKoji(TestKoji):
         )
 
         self.inspection = "desktop"
-        self.label = "desktop-entry-files"
         self.result = "BAD"
         self.waiver_auth = "Anyone"
 
@@ -365,7 +355,6 @@ class DesktopFileValidateFailsCompareRPM(TestCompareRPMs):
         )
 
         self.inspection = "desktop"
-        self.label = "desktop-entry-files"
         self.result = "BAD"
         self.waiver_auth = "Anyone"
 
@@ -400,7 +389,6 @@ class DesktopFileValidateFailsCompareKoji(TestCompareKoji):
         )
 
         self.inspection = "desktop"
-        self.label = "desktop-entry-files"
         self.result = "BAD"
         self.waiver_auth = "Anyone"
 
@@ -426,7 +414,6 @@ class DesktopFileExecArgsRPM(TestRPMs):
         )
 
         self.inspection = "desktop"
-        self.label = "desktop-entry-files"
         self.result = "OK"
 
 
@@ -451,7 +438,6 @@ class DesktopFileExecArgsKoji(TestKoji):
         )
 
         self.inspection = "desktop"
-        self.label = "desktop-entry-files"
         self.result = "OK"
 
 
@@ -485,7 +471,6 @@ class DesktopFileExecArgsCompareRPM(TestCompareRPMs):
         )
 
         self.inspection = "desktop"
-        self.label = "desktop-entry-files"
         self.result = "OK"
 
 
@@ -519,7 +504,6 @@ class DesktopFileExecArgsCompareKoji(TestCompareKoji):
         )
 
         self.inspection = "desktop"
-        self.label = "desktop-entry-files"
         self.result = "OK"
 
 
@@ -545,7 +529,6 @@ class DesktopFileNotWorldReadableIconRPM(TestRPMs):
         )
 
         self.inspection = "desktop"
-        self.label = "desktop-entry-files"
         self.result = "VERIFY"
         self.waiver_auth = "Anyone"
 
@@ -572,7 +555,6 @@ class DesktopFileNotWorldReadableIconKoji(TestKoji):
         )
 
         self.inspection = "desktop"
-        self.label = "desktop-entry-files"
         self.result = "VERIFY"
         self.waiver_auth = "Anyone"
 
@@ -609,7 +591,6 @@ class DesktopFileNotWorldReadableIconCompareRPM(TestCompareRPMs):
         )
 
         self.inspection = "desktop"
-        self.label = "desktop-entry-files"
         self.result = "VERIFY"
         self.waiver_auth = "Anyone"
 
@@ -646,7 +627,6 @@ class DesktopFileNotWorldReadableIconCompareKoji(TestCompareKoji):
         )
 
         self.inspection = "desktop"
-        self.label = "desktop-entry-files"
         self.result = "VERIFY"
         self.waiver_auth = "Anyone"
 
@@ -669,7 +649,6 @@ class DesktopFileInvalidExecRPM(TestRPMs):
         )
 
         self.inspection = "desktop"
-        self.label = "desktop-entry-files"
         self.result = "VERIFY"
         self.waiver_auth = "Anyone"
 
@@ -692,7 +671,6 @@ class DesktopFileInvalidExecRPMs(TestKoji):
         )
 
         self.inspection = "desktop"
-        self.label = "desktop-entry-files"
         self.result = "VERIFY"
         self.waiver_auth = "Anyone"
 
@@ -723,7 +701,6 @@ class DesktopFileInvalidExecCompareRPM(TestCompareRPMs):
         )
 
         self.inspection = "desktop"
-        self.label = "desktop-entry-files"
         self.result = "VERIFY"
         self.waiver_auth = "Anyone"
 
@@ -754,7 +731,6 @@ class DesktopFileInvalidExecCompareKoji(TestCompareKoji):
         )
 
         self.inspection = "desktop"
-        self.label = "desktop-entry-files"
         self.result = "VERIFY"
         self.waiver_auth = "Anyone"
 
@@ -781,7 +757,6 @@ class DesktopFileWithoutWorldExecutableExecRPM(TestRPMs):
         )
 
         self.inspection = "desktop"
-        self.label = "desktop-entry-files"
         self.result = "VERIFY"
         self.waiver_auth = "Anyone"
 
@@ -808,7 +783,6 @@ class DesktopFileWithoutWorldExecutableExecKoji(TestKoji):
         )
 
         self.inspection = "desktop"
-        self.label = "desktop-entry-files"
         self.result = "VERIFY"
         self.waiver_auth = "Anyone"
 
@@ -845,7 +819,6 @@ class DesktopFileWithoutWorldExecutableExecCompareRPM(TestCompareRPMs):
         )
 
         self.inspection = "desktop"
-        self.label = "desktop-entry-files"
         self.result = "VERIFY"
         self.waiver_auth = "Anyone"
 
@@ -882,6 +855,5 @@ class DesktopFileWithoutWorldExecutableExecCompareKoji(TestCompareKoji):
         )
 
         self.inspection = "desktop"
-        self.label = "desktop-entry-files"
         self.result = "VERIFY"
         self.waiver_auth = "Anyone"

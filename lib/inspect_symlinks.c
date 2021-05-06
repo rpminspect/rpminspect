@@ -96,7 +96,7 @@ static bool symlinks_driver(struct rpminspect *ri, rpmfile_entry_t *file) {
 
     /* initialize the result parameters */
     init_result_params(&params);
-    params.header = HEADER_SYMLINKS;
+    params.header = NAME_SYMLINKS;
     params.remedy = REMEDY_SYMLINKS;
     params.verb = VERB_FAILED;
     params.arch = get_rpm_header_arch(file->rpm_header);
@@ -325,7 +325,7 @@ bool inspect_symlinks(struct rpminspect *ri) {
     if (result) {
         init_result_params(&params);
         params.waiverauth = NOT_WAIVABLE;
-        params.header = HEADER_SYMLINKS;
+        params.header = NAME_SYMLINKS;
         params.severity = RESULT_OK;
         add_result(ri, &params);
     }

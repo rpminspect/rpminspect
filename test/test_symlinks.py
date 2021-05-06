@@ -60,7 +60,6 @@ class AbsoluteSymlinkExistsRPMs(TestRPMs):
         self.rpm.add_installed_symlink("usr/sbin/testscript", "/usr/bin/testscript")
 
         self.inspection = "symlinks"
-        self.label = "symlinks"
         self.result = "OK"
         self.waiver_auth = "Not Waivable"
 
@@ -78,7 +77,6 @@ class AbsoluteSymlinkExistsKoji(TestKoji):
         self.rpm.add_installed_symlink("usr/sbin/rpminspect", "/usr/bin/rpminspect")
 
         self.inspection = "symlinks"
-        self.label = "symlinks"
         self.result = "OK"
         self.waiver_auth = "Not Waivable"
 
@@ -98,7 +96,6 @@ class AbsoluteSymlinkExistsCompareRPMs(TestCompareRPMs):
         )
 
         self.inspection = "symlinks"
-        self.label = "symlinks"
         self.result = "OK"
         self.waiver_auth = "Not Waivable"
 
@@ -118,7 +115,6 @@ class AbsoluteSymlinkExistsCompareKoji(TestCompareKoji):
         )
 
         self.inspection = "symlinks"
-        self.label = "symlinks"
         self.result = "OK"
         self.waiver_auth = "Not Waivable"
 
@@ -137,7 +133,6 @@ class RelativeSymlinkExistsParentDirRPMs(TestRPMs):
         self.rpm.add_installed_symlink("usr/sbin/rpminspect", "../bin/rpminspect")
 
         self.inspection = "symlinks"
-        self.label = "symlinks"
         self.result = "OK"
         self.waiver_auth = "Not Waivable"
 
@@ -155,7 +150,6 @@ class RelativeSymlinkExistsParentDirKoji(TestKoji):
         self.rpm.add_installed_symlink("usr/sbin/rpminspect", "../bin/rpminspect")
 
         self.inspection = "symlinks"
-        self.label = "symlinks"
         self.result = "OK"
         self.waiver_auth = "Not Waivable"
 
@@ -173,7 +167,6 @@ class RelativeSymlinkExistsParentDirCompareRPMs(TestCompareRPMs):
         self.after_rpm.add_installed_symlink("usr/sbin/rpminspect", "../bin/rpminspect")
 
         self.inspection = "symlinks"
-        self.label = "symlinks"
         self.result = "OK"
         self.waiver_auth = "Not Waivable"
 
@@ -191,7 +184,6 @@ class RelativeSymlinkExistsParentDirCompareKoji(TestCompareKoji):
         self.after_rpm.add_installed_symlink("usr/sbin/rpminspect", "../bin/rpminspect")
 
         self.inspection = "symlinks"
-        self.label = "symlinks"
         self.result = "OK"
         self.waiver_auth = "Not Waivable"
 
@@ -210,7 +202,6 @@ class RelativeSymlinkExistsCurrentDirRPMs(TestRPMs):
         self.rpm.add_installed_symlink("usr/bin/anotherrpminspect", "rpminspect")
 
         self.inspection = "symlinks"
-        self.label = "symlinks"
         self.result = "OK"
         self.waiver_auth = "Not Waivable"
 
@@ -228,7 +219,6 @@ class RelativeSymlinkExistsCurrentDirKoji(TestKoji):
         self.rpm.add_installed_symlink("usr/bin/anotherrpminspect", "rpminspect")
 
         self.inspection = "symlinks"
-        self.label = "symlinks"
         self.result = "OK"
         self.waiver_auth = "Not Waivable"
 
@@ -246,7 +236,6 @@ class RelativeSymlinkExistsCurrentDirCompareRPMs(TestCompareRPMs):
         self.after_rpm.add_installed_symlink("usr/bin/anotherrpminspect", "rpminspect")
 
         self.inspection = "symlinks"
-        self.label = "symlinks"
         self.result = "OK"
         self.waiver_auth = "Not Waivable"
 
@@ -264,7 +253,6 @@ class RelativeSymlinkExistsCurrentDirCompareKoji(TestCompareKoji):
         self.after_rpm.add_installed_symlink("usr/bin/anotherrpminspect", "rpminspect")
 
         self.inspection = "symlinks"
-        self.label = "symlinks"
         self.result = "OK"
         self.waiver_auth = "Not Waivable"
 
@@ -286,7 +274,6 @@ class SymlinkExistsMultiplePackagesRPMS(TestRPMs):
         )
 
         self.inspection = "symlinks"
-        self.label = "symlinks"
         self.result = "OK"
         self.waiver_auth = "Not Waivable"
 
@@ -307,7 +294,6 @@ class SymlinkExistsMultiplePackagesKoji(TestKoji):
         )
 
         self.inspection = "symlinks"
-        self.label = "symlinks"
         self.result = "OK"
         self.waiver_auth = "Not Waivable"
 
@@ -328,7 +314,6 @@ class SymlinkExistsMultiplePackagesCompareRPMs(TestCompareRPMs):
         )
 
         self.inspection = "symlinks"
-        self.label = "symlinks"
         self.result = "OK"
         self.waiver_auth = "Not Waivable"
 
@@ -349,7 +334,6 @@ class SymlinkExistsMultiplePackagesCompareKoji(TestCompareKoji):
         )
 
         self.inspection = "symlinks"
-        self.label = "symlinks"
         self.result = "OK"
         self.waiver_auth = "Not Waivable"
 
@@ -370,7 +354,6 @@ class AbsoluteSymlinkDanglingRPMs(TestRPMs):
         )
 
         self.inspection = "symlinks"
-        self.label = "symlinks"
         self.result = "INFO"
         self.waiver_auth = "Not Waivable"
 
@@ -390,7 +373,6 @@ class AbsoluteSymlinkDanglingKoji(TestKoji):
         )
 
         self.inspection = "symlinks"
-        self.label = "symlinks"
         self.result = "INFO"
         self.waiver_auth = "Not Waivable"
 
@@ -410,7 +392,6 @@ class AbsoluteSymlinkDanglingCompareRPMs(TestCompareRPMs):
         )
 
         self.inspection = "symlinks"
-        self.label = "symlinks"
         self.result = "INFO"
         self.waiver_auth = "Not Waivable"
 
@@ -430,7 +411,6 @@ class AbsoluteSymlinkDanglingCompareKoji(TestCompareKoji):
         )
 
         self.inspection = "symlinks"
-        self.label = "symlinks"
         self.result = "INFO"
         self.waiver_auth = "Not Waivable"
 
@@ -451,7 +431,6 @@ class RelativeSymlinkDanglingParentDirRPMs(TestRPMs):
         )
 
         self.inspection = "symlinks"
-        self.label = "symlinks"
         self.result = "INFO"
         self.waiver_auth = "Not Waivable"
 
@@ -471,7 +450,6 @@ class RelativeSymlinkDanglingParentDirKoji(TestKoji):
         )
 
         self.inspection = "symlinks"
-        self.label = "symlinks"
         self.result = "INFO"
         self.waiver_auth = "Not Waivable"
 
@@ -491,7 +469,6 @@ class RelativeSymlinkDanglingParentDirAfterRPMs(TestCompareRPMs):
         )
 
         self.inspection = "symlinks"
-        self.label = "symlinks"
         self.result = "INFO"
         self.waiver_auth = "Not Waivable"
 
@@ -511,7 +488,6 @@ class RelativeSymlinkDanglingParentDirAfterKoji(TestCompareKoji):
         )
 
         self.inspection = "symlinks"
-        self.label = "symlinks"
         self.result = "INFO"
         self.waiver_auth = "Not Waivable"
 
@@ -532,7 +508,6 @@ class RelativeSymlinkDanglingCurrentDirRPMs(TestRPMs):
         )
 
         self.inspection = "symlinks"
-        self.label = "symlinks"
         self.result = "INFO"
         self.waiver_auth = "Not Waivable"
 
@@ -552,7 +527,6 @@ class RelativeSymlinkDanglingCurrentDirKoji(TestKoji):
         )
 
         self.inspection = "symlinks"
-        self.label = "symlinks"
         self.result = "INFO"
         self.waiver_auth = "Not Waivable"
 
@@ -572,7 +546,6 @@ class RelativeSymlinkDanglingCurrentDirCompareRPMs(TestCompareRPMs):
         )
 
         self.inspection = "symlinks"
-        self.label = "symlinks"
         self.result = "INFO"
         self.waiver_auth = "Not Waivable"
 
@@ -592,7 +565,6 @@ class RelativeSymlinkDanglingCurrentDirCompareKoji(TestCompareKoji):
         )
 
         self.inspection = "symlinks"
-        self.label = "symlinks"
         self.result = "INFO"
         self.waiver_auth = "Not Waivable"
 
@@ -625,7 +597,6 @@ class TooManySymlinkLevelsRPMs(TestRPMs):
         )
 
         self.inspection = "symlinks"
-        self.label = "symlinks"
         self.result = "BAD"
         self.waiver_auth = "Anyone"
 
@@ -654,7 +625,6 @@ class TooManySymlinkLevelsKoji(TestKoji):
         )
 
         self.inspection = "symlinks"
-        self.label = "symlinks"
         self.result = "BAD"
         self.waiver_auth = "Anyone"
 
@@ -687,7 +657,6 @@ class TooManySymlinkLevelsCompareRPMs(TestCompareRPMs):
         self.after_rpm.header += "\n%global __arch_install_post %{nil}\n"
 
         self.inspection = "symlinks"
-        self.label = "symlinks"
         self.result = "BAD"
         self.waiver_auth = "Anyone"
 
@@ -720,7 +689,6 @@ class TooManySymlinkLevelsCompareKoji(TestCompareKoji):
         self.after_rpm.header += "\n%global __arch_install_post %{nil}\n"
 
         self.inspection = "symlinks"
-        self.label = "symlinks"
         self.result = "BAD"
         self.waiver_auth = "Anyone"
 
@@ -739,7 +707,6 @@ class DirectoryBecomesSymlinkCompareRPMs(TestCompareRPMs):
         self.after_rpm.add_installed_directory("usr/share/actualdirectory")
 
         self.inspection = "symlinks"
-        self.label = "symlinks"
         self.result = "VERIFY"
         self.waiver_auth = "Anyone"
 
@@ -757,7 +724,6 @@ class DirectoryBecomesSymlinkCompareKoji(TestCompareKoji):
         self.after_rpm.add_installed_directory("usr/share/actualdirectory")
 
         self.inspection = "symlinks"
-        self.label = "symlinks"
         self.result = "VERIFY"
         self.waiver_auth = "Anyone"
 
@@ -786,7 +752,6 @@ class NonDirectoryBecomesSymlinkCompareRPMs(TestCompareRPMs):
         self.after_rpm.add_installed_symlink("usr/bin/anotherrpminspect", "rpminspect")
 
         self.inspection = "symlinks"
-        self.label = "symlinks"
         self.result = "VERIFY"
         self.waiver_auth = "Anyone"
 
@@ -814,6 +779,5 @@ class NonDirectoryBecomesSymlinkCompareKoji(TestCompareKoji):
         self.after_rpm.add_installed_symlink("usr/bin/anotherrpminspect", "rpminspect")
 
         self.inspection = "symlinks"
-        self.label = "symlinks"
         self.result = "VERIFY"
         self.waiver_auth = "Anyone"

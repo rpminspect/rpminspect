@@ -79,7 +79,7 @@ static bool doc_driver(struct rpminspect *ri, rpmfile_entry_t *file)
 
     /* set up result parameters */
     init_result_params(&params);
-    params.header = HEADER_DOC;
+    params.header = NAME_DOC;
     params.arch = arch;
     params.file = file->localpath;
     params.remedy = REMEDY_DOC;
@@ -150,7 +150,7 @@ bool inspect_doc(struct rpminspect *ri) {
         init_result_params(&params);
         params.severity = RESULT_OK;
         params.waiverauth = NOT_WAIVABLE;
-        params.header = HEADER_DOC;
+        params.header = NAME_DOC;
         add_result(ri, &params);
     }
 

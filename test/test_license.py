@@ -30,7 +30,6 @@ class EmptyLicenseTagSRPM(TestSRPM):
         TestSRPM.setUp(self)
         self.rpm.license = ""
         self.inspection = "license"
-        self.label = "license"
         self.result = "BAD"
 
 
@@ -43,7 +42,6 @@ class EmptyLicenseTagRPMs(TestRPMs):
         TestRPMs.setUp(self)
         self.rpm.license = ""
         self.inspection = "license"
-        self.label = "license"
         self.result = "BAD"
 
 
@@ -56,7 +54,6 @@ class EmptyLicenseTagKoji(TestKoji):
         TestKoji.setUp(self)
         self.rpm.license = ""
         self.inspection = "license"
-        self.label = "license"
         self.result = "BAD"
 
 
@@ -66,7 +63,6 @@ class ForbiddenLicenseTagSRPM(TestSRPM):
         TestSRPM.setUp(self)
         self.rpm.addLicense("APSL-1.2")
         self.inspection = "license"
-        self.label = "license"
         self.result = "BAD"
 
 
@@ -76,7 +72,6 @@ class ForbiddenLicenseTagRPMs(TestRPMs):
         TestRPMs.setUp(self)
         self.rpm.addLicense("APSL-1.2")
         self.inspection = "license"
-        self.label = "license"
         self.result = "BAD"
 
 
@@ -86,7 +81,6 @@ class ForbiddenLicenseTagKoji(TestKoji):
         TestKoji.setUp(self)
         self.rpm.addLicense("APSL-1.2")
         self.inspection = "license"
-        self.label = "license"
         self.result = "BAD"
 
 
@@ -96,7 +90,6 @@ class BadWordLicenseTagSRPM(TestSRPM):
         TestSRPM.setUp(self)
         self.rpm.addLicense("GPLv2+ and reallybadword and MIT")
         self.inspection = "license"
-        self.label = "license"
         self.result = "BAD"
 
 
@@ -106,7 +99,6 @@ class BadWordLicenseTagRPMs(TestRPMs):
         TestRPMs.setUp(self)
         self.rpm.addLicense("GPLv2+ and reallybadword and MIT")
         self.inspection = "license"
-        self.label = "license"
         self.result = "BAD"
 
 
@@ -116,7 +108,6 @@ class BadWordLicenseTagKoji(TestKoji):
         TestKoji.setUp(self)
         self.rpm.addLicense("GPLv2+ and reallybadword and MIT")
         self.inspection = "license"
-        self.label = "license"
         self.result = "BAD"
 
 
@@ -126,7 +117,6 @@ class ValidLicenseTagSRPM(TestSRPM):
         TestSRPM.setUp(self)
         self.rpm.addLicense("GPLv3+")
         self.inspection = "license"
-        self.label = "license"
         self.result = "INFO"
 
 
@@ -136,7 +126,6 @@ class ValidLicenseTagRPMs(TestRPMs):
         TestRPMs.setUp(self)
         self.rpm.addLicense("GPLv3+")
         self.inspection = "license"
-        self.label = "license"
         self.result = "INFO"
 
 
@@ -146,7 +135,6 @@ class ValidLicenseTagKoji(TestKoji):
         TestKoji.setUp(self)
         self.rpm.addLicense("GPLv3+")
         self.inspection = "license"
-        self.label = "license"
         self.result = "INFO"
 
 
@@ -156,7 +144,6 @@ class ValidLicenseTagWithSpacesSRPM(TestSRPM):
         TestSRPM.setUp(self)
         self.rpm.addLicense("ASL 2.0")
         self.inspection = "license"
-        self.label = "license"
         self.result = "INFO"
 
 
@@ -166,7 +153,6 @@ class ValidLicenseTagWithSpacesRPMs(TestRPMs):
         TestRPMs.setUp(self)
         self.rpm.addLicense("ASL 2.0")
         self.inspection = "license"
-        self.label = "license"
         self.result = "INFO"
 
 
@@ -176,7 +162,6 @@ class ValidLicenseTagWithSpacesKoji(TestKoji):
         TestKoji.setUp(self)
         self.rpm.addLicense("ASL 2.0")
         self.inspection = "license"
-        self.label = "license"
         self.result = "INFO"
 
 
@@ -186,7 +171,6 @@ class ValidLicenseTagWithBooleanSpacesSRPM(TestSRPM):
         TestSRPM.setUp(self)
         self.rpm.addLicense("GPLv3+ and ASL 2.0")
         self.inspection = "license"
-        self.label = "license"
         self.result = "INFO"
 
 
@@ -196,7 +180,6 @@ class ValidLicenseTagWithBooleanSpacesRPMs(TestRPMs):
         TestRPMs.setUp(self)
         self.rpm.addLicense("ASL 2.0 and GPLv3+")
         self.inspection = "license"
-        self.label = "license"
         self.result = "INFO"
 
 
@@ -206,7 +189,6 @@ class ValidLicenseTagWithBooleanSpacesKoji(TestKoji):
         TestKoji.setUp(self)
         self.rpm.addLicense("GPLv3+ or ASL 2.0")
         self.inspection = "license"
-        self.label = "license"
         self.result = "INFO"
 
 
@@ -216,7 +198,6 @@ class ValidLicenseTagWithBooleanSpacesParensSRPM(TestSRPM):
         TestSRPM.setUp(self)
         self.rpm.addLicense("Artistic 2.0 and (GPL+ or Artistic)")
         self.inspection = "license"
-        self.label = "license"
         self.result = "INFO"
 
 
@@ -226,7 +207,6 @@ class ValidLicenseTagWithBooleanSpacesParensRPMs(TestRPMs):
         TestRPMs.setUp(self)
         self.rpm.addLicense("Artistic 2.0 and (GPL+ or Artistic)")
         self.inspection = "license"
-        self.label = "license"
         self.result = "INFO"
 
 
@@ -236,7 +216,6 @@ class ValidLicenseTagWithBooleanSpacesParensKoji(TestKoji):
         TestKoji.setUp(self)
         self.rpm.addLicense("Artistic 2.0 and (GPL+ or Artistic)")
         self.inspection = "license"
-        self.label = "license"
         self.result = "INFO"
 
 
@@ -246,7 +225,6 @@ class AnotherValidLicenseTagWithBooleanSpacesParensSRPM(TestSRPM):
         TestSRPM.setUp(self)
         self.rpm.addLicense("MIT and (BSD or ASL 2.0)")
         self.inspection = "license"
-        self.label = "license"
         self.result = "INFO"
 
 
@@ -256,7 +234,6 @@ class AnotherValidLicenseTagWithBooleanSpacesParensRPMs(TestRPMs):
         TestRPMs.setUp(self)
         self.rpm.addLicense("MIT and (BSD or ASL 2.0)")
         self.inspection = "license"
-        self.label = "license"
         self.result = "INFO"
 
 
@@ -266,7 +243,6 @@ class AnotherValidLicenseTagWithBooleanSpacesParensKoji(TestKoji):
         TestKoji.setUp(self)
         self.rpm.addLicense("MIT and (BSD or ASL 2.0)")
         self.inspection = "license"
-        self.label = "license"
         self.result = "INFO"
 
 
@@ -279,7 +255,6 @@ class ValidGlibcLicenseTagKoji(TestKoji):
             "and BSD and Inner-Net and ISC and Public Domain and GFDL"
         )
         self.inspection = "license"
-        self.label = "license"
         self.result = "INFO"
 
 
@@ -289,5 +264,4 @@ class ValidPerlHTTPMessageLicenseTagKoji(TestKoji):
         TestKoji.setUp(self)
         self.rpm.addLicense("(GPL+ or Artistic) and CC0")
         self.inspection = "license"
-        self.label = "license"
         self.result = "INFO"

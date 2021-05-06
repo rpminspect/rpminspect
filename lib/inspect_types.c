@@ -65,7 +65,7 @@ static bool types_driver(struct rpminspect *ri, rpmfile_entry_t *file)
         init_result_params(&params);
         params.severity = RESULT_VERIFY;
         params.waiverauth = WAIVABLE_BY_ANYONE;
-        params.header = HEADER_TYPES;
+        params.header = NAME_TYPES;
         params.remedy = REMEDY_TYPES;
         params.arch = arch;
         params.file = file->localpath;
@@ -97,7 +97,7 @@ bool inspect_types(struct rpminspect *ri) {
         init_result_params(&params);
         params.severity = RESULT_OK;
         params.waiverauth = NOT_WAIVABLE;
-        params.header = HEADER_TYPES;
+        params.header = NAME_TYPES;
         add_result(ri, &params);
     }
 

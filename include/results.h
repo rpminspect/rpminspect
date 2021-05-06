@@ -27,53 +27,6 @@
 #define _LIBRPMINSPECT_RESULTS_H
 
 /*
- * Inspection headers
- */
-#define HEADER_RPMINSPECT    "rpminspect"
-#define HEADER_METADATA      "header-metadata"
-#define HEADER_EMPTYRPM      "empty-payload"
-#define HEADER_LOSTPAYLOAD   "lost-payload"
-#define HEADER_LICENSE       "license"
-#define HEADER_ELF           "elf-object-properties"
-#define HEADER_MANPAGE       "man-pages"
-#define HEADER_XML           "xml-files"
-#define HEADER_DESKTOP       "desktop-entry-files"
-#define HEADER_DISTTAG       "dist-tag"
-#define HEADER_SPECNAME      "spec-file-name"
-#define HEADER_MODULARITY    "modularity"
-#define HEADER_JAVABYTECODE  "java-bytecode"
-#define HEADER_CHANGEDFILES  "changed-files"
-#define HEADER_MOVEDFILES    "moved-files"
-#define HEADER_REMOVEDFILES  "removed-files"
-#define HEADER_ADDEDFILES    "added-files"
-#define HEADER_UPSTREAM      "upstream"
-#define HEADER_OWNERSHIP     "ownership"
-#define HEADER_SHELLSYNTAX   "shell-syntax"
-#define HEADER_ANNOCHECK     "annocheck"
-#define HEADER_DSODEPS       "dso-deps"
-#define HEADER_FILESIZE      "filesize"
-#define HEADER_PERMISSIONS   "permissions"
-#define HEADER_CAPABILITIES  "capabilities"
-#define HEADER_KMOD          "kernel-modules"
-#define HEADER_ARCH          "architectures"
-#define HEADER_SUBPACKAGES   "subpackages"
-#define HEADER_CHANGELOG     "changelog"
-#define HEADER_PATHMIGRATION "path-migration"
-#define HEADER_LTO           "lto"
-#define HEADER_SYMLINKS      "symlinks"
-#define HEADER_FILES         "files"
-#define HEADER_TYPES         "types"
-#define HEADER_ABIDIFF       "abidiff"
-#define HEADER_KMIDIFF       "kmidiff"
-#define HEADER_CONFIG        "config"
-#define HEADER_DOC           "doc"
-#define HEADER_PATCHES       "patches"
-#define HEADER_VIRUS         "virus"
-#define HEADER_POLITICS      "politics"
-#define HEADER_BADFUNCS      "bad-functions"
-#define HEADER_RUNPATH       "runpath"
-
-/*
  * Inspection remedies
  */
 /* metadata */

@@ -51,7 +51,7 @@ static bool permissions_driver(struct rpminspect *ri, rpmfile_entry_t *file)
     /* Set up result parameters */
     init_result_params(&params);
     params.severity = RESULT_VERIFY;
-    params.header = HEADER_PERMISSIONS;
+    params.header = NAME_PERMISSIONS;
     params.arch = arch;
 
     /* Local working copies for display */
@@ -65,7 +65,7 @@ static bool permissions_driver(struct rpminspect *ri, rpmfile_entry_t *file)
     }
 
     mode_diff = before_mode ^ after_mode;
-    allowed = match_fileinfo_mode(ri, file, HEADER_PERMISSIONS, NULL);
+    allowed = match_fileinfo_mode(ri, file, NAME_PERMISSIONS, NULL);
 
     /* if setuid/setgid or new mode is more open */
     if (mode_diff && file->peer_file && !allowed) {
@@ -118,7 +118,7 @@ bool inspect_permissions(struct rpminspect *ri) {
         init_result_params(&params);
         params.severity = RESULT_OK;
         params.waiverauth = NOT_WAIVABLE;
-        params.header = HEADER_PERMISSIONS;
+        params.header = NAME_PERMISSIONS;
         add_result(ri, &params);
     }
 

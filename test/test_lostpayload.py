@@ -26,7 +26,6 @@ class NewPkgHasEmptyPayload(TestCompareKoji):
         self.before_rpm.add_simple_payload_file()
         self.after_rpm.add_subpackage(self.after_rpm.name + "-newthing")
         self.inspection = "lostpayload"
-        self.label = "lost-payload"
         self.result = "VERIFY"
         self.waiver_auth = "Anyone"
 
@@ -36,7 +35,6 @@ class PkgStillHasEmptyPayload(TestCompareKoji):
     def setUp(self):
         TestCompareKoji.setUp(self)
         self.inspection = "lostpayload"
-        self.label = "lost-payload"
         self.result = "INFO"
 
 
@@ -46,7 +44,6 @@ class PkgLostPayload(TestCompareKoji):
         TestCompareKoji.setUp(self)
         self.before_rpm.add_simple_payload_file()
         self.inspection = "lostpayload"
-        self.label = "lost-payload"
         self.result = "VERIFY"
         self.waiver_auth = "Anyone"
 
@@ -58,6 +55,5 @@ class ExistingPkgMissing(TestCompareKoji):
         self.before_rpm.add_simple_payload_file()
         self.before_rpm.add_subpackage(self.before_rpm.name + "-newthing")
         self.inspection = "lostpayload"
-        self.label = "lost-payload"
         self.result = "VERIFY"
         self.waiver_auth = "Anyone"

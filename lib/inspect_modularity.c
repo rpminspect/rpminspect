@@ -40,7 +40,7 @@ static bool modularity_driver(struct rpminspect *ri, rpmfile_entry_t *file) {
     init_result_params(&params);
     params.severity = RESULT_BAD;
     params.waiverauth = NOT_WAIVABLE;
-    params.header = HEADER_MODULARITY;
+    params.header = NAME_MODULARITY;
     params.remedy = REMEDY_MODULARITY;
 
     /* Build the message we'll use for errors */
@@ -93,7 +93,7 @@ bool inspect_modularity(struct rpminspect *ri) {
         init_result_params(&params);
         params.severity = RESULT_OK;
         params.waiverauth = WAIVABLE_BY_ANYONE;
-        params.header = HEADER_MODULARITY;
+        params.header = NAME_MODULARITY;
         add_result(ri, &params);
     }
 

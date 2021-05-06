@@ -89,7 +89,7 @@ static bool removedfiles_driver(struct rpminspect *ri, rpmfile_entry_t *file)
 
     /* Set up result parameters */
     init_result_params(&params);
-    params.header = HEADER_REMOVEDFILES;
+    params.header = NAME_REMOVEDFILES;
     params.arch = arch;
     params.file = file->localpath;
 
@@ -190,7 +190,7 @@ bool inspect_removedfiles(struct rpminspect *ri)
         init_result_params(&params);
         params.severity = RESULT_OK;
         params.waiverauth = NOT_WAIVABLE;
-        params.header = HEADER_REMOVEDFILES;
+        params.header = NAME_REMOVEDFILES;
         add_result(ri, &params);
     }
 

@@ -211,7 +211,7 @@ static bool abidiff_driver(struct rpminspect *ri, rpmfile_entry_t *file) {
 
     /* report the results */
     init_result_params(&params);
-    params.header = HEADER_ABIDIFF;
+    params.header = NAME_ABIDIFF;
     params.waiverauth = WAIVABLE_BY_ANYONE;
     params.remedy = REMEDY_ABIDIFF;
     params.arch = arch;
@@ -351,7 +351,7 @@ bool inspect_abidiff(struct rpminspect *ri) {
     if (result) {
         init_result_params(&params);
         params.waiverauth = NOT_WAIVABLE;
-        params.header = HEADER_ABIDIFF;
+        params.header = NAME_ABIDIFF;
         params.severity = RESULT_OK;
         add_result(ri, &params);
     }

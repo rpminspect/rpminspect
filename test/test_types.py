@@ -31,7 +31,6 @@ class SameTypeCompareSRPM(TestCompareSRPM):
         self.after_rpm.add_simple_compilation(installPath="/usr/bin/rpminspect")
 
         self.inspection = "types"
-        self.label = "types"
         self.result = "OK"
 
 
@@ -42,7 +41,6 @@ class SameTypeCompareRPMs(TestCompareRPMs):
         self.after_rpm.add_simple_compilation(installPath="/usr/bin/rpminspect")
 
         self.inspection = "types"
-        self.label = "types"
         self.result = "OK"
 
 
@@ -53,7 +51,6 @@ class SameTypeCompareKoji(TestCompareKoji):
         self.after_rpm.add_simple_compilation(installPath="/usr/bin/rpminspect")
 
         self.inspection = "types"
-        self.label = "types"
         self.result = "OK"
 
 
@@ -70,7 +67,6 @@ class ChangedTypeCompareSRPM(TestCompareSRPM):
         )
 
         self.inspection = "types"
-        self.label = "types"
         self.result = "VERIFY"
         self.waiver_auth = "Anyone"
 
@@ -88,7 +84,6 @@ class ChangedTypeCompareRPMs(TestCompareRPMs):
         )
 
         self.inspection = "types"
-        self.label = "types"
         self.result = "VERIFY"
         self.waiver_auth = "Anyone"
 
@@ -106,6 +101,5 @@ class ChangedTypeCompareKoji(TestCompareKoji):
         )
 
         self.inspection = "types"
-        self.label = "types"
         self.result = "VERIFY"
         self.waiver_auth = "Anyone"
