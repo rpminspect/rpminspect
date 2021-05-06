@@ -70,7 +70,7 @@ static bool filesize_driver(struct rpminspect *ri, rpmfile_entry_t *file)
     init_result_params(&params);
     params.severity = RESULT_INFO;
     params.waiverauth = NOT_WAIVABLE;
-    params.header = HEADER_FILESIZE;
+    params.header = NAME_FILESIZE;
     params.arch = arch;
     params.file = file->localpath;
 
@@ -146,7 +146,7 @@ bool inspect_filesize(struct rpminspect *ri) {
         init_result_params(&params);
         params.severity = RESULT_OK;
         params.waiverauth = NOT_WAIVABLE;
-        params.header = HEADER_FILESIZE;
+        params.header = NAME_FILESIZE;
         add_result(ri, &params);
     }
 

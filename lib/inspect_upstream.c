@@ -135,7 +135,7 @@ bool inspect_upstream(struct rpminspect *ri)
     assert(ri != NULL);
 
     init_result_params(&params);
-    params.header = HEADER_UPSTREAM;
+    params.header = NAME_UPSTREAM;
 
     /* Check for source package */
     TAILQ_FOREACH(peer, ri->peers, items) {

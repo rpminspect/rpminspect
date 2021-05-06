@@ -48,7 +48,7 @@ static bool valid_peers(struct rpminspect *ri, const Header before_hdr, const He
 
     /* Set up result parameters */
     init_result_params(&params);
-    params.header = HEADER_METADATA;
+    params.header = NAME_METADATA;
 
     after_vendor = headerGetString(after_hdr, RPMTAG_VENDOR);
     if (ri->vendor == NULL) {
@@ -207,7 +207,7 @@ bool inspect_metadata(struct rpminspect *ri) {
         init_result_params(&params);
         params.severity = RESULT_OK;
         params.waiverauth = NOT_WAIVABLE;
-        params.header = HEADER_METADATA;
+        params.header = NAME_METADATA;
         add_result(ri, &params);
     }
 

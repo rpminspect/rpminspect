@@ -70,7 +70,7 @@ bool inspect_subpackages(struct rpminspect *ri) {
 
     /* Set up result parameters */
     init_result_params(&params);
-    params.header = HEADER_SUBPACKAGES;
+    params.header = NAME_SUBPACKAGES;
 
     /* Report results */
     if (lost != NULL && !TAILQ_EMPTY(lost)) {

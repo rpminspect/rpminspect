@@ -457,7 +457,7 @@ static bool inspect_elf_execstack(struct rpminspect *ri, Elf *after_elf, Elf *be
     /* Set up result parameters */
     init_result_params(&params);
     params.waiverauth = WAIVABLE_BY_SECURITY;
-    params.header = HEADER_ELF;
+    params.header = NAME_ELF;
     params.arch = arch;
     params.file = localpath;
 
@@ -599,7 +599,7 @@ static bool check_relro(struct rpminspect *ri, Elf *before_elf, Elf *after_elf, 
     if (params.msg != NULL) {
         params.severity = RESULT_BAD;
         params.waiverauth = WAIVABLE_BY_SECURITY;
-        params.header = HEADER_ELF;
+        params.header = NAME_ELF;
         params.remedy = REMEDY_ELF_GNU_RELRO;
         params.arch = arch;
         params.file = localpath;
@@ -714,7 +714,7 @@ static bool check_fortified(struct rpminspect *ri, Elf *before_elf, Elf *after_e
 
     init_result_params(&params);
     xasprintf(&params.msg, _("%s may have lost -D_FORTIFY_SOURCE on %s"), localpath, arch);
-    params.header = HEADER_ELF;
+    params.header = NAME_ELF;
     params.severity = RESULT_VERIFY;
     params.waiverauth = WAIVABLE_BY_SECURITY;
     params.details = output_buffer;
@@ -938,7 +938,7 @@ static bool elf_archive_tests(struct rpminspect *ri, Elf *after_elf, int after_e
         xasprintf(&params.msg, _("%s in %s has objects built without -fPIC on %s"), localpath, name, arch);
         params.severity = RESULT_BAD;
         params.waiverauth = WAIVABLE_BY_SECURITY;
-        params.header = HEADER_ELF;
+        params.header = NAME_ELF;
         params.remedy = REMEDY_ELF_FPIC;
         params.details = screendump;
         params.arch = arch;
@@ -968,7 +968,7 @@ static bool elf_regular_tests(struct rpminspect *ri, Elf *after_elf, Elf *before
 
     init_result_params(&params);
     params.severity = RESULT_BAD;
-    params.header = HEADER_ELF;
+    params.header = NAME_ELF;
     params.waiverauth = WAIVABLE_BY_SECURITY;
     params.remedy = REMEDY_ELF_TEXTREL;
     params.arch = arch;
@@ -1097,7 +1097,7 @@ bool inspect_elf(struct rpminspect *ri)
         init_result_params(&params);
         params.severity = RESULT_OK;
         params.waiverauth = NOT_WAIVABLE;
-        params.header = HEADER_ELF;
+        params.header = NAME_ELF;
         add_result(ri, &params);
     }
 

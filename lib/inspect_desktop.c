@@ -188,7 +188,7 @@ static bool validate_desktop_contents(struct rpminspect *ri, const rpmfile_entry
     init_result_params(&params);
     params.severity = RESULT_VERIFY;
     params.waiverauth = WAIVABLE_BY_ANYONE;
-    params.header = HEADER_DESKTOP;
+    params.header = NAME_DESKTOP;
     params.remedy = REMEDY_DESKTOP;
     params.arch = arch;
     params.file = file->localpath;
@@ -359,7 +359,7 @@ static bool desktop_driver(struct rpminspect *ri, rpmfile_entry_t *file)
         params.waiverauth = WAIVABLE_BY_ANYONE;
     }
 
-    params.header = HEADER_DESKTOP;
+    params.header = NAME_DESKTOP;
     params.remedy = REMEDY_DESKTOP;
     params.arch = arch;
     params.file = file->localpath;
@@ -413,7 +413,7 @@ bool inspect_desktop(struct rpminspect *ri)
         init_result_params(&params);
         params.severity = RESULT_OK;
         params.waiverauth = NOT_WAIVABLE;
-        params.header = HEADER_DESKTOP;
+        params.header = NAME_DESKTOP;
         add_result(ri, &params);
     }
 

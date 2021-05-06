@@ -132,7 +132,7 @@ static bool shellsyntax_driver(struct rpminspect *ri, rpmfile_entry_t *file)
 
     /* Set up the result parameters */
     init_result_params(&params);
-    params.header = HEADER_SHELLSYNTAX;
+    params.header = NAME_SHELLSYNTAX;
     params.arch = arch;
     params.file = file->localpath;
 
@@ -251,7 +251,7 @@ bool inspect_shellsyntax(struct rpminspect *ri) {
         init_result_params(&params);
         params.severity = RESULT_OK;
         params.waiverauth = NOT_WAIVABLE;
-        params.header = HEADER_SHELLSYNTAX;
+        params.header = NAME_SHELLSYNTAX;
         add_result(ri, &params);
     }
 

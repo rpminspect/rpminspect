@@ -156,7 +156,7 @@ static bool changedfiles_driver(struct rpminspect *ri, rpmfile_entry_t *file)
     init_result_params(&params);
     params.severity = RESULT_INFO;
     params.waiverauth = NOT_WAIVABLE;
-    params.header = HEADER_CHANGEDFILES;
+    params.header = NAME_CHANGEDFILES;
     params.arch = arch;
     params.file = file->localpath;
 
@@ -234,8 +234,8 @@ static bool changedfiles_driver(struct rpminspect *ri, rpmfile_entry_t *file)
                                                        strsuffix(file->localpath, ".bz2") ||
                                                        strsuffix(file->localpath, ".xz")))) {
         /* uncompress the files to temporary files for comparison */
-        before_uncompressed_file = uncompress_file(ri, file->peer_file->fullpath, HEADER_CHANGEDFILES);
-        after_uncompressed_file = uncompress_file(ri, file->fullpath, HEADER_CHANGEDFILES);
+        before_uncompressed_file = uncompress_file(ri, file->peer_file->fullpath, NAME_CHANGEDFILES);
+        after_uncompressed_file = uncompress_file(ri, file->fullpath, NAME_CHANGEDFILES);
 
         /* we may not have been able to uncompress */
         if (before_uncompressed_file == NULL || after_uncompressed_file == NULL) {
@@ -478,7 +478,7 @@ bool inspect_changedfiles(struct rpminspect *ri)
         init_result_params(&params);
         params.severity = RESULT_OK;
         params.waiverauth = NOT_WAIVABLE;
-        params.header = HEADER_CHANGEDFILES;
+        params.header = NAME_CHANGEDFILES;
         add_result(ri, &params);
     }
 

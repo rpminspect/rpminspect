@@ -451,7 +451,7 @@ bool inspect_license(struct rpminspect *ri)
     assert(ri->peers != NULL);
 
     init_result_params(&params);
-    params.header = HEADER_LICENSE;
+    params.header = NAME_LICENSE;
     params.waiverauth = NOT_WAIVABLE;
 
     xasprintf(&actual_licensedb, "%s/%s/%s", ri->vendor_data_dir, LICENSES_DIR, ri->licensedb);

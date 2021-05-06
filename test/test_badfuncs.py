@@ -31,7 +31,6 @@ class ForbiddenIPv6FunctionRPM(TestRPMs):
         TestRPMs.setUp(self)
         self.rpm.add_simple_compilation(sourceContent=forbidden_ipv6_src)
         self.inspection = "badfuncs"
-        self.label = "bad-functions"
         self.waiver_auth = "Anyone"
         self.result = "VERIFY"
 
@@ -41,7 +40,6 @@ class ForbiddenIPv6FunctionKoji(TestKoji):
         TestKoji.setUp(self)
         self.rpm.add_simple_compilation(sourceContent=forbidden_ipv6_src)
         self.inspection = "badfuncs"
-        self.label = "bad-functions"
         self.waiver_auth = "Anyone"
         self.result = "VERIFY"
 
@@ -52,7 +50,6 @@ class ForbiddenIPv6FunctionCompareRPMs(TestCompareRPMs):
         self.before_rpm.add_simple_compilation(sourceContent=forbidden_ipv6_src)
         self.after_rpm.add_simple_compilation(sourceContent=forbidden_ipv6_src)
         self.inspection = "badfuncs"
-        self.label = "bad-functions"
         self.waiver_auth = "Anyone"
         self.result = "VERIFY"
 
@@ -63,6 +60,5 @@ class ForbiddenIPv6FunctionCompareKoji(TestCompareKoji):
         self.before_rpm.add_simple_compilation(sourceContent=forbidden_ipv6_src)
         self.after_rpm.add_simple_compilation(sourceContent=forbidden_ipv6_src)
         self.inspection = "badfuncs"
-        self.label = "bad-functions"
         self.waiver_auth = "Anyone"
         self.result = "VERIFY"

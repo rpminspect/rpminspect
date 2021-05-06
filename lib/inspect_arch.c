@@ -52,7 +52,7 @@ bool inspect_arch(struct rpminspect *ri) {
 
     init_result_params(&params);
     params.waiverauth = WAIVABLE_BY_ANYONE;
-    params.header = HEADER_ARCH;
+    params.header = NAME_ARCH;
 
     /* Gather up all the architectures */
     TAILQ_FOREACH(peer, ri->peers, items) {

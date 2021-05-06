@@ -43,7 +43,7 @@ static bool movedfiles_driver(struct rpminspect *ri, rpmfile_entry_t *file) {
     rebase = is_rebase(ri);
 
     init_result_params(&params);
-    params.header = HEADER_MOVEDFILES;
+    params.header = NAME_MOVEDFILES;
 
     if (rebase) {
         params.severity = RESULT_INFO;
@@ -72,7 +72,7 @@ bool inspect_movedfiles(struct rpminspect *ri) {
 
     init_result_params(&params);
     params.waiverauth = NOT_WAIVABLE;
-    params.header = HEADER_MOVEDFILES;
+    params.header = NAME_MOVEDFILES;
 
     if (result) {
         params.severity = RESULT_OK;

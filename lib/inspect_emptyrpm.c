@@ -64,7 +64,7 @@ bool inspect_emptyrpm(struct rpminspect *ri) {
     assert(ri->peers != NULL);
 
     init_result_params(&params);
-    params.header = HEADER_EMPTYRPM;
+    params.header = NAME_EMPTYRPM;
 
     /*
      * The emptyrpm inspection looks for any packages missing

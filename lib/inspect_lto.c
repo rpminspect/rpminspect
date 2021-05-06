@@ -145,7 +145,7 @@ static bool lto_driver(struct rpminspect *ri, rpmfile_entry_t *file) {
     init_result_params(&params);
     params.severity = RESULT_BAD;
     params.waiverauth = NOT_WAIVABLE;
-    params.header = HEADER_LTO;
+    params.header = NAME_LTO;
     params.remedy = REMEDY_LTO;
     params.verb = VERB_FAILED;
     params.arch = arch;
@@ -218,7 +218,7 @@ bool inspect_lto(struct rpminspect *ri) {
     if (result) {
         init_result_params(&params);
         params.waiverauth = NOT_WAIVABLE;
-        params.header = HEADER_LTO;
+        params.header = NAME_LTO;
         params.severity = RESULT_OK;
         add_result(ri, &params);
     }

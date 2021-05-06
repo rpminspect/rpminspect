@@ -152,7 +152,6 @@ class GoodKmodParamsRPMs(TestCompareRPMs):
         )
 
         self.inspection = "kmod"
-        self.label = "kernel-modules"
         self.result = "OK"
         self.waiver_auth = "Not Waivable"
 
@@ -173,7 +172,6 @@ class LostKmodParmsRPMs(TestCompareRPMs):
         )
 
         self.inspection = "kmod"
-        self.label = "kernel-modules"
         self.result = "VERIFY"
         self.waiver_auth = "Anyone"
 
@@ -194,7 +192,6 @@ class GoodKmodParamsKoji(TestCompareKoji):
         )
 
         self.inspection = "kmod"
-        self.label = "kernel-modules"
         self.result = "OK"
         self.waiver_auth = "Not Waivable"
 
@@ -215,7 +212,6 @@ class LostKmodParamsKoji(TestCompareKoji):
         )
 
         self.inspection = "kmod"
-        self.label = "kernel-modules"
         self.result = "VERIFY"
         self.waiver_auth = "Anyone"
 
@@ -240,7 +236,6 @@ class GoodKmodDependsRPMs(TestCompareRPMs):
         )
 
         self.inspection = "kmod"
-        self.label = "kernel-modules"
         self.result = "OK"
         self.waiver_auth = "Not Waivable"
 
@@ -261,7 +256,6 @@ class LostKmodDependsRPMs(TestCompareRPMs):
         )
 
         self.inspection = "kmod"
-        self.label = "kernel-modules"
         self.result = "VERIFY"
         self.waiver_auth = "Anyone"
 
@@ -282,7 +276,6 @@ class GoodKmodDependsKoji(TestCompareKoji):
         )
 
         self.inspection = "kmod"
-        self.label = "kernel-modules"
         self.result = "OK"
         self.waiver_auth = "Not Waivable"
 
@@ -303,7 +296,6 @@ class LostKmodDependsKoji(TestCompareKoji):
         )
 
         self.inspection = "kmod"
-        self.label = "kernel-modules"
         self.result = "VERIFY"
         self.waiver_auth = "Anyone"
 
@@ -328,7 +320,6 @@ class GoodKmodAliasesRPMs(TestCompareRPMs):
         )
 
         self.inspection = "kmod"
-        self.label = "kernel-modules"
         self.result = "OK"
         self.waiver_auth = "Not Waivable"
 
@@ -349,7 +340,6 @@ class LostKmodAliasesRPMs(TestCompareRPMs):
         )
 
         self.inspection = "kmod"
-        self.label = "kernel-modules"
         self.result = "VERIFY"
         self.waiver_auth = "Anyone"
 
@@ -370,7 +360,6 @@ class GoodKmodAliasesKoji(TestCompareKoji):
         )
 
         self.inspection = "kmod"
-        self.label = "kernel-modules"
         self.result = "OK"
         self.waiver_auth = "Not Waivable"
 
@@ -391,7 +380,6 @@ class LostKmodAliasesKoji(TestCompareKoji):
         )
 
         self.inspection = "kmod"
-        self.label = "kernel-modules"
         self.result = "VERIFY"
         self.waiver_auth = "Anyone"
 
@@ -412,7 +400,6 @@ class KmodChangingPathCompareRPMs(TestCompareRPMs):
         )
 
         self.inspection = "kmod"
-        self.label = "kernel-modules"
         self.result = "OK"
         self.waiver_auth = "Not Waivable"
 
@@ -432,6 +419,5 @@ class KmodChangingPathCompareKoji(TestCompareKoji):
         )
 
         self.inspection = "kmod"
-        self.label = "kernel-modules"
         self.result = "OK"
         self.waiver_auth = "Not Waivable"

@@ -43,7 +43,6 @@ class LostChangeLogCompareSRPM(TestCompareSRPM):
         self.after_rpm.section_changelog = None
 
         self.inspection = "changelog"
-        self.label = "changelog"
         self.result = "VERIFY"
         self.waiver_auth = "Anyone"
 
@@ -64,7 +63,6 @@ class LostChangeLogCompareRPMs(TestCompareRPMs):
         self.after_rpm.section_changelog = None
 
         self.inspection = "changelog"
-        self.label = "changelog"
         # this is INFO because it's only comapring the binary RPMs,
         # the other checks are for SRPMs
         self.result = "INFO"
@@ -87,7 +85,6 @@ class LostChangeLogCompareKoji(TestCompareKoji):
         self.after_rpm.section_changelog = None
 
         self.inspection = "changelog"
-        self.label = "changelog"
         self.result = "VERIFY"
         self.waiver_auth = "Anyone"
 
@@ -110,7 +107,6 @@ class GainedChangeLogCompareSRPM(TestCompareSRPM):
         self.after_rpm.section_changelog = clog
 
         self.inspection = "changelog"
-        self.label = "changelog"
         self.result = "INFO"
         self.waiver_auth = "Not Waivable"
 
@@ -131,7 +127,6 @@ class GainedChangeLogCompareRPMs(TestCompareRPMs):
         self.after_rpm.section_changelog = clog
 
         self.inspection = "changelog"
-        self.label = "changelog"
         self.result = "INFO"
         self.waiver_auth = "Not Waivable"
 
@@ -152,7 +147,6 @@ class GainedChangeLogCompareKoji(TestCompareKoji):
         self.after_rpm.section_changelog = clog
 
         self.inspection = "changelog"
-        self.label = "changelog"
         self.result = "INFO"
         self.waiver_auth = "Not Waivable"
 
@@ -175,7 +169,6 @@ class SameChangeLogCompareSRPM(TestCompareSRPM):
         self.after_rpm.section_changelog = clog
 
         self.inspection = "changelog"
-        self.label = "changelog"
         self.result = "BAD"
         self.waiver_auth = "Anyone"
 
@@ -196,7 +189,6 @@ class SameChangeLogCompareKoji(TestCompareKoji):
         self.after_rpm.section_changelog = clog
 
         self.inspection = "changelog"
-        self.label = "changelog"
         self.result = "BAD"
         self.waiver_auth = "Anyone"
 
@@ -228,7 +220,6 @@ class BalancedChangeLogEditCompareKoji(TestCompareKoji):
         self.after_rpm.section_changelog = after_prefix + suffix
 
         self.inspection = "changelog"
-        self.label = "changelog"
         self.result = "INFO"
         self.waiver_auth = "Not Waivable"
 
@@ -257,7 +248,6 @@ class UnbalancedChangeLogEditCompareKoji(TestCompareKoji):
         self.after_rpm.section_changelog = prefix + suffix
 
         self.inspection = "changelog"
-        self.label = "changelog"
         self.result = "INFO"
         self.waiver_auth = "Not Waivable"
 
@@ -290,7 +280,6 @@ class AddChangeLogEntryCompareSRPM(TestCompareSRPM):
         # We want to check here for OK anyway because any other return
         # indicates a failure in the SRPM only changelog inspection.
         self.inspection = "changelog"
-        self.label = "changelog"
         self.result = "OK"
         self.waiver_auth = "Not Waivable"
 
@@ -315,7 +304,6 @@ class AddChangeLogEntryCompareRPMs(TestCompareRPMs):
         self.after_rpm.section_changelog = after_prefix + suffix
 
         self.inspection = "changelog"
-        self.label = "changelog"
         self.result = "INFO"
         self.waiver_auth = "Not Waivable"
 
@@ -340,7 +328,6 @@ class AddChangeLogEntryCompareKoji(TestCompareKoji):
         self.after_rpm.section_changelog = after_prefix + suffix
 
         self.inspection = "changelog"
-        self.label = "changelog"
         self.result = "INFO"
         self.waiver_auth = "Not Waivable"
 
@@ -367,6 +354,5 @@ class UnprofessinalChangeLogEntryCompareKoji(TestCompareKoji):
         self.after_rpm.section_changelog = after_prefix + suffix
 
         self.inspection = "changelog"
-        self.label = "changelog"
         self.result = "BAD"
         self.waiver_auth = "Not Waivable"

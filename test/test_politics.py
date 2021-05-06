@@ -37,7 +37,6 @@ class AllowedPoliticallySensitiveFileSRPM(TestSRPM):
         )
 
         self.inspection = "politics"
-        self.label = "politics"
         self.result = "INFO"
         self.waiver_auth = "Not Waivable"
 
@@ -52,7 +51,6 @@ class AllowedPoliticallySensitiveFileRPMs(TestRPMs):
         )
 
         self.inspection = "politics"
-        self.label = "politics"
         self.result = "INFO"
         self.waiver_auth = "Not Waivable"
 
@@ -67,7 +65,6 @@ class AllowedPoliticallySensitiveFileKoji(TestKoji):
         )
 
         self.inspection = "politics"
-        self.label = "politics"
         self.result = "INFO"
         self.waiver_auth = "Not Waivable"
 
@@ -82,7 +79,6 @@ class AllowedPoliticallySensitiveFileCompareSRPM(TestCompareSRPM):
         )
 
         self.inspection = "politics"
-        self.label = "politics"
         self.result = "INFO"
         self.waiver_auth = "Not Waivable"
 
@@ -97,7 +93,6 @@ class AllowedPoliticallySensitiveFileCompareRPMs(TestCompareRPMs):
         )
 
         self.inspection = "politics"
-        self.label = "politics"
         self.result = "INFO"
         self.waiver_auth = "Not Waivable"
 
@@ -112,7 +107,6 @@ class AllowedPoliticallySensitiveFileCompareKoji(TestCompareKoji):
         )
 
         self.inspection = "politics"
-        self.label = "politics"
         self.result = "INFO"
         self.waiver_auth = "Not Waivable"
 
@@ -128,7 +122,6 @@ class ForbiddenPoliticallySensitiveFileSRPM(TestSRPM):
         )
 
         self.inspection = "politics"
-        self.label = "politics"
         self.result = "BAD"
         self.waiver_auth = "Not Waivable"
 
@@ -143,7 +136,6 @@ class ForbiddenPoliticallySensitiveFileRPMs(TestRPMs):
         )
 
         self.inspection = "politics"
-        self.label = "politics"
         self.result = "BAD"
         self.waiver_auth = "Not Waivable"
 
@@ -158,7 +150,6 @@ class ForbiddenPoliticallySensitiveFileKoji(TestKoji):
         )
 
         self.inspection = "politics"
-        self.label = "politics"
         self.result = "BAD"
         self.waiver_auth = "Not Waivable"
 
@@ -173,7 +164,6 @@ class ForbiddenPoliticallySensitiveFileCompareSRPM(TestCompareSRPM):
         )
 
         self.inspection = "politics"
-        self.label = "politics"
         self.result = "BAD"
         self.waiver_auth = "Not Waivable"
 
@@ -188,7 +178,6 @@ class ForbiddenPoliticallySensitiveFileCompareRPMs(TestCompareRPMs):
         )
 
         self.inspection = "politics"
-        self.label = "politics"
         self.result = "BAD"
         self.waiver_auth = "Not Waivable"
 
@@ -203,6 +192,5 @@ class ForbiddenPoliticallySensitiveFileCompareKoji(TestCompareKoji):
         )
 
         self.inspection = "politics"
-        self.label = "politics"
         self.result = "BAD"
         self.waiver_auth = "Not Waivable"

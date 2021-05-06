@@ -49,7 +49,6 @@ class SlashBinOwnedByRootRPMs(TestRPMs):
         )
 
         self.inspection = "ownership"
-        self.label = "ownership"
         self.result = "OK"
 
 
@@ -70,7 +69,6 @@ class SlashSbinOwnedByRootRPMs(TestRPMs):
         )
 
         self.inspection = "ownership"
-        self.label = "ownership"
         self.result = "OK"
 
 
@@ -91,7 +89,6 @@ class SlashUsrSlashBinOwnedByRootRPMs(TestRPMs):
         )
 
         self.inspection = "ownership"
-        self.label = "ownership"
         self.result = "OK"
 
 
@@ -112,7 +109,6 @@ class SlashUsrSlashSbinOwnedByRootRPMs(TestRPMs):
         )
 
         self.inspection = "ownership"
-        self.label = "ownership"
         self.result = "OK"
 
 
@@ -133,7 +129,6 @@ class SlashBinOwnedByBinRPMs(TestRPMs):
         )
 
         self.inspection = "ownership"
-        self.label = "ownership"
         self.result = "BAD"
         self.waiver_auth = "Anyone"
 
@@ -155,7 +150,6 @@ class SlashSbinOwnedByBinRPMs(TestRPMs):
         )
 
         self.inspection = "ownership"
-        self.label = "ownership"
         self.result = "BAD"
         self.waiver_auth = "Anyone"
 
@@ -177,7 +171,6 @@ class SlashUsrSlashBinOwnedByBinRPMs(TestRPMs):
         )
 
         self.inspection = "ownership"
-        self.label = "ownership"
         self.result = "BAD"
         self.waiver_auth = "Anyone"
 
@@ -199,7 +192,6 @@ class SlashUsrSlashSbinOwnedByBinRPMs(TestRPMs):
         )
 
         self.inspection = "ownership"
-        self.label = "ownership"
         self.result = "BAD"
         self.waiver_auth = "Anyone"
 
@@ -221,7 +213,6 @@ class SlashBinOwnedByRootKoji(TestKoji):
         )
 
         self.inspection = "ownership"
-        self.label = "ownership"
         self.result = "OK"
 
 
@@ -242,7 +233,6 @@ class SlashSbinOwnedByRootKoji(TestKoji):
         )
 
         self.inspection = "ownership"
-        self.label = "ownership"
         self.result = "OK"
 
 
@@ -263,7 +253,6 @@ class SlashUsrSlashBinOwnedByRootKoji(TestKoji):
         )
 
         self.inspection = "ownership"
-        self.label = "ownership"
         self.result = "OK"
 
 
@@ -284,7 +273,6 @@ class SlashUsrSlashSbinOwnedByRootKoji(TestKoji):
         )
 
         self.inspection = "ownership"
-        self.label = "ownership"
         self.result = "OK"
 
 
@@ -305,7 +293,6 @@ class SlashBinOwnedByBinKoji(TestKoji):
         )
 
         self.inspection = "ownership"
-        self.label = "ownership"
         self.result = "BAD"
         self.waiver_auth = "Anyone"
 
@@ -327,7 +314,6 @@ class SlashSbinOwnedByBinKoji(TestKoji):
         )
 
         self.inspection = "ownership"
-        self.label = "ownership"
         self.result = "BAD"
         self.waiver_auth = "Anyone"
 
@@ -349,7 +335,6 @@ class SlashUsrSlashBinOwnedByBinKoji(TestKoji):
         )
 
         self.inspection = "ownership"
-        self.label = "ownership"
         self.result = "BAD"
         self.waiver_auth = "Anyone"
 
@@ -371,7 +356,6 @@ class SlashUsrSlashSbinOwnedByBinKoji(TestKoji):
         )
 
         self.inspection = "ownership"
-        self.label = "ownership"
         self.result = "BAD"
         self.waiver_auth = "Anyone"
 
@@ -393,7 +377,6 @@ class SlashBinOwnedByRootCompareRPMs(TestCompareRPMs):
         )
 
         self.inspection = "ownership"
-        self.label = "ownership"
         self.result = "OK"
 
 
@@ -414,7 +397,6 @@ class SlashSbinOwnedByRootCompareRPMs(TestCompareRPMs):
         )
 
         self.inspection = "ownership"
-        self.label = "ownership"
         self.result = "OK"
 
 
@@ -435,7 +417,6 @@ class SlashUsrSlashBinOwnedByRootCompareRPMs(TestCompareRPMs):
         )
 
         self.inspection = "ownership"
-        self.label = "ownership"
         self.result = "OK"
 
 
@@ -456,7 +437,6 @@ class SlashUsrSlashSbinOwnedByRootCompareRPMs(TestCompareRPMs):
         )
 
         self.inspection = "ownership"
-        self.label = "ownership"
         self.result = "OK"
 
 
@@ -477,7 +457,6 @@ class SlashBinOwnedByBinCompareRPMs(TestCompareRPMs):
         )
 
         self.inspection = "ownership"
-        self.label = "ownership"
         self.result = "BAD"
         self.waiver_auth = "Anyone"
 
@@ -499,7 +478,6 @@ class SlashSbinOwnedByBinCompareRPMs(TestCompareRPMs):
         )
 
         self.inspection = "ownership"
-        self.label = "ownership"
         self.result = "BAD"
         self.waiver_auth = "Anyone"
 
@@ -521,7 +499,6 @@ class SlashUsrSlashBinOwnedByBinCompareRPMs(TestCompareRPMs):
         )
 
         self.inspection = "ownership"
-        self.label = "ownership"
         self.result = "BAD"
         self.waiver_auth = "Anyone"
 
@@ -543,7 +520,6 @@ class SlashUsrSlashSbinOwnedByBinCompareRPMs(TestCompareRPMs):
         )
 
         self.inspection = "ownership"
-        self.label = "ownership"
         self.result = "BAD"
         self.waiver_auth = "Anyone"
 
@@ -565,7 +541,6 @@ class SlashBinOwnedByRootCompareKoji(TestCompareKoji):
         )
 
         self.inspection = "ownership"
-        self.label = "ownership"
         self.result = "OK"
 
 
@@ -586,7 +561,6 @@ class SlashSbinOwnedByRootCompareKoji(TestCompareKoji):
         )
 
         self.inspection = "ownership"
-        self.label = "ownership"
         self.result = "OK"
 
 
@@ -607,7 +581,6 @@ class SlashUsrSlashBinOwnedByRootCompareKoji(TestCompareKoji):
         )
 
         self.inspection = "ownership"
-        self.label = "ownership"
         self.result = "OK"
 
 
@@ -628,7 +601,6 @@ class SlashUsrSlashSbinOwnedByRootCompareKoji(TestCompareKoji):
         )
 
         self.inspection = "ownership"
-        self.label = "ownership"
         self.result = "OK"
 
 
@@ -649,7 +621,6 @@ class SlashBinOwnedByBinCompareKoji(TestCompareKoji):
         )
 
         self.inspection = "ownership"
-        self.label = "ownership"
         self.result = "BAD"
         self.waiver_auth = "Anyone"
 
@@ -671,7 +642,6 @@ class SlashSbinOwnedByBinCompareKoji(TestCompareKoji):
         )
 
         self.inspection = "ownership"
-        self.label = "ownership"
         self.result = "BAD"
         self.waiver_auth = "Anyone"
 
@@ -693,7 +663,6 @@ class SlashUsrSlashBinOwnedByBinCompareKoji(TestCompareKoji):
         )
 
         self.inspection = "ownership"
-        self.label = "ownership"
         self.result = "BAD"
         self.waiver_auth = "Anyone"
 
@@ -715,7 +684,6 @@ class SlashUsrSlashSbinOwnedByBinCompareKoji(TestCompareKoji):
         )
 
         self.inspection = "ownership"
-        self.label = "ownership"
         self.result = "BAD"
         self.waiver_auth = "Anyone"
 
@@ -742,7 +710,6 @@ class SlashBinOwnedByGroupRootRPMs(TestRPMs):
         )
 
         self.inspection = "ownership"
-        self.label = "ownership"
         self.result = "OK"
 
 
@@ -763,7 +730,6 @@ class SlashSbinOwnedByGroupRootRPMs(TestRPMs):
         )
 
         self.inspection = "ownership"
-        self.label = "ownership"
         self.result = "OK"
 
 
@@ -784,7 +750,6 @@ class SlashUsrSlashBinOwnedByGroupRootRPMs(TestRPMs):
         )
 
         self.inspection = "ownership"
-        self.label = "ownership"
         self.result = "OK"
 
 
@@ -805,7 +770,6 @@ class SlashUsrSlashSbinOwnedByGroupRootRPMs(TestRPMs):
         )
 
         self.inspection = "ownership"
-        self.label = "ownership"
         self.result = "OK"
 
 
@@ -826,7 +790,6 @@ class SlashBinOwnedByGroupBinRPMs(TestRPMs):
         )
 
         self.inspection = "ownership"
-        self.label = "ownership"
         self.result = "BAD"
         self.waiver_auth = "Anyone"
 
@@ -848,7 +811,6 @@ class SlashSbinOwnedByGroupBinRPMs(TestRPMs):
         )
 
         self.inspection = "ownership"
-        self.label = "ownership"
         self.result = "BAD"
         self.waiver_auth = "Anyone"
 
@@ -870,7 +832,6 @@ class SlashiUsrSlashBinOwnedByGroupBinRPMs(TestRPMs):
         )
 
         self.inspection = "ownership"
-        self.label = "ownership"
         self.result = "BAD"
         self.waiver_auth = "Anyone"
 
@@ -892,7 +853,6 @@ class SlashUsrSlashSbinOwnedByGroupBinRPMs(TestRPMs):
         )
 
         self.inspection = "ownership"
-        self.label = "ownership"
         self.result = "BAD"
         self.waiver_auth = "Anyone"
 
@@ -914,7 +874,6 @@ class SlashBinOwnedByGroupRootKoji(TestKoji):
         )
 
         self.inspection = "ownership"
-        self.label = "ownership"
         self.result = "OK"
 
 
@@ -935,7 +894,6 @@ class SlashSbinOwnedByGroupRootKoji(TestKoji):
         )
 
         self.inspection = "ownership"
-        self.label = "ownership"
         self.result = "OK"
 
 
@@ -956,7 +914,6 @@ class SlashUsrSlashBinOwnedByGroupRootKoji(TestKoji):
         )
 
         self.inspection = "ownership"
-        self.label = "ownership"
         self.result = "OK"
 
 
@@ -977,7 +934,6 @@ class SlashUsrSlashSbinOwnedByGroupRootKoji(TestKoji):
         )
 
         self.inspection = "ownership"
-        self.label = "ownership"
         self.result = "OK"
 
 
@@ -998,7 +954,6 @@ class SlashBinOwnedByGroupBinKoji(TestKoji):
         )
 
         self.inspection = "ownership"
-        self.label = "ownership"
         self.result = "BAD"
         self.waiver_auth = "Anyone"
 
@@ -1020,7 +975,6 @@ class SlashSbinOwnedByGroupBinKoji(TestKoji):
         )
 
         self.inspection = "ownership"
-        self.label = "ownership"
         self.result = "BAD"
         self.waiver_auth = "Anyone"
 
@@ -1042,7 +996,6 @@ class SlashUsrSlashBinOwnedByGroupBinKoji(TestKoji):
         )
 
         self.inspection = "ownership"
-        self.label = "ownership"
         self.result = "BAD"
         self.waiver_auth = "Anyone"
 
@@ -1064,7 +1017,6 @@ class SlashUsrSlashSbinOwnedByGroupBinKoji(TestKoji):
         )
 
         self.inspection = "ownership"
-        self.label = "ownership"
         self.result = "BAD"
         self.waiver_auth = "Anyone"
 
@@ -1086,7 +1038,6 @@ class SlashBinOwnedByGroupRootCompareRPMs(TestCompareRPMs):
         )
 
         self.inspection = "ownership"
-        self.label = "ownership"
         self.result = "OK"
 
 
@@ -1107,7 +1058,6 @@ class SlashSbinOwnedByGroupRootCompareRPMs(TestCompareRPMs):
         )
 
         self.inspection = "ownership"
-        self.label = "ownership"
         self.result = "OK"
 
 
@@ -1128,7 +1078,6 @@ class SlashUsrSlashBinOwnedByGroupRootCompareRPMs(TestCompareRPMs):
         )
 
         self.inspection = "ownership"
-        self.label = "ownership"
         self.result = "OK"
 
 
@@ -1149,7 +1098,6 @@ class SlashUsrSlashSbinOwnedByGroupRootCompareRPMs(TestCompareRPMs):
         )
 
         self.inspection = "ownership"
-        self.label = "ownership"
         self.result = "OK"
 
 
@@ -1170,7 +1118,6 @@ class SlashBinOwnedByGroupBinCompareRPMs(TestCompareRPMs):
         )
 
         self.inspection = "ownership"
-        self.label = "ownership"
         self.result = "BAD"
         self.waiver_auth = "Anyone"
 
@@ -1192,7 +1139,6 @@ class SlashSbinOwnedByGroupBinCompareRPMs(TestCompareRPMs):
         )
 
         self.inspection = "ownership"
-        self.label = "ownership"
         self.result = "BAD"
         self.waiver_auth = "Anyone"
 
@@ -1214,7 +1160,6 @@ class SlashUsrSlashBinOwnedByGroupBinCompareRPMs(TestCompareRPMs):
         )
 
         self.inspection = "ownership"
-        self.label = "ownership"
         self.result = "BAD"
         self.waiver_auth = "Anyone"
 
@@ -1236,7 +1181,6 @@ class SlashUsrSlashSbinOwnedByGroupBinCompareRPMs(TestCompareRPMs):
         )
 
         self.inspection = "ownership"
-        self.label = "ownership"
         self.result = "BAD"
         self.waiver_auth = "Anyone"
 
@@ -1258,7 +1202,6 @@ class SlashBinOwnedByGroupRootCompareKoji(TestCompareKoji):
         )
 
         self.inspection = "ownership"
-        self.label = "ownership"
         self.result = "OK"
 
 
@@ -1279,7 +1222,6 @@ class SlashSbinOwnedByGroupRootCompareKoji(TestCompareKoji):
         )
 
         self.inspection = "ownership"
-        self.label = "ownership"
         self.result = "OK"
 
 
@@ -1300,7 +1242,6 @@ class SlashUsrSlashBinOwnedByGroupRootCompareKoji(TestCompareKoji):
         )
 
         self.inspection = "ownership"
-        self.label = "ownership"
         self.result = "OK"
 
 
@@ -1321,7 +1262,6 @@ class SlashUsrSlashSbinOwnedByGroupRootCompareKoji(TestCompareKoji):
         )
 
         self.inspection = "ownership"
-        self.label = "ownership"
         self.result = "OK"
 
 
@@ -1342,7 +1282,6 @@ class SlashBinOwnedByGroupBinCompareKoji(TestCompareKoji):
         )
 
         self.inspection = "ownership"
-        self.label = "ownership"
         self.result = "BAD"
         self.waiver_auth = "Anyone"
 
@@ -1364,7 +1303,6 @@ class SlashSbinOwnedByGroupBinCompareKoji(TestCompareKoji):
         )
 
         self.inspection = "ownership"
-        self.label = "ownership"
         self.result = "BAD"
         self.waiver_auth = "Anyone"
 
@@ -1386,7 +1324,6 @@ class SlashUsrSlashBinOwnedByGroupBinCompareKoji(TestCompareKoji):
         )
 
         self.inspection = "ownership"
-        self.label = "ownership"
         self.result = "BAD"
         self.waiver_auth = "Anyone"
 
@@ -1408,7 +1345,6 @@ class SlashUsrSlashSbinOwnedByGroupBinCompareKoji(TestCompareKoji):
         )
 
         self.inspection = "ownership"
-        self.label = "ownership"
         self.result = "BAD"
         self.waiver_auth = "Anyone"
 
@@ -1434,7 +1370,6 @@ class SlashBinOwnedByMockRPMs(TestRPMs):
         )
 
         self.inspection = "ownership"
-        self.label = "ownership"
         self.result = "BAD"
         self.waiver_auth = "Anyone"
 
@@ -1455,7 +1390,6 @@ class SlashBinOwnedByMockKoji(TestKoji):
         )
 
         self.inspection = "ownership"
-        self.label = "ownership"
         self.result = "BAD"
         self.waiver_auth = "Anyone"
 
@@ -1477,7 +1411,6 @@ class SlashBinOwnedByMockCompareRPMs(TestCompareRPMs):
         )
 
         self.inspection = "ownership"
-        self.label = "ownership"
         self.result = "BAD"
         self.waiver_auth = "Anyone"
 
@@ -1499,7 +1432,6 @@ class SlashBinOwnedByMockCompareKoji(TestCompareKoji):
         )
 
         self.inspection = "ownership"
-        self.label = "ownership"
         self.result = "BAD"
         self.waiver_auth = "Anyone"
 
@@ -1526,7 +1458,6 @@ class SlashBinOwnedByGroupMockRPMs(TestRPMs):
         )
 
         self.inspection = "ownership"
-        self.label = "ownership"
         self.result = "BAD"
         self.waiver_auth = "Anyone"
 
@@ -1548,7 +1479,6 @@ class SlashBinOwnedByGroupMockKoji(TestKoji):
         )
 
         self.inspection = "ownership"
-        self.label = "ownership"
         self.result = "BAD"
         self.waiver_auth = "Anyone"
 
@@ -1570,7 +1500,6 @@ class SlashBinOwnedByGroupMockCompareRPMs(TestCompareRPMs):
         )
 
         self.inspection = "ownership"
-        self.label = "ownership"
         self.result = "BAD"
         self.waiver_auth = "Anyone"
 
@@ -1592,7 +1521,6 @@ class SlashBinOwnedByGroupMockCompareKoji(TestCompareKoji):
         )
 
         self.inspection = "ownership"
-        self.label = "ownership"
         self.result = "BAD"
         self.waiver_auth = "Anyone"
 
@@ -1627,7 +1555,6 @@ class CapSETUIDWithOtherExecRPMs(TestRPMs):
         )
 
         self.inspection = "ownership"
-        self.label = "ownership"
         self.result = "BAD"
         self.waiver_auth = "Anyone"
 
@@ -1657,7 +1584,6 @@ class CapSETUIDWithOtherExecKoji(TestKoji):
         )
 
         self.inspection = "ownership"
-        self.label = "ownership"
         self.result = "BAD"
         self.waiver_auth = "Anyone"
 
@@ -1689,7 +1615,6 @@ class CapSETUIDWithOtherExecCompareRPMs(TestCompareRPMs):
         )
 
         self.inspection = "ownership"
-        self.label = "ownership"
         self.result = "BAD"
         self.waiver_auth = "Anyone"
 
@@ -1721,7 +1646,6 @@ class CapSETUIDWithOtherExecCompareKoji(TestCompareKoji):
         )
 
         self.inspection = "ownership"
-        self.label = "ownership"
         self.result = "BAD"
         self.waiver_auth = "Anyone"
 
@@ -1756,7 +1680,6 @@ class CapSETUIDWithGroupExecRPMs(TestRPMs):
         )
 
         self.inspection = "ownership"
-        self.label = "ownership"
         self.result = "BAD"
         self.waiver_auth = "Anyone"
 
@@ -1786,7 +1709,6 @@ class CapSETUIDWithGroupExecKoji(TestKoji):
         )
 
         self.inspection = "ownership"
-        self.label = "ownership"
         self.result = "BAD"
         self.waiver_auth = "Anyone"
 
@@ -1818,7 +1740,6 @@ class CapSETUIDWithGroupExecCompareRPMs(TestCompareRPMs):
         )
 
         self.inspection = "ownership"
-        self.label = "ownership"
         self.result = "BAD"
         self.waiver_auth = "Anyone"
 
@@ -1850,7 +1771,6 @@ class CapSETUIDWithGroupExecCompareKoji(TestCompareKoji):
         )
 
         self.inspection = "ownership"
-        self.label = "ownership"
         self.result = "BAD"
         self.waiver_auth = "Anyone"
 
@@ -1885,7 +1805,6 @@ class FileOwnerChangedCompareRPMs(TestCompareRPMs):
         )
 
         self.inspection = "ownership"
-        self.label = "ownership"
         self.result = "BAD"
         self.waiver_auth = "Anyone"
 
@@ -1916,7 +1835,6 @@ class FileOwnerChangedCompareKoji(TestCompareKoji):
         )
 
         self.inspection = "ownership"
-        self.label = "ownership"
         self.result = "BAD"
         self.waiver_auth = "Anyone"
 
@@ -1951,7 +1869,6 @@ class FileGroupChangedCompareRPMs(TestCompareRPMs):
         )
 
         self.inspection = "ownership"
-        self.label = "ownership"
         self.result = "BAD"
         self.waiver_auth = "Anyone"
 
@@ -1982,6 +1899,5 @@ class FileGroupChangedCompareKoji(TestCompareKoji):
         )
 
         self.inspection = "ownership"
-        self.label = "ownership"
         self.result = "BAD"
         self.waiver_auth = "Anyone"

@@ -42,7 +42,6 @@ class ManPageCorrectSectionRPM(TestRPMs):
         )
 
         self.inspection = "manpage"
-        self.label = "man-pages"
         self.result = "OK"
 
 
@@ -62,7 +61,6 @@ class ManPageCorrectSectionKoji(TestKoji):
         )
 
         self.inspection = "manpage"
-        self.label = "man-pages"
         self.result = "OK"
 
 
@@ -87,7 +85,6 @@ class ManPageCorrectSectionCompareRPMs(TestCompareRPMs):
         )
 
         self.inspection = "manpage"
-        self.label = "man-pages"
         self.result = "OK"
 
 
@@ -112,7 +109,6 @@ class ManPageCorrectSectionCompareKoji(TestCompareKoji):
         )
 
         self.inspection = "manpage"
-        self.label = "man-pages"
         self.result = "OK"
 
 
@@ -134,7 +130,6 @@ class ManPageNotGzippedRPM(TestRPMs):
 
         # the test
         self.inspection = "manpage"
-        self.label = "man-pages"
         self.result = "VERIFY"
         self.waiver_auth = "Anyone"
 
@@ -157,7 +152,6 @@ class ManPageNotGzippedKoji(TestKoji):
 
         # the test
         self.inspection = "manpage"
-        self.label = "man-pages"
         self.result = "VERIFY"
         self.waiver_auth = "Anyone"
 
@@ -185,7 +179,6 @@ class ManPageNotGzippedCompareRPMs(TestCompareRPMs):
 
         # the test
         self.inspection = "manpage"
-        self.label = "man-pages"
         self.result = "VERIFY"
         self.waiver_auth = "Anyone"
 
@@ -213,7 +206,6 @@ class ManPageNotGzippedCompareKoji(TestCompareKoji):
 
         # the test
         self.inspection = "manpage"
-        self.label = "man-pages"
         self.result = "VERIFY"
         self.waiver_auth = "Anyone"
 
@@ -226,7 +218,6 @@ class ManPageWrongSectionRPM(TestRPMs):
             sourceFileName="foo.8", installPath="usr/share/man/man1/foo.8.gz"
         )
         self.inspection = "manpage"
-        self.label = "man-pages"
         self.result = "VERIFY"
         self.waiver_auth = "Anyone"
 
@@ -239,7 +230,6 @@ class ManPageWrongSectionKoji(TestKoji):
             sourceFileName="foo.8", installPath="usr/share/man/man1/foo.8.gz"
         )
         self.inspection = "manpage"
-        self.label = "man-pages"
         self.result = "VERIFY"
         self.waiver_auth = "Anyone"
 
@@ -255,7 +245,6 @@ class ManPageWrongSectionCompareRPMs(TestCompareRPMs):
             sourceFileName="foo.8", installPath="usr/share/man/man1/foo.8.gz"
         )
         self.inspection = "manpage"
-        self.label = "man-pages"
         self.result = "VERIFY"
         self.waiver_auth = "Anyone"
 
@@ -271,7 +260,6 @@ class ManPageWrongSectionCompareKoji(TestCompareKoji):
             sourceFileName="foo.8", installPath="usr/share/man/man1/foo.8.gz"
         )
         self.inspection = "manpage"
-        self.label = "man-pages"
         self.result = "VERIFY"
         self.waiver_auth = "Anyone"
 
@@ -292,7 +280,6 @@ class InvalidManPageRPM(TestRPMs):
 
         # the test
         self.inspection = "manpage"
-        self.label = "man-pages"
         self.result = "VERIFY"
         self.waiver_auth = "Anyone"
 
@@ -313,7 +300,6 @@ class InvalidManPageKoji(TestKoji):
 
         # the test
         self.inspection = "manpage"
-        self.label = "man-pages"
         self.result = "VERIFY"
         self.waiver_auth = "Anyone"
 
@@ -339,7 +325,6 @@ class InvalidManPageCompareRPMs(TestCompareRPMs):
 
         # the test
         self.inspection = "manpage"
-        self.label = "man-pages"
         self.result = "VERIFY"
         self.waiver_auth = "Anyone"
 
@@ -365,7 +350,6 @@ class InvalidManPageCompareKoji(TestCompareKoji):
 
         # the test
         self.inspection = "manpage"
-        self.label = "man-pages"
         self.result = "VERIFY"
         self.waiver_auth = "Anyone"
 
@@ -389,7 +373,6 @@ class EmptyManPageRPM(TestRPMs):
 
         # the test
         self.inspection = "manpage"
-        self.label = "man-pages"
         self.result = "VERIFY"
         self.waiver_auth = "Anyone"
 
@@ -413,7 +396,6 @@ class EmptyManPageKoji(TestKoji):
 
         # the test
         self.inspection = "manpage"
-        self.label = "man-pages"
         self.result = "VERIFY"
         self.waiver_auth = "Anyone"
 
@@ -437,7 +419,6 @@ class EmptyManPageCompareRPMs(TestCompareRPMs):
 
         # the test
         self.inspection = "manpage"
-        self.label = "man-pages"
         self.result = "VERIFY"
         self.waiver_auth = "Anyone"
 
@@ -461,6 +442,5 @@ class EmptyManPageCompareKoji(TestCompareKoji):
 
         # the test
         self.inspection = "manpage"
-        self.label = "man-pages"
         self.result = "VERIFY"
         self.waiver_auth = "Anyone"

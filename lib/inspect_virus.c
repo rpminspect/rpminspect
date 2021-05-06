@@ -136,7 +136,7 @@ bool inspect_virus(struct rpminspect *ri)
     /* display version information about clamav */
     params.severity = RESULT_INFO;
     params.waiverauth = NOT_WAIVABLE;
-    params.header = HEADER_VIRUS;
+    params.header = NAME_VIRUS;
     xasprintf(&params.msg, _("clamav version information"));
 
     dbpath = cl_retdbdir();
@@ -186,7 +186,7 @@ bool inspect_virus(struct rpminspect *ri)
     /* run the virus check on each file */
     params.severity = RESULT_BAD;
     params.waiverauth = WAIVABLE_BY_ANYONE;
-    params.header = HEADER_VIRUS;
+    params.header = NAME_VIRUS;
     params.verb = VERB_FAILED;
     params.noun = _("virus or malware in ${FILE}");
     result = foreach_peer_file(ri, NAME_VIRUS, virus_driver, false);
@@ -196,7 +196,7 @@ bool inspect_virus(struct rpminspect *ri)
         init_result_params(&params);
         params.severity = RESULT_OK;
         params.waiverauth = NOT_WAIVABLE;
-        params.header = HEADER_VIRUS;
+        params.header = NAME_VIRUS;
         add_result(ri, &params);
     }
 

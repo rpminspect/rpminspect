@@ -38,7 +38,6 @@ class MissingDistTagSRPM(TestSRPM):
     def setUp(self):
         TestSRPM.setUp(self)
         self.inspection = "disttag"
-        self.label = "dist-tag"
         self.result = "BAD"
         self.waiver_auth = "Not Waivable"
 
@@ -48,7 +47,6 @@ class MissingDistTagKojiBuild(TestKoji):
     def setUp(self):
         TestKoji.setUp(self)
         self.inspection = "disttag"
-        self.label = "dist-tag"
         self.result = "BAD"
         self.waiver_auth = "Not Waivable"
 
@@ -59,7 +57,6 @@ class DistTagOnNonSRPM(TestRPMs):
         TestRPMs.setUp(self)
         self.rpm.release = "1%{?dist}"
         self.inspection = "disttag"
-        self.label = "dist-tag"
         self.result = "INFO"
         self.waiver_auth = "Not Waivable"
 
@@ -70,7 +67,6 @@ class MalformedDistTagSRPM(TestSRPM):
         TestSRPM.setUp(self)
         self.rpm.release = "1dist"
         self.inspection = "disttag"
-        self.label = "dist-tag"
         self.result = "BAD"
         self.waiver_auth = "Not Waivable"
 
@@ -81,7 +77,6 @@ class MalformedDistTagKojiBuild(TestKoji):
         TestKoji.setUp(self)
         self.rpm.release = "1dist"
         self.inspection = "disttag"
-        self.label = "dist-tag"
         self.result = "BAD"
         self.waiver_auth = "Not Waivable"
 
@@ -92,7 +87,6 @@ class DistTagSRPM(TestSRPM):
         TestSRPM.setUp(self)
         self.rpm.release = "1%{?dist}"
         self.inspection = "disttag"
-        self.label = "dist-tag"
 
 
 # Verify correct %{?dist} usage passes on Koji build (OK)
@@ -101,7 +95,6 @@ class DistTagKojiBuild(TestKoji):
         TestKoji.setUp(self)
         self.rpm.release = "1%{?dist}"
         self.inspection = "disttag"
-        self.label = "dist-tag"
 
 
 ########################################################################
@@ -159,7 +152,6 @@ class DistTagInMacroSRPM(RequiresRpminspect):
         # the inspection we are checking
         self.exitcode = 0
         self.inspection = "disttag"
-        self.label = "dist-tag"
         self.result = "OK"
         self.waiver_auth = "Not Waivable"
 
@@ -199,7 +191,7 @@ class DistTagInMacroSRPM(RequiresRpminspect):
             self.dumpResults()
 
         self.assertEqual(self.p.returncode, self.exitcode)
-        check_results(self.results, self.label, self.result, self.waiver_auth)
+        check_results(self.results, self.inspection, self.result, self.waiver_auth)
 
     def tearDown(self):
         self.tmpdir.cleanup()
@@ -251,7 +243,6 @@ class TabbedDistTagInMacroSRPM(RequiresRpminspect):
         # the inspection we are checking
         self.exitcode = 0
         self.inspection = "disttag"
-        self.label = "dist-tag"
         self.result = "OK"
         self.waiver_auth = "Not Waivable"
 
@@ -291,7 +282,7 @@ class TabbedDistTagInMacroSRPM(RequiresRpminspect):
             self.dumpResults()
 
         self.assertEqual(self.p.returncode, self.exitcode)
-        check_results(self.results, self.label, self.result, self.waiver_auth)
+        check_results(self.results, self.inspection, self.result, self.waiver_auth)
 
     def tearDown(self):
         self.tmpdir.cleanup()

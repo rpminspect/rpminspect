@@ -102,7 +102,7 @@ static bool dsodeps_driver(struct rpminspect *ri, rpmfile_entry_t *file)
     init_result_params(&params);
     params.severity = RESULT_VERIFY;
     params.waiverauth = WAIVABLE_BY_ANYONE;
-    params.header = HEADER_DSODEPS;
+    params.header = NAME_DSODEPS;
     params.remedy = REMEDY_DSODEPS;
     params.arch = arch;
     params.file = file->localpath;
@@ -233,7 +233,7 @@ bool inspect_dsodeps(struct rpminspect *ri) {
         init_result_params(&params);
         params.severity = RESULT_OK;
         params.waiverauth = NOT_WAIVABLE;
-        params.header = HEADER_DSODEPS;
+        params.header = NAME_DSODEPS;
         add_result(ri, &params);
     }
 

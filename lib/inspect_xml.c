@@ -190,7 +190,7 @@ static bool xml_driver(struct rpminspect *ri, rpmfile_entry_t *file)
     init_result_params(&params);
     params.severity = RESULT_VERIFY;
     params.waiverauth = WAIVABLE_BY_ANYONE;
-    params.header = HEADER_XML;
+    params.header = NAME_XML;
     params.remedy = REMEDY_XML;
     params.arch = get_rpm_header_arch(file->rpm_header);
     params.file = file->localpath;
@@ -219,7 +219,7 @@ bool inspect_xml(struct rpminspect *ri)
         init_result_params(&params);
         params.severity = RESULT_OK;
         params.waiverauth = NOT_WAIVABLE;
-        params.header = HEADER_XML;
+        params.header = NAME_XML;
         add_result(ri, &params);
     }
 

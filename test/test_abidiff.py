@@ -46,7 +46,6 @@ class AbidiffNoRebaseNoABIChangeRPMs(TestCompareRPMs):
         self.after_rpm.add_simple_library()
 
         self.inspection = "abidiff"
-        self.label = "abidiff"
         self.result = "OK"
 
 
@@ -58,7 +57,6 @@ class AbidiffNoRebaseNoABIChangeKoji(TestCompareKoji):
         self.after_rpm.add_simple_library()
 
         self.inspection = "abidiff"
-        self.label = "abidiff"
         self.result = "OK"
 
 
@@ -75,7 +73,6 @@ class AbidiffRebaseNoABIChangeRPMs(TestCompareRPMs):
         self.after_rpm.add_simple_library()
 
         self.inspection = "abidiff"
-        self.label = "abidiff"
         self.exitcode = 0
         self.result = "OK"
         self.waiver_auth = "Not Waivable"
@@ -93,7 +90,6 @@ class AbidiffRebaseNoABIChangeKoji(TestCompareKoji):
         self.after_rpm.header += "\n%global __os_install_post %{nil}\n"
 
         self.inspection = "abidiff"
-        self.label = "abidiff"
         self.exitcode = 0
         self.result = "OK"
         self.waiver_auth = "Not Waivable"
@@ -112,7 +108,6 @@ class AbidiffRebaseWithABIChangeRPMs(TestCompareRPMs):
         self.after_rpm.add_simple_library(sourceContent=new_library_source)
 
         self.inspection = "abidiff"
-        self.label = "abidiff"
         self.exitcode = 0
         self.result = "OK"
         self.waiver_auth = "Not Waivable"
@@ -130,7 +125,6 @@ class AbidiffRebaseWithABIChangeKoji(TestCompareKoji):
         self.after_rpm.add_simple_library(sourceContent=new_library_source)
 
         self.inspection = "abidiff"
-        self.label = "abidiff"
         self.exitcode = 0
         self.result = "OK"
         self.waiver_auth = "Not Waivable"
@@ -151,7 +145,6 @@ class AbidiffNoRebaseWithABIChangeRPMs(TestCompareRPMs):
         )
 
         self.inspection = "abidiff"
-        self.label = "abidiff"
         self.result = "VERIFY"
         self.waiver_auth = "Anyone"
 
@@ -170,6 +163,5 @@ class AbidiffNoRebaseWithABIChangeKoji(TestCompareKoji):
         )
 
         self.inspection = "abidiff"
-        self.label = "abidiff"
         self.result = "VERIFY"
         self.waiver_auth = "Anyone"

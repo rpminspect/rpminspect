@@ -44,7 +44,6 @@ class XMLWellFormedRPM(TestRPMs):
             "/usr/share/data/valid.xml", rpmfluff.SourceFile("valid.xml", valid_xml)
         )
         self.inspection = "xml"
-        self.label = "xml-files"
         self.result = "OK"
 
 
@@ -56,7 +55,6 @@ class XMLWellFormedKoji(TestKoji):
             "/usr/share/data/valid.xml", rpmfluff.SourceFile("valid.xml", valid_xml)
         )
         self.inspection = "xml"
-        self.label = "xml-files"
         self.result = "OK"
 
 
@@ -71,7 +69,6 @@ class XMLWellFormedCompareRPMs(TestCompareRPMs):
             "/usr/share/data/valid.xml", rpmfluff.SourceFile("valid.xml", valid_xml)
         )
         self.inspection = "xml"
-        self.label = "xml-files"
         self.result = "OK"
 
 
@@ -86,7 +83,6 @@ class XMLWellFormedCompareKoji(TestCompareKoji):
             "/usr/share/data/valid.xml", rpmfluff.SourceFile("valid.xml", valid_xml)
         )
         self.inspection = "xml"
-        self.label = "xml-files"
         self.result = "OK"
 
 
@@ -99,7 +95,6 @@ class XMLMalformedRPM(TestRPMs):
             rpmfluff.SourceFile("invalid.xml", invalid_xml),
         )
         self.inspection = "xml"
-        self.label = "xml-files"
         self.result = "VERIFY"
         self.waiver_auth = "Anyone"
 
@@ -113,7 +108,6 @@ class XMLMalformedKoji(TestKoji):
             rpmfluff.SourceFile("invalid.xml", invalid_xml),
         )
         self.inspection = "xml"
-        self.label = "xml-files"
         self.result = "VERIFY"
         self.waiver_auth = "Anyone"
 
@@ -131,7 +125,6 @@ class XMLMalformedCompareRPMs(TestCompareRPMs):
             rpmfluff.SourceFile("invalid.xml", invalid_xml),
         )
         self.inspection = "xml"
-        self.label = "xml-files"
         self.result = "VERIFY"
         self.waiver_auth = "Anyone"
 
@@ -149,6 +142,5 @@ class XMLMalformedCompareKoji(TestCompareKoji):
             rpmfluff.SourceFile("invalid.xml", invalid_xml),
         )
         self.inspection = "xml"
-        self.label = "xml-files"
         self.result = "VERIFY"
         self.waiver_auth = "Anyone"

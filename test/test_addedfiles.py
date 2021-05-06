@@ -36,7 +36,6 @@ class FileSizeGrowsAtThreshold(TestCompareRPMs):
         )
 
         self.inspection = "filesize"
-        self.label = "filesize"
         self.result = "VERIFY"
         self.waiver_auth = "Anyone"
 
@@ -56,7 +55,6 @@ class FileSizeGrowsAboveThreshold(TestCompareRPMs):
         )
 
         self.inspection = "filesize"
-        self.label = "filesize"
         self.result = "VERIFY"
         self.waiver_auth = "Anyone"
 
@@ -75,6 +73,5 @@ class FileSizeGrowsBelowThreshold(TestCompareRPMs):
         )
 
         self.inspection = "filesize"
-        self.label = "filesize"
         self.result = "INFO"
         self.waiver_auth = "Not Waivable"

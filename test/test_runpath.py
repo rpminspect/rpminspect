@@ -34,7 +34,6 @@ class ValidRPATH1RPMs(TestRPMs):
         self.rpm.section_build += "patchelf --set-rpath '$ORIGIN' a.out\n"
 
         self.inspection = "runpath"
-        self.label = "runpath"
         self.result = "OK"
         self.waiver_auth = "Not Waivable"
 
@@ -47,7 +46,6 @@ class ValidRPATH1Koji(TestKoji):
         self.rpm.section_build += "patchelf --set-rpath '$ORIGIN' a.out\n"
 
         self.inspection = "runpath"
-        self.label = "runpath"
         self.result = "OK"
         self.waiver_auth = "Not Waivable"
 
@@ -60,7 +58,6 @@ class ValidRPATH1CompareRPMs(TestCompareRPMs):
         self.after_rpm.section_build += "patchelf --set-rpath '$ORIGIN' a.out\n"
 
         self.inspection = "runpath"
-        self.label = "runpath"
         self.result = "OK"
         self.waiver_auth = "Not Waivable"
 
@@ -73,7 +70,6 @@ class ValidRPATH1CompareKoji(TestCompareKoji):
         self.after_rpm.section_build += "patchelf --set-rpath '$ORIGIN' a.out\n"
 
         self.inspection = "runpath"
-        self.label = "runpath"
         self.result = "OK"
         self.waiver_auth = "Not Waivable"
 
@@ -89,7 +85,6 @@ class ValidRPATH2RPMs(TestRPMs):
         self.rpm.section_build += "patchelf --set-rpath '$ORIGIN/' a.out\n"
 
         self.inspection = "runpath"
-        self.label = "runpath"
         self.result = "OK"
         self.waiver_auth = "Not Waivable"
 
@@ -102,7 +97,6 @@ class ValidRPATH2Koji(TestKoji):
         self.rpm.section_build += "patchelf --set-rpath '$ORIGIN/' a.out\n"
 
         self.inspection = "runpath"
-        self.label = "runpath"
         self.result = "OK"
         self.waiver_auth = "Not Waivable"
 
@@ -115,7 +109,6 @@ class ValidRPATH2CompareRPMs(TestCompareRPMs):
         self.after_rpm.section_build += "patchelf --set-rpath '$ORIGIN/' a.out\n"
 
         self.inspection = "runpath"
-        self.label = "runpath"
         self.result = "OK"
         self.waiver_auth = "Not Waivable"
 
@@ -128,7 +121,6 @@ class ValidRPATH2CompareKoji(TestCompareKoji):
         self.after_rpm.section_build += "patchelf --set-rpath '$ORIGIN/' a.out\n"
 
         self.inspection = "runpath"
-        self.label = "runpath"
         self.result = "OK"
         self.waiver_auth = "Not Waivable"
 
@@ -146,7 +138,6 @@ class ValidRPATH3RPMs(TestRPMs):
         )
 
         self.inspection = "runpath"
-        self.label = "runpath"
         self.result = "VERIFY"
         self.waiver_auth = "Anyone"
 
@@ -161,7 +152,6 @@ class ValidRPATH3Koji(TestKoji):
         )
 
         self.inspection = "runpath"
-        self.label = "runpath"
         self.result = "VERIFY"
         self.waiver_auth = "Anyone"
 
@@ -174,7 +164,6 @@ class ValidRPATH3CompareRPMs(TestCompareRPMs):
         self.after_rpm.section_build += "patchelf --set-rpath '$ORIGIN/../lib/jli:$ORIGIN/../lib' a.out\n"  # noqa: E501
 
         self.inspection = "runpath"
-        self.label = "runpath"
         self.result = "VERIFY"
         self.waiver_auth = "Anyone"
 
@@ -187,7 +176,6 @@ class ValidRPATH3CompareKoji(TestCompareKoji):
         self.after_rpm.section_build += "patchelf --set-rpath '$ORIGIN/../lib/jli:$ORIGIN/../lib' a.out\n"  # noqa: E501
 
         self.inspection = "runpath"
-        self.label = "runpath"
         self.result = "VERIFY"
         self.waiver_auth = "Anyone"
 
@@ -203,7 +191,6 @@ class ValidRPATH4RPMs(TestRPMs):
         self.rpm.section_build += "patchelf --set-rpath '$ORIGIN/../lib64' a.out\n"
 
         self.inspection = "runpath"
-        self.label = "runpath"
         self.result = "OK"
         self.waiver_auth = "Not Waivable"
 
@@ -216,7 +203,6 @@ class ValidRPATH4Koji(TestKoji):
         self.rpm.section_build += "patchelf --set-rpath '$ORIGIN/../lib64' a.out\n"
 
         self.inspection = "runpath"
-        self.label = "runpath"
         self.result = "OK"
         self.waiver_auth = "Not Waivable"
 
@@ -231,7 +217,6 @@ class ValidRPATH4CompareRPMs(TestCompareRPMs):
         )
 
         self.inspection = "runpath"
-        self.label = "runpath"
         self.result = "OK"
         self.waiver_auth = "Not Waivable"
 
@@ -246,7 +231,6 @@ class ValidRPATH4CompareKoji(TestCompareKoji):
         )
 
         self.inspection = "runpath"
-        self.label = "runpath"
         self.result = "OK"
         self.waiver_auth = "Not Waivable"
 
@@ -264,7 +248,6 @@ class ValidRPATH5RPMs(TestRPMs):
         )
 
         self.inspection = "runpath"
-        self.label = "runpath"
         self.result = "OK"
         self.waiver_auth = "Not Waivable"
 
@@ -279,7 +262,6 @@ class ValidRPATH5Koji(TestKoji):
         )
 
         self.inspection = "runpath"
-        self.label = "runpath"
         self.result = "OK"
         self.waiver_auth = "Not Waivable"
 
@@ -294,7 +276,6 @@ class ValidRPATH5CompareRPMs(TestCompareRPMs):
         )
 
         self.inspection = "runpath"
-        self.label = "runpath"
         self.result = "OK"
         self.waiver_auth = "Not Waivable"
 
@@ -309,7 +290,6 @@ class ValidRPATH5CompareKoji(TestCompareKoji):
         )
 
         self.inspection = "runpath"
-        self.label = "runpath"
         self.result = "OK"
         self.waiver_auth = "Not Waivable"
 
@@ -325,7 +305,6 @@ class InvalidRPATH1RPMs(TestRPMs):
         self.rpm.section_build += "patchelf --set-rpath '/builddir/build/BUILD/jq-1.6/.libs' a.out\n"  # noqa: E501
 
         self.inspection = "runpath"
-        self.label = "runpath"
         self.result = "VERIFY"
         self.waiver_auth = "Anyone"
 
@@ -338,7 +317,6 @@ class InvalidRPATH1Koji(TestKoji):
         self.rpm.section_build += "patchelf --set-rpath '/builddir/build/BUILD/jq-1.6/.libs' a.out\n"  # noqa: E501
 
         self.inspection = "runpath"
-        self.label = "runpath"
         self.result = "VERIFY"
         self.waiver_auth = "Anyone"
 
@@ -351,7 +329,6 @@ class InvalidRPATH1CompareRPMs(TestCompareRPMs):
         self.after_rpm.section_build += "patchelf --set-rpath '/builddir/build/BUILD/jq-1.6/.libs' a.out\n"  # noqa: E501
 
         self.inspection = "runpath"
-        self.label = "runpath"
         self.result = "VERIFY"
         self.waiver_auth = "Anyone"
 
@@ -364,7 +341,6 @@ class InvalidRPATH1CompareKoji(TestCompareKoji):
         self.after_rpm.section_build += "patchelf --set-rpath '/builddir/build/BUILD/jq-1.6/.libs' a.out\n"  # noqa: E501
 
         self.inspection = "runpath"
-        self.label = "runpath"
         self.result = "VERIFY"
         self.waiver_auth = "Anyone"
 
@@ -380,7 +356,6 @@ class InvalidRPATH2RPMs(TestRPMs):
         self.rpm.section_build += "patchelf --set-rpath '/builddir/build/BUILD/texlive-base-20200327/source/inst/lib' a.out\n"  # noqa: E501
 
         self.inspection = "runpath"
-        self.label = "runpath"
         self.result = "VERIFY"
         self.waiver_auth = "Anyone"
 
@@ -393,7 +368,6 @@ class InvalidRPATH2Koji(TestKoji):
         self.rpm.section_build += "patchelf --set-rpath '/builddir/build/BUILD/texlive-base-20200327/source/inst/lib' a.out\n"  # noqa: E501
 
         self.inspection = "runpath"
-        self.label = "runpath"
         self.result = "VERIFY"
         self.waiver_auth = "Anyone"
 
@@ -406,7 +380,6 @@ class InvalidRPATH2CompareRPMs(TestCompareRPMs):
         self.after_rpm.section_build += "patchelf --set-rpath '/builddir/build/BUILD/texlive-base-20200327/source/inst/lib' a.out\n"  # noqa: E501
 
         self.inspection = "runpath"
-        self.label = "runpath"
         self.result = "VERIFY"
         self.waiver_auth = "Anyone"
 
@@ -419,7 +392,6 @@ class InvalidRPATH2CompareKoji(TestCompareKoji):
         self.after_rpm.section_build += "patchelf --set-rpath '/builddir/build/BUILD/texlive-base-20200327/source/inst/lib' a.out\n"  # noqa: E501
 
         self.inspection = "runpath"
-        self.label = "runpath"
         self.result = "VERIFY"
         self.waiver_auth = "Anyone"
 
@@ -435,7 +407,6 @@ class ValidRPATH6RPMs(TestRPMs):
         self.rpm.section_build += "patchelf --set-rpath '/usr/lib/systemd' a.out\n"
 
         self.inspection = "runpath"
-        self.label = "runpath"
         self.result = "VERIFY"
         self.waiver_auth = "Anyone"
 
@@ -448,7 +419,6 @@ class ValidRPATH6Koji(TestKoji):
         self.rpm.section_build += "patchelf --set-rpath '/usr/lib/systemd' a.out\n"
 
         self.inspection = "runpath"
-        self.label = "runpath"
         self.result = "VERIFY"
         self.waiver_auth = "Anyone"
 
@@ -463,7 +433,6 @@ class ValidRPATH6CompareRPMs(TestCompareRPMs):
         )
 
         self.inspection = "runpath"
-        self.label = "runpath"
         self.result = "VERIFY"
         self.waiver_auth = "Anyone"
 
@@ -478,7 +447,6 @@ class ValidRPATH6CompareKoji(TestCompareKoji):
         )
 
         self.inspection = "runpath"
-        self.label = "runpath"
         self.result = "VERIFY"
         self.waiver_auth = "Anyone"
 
@@ -494,7 +462,6 @@ class ValidRPATH7RPMs(TestRPMs):
         self.rpm.section_build += "patchelf --set-rpath '/usr/lib64' a.out\n"
 
         self.inspection = "runpath"
-        self.label = "runpath"
         self.result = "VERIFY"
         self.waiver_auth = "Anyone"
 
@@ -507,7 +474,6 @@ class ValidRPATH7Koji(TestKoji):
         self.rpm.section_build += "patchelf --set-rpath '/usr/lib64' a.out\n"
 
         self.inspection = "runpath"
-        self.label = "runpath"
         self.result = "VERIFY"
         self.waiver_auth = "Anyone"
 
@@ -520,7 +486,6 @@ class ValidRPATH7CompareRPMs(TestCompareRPMs):
         self.after_rpm.section_build += "patchelf --set-rpath '/usr/lib64' a.out\n"
 
         self.inspection = "runpath"
-        self.label = "runpath"
         self.result = "VERIFY"
         self.waiver_auth = "Anyone"
 
@@ -533,7 +498,6 @@ class ValidRPATH7CompareKoji(TestCompareKoji):
         self.after_rpm.section_build += "patchelf --set-rpath '/usr/lib64' a.out\n"
 
         self.inspection = "runpath"
-        self.label = "runpath"
         self.result = "VERIFY"
         self.waiver_auth = "Anyone"
 
@@ -549,7 +513,6 @@ class ValidRPATH8RPMs(TestRPMs):
         self.rpm.section_build += "patchelf --set-rpath '/usr/lib64/sssd' a.out\n"
 
         self.inspection = "runpath"
-        self.label = "runpath"
         self.result = "VERIFY"
         self.waiver_auth = "Anyone"
 
@@ -562,7 +525,6 @@ class ValidRPATH8Koji(TestKoji):
         self.rpm.section_build += "patchelf --set-rpath '/usr/lib64/sssd' a.out\n"
 
         self.inspection = "runpath"
-        self.label = "runpath"
         self.result = "VERIFY"
         self.waiver_auth = "Anyone"
 
@@ -575,7 +537,6 @@ class ValidRPATH8CompareRPMs(TestCompareRPMs):
         self.after_rpm.section_build += "patchelf --set-rpath '/usr/lib64/sssd' a.out\n"
 
         self.inspection = "runpath"
-        self.label = "runpath"
         self.result = "VERIFY"
         self.waiver_auth = "Anyone"
 
@@ -588,7 +549,6 @@ class ValidRPATH8CompareKoji(TestCompareKoji):
         self.after_rpm.section_build += "patchelf --set-rpath '/usr/lib64/sssd' a.out\n"
 
         self.inspection = "runpath"
-        self.label = "runpath"
         self.result = "VERIFY"
         self.waiver_auth = "Anyone"
 
@@ -604,7 +564,6 @@ class ValidRPATH9RPMs(TestRPMs):
         self.rpm.section_build += "patchelf --set-rpath '/usr/lib64:/usr/lib64/firebird/intl' a.out\n"  # noqa: E501
 
         self.inspection = "runpath"
-        self.label = "runpath"
         self.result = "VERIFY"
         self.waiver_auth = "Anyone"
 
@@ -617,7 +576,6 @@ class ValidRPATH9Koji(TestKoji):
         self.rpm.section_build += "patchelf --set-rpath '/usr/lib64:/usr/lib64/firebird/intl' a.out\n"  # noqa: E501
 
         self.inspection = "runpath"
-        self.label = "runpath"
         self.result = "VERIFY"
         self.waiver_auth = "Anyone"
 
@@ -630,7 +588,6 @@ class ValidRPATH9CompareRPMs(TestCompareRPMs):
         self.after_rpm.section_build += "patchelf --set-rpath '/usr/lib64:/usr/lib64/firebird/intl' a.out\n"  # noqa: E501
 
         self.inspection = "runpath"
-        self.label = "runpath"
         self.result = "VERIFY"
         self.waiver_auth = "Anyone"
 
@@ -643,7 +600,6 @@ class ValidRPATH9CompareKoji(TestCompareKoji):
         self.after_rpm.section_build += "patchelf --set-rpath '/usr/lib64:/usr/lib64/firebird/intl' a.out\n"  # noqa: E501
 
         self.inspection = "runpath"
-        self.label = "runpath"
         self.result = "VERIFY"
         self.waiver_auth = "Anyone"
 
@@ -659,7 +615,6 @@ class ValidRPATH10RPMs(TestRPMs):
         self.rpm.section_build += "patchelf --set-rpath '/usr/libexec/sudo' a.out\n"
 
         self.inspection = "runpath"
-        self.label = "runpath"
         self.result = "VERIFY"
         self.waiver_auth = "Anyone"
 
@@ -672,7 +627,6 @@ class ValidRPATH10Koji(TestKoji):
         self.rpm.section_build += "patchelf --set-rpath '/usr/libexec/sudo' a.out\n"
 
         self.inspection = "runpath"
-        self.label = "runpath"
         self.result = "VERIFY"
         self.waiver_auth = "Anyone"
 
@@ -687,7 +641,6 @@ class ValidRPATH10CompareRPMs(TestCompareRPMs):
         )
 
         self.inspection = "runpath"
-        self.label = "runpath"
         self.result = "VERIFY"
         self.waiver_auth = "Anyone"
 
@@ -702,7 +655,6 @@ class ValidRPATH10CompareKoji(TestCompareKoji):
         )
 
         self.inspection = "runpath"
-        self.label = "runpath"
         self.result = "VERIFY"
         self.waiver_auth = "Anyone"
 
@@ -718,7 +670,6 @@ class InvalidRPATH3RPMs(TestRPMs):
         self.rpm.section_build += "patchelf --set-rpath '/lib64:$ORIGIN/../etc:$ORIGIN/usr/lib64/:/builddir/build/BUILD/lib64' a.out\n"  # noqa: E501
 
         self.inspection = "runpath"
-        self.label = "runpath"
         self.result = "VERIFY"
         self.waiver_auth = "Anyone"
 
@@ -731,7 +682,6 @@ class InvalidRPATH3Koji(TestKoji):
         self.rpm.section_build += "patchelf --set-rpath '/lib64:$ORIGIN/../etc:$ORIGIN/usr/lib64/:/builddir/build/BUILD/lib64' a.out\n"  # noqa: E501
 
         self.inspection = "runpath"
-        self.label = "runpath"
         self.result = "VERIFY"
         self.waiver_auth = "Anyone"
 
@@ -744,7 +694,6 @@ class InvalidRPATH3CompareRPMs(TestCompareRPMs):
         self.after_rpm.section_build += "patchelf --set-rpath '/lib64:$ORIGIN/../etc:$ORIGIN/usr/lib64/:/builddir/build/BUILD/lib64' a.out\n"  # noqa: E501
 
         self.inspection = "runpath"
-        self.label = "runpath"
         self.result = "VERIFY"
         self.waiver_auth = "Anyone"
 
@@ -757,7 +706,6 @@ class InvalidRPATH3CompareKoji(TestCompareKoji):
         self.after_rpm.section_build += "patchelf --set-rpath '/lib64:$ORIGIN/../etc:$ORIGIN/usr/lib64/:/builddir/build/BUILD/lib64' a.out\n"  # noqa: E501
 
         self.inspection = "runpath"
-        self.label = "runpath"
         self.result = "VERIFY"
         self.waiver_auth = "Anyone"
 
@@ -773,7 +721,6 @@ class ValidRPATH11RPMs(TestRPMs):
         self.rpm.section_build += "patchelf --set-rpath '/usr/src/kernels/' a.out\n"
 
         self.inspection = "runpath"
-        self.label = "runpath"
         self.result = "VERIFY"
         self.waiver_auth = "Anyone"
 
@@ -786,7 +733,6 @@ class ValidRPATH11Koji(TestKoji):
         self.rpm.section_build += "patchelf --set-rpath '/usr/src/kernels/' a.out\n"
 
         self.inspection = "runpath"
-        self.label = "runpath"
         self.result = "VERIFY"
         self.waiver_auth = "Anyone"
 
@@ -801,7 +747,6 @@ class ValidRPATH11CompareRPMs(TestCompareRPMs):
         )
 
         self.inspection = "runpath"
-        self.label = "runpath"
         self.result = "VERIFY"
         self.waiver_auth = "Anyone"
 
@@ -816,6 +761,5 @@ class ValidRPATH11CompareKoji(TestCompareKoji):
         )
 
         self.inspection = "runpath"
-        self.label = "runpath"
         self.result = "VERIFY"
         self.waiver_auth = "Anyone"

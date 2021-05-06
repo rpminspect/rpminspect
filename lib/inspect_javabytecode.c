@@ -111,7 +111,7 @@ static bool check_class_file(struct rpminspect *ri, const char *fullpath,
     init_result_params(&params);
     params.severity = RESULT_BAD;
     params.waiverauth = WAIVABLE_BY_ANYONE;
-    params.header = HEADER_JAVABYTECODE;
+    params.header = NAME_JAVABYTECODE;
 
     /* try to see if this is just a .class file */
     major = get_jvm_major(fullpath, localpath, container);
@@ -292,7 +292,7 @@ bool inspect_javabytecode(struct rpminspect *ri)
         init_result_params(&params);
         params.severity = RESULT_OK;
         params.waiverauth = NOT_WAIVABLE;
-        params.header = HEADER_JAVABYTECODE;
+        params.header = NAME_JAVABYTECODE;
         add_result(ri, &params);
     }
 

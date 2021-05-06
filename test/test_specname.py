@@ -26,7 +26,6 @@ class SpecNameSRPM(TestSRPM):
     def setUp(self):
         TestSRPM.setUp(self)
         self.inspection = "specname"
-        self.label = "spec-file-name"
         self.result = "OK"
 
 
@@ -35,7 +34,6 @@ class SpecNameKojiBuild(TestKoji):
     def setUp(self):
         TestKoji.setUp(self)
         self.inspection = "specname"
-        self.label = "spec-file-name"
         self.result = "OK"
 
 
@@ -44,7 +42,6 @@ class SpecNameRPMs(TestRPMs):
     def setUp(self):
         TestRPMs.setUp(self)
         self.inspection = "specname"
-        self.label = "spec-file-name"
         self.result = "INFO"
         self.waiver_auth = "Not Waivable"
 
@@ -56,7 +53,6 @@ class BadSpecNameSRPM(TestSRPM):
         TestSRPM.setUp(self)
         self.rpm.addSpecBasename("badspecname")
         self.inspection = "specname"
-        self.label = "spec-file-name"
         self.result = "BAD"
         self.waiver_auth = "Not Waivable"
 
@@ -68,6 +64,5 @@ class BadSpecNameKojiBuild(TestKoji):
         TestKoji.setUp(self)
         self.rpm.addSpecBasename("badspecname")
         self.inspection = "specname"
-        self.label = "spec-file-name"
         self.result = "BAD"
         self.waiver_auth = "Not Waivable"

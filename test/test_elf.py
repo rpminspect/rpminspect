@@ -69,7 +69,6 @@ class WithoutExecStackRPM(TestRPMs):
         TestRPMs.setUp(self)
         self.rpm.add_simple_compilation(compileFlags="-Wl,-z,noexecstack")
         self.inspection = "elf"
-        self.label = "elf-object-properties"
         self.waiver_auth = "Not Waivable"
         self.result = "OK"
 
@@ -79,7 +78,6 @@ class WithoutExecStackKoji(TestKoji):
         TestKoji.setUp(self)
         self.rpm.add_simple_compilation(compileFlags="-Wl,-z,noexecstack")
         self.inspection = "elf"
-        self.label = "elf-object-properties"
         self.waiver_auth = "Not Waivable"
         self.result = "OK"
 
@@ -90,7 +88,6 @@ class WithoutExecStackCompareRPM(TestCompareRPMs):
         self.before_rpm.add_simple_compilation(compileFlags="-Wl,-z,noexecstack")
         self.after_rpm.add_simple_compilation(compileFlags="-Wl,-z,noexecstack")
         self.inspection = "elf"
-        self.label = "elf-object-properties"
         self.waiver_auth = "Not Waivable"
         self.result = "OK"
 
@@ -101,7 +98,6 @@ class WithoutExecStackCompareKoji(TestCompareKoji):
         self.before_rpm.add_simple_compilation(compileFlags="-Wl,-z,noexecstack")
         self.after_rpm.add_simple_compilation(compileFlags="-Wl,-z,noexecstack")
         self.inspection = "elf"
-        self.label = "elf-object-properties"
         self.waiver_auth = "Not Waivable"
         self.result = "OK"
 
@@ -112,7 +108,6 @@ class WithExecStackRPM(TestRPMs):
         TestRPMs.setUp(self)
         self.rpm.add_simple_compilation(compileFlags="-Wl,-z,execstack")
         self.inspection = "elf"
-        self.label = "elf-object-properties"
         self.waiver_auth = "Security"
         self.result = "BAD"
 
@@ -122,7 +117,6 @@ class WithExecStackKoji(TestKoji):
         TestKoji.setUp(self)
         self.rpm.add_simple_compilation(compileFlags="-Wl,-z,execstack")
         self.inspection = "elf"
-        self.label = "elf-object-properties"
         self.waiver_auth = "Security"
         self.result = "BAD"
 
@@ -133,7 +127,6 @@ class WithExecStackCompareRPMs(TestCompareRPMs):
         self.before_rpm.add_simple_compilation(compileFlags="-Wl,-z,execstack")
         self.after_rpm.add_simple_compilation(compileFlags="-Wl,-z,execstack")
         self.inspection = "elf"
-        self.label = "elf-object-properties"
         self.waiver_auth = "Security"
         self.result = "VERIFY"
 
@@ -144,7 +137,6 @@ class WithExecStackCompare(TestCompareKoji):
         self.before_rpm.add_simple_compilation(compileFlags="-Wl,-z,execstack")
         self.after_rpm.add_simple_compilation(compileFlags="-Wl,-z,execstack")
         self.inspection = "elf"
-        self.label = "elf-object-properties"
         self.waiver_auth = "Security"
         self.result = "VERIFY"
 
@@ -156,7 +148,6 @@ class LostFullRELROCompareRPMs(TestCompareRPMs):
         self.before_rpm.add_simple_compilation(compileFlags="-Wl,-z,relro,-z,now")
         self.after_rpm.add_simple_compilation(compileFlags="-Wl,-z,norelro")
         self.inspection = "elf"
-        self.label = "elf-object-properties"
         self.waiver_auth = "Security"
         self.result = "BAD"
 
@@ -167,7 +158,6 @@ class LostFullRELROCompareKoji(TestCompareKoji):
         self.before_rpm.add_simple_compilation(compileFlags="-Wl,-z,relro,-z,now")
         self.after_rpm.add_simple_compilation(compileFlags="-Wl,-z,norelro")
         self.inspection = "elf"
-        self.label = "elf-object-properties"
         self.waiver_auth = "Security"
         self.result = "BAD"
 
@@ -179,7 +169,6 @@ class FulltoPartialRELROCompareRPMs(TestCompareRPMs):
         self.before_rpm.add_simple_compilation(compileFlags="-Wl,-z,relro,-z,now")
         self.after_rpm.add_simple_compilation(compileFlags="-Wl,-z,relro,-z,lazy")
         self.inspection = "elf"
-        self.label = "elf-object-properties"
         self.waiver_auth = "Security"
         self.result = "BAD"
 
@@ -190,7 +179,6 @@ class FulltoPartialRELROCompareKoji(TestCompareKoji):
         self.before_rpm.add_simple_compilation(compileFlags="-Wl,-z,relro,-z,now")
         self.after_rpm.add_simple_compilation(compileFlags="-Wl,-z,relro,-z,lazy")
         self.inspection = "elf"
-        self.label = "elf-object-properties"
         self.waiver_auth = "Security"
         self.result = "BAD"
 
@@ -211,7 +199,6 @@ class LostFortifySourceCompareRPMs(TestCompareRPMs):
             compileFlags="-fno-stack-protector -O2 -D_FORTIFY_SOURCE=0",
         )
         self.inspection = "elf"
-        self.label = "elf-object-properties"
         self.waiver_auth = "Security"
         self.result = "VERIFY"
 
@@ -231,7 +218,6 @@ class LostFortifySourceCompareKoji(TestCompareKoji):
             compileFlags="-fno-stack-protector -O2 -D_FORTIFY_SOURCE=0",
         )
         self.inspection = "elf"
-        self.label = "elf-object-properties"
         self.waiver_auth = "Security"
         self.result = "VERIFY"
 
@@ -267,7 +253,6 @@ class LostPICCompareRPMs(TestCompareRPMs):
         self.after_rpm.add_payload_check(installPath, None)
 
         self.inspection = "elf"
-        self.label = "elf-object-properties"
         self.waiver_auth = "Security"
         self.result = "BAD"
 
@@ -302,7 +287,6 @@ class LostPICCompareKoji(TestCompareKoji):
         self.after_rpm.add_payload_check(installPath, None)
 
         self.inspection = "elf"
-        self.label = "elf-object-properties"
         self.waiver_auth = "Security"
         self.result = "BAD"
 
@@ -327,7 +311,6 @@ class HasTEXTRELRPMs(TestRPMs):
         self.rpm.add_payload_check(installPath, None)
 
         self.inspection = "elf"
-        self.label = "elf-object-properties"
         self.waiver_auth = "Security"
         self.result = "BAD"
 
@@ -369,7 +352,6 @@ class HasTEXTRELCompareRPMs(TestCompareRPMs):
         self.after_rpm.add_payload_check(installPath, None)
 
         self.inspection = "elf"
-        self.label = "elf-object-properties"
         self.waiver_auth = "Security"
         self.result = "BAD"
 
@@ -411,6 +393,5 @@ class HasTEXTRELCompareKoji(TestCompareKoji):
         self.after_rpm.add_payload_check(installPath, None)
 
         self.inspection = "elf"
-        self.label = "elf-object-properties"
         self.waiver_auth = "Security"
         self.result = "BAD"

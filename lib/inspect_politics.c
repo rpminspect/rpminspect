@@ -130,7 +130,7 @@ static bool politics_driver(struct rpminspect *ri, rpmfile_entry_t *file)
         init_result_params(&params);
         params.arch = get_rpm_header_arch(file->rpm_header);
         params.file = file->localpath;
-        params.header = HEADER_POLITICS;
+        params.header = NAME_POLITICS;
         params.remedy = REMEDY_POLITICS;
 
         if (allowed) {
@@ -170,7 +170,7 @@ bool inspect_politics(struct rpminspect *ri)
         init_result_params(&params);
         params.severity = RESULT_OK;
         params.waiverauth = NOT_WAIVABLE;
-        params.header = HEADER_POLITICS;
+        params.header = NAME_POLITICS;
         add_result(ri, &params);
     }
 

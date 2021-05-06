@@ -56,7 +56,6 @@ class DocBecomesNonDocCompareRPMs(TestCompareRPMs):
         )
 
         self.inspection = "doc"
-        self.label = "doc"
         self.result = "VERIFY"
         self.waiver_auth = "Anyone"
 
@@ -78,7 +77,6 @@ class DocBecomesNonDocCompareKoji(TestCompareKoji):
         )
 
         self.inspection = "doc"
-        self.label = "doc"
         self.result = "VERIFY"
         self.waiver_auth = "Anyone"
 
@@ -101,7 +99,6 @@ class DocBecomesNonDocRebaseCompareRPMs(TestCompareRPMs):
         )
 
         self.inspection = "doc"
-        self.label = "doc"
         self.result = "INFO"
         self.waiver_auth = "Not Waivable"
 
@@ -123,7 +120,6 @@ class DocBecomesNonDocRebaseCompareKoji(TestCompareKoji):
         )
 
         self.inspection = "doc"
-        self.label = "doc"
         self.result = "INFO"
         self.waiver_auth = "Not Waivable"
 
@@ -146,7 +142,6 @@ class NonDocBecomesDocCompareRPMs(TestCompareRPMs):
         )
 
         self.inspection = "doc"
-        self.label = "doc"
         self.result = "VERIFY"
         self.waiver_auth = "Anyone"
 
@@ -168,7 +163,6 @@ class NonDocBecomesDocCompareKoji(TestCompareKoji):
         )
 
         self.inspection = "doc"
-        self.label = "doc"
         self.result = "VERIFY"
         self.waiver_auth = "Anyone"
 
@@ -191,7 +185,6 @@ class NonDocBecomesDocRebaseCompareRPMs(TestCompareRPMs):
         )
 
         self.inspection = "doc"
-        self.label = "doc"
         self.result = "INFO"
         self.waiver_auth = "Not Waivable"
 
@@ -213,7 +206,6 @@ class NonDocBecomesDocRebaseCompareKoji(TestCompareKoji):
         )
 
         self.inspection = "doc"
-        self.label = "doc"
         self.result = "INFO"
         self.waiver_auth = "Not Waivable"
 
@@ -236,7 +228,6 @@ class DocChangesWhitespaceCompareRPMs(TestCompareRPMs):
         )
 
         self.inspection = "doc"
-        self.label = "doc"
         self.result = "INFO"
         self.waiver_auth = "Not Waivable"
 
@@ -258,7 +249,6 @@ class DocChangesWhitespaceCompareKoji(TestCompareKoji):
         )
 
         self.inspection = "doc"
-        self.label = "doc"
         self.result = "INFO"
         self.waiver_auth = "Not Waivable"
 
@@ -280,7 +270,6 @@ class DocChangesWhitespaceRebaseCompareRPMs(TestCompareRPMs):
         )
 
         self.inspection = "doc"
-        self.label = "doc"
         self.result = "INFO"
         self.waiver_auth = "Not Waivable"
 
@@ -302,7 +291,6 @@ class DocChangesWhitespaceRebaseCompareKoji(TestCompareKoji):
         )
 
         self.inspection = "doc"
-        self.label = "doc"
         self.result = "INFO"
         self.waiver_auth = "Not Waivable"
 
@@ -325,7 +313,6 @@ class DocChangesContentCompareRPMs(TestCompareRPMs):
         )
 
         self.inspection = "doc"
-        self.label = "doc"
         self.result = "INFO"
         self.waiver_auth = "Not Waivable"
 
@@ -347,7 +334,6 @@ class DocChangesContentCompareKoji(TestCompareKoji):
         )
 
         self.inspection = "doc"
-        self.label = "doc"
         self.result = "INFO"
         self.waiver_auth = "Not Waivable"
 
@@ -369,7 +355,6 @@ class DocChangesContentRebaseCompareRPMs(TestCompareRPMs):
         )
 
         self.inspection = "doc"
-        self.label = "doc"
         self.result = "INFO"
         self.waiver_auth = "Not Waivable"
 
@@ -391,6 +376,5 @@ class DocChangesContentRebaseCompareKoji(TestCompareKoji):
         )
 
         self.inspection = "doc"
-        self.label = "doc"
         self.result = "INFO"
         self.waiver_auth = "Not Waivable"

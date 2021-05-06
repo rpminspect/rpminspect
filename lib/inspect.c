@@ -344,87 +344,87 @@ const char *inspection_header_to_desc(const char *header)
 {
     uint64_t i = 0;
 
-    if (!strcmp(header, HEADER_METADATA)) {
+    if (!strcmp(header, NAME_METADATA)) {
         i = INSPECT_METADATA;
-    } else if (!strcmp(header, HEADER_EMPTYRPM)) {
+    } else if (!strcmp(header, NAME_EMPTYRPM)) {
         i = INSPECT_EMPTYRPM;
-    } else if (!strcmp(header, HEADER_LOSTPAYLOAD)) {
+    } else if (!strcmp(header, NAME_LOSTPAYLOAD)) {
         i = INSPECT_LOSTPAYLOAD;
-    } else if (!strcmp(header, HEADER_LICENSE)) {
+    } else if (!strcmp(header, NAME_LICENSE)) {
         i = INSPECT_LICENSE;
-    } else if (!strcmp(header, HEADER_ELF)) {
+    } else if (!strcmp(header, NAME_ELF)) {
         i = INSPECT_ELF;
-    } else if (!strcmp(header, HEADER_MANPAGE)) {
+    } else if (!strcmp(header, NAME_MANPAGE)) {
         i = INSPECT_MANPAGE;
-    } else if (!strcmp(header, HEADER_XML)) {
+    } else if (!strcmp(header, NAME_XML)) {
         i = INSPECT_XML;
-    } else if (!strcmp(header, HEADER_DESKTOP)) {
+    } else if (!strcmp(header, NAME_DESKTOP)) {
         i = INSPECT_DESKTOP;
-    } else if (!strcmp(header, HEADER_DISTTAG)) {
+    } else if (!strcmp(header, NAME_DISTTAG)) {
         i = INSPECT_DISTTAG;
-    } else if (!strcmp(header, HEADER_SPECNAME)) {
+    } else if (!strcmp(header, NAME_SPECNAME)) {
         i = INSPECT_SPECNAME;
-    } else if (!strcmp(header, HEADER_MODULARITY)) {
+    } else if (!strcmp(header, NAME_MODULARITY)) {
         i = INSPECT_MODULARITY;
-    } else if (!strcmp(header, HEADER_JAVABYTECODE)) {
+    } else if (!strcmp(header, NAME_JAVABYTECODE)) {
         i = INSPECT_JAVABYTECODE;
-    } else if (!strcmp(header, HEADER_CHANGEDFILES)) {
+    } else if (!strcmp(header, NAME_CHANGEDFILES)) {
         i = INSPECT_CHANGEDFILES;
-    } else if (!strcmp(header, HEADER_MOVEDFILES)) {
+    } else if (!strcmp(header, NAME_MOVEDFILES)) {
         i = INSPECT_MOVEDFILES;
-    } else if (!strcmp(header, HEADER_REMOVEDFILES)) {
+    } else if (!strcmp(header, NAME_REMOVEDFILES)) {
         i = INSPECT_REMOVEDFILES;
-    } else if (!strcmp(header, HEADER_ADDEDFILES)) {
+    } else if (!strcmp(header, NAME_ADDEDFILES)) {
         i = INSPECT_ADDEDFILES;
-    } else if (!strcmp(header, HEADER_UPSTREAM)) {
+    } else if (!strcmp(header, NAME_UPSTREAM)) {
         i = INSPECT_UPSTREAM;
-    } else if (!strcmp(header, HEADER_OWNERSHIP)) {
+    } else if (!strcmp(header, NAME_OWNERSHIP)) {
         i = INSPECT_OWNERSHIP;
-    } else if (!strcmp(header, HEADER_SHELLSYNTAX)) {
+    } else if (!strcmp(header, NAME_SHELLSYNTAX)) {
         i = INSPECT_SHELLSYNTAX;
-    } else if (!strcmp(header, HEADER_DSODEPS)) {
+    } else if (!strcmp(header, NAME_DSODEPS)) {
         i = INSPECT_DSODEPS;
-    } else if (!strcmp(header, HEADER_FILESIZE)) {
+    } else if (!strcmp(header, NAME_FILESIZE)) {
         i = INSPECT_FILESIZE;
-    } else if (!strcmp(header, HEADER_PERMISSIONS)) {
+    } else if (!strcmp(header, NAME_PERMISSIONS)) {
         i = INSPECT_PERMISSIONS;
-    } else if (!strcmp(header, HEADER_CAPABILITIES)) {
+    } else if (!strcmp(header, NAME_CAPABILITIES)) {
         i = INSPECT_CAPABILITIES;
-    } else if (!strcmp(header, HEADER_KMOD)) {
+    } else if (!strcmp(header, NAME_KMOD)) {
         i = INSPECT_KMOD;
-    } else if (!strcmp(header, HEADER_ARCH)) {
+    } else if (!strcmp(header, NAME_ARCH)) {
         i = INSPECT_ARCH;
-    } else if (!strcmp(header, HEADER_SUBPACKAGES)) {
+    } else if (!strcmp(header, NAME_SUBPACKAGES)) {
         i = INSPECT_SUBPACKAGES;
-    } else if (!strcmp(header, HEADER_CHANGELOG)) {
+    } else if (!strcmp(header, NAME_CHANGELOG)) {
         i = INSPECT_CHANGELOG;
-    } else if (!strcmp(header, HEADER_PATHMIGRATION)) {
+    } else if (!strcmp(header, NAME_PATHMIGRATION)) {
         i = INSPECT_PATHMIGRATION;
-    } else if (!strcmp(header, HEADER_LTO)) {
+    } else if (!strcmp(header, NAME_LTO)) {
         i = INSPECT_LTO;
-    } else if (!strcmp(header, HEADER_SYMLINKS)) {
+    } else if (!strcmp(header, NAME_SYMLINKS)) {
         i = INSPECT_SYMLINKS;
-    } else if (!strcmp(header, HEADER_FILES)) {
+    } else if (!strcmp(header, NAME_FILES)) {
         i = INSPECT_FILES;
-    } else if (!strcmp(header, HEADER_TYPES)) {
+    } else if (!strcmp(header, NAME_TYPES)) {
         i = INSPECT_TYPES;
-    } else if (!strcmp(header, HEADER_ABIDIFF)) {
+    } else if (!strcmp(header, NAME_ABIDIFF)) {
         i = INSPECT_ABIDIFF;
-    } else if (!strcmp(header, HEADER_KMIDIFF)) {
+    } else if (!strcmp(header, NAME_KMIDIFF)) {
         i = INSPECT_KMIDIFF;
-    } else if (!strcmp(header, HEADER_CONFIG)) {
+    } else if (!strcmp(header, NAME_CONFIG)) {
         i = INSPECT_CONFIG;
-    } else if (!strcmp(header, HEADER_DOC)) {
+    } else if (!strcmp(header, NAME_DOC)) {
         i = INSPECT_DOC;
-    } else if (!strcmp(header, HEADER_PATCHES)) {
+    } else if (!strcmp(header, NAME_PATCHES)) {
         i = INSPECT_PATCHES;
-    } else if (!strcmp(header, HEADER_VIRUS)) {
+    } else if (!strcmp(header, NAME_VIRUS)) {
         i = INSPECT_VIRUS;
-    } else if (!strcmp(header, HEADER_POLITICS)) {
+    } else if (!strcmp(header, NAME_POLITICS)) {
         i = INSPECT_POLITICS;
-    } else if (!strcmp(header, HEADER_BADFUNCS)) {
+    } else if (!strcmp(header, NAME_BADFUNCS)) {
         i = INSPECT_BADFUNCS;
-    } else if (!strcmp(header, HEADER_RUNPATH)) {
+    } else if (!strcmp(header, NAME_RUNPATH)) {
         i = INSPECT_RUNPATH;
     }
 

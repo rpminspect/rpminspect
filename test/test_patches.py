@@ -165,7 +165,6 @@ class PatchUnderFourBytes(TestSRPM):
         self.rpm.add_patch(rpmfluff.SourceFile("some.patch", "Qx"), False)
 
         self.inspection = "patches"
-        self.label = "patches"
         self.result = "BAD"
         self.waiver_auth = "Anyone"
 
@@ -184,7 +183,6 @@ class PatchUnderFourBytesCompare(TestCompareSRPM):
         self.after_rpm.add_patch(rpmfluff.SourceFile("some.patch", "Qx"), False)
 
         self.inspection = "patches"
-        self.label = "patches"
         self.result = "BAD"
         self.waiver_auth = "Anyone"
 
@@ -200,7 +198,6 @@ class PatchChangedNotRebaseCompare(TestCompareSRPM):
         )
 
         self.inspection = "patches"
-        self.label = "patches"
         self.result = "INFO"
         self.waiver_auth = "Not Waivable"
 
@@ -215,7 +212,6 @@ class PatchChangedInRebaseCompare(TestCompareSRPM):
         )
 
         self.inspection = "patches"
-        self.label = "patches"
         self.result = "INFO"
         self.waiver_auth = "Not Waivable"
 
@@ -228,7 +224,6 @@ class PatchAddedNotRebaseCompare(TestCompareSRPM):
         self.after_rpm.add_patch(rpmfluff.SourceFile("some.patch", patch_file), False)
 
         self.inspection = "patches"
-        self.label = "patches"
         self.result = "INFO"
         self.waiver_auth = "Not Waivable"
 
@@ -241,7 +236,6 @@ class PatchAddedInRebaseCompare(TestCompareSRPM):
         self.after_rpm.add_patch(rpmfluff.SourceFile("some.patch", patch_file), False)
 
         self.inspection = "patches"
-        self.label = "patches"
         self.result = "INFO"
         self.waiver_auth = "Not Waivable"
 
@@ -257,7 +251,6 @@ class PatchTouchesTooManyFiles(TestSRPM):
         )
 
         self.inspection = "patches"
-        self.label = "patches"
         self.result = "VERIFY"
         self.waiver_auth = "Anyone"
 
@@ -286,7 +279,6 @@ class PatchTouchesTooManyFilesCompare(TestCompareSRPM):
         )
 
         self.inspection = "patches"
-        self.label = "patches"
         self.result = "VERIFY"
         self.waiver_auth = "Anyone"
 
@@ -316,7 +308,6 @@ class PatchTouchesTooManyLines(TestSRPM):
         )
 
         self.inspection = "patches"
-        self.label = "patches"
         self.result = "VERIFY"
         self.waiver_auth = "Anyone"
 
@@ -345,7 +336,6 @@ class PatchTouchesTooManyLinesCompare(TestCompareSRPM):
         )
 
         self.inspection = "patches"
-        self.label = "patches"
         self.result = "VERIFY"
         self.waiver_auth = "Anyone"
 

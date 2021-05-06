@@ -77,7 +77,6 @@ class ShWellFormedRPM(TestRPMs):
             "/usr/share/data/valid_sh.sh", rpmfluff.SourceFile("valid_sh.sh", valid_sh)
         )
         self.inspection = "shellsyntax"
-        self.label = "shell-syntax"
         self.result = "OK"
 
 
@@ -94,7 +93,6 @@ class ShMalformedRPM(TestRPMs):
             rpmfluff.SourceFile("invalid_sh.sh", invalid_sh),
         )
         self.inspection = "shellsyntax"
-        self.label = "shell-syntax"
         self.result = "BAD"
         self.waiver_auth = "Anyone"
 
@@ -111,7 +109,6 @@ class ShWellFormedKoji(TestKoji):
             "/usr/share/data/valid_sh.sh", rpmfluff.SourceFile("valid_sh.sh", valid_sh)
         )
         self.inspection = "shellsyntax"
-        self.label = "shell-syntax"
         self.result = "OK"
 
 
@@ -128,7 +125,6 @@ class ShMalformedKoji(TestKoji):
             rpmfluff.SourceFile("invalid_sh.sh", invalid_sh),
         )
         self.inspection = "shellsyntax"
-        self.label = "shell-syntax"
         self.result = "BAD"
         self.waiver_auth = "Anyone"
 
@@ -147,7 +143,6 @@ class ShWellFormedCompareRPMs(TestCompareRPMs):
             "/usr/share/data/valid_sh.sh", rpmfluff.SourceFile("valid_sh.sh", valid_sh)
         )
         self.inspection = "shellsyntax"
-        self.label = "shell-syntax"
         self.result = "OK"
 
 
@@ -167,7 +162,6 @@ class ShMalformedCompareRPMs(TestCompareRPMs):
             rpmfluff.SourceFile("invalid_sh.sh", invalid_sh),
         )
         self.inspection = "shellsyntax"
-        self.label = "shell-syntax"
         self.result = "BAD"
         self.waiver_auth = "Anyone"
 
@@ -186,7 +180,6 @@ class ShWellFormedCompareKoji(TestCompareKoji):
             "/usr/share/data/valid_sh.sh", rpmfluff.SourceFile("valid_sh.sh", valid_sh)
         )
         self.inspection = "shellsyntax"
-        self.label = "shell-syntax"
         self.result = "OK"
 
 
@@ -206,7 +199,6 @@ class ShMalformedCompareKoji(TestCompareKoji):
             rpmfluff.SourceFile("invalid_sh.sh", invalid_sh),
         )
         self.inspection = "shellsyntax"
-        self.label = "shell-syntax"
         self.result = "BAD"
         self.waiver_auth = "Anyone"
 
@@ -226,7 +218,6 @@ class ShWellMalformedCompareRPMs(TestCompareRPMs):
             rpmfluff.SourceFile("invalid_sh.sh", invalid_sh),
         )
         self.inspection = "shellsyntax"
-        self.label = "shell-syntax"
         self.result = "BAD"
         self.waiver_auth = "Anyone"
 
@@ -246,7 +237,6 @@ class ShWellMalformedCompareKoji(TestCompareKoji):
             rpmfluff.SourceFile("invalid_sh.sh", invalid_sh),
         )
         self.inspection = "shellsyntax"
-        self.label = "shell-syntax"
         self.result = "BAD"
         self.waiver_auth = "Anyone"
 
@@ -318,7 +308,6 @@ class KshWellFormedRPM(TestRPMs):
             rpmfluff.SourceFile("valid_ksh.sh", valid_ksh),
         )
         self.inspection = "shellsyntax"
-        self.label = "shell-syntax"
         self.result = "OK"
 
 
@@ -335,7 +324,6 @@ class KshMalformedRPM(TestRPMs):
             rpmfluff.SourceFile("invalid_ksh.sh", invalid_ksh),
         )
         self.inspection = "shellsyntax"
-        self.label = "shell-syntax"
         self.result = "BAD"
         self.waiver_auth = "Anyone"
 
@@ -353,7 +341,6 @@ class KshWellFormedKoji(TestKoji):
             rpmfluff.SourceFile("valid_ksh.sh", valid_ksh),
         )
         self.inspection = "shellsyntax"
-        self.label = "shell-syntax"
         self.result = "OK"
 
 
@@ -370,7 +357,6 @@ class KshMalformedKoji(TestKoji):
             rpmfluff.SourceFile("invalid_ksh.sh", invalid_ksh),
         )
         self.inspection = "shellsyntax"
-        self.label = "shell-syntax"
         self.result = "BAD"
         self.waiver_auth = "Anyone"
 
@@ -391,7 +377,6 @@ class KshWellFormedCompareRPMs(TestCompareRPMs):
             rpmfluff.SourceFile("valid_sh.sh", valid_ksh),
         )
         self.inspection = "shellsyntax"
-        self.label = "shell-syntax"
         self.result = "OK"
 
 
@@ -411,7 +396,6 @@ class KshMalformedCompareRPMs(TestCompareRPMs):
             rpmfluff.SourceFile("invalid_ksh.sh", invalid_ksh),
         )
         self.inspection = "shellsyntax"
-        self.label = "shell-syntax"
         self.result = "BAD"
         self.waiver_auth = "Anyone"
 
@@ -432,7 +416,6 @@ class KshWellFormedCompareKoji(TestCompareKoji):
             rpmfluff.SourceFile("valid_ksh.sh", valid_ksh),
         )
         self.inspection = "shellsyntax"
-        self.label = "shell-syntax"
         self.result = "OK"
 
 
@@ -452,7 +435,6 @@ class KshMalformedCompareKoji(TestCompareKoji):
             rpmfluff.SourceFile("invalid_ksh.sh", invalid_ksh),
         )
         self.inspection = "shellsyntax"
-        self.label = "shell-syntax"
         self.result = "BAD"
         self.waiver_auth = "Anyone"
 
@@ -473,7 +455,6 @@ class KshWellMalformedCompareRPMs(TestCompareRPMs):
             rpmfluff.SourceFile("invalid_ksh.sh", invalid_ksh),
         )
         self.inspection = "shellsyntax"
-        self.label = "shell-syntax"
         self.result = "BAD"
         self.waiver_auth = "Anyone"
 
@@ -494,7 +475,6 @@ class KshWellMalformedCompareKoji(TestCompareKoji):
             rpmfluff.SourceFile("invalid_ksh.sh", invalid_ksh),
         )
         self.inspection = "shellsyntax"
-        self.label = "shell-syntax"
         self.result = "BAD"
         self.waiver_auth = "Anyone"
 
@@ -562,7 +542,6 @@ class ZshWellFormedRPM(TestRPMs):
             rpmfluff.SourceFile("valid_zsh.sh", valid_zsh),
         )
         self.inspection = "shellsyntax"
-        self.label = "shell-syntax"
         self.result = "OK"
 
 
@@ -579,7 +558,6 @@ class ZshMalformedRPM(TestRPMs):
             rpmfluff.SourceFile("invalid_zsh.sh", invalid_zsh),
         )
         self.inspection = "shellsyntax"
-        self.label = "shell-syntax"
         self.result = "BAD"
         self.waiver_auth = "Anyone"
 
@@ -597,7 +575,6 @@ class ZshWellFormedKoji(TestKoji):
             rpmfluff.SourceFile("valid_zsh.sh", valid_zsh),
         )
         self.inspection = "shellsyntax"
-        self.label = "shell-syntax"
         self.result = "OK"
 
 
@@ -614,7 +591,6 @@ class ZshMalformedKoji(TestKoji):
             rpmfluff.SourceFile("invalid_zsh.sh", invalid_zsh),
         )
         self.inspection = "shellsyntax"
-        self.label = "shell-syntax"
         self.result = "BAD"
         self.waiver_auth = "Anyone"
 
@@ -635,7 +611,6 @@ class ZshWellFormedCompareRPMs(TestCompareRPMs):
             rpmfluff.SourceFile("valid_zsh.sh", valid_zsh),
         )
         self.inspection = "shellsyntax"
-        self.label = "shell-syntax"
         self.result = "OK"
 
 
@@ -655,7 +630,6 @@ class ZshMalformedCompareRPMs(TestCompareRPMs):
             rpmfluff.SourceFile("invalid_zsh.sh", invalid_zsh),
         )
         self.inspection = "shellsyntax"
-        self.label = "shell-syntax"
         self.result = "BAD"
         self.waiver_auth = "Anyone"
 
@@ -676,7 +650,6 @@ class ZshWellFormedCompareKoji(TestCompareKoji):
             rpmfluff.SourceFile("valid_zsh.sh", valid_zsh),
         )
         self.inspection = "shellsyntax"
-        self.label = "shell-syntax"
         self.result = "OK"
 
 
@@ -696,7 +669,6 @@ class ZshMalformedCompareKoji(TestCompareKoji):
             rpmfluff.SourceFile("invalid_zsh.sh", invalid_zsh),
         )
         self.inspection = "shellsyntax"
-        self.label = "shell-syntax"
         self.result = "BAD"
         self.waiver_auth = "Anyone"
 
@@ -717,7 +689,6 @@ class ZshWellMalformedCompareRPMs(TestCompareRPMs):
             rpmfluff.SourceFile("invalid_zsh.sh", invalid_zsh),
         )
         self.inspection = "shellsyntax"
-        self.label = "shell-syntax"
         self.result = "BAD"
         self.waiver_auth = "Anyone"
 
@@ -738,7 +709,6 @@ class ZshWellMalformedCompareKoji(TestCompareKoji):
             rpmfluff.SourceFile("invalid_zsh.sh", invalid_zsh),
         )
         self.inspection = "shellsyntax"
-        self.label = "shell-syntax"
         self.result = "BAD"
         self.waiver_auth = "Anyone"
 
@@ -823,7 +793,6 @@ class CshWellFormedRPM(TestRPMs):
             rpmfluff.SourceFile("valid_csh.sh", valid_csh),
         )
         self.inspection = "shellsyntax"
-        self.label = "shell-syntax"
         self.result = "OK"
 
 
@@ -840,7 +809,6 @@ class CshMalformedRPM(TestRPMs):
             rpmfluff.SourceFile("invalid_csh.sh", invalid_csh),
         )
         self.inspection = "shellsyntax"
-        self.label = "shell-syntax"
         self.result = "BAD"
         self.waiver_auth = "Anyone"
 
@@ -858,7 +826,6 @@ class CshWellFormedKoji(TestKoji):
             rpmfluff.SourceFile("valid_csh.sh", valid_csh),
         )
         self.inspection = "shellsyntax"
-        self.label = "shell-syntax"
         self.result = "OK"
 
 
@@ -875,7 +842,6 @@ class CshMalformedKoji(TestKoji):
             rpmfluff.SourceFile("invalid_csh.sh", invalid_csh),
         )
         self.inspection = "shellsyntax"
-        self.label = "shell-syntax"
         self.result = "BAD"
         self.waiver_auth = "Anyone"
 
@@ -896,7 +862,6 @@ class CshWellFormedCompareRPMs(TestCompareRPMs):
             rpmfluff.SourceFile("valid_csh.sh", valid_csh),
         )
         self.inspection = "shellsyntax"
-        self.label = "shell-syntax"
         self.result = "OK"
 
 
@@ -916,7 +881,6 @@ class CshMalformedCompareRPMs(TestCompareRPMs):
             rpmfluff.SourceFile("invalid_csh.sh", invalid_csh),
         )
         self.inspection = "shellsyntax"
-        self.label = "shell-syntax"
         self.result = "BAD"
         self.waiver_auth = "Anyone"
 
@@ -937,7 +901,6 @@ class CshWellFormedCompareKoji(TestCompareKoji):
             rpmfluff.SourceFile("valid_csh.sh", valid_csh),
         )
         self.inspection = "shellsyntax"
-        self.label = "shell-syntax"
         self.result = "OK"
 
 
@@ -957,7 +920,6 @@ class CshMalformedCompareKoji(TestCompareKoji):
             rpmfluff.SourceFile("invalid_csh.sh", invalid_csh),
         )
         self.inspection = "shellsyntax"
-        self.label = "shell-syntax"
         self.result = "BAD"
         self.waiver_auth = "Anyone"
 
@@ -978,7 +940,6 @@ class CshWellMalformedCompareRPMs(TestCompareRPMs):
             rpmfluff.SourceFile("invalid_csh.sh", invalid_csh),
         )
         self.inspection = "shellsyntax"
-        self.label = "shell-syntax"
         self.result = "BAD"
         self.waiver_auth = "Anyone"
 
@@ -999,7 +960,6 @@ class CshWellMalformedCompareKoji(TestCompareKoji):
             rpmfluff.SourceFile("invalid_csh.sh", invalid_csh),
         )
         self.inspection = "shellsyntax"
-        self.label = "shell-syntax"
         self.result = "BAD"
         self.waiver_auth = "Anyone"
 
@@ -1056,7 +1016,6 @@ class TcshWellFormedRPM(TestRPMs):
             rpmfluff.SourceFile("valid_tcsh.sh", valid_tcsh),
         )
         self.inspection = "shellsyntax"
-        self.label = "shell-syntax"
         self.result = "OK"
 
 
@@ -1073,7 +1032,6 @@ class TcshMalformedRPM(TestRPMs):
             rpmfluff.SourceFile("invalid_tcsh.sh", invalid_tcsh),
         )
         self.inspection = "shellsyntax"
-        self.label = "shell-syntax"
         self.result = "BAD"
         self.waiver_auth = "Anyone"
 
@@ -1091,7 +1049,6 @@ class TcshWellFormedKoji(TestKoji):
             rpmfluff.SourceFile("valid_tcsh.sh", valid_tcsh),
         )
         self.inspection = "shellsyntax"
-        self.label = "shell-syntax"
         self.result = "OK"
 
 
@@ -1108,7 +1065,6 @@ class TcshMalformedKoji(TestKoji):
             rpmfluff.SourceFile("invalid_tcsh.sh", invalid_tcsh),
         )
         self.inspection = "shellsyntax"
-        self.label = "shell-syntax"
         self.result = "BAD"
         self.waiver_auth = "Anyone"
 
@@ -1129,7 +1085,6 @@ class TcshWellFormedCompareRPMs(TestCompareRPMs):
             rpmfluff.SourceFile("valid_tcsh.sh", valid_tcsh),
         )
         self.inspection = "shellsyntax"
-        self.label = "shell-syntax"
         self.result = "OK"
 
 
@@ -1149,7 +1104,6 @@ class TcshMalformedCompareRPMs(TestCompareRPMs):
             rpmfluff.SourceFile("invalid_tcsh.sh", invalid_tcsh),
         )
         self.inspection = "shellsyntax"
-        self.label = "shell-syntax"
         self.result = "BAD"
         self.waiver_auth = "Anyone"
 
@@ -1170,7 +1124,6 @@ class TcshWellFormedCompareKoji(TestCompareKoji):
             rpmfluff.SourceFile("valid_tcsh.sh", valid_tcsh),
         )
         self.inspection = "shellsyntax"
-        self.label = "shell-syntax"
         self.result = "OK"
 
 
@@ -1190,7 +1143,6 @@ class TcshMalformedCompareKoji(TestCompareKoji):
             rpmfluff.SourceFile("invalid_tcsh.sh", invalid_tcsh),
         )
         self.inspection = "shellsyntax"
-        self.label = "shell-syntax"
         self.result = "BAD"
         self.waiver_auth = "Anyone"
 
@@ -1211,7 +1163,6 @@ class TcshWellMalformedCompareRPMs(TestCompareRPMs):
             rpmfluff.SourceFile("invalid_tcsh.sh", invalid_tcsh),
         )
         self.inspection = "shellsyntax"
-        self.label = "shell-syntax"
         self.result = "BAD"
         self.waiver_auth = "Anyone"
 
@@ -1232,7 +1183,6 @@ class TcshWellMalformedCompareKoji(TestCompareKoji):
             rpmfluff.SourceFile("invalid_tcsh.sh", invalid_tcsh),
         )
         self.inspection = "shellsyntax"
-        self.label = "shell-syntax"
         self.result = "BAD"
         self.waiver_auth = "Anyone"
 
@@ -1310,7 +1260,6 @@ class RcWellFormedRPM(TestRPMs):
             "/usr/share/data/valid_rc.sh", rpmfluff.SourceFile("valid_rc.sh", valid_rc)
         )
         self.inspection = "shellsyntax"
-        self.label = "shell-syntax"
         self.result = "OK"
 
 
@@ -1327,7 +1276,6 @@ class RcMalformedRPM(TestRPMs):
             rpmfluff.SourceFile("invalid_rc.sh", invalid_rc),
         )
         self.inspection = "shellsyntax"
-        self.label = "shell-syntax"
         self.result = "BAD"
         self.waiver_auth = "Anyone"
 
@@ -1344,7 +1292,6 @@ class RcWellFormedKoji(TestKoji):
             "/usr/share/data/valid_rc.sh", rpmfluff.SourceFile("valid_rc.sh", valid_rc)
         )
         self.inspection = "shellsyntax"
-        self.label = "shell-syntax"
         self.result = "OK"
 
 
@@ -1361,7 +1308,6 @@ class RcMalformedKoji(TestKoji):
             rpmfluff.SourceFile("invalid_rc.sh", invalid_rc),
         )
         self.inspection = "shellsyntax"
-        self.label = "shell-syntax"
         self.result = "BAD"
         self.waiver_auth = "Anyone"
 
@@ -1380,7 +1326,6 @@ class RcWellFormedCompareRPMs(TestCompareRPMs):
             "/usr/share/data/valid_rc.sh", rpmfluff.SourceFile("valid_rc.sh", valid_rc)
         )
         self.inspection = "shellsyntax"
-        self.label = "shell-syntax"
         self.result = "OK"
 
 
@@ -1400,7 +1345,6 @@ class RcMalformedCompareRPMs(TestCompareRPMs):
             rpmfluff.SourceFile("invalid_rc.sh", invalid_rc),
         )
         self.inspection = "shellsyntax"
-        self.label = "shell-syntax"
         self.result = "BAD"
         self.waiver_auth = "Anyone"
 
@@ -1419,7 +1363,6 @@ class RcWellFormedCompareKoji(TestCompareKoji):
             "/usr/share/data/valid_rc.sh", rpmfluff.SourceFile("valid_rc.sh", valid_rc)
         )
         self.inspection = "shellsyntax"
-        self.label = "shell-syntax"
         self.result = "OK"
 
 
@@ -1439,7 +1382,6 @@ class RcMalformedCompareKoji(TestCompareKoji):
             rpmfluff.SourceFile("invalid_rc.sh", invalid_rc),
         )
         self.inspection = "shellsyntax"
-        self.label = "shell-syntax"
         self.result = "BAD"
         self.waiver_auth = "Anyone"
 
@@ -1459,7 +1401,6 @@ class RcWellMalformedCompareRPMs(TestCompareRPMs):
             rpmfluff.SourceFile("invalid_rc.sh", invalid_rc),
         )
         self.inspection = "shellsyntax"
-        self.label = "shell-syntax"
         self.result = "BAD"
         self.waiver_auth = "Anyone"
 
@@ -1479,7 +1420,6 @@ class RcWellMalformedCompareKoji(TestCompareKoji):
             rpmfluff.SourceFile("invalid_rc.sh", invalid_rc),
         )
         self.inspection = "shellsyntax"
-        self.label = "shell-syntax"
         self.result = "BAD"
         self.waiver_auth = "Anyone"
 
@@ -1561,7 +1501,6 @@ class BashWellFormedRPM(TestRPMs):
             rpmfluff.SourceFile("valid_bash.sh", valid_bash),
         )
         self.inspection = "shellsyntax"
-        self.label = "shell-syntax"
         self.result = "OK"
 
 
@@ -1578,7 +1517,6 @@ class BashMalformedRPM(TestRPMs):
             rpmfluff.SourceFile("invalid_bash.sh", invalid_bash),
         )
         self.inspection = "shellsyntax"
-        self.label = "shell-syntax"
         self.result = "BAD"
         self.waiver_auth = "Anyone"
 
@@ -1596,7 +1534,6 @@ class BashExtglobWellFormedRPM(TestRPMs):
             rpmfluff.SourceFile("valid_bash_extglob.sh", valid_bash_extglob),
         )
         self.inspection = "shellsyntax"
-        self.label = "shell-syntax"
         self.result = "INFO"
 
 
@@ -1613,7 +1550,6 @@ class BashWellFormedKoji(TestKoji):
             rpmfluff.SourceFile("valid_bash.sh", valid_bash),
         )
         self.inspection = "shellsyntax"
-        self.label = "shell-syntax"
         self.result = "OK"
 
 
@@ -1630,7 +1566,6 @@ class BashMalformedKoji(TestKoji):
             rpmfluff.SourceFile("invalid_bash.sh", invalid_bash),
         )
         self.inspection = "shellsyntax"
-        self.label = "shell-syntax"
         self.result = "BAD"
         self.waiver_auth = "Anyone"
 
@@ -1648,7 +1583,6 @@ class BashExtglobWellFormedKoji(TestKoji):
             rpmfluff.SourceFile("valid_bash_extglob.sh", valid_bash_extglob),
         )
         self.inspection = "shellsyntax"
-        self.label = "shell-syntax"
         self.result = "INFO"
 
 
@@ -1668,7 +1602,6 @@ class BashWellFormedCompareRPMs(TestCompareRPMs):
             rpmfluff.SourceFile("valid_sh.sh", valid_bash),
         )
         self.inspection = "shellsyntax"
-        self.label = "shell-syntax"
         self.result = "OK"
 
 
@@ -1688,7 +1621,6 @@ class BashMalformedCompareRPMs(TestCompareRPMs):
             rpmfluff.SourceFile("invalid_bash.sh", invalid_bash),
         )
         self.inspection = "shellsyntax"
-        self.label = "shell-syntax"
         self.result = "BAD"
         self.waiver_auth = "Anyone"
 
@@ -1709,7 +1641,6 @@ class BashExtglobWellFormedCompareRPMs(TestCompareRPMs):
             rpmfluff.SourceFile("valid_bash_extglob.sh", valid_bash_extglob),
         )
         self.inspection = "shellsyntax"
-        self.label = "shell-syntax"
         self.result = "INFO"
 
 
@@ -1729,7 +1660,6 @@ class BashWellFormedCompareKoji(TestCompareKoji):
             rpmfluff.SourceFile("valid_bash.sh", valid_bash),
         )
         self.inspection = "shellsyntax"
-        self.label = "shell-syntax"
         self.result = "OK"
 
 
@@ -1749,7 +1679,6 @@ class BashMalformedCompareKoji(TestCompareKoji):
             rpmfluff.SourceFile("invalid_bash.sh", invalid_bash),
         )
         self.inspection = "shellsyntax"
-        self.label = "shell-syntax"
         self.result = "BAD"
         self.waiver_auth = "Anyone"
 
@@ -1770,7 +1699,6 @@ class BashExtglobWellFormedCompareKoji(TestCompareKoji):
             rpmfluff.SourceFile("valid_bash_extglob.sh", valid_bash_extglob),
         )
         self.inspection = "shellsyntax"
-        self.label = "shell-syntax"
         self.result = "INFO"
 
 
@@ -1790,7 +1718,6 @@ class BashWellMalformedCompareRPMs(TestCompareRPMs):
             rpmfluff.SourceFile("invalid_bash.sh", invalid_bash),
         )
         self.inspection = "shellsyntax"
-        self.label = "shell-syntax"
         self.result = "BAD"
         self.waiver_auth = "Anyone"
 
@@ -1811,6 +1738,5 @@ class BashWellMalformedCompareKoji(TestCompareKoji):
             rpmfluff.SourceFile("invalid_bash.sh", invalid_bash),
         )
         self.inspection = "shellsyntax"
-        self.label = "shell-syntax"
         self.result = "BAD"
         self.waiver_auth = "Anyone"

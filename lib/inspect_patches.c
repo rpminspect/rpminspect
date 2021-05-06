@@ -174,7 +174,7 @@ static bool patches_driver(struct rpminspect *ri, rpmfile_entry_t *file)
 
     /* patches may be compressed, so uncompress them here for diff(1) */
     if (file->peer_file) {
-        before_patch = uncompress_file(ri, file->peer_file->fullpath, HEADER_PATCHES);
+        before_patch = uncompress_file(ri, file->peer_file->fullpath, NAME_PATCHES);
 
         if (before_patch == NULL) {
             warn("unable to prepare patch: %s", file->peer_file->localpath);
@@ -182,7 +182,7 @@ static bool patches_driver(struct rpminspect *ri, rpmfile_entry_t *file)
         }
     }
 
-    after_patch = uncompress_file(ri, file->fullpath, HEADER_PATCHES);
+    after_patch = uncompress_file(ri, file->fullpath, NAME_PATCHES);
 
     if (after_patch == NULL) {
         warn("unable to prepare patch: %s", file->localpath);
@@ -330,7 +330,7 @@ bool inspect_patches(struct rpminspect *ri)
     assert(ri != NULL);
 
     init_result_params(&params);
-    params.header = HEADER_PATCHES;
+    params.header = NAME_PATCHES;
 
     /* Check for source package */
     TAILQ_FOREACH(peer, ri->peers, items) {
@@ -397,7 +397,7 @@ bool inspect_patches(struct rpminspect *ri)
     /* Sound the everything-is-ok alarm if everything is, in fact, ok */
     if (result && !reported) {
         init_result_params(&params);
-        params.header = HEADER_PATCHES;
+        params.header = NAME_PATCHES;
         params.severity = RESULT_OK;
         params.waiverauth = NOT_WAIVABLE;
         add_result(ri, &params);

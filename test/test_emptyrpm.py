@@ -25,7 +25,6 @@ class HasPayloadSRPM(TestSRPM):
         TestSRPM.setUp(self)
         self.rpm.add_simple_payload_file()
         self.inspection = "emptyrpm"
-        self.label = "empty-payload"
         self.result = "OK"
 
 
@@ -35,7 +34,6 @@ class HasPayloadRPMs(TestRPMs):
         TestRPMs.setUp(self)
         self.rpm.add_simple_payload_file()
         self.inspection = "emptyrpm"
-        self.label = "empty-payload"
         self.result = "OK"
 
 
@@ -45,7 +43,6 @@ class HasPayloadKojiBuild(TestKoji):
         TestKoji.setUp(self)
         self.rpm.add_simple_payload_file()
         self.inspection = "emptyrpm"
-        self.label = "empty-payload"
         self.result = "OK"
 
 
@@ -54,7 +51,6 @@ class PkgHasEmptyPayload(TestRPMs):
     def setUp(self):
         TestRPMs.setUp(self)
         self.inspection = "emptyrpm"
-        self.label = "empty-payload"
         self.result = "VERIFY"
         self.waiver_auth = "Anyone"
 
@@ -64,6 +60,5 @@ class KojiBuildHaveEmptyPayloads(TestKoji):
     def setUp(self):
         TestKoji.setUp(self)
         self.inspection = "emptyrpm"
-        self.label = "empty-payload"
         self.result = "VERIFY"
         self.waiver_auth = "Anyone"
