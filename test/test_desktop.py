@@ -75,6 +75,26 @@ MimeType=application/x-extension-fcstd;
 """
 
 
+good_tryexec_args_desktop_file = """[Desktop Entry]
+Name=Hello World
+Name[de]=Hello World
+Name[pl]=Hello World
+Comment=Lorem ipsum dolor sit amet
+Comment[de]=Lorem ipsum dolor sit amet
+GenericName=Greeting Application
+GenericName[de]=Greeting Application
+GenericName[pl]=Greeting Application
+Exec=hello-world %F
+TryExec=something-else
+Terminal=false
+Type=Application
+Icon=hello-world
+Categories=Graphics;
+StartupNotify=true
+MimeType=application/x-extension-fcstd;
+"""
+
+
 # Valid desktop file passes in RPM (OK)
 class ValidDesktopFileRPM(TestRPMs):
     def setUp(self):
@@ -857,3 +877,111 @@ class DesktopFileWithoutWorldExecutableExecCompareKoji(TestCompareKoji):
         self.inspection = "desktop"
         self.result = "VERIFY"
         self.waiver_auth = "Anyone"
+
+
+# Desktop file with invalid Exec file in RPM (VERIFY)
+class DesktopFileMissingExecWithTryExecRPM(TestRPMs):
+    def setUp(self):
+        TestRPMs.setUp(self)
+
+        # Adds /usr/share/icons/hello-world.png
+        self.rpm.add_installed_file(
+            "/usr/share/icons/hello-world.png",
+            rpmfluff.GeneratedSourceFile("hello-world.png", rpmfluff.make_png()),
+        )
+
+        # Adds /usr/share/applications/hello-world.desktop
+        self.rpm.add_installed_file(
+            "/usr/share/applications/hello-world.desktop",
+            rpmfluff.SourceFile("hello-world.desktop", good_tryexec_args_desktop_file),
+        )
+
+        self.inspection = "desktop"
+        self.label = "desktop-entry-files"
+        self.result = "INFO"
+        self.waiver_auth = "Not Waivable"
+
+
+# Desktop file with invalid Exec file in Koji build (VERIFY)
+class DesktopFileMissingExecWithTryExecRPMs(TestKoji):
+    def setUp(self):
+        TestKoji.setUp(self)
+
+        # Adds /usr/share/icons/hello-world.png
+        self.rpm.add_installed_file(
+            "/usr/share/icons/hello-world.png",
+            rpmfluff.GeneratedSourceFile("hello-world.png", rpmfluff.make_png()),
+        )
+
+        # Adds /usr/share/applications/hello-world.desktop
+        self.rpm.add_installed_file(
+            "/usr/share/applications/hello-world.desktop",
+            rpmfluff.SourceFile("hello-world.desktop", good_tryexec_args_desktop_file),
+        )
+
+        self.inspection = "desktop"
+        self.label = "desktop-entry-files"
+        self.result = "INFO"
+        self.waiver_auth = "Not Waivable"
+
+
+# Desktop file with invalid Exec file in RPM compare (VERIFY)
+class DesktopFileMissingExecWithTryExecCompareRPM(TestCompareRPMs):
+    def setUp(self):
+        TestCompareRPMs.setUp(self)
+
+        # Adds /usr/share/icons/hello-world.png
+        self.before_rpm.add_installed_file(
+            "/usr/share/icons/hello-world.png",
+            rpmfluff.GeneratedSourceFile("hello-world.png", rpmfluff.make_png()),
+        )
+        self.after_rpm.add_installed_file(
+            "/usr/share/icons/hello-world.png",
+            rpmfluff.GeneratedSourceFile("hello-world.png", rpmfluff.make_png()),
+        )
+
+        # Adds /usr/share/applications/hello-world.desktop
+        self.before_rpm.add_installed_file(
+            "/usr/share/applications/hello-world.desktop",
+            rpmfluff.SourceFile("hello-world.desktop", good_tryexec_args_desktop_file),
+        )
+        self.after_rpm.add_installed_file(
+            "/usr/share/applications/hello-world.desktop",
+            rpmfluff.SourceFile("hello-world.desktop", good_tryexec_args_desktop_file),
+        )
+
+        self.inspection = "desktop"
+        self.label = "desktop-entry-files"
+        self.result = "INFO"
+        self.waiver_auth = "Not Waivable"
+
+
+# Desktop file with invalid Exec file in Koji compare (VERIFY)
+class DesktopFileMissingExecWithTryExecCompareKoji(TestCompareKoji):
+    def setUp(self):
+        TestCompareKoji.setUp(self)
+
+        # Adds /usr/share/icons/hello-world.png
+        self.before_rpm.add_installed_file(
+            "/usr/share/icons/hello-world.png",
+            rpmfluff.GeneratedSourceFile("hello-world.png", rpmfluff.make_png()),
+        )
+        self.after_rpm.add_installed_file(
+            "/usr/share/icons/hello-world.png",
+            rpmfluff.GeneratedSourceFile("hello-world.png", rpmfluff.make_png()),
+        )
+
+        # Adds /usr/share/applications/hello-world.desktop
+        self.before_rpm.add_installed_file(
+            "/usr/share/applications/hello-world.desktop",
+            rpmfluff.SourceFile("hello-world.desktop", good_tryexec_args_desktop_file),
+        )
+        self.after_rpm.add_installed_file(
+            "/usr/share/applications/hello-world.desktop",
+            rpmfluff.SourceFile("hello-world.desktop", good_tryexec_args_desktop_file),
+        )
+
+        self.inspection = "desktop"
+        self.label = "desktop-entry-files"
+        self.result = "INFO"
+        self.waiver_auth = "Not Waivable"
