@@ -11,9 +11,9 @@ Contributors
 
 - Danilo C. L. de Paula <ddepaula@redhat.com>
 
-- David Shea <dshea@redhat.com>
-
 - Davide Cavalca <dcavalca@fb.com>
+
+- David Shea <dshea@redhat.com>
 
 - Denys Vlasenko <dvlasenk@redhat.com>
 
@@ -27,6 +27,12 @@ Contributors
 
 - Jim Bair <jbair@redhat.com>
 
+- Miro Hrončok <miro@hroncok.cz>
+
+- Pino Toscano <ptoscano@redhat.com>
+
 - Serhii Turivnyi <sturivny@redhat.com>
+
+- Siddhesh Poyarekar <siddhesh@gotplt.org>
 
 - Tim Flink <tflink@fedoraproject.org>

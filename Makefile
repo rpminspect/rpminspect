@@ -132,6 +132,8 @@ authors:
 	echo "============" >> AUTHORS.md
 	echo >> AUTHORS.md
 	git log --pretty="%an <%ae>" | sort -u | grep -vE "$(PRIMARY_AUTHORS)" | sed -e 's|^|- |g' | sed G >> AUTHORS.md
+	head -n $$(($$(wc -l < AUTHORS.md) - 1)) AUTHORS.md > AUTHORS.md.new
+	mv AUTHORS.md.new AUTHORS.md
 
 help:
 	@echo "rpminspect helper Makefile"
