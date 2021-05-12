@@ -22,6 +22,7 @@ librpminspect_sources = [
     'checksums.c',
     'copyfile.c',
     'debug.c',
+    'diags.c',
     'filecmp.c',
     'fileinfo.c',
     'files.c',

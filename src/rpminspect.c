@@ -30,6 +30,9 @@
 #include <limits.h>
 #include <glob.h>
 #include <regex.h>
+#include <zlib.h>
+#include <magic.h>
+#include <clamav.h>
 
 #include "rpminspect.h"
 
@@ -280,7 +283,8 @@ static void check_found(const bool found, const char *inspection, const char *pr
     return;
 }
 
-int main(int argc, char **argv) {
+int main(int argc, char **argv)
+{
     char *progname = basename(argv[0]);
     int c = 0;
     int i = 0;
@@ -351,6 +355,7 @@ int main(int argc, char **argv) {
     size_t cmdlen = 0;
     char *tail = NULL;
     bool ires = false;
+    string_list_t *diags = NULL;
     struct rpminspect *ri = NULL;
 
     /* Be friendly to "rpminspect ... 2>&1 | tee" use case */
@@ -721,16 +726,21 @@ int main(int argc, char **argv) {
     /* general information in the results */
     init_result_params(&params);
     params.severity = RESULT_INFO;
-    params.header = COMMAND_NAME;
+    params.header = _("diagnostics");
+
+    /* gather version information for dependent programs and libraries */
+    diags = gather_diags(ri, progname, PACKAGE_VERSION);
 
     /* add version information to the results output */
-    params.msg = _("version");
-    xasprintf(&params.details, "%s version %s", progname, PACKAGE_VERSION);
+    xasprintf(&params.msg, _("Version information for libraries and programs used by %s.  This result is for informational and diagnostic purposes only."), COMMAND_NAME);
+    params.details = list_to_string(diags, "\n");
     add_result_entry(&ri->results, &params);
+    free(params.msg);
     free(params.details);
+    list_free(diags, free);
 
     /* add command line information to the results output */
-    params.msg = _("command line");
+    xasprintf(&params.msg, _("Command line arguments used to invoke %s."), COMMAND_NAME);
 
     for (i = 0; i < argc; i++) {
         cmdlen += strlen(argv[i]) + 1;
@@ -749,6 +759,7 @@ int main(int argc, char **argv) {
     }
 
     add_result_entry(&ri->results, &params);
+    free(params.msg);
     free(params.details);
 
     /* make sure the worst result is set before running inspections */

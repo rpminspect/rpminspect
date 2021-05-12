@@ -49,7 +49,7 @@ class SkipUpstreamSRPM(TestSRPM):
         self.inspection = "upstream"
 
         # since it should skip, only look for our diagnostic output
-        self.result_inspection = "rpminspect"
+        self.result_inspection = "diagnostics"
         self.result = "INFO"
 
     def runTest(self):
@@ -71,7 +71,7 @@ class SkipUpstreamRPMs(TestRPMs):
         self.inspection = "upstream"
 
         # since it should skip, only look for our diagnostic output
-        self.result_inspection = "rpminspect"
+        self.result_inspection = "diagnostics"
         self.result = "INFO"
 
     def runTest(self):
@@ -93,7 +93,7 @@ class SkipUpstreamKoji(TestKoji):
         self.inspection = "upstream"
 
         # since it should skip, only look for our diagnostic output
-        self.result_inspection = "rpminspect"
+        self.result_inspection = "diagnostics"
         self.result = "INFO"
 
     def runTest(self):

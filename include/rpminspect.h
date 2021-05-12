@@ -395,4 +395,7 @@ int filecmp(const char *x, const char *y);
 /* abspath.c */
 char *abspath(const char *path);
 
+/* diags.c */
+string_list_t *gather_diags(struct rpminspect *ri, const char *progname, const char *progver);
+
 #endif

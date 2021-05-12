@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: rpminspect\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-05-08 11:56-0400\n"
+"POT-Creation-Date: 2021-05-12 15:39-0400\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -949,7 +949,7 @@ msgstr ""
 msgid "*** inspection flag must be 'on' or 'off', ignoring for '%s'"
 msgstr ""
 
-#: lib/init.c:994 src/rpminspect.c:276
+#: lib/init.c:994 src/rpminspect.c:279
 #, c-format
 msgid "*** Unknown inspection: `%s`"
 msgstr ""
@@ -2377,296 +2377,304 @@ msgstr ""
 msgid "UNKNOWN"
 msgstr ""
 
-#: src/rpminspect.c:46
+#: src/rpminspect.c:49
 #, c-format
 msgid ""
 "Compare package builds for policy compliance and consistency.\n"
 "\n"
 msgstr ""
 
-#: src/rpminspect.c:47
+#: src/rpminspect.c:50
 #, c-format
 msgid "Usage: %s [OPTIONS] [before build] [after build]\n"
 msgstr ""
 
-#: src/rpminspect.c:48
+#: src/rpminspect.c:51
 #, c-format
 msgid "Options:\n"
 msgstr ""
 
-#: src/rpminspect.c:49
+#: src/rpminspect.c:52
 #, c-format
 msgid "  -c FILE, --config=FILE   Configuration file to use\n"
 msgstr ""
 
-#: src/rpminspect.c:50
+#: src/rpminspect.c:53
 #, c-format
 msgid "  -p NAME, --profile=NAME  Configuration profile to use\n"
 msgstr ""
 
-#: src/rpminspect.c:51
+#: src/rpminspect.c:54
 #, c-format
 msgid "  -T LIST, --tests=LIST    List of tests to run\n"
 msgstr ""
 
-#: src/rpminspect.c:52
+#: src/rpminspect.c:55
 #, c-format
 msgid "                             (default: ALL)\n"
 msgstr ""
 
-#: src/rpminspect.c:53
+#: src/rpminspect.c:56
 #, c-format
 msgid "  -E LIST, --exclude=LIST  List of tests to exclude\n"
 msgstr ""
 
-#: src/rpminspect.c:54
+#: src/rpminspect.c:57
 #, c-format
 msgid "                             (default: none)\n"
 msgstr ""
 
-#: src/rpminspect.c:55
+#: src/rpminspect.c:58
 #, c-format
 msgid "  -a LIST, --arches=LIST   List of architectures to check\n"
 msgstr ""
 
-#: src/rpminspect.c:56
+#: src/rpminspect.c:59
 #, c-format
 msgid "  -r STR, --release=STR    Product release string\n"
 msgstr ""
 
-#: src/rpminspect.c:57
+#: src/rpminspect.c:60
 #, c-format
 msgid "  -n, --no-rebase          Disable build rebase detection\n"
 msgstr ""
 
-#: src/rpminspect.c:58
+#: src/rpminspect.c:61
 #, c-format
 msgid "  -o FILE, --output=FILE   Write results to FILE\n"
 msgstr ""
 
-#: src/rpminspect.c:59
+#: src/rpminspect.c:62
 #, c-format
 msgid "                             (default: stdout)\n"
 msgstr ""
 
-#: src/rpminspect.c:60
+#: src/rpminspect.c:63
 #, c-format
 msgid "  -F TYPE, --format=TYPE   Format output results as TYPE\n"
 msgstr ""
 
-#: src/rpminspect.c:61
+#: src/rpminspect.c:64
 #, c-format
 msgid "                             (default: text)\n"
 msgstr ""
 
-#: src/rpminspect.c:62
+#: src/rpminspect.c:65
 #, c-format
 msgid "  -t TAG, --threshold=TAG  Result threshold triggering exit\n"
 msgstr ""
 
-#: src/rpminspect.c:63
+#: src/rpminspect.c:66
 #, c-format
 msgid "                           failure (default: VERIFY)\n"
 msgstr ""
 
-#: src/rpminspect.c:64
+#: src/rpminspect.c:67
 #, c-format
 msgid "  -l, --list               List available tests and formats\n"
 msgstr ""
 
-#: src/rpminspect.c:65
+#: src/rpminspect.c:68
 #, c-format
 msgid "  -w PATH, --workdir=PATH  Temporary directory to use\n"
 msgstr ""
 
-#: src/rpminspect.c:66
+#: src/rpminspect.c:69
 #, c-format
 msgid "                             (default: %s)\n"
 msgstr ""
 
-#: src/rpminspect.c:67
+#: src/rpminspect.c:70
 #, c-format
 msgid ""
 "  -f, --fetch-only         Fetch builds only, do not perform inspections\n"
 msgstr ""
 
-#: src/rpminspect.c:68
+#: src/rpminspect.c:71
 #, c-format
 msgid "                             (implies -k)\n"
 msgstr ""
 
-#: src/rpminspect.c:69
+#: src/rpminspect.c:72
 #, c-format
 msgid "  -k, --keep               Do not remove the comparison working files\n"
 msgstr ""
 
-#: src/rpminspect.c:70
+#: src/rpminspect.c:73
 #, c-format
 msgid "  -d, --debug              Debugging mode output\n"
 msgstr ""
 
-#: src/rpminspect.c:71
+#: src/rpminspect.c:74
 #, c-format
 msgid ""
 "  -D, --dump-config        Dump configuration settings used (in YAML "
 "format)\n"
 msgstr ""
 
-#: src/rpminspect.c:72
+#: src/rpminspect.c:75
 #, c-format
 msgid "  -v, --verbose            Verbose inspection output\n"
 msgstr ""
 
-#: src/rpminspect.c:73
+#: src/rpminspect.c:76
 #, c-format
 msgid "                           when finished, display full path\n"
 msgstr ""
 
-#: src/rpminspect.c:74
+#: src/rpminspect.c:77
 #, c-format
 msgid "  -?, --help               Display usage information\n"
 msgstr ""
 
-#: src/rpminspect.c:75
+#: src/rpminspect.c:78
 #, c-format
 msgid "  -V, --version            Display program version\n"
 msgstr ""
 
-#: src/rpminspect.c:76
+#: src/rpminspect.c:79
 #, c-format
 msgid ""
 "\n"
 "See the rpminspect(1) man page for more information.\n"
 msgstr ""
 
-#: src/rpminspect.c:107 src/rpminspect.c:118
+#: src/rpminspect.c:110 src/rpminspect.c:121
 #, c-format
 msgid "*** Product release for after build (%s) is empty"
 msgstr ""
 
-#: src/rpminspect.c:133 src/rpminspect.c:142
+#: src/rpminspect.c:136 src/rpminspect.c:145
 #, c-format
 msgid "*** Product release for before build (%s) is empty"
 msgstr ""
 
-#: src/rpminspect.c:180
+#: src/rpminspect.c:183
 #, c-format
 msgid "*** unable to compile product release regular expression: %s"
 msgstr ""
 
-#: src/rpminspect.c:242
+#: src/rpminspect.c:245
 #, c-format
 msgid "*** Unable to determine product release for %s and %s"
 msgstr ""
 
-#: src/rpminspect.c:259
+#: src/rpminspect.c:262
 msgid "*** The -T and -E options are mutually exclusive"
 msgstr ""
 
-#: src/rpminspect.c:260 src/rpminspect.c:277 src/rpminspect.c:635
-#: src/rpminspect.c:672
+#: src/rpminspect.c:263 src/rpminspect.c:280 src/rpminspect.c:640
+#: src/rpminspect.c:677
 #, c-format
 msgid "*** See `%s --help` for more information."
 msgstr ""
 
-#: src/rpminspect.c:420
+#: src/rpminspect.c:425
 #, c-format
 msgid "*** Invalid output format: `%s`."
 msgstr ""
 
-#: src/rpminspect.c:435
+#: src/rpminspect.c:440
 #, c-format
 msgid "*** Unable to expand workdir: `%s`"
 msgstr ""
 
-#: src/rpminspect.c:471
+#: src/rpminspect.c:476
 #, c-format
 msgid "%s version %s\n"
 msgstr ""
 
-#: src/rpminspect.c:474
+#: src/rpminspect.c:479
 #, c-format
 msgid "?? getopt returned character code 0%o ??"
 msgstr ""
 
-#: src/rpminspect.c:481
+#: src/rpminspect.c:486
 #, c-format
 msgid "Available output formats:\n"
 msgstr ""
 
-#: src/rpminspect.c:498
+#: src/rpminspect.c:503
 #, c-format
 msgid ""
 "\n"
 "Available inspections:\n"
 msgstr ""
 
-#: src/rpminspect.c:535 src/rpminspect.c:543 src/rpminspect.c:556
+#: src/rpminspect.c:540 src/rpminspect.c:548 src/rpminspect.c:561
 #, c-format
 msgid "Failed to read configuration file %s"
 msgstr ""
 
-#: src/rpminspect.c:562
+#: src/rpminspect.c:567
 #, c-format
 msgid "Please specify a configuration file using '-c' or supply ./%s"
 msgstr ""
 
-#: src/rpminspect.c:634
+#: src/rpminspect.c:639
 msgid "*** Invalid before and after build specification."
 msgstr ""
 
-#: src/rpminspect.c:642
+#: src/rpminspect.c:647
 msgid "*** unable to read RPM configuration"
 msgstr ""
 
-#: src/rpminspect.c:671
+#: src/rpminspect.c:676
 #, c-format
 msgid "*** Unsupported architecture specified: `%s`"
 msgstr ""
 
-#: src/rpminspect.c:694
+#: src/rpminspect.c:699
 #, c-format
 msgid "*** Unable to create directory %s"
 msgstr ""
 
-#: src/rpminspect.c:706 src/rpminspect.c:717
+#: src/rpminspect.c:711 src/rpminspect.c:722
 msgid "*** failed to gather specified builds."
 msgstr ""
 
-#: src/rpminspect.c:727
-msgid "version"
+#: src/rpminspect.c:729
+msgid "diagnostics"
 msgstr ""
 
-#: src/rpminspect.c:733
-msgid "command line"
+#: src/rpminspect.c:735
+#, c-format
+msgid ""
+"Version information for libraries and programs used by %s.  This result is "
+"for informational and diagnostic purposes only."
 msgstr ""
 
-#: src/rpminspect.c:763
+#: src/rpminspect.c:743
+#, c-format
+msgid "Command line arguments used to invoke %s."
+msgstr ""
+
+#: src/rpminspect.c:774
 msgid "*** No peers, ensure packages exist for specified architecture(s)."
 msgstr ""
 
-#: src/rpminspect.c:771
+#: src/rpminspect.c:782
 msgid "invalid after RPM"
 msgstr ""
 
-#: src/rpminspect.c:779
+#: src/rpminspect.c:790
 msgid "invalid before RPM"
 msgstr ""
 
-#: src/rpminspect.c:804
+#: src/rpminspect.c:815
 #, c-format
 msgid "Running %s inspection..."
 msgstr ""
 
-#: src/rpminspect.c:813
+#: src/rpminspect.c:824
 msgid "pass"
 msgstr ""
 
-#: src/rpminspect.c:813
+#: src/rpminspect.c:824
 msgid "FAIL"
 msgstr ""
 
-#: src/rpminspect.c:835
+#: src/rpminspect.c:846
 #, c-format
 msgid ""
 "\n"
