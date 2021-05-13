@@ -114,7 +114,8 @@ enum {
     BLOCK_VENDOR,
     BLOCK_XML,
     BLOCK_EMPTYRPM,
-    BLOCK_EXPECTED_EMPTY_RPMS
+    BLOCK_EXPECTED_EMPTY_RPMS,
+    BLOCK_TYPES
 };
 
 static int add_regex(const char *pattern, regex_t **regex_out)
@@ -242,6 +243,8 @@ static void add_ignore(string_list_map_t **table, int i, char *s)
         inspection = NAME_BADFUNCS;
     } else if (i == BLOCK_RUNPATH) {
         inspection = NAME_RUNPATH;
+    } else if (i == BLOCK_TYPES) {
+        inspection = NAME_TYPES;
     } else {
         warnx(_("*** ignore found in %d, value `%s'"), i, s);
         return;
@@ -595,7 +598,8 @@ static int read_cfgfile(struct rpminspect *ri, const char *filename)
                                                           group != BLOCK_ABIDIFF &&
                                                           group != BLOCK_KMIDIFF &&
                                                           group != BLOCK_BADFUNCS &&
-                                                          group != BLOCK_RUNPATH)) {
+                                                          group != BLOCK_RUNPATH &&
+                                                          group != BLOCK_TYPES)) {
                         block = BLOCK_IGNORE;
                         group = BLOCK_NULL;
                     } else if (!strcmp(key, "security_path_prefix")) {
@@ -670,6 +674,9 @@ static int read_cfgfile(struct rpminspect *ri, const char *filename)
                     } else if (!strcmp(key, NAME_EMPTYRPM)) {
                         block = BLOCK_NULL;
                         group = BLOCK_EMPTYRPM;
+                    } else if (!strcmp(key, NAME_TYPES)) {
+                        block = BLOCK_NULL;
+                        group = BLOCK_TYPES;
                     }
                 }
 
@@ -752,6 +759,8 @@ static int read_cfgfile(struct rpminspect *ri, const char *filename)
                             block = BLOCK_RUNPATH_ALLOWED_ORIGIN_PATHS;
                         } else if (!strcmp(key, "origin_prefix_trim")) {
                             block = BLOCK_RUNPATH_ORIGIN_PREFIX_TRIM;
+                        } else if (!strcmp(key, "ignore")) {
+                            block = BLOCK_IGNORE;
                         }
                     } else if (group == BLOCK_ELF) {
                         if (!strcmp(key, "ignore")) {
@@ -786,13 +795,13 @@ static int read_cfgfile(struct rpminspect *ri, const char *filename)
                             group = BLOCK_BADFUNCS;
                             block = BLOCK_IGNORE;
                         }
-                    } else if (group == BLOCK_RUNPATH) {
-                        if (!strcmp(key, "ignore")) {
-                            block = BLOCK_IGNORE;
-                        }
                     } else if (group == BLOCK_EMPTYRPM) {
                         if (!strcmp(key, "expected_empty")) {
                             block = BLOCK_EXPECTED_EMPTY_RPMS;
+                        }
+                    } else if (group == BLOCK_TYPES) {
+                        if (!strcmp(key, "ignore")) {
+                            block = BLOCK_IGNORE;
                         }
                     }
                 } else if (symbol == SYMBOL_VALUE) {
