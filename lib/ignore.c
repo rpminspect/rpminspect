@@ -25,6 +25,8 @@
 #include <glob.h>
 #include <assert.h>
 #include <err.h>
+#include <libgen.h>
+#include <limits.h>
 #include "queue.h"
 #include "rpminspect.h"
 
@@ -44,25 +46,42 @@ static bool match_path(const char *pattern, const char *root, const char *needle
     bool match = false;
     int r = 0;
     int gflags = GLOB_NOSORT | GLOB_PERIOD | GLOB_BRACE;
-    char *globpath = NULL;
+    char globpath[PATH_MAX + 1];
     char *globsub = NULL;
+    char *gp = globpath;
     glob_t found;
     size_t len = 0;
     size_t i = 0;
+    char *n = NULL;
 
     assert(pattern != NULL);
     assert(needle != NULL);
+
+    n = strdup(needle);
+    assert(n != NULL);
 
     if (root != NULL) {
         len = strlen(root);
     }
 
-    if (root == NULL) {
-        globpath = strdup(pattern);
-    } else {
-        xasprintf(&globpath, "%s%s", root, pattern);
+    memset(globpath, 0, sizeof(globpath));
+
+    if (root != NULL) {
+        gp = stpcpy(gp, root);
     }
 
+    if (!strprefix(pattern, "/")) {
+        gp = stpcpy(gp, dirname(n));
+    }
+
+    free(n);
+
+    if (!strsuffix(globpath, "/") && !strprefix(pattern, "/")) {
+        gp = stpcpy(gp, "/");
+    }
+
+    gp = stpcpy(gp, pattern);
+    DEBUG_PRINT("globpath=|%s|\n", globpath);
     r = glob(globpath, gflags, NULL, &found);
 
     if (r == GLOB_NOSPACE || r == GLOB_ABORTED) {
@@ -70,7 +89,6 @@ static bool match_path(const char *pattern, const char *root, const char *needle
     }
 
     if (r != 0) {
-        free(globpath);
         return false;
     }
 
@@ -83,7 +101,6 @@ static bool match_path(const char *pattern, const char *root, const char *needle
         }
     }
 
-    free(globpath);
     globfree(&found);
 
     return match;
@@ -110,6 +127,8 @@ bool ignore_path(const struct rpminspect *ri, const char *inspection, const char
     if (path == NULL) {
         return true;
     }
+
+    DEBUG_PRINT("ignore_path -> path=|%s|\n", path);
 
     /* first, handle the global ignores */
     if (ri->ignores != NULL && !TAILQ_EMPTY(ri->ignores)) {
