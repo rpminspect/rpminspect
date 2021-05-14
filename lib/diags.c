@@ -31,6 +31,11 @@
 
 #include "rpminspect.h"
 
+/* For older versions of OpenSSL */
+#ifndef OPENSSL_VERSION
+#define OPENSSL_VERSION 0
+#endif
+
 /*
  * Gather versions of dependent libraries and programs and add the
  * information as strings to a list and return the list.  Caller must
