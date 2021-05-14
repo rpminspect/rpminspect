@@ -25,13 +25,29 @@ endif
 jsonc = dependency('json-c', required : true)
 libxml = dependency('libxml-2.0', required : true)
 rpm = dependency('rpm', required : true)
-libarchive = dependency('libarchive', required : true)
 libkmod = dependency('libkmod', required : true)
 libcurl = dependency('libcurl', required : true)
 zlib = dependency('zlib', required : true)
 yaml = dependency('yaml-0.1', required : true)
-openssl = dependency('openssl', required : true)
 clamav = dependency('libclamav', required : true)
+
+# libarchive (need to check for specific functions)
+libarchive = dependency('libarchive', required : true)
+
+if cc.has_function('archive_version_details', dependencies : [ libarchive ])
+    add_project_arguments('-D_HAVE_ARCHIVE_VERSION_DETAILS', language : 'c')
+elif cc.has_function('archive_version_string', dependencies : [ libarchive ])
+    add_project_arguments('-D_HAVE_ARCHIVE_VERSION_STRING', language : 'c')
+endif
+
+# openssl (need to check for the version info function)
+openssl = dependency('openssl', required : true)
+
+if not cc.has_function('OpenSSL_version', dependencies : [ openssl ]) and cc.has_function('SSLeay_version', dependencies : [ openssl ])
+    add_project_arguments('-DOpenSSL_version=SSLeay_version', language : 'c')
+elif not cc.has_function('OpenSSL_version', dependencies : [ openssl ]) and not cc.has_function('SSLeay_version', dependencies : [ openssl ])
+    add_project_arguments('-D_NO_OPENSSL_VERSION_FUNCTION', language : 'c')
+endif
 
 # Test suite dependencies
 run_tests = get_option('tests')
@@ -119,6 +135,10 @@ endif
 # libmagic
 if not cc.has_function('magic_open', args : ['-lmagic'])
     error('*** unable to find magic_open() in libmagic')
+endif
+
+if cc.has_function('magic_version', args : ['-lmagic'])
+    add_project_arguments('-D_HAVE_MAGIC_VERSION', language : 'c')
 endif
 
 magic = declare_dependency(link_args : ['-lmagic'])

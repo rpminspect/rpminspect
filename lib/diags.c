@@ -74,11 +74,14 @@ string_list_t *gather_diags(struct rpminspect *ri, const char *progname, const c
     xasprintf(&entry->data, "zlib version %s", zlibVersion());
     TAILQ_INSERT_TAIL(list, entry, items);
 
+#ifdef _HAVE_MAGIC_VERSION
     /* libmagic */
+    /* older versions of libmagic lack this function */
     entry = calloc(1, sizeof(*entry));
     assert(entry != NULL);
     xasprintf(&entry->data, "libmagic version %d", magic_version());
     TAILQ_INSERT_TAIL(list, entry, items);
+#endif
 
     /* libclamav */
     entry = calloc(1, sizeof(*entry));
@@ -127,6 +130,7 @@ string_list_t *gather_diags(struct rpminspect *ri, const char *progname, const c
     free(tmp);
 
     /* libarchive */
+#ifdef _HAVE_ARCHIVE_VERSION_DETAILS
     tmp = strreplace(archive_version_details(), "libarchive ", NULL);
     details = strsplit(tmp, " ");
     free(tmp);
@@ -147,6 +151,12 @@ string_list_t *gather_diags(struct rpminspect *ri, const char *progname, const c
 
     free(ver);
     free(tmp);
+#elif _HAVE_ARCHIVE_VERSION_STRING
+    entry = calloc(1, sizeof(*entry));
+    assert(entry != NULL);
+    xasprintf(&entry->data, "%s", archive_version_string());
+    TAILQ_INSERT_TAIL(list, entry, items);
+#endif
 
     /* libyaml */
     entry = calloc(1, sizeof(*entry));
@@ -154,6 +164,7 @@ string_list_t *gather_diags(struct rpminspect *ri, const char *progname, const c
     xasprintf(&entry->data, "libyaml version %s", yaml_get_version_string());
     TAILQ_INSERT_TAIL(list, entry, items);
 
+#ifndef NO_OPENSSL_VERSION_FUNCTION
     /* openssl */
     tmp = strreplace(OpenSSL_version(OPENSSL_VERSION), "OpenSSL ", "OpenSSL version ");
     entry = calloc(1, sizeof(*entry));
@@ -161,6 +172,7 @@ string_list_t *gather_diags(struct rpminspect *ri, const char *progname, const c
     xasprintf(&entry->data, "%s", tmp);
     TAILQ_INSERT_TAIL(list, entry, items);
     free(tmp);
+#endif
 
     /* xmlrpc-c */
     xmlrpc_client_version(&major, &minor, &update);
