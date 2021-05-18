@@ -500,7 +500,10 @@ static int read_cfgfile(struct rpminspect *ri, const char *filename)
     yaml_parser_set_input_file(&parser, fp);
 
     do {
-        yaml_parser_scan(&parser, &token);
+        if (yaml_parser_scan(&parser, &token) == 0) {
+            warnx(_("ignoring malformed %s configuration file: %s"), COMMAND_NAME, filename);
+            return -1;
+        }
 
         switch (token.type) {
             case YAML_STREAM_START_TOKEN:
