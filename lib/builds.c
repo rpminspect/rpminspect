@@ -388,7 +388,10 @@ static int download_build(const struct rpminspect *ri, const struct koji_build *
                  * a hash table at the end.
                  */
                 do {
-                    yaml_parser_scan(&parser, &token);
+                    if (yaml_parser_scan(&parser, &token) == 0) {
+                        warnx(_("ignoring malformed module metadata file: %s"), dst);
+                        return -1;
+                    }
 
                     switch (token.type) {
                         case YAML_SCALAR_TOKEN:
