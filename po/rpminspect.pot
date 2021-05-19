@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: rpminspect\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-05-12 15:39-0400\n"
+"POT-Creation-Date: 2021-05-19 14:14-0400\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -784,6 +784,21 @@ msgid ""
 "only carry DT_RPATH or DT_RUNPATH, never both."
 msgstr ""
 
+#: lib/abi.c:163
+#, c-format
+msgid "malformed ABI level identifier: %s"
+msgstr ""
+
+#: lib/abi.c:168
+#, c-format
+msgid "ABI level %d already defined"
+msgstr ""
+
+#: lib/abi.c:182
+#, c-format
+msgid "malformed ABI level entry: %s"
+msgstr ""
+
 #: lib/builds.c:83
 msgid "no koji build or task specified"
 msgstr ""
@@ -813,21 +828,26 @@ msgstr ""
 msgid "Downloading %s...\n"
 msgstr ""
 
-#: lib/builds.c:423
+#: lib/builds.c:392
+#, c-format
+msgid "ignoring malformed module metadata file: %s"
+msgstr ""
+
+#: lib/builds.c:426
 msgid "fclose()"
 msgstr ""
 
-#: lib/builds.c:742
+#: lib/builds.c:745
 #, c-format
 msgid "`%s' already exists"
 msgstr ""
 
-#: lib/builds.c:784
+#: lib/builds.c:787
 #, c-format
 msgid "unable to find after build: %s"
 msgstr ""
 
-#: lib/builds.c:836
+#: lib/builds.c:839
 #, c-format
 msgid "unable to find before build: %s"
 msgstr ""
@@ -894,86 +914,91 @@ msgstr ""
 msgid "*** payload path %s not in RPM metadata"
 msgstr ""
 
-#: lib/init.c:246
+#: lib/init.c:249
 #, c-format
 msgid "*** ignore found in %d, value `%s'"
 msgstr ""
 
-#: lib/init.c:339
+#: lib/init.c:344
 #, c-format
 msgid "invalid input string `%s`"
 msgstr ""
 
-#: lib/init.c:366 lib/init.c:375 lib/init.c:383 lib/init.c:395 lib/init.c:404
-#: lib/init.c:412 lib/init.c:424 lib/init.c:433 lib/init.c:441 lib/init.c:453
+#: lib/init.c:371 lib/init.c:380 lib/init.c:388 lib/init.c:400 lib/init.c:409
+#: lib/init.c:417 lib/init.c:429 lib/init.c:438 lib/init.c:446 lib/init.c:458
 #, c-format
 msgid "*** invalid mode string: %s"
 msgstr ""
 
-#: lib/init.c:877
+#: lib/init.c:504
+#, c-format
+msgid "ignoring malformed %s configuration file: %s"
+msgstr ""
+
+#: lib/init.c:912
 #, c-format
 msgid "*** unknown specname match setting '%s', defaulting to 'full'"
 msgstr ""
 
-#: lib/init.c:886
+#: lib/init.c:921
 #, c-format
 msgid "*** unknown specname primary setting '%s', defaulting to 'name'"
 msgstr ""
 
-#: lib/init.c:897
+#: lib/init.c:932
 msgid "error reading elf include path"
 msgstr ""
 
-#: lib/init.c:906
+#: lib/init.c:941
 msgid "error reading elf exclude path"
 msgstr ""
 
-#: lib/init.c:917
+#: lib/init.c:952
 msgid "error reading man page include path"
 msgstr ""
 
-#: lib/init.c:926
+#: lib/init.c:961
 msgid "error reading man page exclude path"
 msgstr ""
 
-#: lib/init.c:937
+#: lib/init.c:972
 msgid "error reading xml include path"
 msgstr ""
 
-#: lib/init.c:946
+#: lib/init.c:981
 msgid "error reading xml exclude path"
 msgstr ""
 
-#: lib/init.c:990
+#: lib/init.c:1025
 #, c-format
 msgid "*** inspection flag must be 'on' or 'off', ignoring for '%s'"
 msgstr ""
 
-#: lib/init.c:994 src/rpminspect.c:279
+#: lib/init.c:1029 src/rpminspect.c:279
 #, c-format
 msgid "*** Unknown inspection: `%s`"
 msgstr ""
 
-#: lib/init.c:1215
+#: lib/init.c:1254
 #, c-format
 msgid "*** Invalid filename in the fileinfo list: %s"
 msgstr ""
 
-#: lib/init.c:1216
+#: lib/init.c:1255
 msgid "*** From this invalid line:"
 msgstr ""
 
-#: lib/init.c:1217
+#: lib/init.c:1256
 #, c-format
 msgid "***     %s"
 msgstr ""
 
-#: lib/init.c:1595 lib/init.c:1616
+#: lib/init.c:1634 lib/init.c:1655
 #, c-format
 msgid "*** error reading '%s'\n"
 msgstr ""
 
-#: lib/init.c:1611
+#: lib/init.c:1650
 #, c-format
 msgid "*** unable to read profile '%s' from %s\n"
 msgstr ""
@@ -1301,35 +1326,35 @@ msgid ""
 "File %s is not a valid desktop file on %s; desktop-file-validate reports:"
 msgstr ""
 
-#: lib/inspect_disttag.c:195
+#: lib/inspect_disttag.c:191
 #, c-format
 msgid "The %s file is missing the %s tag."
 msgstr ""
 
-#: lib/inspect_disttag.c:197
+#: lib/inspect_disttag.c:193
 msgid "Release: tag"
 msgstr ""
 
-#: lib/inspect_disttag.c:201
+#: lib/inspect_disttag.c:197
 #, c-format
 msgid ""
 "The dist tag should be of the form '%s' in the %s tag or in a macro used in "
 "the %s tag."
 msgstr ""
 
-#: lib/inspect_disttag.c:203 lib/inspect_disttag.c:209
+#: lib/inspect_disttag.c:199 lib/inspect_disttag.c:205
 #, c-format
 msgid "'%%{?dist}' tag"
 msgstr ""
 
-#: lib/inspect_disttag.c:207
+#: lib/inspect_disttag.c:203
 #, c-format
 msgid ""
 "The %s tag does not seem to contain '%s' or a macro that expands to include "
 "the '%s' tag."
 msgstr ""
 
-#: lib/inspect_disttag.c:263
+#: lib/inspect_disttag.c:259
 msgid "Specified package is not a source RPM, skipping."
 msgstr ""
 
@@ -1891,7 +1916,7 @@ msgstr ""
 msgid "%s changed (%ld bytes -> %ld bytes)"
 msgstr ""
 
-#: lib/inspect_patches.c:238 lib/inspect_patches.c:262
+#: lib/inspect_patches.c:238 lib/inspect_patches.c:264
 msgid "patch file ${FILE}"
 msgstr ""
 
@@ -1900,34 +1925,34 @@ msgstr ""
 msgid "New patch file `%s` appeared"
 msgstr ""
 
-#: lib/inspect_patches.c:289
+#: lib/inspect_patches.c:291
 #, c-format
 msgid "%s touches as many as %ld line%s"
 msgstr ""
 
-#: lib/inspect_patches.c:291
+#: lib/inspect_patches.c:293
 #, c-format
 msgid "%s touches %ld file%s"
 msgstr ""
 
-#: lib/inspect_patches.c:293
+#: lib/inspect_patches.c:295
 #, c-format
 msgid "%s touches %ld file%s and %s%ld line%s"
 msgstr ""
 
-#: lib/inspect_patches.c:293
+#: lib/inspect_patches.c:295
 msgid "as many as "
 msgstr ""
 
-#: lib/inspect_patches.c:297
+#: lib/inspect_patches.c:299
 msgid "patch changes ${FILE}"
 msgstr ""
 
-#: lib/inspect_patches.c:352 lib/inspect_upstream.c:152
+#: lib/inspect_patches.c:354 lib/inspect_upstream.c:152
 msgid "No source packages available, skipping inspection."
 msgstr ""
 
-#: lib/inspect_patches.c:387
+#: lib/inspect_patches.c:389
 #, c-format
 msgid "Patch file `%s` removed"
 msgstr ""
