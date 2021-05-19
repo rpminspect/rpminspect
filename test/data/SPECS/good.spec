@@ -10,7 +10,6 @@
 
 # Extra macros that should be ignored by rpminspect
 %{!?_selinux_policy_version: %global _selinux_policy_version %(%{__sed} -e 's,.*selinux-policy-\\([^/]*\\)/.*,\\1,' /usr/share/selinux/devel/policyhelp 2>/dev/null)}
-%{!?_licensedir:%global license %doc}
 
 # Multiline macros should be ignored
 %define multiline_macro \
