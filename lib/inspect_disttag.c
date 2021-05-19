@@ -38,6 +38,10 @@ static void append_macros(string_list_t **macros, const char *s)
 
     new_macros = get_macros(s);
 
+    if (new_macros == NULL) {
+        return;
+    }
+
     while (!TAILQ_EMPTY(new_macros)) {
         /* take the first new macro */
         entry = TAILQ_FIRST(new_macros);
@@ -124,7 +128,6 @@ static bool disttag_driver(struct rpminspect *ri, rpmfile_entry_t *file) {
     string_entry_t *entry = NULL;
     char *buf = NULL;
     char *release = NULL;
-    char *specfile = NULL;
     int macrocount = 0;
     struct result_params params;
 
@@ -133,17 +136,10 @@ static bool disttag_driver(struct rpminspect *ri, rpmfile_entry_t *file) {
         return true;
     }
 
-    /* Spec files are all named in a standard way */
-    xasprintf(&specfile, "%s.spec", headerGetString(file->rpm_header, RPMTAG_NAME));
-
     /* We only want to look at the spec files */
-    if (strcmp(file->localpath, specfile)) {
-        free(specfile);
+    if (!strsuffix(file->localpath, SPEC_FILENAME_EXTENSION)) {
         return true;
     }
-
-    /* We're done with this */
-    free(specfile);
 
     /* Read in spec file macros */
     macrocount = get_specfile_macros(ri, file->fullpath);

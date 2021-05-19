@@ -68,13 +68,13 @@ int get_specfile_macros(struct rpminspect *ri, const char *specfile)
     assert(spec != NULL);
 
     /* Use a regular expression to match macro lines we will break down */
-    xasprintf(&buf, "^\\s*%%(%s|%s)\\s+\\w+\\s+.*[\\w\\S]+$", SPEC_MACRO_DEFINE, SPEC_MACRO_GLOBAL);
+    xasprintf(&buf, "(%s|%s)", SPEC_MACRO_DEFINE, SPEC_MACRO_GLOBAL);
     reg_result = regcomp(&macro_regex, buf, REG_EXTENDED);
     free(buf);
 
     if (reg_result != 0) {
         regerror(reg_result, &macro_regex, reg_error, sizeof(reg_error));
-        warn("%s: %s", __func__, reg_error);
+        warnx("%s", reg_error);
         return 0;
     }
 
