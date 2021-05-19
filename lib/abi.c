@@ -160,12 +160,12 @@ abi_t *read_abi(const char *vendor_data_dir, const char *product_release)
              * seen it before
              */
             if (sscanf(line->data + 7, "%d]", &found_level) == EOF) {
-                warn("malformed ABI level identifier: %s", line->data);
+                warn(_("malformed ABI level identifier: %s"), line->data);
                 skip_entries = true;
             }
 
             if (levels & (((uint64_t) 1) << found_level)) {
-                warn("ABI level %d already defined", found_level);
+                warn(_("ABI level %d already defined"), found_level);
                 skip_entries = true;
             }
 
@@ -179,7 +179,7 @@ abi_t *read_abi(const char *vendor_data_dir, const char *product_release)
             linekv = strsplit(line->data, "=");
 
             if (list_len(linekv) != 2) {
-                warn("malformed ABI level entry: %s", line->data);
+                warn(_("malformed ABI level entry: %s"), line->data);
                 list_free(linekv, free);
                 continue;
             }
