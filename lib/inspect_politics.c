@@ -35,12 +35,17 @@ static bool politics_driver(struct rpminspect *ri, rpmfile_entry_t *file)
     char *digest = NULL;
     bool matched = false;
     bool allowed = false;
-    int flags = FNM_NOESCAPE | FNM_PERIOD | FNM_EXTMATCH;
+    int flags = FNM_NOESCAPE | FNM_PERIOD;
     const char *name = NULL;
     struct result_params params;
 
     assert(ri != NULL);
     assert(file != NULL);
+
+#ifdef FNM_EXTMATCH
+    /* glibc provides this extended pattern matching syntax */
+    flags |= FNM_EXTMATCH;
+#endif
 
     /* special files and directories can be skipped */
     if (S_ISDIR(file->st.st_mode) ||

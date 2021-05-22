@@ -37,7 +37,6 @@
 #include <inttypes.h>
 
 #include <dlfcn.h>
-#include <gnu/lib-names.h>
 #include <link.h>
 
 #include <gelf.h>

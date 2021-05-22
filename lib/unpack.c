@@ -125,7 +125,7 @@ int unpack_archive(const char *archive, const char *dest, const bool force) {
         if (errno == ENOENT) {
             return 0;
         } else {
-            warn("realpath()");
+            warn("realpath: %s", archive);
             return -1;
         }
     }

@@ -42,12 +42,10 @@ void sigabrt_handler(__attribute__ ((unused)) int i)
     return;
 }
 
-static void usage(const char *progname)
+static void usage(void)
 {
-    assert(progname != NULL);
-
     printf(_("Compare package builds for policy compliance and consistency.\n\n"));
-    printf(_("Usage: %s [OPTIONS] [before build] [after build]\n"), progname);
+    printf(_("Usage: %s [OPTIONS] [before build] [after build]\n"), COMMAND_NAME);
     printf(_("Options:\n"));
     printf(_("  -c FILE, --config=FILE   Configuration file to use\n"));
     printf(_("  -p NAME, --profile=NAME  Configuration profile to use\n"));
@@ -254,13 +252,11 @@ static char *get_product_release(string_map_t *products, const favor_release_t f
 /*
  * Used to ensure the user only specifies the -T or -E option.
  */
-static void check_inspection_options(const bool inspection_opt, const char *progname)
+static void check_inspection_options(const bool inspection_opt)
 {
-    assert(progname != NULL);
-
     if (inspection_opt) {
         warnx(_("*** The -T and -E options are mutually exclusive"));
-        errx(RI_PROGRAM_ERROR, _("*** See `%s --help` for more information."), progname);
+        errx(RI_PROGRAM_ERROR, _("*** See `%s --help` for more information."), COMMAND_NAME);
     }
 
     return;
@@ -270,14 +266,13 @@ static void check_inspection_options(const bool inspection_opt, const char *prog
  * Used in the -T and -E option processing to report any unknown
  * test names provided.  Exit if true.
  */
-static void check_found(const bool found, const char *inspection, const char *progname)
+static void check_found(const bool found, const char *inspection)
 {
     assert(inspection != NULL);
-    assert(progname != NULL);
 
     if (!found) {
         warnx(_("*** Unknown inspection: `%s`"), inspection);
-        errx(RI_PROGRAM_ERROR, _("*** See `%s --help` for more information."), progname);
+        errx(RI_PROGRAM_ERROR, _("*** See `%s --help` for more information."), COMMAND_NAME);
     }
 
     return;
@@ -285,7 +280,7 @@ static void check_found(const bool found, const char *inspection, const char *pr
 
 int main(int argc, char **argv)
 {
-    char *progname = basename(argv[0]);
+    char resolved[PATH_MAX];
     int c = 0;
     int i = 0;
     int j = 0;
@@ -324,7 +319,7 @@ int main(int argc, char **argv)
     char *token = NULL;
     char *workdir = NULL;
     struct stat sbuf;
-    char cwd[PATH_MAX + 1];
+    char cwd[PATH_MAX];
     char *r = NULL;
     char *output = NULL;
     char *release = NULL;
@@ -388,14 +383,14 @@ int main(int argc, char **argv)
                 break;
             case 'T':
                 /* Inspections to enable */
-                check_inspection_options(inspection_opt, progname);
+                check_inspection_options(inspection_opt);
                 insoptarg = strdup(optarg);
                 exclude = false;
                 inspection_opt = true;
                 break;
             case 'E':
                 /* Inspections to disable */
-                check_inspection_options(inspection_opt, progname);
+                check_inspection_options(inspection_opt);
                 insoptarg = strdup(optarg);
                 exclude = true;
                 inspection_opt = true;
@@ -470,10 +465,10 @@ int main(int argc, char **argv)
                 verbose = true;
                 break;
             case '?':
-                usage(progname);
+                usage();
                 exit(0);
             case 'V':
-                printf(_("%s version %s\n"), progname, PACKAGE_VERSION);
+                printf(_("%s version %s\n"), COMMAND_NAME, PACKAGE_VERSION);
                 exit(0);
             default:
                 errx(RI_PROGRAM_ERROR, _("?? getopt returned character code 0%o ??"), c);
@@ -517,6 +512,13 @@ int main(int argc, char **argv)
         }
 
         exit(RI_INSPECTION_SUCCESS);
+    }
+
+    /* Get the full path to the program */
+    memset(resolved, '\0', sizeof(resolved));
+
+    if (realpath(argv[0], resolved) == NULL) {
+        err(EXIT_FAILURE, "realpath");
     }
 
     /*
@@ -569,7 +571,8 @@ int main(int argc, char **argv)
 
     free(profile);
 
-    /* various options from the command line */
+    /* various options from the command line or elsewhere */
+    ri->progname = strdup(resolved);
     ri->verbose = verbose;
     ri->product_release = release;
     ri->threshold = getseverity(threshold);
@@ -590,7 +593,7 @@ int main(int argc, char **argv)
 
         while ((inspection = strsep(&insoptarg, ",")) != NULL) {
             found = process_inspection_flag(inspection, exclude, &ri->tests);
-            check_found(found, inspection, progname);
+            check_found(found, inspection);
         }
 
         free(tmp);
@@ -637,7 +640,7 @@ int main(int argc, char **argv)
                 return RI_INSPECTION_SUCCESS;
             } else {
                 warnx(_("*** Invalid before and after build specification."));
-                errx(RI_PROGRAM_ERROR, _("*** See `%s --help` for more information."), progname);
+                errx(RI_PROGRAM_ERROR, _("*** See `%s --help` for more information."), COMMAND_NAME);
             }
         }
     }
@@ -674,7 +677,7 @@ int main(int argc, char **argv)
             if (!found) {
                 rpmFreeRpmrc();
                 warnx(_("*** Unsupported architecture specified: `%s`"), token);
-                errx(RI_PROGRAM_ERROR, _("*** See `%s --help` for more information."), progname);
+                errx(RI_PROGRAM_ERROR, _("*** See `%s --help` for more information."), COMMAND_NAME);
             }
 
             /* architecture is valid, save it */
@@ -729,7 +732,7 @@ int main(int argc, char **argv)
     params.header = _("diagnostics");
 
     /* gather version information for dependent programs and libraries */
-    diags = gather_diags(ri, progname, PACKAGE_VERSION);
+    diags = gather_diags(ri, COMMAND_NAME, PACKAGE_VERSION);
 
     /* add version information to the results output */
     xasprintf(&params.msg, _("Version information for libraries and programs used by %s.  This result is for informational and diagnostic purposes only."), COMMAND_NAME);

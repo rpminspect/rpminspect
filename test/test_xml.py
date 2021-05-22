@@ -22,14 +22,14 @@ from baseclass import TestRPMs, TestKoji, TestCompareRPMs, TestCompareKoji
 
 valid_xml = """<?xml version='1.0'?>
 <!DOCTYPE greeting [
-  <!ELEMENT greeting (#PCDATA)>
+    <!ELEMENT greeting (#PCDATA)>
 ]>
 <greeting>Hello, world!</greeting>
 """
 
 invalid_xml = """<?xml version='1.0'?>
 <!DOCTYPE greeting [
-  <!ELEMENT greeting EMPTY>
+    <!ELEMENT greeting EMPTY>
 ]>
 <greeting>Hello world</greeting>
 <nonClosingElement variable="value">

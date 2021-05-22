@@ -19,8 +19,6 @@ jobs:
         # Set up the matrix of distributions to test
         strategy:
             matrix:
-                #container: ["alpine:latest"]
-
                 # This one frequently breaks.  Like installing
                 # packages doesn't work.  I am not convinced
                 # tumbleweed is useful in the CI environment.
@@ -33,7 +31,8 @@ jobs:
                             "debian:testing",
                             "opensuse/leap",
                             "archlinux/archlinux:base-devel",
-                            "gentoo/stage3"]
+                            "gentoo/stage3",
+                            "alpine:latest"]
 
         container:
             image: ${{ matrix.container }}
@@ -46,7 +45,6 @@ jobs:
               run: |
                   case "${{ matrix.container }}" in
                       alpine*)
-                          apk update
                           apk add git
                           ;;
                       archlinux*)
