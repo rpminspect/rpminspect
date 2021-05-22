@@ -36,13 +36,23 @@
 #include <rpm/header.h>
 #include <rpm/rpmtag.h>
 
+#ifdef MANDOC_INCLUDE_SUBDIR
+#include <mandoc/man.h>
+#include <mandoc/mandoc.h>
+#else
 #include <man.h>
 #include <mandoc.h>
+#endif
 
 /* Required for libmandoc >= 1.14.5 */
 #ifdef NEWLIBMANDOC
+#ifdef MANDOC_INCLUDE_SUBDIR
+#include <mandoc/roff.h>
+#include <mandoc/mandoc_parse.h>
+#else
 #include <roff.h>
 #include <mandoc_parse.h>
+#endif
 #endif
 
 #include "rpminspect.h"

@@ -33,7 +33,6 @@
 #include <err.h>
 
 #include <dlfcn.h>
-#include <gnu/lib-names.h>
 #include <link.h>
 
 #include <gelf.h>
@@ -67,15 +66,61 @@ void init_elf_data(struct rpminspect *ri)
     string_entry_t *iter = NULL;
     string_map_t *hentry = NULL;
     size_t symbol_len;
+    Elf *e = NULL;
+    int fd = 0;
+    GElf_Dyn *tags = NULL;
+    GElf_Shdr shdr;
+    size_t sz = 0;
+    size_t i = 0;
+    bool found = false;
+    char *libc_so = NULL;
+    char *needed = NULL;
 
     assert(ri != NULL);
+
+    /*
+     * Look for a libc on ourself.  If we find one, extract that and
+     * use it for the libc.  The requirement here is that the C library
+     * needs to start with "libc.".  So far this has been true of the
+     * glibc and musl systems I have seen.
+     */
+    if ((e = get_elf(ri->progname, &fd)) == NULL) {
+        close(fd);
+        return;
+    }
+
+    found = get_dynamic_tags(e, DT_NEEDED, &tags, &sz, &shdr);
+
+    if (!found || sz == 0) {
+        elf_end(e);
+        close(fd);
+        return;
+    }
+
+    for (i = 0; i <= sz; i++) {
+        needed = elf_strptr(e, shdr.sh_link, (size_t) tags[i].d_un.d_ptr);
+
+        if (strprefix(needed, "libc.")) {
+            libc_so = strdup(needed);
+            break;
+        }
+    }
+
+    elf_end(e);
+    close(fd);
+
+    if (libc_so == NULL) {
+        warnx("unable to find libc");
+        return;
+    }
 
     /*
      * Use libdl to get the path to libc.so.6 so we can open it.
      * This is kind of lame, but avoids having to hardcode library paths
      * or call an external program or worry about 32 vs. 64-bit.
      */
-    dl = dlopen(LIBC_SO, RTLD_LAZY);
+    dl = dlopen(libc_so, RTLD_LAZY);
+    free(libc_so);
 
     if (dl == NULL) {
         return;

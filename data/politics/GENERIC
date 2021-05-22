@@ -6,6 +6,10 @@
 # file or '*' to indicate all files should match, and whether or not
 # it is allowed.
 #
+# If you are using a glibc-based system, the filename pattern may
+# contain pattern matching syntax supported by FNM_EXTMATCH.  See
+# fnmatch(3) for more information.
+#
 #
 #<filename pattern>  <message digest>                           <allow/deny>
 #

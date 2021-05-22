@@ -45,7 +45,7 @@ static bool match_path(const char *pattern, const char *root, const char *needle
 {
     bool match = false;
     int r = 0;
-    int gflags = GLOB_NOSORT | GLOB_PERIOD | GLOB_BRACE;
+    int gflags = GLOB_NOSORT | GLOB_PERIOD;
     char globpath[PATH_MAX + 1];
     char *globsub = NULL;
     char *gp = globpath;
@@ -56,6 +56,11 @@ static bool match_path(const char *pattern, const char *root, const char *needle
 
     assert(pattern != NULL);
     assert(needle != NULL);
+
+#ifdef GLOB_BRACE
+    /* this is a GNU extension, see glob(3) */
+    gflags |= GLOB_BRACE;
+#endif
 
     n = strdup(needle);
     assert(n != NULL);

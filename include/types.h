@@ -326,6 +326,7 @@ typedef struct _string_list_map_t {
  * their program.  You need to free this struct on exit.
  */
 struct rpminspect {
+    char *progname;            /* Full path to the program */
     string_list_t *cfgfiles;   /* list of full path config files read (in order) */
     char *workdir;             /* full path to working directory */
     char *profiledir;          /* full path to profiles directory */

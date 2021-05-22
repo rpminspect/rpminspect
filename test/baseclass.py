@@ -17,6 +17,7 @@
 #
 
 import os
+import platform
 import shutil
 import socket
 import subprocess
@@ -65,9 +66,18 @@ def check_results(results, inspection, result, waiver_auth, message=None):
     for r in results[inspection]:
         if "result" in r and "waiver authorization" in r:
             if r["result"] == result and r["waiver authorization"] == waiver_auth:
-                if message and r.get("message") != message:
+                # handle systems with partially configured rpmbuild setups
+                if message:
+                    m = r.get("message")
+                else:
+                    m = None
+
+                if m and m.find('%{_arch}') != -1:
+                    m = m.replace('%{_arch}', platform.machine())
+
+                if m != message:
                     raise AssertionError(
-                        f'Expected result message "{message}" but it was "{r.get("message")}"'
+                        f'Expected result message "{m}" but it was "{m}"'
                     )
                 break
     else:
@@ -237,6 +247,8 @@ class TestSRPM(RequiresRpminspect):
 
         self.p = subprocess.Popen(args, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         (self.out, self.err) = self.p.communicate()
+
+        self.results = None
 
         try:
             with open(self.outputfile) as f:

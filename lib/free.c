@@ -87,6 +87,7 @@ void free_rpminspect(struct rpminspect *ri) {
         return;
     }
 
+    free(ri->progname);
     list_free(ri->cfgfiles, free);
     free(ri->workdir);
     free(ri->kojihub);

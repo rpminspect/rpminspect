@@ -129,7 +129,12 @@ endif
 if cc.has_header('mandoc_parse.h')
     add_project_arguments('-DNEWLIBMANDOC', language : 'c')
 else
-    message('using libmandoc < 1.14.5 API')
+    if cc.has_header('mandoc/mandoc_parse.h')
+        add_project_arguments('-DNEWLIBMANDOC', language : 'c')
+        add_project_arguments('-DMANDOC_INCLUDE_SUBDIR', language : 'c')
+    else
+        message('using libmandoc < 1.14.5 API')
+    endif
 endif
 
 # libmagic

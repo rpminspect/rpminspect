@@ -147,7 +147,7 @@ static bool symlinks_driver(struct rpminspect *ri, rpmfile_entry_t *file) {
     /*
      * try to find the link destination
      * Handle absolute symlinks differently so we can check each subpackage.
-     * Relative symlinks will be realpath()'ed in each subpackage.
+     * Relative symlinks will be canonicalized in each subpackage.
      */
     if (*target == '/') {
         /* link is absolute */
