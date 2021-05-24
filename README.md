@@ -84,7 +84,7 @@ meson and ninja, plus the following libraries:
 | mandoc                | https://mandoc.bsd.lv/                                    | ISC                          |
 | libyaml               | https://github.com/yaml/libyaml                           | MIT                          |
 | file (for libmagic)   | http://www.darwinsys.com/file/                            | BSD                          |
-| OpenSSL or LibreSSL   | https://www.openssl.org/ or http://www.libressl.org/      | OpenSSL or (OpenSSL and ISC) |
+| OpenSSL               | https://www.openssl.org/                                  | OpenSSL                      |
 | libcap                | https://sites.google.com/site/fullycapable/               | BSD-3-Clause                 |
 
 Additionally, the unit test suite requires the following packages:
