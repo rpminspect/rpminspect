@@ -72,8 +72,8 @@ def check_results(results, inspection, result, waiver_auth, message=None):
                 else:
                     m = None
 
-                if m and m.find('%{_arch}') != -1:
-                    m = m.replace('%{_arch}', platform.machine())
+                if m and m.find("%{_arch}") != -1:
+                    m = m.replace("%{_arch}", platform.machine())
 
                 if m != message:
                     raise AssertionError(
