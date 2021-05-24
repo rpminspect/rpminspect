@@ -23,6 +23,7 @@
 #include <string.h>
 #include <errno.h>
 #include <assert.h>
+#include <sys/capability.h>
 
 #include "rpminspect.h"
 
@@ -31,6 +32,7 @@ static bool capabilities_driver(struct rpminspect *ri, rpmfile_entry_t *file)
     bool result = true;
     cap_t aftercap = NULL;
     cap_t beforecap = NULL;
+    cap_t expected = NULL;
     char *after = NULL;
     char *before = NULL;
     const char *pkg = NULL;
@@ -55,11 +57,9 @@ static bool capabilities_driver(struct rpminspect *ri, rpmfile_entry_t *file)
 
     /* Get the cap values */
     aftercap = get_cap(file);
-    after = cap_to_text(aftercap, NULL);
 
     if (file->peer_file) {
         beforecap = get_cap(file->peer_file);
-        before = cap_to_text(beforecap, NULL);
     }
 
     /* The architecture is used in reporting */
@@ -72,34 +72,45 @@ static bool capabilities_driver(struct rpminspect *ri, rpmfile_entry_t *file)
     params.file = file->localpath;
 
     /* Report if the caps are different */
-    if (after && before && strcmp(after, before)) {
-        xasprintf(&params.msg, _("File capabilities for %s changed from '%s' to '%s' on %s\n"), file->localpath, before, after, arch);
-        params.severity = RESULT_VERIFY;
-        params.waiverauth = WAIVABLE_BY_SECURITY;
-        params.remedy = REMEDY_CAPABILITIES;
-        params.verb = VERB_CHANGED;
-        params.noun = _("${FILE} capabilities");
-        add_result(ri, &params);
-        free(params.msg);
-        result = false;
-    } else if (after && before && !strcmp(after, before)) {
-        xasprintf(&params.msg, _("File capabilities found for %s: '%s' on %s\n"), file->localpath, after, arch);
-        params.severity = RESULT_INFO;
-        params.waiverauth = NOT_WAIVABLE;
-        add_result(ri, &params);
-        free(params.msg);
+    if (beforecap && aftercap) {
+        before = cap_to_text(beforecap, NULL);
+        assert(before != NULL);
+        after = cap_to_text(aftercap, NULL);
+        assert(after != NULL);
+
+        if (cap_compare(beforecap, aftercap)) {
+            xasprintf(&params.msg, _("File capabilities for %s changed from '%s' to '%s' on %s\n"), file->localpath, before, after, arch);
+            params.severity = RESULT_VERIFY;
+            params.waiverauth = WAIVABLE_BY_SECURITY;
+            params.remedy = REMEDY_CAPABILITIES;
+            params.verb = VERB_CHANGED;
+            params.noun = _("${FILE} capabilities");
+            add_result(ri, &params);
+            free(params.msg);
+            result = false;
+        } else if (!cap_compare(beforecap, aftercap)) {
+            xasprintf(&params.msg, _("File capabilities found for %s: '%s' on %s\n"), file->localpath, after, arch);
+            params.severity = RESULT_INFO;
+            params.waiverauth = NOT_WAIVABLE;
+            add_result(ri, &params);
+            free(params.msg);
+        }
     }
 
     /* If we have after caps, check it against the caps list and report */
     pkg = headerGetString(file->rpm_header, RPMTAG_NAME);
     flcaps = get_caps_entry(ri, pkg, file->localpath);
 
-    if (!after && !flcaps) {
+    if (!aftercap && !flcaps) {
         return true;
     }
 
-    if (after && flcaps) {
-        if (!strcmp(after, flcaps->caps)) {
+    if (flcaps->caps) {
+        expected = cap_from_text(flcaps->caps);
+    }
+
+    if (aftercap && expected) {
+        if (!cap_compare(aftercap, expected)) {
             xasprintf(&params.msg, _("File capabilities list entry found for %s: '%s' on %s, matches package\n"), file->localpath, flcaps->caps, arch);
             params.severity = RESULT_INFO;
             params.waiverauth = NOT_WAIVABLE;
@@ -116,7 +127,7 @@ static bool capabilities_driver(struct rpminspect *ri, rpmfile_entry_t *file)
             free(params.msg);
             result = false;
         }
-    } else if (after && !flcaps) {
+    } else if (aftercap && cap_compare(aftercap, expected)) {
         xasprintf(&params.msg, _("File capabilities for %s not found on the capabilities list on %s\n"), file->localpath, arch);
         params.severity = RESULT_BAD;
         params.waiverauth = WAIVABLE_BY_SECURITY;
@@ -126,7 +137,7 @@ static bool capabilities_driver(struct rpminspect *ri, rpmfile_entry_t *file)
         add_result(ri, &params);
         free(params.msg);
         result = false;
-    } else if (!after && flcaps) {
+    } else if (!aftercap && expected) {
         xasprintf(&params.msg, _("File capabilities expected for %s but not found on %s: expected '%s'\n"), file->localpath, arch, flcaps->caps);
         params.severity = RESULT_BAD;
         params.waiverauth = WAIVABLE_BY_SECURITY;
