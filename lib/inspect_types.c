@@ -51,6 +51,11 @@ static bool types_driver(struct rpminspect *ri, rpmfile_entry_t *file)
         return true;
     }
 
+    /* Skip spec files in source RPMs */
+    if (headerIsSource(file->rpm_header) && strsuffix(file->localpath, SPEC_FILENAME_EXTENSION)) {
+        return true;
+    }
+
     /* We need the architecture for reporting */
     arch = get_rpm_header_arch(file->rpm_header);
 
