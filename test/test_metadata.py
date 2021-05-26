@@ -260,37 +260,37 @@ class DirtySummaryKojiBuild(TestKoji):
         self.result = "BAD"
 
 
-# Verify changing Summary reports verify on SRPM (VERIFY)
+# Verify changing Summary reports verify on SRPM (INFO)
 class ChangingSummaryCompareSRPM(TestCompareSRPM):
     def setUp(self):
         TestCompareSRPM.setUp(self)
         self.before_rpm.add_summary("Lorem ipsum dolor sit amet")
         self.after_rpm.add_summary("Lorem ipsum")
         self.inspection = "metadata"
-        self.result = "VERIFY"
-        self.waiver_auth = "Anyone"
+        self.result = "INFO"
+        self.waiver_auth = "Not Waivable"
 
 
-# Verify changing Summary reports verify on built RPMs (VERIFY)
+# Verify changing Summary reports verify on built RPMs (INFO)
 class ChangingSummaryCompareRPMs(TestCompareRPMs):
     def setUp(self):
         TestCompareRPMs.setUp(self)
         self.before_rpm.add_summary("Lorem ipsum dolor sit amet")
         self.after_rpm.add_summary("Lorem ipsum")
         self.inspection = "metadata"
-        self.result = "VERIFY"
-        self.waiver_auth = "Anyone"
+        self.result = "INFO"
+        self.waiver_auth = "Not Waivable"
 
 
-# Verify changing Summary reports verify on Koji build (VERIFY)
+# Verify changing Summary reports verify on Koji build (INFO)
 class ChangingSummaryCompareKojiBuild(TestCompareKoji):
     def setUp(self):
         TestCompareKoji.setUp(self)
         self.before_rpm.add_summary("Lorem ipsum dolor sit amet")
         self.after_rpm.add_summary("Lorem ipsum")
         self.inspection = "metadata"
-        self.result = "VERIFY"
-        self.waiver_auth = "Anyone"
+        self.result = "INFO"
+        self.waiver_auth = "Not Waivable"
 
 
 # Verify Description without bad words passes on an SRPM (OK)
@@ -389,7 +389,7 @@ class DirtyDescriptionKojiBuild(TestKoji):
         self.result = "BAD"
 
 
-# Verify changing Description reports verify on SRPM (VERIFY)
+# Verify changing Description reports verify on SRPM (INFO)
 class ChangingDescriptionCompareSRPM(TestCompareSRPM):
     def setUp(self):
         TestCompareSRPM.setUp(self)
@@ -403,11 +403,11 @@ class ChangingDescriptionCompareSRPM(TestCompareSRPM):
         )
         self.after_rpm.add_description("Lorem ipsum dolor sit amet")
         self.inspection = "metadata"
-        self.result = "VERIFY"
-        self.waiver_auth = "Anyone"
+        self.result = "INFO"
+        self.waiver_auth = "Not Waivable"
 
 
-# Verify changing Description reports verify on built RPMs (VERIFY)
+# Verify changing Description reports verify on built RPMs (INFO)
 class ChangingDescriptionCompareRPMs(TestCompareRPMs):
     def setUp(self):
         TestCompareRPMs.setUp(self)
@@ -421,11 +421,11 @@ class ChangingDescriptionCompareRPMs(TestCompareRPMs):
         )
         self.after_rpm.add_description("Lorem ipsum dolor sit amet")
         self.inspection = "metadata"
-        self.result = "VERIFY"
-        self.waiver_auth = "Anyone"
+        self.result = "INFO"
+        self.waiver_auth = "Not Waivable"
 
 
-# Verify changing Description reports verify on Koji build (VERIFY)
+# Verify changing Description reports verify on Koji build (INFO)
 class ChangingDescriptionCompareKojiBuild(TestCompareKoji):
     def setUp(self):
         TestCompareKoji.setUp(self)
@@ -439,5 +439,5 @@ class ChangingDescriptionCompareKojiBuild(TestCompareKoji):
         )
         self.after_rpm.add_description("Lorem ipsum dolor sit amet")
         self.inspection = "metadata"
-        self.result = "VERIFY"
-        self.waiver_auth = "Anyone"
+        self.result = "INFO"
+        self.waiver_auth = "Not Waivable"
