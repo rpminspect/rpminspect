@@ -125,12 +125,6 @@ static bool valid_peers(struct rpminspect *ri, const Header before_hdr, const He
         after_name = headerGetString(after_hdr, RPMTAG_NAME);
         params.msg = NULL;
 
-        if (rebase) {
-            params.severity = RESULT_INFO;
-        } else {
-            params.severity = RESULT_VERIFY;
-        }
-
         if (before_vendor == NULL && after_vendor) {
             xasprintf(&params.msg, _("Gained Package Vendor \"%s\" in %s"), after_vendor, after_name);
         } else if (before_vendor && after_vendor == NULL) {
@@ -140,6 +134,12 @@ static bool valid_peers(struct rpminspect *ri, const Header before_hdr, const He
         }
 
         if (params.msg) {
+            if (rebase) {
+                params.severity = RESULT_INFO;
+            } else {
+                params.severity = RESULT_VERIFY;
+            }
+
             params.waiverauth = WAIVABLE_BY_ANYONE;
             params.remedy = NULL;
             add_result(ri, &params);
@@ -149,7 +149,8 @@ static bool valid_peers(struct rpminspect *ri, const Header before_hdr, const He
 
         if (strcmp(before_summary, after_summary)) {
             xasprintf(&params.msg, _("Package Summary change from \"%s\" to \"%s\" in %s"), before_summary, after_summary, after_name);
-            params.waiverauth = WAIVABLE_BY_ANYONE;
+            params.severity = RESULT_INFO;
+            params.waiverauth = NOT_WAIVABLE;
             params.remedy = NULL;
             add_result(ri, &params);
             free(params.msg);
@@ -159,7 +160,8 @@ static bool valid_peers(struct rpminspect *ri, const Header before_hdr, const He
         if (strcmp(before_description, after_description)) {
             xasprintf(&params.msg, _("Package Description changed in %s"), after_name);
             xasprintf(&params.details, _("from:\n\n%s\n\nto:\n\n%s"), before_description, after_description);
-            params.waiverauth = WAIVABLE_BY_ANYONE;
+            params.severity = RESULT_INFO;
+            params.waiverauth = NOT_WAIVABLE;
             params.remedy = NULL;
             add_result(ri, &params);
             free(params.msg);
