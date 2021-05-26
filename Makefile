@@ -69,7 +69,7 @@ flake8:
 	python3 -m flake8
 
 black:
-	python3 -m black --check --diff $(topdir)/test/
+	python3 -m black --check --diff $(topdir)/test/ $(topdir)/doc/
 
 gate: all
 	$(topdir)/utils/gate.sh $(topdir)/build/src/rpminspect
