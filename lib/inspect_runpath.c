@@ -59,6 +59,34 @@ static string_list_t *get_tag_list(Elf *elf, const Elf64_Sxword tag)
 }
 
 /*
+ * Given a working path, check to see if any packages in our build own
+ * that path.  True if we find it, false otherwise.
+ */
+static bool build_contains(const struct rpminspect *ri, const char *working_path)
+{
+    rpmpeer_entry_t *peer = NULL;
+    rpmfile_entry_t *file = NULL;
+
+    assert(ri != NULL);
+    assert(working_path != NULL);
+    assert(ri->peers != NULL);
+
+    TAILQ_FOREACH(peer, ri->peers, items) {
+        if (peer->after_files == NULL || TAILQ_EMPTY(peer->after_files)) {
+            continue;
+        }
+
+        TAILQ_FOREACH(file, peer->after_files, items) {
+            if (S_ISDIR(file->st.st_mode) && !strcmp(file->localpath, working_path)) {
+                return true;
+            }
+        }
+    }
+
+    return false;
+}
+
+/*
  * Return a bool that represents whether or not the runpath
  * string_list_t contains valid runpath entries.  If all entries are
  * valid, the function returns true.  Any invalid entries trigger a
@@ -175,7 +203,9 @@ static bool check_runpath(struct rpminspect *ri, const rpmfile_entry_t *file, co
                 working_path = abspath(working_path);
 
                 /* check for the working path in the allowed paths */
-                valid = list_contains(allowed, working_path);
+                if (list_contains(allowed, working_path) || build_contains(ri, working_path)) {
+                    valid = true;
+                }
 
                 free(working_path);
             }
