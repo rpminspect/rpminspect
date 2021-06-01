@@ -296,3 +296,28 @@ class ValidLoremIpsonLicenseTagKoji(TestKoji):
         )
         self.inspection = "license"
         self.result = "INFO"
+
+
+# Invalid use of fedora_name string when an abbreviation is available (BAD)
+class InvalidUseOfLicenseStringSRPM(TestSRPM):
+    def setUp(self):
+        TestSRPM.setUp(self)
+        self.rpm.addLicense("Apache Software License 2.0")
+        self.inspection = "license"
+        self.result = "BAD"
+
+
+class InvalidUseOfLicenseStringRPMs(TestRPMs):
+    def setUp(self):
+        TestRPMs.setUp(self)
+        self.rpm.addLicense("Apache Software License 2.0")
+        self.inspection = "license"
+        self.result = "BAD"
+
+
+class InvalidUseOfLicenseStringKoji(TestKoji):
+    def setUp(self):
+        TestKoji.setUp(self)
+        self.rpm.addLicense("Apache Software License 2.0")
+        self.inspection = "license"
+        self.result = "BAD"

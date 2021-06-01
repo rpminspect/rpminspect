@@ -89,18 +89,18 @@ static struct json_object *read_licensedb(const char *licensedb)
  */
 static bool check_license_abbrev(const char *lic)
 {
-    const char *fedora_abbrev = NULL;
-    const char *fedora_name = NULL;
-    const char *spdx_abbrev = NULL;
+    const char *fedora_abbrev = "";
+    const char *fedora_name = "";
+    const char *spdx_abbrev = "";
     bool approved = false;
 
     assert(lic != NULL);
 
     json_object_object_foreach(licdb, license_name, val) {
         /* first reset our variables */
-        fedora_abbrev = NULL;
-        fedora_name = NULL;
-        spdx_abbrev = NULL;
+        fedora_abbrev = "";
+        fedora_name = "";
+        spdx_abbrev = "";
         approved = false;
 
         if (strlen(license_name) == 0) {
@@ -133,7 +133,8 @@ static bool check_license_abbrev(const char *lic)
          * if we hit 'spdx_abbrev' and approved is true, that is valid
          * NOTE: we only match the first hit in the license database
          */
-        if (approved && ((!strcmp(lic, fedora_abbrev) || !strcmp(lic, spdx_abbrev)) || !strcmp(lic, fedora_name))) {
+        if (approved && ((!strcmp(lic, fedora_abbrev) || !strcmp(lic, spdx_abbrev)) ||
+                         (strlen(fedora_abbrev) == 0 && strlen(spdx_abbrev) == 0 && !strcmp(lic, fedora_name)))) {
             return true;
         }
     }
