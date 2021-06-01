@@ -218,5 +218,15 @@
     "spdx_abbrev": "CC0-1.0",
     "spdx_name": "Creative Commons Zero v1.0 Universal",
     "url": "http://creativecommons.org/publicdomain/zero/1.0/legalcode"
+  },
+  "Lorem ipsum": {
+    "approved": "yes",
+    "fedora_abbrev": "",
+    "fedora_name": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua",
+    "id": "8000",
+    "license_text": "",
+    "spdx_abbrev": "#No official SPDX support",
+    "spdx_name": "#No official SPDX support",
+    "url": "https://www.lipsum.com/"
   }
 }

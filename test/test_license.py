@@ -265,3 +265,34 @@ class ValidPerlHTTPMessageLicenseTagKoji(TestKoji):
         self.rpm.addLicense("(GPL+ or Artistic) and CC0")
         self.inspection = "license"
         self.result = "INFO"
+
+
+# Valid License string without any official abbreviations (OK)
+class ValidLoremIpsonLicenseTagSRPM(TestSRPM):
+    def setUp(self):
+        TestSRPM.setUp(self)
+        self.rpm.addLicense(
+            "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua"  # noqa: E501
+        )
+        self.inspection = "license"
+        self.result = "INFO"
+
+
+class ValidLoremIpsonLicenseTagRPMs(TestRPMs):
+    def setUp(self):
+        TestRPMs.setUp(self)
+        self.rpm.addLicense(
+            "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua"  # noqa: E501
+        )
+        self.inspection = "license"
+        self.result = "INFO"
+
+
+class ValidLoremIpsonLicenseTagKoji(TestKoji):
+    def setUp(self):
+        TestKoji.setUp(self)
+        self.rpm.addLicense(
+            "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua"  # noqa: E501
+        )
+        self.inspection = "license"
+        self.result = "INFO"
