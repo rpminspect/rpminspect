@@ -68,7 +68,7 @@ static bool permissions_driver(struct rpminspect *ri, rpmfile_entry_t *file)
     allowed = match_fileinfo_mode(ri, file, NAME_PERMISSIONS, NULL);
 
     /* if setuid/setgid or new mode is more open */
-    if (mode_diff && file->peer_file && !allowed) {
+    if (mode_diff && file->peer_file && !allowed && (ri->tests & INSPECT_PERMISSIONS)) {
         if (!(before_mode & (S_ISUID|S_ISGID)) && (after_mode & (S_ISUID|S_ISGID))) {
             params.severity = RESULT_BAD;
             what = _("changed setuid/setgid");

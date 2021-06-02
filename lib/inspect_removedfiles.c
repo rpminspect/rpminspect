@@ -120,25 +120,27 @@ static bool removedfiles_driver(struct rpminspect *ri, rpmfile_entry_t *file)
     /*
      * File has been removed, report results.
      */
-    if (is_elf(file->fullpath) && !strcmp(type, "application/x-pie-executable")) {
-        soname = get_elf_soname(file->fullpath);
-        params.severity = RESULT_BAD;
+    if (params.waiverauth == WAIVABLE_BY_SECURITY || (ri->tests & INSPECT_REMOVEDFILES)) {
+        if (is_elf(file->fullpath) && !strcmp(type, "application/x-pie-executable")) {
+            soname = get_elf_soname(file->fullpath);
+            params.severity = RESULT_BAD;
 
-        if (soname) {
-            xasprintf(&params.msg, _("ABI break: Library %s with SONAME '%s' removed from %s"), file->localpath, soname, arch);
-            free(soname);
+            if (soname) {
+                xasprintf(&params.msg, _("ABI break: Library %s with SONAME '%s' removed from %s"), file->localpath, soname, arch);
+                free(soname);
+            } else {
+                xasprintf(&params.msg, _("ABI break: Library %s removed from %s"), file->localpath, arch);
+            }
+
+            add_removedfiles_result(ri, &params);
+            result = !(params.severity >= RESULT_VERIFY);
+            free(params.msg);
         } else {
-            xasprintf(&params.msg, _("ABI break: Library %s removed from %s"), file->localpath, arch);
+            xasprintf(&params.msg, _("%s removed from %s"), file->localpath, arch);
+            add_removedfiles_result(ri, &params);
+            result = !(params.severity >= RESULT_VERIFY);
+            free(params.msg);
         }
-
-        add_removedfiles_result(ri, &params);
-        result = !(params.severity >= RESULT_VERIFY);
-        free(params.msg);
-    } else {
-        xasprintf(&params.msg, _("%s removed from %s"), file->localpath, arch);
-        add_removedfiles_result(ri, &params);
-        result = !(params.severity >= RESULT_VERIFY);
-        free(params.msg);
     }
 
     return result;

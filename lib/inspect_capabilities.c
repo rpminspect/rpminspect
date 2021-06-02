@@ -88,7 +88,7 @@ static bool capabilities_driver(struct rpminspect *ri, rpmfile_entry_t *file)
             add_result(ri, &params);
             free(params.msg);
             result = false;
-        } else if (!cap_compare(beforecap, aftercap)) {
+        } else if (!cap_compare(beforecap, aftercap) && (ri->tests & INSPECT_CAPABILITIES)) {
             xasprintf(&params.msg, _("File capabilities found for %s: '%s' on %s\n"), file->localpath, after, arch);
             params.severity = RESULT_INFO;
             params.waiverauth = NOT_WAIVABLE;
@@ -110,7 +110,7 @@ static bool capabilities_driver(struct rpminspect *ri, rpmfile_entry_t *file)
     }
 
     if (aftercap && expected) {
-        if (!cap_compare(aftercap, expected)) {
+        if (!cap_compare(aftercap, expected) && (ri->tests & INSPECT_CAPABILITIES)) {
             xasprintf(&params.msg, _("File capabilities list entry found for %s: '%s' on %s, matches package\n"), file->localpath, flcaps->caps, arch);
             params.severity = RESULT_INFO;
             params.waiverauth = NOT_WAIVABLE;

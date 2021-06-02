@@ -804,8 +804,8 @@ int main(int argc, char **argv)
         }
 
         for (i = 0; inspections[i].name != NULL; i++) {
-            /* test not selected by user */
-            if (!(ri->tests & inspections[i].flag)) {
+            /* test not selected by user and not a security inspection */
+            if (!(ri->tests & inspections[i].flag) && !(SECURITY_INSPECTIONS & inspections[i].flag)) {
                 continue;
             }
 

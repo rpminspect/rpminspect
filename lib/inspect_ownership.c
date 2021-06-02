@@ -120,7 +120,7 @@ static bool ownership_driver(struct rpminspect *ri, rpmfile_entry_t *file) {
      */
 
     /* Report forbidden file owners */
-    if (ri->forbidden_owners && list_contains(ri->forbidden_owners, owner)) {
+    if (ri->forbidden_owners && list_contains(ri->forbidden_owners, owner) && (ri->tests & INSPECT_OWNERSHIP)) {
         xasprintf(&params.msg, _("File %s has forbidden owner `%s` on %s"), file->localpath, owner, arch);
         params.severity = RESULT_BAD;
         params.waiverauth = WAIVABLE_BY_ANYONE;
@@ -131,7 +131,7 @@ static bool ownership_driver(struct rpminspect *ri, rpmfile_entry_t *file) {
     }
 
     /* Report forbidden file groups */
-    if (ri->forbidden_groups && list_contains(ri->forbidden_groups, group)) {
+    if (ri->forbidden_groups && list_contains(ri->forbidden_groups, group) && (ri->tests & INSPECT_OWNERSHIP)) {
         xasprintf(&params.msg, _("File %s has forbidden group `%s` on %s"), file->localpath, owner, arch);
         params.severity = RESULT_BAD;
         params.waiverauth = WAIVABLE_BY_ANYONE;
@@ -147,7 +147,7 @@ static bool ownership_driver(struct rpminspect *ri, rpmfile_entry_t *file) {
             bin = true;
 
             /* Check the owner */
-            if (strcmp(owner, ri->bin_owner) && !match_fileinfo_owner(ri, file, owner, NAME_OWNERSHIP, NULL)) {
+            if (strcmp(owner, ri->bin_owner) && !match_fileinfo_owner(ri, file, owner, NAME_OWNERSHIP, NULL) && (ri->tests & INSPECT_OWNERSHIP)) {
                 xasprintf(&params.msg, _("File %s has owner `%s` on %s, but should be `%s`"), file->localpath, owner, arch, ri->bin_owner);
                 params.severity = RESULT_BAD;
                 params.waiverauth = WAIVABLE_BY_ANYONE;
@@ -171,7 +171,7 @@ static bool ownership_driver(struct rpminspect *ri, rpmfile_entry_t *file) {
 
                 /* Handle if CAP_SETUID is present or not */
                 if (have_setuid == CAP_SET) {
-                    if (file->st.st_mode & S_IXOTH) {
+                    if (file->st.st_mode & S_IXOTH & (ri->tests & INSPECT_OWNERSHIP)) {
                         xasprintf(&params.msg, _("File %s on %s has CAP_SETUID capability but group `%s` and is world executable"), file->localpath, arch, group);
                         params.severity = RESULT_BAD;
                         params.waiverauth = WAIVABLE_BY_ANYONE;
@@ -190,7 +190,7 @@ static bool ownership_driver(struct rpminspect *ri, rpmfile_entry_t *file) {
                         free(params.msg);
                         result = false;
                     }
-                } else if (!match_fileinfo_group(ri, file, group, NAME_OWNERSHIP, NULL)) {
+                } else if (!match_fileinfo_group(ri, file, group, NAME_OWNERSHIP, NULL) && (ri->tests & INSPECT_OWNERSHIP)) {
                     xasprintf(&params.msg, _("File %s has group `%s` on %s, but should be `%s`"), file->localpath, group, arch, ri->bin_group);
                     params.severity = RESULT_BAD;
                     params.waiverauth = WAIVABLE_BY_ANYONE;
@@ -208,7 +208,7 @@ static bool ownership_driver(struct rpminspect *ri, rpmfile_entry_t *file) {
     /*
      * BEFORE AND AFTER
      */
-    if (file->peer_file) {
+    if (file->peer_file && (ri->tests & INSPECT_OWNERSHIP)) {
         /* Get the before file values */
         before_owner = get_header_value(file->peer_file, RPMTAG_FILEUSERNAME);
         before_group = get_header_value(file->peer_file, RPMTAG_FILEGROUPNAME);
