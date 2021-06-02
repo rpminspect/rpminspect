@@ -227,12 +227,13 @@ static bool changedfiles_driver(struct rpminspect *ri, rpmfile_entry_t *file)
      * build could change the compression ratios or other properties
      * but the uncompressed content would be the same.
      */
-    if (!strcmp(type, "application/x-gzip") || !strcmp(type, "application/gzip") ||
-        !strcmp(type, "application/x-bzip2") || !strcmp(type, "application/bzip2") ||
-        !strcmp(type, "application/x-xz") || !strcmp(type, "application/xz") ||
-        (!strcmp(type, "application/octet-stream") && (strsuffix(file->localpath, ".gz") ||        /* this is a workaround for bad/old versions of libmagic */
-                                                       strsuffix(file->localpath, ".bz2") ||
-                                                       strsuffix(file->localpath, ".xz")))) {
+    if ((!strcmp(type, "application/x-gzip") || !strcmp(type, "application/gzip") ||
+         !strcmp(type, "application/x-bzip2") || !strcmp(type, "application/bzip2") ||
+         !strcmp(type, "application/x-xz") || !strcmp(type, "application/xz") ||
+         (!strcmp(type, "application/octet-stream") && (strsuffix(file->localpath, ".gz") ||        /* this is a workaround for bad/old versions of libmagic */
+                                                        strsuffix(file->localpath, ".bz2") ||
+                                                        strsuffix(file->localpath, ".xz")))) &&
+        (params.waiverauth == WAIVABLE_BY_SECURITY || (ri->tests & INSPECT_CHANGEDFILES))) {
         /* uncompress the files to temporary files for comparison */
         before_uncompressed_file = uncompress_file(ri, file->peer_file->fullpath, NAME_CHANGEDFILES);
         after_uncompressed_file = uncompress_file(ri, file->fullpath, NAME_CHANGEDFILES);
@@ -308,7 +309,7 @@ static bool changedfiles_driver(struct rpminspect *ri, rpmfile_entry_t *file)
     /*
      * Compare gettext .mo files and report any changes.
      */
-    if (!strcmp(type, "application/x-gettext-translation") && strsuffix(file->localpath, MO_FILENAME_EXTENSION)) {
+    if (!strcmp(type, "application/x-gettext-translation") && strsuffix(file->localpath, MO_FILENAME_EXTENSION) && (ri->tests & INSPECT_CHANGEDFILES)) {
         /*
          * This one is somewhat complicated.  We run msgunfmt on the mo files,
          * but first we have to make temporary files for that output.  Then
@@ -388,7 +389,7 @@ static bool changedfiles_driver(struct rpminspect *ri, rpmfile_entry_t *file)
         }
     }
 
-    if (!strcmp(type, "text/x-c") && possible_header) {
+    if (!strcmp(type, "text/x-c") && possible_header && (ri->tests & INSPECT_CHANGEDFILES)) {
         /* Now diff the header content */
         errors = run_cmd(&exitcode, ri->commands.diff, "-u", "-w", "--label", file->localpath, file->peer_file->fullpath, file->fullpath, NULL);
 
@@ -441,16 +442,18 @@ static bool changedfiles_driver(struct rpminspect *ri, rpmfile_entry_t *file)
     }
 
     /* Finally, anything that gets down to here just compare checksums. */
-    before_sum = checksum(file->peer_file);
-    after_sum = checksum(file);
+    if (!rebase && (ri->tests & INSPECT_CHANGEDFILES)) {
+        before_sum = checksum(file->peer_file);
+        after_sum = checksum(file);
 
-    if (strcmp(before_sum, after_sum) && !rebase) {
-        xasprintf(&params.msg, _("File %s changed content on %s.  Please verify this change was deliberate for a non-rebased build."), file->localpath, arch);
-        params.severity = RESULT_VERIFY;
-        params.waiverauth = WAIVABLE_BY_ANYONE;
-        params.verb = VERB_CHANGED;
-        params.noun = _("${FILE}");
-        add_changedfiles_result(ri, &params);
+        if (before_sum && after_sum && strcmp(before_sum, after_sum)) {
+            xasprintf(&params.msg, _("File %s changed content on %s.  Please verify this change was deliberate for a non-rebased build."), file->localpath, arch);
+            params.severity = RESULT_VERIFY;
+            params.waiverauth = WAIVABLE_BY_ANYONE;
+            params.verb = VERB_CHANGED;
+            params.noun = _("${FILE}");
+            add_changedfiles_result(ri, &params);
+        }
     }
 
 done:

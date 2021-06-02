@@ -96,7 +96,7 @@ static bool addedfiles_driver(struct rpminspect *ri, rpmfile_entry_t *file)
     params.file = file->localpath;
 
     /* Check for any forbidden path prefixes */
-    if (ri->forbidden_path_prefixes) {
+    if (ri->forbidden_path_prefixes && (ri->tests & INSPECT_ADDEDFILES)) {
         TAILQ_FOREACH(entry, ri->forbidden_path_prefixes, items) {
             subpath = entry->data;
             localpath = file->localpath;
@@ -124,7 +124,7 @@ static bool addedfiles_driver(struct rpminspect *ri, rpmfile_entry_t *file)
     }
 
     /* Check for any forbidden path suffixes */
-    if (ri->forbidden_path_suffixes) {
+    if (ri->forbidden_path_suffixes && (ri->tests & INSPECT_ADDEDFILES)) {
         TAILQ_FOREACH(entry, ri->forbidden_path_suffixes, items) {
             if (strsuffix(file->localpath, entry->data)) {
                 xasprintf(&params.msg, _("Packages should not contain files or directories ending with `%s` on %s: %s"), entry->data, arch, file->localpath);
@@ -136,7 +136,7 @@ static bool addedfiles_driver(struct rpminspect *ri, rpmfile_entry_t *file)
     }
 
     /* Check for any forbidden directories */
-    if (ri->forbidden_directories && S_ISDIR(file->st.st_mode)) {
+    if (ri->forbidden_directories && S_ISDIR(file->st.st_mode) && (ri->tests & INSPECT_ADDEDFILES)) {
         TAILQ_FOREACH(entry, ri->forbidden_directories, items) {
             if (!strcmp(file->localpath, entry->data)) {
                 xasprintf(&params.msg, _("Forbidden directory `%s` found on %s"), entry->data, arch);
@@ -174,17 +174,19 @@ static bool addedfiles_driver(struct rpminspect *ri, rpmfile_entry_t *file)
     }
 
     /* Default for new files */
-    if (rebase) {
-        params.severity = RESULT_INFO;
-        params.waiverauth = NOT_WAIVABLE;
-    } else {
-        params.severity = RESULT_VERIFY;
-        params.waiverauth = WAIVABLE_BY_ANYONE;
-    }
+    if (ri->tests & INSPECT_ADDEDFILES) {
+        if (rebase) {
+            params.severity = RESULT_INFO;
+            params.waiverauth = NOT_WAIVABLE;
+        } else {
+            params.severity = RESULT_VERIFY;
+            params.waiverauth = WAIVABLE_BY_ANYONE;
+        }
 
-    xasprintf(&params.msg, _("`%s` added on %s"), file->localpath, arch);
-    add_result(ri, &params);
-    result = !(params.severity >= RESULT_VERIFY);
+        xasprintf(&params.msg, _("`%s` added on %s"), file->localpath, arch);
+        add_result(ri, &params);
+        result = !(params.severity >= RESULT_VERIFY);
+    }
 
 done:
     free(params.msg);
