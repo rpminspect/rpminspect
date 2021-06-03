@@ -124,7 +124,9 @@ int get_specfile_macros(struct rpminspect *ri, const char *specfile)
         entry = TAILQ_FIRST(fields);
 
         if (strcmp(entry->data, SPEC_MACRO_DEFINE) && strcmp(entry->data, SPEC_MACRO_GLOBAL)) {
-            err(RI_PROGRAM_ERROR, "unexpected macro line: %s", specline->data);
+            /* ignore complex macros, like a conditional define with a %global */
+            list_free(fields, free);
+            continue;
         }
 
         TAILQ_REMOVE(fields, entry, items);
