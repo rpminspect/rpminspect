@@ -31,6 +31,7 @@
 #include <rpm/rpmlib.h>
 #include <rpm/rpmfi.h>
 #include <libkmod.h>
+#include "secrules.h"
 #include "queue.h"
 #include "uthash.h"
 
@@ -345,6 +346,7 @@ struct rpminspect {
     caps_t *caps;
     string_list_t *rebaseable;
     politics_list_t *politics;
+    security_t *security;
 
     /* Koji information (from config file) */
     char *kojihub;             /* URL of Koji hub */
