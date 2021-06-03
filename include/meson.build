@@ -6,6 +6,7 @@ install_headers(
     'readelf.h',
     'results.h',
     'rpminspect.h',
+    'secrules.h',
     'types.h',
     'uthash.h',
     subdir : 'librpminspect'

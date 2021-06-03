@@ -82,6 +82,10 @@ void free_rpminspect(struct rpminspect *ri) {
     caps_filelist_entry_t *cflentry = NULL;
     header_cache_entry_t *hentry = NULL;
     politics_entry_t *pentry = NULL;
+    security_t *sentry = NULL;
+    security_t *tmp_sentry = NULL;
+    secrule_t *srentry = NULL;
+    secrule_t *tmp_srentry = NULL;
 
     if (ri == NULL) {
         return;
@@ -153,6 +157,24 @@ void free_rpminspect(struct rpminspect *ri) {
         }
 
         free(ri->politics);
+    }
+
+    if (ri->security) {
+        HASH_ITER(hh, ri->security, sentry, tmp_sentry) {
+            HASH_DEL(ri->security, sentry);
+            free(sentry->pkg);
+            free(sentry->ver);
+            free(sentry->rel);
+
+            if (sentry->rules) {
+                HASH_ITER(hh, sentry->rules, srentry, tmp_srentry) {
+                    HASH_DEL(sentry->rules, srentry);
+                    free(srentry);
+                }
+            }
+
+            free(sentry);
+        }
     }
 
     list_free(ri->badwords, free);
