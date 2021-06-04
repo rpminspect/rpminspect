@@ -48,6 +48,9 @@ static struct rpminspect *workri = NULL;
 static int whichbuild = BEFORE_BUILD;
 static bool fetch_only = false;
 static int mode = S_IRWXU | S_IRGRP | S_IXGRP | S_IROTH | S_IXOTH;
+static size_t total_width = 0;
+static size_t bar_width = 0;
+static curl_off_t displayed = 0;
 
 /* This array holds strings that map to the whichbuild index value. */
 static char *build_desc[] = { "before", "after" };
@@ -231,15 +234,46 @@ static int copytree(const char *fpath, const struct stat *sb, int tflag, struct 
     return ret;
 }
 
-#ifdef CURLOPT_XFERINFOFUNCTION
 /*
  * libcurl progress callback function
+ * The caller needs to set up the terminal for displaying the progress
+ * bar.  The total width needs to be in the global total_width
+ * variable.  And the caller needs to position the cursor so this
+ * callback can start printing hash marks.
  */
-static int download_progress(__attribute__((unused)) void *p, __attribute__((unused)) curl_off_t dltotal, __attribute__((unused)) curl_off_t dlnow, __attribute__((unused)) curl_off_t ultotal, __attribute__((unused)) curl_off_t ulnow)
+static int download_progress(__attribute__((unused)) void *p, curl_off_t dltotal, curl_off_t dlnow, __attribute__((unused)) curl_off_t ultotal, __attribute__((unused)) curl_off_t ulnow)
 {
+    curl_off_t percentage = 0;
+    curl_off_t hashes = 0;
+    curl_off_t i = 0;
+
+    /* compute percentage downloaded */
+    if (dltotal > 0) {
+        percentage = (100L*dlnow + dltotal/2) / dltotal;
+    }
+
+    /*
+     * now determine how many hash marks represent that percentage in
+     * our progress bar
+     */
+    hashes = (percentage / 100.0) * bar_width;
+
+    /*
+     * display any new hash marks to indicate progress and update our
+     * displayed total
+     */
+    if (hashes != displayed) {
+        for (i = 0; i < (hashes - displayed); i++) {
+            printf("#");
+            fflush(stdout);
+        }
+
+        displayed = hashes;
+    }
+
+
     return 0;
 }
-#endif
 
 /*
  * Download helper for libcurl
@@ -249,6 +283,8 @@ static void curl_helper(const bool verbose, const char *src, const char *dst) {
     CURL *c = NULL;
     int r;
     CURLcode cc;
+    char *archive = NULL;
+    char *vmsg = NULL;
 
     /* ignore unusued variable warnings if assert is disabled */
     (void) r;
@@ -269,19 +305,41 @@ static void curl_helper(const bool verbose, const char *src, const char *dst) {
     curl_easy_setopt(c, CURLOPT_FOLLOWLOCATION, 1L);
 
     if (verbose) {
-#ifdef CURLOPT_XFERINFOFUNCTION
-        /* enable the download progress bar */
         curl_easy_setopt(c, CURLOPT_XFERINFOFUNCTION, download_progress);
-#endif
+        curl_easy_setopt(c, CURLOPT_NOPROGRESS, 0);
 
-        printf(_("Downloading %s...\n"), src);
+        /* the basename of the source URL, which is the file name */
+        archive = rindex(src, '/') + 1;
+        assert(archive != NULL);
+        bar_width = total_width / 2;
+        displayed = 0;
+
+        /* we need to shorten the package basename if too wide */
+        if ((strlen(archive) + 4) > bar_width) {
+            archive = strshorten(archive, bar_width - 4);
+            assert(archive != NULL);
+            xasprintf(&vmsg, "=> %s", archive);
+            assert(vmsg != NULL);
+            free(archive);
+        } else {
+            xasprintf(&vmsg, "=> %s", archive);
+        }
+
+        /* display the progress bar and position the cursor */
+        printf("%s\033[%ldC[\033[%ldC]", vmsg, bar_width - strlen(vmsg), bar_width);
+        printf("\033[%ldD", bar_width);
+        fflush(stdout);
+        free(vmsg);
+
+        /* update bar_width to remove the bounding character */
+        bar_width -= 1;
     }
 
     /* perform the download */
     fp = fopen(dst, "wb");
 
     if (fp == NULL) {
-        err(RI_PROGRAM_ERROR, "fopen()");
+        err(RI_PROGRAM_ERROR, "fopen");
     }
 
     curl_easy_setopt(c, CURLOPT_URL, src);
@@ -292,14 +350,19 @@ static void curl_helper(const bool verbose, const char *src, const char *dst) {
 #endif
     cc = curl_easy_perform(c);
 
+    if (verbose) {
+        printf("\n");
+        fflush(stdout);
+    }
+
     if (fclose(fp) != 0) {
-        err(RI_PROGRAM_ERROR, "fclose()");
+        err(RI_PROGRAM_ERROR, "fclose");
     }
 
     /* remove output file if there was a download error (e.g., 404) */
     if (cc != CURLE_OK) {
         if (unlink(dst)) {
-            warn("unlink()");
+            warn("unlink");
         }
     }
 
@@ -316,6 +379,11 @@ static int download_build(const struct rpminspect *ri, const struct koji_build *
 {
     koji_buildlist_entry_t *buildentry = NULL;
     koji_rpmlist_entry_t *rpm = NULL;
+    const char *downloading = NULL;
+    char *verbose_msg = NULL;
+    size_t mlen = 0;
+    char *mend = NULL;
+    int i = 0;
     char *src = NULL;
     char *srcfmt = NULL;
     char *dst = NULL;
@@ -339,6 +407,43 @@ static int download_build(const struct rpminspect *ri, const struct koji_build *
              * submit to koji
              */
             continue;
+        }
+
+        /* Download status output */
+        if (ri->verbose) {
+            /* the progress bar will need the terminal width */
+            total_width = tty_width();
+
+            /* generate our downloading message */
+            if (ri->buildtype == KOJI_BUILD_MODULE) {
+                downloading = _("Downloading module");
+            } else {
+                downloading = _("Downloading RPM build");
+            }
+
+            xasprintf(&verbose_msg, "%s %s-%s-%s", downloading, build->package_name, build->version, build->release);
+            assert(verbose_msg != NULL);
+
+            /* truncate the message to one line if it is too long */
+            mlen = strlen(verbose_msg);
+
+            if (mlen > total_width) {
+                mend = verbose_msg + total_width - 3;
+
+                for (i = 0; i < 3; i++) {
+                    if (*mend == '\0') {
+                        break;
+                    }
+
+                    *mend++ = '.';
+                }
+
+                *mend = '\0';
+            }
+
+            /* display the message */
+            printf("%s\n", verbose_msg);
+            free(verbose_msg);
         }
 
         /* Download module metadata at the top level */
@@ -423,7 +528,7 @@ static int download_build(const struct rpminspect *ri, const struct koji_build *
                 yaml_parser_delete(&parser);
 
                 if (fclose(fp) != 0) {
-                    err(RI_PROGRAM_ERROR, _("fclose()"));
+                    err(RI_PROGRAM_ERROR, "fclose");
                 }
             }
 
@@ -446,7 +551,7 @@ static int download_build(const struct rpminspect *ri, const struct koji_build *
             }
 
             if (mkdirp(dst, mode)) {
-                warn("mkdirp()");
+                warn("mkdirp");
                 return -1;
             }
 
