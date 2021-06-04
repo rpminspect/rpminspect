@@ -193,6 +193,7 @@ char *strxmlescape(const char *);
 char *strappend(char *, ...);
 string_list_t *strsplit(const char *, const char *);
 const char *strtype(const mode_t mode);
+char *strshorten(const char *s, size_t width);
 
 /* badwords.c */
 bool has_bad_word(const char *, const string_list_t *);

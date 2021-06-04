@@ -555,3 +555,53 @@ const char *strtype(const mode_t mode)
         return _("UNKNOWN");
     }
 }
+
+/*
+ * Given a string s and a width, shorten the string to be no longer
+ * than width.  The center of the string is replaced with "..." and
+ * the left and right parts of the string contain the maximum number
+ * of characters allowed to represent the string and still be no wider
+ * than width.  Caller must free the returned string.
+ */
+char *strshorten(const char *s, size_t width)
+{
+    char *r = NULL;
+    char *tail = NULL;
+    size_t input_len = 0;
+    size_t half_width = 0;
+    size_t left_width = 0;
+    size_t right_width = 0;
+
+    /* the empty case */
+    if (width == 0 || s == NULL) {
+        return r;
+    }
+
+    /* the simple case */
+    input_len = strlen(s);
+
+    if (input_len <= width) {
+        return strdup(s);
+    }
+
+    /* allocate the buffer for the shortened string */
+    r = calloc(1, width + 1);
+    assert(r != NULL);
+    tail = r;
+
+    /* compute width of each half */
+    half_width = (width - 3) / 2;
+    left_width = right_width = half_width;
+
+    if (((half_width * 2) + 3) != width) {
+        left_width++;
+    }
+
+    /* create the shortened string */
+    tail = stpncpy(tail, s, left_width);
+    tail = stpcpy(tail, "...");
+    s = s + input_len - right_width;
+    tail = stpcpy(tail, s);
+
+    return r;
+}
