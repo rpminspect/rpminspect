@@ -42,6 +42,12 @@ void sigabrt_handler(__attribute__ ((unused)) int i)
     return;
 }
 
+void sigwinch_handler(__attribute__ ((unused)) int i)
+{
+    terminal_resized = 1;
+    return;
+}
+
 static void usage(void)
 {
     printf(_("Compare package builds for policy compliance and consistency.\n\n"));
@@ -358,6 +364,9 @@ int main(int argc, char **argv)
 
     /* SIGABRT handler since we use abort() in some failure cases */
     signal(SIGABRT, sigabrt_handler);
+
+    /* SIGWINCH handler to capture terminal resizes */
+    signal(SIGWINCH, sigwinch_handler);
 
     /* Set up the i18n environment */
     setlocale(LC_ALL, "");

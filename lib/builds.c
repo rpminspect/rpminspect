@@ -36,12 +36,16 @@
 #include <sys/stat.h>
 #include <dirent.h>
 #include <unistd.h>
+#include <signal.h>
 #include <errno.h>
 #include <err.h>
 #include <rpm/rpmlib.h>
 #include <curl/curl.h>
 #include <yaml.h>
 #include "rpminspect.h"
+
+/* Globals used by programs linking with the library */
+volatile sig_atomic_t terminal_resized = 0;
 
 /* Local global variables */
 static struct rpminspect *workri = NULL;
@@ -50,7 +54,8 @@ static bool fetch_only = false;
 static int mode = S_IRWXU | S_IRGRP | S_IXGRP | S_IROTH | S_IXOTH;
 static size_t total_width = 0;
 static size_t bar_width = 0;
-static curl_off_t displayed = 0;
+static curl_off_t progress_displayed = 0;
+static size_t progress_msg_len = 0;
 
 /* This array holds strings that map to the whichbuild index value. */
 static char *build_desc[] = { "before", "after" };
@@ -235,6 +240,65 @@ static int copytree(const char *fpath, const struct stat *sb, int tflag, struct 
 }
 
 /*
+ * Called by either the download helper or the progress bar callback
+ * on SIGWINCH.  Sets the line up for the progress bar.  NULL input
+ * means reposition an in-progress progress bar.
+ */
+static void setup_progress_bar(const char *src)
+{
+    char *archive = NULL;
+    char *vmsg = NULL;
+    size_t shift = 0;
+    size_t border = 1;
+
+    /* terminal width and progress bar width */
+    total_width = tty_width();
+    bar_width = total_width / 2;
+    progress_displayed = 0;
+
+    if (total_width % 2 == 1) {
+        shift = 1;
+    } else {
+        border = 2;
+    }
+
+    if (src != NULL) {
+        /* the basename of the source URL, which is the file name */
+        archive = rindex(src, '/') + 1;
+        assert(archive != NULL);
+
+        /* we need to shorten the package basename if too wide */
+        if ((strlen(archive) + 4) > bar_width) {
+            archive = strshorten(archive, bar_width - 4);
+            assert(archive != NULL);
+            xasprintf(&vmsg, "=> %s", archive);
+            assert(vmsg != NULL);
+            free(archive);
+        } else {
+            xasprintf(&vmsg, "=> %s", archive);
+        }
+
+        progress_msg_len = strlen(vmsg);
+    }
+
+    /* display the progress bar and position the cursor */
+    if (vmsg != NULL) {
+        /* new progress bar */
+        printf("%s\033[%ldC[\033[%ldC]\033[%ldD", vmsg, bar_width - progress_msg_len, bar_width, bar_width - shift);
+        free(vmsg);
+    } else {
+        /* reposition due to terminal resize */
+        printf("\033[%ldD[\033[%ldC]\033[%ldD", progress_msg_len + progress_displayed, bar_width, bar_width - shift);
+    }
+
+    /* account for the progress bar borders and rounding */
+    bar_width -= border;
+
+    fflush(stdout);
+    return;
+}
+
+/*
  * libcurl progress callback function
  * The caller needs to set up the terminal for displaying the progress
  * bar.  The total width needs to be in the global total_width
@@ -253,6 +317,17 @@ static int download_progress(__attribute__((unused)) void *p, curl_off_t dltotal
     }
 
     /*
+     * adjust the progress bar if the terminal has resized
+     */
+    if (terminal_resized == 1) {
+        /* reposition the progress bar */
+        setup_progress_bar(NULL);
+
+        /* reset for the next change */
+        terminal_resized = 0;
+    }
+
+    /*
      * now determine how many hash marks represent that percentage in
      * our progress bar
      */
@@ -262,15 +337,14 @@ static int download_progress(__attribute__((unused)) void *p, curl_off_t dltotal
      * display any new hash marks to indicate progress and update our
      * displayed total
      */
-    if (hashes != displayed) {
-        for (i = 0; i < (hashes - displayed); i++) {
+    if (hashes != progress_displayed) {
+        for (i = 0; i < (hashes - progress_displayed); i++) {
             printf("#");
             fflush(stdout);
         }
 
-        displayed = hashes;
+        progress_displayed = hashes;
     }
-
 
     return 0;
 }
@@ -283,8 +357,6 @@ static void curl_helper(const bool verbose, const char *src, const char *dst) {
     CURL *c = NULL;
     int r;
     CURLcode cc;
-    char *archive = NULL;
-    char *vmsg = NULL;
 
     /* ignore unusued variable warnings if assert is disabled */
     (void) r;
@@ -307,32 +379,7 @@ static void curl_helper(const bool verbose, const char *src, const char *dst) {
     if (verbose) {
         curl_easy_setopt(c, CURLOPT_XFERINFOFUNCTION, download_progress);
         curl_easy_setopt(c, CURLOPT_NOPROGRESS, 0);
-
-        /* the basename of the source URL, which is the file name */
-        archive = rindex(src, '/') + 1;
-        assert(archive != NULL);
-        bar_width = total_width / 2;
-        displayed = 0;
-
-        /* we need to shorten the package basename if too wide */
-        if ((strlen(archive) + 4) > bar_width) {
-            archive = strshorten(archive, bar_width - 4);
-            assert(archive != NULL);
-            xasprintf(&vmsg, "=> %s", archive);
-            assert(vmsg != NULL);
-            free(archive);
-        } else {
-            xasprintf(&vmsg, "=> %s", archive);
-        }
-
-        /* display the progress bar and position the cursor */
-        printf("%s\033[%ldC[\033[%ldC]", vmsg, bar_width - strlen(vmsg), bar_width);
-        printf("\033[%ldD", bar_width);
-        fflush(stdout);
-        free(vmsg);
-
-        /* update bar_width to remove the bounding character */
-        bar_width -= 1;
+        setup_progress_bar(src);
     }
 
     /* perform the download */
