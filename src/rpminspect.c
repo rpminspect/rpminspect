@@ -287,6 +287,8 @@ static void check_found(const bool found, const char *inspection)
 int main(int argc, char **argv)
 {
     char resolved[PATH_MAX];
+    struct sigaction abrt;
+    struct sigaction winch;
     int c = 0;
     int i = 0;
     int j = 0;
@@ -363,10 +365,16 @@ int main(int argc, char **argv)
     setlinebuf(stdout);
 
     /* SIGABRT handler since we use abort() in some failure cases */
-    signal(SIGABRT, sigabrt_handler);
+    abrt.sa_handler = sigabrt_handler;
+    sigemptyset(&abrt.sa_mask);
+    abrt.sa_flags = 0;
+    sigaction(SIGABRT, &abrt, NULL);
 
     /* SIGWINCH handler to capture terminal resizes */
-    signal(SIGWINCH, sigwinch_handler);
+    winch.sa_handler = sigwinch_handler;
+    sigemptyset(&winch.sa_mask);
+    winch.sa_flags = 0;
+    sigaction(SIGWINCH, &winch, NULL);
 
     /* Set up the i18n environment */
     setlocale(LC_ALL, "");
