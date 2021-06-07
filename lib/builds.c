@@ -282,6 +282,24 @@ static void setup_progress_bar(const char *src)
     }
 
     /* display the progress bar and position the cursor */
+    /*
+     * Because I am very likely to forget these escape sequences,
+     * here's a brief explanation.  These are originate from the VT100
+     * and then became ANSI escape sequences, so you can search for
+     * both terms online and probably find the information you want.
+     * Here are direction movement ones:
+     *
+     *    Esc[nA      Move the cursor up n lines
+     *    Esc[nB      Move the cursor down n lines
+     *    Esc[nC      Move the cursor right n columns
+     *    Esc[nD      Move the cursor left n columns
+     *
+     * Within printf(3), we can't say "Esc" for escape, so we spell
+     * that as \033 to use the octal code (see ascii(7) for more
+     * information).  The values for n are computed and then are
+     * substituted in to the format string making this extremely
+     * difficult to read.  Good luck decoding.
+     */
     if (vmsg != NULL) {
         /* new progress bar */
         printf("%s\033[%ldC[\033[%ldC]\033[%ldD", vmsg, bar_width - progress_msg_len, bar_width, bar_width - shift);
