@@ -26,6 +26,7 @@
 #include <stdbool.h>
 #include <sys/types.h>
 #include <sys/capability.h>
+#include <signal.h>
 #include <regex.h>
 #include <rpm/header.h>
 
@@ -47,6 +48,9 @@ extern struct inspect inspections[];
 
 /* List of all output format types (output.c) */
 extern struct format formats[];
+
+/* Terminal resize indicator */
+extern volatile sig_atomic_t terminal_resized;
 
 /* Macros */
 #ifdef NDEBUG
