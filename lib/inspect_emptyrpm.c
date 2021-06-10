@@ -96,12 +96,11 @@ bool inspect_emptyrpm(struct rpminspect *ri)
                 params.severity = RESULT_VERIFY;
                 params.waiverauth = WAIVABLE_BY_ANYONE;
                 params.remedy = REMEDY_EMPTYRPM;
+                good = false;
             }
 
             add_result(ri, &params);
             free(params.msg);
-
-            good = false;
         }
     }
 
