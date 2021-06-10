@@ -326,7 +326,6 @@ int main(int argc, char **argv)
     char *walk = NULL;
     char *token = NULL;
     char *workdir = NULL;
-    struct stat sbuf;
     char cwd[PATH_MAX];
     char *r = NULL;
     char *output = NULL;
@@ -455,11 +454,7 @@ int main(int argc, char **argv)
                     globfree(&expand);
                 } else {
                     /* canonicalize the path specified if it exists */
-                    if (stat(optarg, &sbuf) == 0) {
-                        workdir = realpath(optarg, NULL);
-                    } else {
-                        workdir = strdup(optarg);
-                    }
+                    workdir = realpath(optarg, NULL);
                 }
 
                 break;
@@ -616,14 +611,13 @@ int main(int argc, char **argv)
         free(tmp);
     }
 
-    /* the user specified a working directory */
+    /* Handle user-specified working directory */
     if (workdir != NULL) {
+        /* the user specified a working directory */
         free(ri->workdir);
         ri->workdir = workdir;
-    }
-
-    /* no workdir specified, but fetch only requested, default to cwd */
-    if (workdir == NULL && fetch_only) {
+    } else if (workdir == NULL && fetch_only) {
+        /* no workdir specified, but fetch only requested, default to cwd */
         memset(cwd, '\0', sizeof(cwd));
         r = getcwd(cwd, PATH_MAX);
         assert(r != NULL);
@@ -692,6 +686,7 @@ int main(int argc, char **argv)
             }
 
             if (!found) {
+                free_rpminspect(ri);
                 rpmFreeRpmrc();
                 warnx(_("*** Unsupported architecture specified: `%s`"), token);
                 errx(RI_PROGRAM_ERROR, _("*** See `%s --help` for more information."), COMMAND_NAME);
@@ -727,6 +722,7 @@ int main(int argc, char **argv)
             assert(ri->after != NULL);
 
             if (gather_builds(ri, true)) {
+                free_rpminspect(ri);
                 rpmFreeRpmrc();
                 errx(RI_PROGRAM_ERROR, _("*** failed to gather specified builds."));
             }
@@ -736,8 +732,13 @@ int main(int argc, char **argv)
             free(ri->worksubdir);
             ri->worksubdir = NULL;
         }
+
+        free_rpminspect(ri);
+        rpmFreeRpmrc();
+        return RI_INSPECTION_SUCCESS;
     } else {
         if (gather_builds(ri, false)) {
+            free_rpminspect(ri);
             rpmFreeRpmrc();
             errx(RI_PROGRAM_ERROR, _("*** failed to gather specified builds."));
         }

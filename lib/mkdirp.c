@@ -29,7 +29,7 @@
 #include <unistd.h>
 #include "rpminspect.h"
 
-int mkdirp(char *path, mode_t mode) {
+int mkdirp(const char *path, mode_t mode) {
     int r = 0;
     char *p = NULL;
     char *start = NULL;
