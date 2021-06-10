@@ -37,7 +37,6 @@ patchelf
 python36-devel
 python36-pip
 python36-rpm
-python36-setuptools_scm
 rc
 rpm-build
 rpm-devel
