@@ -548,7 +548,6 @@ struct koji_build *get_koji_build(struct rpminspect *ri, const char *buildspec)
         xmlrpc_env_clean(&env);
         xmlrpc_client_cleanup();
         free_koji_build(build);
-        xmlrpc_DECREF(result);
         return NULL;
     } else {
         xmlrpc_abort_on_fault(&env);
