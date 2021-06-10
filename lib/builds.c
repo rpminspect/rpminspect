@@ -367,6 +367,13 @@ static int download_progress(__attribute__((unused)) void *p, curl_off_t dltotal
     return 0;
 }
 
+#if LIBCURL_VERSION_NUM < 0x072000
+static int legacy_download_progress(void *p, double dltotal, double dlnow, double ultotal, double ulnow)
+{
+  return download_progress(p, (curl_off_t) dltotal, (curl_off_t) dlnow, (curl_off_t) ultotal, (curl_off_t) ulnow);
+}
+#endif
+
 /*
  * Download helper for libcurl
  */
@@ -395,8 +402,11 @@ static void curl_helper(const bool verbose, const char *src, const char *dst) {
     curl_easy_setopt(c, CURLOPT_FOLLOWLOCATION, 1L);
 
     if (verbose) {
+#if LIBCURL_VERSION_NUM >= 0x072000
         curl_easy_setopt(c, CURLOPT_XFERINFOFUNCTION, download_progress);
-        curl_easy_setopt(c, CURLOPT_NOPROGRESS, 0);
+#else
+        curl_easy_setopt(c, CURLOPT_PROGRESSFUNCTION, legacy_download_progress);
+#endif
         setup_progress_bar(src);
     }
 
