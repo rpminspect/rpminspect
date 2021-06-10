@@ -158,6 +158,7 @@ bool is_local_rpm(struct rpminspect *, const char *);
 koji_buildlist_t *init_koji_buildlist(void);
 void free_koji_buildlist(koji_buildlist_t *);
 koji_rpmlist_t *init_koji_rpmlist(void);
+void free_koji_rpmlist_entry(koji_rpmlist_entry_t *);
 void free_koji_rpmlist(koji_rpmlist_t *);
 void init_koji_build(struct koji_build *);
 void free_koji_build(struct koji_build *);
@@ -179,7 +180,7 @@ bool compare_module_aliases(kernel_alias_data_t *, kernel_alias_data_t *, module
 string_list_t *get_kmod_values(const char *, const char *);
 
 /* mkdirp.c */
-int mkdirp(char *, mode_t);
+int mkdirp(const char *, mode_t);
 
 /* rmtree.c */
 int rmtree(const char *, const bool, const bool);

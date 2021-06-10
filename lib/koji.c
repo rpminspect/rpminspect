@@ -263,6 +263,24 @@ koji_rpmlist_t *init_koji_rpmlist(void)
 }
 
 /*
+ * Free memory associated with a koji_rpmlist_entry_t.
+ */
+void free_koji_rpmlist_entry(koji_rpmlist_entry_t *entry)
+{
+    if (entry == NULL) {
+        return;
+    }
+
+    free(entry->arch);
+    free(entry->name);
+    free(entry->version);
+    free(entry->release);
+    free(entry);
+
+    return;
+}
+
+/*
  * Free memory associated with a koji_rpmlist_t.
  */
 void free_koji_rpmlist(koji_rpmlist_t *rpms)
@@ -276,15 +294,7 @@ void free_koji_rpmlist(koji_rpmlist_t *rpms)
     while (!TAILQ_EMPTY(rpms)) {
         entry = TAILQ_FIRST(rpms);
         TAILQ_REMOVE(rpms, entry, items);
-        free(entry->arch);
-        entry->arch = NULL;
-        free(entry->name);
-        entry->name = NULL;
-        free(entry->version);
-        entry->version = NULL;
-        free(entry->release);
-        entry->release = NULL;
-        free(entry);
+        free_koji_rpmlist_entry(entry);
     }
 
     free(rpms);
@@ -538,6 +548,7 @@ struct koji_build *get_koji_build(struct rpminspect *ri, const char *buildspec)
         xmlrpc_env_clean(&env);
         xmlrpc_client_cleanup();
         free_koji_build(build);
+        xmlrpc_DECREF(result);
         return NULL;
     } else {
         xmlrpc_abort_on_fault(&env);
@@ -545,9 +556,9 @@ struct koji_build *get_koji_build(struct rpminspect *ri, const char *buildspec)
 
     /* is this a valid build? */
     if (xmlrpc_value_type(result) == XMLRPC_TYPE_NIL) {
-        xmlrpc_DECREF(result);
         xmlrpc_env_clean(&env);
         xmlrpc_client_cleanup();
+        xmlrpc_DECREF(result);
         free_koji_build(build);
         return NULL;
     }
@@ -572,6 +583,8 @@ struct koji_build *get_koji_build(struct rpminspect *ri, const char *buildspec)
          */
         if (xmlrpc_value_type(value) == XMLRPC_TYPE_NIL) {
             xmlrpc_DECREF(value);
+            free(key);
+            key = NULL;
             continue;
         }
 
@@ -693,6 +706,8 @@ struct koji_build *get_koji_build(struct rpminspect *ri, const char *buildspec)
                 /* Skip nil values */
                 if (xmlrpc_value_type(subv) == XMLRPC_TYPE_NIL) {
                     xmlrpc_DECREF(subv);
+                    free(subkey);
+                    subkey = NULL;
                     continue;
                 }
 
@@ -701,6 +716,7 @@ struct koji_build *get_koji_build(struct rpminspect *ri, const char *buildspec)
                     xmlrpc_abort_on_fault(&env);
                     xmlrpc_DECREF(value);
                     free(subkey);
+                    subkey = NULL;
                     value = subv;
                     j = 0;
                     continue;
@@ -735,13 +751,19 @@ struct koji_build *get_koji_build(struct rpminspect *ri, const char *buildspec)
 
                 xmlrpc_DECREF(subv);
                 free(subkey);
+                subkey = NULL;
             }
         }
+
+        xmlrpc_DECREF(value);
+        free(key);
+        key = NULL;
     }
+
+    xmlrpc_DECREF(result);
 
     /* Modules have multiple builds, so collect the IDs */
     if (ri->buildtype == KOJI_BUILD_MODULE) {
-        xmlrpc_DECREF(result);
         result = xmlrpc_client_call(&env, ri->kojihub, "getLatestBuilds", "(s)", build->module_content_koji_tag);
         xmlrpc_abort_on_fault(&env);
 
@@ -853,9 +875,9 @@ struct koji_build *get_koji_build(struct rpminspect *ri, const char *buildspec)
 
             TAILQ_INSERT_TAIL(build->builds, buildentry, builditems);
         }
-    }
 
-    xmlrpc_DECREF(result);
+        xmlrpc_DECREF(result);
+    }
 
     /* Call 'listBuildRPMs' on the koji hub for each build_id */
     TAILQ_FOREACH(buildentry, build->builds, builditems) {
@@ -890,6 +912,8 @@ struct koji_build *get_koji_build(struct rpminspect *ri, const char *buildspec)
                 if (xmlrpc_value_type(value) == XMLRPC_TYPE_NIL) {
                     xmlrpc_DECREF(value);
                     xmlrpc_DECREF(k);
+                    free(key);
+                    key = NULL;
                     continue;
                 }
 
@@ -918,7 +942,7 @@ struct koji_build *get_koji_build(struct rpminspect *ri, const char *buildspec)
                          * XXX: have no idea what we got back here, set it
                          * negative for future debugging
                          */
-                        rpm->size = -47;
+                        rpm->size = -1;
                     }
                 }
 
@@ -931,13 +955,17 @@ struct koji_build *get_koji_build(struct rpminspect *ri, const char *buildspec)
             /* add this rpm to the list */
             if (allowed_arch(ri, rpm->arch)) {
                 TAILQ_INSERT_TAIL(buildentry->rpms, rpm, items);
+            } else {
+                free_koji_rpmlist_entry(rpm);
             }
+
+            xmlrpc_DECREF(element);
         }
+
+        xmlrpc_DECREF(result);
     }
 
     /* Cleanup */
-    xmlrpc_DECREF(result);
-
     xmlrpc_env_clean(&env);
     xmlrpc_client_cleanup();
 
@@ -1156,12 +1184,14 @@ string_list_t *get_all_arches(const struct rpminspect *ri)
     fake_params = xmlrpc_array_new(&env);              /* super empty array */
     result = xmlrpc_client_call_server_params(&env, server, "getAllArches", fake_params);
     xmlrpc_abort_on_fault(&env);
+    xmlrpc_DECREF(fake_params);
+    xmlrpc_server_info_free(server);
 
     /* is this a valid return value? */
     if (xmlrpc_value_type(result) != XMLRPC_TYPE_ARRAY) {
-        xmlrpc_DECREF(result);
         xmlrpc_env_clean(&env);
         xmlrpc_client_cleanup();
+        xmlrpc_DECREF(result);
         return NULL;
     }
 
@@ -1176,6 +1206,7 @@ string_list_t *get_all_arches(const struct rpminspect *ri)
         /* Get the array element as a string */
         xmlrpc_decompose_value(&env, value, "s", &element);
         xmlrpc_abort_on_fault(&env);
+        xmlrpc_DECREF(value);
 
         /* Flag what we have */
         if (!strcmp(element, RPM_NOARCH_NAME)) {
@@ -1190,18 +1221,21 @@ string_list_t *get_all_arches(const struct rpminspect *ri)
          * be present in the output.
          */
         if (xmlrpc_value_type(value) == XMLRPC_TYPE_NIL) {
+            xmlrpc_DECREF(value);
+            free(element);
+            element = NULL;
             continue;
         }
 
         /* add this architecture to the list */
         arch = calloc(1, sizeof(*arch));
         assert(arch != NULL);
-
-        arch->data = strdup(element);
-        assert(arch->data != NULL);
+        arch->data = element;
 
         TAILQ_INSERT_TAIL(arches, arch, items);
     }
+
+    xmlrpc_DECREF(result);
 
     /* Always add 'noarch' and 'src' to this list */
     if (!have_noarch) {
@@ -1221,8 +1255,6 @@ string_list_t *get_all_arches(const struct rpminspect *ri)
     }
 
     /* Cleanup */
-    xmlrpc_DECREF(result);
-
     xmlrpc_env_clean(&env);
     xmlrpc_client_cleanup();
 

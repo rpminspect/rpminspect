@@ -1,6 +1,6 @@
 /*
- * Copyright 2003-2021 David Shea <david@reallylongword.org>
- *                     David Cantrell <david.l.cantrell@gmail.com>
+ * Copyright 2003 David Shea <david@reallylongword.org>
+ *                David Cantrell <david.l.cantrell@gmail.com>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -32,13 +32,15 @@
 static int rmtree_entry(const char *, const struct stat *, int, struct FTW *);
 
 static int rmtree_entry(const char *fpath, __attribute__((unused)) const struct stat *sb,
-                        __attribute__((unused)) int tflag, __attribute__((unused)) struct FTW *ftwbuf) {
+                        __attribute__((unused)) int tflag, __attribute__((unused)) struct FTW *ftwbuf)
+{
     assert(fpath != NULL);
     return remove(fpath);
 }
 
 /* Remove specified tree, ignoring errors if specified. */
-int rmtree(const char *path, const bool ignore_errors, const bool contentsonly) {
+int rmtree(const char *path, const bool ignore_errors, const bool contentsonly)
+{
     struct stat sb;
     int status = 0;
     int flags = FTW_DEPTH | FTW_MOUNT | FTW_PHYS;
