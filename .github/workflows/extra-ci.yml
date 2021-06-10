@@ -53,7 +53,7 @@ jobs:
                           pacman --noconfirm -Syu
                           pacman --noconfirm -S git
                           ;;
-                      centos*)
+                      centos*|almalinux*)
                           yum install -y epel-release
                           rpm --import /etc/pki/rpm-gpg/*
                           yum install -y git
@@ -85,7 +85,7 @@ jobs:
                       archlinux*)
                           pacman --noconfirm -S make
                           ;;
-                      centos*)
+                      centos*|almalinux*)
                           yum install -y make
                           ;;
                       debian*|ubuntu*)
