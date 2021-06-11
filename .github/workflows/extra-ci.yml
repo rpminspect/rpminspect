@@ -126,15 +126,15 @@ jobs:
               run: |
                   case "${{ matrix.container }}" in
                       fedora*)
-                          dnf install -y make
+                          i386 dnf install -y make
                           ;;
                   esac
-                  make instreqs
-                  meson setup build --werror -Db_buildtype=debug -Db_coverage=true
-                  ninja -C build -v
-                  meson test -C build -v
-                  ninja -C build coverage
-                  curl -s https://codecov.io/bash | bash
+                  i386 make instreqs
+                  i386 meson setup build --werror -Db_buildtype=debug -Db_coverage=true
+                  i386 ninja -C build -v
+                  i386 meson test -C build -v
+                  i386 ninja -C build coverage
+                  i386 curl -s https://codecov.io/bash | i386 bash
 
     # Non-x86_64 architectures for Fedora, Ubuntu, Debian, Arch, and Alpine
     # https://github.com/uraimo/run-on-arch-action
