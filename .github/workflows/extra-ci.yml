@@ -126,7 +126,7 @@ jobs:
               run: |
                   case "${{ matrix.container }}" in
                       fedora*)
-                          i386 dnf install -y make
+                          dnf install -y util-linux make
                           ;;
                   esac
                   i386 make instreqs
