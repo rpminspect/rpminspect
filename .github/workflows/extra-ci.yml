@@ -102,40 +102,6 @@ jobs:
                   ninja -C build coverage
                   curl -s https://codecov.io/bash | bash
 
-    i386:
-        # Use containers on their ubuntu latest image
-        runs-on: ubuntu-latest
-
-        # Set up the matrix of distributions to test
-        strategy:
-            matrix:
-                container: ["fedora:rawhide", "fedora:latest"]
-
-        container:
-            image: ${{ matrix.container }}
-
-        # All of these steps run from within the main source
-        # directory, so think of that as your $PWD
-        steps:
-            # This means clone the git repo
-            - uses: actions/checkout@v2.1.0
-
-            # Within the container, install the dependencies, build,
-            # and run the test suite
-            - name: Build and run the test suite
-              run: |
-                  case "${{ matrix.container }}" in
-                      fedora*)
-                          dnf install -y util-linux make
-                          ;;
-                  esac
-                  i386 make instreqs
-                  i386 meson setup build --werror -Db_buildtype=debug -Db_coverage=true
-                  i386 ninja -C build -v
-                  i386 meson test -C build -v
-                  i386 ninja -C build coverage
-                  i386 curl -s https://codecov.io/bash | i386 bash
-
     # Non-x86_64 architectures for Fedora, Ubuntu, Debian, Arch, and Alpine
     # https://github.com/uraimo/run-on-arch-action
     emulated:
@@ -145,7 +111,7 @@ jobs:
         # Run steps on a matrix of arch/distro combinations
         strategy:
             matrix:
-                arch: ["aarch64", "ppc64le", "s390x"]
+                arch: ["i386", "aarch64", "ppc64le", "s390x"]
                 distro: ["fedora_latest"]
 
         # All of these steps run from within the main source
