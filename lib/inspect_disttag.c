@@ -122,7 +122,8 @@ static bool check_release_macros(const int macrocount, const pair_list_t *macros
     return ret;
 }
 
-static bool disttag_driver(struct rpminspect *ri, rpmfile_entry_t *file) {
+static bool disttag_driver(struct rpminspect *ri, rpmfile_entry_t *file)
+{
     bool result = true;
     string_list_t *contents = NULL;
     string_entry_t *entry = NULL;
@@ -215,7 +216,8 @@ static bool disttag_driver(struct rpminspect *ri, rpmfile_entry_t *file) {
 /*
  * Main driver for the 'disttag' inspection.
  */
-bool inspect_disttag(struct rpminspect *ri) {
+bool inspect_disttag(struct rpminspect *ri)
+{
     bool result = true;
     bool src = false;
     rpmpeer_entry_t *peer = NULL;
