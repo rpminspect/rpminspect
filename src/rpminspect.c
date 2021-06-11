@@ -286,7 +286,6 @@ static void check_found(const bool found, const char *inspection)
 
 int main(int argc, char **argv)
 {
-    char resolved[PATH_MAX];
     struct sigaction abrt;
     struct sigaction winch;
     int c = 0;
@@ -526,13 +525,6 @@ int main(int argc, char **argv)
         exit(RI_INSPECTION_SUCCESS);
     }
 
-    /* Get the full path to the program */
-    memset(resolved, '\0', sizeof(resolved));
-
-    if (realpath(argv[0], resolved) == NULL) {
-        err(EXIT_FAILURE, "realpath");
-    }
-
     /*
      * Find an appropriate configuration file. This involves:
      *
@@ -584,7 +576,7 @@ int main(int argc, char **argv)
     free(profile);
 
     /* various options from the command line or elsewhere */
-    ri->progname = strdup(resolved);
+    ri->progname = strdup(argv[0]);
     ri->verbose = verbose;
     ri->product_release = release;
     ri->threshold = getseverity(threshold);
