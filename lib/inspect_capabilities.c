@@ -56,10 +56,24 @@ static bool capabilities_driver(struct rpminspect *ri, rpmfile_entry_t *file)
     }
 
     /* Get the cap values */
-    aftercap = get_cap(file);
+    after = get_rpm_header_value(file, RPMTAG_FILECAPS);
+
+    if (after && strcmp(after, "")) {
+        aftercap = cap_from_text(after);
+    } else {
+        free(after);
+        after = NULL;
+    }
 
     if (file->peer_file) {
-        beforecap = get_cap(file->peer_file);
+        before = get_rpm_header_value(file->peer_file, RPMTAG_FILECAPS);
+
+        if (before && strcmp(before, "")) {
+            beforecap = cap_from_text(before);
+        } else {
+            free(before);
+            before = NULL;
+        }
     }
 
     /* The architecture is used in reporting */
@@ -73,11 +87,6 @@ static bool capabilities_driver(struct rpminspect *ri, rpmfile_entry_t *file)
 
     /* Report if the caps are different */
     if (beforecap && aftercap) {
-        before = cap_to_text(beforecap, NULL);
-        assert(before != NULL);
-        after = cap_to_text(aftercap, NULL);
-        assert(after != NULL);
-
         if (cap_compare(beforecap, aftercap)) {
             xasprintf(&params.msg, _("File capabilities for %s changed from '%s' to '%s' on %s\n"), file->localpath, before, after, arch);
             params.severity = RESULT_VERIFY;
@@ -102,10 +111,12 @@ static bool capabilities_driver(struct rpminspect *ri, rpmfile_entry_t *file)
     flcaps = get_caps_entry(ri, pkg, file->localpath);
 
     if (!aftercap && !flcaps) {
+        free(after);
+        free(before);
         return true;
     }
 
-    if (flcaps->caps) {
+    if (flcaps && flcaps->caps) {
         expected = cap_from_text(flcaps->caps);
     }
 
@@ -149,13 +160,17 @@ static bool capabilities_driver(struct rpminspect *ri, rpmfile_entry_t *file)
         result = false;
     }
 
+    free(before);
+    free(after);
+
     return result;
 }
 
 /*
  * Main driver for the 'capabilities' inspection.
  */
-bool inspect_capabilities(struct rpminspect *ri) {
+bool inspect_capabilities(struct rpminspect *ri)
+{
     bool result;
     struct result_params params;
 
