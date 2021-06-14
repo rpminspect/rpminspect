@@ -31,55 +31,6 @@
 
 #include "rpminspect.h"
 
-/*
- * Given an RPM header tag, get that header tag array and return the
- * string that matches the index value for this file.  That's complex,
- * but some tags are arrays of strings (or ints) and what we need to
- * do is first get the array, then knowing the index entry for the file
- * we have, pull that array index out and return it.
- *
- * Limitations:
- * "tag" must refer to an s[] tag (see rpmtag.h from librpm)
- * "file" must have a usable array index value (idx)
- *
- * Returned value must be free'd by caller.
- */
-static char *get_header_value(const rpmfile_entry_t *file, rpmTag tag)
-{
-    rpmtd td = NULL;
-    rpmFlags flags = HEADERGET_MINMEM | HEADERGET_EXT | HEADERGET_ARGV;
-    const char *val = NULL;
-    char *ret = NULL;
-
-    assert(file != NULL);
-    assert(file->idx >= 0);
-
-    /* new header transaction */
-    td = rpmtdNew();
-
-    /* find the header tag we want to extract values from */
-    if (!headerGet(file->rpm_header, tag, td, flags)) {
-        warn(_("*** unable to find tag %s for %s"), rpmTagGetName(tag), file->fullpath);
-        rpmtdFree(td);
-        return ret;
-    }
-
-    /* set the array index */
-    if (rpmtdSetIndex(td, file->idx) == -1) {
-        warn(_("*** file index %d is out of bounds for %s"), file->idx, file->fullpath);
-        rpmtdFree(td);
-        return ret;
-    }
-
-    /* get the tag we are looking for and copy the value */
-    val = rpmtdGetString(td);
-    assert(val != NULL);
-    ret = strdup(val);
-    rpmtdFree(td);
-
-    return ret;
-}
-
 /* Main driver for the 'ownership' inspection */
 static bool ownership_driver(struct rpminspect *ri, rpmfile_entry_t *file) {
     bool result = true;
@@ -106,8 +57,8 @@ static bool ownership_driver(struct rpminspect *ri, rpmfile_entry_t *file) {
     arch = get_rpm_header_arch(file->rpm_header);
 
     /* Get the owner and group of the file */
-    owner = get_header_value(file, RPMTAG_FILEUSERNAME);
-    group = get_header_value(file, RPMTAG_FILEGROUPNAME);
+    owner = get_rpm_header_value(file, RPMTAG_FILEUSERNAME);
+    group = get_rpm_header_value(file, RPMTAG_FILEGROUPNAME);
 
     /* Set up result parameters */
     init_result_params(&params);
@@ -210,8 +161,8 @@ static bool ownership_driver(struct rpminspect *ri, rpmfile_entry_t *file) {
      */
     if (file->peer_file && (ri->tests & INSPECT_OWNERSHIP)) {
         /* Get the before file values */
-        before_owner = get_header_value(file->peer_file, RPMTAG_FILEUSERNAME);
-        before_group = get_header_value(file->peer_file, RPMTAG_FILEGROUPNAME);
+        before_owner = get_rpm_header_value(file->peer_file, RPMTAG_FILEUSERNAME);
+        before_group = get_rpm_header_value(file->peer_file, RPMTAG_FILEGROUPNAME);
 
         /* Determine if anything changed */
         if (strcmp(before_owner, owner)) {
