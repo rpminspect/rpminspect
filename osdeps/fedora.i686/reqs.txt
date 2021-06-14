@@ -27,6 +27,7 @@ libabigail.i686
 libarchive-devel.i686
 libcap-devel.i686
 libcurl-devel.i686
+libffi-devel
 libffi-devel.i686
 libmandoc-devel.i686
 libxml2-devel.i686
