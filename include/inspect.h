@@ -562,12 +562,6 @@ bool inspect_runpath(struct rpminspect *ri);
 #define INSPECT_BADFUNCS                    (((uint64_t) 1) << 41)
 #define INSPECT_RUNPATH                     (((uint64_t) 1) << 42)
 
-/*
- * The following inspections carry one or more checks that can trigger
- * a WAIVABLE_BY_SECURITY result.
- */
-#define SECURITY_INSPECTIONS                (INSPECT_ADDEDFILES | INSPECT_CAPABILITIES | INSPECT_CHANGEDFILES | INSPECT_ELF | INSPECT_OWNERSHIP | INSPECT_PERMISSIONS | INSPECT_REMOVEDFILES)
-
 /* Inspection names */
 #define NAME_LICENSE                        "license"
 #define NAME_EMPTYRPM                       "emptyrpm"
