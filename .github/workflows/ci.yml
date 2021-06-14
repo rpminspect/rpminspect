@@ -87,7 +87,7 @@ jobs:
                           ;;
                   esac
                   make instreqs OSDEPS_ARCH=i686
-                  meson setup build --werror -Db_buildtype=debug -Db_coverage=true
+                  env CFLAGS="-m32" LDFLAGS="-m32" PKG_CONFIG_PATH=/usr/lib/pkgconfig meson setup build --werror -Db_buildtype=debug -Db_coverage=true
                   ninja -C build -v
                   meson test -C build -v
                   ninja -C build coverage
