@@ -32,7 +32,8 @@
 #include "rpminspect.h"
 
 /* Main driver for the 'ownership' inspection */
-static bool ownership_driver(struct rpminspect *ri, rpmfile_entry_t *file) {
+static bool ownership_driver(struct rpminspect *ri, rpmfile_entry_t *file)
+{
     bool result = true;
     const char *arch = NULL;
     char *owner = NULL;
@@ -226,7 +227,8 @@ static bool ownership_driver(struct rpminspect *ri, rpmfile_entry_t *file) {
 /*
  * Main driver for the 'ownership' inspection.
  */
-bool inspect_ownership(struct rpminspect *ri) {
+bool inspect_ownership(struct rpminspect *ri)
+{
     bool result = false;
     struct result_params params;
 
