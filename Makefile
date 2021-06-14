@@ -19,7 +19,7 @@ OS = $(error "*** unable to determine host operating system")
 endif
 
 # Handle optional architecture if specified
-ifeq($(OSDEPS_ARCH),)
+ifeq ($(OSDEPS_ARCH),)
 OS_SUBDIR = $(OS)
 else
 OS_SUBDIR = $(OS).$(OSDEPS_ARCH)
