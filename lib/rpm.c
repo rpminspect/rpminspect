@@ -222,3 +222,52 @@ string_list_t *get_rpm_header_string_array(Header hdr, rpmTagVal tag)
     rpmtdFree(td);
     return list;
 }
+
+/*
+ * Given an RPM header tag, get that header tag array and return the
+ * string that matches the index value for this file.  That's complex,
+ * but some tags are arrays of strings (or ints) and what we need to
+ * do is first get the array, then knowing the index entry for the file
+ * we have, pull that array index out and return it.
+ *
+ * Limitations:
+ * "tag" must refer to an s[] tag (see rpmtag.h from librpm)
+ * "file" must have a usable array index value (idx)
+ *
+ * Returned value must be free'd by caller.
+ */
+char *get_rpm_header_value(const rpmfile_entry_t *file, rpmTag tag)
+{
+    rpmtd td = NULL;
+    rpmFlags flags = HEADERGET_MINMEM | HEADERGET_EXT | HEADERGET_ARGV;
+    const char *val = NULL;
+    char *ret = NULL;
+
+    assert(file != NULL);
+    assert(file->idx >= 0);
+
+    /* new header transaction */
+    td = rpmtdNew();
+
+    /* find the header tag we want to extract values from */
+    if (!headerGet(file->rpm_header, tag, td, flags)) {
+        warn(_("*** unable to find tag %s for %s"), rpmTagGetName(tag), file->fullpath);
+        rpmtdFree(td);
+        return ret;
+    }
+
+    /* set the array index */
+    if (rpmtdSetIndex(td, file->idx) == -1) {
+        warn(_("*** file index %d is out of bounds for %s"), file->idx, file->fullpath);
+        rpmtdFree(td);
+        return ret;
+    }
+
+    /* get the tag we are looking for and copy the value */
+    val = rpmtdGetString(td);
+    assert(val != NULL);
+    ret = strdup(val);
+    rpmtdFree(td);
+
+    return ret;
+}
