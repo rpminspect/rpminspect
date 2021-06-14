@@ -18,7 +18,14 @@ ifeq ($(OS),)
 OS = $(error "*** unable to determine host operating system")
 endif
 
--include $(topdir)/osdeps/$(OS)/defs.mk
+# Handle optional architecture if specified
+ifeq($(OSDEPS_ARCH),)
+OS_SUBDIR = $(OS)
+else
+OS_SUBDIR = $(OS).$(OSDEPS_ARCH)
+endif
+
+-include $(topdir)/osdeps/$(OS_SUBDIR)/defs.mk
 
 ifeq ($(PKG_CMD),)
 PKG_CMD = $(error "*** unable to determine host operating system package command")
@@ -109,20 +116,15 @@ clean:
 	-rm -rf $(MESON_BUILD_DIR)
 
 instreqs:
-	if [ -z "$(OSDEPS_ARCH)" ]; then \
-		OS_SUBDIR="$(OS)" ; \
-	else \
-		OS_SUBDIR="$(OS).$(OSDEPS_ARCH)" ; \
-	fi ; \
 	if [ -x $(topdir)/osdeps/$(OS_SUBDIR)/pre.sh ]; then \
 		env OSDEPS=$(topdir)/osdeps/$(OS_SUBDIR) $(topdir)/osdeps/$(OS_SUBDIR)/pre.sh ; \
-	fi ; \
+	fi
 	if [ -f $(topdir)/osdeps/$(OS_SUBDIR)/reqs.txt ]; then \
 		$(PKG_CMD) $$(grep -v ^# $(topdir)/osdeps/$(OS_SUBDIR)/reqs.txt 2>/dev/null | awk 'NF' ORS=' ') ; \
-	fi ; \
+	fi
 	if [ -f $(topdir)/osdeps/$(OS_SUBDIR)/pip.txt ]; then \
 		$(PIP_CMD) $$(grep -v ^# $(topdir)/osdeps/$(OS_SUBDIR)/pip.txt 2>/dev/null | awk 'NF' ORS=' ') ; \
-	fi ; \
+	fi
 	if [ -x $(topdir)/osdeps/$(OS_SUBDIR)/post.sh ]; then \
 		env OSDEPS=$(topdir)/osdeps/$(OS_SUBDIR) $(topdir)/osdeps/$(OS_SUBDIR)/post.sh ; \
 	fi
