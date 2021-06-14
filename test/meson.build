@@ -118,6 +118,7 @@ if python.found()
         'test_abidiff.py',
         'test_addedfiles.py',
         'test_badfuncs.py',
+        'test_capabilities.py',
         'test_changedfiles.py',
         'test_changelog.py',
         'test_command.py',
