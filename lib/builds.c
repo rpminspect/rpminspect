@@ -302,11 +302,11 @@ static void setup_progress_bar(const char *src)
      */
     if (vmsg != NULL) {
         /* new progress bar */
-        printf("%s\033[%ldC[\033[%ldC]\033[%ldD", vmsg, bar_width - progress_msg_len, bar_width, bar_width - shift);
+        printf("%s\033[%zuC[\033[%zuC]\033[%zuD", vmsg, bar_width - progress_msg_len, bar_width, bar_width - shift);
         free(vmsg);
     } else {
         /* reposition due to terminal resize */
-        printf("\033[%ldD[\033[%ldC]\033[%ldD", progress_msg_len + progress_displayed, bar_width, bar_width - shift);
+        printf("\033[%" CURL_FORMAT_CURL_OFF_T "D[\033[%zuC]\033[%zuD", progress_msg_len + progress_displayed, bar_width, bar_width - shift);
     }
 
     /* account for the progress bar borders and rounding */
