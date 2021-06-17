@@ -1556,7 +1556,7 @@ class CapSETUIDWithOtherExecRPMs(TestRPMs):
 
         self.inspection = "ownership"
         self.result = "BAD"
-        self.waiver_auth = "Anyone"
+        self.waiver_auth = "Security"
 
 
 class CapSETUIDWithOtherExecKoji(TestKoji):
@@ -1585,7 +1585,7 @@ class CapSETUIDWithOtherExecKoji(TestKoji):
 
         self.inspection = "ownership"
         self.result = "BAD"
-        self.waiver_auth = "Anyone"
+        self.waiver_auth = "Security"
 
 
 class CapSETUIDWithOtherExecCompareRPMs(TestCompareRPMs):
@@ -1616,7 +1616,7 @@ class CapSETUIDWithOtherExecCompareRPMs(TestCompareRPMs):
 
         self.inspection = "ownership"
         self.result = "BAD"
-        self.waiver_auth = "Anyone"
+        self.waiver_auth = "Security"
 
 
 class CapSETUIDWithOtherExecCompareKoji(TestCompareKoji):
@@ -1647,7 +1647,7 @@ class CapSETUIDWithOtherExecCompareKoji(TestCompareKoji):
 
         self.inspection = "ownership"
         self.result = "BAD"
-        self.waiver_auth = "Anyone"
+        self.waiver_auth = "Security"
 
 
 #################################
@@ -1681,7 +1681,7 @@ class CapSETUIDWithGroupExecRPMs(TestRPMs):
 
         self.inspection = "ownership"
         self.result = "BAD"
-        self.waiver_auth = "Anyone"
+        self.waiver_auth = "Security"
 
 
 class CapSETUIDWithGroupExecKoji(TestKoji):
@@ -1710,7 +1710,7 @@ class CapSETUIDWithGroupExecKoji(TestKoji):
 
         self.inspection = "ownership"
         self.result = "BAD"
-        self.waiver_auth = "Anyone"
+        self.waiver_auth = "Security"
 
 
 class CapSETUIDWithGroupExecCompareRPMs(TestCompareRPMs):
@@ -1741,7 +1741,7 @@ class CapSETUIDWithGroupExecCompareRPMs(TestCompareRPMs):
 
         self.inspection = "ownership"
         self.result = "BAD"
-        self.waiver_auth = "Anyone"
+        self.waiver_auth = "Security"
 
 
 class CapSETUIDWithGroupExecCompareKoji(TestCompareKoji):
@@ -1772,7 +1772,7 @@ class CapSETUIDWithGroupExecCompareKoji(TestCompareKoji):
 
         self.inspection = "ownership"
         self.result = "BAD"
-        self.waiver_auth = "Anyone"
+        self.waiver_auth = "Security"
 
 
 #################

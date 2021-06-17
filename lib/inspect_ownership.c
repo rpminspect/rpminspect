@@ -45,6 +45,7 @@ static bool ownership_driver(struct rpminspect *ri, rpmfile_entry_t *file)
     char *before_val = NULL;
     char *after_val = NULL;
     char *what = NULL;
+    char *captext = NULL;
     cap_t cap = NULL;
     cap_flag_value_t have_setuid = CAP_CLEAR;
     struct result_params params;
@@ -112,7 +113,14 @@ static bool ownership_driver(struct rpminspect *ri, rpmfile_entry_t *file)
             /* Check the group - special handling */
             if (strcmp(group, ri->bin_group)) {
                 /* Gather capabilities(7) for the file we need */
-                cap = get_cap(file);
+                captext = get_rpm_header_value(file, RPMTAG_FILECAPS);
+
+                if (captext && strcmp(captext, "")) {
+                    cap = cap_from_text(captext);
+                }
+
+                free(captext);
+                captext = NULL;
 
                 if (cap) {
                     if (cap_get_flag(cap, CAP_SETUID, CAP_EFFECTIVE, &have_setuid) == -1) {
@@ -123,10 +131,10 @@ static bool ownership_driver(struct rpminspect *ri, rpmfile_entry_t *file)
 
                 /* Handle if CAP_SETUID is present or not */
                 if (have_setuid == CAP_SET) {
-                    if (file->st.st_mode & S_IXOTH & (ri->tests & INSPECT_OWNERSHIP)) {
+                    if ((file->st.st_mode & S_IXOTH) && (ri->tests & INSPECT_OWNERSHIP)) {
                         xasprintf(&params.msg, _("File %s on %s has CAP_SETUID capability but group `%s` and is world executable"), file->localpath, arch, group);
                         params.severity = RESULT_BAD;
-                        params.waiverauth = WAIVABLE_BY_ANYONE;
+                        params.waiverauth = WAIVABLE_BY_SECURITY;
                         params.remedy = REMEDY_OWNERSHIP_IXOTH;
                         add_result(ri, &params);
                         free(params.msg);
