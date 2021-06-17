@@ -778,51 +778,6 @@ void find_file_peers(rpmfile_t *before, rpmfile_t *after)
 }
 
 /**
- * @brief Return the capabilities(7) of the specified rpmfile_entry_t.
- *
- * If the capabilities(7) of the specified file are cached, return
- * that.  Otherwise get and cache the capabilities, then return the
- * cached value.
- *
- * @param file rpmfile_entry_t specifying the file.
- * @return cap_t containing the capabilities(7) of the file.
- */
-cap_t get_cap(rpmfile_entry_t *file)
-{
-    int fd;
-    const char *arch = NULL;
-
-    assert(file != NULL);
-    arch = get_rpm_header_arch(file->rpm_header);
-    assert(arch != NULL);
-
-    if (file->cap) {
-        return file->cap;
-    }
-
-    assert(file->fullpath != NULL);
-
-    /* Only for regular files */
-    if (!S_ISREG(file->st.st_mode)) {
-        return NULL;
-    }
-
-    /* Gather capabilities(7) for the file we need */
-    if ((fd = open(file->fullpath, O_RDONLY)) == -1) {
-        warn("open()");
-        return NULL;
-    }
-
-    file->cap = cap_get_fd(fd);
-
-    if (close(fd) == -1) {
-        warn("close()");
-    }
-
-    return file->cap;
-}
-
-/**
  * @brief Determine if a path is a debug or build path.
  *
  * Returns true if the specified path contains any of:
