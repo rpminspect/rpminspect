@@ -106,7 +106,7 @@ static bool check_runpath(struct rpminspect *ri, const rpmfile_entry_t *file, co
     regex_t origin_root;
     int reg_result = 0;
     char reg_error[BUFSIZ];
-    regmatch_t origin_matches[1];
+    regmatch_t origin_matches[3];
     const char *arch = NULL;
     struct result_params params;
 
