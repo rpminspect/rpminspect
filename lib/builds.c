@@ -246,22 +246,17 @@ static int copytree(const char *fpath, const struct stat *sb, int tflag, struct 
  */
 static void setup_progress_bar(const char *src)
 {
+    size_t half_width = 0;
     char *archive = NULL;
     char *vmsg = NULL;
-    size_t shift = 0;
-    size_t border = 1;
 
     /* terminal width and progress bar width */
     total_width = tty_width();
-    bar_width = total_width / 2;
+    half_width = total_width / 2;
+    bar_width = half_width - 2;       /* account for '[' and ']' */
     progress_displayed = 0;
 
-    if (total_width % 2 == 1) {
-        shift = 1;
-    } else {
-        border = 2;
-    }
-
+    /* generate the verbose message string */
     if (src != NULL) {
         /* the basename of the source URL, which is the file name */
         archive = rindex(src, '/') + 1;
@@ -271,11 +266,11 @@ static void setup_progress_bar(const char *src)
         if ((strlen(archive) + 4) > bar_width) {
             archive = strshorten(archive, bar_width - 4);
             assert(archive != NULL);
-            xasprintf(&vmsg, "=> %s", archive);
+            xasprintf(&vmsg, "=> %s ", archive);
             assert(vmsg != NULL);
             free(archive);
         } else {
-            xasprintf(&vmsg, "=> %s", archive);
+            xasprintf(&vmsg, "=> %s ", archive);
         }
 
         progress_msg_len = strlen(vmsg);
@@ -302,15 +297,12 @@ static void setup_progress_bar(const char *src)
      */
     if (vmsg != NULL) {
         /* new progress bar */
-        printf("%s\033[%zuC[\033[%zuC]\033[%zuD", vmsg, bar_width - progress_msg_len, bar_width, bar_width - shift);
+        printf("%s\033[%zuC[\033[%zuC]\033[%zuD", vmsg, bar_width - progress_msg_len, bar_width, bar_width + 1);
         free(vmsg);
     } else {
         /* reposition due to terminal resize */
-        printf("\033[%" CURL_FORMAT_CURL_OFF_T "D[\033[%zuC]\033[%zuD", progress_msg_len + progress_displayed, bar_width, bar_width - shift);
+        printf("\033[%" CURL_FORMAT_CURL_OFF_T "D[\033[%zuC]\033[%zuD", progress_msg_len + progress_displayed, bar_width, bar_width + 1);
     }
-
-    /* account for the progress bar borders and rounding */
-    bar_width -= border;
 
     fflush(stdout);
     return;
@@ -407,6 +399,7 @@ static void curl_helper(const bool verbose, const char *src, const char *dst) {
 #else
         curl_easy_setopt(c, CURLOPT_PROGRESSFUNCTION, legacy_download_progress);
 #endif
+        curl_easy_setopt(c, CURLOPT_NOPROGRESS, 0L);
         setup_progress_bar(src);
     }
 
