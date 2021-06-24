@@ -33,7 +33,8 @@ jobs:
                             "archlinux/archlinux:base-devel",
                             "gentoo/stage3",
                             "alpine:latest",
-                            "almalinux:8"]
+                            "almalinux:8",
+                            "rockylinux:8"]
 
         container:
             image: ${{ matrix.container }}
@@ -53,7 +54,7 @@ jobs:
                           pacman --noconfirm -Syu
                           pacman --noconfirm -S git
                           ;;
-                      centos*|almalinux*)
+                      centos*|almalinux*|rocky*)
                           yum install -y epel-release
                           rpm --import /etc/pki/rpm-gpg/*
                           yum install -y git
@@ -85,7 +86,7 @@ jobs:
                       archlinux*)
                           pacman --noconfirm -S make
                           ;;
-                      centos*|almalinux*)
+                      centos*|almalinux*|rocky*)
                           yum install -y make
                           ;;
                       debian*|ubuntu*)
