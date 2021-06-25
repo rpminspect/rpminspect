@@ -34,7 +34,8 @@ jobs:
                             "gentoo/stage3",
                             "alpine:latest",
                             "almalinux:8",
-                            "rockylinux:8"]
+                            "rockylinux/rockylinux",
+                            "amazonlinux:2"]
 
         container:
             image: ${{ matrix.container }}
@@ -70,6 +71,11 @@ jobs:
                       opensuse*)
                           zypper install -y git
                           ;;
+                      amzn*)
+                          amazon-linux-extras install epel -y
+                          rpm --import /etc/pki/rpm-gpg/*
+                          yum install -y git
+                          ;;
                   esac
 
             # This means clone the git repo
@@ -86,7 +92,7 @@ jobs:
                       archlinux*)
                           pacman --noconfirm -S make
                           ;;
-                      centos*|almalinux*|rocky*)
+                      centos*|almalinux*|rocky*|amzn*)
                           yum install -y make
                           ;;
                       debian*|ubuntu*)
