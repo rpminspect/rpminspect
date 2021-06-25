@@ -1,3 +1,4 @@
 # list of supported languages using locale codes
 # (i.e., the subdir names in /usr/share/locale)
 #en_US
+ru_RU
