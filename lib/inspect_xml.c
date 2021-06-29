@@ -54,7 +54,7 @@ static bool is_xml_well_formed(const char *path, char **errors)
     static xmlGenericErrorFunc silence = xml_silence_errors;
     xmlParserCtxtPtr ctxt;
     xmlDocPtr doc;
-    bool result;
+    bool result = true;
 
     if (!initialized) {
         initGenericErrorDefaultFunc(&silence);
@@ -72,19 +72,20 @@ static bool is_xml_well_formed(const char *path, char **errors)
         doc = xmlCtxtReadFile(ctxt, path, NULL, XML_PARSE_RECOVER | XML_PARSE_NONET);
     }
 
-    /* an unparsed entity is ok in this check */
-    if (ctxt->errNo == XML_ERR_UNDECLARED_ENTITY || ctxt->errNo == XML_WAR_UNDECLARED_ENTITY) {
+    if (ctxt->errNo == XML_ERR_NONE) {
+        /* well-formed documents */
+        result = true;
+    } else if (ctxt->errNo == XML_ERR_UNDECLARED_ENTITY || ctxt->errNo == XML_WAR_UNDECLARED_ENTITY) {
+        /* an unparsed entity is ok in this check */
         result = true;
     } else {
-        if (!ctxt->valid) {
-            if (errors != NULL && ctxt->lastError.message) {
-                *errors = strdup(ctxt->lastError.message);
-            }
+        /* any other non-zero error code */
+        result = false;
+    }
 
-            result = false;
-        } else {
-            result = true;
-        }
+    /* capture validity output */
+    if (!ctxt->valid && errors != NULL && ctxt->lastError.message) {
+        *errors = strdup(ctxt->lastError.message);
     }
 
     if (doc != NULL) {
@@ -157,6 +158,7 @@ static bool is_xml(const char *path)
 static bool xml_driver(struct rpminspect *ri, rpmfile_entry_t *file)
 {
     bool result = true;
+    const char *pkg = NULL;
     struct result_params params;
 
     /* Skip source packages */
@@ -186,10 +188,11 @@ static bool xml_driver(struct rpminspect *ri, rpmfile_entry_t *file)
         return true;
     }
 
+    /* package name is used for reporting */
+    pkg = headerGetString(file->rpm_header, RPMTAG_NAME);
+
     /* Set up result parameters */
     init_result_params(&params);
-    params.severity = RESULT_VERIFY;
-    params.waiverauth = WAIVABLE_BY_ANYONE;
     params.header = NAME_XML;
     params.remedy = REMEDY_XML;
     params.arch = get_rpm_header_arch(file->rpm_header);
@@ -197,8 +200,17 @@ static bool xml_driver(struct rpminspect *ri, rpmfile_entry_t *file)
 
     result = is_xml_well_formed(file->fullpath, &params.details);
 
-    if (!result) {
-        xasprintf(&params.msg, _("File %s is a malformed XML file on %s"), file->localpath, params.arch);
+    if (result && params.details) {
+        xasprintf(&params.msg, _("%s is a well-formed XML file in %s on %s, but is not a valid XML file"), file->localpath, pkg, params.arch);
+        params.severity = RESULT_INFO;
+        params.waiverauth = NOT_WAIVABLE;
+        add_result(ri, &params);
+        free(params.msg);
+        free(params.details);
+    } else if (!result) {
+        xasprintf(&params.msg, _("%s is not a well-formed XML file in %s on %s"), file->localpath, pkg, params.arch);
+        params.severity = RESULT_VERIFY;
+        params.waiverauth = WAIVABLE_BY_ANYONE;
         add_result(ri, &params);
         free(params.msg);
         free(params.details);
