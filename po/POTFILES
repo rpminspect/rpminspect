@@ -6,6 +6,7 @@ include/queue.h
 include/readelf.h
 include/results.h
 include/rpminspect.h
+include/secrules.h
 include/types.h
 include/uthash.h
 lib/abi.c
