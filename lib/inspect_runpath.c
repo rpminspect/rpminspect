@@ -198,7 +198,7 @@ static bool check_runpath(struct rpminspect *ri, const rpmfile_entry_t *file, co
                 allowed = ri->runpath_allowed_paths;
             }
 
-            if (!valid && working_path && allowed) {
+            if (!valid && working_path) {
                 /* canonicalize the path string */
                 working_path = abspath(working_path);
 
