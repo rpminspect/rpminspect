@@ -34,21 +34,28 @@ elif [ -r /etc/redhat-release ] && [ "${ID}" = "rhel" ]; then
 elif [ -r /etc/almalinux-release ] && [ "${ID}" = "almalinux" ]; then
     v="$(echo "${VERSION_ID}" | cut -d '.' -f 1)"
     if [ "${v}" = "8" ]; then
-       echo "${ID}${v}"
+        echo "${ID}${v}"
     else
-       echo "unknown OS: ${ID}" >&2
+        echo "unknown OS: ${ID}" >&2
     fi
 elif [ -r /etc/rocky-release ] && [ "${ID}" = "rocky" ]; then
     v="$(echo "${VERSION_ID}" | cut -d '.' -f 1)"
     if [ "${v}" = "8" ]; then
-       echo "${ID}${v}"
+        echo "${ID}${v}"
     else
-       echo "unknown OS: ${ID}" >&2
+        echo "unknown OS: ${ID}" >&2
     fi
 else
     case "${ID}" in
         opensuse-leap|opensuse-tumbleweed|ubuntu|debian|slackware|arch|gentoo|alpine)
             echo "${ID}"
+            ;;
+        amzn)
+            if [ "${VERSION_ID}" = "2" ]; then
+                echo "${ID}${VERSION_ID}"
+            else
+                echo "unknown OS: ${ID}" >&2
+            fi
             ;;
         *)
             echo "unknown OS: ${ID}" >&2
