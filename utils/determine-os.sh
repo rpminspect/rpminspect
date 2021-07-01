@@ -12,6 +12,10 @@ if [ -r /etc/os-release ] || [ -L /etc/os-release ]; then
     . /etc/os-release
 fi
 
+# Crux Linux lacks /etc/os-release or an /etc/*-release file
+grep -q ^CRUX /etc/issue >/dev/null 2>&1
+IS_CRUX=$?
+
 if [ -r /etc/fedora-release ] && [ "${ID}" = "fedora" ]; then
     if grep -q -i rawhide /etc/fedora-release >/dev/null 2>&1 ; then
         echo "${ID}-rawhide"
@@ -42,6 +46,14 @@ elif [ -r /etc/rocky-release ] && [ "${ID}" = "rocky" ]; then
     v="$(echo "${VERSION_ID}" | cut -d '.' -f 1)"
     if [ "${v}" = "8" ]; then
         echo "${ID}${v}"
+    else
+        echo "unknown OS: ${ID}" >&2
+    fi
+elif [ ${IS_CRUX} -eq 0 ] && [ -f /etc/pkgadd.conf ] && [ -f /etc/pkgmk.conf ]; then
+    echo "crux"
+elif [ -r /etc/altlinux-release ] && [ "${ID}" = "altlinux" ]; then
+    if [ "${VERSION_ID}" = "p9" ]; then
+        echo "${ID}"
     else
         echo "unknown OS: ${ID}" >&2
     fi
