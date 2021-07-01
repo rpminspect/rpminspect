@@ -9,7 +9,8 @@ The GitHub Actions call:
 
     make instreqs
 
-For each operating system's environment.  That make target does the following:
+For each operating system's environment.  That make target does the
+following:
 
 * If there is a 'pre.sh' script for the OS, run it.  This is a shell
   script that runs in the target environment.  Use it for any set up

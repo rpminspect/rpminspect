@@ -26,6 +26,46 @@ Status
 [![ShellCheck](https://github.com/rpminspect/rpminspect/actions/workflows/shellcheck.yml/badge.svg)](https://github.com/rpminspect/rpminspect/actions/workflows/shellcheck.yml)
 [![Extra CI](https://github.com/rpminspect/rpminspect/actions/workflows/extra-ci.yml/badge.svg)](https://github.com/rpminspect/rpminspect/actions/workflows/extra-ci.yml)
 
+For each merge and pull request, rpminspect is built and tested in the
+following environments:
+
+* Fedora Linux on x86_64 (current stable release and rawhide)
+
+* Fedora Linux on i686 (current stable release and rawhide)
+
+* CentOS 8 on x86_64
+
+* CentOS 7 on x86_64
+
+* Ubuntu Linux on x86_64
+
+* Debian Stable on x86_64
+
+* Debian Testing on x86_64
+
+* OpenSUSE Leap on x86_64
+
+* Arch Linux on x86_64
+
+* Gentoo Linux on x86_64
+
+* Alpine Linux on x86_64
+
+* AlmaLinux 8 on x86_64
+
+* Rocky Linux on x86_64
+
+* Amazon Linux 2 on x86_64
+
+Additionally, rpminspect is built in the following environments on
+each merge and pull request:
+
+* Fedora Linux on ppc64le (current stable release)
+
+* Fedora Linux on aarch64 (current stable release)
+
+* Fedora Linux on s390x (current stable release)
+
 Build Types Support
 -------------------
 

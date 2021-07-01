@@ -26,28 +26,28 @@ elif [ -r /etc/centos-release ] && [ "${ID}" = "centos" ]; then
     if [ ${VERSION_ID} -eq 7 ] || [ ${VERSION_ID} -eq 8 ]; then
         echo "${ID}${VERSION_ID}"
     else
-        echo "unknown OS: ${ID}" >&2
+        echo "unknown OS: ${ID}:${VERSION_ID}" >&2
     fi
 elif [ -r /etc/redhat-release ] && [ "${ID}" = "rhel" ]; then
     v="$(echo "${VERSION_ID}" | cut -d '.' -f 1)"
     if [ "${v}" = "7" ] || [ "${v}" = "8" ]; then
         echo "${ID}${v}"
     else
-        echo "unknown OS: ${ID}" >&2
+        echo "unknown OS: ${ID}:${VERSION_ID}" >&2
     fi
 elif [ -r /etc/almalinux-release ] && [ "${ID}" = "almalinux" ]; then
     v="$(echo "${VERSION_ID}" | cut -d '.' -f 1)"
     if [ "${v}" = "8" ]; then
         echo "${ID}${v}"
     else
-        echo "unknown OS: ${ID}" >&2
+        echo "unknown OS: ${ID}:${VERSION_ID}" >&2
     fi
 elif [ -r /etc/rocky-release ] && [ "${ID}" = "rocky" ]; then
     v="$(echo "${VERSION_ID}" | cut -d '.' -f 1)"
     if [ "${v}" = "8" ]; then
         echo "${ID}${v}"
     else
-        echo "unknown OS: ${ID}" >&2
+        echo "unknown OS: ${ID}:${VERSION_ID}" >&2
     fi
 elif [ ${IS_CRUX} -eq 0 ] && [ -f /etc/pkgadd.conf ] && [ -f /etc/pkgmk.conf ]; then
     echo "crux"
@@ -55,18 +55,18 @@ elif [ -r /etc/altlinux-release ] && [ "${ID}" = "altlinux" ]; then
     if [ "${VERSION_ID}" = "p9" ]; then
         echo "${ID}"
     else
-        echo "unknown OS: ${ID}" >&2
+        echo "unknown OS: ${ID}:${VERSION_ID}" >&2
     fi
 else
     case "${ID}" in
-        opensuse-leap|opensuse-tumbleweed|ubuntu|debian|slackware|arch|gentoo|alpine)
+        opensuse-leap|opensuse-tumbleweed|ubuntu|debian|slackware|arch|gentoo|alpine|mageia)
             echo "${ID}"
             ;;
         amzn)
             if [ "${VERSION_ID}" = "2" ]; then
                 echo "${ID}${VERSION_ID}"
             else
-                echo "unknown OS: ${ID}" >&2
+                echo "unknown OS: ${ID}:${VERSION_ID}" >&2
             fi
             ;;
         *)
