@@ -49,7 +49,7 @@ args = ["gcc", "-print-multi-lib"]
 proc = subprocess.Popen(args, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 (out, err) = proc.communicate()
 
-if proc.returncode == 0 and str(out).find("@m32") != -1:
+if proc.returncode == 0 and str(out).find("@m32") != -1 and os.path.isfile('/usr/include/gnu/stubs-32.h'):
     have_gcc_multilib = True
 
 
