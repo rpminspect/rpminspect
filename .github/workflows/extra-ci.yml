@@ -71,10 +71,10 @@ jobs:
                       opensuse*)
                           zypper install -y git
                           ;;
-                      amzn*)
+                      amazonlinux*)
                           amazon-linux-extras install epel -y
                           rpm --import /etc/pki/rpm-gpg/*
-                          yum install -y git tar
+                          yum install -y git
                           ;;
                   esac
 
@@ -92,7 +92,7 @@ jobs:
                       archlinux*)
                           pacman --noconfirm -S make
                           ;;
-                      centos*|almalinux*|rocky*|amzn*)
+                      centos*|almalinux*|rocky*|amazonlinux*)
                           yum install -y make
                           ;;
                       debian*|ubuntu*)
