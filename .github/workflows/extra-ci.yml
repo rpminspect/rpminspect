@@ -35,7 +35,8 @@ jobs:
                             "alpine:latest",
                             "almalinux:8",
                             "rockylinux/rockylinux",
-                            "amazonlinux:2"]
+                            "amazonlinux:2",
+                            "mageia:latest"]
 
         container:
             image: ${{ matrix.container }}
@@ -76,6 +77,9 @@ jobs:
                           rpm --import /etc/pki/rpm-gpg/*
                           yum install -y git
                           ;;
+                      mageia*)
+                          dnf install -y git
+                          ;;
                   esac
 
             # This means clone the git repo
@@ -92,7 +96,7 @@ jobs:
                       archlinux*)
                           pacman --noconfirm -S make
                           ;;
-                      centos*|almalinux*|rocky*|amazonlinux*)
+                      centos*|almalinux*|rocky*|amazonlinux*|mageia*)
                           yum install -y make
                           ;;
                       debian*|ubuntu*)
