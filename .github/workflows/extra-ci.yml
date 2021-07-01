@@ -74,7 +74,7 @@ jobs:
                       amzn*)
                           amazon-linux-extras install epel -y
                           rpm --import /etc/pki/rpm-gpg/*
-                          yum install -y git
+                          yum install -y git tar
                           ;;
                   esac
 
