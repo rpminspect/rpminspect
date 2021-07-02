@@ -132,6 +132,13 @@
  */
 #define POLITICS_DIR "politics"
 
+/**
+ * @def SECURITY_DIR
+ * Name of the VENDOR_DATA_DIR subdirectory with security related
+ * package rules.
+ */
+#define SECURITY_DIR "security"
+
 /** @} */
 
 /**

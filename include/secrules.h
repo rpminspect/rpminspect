@@ -30,85 +30,88 @@
  * corresponding configuration file string is in a comment for each
  * rule type (e.g., "caps" or "fortifysource").
  */
-enum secrule_type {
-    /* not used */
-    SECRULE_NULL = 0,
 
-    /*
-     * caps
-     * Any inspection that looks at capabilities(7) values.
-     */
-    SECRULE_CAPS = 1,
+/* only used to indicate an unknown rule */
+#define SECRULE_NULL 0
 
-    /*
-     * execstack
-     * ELF object contains an executable stack or built without
-     * GNU_STACK.
-     */
-    SECRULE_EXECSTACK = 2,
+/*
+ * caps
+ * Any inspection that looks at capabilities(7) values.
+ */
+#define SECRULE_CAPS 1
 
-    /*
-     * relro
-     * ELF object loses partial or full GNU_RELRO protection.
-     */
-    SECRULE_RELRO = 3,
+/*
+ * execstack
+ * ELF object contains an executable stack or built without
+ * GNU_STACK.
+ */
+#define SECRULE_EXECSTACK 2
 
-    /*
-     * fortifysource
-     * ELF object loses -D_FORTIFY_SOURCE protection.
-     */
-    SECRULE_FORTIFYSOURCE = 4,
+/*
+ * relro
+ * ELF object loses partial or full GNU_RELRO protection.
+ */
+#define SECRULE_RELRO 3
 
-    /*
-     * pic
-     * ELF objects in static libraries built without -fPIC
-     */
-    SECRULE_PIC = 5,
+/*
+ * fortifysource
+ * ELF object loses -D_FORTIFY_SOURCE protection.
+ */
+#define SECRULE_FORTIFYSOURCE 4
 
-    /*
-     * textrel
-     * ELF object has TEXTREL relocations.
-     */
-    SECRULE_TEXTREL = 6,
+/*
+ * pic
+ * ELF objects in static libraries built without -fPIC
+ */
+#define SECRULE_PIC 5
 
-    /*
-     * setuid
-     * File has CAP_SETUID but is group writable.
-     */
-    SECRULE_SETUID = 7,
+/*
+ * textrel
+ * ELF object has TEXTREL relocations.
+ */
+#define SECRULE_TEXTREL 6
 
-    /*
-     * worldwritable
-     * File or directory is world writable.
-     */
-    SECRULE_WORLDWRITABLE = 8,
+/*
+ * setuid
+ * File has CAP_SETUID but is group writable.
+ */
+#define SECRULE_SETUID 7
 
-    /*
-     * securitypath
-     * File is removed but belonged in a security path prefix as
-     * defined in the configuration file.
-     */
-    SECRULE_SECURITYPATH = 9,
+/*
+ * worldwritable
+ * File or directory is world writable.
+ */
+#define SECRULE_WORLDWRITABLE 8
 
-    /*
-     * modes
-     * File mode does not match expected mode from the fileinfo rules.
-     */
-    SECRULE_MODES = 10
-};
+/*
+ * securitypath
+ * File is removed but belonged in a security path prefix as
+ * defined in the configuration file.
+ */
+#define SECRULE_SECURITYPATH 9
+
+/*
+ * modes
+ * File mode does not match expected mode from the fileinfo rules.
+ */
+#define SECRULE_MODES 10
+
 
 enum secrule_action {
     /* not used */
     SECRULE_ACTION_NULL = 0,
 
+    /* ignore the finding */
+    SECRULE_ACTION_SKIP = 1,
+
     /* reporting level will be INFO */
-    SECRULE_ACTION_INFORM = 1,
+    SECRULE_ACTION_INFORM = 2,
 
     /* reporting level will be VERIFY */
-    SECRULE_ACTION_VERIFY = 2,
+    SECRULE_ACTION_VERIFY = 3,
 
     /* reporting level will be BAD */
-    SECRULE_ACTION_FAIL = 3
+    SECRULE_ACTION_FAIL = 4
 };
 
 /*
@@ -117,7 +120,7 @@ enum secrule_action {
  * definitions file.
  */
 typedef struct _secrule_t {
-    enum secrule_type type;
+    int type;
     enum secrule_action action;
     UT_hash_handle hh;
 } secrule_t;

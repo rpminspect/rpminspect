@@ -28,6 +28,7 @@
 #include <err.h>
 #include <yaml.h>
 #include "rpminspect.h"
+#include "uthash.h"
 
 /* List defaults (not in constants.h to avoid cpp shenanigans) */
 
@@ -1554,6 +1555,213 @@ bool init_politics(struct rpminspect *ri) {
     }
 
     list_free(contents, free);
+
+    return true;
+}
+
+/*
+ * Initialize the security list for the given product release.  If the
+ * file cannot be found, return false.
+ */
+bool init_security(struct rpminspect *ri)
+{
+    int pos = 0;
+    bool new = false;
+    char *filename = NULL;
+    char *line = NULL;
+    char *token = NULL;
+    char *pkg = NULL;
+    char *ver = NULL;
+    char *rel = NULL;
+    string_list_t *contents = NULL;
+    string_entry_t *entry = NULL;
+    string_list_t *rules = NULL;
+    string_entry_t *rentry = NULL;
+    string_list_t *kv = NULL;
+    string_entry_t *key = NULL;
+    string_entry_t *value = NULL;
+    int stype;
+    enum secrule_action saction;
+    security_t *sentry = NULL;
+    secrule_t *rule_entry = NULL;
+
+    assert(ri != NULL);
+    assert(ri->vendor_data_dir != NULL);
+    assert(ri->product_release != NULL);
+
+    /* already initialized */
+    if (ri->security_initialized) {
+        return true;
+    }
+
+    /* the actual security file */
+    xasprintf(&filename, "%s/%s/%s", ri->vendor_data_dir, SECURITY_DIR, ri->product_release);
+    assert(filename != NULL);
+    contents = read_file(filename);
+    free(filename);
+
+    if (contents == NULL) {
+        return false;
+    }
+
+    /* add all the entries to the caps list */
+    TAILQ_FOREACH(entry, contents, items) {
+        if (entry->data == NULL) {
+            continue;
+        }
+
+        /* trim line ending characters */
+        line = entry->data;
+        line[strcspn(line, "\r\n")] = '\0';
+
+        /* skip blank lines and comments */
+        if (*line == '#' || *line == '\n' || *line == '\r' || !strcmp(line, "")) {
+            continue;
+        }
+
+        /* read the fields */
+        while ((token = strsep(&line, " \t")) != NULL) {
+            /* might be lots of space between fields */
+            if (*token == '\0') {
+                continue;
+            }
+
+            if (pos == 0) {
+                /* look up this package in the table */
+                pkg = strdup(token);
+                assert(pkg != NULL);
+                HASH_FIND_STR(ri->security, pkg, sentry);
+            } else if (pos == 1) {
+                ver = strdup(token);
+                assert(ver != NULL);
+            } else if (pos == 2) {
+                rel = strdup(token);
+                assert(rel != NULL);
+            } else if (pos == 3) {
+                rules = strsplit(token, ",");
+            }
+
+            pos++;
+        }
+
+        /* add the entry */
+        if (pkg && ver && rel && rules) {
+            if (sentry == NULL) {
+                sentry = calloc(1, sizeof(*sentry));
+                assert(sentry != NULL);
+                new = true;
+            }
+
+            /* the main NVR values of a rule */
+            free(sentry->pkg);
+            sentry->pkg = strdup(pkg);
+            free(sentry->ver);
+            sentry->ver = strdup(ver);
+            free(sentry->rel);
+            sentry->rel = strdup(rel);
+
+            /* the list of individual rules */
+            TAILQ_FOREACH(rentry, rules, items) {
+                /* split the RULE=ACTION setting */
+                kv = strsplit(rentry->data, "=");
+
+                /* we must have a rule and action */
+                if (list_len(kv) != 2) {
+                    warnx(_("*** invalid security rule: %s"), rentry->data);
+                    list_free(kv, free);
+                    continue;
+                }
+
+                key = TAILQ_FIRST(kv);
+                value = TAILQ_LAST(kv, string_entry_s);
+
+                /* find the rule */
+                if (!strcasecmp(key->data, "caps")) {
+                    stype = SECRULE_CAPS;
+                } else if (!strcasecmp(key->data, "execstack")) {
+                    stype = SECRULE_EXECSTACK;
+                } else if (!strcasecmp(key->data, "relro")) {
+                    stype = SECRULE_RELRO;
+                } else if (!strcasecmp(key->data, "fortifysource")) {
+                    stype = SECRULE_FORTIFYSOURCE;
+                } else if (!strcasecmp(key->data, "pic")) {
+                    stype = SECRULE_PIC;
+                } else if (!strcasecmp(key->data, "textrel")) {
+                    stype = SECRULE_TEXTREL;
+                } else if (!strcasecmp(key->data, "setuid")) {
+                    stype = SECRULE_SETUID;
+                } else if (!strcasecmp(key->data, "worldwritable")) {
+                    stype = SECRULE_WORLDWRITABLE;
+                } else if (!strcasecmp(key->data, "securitypath")) {
+                    stype = SECRULE_SECURITYPATH;
+                } else if (!strcasecmp(key->data, "modes")) {
+                    stype = SECRULE_MODES;
+                } else {
+                    stype = SECRULE_NULL;
+                }
+
+                if (stype == SECRULE_NULL) {
+                    warnx(_("*** unknown security rule: %s"), key->data);
+                    list_free(kv, free);
+                    continue;
+                }
+
+                /* find the action */
+                if (!strcasecmp(value->data, "skip")) {
+                    saction = SECRULE_ACTION_SKIP;
+                } else if (!strcasecmp(value->data, "inform")) {
+                    saction = SECRULE_ACTION_INFORM;
+                } else if (!strcasecmp(value->data, "verify")) {
+                    saction = SECRULE_ACTION_VERIFY;
+                } else if (!strcasecmp(value->data, "fail")) {
+                    saction = SECRULE_ACTION_FAIL;
+                } else {
+                    saction = SECRULE_ACTION_NULL;
+                }
+
+                if (saction == SECRULE_ACTION_NULL) {
+                    warnx(_("*** unknown security action: %s"), value->data);
+                    list_free(kv, free);
+                    continue;
+                }
+
+                /* add or replace the rule action */
+                HASH_FIND_INT(sentry->rules, &stype, rule_entry);
+
+                if (rule_entry == NULL) {
+                    rule_entry = calloc(1, sizeof(*rule_entry));
+                    assert(rule_entry != NULL);
+                    rule_entry->type = stype;
+                    rule_entry->action = saction;
+                    HASH_ADD_INT(sentry->rules, type, rule_entry);
+                } else {
+                    /* rule already exists, just replace the action */
+                    rule_entry->action = saction;
+                }
+
+                /* clean up */
+                list_free(kv, free);
+            }
+
+            /* add new entries to the security rules */
+            if (new) {
+                HASH_ADD_KEYPTR(hh, ri->security, sentry->pkg, strlen(sentry->pkg), sentry);
+            }
+        } else {
+            warnx(_("*** malformed security line: %s"), line);
+        }
+
+        /* clean up */
+        free(pkg);
+        free(ver);
+        free(rel);
+        list_free(rules, free);
+        pos = 0;
+        new = false;
+    }
+
+    list_free(contents, free);
+    ri->security_initialized = true;
 
     return true;
 }

@@ -125,6 +125,7 @@ bool init_fileinfo(struct rpminspect *);
 bool init_caps(struct rpminspect *);
 bool init_rebaseable(struct rpminspect *);
 bool init_politics(struct rpminspect *ri);
+bool init_security(struct rpminspect *ri);
 struct rpminspect *init_rpminspect(struct rpminspect *, const char *, const char *);
 
 /* free.c */
