@@ -96,7 +96,7 @@ jobs:
                       archlinux*)
                           pacman --noconfirm -S make
                           ;;
-                      centos*|almalinux*|rocky*|amazonlinux*|mageia*)
+                      centos*|almalinux*|rocky*|amazonlinux*)
                           yum install -y make
                           ;;
                       debian*|ubuntu*)
@@ -104,6 +104,9 @@ jobs:
                           ;;
                       opensuse*)
                           zypper install -y make
+                          ;;
+                      mageia*)
+                          dnf install -y make
                           ;;
                   esac
                   make instreqs
