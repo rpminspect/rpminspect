@@ -154,10 +154,10 @@ Here are some examples:
               - /usr/lib64/systemd
 
 A full example is provided in the rpminspect_ source tree under the
-name **data/generic.yaml**. You should also check the main
-configuration in the vendor data package to see what the setting is
-for that product and then adjust accordingly in your local
-configuration file.
+name **data/generic.yaml** (latest upstream one is available
+here_). You should also check the main configuration in the vendor
+data package to see what the setting is for that product and then
+adjust accordingly in your local configuration file.
 
 
 Runtime Data
@@ -234,3 +234,5 @@ Here is a description of the subdirectories found in
 .. _RPM: https://rpm-packaging-guide.github.io/
 
 .. _JSON: https://www.json.org
+
+.. _here: https://github.com/rpminspect/rpminspect/blob/master/data/generic.yaml
