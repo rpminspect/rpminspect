@@ -347,6 +347,7 @@ struct rpminspect {
     string_list_t *rebaseable;
     politics_list_t *politics;
     security_t *security;
+    bool security_initialized;
 
     /* Koji information (from config file) */
     char *kojihub;             /* URL of Koji hub */

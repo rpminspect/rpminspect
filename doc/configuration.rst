@@ -227,6 +227,22 @@ Here is a description of the subdirectories found in
     packages rather than modifying the **rpminspect.yaml** files for
     each of those packages.
 
+- **security/**
+
+    Contains per-product files that specify the actions to take for
+    different security rules on a per package and version basis.  For
+    example, a product may have an older build of a package like
+    openssl and needs to relax some of the security rules in
+    rpminspect.  Later product versions can define stricter rules.
+    This file is also how you instruct rpminspect to ignore things it
+    reports as needed product security inspection.  The idea here is
+    that the package maintainer will consult with their product
+    security team to determine if the reported problem warrants a
+    security rule and if so add it to this file for that product.
+    Subsequent runs of rpminspect on the package in question will
+    follow the rule here and ideally not continue reporting the
+    security failure.
+
 .. _rpminspect: https://github.com/rpminspect/rpminspect
 
 .. _rpminspect-data-fedora: https://github.com/rpminspect/rpminspect-data-fedora

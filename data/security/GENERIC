@@ -1,0 +1,43 @@
+#
+# Security rules for the test suite
+#
+# One package per line.  Blank lines and lines beginning with '#' are
+# ignored.  Malformed lines are ignored, but a warning is displayed.
+# Each rule consists of four fields separated by spaces or tabs (any
+# number):
+#
+#     name           The name of the package
+#     version        The package version, can use glob(7) syntax
+#     release        The package release, can use glob(7) syntax
+#     rules          Comma-delimited list of security rules where each
+#                    element is RULE=ACTION.
+#
+# Available RULES (case-insensitive in the config file):
+#
+#     caps           Check file capabilities(7)
+#     execstack      Check for executable stack in ELF objects or programs
+#                    built without GNU_STACK.
+#     relro          Check for ELF objects losing GNU_RELRO protection.
+#     fortifysource  Check for ELF objects losing -D_FORTIFY_SOURCE.
+#     pic            Check for ELF objects built without -fPIC in static
+#                    libraries.
+#     textrel        Check for an TEXTREL relocations.
+#     setuid         Check for CAP_SETUID and group writable permissions.
+#     worldwritable  Check for world writable permissions.
+#     securitypath   Check for loss of file(s) that belong in a security
+#                    path prefix.
+#     modes          Check for expected file ownership and permissions.
+#
+# Available ACTIONS (case-insensitive in the config file):
+#
+#     SKIP           The finding is ignored.
+#     INFORM         The finding is reported at the INFO level, which does
+#                    not trigger a failing exit code.
+#     VERIFY         The finding is reported at the VERIFY level, which does
+#                    trigger a failing exit code.
+#     FAIL           The finding is reported at the BAD level, which does
+#                    trigger a failing exit code.
+#
+
+slirp       *        *    caps=SKIP,execStack=INFORM,RELRO=verify,FortifySOURCE=FAIL,pic=inform,TEXTrel=Verify,setUID=FaIl,worldwritable=Skip,SECURITYPATH=verify,Modes=Inform
+xanim       *        *    relro=inform,pic=SKIP
