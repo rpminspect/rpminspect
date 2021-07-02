@@ -66,6 +66,16 @@ each merge and pull request:
 
 * Fedora Linux on s390x (current stable release)
 
+
+Documentation
+-------------
+
+The latest documentation is available at https://rpminspect.readthedocs.io/
+
+The documentation is regenerated each time there is a push or pull
+request merged in to the master branch.
+
+
 Build Types Support
 -------------------
 
