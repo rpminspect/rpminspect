@@ -1,7 +1,7 @@
 bash
 bison
 clamav
-clamav-dd
+clamav-db
 dash
 desktop-file-utils
 diffstat
