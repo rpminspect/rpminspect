@@ -321,7 +321,7 @@ static bool validate_desktop_contents(struct rpminspect *ri, const rpmfile_entry
             }
 
             if (!(sb.st_mode & S_IROTH)) {
-                xasprintf(&params.msg, _("Desktop file %s on %s references icon %s but %s is not readable by all"), file->localpath, arch, tmp, tmp);
+                xasprintf(&params.msg, _("Desktop file %s on %s references icon %s but %s is not readable by all"), file->localpath, arch, key_icon, key_icon);
                 params.severity = RESULT_VERIFY;
                 params.waiverauth = WAIVABLE_BY_ANYONE;
                 add_result(ri, &params);
@@ -331,7 +331,7 @@ static bool validate_desktop_contents(struct rpminspect *ri, const rpmfile_entry
         }
 
         if (!found) {
-            xasprintf(&params.msg, _("Desktop file %s on %s references icon %s but no subpackages contain %s"), file->localpath, arch, tmp, tmp);
+            xasprintf(&params.msg, _("Desktop file %s on %s references icon %s but no subpackages contain %s"), file->localpath, arch, key_icon, key_icon);
             params.severity = RESULT_VERIFY;
             params.waiverauth = WAIVABLE_BY_ANYONE;
             add_result(ri, &params);
