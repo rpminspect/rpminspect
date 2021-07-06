@@ -19,6 +19,7 @@
  * SPDX-License-Identifier: LGPL-3.0-or-later
  */
 
+#include "queue.h"
 #include "uthash.h"
 
 #ifndef _LIBRPMINSPECT_SECRULES_H
@@ -126,16 +127,18 @@ typedef struct _secrule_t {
 } secrule_t;
 
 /*
- * Security hash table
- * This table holds the rows as read from the vendor security
+ * Security rules list
+ * This list holds the rows as read from the vendor security
  * definitions files.
  */
-typedef struct _security_t {
+typedef struct _security_entry_t {
     char *pkg;
     char *ver;
     char *rel;
     secrule_t *rules;
-    UT_hash_handle hh;
-} security_t;
+    TAILQ_ENTRY(_security_entry_t) items;
+} security_entry_t;
+
+typedef TAILQ_HEAD(security_entry_s, _security_entry_t) security_list_t;
 
 #endif

@@ -28,6 +28,7 @@
 #include <err.h>
 #include <yaml.h>
 #include "rpminspect.h"
+#include "queue.h"
 #include "uthash.h"
 
 /* List defaults (not in constants.h to avoid cpp shenanigans) */
@@ -1462,7 +1463,8 @@ bool init_rebaseable(struct rpminspect *ri)
  * Initialize the politics list for the given product release.  If the
  * file cannot be found, return false.
  */
-bool init_politics(struct rpminspect *ri) {
+bool init_politics(struct rpminspect *ri)
+{
     char *filename = NULL;
     string_list_t *contents = NULL;
     string_entry_t *entry = NULL;
@@ -1566,7 +1568,6 @@ bool init_politics(struct rpminspect *ri) {
 bool init_security(struct rpminspect *ri)
 {
     int pos = 0;
-    bool new = false;
     char *filename = NULL;
     char *line = NULL;
     char *token = NULL;
@@ -1582,7 +1583,7 @@ bool init_security(struct rpminspect *ri)
     string_entry_t *value = NULL;
     int stype;
     enum secrule_action saction;
-    security_t *sentry = NULL;
+    security_entry_t *sentry = NULL;
     secrule_t *rule_entry = NULL;
 
     assert(ri != NULL);
@@ -1592,6 +1593,10 @@ bool init_security(struct rpminspect *ri)
     /* already initialized */
     if (ri->security_initialized) {
         return true;
+    } else {
+        ri->security = calloc(1, sizeof(*ri->security));
+        assert(ri->security != NULL);
+        TAILQ_INIT(ri->security);
     }
 
     /* the actual security file */
@@ -1627,10 +1632,8 @@ bool init_security(struct rpminspect *ri)
             }
 
             if (pos == 0) {
-                /* look up this package in the table */
                 pkg = strdup(token);
                 assert(pkg != NULL);
-                HASH_FIND_STR(ri->security, pkg, sentry);
             } else if (pos == 1) {
                 ver = strdup(token);
                 assert(ver != NULL);
@@ -1646,11 +1649,9 @@ bool init_security(struct rpminspect *ri)
 
         /* add the entry */
         if (pkg && ver && rel && rules) {
-            if (sentry == NULL) {
-                sentry = calloc(1, sizeof(*sentry));
-                assert(sentry != NULL);
-                new = true;
-            }
+            /* allocate a new entry */
+            sentry = calloc(1, sizeof(*sentry));
+            assert(sentry != NULL);
 
             /* the main NVR values of a rule */
             free(sentry->pkg);
@@ -1743,10 +1744,8 @@ bool init_security(struct rpminspect *ri)
                 list_free(kv, free);
             }
 
-            /* add new entries to the security rules */
-            if (new) {
-                HASH_ADD_KEYPTR(hh, ri->security, sentry->pkg, strlen(sentry->pkg), sentry);
-            }
+            /* add new entry to the security rules list */
+            TAILQ_INSERT_TAIL(ri->security, sentry, items);
         } else {
             warnx(_("*** malformed security line: %s"), line);
         }
@@ -1757,7 +1756,6 @@ bool init_security(struct rpminspect *ri)
         free(rel);
         list_free(rules, free);
         pos = 0;
-        new = false;
     }
 
     list_free(contents, free);
