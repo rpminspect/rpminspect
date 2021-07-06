@@ -133,11 +133,13 @@ typedef TAILQ_HEAD(rpmpeer_s, _rpmpeer_entry_t) rpmpeer_t;
  * And individual inspection result and the list to hold them.
  */
 typedef enum _severity_t {
-    RESULT_OK     = 0,
-    RESULT_INFO   = 1,
-    RESULT_WAIVED = 2,
-    RESULT_VERIFY = 3,
-    RESULT_BAD    = 4
+    RESULT_NULL   = 0,      /* used to indicate internal error */
+    RESULT_OK     = 1,
+    RESULT_INFO   = 2,
+    RESULT_WAIVED = 3,
+    RESULT_VERIFY = 4,
+    RESULT_BAD    = 5,
+    RESULT_SKIP   = 6       /* not reported, used to skip output */
 } severity_t;
 
 typedef enum _waiverauth_t {
@@ -346,7 +348,7 @@ struct rpminspect {
     caps_t *caps;
     string_list_t *rebaseable;
     politics_list_t *politics;
-    security_t *security;
+    security_list_t *security;
     bool security_initialized;
 
     /* Koji information (from config file) */
