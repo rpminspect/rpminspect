@@ -50,11 +50,12 @@ void test_printwrap(void) {
 }
 
 void test_strseverity(void) {
+    RI_ASSERT_EQUAL(strcmp(strseverity(RESULT_NULL), "NULL"), 0);
     RI_ASSERT_EQUAL(strcmp(strseverity(RESULT_OK), "OK"), 0);
     RI_ASSERT_EQUAL(strcmp(strseverity(RESULT_INFO), "INFO"), 0);
-    RI_ASSERT_EQUAL(strcmp(strseverity(RESULT_WAIVED), "WAIVED"), 0);
     RI_ASSERT_EQUAL(strcmp(strseverity(RESULT_VERIFY), "VERIFY"), 0);
     RI_ASSERT_EQUAL(strcmp(strseverity(RESULT_BAD), "BAD"), 0);
+    RI_ASSERT_EQUAL(strcmp(strseverity(RESULT_SKIP), "SKIP"), 0);
     RI_ASSERT_EQUAL(strcmp(strseverity(-1), "UnKnOwN"), 0);
 }
 
