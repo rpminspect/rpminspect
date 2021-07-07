@@ -46,7 +46,8 @@ jobs:
                             "almalinux:8",
                             "rockylinux/rockylinux",
                             "amazonlinux:2",
-                            "mageia:latest"]
+                            "mageia:latest",
+                            "alt:latest"]
 
         container:
             image: ${{ matrix.container }}
@@ -71,7 +72,7 @@ jobs:
                           rpm --import /etc/pki/rpm-gpg/*
                           yum install -y git
                           ;;
-                      debian*|ubuntu*)
+                      debian*|ubuntu*|alt*)
                           apt-get update
                           apt-get install -y git
                           ;;
@@ -99,6 +100,7 @@ jobs:
             # and run the test suite
             - name: Build and run the test suite
               run: |
+                  # Install make(1) so we can use the instreqs target
                   case "${{ matrix.container }}" in
                       alpine*)
                           apk add make
@@ -109,7 +111,7 @@ jobs:
                       centos*|almalinux*|rocky*|amazonlinux*)
                           yum install -y make
                           ;;
-                      debian*|ubuntu*)
+                      debian*|ubuntu*|alt*)
                           apt-get install -y make
                           ;;
                       opensuse*)
@@ -119,12 +121,36 @@ jobs:
                           dnf install -y make
                           ;;
                   esac
+
+                  # Install build dependencies and set up the target
                   make instreqs
-                  meson setup build --werror -Db_buildtype=debug -Db_coverage=true
-                  ninja -C build -v
-                  meson test -C build -v
-                  ninja -C build coverage
-                  curl -s https://codecov.io/bash | bash
+
+                  # Build the software and run the test suite
+                  case "${{ matrix.container }}" in
+                      alt*)
+                          # Set the build up to run as a non-root user for Alt Linux
+                          SRC="$(pwd)"
+                          HME="/home/tester"
+                          DST="${HME}/$(basename "${SRC}")"
+                          cp -pr "${SRC}" "${HME}"
+                          chown -R tester:tester "${DST}"
+
+                          # Run the build and test suite as non-root
+                          cd "${DST}"
+                          sudo -u tester meson setup build --werror -Db_buildtype=debug -Db_coverage=true
+                          sudo -u tester ninja -C build -v
+                          sudo -u tester meson test -C build -v
+                          sudo -u tester ninja -C build coverage
+                          curl -s https://codecov.io/bash | bash
+                          ;;
+                      *)
+                          meson setup build --werror -Db_buildtype=debug -Db_coverage=true
+                          ninja -C build -v
+                          meson test -C build -v
+                          ninja -C build coverage
+                          curl -s https://codecov.io/bash | bash
+                          ;;
+                  esac
 
     # Non-x86_64 architectures for Fedora, Ubuntu, Debian, Arch, and Alpine
     # https://github.com/uraimo/run-on-arch-action
