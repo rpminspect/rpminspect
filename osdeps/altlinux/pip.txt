@@ -1,0 +1,3 @@
+cpp-coveralls
+rpmfluff
+timeout-decorator
