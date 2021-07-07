@@ -136,10 +136,9 @@ typedef enum _severity_t {
     RESULT_NULL   = 0,      /* used to indicate internal error */
     RESULT_OK     = 1,
     RESULT_INFO   = 2,
-    RESULT_WAIVED = 3,
-    RESULT_VERIFY = 4,
-    RESULT_BAD    = 5,
-    RESULT_SKIP   = 6       /* not reported, used to skip output */
+    RESULT_VERIFY = 3,
+    RESULT_BAD    = 4,
+    RESULT_SKIP   = 5       /* not reported, used to skip output */
 } severity_t;
 
 typedef enum _waiverauth_t {
