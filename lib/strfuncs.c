@@ -253,16 +253,18 @@ cleanup:
  */
 char *strseverity(const severity_t severity) {
     switch (severity) {
+        case RESULT_NULL:
+            return _("NULL");
         case RESULT_OK:
             return _("OK");
         case RESULT_INFO:
             return _("INFO");
-        case RESULT_WAIVED:
-            return _("WAIVED");
         case RESULT_VERIFY:
             return _("VERIFY");
         case RESULT_BAD:
             return _("BAD");
+        case RESULT_SKIP:
+            return _("SKIP");
         default:
             return _("UnKnOwN");
     }
@@ -281,16 +283,18 @@ severity_t getseverity(const char *name) {
         return s;
     }
 
-    if (!strcasecmp(name, _("OK"))) {
+    if (!strcasecmp(name, _("NULL"))) {
+        s = RESULT_NULL;
+    } else if (!strcasecmp(name, _("OK"))) {
         s = RESULT_OK;
     } else if (!strcasecmp(name, _("INFO"))) {
         s = RESULT_INFO;
-    } else if (!strcasecmp(name, _("WAIVED"))) {
-        s = RESULT_WAIVED;
     } else if (!strcasecmp(name, _("VERIFY"))) {
         s = RESULT_VERIFY;
     } else if (!strcasecmp(name, _("BAD"))) {
         s = RESULT_BAD;
+    } else if (!strcasecmp(name, _("SKIP"))) {
+        s = RESULT_SKIP;
     }
 
     return s;
