@@ -44,6 +44,11 @@ make install
 cd ..
 rm -rf rc
 
+# This brp script on Alt Linux will prevent the deliberately broken
+# shellsyntax tests from running, so just remove the file and let our
+# test suite do what it wants.
+rm -f /usr/lib/rpm/shell.req
+
 # Create a test user to perform the build and run the test suite
 # Alt Linux has patched rpmbuild to prevent running it as root.
 useradd -c "Test User" -d /home/tester -m -s /bin/zsh tester
