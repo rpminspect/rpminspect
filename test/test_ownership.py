@@ -19,9 +19,20 @@
 
 import os
 import rpmfluff
+import subprocess
+import unittest
+from distutils.version import LooseVersion
 
 from baseclass import TestRPMs, TestKoji
 from baseclass import TestCompareRPMs, TestCompareKoji
+
+# Some tests require rpm >= 4.7.0
+proc = subprocess.Popen(["rpmbuild", "--version"], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+(out, err) = proc.communicate()
+if LooseVersion(out.split()[2].decode('utf-8')) >= LooseVersion("4.7.0"):
+    have_caps_support = True
+else:
+    have_caps_support = False
 
 # Read in the built rpminspect executable for use in these test RPMs
 with open(os.environ["RPMINSPECT"], mode="rb") as f:
@@ -46,6 +57,7 @@ class SlashBinOwnedByRootRPMs(TestRPMs):
             installPath="bin/rpminspect",
             sourceFile=rpmfluff.SourceFile("rpminspect", ri_bytes),
             owner="root",
+            group="root",
         )
 
         self.inspection = "ownership"
@@ -66,6 +78,7 @@ class SlashSbinOwnedByRootRPMs(TestRPMs):
             installPath="sbin/rpminspect",
             sourceFile=rpmfluff.SourceFile("rpminspect", ri_bytes),
             owner="root",
+            group="root",
         )
 
         self.inspection = "ownership"
@@ -86,6 +99,7 @@ class SlashUsrSlashBinOwnedByRootRPMs(TestRPMs):
             installPath="usr/bin/rpminspect",
             sourceFile=rpmfluff.SourceFile("rpminspect", ri_bytes),
             owner="root",
+            group="root",
         )
 
         self.inspection = "ownership"
@@ -106,6 +120,7 @@ class SlashUsrSlashSbinOwnedByRootRPMs(TestRPMs):
             installPath="usr/sbin/rpminspect",
             sourceFile=rpmfluff.SourceFile("rpminspect", ri_bytes),
             owner="root",
+            group="root",
         )
 
         self.inspection = "ownership"
@@ -126,6 +141,7 @@ class SlashBinOwnedByBinRPMs(TestRPMs):
             installPath="bin/rpminspect",
             sourceFile=rpmfluff.SourceFile("rpminspect", ri_bytes),
             owner="bin",
+            group="root",
         )
 
         self.inspection = "ownership"
@@ -147,6 +163,7 @@ class SlashSbinOwnedByBinRPMs(TestRPMs):
             installPath="sbin/rpminspect",
             sourceFile=rpmfluff.SourceFile("rpminspect", ri_bytes),
             owner="bin",
+            group="root",
         )
 
         self.inspection = "ownership"
@@ -168,6 +185,7 @@ class SlashUsrSlashBinOwnedByBinRPMs(TestRPMs):
             installPath="usr/bin/rpminspect",
             sourceFile=rpmfluff.SourceFile("rpminspect", ri_bytes),
             owner="bin",
+            group="root",
         )
 
         self.inspection = "ownership"
@@ -189,6 +207,7 @@ class SlashUsrSlashSbinOwnedByBinRPMs(TestRPMs):
             installPath="usr/sbin/rpminspect",
             sourceFile=rpmfluff.SourceFile("rpminspect", ri_bytes),
             owner="bin",
+            group="root",
         )
 
         self.inspection = "ownership"
@@ -210,6 +229,7 @@ class SlashBinOwnedByRootKoji(TestKoji):
             installPath="bin/rpminspect",
             sourceFile=rpmfluff.SourceFile("rpminspect", ri_bytes),
             owner="root",
+            group="root",
         )
 
         self.inspection = "ownership"
@@ -230,6 +250,7 @@ class SlashSbinOwnedByRootKoji(TestKoji):
             installPath="sbin/rpminspect",
             sourceFile=rpmfluff.SourceFile("rpminspect", ri_bytes),
             owner="root",
+            group="root",
         )
 
         self.inspection = "ownership"
@@ -250,6 +271,7 @@ class SlashUsrSlashBinOwnedByRootKoji(TestKoji):
             installPath="usr/bin/rpminspect",
             sourceFile=rpmfluff.SourceFile("rpminspect", ri_bytes),
             owner="root",
+            group="root",
         )
 
         self.inspection = "ownership"
@@ -270,6 +292,7 @@ class SlashUsrSlashSbinOwnedByRootKoji(TestKoji):
             installPath="usr/sbin/rpminspect",
             sourceFile=rpmfluff.SourceFile("rpminspect", ri_bytes),
             owner="root",
+            group="root",
         )
 
         self.inspection = "ownership"
@@ -290,6 +313,7 @@ class SlashBinOwnedByBinKoji(TestKoji):
             installPath="bin/rpminspect",
             sourceFile=rpmfluff.SourceFile("rpminspect", ri_bytes),
             owner="bin",
+            group="root",
         )
 
         self.inspection = "ownership"
@@ -311,6 +335,7 @@ class SlashSbinOwnedByBinKoji(TestKoji):
             installPath="sbin/rpminspect",
             sourceFile=rpmfluff.SourceFile("rpminspect", ri_bytes),
             owner="bin",
+            group="root",
         )
 
         self.inspection = "ownership"
@@ -332,6 +357,7 @@ class SlashUsrSlashBinOwnedByBinKoji(TestKoji):
             installPath="usr/bin/rpminspect",
             sourceFile=rpmfluff.SourceFile("rpminspect", ri_bytes),
             owner="bin",
+            group="root",
         )
 
         self.inspection = "ownership"
@@ -353,6 +379,7 @@ class SlashUsrSlashSbinOwnedByBinKoji(TestKoji):
             installPath="bin/rpminspect",
             sourceFile=rpmfluff.SourceFile("rpminspect", ri_bytes),
             owner="bin",
+            group="root",
         )
 
         self.inspection = "ownership"
@@ -374,6 +401,7 @@ class SlashBinOwnedByRootCompareRPMs(TestCompareRPMs):
             installPath="bin/rpminspect",
             sourceFile=rpmfluff.SourceFile("rpminspect", ri_bytes),
             owner="root",
+            group="root",
         )
 
         self.inspection = "ownership"
@@ -394,6 +422,7 @@ class SlashSbinOwnedByRootCompareRPMs(TestCompareRPMs):
             installPath="sbin/rpminspect",
             sourceFile=rpmfluff.SourceFile("rpminspect", ri_bytes),
             owner="root",
+            group="root",
         )
 
         self.inspection = "ownership"
@@ -414,6 +443,7 @@ class SlashUsrSlashBinOwnedByRootCompareRPMs(TestCompareRPMs):
             installPath="usr/bin/rpminspect",
             sourceFile=rpmfluff.SourceFile("rpminspect", ri_bytes),
             owner="root",
+            group="root",
         )
 
         self.inspection = "ownership"
@@ -434,6 +464,7 @@ class SlashUsrSlashSbinOwnedByRootCompareRPMs(TestCompareRPMs):
             installPath="usr/sbin/rpminspect",
             sourceFile=rpmfluff.SourceFile("rpminspect", ri_bytes),
             owner="root",
+            group="root",
         )
 
         self.inspection = "ownership"
@@ -454,6 +485,7 @@ class SlashBinOwnedByBinCompareRPMs(TestCompareRPMs):
             installPath="bin/rpminspect",
             sourceFile=rpmfluff.SourceFile("rpminspect", ri_bytes),
             owner="bin",
+            group="root",
         )
 
         self.inspection = "ownership"
@@ -475,6 +507,7 @@ class SlashSbinOwnedByBinCompareRPMs(TestCompareRPMs):
             installPath="sbin/rpminspect",
             sourceFile=rpmfluff.SourceFile("rpminspect", ri_bytes),
             owner="bin",
+            group="root",
         )
 
         self.inspection = "ownership"
@@ -496,6 +529,7 @@ class SlashUsrSlashBinOwnedByBinCompareRPMs(TestCompareRPMs):
             installPath="usr/bin/rpminspect",
             sourceFile=rpmfluff.SourceFile("rpminspect", ri_bytes),
             owner="bin",
+            group="root",
         )
 
         self.inspection = "ownership"
@@ -517,6 +551,7 @@ class SlashUsrSlashSbinOwnedByBinCompareRPMs(TestCompareRPMs):
             installPath="usr/sbin/rpminspect",
             sourceFile=rpmfluff.SourceFile("rpminspect", ri_bytes),
             owner="bin",
+            group="root",
         )
 
         self.inspection = "ownership"
@@ -538,6 +573,7 @@ class SlashBinOwnedByRootCompareKoji(TestCompareKoji):
             installPath="bin/rpminspect",
             sourceFile=rpmfluff.SourceFile("rpminspect", ri_bytes),
             owner="root",
+            group="root",
         )
 
         self.inspection = "ownership"
@@ -558,6 +594,7 @@ class SlashSbinOwnedByRootCompareKoji(TestCompareKoji):
             installPath="sbin/rpminspect",
             sourceFile=rpmfluff.SourceFile("rpminspect", ri_bytes),
             owner="root",
+            group="root",
         )
 
         self.inspection = "ownership"
@@ -578,6 +615,7 @@ class SlashUsrSlashBinOwnedByRootCompareKoji(TestCompareKoji):
             installPath="usr/bin/rpminspect",
             sourceFile=rpmfluff.SourceFile("rpminspect", ri_bytes),
             owner="root",
+            group="root",
         )
 
         self.inspection = "ownership"
@@ -598,6 +636,7 @@ class SlashUsrSlashSbinOwnedByRootCompareKoji(TestCompareKoji):
             installPath="usr/sbin/rpminspect",
             sourceFile=rpmfluff.SourceFile("rpminspect", ri_bytes),
             owner="root",
+            group="root",
         )
 
         self.inspection = "ownership"
@@ -618,6 +657,7 @@ class SlashBinOwnedByBinCompareKoji(TestCompareKoji):
             installPath="bin/rpminspect",
             sourceFile=rpmfluff.SourceFile("rpminspect", ri_bytes),
             owner="bin",
+            group="root",
         )
 
         self.inspection = "ownership"
@@ -639,6 +679,7 @@ class SlashSbinOwnedByBinCompareKoji(TestCompareKoji):
             installPath="sbin/rpminspect",
             sourceFile=rpmfluff.SourceFile("rpminspect", ri_bytes),
             owner="bin",
+            group="root",
         )
 
         self.inspection = "ownership"
@@ -660,6 +701,7 @@ class SlashUsrSlashBinOwnedByBinCompareKoji(TestCompareKoji):
             installPath="usr/bin/rpminspect",
             sourceFile=rpmfluff.SourceFile("rpminspect", ri_bytes),
             owner="bin",
+            group="root",
         )
 
         self.inspection = "ownership"
@@ -681,6 +723,7 @@ class SlashUsrSlashSbinOwnedByBinCompareKoji(TestCompareKoji):
             installPath="usr/sbin/rpminspect",
             sourceFile=rpmfluff.SourceFile("rpminspect", ri_bytes),
             owner="bin",
+            group="root",
         )
 
         self.inspection = "ownership"
@@ -706,6 +749,7 @@ class SlashBinOwnedByGroupRootRPMs(TestRPMs):
         self.rpm.add_installed_file(
             installPath="bin/rpminspect",
             sourceFile=rpmfluff.SourceFile("rpminspect", ri_bytes),
+            owner="root",
             group="root",
         )
 
@@ -726,6 +770,7 @@ class SlashSbinOwnedByGroupRootRPMs(TestRPMs):
         self.rpm.add_installed_file(
             installPath="sbin/rpminspect",
             sourceFile=rpmfluff.SourceFile("rpminspect", ri_bytes),
+            owner="root",
             group="root",
         )
 
@@ -746,6 +791,7 @@ class SlashUsrSlashBinOwnedByGroupRootRPMs(TestRPMs):
         self.rpm.add_installed_file(
             installPath="usr/bin/rpminspect",
             sourceFile=rpmfluff.SourceFile("rpminspect", ri_bytes),
+            owner="root",
             group="root",
         )
 
@@ -766,6 +812,7 @@ class SlashUsrSlashSbinOwnedByGroupRootRPMs(TestRPMs):
         self.rpm.add_installed_file(
             installPath="usr/sbin/rpminspect",
             sourceFile=rpmfluff.SourceFile("rpminspect", ri_bytes),
+            owner="root",
             group="root",
         )
 
@@ -786,6 +833,7 @@ class SlashBinOwnedByGroupBinRPMs(TestRPMs):
         self.rpm.add_installed_file(
             installPath="bin/rpminspect",
             sourceFile=rpmfluff.SourceFile("rpminspect", ri_bytes),
+            owner="root",
             group="bin",
         )
 
@@ -807,6 +855,7 @@ class SlashSbinOwnedByGroupBinRPMs(TestRPMs):
         self.rpm.add_installed_file(
             installPath="sbin/rpminspect",
             sourceFile=rpmfluff.SourceFile("rpminspect", ri_bytes),
+            owner="root",
             group="bin",
         )
 
@@ -828,6 +877,7 @@ class SlashiUsrSlashBinOwnedByGroupBinRPMs(TestRPMs):
         self.rpm.add_installed_file(
             installPath="usr/bin/rpminspect",
             sourceFile=rpmfluff.SourceFile("rpminspect", ri_bytes),
+            owner="root",
             group="bin",
         )
 
@@ -849,6 +899,7 @@ class SlashUsrSlashSbinOwnedByGroupBinRPMs(TestRPMs):
         self.rpm.add_installed_file(
             installPath="usr/sbin/rpminspect",
             sourceFile=rpmfluff.SourceFile("rpminspect", ri_bytes),
+            owner="root",
             group="bin",
         )
 
@@ -870,6 +921,7 @@ class SlashBinOwnedByGroupRootKoji(TestKoji):
         self.rpm.add_installed_file(
             installPath="bin/rpminspect",
             sourceFile=rpmfluff.SourceFile("rpminspect", ri_bytes),
+            owner="root",
             group="root",
         )
 
@@ -890,6 +942,7 @@ class SlashSbinOwnedByGroupRootKoji(TestKoji):
         self.rpm.add_installed_file(
             installPath="sbin/rpminspect",
             sourceFile=rpmfluff.SourceFile("rpminspect", ri_bytes),
+            owner="root",
             group="root",
         )
 
@@ -910,6 +963,7 @@ class SlashUsrSlashBinOwnedByGroupRootKoji(TestKoji):
         self.rpm.add_installed_file(
             installPath="usr/bin/rpminspect",
             sourceFile=rpmfluff.SourceFile("rpminspect", ri_bytes),
+            owner="root",
             group="root",
         )
 
@@ -930,6 +984,7 @@ class SlashUsrSlashSbinOwnedByGroupRootKoji(TestKoji):
         self.rpm.add_installed_file(
             installPath="usr/sbin/rpminspect",
             sourceFile=rpmfluff.SourceFile("rpminspect", ri_bytes),
+            owner="root",
             group="root",
         )
 
@@ -950,6 +1005,7 @@ class SlashBinOwnedByGroupBinKoji(TestKoji):
         self.rpm.add_installed_file(
             installPath="bin/rpminspect",
             sourceFile=rpmfluff.SourceFile("rpminspect", ri_bytes),
+            owner="root",
             group="bin",
         )
 
@@ -971,6 +1027,7 @@ class SlashSbinOwnedByGroupBinKoji(TestKoji):
         self.rpm.add_installed_file(
             installPath="sbin/rpminspect",
             sourceFile=rpmfluff.SourceFile("rpminspect", ri_bytes),
+            owner="root",
             group="bin",
         )
 
@@ -992,6 +1049,7 @@ class SlashUsrSlashBinOwnedByGroupBinKoji(TestKoji):
         self.rpm.add_installed_file(
             installPath="usr/bin/rpminspect",
             sourceFile=rpmfluff.SourceFile("rpminspect", ri_bytes),
+            owner="root",
             group="bin",
         )
 
@@ -1013,6 +1071,7 @@ class SlashUsrSlashSbinOwnedByGroupBinKoji(TestKoji):
         self.rpm.add_installed_file(
             installPath="usr/sbin/rpminspect",
             sourceFile=rpmfluff.SourceFile("rpminspect", ri_bytes),
+            owner="root",
             group="bin",
         )
 
@@ -1034,6 +1093,7 @@ class SlashBinOwnedByGroupRootCompareRPMs(TestCompareRPMs):
         self.after_rpm.add_installed_file(
             installPath="bin/rpminspect",
             sourceFile=rpmfluff.SourceFile("rpminspect", ri_bytes),
+            owner="root",
             group="root",
         )
 
@@ -1054,6 +1114,7 @@ class SlashSbinOwnedByGroupRootCompareRPMs(TestCompareRPMs):
         self.after_rpm.add_installed_file(
             installPath="sbin/rpminspect",
             sourceFile=rpmfluff.SourceFile("rpminspect", ri_bytes),
+            owner="root",
             group="root",
         )
 
@@ -1074,6 +1135,7 @@ class SlashUsrSlashBinOwnedByGroupRootCompareRPMs(TestCompareRPMs):
         self.after_rpm.add_installed_file(
             installPath="usr/bin/rpminspect",
             sourceFile=rpmfluff.SourceFile("rpminspect", ri_bytes),
+            owner="root",
             group="root",
         )
 
@@ -1094,6 +1156,7 @@ class SlashUsrSlashSbinOwnedByGroupRootCompareRPMs(TestCompareRPMs):
         self.after_rpm.add_installed_file(
             installPath="usr/sbin/rpminspect",
             sourceFile=rpmfluff.SourceFile("rpminspect", ri_bytes),
+            owner="root",
             group="root",
         )
 
@@ -1114,6 +1177,7 @@ class SlashBinOwnedByGroupBinCompareRPMs(TestCompareRPMs):
         self.after_rpm.add_installed_file(
             installPath="bin/rpminspect",
             sourceFile=rpmfluff.SourceFile("rpminspect", ri_bytes),
+            owner="root",
             group="bin",
         )
 
@@ -1135,6 +1199,7 @@ class SlashSbinOwnedByGroupBinCompareRPMs(TestCompareRPMs):
         self.after_rpm.add_installed_file(
             installPath="sbin/rpminspect",
             sourceFile=rpmfluff.SourceFile("rpminspect", ri_bytes),
+            owner="root",
             group="bin",
         )
 
@@ -1156,6 +1221,7 @@ class SlashUsrSlashBinOwnedByGroupBinCompareRPMs(TestCompareRPMs):
         self.after_rpm.add_installed_file(
             installPath="usr/bin/rpminspect",
             sourceFile=rpmfluff.SourceFile("rpminspect", ri_bytes),
+            owner="root",
             group="bin",
         )
 
@@ -1177,6 +1243,7 @@ class SlashUsrSlashSbinOwnedByGroupBinCompareRPMs(TestCompareRPMs):
         self.after_rpm.add_installed_file(
             installPath="usr/sbin/rpminspect",
             sourceFile=rpmfluff.SourceFile("rpminspect", ri_bytes),
+            owner="root",
             group="bin",
         )
 
@@ -1198,6 +1265,7 @@ class SlashBinOwnedByGroupRootCompareKoji(TestCompareKoji):
         self.after_rpm.add_installed_file(
             installPath="bin/rpminspect",
             sourceFile=rpmfluff.SourceFile("rpminspect", ri_bytes),
+            owner="root",
             group="root",
         )
 
@@ -1218,6 +1286,7 @@ class SlashSbinOwnedByGroupRootCompareKoji(TestCompareKoji):
         self.after_rpm.add_installed_file(
             installPath="sbin/rpminspect",
             sourceFile=rpmfluff.SourceFile("rpminspect", ri_bytes),
+            owner="root",
             group="root",
         )
 
@@ -1238,6 +1307,7 @@ class SlashUsrSlashBinOwnedByGroupRootCompareKoji(TestCompareKoji):
         self.after_rpm.add_installed_file(
             installPath="usr/bin/rpminspect",
             sourceFile=rpmfluff.SourceFile("rpminspect", ri_bytes),
+            owner="root",
             group="root",
         )
 
@@ -1258,6 +1328,7 @@ class SlashUsrSlashSbinOwnedByGroupRootCompareKoji(TestCompareKoji):
         self.after_rpm.add_installed_file(
             installPath="usr/sbin/rpminspect",
             sourceFile=rpmfluff.SourceFile("rpminspect", ri_bytes),
+            owner="root",
             group="root",
         )
 
@@ -1278,6 +1349,7 @@ class SlashBinOwnedByGroupBinCompareKoji(TestCompareKoji):
         self.after_rpm.add_installed_file(
             installPath="bin/rpminspect",
             sourceFile=rpmfluff.SourceFile("rpminspect", ri_bytes),
+            owner="root",
             group="bin",
         )
 
@@ -1299,6 +1371,7 @@ class SlashSbinOwnedByGroupBinCompareKoji(TestCompareKoji):
         self.after_rpm.add_installed_file(
             installPath="sbin/rpminspect",
             sourceFile=rpmfluff.SourceFile("rpminspect", ri_bytes),
+            owner="root",
             group="bin",
         )
 
@@ -1320,6 +1393,7 @@ class SlashUsrSlashBinOwnedByGroupBinCompareKoji(TestCompareKoji):
         self.after_rpm.add_installed_file(
             installPath="usr/bin/rpminspect",
             sourceFile=rpmfluff.SourceFile("rpminspect", ri_bytes),
+            owner="root",
             group="bin",
         )
 
@@ -1341,6 +1415,7 @@ class SlashUsrSlashSbinOwnedByGroupBinCompareKoji(TestCompareKoji):
         self.after_rpm.add_installed_file(
             installPath="usr/sbin/rpminspect",
             sourceFile=rpmfluff.SourceFile("rpminspect", ri_bytes),
+            owner="root",
             group="bin",
         )
 
@@ -1367,6 +1442,7 @@ class SlashBinOwnedByMockRPMs(TestRPMs):
             installPath="bin/rpminspect",
             sourceFile=rpmfluff.SourceFile("rpminspect", ri_bytes),
             owner="mockbuild",
+            group="root",
         )
 
         self.inspection = "ownership"
@@ -1387,6 +1463,7 @@ class SlashBinOwnedByMockKoji(TestKoji):
             installPath="bin/rpminspect",
             sourceFile=rpmfluff.SourceFile("rpminspect", ri_bytes),
             owner="mockbuild",
+            group="root",
         )
 
         self.inspection = "ownership"
@@ -1408,6 +1485,7 @@ class SlashBinOwnedByMockCompareRPMs(TestCompareRPMs):
             installPath="bin/rpminspect",
             sourceFile=rpmfluff.SourceFile("rpminspect", ri_bytes),
             owner="mockbuild",
+            group="root",
         )
 
         self.inspection = "ownership"
@@ -1429,6 +1507,7 @@ class SlashBinOwnedByMockCompareKoji(TestCompareKoji):
             installPath="bin/rpminspect",
             sourceFile=rpmfluff.SourceFile("rpminspect", ri_bytes),
             owner="mockbuild",
+            group="root",
         )
 
         self.inspection = "ownership"
@@ -1454,6 +1533,7 @@ class SlashBinOwnedByGroupMockRPMs(TestRPMs):
         self.rpm.add_installed_file(
             installPath="bin/rpminspect",
             sourceFile=rpmfluff.SourceFile("rpminspect", ri_bytes),
+            owner="root",
             group="mockbuild",
         )
 
@@ -1475,6 +1555,7 @@ class SlashBinOwnedByGroupMockKoji(TestKoji):
         self.rpm.add_installed_file(
             installPath="bin/rpminspect",
             sourceFile=rpmfluff.SourceFile("rpminspect", ri_bytes),
+            owner="root",
             group="mockbuild",
         )
 
@@ -1496,6 +1577,7 @@ class SlashBinOwnedByGroupMockCompareRPMs(TestCompareRPMs):
         self.after_rpm.add_installed_file(
             installPath="bin/rpminspect",
             sourceFile=rpmfluff.SourceFile("rpminspect", ri_bytes),
+            owner="root",
             group="mockbuild",
         )
 
@@ -1517,6 +1599,7 @@ class SlashBinOwnedByGroupMockCompareKoji(TestCompareKoji):
         self.after_rpm.add_installed_file(
             installPath="bin/rpminspect",
             sourceFile=rpmfluff.SourceFile("rpminspect", ri_bytes),
+            owner="root",
             group="mockbuild",
         )
 
@@ -1535,6 +1618,7 @@ class CapSETUIDWithOtherExecRPMs(TestRPMs):
     For RPM binary files, check that a file with CAP_SETUID set and
     world execution permissions fails.
     """
+    @unittest.skipUnless(have_caps_support, "rpm lacks %caps macro support (need rpm >= 4.7.0)")
 
     def setUp(self):
         TestRPMs.setUp(self)
@@ -1564,6 +1648,7 @@ class CapSETUIDWithOtherExecKoji(TestKoji):
     For RPMs from Koji builds, check that a file with CAP_SETUID set and
     world execution permissions fails.
     """
+    @unittest.skipUnless(have_caps_support, "rpm lacks %caps macro support (need rpm >= 4.7.0)")
 
     def setUp(self):
         TestKoji.setUp(self)
@@ -1593,6 +1678,7 @@ class CapSETUIDWithOtherExecCompareRPMs(TestCompareRPMs):
     When comparing RPMs, check that a file in the new build with CAP_SETUID set
     and world execution permissions fails.
     """
+    @unittest.skipUnless(have_caps_support, "rpm lacks %caps macro support (need rpm >= 4.7.0)")
 
     def setUp(self):
         TestCompareRPMs.setUp(self)
@@ -1624,6 +1710,7 @@ class CapSETUIDWithOtherExecCompareKoji(TestCompareKoji):
     When comparing RPMs from Koji builds, check that a file in the new build
     with CAP_SETUID set and world execution permissions fails.
     """
+    @unittest.skipUnless(have_caps_support, "rpm lacks %caps macro support (need rpm >= 4.7.0)")
 
     def setUp(self):
         TestCompareKoji.setUp(self)
@@ -1660,6 +1747,7 @@ class CapSETUIDWithGroupExecRPMs(TestRPMs):
     For RPM binary files, check that a file with CAP_SETUID set
     and group execution permissions fails.
     """
+    @unittest.skipUnless(have_caps_support, "rpm lacks %caps macro support (need rpm >= 4.7.0)")
 
     def setUp(self):
         TestRPMs.setUp(self)
@@ -1689,6 +1777,7 @@ class CapSETUIDWithGroupExecKoji(TestKoji):
     For RPMs in Koji builds, check that a file with CAP_SETUID set
     and group execution permissions fails.
     """
+    @unittest.skipUnless(have_caps_support, "rpm lacks %caps macro support (need rpm >= 4.7.0)")
 
     def setUp(self):
         TestKoji.setUp(self)
@@ -1718,6 +1807,7 @@ class CapSETUIDWithGroupExecCompareRPMs(TestCompareRPMs):
     When comparing RPMs, check that a file in the new build with CAP_SETUID set
     and world execution permissions fails.
     """
+    @unittest.skipUnless(have_caps_support, "rpm lacks %caps macro support (need rpm >= 4.7.0)")
 
     def setUp(self):
         TestCompareRPMs.setUp(self)
@@ -1749,6 +1839,7 @@ class CapSETUIDWithGroupExecCompareKoji(TestCompareKoji):
     When comparing RPMs from Koji builds, check that a file in the new build
     with CAP_SETUID set and world execution permissions fails.
     """
+    @unittest.skipUnless(have_caps_support, "rpm lacks %caps macro support (need rpm >= 4.7.0)")
 
     def setUp(self):
         TestCompareKoji.setUp(self)
@@ -1794,6 +1885,7 @@ class FileOwnerChangedCompareRPMs(TestCompareRPMs):
             sourceFile=rpmfluff.SourceFile("rpminspect", ri_bytes),
             mode="0755",
             owner="root",
+            group="root",
         )
 
         # Switch to bin owner
@@ -1802,6 +1894,7 @@ class FileOwnerChangedCompareRPMs(TestCompareRPMs):
             sourceFile=rpmfluff.SourceFile("rpminspect", ri_bytes),
             mode="0755",
             owner="bin",
+            group="root",
         )
 
         self.inspection = "ownership"
@@ -1824,6 +1917,7 @@ class FileOwnerChangedCompareKoji(TestCompareKoji):
             sourceFile=rpmfluff.SourceFile("rpminspect", ri_bytes),
             mode="0755",
             owner="root",
+            group="root",
         )
 
         # Switch to bin owner
@@ -1832,6 +1926,7 @@ class FileOwnerChangedCompareKoji(TestCompareKoji):
             sourceFile=rpmfluff.SourceFile("rpminspect", ri_bytes),
             mode="0755",
             owner="bin",
+            group="root",
         )
 
         self.inspection = "ownership"
@@ -1857,6 +1952,7 @@ class FileGroupChangedCompareRPMs(TestCompareRPMs):
             installPath="bin/rpminspect",
             sourceFile=rpmfluff.SourceFile("rpminspect", ri_bytes),
             mode="0755",
+            owner="root",
             group="root",
         )
 
@@ -1865,6 +1961,7 @@ class FileGroupChangedCompareRPMs(TestCompareRPMs):
             installPath="bin/rpminspect",
             sourceFile=rpmfluff.SourceFile("rpminspect", ri_bytes),
             mode="0755",
+            owner="root",
             group="bin",
         )
 
@@ -1887,6 +1984,7 @@ class FileGroupChangedCompareKoji(TestCompareKoji):
             installPath="bin/rpminspect",
             sourceFile=rpmfluff.SourceFile("rpminspect", self.rpminspect),
             mode="0755",
+            owner="root",
             group="root",
         )
 
@@ -1895,6 +1993,7 @@ class FileGroupChangedCompareKoji(TestCompareKoji):
             installPath="bin/rpminspect",
             sourceFile=rpmfluff.SourceFile("rpminspect", self.rpminspect),
             mode="0755",
+            owner="root",
             group="bin",
         )
 
