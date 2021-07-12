@@ -9,7 +9,6 @@ diffstat
 diffutils
 elfutils-devel
 gcc
-gcovr
 gettext-devel
 git
 glibc-devel
