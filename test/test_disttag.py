@@ -21,8 +21,19 @@ import os
 import shutil
 import subprocess
 import tempfile
+from distutils.version import LooseVersion
 from baseclass import TestSRPM, TestRPMs, TestKoji
 from baseclass import RequiresRpminspect, check_results
+
+# Older versions of rpm require a Group tag
+proc = subprocess.Popen(
+    ["rpmbuild", "--version"], stdout=subprocess.PIPE, stderr=subprocess.PIPE
+)
+(out, err) = proc.communicate()
+if LooseVersion(out.split()[2].decode("utf-8")) <= LooseVersion("4.0.4"):
+    have_old_rpm = True
+else:
+    have_old_rpm = False
 
 specdir = os.path.realpath(
     os.path.join(os.environ["RPMINSPECT_TEST_DATA_PATH"], "SPECS")
@@ -30,6 +41,10 @@ specdir = os.path.realpath(
 
 good_spec_file = open(os.path.join(specdir, "good.spec"), "r").read()
 good_tabbed_spec_file = open(os.path.join(specdir, "good-tabbed.spec"), "r").read()
+good_group_spec_file = open(os.path.join(specdir, "good-group.spec"), "r").read()
+good_tabbed_group_spec_file = open(
+    os.path.join(specdir, "good-tabbed-group.spec"), "r"
+).read()
 bad_spec_file = open(os.path.join(specdir, "bad.spec"), "r").read()
 
 
@@ -119,15 +134,18 @@ class DistTagInMacroSRPM(RequiresRpminspect):
         shutil.copyfile(self.rpminspect, os.path.join(self.tmpdir.name, "rpminspect"))
         self.specfile = os.path.join(self.tmpdir.name, "rpminspect.spec")
         sf = open(self.specfile, "w")
-        sf.write(good_spec_file)
+
+        if have_old_rpm:
+            sf.write(good_group_spec_file)
+        else:
+            sf.write(good_spec_file)
+
         sf.close()
 
         # create the test SRPM (undefine dist to make a predictable
         # SRPM filename)
         args = [
             "rpmbuild",
-            "--undefine",
-            "dist",
             "--define",
             "_topdir %s" % self.tmpdir.name,
             "--define",
@@ -145,6 +163,11 @@ class DistTagInMacroSRPM(RequiresRpminspect):
             "-bs",
             os.path.join(self.tmpdir.name, "rpminspect.spec"),
         ]
+
+        if not have_old_rpm:
+            args.insert(1, "dist")
+            args.insert(1, "--undefine")
+
         p = subprocess.Popen(args, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         (out, err) = p.communicate()
         self.srpm = os.path.join(self.tmpdir.name, "example-0.1-4.7.src.rpm")
@@ -210,15 +233,18 @@ class TabbedDistTagInMacroSRPM(RequiresRpminspect):
         shutil.copyfile(self.rpminspect, os.path.join(self.tmpdir.name, "rpminspect"))
         self.specfile = os.path.join(self.tmpdir.name, "rpminspect.spec")
         sf = open(self.specfile, "w")
-        sf.write(good_tabbed_spec_file)
+
+        if have_old_rpm:
+            sf.write(good_tabbed_group_spec_file)
+        else:
+            sf.write(good_tabbed_spec_file)
+
         sf.close()
 
         # create the test SRPM (undefine dist to make a predictable
         # SRPM filename)
         args = [
             "rpmbuild",
-            "--undefine",
-            "dist",
             "--define",
             "_topdir %s" % self.tmpdir.name,
             "--define",
@@ -236,6 +262,11 @@ class TabbedDistTagInMacroSRPM(RequiresRpminspect):
             "-bs",
             os.path.join(self.tmpdir.name, "rpminspect.spec"),
         ]
+
+        if not have_old_rpm:
+            args.insert(1, "dist")
+            args.insert(1, "--undefine")
+
         p = subprocess.Popen(args, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         (out, err) = p.communicate()
         self.srpm = os.path.join(self.tmpdir.name, "example-0.1-4.7.src.rpm")

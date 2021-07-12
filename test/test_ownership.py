@@ -27,9 +27,11 @@ from baseclass import TestRPMs, TestKoji
 from baseclass import TestCompareRPMs, TestCompareKoji
 
 # Some tests require rpm >= 4.7.0
-proc = subprocess.Popen(["rpmbuild", "--version"], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+proc = subprocess.Popen(
+    ["rpmbuild", "--version"], stdout=subprocess.PIPE, stderr=subprocess.PIPE
+)
 (out, err) = proc.communicate()
-if LooseVersion(out.split()[2].decode('utf-8')) >= LooseVersion("4.7.0"):
+if LooseVersion(out.split()[2].decode("utf-8")) >= LooseVersion("4.7.0"):
     have_caps_support = True
 else:
     have_caps_support = False
@@ -1618,8 +1620,10 @@ class CapSETUIDWithOtherExecRPMs(TestRPMs):
     For RPM binary files, check that a file with CAP_SETUID set and
     world execution permissions fails.
     """
-    @unittest.skipUnless(have_caps_support, "rpm lacks %caps macro support (need rpm >= 4.7.0)")
 
+    @unittest.skipUnless(
+        have_caps_support, "rpm lacks %caps macro support (need rpm >= 4.7.0)"
+    )
     def setUp(self):
         TestRPMs.setUp(self)
 
@@ -1648,8 +1652,10 @@ class CapSETUIDWithOtherExecKoji(TestKoji):
     For RPMs from Koji builds, check that a file with CAP_SETUID set and
     world execution permissions fails.
     """
-    @unittest.skipUnless(have_caps_support, "rpm lacks %caps macro support (need rpm >= 4.7.0)")
 
+    @unittest.skipUnless(
+        have_caps_support, "rpm lacks %caps macro support (need rpm >= 4.7.0)"
+    )
     def setUp(self):
         TestKoji.setUp(self)
 
@@ -1678,8 +1684,10 @@ class CapSETUIDWithOtherExecCompareRPMs(TestCompareRPMs):
     When comparing RPMs, check that a file in the new build with CAP_SETUID set
     and world execution permissions fails.
     """
-    @unittest.skipUnless(have_caps_support, "rpm lacks %caps macro support (need rpm >= 4.7.0)")
 
+    @unittest.skipUnless(
+        have_caps_support, "rpm lacks %caps macro support (need rpm >= 4.7.0)"
+    )
     def setUp(self):
         TestCompareRPMs.setUp(self)
 
@@ -1710,8 +1718,10 @@ class CapSETUIDWithOtherExecCompareKoji(TestCompareKoji):
     When comparing RPMs from Koji builds, check that a file in the new build
     with CAP_SETUID set and world execution permissions fails.
     """
-    @unittest.skipUnless(have_caps_support, "rpm lacks %caps macro support (need rpm >= 4.7.0)")
 
+    @unittest.skipUnless(
+        have_caps_support, "rpm lacks %caps macro support (need rpm >= 4.7.0)"
+    )
     def setUp(self):
         TestCompareKoji.setUp(self)
 
@@ -1747,8 +1757,10 @@ class CapSETUIDWithGroupExecRPMs(TestRPMs):
     For RPM binary files, check that a file with CAP_SETUID set
     and group execution permissions fails.
     """
-    @unittest.skipUnless(have_caps_support, "rpm lacks %caps macro support (need rpm >= 4.7.0)")
 
+    @unittest.skipUnless(
+        have_caps_support, "rpm lacks %caps macro support (need rpm >= 4.7.0)"
+    )
     def setUp(self):
         TestRPMs.setUp(self)
 
@@ -1777,8 +1789,10 @@ class CapSETUIDWithGroupExecKoji(TestKoji):
     For RPMs in Koji builds, check that a file with CAP_SETUID set
     and group execution permissions fails.
     """
-    @unittest.skipUnless(have_caps_support, "rpm lacks %caps macro support (need rpm >= 4.7.0)")
 
+    @unittest.skipUnless(
+        have_caps_support, "rpm lacks %caps macro support (need rpm >= 4.7.0)"
+    )
     def setUp(self):
         TestKoji.setUp(self)
 
@@ -1807,8 +1821,10 @@ class CapSETUIDWithGroupExecCompareRPMs(TestCompareRPMs):
     When comparing RPMs, check that a file in the new build with CAP_SETUID set
     and world execution permissions fails.
     """
-    @unittest.skipUnless(have_caps_support, "rpm lacks %caps macro support (need rpm >= 4.7.0)")
 
+    @unittest.skipUnless(
+        have_caps_support, "rpm lacks %caps macro support (need rpm >= 4.7.0)"
+    )
     def setUp(self):
         TestCompareRPMs.setUp(self)
 
@@ -1839,8 +1855,10 @@ class CapSETUIDWithGroupExecCompareKoji(TestCompareKoji):
     When comparing RPMs from Koji builds, check that a file in the new build
     with CAP_SETUID set and world execution permissions fails.
     """
-    @unittest.skipUnless(have_caps_support, "rpm lacks %caps macro support (need rpm >= 4.7.0)")
 
+    @unittest.skipUnless(
+        have_caps_support, "rpm lacks %caps macro support (need rpm >= 4.7.0)"
+    )
     def setUp(self):
         TestCompareKoji.setUp(self)
 

@@ -16,13 +16,29 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 #
 
+import subprocess
+import unittest
+from distutils.version import LooseVersion
 from baseclass import TestRPMs, TestKoji
 from baseclass import TestCompareRPMs, TestCompareKoji
+
+# Some tests require rpm >= 4.7.0
+proc = subprocess.Popen(
+    ["rpmbuild", "--version"], stdout=subprocess.PIPE, stderr=subprocess.PIPE
+)
+(out, err) = proc.communicate()
+if LooseVersion(out.split()[2].decode("utf-8")) >= LooseVersion("4.7.0"):
+    have_caps_support = True
+else:
+    have_caps_support = False
 
 
 # package contains a file with capabilities(7) but it is not on the
 # list (BAD)
 class UnapprovedCapabilitiesRPMs(TestRPMs):
+    @unittest.skipUnless(
+        have_caps_support, "rpm lacks %caps macro support (need rpm >= 4.7.0)"
+    )
     def setUp(self):
         super().setUp()
 
@@ -38,6 +54,9 @@ class UnapprovedCapabilitiesRPMs(TestRPMs):
 
 
 class UnapprovedCapabilitiesKoji(TestKoji):
+    @unittest.skipUnless(
+        have_caps_support, "rpm lacks %caps macro support (need rpm >= 4.7.0)"
+    )
     def setUp(self):
         super().setUp()
 
@@ -53,6 +72,9 @@ class UnapprovedCapabilitiesKoji(TestKoji):
 
 
 class UnapprovedCapabilitiesCompareRPMs(TestCompareRPMs):
+    @unittest.skipUnless(
+        have_caps_support, "rpm lacks %caps macro support (need rpm >= 4.7.0)"
+    )
     def setUp(self):
         super().setUp()
 
@@ -68,6 +90,9 @@ class UnapprovedCapabilitiesCompareRPMs(TestCompareRPMs):
 
 
 class UnapprovedCapabilitiesCompareKoji(TestCompareKoji):
+    @unittest.skipUnless(
+        have_caps_support, "rpm lacks %caps macro support (need rpm >= 4.7.0)"
+    )
     def setUp(self):
         super().setUp()
 
@@ -84,6 +109,9 @@ class UnapprovedCapabilitiesCompareKoji(TestCompareKoji):
 
 # package contains a file with approved capabilities(7) (OK)
 class ApprovedCapabilitiesRPMs(TestRPMs):
+    @unittest.skipUnless(
+        have_caps_support, "rpm lacks %caps macro support (need rpm >= 4.7.0)"
+    )
     def setUp(self):
         super().setUp()
 
@@ -99,6 +127,9 @@ class ApprovedCapabilitiesRPMs(TestRPMs):
 
 
 class ApprovedCapabilitiesKoji(TestKoji):
+    @unittest.skipUnless(
+        have_caps_support, "rpm lacks %caps macro support (need rpm >= 4.7.0)"
+    )
     def setUp(self):
         super().setUp()
 
@@ -114,6 +145,9 @@ class ApprovedCapabilitiesKoji(TestKoji):
 
 
 class ApprovedCapabilitiesCompareRPMs(TestCompareRPMs):
+    @unittest.skipUnless(
+        have_caps_support, "rpm lacks %caps macro support (need rpm >= 4.7.0)"
+    )
     def setUp(self):
         super().setUp()
 
@@ -129,6 +163,9 @@ class ApprovedCapabilitiesCompareRPMs(TestCompareRPMs):
 
 
 class ApprovedCapabilitiesCompareKoji(TestCompareKoji):
+    @unittest.skipUnless(
+        have_caps_support, "rpm lacks %caps macro support (need rpm >= 4.7.0)"
+    )
     def setUp(self):
         super().setUp()
 
