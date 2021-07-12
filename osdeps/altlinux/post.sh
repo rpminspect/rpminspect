@@ -49,6 +49,10 @@ rm -rf rc
 # test suite do what it wants.
 rm -f /usr/lib/rpm/shell.req
 
+# Alt Linux is configured to set the RPMTAG_VENDOR to always be "ALT
+# Linux Team", so remove that macro.
+find /usr/lib/rpm -type f -name macros | xargs sed -i -e '/^%vendor/d'
+
 # Create a test user to perform the build and run the test suite
 # Alt Linux has patched rpmbuild to prevent running it as root.
 useradd -c "Test User" -d /home/tester -m -s /bin/zsh tester
