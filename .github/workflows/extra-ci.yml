@@ -47,7 +47,8 @@ jobs:
                             "rockylinux/rockylinux",
                             "amazonlinux:2",
                             "mageia:latest",
-                            "alt:latest"]
+                            "alt:latest",
+                            "oraclelinux:8"]
 
         container:
             image: ${{ matrix.container }}
@@ -71,6 +72,22 @@ jobs:
                           yum install -y epel-release
                           rpm --import /etc/pki/rpm-gpg/*
                           yum install -y git
+                          ;;
+                      oraclelinux*)
+                          # Oracle's EPEL copy
+                          mkdir -p /etc/yum.repos.d
+                          echo '[ol8_developer_EPEL]' > /etc/yum.repos.d/ol8-epel.repo
+                          echo 'name= Oracle Linux $releasever EPEL ($basearch)' >> /etc/yum.repos.d/ol8-epel.repo
+                          echo 'baseurl=https://yum.oracle.com/repo/OracleLinux/OL8/developer/EPEL/$basearch/' >> /etc/yum.repos.d/ol8-epel.repo
+                          echo 'gpgkey=file:///etc/pki/rpm-gpg/RPM-GPG-KEY-oracle' >> /etc/yum.repos.d/ol8-epel.repo
+                          echo 'gpgcheck=1' >> /etc/yum.repos.d/ol8-epel.repo
+                          echo 'enabled=1' >> /etc/yum.repos.d/ol8-epel.repo
+
+                          # Turn on all the other repos
+                          sed -i -e 's|enabled=0|enabled=1|g' /etc/yum.repos.d/oracle-linux-ol8.repo
+
+                          dnf makecache
+                          dnf install -y git
                           ;;
                       debian*|ubuntu*|alt*)
                           apt-get update
@@ -117,7 +134,7 @@ jobs:
                       opensuse*)
                           zypper install -y make
                           ;;
-                      mageia*)
+                      mageia*|oraclelinux*)
                           dnf install -y make
                           ;;
                   esac
