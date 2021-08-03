@@ -57,7 +57,7 @@ elif [ -r /etc/altlinux-release ] && [ "${ID}" = "altlinux" ]; then
     else
         echo "unknown OS: ${ID}:${VERSION_ID}" >&2
     fi
-elif [ -r /etc/oracle-release ] && [ "${ID}" = "ol" ]; the
+elif [ -r /etc/oracle-release ] && [ "${ID}" = "ol" ]; then
     v="$(echo "${VERSION_ID}" | cut -d '.' -f 1)"
     if [ "${v}" = "8" ]; then
         echo "${ID}${v}"
