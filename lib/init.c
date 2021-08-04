@@ -1649,8 +1649,6 @@ bool init_security(struct rpminspect *ri)
             assert(sentry != NULL);
 
             /* the main values of a rule */
-            free(sentry->path);
-            sentry->path = strdup(path);
             free(sentry->pkg);
             sentry->pkg = strdup(pkg);
             free(sentry->ver);
