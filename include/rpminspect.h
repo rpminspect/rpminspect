@@ -269,9 +269,9 @@ char *run_cmd(int *, const char *, ...) __attribute__((__sentinel__));
 void free_argv_table(struct rpminspect *ri, string_list_map_t *table);
 
 /* fileinfo.c */
-bool match_fileinfo_mode(struct rpminspect *, const rpmfile_entry_t *, const char *, const char *);
-bool match_fileinfo_owner(struct rpminspect *, const rpmfile_entry_t *, const char *, const char *, const char *);
-bool match_fileinfo_group(struct rpminspect *, const rpmfile_entry_t *, const char *, const char *, const char *);
+bool match_fileinfo_mode(struct rpminspect *, const rpmfile_entry_t *, const char *, const char *, const char *);
+bool match_fileinfo_owner(struct rpminspect *, const rpmfile_entry_t *, const char *, const char *, const char *, const char *);
+bool match_fileinfo_group(struct rpminspect *, const rpmfile_entry_t *, const char *, const char *, const char *, const char *);
 caps_filelist_entry_t *get_caps_entry(struct rpminspect *, const char *, const char *);
 
 /* flags.c */

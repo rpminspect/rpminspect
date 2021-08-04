@@ -91,9 +91,9 @@ static bool addedfiles_driver(struct rpminspect *ri, rpmfile_entry_t *file)
     params.severity = RESULT_BAD;
     params.waiverauth = WAIVABLE_BY_ANYONE;
     params.header = NAME_ADDEDFILES;
-    params.remedy = REMEDY_ADDEDFILES;
     params.arch = arch;
     params.file = file->localpath;
+    xasprintf(&params.remedy, REMEDY_ADDEDFILES, ri->fileinfo_filename);
 
     /* Check for any forbidden path prefixes */
     if (ri->forbidden_path_prefixes && (ri->tests & INSPECT_ADDEDFILES)) {
@@ -169,7 +169,7 @@ static bool addedfiles_driver(struct rpminspect *ri, rpmfile_entry_t *file)
 
     /* Check for any new setuid or setgid files */
     if (!S_ISDIR(file->st.st_mode) && (file->st.st_mode & (S_ISUID|S_ISGID))) {
-        match_fileinfo_mode(ri, file, NAME_ADDEDFILES, REMEDY_ADDEDFILES);
+        match_fileinfo_mode(ri, file, NAME_ADDEDFILES, REMEDY_ADDEDFILES, ri->fileinfo_filename);
         goto done;
     }
 
@@ -190,6 +190,7 @@ static bool addedfiles_driver(struct rpminspect *ri, rpmfile_entry_t *file)
 
 done:
     free(params.msg);
+    free(params.remedy);
 
     return result;
 }

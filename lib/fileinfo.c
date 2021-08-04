@@ -37,10 +37,11 @@
  * @param header The header string to use for results reporting if the
  *               file is found.
  * @param remedy The remedy string to use for results reporting if the
- *               file is found.
+ *               file is found.  Must contain a %s for fname.
+ * @param fname The filename of the data package file to update.
  * @return True if the file is on the fileinfo list, false otherwise.
  */
-bool match_fileinfo_mode(struct rpminspect *ri, const rpmfile_entry_t *file, const char *header, const char *remedy)
+bool match_fileinfo_mode(struct rpminspect *ri, const rpmfile_entry_t *file, const char *header, const char *remedy, const char *fname)
 {
     fileinfo_entry_t *fientry = NULL;
     mode_t interesting = S_ISUID | S_ISGID | S_ISVTX | S_IRWXU | S_IRWXG | S_IRWXO;
@@ -51,6 +52,10 @@ bool match_fileinfo_mode(struct rpminspect *ri, const rpmfile_entry_t *file, con
     assert(ri != NULL);
     assert(file != NULL);
 
+    if (remedy) {
+        assert(fname != NULL);
+    }
+
     perms = file->st.st_mode & interesting;
     pkg = headerGetString(file->rpm_header, RPMTAG_NAME);
 
@@ -58,7 +63,10 @@ bool match_fileinfo_mode(struct rpminspect *ri, const rpmfile_entry_t *file, con
     params.header = header;
     params.arch = get_rpm_header_arch(file->rpm_header);
     params.file = file->localpath;
-    params.remedy = remedy;
+
+    if (remedy) {
+        xasprintf(&params.remedy, remedy, fname);
+    }
 
     if (init_fileinfo(ri)) {
         TAILQ_FOREACH(fientry, ri->fileinfo, items) {
@@ -69,6 +77,7 @@ bool match_fileinfo_mode(struct rpminspect *ri, const rpmfile_entry_t *file, con
                     params.waiverauth = NOT_WAIVABLE;
                     add_result(ri, &params);
                     free(params.msg);
+                    free(params.remedy);
                     return true;
                 } else {
                     xasprintf(&params.msg, _("%s in %s on %s carries mode %04o, is on the fileinfo list but expected mode %04o"), file->localpath, pkg, params.arch, perms, fientry->mode);
@@ -76,6 +85,7 @@ bool match_fileinfo_mode(struct rpminspect *ri, const rpmfile_entry_t *file, con
                     params.waiverauth = WAIVABLE_BY_SECURITY;
                     add_result(ri, &params);
                     free(params.msg);
+                    free(params.remedy);
                     return true;
                 }
 
@@ -91,8 +101,11 @@ bool match_fileinfo_mode(struct rpminspect *ri, const rpmfile_entry_t *file, con
         params.waiverauth = WAIVABLE_BY_SECURITY;
         add_result(ri, &params);
         free(params.msg);
+        free(params.remedy);
+        params.remedy = NULL;
     }
 
+    free(params.remedy);
     return false;
 }
 
@@ -106,10 +119,11 @@ bool match_fileinfo_mode(struct rpminspect *ri, const rpmfile_entry_t *file, con
  * @param header The header string to use for results reporting if the
  *               file is found.
  * @param remedy The remedy string to use for results reporting if the
- *               file is found.
+ *               file is found.  Must contain %s for fname.
+ * @param fname The filename of the data package file to update.
  * @return True if the file is on the fileinfo list, false otherwise.
  */
-bool match_fileinfo_owner(struct rpminspect *ri, const rpmfile_entry_t *file, const char *owner, const char *header, const char *remedy)
+bool match_fileinfo_owner(struct rpminspect *ri, const rpmfile_entry_t *file, const char *owner, const char *header, const char *remedy, const char *fname)
 {
     fileinfo_entry_t *fientry = NULL;
     const char *pkg = NULL;
@@ -119,13 +133,20 @@ bool match_fileinfo_owner(struct rpminspect *ri, const rpmfile_entry_t *file, co
     assert(file != NULL);
     assert(owner != NULL);
 
+    if (remedy) {
+        assert(fname != NULL);
+    }
+
     pkg = headerGetString(file->rpm_header, RPMTAG_NAME);
 
     init_result_params(&params);
     params.header = header;
     params.arch = get_rpm_header_arch(file->rpm_header);
     params.file = file->localpath;
-    params.remedy = remedy;
+
+    if (remedy) {
+        xasprintf(&params.remedy, remedy, fname);
+    }
 
     if (init_fileinfo(ri)) {
         TAILQ_FOREACH(fientry, ri->fileinfo, items) {
@@ -136,6 +157,7 @@ bool match_fileinfo_owner(struct rpminspect *ri, const rpmfile_entry_t *file, co
                     params.waiverauth = NOT_WAIVABLE;
                     add_result(ri, &params);
                     free(params.msg);
+                    free(params.remedy);
                     return true;
                 } else {
                     xasprintf(&params.msg, _("%s in %s on %s carries owner '%s', but is on the fileinfo list with expected owner '%s'"), file->localpath, pkg, params.arch, owner, fientry->owner);
@@ -143,6 +165,7 @@ bool match_fileinfo_owner(struct rpminspect *ri, const rpmfile_entry_t *file, co
                     params.waiverauth = WAIVABLE_BY_SECURITY;
                     add_result(ri, &params);
                     free(params.msg);
+                    free(params.remedy);
                     return true;
                 }
 
@@ -151,6 +174,7 @@ bool match_fileinfo_owner(struct rpminspect *ri, const rpmfile_entry_t *file, co
         }
     }
 
+    free(params.remedy);
     return false;
 }
 
@@ -164,10 +188,11 @@ bool match_fileinfo_owner(struct rpminspect *ri, const rpmfile_entry_t *file, co
  * @param header The header string to use for results reporting if the
  *               file is found.
  * @param remedy The remedy string to use for results reporting if the
- *               file is found.
+ *               file is found.  Must contain %s for fname.
+ * @param fname The filename of the data package file to update.
  * @return True if the file is on the fileinfo list, false otherwise.
  */
-bool match_fileinfo_group(struct rpminspect *ri, const rpmfile_entry_t *file, const char *group, const char *header, const char *remedy)
+bool match_fileinfo_group(struct rpminspect *ri, const rpmfile_entry_t *file, const char *group, const char *header, const char *remedy, const char *fname)
 {
     fileinfo_entry_t *fientry = NULL;
     const char *pkg = NULL;
@@ -176,13 +201,20 @@ bool match_fileinfo_group(struct rpminspect *ri, const rpmfile_entry_t *file, co
     assert(ri != NULL);
     assert(file != NULL);
 
+    if (remedy) {
+        assert(fname != NULL);
+    }
+
     pkg = headerGetString(file->rpm_header, RPMTAG_NAME);
 
     init_result_params(&params);
     params.header = header;
     params.arch = get_rpm_header_arch(file->rpm_header);
     params.file = file->localpath;
-    params.remedy = remedy;
+
+    if (remedy) {
+        xasprintf(&params.remedy, remedy, fname);
+    }
 
     if (init_fileinfo(ri)) {
         TAILQ_FOREACH(fientry, ri->fileinfo, items) {
@@ -193,6 +225,7 @@ bool match_fileinfo_group(struct rpminspect *ri, const rpmfile_entry_t *file, co
                     params.waiverauth = NOT_WAIVABLE;
                     add_result(ri, &params);
                     free(params.msg);
+                    free(params.remedy);
                     return true;
                 } else {
                     xasprintf(&params.msg, _("%s in %s on %s carries group '%s', but is on the fileinfo list with expected group '%s'"), file->localpath, pkg, params.arch, group, fientry->group);
@@ -200,6 +233,7 @@ bool match_fileinfo_group(struct rpminspect *ri, const rpmfile_entry_t *file, co
                     params.waiverauth = WAIVABLE_BY_SECURITY;
                     add_result(ri, &params);
                     free(params.msg);
+                    free(params.remedy);
                     return true;
                 }
 
@@ -208,6 +242,7 @@ bool match_fileinfo_group(struct rpminspect *ri, const rpmfile_entry_t *file, co
         }
     }
 
+    free(params.remedy);
     return false;
 }
 

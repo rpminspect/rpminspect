@@ -116,6 +116,8 @@ void free_rpminspect(struct rpminspect *ri) {
         free(ri->fileinfo);
     }
 
+    free(ri->fileinfo_filename);
+
     if (ri->caps) {
         while (!TAILQ_EMPTY(ri->caps)) {
             centry = TAILQ_FIRST(ri->caps);
@@ -143,7 +145,9 @@ void free_rpminspect(struct rpminspect *ri) {
         free(ri->caps);
     }
 
+    free(ri->caps_filename);
     list_free(ri->rebaseable, free);
+    free(ri->rebaseable_filename);
 
     if (ri->politics) {
         while (!TAILQ_EMPTY(ri->politics)) {
@@ -158,11 +162,14 @@ void free_rpminspect(struct rpminspect *ri) {
         free(ri->politics);
     }
 
+    free(ri->politics_filename);
+
     if (ri->security) {
         while (!TAILQ_EMPTY(ri->security)) {
             sentry = TAILQ_FIRST(ri->security);
             TAILQ_REMOVE(ri->security, sentry, items);
 
+            free(sentry->path);
             free(sentry->pkg);
             free(sentry->ver);
             free(sentry->rel);
@@ -180,6 +187,7 @@ void free_rpminspect(struct rpminspect *ri) {
         free(ri->security);
     }
 
+    free(ri->security_filename);
     list_free(ri->badwords, free);
 
     free_regex(ri->elf_path_include);

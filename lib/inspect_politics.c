@@ -136,7 +136,7 @@ static bool politics_driver(struct rpminspect *ri, rpmfile_entry_t *file)
         params.arch = get_rpm_header_arch(file->rpm_header);
         params.file = file->localpath;
         params.header = NAME_POLITICS;
-        params.remedy = REMEDY_POLITICS;
+        xasprintf(&params.remedy, REMEDY_POLITICS, ri->politics_filename);
 
         if (allowed) {
             xasprintf(&params.msg, _("Possible politically sensitive file (%s) found in %s on %s: rules allow this file."), file->localpath, name, params.arch);
@@ -153,6 +153,7 @@ static bool politics_driver(struct rpminspect *ri, rpmfile_entry_t *file)
 
         add_result(ri, &params);
         free(params.msg);
+        free(params.remedy);
     }
 
     return result;

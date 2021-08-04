@@ -1176,8 +1176,8 @@ static int read_cfgfile(struct rpminspect *ri, const char *filename)
  * Initialize the fileinfo list for the given product release.  If the
  * file cannot be found, return false.
  */
-bool init_fileinfo(struct rpminspect *ri) {
-    char *filename = NULL;
+bool init_fileinfo(struct rpminspect *ri)
+{
     string_list_t *contents = NULL;
     string_entry_t *entry = NULL;
     char *line = NULL;
@@ -1196,10 +1196,9 @@ bool init_fileinfo(struct rpminspect *ri) {
     }
 
     /* the actual fileinfo file */
-    xasprintf(&filename, "%s/%s/%s", ri->vendor_data_dir, FILEINFO_DIR, ri->product_release);
-    assert(filename != NULL);
-    contents = read_file(filename);
-    free(filename);
+    xasprintf(&ri->fileinfo_filename, "%s/%s/%s", ri->vendor_data_dir, FILEINFO_DIR, ri->product_release);
+    assert(ri->fileinfo_filename != NULL);
+    contents = read_file(ri->fileinfo_filename);
 
     if (contents == NULL) {
         return false;
@@ -1291,7 +1290,6 @@ bool init_fileinfo(struct rpminspect *ri) {
  */
 bool init_caps(struct rpminspect *ri)
 {
-    char *filename = NULL;
     char *line = NULL;
     char *token = NULL;
     string_list_t *contents = NULL;
@@ -1311,10 +1309,9 @@ bool init_caps(struct rpminspect *ri)
     }
 
     /* the actual caps list file */
-    xasprintf(&filename, "%s/%s/%s", ri->vendor_data_dir, CAPABILITIES_DIR, ri->product_release);
-    assert(filename != NULL);
-    contents = read_file(filename);
-    free(filename);
+    xasprintf(&ri->caps_filename, "%s/%s/%s", ri->vendor_data_dir, CAPABILITIES_DIR, ri->product_release);
+    assert(ri->caps_filename != NULL);
+    contents = read_file(ri->caps_filename);
 
     if (contents == NULL) {
         return false;
@@ -1402,7 +1399,6 @@ bool init_caps(struct rpminspect *ri)
  */
 bool init_rebaseable(struct rpminspect *ri)
 {
-    char *filename = NULL;
     string_list_t *contents = NULL;
     string_entry_t *entry = NULL;
     char *line = NULL;
@@ -1418,10 +1414,9 @@ bool init_rebaseable(struct rpminspect *ri)
     }
 
     /* the actual rebaseable list file */
-    xasprintf(&filename, "%s/%s/%s", ri->vendor_data_dir, REBASEABLE_DIR, ri->product_release);
-    assert(filename != NULL);
-    contents = read_file(filename);
-    free(filename);
+    xasprintf(&ri->rebaseable_filename, "%s/%s/%s", ri->vendor_data_dir, REBASEABLE_DIR, ri->product_release);
+    assert(ri->rebaseable_filename != NULL);
+    contents = read_file(ri->rebaseable_filename);
 
     if (contents == NULL) {
         return false;
@@ -1465,7 +1460,6 @@ bool init_rebaseable(struct rpminspect *ri)
  */
 bool init_politics(struct rpminspect *ri)
 {
-    char *filename = NULL;
     string_list_t *contents = NULL;
     string_entry_t *entry = NULL;
     char *line = NULL;
@@ -1483,10 +1477,9 @@ bool init_politics(struct rpminspect *ri)
     }
 
     /* the actual politics file */
-    xasprintf(&filename, "%s/%s/%s", ri->vendor_data_dir, POLITICS_DIR, ri->product_release);
-    assert(filename != NULL);
-    contents = read_file(filename);
-    free(filename);
+    xasprintf(&ri->politics_filename, "%s/%s/%s", ri->vendor_data_dir, POLITICS_DIR, ri->product_release);
+    assert(ri->politics_filename != NULL);
+    contents = read_file(ri->politics_filename);
 
     if (contents == NULL) {
         return false;
@@ -1568,9 +1561,9 @@ bool init_politics(struct rpminspect *ri)
 bool init_security(struct rpminspect *ri)
 {
     int pos = 0;
-    char *filename = NULL;
     char *line = NULL;
     char *token = NULL;
+    char *path = NULL;
     char *pkg = NULL;
     char *ver = NULL;
     char *rel = NULL;
@@ -1600,10 +1593,9 @@ bool init_security(struct rpminspect *ri)
     }
 
     /* the actual security file */
-    xasprintf(&filename, "%s/%s/%s", ri->vendor_data_dir, SECURITY_DIR, ri->product_release);
-    assert(filename != NULL);
-    contents = read_file(filename);
-    free(filename);
+    xasprintf(&ri->security_filename, "%s/%s/%s", ri->vendor_data_dir, SECURITY_DIR, ri->product_release);
+    assert(ri->security_filename != NULL);
+    contents = read_file(ri->security_filename);
 
     if (contents == NULL) {
         return false;
@@ -1632,15 +1624,18 @@ bool init_security(struct rpminspect *ri)
             }
 
             if (pos == 0) {
+                path = strdup(token);
+                assert(path != NULL);
+            } else if (pos == 1) {
                 pkg = strdup(token);
                 assert(pkg != NULL);
-            } else if (pos == 1) {
+            } else if (pos == 2) {
                 ver = strdup(token);
                 assert(ver != NULL);
-            } else if (pos == 2) {
+            } else if (pos == 3) {
                 rel = strdup(token);
                 assert(rel != NULL);
-            } else if (pos == 3) {
+            } else if (pos == 4) {
                 rules = strsplit(token, ",");
             }
 
@@ -1648,12 +1643,14 @@ bool init_security(struct rpminspect *ri)
         }
 
         /* add the entry */
-        if (pkg && ver && rel && rules) {
+        if (path && pkg && ver && rel && rules) {
             /* allocate a new entry */
             sentry = calloc(1, sizeof(*sentry));
             assert(sentry != NULL);
 
-            /* the main NVR values of a rule */
+            /* the main values of a rule */
+            free(sentry->path);
+            sentry->path = strdup(path);
             free(sentry->pkg);
             sentry->pkg = strdup(pkg);
             free(sentry->ver);
@@ -1751,6 +1748,7 @@ bool init_security(struct rpminspect *ri)
         }
 
         /* clean up */
+        free(path);
         free(pkg);
         free(ver);
         free(rel);
