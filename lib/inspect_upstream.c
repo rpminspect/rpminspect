@@ -163,12 +163,11 @@ bool inspect_upstream(struct rpminspect *ri)
         /* versions changed */
         params.severity = RESULT_INFO;
         params.waiverauth = NOT_WAIVABLE;
-        params.remedy = NULL;
     } else {
         /* versions are the same, likely maintenance */
         params.severity = RESULT_VERIFY;
         params.waiverauth = WAIVABLE_BY_ANYONE;
-        params.remedy = REMEDY_UPSTREAM;
+        xasprintf(&params.remedy, REMEDY_UPSTREAM, ri->rebaseable_filename);
     }
 
     /* Run the main inspection */
@@ -212,9 +211,12 @@ bool inspect_upstream(struct rpminspect *ri)
         params.severity = RESULT_OK;
         params.waiverauth = NOT_WAIVABLE;
         params.msg = NULL;
+        free(params.remedy);
         params.remedy = NULL;
         add_result(ri, &params);
     }
+
+    free(params.remedy);
 
     return result;
 }

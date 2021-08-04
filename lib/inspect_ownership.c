@@ -75,22 +75,24 @@ static bool ownership_driver(struct rpminspect *ri, rpmfile_entry_t *file)
     /* Report forbidden file owners */
     if (ri->forbidden_owners && list_contains(ri->forbidden_owners, owner) && (ri->tests & INSPECT_OWNERSHIP)) {
         xasprintf(&params.msg, _("File %s has forbidden owner `%s` on %s"), file->localpath, owner, arch);
+        xasprintf(&params.remedy, REMEDY_OWNERSHIP_DEFATTR, ri->fileinfo_filename);
         params.severity = RESULT_BAD;
         params.waiverauth = WAIVABLE_BY_ANYONE;
-        params.remedy = REMEDY_OWNERSHIP_DEFATTR;
         add_result(ri, &params);
         free(params.msg);
+        free(params.remedy);
         result = false;
     }
 
     /* Report forbidden file groups */
     if (ri->forbidden_groups && list_contains(ri->forbidden_groups, group) && (ri->tests & INSPECT_OWNERSHIP)) {
         xasprintf(&params.msg, _("File %s has forbidden group `%s` on %s"), file->localpath, owner, arch);
+        xasprintf(&params.remedy, REMEDY_OWNERSHIP_DEFATTR, ri->fileinfo_filename);
         params.severity = RESULT_BAD;
         params.waiverauth = WAIVABLE_BY_ANYONE;
-        params.remedy = REMEDY_OWNERSHIP_DEFATTR;
         add_result(ri, &params);
         free(params.msg);
+        free(params.remedy);
         result = false;
     }
 
@@ -100,13 +102,14 @@ static bool ownership_driver(struct rpminspect *ri, rpmfile_entry_t *file)
             bin = true;
 
             /* Check the owner */
-            if (strcmp(owner, ri->bin_owner) && !match_fileinfo_owner(ri, file, owner, NAME_OWNERSHIP, NULL) && (ri->tests & INSPECT_OWNERSHIP)) {
+            if (strcmp(owner, ri->bin_owner) && !match_fileinfo_owner(ri, file, owner, NAME_OWNERSHIP, NULL, NULL) && (ri->tests & INSPECT_OWNERSHIP)) {
                 xasprintf(&params.msg, _("File %s has owner `%s` on %s, but should be `%s`"), file->localpath, owner, arch, ri->bin_owner);
+                xasprintf(&params.remedy, REMEDY_OWNERSHIP_BIN_OWNER, ri->fileinfo_filename);
                 params.severity = RESULT_BAD;
                 params.waiverauth = WAIVABLE_BY_ANYONE;
-                params.remedy = REMEDY_OWNERSHIP_BIN_OWNER;
                 add_result(ri, &params);
                 free(params.msg);
+                free(params.remedy);
                 result = false;
             }
 
@@ -133,30 +136,33 @@ static bool ownership_driver(struct rpminspect *ri, rpmfile_entry_t *file)
                 if (have_setuid == CAP_SET) {
                     if ((file->st.st_mode & S_IXOTH) && (ri->tests & INSPECT_OWNERSHIP)) {
                         xasprintf(&params.msg, _("File %s on %s has CAP_SETUID capability but group `%s` and is world executable"), file->localpath, arch, group);
+                        xasprintf(&params.remedy, REMEDY_OWNERSHIP_IXOTH, ri->fileinfo_filename);
                         params.severity = RESULT_BAD;
                         params.waiverauth = WAIVABLE_BY_SECURITY;
-                        params.remedy = REMEDY_OWNERSHIP_IXOTH;
                         add_result(ri, &params);
                         free(params.msg);
+                        free(params.remedy);
                         result = false;
                     }
 
                     if (file->st.st_mode & S_IWGRP) {
                         xasprintf(&params.msg, _("File %s on %s has CAP_SETUID capability but group `%s` and is group writable"), file->localpath, arch, group);
+                        xasprintf(&params.remedy, REMEDY_OWNERSHIP_IWGRP, ri->fileinfo_filename);
                         params.severity = RESULT_BAD;
                         params.waiverauth = WAIVABLE_BY_SECURITY;
-                        params.remedy = REMEDY_OWNERSHIP_IWGRP;
                         add_result(ri, &params);
                         free(params.msg);
+                        free(params.remedy);
                         result = false;
                     }
-                } else if (!match_fileinfo_group(ri, file, group, NAME_OWNERSHIP, NULL) && (ri->tests & INSPECT_OWNERSHIP)) {
+                } else if (!match_fileinfo_group(ri, file, group, NAME_OWNERSHIP, NULL, NULL) && (ri->tests & INSPECT_OWNERSHIP)) {
                     xasprintf(&params.msg, _("File %s has group `%s` on %s, but should be `%s`"), file->localpath, group, arch, ri->bin_group);
+                    xasprintf(&params.remedy, REMEDY_OWNERSHIP_BIN_GROUP, ri->fileinfo_filename);
                     params.severity = RESULT_BAD;
                     params.waiverauth = WAIVABLE_BY_ANYONE;
-                    params.remedy = REMEDY_OWNERSHIP_BIN_GROUP;
                     add_result(ri, &params);
                     free(params.msg);
+                    free(params.remedy);
                     result = false;
                 }
             }
@@ -215,9 +221,10 @@ static bool ownership_driver(struct rpminspect *ri, rpmfile_entry_t *file)
 
             free(params.msg);
             xasprintf(&params.msg, _("File %s changed %s from `%s` to `%s` on %s"), file->localpath, what, before_val, after_val, arch);
-            params.remedy = REMEDY_OWNERSHIP_CHANGED;
+            xasprintf(&params.remedy, REMEDY_OWNERSHIP_CHANGED, ri->fileinfo_filename);
             add_result(ri, &params);
             free(params.msg);
+            free(params.remedy);
             result = false;
         }
 

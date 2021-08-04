@@ -165,7 +165,7 @@ struct result_params {
     const char *header;
     char *msg;
     char *details;
-    const char *remedy;
+    char *remedy;
     verb_t verb;
     const char *noun;
     const char *arch;
@@ -178,7 +178,7 @@ typedef struct _results_entry_t {
     const char *header;       /* header string for reporting */
     char *msg;                /* the result message */
     char *details;            /* details (optional, can be NULL) */
-    const char *remedy;       /* suggested correction for the result */
+    char *remedy;             /* suggested correction for the result */
     verb_t verb;              /* verb indicating what happened */
     char *noun;               /* noun impacted by 'verb', one line
                                  (e.g., a file path or an RPM dependency
@@ -343,11 +343,16 @@ struct rpminspect {
     favor_release_t favor_release;
 
     /* Populated at runtime for the product release */
+    char *fileinfo_filename;
     fileinfo_t *fileinfo;
     caps_t *caps;
+    char *caps_filename;
     string_list_t *rebaseable;
+    char *rebaseable_filename;
     politics_list_t *politics;
+    char *politics_filename;
     security_list_t *security;
+    char *security_filename;
     bool security_initialized;
 
     /* Koji information (from config file) */

@@ -65,7 +65,7 @@ static bool permissions_driver(struct rpminspect *ri, rpmfile_entry_t *file)
     }
 
     mode_diff = before_mode ^ after_mode;
-    allowed = match_fileinfo_mode(ri, file, NAME_PERMISSIONS, NULL);
+    allowed = match_fileinfo_mode(ri, file, NAME_PERMISSIONS, NULL, NULL);
 
     /* if setuid/setgid or new mode is more open */
     if (mode_diff && file->peer_file && !allowed && (ri->tests & INSPECT_PERMISSIONS)) {

@@ -73,6 +73,8 @@ void free_results(results_t *results) {
         entry->msg = NULL;
         free(entry->details);
         entry->details = NULL;
+        free(entry->remedy);
+        entry->remedy = NULL;
         free(entry->noun);
         entry->noun = NULL;
         free(entry->arch);
@@ -133,7 +135,7 @@ void add_result_entry(results_t **results, struct result_params *params)
     }
 
     if (params->remedy != NULL) {
-        entry->remedy = params->remedy;
+        entry->remedy = strdup(params->remedy);
     }
 
     entry->verb = params->verb;
