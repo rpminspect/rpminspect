@@ -428,4 +428,4 @@ BSD licenses.  Both of these cases are allowed under the GPLv3 and
 LGPLv3.  The combined work is licensed as described in the previous
 paragraph.
 
-Copyright statements are in the boilerplates of each source file.
+Copyright statements are in the boilerplates of each source file. 
