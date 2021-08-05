@@ -67,7 +67,7 @@ jobs:
                   case "${{ matrix.container }}" in
                       fedora*)
                           dnf remove -y fedora-repos-modular
-                          dnf install -y make
+                          dnf install -y make git
                           ;;
                   esac
 
