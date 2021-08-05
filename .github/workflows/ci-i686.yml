@@ -1,0 +1,82 @@
+name: CI on i686
+
+on:
+    push:
+        branches: [ master ]
+        paths-ignore:
+        - AUTHORS.md
+        - CC-BY-4.0.txt
+        - CODE_OF_CONDUCT.md
+        - COPYING
+        - COPYING.LIB
+        - HISTORY
+        - LICENSE-2.0.txt
+        - MISSING
+        - README.md
+        - TODO
+        - 'contrib/**'
+        - 'data/**'
+        - 'doc/**'
+        - 'po/**'
+        - 'regress/**'
+        - 'utils/**'
+
+    pull_request:
+        branches: [ master ]
+        paths-ignore:
+        - AUTHORS.md
+        - CC-BY-4.0.txt
+        - CODE_OF_CONDUCT.md
+        - COPYING
+        - COPYING.LIB
+        - HISTORY
+        - LICENSE-2.0.txt
+        - MISSING
+        - README.md
+        - TODO
+        - 'contrib/**'
+        - 'data/**'
+        - 'doc/**'
+        - 'po/**'
+        - 'regress/**'
+        - 'utils/**'
+
+jobs:
+    # Fedora Linux
+    fedora-i686:
+        # Use containers on their ubuntu latest image
+        runs-on: ubuntu-latest
+
+        # Set up the matrix of distributions to test
+        strategy:
+            matrix:
+                container: ["fedora:rawhide", "fedora:latest"]
+
+        container:
+            image: ${{ matrix.container }}
+
+        # All of these steps run from within the main source
+        # directory, so think of that as your $PWD
+        steps:
+            # This means clone the git repo
+            - uses: actions/checkout@v2.1.0
+
+            # Some housekeeping
+            - name: Package housekeeping
+              run: |
+                  case "${{ matrix.container }}" in
+                      fedora*)
+                          dnf remove -y fedora-repos-modular
+                          dnf install -y make
+                          ;;
+                  esac
+
+            # 32-bit build
+            - name: Build and run the test suite on i686
+              run: |
+                  make instreqs OSDEPS_ARCH=i686
+                  env CFLAGS="-m32" LDFLAGS="-m32" PKG_CONFIG_PATH=/usr/lib/pkgconfig meson setup build --werror -Db_buildtype=debug -Db_coverage=true
+                  ninja -C build -v
+                  meson test -C build -v
+                  ninja -C build coverage
+                  curl -s https://codecov.io/bash | bash

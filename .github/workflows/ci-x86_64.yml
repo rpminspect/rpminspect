@@ -1,4 +1,4 @@
-name: CI
+name: CI on x86_64
 
 on:
     push:
@@ -43,7 +43,7 @@ on:
 
 jobs:
     # Fedora Linux
-    fedora:
+    fedora-x86_64:
         # Use containers on their ubuntu latest image
         runs-on: ubuntu-latest
 
@@ -71,19 +71,9 @@ jobs:
                           ;;
                   esac
 
-            # 32-bit build
-            - name: Build and run the test suite on i686
-              run: |
-                  make clean
-                  make instreqs OSDEPS_ARCH=i686
-                  env CFLAGS="-m32" LDFLAGS="-m32" PKG_CONFIG_PATH=/usr/lib/pkgconfig meson setup build --werror -Db_buildtype=debug -Db_coverage=true
-                  ninja -C build -v
-                  meson test -C build -v
-
             # 64-bit build
             - name: Build and run the test suite on x86_64
               run: |
-                  make clean
                   make instreqs
                   meson setup build --werror -Db_buildtype=debug -Db_coverage=true
                   ninja -C build -v
