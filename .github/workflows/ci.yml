@@ -67,14 +67,14 @@ jobs:
                   case "${{ matrix.container }}" in
                       fedora*)
                           dnf remove -y fedora-repos-modular
-                          dnf install -y make git
+                          dnf install -y make
                           ;;
                   esac
 
             # 32-bit build
             - name: Build and run the test suite on i686
               run: |
-                  git clean -d -x -f
+                  make clean
                   make instreqs OSDEPS_ARCH=i686
                   env CFLAGS="-m32" LDFLAGS="-m32" PKG_CONFIG_PATH=/usr/lib/pkgconfig meson setup build --werror -Db_buildtype=debug -Db_coverage=true
                   ninja -C build -v
@@ -83,7 +83,7 @@ jobs:
             # 64-bit build
             - name: Build and run the test suite on x86_64
               run: |
-                  git clean -d -x -f
+                  make clean
                   make instreqs
                   meson setup build --werror -Db_buildtype=debug -Db_coverage=true
                   ninja -C build -v
