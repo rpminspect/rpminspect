@@ -72,7 +72,7 @@ bool match_fileinfo_mode(struct rpminspect *ri, const rpmfile_entry_t *file, con
         TAILQ_FOREACH(fientry, ri->fileinfo, items) {
             if (!strcmp(file->localpath, fientry->filename)) {
                 if (file->st.st_mode == fientry->mode) {
-                    xasprintf(&params.msg, _("%s in %s on %s carries mode %04o, but is on the fileinfo list"), file->localpath, pkg, params.arch, perms);
+                    xasprintf(&params.msg, _("%s in %s on %s carries expected mode %04o"), file->localpath, pkg, params.arch, perms);
                     params.severity = RESULT_INFO;
                     params.waiverauth = NOT_WAIVABLE;
                     add_result(ri, &params);
@@ -80,7 +80,7 @@ bool match_fileinfo_mode(struct rpminspect *ri, const rpmfile_entry_t *file, con
                     free(params.remedy);
                     return true;
                 } else {
-                    xasprintf(&params.msg, _("%s in %s on %s carries mode %04o, is on the fileinfo list but expected mode %04o"), file->localpath, pkg, params.arch, perms, fientry->mode);
+                    xasprintf(&params.msg, _("%s in %s on %s carries unexpected mode %04o; expected mode %04o"), file->localpath, pkg, params.arch, perms, fientry->mode);
                     params.severity = RESULT_VERIFY;
                     params.waiverauth = WAIVABLE_BY_SECURITY;
                     add_result(ri, &params);
@@ -152,7 +152,7 @@ bool match_fileinfo_owner(struct rpminspect *ri, const rpmfile_entry_t *file, co
         TAILQ_FOREACH(fientry, ri->fileinfo, items) {
             if (!strcmp(file->localpath, fientry->filename)) {
                 if (!strcmp(owner, fientry->owner)) {
-                    xasprintf(&params.msg, _("%s in %s on %s carries owner '%s' and is on the fileinfo list"), file->localpath, pkg, params.arch, fientry->owner);
+                    xasprintf(&params.msg, _("%s in %s on %s carries expected owner '%s'"), file->localpath, pkg, params.arch, fientry->owner);
                     params.severity = RESULT_INFO;
                     params.waiverauth = NOT_WAIVABLE;
                     add_result(ri, &params);
@@ -160,7 +160,7 @@ bool match_fileinfo_owner(struct rpminspect *ri, const rpmfile_entry_t *file, co
                     free(params.remedy);
                     return true;
                 } else {
-                    xasprintf(&params.msg, _("%s in %s on %s carries owner '%s', but is on the fileinfo list with expected owner '%s'"), file->localpath, pkg, params.arch, owner, fientry->owner);
+                    xasprintf(&params.msg, _("%s in %s on %s carries unexpected owner '%s'; expected owner '%s'"), file->localpath, pkg, params.arch, owner, fientry->owner);
                     params.severity = RESULT_VERIFY;
                     params.waiverauth = WAIVABLE_BY_SECURITY;
                     add_result(ri, &params);
@@ -220,7 +220,7 @@ bool match_fileinfo_group(struct rpminspect *ri, const rpmfile_entry_t *file, co
         TAILQ_FOREACH(fientry, ri->fileinfo, items) {
             if (!strcmp(file->localpath, fientry->filename)) {
                 if (!strcmp(group, fientry->group)) {
-                    xasprintf(&params.msg, _("%s in %s on %s carries group '%s' and is on the fileinfo list"), file->localpath, pkg, params.arch, fientry->group);
+                    xasprintf(&params.msg, _("%s in %s on %s carries expected group '%s'"), file->localpath, pkg, params.arch, fientry->group);
                     params.severity = RESULT_INFO;
                     params.waiverauth = NOT_WAIVABLE;
                     add_result(ri, &params);
@@ -228,7 +228,7 @@ bool match_fileinfo_group(struct rpminspect *ri, const rpmfile_entry_t *file, co
                     free(params.remedy);
                     return true;
                 } else {
-                    xasprintf(&params.msg, _("%s in %s on %s carries group '%s', but is on the fileinfo list with expected group '%s'"), file->localpath, pkg, params.arch, group, fientry->group);
+                    xasprintf(&params.msg, _("%s in %s on %s carries group unexpected '%s'; expected group '%s'"), file->localpath, pkg, params.arch, group, fientry->group);
                     params.severity = RESULT_VERIFY;
                     params.waiverauth = WAIVABLE_BY_SECURITY;
                     add_result(ri, &params);

@@ -91,6 +91,7 @@ lib/results.c
 lib/rmtree.c
 lib/rpm.c
 lib/runcmd.c
+lib/secrule.c
 lib/strfuncs.c
 lib/tty.c
 lib/uncompress.c

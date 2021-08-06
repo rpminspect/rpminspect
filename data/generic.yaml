@@ -716,3 +716,11 @@ runpath:
     # here will only be used during this inspection.
     #ignore:
     #    - /usr/lib*/libexample.so*
+
+types:
+    # Optional list of glob(7) specifications to match files to ignore
+    # for this inspection.  The format of this list is the same as the
+    # global 'ignore' list.  The difference is the items specified
+    # here will only be used during this inspection.
+    #ignore:
+    #    - /usr/lib*/libexample.so*
