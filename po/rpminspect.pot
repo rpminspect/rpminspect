@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: rpminspect\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-06-30 15:42-0400\n"
+"POT-Creation-Date: 2021-08-06 10:50-0400\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -501,51 +501,69 @@ msgid ""
 msgstr ""
 
 #: include/results.h:90
+#, c-format
 msgid ""
 "Unexpected file additions were found.  Verify these changes are correct.  If "
-"they are not, adjust the build to prevent the file additions between builds."
+"they are not, adjust the build to prevent the file additions between "
+"builds.  If they are correct, update %s and send a patch to the project "
+"owning that file so rpminspect knows to expect this change."
 msgstr ""
 
 #: include/results.h:93
+#, c-format
 msgid ""
-"Unexpected changed source archive content.  The version of the package did "
-"not change between builds, but the source archive content did.  This may be "
-"deliberate, but needs inspection."
+"Unexpected changed source archive content. The version of the package did "
+"not change between builds, but the source archive content did. This may be "
+"deliberate, but needs inspection. If this change is expected, update %s and "
+"send a patch to the project that owns that file."
 msgstr ""
 
 #: include/results.h:96
 #, c-format
-msgid "Make sure the %files section includes the %defattr macro."
+msgid ""
+"Make sure the %%files section includes the %%defattr macro. If these "
+"permissions are expected, update %s and send a patch to the project that "
+"owns it."
 msgstr ""
 
 #: include/results.h:97
+#, c-format
 msgid ""
 "Bin path files must be owned by the bin_owner set in the rpminspect "
-"configuration, which is usually root."
+"configuration, which is usually root. If this ownership is expected, update "
+"%s and send a patch to the project that owns it."
 msgstr ""
 
 #: include/results.h:98
+#, c-format
 msgid ""
 "Bin path files must be owned by the bin_group set in the rpminspect "
-"configuration, which is usually root."
+"configuration, which is usually root. If this ownership is expect, update %s "
+"and send a patch to the project that owns it."
 msgstr ""
 
 #: include/results.h:99
+#, c-format
 msgid ""
 "Either chgrp the file to the bin_group set in the rpminspect configuration "
-"or remove the world execute bit on the file (chmod o-x)."
+"or remove the world execute bit on the file (chmod o-x). If this ownership "
+"is expected, update %s and send a patch to the project that owns it."
 msgstr ""
 
 #: include/results.h:100
+#, c-format
 msgid ""
 "Either chgrp the file to the bin_group set in the rpminspect configuration "
-"or remove the group write bit on the file (chmod g-w)."
+"or remove the group write bit on the file (chmod g-w). If this ownership is "
+"expected, update %s and send a patch to the project that owns it."
 msgstr ""
 
 #: include/results.h:101
+#, c-format
 msgid ""
 "Verify the ownership changes are expected. If not, adjust the package build "
-"process to set correct owner and group information."
+"process to set correct owner and group information. If expected, update %s "
+"and send a patch to the project that owns it."
 msgstr ""
 
 #: include/results.h:104
@@ -590,11 +608,13 @@ msgid ""
 msgstr ""
 
 #: include/results.h:119
+#, c-format
 msgid ""
 "Unexpected capabilities were found on the indicated file.  Consult "
 "capabilities(7) and either adjust the files in the package or modify the "
 "capabilities list in the rpminspect vendor data package.  The security team "
-"may also be of help for this situation."
+"may also be of help for this situation.  If necessary, update %s with the "
+"changes found here and send a patch to the project that owns the data file."
 msgstr ""
 
 #: include/results.h:122
@@ -749,10 +769,12 @@ msgid ""
 msgstr ""
 
 #: include/results.h:172
+#, c-format
 msgid ""
 "A file with potential politically sensitive content was found in the "
 "package.  If this file is permitted, it should be added to the rpminspect "
-"vendor data package for the product."
+"vendor data package for the product.  Modify the %s file and send a patch to "
+"the project that owns it."
 msgstr ""
 
 #: include/results.h:175
@@ -865,47 +887,41 @@ msgstr ""
 msgid ", overwriting"
 msgstr ""
 
-#: lib/fileinfo.c:67
+#: lib/fileinfo.c:75
 #, c-format
-msgid "%s in %s on %s carries mode %04o, but is on the fileinfo list"
+msgid "%s in %s on %s carries expected mode %04o"
 msgstr ""
 
-#: lib/fileinfo.c:74
+#: lib/fileinfo.c:83
 #, c-format
-msgid ""
-"%s in %s on %s carries mode %04o, is on the fileinfo list but expected mode "
-"%04o"
+msgid "%s in %s on %s carries unexpected mode %04o; expected mode %04o"
 msgstr ""
 
-#: lib/fileinfo.c:89
+#: lib/fileinfo.c:99
 #, c-format
 msgid ""
 "%s in %s on %s carries insecure mode %04o, Security Team review may be "
 "required"
 msgstr ""
 
-#: lib/fileinfo.c:134
+#: lib/fileinfo.c:155
 #, c-format
-msgid "%s in %s on %s carries owner '%s' and is on the fileinfo list"
+msgid "%s in %s on %s carries expected owner '%s'"
 msgstr ""
 
-#: lib/fileinfo.c:141
+#: lib/fileinfo.c:163
 #, c-format
-msgid ""
-"%s in %s on %s carries owner '%s', but is on the fileinfo list with expected "
-"owner '%s'"
+msgid "%s in %s on %s carries unexpected owner '%s'; expected owner '%s'"
 msgstr ""
 
-#: lib/fileinfo.c:191
+#: lib/fileinfo.c:223
 #, c-format
-msgid "%s in %s on %s carries group '%s' and is on the fileinfo list"
+msgid "%s in %s on %s carries expected group '%s'"
 msgstr ""
 
-#: lib/fileinfo.c:198
+#: lib/fileinfo.c:231
 #, c-format
-msgid ""
-"%s in %s on %s carries group '%s', but is on the fileinfo list with expected "
-"group '%s'"
+msgid "%s in %s on %s carries group unexpected '%s'; expected group '%s'"
 msgstr ""
 
 #: lib/files.c:265
@@ -913,91 +929,111 @@ msgstr ""
 msgid "*** payload path %s not in RPM metadata"
 msgstr ""
 
-#: lib/init.c:249
+#: lib/init.c:251
 #, c-format
 msgid "*** ignore found in %d, value `%s'"
 msgstr ""
 
-#: lib/init.c:344
+#: lib/init.c:346
 #, c-format
 msgid "invalid input string `%s`"
 msgstr ""
 
-#: lib/init.c:371 lib/init.c:380 lib/init.c:388 lib/init.c:400 lib/init.c:409
-#: lib/init.c:417 lib/init.c:429 lib/init.c:438 lib/init.c:446 lib/init.c:458
+#: lib/init.c:373 lib/init.c:382 lib/init.c:390 lib/init.c:402 lib/init.c:411
+#: lib/init.c:419 lib/init.c:431 lib/init.c:440 lib/init.c:448 lib/init.c:460
 #, c-format
 msgid "*** invalid mode string: %s"
 msgstr ""
 
-#: lib/init.c:504
+#: lib/init.c:506
 #, c-format
 msgid "ignoring malformed %s configuration file: %s"
 msgstr ""
 
-#: lib/init.c:912
+#: lib/init.c:914
 #, c-format
 msgid "*** unknown specname match setting '%s', defaulting to 'full'"
 msgstr ""
 
-#: lib/init.c:921
+#: lib/init.c:923
 #, c-format
 msgid "*** unknown specname primary setting '%s', defaulting to 'name'"
 msgstr ""
 
-#: lib/init.c:932
+#: lib/init.c:934
 msgid "error reading elf include path"
 msgstr ""
 
-#: lib/init.c:941
+#: lib/init.c:943
 msgid "error reading elf exclude path"
 msgstr ""
 
-#: lib/init.c:952
+#: lib/init.c:954
 msgid "error reading man page include path"
 msgstr ""
 
-#: lib/init.c:961
+#: lib/init.c:963
 msgid "error reading man page exclude path"
 msgstr ""
 
-#: lib/init.c:972
+#: lib/init.c:974
 msgid "error reading xml include path"
 msgstr ""
 
-#: lib/init.c:981
+#: lib/init.c:983
 msgid "error reading xml exclude path"
 msgstr ""
 
-#: lib/init.c:1025
+#: lib/init.c:1027
 #, c-format
 msgid "*** inspection flag must be 'on' or 'off', ignoring for '%s'"
 msgstr ""
 
-#: lib/init.c:1029 src/rpminspect.c:280
+#: lib/init.c:1031 src/rpminspect.c:280
 #, c-format
 msgid "*** Unknown inspection: `%s`"
 msgstr ""
 
-#: lib/init.c:1254
+#: lib/init.c:1255
 #, c-format
 msgid "*** Invalid filename in the fileinfo list: %s"
 msgstr ""
 
-#: lib/init.c:1255
+#: lib/init.c:1256
 msgid "*** From this invalid line:"
 msgstr ""
 
-#: lib/init.c:1256
+#: lib/init.c:1257
 #, c-format
 msgid "***     %s"
 msgstr ""
 
-#: lib/init.c:1634 lib/init.c:1655
+#: lib/init.c:1666
+#, c-format
+msgid "*** invalid security rule: %s"
+msgstr ""
+
+#: lib/init.c:1700
+#, c-format
+msgid "*** unknown security rule: %s"
+msgstr ""
+
+#: lib/init.c:1719
+#, c-format
+msgid "*** unknown security action: %s"
+msgstr ""
+
+#: lib/init.c:1745
+#, c-format
+msgid "*** malformed security line: %s"
+msgstr ""
+
+#: lib/init.c:1836 lib/init.c:1857
 #, c-format
 msgid "*** error reading '%s'\n"
 msgstr ""
 
-#: lib/init.c:1650
+#: lib/init.c:1852
 #, c-format
 msgid "*** unable to read profile '%s' from %s\n"
 msgstr ""
@@ -1140,33 +1176,33 @@ msgstr ""
 msgid "${FILE} capabilities"
 msgstr ""
 
-#: lib/inspect_capabilities.c:101
+#: lib/inspect_capabilities.c:102
 #, c-format
 msgid "File capabilities found for %s: '%s' on %s\n"
 msgstr ""
 
-#: lib/inspect_capabilities.c:125
+#: lib/inspect_capabilities.c:126
 #, c-format
 msgid ""
 "File capabilities list entry found for %s: '%s' on %s, matches package\n"
 msgstr ""
 
-#: lib/inspect_capabilities.c:131
+#: lib/inspect_capabilities.c:132
 #, c-format
 msgid "File capabilities list mismatch for %s: expected '%s', got '%s'\n"
 msgstr ""
 
-#: lib/inspect_capabilities.c:136 lib/inspect_capabilities.c:147
-#: lib/inspect_capabilities.c:157
+#: lib/inspect_capabilities.c:137 lib/inspect_capabilities.c:149
+#: lib/inspect_capabilities.c:160
 msgid "${FILE} capabilities list"
 msgstr ""
 
-#: lib/inspect_capabilities.c:142
+#: lib/inspect_capabilities.c:144
 #, c-format
 msgid "File capabilities for %s not found on the capabilities list on %s\n"
 msgstr ""
 
-#: lib/inspect_capabilities.c:152
+#: lib/inspect_capabilities.c:155
 #, c-format
 msgid "File capabilities expected for %s but not found on %s: expected '%s'\n"
 msgstr ""
@@ -1858,35 +1894,35 @@ msgstr ""
 msgid "File %s has forbidden owner `%s` on %s"
 msgstr ""
 
-#: lib/inspect_ownership.c:88
+#: lib/inspect_ownership.c:89
 #, c-format
 msgid "File %s has forbidden group `%s` on %s"
 msgstr ""
 
-#: lib/inspect_ownership.c:104
+#: lib/inspect_ownership.c:106
 #, c-format
 msgid "File %s has owner `%s` on %s, but should be `%s`"
 msgstr ""
 
-#: lib/inspect_ownership.c:135
+#: lib/inspect_ownership.c:138
 #, c-format
 msgid ""
 "File %s on %s has CAP_SETUID capability but group `%s` and is world "
 "executable"
 msgstr ""
 
-#: lib/inspect_ownership.c:145
+#: lib/inspect_ownership.c:149
 #, c-format
 msgid ""
 "File %s on %s has CAP_SETUID capability but group `%s` and is group writable"
 msgstr ""
 
-#: lib/inspect_ownership.c:154
+#: lib/inspect_ownership.c:159
 #, c-format
 msgid "File %s has group `%s` on %s, but should be `%s`"
 msgstr ""
 
-#: lib/inspect_ownership.c:217
+#: lib/inspect_ownership.c:223
 #, c-format
 msgid "File %s changed %s from `%s` to `%s` on %s"
 msgstr ""
@@ -2167,7 +2203,7 @@ msgstr ""
 msgid "checksum of ${FILE}"
 msgstr ""
 
-#: lib/inspect_upstream.c:197
+#: lib/inspect_upstream.c:196
 #, c-format
 msgid "Source file `%s` removed"
 msgstr ""
@@ -2338,71 +2374,84 @@ msgstr ""
 msgid "error closing `%s`"
 msgstr ""
 
-#: lib/strfuncs.c:257 lib/strfuncs.c:284
+#: lib/secrule.c:45
+msgid "init_security"
+msgstr ""
+
+#: lib/secrule.c:64
+#, c-format
+msgid "unknown security rule %d"
+msgstr ""
+
+#: lib/strfuncs.c:257 lib/strfuncs.c:286
+msgid "NULL"
+msgstr ""
+
+#: lib/strfuncs.c:259 lib/strfuncs.c:288
 msgid "OK"
 msgstr ""
 
-#: lib/strfuncs.c:259 lib/strfuncs.c:286
+#: lib/strfuncs.c:261 lib/strfuncs.c:290
 msgid "INFO"
 msgstr ""
 
-#: lib/strfuncs.c:261 lib/strfuncs.c:288
-msgid "WAIVED"
-msgstr ""
-
-#: lib/strfuncs.c:263 lib/strfuncs.c:290
+#: lib/strfuncs.c:263 lib/strfuncs.c:292
 msgid "VERIFY"
 msgstr ""
 
-#: lib/strfuncs.c:265 lib/strfuncs.c:292
+#: lib/strfuncs.c:265 lib/strfuncs.c:294
 msgid "BAD"
 msgstr ""
 
-#: lib/strfuncs.c:267 lib/strfuncs.c:311
+#: lib/strfuncs.c:267 lib/strfuncs.c:296
+msgid "SKIP"
+msgstr ""
+
+#: lib/strfuncs.c:269 lib/strfuncs.c:315
 msgid "UnKnOwN"
 msgstr ""
 
-#: lib/strfuncs.c:305
+#: lib/strfuncs.c:309
 msgid "Not Waivable"
 msgstr ""
 
-#: lib/strfuncs.c:307
+#: lib/strfuncs.c:311
 msgid "Anyone"
 msgstr ""
 
-#: lib/strfuncs.c:309
+#: lib/strfuncs.c:313
 msgid "Security"
 msgstr ""
 
-#: lib/strfuncs.c:541
+#: lib/strfuncs.c:545
 msgid "regular file"
 msgstr ""
 
-#: lib/strfuncs.c:543
+#: lib/strfuncs.c:547
 msgid "directory"
 msgstr ""
 
-#: lib/strfuncs.c:545
+#: lib/strfuncs.c:549
 msgid "character device"
 msgstr ""
 
-#: lib/strfuncs.c:547
+#: lib/strfuncs.c:551
 msgid "block device"
 msgstr ""
 
-#: lib/strfuncs.c:549
+#: lib/strfuncs.c:553
 msgid "FIFO (named pipe)"
 msgstr ""
 
-#: lib/strfuncs.c:551
+#: lib/strfuncs.c:555
 msgid "symbolic link"
 msgstr ""
 
-#: lib/strfuncs.c:553
+#: lib/strfuncs.c:557
 msgid "socket"
 msgstr ""
 
-#: lib/strfuncs.c:555
+#: lib/strfuncs.c:559
 msgid "UNKNOWN"
 msgstr ""
 
