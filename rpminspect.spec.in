@@ -101,9 +101,9 @@ programs wanting to incorporate RPM test functionality.
 
 
 %package -n librpminspect-devel
-Summary:         Header files and development libraries for librpminspect
-Group:           Development/Tools
-Requires:        librpminspect%{?_isa} = %{version}-%{release}
+Summary:        Header files and development libraries for librpminspect
+Group:          Development/Tools
+Requires:       librpminspect%{?_isa} = %{version}-%{release}
 
 %description -n librpminspect-devel
 The header files and development library links required to build software
@@ -111,8 +111,8 @@ using librpminspect.
 
 
 %package -n rpminspect-data-generic
-Summary:         Template data files used to drive rpminspect tests
-Group:           Development/Tools
+Summary:        Template data files used to drive rpminspect tests
+Group:          Development/Tools
 
 %description -n rpminspect-data-generic
 The rpminspect-data-generic package is meant as a template to build your
@@ -132,9 +132,10 @@ control files.
 
 %install
 %meson_install
+%find_lang %{name}
 
 
-%files
+%files -f %{name}.lang
 %doc AUTHORS.md README.md TODO
 %license COPYING
 %{_bindir}/rpminspect
