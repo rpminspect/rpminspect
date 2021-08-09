@@ -629,10 +629,20 @@ static int read_cfgfile(struct rpminspect *ri, const char *filename)
                         group = BLOCK_NULL;
                     } else if (!strcmp(key, "security_path_prefix")) {
                         block = BLOCK_SECURITY_PATH_PREFIX;
-                        group = BLOCK_NULL;
+
+                        if (group != BLOCK_SECURITY_PATH_PREFIX) {
+                            list_free(ri->security_path_prefix, free);
+                            ri->security_path_prefix = NULL;
+                            group = BLOCK_SECURITY_PATH_PREFIX;
+                        }
                     } else if (!strcmp(key, "badwords")) {
                         block = BLOCK_BADWORDS;
-                        group = BLOCK_NULL;
+
+                        if (group != BLOCK_BADWORDS) {
+                            list_free(ri->badwords, free);
+                            ri->badwords = NULL;
+                            group = BLOCK_BADWORDS;
+                        }
                     } else if (!strcmp(key, NAME_METADATA)) {
                         block = BLOCK_NULL;
                         group = BLOCK_METADATA;
@@ -692,7 +702,12 @@ static int read_cfgfile(struct rpminspect *ri, const char *filename)
                         group = BLOCK_PATCHES;
                     } else if (!strcmp(key, NAME_BADFUNCS)) {
                         block = BLOCK_BADFUNCS;
-                        group = BLOCK_NULL;
+
+                        if (group != BLOCK_BADFUNCS) {
+                            list_free(ri->bad_functions, free);
+                            ri->bad_functions = NULL;
+                            group = BLOCK_BADFUNCS;
+                        }
                     } else if (!strcmp(key, NAME_RUNPATH)) {
                         block = BLOCK_NULL;
                         group = BLOCK_RUNPATH;
@@ -717,74 +732,108 @@ static int read_cfgfile(struct rpminspect *ri, const char *filename)
                             group = BLOCK_MIGRATED_PATHS;
                         } else if (!strcmp(key, "excluded_paths")) {
                             group = BLOCK_PATHMIGRATION_EXCLUDED_PATHS;
+                            list_free(ri->pathmigration_excluded_paths, free);
+                            ri->pathmigration_excluded_paths = NULL;
                         } else if (!strcmp(key, "ignore")) {
                             group = BLOCK_IGNORE;
                         }
                     } else if (group == BLOCK_METADATA) {
                         if (!strcmp(key, "buildhost_subdomain")) {
                             block = BLOCK_BUILDHOST_SUBDOMAIN;
+                            list_free(ri->buildhost_subdomain, free);
+                            ri->buildhost_subdomain = NULL;
                         }
                     } else if (group == BLOCK_CHANGEDFILES) {
                         if (!strcmp(key, "header_file_extensions")) {
                             block = BLOCK_HEADER_FILE_EXTENSIONS;
+                            list_free(ri->header_file_extensions, free);
+                            ri->header_file_extensions = NULL;
                         } else if (!strcmp(key, "ignore")) {
                             block = BLOCK_IGNORE;
                         }
                     } else if (group == BLOCK_ADDEDFILES) {
                         if (!strcmp(key, "forbidden_path_prefixes")) {
                             block = BLOCK_FORBIDDEN_PATH_PREFIXES;
+                            list_free(ri->forbidden_path_prefixes, free);
+                            ri->forbidden_path_prefixes = NULL;
                         } else if (!strcmp(key, "forbidden_path_suffixes")) {
                             block = BLOCK_FORBIDDEN_PATH_SUFFIXES;
+                            list_free(ri->forbidden_path_suffixes, free);
+                            ri->forbidden_path_suffixes = NULL;
                         } else if (!strcmp(key, "forbidden_directories")) {
                             block = BLOCK_FORBIDDEN_DIRECTORIES;
+                            list_free(ri->forbidden_directories, free);
+                            ri->forbidden_directories = NULL;
                         } else if (!strcmp(key, "ignore")) {
                             block = BLOCK_IGNORE;
                         }
                     } else if (group == BLOCK_OWNERSHIP) {
                         if (!strcmp(key, "bin_paths")) {
                             block = BLOCK_BIN_PATHS;
+                            list_free(ri->bin_paths, free);
+                            ri->bin_paths = NULL;
                         } else if (!strcmp(key, "forbidden_owners")) {
                             block = BLOCK_FORBIDDEN_OWNERS;
+                            list_free(ri->forbidden_owners, free);
+                            ri->forbidden_owners = NULL;
                         } else if (!strcmp(key, "forbidden_groups")) {
                             block = BLOCK_FORBIDDEN_GROUPS;
+                            list_free(ri->forbidden_groups, free);
+                            ri->forbidden_groups = NULL;
                         } else if (!strcmp(key, "ignore")) {
                             block = BLOCK_IGNORE;
                         }
                     } else if (group == BLOCK_SHELLSYNTAX) {
                         if (!strcmp(key, "shells")) {
                             block = BLOCK_SHELLS;
+                            list_free(ri->shells, free);
+                            ri->shells = NULL;
                         } else if (!strcmp(key, "ignore")) {
                             block = BLOCK_IGNORE;
                         }
                     } else if (group == BLOCK_LTO) {
                         if (!strcmp(key, "lto_symbol_name_prefixes")) {
                             block = BLOCK_LTO_SYMBOL_NAME_PREFIXES;
+                            list_free(ri->lto_symbol_name_prefixes, free);
+                            ri->lto_symbol_name_prefixes = NULL;
                         } else if (!strcmp(key, "ignore")) {
                             block = BLOCK_IGNORE;
                         }
                     } else if (group == BLOCK_FILES) {
                         if (!strcmp(key, "forbidden_paths")) {
                             block = BLOCK_FORBIDDEN_PATHS;
+                            list_free(ri->forbidden_paths, free);
+                            ri->forbidden_paths = NULL;
                         } else if (!strcmp(key, "ignore")) {
                             block = BLOCK_IGNORE;
                         }
                     } else if (group == BLOCK_KMIDIFF) {
                         if (!strcmp(key, "kernel_filenames")) {
                             block = BLOCK_KERNEL_FILENAMES;
+                            list_free(ri->kernel_filenames, free);
+                            ri->kernel_filenames = NULL;
                         } else if (!strcmp(key, "ignore")) {
                             block = BLOCK_IGNORE;
                         }
                     } else if (group == BLOCK_PATCHES) {
                         if (!strcmp(key, "patch_ignore_list")) {
                             block = BLOCK_PATCH_FILENAMES;
+                            list_free(ri->patch_ignore_list, free);
+                            ri->patch_ignore_list = NULL;
                         }
                     } else if (group == BLOCK_RUNPATH) {
                         if (!strcmp(key, "allowed_paths")) {
                             block = BLOCK_RUNPATH_ALLOWED_PATHS;
+                            list_free(ri->runpath_allowed_paths, free);
+                            ri->runpath_allowed_paths = NULL;
                         } else if (!strcmp(key, "allowed_origin_paths")) {
                             block = BLOCK_RUNPATH_ALLOWED_ORIGIN_PATHS;
+                            list_free(ri->runpath_allowed_origin_paths, free);
+                            ri->runpath_allowed_origin_paths = NULL;
                         } else if (!strcmp(key, "origin_prefix_trim")) {
                             block = BLOCK_RUNPATH_ORIGIN_PREFIX_TRIM;
+                            list_free(ri->runpath_origin_prefix_trim, free);
+                            ri->runpath_origin_prefix_trim = NULL;
                         } else if (!strcmp(key, "ignore")) {
                             block = BLOCK_IGNORE;
                         }
@@ -824,6 +873,8 @@ static int read_cfgfile(struct rpminspect *ri, const char *filename)
                     } else if (group == BLOCK_EMPTYRPM) {
                         if (!strcmp(key, "expected_empty")) {
                             block = BLOCK_EXPECTED_EMPTY_RPMS;
+                            list_free(ri->expected_empty_rpms, free);
+                            ri->expected_empty_rpms = NULL;
                         }
                     } else if (group == BLOCK_TYPES) {
                         if (!strcmp(key, "ignore")) {
