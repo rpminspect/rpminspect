@@ -328,18 +328,6 @@ bool find_all(Elf *elf, string_list_t **user_data);
  */
 char *bytes_to_str(unsigned char *array, size_t len);
 
-/* ignore.c */
-/**
- * @brief Given a path and struct rpminspect, determine if the path
- * should be ignored or not.
- *
- * @param ri The struct rpminspect for the program.  @param path The
- * relative path to check (i.e., localpath).  @param root The root
- * directory, optional (pass NULL to use '/').  @return True if path
- * should be ignored, false otherwise.
- */
-bool ignore_path(const struct rpminspect *ri, const char *inspection, const char *path, const char *root);
-
 /* paths.c */
 /**
  * @brief Return the before build debuginfo package path where the
@@ -369,6 +357,18 @@ const char *get_before_debuginfo_path(struct rpminspect *ri, const char *binarch
  */
 const char *get_after_debuginfo_path(struct rpminspect *ri, const char *binarch);
 bool usable_path(const char *path);
+bool match_path(const char *pattern, const char *root, const char *needle);
+
+/**
+ * @brief Given a path and struct rpminspect, determine if the path
+ * should be ignored or not.
+ *
+ * @param ri The struct rpminspect for the program.  @param path The
+ * relative path to check (i.e., localpath).  @param root The root
+ * directory, optional (pass NULL to use '/').  @return True if path
+ * should be ignored, false otherwise.
+ */
+bool ignore_path(const struct rpminspect *ri, const char *inspection, const char *path, const char *root);
 
 /* rebase.c */
 /**
