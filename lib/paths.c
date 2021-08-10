@@ -19,8 +19,14 @@
  * SPDX-License-Identifier: LGPL-3.0-or-later
  */
 
+#include <stdlib.h>
+#include <stdbool.h>
+#include <string.h>
+#include <libgen.h>
+#include <limits.h>
 #include <assert.h>
 #include <err.h>
+#include <glob.h>
 #include <rpm/header.h>
 #include <rpm/rpmtag.h>
 #include "queue.h"
@@ -149,4 +155,134 @@ bool usable_path(const char *path)
     }
 
     return true;
+}
+
+/*
+ * Helper function for glob(7) matching given a path string and
+ * (optional) root directory.
+ */
+bool match_path(const char *pattern, const char *root, const char *needle)
+{
+    bool match = false;
+    int r = 0;
+    int gflags = GLOB_NOSORT | GLOB_PERIOD;
+    char globpath[PATH_MAX + 1];
+    char *globsub = NULL;
+    char *gp = globpath;
+    glob_t found;
+    size_t len = 0;
+    size_t i = 0;
+    char *n = NULL;
+
+    assert(pattern != NULL);
+    assert(needle != NULL);
+
+#ifdef GLOB_BRACE
+    /* this is a GNU extension, see glob(3) */
+    gflags |= GLOB_BRACE;
+#endif
+
+    n = strdup(needle);
+    assert(n != NULL);
+
+    if (root != NULL) {
+        len = strlen(root);
+    }
+
+    memset(globpath, 0, sizeof(globpath));
+
+    if (root != NULL) {
+        gp = stpcpy(gp, root);
+    }
+
+    if (!strprefix(pattern, "/")) {
+        gp = stpcpy(gp, dirname(n));
+    }
+
+    free(n);
+
+    if (!strsuffix(globpath, "/") && !strprefix(pattern, "/")) {
+        gp = stpcpy(gp, "/");
+    }
+
+    gp = stpcpy(gp, pattern);
+    DEBUG_PRINT("globpath=|%s|\n", globpath);
+    r = glob(globpath, gflags, NULL, &found);
+
+    if (r == GLOB_NOSPACE || r == GLOB_ABORTED) {
+        warn("glob()");
+    }
+
+    if (r != 0) {
+        return false;
+    }
+
+    for (i = 0; i < found.gl_pathc; i++) {
+        globsub = found.gl_pathv[i] + len;
+
+        if (!strcmp(globsub, needle)) {
+            match = true;
+            break;
+        }
+    }
+
+    globfree(&found);
+
+    return match;
+}
+
+/**
+ * @brief Given a path and struct rpminspect, determine if the path should be ignored or not.
+ *
+ * @param ri The struct rpminspect for the program.
+ * @param inspection The name of the inspection currently running.
+ * @param path The relative path to check (i.e., localpath).
+ * @param root The root directory, optional (pass NULL to use '/').
+ * @return True if path should be ignored, false otherwise.
+ */
+bool ignore_path(const struct rpminspect *ri, const char *inspection, const char *path, const char *root)
+{
+    bool match = false;
+    string_entry_t *entry = NULL;
+    string_list_map_t *mapentry = NULL;
+
+    assert(ri != NULL);
+
+    if (path == NULL) {
+        return true;
+    }
+
+    DEBUG_PRINT("ignore_path -> path=|%s|\n", path);
+
+    /* first, handle the global ignores */
+    if (ri->ignores != NULL && !TAILQ_EMPTY(ri->ignores)) {
+        TAILQ_FOREACH(entry, ri->ignores, items) {
+            match = match_path(entry->data, root, path);
+
+            if (match) {
+                break;
+            }
+        }
+    }
+
+    if (match) {
+        return match;
+    }
+
+    /* second, handle the per-inspection ignores */
+    if (ri->inspection_ignores != NULL) {
+        HASH_FIND_STR(ri->inspection_ignores, inspection, mapentry);
+
+        if (mapentry != NULL && mapentry->value != NULL && !TAILQ_EMPTY(mapentry->value)) {
+            TAILQ_FOREACH(entry, mapentry->value, items) {
+                match = match_path(entry->data, root, path);
+
+                if (match) {
+                    return match;
+                }
+            }
+        }
+    }
+
+    return match;
 }

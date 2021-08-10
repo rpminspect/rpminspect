@@ -28,7 +28,6 @@ librpminspect_sources = [
     'files.c',
     'flags.c',
     'free.c',
-    'ignore.c',
     'init.c',
     'inspect.c',
     'inspect_addedfiles.c',
