@@ -9,6 +9,8 @@ Contributors
 
 - Alexander Scheel <ascheel@redhat.com>
 
+- Caolán McNamara <caolanm@redhat.com>
+
 - Danilo C. L. de Paula <ddepaula@redhat.com>
 
 - Davide Cavalca <dcavalca@fb.com>
