@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: rpminspect\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-08-06 10:50-0400\n"
+"POT-Creation-Date: 2021-08-10 14:33-0400\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -950,90 +950,90 @@ msgstr ""
 msgid "ignoring malformed %s configuration file: %s"
 msgstr ""
 
-#: lib/init.c:914
+#: lib/init.c:965
 #, c-format
 msgid "*** unknown specname match setting '%s', defaulting to 'full'"
 msgstr ""
 
-#: lib/init.c:923
+#: lib/init.c:974
 #, c-format
 msgid "*** unknown specname primary setting '%s', defaulting to 'name'"
 msgstr ""
 
-#: lib/init.c:934
+#: lib/init.c:985
 msgid "error reading elf include path"
 msgstr ""
 
-#: lib/init.c:943
+#: lib/init.c:994
 msgid "error reading elf exclude path"
 msgstr ""
 
-#: lib/init.c:954
+#: lib/init.c:1005
 msgid "error reading man page include path"
 msgstr ""
 
-#: lib/init.c:963
+#: lib/init.c:1014
 msgid "error reading man page exclude path"
 msgstr ""
 
-#: lib/init.c:974
+#: lib/init.c:1025
 msgid "error reading xml include path"
 msgstr ""
 
-#: lib/init.c:983
+#: lib/init.c:1034
 msgid "error reading xml exclude path"
 msgstr ""
 
-#: lib/init.c:1027
+#: lib/init.c:1078
 #, c-format
 msgid "*** inspection flag must be 'on' or 'off', ignoring for '%s'"
 msgstr ""
 
-#: lib/init.c:1031 src/rpminspect.c:280
+#: lib/init.c:1082 src/rpminspect.c:280
 #, c-format
 msgid "*** Unknown inspection: `%s`"
 msgstr ""
 
-#: lib/init.c:1255
+#: lib/init.c:1306
 #, c-format
 msgid "*** Invalid filename in the fileinfo list: %s"
 msgstr ""
 
-#: lib/init.c:1256
+#: lib/init.c:1307
 msgid "*** From this invalid line:"
 msgstr ""
 
-#: lib/init.c:1257
+#: lib/init.c:1308
 #, c-format
 msgid "***     %s"
 msgstr ""
 
-#: lib/init.c:1666
+#: lib/init.c:1717
 #, c-format
 msgid "*** invalid security rule: %s"
 msgstr ""
 
-#: lib/init.c:1700
+#: lib/init.c:1751
 #, c-format
 msgid "*** unknown security rule: %s"
 msgstr ""
 
-#: lib/init.c:1719
+#: lib/init.c:1770
 #, c-format
 msgid "*** unknown security action: %s"
 msgstr ""
 
-#: lib/init.c:1745
+#: lib/init.c:1796
 #, c-format
 msgid "*** malformed security line: %s"
 msgstr ""
 
-#: lib/init.c:1836 lib/init.c:1857
+#: lib/init.c:1887 lib/init.c:1908
 #, c-format
 msgid "*** error reading '%s'\n"
 msgstr ""
 
-#: lib/init.c:1852
+#: lib/init.c:1903
 #, c-format
 msgid "*** unable to read profile '%s' from %s\n"
 msgstr ""
