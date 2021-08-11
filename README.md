@@ -57,6 +57,12 @@ following environments:
 
 * Amazon Linux 2 on x86_64
 
+* Mageia Linux on x86_64
+
+* Alt Linux on x86_64
+
+* Oracle Linux 8 on x86_64
+
 Additionally, rpminspect is built in the following environments on
 each merge and pull request:
 
