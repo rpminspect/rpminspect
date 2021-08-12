@@ -94,6 +94,7 @@ librpminspect_sources = [
     'rmtree.c',
     'rpm.c',
     'runcmd.c',
+    'secrule.c',
     'strfuncs.c',
     'tty.c',
     'uncompress.c',

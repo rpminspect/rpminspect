@@ -177,6 +177,8 @@ bool match_path(const char *pattern, const char *root, const char *needle)
     assert(pattern != NULL);
     assert(needle != NULL);
 
+DEBUG_PRINT("pattern=|%s|, root=|%s|, needle=|%s|\n", pattern, root, needle);
+
 #ifdef GLOB_BRACE
     /* this is a GNU extension, see glob(3) */
     gflags |= GLOB_BRACE;
@@ -252,21 +254,15 @@ bool ignore_path(const struct rpminspect *ri, const char *inspection, const char
         return true;
     }
 
-    DEBUG_PRINT("ignore_path -> path=|%s|\n", path);
-
     /* first, handle the global ignores */
     if (ri->ignores != NULL && !TAILQ_EMPTY(ri->ignores)) {
         TAILQ_FOREACH(entry, ri->ignores, items) {
             match = match_path(entry->data, root, path);
 
             if (match) {
-                break;
+                return match;
             }
         }
-    }
-
-    if (match) {
-        return match;
     }
 
     /* second, handle the per-inspection ignores */

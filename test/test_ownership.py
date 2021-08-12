@@ -1647,6 +1647,134 @@ class CapSETUIDWithOtherExecRPMs(TestRPMs):
         self.waiver_auth = "Security"
 
 
+class SecuritySKIPCapSETUIDWithOtherExecRPMs(TestRPMs):
+    """
+    For RPM binary files, check that a file with CAP_SETUID set and
+    world execution permissions fails.
+    """
+
+    @unittest.skipUnless(
+        have_caps_support, "rpm lacks %caps macro support (need rpm >= 4.7.0)"
+    )
+    def setUp(self):
+        TestRPMs.setUp(self)
+
+        # add file owned by root w/ setuid capability and g+x mode
+        # (basically duplicate add_installed_file() here because we
+        # need to use the %caps macro)
+        installPath = "bin/skip"
+        sourceId = self.rpm.add_source(rpmfluff.SourceFile("rpminspect", ri_bytes))
+        self.rpm.create_parent_dirs(installPath)
+        self.rpm.section_install += "install -D %%{SOURCE%i} $RPM_BUILD_ROOT/%s\n" % (
+            sourceId,
+            self.rpm.escape_path(installPath),
+        )
+        sub = self.rpm.get_subpackage(None)
+        sub.section_files += (
+            "%%attr(0707,root,bin) %%caps(cap_setuid=ep) /%s\n" % installPath
+        )
+
+        self.inspection = "ownership"
+        self.result = "OK"
+        self.waiver_auth = "Not Waivable"
+
+
+class SecurityINFORMCapSETUIDWithOtherExecRPMs(TestRPMs):
+    """
+    For RPM binary files, check that a file with CAP_SETUID set and
+    world execution permissions fails.
+    """
+
+    @unittest.skipUnless(
+        have_caps_support, "rpm lacks %caps macro support (need rpm >= 4.7.0)"
+    )
+    def setUp(self):
+        TestRPMs.setUp(self)
+
+        # add file owned by root w/ setuid capability and g+x mode
+        # (basically duplicate add_installed_file() here because we
+        # need to use the %caps macro)
+        installPath = "bin/inform"
+        sourceId = self.rpm.add_source(rpmfluff.SourceFile("rpminspect", ri_bytes))
+        self.rpm.create_parent_dirs(installPath)
+        self.rpm.section_install += "install -D %%{SOURCE%i} $RPM_BUILD_ROOT/%s\n" % (
+            sourceId,
+            self.rpm.escape_path(installPath),
+        )
+        sub = self.rpm.get_subpackage(None)
+        sub.section_files += (
+            "%%attr(0707,root,bin) %%caps(cap_setuid=ep) /%s\n" % installPath
+        )
+
+        self.inspection = "ownership"
+        self.result = "INFO"
+        self.waiver_auth = "Security"
+
+
+class SecurityVERIFYCapSETUIDWithOtherExecRPMs(TestRPMs):
+    """
+    For RPM binary files, check that a file with CAP_SETUID set and
+    world execution permissions fails.
+    """
+
+    @unittest.skipUnless(
+        have_caps_support, "rpm lacks %caps macro support (need rpm >= 4.7.0)"
+    )
+    def setUp(self):
+        TestRPMs.setUp(self)
+
+        # add file owned by root w/ setuid capability and g+x mode
+        # (basically duplicate add_installed_file() here because we
+        # need to use the %caps macro)
+        installPath = "bin/verify"
+        sourceId = self.rpm.add_source(rpmfluff.SourceFile("rpminspect", ri_bytes))
+        self.rpm.create_parent_dirs(installPath)
+        self.rpm.section_install += "install -D %%{SOURCE%i} $RPM_BUILD_ROOT/%s\n" % (
+            sourceId,
+            self.rpm.escape_path(installPath),
+        )
+        sub = self.rpm.get_subpackage(None)
+        sub.section_files += (
+            "%%attr(0707,root,bin) %%caps(cap_setuid=ep) /%s\n" % installPath
+        )
+
+        self.inspection = "ownership"
+        self.result = "VERIFY"
+        self.waiver_auth = "Security"
+
+
+class SecurityFAILCapSETUIDWithOtherExecRPMs(TestRPMs):
+    """
+    For RPM binary files, check that a file with CAP_SETUID set and
+    world execution permissions fails.
+    """
+
+    @unittest.skipUnless(
+        have_caps_support, "rpm lacks %caps macro support (need rpm >= 4.7.0)"
+    )
+    def setUp(self):
+        TestRPMs.setUp(self)
+
+        # add file owned by root w/ setuid capability and g+x mode
+        # (basically duplicate add_installed_file() here because we
+        # need to use the %caps macro)
+        installPath = "bin/fail"
+        sourceId = self.rpm.add_source(rpmfluff.SourceFile("rpminspect", ri_bytes))
+        self.rpm.create_parent_dirs(installPath)
+        self.rpm.section_install += "install -D %%{SOURCE%i} $RPM_BUILD_ROOT/%s\n" % (
+            sourceId,
+            self.rpm.escape_path(installPath),
+        )
+        sub = self.rpm.get_subpackage(None)
+        sub.section_files += (
+            "%%attr(0707,root,bin) %%caps(cap_setuid=ep) /%s\n" % installPath
+        )
+
+        self.inspection = "ownership"
+        self.result = "BAD"
+        self.waiver_auth = "Security"
+
+
 class CapSETUIDWithOtherExecKoji(TestKoji):
     """
     For RPMs from Koji builds, check that a file with CAP_SETUID set and
@@ -1663,6 +1791,134 @@ class CapSETUIDWithOtherExecKoji(TestKoji):
         # (basically duplicate add_installed_file() here because we
         # need to use the %caps macro)
         installPath = "bin/rpminspect"
+        sourceId = self.rpm.add_source(rpmfluff.SourceFile("rpminspect", ri_bytes))
+        self.rpm.create_parent_dirs(installPath)
+        self.rpm.section_install += "install -D %%{SOURCE%i} $RPM_BUILD_ROOT/%s\n" % (
+            sourceId,
+            self.rpm.escape_path(installPath),
+        )
+        sub = self.rpm.get_subpackage(None)
+        sub.section_files += (
+            "%%attr(0707,root,bin) %%caps(cap_setuid=ep) /%s\n" % installPath
+        )
+
+        self.inspection = "ownership"
+        self.result = "BAD"
+        self.waiver_auth = "Security"
+
+
+class SecuritySKIPCapSETUIDWithOtherExecKoji(TestKoji):
+    """
+    For RPMs from Koji builds, check that a file with CAP_SETUID set and
+    world execution permissions fails.
+    """
+
+    @unittest.skipUnless(
+        have_caps_support, "rpm lacks %caps macro support (need rpm >= 4.7.0)"
+    )
+    def setUp(self):
+        TestKoji.setUp(self)
+
+        # add file owned by root w/ setuid capability and g+x mode
+        # (basically duplicate add_installed_file() here because we
+        # need to use the %caps macro)
+        installPath = "bin/skip"
+        sourceId = self.rpm.add_source(rpmfluff.SourceFile("rpminspect", ri_bytes))
+        self.rpm.create_parent_dirs(installPath)
+        self.rpm.section_install += "install -D %%{SOURCE%i} $RPM_BUILD_ROOT/%s\n" % (
+            sourceId,
+            self.rpm.escape_path(installPath),
+        )
+        sub = self.rpm.get_subpackage(None)
+        sub.section_files += (
+            "%%attr(0707,root,bin) %%caps(cap_setuid=ep) /%s\n" % installPath
+        )
+
+        self.inspection = "ownership"
+        self.result = "OK"
+        self.waiver_auth = "Not Waivable"
+
+
+class SecurityINFORMCapSETUIDWithOtherExecKoji(TestKoji):
+    """
+    For RPMs from Koji builds, check that a file with CAP_SETUID set and
+    world execution permissions fails.
+    """
+
+    @unittest.skipUnless(
+        have_caps_support, "rpm lacks %caps macro support (need rpm >= 4.7.0)"
+    )
+    def setUp(self):
+        TestKoji.setUp(self)
+
+        # add file owned by root w/ setuid capability and g+x mode
+        # (basically duplicate add_installed_file() here because we
+        # need to use the %caps macro)
+        installPath = "bin/inform"
+        sourceId = self.rpm.add_source(rpmfluff.SourceFile("rpminspect", ri_bytes))
+        self.rpm.create_parent_dirs(installPath)
+        self.rpm.section_install += "install -D %%{SOURCE%i} $RPM_BUILD_ROOT/%s\n" % (
+            sourceId,
+            self.rpm.escape_path(installPath),
+        )
+        sub = self.rpm.get_subpackage(None)
+        sub.section_files += (
+            "%%attr(0707,root,bin) %%caps(cap_setuid=ep) /%s\n" % installPath
+        )
+
+        self.inspection = "ownership"
+        self.result = "INFO"
+        self.waiver_auth = "Security"
+
+
+class SecurityVERIFYCapSETUIDWithOtherExecKoji(TestKoji):
+    """
+    For RPMs from Koji builds, check that a file with CAP_SETUID set and
+    world execution permissions fails.
+    """
+
+    @unittest.skipUnless(
+        have_caps_support, "rpm lacks %caps macro support (need rpm >= 4.7.0)"
+    )
+    def setUp(self):
+        TestKoji.setUp(self)
+
+        # add file owned by root w/ setuid capability and g+x mode
+        # (basically duplicate add_installed_file() here because we
+        # need to use the %caps macro)
+        installPath = "bin/verify"
+        sourceId = self.rpm.add_source(rpmfluff.SourceFile("rpminspect", ri_bytes))
+        self.rpm.create_parent_dirs(installPath)
+        self.rpm.section_install += "install -D %%{SOURCE%i} $RPM_BUILD_ROOT/%s\n" % (
+            sourceId,
+            self.rpm.escape_path(installPath),
+        )
+        sub = self.rpm.get_subpackage(None)
+        sub.section_files += (
+            "%%attr(0707,root,bin) %%caps(cap_setuid=ep) /%s\n" % installPath
+        )
+
+        self.inspection = "ownership"
+        self.result = "VERIFY"
+        self.waiver_auth = "Security"
+
+
+class SecurityFAILCapSETUIDWithOtherExecKoji(TestKoji):
+    """
+    For RPMs from Koji builds, check that a file with CAP_SETUID set and
+    world execution permissions fails.
+    """
+
+    @unittest.skipUnless(
+        have_caps_support, "rpm lacks %caps macro support (need rpm >= 4.7.0)"
+    )
+    def setUp(self):
+        TestKoji.setUp(self)
+
+        # add file owned by root w/ setuid capability and g+x mode
+        # (basically duplicate add_installed_file() here because we
+        # need to use the %caps macro)
+        installPath = "bin/fail"
         sourceId = self.rpm.add_source(rpmfluff.SourceFile("rpminspect", ri_bytes))
         self.rpm.create_parent_dirs(installPath)
         self.rpm.section_install += "install -D %%{SOURCE%i} $RPM_BUILD_ROOT/%s\n" % (
@@ -1713,6 +1969,142 @@ class CapSETUIDWithOtherExecCompareRPMs(TestCompareRPMs):
         self.waiver_auth = "Security"
 
 
+class SecuritySKIPCapSETUIDWithOtherExecCompareRPMs(TestCompareRPMs):
+    """
+    When comparing RPMs, check that a file in the new build with CAP_SETUID set
+    and world execution permissions fails.
+    """
+
+    @unittest.skipUnless(
+        have_caps_support, "rpm lacks %caps macro support (need rpm >= 4.7.0)"
+    )
+    def setUp(self):
+        TestCompareRPMs.setUp(self)
+
+        # add file owned by root w/ setuid capability and o+x mode
+        # (basically duplicate add_installed_file() here because we
+        # need to use the %caps macro)
+        installPath = "bin/skip"
+        sourceId = self.after_rpm.add_source(
+            rpmfluff.SourceFile("rpminspect", ri_bytes)
+        )
+        self.after_rpm.create_parent_dirs(installPath)
+        self.after_rpm.section_install += (
+            "install -D %%{SOURCE%i} $RPM_BUILD_ROOT/%s\n"
+            % (sourceId, self.after_rpm.escape_path(installPath))
+        )
+        sub = self.after_rpm.get_subpackage(None)
+        sub.section_files += (
+            "%%attr(0707,root,bin) %%caps(cap_setuid=ep) /%s\n" % installPath
+        )
+
+        self.inspection = "ownership"
+        self.result = "OK"
+        self.waiver_auth = "Not Waivable"
+
+
+class SecurityINFORMCapSETUIDWithOtherExecCompareRPMs(TestCompareRPMs):
+    """
+    When comparing RPMs, check that a file in the new build with CAP_SETUID set
+    and world execution permissions fails.
+    """
+
+    @unittest.skipUnless(
+        have_caps_support, "rpm lacks %caps macro support (need rpm >= 4.7.0)"
+    )
+    def setUp(self):
+        TestCompareRPMs.setUp(self)
+
+        # add file owned by root w/ setuid capability and o+x mode
+        # (basically duplicate add_installed_file() here because we
+        # need to use the %caps macro)
+        installPath = "bin/inform"
+        sourceId = self.after_rpm.add_source(
+            rpmfluff.SourceFile("rpminspect", ri_bytes)
+        )
+        self.after_rpm.create_parent_dirs(installPath)
+        self.after_rpm.section_install += (
+            "install -D %%{SOURCE%i} $RPM_BUILD_ROOT/%s\n"
+            % (sourceId, self.after_rpm.escape_path(installPath))
+        )
+        sub = self.after_rpm.get_subpackage(None)
+        sub.section_files += (
+            "%%attr(0707,root,bin) %%caps(cap_setuid=ep) /%s\n" % installPath
+        )
+
+        self.inspection = "ownership"
+        self.result = "INFO"
+        self.waiver_auth = "Security"
+
+
+class SecurityVERIFYCapSETUIDWithOtherExecCompareRPMs(TestCompareRPMs):
+    """
+    When comparing RPMs, check that a file in the new build with CAP_SETUID set
+    and world execution permissions fails.
+    """
+
+    @unittest.skipUnless(
+        have_caps_support, "rpm lacks %caps macro support (need rpm >= 4.7.0)"
+    )
+    def setUp(self):
+        TestCompareRPMs.setUp(self)
+
+        # add file owned by root w/ setuid capability and o+x mode
+        # (basically duplicate add_installed_file() here because we
+        # need to use the %caps macro)
+        installPath = "bin/verify"
+        sourceId = self.after_rpm.add_source(
+            rpmfluff.SourceFile("rpminspect", ri_bytes)
+        )
+        self.after_rpm.create_parent_dirs(installPath)
+        self.after_rpm.section_install += (
+            "install -D %%{SOURCE%i} $RPM_BUILD_ROOT/%s\n"
+            % (sourceId, self.after_rpm.escape_path(installPath))
+        )
+        sub = self.after_rpm.get_subpackage(None)
+        sub.section_files += (
+            "%%attr(0707,root,bin) %%caps(cap_setuid=ep) /%s\n" % installPath
+        )
+
+        self.inspection = "ownership"
+        self.result = "VERIFY"
+        self.waiver_auth = "Security"
+
+
+class SecurityFAILCapSETUIDWithOtherExecCompareRPMs(TestCompareRPMs):
+    """
+    When comparing RPMs, check that a file in the new build with CAP_SETUID set
+    and world execution permissions fails.
+    """
+
+    @unittest.skipUnless(
+        have_caps_support, "rpm lacks %caps macro support (need rpm >= 4.7.0)"
+    )
+    def setUp(self):
+        TestCompareRPMs.setUp(self)
+
+        # add file owned by root w/ setuid capability and o+x mode
+        # (basically duplicate add_installed_file() here because we
+        # need to use the %caps macro)
+        installPath = "bin/fail"
+        sourceId = self.after_rpm.add_source(
+            rpmfluff.SourceFile("rpminspect", ri_bytes)
+        )
+        self.after_rpm.create_parent_dirs(installPath)
+        self.after_rpm.section_install += (
+            "install -D %%{SOURCE%i} $RPM_BUILD_ROOT/%s\n"
+            % (sourceId, self.after_rpm.escape_path(installPath))
+        )
+        sub = self.after_rpm.get_subpackage(None)
+        sub.section_files += (
+            "%%attr(0707,root,bin) %%caps(cap_setuid=ep) /%s\n" % installPath
+        )
+
+        self.inspection = "ownership"
+        self.result = "BAD"
+        self.waiver_auth = "Security"
+
+
 class CapSETUIDWithOtherExecCompareKoji(TestCompareKoji):
     """
     When comparing RPMs from Koji builds, check that a file in the new build
@@ -1729,6 +2121,142 @@ class CapSETUIDWithOtherExecCompareKoji(TestCompareKoji):
         # (basically duplicate add_installed_file() here because we
         # need to use the %caps macro)
         installPath = "bin/rpminspect"
+        sourceId = self.after_rpm.add_source(
+            rpmfluff.SourceFile("rpminspect", ri_bytes)
+        )
+        self.after_rpm.create_parent_dirs(installPath)
+        self.after_rpm.section_install += (
+            "install -D %%{SOURCE%i} $RPM_BUILD_ROOT/%s\n"
+            % (sourceId, self.after_rpm.escape_path(installPath))
+        )
+        sub = self.after_rpm.get_subpackage(None)
+        sub.section_files += (
+            "%%attr(0707,root,bin) %%caps(cap_setuid=ep) /%s\n" % installPath
+        )
+
+        self.inspection = "ownership"
+        self.result = "BAD"
+        self.waiver_auth = "Security"
+
+
+class SecuritySKIPCapSETUIDWithOtherExecCompareKoji(TestCompareKoji):
+    """
+    When comparing RPMs from Koji builds, check that a file in the new build
+    with CAP_SETUID set and world execution permissions fails.
+    """
+
+    @unittest.skipUnless(
+        have_caps_support, "rpm lacks %caps macro support (need rpm >= 4.7.0)"
+    )
+    def setUp(self):
+        TestCompareKoji.setUp(self)
+
+        # add file owned by root w/ setuid capability and o+x mode
+        # (basically duplicate add_installed_file() here because we
+        # need to use the %caps macro)
+        installPath = "bin/skip"
+        sourceId = self.after_rpm.add_source(
+            rpmfluff.SourceFile("rpminspect", ri_bytes)
+        )
+        self.after_rpm.create_parent_dirs(installPath)
+        self.after_rpm.section_install += (
+            "install -D %%{SOURCE%i} $RPM_BUILD_ROOT/%s\n"
+            % (sourceId, self.after_rpm.escape_path(installPath))
+        )
+        sub = self.after_rpm.get_subpackage(None)
+        sub.section_files += (
+            "%%attr(0707,root,bin) %%caps(cap_setuid=ep) /%s\n" % installPath
+        )
+
+        self.inspection = "ownership"
+        self.result = "OK"
+        self.waiver_auth = "Not Waivable"
+
+
+class SecurityINFORMCapSETUIDWithOtherExecCompareKoji(TestCompareKoji):
+    """
+    When comparing RPMs from Koji builds, check that a file in the new build
+    with CAP_SETUID set and world execution permissions fails.
+    """
+
+    @unittest.skipUnless(
+        have_caps_support, "rpm lacks %caps macro support (need rpm >= 4.7.0)"
+    )
+    def setUp(self):
+        TestCompareKoji.setUp(self)
+
+        # add file owned by root w/ setuid capability and o+x mode
+        # (basically duplicate add_installed_file() here because we
+        # need to use the %caps macro)
+        installPath = "bin/inform"
+        sourceId = self.after_rpm.add_source(
+            rpmfluff.SourceFile("rpminspect", ri_bytes)
+        )
+        self.after_rpm.create_parent_dirs(installPath)
+        self.after_rpm.section_install += (
+            "install -D %%{SOURCE%i} $RPM_BUILD_ROOT/%s\n"
+            % (sourceId, self.after_rpm.escape_path(installPath))
+        )
+        sub = self.after_rpm.get_subpackage(None)
+        sub.section_files += (
+            "%%attr(0707,root,bin) %%caps(cap_setuid=ep) /%s\n" % installPath
+        )
+
+        self.inspection = "ownership"
+        self.result = "INFO"
+        self.waiver_auth = "Security"
+
+
+class SecurityVERIFYCapSETUIDWithOtherExecCompareKoji(TestCompareKoji):
+    """
+    When comparing RPMs from Koji builds, check that a file in the new build
+    with CAP_SETUID set and world execution permissions fails.
+    """
+
+    @unittest.skipUnless(
+        have_caps_support, "rpm lacks %caps macro support (need rpm >= 4.7.0)"
+    )
+    def setUp(self):
+        TestCompareKoji.setUp(self)
+
+        # add file owned by root w/ setuid capability and o+x mode
+        # (basically duplicate add_installed_file() here because we
+        # need to use the %caps macro)
+        installPath = "bin/verify"
+        sourceId = self.after_rpm.add_source(
+            rpmfluff.SourceFile("rpminspect", ri_bytes)
+        )
+        self.after_rpm.create_parent_dirs(installPath)
+        self.after_rpm.section_install += (
+            "install -D %%{SOURCE%i} $RPM_BUILD_ROOT/%s\n"
+            % (sourceId, self.after_rpm.escape_path(installPath))
+        )
+        sub = self.after_rpm.get_subpackage(None)
+        sub.section_files += (
+            "%%attr(0707,root,bin) %%caps(cap_setuid=ep) /%s\n" % installPath
+        )
+
+        self.inspection = "ownership"
+        self.result = "VERIFY"
+        self.waiver_auth = "Security"
+
+
+class SecurityFAILCapSETUIDWithOtherExecCompareKoji(TestCompareKoji):
+    """
+    When comparing RPMs from Koji builds, check that a file in the new build
+    with CAP_SETUID set and world execution permissions fails.
+    """
+
+    @unittest.skipUnless(
+        have_caps_support, "rpm lacks %caps macro support (need rpm >= 4.7.0)"
+    )
+    def setUp(self):
+        TestCompareKoji.setUp(self)
+
+        # add file owned by root w/ setuid capability and o+x mode
+        # (basically duplicate add_installed_file() here because we
+        # need to use the %caps macro)
+        installPath = "bin/fail"
         sourceId = self.after_rpm.add_source(
             rpmfluff.SourceFile("rpminspect", ri_bytes)
         )
@@ -1784,6 +2312,134 @@ class CapSETUIDWithGroupExecRPMs(TestRPMs):
         self.waiver_auth = "Security"
 
 
+class SecuritySKIPCapSETUIDWithGroupExecRPMs(TestRPMs):
+    """
+    For RPM binary files, check that a file with CAP_SETUID set
+    and group execution permissions fails.
+    """
+
+    @unittest.skipUnless(
+        have_caps_support, "rpm lacks %caps macro support (need rpm >= 4.7.0)"
+    )
+    def setUp(self):
+        TestRPMs.setUp(self)
+
+        # add file owned by root w/ setuid capability and g+x mode
+        # (basically duplicate add_installed_file() here because we
+        # need to use the %caps macro)
+        installPath = "bin/skip"
+        sourceId = self.rpm.add_source(rpmfluff.SourceFile("rpminspect", ri_bytes))
+        self.rpm.create_parent_dirs(installPath)
+        self.rpm.section_install += "install -D %%{SOURCE%i} $RPM_BUILD_ROOT/%s\n" % (
+            sourceId,
+            self.rpm.escape_path(installPath),
+        )
+        sub = self.rpm.get_subpackage(None)
+        sub.section_files += (
+            "%%attr(0770,root,bin) %%caps(cap_setuid=ep) /%s\n" % installPath
+        )
+
+        self.inspection = "ownership"
+        self.result = "OK"
+        self.waiver_auth = "Not Waivable"
+
+
+class SecurityINFORMCapSETUIDWithGroupExecRPMs(TestRPMs):
+    """
+    For RPM binary files, check that a file with CAP_SETUID set
+    and group execution permissions fails.
+    """
+
+    @unittest.skipUnless(
+        have_caps_support, "rpm lacks %caps macro support (need rpm >= 4.7.0)"
+    )
+    def setUp(self):
+        TestRPMs.setUp(self)
+
+        # add file owned by root w/ setuid capability and g+x mode
+        # (basically duplicate add_installed_file() here because we
+        # need to use the %caps macro)
+        installPath = "bin/inform"
+        sourceId = self.rpm.add_source(rpmfluff.SourceFile("rpminspect", ri_bytes))
+        self.rpm.create_parent_dirs(installPath)
+        self.rpm.section_install += "install -D %%{SOURCE%i} $RPM_BUILD_ROOT/%s\n" % (
+            sourceId,
+            self.rpm.escape_path(installPath),
+        )
+        sub = self.rpm.get_subpackage(None)
+        sub.section_files += (
+            "%%attr(0770,root,bin) %%caps(cap_setuid=ep) /%s\n" % installPath
+        )
+
+        self.inspection = "ownership"
+        self.result = "INFO"
+        self.waiver_auth = "Security"
+
+
+class SecurityVERIFYCapSETUIDWithGroupExecRPMs(TestRPMs):
+    """
+    For RPM binary files, check that a file with CAP_SETUID set
+    and group execution permissions fails.
+    """
+
+    @unittest.skipUnless(
+        have_caps_support, "rpm lacks %caps macro support (need rpm >= 4.7.0)"
+    )
+    def setUp(self):
+        TestRPMs.setUp(self)
+
+        # add file owned by root w/ setuid capability and g+x mode
+        # (basically duplicate add_installed_file() here because we
+        # need to use the %caps macro)
+        installPath = "bin/verify"
+        sourceId = self.rpm.add_source(rpmfluff.SourceFile("rpminspect", ri_bytes))
+        self.rpm.create_parent_dirs(installPath)
+        self.rpm.section_install += "install -D %%{SOURCE%i} $RPM_BUILD_ROOT/%s\n" % (
+            sourceId,
+            self.rpm.escape_path(installPath),
+        )
+        sub = self.rpm.get_subpackage(None)
+        sub.section_files += (
+            "%%attr(0770,root,bin) %%caps(cap_setuid=ep) /%s\n" % installPath
+        )
+
+        self.inspection = "ownership"
+        self.result = "VERIFY"
+        self.waiver_auth = "Security"
+
+
+class SecurityFAILCapSETUIDWithGroupExecRPMs(TestRPMs):
+    """
+    For RPM binary files, check that a file with CAP_SETUID set
+    and group execution permissions fails.
+    """
+
+    @unittest.skipUnless(
+        have_caps_support, "rpm lacks %caps macro support (need rpm >= 4.7.0)"
+    )
+    def setUp(self):
+        TestRPMs.setUp(self)
+
+        # add file owned by root w/ setuid capability and g+x mode
+        # (basically duplicate add_installed_file() here because we
+        # need to use the %caps macro)
+        installPath = "bin/fail"
+        sourceId = self.rpm.add_source(rpmfluff.SourceFile("rpminspect", ri_bytes))
+        self.rpm.create_parent_dirs(installPath)
+        self.rpm.section_install += "install -D %%{SOURCE%i} $RPM_BUILD_ROOT/%s\n" % (
+            sourceId,
+            self.rpm.escape_path(installPath),
+        )
+        sub = self.rpm.get_subpackage(None)
+        sub.section_files += (
+            "%%attr(0770,root,bin) %%caps(cap_setuid=ep) /%s\n" % installPath
+        )
+
+        self.inspection = "ownership"
+        self.result = "BAD"
+        self.waiver_auth = "Security"
+
+
 class CapSETUIDWithGroupExecKoji(TestKoji):
     """
     For RPMs in Koji builds, check that a file with CAP_SETUID set
@@ -1800,6 +2456,134 @@ class CapSETUIDWithGroupExecKoji(TestKoji):
         # (basically duplicate add_installed_file() here because we
         # need to use the %caps macro)
         installPath = "bin/rpminspect"
+        sourceId = self.rpm.add_source(rpmfluff.SourceFile("rpminspect", ri_bytes))
+        self.rpm.create_parent_dirs(installPath)
+        self.rpm.section_install += "install -D %%{SOURCE%i} $RPM_BUILD_ROOT/%s\n" % (
+            sourceId,
+            self.rpm.escape_path(installPath),
+        )
+        sub = self.rpm.get_subpackage(None)
+        sub.section_files += (
+            "%%attr(0770,root,bin) %%caps(cap_setuid=ep) /%s\n" % installPath
+        )
+
+        self.inspection = "ownership"
+        self.result = "BAD"
+        self.waiver_auth = "Security"
+
+
+class SecuritySKIPCapSETUIDWithGroupExecKoji(TestKoji):
+    """
+    For RPMs in Koji builds, check that a file with CAP_SETUID set
+    and group execution permissions fails.
+    """
+
+    @unittest.skipUnless(
+        have_caps_support, "rpm lacks %caps macro support (need rpm >= 4.7.0)"
+    )
+    def setUp(self):
+        TestKoji.setUp(self)
+
+        # add file owned by root w/ setuid capability and g+x mode
+        # (basically duplicate add_installed_file() here because we
+        # need to use the %caps macro)
+        installPath = "bin/skip"
+        sourceId = self.rpm.add_source(rpmfluff.SourceFile("rpminspect", ri_bytes))
+        self.rpm.create_parent_dirs(installPath)
+        self.rpm.section_install += "install -D %%{SOURCE%i} $RPM_BUILD_ROOT/%s\n" % (
+            sourceId,
+            self.rpm.escape_path(installPath),
+        )
+        sub = self.rpm.get_subpackage(None)
+        sub.section_files += (
+            "%%attr(0770,root,bin) %%caps(cap_setuid=ep) /%s\n" % installPath
+        )
+
+        self.inspection = "ownership"
+        self.result = "OK"
+        self.waiver_auth = "Not Waivable"
+
+
+class SecurityINFORMCapSETUIDWithGroupExecKoji(TestKoji):
+    """
+    For RPMs in Koji builds, check that a file with CAP_SETUID set
+    and group execution permissions fails.
+    """
+
+    @unittest.skipUnless(
+        have_caps_support, "rpm lacks %caps macro support (need rpm >= 4.7.0)"
+    )
+    def setUp(self):
+        TestKoji.setUp(self)
+
+        # add file owned by root w/ setuid capability and g+x mode
+        # (basically duplicate add_installed_file() here because we
+        # need to use the %caps macro)
+        installPath = "bin/inform"
+        sourceId = self.rpm.add_source(rpmfluff.SourceFile("rpminspect", ri_bytes))
+        self.rpm.create_parent_dirs(installPath)
+        self.rpm.section_install += "install -D %%{SOURCE%i} $RPM_BUILD_ROOT/%s\n" % (
+            sourceId,
+            self.rpm.escape_path(installPath),
+        )
+        sub = self.rpm.get_subpackage(None)
+        sub.section_files += (
+            "%%attr(0770,root,bin) %%caps(cap_setuid=ep) /%s\n" % installPath
+        )
+
+        self.inspection = "ownership"
+        self.result = "INFO"
+        self.waiver_auth = "Security"
+
+
+class SecurityVERIFYCapSETUIDWithGroupExecKoji(TestKoji):
+    """
+    For RPMs in Koji builds, check that a file with CAP_SETUID set
+    and group execution permissions fails.
+    """
+
+    @unittest.skipUnless(
+        have_caps_support, "rpm lacks %caps macro support (need rpm >= 4.7.0)"
+    )
+    def setUp(self):
+        TestKoji.setUp(self)
+
+        # add file owned by root w/ setuid capability and g+x mode
+        # (basically duplicate add_installed_file() here because we
+        # need to use the %caps macro)
+        installPath = "bin/verify"
+        sourceId = self.rpm.add_source(rpmfluff.SourceFile("rpminspect", ri_bytes))
+        self.rpm.create_parent_dirs(installPath)
+        self.rpm.section_install += "install -D %%{SOURCE%i} $RPM_BUILD_ROOT/%s\n" % (
+            sourceId,
+            self.rpm.escape_path(installPath),
+        )
+        sub = self.rpm.get_subpackage(None)
+        sub.section_files += (
+            "%%attr(0770,root,bin) %%caps(cap_setuid=ep) /%s\n" % installPath
+        )
+
+        self.inspection = "ownership"
+        self.result = "VERIFY"
+        self.waiver_auth = "Security"
+
+
+class SecurityFAILCapSETUIDWithGroupExecKoji(TestKoji):
+    """
+    For RPMs in Koji builds, check that a file with CAP_SETUID set
+    and group execution permissions fails.
+    """
+
+    @unittest.skipUnless(
+        have_caps_support, "rpm lacks %caps macro support (need rpm >= 4.7.0)"
+    )
+    def setUp(self):
+        TestKoji.setUp(self)
+
+        # add file owned by root w/ setuid capability and g+x mode
+        # (basically duplicate add_installed_file() here because we
+        # need to use the %caps macro)
+        installPath = "bin/fail"
         sourceId = self.rpm.add_source(rpmfluff.SourceFile("rpminspect", ri_bytes))
         self.rpm.create_parent_dirs(installPath)
         self.rpm.section_install += "install -D %%{SOURCE%i} $RPM_BUILD_ROOT/%s\n" % (
@@ -1850,6 +2634,142 @@ class CapSETUIDWithGroupExecCompareRPMs(TestCompareRPMs):
         self.waiver_auth = "Security"
 
 
+class SecuritySKIPCapSETUIDWithGroupExecCompareRPMs(TestCompareRPMs):
+    """
+    When comparing RPMs, check that a file in the new build with CAP_SETUID set
+    and world execution permissions fails.
+    """
+
+    @unittest.skipUnless(
+        have_caps_support, "rpm lacks %caps macro support (need rpm >= 4.7.0)"
+    )
+    def setUp(self):
+        TestCompareRPMs.setUp(self)
+
+        # add file owned by root w/ setuid capability and g+x mode
+        # (basically duplicate add_installed_file() here because we
+        # need to use the %caps macro)
+        installPath = "bin/skip"
+        sourceId = self.after_rpm.add_source(
+            rpmfluff.SourceFile("rpminspect", ri_bytes)
+        )
+        self.after_rpm.create_parent_dirs(installPath)
+        self.after_rpm.section_install += (
+            "install -D %%{SOURCE%i} $RPM_BUILD_ROOT/%s\n"
+            % (sourceId, self.after_rpm.escape_path(installPath))
+        )
+        sub = self.after_rpm.get_subpackage(None)
+        sub.section_files += (
+            "%%attr(0770,root,bin) %%caps(cap_setuid=ep) /%s\n" % installPath
+        )
+
+        self.inspection = "ownership"
+        self.result = "OK"
+        self.waiver_auth = "Not Waivable"
+
+
+class SecurityINFORMCapSETUIDWithGroupExecCompareRPMs(TestCompareRPMs):
+    """
+    When comparing RPMs, check that a file in the new build with CAP_SETUID set
+    and world execution permissions fails.
+    """
+
+    @unittest.skipUnless(
+        have_caps_support, "rpm lacks %caps macro support (need rpm >= 4.7.0)"
+    )
+    def setUp(self):
+        TestCompareRPMs.setUp(self)
+
+        # add file owned by root w/ setuid capability and g+x mode
+        # (basically duplicate add_installed_file() here because we
+        # need to use the %caps macro)
+        installPath = "bin/inform"
+        sourceId = self.after_rpm.add_source(
+            rpmfluff.SourceFile("rpminspect", ri_bytes)
+        )
+        self.after_rpm.create_parent_dirs(installPath)
+        self.after_rpm.section_install += (
+            "install -D %%{SOURCE%i} $RPM_BUILD_ROOT/%s\n"
+            % (sourceId, self.after_rpm.escape_path(installPath))
+        )
+        sub = self.after_rpm.get_subpackage(None)
+        sub.section_files += (
+            "%%attr(0770,root,bin) %%caps(cap_setuid=ep) /%s\n" % installPath
+        )
+
+        self.inspection = "ownership"
+        self.result = "INFO"
+        self.waiver_auth = "Security"
+
+
+class SecurityVERIFYCapSETUIDWithGroupExecCompareRPMs(TestCompareRPMs):
+    """
+    When comparing RPMs, check that a file in the new build with CAP_SETUID set
+    and world execution permissions fails.
+    """
+
+    @unittest.skipUnless(
+        have_caps_support, "rpm lacks %caps macro support (need rpm >= 4.7.0)"
+    )
+    def setUp(self):
+        TestCompareRPMs.setUp(self)
+
+        # add file owned by root w/ setuid capability and g+x mode
+        # (basically duplicate add_installed_file() here because we
+        # need to use the %caps macro)
+        installPath = "bin/verify"
+        sourceId = self.after_rpm.add_source(
+            rpmfluff.SourceFile("rpminspect", ri_bytes)
+        )
+        self.after_rpm.create_parent_dirs(installPath)
+        self.after_rpm.section_install += (
+            "install -D %%{SOURCE%i} $RPM_BUILD_ROOT/%s\n"
+            % (sourceId, self.after_rpm.escape_path(installPath))
+        )
+        sub = self.after_rpm.get_subpackage(None)
+        sub.section_files += (
+            "%%attr(0770,root,bin) %%caps(cap_setuid=ep) /%s\n" % installPath
+        )
+
+        self.inspection = "ownership"
+        self.result = "VERIFY"
+        self.waiver_auth = "Security"
+
+
+class SecurityFAILCapSETUIDWithGroupExecCompareRPMs(TestCompareRPMs):
+    """
+    When comparing RPMs, check that a file in the new build with CAP_SETUID set
+    and world execution permissions fails.
+    """
+
+    @unittest.skipUnless(
+        have_caps_support, "rpm lacks %caps macro support (need rpm >= 4.7.0)"
+    )
+    def setUp(self):
+        TestCompareRPMs.setUp(self)
+
+        # add file owned by root w/ setuid capability and g+x mode
+        # (basically duplicate add_installed_file() here because we
+        # need to use the %caps macro)
+        installPath = "bin/fail"
+        sourceId = self.after_rpm.add_source(
+            rpmfluff.SourceFile("rpminspect", ri_bytes)
+        )
+        self.after_rpm.create_parent_dirs(installPath)
+        self.after_rpm.section_install += (
+            "install -D %%{SOURCE%i} $RPM_BUILD_ROOT/%s\n"
+            % (sourceId, self.after_rpm.escape_path(installPath))
+        )
+        sub = self.after_rpm.get_subpackage(None)
+        sub.section_files += (
+            "%%attr(0770,root,bin) %%caps(cap_setuid=ep) /%s\n" % installPath
+        )
+
+        self.inspection = "ownership"
+        self.result = "BAD"
+        self.waiver_auth = "Security"
+
+
 class CapSETUIDWithGroupExecCompareKoji(TestCompareKoji):
     """
     When comparing RPMs from Koji builds, check that a file in the new build
@@ -1866,6 +2786,142 @@ class CapSETUIDWithGroupExecCompareKoji(TestCompareKoji):
         # (basically duplicate add_installed_file() here because we
         # need to use the %caps macro)
         installPath = "bin/rpminspect"
+        sourceId = self.after_rpm.add_source(
+            rpmfluff.SourceFile("rpminspect", ri_bytes)
+        )
+        self.after_rpm.create_parent_dirs(installPath)
+        self.after_rpm.section_install += (
+            "install -D %%{SOURCE%i} $RPM_BUILD_ROOT/%s\n"
+            % (sourceId, self.after_rpm.escape_path(installPath))
+        )
+        sub = self.after_rpm.get_subpackage(None)
+        sub.section_files += (
+            "%%attr(0770,root,bin) %%caps(cap_setuid=ep) /%s\n" % installPath
+        )
+
+        self.inspection = "ownership"
+        self.result = "BAD"
+        self.waiver_auth = "Security"
+
+
+class SecuritySKIPCapSETUIDWithGroupExecCompareKoji(TestCompareKoji):
+    """
+    When comparing RPMs from Koji builds, check that a file in the new build
+    with CAP_SETUID set and world execution permissions fails.
+    """
+
+    @unittest.skipUnless(
+        have_caps_support, "rpm lacks %caps macro support (need rpm >= 4.7.0)"
+    )
+    def setUp(self):
+        TestCompareKoji.setUp(self)
+
+        # add file owned by root w/ setuid capability and g+x mode
+        # (basically duplicate add_installed_file() here because we
+        # need to use the %caps macro)
+        installPath = "bin/skip"
+        sourceId = self.after_rpm.add_source(
+            rpmfluff.SourceFile("rpminspect", ri_bytes)
+        )
+        self.after_rpm.create_parent_dirs(installPath)
+        self.after_rpm.section_install += (
+            "install -D %%{SOURCE%i} $RPM_BUILD_ROOT/%s\n"
+            % (sourceId, self.after_rpm.escape_path(installPath))
+        )
+        sub = self.after_rpm.get_subpackage(None)
+        sub.section_files += (
+            "%%attr(0770,root,bin) %%caps(cap_setuid=ep) /%s\n" % installPath
+        )
+
+        self.inspection = "ownership"
+        self.result = "OK"
+        self.waiver_auth = "Not Waivable"
+
+
+class SecurityINFORMCapSETUIDWithGroupExecCompareKoji(TestCompareKoji):
+    """
+    When comparing RPMs from Koji builds, check that a file in the new build
+    with CAP_SETUID set and world execution permissions fails.
+    """
+
+    @unittest.skipUnless(
+        have_caps_support, "rpm lacks %caps macro support (need rpm >= 4.7.0)"
+    )
+    def setUp(self):
+        TestCompareKoji.setUp(self)
+
+        # add file owned by root w/ setuid capability and g+x mode
+        # (basically duplicate add_installed_file() here because we
+        # need to use the %caps macro)
+        installPath = "bin/inform"
+        sourceId = self.after_rpm.add_source(
+            rpmfluff.SourceFile("rpminspect", ri_bytes)
+        )
+        self.after_rpm.create_parent_dirs(installPath)
+        self.after_rpm.section_install += (
+            "install -D %%{SOURCE%i} $RPM_BUILD_ROOT/%s\n"
+            % (sourceId, self.after_rpm.escape_path(installPath))
+        )
+        sub = self.after_rpm.get_subpackage(None)
+        sub.section_files += (
+            "%%attr(0770,root,bin) %%caps(cap_setuid=ep) /%s\n" % installPath
+        )
+
+        self.inspection = "ownership"
+        self.result = "INFO"
+        self.waiver_auth = "Security"
+
+
+class SecurityVERIFYCapSETUIDWithGroupExecCompareKoji(TestCompareKoji):
+    """
+    When comparing RPMs from Koji builds, check that a file in the new build
+    with CAP_SETUID set and world execution permissions fails.
+    """
+
+    @unittest.skipUnless(
+        have_caps_support, "rpm lacks %caps macro support (need rpm >= 4.7.0)"
+    )
+    def setUp(self):
+        TestCompareKoji.setUp(self)
+
+        # add file owned by root w/ setuid capability and g+x mode
+        # (basically duplicate add_installed_file() here because we
+        # need to use the %caps macro)
+        installPath = "bin/verify"
+        sourceId = self.after_rpm.add_source(
+            rpmfluff.SourceFile("rpminspect", ri_bytes)
+        )
+        self.after_rpm.create_parent_dirs(installPath)
+        self.after_rpm.section_install += (
+            "install -D %%{SOURCE%i} $RPM_BUILD_ROOT/%s\n"
+            % (sourceId, self.after_rpm.escape_path(installPath))
+        )
+        sub = self.after_rpm.get_subpackage(None)
+        sub.section_files += (
+            "%%attr(0770,root,bin) %%caps(cap_setuid=ep) /%s\n" % installPath
+        )
+
+        self.inspection = "ownership"
+        self.result = "VERIFY"
+        self.waiver_auth = "Security"
+
+
+class SecurityFAILCapSETUIDWithGroupExecCompareKoji(TestCompareKoji):
+    """
+    When comparing RPMs from Koji builds, check that a file in the new build
+    with CAP_SETUID set and world execution permissions fails.
+    """
+
+    @unittest.skipUnless(
+        have_caps_support, "rpm lacks %caps macro support (need rpm >= 4.7.0)"
+    )
+    def setUp(self):
+        TestCompareKoji.setUp(self)
+
+        # add file owned by root w/ setuid capability and g+x mode
+        # (basically duplicate add_installed_file() here because we
+        # need to use the %caps macro)
+        installPath = "bin/fail"
         sourceId = self.after_rpm.add_source(
             rpmfluff.SourceFile("rpminspect", ri_bytes)
         )

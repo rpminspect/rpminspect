@@ -169,6 +169,7 @@ void free_rpminspect(struct rpminspect *ri) {
             sentry = TAILQ_FIRST(ri->security);
             TAILQ_REMOVE(ri->security, sentry, items);
 
+            free(sentry->path);
             free(sentry->pkg);
             free(sentry->ver);
             free(sentry->rel);
