@@ -157,11 +157,17 @@ static bool addedfiles_driver(struct rpminspect *ri, rpmfile_entry_t *file)
             }
 
             if (strprefix(file->localpath, subpath)) {
-                params.severity = RESULT_VERIFY;
-                params.waiverauth = WAIVABLE_BY_SECURITY;
-                xasprintf(&params.msg, _("New security-related file `%s` added on %s requires inspection by the Security Team"), file->localpath, arch);
-                add_result(ri, &params);
-                result = !(params.severity >= RESULT_VERIFY);
+                params.severity = get_secrule_result_severity(ri, file, SECRULE_SECURITYPATH);
+
+                if (params.severity != RESULT_NULL && params.severity != RESULT_SKIP) {
+                    params.waiverauth = WAIVABLE_BY_SECURITY;
+                    xasprintf(&params.msg, _("New security-related file `%s` added on %s requires inspection by the Security Team"), file->localpath, arch);
+                    add_result(ri, &params);
+                    result = !(params.severity >= RESULT_VERIFY);
+                } else {
+                    result = true;
+                }
+
                 goto done;
             }
         }
