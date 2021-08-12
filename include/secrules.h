@@ -19,9 +19,6 @@
  * SPDX-License-Identifier: LGPL-3.0-or-later
  */
 
-#include "queue.h"
-#include "uthash.h"
-
 #ifndef _LIBRPMINSPECT_SECRULES_H
 #define _LIBRPMINSPECT_SECRULES_H
 
@@ -96,49 +93,5 @@
  * File mode does not match expected mode from the fileinfo rules.
  */
 #define SECRULE_MODES 10
-
-
-enum secrule_action {
-    /* not used */
-    SECRULE_ACTION_NULL = 0,
-
-    /* ignore the finding */
-    SECRULE_ACTION_SKIP = 1,
-
-    /* reporting level will be INFO */
-    SECRULE_ACTION_INFORM = 2,
-
-    /* reporting level will be VERIFY */
-    SECRULE_ACTION_VERIFY = 3,
-
-    /* reporting level will be BAD */
-    SECRULE_ACTION_FAIL = 4
-};
-
-/*
- * Security rule actions hash table
- * There is one of these for each row in the vendor security
- * definitions file.
- */
-typedef struct _secrule_t {
-    int type;
-    enum secrule_action action;
-    UT_hash_handle hh;
-} secrule_t;
-
-/*
- * Security rules list
- * This list holds the rows as read from the vendor security
- * definitions files.
- */
-typedef struct _security_entry_t {
-    char *pkg;
-    char *ver;
-    char *rel;
-    secrule_t *rules;
-    TAILQ_ENTRY(_security_entry_t) items;
-} security_entry_t;
-
-typedef TAILQ_HEAD(security_entry_s, _security_entry_t) security_list_t;
 
 #endif

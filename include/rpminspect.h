@@ -405,4 +405,7 @@ char *abspath(const char *path);
 /* diags.c */
 string_list_t *gather_diags(struct rpminspect *ri, const char *progname, const char *progver);
 
+/* secrule.c */
+severity_t get_secrule_result_severity(struct rpminspect *ri, const rpmfile_entry_t *file, const int type);
+
 #endif

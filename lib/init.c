@@ -1626,7 +1626,7 @@ bool init_security(struct rpminspect *ri)
     string_entry_t *key = NULL;
     string_entry_t *value = NULL;
     int stype;
-    enum secrule_action saction;
+    severity_t severity;
     security_entry_t *sentry = NULL;
     secrule_t *rule_entry = NULL;
 
@@ -1700,6 +1700,8 @@ bool init_security(struct rpminspect *ri)
             assert(sentry != NULL);
 
             /* the main values of a rule */
+            free(sentry->path);
+            sentry->path = strdup(path);
             free(sentry->pkg);
             sentry->pkg = strdup(pkg);
             free(sentry->ver);
@@ -1755,18 +1757,19 @@ bool init_security(struct rpminspect *ri)
 
                 /* find the action */
                 if (!strcasecmp(value->data, "skip")) {
-                    saction = SECRULE_ACTION_SKIP;
+                    severity = RESULT_SKIP;
                 } else if (!strcasecmp(value->data, "inform")) {
-                    saction = SECRULE_ACTION_INFORM;
+                    severity = RESULT_INFO;
                 } else if (!strcasecmp(value->data, "verify")) {
-                    saction = SECRULE_ACTION_VERIFY;
+                    severity = RESULT_VERIFY;
                 } else if (!strcasecmp(value->data, "fail")) {
-                    saction = SECRULE_ACTION_FAIL;
+                    severity = RESULT_BAD;
                 } else {
-                    saction = SECRULE_ACTION_NULL;
+                    /* unknown text was present */
+                    severity = RESULT_NULL;
                 }
 
-                if (saction == SECRULE_ACTION_NULL) {
+                if (severity == RESULT_NULL) {
                     warnx(_("*** unknown security action: %s"), value->data);
                     list_free(kv, free);
                     continue;
@@ -1779,11 +1782,11 @@ bool init_security(struct rpminspect *ri)
                     rule_entry = calloc(1, sizeof(*rule_entry));
                     assert(rule_entry != NULL);
                     rule_entry->type = stype;
-                    rule_entry->action = saction;
+                    rule_entry->severity = severity;
                     HASH_ADD_INT(sentry->rules, type, rule_entry);
                 } else {
                     /* rule already exists, just replace the action */
-                    rule_entry->action = saction;
+                    rule_entry->severity = severity;
                 }
 
                 /* clean up */

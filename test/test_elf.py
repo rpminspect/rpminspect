@@ -111,7 +111,53 @@ class WithoutExecStackCompareKoji(TestCompareKoji):
 class WithExecStackRPM(TestRPMs):
     def setUp(self):
         TestRPMs.setUp(self)
-        self.rpm.add_simple_compilation(compileFlags="-Wl,-z,execstack")
+        self.rpm.add_simple_compilation(
+            installPath="usr/bin/execstack", compileFlags="-Wl,-z,execstack"
+        )
+        self.inspection = "elf"
+        self.waiver_auth = "Security"
+        self.result = "BAD"
+
+
+class SecuritySKIPWithExecStackRPM(TestRPMs):
+    def setUp(self):
+        TestRPMs.setUp(self)
+        self.rpm.add_simple_compilation(
+            installPath="usr/sbin/skip", compileFlags="-Wl,-z,execstack"
+        )
+        self.inspection = "elf"
+        self.waiver_auth = "Not Waivable"
+        self.result = "OK"
+
+
+class SecurityINFORMWithExecStackRPM(TestRPMs):
+    def setUp(self):
+        TestRPMs.setUp(self)
+        self.rpm.add_simple_compilation(
+            installPath="usr/sbin/inform", compileFlags="-Wl,-z,execstack"
+        )
+        self.inspection = "elf"
+        self.waiver_auth = "Security"
+        self.result = "INFO"
+
+
+class SecurityVERIFYWithExecStackRPM(TestRPMs):
+    def setUp(self):
+        TestRPMs.setUp(self)
+        self.rpm.add_simple_compilation(
+            installPath="usr/sbin/verify", compileFlags="-Wl,-z,execstack"
+        )
+        self.inspection = "elf"
+        self.waiver_auth = "Security"
+        self.result = "VERIFY"
+
+
+class SecurityFAILWithExecStackRPM(TestRPMs):
+    def setUp(self):
+        TestRPMs.setUp(self)
+        self.rpm.add_simple_compilation(
+            installPath="usr/sbin/fail", compileFlags="-Wl,-z,execstack"
+        )
         self.inspection = "elf"
         self.waiver_auth = "Security"
         self.result = "BAD"
@@ -120,7 +166,53 @@ class WithExecStackRPM(TestRPMs):
 class WithExecStackKoji(TestKoji):
     def setUp(self):
         TestKoji.setUp(self)
-        self.rpm.add_simple_compilation(compileFlags="-Wl,-z,execstack")
+        self.rpm.add_simple_compilation(
+            installPath="usr/bin/execstack", compileFlags="-Wl,-z,execstack"
+        )
+        self.inspection = "elf"
+        self.waiver_auth = "Security"
+        self.result = "BAD"
+
+
+class SecuritySKIPWithExecStackKoji(TestKoji):
+    def setUp(self):
+        TestKoji.setUp(self)
+        self.rpm.add_simple_compilation(
+            installPath="usr/sbin/skip", compileFlags="-Wl,-z,execstack"
+        )
+        self.inspection = "elf"
+        self.waiver_auth = "Not Waivable"
+        self.result = "OK"
+
+
+class SecurityINFORMWithExecStackKoji(TestKoji):
+    def setUp(self):
+        TestKoji.setUp(self)
+        self.rpm.add_simple_compilation(
+            installPath="usr/sbin/inform", compileFlags="-Wl,-z,execstack"
+        )
+        self.inspection = "elf"
+        self.waiver_auth = "Security"
+        self.result = "INFO"
+
+
+class SecurityVERIFYWithExecStackKoji(TestKoji):
+    def setUp(self):
+        TestKoji.setUp(self)
+        self.rpm.add_simple_compilation(
+            installPath="usr/sbin/verify", compileFlags="-Wl,-z,execstack"
+        )
+        self.inspection = "elf"
+        self.waiver_auth = "Security"
+        self.result = "VERIFY"
+
+
+class SecurityFAILWithExecStackKoji(TestKoji):
+    def setUp(self):
+        TestKoji.setUp(self)
+        self.rpm.add_simple_compilation(
+            installPath="usr/sbin/fail", compileFlags="-Wl,-z,execstack"
+        )
         self.inspection = "elf"
         self.waiver_auth = "Security"
         self.result = "BAD"
@@ -129,21 +221,141 @@ class WithExecStackKoji(TestKoji):
 class WithExecStackCompareRPMs(TestCompareRPMs):
     def setUp(self):
         TestCompareRPMs.setUp(self)
-        self.before_rpm.add_simple_compilation(compileFlags="-Wl,-z,execstack")
-        self.after_rpm.add_simple_compilation(compileFlags="-Wl,-z,execstack")
+        self.before_rpm.add_simple_compilation(
+            installPath="usr/bin/execstack", compileFlags="-Wl,-z,execstack"
+        )
+        self.after_rpm.add_simple_compilation(
+            installPath="usr/bin/execstack", compileFlags="-Wl,-z,execstack"
+        )
+        self.inspection = "elf"
+        self.waiver_auth = "Security"
+        self.result = "BAD"
+
+
+class SecuritySKIPWithExecStackCompareRPMs(TestCompareRPMs):
+    def setUp(self):
+        TestCompareRPMs.setUp(self)
+        self.before_rpm.add_simple_compilation(
+            installPath="usr/sbin/skip", compileFlags="-Wl,-z,execstack"
+        )
+        self.after_rpm.add_simple_compilation(
+            installPath="usr/sbin/skip", compileFlags="-Wl,-z,execstack"
+        )
+        self.inspection = "elf"
+        self.waiver_auth = "Not Waivable"
+        self.result = "OK"
+
+
+class SecurityINFORMWithExecStackCompareRPMs(TestCompareRPMs):
+    def setUp(self):
+        TestCompareRPMs.setUp(self)
+        self.before_rpm.add_simple_compilation(
+            installPath="usr/sbin/inform", compileFlags="-Wl,-z,execstack"
+        )
+        self.after_rpm.add_simple_compilation(
+            installPath="usr/sbin/inform", compileFlags="-Wl,-z,execstack"
+        )
+        self.inspection = "elf"
+        self.waiver_auth = "Security"
+        self.result = "INFO"
+
+
+class SecurityVERIFYWithExecStackCompareRPMs(TestCompareRPMs):
+    def setUp(self):
+        TestCompareRPMs.setUp(self)
+        self.before_rpm.add_simple_compilation(
+            installPath="usr/sbin/verify", compileFlags="-Wl,-z,execstack"
+        )
+        self.after_rpm.add_simple_compilation(
+            installPath="usr/sbin/verify", compileFlags="-Wl,-z,execstack"
+        )
         self.inspection = "elf"
         self.waiver_auth = "Security"
         self.result = "VERIFY"
 
 
-class WithExecStackCompare(TestCompareKoji):
+class SecurityFAILWithExecStackCompareRPMs(TestCompareRPMs):
+    def setUp(self):
+        TestCompareRPMs.setUp(self)
+        self.before_rpm.add_simple_compilation(
+            installPath="usr/sbin/fail", compileFlags="-Wl,-z,execstack"
+        )
+        self.after_rpm.add_simple_compilation(
+            installPath="usr/sbin/fail", compileFlags="-Wl,-z,execstack"
+        )
+        self.inspection = "elf"
+        self.waiver_auth = "Security"
+        self.result = "BAD"
+
+
+class WithExecStackCompareKoji(TestCompareKoji):
     def setUp(self):
         TestCompareKoji.setUp(self)
-        self.before_rpm.add_simple_compilation(compileFlags="-Wl,-z,execstack")
-        self.after_rpm.add_simple_compilation(compileFlags="-Wl,-z,execstack")
+        self.before_rpm.add_simple_compilation(
+            installPath="usr/bin/execstack", compileFlags="-Wl,-z,execstack"
+        )
+        self.after_rpm.add_simple_compilation(
+            installPath="usr/bin/execstack", compileFlags="-Wl,-z,execstack"
+        )
+        self.inspection = "elf"
+        self.waiver_auth = "Security"
+        self.result = "BAD"
+
+
+class SecuritySKIPWithExecStackCompareKoji(TestCompareKoji):
+    def setUp(self):
+        TestCompareKoji.setUp(self)
+        self.before_rpm.add_simple_compilation(
+            installPath="usr/sbin/skip", compileFlags="-Wl,-z,execstack"
+        )
+        self.after_rpm.add_simple_compilation(
+            installPath="usr/sbin/skip", compileFlags="-Wl,-z,execstack"
+        )
+        self.inspection = "elf"
+        self.waiver_auth = "Not Waivable"
+        self.result = "OK"
+
+
+class SecurityINFORMWithExecStackCompareKoji(TestCompareKoji):
+    def setUp(self):
+        TestCompareKoji.setUp(self)
+        self.before_rpm.add_simple_compilation(
+            installPath="usr/sbin/inform", compileFlags="-Wl,-z,execstack"
+        )
+        self.after_rpm.add_simple_compilation(
+            installPath="usr/sbin/inform", compileFlags="-Wl,-z,execstack"
+        )
+        self.inspection = "elf"
+        self.waiver_auth = "Security"
+        self.result = "INFO"
+
+
+class SecurityVERIFYWithExecStackCompareKoji(TestCompareKoji):
+    def setUp(self):
+        TestCompareKoji.setUp(self)
+        self.before_rpm.add_simple_compilation(
+            installPath="usr/sbin/verify", compileFlags="-Wl,-z,execstack"
+        )
+        self.after_rpm.add_simple_compilation(
+            installPath="usr/sbin/verify", compileFlags="-Wl,-z,execstack"
+        )
         self.inspection = "elf"
         self.waiver_auth = "Security"
         self.result = "VERIFY"
+
+
+class SecurityFAILWithExecStackCompareKoji(TestCompareKoji):
+    def setUp(self):
+        TestCompareKoji.setUp(self)
+        self.before_rpm.add_simple_compilation(
+            installPath="usr/sbin/fail", compileFlags="-Wl,-z,execstack"
+        )
+        self.after_rpm.add_simple_compilation(
+            installPath="usr/sbin/fail", compileFlags="-Wl,-z,execstack"
+        )
+        self.inspection = "elf"
+        self.waiver_auth = "Security"
+        self.result = "BAD"
 
 
 # Program lost full RELRO
@@ -157,11 +369,123 @@ class LostFullRELROCompareRPMs(TestCompareRPMs):
         self.result = "BAD"
 
 
+class SecuritySKIPLostFullRELROCompareRPMs(TestCompareRPMs):
+    def setUp(self):
+        TestCompareRPMs.setUp(self)
+        self.before_rpm.add_simple_compilation(
+            installPath="usr/sbin/skip", compileFlags="-Wl,-z,relro,-z,now"
+        )
+        self.after_rpm.add_simple_compilation(
+            installPath="usr/sbin/skip", compileFlags="-Wl,-z,norelro"
+        )
+        self.inspection = "elf"
+        self.waiver_auth = "Not Waivable"
+        self.result = "OK"
+
+
+class SecurityINFORMLostFullRELROCompareRPMs(TestCompareRPMs):
+    def setUp(self):
+        TestCompareRPMs.setUp(self)
+        self.before_rpm.add_simple_compilation(
+            installPath="usr/sbin/inform", compileFlags="-Wl,-z,relro,-z,now"
+        )
+        self.after_rpm.add_simple_compilation(
+            installPath="usr/sbin/inform", compileFlags="-Wl,-z,norelro"
+        )
+        self.inspection = "elf"
+        self.waiver_auth = "Security"
+        self.result = "INFO"
+
+
+class SecurityVERIFYLostFullRELROCompareRPMs(TestCompareRPMs):
+    def setUp(self):
+        TestCompareRPMs.setUp(self)
+        self.before_rpm.add_simple_compilation(
+            installPath="usr/sbin/verify", compileFlags="-Wl,-z,relro,-z,now"
+        )
+        self.after_rpm.add_simple_compilation(
+            installPath="usr/sbin/verify", compileFlags="-Wl,-z,norelro"
+        )
+        self.inspection = "elf"
+        self.waiver_auth = "Security"
+        self.result = "VERIFY"
+
+
+class SecurityFAILLostFullRELROCompareRPMs(TestCompareRPMs):
+    def setUp(self):
+        TestCompareRPMs.setUp(self)
+        self.before_rpm.add_simple_compilation(
+            installPath="usr/sbin/fail", compileFlags="-Wl,-z,relro,-z,now"
+        )
+        self.after_rpm.add_simple_compilation(
+            installPath="usr/sbin/fail", compileFlags="-Wl,-z,norelro"
+        )
+        self.inspection = "elf"
+        self.waiver_auth = "Security"
+        self.result = "BAD"
+
+
 class LostFullRELROCompareKoji(TestCompareKoji):
     def setUp(self):
         TestCompareKoji.setUp(self)
         self.before_rpm.add_simple_compilation(compileFlags="-Wl,-z,relro,-z,now")
         self.after_rpm.add_simple_compilation(compileFlags="-Wl,-z,norelro")
+        self.inspection = "elf"
+        self.waiver_auth = "Security"
+        self.result = "BAD"
+
+
+class SecuritySKIPLostFullRELROCompareKoji(TestCompareKoji):
+    def setUp(self):
+        TestCompareKoji.setUp(self)
+        self.before_rpm.add_simple_compilation(
+            installPath="usr/sbin/skip", compileFlags="-Wl,-z,relro,-z,now"
+        )
+        self.after_rpm.add_simple_compilation(
+            installPath="usr/sbin/skip", compileFlags="-Wl,-z,norelro"
+        )
+        self.inspection = "elf"
+        self.waiver_auth = "Not Waivable"
+        self.result = "OK"
+
+
+class SecurityINFORMLostFullRELROCompareKoji(TestCompareKoji):
+    def setUp(self):
+        TestCompareKoji.setUp(self)
+        self.before_rpm.add_simple_compilation(
+            installPath="usr/sbin/inform", compileFlags="-Wl,-z,relro,-z,now"
+        )
+        self.after_rpm.add_simple_compilation(
+            installPath="usr/sbin/inform", compileFlags="-Wl,-z,norelro"
+        )
+        self.inspection = "elf"
+        self.waiver_auth = "Security"
+        self.result = "INFO"
+
+
+class SecurityVERIFYLostFullRELROCompareKoji(TestCompareKoji):
+    def setUp(self):
+        TestCompareKoji.setUp(self)
+        self.before_rpm.add_simple_compilation(
+            installPath="usr/sbin/verify", compileFlags="-Wl,-z,relro,-z,now"
+        )
+        self.after_rpm.add_simple_compilation(
+            installPath="usr/sbin/verify", compileFlags="-Wl,-z,norelro"
+        )
+        self.inspection = "elf"
+        self.waiver_auth = "Security"
+        self.result = "VERIFY"
+
+
+class SecurityFAILLostFullRELROCompareKoji(TestCompareKoji):
+    def setUp(self):
+        TestCompareKoji.setUp(self)
+        self.before_rpm.add_simple_compilation(
+            installPath="usr/sbin/fail", compileFlags="-Wl,-z,relro,-z,now"
+        )
+        self.after_rpm.add_simple_compilation(
+            installPath="usr/sbin/fail", compileFlags="-Wl,-z,norelro"
+        )
         self.inspection = "elf"
         self.waiver_auth = "Security"
         self.result = "BAD"
@@ -178,11 +502,123 @@ class FulltoPartialRELROCompareRPMs(TestCompareRPMs):
         self.result = "BAD"
 
 
+class SecuritySKIPFulltoPartialRELROCompareRPMs(TestCompareRPMs):
+    def setUp(self):
+        TestCompareRPMs.setUp(self)
+        self.before_rpm.add_simple_compilation(
+            installPath="usr/sbin/skip", compileFlags="-Wl,-z,relro,-z,now"
+        )
+        self.after_rpm.add_simple_compilation(
+            installPath="usr/sbin/skip", compileFlags="-Wl,-z,relro,-z,lazy"
+        )
+        self.inspection = "elf"
+        self.waiver_auth = "Not Waivable"
+        self.result = "OK"
+
+
+class SecurityINFORMFulltoPartialRELROCompareRPMs(TestCompareRPMs):
+    def setUp(self):
+        TestCompareRPMs.setUp(self)
+        self.before_rpm.add_simple_compilation(
+            installPath="usr/sbin/inform", compileFlags="-Wl,-z,relro,-z,now"
+        )
+        self.after_rpm.add_simple_compilation(
+            installPath="usr/sbin/inform", compileFlags="-Wl,-z,relro,-z,lazy"
+        )
+        self.inspection = "elf"
+        self.waiver_auth = "Security"
+        self.result = "INFO"
+
+
+class SecurityVERIFYFulltoPartialRELROCompareRPMs(TestCompareRPMs):
+    def setUp(self):
+        TestCompareRPMs.setUp(self)
+        self.before_rpm.add_simple_compilation(
+            installPath="usr/sbin/verify", compileFlags="-Wl,-z,relro,-z,now"
+        )
+        self.after_rpm.add_simple_compilation(
+            installPath="usr/sbin/verify", compileFlags="-Wl,-z,relro,-z,lazy"
+        )
+        self.inspection = "elf"
+        self.waiver_auth = "Security"
+        self.result = "VERIFY"
+
+
+class SecurityFAILFulltoPartialRELROCompareRPMs(TestCompareRPMs):
+    def setUp(self):
+        TestCompareRPMs.setUp(self)
+        self.before_rpm.add_simple_compilation(
+            installPath="usr/sbin/fail", compileFlags="-Wl,-z,relro,-z,now"
+        )
+        self.after_rpm.add_simple_compilation(
+            installPath="usr/sbin/fail", compileFlags="-Wl,-z,relro,-z,lazy"
+        )
+        self.inspection = "elf"
+        self.waiver_auth = "Security"
+        self.result = "BAD"
+
+
 class FulltoPartialRELROCompareKoji(TestCompareKoji):
     def setUp(self):
         TestCompareKoji.setUp(self)
         self.before_rpm.add_simple_compilation(compileFlags="-Wl,-z,relro,-z,now")
         self.after_rpm.add_simple_compilation(compileFlags="-Wl,-z,relro,-z,lazy")
+        self.inspection = "elf"
+        self.waiver_auth = "Security"
+        self.result = "BAD"
+
+
+class SecuritySKIPFulltoPartialRELROCompareKoji(TestCompareKoji):
+    def setUp(self):
+        TestCompareKoji.setUp(self)
+        self.before_rpm.add_simple_compilation(
+            installPath="usr/sbin/skip", compileFlags="-Wl,-z,relro,-z,now"
+        )
+        self.after_rpm.add_simple_compilation(
+            installPath="usr/sbin/skip", compileFlags="-Wl,-z,relro,-z,lazy"
+        )
+        self.inspection = "elf"
+        self.waiver_auth = "Not Waivable"
+        self.result = "OK"
+
+
+class SecurityINFORMFulltoPartialRELROCompareKoji(TestCompareKoji):
+    def setUp(self):
+        TestCompareKoji.setUp(self)
+        self.before_rpm.add_simple_compilation(
+            installPath="usr/sbin/inform", compileFlags="-Wl,-z,relro,-z,now"
+        )
+        self.after_rpm.add_simple_compilation(
+            installPath="usr/sbin/inform", compileFlags="-Wl,-z,relro,-z,lazy"
+        )
+        self.inspection = "elf"
+        self.waiver_auth = "Security"
+        self.result = "INFO"
+
+
+class SecurityVERIFYFulltoPartialRELROCompareKoji(TestCompareKoji):
+    def setUp(self):
+        TestCompareKoji.setUp(self)
+        self.before_rpm.add_simple_compilation(
+            installPath="usr/sbin/verify", compileFlags="-Wl,-z,relro,-z,now"
+        )
+        self.after_rpm.add_simple_compilation(
+            installPath="usr/sbin/verify", compileFlags="-Wl,-z,relro,-z,lazy"
+        )
+        self.inspection = "elf"
+        self.waiver_auth = "Security"
+        self.result = "VERIFY"
+
+
+class SecurityFAILFulltoPartialRELROCompareKoji(TestCompareKoji):
+    def setUp(self):
+        TestCompareKoji.setUp(self)
+        self.before_rpm.add_simple_compilation(
+            installPath="usr/sbin/fail", compileFlags="-Wl,-z,relro,-z,now"
+        )
+        self.after_rpm.add_simple_compilation(
+            installPath="usr/sbin/fail", compileFlags="-Wl,-z,relro,-z,lazy"
+        )
         self.inspection = "elf"
         self.waiver_auth = "Security"
         self.result = "BAD"
@@ -205,7 +641,91 @@ class LostFortifySourceCompareRPMs(TestCompareRPMs):
         )
         self.inspection = "elf"
         self.waiver_auth = "Security"
+        self.result = "BAD"
+
+
+class SecuritySKIPLostFortifySourceCompareRPMs(TestCompareRPMs):
+    @unittest.skipIf(have_musl_libc, "musl libc lacks _FORTIFY_SOURCE support")
+    def setUp(self):
+        TestCompareRPMs.setUp(self)
+
+        # Enabling FORTIFY_SOURCE requires -O1 or higher
+        self.before_rpm.add_simple_compilation(
+            sourceContent=fortify_src,
+            installPath="usr/sbin/skip",
+            compileFlags="-fno-stack-protector -O2 -D_FORTIFY_SOURCE",
+        )
+        self.after_rpm.add_simple_compilation(
+            sourceContent=fortify_src,
+            installPath="usr/sbin/skip",
+            compileFlags="-fno-stack-protector -O2 -D_FORTIFY_SOURCE=0",
+        )
+        self.inspection = "elf"
+        self.waiver_auth = "Not Waivable"
+        self.result = "OK"
+
+
+class SecurityINFORMLostFortifySourceCompareRPMs(TestCompareRPMs):
+    @unittest.skipIf(have_musl_libc, "musl libc lacks _FORTIFY_SOURCE support")
+    def setUp(self):
+        TestCompareRPMs.setUp(self)
+
+        # Enabling FORTIFY_SOURCE requires -O1 or higher
+        self.before_rpm.add_simple_compilation(
+            sourceContent=fortify_src,
+            installPath="usr/sbin/inform",
+            compileFlags="-fno-stack-protector -O2 -D_FORTIFY_SOURCE",
+        )
+        self.after_rpm.add_simple_compilation(
+            sourceContent=fortify_src,
+            installPath="usr/sbin/inform",
+            compileFlags="-fno-stack-protector -O2 -D_FORTIFY_SOURCE=0",
+        )
+        self.inspection = "elf"
+        self.waiver_auth = "Security"
+        self.result = "INFO"
+
+
+class SecurityVERIFYLostFortifySourceCompareRPMs(TestCompareRPMs):
+    @unittest.skipIf(have_musl_libc, "musl libc lacks _FORTIFY_SOURCE support")
+    def setUp(self):
+        TestCompareRPMs.setUp(self)
+
+        # Enabling FORTIFY_SOURCE requires -O1 or higher
+        self.before_rpm.add_simple_compilation(
+            sourceContent=fortify_src,
+            installPath="usr/sbin/verify",
+            compileFlags="-fno-stack-protector -O2 -D_FORTIFY_SOURCE",
+        )
+        self.after_rpm.add_simple_compilation(
+            sourceContent=fortify_src,
+            installPath="usr/sbin/verify",
+            compileFlags="-fno-stack-protector -O2 -D_FORTIFY_SOURCE=0",
+        )
+        self.inspection = "elf"
+        self.waiver_auth = "Security"
         self.result = "VERIFY"
+
+
+class SecurityFAILLostFortifySourceCompareRPMs(TestCompareRPMs):
+    @unittest.skipIf(have_musl_libc, "musl libc lacks _FORTIFY_SOURCE support")
+    def setUp(self):
+        TestCompareRPMs.setUp(self)
+
+        # Enabling FORTIFY_SOURCE requires -O1 or higher
+        self.before_rpm.add_simple_compilation(
+            sourceContent=fortify_src,
+            installPath="usr/sbin/fail",
+            compileFlags="-fno-stack-protector -O2 -D_FORTIFY_SOURCE",
+        )
+        self.after_rpm.add_simple_compilation(
+            sourceContent=fortify_src,
+            installPath="usr/sbin/fail",
+            compileFlags="-fno-stack-protector -O2 -D_FORTIFY_SOURCE=0",
+        )
+        self.inspection = "elf"
+        self.waiver_auth = "Security"
+        self.result = "BAD"
 
 
 class LostFortifySourceCompareKoji(TestCompareKoji):
@@ -224,7 +744,91 @@ class LostFortifySourceCompareKoji(TestCompareKoji):
         )
         self.inspection = "elf"
         self.waiver_auth = "Security"
+        self.result = "BAD"
+
+
+class SecuritySKIPLostFortifySourceCompareKoji(TestCompareKoji):
+    @unittest.skipIf(have_musl_libc, "musl libc lacks _FORTIFY_SOURCE support")
+    def setUp(self):
+        TestCompareKoji.setUp(self)
+
+        # Enabling FORTIFY_SOURCE requires -O1 or higher
+        self.before_rpm.add_simple_compilation(
+            sourceContent=fortify_src,
+            installPath="usr/sbin/skip",
+            compileFlags="-fno-stack-protector -O2 -D_FORTIFY_SOURCE",
+        )
+        self.after_rpm.add_simple_compilation(
+            sourceContent=fortify_src,
+            installPath="usr/sbin/skip",
+            compileFlags="-fno-stack-protector -O2 -D_FORTIFY_SOURCE=0",
+        )
+        self.inspection = "elf"
+        self.waiver_auth = "Not Waivable"
+        self.result = "OK"
+
+
+class SecurityINFORMLostFortifySourceCompareKoji(TestCompareKoji):
+    @unittest.skipIf(have_musl_libc, "musl libc lacks _FORTIFY_SOURCE support")
+    def setUp(self):
+        TestCompareKoji.setUp(self)
+
+        # Enabling FORTIFY_SOURCE requires -O1 or higher
+        self.before_rpm.add_simple_compilation(
+            sourceContent=fortify_src,
+            installPath="usr/sbin/inform",
+            compileFlags="-fno-stack-protector -O2 -D_FORTIFY_SOURCE",
+        )
+        self.after_rpm.add_simple_compilation(
+            sourceContent=fortify_src,
+            installPath="usr/sbin/inform",
+            compileFlags="-fno-stack-protector -O2 -D_FORTIFY_SOURCE=0",
+        )
+        self.inspection = "elf"
+        self.waiver_auth = "Security"
+        self.result = "INFO"
+
+
+class SecurityVERIFYLostFortifySourceCompareKoji(TestCompareKoji):
+    @unittest.skipIf(have_musl_libc, "musl libc lacks _FORTIFY_SOURCE support")
+    def setUp(self):
+        TestCompareKoji.setUp(self)
+
+        # Enabling FORTIFY_SOURCE requires -O1 or higher
+        self.before_rpm.add_simple_compilation(
+            sourceContent=fortify_src,
+            installPath="usr/sbin/verify",
+            compileFlags="-fno-stack-protector -O2 -D_FORTIFY_SOURCE",
+        )
+        self.after_rpm.add_simple_compilation(
+            sourceContent=fortify_src,
+            installPath="usr/sbin/verify",
+            compileFlags="-fno-stack-protector -O2 -D_FORTIFY_SOURCE=0",
+        )
+        self.inspection = "elf"
+        self.waiver_auth = "Security"
         self.result = "VERIFY"
+
+
+class SecurityFAILLostFortifySourceCompareKoji(TestCompareKoji):
+    @unittest.skipIf(have_musl_libc, "musl libc lacks _FORTIFY_SOURCE support")
+    def setUp(self):
+        TestCompareKoji.setUp(self)
+
+        # Enabling FORTIFY_SOURCE requires -O1 or higher
+        self.before_rpm.add_simple_compilation(
+            sourceContent=fortify_src,
+            installPath="usr/sbin/fail",
+            compileFlags="-fno-stack-protector -O2 -D_FORTIFY_SOURCE",
+        )
+        self.after_rpm.add_simple_compilation(
+            sourceContent=fortify_src,
+            installPath="usr/sbin/fail",
+            compileFlags="-fno-stack-protector -O2 -D_FORTIFY_SOURCE=0",
+        )
+        self.inspection = "elf"
+        self.waiver_auth = "Security"
+        self.result = "BAD"
 
 
 # Program lost -fPIC in after (BAD, WAIVABLE_BY_SECURITY)
@@ -234,6 +838,142 @@ class LostPICCompareRPMs(TestCompareRPMs):
         TestCompareRPMs.setUp(self)
 
         installPath = "usr/lib/libsimple.a"
+
+        self.before_rpm.add_source(rpmfluff.SourceFile("simple.c", test_library_source))
+        self.before_rpm.section_build += "gcc -m32 -fPIC -c simple.c\n"
+        self.before_rpm.section_build += "ar -crs libsimple.a simple.o\n"
+        self.before_rpm.create_parent_dirs(installPath)
+        self.before_rpm.section_install += (
+            "cp libsimple.a $RPM_BUILD_ROOT/%s\n" % installPath
+        )
+        sub = self.before_rpm.get_subpackage(None)
+        sub.section_files += "/%s\n" % installPath
+        self.before_rpm.add_payload_check(installPath, None)
+
+        self.after_rpm.add_source(rpmfluff.SourceFile("simple.c", test_library_source))
+        self.after_rpm.section_build += "gcc -m32 -fno-PIC -c simple.c\n"
+        self.after_rpm.section_build += "ar -crs libsimple.a simple.o\n"
+        self.after_rpm.create_parent_dirs(installPath)
+        self.after_rpm.section_install += (
+            "cp libsimple.a $RPM_BUILD_ROOT/%s\n" % installPath
+        )
+        sub = self.after_rpm.get_subpackage(None)
+        sub.section_files += "/%s\n" % installPath
+        self.after_rpm.add_payload_check(installPath, None)
+
+        self.inspection = "elf"
+        self.waiver_auth = "Security"
+        self.result = "BAD"
+
+
+class SecuritySKIPLostPICCompareRPMs(TestCompareRPMs):
+    @unittest.skipUnless(have_gcc_multilib, "gcc lacks multilib (-m32) support")
+    def setUp(self):
+        TestCompareRPMs.setUp(self)
+
+        installPath = "usr/lib/libskip.a"
+
+        self.before_rpm.add_source(rpmfluff.SourceFile("simple.c", test_library_source))
+        self.before_rpm.section_build += "gcc -m32 -fPIC -c simple.c\n"
+        self.before_rpm.section_build += "ar -crs libsimple.a simple.o\n"
+        self.before_rpm.create_parent_dirs(installPath)
+        self.before_rpm.section_install += (
+            "cp libsimple.a $RPM_BUILD_ROOT/%s\n" % installPath
+        )
+        sub = self.before_rpm.get_subpackage(None)
+        sub.section_files += "/%s\n" % installPath
+        self.before_rpm.add_payload_check(installPath, None)
+
+        self.after_rpm.add_source(rpmfluff.SourceFile("simple.c", test_library_source))
+        self.after_rpm.section_build += "gcc -m32 -fno-PIC -c simple.c\n"
+        self.after_rpm.section_build += "ar -crs libsimple.a simple.o\n"
+        self.after_rpm.create_parent_dirs(installPath)
+        self.after_rpm.section_install += (
+            "cp libsimple.a $RPM_BUILD_ROOT/%s\n" % installPath
+        )
+        sub = self.after_rpm.get_subpackage(None)
+        sub.section_files += "/%s\n" % installPath
+        self.after_rpm.add_payload_check(installPath, None)
+
+        self.inspection = "elf"
+        self.waiver_auth = "Not Waivable"
+        self.result = "OK"
+
+
+class SecurityINFORMLostPICCompareRPMs(TestCompareRPMs):
+    @unittest.skipUnless(have_gcc_multilib, "gcc lacks multilib (-m32) support")
+    def setUp(self):
+        TestCompareRPMs.setUp(self)
+
+        installPath = "usr/lib/libinform.a"
+
+        self.before_rpm.add_source(rpmfluff.SourceFile("simple.c", test_library_source))
+        self.before_rpm.section_build += "gcc -m32 -fPIC -c simple.c\n"
+        self.before_rpm.section_build += "ar -crs libsimple.a simple.o\n"
+        self.before_rpm.create_parent_dirs(installPath)
+        self.before_rpm.section_install += (
+            "cp libsimple.a $RPM_BUILD_ROOT/%s\n" % installPath
+        )
+        sub = self.before_rpm.get_subpackage(None)
+        sub.section_files += "/%s\n" % installPath
+        self.before_rpm.add_payload_check(installPath, None)
+
+        self.after_rpm.add_source(rpmfluff.SourceFile("simple.c", test_library_source))
+        self.after_rpm.section_build += "gcc -m32 -fno-PIC -c simple.c\n"
+        self.after_rpm.section_build += "ar -crs libsimple.a simple.o\n"
+        self.after_rpm.create_parent_dirs(installPath)
+        self.after_rpm.section_install += (
+            "cp libsimple.a $RPM_BUILD_ROOT/%s\n" % installPath
+        )
+        sub = self.after_rpm.get_subpackage(None)
+        sub.section_files += "/%s\n" % installPath
+        self.after_rpm.add_payload_check(installPath, None)
+
+        self.inspection = "elf"
+        self.waiver_auth = "Security"
+        self.result = "INFO"
+
+
+class SecurityVERIFYLostPICCompareRPMs(TestCompareRPMs):
+    @unittest.skipUnless(have_gcc_multilib, "gcc lacks multilib (-m32) support")
+    def setUp(self):
+        TestCompareRPMs.setUp(self)
+
+        installPath = "usr/lib/libverify.a"
+
+        self.before_rpm.add_source(rpmfluff.SourceFile("simple.c", test_library_source))
+        self.before_rpm.section_build += "gcc -m32 -fPIC -c simple.c\n"
+        self.before_rpm.section_build += "ar -crs libsimple.a simple.o\n"
+        self.before_rpm.create_parent_dirs(installPath)
+        self.before_rpm.section_install += (
+            "cp libsimple.a $RPM_BUILD_ROOT/%s\n" % installPath
+        )
+        sub = self.before_rpm.get_subpackage(None)
+        sub.section_files += "/%s\n" % installPath
+        self.before_rpm.add_payload_check(installPath, None)
+
+        self.after_rpm.add_source(rpmfluff.SourceFile("simple.c", test_library_source))
+        self.after_rpm.section_build += "gcc -m32 -fno-PIC -c simple.c\n"
+        self.after_rpm.section_build += "ar -crs libsimple.a simple.o\n"
+        self.after_rpm.create_parent_dirs(installPath)
+        self.after_rpm.section_install += (
+            "cp libsimple.a $RPM_BUILD_ROOT/%s\n" % installPath
+        )
+        sub = self.after_rpm.get_subpackage(None)
+        sub.section_files += "/%s\n" % installPath
+        self.after_rpm.add_payload_check(installPath, None)
+
+        self.inspection = "elf"
+        self.waiver_auth = "Security"
+        self.result = "VERIFY"
+
+
+class SecurityFAILLostPICCompareRPMs(TestCompareRPMs):
+    @unittest.skipUnless(have_gcc_multilib, "gcc lacks multilib (-m32) support")
+    def setUp(self):
+        TestCompareRPMs.setUp(self)
+
+        installPath = "usr/lib/libfail.a"
 
         self.before_rpm.add_source(rpmfluff.SourceFile("simple.c", test_library_source))
         self.before_rpm.section_build += "gcc -m32 -fPIC -c simple.c\n"
@@ -320,6 +1060,98 @@ class HasTEXTRELRPMs(TestRPMs):
         self.result = "BAD"
 
 
+class SecuritySKIPHasTEXTRELRPMs(TestRPMs):
+    @unittest.skipUnless(have_gcc_multilib, "gcc lacks multilib (-m32) support")
+    def setUp(self):
+        TestRPMs.setUp(self)
+
+        installPath = "usr/lib/libskip.so"
+
+        # Can't use rpmfluff here because it always adds -fPIC
+        self.rpm.add_source(rpmfluff.SourceFile("simple.c", simple_library_source))
+        self.rpm.section_build += (
+            "gcc -m32 -fno-pic -shared -Wl,-z,noexecstack -o libsimple.so simple.c\n"
+        )
+        self.rpm.create_parent_dirs(installPath)
+        self.rpm.section_install += "cp libsimple.so $RPM_BUILD_ROOT/%s\n" % installPath
+        sub = self.rpm.get_subpackage(None)
+        sub.section_files += "/%s\n" % installPath
+        self.rpm.add_payload_check(installPath, None)
+
+        self.inspection = "elf"
+        self.waiver_auth = "Not Waivable"
+        self.result = "OK"
+
+
+class SecurityINFORMHasTEXTRELRPMs(TestRPMs):
+    @unittest.skipUnless(have_gcc_multilib, "gcc lacks multilib (-m32) support")
+    def setUp(self):
+        TestRPMs.setUp(self)
+
+        installPath = "usr/lib/libinform.so"
+
+        # Can't use rpmfluff here because it always adds -fPIC
+        self.rpm.add_source(rpmfluff.SourceFile("simple.c", simple_library_source))
+        self.rpm.section_build += (
+            "gcc -m32 -fno-pic -shared -Wl,-z,noexecstack -o libsimple.so simple.c\n"
+        )
+        self.rpm.create_parent_dirs(installPath)
+        self.rpm.section_install += "cp libsimple.so $RPM_BUILD_ROOT/%s\n" % installPath
+        sub = self.rpm.get_subpackage(None)
+        sub.section_files += "/%s\n" % installPath
+        self.rpm.add_payload_check(installPath, None)
+
+        self.inspection = "elf"
+        self.waiver_auth = "Security"
+        self.result = "INFO"
+
+
+class SecurityVERIFYHasTEXTRELRPMs(TestRPMs):
+    @unittest.skipUnless(have_gcc_multilib, "gcc lacks multilib (-m32) support")
+    def setUp(self):
+        TestRPMs.setUp(self)
+
+        installPath = "usr/lib/libverify.so"
+
+        # Can't use rpmfluff here because it always adds -fPIC
+        self.rpm.add_source(rpmfluff.SourceFile("simple.c", simple_library_source))
+        self.rpm.section_build += (
+            "gcc -m32 -fno-pic -shared -Wl,-z,noexecstack -o libsimple.so simple.c\n"
+        )
+        self.rpm.create_parent_dirs(installPath)
+        self.rpm.section_install += "cp libsimple.so $RPM_BUILD_ROOT/%s\n" % installPath
+        sub = self.rpm.get_subpackage(None)
+        sub.section_files += "/%s\n" % installPath
+        self.rpm.add_payload_check(installPath, None)
+
+        self.inspection = "elf"
+        self.waiver_auth = "Security"
+        self.result = "VERIFY"
+
+
+class SecurityFAILHasTEXTRELRPMs(TestRPMs):
+    @unittest.skipUnless(have_gcc_multilib, "gcc lacks multilib (-m32) support")
+    def setUp(self):
+        TestRPMs.setUp(self)
+
+        installPath = "usr/lib/libfail.so"
+
+        # Can't use rpmfluff here because it always adds -fPIC
+        self.rpm.add_source(rpmfluff.SourceFile("simple.c", simple_library_source))
+        self.rpm.section_build += (
+            "gcc -m32 -fno-pic -shared -Wl,-z,noexecstack -o libsimple.so simple.c\n"
+        )
+        self.rpm.create_parent_dirs(installPath)
+        self.rpm.section_install += "cp libsimple.so $RPM_BUILD_ROOT/%s\n" % installPath
+        sub = self.rpm.get_subpackage(None)
+        sub.section_files += "/%s\n" % installPath
+        self.rpm.add_payload_check(installPath, None)
+
+        self.inspection = "elf"
+        self.waiver_auth = "Security"
+        self.result = "BAD"
+
+
 class HasTEXTRELCompareRPMs(TestCompareRPMs):
     @unittest.skipUnless(have_gcc_multilib, "gcc lacks multilib (-m32) support")
     def setUp(self):
@@ -361,12 +1193,340 @@ class HasTEXTRELCompareRPMs(TestCompareRPMs):
         self.result = "BAD"
 
 
+class SecuritySKIPHasTEXTRELCompareRPMs(TestCompareRPMs):
+    @unittest.skipUnless(have_gcc_multilib, "gcc lacks multilib (-m32) support")
+    def setUp(self):
+        TestCompareRPMs.setUp(self)
+
+        installPath = "usr/lib/libskip.so"
+
+        # Can't use rpmfluff here because it always adds -fPIC
+        self.before_rpm.add_source(
+            rpmfluff.SourceFile("simple.c", simple_library_source)
+        )
+        self.before_rpm.section_build += (
+            "gcc -m32 -fPIC -shared -Wl,-z,noexecstack -o libsimple.so simple.c\n"
+        )
+        self.before_rpm.create_parent_dirs(installPath)
+        self.before_rpm.section_install += (
+            "cp libsimple.so $RPM_BUILD_ROOT/%s\n" % installPath
+        )
+        sub = self.before_rpm.get_subpackage(None)
+        sub.section_files += "/%s\n" % installPath
+        self.before_rpm.add_payload_check(installPath, None)
+
+        self.after_rpm.add_source(
+            rpmfluff.SourceFile("simple.c", simple_library_source)
+        )
+        self.after_rpm.section_build += (
+            "gcc -m32 -fno-pic -shared -Wl,-z,noexecstack -o libsimple.so simple.c\n"
+        )
+        self.after_rpm.create_parent_dirs(installPath)
+        self.after_rpm.section_install += (
+            "cp libsimple.so $RPM_BUILD_ROOT/%s\n" % installPath
+        )
+        sub = self.after_rpm.get_subpackage(None)
+        sub.section_files += "/%s\n" % installPath
+        self.after_rpm.add_payload_check(installPath, None)
+
+        self.inspection = "elf"
+        self.waiver_auth = "Not Waivable"
+        self.result = "OK"
+
+
+class SecurityINFORMHasTEXTRELCompareRPMs(TestCompareRPMs):
+    @unittest.skipUnless(have_gcc_multilib, "gcc lacks multilib (-m32) support")
+    def setUp(self):
+        TestCompareRPMs.setUp(self)
+
+        installPath = "usr/lib/libinform.so"
+
+        # Can't use rpmfluff here because it always adds -fPIC
+        self.before_rpm.add_source(
+            rpmfluff.SourceFile("simple.c", simple_library_source)
+        )
+        self.before_rpm.section_build += (
+            "gcc -m32 -fPIC -shared -Wl,-z,noexecstack -o libsimple.so simple.c\n"
+        )
+        self.before_rpm.create_parent_dirs(installPath)
+        self.before_rpm.section_install += (
+            "cp libsimple.so $RPM_BUILD_ROOT/%s\n" % installPath
+        )
+        sub = self.before_rpm.get_subpackage(None)
+        sub.section_files += "/%s\n" % installPath
+        self.before_rpm.add_payload_check(installPath, None)
+
+        self.after_rpm.add_source(
+            rpmfluff.SourceFile("simple.c", simple_library_source)
+        )
+        self.after_rpm.section_build += (
+            "gcc -m32 -fno-pic -shared -Wl,-z,noexecstack -o libsimple.so simple.c\n"
+        )
+        self.after_rpm.create_parent_dirs(installPath)
+        self.after_rpm.section_install += (
+            "cp libsimple.so $RPM_BUILD_ROOT/%s\n" % installPath
+        )
+        sub = self.after_rpm.get_subpackage(None)
+        sub.section_files += "/%s\n" % installPath
+        self.after_rpm.add_payload_check(installPath, None)
+
+        self.inspection = "elf"
+        self.waiver_auth = "Security"
+        self.result = "INFO"
+
+
+class SecurityVERIFYHasTEXTRELCompareRPMs(TestCompareRPMs):
+    @unittest.skipUnless(have_gcc_multilib, "gcc lacks multilib (-m32) support")
+    def setUp(self):
+        TestCompareRPMs.setUp(self)
+
+        installPath = "usr/lib/libverify.so"
+
+        # Can't use rpmfluff here because it always adds -fPIC
+        self.before_rpm.add_source(
+            rpmfluff.SourceFile("simple.c", simple_library_source)
+        )
+        self.before_rpm.section_build += (
+            "gcc -m32 -fPIC -shared -Wl,-z,noexecstack -o libsimple.so simple.c\n"
+        )
+        self.before_rpm.create_parent_dirs(installPath)
+        self.before_rpm.section_install += (
+            "cp libsimple.so $RPM_BUILD_ROOT/%s\n" % installPath
+        )
+        sub = self.before_rpm.get_subpackage(None)
+        sub.section_files += "/%s\n" % installPath
+        self.before_rpm.add_payload_check(installPath, None)
+
+        self.after_rpm.add_source(
+            rpmfluff.SourceFile("simple.c", simple_library_source)
+        )
+        self.after_rpm.section_build += (
+            "gcc -m32 -fno-pic -shared -Wl,-z,noexecstack -o libsimple.so simple.c\n"
+        )
+        self.after_rpm.create_parent_dirs(installPath)
+        self.after_rpm.section_install += (
+            "cp libsimple.so $RPM_BUILD_ROOT/%s\n" % installPath
+        )
+        sub = self.after_rpm.get_subpackage(None)
+        sub.section_files += "/%s\n" % installPath
+        self.after_rpm.add_payload_check(installPath, None)
+
+        self.inspection = "elf"
+        self.waiver_auth = "Security"
+        self.result = "VERIFY"
+
+
+class SecurityFAILHasTEXTRELCompareRPMs(TestCompareRPMs):
+    @unittest.skipUnless(have_gcc_multilib, "gcc lacks multilib (-m32) support")
+    def setUp(self):
+        TestCompareRPMs.setUp(self)
+
+        installPath = "usr/lib/libfail.so"
+
+        # Can't use rpmfluff here because it always adds -fPIC
+        self.before_rpm.add_source(
+            rpmfluff.SourceFile("simple.c", simple_library_source)
+        )
+        self.before_rpm.section_build += (
+            "gcc -m32 -fPIC -shared -Wl,-z,noexecstack -o libsimple.so simple.c\n"
+        )
+        self.before_rpm.create_parent_dirs(installPath)
+        self.before_rpm.section_install += (
+            "cp libsimple.so $RPM_BUILD_ROOT/%s\n" % installPath
+        )
+        sub = self.before_rpm.get_subpackage(None)
+        sub.section_files += "/%s\n" % installPath
+        self.before_rpm.add_payload_check(installPath, None)
+
+        self.after_rpm.add_source(
+            rpmfluff.SourceFile("simple.c", simple_library_source)
+        )
+        self.after_rpm.section_build += (
+            "gcc -m32 -fno-pic -shared -Wl,-z,noexecstack -o libsimple.so simple.c\n"
+        )
+        self.after_rpm.create_parent_dirs(installPath)
+        self.after_rpm.section_install += (
+            "cp libsimple.so $RPM_BUILD_ROOT/%s\n" % installPath
+        )
+        sub = self.after_rpm.get_subpackage(None)
+        sub.section_files += "/%s\n" % installPath
+        self.after_rpm.add_payload_check(installPath, None)
+
+        self.inspection = "elf"
+        self.waiver_auth = "Security"
+        self.result = "BAD"
+
+
 class HasTEXTRELCompareKoji(TestCompareKoji):
     @unittest.skipUnless(have_gcc_multilib, "gcc lacks multilib (-m32) support")
     def setUp(self):
         TestCompareKoji.setUp(self)
 
         installPath = "usr/lib/libfoo.so"
+
+        # Can't use rpmfluff here because it always adds -fPIC
+        self.before_rpm.add_source(
+            rpmfluff.SourceFile("simple.c", simple_library_source)
+        )
+        self.before_rpm.section_build += (
+            "gcc -m32 -fPIC -shared -Wl,-z,noexecstack -o libsimple.so simple.c\n"
+        )
+        self.before_rpm.create_parent_dirs(installPath)
+        self.before_rpm.section_install += (
+            "cp libsimple.so $RPM_BUILD_ROOT/%s\n" % installPath
+        )
+        sub = self.before_rpm.get_subpackage(None)
+        sub.section_files += "/%s\n" % installPath
+        self.before_rpm.add_payload_check(installPath, None)
+
+        self.after_rpm.add_source(
+            rpmfluff.SourceFile("simple.c", simple_library_source)
+        )
+        self.after_rpm.section_build += (
+            "gcc -m32 -fno-pic -shared -Wl,-z,noexecstack -o libsimple.so simple.c\n"
+        )
+        self.after_rpm.create_parent_dirs(installPath)
+        self.after_rpm.section_install += (
+            "cp libsimple.so $RPM_BUILD_ROOT/%s\n" % installPath
+        )
+        sub = self.after_rpm.get_subpackage(None)
+        sub.section_files += "/%s\n" % installPath
+        self.after_rpm.add_payload_check(installPath, None)
+
+        self.inspection = "elf"
+        self.waiver_auth = "Security"
+        self.result = "BAD"
+
+
+class SecuritySKIPHasTEXTRELCompareKoji(TestCompareKoji):
+    @unittest.skipUnless(have_gcc_multilib, "gcc lacks multilib (-m32) support")
+    def setUp(self):
+        TestCompareKoji.setUp(self)
+
+        installPath = "usr/lib/libskip.so"
+
+        # Can't use rpmfluff here because it always adds -fPIC
+        self.before_rpm.add_source(
+            rpmfluff.SourceFile("simple.c", simple_library_source)
+        )
+        self.before_rpm.section_build += (
+            "gcc -m32 -fPIC -shared -Wl,-z,noexecstack -o libsimple.so simple.c\n"
+        )
+        self.before_rpm.create_parent_dirs(installPath)
+        self.before_rpm.section_install += (
+            "cp libsimple.so $RPM_BUILD_ROOT/%s\n" % installPath
+        )
+        sub = self.before_rpm.get_subpackage(None)
+        sub.section_files += "/%s\n" % installPath
+        self.before_rpm.add_payload_check(installPath, None)
+
+        self.after_rpm.add_source(
+            rpmfluff.SourceFile("simple.c", simple_library_source)
+        )
+        self.after_rpm.section_build += (
+            "gcc -m32 -fno-pic -shared -Wl,-z,noexecstack -o libsimple.so simple.c\n"
+        )
+        self.after_rpm.create_parent_dirs(installPath)
+        self.after_rpm.section_install += (
+            "cp libsimple.so $RPM_BUILD_ROOT/%s\n" % installPath
+        )
+        sub = self.after_rpm.get_subpackage(None)
+        sub.section_files += "/%s\n" % installPath
+        self.after_rpm.add_payload_check(installPath, None)
+
+        self.inspection = "elf"
+        self.waiver_auth = "Not Waivable"
+        self.result = "OK"
+
+
+class SecurityINFORMHasTEXTRELCompareKoji(TestCompareKoji):
+    @unittest.skipUnless(have_gcc_multilib, "gcc lacks multilib (-m32) support")
+    def setUp(self):
+        TestCompareKoji.setUp(self)
+
+        installPath = "usr/lib/libinform.so"
+
+        # Can't use rpmfluff here because it always adds -fPIC
+        self.before_rpm.add_source(
+            rpmfluff.SourceFile("simple.c", simple_library_source)
+        )
+        self.before_rpm.section_build += (
+            "gcc -m32 -fPIC -shared -Wl,-z,noexecstack -o libsimple.so simple.c\n"
+        )
+        self.before_rpm.create_parent_dirs(installPath)
+        self.before_rpm.section_install += (
+            "cp libsimple.so $RPM_BUILD_ROOT/%s\n" % installPath
+        )
+        sub = self.before_rpm.get_subpackage(None)
+        sub.section_files += "/%s\n" % installPath
+        self.before_rpm.add_payload_check(installPath, None)
+
+        self.after_rpm.add_source(
+            rpmfluff.SourceFile("simple.c", simple_library_source)
+        )
+        self.after_rpm.section_build += (
+            "gcc -m32 -fno-pic -shared -Wl,-z,noexecstack -o libsimple.so simple.c\n"
+        )
+        self.after_rpm.create_parent_dirs(installPath)
+        self.after_rpm.section_install += (
+            "cp libsimple.so $RPM_BUILD_ROOT/%s\n" % installPath
+        )
+        sub = self.after_rpm.get_subpackage(None)
+        sub.section_files += "/%s\n" % installPath
+        self.after_rpm.add_payload_check(installPath, None)
+
+        self.inspection = "elf"
+        self.waiver_auth = "Security"
+        self.result = "INFO"
+
+
+class SecurityVERIFYHasTEXTRELCompareKoji(TestCompareKoji):
+    @unittest.skipUnless(have_gcc_multilib, "gcc lacks multilib (-m32) support")
+    def setUp(self):
+        TestCompareKoji.setUp(self)
+
+        installPath = "usr/lib/libverify.so"
+
+        # Can't use rpmfluff here because it always adds -fPIC
+        self.before_rpm.add_source(
+            rpmfluff.SourceFile("simple.c", simple_library_source)
+        )
+        self.before_rpm.section_build += (
+            "gcc -m32 -fPIC -shared -Wl,-z,noexecstack -o libsimple.so simple.c\n"
+        )
+        self.before_rpm.create_parent_dirs(installPath)
+        self.before_rpm.section_install += (
+            "cp libsimple.so $RPM_BUILD_ROOT/%s\n" % installPath
+        )
+        sub = self.before_rpm.get_subpackage(None)
+        sub.section_files += "/%s\n" % installPath
+        self.before_rpm.add_payload_check(installPath, None)
+
+        self.after_rpm.add_source(
+            rpmfluff.SourceFile("simple.c", simple_library_source)
+        )
+        self.after_rpm.section_build += (
+            "gcc -m32 -fno-pic -shared -Wl,-z,noexecstack -o libsimple.so simple.c\n"
+        )
+        self.after_rpm.create_parent_dirs(installPath)
+        self.after_rpm.section_install += (
+            "cp libsimple.so $RPM_BUILD_ROOT/%s\n" % installPath
+        )
+        sub = self.after_rpm.get_subpackage(None)
+        sub.section_files += "/%s\n" % installPath
+        self.after_rpm.add_payload_check(installPath, None)
+
+        self.inspection = "elf"
+        self.waiver_auth = "Security"
+        self.result = "VERIFY"
+
+
+class SecurityFAILHasTEXTRELCompareKoji(TestCompareKoji):
+    @unittest.skipUnless(have_gcc_multilib, "gcc lacks multilib (-m32) support")
+    def setUp(self):
+        TestCompareKoji.setUp(self)
+
+        installPath = "usr/lib/libfail.so"
 
         # Can't use rpmfluff here because it always adds -fPIC
         self.before_rpm.add_source(

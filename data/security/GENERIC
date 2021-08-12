@@ -3,14 +3,26 @@
 #
 # One package per line.  Blank lines and lines beginning with '#' are
 # ignored.  Malformed lines are ignored, but a warning is displayed.
+# The first matching rule in this file is used by rpminspect, so be
+# careful of ordering of explicit files and packages and then wildcard
+# rules.
+#
 # Each rule consists of four fields separated by spaces or tabs (any
 # number):
 #
+#     path           The file or path, can use glob(7) syntax
 #     name           The name of the package
 #     version        The package version, can use glob(7) syntax
 #     release        The package release, can use glob(7) syntax
 #     rules          Comma-delimited list of security rules where each
 #                    element is RULE=ACTION.
+#
+# It is common to establish per-file rules in a specific package, but
+# with glob(7) syntax it is possible to write a rule that applies to
+# all files in a package.  Just be aware of what you are writing in
+# the fields because security rules should favor more explicit
+# matching over wildcard matching.  The most common fields to carry
+# '*' values should be version and release.
 #
 # Available RULES (case-insensitive in the config file):
 #
@@ -39,5 +51,6 @@
 #                    trigger a failing exit code.
 #
 
-slirp       *        *    caps=SKIP,execStack=INFORM,RELRO=verify,FortifySOURCE=FAIL,pic=inform,TEXTrel=Verify,setUID=FaIl,worldwritable=Skip,SECURITYPATH=verify,Modes=Inform
-xanim       *        *    relro=inform,pic=SKIP
+#<path>           <package>   <version>   <release>   <rules>
+/usr/bin/slirp    slirp       *           *           caps=SKIP,execStack=INFORM,RELRO=verify,FortifySOURCE=FAIL,pic=inform,TEXTrel=Verify,setUID=FaIl,worldwritable=Skip,SECURITYPATH=verify,Modes=Inform
+/usr/bin/xanim    xanim       *           *           relro=inform,pic=SKIP

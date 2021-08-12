@@ -159,6 +159,78 @@ class UnapprovedExecutableWithSetUIDRPMs(TestRPMs):
         self.waiver_auth = "Security"
 
 
+class SecuritySKIPUnapprovedExecutableWithSetUIDRPMs(TestRPMs):
+    """
+    Assert when a setuid file is in a package and it's on the fileinfo list,
+    INFO result occurs when testing the RPMs.
+    """
+
+    def setUp(self):
+        super().setUp()
+
+        self.rpm.add_installed_file(
+            "/usr/bin/skip", rpmfluff.SourceFile("file", "a" * 5), mode="4755"
+        )
+
+        self.inspection = "permissions"
+        self.result = "OK"
+        self.waiver_auth = "Not Waivable"
+
+
+class SecurityINFORMUnapprovedExecutableWithSetUIDRPMs(TestRPMs):
+    """
+    Assert when a setuid file is in a package and it's on the fileinfo list,
+    INFO result occurs when testing the RPMs.
+    """
+
+    def setUp(self):
+        super().setUp()
+
+        self.rpm.add_installed_file(
+            "/usr/bin/inform", rpmfluff.SourceFile("file", "a" * 5), mode="4755"
+        )
+
+        self.inspection = "permissions"
+        self.result = "INFO"
+        self.waiver_auth = "Security"
+
+
+class SecurityVERIFYUnapprovedExecutableWithSetUIDRPMs(TestRPMs):
+    """
+    Assert when a setuid file is in a package and it's on the fileinfo list,
+    INFO result occurs when testing the RPMs.
+    """
+
+    def setUp(self):
+        super().setUp()
+
+        self.rpm.add_installed_file(
+            "/usr/bin/verify", rpmfluff.SourceFile("file", "a" * 5), mode="4755"
+        )
+
+        self.inspection = "permissions"
+        self.result = "VERIFY"
+        self.waiver_auth = "Security"
+
+
+class SecurityFAILUnapprovedExecutableWithSetUIDRPMs(TestRPMs):
+    """
+    Assert when a setuid file is in a package and it's on the fileinfo list,
+    INFO result occurs when testing the RPMs.
+    """
+
+    def setUp(self):
+        super().setUp()
+
+        self.rpm.add_installed_file(
+            "/usr/bin/fail", rpmfluff.SourceFile("file", "a" * 5), mode="4755"
+        )
+
+        self.inspection = "permissions"
+        self.result = "BAD"
+        self.waiver_auth = "Security"
+
+
 class UnapprovedExecutableWithSetUIDKoji(TestKoji):
     """
     Assert when a setuid file is in a package and it's on the fileinfo list,
@@ -170,6 +242,78 @@ class UnapprovedExecutableWithSetUIDKoji(TestKoji):
 
         self.rpm.add_installed_file(
             "/usr/bin/trojan", rpmfluff.SourceFile("file", "a" * 5), mode="4755"
+        )
+
+        self.inspection = "permissions"
+        self.result = "BAD"
+        self.waiver_auth = "Security"
+
+
+class SecuritySKIPUnapprovedExecutableWithSetUIDKoji(TestKoji):
+    """
+    Assert when a setuid file is in a package and it's on the fileinfo list,
+    INFO result occurs when testing the RPMs.
+    """
+
+    def setUp(self):
+        super().setUp()
+
+        self.rpm.add_installed_file(
+            "/usr/bin/skip", rpmfluff.SourceFile("file", "a" * 5), mode="4755"
+        )
+
+        self.inspection = "permissions"
+        self.result = "OK"
+        self.waiver_auth = "Not Waivable"
+
+
+class SecurityINFORMUnapprovedExecutableWithSetUIDKoji(TestKoji):
+    """
+    Assert when a setuid file is in a package and it's on the fileinfo list,
+    INFO result occurs when testing the RPMs.
+    """
+
+    def setUp(self):
+        super().setUp()
+
+        self.rpm.add_installed_file(
+            "/usr/bin/inform", rpmfluff.SourceFile("file", "a" * 5), mode="4755"
+        )
+
+        self.inspection = "permissions"
+        self.result = "INFO"
+        self.waiver_auth = "Security"
+
+
+class SecurityVERIFYUnapprovedExecutableWithSetUIDKoji(TestKoji):
+    """
+    Assert when a setuid file is in a package and it's on the fileinfo list,
+    INFO result occurs when testing the RPMs.
+    """
+
+    def setUp(self):
+        super().setUp()
+
+        self.rpm.add_installed_file(
+            "/usr/bin/verify", rpmfluff.SourceFile("file", "a" * 5), mode="4755"
+        )
+
+        self.inspection = "permissions"
+        self.result = "VERIFY"
+        self.waiver_auth = "Security"
+
+
+class SecurityFAILUnapprovedExecutableWithSetUIDKoji(TestKoji):
+    """
+    Assert when a setuid file is in a package and it's on the fileinfo list,
+    INFO result occurs when testing the RPMs.
+    """
+
+    def setUp(self):
+        super().setUp()
+
+        self.rpm.add_installed_file(
+            "/usr/bin/fail", rpmfluff.SourceFile("file", "a" * 5), mode="4755"
         )
 
         self.inspection = "permissions"
@@ -212,6 +356,78 @@ class UnapprovedExecutableWithSetUIDCompareRPMs(TestCompareRPMs):
         self.waiver_auth = "Security"
 
 
+class SecuritySKIPUnapprovedExecutableWithSetUIDCompareRPMs(TestCompareRPMs):
+    """
+    Assert when a setuid file is in a package and it's on the fileinfo list,
+    INFO result occurs when testing the RPMs.
+    """
+
+    def setUp(self):
+        super().setUp()
+
+        self.after_rpm.add_installed_file(
+            "/usr/bin/skip", rpmfluff.SourceFile("file", "a" * 5), mode="4755"
+        )
+
+        self.inspection = "permissions"
+        self.result = "OK"
+        self.waiver_auth = "Not Waivable"
+
+
+class SecurityINFORMUnapprovedExecutableWithSetUIDCompareRPMs(TestCompareRPMs):
+    """
+    Assert when a setuid file is in a package and it's on the fileinfo list,
+    INFO result occurs when testing the RPMs.
+    """
+
+    def setUp(self):
+        super().setUp()
+
+        self.after_rpm.add_installed_file(
+            "/usr/bin/inform", rpmfluff.SourceFile("file", "a" * 5), mode="4755"
+        )
+
+        self.inspection = "permissions"
+        self.result = "INFO"
+        self.waiver_auth = "Security"
+
+
+class SecurityVERIFYUnapprovedExecutableWithSetUIDCompareRPMs(TestCompareRPMs):
+    """
+    Assert when a setuid file is in a package and it's on the fileinfo list,
+    INFO result occurs when testing the RPMs.
+    """
+
+    def setUp(self):
+        super().setUp()
+
+        self.after_rpm.add_installed_file(
+            "/usr/bin/verify", rpmfluff.SourceFile("file", "a" * 5), mode="4755"
+        )
+
+        self.inspection = "permissions"
+        self.result = "VERIFY"
+        self.waiver_auth = "Security"
+
+
+class SecurityFAILUnapprovedExecutableWithSetUIDCompareRPMs(TestCompareRPMs):
+    """
+    Assert when a setuid file is in a package and it's on the fileinfo list,
+    INFO result occurs when testing the RPMs.
+    """
+
+    def setUp(self):
+        super().setUp()
+
+        self.after_rpm.add_installed_file(
+            "/usr/bin/fail", rpmfluff.SourceFile("file", "a" * 5), mode="4755"
+        )
+
+        self.inspection = "permissions"
+        self.result = "BAD"
+        self.waiver_auth = "Security"
+
+
 class UnapprovedExecutableWithSetUIDCompareKoji(TestCompareKoji):
     """
     Assert when a setuid file is in a package and it's on the fileinfo list,
@@ -223,6 +439,78 @@ class UnapprovedExecutableWithSetUIDCompareKoji(TestCompareKoji):
 
         self.after_rpm.add_installed_file(
             "/usr/bin/trojan", rpmfluff.SourceFile("file", "a" * 5), mode="4755"
+        )
+
+        self.inspection = "permissions"
+        self.result = "BAD"
+        self.waiver_auth = "Security"
+
+
+class SecuritySKIPUnapprovedExecutableWithSetUIDCompareKoji(TestCompareKoji):
+    """
+    Assert when a setuid file is in a package and it's on the fileinfo list,
+    INFO result occurs when testing the RPMs.
+    """
+
+    def setUp(self):
+        super().setUp()
+
+        self.after_rpm.add_installed_file(
+            "/usr/bin/skip", rpmfluff.SourceFile("file", "a" * 5), mode="4755"
+        )
+
+        self.inspection = "permissions"
+        self.result = "OK"
+        self.waiver_auth = "Not Waivable"
+
+
+class SecurityINFORMUnapprovedExecutableWithSetUIDCompareKoji(TestCompareKoji):
+    """
+    Assert when a setuid file is in a package and it's on the fileinfo list,
+    INFO result occurs when testing the RPMs.
+    """
+
+    def setUp(self):
+        super().setUp()
+
+        self.after_rpm.add_installed_file(
+            "/usr/bin/inform", rpmfluff.SourceFile("file", "a" * 5), mode="4755"
+        )
+
+        self.inspection = "permissions"
+        self.result = "INFO"
+        self.waiver_auth = "Security"
+
+
+class SecurityVERIFYUnapprovedExecutableWithSetUIDCompareKoji(TestCompareKoji):
+    """
+    Assert when a setuid file is in a package and it's on the fileinfo list,
+    INFO result occurs when testing the RPMs.
+    """
+
+    def setUp(self):
+        super().setUp()
+
+        self.after_rpm.add_installed_file(
+            "/usr/bin/verify", rpmfluff.SourceFile("file", "a" * 5), mode="4755"
+        )
+
+        self.inspection = "permissions"
+        self.result = "VERIFY"
+        self.waiver_auth = "Security"
+
+
+class SecurityFAILUnapprovedExecutableWithSetUIDCompareKoji(TestCompareKoji):
+    """
+    Assert when a setuid file is in a package and it's on the fileinfo list,
+    INFO result occurs when testing the RPMs.
+    """
+
+    def setUp(self):
+        super().setUp()
+
+        self.after_rpm.add_installed_file(
+            "/usr/bin/fail", rpmfluff.SourceFile("file", "a" * 5), mode="4755"
         )
 
         self.inspection = "permissions"
@@ -265,6 +553,78 @@ class FileIWOTHProhibitedRPMs(TestRPMs):
         self.waiver_auth = "Security"
 
 
+class SecuritySKIPFileIWOTHProhibitedRPMs(TestRPMs):
+    """
+    Assert when a world-writable file is in a package,
+    BAD result occurs requiring a Security waiver.
+    """
+
+    def setUp(self):
+        super().setUp()
+
+        self.rpm.add_installed_file(
+            "/usr/bin/skip", rpmfluff.SourceFile("file", "a" * 5), mode="0757"
+        )
+
+        self.inspection = "permissions"
+        self.result = "OK"
+        self.waiver_auth = "Not Waivable"
+
+
+class SecurityINFORMFileIWOTHProhibitedRPMs(TestRPMs):
+    """
+    Assert when a world-writable file is in a package,
+    BAD result occurs requiring a Security waiver.
+    """
+
+    def setUp(self):
+        super().setUp()
+
+        self.rpm.add_installed_file(
+            "/usr/bin/inform", rpmfluff.SourceFile("file", "a" * 5), mode="0757"
+        )
+
+        self.inspection = "permissions"
+        self.result = "INFO"
+        self.waiver_auth = "Security"
+
+
+class SecurityVERIFYFileIWOTHProhibitedRPMs(TestRPMs):
+    """
+    Assert when a world-writable file is in a package,
+    BAD result occurs requiring a Security waiver.
+    """
+
+    def setUp(self):
+        super().setUp()
+
+        self.rpm.add_installed_file(
+            "/usr/bin/verify", rpmfluff.SourceFile("file", "a" * 5), mode="0757"
+        )
+
+        self.inspection = "permissions"
+        self.result = "VERIFY"
+        self.waiver_auth = "Security"
+
+
+class SecurityFAILFileIWOTHProhibitedRPMs(TestRPMs):
+    """
+    Assert when a world-writable file is in a package,
+    BAD result occurs requiring a Security waiver.
+    """
+
+    def setUp(self):
+        super().setUp()
+
+        self.rpm.add_installed_file(
+            "/usr/bin/fail", rpmfluff.SourceFile("file", "a" * 5), mode="0757"
+        )
+
+        self.inspection = "permissions"
+        self.result = "BAD"
+        self.waiver_auth = "Security"
+
+
 class FileIWOTHProhibitedKoji(TestKoji):
     """
     Assert when a world-writable file is in a package,
@@ -276,6 +636,78 @@ class FileIWOTHProhibitedKoji(TestKoji):
 
         self.rpm.add_installed_file(
             "/usr/bin/derp", rpmfluff.SourceFile("file", "a" * 5), mode="0757"
+        )
+
+        self.inspection = "permissions"
+        self.result = "BAD"
+        self.waiver_auth = "Security"
+
+
+class SecuritySKIPFileIWOTHProhibitedKoji(TestKoji):
+    """
+    Assert when a world-writable file is in a package,
+    BAD result occurs requiring a Security waiver.
+    """
+
+    def setUp(self):
+        super().setUp()
+
+        self.rpm.add_installed_file(
+            "/usr/bin/skip", rpmfluff.SourceFile("file", "a" * 5), mode="0757"
+        )
+
+        self.inspection = "permissions"
+        self.result = "OK"
+        self.waiver_auth = "Not Waivable"
+
+
+class SecurityINFORMFileIWOTHProhibitedKoji(TestKoji):
+    """
+    Assert when a world-writable file is in a package,
+    BAD result occurs requiring a Security waiver.
+    """
+
+    def setUp(self):
+        super().setUp()
+
+        self.rpm.add_installed_file(
+            "/usr/bin/inform", rpmfluff.SourceFile("file", "a" * 5), mode="0757"
+        )
+
+        self.inspection = "permissions"
+        self.result = "INFO"
+        self.waiver_auth = "Security"
+
+
+class SecurityVERIFYFileIWOTHProhibitedKoji(TestKoji):
+    """
+    Assert when a world-writable file is in a package,
+    BAD result occurs requiring a Security waiver.
+    """
+
+    def setUp(self):
+        super().setUp()
+
+        self.rpm.add_installed_file(
+            "/usr/bin/verify", rpmfluff.SourceFile("file", "a" * 5), mode="0757"
+        )
+
+        self.inspection = "permissions"
+        self.result = "VERIFY"
+        self.waiver_auth = "Security"
+
+
+class SecurityFAILFileIWOTHProhibitedKoji(TestKoji):
+    """
+    Assert when a world-writable file is in a package,
+    BAD result occurs requiring a Security waiver.
+    """
+
+    def setUp(self):
+        super().setUp()
+
+        self.rpm.add_installed_file(
+            "/usr/bin/fail", rpmfluff.SourceFile("file", "a" * 5), mode="0757"
         )
 
         self.inspection = "permissions"
@@ -318,6 +750,78 @@ class FileIWOTHProhibitedCompareRPMs(TestCompareRPMs):
         self.waiver_auth = "Security"
 
 
+class SecuritySKIPFileIWOTHProhibitedCompareRPMs(TestCompareRPMs):
+    """
+    Assert when a world-writable file is in a package,
+    BAD result occurs requiring a Security waiver.
+    """
+
+    def setUp(self):
+        super().setUp()
+
+        self.after_rpm.add_installed_file(
+            "/usr/bin/skip", rpmfluff.SourceFile("file", "a" * 5), mode="0757"
+        )
+
+        self.inspection = "permissions"
+        self.result = "OK"
+        self.waiver_auth = "Not Waivable"
+
+
+class SecurityINFORMFileIWOTHProhibitedCompareRPMs(TestCompareRPMs):
+    """
+    Assert when a world-writable file is in a package,
+    BAD result occurs requiring a Security waiver.
+    """
+
+    def setUp(self):
+        super().setUp()
+
+        self.after_rpm.add_installed_file(
+            "/usr/bin/inform", rpmfluff.SourceFile("file", "a" * 5), mode="0757"
+        )
+
+        self.inspection = "permissions"
+        self.result = "INFO"
+        self.waiver_auth = "Security"
+
+
+class SecurityVERIFYFileIWOTHProhibitedCompareRPMs(TestCompareRPMs):
+    """
+    Assert when a world-writable file is in a package,
+    BAD result occurs requiring a Security waiver.
+    """
+
+    def setUp(self):
+        super().setUp()
+
+        self.after_rpm.add_installed_file(
+            "/usr/bin/verify", rpmfluff.SourceFile("file", "a" * 5), mode="0757"
+        )
+
+        self.inspection = "permissions"
+        self.result = "VERIFY"
+        self.waiver_auth = "Security"
+
+
+class SecurityFAILFileIWOTHProhibitedCompareRPMs(TestCompareRPMs):
+    """
+    Assert when a world-writable file is in a package,
+    BAD result occurs requiring a Security waiver.
+    """
+
+    def setUp(self):
+        super().setUp()
+
+        self.after_rpm.add_installed_file(
+            "/usr/bin/fail", rpmfluff.SourceFile("file", "a" * 5), mode="0757"
+        )
+
+        self.inspection = "permissions"
+        self.result = "BAD"
+        self.waiver_auth = "Security"
+
+
 class FileIWOTHProhibitedCompareKoji(TestCompareKoji):
     """
     Assert when a world-writable file is in a package,
@@ -329,6 +833,78 @@ class FileIWOTHProhibitedCompareKoji(TestCompareKoji):
 
         self.after_rpm.add_installed_file(
             "/usr/bin/derp", rpmfluff.SourceFile("file", "a" * 5), mode="0757"
+        )
+
+        self.inspection = "permissions"
+        self.result = "BAD"
+        self.waiver_auth = "Security"
+
+
+class SecuritySKIPFileIWOTHProhibitedCompareKoji(TestCompareKoji):
+    """
+    Assert when a world-writable file is in a package,
+    BAD result occurs requiring a Security waiver.
+    """
+
+    def setUp(self):
+        super().setUp()
+
+        self.after_rpm.add_installed_file(
+            "/usr/bin/skip", rpmfluff.SourceFile("file", "a" * 5), mode="0757"
+        )
+
+        self.inspection = "permissions"
+        self.result = "OK"
+        self.waiver_auth = "Not Waivable"
+
+
+class SecurityINFORMFileIWOTHProhibitedCompareKoji(TestCompareKoji):
+    """
+    Assert when a world-writable file is in a package,
+    BAD result occurs requiring a Security waiver.
+    """
+
+    def setUp(self):
+        super().setUp()
+
+        self.after_rpm.add_installed_file(
+            "/usr/bin/inform", rpmfluff.SourceFile("file", "a" * 5), mode="0757"
+        )
+
+        self.inspection = "permissions"
+        self.result = "INFO"
+        self.waiver_auth = "Security"
+
+
+class SecurityVERIFYFileIWOTHProhibitedCompareKoji(TestCompareKoji):
+    """
+    Assert when a world-writable file is in a package,
+    BAD result occurs requiring a Security waiver.
+    """
+
+    def setUp(self):
+        super().setUp()
+
+        self.after_rpm.add_installed_file(
+            "/usr/bin/verify", rpmfluff.SourceFile("file", "a" * 5), mode="0757"
+        )
+
+        self.inspection = "permissions"
+        self.result = "VERIFY"
+        self.waiver_auth = "Security"
+
+
+class SecurityFAILFileIWOTHProhibitedCompareKoji(TestCompareKoji):
+    """
+    Assert when a world-writable file is in a package,
+    BAD result occurs requiring a Security waiver.
+    """
+
+    def setUp(self):
+        super().setUp()
+
+        self.after_rpm.add_installed_file(
+            "/usr/bin/fail", rpmfluff.SourceFile("file", "a" * 5), mode="0757"
         )
 
         self.inspection = "permissions"
@@ -371,6 +947,78 @@ class FileIWOTHandISVTXProhibitedRPMs(TestRPMs):
         self.waiver_auth = "Security"
 
 
+class SecuritySKIPFileIWOTHandISVTXProhibitedRPMs(TestRPMs):
+    """
+    Assert when a world-writable file with the sticky bit is in a package,
+    BAD result occurs requiring a Security waiver.
+    """
+
+    def setUp(self):
+        super().setUp()
+
+        self.rpm.add_installed_file(
+            "/usr/bin/skip", rpmfluff.SourceFile("file", "a" * 5), mode="1757"
+        )
+
+        self.inspection = "permissions"
+        self.result = "OK"
+        self.waiver_auth = "Not Waivable"
+
+
+class SecurityINFORMFileIWOTHandISVTXProhibitedRPMs(TestRPMs):
+    """
+    Assert when a world-writable file with the sticky bit is in a package,
+    BAD result occurs requiring a Security waiver.
+    """
+
+    def setUp(self):
+        super().setUp()
+
+        self.rpm.add_installed_file(
+            "/usr/bin/inform", rpmfluff.SourceFile("file", "a" * 5), mode="1757"
+        )
+
+        self.inspection = "permissions"
+        self.result = "INFO"
+        self.waiver_auth = "Security"
+
+
+class SecurityVERIFYFileIWOTHandISVTXProhibitedRPMs(TestRPMs):
+    """
+    Assert when a world-writable file with the sticky bit is in a package,
+    BAD result occurs requiring a Security waiver.
+    """
+
+    def setUp(self):
+        super().setUp()
+
+        self.rpm.add_installed_file(
+            "/usr/bin/verify", rpmfluff.SourceFile("file", "a" * 5), mode="1757"
+        )
+
+        self.inspection = "permissions"
+        self.result = "VERIFY"
+        self.waiver_auth = "Security"
+
+
+class SecurityFAILFileIWOTHandISVTXProhibitedRPMs(TestRPMs):
+    """
+    Assert when a world-writable file with the sticky bit is in a package,
+    BAD result occurs requiring a Security waiver.
+    """
+
+    def setUp(self):
+        super().setUp()
+
+        self.rpm.add_installed_file(
+            "/usr/bin/fail", rpmfluff.SourceFile("file", "a" * 5), mode="1757"
+        )
+
+        self.inspection = "permissions"
+        self.result = "BAD"
+        self.waiver_auth = "Security"
+
+
 class FileIWOTHandISVTXProhibitedKoji(TestKoji):
     """
     Assert when a world-writable file with the sticky bit is in a package,
@@ -382,6 +1030,78 @@ class FileIWOTHandISVTXProhibitedKoji(TestKoji):
 
         self.rpm.add_installed_file(
             "/usr/bin/derp", rpmfluff.SourceFile("file", "a" * 5), mode="1757"
+        )
+
+        self.inspection = "permissions"
+        self.result = "BAD"
+        self.waiver_auth = "Security"
+
+
+class SecuritySKIPFileIWOTHandISVTXProhibitedKoji(TestKoji):
+    """
+    Assert when a world-writable file with the sticky bit is in a package,
+    BAD result occurs requiring a Security waiver.
+    """
+
+    def setUp(self):
+        super().setUp()
+
+        self.rpm.add_installed_file(
+            "/usr/bin/skip", rpmfluff.SourceFile("file", "a" * 5), mode="1757"
+        )
+
+        self.inspection = "permissions"
+        self.result = "OK"
+        self.waiver_auth = "Not Waivable"
+
+
+class SecurityINFORMFileIWOTHandISVTXProhibitedKoji(TestKoji):
+    """
+    Assert when a world-writable file with the sticky bit is in a package,
+    BAD result occurs requiring a Security waiver.
+    """
+
+    def setUp(self):
+        super().setUp()
+
+        self.rpm.add_installed_file(
+            "/usr/bin/inform", rpmfluff.SourceFile("file", "a" * 5), mode="1757"
+        )
+
+        self.inspection = "permissions"
+        self.result = "INFO"
+        self.waiver_auth = "Security"
+
+
+class SecurityVERIFYFileIWOTHandISVTXProhibitedKoji(TestKoji):
+    """
+    Assert when a world-writable file with the sticky bit is in a package,
+    BAD result occurs requiring a Security waiver.
+    """
+
+    def setUp(self):
+        super().setUp()
+
+        self.rpm.add_installed_file(
+            "/usr/bin/verify", rpmfluff.SourceFile("file", "a" * 5), mode="1757"
+        )
+
+        self.inspection = "permissions"
+        self.result = "VERIFY"
+        self.waiver_auth = "Security"
+
+
+class SecurityFAILFileIWOTHandISVTXProhibitedKoji(TestKoji):
+    """
+    Assert when a world-writable file with the sticky bit is in a package,
+    BAD result occurs requiring a Security waiver.
+    """
+
+    def setUp(self):
+        super().setUp()
+
+        self.rpm.add_installed_file(
+            "/usr/bin/fail", rpmfluff.SourceFile("file", "a" * 5), mode="1757"
         )
 
         self.inspection = "permissions"
@@ -424,6 +1144,78 @@ class FileIWOTHandISVTXProhibitedCompareRPMs(TestCompareRPMs):
         self.waiver_auth = "Security"
 
 
+class SecuritySKIPFileIWOTHandISVTXProhibitedCompareRPMs(TestCompareRPMs):
+    """
+    Assert when a world-writable file with the sticky bit is in a package,
+    BAD result occurs requiring a Security waiver.
+    """
+
+    def setUp(self):
+        super().setUp()
+
+        self.after_rpm.add_installed_file(
+            "/usr/bin/skip", rpmfluff.SourceFile("file", "a" * 5), mode="1757"
+        )
+
+        self.inspection = "permissions"
+        self.result = "OK"
+        self.waiver_auth = "Not Waivable"
+
+
+class SecurityINFORMFileIWOTHandISVTXProhibitedCompareRPMs(TestCompareRPMs):
+    """
+    Assert when a world-writable file with the sticky bit is in a package,
+    BAD result occurs requiring a Security waiver.
+    """
+
+    def setUp(self):
+        super().setUp()
+
+        self.after_rpm.add_installed_file(
+            "/usr/bin/inform", rpmfluff.SourceFile("file", "a" * 5), mode="1757"
+        )
+
+        self.inspection = "permissions"
+        self.result = "INFO"
+        self.waiver_auth = "Security"
+
+
+class SecurityVERIFYFileIWOTHandISVTXProhibitedCompareRPMs(TestCompareRPMs):
+    """
+    Assert when a world-writable file with the sticky bit is in a package,
+    BAD result occurs requiring a Security waiver.
+    """
+
+    def setUp(self):
+        super().setUp()
+
+        self.after_rpm.add_installed_file(
+            "/usr/bin/verify", rpmfluff.SourceFile("file", "a" * 5), mode="1757"
+        )
+
+        self.inspection = "permissions"
+        self.result = "VERIFY"
+        self.waiver_auth = "Security"
+
+
+class SecurityFAILFileIWOTHandISVTXProhibitedCompareRPMs(TestCompareRPMs):
+    """
+    Assert when a world-writable file with the sticky bit is in a package,
+    BAD result occurs requiring a Security waiver.
+    """
+
+    def setUp(self):
+        super().setUp()
+
+        self.after_rpm.add_installed_file(
+            "/usr/bin/fail", rpmfluff.SourceFile("file", "a" * 5), mode="1757"
+        )
+
+        self.inspection = "permissions"
+        self.result = "BAD"
+        self.waiver_auth = "Security"
+
+
 class FileIWOTHandISVTXProhibitedCompareKoji(TestCompareKoji):
     """
     Assert when a world-writable file with the sticky bit is in a package,
@@ -435,6 +1227,78 @@ class FileIWOTHandISVTXProhibitedCompareKoji(TestCompareKoji):
 
         self.after_rpm.add_installed_file(
             "/usr/bin/derp", rpmfluff.SourceFile("file", "a" * 5), mode="1757"
+        )
+
+        self.inspection = "permissions"
+        self.result = "BAD"
+        self.waiver_auth = "Security"
+
+
+class SecuritySKIPFileIWOTHandISVTXProhibitedCompareKoji(TestCompareKoji):
+    """
+    Assert when a world-writable file with the sticky bit is in a package,
+    BAD result occurs requiring a Security waiver.
+    """
+
+    def setUp(self):
+        super().setUp()
+
+        self.after_rpm.add_installed_file(
+            "/usr/bin/skip", rpmfluff.SourceFile("file", "a" * 5), mode="1757"
+        )
+
+        self.inspection = "permissions"
+        self.result = "OK"
+        self.waiver_auth = "Not Waivable"
+
+
+class SecurityINFORMFileIWOTHandISVTXProhibitedCompareKoji(TestCompareKoji):
+    """
+    Assert when a world-writable file with the sticky bit is in a package,
+    BAD result occurs requiring a Security waiver.
+    """
+
+    def setUp(self):
+        super().setUp()
+
+        self.after_rpm.add_installed_file(
+            "/usr/bin/inform", rpmfluff.SourceFile("file", "a" * 5), mode="1757"
+        )
+
+        self.inspection = "permissions"
+        self.result = "INFO"
+        self.waiver_auth = "Security"
+
+
+class SecurityVERIFYFileIWOTHandISVTXProhibitedCompareKoji(TestCompareKoji):
+    """
+    Assert when a world-writable file with the sticky bit is in a package,
+    BAD result occurs requiring a Security waiver.
+    """
+
+    def setUp(self):
+        super().setUp()
+
+        self.after_rpm.add_installed_file(
+            "/usr/bin/verify", rpmfluff.SourceFile("file", "a" * 5), mode="1757"
+        )
+
+        self.inspection = "permissions"
+        self.result = "VERIFY"
+        self.waiver_auth = "Security"
+
+
+class SecurityFAILFileIWOTHandISVTXProhibitedCompareKoji(TestCompareKoji):
+    """
+    Assert when a world-writable file with the sticky bit is in a package,
+    BAD result occurs requiring a Security waiver.
+    """
+
+    def setUp(self):
+        super().setUp()
+
+        self.after_rpm.add_installed_file(
+            "/usr/bin/fail", rpmfluff.SourceFile("file", "a" * 5), mode="1757"
         )
 
         self.inspection = "permissions"
@@ -473,6 +1337,70 @@ class DirIWOTHProhibitedRPMs(TestRPMs):
         self.waiver_auth = "Security"
 
 
+class SecuritySKIPDirIWOTHProhibitedRPMs(TestRPMs):
+    """
+    Assert when a world-writable dir is in a package,
+    BAD result occurs requiring a Security waiver.
+    """
+
+    def setUp(self):
+        super().setUp()
+
+        self.rpm.add_installed_directory("/usr/share/skip", mode="0757")
+
+        self.inspection = "permissions"
+        self.result = "OK"
+        self.waiver_auth = "Not Waivable"
+
+
+class SecurityINFORMDirIWOTHProhibitedRPMs(TestRPMs):
+    """
+    Assert when a world-writable dir is in a package,
+    BAD result occurs requiring a Security waiver.
+    """
+
+    def setUp(self):
+        super().setUp()
+
+        self.rpm.add_installed_directory("/usr/share/inform", mode="0757")
+
+        self.inspection = "permissions"
+        self.result = "INFO"
+        self.waiver_auth = "Security"
+
+
+class SecurityVERIFYDirIWOTHProhibitedRPMs(TestRPMs):
+    """
+    Assert when a world-writable dir is in a package,
+    BAD result occurs requiring a Security waiver.
+    """
+
+    def setUp(self):
+        super().setUp()
+
+        self.rpm.add_installed_directory("/usr/share/verify", mode="0757")
+
+        self.inspection = "permissions"
+        self.result = "VERIFY"
+        self.waiver_auth = "Security"
+
+
+class SecurityFAILDirIWOTHProhibitedRPMs(TestRPMs):
+    """
+    Assert when a world-writable dir is in a package,
+    BAD result occurs requiring a Security waiver.
+    """
+
+    def setUp(self):
+        super().setUp()
+
+        self.rpm.add_installed_directory("/usr/share/fail", mode="0757")
+
+        self.inspection = "permissions"
+        self.result = "BAD"
+        self.waiver_auth = "Security"
+
+
 class DirIWOTHProhibitedKoji(TestKoji):
     """
     Assert when a world-writable dir is in a package,
@@ -483,6 +1411,70 @@ class DirIWOTHProhibitedKoji(TestKoji):
         super().setUp()
 
         self.rpm.add_installed_directory("/usr/share/dumping-ground", mode="0757")
+
+        self.inspection = "permissions"
+        self.result = "BAD"
+        self.waiver_auth = "Security"
+
+
+class SecuritySKIPDirIWOTHProhibitedKoji(TestKoji):
+    """
+    Assert when a world-writable dir is in a package,
+    BAD result occurs requiring a Security waiver.
+    """
+
+    def setUp(self):
+        super().setUp()
+
+        self.rpm.add_installed_directory("/usr/share/skip", mode="0757")
+
+        self.inspection = "permissions"
+        self.result = "OK"
+        self.waiver_auth = "Not Waivable"
+
+
+class SecurityINFORMDirIWOTHProhibitedKoji(TestKoji):
+    """
+    Assert when a world-writable dir is in a package,
+    BAD result occurs requiring a Security waiver.
+    """
+
+    def setUp(self):
+        super().setUp()
+
+        self.rpm.add_installed_directory("/usr/share/inform", mode="0757")
+
+        self.inspection = "permissions"
+        self.result = "INFO"
+        self.waiver_auth = "Security"
+
+
+class SecurityVERIFYDirIWOTHProhibitedKoji(TestKoji):
+    """
+    Assert when a world-writable dir is in a package,
+    BAD result occurs requiring a Security waiver.
+    """
+
+    def setUp(self):
+        super().setUp()
+
+        self.rpm.add_installed_directory("/usr/share/verify", mode="0757")
+
+        self.inspection = "permissions"
+        self.result = "VERIFY"
+        self.waiver_auth = "Security"
+
+
+class SecurityFAILDirIWOTHProhibitedKoji(TestKoji):
+    """
+    Assert when a world-writable dir is in a package,
+    BAD result occurs requiring a Security waiver.
+    """
+
+    def setUp(self):
+        super().setUp()
+
+        self.rpm.add_installed_directory("/usr/share/fail", mode="0757")
 
         self.inspection = "permissions"
         self.result = "BAD"
@@ -520,6 +1512,70 @@ class DirIWOTHProhibitedCompareRPMs(TestCompareRPMs):
         self.waiver_auth = "Security"
 
 
+class SecuritySKIPDirIWOTHProhibitedCompareRPMs(TestCompareRPMs):
+    """
+    Assert when a world-writable dir is in a package,
+    BAD result occurs requiring a Security waiver.
+    """
+
+    def setUp(self):
+        super().setUp()
+
+        self.after_rpm.add_installed_directory("/usr/share/skip", mode="0757")
+
+        self.inspection = "permissions"
+        self.result = "OK"
+        self.waiver_auth = "Not Waivable"
+
+
+class SecurityINFORMDirIWOTHProhibitedCompareRPMs(TestCompareRPMs):
+    """
+    Assert when a world-writable dir is in a package,
+    BAD result occurs requiring a Security waiver.
+    """
+
+    def setUp(self):
+        super().setUp()
+
+        self.after_rpm.add_installed_directory("/usr/share/inform", mode="0757")
+
+        self.inspection = "permissions"
+        self.result = "INFO"
+        self.waiver_auth = "Security"
+
+
+class SecurityVERIFYDirIWOTHProhibitedCompareRPMs(TestCompareRPMs):
+    """
+    Assert when a world-writable dir is in a package,
+    BAD result occurs requiring a Security waiver.
+    """
+
+    def setUp(self):
+        super().setUp()
+
+        self.after_rpm.add_installed_directory("/usr/share/verify", mode="0757")
+
+        self.inspection = "permissions"
+        self.result = "VERIFY"
+        self.waiver_auth = "Security"
+
+
+class SecurityFAILDirIWOTHProhibitedCompareRPMs(TestCompareRPMs):
+    """
+    Assert when a world-writable dir is in a package,
+    BAD result occurs requiring a Security waiver.
+    """
+
+    def setUp(self):
+        super().setUp()
+
+        self.after_rpm.add_installed_directory("/usr/share/fail", mode="0757")
+
+        self.inspection = "permissions"
+        self.result = "BAD"
+        self.waiver_auth = "Security"
+
+
 class DirIWOTHProhibitedCompareKoji(TestCompareKoji):
     """
     Assert when a world-writable dir is in a package,
@@ -530,6 +1586,70 @@ class DirIWOTHProhibitedCompareKoji(TestCompareKoji):
         super().setUp()
 
         self.after_rpm.add_installed_directory("/usr/share/dumping-ground", mode="0757")
+
+        self.inspection = "permissions"
+        self.result = "BAD"
+        self.waiver_auth = "Security"
+
+
+class SecuritySKIPDirIWOTHProhibitedCompareKoji(TestCompareKoji):
+    """
+    Assert when a world-writable dir is in a package,
+    BAD result occurs requiring a Security waiver.
+    """
+
+    def setUp(self):
+        super().setUp()
+
+        self.after_rpm.add_installed_directory("/usr/share/skip", mode="0757")
+
+        self.inspection = "permissions"
+        self.result = "OK"
+        self.waiver_auth = "Not Waivable"
+
+
+class SecurityINFORMDirIWOTHProhibitedCompareKoji(TestCompareKoji):
+    """
+    Assert when a world-writable dir is in a package,
+    BAD result occurs requiring a Security waiver.
+    """
+
+    def setUp(self):
+        super().setUp()
+
+        self.after_rpm.add_installed_directory("/usr/share/inform", mode="0757")
+
+        self.inspection = "permissions"
+        self.result = "INFO"
+        self.waiver_auth = "Security"
+
+
+class SecurityVERIFYDirIWOTHProhibitedCompareKoji(TestCompareKoji):
+    """
+    Assert when a world-writable dir is in a package,
+    BAD result occurs requiring a Security waiver.
+    """
+
+    def setUp(self):
+        super().setUp()
+
+        self.after_rpm.add_installed_directory("/usr/share/verify", mode="0757")
+
+        self.inspection = "permissions"
+        self.result = "VERIFY"
+        self.waiver_auth = "Security"
+
+
+class SecurityFAILDirIWOTHProhibitedCompareKoji(TestCompareKoji):
+    """
+    Assert when a world-writable dir is in a package,
+    BAD result occurs requiring a Security waiver.
+    """
+
+    def setUp(self):
+        super().setUp()
+
+        self.after_rpm.add_installed_directory("/usr/share/fail", mode="0757")
 
         self.inspection = "permissions"
         self.result = "BAD"
@@ -567,6 +1687,70 @@ class DirIWOTHandISVTXProhibitedRPMs(TestRPMs):
         self.waiver_auth = "Security"
 
 
+class SecuritySKIPDirIWOTHandISVTXProhibitedRPMs(TestRPMs):
+    """
+    Assert when a world-writable dir with the sticky bit is in a package,
+    BAD result occurs requiring a Security waiver.
+    """
+
+    def setUp(self):
+        super().setUp()
+
+        self.rpm.add_installed_directory("/usr/share/skip", mode="1757")
+
+        self.inspection = "permissions"
+        self.result = "OK"
+        self.waiver_auth = "Not Waivable"
+
+
+class SecurityINFORMDirIWOTHandISVTXProhibitedRPMs(TestRPMs):
+    """
+    Assert when a world-writable dir with the sticky bit is in a package,
+    BAD result occurs requiring a Security waiver.
+    """
+
+    def setUp(self):
+        super().setUp()
+
+        self.rpm.add_installed_directory("/usr/share/inform", mode="1757")
+
+        self.inspection = "permissions"
+        self.result = "INFO"
+        self.waiver_auth = "Security"
+
+
+class SecurityVERIFYDirIWOTHandISVTXProhibitedRPMs(TestRPMs):
+    """
+    Assert when a world-writable dir with the sticky bit is in a package,
+    BAD result occurs requiring a Security waiver.
+    """
+
+    def setUp(self):
+        super().setUp()
+
+        self.rpm.add_installed_directory("/usr/share/verify", mode="1757")
+
+        self.inspection = "permissions"
+        self.result = "VERIFY"
+        self.waiver_auth = "Security"
+
+
+class SecurityFAILDirIWOTHandISVTXProhibitedRPMs(TestRPMs):
+    """
+    Assert when a world-writable dir with the sticky bit is in a package,
+    BAD result occurs requiring a Security waiver.
+    """
+
+    def setUp(self):
+        super().setUp()
+
+        self.rpm.add_installed_directory("/usr/share/fail", mode="1757")
+
+        self.inspection = "permissions"
+        self.result = "BAD"
+        self.waiver_auth = "Security"
+
+
 class DirIWOTHandISVTXProhibitedKoji(TestKoji):
     """
     Assert when a world-writable dir with the sticky bit is in a package,
@@ -577,6 +1761,70 @@ class DirIWOTHandISVTXProhibitedKoji(TestKoji):
         super().setUp()
 
         self.rpm.add_installed_directory("/usr/share/dumping-ground", mode="1757")
+
+        self.inspection = "permissions"
+        self.result = "BAD"
+        self.waiver_auth = "Security"
+
+
+class SecuritySKIPDirIWOTHandISVTXProhibitedKoji(TestKoji):
+    """
+    Assert when a world-writable dir with the sticky bit is in a package,
+    BAD result occurs requiring a Security waiver.
+    """
+
+    def setUp(self):
+        super().setUp()
+
+        self.rpm.add_installed_directory("/usr/share/skip", mode="1757")
+
+        self.inspection = "permissions"
+        self.result = "OK"
+        self.waiver_auth = "Not Waivable"
+
+
+class SecurityINFORMDirIWOTHandISVTXProhibitedKoji(TestKoji):
+    """
+    Assert when a world-writable dir with the sticky bit is in a package,
+    BAD result occurs requiring a Security waiver.
+    """
+
+    def setUp(self):
+        super().setUp()
+
+        self.rpm.add_installed_directory("/usr/share/inform", mode="1757")
+
+        self.inspection = "permissions"
+        self.result = "INFO"
+        self.waiver_auth = "Security"
+
+
+class SecurityVERIFYDirIWOTHandISVTXProhibitedKoji(TestKoji):
+    """
+    Assert when a world-writable dir with the sticky bit is in a package,
+    BAD result occurs requiring a Security waiver.
+    """
+
+    def setUp(self):
+        super().setUp()
+
+        self.rpm.add_installed_directory("/usr/share/verify", mode="1757")
+
+        self.inspection = "permissions"
+        self.result = "VERIFY"
+        self.waiver_auth = "Security"
+
+
+class SecurityFAILDirIWOTHandISVTXProhibitedKoji(TestKoji):
+    """
+    Assert when a world-writable dir with the sticky bit is in a package,
+    BAD result occurs requiring a Security waiver.
+    """
+
+    def setUp(self):
+        super().setUp()
+
+        self.rpm.add_installed_directory("/usr/share/fail", mode="1757")
 
         self.inspection = "permissions"
         self.result = "BAD"
@@ -614,6 +1862,70 @@ class DirIWOTHandISVTXProhibitedCompareRPMs(TestCompareRPMs):
         self.waiver_auth = "Security"
 
 
+class SecuritySKIPDirIWOTHandISVTXProhibitedCompareRPMs(TestCompareRPMs):
+    """
+    Assert when a world-writable dir with the sticky bit is in a package,
+    BAD result occurs requiring a Security waiver.
+    """
+
+    def setUp(self):
+        super().setUp()
+
+        self.after_rpm.add_installed_directory("/usr/share/skip", mode="1757")
+
+        self.inspection = "permissions"
+        self.result = "OK"
+        self.waiver_auth = "Not Waivable"
+
+
+class SecurityINFORMDirIWOTHandISVTXProhibitedCompareRPMs(TestCompareRPMs):
+    """
+    Assert when a world-writable dir with the sticky bit is in a package,
+    BAD result occurs requiring a Security waiver.
+    """
+
+    def setUp(self):
+        super().setUp()
+
+        self.after_rpm.add_installed_directory("/usr/share/inform", mode="1757")
+
+        self.inspection = "permissions"
+        self.result = "INFO"
+        self.waiver_auth = "Security"
+
+
+class SecurityVERIFYDirIWOTHandISVTXProhibitedCompareRPMs(TestCompareRPMs):
+    """
+    Assert when a world-writable dir with the sticky bit is in a package,
+    BAD result occurs requiring a Security waiver.
+    """
+
+    def setUp(self):
+        super().setUp()
+
+        self.after_rpm.add_installed_directory("/usr/share/verify", mode="1757")
+
+        self.inspection = "permissions"
+        self.result = "VERIFY"
+        self.waiver_auth = "Security"
+
+
+class SecurityFAILDirIWOTHandISVTXProhibitedCompareRPMs(TestCompareRPMs):
+    """
+    Assert when a world-writable dir with the sticky bit is in a package,
+    BAD result occurs requiring a Security waiver.
+    """
+
+    def setUp(self):
+        super().setUp()
+
+        self.after_rpm.add_installed_directory("/usr/share/fail", mode="1757")
+
+        self.inspection = "permissions"
+        self.result = "BAD"
+        self.waiver_auth = "Security"
+
+
 class DirIWOTHandISVTXProhibitedCompareKoji(TestCompareKoji):
     """
     Assert when a world-writable dir with the sticky bit is in a package,
@@ -624,6 +1936,70 @@ class DirIWOTHandISVTXProhibitedCompareKoji(TestCompareKoji):
         super().setUp()
 
         self.after_rpm.add_installed_directory("/usr/share/dumping-ground", mode="1757")
+
+        self.inspection = "permissions"
+        self.result = "BAD"
+        self.waiver_auth = "Security"
+
+
+class SecuritySKIPDirIWOTHandISVTXProhibitedCompareKoji(TestCompareKoji):
+    """
+    Assert when a world-writable dir with the sticky bit is in a package,
+    BAD result occurs requiring a Security waiver.
+    """
+
+    def setUp(self):
+        super().setUp()
+
+        self.after_rpm.add_installed_directory("/usr/share/skip", mode="1757")
+
+        self.inspection = "permissions"
+        self.result = "OK"
+        self.waiver_auth = "Not Waivable"
+
+
+class SecurityINFORMDirIWOTHandISVTXProhibitedCompareKoji(TestCompareKoji):
+    """
+    Assert when a world-writable dir with the sticky bit is in a package,
+    BAD result occurs requiring a Security waiver.
+    """
+
+    def setUp(self):
+        super().setUp()
+
+        self.after_rpm.add_installed_directory("/usr/share/inform", mode="1757")
+
+        self.inspection = "permissions"
+        self.result = "INFO"
+        self.waiver_auth = "Security"
+
+
+class SecurityVERIFYDirIWOTHandISVTXProhibitedCompareKoji(TestCompareKoji):
+    """
+    Assert when a world-writable dir with the sticky bit is in a package,
+    BAD result occurs requiring a Security waiver.
+    """
+
+    def setUp(self):
+        super().setUp()
+
+        self.after_rpm.add_installed_directory("/usr/share/verify", mode="1757")
+
+        self.inspection = "permissions"
+        self.result = "VERIFY"
+        self.waiver_auth = "Security"
+
+
+class SecurityFAILDirIWOTHandISVTXProhibitedCompareKoji(TestCompareKoji):
+    """
+    Assert when a world-writable dir with the sticky bit is in a package,
+    BAD result occurs requiring a Security waiver.
+    """
+
+    def setUp(self):
+        super().setUp()
+
+        self.after_rpm.add_installed_directory("/usr/share/fail", mode="1757")
 
         self.inspection = "permissions"
         self.result = "BAD"

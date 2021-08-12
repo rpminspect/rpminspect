@@ -1,0 +1,46 @@
+#<path>                <package>   <version>   <release>   <rules>
+/usr/sbin/skip         vaporware   *           *           caps=SKIP,execstack=SKIP,relro=SKIP,fortifysource=SKIP
+/usr/sbin/inform       vaporware   *           *           caps=INFORM,execstack=INFORM,relro=INFORM,fortifysource=INFORM
+/usr/sbin/verify       vaporware   *           *           caps=VERIFY,execstack=VERIFY,relro=VERIFY,fortifysource=VERIFY
+/usr/sbin/fail         vaporware   *           *           caps=FAIL,execstack=FAIL,relro=FAIL,fortifysource=FAIL
+
+# used by CAP_SETUID tests
+/bin/skip              vaporware   *           *           setuid=SKIP
+/bin/inform            vaporware   *           *           setuid=INFORM
+/bin/verify            vaporware   *           *           setuid=VERIFY
+/bin/fail              vaporware   *           *           setuid=FAIL
+
+# used by modes and worldwritable tests
+/usr/bin/skip          vaporware   *           *           modes=SKIP,worldwritable=SKIP
+/usr/bin/inform        vaporware   *           *           modes=INFORM,worldwritable=INFORM
+/usr/bin/verify        vaporware   *           *           modes=VERIFY,worldwritable=VERIFY
+/usr/bin/fail          vaporware   *           *           modes=FAIL,worldwritable=FAIL
+/usr/share/skip        vaporware   *           *           modes=SKIP,worldwritable=SKIP
+/usr/share/inform      vaporware   *           *           modes=INFORM,worldwritable=INFORM
+/usr/share/verify      vaporware   *           *           modes=VERIFY,worldwritable=VERIFY
+/usr/share/fail        vaporware   *           *           modes=FAIL,worldwritable=FAIL
+
+# these are not on the data/capabilities/ list, but get caught this
+# way so we want to test how the reporting is controlled
+/usr/sbin/skip1        vaporware   *           *           caps=SKIP
+/usr/sbin/inform1      vaporware   *           *           caps=INFORM
+/usr/sbin/verify1      vaporware   *           *           caps=VERIFY
+/usr/sbin/fail1        vaporware   *           *           caps=FAIL
+
+# for some of the ELF static library tests
+/usr/lib/libskip.a     vaporware   *           *           pic=SKIP
+/usr/lib/libinform.a   vaporware   *           *           pic=INFORM
+/usr/lib/libverify.a   vaporware   *           *           pic=VERIFY
+/usr/lib/libfail.a     vaporware   *           *           pic=FAIL
+
+# for some of the ELF shared library tests
+/usr/lib/libskip.so    vaporware   *           *           textrel=SKIP
+/usr/lib/libinform.so  vaporware   *           *           textrel=INFORM
+/usr/lib/libverify.so  vaporware   *           *           textrel=VERIFY
+/usr/lib/libfail.so    vaporware   *           *           textrel=FAIL
+
+# for the securitypath tests
+/etc/sudoers.d/skip    vaporware   *           *           securitypath=SKIP
+/etc/sudoers.d/inform  vaporware   *           *           securitypath=INFORM
+/etc/sudoers.d/verify  vaporware   *           *           securitypath=VERIFY
+/etc/sudoers.d/fail    vaporware   *           *           securitypath=FAIL

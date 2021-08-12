@@ -322,6 +322,33 @@ typedef struct _string_list_map_t {
 } string_list_map_t;
 
 /*
+ * Security rule actions hash table
+ * There is one of these for each row in the vendor security
+ * definitions file.
+ */
+typedef struct _secrule_t {
+    int type;
+    severity_t severity;
+    UT_hash_handle hh;
+} secrule_t;
+
+/*
+ * Security rules list
+ * This list holds the rows as read from the vendor security
+ * definitions files.
+ */
+typedef struct _security_entry_t {
+    char *path;
+    char *pkg;
+    char *ver;
+    char *rel;
+    secrule_t *rules;
+    TAILQ_ENTRY(_security_entry_t) items;
+} security_entry_t;
+
+typedef TAILQ_HEAD(security_entry_s, _security_entry_t) security_list_t;
+
+/*
  * Configuration and state instance for librpminspect run.
  * Applications using librpminspect should initialize the
  * library and retain this structure through the run of
