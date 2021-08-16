@@ -80,13 +80,18 @@ bool match_fileinfo_mode(struct rpminspect *ri, const rpmfile_entry_t *file, con
                     free(params.remedy);
                     return true;
                 } else {
-                    xasprintf(&params.msg, _("%s in %s on %s carries unexpected mode %04o; expected mode %04o"), file->localpath, pkg, params.arch, perms, fientry->mode);
-                    params.severity = RESULT_VERIFY;
-                    params.waiverauth = WAIVABLE_BY_SECURITY;
-                    add_result(ri, &params);
-                    free(params.msg);
-                    free(params.remedy);
-                    return true;
+                    params.severity = get_secrule_result_severity(ri, file, SECRULE_MODES);
+
+                    if (params.severity != RESULT_NULL && params.severity != RESULT_SKIP) {
+                        params.waiverauth = WAIVABLE_BY_SECURITY;
+                        xasprintf(&params.msg, _("%s in %s on %s carries unexpected mode %04o; expected mode %04o; requires inspection by the Security Team"), file->localpath, pkg, params.arch, perms, fientry->mode);
+                        add_result(ri, &params);
+                        free(params.msg);
+                        free(params.remedy);
+                        params.remedy = NULL;
+
+                        return true;
+                    }
                 }
 
                 break;
@@ -96,13 +101,16 @@ bool match_fileinfo_mode(struct rpminspect *ri, const rpmfile_entry_t *file, con
 
     /* catch anything not on the fileinfo list with setuid/setgid */
     if ((perms & S_ISUID) || (perms & S_ISGID)) {
-        xasprintf(&params.msg, _("%s in %s on %s carries insecure mode %04o, Security Team review may be required"), file->localpath, pkg, params.arch, perms);
-        params.severity = RESULT_BAD;
-        params.waiverauth = WAIVABLE_BY_SECURITY;
-        add_result(ri, &params);
-        free(params.msg);
-        free(params.remedy);
-        params.remedy = NULL;
+        params.severity = get_secrule_result_severity(ri, file, SECRULE_MODES);
+
+        if (params.severity != RESULT_NULL && params.severity != RESULT_SKIP) {
+            params.waiverauth = WAIVABLE_BY_SECURITY;
+            xasprintf(&params.msg, _("%s in %s on %s carries insecure mode %04o, Security Team review may be required"), file->localpath, pkg, params.arch, perms);
+            add_result(ri, &params);
+            free(params.msg);
+            free(params.remedy);
+            params.remedy = NULL;
+        }
     }
 
     free(params.remedy);
@@ -160,13 +168,16 @@ bool match_fileinfo_owner(struct rpminspect *ri, const rpmfile_entry_t *file, co
                     free(params.remedy);
                     return true;
                 } else {
-                    xasprintf(&params.msg, _("%s in %s on %s carries unexpected owner '%s'; expected owner '%s'"), file->localpath, pkg, params.arch, owner, fientry->owner);
-                    params.severity = RESULT_VERIFY;
-                    params.waiverauth = WAIVABLE_BY_SECURITY;
-                    add_result(ri, &params);
-                    free(params.msg);
-                    free(params.remedy);
-                    return true;
+                    params.severity = get_secrule_result_severity(ri, file, SECRULE_MODES);
+
+                    if (params.severity != RESULT_NULL && params.severity != RESULT_SKIP) {
+                        params.waiverauth = WAIVABLE_BY_SECURITY;
+                        xasprintf(&params.msg, _("%s in %s on %s carries unexpected owner '%s'; expected owner '%s'; requires inspection by the Security Team"), file->localpath, pkg, params.arch, owner, fientry->owner);
+                        add_result(ri, &params);
+                        free(params.msg);
+                        free(params.remedy);
+                        return true;
+                    }
                 }
 
                 break;
@@ -228,13 +239,16 @@ bool match_fileinfo_group(struct rpminspect *ri, const rpmfile_entry_t *file, co
                     free(params.remedy);
                     return true;
                 } else {
-                    xasprintf(&params.msg, _("%s in %s on %s carries group unexpected '%s'; expected group '%s'"), file->localpath, pkg, params.arch, group, fientry->group);
-                    params.severity = RESULT_VERIFY;
-                    params.waiverauth = WAIVABLE_BY_SECURITY;
-                    add_result(ri, &params);
-                    free(params.msg);
-                    free(params.remedy);
-                    return true;
+                    params.severity = get_secrule_result_severity(ri, file, SECRULE_MODES);
+
+                    if (params.severity != RESULT_NULL && params.severity != RESULT_SKIP) {
+                        params.waiverauth = WAIVABLE_BY_SECURITY;
+                        xasprintf(&params.msg, _("%s in %s on %s carries group unexpected '%s'; expected group '%s'; requires inspection by the Security Team"), file->localpath, pkg, params.arch, group, fientry->group);
+                        add_result(ri, &params);
+                        free(params.msg);
+                        free(params.remedy);
+                        return true;
+                    }
                 }
 
                 break;
