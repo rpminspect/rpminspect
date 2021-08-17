@@ -90,12 +90,15 @@ static bool permissions_driver(struct rpminspect *ri, rpmfile_entry_t *file)
 
     /* check for world-writability */
     if (!allowed && !S_ISLNK(file->st.st_mode) && ((after_mode & (S_IWOTH|S_ISVTX)) || (after_mode & S_IWOTH))) {
-        xasprintf(&params.msg, _("%s (%s) is world-writable on %s"), file->localpath, get_mime_type(file), arch);
-        params.severity = RESULT_BAD;
-        params.waiverauth = WAIVABLE_BY_SECURITY;
-        add_result(ri, &params);
-        free(params.msg);
-        result = false;
+        params.severity = get_secrule_result_severity(ri, file, SECRULE_WORLDWRITABLE);
+
+        if (params.severity != RESULT_NULL && params.severity != RESULT_SKIP) {
+            xasprintf(&params.msg, _("%s (%s) is world-writable on %s"), file->localpath, get_mime_type(file), arch);
+            params.waiverauth = WAIVABLE_BY_SECURITY;
+            add_result(ri, &params);
+            free(params.msg);
+            result = false;
+        }
     }
 
     return result;
