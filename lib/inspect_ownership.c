@@ -135,25 +135,31 @@ static bool ownership_driver(struct rpminspect *ri, rpmfile_entry_t *file)
                 /* Handle if CAP_SETUID is present or not */
                 if (have_setuid == CAP_SET) {
                     if ((file->st.st_mode & S_IXOTH) && (ri->tests & INSPECT_OWNERSHIP)) {
-                        xasprintf(&params.msg, _("File %s on %s has CAP_SETUID capability but group `%s` and is world executable"), file->localpath, arch, group);
-                        xasprintf(&params.remedy, REMEDY_OWNERSHIP_IXOTH, ri->fileinfo_filename);
-                        params.severity = RESULT_BAD;
-                        params.waiverauth = WAIVABLE_BY_SECURITY;
-                        add_result(ri, &params);
-                        free(params.msg);
-                        free(params.remedy);
-                        result = false;
+                        params.severity = get_secrule_result_severity(ri, file, SECRULE_SETUID);
+
+                        if (params.severity != RESULT_NULL && params.severity != RESULT_SKIP) {
+                            xasprintf(&params.msg, _("File %s on %s has CAP_SETUID capability but group `%s` and is world executable"), file->localpath, arch, group);
+                            xasprintf(&params.remedy, REMEDY_OWNERSHIP_IXOTH, ri->fileinfo_filename);
+                            params.waiverauth = WAIVABLE_BY_SECURITY;
+                            add_result(ri, &params);
+                            free(params.msg);
+                            free(params.remedy);
+                            result = false;
+                        }
                     }
 
                     if (file->st.st_mode & S_IWGRP) {
-                        xasprintf(&params.msg, _("File %s on %s has CAP_SETUID capability but group `%s` and is group writable"), file->localpath, arch, group);
-                        xasprintf(&params.remedy, REMEDY_OWNERSHIP_IWGRP, ri->fileinfo_filename);
-                        params.severity = RESULT_BAD;
-                        params.waiverauth = WAIVABLE_BY_SECURITY;
-                        add_result(ri, &params);
-                        free(params.msg);
-                        free(params.remedy);
-                        result = false;
+                        params.severity = get_secrule_result_severity(ri, file, SECRULE_SETUID);
+
+                        if (params.severity != RESULT_NULL && params.severity != RESULT_SKIP) {
+                            xasprintf(&params.msg, _("File %s on %s has CAP_SETUID capability but group `%s` and is group writable"), file->localpath, arch, group);
+                            xasprintf(&params.remedy, REMEDY_OWNERSHIP_IWGRP, ri->fileinfo_filename);
+                            params.waiverauth = WAIVABLE_BY_SECURITY;
+                            add_result(ri, &params);
+                            free(params.msg);
+                            free(params.remedy);
+                            result = false;
+                        }
                     }
                 } else if (!match_fileinfo_group(ri, file, group, NAME_OWNERSHIP, NULL, NULL) && (ri->tests & INSPECT_OWNERSHIP)) {
                     xasprintf(&params.msg, _("File %s has group `%s` on %s, but should be `%s`"), file->localpath, group, arch, ri->bin_group);
