@@ -431,13 +431,13 @@ static void add_execstack_flag_str(string_list_t *list, const char *s)
     return;
 }
 
-static bool inspect_elf_execstack(struct rpminspect *ri, Elf *after_elf, Elf *before_elf, const char *localpath, const char *arch)
+static bool inspect_elf_execstack(struct rpminspect *ri, Elf *after_elf, Elf *before_elf, rpmfile_entry_t *file, const char *arch)
 {
     Elf64_Half elf_type;
     uint64_t execstack_flags;
     string_list_t *flaglist = NULL;
     char *fs = NULL;
-    bool result = false;
+    bool result = true;
     bool before_execstack = false;
     struct result_params params;
 
@@ -458,29 +458,37 @@ static bool inspect_elf_execstack(struct rpminspect *ri, Elf *after_elf, Elf *be
     params.waiverauth = WAIVABLE_BY_SECURITY;
     params.header = NAME_ELF;
     params.arch = arch;
-    params.file = localpath;
+    params.file = file->localpath;
 
     /* Check if execstack information is present */
     if (!is_execstack_present(after_elf)) {
+        params.severity = get_secrule_result_severity(ri, file, SECRULE_EXECSTACK);
+
         if (elf_type == ET_REL) {
             /* Missing .note.GNU-stack will result in an executable stack */
             if (before_execstack) {
-                xasprintf(&params.msg, _("Object still has executable stack (no GNU-stack note): %s on %s"), localpath, arch);
-                params.severity = RESULT_VERIFY;
+                xasprintf(&params.msg, _("Object still has executable stack (no GNU-stack note): %s on %s"), file->localpath, arch);
+
+                /* manual override the severity if necessary */
+                if (params.severity == RESULT_BAD) {
+                    params.severity = RESULT_VERIFY;
+                }
             } else {
-                xasprintf(&params.msg, _("Object has executable stack (no GNU-stack note): %s on %s"), localpath, arch);
-                params.severity = RESULT_BAD;
+                xasprintf(&params.msg, _("Object has executable stack (no GNU-stack note): %s on %s"), file->localpath, arch);
             }
         } else {
-            xasprintf(&params.msg, _("Program built without GNU_STACK: %s on %s"), localpath, arch);
-            params.severity = RESULT_BAD;
+            xasprintf(&params.msg, _("Program built without GNU_STACK: %s on %s"), file->localpath, arch);
         }
 
-        params.remedy = REMEDY_ELF_EXECSTACK_MISSING;
-        params.verb = VERB_CHANGED;
-        params.noun = _("GNU_STACK on ${FILE}");
-        add_result(ri, &params);
-        goto cleanup;
+        if (params.severity != RESULT_NULL && params.severity != RESULT_SKIP) {
+            params.remedy = REMEDY_ELF_EXECSTACK_MISSING;
+            params.verb = VERB_CHANGED;
+            params.noun = _("GNU_STACK on ${FILE}");
+            add_result(ri, &params);
+            result = false;
+        }
+
+        free(params.msg);
     }
 
     /* Check that the execstack flags make sense */
@@ -523,56 +531,67 @@ static bool inspect_elf_execstack(struct rpminspect *ri, Elf *after_elf, Elf *be
             }
 
             fs = list_to_string(flaglist, ", ");
-            xasprintf(&params.msg, _("File %s has invalid execstack flags (%s) on %s"), localpath, fs, arch);
+            xasprintf(&params.msg, _("File %s has invalid execstack flags (%s) on %s"), file->localpath, fs, arch);
 
             free(fs);
             list_free(flaglist, free);
         } else {
-            xasprintf(&params.msg, _("File %s has unrecognized GNU_STACK '%s' (expected RW or RWE) on %s"), localpath, pflags_to_str(execstack_flags), arch);
+            xasprintf(&params.msg, _("File %s has unrecognized GNU_STACK '%s' (expected RW or RWE) on %s"), file->localpath, pflags_to_str(execstack_flags), arch);
         }
 
         if (params.msg) {
-            params.severity = RESULT_BAD;
-            params.remedy = REMEDY_ELF_EXECSTACK_INVALID;
-            params.verb = VERB_FAILED;
-            params.noun = _("execstack on ${FILE}");
-            add_result(ri, &params);
-        }
+            params.severity = get_secrule_result_severity(ri, file, SECRULE_EXECSTACK);
 
-        goto cleanup;
+            if (params.severity != RESULT_NULL && params.severity != RESULT_SKIP) {
+                params.remedy = REMEDY_ELF_EXECSTACK_INVALID;
+                params.verb = VERB_FAILED;
+                params.noun = _("execstack on ${FILE}");
+                add_result(ri, &params);
+                result = false;
+            }
+
+            free(params.msg);
+        }
     }
 
     /* Check that the stack is not marked as executable */
     if (is_stack_executable(after_elf, execstack_flags)) {
+        params.severity = get_secrule_result_severity(ri, file, SECRULE_EXECSTACK);
+
         if (elf_type == ET_REL) {
             if (before_execstack) {
-                xasprintf(&params.msg, _("Object still has executable stack (GNU-stack note = X): %s on %s"), localpath, arch);
-                params.severity = RESULT_VERIFY;
+                xasprintf(&params.msg, _("Object still has executable stack (GNU-stack note = X): %s on %s"), file->localpath, arch);
+
+                /* manual override the severity to keep it below BAD */
+                if (params.severity == RESULT_BAD) {
+                    params.severity = RESULT_VERIFY;
+                }
             } else {
-                xasprintf(&params.msg, _("Object has executable stack (GNU-stack note = X): %s on %s"), localpath, arch);
-                params.severity = RESULT_BAD;
+                xasprintf(&params.msg, _("Object has executable stack (GNU-stack note = X): %s on %s"), file->localpath, arch);
             }
         } else {
             if (before_execstack) {
-                xasprintf(&params.msg, _("Stack is still executable: %s on %s"), localpath, arch);
-                params.severity = RESULT_VERIFY;
+                xasprintf(&params.msg, _("Stack is still executable: %s on %s"), file->localpath, arch);
+
+                /* manual override the severity to keep it below BAD */
+                if (params.severity == RESULT_BAD) {
+                    params.severity = RESULT_VERIFY;
+                }
             } else {
-                xasprintf(&params.msg, _("Stack is executable: %s on %s"), localpath, arch);
-                params.severity = RESULT_BAD;
+                xasprintf(&params.msg, _("Stack is executable: %s on %s"), file->localpath, arch);
             }
         }
 
-        params.remedy = REMEDY_ELF_EXECSTACK_EXECUTABLE;
-        params.verb = VERB_FAILED;
-        params.noun = _("execstack on ${FILE}");
-        add_result(ri, &params);
-        goto cleanup;
+        if (params.severity != RESULT_NULL && params.severity != RESULT_SKIP) {
+            params.remedy = REMEDY_ELF_EXECSTACK_EXECUTABLE;
+            params.verb = VERB_FAILED;
+            params.noun = _("execstack on ${FILE}");
+            add_result(ri, &params);
+            result = false;
+        }
+
+        free(params.msg);
     }
-
-    result = true;
-
-cleanup:
-    free(params.msg);
 
     return result;
 }
@@ -960,7 +979,7 @@ static bool elf_archive_tests(struct rpminspect *ri, Elf *after_elf, int after_e
     return result;
 }
 
-static bool elf_regular_tests(struct rpminspect *ri, Elf *after_elf, Elf *before_elf, const char *localpath, const char *arch, const char *name)
+static bool elf_regular_tests(struct rpminspect *ri, Elf *after_elf, Elf *before_elf, rpmfile_entry_t *file, const char *arch, const char *name)
 {
     bool result = true;
     struct result_params params;
@@ -971,26 +990,26 @@ static bool elf_regular_tests(struct rpminspect *ri, Elf *after_elf, Elf *before
     params.waiverauth = WAIVABLE_BY_SECURITY;
     params.remedy = REMEDY_ELF_TEXTREL;
     params.arch = arch;
-    params.file = localpath;
+    params.file = file->localpath;
     params.noun = _("TEXTREL relocations on ${FILE}");
 
     /* skip kernel eBPF machine type objects */
     if (get_elf_machine(after_elf) == EM_BPF) {
-        DEBUG_PRINT("eBPF object encountered (%s), skipping\n", localpath);
+        DEBUG_PRINT("eBPF object encountered (%s), skipping\n", file->localpath);
         return true;
     }
 
-    if (!inspect_elf_execstack(ri, after_elf, before_elf, localpath, arch)) {
+    if (!inspect_elf_execstack(ri, after_elf, before_elf, file, arch)) {
         result = false;
     }
 
     if (has_textrel(after_elf)) {
         /* Only complain for baseline (no before), or for gaining TEXTREL between before and after. */
         if (before_elf && !has_textrel(before_elf)) {
-            xasprintf(&params.msg, _("%s in %s acquired TEXTREL relocations on %s"), localpath, name, arch);
+            xasprintf(&params.msg, _("%s in %s acquired TEXTREL relocations on %s"), file->localpath, name, arch);
             params.verb = VERB_ADDED;
         } else if (!before_elf) {
-            xasprintf(&params.msg, _("%s in %s has TEXTREL relocations on %s"), localpath, name, arch);
+            xasprintf(&params.msg, _("%s in %s has TEXTREL relocations on %s"), file->localpath, name, arch);
             params.verb = VERB_FAILED;
         }
 
@@ -1003,12 +1022,12 @@ static bool elf_regular_tests(struct rpminspect *ri, Elf *after_elf, Elf *before
 
     if (before_elf) {
         /* Check if we lost GNU_RELRO */
-        if (!check_relro(ri, before_elf, after_elf, localpath, arch)) {
+        if (!check_relro(ri, before_elf, after_elf, file->localpath, arch)) {
             result = false;
         }
 
         /* Check if the object lost fortified symbols or gained unfortified, fortifiable symbols */
-        if (!check_fortified(ri, before_elf, after_elf, localpath, arch)) {
+        if (!check_fortified(ri, before_elf, after_elf, file->localpath, arch)) {
             result = false;
         }
     }
@@ -1054,7 +1073,7 @@ static bool elf_driver(struct rpminspect *ri, rpmfile_entry_t *after)
             before_elf = get_elf(after->peer_file->fullpath, &before_elf_fd);
         }
 
-        result = elf_regular_tests(ri, after_elf, before_elf, after->localpath, arch, name);
+        result = elf_regular_tests(ri, after_elf, before_elf, after, arch, name);
     }
 
     if (after_elf) {
