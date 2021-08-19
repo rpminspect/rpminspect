@@ -468,11 +468,6 @@ static bool inspect_elf_execstack(struct rpminspect *ri, Elf *after_elf, Elf *be
             /* Missing .note.GNU-stack will result in an executable stack */
             if (before_execstack) {
                 xasprintf(&params.msg, _("Object still has executable stack (no GNU-stack note): %s on %s"), file->localpath, arch);
-
-                /* manual override the severity if necessary */
-                if (params.severity == RESULT_BAD) {
-                    params.severity = RESULT_VERIFY;
-                }
             } else {
                 xasprintf(&params.msg, _("Object has executable stack (no GNU-stack note): %s on %s"), file->localpath, arch);
             }
@@ -561,22 +556,12 @@ static bool inspect_elf_execstack(struct rpminspect *ri, Elf *after_elf, Elf *be
         if (elf_type == ET_REL) {
             if (before_execstack) {
                 xasprintf(&params.msg, _("Object still has executable stack (GNU-stack note = X): %s on %s"), file->localpath, arch);
-
-                /* manual override the severity to keep it below BAD */
-                if (params.severity == RESULT_BAD) {
-                    params.severity = RESULT_VERIFY;
-                }
             } else {
                 xasprintf(&params.msg, _("Object has executable stack (GNU-stack note = X): %s on %s"), file->localpath, arch);
             }
         } else {
             if (before_execstack) {
                 xasprintf(&params.msg, _("Stack is still executable: %s on %s"), file->localpath, arch);
-
-                /* manual override the severity to keep it below BAD */
-                if (params.severity == RESULT_BAD) {
-                    params.severity = RESULT_VERIFY;
-                }
             } else {
                 xasprintf(&params.msg, _("Stack is executable: %s on %s"), file->localpath, arch);
             }
@@ -596,8 +581,9 @@ static bool inspect_elf_execstack(struct rpminspect *ri, Elf *after_elf, Elf *be
     return result;
 }
 
-static bool check_relro(struct rpminspect *ri, Elf *before_elf, Elf *after_elf, const char *localpath, const char *arch)
+static bool check_relro(struct rpminspect *ri, Elf *before_elf, Elf *after_elf, const rpmfile_entry_t *file, const char *arch)
 {
+    bool r = true;
     bool before_relro = has_relro(before_elf);
     bool before_bind_now = has_bind_now(before_elf);
     bool after_relro = has_relro(after_elf);
@@ -608,27 +594,31 @@ static bool check_relro(struct rpminspect *ri, Elf *before_elf, Elf *after_elf, 
 
     if (before_relro && before_bind_now && after_relro && !after_bind_now) {
         /* full relro in before, partial relro in after */
-        xasprintf(&params.msg, _("%s lost full GNU_RELRO security protection on %s"), localpath, arch);
+        xasprintf(&params.msg, _("%s lost full GNU_RELRO security protection on %s"), file->localpath, arch);
     } else if (before_relro && !after_relro) {
         /* partial or full relro in before, no relro in after */
-        xasprintf(&params.msg, _("%s lost GNU_RELRO security protection on %s"), localpath, arch);
+        xasprintf(&params.msg, _("%s lost GNU_RELRO security protection on %s"), file->localpath, arch);
     }
 
     if (params.msg != NULL) {
-        params.severity = RESULT_BAD;
+        params.severity = get_secrule_result_severity(ri, file, SECRULE_RELRO);
         params.waiverauth = WAIVABLE_BY_SECURITY;
         params.header = NAME_ELF;
         params.remedy = REMEDY_ELF_GNU_RELRO;
         params.arch = arch;
-        params.file = localpath;
+        params.file = file->localpath;
         params.verb = VERB_REMOVED;
         params.noun = _("GNU_RELRO on ${FILE}");
-        add_result(ri, &params);
+
+        if (params.severity != RESULT_NULL && params.severity != RESULT_SKIP) {
+            add_result(ri, &params);
+            r = false;
+        }
+
         free(params.msg);
-        return false;
     }
 
-    return true;
+    return r;
 }
 
 /**
@@ -642,7 +632,7 @@ static bool check_relro(struct rpminspect *ri, Elf *before_elf, Elf *after_elf, 
  * @param localpath Filename of the ELF object in question, relative to an installed system
  * @param arch Architecture of the ELF object
  */
-static bool check_fortified(struct rpminspect *ri, Elf *before_elf, Elf *after_elf, const char *localpath, const char *arch)
+static bool check_fortified(struct rpminspect *ri, Elf *before_elf, Elf *after_elf, const rpmfile_entry_t *file, const char *arch)
 {
     string_list_t *before_fortifiable = NULL;
     string_list_t *before_fortified = NULL;
@@ -695,7 +685,6 @@ static bool check_fortified(struct rpminspect *ri, Elf *before_elf, Elf *after_e
      *   - after shows no sign of being fortified, and
      *   - after contains symbols that we think could have been fortified.
      */
-    result = false;
 
     /* Create a screendump listing the symbols involved. */
     output_stream = open_memstream(&output_buffer, &output_size);
@@ -731,17 +720,22 @@ static bool check_fortified(struct rpminspect *ri, Elf *before_elf, Elf *after_e
     assert(output_result == 0);
 
     init_result_params(&params);
-    xasprintf(&params.msg, _("%s may have lost -D_FORTIFY_SOURCE on %s"), localpath, arch);
+    xasprintf(&params.msg, _("%s may have lost -D_FORTIFY_SOURCE on %s"), file->localpath, arch);
     params.header = NAME_ELF;
-    params.severity = RESULT_VERIFY;
     params.waiverauth = WAIVABLE_BY_SECURITY;
     params.details = output_buffer;
     params.remedy = REMEDY_ELF_FORTIFY_SOURCE;
     params.arch = arch;
-    params.file = localpath;
+    params.file = file->localpath;
     params.verb = VERB_REMOVED;
     params.noun = _("-D_FORTIFY_SOURCE on ${FILE}");
-    add_result(ri, &params);
+    params.severity = get_secrule_result_severity(ri, file, SECRULE_FORTIFYSOURCE);
+
+    if (params.severity != RESULT_NULL && params.severity != RESULT_SKIP) {
+        add_result(ri, &params);
+        result = false;
+    }
+
     free(params.msg);
 
 cleanup:
@@ -872,7 +866,7 @@ bool find_all(Elf *elf, string_list_t **all_list)
     return true;
 }
 
-static bool elf_archive_tests(struct rpminspect *ri, Elf *after_elf, int after_elf_fd, Elf *before_elf, int before_elf_fd, const char *localpath, const char *arch, const char *name)
+static bool elf_archive_tests(struct rpminspect *ri, Elf *after_elf, int after_elf_fd, Elf *before_elf, int before_elf_fd, const rpmfile_entry_t *file, const char *arch, const char *name)
 {
     string_list_t *after_no_pic = NULL;
     string_list_t *before_pic = NULL;
@@ -951,21 +945,27 @@ static bool elf_archive_tests(struct rpminspect *ri, Elf *after_elf, int after_e
     output_result = fclose(output_stream);
     assert(output_result == 0);
 
-    if (!result) {
-        init_result_params(&params);
-        xasprintf(&params.msg, _("%s in %s has objects built without -fPIC on %s"), localpath, name, arch);
-        params.severity = RESULT_BAD;
-        params.waiverauth = WAIVABLE_BY_SECURITY;
-        params.header = NAME_ELF;
-        params.remedy = REMEDY_ELF_FPIC;
-        params.details = screendump;
-        params.arch = arch;
-        params.file = localpath;
-        params.verb = VERB_REMOVED;
-        params.noun = _("-fPIC on ${FILE}");
+    init_result_params(&params);
+    xasprintf(&params.msg, _("%s in %s has objects built without -fPIC on %s"), file->localpath, name, arch);
+    params.waiverauth = WAIVABLE_BY_SECURITY;
+    params.header = NAME_ELF;
+    params.remedy = REMEDY_ELF_FPIC;
+    params.details = screendump;
+    params.arch = arch;
+    params.file = file->localpath;
+    params.verb = VERB_REMOVED;
+    params.noun = _("-fPIC on ${FILE}");
+    params.severity = get_secrule_result_severity(ri, file, SECRULE_PIC);
+
+    if (!result && params.severity != RESULT_NULL && params.severity != RESULT_SKIP) {
         add_result(ri, &params);
-        free(params.msg);
     }
+
+    if (params.severity == RESULT_SKIP) {
+        result = true;
+    }
+
+    free(params.msg);
 
     list_free(after_lost_pic, NULL);
     list_free(after_new, NULL);
@@ -985,7 +985,7 @@ static bool elf_regular_tests(struct rpminspect *ri, Elf *after_elf, Elf *before
     struct result_params params;
 
     init_result_params(&params);
-    params.severity = RESULT_BAD;
+    params.severity = get_secrule_result_severity(ri, file, SECRULE_TEXTREL);
     params.header = NAME_ELF;
     params.waiverauth = WAIVABLE_BY_SECURITY;
     params.remedy = REMEDY_ELF_TEXTREL;
@@ -1013,21 +1013,22 @@ static bool elf_regular_tests(struct rpminspect *ri, Elf *after_elf, Elf *before
             params.verb = VERB_FAILED;
         }
 
-        if (params.msg != NULL) {
+        if (params.msg != NULL && (params.severity != RESULT_NULL && params.severity != RESULT_SKIP)) {
             add_result(ri, &params);
             result = false;
-            free(params.msg);
         }
+
+        free(params.msg);
     }
 
     if (before_elf) {
         /* Check if we lost GNU_RELRO */
-        if (!check_relro(ri, before_elf, after_elf, file->localpath, arch)) {
+        if (!check_relro(ri, before_elf, after_elf, file, arch)) {
             result = false;
         }
 
         /* Check if the object lost fortified symbols or gained unfortified, fortifiable symbols */
-        if (!check_fortified(ri, before_elf, after_elf, file->localpath, arch)) {
+        if (!check_fortified(ri, before_elf, after_elf, file, arch)) {
             result = false;
         }
     }
@@ -1067,7 +1068,7 @@ static bool elf_driver(struct rpminspect *ri, rpmfile_entry_t *after)
             before_elf = get_elf_archive(after->peer_file->fullpath, &before_elf_fd);
         }
 
-        result = elf_archive_tests(ri, after_elf, after_elf_fd, before_elf, before_elf_fd, after->localpath, arch, name);
+        result = elf_archive_tests(ri, after_elf, after_elf_fd, before_elf, before_elf_fd, after, arch, name);
     } else if ((after_elf = get_elf(after->fullpath, &after_elf_fd)) != NULL) {
         if (after->peer_file != NULL) {
             before_elf = get_elf(after->peer_file->fullpath, &before_elf_fd);
