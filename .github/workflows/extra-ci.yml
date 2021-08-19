@@ -48,7 +48,8 @@ jobs:
                             "amazonlinux:2",
                             "mageia:latest",
                             "alt:latest",
-                            "oraclelinux:8"]
+                            "oraclelinux:8",
+                            "openeuler20/openeuler"]
 
         container:
             image: ${{ matrix.container }}
@@ -86,6 +87,10 @@ jobs:
                           # Turn on all the other repos
                           sed -i -e 's|enabled=0|enabled=1|g' /etc/yum.repos.d/oracle-linux-ol8.repo
 
+                          dnf makecache
+                          dnf install -y git
+                          ;;
+                      openeuler*)
                           dnf makecache
                           dnf install -y git
                           ;;
@@ -134,7 +139,7 @@ jobs:
                       opensuse*)
                           zypper install -y make
                           ;;
-                      mageia*|oraclelinux*)
+                      mageia*|oraclelinux*|openeuler*)
                           dnf install -y make
                           ;;
                   esac
