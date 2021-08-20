@@ -228,7 +228,8 @@ string_list_t *get_rpm_header_string_array(Header hdr, rpmTagVal tag)
  * string that matches the index value for this file.  That's complex,
  * but some tags are arrays of strings (or ints) and what we need to
  * do is first get the array, then knowing the index entry for the file
- * we have, pull that array index out and return it.
+ * we have, pull that array index out and return it.  NULL return means
+ * an empty value or the tag was not present in the header.
  *
  * Limitations:
  * "tag" must refer to an s[] tag (see rpmtag.h from librpm)
@@ -251,7 +252,6 @@ char *get_rpm_header_value(const rpmfile_entry_t *file, rpmTag tag)
 
     /* find the header tag we want to extract values from */
     if (!headerGet(file->rpm_header, tag, td, flags)) {
-        warn(_("*** unable to find tag %s for %s"), rpmTagGetName(tag), file->fullpath);
         rpmtdFree(td);
         return ret;
     }
