@@ -31,6 +31,14 @@
 #include "queue.h"
 #include "uthash.h"
 
+/*
+ * Debug printing on the config file parser is verbose, so it can be
+ * disabled by commenting this line out and uncommented the
+ * INIT_DEBUG_PRINT line that expands to void.
+ */
+/* #define INIT_DEBUG_PRINT(...) DEBUG_PRINT((__VA_ARGS__)) */
+#define INIT_DEBUG_PRINT(...) (void)(0)
+
 /* List defaults (not in constants.h to avoid cpp shenanigans) */
 
 /**
@@ -252,7 +260,7 @@ static void add_ignore(string_list_map_t **table, int i, char *s)
         return;
     }
 
-    DEBUG_PRINT("    add_ignore -> inspection=%s, s=|%s|\n", inspection, s);
+    INIT_DEBUG_PRINT("    add_ignore -> inspection=%s, s=|%s|\n", inspection, s);
 
     /* create the entry for the value list */
     ignore = calloc(1, sizeof(*ignore));
@@ -510,40 +518,40 @@ static int read_cfgfile(struct rpminspect *ri, const char *filename)
         switch (token.type) {
             case YAML_STREAM_START_TOKEN:
                 /* begin reading the config file */
-                DEBUG_PRINT("YAML_STREAM_START_TOKEN\n");
+                INIT_DEBUG_PRINT("YAML_STREAM_START_TOKEN\n");
                 read_stream = true;
                 break;
             case YAML_STREAM_END_TOKEN:
                 /* stop reading the config file */
-                DEBUG_PRINT("YAML_STREAM_END_TOKEN\n");
+                INIT_DEBUG_PRINT("YAML_STREAM_END_TOKEN\n");
                 read_stream = false;
                 break;
             case YAML_KEY_TOKEN:
-                DEBUG_PRINT("YAML_KEY_TOKEN -> SYMBOL_KEY\n");
+                INIT_DEBUG_PRINT("YAML_KEY_TOKEN -> SYMBOL_KEY\n");
                 symbol = SYMBOL_KEY;
                 break;
             case YAML_VALUE_TOKEN:
-                DEBUG_PRINT("YAML_VALUE_TOKEN -> SYMBOL_VALUE\n");
+                INIT_DEBUG_PRINT("YAML_VALUE_TOKEN -> SYMBOL_VALUE\n");
                 symbol = SYMBOL_VALUE;
                 break;
             case YAML_BLOCK_SEQUENCE_START_TOKEN:
-                DEBUG_PRINT("YAML_BLOCK_SEQUENCE_START_TOKEN\n");
+                INIT_DEBUG_PRINT("YAML_BLOCK_SEQUENCE_START_TOKEN\n");
                 read_list = true;
                 break;
             case YAML_BLOCK_ENTRY_TOKEN:
-                DEBUG_PRINT("YAML_BLOCK_ENTRY_TOKEN\n");
+                INIT_DEBUG_PRINT("YAML_BLOCK_ENTRY_TOKEN\n");
 
                 if (read_list) {
-                    DEBUG_PRINT("    -> SYMBOL_ENTRY, block=%d, group=%d\n", block, group);
+                    INIT_DEBUG_PRINT("    -> SYMBOL_ENTRY, block=%d, group=%d\n", block, group);
                     symbol = SYMBOL_ENTRY;
                 }
 
                 break;
             case YAML_BLOCK_END_TOKEN:
-                DEBUG_PRINT("YAML_BLOCK_END_TOKEN\n");
+                INIT_DEBUG_PRINT("YAML_BLOCK_END_TOKEN\n");
 
                 if (read_list && block == BLOCK_NULL && group != BLOCK_NULL) {
-                    DEBUG_PRINT("    -> read_list=false\n");
+                    INIT_DEBUG_PRINT("    -> read_list=false\n");
                     read_list = false;
                 }
 
@@ -556,30 +564,30 @@ static int read_cfgfile(struct rpminspect *ri, const char *filename)
                  * effective top level.
                  */
                 if (level > 1) {
-                    DEBUG_PRINT("    -> level--\n");
+                    INIT_DEBUG_PRINT("    -> level--\n");
                     level--;
                 }
 
                 /* At the top?  Reset block indicator. */
                 if (level == 1) {
-                    DEBUG_PRINT("    -> block=BLOCK_NULL\n");
+                    INIT_DEBUG_PRINT("    -> block=BLOCK_NULL\n");
                     block = BLOCK_NULL;
                 }
 
                 break;
             case YAML_BLOCK_MAPPING_START_TOKEN:
                 /* YAML is all endless blocks */
-                DEBUG_PRINT("YAML_BLOCK_MAPPING_START_TOKEN\n");
+                INIT_DEBUG_PRINT("YAML_BLOCK_MAPPING_START_TOKEN\n");
                 level++;
                 break;
             case YAML_SCALAR_TOKEN:
                 /* convert the value to a string for comparison and copying */
                 t = bytes_to_str(token.data.scalar.value, token.data.scalar.length);
-                DEBUG_PRINT("YAML_SCALAR_TOKEN -> key=%s\n", key);
+                INIT_DEBUG_PRINT("YAML_SCALAR_TOKEN -> key=%s\n", key);
 
                 /* determine which config file block we are in */
                 if (key && read_stream && block != BLOCK_INSPECTIONS) {
-                    DEBUG_PRINT("    (top level)\n");
+                    INIT_DEBUG_PRINT("    (top level)\n");
 
                     if (!strcmp(key, "common")) {
                         block = BLOCK_COMMON;
@@ -724,7 +732,7 @@ static int read_cfgfile(struct rpminspect *ri, const char *filename)
                     /* save keys because they determine where values go */
                     free(key);
                     key = strdup(t);
-                    DEBUG_PRINT("    -> SYMBOL_KEY=%s\n", key);
+                    INIT_DEBUG_PRINT("    -> SYMBOL_KEY=%s\n", key);
 
                     /* handle group subsection blocks here rather than above */
                     if (group == BLOCK_PATHMIGRATION || group == BLOCK_MIGRATED_PATHS || group == BLOCK_PATHMIGRATION_EXCLUDED_PATHS) {
@@ -882,7 +890,7 @@ static int read_cfgfile(struct rpminspect *ri, const char *filename)
                         }
                     }
                 } else if (symbol == SYMBOL_VALUE) {
-                    DEBUG_PRINT("    -> SYMBOL_VALUE=%s\n", key);
+                    INIT_DEBUG_PRINT("    -> SYMBOL_VALUE=%s\n", key);
 
                     /* sort values in to the right settings based on the block */
                     if (block == BLOCK_COMMON) {
@@ -1137,7 +1145,7 @@ static int read_cfgfile(struct rpminspect *ri, const char *filename)
                         }
                     }
                 } else if (symbol == SYMBOL_ENTRY) {
-                    DEBUG_PRINT("    -> SYMBOL_ENTRY=%s, block=%d, group=%d\n", t, block, group);
+                    INIT_DEBUG_PRINT("    -> SYMBOL_ENTRY=%s, block=%d, group=%d\n", t, block, group);
 
                     if (block == BLOCK_BADFUNCS) {
                         add_entry(&ri->bad_functions, t);
@@ -1207,7 +1215,7 @@ static int read_cfgfile(struct rpminspect *ri, const char *filename)
         }
     } while (token.type != YAML_STREAM_END_TOKEN);
 
-    DEBUG_PRINT("YAML_STREAM_END_TOKEN\n");
+    INIT_DEBUG_PRINT("YAML_STREAM_END_TOKEN\n");
 
     /* destroy the YAML parser, close the input file */
     yaml_parser_delete(&parser);
@@ -1941,13 +1949,13 @@ struct rpminspect *init_rpminspect(struct rpminspect *ri, const char *cfgfile, c
     if (ri->ignores && !TAILQ_EMPTY(ri->ignores)) {
         string_entry_t *se = NULL;
 
-        DEBUG_PRINT("global ignores:\n");
+        INIT_DEBUG_PRINT("global ignores:\n");
 
         TAILQ_FOREACH(se, ri->ignores, items) {
-            DEBUG_PRINT("    - %s\n", se->data);
+            INIT_DEBUG_PRINT("    - %s\n", se->data);
         }
     } else {
-        DEBUG_PRINT("no global ignores defined\n");
+        INIT_DEBUG_PRINT("no global ignores defined\n");
     }
 
     if (ri->inspection_ignores) {
@@ -1955,19 +1963,19 @@ struct rpminspect *init_rpminspect(struct rpminspect *ri, const char *cfgfile, c
         string_list_map_t *te = NULL;
         string_entry_t *se = NULL;
 
-        DEBUG_PRINT("per-inspection ignores:\n");
+        INIT_DEBUG_PRINT("per-inspection ignores:\n");
 
         HASH_ITER(hh, ri->inspection_ignores, e, te) {
-            DEBUG_PRINT("    %s:\n", e->key);
+            INIT_DEBUG_PRINT("    %s:\n", e->key);
 
             if (e->value && !TAILQ_EMPTY(e->value)) {
                 TAILQ_FOREACH(se, e->value, items) {
-                    DEBUG_PRINT("        - %s\n", se->data);
+                    INIT_DEBUG_PRINT("        - %s\n", se->data);
                 }
             }
         }
     } else {
-        DEBUG_PRINT("no per-inspection ignores defined\n");
+        INIT_DEBUG_PRINT("no per-inspection ignores defined\n");
     }
 #endif
 
