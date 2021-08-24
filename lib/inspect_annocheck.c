@@ -100,7 +100,7 @@ static bool annocheck_driver(struct rpminspect *ri, rpmfile_entry_t *file)
         }
 
         /* Build a reporting message if we need to */
-        if (before_out && after_out) {
+        if (file->peer_file) {
             if (before_exit == 0 && after_exit == 0) {
                 xasprintf(&params.msg, _("annocheck '%s' test passes for %s on %s"), hentry->key, file->localpath, arch);
             } else if (before_exit && after_exit == 0) {
@@ -110,8 +110,13 @@ static bool annocheck_driver(struct rpminspect *ri, rpmfile_entry_t *file)
                 params.severity = RESULT_VERIFY;
                 params.verb = VERB_CHANGED;
                 result = false;
+            } else if (after_exit) {
+                xasprintf(&params.msg, _("annocheck '%s' test fails for %s on %s"), hentry->key, file->localpath, arch);
+                params.severity = RESULT_VERIFY;
+                params.verb = VERB_CHANGED;
+                result = false;
             }
-        } else if (after_out) {
+        } else {
             if (after_exit == 0) {
                 xasprintf(&params.msg, _("annocheck '%s' test passes for %s on %s"), hentry->key, file->localpath, arch);
             } else if (after_exit) {
@@ -149,6 +154,8 @@ static bool annocheck_driver(struct rpminspect *ri, rpmfile_entry_t *file)
         free(before_out);
         after_out = NULL;
         before_out = NULL;
+        after_exit = 0;
+        before_exit = 0;
     }
 
     return result;
@@ -157,8 +164,9 @@ static bool annocheck_driver(struct rpminspect *ri, rpmfile_entry_t *file)
 /*
  * Main driver for the 'annocheck' inspection.
  */
-bool inspect_annocheck(struct rpminspect *ri) {
-    bool result;
+bool inspect_annocheck(struct rpminspect *ri)
+{
+    bool result = true;
     struct result_params params;
 
     assert(ri != NULL);
