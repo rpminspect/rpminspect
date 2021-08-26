@@ -29,6 +29,11 @@
  * @copyright Apache-2.0
  */
 
+/*
+ * XXX: temporary until we have support for the OpenSSL 3.0 API
+ */
+#define OPENSSL_API_COMPAT 0x101010bfL
+
 #include <stdio.h>
 #include <unistd.h>
 #include <string.h>
