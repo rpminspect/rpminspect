@@ -19,7 +19,6 @@ on:
         - 'doc/**'
         - 'po/**'
         - 'regress/**'
-        - 'utils/**'
 
 jobs:
     x86_64:
