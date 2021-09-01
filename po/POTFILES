@@ -24,7 +24,6 @@ lib/fileinfo.c
 lib/files.c
 lib/flags.c
 lib/free.c
-lib/ignore.c
 lib/init.c
 lib/inspect_abidiff.c
 lib/inspect_addedfiles.c

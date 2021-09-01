@@ -38,3 +38,5 @@ Contributors
 - Siddhesh Poyarekar <siddhesh@gotplt.org>
 
 - Tim Flink <tflink@fedoraproject.org>
+
+- wangqing <wangqing@uniontech.com>

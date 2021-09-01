@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: rpminspect\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-08-10 14:33-0400\n"
+"POT-Creation-Date: 2021-09-01 10:40-0400\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -873,7 +873,7 @@ msgstr ""
 msgid "unable to find before build: %s"
 msgstr ""
 
-#: lib/checksums.c:87
+#: lib/checksums.c:92
 #, c-format
 msgid "%s is a FIFO"
 msgstr ""
@@ -892,36 +892,42 @@ msgstr ""
 msgid "%s in %s on %s carries expected mode %04o"
 msgstr ""
 
-#: lib/fileinfo.c:83
+#: lib/fileinfo.c:87
 #, c-format
-msgid "%s in %s on %s carries unexpected mode %04o; expected mode %04o"
+msgid ""
+"%s in %s on %s carries unexpected mode %04o; expected mode %04o; requires "
+"inspection by the Security Team"
 msgstr ""
 
-#: lib/fileinfo.c:99
+#: lib/fileinfo.c:108
 #, c-format
 msgid ""
 "%s in %s on %s carries insecure mode %04o, Security Team review may be "
 "required"
 msgstr ""
 
-#: lib/fileinfo.c:155
+#: lib/fileinfo.c:163
 #, c-format
 msgid "%s in %s on %s carries expected owner '%s'"
 msgstr ""
 
-#: lib/fileinfo.c:163
+#: lib/fileinfo.c:175
 #, c-format
-msgid "%s in %s on %s carries unexpected owner '%s'; expected owner '%s'"
+msgid ""
+"%s in %s on %s carries unexpected owner '%s'; expected owner '%s'; requires "
+"inspection by the Security Team"
 msgstr ""
 
-#: lib/fileinfo.c:223
+#: lib/fileinfo.c:234
 #, c-format
 msgid "%s in %s on %s carries expected group '%s'"
 msgstr ""
 
-#: lib/fileinfo.c:231
+#: lib/fileinfo.c:246
 #, c-format
-msgid "%s in %s on %s carries group unexpected '%s'; expected group '%s'"
+msgid ""
+"%s in %s on %s carries group unexpected '%s'; expected group '%s'; requires "
+"inspection by the Security Team"
 msgstr ""
 
 #: lib/files.c:265
@@ -929,111 +935,111 @@ msgstr ""
 msgid "*** payload path %s not in RPM metadata"
 msgstr ""
 
-#: lib/init.c:251
+#: lib/init.c:259
 #, c-format
 msgid "*** ignore found in %d, value `%s'"
 msgstr ""
 
-#: lib/init.c:346
+#: lib/init.c:354
 #, c-format
 msgid "invalid input string `%s`"
 msgstr ""
 
-#: lib/init.c:373 lib/init.c:382 lib/init.c:390 lib/init.c:402 lib/init.c:411
-#: lib/init.c:419 lib/init.c:431 lib/init.c:440 lib/init.c:448 lib/init.c:460
+#: lib/init.c:381 lib/init.c:390 lib/init.c:398 lib/init.c:410 lib/init.c:419
+#: lib/init.c:427 lib/init.c:439 lib/init.c:448 lib/init.c:456 lib/init.c:468
 #, c-format
 msgid "*** invalid mode string: %s"
 msgstr ""
 
-#: lib/init.c:506
+#: lib/init.c:514
 #, c-format
 msgid "ignoring malformed %s configuration file: %s"
 msgstr ""
 
-#: lib/init.c:965
+#: lib/init.c:973
 #, c-format
 msgid "*** unknown specname match setting '%s', defaulting to 'full'"
 msgstr ""
 
-#: lib/init.c:974
+#: lib/init.c:982
 #, c-format
 msgid "*** unknown specname primary setting '%s', defaulting to 'name'"
 msgstr ""
 
-#: lib/init.c:985
+#: lib/init.c:993
 msgid "error reading elf include path"
 msgstr ""
 
-#: lib/init.c:994
+#: lib/init.c:1002
 msgid "error reading elf exclude path"
 msgstr ""
 
-#: lib/init.c:1005
+#: lib/init.c:1013
 msgid "error reading man page include path"
 msgstr ""
 
-#: lib/init.c:1014
+#: lib/init.c:1022
 msgid "error reading man page exclude path"
 msgstr ""
 
-#: lib/init.c:1025
+#: lib/init.c:1033
 msgid "error reading xml include path"
 msgstr ""
 
-#: lib/init.c:1034
+#: lib/init.c:1042
 msgid "error reading xml exclude path"
 msgstr ""
 
-#: lib/init.c:1078
+#: lib/init.c:1086
 #, c-format
 msgid "*** inspection flag must be 'on' or 'off', ignoring for '%s'"
 msgstr ""
 
-#: lib/init.c:1082 src/rpminspect.c:280
+#: lib/init.c:1090 src/rpminspect.c:280
 #, c-format
 msgid "*** Unknown inspection: `%s`"
 msgstr ""
 
-#: lib/init.c:1306
+#: lib/init.c:1314
 #, c-format
 msgid "*** Invalid filename in the fileinfo list: %s"
 msgstr ""
 
-#: lib/init.c:1307
+#: lib/init.c:1315
 msgid "*** From this invalid line:"
 msgstr ""
 
-#: lib/init.c:1308
+#: lib/init.c:1316
 #, c-format
 msgid "***     %s"
 msgstr ""
 
-#: lib/init.c:1717
+#: lib/init.c:1727
 #, c-format
 msgid "*** invalid security rule: %s"
 msgstr ""
 
-#: lib/init.c:1751
+#: lib/init.c:1761
 #, c-format
 msgid "*** unknown security rule: %s"
 msgstr ""
 
-#: lib/init.c:1770
+#: lib/init.c:1781
 #, c-format
 msgid "*** unknown security action: %s"
 msgstr ""
 
-#: lib/init.c:1796
+#: lib/init.c:1807
 #, c-format
 msgid "*** malformed security line: %s"
 msgstr ""
 
-#: lib/init.c:1887 lib/init.c:1908
+#: lib/init.c:1898 lib/init.c:1919
 #, c-format
 msgid "*** error reading '%s'\n"
 msgstr ""
 
-#: lib/init.c:1903
+#: lib/init.c:1914
 #, c-format
 msgid "*** unable to read profile '%s' from %s\n"
 msgstr ""
@@ -1103,19 +1109,19 @@ msgstr ""
 msgid "Forbidden directory `%s` found on %s"
 msgstr ""
 
-#: lib/inspect_addedfiles.c:162
+#: lib/inspect_addedfiles.c:164
 #, c-format
 msgid ""
 "New security-related file `%s` added on %s requires inspection by the "
 "Security Team"
 msgstr ""
 
-#: lib/inspect_addedfiles.c:186
+#: lib/inspect_addedfiles.c:192
 #, c-format
 msgid "`%s` added on %s"
 msgstr ""
 
-#: lib/inspect_annocheck.c:105 lib/inspect_annocheck.c:116
+#: lib/inspect_annocheck.c:105 lib/inspect_annocheck.c:121
 #, c-format
 msgid "annocheck '%s' test passes for %s on %s"
 msgstr ""
@@ -1130,7 +1136,7 @@ msgstr ""
 msgid "annocheck '%s' test now fails for %s on %s"
 msgstr ""
 
-#: lib/inspect_annocheck.c:118
+#: lib/inspect_annocheck.c:114 lib/inspect_annocheck.c:123
 #, c-format
 msgid "annocheck '%s' test fails for %s on %s"
 msgstr ""
@@ -1167,42 +1173,42 @@ msgstr ""
 msgid "forbidden functions found in ${FILE}"
 msgstr ""
 
-#: lib/inspect_capabilities.c:91
+#: lib/inspect_capabilities.c:94
 #, c-format
 msgid "File capabilities for %s changed from '%s' to '%s' on %s\n"
 msgstr ""
 
-#: lib/inspect_capabilities.c:96
+#: lib/inspect_capabilities.c:98
 msgid "${FILE} capabilities"
 msgstr ""
 
-#: lib/inspect_capabilities.c:102
+#: lib/inspect_capabilities.c:105
 #, c-format
 msgid "File capabilities found for %s: '%s' on %s\n"
 msgstr ""
 
-#: lib/inspect_capabilities.c:126
+#: lib/inspect_capabilities.c:129
 #, c-format
 msgid ""
 "File capabilities list entry found for %s: '%s' on %s, matches package\n"
 msgstr ""
 
-#: lib/inspect_capabilities.c:132
+#: lib/inspect_capabilities.c:138
 #, c-format
 msgid "File capabilities list mismatch for %s: expected '%s', got '%s'\n"
 msgstr ""
 
-#: lib/inspect_capabilities.c:137 lib/inspect_capabilities.c:149
-#: lib/inspect_capabilities.c:160
+#: lib/inspect_capabilities.c:142 lib/inspect_capabilities.c:157
+#: lib/inspect_capabilities.c:171
 msgid "${FILE} capabilities list"
 msgstr ""
 
-#: lib/inspect_capabilities.c:144
+#: lib/inspect_capabilities.c:153
 #, c-format
 msgid "File capabilities for %s not found on the capabilities list on %s\n"
 msgstr ""
 
-#: lib/inspect_capabilities.c:155
+#: lib/inspect_capabilities.c:167
 #, c-format
 msgid "File capabilities expected for %s but not found on %s: expected '%s'\n"
 msgstr ""
@@ -1442,12 +1448,12 @@ msgstr ""
 msgid "DT_NEEDED symbol(s) added to %s on %s"
 msgstr ""
 
-#: lib/inspect_elf.c:468
+#: lib/inspect_elf.c:470
 #, c-format
 msgid "Object still has executable stack (no GNU-stack note): %s on %s"
 msgstr ""
 
-#: lib/inspect_elf.c:471
+#: lib/inspect_elf.c:472
 #, c-format
 msgid "Object has executable stack (no GNU-stack note): %s on %s"
 msgstr ""
@@ -1461,102 +1467,102 @@ msgstr ""
 msgid "GNU_STACK on ${FILE}"
 msgstr ""
 
-#: lib/inspect_elf.c:526
+#: lib/inspect_elf.c:529
 #, c-format
 msgid "File %s has invalid execstack flags (%s) on %s"
 msgstr ""
 
-#: lib/inspect_elf.c:531
+#: lib/inspect_elf.c:534
 #, c-format
 msgid "File %s has unrecognized GNU_STACK '%s' (expected RW or RWE) on %s"
 msgstr ""
 
-#: lib/inspect_elf.c:538 lib/inspect_elf.c:567
+#: lib/inspect_elf.c:543 lib/inspect_elf.c:573
 msgid "execstack on ${FILE}"
 msgstr ""
 
-#: lib/inspect_elf.c:549
+#: lib/inspect_elf.c:558
 #, c-format
 msgid "Object still has executable stack (GNU-stack note = X): %s on %s"
 msgstr ""
 
-#: lib/inspect_elf.c:552
+#: lib/inspect_elf.c:560
 #, c-format
 msgid "Object has executable stack (GNU-stack note = X): %s on %s"
 msgstr ""
 
-#: lib/inspect_elf.c:557
+#: lib/inspect_elf.c:564
 #, c-format
 msgid "Stack is still executable: %s on %s"
 msgstr ""
 
-#: lib/inspect_elf.c:560
+#: lib/inspect_elf.c:566
 #, c-format
 msgid "Stack is executable: %s on %s"
 msgstr ""
 
-#: lib/inspect_elf.c:592
+#: lib/inspect_elf.c:597
 #, c-format
 msgid "%s lost full GNU_RELRO security protection on %s"
 msgstr ""
 
-#: lib/inspect_elf.c:595
+#: lib/inspect_elf.c:600
 #, c-format
 msgid "%s lost GNU_RELRO security protection on %s"
 msgstr ""
 
-#: lib/inspect_elf.c:606
+#: lib/inspect_elf.c:611
 msgid "GNU_RELRO on ${FILE}"
 msgstr ""
 
-#: lib/inspect_elf.c:685
+#: lib/inspect_elf.c:693
 #, c-format
 msgid "Fortified symbols lost:\n"
 msgstr ""
 
-#: lib/inspect_elf.c:698
+#: lib/inspect_elf.c:706
 #, c-format
 msgid "Fortifiable symbols present:\n"
 msgstr ""
 
-#: lib/inspect_elf.c:715
+#: lib/inspect_elf.c:723
 #, c-format
 msgid "%s may have lost -D_FORTIFY_SOURCE on %s"
 msgstr ""
 
-#: lib/inspect_elf.c:724
+#: lib/inspect_elf.c:731
 msgid "-D_FORTIFY_SOURCE on ${FILE}"
 msgstr ""
 
-#: lib/inspect_elf.c:906
+#: lib/inspect_elf.c:919
 #, c-format
 msgid "The following objects lost -fPIC:\n"
 msgstr ""
 
-#: lib/inspect_elf.c:923
+#: lib/inspect_elf.c:936
 #, c-format
 msgid "The following new objects were built without -fPIC:\n"
 msgstr ""
 
-#: lib/inspect_elf.c:937
+#: lib/inspect_elf.c:949
 #, c-format
 msgid "%s in %s has objects built without -fPIC on %s"
 msgstr ""
 
-#: lib/inspect_elf.c:946
+#: lib/inspect_elf.c:957
 msgid "-fPIC on ${FILE}"
 msgstr ""
 
-#: lib/inspect_elf.c:975
+#: lib/inspect_elf.c:994
 msgid "TEXTREL relocations on ${FILE}"
 msgstr ""
 
-#: lib/inspect_elf.c:990
+#: lib/inspect_elf.c:1009
 #, c-format
 msgid "%s in %s acquired TEXTREL relocations on %s"
 msgstr ""
 
-#: lib/inspect_elf.c:993
+#: lib/inspect_elf.c:1012
 #, c-format
 msgid "%s in %s has TEXTREL relocations on %s"
 msgstr ""
@@ -1904,25 +1910,25 @@ msgstr ""
 msgid "File %s has owner `%s` on %s, but should be `%s`"
 msgstr ""
 
-#: lib/inspect_ownership.c:138
+#: lib/inspect_ownership.c:141
 #, c-format
 msgid ""
 "File %s on %s has CAP_SETUID capability but group `%s` and is world "
 "executable"
 msgstr ""
 
-#: lib/inspect_ownership.c:149
+#: lib/inspect_ownership.c:155
 #, c-format
 msgid ""
 "File %s on %s has CAP_SETUID capability but group `%s` and is group writable"
 msgstr ""
 
-#: lib/inspect_ownership.c:159
+#: lib/inspect_ownership.c:165
 #, c-format
 msgid "File %s has group `%s` on %s, but should be `%s`"
 msgstr ""
 
-#: lib/inspect_ownership.c:223
+#: lib/inspect_ownership.c:229
 #, c-format
 msgid "File %s changed %s from `%s` to `%s` on %s"
 msgstr ""
@@ -1999,7 +2005,7 @@ msgstr ""
 msgid "%s %s permissions from %04o to %04o on %s"
 msgstr ""
 
-#: lib/inspect_permissions.c:93
+#: lib/inspect_permissions.c:96
 #, c-format
 msgid "%s (%s) is world-writable on %s"
 msgstr ""
@@ -2048,7 +2054,7 @@ msgstr ""
 msgid "ABI break: Library %s removed from %s"
 msgstr ""
 
-#: lib/inspect_removedfiles.c:139
+#: lib/inspect_removedfiles.c:135
 #, c-format
 msgid "%s removed from %s"
 msgstr ""
@@ -2354,11 +2360,6 @@ msgstr ""
 msgid "Fopen() failed for %s: %s"
 msgstr ""
 
-#: lib/rpm.c:254
-#, c-format
-msgid "*** unable to find tag %s for %s"
-msgstr ""
-
 #: lib/rpm.c:261
 #, c-format
 msgid "*** file index %d is out of bounds for %s"
@@ -2372,15 +2373,6 @@ msgstr ""
 #: lib/runcmd.c:121
 #, c-format
 msgid "error closing `%s`"
-msgstr ""
-
-#: lib/secrule.c:45
-msgid "init_security"
-msgstr ""
-
-#: lib/secrule.c:64
-#, c-format
-msgid "unknown security rule %d"
 msgstr ""
 
 #: lib/strfuncs.c:257 lib/strfuncs.c:286

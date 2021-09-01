@@ -63,6 +63,8 @@ following environments:
 
 * Oracle Linux 8 on x86_64
 
+* openEuler Linux 20 on x86_64
+
 Additionally, rpminspect is built in the following environments on
 each merge and pull request:
 
