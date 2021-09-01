@@ -70,7 +70,7 @@ elif [ -r /etc/oracle-release ] && [ "${ID}" = "ol" ]; then
 elif [ -r /etc/openEuler-release ] && [ "${ID}" = "openEuler" ]; then
     v="$(echo "${VERSION_ID}" | cut -d '.' -f 1)"
     if [ "${v}" = "20" ]; then
-        echo "$(echo "${ID}" | tr [A-Z] [a-z])${v}"
+        echo "$(echo "${ID}" | tr '[:upper:]' '[:lower:]')${v}"
     else
         echo "unknown OS: ${ID}:${VERSION_ID}" >&2
     fi
