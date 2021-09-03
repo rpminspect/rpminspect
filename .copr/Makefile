@@ -46,6 +46,7 @@ srpm:
 ifeq ($(BUILDTYPE),copr)
 	sed -i -e '/^Release:/ s/1[^%]*/0.1.$(GITDATE)git$(GITHASH)/' "$(SPEC)"
 	sed -i -e 's|^Source0:.*$$|Source0: $(TARBALL_BASENAME).tar.xz|g' "$(SPEC)"
+	sed -i -e 's|^%autosetup.*$$|%autosetup -n $(TARBALL_BASENAME)|g' "$(SPEC)"
 	sed -i -e '/^Source1:.*$$/d' "$(SPEC)"
 	sed -i -e '/^Source2:.*$$/d' "$(SPEC)"
 	sed -i -e '/^%{gpgverify}.*$$/d' "$(SPEC)"
