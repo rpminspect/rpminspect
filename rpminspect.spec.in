@@ -10,8 +10,9 @@ Group:          Development/Tools
 # license.
 License:        GPLv3+ and LGPLv2+ and ASL 2.0 and CC-BY
 URL:            https://github.com/rpminspect/rpminspect
-Source0:        https://github.com/rpminspect/rpminspect/releases/download/v%%VERSION%%/%%TARBALL%%
-Source1:        changelog
+Source0:        https://github.com/rpminspect/rpminspect/releases/download/v%{version}/%{name}-%{version}.tar.xz
+Source1:        https://github.com/rpminspect/rpminspect/releases/download/v%{version}/%{name}-%{version}.tar.xz.asc
+Source2:        %%GPGKEYRING%%
 Requires:       librpminspect%{?_isa} = %{version}-%{release}
 
 BuildRequires:  meson
@@ -34,6 +35,7 @@ BuildRequires:  libcap-devel
 BuildRequires:  gettext-devel
 BuildRequires:  clamav-devel
 BuildRequires:  libmandoc-devel >= 1.14.5
+BuildRequires:  gnupg2
 
 
 %description
@@ -122,7 +124,8 @@ control files.
 
 
 %prep
-%setup -q
+%{gpgverify} --keyring='%{SOURCE2}' --signature='%{SOURCE1}' --data='%{SOURCE0}'
+%autosetup
 
 
 %build
@@ -159,4 +162,3 @@ control files.
 
 
 %changelog
-%include %{SOURCE1}
