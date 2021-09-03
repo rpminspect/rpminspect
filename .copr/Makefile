@@ -42,7 +42,7 @@ endif
 srpm:
 	$(topdir)/.copr/instpkgs.sh $(SPEC_TEMPLATE)
 	sed -e 's|%%VERSION%%|$(VER)|g' < "$(SPEC_TEMPLATE)" > "$(SPEC)"
-	sed -i -e 's|$(PKG)-$(VER).tar.gz|$(TARBALL_BASENAME).tar.xz|g' "$(SPEC)"
+	sed -i -e 's|$(PKG)-$(VER).tar.xz|$(TARBALL_BASENAME).tar.xz|g' "$(SPEC)"
 ifeq ($(BUILDTYPE),copr)
 	sed -i -e '/^Release:/ s/1[^%]*/0.1.$(GITDATE)git$(GITHASH)/' "$(SPEC)"
 	sed -i -e '/^Source1:.*$$/d' "$(SPEC)"
