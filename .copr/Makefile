@@ -24,6 +24,7 @@ SPEC := $(topdir)/$(shell basename $(SPEC_TEMPLATE) .in)
 
 # Replace placeholders in the spec file template
 RPMDATE = $(shell date +'%a %b %d %Y')
+RPMAUTHOR = $(shell git log | tac | grep ^Author: | head -n 1 | cut -d ' ' -f 2,3,4)
 
 # Various things we need to generate a tarball
 PKG := $(shell grep ^Name: "$(SPEC_TEMPLATE)" | awk '{ print $$2; }')
@@ -42,11 +43,12 @@ endif
 srpm:
 	$(topdir)/.copr/instpkgs.sh $(SPEC_TEMPLATE)
 	sed -e 's|%%VERSION%%|$(VER)|g' < "$(SPEC_TEMPLATE)" > "$(SPEC)"
-	sed -i -e 's|$(PKG)-$(VER).tar.xz|$(TARBALL_BASENAME).tar.xz|g' "$(SPEC)"
 ifeq ($(BUILDTYPE),copr)
 	sed -i -e '/^Release:/ s/1[^%]*/0.1.$(GITDATE)git$(GITHASH)/' "$(SPEC)"
+	sed -i -e 's|^Source0:.*$$|Source0: $(TARBALL_BASENAME).tar.xz|g' "$(SPEC)"
 	sed -i -e '/^Source1:.*$$/d' "$(SPEC)"
 	sed -i -e '/^Source2:.*$$/d' "$(SPEC)"
+	sed -i -e '/^%{gpgverify}.*$$/d' "$(SPEC)"
 	echo "* $(RPMDATE) $(RPMAUTHOR) - $(VER)-$(GITDATE)git$(GITHASH)" >> "$(SPEC)"
 	echo "- Build rpminspect-$(VER)-$(GITDATE)git$(GITHASH) snapshot" >> "$(SPEC)"
 endif
