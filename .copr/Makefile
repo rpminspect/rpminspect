@@ -39,27 +39,22 @@ ifeq ($(BUILDTYPE),release)
 TARBALL_BASENAME = $(PKG)-$(VER)
 endif
 
-ifeq ($(BUILDTYPE),release)
-CHANGELOG_CMD = $(topdir)/utils/mkrpmchangelog.sh
-else
-CHANGELOG_CMD = $(topdir)/utils/mkrpmchangelog.sh --copr
-endif
-
 srpm:
 	$(topdir)/.copr/instpkgs.sh $(SPEC_TEMPLATE)
 	sed -e 's|%%VERSION%%|$(VER)|g' < "$(SPEC_TEMPLATE)" > "$(SPEC)"
-	sed -i -e 's|%%RPMDATE%%|$(RPMDATE)|g' "$(SPEC)"
-	sed -i -e 's|%%TARBALL%%|$(TARBALL_BASENAME).tar.xz|g' "$(SPEC)"
-	sed -i -e 's|^%setup.*$$|%setup -q -n $(TARBALL_BASENAME)|g' "$(SPEC)"
+	sed -i -e 's|$(PKG)-$(VER).tar.gz|$(TARBALL_BASENAME).tar.xz|g' "$(SPEC)"
 ifeq ($(BUILDTYPE),copr)
 	sed -i -e '/^Release:/ s/1[^%]*/0.1.$(GITDATE)git$(GITHASH)/' "$(SPEC)"
+	sed -i -e '/^Source1:.*$$/d' "$(SPEC)"
+	sed -i -e '/^Source2:.*$$/d' "$(SPEC)"
+	echo "* $(RPMDATE) $(RPMAUTHOR) - $(VER)-$(GITDATE)git$(GITHASH)" >> "$(SPEC)"
+	echo "- Build rpminspect-$(VER)-$(GITDATE)git$(GITHASH) snapshot" >> "$(SPEC)"
 endif
 	git archive \
 		--format=tar \
 		--output='$(topdir)/$(TARBALL_BASENAME).tar' \
 		--prefix='$(TARBALL_BASENAME)/' HEAD $(topdir)
 	xz -9f $(topdir)/$(TARBALL_BASENAME).tar
-	cd $(topdir) ; $(CHANGELOG_CMD) > changelog
 	rpmbuild \
 		-bs --nodeps \
 		--define "_sourcedir $(topdir)" \
