@@ -50,7 +50,7 @@ fi
 git log --reverse --pretty=format:%s "${PREV_TAG}".."${LATEST_TAG}" 2>/dev/null | grep -E "^\[" | while read -r logline ; do
     category="$(echo "${logline}" | cut -d ']' -f 1 | cut -d '[' -f 2)"
     [ -z "${category}" ] && continue
-    echo "* $(echo "${logline}" | cut -d ']' -f 2 | xargs -0)" >> "${TMPDIR}"/"${category}"
+    echo "*$(echo "${logline}" | cut -d ']' -f 2 | xargs -0)" >> "${TMPDIR}"/"${category}"
 done
 
 # now create a draft announcement grouped by category
