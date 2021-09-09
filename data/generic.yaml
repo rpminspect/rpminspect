@@ -171,6 +171,25 @@ vendor:
     # there is no product release regexp mapping enabled.
     #- fc31: ^\.fc31.*$
 
+macrofiles:
+    # Paths to all RPM macro definitions that rpminspect should use.
+    # Note that you likely want to _exclude_ ~/.rpmmacros here whereas
+    # rpmbuild will include that by default.  The main reason is
+    # rpminspect is expecting to report portability across system and
+    # any locally defined macros in your home directory can impact
+    # that.
+    #
+    # This is a list of file paths.  glob(7) syntax is allowed as are
+    # RPM macros.
+    - /usr/lib/rpm/macros
+    - /usr/lib/rpm/macros.d/macros.*
+    - /usr/lib/rpm/platform/%{_target}/macros
+    - /usr/lib/rpm/fileattrs/*.attr
+    - /usr/lib/rpm/redhat/macros
+    - /etc/rpm/macros.*
+    - /etc/rpm/macros
+    - /etc/rpm/%{_target}/macros
+
 ignore:
     # Sometimes you want certain files or directories ignored by
     # rpminspect.  This section lets you list paths--glob(3) syntax

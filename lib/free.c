@@ -217,6 +217,7 @@ void free_rpminspect(struct rpminspect *ri) {
     free(ri->commands.kmidiff);
 
     list_free(ri->buildhost_subdomain, free);
+    list_free(ri->macrofiles, free);
     list_free(ri->security_path_prefix, free);
     list_free(ri->header_file_extensions, free);
     list_free(ri->forbidden_path_prefixes, free);
