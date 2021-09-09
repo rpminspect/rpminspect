@@ -125,7 +125,8 @@ enum {
     BLOCK_XML,
     BLOCK_EMPTYRPM,
     BLOCK_EXPECTED_EMPTY_RPMS,
-    BLOCK_TYPES
+    BLOCK_TYPES,
+    BLOCK_MACROFILES
 };
 
 static int add_regex(const char *pattern, regex_t **regex_out)
@@ -635,6 +636,14 @@ static int read_cfgfile(struct rpminspect *ri, const char *filename)
                                                           group != BLOCK_TYPES)) {
                         block = BLOCK_IGNORE;
                         group = BLOCK_NULL;
+                    } else if (!strcmp(key, "macrofiles")) {
+                        block = BLOCK_MACROFILES;
+
+                        if (group != BLOCK_MACROFILES) {
+                            list_free(ri->macrofiles, free);
+                            ri->macrofiles = NULL;
+                            group = BLOCK_MACROFILES;
+                        }
                     } else if (!strcmp(key, "security_path_prefix")) {
                         block = BLOCK_SECURITY_PATH_PREFIX;
 
@@ -1151,6 +1160,8 @@ static int read_cfgfile(struct rpminspect *ri, const char *filename)
                         add_entry(&ri->bad_functions, t);
                     } else if (block == BLOCK_BADWORDS) {
                         add_entry(&ri->badwords, t);
+                    } else if (block == BLOCK_MACROFILES) {
+                        add_entry(&ri->macrofiles, t);
                     } else if (block == BLOCK_SECURITY_PATH_PREFIX) {
                         add_entry(&ri->security_path_prefix, t);
                     } else if (block == BLOCK_BUILDHOST_SUBDOMAIN) {
