@@ -139,7 +139,7 @@ control files.
 
 
 %files -f %{name}.lang
-%doc AUTHORS.md README.md TODO
+%doc AUTHORS.md CHANGES.md README.md TODO
 %license COPYING
 %{_bindir}/rpminspect
 %{_mandir}/man1/rpminspect.1*
