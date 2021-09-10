@@ -24,8 +24,21 @@
 #include <string.h>
 #include <errno.h>
 #include <assert.h>
+#include <rpm/rpmfileutil.h>
+#include <rpm/rpmmacro.h>
 
 #include "rpminspect.h"
+
+/*
+ * This is used internally by librpminspect to match spec files that
+ * used %{?dist} after RPM macro expansion.
+ *
+ * One potential problem with this substring is someone using it in
+ * their own macro definitions.  So this tries to be unique and weird
+ * in a way that no one would use it.  But I guess never say never,
+ * right?
+ */
+#define DIST_TAG_MARKER "_____!!!!!####D#I#S#T####!!!!!_____"
 
 static void append_macros(string_list_t **macros, const char *s)
 {
@@ -129,18 +142,9 @@ static bool disttag_driver(struct rpminspect *ri, rpmfile_entry_t *file)
     string_entry_t *entry = NULL;
     char *buf = NULL;
     char *release = NULL;
+    char *expanded_release = NULL;
     int macrocount = 0;
     struct result_params params;
-
-    /* Skip binary packages */
-    if (!headerIsSource(file->rpm_header)) {
-        return true;
-    }
-
-    /* We only want to look at the spec files */
-    if (!strsuffix(file->localpath, SPEC_FILENAME_EXTENSION)) {
-        return true;
-    }
 
     /* Read in spec file macros */
     macrocount = get_specfile_macros(ri, file->fullpath);
@@ -177,6 +181,9 @@ static bool disttag_driver(struct rpminspect *ri, rpmfile_entry_t *file)
         release++;
     }
 
+    /* Expand macros in the release value */
+    expanded_release = rpmExpand(release, NULL);
+
     /* Set up the result parameters */
     init_result_params(&params);
     params.severity = RESULT_BAD;
@@ -194,20 +201,17 @@ static bool disttag_driver(struct rpminspect *ri, rpmfile_entry_t *file)
         params.noun = _("Release: tag");
         add_result(ri, &params);
         result = false;
-    } else if (strstr(release, "dist") && !strstr(release, SPEC_DISTTAG)) {
-        xasprintf(&params.msg, _("The dist tag should be of the form '%s' in the %s tag or in a macro used in the %s tag."), SPEC_DISTTAG, SPEC_TAG_RELEASE, SPEC_TAG_RELEASE);
+    } else if (strstr(release, SPEC_DISTTAG) || strstr(expanded_release, DIST_TAG_MARKER)) {
+        result = true;
+    } else if (!check_release_macros(macrocount, ri->macros, release, SPEC_DISTTAG)) {
+        xasprintf(&params.msg, _("The %s tag value is missing the dist tag in the proper form. The dist tag should be of the form '%s' in the %s tag or in a macro used in the %s tag. After RPM macro expansion, no dist tag was found in this %s tag value."), SPEC_TAG_RELEASE, SPEC_DISTTAG, SPEC_TAG_RELEASE, SPEC_TAG_RELEASE, SPEC_TAG_RELEASE);
         params.verb = VERB_FAILED;
-        params.noun = _("'%%{?dist}' tag");
-        add_result(ri, &params);
-        result = false;
-    } else if (!check_release_macros(macrocount, ri->macros, release, SPEC_DISTTAG) && !strstr(release, SPEC_DISTTAG)) {
-        xasprintf(&params.msg, _("The %s tag does not seem to contain '%s' or a macro that expands to include the '%s' tag."), SPEC_TAG_RELEASE, SPEC_DISTTAG, SPEC_DISTTAG);
-        params.verb = VERB_REMOVED;
         params.noun = _("'%%{?dist}' tag");
         add_result(ri, &params);
         result = false;
     }
 
+    free(expanded_release);
     free(params.msg);
     list_free(contents, free);
     return result;
@@ -220,6 +224,8 @@ bool inspect_disttag(struct rpminspect *ri)
 {
     bool result = true;
     bool src = false;
+    char *mf = NULL;
+    char *macropath = NULL;
     rpmpeer_entry_t *peer = NULL;
     rpmfile_entry_t *file = NULL;
     struct result_params params;
@@ -243,7 +249,26 @@ bool inspect_disttag(struct rpminspect *ri)
         src = true;
 
         TAILQ_FOREACH(file, peer->after_files, items) {
+            /* skip all source files except the spec file */
+            if (!strsuffix(file->localpath, SPEC_FILENAME_EXTENSION)) {
+                continue;
+            }
+
+            /* Initialize the macros */
+            if (ri->macrofiles) {
+                macropath = list_to_string(ri->macrofiles, ":");
+                mf = rpmGetPath(macropath, NULL);
+                rpmInitMacros(NULL, mf);
+                free(macropath);
+                free(mf);
+            }
+
+            /* Define the dist macro for rpminspect */
+            (void) rpmDefineMacro(NULL, "dist " DIST_TAG_MARKER, 0);
+
+            /* Analyze the spec file */
             result = disttag_driver(ri, file);
+            break;
         }
     }
 
