@@ -123,10 +123,6 @@ int get_specfile_macros(struct rpminspect *ri, const char *specfile)
             TAILQ_INIT(ri->macros);
         }
 
-        /* add the macro */
-        pair = calloc(1, sizeof(*pair));
-        assert(pair != NULL);
-
         /* verify the first element is %define or %global */
         entry = TAILQ_FIRST(fields);
 
@@ -149,6 +145,11 @@ int get_specfile_macros(struct rpminspect *ri, const char *specfile)
             continue;
         }
 
+        /* add the macro */
+        pair = calloc(1, sizeof(*pair));
+        assert(pair != NULL);
+
+        /* the macro key */
         TAILQ_REMOVE(fields, entry, items);
         pair->key = entry->data;
         free(entry);
