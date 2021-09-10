@@ -19,6 +19,7 @@
  * SPDX-License-Identifier: LGPL-3.0-or-later
  */
 
+#include <ctype.h>
 #include <regex.h>
 #include <assert.h>
 #include <err.h>
@@ -41,6 +42,7 @@
 int get_specfile_macros(struct rpminspect *ri, const char *specfile)
 {
     int n = 0;
+    char *sl = NULL;
     string_entry_t *specline = NULL;
     string_list_t *spec = NULL;
     string_list_t *fields = NULL;
@@ -96,11 +98,16 @@ int get_specfile_macros(struct rpminspect *ri, const char *specfile)
         }
 
         /* trim line endings */
-        specline->data[strcspn(specline->data, "\r\n")] = 0;
+        sl = specline->data;
+        sl[strcspn(sl, "\r\n")] = 0;
+
+        while (isspace(*sl)) {
+            sl++;
+        }
 
         /* break up fields */
-        DEBUG_PRINT("specline->data: |%s|\n", specline->data);
-        fields = strsplit(specline->data, " ");
+        DEBUG_PRINT("sl=|%s|\n", sl);
+        fields = strsplit(sl, " ");
 
         if (list_len(fields) != 3) {
             /* not a macro line */

@@ -21,6 +21,7 @@ import os
 import shutil
 import subprocess
 import tempfile
+import unittest
 from distutils.version import LooseVersion
 from baseclass import TestSRPM, TestRPMs, TestKoji
 from baseclass import RequiresRpminspect, check_results
@@ -46,6 +47,20 @@ good_tabbed_group_spec_file = open(
     os.path.join(specdir, "good-tabbed-group.spec"), "r"
 ).read()
 bad_spec_file = open(os.path.join(specdir, "bad.spec"), "r").read()
+
+# The %autorelease macro is in Fedora under a specific filename, so
+# only run those tests if we have it present on the system.
+missing_rpmautospec = True
+
+if os.path.isfile("/usr/lib/rpm/macros.d/macros.rpmautospec"):
+    f = open("/usr/lib/rpm/macros.d/macros.rpmautospec", "r")
+    lines = f.readlines()
+    f.close()
+
+    for line in lines:
+        if line.index("%autorelease") != -1:
+            missing_rpmautospec = False
+            break
 
 
 # Verify missing %{?dist} in Release fails on SRPM (BAD)
@@ -109,6 +124,24 @@ class DistTagKojiBuild(TestKoji):
     def setUp(self):
         TestKoji.setUp(self)
         self.rpm.release = "1%{?dist}"
+        self.inspection = "disttag"
+
+
+# Verify system wide macros in the dist tag work in SRPM (OK)
+class AutoReleaseDistTagSRPM(TestSRPM):
+    @unittest.skipIf(missing_rpmautospec, "test requires the rpmautospec macros")
+    def setUp(self):
+        TestSRPM.setUp(self)
+        self.rpm.release = "%autorelease"
+        self.inspection = "disttag"
+
+
+# Verify system wide macros in the dist tag work in Koji build (OK)
+class AutoReleaseDistTagKoji(TestKoji):
+    @unittest.skipIf(missing_rpmautospec, "test requires the rpmautospec macros")
+    def setUp(self):
+        TestKoji.setUp(self)
+        self.rpm.release = "%autorelease"
         self.inspection = "disttag"
 
 
