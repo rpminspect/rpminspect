@@ -268,6 +268,9 @@ bool inspect_disttag(struct rpminspect *ri)
 
             /* Analyze the spec file */
             result = disttag_driver(ri, file);
+
+            /* Clean up and get out */
+            rpmFreeMacros(NULL);
             break;
         }
     }
