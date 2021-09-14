@@ -527,15 +527,17 @@ class TestKoji(TestSRPM):
         # copy everything in to place as if Koji built it
         with tempfile.TemporaryDirectory() as kojidir:
             # copy over the SRPM to the fake koji build
-            srcdir = kojidir + "/src"
+            srcdir = os.path.join(kojidir, "src")
             os.makedirs(srcdir, exist_ok=True)
             shutil.copy(self.rpm.get_built_srpm(), srcdir)
 
             # copy over the built RPMs to the fake koji build
             for a in self.rpm.get_build_archs():
-                adir = kojidir + "/" + a
+                adir = os.path.join(kojidir, a)
                 os.makedirs(adir, exist_ok=True)
-                shutil.copy(self.rpm.get_built_rpm(a), adir)
+                for sp in self.rpm.get_subpackage_names():
+                    src = self.rpm.get_built_rpm(a, sp)
+                    shutil.copy(src, adir)
 
             args = [
                 self.rpminspect,
@@ -608,8 +610,8 @@ class TestCompareKoji(TestCompareSRPM):
         # copy everything in to place as if Koji built it
         with tempfile.TemporaryDirectory() as kojidir:
             # copy over the SRPM to the fake koji build
-            beforesrcdir = kojidir + "/before/src"
-            aftersrcdir = kojidir + "/after/src"
+            beforesrcdir = os.path.join(kojidir, "before", "src")
+            aftersrcdir = os.path.join(kojidir, "after", "src")
             os.makedirs(beforesrcdir, exist_ok=True)
             os.makedirs(aftersrcdir, exist_ok=True)
             shutil.copy(self.before_rpm.get_built_srpm(), beforesrcdir)
@@ -617,14 +619,16 @@ class TestCompareKoji(TestCompareSRPM):
 
             # copy over the built RPMs to the fake koji build
             for a in self.before_rpm.get_build_archs():
-                adir = kojidir + "/before/" + a
+                adir = os.path.join(kojidir, "before", a)
                 os.makedirs(adir, exist_ok=True)
-                shutil.copy(self.before_rpm.get_built_rpm(a), adir)
+                for sp in self.before_rpm.get_subpackage_names():
+                    shutil.copy(self.before_rpm.get_built_rpm(a, sp), adir)
 
             for a in self.after_rpm.get_build_archs():
-                adir = kojidir + "/after/" + a
+                adir = os.path.join(kojidir, "after", a)
                 os.makedirs(adir, exist_ok=True)
-                shutil.copy(self.after_rpm.get_built_rpm(a), adir)
+                for sp in self.after_rpm.get_subpackage_names():
+                    shutil.copy(self.after_rpm.get_built_rpm(a, sp), adir)
 
             args = [
                 self.rpminspect,
@@ -646,8 +650,8 @@ class TestCompareKoji(TestCompareSRPM):
             if KEEP_RESULTS:
                 args.append("-k")
 
-            args.append(kojidir + "/before")
-            args.append(kojidir + "/after")
+            args.append(os.path.join(kojidir, "before"))
+            args.append(os.path.join(kojidir, "after"))
 
             self.p = subprocess.Popen(
                 args, stdout=subprocess.PIPE, stderr=subprocess.PIPE
