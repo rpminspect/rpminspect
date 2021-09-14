@@ -160,12 +160,11 @@ static bool validate_desktop_contents(struct rpminspect *ri, const rpmfile_entry
     string_entry_t *entry = NULL;
     char *buf = NULL;
     char *tmp = NULL;
-    char *walk = NULL;
-    char *allpkgtrees = NULL;
     const char *arch = NULL;
     char *exectoken = NULL;
     struct stat sb;
     bool found = false;
+    rpmpeer_entry_t *peer = NULL;
     struct result_params params;
     char *key_exec = NULL;
     char *key_icon = NULL;
@@ -193,13 +192,6 @@ static bool validate_desktop_contents(struct rpminspect *ri, const rpmfile_entry
     params.remedy = REMEDY_DESKTOP;
     params.arch = arch;
     params.file = file->localpath;
-
-    /* Get the directory tree to walk */
-    tmp = strdup(file->fullpath);
-    walk = tmp + (strlen(file->fullpath) - strlen(file->localpath));
-    *walk = '\0';
-    allpkgtrees = strdup(dirname(tmp));
-    free(tmp);
 
     /* Read the desktop entry file */
     contents = read_file(file->fullpath);
@@ -255,47 +247,70 @@ static bool validate_desktop_contents(struct rpminspect *ri, const rpmfile_entry
             xasprintf(&file_to_find, "/usr/bin/%s", key_exec);
         }
 
-        /*
-         * If we get 1 back from nftw(), it means the executable was
-         * found and is valid.  If found, the nftw() helper replaces
-         * file_to_find with the full path to where it was found.
-         */
-        if (nftw(allpkgtrees, find_file, FOPEN_MAX, FTW_MOUNT|FTW_PHYS) == 1) {
-            if (lstat(file_to_find, &sb) == -1) {
-                warn("stat()");
-                list_free(contents, free);
-                return false;
+        TAILQ_FOREACH(peer, ri->peers, items) {
+            /*
+             * Skip the SRPM and any package that lacks a tree (like a
+             * meta package only providing headers)
+             */
+            if (headerIsSource(peer->after_hdr) || peer->after_root == NULL) {
+                continue;
             }
 
-            if (!(sb.st_mode & S_IXOTH)) {
-                xasprintf(&params.msg, _("Desktop file %s on %s references executable %s but %s is not executable by all"), file->localpath, arch, tmp, tmp);
+            /*
+             * If we get 1 back from nftw(), it means the executable was
+             * found and is valid.  If found, the nftw() helper replaces
+             * file_to_find with the full path to where it was found.
+             */
+            found = false;
+
+            if (nftw(peer->after_root, find_file, FOPEN_MAX, FTW_MOUNT|FTW_PHYS) == 1) {
+                found = true;
+
+                if (lstat(file_to_find, &sb) == -1) {
+                    warn("stat()");
+                    list_free(contents, free);
+                    free(file_to_find);
+                    return false;
+                }
+
+                if (!(sb.st_mode & S_IXOTH)) {
+                    xasprintf(&params.msg, _("Desktop file %s on %s references executable %s but %s is not executable by all"), file->localpath, arch, tmp, tmp);
+                    params.severity = RESULT_VERIFY;
+                    params.waiverauth = WAIVABLE_BY_ANYONE;
+                    add_result(ri, &params);
+                    free(params.msg);
+                    result = false;
+                }
+            }
+
+            if (found) {
+                break;
+            }
+        }
+
+        if (!found) {
+            if (key_tryexec != NULL) {
+                /*
+                 * At this point, nftw() did not find the executable.
+                 * However, since there is TryExec in the desktop file,
+                 * then the desktop file may be ignored by menu
+                 * implementations. Hence, report it only as "INFO"
+                 * result, as this is acceptable.
+                 */
+               xasprintf(&params.msg, _("Desktop file %s on %s references executable %s; no subpackages contain an executable of that name, however it has a TryExec key so it may be ignored in case %s does not exist"), file->localpath, arch, tmp, key_tryexec);
+                params.severity = RESULT_INFO;
+                params.waiverauth = NOT_WAIVABLE;
+                add_result(ri, &params);
+                free(params.msg);
+                result = false;
+            } else {
+                xasprintf(&params.msg, _("Desktop file %s on %s references executable %s but no subpackages contain an executable of that name"), file->localpath, arch, tmp);
                 params.severity = RESULT_VERIFY;
                 params.waiverauth = WAIVABLE_BY_ANYONE;
                 add_result(ri, &params);
                 free(params.msg);
                 result = false;
             }
-        } else if (key_tryexec != NULL) {
-            /*
-             * At this point, nftw() did not find the executable.
-             * However, since there is TryExec in the desktop file,
-             * then the desktop file may be ignored by menu
-             * implementations. Hence, report it only as "INFO"
-             * result, as this is acceptable.
-             */
-            xasprintf(&params.msg, _("Desktop file %s on %s references executable %s; no subpackages contain an executable of that name, however it has a TryExec key so it may be ignored in case %s does not exist"), file->localpath, arch, tmp, key_tryexec);
-            params.severity = RESULT_INFO;
-            params.waiverauth = NOT_WAIVABLE;
-            add_result(ri, &params);
-            free(params.msg);
-            result = false;
-        } else {
-            xasprintf(&params.msg, _("Desktop file %s on %s references executable %s but no subpackages contain an executable of that name"), file->localpath, arch, tmp);
-            params.severity = RESULT_VERIFY;
-            params.waiverauth = WAIVABLE_BY_ANYONE;
-            add_result(ri, &params);
-            free(params.msg);
-            result = false;
         }
 
         free(file_to_find);
@@ -306,27 +321,44 @@ static bool validate_desktop_contents(struct rpminspect *ri, const rpmfile_entry
         file_to_find = strdup(key_icon);
         found = false;
 
-        /*
-         * If we get 1 back from nftw(), it means the icon was
-         * found and is valid.  If found, the nftw() helper replaces
-         * file_to_find with the full path to where it was found.
-         */
-        if (nftw(allpkgtrees, find_file, FOPEN_MAX, FTW_MOUNT|FTW_PHYS) == 1) {
-            found = true;
-
-            if (lstat(file_to_find, &sb) == -1) {
-                warn("stat()");
-                list_free(contents, free);
-                return false;
+        TAILQ_FOREACH(peer, ri->peers, items) {
+            /*
+             * Skip the SRPM and any package that lacks a tree (like a
+             * meta package only providing headers)
+             */
+            if (headerIsSource(peer->after_hdr) || peer->after_root == NULL) {
+                continue;
             }
 
-            if (!(sb.st_mode & S_IROTH)) {
-                xasprintf(&params.msg, _("Desktop file %s on %s references icon %s but %s is not readable by all"), file->localpath, arch, key_icon, key_icon);
-                params.severity = RESULT_VERIFY;
-                params.waiverauth = WAIVABLE_BY_ANYONE;
-                add_result(ri, &params);
-                free(params.msg);
-                result = false;
+            /*
+             * If we get 1 back from nftw(), it means the icon was
+             * found and is valid.  If found, the nftw() helper replaces
+             * file_to_find with the full path to where it was found.
+             */
+            found = false;
+
+            if (nftw(peer->after_root, find_file, FOPEN_MAX, FTW_MOUNT|FTW_PHYS) == 1) {
+                found = true;
+
+                if (lstat(file_to_find, &sb) == -1) {
+                    warn("stat()");
+                    list_free(contents, free);
+                    free(file_to_find);
+                    return false;
+                }
+
+                if (!(sb.st_mode & S_IROTH)) {
+                    xasprintf(&params.msg, _("Desktop file %s on %s references icon %s but %s is not readable by all"), file->localpath, arch, key_icon, key_icon);
+                    params.severity = RESULT_VERIFY;
+                    params.waiverauth = WAIVABLE_BY_ANYONE;
+                    add_result(ri, &params);
+                    free(params.msg);
+                    result = false;
+                }
+            }
+
+            if (found) {
+                break;
             }
         }
 
@@ -343,7 +375,6 @@ static bool validate_desktop_contents(struct rpminspect *ri, const rpmfile_entry
     }
 
     list_free(contents, free);
-    free(allpkgtrees);
 
     return result;
 }

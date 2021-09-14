@@ -985,3 +985,66 @@ class DesktopFileMissingExecWithTryExecCompareKoji(TestCompareKoji):
         self.label = "desktop-entry-files"
         self.result = "INFO"
         self.waiver_auth = "Not Waivable"
+
+
+# Valid desktop file passes in Koji build using subpackage (OK)
+class ValidDesktopFileIconInSubpackageKoji(TestKoji):
+    def setUp(self):
+        TestKoji.setUp(self)
+
+        # Adds /usr/bin/hello-world
+        self.rpm.add_simple_compilation()
+
+        # Adds /usr/share/applications/hello-world.desktop
+        self.rpm.add_installed_file(
+            "/usr/share/applications/hello-world.desktop",
+            rpmfluff.SourceFile("hello-world.desktop", good_desktop_file),
+        )
+
+        # Adds /usr/share/icons/hello-world.png to a subpackage
+        self.rpm.add_subpackage("icons")
+        self.rpm.add_installed_file(
+            "/usr/share/icons/hello-world.png",
+            rpmfluff.GeneratedSourceFile("hello-world.png", rpmfluff.make_png()),
+            subpackageSuffix="icons",
+        )
+
+        self.inspection = "desktop"
+        self.result = "OK"
+
+
+class ValidDesktopFileIconInSubpackageCompareKoji(TestCompareKoji):
+    def setUp(self):
+        TestCompareKoji.setUp(self)
+
+        # Adds /usr/bin/hello-world
+        self.before_rpm.add_simple_compilation()
+        self.after_rpm.add_simple_compilation()
+
+        # Adds /usr/share/applications/hello-world.desktop
+        self.before_rpm.add_installed_file(
+            "/usr/share/applications/hello-world.desktop",
+            rpmfluff.SourceFile("hello-world.desktop", good_desktop_file),
+        )
+        self.after_rpm.add_installed_file(
+            "/usr/share/applications/hello-world.desktop",
+            rpmfluff.SourceFile("hello-world.desktop", good_desktop_file),
+        )
+
+        # Adds /usr/share/icons/hello-world.png to a subpackage
+        self.before_rpm.add_subpackage("icons")
+        self.before_rpm.add_installed_file(
+            "/usr/share/icons/hello-world.png",
+            rpmfluff.GeneratedSourceFile("hello-world.png", rpmfluff.make_png()),
+            subpackageSuffix="icons",
+        )
+
+        self.after_rpm.add_subpackage("icons")
+        self.after_rpm.add_installed_file(
+            "/usr/share/icons/hello-world.png",
+            rpmfluff.GeneratedSourceFile("hello-world.png", rpmfluff.make_png()),
+            subpackageSuffix="icons",
+        )
+
+        self.inspection = "desktop"
+        self.result = "OK"
