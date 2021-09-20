@@ -228,8 +228,15 @@ static bool validate_desktop_contents(struct rpminspect *ri, const rpmfile_entry
             key_icon = tmp;
         } else if (strprefix(buf, "TryExec=")) {
             /* Take everything after the key and trim newlines */
-            tmp = buf + 5;
+            tmp = buf + 8;
             tmp[strcspn(tmp, "\n")] = 0;
+
+            /* The TryExec line may specify arguments to the program, strip those */
+            exectoken = index(tmp, ' ');
+
+            if (exectoken != NULL) {
+                *exectoken = '\0';
+            }
 
             key_tryexec = tmp;
         }
