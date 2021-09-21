@@ -139,6 +139,13 @@
  */
 #define SECURITY_DIR "security"
 
+/**
+ * @def ICONS_DIR
+ * Name of the VENDOR_DATA_DIR subdirectory with standard icon names
+ * defined per product.
+ */
+#define ICONS_DIR "icons"
+
 /** @} */
 
 /**

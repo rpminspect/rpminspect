@@ -35,6 +35,12 @@ install_subdir(
     strip_directory : true
 )
 
+install_subdir(
+    'icons',
+    install_dir : get_option('datadir') + '/rpminspect/icons',
+    strip_directory : true
+)
+
 # Install the configuration file
 install_data(
     sources : 'generic.yaml',
