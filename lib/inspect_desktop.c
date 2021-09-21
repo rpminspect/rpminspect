@@ -369,6 +369,11 @@ static bool validate_desktop_contents(struct rpminspect *ri, const rpmfile_entry
             }
         }
 
+        /* check standard system icons as a failsafe */
+        if (!found && init_icons(ri) && list_contains(ri->icons, key_icon)) {
+            found = true;
+        }
+
         if (!found) {
             xasprintf(&params.msg, _("Desktop file %s on %s references icon %s but no subpackages contain %s"), file->localpath, arch, key_icon, key_icon);
             params.severity = RESULT_VERIFY;

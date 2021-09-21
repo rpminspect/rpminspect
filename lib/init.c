@@ -1497,7 +1497,7 @@ bool init_rebaseable(struct rpminspect *ri)
     assert(ri->rebaseable != NULL);
     TAILQ_INIT(ri->rebaseable);
 
-    /* add all the entries to the caps list */
+    /* add all the entries to the rebaseable list */
     TAILQ_FOREACH(entry, contents, items) {
         if (entry->data == NULL) {
             continue;
@@ -1829,6 +1829,68 @@ bool init_security(struct rpminspect *ri)
 
     list_free(contents, free);
     ri->security_initialized = true;
+
+    return true;
+}
+
+/*
+ * Initialize the icons list for the given product release and cache
+ * it.  Return the cached list.  If the file cannot be found, return
+ * false.
+ */
+bool init_icons(struct rpminspect *ri)
+{
+    string_list_t *contents = NULL;
+    string_entry_t *entry = NULL;
+    char *line = NULL;
+    string_entry_t *newentry = NULL;
+
+    assert(ri != NULL);
+    assert(ri->vendor_data_dir != NULL);
+    assert(ri->product_release != NULL);
+
+    /* already initialized */
+    if (ri->icons) {
+        return true;
+    }
+
+    /* the actual icons list file */
+    xasprintf(&ri->icons_filename, "%s/%s/%s", ri->vendor_data_dir, ICONS_DIR, ri->product_release);
+    assert(ri->icons_filename != NULL);
+    contents = read_file(ri->icons_filename);
+
+    if (contents == NULL) {
+        return false;
+    }
+
+    /* initialize the list */
+    ri->icons = calloc(1, sizeof(*(ri->icons)));
+    assert(ri->icons != NULL);
+    TAILQ_INIT(ri->icons);
+
+    /* add all the entries to the icons list */
+    TAILQ_FOREACH(entry, contents, items) {
+        if (entry->data == NULL) {
+            continue;
+        }
+
+        /* trim line ending characters */
+        line = entry->data;
+        line[strcspn(line, "\r\n")] = '\0';
+
+        /* skip blank lines and comments */
+        if (*line == '#' || *line == '\n' || *line == '\r' || !strcmp(line, "")) {
+            continue;
+        }
+
+        /* add the entry to the actual list */
+        newentry = calloc(1, sizeof(*newentry));
+        assert(newentry != NULL);
+        newentry->data = strdup(line);
+        TAILQ_INSERT_TAIL(ri->icons, newentry, items);
+    }
+
+    list_free(contents, free);
 
     return true;
 }

@@ -189,6 +189,8 @@ void free_rpminspect(struct rpminspect *ri) {
 
     free(ri->security_filename);
     list_free(ri->badwords, free);
+    list_free(ri->icons, free);
+    free(ri->icons_filename);
 
     free_regex(ri->elf_path_include);
     free_regex(ri->elf_path_exclude);

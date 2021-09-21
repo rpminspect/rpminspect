@@ -381,6 +381,8 @@ struct rpminspect {
     security_list_t *security;
     char *security_filename;
     bool security_initialized;
+    string_list_t *icons;
+    char *icons_filename;
 
     /* Koji information (from config file) */
     char *kojihub;             /* URL of Koji hub */
