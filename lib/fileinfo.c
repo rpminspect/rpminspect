@@ -52,10 +52,6 @@ bool match_fileinfo_mode(struct rpminspect *ri, const rpmfile_entry_t *file, con
     assert(ri != NULL);
     assert(file != NULL);
 
-    if (remedy) {
-        assert(fname != NULL);
-    }
-
     perms = file->st.st_mode & interesting;
     pkg = headerGetString(file->rpm_header, RPMTAG_NAME);
 
