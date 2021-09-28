@@ -131,11 +131,11 @@ static bool capabilities_driver(struct rpminspect *ri, rpmfile_entry_t *file)
             params.waiverauth = NOT_WAIVABLE;
             add_result(ri, &params);
             free(params.msg);
-        } else {
+        } else if (cap_compare(aftercap, expected) && (ri->tests & INSPECT_CAPABILITIES)) {
             params.severity = get_secrule_result_severity(ri, file, SECRULE_CAPS);
 
             if (params.severity != RESULT_NULL && params.severity != RESULT_SKIP) {
-                xasprintf(&params.msg, _("File capabilities list mismatch for %s: expected '%s', got '%s'\n"), file->localpath, flcaps->caps, arch);
+                xasprintf(&params.msg, _("File capabilities list mismatch for %s: expected '%s', got '%s'\n"), file->localpath, flcaps->caps, after);
                 xasprintf(&params.remedy, REMEDY_CAPABILITIES, ri->caps_filename);
                 params.waiverauth = WAIVABLE_BY_SECURITY;
                 params.verb = VERB_FAILED;
@@ -146,11 +146,11 @@ static bool capabilities_driver(struct rpminspect *ri, rpmfile_entry_t *file)
                 result = false;
             }
         }
-    } else if (aftercap && cap_compare(aftercap, expected)) {
+    } else if (aftercap && !expected) {
         params.severity = get_secrule_result_severity(ri, file, SECRULE_CAPS);
 
         if (params.severity != RESULT_NULL && params.severity != RESULT_SKIP) {
-            xasprintf(&params.msg, _("File capabilities for %s not found on the capabilities list on %s\n"), file->localpath, arch);
+            xasprintf(&params.msg, _("File capabilities for %s (%s) not found on the capabilities list on %s\n"), file->localpath, after, arch);
             xasprintf(&params.remedy, REMEDY_CAPABILITIES, ri->caps_filename);
             params.waiverauth = WAIVABLE_BY_SECURITY;
             params.verb = VERB_REMOVED;
