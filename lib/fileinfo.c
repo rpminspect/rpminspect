@@ -25,6 +25,7 @@
 #include <assert.h>
 #include <err.h>
 #include <errno.h>
+#include <fnmatch.h>
 #include <rpm/header.h>
 #include "rpminspect.h"
 
@@ -263,6 +264,8 @@ bool match_fileinfo_group(struct rpminspect *ri, const rpmfile_entry_t *file, co
  */
 caps_filelist_entry_t *get_caps_entry(struct rpminspect *ri, const char *pkg, const char *filepath)
 {
+    bool found = false;
+    int flags = FNM_NOESCAPE | FNM_PATHNAME;
     caps_entry_t *entry = NULL;
     caps_filelist_entry_t *flentry = NULL;
 
@@ -273,24 +276,28 @@ caps_filelist_entry_t *get_caps_entry(struct rpminspect *ri, const char *pkg, co
     if (init_caps(ri)) {
         /* Look for the package in the caps list */
         TAILQ_FOREACH(entry, ri->caps, items) {
-            if (!strcmp(entry->pkg, pkg)) {
+            if (!strcmp(entry->pkg, pkg) || !fnmatch(entry->pkg, pkg, flags)) {
+                found = true;
                 break;
             }
         }
 
-        if (entry == NULL) {
+        if (!found) {
             return NULL;
         }
 
+        found = false;
+
         /* Look for this file's entry for that package */
         TAILQ_FOREACH(flentry, entry->files, items) {
-            if (strsuffix(flentry->path, filepath)) {
+            if (!strcmp(flentry->path, filepath) || !fnmatch(flentry->path, filepath, flags)) {
+                found = true;
                 break;
             }
         }
 
         /* No entry, make sure to return NULL */
-        if (flentry == NULL) {
+        if (!found) {
             return NULL;
         }
     }
