@@ -36,6 +36,7 @@ static security_entry_t *get_secrule_by_path(struct rpminspect *ri, const rpmfil
     const char *version = NULL;
     const char *release = NULL;
     security_entry_t *sentry = NULL;
+    int flags = FNM_NOESCAPE | FNM_PATHNAME;
     int w = 0;
     int x = 0;
     int y = 0;
@@ -60,10 +61,10 @@ static security_entry_t *get_secrule_by_path(struct rpminspect *ri, const rpmfil
 
     /* try to find a secrule */
     TAILQ_FOREACH(sentry, ri->security, items) {
-        w = fnmatch(sentry->path, file->localpath, FNM_NOESCAPE);
-        x = fnmatch(sentry->pkg, name, FNM_NOESCAPE);
-        y = fnmatch(sentry->ver, version, FNM_NOESCAPE);
-        z = fnmatch(sentry->rel, release, FNM_NOESCAPE);
+        w = fnmatch(sentry->path, file->localpath, flags);
+        x = fnmatch(sentry->pkg, name, flags);
+        y = fnmatch(sentry->ver, version, flags);
+        z = fnmatch(sentry->rel, release, flags);
 
         if (w == 0 && x == 0 && y == 0 && z == 0) {
             /* match found */
