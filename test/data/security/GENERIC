@@ -44,3 +44,6 @@
 /etc/sudoers.d/inform  vaporware   *           *           securitypath=INFORM
 /etc/sudoers.d/verify  vaporware   *           *           securitypath=VERIFY
 /etc/sudoers.d/fail    vaporware   *           *           securitypath=FAIL
+
+# ignore everything about the build-id files
+/usr/lib/.build-id     *           *           *           caps=SKIP,execstack=SKIP,relro=SKIP,fortifysource=SKIP,pic=SKIP,textrel=SKIP,setuid=SKIP,worldwritable=SKIP,securitypath=SKIP,modes=SKIP
