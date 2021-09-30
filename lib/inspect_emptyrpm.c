@@ -56,6 +56,7 @@ static bool is_expected_empty(const struct rpminspect *ri, const char *p)
 bool inspect_emptyrpm(struct rpminspect *ri)
 {
     bool good = true;
+    bool reported = false;
     rpmpeer_entry_t *peer = NULL;
     const char *name = NULL;
     char *bn = NULL;
@@ -91,12 +92,14 @@ bool inspect_emptyrpm(struct rpminspect *ri)
                 params.severity = RESULT_INFO;
                 params.waiverauth = NOT_WAIVABLE;
                 params.remedy = NULL;
+                reported = true;
             } else {
                 xasprintf(&params.msg, _("New package %s is empty (no payloads)"), basename(peer->after_rpm));
                 params.severity = RESULT_VERIFY;
                 params.waiverauth = WAIVABLE_BY_ANYONE;
                 params.remedy = REMEDY_EMPTYRPM;
                 good = false;
+                reported = true;
             }
 
             add_result(ri, &params);
@@ -104,7 +107,7 @@ bool inspect_emptyrpm(struct rpminspect *ri)
         }
     }
 
-    if (good) {
+    if (good & !reported) {
         params.severity = RESULT_OK;
         params.waiverauth = NOT_WAIVABLE;
         add_result(ri, &params);
