@@ -36,6 +36,7 @@ py3-rpm
 py3-yaml
 python3-dev
 rpm-dev
+rust
 sed
 tcsh
 xmlrpc-c-dev
