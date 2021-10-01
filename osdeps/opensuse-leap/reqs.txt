@@ -1,4 +1,5 @@
 bash
+cargo
 clamav
 clamav-devel
 cunit-devel
@@ -40,6 +41,7 @@ python3-pip
 python3-rpm
 rpm-build
 rpm-devel
+rust
 sssd
 tcsh
 valgrind

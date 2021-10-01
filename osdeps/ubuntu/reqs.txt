@@ -1,4 +1,5 @@
 abigail-tools
+cargo
 clamav
 diffstat
 desktop-file-utils
@@ -32,6 +33,7 @@ python3-rpm
 python3-setuptools
 rc
 rpm
+rustc
 sssd
 tcsh
 valgrind

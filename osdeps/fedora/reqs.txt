@@ -1,5 +1,6 @@
 annobin
 bash
+cargo
 clamav-data
 clamav-devel
 clamav-update
@@ -44,6 +45,7 @@ python3-timeout-decorator
 rc
 rpm-build
 rpm-devel
+rust
 sssd-client
 tcsh
 valgrind
