@@ -3,6 +3,7 @@ autoconf
 automake
 bash
 bison
+cargo
 clamav-daemon
 clamav-db
 clamav-dev
