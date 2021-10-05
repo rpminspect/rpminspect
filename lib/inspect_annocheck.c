@@ -26,21 +26,50 @@
 
 #include "rpminspect.h"
 
+/* Trim workdir substrings from a generated string. */
+static char *trim_workdir(const rpmfile_entry_t *file, char *s)
+{
+    size_t fl = 0;
+    size_t ll = 0;
+    char *workdir = NULL;
+    char *tmp = NULL;
+
+    assert(file != NULL);
+
+    if (s == NULL) {
+        return s;
+    }
+
+    fl = strlen(file->fullpath);
+    ll = strlen(file->localpath);
+
+    if (fl > ll) {
+        workdir = strndup(file->fullpath, fl - ll);
+    }
+
+    if (workdir) {
+        tmp = strreplace(s, workdir, NULL);
+        free(s);
+        free(workdir);
+        s = tmp;
+    }
+
+    return s;
+}
+
 static bool annocheck_driver(struct rpminspect *ri, rpmfile_entry_t *file)
 {
     bool result = true;
     const char *arch = NULL;
-    char *cmd = NULL;
+    char *before_cmd = NULL;
+    char *after_cmd = NULL;
     string_map_t *hentry = NULL;
     string_map_t *tmp_hentry = NULL;
-    char *wrkdir = NULL;
-    size_t fl = 0;
-    size_t ll = 0;
-    char *tmp_out = NULL;
     char *after_out = NULL;
     int after_exit = 0;
     char *before_out = NULL;
     int before_exit = 0;
+    char *details = NULL;
     struct result_params params;
 
     assert(ri != NULL);
@@ -77,26 +106,24 @@ static bool annocheck_driver(struct rpminspect *ri, rpmfile_entry_t *file)
     HASH_ITER(hh, ri->annocheck, hentry, tmp_hentry) {
         /* Run the test on the file */
         if (get_after_debuginfo_path(ri, arch) == NULL) {
-            xasprintf(&cmd, "%s %s %s", ri->commands.annocheck, hentry->value, file->fullpath);
+            xasprintf(&after_cmd, "%s %s %s", ri->commands.annocheck, hentry->value, file->fullpath);
         } else {
-            xasprintf(&cmd, "%s %s --debug-dir=%s %s", ri->commands.annocheck, hentry->value, get_after_debuginfo_path(ri, arch), file->fullpath);
+            xasprintf(&after_cmd, "%s %s --debug-dir=%s %s", ri->commands.annocheck, hentry->value, get_after_debuginfo_path(ri, arch), file->fullpath);
         }
 
-        DEBUG_PRINT("%s\n", cmd);
-        after_out = run_cmd(&after_exit, cmd, NULL);
-        free(cmd);
+        DEBUG_PRINT("after_cmd: %s\n", after_cmd);
+        after_out = run_cmd(&after_exit, after_cmd, NULL);
 
         /* If we have a before build, run the command on that */
         if (file->peer_file) {
             if (get_before_debuginfo_path(ri, arch) == NULL) {
-                xasprintf(&cmd, "%s %s %s", ri->commands.annocheck, hentry->value, file->peer_file->fullpath);
+                xasprintf(&before_cmd, "%s %s %s", ri->commands.annocheck, hentry->value, file->peer_file->fullpath);
             } else {
-                xasprintf(&cmd, "%s %s --debug-dir=%s %s", ri->commands.annocheck, hentry->value, get_before_debuginfo_path(ri, arch), file->peer_file->fullpath);
+                xasprintf(&before_cmd, "%s %s --debug-dir=%s %s", ri->commands.annocheck, hentry->value, get_before_debuginfo_path(ri, arch), file->peer_file->fullpath);
             }
 
-            DEBUG_PRINT("%s\n", cmd);
-            before_out = run_cmd(&before_exit, cmd, NULL);
-            free(cmd);
+            DEBUG_PRINT("before_%s\n", before_cmd);
+            before_out = run_cmd(&before_exit, before_cmd, NULL);
         }
 
         /* Build a reporting message if we need to */
@@ -129,24 +156,21 @@ static bool annocheck_driver(struct rpminspect *ri, rpmfile_entry_t *file)
 
         /* Report the results */
         if (params.msg) {
-            /* trim the working directory from the details if it exists */
-            fl = strlen(file->fullpath);
-            ll = strlen(file->localpath);
-
-            if (fl > ll) {
-                wrkdir = strndup(file->fullpath, fl - ll);
+            /* trim the before build working directory and generate details */
+            if (before_cmd) {
+                before_cmd = trim_workdir(file->peer_file, before_cmd);
+                xasprintf(&details, "Command: %s\nExit Code: %d\n    compared with the output of:\nCommand: %s\nExit Code: %d\n\n%s", before_cmd, before_exit, after_cmd, after_exit, after_out);
+            } else {
+                xasprintf(&details, "Command: %s\nExit Code: %d\n\n%s", after_cmd, after_exit, after_out);
             }
 
-            if (wrkdir) {
-                tmp_out = strreplace(after_out, wrkdir, NULL);
-                free(after_out);
-                free(wrkdir);
-                after_out = tmp_out;
-            }
+            /* trim the after build working directory */
+            details = trim_workdir(file, details);
 
-            params.details = after_out;
+            params.details = details;
             add_result(ri, &params);
             free(params.msg);
+            free(details);
         }
 
         /* Cleanup */
@@ -154,6 +178,10 @@ static bool annocheck_driver(struct rpminspect *ri, rpmfile_entry_t *file)
         free(before_out);
         after_out = NULL;
         before_out = NULL;
+
+        free(after_cmd);
+        free(before_cmd);
+
         after_exit = 0;
         before_exit = 0;
     }
