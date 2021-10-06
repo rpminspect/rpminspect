@@ -488,3 +488,32 @@ bool list_contains(const string_list_t *list, const char *s)
 
     return false;
 }
+
+/*
+ * Append the string to the string_list_t and return the
+ * string_list_t.  A NULL string is not added and the caller just gets
+ * back a pointer to the same string_list_t.  A NULL list may be
+ * specified, in which case the function will start a new list and add
+ * the string to it.  Caller responsible for all memory management.
+ */
+string_list_t *list_add(string_list_t *list, const char *s)
+{
+    string_entry_t *entry = NULL;
+
+    if (s == NULL) {
+        return list;
+    }
+
+    if (list == NULL) {
+        list = calloc(1, sizeof(*list));
+        assert(list != NULL);
+        TAILQ_INIT(list);
+    }
+
+    entry = calloc(1, sizeof(*entry));
+    assert(entry != NULL);
+    entry->data = strdup(s);
+    TAILQ_INSERT_TAIL(list, entry, items);
+
+    return list;
+}
