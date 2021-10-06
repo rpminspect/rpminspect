@@ -151,6 +151,7 @@ string_list_t * list_sort(const string_list_t *);
 string_list_t * list_copy(const string_list_t *);
 string_list_t *list_from_array(const char **);
 bool list_contains(const string_list_t *, const char *);
+string_list_t *list_add(string_list_t *list, const char *s);
 
 /* local.c */
 bool is_local_build(const char *);
