@@ -340,10 +340,11 @@ char *bytes_to_str(unsigned char *array, size_t len);
  *
  * @param ri The struct rpminspect for the program.
  * @param binarch The required debuginfo architecture.
+ * @param subpkg Optional subpackage name to get the debuginfo for.
  * @return Full path to the extract before build debuginfo package, or
  * NULL if not found.
  */
-const char *get_before_debuginfo_path(struct rpminspect *ri, const char *binarch);
+const char *get_before_debuginfo_path(struct rpminspect *ri, const char *binarch, const char *subpkg);
 
 /**
  * @brief Return the after build debuginfo package path where the
@@ -354,10 +355,11 @@ const char *get_before_debuginfo_path(struct rpminspect *ri, const char *binarch
  *
  * @param ri The struct rpminspect for the program.
  * @param binarch The required debuginfo architecture.
+ * @param subpkg Optional subpackage name to get the debuginfo for.
  * @return Full path to the extract after build debuginfo package, or
  * NULL if not found.
  */
-const char *get_after_debuginfo_path(struct rpminspect *ri, const char *binarch);
+const char *get_after_debuginfo_path(struct rpminspect *ri, const char *binarch, const char *subpkg);
 bool usable_path(const char *path);
 bool match_path(const char *pattern, const char *root, const char *needle);
 

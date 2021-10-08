@@ -32,6 +32,83 @@
 #include "queue.h"
 #include "rpminspect.h"
 
+/*
+ * Helper for the debuginfo path functions.
+ */
+static const char *_get_debuginfo_path_helper(struct rpminspect *ri, const char *binarch, const char *subpkg, int build)
+{
+    rpmpeer_entry_t *peer = NULL;
+    rpmpeer_entry_t *safety = NULL;
+    const char *name = NULL;
+    const char *arch = NULL;
+    const char *path = NULL;
+    unsigned int count = 0;
+
+    assert(ri != NULL);
+    assert(binarch != NULL);
+    assert(build == BEFORE_BUILD || build == AFTER_BUILD);
+
+    /* try to find a debuginfo package */
+    TAILQ_FOREACH(peer, ri->peers, items) {
+        if ((build == BEFORE_BUILD && peer->before_hdr == NULL) || (build == AFTER_BUILD && peer->after_hdr == NULL)) {
+            continue;
+        }
+
+        if (build == BEFORE_BUILD) {
+            arch = get_rpm_header_arch(peer->before_hdr);
+        } else {
+            arch = get_rpm_header_arch(peer->after_hdr);
+        }
+
+        assert(arch != NULL);
+
+        if (strcmp(arch, binarch)) {
+            /* not the same architecture */
+            continue;
+        }
+
+        if (build == BEFORE_BUILD) {
+            name = headerGetString(peer->before_hdr, RPMTAG_NAME);
+        } else {
+            name = headerGetString(peer->after_hdr, RPMTAG_NAME);
+        }
+
+        assert(name != NULL);
+
+        /* found debuginfo package */
+        if (strsuffix(name, DEBUGINFO_SUFFIX)) {
+            count++;
+
+            if (safety == NULL) {
+                safety = peer;
+            }
+
+            /* match subpackage to its debuginfo */
+            if (subpkg && !strprefix(name, subpkg)) {
+                continue;
+            }
+
+            /* just copy the pointer, no need to dupe it */
+            if (build == BEFORE_BUILD) {
+                return peer->before_root;
+            } else {
+                return peer->after_root;
+            }
+        }
+    }
+
+    /* older systems used to generate a single debuginfo package */
+    if (count == 1 && path == NULL) {
+        if (build == BEFORE_BUILD) {
+            return safety->before_root;
+        } else {
+            return safety->after_root;
+        }
+    }
+
+    return NULL;
+}
+
 /**
  * @brief Return the before build debuginfo package path where the
  * package was extracted for rpminspect.  The path must match the
@@ -41,43 +118,13 @@
  *
  * @param ri The struct rpminspect for the program.
  * @param binarch The required debuginfo architecture.
+ * @param subpkg Optional subpackage name to get the debuginfo for.
  * @return Full path to the extract before build debuginfo package, or
  * NULL if not found.
  */
-const char *get_before_debuginfo_path(struct rpminspect *ri, const char *binarch)
+const char *get_before_debuginfo_path(struct rpminspect *ri, const char *binarch, const char *subpkg)
 {
-    rpmpeer_entry_t *peer = NULL;
-    const char *name = NULL;
-    const char *arch = NULL;
-
-    assert(ri != NULL);
-    assert(binarch != NULL);
-
-    /* try to find a debuginfo package */
-    TAILQ_FOREACH(peer, ri->peers, items) {
-        if (peer->before_hdr == NULL) {
-            continue;
-        }
-
-        arch = get_rpm_header_arch(peer->before_hdr);
-        assert(arch != NULL);
-
-        if (strcmp(arch, binarch)) {
-            /* not the same architecture */
-            continue;
-        }
-
-        name = headerGetString(peer->before_hdr, RPMTAG_NAME);
-        assert(name != NULL);
-
-        /* found the debuginfo package */
-        if (strsuffix(name, DEBUGINFO_SUFFIX)) {
-            /* just copy the pointer, no need to dupe it */
-            return peer->before_root;
-        }
-    }
-
-    return NULL;
+    return _get_debuginfo_path_helper(ri, binarch, subpkg, BEFORE_BUILD);
 }
 
 /**
@@ -89,43 +136,13 @@ const char *get_before_debuginfo_path(struct rpminspect *ri, const char *binarch
  *
  * @param ri The struct rpminspect for the program.
  * @param binarch The required debuginfo architecture.
- * @return Full path to the extract after build debuginfo package, or
- * NULL if not found.
+ * @param subpkg Optional subpackage name to get the debuginfo for.
+ * @return Full path to the extract after build debuginfo package for
+ * the name subpackage, or NULL if not found.
  */
-const char *get_after_debuginfo_path(struct rpminspect *ri, const char *binarch)
+const char *get_after_debuginfo_path(struct rpminspect *ri, const char *binarch, const char *subpkg)
 {
-    rpmpeer_entry_t *peer = NULL;
-    const char *name = NULL;
-    const char *arch = NULL;
-
-    assert(ri != NULL);
-    assert(binarch != NULL);
-
-    /* try to find a debuginfo package */
-    TAILQ_FOREACH(peer, ri->peers, items) {
-        if (peer->after_hdr == NULL) {
-            continue;
-        }
-
-        arch = get_rpm_header_arch(peer->after_hdr);
-        assert(arch != NULL);
-
-        if (strcmp(arch, binarch)) {
-            /* not the same architecture */
-            continue;
-        }
-
-        name = headerGetString(peer->after_hdr, RPMTAG_NAME);
-        assert(name != NULL);
-
-        /* found the debuginfo package */
-        if (strsuffix(name, DEBUGINFO_SUFFIX)) {
-            /* just copy the pointer, no need to dupe it */
-            return peer->after_root;
-        }
-    }
-
-    return NULL;
+    return _get_debuginfo_path_helper(ri, binarch, subpkg, AFTER_BUILD);
 }
 
 /*

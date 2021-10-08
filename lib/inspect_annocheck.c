@@ -61,6 +61,8 @@ static bool annocheck_driver(struct rpminspect *ri, rpmfile_entry_t *file)
 {
     bool result = true;
     const char *arch = NULL;
+    const char *before = NULL;
+    const char *after = NULL;
     char *before_cmd = NULL;
     char *after_cmd = NULL;
     string_map_t *hentry = NULL;
@@ -104,11 +106,13 @@ static bool annocheck_driver(struct rpminspect *ri, rpmfile_entry_t *file)
 
     /* Run each annocheck test and report the results */
     HASH_ITER(hh, ri->annocheck, hentry, tmp_hentry) {
+        after = headerGetString(file->rpm_header, RPMTAG_NAME);
+
         /* Run the test on the file */
-        if (get_after_debuginfo_path(ri, arch) == NULL) {
+        if (get_after_debuginfo_path(ri, arch, after) == NULL) {
             xasprintf(&after_cmd, "%s %s %s", ri->commands.annocheck, hentry->value, file->fullpath);
         } else {
-            xasprintf(&after_cmd, "%s %s --debug-dir=%s %s", ri->commands.annocheck, hentry->value, get_after_debuginfo_path(ri, arch), file->fullpath);
+            xasprintf(&after_cmd, "%s %s --debug-dir=%s %s", ri->commands.annocheck, hentry->value, get_after_debuginfo_path(ri, arch, after), file->fullpath);
         }
 
         DEBUG_PRINT("after_cmd: %s\n", after_cmd);
@@ -116,18 +120,18 @@ static bool annocheck_driver(struct rpminspect *ri, rpmfile_entry_t *file)
 
         /* If we have a before build, run the command on that */
         if (file->peer_file) {
-            if (get_before_debuginfo_path(ri, arch) == NULL) {
+            before = headerGetString(file->peer_file->rpm_header, RPMTAG_NAME);
+
+            if (get_before_debuginfo_path(ri, arch, before) == NULL) {
                 xasprintf(&before_cmd, "%s %s %s", ri->commands.annocheck, hentry->value, file->peer_file->fullpath);
             } else {
-                xasprintf(&before_cmd, "%s %s --debug-dir=%s %s", ri->commands.annocheck, hentry->value, get_before_debuginfo_path(ri, arch), file->peer_file->fullpath);
+                xasprintf(&before_cmd, "%s %s --debug-dir=%s %s", ri->commands.annocheck, hentry->value, get_before_debuginfo_path(ri, arch, before), file->peer_file->fullpath);
             }
 
             DEBUG_PRINT("before_%s\n", before_cmd);
             before_out = run_cmd(&before_exit, before_cmd, NULL);
-        }
 
-        /* Build a reporting message if we need to */
-        if (file->peer_file) {
+            /* Build a reporting message if we need to */
             if (before_exit == 0 && after_exit == 0) {
                 xasprintf(&params.msg, _("annocheck '%s' test passes for %s on %s"), hentry->key, file->localpath, arch);
             } else if (before_exit && after_exit == 0) {
