@@ -175,9 +175,7 @@ static void prune_local(const int whichbuild) {
 static int copytree(const char *fpath, const struct stat *sb, int tflag, struct FTW *ftwbuf)
 {
     static int toptrim = 0;
-    char *workfpath = NULL;
     char *bufpath = NULL;
-    char *copysrc = NULL;
     Header h;
     const char *arch = NULL;
     int ret = 0;
@@ -198,30 +196,30 @@ static int copytree(const char *fpath, const struct stat *sb, int tflag, struct 
     }
 
     /* Copy file or create a directory */
-    workfpath = ((char *) fpath) + toptrim;
-    xasprintf(&bufpath, "%s/%s/%s", workri->worksubdir, build_desc[whichbuild], workfpath);
-    copysrc = realpath(fpath, NULL);
+    xasprintf(&bufpath, "%s/%s/%s", workri->worksubdir, build_desc[whichbuild], ((char *) fpath) + toptrim);
 
     if (S_ISDIR(sb->st_mode)) {
         if (mkdirp(bufpath, mode)) {
-            warn("mkdirp()");
+            warn("mkdirp");
             ret = -1;
         }
     } else if (S_ISREG(sb->st_mode) || S_ISLNK(sb->st_mode)) {
         h = get_rpm_header(workri, fpath);
 
         if (h == NULL) {
+            free(bufpath);
             return ret;
         }
 
         arch = get_rpm_header_arch(h);
 
         if (!allowed_arch(workri, arch)) {
+            free(bufpath);
             return 0;
         }
 
-        if (copyfile(copysrc, bufpath, true, false)) {
-            warn("copyfile()");
+        if (copyfile(fpath, bufpath, true, false)) {
+            warn("copyfile");
             ret = -1;
         }
 
@@ -232,9 +230,7 @@ static int copytree(const char *fpath, const struct stat *sb, int tflag, struct 
         ret = -1;
     }
 
-    fflush(stderr);
     free(bufpath);
-    free(copysrc);
 
     return ret;
 }
