@@ -63,17 +63,17 @@ static short get_jvm_major(const char *filename, const char *localpath,
         fd = open(filename, O_RDONLY | O_CLOEXEC | O_LARGEFILE);
 
         if (fd == -1) {
-            warn("open()");
+            warn("open");
             return -1;
         }
 
         if (read(fd, magic, sizeof(magic)) != sizeof(magic)) {
-            warn("read()");
+            warn("read");
             return -1;
         }
 
         if (close(fd) == -1) {
-            warn("close()");
+            warn("close");
             return -1;
         }
 
@@ -183,7 +183,7 @@ static bool javabytecode_driver(struct rpminspect *ri, rpmfile_entry_t *file, co
         tmppath = mkdtemp(tmppath);
 
         if (tmppath == NULL) {
-            warn("mkdtemp()");
+            warn("mkdtemp");
             free(tmppath);
             return false;
         }
@@ -203,7 +203,7 @@ static bool javabytecode_driver(struct rpminspect *ri, rpmfile_entry_t *file, co
 
         if (jarstatus != 0) {
             /* we errored somewhere, just report it */
-            warn("nftw()");
+            warn("nftw");
         }
 
         /* clean up */

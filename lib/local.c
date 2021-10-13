@@ -51,7 +51,7 @@ bool is_local_build(const char *build) {
     }
 
     if (stat(build, &sb) == -1) {
-        warn("stat()");
+        warn("stat");
         return false;
     }
 
@@ -62,16 +62,16 @@ bool is_local_build(const char *build) {
     memset(cwd, '\0', sizeof(cwd));
 
     if (getcwd(cwd, PATH_MAX) == NULL) {
-        err(RI_PROGRAM_ERROR, "getcwd()");
+        err(RI_PROGRAM_ERROR, "getcwd");
     }
 
     if (chdir(build) == -1) {
-        warn("chdir()");
+        warn("chdir");
         return false;
     }
 
     if (chdir(cwd) == -1) {
-        warn("chdir()");
+        warn("chdir");
         return false;
     }
 

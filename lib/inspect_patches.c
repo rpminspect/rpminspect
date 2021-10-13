@@ -195,7 +195,7 @@ static bool patches_driver(struct rpminspect *ri, rpmfile_entry_t *file)
      * generating multiple patches against multiple branches.
      */
     if (stat(after_patch, &sb) != 0) {
-        warn("stat()");
+        warn("stat");
         return false;
     }
 

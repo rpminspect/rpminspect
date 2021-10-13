@@ -203,7 +203,7 @@ static char *inspect_manpage_validity(const char *path, const char *localpath)
         fprintf(error_stream, _("Man page %s does not end in %s\n"), path, GZIPPED_FILENAME_EXTENSION);
     } else {
         if (read(fd, magic, sizeof(magic)) != sizeof(magic)) {
-            fprintf(error_stream, "read(): %s\n", strerror(errno));
+            fprintf(error_stream, "read: %s\n", strerror(errno));
             goto end;
         }
 
@@ -213,7 +213,7 @@ static char *inspect_manpage_validity(const char *path, const char *localpath)
 
         /* Reset the fd and continue */
         if (lseek(fd, 0, SEEK_SET) == -1) {
-            fprintf(error_stream, "lseek(): %s\n", strerror(errno));
+            fprintf(error_stream, "lseek: %s\n", strerror(errno));
             goto end;
         }
     }
@@ -320,7 +320,7 @@ static bool manpage_driver(struct rpminspect *ri, rpmfile_entry_t *file)
             result = false;
             free(params.msg);
         } else if (r == -1) {
-            warn("stat()");
+            warn("stat");
         }
 
         free(uncompressed_man_page);

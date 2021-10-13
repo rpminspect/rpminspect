@@ -75,7 +75,7 @@ Header get_rpm_header(struct rpminspect *ri, const char *pkg)
     fd = Fopen(pkg, "r.ufdio");
 
     if (fd == NULL || Ferror(fd)) {
-        warnx(_("Fopen() failed for %s: %s"), pkg, Fstrerror(fd));
+        warnx(_("Fopen failed for %s: %s"), pkg, Fstrerror(fd));
 
         if (fd) {
             Fclose(fd);

@@ -113,12 +113,12 @@ char *compute_checksum(const char *filename, mode_t *st_mode, enum checksum type
 
     /* read in the file to generate the requested checksum */
     if ((input = open(filename, O_RDONLY)) == -1) {
-        warn("open()");
+        warn("open");
         return NULL;
     }
 
     if ((len = read(input, buf, sizeof(buf))) == -1) {
-        warn("read()");
+        warn("read");
         return NULL;
     }
 
@@ -135,13 +135,13 @@ char *compute_checksum(const char *filename, mode_t *st_mode, enum checksum type
         }
 
         if ((len = read(input, buf, sizeof(buf))) == -1) {
-            warn("read()");
+            warn("read");
             return NULL;
         }
     }
 
     if (close(input) == -1) {
-        warn("close()");
+        warn("close");
         return NULL;
     }
 
@@ -172,7 +172,7 @@ char *compute_checksum(const char *filename, mode_t *st_mode, enum checksum type
 
     /* this is our human readable digest, caller must free */
     if ((ret = calloc(len + 1, sizeof(char *))) == NULL) {
-        warn("calloc()");
+        warn("calloc");
         return NULL;
     }
 

@@ -497,13 +497,13 @@ static int read_cfgfile(struct rpminspect *ri, const char *filename)
 
     /* prepare a YAML parser */
     if (!yaml_parser_initialize(&parser)) {
-        warn("yaml_parser_initialize()");
+        warn("yaml_parser_initialize");
         return -1;
     }
 
     /* open the config file */
     if ((fp = fopen(filename, "r")) == NULL) {
-        warn("fopen()");
+        warn("fopen");
         return -1;
     }
 
@@ -1072,7 +1072,7 @@ static int read_cfgfile(struct rpminspect *ri, const char *filename)
                                 ri->size_threshold = strtol(t, 0, 10);
 
                                 if ((ri->size_threshold == LONG_MIN || ri->size_threshold == LONG_MAX) && errno == ERANGE) {
-                                    warn("strtol()");
+                                    warn("strtol");
                                     ri->size_threshold = 0;
                                 }
                             }
@@ -1115,7 +1115,7 @@ static int read_cfgfile(struct rpminspect *ri, const char *filename)
                             ri->abi_security_threshold = strtol(t, 0, 10);
 
                             if ((ri->abi_security_threshold == LONG_MIN || ri->abi_security_threshold == LONG_MAX) && errno == ERANGE) {
-                                warn("strtol()");
+                                warn("strtol");
                                 ri->abi_security_threshold = DEFAULT_ABI_SECURITY_THRESHOLD;
                             }
                         }
@@ -1141,14 +1141,14 @@ static int read_cfgfile(struct rpminspect *ri, const char *filename)
                             ri->patch_file_threshold = strtol(t, 0, 10);
 
                             if ((ri->patch_file_threshold == LONG_MIN || ri->patch_file_threshold == LONG_MAX) && errno == ERANGE) {
-                                warn("strtol()");
+                                warn("strtol");
                                 ri->patch_file_threshold = DEFAULT_PATCH_FILE_THRESHOLD;
                             }
                         } else if (!strcmp(key, "line_count_threshold")) {
                             ri->patch_line_threshold = strtol(t, 0, 10);
 
                             if ((ri->patch_line_threshold == LONG_MIN || ri->patch_line_threshold == LONG_MAX) && errno == ERANGE) {
-                                warn("strtol()");
+                                warn("strtol");
                                 ri->patch_line_threshold = DEFAULT_PATCH_LINE_THRESHOLD;
                             }
                         }
@@ -1232,7 +1232,7 @@ static int read_cfgfile(struct rpminspect *ri, const char *filename)
     yaml_parser_delete(&parser);
 
     if (fclose(fp) != 0) {
-        warn("fclose()");
+        warn("fclose");
         return -1;
     }
 

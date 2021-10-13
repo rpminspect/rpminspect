@@ -43,7 +43,7 @@ int mkdirp(const char *path, mode_t mode) {
         start = p = strdup(path);
     } else {
         if ((cwd = getcwd(NULL, 0)) == NULL) {
-            warn("getcwd()");
+            warn("getcwd");
             return -1;
         }
 
