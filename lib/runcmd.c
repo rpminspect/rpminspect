@@ -28,118 +28,164 @@
 #include <errno.h>
 #include <assert.h>
 #include <err.h>
+#include <sys/types.h>
+#include <sys/wait.h>
+#include <unistd.h>
 
 #include "rpminspect.h"
 
+#define RD STDIN_FILENO
+#define WR STDOUT_FILENO
+
+extern char **environ;
+
 /*
- * Generic popen() wrapper to return the output of the process and the
- * exit code (if desired).  This function returns an allocated string of
- * the output from the program that ran or NULL if there was no output.
+ * Generic fork()/execvpe() wrapper to return the output of the
+ * process and the exit code (if desired).  This function returns an
+ * allocated string of the output from the program that ran or NULL if
+ * there was no output.
  *
- * The first argument is a pointer to an int that will hold the exit code
- * from popen().  If this pointer is NULL, then the caller does not want
- * the exit code and the function does nothing.
+ * The first argument is a pointer to an int that will hold the exit
+ * code from execvpe().  If this pointer is NULL, then the caller does
+ * not want the exit code and the function does nothing.
  *
- * The second argument is the command followed by any additional arguments
- * that should be included with it.  Note that it is not a format string,
- * all of the subsequent arguments need to be strings because they all
- * get concatenated together.
+ * The second argument is the command followed by any additional
+ * arguments that should be included with it.  Note that it is not a
+ * format string, all of the subsequent arguments need to be strings
+ * because they all get concatenated together.
  */
-char *sl_run_cmd(int *exitcode, string_list_t *list)
+char *run_cmd_vpe(int *exitcode, char **argv)
 {
-    int status;
+    int i = 0;
+    int pfd[2];
+    int status = 0;
+    pid_t proc = 0;
+    FILE *reader = 0;
+    char *signame = NULL;
     char *output = NULL;
     char *tail = NULL;
     size_t n = BUFSIZ;
     char *buf = NULL;
-    FILE *cmdfp = NULL;
-    char *built = NULL;
-    string_entry_t *entry = NULL;
 
-    assert(list != NULL);
+    assert(argv != NULL);
+    assert(argv[0] != NULL);
 
-    /* build the command line */
-    TAILQ_FOREACH(entry, list, items) {
-        if (built == NULL) {
-            built = strdup(entry->data);
-        } else {
-            xasprintf(&output, "%s %s", built, entry->data);
-            assert(output != NULL);
-            free(built);
-            built = output;
-        }
+    /* create pipes to interact with the child */
+    if (pipe(pfd) == -1) {
+        warn("pipe");
+        *exitcode = EXIT_FAILURE;
+        return NULL;
     }
-
-    /* always combine stdout and stderr */
-    xasprintf(&output, "%s 2>&1", built);
-    assert(output != NULL);
-    free(built);
-    built = output;
-
-    /* shrink memory allocation */
-    built = realloc(built, strlen(built) + 1);
 
     /* run the command */
-    cmdfp = popen(built, "r");
+    proc = fork();
 
-    if (cmdfp == NULL) {
-        warn(_("error running `%s`"), built);
-        free(built);
-        return false;
-    }
+    if (proc == 0) {
+        /* connect the output */
+        if (dup2(pfd[WR], STDOUT_FILENO) == -1 || dup2(pfd[WR], STDERR_FILENO) == -1) {
+            warn("dup2");
+            _exit(EXIT_FAILURE);
+        }
 
-    /*
-     * Read in all of the information back from the command and store
-     * it as our result.  Just concatenate the string as we read it
-     * back in buffer size chunks.
-     */
-    output = NULL;
-    buf = calloc(1, n);
-    assert(buf != NULL);
+        /* close the pipe */
+        if (close(pfd[RD]) == -1 || close(pfd[WR]) == -1) {
+            warn("dup2");
+            _exit(EXIT_FAILURE);
+        }
 
-    while (getline(&buf, &n, cmdfp) != -1) {
-        if (output == NULL) {
-            output = strdup(buf);
-        } else {
-            xasprintf(&tail, "%s%s", output, buf);
+        setlinebuf(stdout);
+
+        /* run the command */
+        if (execvpe(argv[0], argv, environ) == -1) {
+            warn("execvpe");
+            _exit(EXIT_FAILURE);
+        }
+    } else if (proc == -1) {
+        /* failure */
+        warn("fork");
+    } else {
+        /* close the pipe */
+        if (close(pfd[WR]) == -1) {
+            warn("close");
+        }
+
+        /*
+         * Read in all of the information back from the command and store
+         * it as our result.  Just concatenate the string as we read it
+         * back in buffer size chunks.
+         */
+        reader = fdopen(pfd[RD], "r");
+
+        if (reader == NULL) {
+            *exitcode = EXIT_FAILURE;
+            return NULL;
+        }
+
+        output = NULL;
+        buf = calloc(1, n);
+        assert(buf != NULL);
+
+        while (getline(&buf, &n, reader) != -1) {
+            xasprintf(&tail, "%s%s", (output == NULL) ? "" : output, buf);
             assert(tail != NULL);
             free(output);
             output = tail;
         }
-    }
 
-    free(buf);
+        free(buf);
 
-    /* Capture the return code from the validation tool */
-    status = pclose(cmdfp);
+        if (fclose(reader) == -1) {
+            warn("fclose");
+        }
 
-    if (exitcode != NULL) {
-        *exitcode = status;
-    }
+        /* wait for the command */
+        if (waitpid(proc, &status, 0) == -1) {
+            warn("waitpid");
+            *exitcode = EXIT_FAILURE;
+        }
 
-    if (status == -1) {
-        warn(_("error closing `%s`"), built);
-        free(built);
-        free(output);
-        return NULL;
-    }
+        if (WIFEXITED(status)) {
+            *exitcode = WEXITSTATUS(status);
+        } else if (WIFSIGNALED(status)) {
+            *exitcode = EXIT_FAILURE;
 
-    /* There may be no results from the tool */
-    if (output != NULL) {
-        /* Trim trailing newline */
-        tail = rindex(output, '\n');
+            /* generate a string with the signal name if possible */
+            i = WTERMSIG(status);
 
-        if (tail != NULL) {
-            tail[strcspn(tail, "\n")] = 0;
+            if (strsignal(i) == NULL) {
+                xasprintf(&signame, _("%d"), i);
+            } else {
+                xasprintf(&signame, _("%d (%s)"), i, strsignal(i));
+            }
+
+            /* generic output indicating the command we tried to run and the signal received */
+            if (output) {
+                xasprintf(&tail, _("%s\n\n%s tried to run the command and it received signal %s"), output, COMMAND_NAME, signame);
+                free(output);
+                output = tail;
+            } else {
+                xasprintf(&output, _("%s tried to run the command and it received signal %s"), COMMAND_NAME, signame);
+            }
+
+            free(signame);
+        }
+
+        /* There may be no results from the tool */
+        if (output != NULL) {
+            /* Trim trailing newline */
+            tail = rindex(output, '\n');
+
+            if (tail != NULL) {
+                tail[strcspn(tail, "\n")] = 0;
+            }
         }
     }
 
-    free(built);
     return output;
 }
 
 /*
- * Wrapper for sl_run_cmd() that lets you pass in varargs instead of a
+ * Wrapper for run_cmd_vpe() that lets you pass in varargs instead of a
  * string_list_t.
  */
 char *run_cmd(int *exitcode, const char *cmd, ...)
@@ -147,38 +193,94 @@ char *run_cmd(int *exitcode, const char *cmd, ...)
     va_list ap;
     char *output = NULL;
     char *element = NULL;
-    string_list_t *list = NULL;
-    string_entry_t *entry = NULL;
+    char **argv = NULL;
+    int i = 0;
 
     assert(cmd != NULL);
 
-    /* convert varargs to a string_list_t */
-    list = calloc(1, sizeof(*list));
-    assert(list != NULL);
-    TAILQ_INIT(list);
+    /* convert varargs to a string array */
+    argv = calloc(2, sizeof(*argv));
+    assert(argv != NULL);
 
-    entry = calloc(1, sizeof(*entry));
-    assert(entry != NULL);
-    entry->data = strdup(cmd);
-    TAILQ_INSERT_TAIL(list, entry, items);
+    /* add the command */
+    argv[i] = strdup(cmd);
+    assert(argv[i] != NULL);
+    i++;
+    argv[i] = NULL;
 
     /* Add the remaining elements */
     va_start(ap, cmd);
 
     while ((element = va_arg(ap, char *)) != NULL) {
-        entry = calloc(1, sizeof(*entry));
-        assert(entry != NULL);
-        entry->data = strdup(element);
-        TAILQ_INSERT_TAIL(list, entry, items);
+        i++;
+        argv = reallocarray(argv, i + 1, sizeof(*argv));
+        assert(argv != NULL);
+
+        argv[i - 1] = strdup(element);
+        assert(argv[i - 1] != NULL);
+        argv[i] = NULL;
     }
 
     va_end(ap);
 
     /* run the command */
-    output = sl_run_cmd(exitcode, list);
-    list_free(list, free);
+    output = run_cmd_vpe(exitcode, argv);
+
+    /* clean up */
+    free_argv(argv);
 
     return output;
+}
+
+/*
+ * Split a string in to a char ** of all the arguments, terminated
+ * with a NULL entry.  Caller must free.
+ */
+char **build_argv(const char *cmd)
+{
+    char **r = NULL;
+    int i = 0;
+    string_list_t *list = NULL;
+    string_entry_t *entry = NULL;
+
+    if (cmd == NULL) {
+        return NULL;
+    }
+
+    list = strsplit(cmd, " \t");
+    assert(list != NULL);
+
+    TAILQ_FOREACH(entry, list, items) {
+        r = reallocarray(r, i + 2, sizeof(*r));
+        assert(r != NULL);
+
+        r[i] = strdup(entry->data);
+        assert(r[i] != NULL);
+        r[i + 1] = NULL;
+        i++;
+    }
+
+    list_free(list, free);
+    return r;
+}
+
+/*
+ * Clean up a char **
+ */
+void free_argv(char **argv)
+{
+    int i = 0;
+
+    if (argv == NULL) {
+        return;
+    }
+
+    for (i = 0; argv[i] != NULL; i++) {
+        free(argv[i]);
+    }
+
+    free(argv);
+    return;
 }
 
 /*
