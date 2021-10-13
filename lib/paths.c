@@ -163,7 +163,7 @@ bool usable_path(const char *path)
     memset(&sb, 0, sizeof(sb));
 
     if (lstat(path, &sb) == -1) {
-        warn("lstat(%s)", path);
+        warn("lstat");
         return false;
     }
 
@@ -194,8 +194,6 @@ bool match_path(const char *pattern, const char *root, const char *needle)
     assert(pattern != NULL);
     assert(needle != NULL);
 
-DEBUG_PRINT("pattern=|%s|, root=|%s|, needle=|%s|\n", pattern, root, needle);
-
 #ifdef GLOB_BRACE
     /* this is a GNU extension, see glob(3) */
     gflags |= GLOB_BRACE;
@@ -225,11 +223,10 @@ DEBUG_PRINT("pattern=|%s|, root=|%s|, needle=|%s|\n", pattern, root, needle);
     }
 
     gp = stpcpy(gp, pattern);
-    DEBUG_PRINT("globpath=|%s|\n", globpath);
     r = glob(globpath, gflags, NULL, &found);
 
     if (r == GLOB_NOSPACE || r == GLOB_ABORTED) {
-        warn("glob()");
+        warn("glob");
     }
 
     if (r != 0) {

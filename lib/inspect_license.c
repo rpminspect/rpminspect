@@ -75,7 +75,7 @@ static struct json_object *read_licensedb(const char *licensedb)
     jerr = json_tokener_get_error(tok);
 
     if (jerr != json_tokener_success) {
-        warnx("json_tokener_parse_ex(): %s", json_tokener_error_desc(jerr));
+        warnx("json_tokener_parse_ex: %s", json_tokener_error_desc(jerr));
     }
 
     json_tokener_free(tok);

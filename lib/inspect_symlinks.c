@@ -139,7 +139,7 @@ static bool symlinks_driver(struct rpminspect *ri, rpmfile_entry_t *file) {
     memset(cwd, '\0', sizeof(cwd));
 
     if (getcwd(cwd, PATH_MAX) == NULL) {
-        err(RI_PROGRAM_ERROR, "getcwd()");
+        err(RI_PROGRAM_ERROR, "getcwd");
     }
 
     memset(reltarget, '\0', sizeof(reltarget));
@@ -261,7 +261,7 @@ static bool symlinks_driver(struct rpminspect *ri, rpmfile_entry_t *file) {
     TAILQ_FOREACH(peer, ri->peers, items) {
         /* move to the subpackage root */
         if (chdir(peer->after_root) == -1) {
-            warn("chdir()");
+            warn("chdir");
             continue;
         }
 

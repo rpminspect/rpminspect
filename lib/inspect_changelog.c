@@ -133,7 +133,7 @@ static char *create_changelog(const string_list_t *changelog, const char *where)
     fd = mkstemp(output);
 
     if (fd == -1) {
-        warn("mkstemp()");
+        warn("mkstemp");
         free(output);
         return NULL;
     }
@@ -141,7 +141,7 @@ static char *create_changelog(const string_list_t *changelog, const char *where)
     logfp = fdopen(fd, "w");
 
     if (logfp == NULL) {
-        warn("fdopen()");
+        warn("fdopen");
         close(fd);
         free(output);
         return NULL;
@@ -152,7 +152,7 @@ static char *create_changelog(const string_list_t *changelog, const char *where)
     }
 
     if (fclose(logfp) != 0) {
-        warn("fclose()");
+        warn("fclose");
         close(fd);
         free(output);
         return NULL;

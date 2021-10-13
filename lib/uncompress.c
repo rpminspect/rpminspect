@@ -72,7 +72,7 @@ char *uncompress_file(struct rpminspect *ri, const char *infile, const char *sub
     r = stat(outfile, &sb);
 
     if ((r == -1) && (errno != ENOENT)) {
-        warn("stat()");
+        warn("stat");
         goto error1;
     }
 
@@ -82,7 +82,7 @@ char *uncompress_file(struct rpminspect *ri, const char *infile, const char *sub
      */
     if (errno == ENOENT) {
         if (mkdirp(outfile, mode) == -1) {
-            warn("mkdirp()");
+            warn("mkdirp");
             goto error1;
         }
     }
@@ -104,7 +104,7 @@ char *uncompress_file(struct rpminspect *ri, const char *infile, const char *sub
     fd = mkstemp(outfile);
 
     if (fd == -1) {
-        warn("mkstemp()");
+        warn("mkstemp");
         goto error1;
     }
 
@@ -192,14 +192,14 @@ char *uncompress_file(struct rpminspect *ri, const char *infile, const char *sub
     r = archive_read_open_filename(input, infile, 16384);
 
     if (r != ARCHIVE_OK) {
-        warn("archive_read_open_filename(): %s", archive_error_string(input));
+        warn("archive_read_open_filename: %s", archive_error_string(input));
         goto error2;
     }
 
     r = archive_read_next_header(input, &entry);
 
     if (r == ARCHIVE_WARN || r == ARCHIVE_FAILED || r == ARCHIVE_FATAL) {
-        warn("archive_read_next_header(): %s", archive_error_string(input));
+        warn("archive_read_next_header: %s", archive_error_string(input));
         goto error2;
     }
 
@@ -212,7 +212,7 @@ char *uncompress_file(struct rpminspect *ri, const char *infile, const char *sub
             }
 
             if (write(fd, buf, size) == -1) {
-                warn("write()");
+                warn("write");
                 goto error2;
             }
         }
@@ -221,7 +221,7 @@ char *uncompress_file(struct rpminspect *ri, const char *infile, const char *sub
         fp = fdopen(fd, "w");
 
         if (fp == NULL) {
-            warn("fdopen()");
+            warn("fdopen");
             goto error2;
         }
 
@@ -231,7 +231,7 @@ char *uncompress_file(struct rpminspect *ri, const char *infile, const char *sub
          * the fd
          */
         if (fclose(fp) == -1) {
-            warn("fclose()");
+            warn("fclose");
             goto error2;
         }
 
@@ -242,7 +242,7 @@ char *uncompress_file(struct rpminspect *ri, const char *infile, const char *sub
 
     /* close up our uncompressed file */
     if (fd && close(fd) == -1) {
-        warn("close()");
+        warn("close");
         goto error1;
     }
 

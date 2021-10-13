@@ -179,7 +179,7 @@ rpmfile_t *extract_rpm(const char *pkg, Header hdr, char **output_dir)
     }
 
     if (mkdir(*output_dir, S_IRWXU | S_IRGRP | S_IXGRP | S_IROTH | S_IXOTH) == -1) {
-        warn("mkdir()");
+        warn("mkdir");
         return NULL;
     }
 
@@ -208,7 +208,7 @@ rpmfile_t *extract_rpm(const char *pkg, Header hdr, char **output_dir)
         rpm_path = rpmtdNextString(td);
 
         if (rpm_path == NULL) {
-            warn("rpmtdNextString()");
+            warn("rpmtdNextString");
             goto cleanup;
         }
 
@@ -231,7 +231,7 @@ rpmfile_t *extract_rpm(const char *pkg, Header hdr, char **output_dir)
     archive_read_support_format_all(archive);
 
     if (archive_read_open_filename(archive, pkg, 10240) != ARCHIVE_OK) {
-        warn("archive_read_open_filename()");
+        warn("archive_read_open_filename");
         goto cleanup;
     }
 
@@ -246,7 +246,7 @@ rpmfile_t *extract_rpm(const char *pkg, Header hdr, char **output_dir)
         }
 
         if (archive_result != ARCHIVE_OK) {
-            warn("archive_read_next_header()");
+            warn("archive_read_next_header");
             free_files(file_list);
             file_list = NULL;
             goto cleanup;
@@ -315,7 +315,7 @@ rpmfile_t *extract_rpm(const char *pkg, Header hdr, char **output_dir)
 
         /* Write the file to disk */
         if (archive_read_extract(archive, entry, archive_flags) != ARCHIVE_OK) {
-            warn("archive_read_extract()");
+            warn("archive_read_extract");
             free_files(file_list);
             file_list = NULL;
             goto cleanup;
@@ -467,7 +467,7 @@ static char *comparable_version_substrings(const char *s, const char *ignore)
 
     if (reg_result != 0) {
         regerror(reg_result, &num_regex, reg_error, sizeof(reg_error));
-        warn("regcomp(): %s", reg_error);
+        warn("regcomp: %s", reg_error);
         return NULL;
     }
 

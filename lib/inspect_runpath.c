@@ -172,7 +172,7 @@ static bool check_runpath(struct rpminspect *ri, const rpmfile_entry_t *file, co
 
                         if (reg_result != 0) {
                             regerror(reg_result, &origin_root, reg_error, sizeof(reg_error));
-                            warn("regexec(): %s", reg_error);
+                            warn("regexec: %s", reg_error);
                             regfree(&origin_root);
                             continue;
                         }

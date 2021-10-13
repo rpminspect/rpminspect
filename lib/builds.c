@@ -108,7 +108,7 @@ static void set_worksubdir(struct rpminspect *ri, workdir_t wd, const struct koj
         }
 
         if (mkdtemp(ri->worksubdir) == NULL) {
-            err(RI_PROGRAM_ERROR, "mkdtemp()");
+            err(RI_PROGRAM_ERROR, "mkdtemp");
         }
     }
 
@@ -160,7 +160,7 @@ static void prune_local(const int whichbuild) {
     }
 
     if (closedir(d) == -1) {
-        warn("closedir()");
+        warn("closedir");
         return;
     }
 
@@ -382,7 +382,7 @@ static void curl_helper(const bool verbose, const char *src, const char *dst) {
 
     /* initialize curl */
     if (!(c = curl_easy_init())) {
-        warn("curl_easy_init()");
+        warn("curl_easy_init");
         return;
     }
 
@@ -520,7 +520,7 @@ static int download_build(const struct rpminspect *ri, const struct koji_build *
             }
 
             if (mkdirp(dst, mode)) {
-                warn("mkdirp()");
+                warn("mkdirp");
                 return -1;
             }
 
@@ -534,12 +534,12 @@ static int download_build(const struct rpminspect *ri, const struct koji_build *
             if (filter == NULL) {
                 /* prepare a YAML parser */
                 if (!yaml_parser_initialize(&parser)) {
-                    warn("yaml_parser_initialize()");
+                    warn("yaml_parser_initialize");
                 }
 
                 /* open the modulemd file */
                 if ((fp = fopen(dst, "r")) == NULL) {
-                    err(RI_PROGRAM_ERROR, "fopen()");
+                    err(RI_PROGRAM_ERROR, "fopen");
                 }
 
                 /* initialize a string list for the loop */
@@ -722,7 +722,7 @@ static int download_task(const struct rpminspect *ri, const struct koji_task *ta
         }
 
         if (mkdirp(dst, mode)) {
-            warn("mkdirp()");
+            warn("mkdirp");
             return -1;
         }
 
@@ -740,7 +740,7 @@ static int download_task(const struct rpminspect *ri, const struct koji_task *ta
                 }
 
                 if (mkdirp(dst, mode)) {
-                    warn("mkdirp()");
+                    warn("mkdirp");
                     return -1;
                 }
 
@@ -812,7 +812,7 @@ static int download_rpm(const char *rpm)
     }
 
     if (mkdirp(dstdir, mode)) {
-        warn("mkdirp()");
+        warn("mkdirp");
         return -1;
     }
 
@@ -919,7 +919,7 @@ int gather_builds(struct rpminspect *ri, bool fo) {
 
             /* copy after tree */
             if (nftw(ri->after, copytree, FOPEN_MAX, FTW_PHYS) == -1) {
-                warn("nftw()");
+                warn("nftw");
                 return -1;
             }
 
@@ -929,14 +929,14 @@ int gather_builds(struct rpminspect *ri, bool fo) {
             set_worksubdir(ri, LOCAL_WORKDIR, NULL, NULL);
 
             if (download_rpm(ri->after)) {
-                warn("download_rpm()");
+                warn("download_rpm");
                 return -1;
             }
         } else if (is_task_id(ri->after) && (task = get_koji_task(ri, ri->after)) != NULL) {
             set_worksubdir(ri, TASK_WORKDIR, NULL, task);
 
             if (download_task(ri, task)) {
-                warn("download_task()");
+                warn("download_task");
                 free_koji_task(task);
                 return -1;
             }
@@ -946,7 +946,7 @@ int gather_builds(struct rpminspect *ri, bool fo) {
             set_worksubdir(ri, BUILD_WORKDIR, build, NULL);
 
             if (download_build(ri, build)) {
-                warn("download_build()");
+                warn("download_build");
                 free_koji_build(build);
                 return -1;
             }
@@ -971,7 +971,7 @@ int gather_builds(struct rpminspect *ri, bool fo) {
 
         /* copy before tree */
         if (nftw(ri->before, copytree, FOPEN_MAX, FTW_PHYS) == -1) {
-            warn("nftw()");
+            warn("nftw");
             return -1;
         }
 
@@ -981,14 +981,14 @@ int gather_builds(struct rpminspect *ri, bool fo) {
         set_worksubdir(ri, LOCAL_WORKDIR, NULL, NULL);
 
         if (download_rpm(ri->before)) {
-            warn("download_rpm()");
+            warn("download_rpm");
             return -1;
         }
     } else if (is_task_id(ri->before) && (task = get_koji_task(ri, ri->before)) != NULL) {
         set_worksubdir(ri, TASK_WORKDIR, NULL, task);
 
         if (download_task(ri, task)) {
-            warn("download_task()");
+            warn("download_task");
             free_koji_task(task);
             return -1;
         }
@@ -998,7 +998,7 @@ int gather_builds(struct rpminspect *ri, bool fo) {
         set_worksubdir(ri, BUILD_WORKDIR, build, NULL);
 
         if (download_build(ri, build)) {
-            warn("download_build()");
+            warn("download_build");
             free_koji_build(build);
             return -1;
         }

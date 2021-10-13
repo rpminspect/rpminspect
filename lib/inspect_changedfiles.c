@@ -74,12 +74,12 @@ static char *run_and_capture(const char *where, char **output, char *cmd, const 
     fd = mkstemp(*output);
 
     if (fd == -1) {
-        warn("mkstemp()");
+        warn("mkstemp");
         return false;
     }
 
     if (close(fd) == -1) {
-        warn("close()");
+        warn("close");
         return false;
     }
 
@@ -195,17 +195,17 @@ static bool changedfiles_driver(struct rpminspect *ri, rpmfile_entry_t *file)
         fd = open(file->fullpath, O_RDONLY | O_CLOEXEC | O_LARGEFILE);
 
         if (fd == -1) {
-            warn("open()");
+            warn("open");
             return true;
         }
 
         if (read(fd, magic, sizeof(magic)) != sizeof(magic)) {
-            warn("read()");
+            warn("read");
             return true;
         }
 
         if (close(fd) == -1) {
-            warn("close()");
+            warn("close");
             return true;
         }
 
@@ -353,11 +353,11 @@ static bool changedfiles_driver(struct rpminspect *ri, rpmfile_entry_t *file)
 
         /* Remove the temporary files */
         if (unlink(before_tmp) == -1) {
-            warn("unlink()");
+            warn("unlink");
         }
 
         if (unlink(after_tmp) == -1) {
-            warn("unlink()");
+            warn("unlink");
         }
 
         if (exitcode) {

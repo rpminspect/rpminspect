@@ -199,7 +199,7 @@ static GElf_Half _get_elf_helper(Elf *elf, elfinfo_t type, GElf_Half fail)
     assert(kind == ELF_K_ELF);
 
     if (gelf_getehdr(elf, &ehdr) == NULL) {
-        warn("gelf_getehdr()");
+        warn("gelf_getehdr");
         ret = fail;
     }
 
