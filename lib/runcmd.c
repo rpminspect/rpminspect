@@ -31,6 +31,7 @@
 #include <sys/types.h>
 #include <sys/wait.h>
 #include <unistd.h>
+#include <limits.h>
 
 #include "rpminspect.h"
 
@@ -54,7 +55,7 @@ extern char **environ;
  * format string, all of the subsequent arguments need to be strings
  * because they all get concatenated together.
  */
-char *run_cmd_vpe(int *exitcode, char **argv)
+char *run_cmd_vpe(int *exitcode, const char *workdir, char **argv)
 {
     int i = 0;
     int pfd[2];
@@ -66,9 +67,25 @@ char *run_cmd_vpe(int *exitcode, char **argv)
     char *tail = NULL;
     size_t n = BUFSIZ;
     char *buf = NULL;
+    char cwd[PATH_MAX + 1];
 
     assert(argv != NULL);
     assert(argv[0] != NULL);
+
+    /* use working directory if given one */
+    if (workdir) {
+        /* save current directory */
+        memset(cwd, '\0', sizeof(cwd));
+
+        if (getcwd(cwd, PATH_MAX) == NULL) {
+            err(RI_PROGRAM_ERROR, "getcwd");
+        }
+
+        /* power through if it fails */
+        if (chdir(workdir) == -1) {
+            warn("chdir");
+        }
+    }
 
     /* create pipes to interact with the child */
     if (pipe(pfd) == -1) {
@@ -181,6 +198,11 @@ char *run_cmd_vpe(int *exitcode, char **argv)
         }
     }
 
+    /* go back to where we started */
+    if (workdir && chdir(cwd) == -1) {
+        warn("chdir");
+    }
+
     return output;
 }
 
@@ -188,7 +210,7 @@ char *run_cmd_vpe(int *exitcode, char **argv)
  * Wrapper for run_cmd_vpe() that lets you pass in varargs instead of a
  * string_list_t.
  */
-char *run_cmd(int *exitcode, const char *cmd, ...)
+char *run_cmd(int *exitcode, const char *workdir, const char *cmd, ...)
 {
     va_list ap;
     char *output = NULL;
@@ -224,7 +246,7 @@ char *run_cmd(int *exitcode, const char *cmd, ...)
     va_end(ap);
 
     /* run the command */
-    output = run_cmd_vpe(exitcode, argv);
+    output = run_cmd_vpe(exitcode, workdir, argv);
 
     /* clean up */
     free_argv(argv);
