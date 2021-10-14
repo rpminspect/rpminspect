@@ -34,7 +34,7 @@
 #include "rpminspect.h"
 
 /* Globals */
-static string_list_t *firstargs = NULL;
+static char *cmdprefix = NULL;
 static string_list_t *suppressions = NULL;
 static string_list_map_t *debug_info_dir1_table;
 static string_list_map_t *debug_info_dir2_table;
@@ -94,24 +94,17 @@ static severity_t check_abi(const severity_t sev, const long int threshold, cons
     return sev;
 }
 
-static bool abidiff_driver(struct rpminspect *ri, rpmfile_entry_t *file) {
+static bool abidiff_driver(struct rpminspect *ri, rpmfile_entry_t *file)
+{
     bool result = true;
     bool rebase = false;
-    string_list_t *argv = NULL;
-    string_list_t *local_suppressions = NULL;
-    string_list_t *local_d1 = NULL;
-    string_list_t *local_d2 = NULL;
-    string_list_t *local_h1 = NULL;
-    string_list_t *local_h2 = NULL;
+    char **argv = NULL;
     string_entry_t *entry = NULL;
     const char *arch = NULL;
     const char *name = NULL;
     string_list_map_t *hentry = NULL;
     int exitcode = 0;
-    int status = 0;
-    char *tmp = NULL;
     char *cmd = NULL;
-    char *details = NULL;
     char *output = NULL;
     struct result_params params;
     bool report = false;
@@ -119,7 +112,7 @@ static bool abidiff_driver(struct rpminspect *ri, rpmfile_entry_t *file) {
 
     assert(ri != NULL);
     assert(file != NULL);
-    assert(firstargs != NULL);
+    assert(cmdprefix != NULL);
 
     /* skip source packages */
     if (headerIsSource(file->rpm_header)) {
@@ -145,66 +138,56 @@ static bool abidiff_driver(struct rpminspect *ri, rpmfile_entry_t *file) {
     arch = get_rpm_header_arch(file->rpm_header);
 
     /* build the abidiff command */
-    argv = list_copy(firstargs);
+    cmd = strdup(cmdprefix);
+    assert(cmd != NULL);
 
     if (suppressions && !TAILQ_EMPTY(suppressions)) {
-        local_suppressions = list_copy(suppressions);
-        TAILQ_CONCAT(argv, local_suppressions, items);
+        TAILQ_FOREACH(entry, suppressions, items) {
+            cmd = strappend(cmd, " ", entry->data, NULL);
+        }
     }
 
     /* debug dir args */
     HASH_FIND_STR(debug_info_dir1_table, arch, hentry);
 
     if (hentry != NULL && hentry->value && !TAILQ_EMPTY(hentry->value)) {
-        local_d1 = list_copy(hentry->value);
-        TAILQ_CONCAT(argv, local_d1, items);
+        TAILQ_FOREACH(entry, hentry->value, items) {
+            cmd = strappend(cmd, " ", entry->data, NULL);
+        }
     }
 
     HASH_FIND_STR(debug_info_dir2_table, arch, hentry);
 
     if (hentry != NULL && hentry->value && !TAILQ_EMPTY(hentry->value)) {
-        local_d2 = list_copy(hentry->value);
-        TAILQ_CONCAT(argv, local_d2, items);
+        TAILQ_FOREACH(entry, hentry->value, items) {
+            cmd = strappend(cmd, " ", entry->data, NULL);
+        }
     }
 
     /* header dir args */
     HASH_FIND_STR(headers_dir1_table, arch, hentry);
 
     if (hentry != NULL && hentry->value && !TAILQ_EMPTY(hentry->value)) {
-        local_h1 = list_copy(hentry->value);
-        TAILQ_CONCAT(argv, local_h1, items);
+        TAILQ_FOREACH(entry, hentry->value, items) {
+            cmd = strappend(cmd, " ", entry->data, NULL);
+        }
     }
 
     HASH_FIND_STR(headers_dir2_table, arch, hentry);
 
     if (hentry != NULL && hentry->value && !TAILQ_EMPTY(hentry->value)) {
-        local_h2 = list_copy(hentry->value);
-        TAILQ_CONCAT(argv, local_h2, items);
+        TAILQ_FOREACH(entry, hentry->value, items) {
+            cmd = strappend(cmd, " ", entry->data, NULL);
+        }
     }
 
-    /* the before build */
-    entry = calloc(1, sizeof(*entry));
-    assert(entry != NULL);
-    entry->data = strdup(file->peer_file->fullpath);
-    assert(entry->data != NULL);
-    TAILQ_INSERT_TAIL(argv, entry, items);
-
-    /* the after build */
-    entry = calloc(1, sizeof(*entry));
-    assert(entry != NULL);
-    entry->data = strdup(file->fullpath);
-    assert(entry->data != NULL);
-    TAILQ_INSERT_TAIL(argv, entry, items);
+    /* the before and after builds */
+    cmd = strappend(cmd, " ", file->peer_file->fullpath, " ", file->fullpath, NULL);
 
     /* run abidiff */
-    output = sl_run_cmd(&exitcode, argv);
-
-    /* generate a reporting string for the command run */
-    cmd = list_to_string(argv, " ");
-    tmp = strreplace(cmd, ri->worksubdir, NULL);
-    assert(tmp != NULL);
-    free(cmd);
-    cmd = tmp;
+    argv = build_argv(cmd);
+    output = run_cmd_vpe(&exitcode, NULL, argv);
+    free_argv(argv);
 
     /* determine if this is a rebase build */
     rebase = is_rebase(ri);
@@ -216,75 +199,61 @@ static bool abidiff_driver(struct rpminspect *ri, rpmfile_entry_t *file) {
     params.remedy = REMEDY_ABIDIFF;
     params.arch = arch;
 
-    if (!WIFEXITED(exitcode)) {
-        xasprintf(&details, _("Command: %s"), cmd);
-        params.msg = _("ABI comparison ended unexpectedly.");
+    if ((exitcode & ABIDIFF_ERROR) || (exitcode & ABIDIFF_USAGE_ERROR)) {
+        params.severity = RESULT_VERIFY;
         params.verb = VERB_FAILED;
         params.noun = ri->commands.abidiff;
         report = true;
-    } else {
-        status = WEXITSTATUS(exitcode);
+    } else if (!rebase && (exitcode & ABIDIFF_ABI_CHANGE)) {
+        params.severity = RESULT_VERIFY;
+        params.verb = VERB_CHANGED;
+        params.noun = _("ABI");
+        report = true;
+    } else if (!rebase && (exitcode & ABIDIFF_ABI_INCOMPATIBLE_CHANGE)) {
+        params.severity = RESULT_BAD;
+        params.verb = VERB_CHANGED;
+        params.noun = _("ABI");
+        report = true;
+    }
 
-        if ((status & ABIDIFF_ERROR) || (status & ABIDIFF_USAGE_ERROR)) {
-            params.severity = RESULT_VERIFY;
-            params.verb = VERB_FAILED;
-            params.noun = ri->commands.abidiff;
-            report = true;
-        }
+    /* check the ABI compat level list */
+    name = headerGetString(file->rpm_header, RPMTAG_NAME);
+    params.severity = check_abi(params.severity, ri->abi_security_threshold, file->localpath, name, &compat_level);
 
-        if (!rebase && (status & ABIDIFF_ABI_CHANGE)) {
-            params.severity = RESULT_VERIFY;
-            params.verb = VERB_CHANGED;
-            params.noun = _("ABI");
-            report = true;
-        }
-
-        if (!rebase && (status & ABIDIFF_ABI_INCOMPATIBLE_CHANGE)) {
-            params.severity = RESULT_BAD;
-            params.verb = VERB_CHANGED;
-            params.noun = _("ABI");
-            report = true;
-        }
-
-        /* check the ABI compat level list */
-        name = headerGetString(file->rpm_header, RPMTAG_NAME);
-        params.severity = check_abi(params.severity, ri->abi_security_threshold, file->localpath, name, &compat_level);
-
-        /* add additional details */
-        if (report) {
-            if (!strcmp(file->peer_file->localpath, file->localpath)) {
-                if (compat_level) {
-                    xasprintf(&params.msg, _("Comparing old vs. new version of %s in package %s with ABI compatibility level %ld on %s revealed ABI differences."), file->localpath, name, compat_level, arch);
-                } else {
-                    xasprintf(&params.msg, _("Comparing old vs. new version of %s in package %s on %s revealed ABI differences."), file->localpath, name, arch);
-                }
+    /* add additional details */
+    if (report) {
+        if (!strcmp(file->peer_file->localpath, file->localpath)) {
+            if (compat_level) {
+                xasprintf(&params.msg, _("Comparing old vs. new version of %s in package %s with ABI compatibility level %ld on %s revealed ABI differences."), file->localpath, name, compat_level, arch);
             } else {
-                if (compat_level) {
-                    xasprintf(&params.msg, _("Comparing from %s to %s in package %s with ABI compatibility level %ld on %s revealed ABI differences."), file->peer_file->localpath, file->localpath, name, compat_level, arch);
-                } else {
-                    xasprintf(&params.msg, _("Comparing from %s to %s in package %s on %s revealed ABI differences."), file->peer_file->localpath, file->localpath, name, arch);
-                }
+                xasprintf(&params.msg, _("Comparing old vs. new version of %s in package %s on %s revealed ABI differences."), file->localpath, name, arch);
+            }
+        } else {
+            if (compat_level) {
+                xasprintf(&params.msg, _("Comparing from %s to %s in package %s with ABI compatibility level %ld on %s revealed ABI differences."), file->peer_file->localpath, file->localpath, name, compat_level, arch);
+            } else {
+                xasprintf(&params.msg, _("Comparing from %s to %s in package %s on %s revealed ABI differences."), file->peer_file->localpath, file->localpath, name, arch);
             }
         }
     }
 
-    if (report) {
+    if (report || (exitcode && output)) {
+        if (exitcode && output) {
+            params.msg = strdup(_("ABI comparison ended unexpectedly."));
+            params.verb = VERB_FAILED;
+            params.noun = ri->commands.abidiff;
+        }
+
         params.file = file->localpath;
         xasprintf(&params.details, _("Command: %s\n\n%s"), cmd, output);
         add_result(ri, &params);
         free(params.msg);
+        free(params.details);
         result = false;
     }
 
     /* cleanup */
-    list_free(argv, free);
-    free(local_suppressions);
-    free(local_d1);
-    free(local_d2);
-    free(local_h1);
-    free(local_h2);
     free(cmd);
-    free(details);
     free(output);
 
     return result;
@@ -295,7 +264,6 @@ static bool abidiff_driver(struct rpminspect *ri, rpmfile_entry_t *file) {
  */
 bool inspect_abidiff(struct rpminspect *ri) {
     bool result = false;
-    string_entry_t *entry = NULL;
     size_t num_arches = 0;
     struct result_params params;
 
@@ -318,21 +286,11 @@ bool inspect_abidiff(struct rpminspect *ri) {
     headers_dir1_table = get_abi_dir_arg(ri, num_arches, NULL, ABI_HEADERS_DIR1, INCLUDE_PATH, BEFORE_BUILD);
     headers_dir2_table = get_abi_dir_arg(ri, num_arches, NULL, ABI_HEADERS_DIR2, INCLUDE_PATH, AFTER_BUILD);
 
-    /* build the list of first command line arguments */
-    firstargs = calloc(1, sizeof(*firstargs));
-    assert(firstargs != NULL);
-    TAILQ_INIT(firstargs);
-
-    entry = calloc(1, sizeof(*entry));
-    assert(entry != NULL);
-    entry->data = strdup(ri->commands.abidiff);
-    TAILQ_INSERT_TAIL(firstargs, entry, items);
-
+    /* build the list of first part of the command */
     if (ri->abidiff_extra_args) {
-        entry = calloc(1, sizeof(*entry));
-        assert(entry != NULL);
-        entry->data = strdup(ri->abidiff_extra_args);
-        TAILQ_INSERT_TAIL(firstargs, entry, items);
+        xasprintf(&cmdprefix, "%s %s", ri->commands.abidiff, ri->abidiff_extra_args);
+    } else {
+        cmdprefix = strdup(ri->commands.abidiff);
     }
 
     /* run the main inspection */
@@ -340,7 +298,7 @@ bool inspect_abidiff(struct rpminspect *ri) {
 
     /* clean up */
     free_abi(abi);
-    list_free(firstargs, free);
+    free(cmdprefix);
     list_free(suppressions, free);
     free_argv_table(ri, debug_info_dir1_table);
     free_argv_table(ri, debug_info_dir2_table);
