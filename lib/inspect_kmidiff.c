@@ -33,7 +33,7 @@
 #include "rpminspect.h"
 
 /* Globals */
-static string_list_t *firstargs = NULL;
+static char *cmdprefix = NULL;
 static string_list_t *suppressions = NULL;
 static string_list_map_t *debug_info_dir1_table;
 static string_list_map_t *debug_info_dir2_table;
@@ -137,32 +137,24 @@ static bool kmidiff_driver(struct rpminspect *ri, rpmfile_entry_t *file)
 {
     bool result = true;
     bool rebase = false;
-    string_list_t *argv = NULL;
+    char **argv = NULL;
     string_entry_t *entry = NULL;
-    string_list_t *local_suppressions = NULL;
-    string_list_t *local_d1 = NULL;
-    string_list_t *local_d2 = NULL;
-    string_list_t *local_h1 = NULL;
-    string_list_t *local_h2 = NULL;
     const char *arch = NULL;
     const char *name = NULL;
     string_list_map_t *hentry = NULL;
     char *kabi = NULL;
     int exitcode = 0;
-    int status = 0;
     int i = 0;
     char *fname[] = KERNEL_FILENAMES;
     char *compare = NULL;
-    char *tmp = NULL;
     char *cmd = NULL;
     char *output = NULL;
-    char *details = NULL;
     struct result_params params;
     bool report = false;
 
     assert(ri != NULL);
     assert(file != NULL);
-    assert(firstargs != NULL);
+    assert(cmdprefix != NULL);
 
     /* skip source packages */
     if (headerIsSource(file->rpm_header)) {
@@ -212,74 +204,44 @@ static bool kmidiff_driver(struct rpminspect *ri, rpmfile_entry_t *file)
     kabi = get_kabi_file(ri, arch);
 
     /* build the kmidiff command */
-    argv = list_copy(firstargs);
+    cmd = strdup(cmdprefix);
+    assert(cmd != NULL);
 
     if (kabi) {
-        entry = calloc(1, sizeof(*entry));
-        assert(entry != NULL);
-        xasprintf(&entry->data, "%s %s", KMIDIFF_KMI_WHITELIST, kabi);
-        assert(entry->data != NULL);
-        TAILQ_INSERT_TAIL(argv, entry, items);
+        cmd = strappend(cmd, " ", KMIDIFF_KMI_WHITELIST, " ", kabi, NULL);
         free(kabi);
     }
 
     if (suppressions && !TAILQ_EMPTY(suppressions)) {
-        local_suppressions = list_copy(suppressions);
-        TAILQ_CONCAT(argv, local_suppressions, items);
+        TAILQ_FOREACH(entry, suppressions, items) {
+            cmd = strappend(cmd, " ", entry->data, NULL);
+        }
     }
 
     /* debug dir args */
     HASH_FIND_STR(debug_info_dir1_table, arch, hentry);
 
     if (hentry != NULL && hentry->value && !TAILQ_EMPTY(hentry->value)) {
-        local_d1 = list_copy(hentry->value);
-        TAILQ_CONCAT(argv, local_d1, items);
+        TAILQ_FOREACH(entry, hentry->value, items) {
+            cmd = strappend(cmd, " ", entry->data, NULL);
+        }
     }
 
     HASH_FIND_STR(debug_info_dir2_table, arch, hentry);
 
     if (hentry != NULL && hentry->value && !TAILQ_EMPTY(hentry->value)) {
-        local_d2 = list_copy(hentry->value);
-        TAILQ_CONCAT(argv, local_d2, items);
+        TAILQ_FOREACH(entry, hentry->value, items) {
+            cmd = strappend(cmd, " ", entry->data, NULL);
+        }
     }
 
-    /* the before kernel image */
-    entry = calloc(1, sizeof(*entry));
-    assert(entry != NULL);
-    xasprintf(&entry->data, "%s %s", KMIDIFF_VMLINUX1, file->peer_file->fullpath);
-    assert(entry->data != NULL);
-    TAILQ_INSERT_TAIL(argv, entry, items);
-
-    /* the after kernel image */
-    entry = calloc(1, sizeof(*entry));
-    assert(entry != NULL);
-    xasprintf(&entry->data, "%s %s", KMIDIFF_VMLINUX2, file->fullpath);
-    assert(entry->data != NULL);
-    TAILQ_INSERT_TAIL(argv, entry, items);
-
-    /* the before root */
-    entry = calloc(1, sizeof(*entry));
-    assert(entry != NULL);
-    entry->data = strdup(before_root);
-    assert(entry->data != NULL);
-    TAILQ_INSERT_TAIL(argv, entry, items);
-
-    /* the after root */
-    entry = calloc(1, sizeof(*entry));
-    assert(entry != NULL);
-    entry->data = strdup(after_root);
-    assert(entry->data != NULL);
-    TAILQ_INSERT_TAIL(argv, entry, items);
+    /* the before and after kernel images and root directories */
+    cmd = strappend(cmd, " ", KMIDIFF_VMLINUX1, " ", file->peer_file->fullpath, " ", KMIDIFF_VMLINUX2, " ", file->fullpath, " ", before_root, " ", after_root, NULL);
 
     /* run kmidiff */
-    output = sl_run_cmd(&exitcode, argv);
-
-    /* generate a reporting string for the command run */
-    cmd = list_to_string(argv, " ");
-    tmp = strreplace(cmd, ri->worksubdir, NULL);
-    assert(tmp != NULL);
-    free(cmd);
-    cmd = tmp;
+    argv = build_argv(cmd);
+    output = run_cmd_vpe(&exitcode, ri->worksubdir, argv);
+    free_argv(argv);
 
     /* determine if this is a rebase build */
     rebase = is_rebase(ri);
@@ -291,66 +253,52 @@ static bool kmidiff_driver(struct rpminspect *ri, rpmfile_entry_t *file)
     params.remedy = REMEDY_KMIDIFF;
     params.arch = arch;
 
-    if (!WIFEXITED(exitcode)) {
-        xasprintf(&details, _("Command: %s"), cmd);
-        params.msg = _("KMI comparison ended unexpectedly.");
+    if ((exitcode & ABIDIFF_ERROR) || (exitcode & ABIDIFF_USAGE_ERROR)) {
+        params.severity = RESULT_VERIFY;
         params.verb = VERB_FAILED;
         params.noun = ri->commands.kmidiff;
         report = true;
-    } else {
-        status = WEXITSTATUS(exitcode);
+    } else if (!rebase && (exitcode & ABIDIFF_ABI_CHANGE)) {
+        params.severity = RESULT_VERIFY;
+        params.verb = VERB_CHANGED;
+        params.noun = _("KMI");
+        report = true;
+    } else if (!rebase && (exitcode & ABIDIFF_ABI_INCOMPATIBLE_CHANGE)) {
+        params.severity = RESULT_BAD;
+        params.verb = VERB_CHANGED;
+        params.noun = _("KMI");
+        report = true;
+    }
 
-        if ((status & ABIDIFF_ERROR) || (status & ABIDIFF_USAGE_ERROR)) {
-            params.severity = RESULT_VERIFY;
-            params.verb = VERB_FAILED;
-            params.noun = ri->commands.kmidiff;
-            report = true;
-        }
+    /* check the ABI compat level list */
+    name = headerGetString(file->rpm_header, RPMTAG_NAME);
 
-        if (!rebase && (status & ABIDIFF_ABI_CHANGE)) {
-            params.severity = RESULT_VERIFY;
-            params.verb = VERB_CHANGED;
-            params.noun = _("KMI");
-            report = true;
-        }
-
-        if (!rebase && (status & ABIDIFF_ABI_INCOMPATIBLE_CHANGE)) {
-            params.severity = RESULT_BAD;
-            params.verb = VERB_CHANGED;
-            params.noun = _("KMI");
-            report = true;
-        }
-
-        /* check the ABI compat level list */
-        name = headerGetString(file->rpm_header, RPMTAG_NAME);
-
-        /* add additional details */
-        if (report) {
-            if (!strcmp(file->peer_file->localpath, file->localpath)) {
-                xasprintf(&params.msg, _("Comparing old vs. new version of %s in package %s on %s revealed Kernel Module Interface (KMI) differences."), file->localpath, name, arch);
-            } else {
-                xasprintf(&params.msg, _("Comparing from %s to %s in package %s on %s revealed Kernel Module Interface (KMI) differences."), file->peer_file->localpath, file->localpath, name, arch);
-            }
+    /* add additional details */
+    if (report) {
+        if (!strcmp(file->peer_file->localpath, file->localpath)) {
+            xasprintf(&params.msg, _("Comparing old vs. new version of %s in package %s on %s revealed Kernel Module Interface (KMI) differences."), file->localpath, name, arch);
+        } else {
+            xasprintf(&params.msg, _("Comparing from %s to %s in package %s on %s revealed Kernel Module Interface (KMI) differences."), file->peer_file->localpath, file->localpath, name, arch);
         }
     }
 
-    if (report) {
+    if (report || (exitcode && output)) {
+        if (exitcode && output) {
+            params.msg = strdup(_("KMI comparison ended unexpectedly."));
+            params.verb = VERB_FAILED;
+            params.noun = ri->commands.abidiff;
+        }
+
         params.file = file->localpath;
         xasprintf(&params.details, _("Command: %s\n\n%s"), cmd, output);
         add_result(ri, &params);
         free(params.msg);
+        free(params.details);
         result = false;
     }
 
     /* cleanup */
-    list_free(argv, free);
-    free(local_suppressions);
-    free(local_d1);
-    free(local_d2);
-    free(local_h1);
-    free(local_h2);
     free(cmd);
-    free(details);
     free(output);
 
     return result;
@@ -363,7 +311,6 @@ bool inspect_kmidiff(struct rpminspect *ri) {
     bool result = true;
     rpmpeer_entry_t *peer = NULL;
     rpmfile_entry_t *file = NULL;
-    string_entry_t *entry = NULL;
     size_t num_arches = 0;
     struct result_params params;
 
@@ -381,20 +328,10 @@ bool inspect_kmidiff(struct rpminspect *ri) {
     debug_info_dir2_table = get_abi_dir_arg(ri, num_arches, DEBUGINFO_SUFFIX, ABI_DEBUG_INFO_DIR2, DEBUG_PATH, AFTER_BUILD);
 
     /* build the list of first command line arguments */
-    firstargs = calloc(1, sizeof(*firstargs));
-    assert(firstargs != NULL);
-    TAILQ_INIT(firstargs);
-
-    entry = calloc(1, sizeof(*entry));
-    assert(entry != NULL);
-    entry->data = strdup(ri->commands.kmidiff);
-    TAILQ_INSERT_TAIL(firstargs, entry, items);
-
     if (ri->kmidiff_extra_args) {
-        entry = calloc(1, sizeof(*entry));
-        assert(entry != NULL);
-        entry->data = strdup(ri->kmidiff_extra_args);
-        TAILQ_INSERT_TAIL(firstargs, entry, items);
+        xasprintf(&cmdprefix, "%s %s", ri->commands.kmidiff, ri->kmidiff_extra_args);
+    } else {
+        cmdprefix = strdup(ri->commands.kmidiff);
     }
 
     /* run the main inspection */
@@ -428,7 +365,7 @@ bool inspect_kmidiff(struct rpminspect *ri) {
     }
 
     /* clean up */
-    list_free(firstargs, free);
+    free(cmdprefix);
     list_free(suppressions, free);
     free(kabi_dir);
     free_argv_table(ri, debug_info_dir1_table);
