@@ -266,8 +266,8 @@ char *compute_checksum(const char *, mode_t *, enum checksum);
 char *checksum(rpmfile_entry_t *);
 
 /* runcmd.c */
-char *run_cmd_vpe(int *exitcode, char **argv);
-char *run_cmd(int *, const char *, ...) __attribute__((__sentinel__));
+char *run_cmd_vpe(int *exitcode, const char *workdir, char **argv);
+char *run_cmd(int *, const char *, const char *, ...) __attribute__((__sentinel__));
 void free_argv_table(struct rpminspect *ri, string_list_map_t *table);
 char **build_argv(const char *cmd);
 void free_argv(char **argv);
