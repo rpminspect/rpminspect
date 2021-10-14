@@ -156,18 +156,18 @@ static bool shellsyntax_driver(struct rpminspect *ri, rpmfile_entry_t *file)
     }
 
     /* Run with -n and capture results */
-    errors = run_cmd(&exitcode, shell, "-n", file->fullpath, NULL);
+    errors = run_cmd(&exitcode, ri->worksubdir, shell, "-n", file->fullpath, NULL);
     DEBUG_PRINT("exitcode=%d, errors=|%s|\n", exitcode, errors);
 
     if (before_shell) {
-        before_errors = run_cmd(&before_exitcode, before_shell, "-n", file->peer_file->fullpath, NULL);
+        before_errors = run_cmd(&before_exitcode, ri->worksubdir, before_shell, "-n", file->peer_file->fullpath, NULL);
         DEBUG_PRINT("before_exitcode=%d, before_errors=|%s|\n", before_exitcode, before_errors);
     }
 
     /* Special cash for GNU bash, try with extglob */
     if (exitcode && !strcmp(shell, "bash")) {
         free(errors);
-        errors = run_cmd(&exitcode, shell, "-n", "-O", "extglob", file->fullpath, NULL);
+        errors = run_cmd(&exitcode, ri->worksubdir, shell, "-n", "-O", "extglob", file->fullpath, NULL);
         DEBUG_PRINT("exitcode=%d, errors=|%s|\n", exitcode, errors);
 
         if (!exitcode) {

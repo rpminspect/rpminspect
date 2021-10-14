@@ -163,7 +163,7 @@ static bool config_driver(struct rpminspect *ri, rpmfile_entry_t *file)
             if (exitcode) {
                 /* the files differ and not a rebase, see if it's only whitespace changes */
                 free(diff_output);
-                params.details = run_cmd(&exitcode, ri->commands.diff, "-u", "-w", "-I^#.*", file->peer_file->fullpath, file->fullpath, NULL);
+                params.details = run_cmd(&exitcode, ri->worksubdir, ri->commands.diff, "-u", "-w", "-I^#.*", file->peer_file->fullpath, file->fullpath, NULL);
 
                 if (exitcode == 0) {
                     xasprintf(&params.msg, _("%%config file content change for %s in %s on %s (comments/whitespace only)"), file->localpath, name, arch);

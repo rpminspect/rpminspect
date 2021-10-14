@@ -192,7 +192,7 @@ string_list_t *gather_diags(struct rpminspect *ri, const char *progname, const c
      */
 
     /* msgunfmt */
-    tmp = run_cmd(&exitcode, ri->commands.msgunfmt, "--version", NULL);
+    tmp = run_cmd(&exitcode, ri->worksubdir, ri->commands.msgunfmt, "--version", NULL);
     details = strsplit(tmp, "\n");
     free(tmp);
 
@@ -208,7 +208,7 @@ string_list_t *gather_diags(struct rpminspect *ri, const char *progname, const c
     free(ver);
 
     /* diff */
-    tmp = run_cmd(&exitcode, ri->commands.diff, "--version", NULL);
+    tmp = run_cmd(&exitcode, ri->worksubdir, ri->commands.diff, "--version", NULL);
     details = strsplit(tmp, "\n");
     free(tmp);
 
@@ -224,7 +224,7 @@ string_list_t *gather_diags(struct rpminspect *ri, const char *progname, const c
     free(ver);
 
     /* diffstat */
-    ver = run_cmd(&exitcode, ri->commands.diffstat, "--version", NULL);
+    ver = run_cmd(&exitcode, ri->worksubdir, ri->commands.diffstat, "--version", NULL);
     entry = calloc(1, sizeof(*entry));
     assert(entry != NULL);
     xasprintf(&entry->data, "%s", ver);
@@ -232,7 +232,7 @@ string_list_t *gather_diags(struct rpminspect *ri, const char *progname, const c
     free(ver);
 
     /* annocheck */
-    tmp = run_cmd(&exitcode, ri->commands.annocheck, "--version", NULL);
+    tmp = run_cmd(&exitcode, ri->worksubdir, ri->commands.annocheck, "--version", NULL);
     details = strsplit(tmp, "\n");
     free(tmp);
 
@@ -248,7 +248,7 @@ string_list_t *gather_diags(struct rpminspect *ri, const char *progname, const c
     free(ver);
 
     /* abidiff */
-    tmp = run_cmd(&exitcode, ri->commands.abidiff, "--version", NULL);
+    tmp = run_cmd(&exitcode, ri->worksubdir, ri->commands.abidiff, "--version", NULL);
     details = strsplit(tmp, "\n");
     free(tmp);
 
@@ -264,7 +264,7 @@ string_list_t *gather_diags(struct rpminspect *ri, const char *progname, const c
     free(ver);
 
     /* kmidiff */
-    tmp = run_cmd(&exitcode, ri->commands.kmidiff, "--version", NULL);
+    tmp = run_cmd(&exitcode, ri->worksubdir, ri->commands.kmidiff, "--version", NULL);
     details = strsplit(tmp, "\n");
     free(tmp);
 
