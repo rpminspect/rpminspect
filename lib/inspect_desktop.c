@@ -425,7 +425,8 @@ static bool desktop_driver(struct rpminspect *ri, rpmfile_entry_t *file)
         before_out = tmpbuf;
     }
 
-    if (after_code == -1) {
+    if (after_code) {
+        /* non-zero on exit is a failed desktop file */
         result = false;
     }
 
