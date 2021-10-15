@@ -250,7 +250,7 @@ char *run_cmd(int *exitcode, const char *workdir, const char *cmd, ...)
 
     while ((element = va_arg(ap, char *)) != NULL) {
         i++;
-        argv = reallocarray(argv, i + 1, sizeof(*argv));
+        argv = realloc(argv, sizeof(*argv) * (i + 1));
         assert(argv != NULL);
 
         argv[i - 1] = strdup(element);
@@ -288,7 +288,7 @@ char **build_argv(const char *cmd)
     assert(list != NULL);
 
     TAILQ_FOREACH(entry, list, items) {
-        r = reallocarray(r, i + 2, sizeof(*r));
+        r = realloc(r, sizeof(*r) * (i + 2));
         assert(r != NULL);
 
         r[i] = strdup(entry->data);
