@@ -48,7 +48,9 @@ extern char **environ;
  *
  * The first argument is a pointer to an int that will hold the exit
  * code from execvpe().  If this pointer is NULL, then the caller does
- * not want the exit code and the function does nothing.
+ * not want the exit code.  Internally the exit code will be used to
+ * determine if the process was signaled or not, but the exit code
+ * will not be given back to the caller.
  *
  * The second argument is the command followed by any additional
  * arguments that should be included with it.  Note that it is not a
@@ -89,8 +91,11 @@ char *run_cmd_vpe(int *exitcode, const char *workdir, char **argv)
 
     /* create pipes to interact with the child */
     if (pipe(pfd) == -1) {
+        if (exitcode) {
+            *exitcode = EXIT_FAILURE;
+        }
+
         warn("pipe");
-        *exitcode = EXIT_FAILURE;
         return NULL;
     }
 
@@ -134,7 +139,10 @@ char *run_cmd_vpe(int *exitcode, const char *workdir, char **argv)
         reader = fdopen(pfd[RD], "r");
 
         if (reader == NULL) {
-            *exitcode = EXIT_FAILURE;
+            if (exitcode) {
+                *exitcode = EXIT_FAILURE;
+            }
+
             return NULL;
         }
 
@@ -157,14 +165,21 @@ char *run_cmd_vpe(int *exitcode, const char *workdir, char **argv)
 
         /* wait for the command */
         if (waitpid(proc, &status, 0) == -1) {
+            if (exitcode) {
+                *exitcode = EXIT_FAILURE;
+            }
+
             warn("waitpid");
-            *exitcode = EXIT_FAILURE;
         }
 
         if (WIFEXITED(status)) {
-            *exitcode = WEXITSTATUS(status);
+            if (exitcode) {
+                *exitcode = WEXITSTATUS(status);
+            }
         } else if (WIFSIGNALED(status)) {
-            *exitcode = EXIT_FAILURE;
+            if (exitcode) {
+                *exitcode = EXIT_FAILURE;
+            }
 
             /* generate a string with the signal name if possible */
             i = WTERMSIG(status);
