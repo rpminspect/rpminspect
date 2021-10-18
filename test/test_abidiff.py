@@ -36,15 +36,6 @@ void exponent(void)
 }
 """
 
-# Simple way to figure out if we are musl or glibc
-have_musl_libc = False
-args = ["patchelf", "--print-interpreter", "/sbin/init"]
-proc = subprocess.Popen(args, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-(out, err) = proc.communicate()
-
-if proc.returncode == 0 and str(out).find("ld-musl") != -1:
-    have_musl_libc = True
-
 
 # Test two builds that are not a rebase and do not change the ABI in
 # an incompatible way (OK)
@@ -154,11 +145,7 @@ class AbidiffNoRebaseWithABIChangeRPMs(TestCompareRPMs):
             compileFlags="-g -Wl,-soname,libcrashy.so.1",
         )
 
-        if have_musl_libc:
-            self.result = "BAD"
-        else:
-            self.result = "VERIFY"
-
+        self.result = "VERIFY"
         self.inspection = "abidiff"
         self.waiver_auth = "Anyone"
 
