@@ -400,6 +400,7 @@ struct rpminspect {
 
     /* Optional: list of RPM macro file paths */
     string_list_t *macrofiles;
+    bool macros_loaded;
 
     /*
      * Optional: if not NULL, contains list of path prefixes for files

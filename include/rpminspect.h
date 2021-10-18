@@ -298,6 +298,7 @@ const char *get_after_rel(struct rpminspect *);
 int gather_builds(struct rpminspect *, bool);
 
 /* macros.c */
+void load_macros(struct rpminspect *ri);
 string_list_t *get_macros(const char *);
 int get_specfile_macros(struct rpminspect *, const char *);
 
