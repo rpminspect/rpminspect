@@ -24,9 +24,7 @@
 #include <string.h>
 #include <errno.h>
 #include <assert.h>
-#include <rpm/rpmfileutil.h>
 #include <rpm/rpmmacro.h>
-
 #include "rpminspect.h"
 
 /*
@@ -224,8 +222,6 @@ bool inspect_disttag(struct rpminspect *ri)
 {
     bool result = true;
     bool src = false;
-    char *mf = NULL;
-    char *macropath = NULL;
     rpmpeer_entry_t *peer = NULL;
     rpmfile_entry_t *file = NULL;
     struct result_params params;
@@ -254,23 +250,13 @@ bool inspect_disttag(struct rpminspect *ri)
                 continue;
             }
 
-            /* Initialize the macros */
-            if (ri->macrofiles) {
-                macropath = list_to_string(ri->macrofiles, ":");
-                mf = rpmGetPath(macropath, NULL);
-                rpmInitMacros(NULL, mf);
-                free(macropath);
-                free(mf);
-            }
-
             /* Define the dist macro for rpminspect */
             (void) rpmDefineMacro(NULL, "dist " DIST_TAG_MARKER, 0);
 
             /* Analyze the spec file */
             result = disttag_driver(ri, file);
 
-            /* Clean up and get out */
-            rpmFreeMacros(NULL);
+            /* Done after looking at the spec file */
             break;
         }
     }
