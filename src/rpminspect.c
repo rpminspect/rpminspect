@@ -33,7 +33,8 @@
 #include <zlib.h>
 #include <magic.h>
 #include <clamav.h>
-
+#include <rpm/rpmlib.h>
+#include <rpm/rpmmacro.h>
 #include "rpminspect.h"
 
 void sigabrt_handler(__attribute__ ((unused)) int i)
@@ -653,6 +654,9 @@ int main(int argc, char **argv)
         errx(RI_PROGRAM_ERROR, _("*** unable to read RPM configuration"));
     }
 
+    /* load macros for librpm */
+    load_macros(ri);
+
     /* if an architecture list is specified, validate it */
     if (archopt) {
         /* initialize the list of allowed architectures */
@@ -864,6 +868,7 @@ int main(int argc, char **argv)
     }
 
     free_rpminspect(ri);
+    rpmFreeMacros(NULL);
     rpmFreeRpmrc();
 
     return ret;
