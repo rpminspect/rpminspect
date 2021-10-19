@@ -258,6 +258,7 @@ void output_xunit(const results_t *, const char *, const severity_t);
 int unpack_archive(const char *, const char *, const bool);
 
 /* magic.c */
+char *mime_type(const char *);
 char *get_mime_type(rpmfile_entry_t *);
 bool is_text_file(rpmfile_entry_t *);
 
