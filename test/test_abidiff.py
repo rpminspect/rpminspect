@@ -16,7 +16,6 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 #
 
-import subprocess
 from baseclass import TestCompareRPMs, TestCompareKoji
 
 # Simple source files for library ABI tests
