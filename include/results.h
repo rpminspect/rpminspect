@@ -179,4 +179,7 @@
 
 #define REMEDY_RUNPATH_BOTH _("Both DT_RPATH and DT_RUNPATH properties were found in an ELF shared object.  This indicates a linker error and should not happen.  ELF objects should only carry DT_RPATH or DT_RUNPATH, never both.")
 
+/* unicode */
+#define REMEDY_UNICODE _("The rpminspect configuration file contains a list of forbidden Unicode code points.  One was found in the extracted and patched source tree or in one of the text source files in the source RPM.  Either remove this code point or discuss the situation with the Product Security Team to determine the correct course of action.")
+
 #endif

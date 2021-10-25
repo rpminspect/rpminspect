@@ -86,6 +86,7 @@ struct inspect inspections[] = {
     { INSPECT_POLITICS,      "politics",      true,  &inspect_politics },
     { INSPECT_BADFUNCS,      "badfuncs",      true,  &inspect_badfuncs },
     { INSPECT_RUNPATH,       "runpath",       true,  &inspect_runpath },
+    { INSPECT_UNICODE,       "unicode",       true,  &inspect_unicode },
     { 0, NULL, false, NULL }
 };
 
@@ -228,6 +229,8 @@ uint64_t inspection_id(const char *name)
         return INSPECT_BADFUNCS;
     } else if (!strcmp(name, NAME_RUNPATH)) {
         return INSPECT_RUNPATH;
+    } else if (!strcmp(name, NAME_UNICODE)) {
+        return INSPECT_UNICODE;
     } else {
         return INSPECT_NULL;
     }
@@ -327,6 +330,8 @@ const char *inspection_desc(const uint64_t inspection)
             return DESC_BADFUNCS;
         case INSPECT_RUNPATH:
             return DESC_RUNPATH;
+        case INSPECT_UNICODE:
+            return DESC_UNICODE;
         default:
             return NULL;
     }
@@ -426,6 +431,8 @@ const char *inspection_header_to_desc(const char *header)
         i = INSPECT_BADFUNCS;
     } else if (!strcmp(header, NAME_RUNPATH)) {
         i = INSPECT_RUNPATH;
+    } else if (!strcmp(header, NAME_UNICODE)) {
+        i = INSPECT_UNICODE;
     }
 
     return inspection_desc(i);

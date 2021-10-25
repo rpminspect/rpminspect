@@ -126,7 +126,11 @@ enum {
     BLOCK_EMPTYRPM,
     BLOCK_EXPECTED_EMPTY_RPMS,
     BLOCK_TYPES,
-    BLOCK_MACROFILES
+    BLOCK_MACROFILES,
+    BLOCK_UNICODE,
+    BLOCK_UNICODE_EXCLUDE,
+    BLOCK_UNICODE_EXCLUDED_MIME_TYPES,
+    BLOCK_UNICODE_FORBIDDEN_CODEPOINTS
 };
 
 static int add_regex(const char *pattern, regex_t **regex_out)
@@ -256,6 +260,8 @@ static void add_ignore(string_list_map_t **table, int i, char *s)
         inspection = NAME_RUNPATH;
     } else if (i == BLOCK_TYPES) {
         inspection = NAME_TYPES;
+    } else if (i == BLOCK_UNICODE) {
+        inspection = NAME_UNICODE;
     } else {
         warnx(_("*** ignore found in %d, value `%s'"), i, s);
         return;
@@ -633,7 +639,8 @@ static int read_cfgfile(struct rpminspect *ri, const char *filename)
                                                           group != BLOCK_KMIDIFF &&
                                                           group != BLOCK_BADFUNCS &&
                                                           group != BLOCK_RUNPATH &&
-                                                          group != BLOCK_TYPES)) {
+                                                          group != BLOCK_TYPES &&
+                                                          group != BLOCK_UNICODE)) {
                         block = BLOCK_IGNORE;
                         group = BLOCK_NULL;
                     } else if (!strcmp(key, "macrofiles")) {
@@ -734,6 +741,9 @@ static int read_cfgfile(struct rpminspect *ri, const char *filename)
                     } else if (!strcmp(key, NAME_TYPES)) {
                         block = BLOCK_NULL;
                         group = BLOCK_TYPES;
+                    } else if (!strcmp(key, NAME_UNICODE)) {
+                        block = BLOCK_NULL;
+                        group = BLOCK_UNICODE;
                     }
                 }
 
@@ -895,6 +905,18 @@ static int read_cfgfile(struct rpminspect *ri, const char *filename)
                         }
                     } else if (group == BLOCK_TYPES) {
                         if (!strcmp(key, "ignore")) {
+                            block = BLOCK_IGNORE;
+                        }
+                    } else if (group == BLOCK_UNICODE) {
+                        if (!strcmp(key, "excluded_mime_types")) {
+                            block = BLOCK_UNICODE_EXCLUDED_MIME_TYPES;
+                            list_free(ri->unicode_excluded_mime_types, free);
+                            ri->unicode_excluded_mime_types = NULL;
+                        } else if (!strcmp(key, "forbidden_codepoints")) {
+                            block = BLOCK_UNICODE_FORBIDDEN_CODEPOINTS;
+                            list_free(ri->unicode_forbidden_codepoints, free);
+                            ri->unicode_forbidden_codepoints = NULL;
+                        } else if (!strcmp(key, "ignore")) {
                             block = BLOCK_IGNORE;
                         }
                     }
@@ -1152,6 +1174,10 @@ static int read_cfgfile(struct rpminspect *ri, const char *filename)
                                 ri->patch_line_threshold = DEFAULT_PATCH_LINE_THRESHOLD;
                             }
                         }
+                    } else if (group == BLOCK_UNICODE && block == BLOCK_UNICODE_EXCLUDE) {
+                        if (add_regex(t, &ri->unicode_exclude) != 0) {
+                            warn(_("error reading unicode exclude regular expression"));
+                        }
                     }
                 } else if (symbol == SYMBOL_ENTRY) {
                     INIT_DEBUG_PRINT("    -> SYMBOL_ENTRY=%s, block=%d, group=%d\n", t, block, group);
@@ -1212,6 +1238,10 @@ static int read_cfgfile(struct rpminspect *ri, const char *filename)
                         add_entry(&ri->runpath_origin_prefix_trim, t);
                     } else if (block == BLOCK_EXPECTED_EMPTY_RPMS) {
                         add_entry(&ri->expected_empty_rpms, t);
+                    } else if (block == BLOCK_UNICODE_EXCLUDED_MIME_TYPES) {
+                        add_entry(&ri->unicode_excluded_mime_types, t);
+                    } else if (block == BLOCK_UNICODE_FORBIDDEN_CODEPOINTS) {
+                        add_entry(&ri->unicode_forbidden_codepoints, t);
                     }
                 }
 

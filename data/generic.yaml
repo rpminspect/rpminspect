@@ -142,6 +142,7 @@ vendor:
     #subpackages: off
     #symlinks: off
     #types: off
+    #unicode: off
     #upstream: off
     #virus: off
     #xml: off
@@ -737,6 +738,46 @@ runpath:
     #    - /usr/lib*/libexample.so*
 
 types:
+    # Optional list of glob(7) specifications to match files to ignore
+    # for this inspection.  The format of this list is the same as the
+    # global 'ignore' list.  The difference is the items specified
+    # here will only be used during this inspection.
+    #ignore:
+    #    - /usr/lib*/libexample.so*
+
+unicode:
+    # Regular expression to match file and directory names for
+    # exclusion.  Take care with making this too complicated as it may
+    # become difficult to maintain over time.  The regular expression
+    # here is processed by regex(3) and can use POSIX Extended Regular
+    # Expression syntax.
+    exclude: ^(\.git|\.hg|\.desktop|\.ppd|\.txt|\.directory|ChangeLog|NEWS)$
+
+    # List of file MIME types of files this inspection should exclude.
+    # MIME types are determined by libmagic, which is how the file(1)
+    # command works.  Sometimes matching by MIME type does not quit
+    # produce the desired results, so keep that in mind when adding to
+    # this list.
+    excluded_mime_types:
+        - text/x-po
+        - text/x-tex
+        - text/x-troff
+        - text/html
+
+    # List of forbidden Unicode codepoints in source code.  Codepoints
+    # are written in hexidecimal notation.  The case of the letters
+    # does not matter.  Be sure to prefix the code point with '0x'.
+    forbidden_codepoints:
+        - 0x202A
+        - 0x202B
+        - 0x202C
+        - 0x202D
+        - 0x202E
+        - 0x2066
+        - 0x2067
+        - 0x2068
+        - 0x2069
+
     # Optional list of glob(7) specifications to match files to ignore
     # for this inspection.  The format of this list is the same as the
     # global 'ignore' list.  The difference is the items specified

@@ -259,6 +259,9 @@ void free_rpminspect(struct rpminspect *ri) {
     list_free(ri->runpath_origin_prefix_trim, free);
     free_string_list_map(ri->inspection_ignores);
     list_free(ri->expected_empty_rpms, free);
+    free_regex(ri->unicode_exclude);
+    list_free(ri->unicode_excluded_mime_types, free);
+    list_free(ri->unicode_forbidden_codepoints, free);
 
     free_rpmpeer(ri->peers);
 

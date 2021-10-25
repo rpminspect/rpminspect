@@ -31,6 +31,7 @@
 #include <rpm/rpmlib.h>
 #include <rpm/rpmfi.h>
 #include <libkmod.h>
+#include <unicode/utypes.h>
 #include "secrules.h"
 #include "queue.h"
 #include "uthash.h"
@@ -47,6 +48,16 @@ typedef struct _string_entry_t {
 } string_entry_t;
 
 typedef TAILQ_HEAD(string_entry_s, _string_entry_t) string_list_t;
+
+/*
+ * List of UChars.  Used by at least the unicode inspection.
+ */
+typedef struct _UChar_entry_t {
+    UChar data;
+    TAILQ_ENTRY(_UChar_entry_t) items;
+} UChar_entry_t;
+
+typedef TAILQ_HEAD(UChar_entry_s, _UChar_entry_t) UChar_list_t;
 
 /*
  * List of string pairs. Used to later convert in to a newly allocated hash table.
@@ -553,6 +564,11 @@ struct rpminspect {
 
     /* Optional list of expected RPMs with empty payloads */
     string_list_t *expected_empty_rpms;
+
+    /* unicode inspection lists */
+    regex_t *unicode_exclude;
+    string_list_t *unicode_excluded_mime_types;
+    string_list_t *unicode_forbidden_codepoints;
 
     /* Options specified by the user */
     char *before;              /* before build ID arg given on cmdline */

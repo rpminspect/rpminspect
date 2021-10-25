@@ -69,6 +69,7 @@ librpminspect_sources = [
     'inspect_subpackages.c',
     'inspect_symlinks.c',
     'inspect_types.c',
+    'inspect_unicode.c',
     'inspect_upstream.c',
     'inspect_virus.c',
     'inspect_xml.c',
@@ -113,6 +114,7 @@ librpminspect = library(
         xmlrpc_client,
         libxml,
         rpm,
+        rpmbuild,
         libarchive,
         libelf,
         libkmod,
@@ -125,5 +127,7 @@ librpminspect = library(
         magic,
         clamav,
         dl,
+        icu_uc,
+        icu_io,
     ]
 )

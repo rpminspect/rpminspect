@@ -508,6 +508,15 @@ bool inspect_badfuncs(struct rpminspect *ri);
  */
 bool inspect_runpath(struct rpminspect *ri);
 
+/**
+ * @brief Main driver for the 'unicode' inspection.
+ *
+ *
+ * @param ri Pointer to the struct rpminspect for the program.
+ * @return True if the inspection passed, false otherwise.
+ */
+bool inspect_unicode(struct rpminspect *ri);
+
 /** @} */
 
 /*
@@ -561,6 +570,7 @@ bool inspect_runpath(struct rpminspect *ri);
 #define INSPECT_POLITICS                    (((uint64_t) 1) << 40)
 #define INSPECT_BADFUNCS                    (((uint64_t) 1) << 41)
 #define INSPECT_RUNPATH                     (((uint64_t) 1) << 42)
+#define INSPECT_UNICODE                     (((uint64_t) 1) << 43)
 
 /* Inspection names */
 #define NAME_LICENSE                        "license"
@@ -605,6 +615,7 @@ bool inspect_runpath(struct rpminspect *ri);
 #define NAME_POLITICS                       "politics"
 #define NAME_BADFUNCS                       "badfuncs"
 #define NAME_RUNPATH                        "runpath"
+#define NAME_UNICODE                        "unicode"
 
 /* Long descriptions for the inspections */
 #define DESC_LICENSE _("Verify the string specified in the License tag of the RPM metadata describes permissible software licenses as defined by the license database. Also checks to see if the License tag contains any unprofessional words as defined in the configuration file.")
@@ -690,5 +701,7 @@ bool inspect_runpath(struct rpminspect *ri);
 #define DESC_BADFUNCS _("Check for forbidden functions in ELF files.  Forbidden functions are defined in the runtime configuration files.  Usually this inspection is used to catch built packages that make use of deprecated API functions if you wish built packages to conform to replacement APIs.")
 
 #define DESC_RUNPATH _("Check for forbidden paths in both the DT_RPATH and DT_RUNPATH settings in ELF shared objects.")
+
+#define DESC_UNICODE _("Scan extracted and patched source code files, scripts, and RPM spec files for any prohibited Unicode code points, as defined in the configuration file.  Any prohibited code points are reported as a possible security risk.")
 
 #endif
