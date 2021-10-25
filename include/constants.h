@@ -427,12 +427,28 @@
 
 /** @} */
 
-#define SPEC_MACRO_DEFINE "%define"
-#define SPEC_MACRO_GLOBAL "%global"
+#define SPEC_MACRO_DEFINE      "%define"
+#define SPEC_MACRO_GLOBAL      "%global"
 #define SPEC_SECTION_CHANGELOG "%changelog"
-#define SPEC_SECTION_FILES "%files"
-#define SPEC_TAG_RELEASE "Release:"
-#define SPEC_DISTTAG "%{?dist}"
+#define SPEC_SECTION_FILES     "%files"
+#define SPEC_TAG_RELEASE       "Release:"
+#define SPEC_DISTTAG           "%{?dist}"
+
+/*
+ * Names of rpmbuild(1) subdirectories.  rpminspect models an rpmbuild
+ * layout similar to how rpmbuild is used for distributions like
+ * Fedora Linux.  That is there is a top level directory (topdir) and
+ * all of the other directories are subdirectories in topdir.  For the
+ * purposes of rpminspect, the topdir definition here is a
+ * subdirectory in the working directory location rpminspect is using.
+ */
+#define RPMBUILD_TOPDIR        "rpmbuild"
+#define RPMBUILD_BUILDDIR      "BUILD"
+#define RPMBUILD_BUILDROOTDIR  "BUILDROOT"
+#define RPMBUILD_RPMDIR        "RPMS"
+#define RPMBUILD_SOURCEDIR     "SOURCES"
+#define RPMBUILD_SPECDIR       "SPECS"
+#define RPMBUILD_SRPMDIR       "SRPMS"
 
 /** @} */
 

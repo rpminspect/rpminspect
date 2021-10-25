@@ -30,6 +30,15 @@ libcurl = dependency('libcurl', required : true)
 zlib = dependency('zlib', required : true)
 yaml = dependency('yaml-0.1', required : true)
 clamav = dependency('libclamav', required : true)
+icu_uc = dependency('icu-uc', required : true)
+icu_io = dependency('icu-io', required : true)
+
+# librpmbuild
+if not cc.has_function('rpmSpecParse', args : ['-lrpmbuild'])
+    error('*** unable to find rpmSpecParse() in librpmbuild')
+else
+    rpmbuild = declare_dependency(link_args : ['-lrpmbuild'])
+endif
 
 # libarchive (need to check for specific functions)
 libarchive = dependency('libarchive', required : true)
