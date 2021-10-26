@@ -270,6 +270,7 @@ class TestSRPM(RequiresRpminspect):
         )
 
     def tearDown(self):
+        super().tearDown()
         self.rpm.clean()
 
 
@@ -367,6 +368,7 @@ class TestCompareSRPM(RequiresRpminspect):
         )
 
     def tearDown(self):
+        super().tearDown()
         self.before_rpm.clean()
         self.after_rpm.clean()
 
@@ -435,9 +437,6 @@ class TestRPMs(TestSRPM):
                 self.waiver_auth,
             )
 
-    def tearDown(self):
-        self.rpm.clean()
-
 
 # Base test case class that compares before and after built RPMs
 class TestCompareRPMs(TestCompareSRPM):
@@ -504,10 +503,6 @@ class TestCompareRPMs(TestCompareSRPM):
                 self.waiver_auth,
                 message=self.message,
             )
-
-    def tearDown(self):
-        self.before_rpm.clean()
-        self.after_rpm.clean()
 
 
 # Base test case class that tests a fake Koji build
@@ -587,9 +582,6 @@ class TestKoji(TestSRPM):
                 self.waiver_auth,
                 message=self.message,
             )
-
-    def tearDown(self):
-        self.rpm.clean()
 
 
 # Base test case class that compares before and after Koji builds
@@ -683,7 +675,3 @@ class TestCompareKoji(TestCompareSRPM):
                 )
             except AssertionError:
                 self.dumpResults()
-
-    def tearDown(self):
-        self.before_rpm.clean()
-        self.after_rpm.clean()
