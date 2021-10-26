@@ -47,7 +47,7 @@ static bool seen = false;
 static char *build = NULL;
 static struct rpminspect *globalri = NULL;
 static bool globalresult = true;
-static UChar_list_t *forbidden = NULL;
+static UChar32_list_t *forbidden = NULL;
 static const char *globalarch = NULL;
 
 /*
@@ -182,7 +182,7 @@ static int validate_file(const char *fpath, __attribute__((unused)) const struct
     size_t sz = BUFSIZ;
     size_t linenum = 0;
     size_t colnum = 0;
-    UChar_entry_t *uentry = NULL;
+    UChar32_entry_t *uentry = NULL;
     struct result_params params;
 
     assert(globalri != NULL);
@@ -356,7 +356,7 @@ static bool unicode_driver(struct rpminspect *ri, rpmfile_entry_t *file)
 bool inspect_unicode(struct rpminspect *ri)
 {
     bool result = true;
-    UChar_entry_t *entry = NULL;
+    UChar32_entry_t *entry = NULL;
     string_entry_t *sentry = NULL;
     struct result_params params;
 
@@ -372,6 +372,7 @@ bool inspect_unicode(struct rpminspect *ri)
         TAILQ_FOREACH(sentry, ri->unicode_forbidden_codepoints, items) {
             entry = calloc(1, sizeof(*entry));
             assert(entry != NULL);
+            errno = 0;
             entry->data = strtol(sentry->data, NULL, 16);
 
             if (errno == ERANGE || errno == EINVAL) {
