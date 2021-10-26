@@ -342,8 +342,6 @@ static bool unicode_driver(struct rpminspect *ri, rpmfile_entry_t *file)
         if (nftw(build, validate_file, FOPEN_MAX, FTW_MOUNT|FTW_PHYS) == -1) {
             warn("nftw");
         }
-
-        free(build);
     }
 
     /* check the individual file */
