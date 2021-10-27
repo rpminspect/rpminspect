@@ -30,6 +30,32 @@
 #include <stdio.h>
 #include <assert.h>
 #include "rpminspect.h"
+#include "uthash.h"
+
+/*
+ * Given an inspection, print any per-inspection ignores.
+ */
+static void dump_inspection_ignores(const string_list_map_t *ignores, const char *key)
+{
+    string_list_map_t *mapentry = NULL;
+    string_entry_t *entry = NULL;
+
+    if (ignores == NULL || key == NULL) {
+        return;
+    }
+
+    HASH_FIND_STR(ignores, key, mapentry);
+
+    if (mapentry != NULL && mapentry->value != NULL && !TAILQ_EMPTY(mapentry->value)) {
+        printf("    ignore:\n");
+
+        TAILQ_FOREACH(entry, mapentry->value, items) {
+            printf("        - %s\n", entry->data);
+        }
+    }
+
+    return;
+}
 
 /**
  * @brief Set the global debugging mode.
@@ -59,10 +85,13 @@ void dump_cfg(const struct rpminspect *ri)
     string_entry_t *entry = NULL;
     string_map_t *hentry = NULL;
     string_map_t *tmp_hentry = NULL;
+    string_list_map_t *mapentry = NULL;
 
     assert(ri != NULL);
 
     printf("# rpminspect configuration\n\n---\n");
+
+    /* common */
 
     if (ri->workdir || ri->profiledir) {
         printf("common:\n");
@@ -75,6 +104,8 @@ void dump_cfg(const struct rpminspect *ri)
             printf("    profiledir: %s\n", ri->profiledir);
         }
     }
+
+    /* koji */
 
     if (ri->kojihub || ri->kojiursine || ri->kojimbs) {
         printf("koji:\n");
@@ -91,6 +122,8 @@ void dump_cfg(const struct rpminspect *ri)
             printf("    download_mbs: %s\n", ri->kojimbs);
         }
     }
+
+    /* commands */
 
     printf("commands:\n");
 
@@ -122,6 +155,8 @@ void dump_cfg(const struct rpminspect *ri)
         printf("    kmidiff: %s\n", ri->commands.kmidiff);
     }
 
+    /* vendor */
+
     printf("vendor:\n");
 
     if (ri->vendor_data_dir) {
@@ -134,11 +169,15 @@ void dump_cfg(const struct rpminspect *ri)
 
     printf("    favor_release: %s\n", (ri->favor_release == FAVOR_NONE) ? "none" : (ri->favor_release == FAVOR_OLDEST) ? "oldest" : (ri->favor_release == FAVOR_NEWEST) ? "newest" : "?");
 
+    /* inspections */
+
     printf("inspections:\n");
 
     for (i = 0; inspections[i].name != NULL; i++) {
         printf("    %s: %s\n", inspections[i].name, (ri->tests & inspections[i].flag) ? "on" : "off");
     }
+
+    /* products */
 
     if (ri->products) {
         printf("products:\n");
@@ -148,6 +187,18 @@ void dump_cfg(const struct rpminspect *ri)
         }
     }
 
+    /* macrofiles */
+
+    if (ri->macrofiles && !TAILQ_EMPTY(ri->macrofiles)) {
+        printf("macrofiles:\n");
+
+        TAILQ_FOREACH(entry, ri->macrofiles, items) {
+            printf("    - %s\n", entry->data);
+        }
+    }
+
+    /* ignore */
+
     if (ri->ignores && !TAILQ_EMPTY(ri->ignores)) {
         printf("ignore:\n");
 
@@ -155,6 +206,8 @@ void dump_cfg(const struct rpminspect *ri)
             printf("    - %s\n", entry->data);
         }
     }
+
+    /* security_path_prefix */
 
     if (ri->security_path_prefix && !TAILQ_EMPTY(ri->security_path_prefix)) {
         printf("security_path_prefix:\n");
@@ -164,6 +217,8 @@ void dump_cfg(const struct rpminspect *ri)
         }
     }
 
+    /* badwords */
+
     if (ri->badwords && !TAILQ_EMPTY(ri->badwords)) {
         printf("badwords:\n");
 
@@ -171,6 +226,8 @@ void dump_cfg(const struct rpminspect *ri)
             printf("    - %s\n", entry->data);
         }
     }
+
+    /* metadata */
 
     if (ri->vendor || (ri->buildhost_subdomain && !TAILQ_EMPTY(ri->buildhost_subdomain))) {
         printf("metadata:\n");
@@ -188,7 +245,11 @@ void dump_cfg(const struct rpminspect *ri)
         }
     }
 
-    if (ri->elf_path_include_pattern || ri->elf_path_exclude_pattern) {
+    /* elf */
+
+    HASH_FIND_STR(ri->inspection_ignores, NAME_ELF, mapentry);
+
+    if (ri->elf_path_include_pattern || ri->elf_path_exclude_pattern || mapentry != NULL) {
         printf("elf:\n");
 
         if (ri->elf_path_include_pattern) {
@@ -198,9 +259,26 @@ void dump_cfg(const struct rpminspect *ri)
         if (ri->elf_path_exclude_pattern) {
             printf("    exclude_path: %s\n", ri->elf_path_exclude_pattern);
         }
+
+        dump_inspection_ignores(ri->inspection_ignores, NAME_ELF);
     }
 
-    if (ri->manpage_path_include_pattern || ri->manpage_path_exclude_pattern) {
+    /* emptyrpm */
+
+    if (ri->expected_empty_rpms && !TAILQ_EMPTY(ri->expected_empty_rpms)) {
+        printf("emptyrpm:\n");
+        printf("    expected_empty:\n");
+
+        TAILQ_FOREACH(entry, ri->expected_empty_rpms, items) {
+            printf("        - %s\n", entry->data);
+        }
+    }
+
+    /* manpage */
+
+    HASH_FIND_STR(ri->inspection_ignores, NAME_MANPAGE, mapentry);
+
+    if (ri->manpage_path_include_pattern || ri->manpage_path_exclude_pattern || mapentry != NULL) {
         printf("manpage:\n");
 
         if (ri->manpage_path_include_pattern) {
@@ -210,9 +288,15 @@ void dump_cfg(const struct rpminspect *ri)
         if (ri->manpage_path_exclude_pattern) {
             printf("    exclude_path: %s\n", ri->manpage_path_exclude_pattern);
         }
+
+        dump_inspection_ignores(ri->inspection_ignores, NAME_MANPAGE);
     }
 
-    if (ri->xml_path_include_pattern || ri->xml_path_exclude_pattern) {
+    /* xml */
+
+    HASH_FIND_STR(ri->inspection_ignores, NAME_XML, mapentry);
+
+    if (ri->xml_path_include_pattern || ri->xml_path_exclude_pattern || mapentry != NULL) {
         printf("xml:\n");
 
         if (ri->xml_path_include_pattern) {
@@ -222,21 +306,47 @@ void dump_cfg(const struct rpminspect *ri)
         if (ri->xml_path_exclude_pattern) {
             printf("    exclude_path: %s\n", ri->xml_path_exclude_pattern);
         }
+
+        dump_inspection_ignores(ri->inspection_ignores, NAME_XML);
     }
 
-    if (ri->desktop_entry_files_dir) {
-        printf("desktop:\n    desktop_entry_files_dir: %s\n", ri->desktop_entry_files_dir);
-    }
+    /* desktop */
 
-    if (ri->header_file_extensions && !TAILQ_EMPTY(ri->header_file_extensions)) {
-        printf("changedfiles:\n    header_file_extensions:\n");
+    HASH_FIND_STR(ri->inspection_ignores, NAME_DESKTOP, mapentry);
 
-        TAILQ_FOREACH(entry, ri->header_file_extensions, items) {
-            printf("        - %s\n", entry->data);
+    if (ri->desktop_entry_files_dir || mapentry != NULL) {
+        printf("desktop:\n");
+
+        if (ri->desktop_entry_files_dir) {
+            printf("    desktop_entry_files_dir: %s\n", ri->desktop_entry_files_dir);
         }
+
+        dump_inspection_ignores(ri->inspection_ignores, NAME_DESKTOP);
     }
 
-    if ((ri->forbidden_path_prefixes && !TAILQ_EMPTY(ri->forbidden_path_prefixes)) || (ri->forbidden_path_suffixes && !TAILQ_EMPTY(ri->forbidden_path_suffixes)) || (ri->forbidden_directories && !TAILQ_EMPTY(ri->forbidden_directories))) {
+    /* changedfiles */
+
+    HASH_FIND_STR(ri->inspection_ignores, NAME_CHANGEDFILES, mapentry);
+
+    if ((ri->header_file_extensions && !TAILQ_EMPTY(ri->header_file_extensions)) || mapentry != NULL) {
+        printf("changedfiles:\n");
+
+        if (ri->header_file_extensions && !TAILQ_EMPTY(ri->header_file_extensions)) {
+            printf("    header_file_extensions:\n");
+
+            TAILQ_FOREACH(entry, ri->header_file_extensions, items) {
+                printf("        - %s\n", entry->data);
+            }
+        }
+
+        dump_inspection_ignores(ri->inspection_ignores, NAME_CHANGEDFILES);
+    }
+
+    /* addedfiles */
+
+    HASH_FIND_STR(ri->inspection_ignores, NAME_ADDEDFILES, mapentry);
+
+    if ((ri->forbidden_path_prefixes && !TAILQ_EMPTY(ri->forbidden_path_prefixes)) || (ri->forbidden_path_suffixes && !TAILQ_EMPTY(ri->forbidden_path_suffixes)) || (ri->forbidden_directories && !TAILQ_EMPTY(ri->forbidden_directories)) || mapentry != NULL) {
         printf("addedfiles:\n");
 
         if (ri->forbidden_path_prefixes && !TAILQ_EMPTY(ri->forbidden_path_prefixes)) {
@@ -262,9 +372,15 @@ void dump_cfg(const struct rpminspect *ri)
                 printf("        - %s\n", entry->data);
             }
         }
+
+        dump_inspection_ignores(ri->inspection_ignores, NAME_ADDEDFILES);
     }
 
-    if ((ri->bin_paths && !TAILQ_EMPTY(ri->bin_paths)) || ri->bin_owner || ri->bin_group || (ri->forbidden_owners && !TAILQ_EMPTY(ri->forbidden_owners)) || (ri->forbidden_groups && !TAILQ_EMPTY(ri->forbidden_groups))) {
+    /* ownership */
+
+    HASH_FIND_STR(ri->inspection_ignores, NAME_OWNERSHIP, mapentry);
+
+    if ((ri->bin_paths && !TAILQ_EMPTY(ri->bin_paths)) || ri->bin_owner || ri->bin_group || (ri->forbidden_owners && !TAILQ_EMPTY(ri->forbidden_owners)) || (ri->forbidden_groups && !TAILQ_EMPTY(ri->forbidden_groups)) || mapentry != NULL) {
         printf("ownership:\n");
 
         if (ri->bin_paths && !TAILQ_EMPTY(ri->bin_paths)) {
@@ -298,17 +414,29 @@ void dump_cfg(const struct rpminspect *ri)
                 printf("        - %s\n", entry->data);
             }
         }
+
+        dump_inspection_ignores(ri->inspection_ignores, NAME_OWNERSHIP);
     }
 
-    if (ri->shells && !TAILQ_EMPTY(ri->shells)) {
+    /* shellsyntax */
+
+    HASH_FIND_STR(ri->inspection_ignores, NAME_SHELLSYNTAX, mapentry);
+
+    if ((ri->shells && !TAILQ_EMPTY(ri->shells)) || mapentry != NULL) {
         printf("shellsyntax:\n    shells:\n");
 
         TAILQ_FOREACH(entry, ri->shells, items) {
             printf("        - %s\n", entry->data);
         }
+
+        dump_inspection_ignores(ri->inspection_ignores, NAME_SHELLSYNTAX);
     }
 
-    if (ri->size_threshold) {
+    /* filesize */
+
+    HASH_FIND_STR(ri->inspection_ignores, NAME_FILESIZE, mapentry);
+
+    if (ri->size_threshold || mapentry != NULL) {
         printf("filesize:\n    size_threshold: ");
 
         if (ri->size_threshold == -1) {
@@ -318,37 +446,62 @@ void dump_cfg(const struct rpminspect *ri)
         }
 
         printf("\n");
+        dump_inspection_ignores(ri->inspection_ignores, NAME_FILESIZE);
     }
 
-    if (ri->lto_symbol_name_prefixes && !TAILQ_EMPTY(ri->lto_symbol_name_prefixes)) {
+    /* lto */
+
+    HASH_FIND_STR(ri->inspection_ignores, NAME_LTO, mapentry);
+
+    if ((ri->lto_symbol_name_prefixes && !TAILQ_EMPTY(ri->lto_symbol_name_prefixes)) || mapentry != NULL) {
         printf("lto:\n    lto_symbol_name_prefixes:\n");
 
         TAILQ_FOREACH(entry, ri->lto_symbol_name_prefixes, items) {
             printf("        - %s\n", entry->data);
         }
+
+        dump_inspection_ignores(ri->inspection_ignores, NAME_LTO);
     }
+
+    /* specname */
 
     printf("specname:\n");
     printf("    match: %s\n", (ri->specmatch == MATCH_FULL) ? "full" : (ri->specmatch == MATCH_PREFIX) ? "prefix" : (ri->specmatch == MATCH_SUFFIX) ? "suffix" : "?");
     printf("    primary: %s\n", (ri->specprimary == PRIMARY_NAME) ? "name" : (ri->specprimary == PRIMARY_FILENAME) ? "filename" : "?");
 
-    if (ri->annocheck) {
+    /* annocheck */
+
+    HASH_FIND_STR(ri->inspection_ignores, NAME_ANNOCHECK, mapentry);
+
+    if (ri->annocheck || mapentry != NULL) {
         printf("annocheck:\n");
 
         HASH_ITER(hh, ri->annocheck, hentry, tmp_hentry) {
             printf("    - %s: %s\n", hentry->key, hentry->value);
         }
+
+        dump_inspection_ignores(ri->inspection_ignores, NAME_ANNOCHECK);
     }
 
-    if (ri->jvm) {
+    /* javabytecode */
+
+    HASH_FIND_STR(ri->inspection_ignores, NAME_JAVABYTECODE, mapentry);
+
+    if (ri->jvm || mapentry != NULL) {
         printf("javabytecode:\n");
 
         HASH_ITER(hh, ri->jvm, hentry, tmp_hentry) {
             printf("    - %s: %s\n", hentry->key, hentry->value);
         }
+
+        dump_inspection_ignores(ri->inspection_ignores, NAME_JAVABYTECODE);
     }
 
-    if (ri->pathmigration || (ri->pathmigration_excluded_paths && !TAILQ_EMPTY(ri->pathmigration_excluded_paths))) {
+    /* pathmigration */
+
+    HASH_FIND_STR(ri->inspection_ignores, NAME_PATHMIGRATION, mapentry);
+
+    if (ri->pathmigration || (ri->pathmigration_excluded_paths && !TAILQ_EMPTY(ri->pathmigration_excluded_paths)) || mapentry != NULL) {
         printf("pathmigration:\n");
 
         if (ri->pathmigration) {
@@ -366,7 +519,13 @@ void dump_cfg(const struct rpminspect *ri)
                 printf("        - %s\n", entry->data);
             }
         }
+
+        dump_inspection_ignores(ri->inspection_ignores, NAME_PATHMIGRATION);
     }
+
+    /* files */
+
+    HASH_FIND_STR(ri->inspection_ignores, NAME_FILES, mapentry);
 
     if (ri->forbidden_paths && !TAILQ_EMPTY(ri->forbidden_paths)) {
         printf("files:\n    forbidden_paths:\n");
@@ -374,29 +533,45 @@ void dump_cfg(const struct rpminspect *ri)
         TAILQ_FOREACH(entry, ri->forbidden_paths, items) {
             printf("        - %s\n", entry->data);
         }
+
+        dump_inspection_ignores(ri->inspection_ignores, NAME_FILES);
     }
 
-    printf("abidiff:\n");
+    /* abidiff */
 
-    if (ri->abidiff_suppression_file) {
-        printf("    suppression_file: %s\n", ri->abidiff_suppression_file);
+    HASH_FIND_STR(ri->inspection_ignores, NAME_ABIDIFF, mapentry);
+
+    if (ri->abidiff_suppression_file || ri->abidiff_debuginfo_path || ri->abidiff_include_path || ri->abidiff_extra_args || mapentry != NULL) {
+        printf("abidiff:\n");
+
+        if (ri->abidiff_suppression_file) {
+            printf("    suppression_file: %s\n", ri->abidiff_suppression_file);
+        }
+
+        if (ri->abidiff_debuginfo_path) {
+            printf("    debuginfo_path: %s\n", ri->abidiff_debuginfo_path);
+        }
+
+        if (ri->abidiff_include_path) {
+            printf("    include_path: %s\n", ri->abidiff_include_path);
+        }
+
+        if (ri->abidiff_extra_args) {
+            printf("    extra_args: %s\n", ri->abidiff_extra_args);
+        }
+
+        printf("    security_level_threshold: %ld\n", ri->abi_security_threshold);
+        dump_inspection_ignores(ri->inspection_ignores, NAME_ABIDIFF);
+    } else {
+        printf("abidiff:\n");
+        printf("    security_level_threshold: %ld\n", ri->abi_security_threshold);
     }
 
-    if (ri->abidiff_debuginfo_path) {
-        printf("    debuginfo_path: %s\n", ri->abidiff_debuginfo_path);
-    }
+    /* kmidiff */
 
-    if (ri->abidiff_include_path) {
-        printf("    include_path: %s\n", ri->abidiff_include_path);
-    }
+    HASH_FIND_STR(ri->inspection_ignores, NAME_KMIDIFF, mapentry);
 
-    if (ri->abidiff_extra_args) {
-        printf("    extra_args: %s\n", ri->abidiff_extra_args);
-    }
-
-    printf("    security_level_threshold: %ld\n", ri->abi_security_threshold);
-
-    if (ri->kmidiff_suppression_file || ri->kmidiff_debuginfo_path || ri->kmidiff_extra_args || (ri->kernel_filenames && !TAILQ_EMPTY(ri->kernel_filenames)) || ri->kabi_dir || ri->kabi_filename) {
+    if (ri->kmidiff_suppression_file || ri->kmidiff_debuginfo_path || ri->kmidiff_extra_args || (ri->kernel_filenames && !TAILQ_EMPTY(ri->kernel_filenames)) || ri->kabi_dir || ri->kabi_filename || mapentry != NULL) {
         printf("kmidiff:\n");
 
         if (ri->kmidiff_suppression_file) {
@@ -426,7 +601,11 @@ void dump_cfg(const struct rpminspect *ri)
         if (ri->kabi_filename) {
             printf("    kabi_filename: %s\n", ri->kabi_filename);
         }
+
+        dump_inspection_ignores(ri->inspection_ignores, NAME_KMIDIFF);
     }
+
+    /* patches */
 
     printf("patches:\n");
 
@@ -441,17 +620,28 @@ void dump_cfg(const struct rpminspect *ri)
     printf("    file_count_threshold: %ld\n", ri->patch_file_threshold);
     printf("    line_count_threshold: %ld\n", ri->patch_line_threshold);
 
-    if (ri->bad_functions && !TAILQ_EMPTY(ri->bad_functions)) {
+    /* badfuncs */
+
+    HASH_FIND_STR(ri->inspection_ignores, NAME_BADFUNCS, mapentry);
+
+    if ((ri->bad_functions && !TAILQ_EMPTY(ri->bad_functions)) || mapentry != NULL) {
         printf("badfuncs:\n");
 
         TAILQ_FOREACH(entry, ri->bad_functions, items) {
             printf("    - %s\n", entry->data);
         }
+
+        dump_inspection_ignores(ri->inspection_ignores, NAME_BADFUNCS);
     }
+
+    /* runpath */
+
+    HASH_FIND_STR(ri->inspection_ignores, NAME_RUNPATH, mapentry);
 
     if ((ri->runpath_allowed_paths && !TAILQ_EMPTY(ri->runpath_allowed_paths)) ||
         (ri->runpath_allowed_origin_paths && !TAILQ_EMPTY(ri->runpath_allowed_origin_paths)) ||
-        (ri->runpath_origin_prefix_trim && !TAILQ_EMPTY(ri->runpath_origin_prefix_trim))) {
+        (ri->runpath_origin_prefix_trim && !TAILQ_EMPTY(ri->runpath_origin_prefix_trim)) ||
+        mapentry != NULL) {
         printf("runpath:\n");
 
         if (ri->runpath_allowed_paths && !TAILQ_EMPTY(ri->runpath_allowed_paths)) {
@@ -477,6 +667,50 @@ void dump_cfg(const struct rpminspect *ri)
                 printf("        - %s\n", entry->data);
             }
         }
+
+        dump_inspection_ignores(ri->inspection_ignores, NAME_RUNPATH);
+    }
+
+    /* types */
+
+    HASH_FIND_STR(ri->inspection_ignores, NAME_TYPES, mapentry);
+
+    if (mapentry != NULL) {
+        printf("types:\n");
+        dump_inspection_ignores(ri->inspection_ignores, NAME_TYPES);
+    }
+
+    /* unicode */
+
+    HASH_FIND_STR(ri->inspection_ignores, NAME_UNICODE, mapentry);
+
+    if (ri->unicode_exclude ||
+        (ri->unicode_excluded_mime_types && !TAILQ_EMPTY(ri->unicode_excluded_mime_types)) ||
+        (ri->unicode_forbidden_codepoints && !TAILQ_EMPTY(ri->unicode_forbidden_codepoints)) ||
+        mapentry != NULL) {
+        printf("unicode:\n");
+
+        if (ri->unicode_exclude) {
+            printf("    exclude: [SET]\n");
+        }
+
+        if (ri->unicode_excluded_mime_types && !TAILQ_EMPTY(ri->unicode_excluded_mime_types)) {
+            printf("    excluded_mime_types:\n");
+
+            TAILQ_FOREACH(entry, ri->unicode_excluded_mime_types, items) {
+                printf("        - %s\n", entry->data);
+            }
+        }
+
+        if (ri->unicode_forbidden_codepoints && !TAILQ_EMPTY(ri->unicode_forbidden_codepoints)) {
+            printf("    forbidden_codepoints:\n");
+
+            TAILQ_FOREACH(entry, ri->unicode_forbidden_codepoints, items) {
+                printf("        - %s\n", entry->data);
+            }
+        }
+
+        dump_inspection_ignores(ri->inspection_ignores, NAME_UNICODE);
     }
 
     printf("\n\n");
