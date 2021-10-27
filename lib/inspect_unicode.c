@@ -306,6 +306,7 @@ static int validate_file(const char *fpath, __attribute__((unused)) const struct
                 xasprintf(&params.msg, _("A forbidden code point was found in the %s source file on line %ld at column %ld."), localpath, linenum, colnum);
                 add_result(globalri, &params);
                 free(params.msg);
+                globalresult = false;
             }
         }
 
@@ -345,6 +346,8 @@ static bool unicode_driver(struct rpminspect *ri, rpmfile_entry_t *file)
         if (nftw(build, validate_file, FOPEN_MAX, FTW_MOUNT|FTW_PHYS) == -1) {
             warn("nftw");
         }
+
+        seen = true;
     }
 
     /* check the individual file */
