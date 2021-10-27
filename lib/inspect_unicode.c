@@ -29,6 +29,7 @@
 #include <rpm/rpmbuild.h>
 #include <rpm/rpmlog.h>
 #include <unicode/ustdio.h>
+#include <unicode/ustring.h>
 #include "rpminspect.h"
 
 /* subdirectories to create or link for the rpmbuild structure */
@@ -181,6 +182,7 @@ static int validate_file(const char *fpath, __attribute__((unused)) const struct
     size_t i = 0;
     size_t sz = BUFSIZ;
     size_t linenum = 0;
+    UChar *needle = NULL;
     size_t colnum = 0;
     UChar32_entry_t *uentry = NULL;
     struct result_params params;
@@ -295,14 +297,15 @@ static int validate_file(const char *fpath, __attribute__((unused)) const struct
         line[i] = '\0';
 
         /* check this line for any prohibited characters */
-        for (colnum = 0; line[colnum] != '\0'; colnum++) {
-            TAILQ_FOREACH(uentry, forbidden, items) {
-                if (line[colnum] == uentry->data) {
-                    /* forbidden code point found */
-                    xasprintf(&params.msg, _("A forbidden code point was found in the %s source file on line %ld at column %ld."), localpath, linenum, colnum);
-                    add_result(globalri, &params);
-                    free(params.msg);
-                }
+        TAILQ_FOREACH(uentry, forbidden, items) {
+            needle = u_strchr32(line, uentry->data);
+
+            if (needle != NULL) {
+                /* forbidden code point found */
+                colnum = u_strlen(line) - u_strlen(needle);
+                xasprintf(&params.msg, _("A forbidden code point was found in the %s source file on line %ld at column %ld."), localpath, linenum, colnum);
+                add_result(globalri, &params);
+                free(params.msg);
             }
         }
 
