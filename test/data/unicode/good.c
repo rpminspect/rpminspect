@@ -1,8 +1,9 @@
-#include <stdio.h>
-#include <stdlib.h>
-
-int main(int argc, char **argv)
-{
-    printf("Hello, world!\n");
-    return EXIT_SUCCESS;
-}
+  void hello ()
+  {
+    __builtin_printf ("Hello world\n");
+  }
+  int main ()
+  {
+    hello ();
+    return 0;
+  }
