@@ -37,10 +37,20 @@ bad_asm_src = open(os.path.join(datadir, "unicode", "bad.s")).read()
 status_src = open(os.path.join(datadir, "unicode", "status.sh")).read()
 makefile_src = open(os.path.join(datadir, "unicode", "Makefile")).read()
 
+commenting_out_new_src = open(
+    os.path.join(datadir, "unicode", "commenting-out-new.c")
+).read()
+early_return_new_src = open(
+    os.path.join(datadir, "unicode", "early-return-new.c")
+).read()
+stretched_string_new_src = open(
+    os.path.join(datadir, "unicode", "stretched-string-new.c")
+).read()
+
 
 # The following tests run the unicode inspection with a known good source
 # file in the SRPM.  All of the results for these should be 'OK'.
-class UnicodeGoodSourceSRPM(TestSRPM):
+class UnicodeGoodCSourceSRPM(TestSRPM):
     def setUp(self):
         super().setUp()
 
@@ -56,7 +66,7 @@ class UnicodeGoodSourceSRPM(TestSRPM):
         self.result = "OK"
 
 
-class UnicodeGoodSourceRPMs(TestRPMs):
+class UnicodeGoodCSourceRPMs(TestRPMs):
     def setUp(self):
         super().setUp()
 
@@ -72,7 +82,7 @@ class UnicodeGoodSourceRPMs(TestRPMs):
         self.result = "OK"
 
 
-class UnicodeGoodSourceKoji(TestKoji):
+class UnicodeGoodCSourceKoji(TestKoji):
     def setUp(self):
         super().setUp()
 
@@ -88,7 +98,7 @@ class UnicodeGoodSourceKoji(TestKoji):
         self.result = "OK"
 
 
-class UnicodeGoodSourceCompareSRPM(TestCompareSRPM):
+class UnicodeGoodCSourceCompareSRPM(TestCompareSRPM):
     def setUp(self):
         super().setUp()
 
@@ -108,7 +118,7 @@ class UnicodeGoodSourceCompareSRPM(TestCompareSRPM):
         self.result = "OK"
 
 
-class UnicodeGoodSourceCompareRPMs(TestCompareRPMs):
+class UnicodeGoodCSourceCompareRPMs(TestCompareRPMs):
     def setUp(self):
         super().setUp()
 
@@ -128,7 +138,7 @@ class UnicodeGoodSourceCompareRPMs(TestCompareRPMs):
         self.result = "OK"
 
 
-class UnicodeGoodSourceCompareKoji(TestCompareKoji):
+class UnicodeGoodCSourceCompareKoji(TestCompareKoji):
     def setUp(self):
         super().setUp()
 
@@ -150,7 +160,7 @@ class UnicodeGoodSourceCompareKoji(TestCompareKoji):
 
 # The following tests run the unicode inspection with a known good source
 # file in a tarball in the SRPM.  All of the results for these should be 'OK'.
-class UnicodeGoodSourceArchiveSRPM(TestSRPM):
+class UnicodeGoodCSourceArchiveSRPM(TestSRPM):
     def setUp(self):
         super().setUp()
 
@@ -176,7 +186,7 @@ class UnicodeGoodSourceArchiveSRPM(TestSRPM):
         self.result = "OK"
 
 
-class UnicodeGoodSourceArchiveRPMs(TestRPMs):
+class UnicodeGoodCSourceArchiveRPMs(TestRPMs):
     def setUp(self):
         super().setUp()
 
@@ -202,7 +212,7 @@ class UnicodeGoodSourceArchiveRPMs(TestRPMs):
         self.result = "OK"
 
 
-class UnicodeGoodSourceArchiveKoji(TestKoji):
+class UnicodeGoodCSourceArchiveKoji(TestKoji):
     def setUp(self):
         super().setUp()
 
@@ -228,7 +238,7 @@ class UnicodeGoodSourceArchiveKoji(TestKoji):
         self.result = "OK"
 
 
-class UnicodeGoodSourceArchiveCompareSRPM(TestCompareSRPM):
+class UnicodeGoodCSourceArchiveCompareSRPM(TestCompareSRPM):
     def setUp(self):
         super().setUp()
 
@@ -272,7 +282,7 @@ class UnicodeGoodSourceArchiveCompareSRPM(TestCompareSRPM):
         self.result = "OK"
 
 
-class UnicodeGoodSourceArchiveCompareRPMs(TestCompareRPMs):
+class UnicodeGoodCSourceArchiveCompareRPMs(TestCompareRPMs):
     def setUp(self):
         super().setUp()
 
@@ -316,7 +326,7 @@ class UnicodeGoodSourceArchiveCompareRPMs(TestCompareRPMs):
         self.result = "OK"
 
 
-class UnicodeGoodSourceArchiveCompareKoji(TestCompareKoji):
+class UnicodeGoodCSourceArchiveCompareKoji(TestCompareKoji):
     def setUp(self):
         super().setUp()
 
@@ -363,7 +373,7 @@ class UnicodeGoodSourceArchiveCompareKoji(TestCompareKoji):
 # The following tests run the unicode inspection with a known bad source file
 # in the SRPM.  All of the results for these should be 'BAD' with a waiver
 # authorization of "Security" except for the jobs that lack any SRPM file.
-class UnicodeBadSourceSRPM(TestSRPM):
+class UnicodeBadCSourceSRPM(TestSRPM):
     def setUp(self):
         super().setUp()
 
@@ -374,14 +384,13 @@ class UnicodeBadSourceSRPM(TestSRPM):
 
         # drop our known bad source files directly in the SRPM
         self.rpm.add_source(rpmfluff.SourceFile("bad.c", bad_c_src))
-        self.rpm.add_source(rpmfluff.SourceFile("bad.s", bad_asm_src))
 
         self.inspection = "unicode"
         self.waiver_auth = "Security"
         self.result = "BAD"
 
 
-class UnicodeBadSourceRPMs(TestRPMs):
+class UnicodeBadCSourceRPMs(TestRPMs):
     def setUp(self):
         super().setUp()
 
@@ -392,7 +401,6 @@ class UnicodeBadSourceRPMs(TestRPMs):
 
         # drop our known bad source files directly in the SRPM
         self.rpm.add_source(rpmfluff.SourceFile("bad.c", bad_c_src))
-        self.rpm.add_source(rpmfluff.SourceFile("bad.s", bad_asm_src))
 
         self.inspection = "unicode"
 
@@ -401,7 +409,7 @@ class UnicodeBadSourceRPMs(TestRPMs):
         self.result = "OK"
 
 
-class UnicodeBadSourceKoji(TestKoji):
+class UnicodeBadCSourceKoji(TestKoji):
     def setUp(self):
         super().setUp()
 
@@ -412,6 +420,349 @@ class UnicodeBadSourceKoji(TestKoji):
 
         # drop our known bad source files directly in the SRPM
         self.rpm.add_source(rpmfluff.SourceFile("bad.c", bad_c_src))
+
+        self.inspection = "unicode"
+        self.waiver_auth = "Security"
+        self.result = "BAD"
+
+
+class UnicodeBadCSourceCompareSRPM(TestCompareSRPM):
+    def setUp(self):
+        super().setUp()
+
+        # this creates enough of a spec file to appease rpmbuild
+        self.before_rpm.add_installed_file(
+            "/usr/bin/status", rpmfluff.SourceFile("status.sh", status_src), mode=755
+        )
+        self.after_rpm.add_installed_file(
+            "/usr/bin/status", rpmfluff.SourceFile("status.sh", status_src), mode=755
+        )
+
+        # drop our known bad source files directly in the SRPM
+        self.before_rpm.add_source(rpmfluff.SourceFile("bad.c", bad_c_src))
+        self.after_rpm.add_source(rpmfluff.SourceFile("bad.c", bad_c_src))
+
+        self.inspection = "unicode"
+        self.waiver_auth = "Security"
+        self.result = "BAD"
+
+
+class UnicodeBadCSourceCompareRPMs(TestCompareRPMs):
+    def setUp(self):
+        super().setUp()
+
+        # this creates enough of a spec file to appease rpmbuild
+        self.before_rpm.add_installed_file(
+            "/usr/bin/status", rpmfluff.SourceFile("status.sh", status_src), mode=755
+        )
+        self.after_rpm.add_installed_file(
+            "/usr/bin/status", rpmfluff.SourceFile("status.sh", status_src), mode=755
+        )
+
+        # drop our known bad source files directly in the SRPM
+        self.before_rpm.add_source(rpmfluff.SourceFile("bad.c", bad_c_src))
+        self.after_rpm.add_source(rpmfluff.SourceFile("bad.c", bad_c_src))
+
+        self.inspection = "unicode"
+
+        # the result here is OK because the unicode inspection only works on SRPMs and
+        # if we don't have those it is a no-op inspection that returns OK
+        self.result = "OK"
+
+
+class UnicodeBadCSourceCompareKoji(TestCompareKoji):
+    def setUp(self):
+        super().setUp()
+
+        # this creates enough of a spec file to appease rpmbuild
+        self.before_rpm.add_installed_file(
+            "/usr/bin/status", rpmfluff.SourceFile("status.sh", status_src), mode=755
+        )
+        self.after_rpm.add_installed_file(
+            "/usr/bin/status", rpmfluff.SourceFile("status.sh", status_src), mode=755
+        )
+
+        # drop our known bad source files directly in the SRPM
+        self.before_rpm.add_source(rpmfluff.SourceFile("bad.c", bad_c_src))
+        self.after_rpm.add_source(rpmfluff.SourceFile("bad.c", bad_c_src))
+
+        self.inspection = "unicode"
+        self.waiver_auth = "Security"
+        self.result = "BAD"
+
+
+# The following tests run the unicode inspection with known bad source
+# files in a tarball in the SRPM.  All of the results for these should be 'OK'
+# except for the jobs that lack any SRPM file.
+class UnicodeBadCSourceArchiveSRPM(TestSRPM):
+    def setUp(self):
+        super().setUp()
+
+        self.rpm.header += "\n%define debug_package %{nil}\n"
+        self.rpm.add_source(
+            rpmfluff.GeneratedTarball(
+                "%s-%s.tar.gz" % (AFTER_NAME, AFTER_VER),
+                "%s-%s" % (AFTER_NAME, AFTER_VER),
+                [
+                    rpmfluff.SourceFile("Makefile", makefile_src),
+                    rpmfluff.SourceFile("bad.c", bad_c_src),
+                    rpmfluff.SourceFile("status.sh", status_src),
+                ],
+            )
+        )
+        self.rpm.section_prep = "%setup\n"
+        self.rpm.section_build += "make\n"
+        self.rpm.section_install += "make install DESTDIR=%{buildroot}\n"
+        sub = self.rpm.get_subpackage(None)
+        sub.section_files += "/usr/bin/status\n"
+
+        self.inspection = "unicode"
+        self.waiver_auth = "Security"
+        self.result = "BAD"
+
+
+class UnicodeBadCSourceArchiveRPMs(TestRPMs):
+    def setUp(self):
+        super().setUp()
+
+        self.rpm.header += "\n%define debug_package %{nil}\n"
+        self.rpm.add_source(
+            rpmfluff.GeneratedTarball(
+                "%s-%s.tar.gz" % (AFTER_NAME, AFTER_VER),
+                "%s-%s" % (AFTER_NAME, AFTER_VER),
+                [
+                    rpmfluff.SourceFile("Makefile", makefile_src),
+                    rpmfluff.SourceFile("bad.c", bad_c_src),
+                    rpmfluff.SourceFile("status.sh", status_src),
+                ],
+            )
+        )
+        self.rpm.section_prep = "%setup\n"
+        self.rpm.section_build += "make\n"
+        self.rpm.section_install += "make install DESTDIR=%{buildroot}\n"
+        sub = self.rpm.get_subpackage(None)
+        sub.section_files += "/usr/bin/status\n"
+
+        self.inspection = "unicode"
+
+        # the result here is OK because the unicode inspection only works on SRPMs and
+        # if we don't have those it is a no-op inspection that returns OK
+        self.result = "OK"
+
+
+class UnicodeBadCSourceArchiveKoji(TestKoji):
+    def setUp(self):
+        super().setUp()
+
+        self.rpm.header += "\n%define debug_package %{nil}\n"
+        self.rpm.add_source(
+            rpmfluff.GeneratedTarball(
+                "%s-%s.tar.gz" % (AFTER_NAME, AFTER_VER),
+                "%s-%s" % (AFTER_NAME, AFTER_VER),
+                [
+                    rpmfluff.SourceFile("Makefile", makefile_src),
+                    rpmfluff.SourceFile("bad.c", bad_c_src),
+                    rpmfluff.SourceFile("status.sh", status_src),
+                ],
+            )
+        )
+        self.rpm.section_prep = "%setup\n"
+        self.rpm.section_build += "make\n"
+        self.rpm.section_install += "make install DESTDIR=%{buildroot}\n"
+        sub = self.rpm.get_subpackage(None)
+        sub.section_files += "/usr/bin/status\n"
+
+        self.inspection = "unicode"
+        self.waiver_auth = "Security"
+        self.result = "BAD"
+
+
+class UnicodeBadCSourceArchiveCompareSRPM(TestCompareSRPM):
+    def setUp(self):
+        super().setUp()
+
+        self.before_rpm.header += "\n%define debug_package %{nil}\n"
+        self.before_rpm.add_source(
+            rpmfluff.GeneratedTarball(
+                "%s-%s.tar.gz" % (BEFORE_NAME, BEFORE_VER),
+                "%s-%s" % (BEFORE_NAME, BEFORE_VER),
+                [
+                    rpmfluff.SourceFile("Makefile", makefile_src),
+                    rpmfluff.SourceFile("bad.c", bad_c_src),
+                    rpmfluff.SourceFile("status.sh", status_src),
+                ],
+            )
+        )
+        self.before_rpm.section_prep = "%setup\n"
+        self.before_rpm.section_build += "make\n"
+        self.before_rpm.section_install += "make install DESTDIR=%{buildroot}\n"
+        sub = self.before_rpm.get_subpackage(None)
+        sub.section_files += "/usr/bin/status\n"
+
+        self.after_rpm.header += "\n%define debug_package %{nil}\n"
+        self.after_rpm.add_source(
+            rpmfluff.GeneratedTarball(
+                "%s-%s.tar.gz" % (AFTER_NAME, AFTER_VER),
+                "%s-%s" % (AFTER_NAME, AFTER_VER),
+                [
+                    rpmfluff.SourceFile("Makefile", makefile_src),
+                    rpmfluff.SourceFile("bad.c", bad_c_src),
+                    rpmfluff.SourceFile("status.sh", status_src),
+                ],
+            )
+        )
+        self.after_rpm.section_prep = "%setup\n"
+        self.after_rpm.section_build += "make\n"
+        self.after_rpm.section_install += "make install DESTDIR=%{buildroot}\n"
+        sub = self.after_rpm.get_subpackage(None)
+        sub.section_files += "/usr/bin/status\n"
+
+        self.inspection = "unicode"
+        self.waiver_auth = "Security"
+        self.result = "BAD"
+
+
+class UnicodeBadCSourceArchiveCompareRPMs(TestCompareRPMs):
+    def setUp(self):
+        super().setUp()
+
+        self.before_rpm.header += "\n%define debug_package %{nil}\n"
+        self.before_rpm.add_source(
+            rpmfluff.GeneratedTarball(
+                "%s-%s.tar.gz" % (BEFORE_NAME, BEFORE_VER),
+                "%s-%s" % (BEFORE_NAME, BEFORE_VER),
+                [
+                    rpmfluff.SourceFile("Makefile", makefile_src),
+                    rpmfluff.SourceFile("bad.c", bad_c_src),
+                    rpmfluff.SourceFile("status.sh", status_src),
+                ],
+            )
+        )
+        self.before_rpm.section_prep = "%setup\n"
+        self.before_rpm.section_build += "make\n"
+        self.before_rpm.section_install += "make install DESTDIR=%{buildroot}\n"
+        sub = self.before_rpm.get_subpackage(None)
+        sub.section_files += "/usr/bin/status\n"
+
+        self.after_rpm.header += "\n%define debug_package %{nil}\n"
+        self.after_rpm.add_source(
+            rpmfluff.GeneratedTarball(
+                "%s-%s.tar.gz" % (AFTER_NAME, AFTER_VER),
+                "%s-%s" % (AFTER_NAME, AFTER_VER),
+                [
+                    rpmfluff.SourceFile("Makefile", makefile_src),
+                    rpmfluff.SourceFile("bad.c", bad_c_src),
+                    rpmfluff.SourceFile("status.sh", status_src),
+                ],
+            )
+        )
+        self.after_rpm.section_prep = "%setup\n"
+        self.after_rpm.section_build += "make\n"
+        self.after_rpm.section_install += "make install DESTDIR=%{buildroot}\n"
+        sub = self.after_rpm.get_subpackage(None)
+        sub.section_files += "/usr/bin/status\n"
+
+        self.inspection = "unicode"
+
+        # the result here is OK because the unicode inspection only works on SRPMs and
+        # if we don't have those it is a no-op inspection that returns OK
+        self.result = "OK"
+
+
+class UnicodeBadCSourceArchiveCompareKoji(TestCompareKoji):
+    def setUp(self):
+        super().setUp()
+
+        self.before_rpm.header += "\n%define debug_package %{nil}\n"
+        self.before_rpm.add_source(
+            rpmfluff.GeneratedTarball(
+                "%s-%s.tar.gz" % (BEFORE_NAME, BEFORE_VER),
+                "%s-%s" % (BEFORE_NAME, BEFORE_VER),
+                [
+                    rpmfluff.SourceFile("Makefile", makefile_src),
+                    rpmfluff.SourceFile("bad.c", bad_c_src),
+                    rpmfluff.SourceFile("status.sh", status_src),
+                ],
+            )
+        )
+        self.before_rpm.section_prep = "%setup\n"
+        self.before_rpm.section_build += "make\n"
+        self.before_rpm.section_install += "make install DESTDIR=%{buildroot}\n"
+        sub = self.before_rpm.get_subpackage(None)
+        sub.section_files += "/usr/bin/status\n"
+
+        self.after_rpm.header += "\n%define debug_package %{nil}\n"
+        self.after_rpm.add_source(
+            rpmfluff.GeneratedTarball(
+                "%s-%s.tar.gz" % (AFTER_NAME, AFTER_VER),
+                "%s-%s" % (AFTER_NAME, AFTER_VER),
+                [
+                    rpmfluff.SourceFile("Makefile", makefile_src),
+                    rpmfluff.SourceFile("bad.c", bad_c_src),
+                    rpmfluff.SourceFile("status.sh", status_src),
+                ],
+            )
+        )
+        self.after_rpm.section_prep = "%setup\n"
+        self.after_rpm.section_build += "make\n"
+        self.after_rpm.section_install += "make install DESTDIR=%{buildroot}\n"
+        sub = self.after_rpm.get_subpackage(None)
+        sub.section_files += "/usr/bin/status\n"
+
+        self.inspection = "unicode"
+        self.waiver_auth = "Security"
+        self.result = "BAD"
+
+
+# The following tests run the unicode inspection with a known bad source file
+# in the SRPM.  All of the results for these should be 'BAD' with a waiver
+# authorization of "Security" except for the jobs that lack any SRPM file.
+class UnicodeBadAsmSourceSRPM(TestSRPM):
+    def setUp(self):
+        super().setUp()
+
+        # this creates enough of a spec file to appease rpmbuild
+        self.rpm.add_installed_file(
+            "/usr/bin/status", rpmfluff.SourceFile("status.sh", status_src), mode=755
+        )
+
+        # drop our known bad source files directly in the SRPM
+        self.rpm.add_source(rpmfluff.SourceFile("bad.c", bad_c_src))
+
+        self.inspection = "unicode"
+        self.waiver_auth = "Security"
+        self.result = "BAD"
+
+
+class UnicodeBadAsmSourceRPMs(TestRPMs):
+    def setUp(self):
+        super().setUp()
+
+        # this creates enough of a spec file to appease rpmbuild
+        self.rpm.add_installed_file(
+            "/usr/bin/status", rpmfluff.SourceFile("status.sh", status_src), mode=755
+        )
+
+        # drop our known bad source files directly in the SRPM
+        self.rpm.add_source(rpmfluff.SourceFile("bad.c", bad_c_src))
+
+        self.inspection = "unicode"
+
+        # the result here is OK because the unicode inspection only works on SRPMs and
+        # if we don't have those it is a no-op inspection that returns OK
+        self.result = "OK"
+
+
+class UnicodeBadAsmSourceKoji(TestKoji):
+    def setUp(self):
+        super().setUp()
+
+        # this creates enough of a spec file to appease rpmbuild
+        self.rpm.add_installed_file(
+            "/usr/bin/status", rpmfluff.SourceFile("status.sh", status_src), mode=755
+        )
+
+        # drop our known bad source files directly in the SRPM
         self.rpm.add_source(rpmfluff.SourceFile("bad.s", bad_asm_src))
 
         self.inspection = "unicode"
@@ -419,7 +770,7 @@ class UnicodeBadSourceKoji(TestKoji):
         self.result = "BAD"
 
 
-class UnicodeBadSourceCompareSRPM(TestCompareSRPM):
+class UnicodeBadAsmSourceCompareSRPM(TestCompareSRPM):
     def setUp(self):
         super().setUp()
 
@@ -432,9 +783,7 @@ class UnicodeBadSourceCompareSRPM(TestCompareSRPM):
         )
 
         # drop our known bad source files directly in the SRPM
-        self.before_rpm.add_source(rpmfluff.SourceFile("bad.c", bad_c_src))
         self.before_rpm.add_source(rpmfluff.SourceFile("bad.s", bad_asm_src))
-        self.after_rpm.add_source(rpmfluff.SourceFile("bad.c", bad_c_src))
         self.after_rpm.add_source(rpmfluff.SourceFile("bad.s", bad_asm_src))
 
         self.inspection = "unicode"
@@ -442,7 +791,7 @@ class UnicodeBadSourceCompareSRPM(TestCompareSRPM):
         self.result = "BAD"
 
 
-class UnicodeBadSourceCompareRPMs(TestCompareRPMs):
+class UnicodeBadAsmSourceCompareRPMs(TestCompareRPMs):
     def setUp(self):
         super().setUp()
 
@@ -455,9 +804,7 @@ class UnicodeBadSourceCompareRPMs(TestCompareRPMs):
         )
 
         # drop our known bad source files directly in the SRPM
-        self.before_rpm.add_source(rpmfluff.SourceFile("bad.c", bad_c_src))
         self.before_rpm.add_source(rpmfluff.SourceFile("bad.s", bad_asm_src))
-        self.after_rpm.add_source(rpmfluff.SourceFile("bad.c", bad_c_src))
         self.after_rpm.add_source(rpmfluff.SourceFile("bad.s", bad_asm_src))
 
         self.inspection = "unicode"
@@ -467,7 +814,7 @@ class UnicodeBadSourceCompareRPMs(TestCompareRPMs):
         self.result = "OK"
 
 
-class UnicodeBadSourceCompareKoji(TestCompareKoji):
+class UnicodeBadAsmSourceCompareKoji(TestCompareKoji):
     def setUp(self):
         super().setUp()
 
@@ -480,9 +827,7 @@ class UnicodeBadSourceCompareKoji(TestCompareKoji):
         )
 
         # drop our known bad source files directly in the SRPM
-        self.before_rpm.add_source(rpmfluff.SourceFile("bad.c", bad_c_src))
         self.before_rpm.add_source(rpmfluff.SourceFile("bad.s", bad_asm_src))
-        self.after_rpm.add_source(rpmfluff.SourceFile("bad.c", bad_c_src))
         self.after_rpm.add_source(rpmfluff.SourceFile("bad.s", bad_asm_src))
 
         self.inspection = "unicode"
@@ -493,7 +838,7 @@ class UnicodeBadSourceCompareKoji(TestCompareKoji):
 # The following tests run the unicode inspection with known bad source
 # files in a tarball in the SRPM.  All of the results for these should be 'OK'
 # except for the jobs that lack any SRPM file.
-class UnicodeBadSourceArchiveSRPM(TestSRPM):
+class UnicodeBadAsmSourceArchiveSRPM(TestSRPM):
     def setUp(self):
         super().setUp()
 
@@ -504,7 +849,6 @@ class UnicodeBadSourceArchiveSRPM(TestSRPM):
                 "%s-%s" % (AFTER_NAME, AFTER_VER),
                 [
                     rpmfluff.SourceFile("Makefile", makefile_src),
-                    rpmfluff.SourceFile("bad.c", bad_c_src),
                     rpmfluff.SourceFile("bad.s", bad_asm_src),
                     rpmfluff.SourceFile("status.sh", status_src),
                 ],
@@ -521,7 +865,7 @@ class UnicodeBadSourceArchiveSRPM(TestSRPM):
         self.result = "BAD"
 
 
-class UnicodeBadSourceArchiveRPMs(TestRPMs):
+class UnicodeBadAsmSourceArchiveRPMs(TestRPMs):
     def setUp(self):
         super().setUp()
 
@@ -532,7 +876,6 @@ class UnicodeBadSourceArchiveRPMs(TestRPMs):
                 "%s-%s" % (AFTER_NAME, AFTER_VER),
                 [
                     rpmfluff.SourceFile("Makefile", makefile_src),
-                    rpmfluff.SourceFile("bad.c", bad_c_src),
                     rpmfluff.SourceFile("bad.s", bad_asm_src),
                     rpmfluff.SourceFile("status.sh", status_src),
                 ],
@@ -551,7 +894,7 @@ class UnicodeBadSourceArchiveRPMs(TestRPMs):
         self.result = "OK"
 
 
-class UnicodeBadSourceArchiveKoji(TestKoji):
+class UnicodeBadAsmSourceArchiveKoji(TestKoji):
     def setUp(self):
         super().setUp()
 
@@ -562,7 +905,6 @@ class UnicodeBadSourceArchiveKoji(TestKoji):
                 "%s-%s" % (AFTER_NAME, AFTER_VER),
                 [
                     rpmfluff.SourceFile("Makefile", makefile_src),
-                    rpmfluff.SourceFile("bad.c", bad_c_src),
                     rpmfluff.SourceFile("bad.s", bad_asm_src),
                     rpmfluff.SourceFile("status.sh", status_src),
                 ],
@@ -579,7 +921,7 @@ class UnicodeBadSourceArchiveKoji(TestKoji):
         self.result = "BAD"
 
 
-class UnicodeBadSourceArchiveCompareSRPM(TestCompareSRPM):
+class UnicodeBadAsmSourceArchiveCompareSRPM(TestCompareSRPM):
     def setUp(self):
         super().setUp()
 
@@ -590,7 +932,6 @@ class UnicodeBadSourceArchiveCompareSRPM(TestCompareSRPM):
                 "%s-%s" % (BEFORE_NAME, BEFORE_VER),
                 [
                     rpmfluff.SourceFile("Makefile", makefile_src),
-                    rpmfluff.SourceFile("bad.c", bad_c_src),
                     rpmfluff.SourceFile("bad.s", bad_asm_src),
                     rpmfluff.SourceFile("status.sh", status_src),
                 ],
@@ -609,7 +950,6 @@ class UnicodeBadSourceArchiveCompareSRPM(TestCompareSRPM):
                 "%s-%s" % (AFTER_NAME, AFTER_VER),
                 [
                     rpmfluff.SourceFile("Makefile", makefile_src),
-                    rpmfluff.SourceFile("bad.c", bad_c_src),
                     rpmfluff.SourceFile("bad.s", bad_asm_src),
                     rpmfluff.SourceFile("status.sh", status_src),
                 ],
@@ -626,7 +966,7 @@ class UnicodeBadSourceArchiveCompareSRPM(TestCompareSRPM):
         self.result = "BAD"
 
 
-class UnicodeBadSourceArchiveCompareRPMs(TestCompareRPMs):
+class UnicodeBadAsmSourceArchiveCompareRPMs(TestCompareRPMs):
     def setUp(self):
         super().setUp()
 
@@ -637,7 +977,6 @@ class UnicodeBadSourceArchiveCompareRPMs(TestCompareRPMs):
                 "%s-%s" % (BEFORE_NAME, BEFORE_VER),
                 [
                     rpmfluff.SourceFile("Makefile", makefile_src),
-                    rpmfluff.SourceFile("bad.c", bad_c_src),
                     rpmfluff.SourceFile("bad.s", bad_asm_src),
                     rpmfluff.SourceFile("status.sh", status_src),
                 ],
@@ -656,7 +995,6 @@ class UnicodeBadSourceArchiveCompareRPMs(TestCompareRPMs):
                 "%s-%s" % (AFTER_NAME, AFTER_VER),
                 [
                     rpmfluff.SourceFile("Makefile", makefile_src),
-                    rpmfluff.SourceFile("bad.c", bad_c_src),
                     rpmfluff.SourceFile("bad.s", bad_asm_src),
                     rpmfluff.SourceFile("status.sh", status_src),
                 ],
@@ -675,7 +1013,7 @@ class UnicodeBadSourceArchiveCompareRPMs(TestCompareRPMs):
         self.result = "OK"
 
 
-class UnicodeBadSourceArchiveCompareKoji(TestCompareKoji):
+class UnicodeBadAsmSourceArchiveCompareKoji(TestCompareKoji):
     def setUp(self):
         super().setUp()
 
@@ -686,7 +1024,6 @@ class UnicodeBadSourceArchiveCompareKoji(TestCompareKoji):
                 "%s-%s" % (BEFORE_NAME, BEFORE_VER),
                 [
                     rpmfluff.SourceFile("Makefile", makefile_src),
-                    rpmfluff.SourceFile("bad.c", bad_c_src),
                     rpmfluff.SourceFile("bad.s", bad_asm_src),
                     rpmfluff.SourceFile("status.sh", status_src),
                 ],
@@ -705,8 +1042,1051 @@ class UnicodeBadSourceArchiveCompareKoji(TestCompareKoji):
                 "%s-%s" % (AFTER_NAME, AFTER_VER),
                 [
                     rpmfluff.SourceFile("Makefile", makefile_src),
-                    rpmfluff.SourceFile("bad.c", bad_c_src),
                     rpmfluff.SourceFile("bad.s", bad_asm_src),
+                    rpmfluff.SourceFile("status.sh", status_src),
+                ],
+            )
+        )
+        self.after_rpm.section_prep = "%setup\n"
+        self.after_rpm.section_build += "make\n"
+        self.after_rpm.section_install += "make install DESTDIR=%{buildroot}\n"
+        sub = self.after_rpm.get_subpackage(None)
+        sub.section_files += "/usr/bin/status\n"
+
+        self.inspection = "unicode"
+        self.waiver_auth = "Security"
+        self.result = "BAD"
+
+
+# The following tests run the unicode inspection with a known bad source file
+# in the SRPM.  All of the results for these should be 'BAD' with a waiver
+# authorization of "Security" except for the jobs that lack any SRPM file.
+class UnicodeBadCommentingOutSourceSRPM(TestSRPM):
+    def setUp(self):
+        super().setUp()
+
+        # this creates enough of a spec file to appease rpmbuild
+        self.rpm.add_installed_file(
+            "/usr/bin/status", rpmfluff.SourceFile("status.sh", status_src), mode=755
+        )
+
+        # drop our known bad source files directly in the SRPM
+        self.rpm.add_source(rpmfluff.SourceFile("bad.c", bad_c_src))
+
+        self.inspection = "unicode"
+        self.waiver_auth = "Security"
+        self.result = "BAD"
+
+
+class UnicodeBadCommentingOutSourceRPMs(TestRPMs):
+    def setUp(self):
+        super().setUp()
+
+        # this creates enough of a spec file to appease rpmbuild
+        self.rpm.add_installed_file(
+            "/usr/bin/status", rpmfluff.SourceFile("status.sh", status_src), mode=755
+        )
+
+        # drop our known bad source files directly in the SRPM
+        self.rpm.add_source(rpmfluff.SourceFile("bad.c", bad_c_src))
+
+        self.inspection = "unicode"
+
+        # the result here is OK because the unicode inspection only works on SRPMs and
+        # if we don't have those it is a no-op inspection that returns OK
+        self.result = "OK"
+
+
+class UnicodeBadCommentingOutSourceKoji(TestKoji):
+    def setUp(self):
+        super().setUp()
+
+        # this creates enough of a spec file to appease rpmbuild
+        self.rpm.add_installed_file(
+            "/usr/bin/status", rpmfluff.SourceFile("status.sh", status_src), mode=755
+        )
+
+        # drop our known bad source files directly in the SRPM
+        self.rpm.add_source(rpmfluff.SourceFile("bad.c", commenting_out_new_src))
+
+        self.inspection = "unicode"
+        self.waiver_auth = "Security"
+        self.result = "BAD"
+
+
+class UnicodeBadCommentingOutSourceCompareSRPM(TestCompareSRPM):
+    def setUp(self):
+        super().setUp()
+
+        # this creates enough of a spec file to appease rpmbuild
+        self.before_rpm.add_installed_file(
+            "/usr/bin/status", rpmfluff.SourceFile("status.sh", status_src), mode=755
+        )
+        self.after_rpm.add_installed_file(
+            "/usr/bin/status", rpmfluff.SourceFile("status.sh", status_src), mode=755
+        )
+
+        # drop our known bad source files directly in the SRPM
+        self.before_rpm.add_source(rpmfluff.SourceFile("bad.c", commenting_out_new_src))
+        self.after_rpm.add_source(rpmfluff.SourceFile("bad.c", commenting_out_new_src))
+
+        self.inspection = "unicode"
+        self.waiver_auth = "Security"
+        self.result = "BAD"
+
+
+class UnicodeBadCommentingOutSourceCompareRPMs(TestCompareRPMs):
+    def setUp(self):
+        super().setUp()
+
+        # this creates enough of a spec file to appease rpmbuild
+        self.before_rpm.add_installed_file(
+            "/usr/bin/status", rpmfluff.SourceFile("status.sh", status_src), mode=755
+        )
+        self.after_rpm.add_installed_file(
+            "/usr/bin/status", rpmfluff.SourceFile("status.sh", status_src), mode=755
+        )
+
+        # drop our known bad source files directly in the SRPM
+        self.before_rpm.add_source(rpmfluff.SourceFile("bad.c", commenting_out_new_src))
+        self.after_rpm.add_source(rpmfluff.SourceFile("bad.c", commenting_out_new_src))
+
+        self.inspection = "unicode"
+
+        # the result here is OK because the unicode inspection only works on SRPMs and
+        # if we don't have those it is a no-op inspection that returns OK
+        self.result = "OK"
+
+
+class UnicodeBadCommentingOutSourceCompareKoji(TestCompareKoji):
+    def setUp(self):
+        super().setUp()
+
+        # this creates enough of a spec file to appease rpmbuild
+        self.before_rpm.add_installed_file(
+            "/usr/bin/status", rpmfluff.SourceFile("status.sh", status_src), mode=755
+        )
+        self.after_rpm.add_installed_file(
+            "/usr/bin/status", rpmfluff.SourceFile("status.sh", status_src), mode=755
+        )
+
+        # drop our known bad source files directly in the SRPM
+        self.before_rpm.add_source(rpmfluff.SourceFile("bad.c", commenting_out_new_src))
+        self.after_rpm.add_source(rpmfluff.SourceFile("bad.c", commenting_out_new_src))
+
+        self.inspection = "unicode"
+        self.waiver_auth = "Security"
+        self.result = "BAD"
+
+
+# The following tests run the unicode inspection with known bad source
+# files in a tarball in the SRPM.  All of the results for these should be 'OK'
+# except for the jobs that lack any SRPM file.
+class UnicodeBadCommentingOutSourceArchiveSRPM(TestSRPM):
+    def setUp(self):
+        super().setUp()
+
+        self.rpm.header += "\n%define debug_package %{nil}\n"
+        self.rpm.add_source(
+            rpmfluff.GeneratedTarball(
+                "%s-%s.tar.gz" % (AFTER_NAME, AFTER_VER),
+                "%s-%s" % (AFTER_NAME, AFTER_VER),
+                [
+                    rpmfluff.SourceFile("Makefile", makefile_src),
+                    rpmfluff.SourceFile("bad.c", commenting_out_new_src),
+                    rpmfluff.SourceFile("status.sh", status_src),
+                ],
+            )
+        )
+        self.rpm.section_prep = "%setup\n"
+        self.rpm.section_build += "make\n"
+        self.rpm.section_install += "make install DESTDIR=%{buildroot}\n"
+        sub = self.rpm.get_subpackage(None)
+        sub.section_files += "/usr/bin/status\n"
+
+        self.inspection = "unicode"
+        self.waiver_auth = "Security"
+        self.result = "BAD"
+
+
+class UnicodeBadCommentingOutSourceArchiveRPMs(TestRPMs):
+    def setUp(self):
+        super().setUp()
+
+        self.rpm.header += "\n%define debug_package %{nil}\n"
+        self.rpm.add_source(
+            rpmfluff.GeneratedTarball(
+                "%s-%s.tar.gz" % (AFTER_NAME, AFTER_VER),
+                "%s-%s" % (AFTER_NAME, AFTER_VER),
+                [
+                    rpmfluff.SourceFile("Makefile", makefile_src),
+                    rpmfluff.SourceFile("bad.c", commenting_out_new_src),
+                    rpmfluff.SourceFile("status.sh", status_src),
+                ],
+            )
+        )
+        self.rpm.section_prep = "%setup\n"
+        self.rpm.section_build += "make\n"
+        self.rpm.section_install += "make install DESTDIR=%{buildroot}\n"
+        sub = self.rpm.get_subpackage(None)
+        sub.section_files += "/usr/bin/status\n"
+
+        self.inspection = "unicode"
+
+        # the result here is OK because the unicode inspection only works on SRPMs and
+        # if we don't have those it is a no-op inspection that returns OK
+        self.result = "OK"
+
+
+class UnicodeBadCommentingOutSourceArchiveKoji(TestKoji):
+    def setUp(self):
+        super().setUp()
+
+        self.rpm.header += "\n%define debug_package %{nil}\n"
+        self.rpm.add_source(
+            rpmfluff.GeneratedTarball(
+                "%s-%s.tar.gz" % (AFTER_NAME, AFTER_VER),
+                "%s-%s" % (AFTER_NAME, AFTER_VER),
+                [
+                    rpmfluff.SourceFile("Makefile", makefile_src),
+                    rpmfluff.SourceFile("bad.c", commenting_out_new_src),
+                    rpmfluff.SourceFile("status.sh", status_src),
+                ],
+            )
+        )
+        self.rpm.section_prep = "%setup\n"
+        self.rpm.section_build += "make\n"
+        self.rpm.section_install += "make install DESTDIR=%{buildroot}\n"
+        sub = self.rpm.get_subpackage(None)
+        sub.section_files += "/usr/bin/status\n"
+
+        self.inspection = "unicode"
+        self.waiver_auth = "Security"
+        self.result = "BAD"
+
+
+class UnicodeBadCommentingOutSourceArchiveCompareSRPM(TestCompareSRPM):
+    def setUp(self):
+        super().setUp()
+
+        self.before_rpm.header += "\n%define debug_package %{nil}\n"
+        self.before_rpm.add_source(
+            rpmfluff.GeneratedTarball(
+                "%s-%s.tar.gz" % (BEFORE_NAME, BEFORE_VER),
+                "%s-%s" % (BEFORE_NAME, BEFORE_VER),
+                [
+                    rpmfluff.SourceFile("Makefile", makefile_src),
+                    rpmfluff.SourceFile("bad.c", commenting_out_new_src),
+                    rpmfluff.SourceFile("status.sh", status_src),
+                ],
+            )
+        )
+        self.before_rpm.section_prep = "%setup\n"
+        self.before_rpm.section_build += "make\n"
+        self.before_rpm.section_install += "make install DESTDIR=%{buildroot}\n"
+        sub = self.before_rpm.get_subpackage(None)
+        sub.section_files += "/usr/bin/status\n"
+
+        self.after_rpm.header += "\n%define debug_package %{nil}\n"
+        self.after_rpm.add_source(
+            rpmfluff.GeneratedTarball(
+                "%s-%s.tar.gz" % (AFTER_NAME, AFTER_VER),
+                "%s-%s" % (AFTER_NAME, AFTER_VER),
+                [
+                    rpmfluff.SourceFile("Makefile", makefile_src),
+                    rpmfluff.SourceFile("bad.c", commenting_out_new_src),
+                    rpmfluff.SourceFile("status.sh", status_src),
+                ],
+            )
+        )
+        self.after_rpm.section_prep = "%setup\n"
+        self.after_rpm.section_build += "make\n"
+        self.after_rpm.section_install += "make install DESTDIR=%{buildroot}\n"
+        sub = self.after_rpm.get_subpackage(None)
+        sub.section_files += "/usr/bin/status\n"
+
+        self.inspection = "unicode"
+        self.waiver_auth = "Security"
+        self.result = "BAD"
+
+
+class UnicodeBadCommentingOutSourceArchiveCompareRPMs(TestCompareRPMs):
+    def setUp(self):
+        super().setUp()
+
+        self.before_rpm.header += "\n%define debug_package %{nil}\n"
+        self.before_rpm.add_source(
+            rpmfluff.GeneratedTarball(
+                "%s-%s.tar.gz" % (BEFORE_NAME, BEFORE_VER),
+                "%s-%s" % (BEFORE_NAME, BEFORE_VER),
+                [
+                    rpmfluff.SourceFile("Makefile", makefile_src),
+                    rpmfluff.SourceFile("bad.c", commenting_out_new_src),
+                    rpmfluff.SourceFile("status.sh", status_src),
+                ],
+            )
+        )
+        self.before_rpm.section_prep = "%setup\n"
+        self.before_rpm.section_build += "make\n"
+        self.before_rpm.section_install += "make install DESTDIR=%{buildroot}\n"
+        sub = self.before_rpm.get_subpackage(None)
+        sub.section_files += "/usr/bin/status\n"
+
+        self.after_rpm.header += "\n%define debug_package %{nil}\n"
+        self.after_rpm.add_source(
+            rpmfluff.GeneratedTarball(
+                "%s-%s.tar.gz" % (AFTER_NAME, AFTER_VER),
+                "%s-%s" % (AFTER_NAME, AFTER_VER),
+                [
+                    rpmfluff.SourceFile("Makefile", makefile_src),
+                    rpmfluff.SourceFile("bad.c", commenting_out_new_src),
+                    rpmfluff.SourceFile("status.sh", status_src),
+                ],
+            )
+        )
+        self.after_rpm.section_prep = "%setup\n"
+        self.after_rpm.section_build += "make\n"
+        self.after_rpm.section_install += "make install DESTDIR=%{buildroot}\n"
+        sub = self.after_rpm.get_subpackage(None)
+        sub.section_files += "/usr/bin/status\n"
+
+        self.inspection = "unicode"
+
+        # the result here is OK because the unicode inspection only works on SRPMs and
+        # if we don't have those it is a no-op inspection that returns OK
+        self.result = "OK"
+
+
+class UnicodeBadCommentingOutSourceArchiveCompareKoji(TestCompareKoji):
+    def setUp(self):
+        super().setUp()
+
+        self.before_rpm.header += "\n%define debug_package %{nil}\n"
+        self.before_rpm.add_source(
+            rpmfluff.GeneratedTarball(
+                "%s-%s.tar.gz" % (BEFORE_NAME, BEFORE_VER),
+                "%s-%s" % (BEFORE_NAME, BEFORE_VER),
+                [
+                    rpmfluff.SourceFile("Makefile", makefile_src),
+                    rpmfluff.SourceFile("bad.c", commenting_out_new_src),
+                    rpmfluff.SourceFile("status.sh", status_src),
+                ],
+            )
+        )
+        self.before_rpm.section_prep = "%setup\n"
+        self.before_rpm.section_build += "make\n"
+        self.before_rpm.section_install += "make install DESTDIR=%{buildroot}\n"
+        sub = self.before_rpm.get_subpackage(None)
+        sub.section_files += "/usr/bin/status\n"
+
+        self.after_rpm.header += "\n%define debug_package %{nil}\n"
+        self.after_rpm.add_source(
+            rpmfluff.GeneratedTarball(
+                "%s-%s.tar.gz" % (AFTER_NAME, AFTER_VER),
+                "%s-%s" % (AFTER_NAME, AFTER_VER),
+                [
+                    rpmfluff.SourceFile("Makefile", makefile_src),
+                    rpmfluff.SourceFile("bad.c", commenting_out_new_src),
+                    rpmfluff.SourceFile("status.sh", status_src),
+                ],
+            )
+        )
+        self.after_rpm.section_prep = "%setup\n"
+        self.after_rpm.section_build += "make\n"
+        self.after_rpm.section_install += "make install DESTDIR=%{buildroot}\n"
+        sub = self.after_rpm.get_subpackage(None)
+        sub.section_files += "/usr/bin/status\n"
+
+        self.inspection = "unicode"
+        self.waiver_auth = "Security"
+        self.result = "BAD"
+
+
+# The following tests run the unicode inspection with a known bad source file
+# in the SRPM.  All of the results for these should be 'BAD' with a waiver
+# authorization of "Security" except for the jobs that lack any SRPM file.
+class UnicodeBadEarlyReturnSourceSRPM(TestSRPM):
+    def setUp(self):
+        super().setUp()
+
+        # this creates enough of a spec file to appease rpmbuild
+        self.rpm.add_installed_file(
+            "/usr/bin/status", rpmfluff.SourceFile("status.sh", status_src), mode=755
+        )
+
+        # drop our known bad source files directly in the SRPM
+        self.rpm.add_source(rpmfluff.SourceFile("bad.c", early_return_new_src))
+
+        self.inspection = "unicode"
+        self.waiver_auth = "Security"
+        self.result = "BAD"
+
+
+class UnicodeBadEarlyReturnSourceRPMs(TestRPMs):
+    def setUp(self):
+        super().setUp()
+
+        # this creates enough of a spec file to appease rpmbuild
+        self.rpm.add_installed_file(
+            "/usr/bin/status", rpmfluff.SourceFile("status.sh", status_src), mode=755
+        )
+
+        # drop our known bad source files directly in the SRPM
+        self.rpm.add_source(rpmfluff.SourceFile("bad.c", early_return_new_src))
+
+        self.inspection = "unicode"
+
+        # the result here is OK because the unicode inspection only works on SRPMs and
+        # if we don't have those it is a no-op inspection that returns OK
+        self.result = "OK"
+
+
+class UnicodeBadEarlyReturnSourceKoji(TestKoji):
+    def setUp(self):
+        super().setUp()
+
+        # this creates enough of a spec file to appease rpmbuild
+        self.rpm.add_installed_file(
+            "/usr/bin/status", rpmfluff.SourceFile("status.sh", status_src), mode=755
+        )
+
+        # drop our known bad source files directly in the SRPM
+        self.rpm.add_source(rpmfluff.SourceFile("bad.c", early_return_new_src))
+
+        self.inspection = "unicode"
+        self.waiver_auth = "Security"
+        self.result = "BAD"
+
+
+class UnicodeBadEarlyReturnSourceCompareSRPM(TestCompareSRPM):
+    def setUp(self):
+        super().setUp()
+
+        # this creates enough of a spec file to appease rpmbuild
+        self.before_rpm.add_installed_file(
+            "/usr/bin/status", rpmfluff.SourceFile("status.sh", status_src), mode=755
+        )
+        self.after_rpm.add_installed_file(
+            "/usr/bin/status", rpmfluff.SourceFile("status.sh", status_src), mode=755
+        )
+
+        # drop our known bad source files directly in the SRPM
+        self.before_rpm.add_source(rpmfluff.SourceFile("bad.c", early_return_new_src))
+        self.after_rpm.add_source(rpmfluff.SourceFile("bad.c", early_return_new_src))
+
+        self.inspection = "unicode"
+        self.waiver_auth = "Security"
+        self.result = "BAD"
+
+
+class UnicodeBadEarlyReturnSourceCompareRPMs(TestCompareRPMs):
+    def setUp(self):
+        super().setUp()
+
+        # this creates enough of a spec file to appease rpmbuild
+        self.before_rpm.add_installed_file(
+            "/usr/bin/status", rpmfluff.SourceFile("status.sh", status_src), mode=755
+        )
+        self.after_rpm.add_installed_file(
+            "/usr/bin/status", rpmfluff.SourceFile("status.sh", status_src), mode=755
+        )
+
+        # drop our known bad source files directly in the SRPM
+        self.before_rpm.add_source(rpmfluff.SourceFile("bad.c", early_return_new_src))
+        self.after_rpm.add_source(rpmfluff.SourceFile("bad.c", early_return_new_src))
+
+        self.inspection = "unicode"
+
+        # the result here is OK because the unicode inspection only works on SRPMs and
+        # if we don't have those it is a no-op inspection that returns OK
+        self.result = "OK"
+
+
+class UnicodeBadEarlyReturnSourceCompareKoji(TestCompareKoji):
+    def setUp(self):
+        super().setUp()
+
+        # this creates enough of a spec file to appease rpmbuild
+        self.before_rpm.add_installed_file(
+            "/usr/bin/status", rpmfluff.SourceFile("status.sh", status_src), mode=755
+        )
+        self.after_rpm.add_installed_file(
+            "/usr/bin/status", rpmfluff.SourceFile("status.sh", status_src), mode=755
+        )
+
+        # drop our known bad source files directly in the SRPM
+        self.before_rpm.add_source(rpmfluff.SourceFile("bad.c", early_return_new_src))
+        self.after_rpm.add_source(rpmfluff.SourceFile("bad.c", early_return_new_src))
+
+        self.inspection = "unicode"
+        self.waiver_auth = "Security"
+        self.result = "BAD"
+
+
+# The following tests run the unicode inspection with known bad source
+# files in a tarball in the SRPM.  All of the results for these should be 'OK'
+# except for the jobs that lack any SRPM file.
+class UnicodeBadEarlyReturnSourceArchiveSRPM(TestSRPM):
+    def setUp(self):
+        super().setUp()
+
+        self.rpm.header += "\n%define debug_package %{nil}\n"
+        self.rpm.add_source(
+            rpmfluff.GeneratedTarball(
+                "%s-%s.tar.gz" % (AFTER_NAME, AFTER_VER),
+                "%s-%s" % (AFTER_NAME, AFTER_VER),
+                [
+                    rpmfluff.SourceFile("Makefile", makefile_src),
+                    rpmfluff.SourceFile("bad.c", early_return_new_src),
+                    rpmfluff.SourceFile("status.sh", status_src),
+                ],
+            )
+        )
+        self.rpm.section_prep = "%setup\n"
+        self.rpm.section_build += "make\n"
+        self.rpm.section_install += "make install DESTDIR=%{buildroot}\n"
+        sub = self.rpm.get_subpackage(None)
+        sub.section_files += "/usr/bin/status\n"
+
+        self.inspection = "unicode"
+        self.waiver_auth = "Security"
+        self.result = "BAD"
+
+
+class UnicodeBadEarlyReturnSourceArchiveRPMs(TestRPMs):
+    def setUp(self):
+        super().setUp()
+
+        self.rpm.header += "\n%define debug_package %{nil}\n"
+        self.rpm.add_source(
+            rpmfluff.GeneratedTarball(
+                "%s-%s.tar.gz" % (AFTER_NAME, AFTER_VER),
+                "%s-%s" % (AFTER_NAME, AFTER_VER),
+                [
+                    rpmfluff.SourceFile("Makefile", makefile_src),
+                    rpmfluff.SourceFile("bad.c", early_return_new_src),
+                    rpmfluff.SourceFile("status.sh", status_src),
+                ],
+            )
+        )
+        self.rpm.section_prep = "%setup\n"
+        self.rpm.section_build += "make\n"
+        self.rpm.section_install += "make install DESTDIR=%{buildroot}\n"
+        sub = self.rpm.get_subpackage(None)
+        sub.section_files += "/usr/bin/status\n"
+
+        self.inspection = "unicode"
+
+        # the result here is OK because the unicode inspection only works on SRPMs and
+        # if we don't have those it is a no-op inspection that returns OK
+        self.result = "OK"
+
+
+class UnicodeBadEarlyReturnSourceArchiveKoji(TestKoji):
+    def setUp(self):
+        super().setUp()
+
+        self.rpm.header += "\n%define debug_package %{nil}\n"
+        self.rpm.add_source(
+            rpmfluff.GeneratedTarball(
+                "%s-%s.tar.gz" % (AFTER_NAME, AFTER_VER),
+                "%s-%s" % (AFTER_NAME, AFTER_VER),
+                [
+                    rpmfluff.SourceFile("Makefile", makefile_src),
+                    rpmfluff.SourceFile("bad.c", early_return_new_src),
+                    rpmfluff.SourceFile("status.sh", status_src),
+                ],
+            )
+        )
+        self.rpm.section_prep = "%setup\n"
+        self.rpm.section_build += "make\n"
+        self.rpm.section_install += "make install DESTDIR=%{buildroot}\n"
+        sub = self.rpm.get_subpackage(None)
+        sub.section_files += "/usr/bin/status\n"
+
+        self.inspection = "unicode"
+        self.waiver_auth = "Security"
+        self.result = "BAD"
+
+
+class UnicodeBadEarlyReturnSourceArchiveCompareSRPM(TestCompareSRPM):
+    def setUp(self):
+        super().setUp()
+
+        self.before_rpm.header += "\n%define debug_package %{nil}\n"
+        self.before_rpm.add_source(
+            rpmfluff.GeneratedTarball(
+                "%s-%s.tar.gz" % (BEFORE_NAME, BEFORE_VER),
+                "%s-%s" % (BEFORE_NAME, BEFORE_VER),
+                [
+                    rpmfluff.SourceFile("Makefile", makefile_src),
+                    rpmfluff.SourceFile("bad.c", early_return_new_src),
+                    rpmfluff.SourceFile("status.sh", status_src),
+                ],
+            )
+        )
+        self.before_rpm.section_prep = "%setup\n"
+        self.before_rpm.section_build += "make\n"
+        self.before_rpm.section_install += "make install DESTDIR=%{buildroot}\n"
+        sub = self.before_rpm.get_subpackage(None)
+        sub.section_files += "/usr/bin/status\n"
+
+        self.after_rpm.header += "\n%define debug_package %{nil}\n"
+        self.after_rpm.add_source(
+            rpmfluff.GeneratedTarball(
+                "%s-%s.tar.gz" % (AFTER_NAME, AFTER_VER),
+                "%s-%s" % (AFTER_NAME, AFTER_VER),
+                [
+                    rpmfluff.SourceFile("Makefile", makefile_src),
+                    rpmfluff.SourceFile("bad.c", early_return_new_src),
+                    rpmfluff.SourceFile("status.sh", status_src),
+                ],
+            )
+        )
+        self.after_rpm.section_prep = "%setup\n"
+        self.after_rpm.section_build += "make\n"
+        self.after_rpm.section_install += "make install DESTDIR=%{buildroot}\n"
+        sub = self.after_rpm.get_subpackage(None)
+        sub.section_files += "/usr/bin/status\n"
+
+        self.inspection = "unicode"
+        self.waiver_auth = "Security"
+        self.result = "BAD"
+
+
+class UnicodeBadEarlyReturnSourceArchiveCompareRPMs(TestCompareRPMs):
+    def setUp(self):
+        super().setUp()
+
+        self.before_rpm.header += "\n%define debug_package %{nil}\n"
+        self.before_rpm.add_source(
+            rpmfluff.GeneratedTarball(
+                "%s-%s.tar.gz" % (BEFORE_NAME, BEFORE_VER),
+                "%s-%s" % (BEFORE_NAME, BEFORE_VER),
+                [
+                    rpmfluff.SourceFile("Makefile", makefile_src),
+                    rpmfluff.SourceFile("bad.c", early_return_new_src),
+                    rpmfluff.SourceFile("status.sh", status_src),
+                ],
+            )
+        )
+        self.before_rpm.section_prep = "%setup\n"
+        self.before_rpm.section_build += "make\n"
+        self.before_rpm.section_install += "make install DESTDIR=%{buildroot}\n"
+        sub = self.before_rpm.get_subpackage(None)
+        sub.section_files += "/usr/bin/status\n"
+
+        self.after_rpm.header += "\n%define debug_package %{nil}\n"
+        self.after_rpm.add_source(
+            rpmfluff.GeneratedTarball(
+                "%s-%s.tar.gz" % (AFTER_NAME, AFTER_VER),
+                "%s-%s" % (AFTER_NAME, AFTER_VER),
+                [
+                    rpmfluff.SourceFile("Makefile", makefile_src),
+                    rpmfluff.SourceFile("bad.c", early_return_new_src),
+                    rpmfluff.SourceFile("status.sh", status_src),
+                ],
+            )
+        )
+        self.after_rpm.section_prep = "%setup\n"
+        self.after_rpm.section_build += "make\n"
+        self.after_rpm.section_install += "make install DESTDIR=%{buildroot}\n"
+        sub = self.after_rpm.get_subpackage(None)
+        sub.section_files += "/usr/bin/status\n"
+
+        self.inspection = "unicode"
+
+        # the result here is OK because the unicode inspection only works on SRPMs and
+        # if we don't have those it is a no-op inspection that returns OK
+        self.result = "OK"
+
+
+class UnicodeBadEarlyReturnSourceArchiveCompareKoji(TestCompareKoji):
+    def setUp(self):
+        super().setUp()
+
+        self.before_rpm.header += "\n%define debug_package %{nil}\n"
+        self.before_rpm.add_source(
+            rpmfluff.GeneratedTarball(
+                "%s-%s.tar.gz" % (BEFORE_NAME, BEFORE_VER),
+                "%s-%s" % (BEFORE_NAME, BEFORE_VER),
+                [
+                    rpmfluff.SourceFile("Makefile", makefile_src),
+                    rpmfluff.SourceFile("bad.c", early_return_new_src),
+                    rpmfluff.SourceFile("status.sh", status_src),
+                ],
+            )
+        )
+        self.before_rpm.section_prep = "%setup\n"
+        self.before_rpm.section_build += "make\n"
+        self.before_rpm.section_install += "make install DESTDIR=%{buildroot}\n"
+        sub = self.before_rpm.get_subpackage(None)
+        sub.section_files += "/usr/bin/status\n"
+
+        self.after_rpm.header += "\n%define debug_package %{nil}\n"
+        self.after_rpm.add_source(
+            rpmfluff.GeneratedTarball(
+                "%s-%s.tar.gz" % (AFTER_NAME, AFTER_VER),
+                "%s-%s" % (AFTER_NAME, AFTER_VER),
+                [
+                    rpmfluff.SourceFile("Makefile", makefile_src),
+                    rpmfluff.SourceFile("bad.c", early_return_new_src),
+                    rpmfluff.SourceFile("status.sh", status_src),
+                ],
+            )
+        )
+        self.after_rpm.section_prep = "%setup\n"
+        self.after_rpm.section_build += "make\n"
+        self.after_rpm.section_install += "make install DESTDIR=%{buildroot}\n"
+        sub = self.after_rpm.get_subpackage(None)
+        sub.section_files += "/usr/bin/status\n"
+
+        self.inspection = "unicode"
+        self.waiver_auth = "Security"
+        self.result = "BAD"
+
+
+# The following tests run the unicode inspection with a known bad source file
+# in the SRPM.  All of the results for these should be 'BAD' with a waiver
+# authorization of "Security" except for the jobs that lack any SRPM file.
+class UnicodeBadStretchStringSourceSRPM(TestSRPM):
+    def setUp(self):
+        super().setUp()
+
+        # this creates enough of a spec file to appease rpmbuild
+        self.rpm.add_installed_file(
+            "/usr/bin/status", rpmfluff.SourceFile("status.sh", status_src), mode=755
+        )
+
+        # drop our known bad source files directly in the SRPM
+        self.rpm.add_source(rpmfluff.SourceFile("bad.c", stretched_string_new_src))
+
+        self.inspection = "unicode"
+        self.waiver_auth = "Security"
+        self.result = "BAD"
+
+
+class UnicodeBadStretchStringSourceRPMs(TestRPMs):
+    def setUp(self):
+        super().setUp()
+
+        # this creates enough of a spec file to appease rpmbuild
+        self.rpm.add_installed_file(
+            "/usr/bin/status", rpmfluff.SourceFile("status.sh", status_src), mode=755
+        )
+
+        # drop our known bad source files directly in the SRPM
+        self.rpm.add_source(rpmfluff.SourceFile("bad.c", stretched_string_new_src))
+
+        self.inspection = "unicode"
+
+        # the result here is OK because the unicode inspection only works on SRPMs and
+        # if we don't have those it is a no-op inspection that returns OK
+        self.result = "OK"
+
+
+class UnicodeBadStretchStringSourceKoji(TestKoji):
+    def setUp(self):
+        super().setUp()
+
+        # this creates enough of a spec file to appease rpmbuild
+        self.rpm.add_installed_file(
+            "/usr/bin/status", rpmfluff.SourceFile("status.sh", status_src), mode=755
+        )
+
+        # drop our known bad source files directly in the SRPM
+        self.rpm.add_source(rpmfluff.SourceFile("bad.c", stretched_string_new_src))
+
+        self.inspection = "unicode"
+        self.waiver_auth = "Security"
+        self.result = "BAD"
+
+
+class UnicodeBadStretchStringSourceCompareSRPM(TestCompareSRPM):
+    def setUp(self):
+        super().setUp()
+
+        # this creates enough of a spec file to appease rpmbuild
+        self.before_rpm.add_installed_file(
+            "/usr/bin/status", rpmfluff.SourceFile("status.sh", status_src), mode=755
+        )
+        self.after_rpm.add_installed_file(
+            "/usr/bin/status", rpmfluff.SourceFile("status.sh", status_src), mode=755
+        )
+
+        # drop our known bad source files directly in the SRPM
+        self.before_rpm.add_source(
+            rpmfluff.SourceFile("bad.c", stretched_string_new_src)
+        )
+        self.after_rpm.add_source(
+            rpmfluff.SourceFile("bad.c", stretched_string_new_src)
+        )
+
+        self.inspection = "unicode"
+        self.waiver_auth = "Security"
+        self.result = "BAD"
+
+
+class UnicodeBadStretchStringSourceCompareRPMs(TestCompareRPMs):
+    def setUp(self):
+        super().setUp()
+
+        # this creates enough of a spec file to appease rpmbuild
+        self.before_rpm.add_installed_file(
+            "/usr/bin/status", rpmfluff.SourceFile("status.sh", status_src), mode=755
+        )
+        self.after_rpm.add_installed_file(
+            "/usr/bin/status", rpmfluff.SourceFile("status.sh", status_src), mode=755
+        )
+
+        # drop our known bad source files directly in the SRPM
+        self.before_rpm.add_source(
+            rpmfluff.SourceFile("bad.c", stretched_string_new_src)
+        )
+        self.after_rpm.add_source(
+            rpmfluff.SourceFile("bad.c", stretched_string_new_src)
+        )
+
+        self.inspection = "unicode"
+
+        # the result here is OK because the unicode inspection only works on SRPMs and
+        # if we don't have those it is a no-op inspection that returns OK
+        self.result = "OK"
+
+
+class UnicodeBadStretchStringSourceCompareKoji(TestCompareKoji):
+    def setUp(self):
+        super().setUp()
+
+        # this creates enough of a spec file to appease rpmbuild
+        self.before_rpm.add_installed_file(
+            "/usr/bin/status", rpmfluff.SourceFile("status.sh", status_src), mode=755
+        )
+        self.after_rpm.add_installed_file(
+            "/usr/bin/status", rpmfluff.SourceFile("status.sh", status_src), mode=755
+        )
+
+        # drop our known bad source files directly in the SRPM
+        self.before_rpm.add_source(
+            rpmfluff.SourceFile("bad.c", stretched_string_new_src)
+        )
+        self.after_rpm.add_source(
+            rpmfluff.SourceFile("bad.c", stretched_string_new_src)
+        )
+
+        self.inspection = "unicode"
+        self.waiver_auth = "Security"
+        self.result = "BAD"
+
+
+# The following tests run the unicode inspection with known bad source
+# files in a tarball in the SRPM.  All of the results for these should be 'OK'
+# except for the jobs that lack any SRPM file.
+class UnicodeBadStretchStringSourceArchiveSRPM(TestSRPM):
+    def setUp(self):
+        super().setUp()
+
+        self.rpm.header += "\n%define debug_package %{nil}\n"
+        self.rpm.add_source(
+            rpmfluff.GeneratedTarball(
+                "%s-%s.tar.gz" % (AFTER_NAME, AFTER_VER),
+                "%s-%s" % (AFTER_NAME, AFTER_VER),
+                [
+                    rpmfluff.SourceFile("Makefile", makefile_src),
+                    rpmfluff.SourceFile("bad.c", stretched_string_new_src),
+                    rpmfluff.SourceFile("status.sh", status_src),
+                ],
+            )
+        )
+        self.rpm.section_prep = "%setup\n"
+        self.rpm.section_build += "make\n"
+        self.rpm.section_install += "make install DESTDIR=%{buildroot}\n"
+        sub = self.rpm.get_subpackage(None)
+        sub.section_files += "/usr/bin/status\n"
+
+        self.inspection = "unicode"
+        self.waiver_auth = "Security"
+        self.result = "BAD"
+
+
+class UnicodeBadStretchStringSourceArchiveRPMs(TestRPMs):
+    def setUp(self):
+        super().setUp()
+
+        self.rpm.header += "\n%define debug_package %{nil}\n"
+        self.rpm.add_source(
+            rpmfluff.GeneratedTarball(
+                "%s-%s.tar.gz" % (AFTER_NAME, AFTER_VER),
+                "%s-%s" % (AFTER_NAME, AFTER_VER),
+                [
+                    rpmfluff.SourceFile("Makefile", makefile_src),
+                    rpmfluff.SourceFile("bad.c", stretched_string_new_src),
+                    rpmfluff.SourceFile("status.sh", status_src),
+                ],
+            )
+        )
+        self.rpm.section_prep = "%setup\n"
+        self.rpm.section_build += "make\n"
+        self.rpm.section_install += "make install DESTDIR=%{buildroot}\n"
+        sub = self.rpm.get_subpackage(None)
+        sub.section_files += "/usr/bin/status\n"
+
+        self.inspection = "unicode"
+
+        # the result here is OK because the unicode inspection only works on SRPMs and
+        # if we don't have those it is a no-op inspection that returns OK
+        self.result = "OK"
+
+
+class UnicodeBadStretchStringSourceArchiveKoji(TestKoji):
+    def setUp(self):
+        super().setUp()
+
+        self.rpm.header += "\n%define debug_package %{nil}\n"
+        self.rpm.add_source(
+            rpmfluff.GeneratedTarball(
+                "%s-%s.tar.gz" % (AFTER_NAME, AFTER_VER),
+                "%s-%s" % (AFTER_NAME, AFTER_VER),
+                [
+                    rpmfluff.SourceFile("Makefile", makefile_src),
+                    rpmfluff.SourceFile("bad.c", stretched_string_new_src),
+                    rpmfluff.SourceFile("status.sh", status_src),
+                ],
+            )
+        )
+        self.rpm.section_prep = "%setup\n"
+        self.rpm.section_build += "make\n"
+        self.rpm.section_install += "make install DESTDIR=%{buildroot}\n"
+        sub = self.rpm.get_subpackage(None)
+        sub.section_files += "/usr/bin/status\n"
+
+        self.inspection = "unicode"
+        self.waiver_auth = "Security"
+        self.result = "BAD"
+
+
+class UnicodeBadStretchStringSourceArchiveCompareSRPM(TestCompareSRPM):
+    def setUp(self):
+        super().setUp()
+
+        self.before_rpm.header += "\n%define debug_package %{nil}\n"
+        self.before_rpm.add_source(
+            rpmfluff.GeneratedTarball(
+                "%s-%s.tar.gz" % (BEFORE_NAME, BEFORE_VER),
+                "%s-%s" % (BEFORE_NAME, BEFORE_VER),
+                [
+                    rpmfluff.SourceFile("Makefile", makefile_src),
+                    rpmfluff.SourceFile("bad.c", stretched_string_new_src),
+                    rpmfluff.SourceFile("status.sh", status_src),
+                ],
+            )
+        )
+        self.before_rpm.section_prep = "%setup\n"
+        self.before_rpm.section_build += "make\n"
+        self.before_rpm.section_install += "make install DESTDIR=%{buildroot}\n"
+        sub = self.before_rpm.get_subpackage(None)
+        sub.section_files += "/usr/bin/status\n"
+
+        self.after_rpm.header += "\n%define debug_package %{nil}\n"
+        self.after_rpm.add_source(
+            rpmfluff.GeneratedTarball(
+                "%s-%s.tar.gz" % (AFTER_NAME, AFTER_VER),
+                "%s-%s" % (AFTER_NAME, AFTER_VER),
+                [
+                    rpmfluff.SourceFile("Makefile", makefile_src),
+                    rpmfluff.SourceFile("bad.c", stretched_string_new_src),
+                    rpmfluff.SourceFile("status.sh", status_src),
+                ],
+            )
+        )
+        self.after_rpm.section_prep = "%setup\n"
+        self.after_rpm.section_build += "make\n"
+        self.after_rpm.section_install += "make install DESTDIR=%{buildroot}\n"
+        sub = self.after_rpm.get_subpackage(None)
+        sub.section_files += "/usr/bin/status\n"
+
+        self.inspection = "unicode"
+        self.waiver_auth = "Security"
+        self.result = "BAD"
+
+
+class UnicodeBadStretchStringSourceArchiveCompareRPMs(TestCompareRPMs):
+    def setUp(self):
+        super().setUp()
+
+        self.before_rpm.header += "\n%define debug_package %{nil}\n"
+        self.before_rpm.add_source(
+            rpmfluff.GeneratedTarball(
+                "%s-%s.tar.gz" % (BEFORE_NAME, BEFORE_VER),
+                "%s-%s" % (BEFORE_NAME, BEFORE_VER),
+                [
+                    rpmfluff.SourceFile("Makefile", makefile_src),
+                    rpmfluff.SourceFile("bad.c", stretched_string_new_src),
+                    rpmfluff.SourceFile("status.sh", status_src),
+                ],
+            )
+        )
+        self.before_rpm.section_prep = "%setup\n"
+        self.before_rpm.section_build += "make\n"
+        self.before_rpm.section_install += "make install DESTDIR=%{buildroot}\n"
+        sub = self.before_rpm.get_subpackage(None)
+        sub.section_files += "/usr/bin/status\n"
+
+        self.after_rpm.header += "\n%define debug_package %{nil}\n"
+        self.after_rpm.add_source(
+            rpmfluff.GeneratedTarball(
+                "%s-%s.tar.gz" % (AFTER_NAME, AFTER_VER),
+                "%s-%s" % (AFTER_NAME, AFTER_VER),
+                [
+                    rpmfluff.SourceFile("Makefile", makefile_src),
+                    rpmfluff.SourceFile("bad.c", stretched_string_new_src),
+                    rpmfluff.SourceFile("status.sh", status_src),
+                ],
+            )
+        )
+        self.after_rpm.section_prep = "%setup\n"
+        self.after_rpm.section_build += "make\n"
+        self.after_rpm.section_install += "make install DESTDIR=%{buildroot}\n"
+        sub = self.after_rpm.get_subpackage(None)
+        sub.section_files += "/usr/bin/status\n"
+
+        self.inspection = "unicode"
+
+        # the result here is OK because the unicode inspection only works on SRPMs and
+        # if we don't have those it is a no-op inspection that returns OK
+        self.result = "OK"
+
+
+class UnicodeBadStretchStringSourceArchiveCompareKoji(TestCompareKoji):
+    def setUp(self):
+        super().setUp()
+
+        self.before_rpm.header += "\n%define debug_package %{nil}\n"
+        self.before_rpm.add_source(
+            rpmfluff.GeneratedTarball(
+                "%s-%s.tar.gz" % (BEFORE_NAME, BEFORE_VER),
+                "%s-%s" % (BEFORE_NAME, BEFORE_VER),
+                [
+                    rpmfluff.SourceFile("Makefile", makefile_src),
+                    rpmfluff.SourceFile("bad.c", stretched_string_new_src),
+                    rpmfluff.SourceFile("status.sh", status_src),
+                ],
+            )
+        )
+        self.before_rpm.section_prep = "%setup\n"
+        self.before_rpm.section_build += "make\n"
+        self.before_rpm.section_install += "make install DESTDIR=%{buildroot}\n"
+        sub = self.before_rpm.get_subpackage(None)
+        sub.section_files += "/usr/bin/status\n"
+
+        self.after_rpm.header += "\n%define debug_package %{nil}\n"
+        self.after_rpm.add_source(
+            rpmfluff.GeneratedTarball(
+                "%s-%s.tar.gz" % (AFTER_NAME, AFTER_VER),
+                "%s-%s" % (AFTER_NAME, AFTER_VER),
+                [
+                    rpmfluff.SourceFile("Makefile", makefile_src),
+                    rpmfluff.SourceFile("bad.c", stretched_string_new_src),
                     rpmfluff.SourceFile("status.sh", status_src),
                 ],
             )
