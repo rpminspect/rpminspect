@@ -182,4 +182,6 @@
 /* unicode */
 #define REMEDY_UNICODE _("The rpminspect configuration file contains a list of forbidden Unicode code points.  One was found in the extracted and patched source tree or in one of the text source files in the source RPM.  Either remove this code point or discuss the situation with the Product Security Team to determine the correct course of action.")
 
+#define REMEDY_UNICODE_PREP_FAILED _("The %prep section of the spec file could not be executed for some reason.  This usually results from a failure in librpmbuild, which is usually tied to archive extraction problems or the filesystem changing while rpminspect is running.  A common cause is removal of the working directory while the program is executing.")
+
 #endif

@@ -120,6 +120,11 @@ static char *prep_source(struct rpminspect *ri, const rpmfile_entry_t *file)
     /* read in the spec file */
     spec = rpmSpecParse(file->fullpath, RPMBUILD_PREP | RPMSPEC_ANYARCH, NULL);
 
+    if (spec == NULL) {
+        warn("rpmSpecParse");
+        return NULL;
+    }
+
     /* run through the %prep stage */
     ba = calloc(1, sizeof(*ba));
     assert(ba != NULL);
@@ -322,6 +327,8 @@ static int validate_file(const char *fpath, __attribute__((unused)) const struct
 
 static bool unicode_driver(struct rpminspect *ri, rpmfile_entry_t *file)
 {
+    struct result_params params;
+
     assert(ri != NULL);
     assert(file != NULL);
     assert(ri->workdir != NULL);
@@ -339,6 +346,21 @@ static bool unicode_driver(struct rpminspect *ri, rpmfile_entry_t *file)
     if (strsuffix(file->localpath, SPEC_FILENAME_EXTENSION)) {
         /* for the spec file, examine each file in the prepared source tree */
         if (prep_source(ri, file) == NULL) {
+            /* failure case where we can't prep the source tree */
+            init_result_params(&params);
+            params.severity = RESULT_BAD;
+            params.waiverauth = NOT_WAIVABLE;
+            params.header = NAME_UNICODE;
+            params.arch = globalarch;
+            params.file = file->localpath;
+            params.noun = _("unable to run %prep in ${FILE}");
+            params.verb = VERB_FAILED;
+            params.remedy = REMEDY_UNICODE_PREP_FAILED;
+            xasprintf(&params.msg, _("Unable to run through the %%prep section %s for further scanning."), file->localpath);
+            add_result(globalri, &params);
+            free(params.msg);
+
+            seen = true;
             return false;
         }
 
