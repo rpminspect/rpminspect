@@ -755,7 +755,7 @@ unicode:
 
     # List of file MIME types of files this inspection should exclude.
     # MIME types are determined by libmagic, which is how the file(1)
-    # command works.  Sometimes matching by MIME type does not quit
+    # command works.  Sometimes matching by MIME type does not quite
     # produce the desired results, so keep that in mind when adding to
     # this list.
     excluded_mime_types:
@@ -766,7 +766,8 @@ unicode:
 
     # List of forbidden Unicode codepoints in source code.  Codepoints
     # are written in hexidecimal notation.  The case of the letters
-    # does not matter.  Be sure to prefix the code point with '0x'.
+    # does not matter.  Be sure to prefix the code point with '0x' and
+    # use single quotes around the values.
     forbidden_codepoints:
         - '0x202A'
         - '0x202B'
