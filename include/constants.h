@@ -437,10 +437,11 @@
 /*
  * Names of rpmbuild(1) subdirectories.  rpminspect models an rpmbuild
  * layout similar to how rpmbuild is used for distributions like
- * Fedora Linux.  That is there is a top level directory (topdir) and
- * all of the other directories are subdirectories in topdir.  For the
- * purposes of rpminspect, the topdir definition here is a
- * subdirectory in the working directory location rpminspect is using.
+ * Fedora Linux.  The main idea is a top level directory is defined
+ * (topdir) and all of the other directories used by rpmbuild are
+ * within topdir.  For the purposes of rpminspect, the topdir
+ * definition here is a subdirectory in the working directory location
+ * rpminspect is using.
  */
 #define RPMBUILD_TOPDIR        "rpmbuild"
 #define RPMBUILD_BUILDDIR      "BUILD"
