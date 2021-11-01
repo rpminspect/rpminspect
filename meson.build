@@ -24,7 +24,6 @@ endif
 # Dependencies that use pkg-config
 jsonc = dependency('json-c', required : true)
 libxml = dependency('libxml-2.0', required : true)
-rpm = dependency('rpm', required : true)
 libkmod = dependency('libkmod', required : true)
 libcurl = dependency('libcurl', required : true)
 zlib = dependency('zlib', required : true)
@@ -32,6 +31,12 @@ yaml = dependency('yaml-0.1', required : true)
 clamav = dependency('libclamav', required : true)
 icu_uc = dependency('icu-uc', required : true)
 icu_io = dependency('icu-io', required : true)
+
+# If we're on an older API, note that for the build
+rpm = dependency('rpm', required : true)
+if rpm.version().version_compare('<4.15.0')
+    add_project_arguments('-D_HAVE_OLD_RPM_API', language : 'c')
+endif
 
 # librpmbuild
 if not cc.has_function('rpmSpecParse', args : ['-lrpmbuild'])

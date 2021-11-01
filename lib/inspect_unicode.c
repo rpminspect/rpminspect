@@ -136,7 +136,11 @@ static char *prep_source(struct rpminspect *ri, const rpmfile_entry_t *file)
 
     rpmSetVerbosity(RPMLOG_WARNING);
 
+#ifdef _HAVE_OLD_RPM_API
+    if (rpmSpecBuild(spec, ba)) {
+#else
     if (rpmSpecBuild(ts, spec, ba)) {
+#endif
         build = NULL;
     } else {
         xasprintf(&build, "%s/%s/%s", ri->worksubdir, RPMBUILD_TOPDIR, RPMBUILD_BUILDDIR);
