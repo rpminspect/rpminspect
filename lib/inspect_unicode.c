@@ -186,9 +186,9 @@ static int validate_file(const char *fpath, __attribute__((unused)) const struct
     UChar *line_new = NULL;
     size_t i = 0;
     size_t sz = BUFSIZ;
-    size_t linenum = 0;
     UChar *needle = NULL;
-    size_t colnum = 0;
+    long int linenum = 0;
+    long int colnum = 0;
     UChar32_entry_t *uentry = NULL;
     struct result_params params;
 
