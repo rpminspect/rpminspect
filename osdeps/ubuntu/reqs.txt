@@ -15,6 +15,7 @@ libcunit1-dev
 libcurl4-openssl-dev
 libelf-dev
 libffi-dev
+libicu-dev
 libjson-c-dev
 libkmod-dev
 libmagic-dev

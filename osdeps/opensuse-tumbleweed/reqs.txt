@@ -28,6 +28,7 @@ libcurl-devel
 libelf-devel
 libffi-devel
 libgcc_s1-32bit
+libicu-devel
 libjson-c-devel
 libkmod-devel
 libopenssl-1_1-devel

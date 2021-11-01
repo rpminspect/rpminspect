@@ -8,6 +8,7 @@ diffstat
 gcc
 gettext
 git
+icu
 json-c
 ksh
 lib32-gcc-libs

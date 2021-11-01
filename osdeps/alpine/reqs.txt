@@ -20,6 +20,7 @@ gcc
 gcovr
 gettext
 git
+icu
 json-c-dev
 kmod-dev
 libffi-dev

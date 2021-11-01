@@ -20,6 +20,7 @@ lib64cunit-devel
 lib64curl-devel
 lib64elfutils-devel
 lib64ffi-devel
+lib64icu-devel
 lib64kmod-devel
 lib64magic-devel
 lib64openssl-devel

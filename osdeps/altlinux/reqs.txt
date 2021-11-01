@@ -21,6 +21,7 @@ libcap-devel
 libclamav-devel
 libcurl-devel
 libffi-devel
+libicu-devel
 libjson-c-devel
 libkmod-devel
 libmagic-devel
