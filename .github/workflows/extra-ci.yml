@@ -33,6 +33,10 @@ jobs:
                 # tumbleweed is useful in the CI environment.
                 #container: ["opensuse/tumbleweed"]
 
+# Disabled for now as Alt Linux uses a very old version of RPM
+# and the unicode inspection needs to adapt for that.
+#                            "alt:latest",
+
                 container: ["centos:centos8",
                             "centos:centos7",
                             "ubuntu:latest",
@@ -46,7 +50,6 @@ jobs:
                             "rockylinux/rockylinux",
                             "amazonlinux:2",
                             "mageia:latest",
-                            "alt:latest",
                             "oraclelinux:8"]
 
         container:
