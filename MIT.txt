@@ -1,0 +1,59 @@
+Some of the source in lib/inspect_unicode.c is derived from code
+examples shown on this blog post:
+
+    https://begriffs.com/posts/2019-05-23-unicode-icu.html
+
+The author states the source code examples on that post are available
+under the MIT license, which is noted below.  Here is the email from
+the author indicating the license for the source code examples on the
+blog post:
+
+
+Date: Sun, 31 Oct 2021 14:43:54 -0500
+From: Joe Nelson <joe@begriffs.com>
+To: David Cantrell <dcantrell@redhat.com>
+Subject: Re: Code from your Unicode post in 2019
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+
+> Just wanted to say thanks for the detailed write up here:
+> 
+>     https://begriffs.com/posts/2019-05-23-unicode-icu.html
+> 
+> About ICU and some specific examples.  It has been helpful for me as I
+> have been working on some key Unicode errors.
+
+Hi David, glad to hear it's helpful!
+
+> I have used some lines from your examples here and there in my code,
+> but I noticed you don't have any license or copyright notice on your
+> code examples.  Are these available under any particular license or
+> have you given it any thought?
+
+Sure, you can use the code snippets under the MIT license. The text of
+the articles, though, is not open source.
+
+
+---------------------------------------------------------------------------
+
+Copyright (c) 2019 Joe Nelson <joe@begriffs.com>
+
+Permission is hereby granted, free of charge, to any person obtaining
+a copy of this software and associated documentation files (the
+"Software"), to deal in the Software without restriction, including
+without limitation the rights to use, copy, modify, merge, publish,
+distribute, sublicense, and/or sell copies of the Software, and to
+permit persons to whom the Software is furnished to do so, subject to
+the following conditions:
+
+The above copyright notice and this permission notice (including the
+next paragraph) shall be included in all copies or substantial
+portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE
+LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
+OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
+WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
