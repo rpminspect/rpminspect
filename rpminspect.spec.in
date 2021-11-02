@@ -8,7 +8,7 @@ Group:          Development/Tools
 # rpminspect(1) command line tool is licensed under the GPLv3+.  And
 # the rpminspect-data-generic package is licensed under the CC-BY-4.0
 # license.
-License:        GPLv3+ and LGPLv2+ and ASL 2.0 and CC-BY
+License:        GPLv3+ and LGPLv2+ and ASL 2.0 and MIT and CC-BY
 URL:            https://github.com/rpminspect/rpminspect
 Source0:        https://github.com/rpminspect/rpminspect/releases/download/v%{version}/%{name}-%{version}.tar.xz
 Source1:        https://github.com/rpminspect/rpminspect/releases/download/v%{version}/%{name}-%{version}.tar.xz.asc
@@ -152,7 +152,7 @@ control files.
 
 
 %files -n librpminspect
-%license COPYING.LIB LICENSE-2.0.txt
+%license COPYING.LIB LICENSE-2.0.txt MIT.txt
 %{_libdir}/librpminspect.so.*
 
 
