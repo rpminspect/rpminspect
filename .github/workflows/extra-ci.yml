@@ -33,10 +33,8 @@ jobs:
                 # tumbleweed is useful in the CI environment.
                 #container: ["opensuse/tumbleweed"]
 
-# Disabled for now as the Python version there is having trouble reading the test_unicode.py data files
-#                            "centos:centos7",
-
                 container: ["centos:centos8",
+                            "centos:centos7",
                             "ubuntu:latest",
                             "debian:stable",
                             "debian:testing",
@@ -166,7 +164,7 @@ jobs:
                       *)
                           meson setup build --werror -Db_buildtype=debug -Db_coverage=true
                           ninja -C build -v
-                          meson test -C build -v
+                          env LANG=en_US.UTF-8 meson test -C build -v
                           ninja -C build coverage
                           curl -s https://codecov.io/bash | bash
                           ;;
