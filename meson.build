@@ -7,7 +7,7 @@ project('rpminspect',
             'werror=true',
             'buildtype=debugoptimized'
         ],
-        license : 'GPL-3.0-or-later AND LGPL-3.0-or-later AND Apache-2.0')
+        license : 'GPL-3.0-or-later AND LGPL-3.0-or-later AND Apache-2.0 AND MIT')
 
 cc = meson.get_compiler('c')
 
