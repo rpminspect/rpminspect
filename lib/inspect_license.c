@@ -120,6 +120,15 @@ static bool check_license_abbrev(const char *lic)
             }
         }
 
+        /* handle "commented out" fields */
+        if (strlen(fedora_abbrev) > 0 && *fedora_abbrev == '#') {
+            fedora_abbrev = "";
+        }
+
+        if (strlen(spdx_abbrev) > 0 && *spdx_abbrev == '#') {
+            spdx_abbrev = "";
+        }
+
         /*
          * no full tag match and no abbreviations, license entry invalid
          */
