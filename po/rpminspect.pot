@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: rpminspect\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-10-28 13:32-0400\n"
+"POT-Creation-Date: 2021-11-03 14:11-0400\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -2211,33 +2211,33 @@ msgstr ""
 msgid "MIME type on %s was %s and became %s on %s"
 msgstr ""
 
-#: lib/inspect_unicode.c:242
+#: lib/inspect_unicode.c:246
 #, c-format
 msgid "empty localpath on %s"
 msgstr ""
 
-#: lib/inspect_unicode.c:258
+#: lib/inspect_unicode.c:262
 msgid "forbidden code point in ${FILE}"
 msgstr ""
 
-#: lib/inspect_unicode.c:311
+#: lib/inspect_unicode.c:315
 #, c-format
 msgid ""
 "A forbidden code point was found in the %s source file on line %ld at column "
 "%ld."
 msgstr ""
 
-#: lib/inspect_unicode.c:356
+#: lib/inspect_unicode.c:360
 #, c-format
 msgid "unable to run %prep in ${FILE}"
 msgstr ""
 
-#: lib/inspect_unicode.c:359
+#: lib/inspect_unicode.c:363
 #, c-format
 msgid "Unable to run through the %%prep section %s for further scanning."
 msgstr ""
 
-#: lib/inspect_unicode.c:441
+#: lib/inspect_unicode.c:445
 msgid "The unicode inspection is only for source packages, skipping."
 msgstr ""
 
