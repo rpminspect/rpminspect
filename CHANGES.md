@@ -1,3 +1,95 @@
+Changes in rpminspect-1.7
+-------------------------
+
+General release and build process changes:
+* Update the spec file template
+* Drop mkrpmchangelog.sh use for Copr builds
+* Remove mkrpmchangelog.sh from the source tree
+* Increment version to 1.7
+* s/\.gz/.xz/ in .copr/Makefile
+* Additional Copr build fixes
+* Adjust %autosetup line for Copr builds
+* Fix output formatting in utils/mkannounce.sh
+* Add libicu-devel as a BuildRequires in the spec file
+* Add some additional comments to the Makefile
+* Add 'MIT' to the project license string
+
+Config file or data/ file changes:
+* Add a new 'macrofiles' section to the config file
+* Quote forbidden Unicode code points in generic.yaml
+* Comment fixes for the 'unicode' section in generic.yaml
+
+Changes to the GitHub Actions CI scripts and files:
+* Install the rust package on Alpine Linux
+* Add 'cargo' to the reqs.txt list for Alpine Linux
+* Install rustc and cargo on all systems now for Python cryptography
+* Make sure Fedora CI instances have 'libicu-devel' installed
+* Make sure ICU is installed for Extra CI targets
+* Disable the Alt Linux job in Extra CI for now
+* Enable Alt Linux, disable CentOS 7 in Extra CI
+* Set LANG=en_US.UTF-8 when running the test suite
+* icu -> icu-dev in reqs.txt for Alpine Linux
+* Rename 'x86_64' job category to 'linux'
+
+rpminspect(1) changes:
+* Call load_macros() and rpmFreeMacros() from rpminspect
+
+Documentation changes:
+* Add CHANGES.md file summarizing changes per release
+
+General bug fix in the library or frontend program:
+* Fix small memory leak in macros.c
+* Call rpmFreeMacros() after the disttag inspection runs
+* TryExec= line parsing for .desktop files
+* Remove unnecessary assert() on fname in match_fileinfo_mode
+* Do not report 'OK' result in emptyrpm for expected empties
+* addedfiles requires a before and after build
+* Minor improvement to the text in REMEDY_ADDEDFILES
+* Correctly match debuginfo trees to subpackages
+* Simiply the copytree() function to remove malloc errors
+* Remove unnecessary '()' from function names in error messages
+* Allow exitcode parameter to be NULL in run_cmd_vpe()
+* Non-zero exit from desktop-file-validate is an error
+* Use realloc() instead of reallocarray()
+* Remove incorrect free() call in inspect_unicode.c
+* Set seen and globalresult in inspect_unicode.c
+* Use a long int for linenum and colnum in inspect_unicode.c
+* Comment clarification in include/constants.h
+* Support rpm < 4.15.0 in the unicode inspection
+* Fallback on fedora_name only if the _abbrev fields are empty
+
+librpminspect feature or significant change:
+* Support %autorelease and other macros in disttag inspection
+* Check subpackages when running the 'desktop' inspection
+* Support standard system icons in the 'desktop' inspection
+* In 'annocheck', report the commands and exit codes
+* Add list_add() to listfuncs() in librpminspect
+* Use fork()/execvpe() in runcmd.c instead of popen()
+* Modify inspect_annocheck.c to use run_cmd_vpe()
+* Allow an optional subdirectory on run_cmd() and run_cmd_vpe()
+* Use the new run_cmd_vpe() API in 'abidiff' and 'kmidiff'
+* Update all run_cmd() calls to the new API
+* Add load_macros() function to macros.c
+* Remove code from inspect_disttag.c that's in load_macros()
+* Introduce mime_type() function in magic.c
+* Change UChar usage to UChar32
+* Expand dump_cfg() for the -D debug mode output
+* Use u_strchr32() when searching for forbidden code points
+* Improve reporting in unicode with prep_source() fails
+
+New inspections or inspection changes (not bug fixes):
+* Add the 'unicode' inspection to check source code
+
+Test suite commits:
+* Collect subpackages when performing Koji build tests
+* Remove musl special handling in test_abidiff.py
+* Remove unused 'import subprocess' from test_abidiff.py
+* Get the tearDown() functions all working correctly
+* Begin test_unicode.py with unicode inspection tests
+* Complete test_unicode.py and use different example code
+* Add additional known bad unicode test cases
+
+
 Changes in rpminspect-1.6
 -------------------------
 
