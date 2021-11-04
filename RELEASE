@@ -1,0 +1,80 @@
+Release Checklist
+
+[ ] Ensure all required PRs are merged and all GitHub Actions pass.
+    Fix any issues that break CI.  The main branch should build
+    cleanly on all CI targets and the test suite should pass
+    everywhere.
+
+Use the upstream release repo for these steps:
+
+[ ] git clean -dxf
+
+[ ] git pull
+
+[ ] make
+
+[ ] make check
+
+[ ] make clean
+
+[ ] make announce > newchanges
+
+[ ] Edit CHANGES.md and create a new entry for the upcoming release
+    with the heading "Changes in rpminspect-X.Y".  Paste the contents
+    of 'newchanges' in this section.
+
+[ ] git add CHANGES.md && git commit -s -m "Update CHANGES.md"
+
+[ ] make update-pot
+
+[ ] git add po && git commit -s -m "Update translation template"
+
+[ ] git push
+
+[ ] make clean
+
+[ ] make release
+
+[ ] make srpm
+
+[ ] Go to https://github.com/rpminspect/rpminspect and draft a new
+    release for this release.  Title it "rpminspect-X.Y" and paste the
+    contents of 'newchanges' in the description box.  Attach these
+    files to the release from this directory:
+
+        rpminspect-X.Y.tar.xz
+        rpminspect-X.Y.tar.xz.asc
+
+[ ] make koji
+
+    NOTE: You may want to try each branch individually using the
+    syntax described in the 'make help' output.  By default this
+    target will submit Koji builds for all Fedora and EPEL branches in
+    the rpminspect dist-git repo that have active build targets.
+
+[ ] Wait for the builds to finish.  You will receive email
+    notifications or you can watch the progress in the Koji task URL.
+    For each branch that completes (except rawhide), submit an update
+    request for that build:
+
+        fedpkg switch-branch BRANCH
+        git clean -dxf
+        git pull
+        fedpkg update --type enhancement --request testing \
+                      --notes "Upgrade to rpminspect-X.Y" \
+                      --no-require-bugs --no-require-testcases
+
+    The type can be 'bugfix', 'security', 'enhancement', or
+    'newpackage'.  Generally rpminspect will be enhancement unless the
+    release only contains bug fixes.  If there's a new inspection or
+    significant change, mark it as an enhancement.
+
+[ ] In the master branch, increment the version number of the project
+    in meson.build and push that.  This way the new Copr builds will
+    carry a newer version number that represents the next release.
+
+[ ] git push
+
+The release is now done.  Use the text from 'newchanges' in a blog
+post about the release.  It may be a good idea to go do releases of
+the data packages now and do a combined blog post about all of them.
