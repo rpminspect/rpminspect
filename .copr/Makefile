@@ -31,9 +31,12 @@ PKG := $(shell grep ^Name: "$(SPEC_TEMPLATE)" | awk '{ print $$2; }')
 VER := $(shell grep 'version :' $(topdir)/meson.build | grep -E "'[0-9]+\.[0-9]+'" | cut -d "'" -f 2)
 
 ifeq ($(BUILDTYPE),copr)
-GITDATE = $(shell date +'%Y%m%d%H%M')
-GITHASH = $(shell git rev-parse --short HEAD)
+GITDATE          = $(shell date +'%Y%m%d%H%M')
+GITHASH          = $(shell git rev-parse --short HEAD)
 TARBALL_BASENAME = $(PKG)-$(VER)-$(GITDATE)git$(GITHASH)
+TAG              = HEAD
+else
+TAG              = $(shell git tag -l | tail -n 1)
 endif
 
 ifeq ($(BUILDTYPE),release)
@@ -43,6 +46,7 @@ endif
 srpm:
 	$(topdir)/.copr/instpkgs.sh $(SPEC_TEMPLATE)
 	sed -e 's|%%VERSION%%|$(VER)|g' < "$(SPEC_TEMPLATE)" > "$(SPEC)"
+	sed -i -e 's|%%GPGKEYRING%%|gpgkey-$(GPGKEY).gpg|g' "$(SPEC)"
 ifeq ($(BUILDTYPE),copr)
 	sed -i -e '/^Release:/ s/1[^%]*/0.1.$(GITDATE)git$(GITHASH)/' "$(SPEC)"
 	sed -i -e 's|^Source0:.*$$|Source0: $(TARBALL_BASENAME).tar.xz|g' "$(SPEC)"
@@ -53,11 +57,14 @@ ifeq ($(BUILDTYPE),copr)
 	echo "* $(RPMDATE) $(RPMAUTHOR) - $(VER)-$(GITDATE)git$(GITHASH)" >> "$(SPEC)"
 	echo "- Build rpminspect-$(VER)-$(GITDATE)git$(GITHASH) snapshot" >> "$(SPEC)"
 endif
+	rm -f "$(TARBALL_BASENAME)".tar.xz.asc
 	git archive \
 		--format=tar \
 		--output='$(topdir)/$(TARBALL_BASENAME).tar' \
-		--prefix='$(TARBALL_BASENAME)/' HEAD $(topdir)
+		--prefix='$(TARBALL_BASENAME)/' $(TAG) $(topdir)
 	xz -9f $(topdir)/$(TARBALL_BASENAME).tar
+	gpg --detach-sign --armor "$(TARBALL_BASENAME)".tar.xz
+	gpg --export -a $(GPGKEY) > gpgkey-$(GPGKEY).gpg
 	rpmbuild \
 		-bs --nodeps \
 		--define "_sourcedir $(topdir)" \

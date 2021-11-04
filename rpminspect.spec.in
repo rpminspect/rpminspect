@@ -61,7 +61,7 @@ Recommends:     xhtml1-dtds
 Recommends:     html401-dtds
 %endif
 
-# Required to support things like %autorelease in spec files
+# Required to support things like %%autorelease in spec files
 %if 0%{?fedora} >= 33
 Recommends:     rpmautospec-rpm-macros
 %endif

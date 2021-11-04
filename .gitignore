@@ -1,6 +1,7 @@
 _build/
 build
 changelog
+*.gpg
 *.ko
 *.ko.cmd
 *.mod

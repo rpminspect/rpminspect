@@ -39,8 +39,8 @@ TARGET_ARG = `arg="$(filter-out $@,$(MAKECMDGOALS))" && echo $${arg:-${1}}`
 PRIMARY_AUTHORS = dcantrell@redhat.com
 
 # full path to release tarball and detached signature
-# (this comes from a 'make release')
-RELEASED_TARBALL = $(topdir)/$(MESON_BUILD_DIR)/meson-dist/$(PROJECT_NAME)-$(PROJECT_VERSION).tar.xz
+# (this comes from a 'make srpm')
+RELEASED_TARBALL = $(PROJECT_NAME)-$(PROJECT_VERSION).tar.xz
 RELEASED_TARBALL_ASC = $(RELEASED_TARBALL).asc
 
 all: setup
@@ -102,16 +102,22 @@ new-release:
 release:
 	$(topdir)/utils/release.sh -t -p
 
+# Generates content for CHANGES.md from previous tag to HEAD
 announce:
+	@$(topdir)/utils/mkannounce.sh
+
+# Generates changes between the two most recent stable releases,
+# excluding HEAD
+stable-announce:
 	@$(topdir)/utils/mkannounce.sh --stable
 
 koji: srpm
 	@if [ ! -f $(RELEASED_TARBALL) ]; then \
-		echo "*** Missing $(RELEASED_TARBALL), be sure to have run 'make release'" >&2 ; \
+		echo "*** Missing $(RELEASED_TARBALL), be sure to have run 'make srpm'" >&2 ; \
 		exit 1 ; \
 	fi
 	@if [ ! -f $(RELEASED_TARBALL_ASC) ]; then \
-		echo "*** Missing $(RELEASED_TARBALL_ASC), be sure to have run 'make release'" >&2 ; \
+		echo "*** Missing $(RELEASED_TARBALL_ASC), be sure to have run 'make srpm'" >&2 ; \
 		exit 1 ; \
 	fi
 	$(topdir)/utils/submit-koji-builds.sh $(RELEASED_TARBALL) $(RELEASED_TARBALL_ASC) $$(basename $(topdir))
@@ -177,7 +183,7 @@ help:
 	@echo "    make new-release     # bumps version number, tags, and pushes"
 	@echo
 	@echo "Generate SRPM of the latest release and do all Koji builds:"
-	@echo "    env BRANCHES=\"master f31 f32 f33 epel7 epel8\" make koji"
+	@echo "    env BRANCHES=\"rawhide f31 f32 f33 epel7 epel8\" make koji"
 	@echo "NOTE: You must set the BRANCHES environment variable for the koji target"
 	@echo "otherwise it will just build for the master branch."
 
