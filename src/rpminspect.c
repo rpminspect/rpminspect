@@ -683,6 +683,7 @@ int main(int argc, char **argv)
 
             if (!found) {
                 free_rpminspect(ri);
+                rpmFreeMacros(NULL);
                 rpmFreeRpmrc();
                 warnx(_("*** Unsupported architecture specified: `%s`"), token);
                 errx(RI_PROGRAM_ERROR, _("*** See `%s --help` for more information."), COMMAND_NAME);
@@ -706,6 +707,7 @@ int main(int argc, char **argv)
     /* create the working directory */
     if (mkdirp(ri->workdir, mode)) {
         free_rpminspect(ri);
+        rpmFreeMacros(NULL);
         rpmFreeRpmrc();
         errx(RI_PROGRAM_ERROR, _("*** Unable to create directory %s"), ri->workdir);
     }
@@ -719,6 +721,7 @@ int main(int argc, char **argv)
 
             if (gather_builds(ri, true)) {
                 free_rpminspect(ri);
+                rpmFreeMacros(NULL);
                 rpmFreeRpmrc();
                 errx(RI_PROGRAM_ERROR, _("*** failed to gather specified builds."));
             }
@@ -730,11 +733,13 @@ int main(int argc, char **argv)
         }
 
         free_rpminspect(ri);
+            rpmFreeMacros(NULL);
         rpmFreeRpmrc();
         return RI_INSPECTION_SUCCESS;
     } else {
         if (gather_builds(ri, false)) {
             free_rpminspect(ri);
+            rpmFreeMacros(NULL);
             rpmFreeRpmrc();
             errx(RI_PROGRAM_ERROR, _("*** failed to gather specified builds."));
         }

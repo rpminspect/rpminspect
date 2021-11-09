@@ -54,7 +54,7 @@ Header get_rpm_header(struct rpminspect *ri, const char *pkg)
     FD_t fd;
     rpmRC result;
     char *bpkg = NULL;
-    header_cache_entry_t *hentry = NULL;
+    header_cache_t *hentry = NULL;
 
     assert(ri != NULL);
     assert(pkg != NULL);
@@ -64,10 +64,10 @@ Header get_rpm_header(struct rpminspect *ri, const char *pkg)
 
     /* First see if we can return the cached header */
     if (ri->header_cache != NULL) {
-        TAILQ_FOREACH(hentry, ri->header_cache, items) {
-            if (!strcmp(hentry->pkg, bpkg)) {
-                return hentry->hdr;
-            }
+        HASH_FIND_STR(ri->header_cache, bpkg, hentry);
+
+        if (hentry != NULL) {
+            return hentry->hdr;
         }
     }
 
@@ -85,7 +85,9 @@ Header get_rpm_header(struct rpminspect *ri, const char *pkg)
     }
 
     hentry = calloc(1, sizeof(*hentry));
+    assert(hentry != NULL);
     hentry->pkg = strdup(bpkg);
+    assert(hentry->pkg != NULL);
 
     ts = rpmtsCreate();
     rpmtsSetVSFlags(ts, _RPMVSF_NODIGESTS | _RPMVSF_NOSIGNATURES);
@@ -94,17 +96,12 @@ Header get_rpm_header(struct rpminspect *ri, const char *pkg)
     Fclose(fd);
 
     if (result != RPMRC_OK) {
+        free(hentry->pkg);
+        free(hentry);
         return NULL;
     }
 
-    if (ri->header_cache == NULL) {
-        /* Initialize the header cache if necessary */
-        ri->header_cache = calloc(1, sizeof(*ri->header_cache));
-        assert(ri->header_cache != NULL);
-        TAILQ_INIT(ri->header_cache);
-    }
-
-    TAILQ_INSERT_TAIL(ri->header_cache, hentry, items);
+    HASH_ADD_KEYPTR(hh, ri->header_cache, hentry->pkg, strlen(hentry->pkg), hentry);
     return hentry->hdr;
 }
 
