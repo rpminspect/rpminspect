@@ -80,7 +80,8 @@ void free_rpminspect(struct rpminspect *ri) {
     fileinfo_entry_t *fientry = NULL;
     caps_entry_t *centry = NULL;
     caps_filelist_entry_t *cflentry = NULL;
-    header_cache_entry_t *hentry = NULL;
+    header_cache_t *hentry = NULL;
+    header_cache_t *tmp_hentry = NULL;
     politics_entry_t *pentry = NULL;
     security_entry_t *sentry = NULL;
     secrule_t *srentry = NULL;
@@ -265,16 +266,11 @@ void free_rpminspect(struct rpminspect *ri) {
 
     free_rpmpeer(ri->peers);
 
-    if (ri->header_cache != NULL) {
-        while (!TAILQ_EMPTY(ri->header_cache)) {
-            hentry = TAILQ_FIRST(ri->header_cache);
-            TAILQ_REMOVE(ri->header_cache, hentry, items);
-            free(hentry->pkg);
-            headerFree(hentry->hdr);
-            free(hentry);
-        }
-
-        free(ri->header_cache);
+    HASH_ITER(hh, ri->header_cache, hentry, tmp_hentry) {
+        HASH_DEL(ri->header_cache, hentry);
+        free(hentry->pkg);
+        headerFree(hentry->hdr);
+        free(hentry);
     }
 
     free(ri->before_rel);

@@ -274,13 +274,11 @@ typedef enum _specname_primary_t {
 } specname_primary_t;
 
 /* RPM header cache so we don't balloon out our memory */
-typedef struct _header_cache_entry_t {
+typedef struct _header_cache_t {
     char *pkg;
     Header hdr;
-    TAILQ_ENTRY(_header_cache_entry_t) items;
-} header_cache_entry_t;
-
-typedef TAILQ_HEAD(header_cache_entry_s, _header_cache_entry_t) header_cache_t;
+    UT_hash_handle hh;
+} header_cache_t;
 
 /* Product release string favoring */
 typedef enum _favor_release_t {
