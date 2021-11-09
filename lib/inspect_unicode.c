@@ -25,6 +25,9 @@
 #include <errno.h>
 #include <err.h>
 #include <ftw.h>
+#include <sys/types.h>
+#include <sys/wait.h>
+#include <unistd.h>
 #include <rpm/rpmspec.h>
 #include <rpm/rpmbuild.h>
 #include <rpm/rpmlog.h>
@@ -52,6 +55,63 @@ static UChar32_list_t *forbidden = NULL;
 static const char *globalarch = NULL;
 
 /*
+ * Helper function to create a ~/rpmbuild tree in the working directory.
+ */
+static char *make_source_dirs(const char *worksubdir, const char *fullpath)
+{
+    int i = 0;
+    int mode = S_IRWXU | S_IRGRP | S_IXGRP | S_IROTH | S_IXOTH;
+    char *fp = NULL;
+    char *shortname = NULL;
+    char *sub = NULL;
+    char *topdir = NULL;
+
+    assert(worksubdir != NULL);
+    assert(fullpath != NULL);
+
+    /* use the already existing source subdirectory */
+    fp = strdup(fullpath);
+    assert(fp != NULL);
+    shortname = dirname(fp);
+    assert(shortname != NULL);
+
+    /* create rpmbuild-like directory structure and set macros */
+    xasprintf(&topdir, "%s/%s", worksubdir, RPMBUILD_TOPDIR);
+    assert(topdir != NULL);
+
+    if (mkdirp(topdir, mode) == -1) {
+        free(topdir);
+        return NULL;
+    }
+
+    for (i = 0; subdirs[i] != NULL; i++) {
+        xasprintf(&sub, "%s/%s/%s", worksubdir, RPMBUILD_TOPDIR, subdirs[i]);
+        assert(sub != NULL);
+
+        if (access(sub, R_OK | W_OK | X_OK) == 0) {
+            free(sub);
+            continue;
+        }
+
+        if (!strcmp(subdirs[i], RPMBUILD_SOURCEDIR) || !strcmp(subdirs[i], RPMBUILD_SPECDIR)) {
+            /* symlinks SOURCES and SPECS to where the SRPM is already extracted */
+            if (symlink(shortname, sub) == -1) {
+                warn("symlink");
+            }
+        } else {
+            if (mkdirp(sub, mode) == -1) {
+                warn("mkdirp");
+            }
+        }
+
+        free(sub);
+    }
+
+    free(fp);
+    return topdir;
+}
+
+/*
  * Given a spec file for a SRPM, do the equivalent of 'rpmbuild -bp'
  * to get an extracted and prepared source tree (e.g., patched).
  * Returns an allocated string containing the path to the rpmbuild
@@ -60,97 +120,230 @@ static const char *globalarch = NULL;
  *
  * A NULL return value indicates a failure to prepare the source tree.
  */
-static char *prep_source(struct rpminspect *ri, const rpmfile_entry_t *file)
+static char *rpm_prep_source(struct rpminspect *ri, const rpmfile_entry_t *file, char **details)
 {
+    int pfd[2];
+    pid_t proc = 0;
+    int status = 0;
+    FILE *reader = NULL;
+    char *tail = NULL;
+    size_t n = BUFSIZ;
+    char *buf = NULL;
     rpmSpec spec = NULL;
-    char *shortname = NULL;
-    char *fullpath = NULL;
-    char *dst = NULL;
     char *macro = NULL;
-    int i = 0;
-    int mode = S_IRWXU | S_IRGRP | S_IXGRP | S_IROTH | S_IXOTH;
     rpmts ts = NULL;
     BTA_t ba = NULL;
+    char *topdir = NULL;
 
     assert(ri != NULL);
     assert(file != NULL);
 
-    /* use the already existing source subdirectory */
-    fullpath = strdup(file->fullpath);
-    assert(fullpath != NULL);
-    shortname = dirname(fullpath);
-    assert(shortname != NULL);
-
-    /* create rpmbuild-like directory structure and set macros */
-    xasprintf(&dst, "%s/%s", ri->worksubdir, RPMBUILD_TOPDIR);
-    assert(dst != NULL);
-
-    if (mkdirp(dst, mode) == -1) {
-        free(dst);
+    /* perform the %prep step in a subprocess to capture stdout/stderr */
+    if (pipe(pfd) == -1) {
+        warn("pipe");
         return NULL;
     }
 
-    free(dst);
+    proc = fork();
 
-    for (i = 0; subdirs[i] != NULL; i++) {
-        xasprintf(&dst, "%s/%s/%s", ri->worksubdir, RPMBUILD_TOPDIR, subdirs[i]);
-        assert(dst != NULL);
-
-        if (!strcmp(subdirs[i], RPMBUILD_SOURCEDIR) || !strcmp(subdirs[i], RPMBUILD_SPECDIR)) {
-            /* symlinks SOURCES and SPECS to where the SRPM is already extracted */
-            if (symlink(shortname, dst) == -1) {
-                warn("symlink");
-            }
-        } else {
-            if (mkdirp(dst, mode) == -1) {
-                warn("mkdirp");
-            }
+    if (proc == 0) {
+        /* connect the output */
+        if (dup2(pfd[STDOUT_FILENO], STDOUT_FILENO) == -1 || dup2(pfd[STDOUT_FILENO], STDERR_FILENO) == -1) {
+            warn("dup2");
+            _exit(EXIT_FAILURE);
         }
 
-        free(dst);
-    }
+        /* close the pipe */
+        if (close(pfd[STDIN_FILENO]) == -1 || close(pfd[STDOUT_FILENO]) == -1) {
+            warn("dup2");
+            _exit(EXIT_FAILURE);
+        }
 
-    free(fullpath);
+        setlinebuf(stdout);
 
-    xasprintf(&macro, "_topdir %s/%s", ri->worksubdir, RPMBUILD_TOPDIR);
-    assert(macro != NULL);
-    (void) rpmDefineMacro(NULL, macro, 0);
-    free(macro);
+        /* define our top dir */
+        topdir = make_source_dirs(ri->worksubdir, file->fullpath);
+        assert(topdir != NULL);
+        xasprintf(&macro, "_topdir %s", topdir);
+        assert(macro != NULL);
+        (void) rpmDefineMacro(NULL, macro, 0);
+        free(macro);
+        free(topdir);
 
-    /* read in the spec file */
-    spec = rpmSpecParse(file->fullpath, RPMBUILD_PREP | RPMSPEC_ANYARCH, NULL);
+        /* read in the spec file */
+        spec = rpmSpecParse(file->fullpath, RPMBUILD_PREP | RPMSPEC_ANYARCH, NULL);
 
-    if (spec == NULL) {
-        warn("rpmSpecParse");
-        return NULL;
-    }
+        if (spec == NULL) {
+            warn("rpmSpecParse");
+            _exit(EXIT_FAILURE);
+        }
 
-    /* run through the %prep stage */
-    ba = calloc(1, sizeof(*ba));
-    assert(ba != NULL);
-    ba->buildAmount |= RPMBUILD_PREP;
+        /* run through the %prep stage */
+        ba = calloc(1, sizeof(*ba));
+        assert(ba != NULL);
+        ba->buildAmount |= RPMBUILD_PREP;
 
-    ts = rpmtsCreate();
-    (void) rpmtsSetRootDir(ts, ri->worksubdir);
-    rpmtsSetFlags(ts, rpmtsFlags(ts) | RPMTRANS_FLAG_NOPLUGINS);
+        ts = rpmtsCreate();
+        (void) rpmtsSetRootDir(ts, ri->worksubdir);
+        rpmtsSetFlags(ts, rpmtsFlags(ts) | RPMTRANS_FLAG_NOPLUGINS | RPMTRANS_FLAG_NOSCRIPTS);
 
-    rpmSetVerbosity(RPMLOG_WARNING);
+        /* normal noise level */
+        rpmSetVerbosity(RPMLOG_NOTICE);
 
+        /* try to perform the rpm %prep step */
 #ifdef _HAVE_OLD_RPM_API
-    if (rpmSpecBuild(spec, ba)) {
+        if (rpmSpecBuild(spec, ba)) {
 #else
-    if (rpmSpecBuild(ts, spec, ba)) {
+        if (rpmSpecBuild(ts, spec, ba)) {
 #endif
-        build = NULL;
+            status = 2;
+        } else {
+            status = EXIT_SUCCESS;
+        }
+
+        /* clean up */
+        rpmSpecFree(spec);
+        rpmtsFree(ts);
+        free(ba);
+
+        _exit(status);
+    } else if (proc == -1) {
+        /* failure */
+        warn("fork");
     } else {
+        /* close the pipe */
+        if (close(pfd[STDOUT_FILENO]) == -1) {
+            warn("close");
+        }
+
+        /* Read the child output back which would be what 'rpmbuild -bp' runs */
+        reader = fdopen(pfd[STDIN_FILENO], "r");
+
+        if (reader == NULL) {
+            warn("fdopen");
+            return NULL;
+        }
+
+        *details = NULL;
+        buf = calloc(1, n);
+        assert(buf != NULL);
+
+        while (getline(&buf, &n, reader) != -1) {
+            xasprintf(&tail, "%s%s", (*details == NULL) ? "" : *details, buf);
+            assert(tail != NULL);
+            free(*details);
+            *details = tail;
+        }
+
+        free(buf);
+
+        if (fclose(reader) == -1) {
+            warn("fclose");
+        }
+
+        /* wait for the child to exit */
+        if (waitpid(proc, &status, 0) == -1) {
+            warn("waitpid");
+        }
+
+        /* where unpacked sources can be found */
         xasprintf(&build, "%s/%s/%s", ri->worksubdir, RPMBUILD_TOPDIR, RPMBUILD_BUILDDIR);
+
+        /* wipe the working directory if %prep failed */
+        if (WEXITSTATUS(status) == 2) {
+            rmtree(build, true, true);
+            free(build);
+            build = NULL;
+        }
     }
 
-    /* clean up */
-    rpmtsFree(ts);
-    free(ba);
-    rpmSpecFree(spec);
+    /* trim trailing newlines from details */
+    if (*details != NULL) {
+        tail = rindex(*details, '\n');
 
+        if (tail != NULL) {
+            tail[strcspn(tail, "\n")] = 0;
+        }
+    }
+
+    return build;
+}
+
+/*
+ * Given a spec file for a SRPM, manually unpack source archives and
+ * uncompress files listed in the header.  This function is used if
+ * rpm_prep_source() fails.  Returns an allocated string containing
+ * the path to the rpmbuild BUILD subdirectory.  The caller is
+ * responsible for freeing the returned string.
+ *
+ * A NULL return value indicates a failure to prepare the source tree.
+ */
+static char *manual_prep_source(struct rpminspect *ri, const rpmfile_entry_t *file)
+{
+    char *topdir = NULL;
+    char *fp = NULL;
+    char *srpmdir = NULL;
+    char *srcfile = NULL;
+    char *mime = NULL;
+    char *extractdir = NULL;
+    string_list_t *sources = NULL;
+    string_entry_t *entry = NULL;
+
+    assert(ri != NULL);
+    assert(file != NULL);
+
+    /* get the directory for the SRPM files */
+    fp = strdup(file->fullpath);
+    assert(fp != NULL);
+    srpmdir = dirname(fp);
+    assert(srpmdir != NULL);
+
+    /* create extract location */
+    topdir = make_source_dirs(ri->worksubdir, file->fullpath);
+    assert(topdir != NULL);
+
+    /* extract to the same location 'rpmbuild' would use */
+    xasprintf(&build, "%s/%s", topdir, RPMBUILD_BUILDDIR);
+    assert(build != NULL);
+    free(topdir);
+
+    /* iterate over a list of all the source files in the SRPM */
+    sources = get_rpm_header_string_array(file->rpm_header, RPMTAG_SOURCE);
+
+    if (sources != NULL && !TAILQ_EMPTY(sources)) {
+        TAILQ_FOREACH(entry, sources, items) {
+            xasprintf(&srcfile, "%s/%s", srpmdir, entry->data);
+            assert(srcfile != NULL);
+
+            /* get the MIME type of the source file */
+            mime = mime_type(srcfile);
+
+            /* skip text files */
+            if (strprefix(mime, "text/")) {
+                free(mime);
+                free(srcfile);
+                continue;
+            }
+
+            /* create a unique subdirectory for this source file */
+            xasprintf(&extractdir, "%s/unpack-XXXXXX", build);
+            assert(extractdir != NULL);
+            extractdir = mkdtemp(extractdir);
+            assert(extractdir != NULL);
+
+            /* try to unpack the file */
+            if (unpack_archive(srcfile, extractdir, true)) {
+                rmtree(extractdir, true, false);
+            }
+
+            free(extractdir);
+            free(mime);
+            free(srcfile);
+        }
+    }
+
+    free(fp);
+    list_free(sources, free);
     return build;
 }
 
@@ -331,6 +524,7 @@ static int validate_file(const char *fpath, __attribute__((unused)) const struct
 
 static bool unicode_driver(struct rpminspect *ri, rpmfile_entry_t *file)
 {
+    bool prepped = false;
     struct result_params params;
 
     assert(ri != NULL);
@@ -346,12 +540,23 @@ static bool unicode_driver(struct rpminspect *ri, rpmfile_entry_t *file)
     globalarch = get_rpm_header_arch(file->rpm_header);
     assert(globalarch != NULL);
 
+    /* initialize result parameters */
+    init_result_params(&params);
+
     /* when the spec file is found, prepare the source tree and check each file there */
     if (strsuffix(file->localpath, SPEC_FILENAME_EXTENSION)) {
-        /* for the spec file, examine each file in the prepared source tree */
-        if (prep_source(ri, file) == NULL) {
-            /* failure case where we can't prep the source tree */
-            init_result_params(&params);
+        if (rpm_prep_source(ri, file, &params.details) != NULL) {
+            /* for the spec file, examine each file in the prepared source tree */
+            prepped = true;
+        } else if (manual_prep_source(ri, file) != NULL) {
+            /* try to fall back on unpacking archives manually */
+            prepped = true;
+            free(params.details);
+            params.details = NULL;
+        }
+
+        if (!prepped) {
+            /* failure case where we can't prep the source tree or manually unpack archives */
             params.severity = RESULT_BAD;
             params.waiverauth = NOT_WAIVABLE;
             params.header = NAME_UNICODE;
@@ -360,9 +565,11 @@ static bool unicode_driver(struct rpminspect *ri, rpmfile_entry_t *file)
             params.noun = _("unable to run %prep in ${FILE}");
             params.verb = VERB_FAILED;
             params.remedy = REMEDY_UNICODE_PREP_FAILED;
-            xasprintf(&params.msg, _("Unable to run through the %%prep section %s for further scanning."), file->localpath);
+            xasprintf(&params.msg, _("Unable to run through the %%prep section in %s or manually unpack sources for further scanning."), file->localpath);
             add_result(globalri, &params);
             free(params.msg);
+            free(params.details);
+            params.details = NULL;
 
             seen = true;
             return false;
