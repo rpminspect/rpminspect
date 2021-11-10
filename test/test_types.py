@@ -26,7 +26,7 @@ echo nope
 
 class SameTypeCompareSRPM(TestCompareSRPM):
     def setUp(self):
-        TestCompareSRPM.setUp(self)
+        super().setUp()
         self.before_rpm.add_simple_compilation(installPath="/usr/bin/rpminspect")
         self.after_rpm.add_simple_compilation(installPath="/usr/bin/rpminspect")
 
@@ -36,7 +36,7 @@ class SameTypeCompareSRPM(TestCompareSRPM):
 
 class SameTypeCompareRPMs(TestCompareRPMs):
     def setUp(self):
-        TestCompareSRPM.setUp(self)
+        super().setUp()
         self.before_rpm.add_simple_compilation(installPath="/usr/bin/rpminspect")
         self.after_rpm.add_simple_compilation(installPath="/usr/bin/rpminspect")
 
@@ -46,7 +46,7 @@ class SameTypeCompareRPMs(TestCompareRPMs):
 
 class SameTypeCompareKoji(TestCompareKoji):
     def setUp(self):
-        TestCompareSRPM.setUp(self)
+        super().setUp()
         self.before_rpm.add_simple_compilation(installPath="/usr/bin/rpminspect")
         self.after_rpm.add_simple_compilation(installPath="/usr/bin/rpminspect")
 
@@ -56,7 +56,7 @@ class SameTypeCompareKoji(TestCompareKoji):
 
 class ChangedTypeCompareSRPM(TestCompareSRPM):
     def setUp(self):
-        TestCompareSRPM.setUp(self)
+        super().setUp()
         self.before_rpm.add_installed_file(
             "/usr/share/vaporware/rpminspect",
             rpmfluff.SourceFile("rpminspect.source", rpminspect_sh),
@@ -73,7 +73,7 @@ class ChangedTypeCompareSRPM(TestCompareSRPM):
 
 class ChangedTypeCompareRPMs(TestCompareRPMs):
     def setUp(self):
-        TestCompareSRPM.setUp(self)
+        super().setUp()
         self.before_rpm.add_installed_file(
             "/usr/share/vaporware/rpminspect",
             rpmfluff.SourceFile("rpminspect.sh", rpminspect_sh),
@@ -90,7 +90,7 @@ class ChangedTypeCompareRPMs(TestCompareRPMs):
 
 class ChangedTypeCompareKoji(TestCompareKoji):
     def setUp(self):
-        TestCompareSRPM.setUp(self)
+        super().setUp()
         self.before_rpm.add_installed_file(
             "/usr/share/vaporware/rpminspect",
             rpmfluff.SourceFile("rpminspect.sh", rpminspect_sh),
