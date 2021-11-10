@@ -733,7 +733,7 @@ int main(int argc, char **argv)
         }
 
         free_rpminspect(ri);
-            rpmFreeMacros(NULL);
+        rpmFreeMacros(NULL);
         rpmFreeRpmrc();
         return RI_INSPECTION_SUCCESS;
     } else {
