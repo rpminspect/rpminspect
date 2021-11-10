@@ -19,10 +19,10 @@ if [ -z "${MESON_VER}" ] || [ ! "${MESON_VER}" = "0.55.0" ]; then
     exit 0
 fi
 
-PYDIR="$(dirname $(rpm -ql meson | grep 'ninjabackend.py$'))"
+PYDIR="$(dirname "$(rpm -ql meson | grep 'ninjabackend.py$')")"
 [ -d "${PYDIR}" ] || exit 2
 
-cd "${PYDIR}"
+cd "${PYDIR}" || exit 1
 [ -f "${OSDEPS}/meson.patch" ] || exit 3
 patch -p0 < "${OSDEPS}/meson.patch"
 
