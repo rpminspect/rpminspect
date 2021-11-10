@@ -19,4 +19,4 @@ jobs:
         steps:
             - uses: actions/checkout@v2
             - run: dnf install -y ShellCheck xz
-            - run: shellcheck --severity=warning **/*.sh
+            - run: find . -type f -name "*.sh" -exec shellcheck --severity=warning {} \;
