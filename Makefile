@@ -78,6 +78,9 @@ flake8:
 black:
 	python3 -m black --check --diff $(topdir)/test/ $(topdir)/doc/
 
+shellcheck:
+	find . -type f -name "*.sh" -exec shellcheck --severity=warning {} \;
+
 gate: all
 	$(topdir)/utils/gate.sh $(topdir)/build/src/rpminspect
 
@@ -157,20 +160,25 @@ help:
 	@echo "The source tree uses meson(1) for building and testing, but this Makefile"
 	@echo "is intended as a simple helper for the common steps."
 	@echo
-	@echo "    all          Default target, setup tree to build and build"
-	@echo "    setup        Run 'meson setup $(MESON_BUILD_DIR)'"
-	@echo "    check        Run 'meson test -C $(MESON_BUILD_DIR) -v'"
-	@echo "    update-pot   Update po/POTFILES and po/rpminspect.pot"
-	@echo "    srpm         Generate an SRPM package of the latest release"
-	@echo "    release      Tag and push current tree as a release"
-	@echo "    new-release  Bump version, tag, and push current tree as a release"
-	@echo "    koji         Run 'make srpm' then 'utils/submit-koji-builds.sh'"
-	@echo "    clean        Run 'rm -rf $(MESON_BUILD_DIR)'"
-	@echo "    instreqs     Install required build and runtime packages"
-	@echo "    authors      Generate a new AUTHORS.md file"
+	@echo "    all               Default target, setup tree to build and build"
+	@echo "    setup             Run 'meson setup $(MESON_BUILD_DIR)'"
+	@echo "    check             Run 'meson test -C $(MESON_BUILD_DIR) -v'"
+	@echo "    update-pot        Update po/POTFILES and po/rpminspect.pot"
+	@echo "    srpm              Generate an SRPM package of the latest release"
+	@echo "    release           Tag and push current tree as a release"
+	@echo "    new-release       Bump version, tag, and push current tree as a release"
+	@echo "    koji              Run 'make srpm' then 'utils/submit-koji-builds.sh'"
+	@echo "    clean             Run 'rm -rf $(MESON_BUILD_DIR)'"
+	@echo "    instreqs          Install required build and runtime packages"
+	@echo "    authors           Generate a new AUTHORS.md file"
 	@echo
 	@echo "To build:"
 	@echo "    make"
+	@echo
+	@echo "To perform syntax and style checks:"
+	@echo "    make shellcheck   Run ShellCheck on all shell scripts"
+	@echo "    make flake8       Run Python flake8 checks on all Python files"
+	@echo "    make black        Run Python black checks on all Python files"
 	@echo
 	@echo "To run the test suite:"
 	@echo "    make check"
