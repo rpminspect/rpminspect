@@ -119,7 +119,7 @@ static bool check_class_file(struct rpminspect *ri, const char *fullpath,
     /* basic checks on the most recent build */
     if (major == -1 && !strsuffix(localpath, CLASS_FILENAME_EXTENSION)) {
         return true;
-    } else if (major < 0 || major > 60) {
+    } else if (major < 0) {
         xasprintf(&params.msg, _("File %s (%s), Java byte code version %d is incorrect (wrong endianness? corrupted file? space JDK?)"), localpath, container, major);
         add_result(ri, &params);
         free(params.msg);
