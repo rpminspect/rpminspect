@@ -87,10 +87,86 @@ def check_results(results, inspection, result, waiver_auth, message=None):
         )
 
 
+# This is a local extension to SimpleRpmBuild in rpmfluff.  For the
+# SRPM only test classes, override the do_make() function so that
+# rpmbuild only builds the SRPM and not all of the packages.
+#
+# The only significant difference here is that rpmbuild is called
+# with the '-bs' option instead of '-ba'.  Enough functions are
+# duplicated here in order to make it all work.
+class SimpleSrpmBuild(rpmfluff.SimpleRpmBuild):
+    def __write_log(self, log, arch):
+        log_dir = self.get_build_log_dir(arch)
+        if not os.path.exists(log_dir):
+            os.makedirs(log_dir)
+        filename = self.get_build_log_path(arch)
+        f = open(filename, "wb")
+        for line in log:
+            f.write(line)
+        f.close()
+
+    def __create_directories(self):
+        """Sets up the directory hierarchy for the build"""
+        if self.tmpdir and not (
+            self.tmpdir_location and os.path.isdir(self.tmpdir_location)
+        ):
+            self.tmpdir_location = tempfile.mkdtemp(prefix="rpmfluff-")
+        os.mkdir(self.get_base_dir())
+
+        # Make fake rpmbuild directories
+        for subDir in ["BUILD", "SOURCES", "SRPMS", "RPMS"]:
+            os.mkdir(os.path.join(self.get_base_dir(), subDir))
+
+    def do_make(self):
+        """
+        Hook to actually perform the rpmbuild, gathering the necessary source files first
+        """
+        self.clean()
+
+        self.__create_directories()
+
+        specFileName = self.gather_spec_file(self.get_base_dir())
+
+        sourcesDir = self.get_sources_dir()
+        self.gather_sources(sourcesDir)
+
+        absBaseDir = os.path.abspath(self.get_base_dir())
+
+        buildArchs = ()
+        if self.buildArchs:
+            buildArchs = self.buildArchs
+        else:
+            buildArchs = (rpmfluff.utils.expectedArch,)
+        for arch in buildArchs:
+            command = [
+                "rpmbuild",
+                "--define",
+                "_topdir %s" % absBaseDir,
+                "--define",
+                "_rpmfilename %%{ARCH}/%%{NAME}-%%{VERSION}-%%{RELEASE}.%%{ARCH}.rpm",
+                "-bs",
+                "--target",
+                arch,
+                specFileName,
+            ]
+            try:
+                log = subprocess.check_output(
+                    command, stderr=subprocess.STDOUT
+                ).splitlines(True)
+            except subprocess.CalledProcessError as e:
+                raise RuntimeError(
+                    "rpmbuild command failed with exit status %s: %s\n%s"
+                    % (e.returncode, e.cmd, e.output)
+                )
+            self.__write_log(log, arch)
+
+
 # Base test case class that ensures we have 'rpminspect'
 # as an executable command.
 class RequiresRpminspect(unittest.TestCase):
     def setUp(self):
+        super().setUp()
+
         # make sure we have the program
         self.rpminspect = os.environ["RPMINSPECT"]
 
@@ -197,7 +273,7 @@ class RequiresRpminspect(unittest.TestCase):
 class TestSRPM(RequiresRpminspect):
     def setUp(self):
         super().setUp()
-        self.rpm = rpmfluff.SimpleRpmBuild(AFTER_NAME, AFTER_VER, AFTER_REL)
+        self.rpm = SimpleSrpmBuild(AFTER_NAME, AFTER_VER, AFTER_REL)
 
         # turn off all rpmbuild post processing stuff for the purposes of testing
         self.rpm.header += "\n%global __os_install_post %{nil}\n"
@@ -290,8 +366,8 @@ class TestCompareSRPM(RequiresRpminspect):
         else:
             after_name = AFTER_NAME
 
-        self.before_rpm = rpmfluff.SimpleRpmBuild(BEFORE_NAME, BEFORE_VER, BEFORE_REL)
-        self.after_rpm = rpmfluff.SimpleRpmBuild(after_name, after_ver, AFTER_REL)
+        self.before_rpm = SimpleSrpmBuild(BEFORE_NAME, BEFORE_VER, BEFORE_REL)
+        self.after_rpm = SimpleSrpmBuild(after_name, after_ver, AFTER_REL)
 
         # turn off all rpmbuild post processing stuff for the purposes of testing
         self.before_rpm.header += "\n%global __os_install_post %{nil}\n"
@@ -374,7 +450,23 @@ class TestCompareSRPM(RequiresRpminspect):
 
 
 # Base test case class that tests the binary RPMs
-class TestRPMs(TestSRPM):
+class TestRPMs(RequiresRpminspect):
+    def setUp(self):
+        super().setUp()
+        self.rpm = rpmfluff.SimpleRpmBuild(AFTER_NAME, AFTER_VER, AFTER_REL)
+
+        # turn off all rpmbuild post processing stuff for the purposes of testing
+        self.rpm.header += "\n%global __os_install_post %{nil}\n"
+
+        # the inheriting class needs to override these
+        self.inspection = None
+        self.result_inspection = None
+
+        # defaults
+        self.exitcode = 0
+        self.result = "OK"
+        self.waiver_auth = "Not Waivable"
+
     def runTest(self):
         self.configFile()
 
@@ -437,9 +529,43 @@ class TestRPMs(TestSRPM):
                 self.waiver_auth,
             )
 
+    def tearDown(self):
+        super().tearDown()
+        self.rpm.clean()
+
 
 # Base test case class that compares before and after built RPMs
-class TestCompareRPMs(TestCompareSRPM):
+class TestCompareRPMs(RequiresRpminspect):
+    def setUp(self, rebase=False, same=False):
+        super().setUp()
+
+        if rebase:
+            after_ver = AFTER_REBASE_VER
+        else:
+            after_ver = AFTER_VER
+
+        if same:
+            after_name = BEFORE_NAME
+            after_ver = BEFORE_VER
+        else:
+            after_name = AFTER_NAME
+
+        self.before_rpm = rpmfluff.SimpleRpmBuild(BEFORE_NAME, BEFORE_VER, BEFORE_REL)
+        self.after_rpm = rpmfluff.SimpleRpmBuild(after_name, after_ver, AFTER_REL)
+
+        # turn off all rpmbuild post processing stuff for the purposes of testing
+        self.before_rpm.header += "\n%global __os_install_post %{nil}\n"
+        self.after_rpm.header += "\n%global __os_install_post %{nil}\n"
+
+        # the inheriting class needs to override these
+        self.inspection = None
+        self.result_inspection = None
+
+        # defaults
+        self.exitcode = 0
+        self.result = "OK"
+        self.waiver_auth = "Not Waivable"
+
     def runTest(self):
         self.configFile()
 
@@ -504,9 +630,14 @@ class TestCompareRPMs(TestCompareSRPM):
                 message=self.message,
             )
 
+    def tearDown(self):
+        super().tearDown()
+        self.before_rpm.clean()
+        self.after_rpm.clean()
+
 
 # Base test case class that tests a fake Koji build
-class TestKoji(TestSRPM):
+class TestKoji(TestRPMs):
     def runTest(self):
         self.configFile()
 
@@ -585,7 +716,7 @@ class TestKoji(TestSRPM):
 
 
 # Base test case class that compares before and after Koji builds
-class TestCompareKoji(TestCompareSRPM):
+class TestCompareKoji(TestCompareRPMs):
     def runTest(self):
         self.configFile()
 
