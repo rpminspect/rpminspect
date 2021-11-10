@@ -895,7 +895,8 @@ static bool is_remote_rpm(const char *url)
  * @param fo True if '-f' (fetch only) specified, false otherwise.
  * @return 0 on success, non-zero on failure.
  */
-int gather_builds(struct rpminspect *ri, bool fo) {
+int gather_builds(struct rpminspect *ri, bool fo)
+{
     struct koji_build *build = NULL;
     struct koji_task *task = NULL;
 
