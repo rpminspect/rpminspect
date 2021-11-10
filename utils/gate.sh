@@ -91,7 +91,7 @@ for package in ${packages}; do
     echo "INFO: Comparing ${builds}"
 
     opts="-o ${package}.log ${builds}"
-    run_rpminspect ${opts}
+    run_rpminspect "${opts}"
     ret=$?
     [ ${ret} -lt 2 ] || exit 1
 

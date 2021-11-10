@@ -6,49 +6,46 @@ CWD="$(pwd)"
 curl -O http://mandoc.bsd.lv/snapshots/mandoc.tar.gz
 SUBDIR="$(tar -tvf mandoc.tar.gz | head -n 1 | rev | cut -d ' ' -f 1 | rev)"
 tar -xvf mandoc.tar.gz
-cd ${SUBDIR}
-echo 'PREFIX=/usr/local'                     > configure.local
-echo 'BINDIR=/usr/local/bin'                >> configure.local
-echo 'SBINDIR=/usr/local/sbin'              >> configure.local
-echo 'MANDIR=/usr/local/share/man'          >> configure.local
-echo 'INCLUDEDIR=/usr/local/include'        >> configure.local
-echo 'LIBDIR=/usr/local/lib'                >> configure.local
-echo 'LN="ln -sf"'                          >> configure.local
-echo 'MANM_MANCONF=mandoc.conf'             >> configure.local
-echo 'INSTALL_PROGRAM="install -D -m 0755"' >> configure.local
-echo 'INSTALL_LIB="install -D -m 0644"'     >> configure.local
-echo 'INSTALL_HDR="install -D -m 0644"'     >> configure.local
-echo 'INSTALL_MAN="install -D -m 0644"'     >> configure.local
-echo 'INSTALL_DATA="install -D -m 0644"'    >> configure.local
-echo 'INSTALL_LIBMANDOC=1'                  >> configure.local
-echo 'CFLAGS="-g -fPIC"'                    >> configure.local
+{ echo 'PREFIX=/usr/local';
+  echo 'BINDIR=/usr/local/bin';
+  echo 'SBINDIR=/usr/local/sbin';
+  echo 'MANDIR=/usr/local/share/man';
+  echo 'INCLUDEDIR=/usr/local/include';
+  echo 'LIBDIR=/usr/local/lib';
+  echo 'LN="ln -sf"';
+  echo 'MANM_MANCONF=mandoc.conf';
+  echo 'INSTALL_PROGRAM="install -D -m 0755"';
+  echo 'INSTALL_LIB="install -D -m 0644"';
+  echo 'INSTALL_HDR="install -D -m 0644"';
+  echo 'INSTALL_MAN="install -D -m 0644"';
+  echo 'INSTALL_DATA="install -D -m 0644"';
+  echo 'INSTALL_LIBMANDOC=1';
+  echo 'CFLAGS="-g -fPIC"';
+} > "${SUBDIR}"/configure.local
 
 # something on Mageia causes the configure script grief, hack around it
-sed -i -e 's|^CC=.*$|CC=gcc|g' configure
-sed -i -e 's|^int dummy;$|extern int dummy;|g' compat_err.c
-sed -i -e 's|^int dummy;$|extern int dummy;|g' compat_getline.c
-sed -i -e 's|^int dummy;$|extern int dummy;|g' compat_reallocarray.c
+sed -i -e 's|^CC=.*$|CC=gcc|g' "${SUBDIR}"/configure
+sed -i -e 's|^int dummy;$|extern int dummy;|g' "${SUBDIR}"/compat_err.c
+sed -i -e 's|^int dummy;$|extern int dummy;|g' "${SUBDIR}"/compat_getline.c
+sed -i -e 's|^int dummy;$|extern int dummy;|g' "${SUBDIR}"/compat_reallocarray.c
 
-./configure
-make
-make lib-install
-cd ..
-rm -rf mandoc.tar.gz ${SUBDIR}
+( cd "${SUBDIR}" && ./configure && make && make lib-install )
+rm -rf mandoc.tar.gz "${SUBDIR}"
 
 # The 'rc' shell is not available in Mageia Linux, build manually
 git clone https://github.com/rakitzis/rc.git
-cd rc
+cd rc || exit 1
 autoreconf -f -i -v
 ./configure --prefix=/usr/local
 make
 make install
 
 # Install libabigail from git
-cd ${CWD}
+cd "${CWD}" || exit 1
 git clone https://sourceware.org/git/libabigail.git
-cd libabigail
+cd libabigail || exit 1
 TAG="$(git tag -l | grep ^libabigail- | grep -v '\.rc' | sort -n | tail -n 1)"
-git checkout -b ${TAG} ${TAG}
+git checkout -b "${TAG}" "${TAG}"
 autoreconf -f -i -v
 ./configure --prefix=/usr/local
 make

@@ -28,7 +28,7 @@ CWD="$(pwd)"
 RPMINSPECT=${RPMINSPECT:-rpminspect}
 TIMECMD="/usr/bin/time"
 TIMEOPTS="-v"
-TMPDIR="$(mktemp -d -p /var/tmp -t "$(basename $0 .sh)".XXXXXX)"
+TMPDIR="$(mktemp -d -p /var/tmp -t "$(basename "$0" .sh)".XXXXXX)"
 trap 'rm -rf "${TMPDIR}"' EXIT
 
 # Make sure we have additional commands available
@@ -51,9 +51,9 @@ BEFORE_BUILD="$(koji list-builds --package=${PKG} | grep "\.${DIST_TAG}" | grep 
 AFTER_BUILD="$(koji list-builds --package=${PKG} | grep "\.${DIST_TAG}" | grep -E ' COMPLETE$' | tail -n 1 | cut -d ' ' -f 1)"
 
 # Fetch builds so they don't have to be downloaded for each inspection
-cd ${TMPDIR} || exit
-${TIMECMD} ${TIMEOPTS} ${RPMINSPECT} -f -v -w ${TMPDIR} ${BEFORE_BUILD} 2>&1 | tee ${CWD}/${PKG}-download-before-ALL.log
-${TIMECMD} ${TIMEOPTS} ${RPMINSPECT} -f -v -w ${TMPDIR} ${AFTER_BUILD} 2>&1 | tee ${CWD}/${PKG}-download-after-ALL.log
+cd "${TMPDIR}" || exit
+${TIMECMD} ${TIMEOPTS} "${RPMINSPECT}" -f -v -w "${TMPDIR}" "${BEFORE_BUILD}" 2>&1 | tee "${CWD}"/"${PKG}"-download-before-ALL.log
+${TIMECMD} ${TIMEOPTS} "${RPMINSPECT}" -f -v -w "${TMPDIR}" "${AFTER_BUILD}" 2>&1 | tee "${CWD}"/"${PKG}"-download-after-ALL.log
 
 # Run and log the inspections
-${TIMECMD} ${TIMEOPTS} ${RPMINSPECT} -T ALL -v ${BEFORE_BUILD} ${AFTER_BUILD} 2>&1 | tee ${CWD}/${PKG}-ALL.log
+${TIMECMD} ${TIMEOPTS} "${RPMINSPECT}" -T ALL -v "${BEFORE_BUILD}" "${AFTER_BUILD}" 2>&1 | tee "${CWD}"/"${PKG}"-ALL.log

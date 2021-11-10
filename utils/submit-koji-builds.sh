@@ -147,7 +147,7 @@ for branch in ${BRANCHES} ; do
     # save current changelog
     pos=$(grep -n '^%changelog' "${PROJECT}".spec | cut -d ':' -f 1)
     len=$(wc -l "${PROJECT}".spec | cut -d ' ' -f 1)
-    tail -n $((${len} - ${pos})) "${PROJECT}".spec > "${CWD}"/cl
+    tail -n $((len - pos)) "${PROJECT}".spec > "${CWD}"/cl
 
     # new changelog entry
     VER="$(grep ^Version "${CWD}"/"${PROJECT}".spec | awk '{ print $2; }')"
@@ -163,13 +163,14 @@ for branch in ${BRANCHES} ; do
         cat "${CWD}"/cl >> "${PROJECT}".spec
     fi
 
-    ( cd "${CWD}" ; rm -f newcl cl )
+    rm -f "${CWD}"/newcl
+    rm -f "${CWD}"/cl
 
     # copy in gpgkey
     cp "${CWD}"/*.gpg .
 
     # commit changes
-    git add sources *.gpg "${PROJECT}".spec
+    git add sources ./*.gpg "${PROJECT}".spec
     ${VENDORPKG} ci -cps
     git clean -dxf
 

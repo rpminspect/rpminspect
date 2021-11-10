@@ -28,7 +28,7 @@ CWD="$(pwd)"
 RPMINSPECT=${RPMINSPECT:-rpminspect}
 TIMECMD="/usr/bin/time"
 TIMEOPTS="-v"
-TMPDIR="$(mktemp -d -p /var/tmp -t "$(basename $0 .sh)".XXXXXX)"
+TMPDIR="$(mktemp -d -p /var/tmp -t "$(basename "$0" .sh)".XXXXXX)"
 trap 'rm -rf "${TMPDIR}"' EXIT
 
 # Make sure we have additional commands available
@@ -51,15 +51,15 @@ BEFORE_BUILD="$(koji list-builds --package=${PKG} | grep "\.${DIST_TAG}" | grep 
 AFTER_BUILD="$(koji list-builds --package=${PKG} | grep "\.${DIST_TAG}" | grep -E ' COMPLETE$' | tail -n 1 | cut -d ' ' -f 1)"
 
 # Fetch builds so they don't have to be downloaded for each inspection
-cd ${TMPDIR} || exit
-${TIMECMD} ${TIMEOPTS} ${RPMINSPECT} -f -v -w ${TMPDIR} ${BEFORE_BUILD} 2>&1 | tee ${CWD}/${PKG}-download-before-indiv.log
-${TIMECMD} ${TIMEOPTS} ${RPMINSPECT} -f -v -w ${TMPDIR} ${AFTER_BUILD} 2>&1 | tee ${CWD}/${PKG}-download-after-indiv.log
+cd "${TMPDIR}" || exit
+${TIMECMD} ${TIMEOPTS} "${RPMINSPECT}" -f -v -w "${TMPDIR}" "${BEFORE_BUILD}" 2>&1 | tee "${CWD}"/"${PKG}"-download-before-indiv.log
+${TIMECMD} ${TIMEOPTS} "${RPMINSPECT}" -f -v -w "${TMPDIR}" "${AFTER_BUILD}" 2>&1 | tee "${CWD}"/"${PKG}"-download-after-indiv.log
 
 # Run and log each inspection
 start=$(${RPMINSPECT} -l | grep -n '^Available inspections:$' | cut -d ':' -f 1)
 len=$(${RPMINSPECT} -l | wc -l)
-ilen=$((${len} - ${start}))
+ilen=$((len - start))
 
-${RPMINSPECT} -l | tail -n ${ilen} | while read inspection ; do
-    ${TIMECMD} ${TIMEOPTS} ${RPMINSPECT} -T ${inspection} -v ${BEFORE_BUILD} ${AFTER_BUILD} 2>&1 | tee ${CWD}/${PKG}-${inspection}.log
+${RPMINSPECT} -l | tail -n ${ilen} | while read -r inspection ; do
+    ${TIMECMD} ${TIMEOPTS} "${RPMINSPECT}" -T "${inspection}" -v "${BEFORE_BUILD}" "${AFTER_BUILD}" 2>&1 | tee "${CWD}"/"${PKG}"-"${inspection}".log
 done
