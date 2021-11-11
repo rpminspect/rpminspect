@@ -2100,3 +2100,463 @@ class UnicodeBadStretchStringSourceArchiveCompareKoji(TestCompareKoji):
         self.inspection = "unicode"
         self.waiver_auth = "Security"
         self.result = "BAD"
+
+
+# The following tests run the unicode inspection with a known good source
+# file in a tarball in the SRPM, but the %prep section in the spec
+# file is bad so the rpmSpecBuild() call will fail and rpminspect will have
+# to fall back on manual unpacking.  All of the results for these should be
+# 'OK'.  We have to perform the test using the TestSRPM and TestCompareSRPM
+# classes because we need to construct a known-bad spec file.
+class UnicodeGoodCSourceArchiveBadPrepSRPM(TestSRPM):
+    def setUp(self):
+        super().setUp()
+
+        self.rpm.header += "\n%define debug_package %{nil}\n"
+        self.rpm.add_source(
+            rpmfluff.GeneratedTarball(
+                "%s-%s.tar.gz" % (AFTER_NAME, AFTER_VER),
+                "%s-%s" % (AFTER_NAME, AFTER_VER),
+                [
+                    rpmfluff.SourceFile("Makefile", makefile_src),
+                    rpmfluff.SourceFile("good.c", good_c_src),
+                    rpmfluff.SourceFile("status.sh", status_src),
+                ],
+            )
+        )
+        self.rpm.section_prep = "%setup\n"
+        self.rpm.section_prep += "/usr/bin/missing-command --do-some-stuff\n\n"
+        self.rpm.section_build += "make\n"
+        self.rpm.section_install += "make install DESTDIR=%{buildroot}\n"
+        sub = self.rpm.get_subpackage(None)
+        sub.section_files += "/usr/bin/status\n"
+
+        self.inspection = "unicode"
+        self.result = "OK"
+
+
+class UnicodeGoodCSourceArchiveCompareBadPrepSRPM(TestCompareSRPM):
+    def setUp(self):
+        super().setUp()
+
+        self.before_rpm.header += "\n%define debug_package %{nil}\n"
+        self.before_rpm.add_source(
+            rpmfluff.GeneratedTarball(
+                "%s-%s.tar.gz" % (BEFORE_NAME, BEFORE_VER),
+                "%s-%s" % (BEFORE_NAME, BEFORE_VER),
+                [
+                    rpmfluff.SourceFile("Makefile", makefile_src),
+                    rpmfluff.SourceFile("good.c", good_c_src),
+                    rpmfluff.SourceFile("status.sh", status_src),
+                ],
+            )
+        )
+        self.before_rpm.section_prep = "%setup\n"
+        self.before_rpm.section_prep += "/usr/bin/missing-command --do-some-stuff\n\n"
+        self.before_rpm.section_build += "make\n"
+        self.before_rpm.section_install += "make install DESTDIR=%{buildroot}\n"
+        sub = self.before_rpm.get_subpackage(None)
+        sub.section_files += "/usr/bin/status\n"
+
+        self.after_rpm.header += "\n%define debug_package %{nil}\n"
+        self.after_rpm.add_source(
+            rpmfluff.GeneratedTarball(
+                "%s-%s.tar.gz" % (AFTER_NAME, AFTER_VER),
+                "%s-%s" % (AFTER_NAME, AFTER_VER),
+                [
+                    rpmfluff.SourceFile("Makefile", makefile_src),
+                    rpmfluff.SourceFile("good.c", good_c_src),
+                    rpmfluff.SourceFile("status.sh", status_src),
+                ],
+            )
+        )
+        self.after_rpm.section_prep = "%setup\n"
+        self.after_rpm.section_prep += "/usr/bin/missing-command --do-some-stuff\n\n"
+        self.after_rpm.section_build += "make\n"
+        self.after_rpm.section_install += "make install DESTDIR=%{buildroot}\n"
+        sub = self.after_rpm.get_subpackage(None)
+        sub.section_files += "/usr/bin/status\n"
+
+        self.inspection = "unicode"
+        self.result = "OK"
+
+
+# The following tests run the unicode inspection with a known bad source
+# file in a tarball in the SRPM, but the %prep section in the spec
+# file is bad so the rpmSpecBuild() call will fail and rpminspect will have
+# to fall back on manual unpacking.  All of the results for these should be
+# 'BAD'.  We have to perform the test using the TestSRPM and TestCompareSRPM
+# classes because we need to construct a known-bad spec file.
+class UnicodeBadCSourceArchiveBadPrepSRPM(TestSRPM):
+    def setUp(self):
+        super().setUp()
+
+        self.rpm.header += "\n%define debug_package %{nil}\n"
+        self.rpm.add_source(
+            rpmfluff.GeneratedTarball(
+                "%s-%s.tar.gz" % (AFTER_NAME, AFTER_VER),
+                "%s-%s" % (AFTER_NAME, AFTER_VER),
+                [
+                    rpmfluff.SourceFile("Makefile", makefile_src),
+                    rpmfluff.SourceFile("bad.c", bad_c_src),
+                    rpmfluff.SourceFile("status.sh", status_src),
+                ],
+            )
+        )
+        self.rpm.section_prep = "%setup\n"
+        self.rpm.section_prep += "/usr/bin/missing-command --do-some-stuff\n\n"
+        self.rpm.section_build += "make\n"
+        self.rpm.section_install += "make install DESTDIR=%{buildroot}\n"
+        sub = self.rpm.get_subpackage(None)
+        sub.section_files += "/usr/bin/status\n"
+
+        self.inspection = "unicode"
+        self.waiver_auth = "Security"
+        self.result = "BAD"
+
+
+class UnicodeBadCSourceArchiveCompareBadPrepSRPM(TestCompareSRPM):
+    def setUp(self):
+        super().setUp()
+
+        self.before_rpm.header += "\n%define debug_package %{nil}\n"
+        self.before_rpm.add_source(
+            rpmfluff.GeneratedTarball(
+                "%s-%s.tar.gz" % (BEFORE_NAME, BEFORE_VER),
+                "%s-%s" % (BEFORE_NAME, BEFORE_VER),
+                [
+                    rpmfluff.SourceFile("Makefile", makefile_src),
+                    rpmfluff.SourceFile("bad.c", bad_c_src),
+                    rpmfluff.SourceFile("status.sh", status_src),
+                ],
+            )
+        )
+        self.before_rpm.section_prep = "%setup\n"
+        self.before_rpm.section_prep += "/usr/bin/missing-command --do-some-stuff\n\n"
+        self.before_rpm.section_build += "make\n"
+        self.before_rpm.section_install += "make install DESTDIR=%{buildroot}\n"
+        sub = self.before_rpm.get_subpackage(None)
+        sub.section_files += "/usr/bin/status\n"
+
+        self.after_rpm.header += "\n%define debug_package %{nil}\n"
+        self.after_rpm.add_source(
+            rpmfluff.GeneratedTarball(
+                "%s-%s.tar.gz" % (AFTER_NAME, AFTER_VER),
+                "%s-%s" % (AFTER_NAME, AFTER_VER),
+                [
+                    rpmfluff.SourceFile("Makefile", makefile_src),
+                    rpmfluff.SourceFile("bad.c", bad_c_src),
+                    rpmfluff.SourceFile("status.sh", status_src),
+                ],
+            )
+        )
+        self.after_rpm.section_prep = "%setup\n"
+        self.after_rpm.section_prep += "/usr/bin/missing-command --do-some-stuff\n\n"
+        self.after_rpm.section_build += "make\n"
+        self.after_rpm.section_install += "make install DESTDIR=%{buildroot}\n"
+        sub = self.after_rpm.get_subpackage(None)
+        sub.section_files += "/usr/bin/status\n"
+
+        self.inspection = "unicode"
+        self.waiver_auth = "Security"
+        self.result = "BAD"
+
+
+class UnicodeBadAsmSourceArchiveBadPrepSRPM(TestSRPM):
+    def setUp(self):
+        super().setUp()
+
+        self.rpm.header += "\n%define debug_package %{nil}\n"
+        self.rpm.add_source(
+            rpmfluff.GeneratedTarball(
+                "%s-%s.tar.gz" % (AFTER_NAME, AFTER_VER),
+                "%s-%s" % (AFTER_NAME, AFTER_VER),
+                [
+                    rpmfluff.SourceFile("Makefile", makefile_src),
+                    rpmfluff.SourceFile("bad.s", bad_asm_src),
+                    rpmfluff.SourceFile("status.sh", status_src),
+                ],
+            )
+        )
+        self.rpm.section_prep = "%setup\n"
+        self.rpm.section_prep += "/usr/bin/missing-command --do-some-stuff\n\n"
+        self.rpm.section_build += "make\n"
+        self.rpm.section_install += "make install DESTDIR=%{buildroot}\n"
+        sub = self.rpm.get_subpackage(None)
+        sub.section_files += "/usr/bin/status\n"
+
+        self.inspection = "unicode"
+        self.waiver_auth = "Security"
+        self.result = "BAD"
+
+
+class UnicodeBadAsmSourceArchiveCompareBadPrepSRPM(TestCompareSRPM):
+    def setUp(self):
+        super().setUp()
+
+        self.before_rpm.header += "\n%define debug_package %{nil}\n"
+        self.before_rpm.add_source(
+            rpmfluff.GeneratedTarball(
+                "%s-%s.tar.gz" % (BEFORE_NAME, BEFORE_VER),
+                "%s-%s" % (BEFORE_NAME, BEFORE_VER),
+                [
+                    rpmfluff.SourceFile("Makefile", makefile_src),
+                    rpmfluff.SourceFile("bad.s", bad_asm_src),
+                    rpmfluff.SourceFile("status.sh", status_src),
+                ],
+            )
+        )
+        self.before_rpm.section_prep = "%setup\n"
+        self.before_rpm.section_prep += "/usr/bin/missing-command --do-some-stuff\n\n"
+        self.before_rpm.section_build += "make\n"
+        self.before_rpm.section_install += "make install DESTDIR=%{buildroot}\n"
+        sub = self.before_rpm.get_subpackage(None)
+        sub.section_files += "/usr/bin/status\n"
+
+        self.after_rpm.header += "\n%define debug_package %{nil}\n"
+        self.after_rpm.add_source(
+            rpmfluff.GeneratedTarball(
+                "%s-%s.tar.gz" % (AFTER_NAME, AFTER_VER),
+                "%s-%s" % (AFTER_NAME, AFTER_VER),
+                [
+                    rpmfluff.SourceFile("Makefile", makefile_src),
+                    rpmfluff.SourceFile("bad.s", bad_asm_src),
+                    rpmfluff.SourceFile("status.sh", status_src),
+                ],
+            )
+        )
+        self.after_rpm.section_prep = "%setup\n"
+        self.after_rpm.section_prep += "/usr/bin/missing-command --do-some-stuff\n\n"
+        self.after_rpm.section_build += "make\n"
+        self.after_rpm.section_install += "make install DESTDIR=%{buildroot}\n"
+        sub = self.after_rpm.get_subpackage(None)
+        sub.section_files += "/usr/bin/status\n"
+
+        self.inspection = "unicode"
+        self.waiver_auth = "Security"
+        self.result = "BAD"
+
+
+class UnicodeBadCommentingOutSourceArchiveBadPrepSRPM(TestSRPM):
+    def setUp(self):
+        super().setUp()
+
+        self.rpm.header += "\n%define debug_package %{nil}\n"
+        self.rpm.add_source(
+            rpmfluff.GeneratedTarball(
+                "%s-%s.tar.gz" % (AFTER_NAME, AFTER_VER),
+                "%s-%s" % (AFTER_NAME, AFTER_VER),
+                [
+                    rpmfluff.SourceFile("Makefile", makefile_src),
+                    rpmfluff.SourceFile("bad.c", commenting_out_new_src),
+                    rpmfluff.SourceFile("status.sh", status_src),
+                ],
+            )
+        )
+        self.rpm.section_prep = "%setup\n"
+        self.rpm.section_prep += "/usr/bin/missing-command --do-some-stuff\n\n"
+        self.rpm.section_build += "make\n"
+        self.rpm.section_install += "make install DESTDIR=%{buildroot}\n"
+        sub = self.rpm.get_subpackage(None)
+        sub.section_files += "/usr/bin/status\n"
+
+        self.inspection = "unicode"
+        self.waiver_auth = "Security"
+        self.result = "BAD"
+
+
+class UnicodeBadCommentingOutSourceArchiveCompareBadPrepSRPM(TestCompareSRPM):
+    def setUp(self):
+        super().setUp()
+
+        self.before_rpm.header += "\n%define debug_package %{nil}\n"
+        self.before_rpm.add_source(
+            rpmfluff.GeneratedTarball(
+                "%s-%s.tar.gz" % (BEFORE_NAME, BEFORE_VER),
+                "%s-%s" % (BEFORE_NAME, BEFORE_VER),
+                [
+                    rpmfluff.SourceFile("Makefile", makefile_src),
+                    rpmfluff.SourceFile("bad.c", commenting_out_new_src),
+                    rpmfluff.SourceFile("status.sh", status_src),
+                ],
+            )
+        )
+        self.before_rpm.section_prep = "%setup\n"
+        self.before_rpm.section_prep += "/usr/bin/missing-command --do-some-stuff\n\n"
+        self.before_rpm.section_build += "make\n"
+        self.before_rpm.section_install += "make install DESTDIR=%{buildroot}\n"
+        sub = self.before_rpm.get_subpackage(None)
+        sub.section_files += "/usr/bin/status\n"
+
+        self.after_rpm.header += "\n%define debug_package %{nil}\n"
+        self.after_rpm.add_source(
+            rpmfluff.GeneratedTarball(
+                "%s-%s.tar.gz" % (AFTER_NAME, AFTER_VER),
+                "%s-%s" % (AFTER_NAME, AFTER_VER),
+                [
+                    rpmfluff.SourceFile("Makefile", makefile_src),
+                    rpmfluff.SourceFile("bad.c", commenting_out_new_src),
+                    rpmfluff.SourceFile("status.sh", status_src),
+                ],
+            )
+        )
+        self.after_rpm.section_prep = "%setup\n"
+        self.after_rpm.section_prep += "/usr/bin/missing-command --do-some-stuff\n\n"
+        self.after_rpm.section_build += "make\n"
+        self.after_rpm.section_install += "make install DESTDIR=%{buildroot}\n"
+        sub = self.after_rpm.get_subpackage(None)
+        sub.section_files += "/usr/bin/status\n"
+
+        self.inspection = "unicode"
+        self.waiver_auth = "Security"
+        self.result = "BAD"
+
+
+class UnicodeBadEarlyReturnSourceArchiveBadPrepSRPM(TestSRPM):
+    def setUp(self):
+        super().setUp()
+
+        self.rpm.header += "\n%define debug_package %{nil}\n"
+        self.rpm.add_source(
+            rpmfluff.GeneratedTarball(
+                "%s-%s.tar.gz" % (AFTER_NAME, AFTER_VER),
+                "%s-%s" % (AFTER_NAME, AFTER_VER),
+                [
+                    rpmfluff.SourceFile("Makefile", makefile_src),
+                    rpmfluff.SourceFile("bad.c", early_return_new_src),
+                    rpmfluff.SourceFile("status.sh", status_src),
+                ],
+            )
+        )
+        self.rpm.section_prep = "%setup\n"
+        self.rpm.section_prep += "/usr/bin/missing-command --do-some-stuff\n\n"
+        self.rpm.section_build += "make\n"
+        self.rpm.section_install += "make install DESTDIR=%{buildroot}\n"
+        sub = self.rpm.get_subpackage(None)
+        sub.section_files += "/usr/bin/status\n"
+
+        self.inspection = "unicode"
+        self.waiver_auth = "Security"
+        self.result = "BAD"
+
+
+class UnicodeBadEarlyReturnSourceArchiveCompareBadPrepSRPM(TestCompareSRPM):
+    def setUp(self):
+        super().setUp()
+
+        self.before_rpm.header += "\n%define debug_package %{nil}\n"
+        self.before_rpm.add_source(
+            rpmfluff.GeneratedTarball(
+                "%s-%s.tar.gz" % (BEFORE_NAME, BEFORE_VER),
+                "%s-%s" % (BEFORE_NAME, BEFORE_VER),
+                [
+                    rpmfluff.SourceFile("Makefile", makefile_src),
+                    rpmfluff.SourceFile("bad.c", early_return_new_src),
+                    rpmfluff.SourceFile("status.sh", status_src),
+                ],
+            )
+        )
+        self.before_rpm.section_prep = "%setup\n"
+        self.before_rpm.section_prep += "/usr/bin/missing-command --do-some-stuff\n\n"
+        self.before_rpm.section_build += "make\n"
+        self.before_rpm.section_install += "make install DESTDIR=%{buildroot}\n"
+        sub = self.before_rpm.get_subpackage(None)
+        sub.section_files += "/usr/bin/status\n"
+
+        self.after_rpm.header += "\n%define debug_package %{nil}\n"
+        self.after_rpm.add_source(
+            rpmfluff.GeneratedTarball(
+                "%s-%s.tar.gz" % (AFTER_NAME, AFTER_VER),
+                "%s-%s" % (AFTER_NAME, AFTER_VER),
+                [
+                    rpmfluff.SourceFile("Makefile", makefile_src),
+                    rpmfluff.SourceFile("bad.c", early_return_new_src),
+                    rpmfluff.SourceFile("status.sh", status_src),
+                ],
+            )
+        )
+        self.after_rpm.section_prep = "%setup\n"
+        self.after_rpm.section_prep += "/usr/bin/missing-command --do-some-stuff\n\n"
+        self.after_rpm.section_build += "make\n"
+        self.after_rpm.section_install += "make install DESTDIR=%{buildroot}\n"
+        sub = self.after_rpm.get_subpackage(None)
+        sub.section_files += "/usr/bin/status\n"
+
+        self.inspection = "unicode"
+        self.waiver_auth = "Security"
+        self.result = "BAD"
+
+
+class UnicodeBadStretchStringSourceArchiveBadPrepSRPM(TestSRPM):
+    def setUp(self):
+        super().setUp()
+
+        self.rpm.header += "\n%define debug_package %{nil}\n"
+        self.rpm.add_source(
+            rpmfluff.GeneratedTarball(
+                "%s-%s.tar.gz" % (AFTER_NAME, AFTER_VER),
+                "%s-%s" % (AFTER_NAME, AFTER_VER),
+                [
+                    rpmfluff.SourceFile("Makefile", makefile_src),
+                    rpmfluff.SourceFile("bad.c", stretched_string_new_src),
+                    rpmfluff.SourceFile("status.sh", status_src),
+                ],
+            )
+        )
+        self.rpm.section_prep = "%setup\n"
+        self.rpm.section_prep += "/usr/bin/missing-command --do-some-stuff\n\n"
+        self.rpm.section_build += "make\n"
+        self.rpm.section_install += "make install DESTDIR=%{buildroot}\n"
+        sub = self.rpm.get_subpackage(None)
+        sub.section_files += "/usr/bin/status\n"
+
+        self.inspection = "unicode"
+        self.waiver_auth = "Security"
+        self.result = "BAD"
+
+
+class UnicodeBadStretchStringSourceArchiveCompareBadPrepSRPM(TestCompareSRPM):
+    def setUp(self):
+        super().setUp()
+
+        self.before_rpm.header += "\n%define debug_package %{nil}\n"
+        self.before_rpm.add_source(
+            rpmfluff.GeneratedTarball(
+                "%s-%s.tar.gz" % (BEFORE_NAME, BEFORE_VER),
+                "%s-%s" % (BEFORE_NAME, BEFORE_VER),
+                [
+                    rpmfluff.SourceFile("Makefile", makefile_src),
+                    rpmfluff.SourceFile("bad.c", stretched_string_new_src),
+                    rpmfluff.SourceFile("status.sh", status_src),
+                ],
+            )
+        )
+        self.before_rpm.section_prep = "%setup\n"
+        self.before_rpm.section_prep += "/usr/bin/missing-command --do-some-stuff\n\n"
+        self.before_rpm.section_build += "make\n"
+        self.before_rpm.section_install += "make install DESTDIR=%{buildroot}\n"
+        sub = self.before_rpm.get_subpackage(None)
+        sub.section_files += "/usr/bin/status\n"
+
+        self.after_rpm.header += "\n%define debug_package %{nil}\n"
+        self.after_rpm.add_source(
+            rpmfluff.GeneratedTarball(
+                "%s-%s.tar.gz" % (AFTER_NAME, AFTER_VER),
+                "%s-%s" % (AFTER_NAME, AFTER_VER),
+                [
+                    rpmfluff.SourceFile("Makefile", makefile_src),
+                    rpmfluff.SourceFile("bad.c", stretched_string_new_src),
+                    rpmfluff.SourceFile("status.sh", status_src),
+                ],
+            )
+        )
+        self.after_rpm.section_prep = "%setup\n"
+        self.after_rpm.section_prep += "/usr/bin/missing-command --do-some-stuff\n\n"
+        self.after_rpm.section_build += "make\n"
+        self.after_rpm.section_install += "make install DESTDIR=%{buildroot}\n"
+        sub = self.after_rpm.get_subpackage(None)
+        sub.section_files += "/usr/bin/status\n"
+
+        self.inspection = "unicode"
+        self.waiver_auth = "Security"
+        self.result = "BAD"
