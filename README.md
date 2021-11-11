@@ -29,48 +29,26 @@ Status
 For each merge and pull request, rpminspect is built and tested in the
 following environments:
 
-* Fedora Linux on x86_64 (current stable release and rawhide)
-
-* Fedora Linux on i686 (current stable release and rawhide)
-
-* CentOS 8 on x86_64
-
-* CentOS 7 on x86_64
-
-* Ubuntu Linux on x86_64
-
-* Debian Stable on x86_64
-
-* Debian Testing on x86_64
-
-* OpenSUSE Leap on x86_64
-
-* Arch Linux on x86_64
-
-* Gentoo Linux on x86_64
-
-* Alpine Linux on x86_64
-
-* AlmaLinux 8 on x86_64
-
-* Rocky Linux on x86_64
-
-* Amazon Linux 2 on x86_64
-
-* Mageia Linux on x86_64
-
-* Alt Linux on x86_64
-
-* Oracle Linux 8 on x86_64
-
-Additionally, rpminspect is built in the following environments on
-each merge and pull request:
-
-* Fedora Linux on ppc64le (current stable release)
-
-* Fedora Linux on aarch64 (current stable release)
-
-* Fedora Linux on s390x (current stable release)
+| Platform | Release | Build | Tests | [x86_64](https://en.wikipedia.org/wiki/X86-64) | [i686](https://en.wikipedia.org/wiki/P6_(microarchitecture)) | [aarch64](https://en.wikipedia.org/wiki/AArch64) | [ppc64le](https://en.wikipedia.org/wiki/Ppc64) | [s390x](https://en.wikipedia.org/wiki/Linux_on_IBM_Z) |
+| :--- | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: |
+| [Fedora Linux](https://getfedora.org/) | stable | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | | | |
+| [Fedora Linux](https://getfedora.org/) | rawhide | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | | | |
+| [Fedora Linux](https://getfedora.org/) | stable | :heavy_check_mark: | | | | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: |
+| [CentOS](https://www.centos.org/) | 8 | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | | | | |
+| [CentOS](https://www.centos.org/) | 7 | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | | | | |
+| [Ubuntu Linux](https://ubuntu.com/) | stable | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | | | | |
+| [Debian GNU/Linux](https://www.debian.org/) | stable | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | | | | |
+| [Debian GNU/Linux](https://www.debian.org/) | testing | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | | | | |
+| [OpenSUSE](https://www.opensuse.org/) | Leap | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | | | | |
+| [Arch Linux](https://archlinux.org/) | stable | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | | | | |
+| [Gentoo Linux](https://www.gentoo.org/) | stable | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | | | | |
+| [Alpine Linux](https://www.alpinelinux.org/) | stable | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | | | | |
+| [AlmaLinux](https://almalinux.org/) | 8 | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | | | | |
+| [Rocky Linux](https://rockylinux.org/) | 8 | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | | | | |
+| [Amazon Linux](https://aws.amazon.com/amazon-linux-2/) | 2 | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | | | | |
+| [Mageia Linux](https://www.mageia.org/) | stable | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | | | | |
+| [Alt Linux](https://en.altlinux.org/Main_Page) | stable | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | | | | |
+| [Oracle Linux](https://www.oracle.com/linux/) | 8 | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | | | | |
 
 
 Documentation
