@@ -127,27 +127,33 @@ Build Requirements
 A typical Linux system with a toolchain for building C software using
 meson and ninja, plus the following libraries:
 
-| Requirement           | URL                                                       | License                      |
-|-----------------------|-----------------------------------------------------------|------------------------------|
-| json-c                | http://json-c.github.io/json-c                            | MIT                          |
-| xmlrpc-c              | http://xmlrpc-c.sourceforge.net/                          | BSD and MIT                  |
-| libxml-2.0            | http://xmlsoft.org/                                       | MIT                          |
-| rpm (for librpm)      | https://github.com/rpm-software-management/rpm            | GPL-2.0-or-later             |
-| libarchive            | https://www.libarchive.org/                               | BSD                          |
-| elfutils (for libelf) | https://sourceware.org/elfutils/                          | LGPL-3.0-or-later            |
-| kmod                  | https://git.kernel.org/pub/scm/utils/kernel/kmod/kmod.git | GPL-2.0-or-later             |
-| zlib                  | https://www.zlib.net/                                     | Zlib and BSL-1.0             |
-| mandoc                | https://mandoc.bsd.lv/                                    | ISC                          |
-| libyaml               | https://github.com/yaml/libyaml                           | MIT                          |
-| file (for libmagic)   | http://www.darwinsys.com/file/                            | BSD                          |
-| OpenSSL               | https://www.openssl.org/                                  | OpenSSL                      |
-| libcap                | https://sites.google.com/site/fullycapable/               | BSD-3-Clause                 |
+| Dependency | Required | Notes | License |
+| :--- | :---: | :--- | :--- |
+| [json-c](http://json-c.github.io/json-c/) | :heavy_check_mark: | | [MIT](https://spdx.org/licenses/MIT.html) |
+| [xmlrpc-c](http://xmlrpc-c.sourceforge.net/) | :heavy_check_mark: | | [BSD-3-Clause](https://spdx.org/licenses/BSD-3-Clause.html) and [MIT](https://spdx.org/licenses/MIT.html) |
+| [libxml-2.0](http://xmlsoft.org/) | :heavy_check_mark: | | [MIT](https://spdx.org/licenses/MIT.html) |
+| [rpm](https://github.com/rpm-software-management/rpm) | :heavy_check_mark: | | [GPL-2.0-or-later](https://spdx.org/licenses/GPL-2.0-or-later.html) |
+| [libarchive](https://www.libarchive.org/) | :heavy_check_mark: | | [BSD-2-Clause](https://spdx.org/licenses/BSD-2-Clause.html) and [BSD-3-Clause](https://spdx.org/licenses/BSD-3-Clause.html) |
+| [elfutils](https://sourceware.org/elfutils/) | :heavy_check_mark: | libelf | [LGPL-3.0-or-later](https://spdx.org/licenses/LGPL-3.0-or-later.html) |
+| [kmod](https://git.kernel.org/pub/scm/utils/kernel/kmod/kmod.git) |                  | Linux only | [GPL-2.0-or-later](https://spdx.org/licenses/GPL-2.0-or-later.html) |
+| [zlib](https://www.zlib.net/) | :heavy_check_mark: | | [Zlib](https://spdx.org/licenses/Zlib.html) and [BSL-1.0](https://spdx.org/licenses/BSL-1.0.html) |
+| [mandoc](https://mandoc.bsd.lv/) | :heavy_check_mark: | libmandoc.a | [ISC](https://spdx.org/licenses/ISC.html) |
+| [libyaml](https://github.com/yaml/libyaml) | :heavy_check_mark: | | [MIT](https://spdx.org/licenses/MIT.html) |
+| [file](http://www.darwinsys.com/file/) | :heavy_check_mark: | | [BSD-2-Clause](https://spdx.org/licenses/BSD-2-Clause.html) |
+| [OpenSSL](https://www.openssl.org/) | :heavy_check_mark: | | [OpenSSL](https://spdx.org/licenses/OpenSSL.html) |
+| [libcap](https://sites.google.com/site/fullycapable/) |                  | Linux only | [BSD-3-Clause](https://spdx.org/licenses/BSD-3-Clause.html) |
+| [ICU](https://icu.unicode.org/) | :heavy_check_mark: | | [ICU](https://spdx.org/licenses/ICU.html) |
+| [curl](https://curl.se/) | :heavy_check_mark: | | [MIT](https://spdx.org/licenses/MIT.html) |
+| [ClamAV](https://www.clamav.net/) | :heavy_check_mark: | | [GPL-2.0-only](https://spdx.org/licenses/GPL-2.0-only.html) |
+| [gettext](https://www.gnu.org/software/gettext/) | | .po to .mo | [GPL-3.0-or-later](https://spdx.org/licenses/GPL-3.0-or-later.html) |
 
 Additionally, the unit test suite requires the following packages:
 
-| Requirement           | URL                                                       | License                      |
-|-----------------------|-----------------------------------------------------------|------------------------------|
-| CUnit                 | http://cunit.sourceforge.net/                             | LGPL-2.0-or-later            |
+| Dependency | License |
+| :--- | :--- |
+| [CUnit](http://cunit.sourceforge.net/)| [LGPL-2.0-or-later](https://spdx.org/licenses/LGPL-2.0-or-later.html) |
+| [Python 3](https://www.python.org/) | [Python-2.0](https://spdx.org/licenses/Python-2.0.html) |
+| [rpmfluff](https://pagure.io/rpmfluff)| [GPL-2.0-only](https://spdx.org/licenses/GPL-2.0-only.html) |
 
 Most distributions include the above projects in prebuilt and packaged
 form.  If those are available, you should use those packages.
