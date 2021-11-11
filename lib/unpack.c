@@ -1,6 +1,6 @@
 /*
- * Copyright 2012-2020 David Cantrell <david.l.cantrell@gmail.com>
- *                     Chris Lumens <chris@bangmoney.org>
+ * Copyright 2012 David Cantrell <david.l.cantrell@gmail.com>
+ *                Chris Lumens <chris@bangmoney.org>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -38,7 +38,8 @@ static int extract_entry(struct archive *, struct archive *, struct archive_entr
  * Reads data from the input archive stream and writes it to the output
  * archive stream.
  */
-static int copy_data(struct archive *ar, struct archive *aw) {
+static int copy_data(struct archive *ar, struct archive *aw)
+{
     int r;
     const void *buf = NULL;
     size_t s;
@@ -61,7 +62,8 @@ static int copy_data(struct archive *ar, struct archive *aw) {
 }
 
 /* Extract a single entry from an archive and write it to disk. */
-static int extract_entry(struct archive *input, struct archive *output, struct archive_entry *entry) {
+static int extract_entry(struct archive *input, struct archive *output, struct archive_entry *entry)
+{
     int r = 0;
     int ret = 0;
 
@@ -97,7 +99,8 @@ static int extract_entry(struct archive *input, struct archive *output, struct a
  * Unpack an archive file to a destination directory.  The directory must
  * exist before calling this function.
  */
-int unpack_archive(const char *archive, const char *dest, const bool force) {
+int unpack_archive(const char *archive, const char *dest, const bool force)
+{
     int flags, r, ret = 0;
     char *rfilename = NULL;
     char cwd[PATH_MAX + 1];
@@ -141,17 +144,20 @@ int unpack_archive(const char *archive, const char *dest, const bool force) {
     r = archive_read_open_filename(input, archive, 16384);
 
     if (r != ARCHIVE_OK) {
-        warn("archive_read_open_filename: %s", archive_error_string(input));
+        warnx("archive_read_open_filename: %s", archive_error_string(input));
+        archive_read_free(input);
         return -1;
     }
 
     /* change to dest */
     if (getcwd(cwd, PATH_MAX) == NULL) {
+        archive_read_free(input);
         err(RI_PROGRAM_ERROR, "getcwd");
     }
 
     if (chdir(dest) != 0) {
         warn("chdir");
+        archive_read_free(input);
         return -1;
     }
 
@@ -173,7 +179,7 @@ int unpack_archive(const char *archive, const char *dest, const bool force) {
         }
     }
 
-    archive_read_close(input);
+    archive_read_free(input);
 #if ARCHIVE_VERSION_NUMBER < 3000000
     archive_write_finish(output);
 #else
