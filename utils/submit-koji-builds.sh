@@ -123,7 +123,7 @@ cd "${PROJECT}" || exit
 
 # Allow the calling environment to override the list of dist-git branches
 if [ -z "${BRANCHES}" ]; then
-    BRANCHES="$(git branch -r | grep -vE "(HEAD)" | cut -d '/' -f 2 | sort | xargs)"
+    BRANCHES="$(git branch -r | grep -vE "(HEAD|playground|main)" | cut -d '/' -f 2 | sort | xargs)"
 fi
 
 for branch in ${BRANCHES} ; do
@@ -132,9 +132,11 @@ for branch in ${BRANCHES} ; do
     git config user.email "${GIT_USEREMAIL}"
 
     # skip this branch if we lack build targets
-    if ! ${VENDORKOJI} list-targets | grep -q "${branch}" >/dev/null 2>&1 ; then
-        echo "*** Skipping ${branch} because there is no longer a ${VENDORKOJI} target"
-        continue
+    if [ ! "${branch}" = "rawhide" ]; then
+        if ! ${VENDORKOJI} list-targets --name="${branch}-candidate" >/dev/null 2>&1 ; then
+            echo "*** Skipping ${branch} because there is no longer a ${VENDORKOJI} target"
+            continue
+        fi
     fi
 
     # make sure we are on the right branch
