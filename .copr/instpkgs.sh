@@ -14,6 +14,5 @@ else
 fi
 
 # The actual BuildRequires
-BUILD_REQUIRES="$(grep ^BuildRequires: "${SPEC}" | awk '{ print $2; }')"
-
-${TOOL} install -y git "${BUILD_REQUIRES}"
+BUILD_REQUIRES="$(rpmspec -q --buildrequires "${SPEC}" | xargs)"
+${TOOL} install -y git ${BUILD_REQUIRES}
