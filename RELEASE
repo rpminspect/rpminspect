@@ -17,11 +17,11 @@ Use the upstream release repo for these steps:
 
 [ ] make clean
 
-[ ] make announce > newchanges
+[ ] make announce > ~/newchanges
 
 [ ] Edit CHANGES.md and create a new entry for the upcoming release
     with the heading "Changes in rpminspect-X.Y".  Paste the contents
-    of 'newchanges' in this section.
+    of ~/newchanges in this section.
 
 [ ] git add CHANGES.md && git commit -s -m "Update CHANGES.md"
 
@@ -75,6 +75,6 @@ Use the upstream release repo for these steps:
 
 [ ] git push
 
-The release is now done.  Use the text from 'newchanges' in a blog
+The release is now done.  Use the text from ~/newchanges in a blog
 post about the release.  It may be a good idea to go do releases of
 the data packages now and do a combined blog post about all of them.
