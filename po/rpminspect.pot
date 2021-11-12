@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: rpminspect\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-11-03 14:11-0400\n"
+"POT-Creation-Date: 2021-11-12 11:43-0500\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -884,17 +884,17 @@ msgstr ""
 msgid "ignoring malformed module metadata file: %s"
 msgstr ""
 
-#: lib/builds.c:914
+#: lib/builds.c:915
 #, c-format
 msgid "`%s' already exists"
 msgstr ""
 
-#: lib/builds.c:956
+#: lib/builds.c:957
 #, c-format
 msgid "unable to find after build: %s"
 msgstr ""
 
-#: lib/builds.c:1008
+#: lib/builds.c:1009
 #, c-format
 msgid "unable to find before build: %s"
 msgstr ""
@@ -1740,27 +1740,27 @@ msgstr ""
 msgid "unable to open license db %s"
 msgstr ""
 
-#: lib/inspect_license.c:202 lib/inspect_license.c:223
+#: lib/inspect_license.c:211 lib/inspect_license.c:232
 #, c-format
 msgid "Unapproved license in %s: %s"
 msgstr ""
 
-#: lib/inspect_license.c:378
+#: lib/inspect_license.c:387
 #, c-format
 msgid "Empty License Tag in %s"
 msgstr ""
 
-#: lib/inspect_license.c:389
+#: lib/inspect_license.c:398
 #, c-format
 msgid "Valid License Tag in %s: %s"
 msgstr ""
 
-#: lib/inspect_license.c:399
+#: lib/inspect_license.c:408
 #, c-format
 msgid "License Tag contains unprofessional language in %s: %s"
 msgstr ""
 
-#: lib/inspect_license.c:465
+#: lib/inspect_license.c:474
 #, c-format
 msgid "Missing license database: %s: %s"
 msgstr ""
@@ -2211,33 +2211,35 @@ msgstr ""
 msgid "MIME type on %s was %s and became %s on %s"
 msgstr ""
 
-#: lib/inspect_unicode.c:246
+#: lib/inspect_unicode.c:448
 #, c-format
 msgid "empty localpath on %s"
 msgstr ""
 
-#: lib/inspect_unicode.c:262
+#: lib/inspect_unicode.c:464
 msgid "forbidden code point in ${FILE}"
 msgstr ""
 
-#: lib/inspect_unicode.c:315
+#: lib/inspect_unicode.c:517
 #, c-format
 msgid ""
 "A forbidden code point was found in the %s source file on line %ld at column "
 "%ld."
 msgstr ""
 
-#: lib/inspect_unicode.c:360
+#: lib/inspect_unicode.c:574
 #, c-format
 msgid "unable to run %prep in ${FILE}"
 msgstr ""
 
-#: lib/inspect_unicode.c:363
+#: lib/inspect_unicode.c:577
 #, c-format
-msgid "Unable to run through the %%prep section %s for further scanning."
+msgid ""
+"Unable to run through the %%prep section in %s or manually unpack sources "
+"for further scanning."
 msgstr ""
 
-#: lib/inspect_unicode.c:445
+#: lib/inspect_unicode.c:661
 msgid "The unicode inspection is only for source packages, skipping."
 msgstr ""
 
@@ -2410,7 +2412,7 @@ msgstr ""
 msgid "Fopen failed for %s: %s"
 msgstr ""
 
-#: lib/rpm.c:261
+#: lib/rpm.c:258
 #, c-format
 msgid "*** file index %d is out of bounds for %s"
 msgstr ""
@@ -2697,7 +2699,7 @@ msgid "*** The -T and -E options are mutually exclusive"
 msgstr ""
 
 #: src/rpminspect.c:266 src/rpminspect.c:282 src/rpminspect.c:647
-#: src/rpminspect.c:688
+#: src/rpminspect.c:689
 #, c-format
 msgid "*** See `%s --help` for more information."
 msgstr ""
@@ -2752,62 +2754,62 @@ msgstr ""
 msgid "*** unable to read RPM configuration"
 msgstr ""
 
-#: src/rpminspect.c:687
+#: src/rpminspect.c:688
 #, c-format
 msgid "*** Unsupported architecture specified: `%s`"
 msgstr ""
 
-#: src/rpminspect.c:710
+#: src/rpminspect.c:712
 #, c-format
 msgid "*** Unable to create directory %s"
 msgstr ""
 
-#: src/rpminspect.c:723 src/rpminspect.c:739
+#: src/rpminspect.c:726 src/rpminspect.c:744
 msgid "*** failed to gather specified builds."
 msgstr ""
 
-#: src/rpminspect.c:746
+#: src/rpminspect.c:751
 msgid "diagnostics"
 msgstr ""
 
-#: src/rpminspect.c:752
+#: src/rpminspect.c:757
 #, c-format
 msgid ""
 "Version information for libraries and programs used by %s.  This result is "
 "for informational and diagnostic purposes only."
 msgstr ""
 
-#: src/rpminspect.c:760
+#: src/rpminspect.c:765
 #, c-format
 msgid "Command line arguments used to invoke %s."
 msgstr ""
 
-#: src/rpminspect.c:791
+#: src/rpminspect.c:796
 msgid "*** No peers, ensure packages exist for specified architecture(s)."
 msgstr ""
 
-#: src/rpminspect.c:799
+#: src/rpminspect.c:804
 msgid "invalid after RPM"
 msgstr ""
 
-#: src/rpminspect.c:807
+#: src/rpminspect.c:812
 msgid "invalid before RPM"
 msgstr ""
 
-#: src/rpminspect.c:832
+#: src/rpminspect.c:837
 #, c-format
 msgid "Running %s inspection..."
 msgstr ""
 
-#: src/rpminspect.c:841
+#: src/rpminspect.c:846
 msgid "pass"
 msgstr ""
 
-#: src/rpminspect.c:841
+#: src/rpminspect.c:846
 msgid "FAIL"
 msgstr ""
 
-#: src/rpminspect.c:863
+#: src/rpminspect.c:868
 #, c-format
 msgid ""
 "\n"
