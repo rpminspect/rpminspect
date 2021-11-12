@@ -1,3 +1,34 @@
+Changes in rpminspect-1.8
+-------------------------
+
+General release and build process changes:
+* Updates to how Koji jobs are prepared and submitted
+* Add RELEASE checklist
+
+Changes to the GitHub Actions CI scripts and files:
+* Add 'make shellcheck' target and update ShellCheck CI job
+* Install findutils for the shellcheck GitHub Action
+
+Documentation changes:
+* Add changes for the 1.7 release
+* Note additional dependencies in README.md
+* Reformat OS list in README.md
+
+General bug fix in the library or frontend program:
+* Handle unexecutable %prep sections in 'unicode'
+* Remove hardcoded maximum version check on Java bytecode
+* Correct everything shellcheck found in shell scripts
+* Exit the manual_prep_source() child process correctly
+* Use archive_read_free() in unpack.c
+
+librpminspect feature or significant change:
+* Convert RPM header cache to a hash table, fix leak
+
+Test suite commits:
+* Define SimpleSrpmBuild for tests that only need an SRPM
+* Add unicode test cases covering rpmSpecBuild() failures
+
+
 Changes in rpminspect-1.7
 -------------------------
 
