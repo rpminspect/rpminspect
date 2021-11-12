@@ -63,8 +63,10 @@ endif
 		--output='$(topdir)/$(TARBALL_BASENAME).tar' \
 		--prefix='$(TARBALL_BASENAME)/' $(TAG) $(topdir)
 	xz -9f $(topdir)/$(TARBALL_BASENAME).tar
+ifeq ($(BUILDTYPE),release)
 	gpg --detach-sign --armor "$(TARBALL_BASENAME)".tar.xz
 	gpg --export -a $(GPGKEY) > gpgkey-$(GPGKEY).gpg
+endif
 	rpmbuild \
 		-bs --nodeps \
 		--define "_sourcedir $(topdir)" \
