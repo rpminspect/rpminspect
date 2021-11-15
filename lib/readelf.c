@@ -290,21 +290,35 @@ Elf * get_elf_archive(const char *fullpath, int *out_fd)
  */
 bool is_elf(const char *fullpath) {
     int fd = 0;
-    Elf *elf;
+    Elf *elf = NULL;
 
+    /* try it as a shared object */
     elf = get_elf(fullpath, &fd);
 
-    if (elf == NULL) {
+    if (elf) {
+        elf_end(elf);
+
         if (fd) {
             close(fd);
         }
 
-        return false;
+        return true;
     }
 
-    elf_end(elf);
-    close(fd);
-    return true;
+    /* try it as a static library */
+    elf = get_elf_archive(fullpath, &fd);
+
+    if (elf) {
+        elf_end(elf);
+
+        if (fd) {
+            close(fd);
+        }
+
+        return true;
+    }
+
+    return false;
 }
 
 /*
