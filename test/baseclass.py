@@ -107,10 +107,11 @@ class SimpleSrpmBuild(rpmfluff.SimpleRpmBuild):
 
     def __create_directories(self):
         """Sets up the directory hierarchy for the build"""
-        if self.tmpdir and not (
-            self.tmpdir_location and os.path.isdir(self.tmpdir_location)
-        ):
-            self.tmpdir_location = tempfile.mkdtemp(prefix="rpmfluff-")
+        if hasattr(self, "tmpdir"):
+            if self.tmpdir and not (
+                self.tmpdir_location and os.path.isdir(self.tmpdir_location)
+            ):
+                self.tmpdir_location = tempfile.mkdtemp(prefix="rpmfluff-")
         os.mkdir(self.get_base_dir())
 
         # Make fake rpmbuild directories
@@ -136,7 +137,10 @@ class SimpleSrpmBuild(rpmfluff.SimpleRpmBuild):
         if self.buildArchs:
             buildArchs = self.buildArchs
         else:
-            buildArchs = (rpmfluff.utils.expectedArch,)
+            if hasattr(rpmfluff, "utils"):
+                buildArchs = (rpmfluff.utils.expectedArch,)
+            else:
+                buildArchs = (rpmfluff.expectedArch,)
         for arch in buildArchs:
             command = [
                 "rpmbuild",
