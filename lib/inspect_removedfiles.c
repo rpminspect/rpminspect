@@ -30,6 +30,8 @@
 
 #include "rpminspect.h"
 
+static bool rebase = false;
+
 static void add_removedfiles_result(struct rpminspect *ri, struct result_params *params)
 {
     assert(ri != NULL);
@@ -52,7 +54,6 @@ static bool removedfiles_driver(struct rpminspect *ri, rpmfile_entry_t *file)
     bool result = true;
     char *type = NULL;
     const char *arch = NULL;
-    bool rebase = false;
     char *soname = NULL;
     string_entry_t *entry = NULL;
     struct result_params params;
@@ -85,22 +86,12 @@ static bool removedfiles_driver(struct rpminspect *ri, rpmfile_entry_t *file)
     /* Collect the RPM architecture and file MIME type */
     type = get_mime_type(file);
     arch = get_rpm_header_arch(file->rpm_header);
-    rebase = is_rebase(ri);
 
     /* Set up result parameters */
     init_result_params(&params);
     params.header = NAME_REMOVEDFILES;
     params.arch = arch;
     params.file = file->localpath;
-
-    if (rebase) {
-        params.severity = RESULT_INFO;
-        params.waiverauth = NOT_WAIVABLE;
-    } else {
-        params.severity = RESULT_VERIFY;
-        params.waiverauth = WAIVABLE_BY_ANYONE;
-        params.remedy = REMEDY_REMOVEDFILES;
-    }
 
     /* Set the waiver type if this is a file of security concern */
     if (ri->security_path_prefix) {
@@ -120,7 +111,14 @@ static bool removedfiles_driver(struct rpminspect *ri, rpmfile_entry_t *file)
      * File has been removed, report results.
      */
     if (params.waiverauth == WAIVABLE_BY_SECURITY || (ri->tests & INSPECT_REMOVEDFILES)) {
-        params.severity = get_secrule_result_severity(ri, file, SECRULE_SECURITYPATH);
+        if (rebase) {
+            params.severity = RESULT_INFO;
+            params.waiverauth = NOT_WAIVABLE;
+        } else {
+            params.severity = get_secrule_result_severity(ri, file, SECRULE_SECURITYPATH);
+            params.waiverauth = WAIVABLE_BY_ANYONE;
+            params.remedy = REMEDY_REMOVEDFILES;
+        }
 
         if (is_elf(file->fullpath) && !strcmp(type, "application/x-pie-executable")) {
             soname = get_elf_soname(file->fullpath);
@@ -155,6 +153,9 @@ bool inspect_removedfiles(struct rpminspect *ri)
     struct result_params params;
 
     assert(ri != NULL);
+
+    /* is this a rebase comparison? */
+    rebase = is_rebase(ri);
 
     /*
      * This is like our after_files loop helper in inspect.c, but
