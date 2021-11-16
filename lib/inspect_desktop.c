@@ -61,6 +61,12 @@ static int find_file(const char *fpath, __attribute__((unused)) const struct sta
         return 0;
     }
 
+    /* Skip debug paths */
+    if (is_debug_or_build_path(fpath)) {
+        return 0;
+    }
+
+
     /* Look for this name as the basename */
     if (filetype == FILETYPE_EXECUTABLE && strsuffix(fpath, file_to_find)) {
         free(file_to_find);
@@ -80,14 +86,11 @@ static int find_file(const char *fpath, __attribute__((unused)) const struct sta
      * will pass.
      */
     if (filetype == FILETYPE_ICON) {
-        if (strsuffix(fpath, file_to_find)) {
-            for (i = 0; icon_extensions[i] != NULL; i++) {
-                if (strsuffix(fpath, icon_extensions[i])) {
-                    free(file_to_find);
-                    file_to_find = strdup(fpath);
-                    return 1;
-                }
-            }
+        if (strsuffix(fpath, file_to_find) && strprefix(mime_type(fpath), "image/")) {
+            /* file is found and is an image type according to libmagic */
+            free(file_to_find);
+            file_to_find = strdup(fpath);
+            return 1;
         } else {
             /* handle icon specs without an extension */
             bn = strdup(file_to_find);
@@ -141,8 +144,7 @@ static bool is_desktop_entry_file(const char *desktop_entry_files_dir, const rpm
         return false;
     }
 
-    if (!strsuffix(file->localpath, DESKTOP_FILENAME_EXTENSION) &&
-        !strsuffix(file->localpath, DIRECTORY_FILENAME_EXTENSION)) {
+    if (!strsuffix(file->localpath, DESKTOP_FILENAME_EXTENSION) && !strsuffix(file->localpath, DIRECTORY_FILENAME_EXTENSION)) {
         return false;
     }
 
