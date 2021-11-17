@@ -51,8 +51,8 @@ class PkgHasEmptyPayload(TestRPMs):
     def setUp(self):
         TestRPMs.setUp(self)
         self.inspection = "emptyrpm"
-        self.result = "VERIFY"
-        self.waiver_auth = "Anyone"
+        self.result = "INFO"
+        self.waiver_auth = "Not Waivable"
 
 
 # Packages in Koji build have empty payloads (VERIFY)
@@ -60,5 +60,5 @@ class KojiBuildHaveEmptyPayloads(TestKoji):
     def setUp(self):
         TestKoji.setUp(self)
         self.inspection = "emptyrpm"
-        self.result = "VERIFY"
-        self.waiver_auth = "Anyone"
+        self.result = "INFO"
+        self.waiver_auth = "Not Waivable"

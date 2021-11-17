@@ -32,16 +32,34 @@
 #include <assert.h>
 #include "rpminspect.h"
 
-static bool is_expected_empty(const struct rpminspect *ri, const char *p)
+static bool payload_only_ghosts(Header h)
 {
-    assert(ri != NULL);
-    assert(p != NULL);
+    bool onlyghosts = true;
+    rpmtd td = NULL;
+    rpmFlags tdflags = HEADERGET_MINMEM | HEADERGET_EXT | HEADERGET_ARGV;
+    rpmfileAttrs fileflags = 0;
 
-    if (ri->expected_empty_rpms == NULL || TAILQ_EMPTY(ri->expected_empty_rpms)) {
-        return false;
+    assert(h != NULL);
+
+    /* check to see if the package only contains %ghost entries */
+    td = rpmtdNew();
+
+    if (headerGet(h, RPMTAG_FILEFLAGS, td, tdflags)) {
+        while ((rpmtdNext(td) != -1)) {
+            fileflags = *(rpmtdGetUint32(td));
+
+            if (!(fileflags & RPMFILE_GHOST)) {
+                /* we found a non-ghost, something is wrong */
+                onlyghosts = false;
+                break;
+            }
+        }
     }
 
-    return list_contains(ri->expected_empty_rpms, p);
+    rpmtdFreeData(td);
+    rpmtdFree(td);
+
+    return onlyghosts;
 }
 
 /**
@@ -81,14 +99,20 @@ bool inspect_emptyrpm(struct rpminspect *ri)
             continue;
         }
 
-        if (is_payload_empty(peer->after_files) && peer->before_rpm == NULL) {
+        if ((peer->after_files == NULL || TAILQ_EMPTY(peer->after_files)) && peer->before_rpm == NULL) {
             name = headerGetString(peer->after_hdr, RPMTAG_NAME);
             assert(name != NULL);
             bn = basename(peer->after_rpm);
             assert(bn != NULL);
 
-            if (is_expected_empty(ri, name)) {
-                xasprintf(&params.msg, _("New package %s is empty (no payloads); this is expected per the configuration file"), bn);
+            if (list_contains(ri->expected_empty_rpms, name)) {
+                xasprintf(&params.msg, _("New package %s is empty (no payloads); this is expected per the rpminspect configuration"), bn);
+                params.severity = RESULT_INFO;
+                params.waiverauth = NOT_WAIVABLE;
+                params.remedy = NULL;
+                reported = true;
+            } else if (payload_only_ghosts(peer->after_hdr)) {
+                xasprintf(&params.msg, _("New package %s is empty (no payloads); this is expected because the package only contains %%ghost entries"), bn);
                 params.severity = RESULT_INFO;
                 params.waiverauth = NOT_WAIVABLE;
                 params.remedy = NULL;

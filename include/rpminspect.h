@@ -230,7 +230,6 @@ rpmfile_t * extract_rpm(const char *, Header, char **output_dir);
 bool process_file_path(const rpmfile_entry_t *, regex_t *, regex_t *);
 void find_file_peers(rpmfile_t *, rpmfile_t *);
 bool is_debug_or_build_path(const char *);
-bool is_payload_empty(rpmfile_t *);
 
 /* tty.c */
 size_t tty_width(void);
