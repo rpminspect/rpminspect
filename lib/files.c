@@ -76,22 +76,29 @@ struct file_data {
 static rpmfileAttrs get_rpmtag_fileflags(const Header h, const int i)
 {
     rpmfileAttrs flags = 0;
-    struct rpmtd_s td;
-    struct rpmtd_s filenames;
+    rpmtd td;
+    rpmtd filenames;
     int idx = -1;
+    rpmFlags tdflags = HEADERGET_MINMEM | HEADERGET_EXT | HEADERGET_ARGV;
 
     assert(h != NULL);
     assert(i >= 0);
 
-    if (headerGet(h, RPMTAG_BASENAMES, &filenames, HEADERGET_MINMEM)) {
-        if (headerGet(h, RPMTAG_FILEFLAGS, &td, HEADERGET_MINMEM)) {
-            idx = rpmtdSetIndex(&td, i);
+    filenames = rpmtdNew();
+
+    if (headerGet(h, RPMTAG_BASENAMES, filenames, tdflags)) {
+        td = rpmtdNew();
+
+        if (headerGet(h, RPMTAG_FILEFLAGS, td, tdflags)) {
+            idx = rpmtdSetIndex(td, i);
             assert(idx != -1);
-            flags = *(rpmtdGetUint32(&td));
-            rpmtdFreeData(&td);
+            flags = *(rpmtdGetUint32(td));
+            rpmtdFreeData(td);
+            rpmtdFree(td);
         }
 
-        rpmtdFreeData(&filenames);
+        rpmtdFreeData(filenames);
+        rpmtdFree(filenames);
     }
 
     return flags;
@@ -800,21 +807,4 @@ bool is_debug_or_build_path(const char *path)
     }
 
     return false;
-}
-
-/**
- * @brief True if the payload is empty, false otherwise.
- *
- * All we do here is count the payload entries.  If we have more than
- * zero, the payload is not empty.
- *
- * @param filelist List of files in the RPM payload.
- */
-bool is_payload_empty(rpmfile_t *filelist) {
-    if (filelist == NULL) {
-        return true;
-    }
-
-    /* Make sure the file list has at least one entry */
-    return TAILQ_EMPTY(filelist);
 }

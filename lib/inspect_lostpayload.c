@@ -77,8 +77,8 @@ bool inspect_lostpayload(struct rpminspect *ri) {
             continue;
         }
 
-        if (is_payload_empty(peer->after_files)) {
-            if (is_payload_empty(peer->before_files)) {
+        if (peer->after_files == NULL || TAILQ_EMPTY(peer->after_files)) {
+            if (peer->before_files == NULL || TAILQ_EMPTY(peer->before_files)) {
                 xasprintf(&params.msg, _("Package %s continues to be empty (no payloads)"), basename(peer->after_rpm));
                 params.severity = RESULT_INFO;
                 params.waiverauth = NOT_WAIVABLE;
