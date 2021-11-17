@@ -90,7 +90,7 @@ bool is_rebase(struct rpminspect *ri)
     }
 
     /* if the package name is on the rebaseable list, it's valid */
-    if (ri->rebase_build == -1 && init_rebaseable(ri) && !strcmp(bn, an) && list_contains(ri->rebaseable, an)) {
+    if (ri->rebase_build == -1 && init_rebaseable(ri) && list_contains(ri->rebaseable, an) && ((bn && !strcmp(bn, an)) || bn == NULL)) {
         return true;
     }
 
