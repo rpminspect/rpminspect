@@ -154,7 +154,7 @@ bool list_contains(const string_list_t *, const char *);
 string_list_t *list_add(string_list_t *list, const char *s);
 
 /* local.c */
-bool is_local_build(const char *);
+bool is_local_build(const char *workdir, const char *build, const bool fetch_only);
 bool is_local_rpm(struct rpminspect *, const char *);
 
 /* koji.c */
