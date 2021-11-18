@@ -33,8 +33,10 @@
 /*
  * Determine if a build specification is local or not.
  */
-bool is_local_build(const char *build) {
+bool is_local_build(const char *workdir, const char *build, const bool fetch_only)
+{
     char cwd[PATH_MAX + 1];
+    char *check = NULL;
     char *r = NULL;
     struct stat sb;
 
@@ -45,13 +47,29 @@ bool is_local_build(const char *build) {
         return false;
     }
 
+    /* get current dir */
+    memset(cwd, '\0', sizeof(cwd));
+
+    if (getcwd(cwd, PATH_MAX) == NULL) {
+        err(RI_PROGRAM_ERROR, "getcwd");
+    }
+
+    /* Figure out where to look */
+    if (fetch_only && workdir) {
+        xasprintf(&check, "%s/%s", workdir, build);
+    } else {
+        check = strdup(build);
+    }
+
     /* Can we read it as a directory off the filesystem? */
-    if (access(build, R_OK)) {
+    if (access(check, R_OK)) {
+        free(check);
         return false;
     }
 
-    if (stat(build, &sb) == -1) {
+    if (stat(check, &sb) == -1) {
         warn("stat");
+        free(check);
         return false;
     }
 
@@ -59,16 +77,13 @@ bool is_local_build(const char *build) {
         return false;
     }
 
-    memset(cwd, '\0', sizeof(cwd));
-
-    if (getcwd(cwd, PATH_MAX) == NULL) {
-        err(RI_PROGRAM_ERROR, "getcwd");
-    }
-
-    if (chdir(build) == -1) {
+    if (chdir(check) == -1) {
         warn("chdir");
+        free(check);
         return false;
     }
+
+    free(check);
 
     if (chdir(cwd) == -1) {
         warn("chdir");
@@ -81,7 +96,8 @@ bool is_local_build(const char *build) {
 /*
  * Returns true if the specified filename is a local RPM.
  */
-bool is_local_rpm(struct rpminspect *ri, const char *rpm) {
+bool is_local_rpm(struct rpminspect *ri, const char *rpm)
+{
     Header h;
     char *rpmpath = NULL;
     bool ret = true;

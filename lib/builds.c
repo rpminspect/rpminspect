@@ -136,7 +136,8 @@ static void get_rpm_info(const char *pkg)
 /*
  * Walk a local build tree and prune empty arch subdirectories.
  */
-static void prune_local(const int whichbuild) {
+static void prune_local(const int whichbuild)
+{
     char *lpath = NULL;
     char *apath = NULL;
     DIR *d = NULL;
@@ -910,9 +911,9 @@ int gather_builds(struct rpminspect *ri, bool fo)
     if (ri->after != NULL) {
         whichbuild = AFTER_BUILD;
 
-        if (is_local_build(ri->after) || is_local_rpm(ri, ri->after)) {
+        if (is_local_build(ri->workdir, ri->after, fetch_only) || is_local_rpm(ri, ri->after)) {
             if (fetch_only) {
-                warnx(_("`%s' already exists"), ri->after);
+                warnx(_("`%s' already exists in %s"), ri->after, ri->workdir);
                 return -1;
             }
 
@@ -967,7 +968,7 @@ int gather_builds(struct rpminspect *ri, bool fo)
     whichbuild = BEFORE_BUILD;
 
     /* before build specified, find it */
-    if (is_local_build(ri->before) || is_local_rpm(ri, ri->before)) {
+    if (is_local_build(ri->workdir, ri->before, fetch_only) || is_local_rpm(ri, ri->before)) {
         set_worksubdir(ri, LOCAL_WORKDIR, NULL, NULL);
 
         /* copy before tree */
