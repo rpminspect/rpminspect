@@ -29,7 +29,8 @@
  * Output a results_t in XUnit format.  This can be consumed by Jenkins or
  * other services that can read in XUnit data (e.g., GitHub).
  */
-void output_xunit(const results_t *results, const char *dest, const severity_t threshold) {
+void output_xunit(const results_t *results, const char *dest, const severity_t threshold)
+{
     results_entry_t *result = NULL;
     int r = 0;
     int count = 0;

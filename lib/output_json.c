@@ -31,7 +31,8 @@
 /*
  * Output a results_t in JSON format.
  */
-void output_json(const results_t *results, const char *dest, __attribute__((unused)) const severity_t threshold) {
+void output_json(const results_t *results, const char *dest, __attribute__((unused)) const severity_t threshold)
+{
     results_entry_t *result = NULL;
     int r = 0;
     int len = 0;
