@@ -196,7 +196,7 @@ static bool disttag_driver(struct rpminspect *ri, rpmfile_entry_t *file)
     if (release == NULL) {
         xasprintf(&params.msg, _("The %s file is missing the %s tag."), file->localpath, SPEC_TAG_RELEASE);
         params.verb = VERB_REMOVED;
-        params.noun = _("Release: tag");
+        params.noun = _("${FILE} missing Release tag");
         add_result(ri, &params);
         result = false;
     } else if (strstr(release, SPEC_DISTTAG) || strstr(expanded_release, DIST_TAG_MARKER)) {
@@ -204,7 +204,7 @@ static bool disttag_driver(struct rpminspect *ri, rpmfile_entry_t *file)
     } else if (!check_release_macros(macrocount, ri->macros, release, SPEC_DISTTAG)) {
         xasprintf(&params.msg, _("The %s tag value is missing the dist tag in the proper form. The dist tag should be of the form '%s' in the %s tag or in a macro used in the %s tag. After RPM macro expansion, no dist tag was found in this %s tag value."), SPEC_TAG_RELEASE, SPEC_DISTTAG, SPEC_TAG_RELEASE, SPEC_TAG_RELEASE, SPEC_TAG_RELEASE);
         params.verb = VERB_FAILED;
-        params.noun = _("'%%{?dist}' tag");
+        params.noun = _("${FILE} does not use '%%{?dist}' in Release");
         add_result(ri, &params);
         result = false;
     }
@@ -265,6 +265,7 @@ bool inspect_disttag(struct rpminspect *ri)
     init_result_params(&params);
     params.waiverauth = NOT_WAIVABLE;
     params.header = NAME_DISTTAG;
+    params.verb = VERB_OK;
 
     /* If we never saw an SRPM, tell the user. */
     if (result && src) {

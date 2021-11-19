@@ -204,6 +204,7 @@ static bool xml_driver(struct rpminspect *ri, rpmfile_entry_t *file)
         xasprintf(&params.msg, _("%s is a well-formed XML file in %s on %s, but is not a valid XML file"), file->localpath, pkg, params.arch);
         params.severity = RESULT_INFO;
         params.waiverauth = NOT_WAIVABLE;
+        params.verb = VERB_OK;
         add_result(ri, &params);
         free(params.msg);
         free(params.details);
@@ -211,6 +212,8 @@ static bool xml_driver(struct rpminspect *ri, rpmfile_entry_t *file)
         xasprintf(&params.msg, _("%s is not a well-formed XML file in %s on %s"), file->localpath, pkg, params.arch);
         params.severity = RESULT_VERIFY;
         params.waiverauth = WAIVABLE_BY_ANYONE;
+        params.verb = VERB_FAILED;
+        params.noun = _("${FILE} is not well-formed XML on ${ARCH}");
         add_result(ri, &params);
         free(params.msg);
         free(params.details);
@@ -232,6 +235,7 @@ bool inspect_xml(struct rpminspect *ri)
         params.severity = RESULT_OK;
         params.waiverauth = NOT_WAIVABLE;
         params.header = NAME_XML;
+        params.verb = VERB_OK;
         add_result(ri, &params);
     }
 

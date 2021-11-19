@@ -286,6 +286,8 @@ static bool validate_desktop_contents(struct rpminspect *ri, const rpmfile_entry
                     xasprintf(&params.msg, _("Desktop file %s on %s references executable %s but %s is not executable by all"), file->localpath, arch, tmp, tmp);
                     params.severity = RESULT_VERIFY;
                     params.waiverauth = WAIVABLE_BY_ANYONE;
+                    params.verb = VERB_FAILED;
+                    params.noun = _("${FILE} references non-executable file on ${ARCH}");
                     add_result(ri, &params);
                     free(params.msg);
                     result = false;
@@ -309,6 +311,7 @@ static bool validate_desktop_contents(struct rpminspect *ri, const rpmfile_entry
                xasprintf(&params.msg, _("Desktop file %s on %s references executable %s; no subpackages contain an executable of that name, however it has a TryExec key so it may be ignored in case %s does not exist"), file->localpath, arch, tmp, key_tryexec);
                 params.severity = RESULT_INFO;
                 params.waiverauth = NOT_WAIVABLE;
+                params.verb = VERB_OK;
                 add_result(ri, &params);
                 free(params.msg);
                 result = false;
@@ -316,6 +319,8 @@ static bool validate_desktop_contents(struct rpminspect *ri, const rpmfile_entry
                 xasprintf(&params.msg, _("Desktop file %s on %s references executable %s but no subpackages contain an executable of that name"), file->localpath, arch, tmp);
                 params.severity = RESULT_VERIFY;
                 params.waiverauth = WAIVABLE_BY_ANYONE;
+                params.verb = VERB_FAILED;
+                params.noun = _("${FILE} references missing executable on ${ARCH}");
                 add_result(ri, &params);
                 free(params.msg);
                 result = false;
@@ -360,6 +365,8 @@ static bool validate_desktop_contents(struct rpminspect *ri, const rpmfile_entry
                     xasprintf(&params.msg, _("Desktop file %s on %s references icon %s but %s is not readable by all"), file->localpath, arch, key_icon, key_icon);
                     params.severity = RESULT_VERIFY;
                     params.waiverauth = WAIVABLE_BY_ANYONE;
+                    params.verb = VERB_FAILED;
+                    params.noun = _("${FILE} references unreadble icon on ${ARCH}");
                     add_result(ri, &params);
                     free(params.msg);
                     result = false;
@@ -380,6 +387,8 @@ static bool validate_desktop_contents(struct rpminspect *ri, const rpmfile_entry
             xasprintf(&params.msg, _("Desktop file %s on %s references icon %s but no subpackages contain %s"), file->localpath, arch, key_icon, key_icon);
             params.severity = RESULT_VERIFY;
             params.waiverauth = WAIVABLE_BY_ANYONE;
+            params.verb = VERB_FAILED;
+            params.noun = _("${FILE} references missing icon on ${ARCH}");
             add_result(ri, &params);
             free(params.msg);
             result = false;
@@ -448,7 +457,7 @@ static bool desktop_driver(struct rpminspect *ri, rpmfile_entry_t *file)
     params.arch = arch;
     params.file = file->localpath;
     params.verb = VERB_CHANGED;
-    params.noun = _("${FILE}");
+    params.noun = _("${FILE} is not valid on ${ARCH}");
 
     if (file->peer_file && before_out == NULL && params.details != NULL) {
         xasprintf(&params.msg, _("File %s is no longer a valid desktop entry file on %s; desktop-file-validate reports:"), file->localpath, arch);
@@ -498,6 +507,7 @@ bool inspect_desktop(struct rpminspect *ri)
         params.severity = RESULT_OK;
         params.waiverauth = NOT_WAIVABLE;
         params.header = NAME_DESKTOP;
+        params.verb = VERB_OK;
         add_result(ri, &params);
     }
 

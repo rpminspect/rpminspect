@@ -73,6 +73,7 @@ static bool filesize_driver(struct rpminspect *ri, rpmfile_entry_t *file)
     params.header = NAME_FILESIZE;
     params.arch = arch;
     params.file = file->localpath;
+    params.verb = VERB_OK;
 
     /* Size checks and messaging */
     if (file->st.st_size > 0 && file->peer_file->st.st_size == 0) {
@@ -80,7 +81,7 @@ static bool filesize_driver(struct rpminspect *ri, rpmfile_entry_t *file)
         xasprintf(&params.msg, _("%s became a non-empty file on %s"), file->localpath, arch);
         params.severity = RESULT_VERIFY;
         params.waiverauth = WAIVABLE_BY_ANYONE;
-        params.verb = VERB_CHANGED;
+        params.verb = VERB_FAILED;
         params.noun = _("non-empty ${FILE}");
         result = false;
     } else if (file->st.st_size == 0 && file->peer_file->st.st_size > 0) {
@@ -88,7 +89,7 @@ static bool filesize_driver(struct rpminspect *ri, rpmfile_entry_t *file)
         xasprintf(&params.msg, _("%s became an empty file on %s"), file->localpath, arch);
         params.severity = RESULT_VERIFY;
         params.waiverauth = WAIVABLE_BY_ANYONE;
-        params.verb = VERB_CHANGED;
+        params.verb = VERB_FAILED;
         params.noun = _("empty ${FILE}");
         result = false;
     } else {

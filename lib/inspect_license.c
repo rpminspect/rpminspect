@@ -382,11 +382,15 @@ static int check_peer_license(struct rpminspect *ri, struct result_params *param
     nevra = get_nevra(hdr);
     assert(nevra != NULL);
     license = headerGetString(hdr, RPMTAG_LICENSE);
+    params->file = nevra;
+    params->arch = get_rpm_header_arch(hdr);
 
     if (license == NULL) {
         xasprintf(&params->msg, _("Empty License Tag in %s"), nevra);
         params->severity = RESULT_BAD;
         params->remedy = REMEDY_LICENSE;
+        params->verb = VERB_FAILED;
+        params->noun = _("missing License tag in ${FILE}");
         add_result(ri, params);
         free(params->msg);
         ret = 1;
@@ -398,6 +402,10 @@ static int check_peer_license(struct rpminspect *ri, struct result_params *param
             xasprintf(&params->msg, _("Valid License Tag in %s: %s"), nevra, license);
             params->severity = RESULT_INFO;
             params->remedy = NULL;
+            params->verb = VERB_OK;
+            params->noun = NULL;
+            params->file = NULL;
+            params->arch = NULL;
             add_result(ri, params);
             free(params->msg);
             ret = 1;
@@ -408,6 +416,8 @@ static int check_peer_license(struct rpminspect *ri, struct result_params *param
             xasprintf(&params->msg, _("License Tag contains unprofessional language in %s: %s"), nevra, license);
             params->severity = RESULT_BAD;
             params->remedy = REMEDY_LICENSE;
+            params->verb = VERB_FAILED;
+            params->noun = _("unprofessional language in License tag in ${FILE}");
             add_result(ri, params);
             free(params->msg);
             ret = 1;
@@ -474,6 +484,10 @@ bool inspect_license(struct rpminspect *ri)
         xasprintf(&params.msg, _("Missing license database: %s: %s"), actual_licensedb, strerror(errno));
         params.severity = RESULT_BAD;
         params.remedy = REMEDY_LICENSEDB;
+        params.verb = VERB_FAILED;
+        params.noun = _("missing license database");
+        params.file = NULL;
+        params.arch = NULL;
         add_result(ri, &params);
         free(params.msg);
         free(actual_licensedb);

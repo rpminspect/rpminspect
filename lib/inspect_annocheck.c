@@ -126,6 +126,7 @@ static bool annocheck_driver(struct rpminspect *ri, rpmfile_entry_t *file)
     params.remedy = REMEDY_ANNOCHECK;
     params.arch = arch;
     params.file = file->localpath;
+    params.verb = VERB_OK;
 
     /* Run each annocheck test and report the results */
     HASH_ITER(hh, ri->annocheck, hentry, tmp_hentry) {
@@ -230,6 +231,7 @@ bool inspect_annocheck(struct rpminspect *ri)
         params.severity = RESULT_OK;
         params.waiverauth = NOT_WAIVABLE;
         params.header = NAME_ANNOCHECK;
+        params.verb = VERB_OK;
         add_result(ri, &params);
     }
 

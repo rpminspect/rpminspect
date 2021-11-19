@@ -305,7 +305,6 @@ static bool manpage_driver(struct rpminspect *ri, rpmfile_entry_t *file)
     params.arch = get_rpm_header_arch(file->rpm_header);
     params.file = file->localpath;
     params.verb = VERB_FAILED;
-    params.noun = _("${FILE}");
 
     /* check for empty man pages */
     uncompressed_man_page = uncompress_file(ri, file->fullpath, NAME_MANPAGE);
@@ -316,6 +315,7 @@ static bool manpage_driver(struct rpminspect *ri, rpmfile_entry_t *file)
             xasprintf(&params.msg, _("Man page %s is possibly empty on %s in %s"), file->localpath, params.arch, pkg);
             params.remedy = REMEDY_MAN_ERRORS;
             params.details = NULL;
+            params.noun = _("empty man page ${FILE} on ${ARCH}");
             add_result(ri, &params);
             result = false;
             free(params.msg);
@@ -331,6 +331,7 @@ static bool manpage_driver(struct rpminspect *ri, rpmfile_entry_t *file)
         xasprintf(&params.msg, _("Man page checker reported problems with %s on %s in %s"), file->localpath, params.arch, pkg);
         params.remedy = REMEDY_MAN_ERRORS;
         params.details = manpage_errors;
+        params.noun = _("man page ${FILE} on ${ARCH} has errors");
         add_result(ri, &params);
         free(params.msg);
         free(manpage_errors);
@@ -342,6 +343,7 @@ static bool manpage_driver(struct rpminspect *ri, rpmfile_entry_t *file)
         xasprintf(&params.msg, _("Man page %s has incorrect path on %s in %s"), file->localpath, params.arch, pkg);
         params.remedy = REMEDY_MAN_PATH;
         params.details = NULL;
+        params.noun = _("man page ${FILE} on ${ARCH} has incorrect path");
         add_result(ri, &params);
         free(params.msg);
         result = false;
@@ -364,6 +366,7 @@ bool inspect_manpage(struct rpminspect *ri)
         params.severity = RESULT_OK;
         params.waiverauth = NOT_WAIVABLE;
         params.header = NAME_MANPAGE;
+        params.verb = VERB_OK;
         add_result(ri, &params);
     }
 

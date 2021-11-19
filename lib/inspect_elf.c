@@ -478,7 +478,7 @@ static bool inspect_elf_execstack(struct rpminspect *ri, Elf *after_elf, Elf *be
         if (params.severity != RESULT_NULL && params.severity != RESULT_SKIP) {
             params.remedy = REMEDY_ELF_EXECSTACK_MISSING;
             params.verb = VERB_CHANGED;
-            params.noun = _("GNU_STACK on ${FILE}");
+            params.noun = _("GNU_STACK in ${FILE} on ${ARCH}");
             add_result(ri, &params);
             result = false;
         }
@@ -540,7 +540,7 @@ static bool inspect_elf_execstack(struct rpminspect *ri, Elf *after_elf, Elf *be
             if (params.severity != RESULT_NULL && params.severity != RESULT_SKIP) {
                 params.remedy = REMEDY_ELF_EXECSTACK_INVALID;
                 params.verb = VERB_FAILED;
-                params.noun = _("execstack on ${FILE}");
+                params.noun = _("execstack in ${FILE} on ${ARCH}");
                 add_result(ri, &params);
                 result = false;
             }
@@ -570,7 +570,7 @@ static bool inspect_elf_execstack(struct rpminspect *ri, Elf *after_elf, Elf *be
         if (params.severity != RESULT_NULL && params.severity != RESULT_SKIP) {
             params.remedy = REMEDY_ELF_EXECSTACK_EXECUTABLE;
             params.verb = VERB_FAILED;
-            params.noun = _("execstack on ${FILE}");
+            params.noun = _("execstack in ${FILE} on ${ARCH}");
             add_result(ri, &params);
             result = false;
         }
@@ -608,7 +608,7 @@ static bool check_relro(struct rpminspect *ri, Elf *before_elf, Elf *after_elf, 
         params.arch = arch;
         params.file = file->localpath;
         params.verb = VERB_REMOVED;
-        params.noun = _("GNU_RELRO on ${FILE}");
+        params.noun = _("lost GNU_RELRO in ${FILE} on ${ARCH}");
 
         if (params.severity != RESULT_NULL && params.severity != RESULT_SKIP) {
             add_result(ri, &params);
@@ -728,7 +728,7 @@ static bool check_fortified(struct rpminspect *ri, Elf *before_elf, Elf *after_e
     params.arch = arch;
     params.file = file->localpath;
     params.verb = VERB_REMOVED;
-    params.noun = _("-D_FORTIFY_SOURCE on ${FILE}");
+    params.noun = _("lost -D_FORTIFY_SOURCE in ${FILE} on ${ARCH}");
     params.severity = get_secrule_result_severity(ri, file, SECRULE_FORTIFYSOURCE);
 
     if (params.severity != RESULT_NULL && params.severity != RESULT_SKIP) {
@@ -954,7 +954,7 @@ static bool elf_archive_tests(struct rpminspect *ri, Elf *after_elf, int after_e
     params.arch = arch;
     params.file = file->localpath;
     params.verb = VERB_REMOVED;
-    params.noun = _("-fPIC on ${FILE}");
+    params.noun = _("missing -fPIC in ${FILE} on ${ARCH}");
     params.severity = get_secrule_result_severity(ri, file, SECRULE_PIC);
 
     if (!result && params.severity != RESULT_NULL && params.severity != RESULT_SKIP) {
@@ -991,7 +991,7 @@ static bool elf_regular_tests(struct rpminspect *ri, Elf *after_elf, Elf *before
     params.remedy = REMEDY_ELF_TEXTREL;
     params.arch = arch;
     params.file = file->localpath;
-    params.noun = _("TEXTREL relocations on ${FILE}");
+    params.noun = _("TEXTREL relocations in ${FILE} on ${ARCH}");
 
     /* skip kernel eBPF machine type objects */
     if (get_elf_machine(after_elf) == EM_BPF) {
@@ -1117,6 +1117,7 @@ bool inspect_elf(struct rpminspect *ri)
         params.severity = RESULT_OK;
         params.waiverauth = NOT_WAIVABLE;
         params.header = NAME_ELF;
+        params.verb = VERB_OK;
         add_result(ri, &params);
     }
 

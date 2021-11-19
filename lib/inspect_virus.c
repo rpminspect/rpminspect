@@ -180,6 +180,10 @@ bool inspect_virus(struct rpminspect *ri)
         warn("closedir");
     }
 
+    params.verb = VERB_OK;
+    params.noun = NULL;
+    params.file = NULL;
+    params.arch = NULL;
     add_result(ri, &params);
     free(params.msg);
 
@@ -188,7 +192,7 @@ bool inspect_virus(struct rpminspect *ri)
     params.waiverauth = WAIVABLE_BY_ANYONE;
     params.header = NAME_VIRUS;
     params.verb = VERB_FAILED;
-    params.noun = _("virus or malware in ${FILE}");
+    params.noun = _("virus or malware in ${FILE} on ${ARCH}");
     result = foreach_peer_file(ri, NAME_VIRUS, virus_driver, false);
 
     /* hope the result is always this */
@@ -197,6 +201,10 @@ bool inspect_virus(struct rpminspect *ri)
         params.severity = RESULT_OK;
         params.waiverauth = NOT_WAIVABLE;
         params.header = NAME_VIRUS;
+        params.verb = VERB_OK;
+        params.noun = NULL;
+        params.file = NULL;
+        params.arch = NULL;
         add_result(ri, &params);
     }
 

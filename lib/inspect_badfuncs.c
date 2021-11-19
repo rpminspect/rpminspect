@@ -131,7 +131,9 @@ static bool badfuncs_driver(struct rpminspect *ri, rpmfile_entry_t *after)
     params.remedy = REMEDY_BADFUNCS;
     params.details = output_buffer;
     params.verb = VERB_FAILED;
-    params.noun = _("forbidden functions found in ${FILE}");
+    params.noun = _("forbidden functions in ${FILE} on ${ARCH}");
+    params.file = after->localpath;
+    params.arch = arch;
     add_result(ri, &params);
     free(params.msg);
     free(output_buffer);

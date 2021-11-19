@@ -461,7 +461,7 @@ static int validate_file(const char *fpath, __attribute__((unused)) const struct
     params.header = NAME_UNICODE;
     params.arch = globalarch;
     params.file = localpath;
-    params.noun = _("forbidden code point in ${FILE}");
+    params.noun = _("forbidden code point in ${FILE} on ${ARCH}");
     params.verb = VERB_FAILED;
     params.remedy = REMEDY_UNICODE;
 
@@ -652,6 +652,7 @@ bool inspect_unicode(struct rpminspect *ri)
     init_result_params(&params);
     params.waiverauth = NOT_WAIVABLE;
     params.header = NAME_UNICODE;
+    params.verb = VERB_OK;
 
     if (result) {
         params.severity = RESULT_OK;
