@@ -152,7 +152,7 @@ abi_t *read_abi(const char *vendor_data_dir, const char *product_release)
         }
 
         /* determine if we are reading a new level or not */
-        if (strprefix(line->data, "[") && strsuffix(line->data, "]") && strcasestr(line->data, "level-")) {
+        if (strprefix(line->data, "[") && strsuffix(line->data, "]") && (strcasestr(line->data, "level-") || strcasestr(line->data, "level "))) {
             /* new compat level section */
 
             /*
