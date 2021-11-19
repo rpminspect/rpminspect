@@ -26,8 +26,9 @@
  * Output formats are reference by a constant.
  */
 
-#define FORMAT_TEXT  0
-#define FORMAT_JSON  1
-#define FORMAT_XUNIT 2
+#define FORMAT_TEXT    0
+#define FORMAT_JSON    1
+#define FORMAT_XUNIT   2
+#define FORMAT_SUMMARY 3
 
 #endif
