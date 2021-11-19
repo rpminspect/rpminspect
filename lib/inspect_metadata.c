@@ -28,7 +28,8 @@
 /*
  * Validate the metadata tags in the RPM headers.
  */
-static bool valid_peers(struct rpminspect *ri, const Header before_hdr, const Header after_hdr) {
+static bool valid_peers(struct rpminspect *ri, const Header before_hdr, const Header after_hdr)
+{
     bool ret = true;
     bool valid_subdomain = false;
     bool rebase = false;
@@ -55,6 +56,10 @@ static bool valid_peers(struct rpminspect *ri, const Header before_hdr, const He
         xasprintf(&params.msg, _("Vendor not set in the rpminspect configuration, ignoring Package Vendor \"%s\" in %s"), after_vendor, after_nevra);
         params.severity = RESULT_INFO;
         params.waiverauth = NOT_WAIVABLE;
+        params.verb = VERB_OK;
+        params.noun = NULL;
+        params.file = NULL;
+        params.arch = NULL;
         params.remedy = REMEDY_VENDOR;
         add_result(ri, &params);
         free(params.msg);
@@ -62,6 +67,10 @@ static bool valid_peers(struct rpminspect *ri, const Header before_hdr, const He
         xasprintf(&params.msg, _("Package Vendor \"%s\" is not \"%s\" in %s"), after_vendor, ri->vendor, after_nevra);
         params.severity = RESULT_BAD;
         params.waiverauth = NOT_WAIVABLE;
+        params.verb = VERB_FAILED;
+        params.noun = _("invalid vendor ${FILE} on ${ARCH}");
+        params.file = after_vendor;
+        params.arch = get_rpm_header_arch(after_hdr);
         params.remedy = REMEDY_VENDOR;
         add_result(ri, &params);
         free(params.msg);
@@ -83,6 +92,10 @@ static bool valid_peers(struct rpminspect *ri, const Header before_hdr, const He
             xasprintf(&params.msg, _("Package Build Host \"%s\" is not within an expected build host subdomain in %s"), after_buildhost, after_nevra);
             params.severity = RESULT_BAD;
             params.waiverauth = NOT_WAIVABLE;
+            params.verb = VERB_FAILED;
+            params.noun = _("invalid build host ${FILE} on ${ARCH}");
+            params.file = after_buildhost;
+            params.arch = get_rpm_header_arch(after_hdr);
             params.remedy = REMEDY_BUILDHOST;
             add_result(ri, &params);
             free(params.msg);
@@ -96,6 +109,10 @@ static bool valid_peers(struct rpminspect *ri, const Header before_hdr, const He
         xasprintf(&params.details, _("Summary: %s"), after_summary);
         params.severity = RESULT_BAD;
         params.waiverauth = NOT_WAIVABLE;
+        params.verb = VERB_FAILED;
+        params.noun = _("Summary contains unprofessional words on ${ARCH}");
+        params.file = NULL;
+        params.arch = get_rpm_header_arch(after_hdr);
         params.remedy = REMEDY_BADWORDS;
         add_result(ri, &params);
         free(params.msg);
@@ -109,6 +126,10 @@ static bool valid_peers(struct rpminspect *ri, const Header before_hdr, const He
         xasprintf(&params.details, "%s", after_description);
         params.severity = RESULT_BAD;
         params.waiverauth = NOT_WAIVABLE;
+        params.verb = VERB_FAILED;
+        params.noun = _("Description contains unprofessional words on ${ARCH}");
+        params.file = NULL;
+        params.arch = get_rpm_header_arch(after_hdr);
         params.remedy = REMEDY_BADWORDS;
         add_result(ri, &params);
         free(params.msg);
@@ -151,6 +172,10 @@ static bool valid_peers(struct rpminspect *ri, const Header before_hdr, const He
             xasprintf(&params.msg, _("Package Summary change from \"%s\" to \"%s\" in %s"), before_summary, after_summary, after_name);
             params.severity = RESULT_INFO;
             params.waiverauth = NOT_WAIVABLE;
+            params.verb = VERB_OK;
+            params.noun = NULL;
+            params.file = NULL;
+            params.arch = NULL;
             params.remedy = NULL;
             add_result(ri, &params);
             free(params.msg);
@@ -162,6 +187,10 @@ static bool valid_peers(struct rpminspect *ri, const Header before_hdr, const He
             xasprintf(&params.details, _("from:\n\n%s\n\nto:\n\n%s"), before_description, after_description);
             params.severity = RESULT_INFO;
             params.waiverauth = NOT_WAIVABLE;
+            params.verb = VERB_OK;
+            params.noun = NULL;
+            params.file = NULL;
+            params.arch = NULL;
             params.remedy = NULL;
             add_result(ri, &params);
             free(params.msg);
@@ -176,7 +205,8 @@ static bool valid_peers(struct rpminspect *ri, const Header before_hdr, const He
 /*
  * Main driver for the 'metadata' inspection.
  */
-bool inspect_metadata(struct rpminspect *ri) {
+bool inspect_metadata(struct rpminspect *ri)
+{
     bool good = true;
     rpmpeer_entry_t *peer = NULL;
     struct result_params params;
@@ -210,6 +240,10 @@ bool inspect_metadata(struct rpminspect *ri) {
         params.severity = RESULT_OK;
         params.waiverauth = NOT_WAIVABLE;
         params.header = NAME_METADATA;
+        params.verb = VERB_OK;
+        params.noun = NULL;
+        params.file = NULL;
+        params.arch = NULL;
         add_result(ri, &params);
     }
 

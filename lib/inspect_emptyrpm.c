@@ -78,6 +78,7 @@ bool inspect_emptyrpm(struct rpminspect *ri)
     rpmpeer_entry_t *peer = NULL;
     const char *name = NULL;
     char *bn = NULL;
+    char *an = NULL;
     struct result_params params;
 
     assert(ri != NULL);
@@ -109,18 +110,31 @@ bool inspect_emptyrpm(struct rpminspect *ri)
                 xasprintf(&params.msg, _("New package %s is empty (no payloads); this is expected per the rpminspect configuration"), bn);
                 params.severity = RESULT_INFO;
                 params.waiverauth = NOT_WAIVABLE;
+                params.verb = VERB_OK;
+                params.noun = NULL;
+                params.file = NULL;
+                params.arch = NULL;
                 params.remedy = NULL;
                 reported = true;
             } else if (payload_only_ghosts(peer->after_hdr)) {
                 xasprintf(&params.msg, _("New package %s is empty (no payloads); this is expected because the package only contains %%ghost entries"), bn);
                 params.severity = RESULT_INFO;
                 params.waiverauth = NOT_WAIVABLE;
+                params.verb = VERB_OK;
+                params.noun = NULL;
+                params.file = NULL;
+                params.arch = NULL;
                 params.remedy = NULL;
                 reported = true;
             } else {
-                xasprintf(&params.msg, _("New package %s is empty (no payloads)"), basename(peer->after_rpm));
+                an = basename(peer->after_rpm);
+                xasprintf(&params.msg, _("New package %s is empty (no payloads)"), an);
                 params.severity = RESULT_VERIFY;
                 params.waiverauth = WAIVABLE_BY_ANYONE;
+                params.verb = VERB_FAILED;
+                params.noun = _("${FILE} has empty payload");
+                params.file = an;
+                params.arch = get_rpm_header_arch(peer->after_hdr);
                 params.remedy = REMEDY_EMPTYRPM;
                 good = false;
                 reported = true;
@@ -134,6 +148,10 @@ bool inspect_emptyrpm(struct rpminspect *ri)
     if (good & !reported) {
         params.severity = RESULT_OK;
         params.waiverauth = NOT_WAIVABLE;
+        params.verb = VERB_OK;
+        params.noun = NULL;
+        params.file = NULL;
+        params.arch = NULL;
         add_result(ri, &params);
     }
 

@@ -142,12 +142,17 @@ static bool politics_driver(struct rpminspect *ri, rpmfile_entry_t *file)
             xasprintf(&params.msg, _("Possible politically sensitive file (%s) found in %s on %s: rules allow this file."), file->localpath, name, params.arch);
             params.severity = RESULT_INFO;
             params.waiverauth = NOT_WAIVABLE;
+            params.verb = VERB_OK;
+            params.noun = NULL;
+            params.file = NULL;
+            params.arch = NULL;
         } else {
             xasprintf(&params.msg, _("Possible politically sensitive file (%s) found in %s on %s: rules prohibit this file."), file->localpath, name, params.arch);
             params.severity = RESULT_BAD;
             params.waiverauth = NOT_WAIVABLE;
             params.verb = VERB_FAILED;
             params.noun = _("${FILE} is politically sensitive");
+            params.file = file->localpath;
             result = false;
         }
 
@@ -177,6 +182,10 @@ bool inspect_politics(struct rpminspect *ri)
         params.severity = RESULT_OK;
         params.waiverauth = NOT_WAIVABLE;
         params.header = NAME_POLITICS;
+        params.verb = VERB_OK;
+        params.noun = NULL;
+        params.file = NULL;
+        params.arch = NULL;
         add_result(ri, &params);
     }
 
