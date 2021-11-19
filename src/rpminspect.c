@@ -748,7 +748,7 @@ int main(int argc, char **argv)
     /* general information in the results */
     init_result_params(&params);
     params.severity = RESULT_INFO;
-    params.header = _("diagnostics");
+    params.header = NAME_DIAGNOSTICS;
 
     /* gather version information for dependent programs and libraries */
     diags = gather_diags(ri, COMMAND_NAME, PACKAGE_VERSION);

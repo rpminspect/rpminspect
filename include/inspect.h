@@ -617,6 +617,9 @@ bool inspect_unicode(struct rpminspect *ri);
 #define NAME_RUNPATH                        "runpath"
 #define NAME_UNICODE                        "unicode"
 
+/* not an actual inspection */
+#define NAME_DIAGNOSTICS                    "diagnostics"
+
 /* Long descriptions for the inspections */
 #define DESC_LICENSE _("Verify the string specified in the License tag of the RPM metadata describes permissible software licenses as defined by the license database. Also checks to see if the License tag contains any unprofessional words as defined in the configuration file.")
 
