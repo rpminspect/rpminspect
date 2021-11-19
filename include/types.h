@@ -163,7 +163,8 @@ typedef enum _verb_t {
     VERB_ADDED = 1,     /* new file or metadata */
     VERB_REMOVED = 2,   /* removed file or metadata */
     VERB_CHANGED = 3,   /* changed file or metadata */
-    VERB_FAILED = 4     /* check failing */
+    VERB_FAILED = 4,    /* check failing */
+    VERB_OK = 5         /* the everything is ok alarm */
 } verb_t;
 
 /*

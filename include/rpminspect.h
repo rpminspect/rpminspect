@@ -253,6 +253,9 @@ void output_json(const results_t *, const char *, const severity_t);
 /* output_xunit.c */
 void output_xunit(const results_t *, const char *, const severity_t);
 
+/* output_summary.c */
+void output_summary(const results_t *results, const char *dest, const severity_t threshold);
+
 /* unpack.c */
 int unpack_archive(const char *, const char *, const bool);
 

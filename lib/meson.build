@@ -82,6 +82,7 @@ librpminspect_sources = [
     'mkdirp.c',
     'output.c',
     'output_json.c',
+    'output_summary.c',
     'output_text.c',
     'output_xunit.c',
     'pairfuncs.c',
