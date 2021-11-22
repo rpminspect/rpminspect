@@ -78,6 +78,7 @@ lib/magic.c
 lib/mkdirp.c
 lib/output.c
 lib/output_json.c
+lib/output_summary.c
 lib/output_text.c
 lib/output_xunit.c
 lib/pairfuncs.c
