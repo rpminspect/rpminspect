@@ -78,6 +78,8 @@ static bool ownership_driver(struct rpminspect *ri, rpmfile_entry_t *file)
         xasprintf(&params.remedy, REMEDY_OWNERSHIP_DEFATTR, ri->fileinfo_filename);
         params.severity = RESULT_BAD;
         params.waiverauth = WAIVABLE_BY_ANYONE;
+        params.verb = VERB_FAILED;
+        params.noun = _("forbidden owner for ${FILE} on ${ARCH}");
         add_result(ri, &params);
         free(params.msg);
         free(params.remedy);
@@ -90,6 +92,8 @@ static bool ownership_driver(struct rpminspect *ri, rpmfile_entry_t *file)
         xasprintf(&params.remedy, REMEDY_OWNERSHIP_DEFATTR, ri->fileinfo_filename);
         params.severity = RESULT_BAD;
         params.waiverauth = WAIVABLE_BY_ANYONE;
+        params.verb = VERB_FAILED;
+        params.noun = _("forbidden group for ${FILE} on ${ARCH}");
         add_result(ri, &params);
         free(params.msg);
         free(params.remedy);
@@ -107,6 +111,8 @@ static bool ownership_driver(struct rpminspect *ri, rpmfile_entry_t *file)
                 xasprintf(&params.remedy, REMEDY_OWNERSHIP_BIN_OWNER, ri->fileinfo_filename);
                 params.severity = RESULT_BAD;
                 params.waiverauth = WAIVABLE_BY_ANYONE;
+                params.verb = VERB_FAILED;
+                params.noun = _("invalid owner for ${FILE} on ${ARCH}");
                 add_result(ri, &params);
                 free(params.msg);
                 free(params.remedy);
@@ -141,6 +147,8 @@ static bool ownership_driver(struct rpminspect *ri, rpmfile_entry_t *file)
                             xasprintf(&params.msg, _("File %s on %s has CAP_SETUID capability but group `%s` and is world executable"), file->localpath, arch, group);
                             xasprintf(&params.remedy, REMEDY_OWNERSHIP_IXOTH, ri->fileinfo_filename);
                             params.waiverauth = WAIVABLE_BY_SECURITY;
+                            params.verb = VERB_FAILED;
+                            params.noun = _("CAP_SETUID and o+x for ${FILE} on ${ARCH}");
                             add_result(ri, &params);
                             free(params.msg);
                             free(params.remedy);
@@ -155,6 +163,8 @@ static bool ownership_driver(struct rpminspect *ri, rpmfile_entry_t *file)
                             xasprintf(&params.msg, _("File %s on %s has CAP_SETUID capability but group `%s` and is group writable"), file->localpath, arch, group);
                             xasprintf(&params.remedy, REMEDY_OWNERSHIP_IWGRP, ri->fileinfo_filename);
                             params.waiverauth = WAIVABLE_BY_SECURITY;
+                            params.verb = VERB_FAILED;
+                            params.noun = _("CAP_SETUID and g+w for ${FILE} on ${ARCH}");
                             add_result(ri, &params);
                             free(params.msg);
                             free(params.remedy);
@@ -166,6 +176,8 @@ static bool ownership_driver(struct rpminspect *ri, rpmfile_entry_t *file)
                     xasprintf(&params.remedy, REMEDY_OWNERSHIP_BIN_GROUP, ri->fileinfo_filename);
                     params.severity = RESULT_BAD;
                     params.waiverauth = WAIVABLE_BY_ANYONE;
+                    params.verb = VERB_FAILED;
+                    params.noun = _("invalid group for ${FILE} on ${ARCH}");
                     add_result(ri, &params);
                     free(params.msg);
                     free(params.remedy);
@@ -212,6 +224,7 @@ static bool ownership_driver(struct rpminspect *ri, rpmfile_entry_t *file)
             xasprintf(&params.msg, "%s:%s", owner, group);
             params.severity = RESULT_VERIFY;
             params.waiverauth = WAIVABLE_BY_ANYONE;
+            params.verb = VERB_FAILED;
 
             if (bin &&
                 ((!strcmp(owner, ri->bin_owner) && !strcmp(what, "owner")) ||
@@ -223,11 +236,13 @@ static bool ownership_driver(struct rpminspect *ri, rpmfile_entry_t *file)
                  */
                 params.severity = RESULT_INFO;
                 params.waiverauth = NOT_WAIVABLE;
+                params.verb = VERB_OK;
             }
 
             free(params.msg);
             xasprintf(&params.msg, _("File %s changed %s from `%s` to `%s` on %s"), file->localpath, what, before_val, after_val, arch);
             xasprintf(&params.remedy, REMEDY_OWNERSHIP_CHANGED, ri->fileinfo_filename);
+            params.noun = _("${FILE} changed owner on ${ARCH}");
             add_result(ri, &params);
             free(params.msg);
             free(params.remedy);
@@ -261,6 +276,7 @@ bool inspect_ownership(struct rpminspect *ri)
         params.severity = RESULT_OK;
         params.waiverauth = NOT_WAIVABLE;
         params.header = NAME_OWNERSHIP;
+        params.verb = VERB_OK;
         add_result(ri, &params);
     }
 

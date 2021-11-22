@@ -169,6 +169,7 @@ static bool config_driver(struct rpminspect *ri, rpmfile_entry_t *file)
                     xasprintf(&params.msg, _("%%config file content change for %s in %s on %s (comments/whitespace only)"), file->localpath, name, arch);
                     params.severity = RESULT_INFO;
                     params.waiverauth = NOT_WAIVABLE;
+                    params.verb = VERB_OK;
                     result = true;
                 } else {
                     xasprintf(&params.msg, _("%%config file content change for %s in %s on %s"), file->localpath, name, arch);
@@ -199,7 +200,8 @@ static bool config_driver(struct rpminspect *ri, rpmfile_entry_t *file)
 /*
  * Main driver for the 'config' inspection.
  */
-bool inspect_config(struct rpminspect *ri) {
+bool inspect_config(struct rpminspect *ri)
+{
     bool result = true;
     struct result_params params;
 
@@ -212,6 +214,7 @@ bool inspect_config(struct rpminspect *ri) {
         params.severity = RESULT_OK;
         params.waiverauth = NOT_WAIVABLE;
         params.header = NAME_CONFIG;
+        params.verb = VERB_OK;
         add_result(ri, &params);
     }
 

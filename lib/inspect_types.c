@@ -75,7 +75,7 @@ static bool types_driver(struct rpminspect *ri, rpmfile_entry_t *file)
         params.arch = arch;
         params.file = file->localpath;
         params.verb = VERB_CHANGED;
-        params.noun = _("${FILE} MIME type");
+        params.noun = _("${FILE} MIME type on ${ARCH}");
         xasprintf(&params.msg, _("MIME type on %s was %s and became %s on %s"), file->localpath, bt, at, arch);
         add_result(ri, &params);
         free(params.msg);
@@ -89,7 +89,8 @@ static bool types_driver(struct rpminspect *ri, rpmfile_entry_t *file)
 /*
  * Main driver for the 'types' inspection.
  */
-bool inspect_types(struct rpminspect *ri) {
+bool inspect_types(struct rpminspect *ri)
+{
     struct result_params params;
 
     assert(ri != NULL);
@@ -103,6 +104,7 @@ bool inspect_types(struct rpminspect *ri) {
         params.severity = RESULT_OK;
         params.waiverauth = NOT_WAIVABLE;
         params.header = NAME_TYPES;
+        params.verb = VERB_OK;
         add_result(ri, &params);
     }
 

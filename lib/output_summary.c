@@ -55,7 +55,7 @@ void output_summary(const results_t *results, const char *dest, __attribute__((u
     /* output the results */
     TAILQ_FOREACH(result, results, items) {
         /* skip conditions */
-        if (!strcmp(result->header, NAME_DIAGNOSTICS)) {
+        if (!strcmp(result->header, NAME_DIAGNOSTICS) || (result->verb == VERB_OK && result->noun == NULL)) {
             continue;
         }
 

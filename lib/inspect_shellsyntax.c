@@ -135,6 +135,8 @@ static bool shellsyntax_driver(struct rpminspect *ri, rpmfile_entry_t *file)
     params.header = NAME_SHELLSYNTAX;
     params.arch = arch;
     params.file = file->localpath;
+    params.verb = VERB_FAILED;
+    params.noun = _("invalid shell script ${FILE} on ${ARCH}");
 
     if (file->peer_file) {
         before_shell = get_shell(ri, file->peer_file->fullpath);
@@ -150,6 +152,7 @@ static bool shellsyntax_driver(struct rpminspect *ri, rpmfile_entry_t *file)
             params.severity = RESULT_INFO;
             params.waiverauth = NOT_WAIVABLE;
             params.remedy = REMEDY_SHELLSYNTAX_GAINED_SHELL;
+            params.verb = VERB_OK;
             add_result(ri, &params);
             free(params.msg);
         }
@@ -198,6 +201,7 @@ static bool shellsyntax_driver(struct rpminspect *ri, rpmfile_entry_t *file)
             params.waiverauth = NOT_WAIVABLE;
             params.details = before_errors;
             params.remedy = NULL;
+            params.verb = VERB_OK;
             add_result(ri, &params);
             free(params.msg);
         } else if ((before_exitcode || before_errors) && (exitcode || errors)) {
@@ -217,6 +221,7 @@ static bool shellsyntax_driver(struct rpminspect *ri, rpmfile_entry_t *file)
             params.waiverauth = NOT_WAIVABLE;
             params.details = NULL;
             params.remedy = NULL;
+            params.verb = VERB_OK;
             add_result(ri, &params);
             free(params.msg);
         } else if (exitcode || errors) {
@@ -239,7 +244,8 @@ static bool shellsyntax_driver(struct rpminspect *ri, rpmfile_entry_t *file)
 /*
  * Main driver for the 'shellsyntax' inspection.
  */
-bool inspect_shellsyntax(struct rpminspect *ri) {
+bool inspect_shellsyntax(struct rpminspect *ri)
+{
     bool result;
     struct result_params params;
 
@@ -252,6 +258,7 @@ bool inspect_shellsyntax(struct rpminspect *ri) {
         params.severity = RESULT_OK;
         params.waiverauth = NOT_WAIVABLE;
         params.header = NAME_SHELLSYNTAX;
+        params.verb = VERB_OK;
         add_result(ri, &params);
     }
 

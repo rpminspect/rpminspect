@@ -29,7 +29,8 @@
 static bool specgood = false;
 static bool seen = false;
 
-static bool specname_driver(struct rpminspect *ri, rpmfile_entry_t *file) {
+static bool specname_driver(struct rpminspect *ri, rpmfile_entry_t *file)
+{
     char *specfile = NULL;
     char *dot = NULL;
     char *desc = NULL;
@@ -79,6 +80,8 @@ static bool specname_driver(struct rpminspect *ri, rpmfile_entry_t *file) {
         params.header = NAME_SPECNAME;
         params.remedy = REMEDY_SPECNAME;
         params.file = file->localpath;
+        params.verb = VERB_FAILED;
+        params.noun = _("unexpected spec filename");
 
         if (ri->specmatch == MATCH_FULL) {
             desc = _("exactly match");
@@ -102,7 +105,8 @@ static bool specname_driver(struct rpminspect *ri, rpmfile_entry_t *file) {
 /*
  * Main driver for the 'specname' inspection.
  */
-bool inspect_specname(struct rpminspect *ri) {
+bool inspect_specname(struct rpminspect *ri)
+{
     struct result_params params;
 
     assert(ri != NULL);
@@ -111,6 +115,7 @@ bool inspect_specname(struct rpminspect *ri) {
     init_result_params(&params);
     params.waiverauth = NOT_WAIVABLE;
     params.header = NAME_SPECNAME;
+    params.verb = VERB_OK;
 
     if (specgood) {
         params.severity = RESULT_OK;

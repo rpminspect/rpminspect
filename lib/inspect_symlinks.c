@@ -55,7 +55,8 @@
  * @param file The file the function is asked to examine
  * @return True if the file passes, false otherwise
  */
-static bool symlinks_driver(struct rpminspect *ri, rpmfile_entry_t *file) {
+static bool symlinks_driver(struct rpminspect *ri, rpmfile_entry_t *file)
+{
     bool result = true;
     ssize_t len = 0;
     char localpath[PATH_MAX + 1];
@@ -98,7 +99,6 @@ static bool symlinks_driver(struct rpminspect *ri, rpmfile_entry_t *file) {
     init_result_params(&params);
     params.header = NAME_SYMLINKS;
     params.remedy = REMEDY_SYMLINKS;
-    params.verb = VERB_FAILED;
     params.arch = get_rpm_header_arch(file->rpm_header);
     params.file = file->localpath;
 
@@ -114,6 +114,8 @@ static bool symlinks_driver(struct rpminspect *ri, rpmfile_entry_t *file) {
 
         params.severity = RESULT_VERIFY;
         params.waiverauth = WAIVABLE_BY_ANYONE;
+        params.verb = VERB_CHANGED;
+        params.noun = _("${FILE} became a symlink on ${ARCH}");
         add_result(ri, &params);
         free(params.msg);
         result = false;
@@ -129,6 +131,8 @@ static bool symlinks_driver(struct rpminspect *ri, rpmfile_entry_t *file) {
         params.severity = RESULT_BAD;
         params.waiverauth = WAIVABLE_BY_ANYONE;
         params.details = strerror(errno);
+        params.verb = VERB_FAILED;
+        params.noun = _("unable to read symlink ${FILE} on ${ARCH}");
         xasprintf(&params.msg, _("An error occurred reading symbolic link %s in %s on %s."), file->localpath, name, arch);
         add_result(ri, &params);
         free(params.msg);
@@ -184,6 +188,8 @@ static bool symlinks_driver(struct rpminspect *ri, rpmfile_entry_t *file) {
                 xasprintf(&params.msg, _("%s %s has too many levels of redirects and cannot be resolved in %s on %s"), strtype(file->st.st_mode), file->localpath, name, arch);
                 xasprintf(&params.details, "%s -> %s", file->localpath, linktarget);
                 params.severity = RESULT_VERIFY;
+                params.verb = VERB_FAILED;
+                params.noun = _("too many redirects for ${FILE} on ${ARCH}");
                 add_result(ri, &params);
                 free(params.msg);
                 free(params.details);
@@ -285,12 +291,15 @@ static bool symlinks_driver(struct rpminspect *ri, rpmfile_entry_t *file) {
             params.severity = RESULT_BAD;
             params.waiverauth = WAIVABLE_BY_ANYONE;
             params.details = strerror(linkerr);
+            params.verb = VERB_FAILED;
+            params.noun = _("dangling symlink ${FILE} on ${ARCH}");
             result = false;
         } else {
             /* XXX - try to find a way to find link destinations in
                Require'd packages (#145); report as INFO for now */
             params.severity = RESULT_INFO;
             params.waiverauth = NOT_WAIVABLE;
+            params.verb = VERB_OK;
             result = true;
         }
 
@@ -300,7 +309,7 @@ static bool symlinks_driver(struct rpminspect *ri, rpmfile_entry_t *file) {
 
     /* return to D-station */
     if (chdir(cwd) == -1) {
-        warn("%s: chdir to %s", __func__, cwd);
+        warn("chdir");
     }
 
     return result;
@@ -315,7 +324,8 @@ static bool symlinks_driver(struct rpminspect *ri, rpmfile_entry_t *file) {
  * @param ri Pointer to the struct rpminspect for the program.
  * @return True if the inspection passed, false otherwise.
  */
-bool inspect_symlinks(struct rpminspect *ri) {
+bool inspect_symlinks(struct rpminspect *ri)
+{
     bool result = true;
     struct result_params params;
 
@@ -327,6 +337,7 @@ bool inspect_symlinks(struct rpminspect *ri) {
         params.waiverauth = NOT_WAIVABLE;
         params.header = NAME_SYMLINKS;
         params.severity = RESULT_OK;
+        params.verb = VERB_OK;
         add_result(ri, &params);
     }
 

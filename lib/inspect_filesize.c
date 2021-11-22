@@ -82,7 +82,7 @@ static bool filesize_driver(struct rpminspect *ri, rpmfile_entry_t *file)
         params.severity = RESULT_VERIFY;
         params.waiverauth = WAIVABLE_BY_ANYONE;
         params.verb = VERB_FAILED;
-        params.noun = _("non-empty ${FILE}");
+        params.noun = _("non-empty ${FILE} on ${ARCH}");
         result = false;
     } else if (file->st.st_size == 0 && file->peer_file->st.st_size > 0) {
         /* became empty */
@@ -90,7 +90,7 @@ static bool filesize_driver(struct rpminspect *ri, rpmfile_entry_t *file)
         params.severity = RESULT_VERIFY;
         params.waiverauth = WAIVABLE_BY_ANYONE;
         params.verb = VERB_FAILED;
-        params.noun = _("empty ${FILE}");
+        params.noun = _("empty ${FILE} on ${ARCH}");
         result = false;
     } else {
         change = ((file->st.st_size - file->peer_file->st.st_size) * 100 / file->peer_file->st.st_size);
@@ -108,17 +108,18 @@ static bool filesize_driver(struct rpminspect *ri, rpmfile_entry_t *file)
         if (change > 0) {
             /* file grew */
             xasprintf(&params.msg, _("%s grew by %lld%% on %s"), file->localpath, llabs(change), arch);
-            params.noun = _("${FILE} size grew");
+            params.noun = _("${FILE} size grew on ${ARCH}");
         } else if (change < 0) {
             /* file shrank */
             xasprintf(&params.msg, _("%s shrank by %lld%% on %s"), file->localpath, llabs(change), arch);
-            params.noun = _("${FILE} size shrank");
+            params.noun = _("${FILE} size shrank on ${ARCH}");
         }
     }
 
     /* info reporting if user configured that */
     if (ri->size_threshold == -1) {
         params.severity = RESULT_INFO;
+        params.verb = VERB_OK;
     }
 
     /* Reporting */
@@ -133,7 +134,8 @@ static bool filesize_driver(struct rpminspect *ri, rpmfile_entry_t *file)
 /*
  * Main driver for the 'filesize' inspection.
  */
-bool inspect_filesize(struct rpminspect *ri) {
+bool inspect_filesize(struct rpminspect *ri)
+{
     bool result;
     struct result_params params;
 
@@ -148,6 +150,7 @@ bool inspect_filesize(struct rpminspect *ri) {
         params.severity = RESULT_OK;
         params.waiverauth = NOT_WAIVABLE;
         params.header = NAME_FILESIZE;
+        params.verb = VERB_OK;
         add_result(ri, &params);
     }
 

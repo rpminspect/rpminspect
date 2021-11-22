@@ -117,7 +117,8 @@ static bool find_lto_symbols(Elf *elf, string_list_t **user_data)
  * @param file The file the function is asked to examine
  * @return True if the file passes, false otherwise
  */
-static bool lto_driver(struct rpminspect *ri, rpmfile_entry_t *file) {
+static bool lto_driver(struct rpminspect *ri, rpmfile_entry_t *file)
+{
     bool result = true;
     Elf *elf = NULL;
     int fd = -1;
@@ -150,6 +151,7 @@ static bool lto_driver(struct rpminspect *ri, rpmfile_entry_t *file) {
     params.verb = VERB_FAILED;
     params.arch = arch;
     params.file = file->localpath;
+    params.noun = _("${FILE} not portable on ${ARCH}");
 
     if ((elf = get_elf_archive(file->fullpath, &fd)) != NULL) {
         /* we found an ELF static library */
@@ -220,6 +222,7 @@ bool inspect_lto(struct rpminspect *ri) {
         params.waiverauth = NOT_WAIVABLE;
         params.header = NAME_LTO;
         params.severity = RESULT_OK;
+        params.verb = VERB_OK;
         add_result(ri, &params);
     }
 

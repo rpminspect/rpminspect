@@ -92,6 +92,7 @@ static bool removedfiles_driver(struct rpminspect *ri, rpmfile_entry_t *file)
     params.header = NAME_REMOVEDFILES;
     params.arch = arch;
     params.file = file->localpath;
+    params.noun = _("library ${FILE} removed on ${ARCH}");
 
     /* Set the waiver type if this is a file of security concern */
     if (ri->security_path_prefix) {
@@ -102,6 +103,7 @@ static bool removedfiles_driver(struct rpminspect *ri, rpmfile_entry_t *file)
 
             if (strprefix(entry->data, file->localpath)) {
                 params.waiverauth = WAIVABLE_BY_SECURITY;
+                params.verb = VERB_FAILED;
                 break;
             }
         }
@@ -114,10 +116,12 @@ static bool removedfiles_driver(struct rpminspect *ri, rpmfile_entry_t *file)
         if (rebase) {
             params.severity = RESULT_INFO;
             params.waiverauth = NOT_WAIVABLE;
+            params.verb = VERB_OK;
         } else {
             params.severity = get_secrule_result_severity(ri, file, SECRULE_SECURITYPATH);
             params.waiverauth = WAIVABLE_BY_ANYONE;
             params.remedy = REMEDY_REMOVEDFILES;
+            params.verb = VERB_FAILED;
         }
 
         if (is_elf(file->fullpath) && !strcmp(type, "application/x-pie-executable")) {
@@ -125,6 +129,7 @@ static bool removedfiles_driver(struct rpminspect *ri, rpmfile_entry_t *file)
 
             if (soname) {
                 xasprintf(&params.msg, _("ABI break: Library %s with SONAME '%s' removed from %s"), file->localpath, soname, arch);
+                params.noun = _("missing SONAME in ${FILE} on ${ARCH}");
                 free(soname);
             } else {
                 xasprintf(&params.msg, _("ABI break: Library %s removed from %s"), file->localpath, arch);
@@ -194,6 +199,7 @@ bool inspect_removedfiles(struct rpminspect *ri)
         params.severity = RESULT_OK;
         params.waiverauth = NOT_WAIVABLE;
         params.header = NAME_REMOVEDFILES;
+        params.verb = VERB_OK;
         add_result(ri, &params);
     }
 

@@ -93,6 +93,7 @@ static bool addedfiles_driver(struct rpminspect *ri, rpmfile_entry_t *file)
     params.header = NAME_ADDEDFILES;
     params.arch = arch;
     params.file = file->localpath;
+    params.verb = VERB_FAILED;
     xasprintf(&params.remedy, REMEDY_ADDEDFILES, ri->fileinfo_filename);
 
     /* Check for any forbidden path prefixes */
@@ -116,6 +117,7 @@ static bool addedfiles_driver(struct rpminspect *ri, rpmfile_entry_t *file)
 
             if (strprefix(localpath, subpath)) {
                 xasprintf(&params.msg, _("Packages should not contain not files or directories starting with `%s` on %s: %s"), entry->data, arch, file->localpath);
+                params.noun = _("invalid directory ${FILE} on ${ARCH}");
                 add_result(ri, &params);
                 result = !(params.severity >= RESULT_VERIFY);
                 goto done;
@@ -128,6 +130,7 @@ static bool addedfiles_driver(struct rpminspect *ri, rpmfile_entry_t *file)
         TAILQ_FOREACH(entry, ri->forbidden_path_suffixes, items) {
             if (strsuffix(file->localpath, entry->data)) {
                 xasprintf(&params.msg, _("Packages should not contain files or directories ending with `%s` on %s: %s"), entry->data, arch, file->localpath);
+                params.noun = _("invalid directory ${FILE} on ${ARCH}");
                 add_result(ri, &params);
                 result = !(params.severity >= RESULT_VERIFY);
                 goto done;
@@ -140,6 +143,7 @@ static bool addedfiles_driver(struct rpminspect *ri, rpmfile_entry_t *file)
         TAILQ_FOREACH(entry, ri->forbidden_directories, items) {
             if (!strcmp(file->localpath, entry->data)) {
                 xasprintf(&params.msg, _("Forbidden directory `%s` found on %s"), entry->data, arch);
+                params.noun = _("forbidden directory ${FILE} on ${ARCH}");
                 add_result(ri, &params);
                 result = !(params.severity >= RESULT_VERIFY);
                 goto done;
@@ -162,6 +166,8 @@ static bool addedfiles_driver(struct rpminspect *ri, rpmfile_entry_t *file)
                 if (params.severity != RESULT_NULL && params.severity != RESULT_SKIP) {
                     params.waiverauth = WAIVABLE_BY_SECURITY;
                     xasprintf(&params.msg, _("New security-related file `%s` added on %s requires inspection by the Security Team"), file->localpath, arch);
+                    params.verb = VERB_ADDED;
+                    params.noun = _("new security-related file ${FILE} on ${ARCH}");
                     add_result(ri, &params);
                     result = !(params.severity >= RESULT_VERIFY);
                 } else {
@@ -184,12 +190,15 @@ static bool addedfiles_driver(struct rpminspect *ri, rpmfile_entry_t *file)
         if (rebase) {
             params.severity = RESULT_INFO;
             params.waiverauth = NOT_WAIVABLE;
+            params.verb = VERB_OK;
         } else {
             params.severity = RESULT_VERIFY;
             params.waiverauth = WAIVABLE_BY_ANYONE;
+            params.verb = VERB_ADDED;
         }
 
         xasprintf(&params.msg, _("`%s` added on %s"), file->localpath, arch);
+        params.noun = _("new file ${FILE} on ${ARCH}");
         add_result(ri, &params);
         result = !(params.severity >= RESULT_VERIFY);
     }
@@ -213,6 +222,7 @@ bool inspect_addedfiles(struct rpminspect *ri)
         params.severity = RESULT_OK;
         params.waiverauth = NOT_WAIVABLE;
         params.header = NAME_ADDEDFILES;
+        params.verb = VERB_OK;
         add_result(ri, &params);
     }
 

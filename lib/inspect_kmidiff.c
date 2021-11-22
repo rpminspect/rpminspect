@@ -252,21 +252,22 @@ static bool kmidiff_driver(struct rpminspect *ri, rpmfile_entry_t *file)
     params.waiverauth = WAIVABLE_BY_ANYONE;
     params.remedy = REMEDY_KMIDIFF;
     params.arch = arch;
+    params.file = file->localpath;
 
     if ((exitcode & ABIDIFF_ERROR) || (exitcode & ABIDIFF_USAGE_ERROR)) {
         params.severity = RESULT_VERIFY;
         params.verb = VERB_FAILED;
-        params.noun = ri->commands.kmidiff;
+        params.noun = _("kmidiff usage error");
         report = true;
     } else if (!rebase && (exitcode & ABIDIFF_ABI_CHANGE)) {
         params.severity = RESULT_VERIFY;
         params.verb = VERB_CHANGED;
-        params.noun = _("KMI");
+        params.noun = _("KMI change in ${FILE} on ${ARCH}");
         report = true;
     } else if (!rebase && (exitcode & ABIDIFF_ABI_INCOMPATIBLE_CHANGE)) {
         params.severity = RESULT_BAD;
         params.verb = VERB_CHANGED;
-        params.noun = _("KMI");
+        params.noun = _("KMI incompatible change in ${FILE} on ${ARCH}");
         report = true;
     }
 
@@ -286,7 +287,7 @@ static bool kmidiff_driver(struct rpminspect *ri, rpmfile_entry_t *file)
         if (exitcode && output) {
             params.msg = strdup(_("KMI comparison ended unexpectedly."));
             params.verb = VERB_FAILED;
-            params.noun = ri->commands.abidiff;
+            params.noun = _("kmidiff unexpected exit");
         }
 
         params.file = file->localpath;
@@ -307,7 +308,8 @@ static bool kmidiff_driver(struct rpminspect *ri, rpmfile_entry_t *file)
 /*
  * Main driver for the 'kmidiff' inspection.
  */
-bool inspect_kmidiff(struct rpminspect *ri) {
+bool inspect_kmidiff(struct rpminspect *ri)
+{
     bool result = true;
     rpmpeer_entry_t *peer = NULL;
     rpmfile_entry_t *file = NULL;
@@ -377,6 +379,7 @@ bool inspect_kmidiff(struct rpminspect *ri) {
         params.waiverauth = NOT_WAIVABLE;
         params.header = NAME_KMIDIFF;
         params.severity = RESULT_OK;
+        params.verb = VERB_OK;
         add_result(ri, &params);
     }
 
