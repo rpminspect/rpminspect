@@ -95,7 +95,7 @@ static bool capabilities_driver(struct rpminspect *ri, rpmfile_entry_t *file)
                 xasprintf(&params.remedy, REMEDY_CAPABILITIES, ri->caps_filename);
                 params.waiverauth = WAIVABLE_BY_SECURITY;
                 params.verb = VERB_CHANGED;
-                params.noun = _("${FILE} capabilities");
+                params.noun = _("${FILE} capabilities on ${ARCH}");
                 add_result(ri, &params);
                 free(params.msg);
                 free(params.remedy);
@@ -105,6 +105,7 @@ static bool capabilities_driver(struct rpminspect *ri, rpmfile_entry_t *file)
             xasprintf(&params.msg, _("File capabilities found for %s: '%s' on %s\n"), file->localpath, after, arch);
             params.severity = RESULT_INFO;
             params.waiverauth = NOT_WAIVABLE;
+            params.verb = VERB_OK;
             add_result(ri, &params);
             free(params.msg);
         }
@@ -129,6 +130,7 @@ static bool capabilities_driver(struct rpminspect *ri, rpmfile_entry_t *file)
             xasprintf(&params.msg, _("File capabilities list entry found for %s: '%s' on %s, matches package\n"), file->localpath, flcaps->caps, arch);
             params.severity = RESULT_INFO;
             params.waiverauth = NOT_WAIVABLE;
+            params.verb = VERB_OK;
             add_result(ri, &params);
             free(params.msg);
         } else if (cap_compare(aftercap, expected) && (ri->tests & INSPECT_CAPABILITIES)) {
@@ -139,7 +141,7 @@ static bool capabilities_driver(struct rpminspect *ri, rpmfile_entry_t *file)
                 xasprintf(&params.remedy, REMEDY_CAPABILITIES, ri->caps_filename);
                 params.waiverauth = WAIVABLE_BY_SECURITY;
                 params.verb = VERB_FAILED;
-                params.noun = _("${FILE} capabilities list");
+                params.noun = _("${FILE} capabilities list on ${ARCH}");
                 add_result(ri, &params);
                 free(params.msg);
                 free(params.remedy);
@@ -154,7 +156,7 @@ static bool capabilities_driver(struct rpminspect *ri, rpmfile_entry_t *file)
             xasprintf(&params.remedy, REMEDY_CAPABILITIES, ri->caps_filename);
             params.waiverauth = WAIVABLE_BY_SECURITY;
             params.verb = VERB_REMOVED;
-            params.noun = _("${FILE} capabilities list");
+            params.noun = _("${FILE} capabilities list on ${ARCH}");
             add_result(ri, &params);
             free(params.msg);
             free(params.remedy);
@@ -168,7 +170,7 @@ static bool capabilities_driver(struct rpminspect *ri, rpmfile_entry_t *file)
             xasprintf(&params.remedy, REMEDY_CAPABILITIES, ri->caps_filename);
             params.waiverauth = WAIVABLE_BY_SECURITY;
             params.verb = VERB_FAILED;
-            params.noun = _("${FILE} capabilities list");
+            params.noun = _("${FILE} capabilities list on ${ARCH}");
             add_result(ri, &params);
             free(params.msg);
             free(params.remedy);
@@ -201,6 +203,7 @@ bool inspect_capabilities(struct rpminspect *ri)
         params.severity = RESULT_OK;
         params.waiverauth = NOT_WAIVABLE;
         params.header = NAME_CAPABILITIES;
+        params.verb = VERB_OK;
         add_result(ri, &params);
     }
 

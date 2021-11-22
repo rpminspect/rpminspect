@@ -71,11 +71,12 @@ static bool upstream_driver(struct rpminspect *ri, rpmfile_entry_t *file)
 
     /* Compare digests of source archive */
     params.file = file->localpath;
+    params.arch = NULL;
 
     if (file->peer_file == NULL) {
         xasprintf(&params.msg, _("New upstream source file `%s` appeared"), params.file)
         params.verb = VERB_ADDED;
-        params.noun = _("source file ${FILE}");
+        params.noun = _("new source file ${FILE}");
         add_result(ri, &params);
         result = !(params.severity >= RESULT_VERIFY);
         reported = true;
@@ -149,6 +150,7 @@ bool inspect_upstream(struct rpminspect *ri)
     if (!have_source) {
         params.severity = RESULT_INFO;
         params.waiverauth = NOT_WAIVABLE;
+        params.verb = VERB_OK;
         xasprintf(&params.msg, _("No source packages available, skipping inspection."));
         add_result(ri, &params);
         free(params.msg);
@@ -194,6 +196,8 @@ bool inspect_upstream(struct rpminspect *ri)
         if (removed != NULL && !TAILQ_EMPTY(removed)) {
             TAILQ_FOREACH(entry, removed, items) {
                 xasprintf(&params.msg, _("Source file `%s` removed"), entry->data);
+                params.verb = VERB_REMOVED;
+                params.noun = _("source file ${FILE} removed");
                 add_result(ri, &params);
                 free(params.msg);
                 result = !(params.severity >= RESULT_VERIFY);
@@ -211,6 +215,7 @@ bool inspect_upstream(struct rpminspect *ri)
         params.severity = RESULT_OK;
         params.waiverauth = NOT_WAIVABLE;
         params.msg = NULL;
+        params.verb = VERB_OK;
         free(params.remedy);
         params.remedy = NULL;
         add_result(ri, &params);

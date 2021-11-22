@@ -198,21 +198,22 @@ static bool abidiff_driver(struct rpminspect *ri, rpmfile_entry_t *file)
     params.waiverauth = WAIVABLE_BY_ANYONE;
     params.remedy = REMEDY_ABIDIFF;
     params.arch = arch;
+    params.file = file->localpath;
 
     if ((exitcode & ABIDIFF_ERROR) || (exitcode & ABIDIFF_USAGE_ERROR)) {
         params.severity = RESULT_VERIFY;
         params.verb = VERB_FAILED;
-        params.noun = ri->commands.abidiff;
+        params.noun = _("abidiff usage error");;
         report = true;
     } else if (!rebase && (exitcode & ABIDIFF_ABI_CHANGE)) {
         params.severity = RESULT_VERIFY;
         params.verb = VERB_CHANGED;
-        params.noun = _("ABI");
+        params.noun = _("ABI change in ${FILE} on ${ARCH}");
         report = true;
     } else if (!rebase && (exitcode & ABIDIFF_ABI_INCOMPATIBLE_CHANGE)) {
         params.severity = RESULT_BAD;
         params.verb = VERB_CHANGED;
-        params.noun = _("ABI");
+        params.noun = _("ABI incompatible change in ${FILE} on ${ARCH}");
         report = true;
     }
 
@@ -241,7 +242,7 @@ static bool abidiff_driver(struct rpminspect *ri, rpmfile_entry_t *file)
         if (exitcode && output) {
             params.msg = strdup(_("ABI comparison ended unexpectedly."));
             params.verb = VERB_FAILED;
-            params.noun = ri->commands.abidiff;
+            params.noun = _("abidff unexpected exit");
         }
 
         params.file = file->localpath;
@@ -262,7 +263,8 @@ static bool abidiff_driver(struct rpminspect *ri, rpmfile_entry_t *file)
 /*
  * Main driver for the 'abidiff' inspection.
  */
-bool inspect_abidiff(struct rpminspect *ri) {
+bool inspect_abidiff(struct rpminspect *ri)
+{
     bool result = false;
     size_t num_arches = 0;
     struct result_params params;
@@ -311,6 +313,7 @@ bool inspect_abidiff(struct rpminspect *ri) {
         params.waiverauth = NOT_WAIVABLE;
         params.header = NAME_ABIDIFF;
         params.severity = RESULT_OK;
+        params.verb = VERB_OK;
         add_result(ri, &params);
     }
 

@@ -33,6 +33,7 @@ static bool pathmigration_driver(struct rpminspect *ri, rpmfile_entry_t *file)
     string_entry_t *entry = NULL;
     char *old = NULL;
     const char *arch = NULL;
+    char *noun = NULL;
     struct result_params params;
 
     /* Ignore files in the SRPM */
@@ -74,6 +75,8 @@ static bool pathmigration_driver(struct rpminspect *ri, rpmfile_entry_t *file)
     params.waiverauth = WAIVABLE_BY_ANYONE;
     params.header = NAME_PATHMIGRATION;
     params.remedy = REMEDY_PATHMIGRATION;
+    params.verb = VERB_FAILED;
+    params.file = file->localpath;
     params.arch = arch;
 
     /* Check for each path migration, break early if we find a match */
@@ -91,10 +94,12 @@ static bool pathmigration_driver(struct rpminspect *ri, rpmfile_entry_t *file)
 
         /* Check to see if we found a path that should be migrated */
         if (strprefix(file->localpath, old)) {
-            xasprintf(&params.msg, "File %s found should be in %s on %s", file->localpath, hentry->value, arch);
-            params.file = file->localpath;
+            xasprintf(&params.msg, _("File %s found should be in %s on %s"), file->localpath, hentry->value, arch);
+            xasprintf(&noun, _("${FILE} should be in %s on ${ARCH}"), hentry->value);
+            params.noun = noun;
             add_result(ri, &params);
             free(params.msg);
+            free(noun);
             result = false;
         }
 
@@ -127,6 +132,7 @@ bool inspect_pathmigration(struct rpminspect *ri) {
         params.severity = RESULT_OK;
         params.waiverauth = NOT_WAIVABLE;
         params.header = NAME_PATHMIGRATION;
+        params.verb = VERB_OK;
         add_result(ri, &params);
     }
 

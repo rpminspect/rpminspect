@@ -46,8 +46,7 @@ static bool jar_result = true;
  * Returns major JVM version found if the file is a compiled Java
  * class file, or -1 if it's not a Java class file.
  */
-static short get_jvm_major(const char *filename, const char *localpath,
-                           const char *container)
+static short get_jvm_major(const char *filename, const char *localpath, const char *container)
 {
     int fd;
     short major;
@@ -98,9 +97,7 @@ static short get_jvm_major(const char *filename, const char *localpath,
 /*
  * Called for each file in the package payload or inside the .jar file.
  */
-static bool check_class_file(struct rpminspect *ri, const char *fullpath,
-                             const char *localpath, const char *peerfullpath,
-                             const char *peerlocalpath, const char *container)
+static bool check_class_file(struct rpminspect *ri, const char *fullpath, const char *localpath, const char *peerfullpath, const char *peerlocalpath, const char *container)
 {
     short major, majorpeer;
     struct result_params params;
@@ -112,6 +109,8 @@ static bool check_class_file(struct rpminspect *ri, const char *fullpath,
     params.severity = RESULT_BAD;
     params.waiverauth = WAIVABLE_BY_ANYONE;
     params.header = NAME_JAVABYTECODE;
+    params.verb = VERB_FAILED;
+    params.file = localpath;
 
     /* try to see if this is just a .class file */
     major = get_jvm_major(fullpath, localpath, container);
@@ -121,11 +120,13 @@ static bool check_class_file(struct rpminspect *ri, const char *fullpath,
         return true;
     } else if (major < 0) {
         xasprintf(&params.msg, _("File %s (%s), Java byte code version %d is incorrect (wrong endianness? corrupted file? space JDK?)"), localpath, container, major);
+        params.noun = _("incorrect Java byte code version in ${FILE}");
         add_result(ri, &params);
         free(params.msg);
         return false;
     } else if (major > supported_major) {
         xasprintf(&params.msg, _("File %s (%s), Java byte code version %d greater than supported major version %d for product release %s"), localpath, container, major, supported_major, ri->product_release);
+        params.noun = _("Java byte code version too new in ${FILE}");
         add_result(ri, &params);
         free(params.msg);
         return false;
@@ -141,6 +142,7 @@ static bool check_class_file(struct rpminspect *ri, const char *fullpath,
 
         if (major != majorpeer) {
             xasprintf(&params.msg, _("Java byte code version changed from %d to %d in %s from %s"), majorpeer, major, localpath, container);
+            params.noun = _("Java byte code version changed in ${FILE}");
             add_result(ri, &params);
             free(params.msg);
             return false;
@@ -153,13 +155,14 @@ static bool check_class_file(struct rpminspect *ri, const char *fullpath,
 /*
  * Helper used by nftw() in javabytecode_driver()
  */
-static int jar_walker(const char *fpath, __attribute__((unused)) const struct stat *sb, int tflag, __attribute__((unused)) struct FTW *ftwbuf) {
+static int jar_walker(const char *fpath, __attribute__((unused)) const struct stat *sb, int tflag, __attribute__((unused)) struct FTW *ftwbuf)
+{
     /* Only looking at regular files */
     if (tflag != FTW_F || !S_ISREG(sb->st_mode)) {
         return 0;
     }
 
-    if (!check_class_file(jar_ri, fpath, fpath+prefixlen, NULL, NULL, jarfile)) {
+    if (!check_class_file(jar_ri, fpath, fpath + prefixlen, NULL, NULL, jarfile)) {
         jar_result = false;
     }
 
@@ -260,7 +263,7 @@ bool inspect_javabytecode(struct rpminspect *ri)
     supported_major = strtol(hentry->value, NULL, 10);
 
     if (errno == ERANGE) {
-        warn(_("strtol"));
+        warn("strtol");
         return false;
     }
 
@@ -293,6 +296,7 @@ bool inspect_javabytecode(struct rpminspect *ri)
         params.severity = RESULT_OK;
         params.waiverauth = NOT_WAIVABLE;
         params.header = NAME_JAVABYTECODE;
+        params.verb = VERB_OK;
         add_result(ri, &params);
     }
 

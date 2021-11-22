@@ -69,8 +69,7 @@ static bool dsodeps_driver(struct rpminspect *ri, rpmfile_entry_t *file)
     }
 
     /* Skip files in the debug path and debug source path */
-    if (strprefix(file->localpath, DEBUG_PATH) ||
-        strprefix(file->localpath, DEBUG_SRC_PATH)) {
+    if (strprefix(file->localpath, DEBUG_PATH) || strprefix(file->localpath, DEBUG_SRC_PATH)) {
         return true;
     }
 
@@ -166,7 +165,7 @@ static bool dsodeps_driver(struct rpminspect *ri, rpmfile_entry_t *file)
     if (removed != NULL && !TAILQ_EMPTY(removed)) {
         xasprintf(&params.msg, _("DT_NEEDED symbol(s) removed from %s on %s"), file->localpath, arch);
         params.verb = VERB_REMOVED;
-        params.noun = _("DT_NEEDED symbol(s) in ${FILE}");
+        params.noun = _("DT_NEEDED symbol(s) in ${FILE} on ${ARCH}");
 
         TAILQ_FOREACH(entry, removed, items) {
             xasprintf(&tmp, "%s\n", entry->data);
@@ -183,7 +182,7 @@ static bool dsodeps_driver(struct rpminspect *ri, rpmfile_entry_t *file)
     if (added != NULL && !TAILQ_EMPTY(added)) {
         xasprintf(&params.msg, _("DT_NEEDED symbol(s) added to %s on %s"), file->localpath, arch);
         params.verb = VERB_ADDED;
-        params.noun = _("DT_NEEDED symbol(s) in ${FILE}");
+        params.noun = _("DT_NEEDED symbol(s) in ${FILE} on ${ARCH}");
 
         TAILQ_FOREACH(entry, added, items) {
             xasprintf(&tmp, "%s\n", entry->data);
@@ -219,7 +218,8 @@ done:
 /*
  * Main driver for the dsodeps inspection.
  */
-bool inspect_dsodeps(struct rpminspect *ri) {
+bool inspect_dsodeps(struct rpminspect *ri)
+{
     bool result;
     struct result_params params;
 
@@ -234,6 +234,7 @@ bool inspect_dsodeps(struct rpminspect *ri) {
         params.severity = RESULT_OK;
         params.waiverauth = NOT_WAIVABLE;
         params.header = NAME_DSODEPS;
+        params.verb = VERB_OK;
         add_result(ri, &params);
     }
 

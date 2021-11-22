@@ -47,7 +47,8 @@ static const char *files_macros[] = { "%artifact",
                                       "%verify",
                                       NULL };
 
-static bool files_driver(struct rpminspect *ri, rpmfile_entry_t *file) {
+static bool files_driver(struct rpminspect *ri, rpmfile_entry_t *file)
+{
     bool result = true;
     bool in_files = false;
     bool valid_macro = false;
@@ -59,6 +60,7 @@ static bool files_driver(struct rpminspect *ri, rpmfile_entry_t *file) {
     string_entry_t *path = NULL;
     string_list_map_t *mapentry = NULL;
     bool ignore = false;
+    char *noun = NULL;
 
     assert(ri != NULL);
     assert(file != NULL);
@@ -75,6 +77,8 @@ static bool files_driver(struct rpminspect *ri, rpmfile_entry_t *file) {
     params.header = NAME_FILES;
     params.remedy = REMEDY_FILES;
     params.file = file->localpath;
+    params.arch = get_rpm_header_arch(file->rpm_header);
+    params.verb = VERB_FAILED;
 
     /* read in the spec file */
     spec = read_file(file->fullpath);
@@ -122,8 +126,11 @@ static bool files_driver(struct rpminspect *ri, rpmfile_entry_t *file) {
                     if (strprefix(specline->data, path->data)) {
                         xasprintf(&params.msg, _("Forbidden path reference (%s) on line %ld of %s"), path->data, line, file->localpath);
                         params.details = specline->data;
+                        xasprintf(&noun, _("invalid spec line: %s"), specline->data);
+                        params.noun = noun;
                         add_result(ri, &params);
                         free(params.msg);
+                        free(noun);
                         result = false;
                     }
                 }
@@ -144,7 +151,8 @@ static bool files_driver(struct rpminspect *ri, rpmfile_entry_t *file) {
 /*
  * Main driver for the 'files' inspection.
  */
-bool inspect_files(struct rpminspect *ri) {
+bool inspect_files(struct rpminspect *ri)
+{
     bool result = false;
     bool src = false;
     struct result_params params;
@@ -170,6 +178,7 @@ bool inspect_files(struct rpminspect *ri) {
     init_result_params(&params);
     params.waiverauth = NOT_WAIVABLE;
     params.header = NAME_FILES;
+    params.verb = VERB_OK;
 
     if (result && src) {
         params.severity = RESULT_OK;

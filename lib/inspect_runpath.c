@@ -213,7 +213,7 @@ static bool check_runpath(struct rpminspect *ri, const rpmfile_entry_t *file, co
             if (!valid) {
                 xasprintf(&params.msg, _("%s has an invalid-looking %s on %s: %s"), file->localpath, symbol, arch, entry->data);
                 params.verb = VERB_FAILED;
-                params.noun = _("runtime search path in ${FILE}");
+                params.noun = _("runtime search path in ${FILE} on ${ARCH}");
                 add_result(ri, &params);
                 free(params.msg);
                 r = false;
@@ -288,8 +288,9 @@ static bool runpath_driver(struct rpminspect *ri, rpmfile_entry_t *file)
         params.waiverauth = NOT_WAIVABLE;
         params.remedy = REMEDY_RUNPATH_BOTH;
         params.file = file->localpath;
+        params.arch = arch;
         params.verb = VERB_FAILED;
-        params.noun = _("both DT_RPATH and DT_RUNPATH in ${FILE}");
+        params.noun = _("both DT_RPATH and DT_RUNPATH in ${FILE} on ${ARCH}");
 
         xasprintf(&params.msg, _("%s has both DT_RPATH and DT_RUNPATH on %s; this is not allowed"), file->localpath, arch);
         add_result(ri, &params);
@@ -323,7 +324,8 @@ cleanup:
 /*
  * Main driver for the runpath inspection.
  */
-bool inspect_runpath(struct rpminspect *ri) {
+bool inspect_runpath(struct rpminspect *ri)
+{
     bool result;
     struct result_params params;
 
@@ -338,6 +340,7 @@ bool inspect_runpath(struct rpminspect *ri) {
         params.severity = RESULT_OK;
         params.waiverauth = NOT_WAIVABLE;
         params.header = NAME_RUNPATH;
+        params.verb = VERB_OK;
         add_result(ri, &params);
     }
 

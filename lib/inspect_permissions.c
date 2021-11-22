@@ -35,6 +35,7 @@ static bool permissions_driver(struct rpminspect *ri, rpmfile_entry_t *file)
     mode_t after_mode;
     mode_t mode_diff;
     bool allowed = false;
+    char *noun = NULL;
     struct result_params params;
 
     assert(ri != NULL);
@@ -53,6 +54,7 @@ static bool permissions_driver(struct rpminspect *ri, rpmfile_entry_t *file)
     params.severity = RESULT_VERIFY;
     params.header = NAME_PERMISSIONS;
     params.arch = arch;
+    params.file = file->localpath;
 
     /* Local working copies for display */
     after_mode = file->st.st_mode & 0777;
@@ -81,9 +83,12 @@ static bool permissions_driver(struct rpminspect *ri, rpmfile_entry_t *file)
 
         xasprintf(&params.msg, _("%s %s permissions from %04o to %04o on %s"), file->localpath, what, before_mode, after_mode, arch);
         params.waiverauth = WAIVABLE_BY_ANYONE;
-        params.file = file->localpath;
+        params.verb = VERB_CHANGED;
+        xasprintf(&noun, _("${FILE} permissions from %04o to %04o on ${ARCH}"), before_mode, after_mode);
+        params.noun = noun;
         add_result(ri, &params);
         free(params.msg);
+        free(noun);
 
         result = false;
     }
@@ -95,6 +100,8 @@ static bool permissions_driver(struct rpminspect *ri, rpmfile_entry_t *file)
         if (params.severity != RESULT_NULL && params.severity != RESULT_SKIP) {
             xasprintf(&params.msg, _("%s (%s) is world-writable on %s"), file->localpath, get_mime_type(file), arch);
             params.waiverauth = WAIVABLE_BY_SECURITY;
+            params.verb = VERB_FAILED;
+            params.noun = _("${FILE} is world-writable on ${ARCH}");
             add_result(ri, &params);
             free(params.msg);
             result = false;
@@ -107,7 +114,8 @@ static bool permissions_driver(struct rpminspect *ri, rpmfile_entry_t *file)
 /*
  * Main driver for the 'permissions' inspection.
  */
-bool inspect_permissions(struct rpminspect *ri) {
+bool inspect_permissions(struct rpminspect *ri)
+{
     bool result = false;
     struct result_params params;
 
@@ -122,6 +130,7 @@ bool inspect_permissions(struct rpminspect *ri) {
         params.severity = RESULT_OK;
         params.waiverauth = NOT_WAIVABLE;
         params.header = NAME_PERMISSIONS;
+        params.verb = VERB_OK;
         add_result(ri, &params);
     }
 

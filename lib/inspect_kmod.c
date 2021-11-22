@@ -41,7 +41,7 @@ static void lost_alias(const char *alias, const string_list_t *before_modules, c
     assert(ri != NULL);
 
     params.remedy = REMEDY_KMOD_ALIAS;
-    params.noun = _("${FILE} kernel module alias");
+    params.noun = _("${FILE} kernel module alias on ${ARCH}");
 
     TAILQ_FOREACH(entry, before_modules, items) {
         xasprintf(&params.msg, _("Kernel module '%s' lost alias '%s'"), entry->data, alias);
@@ -206,8 +206,9 @@ static bool kmod_driver(struct rpminspect *ri, rpmfile_entry_t *file)
             xasprintf(&params.msg, _("Kernel module %s removes parameter '%s'"), file->localpath, entry->data);
             params.remedy = REMEDY_KMOD_PARM;
             params.verb = VERB_REMOVED;
-            params.noun = _("${FILE} kernel module parameter");
+            params.noun = _("${FILE} kernel module parameter on ${ARCH}");
             params.file = file->localpath;
+            params.arch = get_rpm_header_arch(file->rpm_header);
             add_result(ri, &params);
             free(params.msg);
             params.msg = NULL;
@@ -224,8 +225,9 @@ static bool kmod_driver(struct rpminspect *ri, rpmfile_entry_t *file)
             params.waiverauth = NOT_WAIVABLE;
             params.remedy = NULL;
             params.verb = VERB_ADDED;
-            params.noun = _("${FILE} kernel module parameter");
+            params.noun = _("${FILE} kernel module parameter on ${ARCH}");
             params.file = file->localpath;
+            params.arch = get_rpm_header_arch(file->rpm_header);
             add_result(ri, &params);
             free(params.msg);
             params.msg = NULL;
@@ -244,8 +246,9 @@ static bool kmod_driver(struct rpminspect *ri, rpmfile_entry_t *file)
             xasprintf(&params.msg, _("Kernel module %s removes dependency '%s'"), file->localpath, entry->data);
             params.remedy = REMEDY_KMOD_DEPS;
             params.verb = VERB_REMOVED;
-            params.noun = _("${FILE} kernel module dependency");
+            params.noun = _("${FILE} kernel module dependency on ${ARCH}");
             params.file = file->localpath;
+            params.arch = get_rpm_header_arch(file->rpm_header);
             add_result(ri, &params);
             free(params.msg);
             params.msg = NULL;
@@ -294,7 +297,8 @@ static bool kmod_driver(struct rpminspect *ri, rpmfile_entry_t *file)
 /*
  * Main driver for the 'kmod' inspection.
  */
-bool inspect_kmod(struct rpminspect *ri) {
+bool inspect_kmod(struct rpminspect *ri)
+{
     bool result;
 
     assert(ri != NULL);
@@ -304,12 +308,14 @@ bool inspect_kmod(struct rpminspect *ri) {
     params.severity = RESULT_INFO;
     params.waiverauth = NOT_WAIVABLE;
     params.header = NAME_KMOD;
+    params.verb = VERB_OK;
     result = foreach_peer_file(ri, NAME_KMOD, kmod_driver, true);
 
     /* if everything was fine, just say so */
     if (result) {
         params.severity = RESULT_OK;
         params.waiverauth = NOT_WAIVABLE;
+        params.verb = VERB_OK;
         add_result(ri, &params);
     }
 
