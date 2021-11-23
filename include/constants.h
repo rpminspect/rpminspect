@@ -479,4 +479,9 @@
  */
 #define RUNPATH_ORIGIN_STR "$ORIGIN"
 
+/*
+ * Filename prefix for shared libraries and library packages.
+ */
+#define SHARED_LIB_PREFIX "lib"
+
 #endif

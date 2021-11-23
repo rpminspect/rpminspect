@@ -138,6 +138,7 @@ void free_string_map(string_map_t *);
 void free_string_list_map(string_list_map_t *);
 void free_pair(pair_list_t *);
 void free_rpminspect(struct rpminspect *);
+void free_deprules(deprule_list_t *list);
 
 /* listfuncs.c */
 char *list_to_string(const string_list_t *, const char *);
@@ -422,5 +423,14 @@ string_list_t *gather_diags(struct rpminspect *ri, const char *progname, const c
 
 /* secrule.c */
 severity_t get_secrule_result_severity(struct rpminspect *ri, const rpmfile_entry_t *file, const int type);
+
+/* deprules.c */
+deprule_list_t *gather_deprules(Header hdr);
+void find_deprule_peers(deprule_list_t *before, deprule_list_t *after);
+const char *get_deprule_desc(const dep_type_t type);
+dep_op_t get_dep_operator(const rpmsenseFlags f);
+const char *get_deprule_operator_desc(const dep_op_t operator);
+bool deprules_match(const deprule_entry_t *a, const deprule_entry_t *b);
+char *strdeprule(const deprule_entry_t *deprule);
 
 #endif

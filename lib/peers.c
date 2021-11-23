@@ -51,20 +51,14 @@ void free_rpmpeer(rpmpeer_t *peers) {
     while (!TAILQ_EMPTY(peers)) {
         entry = TAILQ_FIRST(peers);
         TAILQ_REMOVE(peers, entry, items);
-        entry->before_hdr = NULL;
-        entry->after_hdr = NULL;
         free(entry->before_rpm);
-        entry->before_rpm = NULL;
         free(entry->after_rpm);
-        entry->after_rpm = NULL;
         free(entry->before_root);
-        entry->before_root = NULL;
         free(entry->after_root);
-        entry->after_root = NULL;
         free_files(entry->before_files);
-        entry->before_files = NULL;
         free_files(entry->after_files);
-        entry->after_files = NULL;
+        free_deprules(entry->before_deprules);
+        free_deprules(entry->after_deprules);
         free(entry);
     }
 
@@ -141,6 +135,7 @@ void add_peer(rpmpeer_t **peers, int whichbuild, bool fetch_only, const char *pk
             peer->after_root = NULL;
         } else {
             peer->before_files = extract_rpm(pkg, hdr, &peer->before_root);
+            peer->before_deprules = gather_deprules(hdr);
         }
     } else if (whichbuild == AFTER_BUILD) {
         peer->after_hdr = hdr;
@@ -151,6 +146,7 @@ void add_peer(rpmpeer_t **peers, int whichbuild, bool fetch_only, const char *pk
             peer->after_root = NULL;
         } else {
             peer->after_files = extract_rpm(pkg, hdr, &peer->after_root);
+            peer->after_deprules = gather_deprules(hdr);
         }
     }
 
@@ -160,6 +156,10 @@ void add_peer(rpmpeer_t **peers, int whichbuild, bool fetch_only, const char *pk
 
     if (peer->before_files && peer->after_files) {
         find_file_peers(peer->before_files, peer->after_files);
+    }
+
+    if (peer->before_deprules && peer->after_deprules) {
+        find_deprule_peers(peer->before_deprules, peer->after_deprules);
     }
 
     return;
