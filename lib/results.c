@@ -70,28 +70,20 @@ void free_results(results_t *results) {
         entry = TAILQ_FIRST(results);
         TAILQ_REMOVE(results, entry, items);
         free(entry->msg);
-        entry->msg = NULL;
         free(entry->details);
-        entry->details = NULL;
         free(entry->remedy);
-        entry->remedy = NULL;
         free(entry->noun);
-        entry->noun = NULL;
         free(entry->arch);
-        entry->arch = NULL;
         free(entry->file);
-        entry->file = NULL;
 
         /* these are all consts */
         entry->header = NULL;
         entry->remedy = NULL;
 
         free(entry);
-        entry = NULL;
     }
 
     free(results);
-    results = NULL;
 
     return;
 }

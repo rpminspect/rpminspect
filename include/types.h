@@ -131,19 +131,65 @@ typedef struct _rpmfile_entry_t {
 typedef TAILQ_HEAD(rpmfile_s, _rpmfile_entry_t) rpmfile_t;
 
 /*
+ * RPM dependency information
+ */
+
+/* Dependency types */
+typedef enum _dep_type_t {
+    TYPE_NULL = 0,
+    TYPE_REQUIRES = 1,
+    TYPE_PROVIDES = 2,
+    TYPE_CONFLICTS = 3,
+    TYPE_OBSOLETES = 4,
+    TYPE_ENHANCES = 5,
+    TYPE_RECOMMENDS = 6,
+    TYPE_SUGGESTS = 7,
+    TYPE_SUPPLEMENTS = 8
+} dep_type_t;
+
+#define FIRST_DEP_TYPE TYPE_REQUIRES
+#define LAST_DEP_TYPE TYPE_SUPPLEMENTS
+
+/* Possible dependency operators */
+typedef enum _dep_op_t {
+    OP_NULL = 0,
+    OP_EQUAL = 1,
+    OP_LESS = 2,
+    OP_GREATER = 3,
+    OP_LESSEQUAL = 4,
+    OP_GREATEREQUAL = 5
+} dep_op_t;
+
+/* Individual dependency entries and the list type */
+typedef struct _deprule_entry_t {
+    dep_type_t type;                       /* dependency type */
+    char *requirement;                     /* dependency requirement name (e.g., glibc or /bin/sh) */
+    dep_op_t operator;                     /* dependency operator (e.g., >, >=) */
+    char *version;                         /* dependency version */
+    bool need_explicit_deps;               /* true if a subpkg needs to explicit require an NVR */
+    string_list_t *providers;              /* for TYPE_REQUIRES, list of subpackages providing it */
+    struct _deprule_entry_t *peer_deprule; /* corresponding before/after deprule */
+    TAILQ_ENTRY(_deprule_entry_t) items;
+} deprule_entry_t;
+
+typedef TAILQ_HEAD(deprule_entry_s, _deprule_entry_t) deprule_list_t;
+
+/*
  * A peer is a mapping of a built RPM from the before and after builds.
  * We can expand this struct as necessary based on what tests need to
  * reference.
  */
 typedef struct _rpmpeer_entry_t {
-    Header before_hdr;        /* RPM header of the before package */
-    Header after_hdr;         /* RPM header of the after package */
-    char *before_rpm;         /* full path to the before RPM */
-    char *after_rpm;          /* full path to the after RPM */
-    char *before_root;        /* full path to the before RPM extracted root dir */
-    char *after_root;         /* full path to the after RPM extracted root dir */
-    rpmfile_t *before_files;  /* list of files in the payload of the before RPM */
-    rpmfile_t *after_files;   /* list of files in the payload of the after RPM */
+    Header before_hdr;                /* RPM header of the before package */
+    Header after_hdr;                 /* RPM header of the after package */
+    char *before_rpm;                 /* full path to the before RPM */
+    char *after_rpm;                  /* full path to the after RPM */
+    char *before_root;                /* full path to the before RPM extracted root dir */
+    char *after_root;                 /* full path to the after RPM extracted root dir */
+    rpmfile_t *before_files;          /* list of files in the payload of the before RPM */
+    rpmfile_t *after_files;           /* list of files in the payload of the after RPM */
+    deprule_list_t *before_deprules;  /* dependency rules for the before RPM */
+    deprule_list_t *after_deprules;   /* dependency rules for the after RPM */
     TAILQ_ENTRY(_rpmpeer_entry_t) items;
 } rpmpeer_entry_t;
 

@@ -524,6 +524,15 @@ bool inspect_runpath(struct rpminspect *ri);
  */
 bool inspect_unicode(struct rpminspect *ri);
 
+/**
+ * @brief Main driver for the 'rpmdeps' inspection.
+ *
+ *
+ * @param ri Pointer to the struct rpminspect for the program.
+ * @return True if the inspection passed, false otherwise.
+ */
+bool inspect_rpmdeps(struct rpminspect *ri);
+
 /** @} */
 
 /*
@@ -582,8 +591,10 @@ bool inspect_unicode(struct rpminspect *ri);
 #define INSPECT_BADFUNCS                    (((uint64_t) 1) << 41)
 #define INSPECT_RUNPATH                     (((uint64_t) 1) << 42)
 #define INSPECT_UNICODE                     (((uint64_t) 1) << 43)
+#define INSPECT_RPMDEPS                     (((uint64_t) 1) << 44)
 
 /* Inspection names */
+#define NAME_DIAGNOSTICS                    "diagnostics"
 #define NAME_LICENSE                        "license"
 #define NAME_EMPTYRPM                       "emptyrpm"
 #define NAME_METADATA                       "metadata"
@@ -631,9 +642,7 @@ bool inspect_unicode(struct rpminspect *ri);
 #define NAME_BADFUNCS                       "badfuncs"
 #define NAME_RUNPATH                        "runpath"
 #define NAME_UNICODE                        "unicode"
-
-/* not an actual inspection */
-#define NAME_DIAGNOSTICS                    "diagnostics"
+#define NAME_RPMDEPS                        "rpmdeps"
 
 /* Long descriptions for the inspections */
 #define DESC_LICENSE _("Verify the string specified in the License tag of the RPM metadata describes permissible software licenses as defined by the license database. Also checks to see if the License tag contains any unprofessional words as defined in the configuration file.")
@@ -725,5 +734,7 @@ bool inspect_unicode(struct rpminspect *ri);
 #define DESC_RUNPATH _("Check for forbidden paths in both the DT_RPATH and DT_RUNPATH settings in ELF shared objects.")
 
 #define DESC_UNICODE _("Scan extracted and patched source code files, scripts, and RPM spec files for any prohibited Unicode code points, as defined in the configuration file.  Any prohibited code points are reported as a possible security risk.")
+
+#define DESC_RPMDEPS _("Check for correct RPM dependency metadata.  Report incorrect or conflicting findings as well as expected changes when comparing a new build to an older build.  Changes are only reported when comparing builds, but this inspection will check for correct RPM dependency metadata when inspecting a single build and report findings.")
 
 #endif

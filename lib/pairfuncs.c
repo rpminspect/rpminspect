@@ -44,6 +44,5 @@ void free_pair(pair_list_t *list)
     }
 
     free(list);
-    list = NULL;
     return;
 }

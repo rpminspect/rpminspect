@@ -18,6 +18,7 @@ lib/bytes.c
 lib/checksums.c
 lib/copyfile.c
 lib/debug.c
+lib/deps.c
 lib/diags.c
 lib/filecmp.c
 lib/fileinfo.c
@@ -59,6 +60,7 @@ lib/inspect_pathmigration.c
 lib/inspect_permissions.c
 lib/inspect_politics.c
 lib/inspect_removedfiles.c
+lib/inspect_rpmdeps.c
 lib/inspect_runpath.c
 lib/inspect_shellsyntax.c
 lib/inspect_specname.c
