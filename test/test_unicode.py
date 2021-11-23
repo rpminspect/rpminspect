@@ -16,6 +16,7 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 #
 
+import codecs
 import os
 import rpmfluff
 
@@ -31,20 +32,30 @@ from baseclass import (
 )
 
 datadir = os.environ["RPMINSPECT_TEST_DATA_PATH"]
-good_c_src = open(os.path.join(datadir, "unicode", "good.c")).read()
-bad_c_src = open(os.path.join(datadir, "unicode", "bad.c")).read()
-bad_asm_src = open(os.path.join(datadir, "unicode", "bad.s")).read()
-status_src = open(os.path.join(datadir, "unicode", "status.sh")).read()
-makefile_src = open(os.path.join(datadir, "unicode", "Makefile")).read()
+good_c_src = codecs.open(
+    os.path.join(datadir, "unicode", "good.c"), encoding="utf-8"
+).read()
+bad_c_src = codecs.open(
+    os.path.join(datadir, "unicode", "bad.c"), encoding="utf-8"
+).read()
+bad_asm_src = codecs.open(
+    os.path.join(datadir, "unicode", "bad.s"), encoding="utf-8"
+).read()
+status_src = codecs.open(
+    os.path.join(datadir, "unicode", "status.sh"), encoding="utf-8"
+).read()
+makefile_src = codecs.open(
+    os.path.join(datadir, "unicode", "Makefile"), encoding="utf-8"
+).read()
 
-commenting_out_new_src = open(
-    os.path.join(datadir, "unicode", "commenting-out-new.c")
+commenting_out_new_src = codecs.open(
+    os.path.join(datadir, "unicode", "commenting-out-new.c"), encoding="utf-8"
 ).read()
-early_return_new_src = open(
-    os.path.join(datadir, "unicode", "early-return-new.c")
+early_return_new_src = codecs.open(
+    os.path.join(datadir, "unicode", "early-return-new.c"), encoding="utf-8"
 ).read()
-stretched_string_new_src = open(
-    os.path.join(datadir, "unicode", "stretched-string-new.c")
+stretched_string_new_src = codecs.open(
+    os.path.join(datadir, "unicode", "stretched-string-new.c"), encoding="utf-8"
 ).read()
 
 
