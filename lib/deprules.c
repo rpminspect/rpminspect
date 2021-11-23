@@ -364,27 +364,3 @@ bool deprules_match(const deprule_entry_t *a, const deprule_entry_t *b)
 
     return n_match && (a->operator == b->operator) && v_match;
 }
-
-/*
- * Free the memory associate with a deprule_list_t list.
- */
-void free_deprules(deprule_list_t *list)
-{
-    deprule_entry_t *entry = NULL;
-
-    if (list == NULL) {
-        return;
-    }
-
-    while (!TAILQ_EMPTY(list)) {
-        entry = TAILQ_FIRST(list);
-        TAILQ_REMOVE(list, entry, items);
-        free(entry->requirement);
-        free(entry->version);
-        list_free(entry->providers, free);
-        free(entry);
-    }
-
-    free(list);
-    return;
-}
