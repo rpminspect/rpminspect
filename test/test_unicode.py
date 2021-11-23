@@ -16,13 +16,13 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 #
 
-import codecs
 import os
 import rpmfluff
 
 from baseclass import BEFORE_NAME, BEFORE_VER, AFTER_NAME, AFTER_VER
 
 from baseclass import (
+    ProvidedSourceFile,
     TestSRPM,
     TestRPMs,
     TestKoji,
@@ -32,31 +32,6 @@ from baseclass import (
 )
 
 datadir = os.environ["RPMINSPECT_TEST_DATA_PATH"]
-good_c_src = codecs.open(
-    os.path.join(datadir, "unicode", "good.c"), encoding="utf-8"
-).read()
-bad_c_src = codecs.open(
-    os.path.join(datadir, "unicode", "bad.c"), encoding="utf-8"
-).read()
-bad_asm_src = codecs.open(
-    os.path.join(datadir, "unicode", "bad.s"), encoding="utf-8"
-).read()
-status_src = codecs.open(
-    os.path.join(datadir, "unicode", "status.sh"), encoding="utf-8"
-).read()
-makefile_src = codecs.open(
-    os.path.join(datadir, "unicode", "Makefile"), encoding="utf-8"
-).read()
-
-commenting_out_new_src = codecs.open(
-    os.path.join(datadir, "unicode", "commenting-out-new.c"), encoding="utf-8"
-).read()
-early_return_new_src = codecs.open(
-    os.path.join(datadir, "unicode", "early-return-new.c"), encoding="utf-8"
-).read()
-stretched_string_new_src = codecs.open(
-    os.path.join(datadir, "unicode", "stretched-string-new.c"), encoding="utf-8"
-).read()
 
 
 # The following tests run the unicode inspection with a known good source
@@ -67,11 +42,17 @@ class UnicodeGoodCSourceSRPM(TestSRPM):
 
         # this creates enough of a spec file to appease rpmbuild
         self.rpm.add_installed_file(
-            "/usr/bin/status", rpmfluff.SourceFile("status.sh", status_src), mode=755
+            "/usr/bin/status",
+            ProvidedSourceFile(
+                "status.sh", os.path.join(datadir, "unicode", "status.sh")
+            ),
+            mode=755,
         )
 
         # drop our known good source file directly in the SRPM
-        self.rpm.add_source(rpmfluff.SourceFile("good.c", good_c_src))
+        self.rpm.add_source(
+            ProvidedSourceFile("good.c", os.path.join(datadir, "unicode", "good.c"))
+        )
 
         self.inspection = "unicode"
         self.result = "OK"
@@ -83,11 +64,17 @@ class UnicodeGoodCSourceRPMs(TestRPMs):
 
         # this creates enough of a spec file to appease rpmbuild
         self.rpm.add_installed_file(
-            "/usr/bin/status", rpmfluff.SourceFile("status.sh", status_src), mode=755
+            "/usr/bin/status",
+            ProvidedSourceFile(
+                "status.sh", os.path.join(datadir, "unicode", "status.sh")
+            ),
+            mode=755,
         )
 
         # drop our known good source file directly in the SRPM
-        self.rpm.add_source(rpmfluff.SourceFile("good.c", good_c_src))
+        self.rpm.add_source(
+            ProvidedSourceFile("good.c", os.path.join(datadir, "unicode", "good.c"))
+        )
 
         self.inspection = "unicode"
         self.result = "OK"
@@ -99,11 +86,17 @@ class UnicodeGoodCSourceKoji(TestKoji):
 
         # this creates enough of a spec file to appease rpmbuild
         self.rpm.add_installed_file(
-            "/usr/bin/status", rpmfluff.SourceFile("status.sh", status_src), mode=755
+            "/usr/bin/status",
+            ProvidedSourceFile(
+                "status.sh", os.path.join(datadir, "unicode", "status.sh")
+            ),
+            mode=755,
         )
 
         # drop our known good source file directly in the SRPM
-        self.rpm.add_source(rpmfluff.SourceFile("good.c", good_c_src))
+        self.rpm.add_source(
+            ProvidedSourceFile("good.c", os.path.join(datadir, "unicode", "good.c"))
+        )
 
         self.inspection = "unicode"
         self.result = "OK"
@@ -115,15 +108,27 @@ class UnicodeGoodCSourceCompareSRPM(TestCompareSRPM):
 
         # this creates enough of a spec file to appease rpmbuild
         self.before_rpm.add_installed_file(
-            "/usr/bin/status", rpmfluff.SourceFile("status.sh", status_src), mode=755
+            "/usr/bin/status",
+            ProvidedSourceFile(
+                "status.sh", os.path.join(datadir, "unicode", "status.sh")
+            ),
+            mode=755,
         )
         self.after_rpm.add_installed_file(
-            "/usr/bin/status", rpmfluff.SourceFile("status.sh", status_src), mode=755
+            "/usr/bin/status",
+            ProvidedSourceFile(
+                "status.sh", os.path.join(datadir, "unicode", "status.sh")
+            ),
+            mode=755,
         )
 
         # drop our known good source file directly in the SRPM
-        self.before_rpm.add_source(rpmfluff.SourceFile("good.c", good_c_src))
-        self.after_rpm.add_source(rpmfluff.SourceFile("good.c", good_c_src))
+        self.before_rpm.add_source(
+            ProvidedSourceFile("good.c", os.path.join(datadir, "unicode", "good.c"))
+        )
+        self.after_rpm.add_source(
+            ProvidedSourceFile("good.c", os.path.join(datadir, "unicode", "good.c"))
+        )
 
         self.inspection = "unicode"
         self.result = "OK"
@@ -135,15 +140,27 @@ class UnicodeGoodCSourceCompareRPMs(TestCompareRPMs):
 
         # this creates enough of a spec file to appease rpmbuild
         self.before_rpm.add_installed_file(
-            "/usr/bin/status", rpmfluff.SourceFile("status.sh", status_src), mode=755
+            "/usr/bin/status",
+            ProvidedSourceFile(
+                "status.sh", os.path.join(datadir, "unicode", "status.sh")
+            ),
+            mode=755,
         )
         self.after_rpm.add_installed_file(
-            "/usr/bin/status", rpmfluff.SourceFile("status.sh", status_src), mode=755
+            "/usr/bin/status",
+            ProvidedSourceFile(
+                "status.sh", os.path.join(datadir, "unicode", "status.sh")
+            ),
+            mode=755,
         )
 
         # drop our known good source file directly in the SRPM
-        self.before_rpm.add_source(rpmfluff.SourceFile("good.c", good_c_src))
-        self.after_rpm.add_source(rpmfluff.SourceFile("good.c", good_c_src))
+        self.before_rpm.add_source(
+            ProvidedSourceFile("good.c", os.path.join(datadir, "unicode", "good.c"))
+        )
+        self.after_rpm.add_source(
+            ProvidedSourceFile("good.c", os.path.join(datadir, "unicode", "good.c"))
+        )
 
         self.inspection = "unicode"
         self.result = "OK"
@@ -155,15 +172,27 @@ class UnicodeGoodCSourceCompareKoji(TestCompareKoji):
 
         # this creates enough of a spec file to appease rpmbuild
         self.before_rpm.add_installed_file(
-            "/usr/bin/status", rpmfluff.SourceFile("status.sh", status_src), mode=755
+            "/usr/bin/status",
+            ProvidedSourceFile(
+                "status.sh", os.path.join(datadir, "unicode", "status.sh")
+            ),
+            mode=755,
         )
         self.after_rpm.add_installed_file(
-            "/usr/bin/status", rpmfluff.SourceFile("status.sh", status_src), mode=755
+            "/usr/bin/status",
+            ProvidedSourceFile(
+                "status.sh", os.path.join(datadir, "unicode", "status.sh")
+            ),
+            mode=755,
         )
 
         # drop our known good source file directly in the SRPM
-        self.before_rpm.add_source(rpmfluff.SourceFile("good.c", good_c_src))
-        self.after_rpm.add_source(rpmfluff.SourceFile("good.c", good_c_src))
+        self.before_rpm.add_source(
+            ProvidedSourceFile("good.c", os.path.join(datadir, "unicode", "good.c"))
+        )
+        self.after_rpm.add_source(
+            ProvidedSourceFile("good.c", os.path.join(datadir, "unicode", "good.c"))
+        )
 
         self.inspection = "unicode"
         self.result = "OK"
@@ -181,9 +210,15 @@ class UnicodeGoodCSourceArchiveSRPM(TestSRPM):
                 "%s-%s.tar.gz" % (AFTER_NAME, AFTER_VER),
                 "%s-%s" % (AFTER_NAME, AFTER_VER),
                 [
-                    rpmfluff.SourceFile("Makefile", makefile_src),
-                    rpmfluff.SourceFile("good.c", good_c_src),
-                    rpmfluff.SourceFile("status.sh", status_src),
+                    ProvidedSourceFile(
+                        "Makefile", os.path.join(datadir, "unicode", "Makefile")
+                    ),
+                    ProvidedSourceFile(
+                        "good.c", os.path.join(datadir, "unicode", "good.c")
+                    ),
+                    ProvidedSourceFile(
+                        "status.sh", os.path.join(datadir, "unicode", "status.sh")
+                    ),
                 ],
             )
         )
@@ -207,9 +242,15 @@ class UnicodeGoodCSourceArchiveRPMs(TestRPMs):
                 "%s-%s.tar.gz" % (AFTER_NAME, AFTER_VER),
                 "%s-%s" % (AFTER_NAME, AFTER_VER),
                 [
-                    rpmfluff.SourceFile("Makefile", makefile_src),
-                    rpmfluff.SourceFile("good.c", good_c_src),
-                    rpmfluff.SourceFile("status.sh", status_src),
+                    ProvidedSourceFile(
+                        "Makefile", os.path.join(datadir, "unicode", "Makefile")
+                    ),
+                    ProvidedSourceFile(
+                        "good.c", os.path.join(datadir, "unicode", "good.c")
+                    ),
+                    ProvidedSourceFile(
+                        "status.sh", os.path.join(datadir, "unicode", "status.sh")
+                    ),
                 ],
             )
         )
@@ -233,9 +274,15 @@ class UnicodeGoodCSourceArchiveKoji(TestKoji):
                 "%s-%s.tar.gz" % (AFTER_NAME, AFTER_VER),
                 "%s-%s" % (AFTER_NAME, AFTER_VER),
                 [
-                    rpmfluff.SourceFile("Makefile", makefile_src),
-                    rpmfluff.SourceFile("good.c", good_c_src),
-                    rpmfluff.SourceFile("status.sh", status_src),
+                    ProvidedSourceFile(
+                        "Makefile", os.path.join(datadir, "unicode", "Makefile")
+                    ),
+                    ProvidedSourceFile(
+                        "good.c", os.path.join(datadir, "unicode", "good.c")
+                    ),
+                    ProvidedSourceFile(
+                        "status.sh", os.path.join(datadir, "unicode", "status.sh")
+                    ),
                 ],
             )
         )
@@ -259,9 +306,15 @@ class UnicodeGoodCSourceArchiveCompareSRPM(TestCompareSRPM):
                 "%s-%s.tar.gz" % (BEFORE_NAME, BEFORE_VER),
                 "%s-%s" % (BEFORE_NAME, BEFORE_VER),
                 [
-                    rpmfluff.SourceFile("Makefile", makefile_src),
-                    rpmfluff.SourceFile("good.c", good_c_src),
-                    rpmfluff.SourceFile("status.sh", status_src),
+                    ProvidedSourceFile(
+                        "Makefile", os.path.join(datadir, "unicode", "Makefile")
+                    ),
+                    ProvidedSourceFile(
+                        "good.c", os.path.join(datadir, "unicode", "good.c")
+                    ),
+                    ProvidedSourceFile(
+                        "status.sh", os.path.join(datadir, "unicode", "status.sh")
+                    ),
                 ],
             )
         )
@@ -277,9 +330,15 @@ class UnicodeGoodCSourceArchiveCompareSRPM(TestCompareSRPM):
                 "%s-%s.tar.gz" % (AFTER_NAME, AFTER_VER),
                 "%s-%s" % (AFTER_NAME, AFTER_VER),
                 [
-                    rpmfluff.SourceFile("Makefile", makefile_src),
-                    rpmfluff.SourceFile("good.c", good_c_src),
-                    rpmfluff.SourceFile("status.sh", status_src),
+                    ProvidedSourceFile(
+                        "Makefile", os.path.join(datadir, "unicode", "Makefile")
+                    ),
+                    ProvidedSourceFile(
+                        "good.c", os.path.join(datadir, "unicode", "good.c")
+                    ),
+                    ProvidedSourceFile(
+                        "status.sh", os.path.join(datadir, "unicode", "status.sh")
+                    ),
                 ],
             )
         )
@@ -303,9 +362,15 @@ class UnicodeGoodCSourceArchiveCompareRPMs(TestCompareRPMs):
                 "%s-%s.tar.gz" % (BEFORE_NAME, BEFORE_VER),
                 "%s-%s" % (BEFORE_NAME, BEFORE_VER),
                 [
-                    rpmfluff.SourceFile("Makefile", makefile_src),
-                    rpmfluff.SourceFile("good.c", good_c_src),
-                    rpmfluff.SourceFile("status.sh", status_src),
+                    ProvidedSourceFile(
+                        "Makefile", os.path.join(datadir, "unicode", "Makefile")
+                    ),
+                    ProvidedSourceFile(
+                        "good.c", os.path.join(datadir, "unicode", "good.c")
+                    ),
+                    ProvidedSourceFile(
+                        "status.sh", os.path.join(datadir, "unicode", "status.sh")
+                    ),
                 ],
             )
         )
@@ -321,9 +386,15 @@ class UnicodeGoodCSourceArchiveCompareRPMs(TestCompareRPMs):
                 "%s-%s.tar.gz" % (AFTER_NAME, AFTER_VER),
                 "%s-%s" % (AFTER_NAME, AFTER_VER),
                 [
-                    rpmfluff.SourceFile("Makefile", makefile_src),
-                    rpmfluff.SourceFile("good.c", good_c_src),
-                    rpmfluff.SourceFile("status.sh", status_src),
+                    ProvidedSourceFile(
+                        "Makefile", os.path.join(datadir, "unicode", "Makefile")
+                    ),
+                    ProvidedSourceFile(
+                        "good.c", os.path.join(datadir, "unicode", "good.c")
+                    ),
+                    ProvidedSourceFile(
+                        "status.sh", os.path.join(datadir, "unicode", "status.sh")
+                    ),
                 ],
             )
         )
@@ -347,9 +418,15 @@ class UnicodeGoodCSourceArchiveCompareKoji(TestCompareKoji):
                 "%s-%s.tar.gz" % (BEFORE_NAME, BEFORE_VER),
                 "%s-%s" % (BEFORE_NAME, BEFORE_VER),
                 [
-                    rpmfluff.SourceFile("Makefile", makefile_src),
-                    rpmfluff.SourceFile("good.c", good_c_src),
-                    rpmfluff.SourceFile("status.sh", status_src),
+                    ProvidedSourceFile(
+                        "Makefile", os.path.join(datadir, "unicode", "Makefile")
+                    ),
+                    ProvidedSourceFile(
+                        "good.c", os.path.join(datadir, "unicode", "good.c")
+                    ),
+                    ProvidedSourceFile(
+                        "status.sh", os.path.join(datadir, "unicode", "status.sh")
+                    ),
                 ],
             )
         )
@@ -365,9 +442,15 @@ class UnicodeGoodCSourceArchiveCompareKoji(TestCompareKoji):
                 "%s-%s.tar.gz" % (AFTER_NAME, AFTER_VER),
                 "%s-%s" % (AFTER_NAME, AFTER_VER),
                 [
-                    rpmfluff.SourceFile("Makefile", makefile_src),
-                    rpmfluff.SourceFile("good.c", good_c_src),
-                    rpmfluff.SourceFile("status.sh", status_src),
+                    ProvidedSourceFile(
+                        "Makefile", os.path.join(datadir, "unicode", "Makefile")
+                    ),
+                    ProvidedSourceFile(
+                        "good.c", os.path.join(datadir, "unicode", "good.c")
+                    ),
+                    ProvidedSourceFile(
+                        "status.sh", os.path.join(datadir, "unicode", "status.sh")
+                    ),
                 ],
             )
         )
@@ -390,11 +473,17 @@ class UnicodeBadCSourceSRPM(TestSRPM):
 
         # this creates enough of a spec file to appease rpmbuild
         self.rpm.add_installed_file(
-            "/usr/bin/status", rpmfluff.SourceFile("status.sh", status_src), mode=755
+            "/usr/bin/status",
+            ProvidedSourceFile(
+                "status.sh", os.path.join(datadir, "unicode", "status.sh")
+            ),
+            mode=755,
         )
 
         # drop our known bad source files directly in the SRPM
-        self.rpm.add_source(rpmfluff.SourceFile("bad.c", bad_c_src))
+        self.rpm.add_source(
+            ProvidedSourceFile("bad.c", os.path.join(datadir, "unicode", "bad.c"))
+        )
 
         self.inspection = "unicode"
         self.waiver_auth = "Security"
@@ -407,11 +496,17 @@ class UnicodeBadCSourceRPMs(TestRPMs):
 
         # this creates enough of a spec file to appease rpmbuild
         self.rpm.add_installed_file(
-            "/usr/bin/status", rpmfluff.SourceFile("status.sh", status_src), mode=755
+            "/usr/bin/status",
+            ProvidedSourceFile(
+                "status.sh", os.path.join(datadir, "unicode", "status.sh")
+            ),
+            mode=755,
         )
 
         # drop our known bad source files directly in the SRPM
-        self.rpm.add_source(rpmfluff.SourceFile("bad.c", bad_c_src))
+        self.rpm.add_source(
+            ProvidedSourceFile("bad.c", os.path.join(datadir, "unicode", "bad.c"))
+        )
 
         self.inspection = "unicode"
 
@@ -426,11 +521,17 @@ class UnicodeBadCSourceKoji(TestKoji):
 
         # this creates enough of a spec file to appease rpmbuild
         self.rpm.add_installed_file(
-            "/usr/bin/status", rpmfluff.SourceFile("status.sh", status_src), mode=755
+            "/usr/bin/status",
+            ProvidedSourceFile(
+                "status.sh", os.path.join(datadir, "unicode", "status.sh")
+            ),
+            mode=755,
         )
 
         # drop our known bad source files directly in the SRPM
-        self.rpm.add_source(rpmfluff.SourceFile("bad.c", bad_c_src))
+        self.rpm.add_source(
+            ProvidedSourceFile("bad.c", os.path.join(datadir, "unicode", "bad.c"))
+        )
 
         self.inspection = "unicode"
         self.waiver_auth = "Security"
@@ -443,15 +544,27 @@ class UnicodeBadCSourceCompareSRPM(TestCompareSRPM):
 
         # this creates enough of a spec file to appease rpmbuild
         self.before_rpm.add_installed_file(
-            "/usr/bin/status", rpmfluff.SourceFile("status.sh", status_src), mode=755
+            "/usr/bin/status",
+            ProvidedSourceFile(
+                "status.sh", os.path.join(datadir, "unicode", "status.sh")
+            ),
+            mode=755,
         )
         self.after_rpm.add_installed_file(
-            "/usr/bin/status", rpmfluff.SourceFile("status.sh", status_src), mode=755
+            "/usr/bin/status",
+            ProvidedSourceFile(
+                "status.sh", os.path.join(datadir, "unicode", "status.sh")
+            ),
+            mode=755,
         )
 
         # drop our known bad source files directly in the SRPM
-        self.before_rpm.add_source(rpmfluff.SourceFile("bad.c", bad_c_src))
-        self.after_rpm.add_source(rpmfluff.SourceFile("bad.c", bad_c_src))
+        self.before_rpm.add_source(
+            ProvidedSourceFile("bad.c", os.path.join(datadir, "unicode", "bad.c"))
+        )
+        self.after_rpm.add_source(
+            ProvidedSourceFile("bad.c", os.path.join(datadir, "unicode", "bad.c"))
+        )
 
         self.inspection = "unicode"
         self.waiver_auth = "Security"
@@ -464,15 +577,27 @@ class UnicodeBadCSourceCompareRPMs(TestCompareRPMs):
 
         # this creates enough of a spec file to appease rpmbuild
         self.before_rpm.add_installed_file(
-            "/usr/bin/status", rpmfluff.SourceFile("status.sh", status_src), mode=755
+            "/usr/bin/status",
+            ProvidedSourceFile(
+                "status.sh", os.path.join(datadir, "unicode", "status.sh")
+            ),
+            mode=755,
         )
         self.after_rpm.add_installed_file(
-            "/usr/bin/status", rpmfluff.SourceFile("status.sh", status_src), mode=755
+            "/usr/bin/status",
+            ProvidedSourceFile(
+                "status.sh", os.path.join(datadir, "unicode", "status.sh")
+            ),
+            mode=755,
         )
 
         # drop our known bad source files directly in the SRPM
-        self.before_rpm.add_source(rpmfluff.SourceFile("bad.c", bad_c_src))
-        self.after_rpm.add_source(rpmfluff.SourceFile("bad.c", bad_c_src))
+        self.before_rpm.add_source(
+            ProvidedSourceFile("bad.c", os.path.join(datadir, "unicode", "bad.c"))
+        )
+        self.after_rpm.add_source(
+            ProvidedSourceFile("bad.c", os.path.join(datadir, "unicode", "bad.c"))
+        )
 
         self.inspection = "unicode"
 
@@ -487,15 +612,27 @@ class UnicodeBadCSourceCompareKoji(TestCompareKoji):
 
         # this creates enough of a spec file to appease rpmbuild
         self.before_rpm.add_installed_file(
-            "/usr/bin/status", rpmfluff.SourceFile("status.sh", status_src), mode=755
+            "/usr/bin/status",
+            ProvidedSourceFile(
+                "status.sh", os.path.join(datadir, "unicode", "status.sh")
+            ),
+            mode=755,
         )
         self.after_rpm.add_installed_file(
-            "/usr/bin/status", rpmfluff.SourceFile("status.sh", status_src), mode=755
+            "/usr/bin/status",
+            ProvidedSourceFile(
+                "status.sh", os.path.join(datadir, "unicode", "status.sh")
+            ),
+            mode=755,
         )
 
         # drop our known bad source files directly in the SRPM
-        self.before_rpm.add_source(rpmfluff.SourceFile("bad.c", bad_c_src))
-        self.after_rpm.add_source(rpmfluff.SourceFile("bad.c", bad_c_src))
+        self.before_rpm.add_source(
+            ProvidedSourceFile("bad.c", os.path.join(datadir, "unicode", "bad.c"))
+        )
+        self.after_rpm.add_source(
+            ProvidedSourceFile("bad.c", os.path.join(datadir, "unicode", "bad.c"))
+        )
 
         self.inspection = "unicode"
         self.waiver_auth = "Security"
@@ -515,9 +652,15 @@ class UnicodeBadCSourceArchiveSRPM(TestSRPM):
                 "%s-%s.tar.gz" % (AFTER_NAME, AFTER_VER),
                 "%s-%s" % (AFTER_NAME, AFTER_VER),
                 [
-                    rpmfluff.SourceFile("Makefile", makefile_src),
-                    rpmfluff.SourceFile("bad.c", bad_c_src),
-                    rpmfluff.SourceFile("status.sh", status_src),
+                    ProvidedSourceFile(
+                        "Makefile", os.path.join(datadir, "unicode", "Makefile")
+                    ),
+                    ProvidedSourceFile(
+                        "bad.c", os.path.join(datadir, "unicode", "bad.c")
+                    ),
+                    ProvidedSourceFile(
+                        "status.sh", os.path.join(datadir, "unicode", "status.sh")
+                    ),
                 ],
             )
         )
@@ -542,9 +685,15 @@ class UnicodeBadCSourceArchiveRPMs(TestRPMs):
                 "%s-%s.tar.gz" % (AFTER_NAME, AFTER_VER),
                 "%s-%s" % (AFTER_NAME, AFTER_VER),
                 [
-                    rpmfluff.SourceFile("Makefile", makefile_src),
-                    rpmfluff.SourceFile("bad.c", bad_c_src),
-                    rpmfluff.SourceFile("status.sh", status_src),
+                    ProvidedSourceFile(
+                        "Makefile", os.path.join(datadir, "unicode", "Makefile")
+                    ),
+                    ProvidedSourceFile(
+                        "bad.c", os.path.join(datadir, "unicode", "bad.c")
+                    ),
+                    ProvidedSourceFile(
+                        "status.sh", os.path.join(datadir, "unicode", "status.sh")
+                    ),
                 ],
             )
         )
@@ -571,9 +720,15 @@ class UnicodeBadCSourceArchiveKoji(TestKoji):
                 "%s-%s.tar.gz" % (AFTER_NAME, AFTER_VER),
                 "%s-%s" % (AFTER_NAME, AFTER_VER),
                 [
-                    rpmfluff.SourceFile("Makefile", makefile_src),
-                    rpmfluff.SourceFile("bad.c", bad_c_src),
-                    rpmfluff.SourceFile("status.sh", status_src),
+                    ProvidedSourceFile(
+                        "Makefile", os.path.join(datadir, "unicode", "Makefile")
+                    ),
+                    ProvidedSourceFile(
+                        "bad.c", os.path.join(datadir, "unicode", "bad.c")
+                    ),
+                    ProvidedSourceFile(
+                        "status.sh", os.path.join(datadir, "unicode", "status.sh")
+                    ),
                 ],
             )
         )
@@ -598,9 +753,15 @@ class UnicodeBadCSourceArchiveCompareSRPM(TestCompareSRPM):
                 "%s-%s.tar.gz" % (BEFORE_NAME, BEFORE_VER),
                 "%s-%s" % (BEFORE_NAME, BEFORE_VER),
                 [
-                    rpmfluff.SourceFile("Makefile", makefile_src),
-                    rpmfluff.SourceFile("bad.c", bad_c_src),
-                    rpmfluff.SourceFile("status.sh", status_src),
+                    ProvidedSourceFile(
+                        "Makefile", os.path.join(datadir, "unicode", "Makefile")
+                    ),
+                    ProvidedSourceFile(
+                        "bad.c", os.path.join(datadir, "unicode", "bad.c")
+                    ),
+                    ProvidedSourceFile(
+                        "status.sh", os.path.join(datadir, "unicode", "status.sh")
+                    ),
                 ],
             )
         )
@@ -616,9 +777,15 @@ class UnicodeBadCSourceArchiveCompareSRPM(TestCompareSRPM):
                 "%s-%s.tar.gz" % (AFTER_NAME, AFTER_VER),
                 "%s-%s" % (AFTER_NAME, AFTER_VER),
                 [
-                    rpmfluff.SourceFile("Makefile", makefile_src),
-                    rpmfluff.SourceFile("bad.c", bad_c_src),
-                    rpmfluff.SourceFile("status.sh", status_src),
+                    ProvidedSourceFile(
+                        "Makefile", os.path.join(datadir, "unicode", "Makefile")
+                    ),
+                    ProvidedSourceFile(
+                        "bad.c", os.path.join(datadir, "unicode", "bad.c")
+                    ),
+                    ProvidedSourceFile(
+                        "status.sh", os.path.join(datadir, "unicode", "status.sh")
+                    ),
                 ],
             )
         )
@@ -643,9 +810,15 @@ class UnicodeBadCSourceArchiveCompareRPMs(TestCompareRPMs):
                 "%s-%s.tar.gz" % (BEFORE_NAME, BEFORE_VER),
                 "%s-%s" % (BEFORE_NAME, BEFORE_VER),
                 [
-                    rpmfluff.SourceFile("Makefile", makefile_src),
-                    rpmfluff.SourceFile("bad.c", bad_c_src),
-                    rpmfluff.SourceFile("status.sh", status_src),
+                    ProvidedSourceFile(
+                        "Makefile", os.path.join(datadir, "unicode", "Makefile")
+                    ),
+                    ProvidedSourceFile(
+                        "bad.c", os.path.join(datadir, "unicode", "bad.c")
+                    ),
+                    ProvidedSourceFile(
+                        "status.sh", os.path.join(datadir, "unicode", "status.sh")
+                    ),
                 ],
             )
         )
@@ -661,9 +834,15 @@ class UnicodeBadCSourceArchiveCompareRPMs(TestCompareRPMs):
                 "%s-%s.tar.gz" % (AFTER_NAME, AFTER_VER),
                 "%s-%s" % (AFTER_NAME, AFTER_VER),
                 [
-                    rpmfluff.SourceFile("Makefile", makefile_src),
-                    rpmfluff.SourceFile("bad.c", bad_c_src),
-                    rpmfluff.SourceFile("status.sh", status_src),
+                    ProvidedSourceFile(
+                        "Makefile", os.path.join(datadir, "unicode", "Makefile")
+                    ),
+                    ProvidedSourceFile(
+                        "bad.c", os.path.join(datadir, "unicode", "bad.c")
+                    ),
+                    ProvidedSourceFile(
+                        "status.sh", os.path.join(datadir, "unicode", "status.sh")
+                    ),
                 ],
             )
         )
@@ -690,9 +869,15 @@ class UnicodeBadCSourceArchiveCompareKoji(TestCompareKoji):
                 "%s-%s.tar.gz" % (BEFORE_NAME, BEFORE_VER),
                 "%s-%s" % (BEFORE_NAME, BEFORE_VER),
                 [
-                    rpmfluff.SourceFile("Makefile", makefile_src),
-                    rpmfluff.SourceFile("bad.c", bad_c_src),
-                    rpmfluff.SourceFile("status.sh", status_src),
+                    ProvidedSourceFile(
+                        "Makefile", os.path.join(datadir, "unicode", "Makefile")
+                    ),
+                    ProvidedSourceFile(
+                        "bad.c", os.path.join(datadir, "unicode", "bad.c")
+                    ),
+                    ProvidedSourceFile(
+                        "status.sh", os.path.join(datadir, "unicode", "status.sh")
+                    ),
                 ],
             )
         )
@@ -708,9 +893,15 @@ class UnicodeBadCSourceArchiveCompareKoji(TestCompareKoji):
                 "%s-%s.tar.gz" % (AFTER_NAME, AFTER_VER),
                 "%s-%s" % (AFTER_NAME, AFTER_VER),
                 [
-                    rpmfluff.SourceFile("Makefile", makefile_src),
-                    rpmfluff.SourceFile("bad.c", bad_c_src),
-                    rpmfluff.SourceFile("status.sh", status_src),
+                    ProvidedSourceFile(
+                        "Makefile", os.path.join(datadir, "unicode", "Makefile")
+                    ),
+                    ProvidedSourceFile(
+                        "bad.c", os.path.join(datadir, "unicode", "bad.c")
+                    ),
+                    ProvidedSourceFile(
+                        "status.sh", os.path.join(datadir, "unicode", "status.sh")
+                    ),
                 ],
             )
         )
@@ -734,11 +925,17 @@ class UnicodeBadAsmSourceSRPM(TestSRPM):
 
         # this creates enough of a spec file to appease rpmbuild
         self.rpm.add_installed_file(
-            "/usr/bin/status", rpmfluff.SourceFile("status.sh", status_src), mode=755
+            "/usr/bin/status",
+            ProvidedSourceFile(
+                "status.sh", os.path.join(datadir, "unicode", "status.sh")
+            ),
+            mode=755,
         )
 
         # drop our known bad source files directly in the SRPM
-        self.rpm.add_source(rpmfluff.SourceFile("bad.c", bad_c_src))
+        self.rpm.add_source(
+            ProvidedSourceFile("bad.c", os.path.join(datadir, "unicode", "bad.c"))
+        )
 
         self.inspection = "unicode"
         self.waiver_auth = "Security"
@@ -751,11 +948,17 @@ class UnicodeBadAsmSourceRPMs(TestRPMs):
 
         # this creates enough of a spec file to appease rpmbuild
         self.rpm.add_installed_file(
-            "/usr/bin/status", rpmfluff.SourceFile("status.sh", status_src), mode=755
+            "/usr/bin/status",
+            ProvidedSourceFile(
+                "status.sh", os.path.join(datadir, "unicode", "status.sh")
+            ),
+            mode=755,
         )
 
         # drop our known bad source files directly in the SRPM
-        self.rpm.add_source(rpmfluff.SourceFile("bad.c", bad_c_src))
+        self.rpm.add_source(
+            ProvidedSourceFile("bad.c", os.path.join(datadir, "unicode", "bad.c"))
+        )
 
         self.inspection = "unicode"
 
@@ -770,11 +973,17 @@ class UnicodeBadAsmSourceKoji(TestKoji):
 
         # this creates enough of a spec file to appease rpmbuild
         self.rpm.add_installed_file(
-            "/usr/bin/status", rpmfluff.SourceFile("status.sh", status_src), mode=755
+            "/usr/bin/status",
+            ProvidedSourceFile(
+                "status.sh", os.path.join(datadir, "unicode", "status.sh")
+            ),
+            mode=755,
         )
 
         # drop our known bad source files directly in the SRPM
-        self.rpm.add_source(rpmfluff.SourceFile("bad.s", bad_asm_src))
+        self.rpm.add_source(
+            ProvidedSourceFile("bad.s", os.path.join(datadir, "unicode", "bad.s"))
+        )
 
         self.inspection = "unicode"
         self.waiver_auth = "Security"
@@ -787,15 +996,27 @@ class UnicodeBadAsmSourceCompareSRPM(TestCompareSRPM):
 
         # this creates enough of a spec file to appease rpmbuild
         self.before_rpm.add_installed_file(
-            "/usr/bin/status", rpmfluff.SourceFile("status.sh", status_src), mode=755
+            "/usr/bin/status",
+            ProvidedSourceFile(
+                "status.sh", os.path.join(datadir, "unicode", "status.sh")
+            ),
+            mode=755,
         )
         self.after_rpm.add_installed_file(
-            "/usr/bin/status", rpmfluff.SourceFile("status.sh", status_src), mode=755
+            "/usr/bin/status",
+            ProvidedSourceFile(
+                "status.sh", os.path.join(datadir, "unicode", "status.sh")
+            ),
+            mode=755,
         )
 
         # drop our known bad source files directly in the SRPM
-        self.before_rpm.add_source(rpmfluff.SourceFile("bad.s", bad_asm_src))
-        self.after_rpm.add_source(rpmfluff.SourceFile("bad.s", bad_asm_src))
+        self.before_rpm.add_source(
+            ProvidedSourceFile("bad.s", os.path.join(datadir, "unicode", "bad.s"))
+        )
+        self.after_rpm.add_source(
+            ProvidedSourceFile("bad.s", os.path.join(datadir, "unicode", "bad.s"))
+        )
 
         self.inspection = "unicode"
         self.waiver_auth = "Security"
@@ -808,15 +1029,27 @@ class UnicodeBadAsmSourceCompareRPMs(TestCompareRPMs):
 
         # this creates enough of a spec file to appease rpmbuild
         self.before_rpm.add_installed_file(
-            "/usr/bin/status", rpmfluff.SourceFile("status.sh", status_src), mode=755
+            "/usr/bin/status",
+            ProvidedSourceFile(
+                "status.sh", os.path.join(datadir, "unicode", "status.sh")
+            ),
+            mode=755,
         )
         self.after_rpm.add_installed_file(
-            "/usr/bin/status", rpmfluff.SourceFile("status.sh", status_src), mode=755
+            "/usr/bin/status",
+            ProvidedSourceFile(
+                "status.sh", os.path.join(datadir, "unicode", "status.sh")
+            ),
+            mode=755,
         )
 
         # drop our known bad source files directly in the SRPM
-        self.before_rpm.add_source(rpmfluff.SourceFile("bad.s", bad_asm_src))
-        self.after_rpm.add_source(rpmfluff.SourceFile("bad.s", bad_asm_src))
+        self.before_rpm.add_source(
+            ProvidedSourceFile("bad.s", os.path.join(datadir, "unicode", "bad.s"))
+        )
+        self.after_rpm.add_source(
+            ProvidedSourceFile("bad.s", os.path.join(datadir, "unicode", "bad.s"))
+        )
 
         self.inspection = "unicode"
 
@@ -831,15 +1064,27 @@ class UnicodeBadAsmSourceCompareKoji(TestCompareKoji):
 
         # this creates enough of a spec file to appease rpmbuild
         self.before_rpm.add_installed_file(
-            "/usr/bin/status", rpmfluff.SourceFile("status.sh", status_src), mode=755
+            "/usr/bin/status",
+            ProvidedSourceFile(
+                "status.sh", os.path.join(datadir, "unicode", "status.sh")
+            ),
+            mode=755,
         )
         self.after_rpm.add_installed_file(
-            "/usr/bin/status", rpmfluff.SourceFile("status.sh", status_src), mode=755
+            "/usr/bin/status",
+            ProvidedSourceFile(
+                "status.sh", os.path.join(datadir, "unicode", "status.sh")
+            ),
+            mode=755,
         )
 
         # drop our known bad source files directly in the SRPM
-        self.before_rpm.add_source(rpmfluff.SourceFile("bad.s", bad_asm_src))
-        self.after_rpm.add_source(rpmfluff.SourceFile("bad.s", bad_asm_src))
+        self.before_rpm.add_source(
+            ProvidedSourceFile("bad.s", os.path.join(datadir, "unicode", "bad.s"))
+        )
+        self.after_rpm.add_source(
+            ProvidedSourceFile("bad.s", os.path.join(datadir, "unicode", "bad.s"))
+        )
 
         self.inspection = "unicode"
         self.waiver_auth = "Security"
@@ -859,9 +1104,15 @@ class UnicodeBadAsmSourceArchiveSRPM(TestSRPM):
                 "%s-%s.tar.gz" % (AFTER_NAME, AFTER_VER),
                 "%s-%s" % (AFTER_NAME, AFTER_VER),
                 [
-                    rpmfluff.SourceFile("Makefile", makefile_src),
-                    rpmfluff.SourceFile("bad.s", bad_asm_src),
-                    rpmfluff.SourceFile("status.sh", status_src),
+                    ProvidedSourceFile(
+                        "Makefile", os.path.join(datadir, "unicode", "Makefile")
+                    ),
+                    ProvidedSourceFile(
+                        "bad.s", os.path.join(datadir, "unicode", "bad.s")
+                    ),
+                    ProvidedSourceFile(
+                        "status.sh", os.path.join(datadir, "unicode", "status.sh")
+                    ),
                 ],
             )
         )
@@ -886,9 +1137,15 @@ class UnicodeBadAsmSourceArchiveRPMs(TestRPMs):
                 "%s-%s.tar.gz" % (AFTER_NAME, AFTER_VER),
                 "%s-%s" % (AFTER_NAME, AFTER_VER),
                 [
-                    rpmfluff.SourceFile("Makefile", makefile_src),
-                    rpmfluff.SourceFile("bad.s", bad_asm_src),
-                    rpmfluff.SourceFile("status.sh", status_src),
+                    ProvidedSourceFile(
+                        "Makefile", os.path.join(datadir, "unicode", "Makefile")
+                    ),
+                    ProvidedSourceFile(
+                        "bad.s", os.path.join(datadir, "unicode", "bad.s")
+                    ),
+                    ProvidedSourceFile(
+                        "status.sh", os.path.join(datadir, "unicode", "status.sh")
+                    ),
                 ],
             )
         )
@@ -915,9 +1172,15 @@ class UnicodeBadAsmSourceArchiveKoji(TestKoji):
                 "%s-%s.tar.gz" % (AFTER_NAME, AFTER_VER),
                 "%s-%s" % (AFTER_NAME, AFTER_VER),
                 [
-                    rpmfluff.SourceFile("Makefile", makefile_src),
-                    rpmfluff.SourceFile("bad.s", bad_asm_src),
-                    rpmfluff.SourceFile("status.sh", status_src),
+                    ProvidedSourceFile(
+                        "Makefile", os.path.join(datadir, "unicode", "Makefile")
+                    ),
+                    ProvidedSourceFile(
+                        "bad.s", os.path.join(datadir, "unicode", "bad.s")
+                    ),
+                    ProvidedSourceFile(
+                        "status.sh", os.path.join(datadir, "unicode", "status.sh")
+                    ),
                 ],
             )
         )
@@ -942,9 +1205,15 @@ class UnicodeBadAsmSourceArchiveCompareSRPM(TestCompareSRPM):
                 "%s-%s.tar.gz" % (BEFORE_NAME, BEFORE_VER),
                 "%s-%s" % (BEFORE_NAME, BEFORE_VER),
                 [
-                    rpmfluff.SourceFile("Makefile", makefile_src),
-                    rpmfluff.SourceFile("bad.s", bad_asm_src),
-                    rpmfluff.SourceFile("status.sh", status_src),
+                    ProvidedSourceFile(
+                        "Makefile", os.path.join(datadir, "unicode", "Makefile")
+                    ),
+                    ProvidedSourceFile(
+                        "bad.s", os.path.join(datadir, "unicode", "bad.s")
+                    ),
+                    ProvidedSourceFile(
+                        "status.sh", os.path.join(datadir, "unicode", "status.sh")
+                    ),
                 ],
             )
         )
@@ -960,9 +1229,15 @@ class UnicodeBadAsmSourceArchiveCompareSRPM(TestCompareSRPM):
                 "%s-%s.tar.gz" % (AFTER_NAME, AFTER_VER),
                 "%s-%s" % (AFTER_NAME, AFTER_VER),
                 [
-                    rpmfluff.SourceFile("Makefile", makefile_src),
-                    rpmfluff.SourceFile("bad.s", bad_asm_src),
-                    rpmfluff.SourceFile("status.sh", status_src),
+                    ProvidedSourceFile(
+                        "Makefile", os.path.join(datadir, "unicode", "Makefile")
+                    ),
+                    ProvidedSourceFile(
+                        "bad.s", os.path.join(datadir, "unicode", "bad.s")
+                    ),
+                    ProvidedSourceFile(
+                        "status.sh", os.path.join(datadir, "unicode", "status.sh")
+                    ),
                 ],
             )
         )
@@ -987,9 +1262,15 @@ class UnicodeBadAsmSourceArchiveCompareRPMs(TestCompareRPMs):
                 "%s-%s.tar.gz" % (BEFORE_NAME, BEFORE_VER),
                 "%s-%s" % (BEFORE_NAME, BEFORE_VER),
                 [
-                    rpmfluff.SourceFile("Makefile", makefile_src),
-                    rpmfluff.SourceFile("bad.s", bad_asm_src),
-                    rpmfluff.SourceFile("status.sh", status_src),
+                    ProvidedSourceFile(
+                        "Makefile", os.path.join(datadir, "unicode", "Makefile")
+                    ),
+                    ProvidedSourceFile(
+                        "bad.s", os.path.join(datadir, "unicode", "bad.s")
+                    ),
+                    ProvidedSourceFile(
+                        "status.sh", os.path.join(datadir, "unicode", "status.sh")
+                    ),
                 ],
             )
         )
@@ -1005,9 +1286,15 @@ class UnicodeBadAsmSourceArchiveCompareRPMs(TestCompareRPMs):
                 "%s-%s.tar.gz" % (AFTER_NAME, AFTER_VER),
                 "%s-%s" % (AFTER_NAME, AFTER_VER),
                 [
-                    rpmfluff.SourceFile("Makefile", makefile_src),
-                    rpmfluff.SourceFile("bad.s", bad_asm_src),
-                    rpmfluff.SourceFile("status.sh", status_src),
+                    ProvidedSourceFile(
+                        "Makefile", os.path.join(datadir, "unicode", "Makefile")
+                    ),
+                    ProvidedSourceFile(
+                        "bad.s", os.path.join(datadir, "unicode", "bad.s")
+                    ),
+                    ProvidedSourceFile(
+                        "status.sh", os.path.join(datadir, "unicode", "status.sh")
+                    ),
                 ],
             )
         )
@@ -1034,9 +1321,15 @@ class UnicodeBadAsmSourceArchiveCompareKoji(TestCompareKoji):
                 "%s-%s.tar.gz" % (BEFORE_NAME, BEFORE_VER),
                 "%s-%s" % (BEFORE_NAME, BEFORE_VER),
                 [
-                    rpmfluff.SourceFile("Makefile", makefile_src),
-                    rpmfluff.SourceFile("bad.s", bad_asm_src),
-                    rpmfluff.SourceFile("status.sh", status_src),
+                    ProvidedSourceFile(
+                        "Makefile", os.path.join(datadir, "unicode", "Makefile")
+                    ),
+                    ProvidedSourceFile(
+                        "bad.s", os.path.join(datadir, "unicode", "bad.s")
+                    ),
+                    ProvidedSourceFile(
+                        "status.sh", os.path.join(datadir, "unicode", "status.sh")
+                    ),
                 ],
             )
         )
@@ -1052,9 +1345,15 @@ class UnicodeBadAsmSourceArchiveCompareKoji(TestCompareKoji):
                 "%s-%s.tar.gz" % (AFTER_NAME, AFTER_VER),
                 "%s-%s" % (AFTER_NAME, AFTER_VER),
                 [
-                    rpmfluff.SourceFile("Makefile", makefile_src),
-                    rpmfluff.SourceFile("bad.s", bad_asm_src),
-                    rpmfluff.SourceFile("status.sh", status_src),
+                    ProvidedSourceFile(
+                        "Makefile", os.path.join(datadir, "unicode", "Makefile")
+                    ),
+                    ProvidedSourceFile(
+                        "bad.s", os.path.join(datadir, "unicode", "bad.s")
+                    ),
+                    ProvidedSourceFile(
+                        "status.sh", os.path.join(datadir, "unicode", "status.sh")
+                    ),
                 ],
             )
         )
@@ -1078,11 +1377,17 @@ class UnicodeBadCommentingOutSourceSRPM(TestSRPM):
 
         # this creates enough of a spec file to appease rpmbuild
         self.rpm.add_installed_file(
-            "/usr/bin/status", rpmfluff.SourceFile("status.sh", status_src), mode=755
+            "/usr/bin/status",
+            ProvidedSourceFile(
+                "status.sh", os.path.join(datadir, "unicode", "status.sh")
+            ),
+            mode=755,
         )
 
         # drop our known bad source files directly in the SRPM
-        self.rpm.add_source(rpmfluff.SourceFile("bad.c", bad_c_src))
+        self.rpm.add_source(
+            ProvidedSourceFile("bad.c", os.path.join(datadir, "unicode", "bad.c"))
+        )
 
         self.inspection = "unicode"
         self.waiver_auth = "Security"
@@ -1095,11 +1400,17 @@ class UnicodeBadCommentingOutSourceRPMs(TestRPMs):
 
         # this creates enough of a spec file to appease rpmbuild
         self.rpm.add_installed_file(
-            "/usr/bin/status", rpmfluff.SourceFile("status.sh", status_src), mode=755
+            "/usr/bin/status",
+            ProvidedSourceFile(
+                "status.sh", os.path.join(datadir, "unicode", "status.sh")
+            ),
+            mode=755,
         )
 
         # drop our known bad source files directly in the SRPM
-        self.rpm.add_source(rpmfluff.SourceFile("bad.c", bad_c_src))
+        self.rpm.add_source(
+            ProvidedSourceFile("bad.c", os.path.join(datadir, "unicode", "bad.c"))
+        )
 
         self.inspection = "unicode"
 
@@ -1114,11 +1425,19 @@ class UnicodeBadCommentingOutSourceKoji(TestKoji):
 
         # this creates enough of a spec file to appease rpmbuild
         self.rpm.add_installed_file(
-            "/usr/bin/status", rpmfluff.SourceFile("status.sh", status_src), mode=755
+            "/usr/bin/status",
+            ProvidedSourceFile(
+                "status.sh", os.path.join(datadir, "unicode", "status.sh")
+            ),
+            mode=755,
         )
 
         # drop our known bad source files directly in the SRPM
-        self.rpm.add_source(rpmfluff.SourceFile("bad.c", commenting_out_new_src))
+        self.rpm.add_source(
+            ProvidedSourceFile(
+                "bad.c", os.path.join(datadir, "unicode", "commenting-out-new.c")
+            )
+        )
 
         self.inspection = "unicode"
         self.waiver_auth = "Security"
@@ -1131,15 +1450,31 @@ class UnicodeBadCommentingOutSourceCompareSRPM(TestCompareSRPM):
 
         # this creates enough of a spec file to appease rpmbuild
         self.before_rpm.add_installed_file(
-            "/usr/bin/status", rpmfluff.SourceFile("status.sh", status_src), mode=755
+            "/usr/bin/status",
+            ProvidedSourceFile(
+                "status.sh", os.path.join(datadir, "unicode", "status.sh")
+            ),
+            mode=755,
         )
         self.after_rpm.add_installed_file(
-            "/usr/bin/status", rpmfluff.SourceFile("status.sh", status_src), mode=755
+            "/usr/bin/status",
+            ProvidedSourceFile(
+                "status.sh", os.path.join(datadir, "unicode", "status.sh")
+            ),
+            mode=755,
         )
 
         # drop our known bad source files directly in the SRPM
-        self.before_rpm.add_source(rpmfluff.SourceFile("bad.c", commenting_out_new_src))
-        self.after_rpm.add_source(rpmfluff.SourceFile("bad.c", commenting_out_new_src))
+        self.before_rpm.add_source(
+            ProvidedSourceFile(
+                "bad.c", os.path.join(datadir, "unicode", "commenting-out-new.c")
+            )
+        )
+        self.after_rpm.add_source(
+            ProvidedSourceFile(
+                "bad.c", os.path.join(datadir, "unicode", "commenting-out-new.c")
+            )
+        )
 
         self.inspection = "unicode"
         self.waiver_auth = "Security"
@@ -1152,15 +1487,31 @@ class UnicodeBadCommentingOutSourceCompareRPMs(TestCompareRPMs):
 
         # this creates enough of a spec file to appease rpmbuild
         self.before_rpm.add_installed_file(
-            "/usr/bin/status", rpmfluff.SourceFile("status.sh", status_src), mode=755
+            "/usr/bin/status",
+            ProvidedSourceFile(
+                "status.sh", os.path.join(datadir, "unicode", "status.sh")
+            ),
+            mode=755,
         )
         self.after_rpm.add_installed_file(
-            "/usr/bin/status", rpmfluff.SourceFile("status.sh", status_src), mode=755
+            "/usr/bin/status",
+            ProvidedSourceFile(
+                "status.sh", os.path.join(datadir, "unicode", "status.sh")
+            ),
+            mode=755,
         )
 
         # drop our known bad source files directly in the SRPM
-        self.before_rpm.add_source(rpmfluff.SourceFile("bad.c", commenting_out_new_src))
-        self.after_rpm.add_source(rpmfluff.SourceFile("bad.c", commenting_out_new_src))
+        self.before_rpm.add_source(
+            ProvidedSourceFile(
+                "bad.c", os.path.join(datadir, "unicode", "commenting-out-new.c")
+            )
+        )
+        self.after_rpm.add_source(
+            ProvidedSourceFile(
+                "bad.c", os.path.join(datadir, "unicode", "commenting-out-new.c")
+            )
+        )
 
         self.inspection = "unicode"
 
@@ -1175,15 +1526,31 @@ class UnicodeBadCommentingOutSourceCompareKoji(TestCompareKoji):
 
         # this creates enough of a spec file to appease rpmbuild
         self.before_rpm.add_installed_file(
-            "/usr/bin/status", rpmfluff.SourceFile("status.sh", status_src), mode=755
+            "/usr/bin/status",
+            ProvidedSourceFile(
+                "status.sh", os.path.join(datadir, "unicode", "status.sh")
+            ),
+            mode=755,
         )
         self.after_rpm.add_installed_file(
-            "/usr/bin/status", rpmfluff.SourceFile("status.sh", status_src), mode=755
+            "/usr/bin/status",
+            ProvidedSourceFile(
+                "status.sh", os.path.join(datadir, "unicode", "status.sh")
+            ),
+            mode=755,
         )
 
         # drop our known bad source files directly in the SRPM
-        self.before_rpm.add_source(rpmfluff.SourceFile("bad.c", commenting_out_new_src))
-        self.after_rpm.add_source(rpmfluff.SourceFile("bad.c", commenting_out_new_src))
+        self.before_rpm.add_source(
+            ProvidedSourceFile(
+                "bad.c", os.path.join(datadir, "unicode", "commenting-out-new.c")
+            )
+        )
+        self.after_rpm.add_source(
+            ProvidedSourceFile(
+                "bad.c", os.path.join(datadir, "unicode", "commenting-out-new.c")
+            )
+        )
 
         self.inspection = "unicode"
         self.waiver_auth = "Security"
@@ -1203,9 +1570,16 @@ class UnicodeBadCommentingOutSourceArchiveSRPM(TestSRPM):
                 "%s-%s.tar.gz" % (AFTER_NAME, AFTER_VER),
                 "%s-%s" % (AFTER_NAME, AFTER_VER),
                 [
-                    rpmfluff.SourceFile("Makefile", makefile_src),
-                    rpmfluff.SourceFile("bad.c", commenting_out_new_src),
-                    rpmfluff.SourceFile("status.sh", status_src),
+                    ProvidedSourceFile(
+                        "Makefile", os.path.join(datadir, "unicode", "Makefile")
+                    ),
+                    ProvidedSourceFile(
+                        "bad.c",
+                        os.path.join(datadir, "unicode", "commenting-out-new.c"),
+                    ),
+                    ProvidedSourceFile(
+                        "status.sh", os.path.join(datadir, "unicode", "status.sh")
+                    ),
                 ],
             )
         )
@@ -1230,9 +1604,16 @@ class UnicodeBadCommentingOutSourceArchiveRPMs(TestRPMs):
                 "%s-%s.tar.gz" % (AFTER_NAME, AFTER_VER),
                 "%s-%s" % (AFTER_NAME, AFTER_VER),
                 [
-                    rpmfluff.SourceFile("Makefile", makefile_src),
-                    rpmfluff.SourceFile("bad.c", commenting_out_new_src),
-                    rpmfluff.SourceFile("status.sh", status_src),
+                    ProvidedSourceFile(
+                        "Makefile", os.path.join(datadir, "unicode", "Makefile")
+                    ),
+                    ProvidedSourceFile(
+                        "bad.c",
+                        os.path.join(datadir, "unicode", "commenting-out-new.c"),
+                    ),
+                    ProvidedSourceFile(
+                        "status.sh", os.path.join(datadir, "unicode", "status.sh")
+                    ),
                 ],
             )
         )
@@ -1259,9 +1640,16 @@ class UnicodeBadCommentingOutSourceArchiveKoji(TestKoji):
                 "%s-%s.tar.gz" % (AFTER_NAME, AFTER_VER),
                 "%s-%s" % (AFTER_NAME, AFTER_VER),
                 [
-                    rpmfluff.SourceFile("Makefile", makefile_src),
-                    rpmfluff.SourceFile("bad.c", commenting_out_new_src),
-                    rpmfluff.SourceFile("status.sh", status_src),
+                    ProvidedSourceFile(
+                        "Makefile", os.path.join(datadir, "unicode", "Makefile")
+                    ),
+                    ProvidedSourceFile(
+                        "bad.c",
+                        os.path.join(datadir, "unicode", "commenting-out-new.c"),
+                    ),
+                    ProvidedSourceFile(
+                        "status.sh", os.path.join(datadir, "unicode", "status.sh")
+                    ),
                 ],
             )
         )
@@ -1286,9 +1674,16 @@ class UnicodeBadCommentingOutSourceArchiveCompareSRPM(TestCompareSRPM):
                 "%s-%s.tar.gz" % (BEFORE_NAME, BEFORE_VER),
                 "%s-%s" % (BEFORE_NAME, BEFORE_VER),
                 [
-                    rpmfluff.SourceFile("Makefile", makefile_src),
-                    rpmfluff.SourceFile("bad.c", commenting_out_new_src),
-                    rpmfluff.SourceFile("status.sh", status_src),
+                    ProvidedSourceFile(
+                        "Makefile", os.path.join(datadir, "unicode", "Makefile")
+                    ),
+                    ProvidedSourceFile(
+                        "bad.c",
+                        os.path.join(datadir, "unicode", "commenting-out-new.c"),
+                    ),
+                    ProvidedSourceFile(
+                        "status.sh", os.path.join(datadir, "unicode", "status.sh")
+                    ),
                 ],
             )
         )
@@ -1304,9 +1699,16 @@ class UnicodeBadCommentingOutSourceArchiveCompareSRPM(TestCompareSRPM):
                 "%s-%s.tar.gz" % (AFTER_NAME, AFTER_VER),
                 "%s-%s" % (AFTER_NAME, AFTER_VER),
                 [
-                    rpmfluff.SourceFile("Makefile", makefile_src),
-                    rpmfluff.SourceFile("bad.c", commenting_out_new_src),
-                    rpmfluff.SourceFile("status.sh", status_src),
+                    ProvidedSourceFile(
+                        "Makefile", os.path.join(datadir, "unicode", "Makefile")
+                    ),
+                    ProvidedSourceFile(
+                        "bad.c",
+                        os.path.join(datadir, "unicode", "commenting-out-new.c"),
+                    ),
+                    ProvidedSourceFile(
+                        "status.sh", os.path.join(datadir, "unicode", "status.sh")
+                    ),
                 ],
             )
         )
@@ -1331,9 +1733,16 @@ class UnicodeBadCommentingOutSourceArchiveCompareRPMs(TestCompareRPMs):
                 "%s-%s.tar.gz" % (BEFORE_NAME, BEFORE_VER),
                 "%s-%s" % (BEFORE_NAME, BEFORE_VER),
                 [
-                    rpmfluff.SourceFile("Makefile", makefile_src),
-                    rpmfluff.SourceFile("bad.c", commenting_out_new_src),
-                    rpmfluff.SourceFile("status.sh", status_src),
+                    ProvidedSourceFile(
+                        "Makefile", os.path.join(datadir, "unicode", "Makefile")
+                    ),
+                    ProvidedSourceFile(
+                        "bad.c",
+                        os.path.join(datadir, "unicode", "commenting-out-new.c"),
+                    ),
+                    ProvidedSourceFile(
+                        "status.sh", os.path.join(datadir, "unicode", "status.sh")
+                    ),
                 ],
             )
         )
@@ -1349,9 +1758,16 @@ class UnicodeBadCommentingOutSourceArchiveCompareRPMs(TestCompareRPMs):
                 "%s-%s.tar.gz" % (AFTER_NAME, AFTER_VER),
                 "%s-%s" % (AFTER_NAME, AFTER_VER),
                 [
-                    rpmfluff.SourceFile("Makefile", makefile_src),
-                    rpmfluff.SourceFile("bad.c", commenting_out_new_src),
-                    rpmfluff.SourceFile("status.sh", status_src),
+                    ProvidedSourceFile(
+                        "Makefile", os.path.join(datadir, "unicode", "Makefile")
+                    ),
+                    ProvidedSourceFile(
+                        "bad.c",
+                        os.path.join(datadir, "unicode", "commenting-out-new.c"),
+                    ),
+                    ProvidedSourceFile(
+                        "status.sh", os.path.join(datadir, "unicode", "status.sh")
+                    ),
                 ],
             )
         )
@@ -1378,9 +1794,16 @@ class UnicodeBadCommentingOutSourceArchiveCompareKoji(TestCompareKoji):
                 "%s-%s.tar.gz" % (BEFORE_NAME, BEFORE_VER),
                 "%s-%s" % (BEFORE_NAME, BEFORE_VER),
                 [
-                    rpmfluff.SourceFile("Makefile", makefile_src),
-                    rpmfluff.SourceFile("bad.c", commenting_out_new_src),
-                    rpmfluff.SourceFile("status.sh", status_src),
+                    ProvidedSourceFile(
+                        "Makefile", os.path.join(datadir, "unicode", "Makefile")
+                    ),
+                    ProvidedSourceFile(
+                        "bad.c",
+                        os.path.join(datadir, "unicode", "commenting-out-new.c"),
+                    ),
+                    ProvidedSourceFile(
+                        "status.sh", os.path.join(datadir, "unicode", "status.sh")
+                    ),
                 ],
             )
         )
@@ -1396,9 +1819,16 @@ class UnicodeBadCommentingOutSourceArchiveCompareKoji(TestCompareKoji):
                 "%s-%s.tar.gz" % (AFTER_NAME, AFTER_VER),
                 "%s-%s" % (AFTER_NAME, AFTER_VER),
                 [
-                    rpmfluff.SourceFile("Makefile", makefile_src),
-                    rpmfluff.SourceFile("bad.c", commenting_out_new_src),
-                    rpmfluff.SourceFile("status.sh", status_src),
+                    ProvidedSourceFile(
+                        "Makefile", os.path.join(datadir, "unicode", "Makefile")
+                    ),
+                    ProvidedSourceFile(
+                        "bad.c",
+                        os.path.join(datadir, "unicode", "commenting-out-new.c"),
+                    ),
+                    ProvidedSourceFile(
+                        "status.sh", os.path.join(datadir, "unicode", "status.sh")
+                    ),
                 ],
             )
         )
@@ -1422,11 +1852,19 @@ class UnicodeBadEarlyReturnSourceSRPM(TestSRPM):
 
         # this creates enough of a spec file to appease rpmbuild
         self.rpm.add_installed_file(
-            "/usr/bin/status", rpmfluff.SourceFile("status.sh", status_src), mode=755
+            "/usr/bin/status",
+            ProvidedSourceFile(
+                "status.sh", os.path.join(datadir, "unicode", "status.sh")
+            ),
+            mode=755,
         )
 
         # drop our known bad source files directly in the SRPM
-        self.rpm.add_source(rpmfluff.SourceFile("bad.c", early_return_new_src))
+        self.rpm.add_source(
+            ProvidedSourceFile(
+                "bad.c", os.path.join(datadir, "unicode", "early-return-new.c")
+            )
+        )
 
         self.inspection = "unicode"
         self.waiver_auth = "Security"
@@ -1439,11 +1877,19 @@ class UnicodeBadEarlyReturnSourceRPMs(TestRPMs):
 
         # this creates enough of a spec file to appease rpmbuild
         self.rpm.add_installed_file(
-            "/usr/bin/status", rpmfluff.SourceFile("status.sh", status_src), mode=755
+            "/usr/bin/status",
+            ProvidedSourceFile(
+                "status.sh", os.path.join(datadir, "unicode", "status.sh")
+            ),
+            mode=755,
         )
 
         # drop our known bad source files directly in the SRPM
-        self.rpm.add_source(rpmfluff.SourceFile("bad.c", early_return_new_src))
+        self.rpm.add_source(
+            ProvidedSourceFile(
+                "bad.c", os.path.join(datadir, "unicode", "early-return-new.c")
+            )
+        )
 
         self.inspection = "unicode"
 
@@ -1458,11 +1904,19 @@ class UnicodeBadEarlyReturnSourceKoji(TestKoji):
 
         # this creates enough of a spec file to appease rpmbuild
         self.rpm.add_installed_file(
-            "/usr/bin/status", rpmfluff.SourceFile("status.sh", status_src), mode=755
+            "/usr/bin/status",
+            ProvidedSourceFile(
+                "status.sh", os.path.join(datadir, "unicode", "status.sh")
+            ),
+            mode=755,
         )
 
         # drop our known bad source files directly in the SRPM
-        self.rpm.add_source(rpmfluff.SourceFile("bad.c", early_return_new_src))
+        self.rpm.add_source(
+            ProvidedSourceFile(
+                "bad.c", os.path.join(datadir, "unicode", "early-return-new.c")
+            )
+        )
 
         self.inspection = "unicode"
         self.waiver_auth = "Security"
@@ -1475,15 +1929,31 @@ class UnicodeBadEarlyReturnSourceCompareSRPM(TestCompareSRPM):
 
         # this creates enough of a spec file to appease rpmbuild
         self.before_rpm.add_installed_file(
-            "/usr/bin/status", rpmfluff.SourceFile("status.sh", status_src), mode=755
+            "/usr/bin/status",
+            ProvidedSourceFile(
+                "status.sh", os.path.join(datadir, "unicode", "status.sh")
+            ),
+            mode=755,
         )
         self.after_rpm.add_installed_file(
-            "/usr/bin/status", rpmfluff.SourceFile("status.sh", status_src), mode=755
+            "/usr/bin/status",
+            ProvidedSourceFile(
+                "status.sh", os.path.join(datadir, "unicode", "status.sh")
+            ),
+            mode=755,
         )
 
         # drop our known bad source files directly in the SRPM
-        self.before_rpm.add_source(rpmfluff.SourceFile("bad.c", early_return_new_src))
-        self.after_rpm.add_source(rpmfluff.SourceFile("bad.c", early_return_new_src))
+        self.before_rpm.add_source(
+            ProvidedSourceFile(
+                "bad.c", os.path.join(datadir, "unicode", "early-return-new.c")
+            )
+        )
+        self.after_rpm.add_source(
+            ProvidedSourceFile(
+                "bad.c", os.path.join(datadir, "unicode", "early-return-new.c")
+            )
+        )
 
         self.inspection = "unicode"
         self.waiver_auth = "Security"
@@ -1496,15 +1966,31 @@ class UnicodeBadEarlyReturnSourceCompareRPMs(TestCompareRPMs):
 
         # this creates enough of a spec file to appease rpmbuild
         self.before_rpm.add_installed_file(
-            "/usr/bin/status", rpmfluff.SourceFile("status.sh", status_src), mode=755
+            "/usr/bin/status",
+            ProvidedSourceFile(
+                "status.sh", os.path.join(datadir, "unicode", "status.sh")
+            ),
+            mode=755,
         )
         self.after_rpm.add_installed_file(
-            "/usr/bin/status", rpmfluff.SourceFile("status.sh", status_src), mode=755
+            "/usr/bin/status",
+            ProvidedSourceFile(
+                "status.sh", os.path.join(datadir, "unicode", "status.sh")
+            ),
+            mode=755,
         )
 
         # drop our known bad source files directly in the SRPM
-        self.before_rpm.add_source(rpmfluff.SourceFile("bad.c", early_return_new_src))
-        self.after_rpm.add_source(rpmfluff.SourceFile("bad.c", early_return_new_src))
+        self.before_rpm.add_source(
+            ProvidedSourceFile(
+                "bad.c", os.path.join(datadir, "unicode", "early-return-new.c")
+            )
+        )
+        self.after_rpm.add_source(
+            ProvidedSourceFile(
+                "bad.c", os.path.join(datadir, "unicode", "early-return-new.c")
+            )
+        )
 
         self.inspection = "unicode"
 
@@ -1519,15 +2005,31 @@ class UnicodeBadEarlyReturnSourceCompareKoji(TestCompareKoji):
 
         # this creates enough of a spec file to appease rpmbuild
         self.before_rpm.add_installed_file(
-            "/usr/bin/status", rpmfluff.SourceFile("status.sh", status_src), mode=755
+            "/usr/bin/status",
+            ProvidedSourceFile(
+                "status.sh", os.path.join(datadir, "unicode", "status.sh")
+            ),
+            mode=755,
         )
         self.after_rpm.add_installed_file(
-            "/usr/bin/status", rpmfluff.SourceFile("status.sh", status_src), mode=755
+            "/usr/bin/status",
+            ProvidedSourceFile(
+                "status.sh", os.path.join(datadir, "unicode", "status.sh")
+            ),
+            mode=755,
         )
 
         # drop our known bad source files directly in the SRPM
-        self.before_rpm.add_source(rpmfluff.SourceFile("bad.c", early_return_new_src))
-        self.after_rpm.add_source(rpmfluff.SourceFile("bad.c", early_return_new_src))
+        self.before_rpm.add_source(
+            ProvidedSourceFile(
+                "bad.c", os.path.join(datadir, "unicode", "early-return-new.c")
+            )
+        )
+        self.after_rpm.add_source(
+            ProvidedSourceFile(
+                "bad.c", os.path.join(datadir, "unicode", "early-return-new.c")
+            )
+        )
 
         self.inspection = "unicode"
         self.waiver_auth = "Security"
@@ -1547,9 +2049,15 @@ class UnicodeBadEarlyReturnSourceArchiveSRPM(TestSRPM):
                 "%s-%s.tar.gz" % (AFTER_NAME, AFTER_VER),
                 "%s-%s" % (AFTER_NAME, AFTER_VER),
                 [
-                    rpmfluff.SourceFile("Makefile", makefile_src),
-                    rpmfluff.SourceFile("bad.c", early_return_new_src),
-                    rpmfluff.SourceFile("status.sh", status_src),
+                    ProvidedSourceFile(
+                        "Makefile", os.path.join(datadir, "unicode", "Makefile")
+                    ),
+                    ProvidedSourceFile(
+                        "bad.c", os.path.join(datadir, "unicode", "early-return-new.c")
+                    ),
+                    ProvidedSourceFile(
+                        "status.sh", os.path.join(datadir, "unicode", "status.sh")
+                    ),
                 ],
             )
         )
@@ -1574,9 +2082,15 @@ class UnicodeBadEarlyReturnSourceArchiveRPMs(TestRPMs):
                 "%s-%s.tar.gz" % (AFTER_NAME, AFTER_VER),
                 "%s-%s" % (AFTER_NAME, AFTER_VER),
                 [
-                    rpmfluff.SourceFile("Makefile", makefile_src),
-                    rpmfluff.SourceFile("bad.c", early_return_new_src),
-                    rpmfluff.SourceFile("status.sh", status_src),
+                    ProvidedSourceFile(
+                        "Makefile", os.path.join(datadir, "unicode", "Makefile")
+                    ),
+                    ProvidedSourceFile(
+                        "bad.c", os.path.join(datadir, "unicode", "early-return-new.c")
+                    ),
+                    ProvidedSourceFile(
+                        "status.sh", os.path.join(datadir, "unicode", "status.sh")
+                    ),
                 ],
             )
         )
@@ -1603,9 +2117,15 @@ class UnicodeBadEarlyReturnSourceArchiveKoji(TestKoji):
                 "%s-%s.tar.gz" % (AFTER_NAME, AFTER_VER),
                 "%s-%s" % (AFTER_NAME, AFTER_VER),
                 [
-                    rpmfluff.SourceFile("Makefile", makefile_src),
-                    rpmfluff.SourceFile("bad.c", early_return_new_src),
-                    rpmfluff.SourceFile("status.sh", status_src),
+                    ProvidedSourceFile(
+                        "Makefile", os.path.join(datadir, "unicode", "Makefile")
+                    ),
+                    ProvidedSourceFile(
+                        "bad.c", os.path.join(datadir, "unicode", "early-return-new.c")
+                    ),
+                    ProvidedSourceFile(
+                        "status.sh", os.path.join(datadir, "unicode", "status.sh")
+                    ),
                 ],
             )
         )
@@ -1630,9 +2150,15 @@ class UnicodeBadEarlyReturnSourceArchiveCompareSRPM(TestCompareSRPM):
                 "%s-%s.tar.gz" % (BEFORE_NAME, BEFORE_VER),
                 "%s-%s" % (BEFORE_NAME, BEFORE_VER),
                 [
-                    rpmfluff.SourceFile("Makefile", makefile_src),
-                    rpmfluff.SourceFile("bad.c", early_return_new_src),
-                    rpmfluff.SourceFile("status.sh", status_src),
+                    ProvidedSourceFile(
+                        "Makefile", os.path.join(datadir, "unicode", "Makefile")
+                    ),
+                    ProvidedSourceFile(
+                        "bad.c", os.path.join(datadir, "unicode", "early-return-new.c")
+                    ),
+                    ProvidedSourceFile(
+                        "status.sh", os.path.join(datadir, "unicode", "status.sh")
+                    ),
                 ],
             )
         )
@@ -1648,9 +2174,15 @@ class UnicodeBadEarlyReturnSourceArchiveCompareSRPM(TestCompareSRPM):
                 "%s-%s.tar.gz" % (AFTER_NAME, AFTER_VER),
                 "%s-%s" % (AFTER_NAME, AFTER_VER),
                 [
-                    rpmfluff.SourceFile("Makefile", makefile_src),
-                    rpmfluff.SourceFile("bad.c", early_return_new_src),
-                    rpmfluff.SourceFile("status.sh", status_src),
+                    ProvidedSourceFile(
+                        "Makefile", os.path.join(datadir, "unicode", "Makefile")
+                    ),
+                    ProvidedSourceFile(
+                        "bad.c", os.path.join(datadir, "unicode", "early-return-new.c")
+                    ),
+                    ProvidedSourceFile(
+                        "status.sh", os.path.join(datadir, "unicode", "status.sh")
+                    ),
                 ],
             )
         )
@@ -1675,9 +2207,15 @@ class UnicodeBadEarlyReturnSourceArchiveCompareRPMs(TestCompareRPMs):
                 "%s-%s.tar.gz" % (BEFORE_NAME, BEFORE_VER),
                 "%s-%s" % (BEFORE_NAME, BEFORE_VER),
                 [
-                    rpmfluff.SourceFile("Makefile", makefile_src),
-                    rpmfluff.SourceFile("bad.c", early_return_new_src),
-                    rpmfluff.SourceFile("status.sh", status_src),
+                    ProvidedSourceFile(
+                        "Makefile", os.path.join(datadir, "unicode", "Makefile")
+                    ),
+                    ProvidedSourceFile(
+                        "bad.c", os.path.join(datadir, "unicode", "early-return-new.c")
+                    ),
+                    ProvidedSourceFile(
+                        "status.sh", os.path.join(datadir, "unicode", "status.sh")
+                    ),
                 ],
             )
         )
@@ -1693,9 +2231,15 @@ class UnicodeBadEarlyReturnSourceArchiveCompareRPMs(TestCompareRPMs):
                 "%s-%s.tar.gz" % (AFTER_NAME, AFTER_VER),
                 "%s-%s" % (AFTER_NAME, AFTER_VER),
                 [
-                    rpmfluff.SourceFile("Makefile", makefile_src),
-                    rpmfluff.SourceFile("bad.c", early_return_new_src),
-                    rpmfluff.SourceFile("status.sh", status_src),
+                    ProvidedSourceFile(
+                        "Makefile", os.path.join(datadir, "unicode", "Makefile")
+                    ),
+                    ProvidedSourceFile(
+                        "bad.c", os.path.join(datadir, "unicode", "early-return-new.c")
+                    ),
+                    ProvidedSourceFile(
+                        "status.sh", os.path.join(datadir, "unicode", "status.sh")
+                    ),
                 ],
             )
         )
@@ -1722,9 +2266,15 @@ class UnicodeBadEarlyReturnSourceArchiveCompareKoji(TestCompareKoji):
                 "%s-%s.tar.gz" % (BEFORE_NAME, BEFORE_VER),
                 "%s-%s" % (BEFORE_NAME, BEFORE_VER),
                 [
-                    rpmfluff.SourceFile("Makefile", makefile_src),
-                    rpmfluff.SourceFile("bad.c", early_return_new_src),
-                    rpmfluff.SourceFile("status.sh", status_src),
+                    ProvidedSourceFile(
+                        "Makefile", os.path.join(datadir, "unicode", "Makefile")
+                    ),
+                    ProvidedSourceFile(
+                        "bad.c", os.path.join(datadir, "unicode", "early-return-new.c")
+                    ),
+                    ProvidedSourceFile(
+                        "status.sh", os.path.join(datadir, "unicode", "status.sh")
+                    ),
                 ],
             )
         )
@@ -1740,9 +2290,15 @@ class UnicodeBadEarlyReturnSourceArchiveCompareKoji(TestCompareKoji):
                 "%s-%s.tar.gz" % (AFTER_NAME, AFTER_VER),
                 "%s-%s" % (AFTER_NAME, AFTER_VER),
                 [
-                    rpmfluff.SourceFile("Makefile", makefile_src),
-                    rpmfluff.SourceFile("bad.c", early_return_new_src),
-                    rpmfluff.SourceFile("status.sh", status_src),
+                    ProvidedSourceFile(
+                        "Makefile", os.path.join(datadir, "unicode", "Makefile")
+                    ),
+                    ProvidedSourceFile(
+                        "bad.c", os.path.join(datadir, "unicode", "early-return-new.c")
+                    ),
+                    ProvidedSourceFile(
+                        "status.sh", os.path.join(datadir, "unicode", "status.sh")
+                    ),
                 ],
             )
         )
@@ -1766,11 +2322,19 @@ class UnicodeBadStretchStringSourceSRPM(TestSRPM):
 
         # this creates enough of a spec file to appease rpmbuild
         self.rpm.add_installed_file(
-            "/usr/bin/status", rpmfluff.SourceFile("status.sh", status_src), mode=755
+            "/usr/bin/status",
+            ProvidedSourceFile(
+                "status.sh", os.path.join(datadir, "unicode", "status.sh")
+            ),
+            mode=755,
         )
 
         # drop our known bad source files directly in the SRPM
-        self.rpm.add_source(rpmfluff.SourceFile("bad.c", stretched_string_new_src))
+        self.rpm.add_source(
+            ProvidedSourceFile(
+                "bad.c", os.path.join(datadir, "unicode", "stretched-string-new.c")
+            )
+        )
 
         self.inspection = "unicode"
         self.waiver_auth = "Security"
@@ -1783,11 +2347,19 @@ class UnicodeBadStretchStringSourceRPMs(TestRPMs):
 
         # this creates enough of a spec file to appease rpmbuild
         self.rpm.add_installed_file(
-            "/usr/bin/status", rpmfluff.SourceFile("status.sh", status_src), mode=755
+            "/usr/bin/status",
+            ProvidedSourceFile(
+                "status.sh", os.path.join(datadir, "unicode", "status.sh")
+            ),
+            mode=755,
         )
 
         # drop our known bad source files directly in the SRPM
-        self.rpm.add_source(rpmfluff.SourceFile("bad.c", stretched_string_new_src))
+        self.rpm.add_source(
+            ProvidedSourceFile(
+                "bad.c", os.path.join(datadir, "unicode", "stretched-string-new.c")
+            )
+        )
 
         self.inspection = "unicode"
 
@@ -1802,11 +2374,19 @@ class UnicodeBadStretchStringSourceKoji(TestKoji):
 
         # this creates enough of a spec file to appease rpmbuild
         self.rpm.add_installed_file(
-            "/usr/bin/status", rpmfluff.SourceFile("status.sh", status_src), mode=755
+            "/usr/bin/status",
+            ProvidedSourceFile(
+                "status.sh", os.path.join(datadir, "unicode", "status.sh")
+            ),
+            mode=755,
         )
 
         # drop our known bad source files directly in the SRPM
-        self.rpm.add_source(rpmfluff.SourceFile("bad.c", stretched_string_new_src))
+        self.rpm.add_source(
+            ProvidedSourceFile(
+                "bad.c", os.path.join(datadir, "unicode", "stretched-string-new.c")
+            )
+        )
 
         self.inspection = "unicode"
         self.waiver_auth = "Security"
@@ -1819,18 +2399,30 @@ class UnicodeBadStretchStringSourceCompareSRPM(TestCompareSRPM):
 
         # this creates enough of a spec file to appease rpmbuild
         self.before_rpm.add_installed_file(
-            "/usr/bin/status", rpmfluff.SourceFile("status.sh", status_src), mode=755
+            "/usr/bin/status",
+            ProvidedSourceFile(
+                "status.sh", os.path.join(datadir, "unicode", "status.sh")
+            ),
+            mode=755,
         )
         self.after_rpm.add_installed_file(
-            "/usr/bin/status", rpmfluff.SourceFile("status.sh", status_src), mode=755
+            "/usr/bin/status",
+            ProvidedSourceFile(
+                "status.sh", os.path.join(datadir, "unicode", "status.sh")
+            ),
+            mode=755,
         )
 
         # drop our known bad source files directly in the SRPM
         self.before_rpm.add_source(
-            rpmfluff.SourceFile("bad.c", stretched_string_new_src)
+            ProvidedSourceFile(
+                "bad.c", os.path.join(datadir, "unicode", "stretched-string-new.c")
+            )
         )
         self.after_rpm.add_source(
-            rpmfluff.SourceFile("bad.c", stretched_string_new_src)
+            ProvidedSourceFile(
+                "bad.c", os.path.join(datadir, "unicode", "stretched-string-new.c")
+            )
         )
 
         self.inspection = "unicode"
@@ -1844,18 +2436,30 @@ class UnicodeBadStretchStringSourceCompareRPMs(TestCompareRPMs):
 
         # this creates enough of a spec file to appease rpmbuild
         self.before_rpm.add_installed_file(
-            "/usr/bin/status", rpmfluff.SourceFile("status.sh", status_src), mode=755
+            "/usr/bin/status",
+            ProvidedSourceFile(
+                "status.sh", os.path.join(datadir, "unicode", "status.sh")
+            ),
+            mode=755,
         )
         self.after_rpm.add_installed_file(
-            "/usr/bin/status", rpmfluff.SourceFile("status.sh", status_src), mode=755
+            "/usr/bin/status",
+            ProvidedSourceFile(
+                "status.sh", os.path.join(datadir, "unicode", "status.sh")
+            ),
+            mode=755,
         )
 
         # drop our known bad source files directly in the SRPM
         self.before_rpm.add_source(
-            rpmfluff.SourceFile("bad.c", stretched_string_new_src)
+            ProvidedSourceFile(
+                "bad.c", os.path.join(datadir, "unicode", "stretched-string-new.c")
+            )
         )
         self.after_rpm.add_source(
-            rpmfluff.SourceFile("bad.c", stretched_string_new_src)
+            ProvidedSourceFile(
+                "bad.c", os.path.join(datadir, "unicode", "stretched-string-new.c")
+            )
         )
 
         self.inspection = "unicode"
@@ -1871,18 +2475,30 @@ class UnicodeBadStretchStringSourceCompareKoji(TestCompareKoji):
 
         # this creates enough of a spec file to appease rpmbuild
         self.before_rpm.add_installed_file(
-            "/usr/bin/status", rpmfluff.SourceFile("status.sh", status_src), mode=755
+            "/usr/bin/status",
+            ProvidedSourceFile(
+                "status.sh", os.path.join(datadir, "unicode", "status.sh")
+            ),
+            mode=755,
         )
         self.after_rpm.add_installed_file(
-            "/usr/bin/status", rpmfluff.SourceFile("status.sh", status_src), mode=755
+            "/usr/bin/status",
+            ProvidedSourceFile(
+                "status.sh", os.path.join(datadir, "unicode", "status.sh")
+            ),
+            mode=755,
         )
 
         # drop our known bad source files directly in the SRPM
         self.before_rpm.add_source(
-            rpmfluff.SourceFile("bad.c", stretched_string_new_src)
+            ProvidedSourceFile(
+                "bad.c", os.path.join(datadir, "unicode", "stretched-string-new.c")
+            )
         )
         self.after_rpm.add_source(
-            rpmfluff.SourceFile("bad.c", stretched_string_new_src)
+            ProvidedSourceFile(
+                "bad.c", os.path.join(datadir, "unicode", "stretched-string-new.c")
+            )
         )
 
         self.inspection = "unicode"
@@ -1903,9 +2519,16 @@ class UnicodeBadStretchStringSourceArchiveSRPM(TestSRPM):
                 "%s-%s.tar.gz" % (AFTER_NAME, AFTER_VER),
                 "%s-%s" % (AFTER_NAME, AFTER_VER),
                 [
-                    rpmfluff.SourceFile("Makefile", makefile_src),
-                    rpmfluff.SourceFile("bad.c", stretched_string_new_src),
-                    rpmfluff.SourceFile("status.sh", status_src),
+                    ProvidedSourceFile(
+                        "Makefile", os.path.join(datadir, "unicode", "Makefile")
+                    ),
+                    ProvidedSourceFile(
+                        "bad.c",
+                        os.path.join(datadir, "unicode", "stretched-string-new.c"),
+                    ),
+                    ProvidedSourceFile(
+                        "status.sh", os.path.join(datadir, "unicode", "status.sh")
+                    ),
                 ],
             )
         )
@@ -1930,9 +2553,16 @@ class UnicodeBadStretchStringSourceArchiveRPMs(TestRPMs):
                 "%s-%s.tar.gz" % (AFTER_NAME, AFTER_VER),
                 "%s-%s" % (AFTER_NAME, AFTER_VER),
                 [
-                    rpmfluff.SourceFile("Makefile", makefile_src),
-                    rpmfluff.SourceFile("bad.c", stretched_string_new_src),
-                    rpmfluff.SourceFile("status.sh", status_src),
+                    ProvidedSourceFile(
+                        "Makefile", os.path.join(datadir, "unicode", "Makefile")
+                    ),
+                    ProvidedSourceFile(
+                        "bad.c",
+                        os.path.join(datadir, "unicode", "stretched-string-new.c"),
+                    ),
+                    ProvidedSourceFile(
+                        "status.sh", os.path.join(datadir, "unicode", "status.sh")
+                    ),
                 ],
             )
         )
@@ -1959,9 +2589,16 @@ class UnicodeBadStretchStringSourceArchiveKoji(TestKoji):
                 "%s-%s.tar.gz" % (AFTER_NAME, AFTER_VER),
                 "%s-%s" % (AFTER_NAME, AFTER_VER),
                 [
-                    rpmfluff.SourceFile("Makefile", makefile_src),
-                    rpmfluff.SourceFile("bad.c", stretched_string_new_src),
-                    rpmfluff.SourceFile("status.sh", status_src),
+                    ProvidedSourceFile(
+                        "Makefile", os.path.join(datadir, "unicode", "Makefile")
+                    ),
+                    ProvidedSourceFile(
+                        "bad.c",
+                        os.path.join(datadir, "unicode", "stretched-string-new.c"),
+                    ),
+                    ProvidedSourceFile(
+                        "status.sh", os.path.join(datadir, "unicode", "status.sh")
+                    ),
                 ],
             )
         )
@@ -1986,9 +2623,16 @@ class UnicodeBadStretchStringSourceArchiveCompareSRPM(TestCompareSRPM):
                 "%s-%s.tar.gz" % (BEFORE_NAME, BEFORE_VER),
                 "%s-%s" % (BEFORE_NAME, BEFORE_VER),
                 [
-                    rpmfluff.SourceFile("Makefile", makefile_src),
-                    rpmfluff.SourceFile("bad.c", stretched_string_new_src),
-                    rpmfluff.SourceFile("status.sh", status_src),
+                    ProvidedSourceFile(
+                        "Makefile", os.path.join(datadir, "unicode", "Makefile")
+                    ),
+                    ProvidedSourceFile(
+                        "bad.c",
+                        os.path.join(datadir, "unicode", "stretched-string-new.c"),
+                    ),
+                    ProvidedSourceFile(
+                        "status.sh", os.path.join(datadir, "unicode", "status.sh")
+                    ),
                 ],
             )
         )
@@ -2004,9 +2648,16 @@ class UnicodeBadStretchStringSourceArchiveCompareSRPM(TestCompareSRPM):
                 "%s-%s.tar.gz" % (AFTER_NAME, AFTER_VER),
                 "%s-%s" % (AFTER_NAME, AFTER_VER),
                 [
-                    rpmfluff.SourceFile("Makefile", makefile_src),
-                    rpmfluff.SourceFile("bad.c", stretched_string_new_src),
-                    rpmfluff.SourceFile("status.sh", status_src),
+                    ProvidedSourceFile(
+                        "Makefile", os.path.join(datadir, "unicode", "Makefile")
+                    ),
+                    ProvidedSourceFile(
+                        "bad.c",
+                        os.path.join(datadir, "unicode", "stretched-string-new.c"),
+                    ),
+                    ProvidedSourceFile(
+                        "status.sh", os.path.join(datadir, "unicode", "status.sh")
+                    ),
                 ],
             )
         )
@@ -2031,9 +2682,16 @@ class UnicodeBadStretchStringSourceArchiveCompareRPMs(TestCompareRPMs):
                 "%s-%s.tar.gz" % (BEFORE_NAME, BEFORE_VER),
                 "%s-%s" % (BEFORE_NAME, BEFORE_VER),
                 [
-                    rpmfluff.SourceFile("Makefile", makefile_src),
-                    rpmfluff.SourceFile("bad.c", stretched_string_new_src),
-                    rpmfluff.SourceFile("status.sh", status_src),
+                    ProvidedSourceFile(
+                        "Makefile", os.path.join(datadir, "unicode", "Makefile")
+                    ),
+                    ProvidedSourceFile(
+                        "bad.c",
+                        os.path.join(datadir, "unicode", "stretched-string-new.c"),
+                    ),
+                    ProvidedSourceFile(
+                        "status.sh", os.path.join(datadir, "unicode", "status.sh")
+                    ),
                 ],
             )
         )
@@ -2049,9 +2707,16 @@ class UnicodeBadStretchStringSourceArchiveCompareRPMs(TestCompareRPMs):
                 "%s-%s.tar.gz" % (AFTER_NAME, AFTER_VER),
                 "%s-%s" % (AFTER_NAME, AFTER_VER),
                 [
-                    rpmfluff.SourceFile("Makefile", makefile_src),
-                    rpmfluff.SourceFile("bad.c", stretched_string_new_src),
-                    rpmfluff.SourceFile("status.sh", status_src),
+                    ProvidedSourceFile(
+                        "Makefile", os.path.join(datadir, "unicode", "Makefile")
+                    ),
+                    ProvidedSourceFile(
+                        "bad.c",
+                        os.path.join(datadir, "unicode", "stretched-string-new.c"),
+                    ),
+                    ProvidedSourceFile(
+                        "status.sh", os.path.join(datadir, "unicode", "status.sh")
+                    ),
                 ],
             )
         )
@@ -2078,9 +2743,16 @@ class UnicodeBadStretchStringSourceArchiveCompareKoji(TestCompareKoji):
                 "%s-%s.tar.gz" % (BEFORE_NAME, BEFORE_VER),
                 "%s-%s" % (BEFORE_NAME, BEFORE_VER),
                 [
-                    rpmfluff.SourceFile("Makefile", makefile_src),
-                    rpmfluff.SourceFile("bad.c", stretched_string_new_src),
-                    rpmfluff.SourceFile("status.sh", status_src),
+                    ProvidedSourceFile(
+                        "Makefile", os.path.join(datadir, "unicode", "Makefile")
+                    ),
+                    ProvidedSourceFile(
+                        "bad.c",
+                        os.path.join(datadir, "unicode", "stretched-string-new.c"),
+                    ),
+                    ProvidedSourceFile(
+                        "status.sh", os.path.join(datadir, "unicode", "status.sh")
+                    ),
                 ],
             )
         )
@@ -2096,9 +2768,16 @@ class UnicodeBadStretchStringSourceArchiveCompareKoji(TestCompareKoji):
                 "%s-%s.tar.gz" % (AFTER_NAME, AFTER_VER),
                 "%s-%s" % (AFTER_NAME, AFTER_VER),
                 [
-                    rpmfluff.SourceFile("Makefile", makefile_src),
-                    rpmfluff.SourceFile("bad.c", stretched_string_new_src),
-                    rpmfluff.SourceFile("status.sh", status_src),
+                    ProvidedSourceFile(
+                        "Makefile", os.path.join(datadir, "unicode", "Makefile")
+                    ),
+                    ProvidedSourceFile(
+                        "bad.c",
+                        os.path.join(datadir, "unicode", "stretched-string-new.c"),
+                    ),
+                    ProvidedSourceFile(
+                        "status.sh", os.path.join(datadir, "unicode", "status.sh")
+                    ),
                 ],
             )
         )
@@ -2129,9 +2808,15 @@ class UnicodeGoodCSourceArchiveBadPrepSRPM(TestSRPM):
                 "%s-%s.tar.gz" % (AFTER_NAME, AFTER_VER),
                 "%s-%s" % (AFTER_NAME, AFTER_VER),
                 [
-                    rpmfluff.SourceFile("Makefile", makefile_src),
-                    rpmfluff.SourceFile("good.c", good_c_src),
-                    rpmfluff.SourceFile("status.sh", status_src),
+                    ProvidedSourceFile(
+                        "Makefile", os.path.join(datadir, "unicode", "Makefile")
+                    ),
+                    ProvidedSourceFile(
+                        "good.c", os.path.join(datadir, "unicode", "good.c")
+                    ),
+                    ProvidedSourceFile(
+                        "status.sh", os.path.join(datadir, "unicode", "status.sh")
+                    ),
                 ],
             )
         )
@@ -2156,9 +2841,15 @@ class UnicodeGoodCSourceArchiveCompareBadPrepSRPM(TestCompareSRPM):
                 "%s-%s.tar.gz" % (BEFORE_NAME, BEFORE_VER),
                 "%s-%s" % (BEFORE_NAME, BEFORE_VER),
                 [
-                    rpmfluff.SourceFile("Makefile", makefile_src),
-                    rpmfluff.SourceFile("good.c", good_c_src),
-                    rpmfluff.SourceFile("status.sh", status_src),
+                    ProvidedSourceFile(
+                        "Makefile", os.path.join(datadir, "unicode", "Makefile")
+                    ),
+                    ProvidedSourceFile(
+                        "good.c", os.path.join(datadir, "unicode", "good.c")
+                    ),
+                    ProvidedSourceFile(
+                        "status.sh", os.path.join(datadir, "unicode", "status.sh")
+                    ),
                 ],
             )
         )
@@ -2175,9 +2866,15 @@ class UnicodeGoodCSourceArchiveCompareBadPrepSRPM(TestCompareSRPM):
                 "%s-%s.tar.gz" % (AFTER_NAME, AFTER_VER),
                 "%s-%s" % (AFTER_NAME, AFTER_VER),
                 [
-                    rpmfluff.SourceFile("Makefile", makefile_src),
-                    rpmfluff.SourceFile("good.c", good_c_src),
-                    rpmfluff.SourceFile("status.sh", status_src),
+                    ProvidedSourceFile(
+                        "Makefile", os.path.join(datadir, "unicode", "Makefile")
+                    ),
+                    ProvidedSourceFile(
+                        "good.c", os.path.join(datadir, "unicode", "good.c")
+                    ),
+                    ProvidedSourceFile(
+                        "status.sh", os.path.join(datadir, "unicode", "status.sh")
+                    ),
                 ],
             )
         )
@@ -2208,9 +2905,15 @@ class UnicodeBadCSourceArchiveBadPrepSRPM(TestSRPM):
                 "%s-%s.tar.gz" % (AFTER_NAME, AFTER_VER),
                 "%s-%s" % (AFTER_NAME, AFTER_VER),
                 [
-                    rpmfluff.SourceFile("Makefile", makefile_src),
-                    rpmfluff.SourceFile("bad.c", bad_c_src),
-                    rpmfluff.SourceFile("status.sh", status_src),
+                    ProvidedSourceFile(
+                        "Makefile", os.path.join(datadir, "unicode", "Makefile")
+                    ),
+                    ProvidedSourceFile(
+                        "bad.c", os.path.join(datadir, "unicode", "bad.c")
+                    ),
+                    ProvidedSourceFile(
+                        "status.sh", os.path.join(datadir, "unicode", "status.sh")
+                    ),
                 ],
             )
         )
@@ -2236,9 +2939,15 @@ class UnicodeBadCSourceArchiveCompareBadPrepSRPM(TestCompareSRPM):
                 "%s-%s.tar.gz" % (BEFORE_NAME, BEFORE_VER),
                 "%s-%s" % (BEFORE_NAME, BEFORE_VER),
                 [
-                    rpmfluff.SourceFile("Makefile", makefile_src),
-                    rpmfluff.SourceFile("bad.c", bad_c_src),
-                    rpmfluff.SourceFile("status.sh", status_src),
+                    ProvidedSourceFile(
+                        "Makefile", os.path.join(datadir, "unicode", "Makefile")
+                    ),
+                    ProvidedSourceFile(
+                        "bad.c", os.path.join(datadir, "unicode", "bad.c")
+                    ),
+                    ProvidedSourceFile(
+                        "status.sh", os.path.join(datadir, "unicode", "status.sh")
+                    ),
                 ],
             )
         )
@@ -2255,9 +2964,15 @@ class UnicodeBadCSourceArchiveCompareBadPrepSRPM(TestCompareSRPM):
                 "%s-%s.tar.gz" % (AFTER_NAME, AFTER_VER),
                 "%s-%s" % (AFTER_NAME, AFTER_VER),
                 [
-                    rpmfluff.SourceFile("Makefile", makefile_src),
-                    rpmfluff.SourceFile("bad.c", bad_c_src),
-                    rpmfluff.SourceFile("status.sh", status_src),
+                    ProvidedSourceFile(
+                        "Makefile", os.path.join(datadir, "unicode", "Makefile")
+                    ),
+                    ProvidedSourceFile(
+                        "bad.c", os.path.join(datadir, "unicode", "bad.c")
+                    ),
+                    ProvidedSourceFile(
+                        "status.sh", os.path.join(datadir, "unicode", "status.sh")
+                    ),
                 ],
             )
         )
@@ -2283,9 +2998,15 @@ class UnicodeBadAsmSourceArchiveBadPrepSRPM(TestSRPM):
                 "%s-%s.tar.gz" % (AFTER_NAME, AFTER_VER),
                 "%s-%s" % (AFTER_NAME, AFTER_VER),
                 [
-                    rpmfluff.SourceFile("Makefile", makefile_src),
-                    rpmfluff.SourceFile("bad.s", bad_asm_src),
-                    rpmfluff.SourceFile("status.sh", status_src),
+                    ProvidedSourceFile(
+                        "Makefile", os.path.join(datadir, "unicode", "Makefile")
+                    ),
+                    ProvidedSourceFile(
+                        "bad.s", os.path.join(datadir, "unicode", "bad.s")
+                    ),
+                    ProvidedSourceFile(
+                        "status.sh", os.path.join(datadir, "unicode", "status.sh")
+                    ),
                 ],
             )
         )
@@ -2311,9 +3032,15 @@ class UnicodeBadAsmSourceArchiveCompareBadPrepSRPM(TestCompareSRPM):
                 "%s-%s.tar.gz" % (BEFORE_NAME, BEFORE_VER),
                 "%s-%s" % (BEFORE_NAME, BEFORE_VER),
                 [
-                    rpmfluff.SourceFile("Makefile", makefile_src),
-                    rpmfluff.SourceFile("bad.s", bad_asm_src),
-                    rpmfluff.SourceFile("status.sh", status_src),
+                    ProvidedSourceFile(
+                        "Makefile", os.path.join(datadir, "unicode", "Makefile")
+                    ),
+                    ProvidedSourceFile(
+                        "bad.s", os.path.join(datadir, "unicode", "bad.s")
+                    ),
+                    ProvidedSourceFile(
+                        "status.sh", os.path.join(datadir, "unicode", "status.sh")
+                    ),
                 ],
             )
         )
@@ -2330,9 +3057,15 @@ class UnicodeBadAsmSourceArchiveCompareBadPrepSRPM(TestCompareSRPM):
                 "%s-%s.tar.gz" % (AFTER_NAME, AFTER_VER),
                 "%s-%s" % (AFTER_NAME, AFTER_VER),
                 [
-                    rpmfluff.SourceFile("Makefile", makefile_src),
-                    rpmfluff.SourceFile("bad.s", bad_asm_src),
-                    rpmfluff.SourceFile("status.sh", status_src),
+                    ProvidedSourceFile(
+                        "Makefile", os.path.join(datadir, "unicode", "Makefile")
+                    ),
+                    ProvidedSourceFile(
+                        "bad.s", os.path.join(datadir, "unicode", "bad.s")
+                    ),
+                    ProvidedSourceFile(
+                        "status.sh", os.path.join(datadir, "unicode", "status.sh")
+                    ),
                 ],
             )
         )
@@ -2358,9 +3091,16 @@ class UnicodeBadCommentingOutSourceArchiveBadPrepSRPM(TestSRPM):
                 "%s-%s.tar.gz" % (AFTER_NAME, AFTER_VER),
                 "%s-%s" % (AFTER_NAME, AFTER_VER),
                 [
-                    rpmfluff.SourceFile("Makefile", makefile_src),
-                    rpmfluff.SourceFile("bad.c", commenting_out_new_src),
-                    rpmfluff.SourceFile("status.sh", status_src),
+                    ProvidedSourceFile(
+                        "Makefile", os.path.join(datadir, "unicode", "Makefile")
+                    ),
+                    ProvidedSourceFile(
+                        "bad.c",
+                        os.path.join(datadir, "unicode", "commenting-out-new.c"),
+                    ),
+                    ProvidedSourceFile(
+                        "status.sh", os.path.join(datadir, "unicode", "status.sh")
+                    ),
                 ],
             )
         )
@@ -2386,9 +3126,16 @@ class UnicodeBadCommentingOutSourceArchiveCompareBadPrepSRPM(TestCompareSRPM):
                 "%s-%s.tar.gz" % (BEFORE_NAME, BEFORE_VER),
                 "%s-%s" % (BEFORE_NAME, BEFORE_VER),
                 [
-                    rpmfluff.SourceFile("Makefile", makefile_src),
-                    rpmfluff.SourceFile("bad.c", commenting_out_new_src),
-                    rpmfluff.SourceFile("status.sh", status_src),
+                    ProvidedSourceFile(
+                        "Makefile", os.path.join(datadir, "unicode", "Makefile")
+                    ),
+                    ProvidedSourceFile(
+                        "bad.c",
+                        os.path.join(datadir, "unicode", "commenting-out-new.c"),
+                    ),
+                    ProvidedSourceFile(
+                        "status.sh", os.path.join(datadir, "unicode", "status.sh")
+                    ),
                 ],
             )
         )
@@ -2405,9 +3152,16 @@ class UnicodeBadCommentingOutSourceArchiveCompareBadPrepSRPM(TestCompareSRPM):
                 "%s-%s.tar.gz" % (AFTER_NAME, AFTER_VER),
                 "%s-%s" % (AFTER_NAME, AFTER_VER),
                 [
-                    rpmfluff.SourceFile("Makefile", makefile_src),
-                    rpmfluff.SourceFile("bad.c", commenting_out_new_src),
-                    rpmfluff.SourceFile("status.sh", status_src),
+                    ProvidedSourceFile(
+                        "Makefile", os.path.join(datadir, "unicode", "Makefile")
+                    ),
+                    ProvidedSourceFile(
+                        "bad.c",
+                        os.path.join(datadir, "unicode", "commenting-out-new.c"),
+                    ),
+                    ProvidedSourceFile(
+                        "status.sh", os.path.join(datadir, "unicode", "status.sh")
+                    ),
                 ],
             )
         )
@@ -2433,9 +3187,15 @@ class UnicodeBadEarlyReturnSourceArchiveBadPrepSRPM(TestSRPM):
                 "%s-%s.tar.gz" % (AFTER_NAME, AFTER_VER),
                 "%s-%s" % (AFTER_NAME, AFTER_VER),
                 [
-                    rpmfluff.SourceFile("Makefile", makefile_src),
-                    rpmfluff.SourceFile("bad.c", early_return_new_src),
-                    rpmfluff.SourceFile("status.sh", status_src),
+                    ProvidedSourceFile(
+                        "Makefile", os.path.join(datadir, "unicode", "Makefile")
+                    ),
+                    ProvidedSourceFile(
+                        "bad.c", os.path.join(datadir, "unicode", "early-return-new.c")
+                    ),
+                    ProvidedSourceFile(
+                        "status.sh", os.path.join(datadir, "unicode", "status.sh")
+                    ),
                 ],
             )
         )
@@ -2461,9 +3221,15 @@ class UnicodeBadEarlyReturnSourceArchiveCompareBadPrepSRPM(TestCompareSRPM):
                 "%s-%s.tar.gz" % (BEFORE_NAME, BEFORE_VER),
                 "%s-%s" % (BEFORE_NAME, BEFORE_VER),
                 [
-                    rpmfluff.SourceFile("Makefile", makefile_src),
-                    rpmfluff.SourceFile("bad.c", early_return_new_src),
-                    rpmfluff.SourceFile("status.sh", status_src),
+                    ProvidedSourceFile(
+                        "Makefile", os.path.join(datadir, "unicode", "Makefile")
+                    ),
+                    ProvidedSourceFile(
+                        "bad.c", os.path.join(datadir, "unicode", "early-return-new.c")
+                    ),
+                    ProvidedSourceFile(
+                        "status.sh", os.path.join(datadir, "unicode", "status.sh")
+                    ),
                 ],
             )
         )
@@ -2480,9 +3246,15 @@ class UnicodeBadEarlyReturnSourceArchiveCompareBadPrepSRPM(TestCompareSRPM):
                 "%s-%s.tar.gz" % (AFTER_NAME, AFTER_VER),
                 "%s-%s" % (AFTER_NAME, AFTER_VER),
                 [
-                    rpmfluff.SourceFile("Makefile", makefile_src),
-                    rpmfluff.SourceFile("bad.c", early_return_new_src),
-                    rpmfluff.SourceFile("status.sh", status_src),
+                    ProvidedSourceFile(
+                        "Makefile", os.path.join(datadir, "unicode", "Makefile")
+                    ),
+                    ProvidedSourceFile(
+                        "bad.c", os.path.join(datadir, "unicode", "early-return-new.c")
+                    ),
+                    ProvidedSourceFile(
+                        "status.sh", os.path.join(datadir, "unicode", "status.sh")
+                    ),
                 ],
             )
         )
@@ -2508,9 +3280,16 @@ class UnicodeBadStretchStringSourceArchiveBadPrepSRPM(TestSRPM):
                 "%s-%s.tar.gz" % (AFTER_NAME, AFTER_VER),
                 "%s-%s" % (AFTER_NAME, AFTER_VER),
                 [
-                    rpmfluff.SourceFile("Makefile", makefile_src),
-                    rpmfluff.SourceFile("bad.c", stretched_string_new_src),
-                    rpmfluff.SourceFile("status.sh", status_src),
+                    ProvidedSourceFile(
+                        "Makefile", os.path.join(datadir, "unicode", "Makefile")
+                    ),
+                    ProvidedSourceFile(
+                        "bad.c",
+                        os.path.join(datadir, "unicode", "stretched-string-new.c"),
+                    ),
+                    ProvidedSourceFile(
+                        "status.sh", os.path.join(datadir, "unicode", "status.sh")
+                    ),
                 ],
             )
         )
@@ -2536,9 +3315,16 @@ class UnicodeBadStretchStringSourceArchiveCompareBadPrepSRPM(TestCompareSRPM):
                 "%s-%s.tar.gz" % (BEFORE_NAME, BEFORE_VER),
                 "%s-%s" % (BEFORE_NAME, BEFORE_VER),
                 [
-                    rpmfluff.SourceFile("Makefile", makefile_src),
-                    rpmfluff.SourceFile("bad.c", stretched_string_new_src),
-                    rpmfluff.SourceFile("status.sh", status_src),
+                    ProvidedSourceFile(
+                        "Makefile", os.path.join(datadir, "unicode", "Makefile")
+                    ),
+                    ProvidedSourceFile(
+                        "bad.c",
+                        os.path.join(datadir, "unicode", "stretched-string-new.c"),
+                    ),
+                    ProvidedSourceFile(
+                        "status.sh", os.path.join(datadir, "unicode", "status.sh")
+                    ),
                 ],
             )
         )
@@ -2555,9 +3341,16 @@ class UnicodeBadStretchStringSourceArchiveCompareBadPrepSRPM(TestCompareSRPM):
                 "%s-%s.tar.gz" % (AFTER_NAME, AFTER_VER),
                 "%s-%s" % (AFTER_NAME, AFTER_VER),
                 [
-                    rpmfluff.SourceFile("Makefile", makefile_src),
-                    rpmfluff.SourceFile("bad.c", stretched_string_new_src),
-                    rpmfluff.SourceFile("status.sh", status_src),
+                    ProvidedSourceFile(
+                        "Makefile", os.path.join(datadir, "unicode", "Makefile")
+                    ),
+                    ProvidedSourceFile(
+                        "bad.c",
+                        os.path.join(datadir, "unicode", "stretched-string-new.c"),
+                    ),
+                    ProvidedSourceFile(
+                        "status.sh", os.path.join(datadir, "unicode", "status.sh")
+                    ),
                 ],
             )
         )

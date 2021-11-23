@@ -87,6 +87,23 @@ def check_results(results, inspection, result, waiver_auth, message=None):
         )
 
 
+# This is a local replacement for ExternalSourceFile.  Rather than
+# reading in the file and writing it out, it just uses shutil.copy to
+# copy the file in place.
+class ProvidedSourceFile:
+    def __init__(self, sourceName, path):
+        self.sourceName = sourceName
+        self.path = path
+
+    def _get_dst_file(self, sourcesDir):
+        dstFileName = os.path.join(sourcesDir, self.sourceName)
+        return dstFileName
+
+    def write_file(self, sourcesDir):
+        dstFile = self._get_dst_file(sourcesDir)
+        shutil.copy(self.path, dstFile)
+
+
 # This is a local extension to SimpleRpmBuild in rpmfluff.  For the
 # SRPM only test classes, override the do_make() function so that
 # rpmbuild only builds the SRPM and not all of the packages.
