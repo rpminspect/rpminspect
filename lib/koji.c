@@ -215,29 +215,17 @@ void free_koji_buildlist(koji_buildlist_t *builds)
         TAILQ_REMOVE(builds, entry, builditems);
 
         free(entry->package_name);
-        entry->package_name = NULL;
         free(entry->owner_name);
-        entry->owner_name = NULL;
         free(entry->nvr);
-        entry->nvr = NULL;
         free(entry->start_time);
-        entry->start_time = NULL;
         free(entry->creation_time);
-        entry->creation_time = NULL;
         free(entry->epoch);
-        entry->epoch = NULL;
         free(entry->completion_time);
-        entry->completion_time = NULL;
         free(entry->tag_name);
-        entry->tag_name = NULL;
         free(entry->version);
-        entry->version = NULL;
         free(entry->release);
-        entry->release = NULL;
         free(entry->volume_name);
-        entry->volume_name = NULL;
         free(entry->name);
-        entry->name = NULL;
 
         free_koji_rpmlist(entry->rpms);
 
