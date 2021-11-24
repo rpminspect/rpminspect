@@ -69,7 +69,11 @@ jobs:
                           ;;
                       centos*|almalinux*|rocky*)
                           yum install -y epel-release
-                          rpm --import /etc/pki/rpm-gpg/*
+
+                          if [ -d /etc/pkg/rpm-gpg ]; then
+                              rpm --import /etc/pki/rpm-gpg/*
+                          fi
+
                           yum install -y git
                           ;;
                       oraclelinux*)
@@ -87,9 +91,6 @@ jobs:
 
                           dnf install -y git
                           ;;
-                      openeuler*)
-                          dnf install -y git
-                          ;;
                       debian*|ubuntu*|alt*)
                           apt-get update
                           apt-get install -y git
@@ -103,7 +104,11 @@ jobs:
                           ;;
                       amazonlinux*)
                           amazon-linux-extras install epel -y
-                          rpm --import /etc/pki/rpm-gpg/*
+
+                          if [ -d /etc/pki/rpm-gpg ]; then
+                              rpm --import /etc/pki/rpm-gpg/*
+                          fi
+
                           yum install -y git
                           ;;
                       mageia*)
@@ -135,7 +140,7 @@ jobs:
                       opensuse*)
                           zypper install -y make
                           ;;
-                      mageia*|oraclelinux*|openeuler*)
+                      mageia*|oraclelinux*)
                           dnf install -y make
                           ;;
                   esac
