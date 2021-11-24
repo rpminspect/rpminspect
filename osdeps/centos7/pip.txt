@@ -1,4 +1,0 @@
-cpp-coveralls
-gcovr
-PyYAML
-timeout-decorator

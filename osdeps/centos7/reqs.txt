@@ -10,6 +10,7 @@ desktop-file-utils
 diffstat
 diffutils
 elfutils-devel
+fedora-packager
 file-devel
 gcc
 gettext
@@ -28,6 +29,7 @@ libcap-devel
 libcurl-devel
 libffi-devel
 libicu-devel
+libtool
 libxml2-devel
 libyaml-devel
 make
@@ -35,9 +37,6 @@ meson
 ninja-build
 openssl-devel
 patchelf
-python36-devel
-python36-pip
-python36-rpm
 rc
 rpm-build
 rpm-devel

@@ -1,21 +1,44 @@
 #!/bin/sh
 PATH=/bin:/usr/bin:/sbin:/usr/sbin
+CWD="$(pwd)"
 
 # Install 32-bit development files on x86_64 systems
 if [ "$(uname -m)" = "x86_64" ]; then
     yum install -y glibc-devel.i686 glibc.i686 libgcc.i686
 fi
 
-# Install rpmfluff-0.5.7.1 manually
-TAG=0.5.7.1
-git clone https://pagure.io/rpmfluff.git
-cd rpmfluff || exit 1
-git checkout -b ${TAG} ${TAG}
-SITE_PACKAGES="$(python3 -c "import sysconfig ; print(sysconfig.get_paths()['purelib'])")"
-install -D -m 0644 rpmfluff.py "${SITE_PACKAGES}"/rpmfluff.py
+# We must install a more recent Python 3 (but exclude 3.10.x)
+cd "${CWD}"
+git clone https://github.com/python/cpython.git
+cd cpython
+TAG="$(git tag -l | grep -E '^v[0-9\.]$' | grep -v 'v3\.10\.' | sort -V | tail -n 1)"
+git checkout -b "${TAG}" "${TAG}"
+./configure --enable-optimizations --disable-static
+make
+make altinstall
+PYTHON_VER="$(./python -c 'import sys ; print("%d.%d" % (sys.version_info[0], sys.version_info[1]))')"
+
+# Now rebuild rpm because we need the Python bindings to use the newer
+# Python.
+cd "${CWD}"
+yumdownloader --source python3-rpm
+SRPM="$(ls -l "${CWD}"/*.rpm)"
+rpmdev-setuptree
+rpm -Uvh "${SRPM}"
+cd "${CWD}"/rpmbuild/SPECS
+sed -i -e 's|^Name:.*$|Name: python3-rpm-rebuild|g' python3-rpm.spec
+yum install -y $(rpmspec -q --buildrequires python3-rpm.spec)
+rpmbuild -ba --define "__python3 /usr/local/bin/python${PYTHON_VER}" python3-rpm.spec
+rpm -Uvh "${CWD}"/rpmbuild/RPMS/$(uname -m)/*.rpm
+
+# Install Python modules for our recent Python.  Have to do this here
+# because post.sh installed the Python we have to use for these tests.
+pip${PYTHON_VER} install --upgrade pip setuptools
+pip${PYTHON_VER} install cpp-coveralls gcovr PyYAML timeout-decorator rpmfluff
 
 # Install the latest mandoc package to /usr/local, the official EPEL-7
-# repos may be dated
+# repos may be dated.
+cd "${CWD}"
 curl -O http://mandoc.bsd.lv/snapshots/mandoc.tar.gz
 SUBDIR="$(tar -tvf mandoc.tar.gz | head -n 1 | rev | cut -d ' ' -f 1 | rev)"
 tar -xvf mandoc.tar.gz
