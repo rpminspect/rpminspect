@@ -167,13 +167,16 @@ jobs:
                           curl -s https://codecov.io/bash | bash
                           ;;
                       centos7)
+                          # Make sure /usr/local is in the PATH
+                          PATH=${PATH}:/usr/local/bin
+
                           # Make sure to use the specific newer Python
                           CWD="$(pwd)"
                           cd /usr/local/bin
                           PYTHON_PROG="$(ls -1 python*.* | grep -v config)"
                           cd "${CWD}"
 
-                          meson setup build --werror -D python_program=${PYTHON_PROG} -D b_buildtype=debug -D b_coverage=true
+                          meson setup build --werror -D python_program="${PYTHON_PROG}" -D b_buildtype=debug -D b_coverage=true
                           ninja -C build -v
                           env LANG=en_US.UTF-8 meson test -C build -v
                           ninja -C build coverage
