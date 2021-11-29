@@ -11,10 +11,10 @@ fi
 cd "${CWD}"
 git clone https://github.com/python/cpython.git
 cd cpython
-TAG="$(git tag -l | grep -E '^v[0-9\.]$' | grep -v 'v3\.10\.' | sort -V | tail -n 1)"
+TAG="$(git tag -l | grep -E '^v[0-9\.]+$' | grep -v 'v3\.10\.' | sort -V | tail -n 1)"
 git checkout -b "${TAG}" "${TAG}"
-./configure --enable-optimizations --disable-static
-make
+./configure
+make -j $(nproc)
 make altinstall
 PYTHON_VER="$(./python -c 'import sys ; print("%d.%d" % (sys.version_info[0], sys.version_info[1]))')"
 
@@ -22,14 +22,14 @@ PYTHON_VER="$(./python -c 'import sys ; print("%d.%d" % (sys.version_info[0], sy
 # Python.
 cd "${CWD}"
 yumdownloader --source python3-rpm
-SRPM="$(ls -l "${CWD}"/*.rpm)"
+SRPM="$(ls -1 "${CWD}"/*.rpm)"
 rpmdev-setuptree
 rpm -Uvh "${SRPM}"
-cd "${CWD}"/rpmbuild/SPECS
+cd ~/rpmbuild/SPECS
 sed -i -e 's|^Name:.*$|Name: python3-rpm-rebuild|g' python3-rpm.spec
 yum install -y $(rpmspec -q --buildrequires python3-rpm.spec)
 rpmbuild -ba --define "__python3 /usr/local/bin/python${PYTHON_VER}" python3-rpm.spec
-rpm -Uvh "${CWD}"/rpmbuild/RPMS/$(uname -m)/*.rpm
+rpm -Uvh ~/rpmbuild/RPMS/$(uname -m)/*.rpm
 
 # Install Python modules for our recent Python.  Have to do this here
 # because post.sh installed the Python we have to use for these tests.
