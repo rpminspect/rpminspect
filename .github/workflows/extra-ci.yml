@@ -168,13 +168,11 @@ jobs:
                           ;;
                       centos7)
                           # Make sure /usr/local is in the PATH
-                          PATH=${PATH}:/usr/local/bin
+                          export PATH=${PATH}:/usr/local/bin
 
                           # Make sure to use the specific newer Python
-                          CWD="$(pwd)"
-                          cd /usr/local/bin
-                          PYTHON_PROG="$(ls -1 python*.* | grep -v config)"
-                          cd "${CWD}"
+                          PYTHON_PROG="$(cd /usr/local/bin ; ls -1 python*.* | grep -v config)"
+                          echo "PYTHON_PROG=|$PYTHON_PROG|"
 
                           meson setup build --werror -D python_program="${PYTHON_PROG}" -D b_buildtype=debug -D b_coverage=true
                           ninja -C build -v
