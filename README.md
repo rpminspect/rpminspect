@@ -299,9 +299,15 @@ module).  For inputs originating from Koji, rpminspect talks to Koji
 and download the build artifacts.  For repeated runs, you may want to
 cache a remote build locally to avoid downloading it with each run.
 
+Remember that you will need the corresponding vendor data package for
+rpminspect in addition to the rpminspect program.  For Fedora, you
+will need to install 'rpminspect-data-fedora'.  You can then invoke
+rpminspect using the 'rpminspect-fedora' script or 'rpminspect -c
+/usr/share/rpminspect/fedora.yaml'.
+
 Here is a simple invocation using tmux as an example:
 
-    $ rpminspect -v tmux-2.9a-2.fc31 tmux-2.9a-3.fc31
+    $ rpminspect-fedora -v tmux-2.9a-2.fc31 tmux-2.9a-3.fc31
 
 This just runs with verbose mode enabled and compares tmux-2.9a-2.fc31
 to tmux-2.9a-3.fc31.  rpminspect downloads the packages for these
@@ -312,31 +318,31 @@ rpminspect tells you where those files are when it finishes.
 
 You can list available inspections with the -l option:
 
-    $ rpminspect -l
+    $ rpminspect-fedora -l
 
 Say you only want to run the license inspection on the builds above:
 
-    $ rpminspect -v -k -T license tmux-2.9a-2.fc31 tmux-2.9a-3.fc31
+    $ rpminspect-fedora -v -k -T license tmux-2.9a-2.fc31 tmux-2.9a-3.fc31
 
 Now let's say you want to run the license and manpage inspections:
 
-    $ rpminspect -v -k -T license,manpage tmux-2.9a-2.fc31 tmux-2.9a-3.fc31
+    $ rpminspect-fedora -v -k -T license,manpage tmux-2.9a-2.fc31 tmux-2.9a-3.fc31
 
 And lastly, what if you want to run *all* inspections except the license
 one:
 
-    $ rpminspect -v -k -E license tmux-2.9a-2.fc31 tmux-2.9a-3.fc31
+    $ rpminspect-fedora -v -k -E license tmux-2.9a-2.fc31 tmux-2.9a-3.fc31
 
 What about specify a locally cached build?  First, let's start by caching
 the builds we have been using:
 
     $ mkdir ~/builds
-    $ rpminspect -v -w ~/builds -f tmux-2.9a-2.fc31
-    $ rpminspect -v -w ~/builds -f tmux-2.9a-3.fc31
+    $ rpminspect-fedora -v -w ~/builds -f tmux-2.9a-2.fc31
+    $ rpminspect-fedora -v -w ~/builds -f tmux-2.9a-3.fc31
 
 Now let's run all the inspections but specify the locally cached builds:
 
-    $ rpminspect -v ~/builds/tmux-2.9a-2.fc31 ~/builds/tmux-2.9a-3.fc31
+    $ rpminspect-fedora -v ~/builds/tmux-2.9a-2.fc31 ~/builds/tmux-2.9a-3.fc31
 
 Easy.  Again, these locally cached builds must look like what rpminspect
 would download from koji.  Hence using rpminspect first to download it.
@@ -344,12 +350,12 @@ would download from koji.  Hence using rpminspect first to download it.
 rpminspect can also run inspections on local RPM packages.  Similar to Koji
 inputs, you may specify a single RPM or two RPMs to compare.  For example:
 
-    $ rpminspect -v ~/rpmbuild/RPMS/x86_64/tmux-2.9a-2.fc31.x86_64.rpm
+    $ rpminspect-fedora -v ~/rpmbuild/RPMS/x86_64/tmux-2.9a-2.fc31.x86_64.rpm
 
 Or:
 
     $ cd ~/rpmbuild/RPMS/x86_64
-    $ rpminspect -v tmux-2.9a-2.fc31.x86_64.rpm tmux-2.9a-3.fc31.x86_64.rpm
+    $ rpminspect-fedora -v tmux-2.9a-2.fc31.x86_64.rpm tmux-2.9a-3.fc31.x86_64.rpm
 
 All of the other command-line options that apply to Koji tests work for
 local RPM packages.
