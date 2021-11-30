@@ -166,7 +166,7 @@ jobs:
                           sudo -u tester ninja -C build coverage
                           curl -s https://codecov.io/bash | bash
                           ;;
-                      centos7)
+                      *centos7)
                           # Make sure /usr/local is in the PATH
                           export PATH=${PATH}:/usr/local/bin
 
