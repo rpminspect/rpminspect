@@ -17,6 +17,7 @@
 #
 
 from baseclass import (
+    VENDOR,
     TestSRPM,
     TestRPMs,
     TestKoji,
@@ -30,7 +31,7 @@ from baseclass import (
 class ValidVendorSRPM(TestSRPM):
     def setUp(self):
         TestSRPM.setUp(self)
-        self.rpm.addVendor("Vendorco Ltd.")
+        self.rpm.addVendor(VENDOR)
         self.inspection = "metadata"
         self.result = "OK"
 
@@ -39,7 +40,7 @@ class ValidVendorSRPM(TestSRPM):
 class ValidVendorRPMs(TestRPMs):
     def setUp(self):
         TestRPMs.setUp(self)
-        self.rpm.addVendor("Vendorco Ltd.")
+        self.rpm.addVendor(VENDOR)
         self.inspection = "metadata"
         self.result = "OK"
 
@@ -48,7 +49,7 @@ class ValidVendorRPMs(TestRPMs):
 class ValidVendorKojiBuild(TestKoji):
     def setUp(self):
         TestKoji.setUp(self)
-        self.rpm.addVendor("Vendorco Ltd.")
+        self.rpm.addVendor(VENDOR)
         self.inspection = "metadata"
         self.result = "OK"
 
@@ -84,7 +85,7 @@ class InvalidVendorKojiBuild(TestKoji):
 class GainingVendorCompareSRPM(TestCompareSRPM):
     def setUp(self):
         TestCompareSRPM.setUp(self)
-        self.after_rpm.addVendor("Vendorco Ltd.")
+        self.after_rpm.addVendor(VENDOR)
         self.inspection = "metadata"
         self.result = "VERIFY"
         self.waiver_auth = "Anyone"
@@ -94,7 +95,7 @@ class GainingVendorCompareSRPM(TestCompareSRPM):
 class GainingVendorCompareRPMs(TestCompareRPMs):
     def setUp(self):
         TestCompareRPMs.setUp(self)
-        self.after_rpm.addVendor("Vendorco Ltd.")
+        self.after_rpm.addVendor(VENDOR)
         self.inspection = "metadata"
         self.result = "VERIFY"
         self.waiver_auth = "Anyone"
@@ -104,7 +105,7 @@ class GainingVendorCompareRPMs(TestCompareRPMs):
 class GainingVendorCompareKojiBuild(TestCompareKoji):
     def setUp(self):
         TestCompareKoji.setUp(self)
-        self.after_rpm.addVendor("Vendorco Ltd.")
+        self.after_rpm.addVendor(VENDOR)
         self.inspection = "metadata"
         self.result = "VERIFY"
         self.waiver_auth = "Anyone"
@@ -114,7 +115,7 @@ class GainingVendorCompareKojiBuild(TestCompareKoji):
 class LosingVendorCompareSRPM(TestCompareSRPM):
     def setUp(self):
         TestCompareSRPM.setUp(self)
-        self.before_rpm.addVendor("Vendorco Ltd.")
+        self.before_rpm.addVendor(VENDOR)
         self.inspection = "metadata"
         self.waiver_auth = "Anyone"
         self.result = "VERIFY"
@@ -125,7 +126,7 @@ class LosingVendorCompareSRPM(TestCompareSRPM):
 class LosingVendorCompareRPMs(TestCompareRPMs):
     def setUp(self):
         TestCompareRPMs.setUp(self)
-        self.before_rpm.addVendor("Vendorco Ltd.")
+        self.before_rpm.addVendor(VENDOR)
         self.inspection = "metadata"
         self.waiver_auth = "Anyone"
         self.result = "VERIFY"
@@ -136,7 +137,7 @@ class LosingVendorCompareRPMs(TestCompareRPMs):
 class LosingVendorCompareKojiBuild(TestCompareKoji):
     def setUp(self):
         TestCompareKoji.setUp(self)
-        self.before_rpm.addVendor("Vendorco Ltd.")
+        self.before_rpm.addVendor(VENDOR)
         self.inspection = "metadata"
         self.waiver_auth = "Anyone"
         self.result = "VERIFY"
@@ -147,7 +148,7 @@ class ChangingVendorCompareSRPM(TestCompareSRPM):
     def setUp(self):
         TestCompareSRPM.setUp(self)
         self.before_rpm.addVendor("Amalgamated Amalgamations LLC")
-        self.after_rpm.addVendor("Vendorco Ltd.")
+        self.after_rpm.addVendor(VENDOR)
         self.inspection = "metadata"
         self.waiver_auth = "Anyone"
         self.result = "VERIFY"
@@ -159,7 +160,7 @@ class ChangingVendorCompareRPMs(TestCompareRPMs):
     def setUp(self):
         TestCompareRPMs.setUp(self)
         self.before_rpm.addVendor("Amalgamated Amalgamations LLC")
-        self.after_rpm.addVendor("Vendorco Ltd.")
+        self.after_rpm.addVendor(VENDOR)
         self.inspection = "metadata"
         self.result = "VERIFY"
         self.waiver_auth = "Anyone"
@@ -170,7 +171,7 @@ class LosingVendorCompareKojiBeforeAfterBuild(TestCompareKoji):
     def setUp(self):
         TestCompareKoji.setUp(self)
         self.before_rpm.addVendor("Amalgamated Amalgamations LLC")
-        self.after_rpm.addVendor("Vendorco Ltd.")
+        self.after_rpm.addVendor(VENDOR)
         self.inspection = "metadata"
         self.result = "VERIFY"
         self.waiver_auth = "Anyone"
@@ -181,7 +182,7 @@ class InvalidBuildhostSubdomainSRPM(TestSRPM):
     def setUp(self):
         TestSRPM.setUp(self)
         self.buildhost_subdomain = ".totallylegitbuilder.com"
-        self.rpm.addVendor("Vendorco Ltd.")
+        self.rpm.addVendor(VENDOR)
         self.inspection = "metadata"
         self.result = "BAD"
 
@@ -191,7 +192,7 @@ class InvalidBuildhostSubdomainRPMs(TestRPMs):
     def setUp(self):
         TestRPMs.setUp(self)
         self.buildhost_subdomain = ".totallylegitbuilder.com"
-        self.rpm.addVendor("Vendorco Ltd.")
+        self.rpm.addVendor(VENDOR)
         self.inspection = "metadata"
         self.result = "BAD"
 
@@ -201,7 +202,7 @@ class InvalidBuildhostSubdomainKojiBuild(TestKoji):
     def setUp(self):
         TestKoji.setUp(self)
         self.buildhost_subdomain = ".totallylegitbuilder.com"
-        self.rpm.addVendor("Vendorco Ltd.")
+        self.rpm.addVendor(VENDOR)
         self.inspection = "metadata"
         self.result = "BAD"
 
