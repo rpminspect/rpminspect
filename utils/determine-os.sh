@@ -69,7 +69,7 @@ elif [ -r /etc/oracle-release ] && [ "${ID}" = "ol" ]; then
     fi
 else
     case "${ID}" in
-        opensuse-leap|opensuse-tumbleweed|ubuntu|debian|slackware|arch|gentoo|alpine|mageia)
+        opensuse-leap|opensuse-tumbleweed|ubuntu|debian|slackware|arch|gentoo|alpine|mageia|freebsd)
             echo "${ID}"
             ;;
         amzn)

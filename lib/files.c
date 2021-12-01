@@ -40,7 +40,10 @@
 #include <sys/types.h>
 #include <unistd.h>
 #include <libgen.h>
+
+#ifdef _WITH_LIBCAP
 #include <sys/capability.h>
+#endif
 
 #include <rpm/header.h>
 #include <rpm/rpmtd.h>
@@ -289,7 +292,9 @@ rpmfile_t *extract_rpm(const char *pkg, Header hdr, char **output_dir)
         file_entry->flags = get_rpmtag_fileflags(hdr, file_entry->idx);
         file_entry->type = NULL;
         file_entry->checksum = NULL;
+#ifdef _WITH_LIBCAP
         file_entry->cap = NULL;
+#endif
 
         TAILQ_INSERT_TAIL(file_list, file_entry, items);
 

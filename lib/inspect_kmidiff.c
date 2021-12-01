@@ -27,6 +27,7 @@
 #include <unistd.h>
 #include <err.h>
 #include <limits.h>
+#include <libgen.h>
 #include <rpm/header.h>
 #include <rpm/rpmtag.h>
 #include "queue.h"

@@ -27,7 +27,10 @@
 #include <errno.h>
 #include <assert.h>
 #include <err.h>
+
+#ifdef _WITH_LIBCAP
 #include <sys/capability.h>
+#endif
 
 #include "rpminspect.h"
 

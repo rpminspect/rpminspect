@@ -27,11 +27,18 @@
 #include <stdint.h>
 #include <stdbool.h>
 #include <sys/stat.h>
-#include <sys/capability.h>
 #include <rpm/rpmlib.h>
 #include <rpm/rpmfi.h>
-#include <libkmod.h>
 #include <unicode/utypes.h>
+
+#ifdef _WITH_LIBKMOD
+#include <libkmod.h>
+#endif
+
+#ifdef _WITH_LIBCAP
+#include <sys/capability.h>
+#endif
+
 #include "secrules.h"
 #include "queue.h"
 #include "uthash.h"
@@ -111,7 +118,9 @@ typedef struct _rpmfile_entry_t {
     int idx;
     char *type;
     char *checksum;
+#ifdef _WITH_LIBCAP
     cap_t cap;
+#endif
     rpmfileAttrs flags;
     struct _rpmfile_entry_t *peer_file;
     bool moved_path;
@@ -823,6 +832,8 @@ typedef enum _filetype_t {
 } filetype_t;
 
 /* Kernel module handling */
+#ifdef _WITH_LIBKMOD
+
 typedef void (*modinfo_to_entries)(string_list_t *, const struct kmod_list *);
 typedef void (*module_alias_callback)(const char *, const string_list_t *, const string_list_t *, void *);
 
@@ -832,6 +843,8 @@ typedef struct _kernel_alias_data_t {
     string_list_t *modules;
     UT_hash_handle hh;
 } kernel_alias_data_t;
+
+#endif
 
 /* Types of workdirs */
 typedef enum _workdir_t {

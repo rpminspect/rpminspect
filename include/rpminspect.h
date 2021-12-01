@@ -25,10 +25,13 @@
 
 #include <stdbool.h>
 #include <sys/types.h>
-#include <sys/capability.h>
 #include <signal.h>
 #include <regex.h>
 #include <rpm/header.h>
+
+#ifdef _WITH_LIBCAP
+#include <sys/capability.h>
+#endif
 
 #include "constants.h"
 #include "types.h"
@@ -175,12 +178,14 @@ string_list_t *get_all_arches(const struct rpminspect *);
 bool allowed_arch(const struct rpminspect *, const char *);
 
 /* kmods.c */
+#ifdef _WITH_LIBKMOD
 bool compare_module_parameters(const struct kmod_list *, const struct kmod_list *, string_list_t **, string_list_t **);
 bool compare_module_dependencies(const struct kmod_list *, const struct kmod_list *, string_list_t **, string_list_t **);
 kernel_alias_data_t *gather_module_aliases(const char *module_name, const struct kmod_list *modinfo_list);
 void free_module_aliases(kernel_alias_data_t *);
 bool compare_module_aliases(kernel_alias_data_t *, kernel_alias_data_t *, module_alias_callback, void *);
 string_list_t *get_kmod_values(const char *, const char *);
+#endif
 
 /* mkdirp.c */
 int mkdirp(const char *, mode_t);

@@ -9,6 +9,16 @@ option('python_program',
        description : ' The basename of the Python 3 executable the build system should use')
 
 option('nls',
-       type: 'boolean',
-       value: true,
+       type : 'boolean',
+       value : true,
        description : 'Enable native language support (translations)')
+
+option('with_libkmod',
+       type : 'boolean',
+       value : true,
+       description : 'Enable libkmod support for Linux kernel modules.  Disabling libkmod support will also disable kmod related inspections.')
+
+option('with_libcap',
+       type : 'boolean',
+       value : true,
+       description : 'Enable Linux capability(7) support using libcap.  Disabling libcap support will also disable capability(7)-related inspections.')

@@ -31,6 +31,7 @@
 #include <stdbool.h>
 #include <ctype.h>
 #include <assert.h>
+#include <libgen.h>
 #include <ftw.h>
 #include <sys/types.h>
 #include <sys/stat.h>
@@ -803,7 +804,8 @@ static int download_rpm(const char *rpm)
     assert(rpm != NULL);
 
     /* the RPM filename */
-    pkg = basename(rpm);
+    pkg = strdup(rpm);
+    assert(pkg != NULL);
 
     /* create the destination directory */
     if (fetch_only) {
@@ -818,13 +820,14 @@ static int download_rpm(const char *rpm)
     }
 
     /* download the package */
-    xasprintf(&dst, "%s/%s", dstdir, pkg);
+    xasprintf(&dst, "%s/%s", dstdir, basename(pkg));
     curl_helper(workri->verbose, rpm, dst);
 
     /* gather the RPM header */
     get_rpm_info(dst);
 
     /* clean up */
+    free(pkg);
     free(dst);
     free(dstdir);
 

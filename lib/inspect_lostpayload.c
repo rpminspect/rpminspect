@@ -30,6 +30,7 @@
 #include <stdbool.h>
 #include <string.h>
 #include <assert.h>
+#include <libgen.h>
 #include "rpminspect.h"
 
 /**
@@ -41,7 +42,8 @@
  *
  * @param ri Pointer to the struct rpminspect for the program.
  */
-bool inspect_lostpayload(struct rpminspect *ri) {
+bool inspect_lostpayload(struct rpminspect *ri)
+{
     bool good = true;
     bool messaged = false;
     rpmpeer_entry_t *peer = NULL;

@@ -21,16 +21,27 @@ if find_program('xgettext', required : get_option('nls')).found()
     subdir('po')
 endif
 
+# Library search dirs
+search_dirs = [ '/usr/lib', '/usr/lib64', '/usr/local/lib' ]
+
 # Dependencies that use pkg-config
 jsonc = dependency('json-c', required : true)
 libxml = dependency('libxml-2.0', required : true)
-libkmod = dependency('libkmod', required : true)
 libcurl = dependency('libcurl', required : true)
 zlib = dependency('zlib', required : true)
 yaml = dependency('yaml-0.1', required : true)
 clamav = dependency('libclamav', required : true)
 icu_uc = dependency('icu-uc', required : true)
 icu_io = dependency('icu-io', required : true)
+
+# libkmod
+if get_option('with_libkmod')
+    libkmod = dependency('libkmod', required : true)
+    add_project_arguments('-D_WITH_LIBKMOD', language : 'c')
+else
+    message('disabling Linux kernel module support (libkmod)')
+    libkmod = disabler()
+endif
 
 # If we're on an older API, note that for the build
 rpm = dependency('rpm', required : true)
@@ -39,10 +50,16 @@ if rpm.version().version_compare('<4.15.0')
 endif
 
 # librpmbuild
-if not cc.has_function('rpmSpecParse', args : ['-lrpmbuild'])
-    error('*** unable to find rpmSpecParse() in librpmbuild')
+rpmbuild = cc.find_library('rpmbuild', dirs : search_dirs, required : true)
+
+if rpmbuild.found()
+    message('found librpmbuild')
+
+    if not cc.has_function('rpmSpecParse', dependencies : [ rpmbuild ])
+        error('*** unable to find rpmSpecParse() in librpmbuild')
+    endif
 else
-    rpmbuild = declare_dependency(link_args : ['-lrpmbuild'])
+    error('*** unable to find librpmbuild')
 endif
 
 # libarchive (need to check for specific functions)
@@ -117,7 +134,7 @@ endif
 
 # libmandoc (favor static one over shared one)
 mandoc = cc.find_library('mandoc',
-                         dirs : [ '/usr/lib', '/usr/lib64', '/usr/local/lib' ],
+                         dirs : search_dirs,
                          required : false,
                          static : true)
 
@@ -125,7 +142,7 @@ if mandoc.found()
     message('found static libmandoc')
 else
     mandoc = cc.find_library('mandoc',
-                             dirs : [ '/usr/lib', '/usr/lib64', '/usr/local/lib' ],
+                             dirs : search_dirs,
                              required : false,
                              static : false)
 
@@ -163,14 +180,21 @@ endif
 magic = declare_dependency(link_args : ['-lmagic'])
 
 # libcap
-libcap = dependency('libcap', method : 'pkg-config', required : false)
+if get_option('with_libcap')
+    libcap = dependency('libcap', method : 'pkg-config', required : false)
 
-if not libcap.found() and cc.has_function('cap_to_text', args : ['-lcap'])
-    libcap = declare_dependency(link_args : ['-lcap'])
-endif
+    if not libcap.found() and cc.has_function('cap_to_text', args : ['-lcap'])
+        libcap = declare_dependency(link_args : ['-lcap'])
+    endif
 
-if not libcap.found()
-    error('*** unable to find libcap')
+    if not libcap.found()
+        error('*** unable to find libcap')
+    endif
+
+    add_project_arguments('-D_WITH_LIBCAP', language : 'c')
+else
+    message('disabling Linux capability(7) support (libcap)')
+    libcap = disabler()
 endif
 
 # dlopen

@@ -40,7 +40,10 @@
 #include <stdbool.h>
 #include <stdint.h>
 #include <libelf.h>
+
+#ifdef _WITH_LIBKMOD
 #include <libkmod.h>
+#endif
 
 #include "types.h"
 
@@ -323,7 +326,9 @@ bool inspect_permissions(struct rpminspect *ri);
  *
  * @param ri Pointer to the struct rpminspect for the program.
  */
+#ifdef _WITH_LIBCAP
 bool inspect_capabilities(struct rpminspect *ri);
+#endif
 
 /**
  * @brief
@@ -332,7 +337,9 @@ bool inspect_capabilities(struct rpminspect *ri);
  *
  * @param ri Pointer to the struct rpminspect for the program.
  */
+#ifdef _WITH_LIBKMOD
 bool inspect_kmod(struct rpminspect *ri);
+#endif
 
 /**
  * @brief
@@ -550,8 +557,12 @@ bool inspect_unicode(struct rpminspect *ri);
 #define INSPECT_DSODEPS                     (((uint64_t) 1) << 20)
 #define INSPECT_FILESIZE                    (((uint64_t) 1) << 21)
 #define INSPECT_PERMISSIONS                 (((uint64_t) 1) << 22)
+#ifdef _WITH_LIBCAP
 #define INSPECT_CAPABILITIES                (((uint64_t) 1) << 23)
+#endif
+#ifdef _WITH_LIBKMOD
 #define INSPECT_KMOD                        (((uint64_t) 1) << 24)
+#endif
 #define INSPECT_ARCH                        (((uint64_t) 1) << 25)
 #define INSPECT_SUBPACKAGES                 (((uint64_t) 1) << 26)
 #define INSPECT_CHANGELOG                   (((uint64_t) 1) << 27)
@@ -595,8 +606,12 @@ bool inspect_unicode(struct rpminspect *ri);
 #define NAME_DSODEPS                        "dsodeps"
 #define NAME_FILESIZE                       "filesize"
 #define NAME_PERMISSIONS                    "permissions"
+#ifdef _WITH_LIBCAP
 #define NAME_CAPABILITIES                   "capabilities"
+#endif
+#ifdef _WITH_LIBKMOD
 #define NAME_KMOD                           "kmod"
+#endif
 #define NAME_ARCH                           "arch"
 #define NAME_SUBPACKAGES                    "subpackages"
 #define NAME_CHANGELOG                      "changelog"
@@ -667,9 +682,13 @@ bool inspect_unicode(struct rpminspect *ri);
 
 #define DESC_PERMISSIONS _("Report stat(2) mode changes between builds.  Checks against the fileinfo list for the product release specified or determined.  Any setuid or setgid changes will raise a message requiring Security Team review.")
 
+#ifdef _WITH_LIBCAP
 #define DESC_CAPABILITIES _("Report capabilities(7) changes between builds.  Checks against the capabilities list for the product release specified or determined.  Any capabilities changes not listed will raise a message requiring Security Team review.")
+#endif
 
+#ifdef _WITH_LIBKMOD
 #define DESC_KMOD _("Report kernel module parameter, dependency, PCI ID, or symbol differences between builds.  Added and removed parameters are reported and if the package version is unchanged, these messages are reported as failures.  The same is true module dependencies, PCI IDs, and symbols.")
+#endif
 
 #define DESC_ARCH _("Report RPM architectures that appear and disappear between the before and after builds.  This inspection does not report the loss of noarch packages.  The purpose of this inspection is to report the loss of target machine architectures as provided in the before build and not seeing them in the after build.")
 

@@ -35,7 +35,6 @@ librpminspect_sources = [
     'inspect_annocheck.c',
     'inspect_arch.c',
     'inspect_badfuncs.c',
-    'inspect_capabilities.c',
     'inspect_changedfiles.c',
     'inspect_changelog.c',
     'inspect_config.c',
@@ -49,7 +48,6 @@ librpminspect_sources = [
     'inspect_filesize.c',
     'inspect_javabytecode.c',
     'inspect_kmidiff.c',
-    'inspect_kmod.c',
     'inspect_license.c',
     'inspect_lostpayload.c',
     'inspect_lto.c',
@@ -74,7 +72,6 @@ librpminspect_sources = [
     'inspect_virus.c',
     'inspect_xml.c',
     'koji.c',
-    'kmods.c',
     'listfuncs.c',
     'local.c',
     'macros.c',
@@ -102,33 +99,44 @@ librpminspect_sources = [
     'uncompress.c',
     'unpack.c',
 ]
+
+deps = [
+    inspect_elf_bits_dep,
+    jsonc,
+    xmlrpc,
+    xmlrpc_client,
+    libxml,
+    rpm,
+    rpmbuild,
+    libarchive,
+    libelf,
+    libcurl,
+    zlib,
+    yaml,
+    openssl,
+    mandoc,
+    magic,
+    clamav,
+    dl,
+    icu_uc,
+    icu_io,
+]
+
+if get_option('with_libkmod')
+    librpminspect_sources += [ 'inspect_kmod.c', 'kmods.c' ]
+    deps += [ libkmod ]
+endif
+
+if get_option('with_libcap')
+    librpminspect_sources += [ 'inspect_capabilities.c' ]
+    deps += [ libcap ]
+endif
+
 librpminspect = library(
     'rpminspect',
     librpminspect_sources,
     include_directories : inc,
     version : '0.5.0',
     install : true,
-    dependencies : [
-        inspect_elf_bits_dep,
-        jsonc,
-        xmlrpc,
-        xmlrpc_client,
-        libxml,
-        rpm,
-        rpmbuild,
-        libarchive,
-        libelf,
-        libkmod,
-        libcurl,
-        zlib,
-        yaml,
-        openssl,
-        libcap,
-        mandoc,
-        magic,
-        clamav,
-        dl,
-        icu_uc,
-        icu_io,
-    ]
+    dependencies : deps
 )

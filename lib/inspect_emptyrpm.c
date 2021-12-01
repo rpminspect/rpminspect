@@ -30,6 +30,7 @@
 #include <stdbool.h>
 #include <string.h>
 #include <assert.h>
+#include <libgen.h>
 #include "rpminspect.h"
 
 static bool payload_only_ghosts(Header h)

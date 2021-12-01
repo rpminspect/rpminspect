@@ -24,6 +24,7 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <unistd.h>
+#include <fcntl.h>
 #include <string.h>
 #include <errno.h>
 #include <err.h>
@@ -92,6 +93,7 @@ static char *run_and_capture(const char *where, char **output, char *cmd, const 
  */
 static bool changedfiles_driver(struct rpminspect *ri, rpmfile_entry_t *file)
 {
+    int flags = O_RDONLY | O_CLOEXEC;
     const char *arch = NULL;
     char *type = NULL;
     char *before_sum = NULL;
@@ -117,6 +119,10 @@ static bool changedfiles_driver(struct rpminspect *ri, rpmfile_entry_t *file)
 
     assert(ri != NULL);
     assert(file != NULL);
+
+#ifdef O_LARGEFILE
+    flags |= O_LARGEFILE;
+#endif
 
     /* Skip source packages */
     if (headerIsSource(file->rpm_header)) {
@@ -192,7 +198,7 @@ static bool changedfiles_driver(struct rpminspect *ri, rpmfile_entry_t *file)
     /* Skip Python bytecode files (these always change) */
     if (!strcmp(type, "application/octet-stream") && (strsuffix(file->fullpath, PYTHON_PYC_FILE_EXTENSION) || strsuffix(file->fullpath, PYTHON_PYO_FILE_EXTENSION))) {
         /* Double check that this is a Python bytecode file */
-        fd = open(file->fullpath, O_RDONLY | O_CLOEXEC | O_LARGEFILE);
+        fd = open(file->fullpath, flags);
 
         if (fd == -1) {
             warn("open");
