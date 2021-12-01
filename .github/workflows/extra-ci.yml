@@ -151,6 +151,9 @@ jobs:
                   # Build the software and run the test suite
                   case "${{ matrix.container }}" in
                       alt*)
+                          # Strike default ALT Linux macros in rpmbuild
+                          find /usr/lib/rpm -type f | xargs sed -i -e '/^%vendor/d'
+
                           # Set the build up to run as a non-root user for Alt Linux
                           SRC="$(pwd)"
                           HME="/home/tester"

@@ -37,11 +37,8 @@ AFTER_VER = "0.1"
 AFTER_REBASE_VER = "47.0"
 AFTER_REL = "2"
 
-# Handle the package Vendor differently on ALT Linux
-if os.path.isfile("/etc/altlinux-release") or os.path.isfile("/etc/alt-release"):
-    VENDOR = "ALT Linux Team"
-else:
-    VENDOR = "rpminspect Test Vendor Ltd."
+# Test suite Vendor name
+VENDOR = "rpminspect Test Vendor Ltd."
 
 # Set this to True to keep rpminspect results (useful to debug the test
 # suite but will make a big mess)
