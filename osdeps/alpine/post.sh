@@ -2,7 +2,7 @@
 PATH=/bin:/usr/bin:/sbin:/usr/sbin
 CWD="$(pwd)"
 
-# There mandoc package in Alpine Linux lacks the library
+# The mandoc package in Alpine Linux lacks the library
 curl -O https://mandoc.bsd.lv/snapshots/mandoc.tar.gz
 SUBDIR="$(tar -tvf mandoc.tar.gz | head -n 1 | rev | cut -d ' ' -f 1 | rev)"
 tar -xvf mandoc.tar.gz
