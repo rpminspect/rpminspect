@@ -294,8 +294,8 @@ xml:
 
     # Regular expression (man 7 regex) matching directories to ignore
     # during the xml inspection. Skip JSP and RHTML files, which
-    # contain a mix of XML and code.
-    exclude_path: .*(\.jsp|\.rhtml)$
+    # contain a mix of XML and code.  Also skip HTML files.
+    exclude_path: .*(\.jsp|\.rhtml|\.html)$
 
     # Optional list of glob(7) specifications to match files to ignore
     # for this inspection.  The format of this list is the same as the
