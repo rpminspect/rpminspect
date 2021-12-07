@@ -85,7 +85,7 @@ static char *run_and_capture(const char *where, char **output, char *cmd, const 
     }
 
     /* Run command and return output */
-    return run_cmd(exitcode, NULL, cmd, fullpath, ">", *output, NULL);
+    return run_cmd(exitcode, NULL, cmd, "-o", *output, fullpath, NULL);
 }
 
 /*
