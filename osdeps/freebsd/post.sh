@@ -1,6 +1,5 @@
 #!/bin/sh
 PATH=/bin:/usr/bin:/sbin:/usr/sbin:/usr/local/bin:/usr/local/sbin
-CWD="$(pwd)"
 
 # libmandoc is missing on FreeBSD
 curl -O https://mandoc.bsd.lv/snapshots/mandoc.tar.gz
