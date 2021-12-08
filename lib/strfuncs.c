@@ -156,10 +156,12 @@ int printwrap(const char *s, const size_t width, const unsigned int indent, FILE
 
     /* print the last word */
     lw = printword(word, width, indent, lw, first, dest);
+
     if (lw < lastlw) {
         lines++;
     }
 
+    fprintf(dest, "\n");
     free(start);
     return lines;
 }
