@@ -785,3 +785,42 @@ unicode:
     # here will only be used during this inspection.
     #ignore:
     #    - /usr/lib*/libexample.so*
+
+rpmdeps:
+    # Optional list of regular expressions to match against
+    # requirement names to ignore.  For example, a dependency of the
+    # form:
+    #
+    #     Requires: libdl.so.2()(64bit)
+    #
+    # Can be ignored with the following regular expression:
+    #
+    #ignore:
+    #    requires: ^libdl\.so.*\(\)\(.*\)$
+    #
+    # The rpmdeps inspection already ignores any dependency
+    # requirement names that match the following (for any type):
+    #
+    #     ^debuginfo\(build\-id\)$
+    #     .*\-debugsource
+    #     .*\-debuginfo
+    #     ^rpmlib\(.*\)$
+    #     ^rtld\(.*\)$
+    #
+    # The regular expression is listed under the block 'requires'
+    # under the block 'ignore' indicating this regular expression
+    # should match only requirement names for Requires dependency
+    # types.  The following types are available:
+    #
+    #    requires
+    #    provides
+    #    conflicts
+    #    obsoletes
+    #    enhances
+    #    recommends
+    #    suggests
+    #    supplements
+    #
+    # Only one regexp can be expressed for each dependency type.
+    # Additional listings will overwrite previous definitions in the
+    # runtime configuration.

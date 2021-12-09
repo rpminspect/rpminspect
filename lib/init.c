@@ -130,7 +130,8 @@ enum {
     BLOCK_UNICODE,
     BLOCK_UNICODE_EXCLUDE,
     BLOCK_UNICODE_EXCLUDED_MIME_TYPES,
-    BLOCK_UNICODE_FORBIDDEN_CODEPOINTS
+    BLOCK_UNICODE_FORBIDDEN_CODEPOINTS,
+    BLOCK_RPMDEPS
 };
 
 static int add_regex(const char *pattern, regex_t **regex_out)
@@ -262,6 +263,8 @@ static void add_ignore(string_list_map_t **table, int i, char *s)
         inspection = NAME_TYPES;
     } else if (i == BLOCK_UNICODE) {
         inspection = NAME_UNICODE;
+    } else if (i == BLOCK_RPMDEPS) {
+        inspection = NAME_RPMDEPS;
     } else {
         warnx(_("*** ignore found in %d, value `%s'"), i, s);
         return;
@@ -497,6 +500,8 @@ static int read_cfgfile(struct rpminspect *ri, const char *filename)
     char *key = NULL;
     char *t = NULL;
     bool exclude = false;
+    dep_type_t depkey = TYPE_NULL;
+    deprule_ignore_map_t *drentry = NULL;
 
     assert(ri != NULL);
     assert(filename != NULL);
@@ -640,7 +645,8 @@ static int read_cfgfile(struct rpminspect *ri, const char *filename)
                                                           group != BLOCK_BADFUNCS &&
                                                           group != BLOCK_RUNPATH &&
                                                           group != BLOCK_TYPES &&
-                                                          group != BLOCK_UNICODE)) {
+                                                          group != BLOCK_UNICODE &&
+                                                          group != BLOCK_RPMDEPS)) {
                         block = BLOCK_IGNORE;
                         group = BLOCK_NULL;
                     } else if (!strcmp(key, "macrofiles")) {
@@ -744,6 +750,9 @@ static int read_cfgfile(struct rpminspect *ri, const char *filename)
                     } else if (!strcmp(key, NAME_UNICODE)) {
                         block = BLOCK_NULL;
                         group = BLOCK_UNICODE;
+                    } else if (!strcmp(key, NAME_RPMDEPS)) {
+                        block = BLOCK_NULL;
+                        group = BLOCK_RPMDEPS;
                     }
                 }
 
@@ -917,6 +926,10 @@ static int read_cfgfile(struct rpminspect *ri, const char *filename)
                             list_free(ri->unicode_forbidden_codepoints, free);
                             ri->unicode_forbidden_codepoints = NULL;
                         } else if (!strcmp(key, "ignore")) {
+                            block = BLOCK_IGNORE;
+                        }
+                    } else if (group == BLOCK_RPMDEPS) {
+                        if (!strcmp(key, "ignore")) {
                             block = BLOCK_IGNORE;
                         }
                     }
@@ -1177,6 +1190,64 @@ static int read_cfgfile(struct rpminspect *ri, const char *filename)
                     } else if (group == BLOCK_UNICODE && block == BLOCK_UNICODE_EXCLUDE) {
                         if (add_regex(t, &ri->unicode_exclude) != 0) {
                             warn(_("error reading unicode exclude regular expression"));
+                        }
+                    } else if (group == BLOCK_RPMDEPS && block == BLOCK_IGNORE) {
+                        /* determine dependency type first */
+                        depkey = TYPE_NULL;
+
+                        if (!strcmp(key, "requires")) {
+                            depkey = TYPE_REQUIRES;
+                        } else if (!strcmp(key, "provides")) {
+                            depkey = TYPE_PROVIDES;
+                        } else if (!strcmp(key, "conflicts")) {
+                            depkey = TYPE_CONFLICTS;
+                        } else if (!strcmp(key, "obsoletes")) {
+                            depkey = TYPE_OBSOLETES;
+                        } else if (!strcmp(key, "enhances")) {
+                            depkey = TYPE_ENHANCES;
+                        } else if (!strcmp(key, "recommends")) {
+                            depkey = TYPE_RECOMMENDS;
+                        } else if (!strcmp(key, "suggests")) {
+                            depkey = TYPE_SUGGESTS;
+                        } else if (!strcmp(key, "supplements")) {
+                            depkey = TYPE_SUPPLEMENTS;
+                        }
+
+                        /* look up valid dependency type */
+                        if (depkey != TYPE_NULL) {
+                            HASH_FIND_INT(ri->deprules_ignore, &depkey, drentry);
+                        }
+
+                        /* overwrite existing entry, otherwise create new one */
+                        if (drentry == NULL) {
+                            drentry = calloc(1, sizeof(*drentry));
+                            assert(drentry != NULL);
+                            drentry->type = depkey;
+
+                            if (debug_mode) {
+                                drentry->pattern = strdup(t);
+                            }
+
+                            if (add_regex(t, &drentry->ignore) != 0) {
+                                warn(_("error reading %s ignore pattern"), get_deprule_desc(depkey));
+                            }
+
+                            HASH_ADD_INT(ri->deprules_ignore, type, drentry);
+                        } else {
+                            free(drentry->pattern);
+                            drentry->pattern = NULL;
+                            drentry->type = depkey;
+
+                            if (debug_mode) {
+                                drentry->pattern = strdup(t);
+                            }
+
+                            regfree(drentry->ignore);
+                            drentry->ignore = NULL;
+
+                            if (add_regex(t, &drentry->ignore) != 0) {
+                                warn(_("error reading %s ignore pattern"), get_deprule_desc(depkey));
+                            }
                         }
                     }
                 } else if (symbol == SYMBOL_ENTRY) {
