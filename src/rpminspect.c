@@ -666,6 +666,7 @@ int main(int argc, char **argv)
 
         /* get a list of valid architectures */
         valid_arches = get_all_arches(ri);
+        assert(valid_arches != NULL);
 
         /* collect the specified architectures */
         walk = archopt;

@@ -1141,7 +1141,7 @@ string_list_t *get_all_arches(const struct rpminspect *ri)
 
     /* if there is no koji system specified in the configuration, stop */
     if (ri->kojihub == NULL) {
-        return NULL;
+        err(EXIT_FAILURE, "*** missing Koji Hub setting from configuration file");
     }
 
     /* initialize our list of architectures, always allow 'src' */
