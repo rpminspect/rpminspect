@@ -24,6 +24,44 @@
 #include "queue.h"
 #include "rpminspect.h"
 
+static void free_string_list_map(string_list_map_t *table)
+{
+    string_list_map_t *entry = NULL;
+    string_list_map_t *tmp_entry = NULL;
+
+    if (table == NULL) {
+        return;
+    }
+
+    HASH_ITER(hh, table, entry, tmp_entry) {
+        HASH_DEL(table, entry);
+        free(entry->key);
+        list_free(entry->value, free);
+        free(entry);
+    }
+
+    return;
+}
+
+static void free_deprule_ignore_map(deprule_ignore_map_t *table)
+{
+    deprule_ignore_map_t *entry = NULL;
+    deprule_ignore_map_t *tmp_entry = NULL;
+
+    if (table == NULL) {
+        return;
+    }
+
+    HASH_ITER(hh, table, entry, tmp_entry) {
+        HASH_DEL(table, entry);
+        free_regex(entry->ignore);
+        free(entry->pattern);
+        free(entry);
+    }
+
+    return;
+}
+
 void free_regex(regex_t *regex)
 {
     if (regex == NULL) {
@@ -47,25 +85,6 @@ void free_string_map(string_map_t *table)
         HASH_DEL(table, entry);
         free(entry->key);
         free(entry->value);
-        free(entry);
-    }
-
-    return;
-}
-
-void free_string_list_map(string_list_map_t *table)
-{
-    string_list_map_t *entry = NULL;
-    string_list_map_t *tmp_entry = NULL;
-
-    if (table == NULL) {
-        return;
-    }
-
-    HASH_ITER(hh, table, entry, tmp_entry) {
-        HASH_DEL(table, entry);
-        free(entry->key);
-        list_free(entry->value, free);
         free(entry);
     }
 
@@ -263,6 +282,7 @@ void free_rpminspect(struct rpminspect *ri) {
     free_regex(ri->unicode_exclude);
     list_free(ri->unicode_excluded_mime_types, free);
     list_free(ri->unicode_forbidden_codepoints, free);
+    free_deprule_ignore_map(ri->deprules_ignore);
 
     free_rpmpeer(ri->peers);
 
@@ -281,29 +301,5 @@ void free_rpminspect(struct rpminspect *ri) {
 
     free_string_map(ri->fortifiable);
 
-    return;
-}
-
-/*
- * Free the memory associate with a deprule_list_t list.
- */
-void free_deprules(deprule_list_t *list)
-{
-    deprule_entry_t *entry = NULL;
-
-    if (list == NULL) {
-        return;
-    }
-
-    while (!TAILQ_EMPTY(list)) {
-        entry = TAILQ_FIRST(list);
-        TAILQ_REMOVE(list, entry, items);
-        free(entry->requirement);
-        free(entry->version);
-        list_free(entry->providers, free);
-        free(entry);
-    }
-
-    free(list);
     return;
 }

@@ -133,12 +133,12 @@ bool init_icons(struct rpminspect *ri);
 struct rpminspect *init_rpminspect(struct rpminspect *, const char *, const char *);
 
 /* free.c */
-void free_regex(regex_t *);
-void free_string_map(string_map_t *);
-void free_string_list_map(string_list_map_t *);
-void free_pair(pair_list_t *);
+void free_string_map(string_map_t *table);
+void free_regex(regex_t *regex);
 void free_rpminspect(struct rpminspect *);
-void free_deprules(deprule_list_t *list);
+
+/* pairfuncs.c */
+void free_pair(pair_list_t *list);
 
 /* listfuncs.c */
 char *list_to_string(const string_list_t *, const char *);
@@ -432,5 +432,6 @@ dep_op_t get_dep_operator(const rpmsenseFlags f);
 const char *get_deprule_operator_desc(const dep_op_t operator);
 bool deprules_match(const deprule_entry_t *a, const deprule_entry_t *b);
 char *strdeprule(const deprule_entry_t *deprule);
+void free_deprules(deprule_list_t *list);
 
 #endif
