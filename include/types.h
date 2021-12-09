@@ -174,6 +174,14 @@ typedef struct _deprule_entry_t {
 
 typedef TAILQ_HEAD(deprule_entry_s, _deprule_entry_t) deprule_list_t;
 
+/* Dependency rule ignore rules */
+typedef struct _deprule_ignore_map_t {
+    dep_type_t type;                  /* dependency rule type */
+    regex_t *ignore;                  /* compiled pattern */
+    char *pattern;                    /* pattern in config file for debug output */
+    UT_hash_handle hh;
+} deprule_ignore_map_t;
+
 /*
  * A peer is a mapping of a built RPM from the before and after builds.
  * We can expand this struct as necessary based on what tests need to
@@ -623,6 +631,9 @@ struct rpminspect {
     regex_t *unicode_exclude;
     string_list_t *unicode_excluded_mime_types;
     string_list_t *unicode_forbidden_codepoints;
+
+    /* RPM dependency ignores -- regexps to match requirements to ignore */
+    deprule_ignore_map_t *deprules_ignore;
 
     /* Options specified by the user */
     char *before;              /* before build ID arg given on cmdline */

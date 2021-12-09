@@ -86,6 +86,8 @@ void dump_cfg(const struct rpminspect *ri)
     string_map_t *hentry = NULL;
     string_map_t *tmp_hentry = NULL;
     string_list_map_t *mapentry = NULL;
+    deprule_ignore_map_t *drentry = NULL;
+    deprule_ignore_map_t *tmp_drentry = NULL;
 
     assert(ri != NULL);
 
@@ -712,7 +714,19 @@ void dump_cfg(const struct rpminspect *ri)
             }
         }
 
-        dump_inspection_ignores(ri->inspection_ignores, NAME_UNICODE);
+        if (mapentry != NULL) {
+            dump_inspection_ignores(ri->inspection_ignores, NAME_UNICODE);
+        }
+    }
+
+    /* rpmdeps */
+
+    if (ri->deprules_ignore) {
+        printf("rpmdeps:\n");
+
+        HASH_ITER(hh, ri->deprules_ignore, drentry, tmp_drentry) {
+            printf("    %s: %s\n", get_deprule_desc(drentry->type), (drentry->pattern == NULL) ? "" : drentry->pattern);
+        }
     }
 
     printf("\n\n");
