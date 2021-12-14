@@ -1889,6 +1889,12 @@ bool init_icons(struct rpminspect *ri)
     assert(ri->icons_filename != NULL);
     contents = read_file(ri->icons_filename);
 
+    /* fallback to 'GENERIC' if not found */
+    if (contents == NULL && strcmp(ri->product_release, "GENERIC")) {
+        xasprintf(&ri->icons_filename, "%s/%s/%s", ri->vendor_data_dir, ICONS_DIR, "GENERIC");
+        contents = read_file(ri->icons_filename);
+    }
+
     if (contents == NULL) {
         return false;
     }
