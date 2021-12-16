@@ -220,33 +220,21 @@ class RequiresRpminspect(unittest.TestCase):
         self.message = None
 
     def dumpResults(self):
-        # The earlier exception may have been on json.loads(), so
-        # give that a try here but default to a string conversion.
-        try:
-            o = json.dumps(json.loads(self.out), sort_keys=True, indent=4)
-        except Exception:
-            o = str(self.out, "utf-8")
+        r = None
 
-        try:
-            e = json.dumps(json.loads(self.err), sort_keys=True, indent=4)
-        except Exception:
-            e = str(self.err, "utf-8")
-
-        try:
-            r = json.dumps(json.loads(self.results), sort_keys=True, indent=4)
-        except Exception:
-            r = self.results
+        if len(self.results) > 0:
+            r = json.dumps(self.results, sort_keys=True, indent=4)
 
         print("\n\ninspection=%s\n" % self.inspection)
 
-        if self.results is not None and len(self.results) > 0:
+        if r is not None:
             print("results:\n%s\n" % r)
 
-        if self.out is not None and len(self.out) > 0:
-            print("stdout:\n%s\n" % o)
+        if len(self.out) > 0:
+            print("stdout:\n%s\n" % str(self.out, "utf-8"))
 
-        if self.err is not None and len(self.err) > 0:
-            print("stderr:\n%s\n" % e)
+        if len(self.err) > 0:
+            print("stderr:\n%s\n" % str(self.err, "utf-8"))
 
         print("\n")
 
