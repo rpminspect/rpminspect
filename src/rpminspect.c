@@ -212,6 +212,9 @@ static char *get_product_release(string_map_t *products, const favor_release_t f
                 if (matched) {
                     break;
                 }
+
+                before_product = NULL;
+                after_product = NULL;
             }
         } else if (!c) {
             matched = true;
@@ -231,6 +234,7 @@ static char *get_product_release(string_map_t *products, const favor_release_t f
             if (c <= 0) {
                 free(after_product);
                 after_product = before_product;
+                before_product = NULL;
             } else {
                 free(before_product);
                 before_product = NULL;
@@ -239,6 +243,7 @@ static char *get_product_release(string_map_t *products, const favor_release_t f
             if (c >= 0) {
                 free(after_product);
                 after_product = before_product;
+                before_product = NULL;
             } else {
                 free(before_product);
                 before_product = NULL;
@@ -248,8 +253,6 @@ static char *get_product_release(string_map_t *products, const favor_release_t f
 
     if (!matched) {
         warnx(_("*** Unable to determine product release for %s and %s"), before, after);
-        free(before_product);
-        free(after_product);
         after_product = NULL;
     }
 
@@ -819,6 +822,8 @@ int main(int argc, char **argv)
 
             if (ri->product_release == NULL) {
                 free_rpminspect(ri);
+                rpmFreeMacros(NULL);
+                rpmFreeRpmrc();
                 return RI_PROGRAM_ERROR;
             }
         }
