@@ -253,6 +253,7 @@ static char *get_product_release(string_map_t *products, const favor_release_t f
 
     if (!matched) {
         warnx(_("*** Unable to determine product release for %s and %s"), before, after);
+        warnx(_("*** See the 'favor_release' setting in the rpminspect configuration file."));
         after_product = NULL;
     }
 
