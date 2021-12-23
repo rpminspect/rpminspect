@@ -67,8 +67,12 @@ struct inspect inspections[] = {
     { INSPECT_DSODEPS,       "dsodeps",       false, &inspect_dsodeps },
     { INSPECT_FILESIZE,      "filesize",      false, &inspect_filesize },
     { INSPECT_PERMISSIONS,   "permissions",   true,  &inspect_permissions },
+#ifdef _WITH_LIBCAP
     { INSPECT_CAPABILITIES,  "capabilities",  true,  &inspect_capabilities },
+#endif
+#ifdef _WITH_LIBKMOD
     { INSPECT_KMOD,          "kmod",          false, &inspect_kmod },
+#endif
     { INSPECT_ARCH,          "arch",          false, &inspect_arch },
     { INSPECT_SUBPACKAGES,   "subpackages",   false, &inspect_subpackages },
     { INSPECT_CHANGELOG,     "changelog",     false, &inspect_changelog },
@@ -191,10 +195,14 @@ uint64_t inspection_id(const char *name)
         return INSPECT_FILESIZE;
     } else if (!strcmp(name, NAME_PERMISSIONS)) {
         return INSPECT_PERMISSIONS;
+#ifdef _WITH_LIBCAP
     } else if (!strcmp(name, NAME_CAPABILITIES)) {
         return INSPECT_CAPABILITIES;
+#endif
+#ifdef _WITH_LIBKMOD
     } else if (!strcmp(name, NAME_KMOD)) {
         return INSPECT_KMOD;
+#endif
     } else if (!strcmp(name, NAME_ARCH)) {
         return INSPECT_ARCH;
     } else if (!strcmp(name, NAME_SUBPACKAGES)) {
@@ -292,10 +300,14 @@ const char *inspection_desc(const uint64_t inspection)
             return DESC_FILESIZE;
         case INSPECT_PERMISSIONS:
             return DESC_PERMISSIONS;
+#ifdef _WITH_LIBCAP
         case INSPECT_CAPABILITIES:
             return DESC_CAPABILITIES;
+#endif
+#ifdef _WITH_LIBKMOD
         case INSPECT_KMOD:
             return DESC_KMOD;
+#endif
         case INSPECT_ARCH:
             return DESC_ARCH;
         case INSPECT_SUBPACKAGES:
@@ -393,10 +405,14 @@ const char *inspection_header_to_desc(const char *header)
         i = INSPECT_FILESIZE;
     } else if (!strcmp(header, NAME_PERMISSIONS)) {
         i = INSPECT_PERMISSIONS;
+#ifdef _WITH_LIBCAP
     } else if (!strcmp(header, NAME_CAPABILITIES)) {
         i = INSPECT_CAPABILITIES;
+#endif
+#ifdef _WITH_LIBKMOD
     } else if (!strcmp(header, NAME_KMOD)) {
         i = INSPECT_KMOD;
+#endif
     } else if (!strcmp(header, NAME_ARCH)) {
         i = INSPECT_ARCH;
     } else if (!strcmp(header, NAME_SUBPACKAGES)) {

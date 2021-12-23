@@ -22,7 +22,7 @@ if find_program('xgettext', required : get_option('nls')).found()
 endif
 
 # Library search dirs
-search_dirs = [ '/usr/lib', '/usr/lib64', '/usr/local/lib' ]
+search_dirs = [ '/usr/local/lib', '/usr/lib64', '/usr/lib' ]
 
 # Dependencies that use pkg-config
 jsonc = dependency('json-c', required : true)
