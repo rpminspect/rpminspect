@@ -187,7 +187,9 @@
 /* rpmdeps */
 #define REMEDY_RPMDEPS_MACROS _("Unexpanded RPM spec file macros were found in the noted dependency rule.  Check the spec file for this dependency and ensure you have not misspelled a macro or used a macro name that does not exist.")
 
-#define REMEDY_RPMDEPS_EXPLICIT _("Add the indicated explicit Requires to the spec file for the named subpackage.  Subpackages depending on shared libraries in another subpackage must carry an explicit 'Requires: SUBPACKAGE_NAME = %%{version}-%%{release}' in the spec file.")
+#define REMEDY_RPMDEPS_EXPLICIT _("Add the indicated explicit Requires to the spec file for the named subpackage.  Subpackages depending on shared libraries in another subpackage must carry an explicit 'Requires: SUBPACKAGE_NAME = %{version}-%{release}' in the spec file.")
+
+#define REMEDY_RPMDEPS_EXPLICIT_EPOCH _("Add the indicated explicit Requires to the spec file for the named subpackage.  Subpackages depending on shared libraries in another subpackage must carry an explicit 'Requires: SUBPACKAGE_NAME = %{epoch}:%{version}-%{release}' in the spec file.")
 
 #define REMEDY_RPMDEPS_MULTIPLE _("Check subpackage %%files sections and explicit Provides statements.  Only one subpackage should provide a given shared library.  Shared library names are automatically added as Provides, so there is no need to specify them in the spec file but you do need to make sure only one subpackage is packaging up the shared library in question.")
 
@@ -197,6 +199,6 @@
 
 #define REMEDY_RPMDEPS_LOST _("A dependency seen in the before build is not seen in the after build meaning it was removed or lost.  If this is a VERIFY result, it means rpminspect noticed the change in what it considers a maintenance update in a package.  An INFO result means it noticed this change, but deems it ok because it is comparing a rebased build.")
 
-#define REMEDY_RPMDEPS_EPOCH _("The package has an Epoch value greater than zero, but the explicit subpackage dependencies are not consistently using it.  For the dependency reported, the '= VERSION-RELEASE' needs to change to '= EPOCH:VERSION-RELEASE' where the EPOCH value matches the package Epoch.")
+#define REMEDY_RPMDEPS_EPOCH _("The package has an Epoch value greater than zero, but the explicit subpackage dependencies are not consistently using it.  For the dependency reported, the '= %{version}-%{release}' needs to change to '= %{epoch}:%{version}-%{release}' to capture the package package Epoch in the dependency.")
 
 #endif
