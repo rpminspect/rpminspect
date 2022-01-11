@@ -849,15 +849,22 @@ msgid ""
 msgstr ""
 
 #: include/results.h:190
-#, c-format
 msgid ""
 "Add the indicated explicit Requires to the spec file for the named "
 "subpackage.  Subpackages depending on shared libraries in another subpackage "
-"must carry an explicit 'Requires: SUBPACKAGE_NAME = %%{version}-%%{release}' "
+"must carry an explicit 'Requires: SUBPACKAGE_NAME = %{version}-%{release}' "
 "in the spec file."
 msgstr ""
 
 #: include/results.h:192
+msgid ""
+"Add the indicated explicit Requires to the spec file for the named "
+"subpackage.  Subpackages depending on shared libraries in another subpackage "
+"must carry an explicit 'Requires: SUBPACKAGE_NAME = %{epoch}:%{version}-"
+"%{release}' in the spec file."
+msgstr ""
+
+#: include/results.h:194
 #, c-format
 msgid ""
 "Check subpackage %%files sections and explicit Provides statements.  Only "
@@ -867,7 +874,7 @@ msgid ""
 "up the shared library in question."
 msgstr ""
 
-#: include/results.h:194
+#: include/results.h:196
 msgid ""
 "A dependency listed in the before build changed to the indicated dependency "
 "in the after build.  If this is a VERIFY result, it means rpminspect noticed "
@@ -876,7 +883,7 @@ msgid ""
 "a rebased build."
 msgstr ""
 
-#: include/results.h:196
+#: include/results.h:198
 msgid ""
 "A new dependency is seen in the after build that was not present in the "
 "before build.  If this is a VERIFY result, it means rpminspect noticed the "
@@ -885,7 +892,7 @@ msgid ""
 "a rebased build."
 msgstr ""
 
-#: include/results.h:198
+#: include/results.h:200
 msgid ""
 "A dependency seen in the before build is not seen in the after build meaning "
 "it was removed or lost.  If this is a VERIFY result, it means rpminspect "
@@ -894,12 +901,13 @@ msgid ""
 "comparing a rebased build."
 msgstr ""
 
-#: include/results.h:200
+#: include/results.h:202
 msgid ""
 "The package has an Epoch value greater than zero, but the explicit "
 "subpackage dependencies are not consistently using it.  For the dependency "
-"reported, the '= VERSION-RELEASE' needs to change to '= EPOCH:VERSION-"
-"RELEASE' where the EPOCH value matches the package Epoch."
+"reported, the '= %{version}-%{release}' needs to change to '= %{epoch}:"
+"%{version}-%{release}' to capture the package package Epoch in the "
+"dependency."
 msgstr ""
 
 #: lib/abi.c:163
@@ -2363,75 +2371,95 @@ msgstr ""
 msgid "Invalid looking %s dependency in the %s package on %s: %s"
 msgstr ""
 
-#: lib/inspect_rpmdeps.c:83 lib/inspect_rpmdeps.c:500 lib/inspect_rpmdeps.c:505
-#: lib/inspect_rpmdeps.c:550
+#: lib/inspect_rpmdeps.c:83 lib/inspect_rpmdeps.c:610 lib/inspect_rpmdeps.c:620
+#: lib/inspect_rpmdeps.c:675
 #, c-format
 msgid "'${FILE}' in %s on ${ARCH}"
 msgstr ""
 
-#: lib/inspect_rpmdeps.c:199
+#: lib/inspect_rpmdeps.c:254
 #, c-format
 msgid ""
-"Subpackage %s on %s uses '%s' from subpackage %s but does not have an "
-"explicit package version requirement.  Please add 'Requires: %s = "
-"%%{version}-%%{release}' to the spec file to avoid the need to test "
-"interoperability between various combinations of old and new subpackages."
+"Subpackage %s on %s carries '%s' which comes from subpackage %s but does not "
+"carry an explicit package version requirement.  Please add 'Requires: %s = "
+"%s' to the spec file to avoid the need to test interoperability between "
+"various combinations of old and new subpackages."
 msgstr ""
 
-#: lib/inspect_rpmdeps.c:201
+#: lib/inspect_rpmdeps.c:255
 #, c-format
-msgid "missing 'Requires: ${FILE} = %%{version}-%%{release}' in %s on ${ARCH}"
+msgid "missing 'Requires: ${FILE} = %s' in %s on ${ARCH}"
 msgstr ""
 
-#: lib/inspect_rpmdeps.c:222
+#: lib/inspect_rpmdeps.c:275
 #, c-format
 msgid "Multiple subpackages provide '%s': %s"
 msgstr ""
 
-#: lib/inspect_rpmdeps.c:223
+#: lib/inspect_rpmdeps.c:276
 #, c-format
 msgid "%s all provide '${FILE}' on ${ARCH}"
 msgstr ""
 
-#: lib/inspect_rpmdeps.c:307
+#: lib/inspect_rpmdeps.c:360
 #, c-format
 msgid "Missing epoch prefix on the version-release in '%s' for %s on %s"
 msgstr ""
 
-#: lib/inspect_rpmdeps.c:308
+#: lib/inspect_rpmdeps.c:361
 #, c-format
 msgid "'${FILE}' needs epoch in %s on ${ARCH}"
 msgstr ""
 
-#: lib/inspect_rpmdeps.c:426
+#: lib/inspect_rpmdeps.c:531
 msgid "spec file"
 msgstr ""
 
-#: lib/inspect_rpmdeps.c:499
+#: lib/inspect_rpmdeps.c:605
+#, c-format
+msgid "Gained '%s' in source package %s"
+msgstr ""
+
+#: lib/inspect_rpmdeps.c:607
 #, c-format
 msgid "Gained '%s' in subpackage %s on %s"
 msgstr ""
 
-#: lib/inspect_rpmdeps.c:504
+#: lib/inspect_rpmdeps.c:615
+#, c-format
+msgid "Retained '%s' in source package %s"
+msgstr ""
+
+#: lib/inspect_rpmdeps.c:617
 #, c-format
 msgid "Retained '%s' in subpackage %s on %s"
 msgstr ""
 
-#: lib/inspect_rpmdeps.c:511
+#: lib/inspect_rpmdeps.c:627
+#, c-format
+msgid "Changed '%s' to '%s' in source package %s"
+msgstr ""
+
+#: lib/inspect_rpmdeps.c:629
 #, c-format
 msgid "Changed '%s' to '%s' in subpackage %s on %s"
 msgstr ""
 
-#: lib/inspect_rpmdeps.c:512
+#: lib/inspect_rpmdeps.c:632
 #, c-format
 msgid "'%s' became '${FILE}' in %s on ${ARCH}"
 msgstr ""
 
-#: lib/inspect_rpmdeps.c:519
+#: lib/inspect_rpmdeps.c:639
 msgid "; this is expected"
 msgstr ""
 
-#: lib/inspect_rpmdeps.c:546
+#: lib/inspect_rpmdeps.c:667
+#, c-format
+msgid "Lost '%s' in source package %s"
+msgstr ""
+
+#: lib/inspect_rpmdeps.c:669
 #, c-format
 msgid "Lost '%s' in subpackage %s on %s"
 msgstr ""

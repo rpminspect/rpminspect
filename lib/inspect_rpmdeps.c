@@ -108,13 +108,20 @@ static bool check_explicit_lib_deps(struct rpminspect *ri, Header h, deprule_lis
     const char *name = NULL;
     const char *arch = NULL;
     rpmpeer_entry_t *peer = NULL;
+    rpmpeer_entry_t *potential_prov = NULL;
+    deprule_entry_t *verify = NULL;
     deprule_entry_t *req = NULL;
     deprule_entry_t *prov = NULL;
-    deprule_entry_t *potential_prov = NULL;
     char *isareq = NULL;
+    char *isaprov = NULL;
     char *multiples = NULL;
     char *r = NULL;
     char *noun = NULL;
+    const char *pn = NULL;
+    const char *pv = NULL;
+    const char *pr = NULL;
+    uint64_t epoch = 0;
+    char *rulestr = NULL;
     bool found = false;
     struct result_params params;
 
@@ -158,21 +165,16 @@ static bool check_explicit_lib_deps(struct rpminspect *ri, Header h, deprule_lis
                     continue;
                 }
 
-                if (strcmp(req->requirement, prov->requirement)) {
-                    /* not a match */
-                    continue;
-                }
+                pn = headerGetString(peer->after_hdr, RPMTAG_NAME);
 
-                potential_prov = prov;
-
-                if (!strcmp(req->requirement, prov->requirement)
-                    && req->operator == prov->operator
-                    && (req->version != NULL && prov->version != NULL && !strcmp(req->version, prov->version))) {
+                /* check that the Requires is explict and matches the Provides */
+                if (!strcmp(req->requirement, prov->requirement)) {
                     /* a package is allowed to to Provide and Require the same thing */
                     /* otherwise we found the subpackage that Provides this explicit Requires */
-                    req->providers = list_add(req->providers, prov->requirement);
+                    potential_prov = peer;
+                    req->providers = list_add(req->providers, pn);
                     found = true;
-                } else if (strstr(req->requirement, "(")) {
+                } else if (strstr(req->requirement, "(") || strstr(prov->requirement, "(")) {
                     /*
                      * we may have a dependency such as:
                      *     Requires: %{name}-libs%{?_isa} = %{version}-%{release}'
@@ -181,31 +183,82 @@ static bool check_explicit_lib_deps(struct rpminspect *ri, Header h, deprule_lis
                     isareq = strdup(req->requirement);
                     isareq[strcspn(isareq, "(")] = '\0';
 
-                    if (!strcmp(isareq, prov->requirement) && req->operator == prov->operator && !strcmp(req->version, prov->version)) {
-                        req->providers = list_add(req->providers, name);
-                        free(isareq);
+                    isaprov = strdup(prov->requirement);
+                    isaprov[strcspn(isaprov, "(")] = '\0';
+
+                    if (!strcmp(isareq, isaprov)) {
+                        potential_prov = peer;
+                        req->providers = list_add(req->providers, pn);
                         found = true;
                     }
 
                     free(isareq);
+                    free(isaprov);
                 }
             }
+
+            /* if we have a provider, get out of the loop */
+            if (found) {
+                break;
+            }
+        }
+
+        /* now look for the explicit Requires of potential_prov */
+        if (found && potential_prov) {
+            /* prove yourself again */
+            found = false;
+
+            pn = headerGetString(potential_prov->after_hdr, RPMTAG_NAME);
+            pv = headerGetString(potential_prov->after_hdr, RPMTAG_VERSION);
+            pr = headerGetString(potential_prov->after_hdr, RPMTAG_RELEASE);
+
+            /* the version-release or epoch:version-release string */
+            epoch = headerGetNumber(potential_prov->after_hdr, RPMTAG_EPOCH);
+
+            if (epoch > 0) {
+                xasprintf(&r, "%ju:%s-%s", epoch, pv, pr);
+            } else {
+                xasprintf(&r, "%s-%s", pv, pr);
+            }
+
+            assert(r != NULL);
+
+            TAILQ_FOREACH(verify, after_deps, items) {
+                /* look only at explicit Requires right now */
+                if ((verify->type != TYPE_REQUIRES) || strprefix(verify->requirement, SHARED_LIB_PREFIX)) {
+                    continue;
+                }
+
+                if (!strcmp(verify->requirement, pn) && verify->operator == OP_EQUAL && !strcmp(verify->version, r)) {
+                    found = true;
+                    break;
+                }
+            }
+
+            free(r);
         }
 
         /* report missing explicit package requires */
         if (!found && potential_prov) {
             r = strdeprule(req);
+            pn = headerGetString(potential_prov->after_hdr, RPMTAG_NAME);
 
-            xasprintf(&params.msg, _("Subpackage %s on %s uses '%s' from subpackage %s but does not have an explicit package version requirement.  Please add 'Requires: %s = %%{version}-%%{release}' to the spec file to avoid the need to test interoperability between various combinations of old and new subpackages."), name, arch, r, name, potential_prov->requirement);
+            if (epoch > 0) {
+                rulestr = "%{epoch}:%{version}-%{release}";
+                params.remedy = REMEDY_RPMDEPS_EXPLICIT_EPOCH;
+            } else {
+                rulestr = "%{version}-%{release}";
+                params.remedy = REMEDY_RPMDEPS_EXPLICIT;
+            }
 
-            xasprintf(&noun, _("missing 'Requires: ${FILE} = %%{version}-%%{release}' in %s on ${ARCH}"), name);
+            xasprintf(&params.msg, _("Subpackage %s on %s carries '%s' which comes from subpackage %s but does not carry an explicit package version requirement.  Please add 'Requires: %s = %s' to the spec file to avoid the need to test interoperability between various combinations of old and new subpackages."), name, arch, r, pn, pn, rulestr);
+            xasprintf(&noun, _("missing 'Requires: ${FILE} = %s' in %s on ${ARCH}"), rulestr, name);
 
             params.severity = RESULT_VERIFY;
             params.noun = noun;
             params.verb = VERB_FAILED;
-            params.file = potential_prov->requirement;
+            params.file = pn;
             params.arch = arch;
-            params.remedy = REMEDY_RPMDEPS_EXPLICIT;
             add_result(ri, &params);
             free(noun);
             free(params.msg);
@@ -245,7 +298,7 @@ static bool check_explicit_lib_deps(struct rpminspect *ri, Header h, deprule_lis
  * that uses the package version and release and ensure it comes
  * prefixed with the Epoch followed by a colon.
  */
-static bool check_epoch_in_provides(struct rpminspect *ri, Header h, deprule_list_t *afterdeps)
+static bool check_explicit_epoch(struct rpminspect *ri, Header h, deprule_list_t *afterdeps)
 {
     bool result = true;
     const char *name = NULL;
@@ -292,7 +345,7 @@ static bool check_epoch_in_provides(struct rpminspect *ri, Header h, deprule_lis
      * check every deprule here that uses the package version and
      * release to ensure it is prefixed with the epoch
      */
-    xasprintf(&verrel, "%s-%s", headerGetString(h, RPMTAG_VERSION), headerGetString(h, RPMTAG_VERSION));
+    xasprintf(&verrel, "%s-%s", headerGetString(h, RPMTAG_VERSION), headerGetString(h, RPMTAG_RELEASE));
     assert(verrel != NULL);
     xasprintf(&epochprefix, "%ju:", epoch);
     assert(epochprefix != NULL);
@@ -302,7 +355,7 @@ static bool check_epoch_in_provides(struct rpminspect *ri, Header h, deprule_lis
             continue;
         }
 
-        if (strstr(deprule->version, verrel) && !strprefix(deprule->version, epochprefix)) {
+        if (strsuffix(deprule->version, verrel) && !strprefix(deprule->version, epochprefix)) {
             drs = strdeprule(deprule);
             xasprintf(&params.msg, _("Missing epoch prefix on the version-release in '%s' for %s on %s"), drs, name, arch);
             xasprintf(&noun, _("'${FILE}' needs epoch in %s on ${ARCH}"), name);
@@ -330,24 +383,36 @@ static bool check_epoch_in_provides(struct rpminspect *ri, Header h, deprule_lis
 /*
  * Check if the deprule change is expected (e.g., automatic Provides).
  */
-static bool expected_deprule_change(const bool rebase, const deprule_entry_t *deprule, const Header h)
+static bool expected_deprule_change(const bool rebase, const deprule_entry_t *deprule, const Header h, const rpmpeer_t *peers)
 {
     bool r = false;
+    bool found = false;
     char *req = NULL;
-    char *verrel = NULL;
+    char *vr = NULL;
+    char *evr = NULL;
+    rpmpeer_entry_t *peer = NULL;
+    const char *name = NULL;
+    const char *arch = NULL;
+    const char *peerarch = NULL;
+    const char *version = NULL;
+    const char *release = NULL;
+    uint64_t epoch = 0;
 
     assert(deprule != NULL);
     assert(h != NULL);
+
+    /* skip source packages */
+    if (headerIsSource(h)) {
+        return true;
+    }
 
     /* changes always expected in a rebase */
     if (rebase) {
         return true;
     }
 
-    /* currently limited to Provides */
-    if (deprule->type != TYPE_PROVIDES) {
-        return false;
-    }
+    /* this package arch */
+    arch = get_rpm_header_arch(h);
 
     /* trim any arch substrings from the name (e.g., "(x86-64)") */
     req = strdup(deprule->requirement);
@@ -357,14 +422,54 @@ static bool expected_deprule_change(const bool rebase, const deprule_entry_t *de
         req[strcspn(req, "(")] = '\0';
     }
 
-    /* deprule version strings are a combo of the version-release */
-    xasprintf(&verrel, "%s-%s", headerGetString(h, RPMTAG_VERSION), headerGetString(h, RPMTAG_RELEASE));
+    /* see if this deprule requirement name matches a subpackage */
+    TAILQ_FOREACH(peer, peers, items) {
+        /* no after peer, ignore */
+        if (peer->after_hdr == NULL) {
+            continue;
+        }
+
+        /* skip source */
+        if (headerIsSource(peer->after_hdr)) {
+            continue;
+        }
+
+        /* match the arch and name */
+        peerarch = get_rpm_header_arch(peer->after_hdr);
+        name = headerGetString(peer->after_hdr, RPMTAG_NAME);
+
+        if (!strcmp(arch, peerarch) && !strcmp(name, req)) {
+            /* we found the subpackage, which is now 'peer' for code below */
+            found = true;
+            break;
+        }
+    }
+
+    if (!found) {
+        free(req);
+        return false;
+    }
+
+    /* deprule version strings are a combo of the version-release or epoch:version-release */
+    version = headerGetString(peer->after_hdr, RPMTAG_VERSION);
+    release = headerGetString(peer->after_hdr, RPMTAG_RELEASE);
+    epoch = headerGetNumber(peer->after_hdr, RPMTAG_EPOCH);
+    xasprintf(&vr, "%s-%s", version, release);
+    xasprintf(&evr, "%ju:%s-%s", epoch, version, release);
 
     /* determine if this is expected */
-    r = ((req && !strcmp(req, headerGetString(h, RPMTAG_NAME)) && (deprule->operator == OP_EQUAL) && (verrel && !strcmp(deprule->version, verrel))));
+    if (deprule->operator == OP_EQUAL) {
+        if (epoch > 0) {
+            r = (evr && !strcmp(deprule->version, evr));
+        } else {
+            r = (vr && !strcmp(deprule->version, vr));
+        }
+    }
 
     free(req);
-    free(verrel);
+    free(vr);
+    free(evr);
+
     return r;
 }
 
@@ -464,7 +569,7 @@ bool inspect_rpmdeps(struct rpminspect *ri)
         }
 
         /* Check that packages defining an Epoch > 0 use it for Provides */
-        if (!check_epoch_in_provides(ri, peer->after_hdr, peer->after_deprules)) {
+        if (!check_explicit_epoch(ri, peer->after_hdr, peer->after_deprules)) {
             result = false;
         }
     }
@@ -496,24 +601,39 @@ bool inspect_rpmdeps(struct rpminspect *ri)
 
                     /* determine what to report */
                     if (deprule->peer_deprule == NULL ) {
-                        xasprintf(&params.msg, _("Gained '%s' in subpackage %s on %s"), drs, name, arch);
+                        if (!strcmp(arch, SRPM_ARCH_NAME)) {
+                            xasprintf(&params.msg, _("Gained '%s' in source package %s"), drs, name);
+                        } else {
+                            xasprintf(&params.msg, _("Gained '%s' in subpackage %s on %s"), drs, name, arch);
+                        }
+
                         xasprintf(&noun, _("'${FILE}' in %s on ${ARCH}"), name);
                         params.remedy = REMEDY_RPMDEPS_GAINED;
                         params.verb = VERB_ADDED;
                     } else if (deprules_match(deprule, deprule->peer_deprule)) {
-                        xasprintf(&params.msg, _("Retained '%s' in subpackage %s on %s"), drs, name, arch);
+                        if (!strcmp(arch, SRPM_ARCH_NAME)) {
+                            xasprintf(&params.msg, _("Retained '%s' in source package %s"), drs, name);
+                        } else {
+                            xasprintf(&params.msg, _("Retained '%s' in subpackage %s on %s"), drs, name, arch);
+                        }
+
                         xasprintf(&noun, _("'${FILE}' in %s on ${ARCH}"), name);
                         params.remedy = NULL;
                         params.verb = VERB_OK;
                         params.waiverauth = NOT_WAIVABLE;
                         params.severity = RESULT_INFO;
                     } else {
-                        xasprintf(&params.msg, _("Changed '%s' to '%s' in subpackage %s on %s"), pdrs, drs, name, arch);
+                        if (!strcmp(arch, SRPM_ARCH_NAME)) {
+                            xasprintf(&params.msg, _("Changed '%s' to '%s' in source package %s"), pdrs, drs, name);
+                        } else {
+                            xasprintf(&params.msg, _("Changed '%s' to '%s' in subpackage %s on %s"), pdrs, drs, name, arch);
+                        }
+
                         xasprintf(&noun, _("'%s' became '${FILE}' in %s on ${ARCH}"), pdrs, name);
                         params.remedy = REMEDY_RPMDEPS_CHANGED;
                         params.verb = VERB_CHANGED;
 
-                        if (expected_deprule_change(rebase, deprule, peer->after_hdr)) {
+                        if (expected_deprule_change(rebase, deprule, peer->after_hdr, ri->peers)) {
                             params.severity = RESULT_INFO;
                             params.waiverauth = NOT_WAIVABLE;
                             params.msg = strappend(params.msg, _("; this is expected"), NULL);
@@ -543,7 +663,12 @@ bool inspect_rpmdeps(struct rpminspect *ri)
                     if (deprule && deprule->peer_deprule == NULL) {
                         pdrs = strdeprule(deprule);
 
-                        xasprintf(&params.msg, _("Lost '%s' in subpackage %s on %s"), pdrs, name, arch);
+                        if (!strcmp(arch, SRPM_ARCH_NAME)) {
+                            xasprintf(&params.msg, _("Lost '%s' in source package %s"), pdrs, name);
+                        } else {
+                            xasprintf(&params.msg, _("Lost '%s' in subpackage %s on %s"), pdrs, name, arch);
+                        }
+
                         params.details = NULL;
                         params.remedy = REMEDY_RPMDEPS_LOST;
                         params.verb = VERB_REMOVED;
