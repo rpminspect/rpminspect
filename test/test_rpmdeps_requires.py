@@ -286,8 +286,9 @@ class ChangingRequiresExpectedCompareSRPM(TestCompareSRPM):
     def setUp(self):
         super().setUp()
 
+        # ok result because this is a source RPM
         self.inspection = "rpmdeps"
-        self.result = "INFO"
+        self.result = "OK"
         self.waiver_auth = "Not Waivable"
 
 
@@ -590,8 +591,9 @@ class MissingEpochRequiresRebaseCompareSRPM(TestCompareSRPM):
         before_sub.add_requires("%s = %s-%s" % (BEFORE_NAME, BEFORE_VER, BEFORE_REL))
         after_sub.add_requires("%s = %s-%s" % (AFTER_NAME, AFTER_VER, AFTER_REL))
 
+        # ok result because this is a source RPM
         self.inspection = "rpmdeps"
-        self.result = "INFO"
+        self.result = "OK"
         self.waiver_auth = "Not Waivable"
 
 
