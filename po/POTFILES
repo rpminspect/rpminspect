@@ -18,7 +18,7 @@ lib/bytes.c
 lib/checksums.c
 lib/copyfile.c
 lib/debug.c
-lib/deps.c
+lib/deprules.c
 lib/diags.c
 lib/filecmp.c
 lib/fileinfo.c

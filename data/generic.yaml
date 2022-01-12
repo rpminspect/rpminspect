@@ -73,12 +73,12 @@ vendor:
     licensedb: generic.json
 
     # Which product release string to favor.  By default, rpminspect
-    # expects the product release strings for the before and after
-    # builds to match.  You can change this here to:
+    # favors the newest product release string.  You can change this
+    # here to:
     #
     #     oldest  Favor the oldest product release string.
-    #     newest  Favor the newest product release string.
-    #     none    Default behavior, require matching release strings.
+    #     newest  Favor the newest product release string (default).
+    #     none    Require matching release strings.
     #
     # If this is set to anything other than 'none', rpminspect will
     # use strverscmp() to compare the strings and return the one that
@@ -88,7 +88,7 @@ vendor:
     #
     # The product release string tells rpminspect which vendor data
     # files to use from the vendor_data_dir.
-    #favor_release: none
+    #favor_release: newest
 
 #inspections:
     # By default all inspections are enabled.  You can enable and

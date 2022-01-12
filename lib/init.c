@@ -2019,7 +2019,7 @@ struct rpminspect *init_rpminspect(struct rpminspect *ri, const char *cfgfile, c
         /* Initialize the struct before reading files */
         ri->workdir = strdup(DEFAULT_WORKDIR);
         ri->vendor_data_dir = strdup(VENDOR_DATA_DIR);
-        ri->favor_release = FAVOR_NONE;
+        ri->favor_release = FAVOR_NEWEST;
         ri->tests = ~0;
         ri->desktop_entry_files_dir = strdup(DESKTOP_ENTRY_FILES_DIR);
         ri->bin_paths = list_from_array(BIN_PATHS);
