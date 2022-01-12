@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: rpminspect\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-01-12 12:05-0500\n"
+"POT-Creation-Date: 2022-01-12 12:06-0500\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -1031,115 +1031,120 @@ msgstr ""
 msgid "*** payload path %s not in RPM metadata"
 msgstr ""
 
-#: lib/init.c:266
+#: lib/init.c:269
 #, c-format
 msgid "*** ignore found in %d, value `%s'"
 msgstr ""
 
-#: lib/init.c:361
+#: lib/init.c:364
 #, c-format
 msgid "invalid input string `%s`"
 msgstr ""
 
-#: lib/init.c:388 lib/init.c:397 lib/init.c:405 lib/init.c:417 lib/init.c:426
-#: lib/init.c:434 lib/init.c:446 lib/init.c:455 lib/init.c:463 lib/init.c:475
+#: lib/init.c:391 lib/init.c:400 lib/init.c:408 lib/init.c:420 lib/init.c:429
+#: lib/init.c:437 lib/init.c:449 lib/init.c:458 lib/init.c:466 lib/init.c:478
 #, c-format
 msgid "*** invalid mode string: %s"
 msgstr ""
 
-#: lib/init.c:521
+#: lib/init.c:526
 #, c-format
 msgid "ignoring malformed %s configuration file: %s"
 msgstr ""
 
-#: lib/init.c:1004
+#: lib/init.c:1017
 #, c-format
 msgid "*** unknown specname match setting '%s', defaulting to 'full'"
 msgstr ""
 
-#: lib/init.c:1013
+#: lib/init.c:1026
 #, c-format
 msgid "*** unknown specname primary setting '%s', defaulting to 'name'"
 msgstr ""
 
-#: lib/init.c:1024
+#: lib/init.c:1037
 msgid "error reading elf include path"
 msgstr ""
 
-#: lib/init.c:1033
+#: lib/init.c:1046
 msgid "error reading elf exclude path"
 msgstr ""
 
-#: lib/init.c:1044
+#: lib/init.c:1057
 msgid "error reading man page include path"
 msgstr ""
 
-#: lib/init.c:1053
+#: lib/init.c:1066
 msgid "error reading man page exclude path"
 msgstr ""
 
-#: lib/init.c:1064
+#: lib/init.c:1077
 msgid "error reading xml include path"
 msgstr ""
 
-#: lib/init.c:1073
+#: lib/init.c:1086
 msgid "error reading xml exclude path"
 msgstr ""
 
-#: lib/init.c:1117
+#: lib/init.c:1130
 #, c-format
 msgid "*** inspection flag must be 'on' or 'off', ignoring for '%s'"
 msgstr ""
 
-#: lib/init.c:1121 src/rpminspect.c:285
+#: lib/init.c:1134 src/rpminspect.c:285
 #, c-format
 msgid "*** Unknown inspection: `%s`"
 msgstr ""
 
-#: lib/init.c:1179
+#: lib/init.c:1192
 msgid "error reading unicode exclude regular expression"
 msgstr ""
 
-#: lib/init.c:1355
+#: lib/init.c:1232 lib/init.c:1249
+#, c-format
+msgid "error reading %s ignore pattern"
+msgstr ""
+
+#: lib/init.c:1426
 #, c-format
 msgid "*** Invalid filename in the fileinfo list: %s"
 msgstr ""
 
-#: lib/init.c:1356
+#: lib/init.c:1427
 msgid "*** From this invalid line:"
 msgstr ""
 
-#: lib/init.c:1357
+#: lib/init.c:1428
 #, c-format
 msgid "***     %s"
 msgstr ""
 
-#: lib/init.c:1768
+#: lib/init.c:1839
 #, c-format
 msgid "*** invalid security rule: %s"
 msgstr ""
 
-#: lib/init.c:1802
+#: lib/init.c:1873
 #, c-format
 msgid "*** unknown security rule: %s"
 msgstr ""
 
-#: lib/init.c:1822
+#: lib/init.c:1893
 #, c-format
 msgid "*** unknown security action: %s"
 msgstr ""
 
-#: lib/init.c:1848
+#: lib/init.c:1919
 #, c-format
 msgid "*** malformed security line: %s"
 msgstr ""
 
-#: lib/init.c:2001 lib/init.c:2022
+#: lib/init.c:2072 lib/init.c:2093
 #, c-format
 msgid "*** error reading '%s'\n"
 msgstr ""
 
-#: lib/init.c:2017
+#: lib/init.c:2088
 #, c-format
 msgid "*** unable to read profile '%s' from %s\n"
 msgstr ""
@@ -2851,75 +2856,75 @@ msgstr ""
 msgid "%s tried to run the command and it received signal %s"
 msgstr ""
 
-#: lib/strfuncs.c:257 lib/strfuncs.c:286
+#: lib/strfuncs.c:259 lib/strfuncs.c:288
 msgid "NULL"
 msgstr ""
 
-#: lib/strfuncs.c:259 lib/strfuncs.c:288
+#: lib/strfuncs.c:261 lib/strfuncs.c:290
 msgid "OK"
 msgstr ""
 
-#: lib/strfuncs.c:261 lib/strfuncs.c:290
+#: lib/strfuncs.c:263 lib/strfuncs.c:292
 msgid "INFO"
 msgstr ""
 
-#: lib/strfuncs.c:263 lib/strfuncs.c:292
+#: lib/strfuncs.c:265 lib/strfuncs.c:294
 msgid "VERIFY"
 msgstr ""
 
-#: lib/strfuncs.c:265 lib/strfuncs.c:294
+#: lib/strfuncs.c:267 lib/strfuncs.c:296
 msgid "BAD"
 msgstr ""
 
-#: lib/strfuncs.c:267 lib/strfuncs.c:296
+#: lib/strfuncs.c:269 lib/strfuncs.c:298
 msgid "SKIP"
 msgstr ""
 
-#: lib/strfuncs.c:269 lib/strfuncs.c:315
+#: lib/strfuncs.c:271 lib/strfuncs.c:317
 msgid "UnKnOwN"
 msgstr ""
 
-#: lib/strfuncs.c:309
+#: lib/strfuncs.c:311
 msgid "Not Waivable"
 msgstr ""
 
-#: lib/strfuncs.c:311
+#: lib/strfuncs.c:313
 msgid "Anyone"
 msgstr ""
 
-#: lib/strfuncs.c:313
+#: lib/strfuncs.c:315
 msgid "Security"
 msgstr ""
 
-#: lib/strfuncs.c:545
+#: lib/strfuncs.c:547
 msgid "regular file"
 msgstr ""
 
-#: lib/strfuncs.c:547
+#: lib/strfuncs.c:549
 msgid "directory"
 msgstr ""
 
-#: lib/strfuncs.c:549
+#: lib/strfuncs.c:551
 msgid "character device"
 msgstr ""
 
-#: lib/strfuncs.c:551
+#: lib/strfuncs.c:553
 msgid "block device"
 msgstr ""
 
-#: lib/strfuncs.c:553
+#: lib/strfuncs.c:555
 msgid "FIFO (named pipe)"
 msgstr ""
 
-#: lib/strfuncs.c:555
+#: lib/strfuncs.c:557
 msgid "symbolic link"
 msgstr ""
 
-#: lib/strfuncs.c:557
+#: lib/strfuncs.c:559
 msgid "socket"
 msgstr ""
 
-#: lib/strfuncs.c:559
+#: lib/strfuncs.c:561
 msgid "UNKNOWN"
 msgstr ""
 
