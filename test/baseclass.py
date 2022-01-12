@@ -278,8 +278,9 @@ class RequiresRpminspect(unittest.TestCase):
         outstream.close()
 
     def tearDown(self):
-        os.unlink(self.conffile)
-        os.unlink(self.outputfile)
+        if not KEEP_RESULTS:
+            os.unlink(self.conffile)
+            os.unlink(self.outputfile)
 
 
 # Base test case class that tests on the SRPM package only
@@ -359,8 +360,9 @@ class TestSRPM(RequiresRpminspect):
         )
 
     def tearDown(self):
-        super().tearDown()
-        self.rpm.clean()
+        if not KEEP_RESULTS:
+            super().tearDown()
+            self.rpm.clean()
 
 
 # Base test case class that compares a before and after SRPM
@@ -457,9 +459,10 @@ class TestCompareSRPM(RequiresRpminspect):
         )
 
     def tearDown(self):
-        super().tearDown()
-        self.before_rpm.clean()
-        self.after_rpm.clean()
+        if not KEEP_RESULTS:
+            super().tearDown()
+            self.before_rpm.clean()
+            self.after_rpm.clean()
 
 
 # Base test case class that tests the binary RPMs
@@ -543,8 +546,9 @@ class TestRPMs(RequiresRpminspect):
             )
 
     def tearDown(self):
-        super().tearDown()
-        self.rpm.clean()
+        if not KEEP_RESULTS:
+            super().tearDown()
+            self.rpm.clean()
 
 
 # Base test case class that compares before and after built RPMs

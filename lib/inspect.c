@@ -59,7 +59,7 @@ struct inspect inspections[] = {
     { INSPECT_CHANGEDFILES,  "changedfiles",  false, &inspect_changedfiles },
     { INSPECT_MOVEDFILES,    "movedfiles",    false, &inspect_movedfiles },
     { INSPECT_REMOVEDFILES,  "removedfiles",  false, &inspect_removedfiles },
-    { INSPECT_ADDEDFILES,    "addedfiles",    false, &inspect_addedfiles },
+    { INSPECT_ADDEDFILES,    "addedfiles",    true,  &inspect_addedfiles },
     { INSPECT_UPSTREAM,      "upstream",      false, &inspect_upstream },
     { INSPECT_OWNERSHIP,     "ownership",     true,  &inspect_ownership },
     { INSPECT_SHELLSYNTAX,   "shellsyntax",   true,  &inspect_shellsyntax },
