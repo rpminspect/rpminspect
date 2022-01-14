@@ -17,7 +17,6 @@
 #
 
 from rpmfluff.sourcefile import SourceFile
-from rpmfluff.samples import hello_world
 from rpmfluff.utils import CC
 
 from baseclass import TestKoji, TestRPMs, TestSRPM
@@ -28,6 +27,29 @@ from baseclass import AFTER_NAME, AFTER_VER, AFTER_REL
 before_requires = "important-package >= 2.0.2-47"
 after_requires = "important-package >= 4.7.0-1"
 unexpanded_requires = "important-package >= 4.7.1-1%{_macro}"
+
+# library source code for use in these package builds
+library_source = """#include <stdio.h>
+
+void greet(const char *message)
+{
+    printf ("%s\\n", message);
+}
+"""
+
+# source to use as /usr/bin example program in package builds
+hello_lib_world = """#include <stdio.h>
+
+void greet(const char *message);
+
+int
+main (int argc, char **argv)
+{
+    greet ("Hello world\\n");
+
+    return 0;
+}
+"""
 
 
 # Requires dependency is correct (OK) - control case
@@ -394,7 +416,9 @@ class MissingEpochRequiresSRPM(TestSRPM):
         # we need some stuff in the packages
         self.rpm.add_simple_compilation(installPath="usr/bin/vaporware")
         self.rpm.add_simple_library(
-            installPath="usr/lib/libvaporware.so.1", subpackageSuffix="devel"
+            installPath="usr/lib/libvaporware.so.1",
+            subpackageSuffix="devel",
+            sourceContent=library_source,
         )
 
         # manually add a devel subpackage with an incorrect Requires
@@ -420,7 +444,9 @@ class MissingEpochRequiresRPMs(TestRPMs):
         # we need some stuff in the packages
         self.rpm.add_simple_compilation(installPath="usr/bin/vaporware")
         self.rpm.add_simple_library(
-            installPath="usr/lib/libvaporware.so.1", subpackageSuffix="devel"
+            installPath="usr/lib/libvaporware.so.1",
+            subpackageSuffix="devel",
+            sourceContent=library_source,
         )
 
         # manually add a devel subpackage with an incorrect Requires
@@ -449,7 +475,9 @@ class MissingEpochRequiresKoji(TestKoji):
         # we need some stuff in the packages
         self.rpm.add_simple_compilation(installPath="usr/bin/vaporware")
         self.rpm.add_simple_library(
-            installPath="usr/lib/libvaporware.so.1", subpackageSuffix="devel"
+            installPath="usr/lib/libvaporware.so.1",
+            subpackageSuffix="devel",
+            sourceContent=library_source,
         )
 
         # manually add a devel subpackage with an incorrect Requires
@@ -478,10 +506,14 @@ class MissingEpochRequiresCompareSRPM(TestCompareSRPM):
         self.before_rpm.add_simple_compilation(installPath="usr/bin/vaporware")
         self.after_rpm.add_simple_compilation(installPath="usr/bin/vaporware")
         self.before_rpm.add_simple_library(
-            installPath="usr/lib/libvaporware.so.1", subpackageSuffix="devel"
+            installPath="usr/lib/libvaporware.so.1",
+            subpackageSuffix="devel",
+            sourceContent=library_source,
         )
         self.after_rpm.add_simple_library(
-            installPath="usr/lib/libvaporware.so.1", subpackageSuffix="devel"
+            installPath="usr/lib/libvaporware.so.1",
+            subpackageSuffix="devel",
+            sourceContent=library_source,
         )
 
         # manually add a devel subpackage with an incorrect Requires
@@ -512,10 +544,14 @@ class MissingEpochRequiresCompareRPMs(TestCompareRPMs):
         self.before_rpm.add_simple_compilation(installPath="usr/bin/vaporware")
         self.after_rpm.add_simple_compilation(installPath="usr/bin/vaporware")
         self.before_rpm.add_simple_library(
-            installPath="usr/lib/libvaporware.so.1", subpackageSuffix="devel"
+            installPath="usr/lib/libvaporware.so.1",
+            subpackageSuffix="devel",
+            sourceContent=library_source,
         )
         self.after_rpm.add_simple_library(
-            installPath="usr/lib/libvaporware.so.1", subpackageSuffix="devel"
+            installPath="usr/lib/libvaporware.so.1",
+            subpackageSuffix="devel",
+            sourceContent=library_source,
         )
 
         # manually add a devel subpackage with an incorrect Requires
@@ -547,10 +583,14 @@ class MissingEpochRequiresCompareKoji(TestCompareKoji):
         self.before_rpm.add_simple_compilation(installPath="usr/bin/vaporware")
         self.after_rpm.add_simple_compilation(installPath="usr/bin/vaporware")
         self.before_rpm.add_simple_library(
-            installPath="usr/lib/libvaporware.so.1", subpackageSuffix="devel"
+            installPath="usr/lib/libvaporware.so.1",
+            subpackageSuffix="devel",
+            sourceContent=library_source,
         )
         self.after_rpm.add_simple_library(
-            installPath="usr/lib/libvaporware.so.1", subpackageSuffix="devel"
+            installPath="usr/lib/libvaporware.so.1",
+            subpackageSuffix="devel",
+            sourceContent=library_source,
         )
 
         # manually add a devel subpackage with an incorrect Requires
@@ -581,10 +621,14 @@ class MissingEpochRequiresRebaseCompareSRPM(TestCompareSRPM):
         self.before_rpm.add_simple_compilation(installPath="usr/bin/vaporware")
         self.after_rpm.add_simple_compilation(installPath="usr/bin/vaporware")
         self.before_rpm.add_simple_library(
-            installPath="usr/lib/libvaporware.so.1", subpackageSuffix="devel"
+            installPath="usr/lib/libvaporware.so.1",
+            subpackageSuffix="devel",
+            sourceContent=library_source,
         )
         self.after_rpm.add_simple_library(
-            installPath="usr/lib/libvaporware.so.1", subpackageSuffix="devel"
+            installPath="usr/lib/libvaporware.so.1",
+            subpackageSuffix="devel",
+            sourceContent=library_source,
         )
 
         # manually add a devel subpackage with an incorrect Requires
@@ -615,10 +659,14 @@ class MissingEpochRequiresRebaseCompareRPMs(TestCompareRPMs):
         self.before_rpm.add_simple_compilation(installPath="usr/bin/vaporware")
         self.after_rpm.add_simple_compilation(installPath="usr/bin/vaporware")
         self.before_rpm.add_simple_library(
-            installPath="usr/lib/libvaporware.so.1", subpackageSuffix="devel"
+            installPath="usr/lib/libvaporware.so.1",
+            subpackageSuffix="devel",
+            sourceContent=library_source,
         )
         self.after_rpm.add_simple_library(
-            installPath="usr/lib/libvaporware.so.1", subpackageSuffix="devel"
+            installPath="usr/lib/libvaporware.so.1",
+            subpackageSuffix="devel",
+            sourceContent=library_source,
         )
 
         # manually add a devel subpackage with an incorrect Requires
@@ -648,10 +696,14 @@ class MissingEpochRequiresRebaseCompareKoji(TestCompareKoji):
         self.before_rpm.add_simple_compilation(installPath="usr/bin/vaporware")
         self.after_rpm.add_simple_compilation(installPath="usr/bin/vaporware")
         self.before_rpm.add_simple_library(
-            installPath="usr/lib/libvaporware.so.1", subpackageSuffix="devel"
+            installPath="usr/lib/libvaporware.so.1",
+            subpackageSuffix="devel",
+            sourceContent=library_source,
         )
         self.after_rpm.add_simple_library(
-            installPath="usr/lib/libvaporware.so.1", subpackageSuffix="devel"
+            installPath="usr/lib/libvaporware.so.1",
+            subpackageSuffix="devel",
+            sourceContent=library_source,
         )
 
         # manually add a devel subpackage with an incorrect Requires
@@ -748,12 +800,13 @@ class MissingExplicitRequiresSRPM(TestSRPM):
             libraryName="libvaporware.so",
             installPath="usr/lib/libvaporware.so",
             subpackageSuffix="libs",
+            sourceContent=library_source,
         )
 
         # now add a program linked with that library
         sourceFileName = "main.c"
         installPath = "usr/bin/vaporware"
-        self.rpm.add_source(SourceFile(sourceFileName, hello_world))
+        self.rpm.add_source(SourceFile(sourceFileName, hello_lib_world))
         self.rpm.section_build += (
             "%if 0%{?__isa_bits} == 32\n%define mopt -m32\n%endif\n"
         )
@@ -784,12 +837,13 @@ class MissingExplicitRequiresRPMs(TestRPMs):
             libraryName="libvaporware.so",
             installPath="usr/lib/libvaporware.so",
             subpackageSuffix="libs",
+            sourceContent=library_source,
         )
 
         # now add a program linked with that library
         sourceFileName = "main.c"
         installPath = "usr/bin/vaporware"
-        self.rpm.add_source(SourceFile(sourceFileName, hello_world))
+        self.rpm.add_source(SourceFile(sourceFileName, hello_lib_world))
         self.rpm.section_build += (
             "%if 0%{?__isa_bits} == 32\n%define mopt -m32\n%endif\n"
         )
@@ -821,12 +875,13 @@ class MissingExplicitRequiresKoji(TestKoji):
             libraryName="libvaporware.so",
             installPath="usr/lib/libvaporware.so",
             subpackageSuffix="libs",
+            sourceContent=library_source,
         )
 
         # now add a program linked with that library
         sourceFileName = "main.c"
         installPath = "usr/bin/vaporware"
-        self.rpm.add_source(SourceFile(sourceFileName, hello_world))
+        self.rpm.add_source(SourceFile(sourceFileName, hello_lib_world))
         self.rpm.section_build += (
             "%if 0%{?__isa_bits} == 32\n%define mopt -m32\n%endif\n"
         )
@@ -857,18 +912,20 @@ class MissingExplicitRequiresCompareSRPM(TestCompareSRPM):
             libraryName="libvaporware.so",
             installPath="usr/lib/libvaporware.so",
             subpackageSuffix="libs",
+            sourceContent=library_source,
         )
         self.after_rpm.add_simple_library(
             libraryName="libvaporware.so",
             installPath="usr/lib/libvaporware.so",
             subpackageSuffix="libs",
+            sourceContent=library_source,
         )
 
         # now add a program linked with that library
         sourceFileName = "main.c"
         installPath = "usr/bin/vaporware"
 
-        self.before_rpm.add_source(SourceFile(sourceFileName, hello_world))
+        self.before_rpm.add_source(SourceFile(sourceFileName, hello_lib_world))
         self.before_rpm.section_build += (
             "%if 0%{?__isa_bits} == 32\n%define mopt -m32\n%endif\n"
         )
@@ -881,7 +938,7 @@ class MissingExplicitRequiresCompareSRPM(TestCompareSRPM):
         binsub.section_files += "/%s\n" % installPath
         self.before_rpm.add_payload_check(installPath, None)
 
-        self.after_rpm.add_source(SourceFile(sourceFileName, hello_world))
+        self.after_rpm.add_source(SourceFile(sourceFileName, hello_lib_world))
         self.after_rpm.section_build += (
             "%if 0%{?__isa_bits} == 32\n%define mopt -m32\n%endif\n"
         )
@@ -913,18 +970,20 @@ class MissingExplicitRequiresCompareRPMs(TestCompareRPMs):
             libraryName="libvaporware.so",
             installPath="usr/lib/libvaporware.so",
             subpackageSuffix="libs",
+            sourceContent=library_source,
         )
         self.after_rpm.add_simple_library(
             libraryName="libvaporware.so",
             installPath="usr/lib/libvaporware.so",
             subpackageSuffix="libs",
+            sourceContent=library_source,
         )
 
         # now add a program linked with that library
         sourceFileName = "main.c"
         installPath = "usr/bin/vaporware"
 
-        self.before_rpm.add_source(SourceFile(sourceFileName, hello_world))
+        self.before_rpm.add_source(SourceFile(sourceFileName, hello_lib_world))
         self.before_rpm.section_build += (
             "%if 0%{?__isa_bits} == 32\n%define mopt -m32\n%endif\n"
         )
@@ -937,7 +996,7 @@ class MissingExplicitRequiresCompareRPMs(TestCompareRPMs):
         binsub.section_files += "/%s\n" % installPath
         self.before_rpm.add_payload_check(installPath, None)
 
-        self.after_rpm.add_source(SourceFile(sourceFileName, hello_world))
+        self.after_rpm.add_source(SourceFile(sourceFileName, hello_lib_world))
         self.after_rpm.section_build += (
             "%if 0%{?__isa_bits} == 32\n%define mopt -m32\n%endif\n"
         )
@@ -970,18 +1029,20 @@ class MissingExplicitRequiresCompareKoji(TestCompareKoji):
             libraryName="libvaporware.so",
             installPath="usr/lib/libvaporware.so",
             subpackageSuffix="libs",
+            sourceContent=library_source,
         )
         self.after_rpm.add_simple_library(
             libraryName="libvaporware.so",
             installPath="usr/lib/libvaporware.so",
             subpackageSuffix="libs",
+            sourceContent=library_source,
         )
 
         # now add a program linked with that library
         sourceFileName = "main.c"
         installPath = "usr/bin/vaporware"
 
-        self.before_rpm.add_source(SourceFile(sourceFileName, hello_world))
+        self.before_rpm.add_source(SourceFile(sourceFileName, hello_lib_world))
         self.before_rpm.section_build += (
             "%if 0%{?__isa_bits} == 32\n%define mopt -m32\n%endif\n"
         )
@@ -994,7 +1055,7 @@ class MissingExplicitRequiresCompareKoji(TestCompareKoji):
         binsub.section_files += "/%s\n" % installPath
         self.before_rpm.add_payload_check(installPath, None)
 
-        self.after_rpm.add_source(SourceFile(sourceFileName, hello_world))
+        self.after_rpm.add_source(SourceFile(sourceFileName, hello_lib_world))
         self.after_rpm.section_build += (
             "%if 0%{?__isa_bits} == 32\n%define mopt -m32\n%endif\n"
         )
