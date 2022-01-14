@@ -627,8 +627,10 @@ void dump_cfg(const struct rpminspect *ri)
     if ((ri->bad_functions && !TAILQ_EMPTY(ri->bad_functions)) || mapentry != NULL) {
         printf("badfuncs:\n");
 
-        TAILQ_FOREACH(entry, ri->bad_functions, items) {
-            printf("    - %s\n", entry->data);
+        if (ri->bad_functions && !TAILQ_EMPTY(ri->bad_functions)) {
+            TAILQ_FOREACH(entry, ri->bad_functions, items) {
+                printf("    - %s\n", entry->data);
+            }
         }
 
         dump_inspection_ignores(ri->inspection_ignores, NAME_BADFUNCS);
