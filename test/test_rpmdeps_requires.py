@@ -16,6 +16,9 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 #
 
+import os
+import unittest
+
 from rpmfluff.sourcefile import SourceFile
 from rpmfluff.utils import CC
 
@@ -23,6 +26,14 @@ from baseclass import TestKoji, TestRPMs, TestSRPM
 from baseclass import TestCompareKoji, TestCompareRPMs, TestCompareSRPM
 from baseclass import BEFORE_NAME, BEFORE_VER, BEFORE_REL
 from baseclass import AFTER_NAME, AFTER_VER, AFTER_REL
+
+# determine if we have /usr/lib/rpm/elfdeps
+# (missing on Alpine Linux as of 14-Jan-2022)
+elfdeps = "/usr/lib/rpm/elfdeps"
+have_elfdeps = False
+
+if os.path.isfile(elfdeps) and os.access(elfdeps, os.X_OK):
+    have_elfdeps = True
 
 before_requires = "important-package >= 2.0.2-47"
 after_requires = "important-package >= 4.7.0-1"
@@ -864,6 +875,7 @@ class MissingExplicitRequiresRPMs(TestRPMs):
 
 
 class MissingExplicitRequiresKoji(TestKoji):
+    @unittest.skipUnless(have_elfdeps, "system lacks %s executable" % elfdeps)
     def setUp(self):
         super().setUp()
 
@@ -1017,6 +1029,7 @@ class MissingExplicitRequiresCompareRPMs(TestCompareRPMs):
 
 
 class MissingExplicitRequiresCompareKoji(TestCompareKoji):
+    @unittest.skipUnless(have_elfdeps, "system lacks %s executable" % elfdeps)
     def setUp(self):
         super().setUp()
 
