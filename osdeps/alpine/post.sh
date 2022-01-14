@@ -63,12 +63,15 @@ cd libabigail || exit 1
 TAG="$(git tag -l | grep ^libabigail- | grep -v '\.rc' | sort -n | tail -n 1)"
 git checkout -b "${TAG}" "${TAG}"
 autoreconf -f -i -v
-if grep -q "<libgen\.h>" tools/abisym.cc >/dev/null 2>&1 ; then
+if ! grep -q "<libgen\.h>" tools/abisym.cc >/dev/null 2>&1 ; then
     sed -i -r '/^#include\ <elf\.h>/a #include <libgen.h>' tools/abisym.cc
 fi
 env LIBS="-lfts" ./configure --prefix=/usr/local
 make V=1
 make install
+
+# Avoid getting %{_arch} in filenames from rpmbuild
+echo "%_arch %(/bin/arch)" > ~/.rpmmacros
 
 # Update the clamav database
 freshclam
