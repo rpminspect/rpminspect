@@ -144,6 +144,7 @@ if python.found()
         'test_politics.py',
         'test_rpmdeps_requires.py',
         'test_rpmdeps_provides.py',
+        'test_rpmdeps_conflicts.py',
         'test_runpath.py',
         'test_securitypath.py',
         'test_shellsyntax.py',
