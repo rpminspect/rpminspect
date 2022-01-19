@@ -196,11 +196,6 @@ static bool check_explicit_lib_deps(struct rpminspect *ri, Header h, deprule_lis
                     free(isaprov);
                 }
             }
-
-            /* if we have a provider, get out of the loop */
-            if (found) {
-                break;
-            }
         }
 
         /* now look for the explicit Requires of potential_prov */
