@@ -143,6 +143,7 @@ if python.found()
         'test_permissions.py',
         'test_politics.py',
         'test_rpmdeps_requires.py',
+        'test_rpmdeps_provides.py',
         'test_runpath.py',
         'test_securitypath.py',
         'test_shellsyntax.py',
