@@ -17,6 +17,7 @@
 #
 
 import os
+import rpm
 import unittest
 
 from rpmfluff.sourcefile import SourceFile
@@ -34,6 +35,18 @@ have_elfdeps = False
 
 if os.path.isfile(elfdeps) and os.access(elfdeps, os.X_OK):
     have_elfdeps = True
+
+# determine if the Recommends tag type is present in librpm
+# version must be >= 4.12.0
+rpmver = list(map(lambda x: int(x), rpm.__version__.strip().split("-")[0].split(".")))
+rpm_major = rpmver[0]
+rpm_minor = rpmver[1]
+rpm_update = rpmver[2]
+
+if rpm_major < 4 or (rpm_major == 4 and rpm_minor < 12):
+    have_recommends = False
+else:
+    have_recommends = True
 
 before_recommends = "important-package >= 2.0.2-47"
 after_recommends = "important-package >= 4.7.0-1"
@@ -65,6 +78,7 @@ main (int argc, char **argv)
 
 # Recommends dependency is correct (OK) - control case
 class RecommendsCorrectRPMs(TestRPMs):
+    @unittest.skipUnless(have_recommends, "librpm too old to support Recommends")
     def setUp(self):
         super().setUp()
 
@@ -76,6 +90,7 @@ class RecommendsCorrectRPMs(TestRPMs):
 
 
 class RecommendsCorrectKoji(TestKoji):
+    @unittest.skipUnless(have_recommends, "librpm too old to support Recommends")
     def setUp(self):
         super().setUp()
 
@@ -88,6 +103,7 @@ class RecommendsCorrectKoji(TestKoji):
 
 # Retaining Recommends dependency in rebase comparison (INFO)
 class RetainingRecommendsRebaseCompareRPMs(TestCompareRPMs):
+    @unittest.skipUnless(have_recommends, "librpm too old to support Recommends")
     def setUp(self):
         super().setUp(rebase=True)
 
@@ -100,6 +116,7 @@ class RetainingRecommendsRebaseCompareRPMs(TestCompareRPMs):
 
 
 class RetainingRecommendsRebaseCompareKoji(TestCompareKoji):
+    @unittest.skipUnless(have_recommends, "librpm too old to support Recommends")
     def setUp(self):
         super().setUp(rebase=True)
 
@@ -113,6 +130,7 @@ class RetainingRecommendsRebaseCompareKoji(TestCompareKoji):
 
 # Retaining Recommends dependency in maint comparison (OK)
 class RetainingRecommendsCompareRPMs(TestCompareRPMs):
+    @unittest.skipUnless(have_recommends, "librpm too old to support Recommends")
     def setUp(self):
         super().setUp()
 
@@ -125,6 +143,7 @@ class RetainingRecommendsCompareRPMs(TestCompareRPMs):
 
 
 class RetainingRecommendsCompareKoji(TestCompareKoji):
+    @unittest.skipUnless(have_recommends, "librpm too old to support Recommends")
     def setUp(self):
         super().setUp()
 
@@ -138,6 +157,7 @@ class RetainingRecommendsCompareKoji(TestCompareKoji):
 
 # Gaining a new Recommends in a rebase comparison (INFO)
 class GainingRecommendsRebaseCompareRPMs(TestCompareRPMs):
+    @unittest.skipUnless(have_recommends, "librpm too old to support Recommends")
     def setUp(self):
         super().setUp(rebase=True)
 
@@ -149,6 +169,7 @@ class GainingRecommendsRebaseCompareRPMs(TestCompareRPMs):
 
 
 class GainingRecommendsRebaseCompareKoji(TestCompareKoji):
+    @unittest.skipUnless(have_recommends, "librpm too old to support Recommends")
     def setUp(self):
         super().setUp(rebase=True)
 
@@ -161,6 +182,7 @@ class GainingRecommendsRebaseCompareKoji(TestCompareKoji):
 
 # Gaining a new Recommends in a maint comparison (VERIFY)
 class GainingRecommendsCompareRPMs(TestCompareRPMs):
+    @unittest.skipUnless(have_recommends, "librpm too old to support Recommends")
     def setUp(self):
         super().setUp()
 
@@ -172,6 +194,7 @@ class GainingRecommendsCompareRPMs(TestCompareRPMs):
 
 
 class GainingRecommendsCompareKoji(TestCompareKoji):
+    @unittest.skipUnless(have_recommends, "librpm too old to support Recommends")
     def setUp(self):
         super().setUp()
 
@@ -184,6 +207,7 @@ class GainingRecommendsCompareKoji(TestCompareKoji):
 
 # Changing a Recommends in a rebase comparison (INFO)
 class ChangingRecommendsRebaseCompareRPMs(TestCompareRPMs):
+    @unittest.skipUnless(have_recommends, "librpm too old to support Recommends")
     def setUp(self):
         super().setUp(rebase=True)
 
@@ -196,6 +220,7 @@ class ChangingRecommendsRebaseCompareRPMs(TestCompareRPMs):
 
 
 class ChangingRecommendsRebaseCompareKoji(TestCompareKoji):
+    @unittest.skipUnless(have_recommends, "librpm too old to support Recommends")
     def setUp(self):
         super().setUp(rebase=True)
 
@@ -209,6 +234,7 @@ class ChangingRecommendsRebaseCompareKoji(TestCompareKoji):
 
 # Changing a Recommends in a maint comparison (VERIFY)
 class ChangingRecommendsCompareRPMs(TestCompareRPMs):
+    @unittest.skipUnless(have_recommends, "librpm too old to support Recommends")
     def setUp(self):
         super().setUp()
 
@@ -221,6 +247,7 @@ class ChangingRecommendsCompareRPMs(TestCompareRPMs):
 
 
 class ChangingRecommendsCompareKoji(TestCompareKoji):
+    @unittest.skipUnless(have_recommends, "librpm too old to support Recommends")
     def setUp(self):
         super().setUp()
 
@@ -234,6 +261,7 @@ class ChangingRecommendsCompareKoji(TestCompareKoji):
 
 # Changing a Recommends in a maint comparison due to NVR (INFO)
 class ChangingRecommendsExpectedCompareSRPM(TestCompareSRPM):
+    @unittest.skipUnless(have_recommends, "librpm too old to support Recommends")
     def setUp(self):
         super().setUp()
 
@@ -244,6 +272,7 @@ class ChangingRecommendsExpectedCompareSRPM(TestCompareSRPM):
 
 
 class ChangingRecommendsExpectedCompareRPMs(TestCompareRPMs):
+    @unittest.skipUnless(have_recommends, "librpm too old to support Recommends")
     def setUp(self):
         super().setUp()
 
@@ -253,6 +282,7 @@ class ChangingRecommendsExpectedCompareRPMs(TestCompareRPMs):
 
 
 class ChangingRecommendsExpectedCompareKoji(TestCompareKoji):
+    @unittest.skipUnless(have_recommends, "librpm too old to support Recommends")
     def setUp(self):
         super().setUp()
 
@@ -263,6 +293,7 @@ class ChangingRecommendsExpectedCompareKoji(TestCompareKoji):
 
 # Losing a Recommends in a rebase comparison (INFO)
 class LosingRecommendsRebaseCompareRPMs(TestCompareRPMs):
+    @unittest.skipUnless(have_recommends, "librpm too old to support Recommends")
     def setUp(self):
         super().setUp(rebase=True)
 
@@ -274,6 +305,7 @@ class LosingRecommendsRebaseCompareRPMs(TestCompareRPMs):
 
 
 class LosingRecommendsRebaseCompareKoji(TestCompareKoji):
+    @unittest.skipUnless(have_recommends, "librpm too old to support Recommends")
     def setUp(self):
         super().setUp(rebase=True)
 
@@ -286,6 +318,7 @@ class LosingRecommendsRebaseCompareKoji(TestCompareKoji):
 
 # Losing a Recommends in a maint comparison (VERIFY)
 class LosingRecommendsCompareRPMs(TestCompareRPMs):
+    @unittest.skipUnless(have_recommends, "librpm too old to support Recommends")
     def setUp(self):
         super().setUp()
 
@@ -297,6 +330,7 @@ class LosingRecommendsCompareRPMs(TestCompareRPMs):
 
 
 class LosingRecommendsCompareKoji(TestCompareKoji):
+    @unittest.skipUnless(have_recommends, "librpm too old to support Recommends")
     def setUp(self):
         super().setUp()
 
@@ -310,6 +344,7 @@ class LosingRecommendsCompareKoji(TestCompareKoji):
 # Missing Epoch prefix on maint compare (BAD for Koji compares, OK
 # otherwise)
 class MissingEpochRecommendsSRPM(TestSRPM):
+    @unittest.skipUnless(have_recommends, "librpm too old to support Recommends")
     def setUp(self):
         super().setUp()
 
@@ -338,6 +373,7 @@ class MissingEpochRecommendsSRPM(TestSRPM):
 
 
 class MissingEpochRecommendsRPMs(TestRPMs):
+    @unittest.skipUnless(have_recommends, "librpm too old to support Recommends")
     def setUp(self):
         super().setUp()
 
@@ -369,6 +405,7 @@ class MissingEpochRecommendsRPMs(TestRPMs):
 
 
 class MissingEpochRecommendsKoji(TestKoji):
+    @unittest.skipUnless(have_recommends, "librpm too old to support Recommends")
     def setUp(self):
         super().setUp()
 
@@ -397,6 +434,7 @@ class MissingEpochRecommendsKoji(TestKoji):
 
 
 class MissingEpochRecommendsCompareSRPM(TestCompareSRPM):
+    @unittest.skipUnless(have_recommends, "librpm too old to support Recommends")
     def setUp(self):
         super().setUp()
 
@@ -435,6 +473,7 @@ class MissingEpochRecommendsCompareSRPM(TestCompareSRPM):
 
 
 class MissingEpochRecommendsCompareRPMs(TestCompareRPMs):
+    @unittest.skipUnless(have_recommends, "librpm too old to support Recommends")
     def setUp(self):
         super().setUp()
 
@@ -474,6 +513,7 @@ class MissingEpochRecommendsCompareRPMs(TestCompareRPMs):
 
 
 class MissingEpochRecommendsCompareKoji(TestCompareKoji):
+    @unittest.skipUnless(have_recommends, "librpm too old to support Recommends")
     def setUp(self):
         super().setUp()
 
@@ -513,6 +553,7 @@ class MissingEpochRecommendsCompareKoji(TestCompareKoji):
 
 # Missing Epoch prefix on rebase compare (INFO)
 class MissingEpochRecommendsRebaseCompareSRPM(TestCompareSRPM):
+    @unittest.skipUnless(have_recommends, "librpm too old to support Recommends")
     def setUp(self):
         super().setUp(rebase=True)
 
@@ -551,6 +592,7 @@ class MissingEpochRecommendsRebaseCompareSRPM(TestCompareSRPM):
 
 
 class MissingEpochRecommendsRebaseCompareRPMs(TestCompareRPMs):
+    @unittest.skipUnless(have_recommends, "librpm too old to support Recommends")
     def setUp(self):
         super().setUp(rebase=True)
 
@@ -588,6 +630,7 @@ class MissingEpochRecommendsRebaseCompareRPMs(TestCompareRPMs):
 
 
 class MissingEpochRecommendsRebaseCompareKoji(TestCompareKoji):
+    @unittest.skipUnless(have_recommends, "librpm too old to support Recommends")
     def setUp(self):
         super().setUp(rebase=True)
 
@@ -626,6 +669,7 @@ class MissingEpochRecommendsRebaseCompareKoji(TestCompareKoji):
 
 # Unexpanded macro in Recommends (BAD)
 class UnexpandedMacroRecommendsSRPM(TestSRPM):
+    @unittest.skipUnless(have_recommends, "librpm too old to support Recommends")
     def setUp(self):
         super().setUp()
 
@@ -638,6 +682,7 @@ class UnexpandedMacroRecommendsSRPM(TestSRPM):
 
 
 class UnexpandedMacroRecommendsRPMs(TestRPMs):
+    @unittest.skipUnless(have_recommends, "librpm too old to support Recommends")
     def setUp(self):
         super().setUp()
 
@@ -649,6 +694,7 @@ class UnexpandedMacroRecommendsRPMs(TestRPMs):
 
 
 class UnexpandedMacroRecommendsKoji(TestKoji):
+    @unittest.skipUnless(have_recommends, "librpm too old to support Recommends")
     def setUp(self):
         super().setUp()
 
@@ -660,6 +706,7 @@ class UnexpandedMacroRecommendsKoji(TestKoji):
 
 
 class UnexpandedMacroRecommendsCompareSRPM(TestCompareSRPM):
+    @unittest.skipUnless(have_recommends, "librpm too old to support Recommends")
     def setUp(self):
         super().setUp()
 
@@ -673,6 +720,7 @@ class UnexpandedMacroRecommendsCompareSRPM(TestCompareSRPM):
 
 
 class UnexpandedMacroRecommendsCompareRPMs(TestCompareRPMs):
+    @unittest.skipUnless(have_recommends, "librpm too old to support Recommends")
     def setUp(self):
         super().setUp()
 
@@ -685,6 +733,7 @@ class UnexpandedMacroRecommendsCompareRPMs(TestCompareRPMs):
 
 
 class UnexpandedMacroRecommendsCompareKoji(TestCompareKoji):
+    @unittest.skipUnless(have_recommends, "librpm too old to support Recommends")
     def setUp(self):
         super().setUp()
 
@@ -698,6 +747,7 @@ class UnexpandedMacroRecommendsCompareKoji(TestCompareKoji):
 
 # Missing explicit Recommends (VERIFY)
 class MissingExplicitRecommendsSRPM(TestSRPM):
+    @unittest.skipUnless(have_recommends, "librpm too old to support Recommends")
     def setUp(self):
         super().setUp()
 
@@ -735,6 +785,7 @@ class MissingExplicitRecommendsSRPM(TestSRPM):
 
 
 class MissingExplicitRecommendsRPMs(TestRPMs):
+    @unittest.skipUnless(have_recommends, "librpm too old to support Recommends")
     def setUp(self):
         super().setUp()
 
@@ -773,6 +824,7 @@ class MissingExplicitRecommendsRPMs(TestRPMs):
 
 
 class MissingExplicitRecommendsKoji(TestKoji):
+    @unittest.skipUnless(have_recommends, "librpm too old to support Recommends")
     @unittest.skipUnless(have_elfdeps, "system lacks %s executable" % elfdeps)
     def setUp(self):
         super().setUp()
@@ -810,6 +862,7 @@ class MissingExplicitRecommendsKoji(TestKoji):
 
 
 class MissingExplicitRecommendsCompareSRPM(TestCompareSRPM):
+    @unittest.skipUnless(have_recommends, "librpm too old to support Recommends")
     def setUp(self):
         super().setUp()
 
@@ -868,6 +921,7 @@ class MissingExplicitRecommendsCompareSRPM(TestCompareSRPM):
 
 
 class MissingExplicitRecommendsCompareRPMs(TestCompareRPMs):
+    @unittest.skipUnless(have_recommends, "librpm too old to support Recommends")
     def setUp(self):
         super().setUp()
 
@@ -927,6 +981,7 @@ class MissingExplicitRecommendsCompareRPMs(TestCompareRPMs):
 
 
 class MissingExplicitRecommendsCompareKoji(TestCompareKoji):
+    @unittest.skipUnless(have_recommends, "librpm too old to support Recommends")
     @unittest.skipUnless(have_elfdeps, "system lacks %s executable" % elfdeps)
     def setUp(self):
         super().setUp()
@@ -986,6 +1041,7 @@ class MissingExplicitRecommendsCompareKoji(TestCompareKoji):
 
 # Multiple providers of the same thing (VERIFY)
 class MultipleProvidersSRPM(TestSRPM):
+    @unittest.skipUnless(have_recommends, "librpm too old to support Recommends")
     @unittest.skipUnless(have_elfdeps, "system lacks %s executable" % elfdeps)
     def setUp(self):
         super().setUp()
@@ -1035,6 +1091,7 @@ class MultipleProvidersSRPM(TestSRPM):
 
 
 class MultipleProvidersRPMs(TestRPMs):
+    @unittest.skipUnless(have_recommends, "librpm too old to support Recommends")
     @unittest.skipUnless(have_elfdeps, "system lacks %s executable" % elfdeps)
     def setUp(self):
         super().setUp()
@@ -1084,6 +1141,7 @@ class MultipleProvidersRPMs(TestRPMs):
 
 
 class MultipleProvidersKoji(TestKoji):
+    @unittest.skipUnless(have_recommends, "librpm too old to support Recommends")
     @unittest.skipUnless(have_elfdeps, "system lacks %s executable" % elfdeps)
     def setUp(self):
         super().setUp()
@@ -1132,6 +1190,7 @@ class MultipleProvidersKoji(TestKoji):
 
 
 class MultipleProvidersCompareSRPM(TestCompareSRPM):
+    @unittest.skipUnless(have_recommends, "librpm too old to support Recommends")
     @unittest.skipUnless(have_elfdeps, "system lacks %s executable" % elfdeps)
     def setUp(self):
         super().setUp()
@@ -1209,6 +1268,7 @@ class MultipleProvidersCompareSRPM(TestCompareSRPM):
 
 
 class MultipleProvidersCompareRPMs(TestCompareRPMs):
+    @unittest.skipUnless(have_recommends, "librpm too old to support Recommends")
     @unittest.skipUnless(have_elfdeps, "system lacks %s executable" % elfdeps)
     def setUp(self):
         super().setUp()
@@ -1285,6 +1345,7 @@ class MultipleProvidersCompareRPMs(TestCompareRPMs):
 
 
 class MultipleProvidersCompareKoji(TestCompareKoji):
+    @unittest.skipUnless(have_recommends, "librpm too old to support Recommends")
     @unittest.skipUnless(have_elfdeps, "system lacks %s executable" % elfdeps)
     def setUp(self):
         super().setUp()

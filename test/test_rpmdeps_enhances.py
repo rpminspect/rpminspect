@@ -17,6 +17,7 @@
 #
 
 import os
+import rpm
 import unittest
 
 from rpmfluff.sourcefile import SourceFile
@@ -34,6 +35,18 @@ have_elfdeps = False
 
 if os.path.isfile(elfdeps) and os.access(elfdeps, os.X_OK):
     have_elfdeps = True
+
+# determine if the Enhances tag type is present in librpm
+# version must be >= 4.12.0
+rpmver = list(map(lambda x: int(x), rpm.__version__.strip().split("-")[0].split(".")))
+rpm_major = rpmver[0]
+rpm_minor = rpmver[1]
+rpm_update = rpmver[2]
+
+if rpm_major < 4 or (rpm_major == 4 and rpm_minor < 12):
+    have_enhances = False
+else:
+    have_enhances = True
 
 before_enhances = "important-package >= 2.0.2-47"
 after_enhances = "important-package >= 4.7.0-1"
@@ -65,6 +78,7 @@ main (int argc, char **argv)
 
 # Enhances dependency is correct (OK) - control case
 class EnhancesCorrectRPMs(TestRPMs):
+    @unittest.skipUnless(have_enhances, "librpm too old to support Enhances")
     def setUp(self):
         super().setUp()
 
@@ -76,6 +90,7 @@ class EnhancesCorrectRPMs(TestRPMs):
 
 
 class EnhancesCorrectKoji(TestKoji):
+    @unittest.skipUnless(have_enhances, "librpm too old to support Enhances")
     def setUp(self):
         super().setUp()
 
@@ -88,6 +103,7 @@ class EnhancesCorrectKoji(TestKoji):
 
 # Retaining Enhances dependency in rebase comparison (INFO)
 class RetainingEnhancesRebaseCompareRPMs(TestCompareRPMs):
+    @unittest.skipUnless(have_enhances, "librpm too old to support Enhances")
     def setUp(self):
         super().setUp(rebase=True)
 
@@ -100,6 +116,7 @@ class RetainingEnhancesRebaseCompareRPMs(TestCompareRPMs):
 
 
 class RetainingEnhancesRebaseCompareKoji(TestCompareKoji):
+    @unittest.skipUnless(have_enhances, "librpm too old to support Enhances")
     def setUp(self):
         super().setUp(rebase=True)
 
@@ -113,6 +130,7 @@ class RetainingEnhancesRebaseCompareKoji(TestCompareKoji):
 
 # Retaining Enhances dependency in maint comparison (OK)
 class RetainingEnhancesCompareRPMs(TestCompareRPMs):
+    @unittest.skipUnless(have_enhances, "librpm too old to support Enhances")
     def setUp(self):
         super().setUp()
 
@@ -125,6 +143,7 @@ class RetainingEnhancesCompareRPMs(TestCompareRPMs):
 
 
 class RetainingEnhancesCompareKoji(TestCompareKoji):
+    @unittest.skipUnless(have_enhances, "librpm too old to support Enhances")
     def setUp(self):
         super().setUp()
 
@@ -138,6 +157,7 @@ class RetainingEnhancesCompareKoji(TestCompareKoji):
 
 # Gaining a new Enhances in a rebase comparison (INFO)
 class GainingEnhancesRebaseCompareRPMs(TestCompareRPMs):
+    @unittest.skipUnless(have_enhances, "librpm too old to support Enhances")
     def setUp(self):
         super().setUp(rebase=True)
 
@@ -149,6 +169,7 @@ class GainingEnhancesRebaseCompareRPMs(TestCompareRPMs):
 
 
 class GainingEnhancesRebaseCompareKoji(TestCompareKoji):
+    @unittest.skipUnless(have_enhances, "librpm too old to support Enhances")
     def setUp(self):
         super().setUp(rebase=True)
 
@@ -161,6 +182,7 @@ class GainingEnhancesRebaseCompareKoji(TestCompareKoji):
 
 # Gaining a new Enhances in a maint comparison (VERIFY)
 class GainingEnhancesCompareRPMs(TestCompareRPMs):
+    @unittest.skipUnless(have_enhances, "librpm too old to support Enhances")
     def setUp(self):
         super().setUp()
 
@@ -172,6 +194,7 @@ class GainingEnhancesCompareRPMs(TestCompareRPMs):
 
 
 class GainingEnhancesCompareKoji(TestCompareKoji):
+    @unittest.skipUnless(have_enhances, "librpm too old to support Enhances")
     def setUp(self):
         super().setUp()
 
@@ -184,6 +207,7 @@ class GainingEnhancesCompareKoji(TestCompareKoji):
 
 # Changing a Enhances in a rebase comparison (INFO)
 class ChangingEnhancesRebaseCompareRPMs(TestCompareRPMs):
+    @unittest.skipUnless(have_enhances, "librpm too old to support Enhances")
     def setUp(self):
         super().setUp(rebase=True)
 
@@ -196,6 +220,7 @@ class ChangingEnhancesRebaseCompareRPMs(TestCompareRPMs):
 
 
 class ChangingEnhancesRebaseCompareKoji(TestCompareKoji):
+    @unittest.skipUnless(have_enhances, "librpm too old to support Enhances")
     def setUp(self):
         super().setUp(rebase=True)
 
@@ -209,6 +234,7 @@ class ChangingEnhancesRebaseCompareKoji(TestCompareKoji):
 
 # Changing a Enhances in a maint comparison (VERIFY)
 class ChangingEnhancesCompareRPMs(TestCompareRPMs):
+    @unittest.skipUnless(have_enhances, "librpm too old to support Enhances")
     def setUp(self):
         super().setUp()
 
@@ -221,6 +247,7 @@ class ChangingEnhancesCompareRPMs(TestCompareRPMs):
 
 
 class ChangingEnhancesCompareKoji(TestCompareKoji):
+    @unittest.skipUnless(have_enhances, "librpm too old to support Enhances")
     def setUp(self):
         super().setUp()
 
@@ -234,6 +261,7 @@ class ChangingEnhancesCompareKoji(TestCompareKoji):
 
 # Changing a Enhances in a maint comparison due to NVR (INFO)
 class ChangingEnhancesExpectedCompareSRPM(TestCompareSRPM):
+    @unittest.skipUnless(have_enhances, "librpm too old to support Enhances")
     def setUp(self):
         super().setUp()
 
@@ -244,6 +272,7 @@ class ChangingEnhancesExpectedCompareSRPM(TestCompareSRPM):
 
 
 class ChangingEnhancesExpectedCompareRPMs(TestCompareRPMs):
+    @unittest.skipUnless(have_enhances, "librpm too old to support Enhances")
     def setUp(self):
         super().setUp()
 
@@ -253,6 +282,7 @@ class ChangingEnhancesExpectedCompareRPMs(TestCompareRPMs):
 
 
 class ChangingEnhancesExpectedCompareKoji(TestCompareKoji):
+    @unittest.skipUnless(have_enhances, "librpm too old to support Enhances")
     def setUp(self):
         super().setUp()
 
@@ -263,6 +293,7 @@ class ChangingEnhancesExpectedCompareKoji(TestCompareKoji):
 
 # Losing a Enhances in a rebase comparison (INFO)
 class LosingEnhancesRebaseCompareRPMs(TestCompareRPMs):
+    @unittest.skipUnless(have_enhances, "librpm too old to support Enhances")
     def setUp(self):
         super().setUp(rebase=True)
 
@@ -274,6 +305,7 @@ class LosingEnhancesRebaseCompareRPMs(TestCompareRPMs):
 
 
 class LosingEnhancesRebaseCompareKoji(TestCompareKoji):
+    @unittest.skipUnless(have_enhances, "librpm too old to support Enhances")
     def setUp(self):
         super().setUp(rebase=True)
 
@@ -286,6 +318,7 @@ class LosingEnhancesRebaseCompareKoji(TestCompareKoji):
 
 # Losing a Enhances in a maint comparison (VERIFY)
 class LosingEnhancesCompareRPMs(TestCompareRPMs):
+    @unittest.skipUnless(have_enhances, "librpm too old to support Enhances")
     def setUp(self):
         super().setUp()
 
@@ -297,6 +330,7 @@ class LosingEnhancesCompareRPMs(TestCompareRPMs):
 
 
 class LosingEnhancesCompareKoji(TestCompareKoji):
+    @unittest.skipUnless(have_enhances, "librpm too old to support Enhances")
     def setUp(self):
         super().setUp()
 
@@ -310,6 +344,7 @@ class LosingEnhancesCompareKoji(TestCompareKoji):
 # Missing Epoch prefix on maint compare (BAD for Koji compares, OK
 # otherwise)
 class MissingEpochEnhancesSRPM(TestSRPM):
+    @unittest.skipUnless(have_enhances, "librpm too old to support Enhances")
     def setUp(self):
         super().setUp()
 
@@ -338,6 +373,7 @@ class MissingEpochEnhancesSRPM(TestSRPM):
 
 
 class MissingEpochEnhancesRPMs(TestRPMs):
+    @unittest.skipUnless(have_enhances, "librpm too old to support Enhances")
     def setUp(self):
         super().setUp()
 
@@ -369,6 +405,7 @@ class MissingEpochEnhancesRPMs(TestRPMs):
 
 
 class MissingEpochEnhancesKoji(TestKoji):
+    @unittest.skipUnless(have_enhances, "librpm too old to support Enhances")
     def setUp(self):
         super().setUp()
 
@@ -397,6 +434,7 @@ class MissingEpochEnhancesKoji(TestKoji):
 
 
 class MissingEpochEnhancesCompareSRPM(TestCompareSRPM):
+    @unittest.skipUnless(have_enhances, "librpm too old to support Enhances")
     def setUp(self):
         super().setUp()
 
@@ -435,6 +473,7 @@ class MissingEpochEnhancesCompareSRPM(TestCompareSRPM):
 
 
 class MissingEpochEnhancesCompareRPMs(TestCompareRPMs):
+    @unittest.skipUnless(have_enhances, "librpm too old to support Enhances")
     def setUp(self):
         super().setUp()
 
@@ -474,6 +513,7 @@ class MissingEpochEnhancesCompareRPMs(TestCompareRPMs):
 
 
 class MissingEpochEnhancesCompareKoji(TestCompareKoji):
+    @unittest.skipUnless(have_enhances, "librpm too old to support Enhances")
     def setUp(self):
         super().setUp()
 
@@ -513,6 +553,7 @@ class MissingEpochEnhancesCompareKoji(TestCompareKoji):
 
 # Missing Epoch prefix on rebase compare (INFO)
 class MissingEpochEnhancesRebaseCompareSRPM(TestCompareSRPM):
+    @unittest.skipUnless(have_enhances, "librpm too old to support Enhances")
     def setUp(self):
         super().setUp(rebase=True)
 
@@ -551,6 +592,7 @@ class MissingEpochEnhancesRebaseCompareSRPM(TestCompareSRPM):
 
 
 class MissingEpochEnhancesRebaseCompareRPMs(TestCompareRPMs):
+    @unittest.skipUnless(have_enhances, "librpm too old to support Enhances")
     def setUp(self):
         super().setUp(rebase=True)
 
@@ -588,6 +630,7 @@ class MissingEpochEnhancesRebaseCompareRPMs(TestCompareRPMs):
 
 
 class MissingEpochEnhancesRebaseCompareKoji(TestCompareKoji):
+    @unittest.skipUnless(have_enhances, "librpm too old to support Enhances")
     def setUp(self):
         super().setUp(rebase=True)
 
@@ -626,6 +669,7 @@ class MissingEpochEnhancesRebaseCompareKoji(TestCompareKoji):
 
 # Unexpanded macro in Enhances (BAD)
 class UnexpandedMacroEnhancesSRPM(TestSRPM):
+    @unittest.skipUnless(have_enhances, "librpm too old to support Enhances")
     def setUp(self):
         super().setUp()
 
@@ -638,6 +682,7 @@ class UnexpandedMacroEnhancesSRPM(TestSRPM):
 
 
 class UnexpandedMacroEnhancesRPMs(TestRPMs):
+    @unittest.skipUnless(have_enhances, "librpm too old to support Enhances")
     def setUp(self):
         super().setUp()
 
@@ -649,6 +694,7 @@ class UnexpandedMacroEnhancesRPMs(TestRPMs):
 
 
 class UnexpandedMacroEnhancesKoji(TestKoji):
+    @unittest.skipUnless(have_enhances, "librpm too old to support Enhances")
     def setUp(self):
         super().setUp()
 
@@ -660,6 +706,7 @@ class UnexpandedMacroEnhancesKoji(TestKoji):
 
 
 class UnexpandedMacroEnhancesCompareSRPM(TestCompareSRPM):
+    @unittest.skipUnless(have_enhances, "librpm too old to support Enhances")
     def setUp(self):
         super().setUp()
 
@@ -673,6 +720,7 @@ class UnexpandedMacroEnhancesCompareSRPM(TestCompareSRPM):
 
 
 class UnexpandedMacroEnhancesCompareRPMs(TestCompareRPMs):
+    @unittest.skipUnless(have_enhances, "librpm too old to support Enhances")
     def setUp(self):
         super().setUp()
 
@@ -685,6 +733,7 @@ class UnexpandedMacroEnhancesCompareRPMs(TestCompareRPMs):
 
 
 class UnexpandedMacroEnhancesCompareKoji(TestCompareKoji):
+    @unittest.skipUnless(have_enhances, "librpm too old to support Enhances")
     def setUp(self):
         super().setUp()
 
@@ -698,6 +747,7 @@ class UnexpandedMacroEnhancesCompareKoji(TestCompareKoji):
 
 # Missing explicit Enhances (VERIFY)
 class MissingExplicitEnhancesSRPM(TestSRPM):
+    @unittest.skipUnless(have_enhances, "librpm too old to support Enhances")
     def setUp(self):
         super().setUp()
 
@@ -735,6 +785,7 @@ class MissingExplicitEnhancesSRPM(TestSRPM):
 
 
 class MissingExplicitEnhancesRPMs(TestRPMs):
+    @unittest.skipUnless(have_enhances, "librpm too old to support Enhances")
     def setUp(self):
         super().setUp()
 
@@ -773,6 +824,7 @@ class MissingExplicitEnhancesRPMs(TestRPMs):
 
 
 class MissingExplicitEnhancesKoji(TestKoji):
+    @unittest.skipUnless(have_enhances, "librpm too old to support Enhances")
     @unittest.skipUnless(have_elfdeps, "system lacks %s executable" % elfdeps)
     def setUp(self):
         super().setUp()
@@ -810,6 +862,7 @@ class MissingExplicitEnhancesKoji(TestKoji):
 
 
 class MissingExplicitEnhancesCompareSRPM(TestCompareSRPM):
+    @unittest.skipUnless(have_enhances, "librpm too old to support Enhances")
     def setUp(self):
         super().setUp()
 
@@ -868,6 +921,7 @@ class MissingExplicitEnhancesCompareSRPM(TestCompareSRPM):
 
 
 class MissingExplicitEnhancesCompareRPMs(TestCompareRPMs):
+    @unittest.skipUnless(have_enhances, "librpm too old to support Enhances")
     def setUp(self):
         super().setUp()
 
@@ -927,6 +981,7 @@ class MissingExplicitEnhancesCompareRPMs(TestCompareRPMs):
 
 
 class MissingExplicitEnhancesCompareKoji(TestCompareKoji):
+    @unittest.skipUnless(have_enhances, "librpm too old to support Enhances")
     @unittest.skipUnless(have_elfdeps, "system lacks %s executable" % elfdeps)
     def setUp(self):
         super().setUp()
@@ -986,6 +1041,7 @@ class MissingExplicitEnhancesCompareKoji(TestCompareKoji):
 
 # Multiple providers of the same thing (VERIFY)
 class MultipleProvidersSRPM(TestSRPM):
+    @unittest.skipUnless(have_enhances, "librpm too old to support Enhances")
     @unittest.skipUnless(have_elfdeps, "system lacks %s executable" % elfdeps)
     def setUp(self):
         super().setUp()
@@ -1035,6 +1091,7 @@ class MultipleProvidersSRPM(TestSRPM):
 
 
 class MultipleProvidersRPMs(TestRPMs):
+    @unittest.skipUnless(have_enhances, "librpm too old to support Enhances")
     @unittest.skipUnless(have_elfdeps, "system lacks %s executable" % elfdeps)
     def setUp(self):
         super().setUp()
@@ -1084,6 +1141,7 @@ class MultipleProvidersRPMs(TestRPMs):
 
 
 class MultipleProvidersKoji(TestKoji):
+    @unittest.skipUnless(have_enhances, "librpm too old to support Enhances")
     @unittest.skipUnless(have_elfdeps, "system lacks %s executable" % elfdeps)
     def setUp(self):
         super().setUp()
@@ -1132,6 +1190,7 @@ class MultipleProvidersKoji(TestKoji):
 
 
 class MultipleProvidersCompareSRPM(TestCompareSRPM):
+    @unittest.skipUnless(have_enhances, "librpm too old to support Enhances")
     @unittest.skipUnless(have_elfdeps, "system lacks %s executable" % elfdeps)
     def setUp(self):
         super().setUp()
@@ -1209,6 +1268,7 @@ class MultipleProvidersCompareSRPM(TestCompareSRPM):
 
 
 class MultipleProvidersCompareRPMs(TestCompareRPMs):
+    @unittest.skipUnless(have_enhances, "librpm too old to support Enhances")
     @unittest.skipUnless(have_elfdeps, "system lacks %s executable" % elfdeps)
     def setUp(self):
         super().setUp()
@@ -1285,6 +1345,7 @@ class MultipleProvidersCompareRPMs(TestCompareRPMs):
 
 
 class MultipleProvidersCompareKoji(TestCompareKoji):
+    @unittest.skipUnless(have_enhances, "librpm too old to support Enhances")
     @unittest.skipUnless(have_elfdeps, "system lacks %s executable" % elfdeps)
     def setUp(self):
         super().setUp()
