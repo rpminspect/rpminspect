@@ -17,6 +17,7 @@
 #
 
 import os
+import rpm
 import unittest
 
 from rpmfluff.sourcefile import SourceFile
@@ -34,6 +35,18 @@ have_elfdeps = False
 
 if os.path.isfile(elfdeps) and os.access(elfdeps, os.X_OK):
     have_elfdeps = True
+
+# determine if the Supplements tag type is present in librpm
+# version must be >= 4.12.0
+rpmver = list(map(lambda x: int(x), rpm.__version__.strip().split("-")[0].split(".")))
+rpm_major = rpmver[0]
+rpm_minor = rpmver[1]
+rpm_update = rpmver[2]
+
+if rpm_major < 4 or (rpm_major == 4 and rpm_minor < 12):
+    have_supplements = False
+else:
+    have_supplements = True
 
 before_supplements = "important-package >= 2.0.2-47"
 after_supplements = "important-package >= 4.7.0-1"
@@ -65,6 +78,7 @@ main (int argc, char **argv)
 
 # Supplements dependency is correct (OK) - control case
 class SupplementsCorrectRPMs(TestRPMs):
+    @unittest.skipUnless(have_supplements, "librpm too old to support Supplements")
     def setUp(self):
         super().setUp()
 
@@ -76,6 +90,7 @@ class SupplementsCorrectRPMs(TestRPMs):
 
 
 class SupplementsCorrectKoji(TestKoji):
+    @unittest.skipUnless(have_supplements, "librpm too old to support Supplements")
     def setUp(self):
         super().setUp()
 
@@ -88,6 +103,7 @@ class SupplementsCorrectKoji(TestKoji):
 
 # Retaining Supplements dependency in rebase comparison (INFO)
 class RetainingSupplementsRebaseCompareRPMs(TestCompareRPMs):
+    @unittest.skipUnless(have_supplements, "librpm too old to support Supplements")
     def setUp(self):
         super().setUp(rebase=True)
 
@@ -100,6 +116,7 @@ class RetainingSupplementsRebaseCompareRPMs(TestCompareRPMs):
 
 
 class RetainingSupplementsRebaseCompareKoji(TestCompareKoji):
+    @unittest.skipUnless(have_supplements, "librpm too old to support Supplements")
     def setUp(self):
         super().setUp(rebase=True)
 
@@ -113,6 +130,7 @@ class RetainingSupplementsRebaseCompareKoji(TestCompareKoji):
 
 # Retaining Supplements dependency in maint comparison (OK)
 class RetainingSupplementsCompareRPMs(TestCompareRPMs):
+    @unittest.skipUnless(have_supplements, "librpm too old to support Supplements")
     def setUp(self):
         super().setUp()
 
@@ -125,6 +143,7 @@ class RetainingSupplementsCompareRPMs(TestCompareRPMs):
 
 
 class RetainingSupplementsCompareKoji(TestCompareKoji):
+    @unittest.skipUnless(have_supplements, "librpm too old to support Supplements")
     def setUp(self):
         super().setUp()
 
@@ -138,6 +157,7 @@ class RetainingSupplementsCompareKoji(TestCompareKoji):
 
 # Gaining a new Supplements in a rebase comparison (INFO)
 class GainingSupplementsRebaseCompareRPMs(TestCompareRPMs):
+    @unittest.skipUnless(have_supplements, "librpm too old to support Supplements")
     def setUp(self):
         super().setUp(rebase=True)
 
@@ -149,6 +169,7 @@ class GainingSupplementsRebaseCompareRPMs(TestCompareRPMs):
 
 
 class GainingSupplementsRebaseCompareKoji(TestCompareKoji):
+    @unittest.skipUnless(have_supplements, "librpm too old to support Supplements")
     def setUp(self):
         super().setUp(rebase=True)
 
@@ -161,6 +182,7 @@ class GainingSupplementsRebaseCompareKoji(TestCompareKoji):
 
 # Gaining a new Supplements in a maint comparison (VERIFY)
 class GainingSupplementsCompareRPMs(TestCompareRPMs):
+    @unittest.skipUnless(have_supplements, "librpm too old to support Supplements")
     def setUp(self):
         super().setUp()
 
@@ -172,6 +194,7 @@ class GainingSupplementsCompareRPMs(TestCompareRPMs):
 
 
 class GainingSupplementsCompareKoji(TestCompareKoji):
+    @unittest.skipUnless(have_supplements, "librpm too old to support Supplements")
     def setUp(self):
         super().setUp()
 
@@ -184,6 +207,7 @@ class GainingSupplementsCompareKoji(TestCompareKoji):
 
 # Changing a Supplements in a rebase comparison (INFO)
 class ChangingSupplementsRebaseCompareRPMs(TestCompareRPMs):
+    @unittest.skipUnless(have_supplements, "librpm too old to support Supplements")
     def setUp(self):
         super().setUp(rebase=True)
 
@@ -196,6 +220,7 @@ class ChangingSupplementsRebaseCompareRPMs(TestCompareRPMs):
 
 
 class ChangingSupplementsRebaseCompareKoji(TestCompareKoji):
+    @unittest.skipUnless(have_supplements, "librpm too old to support Supplements")
     def setUp(self):
         super().setUp(rebase=True)
 
@@ -209,6 +234,7 @@ class ChangingSupplementsRebaseCompareKoji(TestCompareKoji):
 
 # Changing a Supplements in a maint comparison (VERIFY)
 class ChangingSupplementsCompareRPMs(TestCompareRPMs):
+    @unittest.skipUnless(have_supplements, "librpm too old to support Supplements")
     def setUp(self):
         super().setUp()
 
@@ -221,6 +247,7 @@ class ChangingSupplementsCompareRPMs(TestCompareRPMs):
 
 
 class ChangingSupplementsCompareKoji(TestCompareKoji):
+    @unittest.skipUnless(have_supplements, "librpm too old to support Supplements")
     def setUp(self):
         super().setUp()
 
@@ -234,6 +261,7 @@ class ChangingSupplementsCompareKoji(TestCompareKoji):
 
 # Changing a Supplements in a maint comparison due to NVR (INFO)
 class ChangingSupplementsExpectedCompareSRPM(TestCompareSRPM):
+    @unittest.skipUnless(have_supplements, "librpm too old to support Supplements")
     def setUp(self):
         super().setUp()
 
@@ -244,6 +272,7 @@ class ChangingSupplementsExpectedCompareSRPM(TestCompareSRPM):
 
 
 class ChangingSupplementsExpectedCompareRPMs(TestCompareRPMs):
+    @unittest.skipUnless(have_supplements, "librpm too old to support Supplements")
     def setUp(self):
         super().setUp()
 
@@ -253,6 +282,7 @@ class ChangingSupplementsExpectedCompareRPMs(TestCompareRPMs):
 
 
 class ChangingSupplementsExpectedCompareKoji(TestCompareKoji):
+    @unittest.skipUnless(have_supplements, "librpm too old to support Supplements")
     def setUp(self):
         super().setUp()
 
@@ -263,6 +293,7 @@ class ChangingSupplementsExpectedCompareKoji(TestCompareKoji):
 
 # Losing a Supplements in a rebase comparison (INFO)
 class LosingSupplementsRebaseCompareRPMs(TestCompareRPMs):
+    @unittest.skipUnless(have_supplements, "librpm too old to support Supplements")
     def setUp(self):
         super().setUp(rebase=True)
 
@@ -274,6 +305,7 @@ class LosingSupplementsRebaseCompareRPMs(TestCompareRPMs):
 
 
 class LosingSupplementsRebaseCompareKoji(TestCompareKoji):
+    @unittest.skipUnless(have_supplements, "librpm too old to support Supplements")
     def setUp(self):
         super().setUp(rebase=True)
 
@@ -286,6 +318,7 @@ class LosingSupplementsRebaseCompareKoji(TestCompareKoji):
 
 # Losing a Supplements in a maint comparison (VERIFY)
 class LosingSupplementsCompareRPMs(TestCompareRPMs):
+    @unittest.skipUnless(have_supplements, "librpm too old to support Supplements")
     def setUp(self):
         super().setUp()
 
@@ -297,6 +330,7 @@ class LosingSupplementsCompareRPMs(TestCompareRPMs):
 
 
 class LosingSupplementsCompareKoji(TestCompareKoji):
+    @unittest.skipUnless(have_supplements, "librpm too old to support Supplements")
     def setUp(self):
         super().setUp()
 
@@ -310,6 +344,7 @@ class LosingSupplementsCompareKoji(TestCompareKoji):
 # Missing Epoch prefix on maint compare (BAD for Koji compares, OK
 # otherwise)
 class MissingEpochSupplementsSRPM(TestSRPM):
+    @unittest.skipUnless(have_supplements, "librpm too old to support Supplements")
     def setUp(self):
         super().setUp()
 
@@ -338,6 +373,7 @@ class MissingEpochSupplementsSRPM(TestSRPM):
 
 
 class MissingEpochSupplementsRPMs(TestRPMs):
+    @unittest.skipUnless(have_supplements, "librpm too old to support Supplements")
     def setUp(self):
         super().setUp()
 
@@ -369,6 +405,7 @@ class MissingEpochSupplementsRPMs(TestRPMs):
 
 
 class MissingEpochSupplementsKoji(TestKoji):
+    @unittest.skipUnless(have_supplements, "librpm too old to support Supplements")
     def setUp(self):
         super().setUp()
 
@@ -397,6 +434,7 @@ class MissingEpochSupplementsKoji(TestKoji):
 
 
 class MissingEpochSupplementsCompareSRPM(TestCompareSRPM):
+    @unittest.skipUnless(have_supplements, "librpm too old to support Supplements")
     def setUp(self):
         super().setUp()
 
@@ -435,6 +473,7 @@ class MissingEpochSupplementsCompareSRPM(TestCompareSRPM):
 
 
 class MissingEpochSupplementsCompareRPMs(TestCompareRPMs):
+    @unittest.skipUnless(have_supplements, "librpm too old to support Supplements")
     def setUp(self):
         super().setUp()
 
@@ -474,6 +513,7 @@ class MissingEpochSupplementsCompareRPMs(TestCompareRPMs):
 
 
 class MissingEpochSupplementsCompareKoji(TestCompareKoji):
+    @unittest.skipUnless(have_supplements, "librpm too old to support Supplements")
     def setUp(self):
         super().setUp()
 
@@ -513,6 +553,7 @@ class MissingEpochSupplementsCompareKoji(TestCompareKoji):
 
 # Missing Epoch prefix on rebase compare (INFO)
 class MissingEpochSupplementsRebaseCompareSRPM(TestCompareSRPM):
+    @unittest.skipUnless(have_supplements, "librpm too old to support Supplements")
     def setUp(self):
         super().setUp(rebase=True)
 
@@ -551,6 +592,7 @@ class MissingEpochSupplementsRebaseCompareSRPM(TestCompareSRPM):
 
 
 class MissingEpochSupplementsRebaseCompareRPMs(TestCompareRPMs):
+    @unittest.skipUnless(have_supplements, "librpm too old to support Supplements")
     def setUp(self):
         super().setUp(rebase=True)
 
@@ -588,6 +630,7 @@ class MissingEpochSupplementsRebaseCompareRPMs(TestCompareRPMs):
 
 
 class MissingEpochSupplementsRebaseCompareKoji(TestCompareKoji):
+    @unittest.skipUnless(have_supplements, "librpm too old to support Supplements")
     def setUp(self):
         super().setUp(rebase=True)
 
@@ -626,6 +669,7 @@ class MissingEpochSupplementsRebaseCompareKoji(TestCompareKoji):
 
 # Unexpanded macro in Supplements (BAD)
 class UnexpandedMacroSupplementsSRPM(TestSRPM):
+    @unittest.skipUnless(have_supplements, "librpm too old to support Supplements")
     def setUp(self):
         super().setUp()
 
@@ -638,6 +682,7 @@ class UnexpandedMacroSupplementsSRPM(TestSRPM):
 
 
 class UnexpandedMacroSupplementsRPMs(TestRPMs):
+    @unittest.skipUnless(have_supplements, "librpm too old to support Supplements")
     def setUp(self):
         super().setUp()
 
@@ -649,6 +694,7 @@ class UnexpandedMacroSupplementsRPMs(TestRPMs):
 
 
 class UnexpandedMacroSupplementsKoji(TestKoji):
+    @unittest.skipUnless(have_supplements, "librpm too old to support Supplements")
     def setUp(self):
         super().setUp()
 
@@ -660,6 +706,7 @@ class UnexpandedMacroSupplementsKoji(TestKoji):
 
 
 class UnexpandedMacroSupplementsCompareSRPM(TestCompareSRPM):
+    @unittest.skipUnless(have_supplements, "librpm too old to support Supplements")
     def setUp(self):
         super().setUp()
 
@@ -673,6 +720,7 @@ class UnexpandedMacroSupplementsCompareSRPM(TestCompareSRPM):
 
 
 class UnexpandedMacroSupplementsCompareRPMs(TestCompareRPMs):
+    @unittest.skipUnless(have_supplements, "librpm too old to support Supplements")
     def setUp(self):
         super().setUp()
 
@@ -685,6 +733,7 @@ class UnexpandedMacroSupplementsCompareRPMs(TestCompareRPMs):
 
 
 class UnexpandedMacroSupplementsCompareKoji(TestCompareKoji):
+    @unittest.skipUnless(have_supplements, "librpm too old to support Supplements")
     def setUp(self):
         super().setUp()
 
@@ -698,6 +747,7 @@ class UnexpandedMacroSupplementsCompareKoji(TestCompareKoji):
 
 # Missing explicit Supplements (VERIFY)
 class MissingExplicitSupplementsSRPM(TestSRPM):
+    @unittest.skipUnless(have_supplements, "librpm too old to support Supplements")
     def setUp(self):
         super().setUp()
 
@@ -735,6 +785,7 @@ class MissingExplicitSupplementsSRPM(TestSRPM):
 
 
 class MissingExplicitSupplementsRPMs(TestRPMs):
+    @unittest.skipUnless(have_supplements, "librpm too old to support Supplements")
     def setUp(self):
         super().setUp()
 
@@ -773,6 +824,7 @@ class MissingExplicitSupplementsRPMs(TestRPMs):
 
 
 class MissingExplicitSupplementsKoji(TestKoji):
+    @unittest.skipUnless(have_supplements, "librpm too old to support Supplements")
     @unittest.skipUnless(have_elfdeps, "system lacks %s executable" % elfdeps)
     def setUp(self):
         super().setUp()
@@ -810,6 +862,7 @@ class MissingExplicitSupplementsKoji(TestKoji):
 
 
 class MissingExplicitSupplementsCompareSRPM(TestCompareSRPM):
+    @unittest.skipUnless(have_supplements, "librpm too old to support Supplements")
     def setUp(self):
         super().setUp()
 
@@ -868,6 +921,7 @@ class MissingExplicitSupplementsCompareSRPM(TestCompareSRPM):
 
 
 class MissingExplicitSupplementsCompareRPMs(TestCompareRPMs):
+    @unittest.skipUnless(have_supplements, "librpm too old to support Supplements")
     def setUp(self):
         super().setUp()
 
@@ -927,6 +981,7 @@ class MissingExplicitSupplementsCompareRPMs(TestCompareRPMs):
 
 
 class MissingExplicitSupplementsCompareKoji(TestCompareKoji):
+    @unittest.skipUnless(have_supplements, "librpm too old to support Supplements")
     @unittest.skipUnless(have_elfdeps, "system lacks %s executable" % elfdeps)
     def setUp(self):
         super().setUp()
@@ -986,6 +1041,7 @@ class MissingExplicitSupplementsCompareKoji(TestCompareKoji):
 
 # Multiple providers of the same thing (VERIFY)
 class MultipleProvidersSRPM(TestSRPM):
+    @unittest.skipUnless(have_supplements, "librpm too old to support Supplements")
     @unittest.skipUnless(have_elfdeps, "system lacks %s executable" % elfdeps)
     def setUp(self):
         super().setUp()
@@ -1035,6 +1091,7 @@ class MultipleProvidersSRPM(TestSRPM):
 
 
 class MultipleProvidersRPMs(TestRPMs):
+    @unittest.skipUnless(have_supplements, "librpm too old to support Supplements")
     @unittest.skipUnless(have_elfdeps, "system lacks %s executable" % elfdeps)
     def setUp(self):
         super().setUp()
@@ -1084,6 +1141,7 @@ class MultipleProvidersRPMs(TestRPMs):
 
 
 class MultipleProvidersKoji(TestKoji):
+    @unittest.skipUnless(have_supplements, "librpm too old to support Supplements")
     @unittest.skipUnless(have_elfdeps, "system lacks %s executable" % elfdeps)
     def setUp(self):
         super().setUp()
@@ -1132,6 +1190,7 @@ class MultipleProvidersKoji(TestKoji):
 
 
 class MultipleProvidersCompareSRPM(TestCompareSRPM):
+    @unittest.skipUnless(have_supplements, "librpm too old to support Supplements")
     @unittest.skipUnless(have_elfdeps, "system lacks %s executable" % elfdeps)
     def setUp(self):
         super().setUp()
@@ -1209,6 +1268,7 @@ class MultipleProvidersCompareSRPM(TestCompareSRPM):
 
 
 class MultipleProvidersCompareRPMs(TestCompareRPMs):
+    @unittest.skipUnless(have_supplements, "librpm too old to support Supplements")
     @unittest.skipUnless(have_elfdeps, "system lacks %s executable" % elfdeps)
     def setUp(self):
         super().setUp()
@@ -1285,6 +1345,7 @@ class MultipleProvidersCompareRPMs(TestCompareRPMs):
 
 
 class MultipleProvidersCompareKoji(TestCompareKoji):
+    @unittest.skipUnless(have_supplements, "librpm too old to support Supplements")
     @unittest.skipUnless(have_elfdeps, "system lacks %s executable" % elfdeps)
     def setUp(self):
         super().setUp()
