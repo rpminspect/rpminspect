@@ -390,9 +390,10 @@ class MissingEpochSupplementsKoji(TestKoji):
         # manually add a devel subpackage with an incorrect Supplements
         sub.add_supplements("%s = %s-%s" % (AFTER_NAME, AFTER_VER, AFTER_REL))
 
+        # result is OK for Supplements weak dep; Epoch check is for Provides/Requires pairs
         self.inspection = "rpmdeps"
-        self.result = "BAD"
-        self.waiver_auth = "Anyone"
+        self.result = "OK"
+        self.waiver_auth = "Not Waivable"
 
 
 class MissingEpochSupplementsCompareSRPM(TestCompareSRPM):
@@ -504,9 +505,10 @@ class MissingEpochSupplementsCompareKoji(TestCompareKoji):
         before_sub.add_supplements("%s = %s-%s" % (BEFORE_NAME, BEFORE_VER, BEFORE_REL))
         after_sub.add_supplements("%s = %s-%s" % (AFTER_NAME, AFTER_VER, AFTER_REL))
 
+        # result is OK for Supplements weak dep; Epoch check is for Provides/Requires pairs
         self.inspection = "rpmdeps"
-        self.result = "BAD"
-        self.waiver_auth = "Anyone"
+        self.result = "OK"
+        self.waiver_auth = "Not Waivable"
 
 
 # Missing Epoch prefix on rebase compare (INFO)
