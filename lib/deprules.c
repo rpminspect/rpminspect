@@ -22,6 +22,7 @@
 #include <assert.h>
 #include <err.h>
 #include <rpm/header.h>
+#include <rpm/rpmtag.h>
 #include "queue.h"
 #include "rpminspect.h"
 
@@ -61,25 +62,25 @@ static deprule_list_t *gather_deprules_by_type(deprule_list_t *rules, Header hdr
         rtag = RPMTAG_OBSOLETENAME;
         otag = RPMTAG_OBSOLETEFLAGS;
         vtag = RPMTAG_OBSOLETEVERSION;
-#ifdef RPMTAG_RPMENHANCES
+#ifdef RPMTAG_ENHANCES
     } else if (type == TYPE_ENHANCES) {
         rtag = RPMTAG_ENHANCENAME;
         otag = RPMTAG_ENHANCEFLAGS;
         vtag = RPMTAG_ENHANCEVERSION;
 #endif
-#ifdef RPMTAG_RPMRECOMMENDS
+#ifdef RPMTAG_RECOMMENDS
     } else if (type == TYPE_RECOMMENDS) {
         rtag = RPMTAG_RECOMMENDNAME;
         otag = RPMTAG_RECOMMENDFLAGS;
         vtag = RPMTAG_RECOMMENDVERSION;
 #endif
-#ifdef RPMTAG_RPMSUGGESTS
+#ifdef RPMTAG_SUGGESTS
     } else if (type == TYPE_SUGGESTS) {
         rtag = RPMTAG_SUGGESTNAME;
         otag = RPMTAG_SUGGESTFLAGS;
         vtag = RPMTAG_SUGGESTVERSION;
 #endif
-#ifdef RPMTAG_RPMSUPPLEMENTS
+#ifdef RPMTAG_SUPPLEMENTS
     } else if (type == TYPE_SUPPLEMENTS) {
         rtag = RPMTAG_SUPPLEMENTNAME;
         otag = RPMTAG_SUPPLEMENTFLAGS;
