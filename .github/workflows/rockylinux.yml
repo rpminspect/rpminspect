@@ -41,7 +41,7 @@ jobs:
               run: |
                   yum install -y epel-release
 
-                  if [ -d /etc/pkg/rpm-gpg ]; then
+                  if [ -d /etc/pki/rpm-gpg ]; then
                       rpm --import /etc/pki/rpm-gpg/*
                   fi
 
