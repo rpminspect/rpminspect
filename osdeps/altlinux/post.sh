@@ -2,11 +2,9 @@
 PATH=/bin:/usr/bin:/sbin:/usr/sbin
 
 # Install 32-bit development files on 64-bit systems when available
-case "$(uname -m)" in
-    x86_64)
-        apt-get -y install i586-glibc-devel i586-libgcc1
-        ;;
-esac
+if [ "$(uname -m)" = "x86_64" ]; then
+    apt-get -y install i586-glibc-devel i586-libgcc1
+fi
 
 # Alt Linux lacks mandoc
 curl -O http://mandoc.bsd.lv/snapshots/mandoc.tar.gz
@@ -48,7 +46,7 @@ rm -f /usr/lib/rpm/shell.req
 
 # Alt Linux is configured to set the RPMTAG_VENDOR to always be "ALT
 # Linux Team", so remove that macro.
-find /usr/lib/rpm -type f -name macros -print0 | xargs sed -i -e '/^%vendor/d'
+find /usr/lib/rpm -type f -name macros -exec sed -i -e '/^%vendor/d' {} \;
 
 # Create a test user to perform the build and run the test suite
 # Alt Linux has patched rpmbuild to prevent running it as root.
