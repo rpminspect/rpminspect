@@ -48,6 +48,14 @@ if rpm_major < 4 or (rpm_major == 4 and rpm_minor < 12):
 else:
     have_recommends = True
 
+# need to know if we are on ALT Linux or not because rpmbuild
+# on that platform prohibits unexpanded macros, so we can skip
+# those test cases
+on_alt_linux = False
+
+if os.path.isfile("/etc/altlinux-release") or os.path.isfile("/etc/alt-release"):
+    on_alt_linux = True
+
 before_recommends = "important-package >= 2.0.2-47"
 after_recommends = "important-package >= 4.7.0-1"
 unexpanded_recommends = "important-package >= 4.7.1-1%{_macro}"
