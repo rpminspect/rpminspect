@@ -1315,7 +1315,13 @@ class DirIWOTHProhibitedSRPM(TestSRPM):
     def setUp(self):
         super().setUp()
 
-        self.rpm.add_installed_directory("/usr/share/dumping-ground", mode="0757")
+        d = "usr/share/dumping-ground"
+        m = "0757"
+        self.rpm.section_install += "mkdir -p $RPM_BUILD_ROOT/%s\n" % d
+        self.rpm.section_install += "chmod %s $RPM_BUILD_ROOT/%s\n" % (m, d)
+        sub = self.rpm.get_subpackage(None)
+        sub.section_files += "%%attr(%s,-,-) /%s\n" % (m, d)
+        self.rpm.add_payload_check(d, None)
 
         self.inspection = "permissions"
         self.result = "OK"
@@ -1330,7 +1336,13 @@ class DirIWOTHProhibitedRPMs(TestRPMs):
     def setUp(self):
         super().setUp()
 
-        self.rpm.add_installed_directory("/usr/share/dumping-ground", mode="0757")
+        d = "usr/share/dumping-ground"
+        m = "0757"
+        self.rpm.section_install += "mkdir -p $RPM_BUILD_ROOT/%s\n" % d
+        self.rpm.section_install += "chmod %s $RPM_BUILD_ROOT/%s\n" % (m, d)
+        sub = self.rpm.get_subpackage(None)
+        sub.section_files += "%%attr(%s,-,-) /%s\n" % (m, d)
+        self.rpm.add_payload_check(d, None)
 
         self.inspection = "permissions"
         self.result = "BAD"
@@ -1346,7 +1358,13 @@ class SecuritySKIPDirIWOTHProhibitedRPMs(TestRPMs):
     def setUp(self):
         super().setUp()
 
-        self.rpm.add_installed_directory("/usr/share/skip", mode="0757")
+        d = "usr/share/skip"
+        m = "0757"
+        self.rpm.section_install += "mkdir -p $RPM_BUILD_ROOT/%s\n" % d
+        self.rpm.section_install += "chmod %s $RPM_BUILD_ROOT/%s\n" % (m, d)
+        sub = self.rpm.get_subpackage(None)
+        sub.section_files += "%%attr(%s,-,-) /%s\n" % (m, d)
+        self.rpm.add_payload_check(d, None)
 
         self.inspection = "permissions"
         self.result = "OK"
@@ -1362,7 +1380,13 @@ class SecurityINFORMDirIWOTHProhibitedRPMs(TestRPMs):
     def setUp(self):
         super().setUp()
 
-        self.rpm.add_installed_directory("/usr/share/inform", mode="0757")
+        d = "usr/share/inform"
+        m = "0757"
+        self.rpm.section_install += "mkdir -p $RPM_BUILD_ROOT/%s\n" % d
+        self.rpm.section_install += "chmod %s $RPM_BUILD_ROOT/%s\n" % (m, d)
+        sub = self.rpm.get_subpackage(None)
+        sub.section_files += "%%attr(%s,-,-) /%s\n" % (m, d)
+        self.rpm.add_payload_check(d, None)
 
         self.inspection = "permissions"
         self.result = "INFO"
@@ -1378,7 +1402,13 @@ class SecurityVERIFYDirIWOTHProhibitedRPMs(TestRPMs):
     def setUp(self):
         super().setUp()
 
-        self.rpm.add_installed_directory("/usr/share/verify", mode="0757")
+        d = "usr/share/verify"
+        m = "0757"
+        self.rpm.section_install += "mkdir -p $RPM_BUILD_ROOT/%s\n" % d
+        self.rpm.section_install += "chmod %s $RPM_BUILD_ROOT/%s\n" % (m, d)
+        sub = self.rpm.get_subpackage(None)
+        sub.section_files += "%%attr(%s,-,-) /%s\n" % (m, d)
+        self.rpm.add_payload_check(d, None)
 
         self.inspection = "permissions"
         self.result = "VERIFY"
@@ -1394,7 +1424,13 @@ class SecurityFAILDirIWOTHProhibitedRPMs(TestRPMs):
     def setUp(self):
         super().setUp()
 
-        self.rpm.add_installed_directory("/usr/share/fail", mode="0757")
+        d = "usr/share/fail"
+        m = "0757"
+        self.rpm.section_install += "mkdir -p $RPM_BUILD_ROOT/%s\n" % d
+        self.rpm.section_install += "chmod %s $RPM_BUILD_ROOT/%s\n" % (m, d)
+        sub = self.rpm.get_subpackage(None)
+        sub.section_files += "%%attr(%s,-,-) /%s\n" % (m, d)
+        self.rpm.add_payload_check(d, None)
 
         self.inspection = "permissions"
         self.result = "BAD"
@@ -1410,7 +1446,13 @@ class DirIWOTHProhibitedKoji(TestKoji):
     def setUp(self):
         super().setUp()
 
-        self.rpm.add_installed_directory("/usr/share/dumping-ground", mode="0757")
+        d = "usr/share/dumping-ground"
+        m = "0757"
+        self.rpm.section_install += "mkdir -p $RPM_BUILD_ROOT/%s\n" % d
+        self.rpm.section_install += "chmod %s $RPM_BUILD_ROOT/%s\n" % (m, d)
+        sub = self.rpm.get_subpackage(None)
+        sub.section_files += "%%attr(%s,-,-) /%s\n" % (m, d)
+        self.rpm.add_payload_check(d, None)
 
         self.inspection = "permissions"
         self.result = "BAD"
@@ -1426,7 +1468,13 @@ class SecuritySKIPDirIWOTHProhibitedKoji(TestKoji):
     def setUp(self):
         super().setUp()
 
-        self.rpm.add_installed_directory("/usr/share/skip", mode="0757")
+        d = "usr/share/skip"
+        m = "0757"
+        self.rpm.section_install += "mkdir -p $RPM_BUILD_ROOT/%s\n" % d
+        self.rpm.section_install += "chmod %s $RPM_BUILD_ROOT/%s\n" % (m, d)
+        sub = self.rpm.get_subpackage(None)
+        sub.section_files += "%%attr(%s,-,-) /%s\n" % (m, d)
+        self.rpm.add_payload_check(d, None)
 
         self.inspection = "permissions"
         self.result = "OK"
@@ -1442,7 +1490,13 @@ class SecurityINFORMDirIWOTHProhibitedKoji(TestKoji):
     def setUp(self):
         super().setUp()
 
-        self.rpm.add_installed_directory("/usr/share/inform", mode="0757")
+        d = "usr/share/inform"
+        m = "0757"
+        self.rpm.section_install += "mkdir -p $RPM_BUILD_ROOT/%s\n" % d
+        self.rpm.section_install += "chmod %s $RPM_BUILD_ROOT/%s\n" % (m, d)
+        sub = self.rpm.get_subpackage(None)
+        sub.section_files += "%%attr(%s,-,-) /%s\n" % (m, d)
+        self.rpm.add_payload_check(d, None)
 
         self.inspection = "permissions"
         self.result = "INFO"
@@ -1458,7 +1512,13 @@ class SecurityVERIFYDirIWOTHProhibitedKoji(TestKoji):
     def setUp(self):
         super().setUp()
 
-        self.rpm.add_installed_directory("/usr/share/verify", mode="0757")
+        d = "usr/share/verify"
+        m = "0757"
+        self.rpm.section_install += "mkdir -p $RPM_BUILD_ROOT/%s\n" % d
+        self.rpm.section_install += "chmod %s $RPM_BUILD_ROOT/%s\n" % (m, d)
+        sub = self.rpm.get_subpackage(None)
+        sub.section_files += "%%attr(%s,-,-) /%s\n" % (m, d)
+        self.rpm.add_payload_check(d, None)
 
         self.inspection = "permissions"
         self.result = "VERIFY"
@@ -1474,7 +1534,13 @@ class SecurityFAILDirIWOTHProhibitedKoji(TestKoji):
     def setUp(self):
         super().setUp()
 
-        self.rpm.add_installed_directory("/usr/share/fail", mode="0757")
+        d = "usr/share/fail"
+        m = "0757"
+        self.rpm.section_install += "mkdir -p $RPM_BUILD_ROOT/%s\n" % d
+        self.rpm.section_install += "chmod %s $RPM_BUILD_ROOT/%s\n" % (m, d)
+        sub = self.rpm.get_subpackage(None)
+        sub.section_files += "%%attr(%s,-,-) /%s\n" % (m, d)
+        self.rpm.add_payload_check(d, None)
 
         self.inspection = "permissions"
         self.result = "BAD"
@@ -1490,7 +1556,13 @@ class DirIWOTHProhibitedCompareSRPM(TestCompareSRPM):
     def setUp(self):
         super().setUp()
 
-        self.after_rpm.add_installed_directory("/usr/share/dumping-ground", mode="0757")
+        d = "usr/share/dumping-ground"
+        m = "0757"
+        self.after_rpm.section_install += "mkdir -p $RPM_BUILD_ROOT/%s\n" % d
+        self.after_rpm.section_install += "chmod %s $RPM_BUILD_ROOT/%s\n" % (m, d)
+        sub = self.after_rpm.get_subpackage(None)
+        sub.section_files += "%%attr(%s,-,-) /%s\n" % (m, d)
+        self.after_rpm.add_payload_check(d, None)
 
         self.inspection = "permissions"
         self.result = "OK"
@@ -1505,7 +1577,13 @@ class DirIWOTHProhibitedCompareRPMs(TestCompareRPMs):
     def setUp(self):
         super().setUp()
 
-        self.after_rpm.add_installed_directory("/usr/share/dumping-ground", mode="0757")
+        d = "usr/share/dumping-ground"
+        m = "0757"
+        self.after_rpm.section_install += "mkdir -p $RPM_BUILD_ROOT/%s\n" % d
+        self.after_rpm.section_install += "chmod %s $RPM_BUILD_ROOT/%s\n" % (m, d)
+        sub = self.after_rpm.get_subpackage(None)
+        sub.section_files += "%%attr(%s,-,-) /%s\n" % (m, d)
+        self.after_rpm.add_payload_check(d, None)
 
         self.inspection = "permissions"
         self.result = "BAD"
@@ -1521,7 +1599,13 @@ class SecuritySKIPDirIWOTHProhibitedCompareRPMs(TestCompareRPMs):
     def setUp(self):
         super().setUp()
 
-        self.after_rpm.add_installed_directory("/usr/share/skip", mode="0757")
+        d = "usr/share/skip"
+        m = "0757"
+        self.after_rpm.section_install += "mkdir -p $RPM_BUILD_ROOT/%s\n" % d
+        self.after_rpm.section_install += "chmod %s $RPM_BUILD_ROOT/%s\n" % (m, d)
+        sub = self.after_rpm.get_subpackage(None)
+        sub.section_files += "%%attr(%s,-,-) /%s\n" % (m, d)
+        self.after_rpm.add_payload_check(d, None)
 
         self.inspection = "permissions"
         self.result = "OK"
@@ -1537,7 +1621,13 @@ class SecurityINFORMDirIWOTHProhibitedCompareRPMs(TestCompareRPMs):
     def setUp(self):
         super().setUp()
 
-        self.after_rpm.add_installed_directory("/usr/share/inform", mode="0757")
+        d = "usr/share/inform"
+        m = "0757"
+        self.after_rpm.section_install += "mkdir -p $RPM_BUILD_ROOT/%s\n" % d
+        self.after_rpm.section_install += "chmod %s $RPM_BUILD_ROOT/%s\n" % (m, d)
+        sub = self.after_rpm.get_subpackage(None)
+        sub.section_files += "%%attr(%s,-,-) /%s\n" % (m, d)
+        self.after_rpm.add_payload_check(d, None)
 
         self.inspection = "permissions"
         self.result = "INFO"
@@ -1553,7 +1643,13 @@ class SecurityVERIFYDirIWOTHProhibitedCompareRPMs(TestCompareRPMs):
     def setUp(self):
         super().setUp()
 
-        self.after_rpm.add_installed_directory("/usr/share/verify", mode="0757")
+        d = "usr/share/verify"
+        m = "0757"
+        self.after_rpm.section_install += "mkdir -p $RPM_BUILD_ROOT/%s\n" % d
+        self.after_rpm.section_install += "chmod %s $RPM_BUILD_ROOT/%s\n" % (m, d)
+        sub = self.after_rpm.get_subpackage(None)
+        sub.section_files += "%%attr(%s,-,-) /%s\n" % (m, d)
+        self.after_rpm.add_payload_check(d, None)
 
         self.inspection = "permissions"
         self.result = "VERIFY"
@@ -1569,7 +1665,13 @@ class SecurityFAILDirIWOTHProhibitedCompareRPMs(TestCompareRPMs):
     def setUp(self):
         super().setUp()
 
-        self.after_rpm.add_installed_directory("/usr/share/fail", mode="0757")
+        d = "usr/share/fail"
+        m = "0757"
+        self.after_rpm.section_install += "mkdir -p $RPM_BUILD_ROOT/%s\n" % d
+        self.after_rpm.section_install += "chmod %s $RPM_BUILD_ROOT/%s\n" % (m, d)
+        sub = self.after_rpm.get_subpackage(None)
+        sub.section_files += "%%attr(%s,-,-) /%s\n" % (m, d)
+        self.after_rpm.add_payload_check(d, None)
 
         self.inspection = "permissions"
         self.result = "BAD"
@@ -1585,7 +1687,13 @@ class DirIWOTHProhibitedCompareKoji(TestCompareKoji):
     def setUp(self):
         super().setUp()
 
-        self.after_rpm.add_installed_directory("/usr/share/dumping-ground", mode="0757")
+        d = "usr/share/dumping-ground"
+        m = "0757"
+        self.after_rpm.section_install += "mkdir -p $RPM_BUILD_ROOT/%s\n" % d
+        self.after_rpm.section_install += "chmod %s $RPM_BUILD_ROOT/%s\n" % (m, d)
+        sub = self.after_rpm.get_subpackage(None)
+        sub.section_files += "%%attr(%s,-,-) /%s\n" % (m, d)
+        self.after_rpm.add_payload_check(d, None)
 
         self.inspection = "permissions"
         self.result = "BAD"
@@ -1601,7 +1709,13 @@ class SecuritySKIPDirIWOTHProhibitedCompareKoji(TestCompareKoji):
     def setUp(self):
         super().setUp()
 
-        self.after_rpm.add_installed_directory("/usr/share/skip", mode="0757")
+        d = "usr/share/skip"
+        m = "0757"
+        self.after_rpm.section_install += "mkdir -p $RPM_BUILD_ROOT/%s\n" % d
+        self.after_rpm.section_install += "chmod %s $RPM_BUILD_ROOT/%s\n" % (m, d)
+        sub = self.after_rpm.get_subpackage(None)
+        sub.section_files += "%%attr(%s,-,-) /%s\n" % (m, d)
+        self.after_rpm.add_payload_check(d, None)
 
         self.inspection = "permissions"
         self.result = "OK"
@@ -1617,7 +1731,13 @@ class SecurityINFORMDirIWOTHProhibitedCompareKoji(TestCompareKoji):
     def setUp(self):
         super().setUp()
 
-        self.after_rpm.add_installed_directory("/usr/share/inform", mode="0757")
+        d = "usr/share/inform"
+        m = "0757"
+        self.after_rpm.section_install += "mkdir -p $RPM_BUILD_ROOT/%s\n" % d
+        self.after_rpm.section_install += "chmod %s $RPM_BUILD_ROOT/%s\n" % (m, d)
+        sub = self.after_rpm.get_subpackage(None)
+        sub.section_files += "%%attr(%s,-,-) /%s\n" % (m, d)
+        self.after_rpm.add_payload_check(d, None)
 
         self.inspection = "permissions"
         self.result = "INFO"
@@ -1633,7 +1753,13 @@ class SecurityVERIFYDirIWOTHProhibitedCompareKoji(TestCompareKoji):
     def setUp(self):
         super().setUp()
 
-        self.after_rpm.add_installed_directory("/usr/share/verify", mode="0757")
+        d = "usr/share/verify"
+        m = "0757"
+        self.after_rpm.section_install += "mkdir -p $RPM_BUILD_ROOT/%s\n" % d
+        self.after_rpm.section_install += "chmod %s $RPM_BUILD_ROOT/%s\n" % (m, d)
+        sub = self.after_rpm.get_subpackage(None)
+        sub.section_files += "%%attr(%s,-,-) /%s\n" % (m, d)
+        self.after_rpm.add_payload_check(d, None)
 
         self.inspection = "permissions"
         self.result = "VERIFY"
@@ -1649,7 +1775,13 @@ class SecurityFAILDirIWOTHProhibitedCompareKoji(TestCompareKoji):
     def setUp(self):
         super().setUp()
 
-        self.after_rpm.add_installed_directory("/usr/share/fail", mode="0757")
+        d = "usr/share/fail"
+        m = "0757"
+        self.after_rpm.section_install += "mkdir -p $RPM_BUILD_ROOT/%s\n" % d
+        self.after_rpm.section_install += "chmod %s $RPM_BUILD_ROOT/%s\n" % (m, d)
+        sub = self.after_rpm.get_subpackage(None)
+        sub.section_files += "%%attr(%s,-,-) /%s\n" % (m, d)
+        self.after_rpm.add_payload_check(d, None)
 
         self.inspection = "permissions"
         self.result = "BAD"
@@ -1665,7 +1797,13 @@ class DirIWOTHandISVTXProhibitedSRPM(TestSRPM):
     def setUp(self):
         super().setUp()
 
-        self.rpm.add_installed_directory("/usr/share/dumping-ground", mode="1757")
+        d = "usr/share/dumping-ground"
+        m = "1757"
+        self.rpm.section_install += "mkdir -p $RPM_BUILD_ROOT/%s\n" % d
+        self.rpm.section_install += "chmod %s $RPM_BUILD_ROOT/%s\n" % (m, d)
+        sub = self.rpm.get_subpackage(None)
+        sub.section_files += "%%attr(%s,-,-) /%s\n" % (m, d)
+        self.rpm.add_payload_check(d, None)
 
         self.inspection = "permissions"
         self.result = "OK"
@@ -1680,7 +1818,13 @@ class DirIWOTHandISVTXProhibitedRPMs(TestRPMs):
     def setUp(self):
         super().setUp()
 
-        self.rpm.add_installed_directory("/usr/share/dumping-ground", mode="1757")
+        d = "usr/share/dumping-ground"
+        m = "1757"
+        self.rpm.section_install += "mkdir -p $RPM_BUILD_ROOT/%s\n" % d
+        self.rpm.section_install += "chmod %s $RPM_BUILD_ROOT/%s\n" % (m, d)
+        sub = self.rpm.get_subpackage(None)
+        sub.section_files += "%%attr(%s,-,-) /%s\n" % (m, d)
+        self.rpm.add_payload_check(d, None)
 
         self.inspection = "permissions"
         self.result = "BAD"
@@ -1696,7 +1840,13 @@ class SecuritySKIPDirIWOTHandISVTXProhibitedRPMs(TestRPMs):
     def setUp(self):
         super().setUp()
 
-        self.rpm.add_installed_directory("/usr/share/skip", mode="1757")
+        d = "usr/share/skip"
+        m = "1757"
+        self.rpm.section_install += "mkdir -p $RPM_BUILD_ROOT/%s\n" % d
+        self.rpm.section_install += "chmod %s $RPM_BUILD_ROOT/%s\n" % (m, d)
+        sub = self.rpm.get_subpackage(None)
+        sub.section_files += "%%attr(%s,-,-) /%s\n" % (m, d)
+        self.rpm.add_payload_check(d, None)
 
         self.inspection = "permissions"
         self.result = "OK"
@@ -1712,7 +1862,13 @@ class SecurityINFORMDirIWOTHandISVTXProhibitedRPMs(TestRPMs):
     def setUp(self):
         super().setUp()
 
-        self.rpm.add_installed_directory("/usr/share/inform", mode="1757")
+        d = "usr/share/inform"
+        m = "1757"
+        self.rpm.section_install += "mkdir -p $RPM_BUILD_ROOT/%s\n" % d
+        self.rpm.section_install += "chmod %s $RPM_BUILD_ROOT/%s\n" % (m, d)
+        sub = self.rpm.get_subpackage(None)
+        sub.section_files += "%%attr(%s,-,-) /%s\n" % (m, d)
+        self.rpm.add_payload_check(d, None)
 
         self.inspection = "permissions"
         self.result = "INFO"
@@ -1728,7 +1884,13 @@ class SecurityVERIFYDirIWOTHandISVTXProhibitedRPMs(TestRPMs):
     def setUp(self):
         super().setUp()
 
-        self.rpm.add_installed_directory("/usr/share/verify", mode="1757")
+        d = "usr/share/verify"
+        m = "1757"
+        self.rpm.section_install += "mkdir -p $RPM_BUILD_ROOT/%s\n" % d
+        self.rpm.section_install += "chmod %s $RPM_BUILD_ROOT/%s\n" % (m, d)
+        sub = self.rpm.get_subpackage(None)
+        sub.section_files += "%%attr(%s,-,-) /%s\n" % (m, d)
+        self.rpm.add_payload_check(d, None)
 
         self.inspection = "permissions"
         self.result = "VERIFY"
@@ -1744,7 +1906,13 @@ class SecurityFAILDirIWOTHandISVTXProhibitedRPMs(TestRPMs):
     def setUp(self):
         super().setUp()
 
-        self.rpm.add_installed_directory("/usr/share/fail", mode="1757")
+        d = "usr/share/fail"
+        m = "1757"
+        self.rpm.section_install += "mkdir -p $RPM_BUILD_ROOT/%s\n" % d
+        self.rpm.section_install += "chmod %s $RPM_BUILD_ROOT/%s\n" % (m, d)
+        sub = self.rpm.get_subpackage(None)
+        sub.section_files += "%%attr(%s,-,-) /%s\n" % (m, d)
+        self.rpm.add_payload_check(d, None)
 
         self.inspection = "permissions"
         self.result = "BAD"
@@ -1760,7 +1928,13 @@ class DirIWOTHandISVTXProhibitedKoji(TestKoji):
     def setUp(self):
         super().setUp()
 
-        self.rpm.add_installed_directory("/usr/share/dumping-ground", mode="1757")
+        d = "usr/share/dumping-ground"
+        m = "1757"
+        self.rpm.section_install += "mkdir -p $RPM_BUILD_ROOT/%s\n" % d
+        self.rpm.section_install += "chmod %s $RPM_BUILD_ROOT/%s\n" % (m, d)
+        sub = self.rpm.get_subpackage(None)
+        sub.section_files += "%%attr(%s,-,-) /%s\n" % (m, d)
+        self.rpm.add_payload_check(d, None)
 
         self.inspection = "permissions"
         self.result = "BAD"
@@ -1776,7 +1950,13 @@ class SecuritySKIPDirIWOTHandISVTXProhibitedKoji(TestKoji):
     def setUp(self):
         super().setUp()
 
-        self.rpm.add_installed_directory("/usr/share/skip", mode="1757")
+        d = "usr/share/skip"
+        m = "1757"
+        self.rpm.section_install += "mkdir -p $RPM_BUILD_ROOT/%s\n" % d
+        self.rpm.section_install += "chmod %s $RPM_BUILD_ROOT/%s\n" % (m, d)
+        sub = self.rpm.get_subpackage(None)
+        sub.section_files += "%%attr(%s,-,-) /%s\n" % (m, d)
+        self.rpm.add_payload_check(d, None)
 
         self.inspection = "permissions"
         self.result = "OK"
@@ -1792,7 +1972,13 @@ class SecurityINFORMDirIWOTHandISVTXProhibitedKoji(TestKoji):
     def setUp(self):
         super().setUp()
 
-        self.rpm.add_installed_directory("/usr/share/inform", mode="1757")
+        d = "usr/share/inform"
+        m = "1757"
+        self.rpm.section_install += "mkdir -p $RPM_BUILD_ROOT/%s\n" % d
+        self.rpm.section_install += "chmod %s $RPM_BUILD_ROOT/%s\n" % (m, d)
+        sub = self.rpm.get_subpackage(None)
+        sub.section_files += "%%attr(%s,-,-) /%s\n" % (m, d)
+        self.rpm.add_payload_check(d, None)
 
         self.inspection = "permissions"
         self.result = "INFO"
@@ -1808,7 +1994,13 @@ class SecurityVERIFYDirIWOTHandISVTXProhibitedKoji(TestKoji):
     def setUp(self):
         super().setUp()
 
-        self.rpm.add_installed_directory("/usr/share/verify", mode="1757")
+        d = "usr/share/verify"
+        m = "1757"
+        self.rpm.section_install += "mkdir -p $RPM_BUILD_ROOT/%s\n" % d
+        self.rpm.section_install += "chmod %s $RPM_BUILD_ROOT/%s\n" % (m, d)
+        sub = self.rpm.get_subpackage(None)
+        sub.section_files += "%%attr(%s,-,-) /%s\n" % (m, d)
+        self.rpm.add_payload_check(d, None)
 
         self.inspection = "permissions"
         self.result = "VERIFY"
@@ -1824,7 +2016,13 @@ class SecurityFAILDirIWOTHandISVTXProhibitedKoji(TestKoji):
     def setUp(self):
         super().setUp()
 
-        self.rpm.add_installed_directory("/usr/share/fail", mode="1757")
+        d = "usr/share/fail"
+        m = "1757"
+        self.rpm.section_install += "mkdir -p $RPM_BUILD_ROOT/%s\n" % d
+        self.rpm.section_install += "chmod %s $RPM_BUILD_ROOT/%s\n" % (m, d)
+        sub = self.rpm.get_subpackage(None)
+        sub.section_files += "%%attr(%s,-,-) /%s\n" % (m, d)
+        self.rpm.add_payload_check(d, None)
 
         self.inspection = "permissions"
         self.result = "BAD"
@@ -1840,7 +2038,13 @@ class DirIWOTHandISVTXProhibitedCompareSRPM(TestCompareSRPM):
     def setUp(self):
         super().setUp()
 
-        self.after_rpm.add_installed_directory("/usr/share/dumping-ground", mode="1757")
+        d = "usr/share/dumping-ground"
+        m = "1757"
+        self.after_rpm.section_install += "mkdir -p $RPM_BUILD_ROOT/%s\n" % d
+        self.after_rpm.section_install += "chmod %s $RPM_BUILD_ROOT/%s\n" % (m, d)
+        sub = self.after_rpm.get_subpackage(None)
+        sub.section_files += "%%attr(%s,-,-) /%s\n" % (m, d)
+        self.after_rpm.add_payload_check(d, None)
 
         self.inspection = "permissions"
         self.result = "OK"
@@ -1855,7 +2059,13 @@ class DirIWOTHandISVTXProhibitedCompareRPMs(TestCompareRPMs):
     def setUp(self):
         super().setUp()
 
-        self.after_rpm.add_installed_directory("/usr/share/dumping-ground", mode="1757")
+        d = "usr/share/dumping-ground"
+        m = "1757"
+        self.after_rpm.section_install += "mkdir -p $RPM_BUILD_ROOT/%s\n" % d
+        self.after_rpm.section_install += "chmod %s $RPM_BUILD_ROOT/%s\n" % (m, d)
+        sub = self.after_rpm.get_subpackage(None)
+        sub.section_files += "%%attr(%s,-,-) /%s\n" % (m, d)
+        self.after_rpm.add_payload_check(d, None)
 
         self.inspection = "permissions"
         self.result = "BAD"
@@ -1871,7 +2081,13 @@ class SecuritySKIPDirIWOTHandISVTXProhibitedCompareRPMs(TestCompareRPMs):
     def setUp(self):
         super().setUp()
 
-        self.after_rpm.add_installed_directory("/usr/share/skip", mode="1757")
+        d = "usr/share/skip"
+        m = "1757"
+        self.after_rpm.section_install += "mkdir -p $RPM_BUILD_ROOT/%s\n" % d
+        self.after_rpm.section_install += "chmod %s $RPM_BUILD_ROOT/%s\n" % (m, d)
+        sub = self.after_rpm.get_subpackage(None)
+        sub.section_files += "%%attr(%s,-,-) /%s\n" % (m, d)
+        self.after_rpm.add_payload_check(d, None)
 
         self.inspection = "permissions"
         self.result = "OK"
@@ -1887,7 +2103,13 @@ class SecurityINFORMDirIWOTHandISVTXProhibitedCompareRPMs(TestCompareRPMs):
     def setUp(self):
         super().setUp()
 
-        self.after_rpm.add_installed_directory("/usr/share/inform", mode="1757")
+        d = "usr/share/inform"
+        m = "1757"
+        self.after_rpm.section_install += "mkdir -p $RPM_BUILD_ROOT/%s\n" % d
+        self.after_rpm.section_install += "chmod %s $RPM_BUILD_ROOT/%s\n" % (m, d)
+        sub = self.after_rpm.get_subpackage(None)
+        sub.section_files += "%%attr(%s,-,-) /%s\n" % (m, d)
+        self.after_rpm.add_payload_check(d, None)
 
         self.inspection = "permissions"
         self.result = "INFO"
@@ -1903,7 +2125,13 @@ class SecurityVERIFYDirIWOTHandISVTXProhibitedCompareRPMs(TestCompareRPMs):
     def setUp(self):
         super().setUp()
 
-        self.after_rpm.add_installed_directory("/usr/share/verify", mode="1757")
+        d = "usr/share/verify"
+        m = "1757"
+        self.after_rpm.section_install += "mkdir -p $RPM_BUILD_ROOT/%s\n" % d
+        self.after_rpm.section_install += "chmod %s $RPM_BUILD_ROOT/%s\n" % (m, d)
+        sub = self.after_rpm.get_subpackage(None)
+        sub.section_files += "%%attr(%s,-,-) /%s\n" % (m, d)
+        self.after_rpm.add_payload_check(d, None)
 
         self.inspection = "permissions"
         self.result = "VERIFY"
@@ -1919,7 +2147,13 @@ class SecurityFAILDirIWOTHandISVTXProhibitedCompareRPMs(TestCompareRPMs):
     def setUp(self):
         super().setUp()
 
-        self.after_rpm.add_installed_directory("/usr/share/fail", mode="1757")
+        d = "usr/share/fail"
+        m = "1757"
+        self.after_rpm.section_install += "mkdir -p $RPM_BUILD_ROOT/%s\n" % d
+        self.after_rpm.section_install += "chmod %s $RPM_BUILD_ROOT/%s\n" % (m, d)
+        sub = self.after_rpm.get_subpackage(None)
+        sub.section_files += "%%attr(%s,-,-) /%s\n" % (m, d)
+        self.after_rpm.add_payload_check(d, None)
 
         self.inspection = "permissions"
         self.result = "BAD"
@@ -1935,7 +2169,13 @@ class DirIWOTHandISVTXProhibitedCompareKoji(TestCompareKoji):
     def setUp(self):
         super().setUp()
 
-        self.after_rpm.add_installed_directory("/usr/share/dumping-ground", mode="1757")
+        d = "usr/share/dumping-ground"
+        m = "1757"
+        self.after_rpm.section_install += "mkdir -p $RPM_BUILD_ROOT/%s\n" % d
+        self.after_rpm.section_install += "chmod %s $RPM_BUILD_ROOT/%s\n" % (m, d)
+        sub = self.after_rpm.get_subpackage(None)
+        sub.section_files += "%%attr(%s,-,-) /%s\n" % (m, d)
+        self.after_rpm.add_payload_check(d, None)
 
         self.inspection = "permissions"
         self.result = "BAD"
@@ -1951,7 +2191,13 @@ class SecuritySKIPDirIWOTHandISVTXProhibitedCompareKoji(TestCompareKoji):
     def setUp(self):
         super().setUp()
 
-        self.after_rpm.add_installed_directory("/usr/share/skip", mode="1757")
+        d = "usr/share/skip"
+        m = "1757"
+        self.after_rpm.section_install += "mkdir -p $RPM_BUILD_ROOT/%s\n" % d
+        self.after_rpm.section_install += "chmod %s $RPM_BUILD_ROOT/%s\n" % (m, d)
+        sub = self.after_rpm.get_subpackage(None)
+        sub.section_files += "%%attr(%s,-,-) /%s\n" % (m, d)
+        self.after_rpm.add_payload_check(d, None)
 
         self.inspection = "permissions"
         self.result = "OK"
@@ -1967,7 +2213,13 @@ class SecurityINFORMDirIWOTHandISVTXProhibitedCompareKoji(TestCompareKoji):
     def setUp(self):
         super().setUp()
 
-        self.after_rpm.add_installed_directory("/usr/share/inform", mode="1757")
+        d = "usr/share/inform"
+        m = "1757"
+        self.after_rpm.section_install += "mkdir -p $RPM_BUILD_ROOT/%s\n" % d
+        self.after_rpm.section_install += "chmod %s $RPM_BUILD_ROOT/%s\n" % (m, d)
+        sub = self.after_rpm.get_subpackage(None)
+        sub.section_files += "%%attr(%s,-,-) /%s\n" % (m, d)
+        self.after_rpm.add_payload_check(d, None)
 
         self.inspection = "permissions"
         self.result = "INFO"
@@ -1983,7 +2235,13 @@ class SecurityVERIFYDirIWOTHandISVTXProhibitedCompareKoji(TestCompareKoji):
     def setUp(self):
         super().setUp()
 
-        self.after_rpm.add_installed_directory("/usr/share/verify", mode="1757")
+        d = "usr/share/verify"
+        m = "1757"
+        self.after_rpm.section_install += "mkdir -p $RPM_BUILD_ROOT/%s\n" % d
+        self.after_rpm.section_install += "chmod %s $RPM_BUILD_ROOT/%s\n" % (m, d)
+        sub = self.after_rpm.get_subpackage(None)
+        sub.section_files += "%%attr(%s,-,-) /%s\n" % (m, d)
+        self.after_rpm.add_payload_check(d, None)
 
         self.inspection = "permissions"
         self.result = "VERIFY"
@@ -1999,7 +2257,13 @@ class SecurityFAILDirIWOTHandISVTXProhibitedCompareKoji(TestCompareKoji):
     def setUp(self):
         super().setUp()
 
-        self.after_rpm.add_installed_directory("/usr/share/fail", mode="1757")
+        d = "usr/share/fail"
+        m = "1757"
+        self.after_rpm.section_install += "mkdir -p $RPM_BUILD_ROOT/%s\n" % d
+        self.after_rpm.section_install += "chmod %s $RPM_BUILD_ROOT/%s\n" % (m, d)
+        sub = self.after_rpm.get_subpackage(None)
+        sub.section_files += "%%attr(%s,-,-) /%s\n" % (m, d)
+        self.after_rpm.add_payload_check(d, None)
 
         self.inspection = "permissions"
         self.result = "BAD"
