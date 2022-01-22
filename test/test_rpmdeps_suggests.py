@@ -48,6 +48,14 @@ if rpm_major < 4 or (rpm_major == 4 and rpm_minor < 12):
 else:
     have_suggests = True
 
+# need to know if we are on ALT Linux or not because rpmbuild
+# on that platform prohibits unexpanded macros, so we can skip
+# those test cases
+on_alt_linux = False
+
+if os.path.isfile("/etc/altlinux-release") or os.path.isfile("/etc/alt-release"):
+    on_alt_linux = True
+
 before_suggests = "important-package >= 2.0.2-47"
 after_suggests = "important-package >= 4.7.0-1"
 unexpanded_suggests = "important-package >= 4.7.1-1%{_macro}"
@@ -670,6 +678,7 @@ class MissingEpochSuggestsRebaseCompareKoji(TestCompareKoji):
 # Unexpanded macro in Suggests (BAD)
 class UnexpandedMacroSuggestsSRPM(TestSRPM):
     @unittest.skipUnless(have_suggests, "librpm too old to support Suggests")
+    @unittest.skipIf(on_alt_linux, "ALT Linux rpmbuild prohibits unexpanded macros")
     def setUp(self):
         super().setUp()
 
@@ -683,6 +692,7 @@ class UnexpandedMacroSuggestsSRPM(TestSRPM):
 
 class UnexpandedMacroSuggestsRPMs(TestRPMs):
     @unittest.skipUnless(have_suggests, "librpm too old to support Suggests")
+    @unittest.skipIf(on_alt_linux, "ALT Linux rpmbuild prohibits unexpanded macros")
     def setUp(self):
         super().setUp()
 
@@ -695,6 +705,7 @@ class UnexpandedMacroSuggestsRPMs(TestRPMs):
 
 class UnexpandedMacroSuggestsKoji(TestKoji):
     @unittest.skipUnless(have_suggests, "librpm too old to support Suggests")
+    @unittest.skipIf(on_alt_linux, "ALT Linux rpmbuild prohibits unexpanded macros")
     def setUp(self):
         super().setUp()
 
@@ -707,6 +718,7 @@ class UnexpandedMacroSuggestsKoji(TestKoji):
 
 class UnexpandedMacroSuggestsCompareSRPM(TestCompareSRPM):
     @unittest.skipUnless(have_suggests, "librpm too old to support Suggests")
+    @unittest.skipIf(on_alt_linux, "ALT Linux rpmbuild prohibits unexpanded macros")
     def setUp(self):
         super().setUp()
 
@@ -721,6 +733,7 @@ class UnexpandedMacroSuggestsCompareSRPM(TestCompareSRPM):
 
 class UnexpandedMacroSuggestsCompareRPMs(TestCompareRPMs):
     @unittest.skipUnless(have_suggests, "librpm too old to support Suggests")
+    @unittest.skipIf(on_alt_linux, "ALT Linux rpmbuild prohibits unexpanded macros")
     def setUp(self):
         super().setUp()
 
@@ -734,6 +747,7 @@ class UnexpandedMacroSuggestsCompareRPMs(TestCompareRPMs):
 
 class UnexpandedMacroSuggestsCompareKoji(TestCompareKoji):
     @unittest.skipUnless(have_suggests, "librpm too old to support Suggests")
+    @unittest.skipIf(on_alt_linux, "ALT Linux rpmbuild prohibits unexpanded macros")
     def setUp(self):
         super().setUp()
 

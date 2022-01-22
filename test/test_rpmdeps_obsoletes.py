@@ -35,6 +35,14 @@ have_elfdeps = False
 if os.path.isfile(elfdeps) and os.access(elfdeps, os.X_OK):
     have_elfdeps = True
 
+# need to know if we are on ALT Linux or not because rpmbuild
+# on that platform prohibits unexpanded macros, so we can skip
+# those test cases
+on_alt_linux = False
+
+if os.path.isfile("/etc/altlinux-release") or os.path.isfile("/etc/alt-release"):
+    on_alt_linux = True
+
 before_obsoletes = "important-package >= 2.0.2-47"
 after_obsoletes = "important-package >= 4.7.0-1"
 unexpanded_obsoletes = "important-package >= 4.7.1-1%{_macro}"
@@ -624,6 +632,7 @@ class MissingEpochObsoletesRebaseCompareKoji(TestCompareKoji):
 
 # Unexpanded macro in Obsoletes (BAD)
 class UnexpandedMacroObsoletesSRPM(TestSRPM):
+    @unittest.skipIf(on_alt_linux, "ALT Linux rpmbuild prohibits unexpanded macros")
     def setUp(self):
         super().setUp()
 
@@ -636,6 +645,7 @@ class UnexpandedMacroObsoletesSRPM(TestSRPM):
 
 
 class UnexpandedMacroObsoletesRPMs(TestRPMs):
+    @unittest.skipIf(on_alt_linux, "ALT Linux rpmbuild prohibits unexpanded macros")
     def setUp(self):
         super().setUp()
 
@@ -647,6 +657,7 @@ class UnexpandedMacroObsoletesRPMs(TestRPMs):
 
 
 class UnexpandedMacroObsoletesKoji(TestKoji):
+    @unittest.skipIf(on_alt_linux, "ALT Linux rpmbuild prohibits unexpanded macros")
     def setUp(self):
         super().setUp()
 
@@ -658,6 +669,7 @@ class UnexpandedMacroObsoletesKoji(TestKoji):
 
 
 class UnexpandedMacroObsoletesCompareSRPM(TestCompareSRPM):
+    @unittest.skipIf(on_alt_linux, "ALT Linux rpmbuild prohibits unexpanded macros")
     def setUp(self):
         super().setUp()
 
@@ -671,6 +683,7 @@ class UnexpandedMacroObsoletesCompareSRPM(TestCompareSRPM):
 
 
 class UnexpandedMacroObsoletesCompareRPMs(TestCompareRPMs):
+    @unittest.skipIf(on_alt_linux, "ALT Linux rpmbuild prohibits unexpanded macros")
     def setUp(self):
         super().setUp()
 
@@ -683,6 +696,7 @@ class UnexpandedMacroObsoletesCompareRPMs(TestCompareRPMs):
 
 
 class UnexpandedMacroObsoletesCompareKoji(TestCompareKoji):
+    @unittest.skipIf(on_alt_linux, "ALT Linux rpmbuild prohibits unexpanded macros")
     def setUp(self):
         super().setUp()
 
