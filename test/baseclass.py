@@ -164,6 +164,7 @@ class SimpleSrpmBuild(rpmfluff.SimpleRpmBuild):
         for arch in buildArchs:
             command = [
                 "rpmbuild",
+                "--nodeps",
                 "--define",
                 "_topdir %s" % absBaseDir,
                 "--define",
