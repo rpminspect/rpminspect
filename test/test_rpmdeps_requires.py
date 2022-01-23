@@ -503,8 +503,13 @@ class MissingEpochRequiresKoji(TestKoji):
         sub.add_requires("%s = %s-%s" % (AFTER_NAME, AFTER_VER, AFTER_REL))
 
         self.inspection = "rpmdeps"
-        self.result = "BAD"
-        self.waiver_auth = "Anyone"
+
+        if on_alt_linux:
+            self.result = "OK"
+            self.waiver_auth = "Not Waivable"
+        else:
+            self.result = "BAD"
+            self.waiver_auth = "Anyone"
 
 
 class MissingEpochRequiresCompareSRPM(TestCompareSRPM):
@@ -617,8 +622,13 @@ class MissingEpochRequiresCompareKoji(TestCompareKoji):
         after_sub.add_requires("%s = %s-%s" % (AFTER_NAME, AFTER_VER, AFTER_REL))
 
         self.inspection = "rpmdeps"
-        self.result = "BAD"
-        self.waiver_auth = "Anyone"
+
+        if on_alt_linux:
+            self.result = "OK"
+            self.waiver_auth = "Not Waivable"
+        else:
+            self.result = "BAD"
+            self.waiver_auth = "Anyone"
 
 
 # Missing Epoch prefix on rebase compare (INFO)
