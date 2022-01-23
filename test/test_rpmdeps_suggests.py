@@ -36,18 +36,6 @@ have_elfdeps = False
 if os.path.isfile(elfdeps) and os.access(elfdeps, os.X_OK):
     have_elfdeps = True
 
-# determine if the Suggests tag type is present in librpm
-# version must be >= 4.12.0
-rpmver = list(map(lambda x: int(x), rpm.__version__.strip().split("-")[0].split(".")))
-rpm_major = rpmver[0]
-rpm_minor = rpmver[1]
-rpm_update = rpmver[2]
-
-if rpm_major < 4 or (rpm_major == 4 and rpm_minor < 12):
-    have_suggests = False
-else:
-    have_suggests = True
-
 # need to know if we are on ALT Linux or not because rpmbuild
 # on that platform prohibits unexpanded macros, so we can skip
 # those test cases
@@ -55,6 +43,18 @@ on_alt_linux = False
 
 if os.path.isfile("/etc/altlinux-release") or os.path.isfile("/etc/alt-release"):
     on_alt_linux = True
+
+# determine if the Suggests tag type is present in librpm
+# version must be >= 4.12.0
+rpmver = list(map(lambda x: int(x), rpm.__version__.strip().split("-")[0].split(".")))
+rpm_major = rpmver[0]
+rpm_minor = rpmver[1]
+rpm_update = rpmver[2]
+
+if (rpm_major < 4 or (rpm_major == 4 and rpm_minor < 12)) or on_alt_linux:
+    have_suggests = False
+else:
+    have_suggests = True
 
 before_suggests = "important-package >= 2.0.2-47"
 after_suggests = "important-package >= 4.7.0-1"
