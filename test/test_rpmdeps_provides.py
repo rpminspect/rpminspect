@@ -43,9 +43,9 @@ on_alt_linux = False
 if os.path.isfile("/etc/altlinux-release") or os.path.isfile("/etc/alt-release"):
     on_alt_linux = True
 
-before_provides = "important-package >= 2.0.2-47"
-after_provides = "important-package >= 4.7.0-1"
-unexpanded_provides = "important-package >= 4.7.1-1%{_macro}"
+before_provides = "important-package = 2.0.2-47"
+after_provides = "important-package = 4.7.0-1"
+unexpanded_provides = "important-package = 4.7.1-1%{_macro}"
 
 # library source code for use in these package builds
 library_source = """#include <stdio.h>
