@@ -586,6 +586,7 @@ int main(int argc, char **argv)
     ri->product_release = release;
     ri->threshold = getseverity(threshold);
     ri->rebase_detection = rebase_detection;
+    free(threshold);
 
     /*
      * any inspection selections on the command line can override
@@ -862,6 +863,8 @@ int main(int argc, char **argv)
         if (ri->results != NULL) {
             formats[formatidx].driver(ri->results, output, ri->threshold);
         }
+
+        free(output);
     }
 
     /* Set exit code based on result threshold */
