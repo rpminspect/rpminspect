@@ -283,7 +283,7 @@ char **build_argv(const char *cmd);
 void free_argv(char **argv);
 
 /* fileinfo.c */
-bool match_fileinfo_mode(struct rpminspect *, const rpmfile_entry_t *, const char *, const char *, const char *);
+bool match_fileinfo_mode(struct rpminspect *, const rpmfile_entry_t *, const char *, const char *);
 bool match_fileinfo_owner(struct rpminspect *, const rpmfile_entry_t *, const char *, const char *, const char *, const char *);
 bool match_fileinfo_group(struct rpminspect *, const rpmfile_entry_t *, const char *, const char *, const char *, const char *);
 caps_filelist_entry_t *get_caps_entry(struct rpminspect *, const char *, const char *);

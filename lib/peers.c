@@ -29,7 +29,8 @@
 /*
  * Initialize a new rpmpeer_t list.
  */
-rpmpeer_t *init_rpmpeer(void) {
+rpmpeer_t *init_rpmpeer(void)
+{
     rpmpeer_t *peers = NULL;
 
     peers = calloc(1, sizeof(*(peers)));
@@ -41,7 +42,8 @@ rpmpeer_t *init_rpmpeer(void) {
 /*
  * Free memory associated with an rpmpeer_t list.
  */
-void free_rpmpeer(rpmpeer_t *peers) {
+void free_rpmpeer(rpmpeer_t *peers)
+{
     rpmpeer_entry_t *entry = NULL;
 
     if (peers == NULL) {
