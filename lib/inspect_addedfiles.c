@@ -30,6 +30,8 @@
 
 #include "rpminspect.h"
 
+static char *remedy_addedfiles = NULL;
+
 /*
  * Performs all of the tests associated with the addedfiles inspection.
  */
@@ -44,18 +46,13 @@ static bool addedfiles_driver(struct rpminspect *ri, rpmfile_entry_t *file)
     string_entry_t *entry = NULL;
     struct result_params params;
 
-    /* Skip files with a peer, other inspections handle changed/missing files */
-    if (file->peer_file) {
-        return true;
-    }
-
     /* Ignore source RPMs */
     if (headerIsSource(file->rpm_header)) {
         return true;
     }
 
     /* Skip moved files */
-    if (file->moved_path && file->peer_file->moved_path) {
+    if (file->moved_path && file->peer_file && file->peer_file->moved_path) {
         return true;
     }
 
@@ -77,7 +74,7 @@ static bool addedfiles_driver(struct rpminspect *ri, rpmfile_entry_t *file)
     }
 
     /*
-     * File has been added, report results.
+     * Security checks first (works for single build runs as well.
      */
 
     /* The architecture is used in reporting messages */
@@ -94,7 +91,7 @@ static bool addedfiles_driver(struct rpminspect *ri, rpmfile_entry_t *file)
     params.arch = arch;
     params.file = file->localpath;
     params.verb = VERB_FAILED;
-    xasprintf(&params.remedy, REMEDY_ADDEDFILES, ri->fileinfo_filename);
+    params.remedy = remedy_addedfiles;
 
     /* Check for any forbidden path prefixes */
     if (ri->forbidden_path_prefixes && (ri->tests & INSPECT_ADDEDFILES)) {
@@ -151,7 +148,7 @@ static bool addedfiles_driver(struct rpminspect *ri, rpmfile_entry_t *file)
         }
     }
 
-    /* New security path file */
+    /* security path file */
     if (ri->security_path_prefix && S_ISREG(file->st.st_mode)) {
         TAILQ_FOREACH(entry, ri->security_path_prefix, items) {
             subpath = entry->data;
@@ -181,12 +178,15 @@ static bool addedfiles_driver(struct rpminspect *ri, rpmfile_entry_t *file)
 
     /* Check for any new setuid or setgid files */
     if (!S_ISDIR(file->st.st_mode) && (file->st.st_mode & (S_ISUID|S_ISGID))) {
-        match_fileinfo_mode(ri, file, NAME_ADDEDFILES, REMEDY_ADDEDFILES, ri->fileinfo_filename);
+        match_fileinfo_mode(ri, file, NAME_ADDEDFILES, remedy_addedfiles);
         goto done;
     }
 
-    /* Default for new files */
-    if (ri->tests & INSPECT_ADDEDFILES) {
+    /*
+     * Report that a new file has been added in a build comparison.
+     */
+    if ((ri->tests & INSPECT_ADDEDFILES)
+        && (ri->before != NULL && file->peer_file == NULL)) {
         if (rebase) {
             params.severity = RESULT_INFO;
             params.waiverauth = NOT_WAIVABLE;
@@ -205,7 +205,6 @@ static bool addedfiles_driver(struct rpminspect *ri, rpmfile_entry_t *file)
 
 done:
     free(params.msg);
-    free(params.remedy);
 
     return result;
 }
@@ -215,7 +214,10 @@ bool inspect_addedfiles(struct rpminspect *ri)
     bool result;
     struct result_params params;
 
+    xasprintf(&remedy_addedfiles, REMEDY_ADDEDFILES, ri->fileinfo_filename ? _("the fileinfo list") : ri->fileinfo_filename);
+    assert(remedy_addedfiles != NULL);
     result = foreach_peer_file(ri, NAME_ADDEDFILES, addedfiles_driver, false);
+    free(remedy_addedfiles);
 
     if (result) {
         init_result_params(&params);

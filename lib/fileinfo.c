@@ -38,11 +38,10 @@
  * @param header The header string to use for results reporting if the
  *               file is found.
  * @param remedy The remedy string to use for results reporting if the
- *               file is found.  Must contain a %s for fname.
- * @param fname The filename of the data package file to update.
+ *               file is found.
  * @return True if the file is on the fileinfo list, false otherwise.
  */
-bool match_fileinfo_mode(struct rpminspect *ri, const rpmfile_entry_t *file, const char *header, const char *remedy, const char *fname)
+bool match_fileinfo_mode(struct rpminspect *ri, const rpmfile_entry_t *file, const char *header, const char *remedy)
 {
     fileinfo_entry_t *fientry = NULL;
     mode_t interesting = S_ISUID | S_ISGID | S_ISVTX | S_IRWXU | S_IRWXG | S_IRWXO;
@@ -62,7 +61,7 @@ bool match_fileinfo_mode(struct rpminspect *ri, const rpmfile_entry_t *file, con
     params.file = file->localpath;
 
     if (remedy) {
-        xasprintf(&params.remedy, remedy, fname);
+        params.remedy = strdup(remedy);
     }
 
     if (init_fileinfo(ri)) {
@@ -85,8 +84,6 @@ bool match_fileinfo_mode(struct rpminspect *ri, const rpmfile_entry_t *file, con
                         add_result(ri, &params);
                         free(params.msg);
                         free(params.remedy);
-                        params.remedy = NULL;
-
                         return true;
                     }
                 }
@@ -106,7 +103,6 @@ bool match_fileinfo_mode(struct rpminspect *ri, const rpmfile_entry_t *file, con
             add_result(ri, &params);
             free(params.msg);
             free(params.remedy);
-            params.remedy = NULL;
         }
     }
 
