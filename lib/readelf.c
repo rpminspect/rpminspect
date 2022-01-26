@@ -236,7 +236,7 @@ static Elf *get_elf_with_kind(const char *fullpath, int *out_fd, Elf_Kind kind)
     /* library version check */
     if (!initialized) {
         if (elf_version(EV_CURRENT) == EV_NONE) {
-            warn(_("libelf version mismatch\n"));
+            warnx(_("libelf version mismatch"));
             return NULL;
         }
 
