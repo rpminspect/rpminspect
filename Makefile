@@ -95,6 +95,9 @@ update-pot: setup
 srpm:
 	$(topdir)/utils/srpm.sh
 
+copr-srpm:
+	$(topdir)/utils/srpm.sh -c
+
 # This target will increment the version number, commit, tag, and
 # push.  Generally this is not the desired release behavior as the
 # development tree is already using the upcoming release number.
@@ -165,6 +168,7 @@ help:
 	@echo "    check             Run 'meson test -C $(MESON_BUILD_DIR) -v'"
 	@echo "    update-pot        Update po/POTFILES and po/rpminspect.pot"
 	@echo "    srpm              Generate an SRPM package of the latest release"
+	@echo "    copr-srpm         Generate an SRPM package of the latest HEAD revision"
 	@echo "    release           Tag and push current tree as a release"
 	@echo "    new-release       Bump version, tag, and push current tree as a release"
 	@echo "    koji              Run 'make srpm' then 'utils/submit-koji-builds.sh'"
