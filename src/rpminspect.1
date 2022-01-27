@@ -273,7 +273,8 @@ what was found.  Descriptions of actions developers can take are provided in
 the findings.
 .SH EXIT STATUS
 rpminspect exits 0 if all inspections pass, 1 if at least one
-inspection did not pass, or 2 if a program error occurred.
+inspection did not pass.  rpminspect exits 3 if the specified profile
+is not found, and 2 if any other program error occurred.
 .SH BUGS
 Please report bugs at https://github.com/rpminspect/rpminspect using
 the Issues tab.

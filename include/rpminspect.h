@@ -99,7 +99,8 @@ extern volatile sig_atomic_t terminal_resized;
 enum {
     RI_INSPECTION_SUCCESS = 0,   /* inspections passed */
     RI_INSPECTION_FAILURE = 1,   /* inspections failed */
-    RI_PROGRAM_ERROR = 2         /* program errored in some way */
+    RI_PROGRAM_ERROR = 2,        /* program errored in some way */
+    RI_MISSING_PROFILE = 3       /* specified profile not found */
 };
 
 /*

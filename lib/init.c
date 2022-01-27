@@ -2069,7 +2069,7 @@ struct rpminspect *init_rpminspect(struct rpminspect *ri, const char *cfgfile, c
         i = read_cfgfile(ri, cfg->data);
 
         if (i) {
-            warn(_("*** error reading '%s'\n"), cfg->data);
+            warn(_("*** error reading '%s'"), cfg->data);
             free(cfg->data);
             free(cfg);
             return NULL;
@@ -2085,12 +2085,12 @@ struct rpminspect *init_rpminspect(struct rpminspect *ri, const char *cfgfile, c
         filename = realpath(tmp, NULL);
 
         if ((filename == NULL) || (access(filename, F_OK|R_OK) == -1)) {
-            warn(_("*** unable to read profile '%s' from %s\n"), profile, filename);
+            errx(RI_MISSING_PROFILE, _("*** unable to find profile '%s'"), profile);
         } else {
             i = read_cfgfile(ri, filename);
 
             if (i) {
-                warn(_("*** error reading '%s'\n"), filename);
+                warn(_("*** error reading '%s'"), filename);
                 return NULL;
             }
         }
