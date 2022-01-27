@@ -172,11 +172,13 @@ static char *get_product_release(string_map_t *products, const favor_release_t f
             HASH_ITER(hh, products, hentry, tmp_hentry) {
                 /* refresh after_product */
                 xasprintf(&needle, ".%s", hentry->key);
+                before_product = NULL;
+                after_product = NULL;
                 after_product = strstr(after, needle);
                 before_product = strstr(before, needle);
-                free(needle);
 
                 if (after_product == NULL || before_product == NULL) {
+                    free(needle);
                     continue;
                 }
 
@@ -186,19 +188,20 @@ static char *get_product_release(string_map_t *products, const favor_release_t f
                 if (result != 0) {
                     regerror(result, &product_regex, reg_error, sizeof(reg_error));
                     warnx(_("*** unable to compile product release regular expression: %s"), reg_error);
-                    free(before_product);
-                    free(after_product);
+                    free(needle);
                     return NULL;
                 }
 
                 /* now try to match the before and after builds */
                 if (regexec(&product_regex, before_product, 1, before_matches, 0) != 0) {
                     regfree(&product_regex);
+                    free(needle);
                     continue;
                 }
 
                 if (regexec(&product_regex, after_product, 1, after_matches, 0) != 0) {
                     regfree(&product_regex);
+                    free(needle);
                     continue;
                 }
 
@@ -210,11 +213,11 @@ static char *get_product_release(string_map_t *products, const favor_release_t f
                 regfree(&product_regex);
 
                 if (matched) {
+                    free(needle);
                     break;
                 }
 
-                before_product = NULL;
-                after_product = NULL;
+                free(needle);
             }
         } else if (!c) {
             matched = true;
