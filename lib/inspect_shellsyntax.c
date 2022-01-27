@@ -103,6 +103,7 @@ static bool shellsyntax_driver(struct rpminspect *ri, rpmfile_entry_t *file)
     char *before_errors = NULL;
     int before_exitcode = -1;
     char *errors = NULL;
+    char *tmp = NULL;
     bool extglob = false;
     struct result_params params;
 
@@ -165,9 +166,14 @@ static bool shellsyntax_driver(struct rpminspect *ri, rpmfile_entry_t *file)
     if (before_shell) {
         before_errors = run_cmd(&before_exitcode, ri->worksubdir, before_shell, "-n", file->peer_file->fullpath, NULL);
         DEBUG_PRINT("before_exitcode=%d, before_errors=|%s|\n", before_exitcode, before_errors);
+
+        /* remove the working directory prefix */
+        tmp = strreplace(before_errors, file->peer_file->fullpath, file->peer_file->localpath);
+        free(before_errors);
+        before_errors = tmp;
     }
 
-    /* Special cash for GNU bash, try with extglob */
+    /* Special check for GNU bash, try with extglob */
     if (exitcode && !strcmp(shell, "bash")) {
         free(errors);
         errors = run_cmd(&exitcode, ri->worksubdir, shell, "-n", "-O", "extglob", file->fullpath, NULL);
@@ -178,6 +184,11 @@ static bool shellsyntax_driver(struct rpminspect *ri, rpmfile_entry_t *file)
             result = false;
         }
     }
+
+    /* remove the working directory prefix */
+    tmp = strreplace(errors, file->fullpath, file->localpath);
+    free(errors);
+    errors = tmp;
 
     /* Report */
     if (before_shell) {
