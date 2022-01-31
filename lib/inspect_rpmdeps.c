@@ -126,7 +126,10 @@ static bool check_explicit_lib_deps(struct rpminspect *ri, Header h, deprule_lis
     struct result_params params;
 
     assert(ri != NULL);
-    assert(h != NULL);
+
+    if (h == NULL) {
+        return true;
+    }
 
     name = headerGetString(h, RPMTAG_NAME);
     arch = get_rpm_header_arch(h);
@@ -307,7 +310,10 @@ static bool check_explicit_epoch(struct rpminspect *ri, Header h, deprule_list_t
     struct result_params params;
 
     assert(ri != NULL);
-    assert(h != NULL);
+
+    if (h == NULL) {
+        return true;
+    }
 
     name = headerGetString(h, RPMTAG_NAME);
     arch = get_rpm_header_arch(h);
@@ -537,19 +543,29 @@ bool inspect_rpmdeps(struct rpminspect *ri)
             peer->before_deprules = gather_deprules(peer->before_hdr);
         }
 
-        if (peer->after_deprules == NULL) {
+        if (peer->after_hdr && peer->after_deprules == NULL) {
             peer->after_deprules = gather_deprules(peer->after_hdr);
         }
 
         /* Peer up the before and after deps */
         find_deprule_peers(peer->before_deprules, peer->after_deprules);
 
-        /* Name and arch of this peer */
-        name = headerGetString(peer->after_hdr, RPMTAG_NAME);
-        arch = get_rpm_header_arch(peer->after_hdr);
+        /* Name and arch of this peer (try after build first) */
+        name = NULL;
+        arch = NULL;
+
+        if (peer->after_hdr) {
+            name = headerGetString(peer->after_hdr, RPMTAG_NAME);
+            arch = get_rpm_header_arch(peer->after_hdr);
+        }
+
+        if (name == NULL && arch == NULL && peer->before_hdr) {
+            name = headerGetString(peer->before_hdr, RPMTAG_NAME);
+            arch = get_rpm_header_arch(peer->before_hdr);
+        }
 
         /* Check for unexpanded macros in the version fields of dependencies */
-        if (!have_unexpanded_macros(ri, name, arch, peer->after_deprules)) {
+        if (name && arch && !have_unexpanded_macros(ri, name, arch, peer->after_deprules)) {
             result = false;
         }
     }
@@ -572,6 +588,10 @@ bool inspect_rpmdeps(struct rpminspect *ri)
     /* report dependency findings between the before and after build */
     if (ri->before && ri->after) {
         TAILQ_FOREACH(peer, ri->peers, items) {
+            if (peer->after_hdr == NULL) {
+                continue;
+            }
+
             /* Name and arch of this peer */
             name = headerGetString(peer->after_hdr, RPMTAG_NAME);
             arch = get_rpm_header_arch(peer->after_hdr);

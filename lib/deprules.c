@@ -165,7 +165,9 @@ deprule_list_t *gather_deprules(Header hdr)
     deprule_list_t *rules = NULL;
     dep_type_t t = TYPE_NULL;
 
-    assert(hdr != NULL);
+    if (hdr == NULL) {
+        return NULL;
+    }
 
     for (t = FIRST_DEP_TYPE; t <= LAST_DEP_TYPE; t++) {
         rules = gather_deprules_by_type(rules, hdr, t);
@@ -211,10 +213,8 @@ void find_deprule_peers(deprule_list_t *before, deprule_list_t *after)
     deprule_entry_t *before_entry = NULL;
     deprule_entry_t *after_entry = NULL;
 
-    assert(after != NULL);
-
     /* Make sure there is something to match */
-    if (before == NULL || TAILQ_EMPTY(before)) {
+    if ((before == NULL || TAILQ_EMPTY(before)) || (after == NULL || TAILQ_EMPTY(after))) {
         return;
     }
 
