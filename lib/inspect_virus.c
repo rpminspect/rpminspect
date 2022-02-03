@@ -173,6 +173,7 @@ bool inspect_virus(struct rpminspect *ri)
     }
 
     if (errno != 0) {
+        free(params.details);
         err(EXIT_FAILURE, "readdir");
     }
 
@@ -186,6 +187,7 @@ bool inspect_virus(struct rpminspect *ri)
     params.arch = NULL;
     add_result(ri, &params);
     free(params.msg);
+    free(params.details);
 
     /* run the virus check on each file */
     params.severity = RESULT_BAD;

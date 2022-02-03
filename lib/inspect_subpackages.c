@@ -116,8 +116,8 @@ bool inspect_subpackages(struct rpminspect *ri) {
         result = false;
     }
 
-    list_free(lost, NULL);
-    list_free(gain, NULL);
+    list_free(lost, free);
+    list_free(gain, free);
     list_free(before_pkgs, free);
     list_free(after_pkgs, free);
 

@@ -106,6 +106,7 @@ void init_elf_data(struct rpminspect *ri)
         }
     }
 
+    free(tags);
     elf_end(e);
     close(fd);
 
@@ -476,7 +477,7 @@ bool get_dynamic_tags(Elf *elf, const Elf64_Sxword tag, GElf_Dyn **out, size_t *
     }
 
     if (shdr_out != NULL) {
-        memcpy(shdr_out, &shdr, sizeof(*shdr_out));
+        memmove(shdr_out, &shdr, sizeof(*shdr_out));
     }
 
     if (out != NULL) {
@@ -506,7 +507,7 @@ bool get_dynamic_tags(Elf *elf, const Elf64_Sxword tag, GElf_Dyn **out, size_t *
                  */
                 dyn_tmp = realloc(*out, ((*out_size) + 1) * (sizeof(GElf_Dyn)));
                 assert(dyn_tmp != NULL);
-                memcpy(dyn_tmp + *out_size, &dyn, sizeof(GElf_Dyn));
+                memmove(dyn_tmp + *out_size, &dyn, sizeof(GElf_Dyn));
                 *out = dyn_tmp;
                 (*out_size)++;
             }

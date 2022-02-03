@@ -468,16 +468,17 @@ char *strappend(char *dest, ...)
     va_list sl;
     char *s = NULL;
 
-    if (dest == NULL) {
-        return NULL;
-    }
-
     va_start(sl, dest);
 
     while ((s = va_arg(sl, char *)) != NULL) {
-        dest = realloc(dest, strlen(dest) + strlen(s) + 1);
-        assert(dest != NULL);
-        dest = strcat(dest, s);
+        if (dest == NULL) {
+            dest = strdup(s);
+            assert(dest != NULL);
+        } else {
+            dest = realloc(dest, strlen(dest) + strlen(s) + 1);
+            assert(dest != NULL);
+            dest = strcat(dest, s);
+        }
     }
 
     va_end(sl);

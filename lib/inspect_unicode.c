@@ -233,15 +233,13 @@ static char *rpm_prep_source(struct rpminspect *ri, const rpmfile_entry_t *file,
             return NULL;
         }
 
+        free(*details);
         *details = NULL;
         buf = calloc(1, n);
         assert(buf != NULL);
 
         while (getline(&buf, &n, reader) != -1) {
-            xasprintf(&tail, "%s%s", (*details == NULL) ? "" : *details, buf);
-            assert(tail != NULL);
-            free(*details);
-            *details = tail;
+            *details = strappend(*details, buf, NULL);
         }
 
         free(buf);
@@ -273,6 +271,9 @@ static char *rpm_prep_source(struct rpminspect *ri, const rpmfile_entry_t *file,
         if (tail != NULL) {
             tail[strcspn(tail, "\n")] = 0;
         }
+
+        *details = realloc(*details, strlen(*details) + 1);
+        assert(*details != NULL);
     }
 
     return build;
@@ -578,7 +579,6 @@ static bool unicode_driver(struct rpminspect *ri, rpmfile_entry_t *file)
             add_result(globalri, &params);
             free(params.msg);
             free(params.details);
-            params.details = NULL;
 
             seen = true;
             return false;
@@ -590,6 +590,7 @@ static bool unicode_driver(struct rpminspect *ri, rpmfile_entry_t *file)
         }
 
         seen = true;
+        free(params.details);
     }
 
     /* check the individual file */

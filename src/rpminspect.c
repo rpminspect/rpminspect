@@ -802,6 +802,8 @@ int main(int argc, char **argv)
         if (ri->product_release == NULL) {
             if (ri->peers == NULL || TAILQ_EMPTY(ri->peers)) {
                 free_rpminspect(ri);
+                rpmFreeMacros(NULL);
+                rpmFreeRpmrc();
                 errx(RI_PROGRAM_ERROR, _("*** No peers, ensure packages exist for specified architecture(s)."));
             }
 
@@ -810,6 +812,8 @@ int main(int argc, char **argv)
 
             if (after_rel == NULL) {
                 free_rpminspect(ri);
+                rpmFreeMacros(NULL);
+                rpmFreeRpmrc();
                 err(RI_PROGRAM_ERROR, _("invalid after RPM"));
             }
 
@@ -818,6 +822,8 @@ int main(int argc, char **argv)
 
                 if (before_rel == NULL) {
                     free_rpminspect(ri);
+                    rpmFreeMacros(NULL);
+                    rpmFreeRpmrc();
                     err(RI_PROGRAM_ERROR, _("invalid before RPM"));
                 }
             }
