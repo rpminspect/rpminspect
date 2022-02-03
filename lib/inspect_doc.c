@@ -145,7 +145,7 @@ bool inspect_doc(struct rpminspect *ri)
 
     assert(ri != NULL);
 
-    result = foreach_peer_file(ri, NAME_DOC, doc_driver, true);
+    result = foreach_peer_file(ri, NAME_DOC, doc_driver);
 
     if (result && !reported) {
         init_result_params(&params);

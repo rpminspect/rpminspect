@@ -478,6 +478,13 @@ specname:
     primary: name
     #primary: filename
 
+    # Optional list of glob(7) specifications to match files to ignore
+    # for this inspection.  The format of this list is the same as the
+    # global 'ignore' list.  The difference is the items specified
+    # here will only be used during this inspection.
+    #ignore:
+    #    - /usr/lib*/libexample.so*
+
 annocheck:
     # annocheck(1) tests to run.  The left side of the colon is the
     # test name you want to use and the right side are the arguments
@@ -539,6 +546,14 @@ pathmigration:
     excluded_paths:
         - /lib/modules
 
+    # Optional list of glob(7) specifications to match files to ignore
+    # for this inspection.  The format of this list is the same as the
+    # global 'ignore' list.  The difference is the items specified
+    # here will only be used during this inspection.
+    #ignore:
+    #    - /usr/lib*/libexample.so*
+
+politics:
     # Optional list of glob(7) specifications to match files to ignore
     # for this inspection.  The format of this list is the same as the
     # global 'ignore' list.  The difference is the items specified
@@ -824,3 +839,11 @@ rpmdeps:
     # Only one regexp can be expressed for each dependency type.
     # Additional listings will overwrite previous definitions in the
     # runtime configuration.
+
+virus:
+    # Optional list of glob(7) specifications to match files to ignore
+    # for this inspection.  The format of this list is the same as the
+    # global 'ignore' list.  The difference is the items specified
+    # here will only be used during this inspection.
+    #ignore:
+    #    - /usr/lib*/libexample.so*

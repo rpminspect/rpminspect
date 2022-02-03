@@ -216,7 +216,7 @@ bool inspect_addedfiles(struct rpminspect *ri)
 
     xasprintf(&remedy_addedfiles, REMEDY_ADDEDFILES, ri->fileinfo_filename ? _("the fileinfo list") : ri->fileinfo_filename);
     assert(remedy_addedfiles != NULL);
-    result = foreach_peer_file(ri, NAME_ADDEDFILES, addedfiles_driver, false);
+    result = foreach_peer_file(ri, NAME_ADDEDFILES, addedfiles_driver);
     free(remedy_addedfiles);
 
     if (result) {
