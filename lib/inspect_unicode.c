@@ -637,7 +637,7 @@ bool inspect_unicode(struct rpminspect *ri)
         globalri = ri;
 
         /* run the inspection */
-        result = foreach_peer_file(ri, NAME_UNICODE, unicode_driver, false);
+        result = foreach_peer_file(ri, NAME_UNICODE, unicode_driver);
 
         /* free the forbidden list memory */
         while (!TAILQ_EMPTY(forbidden)) {

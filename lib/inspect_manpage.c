@@ -358,7 +358,7 @@ bool inspect_manpage(struct rpminspect *ri)
     struct result_params params;
 
     inspect_manpage_alloc();
-    result = foreach_peer_file(ri, NAME_MANPAGE, manpage_driver, true);
+    result = foreach_peer_file(ri, NAME_MANPAGE, manpage_driver);
     inspect_manpage_free();
 
     if (result) {

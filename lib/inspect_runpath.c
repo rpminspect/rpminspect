@@ -332,7 +332,7 @@ bool inspect_runpath(struct rpminspect *ri)
     assert(ri != NULL);
 
     /* run the runpath test across all ELF files */
-    result = foreach_peer_file(ri, NAME_RUNPATH, runpath_driver, true);
+    result = foreach_peer_file(ri, NAME_RUNPATH, runpath_driver);
 
     /* if everything was fine, just say so */
     if (result) {

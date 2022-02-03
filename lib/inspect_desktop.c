@@ -500,7 +500,7 @@ bool inspect_desktop(struct rpminspect *ri)
      * them.  The before and after peers are compared for these files.
      * For the after files, the Exec and Icon references are checked.
      */
-    result = foreach_peer_file(ri, NAME_DESKTOP, desktop_driver, true);
+    result = foreach_peer_file(ri, NAME_DESKTOP, desktop_driver);
 
     if (result) {
         init_result_params(&params);

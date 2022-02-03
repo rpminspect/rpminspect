@@ -110,7 +110,7 @@ bool inspect_specname(struct rpminspect *ri)
     struct result_params params;
 
     assert(ri != NULL);
-    foreach_peer_file(ri, NAME_SPECNAME, specname_driver, false);
+    foreach_peer_file(ri, NAME_SPECNAME, specname_driver);
 
     init_result_params(&params);
     params.waiverauth = NOT_WAIVABLE;

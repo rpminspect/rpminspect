@@ -124,7 +124,7 @@ bool inspect_pathmigration(struct rpminspect *ri) {
 
     /* Only run the inspection if path migrations are specified */
     if (ri->pathmigration) {
-        result = foreach_peer_file(ri, NAME_PATHMIGRATION, pathmigration_driver, true);
+        result = foreach_peer_file(ri, NAME_PATHMIGRATION, pathmigration_driver);
     }
 
     if (result) {

@@ -309,7 +309,7 @@ bool inspect_kmod(struct rpminspect *ri)
     params.waiverauth = NOT_WAIVABLE;
     params.header = NAME_KMOD;
     params.verb = VERB_OK;
-    result = foreach_peer_file(ri, NAME_KMOD, kmod_driver, true);
+    result = foreach_peer_file(ri, NAME_KMOD, kmod_driver);
 
     /* if everything was fine, just say so */
     if (result) {

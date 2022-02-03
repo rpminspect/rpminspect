@@ -169,7 +169,7 @@ bool inspect_badfuncs(struct rpminspect *ri)
 
     if (ri->bad_functions != NULL) {
         init_elf_data(ri);
-        result = foreach_peer_file(ri, NAME_BADFUNCS, badfuncs_driver, true);
+        result = foreach_peer_file(ri, NAME_BADFUNCS, badfuncs_driver);
     }
 
     if (result) {
