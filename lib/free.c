@@ -299,8 +299,6 @@ void free_rpminspect(struct rpminspect *ri) {
 
     free_results(ri->results);
 
-    free_string_map(ri->fortifiable);
-
     return;
 }
 

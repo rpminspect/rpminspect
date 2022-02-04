@@ -102,6 +102,8 @@ static bool annocheck_driver(struct rpminspect *ri, rpmfile_entry_t *file)
     char *before_out = NULL;
     int before_exit = 0;
     char *details = NULL;
+    string_list_t *slist = NULL;
+    string_entry_t *sentry = NULL;
     struct result_params params;
 
     assert(ri != NULL);
@@ -197,10 +199,44 @@ static bool annocheck_driver(struct rpminspect *ri, rpmfile_entry_t *file)
             params.details = details;
             add_result(ri, &params);
             free(params.msg);
-            free(details);
+        }
+
+        /* Check for loss of -O2 -D_FORTIFY_SOURCE=2 */
+        /* XXX: this will change with a move to libannocheck */
+        if (after_out) {
+            slist = strsplit(after_out, "\n");
+            assert(slist != NULL);
+
+            TAILQ_FOREACH(sentry, slist, items) {
+                if (strprefix(sentry->data, "FAIL:") && (strstr(sentry->data, "fortify") || strstr(sentry->data, "optimization"))) {
+                    init_result_params(&params);
+                    params.header = NAME_ANNOCHECK;
+                    params.waiverauth = WAIVABLE_BY_SECURITY;
+                    params.remedy = REMEDY_ANNOCHECK_FORTIFY_SOURCE;
+                    params.arch = arch;
+                    params.file = file->localpath;
+                    params.verb = VERB_REMOVED;
+                    params.noun = _("lost -D_FORTIFY_SOURCE in ${FILE} on ${ARCH}");
+                    params.severity = get_secrule_result_severity(ri, file, SECRULE_FORTIFYSOURCE);
+
+                    xasprintf(&params.msg, _("%s may have lost -D_FORTIFY_SOURCE on %s"), file->localpath, arch);
+                    params.details = details;
+
+                    if (params.severity != RESULT_NULL && params.severity != RESULT_SKIP) {
+                        add_result(ri, &params);
+                        result = false;
+                    }
+
+                    break;
+                }
+            }
+
+            list_free(slist, free);
         }
 
         /* Cleanup */
+        free(details);
+
         free(after_out);
         free(before_out);
 

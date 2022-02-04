@@ -37,7 +37,6 @@
 #define EM_BPF 247 /* Linux BPF -- in-kernel virtual machine */
 #endif
 
-bool is_fortified(const char *);
 void init_elf_data(struct rpminspect *);
 Elf *get_elf(const char *, int *);
 Elf *get_elf_archive(const char *, int *);

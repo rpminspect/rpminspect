@@ -51,7 +51,6 @@
 #define REMEDY_ELF_EXECSTACK_INVALID _("The data in an ELF file appears to be corrupt; ensure that packaged ELF files are not being truncated or incorrectly modified")
 #define REMEDY_ELF_EXECSTACK_EXECUTABLE _("An ELF stack is marked as executable. Ensure that no execstack options are being passed to the linker, and that no functions are defined on the stack.")
 #define REMEDY_ELF_GNU_RELRO _("Ensure executables are linked with with '-z relro -z now'")
-#define REMEDY_ELF_FORTIFY_SOURCE _("Ensure all object files are compiled with '-O2 -D_FORTIFY_SOURCE=2', and that all appropriate headers are included (no implicit function declarations). Symbols may also appear as unfortified if the compiler is unable to determine the size of a buffer, which is not necessarily an error.")
 #define REMEDY_ELF_FPIC _("Ensure all object files are compiled with -fPIC")
 #define REMEDY_ELF_IPV6 _("Please review all usages of IPv4-only functions and ensure IPv6 compliance.")
 
@@ -107,6 +106,7 @@
 
 /* annocheck */
 #define REMEDY_ANNOCHECK _("See annocheck(1) for more information.")
+#define REMEDY_ANNOCHECK_FORTIFY_SOURCE _("Ensure all object files are compiled with '-O2 -D_FORTIFY_SOURCE=2', and that all appropriate headers are included (no implicit function declarations). Symbols may also appear as unfortified if the compiler is unable to determine the size of a buffer, which is not necessarily an error.")
 
 /* dsodeps */
 #define REMEDY_DSODEPS _("DT_NEEDED symbols have been added or removed.  This happens when the build environment has different versions of the required libraries.  Sometimes this is deliberate but sometimes not.  Verify these changes are expected.  If they are not, modify the package spec file to ensure the build links with the correct shared libraries.")

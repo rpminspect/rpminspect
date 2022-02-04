@@ -114,9 +114,8 @@ const char *inspection_header_to_desc(const char *header);
  * do not contain an executable stack. Second, check that ELF objects
  * do not contain text relocations. When comparing builds, check that
  * the ELF objects in the after build did not lose a PT_GNU_RELRO
- * segment. When comparing builds, check that the ELF objects in the
- * after build did not lose -D_FORTIFY_SOURCE. Lastly, if there is a
- * list of forbidden library functions, make sure nothing uses them.
+ * segment. When comparing builds, if there is a list of forbidden
+ * library functions, make sure nothing uses them.
  *
  * @param ri Pointer to the struct rpminspect for the program.
  */
@@ -655,7 +654,7 @@ bool inspect_rpmdeps(struct rpminspect *ri);
 
 #define DESC_XML _("Check that XML files included in the RPM payload are well-formed.")
 
-#define DESC_ELF _("Perform several checks on ELF files. First, check that ELF objects do not contain an executable stack. Second, check that ELF objects do not contain text relocations. When comparing builds, check that the ELF objects in the after build did not lose a PT_GNU_RELRO segment. When comparing builds, check that the ELF objects in the after build did not lose -D_FORTIFY_SOURCE. Lastly, if there is a list of forbidden library functions, make sure nothing uses them.")
+#define DESC_ELF _("Perform several checks on ELF files. First, check that ELF objects do not contain an executable stack. Second, check that ELF objects do not contain text relocations. When comparing builds, check that the ELF objects in the after build did not lose a PT_GNU_RELRO segment. When comparing buildsand there is a list of forbidden library functions, make sure nothing uses them.")
 
 #define DESC_DESKTOP _("Perform syntax and file reference checks on *.desktop files. Syntax errors and invalid file references are reported as errors.")
 
