@@ -216,37 +216,6 @@ bool has_bind_now(Elf *elf)
     return have_dynamic_tag(elf, DT_BIND_NOW) || have_dynamic_flag(elf, DF_BIND_NOW);
 }
 
-static bool is_fortifiable(const char *symbol)
-{
-    string_map_t *hentry = NULL;
-
-    assert(symbol != NULL);
-    HASH_FIND_STR(rip->fortifiable, symbol, hentry);
-    return hentry != NULL;
-}
-
-/**
- * @brief Return a list of fortified symbols found linked in the given
- * ELF object
- *
- * @param elf ELF object to check
- */
-static string_list_t * get_fortified_symbols(Elf *elf)
-{
-    return get_elf_imported_functions(elf, is_fortified);
-}
-
-/**
- * @brief Return a list of linked symbols that could have been
- * fortified but are not
- *
- * @param elf ELF object to check
- */
-static string_list_t * get_fortifiable_symbols(Elf *elf)
-{
-    return get_elf_imported_functions(elf, is_fortifiable);
-}
-
 /**
  * @brief Check the referenced symbol for global binding.
  */
@@ -622,134 +591,6 @@ static bool check_relro(struct rpminspect *ri, Elf *before_elf, Elf *after_elf, 
 }
 
 /**
- * @brief Check for binaries that had fortified symbols in before, and have no fortified symbols in after.
- *
- * This could indicate a loss of hardening build flags.
- *
- * @param ri The struct rpminspect pointer for the run of the program
- * @param before_elf ELF object from the before build
- * @param after_elf ELF object from the after build
- * @param localpath Filename of the ELF object in question, relative to an installed system
- * @param arch Architecture of the ELF object
- */
-static bool check_fortified(struct rpminspect *ri, Elf *before_elf, Elf *after_elf, const rpmfile_entry_t *file, const char *arch)
-{
-    string_list_t *before_fortifiable = NULL;
-    string_list_t *before_fortified = NULL;
-    string_list_t *after_fortifiable = NULL;
-    string_list_t *after_fortified = NULL;
-    string_list_t *sorted_list;
-    string_entry_t *iter;
-
-    FILE *output_stream;
-    char *output_buffer = NULL;
-    size_t output_size;
-    int output_result;
-
-    struct result_params params;
-    bool result = true;
-
-    /* ignore unused variable warnings if assert is disabled */
-    (void) output_result;
-
-    /* If "before" had no fortified symbols, it can't lose fortified symbols. Return. */
-    before_fortified = get_fortified_symbols(before_elf);
-    assert(before_fortified != NULL);
-
-    if ((before_fortified == NULL) || TAILQ_EMPTY(before_fortified)) {
-        goto cleanup;
-    }
-
-    /*
-     * If "after" has any fortified symbols, then at least some of it was compiled with
-     * -D_FORTIFY_SOURCE. Assume it's fine.
-     */
-    after_fortified = get_fortified_symbols(after_elf);
-    assert(after_fortified != NULL);
-
-    if ((after_fortified != NULL) && !TAILQ_EMPTY(after_fortified)) {
-        goto cleanup;
-    }
-
-    /* If "after" has no fortifiable symbols, it's fine. */
-    after_fortifiable = get_fortifiable_symbols(after_elf);
-    assert(after_fortifiable != NULL);
-
-    if ((after_fortifiable == NULL) || TAILQ_EMPTY(after_fortifiable)) {
-        goto cleanup;
-    }
-
-    /*
-     * At this point:
-     *   - before is definitely fortified,
-     *   - after shows no sign of being fortified, and
-     *   - after contains symbols that we think could have been fortified.
-     */
-
-    /* Create a screendump listing the symbols involved. */
-    output_stream = open_memstream(&output_buffer, &output_size);
-    assert(output_stream != NULL);
-
-    output_result = fprintf(output_stream, _("Fortified symbols lost:\n"));
-    assert(output_result > 0);
-
-    sorted_list = list_sort(before_fortified);
-    assert(sorted_list != NULL);
-
-    TAILQ_FOREACH(iter, sorted_list, items) {
-        output_result = fprintf(output_stream, "\t%s\n", iter->data);
-        assert(output_result > 0);
-    }
-
-    list_free(sorted_list, NULL);
-
-    output_result = fprintf(output_stream, _("Fortifiable symbols present:\n"));
-    assert(output_result > 0);
-
-    sorted_list = list_sort(after_fortifiable);
-    assert(sorted_list != NULL);
-
-    TAILQ_FOREACH(iter, sorted_list, items) {
-        output_result = fprintf(output_stream, "\t%s\n", iter->data);
-        assert(output_result > 0);
-    }
-
-    list_free(sorted_list, NULL);
-
-    output_result = fclose(output_stream);
-    assert(output_result == 0);
-
-    init_result_params(&params);
-    xasprintf(&params.msg, _("%s may have lost -D_FORTIFY_SOURCE on %s"), file->localpath, arch);
-    params.header = NAME_ELF;
-    params.waiverauth = WAIVABLE_BY_SECURITY;
-    params.details = output_buffer;
-    params.remedy = REMEDY_ELF_FORTIFY_SOURCE;
-    params.arch = arch;
-    params.file = file->localpath;
-    params.verb = VERB_REMOVED;
-    params.noun = _("lost -D_FORTIFY_SOURCE in ${FILE} on ${ARCH}");
-    params.severity = get_secrule_result_severity(ri, file, SECRULE_FORTIFYSOURCE);
-
-    if (params.severity != RESULT_NULL && params.severity != RESULT_SKIP) {
-        add_result(ri, &params);
-        result = false;
-    }
-
-    free(params.msg);
-
-cleanup:
-    list_free(before_fortifiable, NULL);
-    list_free(before_fortified, NULL);
-    list_free(after_fortifiable, NULL);
-    list_free(after_fortified, NULL);
-
-    free(output_buffer);
-
-    return result;
-}
-
-/**
  * @brief Helper for elf_archive_tests; add the archive member to the
  * list if compiled *without* -fPIC
  *
@@ -1024,11 +865,6 @@ static bool elf_regular_tests(struct rpminspect *ri, Elf *after_elf, Elf *before
     if (before_elf) {
         /* Check if we lost GNU_RELRO */
         if (!check_relro(ri, before_elf, after_elf, file, arch)) {
-            result = false;
-        }
-
-        /* Check if the object lost fortified symbols or gained unfortified, fortifiable symbols */
-        if (!check_fortified(ri, before_elf, after_elf, file, arch)) {
             result = false;
         }
     }

@@ -43,18 +43,6 @@
 #include "readelf.h"
 #include "rpminspect.h"
 
-bool is_fortified(const char *symbol)
-{
-    /* Besides the fortified versions of functions, look for the
-     * function that gets calls on buffer overflow
-     */
-    if (!strcmp(symbol, "__chk_fail")) {
-        return true;
-    }
-
-    return (strprefix(symbol, "__") && strsuffix(symbol, "_chk"));
-}
-
 void init_elf_data(struct rpminspect *ri)
 {
     void *dl = NULL;
@@ -62,10 +50,6 @@ void init_elf_data(struct rpminspect *ri)
     char *libc_path = NULL;
     Elf *libc_elf = NULL;
     int libc_fd;
-    string_list_t *libc_fortified = NULL;
-    string_entry_t *iter = NULL;
-    string_map_t *hentry = NULL;
-    size_t symbol_len;
     Elf *e = NULL;
     int fd = 0;
     GElf_Dyn *tags = NULL;
@@ -146,38 +130,6 @@ void init_elf_data(struct rpminspect *ri)
 
     if (libc_elf == NULL) {
         goto cleanup;
-    }
-
-    /* Get a list of all fortified symbols in glibc */
-    /* Use .dynsym because libc on some platforms may be stripped of .symtab */
-    if (ri->fortifiable == NULL) {
-        libc_fortified = get_elf_imported_functions(libc_elf, is_fortified);
-
-        if (libc_fortified == NULL) {
-            goto cleanup;
-        }
-
-        /* the symbols will be of the form, e.g., "__asprintf_chk". Turn that into "asprintf". */
-        TAILQ_FOREACH(iter, libc_fortified, items) {
-            /* Skip this one */
-            if (!strcmp(iter->data, "__chk_fail")) {
-                continue;
-            }
-
-            symbol_len = strlen(iter->data);
-
-            hentry = calloc(1, sizeof(*hentry));
-            assert(hentry != NULL);
-            /* minus 2 underscores, minus for _chk, plus \0 */
-            hentry->key = calloc(symbol_len - 5, 1);
-            assert(hentry->key != NULL);
-
-            /* strip off underscores, stop before _chk, \0 already present */
-            strncpy(hentry->key, iter->data + 2, symbol_len - 6);
-            HASH_ADD_KEYPTR(hh, ri->fortifiable, hentry->key, strlen(hentry->key), hentry);
-        }
-
-        list_free(libc_fortified, NULL);
     }
 
 cleanup:
