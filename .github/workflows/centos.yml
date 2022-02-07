@@ -26,13 +26,20 @@ jobs:
         runs-on: ubuntu-latest
 
         # Set up the matrix of distributions to test
+        #
+        # Once EPEL-9 is filled out more, add c9s to the mix:
+        #     "quay.io/centos/centos:stream9"
         strategy:
             matrix:
-                container: ["centos:centos8",
-                            "centos:centos7"]
+                container: ["quay.io/centos/centos:stream8",
+                            "quay.io/centos/centos:centos7"]
 
+        # CentOS images come from quay.io now
         container:
             image: ${{ matrix.container }}
+            credentials:
+                username: ${{ secrets.QUAY_IO_USERNAME }}
+                password: ${{ secrets.QUAY_IO_PASSWORD }}
 
         # All of these steps run from within the main source
         # directory, so think of that as your $PWD
@@ -40,7 +47,17 @@ jobs:
             # Requirements before the git clone can happen
             - name: git clone requirements
               run: |
-                  yum install -y epel-release
+                  case "${{ matrix.container }}" in
+                      *stream9)
+                          dnf install -y 'dnf-command(config-manager)'
+                          dnf config-manager --set-enabled crb
+                          dnf install https://dl.fedoraproject.org/pub/epel/epel-release-latest-9.noarch.rpm \
+                                      https://dl.fedoraproject.org/pub/epel/epel-next-release-latest-9.noarch.rpm
+                          ;;
+                      *)
+                          yum install -y epel-release
+                          ;;
+                  esac
 
                   if [ -d /etc/pki/rpm-gpg ]; then
                       rpm --import /etc/pki/rpm-gpg/*

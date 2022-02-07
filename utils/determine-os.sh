@@ -23,11 +23,14 @@ if [ -r /etc/fedora-release ] && [ "${ID}" = "fedora" ]; then
         echo "${ID}"
     fi
 elif [ -r /etc/centos-release ] && [ "${ID}" = "centos" ]; then
-    if [ ${VERSION_ID} -eq 7 ] || [ ${VERSION_ID} -eq 8 ]; then
-        echo "${ID}${VERSION_ID}"
-    else
-        echo "unknown OS: ${ID}:${VERSION_ID}" >&2
-    fi
+    case "${VERSION_ID}" in
+        7|8|9)
+            echo "${ID}${VERSION_ID}"
+            ;;
+        *)
+            echo "unknown OS: ${ID}:${VERSION_ID}" >&2
+            ;;
+    esac
 elif [ -r /etc/redhat-release ] && [ "${ID}" = "rhel" ]; then
     v="$(echo "${VERSION_ID}" | cut -d '.' -f 1)"
     if [ "${v}" = "7" ] || [ "${v}" = "8" ]; then
