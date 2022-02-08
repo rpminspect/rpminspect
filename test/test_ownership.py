@@ -21,20 +21,23 @@ import os
 import rpmfluff
 import subprocess
 import unittest
-from distutils.version import LooseVersion
 
 from baseclass import TestRPMs, TestKoji
 from baseclass import TestCompareRPMs, TestCompareKoji
 
-# Some tests require rpm >= 4.7.0
+# Check that rpm is built with libcap
+have_caps_support = False
+lack_caps_msg = "rpm lacks %caps macro support"
+
 proc = subprocess.Popen(
-    ["rpmbuild", "--version"], stdout=subprocess.PIPE, stderr=subprocess.PIPE
+    ["ldd", "/usr/bin/rpmbuild"], stdout=subprocess.PIPE, stderr=subprocess.PIPE
 )
 (out, err) = proc.communicate()
-if LooseVersion(out.split()[2].decode("utf-8")) >= LooseVersion("4.7.0"):
-    have_caps_support = True
-else:
-    have_caps_support = False
+
+for line in out.split():
+    if line.decode("utf-8").startswith("libcap"):
+        have_caps_support = True
+        break
 
 # Read in the built rpminspect executable for use in these test RPMs
 with open(os.environ["RPMINSPECT"], mode="rb") as f:
@@ -1621,9 +1624,7 @@ class CapSETUIDWithOtherExecRPMs(TestRPMs):
     world execution permissions fails.
     """
 
-    @unittest.skipUnless(
-        have_caps_support, "rpm lacks %caps macro support (need rpm >= 4.7.0)"
-    )
+    @unittest.skipUnless(have_caps_support, lack_caps_msg)
     def setUp(self):
         TestRPMs.setUp(self)
 
@@ -1653,9 +1654,7 @@ class SecuritySKIPCapSETUIDWithOtherExecRPMs(TestRPMs):
     world execution permissions fails.
     """
 
-    @unittest.skipUnless(
-        have_caps_support, "rpm lacks %caps macro support (need rpm >= 4.7.0)"
-    )
+    @unittest.skipUnless(have_caps_support, lack_caps_msg)
     def setUp(self):
         TestRPMs.setUp(self)
 
@@ -1685,9 +1684,7 @@ class SecurityINFORMCapSETUIDWithOtherExecRPMs(TestRPMs):
     world execution permissions fails.
     """
 
-    @unittest.skipUnless(
-        have_caps_support, "rpm lacks %caps macro support (need rpm >= 4.7.0)"
-    )
+    @unittest.skipUnless(have_caps_support, lack_caps_msg)
     def setUp(self):
         TestRPMs.setUp(self)
 
@@ -1717,9 +1714,7 @@ class SecurityVERIFYCapSETUIDWithOtherExecRPMs(TestRPMs):
     world execution permissions fails.
     """
 
-    @unittest.skipUnless(
-        have_caps_support, "rpm lacks %caps macro support (need rpm >= 4.7.0)"
-    )
+    @unittest.skipUnless(have_caps_support, lack_caps_msg)
     def setUp(self):
         TestRPMs.setUp(self)
 
@@ -1749,9 +1744,7 @@ class SecurityFAILCapSETUIDWithOtherExecRPMs(TestRPMs):
     world execution permissions fails.
     """
 
-    @unittest.skipUnless(
-        have_caps_support, "rpm lacks %caps macro support (need rpm >= 4.7.0)"
-    )
+    @unittest.skipUnless(have_caps_support, lack_caps_msg)
     def setUp(self):
         TestRPMs.setUp(self)
 
@@ -1781,9 +1774,7 @@ class CapSETUIDWithOtherExecKoji(TestKoji):
     world execution permissions fails.
     """
 
-    @unittest.skipUnless(
-        have_caps_support, "rpm lacks %caps macro support (need rpm >= 4.7.0)"
-    )
+    @unittest.skipUnless(have_caps_support, lack_caps_msg)
     def setUp(self):
         TestKoji.setUp(self)
 
@@ -1813,9 +1804,7 @@ class SecuritySKIPCapSETUIDWithOtherExecKoji(TestKoji):
     world execution permissions fails.
     """
 
-    @unittest.skipUnless(
-        have_caps_support, "rpm lacks %caps macro support (need rpm >= 4.7.0)"
-    )
+    @unittest.skipUnless(have_caps_support, lack_caps_msg)
     def setUp(self):
         TestKoji.setUp(self)
 
@@ -1845,9 +1834,7 @@ class SecurityINFORMCapSETUIDWithOtherExecKoji(TestKoji):
     world execution permissions fails.
     """
 
-    @unittest.skipUnless(
-        have_caps_support, "rpm lacks %caps macro support (need rpm >= 4.7.0)"
-    )
+    @unittest.skipUnless(have_caps_support, lack_caps_msg)
     def setUp(self):
         TestKoji.setUp(self)
 
@@ -1877,9 +1864,7 @@ class SecurityVERIFYCapSETUIDWithOtherExecKoji(TestKoji):
     world execution permissions fails.
     """
 
-    @unittest.skipUnless(
-        have_caps_support, "rpm lacks %caps macro support (need rpm >= 4.7.0)"
-    )
+    @unittest.skipUnless(have_caps_support, lack_caps_msg)
     def setUp(self):
         TestKoji.setUp(self)
 
@@ -1909,9 +1894,7 @@ class SecurityFAILCapSETUIDWithOtherExecKoji(TestKoji):
     world execution permissions fails.
     """
 
-    @unittest.skipUnless(
-        have_caps_support, "rpm lacks %caps macro support (need rpm >= 4.7.0)"
-    )
+    @unittest.skipUnless(have_caps_support, lack_caps_msg)
     def setUp(self):
         TestKoji.setUp(self)
 
@@ -1941,9 +1924,7 @@ class CapSETUIDWithOtherExecCompareRPMs(TestCompareRPMs):
     and world execution permissions fails.
     """
 
-    @unittest.skipUnless(
-        have_caps_support, "rpm lacks %caps macro support (need rpm >= 4.7.0)"
-    )
+    @unittest.skipUnless(have_caps_support, lack_caps_msg)
     def setUp(self):
         TestCompareRPMs.setUp(self)
 
@@ -1975,9 +1956,7 @@ class SecuritySKIPCapSETUIDWithOtherExecCompareRPMs(TestCompareRPMs):
     and world execution permissions fails.
     """
 
-    @unittest.skipUnless(
-        have_caps_support, "rpm lacks %caps macro support (need rpm >= 4.7.0)"
-    )
+    @unittest.skipUnless(have_caps_support, lack_caps_msg)
     def setUp(self):
         TestCompareRPMs.setUp(self)
 
@@ -2009,9 +1988,7 @@ class SecurityINFORMCapSETUIDWithOtherExecCompareRPMs(TestCompareRPMs):
     and world execution permissions fails.
     """
 
-    @unittest.skipUnless(
-        have_caps_support, "rpm lacks %caps macro support (need rpm >= 4.7.0)"
-    )
+    @unittest.skipUnless(have_caps_support, lack_caps_msg)
     def setUp(self):
         TestCompareRPMs.setUp(self)
 
@@ -2043,9 +2020,7 @@ class SecurityVERIFYCapSETUIDWithOtherExecCompareRPMs(TestCompareRPMs):
     and world execution permissions fails.
     """
 
-    @unittest.skipUnless(
-        have_caps_support, "rpm lacks %caps macro support (need rpm >= 4.7.0)"
-    )
+    @unittest.skipUnless(have_caps_support, lack_caps_msg)
     def setUp(self):
         TestCompareRPMs.setUp(self)
 
@@ -2077,9 +2052,7 @@ class SecurityFAILCapSETUIDWithOtherExecCompareRPMs(TestCompareRPMs):
     and world execution permissions fails.
     """
 
-    @unittest.skipUnless(
-        have_caps_support, "rpm lacks %caps macro support (need rpm >= 4.7.0)"
-    )
+    @unittest.skipUnless(have_caps_support, lack_caps_msg)
     def setUp(self):
         TestCompareRPMs.setUp(self)
 
@@ -2111,9 +2084,7 @@ class CapSETUIDWithOtherExecCompareKoji(TestCompareKoji):
     with CAP_SETUID set and world execution permissions fails.
     """
 
-    @unittest.skipUnless(
-        have_caps_support, "rpm lacks %caps macro support (need rpm >= 4.7.0)"
-    )
+    @unittest.skipUnless(have_caps_support, lack_caps_msg)
     def setUp(self):
         TestCompareKoji.setUp(self)
 
@@ -2145,9 +2116,7 @@ class SecuritySKIPCapSETUIDWithOtherExecCompareKoji(TestCompareKoji):
     with CAP_SETUID set and world execution permissions fails.
     """
 
-    @unittest.skipUnless(
-        have_caps_support, "rpm lacks %caps macro support (need rpm >= 4.7.0)"
-    )
+    @unittest.skipUnless(have_caps_support, lack_caps_msg)
     def setUp(self):
         TestCompareKoji.setUp(self)
 
@@ -2179,9 +2148,7 @@ class SecurityINFORMCapSETUIDWithOtherExecCompareKoji(TestCompareKoji):
     with CAP_SETUID set and world execution permissions fails.
     """
 
-    @unittest.skipUnless(
-        have_caps_support, "rpm lacks %caps macro support (need rpm >= 4.7.0)"
-    )
+    @unittest.skipUnless(have_caps_support, lack_caps_msg)
     def setUp(self):
         TestCompareKoji.setUp(self)
 
@@ -2213,9 +2180,7 @@ class SecurityVERIFYCapSETUIDWithOtherExecCompareKoji(TestCompareKoji):
     with CAP_SETUID set and world execution permissions fails.
     """
 
-    @unittest.skipUnless(
-        have_caps_support, "rpm lacks %caps macro support (need rpm >= 4.7.0)"
-    )
+    @unittest.skipUnless(have_caps_support, lack_caps_msg)
     def setUp(self):
         TestCompareKoji.setUp(self)
 
@@ -2247,9 +2212,7 @@ class SecurityFAILCapSETUIDWithOtherExecCompareKoji(TestCompareKoji):
     with CAP_SETUID set and world execution permissions fails.
     """
 
-    @unittest.skipUnless(
-        have_caps_support, "rpm lacks %caps macro support (need rpm >= 4.7.0)"
-    )
+    @unittest.skipUnless(have_caps_support, lack_caps_msg)
     def setUp(self):
         TestCompareKoji.setUp(self)
 
@@ -2286,9 +2249,7 @@ class CapSETUIDWithGroupExecRPMs(TestRPMs):
     and group execution permissions fails.
     """
 
-    @unittest.skipUnless(
-        have_caps_support, "rpm lacks %caps macro support (need rpm >= 4.7.0)"
-    )
+    @unittest.skipUnless(have_caps_support, lack_caps_msg)
     def setUp(self):
         TestRPMs.setUp(self)
 
@@ -2318,9 +2279,7 @@ class SecuritySKIPCapSETUIDWithGroupExecRPMs(TestRPMs):
     and group execution permissions fails.
     """
 
-    @unittest.skipUnless(
-        have_caps_support, "rpm lacks %caps macro support (need rpm >= 4.7.0)"
-    )
+    @unittest.skipUnless(have_caps_support, lack_caps_msg)
     def setUp(self):
         TestRPMs.setUp(self)
 
@@ -2350,9 +2309,7 @@ class SecurityINFORMCapSETUIDWithGroupExecRPMs(TestRPMs):
     and group execution permissions fails.
     """
 
-    @unittest.skipUnless(
-        have_caps_support, "rpm lacks %caps macro support (need rpm >= 4.7.0)"
-    )
+    @unittest.skipUnless(have_caps_support, lack_caps_msg)
     def setUp(self):
         TestRPMs.setUp(self)
 
@@ -2382,9 +2339,7 @@ class SecurityVERIFYCapSETUIDWithGroupExecRPMs(TestRPMs):
     and group execution permissions fails.
     """
 
-    @unittest.skipUnless(
-        have_caps_support, "rpm lacks %caps macro support (need rpm >= 4.7.0)"
-    )
+    @unittest.skipUnless(have_caps_support, lack_caps_msg)
     def setUp(self):
         TestRPMs.setUp(self)
 
@@ -2414,9 +2369,7 @@ class SecurityFAILCapSETUIDWithGroupExecRPMs(TestRPMs):
     and group execution permissions fails.
     """
 
-    @unittest.skipUnless(
-        have_caps_support, "rpm lacks %caps macro support (need rpm >= 4.7.0)"
-    )
+    @unittest.skipUnless(have_caps_support, lack_caps_msg)
     def setUp(self):
         TestRPMs.setUp(self)
 
@@ -2446,9 +2399,7 @@ class CapSETUIDWithGroupExecKoji(TestKoji):
     and group execution permissions fails.
     """
 
-    @unittest.skipUnless(
-        have_caps_support, "rpm lacks %caps macro support (need rpm >= 4.7.0)"
-    )
+    @unittest.skipUnless(have_caps_support, lack_caps_msg)
     def setUp(self):
         TestKoji.setUp(self)
 
@@ -2478,9 +2429,7 @@ class SecuritySKIPCapSETUIDWithGroupExecKoji(TestKoji):
     and group execution permissions fails.
     """
 
-    @unittest.skipUnless(
-        have_caps_support, "rpm lacks %caps macro support (need rpm >= 4.7.0)"
-    )
+    @unittest.skipUnless(have_caps_support, lack_caps_msg)
     def setUp(self):
         TestKoji.setUp(self)
 
@@ -2510,9 +2459,7 @@ class SecurityINFORMCapSETUIDWithGroupExecKoji(TestKoji):
     and group execution permissions fails.
     """
 
-    @unittest.skipUnless(
-        have_caps_support, "rpm lacks %caps macro support (need rpm >= 4.7.0)"
-    )
+    @unittest.skipUnless(have_caps_support, lack_caps_msg)
     def setUp(self):
         TestKoji.setUp(self)
 
@@ -2542,9 +2489,7 @@ class SecurityVERIFYCapSETUIDWithGroupExecKoji(TestKoji):
     and group execution permissions fails.
     """
 
-    @unittest.skipUnless(
-        have_caps_support, "rpm lacks %caps macro support (need rpm >= 4.7.0)"
-    )
+    @unittest.skipUnless(have_caps_support, lack_caps_msg)
     def setUp(self):
         TestKoji.setUp(self)
 
@@ -2574,9 +2519,7 @@ class SecurityFAILCapSETUIDWithGroupExecKoji(TestKoji):
     and group execution permissions fails.
     """
 
-    @unittest.skipUnless(
-        have_caps_support, "rpm lacks %caps macro support (need rpm >= 4.7.0)"
-    )
+    @unittest.skipUnless(have_caps_support, lack_caps_msg)
     def setUp(self):
         TestKoji.setUp(self)
 
@@ -2606,9 +2549,7 @@ class CapSETUIDWithGroupExecCompareRPMs(TestCompareRPMs):
     and world execution permissions fails.
     """
 
-    @unittest.skipUnless(
-        have_caps_support, "rpm lacks %caps macro support (need rpm >= 4.7.0)"
-    )
+    @unittest.skipUnless(have_caps_support, lack_caps_msg)
     def setUp(self):
         TestCompareRPMs.setUp(self)
 
@@ -2640,9 +2581,7 @@ class SecuritySKIPCapSETUIDWithGroupExecCompareRPMs(TestCompareRPMs):
     and world execution permissions fails.
     """
 
-    @unittest.skipUnless(
-        have_caps_support, "rpm lacks %caps macro support (need rpm >= 4.7.0)"
-    )
+    @unittest.skipUnless(have_caps_support, lack_caps_msg)
     def setUp(self):
         TestCompareRPMs.setUp(self)
 
@@ -2674,9 +2613,7 @@ class SecurityINFORMCapSETUIDWithGroupExecCompareRPMs(TestCompareRPMs):
     and world execution permissions fails.
     """
 
-    @unittest.skipUnless(
-        have_caps_support, "rpm lacks %caps macro support (need rpm >= 4.7.0)"
-    )
+    @unittest.skipUnless(have_caps_support, lack_caps_msg)
     def setUp(self):
         TestCompareRPMs.setUp(self)
 
@@ -2708,9 +2645,7 @@ class SecurityVERIFYCapSETUIDWithGroupExecCompareRPMs(TestCompareRPMs):
     and world execution permissions fails.
     """
 
-    @unittest.skipUnless(
-        have_caps_support, "rpm lacks %caps macro support (need rpm >= 4.7.0)"
-    )
+    @unittest.skipUnless(have_caps_support, lack_caps_msg)
     def setUp(self):
         TestCompareRPMs.setUp(self)
 
@@ -2742,9 +2677,7 @@ class SecurityFAILCapSETUIDWithGroupExecCompareRPMs(TestCompareRPMs):
     and world execution permissions fails.
     """
 
-    @unittest.skipUnless(
-        have_caps_support, "rpm lacks %caps macro support (need rpm >= 4.7.0)"
-    )
+    @unittest.skipUnless(have_caps_support, lack_caps_msg)
     def setUp(self):
         TestCompareRPMs.setUp(self)
 
@@ -2776,9 +2709,7 @@ class CapSETUIDWithGroupExecCompareKoji(TestCompareKoji):
     with CAP_SETUID set and world execution permissions fails.
     """
 
-    @unittest.skipUnless(
-        have_caps_support, "rpm lacks %caps macro support (need rpm >= 4.7.0)"
-    )
+    @unittest.skipUnless(have_caps_support, lack_caps_msg)
     def setUp(self):
         TestCompareKoji.setUp(self)
 
@@ -2810,9 +2741,7 @@ class SecuritySKIPCapSETUIDWithGroupExecCompareKoji(TestCompareKoji):
     with CAP_SETUID set and world execution permissions fails.
     """
 
-    @unittest.skipUnless(
-        have_caps_support, "rpm lacks %caps macro support (need rpm >= 4.7.0)"
-    )
+    @unittest.skipUnless(have_caps_support, lack_caps_msg)
     def setUp(self):
         TestCompareKoji.setUp(self)
 
@@ -2844,9 +2773,7 @@ class SecurityINFORMCapSETUIDWithGroupExecCompareKoji(TestCompareKoji):
     with CAP_SETUID set and world execution permissions fails.
     """
 
-    @unittest.skipUnless(
-        have_caps_support, "rpm lacks %caps macro support (need rpm >= 4.7.0)"
-    )
+    @unittest.skipUnless(have_caps_support, lack_caps_msg)
     def setUp(self):
         TestCompareKoji.setUp(self)
 
@@ -2878,9 +2805,7 @@ class SecurityVERIFYCapSETUIDWithGroupExecCompareKoji(TestCompareKoji):
     with CAP_SETUID set and world execution permissions fails.
     """
 
-    @unittest.skipUnless(
-        have_caps_support, "rpm lacks %caps macro support (need rpm >= 4.7.0)"
-    )
+    @unittest.skipUnless(have_caps_support, lack_caps_msg)
     def setUp(self):
         TestCompareKoji.setUp(self)
 
@@ -2912,9 +2837,7 @@ class SecurityFAILCapSETUIDWithGroupExecCompareKoji(TestCompareKoji):
     with CAP_SETUID set and world execution permissions fails.
     """
 
-    @unittest.skipUnless(
-        have_caps_support, "rpm lacks %caps macro support (need rpm >= 4.7.0)"
-    )
+    @unittest.skipUnless(have_caps_support, lack_caps_msg)
     def setUp(self):
         TestCompareKoji.setUp(self)
 
