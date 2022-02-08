@@ -36,6 +36,7 @@ following environments:
 | [Fedora Linux](https://getfedora.org/) | stable | :heavy_check_mark: | | | | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: |
 | [CentOS](https://www.centos.org/) | 8 | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | | | | |
 | [CentOS](https://www.centos.org/) | 7 | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | | | | |
+| [Slackware](http://www.slackware.com/) | stable | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | | | | |
 | [Ubuntu Linux](https://ubuntu.com/) | stable | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | | | | |
 | [Debian GNU/Linux](https://www.debian.org/) | stable | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | | | | |
 | [Debian GNU/Linux](https://www.debian.org/) | testing | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | | | | |

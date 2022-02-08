@@ -22,6 +22,20 @@ from distutils.version import LooseVersion
 from baseclass import TestRPMs, TestKoji
 from baseclass import TestCompareRPMs, TestCompareKoji
 
+# Check that rpm is built with libcap
+have_caps_support = False
+lack_caps_msg = "rpm lacks %caps macro support"
+
+proc = subprocess.Popen(
+    ["ldd", "/usr/bin/rpmbuild"], stdout=subprocess.PIPE, stderr=subprocess.PIPE
+)
+(out, err) = proc.communicate()
+
+for line in out.split():
+    if line.decode("utf-8").startswith("libcap"):
+        have_caps_support = True
+        break
+
 # Some tests require rpm >= 4.7.0
 proc = subprocess.Popen(
     ["rpmbuild", "--version"], stdout=subprocess.PIPE, stderr=subprocess.PIPE
@@ -36,9 +50,7 @@ else:
 # package contains a file with capabilities(7) but it is not on the
 # list (BAD)
 class UnapprovedCapabilitiesRPMs(TestRPMs):
-    @unittest.skipUnless(
-        have_caps_support, "rpm lacks %caps macro support (need rpm >= 4.7.0)"
-    )
+    @unittest.skipUnless(have_caps_support, lack_caps_msg)
     def setUp(self):
         super().setUp()
 
@@ -54,9 +66,7 @@ class UnapprovedCapabilitiesRPMs(TestRPMs):
 
 
 class UnapprovedCapabilitiesKoji(TestKoji):
-    @unittest.skipUnless(
-        have_caps_support, "rpm lacks %caps macro support (need rpm >= 4.7.0)"
-    )
+    @unittest.skipUnless(have_caps_support, lack_caps_msg)
     def setUp(self):
         super().setUp()
 
@@ -72,9 +82,7 @@ class UnapprovedCapabilitiesKoji(TestKoji):
 
 
 class UnapprovedCapabilitiesCompareRPMs(TestCompareRPMs):
-    @unittest.skipUnless(
-        have_caps_support, "rpm lacks %caps macro support (need rpm >= 4.7.0)"
-    )
+    @unittest.skipUnless(have_caps_support, lack_caps_msg)
     def setUp(self):
         super().setUp()
 
@@ -90,9 +98,7 @@ class UnapprovedCapabilitiesCompareRPMs(TestCompareRPMs):
 
 
 class UnapprovedCapabilitiesCompareKoji(TestCompareKoji):
-    @unittest.skipUnless(
-        have_caps_support, "rpm lacks %caps macro support (need rpm >= 4.7.0)"
-    )
+    @unittest.skipUnless(have_caps_support, lack_caps_msg)
     def setUp(self):
         super().setUp()
 
@@ -109,9 +115,7 @@ class UnapprovedCapabilitiesCompareKoji(TestCompareKoji):
 
 # package contains a file with approved capabilities(7) (OK)
 class ApprovedCapabilitiesRPMs(TestRPMs):
-    @unittest.skipUnless(
-        have_caps_support, "rpm lacks %caps macro support (need rpm >= 4.7.0)"
-    )
+    @unittest.skipUnless(have_caps_support, lack_caps_msg)
     def setUp(self):
         super().setUp()
 
@@ -127,9 +131,7 @@ class ApprovedCapabilitiesRPMs(TestRPMs):
 
 
 class ApprovedCapabilitiesKoji(TestKoji):
-    @unittest.skipUnless(
-        have_caps_support, "rpm lacks %caps macro support (need rpm >= 4.7.0)"
-    )
+    @unittest.skipUnless(have_caps_support, lack_caps_msg)
     def setUp(self):
         super().setUp()
 
@@ -145,9 +147,7 @@ class ApprovedCapabilitiesKoji(TestKoji):
 
 
 class ApprovedCapabilitiesCompareRPMs(TestCompareRPMs):
-    @unittest.skipUnless(
-        have_caps_support, "rpm lacks %caps macro support (need rpm >= 4.7.0)"
-    )
+    @unittest.skipUnless(have_caps_support, lack_caps_msg)
     def setUp(self):
         super().setUp()
 
@@ -163,9 +163,7 @@ class ApprovedCapabilitiesCompareRPMs(TestCompareRPMs):
 
 
 class ApprovedCapabilitiesCompareKoji(TestCompareKoji):
-    @unittest.skipUnless(
-        have_caps_support, "rpm lacks %caps macro support (need rpm >= 4.7.0)"
-    )
+    @unittest.skipUnless(have_caps_support, lack_caps_msg)
     def setUp(self):
         super().setUp()
 
@@ -181,9 +179,7 @@ class ApprovedCapabilitiesCompareKoji(TestCompareKoji):
 
 
 class SecuritySKIPUnapprovedCapabilitiesRPMs(TestRPMs):
-    @unittest.skipUnless(
-        have_caps_support, "rpm lacks %caps macro support (need rpm >= 4.7.0)"
-    )
+    @unittest.skipUnless(have_caps_support, lack_caps_msg)
     def setUp(self):
         super().setUp()
 
@@ -199,9 +195,7 @@ class SecuritySKIPUnapprovedCapabilitiesRPMs(TestRPMs):
 
 
 class SecurityFAILUnapprovedCapabilitiesCompareRPMs(TestCompareRPMs):
-    @unittest.skipUnless(
-        have_caps_support, "rpm lacks %caps macro support (need rpm >= 4.7.0)"
-    )
+    @unittest.skipUnless(have_caps_support, lack_caps_msg)
     def setUp(self):
         super().setUp()
 
@@ -217,9 +211,7 @@ class SecurityFAILUnapprovedCapabilitiesCompareRPMs(TestCompareRPMs):
 
 
 class SecurityFAILUnapprovedCapabilitiesCompareKoji(TestCompareKoji):
-    @unittest.skipUnless(
-        have_caps_support, "rpm lacks %caps macro support (need rpm >= 4.7.0)"
-    )
+    @unittest.skipUnless(have_caps_support, lack_caps_msg)
     def setUp(self):
         super().setUp()
 
@@ -235,9 +227,7 @@ class SecurityFAILUnapprovedCapabilitiesCompareKoji(TestCompareKoji):
 
 
 class SecuritySKIPUnapprovedCapabilitiesKoji(TestKoji):
-    @unittest.skipUnless(
-        have_caps_support, "rpm lacks %caps macro support (need rpm >= 4.7.0)"
-    )
+    @unittest.skipUnless(have_caps_support, lack_caps_msg)
     def setUp(self):
         super().setUp()
 
@@ -253,9 +243,7 @@ class SecuritySKIPUnapprovedCapabilitiesKoji(TestKoji):
 
 
 class SecuritySKIPUnapprovedCapabilitiesCompareRPMs(TestCompareRPMs):
-    @unittest.skipUnless(
-        have_caps_support, "rpm lacks %caps macro support (need rpm >= 4.7.0)"
-    )
+    @unittest.skipUnless(have_caps_support, lack_caps_msg)
     def setUp(self):
         super().setUp()
 
@@ -271,9 +259,7 @@ class SecuritySKIPUnapprovedCapabilitiesCompareRPMs(TestCompareRPMs):
 
 
 class SecuritySKIPUnapprovedCapabilitiesCompareKoji(TestCompareKoji):
-    @unittest.skipUnless(
-        have_caps_support, "rpm lacks %caps macro support (need rpm >= 4.7.0)"
-    )
+    @unittest.skipUnless(have_caps_support, lack_caps_msg)
     def setUp(self):
         super().setUp()
 
@@ -289,9 +275,7 @@ class SecuritySKIPUnapprovedCapabilitiesCompareKoji(TestCompareKoji):
 
 
 class SecurityINFORMUnapprovedCapabilitiesRPMs(TestRPMs):
-    @unittest.skipUnless(
-        have_caps_support, "rpm lacks %caps macro support (need rpm >= 4.7.0)"
-    )
+    @unittest.skipUnless(have_caps_support, lack_caps_msg)
     def setUp(self):
         super().setUp()
 
@@ -307,9 +291,7 @@ class SecurityINFORMUnapprovedCapabilitiesRPMs(TestRPMs):
 
 
 class SecurityINFORMUnapprovedCapabilitiesKoji(TestKoji):
-    @unittest.skipUnless(
-        have_caps_support, "rpm lacks %caps macro support (need rpm >= 4.7.0)"
-    )
+    @unittest.skipUnless(have_caps_support, lack_caps_msg)
     def setUp(self):
         super().setUp()
 
@@ -325,9 +307,7 @@ class SecurityINFORMUnapprovedCapabilitiesKoji(TestKoji):
 
 
 class SecurityINFORMUnapprovedCapabilitiesCompareRPMs(TestCompareRPMs):
-    @unittest.skipUnless(
-        have_caps_support, "rpm lacks %caps macro support (need rpm >= 4.7.0)"
-    )
+    @unittest.skipUnless(have_caps_support, lack_caps_msg)
     def setUp(self):
         super().setUp()
 
@@ -343,9 +323,7 @@ class SecurityINFORMUnapprovedCapabilitiesCompareRPMs(TestCompareRPMs):
 
 
 class SecurityINFORMUnapprovedCapabilitiesCompareKoji(TestCompareKoji):
-    @unittest.skipUnless(
-        have_caps_support, "rpm lacks %caps macro support (need rpm >= 4.7.0)"
-    )
+    @unittest.skipUnless(have_caps_support, lack_caps_msg)
     def setUp(self):
         super().setUp()
 
@@ -361,9 +339,7 @@ class SecurityINFORMUnapprovedCapabilitiesCompareKoji(TestCompareKoji):
 
 
 class SecurityVERIFYUnapprovedCapabilitiesRPMs(TestRPMs):
-    @unittest.skipUnless(
-        have_caps_support, "rpm lacks %caps macro support (need rpm >= 4.7.0)"
-    )
+    @unittest.skipUnless(have_caps_support, lack_caps_msg)
     def setUp(self):
         super().setUp()
 
@@ -379,9 +355,7 @@ class SecurityVERIFYUnapprovedCapabilitiesRPMs(TestRPMs):
 
 
 class SecurityVERIFYUnapprovedCapabilitiesKoji(TestKoji):
-    @unittest.skipUnless(
-        have_caps_support, "rpm lacks %caps macro support (need rpm >= 4.7.0)"
-    )
+    @unittest.skipUnless(have_caps_support, lack_caps_msg)
     def setUp(self):
         super().setUp()
 
@@ -397,9 +371,7 @@ class SecurityVERIFYUnapprovedCapabilitiesKoji(TestKoji):
 
 
 class SecurityVERIFYUnapprovedCapabilitiesCompareRPMs(TestCompareRPMs):
-    @unittest.skipUnless(
-        have_caps_support, "rpm lacks %caps macro support (need rpm >= 4.7.0)"
-    )
+    @unittest.skipUnless(have_caps_support, lack_caps_msg)
     def setUp(self):
         super().setUp()
 
@@ -415,9 +387,7 @@ class SecurityVERIFYUnapprovedCapabilitiesCompareRPMs(TestCompareRPMs):
 
 
 class SecurityVERIFYUnapprovedCapabilitiesCompareKoji(TestCompareKoji):
-    @unittest.skipUnless(
-        have_caps_support, "rpm lacks %caps macro support (need rpm >= 4.7.0)"
-    )
+    @unittest.skipUnless(have_caps_support, lack_caps_msg)
     def setUp(self):
         super().setUp()
 
@@ -433,9 +403,7 @@ class SecurityVERIFYUnapprovedCapabilitiesCompareKoji(TestCompareKoji):
 
 
 class SecurityFAILUnapprovedCapabilitiesRPMs(TestRPMs):
-    @unittest.skipUnless(
-        have_caps_support, "rpm lacks %caps macro support (need rpm >= 4.7.0)"
-    )
+    @unittest.skipUnless(have_caps_support, lack_caps_msg)
     def setUp(self):
         super().setUp()
 
@@ -451,9 +419,7 @@ class SecurityFAILUnapprovedCapabilitiesRPMs(TestRPMs):
 
 
 class SecurityFAILUnapprovedCapabilitiesKoji(TestKoji):
-    @unittest.skipUnless(
-        have_caps_support, "rpm lacks %caps macro support (need rpm >= 4.7.0)"
-    )
+    @unittest.skipUnless(have_caps_support, lack_caps_msg)
     def setUp(self):
         super().setUp()
 
@@ -469,9 +435,7 @@ class SecurityFAILUnapprovedCapabilitiesKoji(TestKoji):
 
 
 class SecuritySKIPCapabilitiesMismatchRPMs(TestRPMs):
-    @unittest.skipUnless(
-        have_caps_support, "rpm lacks %caps macro support (need rpm >= 4.7.0)"
-    )
+    @unittest.skipUnless(have_caps_support, lack_caps_msg)
     def setUp(self):
         super().setUp()
 
@@ -487,9 +451,7 @@ class SecuritySKIPCapabilitiesMismatchRPMs(TestRPMs):
 
 
 class SecuritySKIPCapabilitiesMismatchKoji(TestKoji):
-    @unittest.skipUnless(
-        have_caps_support, "rpm lacks %caps macro support (need rpm >= 4.7.0)"
-    )
+    @unittest.skipUnless(have_caps_support, lack_caps_msg)
     def setUp(self):
         super().setUp()
 
@@ -505,9 +467,7 @@ class SecuritySKIPCapabilitiesMismatchKoji(TestKoji):
 
 
 class SecuritySKIPCapabilitiesMismatchCompareRPMs(TestCompareRPMs):
-    @unittest.skipUnless(
-        have_caps_support, "rpm lacks %caps macro support (need rpm >= 4.7.0)"
-    )
+    @unittest.skipUnless(have_caps_support, lack_caps_msg)
     def setUp(self):
         super().setUp()
 
@@ -523,9 +483,7 @@ class SecuritySKIPCapabilitiesMismatchCompareRPMs(TestCompareRPMs):
 
 
 class SecuritySKIPCapabilitiesMismatchCompareKoji(TestCompareKoji):
-    @unittest.skipUnless(
-        have_caps_support, "rpm lacks %caps macro support (need rpm >= 4.7.0)"
-    )
+    @unittest.skipUnless(have_caps_support, lack_caps_msg)
     def setUp(self):
         super().setUp()
 
@@ -541,9 +499,7 @@ class SecuritySKIPCapabilitiesMismatchCompareKoji(TestCompareKoji):
 
 
 class SecurityINFORMCapabilitiesMismatchRPMs(TestRPMs):
-    @unittest.skipUnless(
-        have_caps_support, "rpm lacks %caps macro support (need rpm >= 4.7.0)"
-    )
+    @unittest.skipUnless(have_caps_support, lack_caps_msg)
     def setUp(self):
         super().setUp()
 
@@ -559,9 +515,7 @@ class SecurityINFORMCapabilitiesMismatchRPMs(TestRPMs):
 
 
 class SecurityINFORMCapabilitiesMismatchKoji(TestKoji):
-    @unittest.skipUnless(
-        have_caps_support, "rpm lacks %caps macro support (need rpm >= 4.7.0)"
-    )
+    @unittest.skipUnless(have_caps_support, lack_caps_msg)
     def setUp(self):
         super().setUp()
 
@@ -577,9 +531,7 @@ class SecurityINFORMCapabilitiesMismatchKoji(TestKoji):
 
 
 class SecurityINFORMCapabilitiesMismatchCompareRPMs(TestCompareRPMs):
-    @unittest.skipUnless(
-        have_caps_support, "rpm lacks %caps macro support (need rpm >= 4.7.0)"
-    )
+    @unittest.skipUnless(have_caps_support, lack_caps_msg)
     def setUp(self):
         super().setUp()
 
@@ -595,9 +547,7 @@ class SecurityINFORMCapabilitiesMismatchCompareRPMs(TestCompareRPMs):
 
 
 class SecurityINFORMCapabilitiesMismatchCompareKoji(TestCompareKoji):
-    @unittest.skipUnless(
-        have_caps_support, "rpm lacks %caps macro support (need rpm >= 4.7.0)"
-    )
+    @unittest.skipUnless(have_caps_support, lack_caps_msg)
     def setUp(self):
         super().setUp()
 
@@ -613,9 +563,7 @@ class SecurityINFORMCapabilitiesMismatchCompareKoji(TestCompareKoji):
 
 
 class SecurityVERIFYCapabilitiesMismatchRPMs(TestRPMs):
-    @unittest.skipUnless(
-        have_caps_support, "rpm lacks %caps macro support (need rpm >= 4.7.0)"
-    )
+    @unittest.skipUnless(have_caps_support, lack_caps_msg)
     def setUp(self):
         super().setUp()
 
@@ -631,9 +579,7 @@ class SecurityVERIFYCapabilitiesMismatchRPMs(TestRPMs):
 
 
 class SecurityVERIFYCapabilitiesMismatchKoji(TestKoji):
-    @unittest.skipUnless(
-        have_caps_support, "rpm lacks %caps macro support (need rpm >= 4.7.0)"
-    )
+    @unittest.skipUnless(have_caps_support, lack_caps_msg)
     def setUp(self):
         super().setUp()
 
@@ -649,9 +595,7 @@ class SecurityVERIFYCapabilitiesMismatchKoji(TestKoji):
 
 
 class SecurityVERIFYCapabilitiesMismatchCompareRPMs(TestCompareRPMs):
-    @unittest.skipUnless(
-        have_caps_support, "rpm lacks %caps macro support (need rpm >= 4.7.0)"
-    )
+    @unittest.skipUnless(have_caps_support, lack_caps_msg)
     def setUp(self):
         super().setUp()
 
@@ -667,9 +611,7 @@ class SecurityVERIFYCapabilitiesMismatchCompareRPMs(TestCompareRPMs):
 
 
 class SecurityVERIFYCapabilitiesMismatchCompareKoji(TestCompareKoji):
-    @unittest.skipUnless(
-        have_caps_support, "rpm lacks %caps macro support (need rpm >= 4.7.0)"
-    )
+    @unittest.skipUnless(have_caps_support, lack_caps_msg)
     def setUp(self):
         super().setUp()
 
@@ -685,9 +627,7 @@ class SecurityVERIFYCapabilitiesMismatchCompareKoji(TestCompareKoji):
 
 
 class SecurityFAILCapabilitiesMismatchRPMs(TestRPMs):
-    @unittest.skipUnless(
-        have_caps_support, "rpm lacks %caps macro support (need rpm >= 4.7.0)"
-    )
+    @unittest.skipUnless(have_caps_support, lack_caps_msg)
     def setUp(self):
         super().setUp()
 
@@ -703,9 +643,7 @@ class SecurityFAILCapabilitiesMismatchRPMs(TestRPMs):
 
 
 class SecurityFAILCapabilitiesMismatchKoji(TestKoji):
-    @unittest.skipUnless(
-        have_caps_support, "rpm lacks %caps macro support (need rpm >= 4.7.0)"
-    )
+    @unittest.skipUnless(have_caps_support, lack_caps_msg)
     def setUp(self):
         super().setUp()
 
@@ -721,9 +659,7 @@ class SecurityFAILCapabilitiesMismatchKoji(TestKoji):
 
 
 class SecurityFAILCapabilitiesMismatchCompareRPMs(TestCompareRPMs):
-    @unittest.skipUnless(
-        have_caps_support, "rpm lacks %caps macro support (need rpm >= 4.7.0)"
-    )
+    @unittest.skipUnless(have_caps_support, lack_caps_msg)
     def setUp(self):
         super().setUp()
 
@@ -739,9 +675,7 @@ class SecurityFAILCapabilitiesMismatchCompareRPMs(TestCompareRPMs):
 
 
 class SecurityFAILCapabilitiesMismatchCompareKoji(TestCompareKoji):
-    @unittest.skipUnless(
-        have_caps_support, "rpm lacks %caps macro support (need rpm >= 4.7.0)"
-    )
+    @unittest.skipUnless(have_caps_support, lack_caps_msg)
     def setUp(self):
         super().setUp()
 
@@ -757,9 +691,7 @@ class SecurityFAILCapabilitiesMismatchCompareKoji(TestCompareKoji):
 
 
 class SecuritySKIPUnexpectedCapabilitiesRPMs(TestRPMs):
-    @unittest.skipUnless(
-        have_caps_support, "rpm lacks %caps macro support (need rpm >= 4.7.0)"
-    )
+    @unittest.skipUnless(have_caps_support, lack_caps_msg)
     def setUp(self):
         super().setUp()
 
@@ -775,9 +707,7 @@ class SecuritySKIPUnexpectedCapabilitiesRPMs(TestRPMs):
 
 
 class SecuritySKIPUnexpectedCapabilitiesKoji(TestKoji):
-    @unittest.skipUnless(
-        have_caps_support, "rpm lacks %caps macro support (need rpm >= 4.7.0)"
-    )
+    @unittest.skipUnless(have_caps_support, lack_caps_msg)
     def setUp(self):
         super().setUp()
 
@@ -793,9 +723,7 @@ class SecuritySKIPUnexpectedCapabilitiesKoji(TestKoji):
 
 
 class SecuritySKIPUnexpectedCapabilitiesCompareRPMs(TestCompareRPMs):
-    @unittest.skipUnless(
-        have_caps_support, "rpm lacks %caps macro support (need rpm >= 4.7.0)"
-    )
+    @unittest.skipUnless(have_caps_support, lack_caps_msg)
     def setUp(self):
         super().setUp()
 
@@ -811,9 +739,7 @@ class SecuritySKIPUnexpectedCapabilitiesCompareRPMs(TestCompareRPMs):
 
 
 class SecuritySKIPUnexpectedCapabilitiesCompareKoji(TestCompareKoji):
-    @unittest.skipUnless(
-        have_caps_support, "rpm lacks %caps macro support (need rpm >= 4.7.0)"
-    )
+    @unittest.skipUnless(have_caps_support, lack_caps_msg)
     def setUp(self):
         super().setUp()
 
@@ -829,9 +755,7 @@ class SecuritySKIPUnexpectedCapabilitiesCompareKoji(TestCompareKoji):
 
 
 class SecurityINFORMUnexpectedCapabilitiesRPMs(TestRPMs):
-    @unittest.skipUnless(
-        have_caps_support, "rpm lacks %caps macro support (need rpm >= 4.7.0)"
-    )
+    @unittest.skipUnless(have_caps_support, lack_caps_msg)
     def setUp(self):
         super().setUp()
 
@@ -847,9 +771,7 @@ class SecurityINFORMUnexpectedCapabilitiesRPMs(TestRPMs):
 
 
 class SecurityINFORMUnexpectedCapabilitiesKoji(TestKoji):
-    @unittest.skipUnless(
-        have_caps_support, "rpm lacks %caps macro support (need rpm >= 4.7.0)"
-    )
+    @unittest.skipUnless(have_caps_support, lack_caps_msg)
     def setUp(self):
         super().setUp()
 
@@ -865,9 +787,7 @@ class SecurityINFORMUnexpectedCapabilitiesKoji(TestKoji):
 
 
 class SecurityINFORMUnexpectedCapabilitiesCompareRPMs(TestCompareRPMs):
-    @unittest.skipUnless(
-        have_caps_support, "rpm lacks %caps macro support (need rpm >= 4.7.0)"
-    )
+    @unittest.skipUnless(have_caps_support, lack_caps_msg)
     def setUp(self):
         super().setUp()
 
@@ -883,9 +803,7 @@ class SecurityINFORMUnexpectedCapabilitiesCompareRPMs(TestCompareRPMs):
 
 
 class SecurityINFORMUnexpectedCapabilitiesCompareKoji(TestCompareKoji):
-    @unittest.skipUnless(
-        have_caps_support, "rpm lacks %caps macro support (need rpm >= 4.7.0)"
-    )
+    @unittest.skipUnless(have_caps_support, lack_caps_msg)
     def setUp(self):
         super().setUp()
 
@@ -901,9 +819,7 @@ class SecurityINFORMUnexpectedCapabilitiesCompareKoji(TestCompareKoji):
 
 
 class SecurityVERIFYUnexpectedCapabilitiesRPMs(TestRPMs):
-    @unittest.skipUnless(
-        have_caps_support, "rpm lacks %caps macro support (need rpm >= 4.7.0)"
-    )
+    @unittest.skipUnless(have_caps_support, lack_caps_msg)
     def setUp(self):
         super().setUp()
 
@@ -919,9 +835,7 @@ class SecurityVERIFYUnexpectedCapabilitiesRPMs(TestRPMs):
 
 
 class SecurityVERIFYUnexpectedCapabilitiesKoji(TestKoji):
-    @unittest.skipUnless(
-        have_caps_support, "rpm lacks %caps macro support (need rpm >= 4.7.0)"
-    )
+    @unittest.skipUnless(have_caps_support, lack_caps_msg)
     def setUp(self):
         super().setUp()
 
@@ -937,9 +851,7 @@ class SecurityVERIFYUnexpectedCapabilitiesKoji(TestKoji):
 
 
 class SecurityVERIFYUnexpectedCapabilitiesCompareRPMs(TestCompareRPMs):
-    @unittest.skipUnless(
-        have_caps_support, "rpm lacks %caps macro support (need rpm >= 4.7.0)"
-    )
+    @unittest.skipUnless(have_caps_support, lack_caps_msg)
     def setUp(self):
         super().setUp()
 
@@ -955,9 +867,7 @@ class SecurityVERIFYUnexpectedCapabilitiesCompareRPMs(TestCompareRPMs):
 
 
 class SecurityVERIFYUnexpectedCapabilitiesCompareKoji(TestCompareKoji):
-    @unittest.skipUnless(
-        have_caps_support, "rpm lacks %caps macro support (need rpm >= 4.7.0)"
-    )
+    @unittest.skipUnless(have_caps_support, lack_caps_msg)
     def setUp(self):
         super().setUp()
 
@@ -973,9 +883,7 @@ class SecurityVERIFYUnexpectedCapabilitiesCompareKoji(TestCompareKoji):
 
 
 class SecurityFAILUnexpectedCapabilitiesRPMs(TestRPMs):
-    @unittest.skipUnless(
-        have_caps_support, "rpm lacks %caps macro support (need rpm >= 4.7.0)"
-    )
+    @unittest.skipUnless(have_caps_support, lack_caps_msg)
     def setUp(self):
         super().setUp()
 
@@ -991,9 +899,7 @@ class SecurityFAILUnexpectedCapabilitiesRPMs(TestRPMs):
 
 
 class SecurityFAILUnexpectedCapabilitiesKoji(TestKoji):
-    @unittest.skipUnless(
-        have_caps_support, "rpm lacks %caps macro support (need rpm >= 4.7.0)"
-    )
+    @unittest.skipUnless(have_caps_support, lack_caps_msg)
     def setUp(self):
         super().setUp()
 
@@ -1009,9 +915,7 @@ class SecurityFAILUnexpectedCapabilitiesKoji(TestKoji):
 
 
 class SecurityFAILUnexpectedCapabilitiesCompareRPMs(TestCompareRPMs):
-    @unittest.skipUnless(
-        have_caps_support, "rpm lacks %caps macro support (need rpm >= 4.7.0)"
-    )
+    @unittest.skipUnless(have_caps_support, lack_caps_msg)
     def setUp(self):
         super().setUp()
 
@@ -1027,9 +931,7 @@ class SecurityFAILUnexpectedCapabilitiesCompareRPMs(TestCompareRPMs):
 
 
 class SecurityFAILUnexpectedCapabilitiesCompareKoji(TestCompareKoji):
-    @unittest.skipUnless(
-        have_caps_support, "rpm lacks %caps macro support (need rpm >= 4.7.0)"
-    )
+    @unittest.skipUnless(have_caps_support, lack_caps_msg)
     def setUp(self):
         super().setUp()
 

@@ -274,7 +274,7 @@ elf:
 manpage:
     # Regular expression (man 7 regex) matching man page installation
     # directories.
-    include_path: ^(/usr|/usr/local)/share/man/.*
+    include_path: ^(/usr|/usr/local)(/share/man/|/man/).*
 
     # Regular expression (man 7 regex) matching directories to ignore
     # during the man page inspection.
