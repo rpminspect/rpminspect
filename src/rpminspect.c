@@ -87,6 +87,64 @@ static void usage(void)
 }
 
 /*
+ * Match the candidate product string to a product string rule.
+ */
+static char *match_product(string_map_t *products, const char *candidate)
+{
+    char *ret = NULL;
+    bool matched = false;
+    char *needle = NULL;
+    string_map_t *hentry = NULL;
+    string_map_t *tmp_hentry = NULL;
+    regex_t product_regex;
+    char reg_error[BUFSIZ];
+    regmatch_t matches[1];
+    int result;
+
+    assert(candidate != NULL);
+
+    if (products == NULL) {
+        return strdup(candidate);
+    }
+
+    /* Try to see if a product mapping matches our strings */
+    HASH_ITER(hh, products, hentry, tmp_hentry) {
+        /* build a regex for this product release string */
+        result = regcomp(&product_regex, hentry->value, 0);
+
+        if (result != 0) {
+            regerror(result, &product_regex, reg_error, sizeof(reg_error));
+            warnx(_("*** unable to compile product release regular expression: %s"), reg_error);
+            free(needle);
+            return NULL;
+        }
+
+        /* now try to match the candidate */
+        if (regexec(&product_regex, candidate, 1, matches, 0) != 0) {
+            regfree(&product_regex);
+            free(needle);
+            continue;
+        }
+
+        if (matches[0].rm_so > -1) {
+            matched = true;
+            ret = strdup(hentry->key);
+        }
+
+        regfree(&product_regex);
+
+        if (matched) {
+            free(needle);
+            break;
+        }
+
+        free(needle);
+    }
+
+    return ret;
+}
+
+/*
  * Get the product release string by grabbing a possible dist tag from
  * the Release value.  Dist tags begin with '.' and go to the end of the
  * Release value.  Trim any trailing '/' characters in case the user is
@@ -96,21 +154,16 @@ static char *get_product_release(string_map_t *products, const favor_release_t f
 {
     int c;
     char *pos = NULL;
+    char *before_candidate = NULL;
+    char *after_candidate = NULL;
     char *before_product = NULL;
     char *after_product = NULL;
-    char *needle = NULL;
-    string_map_t *hentry = NULL;
-    string_map_t *tmp_hentry = NULL;
-    regex_t product_regex;
-    int result;
-    char reg_error[BUFSIZ];
-    regmatch_t before_matches[1];
-    regmatch_t after_matches[1];
     bool matched = false;
 
     assert(after != NULL);
 
     pos = rindex(after, '.');
+
     if (!pos) {
         warnx(_("*** Product release for after build (%s) is empty"), after);
         return NULL;
@@ -120,11 +173,11 @@ static char *get_product_release(string_map_t *products, const favor_release_t f
      * Get the character after the last occurrence of a period. This should
      * tell us what release flag the product is.
      */
-    pos += 1;
-    after_product = strdup(pos);
-    if (!after_product) {
+    //pos += 1;
+    after_candidate = strdup(pos);
+
+    if (after_candidate == NULL) {
         warnx(_("*** Product release for after build (%s) is empty"), after);
-        free(after_product);
         return NULL;
     }
 
@@ -132,23 +185,23 @@ static char *get_product_release(string_map_t *products, const favor_release_t f
      * Trim any trailing slashes in case the user is specifying builds from
      * local paths
      */
-    after_product[strcspn(after_product, "/")] = 0;
+    after_candidate[strcspn(after_candidate, "/")] = 0;
 
     if (before) {
         pos = rindex(before, '.');
 
         if (!pos) {
             warnx(_("*** Product release for before build (%s) is empty"), before);
-            free(after_product);
+            free(after_candidate);
             return NULL;
         }
 
-        pos += 1;
-        before_product = strdup(pos);
+        //pos += 1;
+        before_candidate = strdup(pos);
 
-        if (!before_product) {
+        if (before_candidate == NULL) {
             warnx(_("*** Product release for before build (%s) is empty"), before);
-            free(after_product);
+            free(after_candidate);
             return NULL;
         }
 
@@ -156,77 +209,27 @@ static char *get_product_release(string_map_t *products, const favor_release_t f
          * Trim any trailing slashes in case the user is specifying builds from
          * local paths
          */
-        before_product[strcspn(before_product, "/")] = 0;
+        before_candidate[strcspn(before_candidate, "/")] = 0;
 
         /*
          * If builds are different and we have no products hash table, fail
          */
+        after_product = match_product(products, after_candidate);
+        before_product = match_product(products, before_candidate);
         c = strcmp(before_product, after_product);
 
-        if (c && (products != NULL)) {
-            /* after_product and before_product are refreshed in the loop */
-            free(after_product);
-            free(before_product);
-
-            /* Try to see if a product mapping matches our strings */
-            HASH_ITER(hh, products, hentry, tmp_hentry) {
-                /* refresh after_product */
-                xasprintf(&needle, ".%s", hentry->key);
-                before_product = NULL;
-                after_product = NULL;
-                after_product = strstr(after, needle);
-                before_product = strstr(before, needle);
-
-                if (after_product == NULL || before_product == NULL) {
-                    free(needle);
-                    continue;
-                }
-
-                /* build a regex for this product release string */
-                result = regcomp(&product_regex, hentry->value, 0);
-
-                if (result != 0) {
-                    regerror(result, &product_regex, reg_error, sizeof(reg_error));
-                    warnx(_("*** unable to compile product release regular expression: %s"), reg_error);
-                    free(needle);
-                    return NULL;
-                }
-
-                /* now try to match the before and after builds */
-                if (regexec(&product_regex, before_product, 1, before_matches, 0) != 0) {
-                    regfree(&product_regex);
-                    free(needle);
-                    continue;
-                }
-
-                if (regexec(&product_regex, after_product, 1, after_matches, 0) != 0) {
-                    regfree(&product_regex);
-                    free(needle);
-                    continue;
-                }
-
-                if (before_matches[0].rm_so > -1 && after_matches[0].rm_so > -1) {
-                    matched = true;
-                    after_product = strdup(hentry->key);
-                }
-
-                regfree(&product_regex);
-
-                if (matched) {
-                    free(needle);
-                    break;
-                }
-
-                free(needle);
-            }
+        if (c) {
+            matched = false;
         } else if (!c) {
             matched = true;
-            free(before_product);
-            before_product = NULL;
         }
     } else {
+        after_product = match_product(products, after_candidate);
         matched = true;
     }
+
+    free(before_candidate);
+    free(after_candidate);
 
     /* Handle release favoring */
     if (!matched && favor_release != FAVOR_NONE) {
