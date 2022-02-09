@@ -61,6 +61,7 @@ jobs:
             # Requirements before the git clone can happen
             - name: git clone requirements
               run: |
+                  slackpkg update
                   slackpkg install git nghttp2 brotli cyrus-sasl dcron perl ca-certificates
                   update-ca-certificates --fresh
 
