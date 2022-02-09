@@ -48,14 +48,19 @@ jobs:
                   sed -i -e 's/^BATCH=.*$/BATCH=on/g' /etc/slackpkg/slackpkg.conf
                   sed -i -e 's/^DEFAULT_ANSWER=.*$/DEFAULT_ANSWER=y/g' /etc/slackpkg/slackpkg.conf
 
-                  # slackpkg needs knowledge
-                  slackpkg update
+                  # slackpkg needs knowledge (disable GPG check for now since we need to get update-ca-certificates)
+                  slackpkg -checkgpg=off update
 
             # Requirements before the git clone can happen
             - name: git clone requirements
               run: |
-                  slackpkg install git nghttp2 brotli cyrus-sasl dcron perl ca-certificates
+                  # Disable GPG check for now since we need to get update-ca-certificates
+                  slackpkg -checkgpg=off install git nghttp2 brotli cyrus-sasl dcron perl ca-certificates
                   update-ca-certificates --fresh
+
+                  # Now we can use GPG checks in slackpkg
+                  slackpkg update
+                  slackpkg reinstall git nghttp2 brotli cyrus-sasl dcron perl ca-certificates
 
             # This means clone the git repo
             - uses: actions/checkout@v2.1.0
