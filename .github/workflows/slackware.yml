@@ -50,18 +50,12 @@ jobs:
                   # Default to yes
                   sed -i -e 's/^DEFAULT_ANSWER=.*$/DEFAULT_ANSWER=y/g' /etc/slackpkg/slackpkg.conf
 
-                  # Disable GPG key checking since we have a circular problem importing the key
-                  # since that can't be fetched before we run update-ca-certificates and we need
-                  # to install the package to get update-ca-certificates.
-                  sed -i -e 's/^GPGCHECK=.*$/GPGCHECK=off/g' /etc/slackpkg/slackpkg.conf
-
                   # slackpkg needs knowledge
-                  slackpkg update
+                  yes | slackpkg update
 
             # Requirements before the git clone can happen
             - name: git clone requirements
               run: |
-                  slackpkg update
                   slackpkg install git nghttp2 brotli cyrus-sasl dcron perl ca-certificates
                   update-ca-certificates --fresh
 
