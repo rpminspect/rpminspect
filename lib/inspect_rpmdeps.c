@@ -27,6 +27,9 @@
 
 /* For reporting */
 static const char *specfile = NULL;
+static char *pkg_evr = NULL;
+static char *pkg_vr = NULL;
+static uint64_t pkg_epoch = 0;
 
 /*
  * Scan all dependencies and look for version values containing
@@ -446,31 +449,34 @@ static bool expected_deprule_change(const bool rebase, const deprule_entry_t *de
         }
     }
 
-    if (!found) {
-        free(req);
-        return false;
-    }
-
     /* deprule version strings are a combo of the version-release or epoch:version-release */
-    version = headerGetString(peer->after_hdr, RPMTAG_VERSION);
-    release = headerGetString(peer->after_hdr, RPMTAG_RELEASE);
-    epoch = headerGetNumber(peer->after_hdr, RPMTAG_EPOCH);
-    xasprintf(&vr, "%s-%s", version, release);
-    xasprintf(&evr, "%ju:%s-%s", epoch, version, release);
-
-    /* determine if this is expected */
-    if (deprule->operator == OP_EQUAL) {
-        if (epoch > 0) {
-            r = (evr && !strcmp(deprule->version, evr));
-        } else {
-            r = (vr && !strcmp(deprule->version, vr));
+    if (!found) {
+        /* use the main package vr and evr */
+        if ((pkg_epoch > 0) && pkg_evr && !strcmp(deprule->version, pkg_evr)) {
+            r = true;
+        } else if (pkg_vr && !strcmp(deprule->version, pkg_vr)) {
+            r = true;
         }
+    } else {
+        /* check against the subpackage match we found */
+        version = headerGetString(peer->after_hdr, RPMTAG_VERSION);
+        release = headerGetString(peer->after_hdr, RPMTAG_RELEASE);
+        epoch = headerGetNumber(peer->after_hdr, RPMTAG_EPOCH);
+        xasprintf(&vr, "%s-%s", version, release);
+        xasprintf(&evr, "%ju:%s-%s", epoch, version, release);
+
+        /* determine if this is expected */
+        if ((epoch > 0) && evr && !strcmp(deprule->version, evr)) {
+            r = true;
+        } else if (vr && !strcmp(deprule->version, vr)) {
+            r = true;
+        }
+
+        free(vr);
+        free(evr);
     }
 
     free(req);
-    free(vr);
-    free(evr);
-
     return r;
 }
 
@@ -486,6 +492,8 @@ bool inspect_rpmdeps(struct rpminspect *ri)
     deprule_entry_t *deprule = NULL;
     const char *name = NULL;
     const char *arch = NULL;
+    const char *version = NULL;
+    const char *release = NULL;
     char *drs = NULL;
     char *pdrs = NULL;
     char *noun = NULL;
@@ -513,6 +521,13 @@ bool inspect_rpmdeps(struct rpminspect *ri)
         if (!headerIsSource(peer->after_hdr)) {
             continue;
         }
+
+        /* grab the epoch, version, and release */
+        version = headerGetString(peer->after_hdr, RPMTAG_VERSION);
+        release = headerGetString(peer->after_hdr, RPMTAG_RELEASE);
+        pkg_epoch = headerGetNumber(peer->after_hdr, RPMTAG_EPOCH);
+        xasprintf(&pkg_vr, "%s-%s", version, release);
+        xasprintf(&pkg_evr, "%ju:%s-%s", pkg_epoch, version, release);
 
         TAILQ_FOREACH(file, peer->after_files, items) {
             if (strsuffix(file->localpath, SPEC_FILENAME_EXTENSION)) {
@@ -723,6 +738,9 @@ bool inspect_rpmdeps(struct rpminspect *ri)
         params.verb = VERB_OK;
         add_result(ri, &params);
     }
+
+    free(pkg_vr);
+    free(pkg_evr);
 
     return result;
 }
