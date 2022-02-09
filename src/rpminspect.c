@@ -93,7 +93,6 @@ static char *match_product(string_map_t *products, const char *candidate)
 {
     char *ret = NULL;
     bool matched = false;
-    char *needle = NULL;
     string_map_t *hentry = NULL;
     string_map_t *tmp_hentry = NULL;
     regex_t product_regex;
@@ -115,14 +114,12 @@ static char *match_product(string_map_t *products, const char *candidate)
         if (result != 0) {
             regerror(result, &product_regex, reg_error, sizeof(reg_error));
             warnx(_("*** unable to compile product release regular expression: %s"), reg_error);
-            free(needle);
             return NULL;
         }
 
         /* now try to match the candidate */
         if (regexec(&product_regex, candidate, 1, matches, 0) != 0) {
             regfree(&product_regex);
-            free(needle);
             continue;
         }
 
@@ -134,11 +131,8 @@ static char *match_product(string_map_t *products, const char *candidate)
         regfree(&product_regex);
 
         if (matched) {
-            free(needle);
             break;
         }
-
-        free(needle);
     }
 
     return ret;
@@ -173,7 +167,6 @@ static char *get_product_release(string_map_t *products, const favor_release_t f
      * Get the character after the last occurrence of a period. This should
      * tell us what release flag the product is.
      */
-    //pos += 1;
     after_candidate = strdup(pos);
 
     if (after_candidate == NULL) {
@@ -196,7 +189,6 @@ static char *get_product_release(string_map_t *products, const favor_release_t f
             return NULL;
         }
 
-        //pos += 1;
         before_candidate = strdup(pos);
 
         if (before_candidate == NULL) {

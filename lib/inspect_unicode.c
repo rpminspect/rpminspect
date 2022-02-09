@@ -489,7 +489,6 @@ static int validate_file(const char *fpath, __attribute__((unused)) const struct
 
                 if (errno == ENOMEM) {
                     warn("realloc");
-                    free(line);
                 }
 
                 line = line_new;
