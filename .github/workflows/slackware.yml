@@ -51,16 +51,15 @@ jobs:
                   # slackpkg needs knowledge (disable GPG check for now since we need to get update-ca-certificates)
                   slackpkg -checkgpg=off update
 
+                  # Disable GPG check for now since we need to get update-ca-certificates
+                  slackpkg -checkgpg=off install dcron perl ca-certificates
+                  update-ca-certificates --fresh
+                  slackpkg update
+
             # Requirements before the git clone can happen
             - name: git clone requirements
               run: |
-                  # Disable GPG check for now since we need to get update-ca-certificates
-                  slackpkg -checkgpg=off install git nghttp2 brotli cyrus-sasl dcron perl ca-certificates
-                  update-ca-certificates --fresh
-
-                  # Now we can use GPG checks in slackpkg
-                  slackpkg update
-                  slackpkg reinstall git nghttp2 brotli cyrus-sasl dcron perl ca-certificates
+                  slackpkg install git nghttp2 brotli cyrus-sasl
 
             # This means clone the git repo
             - uses: actions/checkout@v2.1.0
