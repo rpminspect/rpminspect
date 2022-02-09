@@ -43,6 +43,7 @@ for line in out.split():
 with open(os.environ["RPMINSPECT"], mode="rb") as f:
     ri_bytes = f.read()
 
+
 #############
 # bin owner #
 #############

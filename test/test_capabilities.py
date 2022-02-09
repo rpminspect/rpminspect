@@ -18,7 +18,6 @@
 
 import subprocess
 import unittest
-from distutils.version import LooseVersion
 from baseclass import TestRPMs, TestKoji
 from baseclass import TestCompareRPMs, TestCompareKoji
 
@@ -35,16 +34,6 @@ for line in out.split():
     if line.decode("utf-8").startswith("libcap"):
         have_caps_support = True
         break
-
-# Some tests require rpm >= 4.7.0
-proc = subprocess.Popen(
-    ["rpmbuild", "--version"], stdout=subprocess.PIPE, stderr=subprocess.PIPE
-)
-(out, err) = proc.communicate()
-if LooseVersion(out.split()[2].decode("utf-8")) >= LooseVersion("4.7.0"):
-    have_caps_support = True
-else:
-    have_caps_support = False
 
 
 # package contains a file with capabilities(7) but it is not on the
