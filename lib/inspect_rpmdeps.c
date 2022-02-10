@@ -145,7 +145,8 @@ static bool check_explicit_lib_deps(struct rpminspect *ri, Header h, deprule_lis
     /* iterate over the deps of the after build peer */
     TAILQ_FOREACH(req, after_deps, items) {
         /* only looking at lib* Requires right now */
-        if ((req->type != TYPE_REQUIRES) || !(strprefix(req->requirement, SHARED_LIB_PREFIX) && strstr(req->requirement, SHARED_LIB_SUFFIX))) {
+        if ((req->type != TYPE_REQUIRES)
+            || !(strprefix(req->requirement, SHARED_LIB_PREFIX) && strstr(req->requirement, SHARED_LIB_SUFFIX))) {
             continue;
         }
 
@@ -167,7 +168,8 @@ static bool check_explicit_lib_deps(struct rpminspect *ri, Header h, deprule_lis
                 }
 
                 /* only looking at Provides right now */
-                if ((prov->type != TYPE_PROVIDES) || !(strprefix(req->requirement, SHARED_LIB_PREFIX) && strstr(req->requirement, SHARED_LIB_SUFFIX))) {
+                if ((prov->type != TYPE_PROVIDES)
+                    || !(strprefix(req->requirement, SHARED_LIB_PREFIX) && strstr(req->requirement, SHARED_LIB_SUFFIX))) {
                     continue;
                 }
 
@@ -234,12 +236,23 @@ static bool check_explicit_lib_deps(struct rpminspect *ri, Header h, deprule_lis
 
             TAILQ_FOREACH(verify, after_deps, items) {
                 /* look only at explicit Requires right now */
-                if ((verify->type != TYPE_REQUIRES) || strprefix(verify->requirement, SHARED_LIB_PREFIX)) {
+                if ((verify->type != TYPE_REQUIRES)
+                    || (strprefix(verify->requirement, SHARED_LIB_PREFIX) && strstr(verify->requirement, SHARED_LIB_SUFFIX))) {
                     continue;
                 }
 
-                if (!strcmp(verify->requirement, pn) && verify->operator == OP_EQUAL && !strcmp(verify->version, r)) {
+                /* trim potential %{_isa} suffix */
+                isareq = strdup(verify->requirement);
+                assert(isareq != NULL);
+                isareq[strcspn(isareq, "(")] = '\0';
+
+                if (!strcmp(isareq, pn) && verify->operator == OP_EQUAL && !strcmp(verify->version, r)) {
                     found = true;
+                }
+
+                free(isareq);
+
+                if (found) {
                     break;
                 }
             }
