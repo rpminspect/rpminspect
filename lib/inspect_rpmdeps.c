@@ -145,7 +145,7 @@ static bool check_explicit_lib_deps(struct rpminspect *ri, Header h, deprule_lis
     /* iterate over the deps of the after build peer */
     TAILQ_FOREACH(req, after_deps, items) {
         /* only looking at lib* Requires right now */
-        if ((req->type != TYPE_REQUIRES) || !strprefix(req->requirement, SHARED_LIB_PREFIX)) {
+        if ((req->type != TYPE_REQUIRES) || !(strprefix(req->requirement, SHARED_LIB_PREFIX) && strstr(req->requirement, SHARED_LIB_SUFFIX))) {
             continue;
         }
 
@@ -167,7 +167,7 @@ static bool check_explicit_lib_deps(struct rpminspect *ri, Header h, deprule_lis
                 }
 
                 /* only looking at Provides right now */
-                if ((prov->type != TYPE_PROVIDES) || !strprefix(prov->requirement, SHARED_LIB_PREFIX)) {
+                if ((prov->type != TYPE_PROVIDES) || !(strprefix(req->requirement, SHARED_LIB_PREFIX) && strstr(req->requirement, SHARED_LIB_SUFFIX))) {
                     continue;
                 }
 
@@ -178,7 +178,11 @@ static bool check_explicit_lib_deps(struct rpminspect *ri, Header h, deprule_lis
                     /* a package is allowed to to Provide and Require the same thing */
                     /* otherwise we found the subpackage that Provides this explicit Requires */
                     potential_prov = peer;
-                    req->providers = list_add(req->providers, pn);
+
+                    if (!list_contains(req->providers, pn)) {
+                        req->providers = list_add(req->providers, pn);
+                    }
+
                     found = true;
                 } else if (strstr(req->requirement, "(") || strstr(prov->requirement, "(")) {
                     /*
@@ -194,7 +198,11 @@ static bool check_explicit_lib_deps(struct rpminspect *ri, Header h, deprule_lis
 
                     if (!strcmp(isareq, isaprov)) {
                         potential_prov = peer;
-                        req->providers = list_add(req->providers, pn);
+
+                        if (!list_contains(req->providers, pn)) {
+                            req->providers = list_add(req->providers, pn);
+                        }
+
                         found = true;
                     }
 

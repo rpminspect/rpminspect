@@ -483,5 +483,6 @@
  * Filename prefix for shared libraries and library packages.
  */
 #define SHARED_LIB_PREFIX "lib"
+#define SHARED_LIB_SUFFIX ".so"
 
 #endif
