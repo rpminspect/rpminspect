@@ -257,6 +257,11 @@ static bool check_explicit_lib_deps(struct rpminspect *ri, Header h, deprule_lis
                 }
             }
 
+            /* could be circular */
+            if (!found && !strcmp(name, pn)) {
+                found = true;
+            }
+
             free(r);
         }
 
