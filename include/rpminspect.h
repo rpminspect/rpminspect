@@ -202,7 +202,7 @@ bool strsuffix(const char *, const char *);
 int printwrap(const char *, const size_t, const unsigned int, FILE *);
 bool versioned_match(const char *, Header, const char *, Header);
 char *strseverity(const severity_t);
-severity_t getseverity(const char *);
+severity_t getseverity(const char *, const severity_t);
 char *strwaiverauth(const waiverauth_t);
 char *strreplace(const char *, const char *, const char *);
 char *strxmlescape(const char *);
@@ -248,21 +248,22 @@ results_t *init_results(void);
 void free_results(results_t *);
 void add_result_entry(results_t **, struct result_params *);
 void add_result(struct rpminspect *, struct result_params *);
+bool suppressed_results(const results_t *results, const char *header, const severity_t suppress);
 
 /* output.c */
 const char *format_desc(unsigned int);
 
 /* output_text.c */
-void output_text(const results_t *, const char *, const severity_t);
+void output_text(const results_t *, const char *, const severity_t, const severity_t);
 
 /* output_json.c */
-void output_json(const results_t *, const char *, const severity_t);
+void output_json(const results_t *, const char *, const severity_t, const severity_t);
 
 /* output_xunit.c */
-void output_xunit(const results_t *, const char *, const severity_t);
+void output_xunit(const results_t *, const char *, const severity_t, const severity_t);
 
 /* output_summary.c */
-void output_summary(const results_t *results, const char *dest, const severity_t threshold);
+void output_summary(const results_t *results, const char *dest, const severity_t threshold, const severity_t suppress);
 
 /* unpack.c */
 int unpack_archive(const char *, const char *, const bool);

@@ -30,13 +30,14 @@
 /*
  * Output a results_t in plain text format.
  */
-void output_text(const results_t *results, const char *dest, __attribute__((unused)) const severity_t threshold)
+void output_text(const results_t *results, const char *dest, __attribute__((unused)) const severity_t threshold, const severity_t suppress)
 {
     results_entry_t *result = NULL;
     int r = 0;
     int count = 0;
     int len = 0;
     bool displayed_header = false;
+    bool suppressed = false;
     bool first = true;
     FILE *fp = NULL;
     const char *header = NULL;
@@ -60,16 +61,17 @@ void output_text(const results_t *results, const char *dest, __attribute__((unus
         if (header == NULL || strcmp(header, result->header)) {
             header = result->header;
             displayed_header = false;
+            suppressed = suppressed_results(results, header, suppress);
             count = 1;
         }
 
-        if (first) {
-            first = false;
-        } else {
-            fprintf(fp, "\n");
-        }
+        if (!displayed_header && !suppressed) {
+            if (first) {
+                first = false;
+            } else {
+                fprintf(fp, "\n");
+            }
 
-        if (!displayed_header) {
             len = strlen(header) + 1;
             fprintf(fp, "%s:\n", header);
 
@@ -81,40 +83,42 @@ void output_text(const results_t *results, const char *dest, __attribute__((unus
             displayed_header = true;
         }
 
-        if (result->msg != NULL) {
-            xasprintf(&msg, "%d) %s\n", count++, result->msg);
+        if (result->severity >= suppress) {
+            if (result->msg != NULL) {
+                xasprintf(&msg, "%d) %s\n", count++, result->msg);
 
-            if (width) {
-                printwrap(msg, width, 0, fp);
-            } else {
-                fprintf(fp, "%s", msg);
+                if (width) {
+                    printwrap(msg, width, 0, fp);
+                } else {
+                    fprintf(fp, "%s", msg);
+                }
+
+                fprintf(fp, "\n");
+                free(msg);
+            }
+
+            fprintf(fp, _("Result: %s\n"), strseverity(result->severity));
+
+            fprintf(fp, _("Waiver Authorization: %s\n\n"), strwaiverauth(result->waiverauth));
+
+            if (result->details != NULL) {
+                fprintf(fp, _("Details:\n%s\n\n"), result->details);
+            }
+
+            if (result->remedy != NULL) {
+                xasprintf(&msg, _("Suggested Remedy:\n%s"), result->remedy);
+
+                if (width) {
+                    printwrap(msg, width, 0, fp);
+                } else {
+                   fprintf(fp, "%s", msg);
+                }
+
+                free(msg);
             }
 
             fprintf(fp, "\n");
-            free(msg);
         }
-
-        fprintf(fp, _("Result: %s\n"), strseverity(result->severity));
-
-        fprintf(fp, _("Waiver Authorization: %s\n\n"), strwaiverauth(result->waiverauth));
-
-        if (result->details != NULL) {
-            fprintf(fp, _("Details:\n%s\n\n"), result->details);
-        }
-
-        if (result->remedy != NULL) {
-            xasprintf(&msg, _("Suggested Remedy:\n%s"), result->remedy);
-
-            if (width) {
-                printwrap(msg, width, 0, fp);
-            } else {
-                fprintf(fp, "%s", msg);
-            }
-
-            free(msg);
-        }
-
-        fprintf(fp, "\n");
     }
 
     /* tidy up and return */

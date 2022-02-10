@@ -2117,6 +2117,7 @@ struct rpminspect *init_rpminspect(struct rpminspect *ri, const char *cfgfile, c
     ri->peers = init_rpmpeer();
     ri->threshold = RESULT_VERIFY;
     ri->worst_result = RESULT_OK;
+    ri->suppress = RESULT_NULL;
 
 #if 0
     /* debugging output only to make sure we captured ignores */

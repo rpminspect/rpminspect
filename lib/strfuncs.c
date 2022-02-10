@@ -278,8 +278,8 @@ char *strseverity(const severity_t severity) {
  * Given a severity string, return a severity_t matching it.
  * Or return the default.
  */
-severity_t getseverity(const char *name) {
-    severity_t s = RESULT_VERIFY;
+severity_t getseverity(const char *name, const severity_t default_s) {
+    severity_t s = default_s;
 
     if (name == NULL) {
         return s;

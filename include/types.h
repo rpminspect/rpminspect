@@ -643,9 +643,10 @@ struct rpminspect {
     bool rebase_detection;     /* Is rebase detection enabled for
                                   builds? (default true) */
 
-    /* Failure threshold */
+    /* Failure threshold and results suppression threshold */
     severity_t threshold;
     severity_t worst_result;
+    severity_t suppress;
 
     /* The product release we are inspecting against */
     char *product_release;
@@ -684,7 +685,7 @@ struct format {
     char *name;
 
     /* output driver function */
-    void (*driver)(const results_t *, const char *, const severity_t);
+    void (*driver)(const results_t *, const char *, const severity_t, const severity_t);
 };
 
 /*
