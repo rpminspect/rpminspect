@@ -69,6 +69,8 @@ static void usage(void)
     printf(_("                             (default: text)\n"));
     printf(_("  -t TAG, --threshold=TAG  Result threshold triggering exit\n"));
     printf(_("                           failure (default: VERIFY)\n"));
+    printf(_("  -s TAG, --suppress=TAG   Results suppression threshold\n"));
+    printf(_("                             (default: off, report everything)\n"));
     printf(_("  -l, --list               List available tests and formats\n"));
     printf(_("  -w PATH, --workdir=PATH  Temporary directory to use\n"));
     printf(_("                             (default: %s)\n"), DEFAULT_WORKDIR);
@@ -297,7 +299,7 @@ int main(int argc, char **argv)
     int idx = 0;
     int ret = RI_INSPECTION_SUCCESS;
     glob_t expand;
-    char *short_options = "c:p:T:E:a:r:no:F:lw:t:fkdDv\?V";
+    char *short_options = "c:p:T:E:a:r:no:F:lw:t:s:fkdDv\?V";
     struct option long_options[] = {
         { "config", required_argument, 0, 'c' },
         { "profile", required_argument, 0, 'p' },
@@ -311,6 +313,7 @@ int main(int argc, char **argv)
         { "format", required_argument, 0, 'F' },
         { "workdir", required_argument, 0, 'w' },
         { "threshold", required_argument, 0, 't' },
+        { "suppress", required_argument, 0, 's' },
         { "fetch-only", no_argument, 0, 'f' },
         { "keep", no_argument, 0, 'k' },
         { "debug", no_argument, 0, 'd' },
@@ -334,6 +337,7 @@ int main(int argc, char **argv)
     char *release = NULL;
     bool rebase_detection = true;
     char *threshold = NULL;
+    char *suppress = NULL;
     int formatidx = -1;
     bool fetch_only = false;
     bool keep = false;
@@ -463,6 +467,9 @@ int main(int argc, char **argv)
             case 't':
                 threshold = strdup(optarg);
                 break;
+            case 's':
+                suppress = strdup(optarg);
+                break;
             case 'f':
                 fetch_only = true;        /* -f implies -k */
                 /* fall through */
@@ -582,9 +589,11 @@ int main(int argc, char **argv)
     ri->progname = strdup(argv[0]);
     ri->verbose = verbose;
     ri->product_release = release;
-    ri->threshold = getseverity(threshold);
+    ri->threshold = getseverity(threshold, RESULT_VERIFY);
+    ri->suppress = getseverity(suppress, RESULT_NULL);
     ri->rebase_detection = rebase_detection;
     free(threshold);
+    free(suppress);
 
     /*
      * any inspection selections on the command line can override
@@ -865,7 +874,7 @@ int main(int argc, char **argv)
         }
 
         if (ri->results != NULL) {
-            formats[formatidx].driver(ri->results, output, ri->threshold);
+            formats[formatidx].driver(ri->results, output, ri->threshold, ri->suppress);
         }
 
         free(output);

@@ -30,7 +30,7 @@
 /*
  * Output a results_t in summary text format.
  */
-void output_summary(const results_t *results, const char *dest, __attribute__((unused)) const severity_t threshold)
+void output_summary(const results_t *results, const char *dest, __attribute__((unused)) const severity_t threshold, const severity_t suppress)
 {
     results_entry_t *result = NULL;
     int r = 0;
@@ -55,7 +55,9 @@ void output_summary(const results_t *results, const char *dest, __attribute__((u
     /* output the results */
     TAILQ_FOREACH(result, results, items) {
         /* skip conditions */
-        if (!strcmp(result->header, NAME_DIAGNOSTICS) || (result->verb == VERB_OK && result->noun == NULL)) {
+        if (!strcmp(result->header, NAME_DIAGNOSTICS)
+            || (result->verb == VERB_OK && result->noun == NULL)
+            || (result->severity >= suppress)) {
             continue;
         }
 

@@ -164,3 +164,23 @@ void add_result(struct rpminspect *ri, struct result_params *params)
     add_result_entry(&ri->results, params);
     return;
 }
+
+/*
+ * Returns true if all the results for the named inspection are
+ * suppressed.
+ */
+bool suppressed_results(const results_t *results, const char *header, const severity_t suppress)
+{
+    results_entry_t *result = NULL;
+
+    assert(results != NULL);
+    assert(header != NULL);
+
+    TAILQ_FOREACH(result, results, items) {
+        if (!strcmp(header, result->header) && result->severity >= suppress) {
+            return false;
+        }
+    }
+
+    return true;
+}

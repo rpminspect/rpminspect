@@ -170,6 +170,14 @@ to any of the valid result codes.  Available result codes are OK, INFO,
 WAIVED, VERIFY, or BAD.  The argument expects the result threshold specified
 as a string.  Case does not matter.
 .TP
+.B \-s TAG, \-\-suppress=TAG
+Results suppression threshold.  By default all results are reported,
+but you can use this option to suppress results below a reporting
+level.  The values are the same as for the \-t option above.  For
+example, to only show VERIFY and higher results, pass "\-s VERIFY" at
+run time.  This option is not valid on the "json" or "xunit" output
+formats.
+.TP
 .B \-l, \-\-list
 List available output formats and inspections
 .TP
