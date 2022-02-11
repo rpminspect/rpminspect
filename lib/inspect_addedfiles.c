@@ -113,7 +113,7 @@ static bool addedfiles_driver(struct rpminspect *ri, rpmfile_entry_t *file)
             }
 
             if (strprefix(localpath, subpath)) {
-                xasprintf(&params.msg, _("Packages should not contain not files or directories starting with `%s` on %s: %s"), entry->data, arch, file->localpath);
+                xasprintf(&params.msg, _("Packages should not contain files or directories starting with `%s` on %s: %s"), entry->data, arch, file->localpath);
                 params.noun = _("invalid directory ${FILE} on ${ARCH}");
                 add_result(ri, &params);
                 result = !(params.severity >= RESULT_VERIFY);
@@ -214,7 +214,7 @@ bool inspect_addedfiles(struct rpminspect *ri)
     bool result;
     struct result_params params;
 
-    xasprintf(&remedy_addedfiles, REMEDY_ADDEDFILES, ri->fileinfo_filename ? _("the fileinfo list") : ri->fileinfo_filename);
+    xasprintf(&remedy_addedfiles, REMEDY_ADDEDFILES, ri->fileinfo_filename ? ri->fileinfo_filename : _("the fileinfo list"));
     assert(remedy_addedfiles != NULL);
     result = foreach_peer_file(ri, NAME_ADDEDFILES, addedfiles_driver);
     free(remedy_addedfiles);

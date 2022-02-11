@@ -334,10 +334,10 @@ changedfiles:
 addedfiles:
     # Optional: Forbidden path prefixes, space delimited list.
     forbidden_path_prefixes:
-        - tmp/
-        - var/tmp
-        - etc/init.d
-        - etc/xinetd.d
+        - /tmp/
+        - /var/tmp
+        - /etc/init.d
+        - /etc/xinetd.d
 
     # Optional: Forbidden path suffixes.
     forbidden_path_suffixes:
