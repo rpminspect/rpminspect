@@ -714,7 +714,7 @@ bool inspect_rpmdeps(struct rpminspect *ri)
                         params.remedy = REMEDY_RPMDEPS_CHANGED;
                         params.verb = VERB_CHANGED;
 
-                        if (expected_deprule_change(rebase, deprule, peer->after_hdr, ri->peers)) {
+                        if (deprule->rich || expected_deprule_change(rebase, deprule, peer->after_hdr, ri->peers)) {
                             params.severity = RESULT_INFO;
                             params.waiverauth = NOT_WAIVABLE;
                             params.msg = strappend(params.msg, _("; this is expected"), NULL);
