@@ -176,9 +176,34 @@ deprule_list_t *gather_deprules(Header hdr)
     return rules;
 }
 
+/* Given a deprule requirement, trim off rich dependency markup */
+static char *trim_rich_dep(const char *requirement)
+{
+    char *r = NULL;
+
+    if (requirement == NULL) {
+        return NULL;
+    }
+
+    r = strdup(requirement);
+    assert(r != NULL);
+
+    while (*r == '(') {
+        r++;
+    }
+
+    r[strcspn(r, " \f\n\r\t\v")] = '\0';
+    return r;
+}
+
 /* Given a pair of deprules, see if they are peers */
 static void process_pair(deprule_entry_t *left, deprule_entry_t *right)
 {
+    char *ra = NULL;
+    char *ora = NULL;
+    char *rb = NULL;
+    char *orb = NULL;
+
     assert(left != NULL);
     assert(right != NULL);
 
@@ -187,10 +212,18 @@ static void process_pair(deprule_entry_t *left, deprule_entry_t *right)
         return;
     }
 
-    if (!strcmp(left->requirement, right->requirement)) {
+    /* handle any possible rich dependency strings */
+    /* trim leading parens and cut everything after the first whitespace */
+    ra = ora = trim_rich_dep(left->requirement);
+    rb = orb = trim_rich_dep(right->requirement);
+
+    if (!strcmp(ra, rb)) {
         left->peer_deprule = right;
         right->peer_deprule = left;
     }
+
+    free(ora);
+    free(orb);
 
     return;
 }
@@ -345,23 +378,69 @@ char *strdeprule(const deprule_entry_t *deprule)
  */
 bool deprules_match(const deprule_entry_t *a, const deprule_entry_t *b)
 {
-    const char *ra = NULL;
-    const char *rb = NULL;
-    const char *va = NULL;
-    const char *vb = NULL;
+    bool r = false;
+    char *ora = NULL;
+    char *ra = NULL;
+    char *orb = NULL;
+    char *rb = NULL;
+    char *ova = NULL;
+    char *va = NULL;
+    char *ovb = NULL;
+    char *vb = NULL;
     bool n_match = false;
     bool v_match = false;
 
     assert(a != NULL);
     assert(b != NULL);
 
-    ra = a->requirement;
-    rb = b->requirement;
-    va = a->version;
-    vb = b->version;
+    /* make copies of the requirement and version strings */
+    if (a->requirement) {
+        ra = ora = strdup(a->requirement);
+        assert(ora != NULL);
+    }
+
+    if (b->requirement) {
+        rb = orb = strdup(b->requirement);
+        assert(orb != NULL);
+    }
+
+    if (a->version) {
+        va = ova = strdup(a->version);
+        assert(ova != NULL);
+    }
+
+    if (b->version) {
+        vb = ovb = strdup(b->version);
+        assert(ovb != NULL);
+    }
+
+    /* trim any leading parens in case of rich deps */
+    while (*ra == '(') {
+        ra++;
+    }
+
+    while (*rb == '(') {
+        rb++;
+    }
+
+    /* drop any rich deps clauses from the version strings */
+    if (va) {
+        va[strcspn(va, " \f\n\r\t\v")] = '\0';
+    }
+
+    if (vb) {
+        vb[strcspn(vb, " \f\n\r\t\v")] = '\0';
+    }
 
     n_match = (ra == NULL && rb == NULL) || (ra && rb && !strcmp(ra, rb));
     v_match = (va == NULL && vb == NULL) || (va && vb && !strcmp(va, vb));
 
-    return n_match && (a->operator == b->operator) && v_match;
+    r = n_match && (a->operator == b->operator) && v_match;
+
+    free(ora);
+    free(orb);
+    free(ova);
+    free(ovb);
+
+    return r;
 }

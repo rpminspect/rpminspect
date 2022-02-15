@@ -116,7 +116,9 @@ static bool check_explicit_lib_deps(struct rpminspect *ri, Header h, deprule_lis
     deprule_entry_t *req = NULL;
     deprule_entry_t *prov = NULL;
     char *isareq = NULL;
+    char *working_isareq = NULL;
     char *isaprov = NULL;
+    char *working_isaprov = NULL;
     char *multiples = NULL;
     char *r = NULL;
     char *noun = NULL;
@@ -144,8 +146,8 @@ static bool check_explicit_lib_deps(struct rpminspect *ri, Header h, deprule_lis
 
     /* iterate over the deps of the after build peer */
     TAILQ_FOREACH(req, after_deps, items) {
-        /* only looking at lib* Requires right now */
-        if ((req->type != TYPE_REQUIRES)
+        /* only looking at lib* dependencies right now */
+        if ((req->type == TYPE_PROVIDES)
             || !(strprefix(req->requirement, SHARED_LIB_PREFIX) && strstr(req->requirement, SHARED_LIB_SUFFIX))) {
             continue;
         }
@@ -186,19 +188,28 @@ static bool check_explicit_lib_deps(struct rpminspect *ri, Header h, deprule_lis
                     }
 
                     found = true;
-                } else if (strstr(req->requirement, "(") || strstr(prov->requirement, "(")) {
+                } else if (strrchr(req->requirement, '(') || strrchr(prov->requirement, '(')) {
                     /*
                      * we may have a dependency such as:
                      *     Requires: %{name}-libs%{?_isa} = %{version}-%{release}'
                      * trim the '(x86-64)' or similar ISA substring for comparision purposes
+                     * also trim leading '(' to account for rich deps
                      */
-                    isareq = strdup(req->requirement);
-                    isareq[strcspn(isareq, "(")] = '\0';
+                    working_isareq = isareq = strdup(req->requirement);
+                    working_isaprov = isaprov = strdup(prov->requirement);
 
-                    isaprov = strdup(prov->requirement);
-                    isaprov[strcspn(isaprov, "(")] = '\0';
+                    while (*working_isareq == '(') {
+                        working_isareq++;
+                    }
 
-                    if (!strcmp(isareq, isaprov)) {
+                    while (*working_isaprov == '(') {
+                        working_isaprov++;
+                    }
+
+                    working_isareq[strcspn(working_isareq, "(")] = '\0';
+                    working_isaprov[strcspn(working_isaprov, "(")] = '\0';
+
+                    if (!strcmp(working_isareq, working_isaprov)) {
                         potential_prov = peer;
 
                         if (!list_contains(req->providers, pn)) {
@@ -235,18 +246,23 @@ static bool check_explicit_lib_deps(struct rpminspect *ri, Header h, deprule_lis
             assert(r != NULL);
 
             TAILQ_FOREACH(verify, after_deps, items) {
-                /* look only at explicit Requires right now */
-                if ((verify->type != TYPE_REQUIRES)
+                /* look only at explicit deps right now */
+                if ((verify->type == TYPE_PROVIDES)
                     || (strprefix(verify->requirement, SHARED_LIB_PREFIX) && strstr(verify->requirement, SHARED_LIB_SUFFIX))) {
                     continue;
                 }
 
                 /* trim potential %{_isa} suffix */
-                isareq = strdup(verify->requirement);
+                working_isareq = isareq = strdup(verify->requirement);
                 assert(isareq != NULL);
-                isareq[strcspn(isareq, "(")] = '\0';
 
-                if (!strcmp(isareq, pn) && verify->operator == OP_EQUAL && !strcmp(verify->version, r)) {
+                while (*working_isareq == '(') {
+                    working_isareq++;
+                }
+
+                working_isareq[strcspn(working_isareq, "(")] = '\0';
+
+                if (!strcmp(working_isareq, pn) && verify->operator == OP_EQUAL && !strcmp(verify->version, r)) {
                     found = true;
                 }
 
@@ -418,6 +434,7 @@ static bool expected_deprule_change(const bool rebase, const deprule_entry_t *de
     bool r = false;
     bool found = false;
     char *req = NULL;
+    char *working_req = NULL;
     char *vr = NULL;
     char *evr = NULL;
     rpmpeer_entry_t *peer = NULL;
@@ -444,12 +461,18 @@ static bool expected_deprule_change(const bool rebase, const deprule_entry_t *de
     /* this package arch */
     arch = get_rpm_header_arch(h);
 
-    /* trim any arch substrings from the name (e.g., "(x86-64)") */
-    req = strdup(deprule->requirement);
+    /* a copy of the req to work with */
+    working_req = req = strdup(deprule->requirement);
     assert(req != NULL);
 
-    if (strstr(req, "(")) {
-        req[strcspn(req, "(")] = '\0';
+    /* trim any leading '(' to account for rich deps */
+    while (*working_req == '(') {
+        working_req++;
+    }
+
+    /* trim any arch substrings from the name (e.g., "(x86-64)") */
+    if (strstr(working_req, "(")) {
+        working_req[strcspn(working_req, "(")] = '\0';
     }
 
     /* see if this deprule requirement name matches a subpackage */
@@ -468,7 +491,7 @@ static bool expected_deprule_change(const bool rebase, const deprule_entry_t *de
         peerarch = get_rpm_header_arch(peer->after_hdr);
         name = headerGetString(peer->after_hdr, RPMTAG_NAME);
 
-        if (!strcmp(arch, peerarch) && !strcmp(name, req)) {
+        if (!strcmp(arch, peerarch) && !strcmp(name, working_req)) {
             /* we found the subpackage, which is now 'peer' for code below */
             found = true;
             break;
@@ -492,10 +515,12 @@ static bool expected_deprule_change(const bool rebase, const deprule_entry_t *de
         xasprintf(&evr, "%ju:%s-%s", epoch, version, release);
 
         /* determine if this is expected */
-        if ((epoch > 0) && evr && !strcmp(deprule->version, evr)) {
-            r = true;
-        } else if (vr && !strcmp(deprule->version, vr)) {
-            r = true;
+        if (deprule->version) {
+            if ((epoch > 0) && evr && !strcmp(deprule->version, evr)) {
+                r = true;
+            } else if (vr && !strcmp(deprule->version, vr)) {
+                r = true;
+            }
         }
 
         free(vr);
@@ -656,7 +681,7 @@ bool inspect_rpmdeps(struct rpminspect *ri)
                     }
 
                     /* determine what to report */
-                    if (deprule->peer_deprule == NULL ) {
+                    if (deprule->peer_deprule == NULL) {
                         if (!strcmp(arch, SRPM_ARCH_NAME)) {
                             xasprintf(&params.msg, _("Gained '%s' in source package %s"), drs, name);
                         } else {
@@ -696,6 +721,13 @@ bool inspect_rpmdeps(struct rpminspect *ri)
                         }
                     }
 
+                    /* debuginfo and debugsource pkg findings are always INFO */
+                    if (strsuffix(name, DEBUGINFO_SUFFIX) || strsuffix(name, DEBUGSOURCE_SUFFIX)) {
+                        params.severity = RESULT_INFO;
+                        params.waiverauth = NOT_WAIVABLE;
+                    }
+
+                    /* report the result */
                     params.noun = noun;
                     params.arch = arch;
                     params.file = drs;
@@ -739,6 +771,12 @@ bool inspect_rpmdeps(struct rpminspect *ri)
                         } else {
                             params.waiverauth = WAIVABLE_BY_ANYONE;
                             params.severity = RESULT_VERIFY;
+                        }
+
+                        /* debuginfo and debugsource pkg findings are always INFO */
+                        if (strsuffix(name, DEBUGINFO_SUFFIX) || strsuffix(name, DEBUGSOURCE_SUFFIX)) {
+                            params.severity = RESULT_INFO;
+                            params.waiverauth = NOT_WAIVABLE;
                         }
 
                         add_result(ri, &params);
