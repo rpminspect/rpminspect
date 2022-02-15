@@ -27,6 +27,21 @@
 #include "rpminspect.h"
 
 /*
+ * Given a deprule requirement string, return true if it is a rich
+ * dependency string.  This does what rpmdsIsRich() does in
+ * lib/rpmds.c from rpm, but without first creating a rpmds which we
+ * don't need here.
+ */
+static bool is_rich_dep(const char *requirement)
+{
+    if (requirement && *requirement == '(') {
+        return true;
+    }
+
+    return false;
+}
+
+/*
  * Gather the specific type of deprules and add them to rules.  Return
  * the list.
  */
@@ -141,6 +156,8 @@ static deprule_list_t *gather_deprules_by_type(deprule_list_t *rules, Header hdr
                 deprule_entry->version = strdup(v);
                 assert(deprule_entry->version != NULL);
             }
+
+            deprule_entry->rich = is_rich_dep(deprule_entry->requirement);
 
             TAILQ_INSERT_TAIL(deprules, deprule_entry, items);
         }

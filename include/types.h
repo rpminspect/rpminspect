@@ -166,6 +166,7 @@ typedef struct _deprule_entry_t {
     char *requirement;                     /* dependency requirement name (e.g., glibc or /bin/sh) */
     dep_op_t operator;                     /* dependency operator (e.g., >, >=) */
     char *version;                         /* dependency version */
+    bool rich;                             /* true if this dep is a rich dependency */
     bool need_explicit_deps;               /* true if a subpkg needs to explicit require an NVR */
     string_list_t *providers;              /* for TYPE_REQUIRES, list of subpackages providing it */
     struct _deprule_entry_t *peer_deprule; /* corresponding before/after deprule */
