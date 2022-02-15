@@ -180,19 +180,25 @@ deprule_list_t *gather_deprules(Header hdr)
 static char *trim_rich_dep(const char *requirement)
 {
     char *r = NULL;
+    char *req = NULL;
+    char *tmp = NULL;
 
     if (requirement == NULL) {
         return NULL;
     }
 
-    r = strdup(requirement);
-    assert(r != NULL);
+    tmp = req = strdup(requirement);
+    assert(req != NULL);
 
-    while (*r == '(') {
-        r++;
+    while (*tmp == '(') {
+        tmp++;
     }
 
-    r[strcspn(r, " \f\n\r\t\v")] = '\0';
+    tmp[strcspn(tmp, " \f\n\r\t\v")] = '\0';
+    r = strdup(tmp);
+    assert(r != NULL);
+    free(req);
+
     return r;
 }
 
@@ -200,9 +206,7 @@ static char *trim_rich_dep(const char *requirement)
 static void process_pair(deprule_entry_t *left, deprule_entry_t *right)
 {
     char *ra = NULL;
-    char *ora = NULL;
     char *rb = NULL;
-    char *orb = NULL;
 
     assert(left != NULL);
     assert(right != NULL);
@@ -214,16 +218,16 @@ static void process_pair(deprule_entry_t *left, deprule_entry_t *right)
 
     /* handle any possible rich dependency strings */
     /* trim leading parens and cut everything after the first whitespace */
-    ra = ora = trim_rich_dep(left->requirement);
-    rb = orb = trim_rich_dep(right->requirement);
+    ra = trim_rich_dep(left->requirement);
+    rb = trim_rich_dep(right->requirement);
 
     if (!strcmp(ra, rb)) {
         left->peer_deprule = right;
         right->peer_deprule = left;
     }
 
-    free(ora);
-    free(orb);
+    free(ra);
+    free(rb);
 
     return;
 }
