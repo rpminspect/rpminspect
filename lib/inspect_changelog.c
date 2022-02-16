@@ -213,7 +213,6 @@ static bool check_src_rpm_changelog(struct rpminspect *ri, const rpmpeer_entry_t
     char *before_output = NULL;
     char *after_output = NULL;
     char *diff_output = NULL;
-    int exitcode = 0;
 
     assert(ri != NULL);
     assert(peer != NULL);
@@ -239,7 +238,7 @@ static bool check_src_rpm_changelog(struct rpminspect *ri, const rpmpeer_entry_t
 
     /* Compare the changelogs */
     if (before_output && after_output) {
-        diff_output = run_cmd(&exitcode, ri->worksubdir, ri->commands.diff, "-u", before_output, after_output, NULL);
+        diff_output = get_file_delta(before_output, after_output);
     }
 
     /* Set up result parameters */
@@ -249,7 +248,7 @@ static bool check_src_rpm_changelog(struct rpminspect *ri, const rpmpeer_entry_t
     params.waiverauth = NOT_WAIVABLE;
     params.noun = _("%%changelog");
 
-    if (exitcode) {
+    if (diff_output) {
         /* Skip past the diff(1) header lines */
         params.details = skip_diff_headers(diff_output);
 
@@ -341,7 +340,6 @@ static bool check_bin_rpm_changelog(struct rpminspect *ri, const rpmpeer_entry_t
     char *before_output = NULL;
     char *after_output = NULL;
     char *diff_output = NULL;
-    int exitcode = 0;
     string_entry_t *entry = NULL;
 
     assert(ri != NULL);
@@ -361,7 +359,7 @@ static bool check_bin_rpm_changelog(struct rpminspect *ri, const rpmpeer_entry_t
 
     /* Compare the changelogs */
     if (before_output && after_output) {
-        diff_output = run_cmd(&exitcode, ri->worksubdir, ri->commands.diff, "-u", before_output, after_output, NULL);
+        diff_output = get_file_delta(before_output, after_output);
     }
 
     /* Set up result parameters */
@@ -372,7 +370,7 @@ static bool check_bin_rpm_changelog(struct rpminspect *ri, const rpmpeer_entry_t
     params.verb = VERB_CHANGED;
     params.noun = _("%%changelog");
 
-    if (exitcode) {
+    if (diff_output) {
         /* Skip past the diff(1) header lines */
         params.details = skip_diff_headers(diff_output);
         params.severity = RESULT_INFO;

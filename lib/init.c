@@ -957,10 +957,7 @@ static int read_cfgfile(struct rpminspect *ri, const char *filename)
                             ri->kojimbs = strdup(t);
                         }
                     } else if (block == BLOCK_COMMON) {
-                        if (!strcmp(key, "diff")) {
-                            free(ri->commands.diff);
-                            ri->commands.diff = strdup(t);
-                        } else if (!strcmp(key, "diffstat")) {
+                        if (!strcmp(key, "diffstat")) {
                             free(ri->commands.diffstat);
                             ri->commands.diffstat = strdup(t);
                         } else if (!strcmp(key, "msgunfmt")) {
@@ -2038,7 +2035,6 @@ struct rpminspect *init_rpminspect(struct rpminspect *ri, const char *cfgfile, c
         ri->patch_line_threshold = DEFAULT_PATCH_LINE_THRESHOLD;
 
         /* Initialize commands */
-        ri->commands.diff = strdup(DIFF_CMD);
         ri->commands.diffstat = strdup(DIFFSTAT_CMD);
         ri->commands.msgunfmt = strdup(MSGUNFMT_CMD);
         ri->commands.desktop_file_validate = strdup(DESKTOP_FILE_VALIDATE_CMD);

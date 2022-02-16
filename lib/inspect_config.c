@@ -163,26 +163,21 @@ static bool config_driver(struct rpminspect *ri, rpmfile_entry_t *file)
             if (exitcode) {
                 /* the files differ and not a rebase, see if it's only whitespace changes */
                 free(diff_output);
-                params.details = run_cmd(&exitcode, ri->worksubdir, ri->commands.diff, "-u", "-w", "-I^#.*", file->peer_file->fullpath, file->fullpath, NULL);
+                params.details = get_file_delta(file->peer_file->fullpath, file->fullpath);
 
-                if (exitcode == 0) {
-                    xasprintf(&params.msg, _("%%config file content change for %s in %s on %s (comments/whitespace only)"), file->localpath, name, arch);
-                    params.severity = RESULT_INFO;
-                    params.waiverauth = NOT_WAIVABLE;
-                    params.verb = VERB_OK;
-                    result = true;
-                } else {
+                if (params.details) {
                     xasprintf(&params.msg, _("%%config file content change for %s in %s on %s"), file->localpath, name, arch);
 
                     if (params.severity == RESULT_VERIFY) {
                         result = false;
                     }
+
+                    add_result(ri, &params);
+                    reported = true;
                 }
 
-                add_result(ri, &params);
                 free(params.msg);
                 free(params.details);
-                reported = true;
             }
         }
     } else if (before_config || after_config) {

@@ -436,4 +436,7 @@ const char *get_deprule_operator_desc(const dep_op_t operator);
 bool deprules_match(const deprule_entry_t *a, const deprule_entry_t *b);
 char *strdeprule(const deprule_entry_t *deprule);
 
+/* delta.c */
+char *get_file_delta(const char *a, const char *b);
+
 #endif

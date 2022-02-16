@@ -802,6 +802,7 @@ class TestCompareKoji(TestCompareRPMs):
                 args, stdout=subprocess.PIPE, stderr=subprocess.PIPE
             )
             (self.out, self.err) = self.p.communicate()
+            self.results = []
 
             try:
                 with open(self.outputfile) as f:

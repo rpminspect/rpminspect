@@ -260,10 +260,10 @@ static bool changedfiles_driver(struct rpminspect *ri, rpmfile_entry_t *file)
 
             if (is_text_file(bun) && is_text_file(aun)) {
                 /* uncompressed files are text, use diff */
-                params.details = run_cmd(&exitcode, ri->worksubdir, ri->commands.diff, "-u", before_uncompressed_file, after_uncompressed_file, NULL);
+                params.details = get_file_delta(before_uncompressed_file, after_uncompressed_file);
 
                 /* clean up the diff headers */
-                if (exitcode) {
+                if (params.details) {
                     s = strreplace(params.details, before_uncompressed_file, file->peer_file->localpath);
                     free(params.details);
                     params.details = s;
@@ -355,7 +355,7 @@ static bool changedfiles_driver(struct rpminspect *ri, rpmfile_entry_t *file)
         }
 
         /* Now diff the mo content */
-        params.details = run_cmd(&exitcode, ri->worksubdir, ri->commands.diff, "-u", before_tmp, after_tmp, NULL);
+        params.details = get_file_delta(before_tmp, after_tmp);
 
         /* Remove the temporary files */
         if (unlink(before_tmp) == -1) {
@@ -366,7 +366,7 @@ static bool changedfiles_driver(struct rpminspect *ri, rpmfile_entry_t *file)
             warn("unlink");
         }
 
-        if (exitcode) {
+        if (params.details) {
             xasprintf(&params.msg, _("Message catalog %s changed content on %s"), file->localpath, arch);
             params.severity = RESULT_VERIFY;
             params.waiverauth = WAIVABLE_BY_ANYONE;
@@ -397,9 +397,9 @@ static bool changedfiles_driver(struct rpminspect *ri, rpmfile_entry_t *file)
 
     if (!strcmp(type, "text/x-c") && possible_header && (ri->tests & INSPECT_CHANGEDFILES)) {
         /* Now diff the header content */
-        errors = run_cmd(&exitcode, ri->worksubdir, ri->commands.diff, "-u", "-w", "--label", file->localpath, file->peer_file->fullpath, file->fullpath, NULL);
+        errors = get_file_delta(file->peer_file->fullpath, file->fullpath);
 
-        if (exitcode) {
+        if (errors) {
             /*
              * Skip the diff(1) header since the output from this
              * gives context.
@@ -425,11 +425,11 @@ static bool changedfiles_driver(struct rpminspect *ri, rpmfile_entry_t *file)
             }
 
             if (rebase) {
-                xasprintf(&params.msg, _("Public header file %s changed content on %s.  The output of `diff -uw` folloes."), file->localpath, arch);
+                xasprintf(&params.msg, _("Public header file %s changed content on %s.  A unified diff of the changes follows."), file->localpath, arch);
                 params.severity = RESULT_INFO;
                 params.waiverauth = NOT_WAIVABLE;
             } else {
-                xasprintf(&params.msg, _("Public header file %s changed content on %s.  Please make sure this does not change the ABI exported by this package.  The output of `diff -uw` follows."), file->localpath, arch);
+                xasprintf(&params.msg, _("Public header file %s changed content on %s.  Please make sure this does not change the ABI exported by this package.  A unified diff of the changes follows."), file->localpath, arch);
                 params.severity = RESULT_VERIFY;
                 params.waiverauth = WAIVABLE_BY_ANYONE;
             }

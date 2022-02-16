@@ -104,13 +104,15 @@ static bool doc_driver(struct rpminspect *ri, rpmfile_entry_t *file)
 
         if (exitcode) {
             /* the files differ, see if it's only whitespace changes */
-            diff_output = run_cmd(&exitcode, ri->worksubdir, ri->commands.diff, "-u", "-w", "-I^#.*", file->peer_file->fullpath, file->fullpath, NULL);
+            diff_output = get_file_delta(file->peer_file->fullpath, file->fullpath);
 
             /* always report content changes on %doc files as INFO */
             params.severity = RESULT_INFO;
             params.waiverauth = NOT_WAIVABLE;
 
-            xasprintf(&params.msg, _("%%doc file content change for %s in %s on %s%s\n"), file->localpath, name, arch, (exitcode == 0) ? _(" (comments/whitespace only)") : "");
+            if (diff_output) {
+                xasprintf(&params.msg, _("%%doc file content change for %s in %s on %s\n"), file->localpath, name, arch);
+            }
 
             /* only add the diff output for text content */
             if (strprefix(get_mime_type(file->peer_file), "text/") && strprefix(get_mime_type(file), "text/")) {

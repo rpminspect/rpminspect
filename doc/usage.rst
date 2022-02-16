@@ -444,10 +444,9 @@ run when in comparison mode.
     suspected security impact). Any gzip, bzip2, or xz compressed
     files will have their uncompressed content compared only, which
     will allow changes through in the compression level used. Message
-    catalog files (.mo) are unpacked and compared using
-    diff(1). Public C and C++ header files are preprocessed and
-    compared using diff(1). Any changes with diff output are included
-    in the results.
+    catalog files (.mo) are unpacked and compared.  Public C and C++
+    header files are preprocessed and compared. Any changes with
+    unified diff output are included in the results.
 
 - **movedfiles**
 

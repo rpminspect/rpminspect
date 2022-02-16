@@ -178,13 +178,6 @@
 #define MSGUNFMT_CMD "msgunfmt"
 
 /**
- * @def DIFF_CMD
- * Executable providing diff(1).  NOTE: This should be GNU diff or
- * 100% compatible.
- */
-#define DIFF_CMD "diff"
-
-/**
  * @def DIFFSTAT_CMD
  * Executable providing diffstat(1).
  */
