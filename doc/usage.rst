@@ -87,6 +87,10 @@ results reported are either at the **INFO** or **OK** level.  Anything
 that is **VERIFY** or **BAD** will trigger an exit code of 1
 indicating a failure.  The failure reporting threshold can be adjusted
 with the ``-t`` option.  The default failure threshold is **VERIFY**.
+The ``-s`` option allows you to specify a reporting level for results
+suppression.  That is, anything below the specified level will be
+suppressed in the output.  For example, ``-s VERIFY`` will suppress
+all results below the **VERIFY** level.
 
 The results also contain a value indicating who is the appropriate
 entity or party to waive a particular result.  This information can be
@@ -189,6 +193,7 @@ Options:
 -o FILE, --output=FILE   Write results to FILE (default: stdout)
 -F TYPE, --format=TYPE   Format output results as TYPE (default: text)
 -t TAG, --threshold=TAG  Result threshold triggering exit failure (default: **VERIFY**)
+-s TAG, --suppress=TAG   Results suppression threshold (default: off, report everything)
 -l, --list               List available tests and formats
 -w PATH, --workdir=PATH  Temporary directory to use (default: ``/var/tmp/rpminspect``)
 -f, --fetch-only         Fetch builds only, do not perform inspections (implies ``-k``)
@@ -196,7 +201,7 @@ Options:
 -d, --debug              Debugging mode output
 -D, --dump-config        Dump configuration settings used (in YAML_ format)
 -v, --verbose            Verbose inspection output when finished, display full path
---help                   Display usage information
+-?, --help               Display usage information
 -V, --version            Display program version
 
 See the ``rpminspect(1)`` man page for more information.
@@ -285,6 +290,15 @@ program.
     bytecode versions are exceeded. The bytecode version is vendor
     specific to releases and defined in the configuration file.
 
+- **addedfiles**
+
+    Report added files from the before build to the after
+    build. Debuginfo files are ignored as are files that match the
+    patterns defined in the configuration file. Files added to
+    security paths generate special reporting in case a security
+    review is required. New setuid and setgid files raise a security
+    warning unless the file is in the whitelist.
+
 - **ownership**
 
     Report files and directories owned by unexpected users and
@@ -310,12 +324,21 @@ program.
     between the before and after build. If no annocheck tests are
     defined in the configuration file, this inspection is skipped.
 
+- **permissions**
+
+    Report ``stat(2)`` mode changes between builds. Checks against the
+    fileinfo lists for the product release specified or
+    determined. Any setuid or setgid changes will raise a message
+    indicating a security team should review it.
+
 - **capabilities**
 
-    Report ``capabilities(7)`` changes between builds. Checks against the
-    capabilities list for the product release specified or determined. Any
-    capabilities changes not on the list will raise a message indicating a
-    security team should review the change.
+    Report ``capabilities(7)`` changes between builds. Checks against
+    the capabilities list for the product release specified or
+    determined. Any capabilities changes not on the list will raise a
+    message indicating a security team should review the change.  This
+    inspection is only present if rpminspect was built with libcap
+    support.
 
 - **pathmigration**
 
@@ -385,6 +408,22 @@ program.
     ``DT_RUNPATH`` are found in an ELF_ object, report it as a BAD result
     since that would be a linker error.
 
+- **unicode**
+
+    Scan extracted and patched source code files, scripts, and RPM_
+    spec files for any prohibited Unicode code points, as defined in
+    the configuration file.  Any prohibited code points are reported
+    as a possible security risk.
+
+- **rpmdeps**
+
+    Check for correct RPM_ dependency metadata.  Report incorrect or
+    conflicting findings as well as expected changes when comparing a
+    new build to an older build.  Changes are only reported when
+    comparing builds, but this inspection will check for correct RPM
+    dependency metadata when inspecting a single build and report
+    findings.
+
 **Comparison Mode**
 
 These inspections run when a before and after build are specified as
@@ -428,15 +467,6 @@ run when in comparison mode.
     security review is required. Source RPM_ packages and debuginfo
     files are ignored by this inspection.
 
-- **addedfiles**
-
-    Report added files from the before build to the after
-    build. Debuginfo files are ignored as are files that match the
-    patterns defined in the configuration file. Files added to
-    security paths generate special reporting in case a security
-    review is required. New setuid and setgid files raise a security
-    warning unless the file is in the whitelist.
-
 - **upstream**
 
     Report Source archives defined in the RPM_ spec file changing
@@ -457,20 +487,14 @@ run when in comparison mode.
     non-empty or non-empty files became empty, report those as results
     needing verification. Report file change percentages as info-only.
 
-- **permissions**
-
-    Report ``stat(2)`` mode changes between builds. Checks against the
-    fileinfo lists for the product release specified or
-    determined. Any setuid or setgid changes will raise a message
-    indicating a security team should review it.
-
 - **kmod**
 
     Report kernel module parameter, dependency, PCI ID, or symbol
     differences between builds. Added and removed parameters are
     reported and if the package version is unchanged, these messages
     are reported as failures. The same is true module dependencies,
-    PCI IDs, and symbols.
+    PCI IDs, and symbols. This inspection is only available is
+    rpminspect was built with libkmod support.
 
 - **arch**
 
