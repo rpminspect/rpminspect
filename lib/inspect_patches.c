@@ -219,42 +219,35 @@ static bool patches_driver(struct rpminspect *ri, rpmfile_entry_t *file)
      * This just reports patches that change content.  It uses the INFO reporting level.
      */
     if (comparison && file->peer_file) {
-        params.details = run_cmd(&exitcode, ri->worksubdir, ri->commands.diff, "-q", before_patch, after_patch, NULL);
-        free(params.details);
-        params.details = NULL;
+        params.details = get_file_delta(before_patch, after_patch);
 
-        if (exitcode) {
-            /* the files differ, see if it's only whitespace changes */
-            params.details = run_cmd(&exitcode, ri->worksubdir, ri->commands.diff, "-u", "-w", "-I^#.*", before_patch, after_patch, NULL);
+        if (params.details) {
+            /* more than whitespace changed */
+            oldsize = file->peer_file->st.st_size;
+            newsize = file->st.st_size;
+            xasprintf(&params.msg, _("%s changed (%ld bytes -> %ld bytes)"), file->localpath, oldsize, newsize);
+            params.severity = RESULT_INFO;
+            params.waiverauth = NOT_WAIVABLE;
+            params.verb = VERB_CHANGED;
+            params.noun = _("patch file ${FILE}");
 
-            if (exitcode) {
-                /* more than whitespace changed */
-                oldsize = file->peer_file->st.st_size;
-                newsize = file->st.st_size;
-                xasprintf(&params.msg, _("%s changed (%ld bytes -> %ld bytes)"), file->localpath, oldsize, newsize);
-                params.severity = RESULT_INFO;
-                params.waiverauth = NOT_WAIVABLE;
-                params.verb = VERB_CHANGED;
-                params.noun = _("patch file ${FILE}");
+            /* use friendly names for the files in the diff(1) details */
+            details = strreplace(params.details, before_patch, file->peer_file->localpath);
+            assert(details != NULL);
+            free(params.details);
+            params.details = strreplace(details, after_patch, file->localpath);
+            free(details);
+            assert(params.details != NULL);
 
-                /* use friendly names for the files in the diff(1) details */
-                details = strreplace(params.details, before_patch, file->peer_file->localpath);
-                assert(details != NULL);
-                free(params.details);
-                params.details = strreplace(details, after_patch, file->localpath);
-                free(details);
-                assert(params.details != NULL);
+            /* report the findings */
+            add_result(ri, &params);
+            free(params.details);
+            free(params.msg);
+            params.details = NULL;
+            params.msg = NULL;
 
-                /* report the findings */
-                add_result(ri, &params);
-                free(params.details);
-                free(params.msg);
-                params.details = NULL;
-                params.msg = NULL;
-
-                reported = true;
-                result = true;
-            }
+            reported = true;
+            result = true;
         }
     } else if (comparison && file->peer_file == NULL) {
         xasprintf(&params.msg, _("New patch file `%s` appeared"), params.file);

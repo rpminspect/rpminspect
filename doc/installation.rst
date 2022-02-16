@@ -64,13 +64,13 @@ there are a number of userspace programs used:
 +--------------------------------+-----------+---------------------------------------------------------------+
 | /usr/bin/msgunfmt              | **Yes**   | https://www.gnu.org/software/gettext/                         |
 +--------------------------------+-----------+---------------------------------------------------------------+
-| /usr/bin/diff                  | **Yes**   | https://www.gnu.org/software/diffutils/                       |
-+--------------------------------+-----------+---------------------------------------------------------------+
 | /usr/bin/abidiff               | No        | https://sourceware.org/libabigail/                            |
 +--------------------------------+-----------+---------------------------------------------------------------+
 | /usr/bin/kmidiff               | No        | https://sourceware.org/libabigail/                            |
 +--------------------------------+-----------+---------------------------------------------------------------+
 | /usr/bin/annocheck             | No        | https://sourceware.org/git/annobin.git                        |
++--------------------------------+-----------+---------------------------------------------------------------+
+| /usr/bin/diffstat              | No        | https://invisible-island.net/diffstat/                        |
 +--------------------------------+-----------+---------------------------------------------------------------+
 
 The provided RPM_ spec file template uses the `Fedora Linux
@@ -82,7 +82,7 @@ tools. If they are available, you should use those packages.
 In `Fedora Linux <https://getfedora.org>`_, for example, you can run
 the following to install these programs::
 
-    dnf install desktop-file-utils gettext diffutils libabigail /usr/bin/annocheck
+    dnf install desktop-file-utils gettext diffstat libabigail /usr/bin/annocheck
 
 The *shellsyntax* inspection uses the actual shell programs listed in
 the shells setting in the rpminspect_ configuration file.  Since this

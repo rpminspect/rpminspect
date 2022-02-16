@@ -22,6 +22,7 @@ librpminspect_sources = [
     'checksums.c',
     'copyfile.c',
     'debug.c',
+    'delta.c',
     'deprules.c',
     'diags.c',
     'filecmp.c',
@@ -122,6 +123,7 @@ deps = [
     dl,
     icu_uc,
     icu_io,
+    libxdiff,
 ]
 
 if get_option('with_libkmod')

@@ -129,10 +129,6 @@ void dump_cfg(const struct rpminspect *ri)
 
     printf("commands:\n");
 
-    if (ri->commands.diff) {
-        printf("    diff: %s\n", ri->commands.diff);
-    }
-
     if (ri->commands.diffstat) {
         printf("    diffstat: %s\n", ri->commands.diffstat);
     }

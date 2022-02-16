@@ -33,6 +33,7 @@ yaml = dependency('yaml-0.1', required : true)
 clamav = dependency('libclamav', required : true)
 icu_uc = dependency('icu-uc', required : true)
 icu_io = dependency('icu-io', required : true)
+libxdiff = dependency('libxdiff', required : true)
 
 # libkmod
 if get_option('with_libkmod')

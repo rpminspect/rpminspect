@@ -125,6 +125,7 @@ meson and ninja, plus the following libraries:
 | [curl](https://curl.se/) | :heavy_check_mark: | | [MIT](https://spdx.org/licenses/MIT.html) |
 | [ClamAV](https://www.clamav.net/) | :heavy_check_mark: | | [GPL-2.0-only](https://spdx.org/licenses/GPL-2.0-only.html) |
 | [gettext](https://www.gnu.org/software/gettext/) | | .po to .mo | [GPL-3.0-or-later](https://spdx.org/licenses/GPL-3.0-or-later.html) |
+| [libxdiff](https://github.com/spotrh/libxdiff) | :heavy_check_mark: | | [LGPL-2.1-or-later](https://spdx.org/licenses/LGPL-2.1-or-later.html) |
 
 Additionally, the unit test suite requires the following packages:
 
@@ -146,10 +147,10 @@ there are a number of userspace programs used:
 
     /usr/bin/desktop-file-validate [optional]
     /usr/bin/msgunfmt
-    /usr/bin/diff
     /usr/bin/abidiff [optional]
     /usr/bin/kmidiff [optional]
     /usr/bin/annocheck [optional]
+    /usr/bin/diffstat
 
 The provided spec file template uses the Fedora locations for these
 files, but in the program, they must be on the runtime system.
@@ -160,7 +161,7 @@ packages.
 In Fedora, for example, you can run the following to install these
 programs:
 
-    yum install desktop-file-utils gettext diffutils libabigail /usr/bin/annocheck
+    yum install desktop-file-utils gettext diffstat libabigail /usr/bin/annocheck
 
 The 'shellsyntax' inspection uses the actual shell programs listed in
 the shells setting in the rpminspect configuration file.  Since this

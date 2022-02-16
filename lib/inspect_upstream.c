@@ -62,7 +62,6 @@ static bool upstream_driver(struct rpminspect *ri, rpmfile_entry_t *file)
     char *after_sum = NULL;
     char *diff_output = NULL;
     char *diff_head = NULL;
-    int exitcode;
 
     /* If we are not looking at a Source file, bail. */
     if (!is_source(file)) {
@@ -88,7 +87,7 @@ static bool upstream_driver(struct rpminspect *ri, rpmfile_entry_t *file)
         if (strcmp(before_sum, after_sum)) {
             /* capture 'diff -u' output for text files */
             if (is_text_file(file->peer_file) && is_text_file(file)) {
-                diff_head = diff_output = run_cmd(&exitcode, ri->worksubdir, ri->commands.diff, "-u", file->peer_file->fullpath, file->fullpath, NULL);
+                diff_head = diff_output = get_file_delta(file->peer_file->fullpath, file->fullpath);
 
                 /* skip the two leading lines */
                 if (strprefix(diff_head, "--- ")) {
