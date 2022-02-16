@@ -97,17 +97,55 @@ static int fill_mmfile(mmfile_t *mf, const char *file)
 
 static int delta_out(__attribute__((unused)) void *priv, mmbuffer_t *mb, int nbuf)
 {
-    int i;
+    int i = 0;
+    int r = 0;
+    char *prefix = NULL;
     string_entry_t *entry = NULL;
 
     for (i = 0; i < nbuf; i++) {
+        /* single byte entries are the +/-/' ' prefix */
+        if (mb[i].size == 1 && (mb[i].ptr[0] == ' ' || mb[i].ptr[0] == '+' || mb[i].ptr[0] == '-')) {
+            switch (mb[i].ptr[0]) {
+                case ' ':
+                    prefix = " ";
+                    break;
+                case '+':
+                    prefix = "+";
+                    break;
+                case '-':
+                    prefix = "-";
+                    break;
+            }
+
+            continue;
+        }
+
+        /* capture the line */
         entry = calloc(1, sizeof(*entry));
         assert(entry != NULL);
 
-        entry->data = calloc(1, mb[i].size + 1);
+        if (prefix) {
+            entry->data = calloc(1, mb[i].size + strlen(prefix) + 1);
+        } else {
+            entry->data = calloc(1, mb[i].size + 1);
+        }
+
         assert(entry->data != NULL);
 
-        if (snprintf(entry->data, mb[i].size, "%s", mb[i].ptr) < 0) {
+        if (mb[i].size > 1) {
+            if (prefix) {
+                r = snprintf(entry->data, mb[i].size + 1, "%s%s", prefix, mb[i].ptr);
+            } else {
+                r = snprintf(entry->data, mb[i].size + 1, "%s", mb[i].ptr);
+            }
+        } else {
+            free(entry->data);
+            entry->data = strdup("");
+            assert(entry->data != NULL);
+        }
+
+        if (r < 0) {
+            warn("snprintf");
             free(entry->data);
             free(entry);
             return -1;
@@ -115,8 +153,8 @@ static int delta_out(__attribute__((unused)) void *priv, mmbuffer_t *mb, int nbu
 
         entry->data[strcspn(entry->data, "\n")] = '\0';
         entry->data = realloc(entry->data, strlen(entry->data) + 1);
-
         TAILQ_INSERT_TAIL(list, entry, items);
+        prefix = NULL;
     }
 
     return 0;
