@@ -499,32 +499,36 @@ static bool expected_deprule_change(const bool rebase, const deprule_entry_t *de
     }
 
     /* deprule version strings are a combo of the version-release or epoch:version-release */
-    if (!found) {
-        /* use the main package vr and evr */
-        if ((pkg_epoch > 0) && pkg_evr && !strcmp(deprule->version, pkg_evr)) {
-            r = true;
-        } else if (pkg_vr && !strcmp(deprule->version, pkg_vr)) {
-            r = true;
-        }
-    } else {
-        /* check against the subpackage match we found */
-        version = headerGetString(peer->after_hdr, RPMTAG_VERSION);
-        release = headerGetString(peer->after_hdr, RPMTAG_RELEASE);
-        epoch = headerGetNumber(peer->after_hdr, RPMTAG_EPOCH);
-        xasprintf(&vr, "%s-%s", version, release);
-        xasprintf(&evr, "%ju:%s-%s", epoch, version, release);
-
-        /* determine if this is expected */
-        if (deprule->version) {
-            if ((epoch > 0) && evr && !strcmp(deprule->version, evr)) {
+    if (deprule->version) {
+        if (!found) {
+            /* use the main package vr and evr */
+            if ((pkg_epoch > 0) && pkg_evr && !strcmp(deprule->version, pkg_evr)) {
                 r = true;
-            } else if (vr && !strcmp(deprule->version, vr)) {
+            } else if (pkg_vr && !strcmp(deprule->version, pkg_vr)) {
                 r = true;
             }
-        }
+        } else {
+            /* check against the subpackage match we found */
+            version = headerGetString(peer->after_hdr, RPMTAG_VERSION);
+            release = headerGetString(peer->after_hdr, RPMTAG_RELEASE);
+            epoch = headerGetNumber(peer->after_hdr, RPMTAG_EPOCH);
+            xasprintf(&vr, "%s-%s", version, release);
+            xasprintf(&evr, "%ju:%s-%s", epoch, version, release);
 
-        free(vr);
-        free(evr);
+            /* determine if this is expected */
+            if (deprule->version) {
+                if ((epoch > 0) && evr && !strcmp(deprule->version, evr)) {
+                    r = true;
+                } else if (vr && !strcmp(deprule->version, vr)) {
+                    r = true;
+                }
+            }
+
+            free(vr);
+            free(evr);
+        }
+    } else if (deprule->version == NULL && found) {
+        r = true;
     }
 
     free(req);
