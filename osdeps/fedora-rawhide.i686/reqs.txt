@@ -33,7 +33,6 @@ libcurl-devel.i686
 libffi-devel.i686
 libicu-devel.i686
 libmandoc-devel.i686
-libxdiff-devel.i686
 libxml2-devel.i686
 libyaml-devel.i686
 make
