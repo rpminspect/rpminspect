@@ -29,7 +29,7 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <fcntl.h>
-#include <xdiff.h>
+#include "xdiff.h"
 #include "rpminspect.h"
 
 static string_list_t *list = NULL;

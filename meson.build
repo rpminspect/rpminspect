@@ -33,7 +33,6 @@ yaml = dependency('yaml-0.1', required : true)
 clamav = dependency('libclamav', required : true)
 icu_uc = dependency('icu-uc', required : true)
 icu_io = dependency('icu-io', required : true)
-libxdiff = dependency('libxdiff', required : true)
 
 # libkmod
 if get_option('with_libkmod')
@@ -213,8 +212,10 @@ endif
 
 # Header files for builds
 inc = include_directories('include')
+incxdiff = include_directories('libxdiff')
 
 # Include all of the relevant subdirectories of the source tree
+subdir('libxdiff')
 subdir('lib')
 subdir('src')
 subdir('include')

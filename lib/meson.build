@@ -123,7 +123,6 @@ deps = [
     dl,
     icu_uc,
     icu_io,
-    libxdiff,
 ]
 
 if get_option('with_libkmod')
@@ -139,8 +138,9 @@ endif
 librpminspect = library(
     'rpminspect',
     librpminspect_sources,
-    include_directories : inc,
+    include_directories : [ inc, incxdiff ],
     version : '0.5.0',
     install : true,
+    link_with : [ libxdiff, ],
     dependencies : deps
 )
