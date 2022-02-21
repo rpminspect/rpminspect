@@ -71,7 +71,7 @@ static int fill_mmfile(mmfile_t *mf, const char *file)
         retval = read(fd, buf, size);
 
         if (retval < 0) {
-            if (errno = EINTR || errno == EAGAIN) {
+            if (errno == EINTR || errno == EAGAIN) {
                 continue;
             }
 
