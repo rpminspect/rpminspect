@@ -6,7 +6,6 @@ curl
 dash
 desktop-file-utils
 diffstat
-diffutils
 elfutils-devel
 gcc
 gettext-devel

@@ -32,7 +32,6 @@ cargo
 dash
 desktop-file-utils
 diffstat
-diffutils
 elfutils-devel
 file-devel
 gcc
