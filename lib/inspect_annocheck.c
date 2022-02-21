@@ -31,7 +31,7 @@
  * this inspection.  By default we will report at the RESULT_INFO
  * level but still capture annocheck output.
  */
-static severity_t annocheck_failure_severity = RESULT_INFO;
+static severity_t annocheck_failure_severity = RESULT_VERIFY;
 
 /* Trim workdir substrings from a generated string. */
 static char *trim_workdir(const rpmfile_entry_t *file, char *s)
