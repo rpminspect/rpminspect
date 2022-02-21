@@ -5,7 +5,6 @@ clamav-db
 dash
 desktop-file-utils
 diffstat
-diffutils
 gettext-devel
 git
 glibc-devel

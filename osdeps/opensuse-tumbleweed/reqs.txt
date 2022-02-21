@@ -9,7 +9,6 @@ cunit-devel
 curl
 desktop-file-utils
 diffstat
-diffutils
 file-devel
 gcc
 gcc-32bit
