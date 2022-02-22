@@ -486,6 +486,26 @@ specname:
     #    - /usr/lib*/libexample.so*
 
 annocheck:
+    # Reporting severity for annocheck(1) failures.  By default,
+    # rpminspect will report annocheck(1) failures as a VERIFY result
+    # but you can change this to any valid rpminspect result type.
+    # The valid choices are:
+    #     OK
+    #     INFO
+    #     VERIFY
+    #     BAD
+    #     SKIP
+    # The result codes are primarily for use by systems integrating
+    # rpminspect and process the results output, but the result
+    # reporting level also determines what causes rpminspect to exit
+    # non-zero or not.  By default, any result of VERIFY or higher
+    # will cause a non-zero exit of rpminspect which indicates it
+    # found an failure in one of the inspections.  The OK and INFO
+    # levels will still report the findings but not trigger a non-zero
+    # exit.  The SKIP result code will skip displaying the results in
+    # the output.
+    failure_severity: VERIFY
+
     # annocheck(1) tests to run.  The left side of the colon is the
     # test name you want to use and the right side are the arguments
     # to the annocheck executable before giving it the full path to
@@ -493,7 +513,11 @@ annocheck:
     #
     # This section is optional.  If no annocheck tests are defined
     # here, rpminspect will skip the annocheck inspection.
-    - hardened: --ignore-unknown --verbose
+    #
+    # These job entries may be listed here or under a block named
+    # 'jobs:' if you prefer.
+    jobs:
+        - hardened: --ignore-unknown --verbose
 
     # Optional list of glob(7) specifications to match files to ignore
     # for this inspection.  The format of this list is the same as the

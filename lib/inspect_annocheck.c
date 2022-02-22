@@ -26,13 +26,6 @@
 
 #include "rpminspect.h"
 
-/*
- * Set this to RESULT_VERIFY to pass through annocheck failures up to
- * this inspection.  By default we will report at the RESULT_INFO
- * level but still capture annocheck output.
- */
-static severity_t annocheck_failure_severity = RESULT_VERIFY;
-
 /* Trim workdir substrings from a generated string. */
 static char *trim_workdir(const rpmfile_entry_t *file, char *s)
 {
@@ -163,12 +156,12 @@ static bool annocheck_driver(struct rpminspect *ri, rpmfile_entry_t *file)
                 xasprintf(&params.msg, _("annocheck '%s' test now passes for %s on %s"), hentry->key, file->localpath, arch);
             } else if (before_exit == 0 && after_exit) {
                 xasprintf(&params.msg, _("annocheck '%s' test now fails for %s on %s"), hentry->key, file->localpath, arch);
-                params.severity = annocheck_failure_severity;
+                params.severity = ri->annocheck_failure_severity;
                 params.verb = VERB_CHANGED;
                 result = false;
             } else if (after_exit) {
                 xasprintf(&params.msg, _("annocheck '%s' test fails for %s on %s"), hentry->key, file->localpath, arch);
-                params.severity = annocheck_failure_severity;
+                params.severity = ri->annocheck_failure_severity;
                 params.verb = VERB_CHANGED;
                 result = false;
             }
@@ -177,7 +170,7 @@ static bool annocheck_driver(struct rpminspect *ri, rpmfile_entry_t *file)
                 xasprintf(&params.msg, _("annocheck '%s' test passes for %s on %s"), hentry->key, file->localpath, arch);
             } else if (after_exit) {
                 xasprintf(&params.msg, _("annocheck '%s' test fails for %s on %s"), hentry->key, file->localpath, arch);
-                params.severity = annocheck_failure_severity;
+                params.severity = ri->annocheck_failure_severity;
                 params.verb = VERB_CHANGED;
                 result = false;
             }

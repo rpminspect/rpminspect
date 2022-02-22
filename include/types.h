@@ -551,6 +551,7 @@ struct rpminspect {
 
     /* hash table of annocheck tests */
     string_map_t *annocheck;
+    severity_t annocheck_failure_severity;
 
     /* hash table of path migrations */
     string_map_t *pathmigration;

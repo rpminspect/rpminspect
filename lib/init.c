@@ -1110,7 +1110,16 @@ static int read_cfgfile(struct rpminspect *ri, const char *filename)
                             }
                         }
                     } else if (group == BLOCK_ANNOCHECK) {
-                        process_table(key, t, &ri->annocheck);
+                        if (!strcmp(key, "failure_severity")) {
+                            ri->annocheck_failure_severity = getseverity(t, RESULT_NULL);
+
+                            if (ri->annocheck_failure_severity == RESULT_NULL) {
+                                warnx(_("Invalid annocheck failure_reporting_level: %s, defaulting to %s."), t, strseverity(RESULT_VERIFY));
+                                ri->annocheck_failure_severity = RESULT_VERIFY;
+                            }
+                        } else {
+                            process_table(key, t, &ri->annocheck);
+                        }
                     } else if (group == BLOCK_JAVABYTECODE) {
                         process_table(key, t, &ri->jvm);
                     } else if (group == BLOCK_MIGRATED_PATHS) {
@@ -2033,6 +2042,7 @@ struct rpminspect *init_rpminspect(struct rpminspect *ri, const char *cfgfile, c
         ri->kmidiff_debuginfo_path = strdup(DEBUG_PATH);
         ri->patch_file_threshold = DEFAULT_PATCH_FILE_THRESHOLD;
         ri->patch_line_threshold = DEFAULT_PATCH_LINE_THRESHOLD;
+        ri->annocheck_failure_severity = RESULT_VERIFY;
 
         /* Initialize commands */
         ri->commands.diffstat = strdup(DIFFSTAT_CMD);
