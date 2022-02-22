@@ -1373,8 +1373,11 @@ bool init_fileinfo(struct rpminspect *ri)
     }
 
     /* the actual fileinfo file */
-    xasprintf(&ri->fileinfo_filename, "%s/%s/%s", ri->vendor_data_dir, FILEINFO_DIR, ri->product_release);
-    assert(ri->fileinfo_filename != NULL);
+    if (ri->fileinfo_filename == NULL) {
+        xasprintf(&ri->fileinfo_filename, "%s/%s/%s", ri->vendor_data_dir, FILEINFO_DIR, ri->product_release);
+        assert(ri->fileinfo_filename != NULL);
+    }
+
     contents = read_file(ri->fileinfo_filename);
 
     if (contents == NULL) {
@@ -1486,8 +1489,11 @@ bool init_caps(struct rpminspect *ri)
     }
 
     /* the actual caps list file */
-    xasprintf(&ri->caps_filename, "%s/%s/%s", ri->vendor_data_dir, CAPABILITIES_DIR, ri->product_release);
-    assert(ri->caps_filename != NULL);
+    if (ri->caps_filename == NULL) {
+        xasprintf(&ri->caps_filename, "%s/%s/%s", ri->vendor_data_dir, CAPABILITIES_DIR, ri->product_release);
+        assert(ri->caps_filename != NULL);
+    }
+
     contents = read_file(ri->caps_filename);
 
     if (contents == NULL) {
@@ -1591,8 +1597,11 @@ bool init_rebaseable(struct rpminspect *ri)
     }
 
     /* the actual rebaseable list file */
-    xasprintf(&ri->rebaseable_filename, "%s/%s/%s", ri->vendor_data_dir, REBASEABLE_DIR, ri->product_release);
-    assert(ri->rebaseable_filename != NULL);
+    if (ri->rebaseable_filename == NULL) {
+        xasprintf(&ri->rebaseable_filename, "%s/%s/%s", ri->vendor_data_dir, REBASEABLE_DIR, ri->product_release);
+        assert(ri->rebaseable_filename != NULL);
+    }
+
     contents = read_file(ri->rebaseable_filename);
 
     if (contents == NULL) {
