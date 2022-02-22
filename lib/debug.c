@@ -473,6 +473,8 @@ void dump_cfg(const struct rpminspect *ri)
 
     if (ri->annocheck || mapentry != NULL) {
         printf("annocheck:\n");
+        printf("    failure_severity: %s\n", strseverity(ri->annocheck_failure_severity));
+        printf("    jobs:\n");
 
         HASH_ITER(hh, ri->annocheck, hentry, tmp_hentry) {
             printf("    - %s: %s\n", hentry->key, hentry->value);
