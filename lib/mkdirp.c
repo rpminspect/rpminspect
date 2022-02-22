@@ -29,7 +29,8 @@
 #include <unistd.h>
 #include "rpminspect.h"
 
-int mkdirp(const char *path, mode_t mode) {
+int mkdirp(const char *path, mode_t mode)
+{
     int r = 0;
     char *p = NULL;
     char *start = NULL;
@@ -37,6 +38,13 @@ int mkdirp(const char *path, mode_t mode) {
     struct stat sb;
 
     assert(path != NULL);
+
+    /* exit if path exists */
+    r = stat(path, &sb);
+
+    if (r == 0 && S_ISDIR(sb.st_mode)) {
+        return 0;
+    }
 
     /* handle relative vs. explicit paths, we want explicit */
     if (*path == '/') {
