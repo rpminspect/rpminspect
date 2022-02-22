@@ -31,10 +31,6 @@ koji:
 commands:
     # External helper commands used by rpminspect.  Defaults are noted.
 
-    # diff(1) command, must support -u, -w, and -I options as defined
-    # in GNU diff.
-    #diff: /usr/bin/diff
-
     # diffstat(1) command.
     # https://invisible-island.net/diffstat/
     #diffstat: /usr/bin/diffstat
