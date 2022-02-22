@@ -31,23 +31,33 @@
 /* Local prototypes */
 static int rmtree_entry(const char *, const struct stat *, int, struct FTW *);
 
+static bool contents_only = false;
+
 static int rmtree_entry(const char *fpath, __attribute__((unused)) const struct stat *sb,
                         __attribute__((unused)) int tflag, __attribute__((unused)) struct FTW *ftwbuf)
 {
+    int r = 0;
+
     assert(fpath != NULL);
-    return remove(fpath);
+
+    if ((contents_only && ftwbuf->level != 0) || !contents_only) {
+        r = remove(fpath);
+    }
+
+    return r;
 }
 
 /* Remove specified tree, ignoring errors if specified. */
 int rmtree(const char *path, const bool ignore_errors, const bool contentsonly)
 {
     struct stat sb;
-    int status = 0;
     int flags = FTW_DEPTH | FTW_MOUNT | FTW_PHYS;
 
     if (path == NULL) {
         return 0;
     }
+
+    contents_only = contentsonly;
 
     if (stat(path, &sb) == -1) {
         if (ignore_errors) {
@@ -67,11 +77,5 @@ int rmtree(const char *path, const bool ignore_errors, const bool contentsonly)
         }
     }
 
-    status = nftw(path, rmtree_entry, FOPEN_MAX, flags);
-
-    if (contentsonly) {
-        return status;
-    } else {
-        return (status && rmdir(path));
-    }
+    return nftw(path, rmtree_entry, FOPEN_MAX, flags);
 }

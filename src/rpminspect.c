@@ -28,7 +28,7 @@
 #include <signal.h>
 #include <unistd.h>
 #include <limits.h>
-#include <glob.h>
+#include <wordexp.h>
 #include <regex.h>
 #include <zlib.h>
 #include <magic.h>
@@ -298,7 +298,8 @@ int main(int argc, char **argv)
     int j = 0;
     int idx = 0;
     int ret = RI_INSPECTION_SUCCESS;
-    glob_t expand;
+    wordexp_t expand;
+    struct stat sb;
     char *short_options = "c:p:T:E:a:r:no:F:lw:t:s:fkdDv\?V";
     struct option long_options[] = {
         { "config", required_argument, 0, 'c' },
@@ -447,22 +448,20 @@ int main(int argc, char **argv)
                 list = true;
                 break;
             case 'w':
-                if (index(optarg, '~')) {
-                    /* allow for ~ expansion */
-                    j = glob(optarg, GLOB_TILDE_CHECK, NULL, &expand);
+                /* allow for ~ expansion and other shell stuff */
+                j = wordexp(optarg, &expand, 0);
 
-                    if (j == 0 && expand.gl_pathc == 1) {
-                        workdir = strdup(expand.gl_pathv[0]);
-                    } else {
-                        errx(RI_PROGRAM_ERROR, _("*** Unable to expand workdir: `%s`"), optarg);
-                    }
-
-                    globfree(&expand);
-                } else {
-                    /* canonicalize the path specified if it exists */
-                    workdir = realpath(optarg, NULL);
+                if (j != 0 || expand.we_wordc != 1) {
+                    errx(RI_PROGRAM_ERROR, _("*** Unable to expand workdir: `%s`"), optarg);
                 }
 
+                if (stat(expand.we_wordv[0], &sb) == 0) {
+                    workdir = realpath(expand.we_wordv[0], NULL);
+                } else {
+                    workdir = strdup(expand.we_wordv[0]);
+                }
+
+                wordfree(&expand);
                 break;
             case 't':
                 threshold = strdup(optarg);
