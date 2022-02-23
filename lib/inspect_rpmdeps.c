@@ -121,6 +121,8 @@ static bool check_explicit_lib_deps(struct rpminspect *ri, Header h, deprule_lis
     char *working_isaprov = NULL;
     char *multiples = NULL;
     char *r = NULL;
+    char *vr = NULL;
+    char *evr = NULL;
     char *noun = NULL;
     const char *pn = NULL;
     const char *pv = NULL;
@@ -237,13 +239,11 @@ static bool check_explicit_lib_deps(struct rpminspect *ri, Header h, deprule_lis
             /* the version-release or epoch:version-release string */
             epoch = headerGetNumber(potential_prov->after_hdr, RPMTAG_EPOCH);
 
-            if (epoch > 0) {
-                xasprintf(&r, "%ju:%s-%s", epoch, pv, pr);
-            } else {
-                xasprintf(&r, "%s-%s", pv, pr);
-            }
+            xasprintf(&evr, "%ju:%s-%s", epoch, pv, pr);
+            assert(evr != NULL);
 
-            assert(r != NULL);
+            xasprintf(&vr, "%s-%s", pv, pr);
+            assert(vr != NULL);
 
             TAILQ_FOREACH(verify, after_deps, items) {
                 /* look only at explicit deps right now */
@@ -262,7 +262,7 @@ static bool check_explicit_lib_deps(struct rpminspect *ri, Header h, deprule_lis
 
                 working_isareq[strcspn(working_isareq, "(")] = '\0';
 
-                if (!strcmp(working_isareq, pn) && verify->operator == OP_EQUAL && !strcmp(verify->version, r)) {
+                if (!strcmp(working_isareq, pn) && verify->operator == OP_EQUAL && (!strcmp(verify->version, evr) || !strcmp(verify->version, vr))) {
                     found = true;
                 }
 
@@ -278,7 +278,8 @@ static bool check_explicit_lib_deps(struct rpminspect *ri, Header h, deprule_lis
                 found = true;
             }
 
-            free(r);
+            free(evr);
+            free(vr);
         }
 
         /* report missing explicit package requires */
@@ -502,9 +503,7 @@ static bool expected_deprule_change(const bool rebase, const deprule_entry_t *de
     if (deprule->version) {
         if (!found) {
             /* use the main package vr and evr */
-            if ((pkg_epoch > 0) && pkg_evr && !strcmp(deprule->version, pkg_evr)) {
-                r = true;
-            } else if (pkg_vr && !strcmp(deprule->version, pkg_vr)) {
+            if ((pkg_evr && !strcmp(deprule->version, pkg_evr)) || (pkg_vr && !strcmp(deprule->version, pkg_vr))) {
                 r = true;
             }
         } else {
@@ -512,16 +511,16 @@ static bool expected_deprule_change(const bool rebase, const deprule_entry_t *de
             version = headerGetString(peer->after_hdr, RPMTAG_VERSION);
             release = headerGetString(peer->after_hdr, RPMTAG_RELEASE);
             epoch = headerGetNumber(peer->after_hdr, RPMTAG_EPOCH);
+
             xasprintf(&vr, "%s-%s", version, release);
+            assert(vr != NULL);
+
             xasprintf(&evr, "%ju:%s-%s", epoch, version, release);
+            assert(evr != NULL);
 
             /* determine if this is expected */
-            if (deprule->version) {
-                if ((epoch > 0) && evr && !strcmp(deprule->version, evr)) {
-                    r = true;
-                } else if (vr && !strcmp(deprule->version, vr)) {
-                    r = true;
-                }
+            if (deprule->version && ((evr && !strcmp(deprule->version, evr)) || (vr && !strcmp(deprule->version, vr)))) {
+                r = true;
             }
 
             free(vr);
