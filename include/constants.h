@@ -478,4 +478,9 @@
 #define SHARED_LIB_PREFIX "lib"
 #define SHARED_LIB_SUFFIX ".so"
 
+/*
+ * Fallback tty width if TIOCGWINSZ fails.
+ */
+#define DEFAULT_TTY_WIDTH 80
+
 #endif
