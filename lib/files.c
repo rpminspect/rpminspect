@@ -435,7 +435,10 @@ static void set_peer(rpmfile_entry_t *file, struct file_data *fentry)
     fentry->rpmfile = NULL;
 
     file->peer_file = peer;
-    peer->peer_file = file;
+
+    if (peer) {
+        peer->peer_file = file;
+    }
 
     return;
 }
