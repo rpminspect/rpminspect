@@ -457,6 +457,7 @@ struct rpminspect {
     bool security_initialized;
     string_list_t *icons;
     char *icons_filename;
+    bool librpm_initialized;
 
     /* Koji information (from config file) */
     char *kojihub;             /* URL of Koji hub */

@@ -30,18 +30,20 @@
 #include "rpminspect.h"
 
 /* Initialize librpm if needed */
-int init_librpm(void)
+int init_librpm(struct rpminspect *ri)
 {
     int result;
-    static bool initialized = false;
 
-    if (initialized) {
+    assert(ri != NULL);
+
+    if (ri->librpm_initialized) {
         return RPMRC_OK;
     }
 
     result = rpmReadConfigFiles(NULL, NULL);
+
     if (result == RPMRC_OK) {
-        initialized = true;
+        ri->librpm_initialized = true;
     }
 
     return result;

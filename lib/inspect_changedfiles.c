@@ -101,7 +101,7 @@ static bool changedfiles_driver(struct rpminspect *ri, rpmfile_entry_t *file)
     char *errors = NULL;
     char *short_errors = NULL;
     char *skip_line = NULL;
-    int exitcode;
+    int exitcode = 0;
     bool possible_header = false;
     string_entry_t *entry = NULL;
     char *before_tmp = NULL;

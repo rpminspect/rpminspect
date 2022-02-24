@@ -218,7 +218,7 @@ bool has_bad_word(const char *, const string_list_t *);
 int copyfile(const char *, const char *, bool, bool);
 
 /* rpm.c */
-int init_librpm(void);
+int init_librpm(struct rpminspect *ri);
 Header get_rpm_header(struct rpminspect *, const char *);
 char *get_rpmtag_str(Header, rpmTagVal);
 char *get_nevr(Header);

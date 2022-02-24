@@ -230,24 +230,14 @@ static char *get_product_release(string_map_t *products, const favor_release_t f
         c = strverscmp(before_product, after_product);
         matched = true;
 
-        if (favor_release == FAVOR_OLDEST) {
-            if (c <= 0) {
-                free(after_product);
-                after_product = before_product;
-                before_product = NULL;
-            } else {
-                free(before_product);
-                before_product = NULL;
-            }
-        } else if (favor_release == FAVOR_NEWEST) {
-            if (c >= 0) {
-                free(after_product);
-                after_product = before_product;
-                before_product = NULL;
-            } else {
-                free(before_product);
-                before_product = NULL;
-            }
+        if (favor_release == FAVOR_OLDEST && c <= 0) {
+            free(after_product);
+            after_product = before_product;
+            before_product = NULL;
+        } else if (favor_release == FAVOR_NEWEST && c >= 0) {
+            free(after_product);
+            after_product = before_product;
+            before_product = NULL;
         }
     }
 
@@ -256,6 +246,8 @@ static char *get_product_release(string_map_t *products, const favor_release_t f
         warnx(_("*** See the 'favor_release' setting in the rpminspect configuration file."));
         after_product = NULL;
     }
+
+    free(before_product);
 
     return after_product;
 }
@@ -661,7 +653,7 @@ int main(int argc, char **argv)
     }
 
     /* initialize librpm, we'll be using it */
-    if (init_librpm() != RPMRC_OK) {
+    if (init_librpm(ri) != RPMRC_OK) {
         errx(RI_PROGRAM_ERROR, _("*** unable to read RPM configuration"));
     }
 
