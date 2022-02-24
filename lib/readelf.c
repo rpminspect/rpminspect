@@ -589,6 +589,7 @@ char *get_elf_soname(const char *filepath) {
         soname = strdup(elf_strptr(e, shdr.sh_link, (size_t) tags[0].d_un.d_ptr));
     }
 
+    free(tags);
     elf_end(e);
     close(fd);
     return soname;

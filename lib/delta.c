@@ -36,11 +36,11 @@ static string_list_t *list = NULL;
 
 static int fill_mmfile(mmfile_t *mf, const char *file)
 {
-    int fd;
+    int fd = 0;
     struct stat sb;
     char *buf = NULL;
-    unsigned long size;
-    int retval;
+    unsigned long size = 0;
+    int retval = 0;
 
     mf->ptr = NULL;
     mf->size = 0;
@@ -55,8 +55,9 @@ static int fill_mmfile(mmfile_t *mf, const char *file)
         return 1;
     }
 
+    /* extra byte for the \0 */
     size = sb.st_size;
-    buf = (char *) malloc(size);
+    buf = calloc(1, size + 1);
 
     if (buf == NULL) {
         warn("malloc");
@@ -64,7 +65,7 @@ static int fill_mmfile(mmfile_t *mf, const char *file)
     }
 
     mf->ptr = buf;
-    mf->ptr[size - 1] = '\0';
+    mf->ptr[size] = '\0';
     mf->size = size;
 
     while (size) {
@@ -132,7 +133,7 @@ static int delta_out(__attribute__((unused)) void *priv, mmbuffer_t *mb, int nbu
 
         assert(entry->data != NULL);
 
-        if (mb[i].size > 1) {
+        if (mb[i].size > 1 && mb[i].ptr) {
             if (prefix) {
                 r = snprintf(entry->data, mb[i].size + 1, "%s%s", prefix, mb[i].ptr);
             } else {
@@ -199,12 +200,16 @@ char *get_file_delta(const char *a, const char *b)
     }
 
     if (TAILQ_EMPTY(list)) {
+        free(old.ptr);
+        free(new.ptr);
         free(list);
         return NULL;
     }
 
     r = list_to_string(list, "\n");
     list_free(list, free);
+    free(old.ptr);
+    free(new.ptr);
 
     return r;
 }
