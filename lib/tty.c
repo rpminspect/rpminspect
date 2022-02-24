@@ -27,15 +27,19 @@
 
 /*
  * Return the terminal width.  Used by output routines sending text to
- * stdout.  This function returns 0 if it cannot figure out the width,
- * which means callers should just not worry about the terminal.
+ * stdout.  This function returns DEFAULT_TTY_WIDTH if it cannot
+ * figure out the width.
  */
 size_t tty_width(void) {
     struct winsize w;
 
     /* get the terminal size */
     if (ioctl(0, TIOCGWINSZ, &w) == -1) {
-        return 0;
+        /*
+         * We couldn't determine the real size,
+         * so let's go with the default width.
+         */
+        return DEFAULT_TTY_WIDTH;
     }
 
     return w.ws_col;
