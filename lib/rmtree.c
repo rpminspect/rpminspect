@@ -33,8 +33,7 @@ static int rmtree_entry(const char *, const struct stat *, int, struct FTW *);
 
 static bool contents_only = false;
 
-static int rmtree_entry(const char *fpath, __attribute__((unused)) const struct stat *sb,
-                        __attribute__((unused)) int tflag, __attribute__((unused)) struct FTW *ftwbuf)
+static int rmtree_entry(const char *fpath, __attribute__((unused)) const struct stat *sb, __attribute__((unused)) int tflag, struct FTW *ftwbuf)
 {
     int r = 0;
 
