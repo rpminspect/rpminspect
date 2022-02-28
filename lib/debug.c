@@ -86,6 +86,7 @@ void dump_cfg(const struct rpminspect *ri)
     string_map_t *hentry = NULL;
     string_map_t *tmp_hentry = NULL;
     string_list_map_t *mapentry = NULL;
+    string_list_map_t *tmp_mapentry = NULL;
     deprule_ignore_map_t *drentry = NULL;
     deprule_ignore_map_t *tmp_drentry = NULL;
 
@@ -724,6 +725,30 @@ void dump_cfg(const struct rpminspect *ri)
 
         HASH_ITER(hh, ri->deprules_ignore, drentry, tmp_drentry) {
             printf("    %s: %s\n", get_deprule_desc(drentry->type), (drentry->pattern == NULL) ? "" : drentry->pattern);
+        }
+    }
+
+    /* global and per-inspection ignores */
+
+    if (ri->ignores && !TAILQ_EMPTY(ri->ignores)) {
+        printf("global ignores:\n");
+
+        TAILQ_FOREACH(entry, ri->ignores, items) {
+            printf("    - %s\n", entry->data);
+        }
+    }
+
+    if (ri->inspection_ignores) {
+        printf("per-inspection ignores:\n");
+
+        HASH_ITER(hh, ri->inspection_ignores, mapentry, tmp_mapentry) {
+            if (mapentry->value && !TAILQ_EMPTY(mapentry->value)) {
+                printf("    %s:\n", mapentry->key);
+
+                TAILQ_FOREACH(entry, mapentry->value, items) {
+                    printf("        - %s\n", entry->data);
+                }
+            }
         }
     }
 
