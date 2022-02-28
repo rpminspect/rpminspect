@@ -78,6 +78,8 @@ enum {
     BLOCK_ABIDIFF,
     BLOCK_ADDEDFILES,
     BLOCK_ANNOCHECK,
+    BLOCK_ANNOCHECK_JOBS,
+    BLOCK_ANNOCHECK_FAILURE_SEVERITY,
     BLOCK_BADFUNCS,
     BLOCK_BADWORDS,
     BLOCK_BIN_PATHS,
@@ -894,8 +896,15 @@ static int read_cfgfile(struct rpminspect *ri, const char *filename)
                             block = BLOCK_IGNORE;
                         }
                     } else if (group == BLOCK_ANNOCHECK) {
-                        if (!strcmp(key, "ignore")) {
+                        if (!strcmp(key, "failure_severity")) {
+                            block = BLOCK_ANNOCHECK_FAILURE_SEVERITY;
+                        } else if (!strcmp(key, "jobs")) {
+                            block = BLOCK_ANNOCHECK_JOBS;
+                        } else if (!strcmp(key, "ignore")) {
                             block = BLOCK_IGNORE;
+                        } else if (strcmp(key, t)) {
+                            /* continue support the old syntax for the yaml file */
+                            process_table(key, t, &ri->annocheck);
                         }
                     } else if (group == BLOCK_JAVABYTECODE) {
                         if (!strcmp(key, "ignore")) {
@@ -1110,15 +1119,15 @@ static int read_cfgfile(struct rpminspect *ri, const char *filename)
                             }
                         }
                     } else if (group == BLOCK_ANNOCHECK) {
-                        if (!strcmp(key, "failure_severity")) {
+                        if (block == BLOCK_ANNOCHECK_JOBS) {
+                            process_table(key, t, &ri->annocheck);
+                        } else if (block == BLOCK_ANNOCHECK_FAILURE_SEVERITY) {
                             ri->annocheck_failure_severity = getseverity(t, RESULT_NULL);
 
                             if (ri->annocheck_failure_severity == RESULT_NULL) {
                                 warnx(_("Invalid annocheck failure_reporting_level: %s, defaulting to %s."), t, strseverity(RESULT_VERIFY));
                                 ri->annocheck_failure_severity = RESULT_VERIFY;
                             }
-                        } else {
-                            process_table(key, t, &ri->annocheck);
                         }
                     } else if (group == BLOCK_JAVABYTECODE) {
                         process_table(key, t, &ri->jvm);
@@ -2133,41 +2142,6 @@ struct rpminspect *init_rpminspect(struct rpminspect *ri, const char *cfgfile, c
     ri->threshold = RESULT_VERIFY;
     ri->worst_result = RESULT_OK;
     ri->suppress = RESULT_NULL;
-
-#if 0
-    /* debugging output only to make sure we captured ignores */
-    if (ri->ignores && !TAILQ_EMPTY(ri->ignores)) {
-        string_entry_t *se = NULL;
-
-        INIT_DEBUG_PRINT("global ignores:\n");
-
-        TAILQ_FOREACH(se, ri->ignores, items) {
-            INIT_DEBUG_PRINT("    - %s\n", se->data);
-        }
-    } else {
-        INIT_DEBUG_PRINT("no global ignores defined\n");
-    }
-
-    if (ri->inspection_ignores) {
-        string_list_map_t *e = NULL;
-        string_list_map_t *te = NULL;
-        string_entry_t *se = NULL;
-
-        INIT_DEBUG_PRINT("per-inspection ignores:\n");
-
-        HASH_ITER(hh, ri->inspection_ignores, e, te) {
-            INIT_DEBUG_PRINT("    %s:\n", e->key);
-
-            if (e->value && !TAILQ_EMPTY(e->value)) {
-                TAILQ_FOREACH(se, e->value, items) {
-                    INIT_DEBUG_PRINT("        - %s\n", se->data);
-                }
-            }
-        }
-    } else {
-        INIT_DEBUG_PRINT("no per-inspection ignores defined\n");
-    }
-#endif
 
     return ri;
 }
