@@ -201,20 +201,10 @@ static char *rpm_prep_source(struct rpminspect *ri, const rpmfile_entry_t *file,
             status = EXIT_SUCCESS;
         }
 
-        /* clean up */
+        /* clean up and exit */
         rpmSpecFree(spec);
         rpmtsFree(ts);
         free(ba);
-
-        /*
-         * perform the same cleanup that happens from rpminspect(1)
-         * since this is a child process and we have copies of all of
-         * these allocations
-         */
-        free_rpminspect(ri);
-        rpmFreeMacros(NULL);
-        rpmFreeRpmrc();
-
         _exit(status);
     } else if (proc == -1) {
         /* failure */
