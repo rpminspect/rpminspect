@@ -578,9 +578,11 @@ static void xdl_mark_ignorable(xdchange_t *xscr, xdfenv_t *xe, long flags)
 
 int xdl_diff(mmfile_t *mf1, mmfile_t *mf2, xpparam_t const *xpp,
 	     xdemitconf_t const *xecfg, xdemitcb_t *ecb) {
-	xdchange_t *xscr;
+	xdchange_t *xscr = NULL;
 	xdfenv_t xe;
 	emit_func_t ef = xecfg->hunk_func ? xdl_call_hunk_func : xdl_emit_diff;
+
+	memset(&xe, 0, sizeof(xe));
 
 	if (xdl_do_diff(mf1, mf2, xpp, &xe) < 0) {
 
