@@ -165,8 +165,8 @@ static long get_func_line(xdfenv_t *xe, xdemitconf_t const *xecfg,
 
 int xdl_emit_diff(xdfenv_t *xe, xdchange_t *xscr, xdemitcb_t *ecb, xdemitconf_t const *xecfg)
 {
-	unsigned long s1, s2, e1, e2, lctx;
-	xdchange_t *xch, *xche;
+	unsigned long s1 = 0, s2 = 0, e1 = 0, e2 = 0, lctx = 0;
+	xdchange_t *xch = NULL, *xche = NULL;
 	unsigned long funclineprev = -1;
 	struct func_line func_line = { 0 };
 

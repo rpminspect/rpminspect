@@ -420,6 +420,8 @@ int xdl_emit_hunk_hdr(long unsigned s1, long unsigned c1, long unsigned s2, long
 	mmbuffer_t mb;
 	char buf[128];
 
+	memset(&mb, 0, sizeof(mb));
+
 	memcpy(buf, "@@ -", 4);
 	nb += 4;
 
@@ -457,6 +459,7 @@ int xdl_emit_hunk_hdr(long unsigned s1, long unsigned c1, long unsigned s2, long
 
 	mb.ptr = buf;
 	mb.size = nb;
+
 	if (ecb->outf(ecb->priv, &mb, 1) < 0)
 		return -1;
 
