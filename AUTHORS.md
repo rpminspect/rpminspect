@@ -9,6 +9,8 @@ Contributors
 
 - Alexander Scheel <ascheel@redhat.com>
 
+- Andrew John Hughes <gnu_andrew@member.fsf.org>
+
 - Caolán McNamara <caolanm@redhat.com>
 
 - Danilo C. L. de Paula <ddepaula@redhat.com>
@@ -29,11 +31,13 @@ Contributors
 
 - Jim Bair <jbair@redhat.com>
 
+- Michal Srb <michal@redhat.com>
+
 - Miro Hrončok <miro@hroncok.cz>
 
 - Pino Toscano <ptoscano@redhat.com>
 
-- Serhii Turivnyi <sturivny@redhat.com>
+- Serhii Turivnyi <sturivny@redhat.com>, <turivniy@gmail.com>
 
 - Siddhesh Poyarekar <siddhesh@gotplt.org>
 
