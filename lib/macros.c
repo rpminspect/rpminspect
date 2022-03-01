@@ -49,7 +49,6 @@ void load_macros(struct rpminspect *ri)
     if (ri->macrofiles) {
         macropath = list_to_string(ri->macrofiles, ":");
         mf = rpmGetPath(macropath, NULL);
-        rpmFreeMacros(NULL);
         rpmInitMacros(NULL, mf);
         free(macropath);
         free(mf);
