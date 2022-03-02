@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: rpminspect\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-02-23 12:13-0500\n"
+"POT-Creation-Date: 2022-03-02 09:23-0500\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -1039,125 +1039,125 @@ msgstr ""
 msgid "*** payload path %s not in RPM metadata"
 msgstr ""
 
-#: lib/init.c:269
+#: lib/init.c:271
 #, c-format
 msgid "*** ignore found in %d, value `%s'"
 msgstr ""
 
-#: lib/init.c:364
+#: lib/init.c:366
 #, c-format
 msgid "invalid input string `%s`"
 msgstr ""
 
-#: lib/init.c:391 lib/init.c:400 lib/init.c:408 lib/init.c:420 lib/init.c:429
-#: lib/init.c:437 lib/init.c:449 lib/init.c:458 lib/init.c:466 lib/init.c:478
+#: lib/init.c:393 lib/init.c:402 lib/init.c:410 lib/init.c:422 lib/init.c:431
+#: lib/init.c:439 lib/init.c:451 lib/init.c:460 lib/init.c:468 lib/init.c:480
 #, c-format
 msgid "*** invalid mode string: %s"
 msgstr ""
 
-#: lib/init.c:526
+#: lib/init.c:528
 #, c-format
 msgid "ignoring malformed %s configuration file: %s"
 msgstr ""
 
-#: lib/init.c:1014
+#: lib/init.c:1023
 #, c-format
 msgid "*** unknown specname match setting '%s', defaulting to 'full'"
 msgstr ""
 
-#: lib/init.c:1023
+#: lib/init.c:1032
 #, c-format
 msgid "*** unknown specname primary setting '%s', defaulting to 'name'"
 msgstr ""
 
-#: lib/init.c:1034
+#: lib/init.c:1043
 msgid "error reading elf include path"
 msgstr ""
 
-#: lib/init.c:1043
+#: lib/init.c:1052
 msgid "error reading elf exclude path"
 msgstr ""
 
-#: lib/init.c:1054
+#: lib/init.c:1063
 msgid "error reading man page include path"
 msgstr ""
 
-#: lib/init.c:1063
+#: lib/init.c:1072
 msgid "error reading man page exclude path"
 msgstr ""
 
-#: lib/init.c:1074
+#: lib/init.c:1083
 msgid "error reading xml include path"
 msgstr ""
 
-#: lib/init.c:1083
+#: lib/init.c:1092
 msgid "error reading xml exclude path"
 msgstr ""
 
-#: lib/init.c:1117
+#: lib/init.c:1128
 #, c-format
 msgid "Invalid annocheck failure_reporting_level: %s, defaulting to %s."
 msgstr ""
 
-#: lib/init.c:1136
+#: lib/init.c:1145
 #, c-format
 msgid "*** inspection flag must be 'on' or 'off', ignoring for '%s'"
 msgstr ""
 
-#: lib/init.c:1140 src/rpminspect.c:285
+#: lib/init.c:1149 src/rpminspect.c:277
 #, c-format
 msgid "*** Unknown inspection: `%s`"
 msgstr ""
 
-#: lib/init.c:1198
+#: lib/init.c:1207
 msgid "error reading unicode exclude regular expression"
 msgstr ""
 
-#: lib/init.c:1238 lib/init.c:1255
+#: lib/init.c:1247 lib/init.c:1264
 #, c-format
 msgid "error reading %s ignore pattern"
 msgstr ""
 
-#: lib/init.c:1435
+#: lib/init.c:1444
 #, c-format
 msgid "*** Invalid filename in the fileinfo list: %s"
 msgstr ""
 
-#: lib/init.c:1436
+#: lib/init.c:1445
 msgid "*** From this invalid line:"
 msgstr ""
 
-#: lib/init.c:1437
+#: lib/init.c:1446
 #, c-format
 msgid "***     %s"
 msgstr ""
 
-#: lib/init.c:1854
+#: lib/init.c:1863
 #, c-format
 msgid "*** invalid security rule: %s"
 msgstr ""
 
-#: lib/init.c:1888
+#: lib/init.c:1897
 #, c-format
 msgid "*** unknown security rule: %s"
 msgstr ""
 
-#: lib/init.c:1908
+#: lib/init.c:1917
 #, c-format
 msgid "*** unknown security action: %s"
 msgstr ""
 
-#: lib/init.c:1934
+#: lib/init.c:1943
 #, c-format
 msgid "*** malformed security line: %s"
 msgstr ""
 
-#: lib/init.c:2087 lib/init.c:2108
+#: lib/init.c:2096 lib/init.c:2117
 #, c-format
 msgid "*** error reading '%s'"
 msgstr ""
 
-#: lib/init.c:2103
+#: lib/init.c:2112
 #, c-format
 msgid "*** unable to find profile '%s'"
 msgstr ""
@@ -2609,35 +2609,35 @@ msgstr ""
 msgid "MIME type on %s was %s and became %s on %s"
 msgstr ""
 
-#: lib/inspect_unicode.c:449
+#: lib/inspect_unicode.c:439
 #, c-format
 msgid "empty localpath on %s"
 msgstr ""
 
-#: lib/inspect_unicode.c:465
+#: lib/inspect_unicode.c:455
 msgid "forbidden code point in ${FILE} on ${ARCH}"
 msgstr ""
 
-#: lib/inspect_unicode.c:517
+#: lib/inspect_unicode.c:507
 #, c-format
 msgid ""
 "A forbidden code point was found in the %s source file on line %ld at column "
 "%ld."
 msgstr ""
 
-#: lib/inspect_unicode.c:574
+#: lib/inspect_unicode.c:564
 #, c-format
 msgid "unable to run %prep in ${FILE}"
 msgstr ""
 
-#: lib/inspect_unicode.c:577
+#: lib/inspect_unicode.c:567
 #, c-format
 msgid ""
 "Unable to run through the %%prep section in %s or manually unpack sources "
 "for further scanning."
 msgstr ""
 
-#: lib/inspect_unicode.c:662
+#: lib/inspect_unicode.c:652
 msgid "The unicode inspection is only for source packages, skipping."
 msgstr ""
 
@@ -2840,12 +2840,12 @@ msgstr ""
 msgid "libelf version mismatch"
 msgstr ""
 
-#: lib/rpm.c:78
+#: lib/rpm.c:80
 #, c-format
 msgid "Fopen failed for %s: %s"
 msgstr ""
 
-#: lib/rpm.c:258
+#: lib/rpm.c:260
 #, c-format
 msgid "*** file index %d is out of bounds for %s"
 msgstr ""
@@ -3132,128 +3132,128 @@ msgstr ""
 msgid "*** Product release for before build (%s) is empty"
 msgstr ""
 
-#: src/rpminspect.c:255
+#: src/rpminspect.c:245
 #, c-format
 msgid "*** Unable to determine product release for %s and %s"
 msgstr ""
 
-#: src/rpminspect.c:256
+#: src/rpminspect.c:246
 msgid ""
 "*** See the 'favor_release' setting in the rpminspect configuration file."
 msgstr ""
 
-#: src/rpminspect.c:269
+#: src/rpminspect.c:261
 msgid "*** The -T and -E options are mutually exclusive"
 msgstr ""
 
-#: src/rpminspect.c:270 src/rpminspect.c:286 src/rpminspect.c:658
-#: src/rpminspect.c:701
+#: src/rpminspect.c:262 src/rpminspect.c:278 src/rpminspect.c:650
+#: src/rpminspect.c:693
 #, c-format
 msgid "*** See `%s --help` for more information."
 msgstr ""
 
-#: src/rpminspect.c:443
+#: src/rpminspect.c:435
 #, c-format
 msgid "*** Invalid output format: `%s`."
 msgstr ""
 
-#: src/rpminspect.c:455
+#: src/rpminspect.c:447
 #, c-format
 msgid "*** Unable to expand workdir: `%s`"
 msgstr ""
 
-#: src/rpminspect.c:491
+#: src/rpminspect.c:483
 #, c-format
 msgid "%s version %s\n"
 msgstr ""
 
-#: src/rpminspect.c:494
+#: src/rpminspect.c:486
 #, c-format
 msgid "?? getopt returned character code 0%o ??"
 msgstr ""
 
-#: src/rpminspect.c:501
+#: src/rpminspect.c:493
 #, c-format
 msgid "Available output formats:\n"
 msgstr ""
 
-#: src/rpminspect.c:518
+#: src/rpminspect.c:510
 #, c-format
 msgid ""
 "\n"
 "Available inspections:\n"
 msgstr ""
 
-#: src/rpminspect.c:555 src/rpminspect.c:563 src/rpminspect.c:576
+#: src/rpminspect.c:547 src/rpminspect.c:555 src/rpminspect.c:568
 #, c-format
 msgid "Failed to read configuration file %s"
 msgstr ""
 
-#: src/rpminspect.c:582
+#: src/rpminspect.c:574
 #, c-format
 msgid "Please specify a configuration file using '-c' or supply ./%s"
 msgstr ""
 
-#: src/rpminspect.c:657
+#: src/rpminspect.c:649
 msgid "*** Invalid before and after build specification."
 msgstr ""
 
-#: src/rpminspect.c:665
+#: src/rpminspect.c:657
 msgid "*** unable to read RPM configuration"
 msgstr ""
 
-#: src/rpminspect.c:700
+#: src/rpminspect.c:692
 #, c-format
 msgid "*** Unsupported architecture specified: `%s`"
 msgstr ""
 
-#: src/rpminspect.c:724
+#: src/rpminspect.c:716
 #, c-format
 msgid "*** Unable to create directory %s"
 msgstr ""
 
-#: src/rpminspect.c:738 src/rpminspect.c:756
+#: src/rpminspect.c:730 src/rpminspect.c:748
 msgid "*** failed to gather specified builds."
 msgstr ""
 
-#: src/rpminspect.c:769
+#: src/rpminspect.c:761
 #, c-format
 msgid ""
 "Version information for libraries and programs used by %s.  This result is "
 "for informational and diagnostic purposes only."
 msgstr ""
 
-#: src/rpminspect.c:777
+#: src/rpminspect.c:769
 #, c-format
 msgid "Command line arguments used to invoke %s."
 msgstr ""
 
-#: src/rpminspect.c:810
+#: src/rpminspect.c:802
 msgid "*** No peers, ensure packages exist for specified architecture(s)."
 msgstr ""
 
-#: src/rpminspect.c:820
+#: src/rpminspect.c:812
 msgid "invalid after RPM"
 msgstr ""
 
-#: src/rpminspect.c:830
+#: src/rpminspect.c:822
 msgid "invalid before RPM"
 msgstr ""
 
-#: src/rpminspect.c:857
+#: src/rpminspect.c:849
 #, c-format
 msgid "Running %s inspection..."
 msgstr ""
 
-#: src/rpminspect.c:866
+#: src/rpminspect.c:858
 msgid "pass"
 msgstr ""
 
-#: src/rpminspect.c:866
+#: src/rpminspect.c:858
 msgid "FAIL"
 msgstr ""
 
-#: src/rpminspect.c:890
+#: src/rpminspect.c:882
 #, c-format
 msgid ""
 "\n"
