@@ -1,3 +1,146 @@
+Changes in rpminspect-1.9
+-------------------------
+
+General release and build process changes:
+* Improve call with koji list-targets
+* Skip GPG signing the source archives for Copr builds
+* Use rpmspec to gather BuildRequires for Copr
+* Allow 'python_program' meson configuration option
+* Add 'copr-srpm' Makefile target
+
+Config file or data/ file changes:
+* Skip *.html files in the xml inspection
+* Drop diff(1) command setting from generic.yaml
+
+Changes to the GitHub Actions CI scripts and files:
+* Fix pre.sh for Extra CI on Gentoo Linux
+* Fix the CentOS 7 Extra CI job
+* Small cleanups to the Extra CI definitions
+* Fix post.sh for centos 7 Extra CI job
+* Expand PATH in post.sh for centos7 Extra CI
+* Make sure /usr/local/bin is in the centos7 Extra CI PATH
+* Match the matrix.container name correctly in extra-ci.yml
+* Support special RPM vendor handling on ALT Linux
+* Fix ALT Linux job in Extra CI
+* Drop Open Euler stuff from utils/determine-os.sh
+* Patch source and build system for FreeBSD
+* shellcheck fixes for osdeps post.sh scripts
+* Break out the CI and Extra CI configs in to separate files
+* "/etc/pkg" -> "/etc/pki" in some GitHub Actions
+* Fix /usr/lib/rpm/*/macros modification for ALT Linux
+* Pull CentOS images from quay.io, prepare for CentOS 9 Stream
+* Add Slackware Linux 15.0 to the GitHub Actions collection
+* Use -checkgpg=off with slackpkg initially on Slackware Linux
+* More minor fixes to the Slackware Linux GitHub Action
+* Just set GPGCHECK=off for the Slackware Linux GitHub Action
+* Run 'slackpkg update' before install git and requirements
+* Try to instruct slackpkg to, yes, import the GPG key
+* Install libxdiff-devel in Fedora-derived GitHub Actions jobs
+* Drop libxdiff-devel package installation
+* Drop diffutils from all CI job reqs.txt files
+
+rpminspect(1) changes:
+* Prevent SIGSEGV when get_product_release() fails
+* Default favor_release setting to 'newest'
+* Default favor_release setting to 'newest'
+* Fix two small memory leaks in rpminspect(1)
+* Exit with code 3 if the named profile (-p) is not found
+* Fix -Werror=use-after-free findings from gcc 12
+* Fix get_product_release() for single build jobs
+* Implement the -s/--suppress option in rpminspect
+* Do not remove default or user-specified --workdir paths
+* Pretend that TTY has 80 columns, if the real width is unknown
+
+Documentation changes:
+* Small tweaks to the RELEASE checklist
+* Update usage examples in README.md
+* Update usage.rst to reflect current inspections
+
+General bug fix in the library or frontend program:
+* Make sure is_elf() returns true for ELF archives (*.a)
+* Match MIME type on Icons in the desktop inspection
+* Report removed files at INFO level in rebase comparisons
+* Handle single build runs in is_rebase()
+* Handle the -w option correctly for fetch and non-fetch modes
+* Code formatting
+* Read ABI level blocks with "level N" or "level-N" names
+* Ensure summary mode output works for a number of inspections
+* Prevent SIGSEGV in rpminspect is the configuration is incomplete
+* Prevent SIGSEGV when bad_functions is empty for -D
+* Avoid stairstepping the text in summary output mode
+* Make sure multiple package providers are collected in rpmdeps
+* Correct the name of RPM weak dep macros in deprules.c
+* Do not incorrectly report added files for single builds
+* Cleaner error reporting when elf_version() returns EV_NONE
+* Strip workdir from the Details in shellsyntax reports
+* Some build comparisons with missing peers crash 'rpmdeps'
+* Close a number of non-fatal memory leaks
+* Remove unnecessary free() calls in librpminspect and rpminspect
+* Match shared lib Requires correctly & handle multiple Provides
+* Handle explicit shared lib deps with %{_isa} notation
+* Handle packages that provide automatic shared lib deps
+* Correct the addedfiles reporting messages
+* Memory management fixes with trim_rich_dep() function
+* Minor improvements to delta_out() in librpminspect
+* Skip deprule version matching on NULL in expected_deprule_change()
+* Change = -> == in an if expression
+* Fix three small memory leaks originating in init.c
+* Honor explicit Requires deps that use zero-epoch syntax
+* Patch a number of non-fatal valgrind findings
+* Do not assume peer is not NULL in set_peer()
+* Minor librpm interaction fixes for the unicode inspection
+* Variable initialization fixes for libxdiff
+* YAML parsing error for the failure_severity setting
+* Do not call rpmFreeMacros() in load_macros()
+
+librpminspect feature or significant change:
+* Expand the emptyrpm inspection to handle %ghost entries
+* Replace direct use of "diagnostics" with NAME_DIAGNOSTICS
+* Add new 'summary' output mode (#26)
+* Final update for librpminspect inspections and summary mode
+* Use the -o option on msgunfmt(1) in 'changedfiles'
+* Default annocheck results to RESULT_INFO
+* Guard capabilities and kmod stuff in inspect.c
+* Add 'rpmdeps' inspection
+* Support new config file section for 'rpmdeps'
+* Add 'rpmdeps' inspection
+* Completed 57 test cases for 'rpmdeps' for Requires dependencies
+* Set 'addedfiles' to work for single and compare jobs
+* Drop use_ignore parameter from foreach_peer_file()
+* Remove legacy _FORTIFY_SOURCE check in the elf inspection
+* Begin handling of rich dependency syntax in 'rpmdeps'
+* Add is_rich_dep() to mark rich dependency strings in deprules
+* Use libxdiff instead of relying on /usr/bin/diff
+* Add libxdiff directly to the source tree
+* Report annocheck failures as RESULT_VERIFY
+* Make annocheck failure reporting severity a config file setting
+
+Test suite commits:
+* Support older versions of rpmfluff in baseclass.py
+* Use the codecs module in test_unicode.py
+* Create ProvidedSourceFile for use in test_unicode.py
+* Set QA_RPATHS=63 to disable check-rpaths in rpmbuild
+* Improve the debugging output for failing tests
+* Add test cases for the rpmdeps inspection
+* In rpmdeps_requires tests, expect OK and not INFO for two
+* Ensure rpmdeps Requires test bins link with test lib
+* Skip tests in test_rpmdeps_requires.py that need 'elfdeps'
+* Fix a few small bugs in the Alpine Linux post.sh script
+* Add six remaining test_rpmdeps_requires.py test cases
+* Added 54 tests for Provides dependencies in 'rpmdeps'
+* Added 54 tests for Conflicts dependencies in 'rpmdeps'
+* Add remaining 270 test cases for the rpmdeps inspection
+* Correct weak dep test cases for 'rpmdeps'
+* Skip weak dependency rpmdeps test cases for older librpm versions
+* Pass --nodeps to rpmbuild in the test suite
+* Force the use of %attr for add_installed_directory()
+* Skip unexpanded macro test cases on ALT Linux for rpmdeps
+* Use '=' and not '>=' for Provides in rpmdeps test cases
+* Skip most weak dependency tests on ALT Linux
+* Account for ALT Linux including Epoch values in dependencies
+* Remove old have_caps_support block from test_capabilities.py
+
+
 Changes in rpminspect-1.8
 -------------------------
 
