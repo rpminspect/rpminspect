@@ -1,6 +1,6 @@
 /*
  * derp kernel module
- * Copyright © 2020 David Cantrell <dcantrell@redhat.com>
+ * Copyright 2020 David Cantrell <dcantrell@redhat.com>
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License

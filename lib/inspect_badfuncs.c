@@ -1,5 +1,5 @@
 /*
- * Copyright © 2021 Red Hat, Inc.
+ * Copyright 2021 Red Hat, Inc.
  * Author(s): David Shea <dshea@redhat.com>
  *            David Cantrell <dcantrell@redhat.com>
  *
