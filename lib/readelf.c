@@ -1,5 +1,5 @@
 /*
- * Copyright © 2019 Red Hat, Inc.
+ * Copyright 2019 Red Hat, Inc.
  * Author(s): David Cantrell <dcantrell@redhat.com>
  *            David Shea <dshea@redhat.com>
  *
