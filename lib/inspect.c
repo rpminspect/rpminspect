@@ -139,10 +139,8 @@ bool foreach_peer_file(struct rpminspect *ri, const char *inspection, foreach_pe
     return result;
 }
 
-/**
- * @brief Return inspection ID given its name string.
- *
- * @param name Inspection name.
+/*
+ * Return inspection ID given its name string.
  */
 uint64_t inspection_id(const char *name)
 {
@@ -245,12 +243,8 @@ uint64_t inspection_id(const char *name)
     }
 }
 
-/**
- * @brief Return inspection description string given its ID.
- *
- * Return the long description for the specified inspection.
- *
- * @param id Inspection ID constant.
+/*
+ * Return inspection description given the inspection ID.
  */
 const char *inspection_desc(const uint64_t inspection)
 {
@@ -352,13 +346,8 @@ const char *inspection_desc(const uint64_t inspection)
     }
 }
 
-/**
- * @brief Return inspection description string given its results
- * header.
- *
- * Return the long description for the specified inspection.
- *
- * @param header Inspection header string.
+/*
+ * Return inspection description given the results header string.
  */
 const char *inspection_header_to_desc(const char *header)
 {

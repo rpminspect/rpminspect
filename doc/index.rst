@@ -18,6 +18,7 @@ rpminspect - a build deviation analysis tool
    development
    testing
    release
+   api
 
 Indices and tables
 ==================
