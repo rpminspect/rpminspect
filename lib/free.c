@@ -230,7 +230,6 @@ void free_rpminspect(struct rpminspect *ri) {
     free(ri->desktop_entry_files_dir);
     free(ri->vendor);
 
-    free(ri->commands.diffstat);
     free(ri->commands.msgunfmt);
     free(ri->commands.desktop_file_validate);
     free(ri->commands.annocheck);

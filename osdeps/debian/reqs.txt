@@ -1,7 +1,6 @@
 abigail-tools
 clamav
 desktop-file-utils
-diffstat
 gcc
 gcovr
 gettext

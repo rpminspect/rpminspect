@@ -8,7 +8,6 @@ CUnit.i686
 CUnit-devel.i686
 dash
 desktop-file-utils
-diffstat
 elfutils-devel.i686
 file-devel.i686
 gcc

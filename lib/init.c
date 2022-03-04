@@ -966,10 +966,7 @@ static int read_cfgfile(struct rpminspect *ri, const char *filename)
                             ri->kojimbs = strdup(t);
                         }
                     } else if (block == BLOCK_COMMON) {
-                        if (!strcmp(key, "diffstat")) {
-                            free(ri->commands.diffstat);
-                            ri->commands.diffstat = strdup(t);
-                        } else if (!strcmp(key, "msgunfmt")) {
+                        if (!strcmp(key, "msgunfmt")) {
                             free(ri->commands.msgunfmt);
                             ri->commands.msgunfmt = strdup(t);
                         } else if (!strcmp(key, "desktop-file-validate")) {
@@ -2063,7 +2060,6 @@ struct rpminspect *init_rpminspect(struct rpminspect *ri, const char *cfgfile, c
         ri->annocheck_failure_severity = RESULT_VERIFY;
 
         /* Initialize commands */
-        ri->commands.diffstat = strdup(DIFFSTAT_CMD);
         ri->commands.msgunfmt = strdup(MSGUNFMT_CMD);
         ri->commands.desktop_file_validate = strdup(DESKTOP_FILE_VALIDATE_CMD);
         ri->commands.annocheck = strdup(ANNOCHECK_CMD);

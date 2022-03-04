@@ -231,12 +231,6 @@
 #define MSGUNFMT_CMD "msgunfmt"
 
 /**
- * @def DIFFSTAT_CMD
- * Executable providing diffstat(1).
- */
-#define DIFFSTAT_CMD "diffstat"
-
-/**
  * @def DESKTOP_FILE_VALIDATE_CMD
  * Executable providing desktop-file-validate(1)
  */

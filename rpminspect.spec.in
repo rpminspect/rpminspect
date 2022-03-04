@@ -51,7 +51,6 @@ Summary:        Library providing RPM test API and functionality
 Group:          Development/Tools
 Requires:       desktop-file-utils
 Requires:       gettext
-Requires:       diffstat
 Requires:       clamav-data
 
 # If these are present, the xml inspection can try DTD validation.

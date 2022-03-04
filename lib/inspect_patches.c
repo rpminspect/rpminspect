@@ -41,6 +41,8 @@ static bool reported = false;
 static bool comparison = false;
 static struct result_params params;
 
+enum { DIFF_NULL, DIFF_CONTEXT, DIFF_UNIFIED };
+
 /* Returns true if this file is a Patch file */
 static bool is_patch(const rpmfile_entry_t *file)
 {
@@ -67,83 +69,85 @@ static bool is_patch(const rpmfile_entry_t *file)
 }
 
 /*
- * Take the summary line from diffstat(1) and get the number of files
- * and number of lines modified.  The number of lines is the
- * combination of the number of insertions and deletions.
+ * Compute number of files and lines changed in a patch.
  */
-static diffstat_t get_diffstat_counts(const char *summary)
+static patchstat_t get_patch_stats(const char *patch)
 {
-    diffstat_t counts;
-    string_list_t *output = NULL;
-    string_list_t *fields = NULL;
-    string_entry_t *entry = NULL;
-    char *s = NULL;
-    long int tally = 0;
+    patchstat_t r;
+    string_list_t *lines = NULL;
+    string_entry_t *line = NULL;
+    int difftype = DIFF_NULL;
+    bool maybe_context = false;
+    bool maybe_unified = false;
+    int header_count = -1;
 
-    assert(summary != NULL);
+    assert(patch != NULL);
 
     /* initialize our counts */
-    counts.files = 0;
-    counts.lines = 0;
+    r.files = 0;
+    r.lines = 0;
 
-    /* split the output on newlines so we can get the last line */
-    output = strsplit(summary, "\n\r");
+    /* read in the patch file */
+    lines = read_file(patch);
 
-    if (output == NULL || TAILQ_EMPTY(output)) {
-        warn("unable to split diffstat output");
-        return counts;
+    if (lines == NULL || TAILQ_EMPTY(lines)) {
+        warn("read_file");
+        return r;
     }
 
-    /*
-     * split in to fields that are comma-delimited
-     * this string:
-     *      | 2 files changed, 2 insertions(+), 2 deletions(-)|
-     * will split in to these fields:
-     *      | 2 files changed|
-     *      | 2 insertions(+)|
-     *      | 2 deletions(-)|
-     */
-    entry = TAILQ_LAST(output, string_entry_s);
-    fields = strsplit(entry->data, ",");
-
-    if (fields == NULL || TAILQ_EMPTY(fields)) {
-        warn("unable to split diffstat summary line");
-        list_free(output, free);
-        return counts;
-    }
-
-    /* iterate over the fields and add up the counts */
-    TAILQ_FOREACH(entry, fields, items) {
-        s = entry->data;
-
-        if (strcasestr(s, " changed")) {
-            /* handles "file changed" and "files changed" */
-            tally = strtol(s, 0, 10);
-
-            if ((tally == LONG_MIN || tally == LONG_MAX) && errno == ERANGE) {
-                warn("strtol(%s)", s);
-                tally = 0;
+    /* iterate over each line counting files and line modifications */
+    TAILQ_FOREACH(line, lines, items) {
+        if (difftype == DIFF_NULL) {
+            if (!maybe_context && !maybe_unified) {
+                if (strprefix(line->data, "*** ")) {
+                    header_count++;
+                    maybe_context = true;
+                } else if (strprefix(line->data, "--- ")) {
+                    header_count++;
+                    maybe_unified = true;
+                }
+            } else if (maybe_context && !maybe_unified) {
+                if (strprefix(line->data, "--- ")) {
+                    header_count++;
+                } else if (header_count == 1 && strprefix(line->data, "**********")) {
+                    r.files++;
+                    difftype = DIFF_CONTEXT;
+                    header_count = -1;
+                    maybe_context = false;
+                }
+            } else if (!maybe_context && maybe_unified) {
+                if (strprefix(line->data, "+++ ")) {
+                    header_count++;
+                } else if (header_count == 1 && strprefix(line->data, "@@ ")) {
+                    r.files++;
+                    difftype = DIFF_UNIFIED;
+                    header_count = -1;
+                    maybe_unified = false;
+                }
             }
-
-            counts.files += tally;
-        } else if (strcasestr(s, " insertion") || strcasestr(s, " deletion") || strcasestr(s, " modification")) {
-            /* handles all of the variations of line count changes */
-            tally = strtol(s, 0, 10);
-
-            if ((tally == LONG_MIN || tally == LONG_MAX) && errno == ERANGE) {
-                warn("strtol(%s)", s);
-                tally = 0;
+        } else if (difftype == DIFF_CONTEXT) {
+            if (strprefix(line->data, "+ ") || strprefix(line->data, "- ")) {
+                r.lines++;
+            } else if (strprefix(line->data, "*** ")) {
+                difftype = DIFF_NULL;
+                header_count++;
+                maybe_context = true;
             }
-
-            counts.lines += tally;
+        } else if (difftype == DIFF_UNIFIED) {
+            if ((strprefix(line->data, "+") || strprefix(line->data, "-")) && !strprefix(line->data, "--- ")) {
+                r.lines++;
+            } else if (strprefix(line->data, "--- ")) {
+                difftype = DIFF_NULL;
+                header_count++;
+                maybe_unified = true;
+            }
         }
     }
 
     /* clean up */
-    list_free(output, free);
-    list_free(fields, free);
+    list_free(lines, free);
 
-    return counts;
+    return r;
 }
 
 /* Main driver for the 'patches' inspection. */
@@ -152,9 +156,8 @@ static bool patches_driver(struct rpminspect *ri, rpmfile_entry_t *file)
     bool result = true;
     char *before_patch = NULL;
     char *after_patch = NULL;
-    int exitcode;
     char *details = NULL;
-    diffstat_t ds;
+    patchstat_t ps;
     struct stat sb;
     long unsigned int oldsize = 0;
     long unsigned int newsize = 0;
@@ -264,45 +267,35 @@ static bool patches_driver(struct rpminspect *ri, rpmfile_entry_t *file)
     }
 
     /*
-     * Collect diffstat(1) data and report based on thresholds.
+     * Collect patch stats and report based on thresholds.
      */
-    params.details = run_cmd(&exitcode, ri->worksubdir, ri->commands.diffstat, after_patch, NULL);
+    ps = get_patch_stats(after_patch);
 
-    if (exitcode == 0 && params.details != NULL) {
-        ds = get_diffstat_counts(params.details);
+    if (!is_rebase(ri) && ((ps.files > ri->patch_file_threshold) || (ps.lines > ri->patch_line_threshold))) {
+        params.severity = RESULT_VERIFY;
+        params.waiverauth = WAIVABLE_BY_ANYONE;
+    } else {
+        params.severity = RESULT_INFO;
+        params.waiverauth = NOT_WAIVABLE;
+    }
 
-        if (!is_rebase(ri) && ((ds.files > ri->patch_file_threshold) || (ds.lines > ri->patch_line_threshold))) {
-            params.severity = RESULT_VERIFY;
-            params.waiverauth = WAIVABLE_BY_ANYONE;
+    if (ps.files > 0 || ps.lines > 0) {
+        if (ps.files == 0 && ps.lines > 0) {
+            xasprintf(&params.msg, _("%s touches as many as %ld line%s"), file->localpath, ps.lines, (ps.lines > 1) ? "s" : "");
+        } else if (ps.files > 0 && ps.lines == 0) {
+            xasprintf(&params.msg, _("%s touches %ld file%s"), file->localpath, ps.files, (ps.files > 1) ? "s" : "");
         } else {
-            params.severity = RESULT_INFO;
-            params.waiverauth = NOT_WAIVABLE;
+            xasprintf(&params.msg, _("%s touches %ld file%s and %s%ld line%s"), file->localpath, ps.files, (ps.files > 1) ? "s" : "", (ps.lines > 1) ? _("as many as ") : "", ps.lines, (ps.lines > 1) ? "s" : "");
         }
 
-        if (ds.files > 0 || ds.lines > 0) {
-            if (ds.files == 0 && ds.lines > 0) {
-                xasprintf(&params.msg, _("%s touches as many as %ld line%s"), file->localpath, ds.lines, (ds.lines > 1) ? "s" : "");
-            } else if (ds.files > 0 && ds.lines == 0) {
-                xasprintf(&params.msg, _("%s touches %ld file%s"), file->localpath, ds.files, (ds.files > 1) ? "s" : "");
-            } else {
-                xasprintf(&params.msg, _("%s touches %ld file%s and %s%ld line%s"), file->localpath, ds.files, (ds.files > 1) ? "s" : "", (ds.lines > 1) ? _("as many as ") : "", ds.lines, (ds.lines > 1) ? "s" : "");
-            }
+        params.verb = VERB_CHANGED;
+        params.noun = _("patch changes ${FILE}");
+        add_result(ri, &params);
+        free(params.msg);
+        params.msg = NULL;
 
-            params.verb = VERB_CHANGED;
-            params.noun = _("patch changes ${FILE}");
-            add_result(ri, &params);
-            free(params.msg);
-            free(params.details);
-            params.msg = NULL;
-            params.details = NULL;
-
-            reported = true;
-            result = !(params.severity >= RESULT_VERIFY);
-        }
-    } else if (exitcode) {
-        warn("unable to run %s on %s", ri->commands.diffstat, file->localpath);
-        free(params.details);
-        params.details = NULL;
+        reported = true;
+        result = !(params.severity >= RESULT_VERIFY);
     }
 
     /* clean up */

@@ -11,7 +11,6 @@ dev-libs/xmlrpc-c
 dev-python/pip
 dev-util/cunit
 dev-util/desktop-file-utils
-dev-util/diffstat
 dev-util/gcovr
 dev-util/libabigail
 dev-util/patchelf

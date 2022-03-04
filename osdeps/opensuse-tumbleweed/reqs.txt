@@ -8,7 +8,6 @@ clamav-devel
 cunit-devel
 curl
 desktop-file-utils
-diffstat
 file-devel
 gcc
 gcc-32bit

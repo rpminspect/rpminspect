@@ -621,12 +621,13 @@ bool inspect_doc(struct rpminspect *ri);
  * @brief Main driver for the 'patches' inspection.
  *
  * Inspects all patches defined in the spec file and reports changes
- * between builds.  At the INFO level, rpminspect reports diffstat(1)
- * and patch size changes.  If thresholds are reached regarding a
- * change in the patch size or the number of files the patch touches,
- * rpminspect reports the change at the VERIFY level unless the
- * comparison is for a rebase.  The configuration file can also list
- * patch names that rpminspect should ignore during the inspection.
+ * between builds.  At the INFO level, rpminspect reports patch file
+ * count, line count, and patch size changes.  If thresholds are
+ * reached regarding a change in the patch size or the number of files
+ * the patch touches, rpminspect reports the change at the VERIFY
+ * level unless the comparison is for a rebase.  The configuration
+ * file can also list patch names that rpminspect should ignore during
+ * the inspection.
  *
  * @param ri Pointer to the struct rpminspect for the program.
  * @return True if the inspection passed, false otherwise.
@@ -1526,7 +1527,7 @@ bool inspect_rpmdeps(struct rpminspect *ri);
  * @def DESC_PATCHES
  * The description for the 'patches' inspection.
  */
-#define DESC_PATCHES _("Inspects all patches defined in the spec file and reports changes between builds.  At the INFO level, rpminspect reports diffstat(1) and patch size changes.  If thresholds are reached regarding a change in the patch size or the number of files the patch touches, rpminspect reports the change at the VERIFY level unless the comparison is for a rebase.  The configuration file can also list patch names that rpminspect should ignore during the inspection.")
+#define DESC_PATCHES _("Inspects all patches defined in the spec file and reports changes between builds.  At the INFO level, rpminspect reports file count, line count, and patch size changes.  If thresholds are reached regarding a change in the patch size or the number of files the patch touches, rpminspect reports the change at the VERIFY level unless the comparison is for a rebase.  The configuration file can also list patch names that rpminspect should ignore during the inspection.")
 
 /**
  * @def DESC_VIRUS

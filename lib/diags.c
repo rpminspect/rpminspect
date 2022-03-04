@@ -207,14 +207,6 @@ string_list_t *gather_diags(struct rpminspect *ri, const char *progname, const c
 
     free(ver);
 
-    /* diffstat */
-    ver = run_cmd(&exitcode, ri->worksubdir, ri->commands.diffstat, "--version", NULL);
-    entry = calloc(1, sizeof(*entry));
-    assert(entry != NULL);
-    xasprintf(&entry->data, "%s", ver);
-    TAILQ_INSERT_TAIL(list, entry, items);
-    free(ver);
-
     /* annocheck */
     tmp = run_cmd(&exitcode, ri->worksubdir, ri->commands.annocheck, "--version", NULL);
     details = strsplit(tmp, "\n");

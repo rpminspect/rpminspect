@@ -31,7 +31,6 @@ bash
 cargo
 dash
 desktop-file-utils
-diffstat
 elfutils-devel
 file-devel
 gcc
