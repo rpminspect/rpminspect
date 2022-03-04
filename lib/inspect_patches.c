@@ -91,7 +91,6 @@ static patchstat_t get_patch_stats(const char *patch)
     lines = read_file(patch);
 
     if (lines == NULL || TAILQ_EMPTY(lines)) {
-        warn("read_file");
         return r;
     }
 
