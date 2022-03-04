@@ -23,6 +23,7 @@
 #include <errno.h>
 #include <err.h>
 #include <sys/mman.h>
+#include <sys/stat.h>
 
 #include "rpminspect.h"
 
@@ -36,8 +37,20 @@ void *read_file_bytes(const char *path, off_t *len)
     int fd = 0;
     void *data = NULL;
     void *buf = NULL;
+    struct stat sb;
 
     assert(path != NULL);
+
+    /* zero length files can be ignored */
+    if (stat(path, &sb) == -1) {
+        warn("stat");
+        return NULL;
+    }
+
+    if (sb.st_size == 0) {
+        /* zero length file, ignore */
+        return NULL;
+    }
 
     /* open the file for reading */
     fd = open(path, O_RDONLY);
