@@ -100,31 +100,36 @@ static void get_kabi_dir(struct rpminspect *ri)
  */
 static char *get_kabi_file(const struct rpminspect *ri, const char *arch)
 {
+    char *tmp = NULL;
     char *template = NULL;
     char *kabi = NULL;
 
     assert(ri != NULL);
+    assert(arch != NULL);
 
     if (kabi_dir == NULL || ri->kabi_filename == NULL) {
         return NULL;
     }
 
     /* build the template */
-    assert(arch != NULL);
     xasprintf(&template, "%s/%s", kabi_dir, ri->kabi_filename);
     assert(template != NULL);
 
     /* replace variables */
-    kabi = strreplace(template, "${ARCH}", arch);
+    tmp = strreplace(template, "${ARCH}", arch);
 
-    if (strstr(kabi, "$ARCH")) {
-        free(kabi);
-        kabi = strreplace(template, "$ARCH", arch);
+    if (strstr(tmp, "$ARCH")) {
+        free(tmp);
+        tmp = strreplace(template, "$ARCH", arch);
     }
+
+    /* normalize the path */
+    kabi = abspath(tmp);
+    assert(kabi != NULL);
+    free(tmp);
 
     /* let's see if this is actually a file */
     if (access(kabi, R_OK)) {
-        warn("%s", kabi);
         free(kabi);
         kabi = NULL;
     }
