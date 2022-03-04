@@ -31,17 +31,6 @@ sed -i -e 's|^int dummy;$|extern int dummy;|g' "${SUBDIR}"/compat_err.c
 ( cd "${SUBDIR}" && ./configure && make && make lib-install )
 rm -rf mandoc.tar.gz "${SUBDIR}"
 
-# diffstat is not available as a package, so build it
-curl -O ftp://ftp.invisible-island.net/diffstat/diffstat.tar.gz
-SUBDIR="$(tar -tvf diffstat.tar.gz | head -n 1 | rev | cut -d ' ' -f 1 | rev)"
-tar -xvf diffstat.tar.gz
-cd "${SUBDIR}" || exit 1
-./configure --prefix=/usr/local
-make
-make install
-cd "${CWD}" || exit 1
-rm -rf diffstat.tar.gz "${SUBDIR}"
-
 # The 'rc' shell is not available in Arch Linux, build manually
 git clone https://github.com/rakitzis/rc.git
 cd rc || exit 1

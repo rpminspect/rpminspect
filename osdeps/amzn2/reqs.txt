@@ -7,7 +7,6 @@ CUnit
 CUnit-devel
 dash
 desktop-file-utils
-diffstat
 elfutils-devel
 file-devel
 gcc

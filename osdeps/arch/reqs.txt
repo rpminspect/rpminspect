@@ -4,7 +4,6 @@ bison
 clamav
 cunit
 desktop-file-utils
-diffstat
 gcc
 gettext
 git

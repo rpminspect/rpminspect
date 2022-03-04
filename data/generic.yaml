@@ -31,10 +31,6 @@ koji:
 commands:
     # External helper commands used by rpminspect.  Defaults are noted.
 
-    # diffstat(1) command.
-    # https://invisible-island.net/diffstat/
-    #diffstat: /usr/bin/diffstat
-
     # msgunfmt(1) as found in GNU gettext
     #msgunfmt: /usr/bin/msgunfmt
 

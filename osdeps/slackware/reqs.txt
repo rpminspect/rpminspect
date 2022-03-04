@@ -8,7 +8,6 @@ check
 cmake
 curl
 desktop-file-utils
-diffstat
 elfutils
 flex
 gcc

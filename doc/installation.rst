@@ -70,8 +70,6 @@ there are a number of userspace programs used:
 +--------------------------------+-----------+---------------------------------------------------------------+
 | /usr/bin/annocheck             | No        | https://sourceware.org/git/annobin.git                        |
 +--------------------------------+-----------+---------------------------------------------------------------+
-| /usr/bin/diffstat              | No        | https://invisible-island.net/diffstat/                        |
-+--------------------------------+-----------+---------------------------------------------------------------+
 
 The provided RPM_ spec file template uses the `Fedora Linux
 <https://getfedora.org>`_ locations for these files, but in the
@@ -82,7 +80,7 @@ tools. If they are available, you should use those packages.
 In `Fedora Linux <https://getfedora.org>`_, for example, you can run
 the following to install these programs::
 
-    dnf install desktop-file-utils gettext diffstat libabigail /usr/bin/annocheck
+    dnf install desktop-file-utils gettext libabigail /usr/bin/annocheck
 
 The *shellsyntax* inspection uses the actual shell programs listed in
 the shells setting in the rpminspect_ configuration file.  Since this

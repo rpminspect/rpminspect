@@ -373,7 +373,6 @@ typedef enum _politics_field_t {
 /* Commands used by rpminspect at runtime. */
 struct command_paths {
     char *diff;
-    char *diffstat;
     char *msgunfmt;
     char *desktop_file_validate;
     char *annocheck;
@@ -986,11 +985,11 @@ typedef struct _abi_t {
 } abi_t;
 
 /*
- * diffstat(1) findings for reporting in the patches inspection
+ * Patch stats for reporting in the patches inspection
  */
-typedef struct _diffstat_t {
+typedef struct _patchstat_t {
     long int files;
     long int lines;
-} diffstat_t;
+} patchstat_t;
 
 #endif

@@ -1,7 +1,6 @@
 abigail-tools
 cargo
 clamav
-diffstat
 desktop-file-utils
 gcc
 gcc-multilib

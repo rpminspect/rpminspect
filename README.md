@@ -149,7 +149,6 @@ there are a number of userspace programs used:
     /usr/bin/abidiff [optional]
     /usr/bin/kmidiff [optional]
     /usr/bin/annocheck [optional]
-    /usr/bin/diffstat
 
 The provided spec file template uses the Fedora locations for these
 files, but in the program, they must be on the runtime system.
@@ -160,7 +159,7 @@ packages.
 In Fedora, for example, you can run the following to install these
 programs:
 
-    yum install desktop-file-utils gettext diffstat libabigail /usr/bin/annocheck
+    yum install desktop-file-utils gettext libabigail /usr/bin/annocheck
 
 The 'shellsyntax' inspection uses the actual shell programs listed in
 the shells setting in the rpminspect configuration file.  Since this
