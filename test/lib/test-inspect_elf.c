@@ -29,7 +29,6 @@ int init_test_inspect_elf(void)
     struct rpminspect *ri = NULL;
 
     ri = init_rpminspect(NULL, NULL, NULL);
-    init_elf_data(ri);
 
     if (elf_version(EV_CURRENT) == EV_NONE) {
         r = -1;

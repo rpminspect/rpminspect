@@ -944,7 +944,6 @@ bool inspect_elf(struct rpminspect *ri)
     bool result = false;
     struct result_params params;
 
-    init_elf_data(ri);
     rip = ri;
     result = foreach_peer_file(ri, NAME_ELF, elf_driver);
 
