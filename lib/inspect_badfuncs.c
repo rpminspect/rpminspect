@@ -168,7 +168,6 @@ bool inspect_badfuncs(struct rpminspect *ri)
     assert(ri != NULL);
 
     if (ri->bad_functions != NULL) {
-        init_elf_data(ri);
         result = foreach_peer_file(ri, NAME_BADFUNCS, badfuncs_driver);
     }
 
