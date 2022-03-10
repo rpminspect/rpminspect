@@ -79,36 +79,51 @@ void output_xunit(const results_t *results, const char *dest, const severity_t t
             count = 1;
         }
 
-        if (result->severity >= threshold) {
-            fprintf(fp, "        <failure message=\"%s\">%s</failure>\n", result->msg, inspection_header_to_desc(result->header));
-        }
-
         /* prepare the system out message */
         if (result->msg != NULL) {
+            if (result->severity >= threshold) {
+                fprintf(fp, "        <failure message=\"%s\">%s</failure>\n", result->msg, inspection_header_to_desc(result->header));
+            }
+
             xasprintf(&msg, "%d) %s\n\n", count++, result->msg);
+            assert(msg != NULL);
         }
 
         xasprintf(&rawcdata, _("Result: %s\nWaiver Authorization: %s\n\n"), strseverity(result->severity), strwaiverauth(result->waiverauth));
-        msg = strappend(msg, rawcdata, NULL);
+        assert(rawcdata != NULL);
+
+        if (msg) {
+            msg = strappend(msg, rawcdata, NULL);
+        } else {
+            msg = strdup(rawcdata);
+        }
+
+        assert(msg != NULL);
         free(rawcdata);
 
         if (result->details != NULL) {
             xasprintf(&rawcdata, _("Details:\n%s\n\n"), result->details);
+            assert(rawcdata != NULL);
             msg = strappend(msg, rawcdata, NULL);
+            assert(msg != NULL);
             free(rawcdata);
         }
 
         if (result->remedy != NULL) {
             xasprintf(&rawcdata, _("Suggested Remedy:\n%s"), result->remedy);
+            assert(rawcdata != NULL);
             msg = strappend(msg, rawcdata, NULL);
+            assert(msg != NULL);
             free(rawcdata);
         }
 
         /* escape the string for XML CDATA use */
         cdata = strxmlescape(msg);
+        assert(cdata != NULL);
         fprintf(fp, "        <system-out><![CDATA[%s]]></system-out>\n", cdata);
         free(cdata);
-        free(msg);
+        cdata = NULL;
+        msg = NULL;
     }
 
     /* tidy up and return */
