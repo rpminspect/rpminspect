@@ -32,7 +32,8 @@
  * Helper function for printwrap().  Handles printing the specified word with
  * the optional indentation and a space for the next word.
  */
-static int printword(const char *word, const size_t width, const unsigned int indent, const size_t lw, bool first, FILE *dest) {
+static int printword(const char *word, const size_t width, const unsigned int indent, const size_t lw, bool first, FILE *dest)
+{
     int ret = 0;
 
     if ((strlen(word) + lw) >= width) {
@@ -343,10 +344,10 @@ char *strreplace(const char *s, const char *find, const char *replace)
     char *result = NULL;
 
     if (s == NULL) {
-        return 0;
+        return NULL;
     }
 
-    assert(find);
+    assert(find != NULL);
 
     find_len = strlen(find);
     remainder = s;
@@ -412,7 +413,7 @@ char *strxmlescape(const char *s)
     char *result = NULL;
 
     if (s == NULL) {
-        return 0;
+        return NULL;
     }
 
     /* allocate a buffer for the new string */

@@ -28,7 +28,8 @@
 /*
  * Main driver for the 'arch' inspection.
  */
-bool inspect_arch(struct rpminspect *ri) {
+bool inspect_arch(struct rpminspect *ri)
+{
     bool result = true;
     rpmpeer_entry_t *peer = NULL;
     const char *before_arch = NULL;
