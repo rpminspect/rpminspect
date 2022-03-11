@@ -441,9 +441,14 @@ char *strxmlescape(const char *s)
 
         /* grow the buffer if we need more space */
         if ((len - strlen(result)) <= 8) {
+            /* grow the result string */
             len += BUFSIZ;
             result = realloc(result, len);
             assert(result != NULL);
+
+            /* reset the tmp pointer to the end of the new string */
+            tmp = result;
+            tmp += strlen(result) + 1;
         }
 
         /* next character */

@@ -122,6 +122,7 @@ void output_xunit(const results_t *results, const char *dest, const severity_t t
         assert(cdata != NULL);
         fprintf(fp, "        <system-out><![CDATA[%s]]></system-out>\n", cdata);
         free(cdata);
+        free(msg);
         cdata = NULL;
         msg = NULL;
     }
