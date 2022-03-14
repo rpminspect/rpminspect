@@ -143,12 +143,13 @@ Elf * get_elf_archive(const char *fullpath, int *out_fd)
 /*
  * Return true if a specified file is ELF, false otherwise.
  */
-bool is_elf(const char *fullpath) {
+bool is_elf(const char *path)
+{
     int fd = 0;
     Elf *elf = NULL;
 
     /* try it as a shared object */
-    elf = get_elf(fullpath, &fd);
+    elf = get_elf(path, &fd);
 
     if (elf) {
         elf_end(elf);
@@ -161,7 +162,7 @@ bool is_elf(const char *fullpath) {
     }
 
     /* try it as a static library */
-    elf = get_elf_archive(fullpath, &fd);
+    elf = get_elf_archive(path, &fd);
 
     if (elf) {
         elf_end(elf);
@@ -180,15 +181,15 @@ bool is_elf(const char *fullpath) {
  * Return true if a specified file is an ELF shared library file, that
  * is, of type ET_DYN.
  */
-bool is_elf_shared_library(const char *fullpath)
+bool is_elf_shared_library(const char *path)
 {
     bool result = false;
     int fd = 0;
     Elf *elf = NULL;
     char *soname = NULL;
 
-    elf = get_elf(fullpath, &fd);
-    soname = get_elf_soname(fullpath);
+    elf = get_elf(path, &fd);
+    soname = get_elf_soname(path);
 
     if (elf && get_elf_type(elf) == ET_DYN && soname != NULL) {
         result = true;
@@ -205,19 +206,6 @@ bool have_elf_section(Elf *elf, int64_t section, const char *name)
     return get_elf_section(elf, section, name, NULL, NULL) != NULL;
 }
 
-/**
- * @brief Given an ELF starting section, collect all section names.
- *
- * Sometimes you want to look at section names and do partial string
- * comparisons.  This function will collect all section names that
- * exist given a starting section.  The caller is responsible for
- * freeing the memory allocated with the returned list.
- *
- * @param elf The ELF object to scan.
- * @param start The starting ELF section (optional).
- * @return A string_list_t list of all ELF section names found, NULL
- *         indicates none found.
- */
 string_list_t *get_elf_section_names(Elf *elf, size_t start)
 {
     size_t shstrndx;
@@ -371,13 +359,6 @@ bool get_dynamic_tags(Elf *elf, const Elf64_Sxword tag, GElf_Dyn **out, size_t *
     return found;
 }
 
-/**
- * Check for the specified DT_FLAG flag in d_val for the Elf object.
- *
- * @param elf The ELF object to check
- * @param flag The flag value to look for
- * @return True if DT_FLAGS contains the flag, false otherwise.
- */
 bool have_dynamic_flag(Elf *elf, const Elf64_Sxword flag)
 {
     Elf_Scn *dyn_section;
