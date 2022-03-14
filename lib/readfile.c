@@ -41,14 +41,13 @@ void *read_file_bytes(const char *path, off_t *len)
 
     assert(path != NULL);
 
-    /* zero length files can be ignored */
+    /* unreadable files can be ignored */
     if (stat(path, &sb) == -1) {
-        warn("stat");
         return NULL;
     }
 
+    /* zero length file, ignore */
     if (sb.st_size == 0) {
-        /* zero length file, ignore */
         return NULL;
     }
 
