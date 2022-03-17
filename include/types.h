@@ -826,6 +826,18 @@ struct koji_build {
     char *module_context;
     char *module_content_koji_tag;
 
+    /*
+     * Total size of all RPMs (restricted to specified architectures
+     * by user)
+     */
+    unsigned long int total_size;
+
+    /*
+     * Total size of all unpacked RPMs (restricted to specified
+     * architectures by user)
+     */
+    unsigned long int total_unpacked_size;
+
     /* List of build IDs associated with this build */
     koji_buildlist_t *builds;
 };
@@ -862,6 +874,18 @@ struct koji_task {
     double completion_ts;
     char *arch;
     int id;
+
+    /*
+     * Total size of all RPMs (restricted to specified architectures
+     * by user)
+     */
+    unsigned long int total_size;
+
+    /*
+     * Total size of all unpacked RPMs (restricted to specified
+     * architectures by user)
+     */
+    unsigned long int total_unpacked_size;
 
     /* Descendent tasks (where files are) */
     koji_task_list_t *descendents;

@@ -842,10 +842,10 @@ struct koji_build *get_koji_build(struct rpminspect *ri, const char *buildspec)
                 } else if (!strcmp(key, "id")) {
                     xmlrpc_decompose_value(&env, value, "i", &buildentry->id);
                     xmlrpc_abort_on_fault(&env);
-                } else if (!strcmp(key, "s")) {
+                } else if (!strcmp(key, "volume_name")) {
                     xmlrpc_decompose_value(&env, value, "s", &buildentry->volume_name);
                     xmlrpc_abort_on_fault(&env);
-                } else if (!strcmp(key, "s")) {
+                } else if (!strcmp(key, "name")) {
                     xmlrpc_decompose_value(&env, value, "s", &buildentry->name);
                     xmlrpc_abort_on_fault(&env);
                 }
@@ -926,10 +926,9 @@ struct koji_build *get_koji_build(struct rpminspect *ri, const char *buildspec)
                         xmlrpc_decompose_value(&env, value, "I", &rpm->size);
                     } else {
                         /*
-                         * XXX: have no idea what we got back here, set it
-                         * negative for future debugging
+                         * XXX: have no idea what we got back here
                          */
-                        rpm->size = -1;
+                        rpm->size = 0;
                     }
                 }
 
@@ -941,6 +940,7 @@ struct koji_build *get_koji_build(struct rpminspect *ri, const char *buildspec)
 
             /* add this rpm to the list */
             if (allowed_arch(ri, rpm->arch)) {
+                build->total_size += rpm->size;
                 TAILQ_INSERT_TAIL(buildentry->rpms, rpm, items);
             } else {
                 free_koji_rpmlist_entry(rpm);
