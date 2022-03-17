@@ -28,6 +28,7 @@
 #include <signal.h>
 #include <regex.h>
 #include <rpm/header.h>
+#include <curl/curl.h>
 
 #ifdef _WITH_LIBCAP
 #include <sys/capability.h>
@@ -438,5 +439,57 @@ char *strdeprule(const deprule_entry_t *deprule);
 
 /* delta.c */
 char *get_file_delta(const char *a, const char *b);
+
+/* fs.c */
+/**
+ * @brief Return available space in bytes for the given path.
+ *
+ * Simple function that just wraps statvfs() and returns the available
+ * disk space for the given path.  On error, you get a warn() and the
+ * function returns 0 so the caller needs to handle that.  The reason
+ * it returns 0 is that nearly every instance of the caller handling
+ * an error from this function would be the same handling as if there
+ * was not enough space available.
+ *
+ * @param path The filesystem path to check.
+ * @return Number of bytes available.
+ */
+unsigned long get_available_space(const char *path);
+
+/* curl.c */
+/**
+ * @brief Download helper for libcurl
+ *
+ * Downloads src using libcurl and writes it to dst.  If verbose is
+ * true, displays a progress bar reporting the download progress.
+ *
+ * @param verbose True to display progress bar
+ * @param src URL to download
+ * @param dst Full path to the local destination (including filename)
+ */
+void curl_get_file(const bool verbose, const char *src, const char *dst);
+
+/**
+ * @brief Get the size of the file at the URL specified
+ *
+ * Return the size of the file specified by the URL, but do not
+ * download it.
+ *
+ * @param src URL to the file
+ * @return The size of the file
+ */
+curl_off_t curl_get_size(const char *src);
+
+/**
+ * @brief Return true if the URL specified is to an RPM package
+ *
+ * This function just looks at the URL in question and makes sure it's
+ * a URL and then the ending to check for '.rpm'.  It's not perfect,
+ * but for talking to build systems this is probably sufficient.
+ *
+ * @param url The URL
+ * @return True if the URL is an RPM, false otherwise.
+ */
+bool is_remote_rpm(const char *url);
 
 #endif

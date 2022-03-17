@@ -41,22 +41,14 @@
 #include <errno.h>
 #include <err.h>
 #include <rpm/rpmlib.h>
-#include <curl/curl.h>
 #include <yaml.h>
 #include "rpminspect.h"
-
-/* Globals used by programs linking with the library */
-volatile sig_atomic_t terminal_resized = 0;
 
 /* Local global variables */
 static struct rpminspect *workri = NULL;
 static int whichbuild = BEFORE_BUILD;
 static bool fetch_only = false;
 static int mode = S_IRWXU | S_IRGRP | S_IXGRP | S_IROTH | S_IXOTH;
-static size_t total_width = 0;
-static size_t bar_width = 0;
-static curl_off_t progress_displayed = 0;
-static size_t progress_msg_len = 0;
 
 /* This array holds strings that map to the whichbuild index value. */
 static char *build_desc[] = { "before", "after" };
@@ -67,8 +59,7 @@ static void get_rpm_info(const char *);
 static void prune_local(const int);
 static int copytree(const char *, const struct stat *, int, struct FTW *);
 static int download_build(const struct rpminspect *, const struct koji_build *);
-static int download_task(const struct rpminspect *, const struct koji_task *);
-static void curl_helper(const bool, const char *, const char *);
+static int download_task(const struct rpminspect *, struct koji_task *);
 
 /*
  * Set the working subdirectory for this particular run based on whether
@@ -89,7 +80,8 @@ static void set_worksubdir(struct rpminspect *ri, workdir_t wd, const struct koj
         } else if (task != NULL) {
             xasprintf(&ri->worksubdir, "%s/scratch-%d", ri->workdir, task->id);
         } else {
-            errx(RI_PROGRAM_ERROR, _("no koji build or task specified"));
+            ri->worksubdir = strdup(ri->workdir);
+            assert(ri->worksubdir);
         }
 
         if (mkdirp(ri->worksubdir, mode)) {
@@ -238,211 +230,13 @@ static int copytree(const char *fpath, const struct stat *sb, int tflag, struct 
 }
 
 /*
- * Called by either the download helper or the progress bar callback
- * on SIGWINCH.  Sets the line up for the progress bar.  NULL input
- * means reposition an in-progress progress bar.
- */
-static void setup_progress_bar(const char *src)
-{
-    size_t half_width = 0;
-    char *archive = NULL;
-    char *vmsg = NULL;
-
-    /* terminal width and progress bar width */
-    total_width = tty_width();
-    half_width = total_width / 2;
-    bar_width = half_width - 2;       /* account for '[' and ']' */
-    progress_displayed = 0;
-
-    /* generate the verbose message string */
-    if (src != NULL) {
-        /* the basename of the source URL, which is the file name */
-        archive = rindex(src, '/') + 1;
-        assert(archive != NULL);
-
-        /* we need to shorten the package basename if too wide */
-        if ((strlen(archive) + 4) > bar_width) {
-            archive = strshorten(archive, bar_width - 4);
-            assert(archive != NULL);
-            xasprintf(&vmsg, "=> %s ", archive);
-            assert(vmsg != NULL);
-            free(archive);
-        } else {
-            xasprintf(&vmsg, "=> %s ", archive);
-        }
-
-        progress_msg_len = strlen(vmsg);
-    }
-
-    /* display the progress bar and position the cursor */
-    /*
-     * Because I am very likely to forget these escape sequences,
-     * here's a brief explanation.  These are originate from the VT100
-     * and then became ANSI escape sequences, so you can search for
-     * both terms online and probably find the information you want.
-     * Here are direction movement ones:
-     *
-     *    Esc[nA      Move the cursor up n lines
-     *    Esc[nB      Move the cursor down n lines
-     *    Esc[nC      Move the cursor right n columns
-     *    Esc[nD      Move the cursor left n columns
-     *
-     * Within printf(3), we can't say "Esc" for escape, so we spell
-     * that as \033 to use the octal code (see ascii(7) for more
-     * information).  The values for n are computed and then are
-     * substituted in to the format string making this extremely
-     * difficult to read.  Good luck decoding.
-     */
-    if (vmsg != NULL) {
-        /* new progress bar */
-        printf("%s\033[%zuC[\033[%zuC]\033[%zuD", vmsg, bar_width - progress_msg_len, bar_width, bar_width + 1);
-        free(vmsg);
-    } else {
-        /* reposition due to terminal resize */
-        printf("\033[%" CURL_FORMAT_CURL_OFF_T "D[\033[%zuC]\033[%zuD", progress_msg_len + progress_displayed, bar_width, bar_width + 1);
-    }
-
-    fflush(stdout);
-    return;
-}
-
-/*
- * libcurl progress callback function
- * The caller needs to set up the terminal for displaying the progress
- * bar.  The total width needs to be in the global total_width
- * variable.  And the caller needs to position the cursor so this
- * callback can start printing hash marks.
- */
-static int download_progress(__attribute__((unused)) void *p, curl_off_t dltotal, curl_off_t dlnow, __attribute__((unused)) curl_off_t ultotal, __attribute__((unused)) curl_off_t ulnow)
-{
-    curl_off_t percentage = 0;
-    curl_off_t hashes = 0;
-    curl_off_t i = 0;
-
-    /* compute percentage downloaded */
-    if (dltotal > 0) {
-        percentage = (100L*dlnow + dltotal/2) / dltotal;
-    }
-
-    /*
-     * adjust the progress bar if the terminal has resized
-     */
-    if (terminal_resized == 1) {
-        /* reposition the progress bar */
-        setup_progress_bar(NULL);
-
-        /* reset for the next change */
-        terminal_resized = 0;
-    }
-
-    /*
-     * now determine how many hash marks represent that percentage in
-     * our progress bar
-     */
-    hashes = (percentage / 100.0) * bar_width;
-
-    /*
-     * display any new hash marks to indicate progress and update our
-     * displayed total
-     */
-    if (hashes != progress_displayed) {
-        for (i = 0; i < (hashes - progress_displayed); i++) {
-            printf("#");
-            fflush(stdout);
-        }
-
-        progress_displayed = hashes;
-    }
-
-    return 0;
-}
-
-#if LIBCURL_VERSION_NUM < 0x072000
-static int legacy_download_progress(void *p, double dltotal, double dlnow, double ultotal, double ulnow)
-{
-  return download_progress(p, (curl_off_t) dltotal, (curl_off_t) dlnow, (curl_off_t) ultotal, (curl_off_t) ulnow);
-}
-#endif
-
-/*
- * Download helper for libcurl
- */
-static void curl_helper(const bool verbose, const char *src, const char *dst) {
-    FILE *fp = NULL;
-    CURL *c = NULL;
-    int r;
-    CURLcode cc;
-
-    /* ignore unusued variable warnings if assert is disabled */
-    (void) r;
-    (void) cc;
-
-    assert(src != NULL);
-    assert(dst != NULL);
-
-    DEBUG_PRINT("src=|%s|\ndst=|%s|\n", src, dst);
-
-    /* initialize curl */
-    if (!(c = curl_easy_init())) {
-        warn("curl_easy_init");
-        return;
-    }
-
-    curl_easy_setopt(c, CURLOPT_WRITEFUNCTION, NULL);
-    curl_easy_setopt(c, CURLOPT_FOLLOWLOCATION, 1L);
-
-    if (verbose) {
-#if LIBCURL_VERSION_NUM >= 0x072000
-        curl_easy_setopt(c, CURLOPT_XFERINFOFUNCTION, download_progress);
-#else
-        curl_easy_setopt(c, CURLOPT_PROGRESSFUNCTION, legacy_download_progress);
-#endif
-        curl_easy_setopt(c, CURLOPT_NOPROGRESS, 0L);
-        setup_progress_bar(src);
-    }
-
-    /* perform the download */
-    fp = fopen(dst, "wb");
-
-    if (fp == NULL) {
-        err(RI_PROGRAM_ERROR, "fopen");
-    }
-
-    curl_easy_setopt(c, CURLOPT_URL, src);
-    curl_easy_setopt(c, CURLOPT_WRITEDATA, fp);
-    curl_easy_setopt(c, CURLOPT_FAILONERROR, true);
-#ifdef CURLOPT_TCP_FASTOPEN /* not available on all versions of libcurl (e.g., <= 7.29) */
-    curl_easy_setopt(c, CURLOPT_TCP_FASTOPEN, 1);
-#endif
-    cc = curl_easy_perform(c);
-
-    if (verbose) {
-        printf("\n");
-        fflush(stdout);
-    }
-
-    if (fclose(fp) != 0) {
-        err(RI_PROGRAM_ERROR, "fclose");
-    }
-
-    /* remove output file if there was a download error (e.g., 404) */
-    if (cc != CURLE_OK) {
-        if (unlink(dst)) {
-            warn("unlink");
-        }
-    }
-
-    curl_easy_cleanup(c);
-
-    return;
-}
-
-/*
  * Given a remote artifact specification in a Koji build, download it
  * to our working directory.
  */
 static int download_build(const struct rpminspect *ri, const struct koji_build *build)
 {
+    unsigned long avail = 0;
+    size_t total_width = 0;
     koji_buildlist_entry_t *buildentry = NULL;
     koji_rpmlist_entry_t *rpm = NULL;
     const char *downloading = NULL;
@@ -463,6 +257,18 @@ static int download_build(const struct rpminspect *ri, const struct koji_build *
 
     assert(build != NULL);
     assert(build->builds != NULL);
+
+    /* Check to see that there's enough disk space available */
+    avail = get_available_space(workri->workdir);
+
+    if (avail < build->total_size) {
+        fprintf(stderr, _("There is not enough available space to download the requested build.\n"));
+        fprintf(stderr, _("    Need %lu in %s, have %lu.\n"), build->total_size, workri->workdir, avail);
+        fprintf(stderr, _("See the `-w' option for specifying an alternate working directory.\n"));
+        fflush(stderr);
+        rmtree(workri->worksubdir, true, false);
+        return -1;
+    }
 
     /* Iterate over list of builds, each with a list of packages */
     TAILQ_FOREACH(buildentry, build->builds, builditems) {
@@ -529,7 +335,7 @@ static int download_build(const struct rpminspect *ri, const struct koji_build *
             /* Get the main metadata file */
             dst = strappend(dst, "/modulemd.txt", NULL);
             xasprintf(&src, "%s/packages/%s/%s/%s/files/module/modulemd.txt", workri->kojimbs, build->package_name, build->version, build->release);
-            curl_helper(workri->verbose, src, dst);
+            curl_get_file(workri->verbose, src, dst);
             free(src);
 
             /* Get the list of artifacts to filter if we don't have it */
@@ -634,7 +440,7 @@ static int download_build(const struct rpminspect *ri, const struct koji_build *
                 /* only download this file if we have not already gotten it */
                 if (access(dst, F_OK|R_OK)) {
                     xasprintf(&src, "%s/packages/%s/%s/%s/files/module/modulemd.%s.txt", workri->kojimbs, build->package_name, build->version, build->release, rpm->arch);
-                    curl_helper(workri->verbose, src, dst);
+                    curl_get_file(workri->verbose, src, dst);
                     free(src);
                 }
 
@@ -674,7 +480,7 @@ static int download_build(const struct rpminspect *ri, const struct koji_build *
                       pkg);
 
             /* download the package */
-            curl_helper(workri->verbose, src, dst);
+            curl_get_file(workri->verbose, src, dst);
 
             /* gather the RPM header */
             get_rpm_info(dst);
@@ -696,8 +502,9 @@ static int download_build(const struct rpminspect *ri, const struct koji_build *
  * Given a remote artifact specification in a Koji task, download it
  * to our working directory.
  */
-static int download_task(const struct rpminspect *ri, const struct koji_task *task)
+static int download_task(const struct rpminspect *ri, struct koji_task *task)
 {
+    unsigned long avail = 0;
     size_t len;
     char *pkg = NULL;
     char *src = NULL;
@@ -710,6 +517,48 @@ static int download_task(const struct rpminspect *ri, const struct koji_task *ta
     assert(task != NULL);
     assert(task->descendents != NULL);
 
+    /* compute total size of all files to download for the task */
+    TAILQ_FOREACH(descendent, task->descendents, items) {
+        /* skip if we have nothing */
+        if (TAILQ_EMPTY(descendent->srpms) && TAILQ_EMPTY(descendent->rpms)) {
+            continue;
+        }
+
+        /* size of SRPMs */
+        if (allowed_arch(workri, "src")) {
+            TAILQ_FOREACH(entry, descendent->srpms, items) {
+                xasprintf(&src, "%s/work/%s", workri->kojiursine, entry->data);
+                task->total_size += curl_get_size(src);
+                free(src);
+            }
+        }
+
+        /* size of RPMs */
+        TAILQ_FOREACH(entry, descendent->rpms, items) {
+            /* skip arches the user wishes to exclude */
+            if (!allowed_arch(ri, descendent->task->arch)) {
+                continue;
+            }
+
+            xasprintf(&src, "%s/work/%s", workri->kojiursine, entry->data);
+            task->total_size += curl_get_size(src);
+            free(src);
+        }
+    }
+
+    /* Check to see that there's enough disk space available */
+    avail = get_available_space(workri->workdir);
+
+    if (avail < task->total_size) {
+        fprintf(stderr, _("There is not enough available space to download the requested task.\n"));
+        fprintf(stderr, _("    Need %lu in %s, have %lu.\n"), task->total_size, workri->workdir, avail);
+        fprintf(stderr, _("See the `-w' option for specifying an alternate working directory.\n"));
+        fflush(stderr);
+        rmtree(workri->worksubdir, true, false);
+        return -1;
+    }
+
+    /* download the task */
     TAILQ_FOREACH(descendent, task->descendents, items) {
         /* skip if we have nothing */
         if (TAILQ_EMPTY(descendent->srpms) && TAILQ_EMPTY(descendent->rpms)) {
@@ -754,7 +603,7 @@ static int download_task(const struct rpminspect *ri, const struct koji_task *ta
                 assert(dst != NULL);
 
                 xasprintf(&src, "%s/work/%s", workri->kojiursine, entry->data);
-                curl_helper(workri->verbose, src, dst);
+                curl_get_file(workri->verbose, src, dst);
 
                 /* gather the RPM header */
                 get_rpm_info(dst);
@@ -779,7 +628,7 @@ static int download_task(const struct rpminspect *ri, const struct koji_task *ta
             }
 
             xasprintf(&src, "%s/work/%s", workri->kojiursine, entry->data);
-            curl_helper(workri->verbose, src, dst);
+            curl_get_file(workri->verbose, src, dst);
 
             /* gather the RPM header */
             get_rpm_info(dst);
@@ -797,11 +646,25 @@ static int download_task(const struct rpminspect *ri, const struct koji_task *ta
  */
 static int download_rpm(const char *rpm)
 {
+    unsigned long avail = 0;
+    unsigned long rpmsize = 0;
     char *pkg = NULL;
     char *dstdir = NULL;
     char *dst = NULL;
 
     assert(rpm != NULL);
+
+    /* Check to see that there's enough disk space available */
+    rpmsize = curl_get_size(rpm);
+    avail = get_available_space(workri->workdir);
+
+    if (avail < rpmsize) {
+        fprintf(stderr, _("There is not enough available space to download the requested RPM.\n"));
+        fprintf(stderr, _("    Need %lu in %s, have %lu.\n"), rpmsize, workri->workdir, avail);
+        fprintf(stderr, _("See the `-w' option for specifying an alternate working directory.\n"));
+        fflush(stderr);
+        return -1;
+    }
 
     /* the RPM filename */
     pkg = strdup(rpm);
@@ -821,7 +684,7 @@ static int download_rpm(const char *rpm)
 
     /* download the package */
     xasprintf(&dst, "%s/%s", dstdir, basename(pkg));
-    curl_helper(workri->verbose, rpm, dst);
+    curl_get_file(workri->verbose, rpm, dst);
 
     /* gather the RPM header */
     get_rpm_info(dst);
@@ -850,38 +713,6 @@ static bool is_task_id(const char *id)
     }
 
     return true;
-}
-
-/*
- * Returns true if a string contains a valid URL to an RPM, false
- * otherwise.  The check isn't perfect because it just looks at the
- * ending of the URL for ".rpm"
- */
-static bool is_remote_rpm(const char *url)
-{
-    CURL *c = NULL;
-    CURLcode r = -1;
-
-    assert(url != NULL);
-
-    if (!strsuffix(url, RPM_FILENAME_EXTENSION)) {
-        return false;
-    }
-
-    c = curl_easy_init();
-
-    if (c) {
-        curl_easy_setopt(c, CURLOPT_URL, url);
-        curl_easy_setopt(c, CURLOPT_NOBODY, 1);
-        r = curl_easy_perform(c);
-        curl_easy_cleanup(c);
-    }
-
-    if (r == CURLE_OK) {
-        return true;
-    } else {
-        return false;
-    }
 }
 
 /**
@@ -934,7 +765,6 @@ int gather_builds(struct rpminspect *ri, bool fo)
             set_worksubdir(ri, LOCAL_WORKDIR, NULL, NULL);
 
             if (download_rpm(ri->after)) {
-                warn("download_rpm");
                 return -1;
             }
         } else if (is_task_id(ri->after) && (task = get_koji_task(ri, ri->after)) != NULL) {
@@ -951,7 +781,6 @@ int gather_builds(struct rpminspect *ri, bool fo)
             set_worksubdir(ri, BUILD_WORKDIR, build, NULL);
 
             if (download_build(ri, build)) {
-                warn("download_build");
                 free_koji_build(build);
                 return -1;
             }
@@ -986,7 +815,6 @@ int gather_builds(struct rpminspect *ri, bool fo)
         set_worksubdir(ri, LOCAL_WORKDIR, NULL, NULL);
 
         if (download_rpm(ri->before)) {
-            warn("download_rpm");
             return -1;
         }
     } else if (is_task_id(ri->before) && (task = get_koji_task(ri, ri->before)) != NULL) {
@@ -1003,7 +831,6 @@ int gather_builds(struct rpminspect *ri, bool fo)
         set_worksubdir(ri, BUILD_WORKDIR, build, NULL);
 
         if (download_build(ri, build)) {
-            warn("download_build");
             free_koji_build(build);
             return -1;
         }
