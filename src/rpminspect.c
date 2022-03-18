@@ -289,7 +289,7 @@ int main(int argc, char **argv)
     int i = 0;
     int j = 0;
     int idx = 0;
-    int ret = RI_INSPECTION_SUCCESS;
+    int ret = RI_SUCCESS;
     wordexp_t expand;
     struct stat sb;
     char *short_options = "c:p:T:E:a:r:no:F:lw:t:s:fkdDv\?V";
@@ -523,7 +523,7 @@ int main(int argc, char **argv)
             }
         }
 
-        exit(RI_INSPECTION_SUCCESS);
+        exit(RI_SUCCESS);
     }
 
     /*
@@ -644,7 +644,7 @@ int main(int argc, char **argv)
             free_rpminspect(ri);
 
             if (dump_config) {
-                return RI_INSPECTION_SUCCESS;
+                return RI_SUCCESS;
             } else {
                 warnx(_("*** Invalid before and after build specification."));
                 errx(RI_PROGRAM_ERROR, _("*** See `%s --help` for more information."), COMMAND_NAME);
@@ -722,12 +722,18 @@ int main(int argc, char **argv)
         for (i = optind; i < argc; i++) {
             ri->after = strdup(argv[i]);
             assert(ri->after != NULL);
+            i = gather_builds(ri, true);
 
-            if (gather_builds(ri, true)) {
+            if (i) {
                 free_rpminspect(ri);
                 rpmFreeMacros(NULL);
                 rpmFreeRpmrc();
-                errx(RI_PROGRAM_ERROR, _("*** failed to gather specified builds."));
+
+                if (i > 0) {
+                    errx(i, strexitcode(i));
+                } else {
+                    exit(i);
+                }
             }
 
             free(ri->after);
@@ -739,13 +745,20 @@ int main(int argc, char **argv)
         free_rpminspect(ri);
         rpmFreeMacros(NULL);
         rpmFreeRpmrc();
-        return RI_INSPECTION_SUCCESS;
+        return RI_SUCCESS;
     } else {
-        if (gather_builds(ri, false)) {
+        i = gather_builds(ri, false);
+
+        if (i) {
             free_rpminspect(ri);
             rpmFreeMacros(NULL);
             rpmFreeRpmrc();
-            errx(RI_PROGRAM_ERROR, _("*** failed to gather specified builds."));
+
+            if (i > 0) {
+                errx(i, strexitcode(i));
+            } else {
+                exit(i);
+            }
         }
     }
 

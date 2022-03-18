@@ -174,7 +174,7 @@ int extract_peers(struct rpminspect *ri, bool fetchonly)
     rpmpeer_entry_t *peer = NULL;
 
     if (fetchonly) {
-        return 0;
+        return RI_SUCCESS;
     }
 
     assert(ri != NULL);
@@ -194,7 +194,7 @@ int extract_peers(struct rpminspect *ri, bool fetchonly)
         fprintf(stderr, _("    Need %lu in %s, have %lu.\n"), need, ri->workdir, avail);
         fprintf(stderr, _("See the `-w' option for specifying an alternate working directory.\n"));
         fflush(stderr);
-        return -1;
+        return RI_INSUFFICIENT_SPACE;
     }
 
     /* unpack all RPMs */
@@ -215,5 +215,5 @@ int extract_peers(struct rpminspect *ri, bool fetchonly)
         }
     }
 
-    return 0;
+    return RI_SUCCESS;
 }

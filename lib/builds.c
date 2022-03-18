@@ -267,7 +267,7 @@ static int download_build(const struct rpminspect *ri, const struct koji_build *
         fprintf(stderr, _("See the `-w' option for specifying an alternate working directory.\n"));
         fflush(stderr);
         rmtree(workri->worksubdir, true, false);
-        return -1;
+        return RI_INSUFFICIENT_SPACE;
     }
 
     /* Iterate over list of builds, each with a list of packages */
@@ -495,7 +495,7 @@ static int download_build(const struct rpminspect *ri, const struct koji_build *
         filter = NULL;
     }
 
-    return 0;
+    return RI_SUCCESS;
 }
 
 /*
@@ -555,7 +555,7 @@ static int download_task(const struct rpminspect *ri, struct koji_task *task)
         fprintf(stderr, _("See the `-w' option for specifying an alternate working directory.\n"));
         fflush(stderr);
         rmtree(workri->worksubdir, true, false);
-        return -1;
+        return RI_INSUFFICIENT_SPACE;
     }
 
     /* download the task */
@@ -638,7 +638,7 @@ static int download_task(const struct rpminspect *ri, struct koji_task *task)
         }
     }
 
-    return 0;
+    return RI_SUCCESS;
 }
 
 /*
@@ -663,7 +663,7 @@ static int download_rpm(const char *rpm)
         fprintf(stderr, _("    Need %lu in %s, have %lu.\n"), rpmsize, workri->workdir, avail);
         fprintf(stderr, _("See the `-w' option for specifying an alternate working directory.\n"));
         fflush(stderr);
-        return -1;
+        return RI_INSUFFICIENT_SPACE;
     }
 
     /* the RPM filename */
@@ -694,7 +694,7 @@ static int download_rpm(const char *rpm)
     free(dst);
     free(dstdir);
 
-    return 0;
+    return RI_SUCCESS;
 }
 
 /* Returns true if the string specifies a task ID, which is just an int */
@@ -728,10 +728,11 @@ static bool is_task_id(const char *id)
  * @param ri The main program data structure; contains the before and
  *        after build specifications from the command line.
  * @param fo True if '-f' (fetch only) specified, false otherwise.
- * @return 0 on success, non-zero on failure.
+ * @return 0 on success, non-zero on failure (program exit code).
  */
 int gather_builds(struct rpminspect *ri, bool fo)
 {
+    int r = 0;
     struct koji_build *build = NULL;
     struct koji_task *task = NULL;
 
@@ -763,32 +764,34 @@ int gather_builds(struct rpminspect *ri, bool fo)
             prune_local(whichbuild);
         } else if (is_remote_rpm(ri->after)) {
             set_worksubdir(ri, LOCAL_WORKDIR, NULL, NULL);
+            r = download_rpm(ri->after);
 
-            if (download_rpm(ri->after)) {
-                return -1;
+            if (r != RI_SUCCESS) {
+                return r;
             }
         } else if (is_task_id(ri->after) && (task = get_koji_task(ri, ri->after)) != NULL) {
             set_worksubdir(ri, TASK_WORKDIR, NULL, task);
+            r = download_task(ri, task);
 
-            if (download_task(ri, task)) {
-                warn("download_task");
+            if (r != RI_SUCCESS) {
                 free_koji_task(task);
-                return -1;
+                return r;
             }
 
             free_koji_task(task);
         } else if ((build = get_koji_build(ri, ri->after)) != NULL) {
             set_worksubdir(ri, BUILD_WORKDIR, build, NULL);
+            r = download_build(ri, build);
 
-            if (download_build(ri, build)) {
+            if (r != RI_SUCCESS) {
                 free_koji_build(build);
-                return -1;
+                return r;
             }
 
             free_koji_build(build);
         } else {
             warnx(_("unable to find after build: %s"), ri->after);
-            return -2;
+            return -1;
         }
     }
 
@@ -813,26 +816,28 @@ int gather_builds(struct rpminspect *ri, bool fo)
         prune_local(whichbuild);
     } else if (is_remote_rpm(ri->before)) {
         set_worksubdir(ri, LOCAL_WORKDIR, NULL, NULL);
+        r = download_rpm(ri->before);
 
-        if (download_rpm(ri->before)) {
-            return -1;
+        if (r != RI_SUCCESS) {
+            return r;
         }
     } else if (is_task_id(ri->before) && (task = get_koji_task(ri, ri->before)) != NULL) {
         set_worksubdir(ri, TASK_WORKDIR, NULL, task);
+        r = download_task(ri, task);
 
-        if (download_task(ri, task)) {
-            warn("download_task");
+        if (r != RI_SUCCESS) {
             free_koji_task(task);
-            return -1;
+            return r;
         }
 
         free_koji_task(task);
     } else if ((build = get_koji_build(ri, ri->before)) != NULL) {
         set_worksubdir(ri, BUILD_WORKDIR, build, NULL);
+        r = download_build(ri, build);
 
-        if (download_build(ri, build)) {
+        if (r != RI_SUCCESS) {
             free_koji_build(build);
-            return -1;
+            return r;
         }
 
         free_koji_build(build);

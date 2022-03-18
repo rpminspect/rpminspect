@@ -98,10 +98,11 @@ extern volatile sig_atomic_t terminal_resized;
  * Types of exit codes from the program.
  */
 enum {
-    RI_INSPECTION_SUCCESS = 0,   /* inspections passed */
+    RI_SUCCESS = 0,              /* everything ok */
     RI_INSPECTION_FAILURE = 1,   /* inspections failed */
     RI_PROGRAM_ERROR = 2,        /* program errored in some way */
-    RI_MISSING_PROFILE = 3       /* specified profile not found */
+    RI_MISSING_PROFILE = 3,      /* specified profile not found */
+    RI_INSUFFICIENT_SPACE = 4    /* insufficient disk space */
 };
 
 /*
@@ -211,6 +212,19 @@ char *strappend(char *, ...);
 string_list_t *strsplit(const char *, const char *);
 const char *strtype(const mode_t mode);
 char *strshorten(const char *s, size_t width);
+
+/**
+ * @brief Return descriptive string for the given exit code.
+ *
+ * Return the descriptive string for the specified program exit code.
+ * Unknown exit codes return "".  The caller must not free this
+ * string.
+ *
+ * @param exitcode The program exit code.
+ * @return Descriptive string for the specified exit code (do not
+ *         free!)
+ */
+const char *strexitcode(int exitcode);
 
 /* badwords.c */
 bool has_bad_word(const char *, const string_list_t *);
