@@ -58,7 +58,8 @@ static int printword(const char *word, const size_t width, const unsigned int in
 /*
  * Returns true if s starts with prefix.
  */
-bool strprefix(const char *s, const char *prefix) {
+bool strprefix(const char *s, const char *prefix)
+{
     size_t plen;
 
     assert(s);
@@ -81,7 +82,8 @@ bool strprefix(const char *s, const char *prefix) {
  * Test if the string STR ends up with the string SUFFIX.
  * Both strings have to be NULL terminated.
  */
-bool strsuffix(const char *s, const char *suffix) {
+bool strsuffix(const char *s, const char *suffix)
+{
     int sl, xl;
 
     assert(s);
@@ -105,7 +107,8 @@ bool strsuffix(const char *s, const char *suffix) {
  * don't preformat your strings with two spaces after sentences and stuff
  * like that unless you weird looking word wrapped output.
  */
-int printwrap(const char *s, const size_t width, const unsigned int indent, FILE *dest) {
+int printwrap(const char *s, const size_t width, const unsigned int indent, FILE *dest)
+{
     int lines = 0;
     bool first = false;
     bool begin = false;
@@ -254,7 +257,8 @@ cleanup:
 /*
  * Given a severity_t, return a string representing the value.
  */
-char *strseverity(const severity_t severity) {
+char *strseverity(const severity_t severity)
+{
     switch (severity) {
         case RESULT_NULL:
             return _("NULL");
@@ -279,7 +283,8 @@ char *strseverity(const severity_t severity) {
  * Given a severity string, return a severity_t matching it.
  * Or return the default.
  */
-severity_t getseverity(const char *name, const severity_t default_s) {
+severity_t getseverity(const char *name, const severity_t default_s)
+{
     severity_t s = default_s;
 
     if (name == NULL) {
@@ -306,7 +311,8 @@ severity_t getseverity(const char *name, const severity_t default_s) {
 /*
  * Given a type of waiver authorization, return a string representing it.
  */
-char *strwaiverauth(const waiverauth_t waiverauth) {
+char *strwaiverauth(const waiverauth_t waiverauth)
+{
     switch (waiverauth) {
         case NOT_WAIVABLE:
             return _("Not Waivable");
@@ -617,4 +623,21 @@ char *strshorten(const char *s, size_t width)
     tail = stpcpy(tail, s);
 
     return r;
+}
+
+const char *strexitcode(int exitcode)
+{
+    if (exitcode == RI_SUCCESS) {
+        return _("Success.");
+    } else if (exitcode == RI_INSPECTION_FAILURE) {
+        return _("One or more inspections failed.");
+    } else if (exitcode == RI_PROGRAM_ERROR) {
+        return _("Program error.");
+    } else if (exitcode == RI_MISSING_PROFILE) {
+        return _("The specified profile is not found.");
+    } else if (exitcode == RI_INSUFFICIENT_SPACE) {
+        return _("Insufficient disk space in the working directory.");
+    }
+
+    return "";
 }
