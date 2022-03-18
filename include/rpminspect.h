@@ -233,6 +233,22 @@ rpmpeer_t *init_rpmpeer(void);
 void free_rpmpeer(rpmpeer_t *);
 void add_peer(rpmpeer_t **, int, bool, const char *, Header);
 
+/**
+ * @brief Iterate over all packages and extract them.
+ *
+ * Called internally when the program has verified enough disk space
+ * exists to extract the RPM packages and begin inspections.  The
+ * extraction step previously happened in add_peer() but has been
+ * moved to this function to allow for a disk space check before
+ * extraction begins.  If fetchonly is true, this function is a no-op
+ * and returns 0 immediately.
+ *
+ * @param ri The main rpminspect object
+ * @param fetchonly True if rpminspect is running in fetch-only mode
+ * @return 0 on success, -1 on failure
+ */
+int extract_peers(struct rpminspect *ri, bool fetchonly);
+
 /* files.c */
 void free_files(rpmfile_t *files);
 rpmfile_t * extract_rpm(const char *, Header, char **output_dir);

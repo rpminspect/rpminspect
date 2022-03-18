@@ -189,16 +189,18 @@ typedef struct _deprule_ignore_map_t {
  * reference.
  */
 typedef struct _rpmpeer_entry_t {
-    Header before_hdr;                /* RPM header of the before package */
-    Header after_hdr;                 /* RPM header of the after package */
-    char *before_rpm;                 /* full path to the before RPM */
-    char *after_rpm;                  /* full path to the after RPM */
-    char *before_root;                /* full path to the before RPM extracted root dir */
-    char *after_root;                 /* full path to the after RPM extracted root dir */
-    rpmfile_t *before_files;          /* list of files in the payload of the before RPM */
-    rpmfile_t *after_files;           /* list of files in the payload of the after RPM */
-    deprule_list_t *before_deprules;  /* dependency rules for the before RPM */
-    deprule_list_t *after_deprules;   /* dependency rules for the after RPM */
+    Header before_hdr;                       /* RPM header of the before package */
+    Header after_hdr;                        /* RPM header of the after package */
+    char *before_rpm;                        /* full path to the before RPM */
+    char *after_rpm;                         /* full path to the after RPM */
+    char *before_root;                       /* full path to the before RPM extracted root dir */
+    char *after_root;                        /* full path to the after RPM extracted root dir */
+    rpmfile_t *before_files;                 /* list of files in the payload of the before RPM */
+    rpmfile_t *after_files;                  /* list of files in the payload of the after RPM */
+    deprule_list_t *before_deprules;         /* dependency rules for the before RPM */
+    deprule_list_t *after_deprules;          /* dependency rules for the after RPM */
+    unsigned long int before_unpacked_size;  /* size of unpacked RPM payload */
+    unsigned long int after_unpacked_size;   /* size of unpacked RPM payload */
     TAILQ_ENTRY(_rpmpeer_entry_t) items;
 } rpmpeer_entry_t;
 
