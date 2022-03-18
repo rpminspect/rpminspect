@@ -794,7 +794,7 @@ int gather_builds(struct rpminspect *ri, bool fo)
 
     /* did we get a before build specified? */
     if (ri->before == NULL) {
-        return 0;
+        return extract_peers(ri, fo);
     }
 
     whichbuild = BEFORE_BUILD;
@@ -847,5 +847,8 @@ int gather_builds(struct rpminspect *ri, bool fo)
      */
     init_arches(ri);
 
-    return 0;
+    /*
+     * extract the RPMs
+     */
+    return extract_peers(ri, fo);
 }

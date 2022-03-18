@@ -122,7 +122,9 @@ void add_peer(rpmpeer_t **peers, int whichbuild, bool fetch_only, const char *pk
 
     /* Add the peer if it doesn't already exist, otherwise add it */
     if (!found) {
-        if ((peer = calloc(1, sizeof(*peer))) == NULL) {
+        peer = calloc(1, sizeof(*peer));
+
+        if (peer == NULL) {
             warn("calloc");
             return;
         }
@@ -131,23 +133,25 @@ void add_peer(rpmpeer_t **peers, int whichbuild, bool fetch_only, const char *pk
     if (whichbuild == BEFORE_BUILD) {
         peer->before_hdr = hdr;
         peer->before_rpm = strdup(pkg);
+        peer->before_files = NULL;
+        peer->before_root = NULL;
+        peer->before_unpacked_size = headerGetNumber(peer->before_hdr, RPMTAG_SIZE);
 
         if (fetch_only) {
-            peer->before_files = NULL;
-            peer->after_root = NULL;
+            peer->before_deprules = NULL;
         } else {
-            peer->before_files = extract_rpm(pkg, hdr, &peer->before_root);
             peer->before_deprules = gather_deprules(hdr);
         }
     } else if (whichbuild == AFTER_BUILD) {
         peer->after_hdr = hdr;
         peer->after_rpm = strdup(pkg);
+        peer->after_files = NULL;
+        peer->after_root = NULL;
+        peer->after_unpacked_size = headerGetNumber(peer->after_hdr, RPMTAG_SIZE);
 
         if (fetch_only) {
-            peer->after_files = NULL;
-            peer->after_root = NULL;
+            peer->after_deprules = NULL;
         } else {
-            peer->after_files = extract_rpm(pkg, hdr, &peer->after_root);
             peer->after_deprules = gather_deprules(hdr);
         }
     }
@@ -156,13 +160,60 @@ void add_peer(rpmpeer_t **peers, int whichbuild, bool fetch_only, const char *pk
         TAILQ_INSERT_TAIL(*peers, peer, items);
     }
 
-    if (peer->before_files && peer->after_files) {
-        find_file_peers(peer->before_files, peer->after_files);
-    }
-
     if (peer->before_deprules && peer->after_deprules) {
         find_deprule_peers(peer->before_deprules, peer->after_deprules);
     }
 
     return;
+}
+
+int extract_peers(struct rpminspect *ri, bool fetchonly)
+{
+    unsigned long avail = 0;
+    unsigned long need = 0;
+    rpmpeer_entry_t *peer = NULL;
+
+    if (fetchonly) {
+        return 0;
+    }
+
+    assert(ri != NULL);
+    assert(ri->peers != NULL);
+    assert(ri->workdir != NULL);
+
+    /* compute total unpacked size required and see if there's space */
+    TAILQ_FOREACH(peer, ri->peers, items) {
+        need += peer->before_unpacked_size;
+        need += peer->after_unpacked_size;
+    }
+
+    avail = get_available_space(ri->workdir);
+
+    if (avail < need) {
+        fprintf(stderr, _("There is not enough available space to unpack all of the RPMs.\n"));
+        fprintf(stderr, _("    Need %lu in %s, have %lu.\n"), need, ri->workdir, avail);
+        fprintf(stderr, _("See the `-w' option for specifying an alternate working directory.\n"));
+        fflush(stderr);
+        return -1;
+    }
+
+    /* unpack all RPMs */
+    TAILQ_FOREACH(peer, ri->peers, items) {
+        /* extract the before peer */
+        if (peer->before_hdr && peer->before_rpm) {
+            peer->before_files = extract_rpm(peer->before_rpm, peer->before_hdr, &peer->before_root);
+        }
+
+        /* extract the after peer */
+        if (peer->after_hdr && peer->after_rpm) {
+            peer->after_files = extract_rpm(peer->after_rpm, peer->after_hdr, &peer->after_root);
+        }
+
+        /* match up file peers between builds */
+        if (peer->before_files && peer->after_files) {
+            find_file_peers(peer->before_files, peer->after_files);
+        }
+    }
+
+    return 0;
 }
