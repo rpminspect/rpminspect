@@ -898,7 +898,7 @@ int main(int argc, char **argv)
             printf(_("\nKeeping working directory: %s\n"), ri->worksubdir);
         } else {
             /* remove the working directories we can */
-            (void) rmtree(ri->workdir, true, true);
+            (void) rmtree(ri->worksubdir, true, false);
         }
     }
 
