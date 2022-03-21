@@ -730,7 +730,7 @@ int main(int argc, char **argv)
                 rpmFreeRpmrc();
 
                 if (i > 0) {
-                    errx(i, strexitcode(i));
+                    errx(i, "%s", strexitcode(i));
                 } else {
                     exit(i);
                 }
@@ -755,7 +755,7 @@ int main(int argc, char **argv)
             rpmFreeRpmrc();
 
             if (i > 0) {
-                errx(i, strexitcode(i));
+                errx(i, "%s", strexitcode(i));
             } else {
                 exit(i);
             }
