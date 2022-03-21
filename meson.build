@@ -204,6 +204,17 @@ endif
 
 dl = declare_dependency(link_args : ['-ldl'])
 
+# libm
+if not cc.has_function('round', args : ['-lm'])
+    error('*** unable to find round() in libm')
+endif
+
+if not cc.has_function('lround', args : ['-lm'])
+    error('*** unable to find lround() in libm')
+endif
+
+m = declare_dependency(link_args : ['-lm'])
+
 # Check for sys/queue.h
 if not cc.has_header('sys/queue.h')
     message('<sys/queue.h> not found, using bundled copy')
