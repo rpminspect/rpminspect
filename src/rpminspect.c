@@ -722,17 +722,17 @@ int main(int argc, char **argv)
         for (i = optind; i < argc; i++) {
             ri->after = strdup(argv[i]);
             assert(ri->after != NULL);
-            i = gather_builds(ri, true);
+            j = gather_builds(ri, true);
 
-            if (i) {
+            if (j) {
                 free_rpminspect(ri);
                 rpmFreeMacros(NULL);
                 rpmFreeRpmrc();
 
-                if (i > 0) {
-                    errx(i, "%s", strexitcode(i));
+                if (j > 0) {
+                    errx(j, "%s", strexitcode(j));
                 } else {
-                    exit(i);
+                    exit(j);
                 }
             }
 
@@ -747,17 +747,17 @@ int main(int argc, char **argv)
         rpmFreeRpmrc();
         return RI_SUCCESS;
     } else {
-        i = gather_builds(ri, false);
+        j = gather_builds(ri, false);
 
-        if (i) {
+        if (j) {
             free_rpminspect(ri);
             rpmFreeMacros(NULL);
             rpmFreeRpmrc();
 
-            if (i > 0) {
-                errx(i, "%s", strexitcode(i));
+            if (j > 0) {
+                errx(j, "%s", strexitcode(j));
             } else {
-                exit(i);
+                exit(j);
             }
         }
     }
