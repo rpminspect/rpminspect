@@ -171,6 +171,8 @@ int extract_peers(struct rpminspect *ri, bool fetchonly)
 {
     unsigned long avail = 0;
     unsigned long need = 0;
+    char *availh = NULL;
+    char *needh = NULL;
     rpmpeer_entry_t *peer = NULL;
 
     if (fetchonly) {
@@ -190,10 +192,15 @@ int extract_peers(struct rpminspect *ri, bool fetchonly)
     avail = get_available_space(ri->workdir);
 
     if (avail < need) {
+        availh = human_size(avail);
+        needh = human_size(need);
+
         fprintf(stderr, _("There is not enough available space to unpack all of the RPMs.\n"));
-        fprintf(stderr, _("    Need %lu in %s, have %lu.\n"), need, ri->workdir, avail);
+        fprintf(stderr, _("    Need %s in %s, have %s.\n"), needh, ri->workdir, availh);
         fprintf(stderr, _("See the `-w' option for specifying an alternate working directory.\n"));
         fflush(stderr);
+        free(needh);
+        free(availh);
         return RI_INSUFFICIENT_SPACE;
     }
 

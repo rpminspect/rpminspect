@@ -32,6 +32,7 @@ librpminspect_sources = [
     'flags.c',
     'free.c',
     'fs.c',
+    'humansize.c',
     'init.c',
     'inspect.c',
     'inspect_addedfiles.c',
@@ -125,6 +126,7 @@ deps = [
     dl,
     icu_uc,
     icu_io,
+    m,
 ]
 
 if get_option('with_libkmod')

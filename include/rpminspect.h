@@ -522,4 +522,17 @@ curl_off_t curl_get_size(const char *src);
  */
 bool is_remote_rpm(const char *url);
 
+/* humansize.c */
+/**
+ * @brief Return human-readable size for the bytes given.
+ *
+ * Given a number of bytes, return a human-readable string
+ * representing that size.  The caller must free the returned string.
+ *
+ * @param bytes Number of bytes to convert.
+ * @return Allocated string containing human-readable size; caller
+ *         must free.
+ */
+char *human_size(const unsigned long bytes);
+
 #endif
