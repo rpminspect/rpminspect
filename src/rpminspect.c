@@ -149,7 +149,6 @@ static char *match_product(string_map_t *products, const char *candidate)
 static char *get_product_release(string_map_t *products, const favor_release_t favor_release, const char *before, const char *after)
 {
     int c;
-    char *pos = NULL;
     char *before_candidate = NULL;
     char *after_candidate = NULL;
     char *before_product = NULL;
@@ -158,9 +157,11 @@ static char *get_product_release(string_map_t *products, const favor_release_t f
 
     assert(after != NULL);
 
-    pos = rindex(after, '.');
+    while (*after != '.' && *after != '\0') {
+        after++;
+    }
 
-    if (!pos) {
+    if (!after) {
         warnx(_("*** Product release for after build (%s) is empty"), after);
         return NULL;
     }
@@ -169,7 +170,7 @@ static char *get_product_release(string_map_t *products, const favor_release_t f
      * Get the character after the last occurrence of a period. This should
      * tell us what release flag the product is.
      */
-    after_candidate = strdup(pos);
+    after_candidate = strdup(after);
 
     if (after_candidate == NULL) {
         warnx(_("*** Product release for after build (%s) is empty"), after);
@@ -183,15 +184,17 @@ static char *get_product_release(string_map_t *products, const favor_release_t f
     after_candidate[strcspn(after_candidate, "/")] = 0;
 
     if (before) {
-        pos = rindex(before, '.');
+        while (*before != '.' && *before != '\0') {
+            before++;
+        }
 
-        if (!pos) {
+        if (!before) {
             warnx(_("*** Product release for before build (%s) is empty"), before);
             free(after_candidate);
             return NULL;
         }
 
-        before_candidate = strdup(pos);
+        before_candidate = strdup(before);
 
         if (before_candidate == NULL) {
             warnx(_("*** Product release for before build (%s) is empty"), before);
