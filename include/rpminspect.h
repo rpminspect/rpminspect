@@ -59,16 +59,16 @@ extern volatile sig_atomic_t terminal_resized;
 /* Macros */
 #ifdef NDEBUG
 /* Don't create unused variables if not using assert() */
-#define xasprintf(dest, ...) {                   \
-    *(dest) = NULL;                              \
-    asprintf((dest), __VA_ARGS__);               \
+#define xasprintf(dest, ...) {                         \
+    *(dest) = NULL;                                    \
+    asprintf((dest), __VA_ARGS__);                     \
 }
 #else
-#define xasprintf(dest, ...) {                   \
-    int _xasprintf_result;                       \
-    *(dest) = NULL;                              \
-    _xasprintf_result = asprintf((dest), __VA_ARGS__);\
-    assert(_xasprintf_result != -1);             \
+#define xasprintf(dest, ...) {                         \
+    int _xasprintf_result;                             \
+    *(dest) = NULL;                                    \
+    _xasprintf_result = asprintf((dest), __VA_ARGS__); \
+    assert(_xasprintf_result != -1);                   \
 }
 #endif
 
