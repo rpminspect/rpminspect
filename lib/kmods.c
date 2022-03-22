@@ -139,12 +139,12 @@ static void convert_module_dependencies(string_list_t *list, const struct kmod_l
  */
 bool compare_module_parameters(const struct kmod_list *before, const struct kmod_list *after, string_list_t **lost, string_list_t **gain)
 {
-    string_list_t *before_parm_list;
-    string_list_t *after_parm_list;
-    string_list_t *difference;
-    string_list_t *added;
-
-    bool result;
+    string_list_t *before_parm_list = NULL;
+    string_list_t *after_parm_list = NULL;
+    string_list_t *difference = NULL;
+    string_list_t *added = NULL;
+    string_list_t *combined = NULL;
+    bool result = true;
 
     assert(before);
     assert(after);
@@ -156,9 +156,14 @@ bool compare_module_parameters(const struct kmod_list *before, const struct kmod
     DEBUG_PRINT("after module\n");
     after_parm_list = modinfo_to_list(after, convert_module_parameters);
 
-    /* diff the parameter lists */
+    /* parameters present in both modules */
+    combined = list_intersection(before_parm_list, after_parm_list);
+
+    /* diff the parameter lists to get lost parameters */
     difference = list_difference(before_parm_list, after_parm_list);
-    added = list_difference(after_parm_list, before_parm_list);
+
+    /* gather any new parameters */
+    added = list_difference(after_parm_list, combined);
 
     /* If the lists are empty, everything is fine.
      * Otherwise, make a copy of difference so we can clean everything up
@@ -181,6 +186,7 @@ bool compare_module_parameters(const struct kmod_list *before, const struct kmod
     list_free(difference, NULL);
     list_free(before_parm_list, free);
     list_free(after_parm_list, free);
+    list_free(combined, free);
 
     return result;
 }
