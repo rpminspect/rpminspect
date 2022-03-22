@@ -86,6 +86,7 @@ static bool kmod_driver(struct rpminspect *ri, rpmfile_entry_t *file)
     const char *aftername = NULL;
     const char *beforever = NULL;
     const char *afterver = NULL;
+    severity_t oldsev;
 
     assert(ri != NULL);
     assert(file != NULL);
@@ -151,6 +152,7 @@ static bool kmod_driver(struct rpminspect *ri, rpmfile_entry_t *file)
     }
 
     err = kmod_module_new_from_path(kctx, file->peer_file->fullpath, &beforekmod);
+
     if (err < 0) {
         /* not a kernel module */
         kmod_unref(kctx);
@@ -168,6 +170,7 @@ static bool kmod_driver(struct rpminspect *ri, rpmfile_entry_t *file)
     }
 
     err = kmod_module_new_from_path(kctx, file->fullpath, &afterkmod);
+
     if (err < 0) {
         /* not a kernel module */
         kmod_module_unref(beforekmod);
@@ -179,6 +182,7 @@ static bool kmod_driver(struct rpminspect *ri, rpmfile_entry_t *file)
 
     /* Gather module parameters */
     err = kmod_module_get_info(beforekmod, &beforeinfo);
+
     if (err < 0) {
         warn("kmod_module_get_info");
         kmod_module_unref(beforekmod);
@@ -188,6 +192,7 @@ static bool kmod_driver(struct rpminspect *ri, rpmfile_entry_t *file)
     }
 
     err = kmod_module_get_info(afterkmod, &afterinfo);
+
     if (err < 0) {
         warn("kmod_module_get_info");
         kmod_module_info_free_list(beforeinfo);
@@ -201,9 +206,9 @@ static bool kmod_driver(struct rpminspect *ri, rpmfile_entry_t *file)
     result_parm = compare_module_parameters(beforeinfo, afterinfo, &lost, &gain);
 
     /* Report parameters */
-    if (lost != NULL && !TAILQ_EMPTY(lost)) {
+    if (!result_parm && lost != NULL && !TAILQ_EMPTY(lost)) {
         TAILQ_FOREACH(entry, lost, items) {
-            xasprintf(&params.msg, _("Kernel module %s removes parameter '%s'"), file->localpath, entry->data);
+            xasprintf(&params.msg, _("Kernel module %s removes parameter '%s' (was present in %s)."), file->localpath, entry->data, file->peer_file->localpath);
             params.remedy = REMEDY_KMOD_PARM;
             params.verb = VERB_REMOVED;
             params.noun = _("${FILE} kernel module parameter on ${ARCH}");
@@ -220,7 +225,8 @@ static bool kmod_driver(struct rpminspect *ri, rpmfile_entry_t *file)
 
     if (gain != NULL && !TAILQ_EMPTY(gain)) {
         TAILQ_FOREACH(entry, gain, items) {
-            xasprintf(&params.msg, _("Kernel module %s adds parameter '%s'"), file->localpath, entry->data);
+            xasprintf(&params.msg, _("Kernel module %s adds parameter '%s' (was not present in %s)."), file->localpath, entry->data, file->peer_file->localpath);
+            oldsev = params.severity;
             params.severity = RESULT_INFO;
             params.waiverauth = NOT_WAIVABLE;
             params.remedy = NULL;
@@ -231,6 +237,7 @@ static bool kmod_driver(struct rpminspect *ri, rpmfile_entry_t *file)
             add_result(ri, &params);
             free(params.msg);
             params.msg = NULL;
+            params.severity = oldsev;
         }
 
         list_free(gain, free);
@@ -241,9 +248,9 @@ static bool kmod_driver(struct rpminspect *ri, rpmfile_entry_t *file)
     result_deps = compare_module_dependencies(beforeinfo, afterinfo, &lost, &gain);
 
     /* Report dependencies */
-    if (lost != NULL && !TAILQ_EMPTY(lost)) {
+    if (!result_deps && lost != NULL && !TAILQ_EMPTY(lost)) {
         TAILQ_FOREACH(entry, lost, items) {
-            xasprintf(&params.msg, _("Kernel module %s removes dependency '%s'"), file->localpath, entry->data);
+            xasprintf(&params.msg, _("Kernel module %s removes dependency '%s' (was present in %s)."), file->localpath, entry->data, file->peer_file->localpath);
             params.remedy = REMEDY_KMOD_DEPS;
             params.verb = VERB_REMOVED;
             params.noun = _("${FILE} kernel module dependency on ${ARCH}");
@@ -260,7 +267,7 @@ static bool kmod_driver(struct rpminspect *ri, rpmfile_entry_t *file)
 
     if (gain != NULL && !TAILQ_EMPTY(gain)) {
         TAILQ_FOREACH(entry, gain, items) {
-            xasprintf(&params.msg, _("Kernel module %s adds dependency '%s'"), file->localpath, entry->data);
+            xasprintf(&params.msg, _("Kernel module %s adds dependency '%s' (was not present in %s)."), file->localpath, entry->data, file->peer_file->localpath);
             params.remedy = REMEDY_KMOD_DEPS;
             params.verb = VERB_ADDED;
             params.noun = _("${FILE} kernel module parameter");

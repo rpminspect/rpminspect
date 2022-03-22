@@ -141,6 +141,10 @@ string_list_t *list_difference(const string_list_t *a, const string_list_t *b)
     /* Copy list b into a hash table */
     b_table = list_to_table(b);
 
+    if (b_table == NULL) {
+        return NULL;
+    }
+
     /* Iterate through list a looking for things not in list b */
     TAILQ_FOREACH(iter, a, items) {
         HASH_FIND_STR(b_table, iter->data, hentry);
