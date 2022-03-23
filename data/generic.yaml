@@ -408,12 +408,17 @@ shellsyntax:
 filesize:
     # File size reporting threshold percentage.  What percentage
     # change warrants reporting a VERIFY result?  This change can be
-    # file size increase or decrease.  The default is 20%
+    # file size increase or decrease.
     #
     # NOTE: you can set this to the keyword 'info' (without the single
     # quotes) to have rpminspect report all filesize changes but at
-    # the INFO reporting level
-    size_threshold: 20
+    # the INFO reporting level.
+    #
+    # The default is 'info' to only report changes as INFO.  To enable
+    # size threshold checks based on a percentage, enter the
+    # percentage without the '%'.  For example, to set the threshold
+    # to 20%, put '20' (but without the single quotes).
+    size_threshold: info
 
     # Optional list of glob(7) specifications to match files to ignore
     # for this inspection.  The format of this list is the same as the
