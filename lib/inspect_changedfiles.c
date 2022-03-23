@@ -454,7 +454,7 @@ static bool changedfiles_driver(struct rpminspect *ri, rpmfile_entry_t *file)
 
         if (before_sum && after_sum && strcmp(before_sum, after_sum)) {
             xasprintf(&params.msg, _("File %s changed content on %s.  Please verify this change was deliberate for a non-rebased build."), file->localpath, arch);
-            params.severity = RESULT_VERIFY;
+            params.severity = RESULT_INFO;
             params.waiverauth = WAIVABLE_BY_ANYONE;
             params.verb = VERB_CHANGED;
             params.noun = _("${FILE}");
