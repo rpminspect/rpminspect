@@ -17,7 +17,7 @@
 #
 
 import rpmfluff
-
+import yaml
 from baseclass import TestCompareRPMs
 
 
@@ -39,6 +39,20 @@ class FileSizeGrowsAtThreshold(TestCompareRPMs):
         self.result = "VERIFY"
         self.waiver_auth = "Anyone"
 
+    def configFile(self):
+        super().configFile()
+
+        # modify the threshold for the test run (set it to two files)
+        instream = open(self.conffile, "r")
+        cfg = yaml.full_load(instream)
+        instream.close()
+
+        cfg["filesize"]["size_threshold"] = "20"
+
+        outstream = open(self.conffile, "w")
+        outstream.write(yaml.dump(cfg).replace("- ", "  - "))
+        outstream.close()
+
 
 class FileSizeGrowsAboveThreshold(TestCompareRPMs):
     """Assert when a file grows by more than the configured threshold, VERIFY result occurs."""
@@ -58,6 +72,20 @@ class FileSizeGrowsAboveThreshold(TestCompareRPMs):
         self.result = "VERIFY"
         self.waiver_auth = "Anyone"
 
+    def configFile(self):
+        super().configFile()
+
+        # modify the threshold for the test run (set it to two files)
+        instream = open(self.conffile, "r")
+        cfg = yaml.full_load(instream)
+        instream.close()
+
+        cfg["filesize"]["size_threshold"] = "20"
+
+        outstream = open(self.conffile, "w")
+        outstream.write(yaml.dump(cfg).replace("- ", "  - "))
+        outstream.close()
+
 
 class FileSizeGrowsBelowThreshold(TestCompareRPMs):
     """Assert when a file grows by less than the configured threshold, an INFO result occurs."""
@@ -75,3 +103,17 @@ class FileSizeGrowsBelowThreshold(TestCompareRPMs):
         self.inspection = "filesize"
         self.result = "INFO"
         self.waiver_auth = "Not Waivable"
+
+    def configFile(self):
+        super().configFile()
+
+        # modify the threshold for the test run (set it to two files)
+        instream = open(self.conffile, "r")
+        cfg = yaml.full_load(instream)
+        instream.close()
+
+        cfg["filesize"]["size_threshold"] = "20"
+
+        outstream = open(self.conffile, "w")
+        outstream.write(yaml.dump(cfg).replace("- ", "  - "))
+        outstream.close()
