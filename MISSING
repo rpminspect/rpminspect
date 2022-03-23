@@ -60,3 +60,13 @@ TEST_METADATA (the 'fedora without red hat' string check)
     check itself was not foolproof and did not take in to account word
     boundaries of pathnames.  This kind of check is out of scope for
     rpminspect as it provides no technical or security benefit.
+
+TEST_PATCHES (the file and line count thresholds as failures)
+    The patches inspection will report changes between patches across
+    builds, both the number of lines and number of files touched.
+    However, all of these results are reported as INFO and there is no
+    support for a line count or file count threshold.  These are
+    subjective anyway and impossible to come up with what is allowable
+    or not.  The patches inspection does check for malformed patches
+    and compressed patches that cannot be uncompressed and will report
+    those as well.

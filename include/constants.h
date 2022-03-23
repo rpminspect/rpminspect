@@ -730,28 +730,6 @@
 /** @} */
 
 /**
- * @defgroup 'patches' inspection defaults
- *
- * @{
- */
-
-/**
- * @def DEFAULT_PATCH_FILE_THRESHOLD
- *
- * Default file count reporting threshold for 'patches'
- */
-#define DEFAULT_PATCH_FILE_THRESHOLD 20
-
-/**
- * @def DEFAULT_PATCH_LINE_THRESHOLD
- *
- * Default line count reporting threshold for 'patches'
- */
-#define DEFAULT_PATCH_LINE_THRESHOLD 5000
-
-/** @} */
-
-/**
  * @defgroup 'runpath' inspection defaults
  *
  * @{

@@ -152,12 +152,13 @@ static patchstat_t get_patch_stats(const char *patch)
 /* Main driver for the 'patches' inspection. */
 static bool patches_driver(struct rpminspect *ri, rpmfile_entry_t *file)
 {
-    bool result = true;
     char *before_patch = NULL;
     char *after_patch = NULL;
     char *details = NULL;
     patchstat_t ps;
     struct stat sb;
+    size_t apsz = 0;
+    size_t bpsz = 0;
     long unsigned int oldsize = 0;
     long unsigned int newsize = 0;
 
@@ -165,9 +166,6 @@ static bool patches_driver(struct rpminspect *ri, rpmfile_entry_t *file)
     if (!is_patch(file)) {
         return true;
     }
-
-    /* Compare digests of source archive */
-    params.file = file->localpath;
 
     /* If this patch is on the ignore list, skip */
     if (list_contains(ri->patch_ignore_list, file->localpath)) {
@@ -179,7 +177,7 @@ static bool patches_driver(struct rpminspect *ri, rpmfile_entry_t *file)
         before_patch = uncompress_file(ri, file->peer_file->fullpath, NAME_PATCHES);
 
         if (before_patch == NULL) {
-            warn("unable to prepare patch: %s", file->peer_file->localpath);
+            warnx(_("unable to uncompress patch: %s"), file->peer_file->localpath);
             return false;
         }
     }
@@ -187,7 +185,7 @@ static bool patches_driver(struct rpminspect *ri, rpmfile_entry_t *file)
     after_patch = uncompress_file(ri, file->fullpath, NAME_PATCHES);
 
     if (after_patch == NULL) {
-        warn("unable to prepare patch: %s", file->localpath);
+        warnx(_("unable to uncompress patch: %s"), file->localpath);
         return false;
     }
 
@@ -201,19 +199,41 @@ static bool patches_driver(struct rpminspect *ri, rpmfile_entry_t *file)
         return false;
     }
 
-    if (sb.st_size < 4) {
-        xasprintf(&params.msg, _("Patch %s is under 4 bytes in size - is it corrupt?"), file->localpath);
+    apsz = sb.st_size;
+
+    if (file->peer_file && before_patch && stat(before_patch, &sb) != 0) {
+        warn("stat");
+        return false;
+    }
+
+    bpsz = sb.st_size;
+
+    if ((apsz < 4) || (bpsz < 4)) {
         params.severity = RESULT_BAD;
         params.waiverauth = WAIVABLE_BY_ANYONE;
         params.details = NULL;
         params.remedy = REMEDY_PATCHES_CORRUPT;
         params.verb = VERB_FAILED;
         params.noun = _("corrupt patch ${FILE}");
-        add_result(ri, &params);
-        free(params.msg);
+
+        if (apsz < 4) {
+            params.file = file->localpath;
+            xasprintf(&params.msg, _("Patch %s is under 4 bytes in size - is it corrupt?"), file->localpath);
+            add_result(ri, &params);
+            free(params.msg);
+        }
+
+        if (file->peer_file && before_patch && bpsz < 4) {
+            params.file = file->peer_file->localpath;
+            xasprintf(&params.msg, _("Patch %s is under 4 bytes in size - is it corrupt?"), file->peer_file->localpath);
+            add_result(ri, &params);
+            free(params.msg);
+        }
 
         reported = true;
-        result = false;
+        free(after_patch);
+        free(before_patch);
+        return false;
     }
 
     /*
@@ -232,6 +252,7 @@ static bool patches_driver(struct rpminspect *ri, rpmfile_entry_t *file)
             params.waiverauth = NOT_WAIVABLE;
             params.verb = VERB_CHANGED;
             params.noun = _("patch file ${FILE}");
+            params.file = file->localpath;
 
             /* use friendly names for the files in the diff(1) details */
             details = strreplace(params.details, before_patch, file->peer_file->localpath);
@@ -249,7 +270,6 @@ static bool patches_driver(struct rpminspect *ri, rpmfile_entry_t *file)
             params.msg = NULL;
 
             reported = true;
-            result = true;
         }
     } else if (comparison && file->peer_file == NULL) {
         xasprintf(&params.msg, _("New patch file `%s` appeared"), params.file);
@@ -257,51 +277,43 @@ static bool patches_driver(struct rpminspect *ri, rpmfile_entry_t *file)
         params.waiverauth = NOT_WAIVABLE;
         params.verb = VERB_ADDED;
         params.noun = _("patch file ${FILE}");
+        params.file = file->localpath;
         add_result(ri, &params);
         free(params.msg);
         params.msg = NULL;
 
         reported = true;
-        result = false;
     }
 
     /*
      * Collect patch stats and report based on thresholds.
      */
     ps = get_patch_stats(after_patch);
+    params.severity = RESULT_INFO;
+    params.waiverauth = NOT_WAIVABLE;
+    params.verb = VERB_CHANGED;
+    params.noun = _("patch changes ${FILE}");
+    params.file = file->localpath;
 
-    if (!is_rebase(ri) && ((ps.files > ri->patch_file_threshold) || (ps.lines > ri->patch_line_threshold))) {
-        params.severity = RESULT_VERIFY;
-        params.waiverauth = WAIVABLE_BY_ANYONE;
+    if (ps.files == 0 && ps.lines > 0) {
+        xasprintf(&params.msg, _("%s touches as many as %ld line%s"), file->localpath, ps.lines, (ps.lines > 1) ? "s" : "");
+    } else if (ps.files > 0 && ps.lines == 0) {
+        xasprintf(&params.msg, _("%s touches %ld file%s"), file->localpath, ps.files, (ps.files > 1) ? "s" : "");
     } else {
-        params.severity = RESULT_INFO;
-        params.waiverauth = NOT_WAIVABLE;
+        xasprintf(&params.msg, _("%s touches %ld file%s and %s%ld line%s"), file->localpath, ps.files, (ps.files > 1) ? "s" : "", (ps.lines > 1) ? _("as many as ") : "", ps.lines, (ps.lines > 1) ? "s" : "");
     }
 
-    if (ps.files > 0 || ps.lines > 0) {
-        if (ps.files == 0 && ps.lines > 0) {
-            xasprintf(&params.msg, _("%s touches as many as %ld line%s"), file->localpath, ps.lines, (ps.lines > 1) ? "s" : "");
-        } else if (ps.files > 0 && ps.lines == 0) {
-            xasprintf(&params.msg, _("%s touches %ld file%s"), file->localpath, ps.files, (ps.files > 1) ? "s" : "");
-        } else {
-            xasprintf(&params.msg, _("%s touches %ld file%s and %s%ld line%s"), file->localpath, ps.files, (ps.files > 1) ? "s" : "", (ps.lines > 1) ? _("as many as ") : "", ps.lines, (ps.lines > 1) ? "s" : "");
-        }
+    add_result(ri, &params);
+    free(params.msg);
+    params.msg = NULL;
 
-        params.verb = VERB_CHANGED;
-        params.noun = _("patch changes ${FILE}");
-        add_result(ri, &params);
-        free(params.msg);
-        params.msg = NULL;
-
-        reported = true;
-        result = !(params.severity >= RESULT_VERIFY);
-    }
+    reported = true;
 
     /* clean up */
     free(before_patch);
     free(after_patch);
 
-    return result;
+    return true;
 }
 
 /*

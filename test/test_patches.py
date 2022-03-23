@@ -16,7 +16,6 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 #
 
-import yaml
 import rpmfluff
 
 from baseclass import TestSRPM, TestCompareSRPM
@@ -240,7 +239,7 @@ class PatchAddedInRebaseCompare(TestCompareSRPM):
         self.waiver_auth = "Not Waivable"
 
 
-# patch touches too many files (VERIFY)
+# patch touches too many files (INFO)
 class PatchTouchesTooManyFiles(TestSRPM):
     def setUp(self):
         super().setUp()
@@ -251,22 +250,8 @@ class PatchTouchesTooManyFiles(TestSRPM):
         )
 
         self.inspection = "patches"
-        self.result = "VERIFY"
-        self.waiver_auth = "Anyone"
-
-    def configFile(self):
-        super().configFile()
-
-        # modify the threshold for the test run (set it to two files)
-        instream = open(self.conffile, "r")
-        cfg = yaml.full_load(instream)
-        instream.close()
-
-        cfg["patches"]["file_count_threshold"] = "2"
-
-        outstream = open(self.conffile, "w")
-        outstream.write(yaml.dump(cfg).replace("- ", "  - "))
-        outstream.close()
+        self.result = "INFO"
+        self.waiver_auth = "Not Waivable"
 
 
 class PatchTouchesTooManyFilesCompare(TestCompareSRPM):
@@ -279,25 +264,11 @@ class PatchTouchesTooManyFilesCompare(TestCompareSRPM):
         )
 
         self.inspection = "patches"
-        self.result = "VERIFY"
-        self.waiver_auth = "Anyone"
-
-    def configFile(self):
-        super().configFile()
-
-        # modify the threshold for the test run (set it to two files)
-        instream = open(self.conffile, "r")
-        cfg = yaml.full_load(instream)
-        instream.close()
-
-        cfg["patches"]["file_count_threshold"] = "2"
-
-        outstream = open(self.conffile, "w")
-        outstream.write(yaml.dump(cfg).replace("- ", "  - "))
-        outstream.close()
+        self.result = "INFO"
+        self.waiver_auth = "Not Waivable"
 
 
-# patch touches too many lines (VERIFY)
+# patch touches too many lines (INFO)
 class PatchTouchesTooManyLines(TestSRPM):
     def setUp(self):
         super().setUp()
@@ -308,22 +279,8 @@ class PatchTouchesTooManyLines(TestSRPM):
         )
 
         self.inspection = "patches"
-        self.result = "VERIFY"
-        self.waiver_auth = "Anyone"
-
-    def configFile(self):
-        super().configFile()
-
-        # modify the threshold for the test run (set it to two files)
-        instream = open(self.conffile, "r")
-        cfg = yaml.full_load(instream)
-        instream.close()
-
-        cfg["patches"]["line_count_threshold"] = "3"
-
-        outstream = open(self.conffile, "w")
-        outstream.write(yaml.dump(cfg).replace("- ", "  - "))
-        outstream.close()
+        self.result = "INFO"
+        self.waiver_auth = "Not Waivable"
 
 
 class PatchTouchesTooManyLinesCompare(TestCompareSRPM):
@@ -336,19 +293,5 @@ class PatchTouchesTooManyLinesCompare(TestCompareSRPM):
         )
 
         self.inspection = "patches"
-        self.result = "VERIFY"
-        self.waiver_auth = "Anyone"
-
-    def configFile(self):
-        super().configFile()
-
-        # modify the threshold for the test run (set it to two files)
-        instream = open(self.conffile, "r")
-        cfg = yaml.full_load(instream)
-        instream.close()
-
-        cfg["patches"]["line_count_threshold"] = "3"
-
-        outstream = open(self.conffile, "w")
-        outstream.write(yaml.dump(cfg).replace("- ", "  - "))
-        outstream.close()
+        self.result = "INFO"
+        self.waiver_auth = "Not Waivable"

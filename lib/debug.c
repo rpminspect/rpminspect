@@ -614,9 +614,6 @@ void dump_cfg(const struct rpminspect *ri)
         }
     }
 
-    printf("    file_count_threshold: %ld\n", ri->patch_file_threshold);
-    printf("    line_count_threshold: %ld\n", ri->patch_line_threshold);
-
     /* badfuncs */
 
     HASH_FIND_STR(ri->inspection_ignores, NAME_BADFUNCS, mapentry);
