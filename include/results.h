@@ -39,8 +39,25 @@
  * @{
  */
 
+/**
+ * @def REMEDY_VENDOR
+ *
+ * How to address an invalid Vendor tag in an RPM header.
+ */
 #define REMEDY_VENDOR _("Change the string specified on the 'Vendor:' line in the spec file.")
+
+/**
+ * @def REMEDY_BUILDHOST
+ *
+ * How to address an invalid BuildHost in an RPM header.
+ */
 #define REMEDY_BUILDHOST _("Make sure the SRPM is built on a host within the expected subdomain.")
+
+/**
+ * @def REMEDY_BADWORDS
+ *
+ * How to address unprofessional language found in an RPM description or Summary.
+ */
 #define REMEDY_BADWORDS _("Unprofessional language as defined in the configuration file was found in the text shown.  Remove or change the offending words and rebuild.")
 
 /** @} */
@@ -51,6 +68,11 @@
  * @{
  */
 
+/**
+ * @def REMEDY_EMPTYRPM
+ *
+ * How to address an unexpected empty RPM in the build.
+ */
 #define REMEDY_EMPTYRPM _("Check to see if you eliminated a subpackage but still have the %package and/or the %files section for it.")
 
 /** @} */
@@ -61,6 +83,11 @@
  * @{
  */
 
+/**
+ * @def REMEDY_LOSTPAYLOAD
+ *
+ * How to address an unexpected lost payload in a built RPM.
+ */
 #define REMEDY_LOSTPAYLOAD _("Check to see if you eliminated a subpackage but still have the %package and/or the %files section for it.")
 
 /** @} */
@@ -71,8 +98,25 @@
  * @{
  */
 
+/**
+ * @def REMEDY_LICENSE
+ *
+ * How to address an invalid License tag expression in the spec file.
+ */
 #define REMEDY_LICENSE _("The License tag must contain an approved license string as defined by the distribution (e.g., GPLv2+).  If the license in question is approved, the license database needs updating in the rpminspect-data package.")
+
+/**
+ * @def REMEDY_LICENSEDB
+ *
+ * How to address a missing license database file for rpminspect.
+ */
 #define REMEDY_LICENSEDB _("Make sure the licensedb setting in the rpminspect configuration is set to a valid licensedb file.  This is also commonly due to a missing vendor specific rpminspect-data package on the system.")
+
+/**
+ * @def REMEDY_UNAPPROVED_LICENSE
+ *
+ * How to address an unapproved license found in the License tag.
+ */
 #define REMEDY_UNAPPROVED_LICENSE _("The specified license abbreviation is not listed as approved in the license database.  The license database is specified in the rpminspect configuration file.  Check this file and send a pull request to the appropriate upstream project to update the database.  If the license is listed in the database but marked unapproved, you may need to work with the legal team regarding options for this software.")
 
 /** @} */
@@ -83,11 +127,46 @@
  * @{
  */
 
+/**
+ * @def REMEDY_ELF_TEXTREL
+ *
+ * How to address ELF objects containing non-position independent code.
+ */
 #define REMEDY_ELF_TEXTREL _("Ensure all object files are compiled with -fPIC")
+
+/**
+ * @def REMEDY_ELF_EXECSTACK_MISSING
+ *
+ * How to address ELF objects missing execstack compiler flags.
+ */
 #define REMEDY_ELF_EXECSTACK_MISSING _("Ensure that the package is being built with the correct compiler and compiler flags")
+
+/**
+ * @def REMEDY_ELF_EXECSTACK_INVALID
+ *
+ * How to address invalid ELF objects.
+ */
 #define REMEDY_ELF_EXECSTACK_INVALID _("The data in an ELF file appears to be corrupt; ensure that packaged ELF files are not being truncated or incorrectly modified")
+
+/**
+ * @def REMEDY_ELF_EXECSTACK_EXECUTABLE
+ *
+ * How to address ELF objects with an executable execstack.
+ */
 #define REMEDY_ELF_EXECSTACK_EXECUTABLE _("An ELF stack is marked as executable. Ensure that no execstack options are being passed to the linker, and that no functions are defined on the stack.")
+
+/**
+ * @def REMEDY_ELF_GNU_RELRO
+ *
+ * How to address ELF objects without read-only relocations.
+ */
 #define REMEDY_ELF_GNU_RELRO _("Ensure executables are linked with with '-z relro -z now'")
+
+/**
+ * @def REMEDY_ELF_FPIC
+ *
+ * How to address ELF objects with non-position independent code.
+ */
 #define REMEDY_ELF_FPIC _("Ensure all object files are compiled with -fPIC")
 
 /** @} */
@@ -98,7 +177,18 @@
  * @{
  */
 
+/**
+ * @def REMEDY_MAN_ERRORS
+ *
+ * How to address man page errors.
+ */
 #define REMEDY_MAN_ERRORS _("Correct the errors in the man page as reported by the libmandoc parser.")
+
+/**
+ * @def REMEDY_MAN_PATH
+ *
+ * How to address man page installation programs.
+ */
 #define REMEDY_MAN_PATH _("Correct the installation path for the man page. Man pages must be installed in the directory beneath /usr/share/man that matches the section number of the page.")
 
 /** @} */
@@ -109,6 +199,11 @@
  * @{
  */
 
+/**
+ * @def REMEDY_XML
+ *
+ * How to address XML file validity problems.
+ */
 #define REMEDY_XML _("Correct the reported errors in the XML document")
 
 /** @} */
@@ -119,6 +214,11 @@
  * @{
  */
 
+/**
+ * @def REMEDY_DESKTOP
+ *
+ * How to address *.desktop file validity problems.
+ */
 #define REMEDY_DESKTOP _("Refer to the Desktop Entry Specification at https://standards.freedesktop.org/desktop-entry-spec/latest/ for help correcting the errors and warnings")
 
 /** @} */
@@ -129,6 +229,11 @@
  * @{
  */
 
+/**
+ * @def REMEDY_DISTTAG
+ *
+ * How to deal with the Release field missing a dist tag in the spec file.
+ */
 #define REMEDY_DISTTAG _("The Release: tag in the spec file must include a '%{?dist}' string.  Please add this to the spec file per the distribution packaging guidelines.")
 
 /** @} */
@@ -139,6 +244,11 @@
  * @{
  */
 
+/**
+ * @def REMEDY_SPECNAME
+ *
+ * How to handle spec file naming problems.
+ */
 #define REMEDY_SPECNAME _("The spec file name does not match the expected NAME.spec format.  Rename the spec file to conform to this policy.")
 
 /** @} */
@@ -149,6 +259,11 @@
  * @{
  */
 
+/**
+ * @def REMEDY_MODULARITY
+ *
+ * How to address modularity problems in RPMs that are built as part of modules.
+ */
 #define REMEDY_MODULARITY _("This package is part of a module but is missing the %{modularitylabel} header tag.  Add this as a %define in the spec file and rebuild.")
 
 /** @} */
@@ -159,6 +274,11 @@
  * @{
  */
 
+/**
+ * @def REMEDY_JAVABYTECODE
+ *
+ * How to address Java major byte code version problems.
+ */
 #define REMEDY_JAVABYTECODE _("The Java bytecode version for one or more class files in the build was not met for the product release.  Ensure you are using the correct JDK for the build.")
 
 /** @} */
@@ -169,6 +289,11 @@
  * @{
  */
 
+/**
+ * @def REMEDY_CHANGEDFILES
+ *
+ * How to handle unexpected file changes.
+ */
 #define REMEDY_CHANGEDFILES _("Unexpected file changes were found.  Verify these changes are correct.  If they are not, adjust the build to prevent file changes.")
 
 /** @} */
@@ -179,6 +304,11 @@
  * @{
  */
 
+/**
+ * @def REMEDY_MOVEDFILES
+ *
+ * How to handle unexpected moved files.
+ */
 #define REMEDY_MOVEDFILES _("Unexpected file moves were found.  Verify these changes are correct.  If they are not, adjust the build to prevent the file moves between builds.")
 
 /** @} */
@@ -189,6 +319,11 @@
  * @{
  */
 
+/**
+ * @def REMEDY_REMOVEDFILES
+ *
+ * How to handle unexpected removed files.
+ */
 #define REMEDY_REMOVEDFILES _("Unexpected file removals were found.  Verify these changes are correct.  If they are not, adjust the build to prevent the file removals between builds.")
 
 /** @} */
@@ -199,6 +334,11 @@
  * @{
  */
 
+/**
+ * @def REMEDY_ADDEDFILES
+ *
+ * How to handle unexpected file additions.
+ */
 #define REMEDY_ADDEDFILES _("Unexpected file additions were found.  Verify these changes are correct.  If they are not, adjust the build to prevent the file additions between builds.  If they are correct, update %s and send a patch to the rpminspect data project owning that file so rpminspect knows to expect this change.  You may also need to update the data package or local configuration file and change the forbidden_path_prefixes or forbidden_path_suffixes list.")
 
 /** @} */
@@ -209,6 +349,11 @@
  * @{
  */
 
+/**
+ * @def REMEDY_UPSTREAM
+ *
+ * How to handle unexpected changes in upstream source content.
+ */
 #define REMEDY_UPSTREAM _("Unexpected changed source archive content. The version of the package did not change between builds, but the source archive content did. This may be deliberate, but needs inspection. If this change is expected, update %s and send a patch to the project that owns that file.")
 
 /** @} */
@@ -219,11 +364,46 @@
  * @{
  */
 
+/**
+ * @def REMEDY_OWNERSHIP_DEFATTR
+ *
+ * How to handle unexpected ownership settings in the RPM payload.
+ */
 #define REMEDY_OWNERSHIP_DEFATTR _("Make sure the %%files section includes the %%defattr macro. If these permissions are expected, update %s and send a patch to the project that owns it.")
+
+/**
+ * @def REMEDY_OWNERSHIP_BIN_OWNER
+ *
+ * How to handle incorrect ownership of bin path files.
+ */
 #define REMEDY_OWNERSHIP_BIN_OWNER _("Bin path files must be owned by the bin_owner set in the rpminspect configuration, which is usually root. If this ownership is expected, update %s and send a patch to the project that owns it.")
+
+/**
+ * @def REMEDY_OWNERSHIP_BIN_GROUP
+ *
+ * How to handle incorrect group ownership of bin path files.
+ */
 #define REMEDY_OWNERSHIP_BIN_GROUP _("Bin path files must be owned by the bin_group set in the rpminspect configuration, which is usually root. If this ownership is expect, update %s and send a patch to the project that owns it.")
+
+/**
+ * @def REMEDY_OWNERSHIP_IXOTH
+ *
+ * How to handle files with the world execute bit set where it should not be.
+ */
 #define REMEDY_OWNERSHIP_IXOTH _("Either chgrp the file to the bin_group set in the rpminspect configuration or remove the world execute bit on the file (chmod o-x). If this ownership is expected, update %s and send a patch to the project that owns it.")
+
+/**
+ * @def REMEDY_OWNERSHIP_IWGRP
+ *
+ * How to handle files with the group write bit set where it should not be.
+ */
 #define REMEDY_OWNERSHIP_IWGRP _("Either chgrp the file to the bin_group set in the rpminspect configuration or remove the group write bit on the file (chmod g-w). If this ownership is expected, update %s and send a patch to the project that owns it.")
+
+/**
+ * @def REMEDY_OWNERSHIP_CHANGED
+ *
+ * How to handle unexpected file and directory ownership changes.
+ */
 #define REMEDY_OWNERSHIP_CHANGED _("Verify the ownership changes are expected. If not, adjust the package build process to set correct owner and group information. If expected, update %s and send a patch to the project that owns it.")
 
 /** @} */
@@ -234,8 +414,25 @@
  * @{
  */
 
+/**
+ * @def REMEDY_SHELLSYNTAX
+ *
+ * How to handle shell syntax checker errors.
+ */
 #define REMEDY_SHELLSYNTAX _("Consult the shell documentation for proper syntax.")
+
+/**
+ * @def REMEDY_SHELLSYNTAX_GAINED_SHELL
+ *
+ * How to handle an existing file that has now become a shell script.
+ */
 #define REMEDY_SHELLSYNTAX_GAINED_SHELL _("The file referenced was not a known shell script in the before build but is now a shell script in the after build.")
+
+/**
+ * @def REMEDY_SHELLSYNTAX_BAD
+ *
+ * How to address invalid syntax in a shell script.
+ */
 #define REMEDY_SHELLSYNTAX_BAD _("The referenced shell script is invalid. Consider debugging it with the '-n' option on the shell to find and fix the problem.")
 
 /** @} */
@@ -246,7 +443,18 @@
  * @{
  */
 
+/**
+ * @def REMEDY_ANNOCHECK
+ *
+ * How to handle annocheck(1) findings.
+ */
 #define REMEDY_ANNOCHECK _("See annocheck(1) for more information.")
+
+/**
+ * @def REMEDY_ANNOCHECK_FORTIFY_SOURCE
+ *
+ * How to handle annocheck(1) reporting a file is not built with _FORTIFY_SOURCE enabled.
+ */
 #define REMEDY_ANNOCHECK_FORTIFY_SOURCE _("Ensure all object files are compiled with '-O2 -D_FORTIFY_SOURCE=2', and that all appropriate headers are included (no implicit function declarations). Symbols may also appear as unfortified if the compiler is unable to determine the size of a buffer, which is not necessarily an error.")
 
 /** @} */
@@ -257,6 +465,11 @@
  * @{
  */
 
+/**
+ * @def REMEDY_DSODEPS
+ *
+ * How to handle a change in DT_NEEDED symbols between builds.
+ */
 #define REMEDY_DSODEPS _("DT_NEEDED symbols have been added or removed.  This happens when the build environment has different versions of the required libraries.  Sometimes this is deliberate but sometimes not.  Verify these changes are expected.  If they are not, modify the package spec file to ensure the build links with the correct shared libraries.")
 
 /** @} */
@@ -267,9 +480,32 @@
  * @{
  */
 
+/**
+ * @def REMEDY_FILESIZE_GREW
+ *
+ * How to address an unexpected increase in file size.
+ */
 #define REMEDY_FILESIZE_GREW _("A file grew by a noticeable amount.  Ensure this change is intended.  If it is, you can adjust the filesize inspection settings in the rpminspect.yaml file.")
+
+/**
+ * @def REMEDY_FILESIZE_SHRANK
+ *
+ * How to address an unexpected decrease in file size.
+ */
 #define REMEDY_FILESIZE_SHRANK _("A file shrank by a noticeable amount.  Ensure this change is intended.  If it is, you can adjust the filesize inspection settings in the rpminspect.yaml file.")
+
+/**
+ * @def REMEDY_FILESIZE_BECAME_NOT_EMPTY
+ *
+ * How to address a previously known empty file now containing data.
+ */
 #define REMEDY_FILESIZE_BECAME_NOT_EMPTY _("A previously empty file is no longer empty.  Make sure this change is intended and fix the package spec file if necessary.")
+
+/**
+ * @def REMEDY_FILESIZE_BECAME_EMPTY
+ *
+ * How to address an existing file becoming empty.
+ */
 #define REMEDY_FILESIZE_BECAME_EMPTY _("A previously non-empty file is now empty.  Make sure this change is intended and fix the package space file if necessary.")
 
 /** @} */
@@ -280,6 +516,11 @@
  * @{
  */
 
+/**
+ * @def REMEDY_CAPABILITIES
+ *
+ * How to address unexpected file capabilities(7).
+ */
 #define REMEDY_CAPABILITIES _("Unexpected capabilities were found on the indicated file.  Consult capabilities(7) and either adjust the files in the package or modify the capabilities list in the rpminspect vendor data package.  The security team may also be of help for this situation.  If necessary, update %s with the changes found here and send a patch to the project that owns the data file.")
 
 /** @} */
@@ -290,8 +531,25 @@
  * @{
  */
 
+/**
+ * @def REMEDY_KMOD_PARM
+ *
+ * How to address a loss of kernel module parameters between builds.
+ */
 #define REMEDY_KMOD_PARM _("Kernel module parameters were removed between builds.  This may present usability problems for users if module parameters were removed in a maintenance update.")
+
+/**
+ * @def REMEDY_KMOD_DEPS
+ *
+ * How to address a change in kernel module dependencies between builds.
+ */
 #define REMEDY_KMOD_DEPS _("Kernel module dependencies changed between builds.  This may present usability problems for users if module dependencies changed in a maintenance update.")
+
+/**
+ * @def REMEDY_KMOD_ALIAS
+ *
+ * How to address a change in kernel module device aliases between builds.
+ */
 #define REMEDY_KMOD_ALIAS _("Kernel module device aliases changed between builds.  This may present usability problems for users if module device aliases changed in a maintenance update.")
 
 /** @} */

@@ -49,6 +49,7 @@
 #ifndef EM_BPF
 /**
  * @def EM_PDF
+ *
  * Linux BPF, an in-kernel virtual machine.  This is defined on
  * systems that lack the define in the system header files.
  */
