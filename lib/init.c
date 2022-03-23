@@ -2040,6 +2040,7 @@ struct rpminspect *init_rpminspect(struct rpminspect *ri, const char *cfgfile, c
         ri->kmidiff_suppression_file = strdup(ABI_SUPPRESSION_FILE);
         ri->kmidiff_debuginfo_path = strdup(DEBUG_PATH);
         ri->annocheck_failure_severity = RESULT_VERIFY;
+        ri->size_threshold = -1;
 
         /* Initialize commands */
         ri->commands.msgunfmt = strdup(MSGUNFMT_CMD);
