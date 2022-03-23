@@ -854,7 +854,7 @@ static int read_cfgfile(struct rpminspect *ri, const char *filename)
                             block = BLOCK_IGNORE;
                         }
                     } else if (group == BLOCK_PATCHES) {
-                        if (!strcmp(key, "patch_ignore_list")) {
+                        if (!strcmp(key, "ignore_list")) {
                             block = BLOCK_PATCH_FILENAMES;
                             list_free(ri->patch_ignore_list, free);
                             ri->patch_ignore_list = NULL;
@@ -1182,22 +1182,6 @@ static int read_cfgfile(struct rpminspect *ri, const char *filename)
                         } else if (!strcmp(key, "kabi_filename")) {
                             free(ri->kabi_filename);
                             ri->kabi_filename = strdup(t);
-                        }
-                    } else if (group == BLOCK_PATCHES) {
-                        if (!strcmp(key, "file_count_threshold")) {
-                            ri->patch_file_threshold = strtol(t, 0, 10);
-
-                            if ((ri->patch_file_threshold == LONG_MIN || ri->patch_file_threshold == LONG_MAX) && errno == ERANGE) {
-                                warn("strtol");
-                                ri->patch_file_threshold = DEFAULT_PATCH_FILE_THRESHOLD;
-                            }
-                        } else if (!strcmp(key, "line_count_threshold")) {
-                            ri->patch_line_threshold = strtol(t, 0, 10);
-
-                            if ((ri->patch_line_threshold == LONG_MIN || ri->patch_line_threshold == LONG_MAX) && errno == ERANGE) {
-                                warn("strtol");
-                                ri->patch_line_threshold = DEFAULT_PATCH_LINE_THRESHOLD;
-                            }
                         }
                     } else if (group == BLOCK_UNICODE && block == BLOCK_UNICODE_EXCLUDE) {
                         if (add_regex(t, &ri->unicode_exclude) != 0) {
@@ -2055,8 +2039,6 @@ struct rpminspect *init_rpminspect(struct rpminspect *ri, const char *cfgfile, c
         ri->abi_security_threshold = DEFAULT_ABI_SECURITY_THRESHOLD;
         ri->kmidiff_suppression_file = strdup(ABI_SUPPRESSION_FILE);
         ri->kmidiff_debuginfo_path = strdup(DEBUG_PATH);
-        ri->patch_file_threshold = DEFAULT_PATCH_FILE_THRESHOLD;
-        ri->patch_line_threshold = DEFAULT_PATCH_LINE_THRESHOLD;
         ri->annocheck_failure_severity = RESULT_VERIFY;
 
         /* Initialize commands */

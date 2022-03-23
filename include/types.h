@@ -610,12 +610,6 @@ struct rpminspect {
     /* list of patches to ignore in the 'patches' inspection */
     string_list_t *patch_ignore_list;
 
-    /* file count reporting threshold in the 'patches' inspection */
-    long int patch_file_threshold;
-
-    /* line count reporting threshold in the 'patches' inspection */
-    long int patch_line_threshold;
-
     /* runpath inspection lists */
     string_list_t *runpath_allowed_paths;
     string_list_t *runpath_allowed_origin_paths;

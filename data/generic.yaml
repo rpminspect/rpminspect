@@ -681,18 +681,6 @@ patches:
     #ignore_list:
     #    - example.patch
 
-    # Reporting threshold for number of files that a patch modifies.
-    # If a patch modifies more than this number of files, the
-    # reporting message will mention it explicitly.  The default is
-    # 20 files.
-    file_count_threshold: 20
-
-    # Reporting theshold for number of lines that a patch modifies.
-    # If a patch modifies more than this number of lines, the
-    # reporting message will mention it explicitly.  The default is
-    # 5000 lines.
-    line_count_threshold: 5000
-
 badfuncs:
     # Shared function names prohibited from executables and libraries.
     # The function names listed here are generally ones provided by
