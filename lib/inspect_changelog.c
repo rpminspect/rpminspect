@@ -143,6 +143,7 @@ static char *create_changelog(const string_list_t *changelog, const char *where)
     if (logfp == NULL) {
         warn("fdopen");
         close(fd);
+        unlink(output);
         free(output);
         return NULL;
     }
@@ -154,6 +155,7 @@ static char *create_changelog(const string_list_t *changelog, const char *where)
     if (fclose(logfp) != 0) {
         warn("fclose");
         close(fd);
+        unlink(output);
         free(output);
         return NULL;
     }
@@ -313,6 +315,18 @@ static bool check_src_rpm_changelog(struct rpminspect *ri, const rpmpeer_entry_t
     }
 
     /* cleanup */
+    if (before_output) {
+        if (unlink(before_output) != 0) {
+            warn("unlink");
+        }
+    }
+
+    if (after_output) {
+        if (unlink(after_output) != 0) {
+            warn("unlink");
+        }
+    }
+
     list_free(before_changelog, free);
     list_free(after_changelog, free);
     free(before_nevr);
