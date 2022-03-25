@@ -143,6 +143,7 @@ static char *create_changelog(const string_list_t *changelog, const char *where)
     if (logfp == NULL) {
         warn("fdopen");
         close(fd);
+        unlink(output);
         free(output);
         return NULL;
     }
@@ -154,6 +155,13 @@ static char *create_changelog(const string_list_t *changelog, const char *where)
     if (fclose(logfp) != 0) {
         warn("fclose");
         close(fd);
+        unlink(output);
+        free(output);
+        return NULL;
+    }
+
+    if (unlink(output) != 0) {
+        warn("unlink");
         free(output);
         return NULL;
     }
