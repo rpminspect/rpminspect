@@ -169,6 +169,7 @@ static bool patches_driver(struct rpminspect *ri, rpmfile_entry_t *file)
 
     /* If this patch is on the ignore list, skip */
     if (list_contains(ri->patch_ignore_list, file->localpath)) {
+        DEBUG_PRINT("Per the configuration file, ignoring %s\n", file->localpath);
         return true;
     }
 
