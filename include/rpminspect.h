@@ -407,7 +407,7 @@ const char *get_before_debuginfo_path(struct rpminspect *ri, const char *binarch
  */
 const char *get_after_debuginfo_path(struct rpminspect *ri, const char *binarch, const char *subpkg);
 bool usable_path(const char *path);
-bool match_path(const char *pattern, const char *root, const char *needle);
+bool match_path(const char *pattern, const char *root, const char *path);
 
 /**
  * @brief Given a path and struct rpminspect, determine if the path
