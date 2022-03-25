@@ -351,6 +351,22 @@ addedfiles:
     #ignore:
     #    - /usr/lib*/libexample.so*
 
+movedfiles:
+    # Optional list of glob(7) specifications to match files to ignore
+    # for this inspection.  The format of this list is the same as the
+    # global 'ignore' list.  The difference is the items specified
+    # here will only be used during this inspection.
+    #ignore:
+    #    - /usr/lib*/libexample.so*
+
+removedfiles:
+    # Optional list of glob(7) specifications to match files to ignore
+    # for this inspection.  The format of this list is the same as the
+    # global 'ignore' list.  The difference is the items specified
+    # here will only be used during this inspection.
+    #ignore:
+    #    - /usr/lib*/libexample.so*
+
 ownership:
     # Path prefixes where executable files live
     bin_paths:
@@ -856,3 +872,59 @@ virus:
     # here will only be used during this inspection.
     #ignore:
     #    - /usr/lib*/libexample.so*
+
+capabilities:
+    # Optional list of glob(7) specifications to match files to ignore
+    # for this inspection.  The format of this list is the same as the
+    # global 'ignore' list.  The difference is the items specified
+    # here will only be used during this inspection.
+    #ignore:
+    #    - /usr/lib*/libexample.so*
+
+config:
+    # Optional list of glob(7) specifications to match files to ignore
+    # for this inspection.  The format of this list is the same as the
+    # global 'ignore' list.  The difference is the items specified
+    # here will only be used during this inspection.
+    #ignore:
+    #    - /etc/something*/*.conf
+
+doc:
+    # Optional list of glob(7) specifications to match files to ignore
+    # for this inspection.  The format of this list is the same as the
+    # global 'ignore' list.  The difference is the items specified
+    # here will only be used during this inspection.
+    #ignore:
+    #    - /usr/share/doc/example/README*
+
+kmod:
+    # Optional list of glob(7) specifications to match files to ignore
+    # for this inspection.  The format of this list is the same as the
+    # global 'ignore' list.  The difference is the items specified
+    # here will only be used during this inspection.
+    #ignore:
+    #    - /lib/modules/*/kernel/drivers/pcmcia/yenta_socket.ko*
+
+permissions:
+    # Optional list of glob(7) specifications to match files to ignore
+    # for this inspection.  The format of this list is the same as the
+    # global 'ignore' list.  The difference is the items specified
+    # here will only be used during this inspection.
+    #ignore:
+    #    - /usr/lib*/libexample.so*
+
+symlinks:
+    # Optional list of glob(7) specifications to match files to ignore
+    # for this inspection.  The format of this list is the same as the
+    # global 'ignore' list.  The difference is the items specified
+    # here will only be used during this inspection.
+    #ignore:
+    #    - /usr/bin/superlink
+
+upstream:
+    # Optional list of glob(7) specifications to match files to ignore
+    # for this inspection.  The format of this list is the same as the
+    # global 'ignore' list.  The difference is the items specified
+    # here will only be used during this inspection.
+    #ignore:
+    #    - upstream-archive-name-*.tar.gz

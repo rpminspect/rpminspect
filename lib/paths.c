@@ -178,7 +178,7 @@ bool usable_path(const char *path)
  * Helper function for glob(7) matching given a path string and
  * (optional) root directory.
  */
-bool match_path(const char *pattern, const char *root, const char *needle)
+bool match_path(const char *pattern, const char *root, const char *path)
 {
     bool match = false;
     int r = 0;
@@ -192,14 +192,19 @@ bool match_path(const char *pattern, const char *root, const char *needle)
     char *n = NULL;
 
     assert(pattern != NULL);
-    assert(needle != NULL);
+    assert(path != NULL);
+
+    /* A pattern ending with '/' will match a path prefix */
+    if (strsuffix(pattern, "/") && strprefix(path, pattern)) {
+        return true;
+    }
 
 #ifdef GLOB_BRACE
     /* this is a GNU extension, see glob(3) */
     gflags |= GLOB_BRACE;
 #endif
 
-    n = strdup(needle);
+    n = strdup(path);
     assert(n != NULL);
 
     if (root != NULL) {
@@ -236,7 +241,7 @@ bool match_path(const char *pattern, const char *root, const char *needle)
     for (i = 0; i < found.gl_pathc; i++) {
         globsub = found.gl_pathv[i] + len;
 
-        if (!strcmp(globsub, needle)) {
+        if (!strcmp(globsub, path)) {
             match = true;
             break;
         }
