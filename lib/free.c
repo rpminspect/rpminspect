@@ -282,7 +282,7 @@ void free_rpminspect(struct rpminspect *ri) {
     list_free(ri->unicode_forbidden_codepoints, free);
     free_deprule_ignore_map(ri->deprules_ignore);
 
-    free_rpmpeer(ri->peers);
+    free_peers(ri->peers);
 
     HASH_ITER(hh, ri->header_cache, hentry, tmp_hentry) {
         HASH_DEL(ri->header_cache, hentry);

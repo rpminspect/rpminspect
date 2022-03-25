@@ -2118,7 +2118,7 @@ struct rpminspect *init_rpminspect(struct rpminspect *ri, const char *cfgfile, c
 
     /* the rest of the members are used at runtime */
     ri->buildtype = KOJI_BUILD_RPM;
-    ri->peers = init_rpmpeer();
+    ri->peers = init_peers();
     ri->threshold = RESULT_VERIFY;
     ri->worst_result = RESULT_OK;
     ri->suppress = RESULT_NULL;

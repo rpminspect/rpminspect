@@ -29,7 +29,7 @@
 /*
  * Initialize a new rpmpeer_t list.
  */
-rpmpeer_t *init_rpmpeer(void)
+rpmpeer_t *init_peers(void)
 {
     rpmpeer_t *peers = NULL;
 
@@ -42,7 +42,7 @@ rpmpeer_t *init_rpmpeer(void)
 /*
  * Free memory associated with an rpmpeer_t list.
  */
-void free_rpmpeer(rpmpeer_t *peers)
+void free_peers(rpmpeer_t *peers)
 {
     rpmpeer_entry_t *entry = NULL;
 
@@ -88,7 +88,7 @@ void add_peer(rpmpeer_t **peers, int whichbuild, bool fetch_only, const char *pk
     assert(hdr != NULL);
 
     if (*peers == NULL) {
-        *peers = init_rpmpeer();
+        *peers = init_peers();
     }
 
     /* Get the package or subpackage name and arch */

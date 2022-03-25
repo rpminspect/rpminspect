@@ -243,8 +243,8 @@ string_list_t *get_rpm_header_string_array(Header h, rpmTagVal tag);
 char *get_rpm_header_value(const rpmfile_entry_t *file, rpmTag tag);
 
 /* peers.c */
-rpmpeer_t *init_rpmpeer(void);
-void free_rpmpeer(rpmpeer_t *);
+rpmpeer_t *init_peers(void);
+void free_peers(rpmpeer_t *);
 void add_peer(rpmpeer_t **, int, bool, const char *, Header);
 
 /**
