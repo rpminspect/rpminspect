@@ -132,8 +132,6 @@ static deprule_list_t *gather_deprules_by_type(deprule_list_t *rules, Header hdr
             if (!strcmp(r, "debuginfo(build-id)")
                 || strsuffix(r, DEBUGSOURCE_SUFFIX)
                 || strsuffix(r, DEBUGINFO_SUFFIX)
-                || strstr(r, DEBUGSOURCE_SUFFIX)
-                || strstr(r, DEBUGINFO_SUFFIX)
                 || ((strprefix(r, "rpmlib(") || strprefix(r, "rtld(")) && strsuffix(r, ")"))) {
                 continue;
             }
