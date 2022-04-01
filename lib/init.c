@@ -389,7 +389,8 @@ static void process_table(char *key, char *value, string_map_t **table)
  * Convert a 10 character mode string for a file to a mode_t
  * For example, convert "-rwsr-xr-x" to a mode_t
  */
-static mode_t parse_mode(const char *input) {
+static mode_t parse_mode(const char *input)
+{
     mode_t mode = 0;
     char i;
 

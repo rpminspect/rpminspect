@@ -28,7 +28,8 @@
 /*
  * Main driver for the 'subpackages' inspection.
  */
-bool inspect_subpackages(struct rpminspect *ri) {
+bool inspect_subpackages(struct rpminspect *ri)
+{
     bool result = true;
     rpmpeer_entry_t *peer = NULL;
     string_list_t *before_pkgs = NULL;

@@ -54,8 +54,10 @@
  *                copy operation, false otherwise.
  * @return 0 on success, -1 on error.
  */
-int copyfile(const char *src, const char *dest, bool force, bool verbose) {
-    FILE *in = NULL, *out = NULL;
+int copyfile(const char *src, const char *dest, bool force, bool verbose)
+{
+    FILE *in = NULL;
+    FILE *out = NULL;
     int out_fd;                 /* use open() to test if file exists, then
                                  * fdopen for out */
     char buf[BUFSIZ];

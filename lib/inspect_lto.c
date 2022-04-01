@@ -206,7 +206,8 @@ static bool lto_driver(struct rpminspect *ri, rpmfile_entry_t *file)
  * @param ri Pointer to the struct rpminspect for the program.
  * @return True if the inspection passed, false otherwise.
  */
-bool inspect_lto(struct rpminspect *ri) {
+bool inspect_lto(struct rpminspect *ri)
+{
     bool result = true;
     struct result_params params;
 

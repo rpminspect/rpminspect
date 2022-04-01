@@ -446,7 +446,8 @@ GElf_Phdr * get_elf_phdr(Elf *elf, Elf64_Word type, GElf_Phdr *out)
  * Returns the SONAME of the given file or NULL if unable.
  * Caller must free the returned string.
  */
-char *get_elf_soname(const char *filepath) {
+char *get_elf_soname(const char *filepath)
+{
     char *soname = NULL;
     Elf *e = NULL;
     int fd = 0;
