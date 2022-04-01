@@ -116,7 +116,8 @@ static bool annocheck_driver(struct rpminspect *ri, rpmfile_entry_t *file)
     arch = get_rpm_header_arch(file->rpm_header);
 
     /* Only run this check on ELF files */
-    if (!is_elf(file->fullpath) || (!is_elf(file->fullpath) && file->peer_file && !is_elf(file->peer_file->fullpath))) {
+    if (!is_elf_file(file->fullpath)
+        || (!is_elf_file(file->fullpath) && file->peer_file && !is_elf_file(file->peer_file->fullpath))) {
         return result;
     }
 
