@@ -145,36 +145,7 @@ Elf * get_elf_archive(const char *fullpath, int *out_fd)
  */
 bool is_elf(const char *path)
 {
-    int fd = 0;
-    Elf *elf = NULL;
-
-    /* try it as a shared object */
-    elf = get_elf(path, &fd);
-
-    if (elf) {
-        elf_end(elf);
-
-        if (fd) {
-            close(fd);
-        }
-
-        return true;
-    }
-
-    /* try it as a static library */
-    elf = get_elf_archive(path, &fd);
-
-    if (elf) {
-        elf_end(elf);
-
-        if (fd) {
-            close(fd);
-        }
-
-        return true;
-    }
-
-    return false;
+    return (is_elf_file(path) || is_elf_archive(path));
 }
 
 /*
@@ -199,6 +170,54 @@ bool is_elf_shared_library(const char *path)
     close(fd);
     elf_end(elf);
     return result;
+}
+
+/*
+ * Return true for any ELF file.
+ */
+bool is_elf_file(const char *path)
+{
+    int fd = 0;
+    Elf *elf = NULL;
+
+    /* try it as a shared object */
+    elf = get_elf(path, &fd);
+
+    if (elf) {
+        elf_end(elf);
+
+        if (fd) {
+            close(fd);
+        }
+
+        return true;
+    }
+
+    return false;
+}
+
+/*
+ * Return true for any ELF archive.
+ */
+bool is_elf_archive(const char *path)
+{
+    int fd = 0;
+    Elf *elf = NULL;
+
+    /* try it as a static library */
+    elf = get_elf_archive(path, &fd);
+
+    if (elf) {
+        elf_end(elf);
+
+        if (fd) {
+            close(fd);
+        }
+
+        return true;
+    }
+
+    return false;
 }
 
 bool have_elf_section(Elf *elf, int64_t section, const char *name)

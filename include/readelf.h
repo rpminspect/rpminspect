@@ -135,11 +135,11 @@ GElf_Half get_elf_type(Elf *elf);
 GElf_Half get_elf_machine(Elf *elf);
 
 /**
- * @brief Determine if the specified file is an ELF file.
+ * @brief Determine if the specified file is any ELF file type.
  *
  * Given a path to a file, this function returns true if the file is
- * either an ELF archive or an ELF shared object.  In all other cases
- * it returns False.
+ * either an ELF archive or an ELF file.  In all other cases, it
+ * returns false.
  *
  * @param path The full path to the file in question.
  * @return True if the file is ELF, false otherwise.
@@ -156,6 +156,30 @@ bool is_elf(const char *path);
  * @return True if the file is an ELF shared library, false otherwise.
  */
 bool is_elf_shared_library(const char *path);
+
+/**
+ * @brief Determine if the specified file is an ELF file.
+ *
+ * Given a path to a file, this function returns true if the file is
+ * an ELF file.  That is, an ELF executable, shared library, or shared
+ * object.
+ *
+ * @param path The fullpath tothe file in question.
+ * @return True if the file is an ELF file, false otherwise.
+ */
+bool is_elf_file(const char *path);
+
+/**
+ * @brief Determine if the specified file is an ELF archive.
+ *
+ * Given a path to a file, this function returns true if the file is
+ * an ELF archive.  That is, a '.a' file consisting of ELF object
+ * files.
+ *
+ * @param path The fullpath tothe file in question.
+ * @return True if the file is an ELF archive, false otherwise.
+ */
+bool is_elf_archive(const char *path);
 
 /**
  * @brief Determine if the specified Elf object contains the specified
