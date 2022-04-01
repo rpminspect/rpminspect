@@ -106,7 +106,6 @@ bool match_fileinfo_mode(struct rpminspect *ri, const rpmfile_entry_t *file, con
         }
     }
 
-    free(params.remedy);
     return false;
 }
 
