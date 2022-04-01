@@ -95,7 +95,8 @@ void free_string_map(string_map_t *table)
  * Free a struct rpminspect.  Called by applications using
  * librpminspect before they exit.
  */
-void free_rpminspect(struct rpminspect *ri) {
+void free_rpminspect(struct rpminspect *ri)
+{
     fileinfo_entry_t *fientry = NULL;
     caps_entry_t *centry = NULL;
     caps_filelist_entry_t *cflentry = NULL;

@@ -47,7 +47,8 @@ void init_result_params(struct result_params *params)
 /*
  * Initialize a new results_t list.
  */
-results_t *init_results(void) {
+results_t *init_results(void)
+{
     results_t *results = NULL;
 
     results = calloc(1, sizeof(*results));
@@ -59,7 +60,8 @@ results_t *init_results(void) {
 /*
  * Free memory associated with an results_t list.
  */
-void free_results(results_t *results) {
+void free_results(results_t *results)
+{
     results_entry_t *entry = NULL;
 
     if (results == NULL) {

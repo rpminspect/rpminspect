@@ -116,7 +116,8 @@ static bool pathmigration_driver(struct rpminspect *ri, rpmfile_entry_t *file)
 /*
  * Main driver for the 'pathmigration' inspection.
  */
-bool inspect_pathmigration(struct rpminspect *ri) {
+bool inspect_pathmigration(struct rpminspect *ri)
+{
     bool result = true;
     struct result_params params;
 

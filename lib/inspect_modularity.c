@@ -26,7 +26,8 @@
 
 #include "rpminspect.h"
 
-static bool modularity_driver(struct rpminspect *ri, rpmfile_entry_t *file) {
+static bool modularity_driver(struct rpminspect *ri, rpmfile_entry_t *file)
+{
     bool result = true;
     rpmTagType tt;
     rpmTagVal tv;
@@ -77,7 +78,8 @@ static bool modularity_driver(struct rpminspect *ri, rpmfile_entry_t *file) {
 /*
  * Main driver for the 'modularity' inspection.
  */
-bool inspect_modularity(struct rpminspect *ri) {
+bool inspect_modularity(struct rpminspect *ri)
+{
     bool result = false;
     struct result_params params;
 

@@ -52,7 +52,8 @@
  * @param badwords List of bad words to look for.
  * @return True if a bad word was found in the string, false otherwise.
  */
-bool has_bad_word(const char *s, const string_list_t *badwords) {
+bool has_bad_word(const char *s, const string_list_t *badwords)
+{
     string_entry_t *badword = NULL;
     size_t badword_len;
     char *search;

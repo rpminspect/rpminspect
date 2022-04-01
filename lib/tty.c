@@ -30,7 +30,8 @@
  * stdout.  This function returns DEFAULT_TTY_WIDTH if it cannot
  * figure out the width.
  */
-size_t tty_width(void) {
+size_t tty_width(void)
+{
     struct winsize w;
 
     /* get the terminal size */
