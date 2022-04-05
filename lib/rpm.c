@@ -41,10 +41,7 @@ int init_librpm(struct rpminspect *ri)
     }
 
     result = rpmReadConfigFiles(NULL, NULL);
-
-    if (result == RPMRC_OK) {
-        ri->librpm_initialized = true;
-    }
+    ri->librpm_initialized = true;
 
     return result;
 }
