@@ -471,6 +471,12 @@ static bool expected_deprule_change(const bool rebase, const deprule_entry_t *de
         working_req++;
     }
 
+    /* trim config() wrapper */
+    if (strprefix(working_req, "config(")) {
+        working_req += 7;
+        working_req[strcspn(working_req, ")")] = '\0';
+    }
+
     /* trim any arch substrings from the name (e.g., "(x86-64)") */
     if (strstr(working_req, "(")) {
         working_req[strcspn(working_req, "(")] = '\0';
