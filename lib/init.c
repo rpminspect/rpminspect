@@ -1846,6 +1846,7 @@ bool init_security(struct rpminspect *ri)
         ri->security = calloc(1, sizeof(*ri->security));
         assert(ri->security != NULL);
         TAILQ_INIT(ri->security);
+        ri->security_initialized = true;
     }
 
     /* the actual security file */
@@ -2014,7 +2015,6 @@ bool init_security(struct rpminspect *ri)
     }
 
     list_free(contents, free);
-    ri->security_initialized = true;
 
     return true;
 }
