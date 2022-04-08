@@ -46,8 +46,8 @@ void *read_file_bytes(const char *path, off_t *len)
         return NULL;
     }
 
-    /* zero length file, ignore */
-    if (sb.st_size == 0) {
+    /* zero length file or not a file, ignore */
+    if (sb.st_size == 0 || !S_ISREG(sb.st_mode)) {
         return NULL;
     }
 
