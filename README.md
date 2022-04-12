@@ -21,10 +21,8 @@ vendor-specific data package.
 Status
 ------
 
-[![CI](https://github.com/rpminspect/rpminspect/actions/workflows/ci.yml/badge.svg)](https://github.com/rpminspect/rpminspect/actions/workflows/ci.yml)
 [![Python Checks](https://github.com/rpminspect/rpminspect/actions/workflows/python.yml/badge.svg)](https://github.com/rpminspect/rpminspect/actions/workflows/python.yml)
 [![ShellCheck](https://github.com/rpminspect/rpminspect/actions/workflows/shellcheck.yml/badge.svg)](https://github.com/rpminspect/rpminspect/actions/workflows/shellcheck.yml)
-[![Extra CI](https://github.com/rpminspect/rpminspect/actions/workflows/extra-ci.yml/badge.svg)](https://github.com/rpminspect/rpminspect/actions/workflows/extra-ci.yml)
 
 For each merge and pull request, rpminspect is built and tested in the
 following environments:
@@ -44,7 +42,7 @@ following environments:
 | [Arch Linux](https://archlinux.org/) | stable | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | | | | |
 | [Gentoo Linux](https://www.gentoo.org/) | stable | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | | | | |
 | [Alpine Linux](https://www.alpinelinux.org/) | stable | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | | | | |
-| [AlmaLinux](https://almalinux.org/) | 8 | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | | | | |
+| [AlmaLinux](https://almalinux.org/) | 8 | :heavy_check_mark: | :heavy_check_mark: | [![AlmaLinux](https://github.com/rpminspect/rpminspect/actions/workflows/almalinux.yml/badge.svg)](https://github.com/rpminspect/rpminspect/actions/workflows/almalinux.yml) | | | | |
 | [Rocky Linux](https://rockylinux.org/) | 8 | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | | | | |
 | [Amazon Linux](https://aws.amazon.com/amazon-linux-2/) | 2 | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | | | | |
 | [Mageia Linux](https://www.mageia.org/) | stable | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | | | | |
