@@ -116,9 +116,8 @@ static bool check_explicit_lib_deps(struct rpminspect *ri, Header h, deprule_lis
     deprule_entry_t *req = NULL;
     deprule_entry_t *prov = NULL;
     char *isareq = NULL;
-    char *working_isareq = NULL;
     char *isaprov = NULL;
-    char *working_isaprov = NULL;
+    char *walk = NULL;
     char *multiples = NULL;
     char *r = NULL;
     char *vr = NULL;
@@ -197,21 +196,23 @@ static bool check_explicit_lib_deps(struct rpminspect *ri, Header h, deprule_lis
                      * trim the '(x86-64)' or similar ISA substring for comparision purposes
                      * also trim leading '(' to account for rich deps
                      */
-                    working_isareq = isareq = strdup(req->requirement);
-                    working_isaprov = isaprov = strdup(prov->requirement);
+                    isareq = strdup(req->requirement);
+                    assert(isareq != NULL);
+                    walk = strrchr(isareq, '(');
 
-                    while (*working_isareq == '(') {
-                        working_isareq++;
+                    if (walk != NULL) {
+                        *walk = '\0';
                     }
 
-                    while (*working_isaprov == '(') {
-                        working_isaprov++;
+                    isaprov = strdup(prov->requirement);
+                    assert(isaprov != NULL);
+                    walk = strrchr(isaprov, '(');
+
+                    if (walk != NULL) {
+                        *walk = '\0';
                     }
 
-                    working_isareq[strcspn(working_isareq, "(")] = '\0';
-                    working_isaprov[strcspn(working_isaprov, "(")] = '\0';
-
-                    if (!strcmp(working_isareq, working_isaprov)) {
+                    if (!strcmp(isareq, isaprov)) {
                         potential_prov = peer;
 
                         if (!list_contains(req->providers, pn)) {
@@ -252,17 +253,18 @@ static bool check_explicit_lib_deps(struct rpminspect *ri, Header h, deprule_lis
                     continue;
                 }
 
-                /* trim potential %{_isa} suffix */
-                working_isareq = isareq = strdup(verify->requirement);
-                assert(isareq != NULL);
 
-                while (*working_isareq == '(') {
-                    working_isareq++;
+                /* trim potential %{_isa} suffix */
+                isareq = strdup(verify->requirement);
+                assert(isareq != NULL);
+                walk = strrchr(isareq, '(');
+
+                if (walk != NULL) {
+                    *walk = '\0';
                 }
 
-                working_isareq[strcspn(working_isareq, "(")] = '\0';
 
-                if (!strcmp(working_isareq, pn) && verify->operator == OP_EQUAL && (!strcmp(verify->version, evr) || !strcmp(verify->version, vr))) {
+                if (!strcmp(isareq, pn) && verify->operator == OP_EQUAL && (!strcmp(verify->version, evr) || !strcmp(verify->version, vr))) {
                     found = true;
                 }
 
