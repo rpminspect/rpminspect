@@ -253,7 +253,6 @@ static bool check_explicit_lib_deps(struct rpminspect *ri, Header h, deprule_lis
                     continue;
                 }
 
-
                 /* trim potential %{_isa} suffix */
                 isareq = strdup(verify->requirement);
                 assert(isareq != NULL);
@@ -263,8 +262,8 @@ static bool check_explicit_lib_deps(struct rpminspect *ri, Header h, deprule_lis
                     *walk = '\0';
                 }
 
-
                 if (!strcmp(isareq, pn) && verify->operator == OP_EQUAL && (!strcmp(verify->version, evr) || !strcmp(verify->version, vr))) {
+                    verify->explicit = true;
                     found = true;
                 }
 
@@ -458,6 +457,11 @@ static bool expected_deprule_change(const bool rebase, const deprule_entry_t *de
 
     /* changes always expected in a rebase */
     if (rebase) {
+        return true;
+    }
+
+    /* Rich dependencies and explicit dependencies for automatic deps are expected */
+    if (deprule->rich || deprule->explicit) {
         return true;
     }
 
@@ -724,12 +728,12 @@ bool inspect_rpmdeps(struct rpminspect *ri)
                         xasprintf(&noun, _("'%s' became '${FILE}' in %s on ${ARCH}"), pdrs, name);
                         params.remedy = REMEDY_RPMDEPS_CHANGED;
                         params.verb = VERB_CHANGED;
+                    }
 
-                        if (deprule->rich || expected_deprule_change(rebase, deprule, peer->after_hdr, ri->peers)) {
-                            params.severity = RESULT_INFO;
-                            params.waiverauth = NOT_WAIVABLE;
-                            params.msg = strappend(params.msg, _("; this is expected"), NULL);
-                        }
+                    if (expected_deprule_change(rebase, deprule, peer->after_hdr, ri->peers)) {
+                        params.severity = RESULT_INFO;
+                        params.waiverauth = NOT_WAIVABLE;
+                        params.msg = strappend(params.msg, _("; this is expected"), NULL);
                     }
 
                     /* debuginfo and debugsource pkg findings are always INFO */

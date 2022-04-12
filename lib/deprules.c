@@ -156,6 +156,7 @@ static deprule_list_t *gather_deprules_by_type(deprule_list_t *rules, Header hdr
             }
 
             deprule_entry->rich = is_rich_dep(deprule_entry->requirement);
+            deprule_entry->explicit = false;
 
             TAILQ_INSERT_TAIL(deprules, deprule_entry, items);
         }
