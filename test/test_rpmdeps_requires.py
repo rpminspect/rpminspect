@@ -221,8 +221,8 @@ class GainingRequiresCompareSRPM(TestCompareSRPM):
         self.after_rpm.add_build_requires(after_requires)
 
         self.inspection = "rpmdeps"
-        self.result = "VERIFY"
-        self.waiver_auth = "Anyone"
+        self.result = "INFO"
+        self.waiver_auth = "Not Waivable"
 
 
 class GainingRequiresCompareRPMs(TestCompareRPMs):
