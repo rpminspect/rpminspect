@@ -113,7 +113,7 @@ static bool addedfiles_driver(struct rpminspect *ri, rpmfile_entry_t *file)
             }
 
             if (strprefix(localpath, subpath)) {
-                xasprintf(&params.msg, _("Packages should not contain files or directories starting with `%s` on %s: %s"), entry->data, arch, file->localpath);
+                xasprintf(&params.msg, _("Packages should not contain files or directories starting with `%s` on %s in %s: %s"), entry->data, arch, name, file->localpath);
                 params.noun = _("invalid directory ${FILE} on ${ARCH}");
                 add_result(ri, &params);
                 result = !(params.severity >= RESULT_VERIFY);
@@ -126,7 +126,7 @@ static bool addedfiles_driver(struct rpminspect *ri, rpmfile_entry_t *file)
     if (ri->forbidden_path_suffixes && (ri->tests & INSPECT_ADDEDFILES)) {
         TAILQ_FOREACH(entry, ri->forbidden_path_suffixes, items) {
             if (strsuffix(file->localpath, entry->data)) {
-                xasprintf(&params.msg, _("Packages should not contain files or directories ending with `%s` on %s: %s"), entry->data, arch, file->localpath);
+                xasprintf(&params.msg, _("Packages should not contain files or directories ending with `%s` on %s in %s: %s"), entry->data, arch, name, file->localpath);
                 params.noun = _("invalid directory ${FILE} on ${ARCH}");
                 add_result(ri, &params);
                 result = !(params.severity >= RESULT_VERIFY);
@@ -139,7 +139,7 @@ static bool addedfiles_driver(struct rpminspect *ri, rpmfile_entry_t *file)
     if (ri->forbidden_directories && S_ISDIR(file->st.st_mode) && (ri->tests & INSPECT_ADDEDFILES)) {
         TAILQ_FOREACH(entry, ri->forbidden_directories, items) {
             if (!strcmp(file->localpath, entry->data)) {
-                xasprintf(&params.msg, _("Forbidden directory `%s` found on %s"), entry->data, arch);
+                xasprintf(&params.msg, _("Forbidden directory `%s` found on %s in %s"), entry->data, arch, name);
                 params.noun = _("forbidden directory ${FILE} on ${ARCH}");
                 add_result(ri, &params);
                 result = !(params.severity >= RESULT_VERIFY);
@@ -149,7 +149,10 @@ static bool addedfiles_driver(struct rpminspect *ri, rpmfile_entry_t *file)
     }
 
     /* security path file */
-    if (ri->security_path_prefix && S_ISREG(file->st.st_mode)) {
+    if (ri->security_path_prefix
+        && ri->before != NULL
+        && S_ISREG(file->st.st_mode)
+        && (file->peer_file == NULL || strcmp(file->localpath, file->peer_file->localpath))) {
         TAILQ_FOREACH(entry, ri->security_path_prefix, items) {
             subpath = entry->data;
 
@@ -162,7 +165,7 @@ static bool addedfiles_driver(struct rpminspect *ri, rpmfile_entry_t *file)
 
                 if (params.severity != RESULT_NULL && params.severity != RESULT_SKIP) {
                     params.waiverauth = WAIVABLE_BY_SECURITY;
-                    xasprintf(&params.msg, _("New security-related file `%s` added on %s requires inspection by the Security Team"), file->localpath, arch);
+                    xasprintf(&params.msg, _("New security-related file `%s` added on %s in %s requires inspection by the Security Team"), file->localpath, arch, name);
                     params.verb = VERB_ADDED;
                     params.noun = _("new security-related file ${FILE} on ${ARCH}");
                     add_result(ri, &params);
@@ -185,8 +188,7 @@ static bool addedfiles_driver(struct rpminspect *ri, rpmfile_entry_t *file)
     /*
      * Report that a new file has been added in a build comparison.
      */
-    if ((ri->tests & INSPECT_ADDEDFILES)
-        && (ri->before != NULL && file->peer_file == NULL)) {
+    if ((ri->tests & INSPECT_ADDEDFILES) && (ri->before != NULL && file->peer_file == NULL)) {
         if (rebase) {
             params.severity = RESULT_INFO;
             params.waiverauth = NOT_WAIVABLE;
@@ -197,7 +199,7 @@ static bool addedfiles_driver(struct rpminspect *ri, rpmfile_entry_t *file)
             params.verb = VERB_ADDED;
         }
 
-        xasprintf(&params.msg, _("`%s` added on %s"), file->localpath, arch);
+        xasprintf(&params.msg, _("`%s` added on %s in %s"), file->localpath, arch, name);
         params.noun = _("new file ${FILE} on ${ARCH}");
         add_result(ri, &params);
         result = !(params.severity >= RESULT_VERIFY);
