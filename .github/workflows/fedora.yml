@@ -50,8 +50,7 @@ jobs:
         # Set up the matrix of distributions to test
         strategy:
             matrix:
-                #container: ["fedora:rawhide", "fedora:latest"]
-                container: ["fedora:latest"]
+                container: ["fedora:rawhide", "fedora:latest"]
 
         container:
             image: ${{ matrix.container }}
@@ -82,8 +81,7 @@ jobs:
         # Set up the matrix of distributions to test
         strategy:
             matrix:
-                #container: ["fedora:rawhide", "fedora:latest"]
-                container: ["fedora:latest"]
+                container: ["fedora:rawhide", "fedora:latest"]
 
         container:
             image: ${{ matrix.container }}
