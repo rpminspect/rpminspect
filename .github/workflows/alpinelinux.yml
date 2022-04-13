@@ -37,9 +37,13 @@ jobs:
         # directory, so think of that as your $PWD
         steps:
             # Requirements before the git clone can happen
+            # (The git config step here is to deal with an unusual
+            # error seen only on Alpine Linux.  You shouldn't normally
+            # do this.)
             - name: git clone requirements
               run: |
                   apk add git
+                  git config --global --add safe.directory /__w/rpminspect/rpminspect
 
             # This means clone the git repo
             - uses: actions/checkout@v3
