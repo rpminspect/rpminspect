@@ -61,6 +61,7 @@ jobs:
             # Set up
             - name: git clone requirements
               run: |
+                  dnf install -y git
                   git config --global --add safe.directory /__w/rpminspect/rpminspect
 
             # This means clone the git repo
@@ -97,6 +98,7 @@ jobs:
             # Set up
             - name: git clone requirements
               run: |
+                  dnf install -y git
                   git config --global --add safe.directory /__w/rpminspect/rpminspect
 
             # This means clone the git repo
