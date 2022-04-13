@@ -58,8 +58,13 @@ jobs:
         # All of these steps run from within the main source
         # directory, so think of that as your $PWD
         steps:
+            # Set up
+            - name: git clone requirements
+              run: |
+                  git config --global --add safe.directory /__w/rpminspect/rpminspect
+
             # This means clone the git repo
-            - uses: actions/checkout@v2.1.0
+            - uses: actions/checkout@v3
 
             # Within the container, install the dependencies, build,
             # and run the test suite
@@ -89,8 +94,13 @@ jobs:
         # All of these steps run from within the main source
         # directory, so think of that as your $PWD
         steps:
+            # Set up
+            - name: git clone requirements
+              run: |
+                  git config --global --add safe.directory /__w/rpminspect/rpminspect
+
             # This means clone the git repo
-            - uses: actions/checkout@v2.1.0
+            - uses: actions/checkout@v3
 
             # Within the container, install the dependencies, build,
             # and run the test suite

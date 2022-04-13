@@ -42,9 +42,10 @@ jobs:
                   mkdir -p /var/lib/pacman/
                   pacman --noconfirm -Syu
                   pacman --noconfirm -S git
+                  git config --global --add safe.directory /__w/rpminspect/rpminspect
 
             # This means clone the git repo
-            - uses: actions/checkout@v2.1.0
+            - uses: actions/checkout@v3
 
             # Within the container, install the dependencies, build,
             # and run the test suite
