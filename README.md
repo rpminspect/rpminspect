@@ -32,20 +32,18 @@ following environments:
 | [Fedora Linux](https://getfedora.org/) | stable | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | | | |
 | [Fedora Linux](https://getfedora.org/) | rawhide | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | | | |
 | [Fedora Linux](https://getfedora.org/) | stable | :heavy_check_mark: | | | | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: |
-| [CentOS](https://www.centos.org/) | 8 | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | | | | |
-| [CentOS](https://www.centos.org/) | 7 | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | | | | |
-| [Slackware](http://www.slackware.com/) | stable | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | | | | |
-| [Ubuntu Linux](https://ubuntu.com/) | stable | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | | | | |
-| [Debian GNU/Linux](https://www.debian.org/) | stable | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | | | | |
-| [Debian GNU/Linux](https://www.debian.org/) | testing | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | | | | |
-| [OpenSUSE](https://www.opensuse.org/) | Leap | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | | | | |
+| [CentOS](https://www.centos.org/) | 8<br />7 | :heavy_check_mark: | :heavy_check_mark: | [![CentOS](https://github.com/rpminspect/rpminspect/actions/workflows/centos.yml/badge.svg)](https://github.com/rpminspect/rpminspect/actions/workflows/centos.yml) | | | | |
+| [Slackware](http://www.slackware.com/) | stable | :heavy_check_mark: | :heavy_check_mark: | [![Slackware Linux](https://github.com/rpminspect/rpminspect/actions/workflows/slackware.yml/badge.svg)](https://github.com/rpminspect/rpminspect/actions/workflows/slackware.yml) | | | | |
+| [Ubuntu Linux](https://ubuntu.com/) | stable | :heavy_check_mark: | :heavy_check_mark: | [![Ubuntu Linux](https://github.com/rpminspect/rpminspect/actions/workflows/ubuntu.yml/badge.svg)](https://github.com/rpminspect/rpminspect/actions/workflows/ubuntu.yml) | | | | |
+| [Debian GNU/Linux](https://www.debian.org/) | stable<br />testing | :heavy_check_mark: | :heavy_check_mark: | [![Debian GNU/Linux](https://github.com/rpminspect/rpminspect/actions/workflows/debian.yml/badge.svg)](https://github.com/rpminspect/rpminspect/actions/workflows/debian.yml) | | | | |
+| [OpenSUSE](https://www.opensuse.org/) | Leap | :heavy_check_mark: | :heavy_check_mark: | [![OpenSUSE](https://github.com/rpminspect/rpminspect/actions/workflows/opensuse.yml/badge.svg)](https://github.com/rpminspect/rpminspect/actions/workflows/opensuse.yml) | | | | |
 | [Arch Linux](https://archlinux.org/) | stable | :heavy_check_mark: | :heavy_check_mark: | [![Arch Linux](https://github.com/rpminspect/rpminspect/actions/workflows/archlinux.yml/badge.svg)](https://github.com/rpminspect/rpminspect/actions/workflows/archlinux.yml) | | | | |
-| [Gentoo Linux](https://www.gentoo.org/) | stable | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | | | | |
+| [Gentoo Linux](https://www.gentoo.org/) | stable | :heavy_check_mark: | :heavy_check_mark: | [![Gentoo Linux](https://github.com/rpminspect/rpminspect/actions/workflows/gentoo.yml/badge.svg)](https://github.com/rpminspect/rpminspect/actions/workflows/gentoo.yml) | | | | |
 | [Alpine Linux](https://www.alpinelinux.org/) | stable | :heavy_check_mark: | :heavy_check_mark: | [![Alpine Linux](https://github.com/rpminspect/rpminspect/actions/workflows/alpinelinux.yml/badge.svg)](https://github.com/rpminspect/rpminspect/actions/workflows/alpinelinux.yml) | | | | |
 | [AlmaLinux](https://almalinux.org/) | 8 | :heavy_check_mark: | :heavy_check_mark: | [![AlmaLinux](https://github.com/rpminspect/rpminspect/actions/workflows/almalinux.yml/badge.svg)](https://github.com/rpminspect/rpminspect/actions/workflows/almalinux.yml) | | | | |
-| [Rocky Linux](https://rockylinux.org/) | 8 | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | | | | |
+| [Rocky Linux](https://rockylinux.org/) | 8 | :heavy_check_mark: | :heavy_check_mark: | [![Rocky Linux](https://github.com/rpminspect/rpminspect/actions/workflows/rockylinux.yml/badge.svg)](https://github.com/rpminspect/rpminspect/actions/workflows/rockylinux.yml) | | | | |
 | [Amazon Linux](https://aws.amazon.com/amazon-linux-2/) | 2 | :heavy_check_mark: | :heavy_check_mark: | [![Amazon Linux](https://github.com/rpminspect/rpminspect/actions/workflows/amazonlinux.yml/badge.svg)](https://github.com/rpminspect/rpminspect/actions/workflows/amazonlinux.yml) | | | | |
-| [Mageia Linux](https://www.mageia.org/) | stable | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | | | | |
+| [Mageia Linux](https://www.mageia.org/) | stable | :heavy_check_mark: | :heavy_check_mark: | [![Mageia Linux](https://github.com/rpminspect/rpminspect/actions/workflows/mageia.yml/badge.svg)](https://github.com/rpminspect/rpminspect/actions/workflows/mageia.yml) | | | | |
 | [Alt Linux](https://en.altlinux.org/Main_Page) | stable | :heavy_check_mark: | :heavy_check_mark: | [![Alt Linux](https://github.com/rpminspect/rpminspect/actions/workflows/altlinux.yml/badge.svg)](https://github.com/rpminspect/rpminspect/actions/workflows/altlinux.yml) | | | | |
 | [Oracle Linux](https://www.oracle.com/linux/) | 8 | :heavy_check_mark: | :heavy_check_mark: | [![Oracle Linux](https://github.com/rpminspect/rpminspect/actions/workflows/oraclelinux.yml/badge.svg)](https://github.com/rpminspect/rpminspect/actions/workflows/oraclelinux.yml) | | | | |
 
