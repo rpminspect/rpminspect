@@ -30,7 +30,7 @@
  * security_entry_t for the match is returned and the caller can take
  * appropriate reporting action.
  */
-static security_entry_t *get_secrule_by_path(struct rpminspect *ri, const rpmfile_entry_t *file)
+security_entry_t *get_secrule_by_path(struct rpminspect *ri, const rpmfile_entry_t *file)
 {
     const char *name = NULL;
     const char *version = NULL;

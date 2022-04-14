@@ -456,6 +456,7 @@ char *abspath(const char *path);
 string_list_t *gather_diags(struct rpminspect *ri, const char *progname, const char *progver);
 
 /* secrule.c */
+security_entry_t *get_secrule_by_path(struct rpminspect *ri, const rpmfile_entry_t *file);
 severity_t get_secrule_result_severity(struct rpminspect *ri, const rpmfile_entry_t *file, const int type);
 
 /* deprules.c */
