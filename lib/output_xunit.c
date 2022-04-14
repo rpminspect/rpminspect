@@ -29,7 +29,7 @@
  * Output a results_t in XUnit format.  This can be consumed by Jenkins or
  * other services that can read in XUnit data (e.g., GitHub).
  */
-void output_xunit(const results_t *results, const char *dest, const severity_t threshold, __attribute__((unused)) const severity_t suppress)
+void output_xunit(const results_t *results, const char *dest, const severity_t threshold, const severity_t suppress)
 {
     results_entry_t *result = NULL;
     int r = 0;
@@ -51,24 +51,31 @@ void output_xunit(const results_t *results, const char *dest, const severity_t t
         header = result->header;
     }
 
-    /* default to stdout unless a filename was specified */
-    if (dest == NULL) {
-        fp = stdout;
-    } else {
-        fp = fopen(dest, "w");
-
-        if (fp == NULL) {
-            warn(_("opening %s for writing"), dest);
-            return;
-        }
-    }
-
-    header = NULL;
-    fprintf(fp, "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n");
-    fprintf(fp, "<testsuite tests=\"%d\" failures=\"%d\" errors=\"0\" skipped=\"0\">\n", total, failures);
-
     /* output the results */
     TAILQ_FOREACH(result, results, items) {
+        /* Ignore suppressed results */
+        if (suppressed_results(results, result->header, suppress)) {
+            continue;
+        }
+
+        /* default to stdout unless a filename was specified */
+        if (fp == NULL) {
+            if (dest == NULL) {
+                fp = stdout;
+            } else {
+                fp = fopen(dest, "w");
+            }
+
+            if (fp == NULL) {
+                warn(_("opening %s for writing"), dest);
+                return;
+            }
+
+            header = NULL;
+            fprintf(fp, "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n");
+            fprintf(fp, "<testsuite tests=\"%d\" failures=\"%d\" errors=\"0\" skipped=\"0\">\n", total, failures);
+        }
+
         if (header == NULL || strcmp(header, result->header)) {
             if (header != NULL) {
                 fprintf(fp, "    </testcase>\n");
@@ -128,17 +135,19 @@ void output_xunit(const results_t *results, const char *dest, const severity_t t
     }
 
     /* tidy up and return */
-    if (header != NULL) {
-        fprintf(fp, "    </testcase>\n");
-    }
+    if (fp != NULL) {
+        if (header != NULL) {
+            fprintf(fp, "    </testcase>\n");
+        }
 
-    fprintf(fp, "</testsuite>\n");
-    r = fflush(fp);
-    assert(r == 0);
-
-    if (dest != NULL) {
-        r = fclose(fp);
+        fprintf(fp, "</testsuite>\n");
+        r = fflush(fp);
         assert(r == 0);
+
+        if (dest != NULL) {
+            r = fclose(fp);
+            assert(r == 0);
+        }
     }
 
     return;
