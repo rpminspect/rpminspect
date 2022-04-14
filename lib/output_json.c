@@ -31,7 +31,7 @@
 /*
  * Output a results_t in JSON format.
  */
-void output_json(const results_t *results, const char *dest, __attribute__((unused)) const severity_t threshold, __attribute__((unused)) const severity_t suppress)
+void output_json(const results_t *results, const char *dest, __attribute__((unused)) const severity_t threshold, const severity_t suppress)
 {
     results_entry_t *result = NULL;
     int r = 0;
@@ -46,14 +46,21 @@ void output_json(const results_t *results, const char *dest, __attribute__((unus
 
     assert(results != NULL);
 
-    /*
-     * The main results object.  Each inspection will be an array
-     * with the results contained as array elements.
-     */
-    j = json_object_new_object();
-
     /* output the results */
     TAILQ_FOREACH(result, results, items) {
+        /* Ignore suppressed results */
+        if (suppressed_results(results, result->header, suppress)) {
+            continue;
+        }
+
+        /*
+         * The main results object.  Each inspection will be an array
+         * with the results contained as array elements.
+         */
+        if (j == NULL) {
+            j = json_object_new_object();
+        }
+
         /* if we have a new inspection set, create a new object */
         if (header == NULL || strcmp(header, result->header)) {
             /* add previous inspection if there is one */
@@ -88,46 +95,51 @@ void output_json(const results_t *results, const char *dest, __attribute__((unus
     }
 
     /* add the final inspection */
-    json_object_object_add(j, header, json_object_get(ji));
-
-    /* default to stdout unless a filename was specified */
-    if (dest == NULL) {
-        fp = stdout;
-    } else {
-        fp = fopen(dest, "w");
-
-        if (fp == NULL) {
-            warn(_("error opening %s for writing"), dest);
-            return;
-        }
+    if (header != NULL && j != NULL) {
+        json_object_object_add(j, header, json_object_get(ji));
     }
 
-    /* write out the results */
-    fprintf(fp, "%s\n", json_object_to_json_string_ext(j, flags));
+    /* output results */
+    if (j != NULL) {
+        /* default to stdout unless a filename was specified */
+        if (dest == NULL) {
+            fp = stdout;
+        } else {
+            fp = fopen(dest, "w");
 
-    /* tidy up and return */
-    r = fflush(fp);
-    assert(r == 0);
-
-    if (dest != NULL) {
-        r = fclose(fp);
-        assert(r == 0);
-    }
-
-    /* clean up the json library memory allocation */
-    json_object_object_foreachC(j, iter) {
-        if (json_object_get_type(iter.val) == json_type_array) {
-            len = json_object_array_length(iter.val);
-
-            for (r = 0; r < len; r++) {
-                json_object_array_put_idx(iter.val, r, NULL);
+            if (fp == NULL) {
+                warn(_("error opening %s for writing"), dest);
+                return;
             }
         }
 
-        json_object_put(iter.val);
-    }
+        /* write out the results */
+        fprintf(fp, "%s\n", json_object_to_json_string_ext(j, flags));
 
-    json_object_put(j);
+        /* tidy up and return */
+        r = fflush(fp);
+        assert(r == 0);
+
+        if (dest != NULL) {
+            r = fclose(fp);
+            assert(r == 0);
+        }
+
+        /* clean up the json library memory allocation */
+        json_object_object_foreachC(j, iter) {
+            if (json_object_get_type(iter.val) == json_type_array) {
+                len = json_object_array_length(iter.val);
+
+                for (r = 0; r < len; r++) {
+                    json_object_array_put_idx(iter.val, r, NULL);
+                }
+            }
+
+            json_object_put(iter.val);
+        }
+
+        json_object_put(j);
+    }
 
     return;
 }

@@ -40,25 +40,28 @@ void output_summary(const results_t *results, const char *dest, __attribute__((u
     char *tmp = NULL;
     size_t width = tty_width();
 
-    /* default to stdout unless a filename was specified */
-    if (dest == NULL) {
-        fp = stdout;
-    } else {
-        fp = fopen(dest, "w");
-
-        if (fp == NULL) {
-            warn(_("error opening %s for writing"), dest);
-            return;
-        }
-    }
-
     /* output the results */
     TAILQ_FOREACH(result, results, items) {
         /* skip conditions */
         if (!strcmp(result->header, NAME_DIAGNOSTICS)
             || (result->verb == VERB_OK && result->noun == NULL)
-            || (result->severity >= suppress)) {
+            || (result->severity >= suppress)
+            || suppressed_results(results, result->header, suppress)) {
             continue;
+        }
+
+        /* default to stdout unless a filename was specified */
+        if (fp == NULL) {
+            if (dest == NULL) {
+                fp = stdout;
+            } else {
+                fp = fopen(dest, "w");
+
+                if (fp == NULL) {
+                    warn(_("error opening %s for writing"), dest);
+                    return;
+                }
+            }
         }
 
         /* get a string representing the verb */
@@ -105,12 +108,14 @@ void output_summary(const results_t *results, const char *dest, __attribute__((u
     }
 
     /* tidy up and return */
-    r = fflush(fp);
-    assert(r == 0);
-
-    if (dest != NULL) {
-        r = fclose(fp);
+    if (fp != NULL) {
+        r = fflush(fp);
         assert(r == 0);
+
+        if (dest != NULL) {
+            r = fclose(fp);
+            assert(r == 0);
+        }
     }
 
     return;
