@@ -41,6 +41,8 @@ static bool addedfiles_driver(struct rpminspect *ri, rpmfile_entry_t *file)
     const char *name = NULL;
     char *subpath = NULL;
     char *localpath = NULL;
+    char *head = NULL;
+    char *tail = NULL;
     const char *arch = NULL;
     bool rebase = false;
     string_entry_t *entry = NULL;
@@ -68,8 +70,7 @@ static bool addedfiles_driver(struct rpminspect *ri, rpmfile_entry_t *file)
      * - Anything in a .build-id/ subdirectory
      * - Any Python egg file ending with .egg-info
      */
-    if (strstr(file->localpath, BUILD_ID_DIR) ||
-        strsuffix(file->localpath, EGGINFO_FILENAME_EXTENSION)) {
+    if (strstr(file->localpath, BUILD_ID_DIR) || strsuffix(file->localpath, EGGINFO_FILENAME_EXTENSION)) {
         return true;
     }
 
@@ -136,23 +137,33 @@ static bool addedfiles_driver(struct rpminspect *ri, rpmfile_entry_t *file)
     }
 
     /* Check for any forbidden directories */
-    if (ri->forbidden_directories && S_ISDIR(file->st.st_mode) && (ri->tests & INSPECT_ADDEDFILES)) {
+    if (ri->forbidden_directories && (ri->tests & INSPECT_ADDEDFILES)) {
         TAILQ_FOREACH(entry, ri->forbidden_directories, items) {
-            if (!strcmp(file->localpath, entry->data)) {
-                xasprintf(&params.msg, _("Forbidden directory `%s` found on %s in %s"), entry->data, arch, name);
+            xasprintf(&head, "%s/", entry->data);
+            assert(head != NULL);
+            xasprintf(&tail, "/%s", entry->data);
+            assert(tail != NULL);
+
+            if (strstr(file->localpath, tail) || strstr(file->localpath, head)) {
+                xasprintf(&params.msg, _("Forbidden directory `%s` found on %s in %s: %s"), entry->data, arch, name, file->localpath);
                 params.noun = _("forbidden directory ${FILE} on ${ARCH}");
                 add_result(ri, &params);
                 result = !(params.severity >= RESULT_VERIFY);
+                free(head);
+                free(tail);
                 goto done;
             }
+
+            free(head);
+            free(tail);
         }
     }
 
     /* security path file */
     if (ri->security_path_prefix
-        && ri->before != NULL
         && S_ISREG(file->st.st_mode)
-        && (file->peer_file == NULL || strcmp(file->localpath, file->peer_file->localpath))) {
+        && ((ri->before != NULL && (file->peer_file == NULL || strcmp(file->localpath, file->peer_file->localpath)))
+            || get_secrule_by_path(ri, file) != NULL)) {
         TAILQ_FOREACH(entry, ri->security_path_prefix, items) {
             subpath = entry->data;
 
