@@ -825,7 +825,7 @@ int main(int argc, char **argv)
                 free_rpminspect(ri);
                 rpmFreeMacros(NULL);
                 rpmFreeRpmrc();
-                err(RI_PROGRAM_ERROR, _("invalid after RPM"));
+                errx(RI_PROGRAM_ERROR, _("invalid after RPM"));
             }
 
             if (ri->before) {
@@ -835,7 +835,7 @@ int main(int argc, char **argv)
                     free_rpminspect(ri);
                     rpmFreeMacros(NULL);
                     rpmFreeRpmrc();
-                    err(RI_PROGRAM_ERROR, _("invalid before RPM"));
+                    errx(RI_PROGRAM_ERROR, _("invalid before RPM"));
                 }
             }
 
@@ -846,7 +846,7 @@ int main(int argc, char **argv)
                 free_rpminspect(ri);
                 rpmFreeMacros(NULL);
                 rpmFreeRpmrc();
-                return RI_PROGRAM_ERROR;
+                errx(RI_PROGRAM_ERROR, _("*** Unable to determine product release or none specified (-r)."));
             }
         }
 
