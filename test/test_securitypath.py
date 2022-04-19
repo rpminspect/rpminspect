@@ -18,7 +18,7 @@
 
 import rpmfluff
 
-from baseclass import TestRPMs, TestKoji, TestCompareRPMs, TestCompareKoji
+from baseclass import TestCompareRPMs, TestCompareKoji
 
 contents = """
 # Open things up
@@ -29,124 +29,6 @@ contents = """
 ################################################
 # New file present or added to a security path #
 ################################################
-
-
-# XXX: fix coming with a larger addedfiles inspection fix
-# class FileAddedToSecurityPathRPMs(TestRPMs):
-#    def setUp(self):
-#        super().setUp()
-#        self.rpm.add_installed_file(
-#            "/etc/sudoers.d/wheel", rpmfluff.SourceFile("wheel", contents)
-#        )
-#        self.inspection = "addedfiles"
-#        self.result = "BAD"
-#        self.waiver_auth = "Security"
-
-
-class SecuritySKIPFileAddedToSecurityPathRPMs(TestRPMs):
-    def setUp(self):
-        super().setUp()
-        self.rpm.add_installed_file(
-            "/etc/sudoers.d/skip", rpmfluff.SourceFile("wheel", contents)
-        )
-        self.inspection = "addedfiles"
-        self.result = "OK"
-        self.waiver_auth = "Not Waivable"
-
-
-# XXX: fix coming with a larger addedfiles inspection fix
-# class SecurityINFORMFileAddedToSecurityPathRPMs(TestRPMs):
-#    def setUp(self):
-#        super().setUp()
-#        self.rpm.add_installed_file(
-#            "/etc/sudoers.d/inform", rpmfluff.SourceFile("wheel", contents)
-#        )
-#        self.inspection = "addedfiles"
-#        self.result = "INFO"
-#        self.waiver_auth = "Security"
-
-
-# XXX: fix coming with a larger addedfiles inspection fix
-# class SecurityVERIFYFileAddedToSecurityPathRPMs(TestRPMs):
-#    def setUp(self):
-#        super().setUp()
-#        self.rpm.add_installed_file(
-#            "/etc/sudoers.d/verify", rpmfluff.SourceFile("wheel", contents)
-#        )
-#        self.inspection = "addedfiles"
-#        self.result = "VERIFY"
-#        self.waiver_auth = "Security"
-
-
-# XXX: fix coming with a larger addedfiles inspection fix
-# class SecurityFAILFileAddedToSecurityPathRPMs(TestRPMs):
-#    def setUp(self):
-#        super().setUp()
-#        self.rpm.add_installed_file(
-#            "/etc/sudoers.d/fail", rpmfluff.SourceFile("wheel", contents)
-#        )
-#        self.inspection = "addedfiles"
-#        self.result = "BAD"
-#        self.waiver_auth = "Security"
-
-
-# XXX: fix coming with a larger addedfiles inspection fix
-# class FileAddedToSecurityPathKoji(TestKoji):
-#    def setUp(self):
-#        super().setUp()
-#        self.rpm.add_installed_file(
-#            "/etc/sudoers.d/wheel", rpmfluff.SourceFile("wheel", contents)
-#        )
-#        self.inspection = "addedfiles"
-#        self.result = "BAD"
-#        self.waiver_auth = "Security"
-
-
-class SecuritySKIPFileAddedToSecurityPathKoji(TestKoji):
-    def setUp(self):
-        super().setUp()
-        self.rpm.add_installed_file(
-            "/etc/sudoers.d/skip", rpmfluff.SourceFile("wheel", contents)
-        )
-        self.inspection = "addedfiles"
-        self.result = "OK"
-        self.waiver_auth = "Not Waivable"
-
-
-# XXX: fix coming with a larger addedfiles inspection fix
-# class SecurityINFORMFileAddedToSecurityPathKoji(TestKoji):
-#    def setUp(self):
-#        super().setUp()
-#        self.rpm.add_installed_file(
-#            "/etc/sudoers.d/inform", rpmfluff.SourceFile("wheel", contents)
-#        )
-#        self.inspection = "addedfiles"
-#        self.result = "INFO"
-#        self.waiver_auth = "Security"
-
-
-# XXX: fix coming with a larger addedfiles inspection fix
-# class SecurityVERIFYFileAddedToSecurityPathKoji(TestKoji):
-#    def setUp(self):
-#        super().setUp()
-#        self.rpm.add_installed_file(
-#            "/etc/sudoers.d/verify", rpmfluff.SourceFile("wheel", contents)
-#        )
-#        self.inspection = "addedfiles"
-#        self.result = "VERIFY"
-#        self.waiver_auth = "Security"
-
-
-# XXX: fix coming with a larger addedfiles inspection fix
-# class SecurityFAILFileAddedToSecurityPathKoji(TestKoji):
-#    def setUp(self):
-#        super().setUp()
-#        self.rpm.add_installed_file(
-#            "/etc/sudoers.d/fail", rpmfluff.SourceFile("wheel", contents)
-#        )
-#        self.inspection = "addedfiles"
-#        self.result = "BAD"
-#        self.waiver_auth = "Security"
 
 
 class FileAddedToSecurityPathCompareRPMs(TestCompareRPMs):

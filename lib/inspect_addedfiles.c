@@ -45,6 +45,7 @@ static bool addedfiles_driver(struct rpminspect *ri, rpmfile_entry_t *file)
     char *tail = NULL;
     const char *arch = NULL;
     bool rebase = false;
+    bool peer_new = false;
     string_entry_t *entry = NULL;
     struct result_params params;
 
@@ -159,11 +160,15 @@ static bool addedfiles_driver(struct rpminspect *ri, rpmfile_entry_t *file)
         }
     }
 
-    /* security path file */
-    if (ri->security_path_prefix
-        && S_ISREG(file->st.st_mode)
-        && ((ri->before != NULL && (file->peer_file == NULL || strcmp(file->localpath, file->peer_file->localpath)))
-            || get_secrule_by_path(ri, file) != NULL)) {
+    /* security path file -- only applicable for build comparisons */
+    if ((file->peer_file != NULL && strcmp(file->localpath, file->peer_file->localpath))
+        || (ri->before != NULL && file->peer_file == NULL)) {
+        peer_new = true;
+    } else {
+        peer_new = false;
+    }
+
+    if (ri->security_path_prefix && S_ISREG(file->st.st_mode) && peer_new) {
         TAILQ_FOREACH(entry, ri->security_path_prefix, items) {
             subpath = entry->data;
 
