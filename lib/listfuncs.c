@@ -536,6 +536,8 @@ void list_remove(string_list_t *list, const char *s)
     TAILQ_FOREACH(entry, list, items) {
         if (!strcmp(entry->data, s)) {
             TAILQ_REMOVE(list, entry, items);
+            free(entry->data);
+            free(entry);
         }
     }
 
