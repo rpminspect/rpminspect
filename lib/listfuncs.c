@@ -521,3 +521,23 @@ string_list_t *list_add(string_list_t *list, const char *s)
 
     return list;
 }
+
+/*
+ * Remove an entry matching the string 's'.
+ */
+void list_remove(string_list_t *list, const char *s)
+{
+    string_entry_t *entry = NULL;
+
+    if (list == NULL || s == NULL) {
+        return;
+    }
+
+    TAILQ_FOREACH(entry, list, items) {
+        if (!strcmp(entry->data, s)) {
+            TAILQ_REMOVE(list, entry, items);
+        }
+    }
+
+    return;
+}
