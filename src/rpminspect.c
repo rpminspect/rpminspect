@@ -148,7 +148,7 @@ static char *match_product(string_map_t *products, const char *candidate)
  */
 static char *get_product_release(string_map_t *products, const favor_release_t favor_release, const char *before, const char *after)
 {
-    int c;
+    int c = -1;
     char *before_candidate = NULL;
     char *after_candidate = NULL;
     char *before_product = NULL;
@@ -213,7 +213,10 @@ static char *get_product_release(string_map_t *products, const favor_release_t f
          */
         after_product = match_product(products, after_candidate);
         before_product = match_product(products, before_candidate);
-        c = strcmp(before_product, after_product);
+
+        if (before_product && after_product) {
+            c = strcmp(before_product, after_product);
+        }
 
         if (c) {
             matched = false;
