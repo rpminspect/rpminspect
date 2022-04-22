@@ -616,11 +616,67 @@
 #define SPEC_MACRO_GLOBAL      "%global"
 
 /**
- * @def SPEC_SECTION_CHANGELOG
+ * @def SPEC_MACRO_AUTOPATCH
  *
- * How the change log is specified in the spec file.
+ * The %autopatch macro used to apply all defined Patches.
  */
-#define SPEC_SECTION_CHANGELOG "%changelog"
+#define SPEC_MACRO_AUTOPATCH   "%autopatch"
+
+/**
+ * @def SPEC_MACRO_AUTOSETUP
+ *
+ * The %autosetup macro used to unpack all Sources and apply all
+ * defined Patches.
+ */
+#define SPEC_MACRO_AUTOSETUP   "%autosetup"
+
+/**
+ * @def SPEC_MACRO_PATCH
+ *
+ * The %patchN macro used to apply patches.  N corresponds to the
+ * patch number defined in the header.
+ */
+#define SPEC_MACRO_PATCH       "%patch"
+
+/**
+ * @def SPEC_SECTION_PREP
+ *
+ * Command or series of commands to prepare the software to be built,
+ * for example, unpacking the archive in Source0. This directive can
+ * contain a shell script.
+ */
+#define SPEC_SECTION_PREP      "%prep"
+
+/**
+ * @def SPEC_SECTION_BUILD
+ *
+ * Command or series of commands for actually building the software
+ * into machine code (for compiled languages) or byte code (for some
+ * interpreted languages).
+ */
+#define SPEC_SECTION_BUILD     "%build"
+
+/**
+ * @def SPEC_SECTION_INSTALL
+ *
+ * Command or series of commands for copying the desired build
+ * artifacts from the %builddir (where the build happens) to the
+ * %buildroot directory (which contains the directory structure with
+ * the files to be packaged). This usually means copying files from
+ * ~/rpmbuild/BUILD to ~/rpmbuild/BUILDROOT and creating the necessary
+ * directories in ~/rpmbuild/BUILDROOT. This is only run when creating
+ * a package, not when the end-user installs the package. See Working
+ * with SPEC files for details.
+ */
+#define SPEC_SECTION_INSTALL   "%install"
+
+/**
+ * @def SPEC_SECTION_CHECK
+ *
+ * Command or series of commands to test the software. This normally
+ * includes things such as unit tests.
+ */
+#define SPEC_SECTION_CHECK     "%check"
 
 /**
  * @def SPEC_SECTION_FILES
@@ -630,11 +686,25 @@
 #define SPEC_SECTION_FILES     "%files"
 
 /**
+ * @def SPEC_SECTION_CHANGELOG
+ *
+ * How the change log is specified in the spec file.
+ */
+#define SPEC_SECTION_CHANGELOG "%changelog"
+
+/**
  * @def SPEC_TAG_RELEASE
  *
  * The name of RPMTAG_RELEASE in a spec file.
  */
 #define SPEC_TAG_RELEASE       "Release:"
+
+/**
+ * @def SPEC_TAG_PATCH
+ *
+ * The leading text of the RPMTAG_PATCH identifier in a spec file.
+ */
+#define SPEC_TAG_PATCH         "Patch"
 
 /**
  * @def SPEC_DISTTAG

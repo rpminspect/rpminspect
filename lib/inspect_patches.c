@@ -28,6 +28,8 @@
 #include <errno.h>
 #include <err.h>
 #include <limits.h>
+#include <ctype.h>
+#include <regex.h>
 #include <rpm/header.h>
 #include <rpm/rpmtag.h>
 #include <archive.h>
@@ -35,29 +37,146 @@
 #include "rpminspect.h"
 
 /* Global variables */
-static string_list_t *patches = NULL;
-static bool initialized = false;
+static patches_t *patches = NULL;
+static applied_patches_t *applied = NULL;
 static bool reported = false;
 static bool comparison = false;
+static bool automacro = false;
 static struct result_params params;
 
 enum { DIFF_NULL, DIFF_CONTEXT, DIFF_UNIFIED };
+
+/*
+ * Free the patches hash table
+ */
+static void free_patches(patches_t *table)
+{
+    patches_t *entry = NULL;
+    patches_t *tmp_entry = NULL;
+
+    if (table == NULL) {
+        return;
+    }
+
+    HASH_ITER(hh, table, entry, tmp_entry) {
+        HASH_DEL(table, entry);
+        free(entry->patch);
+        free(entry);
+    }
+
+    return;
+}
+
+/*
+ * Free the applied patches hash table
+ */
+static void free_applied_patches(applied_patches_t *table)
+{
+    applied_patches_t *entry = NULL;
+    applied_patches_t *tmp_entry = NULL;
+
+    if (table == NULL) {
+        return;
+    }
+
+    HASH_ITER(hh, table, entry, tmp_entry) {
+        HASH_DEL(table, entry);
+        free(entry->opts);
+        free(entry);
+    }
+
+    return;
+}
+
+/*
+ * Returns true if the %autopatch or %autosetup macros are in use in
+ * the spec file.
+ */
+static bool have_automacro(const rpmfile_entry_t *specfile)
+{
+    bool r = false;
+    bool valid_section = false;
+    string_list_t *contents = NULL;
+    string_entry_t *entry = NULL;
+    char *buf = NULL;
+    int reg_result = 0;
+    regex_t section_regex;
+    char reg_error[BUFSIZ];
+
+    /* No spec file, we know nothing. */
+    if (specfile == NULL) {
+        return false;
+    }
+
+    /* Read in the spec file */
+    contents = read_file(specfile->fullpath);
+
+    if (contents == NULL) {
+        return false;
+    }
+
+    /* RPM spec file section marker regexp */
+    reg_result = regcomp(&section_regex, "^%[a-z]+$", REG_EXTENDED);
+
+    if (reg_result != 0) {
+        regerror(reg_result, &section_regex, reg_error, sizeof(reg_error));
+        warn("regcomp: %s", reg_error);
+        return NULL;
+    }
+
+    /* Look for %autopatch or %autosetup in valid sections */
+    TAILQ_FOREACH(entry, contents, items) {
+        buf = entry->data;
+
+        /* trim line endings */
+        buf[strcspn(buf, "\r\n")] = 0;
+
+        /* we made it to the changelog, nothing left of value */
+        if (strprefix(buf, SPEC_SECTION_CHANGELOG)) {
+            break;
+        }
+
+        /* section marker check */
+        /*
+         * not sure if leading whitespace is allowed by RPM, but I
+         * have seen stranger things
+         */
+        while (isspace(*buf) && *buf != '\0') {
+            buf++;
+        }
+
+        if (*buf == '%') {
+            if (strprefix(buf, SPEC_SECTION_PREP)
+                || strprefix(buf, SPEC_SECTION_BUILD)
+                || strprefix(buf, SPEC_SECTION_INSTALL)
+                || strprefix(buf, SPEC_SECTION_CHECK)) {
+                valid_section = true;
+            } else if (regexec(&section_regex, buf, 0, NULL, 0) == 0) {
+                valid_section = false;
+            }
+        }
+
+        /* look for the auto macros */
+        if (valid_section && (strstr(buf, SPEC_MACRO_AUTOPATCH) || strstr(buf, SPEC_MACRO_AUTOSETUP))) {
+            r = true;
+            break;
+        }
+    }
+
+    list_free(contents, free);
+    regfree(&section_regex);
+    return r;
+}
 
 /* Returns true if this file is a Patch file */
 static bool is_patch(const rpmfile_entry_t *file)
 {
     char *shortname = NULL;
+    patches_t *hentry = NULL;
 
     assert(file != NULL);
 
-    /* Initialize the patches list once for the run */
-    if (!initialized) {
-        patches = get_rpm_header_string_array(file->rpm_header, RPMTAG_PATCH);
-        initialized = true;
-    }
-
     if (patches == NULL) {
-        /* source RPM does not contain any Patch entries */
         return false;
     }
 
@@ -65,7 +184,13 @@ static bool is_patch(const rpmfile_entry_t *file)
     shortname = rindex(file->fullpath, '/') + 1;
 
     /* See if this file is a Patch file */
-    return list_contains(patches, shortname);
+    HASH_FIND_STR(patches, shortname, hentry);
+
+    if (hentry) {
+        return true;
+    } else {
+        return false;
+    }
 }
 
 /*
@@ -152,6 +277,9 @@ static patchstat_t get_patch_stats(const char *patch)
 /* Main driver for the 'patches' inspection. */
 static bool patches_driver(struct rpminspect *ri, rpmfile_entry_t *file)
 {
+    patches_t *pentry = NULL;
+    applied_patches_t *aentry = NULL;
+    char *buf = NULL;
     char *before_patch = NULL;
     char *after_patch = NULL;
     char *details = NULL;
@@ -171,6 +299,60 @@ static bool patches_driver(struct rpminspect *ri, rpmfile_entry_t *file)
     if (list_contains(ri->patch_ignore_list, file->localpath)) {
         DEBUG_PRINT("Per the configuration file, ignoring %s\n", file->localpath);
         return true;
+    }
+
+    /* make sure defined patches are all applied */
+    if (!automacro) {
+        /* patches are defined without leading directories */
+        buf = file->localpath;
+
+        while (*buf == '/' && *buf != '\0') {
+            buf++;
+        }
+
+        /* first look to see if the patch is in the header */
+        HASH_FIND_STR(patches, buf, pentry);
+
+        /* if it is defined, now try to find its apply macro */
+        if (pentry != NULL) {
+            HASH_FIND_INT(applied, &(pentry->num), aentry);
+
+            /* a defined patch without an apply macro is a problem */
+            if (aentry == NULL) {
+                xasprintf(&params.msg, _("Patch number %ld (%s) is missing a corresponding %%patch%ld macro, usually in %%prep."), pentry->num, pentry->patch, pentry->num);
+                params.remedy = REMEDY_PATCHES_MISSING_MACRO;
+                params.noun = _("missing %%patch macro for ${FILE}");
+            } else if (pentry->num != aentry->num) {
+                xasprintf(&params.msg, _("Patch number %ld (%s) is mismatched with %%patch%ld macro."), pentry->num, pentry->patch, pentry->num);
+                params.remedy = REMEDY_PATCHES_MISMATCHED_MACRO;
+                params.noun = _("mismatched %%patch macro for ${FILE}");
+            }
+
+            if (params.msg) {
+                params.severity = RESULT_VERIFY;
+                params.waiverauth = WAIVABLE_BY_ANYONE;
+                params.details = NULL;
+                params.verb = VERB_FAILED;
+                params.file = file->localpath;
+                add_result(ri, &params);
+                free(params.msg);
+                params.msg = NULL;
+                reported = true;
+            }
+        } else {
+            /* we have no patch defined for this patch file -- likely unreachable */
+            params.severity = RESULT_BAD;
+            params.waiverauth = WAIVABLE_BY_ANYONE;
+            params.details = NULL;
+            params.verb = VERB_FAILED;
+            params.file = file->localpath;
+            params.noun = _("undefined Patch ${FILE}");
+            xasprintf(&params.msg, _("Undefined Patch file %s."), file->localpath);
+            add_result(ri, &params);
+            free(params.msg);
+            params.msg = NULL;
+            reported = true;
+        }
     }
 
     /* patches may be compressed, so uncompress them here for diff(1) */
@@ -326,6 +508,17 @@ bool inspect_patches(struct rpminspect *ri)
     bool have_source = false;
     rpmpeer_entry_t *peer = NULL;
     rpmfile_entry_t *file = NULL;
+    rpmfile_entry_t *specfile = NULL;
+    string_list_t *patchfiles = NULL;
+    string_entry_t *patch = NULL;
+    string_list_t *speclines = NULL;
+    string_entry_t *specentry = NULL;
+    string_list_t *fields = NULL;
+    string_entry_t *entry = NULL;
+    patches_t *hentry = NULL;
+    applied_patches_t *aentry = NULL;
+    char *buf = NULL;
+    size_t len = 0;
 
     assert(ri != NULL);
 
@@ -373,6 +566,131 @@ bool inspect_patches(struct rpminspect *ri)
             continue;
         }
 
+        /* Get the spec file */
+        TAILQ_FOREACH(file, peer->after_files, items) {
+            if (strsuffix(file->localpath, SPEC_FILENAME_EXTENSION)) {
+                specfile = file;
+                break;
+            }
+        }
+
+        /* Determine if %autopatch or %autosetup is used */
+        automacro = have_automacro(specfile);
+
+        /* Initialize the patches hash table */
+        patchfiles = get_rpm_header_string_array(specfile->rpm_header, RPMTAG_PATCH);
+
+        if (patchfiles != NULL && !TAILQ_EMPTY(patchfiles)) {
+            /* get patch numbers unless automacro is in use */
+            if (automacro) {
+                TAILQ_FOREACH(patch, patchfiles, items) {
+                    hentry = calloc(1, sizeof(*hentry));
+                    assert(hentry != NULL);
+                    hentry->patch = strdup(patch->data);
+                    hentry->num = -1;                       /* automacro == true */
+                    HASH_ADD_KEYPTR(hh, patches, hentry->patch, strlen(hentry->patch), hentry);
+                }
+            } else {
+                /* read in the spec file */
+                speclines = read_file(file->fullpath);
+
+                if (speclines == NULL) {
+                    err(RI_PROGRAM_ERROR, "read_contents");
+                }
+
+                TAILQ_FOREACH(specentry, speclines, items) {
+                    /* no more patch files to check */
+                    if (patchfiles == NULL || TAILQ_EMPTY(patchfiles)) {
+                        break;
+                    }
+
+                    /* nothing from the changelog on */
+                    if (strprefix(specentry->data, SPEC_SECTION_CHANGELOG)) {
+                        break;
+                    }
+
+                    /* read patch lines */
+                    if (strprefix(specentry->data, SPEC_TAG_PATCH) && strstr(specentry->data, ":")) {
+                        /* split the line - first field is PatchN:, second is the patch */
+                        fields = strsplit(specentry->data, " \t");
+                        patch = TAILQ_FIRST(fields);
+                        assert(patch != NULL);
+                        entry = TAILQ_NEXT(patch, items);
+                        assert(entry != NULL);
+
+                        /* see if we have this patch */
+                        if (!list_contains(patchfiles, entry->data)) {
+                            list_free(fields, free);
+                            continue;
+                        }
+
+                        /* extract just the number from the tag */
+                        buf = patch->data;
+                        buf += strlen(SPEC_TAG_PATCH);
+                        buf[strcspn(buf, ":")] = '\0';
+
+                        /* add a new patch entry to the hash table */
+                        hentry = calloc(1, sizeof(*hentry));
+                        assert(hentry != NULL);
+                        hentry->patch = strdup(entry->data);
+                        hentry->num = strtoll(buf, NULL, 10);
+
+                        if (errno == ERANGE || errno == EINVAL) {
+                            warn("strtoll");
+                            hentry->num = -1;
+                        }
+
+                        HASH_ADD_KEYPTR(hh, patches, hentry->patch, strlen(hentry->patch), hentry);
+                    } else if (strprefix(specentry->data, SPEC_MACRO_PATCH)) {
+                        /* split the line - first field is %patchN, second (optional) is opts */
+                        fields = strsplit(specentry->data, " \t");
+                        patch = TAILQ_FIRST(fields);
+                        assert(patch != NULL);
+                        entry = TAILQ_NEXT(patch, items);
+
+                        /* extract just the number from the macro */
+                        buf = patch->data;
+                        len = strlen(buf);
+                        buf += strlen(SPEC_MACRO_PATCH);
+                        buf[strcspn(buf, " \t")] = '\0';
+
+                        /* add a new patch entry to the hash table */
+                        aentry = calloc(1, sizeof(*aentry));
+                        assert(aentry != NULL);
+                        aentry->num = strtoll(buf, NULL, 10);
+
+                        if (errno == ERANGE || errno == EINVAL) {
+                            warn("strtoll");
+                            aentry->num = -1;
+                        }
+
+                        /* collect any options to the patch macro if present */
+                        if (entry && entry->data && (strlen(specentry->data) > strlen(patch->data))) {
+                            buf = specentry->data;
+                            buf += len;                  /* advance past the first token */
+
+                            while (isspace(*buf) && *buf != '\0') {
+                                buf++;
+                            }
+
+                            aentry->opts = strdup(buf);
+                        }
+
+                        HASH_ADD_INT(applied, num, aentry);
+                    }
+
+                    /* clean up */
+                    list_free(fields, free);
+                    fields = NULL;
+                 }
+
+                 /* clean up the spec file we read in */
+                 list_free(speclines, free);
+            }
+        }
+
+        list_free(patchfiles, free);
+
         /* Iterate over the SRPM files */
         TAILQ_FOREACH(file, peer->after_files, items) {
             if (!patches_driver(ri, file)) {
@@ -394,6 +712,10 @@ bool inspect_patches(struct rpminspect *ri)
         }
     }
 
+    /* Clean up the patches and applied hash tables */
+    free_applied_patches(applied);
+    free_patches(patches);
+
     /* Sound the everything-is-ok alarm if everything is, in fact, ok */
     if (result && !reported) {
         init_result_params(&params);
@@ -402,9 +724,6 @@ bool inspect_patches(struct rpminspect *ri)
         params.waiverauth = NOT_WAIVABLE;
         add_result(ri, &params);
     }
-
-    /* Our static list of PatchN: spec file members, dump it */
-    list_free(patches, free);
 
     return result;
 }

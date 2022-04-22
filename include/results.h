@@ -685,6 +685,10 @@
 
 #define REMEDY_PATCHES_CORRUPT _("An invalid patch file was found.  This is usually the result of generating a collection of patches by comparing two trees.  When files disappear that can lead to zero length patches in the resulting collection.  Check to see if the source package has any zero length or otherwise invalid patches and correct the problem.")
 
+#define REMEDY_PATCHES_MISSING_MACRO _("The named patch is defined in the source RPM header (this means it has a PatchN: definition in the spec file) but is not applied anywhere in the spec file.  It is missing a corresponding %%patch macro and the spec file lacks the %%autosetup or %%autopatch macros.  You can fix this by adding the appropriate %%patch macro in the spec file (usually in the %%prep section).  The number specified with the %%patch macro corresponds to the number used to define the patch at the top of the spec file.  So Patch47 is applied with a %%patch47 macro.")
+
+#define REMEDY_PATCHES_MISMATCHED_MACRO _("The named patch is defined but is mismatched by number with the %%patch macro.  Make sure all numbered patches have corresponding %%patch macros.  For example, Patch47 needs to have a %%patch47 macro.")
+
 /** @} */
 
 /**

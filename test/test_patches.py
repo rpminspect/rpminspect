@@ -161,7 +161,7 @@ class PatchUnderFourBytes(TestSRPM):
         # parameter of add_patch() is a boolean indicating whether or
         # not to apply the patch in the spec file, so disable that for
         # this test to see if rpminspect works.
-        self.rpm.add_patch(rpmfluff.SourceFile("some.patch", "Qx"), False)
+        self.rpm.add_patch(rpmfluff.SourceFile("some.patch", "Qx"), True)
 
         self.inspection = "patches"
         self.result = "BAD"
@@ -178,8 +178,8 @@ class PatchUnderFourBytesCompare(TestCompareSRPM):
         # parameter of add_patch() is a boolean indicating whether or
         # not to apply the patch in the spec file, so disable that for
         # this test to see if rpminspect works.
-        self.before_rpm.add_patch(rpmfluff.SourceFile("some.patch", "Qx"), False)
-        self.after_rpm.add_patch(rpmfluff.SourceFile("some.patch", "Qx"), False)
+        self.before_rpm.add_patch(rpmfluff.SourceFile("some.patch", "Qx"), True)
+        self.after_rpm.add_patch(rpmfluff.SourceFile("some.patch", "Qx"), True)
 
         self.inspection = "patches"
         self.result = "BAD"
@@ -191,9 +191,9 @@ class PatchChangedNotRebaseCompare(TestCompareSRPM):
     def setUp(self):
         super().setUp()
 
-        self.before_rpm.add_patch(rpmfluff.SourceFile("some.patch", patch_file), False)
+        self.before_rpm.add_patch(rpmfluff.SourceFile("some.patch", patch_file), True)
         self.after_rpm.add_patch(
-            rpmfluff.SourceFile("some.patch", patch_file_changed), False
+            rpmfluff.SourceFile("some.patch", patch_file_changed), True
         )
 
         self.inspection = "patches"
@@ -205,9 +205,9 @@ class PatchChangedInRebaseCompare(TestCompareSRPM):
     def setUp(self):
         super().setUp(rebase=True)
 
-        self.before_rpm.add_patch(rpmfluff.SourceFile("some.patch", patch_file), False)
+        self.before_rpm.add_patch(rpmfluff.SourceFile("some.patch", patch_file), True)
         self.after_rpm.add_patch(
-            rpmfluff.SourceFile("some.patch", patch_file_changed), False
+            rpmfluff.SourceFile("some.patch", patch_file_changed), True
         )
 
         self.inspection = "patches"
@@ -220,7 +220,7 @@ class PatchAddedNotRebaseCompare(TestCompareSRPM):
     def setUp(self):
         super().setUp()
 
-        self.after_rpm.add_patch(rpmfluff.SourceFile("some.patch", patch_file), False)
+        self.after_rpm.add_patch(rpmfluff.SourceFile("some.patch", patch_file), True)
 
         self.inspection = "patches"
         self.result = "INFO"
@@ -232,7 +232,7 @@ class PatchAddedInRebaseCompare(TestCompareSRPM):
     def setUp(self):
         super().setUp(rebase=True)
 
-        self.after_rpm.add_patch(rpmfluff.SourceFile("some.patch", patch_file), False)
+        self.after_rpm.add_patch(rpmfluff.SourceFile("some.patch", patch_file), True)
 
         self.inspection = "patches"
         self.result = "INFO"
@@ -246,7 +246,7 @@ class PatchTouchesTooManyFiles(TestSRPM):
 
         # add the large patch
         self.rpm.add_patch(
-            rpmfluff.SourceFile("some.patch", patch_file_threshold), False
+            rpmfluff.SourceFile("some.patch", patch_file_threshold), True
         )
 
         self.inspection = "patches"
@@ -260,7 +260,7 @@ class PatchTouchesTooManyFilesCompare(TestCompareSRPM):
 
         # add the large patch
         self.after_rpm.add_patch(
-            rpmfluff.SourceFile("some.patch", patch_file_threshold), False
+            rpmfluff.SourceFile("some.patch", patch_file_threshold), True
         )
 
         self.inspection = "patches"
@@ -275,7 +275,7 @@ class PatchTouchesTooManyLines(TestSRPM):
 
         # add the large patch
         self.rpm.add_patch(
-            rpmfluff.SourceFile("some.patch", patch_file_threshold), False
+            rpmfluff.SourceFile("some.patch", patch_file_threshold), True
         )
 
         self.inspection = "patches"
@@ -289,9 +289,121 @@ class PatchTouchesTooManyLinesCompare(TestCompareSRPM):
 
         # add the large patch
         self.after_rpm.add_patch(
-            rpmfluff.SourceFile("some.patch", patch_file_threshold), False
+            rpmfluff.SourceFile("some.patch", patch_file_threshold), True
         )
 
         self.inspection = "patches"
         self.result = "INFO"
         self.waiver_auth = "Not Waivable"
+
+
+# patch defined and %autosetup used
+class PatchDefinedAutoSetupSRPM(TestSRPM):
+    def setUp(self):
+        super().setUp()
+
+        # add a patch and use %autosetup
+        self.rpm.add_patch(rpmfluff.SourceFile("some.patch", patch_file), False)
+        self.rpm.section_prep += "%%autosetup\n"
+
+        self.inspection = "patches"
+        self.result = "INFO"
+        self.waiver_auth = "Not Waivable"
+
+
+class PatchDefinedAutoSetupCompareSRPM(TestCompareSRPM):
+    def setUp(self):
+        super().setUp()
+
+        # add a patch and use %autosetup
+        self.after_rpm.add_patch(rpmfluff.SourceFile("some.patch", patch_file), False)
+        self.after_rpm.section_prep += "%%autosetup\n"
+
+        self.inspection = "patches"
+        self.result = "INFO"
+        self.waiver_auth = "Not Waivable"
+
+
+# patch defined and %autopatch used
+class PatchDefinedAutoPatchSRPM(TestSRPM):
+    def setUp(self):
+        super().setUp()
+
+        # add a patch and use %autopatch
+        self.rpm.add_patch(rpmfluff.SourceFile("some.patch", patch_file), False)
+        self.rpm.section_prep += "%%autopatch\n"
+
+        self.inspection = "patches"
+        self.result = "INFO"
+        self.waiver_auth = "Not Waivable"
+
+
+class PatchDefinedAutoPatchCompareSRPM(TestCompareSRPM):
+    def setUp(self):
+        super().setUp()
+
+        # add a patch and use %autopatch
+        self.after_rpm.add_patch(rpmfluff.SourceFile("some.patch", patch_file), False)
+        self.after_rpm.section_prep += "%%autopatch\n"
+
+        self.inspection = "patches"
+        self.result = "INFO"
+        self.waiver_auth = "Not Waivable"
+
+
+# patch defined but not applied
+class PatchDefinedButNotAppliedSRPM(TestSRPM):
+    def setUp(self):
+        super().setUp()
+
+        # define the patch
+        self.rpm.add_patch(rpmfluff.SourceFile("some.patch", patch_file), False)
+
+        self.inspection = "patches"
+        self.result = "VERIFY"
+        self.waiver_auth = "Anyone"
+
+
+class PatchDefinedButNotAppliedCompareSRPM(TestCompareSRPM):
+    def setUp(self):
+        super().setUp()
+
+        # define the patch
+        self.after_rpm.add_patch(rpmfluff.SourceFile("some.patch", patch_file), False)
+
+        self.inspection = "patches"
+        self.result = "VERIFY"
+        self.waiver_auth = "Anyone"
+
+
+# patches defined but some not applied
+class PatchesDefinedButSomeNotAppliedSRPM(TestSRPM):
+    def setUp(self):
+        super().setUp()
+
+        # define the patch
+        self.rpm.add_patch(rpmfluff.SourceFile("some1.patch", patch_file), True)
+        self.rpm.add_patch(rpmfluff.SourceFile("some2.patch", patch_file), True)
+        self.rpm.add_patch(rpmfluff.SourceFile("some3.patch", patch_file), False)
+        self.rpm.add_patch(rpmfluff.SourceFile("some4.patch", patch_file), True)
+        self.rpm.add_patch(rpmfluff.SourceFile("some5.patch", patch_file), False)
+
+        self.inspection = "patches"
+        self.result = "VERIFY"
+        self.waiver_auth = "Anyone"
+
+
+class PatchesDefinedButSomeNotAppliedCompareSRPM(TestCompareSRPM):
+    def setUp(self):
+        super().setUp()
+
+        # define the patch
+        self.after_rpm.add_patch(rpmfluff.SourceFile("some1.patch", patch_file), True)
+        self.after_rpm.add_patch(rpmfluff.SourceFile("some2.patch", patch_file), True)
+        self.after_rpm.add_patch(rpmfluff.SourceFile("some3.patch", patch_file), False)
+        self.after_rpm.add_patch(rpmfluff.SourceFile("some4.patch", patch_file), True)
+        self.after_rpm.add_patch(rpmfluff.SourceFile("some5.patch", patch_file), False)
+
+        self.inspection = "patches"
+        self.result = "VERIFY"
+        self.waiver_auth = "Anyone"
