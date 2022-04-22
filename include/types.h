@@ -424,6 +424,27 @@ typedef struct _security_entry_t {
 typedef TAILQ_HEAD(security_entry_s, _security_entry_t) security_list_t;
 
 /*
+ * Patches hash table used by the patches inspection
+ * Maps the patch file name to the patch number in the spec file (that
+ * is, the PatchN: and corresponding %patchN number where N is the
+ * number).
+ */
+typedef struct _patches_t {
+    char *patch;
+    int64_t num;              /* -1 means the patch file has no PatchN line */
+    UT_hash_handle hh;
+} patches_t;
+
+/*
+ * Hash table used to record the number of %patchN macros used
+ */
+typedef struct _applied_patches_t {
+    int64_t num;
+    char *opts;
+    UT_hash_handle hh;
+} applied_patches_t;
+
+/*
  * Configuration and state instance for librpminspect run.
  * Applications using librpminspect should initialize the
  * library and retain this structure through the run of
