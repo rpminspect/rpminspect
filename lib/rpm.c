@@ -175,7 +175,7 @@ const char *get_rpm_header_arch(Header h)
 /**
  * @brief Given an RPM header and a tag constant, retrieve the tag
  * value and add each array element as a member of a newly allocated
- * string_list_t.  The caller is responsible for freeing the retruned
+ * string_list_t.  The caller is responsible for freeing the returned
  * string_list_t.  The tag constant must be a string array in the RPM
  * header.  If the tag cannot be found or is empty, this function
  * returns NULL.
