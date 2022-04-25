@@ -431,7 +431,7 @@ typedef TAILQ_HEAD(security_entry_s, _security_entry_t) security_list_t;
  */
 typedef struct _patches_t {
     char *patch;
-    int64_t num;              /* -1 means the patch file has no PatchN line */
+    long num;              /* -1 means the patch file has no PatchN line */
     UT_hash_handle hh;
 } patches_t;
 
@@ -439,7 +439,7 @@ typedef struct _patches_t {
  * Hash table used to record the number of %patchN macros used
  */
 typedef struct _applied_patches_t {
-    int64_t num;
+    long num;
     char *opts;
     UT_hash_handle hh;
 } applied_patches_t;
