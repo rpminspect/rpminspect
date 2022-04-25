@@ -821,27 +821,28 @@ int main(int argc, char **argv)
                 errx(RI_PROGRAM_ERROR, _("*** No peers, ensure packages exist for specified architecture(s)."));
             }
 
-            peer = TAILQ_FIRST(ri->peers);
-            after_rel = headerGetString(peer->after_hdr, RPMTAG_RELEASE);
+            /* try to find a before and after peer */
+            TAILQ_FOREACH(peer, ri->peers, items) {
+                after_rel = headerGetString(peer->after_hdr, RPMTAG_RELEASE);
 
-            if (after_rel == NULL) {
-                free_rpminspect(ri);
-                rpmFreeMacros(NULL);
-                rpmFreeRpmrc();
-                errx(RI_PROGRAM_ERROR, _("invalid after RPM"));
-            }
+                if (ri->before) {
+                    before_rel = headerGetString(peer->before_hdr, RPMTAG_RELEASE);
+                }
 
-            if (ri->before) {
-                before_rel = headerGetString(peer->before_hdr, RPMTAG_RELEASE);
-
-                if (before_rel == NULL) {
-                    free_rpminspect(ri);
-                    rpmFreeMacros(NULL);
-                    rpmFreeRpmrc();
-                    errx(RI_PROGRAM_ERROR, _("invalid before RPM"));
+                if (before_rel && after_rel) {
+                    break;
                 }
             }
 
+            /* if we got here with no before and after release values, bad */
+            if (before_rel == NULL || after_rel == NULL) {
+                free_rpminspect(ri);
+                rpmFreeMacros(NULL);
+                rpmFreeRpmrc();
+                errx(RI_PROGRAM_ERROR, _("unable to find a set of peer packages between the before and after builds"));
+            }
+
+            /* get the product release */
             ri->product_release = get_product_release(ri->products, ri->favor_release, before_rel, after_rel);
             DEBUG_PRINT("product_release=%s\n", ri->product_release);
 
