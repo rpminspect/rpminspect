@@ -835,7 +835,7 @@ int main(int argc, char **argv)
             }
 
             /* if we got here with no before and after release values, bad */
-            if (before_rel == NULL || after_rel == NULL) {
+            if ((ri->before && before_rel == NULL) && after_rel == NULL) {
                 free_rpminspect(ri);
                 rpmFreeMacros(NULL);
                 rpmFreeRpmrc();
