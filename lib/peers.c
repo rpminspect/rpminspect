@@ -160,10 +160,6 @@ void add_peer(rpmpeer_t **peers, int whichbuild, bool fetch_only, const char *pk
         TAILQ_INSERT_TAIL(*peers, peer, items);
     }
 
-    if (peer->before_deprules && peer->after_deprules) {
-        find_deprule_peers(peer->before_deprules, peer->after_deprules);
-    }
-
     return;
 }
 

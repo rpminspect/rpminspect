@@ -219,33 +219,46 @@ static char *trim_rich_dep(const char *requirement)
 }
 
 /* Given a pair of deprules, see if they are peers */
-static void process_pair(deprule_entry_t *left, deprule_entry_t *right)
+static bool process_pair(deprule_entry_t *left, deprule_entry_t *right, const bool strict)
 {
     char *ra = NULL;
     char *rb = NULL;
+    bool match = false;
 
     assert(left != NULL);
     assert(right != NULL);
 
     /* The types must match before anything else */
     if (left->type != right->type) {
-        return;
+        return false;
     }
 
-    /* handle any possible rich dependency strings */
-    /* trim leading parens and cut everything after the first whitespace */
-    ra = trim_rich_dep(left->requirement);
-    rb = trim_rich_dep(right->requirement);
+    if (strict) {
+        if ((left->requirement && right->requirement && !strcmp(left->requirement, right->requirement))
+            && left->operator == right->operator
+            && ((left->version == NULL && right->version == NULL) || (left->version && right->version && !strcmp(left->version, right->version)))) {
+            match = true;
+        }
+    } else {
+        /* handle any possible rich dependency strings */
+        /* trim leading parens and cut everything after the first whitespace */
+        ra = trim_rich_dep(left->requirement);
+        rb = trim_rich_dep(right->requirement);
 
-    if (!strcmp(ra, rb)) {
+        if (!strcmp(ra, rb)) {
+            match = true;
+        }
+
+        free(ra);
+        free(rb);
+    }
+
+    if (match) {
         left->peer_deprule = right;
         right->peer_deprule = left;
     }
 
-    free(ra);
-    free(rb);
-
-    return;
+    return match;
 }
 
 /**
@@ -263,6 +276,8 @@ static void process_pair(deprule_entry_t *left, deprule_entry_t *right)
  */
 void find_deprule_peers(deprule_list_t *before, deprule_list_t *after)
 {
+    int i = 0;
+    bool strict = true;
     deprule_entry_t *before_entry = NULL;
     deprule_entry_t *after_entry = NULL;
 
@@ -271,27 +286,47 @@ void find_deprule_peers(deprule_list_t *before, deprule_list_t *after)
         return;
     }
 
-    /* Match peers from before to after first */
-    TAILQ_FOREACH(before_entry, before, items) {
-        if (before_entry->peer_deprule) {
-            /* already have a peer */
-            continue;
-        }
-
+    /* Just do two passes across deprules to find peers */
+    for (i = 0; i < 2; i++) {
+        /* match from after to before */
         TAILQ_FOREACH(after_entry, after, items) {
-            process_pair(before_entry, after_entry);
-        }
-    }
+            if (after_entry->peer_deprule) {
+                continue;
+            }
 
-    /* Do a second pass from after to before */
-    TAILQ_FOREACH(after_entry, after, items) {
-        if (after_entry->peer_deprule) {
-            /* already have a peer */
-            continue;
+            TAILQ_FOREACH(before_entry, before, items) {
+                if (before_entry->peer_deprule) {
+                    continue;
+                }
+
+                if (process_pair(after_entry, before_entry, strict)) {
+                    /* stop trying to match this peer since we found a match */
+                    break;
+                }
+            }
         }
 
+        /* match from before to after */
         TAILQ_FOREACH(before_entry, before, items) {
-            process_pair(after_entry, before_entry);
+            if (before_entry->peer_deprule) {
+                continue;
+            }
+
+            TAILQ_FOREACH(after_entry, after, items) {
+                if (after_entry->peer_deprule) {
+                    continue;
+                }
+
+                if (process_pair(before_entry, after_entry, strict)) {
+                    /* stop trying to match this peer since we found a match */
+                    break;
+                }
+            }
+        }
+
+        /* relax peer matching for subsequent runs */
+        if (strict) {
+            strict = false;
         }
     }
 

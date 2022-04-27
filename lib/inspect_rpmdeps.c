@@ -577,6 +577,16 @@ bool inspect_rpmdeps(struct rpminspect *ri)
     params.file = specfile;
 
     /*
+     * create global package evr and vr substrings for comparisons
+     */
+    peer = TAILQ_FIRST(ri->peers);
+    version = headerGetString(peer->after_hdr, RPMTAG_VERSION);
+    release = headerGetString(peer->after_hdr, RPMTAG_RELEASE);
+    pkg_epoch = headerGetNumber(peer->after_hdr, RPMTAG_EPOCH);
+    xasprintf(&pkg_vr, "%s-%s", version, release);
+    xasprintf(&pkg_evr, "%ju:%s-%s", pkg_epoch, version, release);
+
+    /*
      * for reporting, we need the name of the spec file from the SRPM
      *
      * NOTE: we only need this for reporting, so if we don't have a
@@ -588,18 +598,10 @@ bool inspect_rpmdeps(struct rpminspect *ri)
             continue;
         }
 
-        /* grab the epoch, version, and release */
-        version = headerGetString(peer->after_hdr, RPMTAG_VERSION);
-        release = headerGetString(peer->after_hdr, RPMTAG_RELEASE);
-        pkg_epoch = headerGetNumber(peer->after_hdr, RPMTAG_EPOCH);
-        xasprintf(&pkg_vr, "%s-%s", version, release);
-        xasprintf(&pkg_evr, "%ju:%s-%s", pkg_epoch, version, release);
-
         TAILQ_FOREACH(file, peer->after_files, items) {
             if (strsuffix(file->localpath, SPEC_FILENAME_EXTENSION)) {
-                found = true;
                 specfile = file->localpath;
-                break;
+                found = true;
             }
         }
 
@@ -690,13 +692,10 @@ bool inspect_rpmdeps(struct rpminspect *ri)
 
                     /* use shorter variable names in the if expressions */
                     drs = strdeprule(deprule);
-
-                    if (deprule->peer_deprule) {
-                        pdrs = strdeprule(deprule->peer_deprule);
-                    }
+                    pdrs = strdeprule(deprule->peer_deprule);
 
                     /* determine what to report */
-                    if (deprule->peer_deprule == NULL) {
+                    if (drs && pdrs == NULL) {
                         if (!strcmp(arch, SRPM_ARCH_NAME)) {
                             xasprintf(&params.msg, _("Gained '%s' in source package %s"), drs, name);
                         } else {
@@ -750,10 +749,7 @@ bool inspect_rpmdeps(struct rpminspect *ri)
                     free(params.msg);
                     free(noun);
                     free(drs);
-
-                    if (deprule->peer_deprule) {
-                        free(pdrs);
-                    }
+                    free(pdrs);
 
                     if (params.severity == RESULT_VERIFY) {
                         result = false;
@@ -763,13 +759,14 @@ bool inspect_rpmdeps(struct rpminspect *ri)
 
             if (peer->before_deprules) {
                 TAILQ_FOREACH(deprule, peer->before_deprules, items) {
-                    if (deprule && deprule->peer_deprule == NULL) {
-                        pdrs = strdeprule(deprule);
+                    drs = strdeprule(deprule);
+                    pdrs = strdeprule(deprule->peer_deprule);
 
+                    if (drs && pdrs == NULL) {
                         if (!strcmp(arch, SRPM_ARCH_NAME)) {
-                            xasprintf(&params.msg, _("Lost '%s' in source package %s"), pdrs, name);
+                            xasprintf(&params.msg, _("Lost '%s' in source package %s"), drs, name);
                         } else {
-                            xasprintf(&params.msg, _("Lost '%s' in subpackage %s on %s"), pdrs, name, arch);
+                            xasprintf(&params.msg, _("Lost '%s' in subpackage %s on %s"), drs, name, arch);
                         }
 
                         params.details = NULL;
@@ -797,12 +794,14 @@ bool inspect_rpmdeps(struct rpminspect *ri)
                         add_result(ri, &params);
                         free(params.msg);
                         free(noun);
-                        free(pdrs);
 
                         if (params.severity == RESULT_VERIFY) {
                             result = false;
                         }
                     }
+
+                    free(pdrs);
+                    free(drs);
                 }
             }
         }
