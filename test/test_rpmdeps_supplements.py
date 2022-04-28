@@ -1281,82 +1281,82 @@ class MultipleProvidersCompareSRPM(TestCompareSRPM):
         self.waiver_auth = "Not Waivable"
 
 
-# XXX: this test needs to be rewritten to properly dupe the shared library
-# class MultipleProvidersCompareRPMs(TestCompareRPMs):
-#    @unittest.skipUnless(have_supplements, "librpm too old to support Supplements")
-#    @unittest.skipUnless(have_elfdeps, "system lacks %s executable" % elfdeps)
-#    def setUp(self):
-#        super().setUp()
-#
-#        # add subpackages
-#        self.before_rpm.add_subpackage("libs")
-#        self.before_rpm.add_subpackage("morelibs")
-#        self.after_rpm.add_subpackage("libs")
-#        self.after_rpm.add_subpackage("morelibs")
-#
-#        # we need some stuff in the packages, first a shared library
-#        self.before_rpm.add_simple_library(
-#            libraryName="libvaporware.so",
-#            installPath="usr/lib/libvaporware.so",
-#            subpackageSuffix="libs",
-#            sourceContent=library_source,
-#        )
-#        self.before_rpm.add_simple_library(
-#            libraryName="libvaporware.so",
-#            installPath="usr/lib/libvaporware.so",
-#            subpackageSuffix="morelibs",
-#            sourceContent=library_source,
-#        )
-#        self.after_rpm.add_simple_library(
-#            libraryName="libvaporware.so",
-#            installPath="usr/lib/libvaporware.so",
-#            subpackageSuffix="libs",
-#            sourceContent=library_source,
-#        )
-#        self.after_rpm.add_simple_library(
-#            libraryName="libvaporware.so",
-#            installPath="usr/lib/libvaporware.so",
-#            subpackageSuffix="morelibs",
-#            sourceContent=library_source,
-#        )
-#
-#        # now add a program linked with that library
-#        sourceFileName = "main.c"
-#        installPath = "usr/bin/vaporware"
-#
-#        self.before_rpm.add_source(SourceFile(sourceFileName, hello_lib_world))
-#        self.before_rpm.section_build += (
-#            "%if 0%{?__isa_bits} == 32\n%define mopt -m32\n%endif\n"
-#        )
-#        self.before_rpm.section_build += (
-#            CC + " %%{?mopt} %s -L. -lvaporware\n" % sourceFileName
-#        )
-#        self.before_rpm.create_parent_dirs(installPath)
-#        self.before_rpm.section_install += "cp a.out $RPM_BUILD_ROOT/%s\n" % installPath
-#        binsub = self.before_rpm.get_subpackage(None)
-#        binsub.section_files += "/%s\n" % installPath
-#        self.before_rpm.add_payload_check(installPath, None)
-#
-#        self.after_rpm.add_source(SourceFile(sourceFileName, hello_lib_world))
-#        self.after_rpm.section_build += (
-#            "%if 0%{?__isa_bits} == 32\n%define mopt -m32\n%endif\n"
-#        )
-#        self.after_rpm.section_build += (
-#            CC + " %%{?mopt} %s -L. -lvaporware\n" % sourceFileName
-#        )
-#        self.after_rpm.create_parent_dirs(installPath)
-#        self.after_rpm.section_install += "cp a.out $RPM_BUILD_ROOT/%s\n" % installPath
-#        binsub = self.after_rpm.get_subpackage(None)
-#        binsub.section_files += "/%s\n" % installPath
-#        self.after_rpm.add_payload_check(installPath, None)
-#
-#        # add an explicit supplements on the libs package
-#        self.before_rpm.add_supplements("vaporware-libs = %{version}-%{release}")
-#        self.after_rpm.add_supplements("vaporware-libs = %{version}-%{release}")
-#
-#        self.inspection = "rpmdeps"
-#        self.result = "VERIFY"
-#        self.waiver_auth = "Anyone"
+class MultipleProvidersCompareRPMs(TestCompareRPMs):
+    @unittest.skipUnless(have_supplements, "librpm too old to support Supplements")
+    @unittest.skipUnless(have_elfdeps, "system lacks %s executable" % elfdeps)
+    def setUp(self):
+        super().setUp()
+
+        # add subpackages
+        self.before_rpm.add_subpackage("libs")
+        self.before_rpm.add_subpackage("morelibs")
+        self.after_rpm.add_subpackage("libs")
+        self.after_rpm.add_subpackage("morelibs")
+
+        # we need some stuff in the packages, first a shared library
+        self.before_rpm.add_simple_library(
+            libraryName="libvaporware.so",
+            installPath="usr/lib/libvaporware.so",
+            subpackageSuffix="libs",
+            sourceContent=library_source,
+        )
+        self.before_rpm.add_simple_library(
+            libraryName="libvaporware.so",
+            installPath="usr/lib/libvaporware.so",
+            subpackageSuffix="morelibs",
+            sourceContent=library_source,
+        )
+        self.after_rpm.add_simple_library(
+            libraryName="libvaporware.so",
+            installPath="usr/lib/libvaporware.so",
+            subpackageSuffix="libs",
+            sourceContent=library_source,
+        )
+        self.after_rpm.add_simple_library(
+            libraryName="libvaporware.so",
+            installPath="usr/lib/libvaporware.so",
+            subpackageSuffix="morelibs",
+            sourceContent=library_source,
+        )
+
+        # now add a program linked with that library
+        sourceFileName = "main.c"
+        installPath = "usr/bin/vaporware"
+
+        self.before_rpm.add_source(SourceFile(sourceFileName, hello_lib_world))
+        self.before_rpm.section_build += (
+            "%if 0%{?__isa_bits} == 32\n%define mopt -m32\n%endif\n"
+        )
+        self.before_rpm.section_build += (
+            CC + " %%{?mopt} %s -L. -lvaporware\n" % sourceFileName
+        )
+        self.before_rpm.create_parent_dirs(installPath)
+        self.before_rpm.section_install += "cp a.out $RPM_BUILD_ROOT/%s\n" % installPath
+        binsub = self.before_rpm.get_subpackage(None)
+        binsub.section_files += "/%s\n" % installPath
+        self.before_rpm.add_payload_check(installPath, None)
+
+        self.after_rpm.add_source(SourceFile(sourceFileName, hello_lib_world))
+        self.after_rpm.section_build += (
+            "%if 0%{?__isa_bits} == 32\n%define mopt -m32\n%endif\n"
+        )
+        self.after_rpm.section_build += (
+            CC + " %%{?mopt} %s -L. -lvaporware\n" % sourceFileName
+        )
+        self.after_rpm.create_parent_dirs(installPath)
+        self.after_rpm.section_install += "cp a.out $RPM_BUILD_ROOT/%s\n" % installPath
+        binsub = self.after_rpm.get_subpackage(None)
+        binsub.section_files += "/%s\n" % installPath
+        self.after_rpm.add_payload_check(installPath, None)
+
+        # add an explicit supplements on the libs package
+        self.before_rpm.add_supplements("vaporware-libs = %{version}-%{release}")
+        self.after_rpm.add_supplements("vaporware-libs = %{version}-%{release}")
+
+        # result is OK because this check is a no-op when comparing single RPMs
+        self.inspection = "rpmdeps"
+        self.result = "OK"
+        self.waiver_auth = "Not Waivable"
 
 
 class MultipleProvidersCompareKoji(TestCompareKoji):
