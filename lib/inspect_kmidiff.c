@@ -260,21 +260,35 @@ static bool kmidiff_driver(struct rpminspect *ri, rpmfile_entry_t *file)
     params.arch = arch;
     params.file = file->localpath;
 
-    if ((exitcode & ABIDIFF_ERROR) || (exitcode & ABIDIFF_USAGE_ERROR)) {
+    /*
+     * An exit code of 0 means the compared binaries are ABI-equal.
+     * Non-zero means something, which is documented here:
+     *
+     * https://sourceware.org/libabigail/manual/abidiff.html#return-values
+     */
+    if (exitcode & ABIDIFF_ERROR) {
+        report = true;
         params.severity = RESULT_VERIFY;
-        params.verb = VERB_FAILED;
-        params.noun = _("kmidiff usage error");
-        report = true;
-    } else if (!rebase && (exitcode & ABIDIFF_ABI_CHANGE)) {
-        params.severity = RESULT_VERIFY;
-        params.verb = VERB_CHANGED;
-        params.noun = _("KMI change in ${FILE} on ${ARCH}");
-        report = true;
-    } else if (!rebase && (exitcode & ABIDIFF_ABI_INCOMPATIBLE_CHANGE)) {
-        params.severity = RESULT_BAD;
-        params.verb = VERB_CHANGED;
-        params.noun = _("KMI incompatible change in ${FILE} on ${ARCH}");
-        report = true;
+
+        if (exitcode & ABIDIFF_USAGE_ERROR) {
+            xasprintf(&params.msg, _("Comparing %s to %s in package %s on %s generated a kmidiff(1) usage error."), file->peer_file->localpath, file->localpath, name, arch);
+            params.verb = VERB_FAILED;
+            params.noun = _("kmidiff usage error");
+        } else if (!rebase && (exitcode & ABIDIFF_ABI_CHANGE)) {
+            xasprintf(&params.msg, _("Comparing %s to %s in package %s on %s revealed Kernel Module Interface (KMI) differences."), file->peer_file->localpath, file->localpath, name, arch);
+            params.verb = VERB_CHANGED;
+            params.noun = _("KMI change in ${FILE} on ${ARCH}");
+        } else if (!rebase && (exitcode & ABIDIFF_ABI_CHANGE) && (exitcode & ABIDIFF_ABI_INCOMPATIBLE_CHANGE)) {
+            xasprintf(&params.msg, _("Comparing %s to %s in package %s on %s revealed incompatible Kernel Module Interface (KMI) differences."), file->peer_file->localpath, file->localpath, name, arch);
+            params.severity = RESULT_BAD;
+            params.verb = VERB_CHANGED;
+            params.noun = _("KMI incompatible change in ${FILE} on ${ARCH}");
+        } else {
+            xasprintf(&params.msg, _("kmidiff(1) comparison of %s to %s in package %s on %s ended unexpectedly."), file->peer_file->localpath, file->localpath, name, arch);
+            params.msg = strdup(_("KMI comparison ended unexpectedly."));
+            params.verb = VERB_FAILED;
+            params.noun = _("kmidiff unexpected exit");
+        }
     }
 
     /* check the ABI compat level list */
@@ -282,22 +296,8 @@ static bool kmidiff_driver(struct rpminspect *ri, rpmfile_entry_t *file)
 
     /* add additional details */
     if (report) {
-        if (!strcmp(file->peer_file->localpath, file->localpath)) {
-            xasprintf(&params.msg, _("Comparing old vs. new version of %s in package %s on %s revealed Kernel Module Interface (KMI) differences."), file->localpath, name, arch);
-        } else {
-            xasprintf(&params.msg, _("Comparing from %s to %s in package %s on %s revealed Kernel Module Interface (KMI) differences."), file->peer_file->localpath, file->localpath, name, arch);
-        }
-    }
-
-    if (report || (exitcode && output)) {
-        if (exitcode && output) {
-            params.msg = strdup(_("KMI comparison ended unexpectedly."));
-            params.verb = VERB_FAILED;
-            params.noun = _("kmidiff unexpected exit");
-        }
-
         params.file = file->localpath;
-        xasprintf(&params.details, _("Command: %s\n\n%s"), cmd, output);
+        xasprintf(&params.details, _("Command: %s\nExit code: %d%s%s"), cmd, exitcode, output ? "\n\n" : "", output ? output : "");
         add_result(ri, &params);
         free(params.msg);
         free(params.details);
