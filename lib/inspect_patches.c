@@ -599,6 +599,8 @@ bool inspect_patches(struct rpminspect *ri)
                 }
 
                 TAILQ_FOREACH(specentry, speclines, items) {
+                    fields = NULL;
+
                     /* no more patch files to check */
                     if (patchfiles == NULL || TAILQ_EMPTY(patchfiles)) {
                         break;
@@ -681,11 +683,10 @@ bool inspect_patches(struct rpminspect *ri)
 
                     /* clean up */
                     list_free(fields, free);
-                    fields = NULL;
-                 }
+                }
 
-                 /* clean up the spec file we read in */
-                 list_free(speclines, free);
+                /* clean up the spec file we read in */
+                list_free(speclines, free);
             }
         }
 
