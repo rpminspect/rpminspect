@@ -83,8 +83,6 @@ static bool annocheck_driver(struct rpminspect *ri, rpmfile_entry_t *file)
 {
     bool result = true;
     const char *arch = NULL;
-    const char *before = NULL;
-    const char *after = NULL;
     char **argv = NULL;
     char *before_cmd = NULL;
     char *after_cmd = NULL;
@@ -133,19 +131,15 @@ static bool annocheck_driver(struct rpminspect *ri, rpmfile_entry_t *file)
 
     /* Run each annocheck test and report the results */
     HASH_ITER(hh, ri->annocheck, hentry, tmp_hentry) {
-        after = headerGetString(file->rpm_header, RPMTAG_NAME);
-
         /* Run the test on the file */
-        after_cmd = build_annocheck_cmd(ri->commands.annocheck, hentry->value, get_after_debuginfo_path(ri, arch, after), file->fullpath);
+        after_cmd = build_annocheck_cmd(ri->commands.annocheck, hentry->value, get_after_debuginfo_path(ri, file, arch), file->fullpath);
         argv = build_argv(after_cmd);
         after_out = run_cmd_vpe(&after_exit, ri->worksubdir, argv);
         free_argv(argv);
 
         /* If we have a before build, run the command on that */
         if (file->peer_file) {
-            before = headerGetString(file->peer_file->rpm_header, RPMTAG_NAME);
-
-            before_cmd = build_annocheck_cmd(ri->commands.annocheck, hentry->value, get_before_debuginfo_path(ri, arch, before), file->peer_file->fullpath);
+            before_cmd = build_annocheck_cmd(ri->commands.annocheck, hentry->value, get_before_debuginfo_path(ri, file, arch), file->peer_file->fullpath);
             argv = build_argv(before_cmd);
             before_out = run_cmd_vpe(&before_exit, ri->workdir, argv);
             free_argv(argv);

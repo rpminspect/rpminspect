@@ -386,12 +386,12 @@ char *bytes_to_str(unsigned char *array, size_t len);
  * IMPORTANT: Do not free the returned string.
  *
  * @param ri The struct rpminspect for the program.
+ * @param file The file we are looking for debuginfo for.
  * @param binarch The required debuginfo architecture.
- * @param subpkg Optional subpackage name to get the debuginfo for.
  * @return Full path to the extract before build debuginfo package, or
  * NULL if not found.
  */
-const char *get_before_debuginfo_path(struct rpminspect *ri, const char *binarch, const char *subpkg);
+const char *get_before_debuginfo_path(struct rpminspect *ri, const rpmfile_entry_t *file, const char *binarch);
 
 /**
  * @brief Return the after build debuginfo package path where the
@@ -401,12 +401,13 @@ const char *get_before_debuginfo_path(struct rpminspect *ri, const char *binarch
  * IMPORTANT: Do not free the returned string.
  *
  * @param ri The struct rpminspect for the program.
+ * @param file The file we are looking for debuginfo for.
  * @param binarch The required debuginfo architecture.
- * @param subpkg Optional subpackage name to get the debuginfo for.
  * @return Full path to the extract after build debuginfo package, or
  * NULL if not found.
  */
-const char *get_after_debuginfo_path(struct rpminspect *ri, const char *binarch, const char *subpkg);
+const char *get_after_debuginfo_path(struct rpminspect *ri, const rpmfile_entry_t *file, const char *binarch);
+
 bool usable_path(const char *path);
 bool match_path(const char *pattern, const char *root, const char *path);
 
@@ -536,5 +537,25 @@ bool is_remote_rpm(const char *url);
  *         must free.
  */
 char *human_size(const unsigned long bytes);
+
+/* joinpath.c */
+/**
+ * @brief Join path substrings in to a single allocated and normalized
+ * path string.  Caller must free this string.
+ *
+ * Given a list of path components as separate strings, join them in to a
+ * correct (but unverified) Unix path.  Extra slashes are removed.  Spaces
+ * and other special characters are not escaped.  This function allocates
+ * memory for the returned value.  The caller must free this memory when
+ * done.
+ *
+ * Usage: path = joinpath(a, b, c, ..., NULL);
+ * (where a, b, and c are char *)
+ *
+ * @param path One or more strings that form path components.  These
+ *             will be joined together and delimited with slashes.
+ * @return Allocated path string that the caller must free.
+ */
+char *joinpath(const char *path, ...);
 
 #endif
