@@ -436,6 +436,13 @@
 #define DEBUG_SUBSTRING "debug"
 
 /**
+ * @def DEBUG_FILE_SUFFIX
+ *
+ * The substring appearing at the end of debuginfo files.
+ */
+#define DEBUG_FILE_SUFFIX ".debug"
+
+/**
  * @def KERNEL_MODULES_DIR
  *
  * Linux loadable kernel modules subdirectory.
