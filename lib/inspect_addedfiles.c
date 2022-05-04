@@ -33,6 +33,57 @@
 static char *remedy_addedfiles = NULL;
 
 /*
+ * Check the given file to see if the path has any forbidden directory in it.
+ */
+static bool have_forbidden_directory(const rpmfile_entry_t *file, const char *forbidden)
+{
+    bool r = false;
+    char *local = NULL;
+    char *full = NULL;
+    char *tmp = NULL;
+    struct stat sb;
+
+    assert(file != NULL);
+    assert(forbidden != NULL);
+
+    /* first see if the actual rpm file is the forbidden directory */
+    if (stat(file->fullpath, &sb) == 0 && S_ISDIR(sb.st_mode) && strsuffix(file->localpath, forbidden)) {
+        return true;
+    }
+
+    /* copy paths for the loop below */
+    local = strdup(file->localpath);
+    assert(local != NULL);
+    full = strdup(file->fullpath);
+    assert(full != NULL);
+
+    /* walk the path backwards checking for the forbidden directory */
+    while (full && local) {
+        /* path component is a directory and is a forbidden one */
+        if (stat(full, &sb) == 0 && S_ISDIR(sb.st_mode) && strsuffix(full, forbidden)) {
+            r = true;
+            break;
+        }
+
+        /* back up the path */
+        tmp = strrchr(local, '/');
+
+        if (tmp == local) {
+            break;
+        } else {
+            *tmp = '\0';
+            tmp = strrchr(full, '/');
+            *tmp = '\0';
+        }
+    }
+
+    free(local);
+    free(full);
+
+    return r;
+}
+
+/*
  * Performs all of the tests associated with the addedfiles inspection.
  */
 static bool addedfiles_driver(struct rpminspect *ri, rpmfile_entry_t *file)
@@ -140,12 +191,7 @@ static bool addedfiles_driver(struct rpminspect *ri, rpmfile_entry_t *file)
     /* Check for any forbidden directories */
     if (ri->forbidden_directories && (ri->tests & INSPECT_ADDEDFILES)) {
         TAILQ_FOREACH(entry, ri->forbidden_directories, items) {
-            xasprintf(&head, "%s/", entry->data);
-            assert(head != NULL);
-            xasprintf(&tail, "/%s", entry->data);
-            assert(tail != NULL);
-
-            if (strstr(file->localpath, tail) || strstr(file->localpath, head)) {
+            if (have_forbidden_directory(file, entry->data)) {
                 xasprintf(&params.msg, _("Forbidden directory `%s` found on %s in %s: %s"), entry->data, arch, name, file->localpath);
                 params.noun = _("forbidden directory ${FILE} on ${ARCH}");
                 add_result(ri, &params);
