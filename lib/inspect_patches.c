@@ -614,11 +614,22 @@ bool inspect_patches(struct rpminspect *ri)
                     /* read patch lines */
                     if (strprefix(specentry->data, SPEC_TAG_PATCH) && strstr(specentry->data, ":")) {
                         /* split the line - first field is PatchN:, second is the patch */
-                        fields = strsplit(specentry->data, " \t");
+                        fields = strsplit(specentry->data, ": \t");
+                        len = list_len(fields);
+
+                        if (len < 2 || len > 3) {
+                            errx(RI_PROGRAM_ERROR, "*** unable to parse line `%s'\n", specentry->data);
+                        }
+
                         patch = TAILQ_FIRST(fields);
                         assert(patch != NULL);
                         entry = TAILQ_NEXT(patch, items);
                         assert(entry != NULL);
+
+                        if (len == 3 && !strcmp(entry->data, "")) {
+                            entry = TAILQ_NEXT(entry, items);
+                            assert(entry != NULL);
+                        }
 
                         /* see if we have this patch */
                         if (!list_contains(patchfiles, entry->data)) {
@@ -629,7 +640,12 @@ bool inspect_patches(struct rpminspect *ri)
                         /* extract just the number from the tag */
                         buf = patch->data;
                         buf += strlen(SPEC_TAG_PATCH);
-                        buf[strcspn(buf, ":")] = '\0';
+                        buf[strcspn(buf, ": \t")] = '\0';
+
+                        /* patch entry may have leading whitespace */
+                        while (isspace(*(entry->data)) && *(entry->data) != '\0') {
+                            entry->data++;
+                        }
 
                         /* add a new patch entry to the hash table */
                         hentry = calloc(1, sizeof(*hentry));

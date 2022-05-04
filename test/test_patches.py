@@ -407,3 +407,41 @@ class PatchesDefinedButSomeNotAppliedCompareSRPM(TestCompareSRPM):
         self.inspection = "patches"
         self.result = "VERIFY"
         self.waiver_auth = "Anyone"
+
+
+# patch defined without a space after ':'
+class PatchDefinedWithoutFieldSpaceSRPM(TestSRPM):
+    def setUp(self):
+        super().setUp()
+
+        # add a patch without a space after the ':'
+        patch = rpmfluff.SourceFile("some.patch", patch_file)
+        patchIndex = len(self.rpm.patches)
+        self.rpm.patches[patchIndex] = patch
+        self.rpm.section_patches += "Patch%s:%s\n" % (patchIndex, patch.sourceName)
+        self.rpm.add_check(rpmfluff.CheckSourceFile(patch.sourceName))
+        self.rpm.section_prep += "%%patch%i\n" % patchIndex
+
+        self.inspection = "patches"
+        self.result = "INFO"
+        self.waiver_auth = "Not Waivable"
+
+
+class PatchDefinedWithoutFieldSpaceCompareSRPM(TestCompareSRPM):
+    def setUp(self):
+        super().setUp()
+
+        # add a patch without a space after the ':'
+        patch = rpmfluff.SourceFile("some.patch", patch_file)
+        patchIndex = len(self.after_rpm.patches)
+        self.after_rpm.patches[patchIndex] = patch
+        self.after_rpm.section_patches += "Patch%s:%s\n" % (
+            patchIndex,
+            patch.sourceName,
+        )
+        self.after_rpm.add_check(rpmfluff.CheckSourceFile(patch.sourceName))
+        self.after_rpm.section_prep += "%%patch%i\n" % patchIndex
+
+        self.inspection = "patches"
+        self.result = "INFO"
+        self.waiver_auth = "Not Waivable"
