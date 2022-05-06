@@ -213,6 +213,7 @@ char *strappend(char *, ...);
 string_list_t *strsplit(const char *, const char *);
 const char *strtype(const mode_t mode);
 char *strshorten(const char *s, size_t width);
+char *strtrim(char *s);
 
 /**
  * @brief Return descriptive string for the given exit code.
