@@ -534,6 +534,10 @@ string_list_t *strsplit(const char *s, const char *delim)
 
     /* split the string and build the list */
     while ((token = strsep(&walk, delim)) != NULL) {
+        if (!strcmp(token, "")) {
+            continue;
+        }
+
         entry = calloc(1, sizeof(*entry));
         assert(entry != NULL);
         entry->data = strdup(token);
