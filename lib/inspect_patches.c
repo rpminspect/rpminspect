@@ -42,7 +42,6 @@ static applied_patches_t *applied = NULL;
 static bool reported = false;
 static bool comparison = false;
 static bool automacro = false;
-static struct result_params params;
 
 enum { DIFF_NULL, DIFF_CONTEXT, DIFF_UNIFIED };
 
@@ -289,6 +288,7 @@ static bool patches_driver(struct rpminspect *ri, rpmfile_entry_t *file)
     size_t bpsz = 0;
     long unsigned int oldsize = 0;
     long unsigned int newsize = 0;
+    struct result_params params;
 
     /* If we are not looking at a Patch file, bail. */
     if (!is_patch(file)) {
@@ -300,6 +300,9 @@ static bool patches_driver(struct rpminspect *ri, rpmfile_entry_t *file)
         DEBUG_PRINT("Per the configuration file, ignoring %s\n", file->localpath);
         return true;
     }
+
+    init_result_params(&params);
+    params.header = NAME_PATCHES;
 
     /* make sure defined patches are all applied */
     if (!automacro) {
@@ -519,6 +522,7 @@ bool inspect_patches(struct rpminspect *ri)
     applied_patches_t *aentry = NULL;
     char *buf = NULL;
     size_t len = 0;
+    struct result_params params;
 
     assert(ri != NULL);
 
@@ -530,7 +534,7 @@ bool inspect_patches(struct rpminspect *ri)
         if (headerIsSource(peer->after_hdr)) {
             have_source = true;
 
-            if (headerIsSource(peer->before_hdr)) {
+            if (peer->before_hdr && headerIsSource(peer->before_hdr)) {
                 comparison = true;
             }
 
@@ -606,6 +610,10 @@ bool inspect_patches(struct rpminspect *ri)
                         break;
                     }
 
+                    /* trim the spec file line of leading and trailing whitespace */
+                    specentry->data = strtrim(specentry->data);
+                    assert(specentry->data != NULL);
+
                     /* nothing from the changelog on */
                     if (strprefix(specentry->data, SPEC_SECTION_CHANGELOG)) {
                         break;
@@ -617,7 +625,7 @@ bool inspect_patches(struct rpminspect *ri)
                         fields = strsplit(specentry->data, ": \t");
                         len = list_len(fields);
 
-                        if (len < 2 || len > 3) {
+                        if (len < 2) {
                             errx(RI_PROGRAM_ERROR, "*** unable to parse line `%s'\n", specentry->data);
                         }
 
@@ -625,11 +633,6 @@ bool inspect_patches(struct rpminspect *ri)
                         assert(patch != NULL);
                         entry = TAILQ_NEXT(patch, items);
                         assert(entry != NULL);
-
-                        if (len == 3 && !strcmp(entry->data, "")) {
-                            entry = TAILQ_NEXT(entry, items);
-                            assert(entry != NULL);
-                        }
 
                         /* see if we have this patch */
                         if (!list_contains(patchfiles, entry->data)) {
@@ -640,7 +643,6 @@ bool inspect_patches(struct rpminspect *ri)
                         /* extract just the number from the tag */
                         buf = patch->data;
                         buf += strlen(SPEC_TAG_PATCH);
-                        buf[strcspn(buf, ": \t")] = '\0';
 
                         /* patch entry may have leading whitespace */
                         while (isspace(*(entry->data)) && *(entry->data) != '\0') {
