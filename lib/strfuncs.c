@@ -527,7 +527,7 @@ string_list_t *strsplit(const char *s, const char *delim)
     if (s && delim == NULL) {
         entry = calloc(1, sizeof(*entry));
         assert(entry != NULL);
-        entry->data = walk;
+        entry->data = strdup(walk);
         TAILQ_INSERT_TAIL(list, entry, items);
         return list;
     }
@@ -653,11 +653,16 @@ const char *strexitcode(int exitcode)
  */
 char *strtrim(char *s)
 {
+    char *r = NULL;
+    char *begin = NULL;
     size_t i = 0;
 
     if (s == NULL) {
-        return s;
+        return NULL;
     }
+
+    /* the beginning of the string */
+    begin = s;
 
     /* remove leading whitespace */
     while (isspace(*s) && *s != '\0') {
@@ -665,7 +670,13 @@ char *strtrim(char *s)
     }
 
     if (s == NULL) {
-        return s;
+        return NULL;
+    }
+
+    /* shift everything to the head of the string */
+    while (s[i] != '\0') {
+        begin[i] = s[i];
+        i++;
     }
 
     /* go to the end and remove trailing whitespace */
@@ -677,11 +688,11 @@ char *strtrim(char *s)
     }
 
     if (s == NULL) {
-        return s;
+        return NULL;
     }
 
     /* reallocate memory block */
-    s = realloc(s, strlen(s) + 1);
+    r = realloc(begin, strlen(begin) + 1);
 
-    return s;
+    return r;
 }
