@@ -24,6 +24,7 @@
 #include <string.h>
 #include <errno.h>
 #include <assert.h>
+#include <err.h>
 #include <rpm/rpmmacro.h>
 #include "rpminspect.h"
 
@@ -251,7 +252,10 @@ bool inspect_disttag(struct rpminspect *ri)
             }
 
             /* Define the dist macro for rpminspect */
-            (void) rpmDefineMacro(NULL, "dist " DIST_TAG_MARKER, 0);
+            if (rpmPushMacro(NULL, "dist", NULL, DIST_TAG_MARKER, RMIL_GLOBAL)) {
+                warnx("rpmPushMacro");
+                _exit(EXIT_FAILURE);
+            }
 
             /* Analyze the spec file */
             result = disttag_driver(ri, file);
