@@ -130,7 +130,6 @@ static char *rpm_prep_source(struct rpminspect *ri, const rpmfile_entry_t *file,
     size_t n = BUFSIZ;
     char *buf = NULL;
     rpmSpec spec = NULL;
-    char *macro = NULL;
     rpmts ts = NULL;
     BTA_t ba = NULL;
     char *topdir = NULL;
@@ -164,10 +163,12 @@ static char *rpm_prep_source(struct rpminspect *ri, const rpmfile_entry_t *file,
         /* define our top dir */
         topdir = make_source_dirs(ri->worksubdir, file->fullpath);
         assert(topdir != NULL);
-        xasprintf(&macro, "_topdir %s", topdir);
-        assert(macro != NULL);
-        (void) rpmDefineMacro(NULL, macro, 0);
-        free(macro);
+
+        if (rpmPushMacro(NULL, "_topdir", NULL, topdir, RMIL_GLOBAL)) {
+            warnx("rpmPushMacro");
+            _exit(EXIT_FAILURE);
+        }
+
         free(topdir);
 
         /* read in the spec file */
