@@ -434,11 +434,14 @@ static bool check_explicit_epoch(struct rpminspect *ri, Header h, deprule_list_t
 static bool expected_deprule_change(const bool rebase, const deprule_entry_t *deprule, const Header h, const rpmpeer_t *peers)
 {
     bool r = false;
+    bool config = false;
     bool found = false;
     char *req = NULL;
     char *working_req = NULL;
     char *vr = NULL;
     char *evr = NULL;
+    char *buf = NULL;
+    char *suffix = NULL;
     rpmpeer_entry_t *peer = NULL;
     const char *name = NULL;
     const char *arch = NULL;
@@ -446,6 +449,7 @@ static bool expected_deprule_change(const bool rebase, const deprule_entry_t *de
     const char *version = NULL;
     const char *release = NULL;
     uint64_t epoch = 0;
+    Header working_hdr = NULL;
 
     assert(deprule != NULL);
     assert(h != NULL);
@@ -479,6 +483,7 @@ static bool expected_deprule_change(const bool rebase, const deprule_entry_t *de
 
     /* trim config() wrapper */
     if (strprefix(working_req, "config(")) {
+        config = true;
         working_req += 7;
         working_req[strcspn(working_req, ")")] = '\0';
     }
@@ -486,6 +491,16 @@ static bool expected_deprule_change(const bool rebase, const deprule_entry_t *de
     /* trim any arch substrings from the name (e.g., "(x86-64)") */
     if (strstr(working_req, "(")) {
         working_req[strcspn(working_req, "(")] = '\0';
+    }
+
+    /* gather any + suffix from the version */
+    if (deprule->version) {
+        buf = strrchr(deprule->version, '+');
+
+        if (buf) {
+            suffix = strdup(buf);
+            assert(suffix != NULL);
+        }
     }
 
     /* see if this deprule requirement name matches a subpackage */
@@ -507,28 +522,71 @@ static bool expected_deprule_change(const bool rebase, const deprule_entry_t *de
         if (!strcmp(arch, peerarch) && !strcmp(name, working_req)) {
             /* we found the subpackage, which is now 'peer' for code below */
             found = true;
+            working_hdr = peer->after_hdr;
             break;
         }
     }
 
+    /*
+     * deprule may be a virtual deprule that does not match a
+     * subpackage but matches the version of the package, such
+     * as:   Provides: thing = 1.2.3-4
+     * where 1.2.3-4 matches %{version}-%{release}
+     */
+    if (!found && deprule->version && deprule->operator == OP_EQUAL) {
+        found = true;
+        working_hdr = h;
+    }
+
     /* deprule version strings are a combo of the version-release or epoch:version-release */
     if (deprule->version) {
-        if (!found) {
+        if (!found && !config) {
             /* use the main package vr and evr */
             if ((pkg_evr && !strcmp(deprule->version, pkg_evr)) || (pkg_vr && !strcmp(deprule->version, pkg_vr))) {
                 r = true;
             }
         } else {
             /* check against the subpackage match we found */
-            version = headerGetString(peer->after_hdr, RPMTAG_VERSION);
-            release = headerGetString(peer->after_hdr, RPMTAG_RELEASE);
-            epoch = headerGetNumber(peer->after_hdr, RPMTAG_EPOCH);
+            version = headerGetString(working_hdr, RPMTAG_VERSION);
+            release = headerGetString(working_hdr, RPMTAG_RELEASE);
+            epoch = headerGetNumber(working_hdr, RPMTAG_EPOCH);
+            arch = get_rpm_header_arch(working_hdr);
 
+            /* first, start with the basic strings */
             xasprintf(&vr, "%s-%s", version, release);
             assert(vr != NULL);
 
             xasprintf(&evr, "%ju:%s-%s", epoch, version, release);
             assert(evr != NULL);
+
+            /* check for trailing information on the version */
+            if (suffix) {
+                xasprintf(&buf, ".%s%s", arch, suffix);
+                assert(buf != NULL);
+            }
+
+            if (suffix && strsuffix(deprule->version, buf)) {
+                vr = strappend(vr, buf, NULL);
+                assert(vr != NULL);
+                evr = strappend(evr, buf, NULL);
+                assert(evr != NULL);
+            } else {
+                /* do we have an architecture trailing? */
+                if (strsuffix(deprule->version, arch)) {
+                    vr = strappend(vr, ".", arch, NULL);
+                    assert(vr != NULL);
+                    evr = strappend(evr, ".", arch, NULL);
+                    assert(evr != NULL);
+                }
+
+                /* do we have '+debug' trailing (usually for kernel packages)? */
+                if (suffix && strsuffix(deprule->version, suffix)) {
+                   vr = strappend(vr, suffix, NULL);
+                   assert(vr != NULL);
+                   evr = strappend(evr, suffix, NULL);
+                   assert(evr != NULL);
+               }
+           }
 
             /* determine if this is expected */
             if (deprule->version && ((evr && !strcmp(deprule->version, evr)) || (vr && !strcmp(deprule->version, vr)))) {
@@ -537,6 +595,8 @@ static bool expected_deprule_change(const bool rebase, const deprule_entry_t *de
 
             free(vr);
             free(evr);
+            free(buf);
+            free(suffix);
         }
     } else if (deprule->version == NULL && found) {
         r = true;

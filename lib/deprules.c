@@ -132,7 +132,8 @@ static deprule_list_t *gather_deprules_by_type(deprule_list_t *rules, Header hdr
             if (!strcmp(r, "debuginfo(build-id)")
                 || strsuffix(r, DEBUGSOURCE_SUFFIX)
                 || strsuffix(r, DEBUGINFO_SUFFIX)
-                || ((strprefix(r, "rpmlib(") || strprefix(r, "rtld(")) && strsuffix(r, ")"))) {
+                || ((strprefix(r, "rpmlib(") || strprefix(r, "rtld(")) && strsuffix(r, ")"))
+                || ((strprefix(r, "kernel(") || strprefix(r, "modalias(") || strprefix(r, "ksym(") || strprefix(r, "kmod(")) && strsuffix(r, ")"))) {
                 continue;
             }
 
@@ -403,7 +404,8 @@ const char *get_deprule_operator_desc(const dep_op_t operator)
     }
 }
 
-/*                                                                                                                                                                   * Given a deprule, construct a human-readable version of it.  Caller
+/*
+ * Given a deprule, construct a human-readable version of it.  Caller
  * must free the returned string.
  */
 char *strdeprule(const deprule_entry_t *deprule)
