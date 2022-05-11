@@ -159,13 +159,13 @@ static bool valid_peers(struct rpminspect *ri, const Header before_hdr, const He
                 params.severity = RESULT_INFO;
             } else {
                 params.severity = RESULT_VERIFY;
+                ret = false;
             }
 
             params.waiverauth = WAIVABLE_BY_ANYONE;
             params.remedy = NULL;
             add_result(ri, &params);
             free(params.msg);
-            ret = false;
         }
 
         if (strcmp(before_summary, after_summary)) {
@@ -179,7 +179,6 @@ static bool valid_peers(struct rpminspect *ri, const Header before_hdr, const He
             params.remedy = NULL;
             add_result(ri, &params);
             free(params.msg);
-            ret = false;
         }
 
         if (strcmp(before_description, after_description)) {
@@ -195,7 +194,6 @@ static bool valid_peers(struct rpminspect *ri, const Header before_hdr, const He
             add_result(ri, &params);
             free(params.msg);
             free(params.details);
-            ret = false;
        }
     }
 
