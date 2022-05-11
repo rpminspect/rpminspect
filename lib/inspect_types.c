@@ -29,8 +29,14 @@ static bool result = true;
 static bool types_driver(struct rpminspect *ri, rpmfile_entry_t *file)
 {
     const char *arch = NULL;
-    char *bt = NULL;
-    char *at = NULL;
+    string_list_t *bmt = NULL;      /* before mime type */
+    string_list_t *amt = NULL;      /* after mime type */
+    string_entry_t *bce = NULL;     /* before category entry */
+    string_entry_t *ace = NULL;     /* after category entry */
+    string_entry_t *bsce = NULL;    /* before subcategory entry */
+    string_entry_t *asce = NULL;    /* after subcategory entry*/
+    char *bnevra = NULL;
+    char *anevra = NULL;
     struct result_params params;
 
     assert(ri != NULL);
@@ -58,30 +64,79 @@ static bool types_driver(struct rpminspect *ri, rpmfile_entry_t *file)
 
     /* We need the architecture for reporting */
     arch = get_rpm_header_arch(file->rpm_header);
+    assert(arch != NULL);
+
+    bnevra = get_nevra(file->peer_file->rpm_header);
+    assert(bnevra != NULL);
+
+    anevra = get_nevra(file->rpm_header);
+    assert(anevra != NULL);
+
+    /* prepare for results reporting */
+    init_result_params(&params);
+    params.severity = RESULT_VERIFY;
+    params.waiverauth = WAIVABLE_BY_ANYONE;
+    params.header = NAME_TYPES;
+    params.remedy = REMEDY_TYPES;
+    params.arch = arch;
+    params.file = file->localpath;
+    params.verb = VERB_CHANGED;
+    params.noun = _("${FILE} MIME type on ${ARCH}");
 
     /* Get the MIME types */
-    bt = get_mime_type(file->peer_file);
-    at = get_mime_type(file);
+    bmt = strsplit(get_mime_type(file->peer_file), "/");
+    amt = strsplit(get_mime_type(file), "/");
 
-    DEBUG_PRINT("before_type=|%s|, after_type=|%s| -- %s\n", bt, at, file->localpath);
+    /* A MIME type should be category/subcategory, so these lists should be length 2 */
+    if (result && list_len(bmt) != 2) {
+        xasprintf(&params.msg, _("Unknown MIME type `%s' on %s in %s"), get_mime_type(file->peer_file), file->peer_file->localpath, bnevra);
+        result = false;
+        goto report;
+    }
 
-    /* Compare */
-    if (strcmp(bt, at)) {
-        init_result_params(&params);
-        params.severity = RESULT_VERIFY;
-        params.waiverauth = WAIVABLE_BY_ANYONE;
-        params.header = NAME_TYPES;
-        params.remedy = REMEDY_TYPES;
-        params.arch = arch;
-        params.file = file->localpath;
-        params.verb = VERB_CHANGED;
-        params.noun = _("${FILE} MIME type on ${ARCH}");
-        xasprintf(&params.msg, _("MIME type on %s was %s and became %s on %s"), file->localpath, bt, at, arch);
+    if (result && list_len(amt) != 2) {
+        xasprintf(&params.msg, _("Unknown MIME type `%s' on %s in %s"), get_mime_type(file), file->localpath, anevra);
+        result = false;
+        goto report;
+    }
+
+    /* Compare the first and second parts of the MIME type */
+    bce = TAILQ_FIRST(bmt);
+    assert(bce != NULL);
+    bsce = TAILQ_NEXT(bce, items);
+    assert(bsce != NULL);
+
+    ace = TAILQ_FIRST(amt);
+    assert(ace != NULL);
+    asce = TAILQ_NEXT(ace, items);
+    assert(asce != NULL);
+
+    /*
+     * The idea with this comparison is to not fail if the type
+     * changes from something like 'text/plain' to 'text/x-makefile'.
+     * Check both parts of the MIME type independently so that 'text'
+     * matches but the subcategory doesn't, but that's still ok.
+     * Let's these changes through but will stop for larger changes
+     * like text/plain to application/x-executable.
+     */
+    if (strcmp(bce->data, ace->data) && strcmp(bsce->data, asce->data)) {
+        xasprintf(&params.msg, _("MIME type for %s in %s was `%s/%s' and became `%s/%s'"), file->localpath, anevra, bce->data, bsce->data, ace->data, asce->data);
+        result = false;
+        goto report;
+    }
+
+    /* Final reporting */
+report:
+    if (!result) {
         add_result(ri, &params);
         free(params.msg);
-
-        result = false;
     }
+
+    /* clean up */
+    list_free(bmt, free);
+    list_free(amt, free);
+    free(bnevra);
+    free(anevra);
 
     return result;
 }
