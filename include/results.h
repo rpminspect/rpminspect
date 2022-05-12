@@ -685,9 +685,9 @@
 
 #define REMEDY_PATCHES_CORRUPT _("An invalid patch file was found.  This is usually the result of generating a collection of patches by comparing two trees.  When files disappear that can lead to zero length patches in the resulting collection.  Check to see if the source package has any zero length or otherwise invalid patches and correct the problem.")
 
-#define REMEDY_PATCHES_MISSING_MACRO _("The named patch is defined in the source RPM header (this means it has a PatchN: definition in the spec file) but is not applied anywhere in the spec file.  It is missing a corresponding %%patch macro and the spec file lacks the %%autosetup or %%autopatch macros.  You can fix this by adding the appropriate %%patch macro in the spec file (usually in the %%prep section).  The number specified with the %%patch macro corresponds to the number used to define the patch at the top of the spec file.  So Patch47 is applied with a %%patch47 macro.")
+#define REMEDY_PATCHES_MISSING_MACRO _("The named patch is defined in the source RPM header (this means it has a PatchN: definition in the spec file) but is not applied anywhere in the spec file.  It is missing a corresponding %patch macro and the spec file lacks the %autosetup or %autopatch macros.  You can fix this by adding the appropriate %patch macro in the spec file (usually in the %prep section).  The number specified with the %patch macro corresponds to the number used to define the patch at the top of the spec file.  So Patch47 is applied with a %patch47 macro.")
 
-#define REMEDY_PATCHES_MISMATCHED_MACRO _("The named patch is defined but is mismatched by number with the %%patch macro.  Make sure all numbered patches have corresponding %%patch macros.  For example, Patch47 needs to have a %%patch47 macro.")
+#define REMEDY_PATCHES_MISMATCHED_MACRO _("The named patch is defined but is mismatched by number with the %patch macro.  Make sure all numbered patches have corresponding %patch macros.  For example, Patch47 needs to have a %patch47 macro.")
 
 /** @} */
 
@@ -757,7 +757,7 @@
 
 #define REMEDY_RPMDEPS_EXPLICIT_EPOCH _("Add the indicated explicit Requires to the spec file for the named subpackage.  Subpackages depending on shared libraries in another subpackage must carry an explicit 'Requires: SUBPACKAGE_NAME = %{epoch}:%{version}-%{release}' in the spec file.")
 
-#define REMEDY_RPMDEPS_MULTIPLE _("Check subpackage %%files sections and explicit Provides statements.  Only one subpackage should provide a given shared library.  Shared library names are automatically added as Provides, so there is no need to specify them in the spec file but you do need to make sure only one subpackage is packaging up the shared library in question.")
+#define REMEDY_RPMDEPS_MULTIPLE _("Check subpackage %files sections and explicit Provides statements.  Only one subpackage should provide a given shared library.  Shared library names are automatically added as Provides, so there is no need to specify them in the spec file but you do need to make sure only one subpackage is packaging up the shared library in question.")
 
 #define REMEDY_RPMDEPS_CHANGED _("A dependency listed in the before build changed to the indicated dependency in the after build.  If this is a VERIFY result, it means rpminspect noticed the change in what it considers a maintenance update in a package.  An INFO result means it noticed this change, but deems it ok because it is comparing a rebased build.")
 

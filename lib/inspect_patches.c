@@ -29,7 +29,6 @@
 #include <err.h>
 #include <limits.h>
 #include <ctype.h>
-#include <regex.h>
 #include <rpm/header.h>
 #include <rpm/rpmtag.h>
 #include <archive.h>
@@ -94,13 +93,10 @@ static void free_applied_patches(applied_patches_t *table)
 static bool have_automacro(const rpmfile_entry_t *specfile)
 {
     bool r = false;
-    bool valid_section = false;
+    bool in_valid_section = false;
     string_list_t *contents = NULL;
     string_entry_t *entry = NULL;
     char *buf = NULL;
-    int reg_result = 0;
-    regex_t section_regex;
-    char reg_error[BUFSIZ];
 
     /* No spec file, we know nothing. */
     if (specfile == NULL) {
@@ -112,15 +108,6 @@ static bool have_automacro(const rpmfile_entry_t *specfile)
 
     if (contents == NULL) {
         return false;
-    }
-
-    /* RPM spec file section marker regexp */
-    reg_result = regcomp(&section_regex, "^%[a-z]+$", REG_EXTENDED);
-
-    if (reg_result != 0) {
-        regerror(reg_result, &section_regex, reg_error, sizeof(reg_error));
-        warn("regcomp: %s", reg_error);
-        return NULL;
     }
 
     /* Look for %autopatch or %autosetup in valid sections */
@@ -140,30 +127,29 @@ static bool have_automacro(const rpmfile_entry_t *specfile)
          * not sure if leading whitespace is allowed by RPM, but I
          * have seen stranger things
          */
-        while (isspace(*buf) && *buf != '\0') {
-            buf++;
-        }
+        buf = strtrim(buf);
 
         if (*buf == '%') {
             if (strprefix(buf, SPEC_SECTION_PREP)
                 || strprefix(buf, SPEC_SECTION_BUILD)
                 || strprefix(buf, SPEC_SECTION_INSTALL)
                 || strprefix(buf, SPEC_SECTION_CHECK)) {
-                valid_section = true;
-            } else if (regexec(&section_regex, buf, 0, NULL, 0) == 0) {
-                valid_section = false;
+                in_valid_section = true;
+            } else if (!strcmp(buf, SPEC_SECTION_CHANGELOG)) {
+                in_valid_section = false;
+                break;
             }
         }
 
         /* look for the auto macros */
-        if (valid_section && (strstr(buf, SPEC_MACRO_AUTOPATCH) || strstr(buf, SPEC_MACRO_AUTOSETUP))) {
+        if (in_valid_section && (!strcmp(buf, SPEC_MACRO_AUTOPATCH) || strprefix(buf, SPEC_MACRO_AUTOPATCH" ")
+                                 || strcmp(buf, SPEC_MACRO_AUTOSETUP) || strprefix(buf, SPEC_MACRO_AUTOSETUP" "))) {
             r = true;
             break;
         }
     }
 
     list_free(contents, free);
-    regfree(&section_regex);
     return r;
 }
 
