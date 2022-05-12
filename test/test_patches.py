@@ -21,6 +21,14 @@ import rpmfluff
 from baseclass import TestSRPM, TestCompareSRPM
 
 # test data
+source_file = """#include <stdio.h>
+int main(void)
+{
+    printf("Hello, world!\n");
+    return 0;
+}
+"""
+
 patch_file = """--- fortify.c.orig      2020-09-22 14:45:41.592625821 -0400
 +++ fortify.c   2020-09-29 10:43:21.829954365 -0400
 @@ -1,13 +1,20 @@
@@ -304,7 +312,10 @@ class PatchDefinedAutoSetupSRPM(TestSRPM):
 
         # add a patch and use %autosetup
         self.rpm.add_patch(rpmfluff.SourceFile("some.patch", patch_file), False)
-        self.rpm.section_prep += "%%autosetup\n"
+        self.rpm.section_prep += "%autosetup\n"
+
+        # the %autosetup macro requires at least one SourceN definition
+        self.rpm.add_source(rpmfluff.SourceFile("hello.c", source_file))
 
         self.inspection = "patches"
         self.result = "INFO"
@@ -317,7 +328,10 @@ class PatchDefinedAutoSetupCompareSRPM(TestCompareSRPM):
 
         # add a patch and use %autosetup
         self.after_rpm.add_patch(rpmfluff.SourceFile("some.patch", patch_file), False)
-        self.after_rpm.section_prep += "%%autosetup\n"
+        self.after_rpm.section_prep += "%autosetup\n"
+
+        # the %autosetup macro requires at least one SourceN definition
+        self.after_rpm.add_source(rpmfluff.SourceFile("hello.c", source_file))
 
         self.inspection = "patches"
         self.result = "INFO"
@@ -331,7 +345,7 @@ class PatchDefinedAutoPatchSRPM(TestSRPM):
 
         # add a patch and use %autopatch
         self.rpm.add_patch(rpmfluff.SourceFile("some.patch", patch_file), False)
-        self.rpm.section_prep += "%%autopatch\n"
+        self.rpm.section_prep += "%autopatch\n"
 
         self.inspection = "patches"
         self.result = "INFO"
@@ -344,7 +358,7 @@ class PatchDefinedAutoPatchCompareSRPM(TestCompareSRPM):
 
         # add a patch and use %autopatch
         self.after_rpm.add_patch(rpmfluff.SourceFile("some.patch", patch_file), False)
-        self.after_rpm.section_prep += "%%autopatch\n"
+        self.after_rpm.section_prep += "%autopatch\n"
 
         self.inspection = "patches"
         self.result = "INFO"
