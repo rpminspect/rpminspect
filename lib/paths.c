@@ -229,7 +229,6 @@ bool match_path(const char *pattern, const char *root, const char *path)
 
     /* Try a match on the leading subdirectory */
     if ((strsuffix(pattern, "*") || strsuffix(pattern, "?")) && !fnmatch(pattern, path, FNM_LEADING_DIR)) {
-        DEBUG_PRINT("MATCH: pattern=|%s|, path=|%s|\n", pattern, path);
         return true;
     }
 
