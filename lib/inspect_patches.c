@@ -142,8 +142,12 @@ static bool have_automacro(const rpmfile_entry_t *specfile)
         }
 
         /* look for the auto macros */
+        /*
+         * this matches lines that are either the macro itself, or the
+         * macro followed by one or more options
+         */
         if (in_valid_section && (!strcmp(buf, SPEC_MACRO_AUTOPATCH) || strprefix(buf, SPEC_MACRO_AUTOPATCH" ")
-                                 || strcmp(buf, SPEC_MACRO_AUTOSETUP) || strprefix(buf, SPEC_MACRO_AUTOSETUP" "))) {
+                                 || !strcmp(buf, SPEC_MACRO_AUTOSETUP) || strprefix(buf, SPEC_MACRO_AUTOSETUP" "))) {
             r = true;
             break;
         }
