@@ -27,6 +27,7 @@
 #include <assert.h>
 #include <err.h>
 #include <glob.h>
+#include <fnmatch.h>
 #include <rpm/header.h>
 #include <rpm/rpmtag.h>
 #include "queue.h"
@@ -226,6 +227,13 @@ bool match_path(const char *pattern, const char *root, const char *path)
         return true;
     }
 
+    /* Try a match on the leading subdirectory */
+    if ((strsuffix(pattern, "*") || strsuffix(pattern, "?")) && !fnmatch(pattern, path, FNM_LEADING_DIR)) {
+        DEBUG_PRINT("MATCH: pattern=|%s|, path=|%s|\n", pattern, path);
+        return true;
+    }
+
+    /* Fall through to glob(3) matching */
 #ifdef GLOB_BRACE
     /* this is a GNU extension, see glob(3) */
     gflags |= GLOB_BRACE;
@@ -280,7 +288,8 @@ bool match_path(const char *pattern, const char *root, const char *path)
 }
 
 /**
- * @brief Given a path and struct rpminspect, determine if the path should be ignored or not.
+ * @brief Given a path and struct rpminspect, determine if the path
+ * should be ignored or not.
  *
  * @param ri The struct rpminspect for the program.
  * @param inspection The name of the inspection currently running.
