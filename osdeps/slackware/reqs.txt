@@ -26,6 +26,7 @@ libgpg-error
 libtool
 libxml2
 libyaml
+llvm
 lz4
 m4
 mariadb
@@ -40,6 +41,7 @@ python3
 python-pip
 python-setuptools
 rpm
+rust
 serf
 sqlite
 subversion

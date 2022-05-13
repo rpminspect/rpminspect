@@ -2,6 +2,9 @@
 PATH=/bin:/usr/bin:/sbin:/usr/sbin
 CWD="$(pwd)"
 
+# There is no cbindgen package in Slackware Linux
+cargo install cbindgen
+
 # There is no clamav package in Slackware Linux
 git clone https://github.com/Cisco-Talos/clamav.git
 cd clamav || exit 1
@@ -10,6 +13,7 @@ git checkout -b "${TAG}" "${TAG}"
 mkdir build
 cd build || exit 1
 cmake -D ENABLE_MILTER=OFF \
+      -D ENABLE_JSON_SHARED=OFF \
       -D CMAKE_INSTALL_PREFIX=/usr \
       -D CMAKE_INSTALL_LIBDIR=lib64 \
       -D APP_CONFIG_DIRECTORY=/etc/clamav \
