@@ -32,8 +32,6 @@
 #include "xdiff.h"
 #include "rpminspect.h"
 
-static string_list_t *list = NULL;
-
 static int fill_mmfile(mmfile_t *mf, const char *file)
 {
     int fd = 0;
@@ -96,11 +94,11 @@ static int fill_mmfile(mmfile_t *mf, const char *file)
     return 0;
 }
 
-static int delta_out(__attribute__((unused)) void *priv, mmbuffer_t *mb, int nbuf)
+static int delta_out(void *priv, mmbuffer_t *mb, int nbuf)
 {
     int i = 0;
-    int r = 0;
     char *prefix = NULL;
+    string_list_t *list = (string_list_t *) priv;
     string_entry_t *entry = NULL;
 
     for (i = 0; i < nbuf; i++) {
@@ -117,39 +115,23 @@ static int delta_out(__attribute__((unused)) void *priv, mmbuffer_t *mb, int nbu
                     prefix = "-";
                     break;
             }
-
-            continue;
         }
 
         /* capture the line */
         entry = calloc(1, sizeof(*entry));
         assert(entry != NULL);
 
-        if (prefix) {
-            entry->data = calloc(1, mb[i].size + strlen(prefix) + 1);
-        } else {
-            entry->data = calloc(1, mb[i].size + 1);
-        }
-
-        assert(entry->data != NULL);
-
-        if (mb[i].size > 1 && mb[i].ptr) {
+        if ((mb[i].size > 1) && mb[i].ptr) {
             if (prefix) {
-                r = snprintf(entry->data, mb[i].size + 1, "%s%s", prefix, mb[i].ptr);
+                xasprintf(&entry->data, "%s%s", prefix, mb[i].ptr);
             } else {
-                r = snprintf(entry->data, mb[i].size + 1, "%s", mb[i].ptr);
+                entry->data = strdup(mb[i].ptr);
             }
+
+            assert(entry->data != NULL);
         } else {
-            free(entry->data);
             entry->data = strdup("");
             assert(entry->data != NULL);
-        }
-
-        if (r < 0) {
-            warn("snprintf");
-            free(entry->data);
-            free(entry);
-            return -1;
         }
 
         entry->data[strcspn(entry->data, "\n")] = '\0';
@@ -173,6 +155,7 @@ char *get_file_delta(const char *a, const char *b)
     xpparam_t xpp;
     xdemitconf_t xecfg;
     xdemitcb_t ecb;
+    string_list_t *list = NULL;
     char *r = NULL;
 
     if (fill_mmfile(&old, a) < 0 || fill_mmfile(&new, b) < 0) {
@@ -184,16 +167,16 @@ char *get_file_delta(const char *a, const char *b)
     memset(&xecfg, 0, sizeof(xecfg));
     memset(&ecb, 0, sizeof(ecb));
 
+    list = calloc(1, sizeof(*list));
+    assert(list != NULL);
+    TAILQ_INIT(list);
+
     xpp.flags = 0;
     xpp.flags |= XDF_IGNORE_WHITESPACE;
 
     xecfg.ctxlen = 3;
-    ecb.priv = 0;
+    ecb.priv = list;
     ecb.outf = delta_out;
-
-    list = calloc(1, sizeof(*list));
-    assert(list != NULL);
-    TAILQ_INIT(list);
 
     if (xdl_diff(&old, &new, &xpp, &xecfg, &ecb) < 0) {
         warn("xdl_diff");
