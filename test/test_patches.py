@@ -16,9 +16,33 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 #
 
+import subprocess
 import rpmfluff
+import unittest
 
 from baseclass import TestSRPM, TestCompareSRPM
+
+# Check to see if %autopatch works (requires lua)
+proc = subprocess.Popen(
+    ["rpmbuild", "-E", "%autopatch"], stdout=subprocess.PIPE, stderr=subprocess.PIPE
+)
+(out, err) = proc.communicate()
+
+if proc.returncode == 0:
+    have_autopatch = True
+else:
+    have_autopatch = False
+
+# Check to see if %autosetup works (requires lua)
+proc = subprocess.Popen(
+    ["rpmbuild", "-E", "%autosetup"], stdout=subprocess.PIPE, stderr=subprocess.PIPE
+)
+(out, err) = proc.communicate()
+
+if proc.returncode == 0:
+    have_autosetup = True
+else:
+    have_autosetup = False
 
 # test data
 source_file = """#include <stdio.h>
@@ -307,6 +331,9 @@ class PatchTouchesTooManyLinesCompare(TestCompareSRPM):
 
 # patch defined and %autosetup used
 class PatchDefinedAutoSetupSRPM(TestSRPM):
+    @unittest.skipUnless(
+        have_autosetup, "rpmbuild lacks %autosetup support (maybe missing liblua)"
+    )
     def setUp(self):
         super().setUp()
 
@@ -323,6 +350,9 @@ class PatchDefinedAutoSetupSRPM(TestSRPM):
 
 
 class PatchDefinedAutoSetupCompareSRPM(TestCompareSRPM):
+    @unittest.skipUnless(
+        have_autosetup, "rpmbuild lacks %autosetup support (maybe missing liblua)"
+    )
     def setUp(self):
         super().setUp()
 
@@ -340,6 +370,9 @@ class PatchDefinedAutoSetupCompareSRPM(TestCompareSRPM):
 
 # patch defined and %autopatch used
 class PatchDefinedAutoPatchSRPM(TestSRPM):
+    @unittest.skipUnless(
+        have_autopatch, "rpmbuild lacks %autopatch support (maybe missing liblua)"
+    )
     def setUp(self):
         super().setUp()
 
@@ -353,6 +386,9 @@ class PatchDefinedAutoPatchSRPM(TestSRPM):
 
 
 class PatchDefinedAutoPatchCompareSRPM(TestCompareSRPM):
+    @unittest.skipUnless(
+        have_autopatch, "rpmbuild lacks %autopatch support (maybe missing liblua)"
+    )
     def setUp(self):
         super().setUp()
 
