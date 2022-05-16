@@ -415,6 +415,18 @@ static bool check_bin_rpm_changelog(struct rpminspect *ri, const rpmpeer_entry_t
     }
 
     /* cleanup */
+    if (before_output) {
+        if (unlink(before_output) != 0) {
+            warn("unlink");
+        }
+    }
+
+    if (after_output) {
+        if (unlink(after_output) != 0) {
+            warn("unlink");
+        }
+    }
+
     list_free(before_changelog, free);
     list_free(after_changelog, free);
     free(before_nevr);
