@@ -785,7 +785,7 @@ int main(int argc, char **argv)
     /* add disk space requirements */
     hsz = human_size(ri->download_size);
     assert(hsz != NULL);
-    xasprintf(&tmp, _("Space required to download artifacts: %zu bytes (%s)\n"), ri->download_size, hsz);
+    xasprintf(&tmp, _("Space required to download artifacts: %lu bytes (%s)\n"), ri->download_size, hsz);
     assert(tmp != NULL);
     params.details = strappend(params.details, tmp, NULL);
     free(tmp);
@@ -793,7 +793,7 @@ int main(int argc, char **argv)
 
     hsz = human_size(ri->unpacked_size);
     assert(hsz != NULL);
-    xasprintf(&tmp, _("Space required to unpack artifacts: %zu bytes (%s)\n"), ri->unpacked_size, hsz);
+    xasprintf(&tmp, _("Space required to unpack artifacts: %lu bytes (%s)\n"), ri->unpacked_size, hsz);
     assert(tmp != NULL);
     params.details = strappend(params.details, tmp, NULL);
     free(tmp);
