@@ -358,6 +358,7 @@ int main(int argc, char **argv)
     rpmpeer_entry_t *peer = NULL;
     const char *after_rel = NULL;
     const char *before_rel = NULL;
+    char *hsz = NULL;
     struct result_params params;
     size_t cmdlen = 0;
     char *tail = NULL;
@@ -777,8 +778,27 @@ int main(int argc, char **argv)
     diags = gather_diags(ri, COMMAND_NAME, PACKAGE_VERSION);
 
     /* add version information to the results output */
-    xasprintf(&params.msg, _("Version information for libraries and programs used by %s.  This result is for informational and diagnostic purposes only."), COMMAND_NAME);
+    xasprintf(&params.msg, _("Version information for libraries and programs used by %s as well as storage requirements.  This result is for informational and diagnostic purposes only."), COMMAND_NAME);
     params.details = list_to_string(diags, "\n");
+    params.details = strappend(params.details, "\n\n", NULL);
+
+    /* add disk space requirements */
+    hsz = human_size(ri->download_size);
+    assert(hsz != NULL);
+    xasprintf(&tmp, _("Space required to download artifacts: %zu bytes (%s)\n"), ri->download_size, hsz);
+    assert(tmp != NULL);
+    params.details = strappend(params.details, tmp, NULL);
+    free(tmp);
+    free(hsz);
+
+    hsz = human_size(ri->unpacked_size);
+    assert(hsz != NULL);
+    xasprintf(&tmp, _("Space required to unpack artifacts: %zu bytes (%s)\n"), ri->unpacked_size, hsz);
+    assert(tmp != NULL);
+    params.details = strappend(params.details, tmp, NULL);
+    free(tmp);
+    free(hsz);
+
     add_result_entry(&ri->results, &params);
     free(params.msg);
     free(params.details);

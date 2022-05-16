@@ -686,6 +686,10 @@ struct rpminspect {
     char *after_rel;                /* after Release w/o ${?dist} */
     int rebase_build;               /* indicates if this is a rebased build */
 
+    /* local disk space requirements */
+    unsigned long int download_size;
+    unsigned long int unpacked_size;
+
     /* spec file macros */
     pair_list_t *macros;
 

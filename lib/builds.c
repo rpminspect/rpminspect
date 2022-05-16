@@ -58,8 +58,9 @@ static void set_worksubdir(struct rpminspect *, workdir_t, const struct koji_bui
 static void get_rpm_info(const char *);
 static void prune_local(const int);
 static int copytree(const char *, const struct stat *, int, struct FTW *);
-static int download_build(const struct rpminspect *, const struct koji_build *);
-static int download_task(const struct rpminspect *, struct koji_task *);
+static int download_build(struct rpminspect *, const struct koji_build *);
+static int download_task(struct rpminspect *, struct koji_task *);
+static int download_rpm(struct rpminspect *ri, const char *rpm);
 
 /*
  * Set the working subdirectory for this particular run based on whether
@@ -233,7 +234,7 @@ static int copytree(const char *fpath, const struct stat *sb, int tflag, struct 
  * Given a remote artifact specification in a Koji build, download it
  * to our working directory.
  */
-static int download_build(const struct rpminspect *ri, const struct koji_build *build)
+static int download_build(struct rpminspect *ri, const struct koji_build *build)
 {
     unsigned long avail = 0;
     char *availh = NULL;
@@ -275,6 +276,8 @@ static int download_build(const struct rpminspect *ri, const struct koji_build *
         free(needh);
         free(availh);
         return RI_INSUFFICIENT_SPACE;
+    } else {
+        ri->download_size += build->total_size;
     }
 
     /* Iterate over list of builds, each with a list of packages */
@@ -509,7 +512,7 @@ static int download_build(const struct rpminspect *ri, const struct koji_build *
  * Given a remote artifact specification in a Koji task, download it
  * to our working directory.
  */
-static int download_task(const struct rpminspect *ri, struct koji_task *task)
+static int download_task(struct rpminspect *ri, struct koji_task *task)
 {
     unsigned long avail = 0;
     char *availh = NULL;
@@ -570,6 +573,8 @@ static int download_task(const struct rpminspect *ri, struct koji_task *task)
         free(availh);
         free(needh);
         return RI_INSUFFICIENT_SPACE;
+    } else {
+        ri->download_size += task->total_size;
     }
 
     /* download the task */
@@ -658,7 +663,7 @@ static int download_task(const struct rpminspect *ri, struct koji_task *task)
 /*
  * Given a remote RPM, download it to our working directory.
  */
-static int download_rpm(const char *rpm)
+static int download_rpm(struct rpminspect *ri, const char *rpm)
 {
     unsigned long avail = 0;
     unsigned long rpmsize = 0;
@@ -685,6 +690,8 @@ static int download_rpm(const char *rpm)
         free(availh);
         free(needh);
         return RI_INSUFFICIENT_SPACE;
+    } else {
+        ri->download_size += rpmsize;
     }
 
     /* the RPM filename */
@@ -785,7 +792,7 @@ int gather_builds(struct rpminspect *ri, bool fo)
             prune_local(whichbuild);
         } else if (is_remote_rpm(ri->after)) {
             set_worksubdir(ri, LOCAL_WORKDIR, NULL, NULL);
-            r = download_rpm(ri->after);
+            r = download_rpm(ri, ri->after);
 
             if (r != RI_SUCCESS) {
                 return r;
@@ -837,7 +844,7 @@ int gather_builds(struct rpminspect *ri, bool fo)
         prune_local(whichbuild);
     } else if (is_remote_rpm(ri->before)) {
         set_worksubdir(ri, LOCAL_WORKDIR, NULL, NULL);
-        r = download_rpm(ri->before);
+        r = download_rpm(ri, ri->before);
 
         if (r != RI_SUCCESS) {
             return r;
