@@ -263,8 +263,9 @@ static bool runpath_driver(struct rpminspect *ri, rpmfile_entry_t *file)
 
     type = get_elf_type(elf);
 
+    /* From here on, we expect ET_EXEC or ET_DYN; ignore all other types */
     if (type != ET_EXEC && type != ET_DYN) {
-        result = false;
+        result = true;
         goto cleanup;
     }
 
@@ -326,7 +327,7 @@ cleanup:
  */
 bool inspect_runpath(struct rpminspect *ri)
 {
-    bool result;
+    bool result = true;
     struct result_params params;
 
     assert(ri != NULL);
