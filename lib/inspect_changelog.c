@@ -395,8 +395,6 @@ static bool check_bin_rpm_changelog(struct rpminspect *ri, const rpmpeer_entry_t
     }
 
     free(diff_output);
-    free(before_output);
-    free(after_output);
 
     /* Check for bad words */
     TAILQ_FOREACH(entry, after_changelog, items) {
@@ -427,6 +425,8 @@ static bool check_bin_rpm_changelog(struct rpminspect *ri, const rpmpeer_entry_t
         }
     }
 
+    free(before_output);
+    free(after_output);
     list_free(before_changelog, free);
     list_free(after_changelog, free);
     free(before_nevr);
