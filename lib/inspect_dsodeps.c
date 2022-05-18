@@ -88,8 +88,8 @@ static bool dsodeps_driver(struct rpminspect *ri, rpmfile_entry_t *file)
 
     after_type = get_elf_type(after_elf);
 
+    /* this inspection only operates on ET_DYN ELF types */
     if (after_type != ET_DYN) {
-        result = false;
         goto done;
     }
 
