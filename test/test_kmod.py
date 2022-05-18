@@ -172,8 +172,8 @@ class LostKmodParmsRPMs(TestCompareRPMs):
         )
 
         self.inspection = "kmod"
-        self.result = "VERIFY"
-        self.waiver_auth = "Anyone"
+        self.result = "INFO"
+        self.waiver_auth = "Not Waivable"
 
 
 # Verify kmod params are good between before and after Koji builds
@@ -212,8 +212,8 @@ class LostKmodParamsKoji(TestCompareKoji):
         )
 
         self.inspection = "kmod"
-        self.result = "VERIFY"
-        self.waiver_auth = "Anyone"
+        self.result = "INFO"
+        self.waiver_auth = "Not Waivable"
 
 
 #########################
@@ -256,8 +256,8 @@ class LostKmodDependsRPMs(TestCompareRPMs):
         )
 
         self.inspection = "kmod"
-        self.result = "VERIFY"
-        self.waiver_auth = "Anyone"
+        self.result = "INFO"
+        self.waiver_auth = "Not Waivable"
 
 
 # Verify kmod depends are good between before and after Koji builds
@@ -296,8 +296,8 @@ class LostKmodDependsKoji(TestCompareKoji):
         )
 
         self.inspection = "kmod"
-        self.result = "VERIFY"
-        self.waiver_auth = "Anyone"
+        self.result = "INFO"
+        self.waiver_auth = "Not Waivable"
 
 
 #########################
@@ -340,8 +340,8 @@ class LostKmodAliasesRPMs(TestCompareRPMs):
         )
 
         self.inspection = "kmod"
-        self.result = "VERIFY"
-        self.waiver_auth = "Anyone"
+        self.result = "INFO"
+        self.waiver_auth = "Not Waivable"
 
 
 # Verify kmod aliases are good between before and after Koji builds
@@ -380,8 +380,8 @@ class LostKmodAliasesKoji(TestCompareKoji):
         )
 
         self.inspection = "kmod"
-        self.result = "VERIFY"
-        self.waiver_auth = "Anyone"
+        self.result = "INFO"
+        self.waiver_auth = "Not Waivable"
 
 
 # Kernel module changing paths

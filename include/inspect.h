@@ -1448,7 +1448,7 @@ bool inspect_rpmdeps(struct rpminspect *ri);
  * The description for the 'kmod' inspection.  Only defined if
  * rpminspect is built with libkmod support.
  */
-#define DESC_KMOD _("Report kernel module parameter, dependency, PCI ID, or symbol differences between builds.  Added and removed parameters are reported and if the package version is unchanged, these messages are reported as failures.  The same is true module dependencies, PCI IDs, and symbols.")
+#define DESC_KMOD _("Report kernel module parameter, dependency, PCI ID, or symbol differences between builds.  This inspection is intended as an information gathering tool to gather kernel module differences between two builds.")
 #endif
 
 /**
