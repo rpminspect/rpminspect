@@ -28,6 +28,7 @@
 
 #include "rpminspect.h"
 
+static bool reported = false;
 static struct result_params params;
 
 static void lost_alias(const char *alias, const string_list_t *before_modules, const string_list_t *after_modules, void *user_data)
@@ -49,6 +50,7 @@ static void lost_alias(const char *alias, const string_list_t *before_modules, c
         params.file = entry->data;
         add_result(ri, &params);
         free(params.msg);
+        reported = true;
     }
 
     if (!TAILQ_EMPTY(after_modules)) {
@@ -58,6 +60,7 @@ static void lost_alias(const char *alias, const string_list_t *before_modules, c
             params.file = entry->data;
             add_result(ri, &params);
             free(params.msg);
+            reported = true;
         }
     }
 
@@ -86,7 +89,6 @@ static bool kmod_driver(struct rpminspect *ri, rpmfile_entry_t *file)
     const char *aftername = NULL;
     const char *beforever = NULL;
     const char *afterver = NULL;
-    severity_t oldsev;
 
     assert(ri != NULL);
     assert(file != NULL);
@@ -137,18 +139,12 @@ static bool kmod_driver(struct rpminspect *ri, rpmfile_entry_t *file)
     assert(beforever != NULL);
     assert(afterver != NULL);
 
-    if (!strcmp(beforename, aftername) && !strcmp(afterver, beforever)) {
-        /* Package name and version are the same, kmod params lost are bad */
-        params.severity = RESULT_VERIFY;
-        params.waiverauth = WAIVABLE_BY_ANYONE;
-    }
-
     /* Read in the kernel modules */
     kctx = kmod_new(NULL, NULL);
 
     if (kctx == NULL) {
         warn("kmod_new");
-        return false;
+        return true;
     }
 
     err = kmod_module_new_from_path(kctx, file->peer_file->fullpath, &beforekmod);
@@ -166,7 +162,7 @@ static bool kmod_driver(struct rpminspect *ri, rpmfile_entry_t *file)
 
     if (kctx == NULL) {
         warn("kmod_new");
-        return false;
+        return true;
     }
 
     err = kmod_module_new_from_path(kctx, file->fullpath, &afterkmod);
@@ -188,7 +184,7 @@ static bool kmod_driver(struct rpminspect *ri, rpmfile_entry_t *file)
         kmod_module_unref(beforekmod);
         kmod_module_unref(afterkmod);
         kmod_unref(kctx);
-        return false;
+        return true;
     }
 
     err = kmod_module_get_info(afterkmod, &afterinfo);
@@ -199,7 +195,7 @@ static bool kmod_driver(struct rpminspect *ri, rpmfile_entry_t *file)
         kmod_module_unref(beforekmod);
         kmod_module_unref(afterkmod);
         kmod_unref(kctx);
-        return false;
+        return true;
     }
 
     /* Compute lost and gained module parameters */
@@ -216,7 +212,7 @@ static bool kmod_driver(struct rpminspect *ri, rpmfile_entry_t *file)
             params.arch = get_rpm_header_arch(file->rpm_header);
             add_result(ri, &params);
             free(params.msg);
-            params.msg = NULL;
+            reported = true;
         }
 
         list_free(lost, free);
@@ -226,9 +222,6 @@ static bool kmod_driver(struct rpminspect *ri, rpmfile_entry_t *file)
     if (gain != NULL && !TAILQ_EMPTY(gain)) {
         TAILQ_FOREACH(entry, gain, items) {
             xasprintf(&params.msg, _("Kernel module %s adds parameter '%s' (was not present in %s)."), file->localpath, entry->data, file->peer_file->localpath);
-            oldsev = params.severity;
-            params.severity = RESULT_INFO;
-            params.waiverauth = NOT_WAIVABLE;
             params.remedy = NULL;
             params.verb = VERB_ADDED;
             params.noun = _("${FILE} kernel module parameter on ${ARCH}");
@@ -236,8 +229,7 @@ static bool kmod_driver(struct rpminspect *ri, rpmfile_entry_t *file)
             params.arch = get_rpm_header_arch(file->rpm_header);
             add_result(ri, &params);
             free(params.msg);
-            params.msg = NULL;
-            params.severity = oldsev;
+            reported = true;
         }
 
         list_free(gain, free);
@@ -258,7 +250,7 @@ static bool kmod_driver(struct rpminspect *ri, rpmfile_entry_t *file)
             params.arch = get_rpm_header_arch(file->rpm_header);
             add_result(ri, &params);
             free(params.msg);
-            params.msg = NULL;
+            reported = true;
         }
 
         list_free(lost, free);
@@ -274,7 +266,7 @@ static bool kmod_driver(struct rpminspect *ri, rpmfile_entry_t *file)
             params.file = file->localpath;
             add_result(ri, &params);
             free(params.msg);
-            params.msg = NULL;
+            reported = true;
         }
 
         list_free(gain, free);
@@ -298,7 +290,7 @@ static bool kmod_driver(struct rpminspect *ri, rpmfile_entry_t *file)
     free_module_aliases(afteraliases);
 
     DEBUG_PRINT("result_parm=%d, result_deps=%d, result_aliases=%d\n", result_parm, result_deps, result_aliases);
-    return result_parm && result_deps && result_aliases;
+    return true;
 }
 
 /*
@@ -319,7 +311,7 @@ bool inspect_kmod(struct rpminspect *ri)
     result = foreach_peer_file(ri, NAME_KMOD, kmod_driver);
 
     /* if everything was fine, just say so */
-    if (result) {
+    if (result && !reported) {
         params.severity = RESULT_OK;
         params.waiverauth = NOT_WAIVABLE;
         params.verb = VERB_OK;
