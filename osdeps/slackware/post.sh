@@ -13,7 +13,7 @@ git checkout -b "${TAG}" "${TAG}"
 mkdir build
 cd build || exit 1
 cmake -D ENABLE_MILTER=OFF \
-      -D ENABLE_JSON_SHARED=OFF \
+      -D ENABLE_JSON_SHARED=ON \
       -D CMAKE_INSTALL_PREFIX=/usr \
       -D CMAKE_INSTALL_LIBDIR=lib64 \
       -D APP_CONFIG_DIRECTORY=/etc/clamav \
