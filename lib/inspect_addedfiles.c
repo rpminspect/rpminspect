@@ -30,6 +30,7 @@
 
 #include "rpminspect.h"
 
+static bool reported = false;
 static char *remedy_addedfiles = NULL;
 
 /*
@@ -95,7 +96,6 @@ static bool addedfiles_driver(struct rpminspect *ri, rpmfile_entry_t *file)
     char *head = NULL;
     char *tail = NULL;
     const char *arch = NULL;
-    bool rebase = false;
     bool peer_new = false;
     string_entry_t *entry = NULL;
     struct result_params params;
@@ -133,9 +133,6 @@ static bool addedfiles_driver(struct rpminspect *ri, rpmfile_entry_t *file)
     /* The architecture is used in reporting messages */
     arch = get_rpm_header_arch(file->rpm_header);
 
-    /* Is this a rebased build or not? */
-    rebase = is_rebase(ri);
-
     /* Set up the result parameters */
     init_result_params(&params);
     params.severity = RESULT_BAD;
@@ -170,6 +167,7 @@ static bool addedfiles_driver(struct rpminspect *ri, rpmfile_entry_t *file)
                 params.noun = _("invalid directory ${FILE} on ${ARCH}");
                 add_result(ri, &params);
                 result = !(params.severity >= RESULT_VERIFY);
+                reported = true;
                 goto done;
             }
         }
@@ -183,6 +181,7 @@ static bool addedfiles_driver(struct rpminspect *ri, rpmfile_entry_t *file)
                 params.noun = _("invalid directory ${FILE} on ${ARCH}");
                 add_result(ri, &params);
                 result = !(params.severity >= RESULT_VERIFY);
+                reported = true;
                 goto done;
             }
         }
@@ -196,6 +195,7 @@ static bool addedfiles_driver(struct rpminspect *ri, rpmfile_entry_t *file)
                 params.noun = _("forbidden directory ${FILE} on ${ARCH}");
                 add_result(ri, &params);
                 result = !(params.severity >= RESULT_VERIFY);
+                reported = true;
                 free(head);
                 free(tail);
                 goto done;
@@ -232,6 +232,7 @@ static bool addedfiles_driver(struct rpminspect *ri, rpmfile_entry_t *file)
                     params.noun = _("new security-related file ${FILE} on ${ARCH}");
                     add_result(ri, &params);
                     result = !(params.severity >= RESULT_VERIFY);
+                    reported = true;
                 } else {
                     result = true;
                 }
@@ -251,20 +252,13 @@ static bool addedfiles_driver(struct rpminspect *ri, rpmfile_entry_t *file)
      * Report that a new file has been added in a build comparison.
      */
     if ((ri->tests & INSPECT_ADDEDFILES) && (ri->before != NULL && file->peer_file == NULL)) {
-        if (rebase) {
-            params.severity = RESULT_INFO;
-            params.waiverauth = NOT_WAIVABLE;
-            params.verb = VERB_OK;
-        } else {
-            params.severity = RESULT_VERIFY;
-            params.waiverauth = WAIVABLE_BY_ANYONE;
-            params.verb = VERB_ADDED;
-        }
-
+        params.severity = RESULT_INFO;
+        params.waiverauth = NOT_WAIVABLE;
+        params.verb = VERB_OK;
         xasprintf(&params.msg, _("`%s` added on %s in %s"), file->localpath, arch, name);
         params.noun = _("new file ${FILE} on ${ARCH}");
         add_result(ri, &params);
-        result = !(params.severity >= RESULT_VERIFY);
+        reported = true;
     }
 
 done:
@@ -283,7 +277,7 @@ bool inspect_addedfiles(struct rpminspect *ri)
     result = foreach_peer_file(ri, NAME_ADDEDFILES, addedfiles_driver);
     free(remedy_addedfiles);
 
-    if (result) {
+    if (result && !reported) {
         init_result_params(&params);
         params.severity = RESULT_OK;
         params.waiverauth = NOT_WAIVABLE;
