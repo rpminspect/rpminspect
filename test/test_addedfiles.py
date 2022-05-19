@@ -326,8 +326,8 @@ class NewFileMaintBuildCompareRPMs(TestCompareRPMs):
         )
 
         self.inspection = "addedfiles"
-        self.result = "VERIFY"
-        self.waiver_auth = "Anyone"
+        self.result = "INFO"
+        self.waiver_auth = "Not Waivable"
 
 
 class NewFileMaintBuildCompareKoji(TestCompareKoji):
@@ -339,8 +339,8 @@ class NewFileMaintBuildCompareKoji(TestCompareKoji):
         )
 
         self.inspection = "addedfiles"
-        self.result = "VERIFY"
-        self.waiver_auth = "Anyone"
+        self.result = "INFO"
+        self.waiver_auth = "Not Waivable"
 
 
 # New file shows up in after build for rebase comparison -> INFO
