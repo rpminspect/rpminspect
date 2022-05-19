@@ -26,6 +26,8 @@
 
 #include "rpminspect.h"
 
+static bool reported = false;
+
 /* Trim workdir substrings from a generated string. */
 static char *trim_workdir(const rpmfile_entry_t *file, char *s)
 {
@@ -116,7 +118,7 @@ static bool annocheck_driver(struct rpminspect *ri, rpmfile_entry_t *file)
     /* Only run this check on ELF files */
     if (!is_elf_file(file->fullpath)
         || (!is_elf_file(file->fullpath) && file->peer_file && !is_elf_file(file->peer_file->fullpath))) {
-        return result;
+        return true;
     }
 
     /* Set up the result parameters */
@@ -153,12 +155,12 @@ static bool annocheck_driver(struct rpminspect *ri, rpmfile_entry_t *file)
                 xasprintf(&params.msg, _("annocheck '%s' test now fails for %s on %s"), hentry->key, file->localpath, arch);
                 params.severity = ri->annocheck_failure_severity;
                 params.verb = VERB_CHANGED;
-                result = false;
+                result = !(ri->annocheck_failure_severity >= RESULT_VERIFY);
             } else if (after_exit) {
                 xasprintf(&params.msg, _("annocheck '%s' test fails for %s on %s"), hentry->key, file->localpath, arch);
                 params.severity = ri->annocheck_failure_severity;
                 params.verb = VERB_CHANGED;
-                result = false;
+                result = !(ri->annocheck_failure_severity >= RESULT_VERIFY);
             }
         } else {
             if (after_exit == 0) {
@@ -167,7 +169,7 @@ static bool annocheck_driver(struct rpminspect *ri, rpmfile_entry_t *file)
                 xasprintf(&params.msg, _("annocheck '%s' test fails for %s on %s"), hentry->key, file->localpath, arch);
                 params.severity = ri->annocheck_failure_severity;
                 params.verb = VERB_CHANGED;
-                result = false;
+                result = !(ri->annocheck_failure_severity >= RESULT_VERIFY);
             }
         }
 
@@ -186,6 +188,7 @@ static bool annocheck_driver(struct rpminspect *ri, rpmfile_entry_t *file)
 
             params.details = details;
             add_result(ri, &params);
+            reported = true;
             free(params.msg);
         }
 
@@ -212,7 +215,8 @@ static bool annocheck_driver(struct rpminspect *ri, rpmfile_entry_t *file)
 
                     if (params.severity != RESULT_NULL && params.severity != RESULT_SKIP) {
                         add_result(ri, &params);
-                        result = false;
+                        reported = true;
+                        result = !(params.severity >= RESULT_VERIFY);
                     }
 
                     break;
@@ -257,7 +261,7 @@ bool inspect_annocheck(struct rpminspect *ri)
     result = foreach_peer_file(ri, NAME_ANNOCHECK, annocheck_driver);
 
     /* if everything was fine, just say so */
-    if (result) {
+    if (result && !reported) {
         init_result_params(&params);
         params.severity = RESULT_OK;
         params.waiverauth = NOT_WAIVABLE;
