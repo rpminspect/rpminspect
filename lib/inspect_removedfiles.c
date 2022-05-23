@@ -31,6 +31,7 @@
 #include "rpminspect.h"
 
 static bool rebase = false;
+static bool reported = false;
 
 static void add_removedfiles_result(struct rpminspect *ri, struct result_params *params)
 {
@@ -42,6 +43,7 @@ static void add_removedfiles_result(struct rpminspect *ri, struct result_params 
     }
 
     add_result(ri, params);
+    reported = true;
     return;
 }
 
@@ -56,6 +58,7 @@ static bool removedfiles_driver(struct rpminspect *ri, rpmfile_entry_t *file)
     const char *arch = NULL;
     char *soname = NULL;
     string_entry_t *entry = NULL;
+    security_entry_t *sentry = NULL;
     struct result_params params;
 
     /* Any entry with a peer has not been removed. */
@@ -87,6 +90,9 @@ static bool removedfiles_driver(struct rpminspect *ri, rpmfile_entry_t *file)
     type = get_mime_type(file);
     arch = get_rpm_header_arch(file->rpm_header);
 
+    /* Get any possible security rule for this path */
+    sentry = get_secrule_by_path(ri, file);
+
     /* Set up result parameters */
     init_result_params(&params);
     params.header = NAME_REMOVEDFILES;
@@ -113,14 +119,24 @@ static bool removedfiles_driver(struct rpminspect *ri, rpmfile_entry_t *file)
      * File has been removed, report results.
      */
     if (params.waiverauth == WAIVABLE_BY_SECURITY || (ri->tests & INSPECT_REMOVEDFILES)) {
-        if (rebase) {
+        params.remedy = REMEDY_REMOVEDFILES;
+
+        if (sentry) {
+            params.severity = get_secrule_result_severity(ri, file, SECRULE_SECURITYPATH);
+        } else {
             params.severity = RESULT_INFO;
+        }
+
+        if (params.severity <= RESULT_INFO) {
             params.waiverauth = NOT_WAIVABLE;
             params.verb = VERB_OK;
         } else {
-            params.severity = get_secrule_result_severity(ri, file, SECRULE_SECURITYPATH);
-            params.waiverauth = WAIVABLE_BY_ANYONE;
-            params.remedy = REMEDY_REMOVEDFILES;
+            if (sentry) {
+                params.waiverauth = WAIVABLE_BY_SECURITY;
+            } else {
+                params.waiverauth = WAIVABLE_BY_ANYONE;
+            }
+
             params.verb = VERB_FAILED;
         }
 
@@ -194,7 +210,7 @@ bool inspect_removedfiles(struct rpminspect *ri)
         }
     }
 
-    if (result) {
+    if (result && !reported) {
         init_result_params(&params);
         params.severity = RESULT_OK;
         params.waiverauth = NOT_WAIVABLE;
