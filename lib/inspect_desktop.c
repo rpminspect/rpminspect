@@ -48,8 +48,11 @@ static int find_file(const char *fpath, __attribute__((unused)) const struct sta
 {
     int i = 0;
     char *bn = NULL;
+    char *tmp = NULL;
     char *last = NULL;
     char *tmpicon = NULL;
+    string_list_t *list = NULL;
+    string_entry_t *entry = NULL;
 
     /* Only looking at regular files */
     /*
@@ -68,10 +71,39 @@ static int find_file(const char *fpath, __attribute__((unused)) const struct sta
 
 
     /* Look for this name as the basename */
-    if (filetype == FILETYPE_EXECUTABLE && strsuffix(fpath, file_to_find)) {
-        free(file_to_find);
-        file_to_find = strdup(fpath);
-        return 1;
+    if (filetype == FILETYPE_EXECUTABLE) {
+        list = strsplit(file_to_find, " ");
+
+        if (list != NULL && !TAILQ_EMPTY(list)) {
+            TAILQ_FOREACH_REVERSE(entry, list, string_entry_s, items) {
+                /* safety check */
+                if (entry->data == NULL) {
+                    continue;
+                }
+
+                /* skip desktop spec params and any variables */
+                if (strchr(entry->data, '%') || strchr(entry->data, '=')) {
+                    continue;
+                }
+
+                if (*entry->data == '/') {
+                    tmp = strdup(entry->data);
+                } else {
+                    /* everything else would be in /usr/bin */
+                    xasprintf(&tmp, "/usr/bin/%s", entry->data);
+                }
+
+                /* actual check */
+                if (strsuffix(fpath, tmp)) {
+                    free(file_to_find);
+                    file_to_find = strdup(fpath);
+                    list_free(list, free);
+                    return 1;
+                }
+            }
+        }
+
+        list_free(list, free);
     }
 
     /* Might be a base name missing a graphics format ending */
@@ -163,7 +195,6 @@ static bool validate_desktop_contents(struct rpminspect *ri, const rpmfile_entry
     char *buf = NULL;
     char *tmp = NULL;
     const char *arch = NULL;
-    char *exectoken = NULL;
     struct stat sb;
     bool found = false;
     rpmpeer_entry_t *peer = NULL;
@@ -211,50 +242,20 @@ static bool validate_desktop_contents(struct rpminspect *ri, const rpmfile_entry
         filetype = FILETYPE_NULL;
 
         if (strprefix(buf, "Exec=")) {
-            /* Take everything after the key and trim newlines */
-            tmp = buf + 5;
-            tmp[strcspn(tmp, "\n")] = 0;
-
-            /* The Exec line may specify arguments to the program, strip those */
-            exectoken = index(tmp, ' ');
-
-            if (exectoken != NULL) {
-                *exectoken = '\0';
-            }
-
-            key_exec = tmp;
+            key_exec = buf + 5;
         } else if (strprefix(buf, "Icon=")) {
             tmp = buf + 5;
             tmp[strcspn(tmp, "\n")] = 0;
 
             key_icon = tmp;
         } else if (strprefix(buf, "TryExec=")) {
-            /* Take everything after the key and trim newlines */
-            tmp = buf + 8;
-            tmp[strcspn(tmp, "\n")] = 0;
-
-            /* The TryExec line may specify arguments to the program, strip those */
-            exectoken = index(tmp, ' ');
-
-            if (exectoken != NULL) {
-                *exectoken = '\0';
-            }
-
-            key_tryexec = tmp;
+            key_tryexec = buf + 8;
         }
     }
 
     if (key_exec != NULL) {
         filetype = FILETYPE_EXECUTABLE;
-
-        /* Figure out how to look for the file */
-        if (*key_exec == '/') {
-            /* value is absolute, take as-is */
-            file_to_find = strdup(key_exec);
-        } else {
-            /* everything else would be in /usr/bin */
-            xasprintf(&file_to_find, "/usr/bin/%s", key_exec);
-        }
+        file_to_find = strdup(key_exec);
 
         TAILQ_FOREACH(peer, ri->peers, items) {
             /*
