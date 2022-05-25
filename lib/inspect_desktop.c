@@ -69,7 +69,6 @@ static int find_file(const char *fpath, __attribute__((unused)) const struct sta
         return 0;
     }
 
-
     /* Look for this name as the basename */
     if (filetype == FILETYPE_EXECUTABLE) {
         list = strsplit(file_to_find, " ");
@@ -98,8 +97,11 @@ static int find_file(const char *fpath, __attribute__((unused)) const struct sta
                     free(file_to_find);
                     file_to_find = strdup(fpath);
                     list_free(list, free);
+                    free(tmp);
                     return 1;
                 }
+
+                free(tmp);
             }
         }
 
