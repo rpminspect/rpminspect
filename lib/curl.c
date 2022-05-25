@@ -33,6 +33,7 @@ volatile sig_atomic_t terminal_resized = 0;
 
 /* Local global variables */
 static size_t total_width = 0;
+static size_t half_width = 0;
 static size_t bar_width = 0;
 static curl_off_t progress_displayed = 0;
 static size_t progress_msg_len = 0;
@@ -44,14 +45,16 @@ static size_t progress_msg_len = 0;
  */
 static void setup_progress_bar(const char *src)
 {
-    size_t half_width = 0;
     char *archive = NULL;
     char *vmsg = NULL;
 
     /* terminal width and progress bar width */
-    total_width = tty_width();
-    half_width = total_width / 2;
-    bar_width = half_width - 2;       /* account for '[' and ']' */
+    if (total_width == 0) {
+        total_width = tty_width();
+        half_width = total_width / 2;
+        bar_width = half_width - 2;       /* account for '[' and ']' */
+    }
+
     progress_displayed = 0;
 
     /* generate the verbose message string */
@@ -129,6 +132,7 @@ static int download_progress(__attribute__((unused)) void *p, curl_off_t dltotal
      */
     if (terminal_resized == 1) {
         /* reposition the progress bar */
+        total_width = 0;
         setup_progress_bar(NULL);
 
         /* reset for the next change */
