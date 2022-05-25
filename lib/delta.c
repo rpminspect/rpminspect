@@ -115,25 +115,27 @@ static int delta_out(void *priv, mmbuffer_t *mb, int nbuf)
                     prefix = "-";
                     break;
             }
+
+            continue;
         }
 
         /* capture the line */
         entry = calloc(1, sizeof(*entry));
         assert(entry != NULL);
 
-        if ((mb[i].size > 1) && mb[i].ptr) {
+        if ((mb[i].size > 1) && mb[i].ptr != NULL) {
             if (prefix) {
                 xasprintf(&entry->data, "%s%s", prefix, mb[i].ptr);
             } else {
-                entry->data = strdup(mb[i].ptr);
+                entry->data = calloc(1, mb[i].size + 1);
+                assert(entry->data != NULL);
+                entry->data = strncpy(entry->data, mb[i].ptr, mb[i].size);
             }
-
-            assert(entry->data != NULL);
         } else {
             entry->data = strdup("");
-            assert(entry->data != NULL);
         }
 
+        assert(entry->data != NULL);
         entry->data[strcspn(entry->data, "\n")] = '\0';
         entry->data = realloc(entry->data, strlen(entry->data) + 1);
         TAILQ_INSERT_TAIL(list, entry, items);
