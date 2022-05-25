@@ -95,6 +95,7 @@ static bool changedfiles_driver(struct rpminspect *ri, rpmfile_entry_t *file)
 {
     int flags = O_RDONLY | O_CLOEXEC;
     const char *arch = NULL;
+    char *nvr = NULL;
     char *type = NULL;
     char *before_sum = NULL;
     char *after_sum = NULL;
@@ -300,9 +301,13 @@ static bool changedfiles_driver(struct rpminspect *ri, rpmfile_entry_t *file)
             }
 
             /* the files are different, report */
-            xasprintf(&params.msg, _("Compressed %s file %s changed content on %s."), comptype, file->localpath, arch);
+            nvr = get_nevr(file->rpm_header);
+            xasprintf(&params.msg, _("Compressed %s file %s changed content in %s on %s."), comptype, file->localpath, nvr, arch);
             params.verb = VERB_CHANGED;
             params.noun = file->localpath;
+            add_result(ri, &params);
+            free(nvr);
+            reported = true;
         }
 
         /* cleanup */
@@ -329,13 +334,14 @@ static bool changedfiles_driver(struct rpminspect *ri, rpmfile_entry_t *file)
         params.details = run_and_capture(ri->workdir, &after_tmp, ri->commands.msgunfmt, file->fullpath, &exitcode);
 
         if (exitcode) {
-            xasprintf(&params.msg, _("Error running msgunfmt on %s on %s"), file->localpath, arch);
+            nvr = get_nevr(file->rpm_header);
+            xasprintf(&params.msg, _("Error running msgunfmt on %s in %s on %s; malformed mo file?"), file->localpath, nvr, arch);
             params.severity = RESULT_BAD;
-            params.waiverauth = NOT_WAIVABLE;
             params.remedy = REMEDY_CHANGEDFILES;
             params.verb = VERB_FAILED;
             params.noun = _("msgunfmt on ${FILE}");
             add_result(ri, &params);
+            free(nvr);
             reported = true;
             goto done;
         }
@@ -343,13 +349,14 @@ static bool changedfiles_driver(struct rpminspect *ri, rpmfile_entry_t *file)
         params.details = run_and_capture(ri->workdir, &before_tmp, ri->commands.msgunfmt, file->peer_file->fullpath, &exitcode);
 
         if (exitcode) {
-            xasprintf(&params.msg, _("Error running msgunfmt on %s on %s"), file->peer_file->localpath, arch);
+            nvr = get_nevr(file->peer_file->rpm_header);
+            xasprintf(&params.msg, _("Error running msgunfmt on %s in %s on %s; malformed mo file?"), file->peer_file->localpath, nvr, arch);
             params.severity = RESULT_BAD;
-            params.waiverauth = NOT_WAIVABLE;
             params.remedy = REMEDY_CHANGEDFILES;
             params.verb = VERB_FAILED;
             params.noun = _("msgunfmt on ${FILE}");
             add_result(ri, &params);
+            free(nvr);
             reported = true;
             goto done;
         }
@@ -367,13 +374,14 @@ static bool changedfiles_driver(struct rpminspect *ri, rpmfile_entry_t *file)
         }
 
         if (params.details) {
-            xasprintf(&params.msg, _("Message catalog %s changed content on %s"), file->localpath, arch);
-            params.severity = RESULT_VERIFY;
-            params.waiverauth = WAIVABLE_BY_ANYONE;
+            nvr = get_nevr(file->rpm_header);
+            xasprintf(&params.msg, _("Message catalog %s changed content in %s on %s"), file->localpath, nvr, arch);
+            params.severity = RESULT_INFO;
             params.remedy = REMEDY_CHANGEDFILES;
             params.verb = VERB_CHANGED;
             params.noun = _("${FILE}");
             add_result(ri, &params);
+            free(nvr);
             reported = true;
             goto done;
         }
@@ -424,20 +432,14 @@ static bool changedfiles_driver(struct rpminspect *ri, rpmfile_entry_t *file)
                 }
             }
 
-            if (rebase) {
-                xasprintf(&params.msg, _("Public header file %s changed content on %s.  A unified diff of the changes follows."), file->localpath, arch);
-                params.severity = RESULT_INFO;
-                params.waiverauth = NOT_WAIVABLE;
-            } else {
-                xasprintf(&params.msg, _("Public header file %s changed content on %s.  Please make sure this does not change the ABI exported by this package.  A unified diff of the changes follows."), file->localpath, arch);
-                params.severity = RESULT_VERIFY;
-                params.waiverauth = WAIVABLE_BY_ANYONE;
-            }
-
+            nvr = get_nevr(file->rpm_header);
+            xasprintf(&params.msg, _("Public header file %s changed content in %s on %s.  A unified diff of the changes follows."), file->localpath, nvr, arch);
+            params.severity = RESULT_INFO;
             params.details = short_errors;
             params.verb = VERB_CHANGED;
             params.noun = _("${FILE}");
             add_result(ri, &params);
+            free(nvr);
             reported = true;
 
             /* details is not allocated here, freeing errors will take care of it */
@@ -453,12 +455,13 @@ static bool changedfiles_driver(struct rpminspect *ri, rpmfile_entry_t *file)
         after_sum = checksum(file);
 
         if (before_sum && after_sum && strcmp(before_sum, after_sum)) {
-            xasprintf(&params.msg, _("File %s changed content on %s.  Please verify this change was deliberate for a non-rebased build."), file->localpath, arch);
+            nvr = get_nevr(file->rpm_header);
+            xasprintf(&params.msg, _("File %s changed content in %s on %s."), file->localpath, nvr, arch);
             params.severity = RESULT_INFO;
-            params.waiverauth = WAIVABLE_BY_ANYONE;
             params.verb = VERB_CHANGED;
             params.noun = _("${FILE}");
             add_changedfiles_result(ri, &params);
+            free(nvr);
         }
     }
 

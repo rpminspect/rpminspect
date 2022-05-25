@@ -292,9 +292,9 @@
 /**
  * @def REMEDY_CHANGEDFILES
  *
- * How to handle unexpected file changes.
+ * How to handle file changes.
  */
-#define REMEDY_CHANGEDFILES _("Unexpected file changes were found.  Verify these changes are correct.  If they are not, adjust the build to prevent file changes.")
+#define REMEDY_CHANGEDFILES _("File changes were found.  In most cases these are expected, but it is a good idea to verify the changes found are deliberate.")
 
 /** @} */
 
