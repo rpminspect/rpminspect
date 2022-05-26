@@ -261,6 +261,10 @@ static int download_build(struct rpminspect *ri, const struct koji_build *build)
     assert(build != NULL);
     assert(build->builds != NULL);
 
+    if (build->total_size == 0) {
+        return -1;
+    }
+
     /* Check to see that there's enough disk space available */
     avail = get_available_space(workri->workdir);
 
@@ -558,6 +562,11 @@ static int download_task(struct rpminspect *ri, struct koji_task *task)
         }
     }
 
+    /* zero size means a read error */
+    if (task->total_size == 0) {
+        return -1;
+    }
+
     /* Check to see that there's enough disk space available */
     avail = get_available_space(workri->workdir);
 
@@ -677,6 +686,11 @@ static int download_rpm(struct rpminspect *ri, const char *rpm)
 
     /* Check to see that there's enough disk space available */
     rpmsize = curl_get_size(rpm);
+
+    if (rpmsize == 0) {
+        return -1;
+    }
+
     avail = get_available_space(workri->workdir);
 
     if (avail < rpmsize) {

@@ -266,7 +266,8 @@ curl_off_t curl_get_size(const char *src)
     cc = curl_easy_perform(c);
 
     if (cc != CURLE_OK) {
-        warn("curl_easy_perform");
+        warnx("unable to read %s", src);
+        return 0;
     }
 
 #ifdef CURLINFO_CONTENT_LENGTH_DOWNLOAD_T
@@ -294,15 +295,11 @@ bool is_remote_rpm(const char *url)
     c = curl_easy_init();
 
     if (c) {
-      curl_easy_setopt(c, CURLOPT_URL, url);
+        curl_easy_setopt(c, CURLOPT_URL, url);
         curl_easy_setopt(c, CURLOPT_NOBODY, 1);
         r = curl_easy_perform(c);
         curl_easy_cleanup(c);
     }
 
-    if (r == CURLE_OK) {
-      return true;
-    } else {
-        return false;
-    }
+    return (r == CURLE_OK);
 }
