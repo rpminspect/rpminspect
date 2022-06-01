@@ -46,12 +46,18 @@ static bool permissions_driver(struct rpminspect *ri, rpmfile_entry_t *file)
         return true;
     }
 
+    /* Ignore debuginfo and debugsource packages */
+    if (strprefix(file->localpath, DEBUG_PATH) || strprefix(file->localpath, DEBUG_SRC_PATH)) {
+        return true;
+    }
+
     /* We need the architecture for reporting */
     arch = get_rpm_header_arch(file->rpm_header);
 
     /* Set up result parameters */
     init_result_params(&params);
-    params.severity = RESULT_VERIFY;
+    params.severity = RESULT_INFO;
+    params.waiverauth = NOT_WAIVABLE;
     params.header = NAME_PERMISSIONS;
     params.arch = arch;
     params.file = file->localpath;
@@ -72,17 +78,20 @@ static bool permissions_driver(struct rpminspect *ri, rpmfile_entry_t *file)
     /* if setuid/setgid or new mode is more open */
     if (mode_diff && file->peer_file && !allowed && (ri->tests & INSPECT_PERMISSIONS)) {
         if (!(before_mode & (S_ISUID|S_ISGID)) && (after_mode & (S_ISUID|S_ISGID))) {
-            params.severity = RESULT_BAD;
+            params.severity = RESULT_VERIFY;
             what = _("changed setuid/setgid");
         } else if (S_ISDIR(file->st.st_mode) && !S_ISLNK(file->st.st_mode)) {
             if (((mode_diff & S_ISVTX) && !(after_mode & S_ISVTX)) || ((after_mode & mode_diff) != 0)) {
-                params.severity = RESULT_BAD;
+                params.severity = RESULT_VERIFY;
                 what = _("relaxed");
             }
         }
 
+        if (params.severity >= RESULT_VERIFY) {
+            params.waiverauth = WAIVABLE_BY_ANYONE;
+        }
+
         xasprintf(&params.msg, _("%s %s permissions from %04o to %04o on %s"), file->localpath, what, before_mode, after_mode, arch);
-        params.waiverauth = WAIVABLE_BY_ANYONE;
         params.verb = VERB_CHANGED;
         xasprintf(&noun, _("${FILE} permissions from %04o to %04o on ${ARCH}"), before_mode, after_mode);
         params.noun = noun;
