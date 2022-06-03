@@ -67,8 +67,8 @@ class ChangedTypeCompareSRPM(TestCompareSRPM):
         )
 
         self.inspection = "types"
-        self.result = "VERIFY"
-        self.waiver_auth = "Anyone"
+        self.result = "INFO"
+        self.waiver_auth = "Not Waivable"
 
 
 class ChangedTypeCompareRPMs(TestCompareRPMs):
@@ -84,8 +84,8 @@ class ChangedTypeCompareRPMs(TestCompareRPMs):
         )
 
         self.inspection = "types"
-        self.result = "VERIFY"
-        self.waiver_auth = "Anyone"
+        self.result = "INFO"
+        self.waiver_auth = "Not Waivable"
 
 
 class ChangedTypeCompareKoji(TestCompareKoji):
@@ -101,5 +101,5 @@ class ChangedTypeCompareKoji(TestCompareKoji):
         )
 
         self.inspection = "types"
-        self.result = "VERIFY"
-        self.waiver_auth = "Anyone"
+        self.result = "INFO"
+        self.waiver_auth = "Not Waivable"
