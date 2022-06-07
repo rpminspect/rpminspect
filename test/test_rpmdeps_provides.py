@@ -167,7 +167,7 @@ class GainingProvidesRebaseCompareKoji(TestCompareKoji):
         self.waiver_auth = "Not Waivable"
 
 
-# Gaining a new Provides in a maint comparison (VERIFY)
+# Gaining a new Provides in a maint comparison
 class GainingProvidesCompareRPMs(TestCompareRPMs):
     def setUp(self):
         super().setUp()
@@ -175,8 +175,8 @@ class GainingProvidesCompareRPMs(TestCompareRPMs):
         self.after_rpm.add_provides(after_provides)
 
         self.inspection = "rpmdeps"
-        self.result = "VERIFY"
-        self.waiver_auth = "Anyone"
+        self.result = "INFO"
+        self.waiver_auth = "Not Waivable"
 
 
 class GainingProvidesCompareKoji(TestCompareKoji):
@@ -186,8 +186,8 @@ class GainingProvidesCompareKoji(TestCompareKoji):
         self.after_rpm.add_provides(after_provides)
 
         self.inspection = "rpmdeps"
-        self.result = "VERIFY"
-        self.waiver_auth = "Anyone"
+        self.result = "INFO"
+        self.waiver_auth = "Not Waivable"
 
 
 # Changing a Provides in a rebase comparison (INFO)
@@ -215,7 +215,7 @@ class ChangingProvidesRebaseCompareKoji(TestCompareKoji):
         self.waiver_auth = "Not Waivable"
 
 
-# Changing a Provides in a maint comparison (VERIFY)
+# Changing a Provides in a maint comparison
 class ChangingProvidesCompareRPMs(TestCompareRPMs):
     def setUp(self):
         super().setUp()
@@ -224,8 +224,8 @@ class ChangingProvidesCompareRPMs(TestCompareRPMs):
         self.after_rpm.add_provides(after_provides)
 
         self.inspection = "rpmdeps"
-        self.result = "VERIFY"
-        self.waiver_auth = "Anyone"
+        self.result = "INFO"
+        self.waiver_auth = "Not Waivable"
 
 
 class ChangingProvidesCompareKoji(TestCompareKoji):
@@ -236,8 +236,8 @@ class ChangingProvidesCompareKoji(TestCompareKoji):
         self.after_rpm.add_provides(after_provides)
 
         self.inspection = "rpmdeps"
-        self.result = "VERIFY"
-        self.waiver_auth = "Anyone"
+        self.result = "INFO"
+        self.waiver_auth = "Not Waivable"
 
 
 # Changing a Provides in a maint comparison due to NVR (INFO)
@@ -292,7 +292,7 @@ class LosingProvidesRebaseCompareKoji(TestCompareKoji):
         self.waiver_auth = "Not Waivable"
 
 
-# Losing a Provides in a maint comparison (VERIFY)
+# Losing a Provides in a maint comparison
 class LosingProvidesCompareRPMs(TestCompareRPMs):
     def setUp(self):
         super().setUp()
@@ -300,8 +300,8 @@ class LosingProvidesCompareRPMs(TestCompareRPMs):
         self.before_rpm.add_provides(before_provides)
 
         self.inspection = "rpmdeps"
-        self.result = "VERIFY"
-        self.waiver_auth = "Anyone"
+        self.result = "INFO"
+        self.waiver_auth = "Not Waivable"
 
 
 class LosingProvidesCompareKoji(TestCompareKoji):
@@ -311,8 +311,8 @@ class LosingProvidesCompareKoji(TestCompareKoji):
         self.before_rpm.add_provides(before_provides)
 
         self.inspection = "rpmdeps"
-        self.result = "VERIFY"
-        self.waiver_auth = "Anyone"
+        self.result = "INFO"
+        self.waiver_auth = "Not Waivable"
 
 
 # Missing Epoch prefix on maint compare (BAD for Koji compares, OK
@@ -708,7 +708,7 @@ class UnexpandedMacroProvidesCompareKoji(TestCompareKoji):
         self.waiver_auth = "Anyone"
 
 
-# Missing explicit Provides (VERIFY)
+# Missing explicit Provides
 class MissingExplicitProvidesSRPM(TestSRPM):
     def setUp(self):
         super().setUp()
