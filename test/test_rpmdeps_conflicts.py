@@ -167,7 +167,7 @@ class GainingConflictsRebaseCompareKoji(TestCompareKoji):
         self.waiver_auth = "Not Waivable"
 
 
-# Gaining a new Conflicts in a maint comparison (VERIFY)
+# Gaining a new Conflicts in a maint comparison
 class GainingConflictsCompareRPMs(TestCompareRPMs):
     def setUp(self):
         super().setUp()
@@ -175,8 +175,8 @@ class GainingConflictsCompareRPMs(TestCompareRPMs):
         self.after_rpm.add_conflicts(after_conflicts)
 
         self.inspection = "rpmdeps"
-        self.result = "VERIFY"
-        self.waiver_auth = "Anyone"
+        self.result = "INFO"
+        self.waiver_auth = "Not Waivable"
 
 
 class GainingConflictsCompareKoji(TestCompareKoji):
@@ -186,8 +186,8 @@ class GainingConflictsCompareKoji(TestCompareKoji):
         self.after_rpm.add_conflicts(after_conflicts)
 
         self.inspection = "rpmdeps"
-        self.result = "VERIFY"
-        self.waiver_auth = "Anyone"
+        self.result = "INFO"
+        self.waiver_auth = "Not Waivable"
 
 
 # Changing a Conflicts in a rebase comparison (INFO)
@@ -215,7 +215,7 @@ class ChangingConflictsRebaseCompareKoji(TestCompareKoji):
         self.waiver_auth = "Not Waivable"
 
 
-# Changing a Conflicts in a maint comparison (VERIFY)
+# Changing a Conflicts in a maint comparison
 class ChangingConflictsCompareRPMs(TestCompareRPMs):
     def setUp(self):
         super().setUp()
@@ -224,8 +224,8 @@ class ChangingConflictsCompareRPMs(TestCompareRPMs):
         self.after_rpm.add_conflicts(after_conflicts)
 
         self.inspection = "rpmdeps"
-        self.result = "VERIFY"
-        self.waiver_auth = "Anyone"
+        self.result = "INFO"
+        self.waiver_auth = "Not Waivable"
 
 
 class ChangingConflictsCompareKoji(TestCompareKoji):
@@ -236,8 +236,8 @@ class ChangingConflictsCompareKoji(TestCompareKoji):
         self.after_rpm.add_conflicts(after_conflicts)
 
         self.inspection = "rpmdeps"
-        self.result = "VERIFY"
-        self.waiver_auth = "Anyone"
+        self.result = "INFO"
+        self.waiver_auth = "Not Waivable"
 
 
 # Changing a Conflicts in a maint comparison due to NVR (INFO)
@@ -292,7 +292,7 @@ class LosingConflictsRebaseCompareKoji(TestCompareKoji):
         self.waiver_auth = "Not Waivable"
 
 
-# Losing a Conflicts in a maint comparison (VERIFY)
+# Losing a Conflicts in a maint comparison
 class LosingConflictsCompareRPMs(TestCompareRPMs):
     def setUp(self):
         super().setUp()
@@ -300,8 +300,8 @@ class LosingConflictsCompareRPMs(TestCompareRPMs):
         self.before_rpm.add_conflicts(before_conflicts)
 
         self.inspection = "rpmdeps"
-        self.result = "VERIFY"
-        self.waiver_auth = "Anyone"
+        self.result = "INFO"
+        self.waiver_auth = "Not Waivable"
 
 
 class LosingConflictsCompareKoji(TestCompareKoji):
@@ -311,8 +311,8 @@ class LosingConflictsCompareKoji(TestCompareKoji):
         self.before_rpm.add_conflicts(before_conflicts)
 
         self.inspection = "rpmdeps"
-        self.result = "VERIFY"
-        self.waiver_auth = "Anyone"
+        self.result = "INFO"
+        self.waiver_auth = "Not Waivable"
 
 
 # Missing Epoch prefix on maint compare (BAD for Koji compares, OK
@@ -708,7 +708,7 @@ class UnexpandedMacroConflictsCompareKoji(TestCompareKoji):
         self.waiver_auth = "Anyone"
 
 
-# Missing explicit Conflicts (VERIFY)
+# Missing explicit Conflicts
 class MissingExplicitConflictsSRPM(TestSRPM):
     def setUp(self):
         super().setUp()

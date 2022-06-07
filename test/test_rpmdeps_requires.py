@@ -213,7 +213,7 @@ class GainingRequiresRebaseCompareKoji(TestCompareKoji):
         self.waiver_auth = "Not Waivable"
 
 
-# Gaining a new Requires in a maint comparison (VERIFY)
+# Gaining a new Requires in a maint comparison (INFO)
 class GainingRequiresCompareSRPM(TestCompareSRPM):
     def setUp(self):
         super().setUp()
@@ -232,8 +232,8 @@ class GainingRequiresCompareRPMs(TestCompareRPMs):
         self.after_rpm.add_requires(after_requires)
 
         self.inspection = "rpmdeps"
-        self.result = "VERIFY"
-        self.waiver_auth = "Anyone"
+        self.result = "INFO"
+        self.waiver_auth = "Not Waivable"
 
 
 class GainingRequiresCompareKoji(TestCompareKoji):
@@ -243,8 +243,8 @@ class GainingRequiresCompareKoji(TestCompareKoji):
         self.after_rpm.add_requires(after_requires)
 
         self.inspection = "rpmdeps"
-        self.result = "VERIFY"
-        self.waiver_auth = "Anyone"
+        self.result = "INFO"
+        self.waiver_auth = "Not Waivable"
 
 
 # Changing a Requires in a rebase comparison (INFO)
@@ -284,7 +284,7 @@ class ChangingRequiresRebaseCompareKoji(TestCompareKoji):
         self.waiver_auth = "Not Waivable"
 
 
-# Changing a Requires in a maint comparison (VERIFY)
+# Changing a Requires in a maint comparison
 class ChangingRequiresCompareSRPM(TestCompareSRPM):
     def setUp(self):
         super().setUp()
@@ -306,8 +306,8 @@ class ChangingRequiresCompareRPMs(TestCompareRPMs):
         self.after_rpm.add_requires(after_requires)
 
         self.inspection = "rpmdeps"
-        self.result = "VERIFY"
-        self.waiver_auth = "Anyone"
+        self.result = "INFO"
+        self.waiver_auth = "Not Waivable"
 
 
 class ChangingRequiresCompareKoji(TestCompareKoji):
@@ -318,8 +318,8 @@ class ChangingRequiresCompareKoji(TestCompareKoji):
         self.after_rpm.add_requires(after_requires)
 
         self.inspection = "rpmdeps"
-        self.result = "VERIFY"
-        self.waiver_auth = "Anyone"
+        self.result = "INFO"
+        self.waiver_auth = "Not Waivable"
 
 
 # Changing a Requires in a maint comparison due to NVR (INFO)
@@ -385,7 +385,7 @@ class LosingRequiresRebaseCompareKoji(TestCompareKoji):
         self.waiver_auth = "Not Waivable"
 
 
-# Losing a Requires in a maint comparison (VERIFY)
+# Losing a Requires in a maint comparison
 class LosingRequiresCompareSRPM(TestCompareSRPM):
     def setUp(self):
         super().setUp()
@@ -393,8 +393,8 @@ class LosingRequiresCompareSRPM(TestCompareSRPM):
         self.before_rpm.add_build_requires(before_requires)
 
         self.inspection = "rpmdeps"
-        self.result = "VERIFY"
-        self.waiver_auth = "Anyone"
+        self.result = "INFO"
+        self.waiver_auth = "Not Waivable"
 
 
 class LosingRequiresCompareRPMs(TestCompareRPMs):
@@ -404,8 +404,8 @@ class LosingRequiresCompareRPMs(TestCompareRPMs):
         self.before_rpm.add_requires(before_requires)
 
         self.inspection = "rpmdeps"
-        self.result = "VERIFY"
-        self.waiver_auth = "Anyone"
+        self.result = "INFO"
+        self.waiver_auth = "Not Waivable"
 
 
 class LosingRequiresCompareKoji(TestCompareKoji):
@@ -415,8 +415,8 @@ class LosingRequiresCompareKoji(TestCompareKoji):
         self.before_rpm.add_requires(before_requires)
 
         self.inspection = "rpmdeps"
-        self.result = "VERIFY"
-        self.waiver_auth = "Anyone"
+        self.result = "INFO"
+        self.waiver_auth = "Not Waivable"
 
 
 # Missing Epoch prefix on maint compare (BAD for Koji compares, OK
@@ -822,7 +822,7 @@ class UnexpandedMacroRequiresCompareKoji(TestCompareKoji):
         self.waiver_auth = "Anyone"
 
 
-# Missing explicit Requires (VERIFY)
+# Missing explicit Requires
 class MissingExplicitRequiresSRPM(TestSRPM):
     def setUp(self):
         super().setUp()

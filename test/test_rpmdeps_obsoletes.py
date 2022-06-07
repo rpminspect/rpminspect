@@ -167,7 +167,7 @@ class GainingObsoletesRebaseCompareKoji(TestCompareKoji):
         self.waiver_auth = "Not Waivable"
 
 
-# Gaining a new Obsoletes in a maint comparison (VERIFY)
+# Gaining a new Obsoletes in a maint comparison
 class GainingObsoletesCompareRPMs(TestCompareRPMs):
     def setUp(self):
         super().setUp()
@@ -175,8 +175,8 @@ class GainingObsoletesCompareRPMs(TestCompareRPMs):
         self.after_rpm.add_obsoletes(after_obsoletes)
 
         self.inspection = "rpmdeps"
-        self.result = "VERIFY"
-        self.waiver_auth = "Anyone"
+        self.result = "INFO"
+        self.waiver_auth = "Not Waivable"
 
 
 class GainingObsoletesCompareKoji(TestCompareKoji):
@@ -186,8 +186,8 @@ class GainingObsoletesCompareKoji(TestCompareKoji):
         self.after_rpm.add_obsoletes(after_obsoletes)
 
         self.inspection = "rpmdeps"
-        self.result = "VERIFY"
-        self.waiver_auth = "Anyone"
+        self.result = "INFO"
+        self.waiver_auth = "Not Waivable"
 
 
 # Changing a Obsoletes in a rebase comparison (INFO)
@@ -215,7 +215,7 @@ class ChangingObsoletesRebaseCompareKoji(TestCompareKoji):
         self.waiver_auth = "Not Waivable"
 
 
-# Changing a Obsoletes in a maint comparison (VERIFY)
+# Changing a Obsoletes in a maint comparison
 class ChangingObsoletesCompareRPMs(TestCompareRPMs):
     def setUp(self):
         super().setUp()
@@ -224,8 +224,8 @@ class ChangingObsoletesCompareRPMs(TestCompareRPMs):
         self.after_rpm.add_obsoletes(after_obsoletes)
 
         self.inspection = "rpmdeps"
-        self.result = "VERIFY"
-        self.waiver_auth = "Anyone"
+        self.result = "INFO"
+        self.waiver_auth = "Not Waivable"
 
 
 class ChangingObsoletesCompareKoji(TestCompareKoji):
@@ -236,8 +236,8 @@ class ChangingObsoletesCompareKoji(TestCompareKoji):
         self.after_rpm.add_obsoletes(after_obsoletes)
 
         self.inspection = "rpmdeps"
-        self.result = "VERIFY"
-        self.waiver_auth = "Anyone"
+        self.result = "INFO"
+        self.waiver_auth = "Not Waivable"
 
 
 # Changing a Obsoletes in a maint comparison due to NVR (INFO)
@@ -292,7 +292,7 @@ class LosingObsoletesRebaseCompareKoji(TestCompareKoji):
         self.waiver_auth = "Not Waivable"
 
 
-# Losing a Obsoletes in a maint comparison (VERIFY)
+# Losing a Obsoletes in a maint comparison
 class LosingObsoletesCompareRPMs(TestCompareRPMs):
     def setUp(self):
         super().setUp()
@@ -300,8 +300,8 @@ class LosingObsoletesCompareRPMs(TestCompareRPMs):
         self.before_rpm.add_obsoletes(before_obsoletes)
 
         self.inspection = "rpmdeps"
-        self.result = "VERIFY"
-        self.waiver_auth = "Anyone"
+        self.result = "INFO"
+        self.waiver_auth = "Not Waivable"
 
 
 class LosingObsoletesCompareKoji(TestCompareKoji):
@@ -311,8 +311,8 @@ class LosingObsoletesCompareKoji(TestCompareKoji):
         self.before_rpm.add_obsoletes(before_obsoletes)
 
         self.inspection = "rpmdeps"
-        self.result = "VERIFY"
-        self.waiver_auth = "Anyone"
+        self.result = "INFO"
+        self.waiver_auth = "Not Waivable"
 
 
 # Missing Epoch prefix on maint compare (BAD for Koji compares, OK
@@ -708,7 +708,7 @@ class UnexpandedMacroObsoletesCompareKoji(TestCompareKoji):
         self.waiver_auth = "Anyone"
 
 
-# Missing explicit Obsoletes (VERIFY)
+# Missing explicit Obsoletes
 class MissingExplicitObsoletesSRPM(TestSRPM):
     def setUp(self):
         super().setUp()

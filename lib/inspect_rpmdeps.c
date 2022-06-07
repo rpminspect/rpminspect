@@ -742,13 +742,8 @@ bool inspect_rpmdeps(struct rpminspect *ri)
             if (peer->after_deprules) {
                 TAILQ_FOREACH(deprule, peer->after_deprules, items) {
                     /* reporting level */
-                    if (rebase) {
-                        params.waiverauth = NOT_WAIVABLE;
-                        params.severity = RESULT_INFO;
-                    } else {
-                        params.waiverauth = WAIVABLE_BY_ANYONE;
-                        params.severity = RESULT_VERIFY;
-                    }
+                    params.waiverauth = NOT_WAIVABLE;
+                    params.severity = RESULT_INFO;
 
                     /* use shorter variable names in the if expressions */
                     drs = strdeprule(deprule);
@@ -775,8 +770,6 @@ bool inspect_rpmdeps(struct rpminspect *ri)
                         xasprintf(&noun, _("'${FILE}' in %s on ${ARCH}"), name);
                         params.remedy = NULL;
                         params.verb = VERB_OK;
-                        params.waiverauth = NOT_WAIVABLE;
-                        params.severity = RESULT_INFO;
                     } else {
                         if (!strcmp(arch, SRPM_ARCH_NAME)) {
                             xasprintf(&params.msg, _("Changed '%s' to '%s' in source package %s"), pdrs, drs, name);
@@ -790,15 +783,7 @@ bool inspect_rpmdeps(struct rpminspect *ri)
                     }
 
                     if (expected_deprule_change(rebase, deprule, peer->after_hdr, ri->peers)) {
-                        params.severity = RESULT_INFO;
-                        params.waiverauth = NOT_WAIVABLE;
                         params.msg = strappend(params.msg, _("; this is expected"), NULL);
-                    }
-
-                    /* debuginfo and debugsource pkg findings are always INFO */
-                    if (strsuffix(name, DEBUGINFO_SUFFIX) || strsuffix(name, DEBUGSOURCE_SUFFIX)) {
-                        params.severity = RESULT_INFO;
-                        params.waiverauth = NOT_WAIVABLE;
                     }
 
                     /* report the result */
@@ -810,10 +795,6 @@ bool inspect_rpmdeps(struct rpminspect *ri)
                     free(noun);
                     free(drs);
                     free(pdrs);
-
-                    if (params.severity == RESULT_VERIFY) {
-                        result = false;
-                    }
                 }
             }
 
@@ -836,28 +817,12 @@ bool inspect_rpmdeps(struct rpminspect *ri)
                         params.noun = noun;
                         params.file = pdrs;
                         params.arch = arch;
-
-                        if (rebase) {
-                            params.waiverauth = NOT_WAIVABLE;
-                            params.severity = RESULT_INFO;
-                        } else {
-                            params.waiverauth = WAIVABLE_BY_ANYONE;
-                            params.severity = RESULT_VERIFY;
-                        }
-
-                        /* debuginfo and debugsource pkg findings are always INFO */
-                        if (strsuffix(name, DEBUGINFO_SUFFIX) || strsuffix(name, DEBUGSOURCE_SUFFIX)) {
-                            params.severity = RESULT_INFO;
-                            params.waiverauth = NOT_WAIVABLE;
-                        }
+                        params.waiverauth = NOT_WAIVABLE;
+                        params.severity = RESULT_INFO;
 
                         add_result(ri, &params);
                         free(params.msg);
                         free(noun);
-
-                        if (params.severity == RESULT_VERIFY) {
-                            result = false;
-                        }
                     }
 
                     free(pdrs);

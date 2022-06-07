@@ -188,7 +188,7 @@ class GainingSuggestsRebaseCompareKoji(TestCompareKoji):
         self.waiver_auth = "Not Waivable"
 
 
-# Gaining a new Suggests in a maint comparison (VERIFY)
+# Gaining a new Suggests in a maint comparison
 class GainingSuggestsCompareRPMs(TestCompareRPMs):
     @unittest.skipUnless(have_suggests, "librpm too old to support Suggests")
     def setUp(self):
@@ -197,8 +197,8 @@ class GainingSuggestsCompareRPMs(TestCompareRPMs):
         self.after_rpm.add_suggests(after_suggests)
 
         self.inspection = "rpmdeps"
-        self.result = "VERIFY"
-        self.waiver_auth = "Anyone"
+        self.result = "INFO"
+        self.waiver_auth = "Not Waivable"
 
 
 class GainingSuggestsCompareKoji(TestCompareKoji):
@@ -209,8 +209,8 @@ class GainingSuggestsCompareKoji(TestCompareKoji):
         self.after_rpm.add_suggests(after_suggests)
 
         self.inspection = "rpmdeps"
-        self.result = "VERIFY"
-        self.waiver_auth = "Anyone"
+        self.result = "INFO"
+        self.waiver_auth = "Not Waivable"
 
 
 # Changing a Suggests in a rebase comparison (INFO)
@@ -240,7 +240,7 @@ class ChangingSuggestsRebaseCompareKoji(TestCompareKoji):
         self.waiver_auth = "Not Waivable"
 
 
-# Changing a Suggests in a maint comparison (VERIFY)
+# Changing a Suggests in a maint comparison
 class ChangingSuggestsCompareRPMs(TestCompareRPMs):
     @unittest.skipUnless(have_suggests, "librpm too old to support Suggests")
     def setUp(self):
@@ -250,8 +250,8 @@ class ChangingSuggestsCompareRPMs(TestCompareRPMs):
         self.after_rpm.add_suggests(after_suggests)
 
         self.inspection = "rpmdeps"
-        self.result = "VERIFY"
-        self.waiver_auth = "Anyone"
+        self.result = "INFO"
+        self.waiver_auth = "Not Waivable"
 
 
 class ChangingSuggestsCompareKoji(TestCompareKoji):
@@ -263,8 +263,8 @@ class ChangingSuggestsCompareKoji(TestCompareKoji):
         self.after_rpm.add_suggests(after_suggests)
 
         self.inspection = "rpmdeps"
-        self.result = "VERIFY"
-        self.waiver_auth = "Anyone"
+        self.result = "INFO"
+        self.waiver_auth = "Not Waivable"
 
 
 # Changing a Suggests in a maint comparison due to NVR (INFO)
@@ -324,7 +324,7 @@ class LosingSuggestsRebaseCompareKoji(TestCompareKoji):
         self.waiver_auth = "Not Waivable"
 
 
-# Losing a Suggests in a maint comparison (VERIFY)
+# Losing a Suggests in a maint comparison
 class LosingSuggestsCompareRPMs(TestCompareRPMs):
     @unittest.skipUnless(have_suggests, "librpm too old to support Suggests")
     def setUp(self):
@@ -333,8 +333,8 @@ class LosingSuggestsCompareRPMs(TestCompareRPMs):
         self.before_rpm.add_suggests(before_suggests)
 
         self.inspection = "rpmdeps"
-        self.result = "VERIFY"
-        self.waiver_auth = "Anyone"
+        self.result = "INFO"
+        self.waiver_auth = "Not Waivable"
 
 
 class LosingSuggestsCompareKoji(TestCompareKoji):
@@ -345,8 +345,8 @@ class LosingSuggestsCompareKoji(TestCompareKoji):
         self.before_rpm.add_suggests(before_suggests)
 
         self.inspection = "rpmdeps"
-        self.result = "VERIFY"
-        self.waiver_auth = "Anyone"
+        self.result = "INFO"
+        self.waiver_auth = "Not Waivable"
 
 
 # Missing Epoch prefix on maint compare (BAD for Koji compares, OK
@@ -759,7 +759,7 @@ class UnexpandedMacroSuggestsCompareKoji(TestCompareKoji):
         self.waiver_auth = "Anyone"
 
 
-# Missing explicit Suggests (VERIFY)
+# Missing explicit Suggests
 class MissingExplicitSuggestsSRPM(TestSRPM):
     @unittest.skipUnless(have_suggests, "librpm too old to support Suggests")
     def setUp(self):
