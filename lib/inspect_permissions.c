@@ -26,6 +26,8 @@
 
 #include "rpminspect.h"
 
+static bool reported = false;
+
 static bool permissions_driver(struct rpminspect *ri, rpmfile_entry_t *file)
 {
     bool result = true;
@@ -80,6 +82,7 @@ static bool permissions_driver(struct rpminspect *ri, rpmfile_entry_t *file)
         if (!(before_mode & (S_ISUID|S_ISGID)) && (after_mode & (S_ISUID|S_ISGID))) {
             params.severity = RESULT_VERIFY;
             what = _("changed setuid/setgid");
+            result = false;
         } else if (S_ISDIR(file->st.st_mode) && !S_ISLNK(file->st.st_mode)) {
             if (((mode_diff & S_ISVTX) && !(after_mode & S_ISVTX)) || ((after_mode & mode_diff) != 0)) {
                 params.severity = RESULT_VERIFY;
@@ -96,10 +99,9 @@ static bool permissions_driver(struct rpminspect *ri, rpmfile_entry_t *file)
         xasprintf(&noun, _("${FILE} permissions from %04o to %04o on ${ARCH}"), before_mode, after_mode);
         params.noun = noun;
         add_result(ri, &params);
+        reported = true;
         free(params.msg);
         free(noun);
-
-        result = false;
     }
 
     /* check for world-writability */
@@ -112,6 +114,7 @@ static bool permissions_driver(struct rpminspect *ri, rpmfile_entry_t *file)
             params.verb = VERB_FAILED;
             params.noun = _("${FILE} is world-writable on ${ARCH}");
             add_result(ri, &params);
+            reported = true;
             free(params.msg);
             result = false;
         }
@@ -134,7 +137,7 @@ bool inspect_permissions(struct rpminspect *ri)
     result = foreach_peer_file(ri, NAME_PERMISSIONS, permissions_driver);
 
     /* if everything was fine, just say so */
-    if (result) {
+    if (result && !reported) {
         init_result_params(&params);
         params.severity = RESULT_OK;
         params.waiverauth = NOT_WAIVABLE;
