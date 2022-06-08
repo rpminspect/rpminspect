@@ -28,6 +28,8 @@
 
 #include "rpminspect.h"
 
+static bool reported = false;
+
 static bool filesize_driver(struct rpminspect *ri, rpmfile_entry_t *file)
 {
     bool result = true;
@@ -125,12 +127,14 @@ static bool filesize_driver(struct rpminspect *ri, rpmfile_entry_t *file)
         params.severity = RESULT_INFO;
         params.verb = VERB_OK;
         params.remedy = NULL;
+        result = true;
     }
 
     /* Reporting */
     if (params.msg) {
         add_result(ri, &params);
         free(params.msg);
+        reported = true;
     }
 
     return result;
@@ -150,7 +154,7 @@ bool inspect_filesize(struct rpminspect *ri)
     result = foreach_peer_file(ri, NAME_FILESIZE, filesize_driver);
 
     /* if everything was fine, just say so */
-    if (result) {
+    if (result && !reported) {
         init_result_params(&params);
         params.severity = RESULT_OK;
         params.waiverauth = NOT_WAIVABLE;
