@@ -192,7 +192,7 @@ char *uncompress_file(struct rpminspect *ri, const char *infile, const char *sub
     r = archive_read_open_filename(input, infile, 16384);
 
     if (r != ARCHIVE_OK) {
-        warn("archive_read_open_filename: %s", archive_error_string(input));
+        /* just stop trying to uncompress if this errors */
         goto error2;
     }
 
