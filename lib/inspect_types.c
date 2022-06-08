@@ -24,6 +24,8 @@
 #include <assert.h>
 #include "rpminspect.h"
 
+static bool reported = false;
+
 static bool types_driver(struct rpminspect *ri, rpmfile_entry_t *file)
 {
     bool r = true;
@@ -127,6 +129,7 @@ static bool types_driver(struct rpminspect *ri, rpmfile_entry_t *file)
     if (!r) {
         add_result(ri, &params);
         free(params.msg);
+        reported = true;
     }
 
     /* clean up */
@@ -135,7 +138,7 @@ static bool types_driver(struct rpminspect *ri, rpmfile_entry_t *file)
     free(bnevra);
     free(anevra);
 
-    return r;
+    return true;
 }
 
 /*
@@ -152,7 +155,7 @@ bool inspect_types(struct rpminspect *ri)
     result = foreach_peer_file(ri, NAME_TYPES, types_driver);
 
     /* if everything was fine, just say so */
-    if (result) {
+    if (!reported) {
         init_result_params(&params);
         params.severity = RESULT_OK;
         params.waiverauth = NOT_WAIVABLE;
