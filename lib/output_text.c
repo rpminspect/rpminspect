@@ -91,7 +91,7 @@ void output_text(const results_t *results, const char *dest, __attribute__((unus
             displayed_header = true;
         }
 
-        if (result->severity >= suppress) {
+        if (!strcmp(header, NAME_DIAGNOSTICS) || (result->severity >= suppress)) {
             if (result->msg != NULL) {
                 xasprintf(&msg, "%d) %s\n", count++, result->msg);
 
