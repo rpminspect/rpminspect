@@ -178,6 +178,11 @@ bool suppressed_results(const results_t *results, const char *header, const seve
     assert(results != NULL);
     assert(header != NULL);
 
+    /* always output diagnostics */
+    if (!strcmp(header, NAME_DIAGNOSTICS)) {
+        return false;
+    }
+
     TAILQ_FOREACH(result, results, items) {
         if (!strcmp(header, result->header) && result->severity >= suppress) {
             return false;
