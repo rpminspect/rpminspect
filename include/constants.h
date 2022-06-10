@@ -114,6 +114,18 @@
 #define CFGFILE "rpminspect.yaml"
 
 /**
+ * @def PRODUCT_RELEASE_CFGFILE_SUBDIR
+ *
+ * The name of the product release configuration file subdirectory.
+ * This will be under 'profiledir', which is defined in the main
+ * configuration file.  This directory can exist and it can hold
+ * configuration files that match product release strings.  If
+ * rpminspect finds one during initialization that matches the product
+ * release string, it will load it.
+ */
+#define PRODUCT_RELEASE_CFGFILE_SUBDIR "product-release"
+
+/**
  * @def DEFAULT_WORKDIR
  *
  * Default working directory location.  rpminspect will create
@@ -599,6 +611,13 @@
  * this extension ends with a period.
  */
 #define ELF_LIB_EXTENSION ".so."
+
+/**
+ * @def YAML_FILENAME_EXTENSION
+ *
+ * YAML filename extension
+ */
+#define YAML_FILENAME_EXTENSION ".yaml"
 
 /** @} */
 

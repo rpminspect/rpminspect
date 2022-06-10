@@ -533,6 +533,17 @@ int main(int argc, char **argv)
         exit(RI_SUCCESS);
     }
 
+    /* Set up the main program data structure */
+    ri = calloc_rpminspect(ri);
+    ri->progname = strdup(argv[0]);
+    ri->verbose = verbose;
+    ri->product_release = release;
+    ri->threshold = getseverity(threshold, RESULT_VERIFY);
+    ri->suppress = getseverity(suppress, RESULT_NULL);
+    ri->rebase_detection = rebase_detection;
+    free(threshold);
+    free(suppress);
+
     /*
      * Find an appropriate configuration file. This involves:
      *
@@ -586,16 +597,6 @@ int main(int argc, char **argv)
     }
 
     free(profile);
-
-    /* various options from the command line or elsewhere */
-    ri->progname = strdup(argv[0]);
-    ri->verbose = verbose;
-    ri->product_release = release;
-    ri->threshold = getseverity(threshold, RESULT_VERIFY);
-    ri->suppress = getseverity(suppress, RESULT_NULL);
-    ri->rebase_detection = rebase_detection;
-    free(threshold);
-    free(suppress);
 
     /*
      * any inspection selections on the command line can override

@@ -133,6 +133,7 @@ bool init_rebaseable(struct rpminspect *);
 bool init_politics(struct rpminspect *ri);
 bool init_security(struct rpminspect *ri);
 bool init_icons(struct rpminspect *ri);
+struct rpminspect *calloc_rpminspect(struct rpminspect *);
 struct rpminspect *init_rpminspect(struct rpminspect *, const char *, const char *);
 
 /* free.c */

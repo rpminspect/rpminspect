@@ -2082,6 +2082,57 @@ bool init_icons(struct rpminspect *ri)
 }
 
 /*
+ * Memory initialization function for struct rpminspect.
+ */
+struct rpminspect *calloc_rpminspect(struct rpminspect *ri)
+{
+    if (ri != NULL) {
+        return ri;
+    }
+
+    /* Only initialize if we were given NULL for ri */
+    ri = calloc(1, sizeof(*ri));
+    assert(ri != NULL);
+
+    /* Initialize the struct before reading files */
+    ri->workdir = strdup(DEFAULT_WORKDIR);
+    ri->vendor_data_dir = strdup(VENDOR_DATA_DIR);
+    ri->favor_release = FAVOR_NEWEST;
+    ri->tests = ~0;
+    ri->desktop_entry_files_dir = strdup(DESKTOP_ENTRY_FILES_DIR);
+    ri->bin_paths = list_from_array(BIN_PATHS);
+    ri->bin_owner = strdup(BIN_OWNER);
+    ri->bin_group = strdup(BIN_GROUP);
+    ri->shells = list_from_array(SHELLS);
+    ri->specmatch = MATCH_FULL;
+    ri->specprimary = PRIMARY_NAME;
+    ri->abidiff_suppression_file = strdup(ABI_SUPPRESSION_FILE);
+    ri->abidiff_debuginfo_path = strdup(DEBUG_PATH);
+    ri->abidiff_include_path = strdup(INCLUDE_PATH);
+    ri->abi_security_threshold = DEFAULT_ABI_SECURITY_THRESHOLD;
+    ri->kmidiff_suppression_file = strdup(ABI_SUPPRESSION_FILE);
+    ri->kmidiff_debuginfo_path = strdup(DEBUG_PATH);
+    ri->annocheck_failure_severity = RESULT_VERIFY;
+    ri->size_threshold = -1;
+
+    /* Initialize commands */
+    ri->commands.msgunfmt = strdup(MSGUNFMT_CMD);
+    ri->commands.desktop_file_validate = strdup(DESKTOP_FILE_VALIDATE_CMD);
+    ri->commands.annocheck = strdup(ANNOCHECK_CMD);
+    ri->commands.abidiff = strdup(ABIDIFF_CMD);
+    ri->commands.kmidiff = strdup(KMIDIFF_CMD);
+
+    /* Store full paths to all config files read */
+    if (ri->cfgfiles == NULL) {
+        ri->cfgfiles = calloc(1, sizeof(*ri->cfgfiles));
+        assert(ri->cfgfiles != NULL);
+        TAILQ_INIT(ri->cfgfiles);
+    }
+
+    return ri;
+}
+
+/*
  * Initialize a struct rpminspect.  Called by applications using
  * librpminspect before they began calling library functions.  If ri
  * passed in is NULL, the function will allocate and initialize a new
@@ -2096,45 +2147,8 @@ struct rpminspect *init_rpminspect(struct rpminspect *ri, const char *cfgfile, c
     char *kernelnames[] = KERNEL_FILENAMES;
     string_entry_t *cfg = NULL;
 
-    /* Only initialize if we were given NULL for ri */
     if (ri == NULL) {
-        ri = calloc(1, sizeof(*ri));
-        assert(ri != NULL);
-
-        /* Initialize the struct before reading files */
-        ri->workdir = strdup(DEFAULT_WORKDIR);
-        ri->vendor_data_dir = strdup(VENDOR_DATA_DIR);
-        ri->favor_release = FAVOR_NEWEST;
-        ri->tests = ~0;
-        ri->desktop_entry_files_dir = strdup(DESKTOP_ENTRY_FILES_DIR);
-        ri->bin_paths = list_from_array(BIN_PATHS);
-        ri->bin_owner = strdup(BIN_OWNER);
-        ri->bin_group = strdup(BIN_GROUP);
-        ri->shells = list_from_array(SHELLS);
-        ri->specmatch = MATCH_FULL;
-        ri->specprimary = PRIMARY_NAME;
-        ri->abidiff_suppression_file = strdup(ABI_SUPPRESSION_FILE);
-        ri->abidiff_debuginfo_path = strdup(DEBUG_PATH);
-        ri->abidiff_include_path = strdup(INCLUDE_PATH);
-        ri->abi_security_threshold = DEFAULT_ABI_SECURITY_THRESHOLD;
-        ri->kmidiff_suppression_file = strdup(ABI_SUPPRESSION_FILE);
-        ri->kmidiff_debuginfo_path = strdup(DEBUG_PATH);
-        ri->annocheck_failure_severity = RESULT_VERIFY;
-        ri->size_threshold = -1;
-
-        /* Initialize commands */
-        ri->commands.msgunfmt = strdup(MSGUNFMT_CMD);
-        ri->commands.desktop_file_validate = strdup(DESKTOP_FILE_VALIDATE_CMD);
-        ri->commands.annocheck = strdup(ANNOCHECK_CMD);
-        ri->commands.abidiff = strdup(ABIDIFF_CMD);
-        ri->commands.kmidiff = strdup(KMIDIFF_CMD);
-    }
-
-    /* Store full paths to all config files read */
-    if (ri->cfgfiles == NULL) {
-        ri->cfgfiles = calloc(1, sizeof(*ri->cfgfiles));
-        assert(ri->cfgfiles != NULL);
-        TAILQ_INIT(ri->cfgfiles);
+        ri = calloc_rpminspect(ri);
     }
 
     /* Read in the config file if we have it */
@@ -2169,9 +2183,26 @@ struct rpminspect *init_rpminspect(struct rpminspect *ri, const char *cfgfile, c
         }
     }
 
+    /* Look for and autoload a product release profile if we have one */
+    if (ri->product_release) {
+        xasprintf(&tmp, "%s/%s/%s%s", ri->profiledir, PRODUCT_RELEASE_CFGFILE_SUBDIR, ri->product_release, YAML_FILENAME_EXTENSION);
+        filename = realpath(tmp, NULL);
+
+        if (filename && !access(filename, F_OK|R_OK)) {
+            i = read_cfgfile(ri, filename);
+
+            if (i) {
+                warn(_("*** error reading '%s'"), filename);
+                return NULL;
+            }
+        }
+
+        free(tmp);
+    }
+
     /* If a profile is specified, read an overlay config file */
     if (profile) {
-        xasprintf(&tmp, "%s/%s.yaml", ri->profiledir, profile);
+        xasprintf(&tmp, "%s/%s%s", ri->profiledir, profile, YAML_FILENAME_EXTENSION);
         filename = realpath(tmp, NULL);
 
         if ((filename == NULL) || (access(filename, F_OK|R_OK) == -1)) {
