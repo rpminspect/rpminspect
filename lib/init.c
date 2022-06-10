@@ -2188,6 +2188,16 @@ struct rpminspect *init_rpminspect(struct rpminspect *ri, const char *cfgfile, c
         free(tmp);
     }
 
+    /* ./rpminspect.yaml if it exists */
+    if (access(CFGFILE, F_OK|R_OK) == 0) {
+        i = read_cfgfile(ri, CFGFILE);
+
+        if (i) {
+            warn(_("*** error reading '%s'"), CFGFILE);
+            return NULL;
+        }
+    }
+
     /* Initialize some lists if we did not get any config file data */
     if (ri->kernel_filenames == NULL) {
         ri->kernel_filenames = calloc(1, sizeof(*ri->kernel_filenames));

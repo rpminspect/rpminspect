@@ -566,8 +566,13 @@ int main(int argc, char **argv)
     free(tmp_cfgfile);
     free(cfgfile);
 
-    /* ./rpminspect.yaml if it exists */
-    if (access(CFGFILE, F_OK|R_OK) == 0) {
+    /*
+     * Failsafe to try and load a config file from the current
+     * directory if we have not been able to load any already.  If we
+     * did initialize, then that process would have also loaded this
+     * file from the current directory.
+     */
+    if (!initialized && access(CFGFILE, F_OK|R_OK) == 0) {
         ri = init_rpminspect(ri, CFGFILE, profile);
         initialized = true;
 
@@ -575,7 +580,6 @@ int main(int argc, char **argv)
             errx(RI_PROGRAM_ERROR, _("Failed to read configuration file %s"), CFGFILE);
         }
     }
-
 
     if (!initialized) {
         errx(RI_PROGRAM_ERROR, _("Please specify a configuration file using '-c' or supply ./%s"), CFGFILE);
