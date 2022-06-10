@@ -185,11 +185,14 @@ macrofiles:
 
 ignore:
     # Sometimes you want certain files or directories ignored by
-    # rpminspect.  This section lets you list paths--glob(3) syntax
+    # rpminspect.  This section lets you list paths--glob(7) syntax
     # allowed--that you want rpminspect to ignore for all inspections.
     #
-    # This is an array of glob(3) compatible strings to match paths
+    # This is an array of glob(7) compatible strings to match paths
     # to ignore.
+    #
+    # You can also add an entry that ends with a slash '/' and
+    # rpminspect will treat it as a path prefix.
     - /usr/lib*/python?.?/site-packages/__pycache__
     - /usr/lib*/python?.?/site-packages/*/*.pyc
     - /usr/lib*/python?.?/site-packages/*/*.pyo
@@ -249,10 +252,11 @@ elf:
     #include_path:
     exclude_path: (^(/boot/vmlinu|/lib/modules|/lib64/modules).*)|(.*/powerpc/lib/crtsavres.o$)|(^/usr/lib(64)?/kernel-wrapper$)
 
-    # Optional list of glob(7) specifications to match files to ignore
-    # for this inspection.  The format of this list is the same as the
-    # global 'ignore' list.  The difference is the items specified
-    # here will only be used during this inspection.
+    # Optional list of glob(7) specifications or path prefixes to
+    # match files to ignore for this inspection.  The format of this
+    # list is the same as the global 'ignore' list.  The difference is
+    # the items specified here will only be used during this
+    # inspection.
     #ignore:
     #    - /usr/lib*/libexample.so*
 
@@ -272,10 +276,11 @@ manpage:
     # during the man page inspection.
     #exclude_path:
 
-    # Optional list of glob(7) specifications to match files to ignore
-    # for this inspection.  The format of this list is the same as the
-    # global 'ignore' list.  The difference is the items specified
-    # here will only be used during this inspection.
+    # Optional list of glob(7) specifications or path prefixes to
+    # match files to ignore for this inspection.  The format of this
+    # list is the same as the global 'ignore' list.  The difference is
+    # the items specified here will only be used during this
+    # inspection.
     #ignore:
     #    - /usr/lib*/libexample.so*
 
@@ -289,10 +294,11 @@ xml:
     # contain a mix of XML and code.  Also skip HTML files.
     exclude_path: .*(\.jsp|\.rhtml|\.html)$
 
-    # Optional list of glob(7) specifications to match files to ignore
-    # for this inspection.  The format of this list is the same as the
-    # global 'ignore' list.  The difference is the items specified
-    # here will only be used during this inspection.
+    # Optional list of glob(7) specifications or path prefixes to
+    # match files to ignore for this inspection.  The format of this
+    # list is the same as the global 'ignore' list.  The difference is
+    # the items specified here will only be used during this
+    # inspection.
     #ignore:
     #    - /usr/lib*/libexample.so*
 
@@ -300,10 +306,11 @@ desktop:
     # Where desktop entry files live
     desktop_entry_files_dir: /usr/share/applications
 
-    # Optional list of glob(7) specifications to match files to ignore
-    # for this inspection.  The format of this list is the same as the
-    # global 'ignore' list.  The difference is the items specified
-    # here will only be used during this inspection.
+    # Optional list of glob(7) specifications or path prefixes to
+    # match files to ignore for this inspection.  The format of this
+    # list is the same as the global 'ignore' list.  The difference is
+    # the items specified here will only be used during this
+    # inspection.
     #ignore:
     #    - /usr/lib*/libexample.so*
 
@@ -316,10 +323,11 @@ changedfiles:
         - .hpp
         - .H
 
-    # Optional list of glob(7) specifications to match files to ignore
-    # for this inspection.  The format of this list is the same as the
-    # global 'ignore' list.  The difference is the items specified
-    # here will only be used during this inspection.
+    # Optional list of glob(7) specifications or path prefixes to
+    # match files to ignore for this inspection.  The format of this
+    # list is the same as the global 'ignore' list.  The difference is
+    # the items specified here will only be used during this
+    # inspection.
     #ignore:
     #    - /usr/lib*/libexample.so*
 
@@ -344,26 +352,29 @@ addedfiles:
         - .hg
         - .git
 
-    # Optional list of glob(7) specifications to match files to ignore
-    # for this inspection.  The format of this list is the same as the
-    # global 'ignore' list.  The difference is the items specified
-    # here will only be used during this inspection.
+    # Optional list of glob(7) specifications or path prefixes to
+    # match files to ignore for this inspection.  The format of this
+    # list is the same as the global 'ignore' list.  The difference is
+    # the items specified here will only be used during this
+    # inspection.
     #ignore:
     #    - /usr/lib*/libexample.so*
 
 movedfiles:
-    # Optional list of glob(7) specifications to match files to ignore
-    # for this inspection.  The format of this list is the same as the
-    # global 'ignore' list.  The difference is the items specified
-    # here will only be used during this inspection.
+    # Optional list of glob(7) specifications or path prefixes to
+    # match files to ignore for this inspection.  The format of this
+    # list is the same as the global 'ignore' list.  The difference is
+    # the items specified here will only be used during this
+    # inspection.
     #ignore:
     #    - /usr/lib*/libexample.so*
 
 removedfiles:
-    # Optional list of glob(7) specifications to match files to ignore
-    # for this inspection.  The format of this list is the same as the
-    # global 'ignore' list.  The difference is the items specified
-    # here will only be used during this inspection.
+    # Optional list of glob(7) specifications or path prefixes to
+    # match files to ignore for this inspection.  The format of this
+    # list is the same as the global 'ignore' list.  The difference is
+    # the items specified here will only be used during this
+    # inspection.
     #ignore:
     #    - /usr/lib*/libexample.so*
 
@@ -389,10 +400,11 @@ ownership:
     forbidden_groups:
         - mockbuild
 
-    # Optional list of glob(7) specifications to match files to ignore
-    # for this inspection.  The format of this list is the same as the
-    # global 'ignore' list.  The difference is the items specified
-    # here will only be used during this inspection.
+    # Optional list of glob(7) specifications or path prefixes to
+    # match files to ignore for this inspection.  The format of this
+    # list is the same as the global 'ignore' list.  The difference is
+    # the items specified here will only be used during this
+    # inspection.
     #ignore:
     #    - /usr/lib*/libexample.so*
 
@@ -414,10 +426,11 @@ shellsyntax:
         - rc
         - bash
 
-    # Optional list of glob(7) specifications to match files to ignore
-    # for this inspection.  The format of this list is the same as the
-    # global 'ignore' list.  The difference is the items specified
-    # here will only be used during this inspection.
+    # Optional list of glob(7) specifications or path prefixes to
+    # match files to ignore for this inspection.  The format of this
+    # list is the same as the global 'ignore' list.  The difference is
+    # the items specified here will only be used during this
+    # inspection.
     #ignore:
     #    - /usr/lib*/libexample.so*
 
@@ -436,10 +449,11 @@ filesize:
     # to 20%, put '20' (but without the single quotes).
     size_threshold: info
 
-    # Optional list of glob(7) specifications to match files to ignore
-    # for this inspection.  The format of this list is the same as the
-    # global 'ignore' list.  The difference is the items specified
-    # here will only be used during this inspection.
+    # Optional list of glob(7) specifications or path prefixes to
+    # match files to ignore for this inspection.  The format of this
+    # list is the same as the global 'ignore' list.  The difference is
+    # the items specified here will only be used during this
+    # inspection.
     #ignore:
     #    - /usr/lib*/libexample.so*
 
@@ -455,10 +469,11 @@ lto:
         - __gnu_lto_v1
         - __gnu_lto_slim
 
-    # Optional list of glob(7) specifications to match files to ignore
-    # for this inspection.  The format of this list is the same as the
-    # global 'ignore' list.  The difference is the items specified
-    # here will only be used during this inspection.
+    # Optional list of glob(7) specifications or path prefixes to
+    # match files to ignore for this inspection.  The format of this
+    # list is the same as the global 'ignore' list.  The difference is
+    # the items specified here will only be used during this
+    # inspection.
     #ignore:
     #    - /usr/lib*/libexample.so*
 
@@ -491,10 +506,11 @@ specname:
     primary: name
     #primary: filename
 
-    # Optional list of glob(7) specifications to match files to ignore
-    # for this inspection.  The format of this list is the same as the
-    # global 'ignore' list.  The difference is the items specified
-    # here will only be used during this inspection.
+    # Optional list of glob(7) specifications or path prefixes to
+    # match files to ignore for this inspection.  The format of this
+    # list is the same as the global 'ignore' list.  The difference is
+    # the items specified here will only be used during this
+    # inspection.
     #ignore:
     #    - /usr/lib*/libexample.so*
 
@@ -532,10 +548,11 @@ annocheck:
     jobs:
         - hardened: --ignore-unknown --verbose
 
-    # Optional list of glob(7) specifications to match files to ignore
-    # for this inspection.  The format of this list is the same as the
-    # global 'ignore' list.  The difference is the items specified
-    # here will only be used during this inspection.
+    # Optional list of glob(7) specifications or path prefixes to
+    # match files to ignore for this inspection.  The format of this
+    # list is the same as the global 'ignore' list.  The difference is
+    # the items specified here will only be used during this
+    # inspection.
     #ignore:
     #    - /usr/lib*/libexample.so*
 
@@ -552,10 +569,11 @@ javabytecode:
     # as you want in this section.
     - default: 43
 
-    # Optional list of glob(7) specifications to match files to ignore
-    # for this inspection.  The format of this list is the same as the
-    # global 'ignore' list.  The difference is the items specified
-    # here will only be used during this inspection.
+    # Optional list of glob(7) specifications or path prefixes to
+    # match files to ignore for this inspection.  The format of this
+    # list is the same as the global 'ignore' list.  The difference is
+    # the items specified here will only be used during this
+    # inspection.
     #ignore:
     #    - /usr/lib*/libexample.so*
 
@@ -583,18 +601,20 @@ pathmigration:
     excluded_paths:
         - /lib/modules
 
-    # Optional list of glob(7) specifications to match files to ignore
-    # for this inspection.  The format of this list is the same as the
-    # global 'ignore' list.  The difference is the items specified
-    # here will only be used during this inspection.
+    # Optional list of glob(7) specifications or path prefixes to
+    # match files to ignore for this inspection.  The format of this
+    # list is the same as the global 'ignore' list.  The difference is
+    # the items specified here will only be used during this
+    # inspection.
     #ignore:
     #    - /usr/lib*/libexample.so*
 
 politics:
-    # Optional list of glob(7) specifications to match files to ignore
-    # for this inspection.  The format of this list is the same as the
-    # global 'ignore' list.  The difference is the items specified
-    # here will only be used during this inspection.
+    # Optional list of glob(7) specifications or path prefixes to
+    # match files to ignore for this inspection.  The format of this
+    # list is the same as the global 'ignore' list.  The difference is
+    # the items specified here will only be used during this
+    # inspection.
     #ignore:
     #    - /usr/lib*/libexample.so*
 
@@ -638,10 +658,11 @@ abidiff:
     # report abidiff(1) findings with a security severity.
     security_level_threshold: 2
 
-    # Optional list of glob(7) specifications to match files to ignore
-    # for this inspection.  The format of this list is the same as the
-    # global 'ignore' list.  The difference is the items specified
-    # here will only be used during this inspection.
+    # Optional list of glob(7) specifications or path prefixes to
+    # match files to ignore for this inspection.  The format of this
+    # list is the same as the global 'ignore' list.  The difference is
+    # the items specified here will only be used during this
+    # inspection.
     #ignore:
     #    - /usr/lib*/libexample.so*
 
@@ -688,10 +709,11 @@ kmidiff:
     # NOTE:  This filename is relative to kabi_dir.
     kabi_filename: kabi_whitelist_${ARCH}
 
-    # Optional list of glob(7) specifications to match files to ignore
-    # for this inspection.  The format of this list is the same as the
-    # global 'ignore' list.  The difference is the items specified
-    # here will only be used during this inspection.
+    # Optional list of glob(7) specifications or path prefixes to
+    # match files to ignore for this inspection.  The format of this
+    # list is the same as the global 'ignore' list.  The difference is
+    # the items specified here will only be used during this
+    # inspection.
     #ignore:
     #    - /usr/lib*/libexample.so*
 
@@ -728,10 +750,11 @@ badfuncs:
     - rexec
     - rresvport
 
-    # Optional list of glob(7) specifications to match files to ignore
-    # for this inspection.  The format of this list is the same as the
-    # global 'ignore' list.  The difference is the items specified
-    # here will only be used during this inspection.
+    # Optional list of glob(7) specifications or path prefixes to
+    # match files to ignore for this inspection.  The format of this
+    # list is the same as the global 'ignore' list.  The difference is
+    # the items specified here will only be used during this
+    # inspection.
     #ignore:
     #    - /usr/lib*/libexample.so*
 
@@ -770,18 +793,20 @@ runpath:
     origin_prefix_trim:
         - ^(opt/rh/[^/]+/root/)
 
-    # Optional list of glob(7) specifications to match files to ignore
-    # for this inspection.  The format of this list is the same as the
-    # global 'ignore' list.  The difference is the items specified
-    # here will only be used during this inspection.
+    # Optional list of glob(7) specifications or path prefixes to
+    # match files to ignore for this inspection.  The format of this
+    # list is the same as the global 'ignore' list.  The difference is
+    # the items specified here will only be used during this
+    # inspection.
     #ignore:
     #    - /usr/lib*/libexample.so*
 
 types:
-    # Optional list of glob(7) specifications to match files to ignore
-    # for this inspection.  The format of this list is the same as the
-    # global 'ignore' list.  The difference is the items specified
-    # here will only be used during this inspection.
+    # Optional list of glob(7) specifications or path prefixes to
+    # match files to ignore for this inspection.  The format of this
+    # list is the same as the global 'ignore' list.  The difference is
+    # the items specified here will only be used during this
+    # inspection.
     #ignore:
     #    - /usr/lib*/libexample.so*
 
@@ -819,10 +844,11 @@ unicode:
         - '0x2068'
         - '0x2069'
 
-    # Optional list of glob(7) specifications to match files to ignore
-    # for this inspection.  The format of this list is the same as the
-    # global 'ignore' list.  The difference is the items specified
-    # here will only be used during this inspection.
+    # Optional list of glob(7) specifications or path prefixes to
+    # match files to ignore for this inspection.  The format of this
+    # list is the same as the global 'ignore' list.  The difference is
+    # the items specified here will only be used during this
+    # inspection.
     #ignore:
     #    - /usr/lib*/libexample.so*
 
@@ -866,65 +892,73 @@ rpmdeps:
     # runtime configuration.
 
 virus:
-    # Optional list of glob(7) specifications to match files to ignore
-    # for this inspection.  The format of this list is the same as the
-    # global 'ignore' list.  The difference is the items specified
-    # here will only be used during this inspection.
+    # Optional list of glob(7) specifications or path prefixes to
+    # match files to ignore for this inspection.  The format of this
+    # list is the same as the global 'ignore' list.  The difference is
+    # the items specified here will only be used during this
+    # inspection.
     #ignore:
     #    - /usr/lib*/libexample.so*
 
 capabilities:
-    # Optional list of glob(7) specifications to match files to ignore
-    # for this inspection.  The format of this list is the same as the
-    # global 'ignore' list.  The difference is the items specified
-    # here will only be used during this inspection.
+    # Optional list of glob(7) specifications or path prefixes to
+    # match files to ignore for this inspection.  The format of this
+    # list is the same as the global 'ignore' list.  The difference is
+    # the items specified here will only be used during this
+    # inspection.
     #ignore:
     #    - /usr/lib*/libexample.so*
 
 config:
-    # Optional list of glob(7) specifications to match files to ignore
-    # for this inspection.  The format of this list is the same as the
-    # global 'ignore' list.  The difference is the items specified
-    # here will only be used during this inspection.
+    # Optional list of glob(7) specifications or path prefixes to
+    # match files to ignore for this inspection.  The format of this
+    # list is the same as the global 'ignore' list.  The difference is
+    # the items specified here will only be used during this
+    # inspection.
     #ignore:
     #    - /etc/something*/*.conf
 
 doc:
-    # Optional list of glob(7) specifications to match files to ignore
-    # for this inspection.  The format of this list is the same as the
-    # global 'ignore' list.  The difference is the items specified
-    # here will only be used during this inspection.
+    # Optional list of glob(7) specifications or path prefixes to
+    # match files to ignore for this inspection.  The format of this
+    # list is the same as the global 'ignore' list.  The difference is
+    # the items specified here will only be used during this
+    # inspection.
     #ignore:
     #    - /usr/share/doc/example/README*
 
 kmod:
-    # Optional list of glob(7) specifications to match files to ignore
-    # for this inspection.  The format of this list is the same as the
-    # global 'ignore' list.  The difference is the items specified
-    # here will only be used during this inspection.
+    # Optional list of glob(7) specifications or path prefixes to
+    # match files to ignore for this inspection.  The format of this
+    # list is the same as the global 'ignore' list.  The difference is
+    # the items specified here will only be used during this
+    # inspection.
     #ignore:
     #    - /lib/modules/*/kernel/drivers/pcmcia/yenta_socket.ko*
 
 permissions:
-    # Optional list of glob(7) specifications to match files to ignore
-    # for this inspection.  The format of this list is the same as the
-    # global 'ignore' list.  The difference is the items specified
-    # here will only be used during this inspection.
+    # Optional list of glob(7) specifications or path prefixes to
+    # match files to ignore for this inspection.  The format of this
+    # list is the same as the global 'ignore' list.  The difference is
+    # the items specified here will only be used during this
+    # inspection.
     #ignore:
     #    - /usr/lib*/libexample.so*
 
 symlinks:
-    # Optional list of glob(7) specifications to match files to ignore
-    # for this inspection.  The format of this list is the same as the
-    # global 'ignore' list.  The difference is the items specified
-    # here will only be used during this inspection.
+    # Optional list of glob(7) specifications or path prefixes to
+    # match files to ignore for this inspection.  The format of this
+    # list is the same as the global 'ignore' list.  The difference is
+    # the items specified here will only be used during this
+    # inspection.
     #ignore:
     #    - /usr/bin/superlink
 
 upstream:
-    # Optional list of glob(7) specifications to match files to ignore
-    # for this inspection.  The format of this list is the same as the
-    # global 'ignore' list.  The difference is the items specified
-    # here will only be used during this inspection.
+    # Optional list of glob(7) specifications or path prefixes to
+    # match files to ignore for this inspection.  The format of this
+    # list is the same as the global 'ignore' list.  The difference is
+    # the items specified here will only be used during this
+    # inspection.
     #ignore:
     #    - upstream-archive-name-*.tar.gz
