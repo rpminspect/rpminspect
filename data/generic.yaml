@@ -548,6 +548,15 @@ annocheck:
     jobs:
         - hardened: --ignore-unknown --verbose
 
+    # In an optional rpminspect.yaml file in the current directory,
+    # you can supply extra arguments to defined annocheck runs.  If
+    # the run is not defined, the options are ignored.  The list here
+    # needs to have the keys match the key:value list under 'jobs'
+    # above.
+    #
+    #extra_opts:
+    #    - hardened: --skip-short-enums
+
     # Optional list of glob(7) specifications or path prefixes to
     # match files to ignore for this inspection.  The format of this
     # list is the same as the global 'ignore' list.  The difference is
