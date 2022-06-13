@@ -105,8 +105,8 @@ endif
 
 # xmlrpc-c
 xmlrpc_cmd = find_program('xmlrpc-c-config', required : true)
-xmlrpc_libs_cmd = run_command(xmlrpc_cmd, '--libs')
-xmlrpc_cflags_cmd = run_command(xmlrpc_cmd, '--cflags')
+xmlrpc_libs_cmd = run_command(xmlrpc_cmd, '--libs', check : true)
+xmlrpc_cflags_cmd = run_command(xmlrpc_cmd, '--cflags', check : true)
 
 if xmlrpc_libs_cmd.returncode() == 0 and xmlrpc_cflags_cmd.returncode() == 0
     xmlrpc = declare_dependency(compile_args: xmlrpc_cflags_cmd.stdout().strip().split(),
@@ -119,8 +119,8 @@ if not xmlrpc.found()
 endif
 
 xmlrpc_cmd = find_program('xmlrpc-c-config', required : true)
-xmlrpc_client_libs_cmd = run_command(xmlrpc_cmd, 'client', '--libs')
-xmlrpc_client_cflags_cmd = run_command(xmlrpc_cmd, 'client', '--cflags')
+xmlrpc_client_libs_cmd = run_command(xmlrpc_cmd, 'client', '--libs', check : true)
+xmlrpc_client_cflags_cmd = run_command(xmlrpc_cmd, 'client', '--cflags', check : true)
 
 if xmlrpc_client_libs_cmd.returncode() == 0 and xmlrpc_client_cflags_cmd.returncode() == 0
     xmlrpc_client = declare_dependency(compile_args: xmlrpc_client_cflags_cmd.stdout().strip().split(),
