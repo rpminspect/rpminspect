@@ -79,6 +79,7 @@ enum {
     BLOCK_ADDEDFILES,
     BLOCK_ANNOCHECK,
     BLOCK_ANNOCHECK_JOBS,
+    BLOCK_ANNOCHECK_EXTRA_OPTS,
     BLOCK_ANNOCHECK_FAILURE_SEVERITY,
     BLOCK_BADFUNCS,
     BLOCK_BADWORDS,
@@ -342,12 +343,12 @@ static void add_ignore(string_list_map_t **table, int i, char *s)
 }
 
 /**
- * Given a key and value, initialize a new hash table (clearing the old
- * one if necessary) and migrate the data from the list to the hash
- * table.  Clear the incoming hash table list.  The caller is
+ * Given a key and value, initialize a new hash table (clearing the
+ * old one if necessary) and migrate the data from the list to the
+ * hash table.  Clear the incoming hash table list.  The caller is
  * responsible for freeing all memory allocated to these structures.
- * Also note this function is destructive and will clear and
- * reinitialize all parameters.
+ * If append is set to true, this function will only append the value
+ * to an existing key in the table.
  *
  * NOTE: The incoming table entries will be removed and freed as the
  * data is migrated to the table and keys.  Before return, the
@@ -356,11 +357,17 @@ static void add_ignore(string_list_map_t **table, int i, char *s)
  * migrate over to the new structures, but the entries themselves are
  * removed and freed from the incoming table.
  *
- * @param incoming_table List of key=value pairs to turn in to a hash table.
+ * @param key The key in the hash table (string).
+ * @param value The value to add to the hash table (string).
+ * @param append True if values should be appended to found entries,
+ *               false otherwise.
  * @param table Destination hash table.
  */
-static void process_table(char *key, char *value, string_map_t **table)
+static void process_table(char *key, char *value, const bool append, string_map_t **table)
 {
+    char *tmp = NULL;
+    string_list_t *tokens = NULL;
+    string_entry_t *sentry = NULL;
     string_map_t *entry = NULL;
 
     assert(key != NULL);
@@ -370,16 +377,37 @@ static void process_table(char *key, char *value, string_map_t **table)
     HASH_FIND_STR(*table, key, entry);
 
     if (entry == NULL) {
-        /* add the new key/value pair to the table */
-        entry = calloc(1, sizeof(*entry));
-        assert(entry != NULL);
-        entry->key = strdup(key);
-        entry->value = strdup(value);
-        HASH_ADD_KEYPTR(hh, *table, entry->key, strlen(entry->key), entry);
+        if (append) {
+            warnx("missing key `%s', unable to append `%s'", key, value);
+        } else {
+            /* add the new key/value pair to the table */
+            entry = calloc(1, sizeof(*entry));
+            assert(entry != NULL);
+            entry->key = strdup(key);
+            entry->value = strdup(value);
+            HASH_ADD_KEYPTR(hh, *table, entry->key, strlen(entry->key), entry);
+        }
     } else {
-        /* entry found, replace the value */
+        /* entry found, handle the value */
+        if (append) {
+            tokens = strsplit(entry->value, " ");
+            assert(tokens != NULL);
+
+            sentry = calloc(1, sizeof(*sentry));
+            assert(sentry != NULL);
+            sentry->data = strdup(value);
+            assert(sentry->data != NULL);
+            TAILQ_INSERT_TAIL(tokens, sentry, items);
+
+            tmp = list_to_string(tokens, " ");
+            list_free(tokens, free);
+        } else {
+            tmp = strdup(value);
+        }
+
+        assert(tmp != NULL);
         free(entry->value);
-        entry->value = strdup(value);
+        entry->value = tmp;
     }
 
     return;
@@ -942,11 +970,13 @@ static int read_cfgfile(struct rpminspect *ri, const char *filename)
                             block = BLOCK_ANNOCHECK_FAILURE_SEVERITY;
                         } else if (!strcmp(key, "jobs")) {
                             block = BLOCK_ANNOCHECK_JOBS;
+                        } else if (!strcmp(key, "extra_opts")) {
+                            block = BLOCK_ANNOCHECK_EXTRA_OPTS;
                         } else if (!strcmp(key, "ignore")) {
                             block = BLOCK_IGNORE;
                         } else if (strcmp(key, t)) {
                             /* continue support the old syntax for the yaml file */
-                            process_table(key, t, &ri->annocheck);
+                            process_table(key, t, false, &ri->annocheck);
                         }
                     } else if (group == BLOCK_JAVABYTECODE) {
                         if (!strcmp(key, "ignore")) {
@@ -1197,7 +1227,9 @@ static int read_cfgfile(struct rpminspect *ri, const char *filename)
                         }
                     } else if (group == BLOCK_ANNOCHECK) {
                         if (block == BLOCK_ANNOCHECK_JOBS) {
-                            process_table(key, t, &ri->annocheck);
+                            process_table(key, t, false, &ri->annocheck);
+                        } else if (block == BLOCK_ANNOCHECK_EXTRA_OPTS) {
+                            process_table(key, t, true, &ri->annocheck);
                         } else if (block == BLOCK_ANNOCHECK_FAILURE_SEVERITY) {
                             ri->annocheck_failure_severity = getseverity(t, RESULT_NULL);
 
@@ -1207,11 +1239,11 @@ static int read_cfgfile(struct rpminspect *ri, const char *filename)
                             }
                         }
                     } else if (group == BLOCK_JAVABYTECODE) {
-                        process_table(key, t, &ri->jvm);
+                        process_table(key, t, false, &ri->jvm);
                     } else if (group == BLOCK_MIGRATED_PATHS) {
-                        process_table(key, t, &ri->pathmigration);
+                        process_table(key, t, false, &ri->pathmigration);
                     } else if (group == BLOCK_PRODUCTS) {
-                        process_table(key, t, &ri->products);
+                        process_table(key, t, false, &ri->products);
                     } else if (block == BLOCK_INSPECTIONS) {
                         if (!strcasecmp(t, "on")) {
                             exclude = false;
