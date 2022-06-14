@@ -97,32 +97,28 @@ extern volatile sig_atomic_t terminal_resized;
 /*
  * Types of exit codes from the program.
  */
-enum {
-    RI_SUCCESS = 0,              /* everything ok */
-    RI_INSPECTION_FAILURE = 1,   /* inspections failed */
-    RI_PROGRAM_ERROR = 2,        /* program errored in some way */
-    RI_MISSING_PROFILE = 3,      /* specified profile not found */
-    RI_INSUFFICIENT_SPACE = 4    /* insufficient disk space */
-};
+#define RI_SUCCESS            0  /* everything ok */
+#define RI_INSPECTION_FAILURE 1  /* inspections failed */
+#define RI_PROGRAM_ERROR      2  /* program errored in some way */
+#define RI_MISSING_PROFILE    3  /* specified profile not found */
+#define RI_INSUFFICIENT_SPACE 4  /* insufficient disk space */
 
 /*
- * Build identifier strings (used in paths)
- * The enum values map to the build_desc array index.
+ * Build identifiers (used in paths)
  */
-enum { BEFORE_BUILD, AFTER_BUILD };
+#define BEFORE_BUILD 0
+#define AFTER_BUILD  1
 
 /*
  * Supported checksum types.
  */
-enum checksum {
-    NULLSUM,
-    MD5SUM,
-    SHA1SUM,
-    SHA224SUM,
-    SHA256SUM,
-    SHA384SUM,
-    SHA512SUM
-};
+#define NULLSUM   0  /* not used...or shouldn't be */
+#define MD5SUM    1
+#define SHA1SUM   2
+#define SHA224SUM 3
+#define SHA256SUM 4
+#define SHA384SUM 5
+#define SHA512SUM 6
 
 /* Common functions */
 
@@ -308,7 +304,7 @@ char *get_mime_type(rpmfile_entry_t *);
 bool is_text_file(rpmfile_entry_t *);
 
 /* checksums.c */
-char *compute_checksum(const char *, mode_t *, enum checksum);
+char *compute_checksum(const char *, mode_t *, int);
 char *checksum(rpmfile_entry_t *);
 
 /* runcmd.c */

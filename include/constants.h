@@ -50,7 +50,7 @@
  * @def DEFAULT_MESSAGE_DIGEST
  *
  * Default message digest to use internally.  The definition comes
- * from an enum in rpminspect.h.
+ * from a macro in rpminspect.h.
  */
 #define DEFAULT_MESSAGE_DIGEST SHA256SUM
 
