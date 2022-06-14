@@ -62,8 +62,9 @@ bool strprefix(const char *s, const char *prefix)
 {
     size_t plen;
 
-    assert(s);
-    assert(prefix);
+    if (s == NULL || prefix == NULL) {
+        return false;
+    }
 
     plen = strlen(prefix);
 
@@ -86,8 +87,9 @@ bool strsuffix(const char *s, const char *suffix)
 {
     int sl, xl;
 
-    assert(s);
-    assert(suffix);
+    if (s == NULL || suffix == NULL) {
+        return false;
+    }
 
     sl = strlen(s);
     xl = strlen(suffix);
