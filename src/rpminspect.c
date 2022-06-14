@@ -232,18 +232,28 @@ static char *get_product_release(string_map_t *products, const favor_release_t f
     free(after_candidate);
 
     /* Handle release favoring */
-    if (!matched && favor_release != FAVOR_NONE) {
-        c = strverscmp(before_product, after_product);
-        matched = true;
+    if (!matched) {
+        if (before_product && after_product && favor_release != FAVOR_NONE) {
+            c = strverscmp(before_product, after_product);
+            matched = true;
 
-        if (favor_release == FAVOR_OLDEST && c <= 0) {
-            free(after_product);
+            if (favor_release == FAVOR_OLDEST && c <= 0) {
+                free(after_product);
+                after_product = before_product;
+                before_product = NULL;
+            } else if (favor_release == FAVOR_NEWEST && c >= 0) {
+                free(after_product);
+                after_product = before_product;
+                before_product = NULL;
+            }
+        } else if (before_product == NULL && after_product) {
+            /* use after product since we got nothing from the before */
+            matched = true;
+        } else if (before_product && after_product == NULL) {
+            /* use before product since we got nothing from the after */
             after_product = before_product;
             before_product = NULL;
-        } else if (favor_release == FAVOR_NEWEST && c >= 0) {
-            free(after_product);
-            after_product = before_product;
-            before_product = NULL;
+            matched = true;
         }
     }
 
