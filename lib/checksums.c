@@ -62,7 +62,7 @@
  * @note Caller must free returned string when done.
  * @return String containing the human-readable checksum digest, or NULL on failure.
  */
-char *compute_checksum(const char *filename, mode_t *st_mode, enum checksum type)
+char *compute_checksum(const char *filename, mode_t *st_mode, int type)
 {
     struct stat sb;
     mode_t *mode = NULL;
