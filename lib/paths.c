@@ -222,6 +222,11 @@ bool match_path(const char *pattern, const char *root, const char *path)
     assert(pattern != NULL);
     assert(path != NULL);
 
+    /* Simple check first */
+    if (!strcmp(pattern, path)) {
+        return true;
+    }
+
     /* A pattern ending with '/' will match a path prefix */
     if (strsuffix(pattern, "/") && strprefix(path, pattern)) {
         return true;
