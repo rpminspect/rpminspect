@@ -184,6 +184,11 @@ bool inspect_upstream(struct rpminspect *ri)
 
         /* Iterate over the SRPM files */
         TAILQ_FOREACH(file, peer->after_files, items) {
+            /* Ignore files we should be ignoring */
+            if (ignore_path(ri, NAME_UPSTREAM, file->localpath, peer->after_root)) {
+                continue;
+            }
+
             if (!upstream_driver(ri, file)) {
                 result = false;
             }
@@ -194,6 +199,11 @@ bool inspect_upstream(struct rpminspect *ri)
 
         if (removed != NULL && !TAILQ_EMPTY(removed)) {
             TAILQ_FOREACH(entry, removed, items) {
+                /* Ignore files we should be ignoring */
+                if (ignore_path(ri, NAME_UPSTREAM, entry->data, peer->after_root)) {
+                    continue;
+                }
+
                 xasprintf(&params.msg, _("Source file `%s` removed"), entry->data);
                 params.verb = VERB_REMOVED;
                 params.noun = _("source file ${FILE} removed");
