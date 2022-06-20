@@ -355,19 +355,6 @@ bool find_no_pic(Elf *elf, string_list_t **user_data);
 bool find_pic(Elf *elf, string_list_t **user_data);
 bool find_all(Elf *elf, string_list_t **user_data);
 
-/* bytes.c */
-/**
- * Given a byte array of a specified length, convert it to a NUL
- * terminated string and return a pointer to the string to the caller.
- * The caller is responsible for freeing the memory associated with
- * this string.
- *
- * @param array The byte array to convert.
- * @param len Number of elements in the byte array.
- * @return Newly allocated string representation of the byte array.
- */
-char *bytes_to_str(unsigned char *array, size_t len);
-
 /* paths.c */
 /**
  * @brief Return the before build debuginfo package path where the
