@@ -18,7 +18,6 @@ librpminspect_sources = [
     'arches.c',
     'badwords.c',
     'builds.c',
-    'bytes.c',
     'checksums.c',
     'copyfile.c',
     'curl.c',

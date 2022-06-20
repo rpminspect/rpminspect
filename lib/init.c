@@ -660,7 +660,9 @@ static int read_cfgfile(struct rpminspect *ri, const char *filename)
                 break;
             case YAML_SCALAR_TOKEN:
                 /* convert the value to a string for comparison and copying */
-                t = bytes_to_str(token.data.scalar.value, token.data.scalar.length);
+                t = strndup((char *)token.data.scalar.value,
+                            token.data.scalar.length);
+                assert(t != NULL);
                 INIT_DEBUG_PRINT("YAML_SCALAR_TOKEN -> key=%s\n", key);
 
                 /* determine which config file block we are in */
