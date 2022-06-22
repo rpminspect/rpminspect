@@ -111,7 +111,7 @@ static char *match_product(string_map_t *products, const char *candidate)
     /* Try to see if a product mapping matches our strings */
     HASH_ITER(hh, products, hentry, tmp_hentry) {
         /* build a regex for this product release string */
-        result = regcomp(&product_regex, hentry->value, 0);
+        result = regcomp(&product_regex, hentry->value, REG_EXTENDED);
 
         if (result != 0) {
             regerror(result, &product_regex, reg_error, sizeof(reg_error));
@@ -120,7 +120,9 @@ static char *match_product(string_map_t *products, const char *candidate)
         }
 
         /* now try to match the candidate */
-        if (regexec(&product_regex, candidate, 1, matches, 0) != 0) {
+        result = regexec(&product_regex, candidate, 1, matches, 0);
+
+        if (result != 0) {
             regfree(&product_regex);
             continue;
         }
