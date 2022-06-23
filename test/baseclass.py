@@ -208,6 +208,7 @@ class RequiresRpminspect(unittest.TestCase):
 
         # set in configFile()
         self.conffile = None
+        self.extra_cfg = None
 
         # use for rpminspect results
         (handle, self.outputfile) = tempfile.mkstemp()
@@ -272,6 +273,10 @@ class RequiresRpminspect(unittest.TestCase):
 
             if hnd:
                 cfg["metadata"]["buildhost_subdomain"].append(hnd)
+
+        # any additional config settings for the test case
+        if self.extra_cfg is not None:
+            cfg |= self.extra_cfg
 
         # write the temporary config file for the test suite
         outstream = open(self.conffile, "w")
