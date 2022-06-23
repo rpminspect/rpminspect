@@ -524,6 +524,12 @@ struct rpminspect {
      */
     string_list_t *bad_functions;
 
+    /*
+     * Optional: if not NULL, contains a map of file paths in packages
+     * and a list of allowed forbidden functions it can use.
+     */
+    string_list_map_t *bad_functions_allowed;
+
     /* Optional: if not NULL, contains list of architectures */
     /* if not specified on the command line, this becomes the list of
        all architectures downloaded */

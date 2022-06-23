@@ -759,6 +759,21 @@ badfuncs:
     - rexec
     - rresvport
 
+    # Some libraries deliberately use forbidden functions.  In these
+    # cases, you can specify an 'allowed' block listing path globs and
+    # the specific functions they are allowed to use.  It is
+    # adviseable to add a comment indicating why the function is
+    # allowed to use forbidden functions for future reference.  The
+    # path specifications can be explicit paths or patterns that are
+    # compatible with fnmatch(3) and glob(3).
+    #
+    #allowed:
+    #    /usr/lib*/libsomething.so.*:
+    #        - inet_aton
+    #        - inet_network
+    #    /usr/lib*/libsomethingelse.so.*:
+    #        - gethostbyname
+
     # Optional list of glob(7) specifications or path prefixes to
     # match files to ignore for this inspection.  The format of this
     # list is the same as the global 'ignore' list.  The difference is

@@ -223,6 +223,7 @@ void free_rpminspect(struct rpminspect *ri)
     free(ri->elf_path_include_pattern);
     free(ri->elf_path_exclude_pattern);
     list_free(ri->bad_functions, free);
+    free_string_list_map(ri->bad_functions_allowed);
     free(ri->manpage_path_include_pattern);
     free(ri->manpage_path_exclude_pattern);
     free(ri->xml_path_include_pattern);
