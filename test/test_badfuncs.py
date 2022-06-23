@@ -62,3 +62,70 @@ class ForbiddenIPv6FunctionCompareKoji(TestCompareKoji):
         self.inspection = "badfuncs"
         self.waiver_auth = "Anyone"
         self.result = "VERIFY"
+
+
+# Program uses forbidden IPv6 function, but is explicitly allowed
+class AllowedForbiddenIPv6FunctionRPM(TestRPMs):
+    def setUp(self):
+        TestRPMs.setUp(self)
+
+        self.extra_cfg = {}
+        self.extra_cfg["badfuncs"] = {}
+        self.extra_cfg["badfuncs"]["allowed"] = {}
+        self.extra_cfg["badfuncs"]["allowed"]["/usr/bin/hello-world"] = ["inet_aton"]
+
+        self.rpm.add_simple_compilation(sourceContent=forbidden_ipv6_src)
+
+        self.inspection = "badfuncs"
+        self.waiver_auth = "Not Waivable"
+        self.result = "OK"
+
+
+class AllowedForbiddenIPv6FunctionKoji(TestKoji):
+    def setUp(self):
+        TestKoji.setUp(self)
+
+        self.extra_cfg = {}
+        self.extra_cfg["badfuncs"] = {}
+        self.extra_cfg["badfuncs"]["allowed"] = {}
+        self.extra_cfg["badfuncs"]["allowed"]["/usr/bin/hello-world"] = ["inet_aton"]
+
+        self.rpm.add_simple_compilation(sourceContent=forbidden_ipv6_src)
+
+        self.inspection = "badfuncs"
+        self.waiver_auth = "Not Waivable"
+        self.result = "OK"
+
+
+class AllowedForbiddenIPv6FunctionCompareRPMs(TestCompareRPMs):
+    def setUp(self):
+        TestCompareRPMs.setUp(self)
+
+        self.extra_cfg = {}
+        self.extra_cfg["badfuncs"] = {}
+        self.extra_cfg["badfuncs"]["allowed"] = {}
+        self.extra_cfg["badfuncs"]["allowed"]["/usr/bin/hello-world"] = ["inet_aton"]
+
+        self.before_rpm.add_simple_compilation(sourceContent=forbidden_ipv6_src)
+        self.after_rpm.add_simple_compilation(sourceContent=forbidden_ipv6_src)
+
+        self.inspection = "badfuncs"
+        self.waiver_auth = "Not Waivable"
+        self.result = "OK"
+
+
+class AllowedForbiddenIPv6FunctionCompareKoji(TestCompareKoji):
+    def setUp(self):
+        TestCompareKoji.setUp(self)
+
+        self.extra_cfg = {}
+        self.extra_cfg["badfuncs"] = {}
+        self.extra_cfg["badfuncs"]["allowed"] = {}
+        self.extra_cfg["badfuncs"]["allowed"]["/usr/bin/hello-world"] = ["inet_aton"]
+
+        self.before_rpm.add_simple_compilation(sourceContent=forbidden_ipv6_src)
+        self.after_rpm.add_simple_compilation(sourceContent=forbidden_ipv6_src)
+
+        self.inspection = "badfuncs"
+        self.waiver_auth = "Not Waivable"
+        self.result = "OK"

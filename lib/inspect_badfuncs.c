@@ -36,6 +36,51 @@
 
 #include "rpminspect.h"
 
+static bool allowed_symbol(const struct rpminspect *ri, const rpmfile_entry_t *file, const char *symbol)
+{
+    char *root = NULL;
+    size_t lenr = 0;
+    size_t lenp = 0;
+    string_entry_t *entry = NULL;
+    string_list_map_t *hentry = NULL;
+    string_list_map_t *tmp_hentry = NULL;
+
+    assert(ri != NULL);
+    assert(file != NULL);
+    assert(symbol != NULL);
+
+    /* no allowed bad functions defined, false */
+    if (ri->bad_functions_allowed == NULL) {
+        return false;
+    }
+
+    /* construct the root path */
+    root = strdup(file->fullpath);
+    assert(root != NULL);
+    lenr = strlen(root);
+    lenp = strlen(file->localpath);
+
+    if (lenr > lenp) {
+        root[strlen(root) - strlen(file->localpath) + 1] = '\0';
+    }
+
+    /* look for the given path in the bad functions allowed hash */
+    HASH_ITER(hh, ri->bad_functions_allowed, hentry, tmp_hentry) {
+        if (match_path(hentry->key, root, file->localpath)) {
+            /* we found a matching path */
+            TAILQ_FOREACH(entry, hentry->value, items) {
+                if (!strcmp(symbol, entry->data)) {
+                    free(root);
+                    return true;
+                }
+            }
+        }
+    }
+
+    free(root);
+    return false;
+}
+
 /**
  * @brief Check for forbidden function symbols in ELF objects.
  *
@@ -98,7 +143,21 @@ static bool badfuncs_driver(struct rpminspect *ri, rpmfile_entry_t *after)
 
     /* Get a list of forbidden symbols that we used. */
     used_symbols = list_intersection(ri->bad_functions, after_symbols);
+
     if (!used_symbols || TAILQ_EMPTY(used_symbols)) {
+        goto cleanup;
+    }
+
+    /* Filter out any allowed forbidden symbols for this file */
+    TAILQ_FOREACH(iter, used_symbols, items) {
+        if (allowed_symbol(ri, after, iter->data)) {
+            TAILQ_REMOVE(used_symbols, iter, items);
+            free(iter->data);
+            free(iter);
+        }
+    }
+
+    if (TAILQ_EMPTY(used_symbols)) {
         goto cleanup;
     }
 

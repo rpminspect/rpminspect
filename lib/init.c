@@ -36,7 +36,7 @@
  * disabled by commenting this line out and uncommented the
  * INIT_DEBUG_PRINT line that expands to void.
  */
-/* #define INIT_DEBUG_PRINT(...) DEBUG_PRINT((__VA_ARGS__)) */
+/* #define INIT_DEBUG_PRINT DEBUG_PRINT */
 #define INIT_DEBUG_PRINT(...) (void)(0)
 
 /* List defaults (not in constants.h to avoid cpp shenanigans) */
@@ -82,6 +82,7 @@ enum {
     BLOCK_ANNOCHECK_EXTRA_OPTS,
     BLOCK_ANNOCHECK_FAILURE_SEVERITY,
     BLOCK_BADFUNCS,
+    BLOCK_BADFUNCS_ALLOWED,
     BLOCK_BADWORDS,
     BLOCK_BIN_PATHS,
     BLOCK_BUILDHOST_SUBDOMAIN,
@@ -223,11 +224,55 @@ static void add_entry(string_list_t **list, const char *s)
  * Given an inspection identifier from the config file reader and a
  * list value, add it to the per-inspection list of ignores.
  */
+static void add_string_list_map_entry(string_list_map_t **table, char *key, char *value)
+{
+    string_list_map_t *mapentry = NULL;
+    string_entry_t *entry = NULL;
+
+    assert(key != NULL);
+    assert(value != NULL);
+
+    /* create the entry for the value list */
+    entry = calloc(1, sizeof(*entry));
+    assert(entry != NULL);
+    entry->data = strdup(value);
+    assert(entry->data != NULL);
+
+    /* look for the list first, add if not found */
+    HASH_FIND_STR(*table, key, mapentry);
+
+    if (mapentry == NULL) {
+        /* start a new entry for this inspection */
+        mapentry = calloc(1, sizeof(*mapentry));
+        assert(mapentry != NULL);
+        mapentry->key = strdup(key);
+        mapentry->value = calloc(1, sizeof(*mapentry->value));
+        assert(mapentry->value != NULL);
+        TAILQ_INIT(mapentry->value);
+        TAILQ_INSERT_TAIL(mapentry->value, entry, items);
+        HASH_ADD_KEYPTR(hh, *table, mapentry->key, strlen(mapentry->key), mapentry);
+    } else {
+        /* on the off chance we have an empty list of values */
+        if (mapentry->value == NULL) {
+            mapentry->value = calloc(1, sizeof(*mapentry->value));
+            assert(mapentry->value != NULL);
+            TAILQ_INIT(mapentry->value);
+        }
+
+        /* add to existing ignore list */
+        TAILQ_INSERT_TAIL(mapentry->value, entry, items);
+    }
+
+    return;
+}
+
+/*
+ * Given an inspection identifier from the config file reader and a
+ * list value, add it to the per-inspection list of ignores.
+ */
 static void add_ignore(string_list_map_t **table, int i, char *s)
 {
     char *inspection = NULL;
-    string_list_map_t *entry = NULL;
-    string_entry_t *ignore = NULL;
 
     assert(s != NULL);
     assert(i != BLOCK_NULL);
@@ -307,38 +352,7 @@ static void add_ignore(string_list_map_t **table, int i, char *s)
     }
 
     INIT_DEBUG_PRINT("    add_ignore -> inspection=%s, s=|%s|\n", inspection, s);
-
-    /* create the entry for the value list */
-    ignore = calloc(1, sizeof(*ignore));
-    assert(ignore != NULL);
-    ignore->data = strdup(s);
-    assert(ignore->data != NULL);
-
-    /* look for the list first, add if not found */
-    HASH_FIND_STR(*table, inspection, entry);
-
-    if (entry == NULL) {
-        /* start a new entry for this inspection */
-        entry = calloc(1, sizeof(*entry));
-        assert(entry != NULL);
-        entry->key = strdup(inspection);
-        entry->value = calloc(1, sizeof(*entry->value));
-        assert(entry->value != NULL);
-        TAILQ_INIT(entry->value);
-        TAILQ_INSERT_TAIL(entry->value, ignore, items);
-        HASH_ADD_KEYPTR(hh, *table, entry->key, strlen(entry->key), entry);
-    } else {
-        /* on the off chance we have an empty list of values */
-        if (entry->value == NULL) {
-            entry->value = calloc(1, sizeof(*entry->value));
-            assert(entry->value != NULL);
-            TAILQ_INIT(entry->value);
-        }
-
-        /* add to existing ignore list */
-        TAILQ_INSERT_TAIL(entry->value, ignore, items);
-    }
-
+    add_string_list_map_entry(table, inspection, s);
     return;
 }
 
@@ -347,8 +361,11 @@ static void add_ignore(string_list_map_t **table, int i, char *s)
  * old one if necessary) and migrate the data from the list to the
  * hash table.  Clear the incoming hash table list.  The caller is
  * responsible for freeing all memory allocated to these structures.
- * If append is set to true, this function will only append the value
- * to an existing key in the table.
+ *
+ * If required is set to true, this function will only append the
+ * value to an existing key in the table.  Use this parameter if
+ * processing a secondary table and you require the key to exist from
+ * a previous processing run.
  *
  * NOTE: The incoming table entries will be removed and freed as the
  * data is migrated to the table and keys.  Before return, the
@@ -359,11 +376,10 @@ static void add_ignore(string_list_map_t **table, int i, char *s)
  *
  * @param key The key in the hash table (string).
  * @param value The value to add to the hash table (string).
- * @param append True if values should be appended to found entries,
- *               false otherwise.
+ * @param required Set to true if key must exist to append value to list.
  * @param table Destination hash table.
  */
-static void process_table(char *key, char *value, const bool append, string_map_t **table)
+static void process_table(char *key, char *value, const bool required, string_map_t **table)
 {
     char *tmp = NULL;
     string_list_t *tokens = NULL;
@@ -377,7 +393,7 @@ static void process_table(char *key, char *value, const bool append, string_map_
     HASH_FIND_STR(*table, key, entry);
 
     if (entry == NULL) {
-        if (append) {
+        if (required) {
             warnx("missing key `%s', unable to append `%s'", key, value);
         } else {
             /* add the new key/value pair to the table */
@@ -389,7 +405,7 @@ static void process_table(char *key, char *value, const bool append, string_map_
         }
     } else {
         /* entry found, handle the value */
-        if (append) {
+        if (entry->value != NULL) {
             tokens = strsplit(entry->value, " ");
             assert(tokens != NULL);
 
@@ -806,11 +822,11 @@ static int read_cfgfile(struct rpminspect *ri, const char *filename)
                         block = BLOCK_NULL;
                         group = BLOCK_PATCHES;
                     } else if (!strcmp(key, NAME_BADFUNCS)) {
-                        block = BLOCK_BADFUNCS;
-
-                        if (group != BLOCK_BADFUNCS) {
-                            group = BLOCK_BADFUNCS;
-                        }
+                        block = BLOCK_NULL;
+                        group = BLOCK_BADFUNCS;
+                    } else if (group == BLOCK_BADFUNCS && !strcmp(key, "allowed")) {
+                        block = BLOCK_BADFUNCS_ALLOWED;
+                        group = BLOCK_BADFUNCS;
                     } else if (!strcmp(key, NAME_RUNPATH)) {
                         block = BLOCK_NULL;
                         group = BLOCK_RUNPATH;
@@ -982,10 +998,11 @@ static int read_cfgfile(struct rpminspect *ri, const char *filename)
                         if (!strcmp(key, "ignore")) {
                             block = BLOCK_IGNORE;
                         }
-                    } else if (block == BLOCK_BADFUNCS) {
+                    } else if (group == BLOCK_BADFUNCS) {
                         if (!strcmp(key, "ignore")) {
-                            group = BLOCK_BADFUNCS;
                             block = BLOCK_IGNORE;
+                        } else if (!strcmp(key, "allowed")) {
+                            block = BLOCK_BADFUNCS_ALLOWED;
                         }
                     } else if (group == BLOCK_EMPTYRPM) {
                         if (!strcmp(key, "expected_empty")) {
@@ -1361,8 +1378,12 @@ static int read_cfgfile(struct rpminspect *ri, const char *filename)
                 } else if (symbol == SYMBOL_ENTRY) {
                     INIT_DEBUG_PRINT("    -> SYMBOL_ENTRY=%s, block=%d, group=%d\n", t, block, group);
 
-                    if (block == BLOCK_BADFUNCS) {
-                        add_entry(&ri->bad_functions, t);
+                    if (group == BLOCK_BADFUNCS) {
+                        if (block == BLOCK_NULL) {
+                            add_entry(&ri->bad_functions, t);
+                        } else if (block == BLOCK_BADFUNCS_ALLOWED) {
+                            add_string_list_map_entry(&ri->bad_functions_allowed, key, t);
+                        }
                     } else if (block == BLOCK_BADWORDS) {
                         add_entry(&ri->badwords, t);
                     } else if (block == BLOCK_MACROFILES) {
