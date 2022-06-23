@@ -550,11 +550,7 @@ int main(int argc, char **argv)
     ri->progname = strdup(argv[0]);
     ri->verbose = verbose;
     ri->product_release = release;
-    ri->threshold = getseverity(threshold, RESULT_VERIFY);
-    ri->suppress = getseverity(suppress, RESULT_NULL);
     ri->rebase_detection = rebase_detection;
-    free(threshold);
-    free(suppress);
 
     /*
      * Find an appropriate configuration file. This involves:
@@ -609,6 +605,12 @@ int main(int argc, char **argv)
     }
 
     free(profile);
+
+    /* Reporting threshold and suppression levels */
+    ri->threshold = getseverity(threshold, RESULT_VERIFY);
+    ri->suppress = getseverity(suppress, RESULT_NULL);
+    free(threshold);
+    free(suppress);
 
     /*
      * any inspection selections on the command line can override
