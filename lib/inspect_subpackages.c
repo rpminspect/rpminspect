@@ -80,16 +80,18 @@ bool inspect_subpackages(struct rpminspect *ri)
             *arch = '\0';
             arch++;
 
-            xasprintf(&params.msg, _("Subpackage '%s' has disappeared on '%s'"), entry->data, arch);
-            params.severity = RESULT_VERIFY;
-            params.waiverauth = WAIVABLE_BY_ANYONE;
-            params.remedy = REMEDY_SUBPACKAGES_LOST;
-            params.arch = arch;
-            params.file = entry->data;
-            params.verb = VERB_REMOVED;
-            params.noun = _("subpackage ${FILE}");
-            add_result(ri, &params);
-            free(params.msg);
+            if (allowed_arch(ri, arch)) {
+                xasprintf(&params.msg, _("Subpackage '%s' has disappeared on '%s'"), entry->data, arch);
+                params.severity = RESULT_VERIFY;
+                params.waiverauth = WAIVABLE_BY_ANYONE;
+                params.remedy = REMEDY_SUBPACKAGES_LOST;
+                params.arch = arch;
+                params.file = entry->data;
+                params.verb = VERB_REMOVED;
+                params.noun = _("subpackage ${FILE}");
+                add_result(ri, &params);
+                free(params.msg);
+            }
         }
 
         result = false;
@@ -102,16 +104,18 @@ bool inspect_subpackages(struct rpminspect *ri)
             *arch = '\0';
             arch++;
 
-            xasprintf(&params.msg, _("Subpackage '%s' has appeared on '%s'"), entry->data, arch);
-            params.severity = RESULT_INFO;
-            params.waiverauth = NOT_WAIVABLE;
-            params.remedy = REMEDY_SUBPACKAGES_GAIN;
-            params.arch = arch;
-            params.file = entry->data;
-            params.verb = VERB_ADDED;
-            params.noun = _("subpackage ${FILE}");
-            add_result(ri, &params);
-            free(params.msg);
+            if (allowed_arch(ri, arch)) {
+                xasprintf(&params.msg, _("Subpackage '%s' has appeared on '%s'"), entry->data, arch);
+                params.severity = RESULT_INFO;
+                params.waiverauth = NOT_WAIVABLE;
+                params.remedy = REMEDY_SUBPACKAGES_GAIN;
+                params.arch = arch;
+                params.file = entry->data;
+                params.verb = VERB_ADDED;
+                params.noun = _("subpackage ${FILE}");
+                add_result(ri, &params);
+                free(params.msg);
+            }
         }
 
         result = false;

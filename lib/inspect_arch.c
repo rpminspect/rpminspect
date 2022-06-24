@@ -95,30 +95,33 @@ bool inspect_arch(struct rpminspect *ri)
     /* Report results */
     if (lost != NULL && !TAILQ_EMPTY(lost)) {
         TAILQ_FOREACH(entry, lost, items) {
-            params.severity = RESULT_VERIFY;
-            params.remedy = REMEDY_ARCH_LOST;
-            params.verb = VERB_REMOVED;
-            params.noun = _("lost ${ARCH}");
-            params.arch = entry->data;
-            xasprintf(&params.msg, _("Architecture '%s' has disappeared"), entry->data);
-            add_result(ri, &params);
-            free(params.msg);
+            if (allowed_arch(ri, entry->data)) {
+                params.severity = RESULT_VERIFY;
+                params.remedy = REMEDY_ARCH_LOST;
+                params.verb = VERB_REMOVED;
+                params.noun = _("lost ${ARCH}");
+                params.arch = entry->data;
+                xasprintf(&params.msg, _("Architecture '%s' has disappeared"), entry->data);
+                add_result(ri, &params);
+                free(params.msg);
+            }
         }
 
         result = false;
     }
 
-
     if (gain != NULL && !TAILQ_EMPTY(gain)) {
         TAILQ_FOREACH(entry, gain, items) {
-            params.severity = RESULT_INFO;
-            params.remedy = REMEDY_ARCH_GAIN;
-            params.verb = VERB_ADDED;
-            params.noun = _("gained ${ARCH}");
-            params.arch = entry->data;
-            xasprintf(&params.msg, _("Architecture '%s' has appeared"), entry->data);
-            add_result(ri, &params);
-            free(params.msg);
+            if (allowed_arch(ri, entry->data)) {
+                params.severity = RESULT_INFO;
+                params.remedy = REMEDY_ARCH_GAIN;
+                params.verb = VERB_ADDED;
+                params.noun = _("gained ${ARCH}");
+                params.arch = entry->data;
+                xasprintf(&params.msg, _("Architecture '%s' has appeared"), entry->data);
+                add_result(ri, &params);
+                free(params.msg);
+            }
         }
 
         result = false;
