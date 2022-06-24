@@ -1,3 +1,145 @@
+Changes in rpminspect-1.10
+--------------------------
+
+General release and build process changes:
+* check the results of meson's run_command()
+
+Config file or data/ file changes:
+* Clarify the 'ignore' block in comments
+
+Changes to the GitHub Actions CI scripts and files:
+* Enable Fedora rawhide again for x86_64 and i686
+* Do not use a specific actions/checkout version for alpinelinux
+* Use actions/checkout@v3 in alpinelinux.yml
+* On alpinelinux, run git config to define the safe directory
+* Run git config command on all GitHub Actions jobs
+* Make sure 'git' is installed for the fedora GHA jobs
+* Update the Slackware Linux GHA job
+* Build clamav with '-D ENABLE_JSON_SHARED=ON' on Slackware
+* opensuse does not use yum
+
+rpminspect(1) changes:
+* Add missing format string to errx() calls
+* For fetch-only, do not override the argv counter in the loop
+* Match products with dist tags containing periods
+* Careful cleanup with rmtree() on exit
+* Honor the -s/--suppress option on json, xunit, and summary modes
+* Use errx() for RI_PROGRAM_ERROR conditions in rpminspect(1)
+* Do not assume before_product and after_product exist
+* Improve product release detection for build comparisons
+* Restore product release matching for single build analysis
+* Handle build comparisons where product release is half known
+* Fix handling of the -s and -t command line options
+
+Documentation changes:
+* Large set of Doxygen comments in header files
+* Add Doxygen comments for include/readelf.h
+* More Doxygen comment headers in include/
+
+General bug fix in the library or frontend program:
+* Normalize the KABI path and do not warn on access(3) failures
+* Do not try to mmap() zero length files in read_file()
+* Do not use warn() if read_file() returns NULL in get_patch_stats()
+* Handle NULL result->msg in output_xunit()
+* Reset the tmp pointer on realloc() in strxmlescape()
+* On stat() failure in read_file_bytes(), just return NULL
+* Use CURLINFO_CONTENT_LENGTH_DOWNLOAD on older libcurl releases
+* Correct the reporting of kmod parameter differences
+* Do not report fallthrough changes as VERIFY in changedfiles
+* Stop resetting the patch_ignore_list when reading config files
+* Honor all per-inspection ignore lists; match path prefix
+* Remove temporary files in the 'changelog' inspection
+* Carefully filter debug packages in gather_deprules_by_type()
+* Double free removed in match_fileinfo_mode()
+* read_file_bytes() must be restricted to S_ISREG() files
+* In rpmdeps, do not report new explicit Requires as VERIFY
+* Do not incorrectly report security-related files as new
+* Correctly handle addedfiles edge cases
+* Security path checking only applies to comparisons in addedfiles
+* Missing free() calls in the new list_remove() function
+* Use a long rather than int64_t for the patch number
+* Correct RPM dependency rule peering
+* Prevent double free() in the patches inspection
+* Correct handling of kmidiff(1) exit codes
+* Correctly check for forbidden directories in RPM payloads
+* Handle PatchN: lines in spec files with no space after ':'
+* Address some additional Patch and %patch line reading issues
+* strtrim() and strsplit() memory management fixes
+* Handle more auto deps in the kernel package correctly
+* Make sure INFO results in metadata do not fail rpminspect
+* Relax the 'types' inspection a bit
+* Try FNM_LEADING_DIR matches when patterns end in wildcard
+* Correctly pick up the use of %autopatch or %autosetup
+* strcmp() -> !strcmp() in the patches inspection
+* Memory management fix for the changelog inspection
+* Remove temporary files in the changelog inspection
+* Do not fail 'runpath' when comparing kernel builds
+* free before_output and after_output *after* using them
+* Do not fail dsodeps if ELF type is not ET_DYN
+* Tie the annocheck inspection result to reporting severity
+* Only report forbidden path additions as VERIFY in addedfiles
+* In 'removedfiles' report VERIFY and BAD for security paths
+* Account for leading executables in Exec= (e.g., "env VAR=VAL")
+* Output unified diff correctly in delta_out()
+* Simplify severity reporting in the changedfiles inspection
+* Add missing free(tmp) calls in the desktop inspection
+* Minimize total_width initialization for download progress bar
+* Fail if we cannot read RPMs before downloading
+* Adjust reporting severity in the permissions inspection
+* Prevent repetitive results reporting in 'types'
+* Correct rpmdeps inspection reporting levels
+* Correct results reporting for the permissions inspection
+* Correct results reporting for the types inspection
+* Correct results reporting for the filesize inspection
+* Allow NULL inputs to strprefix() and strsuffix()
+* Get per-inspection ignore list working in 'upstream'
+* Support per-file allowed lists for the badfuncs inspection
+* Use allowed_arch() in the arch and subpackages inspections
+* Remove unnecessary warning from failed chdir() call
+
+librpminspect feature or significant change:
+* Drop dependency on the external 'diffstat' command
+* Remove init_elf_data() function
+* Verify enough local disk space exists before downloading
+* Check for enough disk space before unpacking RPMs
+* Add strexitcode() and RI_INSUFFICIENT_SPACE exit code
+* Display insufficient space messages in human readable sizes
+* Doxygen comment work but also add and use missing remedy strings
+* Update to uthash 2.3.0
+* Drop the file count and line count checks in 'patches'
+* Default the filesize inspection size_threshold to 'info'
+* Rename init_rpmpeer() and free_rpmpeer() functions
+* Restrict the annocheck and lto inspections to ELF files
+* Simplify the librpm initialization call
+* Make the rpmdeps handle expected config() autodeps correctly
+* Adjust how the rpmdeps inspections trims ISA substrings
+* Add list_remove() function to librpminspect
+* Expand the patches inspection to verify patches are applied
+* Change how debuginfo dirs are matched for files
+* Add strtrim() function to librpminspect
+* In strsplit(), skip empty string tokens
+* Replace rpmDefineMacro usage with rpmPushMacro
+* In diagnostics, display download and unpack space reqs
+* Make the kmod inspection report changes as INFO only
+* Remove unnecessary archive_read_open_filename() warning
+* Always output 'diagnostics' results even if -s specified
+* Move ./rpminspect.yaml reading to init_rpminspect()
+* Support optional product release configuration files
+* Allow local rpminspect.yaml files to extend annocheck options
+* Use REG_EXTENDED in match_product()
+
+Test suite commits:
+* Adjust the addedfiles tests to handle new default size threshold
+* Disable all MultipleProvidersCompareRPMs test cases
+* Fix the MultipleProvidersCompareRPMs test cases
+* Correct the %autopatch and %autosetup test cases
+* Skip %autopatch and %autosetup tests on systems without lua
+* Update the test_addedfiles.py test cases
+* Verify automatic ELF Requires handle subpackage changes
+* Support optional rpminspect.yaml overrides per test
+* Use .update() rather than |= to merge dicts
+
+
 Changes in rpminspect-1.9
 -------------------------
 
