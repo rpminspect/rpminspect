@@ -267,7 +267,6 @@ static bool symlinks_driver(struct rpminspect *ri, rpmfile_entry_t *file)
     TAILQ_FOREACH(peer, ri->peers, items) {
         /* move to the subpackage root */
         if (chdir(peer->after_root) == -1) {
-            warn("chdir");
             continue;
         }
 
