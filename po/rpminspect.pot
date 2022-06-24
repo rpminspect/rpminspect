@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: rpminspect\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-03-02 09:23-0500\n"
+"POT-Creation-Date: 2022-06-24 16:15-0400\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -17,7 +17,7 @@ msgstr ""
 "Content-Type: text/plain; charset=CHARSET\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: include/inspect.h:645
+#: include/inspect.h:1302
 msgid ""
 "Verify the string specified in the License tag of the RPM metadata describes "
 "permissible software licenses as defined by the license database. Also "
@@ -25,20 +25,20 @@ msgid ""
 "defined in the configuration file."
 msgstr ""
 
-#: include/inspect.h:647
+#: include/inspect.h:1308
 msgid ""
 "Check all binary RPMs in the build for any empty payloads. When comparing "
 "two builds, report new packages in the after build with empty payloads."
 msgstr ""
 
-#: include/inspect.h:649
+#: include/inspect.h:1314
 msgid ""
 "Check all binary RPMs in the before and after builds for any empty payloads. "
 "Packages that lost payload data from the before build to the after build are "
 "reported."
 msgstr ""
 
-#: include/inspect.h:651
+#: include/inspect.h:1320
 msgid ""
 "Perform some RPM header checks. First, check that the Vendor contains the "
 "expected string as defined in the configuration file. Second, check that the "
@@ -49,18 +49,18 @@ msgid ""
 "build values of the previous RPM header values and report them."
 msgstr ""
 
-#: include/inspect.h:653
+#: include/inspect.h:1326
 msgid ""
 "Perform some checks on man pages in the RPM payload. First, check that each "
 "man page is compressed. Second, check that each man page contains valid "
 "content. Lastly, check that each man page is installed to the correct path."
 msgstr ""
 
-#: include/inspect.h:655
+#: include/inspect.h:1332
 msgid "Check that XML files included in the RPM payload are well-formed."
 msgstr ""
 
-#: include/inspect.h:657
+#: include/inspect.h:1338
 msgid ""
 "Perform several checks on ELF files. First, check that ELF objects do not "
 "contain an executable stack. Second, check that ELF objects do not contain "
@@ -69,29 +69,29 @@ msgid ""
 "there is a list of forbidden library functions, make sure nothing uses them."
 msgstr ""
 
-#: include/inspect.h:659
+#: include/inspect.h:1344
 msgid ""
 "Perform syntax and file reference checks on *.desktop files. Syntax errors "
 "and invalid file references are reported as errors."
 msgstr ""
 
-#: include/inspect.h:661
+#: include/inspect.h:1350
 msgid ""
 "Check that the 'Release' tag in the RPM spec file includes the %{?dist} "
 "directive."
 msgstr ""
 
-#: include/inspect.h:663
+#: include/inspect.h:1356
 msgid "Ensure the spec file name conforms to the NAME.spec naming format."
 msgstr ""
 
-#: include/inspect.h:665
+#: include/inspect.h:1362
 msgid ""
 "Ensure compliance with modularity build and packaging policies (only valid "
 "for module builds, no-op otherwise)."
 msgstr ""
 
-#: include/inspect.h:667
+#: include/inspect.h:1368
 msgid ""
 "Check minimum required Java bytecode version in class files, report bytecode "
 "version changes between builds, and report if bytecode versions are "
@@ -99,7 +99,7 @@ msgid ""
 "in the configuration file."
 msgstr ""
 
-#: include/inspect.h:669
+#: include/inspect.h:1374
 msgid ""
 "Report changed files from the before build to the after build.  Certain file "
 "changes will raise additional warnings if the concern is more critical than "
@@ -111,7 +111,7 @@ msgid ""
 "changes with diff output are included in the results."
 msgstr ""
 
-#: include/inspect.h:671
+#: include/inspect.h:1380
 msgid ""
 "Report files that have moved installation paths or across subpackages "
 "between builds.  Files moved with a security path prefix generate special "
@@ -120,7 +120,7 @@ msgid ""
 "the VERIFY level or higher."
 msgstr ""
 
-#: include/inspect.h:673
+#: include/inspect.h:1386
 msgid ""
 "Report removed files from the before build to the after build.  Shared "
 "libraries get additional reporting output as they may be unexpected "
@@ -131,7 +131,7 @@ msgid ""
 "the VERIFY level or higher."
 msgstr ""
 
-#: include/inspect.h:675
+#: include/inspect.h:1392
 msgid ""
 "Report added files from the before build to the after build.  Debuginfo "
 "files are ignored as are files that match the patterns defined in the "
@@ -142,7 +142,7 @@ msgid ""
 "packages report them at the VERIFY level or higher."
 msgstr ""
 
-#: include/inspect.h:677
+#: include/inspect.h:1398
 msgid ""
 "Report Source archives defined in the RPM spec file changing content between "
 "the before and after build. If the source archives change and the package is "
@@ -150,14 +150,14 @@ msgid ""
 "the change is reported as a rebase of the package and requires inspection."
 msgstr ""
 
-#: include/inspect.h:679
+#: include/inspect.h:1404
 msgid ""
 "Report files and directories owned by unexpected users and groups. Check to "
 "make sure executables are owned by the correct user and group. If a before "
 "and after build have been specified, also report ownership changes."
 msgstr ""
 
-#: include/inspect.h:681
+#: include/inspect.h:1410
 msgid ""
 "For all shell scripts in the build, perform a syntax check on it using the "
 "shell defined in its #! line (shell must also be listed in shell section of "
@@ -167,7 +167,7 @@ msgid ""
 "passing the syntax check."
 msgstr ""
 
-#: include/inspect.h:683
+#: include/inspect.h:1416
 msgid ""
 "Perform annocheck tests defined in the configuration file on all ELF files "
 "in the build.  A single build specified will perform an analysis only.  Two "
@@ -176,27 +176,27 @@ msgid ""
 "inspection is skipped."
 msgstr ""
 
-#: include/inspect.h:685
+#: include/inspect.h:1422
 msgid ""
 "Compare DT_NEEDED entries in dynamic ELF executables and shared libraries "
 "between the before and after build and report changes."
 msgstr ""
 
-#: include/inspect.h:687
+#: include/inspect.h:1428
 msgid ""
 "Report file size changes between builds.  If empty files became non-empty or "
 "non-empty files became empty, report those as results needing verification.  "
 "Report file change percentages as info-only."
 msgstr ""
 
-#: include/inspect.h:689
+#: include/inspect.h:1434
 msgid ""
 "Report stat(2) mode changes between builds.  Checks against the fileinfo "
 "list for the product release specified or determined.  Any setuid or setgid "
 "changes will raise a message requiring Security Team review."
 msgstr ""
 
-#: include/inspect.h:692
+#: include/inspect.h:1442
 msgid ""
 "Report capabilities(7) changes between builds.  Checks against the "
 "capabilities list for the product release specified or determined.  Any "
@@ -204,15 +204,14 @@ msgid ""
 "review."
 msgstr ""
 
-#: include/inspect.h:696
+#: include/inspect.h:1451
 msgid ""
 "Report kernel module parameter, dependency, PCI ID, or symbol differences "
-"between builds.  Added and removed parameters are reported and if the "
-"package version is unchanged, these messages are reported as failures.  The "
-"same is true module dependencies, PCI IDs, and symbols."
+"between builds.  This inspection is intended as an information gathering "
+"tool to gather kernel module differences between two builds."
 msgstr ""
 
-#: include/inspect.h:699
+#: include/inspect.h:1458
 msgid ""
 "Report RPM architectures that appear and disappear between the before and "
 "after builds.  This inspection does not report the loss of noarch packages.  "
@@ -221,13 +220,13 @@ msgid ""
 "after build."
 msgstr ""
 
-#: include/inspect.h:701
+#: include/inspect.h:1464
 msgid ""
 "Report RPM subpackages that appear and disappear between the before and "
 "after builds."
 msgstr ""
 
-#: include/inspect.h:703
+#: include/inspect.h:1470
 #, c-format
 msgid ""
 "Ensure packages contain an entry in the %changelog for the version built.  "
@@ -235,7 +234,7 @@ msgid ""
 "that the new entry contains new text entries."
 msgstr ""
 
-#: include/inspect.h:705
+#: include/inspect.h:1476
 msgid ""
 "Report files that are packaged in directories that are no longer used by the "
 "product.  Usually this means a package has not been updated to account for "
@@ -243,7 +242,7 @@ msgid ""
 "migrating to /usr/sbin."
 msgstr ""
 
-#: include/inspect.h:707
+#: include/inspect.h:1482
 msgid ""
 "Link Time Optimization (LTO) produces smaller and faster shared ELF "
 "executables and libraries.  LTO bytecode is not stable from one release of "
@@ -252,26 +251,26 @@ msgid ""
 "ELF relocatable objects and reports if any is present."
 msgstr ""
 
-#: include/inspect.h:709
+#: include/inspect.h:1488
 msgid ""
 "Symbolic links must be resolvable on the installed system.  This inspection "
 "ensures absolute and relative symlinks are valid.  It also checks for any "
 "symlink usage that will cause problems for RPM."
 msgstr ""
 
-#: include/inspect.h:711
+#: include/inspect.h:1494
 #, c-format
 msgid ""
 "Check %files sections in the spec file for any forbidden path references."
 msgstr ""
 
-#: include/inspect.h:713
+#: include/inspect.h:1500
 msgid ""
 "Compare MIME types of files between builds and report any changes for "
 "verification."
 msgstr ""
 
-#: include/inspect.h:715
+#: include/inspect.h:1506
 msgid ""
 "When comparing two builds or two packages, compare ELF files using "
 "abidiff(1) from the libabigail project.  Differences are reported.  If the "
@@ -283,7 +282,7 @@ msgid ""
 "rebaseable list."
 msgstr ""
 
-#: include/inspect.h:717
+#: include/inspect.h:1512
 msgid ""
 "kmidiff compares the binary Kernel Module Interfaces of two Linux kernel "
 "trees.  The binary KMI is the interface that the Linux kernel exposes to its "
@@ -293,7 +292,7 @@ msgid ""
 "verification."
 msgstr ""
 
-#: include/inspect.h:719
+#: include/inspect.h:1518
 #, c-format
 msgid ""
 "Check for and report differences in configuration files marked with %config "
@@ -302,32 +301,32 @@ msgid ""
 "at the VERIFY level unless the comparison is between rebased packages."
 msgstr ""
 
-#: include/inspect.h:721
+#: include/inspect.h:1524
 #, c-format
 msgid ""
 "Report changes in %doc marked files.  Files that have been added or removed "
 "as documentation files, for instance."
 msgstr ""
 
-#: include/inspect.h:723
+#: include/inspect.h:1530
 msgid ""
 "Inspects all patches defined in the spec file and reports changes between "
-"builds.  At the INFO level, rpminspect reports diffstat(1) and patch size "
-"changes.  If thresholds are reached regarding a change in the patch size or "
-"the number of files the patch touches, rpminspect reports the change at the "
-"VERIFY level unless the comparison is for a rebase.  The configuration file "
-"can also list patch names that rpminspect should ignore during the "
-"inspection."
+"builds.  At the INFO level, rpminspect reports file count, line count, and "
+"patch size changes.  If thresholds are reached regarding a change in the "
+"patch size or the number of files the patch touches, rpminspect reports the "
+"change at the VERIFY level unless the comparison is for a rebase.  The "
+"configuration file can also list patch names that rpminspect should ignore "
+"during the inspection."
 msgstr ""
 
-#: include/inspect.h:725
+#: include/inspect.h:1536
 msgid ""
 "Performs a virus scan on every file in the build using libclamav.  Anything "
 "found by libclamav will fail the inspection.  The ignore_path rules are not "
 "used in this inspection.  All files are scanned."
 msgstr ""
 
-#: include/inspect.h:727
+#: include/inspect.h:1542
 msgid ""
 "Check for known politically sensitive files in packages and report if they "
 "are allowed or prohibited.  The rules come from the politics/ subdirectory "
@@ -336,7 +335,7 @@ msgid ""
 "define the politically sensitive allow and deny rules for that release."
 msgstr ""
 
-#: include/inspect.h:729
+#: include/inspect.h:1548
 msgid ""
 "Check for forbidden functions in ELF files.  Forbidden functions are defined "
 "in the runtime configuration files.  Usually this inspection is used to "
@@ -344,20 +343,20 @@ msgid ""
 "built packages to conform to replacement APIs."
 msgstr ""
 
-#: include/inspect.h:731
+#: include/inspect.h:1554
 msgid ""
 "Check for forbidden paths in both the DT_RPATH and DT_RUNPATH settings in "
 "ELF shared objects."
 msgstr ""
 
-#: include/inspect.h:733
+#: include/inspect.h:1560
 msgid ""
 "Scan extracted and patched source code files, scripts, and RPM spec files "
 "for any prohibited Unicode code points, as defined in the configuration "
 "file.  Any prohibited code points are reported as a possible security risk."
 msgstr ""
 
-#: include/inspect.h:735
+#: include/inspect.h:1566
 msgid ""
 "Check for correct RPM dependency metadata.  Report incorrect or conflicting "
 "findings as well as expected changes when comparing a new build to an older "
@@ -366,42 +365,42 @@ msgid ""
 "build and report findings."
 msgstr ""
 
-#: include/results.h:33
+#: include/results.h:47
 msgid "Change the string specified on the 'Vendor:' line in the spec file."
 msgstr ""
 
-#: include/results.h:34
+#: include/results.h:54
 msgid "Make sure the SRPM is built on a host within the expected subdomain."
 msgstr ""
 
-#: include/results.h:35
+#: include/results.h:61
 msgid ""
 "Unprofessional language as defined in the configuration file was found in "
 "the text shown.  Remove or change the offending words and rebuild."
 msgstr ""
 
-#: include/results.h:38 include/results.h:41
+#: include/results.h:76 include/results.h:91
 #, c-format
 msgid ""
 "Check to see if you eliminated a subpackage but still have the %package and/"
 "or the %files section for it."
 msgstr ""
 
-#: include/results.h:44
+#: include/results.h:106
 msgid ""
 "The License tag must contain an approved license string as defined by the "
 "distribution (e.g., GPLv2+).  If the license in question is approved, the "
 "license database needs updating in the rpminspect-data package."
 msgstr ""
 
-#: include/results.h:45
+#: include/results.h:113
 msgid ""
 "Make sure the licensedb setting in the rpminspect configuration is set to a "
 "valid licensedb file.  This is also commonly due to a missing vendor "
 "specific rpminspect-data package on the system."
 msgstr ""
 
-#: include/results.h:46
+#: include/results.h:120
 msgid ""
 "The specified license abbreviation is not listed as approved in the license "
 "database.  The license database is specified in the rpminspect configuration "
@@ -411,102 +410,97 @@ msgid ""
 "options for this software."
 msgstr ""
 
-#: include/results.h:49 include/results.h:54
+#: include/results.h:135 include/results.h:170
 msgid "Ensure all object files are compiled with -fPIC"
 msgstr ""
 
-#: include/results.h:50
+#: include/results.h:142
 msgid ""
 "Ensure that the package is being built with the correct compiler and "
 "compiler flags"
 msgstr ""
 
-#: include/results.h:51
+#: include/results.h:149
 msgid ""
 "The data in an ELF file appears to be corrupt; ensure that packaged ELF "
 "files are not being truncated or incorrectly modified"
 msgstr ""
 
-#: include/results.h:52
+#: include/results.h:156
 msgid ""
 "An ELF stack is marked as executable. Ensure that no execstack options are "
 "being passed to the linker, and that no functions are defined on the stack."
 msgstr ""
 
-#: include/results.h:53
+#: include/results.h:163
 msgid "Ensure executables are linked with with '-z relro -z now'"
 msgstr ""
 
-#: include/results.h:55
-msgid ""
-"Please review all usages of IPv4-only functions and ensure IPv6 compliance."
-msgstr ""
-
-#: include/results.h:58
+#: include/results.h:185
 msgid "Correct the errors in the man page as reported by the libmandoc parser."
 msgstr ""
 
-#: include/results.h:59
+#: include/results.h:192
 msgid ""
 "Correct the installation path for the man page. Man pages must be installed "
 "in the directory beneath /usr/share/man that matches the section number of "
 "the page."
 msgstr ""
 
-#: include/results.h:62
+#: include/results.h:207
 msgid "Correct the reported errors in the XML document"
 msgstr ""
 
-#: include/results.h:65
+#: include/results.h:222
 msgid ""
 "Refer to the Desktop Entry Specification at https://standards.freedesktop."
 "org/desktop-entry-spec/latest/ for help correcting the errors and warnings"
 msgstr ""
 
-#: include/results.h:68
+#: include/results.h:237
 msgid ""
 "The Release: tag in the spec file must include a '%{?dist}' string.  Please "
 "add this to the spec file per the distribution packaging guidelines."
 msgstr ""
 
-#: include/results.h:71
+#: include/results.h:252
 msgid ""
 "The spec file name does not match the expected NAME.spec format.  Rename the "
 "spec file to conform to this policy."
 msgstr ""
 
-#: include/results.h:74
+#: include/results.h:267
 msgid ""
 "This package is part of a module but is missing the %{modularitylabel} "
 "header tag.  Add this as a %define in the spec file and rebuild."
 msgstr ""
 
-#: include/results.h:77
+#: include/results.h:282
 msgid ""
 "The Java bytecode version for one or more class files in the build was not "
 "met for the product release.  Ensure you are using the correct JDK for the "
 "build."
 msgstr ""
 
-#: include/results.h:80
+#: include/results.h:297
 msgid ""
-"Unexpected file changes were found.  Verify these changes are correct.  If "
-"they are not, adjust the build to prevent file changes."
+"File changes were found.  In most cases these are expected, but it is a good "
+"idea to verify the changes found are deliberate."
 msgstr ""
 
-#: include/results.h:83
+#: include/results.h:312
 msgid ""
 "Unexpected file moves were found.  Verify these changes are correct.  If "
 "they are not, adjust the build to prevent the file moves between builds."
 msgstr ""
 
-#: include/results.h:86
+#: include/results.h:327
 msgid ""
 "Unexpected file removals were found.  Verify these changes are correct.  If "
 "they are not, adjust the build to prevent the file removals between builds."
 msgstr ""
 
-#: include/results.h:89
+#: include/results.h:342
 #, c-format
 msgid ""
 "Unexpected file additions were found.  Verify these changes are correct.  If "
@@ -517,7 +511,7 @@ msgid ""
 "change the forbidden_path_prefixes or forbidden_path_suffixes list."
 msgstr ""
 
-#: include/results.h:92
+#: include/results.h:357
 #, c-format
 msgid ""
 "Unexpected changed source archive content. The version of the package did "
@@ -526,7 +520,7 @@ msgid ""
 "send a patch to the project that owns that file."
 msgstr ""
 
-#: include/results.h:95
+#: include/results.h:372
 #, c-format
 msgid ""
 "Make sure the %%files section includes the %%defattr macro. If these "
@@ -534,7 +528,7 @@ msgid ""
 "owns it."
 msgstr ""
 
-#: include/results.h:96
+#: include/results.h:379
 #, c-format
 msgid ""
 "Bin path files must be owned by the bin_owner set in the rpminspect "
@@ -542,7 +536,7 @@ msgid ""
 "%s and send a patch to the project that owns it."
 msgstr ""
 
-#: include/results.h:97
+#: include/results.h:386
 #, c-format
 msgid ""
 "Bin path files must be owned by the bin_group set in the rpminspect "
@@ -550,7 +544,7 @@ msgid ""
 "and send a patch to the project that owns it."
 msgstr ""
 
-#: include/results.h:98
+#: include/results.h:393
 #, c-format
 msgid ""
 "Either chgrp the file to the bin_group set in the rpminspect configuration "
@@ -558,7 +552,7 @@ msgid ""
 "is expected, update %s and send a patch to the project that owns it."
 msgstr ""
 
-#: include/results.h:99
+#: include/results.h:400
 #, c-format
 msgid ""
 "Either chgrp the file to the bin_group set in the rpminspect configuration "
@@ -566,7 +560,7 @@ msgid ""
 "expected, update %s and send a patch to the project that owns it."
 msgstr ""
 
-#: include/results.h:100
+#: include/results.h:407
 #, c-format
 msgid ""
 "Verify the ownership changes are expected. If not, adjust the package build "
@@ -574,27 +568,27 @@ msgid ""
 "and send a patch to the project that owns it."
 msgstr ""
 
-#: include/results.h:103
+#: include/results.h:422
 msgid "Consult the shell documentation for proper syntax."
 msgstr ""
 
-#: include/results.h:104
+#: include/results.h:429
 msgid ""
 "The file referenced was not a known shell script in the before build but is "
 "now a shell script in the after build."
 msgstr ""
 
-#: include/results.h:105
+#: include/results.h:436
 msgid ""
 "The referenced shell script is invalid. Consider debugging it with the '-n' "
 "option on the shell to find and fix the problem."
 msgstr ""
 
-#: include/results.h:108
+#: include/results.h:451
 msgid "See annocheck(1) for more information."
 msgstr ""
 
-#: include/results.h:109
+#: include/results.h:458
 msgid ""
 "Ensure all object files are compiled with '-O2 -D_FORTIFY_SOURCE=2', and "
 "that all appropriate headers are included (no implicit function "
@@ -602,7 +596,7 @@ msgid ""
 "unable to determine the size of a buffer, which is not necessarily an error."
 msgstr ""
 
-#: include/results.h:112
+#: include/results.h:473
 msgid ""
 "DT_NEEDED symbols have been added or removed.  This happens when the build "
 "environment has different versions of the required libraries.  Sometimes "
@@ -611,19 +605,33 @@ msgid ""
 "the correct shared libraries."
 msgstr ""
 
-#: include/results.h:115
+#: include/results.h:488
+msgid ""
+"A file grew by a noticeable amount.  Ensure this change is intended.  If it "
+"is, you can adjust the filesize inspection settings in the rpminspect.yaml "
+"file."
+msgstr ""
+
+#: include/results.h:495
+msgid ""
+"A file shrank by a noticeable amount.  Ensure this change is intended.  If "
+"it is, you can adjust the filesize inspection settings in the rpminspect."
+"yaml file."
+msgstr ""
+
+#: include/results.h:502
 msgid ""
 "A previously empty file is no longer empty.  Make sure this change is "
 "intended and fix the package spec file if necessary."
 msgstr ""
 
-#: include/results.h:116
+#: include/results.h:509
 msgid ""
 "A previously non-empty file is now empty.  Make sure this change is intended "
 "and fix the package space file if necessary."
 msgstr ""
 
-#: include/results.h:119
+#: include/results.h:524
 #, c-format
 msgid ""
 "Unexpected capabilities were found on the indicated file.  Consult "
@@ -633,73 +641,73 @@ msgid ""
 "changes found here and send a patch to the project that owns the data file."
 msgstr ""
 
-#: include/results.h:122
+#: include/results.h:539
 msgid ""
 "Kernel module parameters were removed between builds.  This may present "
 "usability problems for users if module parameters were removed in a "
 "maintenance update."
 msgstr ""
 
-#: include/results.h:123
+#: include/results.h:546
 msgid ""
 "Kernel module dependencies changed between builds.  This may present "
 "usability problems for users if module dependencies changed in a maintenance "
 "update."
 msgstr ""
 
-#: include/results.h:124
+#: include/results.h:553
 msgid ""
 "Kernel module device aliases changed between builds.  This may present "
 "usability problems for users if module device aliases changed in a "
 "maintenance update."
 msgstr ""
 
-#: include/results.h:127
+#: include/results.h:563
 msgid ""
 "An architecture present in the before build is now missing in the after "
 "build.  This may be deliberate, but check to make sure you do not have any "
 "unexpected ExclusiveArch lines in the spec file."
 msgstr ""
 
-#: include/results.h:128
+#: include/results.h:564
 msgid ""
 "A new architecture has appeared in the after build.  This may indicate "
 "progress in the world of computing."
 msgstr ""
 
-#: include/results.h:131
+#: include/results.h:574
 msgid ""
 "A subpackage present in the before build is now missing in the after build.  "
 "This may be deliberate, but check to make sure you have correct syntax "
 "defining the subpackage in the spec file"
 msgstr ""
 
-#: include/results.h:132
+#: include/results.h:575
 msgid ""
 "A new subpackage has appeared in the after build.  This may indicate "
 "progress in the world of computing."
 msgstr ""
 
-#: include/results.h:135
+#: include/results.h:585
 #, c-format
 msgid ""
 "Make sure the spec file in the after build contains a valid %changelog "
 "section."
 msgstr ""
 
-#: include/results.h:138
+#: include/results.h:595
 msgid ""
 "Files should not be installed in old directory names.  Modify the package to "
 "install the affected file to the preferred directory."
 msgstr ""
 
-#: include/results.h:141
+#: include/results.h:605
 msgid ""
 "ELF .o and .a files should not carry LTO (Link Time Optimization) bytecode.  "
 "Make sure you have stripped LTO bytecode from those files at install time."
 msgstr ""
 
-#: include/results.h:144
+#: include/results.h:615
 msgid ""
 "Make sure symlinks point to a valid destination in one of the subpackages of "
 "the build; dangling symlinks are not allowed.  If you are comparing builds "
@@ -707,7 +715,7 @@ msgid ""
 "NOTE:  You cannot turn a directory in to a symlink due to RPM limitations."
 msgstr ""
 
-#: include/results.h:145
+#: include/results.h:616
 #, c-format
 msgid ""
 "Make sure symlinks point to a valid destination in one of the subpackages of "
@@ -719,7 +727,7 @@ msgid ""
 "'Scriptlet to replace a directory' for more information."
 msgstr ""
 
-#: include/results.h:148
+#: include/results.h:626
 #, c-format
 msgid ""
 "Remove forbidden path references from the indicated line in the %files "
@@ -728,28 +736,28 @@ msgid ""
 "information."
 msgstr ""
 
-#: include/results.h:151
+#: include/results.h:636
 msgid ""
 "In many cases the changing MIME type is deliberate.  Verify that the change "
 "is intended and if necessary fix the spec file so the correct file is "
 "included in the built package."
 msgstr ""
 
-#: include/results.h:154
+#: include/results.h:646
 msgid ""
 "ABI changes introduced during maintenance updates can lead to problems for "
 "users.  See the abidiff(1) documentation and the distribution ABI policies "
 "to determine if this detected change is allowed."
 msgstr ""
 
-#: include/results.h:157
+#: include/results.h:656
 msgid ""
 "Kernel Module Interface introduced during maintenance updates can lead to "
 "problems for users.  See the libabigail documentation and the distribution "
 "KMI policy to determine if this detected change is allowed."
 msgstr ""
 
-#: include/results.h:160
+#: include/results.h:666
 #, c-format
 msgid ""
 "Changes to %config should be done carefully.  Make sure you have installed "
@@ -758,7 +766,7 @@ msgid ""
 "package -or- honor the old file locations."
 msgstr ""
 
-#: include/results.h:163
+#: include/results.h:676
 #, c-format
 msgid ""
 "Changes found among the %doc files.  Verify these changes are intended if "
@@ -766,7 +774,7 @@ msgid ""
 "documentation files and the spec file needs to account for those changes."
 msgstr ""
 
-#: include/results.h:166
+#: include/results.h:686
 msgid ""
 "An invalid patch file was found.  This is usually the result of generating a "
 "collection of patches by comparing two trees.  When files disappear that can "
@@ -775,7 +783,28 @@ msgid ""
 "correct the problem."
 msgstr ""
 
-#: include/results.h:169
+#: include/results.h:688
+#, c-format
+msgid ""
+"The named patch is defined in the source RPM header (this means it has a "
+"PatchN: definition in the spec file) but is not applied anywhere in the spec "
+"file.  It is missing a corresponding %patch macro and the spec file lacks "
+"the %autosetup or %autopatch macros.  You can fix this by adding the "
+"appropriate %patch macro in the spec file (usually in the %prep section).  "
+"The number specified with the %patch macro corresponds to the number used to "
+"define the patch at the top of the spec file.  So Patch47 is applied with a "
+"%patch47 macro."
+msgstr ""
+
+#: include/results.h:690
+#, c-format
+msgid ""
+"The named patch is defined but is mismatched by number with the %patch "
+"macro.  Make sure all numbered patches have corresponding %patch macros.  "
+"For example, Patch47 needs to have a %patch47 macro."
+msgstr ""
+
+#: include/results.h:700
 msgid ""
 "ClamAV has found a virus in the named file.  This may be a false positive, "
 "but you should manually inspect the file in question to ensure it is clean.  "
@@ -784,7 +813,7 @@ msgid ""
 "further help."
 msgstr ""
 
-#: include/results.h:172
+#: include/results.h:710
 #, c-format
 msgid ""
 "A file with potential politically sensitive content was found in the "
@@ -793,7 +822,7 @@ msgid ""
 "the project that owns it."
 msgstr ""
 
-#: include/results.h:175
+#: include/results.h:720
 msgid ""
 "Forbidden symbols were found in an ELF file in the package.  The "
 "configuration settings for rpminspect indicate the named symbols are "
@@ -805,7 +834,7 @@ msgid ""
 "deprecated functions should not be used."
 msgstr ""
 
-#: include/results.h:178
+#: include/results.h:730
 msgid ""
 "Either DT_RPATH or DT_RUNPATH properties were found on ELF shared objects in "
 "this package.  The use of DT_RPATH and DT_RUNPATH is discouraged except in "
@@ -815,14 +844,14 @@ msgid ""
 "files."
 msgstr ""
 
-#: include/results.h:180
+#: include/results.h:732
 msgid ""
 "Both DT_RPATH and DT_RUNPATH properties were found in an ELF shared object.  "
 "This indicates a linker error and should not happen.  ELF objects should "
 "only carry DT_RPATH or DT_RUNPATH, never both."
 msgstr ""
 
-#: include/results.h:183
+#: include/results.h:742
 msgid ""
 "The rpminspect configuration file contains a list of forbidden Unicode code "
 "points.  One was found in the extracted and patched source tree or in one of "
@@ -831,7 +860,7 @@ msgid ""
 "correct course of action."
 msgstr ""
 
-#: include/results.h:185
+#: include/results.h:744
 #, c-format
 msgid ""
 "The %prep section of the spec file could not be executed for some reason.  "
@@ -841,14 +870,14 @@ msgid ""
 "program is executing."
 msgstr ""
 
-#: include/results.h:188
+#: include/results.h:754
 msgid ""
 "Unexpanded RPM spec file macros were found in the noted dependency rule.  "
 "Check the spec file for this dependency and ensure you have not misspelled a "
 "macro or used a macro name that does not exist."
 msgstr ""
 
-#: include/results.h:190
+#: include/results.h:756
 msgid ""
 "Add the indicated explicit Requires to the spec file for the named "
 "subpackage.  Subpackages depending on shared libraries in another subpackage "
@@ -856,7 +885,7 @@ msgid ""
 "in the spec file."
 msgstr ""
 
-#: include/results.h:192
+#: include/results.h:758
 msgid ""
 "Add the indicated explicit Requires to the spec file for the named "
 "subpackage.  Subpackages depending on shared libraries in another subpackage "
@@ -864,17 +893,17 @@ msgid ""
 "%{release}' in the spec file."
 msgstr ""
 
-#: include/results.h:194
+#: include/results.h:760
 #, c-format
 msgid ""
-"Check subpackage %%files sections and explicit Provides statements.  Only "
-"one subpackage should provide a given shared library.  Shared library names "
-"are automatically added as Provides, so there is no need to specify them in "
-"the spec file but you do need to make sure only one subpackage is packaging "
-"up the shared library in question."
+"Check subpackage %files sections and explicit Provides statements.  Only one "
+"subpackage should provide a given shared library.  Shared library names are "
+"automatically added as Provides, so there is no need to specify them in the "
+"spec file but you do need to make sure only one subpackage is packaging up "
+"the shared library in question."
 msgstr ""
 
-#: include/results.h:196
+#: include/results.h:762
 msgid ""
 "A dependency listed in the before build changed to the indicated dependency "
 "in the after build.  If this is a VERIFY result, it means rpminspect noticed "
@@ -883,7 +912,7 @@ msgid ""
 "a rebased build."
 msgstr ""
 
-#: include/results.h:198
+#: include/results.h:764
 msgid ""
 "A new dependency is seen in the after build that was not present in the "
 "before build.  If this is a VERIFY result, it means rpminspect noticed the "
@@ -892,7 +921,7 @@ msgid ""
 "a rebased build."
 msgstr ""
 
-#: include/results.h:200
+#: include/results.h:766
 msgid ""
 "A dependency seen in the before build is not seen in the after build meaning "
 "it was removed or lost.  If this is a VERIFY result, it means rpminspect "
@@ -901,7 +930,7 @@ msgid ""
 "comparing a rebased build."
 msgstr ""
 
-#: include/results.h:202
+#: include/results.h:768
 msgid ""
 "The package has an Epoch value greater than zero, but the explicit "
 "subpackage dependencies are not consistently using it.  For the dependency "
@@ -925,54 +954,75 @@ msgstr ""
 msgid "malformed ABI level entry: %s"
 msgstr ""
 
-#: lib/builds.c:92
-msgid "no koji build or task specified"
-msgstr ""
-
-#: lib/builds.c:96
+#: lib/builds.c:89
 #, c-format
 msgid "unable to create download directory %s"
 msgstr ""
 
-#: lib/builds.c:108
+#: lib/builds.c:101
 #, c-format
 msgid "unknown workdir type %d"
 msgstr ""
 
-#: lib/builds.c:196
+#: lib/builds.c:189
 #, c-format
 msgid "unable to read %s, skipping"
 msgstr ""
 
-#: lib/builds.c:231
+#: lib/builds.c:224
 #, c-format
 msgid "unknown directory member encountered: %s"
 msgstr ""
 
-#: lib/builds.c:485
+#: lib/builds.c:275
+#, c-format
+msgid "There is not enough available space to download the requested build.\n"
+msgstr ""
+
+#: lib/builds.c:276 lib/builds.c:578 lib/builds.c:701 lib/peers.c:194
+#, c-format
+msgid "    Need %s in %s, have %s.\n"
+msgstr ""
+
+#: lib/builds.c:277 lib/builds.c:579 lib/builds.c:702 lib/peers.c:195
+#, c-format
+msgid "See the `-w' option for specifying an alternate working directory.\n"
+msgstr ""
+
+#: lib/builds.c:305
 msgid "Downloading module"
 msgstr ""
 
-#: lib/builds.c:487
+#: lib/builds.c:307
 msgid "Downloading RPM build"
 msgstr ""
 
-#: lib/builds.c:563
+#: lib/builds.c:383
 #, c-format
 msgid "ignoring malformed module metadata file: %s"
 msgstr ""
 
-#: lib/builds.c:919
+#: lib/builds.c:577
+#, c-format
+msgid "There is not enough available space to download the requested task.\n"
+msgstr ""
+
+#: lib/builds.c:700
+#, c-format
+msgid "There is not enough available space to download the requested RPM.\n"
+msgstr ""
+
+#: lib/builds.c:793
 #, c-format
 msgid "`%s' already exists in %s"
 msgstr ""
 
-#: lib/builds.c:961
+#: lib/builds.c:835
 #, c-format
 msgid "unable to find after build: %s"
 msgstr ""
 
-#: lib/builds.c:1013
+#: lib/builds.c:887
 #, c-format
 msgid "unable to find before build: %s"
 msgstr ""
@@ -982,12 +1032,12 @@ msgstr ""
 msgid "%s is a FIFO"
 msgstr ""
 
-#: lib/copyfile.c:115
+#: lib/copyfile.c:117
 #, c-format
 msgid "%s already exists"
 msgstr ""
 
-#: lib/copyfile.c:120
+#: lib/copyfile.c:122
 msgid ", overwriting"
 msgstr ""
 
@@ -1010,24 +1060,24 @@ msgid ""
 "required"
 msgstr ""
 
-#: lib/fileinfo.c:156
+#: lib/fileinfo.c:155
 #, c-format
 msgid "%s in %s on %s carries expected owner '%s'"
 msgstr ""
 
-#: lib/fileinfo.c:168
+#: lib/fileinfo.c:167
 #, c-format
 msgid ""
 "%s in %s on %s carries unexpected owner '%s'; expected owner '%s'; requires "
 "inspection by the Security Team"
 msgstr ""
 
-#: lib/fileinfo.c:227
+#: lib/fileinfo.c:226
 #, c-format
 msgid "%s in %s on %s carries expected group '%s'"
 msgstr ""
 
-#: lib/fileinfo.c:239
+#: lib/fileinfo.c:238
 #, c-format
 msgid ""
 "%s in %s on %s carries group unexpected '%s'; expected group '%s'; requires "
@@ -1039,125 +1089,125 @@ msgstr ""
 msgid "*** payload path %s not in RPM metadata"
 msgstr ""
 
-#: lib/init.c:271
+#: lib/init.c:350
 #, c-format
 msgid "*** ignore found in %d, value `%s'"
 msgstr ""
 
-#: lib/init.c:366
+#: lib/init.c:444
 #, c-format
 msgid "invalid input string `%s`"
 msgstr ""
 
-#: lib/init.c:393 lib/init.c:402 lib/init.c:410 lib/init.c:422 lib/init.c:431
-#: lib/init.c:439 lib/init.c:451 lib/init.c:460 lib/init.c:468 lib/init.c:480
+#: lib/init.c:471 lib/init.c:480 lib/init.c:488 lib/init.c:500 lib/init.c:509
+#: lib/init.c:517 lib/init.c:529 lib/init.c:538 lib/init.c:546 lib/init.c:558
 #, c-format
 msgid "*** invalid mode string: %s"
 msgstr ""
 
-#: lib/init.c:528
+#: lib/init.c:608
 #, c-format
 msgid "ignoring malformed %s configuration file: %s"
 msgstr ""
 
-#: lib/init.c:1023
+#: lib/init.c:1147
 #, c-format
 msgid "*** unknown specname match setting '%s', defaulting to 'full'"
 msgstr ""
 
-#: lib/init.c:1032
+#: lib/init.c:1156
 #, c-format
 msgid "*** unknown specname primary setting '%s', defaulting to 'name'"
 msgstr ""
 
-#: lib/init.c:1043
+#: lib/init.c:1167
 msgid "error reading elf include path"
 msgstr ""
 
-#: lib/init.c:1052
+#: lib/init.c:1176
 msgid "error reading elf exclude path"
 msgstr ""
 
-#: lib/init.c:1063
+#: lib/init.c:1187
 msgid "error reading man page include path"
 msgstr ""
 
-#: lib/init.c:1072
+#: lib/init.c:1196
 msgid "error reading man page exclude path"
 msgstr ""
 
-#: lib/init.c:1083
+#: lib/init.c:1207
 msgid "error reading xml include path"
 msgstr ""
 
-#: lib/init.c:1092
+#: lib/init.c:1216
 msgid "error reading xml exclude path"
 msgstr ""
 
-#: lib/init.c:1128
+#: lib/init.c:1254
 #, c-format
 msgid "Invalid annocheck failure_reporting_level: %s, defaulting to %s."
 msgstr ""
 
-#: lib/init.c:1145
+#: lib/init.c:1271
 #, c-format
 msgid "*** inspection flag must be 'on' or 'off', ignoring for '%s'"
 msgstr ""
 
-#: lib/init.c:1149 src/rpminspect.c:277
+#: lib/init.c:1275 src/rpminspect.c:295
 #, c-format
 msgid "*** Unknown inspection: `%s`"
 msgstr ""
 
-#: lib/init.c:1207
+#: lib/init.c:1317
 msgid "error reading unicode exclude regular expression"
 msgstr ""
 
-#: lib/init.c:1247 lib/init.c:1264
+#: lib/init.c:1357 lib/init.c:1374
 #, c-format
 msgid "error reading %s ignore pattern"
 msgstr ""
 
-#: lib/init.c:1444
+#: lib/init.c:1558
 #, c-format
 msgid "*** Invalid filename in the fileinfo list: %s"
 msgstr ""
 
-#: lib/init.c:1445
+#: lib/init.c:1559
 msgid "*** From this invalid line:"
 msgstr ""
 
-#: lib/init.c:1446
+#: lib/init.c:1560
 #, c-format
 msgid "***     %s"
 msgstr ""
 
-#: lib/init.c:1863
+#: lib/init.c:1978
 #, c-format
 msgid "*** invalid security rule: %s"
 msgstr ""
 
-#: lib/init.c:1897
+#: lib/init.c:2012
 #, c-format
 msgid "*** unknown security rule: %s"
 msgstr ""
 
-#: lib/init.c:1917
+#: lib/init.c:2032
 #, c-format
 msgid "*** unknown security action: %s"
 msgstr ""
 
-#: lib/init.c:1943
+#: lib/init.c:2058
 #, c-format
 msgid "*** malformed security line: %s"
 msgstr ""
 
-#: lib/init.c:2096 lib/init.c:2117
+#: lib/init.c:2224 lib/init.c:2248 lib/init.c:2267 lib/init.c:2280
 #, c-format
 msgid "*** error reading '%s'"
 msgstr ""
 
-#: lib/init.c:2112
+#: lib/init.c:2262
 #, c-format
 msgid "*** unable to find profile '%s'"
 msgstr ""
@@ -1208,7 +1258,7 @@ msgstr ""
 msgid "abidff unexpected exit"
 msgstr ""
 
-#: lib/inspect_abidiff.c:250 lib/inspect_kmidiff.c:295
+#: lib/inspect_abidiff.c:250
 #, c-format
 msgid ""
 "Command: %s\n"
@@ -1216,113 +1266,115 @@ msgid ""
 "%s"
 msgstr ""
 
-#: lib/inspect_addedfiles.c:116
+#: lib/inspect_addedfiles.c:166
 #, c-format
 msgid ""
-"Packages should not contain files or directories starting with `%s` on %s: %s"
+"Packages should not contain files or directories starting with `%s` on %s in "
+"%s: %s"
 msgstr ""
 
-#: lib/inspect_addedfiles.c:117 lib/inspect_addedfiles.c:130
+#: lib/inspect_addedfiles.c:167 lib/inspect_addedfiles.c:181
 msgid "invalid directory ${FILE} on ${ARCH}"
 msgstr ""
 
-#: lib/inspect_addedfiles.c:129
+#: lib/inspect_addedfiles.c:180
 #, c-format
 msgid ""
-"Packages should not contain files or directories ending with `%s` on %s: %s"
+"Packages should not contain files or directories ending with `%s` on %s in "
+"%s: %s"
 msgstr ""
 
-#: lib/inspect_addedfiles.c:142
+#: lib/inspect_addedfiles.c:194
 #, c-format
-msgid "Forbidden directory `%s` found on %s"
+msgid "Forbidden directory `%s` found on %s in %s: %s"
 msgstr ""
 
-#: lib/inspect_addedfiles.c:143
+#: lib/inspect_addedfiles.c:195
 msgid "forbidden directory ${FILE} on ${ARCH}"
 msgstr ""
 
-#: lib/inspect_addedfiles.c:165
+#: lib/inspect_addedfiles.c:230
 #, c-format
 msgid ""
-"New security-related file `%s` added on %s requires inspection by the "
+"New security-related file `%s` added on %s in %s requires inspection by the "
 "Security Team"
 msgstr ""
 
-#: lib/inspect_addedfiles.c:167
+#: lib/inspect_addedfiles.c:232
 msgid "new security-related file ${FILE} on ${ARCH}"
 msgstr ""
 
-#: lib/inspect_addedfiles.c:200
+#: lib/inspect_addedfiles.c:258
 #, c-format
-msgid "`%s` added on %s"
+msgid "`%s` added on %s in %s"
 msgstr ""
 
-#: lib/inspect_addedfiles.c:201
+#: lib/inspect_addedfiles.c:259
 msgid "new file ${FILE} on ${ARCH}"
 msgstr ""
 
-#: lib/inspect_addedfiles.c:217
+#: lib/inspect_addedfiles.c:275
 msgid "the fileinfo list"
 msgstr ""
 
-#: lib/inspect_annocheck.c:154 lib/inspect_annocheck.c:170
+#: lib/inspect_annocheck.c:151 lib/inspect_annocheck.c:167
 #, c-format
 msgid "annocheck '%s' test passes for %s on %s"
 msgstr ""
 
-#: lib/inspect_annocheck.c:156
+#: lib/inspect_annocheck.c:153
 #, c-format
 msgid "annocheck '%s' test now passes for %s on %s"
 msgstr ""
 
-#: lib/inspect_annocheck.c:158
+#: lib/inspect_annocheck.c:155
 #, c-format
 msgid "annocheck '%s' test now fails for %s on %s"
 msgstr ""
 
-#: lib/inspect_annocheck.c:163 lib/inspect_annocheck.c:172
+#: lib/inspect_annocheck.c:160 lib/inspect_annocheck.c:169
 #, c-format
 msgid "annocheck '%s' test fails for %s on %s"
 msgstr ""
 
-#: lib/inspect_annocheck.c:212
+#: lib/inspect_annocheck.c:210
 msgid "lost -D_FORTIFY_SOURCE in ${FILE} on ${ARCH}"
 msgstr ""
 
-#: lib/inspect_annocheck.c:215
+#: lib/inspect_annocheck.c:213
 #, c-format
 msgid "%s may have lost -D_FORTIFY_SOURCE on %s"
 msgstr ""
 
-#: lib/inspect_arch.c:100
+#: lib/inspect_arch.c:102
 msgid "lost ${ARCH}"
 msgstr ""
 
-#: lib/inspect_arch.c:102
+#: lib/inspect_arch.c:104
 #, c-format
 msgid "Architecture '%s' has disappeared"
 msgstr ""
 
-#: lib/inspect_arch.c:116
+#: lib/inspect_arch.c:119
 msgid "gained ${ARCH}"
 msgstr ""
 
-#: lib/inspect_arch.c:118
+#: lib/inspect_arch.c:121
 #, c-format
 msgid "Architecture '%s' has appeared"
 msgstr ""
 
-#: lib/inspect_badfuncs.c:111
+#: lib/inspect_badfuncs.c:170
 #, c-format
 msgid "Forbidden function symbols found:\n"
 msgstr ""
 
-#: lib/inspect_badfuncs.c:127
+#: lib/inspect_badfuncs.c:186
 #, c-format
 msgid "%s may use forbidden functions on %s"
 msgstr ""
 
-#: lib/inspect_badfuncs.c:134
+#: lib/inspect_badfuncs.c:193
 msgid "forbidden functions in ${FILE} on ${ARCH}"
 msgstr ""
 
@@ -1373,53 +1425,43 @@ msgid ""
 "Security Response Team."
 msgstr ""
 
-#: lib/inspect_changedfiles.c:303
+#: lib/inspect_changedfiles.c:305
 #, c-format
-msgid "Compressed %s file %s changed content on %s."
+msgid "Compressed %s file %s changed content in %s on %s."
 msgstr ""
 
-#: lib/inspect_changedfiles.c:332 lib/inspect_changedfiles.c:346
+#: lib/inspect_changedfiles.c:338 lib/inspect_changedfiles.c:353
 #, c-format
-msgid "Error running msgunfmt on %s on %s"
+msgid "Error running msgunfmt on %s in %s on %s; malformed mo file?"
 msgstr ""
 
-#: lib/inspect_changedfiles.c:337 lib/inspect_changedfiles.c:351
+#: lib/inspect_changedfiles.c:342 lib/inspect_changedfiles.c:357
 msgid "msgunfmt on ${FILE}"
 msgstr ""
 
-#: lib/inspect_changedfiles.c:370
+#: lib/inspect_changedfiles.c:378
 #, c-format
-msgid "Message catalog %s changed content on %s"
+msgid "Message catalog %s changed content in %s on %s"
 msgstr ""
 
-#: lib/inspect_changedfiles.c:375 lib/inspect_changedfiles.c:439
-#: lib/inspect_changedfiles.c:460
+#: lib/inspect_changedfiles.c:382 lib/inspect_changedfiles.c:440
+#: lib/inspect_changedfiles.c:462
 msgid "${FILE}"
 msgstr ""
 
-#: lib/inspect_changedfiles.c:428
+#: lib/inspect_changedfiles.c:436
 #, c-format
 msgid ""
-"Public header file %s changed content on %s.  A unified diff of the changes "
-"follows."
+"Public header file %s changed content in %s on %s.  A unified diff of the "
+"changes follows."
 msgstr ""
 
-#: lib/inspect_changedfiles.c:432
+#: lib/inspect_changedfiles.c:459
 #, c-format
-msgid ""
-"Public header file %s changed content on %s.  Please make sure this does not "
-"change the ABI exported by this package.  A unified diff of the changes "
-"follows."
+msgid "File %s changed content in %s on %s."
 msgstr ""
 
-#: lib/inspect_changedfiles.c:456
-#, c-format
-msgid ""
-"File %s changed content on %s.  Please verify this change was deliberate for "
-"a non-rebased build."
-msgstr ""
-
-#: lib/inspect_changelog.c:249 lib/inspect_changelog.c:371
+#: lib/inspect_changelog.c:251 lib/inspect_changelog.c:385
 #, c-format
 msgid "%%changelog"
 msgstr ""
@@ -1464,18 +1506,18 @@ msgstr ""
 msgid "not "
 msgstr ""
 
-#: lib/inspect_desktop.c:286
+#: lib/inspect_desktop.c:289
 #, c-format
 msgid ""
 "Desktop file %s on %s references executable %s but %s is not executable by "
 "all"
 msgstr ""
 
-#: lib/inspect_desktop.c:290
+#: lib/inspect_desktop.c:293
 msgid "${FILE} references non-executable file on ${ARCH}"
 msgstr ""
 
-#: lib/inspect_desktop.c:311
+#: lib/inspect_desktop.c:314
 #, c-format
 msgid ""
 "Desktop file %s on %s references executable %s; no subpackages contain an "
@@ -1483,53 +1525,53 @@ msgid ""
 "in case %s does not exist"
 msgstr ""
 
-#: lib/inspect_desktop.c:319
+#: lib/inspect_desktop.c:322
 #, c-format
 msgid ""
 "Desktop file %s on %s references executable %s but no subpackages contain an "
 "executable of that name"
 msgstr ""
 
-#: lib/inspect_desktop.c:323
+#: lib/inspect_desktop.c:326
 msgid "${FILE} references missing executable on ${ARCH}"
 msgstr ""
 
-#: lib/inspect_desktop.c:365
+#: lib/inspect_desktop.c:368
 #, c-format
 msgid "Desktop file %s on %s references icon %s but %s is not readable by all"
 msgstr ""
 
-#: lib/inspect_desktop.c:369
+#: lib/inspect_desktop.c:372
 msgid "${FILE} references unreadble icon on ${ARCH}"
 msgstr ""
 
-#: lib/inspect_desktop.c:387
+#: lib/inspect_desktop.c:390
 #, c-format
 msgid "Desktop file %s on %s references icon %s but no subpackages contain %s"
 msgstr ""
 
-#: lib/inspect_desktop.c:391
+#: lib/inspect_desktop.c:394
 msgid "${FILE} references missing icon on ${ARCH}"
 msgstr ""
 
-#: lib/inspect_desktop.c:460
+#: lib/inspect_desktop.c:463
 msgid "${FILE} is not valid on ${ARCH}"
 msgstr ""
 
-#: lib/inspect_desktop.c:463
+#: lib/inspect_desktop.c:466
 #, c-format
 msgid ""
 "File %s is no longer a valid desktop entry file on %s; desktop-file-validate "
 "reports:"
 msgstr ""
 
-#: lib/inspect_desktop.c:465
+#: lib/inspect_desktop.c:468
 #, c-format
 msgid ""
 "New file %s is not a valid desktop file on %s; desktop-file-validate reports:"
 msgstr ""
 
-#: lib/inspect_desktop.c:467
+#: lib/inspect_desktop.c:470
 #, c-format
 msgid ""
 "File %s is not a valid desktop file on %s; desktop-file-validate reports:"
@@ -1743,154 +1785,173 @@ msgstr ""
 msgid "The files inspection is only for source packages, skipping."
 msgstr ""
 
-#: lib/inspect_filesize.c:81
+#: lib/inspect_filesize.c:83
 #, c-format
 msgid "%s became a non-empty file on %s"
 msgstr ""
 
-#: lib/inspect_filesize.c:85
+#: lib/inspect_filesize.c:87
 msgid "non-empty ${FILE} on ${ARCH}"
 msgstr ""
 
-#: lib/inspect_filesize.c:89
+#: lib/inspect_filesize.c:92
 #, c-format
 msgid "%s became an empty file on %s"
 msgstr ""
 
-#: lib/inspect_filesize.c:93
+#: lib/inspect_filesize.c:96
 msgid "empty ${FILE} on ${ARCH}"
-msgstr ""
-
-#: lib/inspect_filesize.c:110
-#, c-format
-msgid "%s grew by %lld%% on %s"
-msgstr ""
-
-#: lib/inspect_filesize.c:111
-msgid "${FILE} size grew on ${ARCH}"
 msgstr ""
 
 #: lib/inspect_filesize.c:114
 #, c-format
-msgid "%s shrank by %lld%% on %s"
+msgid "%s grew by %lld%% on %s"
 msgstr ""
 
 #: lib/inspect_filesize.c:115
+msgid "${FILE} size grew on ${ARCH}"
+msgstr ""
+
+#: lib/inspect_filesize.c:119
+#, c-format
+msgid "%s shrank by %lld%% on %s"
+msgstr ""
+
+#: lib/inspect_filesize.c:120
 msgid "${FILE} size shrank on ${ARCH}"
 msgstr ""
 
-#: lib/inspect_javabytecode.c:122
+#: lib/inspect_javabytecode.c:123
 #, c-format
 msgid ""
 "File %s (%s), Java byte code version %d is incorrect (wrong endianness? "
 "corrupted file? space JDK?)"
 msgstr ""
 
-#: lib/inspect_javabytecode.c:123
+#: lib/inspect_javabytecode.c:124
 msgid "incorrect Java byte code version in ${FILE}"
 msgstr ""
 
-#: lib/inspect_javabytecode.c:128
+#: lib/inspect_javabytecode.c:129
 #, c-format
 msgid ""
 "File %s (%s), Java byte code version %d greater than supported major version "
 "%d for product release %s"
 msgstr ""
 
-#: lib/inspect_javabytecode.c:129
+#: lib/inspect_javabytecode.c:130
 msgid "Java byte code version too new in ${FILE}"
 msgstr ""
 
-#: lib/inspect_javabytecode.c:144
+#: lib/inspect_javabytecode.c:145
 #, c-format
 msgid "Java byte code version changed from %d to %d in %s from %s"
 msgstr ""
 
-#: lib/inspect_javabytecode.c:145
+#: lib/inspect_javabytecode.c:146
 msgid "Java byte code version changed in ${FILE}"
 msgstr ""
 
-#: lib/inspect_javabytecode.c:247 lib/inspect_javabytecode.c:259
+#: lib/inspect_javabytecode.c:248 lib/inspect_javabytecode.c:260
 msgid "*** missing JVM version to product release mapping"
 msgstr ""
 
-#: lib/inspect_kmidiff.c:261
+#: lib/inspect_kmidiff.c:274
+#, c-format
+msgid ""
+"Comparing %s to %s in package %s on %s generated a kmidiff(1) usage error."
+msgstr ""
+
+#: lib/inspect_kmidiff.c:276
 msgid "kmidiff usage error"
 msgstr ""
 
-#: lib/inspect_kmidiff.c:266
-msgid "KMI change in ${FILE} on ${ARCH}"
-msgstr ""
-
-#: lib/inspect_kmidiff.c:271
-msgid "KMI incompatible change in ${FILE} on ${ARCH}"
-msgstr ""
-
-#: lib/inspect_kmidiff.c:281
+#: lib/inspect_kmidiff.c:278
 #, c-format
 msgid ""
-"Comparing old vs. new version of %s in package %s on %s revealed Kernel "
-"Module Interface (KMI) differences."
-msgstr ""
-
-#: lib/inspect_kmidiff.c:283
-#, c-format
-msgid ""
-"Comparing from %s to %s in package %s on %s revealed Kernel Module Interface "
+"Comparing %s to %s in package %s on %s revealed Kernel Module Interface "
 "(KMI) differences."
 msgstr ""
 
-#: lib/inspect_kmidiff.c:289
+#: lib/inspect_kmidiff.c:280
+msgid "KMI change in ${FILE} on ${ARCH}"
+msgstr ""
+
+#: lib/inspect_kmidiff.c:282
+#, c-format
+msgid ""
+"Comparing %s to %s in package %s on %s revealed incompatible Kernel Module "
+"Interface (KMI) differences."
+msgstr ""
+
+#: lib/inspect_kmidiff.c:285
+msgid "KMI incompatible change in ${FILE} on ${ARCH}"
+msgstr ""
+
+#: lib/inspect_kmidiff.c:287
+#, c-format
+msgid ""
+"kmidiff(1) comparison of %s to %s in package %s on %s ended unexpectedly."
+msgstr ""
+
+#: lib/inspect_kmidiff.c:288
 msgid "KMI comparison ended unexpectedly."
 msgstr ""
 
-#: lib/inspect_kmidiff.c:291
+#: lib/inspect_kmidiff.c:290
 msgid "kmidiff unexpected exit"
 msgstr ""
 
-#: lib/inspect_kmod.c:44
+#: lib/inspect_kmidiff.c:300
+#, c-format
+msgid ""
+"Command: %s\n"
+"Exit code: %d%s%s"
+msgstr ""
+
+#: lib/inspect_kmod.c:45
 msgid "${FILE} kernel module alias on ${ARCH}"
 msgstr ""
 
-#: lib/inspect_kmod.c:47
+#: lib/inspect_kmod.c:48
 #, c-format
 msgid "Kernel module '%s' lost alias '%s'"
 msgstr ""
 
-#: lib/inspect_kmod.c:56
+#: lib/inspect_kmod.c:58
 #, c-format
 msgid "Kernel module '%s' gained alias '%s'"
 msgstr ""
 
-#: lib/inspect_kmod.c:206
+#: lib/inspect_kmod.c:207
 #, c-format
-msgid "Kernel module %s removes parameter '%s'"
+msgid "Kernel module %s removes parameter '%s' (was present in %s)."
 msgstr ""
 
-#: lib/inspect_kmod.c:209 lib/inspect_kmod.c:228
+#: lib/inspect_kmod.c:210 lib/inspect_kmod.c:227
 msgid "${FILE} kernel module parameter on ${ARCH}"
 msgstr ""
 
-#: lib/inspect_kmod.c:223
+#: lib/inspect_kmod.c:224
 #, c-format
-msgid "Kernel module %s adds parameter '%s'"
+msgid "Kernel module %s adds parameter '%s' (was not present in %s)."
 msgstr ""
 
-#: lib/inspect_kmod.c:246
+#: lib/inspect_kmod.c:245
 #, c-format
-msgid "Kernel module %s removes dependency '%s'"
+msgid "Kernel module %s removes dependency '%s' (was present in %s)."
 msgstr ""
 
-#: lib/inspect_kmod.c:249
+#: lib/inspect_kmod.c:248
 msgid "${FILE} kernel module dependency on ${ARCH}"
 msgstr ""
 
-#: lib/inspect_kmod.c:263
+#: lib/inspect_kmod.c:262
 #, c-format
-msgid "Kernel module %s adds dependency '%s'"
+msgid "Kernel module %s adds dependency '%s' (was not present in %s)."
 msgstr ""
 
-#: lib/inspect_kmod.c:266
+#: lib/inspect_kmod.c:265
 msgid "${FILE} kernel module parameter"
 msgstr ""
 
@@ -2035,8 +2096,8 @@ msgstr ""
 #: lib/inspect_metadata.c:56
 #, c-format
 msgid ""
-"Vendor not set in the rpminspect configuration, ignoring Package Vendor \"%s"
-"\" in %s"
+"Vendor not set in the rpminspect configuration, ignoring Package Vendor "
+"\"%s\" in %s"
 msgstr ""
 
 #: lib/inspect_metadata.c:67
@@ -2102,12 +2163,12 @@ msgstr ""
 msgid "Package Summary change from \"%s\" to \"%s\" in %s"
 msgstr ""
 
-#: lib/inspect_metadata.c:186
+#: lib/inspect_metadata.c:185
 #, c-format
 msgid "Package Description changed in %s"
 msgstr ""
 
-#: lib/inspect_metadata.c:187
+#: lib/inspect_metadata.c:186
 #, c-format
 msgid ""
 "from:\n"
@@ -2119,19 +2180,19 @@ msgid ""
 "%s"
 msgstr ""
 
-#: lib/inspect_modularity.c:47
+#: lib/inspect_modularity.c:48
 #, c-format
 msgid ""
 "Package \"%s\" is part of a module but lacks the '%%{modularitylabel}' "
 "header tag."
 msgstr ""
 
-#: lib/inspect_movedfiles.c:66
+#: lib/inspect_movedfiles.c:68
 #, c-format
 msgid "%s moved to ${FILE} on ${ARCH}"
 msgstr ""
 
-#: lib/inspect_movedfiles.c:69
+#: lib/inspect_movedfiles.c:71
 #, c-format
 msgid "%s probably moved to %s on %s\n"
 msgstr ""
@@ -2202,57 +2263,93 @@ msgstr ""
 msgid "${FILE} changed owner on ${ARCH}"
 msgstr ""
 
-#: lib/inspect_patches.c:203
+#: lib/inspect_patches.c:315
+#, c-format
+msgid ""
+"Patch number %ld (%s) is missing a corresponding %%patch%ld macro, usually "
+"in %%prep."
+msgstr ""
+
+#: lib/inspect_patches.c:317
+#, c-format
+msgid "missing %%patch macro for ${FILE}"
+msgstr ""
+
+#: lib/inspect_patches.c:319
+#, c-format
+msgid "Patch number %ld (%s) is mismatched with %%patch%ld macro."
+msgstr ""
+
+#: lib/inspect_patches.c:321
+#, c-format
+msgid "mismatched %%patch macro for ${FILE}"
+msgstr ""
+
+#: lib/inspect_patches.c:342
+msgid "undefined Patch ${FILE}"
+msgstr ""
+
+#: lib/inspect_patches.c:343
+#, c-format
+msgid "Undefined Patch file %s."
+msgstr ""
+
+#: lib/inspect_patches.c:356 lib/inspect_patches.c:364
+#, c-format
+msgid "unable to uncompress patch: %s"
+msgstr ""
+
+#: lib/inspect_patches.c:393
+msgid "corrupt patch ${FILE}"
+msgstr ""
+
+#: lib/inspect_patches.c:397 lib/inspect_patches.c:404
 #, c-format
 msgid "Patch %s is under 4 bytes in size - is it corrupt?"
 msgstr ""
 
-#: lib/inspect_patches.c:209
-msgid "corrupt patch ${FILE}"
-msgstr ""
-
-#: lib/inspect_patches.c:228
+#: lib/inspect_patches.c:426
 #, c-format
 msgid "%s changed (%ld bytes -> %ld bytes)"
 msgstr ""
 
-#: lib/inspect_patches.c:232 lib/inspect_patches.c:257
+#: lib/inspect_patches.c:430 lib/inspect_patches.c:455
 msgid "patch file ${FILE}"
 msgstr ""
 
-#: lib/inspect_patches.c:253
+#: lib/inspect_patches.c:451
 #, c-format
 msgid "New patch file `%s` appeared"
 msgstr ""
 
-#: lib/inspect_patches.c:284
+#: lib/inspect_patches.c:471
+msgid "patch changes ${FILE}"
+msgstr ""
+
+#: lib/inspect_patches.c:475
 #, c-format
 msgid "%s touches as many as %ld line%s"
 msgstr ""
 
-#: lib/inspect_patches.c:286
+#: lib/inspect_patches.c:477
 #, c-format
 msgid "%s touches %ld file%s"
 msgstr ""
 
-#: lib/inspect_patches.c:288
+#: lib/inspect_patches.c:479
 #, c-format
 msgid "%s touches %ld file%s and %s%ld line%s"
 msgstr ""
 
-#: lib/inspect_patches.c:288
+#: lib/inspect_patches.c:479
 msgid "as many as "
 msgstr ""
 
-#: lib/inspect_patches.c:292
-msgid "patch changes ${FILE}"
-msgstr ""
-
-#: lib/inspect_patches.c:347 lib/inspect_upstream.c:153
+#: lib/inspect_patches.c:539 lib/inspect_upstream.c:153
 msgid "No source packages available, skipping inspection."
 msgstr ""
 
-#: lib/inspect_patches.c:382
+#: lib/inspect_patches.c:714
 #, c-format
 msgid "Patch file `%s` removed"
 msgstr ""
@@ -2267,34 +2364,34 @@ msgstr ""
 msgid "${FILE} should be in %s on ${ARCH}"
 msgstr ""
 
-#: lib/inspect_permissions.c:33 lib/output_summary.c:70
+#: lib/inspect_permissions.c:35 lib/output_summary.c:73
 msgid "changed"
 msgstr ""
 
-#: lib/inspect_permissions.c:76
+#: lib/inspect_permissions.c:84
 msgid "changed setuid/setgid"
 msgstr ""
 
-#: lib/inspect_permissions.c:80
+#: lib/inspect_permissions.c:89
 msgid "relaxed"
 msgstr ""
 
-#: lib/inspect_permissions.c:84
+#: lib/inspect_permissions.c:97
 #, c-format
 msgid "%s %s permissions from %04o to %04o on %s"
 msgstr ""
 
-#: lib/inspect_permissions.c:87
+#: lib/inspect_permissions.c:99
 #, c-format
 msgid "${FILE} permissions from %04o to %04o on ${ARCH}"
 msgstr ""
 
-#: lib/inspect_permissions.c:101
+#: lib/inspect_permissions.c:112
 #, c-format
 msgid "%s (%s) is world-writable on %s"
 msgstr ""
 
-#: lib/inspect_permissions.c:104
+#: lib/inspect_permissions.c:115
 msgid "${FILE} is world-writable on ${ARCH}"
 msgstr ""
 
@@ -2326,31 +2423,31 @@ msgstr ""
 msgid "${FILE} is politically sensitive"
 msgstr ""
 
-#: lib/inspect_removedfiles.c:41
+#: lib/inspect_removedfiles.c:42
 msgid ""
 "; Removing security policy related files requires inspection by the Security "
 "Response Team."
 msgstr ""
 
-#: lib/inspect_removedfiles.c:95
+#: lib/inspect_removedfiles.c:101
 msgid "library ${FILE} removed on ${ARCH}"
 msgstr ""
 
-#: lib/inspect_removedfiles.c:131
+#: lib/inspect_removedfiles.c:147
 #, c-format
 msgid "ABI break: Library %s with SONAME '%s' removed from %s"
 msgstr ""
 
-#: lib/inspect_removedfiles.c:132
+#: lib/inspect_removedfiles.c:148
 msgid "missing SONAME in ${FILE} on ${ARCH}"
 msgstr ""
 
-#: lib/inspect_removedfiles.c:135
+#: lib/inspect_removedfiles.c:151
 #, c-format
 msgid "ABI break: Library %s removed from %s"
 msgstr ""
 
-#: lib/inspect_removedfiles.c:138
+#: lib/inspect_removedfiles.c:154
 #, c-format
 msgid "%s removed from %s"
 msgstr ""
@@ -2360,13 +2457,13 @@ msgstr ""
 msgid "Invalid looking %s dependency in the %s package on %s: %s"
 msgstr ""
 
-#: lib/inspect_rpmdeps.c:86 lib/inspect_rpmdeps.c:694 lib/inspect_rpmdeps.c:704
-#: lib/inspect_rpmdeps.c:766
+#: lib/inspect_rpmdeps.c:86 lib/inspect_rpmdeps.c:760 lib/inspect_rpmdeps.c:770
+#: lib/inspect_rpmdeps.c:816
 #, c-format
 msgid "'${FILE}' in %s on ${ARCH}"
 msgstr ""
 
-#: lib/inspect_rpmdeps.c:298
+#: lib/inspect_rpmdeps.c:299
 #, c-format
 msgid ""
 "Subpackage %s on %s carries '%s' which comes from subpackage %s but does not "
@@ -2375,80 +2472,80 @@ msgid ""
 "various combinations of old and new subpackages."
 msgstr ""
 
-#: lib/inspect_rpmdeps.c:299
+#: lib/inspect_rpmdeps.c:300
 #, c-format
 msgid "missing 'Requires: ${FILE} = %s' in %s on ${ARCH}"
 msgstr ""
 
-#: lib/inspect_rpmdeps.c:319
+#: lib/inspect_rpmdeps.c:320
 #, c-format
 msgid "Multiple subpackages provide '%s': %s"
 msgstr ""
 
-#: lib/inspect_rpmdeps.c:320
+#: lib/inspect_rpmdeps.c:321
 #, c-format
 msgid "%s all provide '${FILE}' on ${ARCH}"
 msgstr ""
 
-#: lib/inspect_rpmdeps.c:407
+#: lib/inspect_rpmdeps.c:408
 #, c-format
 msgid "Missing epoch prefix on the version-release in '%s' for %s on %s"
 msgstr ""
 
-#: lib/inspect_rpmdeps.c:408
+#: lib/inspect_rpmdeps.c:409
 #, c-format
 msgid "'${FILE}' needs epoch in %s on ${ARCH}"
 msgstr ""
 
-#: lib/inspect_rpmdeps.c:601
+#: lib/inspect_rpmdeps.c:675
 msgid "spec file"
 msgstr ""
 
-#: lib/inspect_rpmdeps.c:689
+#: lib/inspect_rpmdeps.c:755
 #, c-format
 msgid "Gained '%s' in source package %s"
 msgstr ""
 
-#: lib/inspect_rpmdeps.c:691
+#: lib/inspect_rpmdeps.c:757
 #, c-format
 msgid "Gained '%s' in subpackage %s on %s"
 msgstr ""
 
-#: lib/inspect_rpmdeps.c:699
+#: lib/inspect_rpmdeps.c:765
 #, c-format
 msgid "Retained '%s' in source package %s"
 msgstr ""
 
-#: lib/inspect_rpmdeps.c:701
+#: lib/inspect_rpmdeps.c:767
 #, c-format
 msgid "Retained '%s' in subpackage %s on %s"
 msgstr ""
 
-#: lib/inspect_rpmdeps.c:711
+#: lib/inspect_rpmdeps.c:775
 #, c-format
 msgid "Changed '%s' to '%s' in source package %s"
 msgstr ""
 
-#: lib/inspect_rpmdeps.c:713
+#: lib/inspect_rpmdeps.c:777
 #, c-format
 msgid "Changed '%s' to '%s' in subpackage %s on %s"
 msgstr ""
 
-#: lib/inspect_rpmdeps.c:716
+#: lib/inspect_rpmdeps.c:780
 #, c-format
 msgid "'%s' became '${FILE}' in %s on ${ARCH}"
 msgstr ""
 
-#: lib/inspect_rpmdeps.c:723
+#: lib/inspect_rpmdeps.c:786
 msgid "; this is expected"
 msgstr ""
 
-#: lib/inspect_rpmdeps.c:758
+#: lib/inspect_rpmdeps.c:808
 #, c-format
 msgid "Lost '%s' in source package %s"
 msgstr ""
 
-#: lib/inspect_rpmdeps.c:760
+#: lib/inspect_rpmdeps.c:810
 #, c-format
 msgid "Lost '%s' in subpackage %s on %s"
 msgstr ""
@@ -2467,11 +2564,11 @@ msgstr ""
 msgid "runtime search path in ${FILE} on ${ARCH}"
 msgstr ""
 
-#: lib/inspect_runpath.c:293
+#: lib/inspect_runpath.c:294
 msgid "both DT_RPATH and DT_RUNPATH in ${FILE} on ${ARCH}"
 msgstr ""
 
-#: lib/inspect_runpath.c:295
+#: lib/inspect_runpath.c:296
 #, c-format
 msgid "%s has both DT_RPATH and DT_RUNPATH on %s; this is not allowed"
 msgstr ""
@@ -2543,16 +2640,16 @@ msgstr ""
 msgid "The specname inspection is only for source packages, skipping."
 msgstr ""
 
-#: lib/inspect_subpackages.c:82
+#: lib/inspect_subpackages.c:84
 #, c-format
 msgid "Subpackage '%s' has disappeared on '%s'"
 msgstr ""
 
-#: lib/inspect_subpackages.c:89 lib/inspect_subpackages.c:111
+#: lib/inspect_subpackages.c:91 lib/inspect_subpackages.c:115
 msgid "subpackage ${FILE}"
 msgstr ""
 
-#: lib/inspect_subpackages.c:104
+#: lib/inspect_subpackages.c:108
 #, c-format
 msgid "Subpackage '%s' has appeared on '%s'"
 msgstr ""
@@ -2591,22 +2688,27 @@ msgstr ""
 msgid "too many redirects for ${FILE} on ${ARCH}"
 msgstr ""
 
-#: lib/inspect_symlinks.c:288
+#: lib/inspect_symlinks.c:287
 #, c-format
 msgid "%s %s %s a dangling symbolic link in %s on %s"
 msgstr ""
 
-#: lib/inspect_symlinks.c:295
+#: lib/inspect_symlinks.c:294
 msgid "dangling symlink ${FILE} on ${ARCH}"
 msgstr ""
 
-#: lib/inspect_types.c:78
+#: lib/inspect_types.c:85
 msgid "${FILE} MIME type on ${ARCH}"
 msgstr ""
 
-#: lib/inspect_types.c:79
+#: lib/inspect_types.c:93 lib/inspect_types.c:98
 #, c-format
-msgid "MIME type on %s was %s and became %s on %s"
+msgid "Unknown MIME type `%s' on %s in %s"
+msgstr ""
+
+#: lib/inspect_types.c:123
+#, c-format
+msgid "MIME type for %s in %s was `%s/%s' and became `%s/%s'"
 msgstr ""
 
 #: lib/inspect_unicode.c:439
@@ -2659,12 +2761,12 @@ msgstr ""
 msgid "checksum of ${FILE}"
 msgstr ""
 
-#: lib/inspect_upstream.c:197
+#: lib/inspect_upstream.c:207
 #, c-format
 msgid "Source file `%s` removed"
 msgstr ""
 
-#: lib/inspect_upstream.c:199
+#: lib/inspect_upstream.c:209
 msgid "source file ${FILE} removed"
 msgstr ""
 
@@ -2771,44 +2873,44 @@ msgid ""
 "with a paging program."
 msgstr ""
 
-#: lib/output_json.c:100 lib/output_summary.c:50 lib/output_text.c:54
+#: lib/output_json.c:111 lib/output_summary.c:61 lib/output_text.c:69
 #, c-format
 msgid "error opening %s for writing"
 msgstr ""
 
-#: lib/output_summary.c:66
+#: lib/output_summary.c:69
 msgid "added"
 msgstr ""
 
-#: lib/output_summary.c:68
+#: lib/output_summary.c:71
 msgid "removed"
 msgstr ""
 
-#: lib/output_summary.c:72
+#: lib/output_summary.c:75
 msgid "FAILED"
 msgstr ""
 
-#: lib/output_summary.c:74
+#: lib/output_summary.c:77
 msgid "ok"
 msgstr ""
 
-#: lib/output_summary.c:76
+#: lib/output_summary.c:79
 msgid "unknown"
 msgstr ""
 
-#: lib/output_text.c:100
+#: lib/output_text.c:108
 #, c-format
 msgid "Result: %s\n"
 msgstr ""
 
-#: lib/output_text.c:102
+#: lib/output_text.c:110
 #, c-format
 msgid ""
 "Waiver Authorization: %s\n"
 "\n"
 msgstr ""
 
-#: lib/output_text.c:105 lib/output_xunit.c:96
+#: lib/output_text.c:113 lib/output_xunit.c:112
 #, c-format
 msgid ""
 "Details:\n"
@@ -2816,19 +2918,19 @@ msgid ""
 "\n"
 msgstr ""
 
-#: lib/output_text.c:109 lib/output_xunit.c:102
+#: lib/output_text.c:117 lib/output_xunit.c:120
 #, c-format
 msgid ""
 "Suggested Remedy:\n"
 "%s"
 msgstr ""
 
-#: lib/output_xunit.c:61
+#: lib/output_xunit.c:70
 #, c-format
 msgid "opening %s for writing"
 msgstr ""
 
-#: lib/output_xunit.c:91
+#: lib/output_xunit.c:99
 #, c-format
 msgid ""
 "Result: %s\n"
@@ -2836,16 +2938,21 @@ msgid ""
 "\n"
 msgstr ""
 
-#: lib/readelf.c:192
+#: lib/peers.c:193
+#, c-format
+msgid "There is not enough available space to unpack all of the RPMs.\n"
+msgstr ""
+
+#: lib/readelf.c:94
 msgid "libelf version mismatch"
 msgstr ""
 
-#: lib/rpm.c:80
+#: lib/rpm.c:77
 #, c-format
 msgid "Fopen failed for %s: %s"
 msgstr ""
 
-#: lib/rpm.c:260
+#: lib/rpm.c:257
 #, c-format
 msgid "*** file index %d is out of bounds for %s"
 msgstr ""
@@ -2873,76 +2980,96 @@ msgstr ""
 msgid "%s tried to run the command and it received signal %s"
 msgstr ""
 
-#: lib/strfuncs.c:259 lib/strfuncs.c:288
+#: lib/strfuncs.c:266 lib/strfuncs.c:296
 msgid "NULL"
 msgstr ""
 
-#: lib/strfuncs.c:261 lib/strfuncs.c:290
+#: lib/strfuncs.c:268 lib/strfuncs.c:298
 msgid "OK"
 msgstr ""
 
-#: lib/strfuncs.c:263 lib/strfuncs.c:292
+#: lib/strfuncs.c:270 lib/strfuncs.c:300
 msgid "INFO"
 msgstr ""
 
-#: lib/strfuncs.c:265 lib/strfuncs.c:294
+#: lib/strfuncs.c:272 lib/strfuncs.c:302
 msgid "VERIFY"
 msgstr ""
 
-#: lib/strfuncs.c:267 lib/strfuncs.c:296
+#: lib/strfuncs.c:274 lib/strfuncs.c:304
 msgid "BAD"
 msgstr ""
 
-#: lib/strfuncs.c:269 lib/strfuncs.c:298
+#: lib/strfuncs.c:276 lib/strfuncs.c:306
 msgid "SKIP"
 msgstr ""
 
-#: lib/strfuncs.c:271 lib/strfuncs.c:317
+#: lib/strfuncs.c:278 lib/strfuncs.c:326
 msgid "UnKnOwN"
 msgstr ""
 
-#: lib/strfuncs.c:311
+#: lib/strfuncs.c:320
 msgid "Not Waivable"
 msgstr ""
 
-#: lib/strfuncs.c:313
+#: lib/strfuncs.c:322
 msgid "Anyone"
 msgstr ""
 
-#: lib/strfuncs.c:315
+#: lib/strfuncs.c:324
 msgid "Security"
 msgstr ""
 
-#: lib/strfuncs.c:548
+#: lib/strfuncs.c:566
 msgid "regular file"
 msgstr ""
 
-#: lib/strfuncs.c:550
+#: lib/strfuncs.c:568
 msgid "directory"
 msgstr ""
 
-#: lib/strfuncs.c:552
+#: lib/strfuncs.c:570
 msgid "character device"
 msgstr ""
 
-#: lib/strfuncs.c:554
+#: lib/strfuncs.c:572
 msgid "block device"
 msgstr ""
 
-#: lib/strfuncs.c:556
+#: lib/strfuncs.c:574
 msgid "FIFO (named pipe)"
 msgstr ""
 
-#: lib/strfuncs.c:558
+#: lib/strfuncs.c:576
 msgid "symbolic link"
 msgstr ""
 
-#: lib/strfuncs.c:560
+#: lib/strfuncs.c:578
 msgid "socket"
 msgstr ""
 
-#: lib/strfuncs.c:562
+#: lib/strfuncs.c:580
 msgid "UNKNOWN"
+msgstr ""
+
+#: lib/strfuncs.c:637
+msgid "Success."
+msgstr ""
+
+#: lib/strfuncs.c:639
+msgid "One or more inspections failed."
+msgstr ""
+
+#: lib/strfuncs.c:641
+msgid "Program error."
+msgstr ""
+
+#: lib/strfuncs.c:643
+msgid "The specified profile is not found."
+msgstr ""
+
+#: lib/strfuncs.c:645
+msgid "Insufficient disk space in the working directory."
 msgstr ""
 
 #: src/rpminspect.c:54
@@ -3122,138 +3249,145 @@ msgstr ""
 msgid "*** unable to compile product release regular expression: %s"
 msgstr ""
 
-#: src/rpminspect.c:164 src/rpminspect.c:175
+#: src/rpminspect.c:167 src/rpminspect.c:178
 #, c-format
 msgid "*** Product release for after build (%s) is empty"
 msgstr ""
 
-#: src/rpminspect.c:189 src/rpminspect.c:197
+#: src/rpminspect.c:194 src/rpminspect.c:202
 #, c-format
 msgid "*** Product release for before build (%s) is empty"
 msgstr ""
 
-#: src/rpminspect.c:245
+#: src/rpminspect.c:263
 #, c-format
 msgid "*** Unable to determine product release for %s and %s"
 msgstr ""
 
-#: src/rpminspect.c:246
+#: src/rpminspect.c:264
 msgid ""
 "*** See the 'favor_release' setting in the rpminspect configuration file."
 msgstr ""
 
-#: src/rpminspect.c:261
+#: src/rpminspect.c:279
 msgid "*** The -T and -E options are mutually exclusive"
 msgstr ""
 
-#: src/rpminspect.c:262 src/rpminspect.c:278 src/rpminspect.c:650
-#: src/rpminspect.c:693
+#: src/rpminspect.c:280 src/rpminspect.c:296 src/rpminspect.c:676
+#: src/rpminspect.c:719
 #, c-format
 msgid "*** See `%s --help` for more information."
 msgstr ""
 
-#: src/rpminspect.c:435
+#: src/rpminspect.c:454
 #, c-format
 msgid "*** Invalid output format: `%s`."
 msgstr ""
 
-#: src/rpminspect.c:447
+#: src/rpminspect.c:466
 #, c-format
 msgid "*** Unable to expand workdir: `%s`"
 msgstr ""
 
-#: src/rpminspect.c:483
+#: src/rpminspect.c:502
 #, c-format
 msgid "%s version %s\n"
 msgstr ""
 
-#: src/rpminspect.c:486
+#: src/rpminspect.c:505
 #, c-format
 msgid "?? getopt returned character code 0%o ??"
 msgstr ""
 
-#: src/rpminspect.c:493
+#: src/rpminspect.c:512
 #, c-format
 msgid "Available output formats:\n"
 msgstr ""
 
-#: src/rpminspect.c:510
+#: src/rpminspect.c:529
 #, c-format
 msgid ""
 "\n"
 "Available inspections:\n"
 msgstr ""
 
-#: src/rpminspect.c:547 src/rpminspect.c:555 src/rpminspect.c:568
+#: src/rpminspect.c:573 src/rpminspect.c:581 src/rpminspect.c:599
 #, c-format
 msgid "Failed to read configuration file %s"
 msgstr ""
 
-#: src/rpminspect.c:574
+#: src/rpminspect.c:604
 #, c-format
 msgid "Please specify a configuration file using '-c' or supply ./%s"
 msgstr ""
 
-#: src/rpminspect.c:649
+#: src/rpminspect.c:675
 msgid "*** Invalid before and after build specification."
 msgstr ""
 
-#: src/rpminspect.c:657
+#: src/rpminspect.c:683
 msgid "*** unable to read RPM configuration"
 msgstr ""
 
-#: src/rpminspect.c:692
+#: src/rpminspect.c:718
 #, c-format
 msgid "*** Unsupported architecture specified: `%s`"
 msgstr ""
 
-#: src/rpminspect.c:716
+#: src/rpminspect.c:742
 #, c-format
 msgid "*** Unable to create directory %s"
 msgstr ""
 
-#: src/rpminspect.c:730 src/rpminspect.c:748
-msgid "*** failed to gather specified builds."
-msgstr ""
-
-#: src/rpminspect.c:761
+#: src/rpminspect.c:800
 #, c-format
 msgid ""
-"Version information for libraries and programs used by %s.  This result is "
-"for informational and diagnostic purposes only."
+"Version information for libraries and programs used by %s as well as storage "
+"requirements.  This result is for informational and diagnostic purposes only."
 msgstr ""
 
-#: src/rpminspect.c:769
+#: src/rpminspect.c:807
+#, c-format
+msgid "Space required to download artifacts: %lu bytes (%s)\n"
+msgstr ""
+
+#: src/rpminspect.c:815
+#, c-format
+msgid "Space required to unpack artifacts: %lu bytes (%s)\n"
+msgstr ""
+
+#: src/rpminspect.c:827
 #, c-format
 msgid "Command line arguments used to invoke %s."
 msgstr ""
 
-#: src/rpminspect.c:802
+#: src/rpminspect.c:860
 msgid "*** No peers, ensure packages exist for specified architecture(s)."
 msgstr ""
 
-#: src/rpminspect.c:812
-msgid "invalid after RPM"
+#: src/rpminspect.c:881
+msgid ""
+"unable to find a set of peer packages between the before and after builds"
 msgstr ""
 
-#: src/rpminspect.c:822
-msgid "invalid before RPM"
+#: src/rpminspect.c:892
+msgid "*** Unable to determine product release or none specified (-r)."
 msgstr ""
 
-#: src/rpminspect.c:849
+#: src/rpminspect.c:908
 #, c-format
 msgid "Running %s inspection..."
 msgstr ""
 
-#: src/rpminspect.c:858
+#: src/rpminspect.c:917
 msgid "pass"
 msgstr ""
 
-#: src/rpminspect.c:858
+#: src/rpminspect.c:917
 msgid "FAIL"
 msgstr ""
 
-#: src/rpminspect.c:882
+#: src/rpminspect.c:941
 #, c-format
 msgid ""
 "\n"

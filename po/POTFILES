@@ -17,6 +17,7 @@ lib/builds.c
 lib/bytes.c
 lib/checksums.c
 lib/copyfile.c
+lib/curl.c
 lib/debug.c
 lib/delta.c
 lib/deprules.c
@@ -26,6 +27,8 @@ lib/fileinfo.c
 lib/files.c
 lib/flags.c
 lib/free.c
+lib/fs.c
+lib/humansize.c
 lib/init.c
 lib/inspect_abidiff.c
 lib/inspect_addedfiles.c
@@ -72,6 +75,7 @@ lib/inspect_unicode.c
 lib/inspect_upstream.c
 lib/inspect_virus.c
 lib/inspect_xml.c
+lib/joinpath.c
 lib/kmods.c
 lib/koji.c
 lib/listfuncs.c
