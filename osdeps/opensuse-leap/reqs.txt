@@ -46,7 +46,5 @@ tcsh
 valgrind
 xhtml-dtd
 xmlrpc-c-devel
-yum
-yum-downloadonly
 zlib-devel
 zsh
