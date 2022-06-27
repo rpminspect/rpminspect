@@ -32,7 +32,7 @@ sed -i -e 's|^int dummy;$|extern int dummy;|g' "${SUBDIR}"/compat_err.c
 ( cd "${SUBDIR}" && ./configure && make && make lib-install )
 rm -rf mandoc.tar.gz "${SUBDIR}"
 
-# The 'rc' shell is not available in Arch Linux, build manually
+# The 'rc' shell is not available in OpenSUSE Tumbleweed, build manually
 git clone https://github.com/rakitzis/rc.git
 cd rc || exit 1
 autoreconf -f -i -v
