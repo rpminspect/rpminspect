@@ -1378,7 +1378,24 @@ static int read_cfgfile(struct rpminspect *ri, const char *filename)
                 } else if (symbol == SYMBOL_ENTRY) {
                     INIT_DEBUG_PRINT("    -> SYMBOL_ENTRY=%s, block=%d, group=%d\n", t, block, group);
 
-                    if (group == BLOCK_BADFUNCS) {
+                    /*
+                     * 'ignore' is handled first because of
+                     * per-inspection ignore lists and the symbol is
+                     * the same across blocks
+                     */
+                    if (block == BLOCK_IGNORE) {
+                        /*
+                         * BLOCK_NULL means we're reading the
+                         * top-level 'ignore' block.  Any other group
+                         * means we are reading the optional 'ignore'
+                         * subblock for an inspection.
+                         */
+                        if (group == BLOCK_NULL) {
+                            add_entry(&ri->ignores, t);
+                        } else {
+                            add_ignore(&ri->inspection_ignores, group, t);
+                        }
+                    } else if (group == BLOCK_BADFUNCS) {
                         if (block == BLOCK_NULL) {
                             add_entry(&ri->bad_functions, t);
                         } else if (block == BLOCK_BADFUNCS_ALLOWED) {
@@ -1406,18 +1423,6 @@ static int read_cfgfile(struct rpminspect *ri, const char *filename)
                         add_entry(&ri->forbidden_owners, t);
                     } else if (block == BLOCK_FORBIDDEN_GROUPS) {
                         add_entry(&ri->forbidden_groups, t);
-                    } else if (block == BLOCK_IGNORE) {
-                        /*
-                         * BLOCK_NULL means we're reading the
-                         * top-level 'ignore' block.  Any other group
-                         * means we are reading the optional 'ignore'
-                         * subblock for an inspection.
-                         */
-                        if (group == BLOCK_NULL) {
-                            add_entry(&ri->ignores, t);
-                        } else {
-                            add_ignore(&ri->inspection_ignores, group, t);
-                        }
                     } else if (block == BLOCK_SHELLS) {
                         add_entry(&ri->shells, t);
                     } else if (block == BLOCK_LTO_SYMBOL_NAME_PREFIXES) {
