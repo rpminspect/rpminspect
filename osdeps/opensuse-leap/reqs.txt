@@ -1,3 +1,5 @@
+autoconf
+automake
 bash
 cargo
 clamav
@@ -33,9 +35,9 @@ make
 meson
 ninja
 patchelf
-python3-PyYAML
 python3-devel
 python3-pip
+python3-PyYAML
 python3-rpm
 rpm-build
 rpm-devel
