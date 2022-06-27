@@ -55,10 +55,12 @@ setup:
 # only way to disable check-rpaths in rpmbuild is to use this
 # environment variable -or- remove the script(s) from /usr/lib/rpm.
 # The environment variable is easier.
+export QA_RPATHS = 63
+
 check: setup
 	@test_name="$(call TARGET_ARG,)" ; \
 	if [ -z "$${test_name}" ]; then \
-		env QA_RPATHS=63 meson test -C $(MESON_BUILD_DIR) -v ; \
+		env meson test -C $(MESON_BUILD_DIR) -v ; \
 	else \
 		test_script="test_$${test_name}.py" ; \
 		if [ ! -f "$(topdir)/test/$${test_script}" ]; then \
@@ -68,7 +70,6 @@ check: setup
 		env RPMINSPECT=$(topdir)/build/src/rpminspect \
 		    RPMINSPECT_YAML=$(topdir)/data/generic.yaml \
 		    RPMINSPECT_TEST_DATA_PATH=$(topdir)/test/data \
-		    QA_RPATHS=63 \
 		python3 -Bm unittest discover -v $(topdir)/test/ $${test_script} ; \
 	fi
 
