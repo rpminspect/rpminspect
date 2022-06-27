@@ -17,6 +17,9 @@ Changes to the GitHub Actions CI scripts and files:
 * Update the Slackware Linux GHA job
 * Build clamav with '-D ENABLE_JSON_SHARED=ON' on Slackware
 * opensuse does not use yum
+* Ensure manual install of 'rc' on OpenSUSE Leap works
+* Install automake and automake for opensuse-leap job
+* Add bison and html2text to opensuse-leap reqs.txt list
 
 rpminspect(1) changes:
 * Add missing format string to errx() calls
@@ -96,6 +99,7 @@ General bug fix in the library or frontend program:
 * Support per-file allowed lists for the badfuncs inspection
 * Use allowed_arch() in the arch and subpackages inspections
 * Remove unnecessary warning from failed chdir() call
+* Process per-inspection ignore blocks first in init.c
 
 librpminspect feature or significant change:
 * Drop dependency on the external 'diffstat' command
@@ -127,6 +131,8 @@ librpminspect feature or significant change:
 * Support optional product release configuration files
 * Allow local rpminspect.yaml files to extend annocheck options
 * Use REG_EXTENDED in match_product()
+* In match_path(), honor common syntax of /path/to/dir/*
+* Add ints to the BLOCK_ enum in init.c
 
 Test suite commits:
 * Adjust the addedfiles tests to handle new default size threshold
