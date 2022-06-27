@@ -1,6 +1,7 @@
 autoconf
 automake
 bash
+bison
 cargo
 clamav
 clamav-devel
@@ -14,6 +15,7 @@ gcovr
 gettext-tools
 git
 glibc-devel-32bit
+html2text
 html-dtd
 kernel-default-devel
 kernel-devel
