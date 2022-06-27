@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: rpminspect\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-06-24 16:28-0400\n"
+"POT-Creation-Date: 2022-06-27 14:58-0400\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -1168,46 +1168,46 @@ msgstr ""
 msgid "error reading %s ignore pattern"
 msgstr ""
 
-#: lib/init.c:1558
+#: lib/init.c:1563
 #, c-format
 msgid "*** Invalid filename in the fileinfo list: %s"
 msgstr ""
 
-#: lib/init.c:1559
+#: lib/init.c:1564
 msgid "*** From this invalid line:"
 msgstr ""
 
-#: lib/init.c:1560
+#: lib/init.c:1565
 #, c-format
 msgid "***     %s"
 msgstr ""
 
-#: lib/init.c:1978
+#: lib/init.c:1983
 #, c-format
 msgid "*** invalid security rule: %s"
 msgstr ""
 
-#: lib/init.c:2012
+#: lib/init.c:2017
 #, c-format
 msgid "*** unknown security rule: %s"
 msgstr ""
 
-#: lib/init.c:2032
+#: lib/init.c:2037
 #, c-format
 msgid "*** unknown security action: %s"
 msgstr ""
 
-#: lib/init.c:2058
+#: lib/init.c:2063
 #, c-format
 msgid "*** malformed security line: %s"
 msgstr ""
 
-#: lib/init.c:2224 lib/init.c:2248 lib/init.c:2267 lib/init.c:2280
+#: lib/init.c:2229 lib/init.c:2253 lib/init.c:2272 lib/init.c:2285
 #, c-format
 msgid "*** error reading '%s'"
 msgstr ""
 
-#: lib/init.c:2262
+#: lib/init.c:2267
 #, c-format
 msgid "*** unable to find profile '%s'"
 msgstr ""
