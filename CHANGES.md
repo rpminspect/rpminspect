@@ -144,6 +144,7 @@ Test suite commits:
 * Verify automatic ELF Requires handle subpackage changes
 * Support optional rpminspect.yaml overrides per test
 * Use .update() rather than |= to merge dicts
+* export QA_RPATHS from the top level Makefile
 
 
 Changes in rpminspect-1.9
