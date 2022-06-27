@@ -232,6 +232,24 @@ bool match_path(const char *pattern, const char *root, const char *path)
         return true;
     }
 
+    /*
+     * Also handle the incredibly common case of the trailing '/'
+     * where users specify an asterisk after the slash to mean
+     * everything below this directory.
+     */
+    if (strsuffix(pattern, "/*")) {
+        globsub = strdup(pattern);
+        assert(globsub != NULL);
+        globsub[strlen(globsub) - 1] = '\0';
+
+        if (globsub && strprefix(path, globsub)) {
+            free(globsub);
+            return true;
+        }
+
+        free(globsub);
+    }
+
     /* Try a match on the leading subdirectory */
     if ((strsuffix(pattern, "*") || strsuffix(pattern, "?")) && !fnmatch(pattern, path, FNM_LEADING_DIR)) {
         return true;
