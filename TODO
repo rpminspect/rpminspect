@@ -27,6 +27,14 @@ Other:
       rebased but not on the rebaseable list.  This should be off by
       default but then enabled in a maintenance profile.  Maybe???
 
+    - Modify downloading builds and packages to go to a download cache
+      directory.  Modify -k/--keep so it retains builds in the
+      download cache and then -k with -d (debug) specified, keep the
+      builds but also the workdir files.
+
+    - Add a command line option to set the build type for local builds
+      (e.g., need a way to specify a local subdirectory is a regular
+      Koji build or a module).
 
 Test categories that have been migrated:
 ----------------------------------------
