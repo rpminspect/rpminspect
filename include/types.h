@@ -215,7 +215,8 @@ typedef enum _severity_t {
     RESULT_INFO   = 2,
     RESULT_VERIFY = 3,
     RESULT_BAD    = 4,
-    RESULT_SKIP   = 5
+    RESULT_SKIP   = 5,
+    RESULT_DIAG   = 6       /* only used by the 'diagnostics' inspection */
 } severity_t;
 
 typedef enum _waiverauth_t {

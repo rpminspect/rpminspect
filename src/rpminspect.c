@@ -790,7 +790,7 @@ int main(int argc, char **argv)
 
     /* general information in the results */
     init_result_params(&params);
-    params.severity = RESULT_INFO;
+    params.severity = RESULT_DIAG;
     params.header = NAME_DIAGNOSTICS;
 
     /* gather version information for dependent programs and libraries */
