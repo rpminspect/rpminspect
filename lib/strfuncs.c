@@ -274,6 +274,8 @@ char *strseverity(const severity_t severity)
             return _("BAD");
         case RESULT_SKIP:
             return _("SKIP");
+        case RESULT_DIAG:
+            return _("DIAGNOSTICS");
         default:
             return _("UnKnOwN");
     }
@@ -305,6 +307,8 @@ severity_t getseverity(const char *name, const severity_t default_s)
         s = RESULT_BAD;
     } else if (!strcasecmp(name, _("SKIP"))) {
         s = RESULT_SKIP;
+    } else if (!strcasecmp(name, _("DIAGNOSTICS"))) {
+        s = RESULT_DIAG;
     }
 
     return s;
