@@ -644,7 +644,10 @@ class LostPICCompareRPMs(TestCompareRPMs):
         self.before_rpm.add_payload_check(installPath, None)
 
         self.after_rpm.add_source(rpmfluff.SourceFile("simple.c", test_library_source))
-        self.after_rpm.section_build += "gcc -m32 -fno-PIC -c simple.c\n"
+        self.after_rpm.section_build += (
+            "gcc -m32 -shared -fno-PIC -o simple.o simple.c\n"
+        )
+        self.after_rpm.section_build += "chmod 0644 simple.o\n"
         self.after_rpm.section_build += "ar -crs libsimple.a simple.o\n"
         self.after_rpm.create_parent_dirs(installPath)
         self.after_rpm.section_install += (
@@ -678,7 +681,10 @@ class SecuritySKIPLostPICCompareRPMs(TestCompareRPMs):
         self.before_rpm.add_payload_check(installPath, None)
 
         self.after_rpm.add_source(rpmfluff.SourceFile("simple.c", test_library_source))
-        self.after_rpm.section_build += "gcc -m32 -fno-PIC -c simple.c\n"
+        self.after_rpm.section_build += (
+            "gcc -m32 -shared -fno-PIC -o simple.o simple.c\n"
+        )
+        self.after_rpm.section_build += "chmod 0644 simple.o\n"
         self.after_rpm.section_build += "ar -crs libsimple.a simple.o\n"
         self.after_rpm.create_parent_dirs(installPath)
         self.after_rpm.section_install += (
@@ -712,7 +718,10 @@ class SecurityINFORMLostPICCompareRPMs(TestCompareRPMs):
         self.before_rpm.add_payload_check(installPath, None)
 
         self.after_rpm.add_source(rpmfluff.SourceFile("simple.c", test_library_source))
-        self.after_rpm.section_build += "gcc -m32 -fno-PIC -c simple.c\n"
+        self.after_rpm.section_build += (
+            "gcc -m32 -shared -fno-PIC -o simple.o simple.c\n"
+        )
+        self.after_rpm.section_build += "chmod 0644 simple.o\n"
         self.after_rpm.section_build += "ar -crs libsimple.a simple.o\n"
         self.after_rpm.create_parent_dirs(installPath)
         self.after_rpm.section_install += (
@@ -746,7 +755,10 @@ class SecurityVERIFYLostPICCompareRPMs(TestCompareRPMs):
         self.before_rpm.add_payload_check(installPath, None)
 
         self.after_rpm.add_source(rpmfluff.SourceFile("simple.c", test_library_source))
-        self.after_rpm.section_build += "gcc -m32 -fno-PIC -c simple.c\n"
+        self.after_rpm.section_build += (
+            "gcc -m32 -shared -fno-PIC -o simple.o simple.c\n"
+        )
+        self.after_rpm.section_build += "chmod 0644 simple.o\n"
         self.after_rpm.section_build += "ar -crs libsimple.a simple.o\n"
         self.after_rpm.create_parent_dirs(installPath)
         self.after_rpm.section_install += (
@@ -780,7 +792,10 @@ class SecurityFAILLostPICCompareRPMs(TestCompareRPMs):
         self.before_rpm.add_payload_check(installPath, None)
 
         self.after_rpm.add_source(rpmfluff.SourceFile("simple.c", test_library_source))
-        self.after_rpm.section_build += "gcc -m32 -fno-PIC -c simple.c\n"
+        self.after_rpm.section_build += (
+            "gcc -m32 -shared -fno-PIC -o simple.o simple.c\n"
+        )
+        self.after_rpm.section_build += "chmod 0644 simple.o\n"
         self.after_rpm.section_build += "ar -crs libsimple.a simple.o\n"
         self.after_rpm.create_parent_dirs(installPath)
         self.after_rpm.section_install += (
@@ -814,7 +829,10 @@ class LostPICCompareKoji(TestCompareKoji):
         self.before_rpm.add_payload_check(installPath, None)
 
         self.after_rpm.add_source(rpmfluff.SourceFile("simple.c", test_library_source))
-        self.after_rpm.section_build += "gcc -m32 -fno-PIC -c simple.c\n"
+        self.after_rpm.section_build += (
+            "gcc -m32 -shared -fno-PIC -o simple.o simple.c\n"
+        )
+        self.after_rpm.section_build += "chmod 0644 simple.o\n"
         self.after_rpm.section_build += "ar -crs libsimple.a simple.o\n"
         self.after_rpm.create_parent_dirs(installPath)
         self.after_rpm.section_install += (
