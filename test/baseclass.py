@@ -353,7 +353,7 @@ class TestSRPM(RequiresRpminspect):
             self.dumpResults()
 
         # anything not OK or INFO is a non-zero return
-        if self.result not in ["OK", "INFO"] and self.exitcode == 0:
+        if self.result not in ["OK", "INFO", "DIAGNOSTICS"] and self.exitcode == 0:
             self.exitcode = 1
 
         # dump stdout and stderr if these do not match
@@ -448,7 +448,7 @@ class TestCompareSRPM(RequiresRpminspect):
             self.dumpResults()
 
         # anything not OK or INFO is a non-zero return
-        if self.result not in ["OK", "INFO"] and self.exitcode == 0:
+        if self.result not in ["OK", "INFO", "DIAGNOSTICS"] and self.exitcode == 0:
             self.exitcode = 1
 
         # dump stdout and stderr if these do not match
@@ -501,7 +501,7 @@ class TestRPMs(RequiresRpminspect):
         self.rpm.do_make()
 
         # anything not OK or INFO is a non-zero return
-        if self.result not in ["OK", "INFO"] and self.exitcode == 0:
+        if self.result not in ["OK", "INFO", "DIAGNOSTICS"] and self.exitcode == 0:
             self.exitcode = 1
 
         for a in self.rpm.get_build_archs():
@@ -602,7 +602,7 @@ class TestCompareRPMs(RequiresRpminspect):
         self.after_rpm.do_make()
 
         # anything not OK or INFO is a non-zero return
-        if self.result not in ["OK", "INFO"] and self.exitcode == 0:
+        if self.result not in ["OK", "INFO", "DIAGNOSTICS"] and self.exitcode == 0:
             self.exitcode = 1
 
         for a in self.before_rpm.get_build_archs():
@@ -722,7 +722,7 @@ class TestKoji(TestRPMs):
                 self.dumpResults()
 
             # anything not OK or INFO is a non-zero return
-            if self.result not in ["OK", "INFO"] and self.exitcode == 0:
+            if self.result not in ["OK", "INFO", "DIAGNOSTICS"] and self.exitcode == 0:
                 self.exitcode = 1
 
             # dump stdout and stderr if these do not match
@@ -816,7 +816,7 @@ class TestCompareKoji(TestCompareRPMs):
                 self.dumpResults()
 
             # anything not OK or INFO is a non-zero return
-            if self.result not in ["OK", "INFO"] and self.exitcode == 0:
+            if self.result not in ["OK", "INFO", "DIAGNOSTICS"] and self.exitcode == 0:
                 self.exitcode = 1
 
             # dump stdout and stderr if these do not match
