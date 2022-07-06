@@ -208,15 +208,19 @@ typedef TAILQ_HEAD(rpmpeer_s, _rpmpeer_entry_t) rpmpeer_t;
 
 /*
  * And individual inspection result and the list to hold them.
+ * NOTE: This enum needs to go from least bad to worst result
+ * codes because that's how rpminspect determines what the exit
+ * code of the program is.  For example, RESULT_OK needs to be
+ * a lower int than RESULT_BAD.
  */
 typedef enum _severity_t {
     RESULT_NULL   = 0,      /* used to indicate internal error */
-    RESULT_OK     = 1,
-    RESULT_INFO   = 2,
-    RESULT_VERIFY = 3,
-    RESULT_BAD    = 4,
-    RESULT_SKIP   = 5,
-    RESULT_DIAG   = 6       /* only used by the 'diagnostics' inspection */
+    RESULT_DIAG   = 1,      /* only used by the 'diagnostics' inspection */
+    RESULT_OK     = 2,
+    RESULT_INFO   = 3,
+    RESULT_VERIFY = 4,
+    RESULT_BAD    = 5,
+    RESULT_SKIP   = 6
 } severity_t;
 
 typedef enum _waiverauth_t {
