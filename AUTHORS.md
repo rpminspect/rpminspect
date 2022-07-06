@@ -37,6 +37,8 @@ Contributors
 
 - Pino Toscano <ptoscano@redhat.com>
 
+- Robbie Harwood <rharwood@redhat.com>
+
 - Serhii Turivnyi <sturivny@redhat.com>, <turivniy@gmail.com>
 
 - Siddhesh Poyarekar <siddhesh@gotplt.org>
