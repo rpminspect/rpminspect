@@ -478,7 +478,13 @@ bool inspect_license(struct rpminspect *ri)
     params.header = NAME_LICENSE;
     params.waiverauth = NOT_WAIVABLE;
 
-    xasprintf(&actual_licensedb, "%s/%s/%s", ri->vendor_data_dir, LICENSES_DIR, ri->licensedb);
+    if (ri->licensedb && ri->licensedb[0] == '/') {
+        actual_licensedb = strdup(ri->licensedb);
+    } else {
+        xasprintf(&actual_licensedb, "%s/%s/%s", ri->vendor_data_dir, LICENSES_DIR, ri->licensedb);
+    }
+
+    assert(actual_licensedb != NULL);
 
     if (ri->licensedb == NULL || access(actual_licensedb, F_OK|R_OK)) {
         xasprintf(&params.msg, _("Missing license database: %s: %s"), actual_licensedb, strerror(errno));
