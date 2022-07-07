@@ -26,6 +26,8 @@
 #include <rpm/rpmlib.h>
 #include <rpm/rpmts.h>
 #include <rpm/header.h>
+#include <archive.h>
+#include <archive_entry.h>
 
 #include "rpminspect.h"
 
@@ -266,4 +268,184 @@ char *get_rpm_header_value(const rpmfile_entry_t *file, rpmTag tag)
     rpmtdFree(td);
 
     return ret;
+}
+
+/**
+ * Given a path to an RPM package, extract the payload to a tar file
+ * for later use with extract_rpm().  This happens in cases where
+ * libarchive cannot detect the cpio stream in an opened RPM file.
+ * The caller must free the returned path string.
+ *
+ * A lot of this is adapted from rpm2archive.c from the rpm sources.
+ *
+ * @param rpm The full path to the RPM.
+ * @return Full path to the tar file containing the payload or NULL on
+ *         error.
+ */
+char *extract_rpm_payload(const char *rpm)
+{
+    char *payload = NULL;
+    rpmts ts;
+    rpmVSFlags vsflags = RPMVSF_MASK_NODIGESTS | RPMVSF_MASK_NOSIGNATURES | RPMVSF_NOHDRCHK;
+    Header hdr = NULL;
+    FD_t fdi = NULL;
+    FD_t gzdi = NULL;
+    const char *compr = NULL;
+    char *rpmio_flags = NULL;
+    rpmfiles files = NULL;
+    rpmfi fi = NULL;
+    struct archive *archive = NULL;
+    struct archive_entry *entry = NULL;
+    char *buf = NULL;
+    char *hardlink = NULL;
+    rpm_mode_t mode = 0;
+    int nlink = 0;
+    int rc = 0;
+    const char *dn = NULL;
+    char *filename = NULL;
+    rpm_loff_t left;
+    size_t len = 0;
+    size_t read = 0;
+
+    assert(rpm != NULL);
+
+    /* create librpm widgets */
+    ts = rpmtsCreate();
+    rpmtsSetVSFlags(ts, vsflags);
+
+    /* open the package */
+    fdi = Fopen(rpm, "r.ufdio");
+    rc = rpmReadPackageFile(ts, fdi, COMMAND_NAME, &hdr);
+
+    if (rc == RPMRC_NOTFOUND || rc == RPMRC_FAIL) {
+        warn("rpmReadPackageFile");
+        goto cleanup;
+    }
+
+    /* determine how to read the payload */
+    compr = headerGetString(hdr, RPMTAG_PAYLOADCOMPRESSOR);
+    xasprintf(&rpmio_flags, "r.%s", compr ? compr : "gzip");
+    assert(rpmio_flags != NULL);
+
+    /* open the payload */
+    gzdi = Fdopen(fdi, rpmio_flags);
+    free(rpmio_flags);
+
+    if (gzdi == NULL) {
+        warnx("Fdopen: %s", Fstrerror(gzdi));
+        goto cleanup;
+    }
+
+    files = rpmfilesNew(NULL, hdr, 0, RPMFI_KEEPHEADER);
+    fi = rpmfiNewArchiveReader(gzdi, files, RPMFI_ITER_READ_ARCHIVE_CONTENT_FIRST);
+
+    /* create a new archive with the payload data */
+    archive = archive_write_new();
+
+    if (archive_write_add_filter_gzip(archive) != ARCHIVE_OK) {
+        warnx("archive_write_add_filter_gzip: %s", archive_error_string(archive));
+        goto cleanup;
+    }
+
+    if (archive_write_set_format_pax_restricted(archive) != ARCHIVE_OK) {
+        warnx("archive_write_set_format_pax_restricted: %s", archive_error_string(archive));
+        goto cleanup;
+    }
+
+    xasprintf(&payload, "%s.tar", rpm);
+    assert(payload != NULL);
+
+    if (archive_write_open_filename(archive, payload) != ARCHIVE_OK) {
+        warnx("archive_write_open_filename: %s", archive_error_string(archive));
+        goto cleanup;
+    }
+
+    /* iterate over every entry in the payload */
+    entry = archive_entry_new();
+
+    buf = calloc(1, BUFSIZ);
+    assert(buf != NULL);
+
+    while (rc >= 0) {
+        rc = rpmfiNext(fi);
+
+        if (rc == RPMERR_ITER_END) {
+            break;
+        }
+
+        mode = rpmfiFMode(fi);
+        nlink = rpmfiFNlink(fi);
+
+        archive_entry_clear(entry);
+        dn = rpmfiDN(fi);
+
+        if (!strcmp(dn, "")) {
+            dn = "/";
+        }
+
+        xasprintf(&filename, ".%s%s", dn, rpmfiBN(fi));
+        assert(filename != NULL);
+        archive_entry_copy_pathname(entry, filename);
+        free(filename);
+
+        archive_entry_set_size(entry, rpmfiFSize(fi));
+        archive_entry_set_filetype(entry, mode & S_IFMT);
+        archive_entry_set_perm(entry, mode);
+        archive_entry_set_uname(entry, rpmfiFUser(fi));
+        archive_entry_set_gname(entry, rpmfiFGroup(fi));
+        archive_entry_set_rdev(entry, rpmfiFRdev(fi));
+        archive_entry_set_mtime(entry, rpmfiFMtime(fi), 0);
+
+        if (S_ISLNK(mode)) {
+            archive_entry_set_symlink(entry, rpmfiFLink(fi));
+        }
+
+        if (nlink > 1) {
+            if (rpmfiArchiveHasContent(fi)) {
+                free(hardlink);
+                hardlink = strdup(archive_entry_pathname(entry));
+                assert(hardlink != NULL);
+            } else {
+                archive_entry_set_hardlink(entry, hardlink);
+            }
+        }
+
+        archive_write_header(archive, entry);
+
+        if (S_ISREG(mode) && (nlink == 1 || rpmfiArchiveHasContent(fi))) {
+            left = rpmfiFSize(fi);
+
+            while (left) {
+                len = (left > BUFSIZ ? BUFSIZ : left);
+                read = rpmfiArchiveRead(fi, buf, len);
+
+                if (read == len) {
+                    archive_write_data(archive, buf, len);
+                } else {
+                    warnx("error reading file from RPM payload");
+                    break;
+                }
+
+                left -= len;
+            }
+        }
+    }
+
+    if (rc == RPMERR_ITER_END) {
+        rc = 0;
+    }
+
+cleanup:
+    free(hardlink);
+    free(buf);
+    Fclose(gzdi);
+    archive_entry_free(entry);
+    archive_write_close(archive);
+    archive_write_free(archive);
+    rpmfilesFree(files);
+    rpmfiFree(fi);
+    headerFree(hdr);
+    rpmtsFree(ts);
+
+    return payload;
 }

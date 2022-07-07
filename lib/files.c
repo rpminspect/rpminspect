@@ -137,6 +137,23 @@ void free_files(rpmfile_t *files)
     free(files);
 }
 
+static struct archive *new_archive_reader(void)
+{
+    struct archive *a = NULL;
+
+    a = archive_read_new();
+    assert(a != NULL);
+
+#if ARCHIVE_VERSION_NUMBER < 3000000
+    archive_read_support_compression_all(a);
+#else
+    archive_read_support_filter_all(a);
+#endif
+    archive_read_support_format_all(a);
+
+    return a;
+}
+
 /**
  * @brief Extract the RPM package specified to a working directory.
  *
@@ -161,6 +178,7 @@ rpmfile_t *extract_rpm(const char *pkg, Header hdr, char **output_dir)
     struct file_data *path_entry = NULL;
     struct file_data *tmp_entry = NULL;
 
+    char *payload = NULL;
     char *hardlinkpath = NULL;
     struct archive *archive = NULL;
     struct archive_entry *entry = NULL;
@@ -230,19 +248,25 @@ rpmfile_t *extract_rpm(const char *pkg, Header hdr, char **output_dir)
     }
 
     /* Open the file with libarchive */
-    archive = archive_read_new();
-    assert(archive != NULL);
-
-#if ARCHIVE_VERSION_NUMBER < 3000000
-    archive_read_support_compression_all(archive);
-#else
-    archive_read_support_filter_all(archive);
-#endif
-    archive_read_support_format_all(archive);
+    archive = new_archive_reader();
 
     if (archive_read_open_filename(archive, pkg, 10240) != ARCHIVE_OK) {
-        warn("archive_read_open_filename");
-        goto cleanup;
+        /* maybe the payload has large files, so try to convert */
+        payload = extract_rpm_payload(pkg);
+
+        if (payload == NULL) {
+            /* can't do anything if the payload extraction failed */
+            goto cleanup;
+        }
+
+        archive_read_free(archive);
+        archive = new_archive_reader();
+
+        if (archive_read_open_filename(archive, payload, 10240) != ARCHIVE_OK) {
+            /* still bad, so bail */
+            warnx("archive_read_open_filename: %s", archive_error_string(archive));
+            goto cleanup;
+        }
     }
 
     /* Allocate space for the return value */
@@ -256,7 +280,7 @@ rpmfile_t *extract_rpm(const char *pkg, Header hdr, char **output_dir)
         }
 
         if (archive_result != ARCHIVE_OK) {
-            warn("archive_read_next_header");
+            warnx("archive_read_next_header: %s", archive_error_string(archive));
             free_files(file_list);
             file_list = NULL;
             goto cleanup;
@@ -272,10 +296,7 @@ rpmfile_t *extract_rpm(const char *pkg, Header hdr, char **output_dir)
         HASH_FIND_STR(path_table, archive_path, path_entry);
 
         if (path_entry == NULL) {
-            warn(_("*** payload path %s not in RPM metadata"), archive_path);
-            free_files(file_list);
-            file_list = NULL;
-            goto cleanup;
+            continue;
         }
 
         /* Create a new rpmfile_entry_t for this file */
@@ -327,7 +348,7 @@ rpmfile_t *extract_rpm(const char *pkg, Header hdr, char **output_dir)
 
         /* Write the file to disk */
         if (archive_read_extract(archive, entry, archive_flags) != ARCHIVE_OK) {
-            warn("archive_read_extract");
+            warnx("archive_read_extract: %s", archive_error_string(archive));
             free_files(file_list);
             file_list = NULL;
             goto cleanup;
@@ -343,6 +364,14 @@ cleanup:
 
     if (archive != NULL) {
         archive_read_free(archive);
+    }
+
+    if (payload) {
+        if (unlink(payload) == -1) {
+            warn("unlink");
+        }
+
+        free(payload);
     }
 
     rpmtdFree(td);

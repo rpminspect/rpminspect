@@ -240,6 +240,7 @@ char *get_nevra(Header);
 const char *get_rpm_header_arch(Header);
 string_list_t *get_rpm_header_string_array(Header h, rpmTagVal tag);
 char *get_rpm_header_value(const rpmfile_entry_t *file, rpmTag tag);
+char *extract_rpm_payload(const char *rpm);
 
 /* peers.c */
 rpmpeer_t *init_peers(void);
