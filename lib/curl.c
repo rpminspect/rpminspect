@@ -19,6 +19,7 @@
  * SPDX-License-Identifier: LGPL-3.0-or-later
  */
 
+#include <math.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -51,7 +52,7 @@ static void setup_progress_bar(const char *src)
     /* terminal width and progress bar width */
     if (total_width == 0) {
         total_width = tty_width();
-        half_width = total_width / 2;
+        half_width = round(total_width / 2);
         bar_width = half_width - 2;       /* account for '[' and ']' */
     }
 
