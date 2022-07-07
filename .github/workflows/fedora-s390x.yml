@@ -2,7 +2,7 @@ name: Fedora Linux s390x
 
 on:
     push:
-        branches: [ master ]
+        branches: [ main ]
         paths-ignore:
         - AUTHORS.md
         - CC-BY-4.0.txt

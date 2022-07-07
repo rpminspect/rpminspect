@@ -2,12 +2,12 @@ name: Python Checks
 
 on:
     push:
-        branches: [ master ]
+        branches: [ main ]
         paths:
         - '**.py'
 
     pull_request:
-        branches: [ master ]
+        branches: [ main ]
         paths:
         - '**.py'
 

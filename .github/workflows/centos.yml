@@ -2,7 +2,7 @@ name: CentOS
 
 on:
     push:
-        branches: [ master ]
+        branches: [ main ]
         paths-ignore:
         - AUTHORS.md
         - CC-BY-4.0.txt
