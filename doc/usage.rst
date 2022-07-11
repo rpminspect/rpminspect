@@ -103,13 +103,13 @@ Workflow Examples
 -----------------
 
 rpminspect_ runs from the command line.  The inputs must be local RPM_
-packages, a Koji_ build specification (*NVR*), a Koji_ scratch build
-task number, a Koji_ module specification, or a locally cached Koji_
-build output (regular build or module).  For inputs originating from
-Koji_, rpminspect_ talks to Koji_ and download the build artifacts.
-For repeated runs, you may want to cache a remote build locally to
-avoid downloading it with each run.  The examples below use `Fedora
-Linux <https://getfedora.org>`_, so they will reference the
+packages, a Koji_ build specification (*NVR*), a Koji_ task number, a
+Koji_ module specification, or a locally cached Koji_ build output
+(regular build or module).  For inputs originating from Koji_,
+rpminspect_ talks to Koji_ and download the build artifacts.  For
+repeated runs, you may want to cache a remote build locally to avoid
+downloading it with each run.  The examples below use `Fedora Linux
+<https://getfedora.org>`_, so they will reference the
 **rpminspect-fedora** wrapper script provided by
 rpminspect-data-fedora_ as the command to run.
 
