@@ -1,4 +1,4 @@
-annobin
+annobin-annocheck
 bash
 clamav-data
 clamav-devel
