@@ -284,6 +284,9 @@ static int download_build(struct rpminspect *ri, const struct koji_build *build)
         ri->download_size += build->total_size;
     }
 
+    /* set the working subdirectory */
+    set_worksubdir(workri, BUILD_WORKDIR, build, NULL);
+
     /* Iterate over list of builds, each with a list of packages */
     TAILQ_FOREACH(buildentry, build->builds, builditems) {
         if (TAILQ_EMPTY(buildentry->rpms)) {
@@ -586,6 +589,9 @@ static int download_task(struct rpminspect *ri, struct koji_task *task)
         ri->download_size += task->total_size;
     }
 
+    /* set working subdirectory */
+    set_worksubdir(workri, TASK_WORKDIR, NULL, task);
+
     /* download the task */
     TAILQ_FOREACH(descendent, task->descendents, items) {
         /* skip if we have nothing */
@@ -724,6 +730,9 @@ static int download_rpm(struct rpminspect *ri, const char *rpm)
         return -1;
     }
 
+    /* set working subdirectory */
+    set_worksubdir(workri, LOCAL_WORKDIR, NULL, NULL);
+
     /* download the package */
     xasprintf(&dst, "%s/%s", dstdir, basename(pkg));
     curl_get_file(workri->verbose, rpm, dst);
@@ -755,6 +764,97 @@ static bool is_task_id(const char *id)
     }
 
     return true;
+}
+
+
+/*
+ * Try to see if a given koji_task can be represented as a koji_build.
+ * If so, convert it and return the resulting koji_build.  If it
+ * can't, return NULL.
+ */
+static struct koji_build *get_koji_task_as_build(const struct koji_task *task)
+{
+    struct koji_build *build = NULL;
+    size_t i = 0;
+    char *srpm = NULL;
+    char *nvr = NULL;
+    const char *srpmext = "." SRPM_ARCH_NAME RPM_FILENAME_EXTENSION;
+    koji_task_entry_t *descendent = NULL;
+    string_list_t *srpmlist = NULL;
+    string_entry_t *entry = NULL;
+
+    assert(task != NULL);
+
+    /* unable to determine candidate NVR without a SRPM */
+    if (!allowed_arch(workri, "src")) {
+        return NULL;
+    }
+
+    /* we need exactly one SRPM */
+    TAILQ_FOREACH(descendent, task->descendents, items) {
+        if (!TAILQ_EMPTY(descendent->srpms)) {
+            srpmlist = descendent->srpms;
+            i += list_len(descendent->srpms);
+        }
+    }
+
+    if (i != 1) {
+        return NULL;
+    }
+
+    /* guess the NVR for the build */
+    entry = TAILQ_FIRST(srpmlist);
+
+    if (entry == NULL || entry->data == NULL) {
+        return NULL;
+    }
+
+    srpm = strdup(entry->data);
+    assert(srpm != NULL);
+    nvr = strrchr(srpm, '/');
+    nvr++;
+
+    if (nvr == NULL) {
+        free(srpm);
+        return NULL;
+    }
+
+    i = strlen(nvr);
+
+    if (strsuffix(nvr, srpmext)) {
+        i -= strlen(srpmext);
+        nvr[i] = '\0';
+    }
+
+    /* try to get the build */
+    build = get_koji_build(workri, nvr);
+    free(srpm);
+
+    return build;
+}
+
+/* Gather local build */
+static int gather_local_build(const char *build)
+{
+    assert(build != NULL);
+
+    if (fetch_only) {
+        warnx(_("`%s' already exists in %s"), build, workri->workdir);
+        return -1;
+    }
+
+    set_worksubdir(workri, LOCAL_WORKDIR, NULL, NULL);
+
+    /* copy after tree */
+    if (nftw(build, copytree, FOPEN_MAX, FTW_PHYS) == -1) {
+        warn("nftw");
+        return -1;
+    }
+
+    /* clean up */
+    prune_local(whichbuild);
+
+    return 0;
 }
 
 /**
@@ -789,40 +889,38 @@ int gather_builds(struct rpminspect *ri, bool fo)
         whichbuild = AFTER_BUILD;
 
         if (is_local_build(ri->workdir, ri->after, fetch_only) || is_local_rpm(ri, ri->after)) {
-            if (fetch_only) {
-                warnx(_("`%s' already exists in %s"), ri->after, ri->workdir);
+            if (gather_local_build(ri->after) == -1) {
                 return -1;
             }
-
-            set_worksubdir(ri, LOCAL_WORKDIR, NULL, NULL);
-
-            /* copy after tree */
-            if (nftw(ri->after, copytree, FOPEN_MAX, FTW_PHYS) == -1) {
-                warn("nftw");
-                return -1;
-            }
-
-            /* clean up */
-            prune_local(whichbuild);
         } else if (is_remote_rpm(ri->after)) {
-            set_worksubdir(ri, LOCAL_WORKDIR, NULL, NULL);
             r = download_rpm(ri, ri->after);
 
             if (r != RI_SUCCESS) {
                 return r;
             }
         } else if (is_task_id(ri->after) && (task = get_koji_task(ri, ri->after)) != NULL) {
-            set_worksubdir(ri, TASK_WORKDIR, NULL, task);
-            r = download_task(ri, task);
+            build = get_koji_task_as_build(task);
 
-            if (r != RI_SUCCESS) {
-                free_koji_task(task);
-                return r;
+            if (build) {
+                r = download_build(ri, build);
+
+                if (r != RI_SUCCESS) {
+                    free_koji_build(build);
+                    return r;
+                }
+
+                free_koji_build(build);
+            } else {
+                r = download_task(ri, task);
+
+                if (r != RI_SUCCESS) {
+                    free_koji_task(task);
+                    return r;
+                }
             }
 
             free_koji_task(task);
         } else if ((build = get_koji_build(ri, ri->after)) != NULL) {
-            set_worksubdir(ri, BUILD_WORKDIR, build, NULL);
             r = download_build(ri, build);
 
             if (r != RI_SUCCESS) {
@@ -846,35 +944,38 @@ int gather_builds(struct rpminspect *ri, bool fo)
 
     /* before build specified, find it */
     if (is_local_build(ri->workdir, ri->before, fetch_only) || is_local_rpm(ri, ri->before)) {
-        set_worksubdir(ri, LOCAL_WORKDIR, NULL, NULL);
-
-        /* copy before tree */
-        if (nftw(ri->before, copytree, FOPEN_MAX, FTW_PHYS) == -1) {
-            warn("nftw");
+        if (gather_local_build(ri->before) == -1) {
             return -1;
         }
-
-        /* clean up */
-        prune_local(whichbuild);
     } else if (is_remote_rpm(ri->before)) {
-        set_worksubdir(ri, LOCAL_WORKDIR, NULL, NULL);
         r = download_rpm(ri, ri->before);
 
         if (r != RI_SUCCESS) {
             return r;
         }
     } else if (is_task_id(ri->before) && (task = get_koji_task(ri, ri->before)) != NULL) {
-        set_worksubdir(ri, TASK_WORKDIR, NULL, task);
-        r = download_task(ri, task);
+        build = get_koji_task_as_build(task);
 
-        if (r != RI_SUCCESS) {
-            free_koji_task(task);
-            return r;
+        if (build) {
+            r = download_build(ri, build);
+
+            if (r != RI_SUCCESS) {
+                free_koji_build(build);
+                return r;
+            }
+
+            free_koji_build(build);
+        } else {
+            r = download_task(ri, task);
+
+            if (r != RI_SUCCESS) {
+                free_koji_task(task);
+                return r;
+            }
         }
 
         free_koji_task(task);
     } else if ((build = get_koji_build(ri, ri->before)) != NULL) {
-        set_worksubdir(ri, BUILD_WORKDIR, build, NULL);
         r = download_build(ri, build);
 
         if (r != RI_SUCCESS) {
