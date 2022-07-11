@@ -654,13 +654,12 @@ const char *strexitcode(int exitcode)
 
 /*
  * Trims leading and trailing whitespace from a dynamically allocated
- * string.  NOTE:  Must call this on a string that has been malloc'ed
- * so free() can be called.  This function uses memmove() and realloc().
+ * string.  NOTE: The string is left allocated as is but shifted to
+ * the beginning and unused chars are \0 at the end.
  */
 char *strtrim(char *s)
 {
     char *r = NULL;
-    char *begin = NULL;
     size_t i = 0;
 
     if (s == NULL) {
@@ -668,7 +667,7 @@ char *strtrim(char *s)
     }
 
     /* the beginning of the string */
-    begin = s;
+    r = s;
 
     /* remove leading whitespace */
     while (isspace(*s) && *s != '\0') {
@@ -681,7 +680,7 @@ char *strtrim(char *s)
 
     /* shift everything to the head of the string */
     while (s[i] != '\0') {
-        begin[i] = s[i];
+        r[i] = s[i];
         i++;
     }
 
@@ -696,9 +695,6 @@ char *strtrim(char *s)
     if (s == NULL) {
         return NULL;
     }
-
-    /* reallocate memory block */
-    r = realloc(begin, strlen(begin) + 1);
 
     return r;
 }
