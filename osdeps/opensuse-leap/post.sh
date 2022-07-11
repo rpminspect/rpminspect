@@ -2,6 +2,9 @@
 PATH=/bin:/usr/bin:/sbin:/usr/sbin
 CWD="$(pwd)"
 
+# Some RPM macros on suse try to override RPMTAG_VENDOR
+sed -i -e '/^%vendor/d' /usr/lib/rpm/macros.d/*
+
 # The mandoc package on OpenSUSE lacks libmandoc.a and
 # header files, which we need to build rpminspect
 curl -O http://mandoc.bsd.lv/snapshots/mandoc.tar.gz
