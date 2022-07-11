@@ -112,6 +112,10 @@ static bool have_automacro(const rpmfile_entry_t *specfile)
 
     /* Look for %autopatch or %autosetup in valid sections */
     TAILQ_FOREACH(entry, contents, items) {
+        if (entry->data == NULL) {
+            continue;
+        }
+
         buf = entry->data;
 
         /* trim line endings */
@@ -129,7 +133,7 @@ static bool have_automacro(const rpmfile_entry_t *specfile)
          */
         buf = strtrim(buf);
 
-        if (*buf == '%') {
+        if (buf && *buf == '%') {
             if (strprefix(buf, SPEC_SECTION_PREP)
                 || strprefix(buf, SPEC_SECTION_BUILD)
                 || strprefix(buf, SPEC_SECTION_INSTALL)
@@ -146,8 +150,8 @@ static bool have_automacro(const rpmfile_entry_t *specfile)
          * this matches lines that are either the macro itself, or the
          * macro followed by one or more options
          */
-        if (in_valid_section && (!strcmp(buf, SPEC_MACRO_AUTOPATCH) || strprefix(buf, SPEC_MACRO_AUTOPATCH" ")
-                                 || !strcmp(buf, SPEC_MACRO_AUTOSETUP) || strprefix(buf, SPEC_MACRO_AUTOSETUP" "))) {
+        if (in_valid_section && buf && (!strcmp(buf, SPEC_MACRO_AUTOPATCH) || strprefix(buf, SPEC_MACRO_AUTOPATCH" ")
+                                        || !strcmp(buf, SPEC_MACRO_AUTOSETUP) || strprefix(buf, SPEC_MACRO_AUTOSETUP" "))) {
             r = true;
             break;
         }
