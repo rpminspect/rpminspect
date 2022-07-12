@@ -282,9 +282,9 @@ char *get_rpm_header_value(const rpmfile_entry_t *file, rpmTag tag)
  * @return Full path to the tar file containing the payload or NULL on
  *         error.
  */
-char *extract_rpm_payload(const char *rpm)
-{
 #ifdef _HAVE_OLD_RPM_API
+char *extract_rpm_payload(__attribute__((unused)) const char *rpm)
+{
     /*
      * only support payload conversion with newer librpm releases
      * which include the rpmfiles.h and rpmarchive.h headers
@@ -292,6 +292,8 @@ char *extract_rpm_payload(const char *rpm)
 
     return NULL;
 #else
+char *extract_rpm_payload(const char *rpm)
+{
     char *payload = NULL;
     rpmts ts;
     rpmVSFlags vsflags = RPMVSF_MASK_NODIGESTS | RPMVSF_MASK_NOSIGNATURES | RPMVSF_NOHDRCHK;
