@@ -284,9 +284,17 @@ char *get_rpm_header_value(const rpmfile_entry_t *file, rpmTag tag)
  */
 char *extract_rpm_payload(const char *rpm)
 {
+#ifdef _HAVE_OLD_RPM_API
+    /*
+     * only support payload conversion with newer librpm releases
+     * which include the rpmfiles.h and rpmarchive.h headers
+     */
+
+    return NULL;
+#else
     char *payload = NULL;
     rpmts ts;
-    rpmVSFlags vsflags = RPMVSF_MASK_NODIGESTS | RPMVSF_MASK_NOSIGNATURES | RPMVSF_NOHDRCHK;
+    rpmVSFlags vsflags = _RPMVSF_MASK_NODIGESTS | _RPMVSF_MASK_NOSIGNATURES | RPMVSF_NOHDRCHK;
     Header hdr = NULL;
     FD_t fdi = NULL;
     FD_t gzdi = NULL;
@@ -448,4 +456,5 @@ cleanup:
     rpmtsFree(ts);
 
     return payload;
+#endif
 }
