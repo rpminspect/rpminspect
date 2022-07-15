@@ -1679,13 +1679,13 @@ bool init_caps(struct rpminspect *ri)
 
                 filelist_entry = calloc(1, sizeof(*filelist_entry));
                 assert(filelist_entry != NULL);
+                field = FILEPATH;
             } else if (field == FILEPATH) {
                 filelist_entry->path = strdup(token);
+                field = CAPABILITIES;
             } else if (field == CAPABILITIES) {
                 filelist_entry->caps = strdup(token);
             }
-
-            field++;
         }
 
         /* add the entry */
