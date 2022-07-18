@@ -507,6 +507,8 @@ bool inspect_patches(struct rpminspect *ri)
     rpmfile_entry_t *file = NULL;
     rpmfile_entry_t *specfile = NULL;
     string_list_t *patchfiles = NULL;
+    string_list_t *before_patchfiles = NULL;
+    string_list_t *removed = NULL;
     string_entry_t *patch = NULL;
     string_list_t *speclines = NULL;
     string_entry_t *specentry = NULL;
@@ -702,8 +704,6 @@ bool inspect_patches(struct rpminspect *ri)
             }
         }
 
-        list_free(patchfiles, free);
-
         /* Iterate over the SRPM files */
         TAILQ_FOREACH(file, peer->after_files, items) {
             if (!patches_driver(ri, file)) {
@@ -712,17 +712,29 @@ bool inspect_patches(struct rpminspect *ri)
         }
 
         /* Report any removed patch files from the SRPM */
-        if (peer->before_files) {
-            TAILQ_FOREACH(file, peer->before_files, items) {
-                if (file->peer_file == NULL) {
-                    xasprintf(&params.msg, _("Patch file `%s` removed"), file->localpath);
-                    add_result(ri, &params);
-                    free(params.msg);
-                    reported = true;
-                    result = !(params.severity >= RESULT_VERIFY);
+        if (specfile->peer_file) {
+            before_patchfiles = get_rpm_header_string_array(specfile->peer_file->rpm_header, RPMTAG_PATCH);
+
+            if (before_patchfiles != NULL && !TAILQ_EMPTY(before_patchfiles)) {
+                removed = list_difference(before_patchfiles, patchfiles);
+
+                if (removed != NULL && !TAILQ_EMPTY(removed)) {
+                    TAILQ_FOREACH(entry, removed, items) {
+                        xasprintf(&params.msg, _("Patch file `%s` removed"), entry->data);
+                        add_result(ri, &params);
+                        free(params.msg);
+                        reported = true;
+                        result = !(params.severity >= RESULT_VERIFY);
+                    }
+
+                    list_free(removed, free);
                 }
+
+                list_free(before_patchfiles, free);
             }
         }
+
+        list_free(patchfiles, free);
     }
 
     /* Clean up the patches and applied hash tables */
