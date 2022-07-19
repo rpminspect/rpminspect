@@ -549,7 +549,6 @@ int main(int argc, char **argv)
     ri = calloc_rpminspect(ri);
     ri->progname = strdup(argv[0]);
     ri->verbose = verbose;
-    ri->product_release = release;
     ri->rebase_detection = rebase_detection;
 
     /*
@@ -605,6 +604,13 @@ int main(int argc, char **argv)
     }
 
     free(profile);
+
+    /* Product release specified on the command line overrides config file */
+    if (release) {
+        free(ri->product_release);
+        ri->product_release = release;
+        free(release);
+    }
 
     /* Reporting threshold and suppression levels */
     ri->threshold = getseverity(threshold, RESULT_VERIFY);
@@ -882,7 +888,10 @@ int main(int argc, char **argv)
             }
 
             /* get the product release */
-            ri->product_release = get_product_release(ri->products, ri->favor_release, before_rel, after_rel);
+            if (ri->product_release == NULL) {
+                ri->product_release = get_product_release(ri->products, ri->favor_release, before_rel, after_rel);
+            }
+
             DEBUG_PRINT("product_release=%s\n", ri->product_release);
 
             if (ri->product_release == NULL) {

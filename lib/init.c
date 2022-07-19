@@ -146,7 +146,8 @@ enum {
     BLOCK_REMOVEDFILES = 68,
     BLOCK_SYMLINKS = 69,
     BLOCK_UPSTREAM = 70,
-    BLOCK_VIRUS = 71
+    BLOCK_VIRUS = 71,
+    BLOCK_ENVIRONMENT = 72
 };
 
 static int add_regex(const char *pattern, regex_t **regex_out)
@@ -686,6 +687,9 @@ static int read_cfgfile(struct rpminspect *ri, const char *filename)
                     if (!strcmp(key, "common")) {
                         block = BLOCK_COMMON;
                         group = BLOCK_NULL;
+                    } else if (!strcmp(key, "environment")) {
+                        block = BLOCK_ENVIRONMENT;
+                        group = BLOCK_NULL;
                     } else if (!strcmp(key, "koji")) {
                         block = BLOCK_KOJI;
                         group = BLOCK_NULL;
@@ -1080,6 +1084,11 @@ static int read_cfgfile(struct rpminspect *ri, const char *filename)
                         } else if (!strcmp(key, "profiledir")) {
                             free(ri->profiledir);
                             ri->profiledir = strdup(t);
+                        }
+                    } else if (block == BLOCK_COMMON) {
+                        if (!strcmp(key, "product_release")) {
+                            free(ri->product_release);
+                            ri->product_release = strdup(t);
                         }
                     } else if (block == BLOCK_KOJI) {
                         if (!strcmp(key, "hub")) {
