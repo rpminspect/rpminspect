@@ -18,6 +18,25 @@ common:
     # exist in the profile directory.
     profiledir: /usr/share/rpminspect/profiles/generic
 
+environment:
+    # There may be instances where rpminspect cannot easily determine
+    # the product release string from the dist tag.  The -r command
+    # line option is for those cases.  If you do not want to use the
+    # command line option, you can add this block to your
+    # rpminspect.yaml file and specify the product release this way.
+    #
+    # For example:
+    # product_release: el8
+    #
+    # If a product release is specified in a config file and then the
+    # -r option is specified (or --release) with a product release,
+    # the command line option overrides the config file value.  If a
+    # product release is specified in either a config file or via the
+    # command line, the automatic detection of the product release in
+    # the dist tag is skipped.
+    #
+    #product_release: GENERIC
+
 koji:
     # The root URL of the XMLRPC API provided by the Koji hub
     hub: http://koji-hub.example.com/api/v1
