@@ -1085,7 +1085,7 @@ static int read_cfgfile(struct rpminspect *ri, const char *filename)
                             free(ri->profiledir);
                             ri->profiledir = strdup(t);
                         }
-                    } else if (block == BLOCK_COMMON) {
+                    } else if (block == BLOCK_ENVIRONMENT) {
                         if (!strcmp(key, "product_release")) {
                             free(ri->product_release);
                             ri->product_release = strdup(t);

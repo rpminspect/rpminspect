@@ -609,7 +609,6 @@ int main(int argc, char **argv)
     if (release) {
         free(ri->product_release);
         ri->product_release = release;
-        free(release);
     }
 
     /* Reporting threshold and suppression levels */
