@@ -19,8 +19,11 @@
  * SPDX-License-Identifier: LGPL-3.0-or-later
  */
 
+#include <stdlib.h>
+#include <string.h>
 #include <assert.h>
 #include <err.h>
+#include <regex.h>
 #include <rpm/header.h>
 #include "queue.h"
 #include "rpminspect.h"
@@ -30,6 +33,64 @@ static const char *specfile = NULL;
 static char *pkg_evr = NULL;
 static char *pkg_vr = NULL;
 static uint64_t pkg_epoch = 0;
+
+/*
+ * Given a requirement string, remove any %{_isa} substring in it.
+ * Returns a newly allocated string.  The %{_isa} substrings are all
+ * defined in the macros files found in /usr/lib/rpm/platform/ and are
+ * of the form "(text-32)" or "(text-64)".  Rather than list them all
+ * out here, this function just uses a regular expression to find a
+ * substring matching "\([a-zA-Z0-9]+-(32|64)\)" and then removes it.
+ * That will catch things like "(aarch-64)" and "(x86-32)" but it
+ * would also match "(SuperPickle47-64)" if that ever showed up.  I'm
+ * going to choose to take that risk to avoid maintaining a static
+ * list of %{_isa} substring values.
+ */
+static char *remove_isa_substring(char *requirement)
+{
+    char *r = NULL;
+    char *tmp = NULL;
+    char *s = requirement;
+    regex_t re;
+    regmatch_t pmatch[1];
+    size_t nmatch = sizeof(pmatch) / sizeof(pmatch[0]);
+
+    /* give me something to work with */
+    if (requirement == NULL) {
+        return NULL;
+    }
+
+    /* isa substring regex pattern */
+    if (regcomp(&re, "\\([a-zA-Z0-9]+-(32|64)\\)", REG_EXTENDED | REG_NEWLINE) != 0) {
+        warn("regcomp");
+        r = strdup(requirement);
+        return r;
+    }
+
+    /* scan the requirement string and remove all isa substrings */
+    while (regexec(&re, s, nmatch, pmatch, 0) != REG_NOMATCH) {
+        if (r) {
+            tmp = strreplace(r, s + pmatch[0].rm_so, NULL);
+            assert(tmp != NULL);
+            free(r);
+            r = tmp;
+        } else {
+            r = strreplace(requirement, s + pmatch[0].rm_so, NULL);
+        }
+
+        s += pmatch[0].rm_eo;
+    }
+
+    /* no isa substrings found, return a dupe of requirement */
+    if (r == NULL) {
+        r = strdup(requirement);
+    }
+
+    /* clean up */
+    regfree(&re);
+
+    return r;
+}
 
 /*
  * Scan all dependencies and look for version values containing
@@ -117,7 +178,6 @@ static bool check_explicit_lib_deps(struct rpminspect *ri, Header h, deprule_lis
     deprule_entry_t *prov = NULL;
     char *isareq = NULL;
     char *isaprov = NULL;
-    char *walk = NULL;
     char *multiples = NULL;
     char *r = NULL;
     char *vr = NULL;
@@ -196,21 +256,11 @@ static bool check_explicit_lib_deps(struct rpminspect *ri, Header h, deprule_lis
                      * trim the '(x86-64)' or similar ISA substring for comparision purposes
                      * also trim leading '(' to account for rich deps
                      */
-                    isareq = strdup(req->requirement);
+                    isareq = remove_isa_substring(req->requirement);
                     assert(isareq != NULL);
-                    walk = strrchr(isareq, '(');
 
-                    if (walk != NULL) {
-                        *walk = '\0';
-                    }
-
-                    isaprov = strdup(prov->requirement);
+                    isaprov = remove_isa_substring(prov->requirement);
                     assert(isaprov != NULL);
-                    walk = strrchr(isaprov, '(');
-
-                    if (walk != NULL) {
-                        *walk = '\0';
-                    }
 
                     if (!strcmp(isareq, isaprov)) {
                         potential_prov = peer;
@@ -254,13 +304,8 @@ static bool check_explicit_lib_deps(struct rpminspect *ri, Header h, deprule_lis
                 }
 
                 /* trim potential %{_isa} suffix */
-                isareq = strdup(verify->requirement);
+                isareq = remove_isa_substring(verify->requirement);
                 assert(isareq != NULL);
-                walk = strrchr(isareq, '(');
-
-                if (walk != NULL) {
-                    *walk = '\0';
-                }
 
                 if (!strcmp(isareq, pn) && verify->operator == OP_EQUAL && (!strcmp(verify->version, evr) || !strcmp(verify->version, vr))) {
                     verify->explicit = true;
@@ -473,7 +518,7 @@ static bool expected_deprule_change(const bool rebase, const deprule_entry_t *de
     arch = get_rpm_header_arch(h);
 
     /* a copy of the req to work with */
-    working_req = req = strdup(deprule->requirement);
+    working_req = req = remove_isa_substring(deprule->requirement);
     assert(req != NULL);
 
     /* trim any leading '(' to account for rich deps */
@@ -486,11 +531,6 @@ static bool expected_deprule_change(const bool rebase, const deprule_entry_t *de
         config = true;
         working_req += 7;
         working_req[strcspn(working_req, ")")] = '\0';
-    }
-
-    /* trim any arch substrings from the name (e.g., "(x86-64)") */
-    if (strstr(working_req, "(")) {
-        working_req[strcspn(working_req, "(")] = '\0';
     }
 
     /* gather any + suffix from the version */
