@@ -538,7 +538,7 @@ void dump_cfg(const struct rpminspect *ri)
 
     HASH_FIND_STR(ri->inspection_ignores, NAME_ABIDIFF, mapentry);
 
-    if (ri->abidiff_suppression_file || ri->abidiff_debuginfo_path || ri->abidiff_include_path || ri->abidiff_extra_args || mapentry != NULL) {
+    if (ri->abidiff_suppression_file || ri->abidiff_debuginfo_path || ri->abidiff_extra_args || mapentry != NULL) {
         printf("abidiff:\n");
 
         if (ri->abidiff_suppression_file) {
@@ -547,10 +547,6 @@ void dump_cfg(const struct rpminspect *ri)
 
         if (ri->abidiff_debuginfo_path) {
             printf("    debuginfo_path: %s\n", ri->abidiff_debuginfo_path);
-        }
-
-        if (ri->abidiff_include_path) {
-            printf("    include_path: %s\n", ri->abidiff_include_path);
         }
 
         if (ri->abidiff_extra_args) {

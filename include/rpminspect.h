@@ -437,12 +437,10 @@ bool is_rebase(struct rpminspect *ri);
 void init_arches(struct rpminspect *ri);
 
 /* abi.c */
-void add_abi_argument(string_list_map_t *table, const char *arg, const char *path, const Header hdr);
-size_t count_abi_entries(const string_list_t *contents);
 abi_t *read_abi(const char *vendor_data_dir, const char *product_release);
 void free_abi(abi_t *list);
 string_list_t *get_abi_suppressions(const struct rpminspect *ri, const char *suppression_file);
-string_list_map_t *get_abi_dir_arg(struct rpminspect *ri, const size_t size, const char *suffix, const char *arg, const char *path, const int type);
+string_list_map_t *get_abi_dir_arg(struct rpminspect *ri, const size_t size, const char *suffix, const char *path, const int type);
 
 /* uncompress.c */
 char *uncompress_file(struct rpminspect *ri, const char *infile, const char *subdir);

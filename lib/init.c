@@ -1290,9 +1290,6 @@ static int read_cfgfile(struct rpminspect *ri, const char *filename)
                         } else if (!strcmp(key, "debuginfo_path")) {
                             free(ri->abidiff_debuginfo_path);
                             ri->abidiff_debuginfo_path = strdup(t);
-                        } else if (!strcmp(key, "include_path")) {
-                            free(ri->abidiff_include_path);
-                            ri->abidiff_include_path = strdup(t);
                         } else if (!strcmp(key, "extra_args")) {
                             free(ri->abidiff_extra_args);
                             ri->abidiff_extra_args = strdup(t);
@@ -2175,7 +2172,6 @@ struct rpminspect *calloc_rpminspect(struct rpminspect *ri)
     ri->specprimary = PRIMARY_NAME;
     ri->abidiff_suppression_file = strdup(ABI_SUPPRESSION_FILE);
     ri->abidiff_debuginfo_path = strdup(DEBUG_PATH);
-    ri->abidiff_include_path = strdup(INCLUDE_PATH);
     ri->abi_security_threshold = DEFAULT_ABI_SECURITY_THRESHOLD;
     ri->kmidiff_suppression_file = strdup(ABI_SUPPRESSION_FILE);
     ri->kmidiff_debuginfo_path = strdup(DEBUG_PATH);

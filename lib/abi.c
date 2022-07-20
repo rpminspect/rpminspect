@@ -28,16 +28,12 @@
 /*
  * Helper to add entries to abi argument tables.
  */
-void add_abi_argument(string_list_map_t *table, const char *arg, const char *path, const Header hdr)
+static void add_abi_argument(string_list_map_t **table, const char *path, const Header hdr)
 {
     string_entry_t *entry = NULL;
     string_list_map_t *hentry = NULL;
+    const char *arch = NULL;
 
-    if (table == NULL) {
-        return;
-    }
-
-    assert(arg != NULL);
     assert(path != NULL);
     assert(hdr != NULL);
 
@@ -48,63 +44,32 @@ void add_abi_argument(string_list_map_t *table, const char *arg, const char *pat
     /* prepare the new list entry */
     entry = calloc(1, sizeof(*entry));
     assert(entry != NULL);
-    xasprintf(&entry->data, "%s %s", arg, path);
+    entry->data = strdup(path);
     assert(entry->data != NULL);
 
     /* look up the entry in the hash table */
-    HASH_FIND_STR(table, get_rpm_header_arch(hdr), hentry);
+    arch = get_rpm_header_arch(hdr);
+    HASH_FIND_STR(*table, arch, hentry);
 
     if (hentry == NULL) {
         /* does not exist in the table, create it and add it */
         hentry = calloc(1, sizeof(*hentry));
         assert(hentry != NULL);
 
-        hentry->key = strdup(get_rpm_header_arch(hdr));
+        hentry->key = strdup(arch);
 
         hentry->value = calloc(1, sizeof(*hentry->value));
         assert(hentry->value != NULL);
         TAILQ_INIT(hentry->value);
         TAILQ_INSERT_TAIL(hentry->value, entry, items);
 
-        HASH_ADD_KEYPTR(hh, table, hentry->key, strlen(hentry->key), hentry);
+        HASH_ADD_KEYPTR(hh, *table, hentry->key, strlen(hentry->key), hentry);
     } else {
         /* list exists, add another entry */
         TAILQ_INSERT_TAIL(hentry->value, entry, items);
     }
 
     return;
-}
-
-/*
- * Count ABI entries in the named ABI compat level file.
- */
-size_t count_abi_entries(const string_list_t *contents)
-{
-    size_t count = 0;
-    string_entry_t *entry = NULL;
-
-    if (list_len(contents) == 0) {
-        return 0;
-    }
-
-    TAILQ_FOREACH(entry, contents, items) {
-        /* skip blank lines, comments, and level definitions */
-        if (*entry->data == '#' || *entry->data == '\n' || *entry->data == '\r') {
-            continue;
-        }
-
-        /* trim line ending characters */
-        entry->data[strcspn(entry->data, "\r\n")] = '\0';
-
-        /* determine if we are reading a new level or not */
-        if (strprefix(entry->data, "[") && strsuffix(entry->data, "]") && strcasestr(entry->data, "level-")) {
-            continue;
-        }
-
-        count++;
-    }
-
-    return count;
 }
 
 /*
@@ -316,7 +281,7 @@ string_list_t *get_abi_suppressions(const struct rpminspect *ri, const char *sup
  * name and the value is a string_list_t of the debug_info_dir1/2 or
  * header_dir1/2 arguments to abidiff(1) or kmidiff(1).
  */
-string_list_map_t *get_abi_dir_arg(struct rpminspect *ri, const size_t size, const char *suffix, const char *arg, const char *path, const int type)
+string_list_map_t *get_abi_dir_arg(struct rpminspect *ri, const size_t size, const char *suffix, const char *path, const int type)
 {
     rpmpeer_entry_t *peer = NULL;
     const char *name = NULL;
@@ -324,10 +289,10 @@ string_list_map_t *get_abi_dir_arg(struct rpminspect *ri, const size_t size, con
     char *root = NULL;
     string_list_map_t *table = NULL;
     Header h;
+    struct stat sb;
 
     assert(ri != NULL);
     assert(size > 0);
-    assert(arg != NULL);
     assert(path != NULL);
 
     /* collect each path argument by arch */
@@ -340,7 +305,6 @@ string_list_map_t *get_abi_dir_arg(struct rpminspect *ri, const size_t size, con
             root = peer->before_root;
             h = peer->before_hdr;
             name = headerGetString(h, RPMTAG_NAME);
-
         } else if (type == AFTER_BUILD && peer->after_files && !TAILQ_EMPTY(peer->after_files)) {
             root = peer->after_root;
             h = peer->after_hdr;
@@ -350,12 +314,21 @@ string_list_map_t *get_abi_dir_arg(struct rpminspect *ri, const size_t size, con
         }
 
         if (suffix && strsuffix(name, suffix)) {
-            xasprintf(&tmp, "%s%s", root, path);
+            tmp = joinpath(root, path, NULL);
+            assert(tmp != NULL);
         } else {
-            xasprintf(&tmp, "%s%s", root, path);
+            continue;
         }
 
-        add_abi_argument(table, arg, tmp, h);
+        if (stat(tmp, &sb) == -1) {
+            free(tmp);
+            continue;
+        }
+
+        if (S_ISDIR(sb.st_mode)) {
+            add_abi_argument(&table, tmp, h);
+        }
+
         free(tmp);
     }
 
