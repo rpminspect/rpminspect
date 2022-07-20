@@ -606,9 +606,6 @@ struct rpminspect {
     /* path where debuginfo files are found in packages */
     char *abidiff_debuginfo_path;
 
-    /* path where header filesa re found in packages */
-    char *abidiff_include_path;
-
     /* extra arguments for abidiff(1) */
     char *abidiff_extra_args;
 

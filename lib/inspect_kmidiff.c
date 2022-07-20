@@ -332,8 +332,8 @@ bool inspect_kmidiff(struct rpminspect *ri)
 
     /* get the debug info dirs (headers not used for kmidiff) */
     num_arches = list_len(ri->arches);
-    debug_info_dir1_table = get_abi_dir_arg(ri, num_arches, DEBUGINFO_SUFFIX, ABI_DEBUG_INFO_DIR1, DEBUG_PATH, BEFORE_BUILD);
-    debug_info_dir2_table = get_abi_dir_arg(ri, num_arches, DEBUGINFO_SUFFIX, ABI_DEBUG_INFO_DIR2, DEBUG_PATH, AFTER_BUILD);
+    debug_info_dir1_table = get_abi_dir_arg(ri, num_arches, DEBUGINFO_SUFFIX, DEBUG_PATH, BEFORE_BUILD);
+    debug_info_dir2_table = get_abi_dir_arg(ri, num_arches, DEBUGINFO_SUFFIX, DEBUG_PATH, AFTER_BUILD);
 
     /* build the list of first command line arguments */
     if (ri->kmidiff_extra_args) {

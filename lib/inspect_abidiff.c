@@ -26,6 +26,7 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <unistd.h>
+#include <ftw.h>
 #include <err.h>
 #include <limits.h>
 #include <rpm/header.h>
@@ -39,9 +40,8 @@ static char *cmdprefix = NULL;
 static string_list_t *suppressions = NULL;
 static string_list_map_t *debug_info_dir1_table;
 static string_list_map_t *debug_info_dir2_table;
-static string_list_map_t *headers_dir1_table;
-static string_list_map_t *headers_dir2_table;
 static abi_t *abi = NULL;
+static rpmfile_entry_t *argfile = NULL;
 
 static severity_t check_abi(const severity_t sev, const long int threshold, const char *path, const char *pkg, long int *compat)
 {
@@ -95,6 +95,53 @@ static severity_t check_abi(const severity_t sev, const long int threshold, cons
     return sev;
 }
 
+static int have_debuginfo(const char *fpath, __attribute__((unused)) const struct stat *sb, int tflag, __attribute__((unused)) struct FTW *ftwbuf)
+{
+    assert(fpath != NULL);
+    assert(argfile != NULL);
+
+    if (tflag != FTW_F) {
+        return 0;
+    }
+
+    if (strstr(fpath, argfile->localpath)) {
+        return 1;
+    }
+
+    return 0;
+}
+
+/*
+ * Try to find the debug subdirectory containing the debuginfo for the
+ * file in question.
+ */
+static char *add_abidiff_arg(char *cmd, string_list_map_t *table, const char *arch, const char *arg, rpmfile_entry_t *file)
+{
+    int flags = FTW_DEPTH | FTW_MOUNT | FTW_PHYS;
+    string_list_map_t *hentry = NULL;
+    string_entry_t *entry = NULL;
+
+    if (table == NULL || arch == NULL || file == NULL) {
+        return cmd;
+    }
+
+    HASH_FIND_STR(table, arch, hentry);
+
+    if (hentry != NULL && hentry->value && !TAILQ_EMPTY(hentry->value)) {
+        argfile = file;
+
+        TAILQ_FOREACH(entry, hentry->value, items) {
+            if (nftw(entry->data, have_debuginfo, FOPEN_MAX, flags) == 1) {
+                /* probably found where the debuginfo lives */
+                cmd = strappend(cmd, " ", arg, " ", entry->data, NULL);
+                break;
+            }
+        }
+    }
+
+    return cmd;
+}
+
 static bool abidiff_driver(struct rpminspect *ri, rpmfile_entry_t *file)
 {
     bool result = true;
@@ -103,7 +150,6 @@ static bool abidiff_driver(struct rpminspect *ri, rpmfile_entry_t *file)
     string_entry_t *entry = NULL;
     const char *arch = NULL;
     const char *name = NULL;
-    string_list_map_t *hentry = NULL;
     int exitcode = 0;
     char *cmd = NULL;
     char *output = NULL;
@@ -149,38 +195,8 @@ static bool abidiff_driver(struct rpminspect *ri, rpmfile_entry_t *file)
     }
 
     /* debug dir args */
-    HASH_FIND_STR(debug_info_dir1_table, arch, hentry);
-
-    if (hentry != NULL && hentry->value && !TAILQ_EMPTY(hentry->value)) {
-        TAILQ_FOREACH(entry, hentry->value, items) {
-            cmd = strappend(cmd, " ", entry->data, NULL);
-        }
-    }
-
-    HASH_FIND_STR(debug_info_dir2_table, arch, hentry);
-
-    if (hentry != NULL && hentry->value && !TAILQ_EMPTY(hentry->value)) {
-        TAILQ_FOREACH(entry, hentry->value, items) {
-            cmd = strappend(cmd, " ", entry->data, NULL);
-        }
-    }
-
-    /* header dir args */
-    HASH_FIND_STR(headers_dir1_table, arch, hentry);
-
-    if (hentry != NULL && hentry->value && !TAILQ_EMPTY(hentry->value)) {
-        TAILQ_FOREACH(entry, hentry->value, items) {
-            cmd = strappend(cmd, " ", entry->data, NULL);
-        }
-    }
-
-    HASH_FIND_STR(headers_dir2_table, arch, hentry);
-
-    if (hentry != NULL && hentry->value && !TAILQ_EMPTY(hentry->value)) {
-        TAILQ_FOREACH(entry, hentry->value, items) {
-            cmd = strappend(cmd, " ", entry->data, NULL);
-        }
-    }
+    cmd = add_abidiff_arg(cmd, debug_info_dir1_table, arch, ABI_DEBUG_INFO_DIR1, file->peer_file);
+    cmd = add_abidiff_arg(cmd, debug_info_dir2_table, arch, ABI_DEBUG_INFO_DIR2, file);
 
     /* the before and after builds */
     cmd = strappend(cmd, " ", file->peer_file->fullpath, " ", file->fullpath, NULL);
@@ -282,12 +298,8 @@ bool inspect_abidiff(struct rpminspect *ri)
     num_arches = list_len(ri->arches);
 
     /* get the debug info dirs */
-    debug_info_dir1_table = get_abi_dir_arg(ri, num_arches, DEBUGINFO_SUFFIX, ABI_DEBUG_INFO_DIR1, DEBUG_PATH, BEFORE_BUILD);
-    debug_info_dir2_table = get_abi_dir_arg(ri, num_arches, DEBUGINFO_SUFFIX, ABI_DEBUG_INFO_DIR2, DEBUG_PATH, AFTER_BUILD);
-
-    /* get the header dirs */
-    headers_dir1_table = get_abi_dir_arg(ri, num_arches, NULL, ABI_HEADERS_DIR1, INCLUDE_PATH, BEFORE_BUILD);
-    headers_dir2_table = get_abi_dir_arg(ri, num_arches, NULL, ABI_HEADERS_DIR2, INCLUDE_PATH, AFTER_BUILD);
+    debug_info_dir1_table = get_abi_dir_arg(ri, num_arches, DEBUGINFO_SUFFIX, DEBUG_PATH, BEFORE_BUILD);
+    debug_info_dir2_table = get_abi_dir_arg(ri, num_arches, DEBUGINFO_SUFFIX, DEBUG_PATH, AFTER_BUILD);
 
     /* build the list of first part of the command */
     if (ri->abidiff_extra_args) {
@@ -305,8 +317,6 @@ bool inspect_abidiff(struct rpminspect *ri)
     list_free(suppressions, free);
     free_argv_table(ri, debug_info_dir1_table);
     free_argv_table(ri, debug_info_dir2_table);
-    free_argv_table(ri, headers_dir1_table);
-    free_argv_table(ri, headers_dir2_table);
 
     /* report the inspection results */
     if (result) {

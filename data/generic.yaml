@@ -674,9 +674,6 @@ abidiff:
     # Location where debuginfo files live in RPM packages.
     debuginfo_path: /usr/lib/debug/
 
-    # Location of header files in RPM packages.
-    include_path: /usr/include/
-
     # Extra arguments for the abidiff(1) program.  These are put on
     # the command line before the two files being compared.
     #extra_args:

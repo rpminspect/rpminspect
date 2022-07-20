@@ -265,7 +265,6 @@ void free_rpminspect(struct rpminspect *ri)
     list_free(ri->forbidden_paths, free);
     free(ri->abidiff_suppression_file);
     free(ri->abidiff_debuginfo_path);
-    free(ri->abidiff_include_path);
     free(ri->abidiff_extra_args);
     free(ri->kmidiff_suppression_file);
     free(ri->kmidiff_debuginfo_path);
