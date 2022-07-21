@@ -41,7 +41,6 @@ static string_list_t *suppressions = NULL;
 static string_list_map_t *debug_info_dir1_table;
 static string_list_map_t *debug_info_dir2_table;
 static abi_t *abi = NULL;
-static rpmfile_entry_t *argfile = NULL;
 
 static severity_t check_abi(const severity_t sev, const long int threshold, const char *path, const char *pkg, long int *compat)
 {
@@ -95,29 +94,12 @@ static severity_t check_abi(const severity_t sev, const long int threshold, cons
     return sev;
 }
 
-static int have_debuginfo(const char *fpath, __attribute__((unused)) const struct stat *sb, int tflag, __attribute__((unused)) struct FTW *ftwbuf)
-{
-    assert(fpath != NULL);
-    assert(argfile != NULL);
-
-    if (tflag != FTW_F) {
-        return 0;
-    }
-
-    if (strstr(fpath, argfile->localpath)) {
-        return 1;
-    }
-
-    return 0;
-}
-
 /*
  * Try to find the debug subdirectory containing the debuginfo for the
  * file in question.
  */
 static char *add_abidiff_arg(char *cmd, string_list_map_t *table, const char *arch, const char *arg, rpmfile_entry_t *file)
 {
-    int flags = FTW_DEPTH | FTW_MOUNT | FTW_PHYS;
     string_list_map_t *hentry = NULL;
     string_entry_t *entry = NULL;
 
@@ -128,14 +110,8 @@ static char *add_abidiff_arg(char *cmd, string_list_map_t *table, const char *ar
     HASH_FIND_STR(table, arch, hentry);
 
     if (hentry != NULL && hentry->value && !TAILQ_EMPTY(hentry->value)) {
-        argfile = file;
-
         TAILQ_FOREACH(entry, hentry->value, items) {
-            if (nftw(entry->data, have_debuginfo, FOPEN_MAX, flags) == 1) {
-                /* probably found where the debuginfo lives */
-                cmd = strappend(cmd, " ", arg, " ", entry->data, NULL);
-                break;
-            }
+            cmd = strappend(cmd, " ", arg, " ", entry->data, NULL);
         }
     }
 
