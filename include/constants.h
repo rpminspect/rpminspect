@@ -305,7 +305,7 @@
  * this is a path to the corresponding directory in a debuginfo
  * package.
  */
-#define ABI_DEBUG_INFO_DIR1 "--debug-info-dir1"
+#define ABI_DEBUG_INFO_DIR1 "--d1"
 
 /**
  * @def ABI_DEBUG_INFO_DIR2
@@ -315,7 +315,7 @@
  * this is a path to the corresponding directory in a debuginfo
  * package.
  */
-#define ABI_DEBUG_INFO_DIR2 "--debug-info-dir2"
+#define ABI_DEBUG_INFO_DIR2 "--d2"
 
 /**
  * @def KMIDIFF_CMD
