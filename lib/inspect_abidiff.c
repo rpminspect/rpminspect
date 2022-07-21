@@ -26,7 +26,6 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <unistd.h>
-#include <ftw.h>
 #include <err.h>
 #include <limits.h>
 #include <rpm/header.h>
@@ -40,6 +39,8 @@ static char *cmdprefix = NULL;
 static string_list_t *suppressions = NULL;
 static string_list_map_t *debug_info_dir1_table;
 static string_list_map_t *debug_info_dir2_table;
+static string_list_map_t *headers_dir1_table;
+static string_list_map_t *headers_dir2_table;
 static abi_t *abi = NULL;
 
 static severity_t check_abi(const severity_t sev, const long int threshold, const char *path, const char *pkg, long int *compat)
@@ -98,12 +99,12 @@ static severity_t check_abi(const severity_t sev, const long int threshold, cons
  * Try to find the debug subdirectory containing the debuginfo for the
  * file in question.
  */
-static char *add_abidiff_arg(char *cmd, string_list_map_t *table, const char *arch, const char *arg, rpmfile_entry_t *file)
+static char *add_abidiff_arg(char *cmd, string_list_map_t *table, const char *arch, const char *arg)
 {
     string_list_map_t *hentry = NULL;
     string_entry_t *entry = NULL;
 
-    if (table == NULL || arch == NULL || file == NULL) {
+    if (table == NULL || arch == NULL) {
         return cmd;
     }
 
@@ -171,8 +172,12 @@ static bool abidiff_driver(struct rpminspect *ri, rpmfile_entry_t *file)
     }
 
     /* debug dir args */
-    cmd = add_abidiff_arg(cmd, debug_info_dir1_table, arch, ABI_DEBUG_INFO_DIR1, file->peer_file);
-    cmd = add_abidiff_arg(cmd, debug_info_dir2_table, arch, ABI_DEBUG_INFO_DIR2, file);
+    cmd = add_abidiff_arg(cmd, debug_info_dir1_table, arch, ABI_DEBUG_INFO_DIR1);
+    cmd = add_abidiff_arg(cmd, debug_info_dir2_table, arch, ABI_DEBUG_INFO_DIR2);
+
+    /* header dir args */
+    cmd = add_abidiff_arg(cmd, headers_dir1_table, arch, ABI_HEADERS_DIR1);
+    cmd = add_abidiff_arg(cmd, headers_dir2_table, arch, ABI_HEADERS_DIR2);
 
     /* the before and after builds */
     cmd = strappend(cmd, " ", file->peer_file->fullpath, " ", file->fullpath, NULL);
@@ -277,6 +282,10 @@ bool inspect_abidiff(struct rpminspect *ri)
     debug_info_dir1_table = get_abidiff_dir_arg(ri, num_arches, DEBUGINFO_SUFFIX, DEBUG_PATH, BEFORE_BUILD);
     debug_info_dir2_table = get_abidiff_dir_arg(ri, num_arches, DEBUGINFO_SUFFIX, DEBUG_PATH, AFTER_BUILD);
 
+    /* get the include dirs */
+    headers_dir1_table = get_abidiff_dir_arg(ri, num_arches, NULL, INCLUDE_SUBDIR, BEFORE_BUILD);
+    headers_dir2_table = get_abidiff_dir_arg(ri, num_arches, NULL, INCLUDE_SUBDIR, AFTER_BUILD);
+
     /* build the list of first part of the command */
     if (ri->abidiff_extra_args) {
         xasprintf(&cmdprefix, "%s %s", ri->commands.abidiff, ri->abidiff_extra_args);
@@ -293,6 +302,8 @@ bool inspect_abidiff(struct rpminspect *ri)
     list_free(suppressions, free);
     free_argv_table(ri, debug_info_dir1_table);
     free_argv_table(ri, debug_info_dir2_table);
+    free_argv_table(ri, headers_dir1_table);
+    free_argv_table(ri, headers_dir2_table);
 
     /* report the inspection results */
     if (result) {

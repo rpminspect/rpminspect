@@ -318,6 +318,22 @@
 #define ABI_DEBUG_INFO_DIR2 "--d2"
 
 /**
+ * @def ABI_HEADERS_DIR1
+ *
+ * The command line option for abidiff(1) to specify the location of
+ * public headers for the files in the before build.
+ */
+#define ABI_HEADERS_DIR1 "--hd1"
+
+/**
+ * @def ABI_HEADERS_DIR2
+ *
+ * The command line option for abidiff(1) to specify the location of
+ * public headers for the files in the after build.
+ */
+#define ABI_HEADERS_DIR2 "--hd2"
+
+/**
  * @def KMIDIFF_CMD
  *
  * Executable providing kmidiff(1), the Kernel Module Interface
@@ -455,11 +471,13 @@
 #define ABI_SUPPRESSION_FILE ".abignore"
 
 /**
- * @def INCLUDE_PATH
+ * @def INCLUDE_SUBDIR
  *
- * Default header file path.
+ * Default header file subdirectory name.  Anywhere we find an include
+ * subdirectory, rpminspect will consider that a location for public
+ * header files.
  */
-#define INCLUDE_PATH "/usr/include/"
+#define INCLUDE_SUBDIR "/include"
 
 /**
  * @def KERNEL_FILENAMES
