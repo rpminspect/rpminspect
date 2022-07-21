@@ -268,14 +268,14 @@ bool inspect_abidiff(struct rpminspect *ri)
     abi = read_abi(ri->vendor_data_dir, ri->product_release);
 
     /* if there's a .abignore file in the after SRPM, we need to use it */
-    suppressions = get_abi_suppressions(ri, ri->abidiff_suppression_file);
+    suppressions = get_abidiff_suppressions(ri, ri->abidiff_suppression_file);
 
     /* number of architectures in the builds we have, for hash table size */
     num_arches = list_len(ri->arches);
 
     /* get the debug info dirs */
-    debug_info_dir1_table = get_abi_dir_arg(ri, num_arches, DEBUGINFO_SUFFIX, DEBUG_PATH, BEFORE_BUILD);
-    debug_info_dir2_table = get_abi_dir_arg(ri, num_arches, DEBUGINFO_SUFFIX, DEBUG_PATH, AFTER_BUILD);
+    debug_info_dir1_table = get_abidiff_dir_arg(ri, num_arches, DEBUGINFO_SUFFIX, DEBUG_PATH, BEFORE_BUILD);
+    debug_info_dir2_table = get_abidiff_dir_arg(ri, num_arches, DEBUGINFO_SUFFIX, DEBUG_PATH, AFTER_BUILD);
 
     /* build the list of first part of the command */
     if (ri->abidiff_extra_args) {
