@@ -239,7 +239,7 @@ void free_abi(abi_t *table)
  * Get any .abignore files that exist in SRPM files in the build.
  * These are passed to every invocation of abidiff(1) if they exist.
  */
-string_list_t *get_abi_suppressions(const struct rpminspect *ri, const char *suppression_file)
+string_list_t *get_abidiff_suppressions(const struct rpminspect *ri, const char *suppression_file)
 {
     rpmpeer_entry_t *peer = NULL;
     rpmfile_entry_t *file = NULL;
@@ -281,7 +281,7 @@ string_list_t *get_abi_suppressions(const struct rpminspect *ri, const char *sup
  * name and the value is a string_list_t of the debug_info_dir1/2 or
  * header_dir1/2 arguments to abidiff(1) or kmidiff(1).
  */
-string_list_map_t *get_abi_dir_arg(struct rpminspect *ri, const size_t size, const char *suffix, const char *path, const int type)
+string_list_map_t *get_abidiff_dir_arg(struct rpminspect *ri, const size_t size, const char *suffix, const char *path, const int type)
 {
     rpmpeer_entry_t *peer = NULL;
     const char *name = NULL;
@@ -313,7 +313,7 @@ string_list_map_t *get_abi_dir_arg(struct rpminspect *ri, const size_t size, con
             continue;
         }
 
-        if (suffix && strsuffix(name, suffix)) {
+        if ((suffix && strsuffix(name, suffix)) || (suffix == NULL)) {
             tmp = joinpath(root, path, NULL);
             assert(tmp != NULL);
         } else {

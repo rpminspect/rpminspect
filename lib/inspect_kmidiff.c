@@ -328,12 +328,12 @@ bool inspect_kmidiff(struct rpminspect *ri)
     get_kabi_dir(ri);
 
     /* if there's a .abignore file in the after SRPM, we need to use it */
-    suppressions = get_abi_suppressions(ri, ri->kmidiff_suppression_file);
+    suppressions = get_abidiff_suppressions(ri, ri->kmidiff_suppression_file);
 
     /* get the debug info dirs (headers not used for kmidiff) */
     num_arches = list_len(ri->arches);
-    debug_info_dir1_table = get_abi_dir_arg(ri, num_arches, DEBUGINFO_SUFFIX, DEBUG_PATH, BEFORE_BUILD);
-    debug_info_dir2_table = get_abi_dir_arg(ri, num_arches, DEBUGINFO_SUFFIX, DEBUG_PATH, AFTER_BUILD);
+    debug_info_dir1_table = get_abidiff_dir_arg(ri, num_arches, DEBUGINFO_SUFFIX, DEBUG_PATH, BEFORE_BUILD);
+    debug_info_dir2_table = get_abidiff_dir_arg(ri, num_arches, DEBUGINFO_SUFFIX, DEBUG_PATH, AFTER_BUILD);
 
     /* build the list of first command line arguments */
     if (ri->kmidiff_extra_args) {
