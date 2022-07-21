@@ -22,8 +22,14 @@
 #include <unistd.h>
 #include <assert.h>
 #include <err.h>
+#include <ftw.h>
 #include "uthash.h"
 #include "rpminspect.h"
+
+/* Global variables */
+static const char *subdir = NULL;
+static string_list_map_t **dest_table = NULL;
+static Header rpmhdr;
 
 /*
  * Helper to add entries to abi argument tables.
@@ -276,10 +282,25 @@ string_list_t *get_abidiff_suppressions(const struct rpminspect *ri, const char 
     return list;
 }
 
+/* nftw() callback for get_abidiff_dir_arg() below */
+static int have_subdir(const char *fpath, __attribute__((unused)) const struct stat *sb, int tflag, __attribute__((unused)) struct FTW *ftwbuf)
+{
+    assert(fpath != NULL);
+    assert(subdir != NULL);
+    assert(rpmhdr != NULL);
+
+    if ((tflag == FTW_D) && strsuffix(fpath, subdir)) {
+        /* this path is a directory with the subdir in it */
+        add_abi_argument(dest_table, fpath, rpmhdr);
+    }
+
+    return 0;
+}
+
 /*
  * Gather paths.  This goes in a hash table where the key is the arch
  * name and the value is a string_list_t of the debug_info_dir1/2 or
- * header_dir1/2 arguments to abidiff(1) or kmidiff(1).
+ * headers_dir1/2 arguments to abidiff(1) or kmidiff(1).
  */
 string_list_map_t *get_abidiff_dir_arg(struct rpminspect *ri, const size_t size, const char *suffix, const char *path, const int type)
 {
@@ -289,6 +310,7 @@ string_list_map_t *get_abidiff_dir_arg(struct rpminspect *ri, const size_t size,
     char *root = NULL;
     string_list_map_t *table = NULL;
     Header h;
+    int flags = FTW_MOUNT | FTW_PHYS;
     struct stat sb;
 
     assert(ri != NULL);
@@ -320,13 +342,21 @@ string_list_map_t *get_abidiff_dir_arg(struct rpminspect *ri, const size_t size,
             continue;
         }
 
-        if (stat(tmp, &sb) == -1) {
-            free(tmp);
-            continue;
-        }
-
-        if (S_ISDIR(sb.st_mode)) {
+        if ((stat(tmp, &sb) == 0) && S_ISDIR(sb.st_mode)) {
+            /* the simple case is that this path just exists */
             add_abi_argument(&table, tmp, h);
+        } else {
+            /*
+             * the more complicated case involves looking for this
+             * path string in all subdirectories in the tree
+             */
+            subdir = path;
+            dest_table = &table;
+            rpmhdr = h;
+
+            if (nftw(root, have_subdir, FOPEN_MAX, flags) != 0) {
+                warn("nftw");
+            }
         }
 
         free(tmp);
