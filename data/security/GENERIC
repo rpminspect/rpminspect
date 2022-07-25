@@ -11,7 +11,7 @@
 # number):
 #
 #     path           The file or path, can use glob(7) syntax
-#     name           The name of the package
+#     name           The name of the package, can use glob(7) syntax
 #     version        The package version, can use glob(7) syntax
 #     release        The package release, can use glob(7) syntax
 #     rules          Comma-delimited list of security rules where each
