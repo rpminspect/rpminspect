@@ -441,6 +441,7 @@ abi_t *read_abi(const char *vendor_data_dir, const char *product_release);
 void free_abi(abi_t *list);
 string_list_t *get_abidiff_suppressions(const struct rpminspect *ri, const char *suppression_file);
 string_list_map_t *get_abidiff_dir_arg(struct rpminspect *ri, const size_t size, const char *suffix, const char *path, const int type);
+char *add_abidiff_arg(char *cmd, string_list_map_t *table, const char *arch, const char *arg);
 
 /* uncompress.c */
 char *uncompress_file(struct rpminspect *ri, const char *infile, const char *subdir);
