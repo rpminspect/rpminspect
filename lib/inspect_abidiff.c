@@ -95,30 +95,6 @@ static severity_t check_abi(const severity_t sev, const long int threshold, cons
     return sev;
 }
 
-/*
- * Try to find the debug subdirectory containing the debuginfo for the
- * file in question.
- */
-static char *add_abidiff_arg(char *cmd, string_list_map_t *table, const char *arch, const char *arg)
-{
-    string_list_map_t *hentry = NULL;
-    string_entry_t *entry = NULL;
-
-    if (table == NULL || arch == NULL) {
-        return cmd;
-    }
-
-    HASH_FIND_STR(table, arch, hentry);
-
-    if (hentry != NULL && hentry->value && !TAILQ_EMPTY(hentry->value)) {
-        TAILQ_FOREACH(entry, hentry->value, items) {
-            cmd = strappend(cmd, " ", arg, " ", entry->data, NULL);
-        }
-    }
-
-    return cmd;
-}
-
 static bool abidiff_driver(struct rpminspect *ri, rpmfile_entry_t *file)
 {
     bool result = true;
