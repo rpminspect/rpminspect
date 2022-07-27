@@ -147,7 +147,6 @@ static bool kmidiff_driver(struct rpminspect *ri, rpmfile_entry_t *file)
     string_entry_t *entry = NULL;
     const char *arch = NULL;
     const char *name = NULL;
-    string_list_map_t *hentry = NULL;
     char *kabi = NULL;
     int exitcode = 0;
     int i = 0;
@@ -225,21 +224,8 @@ static bool kmidiff_driver(struct rpminspect *ri, rpmfile_entry_t *file)
     }
 
     /* debug dir args */
-    HASH_FIND_STR(debug_info_dir1_table, arch, hentry);
-
-    if (hentry != NULL && hentry->value && !TAILQ_EMPTY(hentry->value)) {
-        TAILQ_FOREACH(entry, hentry->value, items) {
-            cmd = strappend(cmd, " ", entry->data, NULL);
-        }
-    }
-
-    HASH_FIND_STR(debug_info_dir2_table, arch, hentry);
-
-    if (hentry != NULL && hentry->value && !TAILQ_EMPTY(hentry->value)) {
-        TAILQ_FOREACH(entry, hentry->value, items) {
-            cmd = strappend(cmd, " ", entry->data, NULL);
-        }
-    }
+    cmd = add_abidiff_arg(cmd, debug_info_dir1_table, arch, ABI_DEBUG_INFO_DIR1);
+    cmd = add_abidiff_arg(cmd, debug_info_dir2_table, arch, ABI_DEBUG_INFO_DIR2);
 
     /* the before and after kernel images and root directories */
     cmd = strappend(cmd, " ", KMIDIFF_VMLINUX1, " ", file->peer_file->fullpath, " ", KMIDIFF_VMLINUX2, " ", file->fullpath, " ", before_root, " ", after_root, NULL);
@@ -285,7 +271,6 @@ static bool kmidiff_driver(struct rpminspect *ri, rpmfile_entry_t *file)
             params.noun = _("KMI incompatible change in ${FILE} on ${ARCH}");
         } else {
             xasprintf(&params.msg, _("kmidiff(1) comparison of %s to %s in package %s on %s ended unexpectedly."), file->peer_file->localpath, file->localpath, name, arch);
-            params.msg = strdup(_("KMI comparison ended unexpectedly."));
             params.verb = VERB_FAILED;
             params.noun = _("kmidiff unexpected exit");
         }
