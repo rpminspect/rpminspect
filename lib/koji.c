@@ -219,7 +219,6 @@ void free_koji_buildlist(koji_buildlist_t *builds)
         free(entry->nvr);
         free(entry->start_time);
         free(entry->creation_time);
-        free(entry->epoch);
         free(entry->completion_time);
         free(entry->tag_name);
         free(entry->version);
@@ -419,6 +418,7 @@ void free_koji_build(struct koji_build *build)
     free(build->start_time);
 
     free(build->volume_name);
+    free(build->cg_name);
 
     free(build->original_url);
 
@@ -495,14 +495,18 @@ struct koji_build *get_koji_build(struct rpminspect *ri, const char *buildspec)
     struct koji_build *build = NULL;
     int i = 0;
     int j = 0;
+    int k = 0;
     int size = 0;
-    int s_sz = 0;
+    int subsize = 0;
+    int modsize = 0;
     xmlrpc_env env;
+    xmlrpc_value *key = NULL;
+    xmlrpc_value *value = NULL;
+    xmlrpc_value *subv = NULL;
+    xmlrpc_value *modv = NULL;
     xmlrpc_value *result = NULL;
     xmlrpc_value *element = NULL;
-    xmlrpc_value *k = NULL;
-    xmlrpc_value *value = NULL;
-    char *key = NULL;
+    char *keyname = NULL;
     koji_buildlist_entry_t *buildentry = NULL;
     koji_rpmlist_entry_t *rpm = NULL;
 
@@ -524,9 +528,6 @@ struct koji_build *get_koji_build(struct rpminspect *ri, const char *buildspec)
     xmlrpc_env_init(&env);
     xmlrpc_client_init2(&env, XMLRPC_CLIENT_NO_FLAGS, SOFTWARE_NAME, PACKAGE_VERSION, NULL, 0);
     xmlrpc_abort_on_fault(&env);
-
-    /* increase the message response size */
-    xmlrpc_limit_set(XMLRPC_XML_SIZE_LIMIT_ID, INT_MAX);
 
     /* call 'getBuild' on the koji hub */
     result = xmlrpc_client_call(&env, ri->kojihub, "getBuild", "(s)", buildspec);
@@ -553,15 +554,16 @@ struct koji_build *get_koji_build(struct rpminspect *ri, const char *buildspec)
     /* read the values from the result */
     size = xmlrpc_struct_size(&env, result);
     xmlrpc_abort_on_fault(&env);
+    i = 0;
 
-    for (i = 0; i < size; i++) {
-        xmlrpc_struct_read_member(&env, result, i, &k, &value);
+    while (i < size) {
+        xmlrpc_struct_read_member(&env, result, i, &key, &value);
         xmlrpc_abort_on_fault(&env);
 
         /* Get the key as a string */
-        xmlrpc_decompose_value(&env, k, "s", &key);
+        xmlrpc_decompose_value(&env, key, "s", &keyname);
         xmlrpc_abort_on_fault(&env);
-        xmlrpc_DECREF(k);
+        xmlrpc_DECREF(key);
 
         /*
          * If the value of a key is nil, just skip over it.  We can't
@@ -569,9 +571,11 @@ struct koji_build *get_koji_build(struct rpminspect *ri, const char *buildspec)
          * be present in the output.
          */
         if (xmlrpc_value_type(value) == XMLRPC_TYPE_NIL) {
+            xmlrpc_decompose_value(&env, value, "n");
             xmlrpc_DECREF(value);
-            free(key);
-            key = NULL;
+            free(keyname);
+            keyname = NULL;
+            i++;
             continue;
         }
 
@@ -580,46 +584,34 @@ struct koji_build *get_koji_build(struct rpminspect *ri, const char *buildspec)
          * This is tedious, but I would rather do it now rather
          * than unpacking XMLRPC results in later functions.
          */
-        if (!strcmp(key, "package_name")) {
+        if (!strcmp(keyname, "package_name")) {
             xmlrpc_decompose_value(&env, value, "s", &build->package_name);
-            xmlrpc_abort_on_fault(&env);
-        } else if (!strcmp(key, "epoch")) {
+        } else if (!strcmp(keyname, "epoch")) {
             xmlrpc_decompose_value(&env, value, "i", &build->epoch);
-            xmlrpc_abort_on_fault(&env);
-        } else if (!strcmp(key, "name")) {
+        } else if (!strcmp(keyname, "name")) {
             xmlrpc_decompose_value(&env, value, "s", &build->name);
-            xmlrpc_abort_on_fault(&env);
-        } else if (!strcmp(key, "version")) {
+        } else if (!strcmp(keyname, "version")) {
             xmlrpc_decompose_value(&env, value, "s", &build->version);
-            xmlrpc_abort_on_fault(&env);
-        } else if (!strcmp(key, "release")) {
+        } else if (!strcmp(keyname, "release")) {
             xmlrpc_decompose_value(&env, value, "s", &build->release);
-            xmlrpc_abort_on_fault(&env);
-        } else if (!strcmp(key, "nvr")) {
+        } else if (!strcmp(keyname, "nvr")) {
             xmlrpc_decompose_value(&env, value, "s", &build->nvr);
-            xmlrpc_abort_on_fault(&env);
-        } else if (!strcmp(key, "source")) {
+        } else if (!strcmp(keyname, "source")) {
             xmlrpc_decompose_value(&env, value, "s", &build->source);
-            xmlrpc_abort_on_fault(&env);
-        } else if (!strcmp(key, "creation_time")) {
+        } else if (!strcmp(keyname, "creation_time")) {
             xmlrpc_decompose_value(&env, value, "s", &build->creation_time);
-            xmlrpc_abort_on_fault(&env);
-        } else if (!strcmp(key, "completion_time")) {
+        } else if (!strcmp(keyname, "completion_time")) {
             xmlrpc_decompose_value(&env, value, "s", &build->completion_time);
-            xmlrpc_abort_on_fault(&env);
-        } else if (!strcmp(key, "package_id")) {
+        } else if (!strcmp(keyname, "package_id")) {
             xmlrpc_decompose_value(&env, value, "i", &build->package_id);
-            xmlrpc_abort_on_fault(&env);
-        } else if (!strcmp(key, "id")) {
+        } else if (!strcmp(keyname, "id")) {
             xmlrpc_decompose_value(&env, value, "i", &build->id);
-            xmlrpc_abort_on_fault(&env);
-        } else if (!strcmp(key, "build_id")) {
+        } else if (!strcmp(keyname, "build_id")) {
             /* we hit this on regular packages, modules handled below */
             buildentry = calloc(1, sizeof(*buildentry));
             assert(buildentry != NULL);
 
             xmlrpc_decompose_value(&env, value, "i", &buildentry->build_id);
-            xmlrpc_abort_on_fault(&env);
 
             if (build->package_name != NULL) {
                 buildentry->package_name = strdup(build->package_name);
@@ -630,40 +622,33 @@ struct koji_build *get_koji_build(struct rpminspect *ri, const char *buildspec)
             TAILQ_INIT(buildentry->rpms);
 
             TAILQ_INSERT_TAIL(build->builds, buildentry, builditems);
-        } else if (!strcmp(key, "state")) {
+        } else if (!strcmp(keyname, "state")) {
             xmlrpc_decompose_value(&env, value, "i", &build->state);
-            xmlrpc_abort_on_fault(&env);
-        } else if (!strcmp(key, "completion_ts")) {
+        } else if (!strcmp(keyname, "completion_ts")) {
             xmlrpc_decompose_value(&env, value, "d", &build->completion_ts);
-            xmlrpc_abort_on_fault(&env);
-        } else if (!strcmp(key, "owner_id")) {
+        } else if (!strcmp(keyname, "owner_id")) {
             xmlrpc_decompose_value(&env, value, "i", &build->owner_id);
-            xmlrpc_abort_on_fault(&env);
-        } else if (!strcmp(key, "owner_name")) {
+        } else if (!strcmp(keyname, "owner_name")) {
             xmlrpc_decompose_value(&env, value, "s", &build->owner_name);
-            xmlrpc_abort_on_fault(&env);
-        } else if (!strcmp(key, "start_time")) {
+        } else if (!strcmp(keyname, "start_time")) {
             xmlrpc_decompose_value(&env, value, "s", &build->start_time);
-            xmlrpc_abort_on_fault(&env);
-        } else if (!strcmp(key, "creation_event_id")) {
+        } else if (!strcmp(keyname, "creation_event_id")) {
             xmlrpc_decompose_value(&env, value, "i", &build->creation_event_id);
-            xmlrpc_abort_on_fault(&env);
-        } else if (!strcmp(key, "start_ts")) {
+        } else if (!strcmp(keyname, "start_ts")) {
             xmlrpc_decompose_value(&env, value, "d", &build->start_ts);
-            xmlrpc_abort_on_fault(&env);
-        } else if (!strcmp(key, "volume_id")) {
+        } else if (!strcmp(keyname, "volume_id")) {
             xmlrpc_decompose_value(&env, value, "i", &build->volume_id);
-            xmlrpc_abort_on_fault(&env);
-        } else if (!strcmp(key, "creation_ts")) {
+        } else if (!strcmp(keyname, "creation_ts")) {
             xmlrpc_decompose_value(&env, value, "d", &build->creation_ts);
-            xmlrpc_abort_on_fault(&env);
-        } else if (!strcmp(key, "task_id")) {
+        } else if (!strcmp(keyname, "task_id")) {
             xmlrpc_decompose_value(&env, value, "i", &build->task_id);
-            xmlrpc_abort_on_fault(&env);
-        } else if (!strcmp(key, "volume_name")) {
+        } else if (!strcmp(keyname, "volume_name")) {
             xmlrpc_decompose_value(&env, value, "s", &build->volume_name);
-            xmlrpc_abort_on_fault(&env);
-        } else if (!strcmp(key, "extra")) {
+        } else if (!strcmp(keyname, "cg_name")) {
+            xmlrpc_decompose_value(&env, value, "s", &build->cg_name);
+        } else if (!strcmp(keyname, "cg_id")) {
+            xmlrpc_decompose_value(&env, value, "i", &build->cg_id);
+        } else if (!strcmp(keyname, "extra")) {
             /*
              * EXTRA METADATA HANDLING
              * This is where module metadata hides, but there can also
@@ -671,80 +656,105 @@ struct koji_build *get_koji_build(struct rpminspect *ri, const char *buildspec)
              * and collect the information.
              */
 
-            int subsize, j;
-            xmlrpc_value *subk = NULL;
-            xmlrpc_value *subv = NULL;
-            char *subkey = NULL;
-
             /* read the values from the result */
             subsize = xmlrpc_struct_size(&env, value);
             xmlrpc_abort_on_fault(&env);
             j = 0;
 
             while (j < subsize) {
-                xmlrpc_struct_read_member(&env, value, j, &subk, &subv);
+                xmlrpc_struct_read_member(&env, value, j, &key, &subv);
                 xmlrpc_abort_on_fault(&env);
 
                 /* Get the key as a string */
-                xmlrpc_decompose_value(&env, subk, "s", &subkey);
+                xmlrpc_decompose_value(&env, key, "s", &keyname);
                 xmlrpc_abort_on_fault(&env);
-                xmlrpc_DECREF(subk);
+                xmlrpc_DECREF(key);
 
                 /* Skip nil values */
                 if (xmlrpc_value_type(subv) == XMLRPC_TYPE_NIL) {
+                    xmlrpc_decompose_value(&env, subv, "n");
                     xmlrpc_DECREF(subv);
-                    free(subkey);
-                    subkey = NULL;
+                    free(keyname);
+                    keyname = NULL;
+                    j++;
                     continue;
                 }
 
-                if (!strcmp(subkey, "source") || !strcmp(subkey, "typeinfo") || !strcmp(subkey, "module")) {
-                    subsize = xmlrpc_struct_size(&env, subv);
-                    xmlrpc_abort_on_fault(&env);
-                    xmlrpc_DECREF(value);
-                    free(subkey);
-                    subkey = NULL;
-                    value = subv;
-                    j = 0;
-                    continue;
-                } else if (!strcmp(subkey, "original_url")) {
-                    xmlrpc_decompose_value(&env, subv, "s", &build->original_url);
-                    xmlrpc_abort_on_fault(&env);
-                } else if (!strcmp(subkey, "modulemd_str")) {
-                    xmlrpc_decompose_value(&env, subv, "s", &build->modulemd_str);
-                    xmlrpc_abort_on_fault(&env);
-                    ri->buildtype = KOJI_BUILD_MODULE;
-                } else if(!strcmp(subkey, "name")) {
-                    xmlrpc_decompose_value(&env, subv, "s", &build->module_name);
-                    xmlrpc_abort_on_fault(&env);
-                } else if(!strcmp(subkey, "stream")) {
-                    xmlrpc_decompose_value(&env, subv, "s", &build->module_stream);
-                    xmlrpc_abort_on_fault(&env);
-                } else if(!strcmp(subkey, "module_build_service_id")) {
-                    xmlrpc_decompose_value(&env, subv, "i", &build->module_build_service_id);
-                    xmlrpc_abort_on_fault(&env);
-                } else if(!strcmp(subkey, "version")) {
-                    xmlrpc_decompose_value(&env, subv, "s", &build->module_version);
-                    xmlrpc_abort_on_fault(&env);
-                } else if(!strcmp(subkey, "context")) {
-                    xmlrpc_decompose_value(&env, subv, "s", &build->module_context);
-                    xmlrpc_abort_on_fault(&env);
-                } else if(!strcmp(subkey, "content_koji_tag")) {
-                    xmlrpc_decompose_value(&env, subv, "s", &build->module_content_koji_tag);
-                    xmlrpc_abort_on_fault(&env);
-                }
+                if (!strcmp(keyname, "source") || !strcmp(keyname, "typeinfo") || !strcmp(keyname, "module")) {
+                    free(keyname);
+                    keyname = NULL;
 
-                j++;
+                    modsize = xmlrpc_struct_size(&env, subv);
+                    xmlrpc_abort_on_fault(&env);
+
+                    /* drill down to the real struct */
+                    if (modsize == 1) {
+                        subsize = modsize;
+                        value = subv;
+                        j = 0;
+                        continue;
+                    }
+
+                    k = 0;
+
+                    while (k < modsize) {
+                        xmlrpc_struct_read_member(&env, subv, k, &key, &modv);
+                        xmlrpc_abort_on_fault(&env);
+
+                        /* Get the key as a string */
+                        xmlrpc_decompose_value(&env, key, "s", &keyname);
+                        xmlrpc_abort_on_fault(&env);
+                        xmlrpc_DECREF(key);
+
+                        /* Skip nil values */
+                        if (xmlrpc_value_type(modv) == XMLRPC_TYPE_NIL) {
+                            xmlrpc_DECREF(modv);
+                            free(keyname);
+                            keyname = NULL;
+                            k++;
+                            continue;
+                        }
+
+                        /* Grab the values we need */
+                        if (!strcmp(keyname, "original_url")) {
+                            xmlrpc_decompose_value(&env, modv, "s", &build->original_url);
+                        } else if (!strcmp(keyname, "name")) {
+                            xmlrpc_decompose_value(&env, modv, "s", &build->module_name);
+                        } else if (!strcmp(keyname, "stream")) {
+                            xmlrpc_decompose_value(&env, modv, "s", &build->module_stream);
+                        } else if (!strcmp(keyname, "module_build_service_id")) {
+                            xmlrpc_decompose_value(&env, modv, "i", &build->module_build_service_id);
+                        } else if (!strcmp(keyname, "version")) {
+                            xmlrpc_decompose_value(&env, modv, "s", &build->module_version);
+                        } else if (!strcmp(keyname, "context")) {
+                            xmlrpc_decompose_value(&env, modv, "s", &build->module_context);
+                        } else if (!strcmp(keyname, "content_koji_tag")) {
+                            xmlrpc_decompose_value(&env, modv, "s", &build->module_content_koji_tag);
+                        } else if (!strcmp(keyname, "modulemd_str")) {
+                            ri->buildtype = KOJI_BUILD_MODULE;
+                            xmlrpc_decompose_value(&env, modv, "s", &build->modulemd_str);
+                        }
+
+                        xmlrpc_abort_on_fault(&env);
+                        xmlrpc_DECREF(modv);
+                        free(keyname);
+                        keyname = NULL;
+                        k++;
+                    }
+                }
 
                 xmlrpc_DECREF(subv);
-                free(subkey);
-                subkey = NULL;
+                free(keyname);
+                keyname = NULL;
+                j++;
             }
         }
 
+        xmlrpc_abort_on_fault(&env);
         xmlrpc_DECREF(value);
-        free(key);
-        key = NULL;
+        free(keyname);
+        keyname = NULL;
+        i++;
     }
 
     xmlrpc_DECREF(result);
@@ -757,101 +767,91 @@ struct koji_build *get_koji_build(struct rpminspect *ri, const char *buildspec)
         /* read the values from the result */
         size = xmlrpc_array_size(&env, result);
         xmlrpc_abort_on_fault(&env);
+        i = 0;
 
-        for (i = 0; i < size; i++) {
+        while (i < size) {
             xmlrpc_array_read_item(&env, result, i, &element);
             xmlrpc_abort_on_fault(&env);
 
             /* each array element is a struct */
-            s_sz = xmlrpc_struct_size(&env, element);
+            subsize = xmlrpc_struct_size(&env, element);
             xmlrpc_abort_on_fault(&env);
 
             buildentry = calloc(1, sizeof(*buildentry));
             assert(buildentry != NULL);
 
-            for (j = 0; j < s_sz; j++) {
-                xmlrpc_struct_read_member(&env, element, j, &k, &value);
+            j = 0;
+
+            while (j < subsize) {
+                xmlrpc_struct_read_member(&env, element, j, &key, &value);
                 xmlrpc_abort_on_fault(&env);
 
                 /* Get the key as a string */
-                xmlrpc_decompose_value(&env, k, "s", &key);
+                xmlrpc_decompose_value(&env, key, "s", &keyname);
                 xmlrpc_abort_on_fault(&env);
-                xmlrpc_DECREF(k);
+                xmlrpc_DECREF(key);
 
                 /* Skip nil values */
                 if (xmlrpc_value_type(value) == XMLRPC_TYPE_NIL) {
                     xmlrpc_DECREF(value);
+                    free(keyname);
+                    keyname = NULL;
+                    j++;
                     continue;
                 }
 
                 /* Grab the values we need */
-                if (!strcmp(key, "build_id")) {
+                if (!strcmp(keyname, "build_id")) {
                     xmlrpc_decompose_value(&env, value, "i", &buildentry->build_id);
-                    xmlrpc_abort_on_fault(&env);
-                } else if (!strcmp(key, "package_name")) {
-                    xmlrpc_decompose_value(&env, value, "s", &buildentry->package_name);
-                    xmlrpc_abort_on_fault(&env);
-                } else if (!strcmp(key, "owner_name")) {
-                    xmlrpc_decompose_value(&env, value, "s", &buildentry->owner_name);
-                    xmlrpc_abort_on_fault(&env);
-                } else if (!strcmp(key, "task_id")) {
-                    xmlrpc_decompose_value(&env, value, "i", &buildentry->task_id);
-                    xmlrpc_abort_on_fault(&env);
-                } else if (!strcmp(key, "state")) {
-                    xmlrpc_decompose_value(&env, value, "i", &buildentry->state);
-                    xmlrpc_abort_on_fault(&env);
-                } else if (!strcmp(key, "nvr")) {
-                    xmlrpc_decompose_value(&env, value, "s", &buildentry->nvr);
-                    xmlrpc_abort_on_fault(&env);
-                } else if (!strcmp(key, "start_time")) {
-                    xmlrpc_decompose_value(&env, value, "s", &buildentry->start_time);
-                    xmlrpc_abort_on_fault(&env);
-                } else if (!strcmp(key, "creation_event_id")) {
-                    xmlrpc_decompose_value(&env, value, "i", &buildentry->creation_event_id);
-                    xmlrpc_abort_on_fault(&env);
-                } else if (!strcmp(key, "creation_time")) {
-                    xmlrpc_decompose_value(&env, value, "s", &buildentry->creation_time);
-                    xmlrpc_abort_on_fault(&env);
-                } else if (!strcmp(key, "epoch")) {
-                    xmlrpc_decompose_value(&env, value, "s", &buildentry->epoch);
-                    xmlrpc_abort_on_fault(&env);
-                } else if (!strcmp(key, "tag_id")) {
-                    xmlrpc_decompose_value(&env, value, "i", &buildentry->tag_id);
-                    xmlrpc_abort_on_fault(&env);
-                } else if (!strcmp(key, "completion_time")) {
+                } else if (!strcmp(keyname, "completion_time")) {
                     xmlrpc_decompose_value(&env, value, "s", &buildentry->completion_time);
-                    xmlrpc_abort_on_fault(&env);
-                } else if (!strcmp(key, "tag_name")) {
-                    xmlrpc_decompose_value(&env, value, "s", &buildentry->tag_name);
-                    xmlrpc_abort_on_fault(&env);
-                } else if (!strcmp(key, "version")) {
-                    xmlrpc_decompose_value(&env, value, "s", &buildentry->version);
-                    xmlrpc_abort_on_fault(&env);
-                } else if (!strcmp(key, "volume_id")) {
-                    xmlrpc_decompose_value(&env, value, "i", &buildentry->volume_id);
-                    xmlrpc_abort_on_fault(&env);
-                } else if (!strcmp(key, "release")) {
-                    xmlrpc_decompose_value(&env, value, "s", &buildentry->release);
-                    xmlrpc_abort_on_fault(&env);
-                } else if (!strcmp(key, "package_id")) {
-                    xmlrpc_decompose_value(&env, value, "i", &buildentry->package_id);
-                    xmlrpc_abort_on_fault(&env);
-                } else if (!strcmp(key, "owner_id")) {
-                    xmlrpc_decompose_value(&env, value, "i", &buildentry->owner_id);
-                    xmlrpc_abort_on_fault(&env);
-                } else if (!strcmp(key, "id")) {
+                } else if (!strcmp(keyname, "create_event")) {
+                    xmlrpc_decompose_value(&env, value, "i", &buildentry->create_event);
+                } else if (!strcmp(keyname, "creation_event_id")) {
+                    xmlrpc_decompose_value(&env, value, "i", &buildentry->creation_event_id);
+                } else if (!strcmp(keyname, "creation_time")) {
+                    xmlrpc_decompose_value(&env, value, "s", &buildentry->creation_time);
+                } else if (!strcmp(keyname, "epoch")) {
+                    xmlrpc_decompose_value(&env, value, "i", &buildentry->epoch);
+                } else if (!strcmp(keyname, "id")) {
                     xmlrpc_decompose_value(&env, value, "i", &buildentry->id);
-                    xmlrpc_abort_on_fault(&env);
-                } else if (!strcmp(key, "volume_name")) {
-                    xmlrpc_decompose_value(&env, value, "s", &buildentry->volume_name);
-                    xmlrpc_abort_on_fault(&env);
-                } else if (!strcmp(key, "name")) {
+                } else if (!strcmp(keyname, "name")) {
                     xmlrpc_decompose_value(&env, value, "s", &buildentry->name);
-                    xmlrpc_abort_on_fault(&env);
+                } else if (!strcmp(keyname, "nvr")) {
+                    xmlrpc_decompose_value(&env, value, "s", &buildentry->nvr);
+                } else if (!strcmp(keyname, "owner_id")) {
+                    xmlrpc_decompose_value(&env, value, "i", &buildentry->owner_id);
+                } else if (!strcmp(keyname, "owner_name")) {
+                    xmlrpc_decompose_value(&env, value, "s", &buildentry->owner_name);
+                } else if (!strcmp(keyname, "package_id")) {
+                    xmlrpc_decompose_value(&env, value, "i", &buildentry->package_id);
+                } else if (!strcmp(keyname, "package_name")) {
+                    xmlrpc_decompose_value(&env, value, "s", &buildentry->package_name);
+                } else if (!strcmp(keyname, "release")) {
+                    xmlrpc_decompose_value(&env, value, "s", &buildentry->release);
+                } else if (!strcmp(keyname, "start_time")) {
+                    xmlrpc_decompose_value(&env, value, "s", &buildentry->start_time);
+                } else if (!strcmp(keyname, "state")) {
+                    xmlrpc_decompose_value(&env, value, "i", &buildentry->state);
+                } else if (!strcmp(keyname, "tag_id")) {
+                    xmlrpc_decompose_value(&env, value, "i", &buildentry->tag_id);
+                } else if (!strcmp(keyname, "tag_name")) {
+                    xmlrpc_decompose_value(&env, value, "s", &buildentry->tag_name);
+                } else if (!strcmp(keyname, "task_id")) {
+                    xmlrpc_decompose_value(&env, value, "i", &buildentry->task_id);
+                } else if (!strcmp(keyname, "version")) {
+                    xmlrpc_decompose_value(&env, value, "s", &buildentry->version);
+                } else if (!strcmp(keyname, "volume_id")) {
+                    xmlrpc_decompose_value(&env, value, "i", &buildentry->volume_id);
+                } else if (!strcmp(keyname, "volume_name")) {
+                    xmlrpc_decompose_value(&env, value, "s", &buildentry->volume_name);
                 }
 
+                xmlrpc_abort_on_fault(&env);
                 xmlrpc_DECREF(value);
-                free(key);
+                free(keyname);
+                keyname = NULL;
+                j++;
             }
 
             xmlrpc_DECREF(element);
@@ -861,6 +861,8 @@ struct koji_build *get_koji_build(struct rpminspect *ri, const char *buildspec)
             TAILQ_INIT(buildentry->rpms);
 
             TAILQ_INSERT_TAIL(build->builds, buildentry, builditems);
+
+            i++;
         }
 
         xmlrpc_DECREF(result);
@@ -880,46 +882,42 @@ struct koji_build *get_koji_build(struct rpminspect *ri, const char *buildspec)
             xmlrpc_abort_on_fault(&env);
 
             /* each array element is a struct */
-            s_sz = xmlrpc_struct_size(&env, element);
+            subsize = xmlrpc_struct_size(&env, element);
             xmlrpc_abort_on_fault(&env);
 
             /* create a new rpm list entry */
             rpm = calloc(1, sizeof(*rpm));
             assert(rpm != NULL);
 
-            for (j = 0; j < s_sz; j++) {
-                xmlrpc_struct_read_member(&env, element, j, &k, &value);
+            for (j = 0; j < subsize; j++) {
+                xmlrpc_struct_read_member(&env, element, j, &key, &value);
                 xmlrpc_abort_on_fault(&env);
 
                 /* Get the key as a string */
-                xmlrpc_decompose_value(&env, k, "s", &key);
+                xmlrpc_decompose_value(&env, key, "s", &keyname);
                 xmlrpc_abort_on_fault(&env);
 
                 /* Skip nil values */
                 if (xmlrpc_value_type(value) == XMLRPC_TYPE_NIL) {
                     xmlrpc_DECREF(value);
-                    xmlrpc_DECREF(k);
-                    free(key);
-                    key = NULL;
+                    xmlrpc_DECREF(key);
+                    free(keyname);
+                    keyname = NULL;
                     continue;
                 }
 
                 /* Grab the values we need */
-                if (!strcmp(key, "arch")) {
+                if (!strcmp(keyname, "arch")) {
                     xmlrpc_decompose_value(&env, value, "s", &rpm->arch);
-                    xmlrpc_abort_on_fault(&env);
-                } else if (!strcmp(key, "name")) {
+                } else if (!strcmp(keyname, "name")) {
                     xmlrpc_decompose_value(&env, value, "s", &rpm->name);
-                    xmlrpc_abort_on_fault(&env);
-                } else if (!strcmp(key, "version")) {
+                } else if (!strcmp(keyname, "version")) {
                     xmlrpc_decompose_value(&env, value, "s", &rpm->version);
-                    xmlrpc_abort_on_fault(&env);
-                } else if (!strcmp(key, "release")) {
+                } else if (!strcmp(keyname, "release")) {
                     xmlrpc_decompose_value(&env, value, "s", &rpm->release);
-                    xmlrpc_abort_on_fault(&env);
-                } else if (!strcmp(key, "epoch")) {
+                } else if (!strcmp(keyname, "epoch")) {
                     xmlrpc_decompose_value(&env, value, "i", &rpm->epoch);
-                } else if (!strcmp(key, "size")) {
+                } else if (!strcmp(keyname, "size")) {
                     if (xmlrpc_value_type(value) == XMLRPC_TYPE_INT) {
                         xmlrpc_decompose_value(&env, value, "i", &rpm->size);
                     } else if (xmlrpc_value_type(value) == XMLRPC_TYPE_I8) {
@@ -932,10 +930,11 @@ struct koji_build *get_koji_build(struct rpminspect *ri, const char *buildspec)
                     }
                 }
 
+                xmlrpc_abort_on_fault(&env);
                 xmlrpc_DECREF(value);
-                xmlrpc_DECREF(k);
-                free(key);
-                key = NULL;
+                xmlrpc_DECREF(key);
+                free(keyname);
+                keyname = NULL;
             }
 
             /* add this rpm to the list */
@@ -996,9 +995,6 @@ struct koji_task *get_koji_task(struct rpminspect *ri, const char *taskspec)
     xmlrpc_env_init(&env);
     xmlrpc_client_init2(&env, XMLRPC_CLIENT_NO_FLAGS, SOFTWARE_NAME, PACKAGE_VERSION, NULL, 0);
     xmlrpc_abort_on_fault(&env);
-
-    /* increase the message response size */
-    xmlrpc_limit_set(XMLRPC_XML_SIZE_LIMIT_ID, INT_MAX);
 
     /* call 'getTaskInfo' on the koji hub */
     result = xmlrpc_client_call(&env, ri->kojihub, "getTaskInfo", "(s)", taskspec);
@@ -1149,9 +1145,6 @@ string_list_t *get_all_arches(const struct rpminspect *ri)
     xmlrpc_env_init(&env);
     xmlrpc_client_init2(&env, XMLRPC_CLIENT_NO_FLAGS, SOFTWARE_NAME, PACKAGE_VERSION, NULL, 0);
     xmlrpc_abort_on_fault(&env);
-
-    /* increase the message response size */
-    xmlrpc_limit_set(XMLRPC_XML_SIZE_LIMIT_ID, INT_MAX);
 
     /*
      * call 'getAllArches' on the koji hub
