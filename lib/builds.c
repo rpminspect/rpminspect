@@ -243,6 +243,7 @@ static int download_build(struct rpminspect *ri, const struct koji_build *build)
     koji_buildlist_entry_t *buildentry = NULL;
     koji_rpmlist_entry_t *rpm = NULL;
     const char *downloading = NULL;
+    bool displayed = false;
     char *verbose_msg = NULL;
     size_t mlen = 0;
     char *mend = NULL;
@@ -299,13 +300,14 @@ static int download_build(struct rpminspect *ri, const struct koji_build *build)
         }
 
         /* Download status output */
-        if (ri->verbose) {
+        if (ri->verbose && ((ri->buildtype == KOJI_BUILD_MODULE && !displayed) || ri->buildtype != KOJI_BUILD_MODULE)) {
             /* the progress bar will need the terminal width */
             total_width = tty_width();
 
             /* generate our downloading message */
             if (ri->buildtype == KOJI_BUILD_MODULE) {
                 downloading = _("Downloading module");
+                displayed = true;
             } else {
                 downloading = _("Downloading RPM build");
             }
