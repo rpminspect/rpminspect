@@ -773,9 +773,10 @@ typedef struct _koji_buildlist_entry_t {
     int state;
     char *nvr;
     char *start_time;
+    int create_event;
     int creation_event_id;
     char *creation_time;
-    char *epoch;
+    int epoch;
     int tag_id;
     char *completion_time;
     char *tag_name;
