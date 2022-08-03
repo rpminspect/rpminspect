@@ -341,8 +341,7 @@ int main(int argc, char **argv)
     char *archopt = NULL;
     char *walk = NULL;
     char *token = NULL;
-    char *workdir = NULL;
-    char cwd[PATH_MAX];
+    char *cwd = NULL;
     char *r = NULL;
     char *output = NULL;
     char *release = NULL;
@@ -397,6 +396,10 @@ int main(int argc, char **argv)
     setlocale(LC_ALL, "");
     bindtextdomain("rpminspect", "/usr/share/locale/");
     textdomain("rpminspect");
+
+    /* initialize local buffers */
+    cwd = calloc(1, PATH_MAX);
+    assert(cwd != NULL);
 
     /* parse command line options */
     while (1) {
@@ -467,9 +470,8 @@ int main(int argc, char **argv)
                 }
 
                 if (stat(expand.we_wordv[0], &sb) == 0) {
-                    workdir = realpath(expand.we_wordv[0], NULL);
-                } else {
-                    workdir = strdup(expand.we_wordv[0]);
+                    tmp = realpath(expand.we_wordv[0], cwd);
+                    assert(tmp != NULL);
                 }
 
                 wordfree(&expand);
@@ -639,18 +641,18 @@ int main(int argc, char **argv)
     }
 
     /* Handle user-specified working directory */
-    if (workdir != NULL) {
+    if (cwd != NULL) {
         /* the user specified a working directory */
         free(ri->workdir);
-        ri->workdir = workdir;
-    } else if (workdir == NULL && fetch_only) {
+        ri->workdir = cwd;
+    } else if (cwd == NULL && fetch_only) {
         /* no workdir specified, but fetch only requested, default to cwd */
-        memset(cwd, '\0', sizeof(cwd));
         r = getcwd(cwd, PATH_MAX);
         assert(r != NULL);
 
         free(ri->workdir);
         ri->workdir = strdup(r);
+        free(cwd);
     }
 
     /* Display the configuration settings for this run */
