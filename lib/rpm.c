@@ -151,12 +151,21 @@ char *get_nevr(Header hdr)
 }
 
 /*
- * Get the RPMTAG_NEVRA extension tag.
+ * Get the RPMTAG_NEVRA extension tag equivalent.  Do not use
+ * RPMTAG_NEVRA directly here because on source RPMs, the "A" part of
+ * NEVRA will have been written at rpmbuild time and does not report
+ * "source" as the architecture but rather the architecture that you
+ * ran rpmbuild on.
  * NOTE: Caller must free this result.
  */
 char *get_nevra(Header hdr)
 {
-    return get_rpmtag_str(hdr, RPMTAG_NEVRA);
+    char *r = NULL;
+
+    r = get_nevr(hdr);
+    assert(r != NULL);
+    r = strappend(r, ".", get_rpm_header_arch(hdr), NULL);
+    return r;
 }
 
 /*
