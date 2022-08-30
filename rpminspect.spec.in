@@ -51,7 +51,14 @@ Summary:        Library providing RPM test API and functionality
 Group:          Development/Tools
 Requires:       desktop-file-utils
 Requires:       gettext
+
+# The clamav data is required for the virus inspection.  Either
+# install the clamav-data or download the data files directly.
+%if 0%{?rhel} >= 8 || 0%{?epel} >= 8 || 0%{?fedora}
+Recommends:     clamav-data
+%else
 Requires:       clamav-data
+%endif
 
 # If these are present, the xml inspection can try DTD validation.
 %if 0%{?rhel} >= 8 || 0%{?fedora}
