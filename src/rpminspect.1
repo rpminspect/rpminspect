@@ -1,4 +1,4 @@
-.\" Copyright © 2018 Red Hat, Inc.
+.\" Copyright 2018 Red Hat, Inc.
 .\" Author(s): David Cantrell <dcantrell@redhat.com>
 .\"
 .\" This program is free software: you can redistribute it and/or modify
@@ -47,18 +47,21 @@ rpminspect originated at Red Hat as an auditing tool used to ensure
 builds complied with certain release rules and policies.  Over time it
 grew to incorporate other checks, such as making sure debugging
 symbols are accurate and various security policies were followed.
-Users are encouraged to contribute tests for new functionality as well
-as bug fixes.
+Users are encouraged to contribute tests for new functionality, report
+bugs, and submit updates to the rules in the corresponding vendor data
+package(s).
 .PP
 The software is made available as this command line program and an
 accompanying library.  This is intentional.  Our findings over time
 have shown that simple tools with a flexible design are more easy to
 integrate in to continuous integration systems.  The library allows
-development of other frontends should anyone ever be interested in
-doing that.  The thought is that most developers will interact with
-rpminspect through the command line.  Everything about an rpminspect
-run is configurable at runtime through command line options as well as
-a configuration file.  The command line options override the
+development of other frontends or integration in to existing
+frontends.  The thought is that most developers will interact with
+rpminspect through the command line and most integrations of
+rpminspect will report results through some sort of existing frontend
+(e.g., GitHub Actions).  Everything about an rpminspect run is
+configurable at runtime through command line options as well as a
+configuration file.  The command line options override the
 configuration file which overrides the compiled in defaults.
 .SH OPTIONS
 .PP
@@ -120,9 +123,9 @@ architectures in the Koji hub and any invalid ones will report an
 error.
 .RS
 .PP
-For the purposes of RPM packaging, both 'noarch' and 'src' are
-considered architectures.  Please keep that in mind when using this
-option.
+For the purposes of RPM packaging and rpminspect, both 'noarch'
+and 'src' are considered architectures.  Please keep that in mind when
+using this option.
 .RE
 .TP
 .B \-r STR, \-\-release=STR
@@ -164,11 +167,11 @@ Write the inspection results in the TYPE format.  The default format
 is text.  Available formats can be seen with the \-l option
 .TP
 .B \-t TAG, \-\-threshold=TAG
-Result threshold that triggers a non-zero exit code.  By default this is
-VERIFY, which maps to a result code seen in the output.  You can set this
-to any of the valid result codes.  Available result codes are OK, INFO,
-WAIVED, VERIFY, or BAD.  The argument expects the result threshold specified
-as a string.  Case does not matter.
+Result threshold that triggers a non-zero exit code.  By default this
+is VERIFY, which maps to a result code seen in the output.  You can
+set this to any of the valid result codes.  Available result codes are
+OK, INFO, VERIFY, or BAD.  The argument expects the result threshold
+specified as a string.  Case does not matter.
 .TP
 .B \-s TAG, \-\-suppress=TAG
 Results suppression threshold.  By default all results are reported,
@@ -241,13 +244,15 @@ inspections will be run.  You can restrict the program to a subset of
 inspections by listing their short names and separating them with
 commas (no spaces).  Or you can list inspections to skip by listing
 the short name prefixed with a `!' in the same comma-delimited list.
+.SH RPMINSPECT BUILD INPUTS
 .PP
-Builds may be local RPM packages, regular Koji builds specified using
-Koji syntax (the NVR or name, version, and release of a package with
-hyphens separating each part), Koji module builds, locally cached Koji
-builds (regular or module), Koji scratch builds (task ID number), or
-locally cached Koji scratch builds.  Any valid Koji build identifier
-works when specifying Koji builds, such as the build ID number or the
+rpminspect uses the term 'build' to refer to inputs.  Builds may be
+local RPM packages, regular Koji builds specified using Koji syntax
+(the NVR or name, version, and release of a package with hyphens
+separating each part), Koji module builds, locally cached Koji builds
+(regular or module), Koji scratch builds (task ID number), or locally
+cached Koji scratch builds.  Any valid Koji build identifier works
+when specifying Koji builds, such as the build ID number or the
 package NVR.  The only exception to this rule is scratch builds.  You
 must use the Koji task ID number for scratch builds.  For more
 information on Koji build specification, please see the Koji
@@ -259,9 +264,11 @@ useful for multiple runs of rpminspect against a specific previous
 build where you are trying to fix something in a new build compared
 against the old one.
 .PP
-Local RPM packages may be specified directly too if you just want to
-use rpminspect on a single RPM.  You may specify a single RPM package
-or two if you want rpminspect to perform the comparison inspections.
+Local and remote RPM packages may be specified directly too if you
+just want to use rpminspect on a single RPM.  You may specify a single
+RPM package or two if you want rpminspect to perform the comparison
+inspections.  A URL to an RPM specified as an input causes rpminspect
+to try and download that package.
 .PP
 Examples:
 .IP
@@ -274,10 +281,41 @@ rpminspect \-T !manpage x3270-3.6ga5-6.fc31 x3270-3.6ga6-1.fc31
 rpminspect \-T ALL \-a ppc64le zsh-5.7.1-3.fc31 zsh-5.7.1-4.fc31
 .IP
 rpminspect \-E disttag \-a ppc64le zsh-5.7.1-3.fc31 zsh-5.7.1-4.fc31
+.IP
+rpminspect \-T ALL https://dl.fedoraproject.org/pub/fedora/linux/releases/36/Everything/x86_64/os/Packages/l/less-590-3.fc36.x86_64.rpm
+.IP
+rpminspect \-T ALL /home/developer/rpmbuild/RPMS/less-590-3.fc36.x86_64.rpm /home/developer/rpmbuild/RPMS/less-590-4.fc36.x86_64.rpm
+.IP
+rpminspect /home/developer/rpmbuild/SRPMS/less-590-4.fc36.src.rpm
 .PP
 The end result of running rpminspect is a report on standard output explaining
 what was found.  Descriptions of actions developers can take are provided in
 the findings.
+.SH CONSTRUCTING LOCAL BUILD INPUTS
+.PP
+The most common use of rpminspect in continuous integration
+environments is to fetch and analyze builds directly from Koji.  That
+is why rpminspect can speak to Koji directly and download files.  If
+you are running rpminspect locally, you can simulate inputs this way
+by constructing a local directory that looks like a Koji build as
+rpminspect would download it.  Start by creating a subdirectory.  It
+can be called anything, but the convention rpminspect follows is to
+name the subdirectory after the Koji build specification in NVR
+syntax.  For example, less-590-3.fc36 would be the subdirectory name.
+The next thing to do is create subdirectories in there for each
+architecture and the source RPM.  Any 'noarch' packages need to go in
+a noarch subdirectory.
+.PP
+As an example, let's consider a source RPM that you rebuild locally.
+Take zlib-1.2.12-5.fc37.src.rpm as the example.  You rebuild this
+locally using either rpmbuild or mock and it generates all of the
+subpackages from the source RPM.  To construct a build input directory
+for rpminspect, you would create a directory named 'zlib-build'.
+Within that directory, create two new subdirectories called 'src'
+and 'x86_64' (assuming you built on x86_64.  Put the source RPM
+in 'zlib-build/src/' and put all of the x86_64 binary RPMs
+in 'zlib-build/x86_64/'.  You may now use 'zlib-build' as an input for
+rpminspect and it will treat it the same way it treats Koji builds.
 .SH EXIT STATUS
 rpminspect exits 0 if all inspections pass, 1 if at least one
 inspection did not pass.  rpminspect exits 3 if the specified profile
