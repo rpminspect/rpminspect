@@ -525,6 +525,7 @@ struct koji_build *get_koji_build(struct rpminspect *ri, const char *buildspec)
     build = calloc(1, sizeof(*build));
     assert(build != NULL);
     init_koji_build(build);
+    xmlrpc_limit_set(XMLRPC_XML_SIZE_LIMIT_ID, SIZE_MAX);
     xmlrpc_env_init(&env);
     xmlrpc_client_init2(&env, XMLRPC_CLIENT_NO_FLAGS, SOFTWARE_NAME, PACKAGE_VERSION, NULL, 0);
     xmlrpc_abort_on_fault(&env);
