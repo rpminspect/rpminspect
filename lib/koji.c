@@ -993,6 +993,7 @@ struct koji_task *get_koji_task(struct rpminspect *ri, const char *taskspec)
     task = calloc(1, sizeof(*task));
     assert(task != NULL);
     init_koji_task(task);
+    xmlrpc_limit_set(XMLRPC_XML_SIZE_LIMIT_ID, SIZE_MAX);
     xmlrpc_env_init(&env);
     xmlrpc_client_init2(&env, XMLRPC_CLIENT_NO_FLAGS, SOFTWARE_NAME, PACKAGE_VERSION, NULL, 0);
     xmlrpc_abort_on_fault(&env);
@@ -1143,6 +1144,7 @@ string_list_t *get_all_arches(const struct rpminspect *ri)
     TAILQ_INSERT_TAIL(arches, arch, items);
 
     /* initialize everything and get XMLRPC ready */
+    xmlrpc_limit_set(XMLRPC_XML_SIZE_LIMIT_ID, SIZE_MAX);
     xmlrpc_env_init(&env);
     xmlrpc_client_init2(&env, XMLRPC_CLIENT_NO_FLAGS, SOFTWARE_NAME, PACKAGE_VERSION, NULL, 0);
     xmlrpc_abort_on_fault(&env);
