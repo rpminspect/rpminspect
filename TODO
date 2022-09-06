@@ -94,14 +94,78 @@ Test categories excluded (see MISSING):
 Integration tests to write for rpminspect
 -----------------------------------------
 
-The test suite needs more integration tests written.  The following
-inspections lack integration tests:
+The test suite needs more integration tests written.  rpminspect is a
+program you run at the command line and it reads RPM files for input.
+The test suite is not simply a unit test suite, but rather a detailed
+integration test suite that creates simulated RPM packages to trigger
+pass and fail cases in each of the different inspections.
+
+There are six input types to rpminspect:
+
+    * Single source RPM
+    * Two source RPMs to compare
+    * Single binary RPM
+    * Two binary RPMs to compare
+    * A single Koji build
+    * Two Koji builds to compare
+
+The test suite carries baseclass.py that defines some base classes
+that you can build on for the different integration tests.  They are:
+
+    * Single source RPM              --> TestSRPM
+    * Two source RPMs to compare     --> TestCompareSRPM
+    * Single binary RPMs             --> TestRPMs
+    * Two binary RPMs to compare     --> TestCompareRPMs
+    * A single Koji build            --> TestKoji
+    * Two Koji builds to compare     --> TestCompareKoji
+
+The TestRPMs and TestCompareRPMs in practice are used to test single
+binary RPMs and not multiple RPMs, but I chose the name a long time
+ago for the class.
+
+These classes set up the test environment with rpminspect from the
+source tree, simulated configuration data, and then test RPM inputs
+built using the 'rpmfluff' module (https://pagure.io/rpmfluff).  In
+the case of base classes that deal with a single SRPM, RPM, or Koji
+build, the class contains "self.rpm" that you can modify.  In the
+compare bare classes, you have "self.before_rpm" and "self.after_rpm".
+
+The base classes will invoke rpminspect and capture the output as
+JSON.  You set "self.inspection", "self.result", and "self.waiverauth"
+to the values you expect in the output from that test input.  The idea
+is that the actual integration tests are mostly fill-in-the-blanks
+type classes.  Some get more complicated due to limitations in
+rpmfluff or something that just needs to be handled in a specific way.
+
+The integration test suite needs to test each inspection with each
+input type above and check the result of each test, both in the
+passing and failing case.  All of the inspections are written as
+lib/inspect_*.c files.  Read through those source files and look for
+the lines with "add_result()" calls.  When add_result() is called,
+that's where a specific test was performed.  Read the code here to
+determine what it's looking for and then construct the test case to
+test for the passing case and then another set of classes for the
+failing case.
+
+For example, if there's an inspection called "uppercase" and its job
+is to check and make sure no files are installed with uppercase
+letters, the integration test suite needs 12 different tests.  The
+first 6 are for the inputs noted above and to test for the passing
+case.  That is a file is installed with lowercase letters.  The next 6
+are for the inputs again, but for the failing case.  That is,
+construct one of the test RPMs to have a file with an uppercase name.
+
+Keep in mind that some test cases only apply to SRPM files and some
+only apply to binary RPMS, so that will impact the number of test
+cases you will need.
+
+The following inspections lack integration tests:
 
     modularity
     javabytecode
-    changedfiles (compare only)
-    removedfiles (compare only)
-    addedfiles (compare only)
+    changedfiles (compare only...these do not apply to single package inputs)
+    removedfiles (compare only...these do not apply to single package inputs)
+    addedfiles (compare only...these do not apply to single package inputs)
     annocheck
     DT_NEEDED
     capabilities
@@ -111,7 +175,9 @@ inspections lack integration tests:
     abidiff
     kmidiff
 
-Need unit tests for run_cmd() verifying NULL as the last parameter.
+There are plenty of functions that can use unit tests too.  Look
+through the source in lib/ for functions that this would apply to and
+feel free to add more unit tests under test/lib/.
 
 
 +=======+
@@ -144,6 +210,9 @@ General functionality
 
 * Drop the need to fork/exec desktop-file-validate if a library
   mechanism can be found instead.
+
+* Translations.  Use po/rpminspect.pot as a template and add more
+  languages.
 
 
 Documentation
