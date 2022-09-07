@@ -535,11 +535,13 @@ struct koji_build *get_koji_build(struct rpminspect *ri, const char *buildspec)
 
     if (env.fault_occurred && env.fault_code >= 1000) {
         /* server side error which means Koji protocol error */
+        xmlrpc_DECREF(result);
         xmlrpc_env_clean(&env);
         xmlrpc_client_cleanup();
         free_koji_build(build);
         return NULL;
     } else {
+        /* we have no idea, so just fail */
         xmlrpc_abort_on_fault(&env);
     }
 
@@ -561,11 +563,6 @@ struct koji_build *get_koji_build(struct rpminspect *ri, const char *buildspec)
         xmlrpc_struct_read_member(&env, result, i, &key, &value);
         xmlrpc_abort_on_fault(&env);
 
-        /* Get the key as a string */
-        xmlrpc_decompose_value(&env, key, "s", &keyname);
-        xmlrpc_abort_on_fault(&env);
-        xmlrpc_DECREF(key);
-
         /*
          * If the value of a key is nil, just skip over it.  We can't
          * do anything with nil values, so it might as well just not
@@ -573,12 +570,16 @@ struct koji_build *get_koji_build(struct rpminspect *ri, const char *buildspec)
          */
         if (xmlrpc_value_type(value) == XMLRPC_TYPE_NIL) {
             xmlrpc_decompose_value(&env, value, "n");
+            xmlrpc_DECREF(key);
             xmlrpc_DECREF(value);
-            free(keyname);
-            keyname = NULL;
             i++;
             continue;
         }
+
+        /* Get the key as a string */
+        xmlrpc_decompose_value(&env, key, "s", &keyname);
+        xmlrpc_abort_on_fault(&env);
+        xmlrpc_DECREF(key);
 
         /*
          * Walk through the keys and fill in the struct.
@@ -657,6 +658,10 @@ struct koji_build *get_koji_build(struct rpminspect *ri, const char *buildspec)
              * and collect the information.
              */
 
+            /* clear keyname */
+            free(keyname);
+            keyname = NULL;
+
             /* read the values from the result */
             subsize = xmlrpc_struct_size(&env, value);
             xmlrpc_abort_on_fault(&env);
@@ -666,21 +671,21 @@ struct koji_build *get_koji_build(struct rpminspect *ri, const char *buildspec)
                 xmlrpc_struct_read_member(&env, value, j, &key, &subv);
                 xmlrpc_abort_on_fault(&env);
 
+                /* Skip nil values */
+                if (xmlrpc_value_type(subv) == XMLRPC_TYPE_NIL) {
+                    xmlrpc_decompose_value(&env, subv, "n");
+                    xmlrpc_DECREF(key);
+                    xmlrpc_DECREF(subv);
+                    j++;
+                    continue;
+                }
+
                 /* Get the key as a string */
                 xmlrpc_decompose_value(&env, key, "s", &keyname);
                 xmlrpc_abort_on_fault(&env);
                 xmlrpc_DECREF(key);
 
-                /* Skip nil values */
-                if (xmlrpc_value_type(subv) == XMLRPC_TYPE_NIL) {
-                    xmlrpc_decompose_value(&env, subv, "n");
-                    xmlrpc_DECREF(subv);
-                    free(keyname);
-                    keyname = NULL;
-                    j++;
-                    continue;
-                }
-
+                /* look for the module information structs */
                 if (!strcmp(keyname, "source") || !strcmp(keyname, "typeinfo") || !strcmp(keyname, "module")) {
                     free(keyname);
                     keyname = NULL;
@@ -691,6 +696,7 @@ struct koji_build *get_koji_build(struct rpminspect *ri, const char *buildspec)
                     /* drill down to the real struct */
                     if (modsize == 1) {
                         subsize = modsize;
+                        xmlrpc_DECREF(value);
                         value = subv;
                         j = 0;
                         continue;
@@ -702,19 +708,18 @@ struct koji_build *get_koji_build(struct rpminspect *ri, const char *buildspec)
                         xmlrpc_struct_read_member(&env, subv, k, &key, &modv);
                         xmlrpc_abort_on_fault(&env);
 
+                        /* Skip nil values */
+                        if (xmlrpc_value_type(modv) == XMLRPC_TYPE_NIL) {
+                            xmlrpc_DECREF(key);
+                            xmlrpc_DECREF(modv);
+                            k++;
+                            continue;
+                        }
+
                         /* Get the key as a string */
                         xmlrpc_decompose_value(&env, key, "s", &keyname);
                         xmlrpc_abort_on_fault(&env);
                         xmlrpc_DECREF(key);
-
-                        /* Skip nil values */
-                        if (xmlrpc_value_type(modv) == XMLRPC_TYPE_NIL) {
-                            xmlrpc_DECREF(modv);
-                            free(keyname);
-                            keyname = NULL;
-                            k++;
-                            continue;
-                        }
 
                         /* Grab the values we need */
                         if (!strcmp(keyname, "original_url")) {
