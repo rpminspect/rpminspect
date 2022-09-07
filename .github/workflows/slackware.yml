@@ -28,7 +28,7 @@ jobs:
         # Set up the matrix of distributions to test
         strategy:
             matrix:
-                container: ["vbatts/slackware:current"]
+                container: ["vbatts/slackware:latest"]
 
         container:
             image: ${{ matrix.container }}
