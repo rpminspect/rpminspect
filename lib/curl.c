@@ -65,8 +65,8 @@ static void setup_progress_bar(const char *src)
         assert(archive != NULL);
 
         /* we need to shorten the package basename if too wide */
-        if ((strlen(archive) + 4) > bar_width) {
-            archive = strshorten(archive, bar_width - 4);
+        if ((strlen(archive) + 5) > bar_width) {
+            archive = strshorten(archive, bar_width - 5);
             assert(archive != NULL);
             xasprintf(&vmsg, "=> %s ", archive);
             assert(vmsg != NULL);
