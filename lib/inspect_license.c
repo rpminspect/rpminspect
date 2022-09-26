@@ -40,33 +40,37 @@
 #include <json.h>
 #include "rpminspect.h"
 
-/* Local globals */
-static struct json_object *licdb = NULL;
-static char *licdata = NULL;
-static int liclen = 0;
-
 /* Local helper functions */
-static struct json_object *read_licensedb(const char *licensedb)
+static struct json_object *read_licensedb(struct rpminspect *ri, const char *db)
 {
-    int fd = 0;
-    struct json_tokener *tok = NULL;
     struct json_object *r = NULL;
+    char *actualdb = NULL;
+    struct json_tokener *tok = NULL;
     enum json_tokener_error jerr;
     int len = 0;
+    char *licdata = NULL;
+    off_t liclen = 0;
 
-    assert(licensedb != NULL);
+    assert(ri != NULL);
+    assert(db != NULL);
 
-    fd = open(licensedb, O_RDONLY);
+    /* build path to license db if necessary */
+    if (db && db[0] == '/') {
+        actualdb = strdup(db);
+    } else {
+        xasprintf(&actualdb, "%s/%s/%s", ri->vendor_data_dir, LICENSES_DIR, db);
+    }
 
-    if (fd == -1) {
-        warn(_("unable to open license db %s"), licensedb);
+    assert(actualdb != NULL);
+
+    if (access(actualdb, F_OK|R_OK)) {
+        warn(_("unable to open license db %s"), actualdb);
+        free(actualdb);
         return NULL;
     }
 
-    liclen = lseek(fd, 0, SEEK_END);
-    licdata = mmap(NULL, liclen, PROT_READ, MAP_PRIVATE, fd, 0);
-    close(fd);
-
+    licdata = read_file_bytes(actualdb, &liclen);
+    free(actualdb);
     tok = json_tokener_new();
     assert(tok != NULL);
 
@@ -79,6 +83,7 @@ static struct json_object *read_licensedb(const char *licensedb)
     }
 
     json_tokener_free(tok);
+    free(licdata);
 
     return r;
 }
@@ -87,16 +92,17 @@ static struct json_object *read_licensedb(const char *licensedb)
  * Called by is_valid_license() to check each short license token.  It
  * will also try to do a whole match on the license tag string.
  */
-static bool check_license_abbrev(const char *lic)
+static bool check_license_abbrev(const struct json_object *db, const char *lic)
 {
     const char *fedora_abbrev = "";
     const char *fedora_name = "";
     const char *spdx_abbrev = "";
     bool approved = false;
 
+    assert(db != NULL);
     assert(lic != NULL);
 
-    json_object_object_foreach(licdb, license_name, val) {
+    json_object_object_foreach(db, license_name, val) {
         /* first reset our variables */
         fedora_abbrev = "";
         fedora_name = "";
@@ -176,7 +182,7 @@ static void token_append(char **dest, const char *token)
 /*
  * Given a license expression without parens, check it.
  */
-static bool is_valid_expression(const char *s, const char *nevra, struct result_params *params, results_t **rq)
+static bool is_valid_expression(const struct json_object *db, const char *s, const char *nevra, struct result_params *params, results_t **rq)
 {
     bool result = true;
     char *tagtokens = NULL;
@@ -184,11 +190,12 @@ static bool is_valid_expression(const char *s, const char *nevra, struct result_
     char *token = NULL;
     char *lic = NULL;
 
+    assert(db != NULL);
     assert(s != NULL);
     assert(params != NULL);
 
     /* see if the entire substring matches */
-    if (check_license_abbrev(s)) {
+    if (check_license_abbrev(db, s)) {
         return true;
     }
 
@@ -205,7 +212,7 @@ static bool is_valid_expression(const char *s, const char *nevra, struct result_
                 continue;
             }
 
-            if (!check_license_abbrev(lic)) {
+            if (!check_license_abbrev(db, lic)) {
                 result = false;
 
                 xasprintf(&params->msg, _("Unapproved license in %s: %s"), nevra, lic);
@@ -226,7 +233,7 @@ static bool is_valid_expression(const char *s, const char *nevra, struct result_
 
     /* check final token */
     if (lic) {
-        if (!check_license_abbrev(lic)) {
+        if (!check_license_abbrev(db, lic)) {
             result = false;
 
             xasprintf(&params->msg, _("Unapproved license in %s: %s"), nevra, lic);
@@ -262,7 +269,7 @@ static bool is_valid_expression(const char *s, const char *nevra, struct result_
  * 4) The function returns true if all license tags are approved in the
  *    database.  Any single tag that is unapproved results in false.
  */
-static bool is_valid_license(struct rpminspect *ri, struct result_params *params, const char *licensedb, const char *nevra, const char *tag)
+static bool is_valid_license(struct rpminspect *ri, struct result_params *params, const char *nevra, const char *tag)
 {
     bool result = true;
     int balance = 0;
@@ -272,10 +279,11 @@ static bool is_valid_license(struct rpminspect *ri, struct result_params *params
     char *token = NULL;
     results_t *rq = NULL;
     results_entry_t *entry = NULL;
+    string_entry_t *sentry = NULL;
+    struct json_object *db = NULL;
 
     assert(ri != NULL);
     assert(params != NULL);
-    assert(licensedb != NULL);
     assert(nevra != NULL);
     assert(tag != NULL);
 
@@ -303,34 +311,35 @@ static bool is_valid_license(struct rpminspect *ri, struct result_params *params
         return false;
     }
 
-    /* read in the approved license database */
-    if (licdb == NULL) {
-        licdb = read_licensedb(licensedb);
+    /* read in each approved license database */
+    TAILQ_FOREACH(sentry, ri->licensedb, items) {
+        db = read_licensedb(ri, sentry->data);
 
-        if (licdb == NULL) {
-            return false;
-        }
-    }
-
-    /* First try to match the entire string */
-    if (check_license_abbrev(tag)) {
-        return true;
-    }
-
-    /* tokenize the license tag and validate each license */
-    tagtokens = tagcopy = strdup(tag);
-
-    while ((token = strsep(&tagtokens, "()")) != NULL) {
-        if (!strcmp(token, "")) {
+        if (db == NULL) {
             continue;
         }
 
-        if (!is_valid_expression(token, nevra, params, &rq)) {
-            result = false;
+        /* First try to match the entire string */
+        if (check_license_abbrev(db, tag)) {
+            return true;
         }
-    }
 
-    free(tagcopy);
+        /* tokenize the license tag and validate each license */
+        tagtokens = tagcopy = strdup(tag);
+
+        while ((token = strsep(&tagtokens, "()")) != NULL) {
+            if (!strcmp(token, "")) {
+                continue;
+            }
+
+            if (!is_valid_expression(db, token, nevra, params, &rq)) {
+                result = false;
+            }
+        }
+
+        free(tagcopy);
+        json_object_put(db);
+    }
 
     /*
      * license tag is approved if number of seen tags equals
@@ -368,7 +377,7 @@ static bool is_valid_license(struct rpminspect *ri, struct result_params *params
 /*
  * Called by inspect_license()
  */
-static int check_peer_license(struct rpminspect *ri, struct result_params *params, const char *actual_licensedb, const Header hdr)
+static int check_peer_license(struct rpminspect *ri, struct result_params *params, const Header hdr)
 {
     int ret = 0;
     bool valid = false;
@@ -377,7 +386,6 @@ static int check_peer_license(struct rpminspect *ri, struct result_params *param
 
     assert(ri != NULL);
     assert(params != NULL);
-    assert(actual_licensedb != NULL);
 
     nevra = get_nevra(hdr);
     assert(nevra != NULL);
@@ -396,7 +404,7 @@ static int check_peer_license(struct rpminspect *ri, struct result_params *param
         ret = 1;
     } else {
         /* is the license tag valid or not */
-        valid = is_valid_license(ri, params, actual_licensedb, nevra, license);
+        valid = is_valid_license(ri, params, nevra, license);
 
         if (valid) {
             xasprintf(&params->msg, _("Valid License Tag in %s: %s"), nevra, license);
@@ -428,30 +436,6 @@ static int check_peer_license(struct rpminspect *ri, struct result_params *param
     return ret;
 }
 
-/*
- * Helper function to clean up the static globals here.
- */
-static void free_licensedb(void)
-{
-    int r;
-
-    /* ignore unused variable warnings if assert is disabled */
-    (void) r;
-
-    if (licdb == NULL) {
-        return;
-    }
-
-    json_object_put(licdb);
-    r = munmap(licdata, liclen);
-    assert(r == 0);
-    licdata = NULL;
-    liclen = 0;
-    licdb = NULL;
-
-    return;
-}
-
 /**
  * @brief Perform the 'license' inspection.
  *
@@ -468,7 +452,6 @@ bool inspect_license(struct rpminspect *ri)
     int seen = 0;
     bool result = false;
     rpmpeer_entry_t *peer = NULL;
-    char *actual_licensedb = NULL;
     struct result_params params;
 
     assert(ri != NULL);
@@ -478,16 +461,8 @@ bool inspect_license(struct rpminspect *ri)
     params.header = NAME_LICENSE;
     params.waiverauth = NOT_WAIVABLE;
 
-    if (ri->licensedb && ri->licensedb[0] == '/') {
-        actual_licensedb = strdup(ri->licensedb);
-    } else {
-        xasprintf(&actual_licensedb, "%s/%s/%s", ri->vendor_data_dir, LICENSES_DIR, ri->licensedb);
-    }
-
-    assert(actual_licensedb != NULL);
-
-    if (ri->licensedb == NULL || access(actual_licensedb, F_OK|R_OK)) {
-        xasprintf(&params.msg, _("Missing license database: %s: %s"), actual_licensedb, strerror(errno));
+    if (ri->licensedb == NULL || TAILQ_EMPTY(ri->licensedb)) {
+        xasprintf(&params.msg, _("Missing license database(s)."));
         params.severity = RESULT_BAD;
         params.remedy = REMEDY_LICENSEDB;
         params.verb = VERB_FAILED;
@@ -496,7 +471,6 @@ bool inspect_license(struct rpminspect *ri)
         params.arch = NULL;
         add_result(ri, &params);
         free(params.msg);
-        free(actual_licensedb);
         return false;
     }
 
@@ -512,13 +486,9 @@ bool inspect_license(struct rpminspect *ri)
             continue;
         }
 
-        good += check_peer_license(ri, &params, actual_licensedb, peer->after_hdr);
+        good += check_peer_license(ri, &params, peer->after_hdr);
         seen++;
     }
-
-    /* Clean up */
-    free_licensedb();
-    free(actual_licensedb);
 
     if (good == seen) {
         params.severity = RESULT_OK;

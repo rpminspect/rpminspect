@@ -467,7 +467,7 @@ struct rpminspect {
 
     /* Vendor data */
     char *vendor_data_dir;     /* main vendor data directory */
-    char *licensedb;           /* name of file under licenses/ to use */
+    string_list_t *licensedb;  /* names of files under licenses/ to use */
     favor_release_t favor_release;
 
     /* Populated at runtime for the product release */

@@ -158,8 +158,12 @@ void dump_cfg(const struct rpminspect *ri)
         printf("    vendor_data_dir: %s\n", ri->vendor_data_dir);
     }
 
-    if (ri->licensedb) {
-        printf("    licensedb: %s\n", ri->licensedb);
+    if (ri->licensedb && !TAILQ_EMPTY(ri->licensedb)) {
+        printf("    licensedb:\n");
+
+        TAILQ_FOREACH(entry, ri->licensedb, items) {
+            printf("        - %s\n", entry->data);
+        }
     }
 
     printf("    favor_release: %s\n", (ri->favor_release == FAVOR_NONE) ? "none" : (ri->favor_release == FAVOR_OLDEST) ? "oldest" : (ri->favor_release == FAVOR_NEWEST) ? "newest" : "?");

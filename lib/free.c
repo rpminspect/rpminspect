@@ -120,7 +120,7 @@ void free_rpminspect(struct rpminspect *ri)
     free(ri->worksubdir);
 
     free(ri->vendor_data_dir);
-    free(ri->licensedb);
+    list_free(ri->licensedb, free);
 
     if (ri->fileinfo) {
         while (!TAILQ_EMPTY(ri->fileinfo)) {
