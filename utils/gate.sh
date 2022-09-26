@@ -45,7 +45,7 @@ failure() {
 }
 
 # Packages to diff to consider this build stable-enough
-packages="zsh kernel python3 mutt emacs tmux elfutils"
+packages="zsh kernel python3 firefox mutt emacs tmux elfutils"
 
 # Validate programs we need are present
 reqs="rpmbuild koji"
