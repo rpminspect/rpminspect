@@ -583,6 +583,7 @@ static int read_cfgfile(struct rpminspect *ri, const char *filename)
     bool exclude = false;
     dep_type_t depkey = TYPE_NULL;
     deprule_ignore_map_t *drentry = NULL;
+    string_entry_t *sentry = NULL;
 
     assert(ri != NULL);
     assert(filename != NULL);
@@ -1132,8 +1133,17 @@ static int read_cfgfile(struct rpminspect *ri, const char *filename)
                             free(ri->vendor_data_dir);
                             ri->vendor_data_dir = strdup(t);
                         } else if (!strcmp(key, "licensedb")) {
-                            free(ri->licensedb);
-                            ri->licensedb = strdup(t);
+                            if (ri->licensedb == NULL) {
+                                ri->licensedb = calloc(1, sizeof(*(ri->licensedb)));
+                                assert(ri->licensedb != NULL);
+                                TAILQ_INIT(ri->licensedb);
+                            }
+
+                            sentry = calloc(1, sizeof(*sentry));
+                            assert(sentry != NULL);
+                            sentry->data = strdup(t);
+                            assert(sentry->data != NULL);
+                            TAILQ_INSERT_TAIL(ri->licensedb, sentry, items);
                         } else if (!strcmp(key, "favor_release")) {
                             if (!strcasecmp(t, "none")) {
                                 ri->favor_release = FAVOR_NONE;
