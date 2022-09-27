@@ -28,6 +28,7 @@
 #include <err.h>
 #include <yaml.h>
 #include "rpminspect.h"
+#include "init.h"
 #include "queue.h"
 #include "uthash.h"
 
@@ -147,7 +148,8 @@ enum {
     BLOCK_SYMLINKS = 69,
     BLOCK_UPSTREAM = 70,
     BLOCK_VIRUS = 71,
-    BLOCK_ENVIRONMENT = 72
+    BLOCK_ENVIRONMENT = 72,
+    BLOCK_LICENSEDB = 73
 };
 
 static int add_regex(const char *pattern, regex_t **regex_out)
@@ -694,9 +696,12 @@ static int read_cfgfile(struct rpminspect *ri, const char *filename)
                     } else if (!strcmp(key, "koji")) {
                         block = BLOCK_KOJI;
                         group = BLOCK_NULL;
-                    } else if (!strcmp(key, "vendor") && group != BLOCK_METADATA) {
-                        block = BLOCK_VENDOR;
-                        group = BLOCK_NULL;
+                    } else if (!strcmp(key, SECTION_VENDOR) && group != BLOCK_METADATA) {
+                        block = BLOCK_NULL;
+                        group = BLOCK_VENDOR;
+                    } else if (!strcmp(key, SECTION_LICENSEDB) && group == BLOCK_VENDOR) {
+                        block = BLOCK_LICENSEDB;
+                        group = BLOCK_VENDOR;
                     } else if (!strcmp(key, "commands")) {
                         block = BLOCK_COMMANDS;
                         group = BLOCK_NULL;
@@ -901,6 +906,10 @@ static int read_cfgfile(struct rpminspect *ri, const char *filename)
                     } else if (group == BLOCK_METADATA) {
                         if (!strcmp(key, "buildhost_subdomain")) {
                             block = BLOCK_BUILDHOST_SUBDOMAIN;
+                        }
+                    } else if (group == BLOCK_VENDOR) {
+                        if (!strcmp(key, SECTION_LICENSEDB)) {
+                            block = BLOCK_LICENSEDB;
                         }
                     } else if (group == BLOCK_CHANGEDFILES) {
                         if (!strcmp(key, "header_file_extensions")) {
@@ -1124,15 +1133,15 @@ static int read_cfgfile(struct rpminspect *ri, const char *filename)
                          * this block needs to come before BLOCK_VENDOR
                          * the key 'vendor' is used in two places
                          */
-                        if (!strcmp(key, "vendor")) {
+                        if (!strcmp(key, SECTION_VENDOR)) {
                             free(ri->vendor);
                             ri->vendor = strdup(t);
                         }
-                    } else if (block == BLOCK_VENDOR) {
+                    } else if (group == BLOCK_VENDOR) {
                         if (!strcmp(key, "vendor_data_dir")) {
                             free(ri->vendor_data_dir);
                             ri->vendor_data_dir = strdup(t);
-                        } else if (!strcmp(key, "licensedb")) {
+                        } else if (!strcmp(key, SECTION_LICENSEDB)) {
                             if (ri->licensedb == NULL) {
                                 ri->licensedb = calloc(1, sizeof(*(ri->licensedb)));
                                 assert(ri->licensedb != NULL);
@@ -1417,6 +1426,8 @@ static int read_cfgfile(struct rpminspect *ri, const char *filename)
                         } else if (block == BLOCK_BADFUNCS_ALLOWED) {
                             add_string_list_map_entry(&ri->bad_functions_allowed, key, t);
                         }
+                    } else if (block == BLOCK_LICENSEDB) {
+                        add_entry(&ri->licensedb, t);
                     } else if (block == BLOCK_BADWORDS) {
                         add_entry(&ri->badwords, t);
                     } else if (block == BLOCK_MACROFILES) {
