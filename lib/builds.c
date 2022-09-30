@@ -892,12 +892,14 @@ int gather_builds(struct rpminspect *ri, bool fo)
 
         if (is_local_build(ri->workdir, ri->after, fetch_only) || is_local_rpm(ri, ri->after)) {
             if (gather_local_build(ri->after) == -1) {
+                warnx(_("unable to gather after build: %s"), ri->after);
                 return -1;
             }
         } else if (is_remote_rpm(ri->after)) {
             r = download_rpm(ri, ri->after);
 
             if (r != RI_SUCCESS) {
+                warnx(_("unable to download after RPM: %s"), ri->after);
                 return r;
             }
         } else if (is_task_id(ri->after) && (task = get_koji_task(ri, ri->after)) != NULL) {
@@ -908,6 +910,7 @@ int gather_builds(struct rpminspect *ri, bool fo)
 
                 if (r != RI_SUCCESS) {
                     free_koji_build(build);
+                    warnx(_("unable to download after build: %s"), ri->after);
                     return r;
                 }
 
@@ -916,6 +919,7 @@ int gather_builds(struct rpminspect *ri, bool fo)
                 r = download_task(ri, task);
 
                 if (r != RI_SUCCESS) {
+                    warnx(_("unable to download after task: %s"), ri->after);
                     free_koji_task(task);
                     return r;
                 }
@@ -926,6 +930,7 @@ int gather_builds(struct rpminspect *ri, bool fo)
             r = download_build(ri, build);
 
             if (r != RI_SUCCESS) {
+                warnx(_("unable to download after build: %s"), ri->after);
                 free_koji_build(build);
                 return r;
             }
