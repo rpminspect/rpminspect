@@ -996,7 +996,7 @@ class MissingExplicitConflictsCompareKoji(TestCompareKoji):
         self.waiver_auth = "Anyone"
 
 
-# Multiple providers of the same thing (VERIFY)
+# Multiple providers of the same thing (OK)
 class MultipleProvidersSRPM(TestSRPM):
     @unittest.skipUnless(have_elfdeps, "system lacks %s executable" % elfdeps)
     def setUp(self):
@@ -1139,8 +1139,8 @@ class MultipleProvidersKoji(TestKoji):
         self.rpm.add_conflicts("vaporware-libs = %{version}-%{release}")
 
         self.inspection = "rpmdeps"
-        self.result = "VERIFY"
-        self.waiver_auth = "Anyone"
+        self.result = "OK"
+        self.waiver_auth = "Not Waivable"
 
 
 class MultipleProvidersCompareSRPM(TestCompareSRPM):
@@ -1369,5 +1369,5 @@ class MultipleProvidersCompareKoji(TestCompareKoji):
         self.after_rpm.add_conflicts("vaporware-libs = %{version}-%{release}")
 
         self.inspection = "rpmdeps"
-        self.result = "VERIFY"
-        self.waiver_auth = "Anyone"
+        self.result = "OK"
+        self.waiver_auth = "Not Waivable"
