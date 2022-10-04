@@ -117,6 +117,7 @@ if python.found()
     test_suites = [
         'test_abidiff.py',
         'test_addedfiles.py',
+        'test_annocheck.py',
         'test_badfuncs.py',
         'test_capabilities.py',
         'test_changedfiles.py',
