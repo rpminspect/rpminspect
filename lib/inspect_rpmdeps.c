@@ -342,88 +342,91 @@ static bool check_explicit_lib_deps(struct rpminspect *ri, Header h, deprule_lis
             }
         }
 
+        /* all of the explicit Requires for this req */
+        explicit_requires = get_explicit_requires(ri, req);
+
         /* now look for the explicit Requires of potential_prov */
-        if (found && potential_prov) {
-            /* prove yourself again */
-            found = false;
+        if (list_len(req->providers) == 1 && list_len(explicit_requires) == 0) {
+            if (found && potential_prov) {
+                /* prove yourself again */
+                found = false;
 
-            pn = headerGetString(potential_prov->after_hdr, RPMTAG_NAME);
-            pv = headerGetString(potential_prov->after_hdr, RPMTAG_VERSION);
-            pr = headerGetString(potential_prov->after_hdr, RPMTAG_RELEASE);
+                pn = headerGetString(potential_prov->after_hdr, RPMTAG_NAME);
+                pv = headerGetString(potential_prov->after_hdr, RPMTAG_VERSION);
+                pr = headerGetString(potential_prov->after_hdr, RPMTAG_RELEASE);
 
-            /* the version-release or epoch:version-release string */
-            epoch = headerGetNumber(potential_prov->after_hdr, RPMTAG_EPOCH);
+                /* the version-release or epoch:version-release string */
+                epoch = headerGetNumber(potential_prov->after_hdr, RPMTAG_EPOCH);
 
-            xasprintf(&evr, "%ju:%s-%s", epoch, pv, pr);
-            assert(evr != NULL);
+                xasprintf(&evr, "%ju:%s-%s", epoch, pv, pr);
+                assert(evr != NULL);
 
-            xasprintf(&vr, "%s-%s", pv, pr);
-            assert(vr != NULL);
+                xasprintf(&vr, "%s-%s", pv, pr);
+                assert(vr != NULL);
 
-            TAILQ_FOREACH(verify, after_deps, items) {
-                /* look only at explicit deps right now */
-                if ((verify->type == TYPE_PROVIDES)
-                    || (strprefix(verify->requirement, SHARED_LIB_PREFIX) && strstr(verify->requirement, SHARED_LIB_SUFFIX))) {
-                    continue;
+                TAILQ_FOREACH(verify, after_deps, items) {
+                    /* look only at explicit deps right now */
+                    if ((verify->type == TYPE_PROVIDES)
+                        || (strprefix(verify->requirement, SHARED_LIB_PREFIX) && strstr(verify->requirement, SHARED_LIB_SUFFIX))) {
+                        continue;
+                    }
+
+                    /* trim potential %{_isa} suffix */
+                    isareq = remove_isa_substring(verify->requirement);
+                    assert(isareq != NULL);
+
+                    if (!strcmp(isareq, pn) && verify->operator == OP_EQUAL && (!strcmp(verify->version, evr) || !strcmp(verify->version, vr))) {
+                        verify->explicit = true;
+                        found = true;
+                    }
+
+                    free(isareq);
+
+                    if (found) {
+                        break;
+                    }
                 }
 
-                /* trim potential %{_isa} suffix */
-                isareq = remove_isa_substring(verify->requirement);
-                assert(isareq != NULL);
-
-                if (!strcmp(isareq, pn) && verify->operator == OP_EQUAL && (!strcmp(verify->version, evr) || !strcmp(verify->version, vr))) {
-                    verify->explicit = true;
+                /* could be circular */
+                if (!found && !strcmp(name, pn)) {
                     found = true;
                 }
 
-                free(isareq);
+                free(evr);
+                free(vr);
+            }
 
-                if (found) {
-                    break;
+            /* report missing explicit package requires */
+            if (!found && potential_prov) {
+                r = strdeprule(req);
+                pn = headerGetString(potential_prov->after_hdr, RPMTAG_NAME);
+
+                if (epoch > 0) {
+                    rulestr = "%{epoch}:%{version}-%{release}";
+                    params.remedy = REMEDY_RPMDEPS_EXPLICIT_EPOCH;
+                } else {
+                    rulestr = "%{version}-%{release}";
+                    params.remedy = REMEDY_RPMDEPS_EXPLICIT;
                 }
+
+                xasprintf(&params.msg, _("Subpackage %s on %s carries '%s' which comes from subpackage %s but does not carry an explicit package version requirement.  Please add 'Requires: %s = %s' to the spec file to avoid the need to test interoperability between various combinations of old and new subpackages."), name, arch, r, pn, pn, rulestr);
+                xasprintf(&noun, _("missing 'Requires: ${FILE} = %s' in %s on ${ARCH}"), rulestr, name);
+
+                params.severity = RESULT_VERIFY;
+                params.noun = noun;
+                params.verb = VERB_FAILED;
+                params.file = pn;
+                params.arch = arch;
+                add_result(ri, &params);
+                free(noun);
+                free(params.msg);
+                free(r);
+
+                result = false;
             }
-
-            /* could be circular */
-            if (!found && !strcmp(name, pn)) {
-                found = true;
-            }
-
-            free(evr);
-            free(vr);
-        }
-
-        /* report missing explicit package requires */
-        if (!found && potential_prov) {
-            r = strdeprule(req);
-            pn = headerGetString(potential_prov->after_hdr, RPMTAG_NAME);
-
-            if (epoch > 0) {
-                rulestr = "%{epoch}:%{version}-%{release}";
-                params.remedy = REMEDY_RPMDEPS_EXPLICIT_EPOCH;
-            } else {
-                rulestr = "%{version}-%{release}";
-                params.remedy = REMEDY_RPMDEPS_EXPLICIT;
-            }
-
-            xasprintf(&params.msg, _("Subpackage %s on %s carries '%s' which comes from subpackage %s but does not carry an explicit package version requirement.  Please add 'Requires: %s = %s' to the spec file to avoid the need to test interoperability between various combinations of old and new subpackages."), name, arch, r, pn, pn, rulestr);
-            xasprintf(&noun, _("missing 'Requires: ${FILE} = %s' in %s on ${ARCH}"), rulestr, name);
-
-            params.severity = RESULT_VERIFY;
-            params.noun = noun;
-            params.verb = VERB_FAILED;
-            params.file = pn;
-            params.arch = arch;
-            add_result(ri, &params);
-            free(noun);
-            free(params.msg);
-            free(r);
-
-            result = false;
         }
 
         /* check for multiple providers foreach Requires */
-        explicit_requires = get_explicit_requires(ri, req);
-
         if (list_len(req->providers) > 1 && list_len(explicit_requires) > 0) {
             r = strdeprule(req);
             multiples = list_to_string(req->providers, ", ");
