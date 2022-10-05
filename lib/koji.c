@@ -30,6 +30,71 @@
 #include "rpminspect.h"
 
 /*
+ * Koji task and build states (could not find a way to get this from
+ * the API)
+ */
+enum {
+    TASK_FREE = 0,
+    TASK_OPEN = 1,
+    TASK_CLOSED = 2,
+    TASK_CANCELED = 3,
+    TASK_ASSIGNED = 4,
+    TASK_FAILED = 5
+};
+
+enum {
+    BUILD_BUILDING = 0,
+    BUILD_COMPLETE = 1,
+    BUILD_DELETED = 2,
+    BUILD_FAILED = 3,
+    BUILD_CANCELED = 4
+};
+
+/*
+ * Return descriptive string for the task state.  Do not free this
+ * string.
+ */
+static const char *task_state_desc(const int state)
+{
+    if (state == TASK_FREE) {
+        return "free";
+    } else if (state == TASK_OPEN) {
+        return "open";
+    } else if (state == TASK_CLOSED) {
+        return "closed";
+    } else if (state == TASK_CANCELED) {
+        return "canceled";
+    } else if (state == TASK_ASSIGNED) {
+        return "assigned";
+    } else if (state == TASK_FAILED) {
+        return "failed";
+    } else {
+        return "UNKNOWN";
+    }
+}
+
+/*
+ * Return descriptive string for the build state.  Do not free this
+ * string.
+ */
+static const char *build_state_desc(const int state)
+{
+    if (state == BUILD_BUILDING) {
+        return "building";
+    } else if (state == BUILD_COMPLETE) {
+        return "complete";
+    } else if (state == BUILD_DELETED) {
+        return "deleted";
+    } else if (state == BUILD_FAILED) {
+        return "failed";
+    } else if (state == BUILD_CANCELED) {
+        return "canceled";
+    } else {
+        return "UNKNOWN";
+    }
+}
+
+/*
  * General error handler for xmlrpc failures.  Could be improved
  * a bit to be more helpful to the user.
  */
@@ -535,7 +600,6 @@ struct koji_build *get_koji_build(struct rpminspect *ri, const char *buildspec)
 
     if (env.fault_occurred && env.fault_code >= 1000) {
         /* server side error which means Koji protocol error */
-        xmlrpc_DECREF(result);
         xmlrpc_env_clean(&env);
         xmlrpc_client_cleanup();
         free_koji_build(build);
@@ -551,6 +615,12 @@ struct koji_build *get_koji_build(struct rpminspect *ri, const char *buildspec)
         xmlrpc_client_cleanup();
         xmlrpc_DECREF(result);
         free_koji_build(build);
+        return NULL;
+    }
+
+    /* build must be complete */
+    if (build->state != BUILD_COMPLETE) {
+        warnx(_("Koji build state is %s for %s, cannot continue."), build_state_desc(build->state), buildspec);
         return NULL;
     }
 
@@ -1017,6 +1087,14 @@ struct koji_task *get_koji_task(struct rpminspect *ri, const char *taskspec)
 
     read_koji_task_struct(&env, result, task);
     xmlrpc_DECREF(result);
+
+    /* task must be closed */
+    if (task->state != TASK_CLOSED) {
+        warnx(_("Koji task state is %s for task %s, cannot continue."), task_state_desc(task->state), taskspec);
+        xmlrpc_env_clean(&env);
+        xmlrpc_client_cleanup();
+        return NULL;
+    }
 
     /* call 'getTaskDescendents' on the task ID */
     result = xmlrpc_client_call(&env, ri->kojihub, "getTaskDescendents", "(s)", taskspec);
