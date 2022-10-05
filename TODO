@@ -166,7 +166,6 @@ The following inspections lack integration tests:
     changedfiles (compare only...these do not apply to single package inputs)
     removedfiles (compare only...these do not apply to single package inputs)
     addedfiles (compare only...these do not apply to single package inputs)
-    annocheck
     DT_NEEDED
     capabilities
     arch
