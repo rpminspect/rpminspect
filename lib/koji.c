@@ -618,13 +618,6 @@ struct koji_build *get_koji_build(struct rpminspect *ri, const char *buildspec)
         return NULL;
     }
 
-    /* build must be complete */
-    if (build->state != BUILD_COMPLETE) {
-        warnx(_("Koji build state is %s for %s, cannot continue."), build_state_desc(build->state), buildspec);
-        free_koji_build(build);
-        return NULL;
-    }
-
     /* read the values from the result */
     size = xmlrpc_struct_size(&env, result);
     xmlrpc_abort_on_fault(&env);
@@ -835,6 +828,13 @@ struct koji_build *get_koji_build(struct rpminspect *ri, const char *buildspec)
     }
 
     xmlrpc_DECREF(result);
+
+    /* build must be complete */
+    if (build->state != BUILD_COMPLETE) {
+        warnx(_("Koji build state is %s for %s, cannot continue."), build_state_desc(build->state), buildspec);
+        free_koji_build(build);
+        return NULL;
+    }
 
     /* Modules have multiple builds, so collect the IDs */
     if (ri->buildtype == KOJI_BUILD_MODULE) {
