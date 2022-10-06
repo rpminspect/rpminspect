@@ -42,7 +42,11 @@ static bool reported = false;
 static bool comparison = false;
 static bool automacro = false;
 
-enum { DIFF_NULL, DIFF_CONTEXT, DIFF_UNIFIED };
+enum {
+    DIFF_NULL = 0,
+    DIFF_CONTEXT = 1,
+    DIFF_UNIFIED = 2
+};
 
 /*
  * Free the patches hash table
