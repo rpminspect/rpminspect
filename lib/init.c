@@ -47,7 +47,7 @@
  * NULL terminated array of strings of paths where executable files
  * may reside.
  */
-const char *BIN_PATHS[] = {"/bin", "/sbin", "/usr/bin", "/usr/sbin", NULL};
+static const char *BIN_PATHS[] = {"/bin", "/sbin", "/usr/bin", "/usr/sbin", NULL};
 
 /**
  * @def SHELLS
@@ -58,14 +58,14 @@ const char *BIN_PATHS[] = {"/bin", "/sbin", "/usr/bin", "/usr/sbin", NULL};
  * is an exception and has special handling in the 'shellsyntax'
  * inspection.
  */
-const char *SHELLS[] = {"sh", "ksh", "zsh", "csh", "tcsh", "rc", "bash", NULL};
+static const char *SHELLS[] = {"sh", "ksh", "zsh", "csh", "tcsh", "rc", "bash", NULL};
 
 /* States used while reading the YAML config files */
 enum {
-    SYMBOL_NULL,
-    SYMBOL_KEY,
-    SYMBOL_VALUE,
-    SYMBOL_ENTRY
+    SYMBOL_NULL = 0,
+    SYMBOL_KEY = 1,
+    SYMBOL_VALUE = 2,
+    SYMBOL_ENTRY = 3
 };
 
 /*
