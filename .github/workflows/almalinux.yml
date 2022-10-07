@@ -28,7 +28,7 @@ jobs:
         # Set up the matrix of distributions to test
         strategy:
             matrix:
-                container: ["almalinux:8"]
+                container: ["almalinux:8", "almalinux:9"]
 
         container:
             image: ${{ matrix.container }}
