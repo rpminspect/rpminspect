@@ -18,7 +18,8 @@
 from baseclass import TestCompareRPMs, TestCompareKoji, TestRPMs, TestKoji
 
 needed_flags = "-Wl,-z,now -fcf-protection=full -fplugin=annobin -O2 \
-        -D_FORTIFY_SOURCE=2 -D_GLIBCXX_ASSERTIONS -fstack-protector-strong"
+        -D_FORTIFY_SOURCE=2 -D_GLIBCXX_ASSERTIONS -fstack-protector-strong \
+        -fstack-clash-protection -flto"
 
 
 class AnnocheckHardenedCompareRPMs(TestCompareRPMs):
