@@ -1,5 +1,6 @@
 # Copyright © 2022 Red Hat, Inc.
 # Author(s): Zuzana Miklankova <zmiklank@redhat.com>
+#            David Cantrell <dcantrell@redhat.com>
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -35,6 +36,15 @@ class AnnocheckHardenedCompareRPMs(TestCompareRPMs):
     def setUp(self):
         super().setUp()
 
+        if os.path.isfile("/etc/slackware-version"):
+            self.extra_cfg = {}
+            self.extra_cfg["annocheck"] = {}
+            self.extra_cfg["annocheck"]["jobs"] = [
+                {
+                    "hardened": "--ignore-unknown --verbose --skip-cf-protection --skip-property-note"  # noqa: E501
+                }
+            ]
+
         self.before_rpm.add_simple_library(compileFlags=needed_flags)
         self.after_rpm.add_simple_library(compileFlags=needed_flags)
 
@@ -48,6 +58,15 @@ class AnnocheckHardenedCompareRPMs(TestCompareRPMs):
 class AnnocheckHardenedCompareKoji(TestCompareKoji):
     def setUp(self):
         super().setUp()
+
+        if os.path.isfile("/etc/slackware-version"):
+            self.extra_cfg = {}
+            self.extra_cfg["annocheck"] = {}
+            self.extra_cfg["annocheck"]["jobs"] = [
+                {
+                    "hardened": "--ignore-unknown --verbose --skip-cf-protection --skip-property-note"  # noqa: E501
+                }
+            ]
 
         self.before_rpm.add_simple_library(compileFlags=needed_flags)
         self.after_rpm.add_simple_library(compileFlags=needed_flags)
@@ -89,6 +108,15 @@ class AnnocheckHardenedRPMs(TestRPMs):
     def setUp(self):
         super().setUp()
 
+        if os.path.isfile("/etc/slackware-version"):
+            self.extra_cfg = {}
+            self.extra_cfg["annocheck"] = {}
+            self.extra_cfg["annocheck"]["jobs"] = [
+                {
+                    "hardened": "--ignore-unknown --verbose --skip-cf-protection --skip-property-note"  # noqa: E501
+                }
+            ]
+
         self.rpm.add_simple_library(compileFlags=needed_flags)
 
         self.inspection = "annocheck"
@@ -101,6 +129,15 @@ class AnnocheckHardenedRPMs(TestRPMs):
 class AnnocheckHardenedKoji(TestKoji):
     def setUp(self):
         super().setUp()
+
+        if os.path.isfile("/etc/slackware-version"):
+            self.extra_cfg = {}
+            self.extra_cfg["annocheck"] = {}
+            self.extra_cfg["annocheck"]["jobs"] = [
+                {
+                    "hardened": "--ignore-unknown --verbose --skip-cf-protection --skip-property-note"  # noqa: E501
+                }
+            ]
 
         self.rpm.add_simple_library(compileFlags=needed_flags)
 
