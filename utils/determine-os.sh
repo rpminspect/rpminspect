@@ -33,19 +33,22 @@ elif [ -r /etc/centos-release ] && [ "${ID}" = "centos" ]; then
     esac
 elif [ -r /etc/redhat-release ] && [ "${ID}" = "rhel" ]; then
     v="$(echo "${VERSION_ID}" | cut -d '.' -f 1)"
-    if [ "${v}" = "7" ] || [ "${v}" = "8" ]; then
-        echo "${ID}${v}"
-    else
-        echo "unknown OS: ${ID}:${VERSION_ID}" >&2
-    fi
+    case "${v}" in
+        7|8)
+            echo "${ID}${v}"
+            ;;
+        *)
+            echo "unknown OS: ${ID}:${v}" >&2
+            ;;
+    esac
 elif [ -r /etc/almalinux-release ] && [ "${ID}" = "almalinux" ]; then
     v="$(echo "${VERSION_ID}" | cut -d '.' -f 1)"
-    case "${VERSION_ID}" in
+    case "${v}" in
         8|9)
             echo "${ID}${v}"
             ;;
         *)
-            echo "unknown OS: ${ID}:${VERSION_ID}" >&2
+            echo "unknown OS: ${ID}:${v}" >&2
             ;;
     esac
 elif [ -r /etc/rocky-release ] && [ "${ID}" = "rocky" ]; then
@@ -53,7 +56,7 @@ elif [ -r /etc/rocky-release ] && [ "${ID}" = "rocky" ]; then
     if [ "${v}" = "8" ]; then
         echo "${ID}${v}"
     else
-        echo "unknown OS: ${ID}:${VERSION_ID}" >&2
+        echo "unknown OS: ${ID}:${v}" >&2
     fi
 elif [ ${IS_CRUX} -eq 0 ] && [ -f /etc/pkgadd.conf ] && [ -f /etc/pkgmk.conf ]; then
     echo "crux"
