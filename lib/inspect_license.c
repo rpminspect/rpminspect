@@ -94,15 +94,16 @@ static struct json_object *read_licensedb(struct rpminspect *ri, const char *db)
  */
 static bool check_license_abbrev(const struct json_object *db, const char *lic)
 {
+    struct json_object *ldb = (struct json_object *) db;
     const char *fedora_abbrev = "";
     const char *fedora_name = "";
     const char *spdx_abbrev = "";
     bool approved = false;
 
-    assert(db != NULL);
+    assert(ldb != NULL);
     assert(lic != NULL);
 
-    json_object_object_foreach(db, license_name, val) {
+    json_object_object_foreach(ldb, license_name, val) {
         /* first reset our variables */
         fedora_abbrev = "";
         fedora_name = "";
