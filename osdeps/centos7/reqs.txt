@@ -1,4 +1,3 @@
-annobin
 bash
 clamav-data
 clamav-devel
