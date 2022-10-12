@@ -380,9 +380,11 @@ static void add_ignore(string_list_map_t **table, int i, char *s)
  * @param key The key in the hash table (string).
  * @param value The value to add to the hash table (string).
  * @param required Set to true if key must exist to append value to list.
+ * @param single Set to true if key must contain only a single value,
+ *               otherwise it's a string list.
  * @param table Destination hash table.
  */
-static void process_table(char *key, char *value, const bool required, string_map_t **table)
+static void process_table(char *key, char *value, const bool required, const bool single, string_map_t **table)
 {
     char *tmp = NULL;
     string_list_t *tokens = NULL;
@@ -408,7 +410,7 @@ static void process_table(char *key, char *value, const bool required, string_ma
         }
     } else {
         /* entry found, handle the value */
-        if (entry->value != NULL) {
+        if (entry->value != NULL && !single) {
             tokens = strsplit(entry->value, " ");
             assert(tokens != NULL);
 
@@ -1006,7 +1008,7 @@ static int read_cfgfile(struct rpminspect *ri, const char *filename)
                             block = BLOCK_IGNORE;
                         } else if (strcmp(key, t)) {
                             /* continue support the old syntax for the yaml file */
-                            process_table(key, t, false, &ri->annocheck);
+                            process_table(key, t, false, false, &ri->annocheck);
                         }
                     } else if (group == BLOCK_JAVABYTECODE) {
                         if (!strcmp(key, SECTION_IGNORE)) {
@@ -1272,9 +1274,9 @@ static int read_cfgfile(struct rpminspect *ri, const char *filename)
                         }
                     } else if (group == BLOCK_ANNOCHECK) {
                         if (block == BLOCK_ANNOCHECK_JOBS) {
-                            process_table(key, t, false, &ri->annocheck);
+                            process_table(key, t, false, false, &ri->annocheck);
                         } else if (block == BLOCK_ANNOCHECK_EXTRA_OPTS) {
-                            process_table(key, t, true, &ri->annocheck);
+                            process_table(key, t, true, false, &ri->annocheck);
                         } else if (block == BLOCK_ANNOCHECK_FAILURE_SEVERITY) {
                             ri->annocheck_failure_severity = getseverity(t, RESULT_NULL);
 
@@ -1284,11 +1286,11 @@ static int read_cfgfile(struct rpminspect *ri, const char *filename)
                             }
                         }
                     } else if (group == BLOCK_JAVABYTECODE) {
-                        process_table(key, t, false, &ri->jvm);
+                        process_table(key, t, false, true, &ri->jvm);
                     } else if (group == BLOCK_MIGRATED_PATHS) {
-                        process_table(key, t, false, &ri->pathmigration);
+                        process_table(key, t, false, false, &ri->pathmigration);
                     } else if (group == BLOCK_PRODUCTS) {
-                        process_table(key, t, false, &ri->products);
+                        process_table(key, t, false, false, &ri->products);
                     } else if (block == BLOCK_INSPECTIONS) {
                         if (!strcasecmp(t, TOKEN_ON)) {
                             exclude = false;
