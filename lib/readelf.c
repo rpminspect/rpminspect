@@ -148,28 +148,41 @@ bool is_elf(const char *path)
     return (is_elf_file(path) || is_elf_archive(path));
 }
 
+static bool _is_elf_type(const char *path, int type)
+{
+    bool result = false;
+    int fd = 0;
+    Elf *elf = NULL;
+
+    assert(path != NULL);
+
+    elf = get_elf(path, &fd);
+
+    if (elf && get_elf_type(elf) == type) {
+        result = true;
+    }
+
+    close(fd);
+    elf_end(elf);
+    return result;
+}
+
 /*
  * Return true if a specified file is an ELF shared library file, that
  * is, of type ET_DYN.
  */
 bool is_elf_shared_library(const char *path)
 {
-    bool result = false;
-    int fd = 0;
-    Elf *elf = NULL;
-    char *soname = NULL;
+    return _is_elf_type(path, ET_DYN);
+}
 
-    elf = get_elf(path, &fd);
-    soname = get_elf_soname(path);
-
-    if (elf && get_elf_type(elf) == ET_DYN && soname != NULL) {
-        result = true;
-    }
-
-    free(soname);
-    close(fd);
-    elf_end(elf);
-    return result;
+/*
+ * Return true if a specified file is an ELF executable file, that
+ * is, of type ET_EXEC.
+ */
+bool is_elf_executable(const char *path)
+{
+    return _is_elf_type(path, ET_EXEC);
 }
 
 /*

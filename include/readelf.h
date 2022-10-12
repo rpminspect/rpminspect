@@ -158,6 +158,17 @@ bool is_elf(const char *path);
 bool is_elf_shared_library(const char *path);
 
 /**
+ * @brief Determine if the specified file is an ELF executable.
+ *
+ * Given a path to a file, this function returns true if the file is
+ * an ELF executable.  That is, if it is ELF type ET_EXEC.
+ *
+ * @param path The fullpath tothe file in question.
+ * @return True if the file is an ELF executable, false otherwise.
+ */
+bool is_elf_executable(const char *path);
+
+/**
  * @brief Determine if the specified file is an ELF file.
  *
  * Given a path to a file, this function returns true if the file is
