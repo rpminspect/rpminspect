@@ -598,15 +598,17 @@ struct koji_build *get_koji_build(struct rpminspect *ri, const char *buildspec)
     /* call 'getBuild' on the koji hub */
     result = xmlrpc_client_call(&env, ri->kojihub, "getBuild", "(s)", buildspec);
 
-    if (env.fault_occurred && (env.fault_code >= 1000 || env.fault_code < 0)) {
-        /* server side error which means Koji protocol error */
-        xmlrpc_env_clean(&env);
-        xmlrpc_client_cleanup();
-        free_koji_build(build);
-        return NULL;
-    } else {
-        /* we have no idea, so just fail */
-        xmlrpc_abort_on_fault(&env);
+    if (env.fault_occurred) {
+        if (env.fault_code >= 1000 || env.fault_code < 0) {
+            /* server side error which means Koji protocol error */
+            xmlrpc_env_clean(&env);
+            xmlrpc_client_cleanup();
+            free_koji_build(build);
+            return NULL;
+        } else {
+            /* we have no idea, so just fail */
+            xmlrpc_abort_on_fault(&env);
+        }
     }
 
     /* is this a valid build? */
@@ -1077,15 +1079,17 @@ struct koji_task *get_koji_task(struct rpminspect *ri, const char *taskspec)
     /* call 'getTaskInfo' on the koji hub */
     result = xmlrpc_client_call(&env, ri->kojihub, "getTaskInfo", "(s)", taskspec);
 
-    if (env.fault_occurred && (env.fault_code >= 1000 || env.fault_code < 0)) {
-        /* server side error which means Koji protocol error */
-        xmlrpc_env_clean(&env);
-        xmlrpc_client_cleanup();
-        free_koji_task(task);
-        return NULL;
-    } else {
-        /* we have no idea, so just fail */
-        xmlrpc_abort_on_fault(&env);
+    if (env.fault_occurred) {
+        if (env.fault_code >= 1000 || env.fault_code < 0 || env.fault_code == 1) {
+            /* server side error which means Koji protocol error */
+            xmlrpc_env_clean(&env);
+            xmlrpc_client_cleanup();
+            free_koji_task(task);
+            return NULL;
+        } else {
+            /* we have no idea, so just fail */
+            xmlrpc_abort_on_fault(&env);
+        }
     }
 
     /* is this a valid build? */
