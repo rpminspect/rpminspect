@@ -54,35 +54,36 @@ static void usage(void)
     printf(_("Compare package builds for policy compliance and consistency.\n\n"));
     printf(_("Usage: %s [OPTIONS] [before build] [after build]\n"), COMMAND_NAME);
     printf(_("Options:\n"));
-    printf(_("  -c FILE, --config=FILE   Configuration file to use\n"));
-    printf(_("  -p NAME, --profile=NAME  Configuration profile to use\n"));
-    printf(_("  -T LIST, --tests=LIST    List of tests to run\n"));
-    printf(_("                             (default: ALL)\n"));
-    printf(_("  -E LIST, --exclude=LIST  List of tests to exclude\n"));
-    printf(_("                             (default: none)\n"));
-    printf(_("  -a LIST, --arches=LIST   List of architectures to check\n"));
-    printf(_("  -r STR, --release=STR    Product release string\n"));
-    printf(_("  -n, --no-rebase          Disable build rebase detection\n"));
-    printf(_("  -o FILE, --output=FILE   Write results to FILE\n"));
-    printf(_("                             (default: stdout)\n"));
-    printf(_("  -F TYPE, --format=TYPE   Format output results as TYPE\n"));
-    printf(_("                             (default: text)\n"));
-    printf(_("  -t TAG, --threshold=TAG  Result threshold triggering exit\n"));
-    printf(_("                           failure (default: VERIFY)\n"));
-    printf(_("  -s TAG, --suppress=TAG   Results suppression threshold\n"));
-    printf(_("                             (default: off, report everything)\n"));
-    printf(_("  -l, --list               List available tests and formats\n"));
-    printf(_("  -w PATH, --workdir=PATH  Temporary directory to use\n"));
-    printf(_("                             (default: %s)\n"), DEFAULT_WORKDIR);
-    printf(_("  -f, --fetch-only         Fetch builds only, do not perform inspections\n"));
-    printf(_("                             (implies -k)\n"));
-    printf(_("  -k, --keep               Do not remove the comparison working files\n"));
-    printf(_("  -d, --debug              Debugging mode output\n"));
-    printf(_("  -D, --dump-config        Dump configuration settings used (in YAML format)\n"));
-    printf(_("  -v, --verbose            Verbose inspection output\n"));
-    printf(_("                           when finished, display full path\n"));
-    printf(_("  -?, --help               Display usage information\n"));
-    printf(_("  -V, --version            Display program version\n"));
+    printf(_("  -c FILE, --config=FILE      Configuration file to use\n"));
+    printf(_("  -p NAME, --profile=NAME     Configuration profile to use\n"));
+    printf(_("  -T LIST, --tests=LIST       List of tests to run\n"));
+    printf(_("                                (default: ALL)\n"));
+    printf(_("  -E LIST, --exclude=LIST     List of tests to exclude\n"));
+    printf(_("                                (default: none)\n"));
+    printf(_("  -a LIST, --arches=LIST      List of architectures to check\n"));
+    printf(_("  -r STR, --release=STR       Product release string\n"));
+    printf(_("  -n, --no-rebase             Disable build rebase detection\n"));
+    printf(_("  -b TYPE, --build-type=TYPE  Set Koji build type to TYPE\n"));
+    printf(_("  -o FILE, --output=FILE      Write results to FILE\n"));
+    printf(_("                                (default: stdout)\n"));
+    printf(_("  -F TYPE, --format=TYPE      Format output results as TYPE\n"));
+    printf(_("                                (default: text)\n"));
+    printf(_("  -t TAG, --threshold=TAG     Result threshold triggering exit\n"));
+    printf(_("                              failure (default: VERIFY)\n"));
+    printf(_("  -s TAG, --suppress=TAG      Results suppression threshold\n"));
+    printf(_("                                (default: off, report everything)\n"));
+    printf(_("  -l, --list                  List available tests and formats\n"));
+    printf(_("  -w PATH, --workdir=PATH     Temporary directory to use\n"));
+    printf(_("                                (default: %s)\n"), DEFAULT_WORKDIR);
+    printf(_("  -f, --fetch-only            Fetch builds only, do not perform inspections\n"));
+    printf(_("                                (implies -k)\n"));
+    printf(_("  -k, --keep                  Do not remove the comparison working files\n"));
+    printf(_("  -d, --debug                 Debugging mode output\n"));
+    printf(_("  -D, --dump-config           Dump configuration settings (in YAML format)\n"));
+    printf(_("  -v, --verbose               Verbose inspection output\n"));
+    printf(_("                              when finished, display full path\n"));
+    printf(_("  -?, --help                  Display usage information\n"));
+    printf(_("  -V, --version               Display program version\n"));
     printf(_("\nSee the rpminspect(1) man page for more information.\n"));
 
     return;
@@ -310,7 +311,7 @@ int main(int argc, char **argv)
     int ret = RI_SUCCESS;
     wordexp_t expand;
     struct stat sb;
-    char *short_options = "c:p:T:E:a:r:no:F:lw:t:s:fkdDv\?V";
+    char *short_options = "c:p:T:E:a:r:nb:o:F:lw:t:s:fkdDv\?V";
     struct option long_options[] = {
         { "config", required_argument, 0, 'c' },
         { "profile", required_argument, 0, 'p' },
@@ -319,6 +320,7 @@ int main(int argc, char **argv)
         { "arches", required_argument, 0, 'a' },
         { "release", required_argument, 0, 'r' },
         { "no-rebase", no_argument, 0, 'n' },
+        { "build-type", required_argument, 0, 'b' },
         { "list", no_argument, 0, 'l' },
         { "output", required_argument, 0, 'o' },
         { "format", required_argument, 0, 'F' },
@@ -346,6 +348,7 @@ int main(int argc, char **argv)
     char *output = NULL;
     char *release = NULL;
     bool rebase_detection = true;
+    koji_build_type_t buildtype = KOJI_BUILD_NULL;
     char *threshold = NULL;
     char *suppress = NULL;
     int formatidx = -1;
@@ -437,6 +440,24 @@ int main(int argc, char **argv)
             case 'n':
                 rebase_detection = false;
                 break;
+            case 'b':
+                /* validate the specified build type */
+                for (i = 0; buildtypes[i].type != KOJI_BUILD_NULL; i++) {
+                    if (!strcasecmp(buildtypes[i].name, optarg)) {
+                        if (!buildtypes[i].supported) {
+                            errx(RI_PROGRAM_ERROR, _("*** Unsupported build type: `%s`."), optarg);
+                        }
+
+                        buildtype = buildtypes[i].type;
+                        break;
+                    }
+                }
+
+                if (buildtype == KOJI_BUILD_NULL) {
+                    errx(RI_PROGRAM_ERROR, _("*** Invalid build type: `%s`."), optarg);
+                }
+
+                break;
             case 'o':
                 output = strdup(optarg);
                 break;
@@ -512,8 +533,29 @@ int main(int argc, char **argv)
 
     /* list inspections and formats and exit if asked to */
     if (list) {
+        /* list the available build types */
+        printf(_("Available build types:\n"));
+
+        for (i = 0; buildtypes[i].type != KOJI_BUILD_NULL; i++) {
+            if (!buildtypes[i].supported) {
+                continue;
+            }
+
+            if (i > 0 && verbose) {
+                printf("\n");
+            }
+
+            printf("    %s\n", buildtypes[i].name);
+            desc = buildtype_desc(buildtypes[i].type);
+
+            if (desc != NULL && verbose) {
+                printwrap(desc, width, 8, stdout);
+                printf("\n");
+            }
+        }
+
         /* list the formats available */
-        printf(_("Available output formats:\n"));
+        printf(_("\nAvailable output formats:\n"));
 
         for (i = 0; formats[i].type != -1; i++) {
             if (i > 0 && verbose) {
@@ -614,6 +656,9 @@ int main(int argc, char **argv)
         free(ri->product_release);
         ri->product_release = release;
     }
+
+    /* Koji build type may have been specified */
+    ri->buildtype = buildtype;
 
     /* Reporting threshold and suppression levels */
     ri->threshold = getseverity(threshold, RESULT_VERIFY);
