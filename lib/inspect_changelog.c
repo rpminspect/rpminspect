@@ -449,7 +449,14 @@ bool inspect_changelog(struct rpminspect *ri)
     assert(ri != NULL);
 
     /* skip this inspection on modules */
-    if (ri->buildtype == KOJI_BUILD_MODULE) {
+    if (ri->buildtype != KOJI_BUILD_RPM) {
+        init_result_params(&params);
+        xasprintf(&params.msg, _("Inspection skipped because this build's type is not `rpm'."));
+        params.severity = RESULT_INFO;
+        params.waiverauth = NOT_WAIVABLE;
+        params.header = NAME_CHANGELOG;
+        add_result(ri, &params);
+        free(params.msg);
         return true;
     }
 
