@@ -53,6 +53,9 @@ extern struct inspect inspections[];
 /* List of all output format types (output.c) */
 extern struct format formats[];
 
+/* List of all build types (koji.c) */
+extern struct buildtype buildtypes[];
+
 /* Terminal resize indicator */
 extern volatile sig_atomic_t terminal_resized;
 
@@ -179,6 +182,7 @@ struct koji_build *get_koji_build(struct rpminspect *, const char *);
 struct koji_task *get_koji_task(struct rpminspect *, const char *);
 string_list_t *get_all_arches(const struct rpminspect *);
 bool allowed_arch(const struct rpminspect *, const char *);
+const char *buildtype_desc(const koji_build_type_t type);
 
 /* kmods.c */
 #ifdef _WITH_LIBKMOD

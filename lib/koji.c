@@ -30,6 +30,25 @@
 #include "rpminspect.h"
 
 /*
+ * Koji build types supported by rpminspect.
+ */
+struct buildtype buildtypes[] = {
+    /*
+     * { koji_build_type_t (add to types.h),
+     *   "name",
+     *   bool--true if the type is supported },
+     */
+    { KOJI_BUILD_IMAGE,  "image",  false },
+    { KOJI_BUILD_MAVEN,  "maven",  false },
+    { KOJI_BUILD_MODULE, "module", true },
+    { KOJI_BUILD_RPM,    "rpm",    true },
+    { KOJI_BUILD_WIN,    "win",    false },
+
+    /* array ends here so for loops can iterate */
+    { KOJI_BUILD_NULL,   NULL,     false }
+};
+
+/*
  * Koji task and build states (could not find a way to get this from
  * the API)
  */
@@ -802,7 +821,7 @@ struct koji_build *get_koji_build(struct rpminspect *ri, const char *buildspec)
                             xmlrpc_decompose_value(&env, modv, "s", &build->module_context);
                         } else if (!strcmp(keyname, "content_koji_tag")) {
                             xmlrpc_decompose_value(&env, modv, "s", &build->module_content_koji_tag);
-                        } else if (!strcmp(keyname, "modulemd_str")) {
+                        } else if (!strcmp(keyname, "modulemd_str") && ri->buildtype == KOJI_BUILD_NULL) {
                             ri->buildtype = KOJI_BUILD_MODULE;
                             xmlrpc_decompose_value(&env, modv, "s", &build->modulemd_str);
                         }
@@ -836,6 +855,11 @@ struct koji_build *get_koji_build(struct rpminspect *ri, const char *buildspec)
         warnx(_("Koji build state is %s for %s, cannot continue."), build_state_desc(build->state), buildspec);
         free_koji_build(build);
         return NULL;
+    }
+
+    /* assume the build type is rpm if not set yet */
+    if (ri->buildtype == KOJI_BUILD_NULL) {
+        ri->buildtype = KOJI_BUILD_RPM;
     }
 
     /* Modules have multiple builds, so collect the IDs */
@@ -1342,4 +1366,16 @@ string_list_t *get_all_arches(const struct rpminspect *ri)
     xmlrpc_client_cleanup();
 
     return arches;
+}
+
+const char *buildtype_desc(const koji_build_type_t type)
+{
+    switch (type) {
+        case KOJI_BUILD_RPM:
+            return _("RPM package build");
+        case KOJI_BUILD_MODULE:
+            return _("Module build consisting of multiple RPM package builds");
+        default:
+            return NULL;
+    }
 }
