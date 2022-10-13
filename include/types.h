@@ -706,6 +706,20 @@ struct rpminspect {
 };
 
 /*
+ * Definition for a build type.
+ */
+struct buildtype {
+    /* the build type that maps to koji_build_type_t */
+    koji_build_type_t type;
+
+    /* name of the build type */
+    char *name;
+
+    /* whether or not this type is supported */
+    bool supported;
+};
+
+/*
  * Definition for an output format.
  */
 struct format {
