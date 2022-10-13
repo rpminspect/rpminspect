@@ -158,13 +158,21 @@ false positives in the output.  If you want to always disable the
 rebase checking and enforce the strict rules, you can pass this
 option.
 .TP
+.B \-b TYPE, \-\-build-type=TYPE
+Set the Koji build type to TYPE.  By default, rpminspect will try to
+automatically determine the build type of the inputs.  In some cases
+you may want to explicitly set the type if it is having trouble
+determining the build type.  This option is most useful when using
+locally provided Koji input subdirectories.  Supported build types can
+be seen with the \-l option.
+.TP
 .B \-o FILE, \-\-output=FILE
 Write the results to the name output file.  By default, results go to
 stdout.
 .TP
 .B \-F TYPE, \-\-format=TYPE
 Write the inspection results in the TYPE format.  The default format
-is text.  Available formats can be seen with the \-l option
+is text.  Available formats can be seen with the \-l option.
 .TP
 .B \-t TAG, \-\-threshold=TAG
 Result threshold that triggers a non-zero exit code.  By default this
