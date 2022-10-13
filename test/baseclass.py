@@ -206,6 +206,9 @@ class RequiresRpminspect(unittest.TestCase):
         ):
             raise MissingRpminspectConf
 
+        # let test cases override the build type
+        self.buildtype = "rpm"
+
         # set in configFile()
         self.conffile = None
         self.extra_cfg = None
@@ -324,6 +327,8 @@ class TestSRPM(RequiresRpminspect):
             "-d",
             "-c",
             self.conffile,
+            "-b",
+            self.buildtype,
             "-F",
             "json",
             "-r",
@@ -420,6 +425,8 @@ class TestCompareSRPM(RequiresRpminspect):
             "-d",
             "-c",
             self.conffile,
+            "-b",
+            self.buildtype,
             "-F",
             "json",
             "-r",
@@ -510,6 +517,8 @@ class TestRPMs(RequiresRpminspect):
                 "-d",
                 "-c",
                 self.conffile,
+                "-b",
+                self.buildtype,
                 "-F",
                 "json",
                 "-r",
@@ -611,6 +620,8 @@ class TestCompareRPMs(RequiresRpminspect):
                 "-d",
                 "-c",
                 self.conffile,
+                "-b",
+                self.buildtype,
                 "-F",
                 "json",
                 "-r",
@@ -694,6 +705,8 @@ class TestKoji(TestRPMs):
                 "-d",
                 "-c",
                 self.conffile,
+                "-b",
+                self.buildtype,
                 "-F",
                 "json",
                 "-r",
@@ -785,6 +798,8 @@ class TestCompareKoji(TestCompareRPMs):
                 "-d",
                 "-c",
                 self.conffile,
+                "-b",
+                self.buildtype,
                 "-F",
                 "json",
                 "-r",
