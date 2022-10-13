@@ -79,6 +79,10 @@ static bool upstream_driver(struct rpminspect *ri, rpmfile_entry_t *file)
         add_result(ri, &params);
         result = !(params.severity >= RESULT_VERIFY);
         reported = true;
+
+        /* clean up */
+        free(params.msg);
+        params.msg = NULL;
     } else {
         /* compare checksums to see if the upstream sources changed */
         before_sum = checksum(file->peer_file);
@@ -109,11 +113,10 @@ static bool upstream_driver(struct rpminspect *ri, rpmfile_entry_t *file)
 
             /* clean up */
             free(diff_output);
+            free(params.msg);
+            params.msg = NULL;
         }
     }
-
-    free(params.msg);
-    params.msg = NULL;
 
     return result;
 }
