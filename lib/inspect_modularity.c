@@ -86,6 +86,13 @@ bool inspect_modularity(struct rpminspect *ri)
     assert(ri != NULL);
 
     if (ri->buildtype != KOJI_BUILD_MODULE) {
+        init_result_params(&params);
+        xasprintf(&params.msg, _("Inspection skipped because this build's type is not `module'."));
+        params.severity = RESULT_INFO;
+        params.waiverauth = NOT_WAIVABLE;
+        params.header = NAME_MODULARITY;
+        add_result(ri, &params);
+        free(params.msg);
         return true;
     }
 
@@ -94,7 +101,7 @@ bool inspect_modularity(struct rpminspect *ri)
     if (result) {
         init_result_params(&params);
         params.severity = RESULT_OK;
-        params.waiverauth = WAIVABLE_BY_ANYONE;
+        params.waiverauth = NOT_WAIVABLE;
         params.header = NAME_MODULARITY;
         add_result(ri, &params);
     }
