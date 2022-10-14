@@ -214,6 +214,8 @@ static bool abidiff_driver(struct rpminspect *ri, rpmfile_entry_t *file)
 
     if (report || (exitcode && output)) {
         if (exitcode && output) {
+            params.severity = RESULT_VERIFY;
+            params.waiverauth = WAIVABLE_BY_ANYONE;
             params.msg = strdup(_("ABI comparison ended unexpectedly."));
             params.verb = VERB_FAILED;
             params.noun = _("abidff unexpected exit");
