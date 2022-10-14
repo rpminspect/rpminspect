@@ -91,3 +91,6 @@ autoreconf -f -i -v
 make
 make install
 cd "${CWD}" || exit 1
+
+# Update shared library cache
+ldconfig
