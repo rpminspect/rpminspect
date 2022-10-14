@@ -16,6 +16,7 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 #
 
+import os
 from baseclass import TestCompareRPMs, TestCompareKoji
 
 # Simple source files for library ABI tests
@@ -100,6 +101,12 @@ class AbidiffRebaseWithABIChangeRPMs(TestCompareRPMs):
     def setUp(self):
         super().setUp(rebase=True)
 
+        # work around a limitation or difference on musl-based toolchains
+        if os.path.isfile("/etc/alpine-release"):
+            self.extra_cfg = {}
+            self.extra_cfg["abidiff"] = {}
+            self.extra_cfg["abidiff"]["extra_args"] = "--no-unreferenced-symbols"
+
         # turn off all rpmbuild post processing stuff for the purposes of testing
         self.before_rpm.header += "\n%global __os_install_post %{nil}\n"
         self.after_rpm.header += "\n%global __os_install_post %{nil}\n"
@@ -116,6 +123,12 @@ class AbidiffRebaseWithABIChangeRPMs(TestCompareRPMs):
 class AbidiffRebaseWithABIChangeKoji(TestCompareKoji):
     def setUp(self):
         super().setUp(rebase=True)
+
+        # work around a limitation or difference on musl-based toolchains
+        if os.path.isfile("/etc/alpine-release"):
+            self.extra_cfg = {}
+            self.extra_cfg["abidiff"] = {}
+            self.extra_cfg["abidiff"]["extra_args"] = "--no-unreferenced-symbols"
 
         # turn off all rpmbuild post processing stuff for the purposes of testing
         self.before_rpm.header += "\n%global __os_install_post %{nil}\n"
