@@ -125,6 +125,7 @@ if python.found()
         'test_command.py',
         'test_config.py',
         'test_default.py',
+        'test_debuginfo.py',
         'test_desktop.py',
         'test_disttag.py',
         'test_doc.py',
