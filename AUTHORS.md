@@ -37,12 +37,16 @@ Contributors
 
 - Pino Toscano <ptoscano@redhat.com>
 
+- Preston Watson <prwatson@redhat.com>
+
 - Robbie Harwood <rharwood@redhat.com>
 
-- Serhii Turivnyi <sturivny@redhat.com>, <turivniy@gmail.com>
+- Serhii Turivnyi <sturivny@redhat.com>
 
 - Siddhesh Poyarekar <siddhesh@gotplt.org>
 
 - Tim Flink <tflink@fedoraproject.org>
 
 - wangqing <wangqing@uniontech.com>
+
+- Zuzana Miklankova <zmiklank@redhat.com>
