@@ -149,7 +149,8 @@ enum {
     BLOCK_UPSTREAM = 70,
     BLOCK_VIRUS = 71,
     BLOCK_ENVIRONMENT = 72,
-    BLOCK_LICENSEDB = 73
+    BLOCK_LICENSEDB = 73,
+    BLOCK_DEBUGINFO = 74
 };
 
 static int add_regex(const char *pattern, regex_t **regex_out)
@@ -349,6 +350,8 @@ static void add_ignore(string_list_map_t **table, int i, char *s)
         inspection = NAME_UPSTREAM;
     } else if (i == BLOCK_VIRUS) {
         inspection = NAME_VIRUS;
+    } else if (i == BLOCK_DEBUGINFO) {
+        inspection = NAME_DEBUGINFO;
     } else {
         warnx(_("*** ignore found in %d, value `%s'"), i, s);
         return;
@@ -750,6 +753,7 @@ static int read_cfgfile(struct rpminspect *ri, const char *filename)
                                                                 group != BLOCK_RUNPATH &&
                                                                 group != BLOCK_SHELLSYNTAX &&
                                                                 group != BLOCK_SPECNAME &&
+                                                                group != BLOCK_DEBUGINFO &&
                                                                 group != BLOCK_SYMLINKS &&
                                                                 group != BLOCK_TYPES &&
                                                                 group != BLOCK_UNICODE &&
@@ -887,6 +891,9 @@ static int read_cfgfile(struct rpminspect *ri, const char *filename)
                     } else if (!strcmp(key, NAME_VIRUS)) {
                         block = BLOCK_NULL;
                         group = BLOCK_VIRUS;
+                    } else if (!strcmp(key, NAME_DEBUGINFO)) {
+                        block = BLOCK_NULL;
+                        group = BLOCK_DEBUGINFO;
                     }
                 }
 
@@ -1081,6 +1088,10 @@ static int read_cfgfile(struct rpminspect *ri, const char *filename)
                             block = BLOCK_IGNORE;
                         }
                     } else if (group == BLOCK_VIRUS) {
+                        if (!strcmp(key, SECTION_IGNORE)) {
+                            block = BLOCK_IGNORE;
+                        }
+                    } else if (group == BLOCK_DEBUGINFO) {
                         if (!strcmp(key, SECTION_IGNORE)) {
                             block = BLOCK_IGNORE;
                         }
@@ -1400,6 +1411,11 @@ static int read_cfgfile(struct rpminspect *ri, const char *filename)
                             if (add_regex(t, &drentry->ignore) != 0) {
                                 warn(_("error reading %s ignore pattern"), get_deprule_desc(depkey));
                             }
+                        }
+                    } else if (group == BLOCK_DEBUGINFO) {
+                        if (!strcmp(key, SECTION_DEBUGINFO_SECTIONS)) {
+                            free(ri->debuginfo_sections);
+                            ri->debuginfo_sections = strdup(t);
                         }
                     }
                 } else if (symbol == SYMBOL_ENTRY) {
@@ -2200,6 +2216,7 @@ struct rpminspect *calloc_rpminspect(struct rpminspect *ri)
     ri->kmidiff_debuginfo_path = strdup(DEBUG_PATH);
     ri->annocheck_failure_severity = RESULT_VERIFY;
     ri->size_threshold = -1;
+    ri->debuginfo_sections = strdup(ELF_GNU_DEBUGDATA);
 
     /* Initialize commands */
     ri->commands.msgunfmt = strdup(MSGUNFMT_CMD);

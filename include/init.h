@@ -36,6 +36,7 @@
 #define SECTION_COMMON                   "common"
 #define SECTION_CONFLICTS                "conflicts"
 #define SECTION_DEBUGINFO_PATH           "debuginfo_path"
+#define SECTION_DEBUGINFO_SECTIONS       "debuginfo_sections"
 #define SECTION_DESKTOP_ENTRY_FILES_DIR  "desktop_entry_files_dir"
 #define SECTION_DESKTOP_FILE_VALIDATE    "desktop-file-validate"
 #define SECTION_DOWNLOAD_MBS             "download_mbs"
