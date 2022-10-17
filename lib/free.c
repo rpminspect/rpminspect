@@ -282,6 +282,7 @@ void free_rpminspect(struct rpminspect *ri)
     list_free(ri->unicode_excluded_mime_types, free);
     list_free(ri->unicode_forbidden_codepoints, free);
     free_deprule_ignore_map(ri->deprules_ignore);
+    free(ri->debuginfo_sections);
 
     free_peers(ri->peers);
 

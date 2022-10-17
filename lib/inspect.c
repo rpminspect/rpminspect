@@ -92,6 +92,7 @@ struct inspect inspections[] = {
     { INSPECT_RUNPATH,       "runpath",       true,  &inspect_runpath },
     { INSPECT_UNICODE,       "unicode",       true,  &inspect_unicode },
     { INSPECT_RPMDEPS,       "rpmdeps",       true,  &inspect_rpmdeps },
+    { INSPECT_DEBUGINFO,     "debuginfo",     true,  &inspect_debuginfo },
     { 0, NULL, false, NULL }
 };
 
@@ -238,6 +239,8 @@ uint64_t inspection_id(const char *name)
         return INSPECT_UNICODE;
     } else if (!strcmp(name, NAME_RPMDEPS)) {
         return INSPECT_RPMDEPS;
+    } else if (!strcmp(name, NAME_DEBUGINFO)) {
+        return INSPECT_DEBUGINFO;
     } else {
         return INSPECT_NULL;
     }
@@ -341,6 +344,8 @@ const char *inspection_desc(const uint64_t inspection)
             return DESC_UNICODE;
         case INSPECT_RPMDEPS:
             return DESC_RPMDEPS;
+        case INSPECT_DEBUGINFO:
+            return DESC_DEBUGINFO;
         default:
             return NULL;
     }
@@ -443,6 +448,8 @@ const char *inspection_header_to_desc(const char *header)
         i = INSPECT_UNICODE;
     } else if (!strcmp(header, NAME_RPMDEPS)) {
         i = INSPECT_RPMDEPS;
+    } else if (!strcmp(header, NAME_DEBUGINFO)) {
+        i = INSPECT_DEBUGINFO;
     }
 
     return inspection_desc(i);

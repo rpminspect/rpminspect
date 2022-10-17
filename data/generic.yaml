@@ -126,6 +126,7 @@ vendor:
     #changedfiles: off
     #changelog: off
     #config: off
+    #debuginfo: off
     #desktop: off
     #disttag: off
     #doc: off
@@ -1005,3 +1006,20 @@ upstream:
     # inspection.
     #ignore:
     #    - upstream-archive-name-*.tar.gz
+
+debuginfo:
+    # Optional list of glob(7) specifications or path prefixes to
+    # match files to ignore for this inspection.  The format of this
+    # list is the same as the global 'ignore' list.  The difference is
+    # the items specified here will only be used during this
+    # inspection.
+    ignore:
+        - /lib/modules/*
+        - /usr/lib/debug/.dwz/*
+        - /usr/lib/grub/*
+
+    # The ELF section name(s) required in debuginfo packages.  The
+    # default is shown here.  Some older releases may have to change
+    # this to .gdb_index, for instance.  This is a space-delimited
+    # string of section names.
+    debuginfo_sections: .gnu_debugdata

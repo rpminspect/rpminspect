@@ -774,7 +774,6 @@
  */
 #define RPMBUILD_BUILDDIR      "BUILD"
 
-
 /**
  * @def RPMBUILD_BUILDROOTDIR
  *
@@ -839,6 +838,49 @@
  * The value of the DT_RPATH or DT_RUNPATH $ORIGIN string.
  */
 #define RUNPATH_ORIGIN_STR "$ORIGIN"
+
+/** @} */
+
+/**
+ * @defgroup ELF section names used through the code.
+ *
+ * @{
+ */
+
+/**
+ * @def ELF_SYMTAB
+ *
+ * The '.symtab' ELF section.
+ */
+#define ELF_SYMTAB ".symtab"
+
+/**
+ * @def ELF_GDB_INDEX
+ *
+ * The '.gdb_index' ELF section.
+ */
+#define ELF_GDB_INDEX ".gdb_index"
+
+/**
+ * @def ELF_GNU_DEBUGDATA
+ *
+ * The '.gnu_debugdata' ELF section.
+ */
+#define ELF_GNU_DEBUGDATA ".gnu_debugdata"
+
+/**
+ * @def ELF_DEBUG_INFO
+ *
+ * The '.debug_info' ELF section.
+ */
+#define ELF_DEBUG_INFO ".debug_info"
+
+/**
+ * @def ELF_GOSYMTAB
+ *
+ * The '.gosymtab' ELF section.
+ */
+#define ELF_GOSYMTAB ".gosymtab"
 
 /** @} */
 

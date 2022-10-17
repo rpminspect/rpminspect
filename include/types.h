@@ -662,6 +662,9 @@ struct rpminspect {
     /* RPM dependency ignores -- regexps to match requirements to ignore */
     deprule_ignore_map_t *deprules_ignore;
 
+    /* debuginfo ELF section name(s) when checking for debugging symbols */
+    char *debuginfo_sections;
+
     /* Options specified by the user */
     char *before;              /* before build ID arg given on cmdline */
     char *after;               /* after build ID arg given on cmdline */

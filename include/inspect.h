@@ -715,6 +715,15 @@ bool inspect_unicode(struct rpminspect *ri);
  */
 bool inspect_rpmdeps(struct rpminspect *ri);
 
+/**
+ * @brief Main driver for the 'debuginfo' inspection.
+ *
+ *
+ * @param ri Pointer to the struct rpminspect for the program.
+ * @return True if the inspection passed, false otherwise.
+ */
+bool inspect_debuginfo(struct rpminspect *ri);
+
 /** @} */
 
 /**
@@ -1003,6 +1012,12 @@ bool inspect_rpmdeps(struct rpminspect *ri);
  */
 #define INSPECT_RPMDEPS                     (((uint64_t) 1) << 44)
 
+/**
+ * @def INSPECT_DEBUGINFO
+ * 'debuginfo' inspection ID.
+ */
+#define INSPECT_DEBUGINFO                   (((uint64_t) 1) << 45)
+
 /** @} */
 
 /**
@@ -1287,6 +1302,12 @@ bool inspect_rpmdeps(struct rpminspect *ri);
  */
 #define NAME_RPMDEPS                        "rpmdeps"
 
+/**
+ * @def NAME_DEBUGINFO
+ * The string "debuginfo"
+ */
+#define NAME_DEBUGINFO                      "debuginfo"
+
 /** @} */
 
 /**
@@ -1564,6 +1585,12 @@ bool inspect_rpmdeps(struct rpminspect *ri);
  * The description for the 'rpmdeps' inspection.
  */
 #define DESC_RPMDEPS _("Check for correct RPM dependency metadata.  Report incorrect or conflicting findings as well as expected changes when comparing a new build to an older build.  Changes are only reported when comparing builds, but this inspection will check for correct RPM dependency metadata when inspecting a single build and report findings.")
+
+/**
+ * @def DESC_DEBUGINFO
+ * The description for the 'debuginfo' inspection.
+ */
+#define DESC_DEBUGINFO _("Checks that files in RPM packages have their debugging symbols stripped and files in debuginfo packages carry debugging symbols.  When comparing builds, report where symbols unexpectedly appear or disappear and what corrective action is needed.")
 
 /** @} */
 
