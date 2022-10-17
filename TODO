@@ -15,7 +15,6 @@ the specifics will be noted during the work in progress.
 Unranked tests categories to migrate (might also decide to skip them):
 ----------------------------------------------------------------------
  TEST_SCRIPT
- TEST_STRIP
  TEST_TRIGGERS
 
 
@@ -74,6 +73,7 @@ Test categories that have been migrated:
 *TEST_METADATA (only checks for bad words, valid license, valid vendor,
                 and valid buildhost)
 *TEST_REQUIRES (rpmdeps)
+*TEST_STRIP    (debuginfo)
 
 
 Test categories excluded (see MISSING):
