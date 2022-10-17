@@ -40,9 +40,13 @@ AFTER_REL = "2"
 # Test suite Vendor name
 VENDOR = "rpminspect Test Vendor Ltd."
 
-# Set this to True to keep rpminspect results (useful to debug the test
-# suite but will make a big mess)
-KEEP_RESULTS = False
+# Run the test suite with KEEP=y (or set to anything) in the
+# environment to instruct the test suite to keep intermediate files
+# and results.
+if os.getenv("KEEP") is None:
+    KEEP_RESULTS = False
+else:
+    KEEP_RESULTS = True
 
 
 # Exceptions used by the test suite

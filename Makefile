@@ -57,6 +57,9 @@ setup:
 # The environment variable is easier.
 export QA_RPATHS = 63
 
+# To keep intermediate files and results files for each test case, set
+# KEEP=y (or to any value) in the calling environment when you run
+# 'make check'.  For example: make check KEEP=y
 check: setup
 	@test_name="$(call TARGET_ARG,)" ; \
 	if [ -z "$${test_name}" ]; then \
