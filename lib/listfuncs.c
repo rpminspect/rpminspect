@@ -127,7 +127,6 @@ string_list_t *list_difference(const string_list_t *a, const string_list_t *b)
     string_map_t *hentry = NULL;
     const string_entry_t *iter = NULL;
     string_list_t *ret = NULL;
-    string_entry_t *entry = NULL;
 
     /* Simple cases */
     if ((a == NULL || TAILQ_EMPTY(a)) && (b == NULL || TAILQ_EMPTY(b))) {
@@ -150,17 +149,7 @@ string_list_t *list_difference(const string_list_t *a, const string_list_t *b)
         HASH_FIND_STR(b_table, iter->data, hentry);
 
         if (hentry == NULL) {
-            entry = calloc(1, sizeof(*entry));
-            assert(entry != NULL);
-            entry->data = strdup(iter->data);
-
-            if (ret == NULL) {
-                ret = calloc(1, sizeof(*ret));
-                assert(ret != NULL);
-                TAILQ_INIT(ret);
-            }
-
-            TAILQ_INSERT_TAIL(ret, entry, items);
+            ret = list_add(ret, iter->data);
         }
     }
 
@@ -177,7 +166,6 @@ string_list_t *list_intersection(const string_list_t *a, const string_list_t *b)
     string_map_t *hentry = NULL;
     const string_entry_t *iter = NULL;
     string_list_t *ret = NULL;
-    string_entry_t *entry = NULL;
 
     /* Copy list b into a hash table */
     b_table = list_to_table(b);
@@ -191,17 +179,7 @@ string_list_t *list_intersection(const string_list_t *a, const string_list_t *b)
         HASH_FIND_STR(b_table, iter->data, hentry);
 
         if (hentry != NULL) {
-            entry = calloc(1, sizeof(*entry));
-            assert(entry != NULL);
-            entry->data = strdup(iter->data);
-
-            if (ret == NULL) {
-                ret = calloc(1, sizeof(*ret));
-                assert(ret != NULL);
-                TAILQ_INIT(ret);
-            }
-
-            TAILQ_INSERT_TAIL(ret, entry, items);
+            ret = list_add(ret, iter->data);
         }
     }
 
@@ -218,7 +196,6 @@ string_list_t *list_union(const string_list_t *a, const string_list_t *b)
     string_map_t *hentry = NULL;
     const string_entry_t *iter = NULL;
     string_list_t *ret = NULL;
-    string_entry_t *entry = NULL;
 
     /*
      * Iterate over both lists, adding each entry to u_table. If it's not already in
@@ -233,17 +210,7 @@ string_list_t *list_union(const string_list_t *a, const string_list_t *b)
             hentry->key = strdup(iter->data);
             HASH_ADD_KEYPTR(hh, u_table, hentry->key, strlen(hentry->key), hentry);
 
-            entry = calloc(1, sizeof(*entry));
-            assert(entry != NULL);
-            entry->data = strdup(iter->data);
-
-            if (ret == NULL) {
-                ret = calloc(1, sizeof(*ret));
-                assert(ret != NULL);
-                TAILQ_INIT(ret);
-            }
-
-            TAILQ_INSERT_TAIL(ret, entry, items);
+            ret = list_add(ret, iter->data);
         }
     }
 
@@ -256,17 +223,7 @@ string_list_t *list_union(const string_list_t *a, const string_list_t *b)
             hentry->key = strdup(iter->data);
             HASH_ADD_KEYPTR(hh, u_table, hentry->key, strlen(hentry->key), hentry);
 
-            entry = calloc(1, sizeof(*entry));
-            assert(entry != NULL);
-            entry->data = strdup(iter->data);
-
-            if (ret == NULL) {
-                ret = calloc(1, sizeof(*ret));
-                assert(ret != NULL);
-                TAILQ_INIT(ret);
-            }
-
-            TAILQ_INSERT_TAIL(ret, entry, items);
+            ret = list_add(ret, iter->data);
         }
     }
 
@@ -362,18 +319,7 @@ string_list_t *list_sort(const string_list_t *list)
     HASH_ITER(hh, map, entry, tmp_entry) {
         HASH_DEL(map, entry);
 
-        iter = calloc(1, sizeof(*iter));
-        assert(iter != NULL);
-        iter->data = strdup(entry->key);
-        assert(iter->data != NULL);
-
-        if (sorted_list == NULL) {
-            sorted_list = calloc(1, sizeof(*sorted_list));
-            assert(sorted_list != NULL);
-            TAILQ_INIT(sorted_list);
-        }
-
-        TAILQ_INSERT_TAIL(sorted_list, iter, items);
+        sorted_list = list_add(sorted_list, entry->key);
 
         free(entry->key);
         free(entry);
@@ -408,26 +354,13 @@ string_list_t * list_copy(const string_list_t *list)
 {
     const string_entry_t *iter = NULL;
     string_list_t *result = NULL;
-    string_entry_t *entry = NULL;
 
     if (list == NULL) {
         return NULL;
     }
 
     TAILQ_FOREACH(iter, list, items) {
-        entry = calloc(1, sizeof(*entry));
-        assert(entry != NULL);
-
-        entry->data = strdup(iter->data);
-        assert(entry->data != NULL);
-
-        if (result == NULL) {
-            result = calloc(1, sizeof(*result));
-            assert(result != NULL);
-            TAILQ_INIT(result);
-        }
-
-        TAILQ_INSERT_TAIL(result, entry, items);
+        result = list_add(result, iter->data);
     }
 
     return result;
@@ -446,22 +379,11 @@ string_list_t *list_from_array(const char **array)
 {
     int i = 0;
     string_list_t *list = NULL;
-    string_entry_t *entry = NULL;
 
     assert(array != NULL);
 
     for (i = 0; array[i] != NULL; i++) {
-        entry = calloc(1, sizeof(*entry));
-        assert(entry != NULL);
-        entry->data = strdup(array[i]);
-
-        if (list == NULL) {
-            list = calloc(1, sizeof(*list));
-            assert(list != NULL);
-            TAILQ_INIT(list);
-        }
-
-        TAILQ_INSERT_TAIL(list, entry, items);
+        list = list_add(list, array[i]);
     }
 
     return list;

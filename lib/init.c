@@ -197,8 +197,6 @@ static int add_regex(const char *pattern, regex_t **regex_out)
  */
 static void add_entry(string_list_t **list, const char *s)
 {
-    string_entry_t *entry = NULL;
-
     assert(list != NULL);
     assert(s != NULL);
 
@@ -213,14 +211,7 @@ static void add_entry(string_list_t **list, const char *s)
         }
     }
 
-    entry = calloc(1, sizeof(*entry));
-    assert(entry != NULL);
-
-    entry->data = strdup(s);
-    assert(entry->data != NULL);
-
-    TAILQ_INSERT_TAIL(*list, entry, items);
-
+    *list = list_add(*list, s);
     return;
 }
 
@@ -231,16 +222,9 @@ static void add_entry(string_list_t **list, const char *s)
 static void add_string_list_map_entry(string_list_map_t **table, char *key, char *value)
 {
     string_list_map_t *mapentry = NULL;
-    string_entry_t *entry = NULL;
 
     assert(key != NULL);
     assert(value != NULL);
-
-    /* create the entry for the value list */
-    entry = calloc(1, sizeof(*entry));
-    assert(entry != NULL);
-    entry->data = strdup(value);
-    assert(entry->data != NULL);
 
     /* look for the list first, add if not found */
     HASH_FIND_STR(*table, key, mapentry);
@@ -253,7 +237,7 @@ static void add_string_list_map_entry(string_list_map_t **table, char *key, char
         mapentry->value = calloc(1, sizeof(*mapentry->value));
         assert(mapentry->value != NULL);
         TAILQ_INIT(mapentry->value);
-        TAILQ_INSERT_TAIL(mapentry->value, entry, items);
+        mapentry->value = list_add(mapentry->value, value);
         HASH_ADD_KEYPTR(hh, *table, mapentry->key, strlen(mapentry->key), mapentry);
     } else {
         /* on the off chance we have an empty list of values */
@@ -264,7 +248,7 @@ static void add_string_list_map_entry(string_list_map_t **table, char *key, char
         }
 
         /* add to existing ignore list */
-        TAILQ_INSERT_TAIL(mapentry->value, entry, items);
+        mapentry->value = list_add(mapentry->value, value);
     }
 
     return;
@@ -391,7 +375,6 @@ static void process_table(char *key, char *value, const bool required, const boo
 {
     char *tmp = NULL;
     string_list_t *tokens = NULL;
-    string_entry_t *sentry = NULL;
     string_map_t *entry = NULL;
 
     assert(key != NULL);
@@ -417,11 +400,7 @@ static void process_table(char *key, char *value, const bool required, const boo
             tokens = strsplit(entry->value, " ");
             assert(tokens != NULL);
 
-            sentry = calloc(1, sizeof(*sentry));
-            assert(sentry != NULL);
-            sentry->data = strdup(value);
-            assert(sentry->data != NULL);
-            TAILQ_INSERT_TAIL(tokens, sentry, items);
+            tokens = list_add(tokens, value);
 
             tmp = list_to_string(tokens, " ");
             list_free(tokens, free);
@@ -590,7 +569,6 @@ static int read_cfgfile(struct rpminspect *ri, const char *filename)
     bool exclude = false;
     dep_type_t depkey = TYPE_NULL;
     deprule_ignore_map_t *drentry = NULL;
-    string_entry_t *sentry = NULL;
 
     assert(ri != NULL);
     assert(filename != NULL);
@@ -1161,11 +1139,7 @@ static int read_cfgfile(struct rpminspect *ri, const char *filename)
                                 TAILQ_INIT(ri->licensedb);
                             }
 
-                            sentry = calloc(1, sizeof(*sentry));
-                            assert(sentry != NULL);
-                            sentry->data = strdup(t);
-                            assert(sentry->data != NULL);
-                            TAILQ_INSERT_TAIL(ri->licensedb, sentry, items);
+                            ri->licensedb = list_add(ri->licensedb, t);
                         } else if (!strcmp(key, SECTION_FAVOR_RELEASE)) {
                             if (!strcasecmp(t, TOKEN_NONE)) {
                                 ri->favor_release = FAVOR_NONE;
@@ -1758,7 +1732,6 @@ bool init_rebaseable(struct rpminspect *ri)
     string_list_t *contents = NULL;
     string_entry_t *entry = NULL;
     char *line = NULL;
-    string_entry_t *newentry = NULL;
 
     assert(ri != NULL);
     assert(ri->vendor_data_dir != NULL);
@@ -1802,10 +1775,7 @@ bool init_rebaseable(struct rpminspect *ri)
         }
 
         /* add the entry to the actual list */
-        newentry = calloc(1, sizeof(*newentry));
-        assert(newentry != NULL);
-        newentry->data = strdup(line);
-        TAILQ_INSERT_TAIL(ri->rebaseable, newentry, items);
+        ri->rebaseable = list_add(ri->rebaseable, line);
     }
 
     list_free(contents, free);
@@ -2132,7 +2102,6 @@ bool init_icons(struct rpminspect *ri)
     string_list_t *contents = NULL;
     string_entry_t *entry = NULL;
     char *line = NULL;
-    string_entry_t *newentry = NULL;
 
     assert(ri != NULL);
     assert(ri->vendor_data_dir != NULL);
@@ -2173,10 +2142,7 @@ bool init_icons(struct rpminspect *ri)
         }
 
         /* add the entry to the actual list */
-        newentry = calloc(1, sizeof(*newentry));
-        assert(newentry != NULL);
-        newentry->data = strdup(line);
-        TAILQ_INSERT_TAIL(ri->icons, newentry, items);
+        ri->icons = list_add(ri->icons, line);
     }
 
     list_free(contents, free);
@@ -2339,10 +2305,7 @@ struct rpminspect *init_rpminspect(struct rpminspect *ri, const char *cfgfile, c
         TAILQ_INIT(ri->kernel_filenames);
 
         for(i = 0; kernelnames[i] != NULL; i++) {
-            cfg = calloc(1, sizeof(*cfg));
-            cfg->data = strdup(kernelnames[i]);
-            assert(cfg->data != NULL);
-            TAILQ_INSERT_TAIL(ri->kernel_filenames, cfg, items);
+            ri->kernel_filenames = list_add(ri->kernel_filenames, kernelnames[i]);
         }
     }
 

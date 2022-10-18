@@ -56,7 +56,6 @@ static bool find_lto_symbols(Elf *elf, string_list_t **user_data)
     string_list_t *names = NULL;
     string_entry_t *entry = NULL;
     string_entry_t *prefix = NULL;
-    string_entry_t *found = NULL;
     Elf_Arhdr *arhdr;
 
     assert(elf != NULL);
@@ -84,9 +83,7 @@ static bool find_lto_symbols(Elf *elf, string_list_t **user_data)
                     }
 
                     /* add this symbol to the list */
-                    found = calloc(1, sizeof(*found));
-                    found->data = strdup(entry->data);
-                    TAILQ_INSERT_TAIL(specifics, found, items);
+                    specifics = list_add(specifics, entry->data);
                     break;
                 }
             }

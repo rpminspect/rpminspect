@@ -35,6 +35,7 @@ char *abspath(const char *path)
 {
     char *r = NULL;
     char *p = NULL;
+    const char *delim = "/";
     string_list_t *tokens = NULL;
     string_list_t *newpath = NULL;
     string_entry_t *token = NULL;
@@ -44,12 +45,12 @@ char *abspath(const char *path)
         return NULL;
     }
 
-    if (!strcmp(path, "")) {
+    if (!strcmp(path, "") || !strcmp(path, delim)) {
         return strdup(path);
     }
 
     /* split path in to tokens */
-    tokens = strsplit(path, "/");
+    tokens = strsplit(path, delim);
     assert(tokens != NULL);
 
     /* our new path elements */
@@ -70,10 +71,7 @@ char *abspath(const char *path)
             free(element);
         } else {
             /* take this path element */
-            element = calloc(1, sizeof(*element));
-            assert(element != NULL);
-            element->data = strdup(token->data);
-            TAILQ_INSERT_TAIL(newpath, element, items);
+            newpath = list_add(newpath, token->data);
         }
     }
 

@@ -135,9 +135,7 @@ static bool dsodeps_driver(struct rpminspect *ri, rpmfile_entry_t *file)
         TAILQ_INIT(after_needed);
 
         for (i = 0; i < sz; i++) {
-            entry = calloc(1, sizeof(*entry));
-            entry->data = strdup(elf_strptr(after_elf, shdr.sh_link, (size_t) (dyn[i].d_un.d_ptr)));
-            TAILQ_INSERT_TAIL(after_needed, entry, items);
+            after_needed = list_add(after_needed, elf_strptr(after_elf, shdr.sh_link, (size_t) (dyn[i].d_un.d_ptr)));
         }
 
         free(dyn);
@@ -149,9 +147,7 @@ static bool dsodeps_driver(struct rpminspect *ri, rpmfile_entry_t *file)
         TAILQ_INIT(before_needed);
 
         for (i = 0; i < sz; i++) {
-            entry = calloc(1, sizeof(*entry));
-            entry->data = strdup(elf_strptr(before_elf, shdr.sh_link, (size_t) (dyn[i].d_un.d_ptr)));
-            TAILQ_INSERT_TAIL(before_needed, entry, items);
+            before_needed = list_add(before_needed, elf_strptr(before_elf, shdr.sh_link, (size_t) (dyn[i].d_un.d_ptr)));
         }
 
         free(dyn);

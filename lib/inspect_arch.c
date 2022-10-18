@@ -75,17 +75,8 @@ bool inspect_arch(struct rpminspect *ri)
             continue;
         }
 
-        entry = calloc(1, sizeof(*entry));
-        assert(entry != NULL);
-        entry->data = strdup(before_arch);
-        assert(entry->data != NULL);
-        TAILQ_INSERT_TAIL(before_arches, entry, items);
-
-        entry = calloc(1, sizeof(*entry));
-        assert(entry != NULL);
-        entry->data = strdup(after_arch);
-        assert(entry->data != NULL);
-        TAILQ_INSERT_TAIL(after_arches, entry, items);
+        before_arches = list_add(before_arches, before_arch);
+        after_arches = list_add(after_arches, after_arch);
     }
 
     /* Compute what was lost and gained */

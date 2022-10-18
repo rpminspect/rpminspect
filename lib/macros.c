@@ -227,7 +227,7 @@ string_list_t *get_macros(const char *s)
     string_list_t *fields = NULL;
     string_entry_t *entry = NULL;
     string_list_t *macros = NULL;
-    string_entry_t *newmacro = NULL;
+    char *data = NULL;
 
     if (s == NULL) {
         return NULL;
@@ -248,22 +248,16 @@ string_list_t *get_macros(const char *s)
         }
 
         if (found) {
-            if (macros == NULL) {
-                macros = calloc(1, sizeof(*macros));
-                TAILQ_INIT(macros);
-            }
-
-            newmacro = calloc(1, sizeof(*newmacro));
-
             /* macros might be conditional, ignore the '?' */
             if (entry->data && entry->data[0] == '?') {
-                newmacro->data = strdup(entry->data + 1);
+                data = entry->data;
+                data++;
             } else {
-                newmacro->data = strdup(entry->data);
+                data = entry->data;
             }
 
-            DEBUG_PRINT("newmacro=|%s|\n", newmacro->data);
-            TAILQ_INSERT_TAIL(macros, newmacro, items);
+            DEBUG_PRINT("found new macro=|%s|\n", data);
+            macros = list_add(macros, data);
             found = false;
         }
     }

@@ -84,12 +84,11 @@ static void convert_module_parameters(string_list_t *list, const struct kmod_lis
 
 static void convert_module_dependencies(string_list_t *list, const struct kmod_list *modinfo)
 {
-    const char *key;
-    const char *value;
-    char *value_copy;
-    char *value_iter;
-    char *token;
-    string_entry_t *entry;
+    const char *key = NULL;
+    const char *value = NULL;
+    char *value_copy = NULL;
+    char *value_iter = NULL;
+    char *token = NULL;
 
     key = kmod_module_info_get_key(modinfo);
 
@@ -108,16 +107,10 @@ static void convert_module_dependencies(string_list_t *list, const struct kmod_l
     /* The value is a comma-separated list of dependencies. Break it up into individual entries. */
     value_copy = strdup(value);
     assert(value_copy != NULL);
-
     value_iter = value_copy;
+
     while ((token = strsep(&value_iter, ",")) != NULL) {
-        entry = calloc(1, sizeof(*entry));
-        assert(entry != NULL);
-
-        entry->data = strdup(token);
-        assert(entry->data != NULL);
-
-        TAILQ_INSERT_TAIL(list, entry, items);
+        list = list_add(list, token);
     }
 
     free(value_copy);
@@ -246,7 +239,6 @@ kernel_alias_data_t *gather_module_aliases(const char *module_name, const struct
 {
     kernel_alias_data_t *r = NULL;
     kernel_alias_data_t *kentry = NULL;
-    string_entry_t *mentry = NULL;
     const struct kmod_list *iter = NULL;
     const char *key = NULL;
     const char *value = NULL;
@@ -268,11 +260,6 @@ kernel_alias_data_t *gather_module_aliases(const char *module_name, const struct
             continue;
         }
 
-        mentry = calloc(1, sizeof(*mentry));
-        assert(mentry != NULL);
-        mentry->data = strdup(module_name);
-        assert(mentry->data != NULL);
-
         HASH_FIND_STR(r, value, kentry);
 
         if (kentry == NULL) {
@@ -282,14 +269,11 @@ kernel_alias_data_t *gather_module_aliases(const char *module_name, const struct
             kentry->alias = strdup(value);
             assert(kentry->alias != NULL);
 
-            kentry->modules = calloc(1, sizeof(*kentry->modules));
-            assert(kentry->modules != NULL);
-            TAILQ_INIT(kentry->modules);
+            kentry->modules = list_add(kentry->modules, module_name);
 
-            TAILQ_INSERT_TAIL(kentry->modules, mentry, items);
             HASH_ADD_KEYPTR(hh, r, kentry->alias, strlen(kentry->alias), kentry);
         } else {
-            TAILQ_INSERT_TAIL(kentry->modules, mentry, items);
+            kentry->modules = list_add(kentry->modules, module_name);
         }
     }
 
@@ -321,27 +305,16 @@ static string_list_t *wildcard_alias_search(const char *alias, kernel_alias_data
 {
     string_list_t *r = NULL;
     string_entry_t *iter = NULL;
-    string_entry_t *entry = NULL;
     kernel_alias_data_t *kentry = NULL;
     kernel_alias_data_t *tmp_kentry = NULL;
 
     assert(alias != NULL);
     assert(data != NULL);
 
-    r = calloc(1, sizeof(*r));
-    assert(r != NULL);
-    TAILQ_INIT(r);
-
     HASH_ITER(hh, data, kentry, tmp_kentry) {
         if (fnmatch(kentry->alias, alias, 0) == 0) {
             TAILQ_FOREACH(iter, kentry->modules, items) {
-                entry = calloc(1, sizeof(*entry));
-                assert(entry != NULL);
-
-                entry->data = strdup(iter->data);
-                assert(entry->data != NULL);
-
-                TAILQ_INSERT_TAIL(r, entry, items);
+                r = list_add(r, iter->data);
             }
         }
     }

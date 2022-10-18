@@ -515,28 +515,20 @@ string_list_t *strsplit(const char *s, const char *delim)
     char *walkp = NULL;
     char *token = NULL;
     string_list_t *list = NULL;
-    string_entry_t *entry = NULL;
 
     if (s == NULL) {
         return NULL;
     }
 
+    /* given a string but no delim, just make a single entry list */
+    if (s && (delim == NULL || !strcmp(delim, "") || !strcmp(s, delim))) {
+        list = list_add(list, s);
+        return list;
+    }
+
     walk = strdup(s);
     assert(walk != NULL);
     walkp = walk;
-
-    list = calloc(1, sizeof(*list));
-    assert(list != NULL);
-    TAILQ_INIT(list);
-
-    /* given a string but no delim, just make a single entry list */
-    if (s && delim == NULL) {
-        entry = calloc(1, sizeof(*entry));
-        assert(entry != NULL);
-        entry->data = strdup(walk);
-        TAILQ_INSERT_TAIL(list, entry, items);
-        return list;
-    }
 
     /* split the string and build the list */
     while ((token = strsep(&walk, delim)) != NULL) {
@@ -544,10 +536,7 @@ string_list_t *strsplit(const char *s, const char *delim)
             continue;
         }
 
-        entry = calloc(1, sizeof(*entry));
-        assert(entry != NULL);
-        entry->data = strdup(token);
-        TAILQ_INSERT_TAIL(list, entry, items);
+        list = list_add(list, token);
     }
 
     free(walkp);

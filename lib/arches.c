@@ -33,7 +33,6 @@
 void init_arches(struct rpminspect *ri)
 {
     rpmpeer_entry_t *peer = NULL;
-    string_entry_t *entry = NULL;
     bool found = false;
     const char *arch = NULL;
 
@@ -61,10 +60,7 @@ void init_arches(struct rpminspect *ri)
         found = list_contains(ri->arches, arch);
 
         if (!found) {
-            entry = calloc(1, sizeof(*entry));
-            assert(entry != NULL);
-            entry->data = strdup(arch);
-            TAILQ_INSERT_TAIL(ri->arches, entry, items);
+            ri->arches = list_add(ri->arches, arch);
         }
     }
 
