@@ -1235,7 +1235,6 @@ struct koji_task *get_koji_task(struct rpminspect *ri, const char *taskspec)
 string_list_t *get_all_arches(const struct rpminspect *ri)
 {
     string_list_t *arches = NULL;
-    string_entry_t *arch = NULL;
     int size = 0;
     int i = 0;
     xmlrpc_env env;
@@ -1255,17 +1254,7 @@ string_list_t *get_all_arches(const struct rpminspect *ri)
     }
 
     /* initialize our list of architectures, always allow 'src' */
-    arches = calloc(1, sizeof(*(arches)));
-    assert(arches != NULL);
-    TAILQ_INIT(arches);
-
-    arch = calloc(1, sizeof(*arch));
-    assert(arch != NULL);
-
-    arch->data = strdup(SRPM_ARCH_NAME);
-    assert(arch->data != NULL);
-
-    TAILQ_INSERT_TAIL(arches, arch, items);
+    arches = list_add(arches, SRPM_ARCH_NAME);
 
     /* initialize everything and get XMLRPC ready */
     xmlrpc_limit_set(XMLRPC_XML_SIZE_LIMIT_ID, SIZE_MAX);
@@ -1335,30 +1324,18 @@ string_list_t *get_all_arches(const struct rpminspect *ri)
         }
 
         /* add this architecture to the list */
-        arch = calloc(1, sizeof(*arch));
-        assert(arch != NULL);
-        arch->data = element;
-
-        TAILQ_INSERT_TAIL(arches, arch, items);
+        arches = list_add(arches, element);
     }
 
     xmlrpc_DECREF(result);
 
     /* Always add 'noarch' and 'src' to this list */
     if (!have_noarch) {
-        arch = calloc(1, sizeof(*arch));
-        assert(arch != NULL);
-        arch->data = strdup(RPM_NOARCH_NAME);
-        assert(arch->data != NULL);
-        TAILQ_INSERT_TAIL(arches, arch, items);
+        arches = list_add(arches, RPM_NOARCH_NAME);
     }
 
     if (!have_src) {
-        arch = calloc(1, sizeof(*arch));
-        assert(arch != NULL);
-        arch->data = strdup(SRPM_ARCH_NAME);
-        assert(arch->data != NULL);
-        TAILQ_INSERT_TAIL(arches, arch, items);
+        arches = list_add(arches, SRPM_ARCH_NAME);
     }
 
     /* Cleanup */

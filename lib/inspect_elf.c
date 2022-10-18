@@ -392,18 +392,12 @@ static const char *pflags_to_str(uint64_t flags)
 
 static void add_execstack_flag_str(string_list_t *list, const char *s)
 {
-    string_entry_t *entry = NULL;
-
     if (s == NULL) {
         return;
     }
 
     assert(list != NULL);
-    entry = calloc(1, sizeof(*entry));
-    assert(entry != NULL);
-    entry->data = strdup(s);
-    assert(entry->data != NULL);
-    TAILQ_INSERT_TAIL(list, entry, items);
+    list = list_add(list, s);
 
     return;
 }
@@ -607,7 +601,6 @@ static bool check_relro(struct rpminspect *ri, Elf *before_elf, Elf *after_elf, 
  */
 bool find_no_pic(Elf *elf, string_list_t **no_pic_list)
 {
-    string_entry_t *entry = NULL;
     Elf_Arhdr *arhdr = NULL;
 
     if ((arhdr = elf_getarhdr(elf)) == NULL) {
@@ -622,17 +615,7 @@ bool find_no_pic(Elf *elf, string_list_t **no_pic_list)
     }
 
     if (!is_pic_ok(elf)) {
-        entry = calloc(1, sizeof(*entry));
-        assert(entry != NULL);
-        entry->data = strdup(arhdr->ar_name);
-
-        if (*no_pic_list == NULL) {
-            *no_pic_list = calloc(1, sizeof(**no_pic_list));
-            assert(*no_pic_list != NULL);
-            TAILQ_INIT(*no_pic_list);
-        }
-
-        TAILQ_INSERT_TAIL(*no_pic_list, entry, items);
+        *no_pic_list = list_add(*no_pic_list, arhdr->ar_name);
     }
 
     return true;
@@ -647,7 +630,6 @@ bool find_no_pic(Elf *elf, string_list_t **no_pic_list)
  */
 bool find_pic(Elf *elf, string_list_t **pic_list)
 {
-    string_entry_t *entry = NULL;
     Elf_Arhdr *arhdr = NULL;
 
     if ((arhdr = elf_getarhdr(elf)) == NULL) {
@@ -662,17 +644,7 @@ bool find_pic(Elf *elf, string_list_t **pic_list)
     }
 
     if (is_pic_ok(elf)) {
-        entry = calloc(1, sizeof(*entry));
-        assert(entry != NULL);
-        entry->data = strdup(arhdr->ar_name);
-
-        if (*pic_list == NULL) {
-            *pic_list = calloc(1, sizeof(**pic_list));
-            assert(*pic_list != NULL);
-            TAILQ_INIT(*pic_list);
-        }
-
-        TAILQ_INSERT_TAIL(*pic_list, entry, items);
+        *pic_list = list_add(*pic_list, arhdr->ar_name);
     }
 
     return true;
@@ -686,7 +658,6 @@ bool find_pic(Elf *elf, string_list_t **pic_list)
  */
 bool find_all(Elf *elf, string_list_t **all_list)
 {
-    string_entry_t *entry = NULL;
     Elf_Arhdr *arhdr = NULL;
 
     if ((arhdr = elf_getarhdr(elf)) == NULL) {
@@ -700,17 +671,7 @@ bool find_all(Elf *elf, string_list_t **all_list)
         return true;
     }
 
-    entry = calloc(1, sizeof(*entry));
-    assert(entry != NULL);
-    entry->data = strdup(arhdr->ar_name);
-
-    if (*all_list == NULL) {
-        *all_list = calloc(1, sizeof(**all_list));
-        assert(*all_list != NULL);
-        TAILQ_INIT(*all_list);
-    }
-
-    TAILQ_INSERT_TAIL(*all_list, entry, items);
+    *all_list = list_add(*all_list, arhdr->ar_name);
 
     return true;
 }

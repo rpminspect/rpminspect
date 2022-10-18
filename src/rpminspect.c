@@ -368,7 +368,6 @@ int main(int argc, char **argv)
     size_t width = tty_width();
     string_list_t *valid_arches = NULL;
     string_entry_t *arch = NULL;
-    string_entry_t *entry = NULL;
     rpmpeer_entry_t *peer = NULL;
     const char *after_rel = NULL;
     const char *before_rel = NULL;
@@ -740,11 +739,6 @@ int main(int argc, char **argv)
 
     /* if an architecture list is specified, validate it */
     if (archopt) {
-        /* initialize the list of allowed architectures */
-        ri->arches = calloc(1, sizeof(*ri->arches));
-        assert(ri->arches != NULL);
-        TAILQ_INIT(ri->arches);
-
         /* get a list of valid architectures */
         valid_arches = get_all_arches(ri);
         assert(valid_arches != NULL);
@@ -772,13 +766,7 @@ int main(int argc, char **argv)
             }
 
             /* architecture is valid, save it */
-            entry = calloc(1, sizeof(*entry));
-            assert(entry != NULL);
-
-            entry->data = strdup(token);
-            assert(entry->data != NULL);
-
-            TAILQ_INSERT_TAIL(ri->arches, entry, items);
+            ri->arches = list_add(ri->arches, token);
         }
 
         /* clean up */

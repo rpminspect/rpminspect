@@ -168,7 +168,6 @@ static string_list_t *get_explicit_requires(struct rpminspect *ri, const deprule
 {
     string_list_t *requires = NULL;
     string_entry_t *entry = NULL;
-    string_entry_t *new = NULL;
     deprule_entry_t *req = NULL;
     rpmpeer_entry_t *peer = NULL;
 
@@ -203,17 +202,7 @@ static string_list_t *get_explicit_requires(struct rpminspect *ri, const deprule
 
             TAILQ_FOREACH(entry, dep->providers, items) {
                 if (!strcmp(entry->data, req->requirement)) {
-                    if (requires == NULL) {
-                        requires = calloc(1, sizeof(*requires));
-                        assert(requires != NULL);
-                        TAILQ_INIT(requires);
-                    }
-
-                    new = calloc(1, sizeof(*new));
-                    assert(new != NULL);
-                    new->data = strdup(entry->data);
-                    assert(new->data != NULL);
-                    TAILQ_INSERT_TAIL(requires, new, items);
+                    requires = list_add(requires, entry->data);
                 }
             }
         }

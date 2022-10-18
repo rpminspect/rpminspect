@@ -245,16 +245,12 @@ string_list_t *get_elf_section_names(Elf *elf, size_t start)
     GElf_Shdr shdr;
     char *section_name = NULL;
     string_list_t *names = NULL;
-    string_entry_t *entry = NULL;
 
     assert(elf != NULL);
 
     if (elf_getshdrstrndx(elf, &shstrndx) != 0) {
         return NULL;
     }
-
-    names = calloc(1, sizeof(*names));
-    TAILQ_INIT(names);
 
     /* get the starting section */
     scn = elf_getscn(elf, start);
@@ -272,9 +268,7 @@ string_list_t *get_elf_section_names(Elf *elf, size_t start)
 
         /* copy this section name in to the list */
         if (section_name != NULL) {
-            entry = calloc(1, sizeof(*entry));
-            entry->data = strdup(section_name);
-            TAILQ_INSERT_TAIL(names, entry, items);
+            names = list_add(names, section_name);
         }
     }
 
@@ -511,29 +505,19 @@ char *get_elf_soname(const char *filepath)
     return soname;
 }
 
-static string_list_t * get_elf_symbol_list(Elf *elf, bool (*filter)(const char *), uint32_t sh_type, const char *table_name)
+static string_list_t *get_elf_symbol_list(Elf *elf, bool (*filter)(const char *), uint32_t sh_type, const char *table_name)
 {
-    Elf_Scn *scn;
+    Elf_Scn *scn = NULL;
     GElf_Shdr shdr;
-    Elf_Data *data;
-
+    Elf_Data *data = NULL;
     Elf_Scn *xndxscn = NULL;
     GElf_Shdr xndxshdr;
     Elf_Data *xndxdata = NULL;
-
     GElf_Sym sym;
-
-    size_t nentries;
-    size_t i;
-
-    char *symstr;
-
-    string_list_t *list;
-    string_entry_t *entry;
-
-    list = calloc(1, sizeof(*list));
-    assert(list != NULL);
-    TAILQ_INIT(list);
+    size_t nentries = 0;
+    size_t i = 0;
+    char *symstr = NULL;
+    string_list_t *list = NULL;
 
     /* get the .dynsym section */
     if ((scn = get_elf_section(elf, sh_type, table_name, NULL, &shdr)) == NULL) {
@@ -572,11 +556,7 @@ static string_list_t * get_elf_symbol_list(Elf *elf, bool (*filter)(const char *
 
         /* Add the symbol to the head of the list */
         if ((filter == NULL) || filter(symstr)) {
-            entry = calloc(1, sizeof(*entry));
-            assert(entry != NULL);
-            entry->data = symstr;
-
-            TAILQ_INSERT_TAIL(list, entry, items);
+            list = list_add(list, symstr);
         }
     }
 

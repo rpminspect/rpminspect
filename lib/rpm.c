@@ -200,7 +200,6 @@ string_list_t *get_rpm_header_string_array(Header hdr, rpmTagVal tag)
     string_list_t *list = NULL;
     rpmtd td = NULL;
     rpmFlags flags = HEADERGET_MINMEM | HEADERGET_EXT | HEADERGET_ARGV;
-    string_entry_t *entry = NULL;
     const char *val = NULL;
 
     if (hdr == NULL) {
@@ -215,15 +214,8 @@ string_list_t *get_rpm_header_string_array(Header hdr, rpmTagVal tag)
     }
 
     /* walk the tag and cram everything in to a list */
-    list = calloc(1, sizeof(*list));
-    assert(list != NULL);
-    TAILQ_INIT(list);
-
     while ((val = rpmtdNextString(td)) != NULL) {
-        entry = calloc(1, sizeof(*entry));
-        assert(entry != NULL);
-        entry->data = strdup(val);
-        TAILQ_INSERT_TAIL(list, entry, items);
+        list = list_add(list, val);
     }
 
     rpmtdFree(td);

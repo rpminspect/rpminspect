@@ -36,7 +36,6 @@ static string_list_t *get_tag_list(Elf *elf, const Elf64_Sxword tag)
     GElf_Shdr shdr;
     size_t i = 0;
     string_list_t *result = NULL;
-    string_entry_t *entry = NULL;
 
     assert(elf != NULL);
 
@@ -46,10 +45,7 @@ static string_list_t *get_tag_list(Elf *elf, const Elf64_Sxword tag)
         TAILQ_INIT(result);
 
         for (i = 0; i < sz; i++) {
-            entry = calloc(1, sizeof(*entry));
-            assert(entry != NULL);
-            entry->data = strdup(elf_strptr(elf, shdr.sh_link, (size_t) (dyn[i].d_un.d_ptr)));
-            TAILQ_INSERT_TAIL(result, entry, items);
+            result = list_add(result, elf_strptr(elf, shdr.sh_link, (size_t) (dyn[i].d_un.d_ptr)));
         }
 
         free(dyn);

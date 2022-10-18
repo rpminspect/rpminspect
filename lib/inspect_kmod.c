@@ -38,7 +38,6 @@ static void lost_alias(const char *alias, const string_list_t *before_modules, c
 
     assert(alias != NULL);
     assert(before_modules != NULL);
-    assert(after_modules != NULL);
     assert(ri != NULL);
 
     params.remedy = REMEDY_KMOD_ALIAS;
@@ -53,7 +52,7 @@ static void lost_alias(const char *alias, const string_list_t *before_modules, c
         reported = true;
     }
 
-    if (!TAILQ_EMPTY(after_modules)) {
+    if (after_modules && !TAILQ_EMPTY(after_modules)) {
         TAILQ_FOREACH(entry, after_modules, items) {
             xasprintf(&params.msg, _("Kernel module '%s' gained alias '%s'"), entry->data, alias);
             params.verb = VERB_ADDED;

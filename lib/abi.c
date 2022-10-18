@@ -90,7 +90,6 @@ abi_t *read_abi(const char *vendor_data_dir, const char *product_release)
     abi_t *r = NULL;
     abi_t *entry = NULL;
     string_entry_t *dsoval = NULL;
-    string_entry_t *dsoentry = NULL;
     string_list_t *contents = NULL;
     string_entry_t *line = NULL;
     string_list_t *linekv = NULL;
@@ -191,18 +190,7 @@ abi_t *read_abi(const char *vendor_data_dir, const char *product_release)
                     /* flag "all DSOs" as part of this ABI level */
                     entry->all = true;
                 } else {
-                    /* initialize the dsos list */
-                    if (entry->dsos == NULL) {
-                        entry->dsos = calloc(1, sizeof(*entry->dsos));
-                        assert(entry->dsos != NULL);
-                        TAILQ_INIT(entry->dsos);
-                    }
-
-                    dsoentry = calloc(1, sizeof(*dsoentry));
-                    assert(dsoentry != NULL);
-                    dsoentry->data = strdup(dsoval->data);
-                    assert(dsoentry->data != NULL);
-                    TAILQ_INSERT_TAIL(entry->dsos, dsoentry, items);
+                    entry->dsos = list_add(entry->dsos, dsoval->data);
                 }
             }
 

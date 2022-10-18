@@ -257,7 +257,6 @@ static int download_build(struct rpminspect *ri, const struct koji_build *build)
     yaml_token_t token;
     int in_filter = 0;
     string_list_t *filter = NULL;
-    string_entry_t *filtered_rpm = NULL;
 
     assert(build != NULL);
     assert(build->builds != NULL);
@@ -396,10 +395,7 @@ static int download_build(struct rpminspect *ri, const struct koji_build *build)
                             } else if ((in_filter == 1) && !strcmp((char *) token.data.scalar.value, "rpms")) {
                                 in_filter++;
                             } else if (in_filter == 2) {
-                                filtered_rpm = calloc(1, sizeof(*filtered_rpm));
-                                assert(filtered_rpm != NULL);
-                                filtered_rpm->data = strdup((char *) token.data.scalar.value);
-                                TAILQ_INSERT_TAIL(filter, filtered_rpm, items);
+                                filter = list_add(filter, (char *) token.data.scalar.value);
                             }
 
                             break;
