@@ -139,7 +139,6 @@ static bool badfuncs_driver(struct rpminspect *ri, rpmfile_entry_t *after)
      * forbidden functions. Since we can't pass custom arguments to
      * the filter, return them all and filter them locally. */
     after_symbols = get_elf_imported_functions(after_elf, NULL);
-    assert(after_symbols != NULL);
 
     /* Get a list of forbidden symbols that we used. */
     used_symbols = list_intersection(ri->bad_functions, after_symbols);
