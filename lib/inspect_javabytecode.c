@@ -249,8 +249,11 @@ bool inspect_javabytecode(struct rpminspect *ri)
         return false;
     }
 
-    /* look up the JVM major version; fall back on default if not found */
-    HASH_FIND_STR(ri->jvm, ri->product_release, hentry);
+    /*
+     * Look up the JVM major version; fall back on default if not found.
+     * From the product_release is trimmed the leading '.'.
+     */
+    HASH_FIND_STR(ri->jvm, ri->product_release+1, hentry);
 
     if (hentry == NULL) {
         HASH_FIND_STR(ri->jvm, "default", hentry);
