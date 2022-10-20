@@ -516,6 +516,7 @@ void free_koji_build(struct koji_build *build)
     free_koji_buildlist(build->builds);
 
     free(build);
+    build = NULL;
 
     return;
 }
@@ -534,6 +535,7 @@ void free_koji_task_entry(koji_task_entry_t *entry)
     list_free(entry->rpms, free);
     list_free(entry->logs, free);
     free(entry);
+    entry = NULL;
 
     return;
 }
@@ -567,6 +569,7 @@ void free_koji_task(struct koji_task *task)
     }
 
     free(task);
+    task = NULL;
 
     return;
 }

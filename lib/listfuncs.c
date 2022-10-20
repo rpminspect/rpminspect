@@ -439,6 +439,7 @@ string_list_t *list_add(string_list_t *list, const char *s)
     entry = calloc(1, sizeof(*entry));
     assert(entry != NULL);
     entry->data = strdup(s);
+    assert(entry->data != NULL);
     TAILQ_INSERT_TAIL(list, entry, items);
 
     return list;
