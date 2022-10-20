@@ -222,7 +222,7 @@ bool has_bind_now(Elf *elf)
 static bool is_global_reloc(GElf_Shdr *symtab_shdr, Elf_Data *symtab_data, Elf_Data *symtab_xdata, uint64_t r_sym)
 {
     GElf_Sym sym;
-    size_t num_syms;
+    size_t num_syms = 0;
 
     /* Sanity check, make sure the symbol index isn't bigger than the symbol table */
     assert(symtab_shdr->sh_entsize > 0);
@@ -231,6 +231,8 @@ static bool is_global_reloc(GElf_Shdr *symtab_shdr, Elf_Data *symtab_data, Elf_D
     if (r_sym >= num_syms) {
         return false;
     }
+
+    memset(&sym, '\0', sizeof(sym));
 
     if (gelf_getsymshndx(symtab_data, symtab_xdata, r_sym, &sym, NULL) == NULL) {
         return false;
@@ -269,13 +271,13 @@ static bool is_global_reloc(GElf_Shdr *symtab_shdr, Elf_Data *symtab_data, Elf_D
 bool is_pic_ok(Elf *elf)
 {
     GElf_Ehdr ehdr;
-    Elf_Scn *rel_section;
+    Elf_Scn *rel_section = NULL;
     GElf_Shdr rel_shdr;
     Elf_Data *rel_data = NULL;
 
-    Elf_Scn *symtab_section;
+    Elf_Scn *symtab_section = NULL;
     GElf_Shdr symtab_shdr;
-    Elf_Data *symtab_data;
+    Elf_Data *symtab_data = NULL;
 
     Elf_Scn *xndxscn = NULL;
     Elf_Data *xndxdata = NULL;
@@ -283,8 +285,8 @@ bool is_pic_ok(Elf *elf)
     GElf_Rel rel;
     GElf_Rela rela;
 
-    size_t entry_size;
-    size_t i;
+    size_t entry_size = 0;
+    size_t i = 0;
 
     assert(elf != NULL);
 
@@ -683,11 +685,11 @@ static bool elf_archive_tests(struct rpminspect *ri, Elf *after_elf, int after_e
     string_list_t *before_all = NULL;
     string_list_t *after_lost_pic = NULL;
     string_list_t *after_new = NULL;
-    string_entry_t *iter;
-    FILE *output_stream;
+    string_entry_t *iter = NULL;
+    FILE *output_stream = NULL;
     char *screendump = NULL;
-    size_t screendump_size;
-    int output_result;
+    size_t screendump_size = 0;
+    int output_result = 0;
     struct result_params params;
     bool result = true;
 
@@ -777,9 +779,8 @@ static bool elf_archive_tests(struct rpminspect *ri, Elf *after_elf, int after_e
 
     free(params.msg);
 
-    list_free(after_lost_pic, NULL);
-    list_free(after_new, NULL);
-
+    list_free(after_lost_pic, free);
+    list_free(after_new, free);
     list_free(after_no_pic, free);
     list_free(before_pic, free);
     list_free(before_all, free);

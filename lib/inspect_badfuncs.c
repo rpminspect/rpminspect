@@ -197,7 +197,7 @@ static bool badfuncs_driver(struct rpminspect *ri, rpmfile_entry_t *after)
     free(output_buffer);
 
 cleanup:
-    list_free(after_symbols, NULL);
+    list_free(after_symbols, free);
     list_free(used_symbols, free);
     list_free(sorted_used, free);
 

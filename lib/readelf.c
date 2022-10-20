@@ -603,4 +603,6 @@ void elf_archive_iterate(int fd, Elf *archive, elf_ar_action action, string_list
 
     /* Rewind the archive */
     elf_rand(archive, SARMAG);
+
+    return;
 }

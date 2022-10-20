@@ -606,6 +606,7 @@ static int download_task(struct rpminspect *ri, struct koji_task *task)
 
         if (mkdirp(dst, mode)) {
             warn("mkdirp");
+            free(dst);
             return -1;
         }
 
@@ -624,6 +625,7 @@ static int download_task(struct rpminspect *ri, struct koji_task *task)
 
                 if (mkdirp(dst, mode)) {
                     warn("mkdirp");
+                    free(dst);
                     return -1;
                 }
 
@@ -892,6 +894,8 @@ int gather_builds(struct rpminspect *ri, bool fo)
         if (is_local_build(ri->workdir, ri->after, fetch_only) || is_local_rpm(ri, ri->after)) {
             if (gather_local_build(ri->after) == -1) {
                 warnx(_("unable to gather after build: %s"), ri->after);
+                free_koji_task(task);
+                free_koji_build(build);
                 return -1;
             }
         } else if (is_remote_rpm(ri->after)) {
@@ -899,6 +903,8 @@ int gather_builds(struct rpminspect *ri, bool fo)
 
             if (r != RI_SUCCESS) {
                 warnx(_("unable to download after RPM: %s"), ri->after);
+                free_koji_task(task);
+                free_koji_build(build);
                 return r;
             }
         } else if (is_task_id(ri->after) && task != NULL) {
@@ -908,8 +914,10 @@ int gather_builds(struct rpminspect *ri, bool fo)
                 r = download_build(ri, innerbuild);
 
                 if (r != RI_SUCCESS) {
-                    free_koji_build(innerbuild);
                     warnx(_("unable to download after build: %s"), ri->after);
+                    free_koji_task(task);
+                    free_koji_build(build);
+                    free_koji_build(innerbuild);
                     return r;
                 }
 
@@ -920,6 +928,7 @@ int gather_builds(struct rpminspect *ri, bool fo)
                 if (r != RI_SUCCESS) {
                     warnx(_("unable to download after task: %s"), ri->after);
                     free_koji_task(task);
+                    free_koji_build(build);
                     return r;
                 }
             }
@@ -930,15 +939,22 @@ int gather_builds(struct rpminspect *ri, bool fo)
 
             if (r != RI_SUCCESS) {
                 warnx(_("unable to download after build: %s"), ri->after);
+                free_koji_task(task);
                 free_koji_build(build);
                 return r;
             }
 
             free_koji_build(build);
         } else {
+            free_koji_task(task);
+            free_koji_build(build);
             return -1;
         }
     }
+
+    /* final cleanup for the after build */
+    free_koji_task(task);
+    free_koji_build(build);
 
     /* did we get a before build specified? */
     if (ri->before == NULL) {
@@ -953,6 +969,8 @@ int gather_builds(struct rpminspect *ri, bool fo)
     if (is_local_build(ri->workdir, ri->before, fetch_only) || is_local_rpm(ri, ri->before)) {
         if (gather_local_build(ri->before) == -1) {
             warnx(_("unable to gather before build: %s"), ri->after);
+            free_koji_task(task);
+            free_koji_build(build);
             return -1;
         }
     } else if (is_remote_rpm(ri->before)) {
@@ -960,6 +978,8 @@ int gather_builds(struct rpminspect *ri, bool fo)
 
         if (r != RI_SUCCESS) {
             warnx(_("unable to download before RPM: %s"), ri->after);
+            free_koji_task(task);
+            free_koji_build(build);
             return r;
         }
     } else if (is_task_id(ri->before) && task != NULL) {
@@ -971,6 +991,8 @@ int gather_builds(struct rpminspect *ri, bool fo)
             if (r != RI_SUCCESS) {
                 warnx(_("unable to download before build: %s"), ri->after);
                 free_koji_build(innerbuild);
+                free_koji_build(build);
+                free_koji_task(task);
                 return r;
             }
 
@@ -980,6 +1002,8 @@ int gather_builds(struct rpminspect *ri, bool fo)
 
             if (r != RI_SUCCESS) {
                 warnx(_("unable to download before task: %s"), ri->after);
+                free_koji_task(task);
+                free_koji_build(build);
                 free_koji_task(task);
                 return r;
             }
@@ -995,10 +1019,17 @@ int gather_builds(struct rpminspect *ri, bool fo)
             return r;
         }
 
+        free_koji_task(task);
         free_koji_build(build);
     } else {
+        free_koji_task(task);
+        free_koji_build(build);
         return -1;
     }
+
+    /* final cleanup for the before build */
+    free_koji_task(task);
+    free_koji_build(build);
 
     /*
      * init the arches list if the user did not specify it (we have
