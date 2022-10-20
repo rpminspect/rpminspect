@@ -160,7 +160,13 @@ static char *get_product_release(string_map_t *products, const favor_release_t f
 
     assert(after != NULL);
 
+    /* skip up to the dist tag */
     while (*after != '.' && *after != '\0') {
+        after++;
+    }
+
+    /* trim the leading period */
+    while (*after == '.' && *after != '\0') {
         after++;
     }
 
@@ -187,7 +193,13 @@ static char *get_product_release(string_map_t *products, const favor_release_t f
     after_candidate[strcspn(after_candidate, "/")] = 0;
 
     if (before) {
+        /* skip up to the dist tag */
         while (*before != '.' && *before != '\0') {
+            before++;
+        }
+
+        /* trim the leading period */
+        while (*before == '.' && *before != '\0') {
             before++;
         }
 
