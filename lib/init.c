@@ -1619,6 +1619,7 @@ bool init_caps(struct rpminspect *ri)
 {
     char *line = NULL;
     char *token = NULL;
+    char *delim = NULL;
     string_list_t *contents = NULL;
     string_entry_t *entry = NULL;
     caps_field_t field = PACKAGE;
@@ -1667,8 +1668,14 @@ bool init_caps(struct rpminspect *ri)
             continue;
         }
 
+        /*
+         * the first two fields are space delimited, but then take the
+         * 3rd field to the end of the line
+         */
+        delim = " \t";
+
         /* read the fields */
-        while ((token = strsep(&line, " \t")) != NULL) {
+        while ((token = strsep(&line, delim)) != NULL) {
             /* might be lots of space between fields */
             if (*token == '\0') {
                 continue;
@@ -1702,6 +1709,9 @@ bool init_caps(struct rpminspect *ri)
             } else if (field == FILEPATH && filelist_entry->path == NULL) {
                 filelist_entry->path = strdup(token);
                 field = CAPABILITIES;
+
+                /* reset to take the remaining part of the line as the 3rd field */
+                delim = "\r\n";
             } else if (field == CAPABILITIES && filelist_entry->caps == NULL) {
                 filelist_entry->caps = strdup(token);
             } else {
