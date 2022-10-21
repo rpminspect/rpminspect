@@ -932,8 +932,6 @@ int gather_builds(struct rpminspect *ri, bool fo)
                     return r;
                 }
             }
-
-            free_koji_task(task);
         } else if (build != NULL) {
             r = download_build(ri, build);
 
@@ -943,18 +941,16 @@ int gather_builds(struct rpminspect *ri, bool fo)
                 free_koji_build(build);
                 return r;
             }
-
-            free_koji_build(build);
         } else {
             free_koji_task(task);
             free_koji_build(build);
             return -1;
         }
-    }
 
-    /* final cleanup for the after build */
-    free_koji_task(task);
-    free_koji_build(build);
+        /* final cleanup for the after build */
+        free_koji_task(task);
+        free_koji_build(build);
+    }
 
     /* did we get a before build specified? */
     if (ri->before == NULL) {
@@ -1008,8 +1004,6 @@ int gather_builds(struct rpminspect *ri, bool fo)
                 return r;
             }
         }
-
-        free_koji_task(task);
     } else if (build != NULL) {
         r = download_build(ri, build);
 
@@ -1018,9 +1012,6 @@ int gather_builds(struct rpminspect *ri, bool fo)
             free_koji_build(build);
             return r;
         }
-
-        free_koji_task(task);
-        free_koji_build(build);
     } else {
         free_koji_task(task);
         free_koji_build(build);
