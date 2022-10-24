@@ -150,7 +150,8 @@ enum {
     BLOCK_VIRUS = 71,
     BLOCK_ENVIRONMENT = 72,
     BLOCK_LICENSEDB = 73,
-    BLOCK_DEBUGINFO = 74
+    BLOCK_DEBUGINFO = 74,
+    BLOCK_PATCH_AUTOMACROS = 75
 };
 
 static int add_regex(const char *pattern, regex_t **regex_out)
@@ -951,6 +952,8 @@ static int read_cfgfile(struct rpminspect *ri, const char *filename)
                     } else if (group == BLOCK_PATCHES) {
                         if (!strcmp(key, SECTION_IGNORE_LIST)) {
                             block = BLOCK_PATCH_FILENAMES;
+                        } else if (!strcmp(key, SECTION_AUTOMACROS)) {
+                            block = BLOCK_PATCH_AUTOMACROS;
                         }
                     } else if (group == BLOCK_RUNPATH) {
                         if (!strcmp(key, SECTION_ALLOWED_PATHS)) {
@@ -1452,6 +1455,8 @@ static int read_cfgfile(struct rpminspect *ri, const char *filename)
                         add_entry(&ri->kernel_filenames, t);
                     } else if (block == BLOCK_PATCH_FILENAMES) {
                         add_entry(&ri->patch_ignore_list, t);
+                    } else if (block == BLOCK_PATCH_AUTOMACROS) {
+                        add_entry(&ri->automacros, t);
                     } else if (group == BLOCK_PATHMIGRATION_EXCLUDED_PATHS) {
                         add_entry(&ri->pathmigration_excluded_paths, t);
                     } else if (block == BLOCK_RUNPATH_ALLOWED_PATHS) {

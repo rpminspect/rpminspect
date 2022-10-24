@@ -644,21 +644,6 @@
 #define SPEC_MACRO_GLOBAL      "%global"
 
 /**
- * @def SPEC_MACRO_AUTOPATCH
- *
- * The %autopatch macro used to apply all defined Patches.
- */
-#define SPEC_MACRO_AUTOPATCH   "%autopatch"
-
-/**
- * @def SPEC_MACRO_AUTOSETUP
- *
- * The %autosetup macro used to unpack all Sources and apply all
- * defined Patches.
- */
-#define SPEC_MACRO_AUTOSETUP   "%autosetup"
-
-/**
  * @def SPEC_MACRO_PATCH
  *
  * The %patchN macro used to apply patches.  N corresponds to the

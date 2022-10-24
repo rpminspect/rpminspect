@@ -94,13 +94,18 @@ static void free_applied_patches(applied_patches_t *table)
  * Returns true if the %autopatch or %autosetup macros are in use in
  * the spec file.
  */
-static bool have_automacro(const rpmfile_entry_t *specfile)
+static bool have_automacro(const struct rpminspect *ri, const rpmfile_entry_t *specfile)
 {
     bool r = false;
     bool in_valid_section = false;
     string_list_t *contents = NULL;
     string_entry_t *entry = NULL;
+    string_entry_t *macro = NULL;
     char *buf = NULL;
+    char *automacro = NULL;
+    char *autospace = NULL;
+
+    assert(ri != NULL);
 
     /* No spec file, we know nothing. */
     if (specfile == NULL) {
@@ -113,6 +118,8 @@ static bool have_automacro(const rpmfile_entry_t *specfile)
     if (contents == NULL) {
         return false;
     }
+
+    DEBUG_PRINT("specfile=|%s|\n", specfile->localpath);
 
     /* Look for %autopatch or %autosetup in valid sections */
     TAILQ_FOREACH(entry, contents, items) {
@@ -154,10 +161,25 @@ static bool have_automacro(const rpmfile_entry_t *specfile)
          * this matches lines that are either the macro itself, or the
          * macro followed by one or more options
          */
-        if (in_valid_section && buf && (!strcmp(buf, SPEC_MACRO_AUTOPATCH) || strprefix(buf, SPEC_MACRO_AUTOPATCH" ")
-                                        || !strcmp(buf, SPEC_MACRO_AUTOSETUP) || strprefix(buf, SPEC_MACRO_AUTOSETUP" "))) {
-            r = true;
-            break;
+        if (in_valid_section && buf && (ri->automacros != NULL && !TAILQ_EMPTY(ri->automacros))) {
+            TAILQ_FOREACH(macro, ri->automacros, items) {
+                xasprintf(&automacro, "%%%s", macro->data);
+                assert(automacro != NULL);
+                xasprintf(&autospace, "%s ", automacro);
+                assert(autospace != NULL);
+
+                if (!strcmp(buf, automacro) || strprefix(buf, autospace)) {
+                    DEBUG_PRINT("found %s macro on this line:\n    %s", automacro, buf);
+                    r = true;
+                }
+
+                free(automacro);
+                free(autospace);
+
+                if (r) {
+                    break;
+                }
+            }
         }
     }
 
@@ -579,7 +601,7 @@ bool inspect_patches(struct rpminspect *ri)
         }
 
         /* Determine if %autopatch or %autosetup is used */
-        automacro = have_automacro(specfile);
+        automacro = have_automacro(ri, specfile);
 
         /* Initialize the patches hash table */
         patchfiles = get_rpm_header_string_array(specfile->rpm_header, RPMTAG_PATCH);
