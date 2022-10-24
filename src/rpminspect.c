@@ -165,11 +165,6 @@ static char *get_product_release(string_map_t *products, const favor_release_t f
         after++;
     }
 
-    /* trim the leading period */
-    while (*after == '.' && *after != '\0') {
-        after++;
-    }
-
     if (!after) {
         warnx(_("*** Product release for after build (%s) is empty"), after);
         return NULL;
@@ -195,11 +190,6 @@ static char *get_product_release(string_map_t *products, const favor_release_t f
     if (before) {
         /* skip up to the dist tag */
         while (*before != '.' && *before != '\0') {
-            before++;
-        }
-
-        /* trim the leading period */
-        while (*before == '.' && *before != '\0') {
             before++;
         }
 
@@ -279,6 +269,11 @@ static char *get_product_release(string_map_t *products, const favor_release_t f
     }
 
     free(before_product);
+
+    /* trim the leading period */
+    while (*after_product == '.' && *after_product != '\0') {
+        after_product++;
+    }
 
     return after_product;
 }
