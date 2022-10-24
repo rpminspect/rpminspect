@@ -27,6 +27,7 @@
 #define SECTION_ALLOWED_ORIGIN_PATHS     "allowed_origin_paths"
 #define SECTION_ALLOWED_PATHS            "allowed_paths"
 #define SECTION_ANNOCHECK                "annocheck"
+#define SECTION_AUTOMACROS               "automacros"
 #define SECTION_BADWORDS                 "badwords"
 #define SECTION_BIN_GROUP                "bin_group"
 #define SECTION_BIN_OWNER                "bin_owner"

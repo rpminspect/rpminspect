@@ -747,6 +747,16 @@ kmidiff:
     #    - /usr/lib*/libexample.so*
 
 patches:
+    # List of spec file macros that handle automatic patching.  If one
+    # of these is found, rpminspect will not report defined patches
+    # missing corresponding %patch macros.  NOTE: Do not list the
+    # macros here with '%' prefixes or braces ('{' or '}').  Just list
+    # their names.
+    automacros:
+        - autopatch
+        - autosetup
+        - forgeautosetup
+
     # List of patch files to ignore in the 'patches' inspection.
     # These should match the name as specified on a PatchN: line in
     # the spec file.

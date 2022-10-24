@@ -524,6 +524,11 @@ struct rpminspect {
     string_list_t *forbidden_directories;
 
     /*
+     * Optional: List of auto macros that handle patch setup.
+     */
+    string_list_t *automacros;
+
+    /*
      * Optional: if not NULL, contains a list of forbidden function
      * names.
      */
