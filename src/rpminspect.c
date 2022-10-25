@@ -91,6 +91,7 @@ static void usage(void)
 
 /*
  * Match the candidate product string to a product string rule.
+ * Caller must free the returned string.
  */
 static char *match_product(string_map_t *products, const char *candidate)
 {
@@ -152,6 +153,8 @@ static char *match_product(string_map_t *products, const char *candidate)
 static char *get_product_release(string_map_t *products, const favor_release_t favor_release, const char *before, const char *after)
 {
     int c = -1;
+    size_t i = 0;
+    char *r = NULL;
     char *before_candidate = NULL;
     char *after_candidate = NULL;
     char *before_product = NULL;
@@ -271,11 +274,20 @@ static char *get_product_release(string_map_t *products, const favor_release_t f
     free(before_product);
 
     /* trim the leading period */
-    while (*after_product == '.' && *after_product != '\0') {
-        after_product++;
+    i = 0;
+
+    while (after_product[i] == '.' && after_product[i] != '\0') {
+        i++;
     }
 
-    return after_product;
+    if (i < strlen(after_product)) {
+        r = strdup(after_product + i);
+        assert(r != NULL);
+    }
+
+    free(after_product);
+
+    return r;
 }
 
 /*
