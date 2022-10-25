@@ -37,10 +37,6 @@
 /* Globals */
 static char *cmdprefix = NULL;
 static string_list_t *suppressions = NULL;
-static string_list_map_t *debug_info_dir1_table;
-static string_list_map_t *debug_info_dir2_table;
-static string_list_map_t *headers_dir1_table;
-static string_list_map_t *headers_dir2_table;
 static abi_t *abi = NULL;
 
 static severity_t check_abi(const severity_t sev, const long int threshold, const char *path, const char *pkg, long int *compat)
@@ -105,6 +101,7 @@ static bool abidiff_driver(struct rpminspect *ri, rpmfile_entry_t *file)
     const char *name = NULL;
     int exitcode = 0;
     char *cmd = NULL;
+    char *tmp = NULL;
     char *output = NULL;
     struct result_params params;
     bool report = false;
@@ -148,12 +145,23 @@ static bool abidiff_driver(struct rpminspect *ri, rpmfile_entry_t *file)
     }
 
     /* debug dir args */
-    cmd = add_abidiff_arg(cmd, debug_info_dir1_table, arch, ABI_DEBUG_INFO_DIR1);
-    cmd = add_abidiff_arg(cmd, debug_info_dir2_table, arch, ABI_DEBUG_INFO_DIR2);
+    tmp = joinpath(ri->worksubdir, ROOT_SUBDIR, BEFORE_SUBDIR, arch, DEBUG_PATH, NULL);
+    assert(tmp != NULL);
+    cmd = strappend(cmd, " ", ABI_DEBUG_INFO_DIR1, " ", tmp, NULL);
+    assert(cmd != NULL);
+    free(tmp);
+
+    tmp = joinpath(ri->worksubdir, ROOT_SUBDIR, AFTER_SUBDIR, arch, DEBUG_PATH, NULL);
+    assert(tmp != NULL);
+    cmd = strappend(cmd, " ", ABI_DEBUG_INFO_DIR2, " ", tmp, NULL);
+    assert(cmd != NULL);
+    free(tmp);
 
     /* header dir args */
+/*
     cmd = add_abidiff_arg(cmd, headers_dir1_table, arch, ABI_HEADERS_DIR1);
     cmd = add_abidiff_arg(cmd, headers_dir2_table, arch, ABI_HEADERS_DIR2);
+*/
 
     /* the before and after builds */
     cmd = strappend(cmd, " ", file->peer_file->fullpath, " ", file->fullpath, NULL);
@@ -242,7 +250,6 @@ static bool abidiff_driver(struct rpminspect *ri, rpmfile_entry_t *file)
 bool inspect_abidiff(struct rpminspect *ri)
 {
     bool result = false;
-    size_t num_arches = 0;
     struct result_params params;
 
     assert(ri != NULL);
@@ -252,17 +259,6 @@ bool inspect_abidiff(struct rpminspect *ri)
 
     /* if there's a .abignore file in the after SRPM, we need to use it */
     suppressions = get_abidiff_suppressions(ri, ri->abidiff_suppression_file);
-
-    /* number of architectures in the builds we have, for hash table size */
-    num_arches = list_len(ri->arches);
-
-    /* get the debug info dirs */
-    debug_info_dir1_table = get_abidiff_dir_arg(ri, num_arches, DEBUGINFO_SUFFIX, DEBUG_PATH, BEFORE_BUILD);
-    debug_info_dir2_table = get_abidiff_dir_arg(ri, num_arches, DEBUGINFO_SUFFIX, DEBUG_PATH, AFTER_BUILD);
-
-    /* get the include dirs */
-    headers_dir1_table = get_abidiff_dir_arg(ri, num_arches, NULL, INCLUDE_SUBDIR, BEFORE_BUILD);
-    headers_dir2_table = get_abidiff_dir_arg(ri, num_arches, NULL, INCLUDE_SUBDIR, AFTER_BUILD);
 
     /* build the list of first part of the command */
     if (ri->abidiff_extra_args) {
@@ -278,10 +274,6 @@ bool inspect_abidiff(struct rpminspect *ri)
     free_abi(abi);
     free(cmdprefix);
     list_free(suppressions, free);
-    free_argv_table(ri, debug_info_dir1_table);
-    free_argv_table(ri, debug_info_dir2_table);
-    free_argv_table(ri, headers_dir1_table);
-    free_argv_table(ri, headers_dir2_table);
 
     /* report the inspection results */
     if (result) {

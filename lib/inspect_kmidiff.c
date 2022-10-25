@@ -36,8 +36,6 @@
 /* Globals */
 static char *cmdprefix = NULL;
 static string_list_t *suppressions = NULL;
-static string_list_map_t *debug_info_dir1_table;
-static string_list_map_t *debug_info_dir2_table;
 static bool found_kernel_image = false;
 static char *kabi_dir = NULL;
 
@@ -153,6 +151,7 @@ static bool kmidiff_driver(struct rpminspect *ri, rpmfile_entry_t *file)
     char *fname[] = KERNEL_FILENAMES;
     char *compare = NULL;
     char *cmd = NULL;
+    char *tmp = NULL;
     char *output = NULL;
     struct result_params params;
     bool report = false;
@@ -224,8 +223,17 @@ static bool kmidiff_driver(struct rpminspect *ri, rpmfile_entry_t *file)
     }
 
     /* debug dir args */
-    cmd = add_abidiff_arg(cmd, debug_info_dir1_table, arch, ABI_DEBUG_INFO_DIR1);
-    cmd = add_abidiff_arg(cmd, debug_info_dir2_table, arch, ABI_DEBUG_INFO_DIR2);
+    tmp = joinpath(ri->worksubdir, ROOT_SUBDIR, BEFORE_SUBDIR, arch, DEBUG_PATH, NULL);
+    assert(tmp != NULL);
+    cmd = strappend(cmd, " ", ABI_DEBUG_INFO_DIR1, " ", tmp, NULL);
+    assert(cmd != NULL);
+    free(tmp);
+
+    tmp = joinpath(ri->worksubdir, ROOT_SUBDIR, AFTER_SUBDIR, arch, DEBUG_PATH, NULL);
+    assert(tmp != NULL);
+    cmd = strappend(cmd, " ", ABI_DEBUG_INFO_DIR2, " ", tmp, NULL);
+    assert(cmd != NULL);
+    free(tmp);
 
     /* the before and after kernel images and root directories */
     cmd = strappend(cmd, " ", KMIDIFF_VMLINUX1, " ", file->peer_file->fullpath, " ", KMIDIFF_VMLINUX2, " ", file->fullpath, " ", before_root, " ", after_root, NULL);
@@ -304,7 +312,6 @@ bool inspect_kmidiff(struct rpminspect *ri)
     bool result = true;
     rpmpeer_entry_t *peer = NULL;
     rpmfile_entry_t *file = NULL;
-    size_t num_arches = 0;
     struct result_params params;
 
     assert(ri != NULL);
@@ -314,11 +321,6 @@ bool inspect_kmidiff(struct rpminspect *ri)
 
     /* if there's a .abignore file in the after SRPM, we need to use it */
     suppressions = get_abidiff_suppressions(ri, ri->kmidiff_suppression_file);
-
-    /* get the debug info dirs (headers not used for kmidiff) */
-    num_arches = list_len(ri->arches);
-    debug_info_dir1_table = get_abidiff_dir_arg(ri, num_arches, DEBUGINFO_SUFFIX, DEBUG_PATH, BEFORE_BUILD);
-    debug_info_dir2_table = get_abidiff_dir_arg(ri, num_arches, DEBUGINFO_SUFFIX, DEBUG_PATH, AFTER_BUILD);
 
     /* build the list of first command line arguments */
     if (ri->kmidiff_extra_args) {
@@ -361,8 +363,6 @@ bool inspect_kmidiff(struct rpminspect *ri)
     free(cmdprefix);
     list_free(suppressions, free);
     free(kabi_dir);
-    free_argv_table(ri, debug_info_dir1_table);
-    free_argv_table(ri, debug_info_dir2_table);
 
     /* report the inspection results */
     if (result) {
