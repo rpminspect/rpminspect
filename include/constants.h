@@ -135,6 +135,29 @@
 #define DEFAULT_WORKDIR "/var/tmp/rpminspect"
 
 /**
+ * @def ROOT_SUBDIR
+ *
+ * The name of the root subdirectory used in the working directory.
+ * This is where packages are extracted as a simulated root
+ * filesystem.
+ */
+#define ROOT_SUBDIR "root"
+
+/**
+ * @def BEFORE_SUBDIR
+ *
+ * The name of the before build subdirectory in the working directory.
+ */
+#define BEFORE_SUBDIR "before"
+
+/**
+ * @def AFTER_SUBDIR
+ *
+ * The name of the after build subdirectory in the working directory.
+ */
+#define AFTER_SUBDIR "after"
+
+/**
  * @def VENDOR_DATA_DIR
  *
  * Default location for the vendor-specific data.  These files should
