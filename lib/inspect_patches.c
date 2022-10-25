@@ -169,7 +169,7 @@ static bool have_automacro(const struct rpminspect *ri, const rpmfile_entry_t *s
                 assert(autospace != NULL);
 
                 if (!strcmp(buf, automacro) || strprefix(buf, autospace)) {
-                    DEBUG_PRINT("found %s macro on this line:\n    %s", automacro, buf);
+                    DEBUG_PRINT("found %s macro on this line:\n    %s\n", automacro, buf);
                     r = true;
                 }
 
