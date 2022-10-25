@@ -164,12 +164,15 @@ static struct archive *new_archive_reader(void)
  * extraction.  Returns an rpmfile_t list of all the payload members.
  * The caller is responsible for freeing this returned list.
  *
+ * @param ri The main program data structure.
  * @param pkg Path to the RPM package to extract.
  * @param hdr RPM Header for the specified package.
+ * @param subdir The build subdirectory in workdir, but without the arch.
+ * @param output_dir The directory where this package was extracted.
  * @return rpmfile_t list of all payload members.  The caller is
  *                   responsible for freeing this list.
  */
-rpmfile_t *extract_rpm(const char *pkg, Header hdr, char **output_dir)
+rpmfile_t *extract_rpm(struct rpminspect *ri, const char *pkg, Header hdr, const char *subdir, char **output_dir)
 {
     rpmtd td = NULL;
 
@@ -192,22 +195,16 @@ rpmfile_t *extract_rpm(const char *pkg, Header hdr, char **output_dir)
 
     const int archive_flags = ARCHIVE_EXTRACT_SECURE_NODOTDOT | ARCHIVE_EXTRACT_SECURE_SYMLINKS;
 
+    assert(ri != NULL);
     assert(pkg != NULL);
     assert(hdr != NULL);
+    assert(subdir != NULL);
 
-    /*
-     * Create an output directory for the rpm payload.
-     * Name the directory the same as the package, but without the ".rpm".
-     * If some joker hands us a file that doesn't end in .rpm, slap a ".d" on the end instead.
-     */
-    if (strsuffix(pkg, RPM_FILENAME_EXTENSION)) {
-        xasprintf(output_dir, "%.*s", (int) strlen(pkg) - 4, pkg);
-    } else {
-        xasprintf(output_dir, "%s.d", pkg);
-    }
+    /* Create an output directory for the rpm payload. */
+    *output_dir = joinpath(ri->worksubdir, ROOT_SUBDIR, subdir, get_rpm_header_arch(hdr), NULL);
+    assert(*output_dir != NULL);
 
-    if (mkdir(*output_dir, S_IRWXU | S_IRGRP | S_IXGRP | S_IROTH | S_IXOTH) == -1) {
-        warn("mkdir");
+    if (mkdirp(*output_dir, S_IRWXU | S_IRGRP | S_IXGRP | S_IROTH | S_IXOTH) == -1) {
         return NULL;
     }
 

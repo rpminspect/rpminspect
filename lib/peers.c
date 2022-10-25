@@ -203,12 +203,12 @@ int extract_peers(struct rpminspect *ri, bool fetchonly)
     TAILQ_FOREACH(peer, ri->peers, items) {
         /* extract the before peer */
         if (peer->before_hdr && peer->before_rpm) {
-            peer->before_files = extract_rpm(peer->before_rpm, peer->before_hdr, &peer->before_root);
+            peer->before_files = extract_rpm(ri, peer->before_rpm, peer->before_hdr, BEFORE_SUBDIR, &peer->before_root);
         }
 
         /* extract the after peer */
         if (peer->after_hdr && peer->after_rpm) {
-            peer->after_files = extract_rpm(peer->after_rpm, peer->after_hdr, &peer->after_root);
+            peer->after_files = extract_rpm(ri, peer->after_rpm, peer->after_hdr, AFTER_SUBDIR, &peer->after_root);
         }
 
         /* match up file peers between builds */

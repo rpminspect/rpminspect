@@ -269,10 +269,10 @@ int extract_peers(struct rpminspect *ri, bool fetchonly);
 
 /* files.c */
 void free_files(rpmfile_t *files);
-rpmfile_t * extract_rpm(const char *, Header, char **output_dir);
-bool process_file_path(const rpmfile_entry_t *, regex_t *, regex_t *);
-void find_file_peers(rpmfile_t *, rpmfile_t *);
-bool is_debug_or_build_path(const char *);
+rpmfile_t *extract_rpm(struct rpminspect *ri, const char *pkg, Header hdr, const char *subdir, char **output_dir);
+bool process_file_path(const rpmfile_entry_t *file, regex_t *include_regex, regex_t *exclude_regex);
+void find_file_peers(rpmfile_t *before, rpmfile_t *after);
+bool is_debug_or_build_path(const char *path);
 
 /* tty.c */
 size_t tty_width(void);
