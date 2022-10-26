@@ -31,7 +31,7 @@ void init_result_params(struct result_params *params)
     assert(params != NULL);
 
     params->severity = RESULT_OK;
-    params->waiverauth = NOT_WAIVABLE;
+    params->waiverauth = NULL_WAIVERAUTH;
     params->header = NULL;
     params->msg = NULL;
     params->details = NULL;

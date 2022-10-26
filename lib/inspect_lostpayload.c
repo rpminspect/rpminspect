@@ -116,12 +116,10 @@ bool inspect_lostpayload(struct rpminspect *ri)
     }
 
     if (!messaged) {
+        init_result_params(&params);
+        params.header = NAME_LOSTPAYLOAD;
         params.severity = RESULT_OK;
-        params.waiverauth = NOT_WAIVABLE;
         params.verb = VERB_OK;
-        params.noun = NULL;
-        params.file = NULL;
-        params.arch = NULL;
         add_result(ri, &params);
     }
 

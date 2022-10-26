@@ -176,7 +176,6 @@ bool inspect_files(struct rpminspect *ri)
     }
 
     init_result_params(&params);
-    params.waiverauth = NOT_WAIVABLE;
     params.header = NAME_FILES;
     params.verb = VERB_OK;
 
@@ -185,6 +184,7 @@ bool inspect_files(struct rpminspect *ri)
         add_result(ri, &params);
     } else if (!src) {
         params.severity = RESULT_INFO;
+        params.waiverauth = NOT_WAIVABLE;
         xasprintf(&params.msg, _("The files inspection is only for source packages, skipping."));
         add_result(ri, &params);
         free(params.msg);

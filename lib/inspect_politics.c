@@ -180,12 +180,8 @@ bool inspect_politics(struct rpminspect *ri)
     if (result) {
         init_result_params(&params);
         params.severity = RESULT_OK;
-        params.waiverauth = NOT_WAIVABLE;
         params.header = NAME_POLITICS;
         params.verb = VERB_OK;
-        params.noun = NULL;
-        params.file = NULL;
-        params.arch = NULL;
         add_result(ri, &params);
     }
 

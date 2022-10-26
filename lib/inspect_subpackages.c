@@ -128,12 +128,10 @@ bool inspect_subpackages(struct rpminspect *ri)
 
     /* Sound the everything-is-ok alarm if everything is, in fact, ok */
     if (result) {
+        init_result_params(&params);
+        params.header = NAME_SUBPACKAGES;
         params.severity = RESULT_OK;
-        params.waiverauth = NOT_WAIVABLE;
-        params.msg = NULL;
         params.verb = VERB_OK;
-        free(params.remedy);
-        params.remedy = NULL;
         add_result(ri, &params);
     }
 

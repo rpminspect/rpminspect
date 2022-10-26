@@ -158,7 +158,6 @@ bool inspect_types(struct rpminspect *ri)
     if (!reported) {
         init_result_params(&params);
         params.severity = RESULT_OK;
-        params.waiverauth = NOT_WAIVABLE;
         params.header = NAME_TYPES;
         params.verb = VERB_OK;
         add_result(ri, &params);

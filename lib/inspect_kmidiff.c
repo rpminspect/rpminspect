@@ -367,7 +367,6 @@ bool inspect_kmidiff(struct rpminspect *ri)
     /* report the inspection results */
     if (result) {
         init_result_params(&params);
-        params.waiverauth = NOT_WAIVABLE;
         params.header = NAME_KMIDIFF;
         params.severity = RESULT_OK;
         params.verb = VERB_OK;

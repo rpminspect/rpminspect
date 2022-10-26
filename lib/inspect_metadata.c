@@ -236,12 +236,8 @@ bool inspect_metadata(struct rpminspect *ri)
     if (good) {
         init_result_params(&params);
         params.severity = RESULT_OK;
-        params.waiverauth = NOT_WAIVABLE;
         params.header = NAME_METADATA;
         params.verb = VERB_OK;
-        params.noun = NULL;
-        params.file = NULL;
-        params.arch = NULL;
         add_result(ri, &params);
     }
 

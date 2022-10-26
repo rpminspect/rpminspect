@@ -492,8 +492,10 @@ bool inspect_license(struct rpminspect *ri)
     }
 
     if (good == seen) {
+        init_result_params(&params);
+        params.header = NAME_LICENSE;
         params.severity = RESULT_OK;
-        params.msg = NULL;
+        params.verb = VERB_OK;
         add_result(ri, &params);
         result = true;
     }

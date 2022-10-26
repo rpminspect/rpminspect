@@ -88,12 +88,10 @@ bool inspect_movedfiles(struct rpminspect *ri)
 
     result = foreach_peer_file(ri, NAME_MOVEDFILES, movedfiles_driver);
 
-    init_result_params(&params);
-    params.waiverauth = NOT_WAIVABLE;
-    params.header = NAME_MOVEDFILES;
-    params.verb = VERB_OK;
-
     if (result) {
+        init_result_params(&params);
+        params.header = NAME_MOVEDFILES;
+        params.verb = VERB_OK;
         params.severity = RESULT_OK;
         add_result(ri, &params);
     }

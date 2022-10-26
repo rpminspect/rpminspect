@@ -113,7 +113,6 @@ bool inspect_specname(struct rpminspect *ri)
     foreach_peer_file(ri, NAME_SPECNAME, specname_driver);
 
     init_result_params(&params);
-    params.waiverauth = NOT_WAIVABLE;
     params.header = NAME_SPECNAME;
     params.verb = VERB_OK;
 
@@ -122,6 +121,7 @@ bool inspect_specname(struct rpminspect *ri)
         add_result(ri, &params);
     } else if (!seen) {
         params.severity = RESULT_INFO;
+        params.waiverauth = NOT_WAIVABLE;
         xasprintf(&params.msg, _("The specname inspection is only for source packages, skipping."));
         add_result(ri, &params);
         free(params.msg);
