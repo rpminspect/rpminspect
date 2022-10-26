@@ -1,4 +1,5 @@
-# Copyright © 2022 Red Hat, Inc.
+#
+# Copyright 2022 Red Hat, Inc.
 # Author(s): Zuzana Miklankova <zmiklank@redhat.com>
 #            David Cantrell <dcantrell@redhat.com>
 #

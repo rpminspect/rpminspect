@@ -1,5 +1,5 @@
 #
-# Copyright © 2020 Red Hat, Inc.
+# Copyright 2020 Red Hat, Inc.
 # Author(s): David Cantrell <dcantrell@redhat.com>
 #            Jim Bair <jbair@redhat.com>
 #

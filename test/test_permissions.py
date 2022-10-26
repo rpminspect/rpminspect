@@ -1,5 +1,5 @@
 #
-# Copyright © 2020 Red Hat, Inc.
+# Copyright 2020 Red Hat, Inc.
 # Author(s): David Cantrell <dcantrell@redhat.com>
 #
 # This program is free software: you can redistribute it and/or modify

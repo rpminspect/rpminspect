@@ -1,5 +1,5 @@
 #
-# Copyright © 2022 Red Hat, Inc.
+# Copyright 2022 Red Hat, Inc.
 # Author(s): David Cantrell <dcantrell@redhat.com>
 #            Preston Watson <prwatson@redhat.com>
 #
