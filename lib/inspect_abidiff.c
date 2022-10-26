@@ -278,7 +278,6 @@ bool inspect_abidiff(struct rpminspect *ri)
     /* report the inspection results */
     if (result) {
         init_result_params(&params);
-        params.waiverauth = NOT_WAIVABLE;
         params.header = NAME_ABIDIFF;
         params.severity = RESULT_OK;
         params.verb = VERB_OK;

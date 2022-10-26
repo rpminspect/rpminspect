@@ -222,18 +222,17 @@ bool inspect_upstream(struct rpminspect *ri)
         list_free(source, free);
     }
 
+    free(params.remedy);
+    params.remedy = NULL;
+    params.msg = NULL;
+
     /* Sound the everything-is-ok alarm if everything is, in fact, ok */
     if (result && !reported) {
         params.severity = RESULT_OK;
-        params.waiverauth = NOT_WAIVABLE;
-        params.msg = NULL;
+        params.waiverauth = NULL_WAIVERAUTH;
         params.verb = VERB_OK;
-        free(params.remedy);
-        params.remedy = NULL;
         add_result(ri, &params);
     }
-
-    free(params.remedy);
 
     return result;
 }

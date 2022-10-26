@@ -640,7 +640,6 @@ bool inspect_unicode(struct rpminspect *ri)
 
     /* report */
     init_result_params(&params);
-    params.waiverauth = NOT_WAIVABLE;
     params.header = NAME_UNICODE;
     params.verb = VERB_OK;
 
@@ -649,6 +648,7 @@ bool inspect_unicode(struct rpminspect *ri)
         add_result(ri, &params);
     } else if (!seen) {
         params.severity = RESULT_INFO;
+        params.waiverauth = NOT_WAIVABLE;
         xasprintf(&params.msg, _("The unicode inspection is only for source packages, skipping."));
         add_result(ri, &params);
         free(params.msg);

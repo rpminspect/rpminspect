@@ -364,7 +364,6 @@ bool inspect_manpage(struct rpminspect *ri)
     if (result) {
         init_result_params(&params);
         params.severity = RESULT_OK;
-        params.waiverauth = NOT_WAIVABLE;
         params.header = NAME_MANPAGE;
         params.verb = VERB_OK;
         add_result(ri, &params);

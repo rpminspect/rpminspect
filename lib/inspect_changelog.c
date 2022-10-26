@@ -489,7 +489,6 @@ bool inspect_changelog(struct rpminspect *ri)
         if (params.severity == RESULT_OK) {
             init_result_params(&params);
             params.severity = RESULT_OK;
-            params.waiverauth = NOT_WAIVABLE;
             params.header = NAME_CHANGELOG;
             add_result(ri, &params);
         }

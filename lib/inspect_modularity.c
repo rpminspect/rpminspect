@@ -101,8 +101,8 @@ bool inspect_modularity(struct rpminspect *ri)
     if (result) {
         init_result_params(&params);
         params.severity = RESULT_OK;
-        params.waiverauth = NOT_WAIVABLE;
         params.header = NAME_MODULARITY;
+        params.verb = VERB_OK;
         add_result(ri, &params);
     }
 

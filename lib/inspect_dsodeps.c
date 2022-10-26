@@ -228,7 +228,6 @@ bool inspect_dsodeps(struct rpminspect *ri)
     if (result) {
         init_result_params(&params);
         params.severity = RESULT_OK;
-        params.waiverauth = NOT_WAIVABLE;
         params.header = NAME_DSODEPS;
         params.verb = VERB_OK;
         add_result(ri, &params);

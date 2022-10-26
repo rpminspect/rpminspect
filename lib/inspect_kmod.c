@@ -312,7 +312,6 @@ bool inspect_kmod(struct rpminspect *ri)
     /* if everything was fine, just say so */
     if (result && !reported) {
         params.severity = RESULT_OK;
-        params.waiverauth = NOT_WAIVABLE;
         params.verb = VERB_OK;
         add_result(ri, &params);
     }

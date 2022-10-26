@@ -152,7 +152,6 @@ bool inspect_doc(struct rpminspect *ri)
     if (result && !reported) {
         init_result_params(&params);
         params.severity = RESULT_OK;
-        params.waiverauth = NOT_WAIVABLE;
         params.header = NAME_DOC;
         add_result(ri, &params);
     }

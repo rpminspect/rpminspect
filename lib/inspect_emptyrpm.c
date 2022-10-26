@@ -147,12 +147,10 @@ bool inspect_emptyrpm(struct rpminspect *ri)
     }
 
     if (good & !reported) {
+        init_result_params(&params);
+        params.header = NAME_EMPTYRPM;
         params.severity = RESULT_OK;
-        params.waiverauth = NOT_WAIVABLE;
         params.verb = VERB_OK;
-        params.noun = NULL;
-        params.file = NULL;
-        params.arch = NULL;
         add_result(ri, &params);
     }
 

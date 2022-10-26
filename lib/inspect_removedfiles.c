@@ -213,7 +213,6 @@ bool inspect_removedfiles(struct rpminspect *ri)
     if (result && !reported) {
         init_result_params(&params);
         params.severity = RESULT_OK;
-        params.waiverauth = NOT_WAIVABLE;
         params.header = NAME_REMOVEDFILES;
         params.verb = VERB_OK;
         add_result(ri, &params);

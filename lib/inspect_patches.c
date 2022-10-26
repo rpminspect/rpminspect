@@ -772,7 +772,7 @@ bool inspect_patches(struct rpminspect *ri)
         init_result_params(&params);
         params.header = NAME_PATCHES;
         params.severity = RESULT_OK;
-        params.waiverauth = NOT_WAIVABLE;
+        params.verb = VERB_OK;
         add_result(ri, &params);
     }
 

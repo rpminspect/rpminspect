@@ -263,7 +263,6 @@ bool inspect_disttag(struct rpminspect *ri)
 
     /* Set up result parameters */
     init_result_params(&params);
-    params.waiverauth = NOT_WAIVABLE;
     params.header = NAME_DISTTAG;
     params.verb = VERB_OK;
 
@@ -273,6 +272,7 @@ bool inspect_disttag(struct rpminspect *ri)
         add_result(ri, &params);
     } else if (!src) {
         params.severity = RESULT_INFO;
+        params.waiverauth = NOT_WAIVABLE;
         params.msg = _("Specified package is not a source RPM, skipping.");
         add_result(ri, &params);
     }

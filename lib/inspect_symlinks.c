@@ -333,7 +333,6 @@ bool inspect_symlinks(struct rpminspect *ri)
 
     if (result) {
         init_result_params(&params);
-        params.waiverauth = NOT_WAIVABLE;
         params.header = NAME_SYMLINKS;
         params.severity = RESULT_OK;
         params.verb = VERB_OK;

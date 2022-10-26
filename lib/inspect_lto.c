@@ -217,7 +217,6 @@ bool inspect_lto(struct rpminspect *ri)
 
     if (result) {
         init_result_params(&params);
-        params.waiverauth = NOT_WAIVABLE;
         params.header = NAME_LTO;
         params.severity = RESULT_OK;
         params.verb = VERB_OK;
