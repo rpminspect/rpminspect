@@ -216,11 +216,11 @@ typedef TAILQ_HEAD(rpmpeer_s, _rpmpeer_entry_t) rpmpeer_t;
 typedef enum _severity_t {
     RESULT_NULL   = 0,      /* used to indicate internal error */
     RESULT_DIAG   = 1,      /* only used by the 'diagnostics' inspection */
-    RESULT_OK     = 2,
-    RESULT_INFO   = 3,
-    RESULT_VERIFY = 4,
-    RESULT_BAD    = 5,
-    RESULT_SKIP   = 6
+    RESULT_SKIP   = 2,
+    RESULT_OK     = 3,
+    RESULT_INFO   = 4,
+    RESULT_VERIFY = 5,
+    RESULT_BAD    = 6
 } severity_t;
 
 typedef enum _waiverauth_t {
