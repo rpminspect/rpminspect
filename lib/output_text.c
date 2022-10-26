@@ -107,7 +107,9 @@ void output_text(const results_t *results, const char *dest, __attribute__((unus
 
             fprintf(fp, _("Result: %s\n"), strseverity(result->severity));
 
-            fprintf(fp, _("Waiver Authorization: %s\n\n"), strwaiverauth(result->waiverauth));
+            if (result->waiverauth > NULL_WAIVERAUTH) {
+                fprintf(fp, _("Waiver Authorization: %s\n\n"), strwaiverauth(result->waiverauth));
+            }
 
             if (result->details != NULL) {
                 fprintf(fp, _("Details:\n%s\n\n"), result->details);

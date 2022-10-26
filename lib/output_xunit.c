@@ -96,7 +96,7 @@ void output_xunit(const results_t *results, const char *dest, const severity_t t
             assert(msg != NULL);
         }
 
-        xasprintf(&rawcdata, _("Result: %s\nWaiver Authorization: %s\n\n"), strseverity(result->severity), strwaiverauth(result->waiverauth));
+        xasprintf(&rawcdata, _("Result: %s\n"), strseverity(result->severity));
         assert(rawcdata != NULL);
 
         if (msg) {
@@ -107,6 +107,20 @@ void output_xunit(const results_t *results, const char *dest, const severity_t t
 
         assert(msg != NULL);
         free(rawcdata);
+
+        if (result->waiverauth > NULL_WAIVERAUTH) {
+            xasprintf(&rawcdata, _("Waiver Authorization: %s\n\n"), strwaiverauth(result->waiverauth));
+            assert(rawcdata != NULL);
+
+            if (msg) {
+                msg = strappend(msg, rawcdata, NULL);
+            } else {
+                msg = strdup(rawcdata);
+            }
+
+            assert(msg != NULL);
+            free(rawcdata);
+        }
 
         if (result->details != NULL) {
             xasprintf(&rawcdata, _("Details:\n%s\n\n"), result->details);
