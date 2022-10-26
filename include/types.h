@@ -224,9 +224,10 @@ typedef enum _severity_t {
 } severity_t;
 
 typedef enum _waiverauth_t {
-    NOT_WAIVABLE         = 0,
-    WAIVABLE_BY_ANYONE   = 1,
-    WAIVABLE_BY_SECURITY = 2
+    NULL_WAIVERAUTH      = 0,
+    NOT_WAIVABLE         = 1,
+    WAIVABLE_BY_ANYONE   = 2,
+    WAIVABLE_BY_SECURITY = 3
 } waiverauth_t;
 
 typedef enum _verb_t {
@@ -235,7 +236,8 @@ typedef enum _verb_t {
     VERB_REMOVED = 2,   /* removed file or metadata */
     VERB_CHANGED = 3,   /* changed file or metadata */
     VERB_FAILED = 4,    /* check failing */
-    VERB_OK = 5         /* the everything is ok alarm */
+    VERB_OK = 5,        /* the everything is ok alarm */
+    VERB_SKIP = 6       /* for skipped inspections or checks */
 } verb_t;
 
 /*
