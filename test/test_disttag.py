@@ -209,7 +209,6 @@ class DistTagInMacroSRPM(RequiresRpminspect):
         self.exitcode = 0
         self.inspection = "disttag"
         self.result = "OK"
-        self.waiver_auth = "Not Waivable"
 
     def runTest(self):
         self.configFile()
@@ -308,7 +307,6 @@ class TabbedDistTagInMacroSRPM(RequiresRpminspect):
         self.exitcode = 0
         self.inspection = "disttag"
         self.result = "OK"
-        self.waiver_auth = "Not Waivable"
 
     def runTest(self):
         self.configFile()

@@ -35,7 +35,6 @@ class ValidRPATH1RPMs(TestRPMs):
 
         self.inspection = "runpath"
         self.result = "OK"
-        self.waiver_auth = "Not Waivable"
 
 
 class ValidRPATH1Koji(TestKoji):
@@ -47,7 +46,6 @@ class ValidRPATH1Koji(TestKoji):
 
         self.inspection = "runpath"
         self.result = "OK"
-        self.waiver_auth = "Not Waivable"
 
 
 class ValidRPATH1CompareRPMs(TestCompareRPMs):
@@ -59,7 +57,6 @@ class ValidRPATH1CompareRPMs(TestCompareRPMs):
 
         self.inspection = "runpath"
         self.result = "OK"
-        self.waiver_auth = "Not Waivable"
 
 
 class ValidRPATH1CompareKoji(TestCompareKoji):
@@ -71,7 +68,6 @@ class ValidRPATH1CompareKoji(TestCompareKoji):
 
         self.inspection = "runpath"
         self.result = "OK"
-        self.waiver_auth = "Not Waivable"
 
 
 ######################################################################
@@ -86,7 +82,6 @@ class ValidRPATH2RPMs(TestRPMs):
 
         self.inspection = "runpath"
         self.result = "OK"
-        self.waiver_auth = "Not Waivable"
 
 
 class ValidRPATH2Koji(TestKoji):
@@ -98,7 +93,6 @@ class ValidRPATH2Koji(TestKoji):
 
         self.inspection = "runpath"
         self.result = "OK"
-        self.waiver_auth = "Not Waivable"
 
 
 class ValidRPATH2CompareRPMs(TestCompareRPMs):
@@ -110,7 +104,6 @@ class ValidRPATH2CompareRPMs(TestCompareRPMs):
 
         self.inspection = "runpath"
         self.result = "OK"
-        self.waiver_auth = "Not Waivable"
 
 
 class ValidRPATH2CompareKoji(TestCompareKoji):
@@ -122,7 +115,6 @@ class ValidRPATH2CompareKoji(TestCompareKoji):
 
         self.inspection = "runpath"
         self.result = "OK"
-        self.waiver_auth = "Not Waivable"
 
 
 ###############################################################################################
@@ -192,7 +184,6 @@ class ValidRPATH4RPMs(TestRPMs):
 
         self.inspection = "runpath"
         self.result = "OK"
-        self.waiver_auth = "Not Waivable"
 
 
 class ValidRPATH4Koji(TestKoji):
@@ -204,7 +195,6 @@ class ValidRPATH4Koji(TestKoji):
 
         self.inspection = "runpath"
         self.result = "OK"
-        self.waiver_auth = "Not Waivable"
 
 
 class ValidRPATH4CompareRPMs(TestCompareRPMs):
@@ -218,7 +208,6 @@ class ValidRPATH4CompareRPMs(TestCompareRPMs):
 
         self.inspection = "runpath"
         self.result = "OK"
-        self.waiver_auth = "Not Waivable"
 
 
 class ValidRPATH4CompareKoji(TestCompareKoji):
@@ -232,7 +221,6 @@ class ValidRPATH4CompareKoji(TestCompareKoji):
 
         self.inspection = "runpath"
         self.result = "OK"
-        self.waiver_auth = "Not Waivable"
 
 
 ####################################################################################
@@ -249,7 +237,6 @@ class ValidRPATH5RPMs(TestRPMs):
 
         self.inspection = "runpath"
         self.result = "OK"
-        self.waiver_auth = "Not Waivable"
 
 
 class ValidRPATH5Koji(TestKoji):
@@ -263,7 +250,6 @@ class ValidRPATH5Koji(TestKoji):
 
         self.inspection = "runpath"
         self.result = "OK"
-        self.waiver_auth = "Not Waivable"
 
 
 class ValidRPATH5CompareRPMs(TestCompareRPMs):
@@ -277,7 +263,6 @@ class ValidRPATH5CompareRPMs(TestCompareRPMs):
 
         self.inspection = "runpath"
         self.result = "OK"
-        self.waiver_auth = "Not Waivable"
 
 
 class ValidRPATH5CompareKoji(TestCompareKoji):
@@ -291,7 +276,6 @@ class ValidRPATH5CompareKoji(TestCompareKoji):
 
         self.inspection = "runpath"
         self.result = "OK"
-        self.waiver_auth = "Not Waivable"
 
 
 ################################################################################################

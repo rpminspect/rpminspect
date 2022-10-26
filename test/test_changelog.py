@@ -281,7 +281,6 @@ class AddChangeLogEntryCompareSRPM(TestCompareSRPM):
         # indicates a failure in the SRPM only changelog inspection.
         self.inspection = "changelog"
         self.result = "OK"
-        self.waiver_auth = "Not Waivable"
 
 
 class AddChangeLogEntryCompareRPMs(TestCompareRPMs):

@@ -61,6 +61,7 @@ class InvalidVendorSRPM(TestSRPM):
         self.rpm.addVendor("Amalgamated Amalgamations LLC")
         self.inspection = "metadata"
         self.result = "BAD"
+        self.waiver_auth = "Not Waivable"
 
 
 # Verify invalid Vendor fails on binary RPMs (BAD)
@@ -70,6 +71,7 @@ class InvalidVendorRPMs(TestRPMs):
         self.rpm.addVendor("Amalgamated Amalgamations LLC")
         self.inspection = "metadata"
         self.result = "BAD"
+        self.waiver_auth = "Not Waivable"
 
 
 # Verify invalid Vendor fails on Koji build (BAD)
@@ -79,6 +81,7 @@ class InvalidVendorKojiBuild(TestKoji):
         self.rpm.addVendor("Amalgamated Amalgamations LLC")
         self.inspection = "metadata"
         self.result = "BAD"
+        self.waiver_auth = "Not Waivable"
 
 
 # Verify gaining Vendor reports verify on SRPM (VERIFY)
@@ -185,6 +188,7 @@ class InvalidBuildhostSubdomainSRPM(TestSRPM):
         self.rpm.addVendor(VENDOR)
         self.inspection = "metadata"
         self.result = "BAD"
+        self.waiver_auth = "Not Waivable"
 
 
 # Verify invalid Buildhost subdomain fails on binary RPMs (BAD)
@@ -195,6 +199,7 @@ class InvalidBuildhostSubdomainRPMs(TestRPMs):
         self.rpm.addVendor(VENDOR)
         self.inspection = "metadata"
         self.result = "BAD"
+        self.waiver_auth = "Not Waivable"
 
 
 # Verify invalid Buildhost subdomain fails on Koji build (BAD)
@@ -205,6 +210,7 @@ class InvalidBuildhostSubdomainKojiBuild(TestKoji):
         self.rpm.addVendor(VENDOR)
         self.inspection = "metadata"
         self.result = "BAD"
+        self.waiver_auth = "Not Waivable"
 
 
 # Verify Summary without bad words passes on an SRPM (OK)
@@ -241,6 +247,7 @@ class DirtySummarySRPM(TestSRPM):
         self.rpm.add_summary("Lorem ipsum reallybadword dolor sit amet")
         self.inspection = "metadata"
         self.result = "BAD"
+        self.waiver_auth = "Not Waivable"
 
 
 # Verify Summary with bad words fails on binary RPMs (BAD)
@@ -250,6 +257,7 @@ class DirtySummaryRPMs(TestRPMs):
         self.rpm.add_summary("Lorem ipsum reallybadword dolor sit amet")
         self.inspection = "metadata"
         self.result = "BAD"
+        self.waiver_auth = "Not Waivable"
 
 
 # Verify Summary with bad words fails on Koji build (BAD)
@@ -259,6 +267,7 @@ class DirtySummaryKojiBuild(TestKoji):
         self.rpm.add_summary("Lorem ipsum reallybadword dolor sit amet")
         self.inspection = "metadata"
         self.result = "BAD"
+        self.waiver_auth = "Not Waivable"
 
 
 # Verify changing Summary reports verify on SRPM (INFO)
@@ -356,6 +365,7 @@ class DirtyDescriptionSRPM(TestSRPM):
         )
         self.inspection = "metadata"
         self.result = "BAD"
+        self.waiver_auth = "Not Waivable"
 
 
 # Verify Description with bad words fails on binary RPMs (BAD)
@@ -372,6 +382,7 @@ class DirtyDescriptionRPMs(TestRPMs):
         )
         self.inspection = "metadata"
         self.result = "BAD"
+        self.waiver_auth = "Not Waivable"
 
 
 # Verify Description with bad words fails on Koji build (BAD)
@@ -388,6 +399,7 @@ class DirtyDescriptionKojiBuild(TestKoji):
         )
         self.inspection = "metadata"
         self.result = "BAD"
+        self.waiver_auth = "Not Waivable"
 
 
 # Verify changing Description reports verify on SRPM (INFO)

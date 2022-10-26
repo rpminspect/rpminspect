@@ -263,7 +263,6 @@ class ConfigChangesWhitespaceCompareRPMs(TestCompareRPMs):
 
         self.inspection = "config"
         self.result = "OK"
-        self.waiver_auth = "Not Waivable"
 
 
 class ConfigChangesWhitespaceCompareKoji(TestCompareKoji):
@@ -284,7 +283,6 @@ class ConfigChangesWhitespaceCompareKoji(TestCompareKoji):
 
         self.inspection = "config"
         self.result = "OK"
-        self.waiver_auth = "Not Waivable"
 
 
 class ConfigChangesWhitespaceRebaseCompareRPMs(TestCompareRPMs):
@@ -305,7 +303,6 @@ class ConfigChangesWhitespaceRebaseCompareRPMs(TestCompareRPMs):
 
         self.inspection = "config"
         self.result = "OK"
-        self.waiver_auth = "Not Waivable"
 
 
 class ConfigChangesWhitespaceRebaseCompareKoji(TestCompareKoji):
@@ -326,7 +323,6 @@ class ConfigChangesWhitespaceRebaseCompareKoji(TestCompareKoji):
 
         self.inspection = "config"
         self.result = "OK"
-        self.waiver_auth = "Not Waivable"
 
 
 # %config content differences (VERIFY)

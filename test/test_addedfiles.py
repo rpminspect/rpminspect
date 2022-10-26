@@ -293,7 +293,6 @@ class SecurityFileContinuesToExistCompareRPMs(TestCompareRPMs):
 
         self.inspection = "addedfiles"
         self.result = "OK"
-        self.waiver_auth = "Not Waivable"
 
 
 class SecurityFileContinuesToExistCompareKoji(TestCompareKoji):
@@ -313,7 +312,6 @@ class SecurityFileContinuesToExistCompareKoji(TestCompareKoji):
 
         self.inspection = "addedfiles"
         self.result = "OK"
-        self.waiver_auth = "Not Waivable"
 
 
 # New file shows up in after build for maintenance comparison -> VERIFY

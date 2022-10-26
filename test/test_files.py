@@ -49,7 +49,6 @@ class ValidFilesSectionSRPM(TestSRPM):
         # the inspection results expected
         self.inspection = "files"
         self.result = "OK"
-        self.waiver_auth = "Not Waivable"
 
 
 class ValidFilesSectionKoji(TestKoji):
@@ -75,7 +74,6 @@ class ValidFilesSectionKoji(TestKoji):
         # the inspection results expected
         self.inspection = "files"
         self.result = "OK"
-        self.waiver_auth = "Not Waivable"
 
 
 class ValidFilesSectionCompareSRPM(TestCompareSRPM):
@@ -103,7 +101,6 @@ class ValidFilesSectionCompareSRPM(TestCompareSRPM):
         # the inspection results expected
         self.inspection = "files"
         self.result = "OK"
-        self.waiver_auth = "Not Waivable"
 
 
 class ValidFilesSectionCompareKoji(TestCompareKoji):
@@ -131,7 +128,6 @@ class ValidFilesSectionCompareKoji(TestCompareKoji):
         # the inspection results expected
         self.inspection = "files"
         self.result = "OK"
-        self.waiver_auth = "Not Waivable"
 
 
 class InvalidFilesSectionSRPM(TestSRPM):

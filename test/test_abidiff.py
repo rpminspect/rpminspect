@@ -76,7 +76,6 @@ class AbidiffRebaseNoABIChangeRPMs(TestCompareRPMs):
         self.inspection = "abidiff"
         self.exitcode = 0
         self.result = "OK"
-        self.waiver_auth = "Not Waivable"
 
 
 class AbidiffRebaseNoABIChangeKoji(TestCompareKoji):
@@ -93,7 +92,6 @@ class AbidiffRebaseNoABIChangeKoji(TestCompareKoji):
         self.inspection = "abidiff"
         self.exitcode = 0
         self.result = "OK"
-        self.waiver_auth = "Not Waivable"
 
 
 # Test two builds that are a rebase and break the ABI (OK)
@@ -117,7 +115,6 @@ class AbidiffRebaseWithABIChangeRPMs(TestCompareRPMs):
         self.inspection = "abidiff"
         self.exitcode = 0
         self.result = "OK"
-        self.waiver_auth = "Not Waivable"
 
 
 class AbidiffRebaseWithABIChangeKoji(TestCompareKoji):
@@ -140,7 +137,6 @@ class AbidiffRebaseWithABIChangeKoji(TestCompareKoji):
         self.inspection = "abidiff"
         self.exitcode = 0
         self.result = "OK"
-        self.waiver_auth = "Not Waivable"
 
 
 # Test two builds that are not a rebase and break the ABI (VERIFY)

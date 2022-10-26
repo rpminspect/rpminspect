@@ -44,7 +44,6 @@ class NoLTOSymbolsRelocRPMs(TestRPMs):
         )
         self.inspection = "lto"
         self.result = "OK"
-        self.waiver_auth = "Not Waivable"
 
 
 class NoLTOSymbolsRelocKoji(TestKoji):
@@ -57,7 +56,6 @@ class NoLTOSymbolsRelocKoji(TestKoji):
         )
         self.inspection = "lto"
         self.result = "OK"
-        self.waiver_auth = "Not Waivable"
 
 
 class NoLTOSymbolsRelocCompareRPMs(TestCompareRPMs):
@@ -70,7 +68,6 @@ class NoLTOSymbolsRelocCompareRPMs(TestCompareRPMs):
         )
         self.inspection = "lto"
         self.result = "OK"
-        self.waiver_auth = "Not Waivable"
 
 
 class NoLTOSymbolsRelocCompareKoji(TestCompareKoji):
@@ -83,7 +80,6 @@ class NoLTOSymbolsRelocCompareKoji(TestCompareKoji):
         )
         self.inspection = "lto"
         self.result = "OK"
-        self.waiver_auth = "Not Waivable"
 
 
 # No LTO symbols in .a files (OK)
@@ -107,7 +103,6 @@ class NoLTOSymbolsStaticLibRPMs(TestRPMs):
 
         self.inspection = "lto"
         self.result = "OK"
-        self.waiver_auth = "Not Waivable"
 
 
 class NoLTOSymbolsStaticLibKoji(TestKoji):
@@ -130,7 +125,6 @@ class NoLTOSymbolsStaticLibKoji(TestKoji):
 
         self.inspection = "lto"
         self.result = "OK"
-        self.waiver_auth = "Not Waivable"
 
 
 class NoLTOSymbolsStaticLibCompareRPMs(TestCompareRPMs):
@@ -153,7 +147,6 @@ class NoLTOSymbolsStaticLibCompareRPMs(TestCompareRPMs):
 
         self.inspection = "lto"
         self.result = "OK"
-        self.waiver_auth = "Not Waivable"
 
 
 class NoLTOSymbolsStaticLibCompareKoji(TestCompareKoji):
@@ -176,7 +169,6 @@ class NoLTOSymbolsStaticLibCompareKoji(TestCompareKoji):
 
         self.inspection = "lto"
         self.result = "OK"
-        self.waiver_auth = "Not Waivable"
 
 
 # LTO symbols present in .o files (BAD)

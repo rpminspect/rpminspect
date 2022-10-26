@@ -47,7 +47,6 @@ class MissingSectionsInDebuginfoPkgSRPM(TestSRPM):
         # this inspection is a no-op on SRPMs
         self.inspection = "debuginfo"
         self.result = "OK"
-        self.waiver_auth = "Not Waivable"
 
 
 class MissingSectionsInDebuginfoPkgCompareSRPM(TestCompareSRPM):
@@ -63,7 +62,6 @@ class MissingSectionsInDebuginfoPkgCompareSRPM(TestCompareSRPM):
         # this inspection is a no-op on SRPMs
         self.inspection = "debuginfo"
         self.result = "OK"
-        self.waiver_auth = "Not Waivable"
 
 
 class MissingSectionsInDebuginfoPkgRPMs(TestRPMs):
@@ -131,7 +129,6 @@ class HaveDebuggingSectionsInRegularPkgSRPM(TestSRPM):
         # this inspection is a no-op on SRPMs
         self.inspection = "debuginfo"
         self.result = "OK"
-        self.waiver_auth = "Not Waivable"
 
 
 class HaveDebuggingSectionsInRegularPkgCompareSRPM(TestCompareSRPM):
@@ -147,7 +144,6 @@ class HaveDebuggingSectionsInRegularPkgCompareSRPM(TestCompareSRPM):
         # this inspection is a no-op on SRPMs
         self.inspection = "debuginfo"
         self.result = "OK"
-        self.waiver_auth = "Not Waivable"
 
 
 class HaveDebuggingSectionsInRegularPkgRPMs(TestRPMs):

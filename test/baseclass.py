@@ -61,7 +61,7 @@ class MissingRpminspectConf(Exception):
 # This function is called to check the JSON results to make sure we
 # have at least one result that matches the result and waiver_auth we
 # were expecting.
-def check_results(results, inspection, result, waiver_auth, message=None):
+def check_results(results, inspection, result, waiver_auth=None, message=None):
     if results == {} or results == [] or results is None:
         raise AssertionError("JSON test result is empty")
 
@@ -71,8 +71,10 @@ def check_results(results, inspection, result, waiver_auth, message=None):
         )
 
     for r in results[inspection]:
-        if "result" in r and "waiver authorization" in r:
-            if r["result"] == result and r["waiver authorization"] == waiver_auth:
+        if "result" in r and ((waiver_auth is None) or ("waiver authorization" in r)):
+            if r["result"] == result and (
+                (waiver_auth is None) or (r["waiver authorization"] == waiver_auth)
+            ):
                 # handle systems with partially configured rpmbuild setups
                 if message:
                     m = r.get("message")
@@ -228,6 +230,11 @@ class RequiresRpminspect(unittest.TestCase):
         # None, the value is not checked.
         self.message = None
 
+        # Default expected test results
+        self.exitcode = 0
+        self.result = "OK"
+        self.waiver_auth = None
+
     def dumpResults(self):
         r = None
 
@@ -308,11 +315,6 @@ class TestSRPM(RequiresRpminspect):
         # the inheriting class needs to override these
         self.inspection = None
         self.result_inspection = None
-
-        # defaults
-        self.exitcode = 0
-        self.result = "OK"
-        self.waiver_auth = "Not Waivable"
 
     def runTest(self):
         self.configFile()
@@ -410,7 +412,7 @@ class TestCompareSRPM(RequiresRpminspect):
         # defaults
         self.exitcode = 0
         self.result = "OK"
-        self.waiver_auth = "Not Waivable"
+        self.waiver_auth = None
 
     def runTest(self):
         self.configFile()
@@ -498,7 +500,7 @@ class TestRPMs(RequiresRpminspect):
         # defaults
         self.exitcode = 0
         self.result = "OK"
-        self.waiver_auth = "Not Waivable"
+        self.waiver_auth = None
 
     def runTest(self):
         self.configFile()
@@ -559,10 +561,11 @@ class TestRPMs(RequiresRpminspect):
             self.assertEqual(
                 self.results[self.result_inspection][0]["result"], self.result
             )
-            self.assertEqual(
-                self.results[self.result_inspection][0]["waiver authorization"],
-                self.waiver_auth,
-            )
+            if "waiver authorization" in self.results[self.result_inspection][0]:
+                self.assertEqual(
+                    self.results[self.result_inspection][0]["waiver authorization"],
+                    self.waiver_auth,
+                )
 
     def tearDown(self):
         if not KEEP_RESULTS:
@@ -600,7 +603,7 @@ class TestCompareRPMs(RequiresRpminspect):
         # defaults
         self.exitcode = 0
         self.result = "OK"
-        self.waiver_auth = "Not Waivable"
+        self.waiver_auth = None
 
     def runTest(self):
         self.configFile()

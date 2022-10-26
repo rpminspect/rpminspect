@@ -31,6 +31,7 @@ class EmptyLicenseTagSRPM(TestSRPM):
         self.rpm.license = ""
         self.inspection = "license"
         self.result = "BAD"
+        self.waiver_auth = "Not Waivable"
 
 
 # Empty License tag fails on RPMs (BAD)
@@ -43,6 +44,7 @@ class EmptyLicenseTagRPMs(TestRPMs):
         self.rpm.license = ""
         self.inspection = "license"
         self.result = "BAD"
+        self.waiver_auth = "Not Waivable"
 
 
 # Empty License tag fails on Koji build (BAD)
@@ -55,6 +57,7 @@ class EmptyLicenseTagKoji(TestKoji):
         self.rpm.license = ""
         self.inspection = "license"
         self.result = "BAD"
+        self.waiver_auth = "Not Waivable"
 
 
 # Forbidden License tag fails on SRPM (BAD)
@@ -64,6 +67,7 @@ class ForbiddenLicenseTagSRPM(TestSRPM):
         self.rpm.addLicense("APSL-1.2")
         self.inspection = "license"
         self.result = "BAD"
+        self.waiver_auth = "Not Waivable"
 
 
 # Forbidden License tag fails on RPMs (BAD)
@@ -73,6 +77,7 @@ class ForbiddenLicenseTagRPMs(TestRPMs):
         self.rpm.addLicense("APSL-1.2")
         self.inspection = "license"
         self.result = "BAD"
+        self.waiver_auth = "Not Waivable"
 
 
 # Forbidden License tag fails on Koji build (BAD)
@@ -82,6 +87,7 @@ class ForbiddenLicenseTagKoji(TestKoji):
         self.rpm.addLicense("APSL-1.2")
         self.inspection = "license"
         self.result = "BAD"
+        self.waiver_auth = "Not Waivable"
 
 
 # License tag with unprofessional language fails on SRPM (BAD)
@@ -91,6 +97,7 @@ class BadWordLicenseTagSRPM(TestSRPM):
         self.rpm.addLicense("GPLv2+ and reallybadword and MIT")
         self.inspection = "license"
         self.result = "BAD"
+        self.waiver_auth = "Not Waivable"
 
 
 # License tag with unprofessional language fails on RPMs (BAD)
@@ -100,6 +107,7 @@ class BadWordLicenseTagRPMs(TestRPMs):
         self.rpm.addLicense("GPLv2+ and reallybadword and MIT")
         self.inspection = "license"
         self.result = "BAD"
+        self.waiver_auth = "Not Waivable"
 
 
 # License tag with unprofessional language fails on Koji build (BAD)
@@ -109,6 +117,7 @@ class BadWordLicenseTagKoji(TestKoji):
         self.rpm.addLicense("GPLv2+ and reallybadword and MIT")
         self.inspection = "license"
         self.result = "BAD"
+        self.waiver_auth = "Not Waivable"
 
 
 # Valid License tag passes on SRPM (OK)
@@ -118,6 +127,7 @@ class ValidLicenseTagSRPM(TestSRPM):
         self.rpm.addLicense("GPLv3+")
         self.inspection = "license"
         self.result = "INFO"
+        self.waiver_auth = "Not Waivable"
 
 
 # Valid License tag passes on RPMs (OK)
@@ -127,6 +137,7 @@ class ValidLicenseTagRPMs(TestRPMs):
         self.rpm.addLicense("GPLv3+")
         self.inspection = "license"
         self.result = "INFO"
+        self.waiver_auth = "Not Waivable"
 
 
 # Valid License tag passes on Koji build (OK)
@@ -136,6 +147,7 @@ class ValidLicenseTagKoji(TestKoji):
         self.rpm.addLicense("GPLv3+")
         self.inspection = "license"
         self.result = "INFO"
+        self.waiver_auth = "Not Waivable"
 
 
 # Valid License tag with spaces passes on SRPM (OK)
@@ -145,6 +157,7 @@ class ValidLicenseTagWithSpacesSRPM(TestSRPM):
         self.rpm.addLicense("ASL 2.0")
         self.inspection = "license"
         self.result = "INFO"
+        self.waiver_auth = "Not Waivable"
 
 
 # Valid License tag with spaces passes on RPMs (OK)
@@ -154,6 +167,7 @@ class ValidLicenseTagWithSpacesRPMs(TestRPMs):
         self.rpm.addLicense("ASL 2.0")
         self.inspection = "license"
         self.result = "INFO"
+        self.waiver_auth = "Not Waivable"
 
 
 # Valid License tag with spaces passes on Koji build (OK)
@@ -163,6 +177,7 @@ class ValidLicenseTagWithSpacesKoji(TestKoji):
         self.rpm.addLicense("ASL 2.0")
         self.inspection = "license"
         self.result = "INFO"
+        self.waiver_auth = "Not Waivable"
 
 
 # Valid License tag with spaces passes on SRPM (OK)
@@ -172,6 +187,7 @@ class ValidLicenseTagWithBooleanSpacesSRPM(TestSRPM):
         self.rpm.addLicense("GPLv3+ and ASL 2.0")
         self.inspection = "license"
         self.result = "INFO"
+        self.waiver_auth = "Not Waivable"
 
 
 # Valid License tag with spaces passes on RPMs (OK)
@@ -181,6 +197,7 @@ class ValidLicenseTagWithBooleanSpacesRPMs(TestRPMs):
         self.rpm.addLicense("ASL 2.0 and GPLv3+")
         self.inspection = "license"
         self.result = "INFO"
+        self.waiver_auth = "Not Waivable"
 
 
 # Valid License tag with spaces passes on Koji build (OK)
@@ -190,6 +207,7 @@ class ValidLicenseTagWithBooleanSpacesKoji(TestKoji):
         self.rpm.addLicense("GPLv3+ or ASL 2.0")
         self.inspection = "license"
         self.result = "INFO"
+        self.waiver_auth = "Not Waivable"
 
 
 # Valid License tag with spaces and parens passes on SRPM (OK)
@@ -199,6 +217,7 @@ class ValidLicenseTagWithBooleanSpacesParensSRPM(TestSRPM):
         self.rpm.addLicense("Artistic 2.0 and (GPL+ or Artistic)")
         self.inspection = "license"
         self.result = "INFO"
+        self.waiver_auth = "Not Waivable"
 
 
 # Valid License tag with spaces and parens passes on RPMs (OK)
@@ -208,6 +227,7 @@ class ValidLicenseTagWithBooleanSpacesParensRPMs(TestRPMs):
         self.rpm.addLicense("Artistic 2.0 and (GPL+ or Artistic)")
         self.inspection = "license"
         self.result = "INFO"
+        self.waiver_auth = "Not Waivable"
 
 
 # Valid License tag with spaces and parens passes on Koji build (OK)
@@ -217,6 +237,7 @@ class ValidLicenseTagWithBooleanSpacesParensKoji(TestKoji):
         self.rpm.addLicense("Artistic 2.0 and (GPL+ or Artistic)")
         self.inspection = "license"
         self.result = "INFO"
+        self.waiver_auth = "Not Waivable"
 
 
 # Valid License tag with spaces and parens passes on SRPM (OK)
@@ -226,6 +247,7 @@ class AnotherValidLicenseTagWithBooleanSpacesParensSRPM(TestSRPM):
         self.rpm.addLicense("MIT and (BSD or ASL 2.0)")
         self.inspection = "license"
         self.result = "INFO"
+        self.waiver_auth = "Not Waivable"
 
 
 # Valid License tag with spaces and parens passes on RPMs (OK)
@@ -235,6 +257,7 @@ class AnotherValidLicenseTagWithBooleanSpacesParensRPMs(TestRPMs):
         self.rpm.addLicense("MIT and (BSD or ASL 2.0)")
         self.inspection = "license"
         self.result = "INFO"
+        self.waiver_auth = "Not Waivable"
 
 
 # Valid License tag with spaces and parens passes on Koji build (OK)
@@ -244,6 +267,7 @@ class AnotherValidLicenseTagWithBooleanSpacesParensKoji(TestKoji):
         self.rpm.addLicense("MIT and (BSD or ASL 2.0)")
         self.inspection = "license"
         self.result = "INFO"
+        self.waiver_auth = "Not Waivable"
 
 
 # Valid glibc License tag on Koji build (OK)
@@ -256,6 +280,7 @@ class ValidGlibcLicenseTagKoji(TestKoji):
         )
         self.inspection = "license"
         self.result = "INFO"
+        self.waiver_auth = "Not Waivable"
 
 
 # Valid perl-HTTP-Message License tag on Koji build (OK)
@@ -265,6 +290,7 @@ class ValidPerlHTTPMessageLicenseTagKoji(TestKoji):
         self.rpm.addLicense("(GPL+ or Artistic) and CC0")
         self.inspection = "license"
         self.result = "INFO"
+        self.waiver_auth = "Not Waivable"
 
 
 # Valid License string without any official abbreviations (OK)
@@ -276,6 +302,7 @@ class ValidLoremIpsonLicenseTagSRPM(TestSRPM):
         )
         self.inspection = "license"
         self.result = "INFO"
+        self.waiver_auth = "Not Waivable"
 
 
 class ValidLoremIpsonLicenseTagRPMs(TestRPMs):
@@ -286,6 +313,7 @@ class ValidLoremIpsonLicenseTagRPMs(TestRPMs):
         )
         self.inspection = "license"
         self.result = "INFO"
+        self.waiver_auth = "Not Waivable"
 
 
 class ValidLoremIpsonLicenseTagKoji(TestKoji):
@@ -296,6 +324,7 @@ class ValidLoremIpsonLicenseTagKoji(TestKoji):
         )
         self.inspection = "license"
         self.result = "INFO"
+        self.waiver_auth = "Not Waivable"
 
 
 # Invalid use of fedora_name string when an abbreviation is available (BAD)
@@ -305,6 +334,7 @@ class InvalidUseOfLicenseStringSRPM(TestSRPM):
         self.rpm.addLicense("Apache Software License 2.0")
         self.inspection = "license"
         self.result = "BAD"
+        self.waiver_auth = "Not Waivable"
 
 
 class InvalidUseOfLicenseStringRPMs(TestRPMs):
@@ -313,6 +343,7 @@ class InvalidUseOfLicenseStringRPMs(TestRPMs):
         self.rpm.addLicense("Apache Software License 2.0")
         self.inspection = "license"
         self.result = "BAD"
+        self.waiver_auth = "Not Waivable"
 
 
 class InvalidUseOfLicenseStringKoji(TestKoji):
@@ -321,3 +352,4 @@ class InvalidUseOfLicenseStringKoji(TestKoji):
         self.rpm.addLicense("Apache Software License 2.0")
         self.inspection = "license"
         self.result = "BAD"
+        self.waiver_auth = "Not Waivable"

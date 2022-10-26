@@ -34,7 +34,6 @@ class HasNoVirusSRPM(TestSRPM):
 
         self.inspection = "virus"
         self.result = "OK"
-        self.waiver_auth = "Not Waivable"
 
 
 @timeout_decorator.timeout(500)
@@ -48,7 +47,6 @@ class HasNoVirusRPMs(TestRPMs):
 
         self.inspection = "virus"
         self.result = "OK"
-        self.waiver_auth = "Not Waivable"
 
 
 @timeout_decorator.timeout(500)
@@ -62,7 +60,6 @@ class HasNoVirusKoji(TestKoji):
 
         self.inspection = "virus"
         self.result = "OK"
-        self.waiver_auth = "Not Waivable"
 
 
 @timeout_decorator.timeout(500)
@@ -79,7 +76,6 @@ class HasNoVirusCompareSRPM(TestCompareSRPM):
 
         self.inspection = "virus"
         self.result = "OK"
-        self.waiver_auth = "Not Waivable"
 
 
 @timeout_decorator.timeout(500)
@@ -96,7 +92,6 @@ class HasNoVirusCompareRPMs(TestCompareRPMs):
 
         self.inspection = "virus"
         self.result = "OK"
-        self.waiver_auth = "Not Waivable"
 
 
 @timeout_decorator.timeout(500)
@@ -113,7 +108,6 @@ class HasNoVirusCompareKoji(TestCompareKoji):
 
         self.inspection = "virus"
         self.result = "OK"
-        self.waiver_auth = "Not Waivable"
 
 
 # package that contains a virus (BAD)
