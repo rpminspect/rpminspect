@@ -958,6 +958,27 @@ int main(int argc, char **argv)
         for (i = 0; inspections[i].name != NULL; i++) {
             /* test not selected by user */
             if (!(ri->tests & inspections[i].flag)) {
+                /*
+                 * tell the user this inspection is skipped when in
+                 * verbose mode
+                 */
+                if (verbose) {
+                    xasprintf(&r, _("Skipping %s inspection..."), inspections[i].name);
+                    assert(r != NULL);
+                    printf("%-36s", r);
+                    free(r);
+
+                    printf("%5s\n", _("skip"));
+                }
+
+                /* add a skipped result for this inspection */
+                init_result_params(&params);
+                params.header = inspections[i].name;
+                params.severity = RESULT_SKIP;
+                params.verb = VERB_SKIP;
+                add_result(ri, &params);
+
+                /* next inspection */
                 continue;
             }
 
@@ -978,6 +999,10 @@ int main(int argc, char **argv)
             if (verbose) {
                 printf("%5s\n", ires ? _("pass") : _("FAIL"));
             }
+        }
+
+        if (verbose) {
+            printf("\n");
         }
 
         /* output the results */
