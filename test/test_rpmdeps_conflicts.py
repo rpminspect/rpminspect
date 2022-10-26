@@ -80,7 +80,6 @@ class ConflictsCorrectRPMs(TestRPMs):
 
         self.inspection = "rpmdeps"
         self.result = "OK"
-        self.waiver_auth = "Not Waivable"
 
 
 class ConflictsCorrectKoji(TestKoji):
@@ -91,7 +90,6 @@ class ConflictsCorrectKoji(TestKoji):
 
         self.inspection = "rpmdeps"
         self.result = "OK"
-        self.waiver_auth = "Not Waivable"
 
 
 # Retaining Conflicts dependency in rebase comparison (INFO)
@@ -129,7 +127,6 @@ class RetainingConflictsCompareRPMs(TestCompareRPMs):
 
         self.inspection = "rpmdeps"
         self.result = "OK"
-        self.waiver_auth = "Not Waivable"
 
 
 class RetainingConflictsCompareKoji(TestCompareKoji):
@@ -141,7 +138,6 @@ class RetainingConflictsCompareKoji(TestCompareKoji):
 
         self.inspection = "rpmdeps"
         self.result = "OK"
-        self.waiver_auth = "Not Waivable"
 
 
 # Gaining a new Conflicts in a rebase comparison (INFO)
@@ -248,7 +244,6 @@ class ChangingConflictsExpectedCompareSRPM(TestCompareSRPM):
         # ok result because this is a source RPM
         self.inspection = "rpmdeps"
         self.result = "OK"
-        self.waiver_auth = "Not Waivable"
 
 
 class ChangingConflictsExpectedCompareRPMs(TestCompareRPMs):
@@ -342,7 +337,6 @@ class MissingEpochConflictsSRPM(TestSRPM):
         # the result is OK here because the Epoch check is a no-op for SRPMs
         self.inspection = "rpmdeps"
         self.result = "OK"
-        self.waiver_auth = "Not Waivable"
 
 
 class MissingEpochConflictsRPMs(TestRPMs):
@@ -373,7 +367,6 @@ class MissingEpochConflictsRPMs(TestRPMs):
         # doesn't fail
         self.inspection = "rpmdeps"
         self.result = "OK"
-        self.waiver_auth = "Not Waivable"
 
 
 class MissingEpochConflictsKoji(TestKoji):
@@ -438,7 +431,6 @@ class MissingEpochConflictsCompareSRPM(TestCompareSRPM):
         # this is 'OK' because the missing Epoch check is a no-op for SRPMs
         self.inspection = "rpmdeps"
         self.result = "OK"
-        self.waiver_auth = "Not Waivable"
 
 
 class MissingEpochConflictsCompareRPMs(TestCompareRPMs):
@@ -477,7 +469,6 @@ class MissingEpochConflictsCompareRPMs(TestCompareRPMs):
         # entire collection of RPMs, it does it iteratively
         self.inspection = "rpmdeps"
         self.result = "OK"
-        self.waiver_auth = "Not Waivable"
 
 
 class MissingEpochConflictsCompareKoji(TestCompareKoji):
@@ -553,7 +544,6 @@ class MissingEpochConflictsRebaseCompareSRPM(TestCompareSRPM):
         # ok result because this is a source RPM
         self.inspection = "rpmdeps"
         self.result = "OK"
-        self.waiver_auth = "Not Waivable"
 
 
 class MissingEpochConflictsRebaseCompareRPMs(TestCompareRPMs):
@@ -641,7 +631,6 @@ class UnexpandedMacroConflictsSRPM(TestSRPM):
         # this is OK because it's the SRPM
         self.inspection = "rpmdeps"
         self.result = "OK"
-        self.waiver_auth = "Not Waivable"
 
 
 class UnexpandedMacroConflictsRPMs(TestRPMs):
@@ -679,7 +668,6 @@ class UnexpandedMacroConflictsCompareSRPM(TestCompareSRPM):
         # this is OK because it's the SRPM
         self.inspection = "rpmdeps"
         self.result = "OK"
-        self.waiver_auth = "Not Waivable"
 
 
 class UnexpandedMacroConflictsCompareRPMs(TestCompareRPMs):
@@ -743,7 +731,6 @@ class MissingExplicitConflictsSRPM(TestSRPM):
         # result is OK because rpminspect can't report missing deps on SRPMs
         self.inspection = "rpmdeps"
         self.result = "OK"
-        self.waiver_auth = "Not Waivable"
 
 
 class MissingExplicitConflictsRPMs(TestRPMs):
@@ -781,7 +768,6 @@ class MissingExplicitConflictsRPMs(TestRPMs):
         # looking at a single RPM
         self.inspection = "rpmdeps"
         self.result = "OK"
-        self.waiver_auth = "Not Waivable"
 
 
 class MissingExplicitConflictsKoji(TestKoji):
@@ -876,7 +862,6 @@ class MissingExplicitConflictsCompareSRPM(TestCompareSRPM):
         # result is OK because rpminspect can't report missing deps on SRPMs
         self.inspection = "rpmdeps"
         self.result = "OK"
-        self.waiver_auth = "Not Waivable"
 
 
 class MissingExplicitConflictsCompareRPMs(TestCompareRPMs):
@@ -935,7 +920,6 @@ class MissingExplicitConflictsCompareRPMs(TestCompareRPMs):
         # RPM comparisons
         self.inspection = "rpmdeps"
         self.result = "OK"
-        self.waiver_auth = "Not Waivable"
 
 
 class MissingExplicitConflictsCompareKoji(TestCompareKoji):
@@ -1043,7 +1027,6 @@ class MultipleProvidersSRPM(TestSRPM):
         # result is OK because this check is a no-op for SRPMs
         self.inspection = "rpmdeps"
         self.result = "OK"
-        self.waiver_auth = "Not Waivable"
 
 
 class MultipleProvidersRPMs(TestRPMs):
@@ -1092,7 +1075,6 @@ class MultipleProvidersRPMs(TestRPMs):
         # result is OK because this check is a no-op for single RPMs
         self.inspection = "rpmdeps"
         self.result = "OK"
-        self.waiver_auth = "Not Waivable"
 
 
 class MultipleProvidersKoji(TestKoji):
@@ -1140,7 +1122,6 @@ class MultipleProvidersKoji(TestKoji):
 
         self.inspection = "rpmdeps"
         self.result = "OK"
-        self.waiver_auth = "Not Waivable"
 
 
 class MultipleProvidersCompareSRPM(TestCompareSRPM):
@@ -1217,7 +1198,6 @@ class MultipleProvidersCompareSRPM(TestCompareSRPM):
         # result is OK because this check is a no-op for SRPMs
         self.inspection = "rpmdeps"
         self.result = "OK"
-        self.waiver_auth = "Not Waivable"
 
 
 class MultipleProvidersCompareRPMs(TestCompareRPMs):
@@ -1294,7 +1274,6 @@ class MultipleProvidersCompareRPMs(TestCompareRPMs):
         # result is OK because this check is a no-op when comparing single RPMs
         self.inspection = "rpmdeps"
         self.result = "OK"
-        self.waiver_auth = "Not Waivable"
 
 
 class MultipleProvidersCompareKoji(TestCompareKoji):
@@ -1370,4 +1349,3 @@ class MultipleProvidersCompareKoji(TestCompareKoji):
 
         self.inspection = "rpmdeps"
         self.result = "OK"
-        self.waiver_auth = "Not Waivable"

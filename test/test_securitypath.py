@@ -50,7 +50,6 @@ class SecuritySKIPFileAddedToSecurityPathCompareRPMs(TestCompareRPMs):
         )
         self.inspection = "addedfiles"
         self.result = "OK"
-        self.waiver_auth = "Not Waivable"
 
 
 class SecurityINFORMFileAddedToSecurityPathCompareRPMs(TestCompareRPMs):
@@ -105,7 +104,6 @@ class SecuritySKIPFileAddedToSecurityPathCompareKoji(TestCompareKoji):
         )
         self.inspection = "addedfiles"
         self.result = "OK"
-        self.waiver_auth = "Not Waivable"
 
 
 class SecurityINFORMFileAddedToSecurityPathCompareKoji(TestCompareKoji):
@@ -165,7 +163,6 @@ class SecuritySKIPFileRemovedFromSecurityPathCompareRPMs(TestCompareRPMs):
         )
         self.inspection = "addedfiles"
         self.result = "OK"
-        self.waiver_auth = "Not Waivable"
 
 
 class SecurityINFORMFileRemovedFromSecurityPathCompareRPMs(TestCompareRPMs):
@@ -220,7 +217,6 @@ class SecuritySKIPFileRemovedFromSecurityPathCompareKoji(TestCompareKoji):
         )
         self.inspection = "addedfiles"
         self.result = "OK"
-        self.waiver_auth = "Not Waivable"
 
 
 class SecurityINFORMFileRemovedFromSecurityPathCompareKoji(TestCompareKoji):

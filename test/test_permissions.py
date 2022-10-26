@@ -54,6 +54,7 @@ class ExecutableWithSetUIDRPMs(TestRPMs):
 
         self.inspection = "permissions"
         self.result = "INFO"
+        self.waiver_auth = "Not Waivable"
 
 
 class ExecutableWithSetUIDKoji(TestKoji):
@@ -71,6 +72,7 @@ class ExecutableWithSetUIDKoji(TestKoji):
 
         self.inspection = "permissions"
         self.result = "INFO"
+        self.waiver_auth = "Not Waivable"
 
 
 class ExecutableWithSetUIDCompareSRPM(TestCompareSRPM):
@@ -105,6 +107,7 @@ class ExecutableWithSetUIDCompareRPMs(TestCompareRPMs):
 
         self.inspection = "permissions"
         self.result = "INFO"
+        self.waiver_auth = "Not Waivable"
 
 
 class ExecutableWithSetUIDCompareKoji(TestCompareKoji):
@@ -122,6 +125,7 @@ class ExecutableWithSetUIDCompareKoji(TestCompareKoji):
 
         self.inspection = "permissions"
         self.result = "INFO"
+        self.waiver_auth = "Not Waivable"
 
 
 class UnapprovedExecutableWithSetUIDSRPM(TestSRPM):
@@ -174,7 +178,6 @@ class SecuritySKIPUnapprovedExecutableWithSetUIDRPMs(TestRPMs):
 
         self.inspection = "permissions"
         self.result = "OK"
-        self.waiver_auth = "Not Waivable"
 
 
 class SecurityINFORMUnapprovedExecutableWithSetUIDRPMs(TestRPMs):
@@ -264,7 +267,6 @@ class SecuritySKIPUnapprovedExecutableWithSetUIDKoji(TestKoji):
 
         self.inspection = "permissions"
         self.result = "OK"
-        self.waiver_auth = "Not Waivable"
 
 
 class SecurityINFORMUnapprovedExecutableWithSetUIDKoji(TestKoji):
@@ -371,7 +373,6 @@ class SecuritySKIPUnapprovedExecutableWithSetUIDCompareRPMs(TestCompareRPMs):
 
         self.inspection = "permissions"
         self.result = "OK"
-        self.waiver_auth = "Not Waivable"
 
 
 class SecurityINFORMUnapprovedExecutableWithSetUIDCompareRPMs(TestCompareRPMs):
@@ -461,7 +462,6 @@ class SecuritySKIPUnapprovedExecutableWithSetUIDCompareKoji(TestCompareKoji):
 
         self.inspection = "permissions"
         self.result = "OK"
-        self.waiver_auth = "Not Waivable"
 
 
 class SecurityINFORMUnapprovedExecutableWithSetUIDCompareKoji(TestCompareKoji):
@@ -568,7 +568,6 @@ class SecuritySKIPFileIWOTHProhibitedRPMs(TestRPMs):
 
         self.inspection = "permissions"
         self.result = "OK"
-        self.waiver_auth = "Not Waivable"
 
 
 class SecurityINFORMFileIWOTHProhibitedRPMs(TestRPMs):
@@ -658,7 +657,6 @@ class SecuritySKIPFileIWOTHProhibitedKoji(TestKoji):
 
         self.inspection = "permissions"
         self.result = "OK"
-        self.waiver_auth = "Not Waivable"
 
 
 class SecurityINFORMFileIWOTHProhibitedKoji(TestKoji):
@@ -765,7 +763,6 @@ class SecuritySKIPFileIWOTHProhibitedCompareRPMs(TestCompareRPMs):
 
         self.inspection = "permissions"
         self.result = "OK"
-        self.waiver_auth = "Not Waivable"
 
 
 class SecurityINFORMFileIWOTHProhibitedCompareRPMs(TestCompareRPMs):
@@ -855,7 +852,6 @@ class SecuritySKIPFileIWOTHProhibitedCompareKoji(TestCompareKoji):
 
         self.inspection = "permissions"
         self.result = "OK"
-        self.waiver_auth = "Not Waivable"
 
 
 class SecurityINFORMFileIWOTHProhibitedCompareKoji(TestCompareKoji):
@@ -962,7 +958,6 @@ class SecuritySKIPFileIWOTHandISVTXProhibitedRPMs(TestRPMs):
 
         self.inspection = "permissions"
         self.result = "OK"
-        self.waiver_auth = "Not Waivable"
 
 
 class SecurityINFORMFileIWOTHandISVTXProhibitedRPMs(TestRPMs):
@@ -1052,7 +1047,6 @@ class SecuritySKIPFileIWOTHandISVTXProhibitedKoji(TestKoji):
 
         self.inspection = "permissions"
         self.result = "OK"
-        self.waiver_auth = "Not Waivable"
 
 
 class SecurityINFORMFileIWOTHandISVTXProhibitedKoji(TestKoji):
@@ -1159,7 +1153,6 @@ class SecuritySKIPFileIWOTHandISVTXProhibitedCompareRPMs(TestCompareRPMs):
 
         self.inspection = "permissions"
         self.result = "OK"
-        self.waiver_auth = "Not Waivable"
 
 
 class SecurityINFORMFileIWOTHandISVTXProhibitedCompareRPMs(TestCompareRPMs):
@@ -1249,7 +1242,6 @@ class SecuritySKIPFileIWOTHandISVTXProhibitedCompareKoji(TestCompareKoji):
 
         self.inspection = "permissions"
         self.result = "OK"
-        self.waiver_auth = "Not Waivable"
 
 
 class SecurityINFORMFileIWOTHandISVTXProhibitedCompareKoji(TestCompareKoji):
@@ -1368,7 +1360,6 @@ class SecuritySKIPDirIWOTHProhibitedRPMs(TestRPMs):
 
         self.inspection = "permissions"
         self.result = "OK"
-        self.waiver_auth = "Not Waivable"
 
 
 class SecurityINFORMDirIWOTHProhibitedRPMs(TestRPMs):
@@ -1478,7 +1469,6 @@ class SecuritySKIPDirIWOTHProhibitedKoji(TestKoji):
 
         self.inspection = "permissions"
         self.result = "OK"
-        self.waiver_auth = "Not Waivable"
 
 
 class SecurityINFORMDirIWOTHProhibitedKoji(TestKoji):
@@ -1609,7 +1599,6 @@ class SecuritySKIPDirIWOTHProhibitedCompareRPMs(TestCompareRPMs):
 
         self.inspection = "permissions"
         self.result = "OK"
-        self.waiver_auth = "Not Waivable"
 
 
 class SecurityINFORMDirIWOTHProhibitedCompareRPMs(TestCompareRPMs):
@@ -1719,7 +1708,6 @@ class SecuritySKIPDirIWOTHProhibitedCompareKoji(TestCompareKoji):
 
         self.inspection = "permissions"
         self.result = "OK"
-        self.waiver_auth = "Not Waivable"
 
 
 class SecurityINFORMDirIWOTHProhibitedCompareKoji(TestCompareKoji):
@@ -1850,7 +1838,6 @@ class SecuritySKIPDirIWOTHandISVTXProhibitedRPMs(TestRPMs):
 
         self.inspection = "permissions"
         self.result = "OK"
-        self.waiver_auth = "Not Waivable"
 
 
 class SecurityINFORMDirIWOTHandISVTXProhibitedRPMs(TestRPMs):
@@ -1960,7 +1947,6 @@ class SecuritySKIPDirIWOTHandISVTXProhibitedKoji(TestKoji):
 
         self.inspection = "permissions"
         self.result = "OK"
-        self.waiver_auth = "Not Waivable"
 
 
 class SecurityINFORMDirIWOTHandISVTXProhibitedKoji(TestKoji):
@@ -2091,7 +2077,6 @@ class SecuritySKIPDirIWOTHandISVTXProhibitedCompareRPMs(TestCompareRPMs):
 
         self.inspection = "permissions"
         self.result = "OK"
-        self.waiver_auth = "Not Waivable"
 
 
 class SecurityINFORMDirIWOTHandISVTXProhibitedCompareRPMs(TestCompareRPMs):
@@ -2201,7 +2186,6 @@ class SecuritySKIPDirIWOTHandISVTXProhibitedCompareKoji(TestCompareKoji):
 
         self.inspection = "permissions"
         self.result = "OK"
-        self.waiver_auth = "Not Waivable"
 
 
 class SecurityINFORMDirIWOTHandISVTXProhibitedCompareKoji(TestCompareKoji):

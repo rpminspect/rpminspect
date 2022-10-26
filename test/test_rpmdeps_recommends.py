@@ -94,7 +94,6 @@ class RecommendsCorrectRPMs(TestRPMs):
 
         self.inspection = "rpmdeps"
         self.result = "OK"
-        self.waiver_auth = "Not Waivable"
 
 
 class RecommendsCorrectKoji(TestKoji):
@@ -106,7 +105,6 @@ class RecommendsCorrectKoji(TestKoji):
 
         self.inspection = "rpmdeps"
         self.result = "OK"
-        self.waiver_auth = "Not Waivable"
 
 
 # Retaining Recommends dependency in rebase comparison (INFO)
@@ -147,7 +145,6 @@ class RetainingRecommendsCompareRPMs(TestCompareRPMs):
 
         self.inspection = "rpmdeps"
         self.result = "OK"
-        self.waiver_auth = "Not Waivable"
 
 
 class RetainingRecommendsCompareKoji(TestCompareKoji):
@@ -160,7 +157,6 @@ class RetainingRecommendsCompareKoji(TestCompareKoji):
 
         self.inspection = "rpmdeps"
         self.result = "OK"
-        self.waiver_auth = "Not Waivable"
 
 
 # Gaining a new Recommends in a rebase comparison (INFO)
@@ -276,7 +272,6 @@ class ChangingRecommendsExpectedCompareSRPM(TestCompareSRPM):
         # ok result because this is a source RPM
         self.inspection = "rpmdeps"
         self.result = "OK"
-        self.waiver_auth = "Not Waivable"
 
 
 class ChangingRecommendsExpectedCompareRPMs(TestCompareRPMs):
@@ -377,7 +372,6 @@ class MissingEpochRecommendsSRPM(TestSRPM):
         # the result is OK here because the Epoch check is a no-op for SRPMs
         self.inspection = "rpmdeps"
         self.result = "OK"
-        self.waiver_auth = "Not Waivable"
 
 
 class MissingEpochRecommendsRPMs(TestRPMs):
@@ -409,7 +403,6 @@ class MissingEpochRecommendsRPMs(TestRPMs):
         # doesn't fail
         self.inspection = "rpmdeps"
         self.result = "OK"
-        self.waiver_auth = "Not Waivable"
 
 
 class MissingEpochRecommendsKoji(TestKoji):
@@ -438,7 +431,6 @@ class MissingEpochRecommendsKoji(TestKoji):
         # result is OK for Recommends weak dep; Epoch check is for Provides/Requires pairs
         self.inspection = "rpmdeps"
         self.result = "OK"
-        self.waiver_auth = "Not Waivable"
 
 
 class MissingEpochRecommendsCompareSRPM(TestCompareSRPM):
@@ -477,7 +469,6 @@ class MissingEpochRecommendsCompareSRPM(TestCompareSRPM):
         # this is 'OK' because the missing Epoch check is a no-op for SRPMs
         self.inspection = "rpmdeps"
         self.result = "OK"
-        self.waiver_auth = "Not Waivable"
 
 
 class MissingEpochRecommendsCompareRPMs(TestCompareRPMs):
@@ -517,7 +508,6 @@ class MissingEpochRecommendsCompareRPMs(TestCompareRPMs):
         # entire collection of RPMs, it does it iteratively
         self.inspection = "rpmdeps"
         self.result = "OK"
-        self.waiver_auth = "Not Waivable"
 
 
 class MissingEpochRecommendsCompareKoji(TestCompareKoji):
@@ -556,7 +546,6 @@ class MissingEpochRecommendsCompareKoji(TestCompareKoji):
         # result is OK for Recommends weak dep; Epoch check is for Provides/Requires pairs
         self.inspection = "rpmdeps"
         self.result = "OK"
-        self.waiver_auth = "Not Waivable"
 
 
 # Missing Epoch prefix on rebase compare (INFO)
@@ -596,7 +585,6 @@ class MissingEpochRecommendsRebaseCompareSRPM(TestCompareSRPM):
         # ok result because this is a source RPM
         self.inspection = "rpmdeps"
         self.result = "OK"
-        self.waiver_auth = "Not Waivable"
 
 
 class MissingEpochRecommendsRebaseCompareRPMs(TestCompareRPMs):
@@ -686,7 +674,6 @@ class UnexpandedMacroRecommendsSRPM(TestSRPM):
         # this is OK because it's the SRPM
         self.inspection = "rpmdeps"
         self.result = "OK"
-        self.waiver_auth = "Not Waivable"
 
 
 class UnexpandedMacroRecommendsRPMs(TestRPMs):
@@ -724,7 +711,6 @@ class UnexpandedMacroRecommendsCompareSRPM(TestCompareSRPM):
         # this is OK because it's the SRPM
         self.inspection = "rpmdeps"
         self.result = "OK"
-        self.waiver_auth = "Not Waivable"
 
 
 class UnexpandedMacroRecommendsCompareRPMs(TestCompareRPMs):
@@ -789,7 +775,6 @@ class MissingExplicitRecommendsSRPM(TestSRPM):
         # result is OK because rpminspect can't report missing deps on SRPMs
         self.inspection = "rpmdeps"
         self.result = "OK"
-        self.waiver_auth = "Not Waivable"
 
 
 class MissingExplicitRecommendsRPMs(TestRPMs):
@@ -828,7 +813,6 @@ class MissingExplicitRecommendsRPMs(TestRPMs):
         # looking at a single RPM
         self.inspection = "rpmdeps"
         self.result = "OK"
-        self.waiver_auth = "Not Waivable"
 
 
 class MissingExplicitRecommendsKoji(TestKoji):
@@ -925,7 +909,6 @@ class MissingExplicitRecommendsCompareSRPM(TestCompareSRPM):
         # result is OK because rpminspect can't report missing deps on SRPMs
         self.inspection = "rpmdeps"
         self.result = "OK"
-        self.waiver_auth = "Not Waivable"
 
 
 class MissingExplicitRecommendsCompareRPMs(TestCompareRPMs):
@@ -985,7 +968,6 @@ class MissingExplicitRecommendsCompareRPMs(TestCompareRPMs):
         # RPM comparisons
         self.inspection = "rpmdeps"
         self.result = "OK"
-        self.waiver_auth = "Not Waivable"
 
 
 class MissingExplicitRecommendsCompareKoji(TestCompareKoji):
@@ -1095,7 +1077,6 @@ class MultipleProvidersSRPM(TestSRPM):
         # result is OK because this check is a no-op for SRPMs
         self.inspection = "rpmdeps"
         self.result = "OK"
-        self.waiver_auth = "Not Waivable"
 
 
 class MultipleProvidersRPMs(TestRPMs):
@@ -1145,7 +1126,6 @@ class MultipleProvidersRPMs(TestRPMs):
         # result is OK because this check is a no-op for single RPMs
         self.inspection = "rpmdeps"
         self.result = "OK"
-        self.waiver_auth = "Not Waivable"
 
 
 class MultipleProvidersKoji(TestKoji):
@@ -1194,7 +1174,6 @@ class MultipleProvidersKoji(TestKoji):
 
         self.inspection = "rpmdeps"
         self.result = "OK"
-        self.waiver_auth = "Not Waivable"
 
 
 class MultipleProvidersCompareSRPM(TestCompareSRPM):
@@ -1272,7 +1251,6 @@ class MultipleProvidersCompareSRPM(TestCompareSRPM):
         # result is OK because this check is a no-op for SRPMs
         self.inspection = "rpmdeps"
         self.result = "OK"
-        self.waiver_auth = "Not Waivable"
 
 
 class MultipleProvidersCompareRPMs(TestCompareRPMs):
@@ -1350,7 +1328,6 @@ class MultipleProvidersCompareRPMs(TestCompareRPMs):
         # result is OK because this check is a no-op when comparing single RPMs
         self.inspection = "rpmdeps"
         self.result = "OK"
-        self.waiver_auth = "Not Waivable"
 
 
 class MultipleProvidersCompareKoji(TestCompareKoji):
@@ -1427,4 +1404,3 @@ class MultipleProvidersCompareKoji(TestCompareKoji):
 
         self.inspection = "rpmdeps"
         self.result = "OK"
-        self.waiver_auth = "Not Waivable"

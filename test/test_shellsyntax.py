@@ -1535,6 +1535,7 @@ class BashExtglobWellFormedRPM(TestRPMs):
         )
         self.inspection = "shellsyntax"
         self.result = "INFO"
+        self.waiver_auth = "Not Waivable"
 
 
 class BashWellFormedKoji(TestKoji):
@@ -1584,6 +1585,7 @@ class BashExtglobWellFormedKoji(TestKoji):
         )
         self.inspection = "shellsyntax"
         self.result = "INFO"
+        self.waiver_auth = "Not Waivable"
 
 
 class BashWellFormedCompareRPMs(TestCompareRPMs):
@@ -1642,6 +1644,7 @@ class BashExtglobWellFormedCompareRPMs(TestCompareRPMs):
         )
         self.inspection = "shellsyntax"
         self.result = "INFO"
+        self.waiver_auth = "Not Waivable"
 
 
 class BashWellFormedCompareKoji(TestCompareKoji):
@@ -1700,6 +1703,7 @@ class BashExtglobWellFormedCompareKoji(TestCompareKoji):
         )
         self.inspection = "shellsyntax"
         self.result = "INFO"
+        self.waiver_auth = "Not Waivable"
 
 
 class BashWellMalformedCompareRPMs(TestCompareRPMs):

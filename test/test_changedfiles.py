@@ -47,7 +47,6 @@ class GzipFileNoChangeRPMs(TestCompareRPMs):
 
         self.inspection = "changedfiles"
         self.result = "OK"
-        self.waiver_auth = "Not Waivable"
 
 
 class GzipFileNoChangeKoji(TestCompareKoji):
@@ -71,7 +70,6 @@ class GzipFileNoChangeKoji(TestCompareKoji):
 
         self.inspection = "changedfiles"
         self.result = "OK"
-        self.waiver_auth = "Not Waivable"
 
 
 # gzip file changes between builds and has different compression ratios
@@ -96,7 +94,6 @@ class GzipFileChangesRPMs(TestCompareRPMs):
 
         self.inspection = "changedfiles"
         self.result = "OK"
-        self.waiver_auth = "Not Waivable"
 
 
 class GzipFileChangesKoji(TestCompareKoji):
@@ -120,7 +117,6 @@ class GzipFileChangesKoji(TestCompareKoji):
 
         self.inspection = "changedfiles"
         self.result = "OK"
-        self.waiver_auth = "Not Waivable"
 
 
 # bzip2 file does not change between builds despite having different
@@ -146,7 +142,6 @@ class Bzip2FileNoChangeRPMs(TestCompareRPMs):
 
         self.inspection = "changedfiles"
         self.result = "OK"
-        self.waiver_auth = "Not Waivable"
 
 
 class Bzip2FileNoChangeKoji(TestCompareKoji):
@@ -170,7 +165,6 @@ class Bzip2FileNoChangeKoji(TestCompareKoji):
 
         self.inspection = "changedfiles"
         self.result = "OK"
-        self.waiver_auth = "Not Waivable"
 
 
 # bzip2 file changes between builds and has different compression ratios
@@ -195,7 +189,6 @@ class Bzip2FileChangesRPMs(TestCompareRPMs):
 
         self.inspection = "changedfiles"
         self.result = "OK"
-        self.waiver_auth = "Not Waivable"
 
 
 class Bzip2FileChangesKoji(TestCompareKoji):
@@ -219,7 +212,6 @@ class Bzip2FileChangesKoji(TestCompareKoji):
 
         self.inspection = "changedfiles"
         self.result = "OK"
-        self.waiver_auth = "Not Waivable"
 
 
 # xz file does not change between builds despite having different
@@ -245,7 +237,6 @@ class XzFileNoChangeRPMs(TestCompareRPMs):
 
         self.inspection = "changedfiles"
         self.result = "OK"
-        self.waiver_auth = "Not Waivable"
 
 
 class XzFileNoChangeKoji(TestCompareKoji):
@@ -269,7 +260,6 @@ class XzFileNoChangeKoji(TestCompareKoji):
 
         self.inspection = "changedfiles"
         self.result = "OK"
-        self.waiver_auth = "Not Waivable"
 
 
 # xz file changes between builds and has different compression ratios
@@ -294,7 +284,6 @@ class XzFileChangesRPMs(TestCompareRPMs):
 
         self.inspection = "changedfiles"
         self.result = "OK"
-        self.waiver_auth = "Not Waivable"
 
 
 class XzFileChangesKoji(TestCompareKoji):
@@ -318,4 +307,3 @@ class XzFileChangesKoji(TestCompareKoji):
 
         self.inspection = "changedfiles"
         self.result = "OK"
-        self.waiver_auth = "Not Waivable"

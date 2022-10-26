@@ -61,7 +61,6 @@ class AbsoluteSymlinkExistsRPMs(TestRPMs):
 
         self.inspection = "symlinks"
         self.result = "OK"
-        self.waiver_auth = "Not Waivable"
 
 
 class AbsoluteSymlinkExistsKoji(TestKoji):
@@ -78,7 +77,6 @@ class AbsoluteSymlinkExistsKoji(TestKoji):
 
         self.inspection = "symlinks"
         self.result = "OK"
-        self.waiver_auth = "Not Waivable"
 
 
 class AbsoluteSymlinkExistsCompareRPMs(TestCompareRPMs):
@@ -97,7 +95,6 @@ class AbsoluteSymlinkExistsCompareRPMs(TestCompareRPMs):
 
         self.inspection = "symlinks"
         self.result = "OK"
-        self.waiver_auth = "Not Waivable"
 
 
 class AbsoluteSymlinkExistsCompareKoji(TestCompareKoji):
@@ -116,7 +113,6 @@ class AbsoluteSymlinkExistsCompareKoji(TestCompareKoji):
 
         self.inspection = "symlinks"
         self.result = "OK"
-        self.waiver_auth = "Not Waivable"
 
 
 # Relative symlink with ../ exists (OK)
@@ -134,7 +130,6 @@ class RelativeSymlinkExistsParentDirRPMs(TestRPMs):
 
         self.inspection = "symlinks"
         self.result = "OK"
-        self.waiver_auth = "Not Waivable"
 
 
 class RelativeSymlinkExistsParentDirKoji(TestKoji):
@@ -151,7 +146,6 @@ class RelativeSymlinkExistsParentDirKoji(TestKoji):
 
         self.inspection = "symlinks"
         self.result = "OK"
-        self.waiver_auth = "Not Waivable"
 
 
 class RelativeSymlinkExistsParentDirCompareRPMs(TestCompareRPMs):
@@ -168,7 +162,6 @@ class RelativeSymlinkExistsParentDirCompareRPMs(TestCompareRPMs):
 
         self.inspection = "symlinks"
         self.result = "OK"
-        self.waiver_auth = "Not Waivable"
 
 
 class RelativeSymlinkExistsParentDirCompareKoji(TestCompareKoji):
@@ -185,7 +178,6 @@ class RelativeSymlinkExistsParentDirCompareKoji(TestCompareKoji):
 
         self.inspection = "symlinks"
         self.result = "OK"
-        self.waiver_auth = "Not Waivable"
 
 
 # Relative symlink in current directory exists (OK)
@@ -203,7 +195,6 @@ class RelativeSymlinkExistsCurrentDirRPMs(TestRPMs):
 
         self.inspection = "symlinks"
         self.result = "OK"
-        self.waiver_auth = "Not Waivable"
 
 
 class RelativeSymlinkExistsCurrentDirKoji(TestKoji):
@@ -220,7 +211,6 @@ class RelativeSymlinkExistsCurrentDirKoji(TestKoji):
 
         self.inspection = "symlinks"
         self.result = "OK"
-        self.waiver_auth = "Not Waivable"
 
 
 class RelativeSymlinkExistsCurrentDirCompareRPMs(TestCompareRPMs):
@@ -237,7 +227,6 @@ class RelativeSymlinkExistsCurrentDirCompareRPMs(TestCompareRPMs):
 
         self.inspection = "symlinks"
         self.result = "OK"
-        self.waiver_auth = "Not Waivable"
 
 
 class RelativeSymlinkExistsCurrentDirCompareKoji(TestCompareKoji):
@@ -254,7 +243,6 @@ class RelativeSymlinkExistsCurrentDirCompareKoji(TestCompareKoji):
 
         self.inspection = "symlinks"
         self.result = "OK"
-        self.waiver_auth = "Not Waivable"
 
 
 # Symlink that exists spans subpackages (OK)
@@ -275,7 +263,6 @@ class SymlinkExistsMultiplePackagesRPMS(TestRPMs):
 
         self.inspection = "symlinks"
         self.result = "OK"
-        self.waiver_auth = "Not Waivable"
 
 
 class SymlinkExistsMultiplePackagesKoji(TestKoji):
@@ -295,7 +282,6 @@ class SymlinkExistsMultiplePackagesKoji(TestKoji):
 
         self.inspection = "symlinks"
         self.result = "OK"
-        self.waiver_auth = "Not Waivable"
 
 
 class SymlinkExistsMultiplePackagesCompareRPMs(TestCompareRPMs):
@@ -315,7 +301,6 @@ class SymlinkExistsMultiplePackagesCompareRPMs(TestCompareRPMs):
 
         self.inspection = "symlinks"
         self.result = "OK"
-        self.waiver_auth = "Not Waivable"
 
 
 class SymlinkExistsMultiplePackagesCompareKoji(TestCompareKoji):
@@ -335,7 +320,6 @@ class SymlinkExistsMultiplePackagesCompareKoji(TestCompareKoji):
 
         self.inspection = "symlinks"
         self.result = "OK"
-        self.waiver_auth = "Not Waivable"
 
 
 # Absolute symlink is dangling (VERIFY)

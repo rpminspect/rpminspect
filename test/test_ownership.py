@@ -1676,7 +1676,6 @@ class SecuritySKIPCapSETUIDWithOtherExecRPMs(TestRPMs):
 
         self.inspection = "ownership"
         self.result = "OK"
-        self.waiver_auth = "Not Waivable"
 
 
 class SecurityINFORMCapSETUIDWithOtherExecRPMs(TestRPMs):
@@ -1826,7 +1825,6 @@ class SecuritySKIPCapSETUIDWithOtherExecKoji(TestKoji):
 
         self.inspection = "ownership"
         self.result = "OK"
-        self.waiver_auth = "Not Waivable"
 
 
 class SecurityINFORMCapSETUIDWithOtherExecKoji(TestKoji):
@@ -1980,7 +1978,6 @@ class SecuritySKIPCapSETUIDWithOtherExecCompareRPMs(TestCompareRPMs):
 
         self.inspection = "ownership"
         self.result = "OK"
-        self.waiver_auth = "Not Waivable"
 
 
 class SecurityINFORMCapSETUIDWithOtherExecCompareRPMs(TestCompareRPMs):
@@ -2140,7 +2137,6 @@ class SecuritySKIPCapSETUIDWithOtherExecCompareKoji(TestCompareKoji):
 
         self.inspection = "ownership"
         self.result = "OK"
-        self.waiver_auth = "Not Waivable"
 
 
 class SecurityINFORMCapSETUIDWithOtherExecCompareKoji(TestCompareKoji):
@@ -2301,7 +2297,6 @@ class SecuritySKIPCapSETUIDWithGroupExecRPMs(TestRPMs):
 
         self.inspection = "ownership"
         self.result = "OK"
-        self.waiver_auth = "Not Waivable"
 
 
 class SecurityINFORMCapSETUIDWithGroupExecRPMs(TestRPMs):
@@ -2451,7 +2446,6 @@ class SecuritySKIPCapSETUIDWithGroupExecKoji(TestKoji):
 
         self.inspection = "ownership"
         self.result = "OK"
-        self.waiver_auth = "Not Waivable"
 
 
 class SecurityINFORMCapSETUIDWithGroupExecKoji(TestKoji):
@@ -2605,7 +2599,6 @@ class SecuritySKIPCapSETUIDWithGroupExecCompareRPMs(TestCompareRPMs):
 
         self.inspection = "ownership"
         self.result = "OK"
-        self.waiver_auth = "Not Waivable"
 
 
 class SecurityINFORMCapSETUIDWithGroupExecCompareRPMs(TestCompareRPMs):
@@ -2765,7 +2758,6 @@ class SecuritySKIPCapSETUIDWithGroupExecCompareKoji(TestCompareKoji):
 
         self.inspection = "ownership"
         self.result = "OK"
-        self.waiver_auth = "Not Waivable"
 
 
 class SecurityINFORMCapSETUIDWithGroupExecCompareKoji(TestCompareKoji):

@@ -74,7 +74,6 @@ class WithoutExecStackRPM(TestRPMs):
         TestRPMs.setUp(self)
         self.rpm.add_simple_compilation(compileFlags="-Wl,-z,noexecstack")
         self.inspection = "elf"
-        self.waiver_auth = "Not Waivable"
         self.result = "OK"
 
 
@@ -83,7 +82,6 @@ class WithoutExecStackKoji(TestKoji):
         TestKoji.setUp(self)
         self.rpm.add_simple_compilation(compileFlags="-Wl,-z,noexecstack")
         self.inspection = "elf"
-        self.waiver_auth = "Not Waivable"
         self.result = "OK"
 
 
@@ -93,7 +91,6 @@ class WithoutExecStackCompareRPM(TestCompareRPMs):
         self.before_rpm.add_simple_compilation(compileFlags="-Wl,-z,noexecstack")
         self.after_rpm.add_simple_compilation(compileFlags="-Wl,-z,noexecstack")
         self.inspection = "elf"
-        self.waiver_auth = "Not Waivable"
         self.result = "OK"
 
 
@@ -103,7 +100,6 @@ class WithoutExecStackCompareKoji(TestCompareKoji):
         self.before_rpm.add_simple_compilation(compileFlags="-Wl,-z,noexecstack")
         self.after_rpm.add_simple_compilation(compileFlags="-Wl,-z,noexecstack")
         self.inspection = "elf"
-        self.waiver_auth = "Not Waivable"
         self.result = "OK"
 
 
@@ -126,7 +122,6 @@ class SecuritySKIPWithExecStackRPM(TestRPMs):
             installPath="usr/sbin/skip", compileFlags="-Wl,-z,execstack"
         )
         self.inspection = "elf"
-        self.waiver_auth = "Not Waivable"
         self.result = "OK"
 
 
@@ -181,7 +176,6 @@ class SecuritySKIPWithExecStackKoji(TestKoji):
             installPath="usr/sbin/skip", compileFlags="-Wl,-z,execstack"
         )
         self.inspection = "elf"
-        self.waiver_auth = "Not Waivable"
         self.result = "OK"
 
 
@@ -242,7 +236,6 @@ class SecuritySKIPWithExecStackCompareRPMs(TestCompareRPMs):
             installPath="usr/sbin/skip", compileFlags="-Wl,-z,execstack"
         )
         self.inspection = "elf"
-        self.waiver_auth = "Not Waivable"
         self.result = "OK"
 
 
@@ -312,7 +305,6 @@ class SecuritySKIPWithExecStackCompareKoji(TestCompareKoji):
             installPath="usr/sbin/skip", compileFlags="-Wl,-z,execstack"
         )
         self.inspection = "elf"
-        self.waiver_auth = "Not Waivable"
         self.result = "OK"
 
 
@@ -379,7 +371,6 @@ class SecuritySKIPLostFullRELROCompareRPMs(TestCompareRPMs):
             installPath="usr/sbin/skip", compileFlags="-Wl,-z,norelro"
         )
         self.inspection = "elf"
-        self.waiver_auth = "Not Waivable"
         self.result = "OK"
 
 
@@ -445,7 +436,6 @@ class SecuritySKIPLostFullRELROCompareKoji(TestCompareKoji):
             installPath="usr/sbin/skip", compileFlags="-Wl,-z,norelro"
         )
         self.inspection = "elf"
-        self.waiver_auth = "Not Waivable"
         self.result = "OK"
 
 
@@ -512,7 +502,6 @@ class SecuritySKIPFulltoPartialRELROCompareRPMs(TestCompareRPMs):
             installPath="usr/sbin/skip", compileFlags="-Wl,-z,relro,-z,lazy"
         )
         self.inspection = "elf"
-        self.waiver_auth = "Not Waivable"
         self.result = "OK"
 
 
@@ -578,7 +567,6 @@ class SecuritySKIPFulltoPartialRELROCompareKoji(TestCompareKoji):
             installPath="usr/sbin/skip", compileFlags="-Wl,-z,relro,-z,lazy"
         )
         self.inspection = "elf"
-        self.waiver_auth = "Not Waivable"
         self.result = "OK"
 
 
@@ -695,7 +683,6 @@ class SecuritySKIPLostPICCompareRPMs(TestCompareRPMs):
         self.after_rpm.add_payload_check(installPath, None)
 
         self.inspection = "elf"
-        self.waiver_auth = "Not Waivable"
         self.result = "OK"
 
 
@@ -890,7 +877,6 @@ class SecuritySKIPHasTEXTRELRPMs(TestRPMs):
         self.rpm.add_payload_check(installPath, None)
 
         self.inspection = "elf"
-        self.waiver_auth = "Not Waivable"
         self.result = "OK"
 
 
@@ -1041,7 +1027,6 @@ class SecuritySKIPHasTEXTRELCompareRPMs(TestCompareRPMs):
         self.after_rpm.add_payload_check(installPath, None)
 
         self.inspection = "elf"
-        self.waiver_auth = "Not Waivable"
         self.result = "OK"
 
 
@@ -1246,7 +1231,6 @@ class SecuritySKIPHasTEXTRELCompareKoji(TestCompareKoji):
         self.after_rpm.add_payload_check(installPath, None)
 
         self.inspection = "elf"
-        self.waiver_auth = "Not Waivable"
         self.result = "OK"
 
 
