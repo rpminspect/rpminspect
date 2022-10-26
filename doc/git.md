@@ -21,7 +21,7 @@ To categorize commits and make release log generation easier, please use categor
 | [fix]  | General bug fix in the library or frontend program |
 | [lib]  | librpminspect feature or significant change |
 | [new]  | New inspections or inspection changes (not bug fixes) |
-| [cmd]  | rpminspect(1) changes |
+| [cmd]  | rpminspect(1) changes or improvements related to it |
 | [cfg]  | Config file or data/ file changes |
 | [ci]   | Changes to the GitHub Actions CI scripts and files |
 | [doc]  | Documentation changes |
