@@ -102,9 +102,9 @@ Requires:       /usr/bin/annocheck
 # the same name, as provided by libabigail.  If it is not present on
 # the system, you can disable the relevant inspections.
 %if 0%{?rhel} >= 8 || 0%{?epel} >= 8 || 0%{?fedora}
-Recommends:     libabigail >= 1.8.2
+Recommends:     libabigail >= 2.1
 %else
-Requires:       libabigail >= 1.8.2
+Requires:       libabigail >= 2.1
 %endif
 
 %description -n librpminspect
