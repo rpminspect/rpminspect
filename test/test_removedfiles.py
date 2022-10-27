@@ -41,7 +41,6 @@ class FileNoRemovedRPMs(TestCompareRPMs):
 
         self.inspection = "removedfiles"
         self.result = "OK"
-        self.waiver_auth = "Not Waivable"
 
 
 class FileNoRemovedKoji(TestCompareKoji):
@@ -62,7 +61,6 @@ class FileNoRemovedKoji(TestCompareKoji):
 
         self.inspection = "removedfiles"
         self.result = "OK"
-        self.waiver_auth = "Not Waivable"
 
 
 class FileRemovedRPMs(TestCompareRPMs):
@@ -96,8 +94,8 @@ class FileRemovedSecurityRPMs(TestCompareRPMs):
         )
 
         self.inspection = "removedfiles"
-        self.result = "OK"
-        self.waiver_auth = "WAIVABLE_BY_SECURITY"
+        self.result = "BAD"
+        self.waiver_auth = "Security"
 
 
 class FileRemovedKoji(TestCompareKoji):
@@ -114,4 +112,3 @@ class FileRemovedKoji(TestCompareKoji):
 
         self.inspection = "removedfiles"
         self.result = "OK"
-        self.waiver_auth = "Not Waivable"
