@@ -157,12 +157,6 @@ static bool abidiff_driver(struct rpminspect *ri, rpmfile_entry_t *file)
     assert(cmd != NULL);
     free(tmp);
 
-    /* header dir args */
-/*
-    cmd = add_abidiff_arg(cmd, headers_dir1_table, arch, ABI_HEADERS_DIR1);
-    cmd = add_abidiff_arg(cmd, headers_dir2_table, arch, ABI_HEADERS_DIR2);
-*/
-
     /* the before and after builds */
     cmd = strappend(cmd, " ", file->peer_file->fullpath, " ", file->fullpath, NULL);
 
