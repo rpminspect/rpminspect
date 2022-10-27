@@ -107,7 +107,7 @@ static bool removedfiles_driver(struct rpminspect *ri, rpmfile_entry_t *file)
                 entry->data++;
             }
 
-            if (strprefix(entry->data, file->localpath)) {
+            if (strprefix(file->localpath, entry->data)) {
                 params.waiverauth = WAIVABLE_BY_SECURITY;
                 params.verb = VERB_FAILED;
                 break;
@@ -133,7 +133,7 @@ static bool removedfiles_driver(struct rpminspect *ri, rpmfile_entry_t *file)
         } else {
             if (sentry) {
                 params.waiverauth = WAIVABLE_BY_SECURITY;
-            } else {
+            } else if ((sentry == NULL) && (params.waiverauth == NULL_WAIVERAUTH)) {
                 params.waiverauth = WAIVABLE_BY_ANYONE;
             }
 
