@@ -22,15 +22,37 @@ static bool reported = false;
  * libannocheck, there's no easy way to discover changes.  The
  * assumption here is the profile naming scheme remains the same.
  */
-static void set_libannocheck_profile(struct libannocheck_internals *anno, const char *product_release)
+static void set_libannocheck_profile(struct libannocheck_internals *anno, const char *annocheck_profile, const char *product_release)
 {
     const char **profiles = NULL;
     unsigned int num_profiles = 0;
     unsigned int i = 0;
     libannocheck_error annoerr = 0;
+    const char *pr = NULL;
 
-    if (anno == NULL || product_release == NULL) {
+    if (anno == NULL || (annocheck_profile == NULL && product_release == NULL)) {
         return;
+    }
+
+    /* if the config file specified a profile, use it */
+    if (annocheck_profile) {
+        annoerr = libannocheck_enable_profile(anno, annocheck_profile);
+
+        if (annoerr != libannocheck_error_none) {
+            warnx(_("libannocheck_enable_profile error: %s"), libannocheck_get_error_message(anno, annoerr));
+        }
+
+        return;
+    }
+
+    /* try to match a profile against the product release */
+
+    /* trim any leading periods */
+    pr = product_release;
+    assert(pr != NULL);
+
+    while (*pr == '.' && *pr != '\0') {
+        pr++;
     }
 
     /* get libannocheck profiles first */
@@ -43,8 +65,12 @@ static void set_libannocheck_profile(struct libannocheck_internals *anno, const 
 
     /* iterate over the profiles to try and find a match */
     for (i = 0; i < num_profiles; i++) {
-        /* XXX: this needs a map in the config file */
-        if (strsuffix(product_release, profiles[i]) || (strprefix(product_release, ".fc") && !strcmp(profiles[i], "rawhide"))) {
+        /*
+         * 'fc' is unique to rpminspect-data-fedora and 'rawhide' is
+         * unique to libannocheck, but these should probably be in the
+         * config file for rpminspect
+         */
+        if (strprefix(profiles[i], pr) || (strprefix(profiles[i], "fc") && !strcmp(profiles[i], "rawhide"))) {
             annoerr = libannocheck_enable_profile(anno, profiles[i]);
 
             if (annoerr != libannocheck_error_none) {
@@ -172,7 +198,7 @@ static struct libannocheck_internals *libannocheck_setup(struct rpminspect *ri, 
         }
 
         /* enable libannocheck profile if there's a match */
-        set_libannocheck_profile(anno, ri->product_release);
+        set_libannocheck_profile(anno, ri->annocheck_profile, ri->product_release);
     } else {
         /* reinitialize with a new file */
         annoerr = libannocheck_reinit(anno, file->fullpath, get_after_debuginfo_path(ri, file, arch));
