@@ -1,5 +1,6 @@
 annobin-libannocheck.i686
 bash
+binutils-devel.i686
 clamav-data
 clamav-devel.i686
 clamav-update.i686
