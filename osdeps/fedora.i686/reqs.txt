@@ -1,4 +1,4 @@
-annobin-annocheck
+annobin-libannocheck
 bash
 cargo
 clamav-data
