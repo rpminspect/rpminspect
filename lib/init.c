@@ -140,7 +140,8 @@ enum {
     BLOCK_LICENSEDB = 73,
     BLOCK_DEBUGINFO = 74,
     BLOCK_PATCH_AUTOMACROS = 75,
-    BLOCK_MODULARITY = 76
+    BLOCK_MODULARITY = 76,
+    BLOCK_ANNOCHECK_PROFILE = 77
 };
 
 static int add_regex(const char *pattern, regex_t **regex_out)
@@ -998,6 +999,8 @@ static int read_cfgfile(struct rpminspect *ri, const char *filename)
                             block = BLOCK_ANNOCHECK_EXTRA_OPTS;
                         } else if (!strcmp(key, SECTION_IGNORE)) {
                             block = BLOCK_IGNORE;
+                        } else if (!strcmp(key, SECTION_PROFILE)) {
+                            block = BLOCK_ANNOCHECK_PROFILE;
                         } else if (strcmp(key, t)) {
                             /* continue support the old syntax for the yaml file */
                             process_table(key, t, false, false, &ri->annocheck);
@@ -1120,9 +1123,6 @@ static int read_cfgfile(struct rpminspect *ri, const char *filename)
                         } else if (!strcmp(key, SECTION_DESKTOP_FILE_VALIDATE)) {
                             free(ri->commands.desktop_file_validate);
                             ri->commands.desktop_file_validate = strdup(t);
-                        } else if (!strcmp(key, SECTION_ANNOCHECK)) {
-                            free(ri->commands.annocheck);
-                            ri->commands.annocheck = strdup(t);
                         } else if (!strcmp(key, SECTION_ABIDIFF)) {
                             free(ri->commands.abidiff);
                             ri->commands.abidiff = strdup(t);
@@ -1293,6 +1293,9 @@ static int read_cfgfile(struct rpminspect *ri, const char *filename)
                                 warnx(_("Invalid annocheck failure_reporting_level: %s, defaulting to %s."), t, strseverity(RESULT_VERIFY));
                                 ri->annocheck_failure_severity = RESULT_VERIFY;
                             }
+                        } else if (block == BLOCK_ANNOCHECK_PROFILE) {
+                            free(ri->annocheck_profile);
+                            ri->annocheck_profile = strdup(t);
                         }
                     } else if (group == BLOCK_JAVABYTECODE) {
                         process_table(key, t, false, true, &ri->jvm);
@@ -2227,7 +2230,6 @@ struct rpminspect *calloc_rpminspect(struct rpminspect *ri)
     /* Initialize commands */
     ri->commands.msgunfmt = strdup(MSGUNFMT_CMD);
     ri->commands.desktop_file_validate = strdup(DESKTOP_FILE_VALIDATE_CMD);
-    ri->commands.annocheck = strdup(ANNOCHECK_CMD);
     ri->commands.abidiff = strdup(ABIDIFF_CMD);
     ri->commands.kmidiff = strdup(KMIDIFF_CMD);
 
