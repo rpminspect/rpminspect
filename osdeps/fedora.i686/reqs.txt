@@ -1,4 +1,4 @@
-annobin-libannocheck
+annobin-libannocheck.i686
 bash
 cargo
 clamav-data

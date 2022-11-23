@@ -1,4 +1,4 @@
-annobin-libannocheck
+annobin-libannocheck.i686
 bash
 clamav-data
 clamav-devel.i686
