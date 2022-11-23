@@ -197,6 +197,15 @@ else
     libcap = disabler()
 endif
 
+# libannocheck
+if get_option('with_libannocheck')
+    libannocheck = dependency('libannocheck', required : true)
+    add_project_arguments('-D_WITH_LIBANNOCHECK', language : 'c')
+else
+    message('disable libannocheck support')
+    libannocheck = disabler()
+endif
+
 # dlopen
 if not cc.has_function('dlopen', args : ['-ldl'], dependencies : [zlib])
     error('*** unable to find dlopen() in libdl')

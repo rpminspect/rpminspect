@@ -376,7 +376,6 @@ struct command_paths {
     char *diff;
     char *msgunfmt;
     char *desktop_file_validate;
-    char *annocheck;
     char *abidiff;
     char *kmidiff;
 };
@@ -588,6 +587,7 @@ struct rpminspect {
     /* hash table of annocheck tests */
     string_map_t *annocheck;
     severity_t annocheck_failure_severity;
+    char *annocheck_profile;
 
     /* hash table of path migrations */
     string_map_t *pathmigration;
