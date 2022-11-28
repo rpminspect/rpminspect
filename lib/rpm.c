@@ -3,6 +3,7 @@
  * SPDX-License-Identifier: LGPL-3.0-or-later
  */
 
+#include <libgen.h>
 #include <stdbool.h>
 #include <assert.h>
 #include <err.h>
@@ -37,6 +38,8 @@ Header get_rpm_header(struct rpminspect *ri, const char *pkg)
     rpmts ts;
     FD_t fd;
     rpmRC result;
+    char *head = NULL;
+    char *headptr = NULL;
     char *bpkg = NULL;
     header_cache_t *hentry = NULL;
 
@@ -44,13 +47,16 @@ Header get_rpm_header(struct rpminspect *ri, const char *pkg)
     assert(pkg != NULL);
 
     /* The cache stores the basename of the pkg */
-    bpkg = basename(pkg);
+    headptr = head = strdup(pkg);
+    assert(headptr != NULL);
+    bpkg = basename(head);
 
     /* First see if we can return the cached header */
     if (ri->header_cache != NULL) {
         HASH_FIND_STR(ri->header_cache, bpkg, hentry);
 
         if (hentry != NULL) {
+            free(headptr);
             return hentry->hdr;
         }
     }
@@ -65,6 +71,7 @@ Header get_rpm_header(struct rpminspect *ri, const char *pkg)
             Fclose(fd);
         }
 
+        free(headptr);
         return NULL;
     }
 
@@ -82,9 +89,11 @@ Header get_rpm_header(struct rpminspect *ri, const char *pkg)
     if (result != RPMRC_OK) {
         free(hentry->pkg);
         free(hentry);
+        free(headptr);
         return NULL;
     }
 
+    free(headptr);
     HASH_ADD_KEYPTR(hh, ri->header_cache, hentry->pkg, strlen(hentry->pkg), hentry);
     return hentry->hdr;
 }

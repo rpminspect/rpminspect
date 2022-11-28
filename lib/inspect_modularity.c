@@ -4,6 +4,7 @@
  */
 
 #include <stdio.h>
+#include <libgen.h>
 #include <string.h>
 #include <ftw.h>
 #include <errno.h>
@@ -22,6 +23,8 @@ static bool static_context = false;
 static int read_modulemd(const char *fpath, __attribute__((unused)) const struct stat *sb, int tflag, __attribute__((unused)) struct FTW *ftwbuf)
 {
     int r = 0;
+    char *head = NULL;
+    char *headptr = NULL;
     char *bn = NULL;
     yaml_parser_t parser;
     yaml_token_t token;
@@ -33,7 +36,9 @@ static int read_modulemd(const char *fpath, __attribute__((unused)) const struct
         return 0;
     }
 
-    bn = basename(fpath);
+    headptr = head = strdup(fpath);
+    assert(headptr != NULL);
+    bn = basename(head);
     static_context = false;
 
     /* try to read this file */
@@ -55,6 +60,7 @@ static int read_modulemd(const char *fpath, __attribute__((unused)) const struct
         do {
             if (yaml_parser_scan(&parser, &token) == 0) {
                 warnx(_("ignoring malformed module metadata file: %s"), fpath);
+                free(headptr);
                 return -1;
             }
 
@@ -98,6 +104,7 @@ static int read_modulemd(const char *fpath, __attribute__((unused)) const struct
         }
     }
 
+    free(headptr);
     return r;
 }
 
