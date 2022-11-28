@@ -194,7 +194,7 @@ bool match_path(const char *pattern, const char *root, const char *path)
 {
     bool match = false;
     int r = 0;
-    int gflags = GLOB_NOSORT | GLOB_PERIOD;
+    int gflags = GLOB_NOSORT;
     char globpath[PATH_MAX + 1];
     char *globsub = NULL;
     char *gp = globpath;
@@ -243,6 +243,11 @@ bool match_path(const char *pattern, const char *root, const char *path)
 #ifdef GLOB_BRACE
     /* this is a GNU extension, see glob(3) */
     gflags |= GLOB_BRACE;
+#endif
+
+#ifdef GLOB_PERIOD
+    /* this is a GNU extension, see glob(3) */
+    gflags |= GLOB_PERIOD;
 #endif
 
     n = strdup(path);
