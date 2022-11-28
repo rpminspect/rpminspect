@@ -4,6 +4,7 @@
  */
 
 #include <stdio.h>
+#include <libgen.h>
 #include <string.h>
 #include <errno.h>
 #include <err.h>
