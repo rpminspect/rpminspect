@@ -6,6 +6,7 @@
 #include <assert.h>
 #include <errno.h>
 #include <err.h>
+#include <fcntl.h>
 #include <sys/mman.h>
 #include <sys/stat.h>
 
