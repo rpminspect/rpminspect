@@ -6,6 +6,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdbool.h>
+#include <libgen.h>
 #include <unistd.h>
 #include <limits.h>
 #include <sys/types.h>
@@ -14,8 +15,21 @@
 #include <errno.h>
 #include <err.h>
 #include <ftw.h>
-#include <byteswap.h>
 #include <assert.h>
+
+#ifdef __linux__
+#include <byteswap.h>
+#define BSWAPFUNC bswap_16
+#endif
+
+#ifdef __freebsd__
+#include <sys/endian.h>
+#define BSWAPFUNC bswap16
+#endif
+
+#ifndef BSWAPFUNC
+#define BSWAPFUNC bswap16
+#endif
 
 #include "rpminspect.h"
 
@@ -33,6 +47,7 @@ static bool jar_result = true;
 static short get_jvm_major(const char *filename, const char *localpath, const char *container)
 {
     int fd;
+    int flags = O_RDONLY | O_CLOEXEC;
     short major;
     char magic[8];
 
@@ -43,7 +58,10 @@ static short get_jvm_major(const char *filename, const char *localpath, const ch
     /* Go ahead and assume Java class filenames end with .class */
     if (strsuffix(filename, CLASS_FILENAME_EXTENSION)) {
         /* read the first 5 bytes and verify it's a Java class */
-        fd = open(filename, O_RDONLY | O_CLOEXEC | O_LARGEFILE);
+#ifdef O_LARGEFILE
+        flags |= O_LARGEFILE;
+#endif
+        fd = open(filename, flags);
 
         if (fd == -1) {
             warn("open");
@@ -66,7 +84,7 @@ static short get_jvm_major(const char *filename, const char *localpath, const ch
             memcpy(&major, magic + 6, sizeof(major));
 
             if (__BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__) {
-                major = bswap_16(major);
+                major = BSWAPFUNC(major);
             }
 
             if (major >= 30) {
