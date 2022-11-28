@@ -1,3 +1,0 @@
-cpp-coveralls
-gcovr
-rpmfluff

@@ -6,6 +6,9 @@ PATH=/bin:/usr/bin:/sbin:/usr/sbin:/usr/local/bin:/usr/local/sbin
 PKG_PREFIX="py$(python3 --version | cut -d ' ' -f 2 | cut -d '.' -f 1,2 | sed -e 's|\.||g')"
 pkg install -y ${PKG_PREFIX}-pip ${PKG_PREFIX}-pyaml ${PKG_PREFIX}-timeout-decorator
 
+# Now install modules with pip
+pip install cpp-coveralls gcovr rpmfluff
+
 # libmandoc is missing on FreeBSD
 curl -O https://mandoc.bsd.lv/snapshots/mandoc.tar.gz
 SUBDIR="$(tar -tvf mandoc.tar.gz | head -n 1 | rev | cut -d ' ' -f 1 | rev)"
@@ -27,7 +30,7 @@ tar -xvf mandoc.tar.gz
   echo 'CFLAGS="-g -fPIC"';
 } > "${SUBDIR}"/configure.local
 
-( cd "${SUBDIR}" && ./configure && make && make lib-install )
+( cd "${SUBDIR}" && ./configure && gmake && gmake lib-install )
 rm -rf mandoc.tar.gz "${SUBDIR}"
 
 # Update the clamav database
