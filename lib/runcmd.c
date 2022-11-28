@@ -22,16 +22,14 @@
 #define RD STDIN_FILENO
 #define WR STDOUT_FILENO
 
-extern char **environ;
-
 /*
- * Generic fork()/execvpe() wrapper to return the output of the
+ * Generic fork()/execvp() wrapper to return the output of the
  * process and the exit code (if desired).  This function returns an
  * allocated string of the output from the program that ran or NULL if
  * there was no output.
  *
  * The first argument is a pointer to an int that will hold the exit
- * code from execvpe().  If this pointer is NULL, then the caller does
+ * code from execvp().  If this pointer is NULL, then the caller does
  * not want the exit code.  Internally the exit code will be used to
  * determine if the process was signaled or not, but the exit code
  * will not be given back to the caller.
@@ -102,8 +100,8 @@ char *run_cmd_vpe(int *exitcode, const char *workdir, char **argv)
         setlinebuf(stdout);
 
         /* run the command */
-        if (execvpe(argv[0], argv, environ) == -1) {
-            warn("execvpe");
+        if (execvp(argv[0], argv) == -1) {
+            warn("execvp");
             _exit(EXIT_FAILURE);
         }
     } else if (proc == -1) {
