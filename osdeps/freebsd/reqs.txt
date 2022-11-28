@@ -1,3 +1,5 @@
+autoconf
+automake
 bash
 clamav
 cunit
@@ -8,6 +10,7 @@ gcc
 gettext
 git
 gmake
+gnulibiberty
 html
 icu
 json-c
@@ -16,6 +19,7 @@ libabigail
 libarchive
 libffi
 libxml2
+libxslt
 libyaml
 meson
 ninja
