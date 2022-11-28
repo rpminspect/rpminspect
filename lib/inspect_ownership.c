@@ -32,9 +32,11 @@ static bool ownership_driver(struct rpminspect *ri, rpmfile_entry_t *file)
     char *before_val = NULL;
     char *after_val = NULL;
     char *what = NULL;
+#ifdef _WITH_LIBCAP
     char *captext = NULL;
     cap_t cap = NULL;
     cap_flag_value_t have_setuid = CAP_CLEAR;
+#endif
     struct result_params params;
 
     /* Skip source packages */
@@ -108,6 +110,7 @@ static bool ownership_driver(struct rpminspect *ri, rpmfile_entry_t *file)
 
             /* Check the group - special handling */
             if (strcmp(group, ri->bin_group)) {
+#ifdef _WITH_LIBCAP
                 /* Gather capabilities(7) for the file we need */
                 captext = get_rpm_header_value(file, RPMTAG_FILECAPS);
 
@@ -159,6 +162,9 @@ static bool ownership_driver(struct rpminspect *ri, rpmfile_entry_t *file)
                         }
                     }
                 } else if (!match_fileinfo_group(ri, file, group, NAME_OWNERSHIP, NULL, NULL) && (ri->tests & INSPECT_OWNERSHIP)) {
+#else
+                if (!match_fileinfo_group(ri, file, group, NAME_OWNERSHIP, NULL, NULL) && (ri->tests & INSPECT_OWNERSHIP)) {
+#endif
                     xasprintf(&params.msg, _("File %s has group `%s` on %s, but should be `%s`"), file->localpath, group, arch, ri->bin_group);
                     xasprintf(&params.remedy, REMEDY_OWNERSHIP_BIN_GROUP, ri->fileinfo_filename);
                     params.severity = RESULT_BAD;
