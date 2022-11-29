@@ -68,6 +68,7 @@ jobs:
 
                   # Requirements before the git clone can happen
                   prepare: |
+                      pkg install -y git
                       git config --global --add safe.directory /__w/rpminspect/rpminspect
                   # Run the build and test
                   run: |
