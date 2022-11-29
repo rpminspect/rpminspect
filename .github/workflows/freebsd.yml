@@ -66,7 +66,7 @@ jobs:
             # Within the container, install the dependencies, build,
             # and run the test suite
             - name: Build and run the test suite
-              uses: vmactions/freebsd-vm@v0.1.5
+              uses: vmactions/freebsd-vm@v0
               with:
                   usesh: true
                   run: |
