@@ -54,16 +54,6 @@ jobs:
         # All of these steps run from within the main source
         # directory, so think of that as your $PWD
         steps:
-            # Needs git
-            - name: Install git
-              run: |
-                  /usr/sbin/pkg install -y git
-
-            # Requirements before the git clone can happen
-            - name: git clone requirements
-              run: |
-                  /usr/local/bin/git config --global --add safe.directory /__w/rpminspect/rpminspect
-
             # This means clone the git repo
             - uses: actions/checkout@v3
 
@@ -71,9 +61,15 @@ jobs:
             # and run the test suite
             - name: Build and run the test suite
               uses: vmactions/freebsd-vm@v0
+
               with:
-                  usesh: true
                   envs: 'PATH'
+                  usesh: true
+
+                  # Requirements before the git clone can happen
+                  prepare: |
+                      git config --global --add safe.directory /__w/rpminspect/rpminspect
+                  # Run the build and test
                   run: |
                       # Install GNU make(1) so we can use the instreqs target
                       pkg install -y gmake
