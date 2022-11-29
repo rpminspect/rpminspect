@@ -145,6 +145,10 @@ if get_option('with_libannocheck')
     deps += [ libannocheck ]
 endif
 
+if build_machine.system() == 'freebsd'
+    deps += [ intl ]
+endif
+
 librpminspect = library(
     'rpminspect',
     librpminspect_sources,

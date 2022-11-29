@@ -15,14 +15,25 @@ cc = meson.get_compiler('c')
 add_global_arguments('-D_GNU_SOURCE', language : 'c')
 add_global_arguments('-DPACKAGE_VERSION="@0@"'.format(meson.project_version()), language : 'c')
 
+# Library search dirs
+search_dirs = [ '/usr/local/lib', '/usr/lib64', '/usr/lib' ]
+
 # Translations
 if find_program('xgettext', required : get_option('nls')).found()
+    if build_machine.system() == 'freebsd'
+        intl = cc.find_library('intl',
+                               dirs : search_dirs,
+                               required : true,
+                               static : false)
+
+        if not intl.found() or not cc.has_function('libintl_gettext', dependencies : [ intl ])
+            error('*** unable to find libintl (with symbol libintl_gettext())')
+        endif
+    endif
+
     add_global_arguments('-DGETTEXT_DOMAIN="' + meson.project_name() + '"', language : 'c')
     subdir('po')
 endif
-
-# Library search dirs
-search_dirs = [ '/usr/local/lib', '/usr/lib64', '/usr/lib' ]
 
 # Dependencies that use pkg-config
 jsonc = dependency('json-c', required : true)
