@@ -47,18 +47,22 @@ jobs:
         # https://github.com/marketplace/actions/freebsd-vm
         runs-on: macos-12
 
+        # Environment variables for the job
+        env:
+            PATH: /usr/local/bin:/usr/bin:/usr/local/sbin:/usr/sbin:/bin:/sbin
+
         # All of these steps run from within the main source
         # directory, so think of that as your $PWD
         steps:
             # Needs git
             - name: Install git
               run: |
-                  pkg install -y git
+                  /usr/sbin/pkg install -y git
 
             # Requirements before the git clone can happen
             - name: git clone requirements
               run: |
-                  git config --global --add safe.directory /__w/rpminspect/rpminspect
+                  /usr/local/bin/git config --global --add safe.directory /__w/rpminspect/rpminspect
 
             # This means clone the git repo
             - uses: actions/checkout@v3
@@ -69,6 +73,7 @@ jobs:
               uses: vmactions/freebsd-vm@v0
               with:
                   usesh: true
+                  envs: 'PATH'
                   run: |
                       # Install GNU make(1) so we can use the instreqs target
                       pkg install -y gmake
