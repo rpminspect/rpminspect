@@ -81,6 +81,6 @@ jobs:
                       # Build the software and run the test suite
                       env CFLAGS=-I/usr/local/include LDFLAGS=-L/usr/local/lib meson setup build --werror -D b_buildtype=debug -D b_coverage=true -D with_libkmod=false -D with_libcap=false -D with_libannocheck=false
                       ninja -C build -v
-                      gmake check
+                      env LANG=en_US.UTF-8 meson test -C build -v
                       ninja -C build coverage
                       curl -s https://codecov.io/bash | bash
