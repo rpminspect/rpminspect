@@ -8,10 +8,7 @@ rpminspect_prog = executable(
         librpminspect,
     ],
     dependencies : [
-        libcurl,
-        yaml,
         rpm,
-        libkmod,
     ]
 )
 
