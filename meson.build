@@ -245,11 +245,6 @@ endif
 inc = include_directories('include')
 incxdiff = include_directories('libxdiff')
 
-# Test environment used by the test suite
-test_env = environment()
-test_env.set('RPMINSPECT_YAML', meson.source_root() + '/data/generic.yaml')
-test_env.set('RPMINSPECT_TEST_DATA_PATH', meson.source_root() + '/test/data')
-
 # Include all of the relevant subdirectories of the source tree
 subdir('libxdiff')
 subdir('lib')
