@@ -15,5 +15,8 @@ rpminspect_prog = executable(
     ]
 )
 
+# Make sure the test suite can find this built rpminspect
+test_env.set('RPMINSPECT', rpminspect_prog.full_path())
+
 # Install man pages
 install_man('rpminspect.1')
