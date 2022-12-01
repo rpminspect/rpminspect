@@ -25,7 +25,7 @@
 #include <rpm/rpmmacro.h>
 
 #ifdef _FREEBSD_LIBIBERTY
-#include <libiberty/libiberty.h>
+extern int strverscmp (const char *, const char *);
 #endif
 
 #include "rpminspect.h"
