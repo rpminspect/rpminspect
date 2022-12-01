@@ -17,13 +17,28 @@ add_global_arguments('-DPACKAGE_VERSION="@0@"'.format(meson.project_version()), 
 # Always add _GNU_SOURCE because some other libraries rely on this macro
 add_global_arguments('-D_GNU_SOURCE', language : 'c')
 
-# On FreeBSD, we need __BSD_VISIBLE
-if build_machine.system() == 'freebsd'
-    add_global_arguments('-D__BSD_VISIBLE', language : 'c')
-endif
-
 # Library search dirs
 search_dirs = [ '/usr/local/lib', '/usr/lib64', '/usr/lib' ]
+
+# On FreeBSD, figure out where strverscmp() is
+libiberty = cc.find_library('iberty',
+                            dirs : search_dirs,
+                            required : false,
+                            static : true)
+
+if build_machine.system() == 'freebsd'
+    # FreeBSD >= 14.x has it in libc
+    if cc.has_function('strverscmp')
+        add_global_arguments('-D__BSD_VISIBLE', language : 'c')
+    else
+        # check GNU libiberty
+        if not libiberty.found()
+            error('*** unable to find libiberty.a for strverscmp()')
+        endif
+
+        add_global_arguments('-D_HAVE_LIBIBERTY', language : 'c')
+    endif
+endif
 
 # Translations
 if find_program('xgettext', required : get_option('nls')).found()

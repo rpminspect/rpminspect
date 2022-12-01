@@ -23,6 +23,11 @@
 #include <clamav.h>
 #include <rpm/rpmlib.h>
 #include <rpm/rpmmacro.h>
+
+#ifdef _HAVE_LIBIBERTY
+#include <libiberty.h>
+#endif
+
 #include "rpminspect.h"
 
 void sigabrt_handler(__attribute__ ((unused)) int i)
