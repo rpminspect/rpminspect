@@ -1,4 +1,10 @@
 # Build rpminspect
+deps = [ rpm ]
+
+if libiberty.found()
+    deps += [ libiberty ]
+endif
+
 rpminspect_prog = executable(
     'rpminspect',
     [ 'rpminspect.c' ],
@@ -7,9 +13,7 @@ rpminspect_prog = executable(
     link_with : [
         librpminspect,
     ],
-    dependencies : [
-        rpm,
-    ]
+    dependencies : deps
 )
 
 # Install man pages
