@@ -36,7 +36,7 @@ if build_machine.system() == 'freebsd'
             error('*** unable to find libiberty.a for strverscmp()')
         endif
 
-        add_global_arguments('-D_HAVE_LIBIBERTY', language : 'c')
+        add_global_arguments('-D_FREEBSD_LIBIBERTY', language : 'c')
     endif
 endif
 
