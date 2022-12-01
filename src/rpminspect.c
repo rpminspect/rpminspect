@@ -24,8 +24,8 @@
 #include <rpm/rpmlib.h>
 #include <rpm/rpmmacro.h>
 
-#ifdef _HAVE_LIBIBERTY
-#include <libiberty.h>
+#ifdef _FREEBSD_LIBIBERTY
+#include <libiberty/libiberty.h>
 #endif
 
 #include "rpminspect.h"
