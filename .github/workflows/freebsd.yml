@@ -92,11 +92,12 @@ jobs:
                       ninja -C build coverage
                       echo $? > exitcodes/coverage
                       curl -s https://codecov.io/bash | bash
+                      mv exitcodes build
 
             # Process the exit codes outside the VM
             - name: Check exit codes
               run: |
-                  for ec in exitcodes/* ; do
+                  for ec in build/exitcodes/* ; do
                       code=$(cat ${ec} 2>/dev/null)
                       [ ${code} -eq 0 ] || exit ${code}
                   done
