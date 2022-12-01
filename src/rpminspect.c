@@ -14,6 +14,7 @@
 #include <sys/ioctl.h>
 #include <signal.h>
 #include <unistd.h>
+#include <string.h>
 #include <limits.h>
 #include <wordexp.h>
 #include <regex.h>
