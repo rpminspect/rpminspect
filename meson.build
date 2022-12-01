@@ -11,9 +11,16 @@ project('rpminspect',
 
 cc = meson.get_compiler('c')
 
-# Compiler options
-add_global_arguments('-D_GNU_SOURCE', language : 'c')
+# Define the program version
 add_global_arguments('-DPACKAGE_VERSION="@0@"'.format(meson.project_version()), language : 'c')
+
+# Always add _GNU_SOURCE because some other libraries rely on this macro
+add_global_arguments('-D_GNU_SOURCE', language : 'c')
+
+# On FreeBSD, we need __BSD_VISIBLE
+if build_machine.system() == 'freebsd'
+    add_global_arguments('-D__BSD_VISIBLE', language : 'c')
+endif
 
 # Library search dirs
 search_dirs = [ '/usr/local/lib', '/usr/lib64', '/usr/lib' ]
