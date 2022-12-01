@@ -12,7 +12,7 @@ pip install cpp-coveralls gcovr rpmfluff
 # libmandoc is missing on FreeBSD
 curl -O https://mandoc.bsd.lv/snapshots/mandoc.tar.gz
 SUBDIR="$(tar -tvf mandoc.tar.gz | head -n 1 | rev | cut -d ' ' -f 1 | rev)"
-tar -xvf mandoc.tar.gz
+tar -xf mandoc.tar.gz
 { echo 'PREFIX=/usr/local';
   echo 'BINDIR=/usr/local/bin';
   echo 'SBINDIR=/usr/local/sbin';
