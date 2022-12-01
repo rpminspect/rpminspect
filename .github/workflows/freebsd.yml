@@ -75,12 +75,28 @@ jobs:
                       # Install GNU make(1) so we can use the instreqs target
                       pkg install -y gmake
 
+                      # Store exit codes for each step here for use in the next step
+                      mkdir -p exitcodes
+
                       # Install build dependencies and set up the target
                       gmake instreqs
+                      echo $? > exitcodes/instreqs
 
                       # Build the software and run the test suite
                       env CFLAGS=-I/usr/local/include LDFLAGS=-L/usr/local/lib meson setup build --werror -D b_buildtype=debug -D b_coverage=true -D with_libkmod=false -D with_libcap=false -D with_libannocheck=false
+                      echo $? > exitcodes/setup
                       ninja -C build -v
+                      echo $? > exitcodes/build
                       env LANG=en_US.UTF-8 meson test -C build -v
+                      echo $? > exitcodes/test
                       ninja -C build coverage
+                      echo $? > exitcodes/coverage
                       curl -s https://codecov.io/bash | bash
+
+            # Process the exit codes outside the VM
+            - name: Check exit codes
+              run: |
+                  for ec in exitcodes/* ; do
+                      code=$(cat ${ec} 2>/dev/null)
+                      [ ${code} -eq 0 ] || exit ${code}
+                  done
