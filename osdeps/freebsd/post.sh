@@ -33,5 +33,8 @@ tar -xf mandoc.tar.gz
 ( cd "${SUBDIR}" && ./configure && gmake && gmake lib-install )
 rm -rf mandoc.tar.gz "${SUBDIR}"
 
+# The ksh93 package does not install a 'ksh' executable, so create a symlink
+ln -sf ksh93 /usr/local/bin/ksh
+
 # Update the clamav database
 freshclam
