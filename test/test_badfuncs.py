@@ -16,6 +16,12 @@ forbidden_ipv6_src = open(datadir + "/forbidden-ipv6.c").read()
 class ForbiddenIPv6FunctionRPM(TestRPMs):
     def setUp(self):
         super().setUp()
+
+        if os.uname().sysname == "FreeBSD":
+            self.extra_cfg = {}
+            self.extra_cfg["badfuncs"] = []
+            self.extra_cfg["badfuncs"].append("__inet_aton")
+
         self.rpm.add_simple_compilation(sourceContent=forbidden_ipv6_src)
         self.inspection = "badfuncs"
         self.waiver_auth = "Anyone"
@@ -25,6 +31,12 @@ class ForbiddenIPv6FunctionRPM(TestRPMs):
 class ForbiddenIPv6FunctionKoji(TestKoji):
     def setUp(self):
         super().setUp()
+
+        if os.uname().sysname == "FreeBSD":
+            self.extra_cfg = {}
+            self.extra_cfg["badfuncs"] = []
+            self.extra_cfg["badfuncs"].append("__inet_aton")
+
         self.rpm.add_simple_compilation(sourceContent=forbidden_ipv6_src)
         self.inspection = "badfuncs"
         self.waiver_auth = "Anyone"
@@ -34,6 +46,12 @@ class ForbiddenIPv6FunctionKoji(TestKoji):
 class ForbiddenIPv6FunctionCompareRPMs(TestCompareRPMs):
     def setUp(self):
         super().setUp()
+
+        if os.uname().sysname == "FreeBSD":
+            self.extra_cfg = {}
+            self.extra_cfg["badfuncs"] = []
+            self.extra_cfg["badfuncs"].append("__inet_aton")
+
         self.before_rpm.add_simple_compilation(sourceContent=forbidden_ipv6_src)
         self.after_rpm.add_simple_compilation(sourceContent=forbidden_ipv6_src)
         self.inspection = "badfuncs"
@@ -44,6 +62,12 @@ class ForbiddenIPv6FunctionCompareRPMs(TestCompareRPMs):
 class ForbiddenIPv6FunctionCompareKoji(TestCompareKoji):
     def setUp(self):
         super().setUp()
+
+        if os.uname().sysname == "FreeBSD":
+            self.extra_cfg = {}
+            self.extra_cfg["badfuncs"] = []
+            self.extra_cfg["badfuncs"].append("__inet_aton")
+
         self.before_rpm.add_simple_compilation(sourceContent=forbidden_ipv6_src)
         self.after_rpm.add_simple_compilation(sourceContent=forbidden_ipv6_src)
         self.inspection = "badfuncs"
@@ -59,7 +83,15 @@ class AllowedForbiddenIPv6FunctionRPM(TestRPMs):
         self.extra_cfg = {}
         self.extra_cfg["badfuncs"] = {}
         self.extra_cfg["badfuncs"]["allowed"] = {}
-        self.extra_cfg["badfuncs"]["allowed"]["/usr/bin/hello-world"] = ["inet_aton"]
+
+        if os.uname().sysname == "Linux":
+            self.extra_cfg["badfuncs"]["allowed"]["/usr/bin/hello-world"] = [
+                "inet_aton"
+            ]
+        elif os.uname().sysname == "FreeBSD":
+            self.extra_cfg["badfuncs"]["allowed"]["/usr/bin/hello-world"] = [
+                "__inet_aton"
+            ]
 
         self.rpm.add_simple_compilation(sourceContent=forbidden_ipv6_src)
 
@@ -74,7 +106,15 @@ class AllowedForbiddenIPv6FunctionKoji(TestKoji):
         self.extra_cfg = {}
         self.extra_cfg["badfuncs"] = {}
         self.extra_cfg["badfuncs"]["allowed"] = {}
-        self.extra_cfg["badfuncs"]["allowed"]["/usr/bin/hello-world"] = ["inet_aton"]
+
+        if os.uname().sysname == "Linux":
+            self.extra_cfg["badfuncs"]["allowed"]["/usr/bin/hello-world"] = [
+                "inet_aton"
+            ]
+        elif os.uname().sysname == "FreeBSD":
+            self.extra_cfg["badfuncs"]["allowed"]["/usr/bin/hello-world"] = [
+                "__inet_aton"
+            ]
 
         self.rpm.add_simple_compilation(sourceContent=forbidden_ipv6_src)
 
@@ -89,7 +129,15 @@ class AllowedForbiddenIPv6FunctionCompareRPMs(TestCompareRPMs):
         self.extra_cfg = {}
         self.extra_cfg["badfuncs"] = {}
         self.extra_cfg["badfuncs"]["allowed"] = {}
-        self.extra_cfg["badfuncs"]["allowed"]["/usr/bin/hello-world"] = ["inet_aton"]
+
+        if os.uname().sysname == "Linux":
+            self.extra_cfg["badfuncs"]["allowed"]["/usr/bin/hello-world"] = [
+                "inet_aton"
+            ]
+        elif os.uname().sysname == "FreeBSD":
+            self.extra_cfg["badfuncs"]["allowed"]["/usr/bin/hello-world"] = [
+                "__inet_aton"
+            ]
 
         self.before_rpm.add_simple_compilation(sourceContent=forbidden_ipv6_src)
         self.after_rpm.add_simple_compilation(sourceContent=forbidden_ipv6_src)
@@ -105,7 +153,15 @@ class AllowedForbiddenIPv6FunctionCompareKoji(TestCompareKoji):
         self.extra_cfg = {}
         self.extra_cfg["badfuncs"] = {}
         self.extra_cfg["badfuncs"]["allowed"] = {}
-        self.extra_cfg["badfuncs"]["allowed"]["/usr/bin/hello-world"] = ["inet_aton"]
+
+        if os.uname().sysname == "Linux":
+            self.extra_cfg["badfuncs"]["allowed"]["/usr/bin/hello-world"] = [
+                "inet_aton"
+            ]
+        elif os.uname().sysname == "FreeBSD":
+            self.extra_cfg["badfuncs"]["allowed"]["/usr/bin/hello-world"] = [
+                "__inet_aton"
+            ]
 
         self.before_rpm.add_simple_compilation(sourceContent=forbidden_ipv6_src)
         self.after_rpm.add_simple_compilation(sourceContent=forbidden_ipv6_src)
