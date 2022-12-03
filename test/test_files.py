@@ -27,7 +27,8 @@ class ValidFilesSectionSRPM(TestSRPM):
             sourceFileName,
         )
         self.rpm.section_install += (
-            "install -D -m 0755 %s %%{buildroot}%%{_libdir}/%s\n"
+            "mkdir -p %%{buildroot}%%{_libdir}\n"
+            "install -m 0755 %s %%{buildroot}%%{_libdir}/%s\n"
             % (libraryName, libraryName)
         )
         sub = self.rpm.get_subpackage(None)
@@ -52,7 +53,8 @@ class ValidFilesSectionKoji(TestKoji):
             sourceFileName,
         )
         self.rpm.section_install += (
-            "install -D -m 0755 %s %%{buildroot}%%{_libdir}/%s\n"
+            "mkdir -p %%{buildroot}%%{_libdir}\n"
+            "install -m 0755 %s %%{buildroot}%%{_libdir}/%s\n"
             % (libraryName, libraryName)
         )
         sub = self.rpm.get_subpackage(None)
@@ -79,7 +81,8 @@ class ValidFilesSectionCompareSRPM(TestCompareSRPM):
             sourceFileName,
         )
         self.after_rpm.section_install += (
-            "install -D -m 0755 %s %%{buildroot}%%{_libdir}/%s\n"
+            "mkdir -p %%{buildroot}%%{_libdir}\n"
+            "install -m 0755 %s %%{buildroot}%%{_libdir}/%s\n"
             % (libraryName, libraryName)
         )
         sub = self.after_rpm.get_subpackage(None)
@@ -106,7 +109,8 @@ class ValidFilesSectionCompareKoji(TestCompareKoji):
             sourceFileName,
         )
         self.after_rpm.section_install += (
-            "install -D -m 0755 %s %%{buildroot}%%{_libdir}/%s\n"
+            "mkdir -p %%{buildroot}%%{_libdir}\n"
+            "install -m 0755 %s %%{buildroot}%%{_libdir}/%s\n"
             % (libraryName, libraryName)
         )
         sub = self.after_rpm.get_subpackage(None)

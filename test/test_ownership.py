@@ -1621,7 +1621,8 @@ class CapSETUIDWithOtherExecRPMs(TestRPMs):
         installPath = "bin/rpminspect"
         sourceId = self.rpm.add_source(rpmfluff.SourceFile("rpminspect", ri_bytes))
         self.rpm.create_parent_dirs(installPath)
-        self.rpm.section_install += "install -D %%{SOURCE%i} $RPM_BUILD_ROOT/%s\n" % (
+        self.rpm.section_install += "mkdir -p $RPM_BUILD_ROOT/bin\n"
+        self.rpm.section_install += "install %%{SOURCE%i} $RPM_BUILD_ROOT/%s\n" % (
             sourceId,
             self.rpm.escape_path(installPath),
         )
@@ -1651,7 +1652,8 @@ class SecuritySKIPCapSETUIDWithOtherExecRPMs(TestRPMs):
         installPath = "bin/skip"
         sourceId = self.rpm.add_source(rpmfluff.SourceFile("rpminspect", ri_bytes))
         self.rpm.create_parent_dirs(installPath)
-        self.rpm.section_install += "install -D %%{SOURCE%i} $RPM_BUILD_ROOT/%s\n" % (
+        self.rpm.section_install += "mkdir -p $RPM_BUILD_ROOT/bin\n"
+        self.rpm.section_install += "install %%{SOURCE%i} $RPM_BUILD_ROOT/%s\n" % (
             sourceId,
             self.rpm.escape_path(installPath),
         )
@@ -1680,7 +1682,8 @@ class SecurityINFORMCapSETUIDWithOtherExecRPMs(TestRPMs):
         installPath = "bin/inform"
         sourceId = self.rpm.add_source(rpmfluff.SourceFile("rpminspect", ri_bytes))
         self.rpm.create_parent_dirs(installPath)
-        self.rpm.section_install += "install -D %%{SOURCE%i} $RPM_BUILD_ROOT/%s\n" % (
+        self.rpm.section_install += "mkdir -p $RPM_BUILD_ROOT/bin\n"
+        self.rpm.section_install += "install %%{SOURCE%i} $RPM_BUILD_ROOT/%s\n" % (
             sourceId,
             self.rpm.escape_path(installPath),
         )
@@ -1710,7 +1713,8 @@ class SecurityVERIFYCapSETUIDWithOtherExecRPMs(TestRPMs):
         installPath = "bin/verify"
         sourceId = self.rpm.add_source(rpmfluff.SourceFile("rpminspect", ri_bytes))
         self.rpm.create_parent_dirs(installPath)
-        self.rpm.section_install += "install -D %%{SOURCE%i} $RPM_BUILD_ROOT/%s\n" % (
+        self.rpm.section_install += "mkdir -p $RPM_BUILD_ROOT/bin\n"
+        self.rpm.section_install += "install %%{SOURCE%i} $RPM_BUILD_ROOT/%s\n" % (
             sourceId,
             self.rpm.escape_path(installPath),
         )
@@ -1740,7 +1744,8 @@ class SecurityFAILCapSETUIDWithOtherExecRPMs(TestRPMs):
         installPath = "bin/fail"
         sourceId = self.rpm.add_source(rpmfluff.SourceFile("rpminspect", ri_bytes))
         self.rpm.create_parent_dirs(installPath)
-        self.rpm.section_install += "install -D %%{SOURCE%i} $RPM_BUILD_ROOT/%s\n" % (
+        self.rpm.section_install += "mkdir -p $RPM_BUILD_ROOT/bin\n"
+        self.rpm.section_install += "install %%{SOURCE%i} $RPM_BUILD_ROOT/%s\n" % (
             sourceId,
             self.rpm.escape_path(installPath),
         )
@@ -1770,7 +1775,8 @@ class CapSETUIDWithOtherExecKoji(TestKoji):
         installPath = "bin/rpminspect"
         sourceId = self.rpm.add_source(rpmfluff.SourceFile("rpminspect", ri_bytes))
         self.rpm.create_parent_dirs(installPath)
-        self.rpm.section_install += "install -D %%{SOURCE%i} $RPM_BUILD_ROOT/%s\n" % (
+        self.rpm.section_install += "mkdir -p $RPM_BUILD_ROOT/bin\n"
+        self.rpm.section_install += "install %%{SOURCE%i} $RPM_BUILD_ROOT/%s\n" % (
             sourceId,
             self.rpm.escape_path(installPath),
         )
@@ -1800,7 +1806,8 @@ class SecuritySKIPCapSETUIDWithOtherExecKoji(TestKoji):
         installPath = "bin/skip"
         sourceId = self.rpm.add_source(rpmfluff.SourceFile("rpminspect", ri_bytes))
         self.rpm.create_parent_dirs(installPath)
-        self.rpm.section_install += "install -D %%{SOURCE%i} $RPM_BUILD_ROOT/%s\n" % (
+        self.rpm.section_install += "mkdir -p $RPM_BUILD_ROOT/bin\n"
+        self.rpm.section_install += "install %%{SOURCE%i} $RPM_BUILD_ROOT/%s\n" % (
             sourceId,
             self.rpm.escape_path(installPath),
         )
@@ -1829,7 +1836,8 @@ class SecurityINFORMCapSETUIDWithOtherExecKoji(TestKoji):
         installPath = "bin/inform"
         sourceId = self.rpm.add_source(rpmfluff.SourceFile("rpminspect", ri_bytes))
         self.rpm.create_parent_dirs(installPath)
-        self.rpm.section_install += "install -D %%{SOURCE%i} $RPM_BUILD_ROOT/%s\n" % (
+        self.rpm.section_install += "mkdir -p $RPM_BUILD_ROOT/bin\n"
+        self.rpm.section_install += "install %%{SOURCE%i} $RPM_BUILD_ROOT/%s\n" % (
             sourceId,
             self.rpm.escape_path(installPath),
         )
@@ -1859,7 +1867,8 @@ class SecurityVERIFYCapSETUIDWithOtherExecKoji(TestKoji):
         installPath = "bin/verify"
         sourceId = self.rpm.add_source(rpmfluff.SourceFile("rpminspect", ri_bytes))
         self.rpm.create_parent_dirs(installPath)
-        self.rpm.section_install += "install -D %%{SOURCE%i} $RPM_BUILD_ROOT/%s\n" % (
+        self.rpm.section_install += "mkdir -p $RPM_BUILD_ROOT/bin\n"
+        self.rpm.section_install += "install %%{SOURCE%i} $RPM_BUILD_ROOT/%s\n" % (
             sourceId,
             self.rpm.escape_path(installPath),
         )
@@ -1889,7 +1898,8 @@ class SecurityFAILCapSETUIDWithOtherExecKoji(TestKoji):
         installPath = "bin/fail"
         sourceId = self.rpm.add_source(rpmfluff.SourceFile("rpminspect", ri_bytes))
         self.rpm.create_parent_dirs(installPath)
-        self.rpm.section_install += "install -D %%{SOURCE%i} $RPM_BUILD_ROOT/%s\n" % (
+        self.rpm.section_install += "mkdir -p $RPM_BUILD_ROOT/bin\n"
+        self.rpm.section_install += "install %%{SOURCE%i} $RPM_BUILD_ROOT/%s\n" % (
             sourceId,
             self.rpm.escape_path(installPath),
         )
@@ -1922,7 +1932,8 @@ class CapSETUIDWithOtherExecCompareRPMs(TestCompareRPMs):
         )
         self.after_rpm.create_parent_dirs(installPath)
         self.after_rpm.section_install += (
-            "install -D %%{SOURCE%i} $RPM_BUILD_ROOT/%s\n"
+            "mkdir -p $RPM_BUILD_ROOT/bin\n"
+            "install %%{SOURCE%i} $RPM_BUILD_ROOT/%s\n"
             % (sourceId, self.after_rpm.escape_path(installPath))
         )
         sub = self.after_rpm.get_subpackage(None)
@@ -1954,7 +1965,8 @@ class SecuritySKIPCapSETUIDWithOtherExecCompareRPMs(TestCompareRPMs):
         )
         self.after_rpm.create_parent_dirs(installPath)
         self.after_rpm.section_install += (
-            "install -D %%{SOURCE%i} $RPM_BUILD_ROOT/%s\n"
+            "mkdir -p $RPM_BUILD_ROOT/bin\n"
+            "install %%{SOURCE%i} $RPM_BUILD_ROOT/%s\n"
             % (sourceId, self.after_rpm.escape_path(installPath))
         )
         sub = self.after_rpm.get_subpackage(None)
@@ -1985,7 +1997,8 @@ class SecurityINFORMCapSETUIDWithOtherExecCompareRPMs(TestCompareRPMs):
         )
         self.after_rpm.create_parent_dirs(installPath)
         self.after_rpm.section_install += (
-            "install -D %%{SOURCE%i} $RPM_BUILD_ROOT/%s\n"
+            "mkdir -p $RPM_BUILD_ROOT/bin\n"
+            "install %%{SOURCE%i} $RPM_BUILD_ROOT/%s\n"
             % (sourceId, self.after_rpm.escape_path(installPath))
         )
         sub = self.after_rpm.get_subpackage(None)
@@ -2017,7 +2030,8 @@ class SecurityVERIFYCapSETUIDWithOtherExecCompareRPMs(TestCompareRPMs):
         )
         self.after_rpm.create_parent_dirs(installPath)
         self.after_rpm.section_install += (
-            "install -D %%{SOURCE%i} $RPM_BUILD_ROOT/%s\n"
+            "mkdir -p $RPM_BUILD_ROOT/bin\n"
+            "install %%{SOURCE%i} $RPM_BUILD_ROOT/%s\n"
             % (sourceId, self.after_rpm.escape_path(installPath))
         )
         sub = self.after_rpm.get_subpackage(None)
@@ -2049,7 +2063,8 @@ class SecurityFAILCapSETUIDWithOtherExecCompareRPMs(TestCompareRPMs):
         )
         self.after_rpm.create_parent_dirs(installPath)
         self.after_rpm.section_install += (
-            "install -D %%{SOURCE%i} $RPM_BUILD_ROOT/%s\n"
+            "mkdir -p $RPM_BUILD_ROOT/bin\n"
+            "install %%{SOURCE%i} $RPM_BUILD_ROOT/%s\n"
             % (sourceId, self.after_rpm.escape_path(installPath))
         )
         sub = self.after_rpm.get_subpackage(None)
@@ -2081,7 +2096,8 @@ class CapSETUIDWithOtherExecCompareKoji(TestCompareKoji):
         )
         self.after_rpm.create_parent_dirs(installPath)
         self.after_rpm.section_install += (
-            "install -D %%{SOURCE%i} $RPM_BUILD_ROOT/%s\n"
+            "mkdir -p $RPM_BUILD_ROOT/bin\n"
+            "install %%{SOURCE%i} $RPM_BUILD_ROOT/%s\n"
             % (sourceId, self.after_rpm.escape_path(installPath))
         )
         sub = self.after_rpm.get_subpackage(None)
@@ -2113,7 +2129,8 @@ class SecuritySKIPCapSETUIDWithOtherExecCompareKoji(TestCompareKoji):
         )
         self.after_rpm.create_parent_dirs(installPath)
         self.after_rpm.section_install += (
-            "install -D %%{SOURCE%i} $RPM_BUILD_ROOT/%s\n"
+            "mkdir -p $RPM_BUILD_ROOT/bin\n"
+            "install %%{SOURCE%i} $RPM_BUILD_ROOT/%s\n"
             % (sourceId, self.after_rpm.escape_path(installPath))
         )
         sub = self.after_rpm.get_subpackage(None)
@@ -2144,7 +2161,8 @@ class SecurityINFORMCapSETUIDWithOtherExecCompareKoji(TestCompareKoji):
         )
         self.after_rpm.create_parent_dirs(installPath)
         self.after_rpm.section_install += (
-            "install -D %%{SOURCE%i} $RPM_BUILD_ROOT/%s\n"
+            "mkdir -p $RPM_BUILD_ROOT/bin\n"
+            "install %%{SOURCE%i} $RPM_BUILD_ROOT/%s\n"
             % (sourceId, self.after_rpm.escape_path(installPath))
         )
         sub = self.after_rpm.get_subpackage(None)
@@ -2176,7 +2194,8 @@ class SecurityVERIFYCapSETUIDWithOtherExecCompareKoji(TestCompareKoji):
         )
         self.after_rpm.create_parent_dirs(installPath)
         self.after_rpm.section_install += (
-            "install -D %%{SOURCE%i} $RPM_BUILD_ROOT/%s\n"
+            "mkdir -p $RPM_BUILD_ROOT/bin\n"
+            "install %%{SOURCE%i} $RPM_BUILD_ROOT/%s\n"
             % (sourceId, self.after_rpm.escape_path(installPath))
         )
         sub = self.after_rpm.get_subpackage(None)
@@ -2208,7 +2227,8 @@ class SecurityFAILCapSETUIDWithOtherExecCompareKoji(TestCompareKoji):
         )
         self.after_rpm.create_parent_dirs(installPath)
         self.after_rpm.section_install += (
-            "install -D %%{SOURCE%i} $RPM_BUILD_ROOT/%s\n"
+            "mkdir -p $RPM_BUILD_ROOT/bin\n"
+            "install %%{SOURCE%i} $RPM_BUILD_ROOT/%s\n"
             % (sourceId, self.after_rpm.escape_path(installPath))
         )
         sub = self.after_rpm.get_subpackage(None)
@@ -2242,7 +2262,8 @@ class CapSETUIDWithGroupExecRPMs(TestRPMs):
         installPath = "bin/rpminspect"
         sourceId = self.rpm.add_source(rpmfluff.SourceFile("rpminspect", ri_bytes))
         self.rpm.create_parent_dirs(installPath)
-        self.rpm.section_install += "install -D %%{SOURCE%i} $RPM_BUILD_ROOT/%s\n" % (
+        self.rpm.section_install += "mkdir -p $RPM_BUILD_ROOT/bin\n"
+        self.rpm.section_install += "install %%{SOURCE%i} $RPM_BUILD_ROOT/%s\n" % (
             sourceId,
             self.rpm.escape_path(installPath),
         )
@@ -2272,7 +2293,8 @@ class SecuritySKIPCapSETUIDWithGroupExecRPMs(TestRPMs):
         installPath = "bin/skip"
         sourceId = self.rpm.add_source(rpmfluff.SourceFile("rpminspect", ri_bytes))
         self.rpm.create_parent_dirs(installPath)
-        self.rpm.section_install += "install -D %%{SOURCE%i} $RPM_BUILD_ROOT/%s\n" % (
+        self.rpm.section_install += "mkdir -p $RPM_BUILD_ROOT/bin\n"
+        self.rpm.section_install += "install %%{SOURCE%i} $RPM_BUILD_ROOT/%s\n" % (
             sourceId,
             self.rpm.escape_path(installPath),
         )
@@ -2301,7 +2323,8 @@ class SecurityINFORMCapSETUIDWithGroupExecRPMs(TestRPMs):
         installPath = "bin/inform"
         sourceId = self.rpm.add_source(rpmfluff.SourceFile("rpminspect", ri_bytes))
         self.rpm.create_parent_dirs(installPath)
-        self.rpm.section_install += "install -D %%{SOURCE%i} $RPM_BUILD_ROOT/%s\n" % (
+        self.rpm.section_install += "mkdir -p $RPM_BUILD_ROOT/bin\n"
+        self.rpm.section_install += "install %%{SOURCE%i} $RPM_BUILD_ROOT/%s\n" % (
             sourceId,
             self.rpm.escape_path(installPath),
         )
@@ -2331,7 +2354,8 @@ class SecurityVERIFYCapSETUIDWithGroupExecRPMs(TestRPMs):
         installPath = "bin/verify"
         sourceId = self.rpm.add_source(rpmfluff.SourceFile("rpminspect", ri_bytes))
         self.rpm.create_parent_dirs(installPath)
-        self.rpm.section_install += "install -D %%{SOURCE%i} $RPM_BUILD_ROOT/%s\n" % (
+        self.rpm.section_install += "mkdir -p $RPM_BUILD_ROOT/bin\n"
+        self.rpm.section_install += "install %%{SOURCE%i} $RPM_BUILD_ROOT/%s\n" % (
             sourceId,
             self.rpm.escape_path(installPath),
         )
@@ -2361,7 +2385,8 @@ class SecurityFAILCapSETUIDWithGroupExecRPMs(TestRPMs):
         installPath = "bin/fail"
         sourceId = self.rpm.add_source(rpmfluff.SourceFile("rpminspect", ri_bytes))
         self.rpm.create_parent_dirs(installPath)
-        self.rpm.section_install += "install -D %%{SOURCE%i} $RPM_BUILD_ROOT/%s\n" % (
+        self.rpm.section_install += "mkdir -p $RPM_BUILD_ROOT/bin\n"
+        self.rpm.section_install += "install %%{SOURCE%i} $RPM_BUILD_ROOT/%s\n" % (
             sourceId,
             self.rpm.escape_path(installPath),
         )
@@ -2391,7 +2416,8 @@ class CapSETUIDWithGroupExecKoji(TestKoji):
         installPath = "bin/rpminspect"
         sourceId = self.rpm.add_source(rpmfluff.SourceFile("rpminspect", ri_bytes))
         self.rpm.create_parent_dirs(installPath)
-        self.rpm.section_install += "install -D %%{SOURCE%i} $RPM_BUILD_ROOT/%s\n" % (
+        self.rpm.section_install += "mkdir -p $RPM_BUILD_ROOT/bin\n"
+        self.rpm.section_install += "install %%{SOURCE%i} $RPM_BUILD_ROOT/%s\n" % (
             sourceId,
             self.rpm.escape_path(installPath),
         )
@@ -2421,7 +2447,8 @@ class SecuritySKIPCapSETUIDWithGroupExecKoji(TestKoji):
         installPath = "bin/skip"
         sourceId = self.rpm.add_source(rpmfluff.SourceFile("rpminspect", ri_bytes))
         self.rpm.create_parent_dirs(installPath)
-        self.rpm.section_install += "install -D %%{SOURCE%i} $RPM_BUILD_ROOT/%s\n" % (
+        self.rpm.section_install += "mkdir -p $RPM_BUILD_ROOT/bin\n"
+        self.rpm.section_install += "install %%{SOURCE%i} $RPM_BUILD_ROOT/%s\n" % (
             sourceId,
             self.rpm.escape_path(installPath),
         )
@@ -2450,7 +2477,8 @@ class SecurityINFORMCapSETUIDWithGroupExecKoji(TestKoji):
         installPath = "bin/inform"
         sourceId = self.rpm.add_source(rpmfluff.SourceFile("rpminspect", ri_bytes))
         self.rpm.create_parent_dirs(installPath)
-        self.rpm.section_install += "install -D %%{SOURCE%i} $RPM_BUILD_ROOT/%s\n" % (
+        self.rpm.section_install += "mkdir -p $RPM_BUILD_ROOT/bin\n"
+        self.rpm.section_install += "install %%{SOURCE%i} $RPM_BUILD_ROOT/%s\n" % (
             sourceId,
             self.rpm.escape_path(installPath),
         )
@@ -2480,7 +2508,8 @@ class SecurityVERIFYCapSETUIDWithGroupExecKoji(TestKoji):
         installPath = "bin/verify"
         sourceId = self.rpm.add_source(rpmfluff.SourceFile("rpminspect", ri_bytes))
         self.rpm.create_parent_dirs(installPath)
-        self.rpm.section_install += "install -D %%{SOURCE%i} $RPM_BUILD_ROOT/%s\n" % (
+        self.rpm.section_install += "mkdir -p $RPM_BUILD_ROOT/bin\n"
+        self.rpm.section_install += "install %%{SOURCE%i} $RPM_BUILD_ROOT/%s\n" % (
             sourceId,
             self.rpm.escape_path(installPath),
         )
@@ -2510,7 +2539,8 @@ class SecurityFAILCapSETUIDWithGroupExecKoji(TestKoji):
         installPath = "bin/fail"
         sourceId = self.rpm.add_source(rpmfluff.SourceFile("rpminspect", ri_bytes))
         self.rpm.create_parent_dirs(installPath)
-        self.rpm.section_install += "install -D %%{SOURCE%i} $RPM_BUILD_ROOT/%s\n" % (
+        self.rpm.section_install += "mkdir -p $RPM_BUILD_ROOT/bin\n"
+        self.rpm.section_install += "install %%{SOURCE%i} $RPM_BUILD_ROOT/%s\n" % (
             sourceId,
             self.rpm.escape_path(installPath),
         )
@@ -2543,7 +2573,8 @@ class CapSETUIDWithGroupExecCompareRPMs(TestCompareRPMs):
         )
         self.after_rpm.create_parent_dirs(installPath)
         self.after_rpm.section_install += (
-            "install -D %%{SOURCE%i} $RPM_BUILD_ROOT/%s\n"
+            "mkdir -p $RPM_BUILD_ROOT/bin\n"
+            "install %%{SOURCE%i} $RPM_BUILD_ROOT/%s\n"
             % (sourceId, self.after_rpm.escape_path(installPath))
         )
         sub = self.after_rpm.get_subpackage(None)
@@ -2575,7 +2606,8 @@ class SecuritySKIPCapSETUIDWithGroupExecCompareRPMs(TestCompareRPMs):
         )
         self.after_rpm.create_parent_dirs(installPath)
         self.after_rpm.section_install += (
-            "install -D %%{SOURCE%i} $RPM_BUILD_ROOT/%s\n"
+            "mkdir -p $RPM_BUILD_ROOT/bin\n"
+            "install %%{SOURCE%i} $RPM_BUILD_ROOT/%s\n"
             % (sourceId, self.after_rpm.escape_path(installPath))
         )
         sub = self.after_rpm.get_subpackage(None)
@@ -2606,7 +2638,8 @@ class SecurityINFORMCapSETUIDWithGroupExecCompareRPMs(TestCompareRPMs):
         )
         self.after_rpm.create_parent_dirs(installPath)
         self.after_rpm.section_install += (
-            "install -D %%{SOURCE%i} $RPM_BUILD_ROOT/%s\n"
+            "mkdir -p $RPM_BUILD_ROOT/bin\n"
+            "install %%{SOURCE%i} $RPM_BUILD_ROOT/%s\n"
             % (sourceId, self.after_rpm.escape_path(installPath))
         )
         sub = self.after_rpm.get_subpackage(None)
@@ -2638,7 +2671,8 @@ class SecurityVERIFYCapSETUIDWithGroupExecCompareRPMs(TestCompareRPMs):
         )
         self.after_rpm.create_parent_dirs(installPath)
         self.after_rpm.section_install += (
-            "install -D %%{SOURCE%i} $RPM_BUILD_ROOT/%s\n"
+            "mkdir -p $RPM_BUILD_ROOT/bin\n"
+            "install %%{SOURCE%i} $RPM_BUILD_ROOT/%s\n"
             % (sourceId, self.after_rpm.escape_path(installPath))
         )
         sub = self.after_rpm.get_subpackage(None)
@@ -2670,7 +2704,8 @@ class SecurityFAILCapSETUIDWithGroupExecCompareRPMs(TestCompareRPMs):
         )
         self.after_rpm.create_parent_dirs(installPath)
         self.after_rpm.section_install += (
-            "install -D %%{SOURCE%i} $RPM_BUILD_ROOT/%s\n"
+            "mkdir -p $RPM_BUILD_ROOT/bin\n"
+            "install %%{SOURCE%i} $RPM_BUILD_ROOT/%s\n"
             % (sourceId, self.after_rpm.escape_path(installPath))
         )
         sub = self.after_rpm.get_subpackage(None)
@@ -2702,7 +2737,8 @@ class CapSETUIDWithGroupExecCompareKoji(TestCompareKoji):
         )
         self.after_rpm.create_parent_dirs(installPath)
         self.after_rpm.section_install += (
-            "install -D %%{SOURCE%i} $RPM_BUILD_ROOT/%s\n"
+            "mkdir -p $RPM_BUILD_ROOT/bin\n"
+            "install %%{SOURCE%i} $RPM_BUILD_ROOT/%s\n"
             % (sourceId, self.after_rpm.escape_path(installPath))
         )
         sub = self.after_rpm.get_subpackage(None)
@@ -2734,7 +2770,8 @@ class SecuritySKIPCapSETUIDWithGroupExecCompareKoji(TestCompareKoji):
         )
         self.after_rpm.create_parent_dirs(installPath)
         self.after_rpm.section_install += (
-            "install -D %%{SOURCE%i} $RPM_BUILD_ROOT/%s\n"
+            "mkdir -p $RPM_BUILD_ROOT/bin\n"
+            "install %%{SOURCE%i} $RPM_BUILD_ROOT/%s\n"
             % (sourceId, self.after_rpm.escape_path(installPath))
         )
         sub = self.after_rpm.get_subpackage(None)
@@ -2765,7 +2802,8 @@ class SecurityINFORMCapSETUIDWithGroupExecCompareKoji(TestCompareKoji):
         )
         self.after_rpm.create_parent_dirs(installPath)
         self.after_rpm.section_install += (
-            "install -D %%{SOURCE%i} $RPM_BUILD_ROOT/%s\n"
+            "mkdir -p $RPM_BUILD_ROOT/bin\n"
+            "install %%{SOURCE%i} $RPM_BUILD_ROOT/%s\n"
             % (sourceId, self.after_rpm.escape_path(installPath))
         )
         sub = self.after_rpm.get_subpackage(None)
@@ -2797,7 +2835,8 @@ class SecurityVERIFYCapSETUIDWithGroupExecCompareKoji(TestCompareKoji):
         )
         self.after_rpm.create_parent_dirs(installPath)
         self.after_rpm.section_install += (
-            "install -D %%{SOURCE%i} $RPM_BUILD_ROOT/%s\n"
+            "mkdir -p $RPM_BUILD_ROOT/bin\n"
+            "install %%{SOURCE%i} $RPM_BUILD_ROOT/%s\n"
             % (sourceId, self.after_rpm.escape_path(installPath))
         )
         sub = self.after_rpm.get_subpackage(None)
@@ -2829,7 +2868,8 @@ class SecurityFAILCapSETUIDWithGroupExecCompareKoji(TestCompareKoji):
         )
         self.after_rpm.create_parent_dirs(installPath)
         self.after_rpm.section_install += (
-            "install -D %%{SOURCE%i} $RPM_BUILD_ROOT/%s\n"
+            "mkdir -p $RPM_BUILD_ROOT/bin\n"
+            "install %%{SOURCE%i} $RPM_BUILD_ROOT/%s\n"
             % (sourceId, self.after_rpm.escape_path(installPath))
         )
         sub = self.after_rpm.get_subpackage(None)

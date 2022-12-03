@@ -3,10 +3,18 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 #
 
+import os
 import rpmfluff
+import unittest
 
 from baseclass import TestSRPM, TestRPMs, TestKoji
 from baseclass import TestCompareSRPM, TestCompareRPMs, TestCompareKoji
+
+# Some tests below are only for Linux systems
+if os.uname().sysname == "Linux":
+    on_linux = True
+else:
+    on_linux = False
 
 
 class ExecutableWithSetUIDSRPM(TestSRPM):
@@ -895,6 +903,7 @@ class SecurityFAILFileIWOTHProhibitedCompareKoji(TestCompareKoji):
         self.waiver_auth = "Security"
 
 
+@unittest.skipUnless(on_linux, "mode 1757 is only on Linux")
 class FileIWOTHandISVTXProhibitedSRPM(TestSRPM):
     """
     Assert when a world-writable file with the sticky bit is in a package,
@@ -912,6 +921,7 @@ class FileIWOTHandISVTXProhibitedSRPM(TestSRPM):
         self.result = "OK"
 
 
+@unittest.skipUnless(on_linux, "mode 1757 is only on Linux")
 class FileIWOTHandISVTXProhibitedRPMs(TestRPMs):
     """
     Assert when a world-writable file with the sticky bit is in a package,
@@ -930,6 +940,7 @@ class FileIWOTHandISVTXProhibitedRPMs(TestRPMs):
         self.waiver_auth = "Security"
 
 
+@unittest.skipUnless(on_linux, "mode 1757 is only on Linux")
 class SecuritySKIPFileIWOTHandISVTXProhibitedRPMs(TestRPMs):
     """
     Assert when a world-writable file with the sticky bit is in a package,
@@ -947,6 +958,7 @@ class SecuritySKIPFileIWOTHandISVTXProhibitedRPMs(TestRPMs):
         self.result = "OK"
 
 
+@unittest.skipUnless(on_linux, "mode 1757 is only on Linux")
 class SecurityINFORMFileIWOTHandISVTXProhibitedRPMs(TestRPMs):
     """
     Assert when a world-writable file with the sticky bit is in a package,
@@ -965,6 +977,7 @@ class SecurityINFORMFileIWOTHandISVTXProhibitedRPMs(TestRPMs):
         self.waiver_auth = "Security"
 
 
+@unittest.skipUnless(on_linux, "mode 1757 is only on Linux")
 class SecurityVERIFYFileIWOTHandISVTXProhibitedRPMs(TestRPMs):
     """
     Assert when a world-writable file with the sticky bit is in a package,
@@ -983,6 +996,7 @@ class SecurityVERIFYFileIWOTHandISVTXProhibitedRPMs(TestRPMs):
         self.waiver_auth = "Security"
 
 
+@unittest.skipUnless(on_linux, "mode 1757 is only on Linux")
 class SecurityFAILFileIWOTHandISVTXProhibitedRPMs(TestRPMs):
     """
     Assert when a world-writable file with the sticky bit is in a package,
@@ -1001,6 +1015,7 @@ class SecurityFAILFileIWOTHandISVTXProhibitedRPMs(TestRPMs):
         self.waiver_auth = "Security"
 
 
+@unittest.skipUnless(on_linux, "mode 1757 is only on Linux")
 class FileIWOTHandISVTXProhibitedKoji(TestKoji):
     """
     Assert when a world-writable file with the sticky bit is in a package,
@@ -1019,6 +1034,7 @@ class FileIWOTHandISVTXProhibitedKoji(TestKoji):
         self.waiver_auth = "Security"
 
 
+@unittest.skipUnless(on_linux, "mode 1757 is only on Linux")
 class SecuritySKIPFileIWOTHandISVTXProhibitedKoji(TestKoji):
     """
     Assert when a world-writable file with the sticky bit is in a package,
@@ -1036,6 +1052,7 @@ class SecuritySKIPFileIWOTHandISVTXProhibitedKoji(TestKoji):
         self.result = "OK"
 
 
+@unittest.skipUnless(on_linux, "mode 1757 is only on Linux")
 class SecurityINFORMFileIWOTHandISVTXProhibitedKoji(TestKoji):
     """
     Assert when a world-writable file with the sticky bit is in a package,
@@ -1054,6 +1071,7 @@ class SecurityINFORMFileIWOTHandISVTXProhibitedKoji(TestKoji):
         self.waiver_auth = "Security"
 
 
+@unittest.skipUnless(on_linux, "mode 1757 is only on Linux")
 class SecurityVERIFYFileIWOTHandISVTXProhibitedKoji(TestKoji):
     """
     Assert when a world-writable file with the sticky bit is in a package,
@@ -1072,6 +1090,7 @@ class SecurityVERIFYFileIWOTHandISVTXProhibitedKoji(TestKoji):
         self.waiver_auth = "Security"
 
 
+@unittest.skipUnless(on_linux, "mode 1757 is only on Linux")
 class SecurityFAILFileIWOTHandISVTXProhibitedKoji(TestKoji):
     """
     Assert when a world-writable file with the sticky bit is in a package,
@@ -1090,6 +1109,7 @@ class SecurityFAILFileIWOTHandISVTXProhibitedKoji(TestKoji):
         self.waiver_auth = "Security"
 
 
+@unittest.skipUnless(on_linux, "mode 1757 is only on Linux")
 class FileIWOTHandISVTXProhibitedCompareSRPM(TestCompareSRPM):
     """
     Assert when a world-writable file with the sticky bit is in a package,
@@ -1107,6 +1127,7 @@ class FileIWOTHandISVTXProhibitedCompareSRPM(TestCompareSRPM):
         self.result = "OK"
 
 
+@unittest.skipUnless(on_linux, "mode 1757 is only on Linux")
 class FileIWOTHandISVTXProhibitedCompareRPMs(TestCompareRPMs):
     """
     Assert when a world-writable file with the sticky bit is in a package,
@@ -1125,6 +1146,7 @@ class FileIWOTHandISVTXProhibitedCompareRPMs(TestCompareRPMs):
         self.waiver_auth = "Security"
 
 
+@unittest.skipUnless(on_linux, "mode 1757 is only on Linux")
 class SecuritySKIPFileIWOTHandISVTXProhibitedCompareRPMs(TestCompareRPMs):
     """
     Assert when a world-writable file with the sticky bit is in a package,
@@ -1142,6 +1164,7 @@ class SecuritySKIPFileIWOTHandISVTXProhibitedCompareRPMs(TestCompareRPMs):
         self.result = "OK"
 
 
+@unittest.skipUnless(on_linux, "mode 1757 is only on Linux")
 class SecurityINFORMFileIWOTHandISVTXProhibitedCompareRPMs(TestCompareRPMs):
     """
     Assert when a world-writable file with the sticky bit is in a package,
@@ -1160,6 +1183,7 @@ class SecurityINFORMFileIWOTHandISVTXProhibitedCompareRPMs(TestCompareRPMs):
         self.waiver_auth = "Security"
 
 
+@unittest.skipUnless(on_linux, "mode 1757 is only on Linux")
 class SecurityVERIFYFileIWOTHandISVTXProhibitedCompareRPMs(TestCompareRPMs):
     """
     Assert when a world-writable file with the sticky bit is in a package,
@@ -1178,6 +1202,7 @@ class SecurityVERIFYFileIWOTHandISVTXProhibitedCompareRPMs(TestCompareRPMs):
         self.waiver_auth = "Security"
 
 
+@unittest.skipUnless(on_linux, "mode 1757 is only on Linux")
 class SecurityFAILFileIWOTHandISVTXProhibitedCompareRPMs(TestCompareRPMs):
     """
     Assert when a world-writable file with the sticky bit is in a package,
@@ -1196,6 +1221,7 @@ class SecurityFAILFileIWOTHandISVTXProhibitedCompareRPMs(TestCompareRPMs):
         self.waiver_auth = "Security"
 
 
+@unittest.skipUnless(on_linux, "mode 1757 is only on Linux")
 class FileIWOTHandISVTXProhibitedCompareKoji(TestCompareKoji):
     """
     Assert when a world-writable file with the sticky bit is in a package,
@@ -1214,6 +1240,7 @@ class FileIWOTHandISVTXProhibitedCompareKoji(TestCompareKoji):
         self.waiver_auth = "Security"
 
 
+@unittest.skipUnless(on_linux, "mode 1757 is only on Linux")
 class SecuritySKIPFileIWOTHandISVTXProhibitedCompareKoji(TestCompareKoji):
     """
     Assert when a world-writable file with the sticky bit is in a package,
@@ -1231,6 +1258,7 @@ class SecuritySKIPFileIWOTHandISVTXProhibitedCompareKoji(TestCompareKoji):
         self.result = "OK"
 
 
+@unittest.skipUnless(on_linux, "mode 1757 is only on Linux")
 class SecurityINFORMFileIWOTHandISVTXProhibitedCompareKoji(TestCompareKoji):
     """
     Assert when a world-writable file with the sticky bit is in a package,
@@ -1249,6 +1277,7 @@ class SecurityINFORMFileIWOTHandISVTXProhibitedCompareKoji(TestCompareKoji):
         self.waiver_auth = "Security"
 
 
+@unittest.skipUnless(on_linux, "mode 1757 is only on Linux")
 class SecurityVERIFYFileIWOTHandISVTXProhibitedCompareKoji(TestCompareKoji):
     """
     Assert when a world-writable file with the sticky bit is in a package,
@@ -1267,6 +1296,7 @@ class SecurityVERIFYFileIWOTHandISVTXProhibitedCompareKoji(TestCompareKoji):
         self.waiver_auth = "Security"
 
 
+@unittest.skipUnless(on_linux, "mode 1757 is only on Linux")
 class SecurityFAILFileIWOTHandISVTXProhibitedCompareKoji(TestCompareKoji):
     """
     Assert when a world-writable file with the sticky bit is in a package,
