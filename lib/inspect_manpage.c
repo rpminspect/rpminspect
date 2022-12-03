@@ -73,8 +73,8 @@ static bool inspect_manpage_alloc(void)
      * For the directory section, look for /man<section>
      * For the filename section, look for <name>.<section>.gz
      */
-    xasprintf(&tmp, "/man\\([^/]\\+\\)/[^/]\\+\\.\\([^.]\\+\\)\\%s$", GZIPPED_FILENAME_EXTENSION);
-    reg_result = regcomp(&sections_regex, tmp, 0);
+    xasprintf(&tmp, "/man([^/]+)/[^/]+\\.([^.]+)\\%s$", GZIPPED_FILENAME_EXTENSION);
+    reg_result = regcomp(&sections_regex, tmp, REG_EXTENDED);
     free(tmp);
     if (reg_result != 0) {
         regerror(reg_result, &sections_regex, reg_error, sizeof(reg_error));
