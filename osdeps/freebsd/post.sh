@@ -1,6 +1,10 @@
 #!/bin/sh
 PATH=/bin:/usr/bin:/sbin:/usr/sbin:/usr/local/bin:/usr/local/sbin
 
+# Hostname to make sure rpmbuild works
+hostname freebsd
+echo "freebsd 127.0.0.1" >> /etc/hosts
+
 # Install Python modules from ports, but we have to determine the
 # package prefix based on the version of Python installed.
 PKG_PREFIX="py$(python3 --version | cut -d ' ' -f 2 | cut -d '.' -f 1,2 | sed -e 's|\.||g')"
