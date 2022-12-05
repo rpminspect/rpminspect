@@ -2,7 +2,7 @@
 PATH=/bin:/usr/bin:/sbin:/usr/sbin:/usr/local/bin:/usr/local/sbin
 
 # Hostname to make sure rpmbuild works (this is gross)
-echo "$(hostname) $(ifconfig | grep "inet " | grep -v "inet 127" | awk '{ print $2; }')" >> /etc/hosts
+echo "$(ifconfig | grep "inet " | grep -v "inet 127" | awk '{ print $2; }') $(hostname)" >> /etc/hosts
 
 # Install Python modules from ports, but we have to determine the
 # package prefix based on the version of Python installed.
