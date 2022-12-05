@@ -948,6 +948,10 @@ static int read_cfgfile(struct rpminspect *ri, const char *filename)
                         } else if (!strcmp(key, SECTION_IGNORE)) {
                             block = BLOCK_IGNORE;
                         }
+                    } else if (group == BLOCK_ABIDIFF) {
+                        if (!strcmp(key, SECTION_IGNORE)) {
+                            block = BLOCK_IGNORE;
+                        }
                     } else if (group == BLOCK_KMIDIFF) {
                         if (!strcmp(key, SECTION_KERNEL_FILENAMES)) {
                             block = BLOCK_KERNEL_FILENAMES;
