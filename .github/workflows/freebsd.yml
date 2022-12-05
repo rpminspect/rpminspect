@@ -21,26 +21,6 @@ on:
         - 'regress/**'
         - 'utils/**'
 
-    pull_request:
-        branches: [ main ]
-        paths-ignore:
-        - AUTHORS.md
-        - CC-BY-4.0.txt
-        - CODE_OF_CONDUCT.md
-        - COPYING
-        - COPYING.LIB
-        - HISTORY
-        - LICENSE-2.0.txt
-        - MISSING
-        - README.md
-        - TODO
-        - 'contrib/**'
-        - 'data/**'
-        - 'doc/**'
-        - 'po/**'
-        - 'regress/**'
-        - 'utils/**'
-
 jobs:
     freebsd:
         # Use containers on this specific macos image
