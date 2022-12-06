@@ -230,13 +230,20 @@ else
     libcap = disabler()
 endif
 
-# libannocheck
+# annocheck(1) or libannocheck
+if get_option('with_annocheck') and get_option('with_libannocheck')
+    error('*** you may only use with_annocheck or with_libannocheck, not both')
+endif
+
+if get_option('with_annocheck')
+    add_project_arguments('-D_WITH_ANNOCHECK', language : 'c')
+endif
+
 if get_option('with_libannocheck')
     libannocheck = dependency('libannocheck', required : true)
     add_project_arguments('-D_WITH_LIBANNOCHECK', language : 'c')
 else
     message('disable libannocheck support')
-    libannocheck = disabler()
 endif
 
 # dlopen

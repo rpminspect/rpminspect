@@ -378,6 +378,9 @@ struct command_paths {
     char *desktop_file_validate;
     char *abidiff;
     char *kmidiff;
+#ifdef _WITH_ANNOCHECK
+    char *annocheck;
+#endif
 };
 
 /* Hash table used for key/value situations where each is a string. */

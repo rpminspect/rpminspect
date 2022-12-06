@@ -280,6 +280,15 @@
  */
 #define DESKTOP_FILE_VALIDATE_CMD "desktop-file-validate"
 
+#ifdef _WITH_ANNOCHECK
+/**
+ * @def ANNOCHECK_CMD
+ *
+ * Executable providing annocheck(1)
+ */
+#define ANNOCHECK_CMD "annocheck"
+#endif
+
 /**
  * @def ABIDIFF_CMD
  *

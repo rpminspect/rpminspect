@@ -23,6 +23,11 @@ option('with_libcap',
        value : true,
        description : 'Enable Linux capability(7) support using libcap.  Disabling libcap support will also disable capability(7)-related inspections.')
 
+option('with_annocheck',
+       type : 'boolean',
+       value : false,
+       description : 'Enable annocheck(1) support for binary file analysis.  Disabling annocheck(1) support will also disable the annocheck inspection.')
+
 option('with_libannocheck',
        type : 'boolean',
        value : true,

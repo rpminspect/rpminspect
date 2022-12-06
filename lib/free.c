@@ -221,6 +221,9 @@ void free_rpminspect(struct rpminspect *ri)
     free(ri->commands.desktop_file_validate);
     free(ri->commands.abidiff);
     free(ri->commands.kmidiff);
+#ifdef _WITH_ANNOCHECK
+    free(ri->commands.annocheck);
+#endif
 
     list_free(ri->buildhost_subdomain, free);
     list_free(ri->macrofiles, free);

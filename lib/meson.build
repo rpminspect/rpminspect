@@ -140,9 +140,12 @@ if get_option('with_libcap')
     deps += [ libcap ]
 endif
 
-if get_option('with_libannocheck')
+if get_option('with_annocheck') or get_option('with_libannocheck')
     librpminspect_sources += [ 'inspect_annocheck.c' ]
-    deps += [ libannocheck ]
+
+    if get_option('with_libannocheck')
+        deps += [ libannocheck ]
+    endif
 endif
 
 if build_machine.system() == 'freebsd'
