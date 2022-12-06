@@ -130,6 +130,12 @@ void dump_cfg(const struct rpminspect *ri)
         printf("    kmidiff: %s\n", ri->commands.kmidiff);
     }
 
+#ifdef _WITH_ANNOCHECK
+    if (ri->commands.annocheck) {
+        printf("    annocheck: %s\n", ri->commands.annocheck);
+    }
+#endif
+
     /* vendor */
 
     printf("vendor:\n");

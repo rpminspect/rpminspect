@@ -206,6 +206,24 @@ string_list_t *gather_diags(struct rpminspect *ri, const char *progname, const c
 
     free(ver);
 
+#ifdef _WITH_ANNOCHECK
+    /* annocheck */
+    tmp = run_cmd(&exitcode, ri->worksubdir, ri->commands.annocheck, "--version", NULL);
+    details = strsplit(tmp, "\n");
+    free(tmp);
+
+    entry = TAILQ_FIRST(details);
+    ver = strreplace(entry->data, ": Version ", " version ");
+    list_free(details, free);
+
+    entry = calloc(1, sizeof(*entry));
+    assert(entry != NULL);
+    xasprintf(&entry->data, "%s", ver);
+    TAILQ_INSERT_TAIL(list, entry, items);
+
+    free(ver);
+#endif
+
     /* abidiff */
     tmp = run_cmd(&exitcode, ri->worksubdir, ri->commands.abidiff, "--version", NULL);
     details = strsplit(tmp, "\n");

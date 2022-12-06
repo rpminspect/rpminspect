@@ -48,8 +48,13 @@ BuildRequires:  clamav-devel
 BuildRequires:  libmandoc-devel >= 1.14.5
 BuildRequires:  gnupg2
 BuildRequires:  libicu-devel
-BuildRequires:  annobin-libannocheck
 
+# libannocheck is only available in EPEL-7 and Fedora at the moment
+%if 0%{?epel} == 7 || 0%{?fedora}
+BuildRequires:  annobin-libannocheck
+%else
+BuildRequires:  annobin-annocheck
+%endif
 
 %description
 Build deviation and compliance tool.  This program runs a number of tests
@@ -145,7 +150,12 @@ control files.
 
 %build
 %meson -Dtests=false
+
+%if 0%{?rhel} >= 8 || 0%{?epel} >= 8 || 0%{?fedora}
 %meson_build
+%else
+%meson_build -D with_libannocheck=false -D with_annocheck=true
+%endif
 
 
 %install

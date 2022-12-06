@@ -8,13 +8,72 @@
 #include <errno.h>
 #include <err.h>
 #include <assert.h>
+
+#ifdef _WITH_LIBANNOCHECK
 #include <libannocheck.h>
+#endif
 
 #include "rpminspect.h"
 
 /* Global variables */
 static bool reported = false;
 
+#ifndef _WITH_LIBANNOCHECK
+/* Trim workdir substrings from a generated string. */
+static char *trim_workdir(const rpmfile_entry_t *file, char *s)
+{
+    size_t fl = 0;
+    size_t ll = 0;
+    char *workdir = NULL;
+    char *tmp = NULL;
+
+    assert(file != NULL);
+
+    if (s == NULL) {
+        return s;
+    }
+
+    fl = strlen(file->fullpath);
+    ll = strlen(file->localpath);
+
+    if (fl > ll) {
+        workdir = strndup(file->fullpath, fl - ll);
+    }
+
+    if (workdir) {
+        tmp = strreplace(s, workdir, NULL);
+        free(s);
+        free(workdir);
+        s = tmp;
+    }
+
+    return s;
+}
+
+/*
+ * Build the annocheck command to run and report in the output.  This
+ * is a single string the caller must free.
+ */
+static char *build_annocheck_cmd(const char *cmd, const char *opts, const char *debugpath, const char *path)
+{
+    char *r = NULL;
+
+    assert(cmd != NULL);
+    assert(path != NULL);
+
+    if (opts == NULL && debugpath == NULL) {
+        xasprintf(&r, "%s %s", cmd, path);
+    } else if (opts && debugpath == NULL) {
+        xasprintf(&r, "%s %s %s", cmd, opts, path);
+    } else if (opts && debugpath) {
+        xasprintf(&r, "%s %s --debug-dir=%s %s", cmd, opts, debugpath, path);
+    }
+
+    return r;
+}
+#endif
+
+#ifdef _WITH_LIBANNOCHECK
 /*
  * Try to map the product release string to an appropriate
  * libannocheck profile.  This is going to be something that will need
@@ -212,6 +271,7 @@ static struct libannocheck_internals *libannocheck_setup(struct rpminspect *ri, 
 
     return anno;
 }
+#endif
 
 static bool annocheck_driver(struct rpminspect *ri, rpmfile_entry_t *file)
 {
@@ -219,6 +279,8 @@ static bool annocheck_driver(struct rpminspect *ri, rpmfile_entry_t *file)
     const char *arch = NULL;
     string_map_t *hentry = NULL;
     string_map_t *tmp_hentry = NULL;
+    struct result_params params;
+#ifdef _WITH_LIBANNOCHECK
     struct libannocheck_internals *ah = NULL;
     libannocheck_error annoerr = 0;
     struct libannocheck_test *annotests = NULL;
@@ -230,7 +292,18 @@ static bool annocheck_driver(struct rpminspect *ri, rpmfile_entry_t *file)
     string_list_t *details = NULL;
     libannocheck_test_state after_worst = 0;
     libannocheck_test_state before_worst = 0;
-    struct result_params params;
+#else
+    char **argv = NULL;
+    char *before_cmd = NULL;
+    char *after_cmd = NULL;
+    char *after_out = NULL;
+    int after_exit = 0;
+    char *before_out = NULL;
+    int before_exit = 0;
+    char *details = NULL;
+    string_list_t *slist = NULL;
+    string_entry_t *sentry = NULL;
+#endif
 
     assert(ri != NULL);
     assert(file != NULL);
@@ -257,11 +330,16 @@ static bool annocheck_driver(struct rpminspect *ri, rpmfile_entry_t *file)
     /* Set up the result parameters */
     init_result_params(&params);
     params.header = NAME_ANNOCHECK;
+    params.severity = RESULT_INFO;
+    params.waiverauth = NOT_WAIVABLE;
+    params.remedy = REMEDY_ANNOCHECK;
+    params.verb = VERB_OK;
     params.arch = arch;
     params.file = file->localpath;
 
     /* Run each annocheck test and report the results */
     HASH_ITER(hh, ri->annocheck, hentry, tmp_hentry) {
+#ifdef _WITH_LIBANNOCHECK
         /* run libannocheck on the before build (if any) first */
         if (file->peer_file) {
             ah = libannocheck_setup(ri, file->peer_file, hentry->value, ah);
@@ -382,11 +460,6 @@ static bool annocheck_driver(struct rpminspect *ri, rpmfile_entry_t *file)
         }
 
         /* report the results */
-        params.severity = RESULT_INFO;
-        params.waiverauth = NOT_WAIVABLE;
-        params.remedy = REMEDY_ANNOCHECK;
-        params.verb = VERB_OK;
-
         if (after_worst == libannocheck_test_state_maybe || after_worst == libannocheck_test_state_failed) {
             params.severity = ri->annocheck_failure_severity;
             params.waiverauth = WAIVABLE_BY_ANYONE;
@@ -436,6 +509,117 @@ static bool annocheck_driver(struct rpminspect *ri, rpmfile_entry_t *file)
     }
 
     return result;
+#else
+        /* Run the test on the file */
+        after_cmd = build_annocheck_cmd(ri->commands.annocheck, hentry->value, get_after_debuginfo_path(ri, file, arch), file->fullpath);
+        argv = build_argv(after_cmd);
+        after_out = run_cmd_vpe(&after_exit, ri->worksubdir, argv);
+        free_argv(argv);
+
+        /* If we have a before build, run the command on that */
+        if (file->peer_file) {
+            before_cmd = build_annocheck_cmd(ri->commands.annocheck, hentry->value, get_before_debuginfo_path(ri, file, arch), file->peer_file->fullpath);
+            argv = build_argv(before_cmd);
+            before_out = run_cmd_vpe(&before_exit, ri->workdir, argv);
+            free_argv(argv);
+
+            /* Build a reporting message if we need to */
+            if (before_exit == 0 && after_exit == 0) {
+                xasprintf(&params.msg, _("annocheck '%s' test passes for %s on %s"), hentry->key, file->localpath, arch);
+            } else if (before_exit && after_exit == 0) {
+                xasprintf(&params.msg, _("annocheck '%s' test now passes for %s on %s"), hentry->key, file->localpath, arch);
+            } else if (before_exit == 0 && after_exit) {
+                xasprintf(&params.msg, _("annocheck '%s' test now fails for %s on %s"), hentry->key, file->localpath, arch);
+                params.severity = ri->annocheck_failure_severity;
+                params.waiverauth = WAIVABLE_BY_ANYONE;
+                params.verb = VERB_CHANGED;
+                result = !(ri->annocheck_failure_severity >= RESULT_VERIFY);
+            } else if (after_exit) {
+                xasprintf(&params.msg, _("annocheck '%s' test fails for %s on %s"), hentry->key, file->localpath, arch);
+                params.severity = ri->annocheck_failure_severity;
+                params.waiverauth = WAIVABLE_BY_ANYONE;
+                params.verb = VERB_CHANGED;
+                result = !(ri->annocheck_failure_severity >= RESULT_VERIFY);
+            }
+        } else {
+            if (after_exit == 0) {
+                xasprintf(&params.msg, _("annocheck '%s' test passes for %s on %s"), hentry->key, file->localpath, arch);
+            } else if (after_exit) {
+                xasprintf(&params.msg, _("annocheck '%s' test fails for %s on %s"), hentry->key, file->localpath, arch);
+                params.severity = ri->annocheck_failure_severity;
+                params.waiverauth = WAIVABLE_BY_ANYONE;
+                params.verb = VERB_CHANGED;
+                result = !(ri->annocheck_failure_severity >= RESULT_VERIFY);
+            }
+        }
+
+        /* Report the results */
+        if (params.msg) {
+            /* trim the before build working directory and generate details */
+            if (before_cmd) {
+                before_cmd = trim_workdir(file->peer_file, before_cmd);
+                xasprintf(&details, "Command: %s\nExit Code: %d\n    compared with the output of:\nCommand: %s\nExit Code: %d\n\n%s", before_cmd, before_exit, after_cmd, after_exit, after_out);
+            } else {
+                xasprintf(&details, "Command: %s\nExit Code: %d\n\n%s", after_cmd, after_exit, after_out);
+            }
+
+            /* trim the after build working directory */
+            details = trim_workdir(file, details);
+
+            params.details = details;
+            add_result(ri, &params);
+            reported = true;
+            free(params.msg);
+        }
+
+        /* Check for loss of -O2 -D_FORTIFY_SOURCE=2 */
+        if (after_out) {
+            slist = strsplit(after_out, "\n");
+            assert(slist != NULL);
+
+            TAILQ_FOREACH(sentry, slist, items) {
+                if (strprefix(sentry->data, "FAIL:") && (strstr(sentry->data, "fortify") || strstr(sentry->data, "optimization"))) {
+                    init_result_params(&params);
+                    params.header = NAME_ANNOCHECK;
+                    params.waiverauth = WAIVABLE_BY_SECURITY;
+                    params.remedy = REMEDY_ANNOCHECK_FORTIFY_SOURCE;
+                    params.arch = arch;
+                    params.file = file->localpath;
+                    params.verb = VERB_REMOVED;
+                    params.noun = _("lost -D_FORTIFY_SOURCE in ${FILE} on ${ARCH}");
+                    params.severity = get_secrule_result_severity(ri, file, SECRULE_FORTIFYSOURCE);
+
+                    xasprintf(&params.msg, _("%s may have lost -D_FORTIFY_SOURCE on %s"), file->localpath, arch);
+                    params.details = details;
+
+                    if (params.severity != RESULT_NULL && params.severity != RESULT_SKIP) {
+                        add_result(ri, &params);
+                        reported = true;
+                        result = !(params.severity >= RESULT_VERIFY);
+                    }
+
+                    break;
+                }
+            }
+
+            list_free(slist, free);
+        }
+
+        /* Cleanup */
+        free(details);
+
+        free(after_out);
+        free(before_out);
+
+        free(after_cmd);
+        free(before_cmd);
+
+        after_exit = 0;
+        before_exit = 0;
+    }
+
+    return result;
+#endif
 }
 
 /*
@@ -447,6 +631,13 @@ bool inspect_annocheck(struct rpminspect *ri)
     struct result_params params;
 
     assert(ri != NULL);
+
+#ifndef _WITH_LIBANNOCHECK
+    /* skip if we have no annocheck tests defined */
+    if (ri->annocheck == NULL) {
+        return true;
+    }
+#endif
 
     /* run the annocheck tests across all ELF files */
     result = foreach_peer_file(ri, NAME_ANNOCHECK, annocheck_driver);
