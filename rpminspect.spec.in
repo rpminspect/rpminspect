@@ -49,11 +49,9 @@ BuildRequires:  libmandoc-devel >= 1.14.5
 BuildRequires:  gnupg2
 BuildRequires:  libicu-devel
 
-# libannocheck is only available in EPEL-7 and Fedora at the moment
-%if 0%{?epel} == 7 || 0%{?fedora}
+# libannocheck is only available in Fedora >= 36 at the moment
+%if 0%{?fedora} >= 36
 BuildRequires:  annobin-libannocheck
-%else
-BuildRequires:  annobin-annocheck
 %endif
 
 %description
@@ -68,6 +66,10 @@ Summary:        Library providing RPM test API and functionality
 Group:          Development/Tools
 Requires:       desktop-file-utils
 Requires:       gettext
+
+%if 0%{?rhel} >= 7 || 0%{?epel} >= 7
+Requires:       /usr/bin/annocheck
+%endif
 
 # The clamav data is required for the virus inspection.  Either
 # install the clamav-data or download the data files directly.
@@ -149,13 +151,14 @@ control files.
 
 
 %build
-%meson -Dtests=false
-
-%if 0%{?rhel} >= 8 || 0%{?epel} >= 8 || 0%{?fedora}
-%meson_build
+# libannocheck is only available in Fedora >= 36 at the moment
+%if 0%{?fedora} >= 36
+%meson -D tests=false
 %else
-%meson_build -D with_libannocheck=false -D with_annocheck=true
+%meson -D tests=false -D with_libannocheck=false -D with_annocheck=true
 %endif
+
+%meson_build
 
 
 %install
