@@ -263,14 +263,11 @@ bool match_path(const char *pattern, const char *root, const char *path)
         gp = stpcpy(gp, root);
     }
 
-    if (!strprefix(pattern, "/")) {
-        gp = stpcpy(gp, dirname(n));
-    }
-
     free(n);
 
     if (!strsuffix(globpath, "/") && !strprefix(pattern, "/")) {
         gp = stpcpy(gp, "/");
+        len++;
     }
 
     gp = stpcpy(gp, pattern);
