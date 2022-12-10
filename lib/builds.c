@@ -218,7 +218,7 @@ static int copytree(const char *fpath, const struct stat *sb, int tflag, struct 
  */
 static int download_build(struct rpminspect *ri, const struct koji_build *build)
 {
-    unsigned long avail = 0;
+    unsigned long int avail = 0;
     char *availh = NULL;
     char *needh = NULL;
     size_t total_width = 0;
@@ -504,7 +504,7 @@ static int download_build(struct rpminspect *ri, const struct koji_build *build)
  */
 static int download_task(struct rpminspect *ri, struct koji_task *task)
 {
-    unsigned long avail = 0;
+    unsigned long int avail = 0;
     char *availh = NULL;
     char *needh = NULL;
     size_t len;
@@ -665,8 +665,8 @@ static int download_task(struct rpminspect *ri, struct koji_task *task)
  */
 static int download_rpm(struct rpminspect *ri, const char *rpm)
 {
-    unsigned long avail = 0;
-    unsigned long rpmsize = 0;
+    unsigned long int avail = 0;
+    unsigned long int rpmsize = 0;
     char *availh = NULL;
     char *needh = NULL;
     char *pkg = NULL;

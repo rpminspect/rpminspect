@@ -9,9 +9,9 @@
 
 #include "rpminspect.h"
 
-unsigned long get_available_space(const char *path)
+unsigned long int get_available_space(const char *path)
 {
-    unsigned long r = 0;
+    unsigned long int r = 0;
     struct statvfs svb;
 
     assert(path != NULL);

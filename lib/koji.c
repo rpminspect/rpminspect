@@ -570,6 +570,8 @@ struct koji_build *get_koji_build(struct rpminspect *ri, const char *buildspec)
     int size = 0;
     int subsize = 0;
     int modsize = 0;
+    int32_t isz = 0;
+    int64_t idsz = 0;
     xmlrpc_env env;
     xmlrpc_value *key = NULL;
     xmlrpc_value *value = NULL;
@@ -1009,9 +1011,13 @@ struct koji_build *get_koji_build(struct rpminspect *ri, const char *buildspec)
                     xmlrpc_decompose_value(&env, value, "i", &rpm->epoch);
                 } else if (!strcmp(keyname, "size")) {
                     if (xmlrpc_value_type(value) == XMLRPC_TYPE_INT) {
-                        xmlrpc_decompose_value(&env, value, "i", &rpm->size);
+                        isz = 0;
+                        xmlrpc_decompose_value(&env, value, "i", &isz);
+                        rpm->size = isz;
                     } else if (xmlrpc_value_type(value) == XMLRPC_TYPE_I8) {
-                        xmlrpc_decompose_value(&env, value, "I", &rpm->size);
+                        idsz = 0;
+                        xmlrpc_decompose_value(&env, value, "I", &idsz);
+                        rpm->size = idsz;
                     } else {
                         /*
                          * XXX: have no idea what we got back here

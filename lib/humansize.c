@@ -8,7 +8,7 @@
 
 #include "rpminspect.h"
 
-char *human_size(const unsigned long bytes)
+char *human_size(const unsigned long int bytes)
 {
     char *r = NULL;
     double s = 0;

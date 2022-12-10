@@ -477,7 +477,7 @@ char *get_file_delta(const char *a, const char *b);
  * @param path The filesystem path to check.
  * @return Number of bytes available.
  */
-unsigned long get_available_space(const char *path);
+unsigned long int get_available_space(const char *path);
 
 /* curl.c */
 /**
@@ -526,7 +526,7 @@ bool is_remote_rpm(const char *url);
  * @return Allocated string containing human-readable size; caller
  *         must free.
  */
-char *human_size(const unsigned long bytes);
+char *human_size(const unsigned long int bytes);
 
 /* joinpath.c */
 /**
