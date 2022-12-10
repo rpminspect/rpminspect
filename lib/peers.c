@@ -148,7 +148,7 @@ void add_peer(rpmpeer_t **peers, int whichbuild, bool fetch_only, const char *pk
 
 int extract_peers(struct rpminspect *ri, bool fetchonly)
 {
-    unsigned long avail = 0;
+    unsigned long int avail = 0;
     char *availh = NULL;
     char *needh = NULL;
     rpmpeer_entry_t *peer = NULL;

@@ -781,8 +781,8 @@ typedef struct _koji_rpmlist_entry_t {
     char *name;
     char *version;
     char *release;
-    int epoch;
-    long long int size;
+    int32_t epoch;
+    unsigned long int size;
     TAILQ_ENTRY(_koji_rpmlist_entry_t) items;
 } koji_rpmlist_entry_t;
 
@@ -792,26 +792,26 @@ typedef TAILQ_HEAD(koji_rpmlist_s, _koji_rpmlist_entry_t) koji_rpmlist_t;
  * List of build IDs from a Koji build.
  */
 typedef struct _koji_buildlist_entry_t {
-    int build_id;
+    int32_t build_id;
     char *package_name;
     char *owner_name;
-    int task_id;
-    int state;
+    int32_t task_id;
+    int32_t state;
     char *nvr;
     char *start_time;
-    int create_event;
-    int creation_event_id;
+    int32_t create_event;
+    int32_t creation_event_id;
     char *creation_time;
-    int epoch;
-    int tag_id;
+    int32_t epoch;
+    int32_t tag_id;
     char *completion_time;
     char *tag_name;
     char *version;
-    int volume_id;
+    int32_t volume_id;
     char *release;
-    int package_id;
-    int owner_id;
-    int id;
+    int32_t package_id;
+    int32_t owner_id;
+    int32_t id;
     char *volume_name;
     char *name;
 
@@ -835,7 +835,7 @@ typedef TAILQ_HEAD(koji_buildlist_s, _koji_buildlist_entry_t) koji_buildlist_t;
 struct koji_build {
     /* These are all relevant to the name of the build */
     char *package_name;
-    int epoch;
+    int32_t epoch;
     char *name;
     char *version;
     char *release;
@@ -847,20 +847,20 @@ struct koji_build {
     /* Koji-specific information about the build */
     char *creation_time;
     char *completion_time;
-    int package_id;
-    int id;
-    int state;
+    int32_t package_id;
+    int32_t id;
+    int32_t state;
     double completion_ts;
-    int owner_id;
+    int32_t owner_id;
     char *owner_name;
     char *start_time;
-    int creation_event_id;
+    int32_t creation_event_id;
     double start_ts;
     double creation_ts;
-    int task_id;
+    int32_t task_id;
 
     /* Where to find the resulting build artifacts */
-    int volume_id;
+    int32_t volume_id;
     char *volume_name;
 
     /*
@@ -870,14 +870,14 @@ struct koji_build {
     char *original_url;
 
     /* Content Generator information (currently not used in rpminspect) */
-    int cg_id;
+    int32_t cg_id;
     char *cg_name;
 
     /* Module metadata -- only if this build is a module */
     char *modulemd_str;
     char *module_name;
     char *module_stream;
-    int module_build_service_id;
+    int32_t module_build_service_id;
     char *module_version;
     char *module_context;
     char *module_content_koji_tag;
@@ -912,24 +912,24 @@ typedef TAILQ_HEAD(koji_task_list_s, _koji_task_entry_t) koji_task_list_t;
 struct koji_task {
     /* members returned from getTaskInfo */
     double weight;
-    int parent;
+    int32_t parent;
     char *completion_time;
     char *start_time;
     double start_ts;
     bool waiting;
     bool awaited;
     char *label;
-    int priority;
-    int channel_id;
-    int state;
+    int32_t priority;
+    int32_t channel_id;
+    int32_t state;
     char *create_time;
     double create_ts;
-    int owner;
-    int host_id;
+    int32_t owner;
+    int32_t host_id;
     char *method;
     double completion_ts;
     char *arch;
-    int id;
+    int32_t id;
 
     /*
      * Total size of all RPMs (restricted to specified architectures
@@ -953,7 +953,7 @@ typedef struct _koji_task_entry_t {
     struct koji_task *task;
 
     /* results from getTaskResult */
-    int brootid;
+    int32_t brootid;
     string_list_t *srpms;
     string_list_t *rpms;
     string_list_t *logs;
