@@ -344,7 +344,8 @@ static bool annocheck_driver(struct rpminspect *ri, rpmfile_entry_t *file)
             ah = libannocheck_setup(ri, file->peer_file, hentry->value, ah);
 
             if (ah == NULL) {
-                continue;
+                /* failed to initialize libannocheck so call that a failure */
+                return false;
             }
 
             /* run the tests on the before build file (if any) */
@@ -501,7 +502,9 @@ static bool annocheck_driver(struct rpminspect *ri, rpmfile_entry_t *file)
     }
 
     /* close out */
-    annoerr = libannocheck_finish(ah);
+    if (ah != NULL) {
+        annoerr = libannocheck_finish(ah);
+    }
 
     if (annoerr != libannocheck_error_none) {
         warnx(_("libannocheck_finish error: %s"), libannocheck_get_error_message(ah, annoerr));
