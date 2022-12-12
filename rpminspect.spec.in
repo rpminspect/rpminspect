@@ -49,10 +49,6 @@ BuildRequires:  libmandoc-devel >= 1.14.5
 BuildRequires:  gnupg2
 BuildRequires:  libicu-devel
 
-# libannocheck is only available in Fedora >= 36 at the moment
-%if 0%{?fedora} >= 36
-BuildRequires:  annobin-libannocheck
-%endif
 
 %description
 Build deviation and compliance tool.  This program runs a number of tests
@@ -67,7 +63,9 @@ Group:          Development/Tools
 Requires:       desktop-file-utils
 Requires:       gettext
 
-%if 0%{?rhel} >= 7 || 0%{?epel} >= 7
+%if 0%{?rhel} >= 8 || 0%{?epel} >= 8 || 0%{?fedora}
+Recommends:     /usr/bin/annocheck
+%else
 Requires:       /usr/bin/annocheck
 %endif
 
@@ -151,13 +149,7 @@ control files.
 
 
 %build
-# libannocheck is only available in Fedora >= 36 at the moment
-%if 0%{?fedora} >= 36
-%meson -D tests=false
-%else
-%meson -D tests=false -D with_libannocheck=false -D with_annocheck=true
-%endif
-
+%meson -Dtests=false
 %meson_build
 
 

@@ -25,10 +25,10 @@ option('with_libcap',
 
 option('with_annocheck',
        type : 'boolean',
-       value : false,
+       value : true,
        description : 'Enable annocheck(1) support for binary file analysis.  Disabling annocheck(1) support will also disable the annocheck inspection.')
 
 option('with_libannocheck',
        type : 'boolean',
-       value : true,
+       value : false,
        description : 'Enable libannocheck support for binary file analysis.  Disabling libannocheck support will also disable the annocheck inspection.')
