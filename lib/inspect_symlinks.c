@@ -88,13 +88,19 @@ static bool symlinks_driver(struct rpminspect *ri, rpmfile_entry_t *file)
 
     /* first, check for things becoming symlinks to guard RPM */
     if (file->peer_file && !S_ISLNK(file->peer_file->st.st_mode)) {
+        /* get the localpath link destination */
+        len = readlink(file->fullpath, localpath, sizeof(localpath) - 1);
+        localpath[len] = '\0';
+
         if (S_ISDIR(file->peer_file->st.st_mode)) {
             /* Some RPM versions cannot handle this on an upgrade */
             params.remedy = REMEDY_SYMLINKS_DIRECTORY;
-            xasprintf(&params.msg, _("Directory %s became a symbolic link (to %s) in %s on %s; this is not allowed!"), file->peer_file->localpath, file->localpath, name, arch);
+            xasprintf(&params.msg, _("Directory %s became a symbolic link (to %s) in %s on %s; this is not allowed!"), file->peer_file->localpath, localpath, name, arch);
         } else {
-            xasprintf(&params.msg, _("%s %s became a symbolic link (to %s) in %s on %s"), strtype(file->peer_file->st.st_mode), file->peer_file->localpath, file->localpath, name, arch);
+            xasprintf(&params.msg, _("%s %s became a symbolic link (to %s) in %s on %s"), strtype(file->peer_file->st.st_mode), file->peer_file->localpath, localpath, name, arch);
         }
+
+        memset(localpath, '\0', sizeof(localpath));
 
         params.severity = RESULT_VERIFY;
         params.waiverauth = WAIVABLE_BY_ANYONE;
