@@ -17,6 +17,9 @@
 
 /* Global variables */
 static bool reported = false;
+#ifdef _WITH_ANNOCHECK
+static const char *annocheck_profile = NULL;
+#endif
 
 #ifndef _WITH_LIBANNOCHECK
 /* Trim workdir substrings from a generated string. */
@@ -54,19 +57,21 @@ static char *trim_workdir(const rpmfile_entry_t *file, char *s)
  * Build the annocheck command to run and report in the output.  This
  * is a single string the caller must free.
  */
-static char *build_annocheck_cmd(const char *cmd, const char *opts, const char *debugpath, const char *path)
+static char *build_annocheck_cmd(const char *cmd, const char *opts, const char *profile, const char *debugpath, const char *path)
 {
     char *r = NULL;
 
     assert(cmd != NULL);
     assert(path != NULL);
 
-    if (opts == NULL && debugpath == NULL) {
+    if (opts == NULL && profile == NULL && debugpath == NULL) {
         xasprintf(&r, "%s %s", cmd, path);
-    } else if (opts && debugpath == NULL) {
+    } else if (opts && profile == NULL && debugpath == NULL) {
         xasprintf(&r, "%s %s %s", cmd, opts, path);
-    } else if (opts && debugpath) {
-        xasprintf(&r, "%s %s --debug-dir=%s %s", cmd, opts, debugpath, path);
+    } else if (opts && profile && debugpath == NULL) {
+        xasprintf(&r, "%s %s --profile=%s %s", cmd, opts, profile, path);
+    } else if (opts && profile && debugpath) {
+        xasprintf(&r, "%s %s --profile=%s --debug-dir=%s %s", cmd, opts, profile, debugpath, path);
     }
 
     return r;
@@ -129,7 +134,7 @@ static void set_libannocheck_profile(struct libannocheck_internals *anno, const 
          * unique to libannocheck, but these should probably be in the
          * config file for rpminspect
          */
-        if (strprefix(profiles[i], pr) || (strprefix(profiles[i], "fc") && !strcmp(profiles[i], "rawhide"))) {
+        if (strprefix(profiles[i], pr) || (strprefix(pr, "fc") && !strcmp(profiles[i], "rawhide"))) {
             annoerr = libannocheck_enable_profile(anno, profiles[i]);
 
             if (annoerr != libannocheck_error_none) {
@@ -513,14 +518,14 @@ static bool annocheck_driver(struct rpminspect *ri, rpmfile_entry_t *file)
     return result;
 #else
         /* Run the test on the file */
-        after_cmd = build_annocheck_cmd(ri->commands.annocheck, hentry->value, get_after_debuginfo_path(ri, file, arch), file->fullpath);
+        after_cmd = build_annocheck_cmd(ri->commands.annocheck, hentry->value, annocheck_profile, get_after_debuginfo_path(ri, file, arch), file->fullpath);
         argv = build_argv(after_cmd);
         after_out = run_cmd_vpe(&after_exit, ri->worksubdir, argv);
         free_argv(argv);
 
         /* If we have a before build, run the command on that */
         if (file->peer_file) {
-            before_cmd = build_annocheck_cmd(ri->commands.annocheck, hentry->value, get_before_debuginfo_path(ri, file, arch), file->peer_file->fullpath);
+            before_cmd = build_annocheck_cmd(ri->commands.annocheck, hentry->value, annocheck_profile, get_before_debuginfo_path(ri, file, arch), file->peer_file->fullpath);
             argv = build_argv(before_cmd);
             before_out = run_cmd_vpe(&before_exit, ri->workdir, argv);
             free_argv(argv);
@@ -634,10 +639,22 @@ bool inspect_annocheck(struct rpminspect *ri)
 
     assert(ri != NULL);
 
-#ifndef _WITH_LIBANNOCHECK
+#ifdef _WITH_ANNOCHECK
     /* skip if we have no annocheck tests defined */
     if (ri->annocheck == NULL) {
         return true;
+    }
+
+    /* XXX: determine a annocheck_profile string */
+    /* this is a workaround until we can drop annocheck(1) support */
+    if (strprefix(ri->product_release, "el7")) {
+        annocheck_profile = "el7";
+    } else if (strprefix(ri->product_release, "el8")) {
+        annocheck_profile = "el8";
+    } else if (strprefix(ri->product_release, "el9")) {
+        annocheck_profile = "el9";
+    } else if (strprefix(ri->product_release, "fc") || !strcmp(ri->product_release, "rawhide")) {
+        annocheck_profile = "rawhide";
     }
 #endif
 
