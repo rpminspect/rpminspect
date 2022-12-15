@@ -205,7 +205,7 @@ static struct libannocheck_internals *libannocheck_setup(struct rpminspect *ri, 
 
     if (anno == NULL) {
         /* initialize libannocheck for this test on this file */
-        annoerr = libannocheck_init(LIBANNOCHECK_VERSION, file->fullpath, get_after_debuginfo_path(ri, file, arch), &anno);
+        annoerr = libannocheck_init(libannocheck_get_version(), file->fullpath, get_after_debuginfo_path(ri, file, arch), &anno);
 
         if (annoerr != libannocheck_error_none) {
              warnx(_("libannocheck_init error: %s"), libannocheck_get_error_message(anno, annoerr));
