@@ -1126,7 +1126,7 @@ static int read_cfgfile(struct rpminspect *ri, const char *filename)
                             free(ri->kojimbs);
                             ri->kojimbs = strdup(t);
                         }
-                    } else if (block == BLOCK_COMMON) {
+                    } else if (block == BLOCK_COMMANDS) {
                         if (!strcmp(key, SECTION_MSGUNFMT)) {
                             free(ri->commands.msgunfmt);
                             ri->commands.msgunfmt = strdup(t);
