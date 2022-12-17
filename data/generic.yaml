@@ -373,7 +373,7 @@ changedfiles:
     #    - /usr/lib*/libexample.so*
 
 addedfiles:
-    # Optional: Forbidden path prefixes, space delimited list.
+    # Optional: Forbidden path prefixes.
     forbidden_path_prefixes:
         - /tmp/
         - /var/tmp
