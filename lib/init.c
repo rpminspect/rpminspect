@@ -10,9 +10,9 @@
 #include <assert.h>
 #include <errno.h>
 #include <err.h>
-#include <yaml.h>
+#include "callbacks.h"
+#include "parser.h"
 #include "rpminspect.h"
-#include "init.h"
 #include "queue.h"
 #include "uthash.h"
 
@@ -43,109 +43,6 @@ static const char *BIN_PATHS[] = {"/bin", "/sbin", "/usr/bin", "/usr/sbin", NULL
  * inspection.
  */
 static const char *SHELLS[] = {"sh", "ksh", "zsh", "csh", "tcsh", "rc", "bash", NULL};
-
-/* States used while reading the YAML config files */
-enum {
-    SYMBOL_NULL = 0,
-    SYMBOL_KEY = 1,
-    SYMBOL_VALUE = 2,
-    SYMBOL_ENTRY = 3
-};
-
-/*
- * Sections of the config file.  The YAML reading loop determines if
- * these have been specified in the right order and in allowed
- * sections.  These values are used for state transitions while
- * reading the file.
- */
-enum {
-    BLOCK_NULL = 0,
-    BLOCK_ABIDIFF = 1,
-    BLOCK_ADDEDFILES = 2,
-    BLOCK_ANNOCHECK = 3,
-    BLOCK_ANNOCHECK_JOBS = 4,
-    BLOCK_ANNOCHECK_EXTRA_OPTS = 5,
-    BLOCK_ANNOCHECK_FAILURE_SEVERITY = 6,
-    BLOCK_BADFUNCS = 7,
-    BLOCK_BADFUNCS_ALLOWED = 8,
-    BLOCK_BADWORDS = 9,
-    BLOCK_BIN_PATHS = 10,
-    BLOCK_BUILDHOST_SUBDOMAIN = 11,
-    BLOCK_CHANGEDFILES = 12,
-    BLOCK_COMMANDS = 13,
-    BLOCK_COMMON = 14,
-    BLOCK_DESKTOP = 15,
-    BLOCK_ELF = 16,
-    BLOCK_FILESIZE = 17,
-    BLOCK_FORBIDDEN_GROUPS = 18,
-    BLOCK_FORBIDDEN_OWNERS = 19,
-    BLOCK_FORBIDDEN_PATH_PREFIXES = 20,
-    BLOCK_FORBIDDEN_PATH_SUFFIXES = 21,
-    BLOCK_FORBIDDEN_DIRECTORIES = 22,
-    BLOCK_HEADER_FILE_EXTENSIONS = 23,
-    BLOCK_IGNORE = 24,
-    BLOCK_INSPECTIONS = 25,
-    BLOCK_JAVABYTECODE = 26,
-    BLOCK_KERNEL_FILENAMES = 27,
-    BLOCK_KMIDIFF = 28,
-    BLOCK_KOJI = 29,
-    BLOCK_LTO = 29,
-    BLOCK_LTO_SYMBOL_NAME_PREFIXES = 30,
-    BLOCK_FILES = 31,
-    BLOCK_FORBIDDEN_PATHS = 32,
-    BLOCK_MANPAGE = 33,
-    BLOCK_METADATA = 34,
-    BLOCK_MIGRATED_PATHS = 35,
-    BLOCK_OWNERSHIP = 36,
-    BLOCK_PATCHES = 37,
-    BLOCK_PATCH_FILENAMES = 38,
-    BLOCK_PATHMIGRATION = 39,
-    BLOCK_PATHMIGRATION_EXCLUDED_PATHS = 40,
-    BLOCK_PRODUCTS = 41,
-    BLOCK_RUNPATH = 42,
-    BLOCK_RUNPATH_ALLOWED_PATHS = 43,
-    BLOCK_RUNPATH_ALLOWED_ORIGIN_PATHS = 44,
-    BLOCK_RUNPATH_ORIGIN_PREFIX_TRIM = 45,
-    BLOCK_SECURITY_PATH_PREFIX = 46,
-    BLOCK_SHELLS = 47,
-    BLOCK_SHELLSYNTAX = 48,
-    BLOCK_SPECNAME = 49,
-    BLOCK_VENDOR = 50,
-    BLOCK_XML = 51,
-    BLOCK_EMPTYRPM = 52,
-    BLOCK_EXPECTED_EMPTY_RPMS = 53,
-    BLOCK_TYPES = 54,
-    BLOCK_MACROFILES = 55,
-    BLOCK_UNICODE = 56,
-    BLOCK_UNICODE_EXCLUDE = 57,
-    BLOCK_UNICODE_EXCLUDED_MIME_TYPES = 58,
-    BLOCK_UNICODE_FORBIDDEN_CODEPOINTS = 59,
-    BLOCK_RPMDEPS = 60,
-    BLOCK_MOVEDFILES = 61,
-    BLOCK_POLITICS = 62,
-#ifdef _WITH_LIBCAP
-    BLOCK_CAPABILITIES = 63,
-#endif
-    BLOCK_CONFIG = 64,
-    BLOCK_DOC = 65,
-#ifdef _WITH_LIBKMOD
-    BLOCK_KMOD = 66,
-#endif
-    BLOCK_PERMISSIONS = 67,
-    BLOCK_REMOVEDFILES = 68,
-    BLOCK_SYMLINKS = 69,
-    BLOCK_UPSTREAM = 70,
-    BLOCK_VIRUS = 71,
-    BLOCK_ENVIRONMENT = 72,
-    BLOCK_LICENSEDB = 73,
-    BLOCK_DEBUGINFO = 74,
-    BLOCK_PATCH_AUTOMACROS = 75,
-#ifdef _HAVE_MODULARITYLABEL
-    BLOCK_MODULARITY = 76,
-#endif
-    BLOCK_ANNOCHECK_PROFILE = 77,
-    BLOCK_BADFUNCS_FORBIDDEN = 78,
-};
 
 static int add_regex(const char *pattern, regex_t **regex_out)
 {
@@ -245,102 +142,6 @@ static void add_string_list_map_entry(string_list_map_t **table, const char *key
         mapentry->value = list_add(mapentry->value, value);
     }
 
-    return;
-}
-
-/*
- * Given an inspection identifier from the config file reader and a
- * list value, add it to the per-inspection list of ignores.
- */
-static void add_ignore(string_list_map_t **table, int i, char *s)
-{
-    char *inspection = NULL;
-
-    assert(s != NULL);
-    assert(i != BLOCK_NULL);
-
-    /*
-     * determine the inspection first.  we do not allow all
-     * inspections to have per-inspection ignore lists.  invalid ones
-     * are reported out.
-     */
-    if (i == BLOCK_ELF) {
-        inspection = NAME_ELF;
-    } else if (i == BLOCK_MANPAGE) {
-        inspection = NAME_MANPAGE;
-    } else if (i == BLOCK_XML) {
-        inspection = NAME_XML;
-    } else if (i == BLOCK_DESKTOP) {
-        inspection = NAME_DESKTOP;
-    } else if (i == BLOCK_CHANGEDFILES) {
-        inspection = NAME_CHANGEDFILES;
-    } else if (i == BLOCK_ADDEDFILES) {
-        inspection = NAME_ADDEDFILES;
-    } else if (i == BLOCK_OWNERSHIP) {
-        inspection = NAME_OWNERSHIP;
-    } else if (i == BLOCK_SHELLSYNTAX) {
-        inspection = NAME_SHELLSYNTAX;
-    } else if (i == BLOCK_FILESIZE) {
-        inspection = NAME_FILESIZE;
-    } else if (i == BLOCK_LTO) {
-        inspection = NAME_LTO;
-    } else if (i == BLOCK_ANNOCHECK) {
-        inspection = NAME_ANNOCHECK;
-    } else if (i == BLOCK_JAVABYTECODE) {
-        inspection = NAME_JAVABYTECODE;
-    } else if (i == BLOCK_PATHMIGRATION) {
-        inspection = NAME_PATHMIGRATION;
-    } else if (i == BLOCK_FILES) {
-        inspection = NAME_FILES;
-    } else if (i == BLOCK_ABIDIFF) {
-        inspection = NAME_ABIDIFF;
-    } else if (i == BLOCK_KMIDIFF) {
-        inspection = NAME_KMIDIFF;
-    } else if (i == BLOCK_BADFUNCS) {
-        inspection = NAME_BADFUNCS;
-    } else if (i == BLOCK_RUNPATH) {
-        inspection = NAME_RUNPATH;
-    } else if (i == BLOCK_TYPES) {
-        inspection = NAME_TYPES;
-    } else if (i == BLOCK_UNICODE) {
-        inspection = NAME_UNICODE;
-    } else if (i == BLOCK_RPMDEPS) {
-        inspection = NAME_RPMDEPS;
-    } else if (i == BLOCK_MOVEDFILES) {
-        inspection = NAME_MOVEDFILES;
-    } else if (i == BLOCK_POLITICS) {
-        inspection = NAME_POLITICS;
-#ifdef _WITH_LIBCAP
-    } else if (i == BLOCK_CAPABILITIES) {
-        inspection = NAME_CAPABILITIES;
-#endif
-    } else if (i == BLOCK_CONFIG) {
-        inspection = NAME_CONFIG;
-    } else if (i == BLOCK_DOC) {
-        inspection = NAME_DOC;
-#ifdef _WITH_LIBKMOD
-    } else if (i == BLOCK_KMOD) {
-        inspection = NAME_KMOD;
-#endif
-    } else if (i == BLOCK_PERMISSIONS) {
-        inspection = NAME_PERMISSIONS;
-    } else if (i == BLOCK_REMOVEDFILES) {
-        inspection = NAME_REMOVEDFILES;
-    } else if (i == BLOCK_SYMLINKS) {
-        inspection = NAME_SYMLINKS;
-    } else if (i == BLOCK_UPSTREAM) {
-        inspection = NAME_UPSTREAM;
-    } else if (i == BLOCK_VIRUS) {
-        inspection = NAME_VIRUS;
-    } else if (i == BLOCK_DEBUGINFO) {
-        inspection = NAME_DEBUGINFO;
-    } else {
-        warnx(_("*** ignore found in %d, value `%s'"), i, s);
-        return;
-    }
-
-    INIT_DEBUG_PRINT("    add_ignore -> inspection=%s, s=|%s|\n", inspection, s);
-    add_string_list_map_entry(table, inspection, s);
     return;
 }
 
@@ -548,1003 +349,502 @@ static mode_t parse_mode(const char *input)
 }
 
 /*
+ * Retrieve a string from configuration, updating the specified field if it
+ * has already been defined.
+ */
+static inline void strget(parser_plugin *p, parser_context *ctx, const char *key1, const char *key2, char **dest)
+{
+    char *res;
+
+    res = p->getstr(ctx, key1, key2);
+
+    if (res == NULL) {
+	return;
+    }
+
+    free(*dest);
+    *dest = res;
+    return;
+}
+
+/* lambda for array() below. */
+static bool array_cb(const char *entry, void *cb_data)
+{
+    string_list_t **list = cb_data;
+    add_entry(list, entry);
+    return false;
+}
+
+/* Transform configuration's array into a string_list_t. */
+static inline void array(parser_plugin *p, parser_context *ctx, const char *key1, const char *key2, string_list_t **list)
+{
+    if (p->strarray_foreach(ctx, key1, key2, array_cb, list)) {
+	warnx(_("problem adding entries to array %s->%s"), key1, key2);
+    }
+
+    return;
+}
+
+/* lambda for add_ignores() below. */
+static bool add_ignores_cb(const char *entry, void *cb_data)
+{
+    add_ignores_cb_data *d = cb_data;
+    add_string_list_map_entry(d->inspection_ignores, d->inspection, entry);
+    return false;
+}
+
+/* Load and add an inspection's ignores section. */
+static inline void add_ignores(struct rpminspect *ri, parser_plugin *p, parser_context *ctx, const char *inspection)
+{
+    add_ignores_cb_data data = { &ri->inspection_ignores, inspection };
+
+    if (p->strarray_foreach(ctx, inspection, "ignores", add_ignores_cb, &data)) {
+	warnx(_("problem adding ignore entries to %s"), inspection);
+    }
+
+    return;
+}
+
+/*
+ * Handle inclusion and exclusion paths for an inspection.  Pass the bare name
+ * of an inspection, not a string.  Reuses variables from context.
+ */
+#define ADD_INCL_EXCL(inspection)					\
+    s = p->getstr(ctx, #inspection, "include_path");			\
+									\
+    if (s != NULL) {							\
+	if (debug_mode) {						\
+	    ri->inspection ## _path_include_pattern = strdup(s);	\
+	}								\
+									\
+	if (add_regex(s, &ri->inspection ## _path_include) != 0) {	\
+	    warn(_("error reading " #inspection " include path"));	\
+	}								\
+									\
+	free(s);							\
+    }									\
+									\
+    s = p->getstr(ctx, #inspection, "exclude_path");			\
+									\
+    if (s != NULL) {							\
+	if (debug_mode) {						\
+	    ri->inspection ## _path_exclude_pattern = strdup(s);	\
+	}								\
+									\
+	if (add_regex(s, &ri->inspection ## _path_exclude) != 0) {	\
+	    warn(_("error reading " #inspection " include path"));	\
+	}								\
+									\
+	free(s);							\
+    }
+
+/* lambda for tabledict below. */
+static bool tabledict_cb(const char *key, const char *value, void *cb_data)
+{
+    tabledict_cb_data *data = cb_data;
+
+    /* javabytecode uses this at top-level, but also supports ignores. */
+    if (!strcasecmp(key, "ignore")) {
+	return false;
+    }
+
+    process_table(key, value, data->required, data->single, data->table);
+    return false;
+}
+
+/* Process a dictionary of strings into the specified table. */
+static void tabledict(parser_plugin *p, parser_context *ctx, const char *key1, const char *key2, string_map_t **table, bool required, bool single)
+{
+    tabledict_cb_data data = { required, single, table };
+
+    if (p->strdict_foreach(ctx, key1, key2, tabledict_cb, &data)) {
+	warnx(_("ignoring malformed section %s->%s"), key1, key2);
+    }
+
+    return;
+}
+
+/* lambda for handling old-style top-level annocheck jobs.  A special case of
+ * tabledict_cb that skips more keys. */
+static bool annocheck_cb(const char *key, const char *value, void *cb_data)
+{
+    tabledict_cb_data *data = cb_data;
+
+    if (!strcasecmp(key, "failure_severity") || !strcasecmp(key, "extra_opts") || !strcasecmp(key, "ignore") || !strcasecmp(key, "ignore")) {
+        return false;
+    }
+
+    process_table(key, value, data->required, data->single, data->table);
+    return false;
+}
+
+/* lambda to handle entries in the rpmdeps config file section. */
+static bool rpmdeps_cb(const char *key, const char *value, void *cb_data)
+{
+    deprule_ignore_map_t *deprules_ignore = cb_data;
+    dep_type_t depkey = TYPE_NULL;
+    deprule_ignore_map_t *drentry = NULL;
+
+    if (!strcmp(key, "requires")) {
+	depkey = TYPE_REQUIRES;
+    } else if (!strcmp(key, "provides")) {
+	depkey = TYPE_PROVIDES;
+    } else if (!strcmp(key, "conflicts")) {
+	depkey = TYPE_CONFLICTS;
+    } else if (!strcmp(key, "obsoletes")) {
+	depkey = TYPE_OBSOLETES;
+    } else if (!strcmp(key, "enhances")) {
+	depkey = TYPE_ENHANCES;
+    } else if (!strcmp(key, "recommends")) {
+	depkey = TYPE_RECOMMENDS;
+    } else if (!strcmp(key, "suggests")) {
+	depkey = TYPE_SUGGESTS;
+    } else if (!strcmp(key, "supplements")) {
+	depkey = TYPE_SUPPLEMENTS;
+    }
+
+    if (depkey != TYPE_NULL) {
+	HASH_FIND_INT(deprules_ignore, &depkey, drentry);
+    }
+
+    /* overwrite existing entry, otherwise create new one */
+    if (drentry == NULL) {
+	drentry = calloc(1, sizeof(*drentry));
+	assert(drentry != NULL);
+	drentry->type = depkey;
+
+	if (debug_mode) {
+	    drentry->pattern = strdup(key);
+	}
+
+	if (add_regex(value, &drentry->ignore) != 0) {
+	    warn(_("error reading %s ignore pattern"), get_deprule_desc(depkey));
+	}
+
+	HASH_ADD_INT(deprules_ignore, type, drentry);
+    } else {
+	free(drentry->pattern);
+	drentry->pattern = NULL;
+	drentry->type = depkey;
+
+	if (debug_mode) {
+	    drentry->pattern = strdup(key);
+	}
+
+	regfree(drentry->ignore);
+	drentry->ignore = NULL;
+
+	if (add_regex(value, &drentry->ignore) != 0) {
+	    warn(_("error reading %s ignore pattern"), get_deprule_desc(depkey));
+	}
+    }
+
+    return false;
+}
+
+/* lambda for handle_inspections() below. */
+static bool handle_inspections_cb(const char *key, const char *value, void *cb_data)
+{
+    uint64_t *tests = cb_data;
+    bool onoff = true;
+
+    if (!strcasecmp(value, "on")) {
+	onoff = false;
+    } else if (strcasecmp(value, "off")) {
+	warnx(_("*** flag must be 'on' or 'off'; ignoring '%s'"), value);
+    }
+
+    if (!process_inspection_flag(key, onoff, tests)) {
+	err(RI_PROGRAM_ERROR, _("*** Unknown inspections: `%s`"), key);
+	return true;
+    }
+
+    return false;
+}
+
+/* Turn inspections on and off from the "inspections" config section. */
+static inline void handle_inspections(struct rpminspect *ri, parser_plugin *p, parser_context *ctx)
+{
+    if (p->strdict_foreach(ctx, "inspections", NULL, handle_inspections_cb, &ri->tests)) {
+	warnx(_("malformed/unknown inspections section"));
+    }
+
+    return;
+}
+
+/* lambda for adding entries from the badfuncs_allowed configuration. */
+static bool badfuncs_allowed_cb(const char *key, const char *value, void *cb_data)
+{
+    string_list_map_t **bad_functions_allowed = cb_data;
+
+    add_string_list_map_entry(bad_functions_allowed, key, value);
+    return false;
+}
+
+/*
  * Read either the main configuration file or a configuration file
  * overlay (profile) and populate the struct rpminspect members.
  */
 static int read_cfgfile(struct rpminspect *ri, const char *filename)
 {
-    FILE *fp = NULL;
-    yaml_parser_t parser;
-    yaml_token_t token;
-    bool read_stream = false;
-    bool read_list = false;
-    int symbol = SYMBOL_NULL;
-    int block = BLOCK_NULL;
-    int group = BLOCK_NULL;
-    unsigned int level = 0;
-    char *key = NULL;
-    char *t = NULL;
-    bool exclude = false;
-    dep_type_t depkey = TYPE_NULL;
-    deprule_ignore_map_t *drentry = NULL;
+    parser_plugin *p = &yaml_parser;
+    parser_context *ctx = NULL;
+    char *s = NULL;
+    tabledict_cb_data annocheck_cb_data = { false, false, &ri->annocheck };
 
     assert(ri != NULL);
     assert(filename != NULL);
 
-    /* prepare a YAML parser */
-    if (!yaml_parser_initialize(&parser)) {
-        warn("yaml_parser_initialize");
-        return -1;
-    }
-
     INIT_DEBUG_PRINT("filename=|%s|\n", filename);
 
-    /* open the config file */
-    if ((fp = fopen(filename, "r")) == NULL) {
-        warn("fopen");
-        return -1;
+    if (p->parse_file(&ctx, filename)) {
+	warnx(_("ignoring malformed %s configuration file: %s"), COMMAND_NAME, filename);
+	return -1;
     }
 
-    /* tell the YAML parser to read the config file */
-    yaml_parser_set_input_file(&parser, fp);
+    /* Processing order doesn't matter, so match data/generic.yaml. */
+    strget(p, ctx, "common", "workdir", &ri->workdir);
+    strget(p, ctx, "common", "profiledir", &ri->profiledir);
+    strget(p, ctx, "environment", "product_release", &ri->product_release);
+    strget(p, ctx, "koji", "hub", &ri->kojihub);
+    strget(p, ctx, "koji", "download_ursine", &ri->kojiursine);
+    strget(p, ctx, "koji", "downloaded_mbs", &ri->kojimbs);
+    strget(p, ctx, "commands", "msgunfmt", &ri->commands.msgunfmt);
+    strget(p, ctx, "commands", "desktop-file-validate", &ri->commands.desktop_file_validate);
+    strget(p, ctx, "commands", "abidiff", &ri->commands.abidiff);
+    strget(p, ctx, "commands", "kmidiff", &ri->commands.kmidiff);
+    strget(p, ctx, "vendor", "vendor_data_dir", &ri->vendor_data_dir);
+    array(p, ctx, "vendor", "licensedb", &ri->licensedb);
 
-    do {
-        if (yaml_parser_scan(&parser, &token) == 0) {
-            warnx(_("ignoring malformed %s configuration file: %s"), COMMAND_NAME, filename);
-            return -1;
-        }
+    s = p->getstr(ctx, "vendor", "favor_release");
 
-        switch (token.type) {
-            case YAML_STREAM_START_TOKEN:
-                /* begin reading the config file */
-                INIT_DEBUG_PRINT("YAML_STREAM_START_TOKEN\n");
-                read_stream = true;
-                break;
-            case YAML_STREAM_END_TOKEN:
-                /* stop reading the config file */
-                INIT_DEBUG_PRINT("YAML_STREAM_END_TOKEN\n");
-                read_stream = false;
-                break;
-            case YAML_KEY_TOKEN:
-                INIT_DEBUG_PRINT("YAML_KEY_TOKEN -> SYMBOL_KEY\n");
-                symbol = SYMBOL_KEY;
-                break;
-            case YAML_VALUE_TOKEN:
-                INIT_DEBUG_PRINT("YAML_VALUE_TOKEN -> SYMBOL_VALUE\n");
-                symbol = SYMBOL_VALUE;
-                break;
-            case YAML_BLOCK_SEQUENCE_START_TOKEN:
-                INIT_DEBUG_PRINT("YAML_BLOCK_SEQUENCE_START_TOKEN\n");
-                read_list = true;
-                break;
-            case YAML_BLOCK_ENTRY_TOKEN:
-                INIT_DEBUG_PRINT("YAML_BLOCK_ENTRY_TOKEN\n");
+    if (s != NULL) {
+	if (!strcasecmp(s, "oldest")) {
+	    ri->favor_release = FAVOR_OLDEST;
+	} else if (!strcasecmp(s, "newest")) {
+	    ri->favor_release = FAVOR_NEWEST;
+	} else {
+	    ri->favor_release = FAVOR_NONE;
+	}
 
-                if (read_list) {
-                    INIT_DEBUG_PRINT("    -> SYMBOL_ENTRY, block=%d, group=%d\n", block, group);
-                    symbol = SYMBOL_ENTRY;
-                }
-
-                break;
-            case YAML_BLOCK_END_TOKEN:
-                INIT_DEBUG_PRINT("YAML_BLOCK_END_TOKEN\n");
-
-                if (read_list && block == BLOCK_NULL && group != BLOCK_NULL) {
-                    INIT_DEBUG_PRINT("    -> read_list=false\n");
-                    read_list = false;
-                }
-
-                /*
-                 * Go back up a level until we are at level 1.  The
-                 * variable is initialized to 0 though we don't really
-                 * use that level.  libyaml throws out two
-                 * YAML_BLOCK_END_TOKENs when reading a stream.  The
-                 * first one can be ignored so level 1 becomes our
-                 * effective top level.
-                 */
-                if (level > 1) {
-                    INIT_DEBUG_PRINT("    -> level--\n");
-                    level--;
-                }
-
-                /* At the top?  Reset block indicator. */
-                if (level == 1) {
-                    INIT_DEBUG_PRINT("    -> block=BLOCK_NULL\n");
-                    block = BLOCK_NULL;
-                }
-
-                break;
-            case YAML_BLOCK_MAPPING_START_TOKEN:
-                /* YAML is all endless blocks */
-                INIT_DEBUG_PRINT("YAML_BLOCK_MAPPING_START_TOKEN\n");
-                level++;
-                break;
-            case YAML_SCALAR_TOKEN:
-                /* convert the value to a string for comparison and copying */
-                t = strndup((char *)token.data.scalar.value,
-                            token.data.scalar.length);
-                assert(t != NULL);
-                INIT_DEBUG_PRINT("YAML_SCALAR_TOKEN -> key=%s\n", key);
-
-                /* determine which config file block we are in */
-                if (key && read_stream && block != BLOCK_INSPECTIONS) {
-                    INIT_DEBUG_PRINT("    (top level)\n");
-
-                    if (!strcmp(key, SECTION_COMMON)) {
-                        block = BLOCK_COMMON;
-                        group = BLOCK_NULL;
-                    } else if (!strcmp(key, SECTION_ENVIRONMENT)) {
-                        block = BLOCK_ENVIRONMENT;
-                        group = BLOCK_NULL;
-                    } else if (!strcmp(key, SECTION_KOJI)) {
-                        block = BLOCK_KOJI;
-                        group = BLOCK_NULL;
-                    } else if (!strcmp(key, SECTION_VENDOR) && group != BLOCK_METADATA) {
-                        block = BLOCK_NULL;
-                        group = BLOCK_VENDOR;
-                    } else if (!strcmp(key, SECTION_LICENSEDB) && group == BLOCK_VENDOR) {
-                        block = BLOCK_LICENSEDB;
-                        group = BLOCK_VENDOR;
-                    } else if (!strcmp(key, SECTION_COMMANDS)) {
-                        block = BLOCK_COMMANDS;
-                        group = BLOCK_NULL;
-                    } else if (!strcmp(key, SECTION_INSPECTIONS)) {
-                        block = BLOCK_INSPECTIONS;
-                        group = BLOCK_NULL;
-                    } else if (!strcmp(key, SECTION_PRODUCTS)) {
-                        block = BLOCK_NULL;
-                        group = BLOCK_PRODUCTS;
-                    /*
-                     * All of these groups are listed here explicitly
-                     * because we have a top-level 'ignore' block and
-                     * then all of these blocks all an 'ignore'
-                     * subblock.  We have to handle things this way so
-                     * the config file parses correctly.
-                     */
-                    } else if (!strcmp(key, SECTION_IGNORE) && (group != BLOCK_ABIDIFF &&
-                                                                group != BLOCK_ADDEDFILES &&
-                                                                group != BLOCK_ANNOCHECK &&
-                                                                group != BLOCK_BADFUNCS &&
-#ifdef _WITH_LIBCAP
-                                                                group != BLOCK_CAPABILITIES &&
-#endif
-                                                                group != BLOCK_CHANGEDFILES &&
-                                                                group != BLOCK_CONFIG &&
-                                                                group != BLOCK_DESKTOP &&
-                                                                group != BLOCK_DOC &&
-                                                                group != BLOCK_ELF &&
-                                                                group != BLOCK_EMPTYRPM &&
-                                                                group != BLOCK_FILES &&
-                                                                group != BLOCK_FILESIZE &&
-                                                                group != BLOCK_JAVABYTECODE &&
-                                                                group != BLOCK_KMIDIFF &&
-#ifdef _WITH_LIBKMOD
-                                                                group != BLOCK_KMOD &&
-#endif
-                                                                group != BLOCK_LTO &&
-                                                                group != BLOCK_MANPAGE &&
-                                                                group != BLOCK_METADATA &&
-                                                                group != BLOCK_MOVEDFILES &&
-                                                                group != BLOCK_OWNERSHIP &&
-                                                                group != BLOCK_PATCHES &&
-                                                                group != BLOCK_PATHMIGRATION &&
-                                                                group != BLOCK_PERMISSIONS &&
-                                                                group != BLOCK_POLITICS &&
-                                                                group != BLOCK_REMOVEDFILES &&
-                                                                group != BLOCK_RPMDEPS &&
-                                                                group != BLOCK_RUNPATH &&
-                                                                group != BLOCK_SHELLSYNTAX &&
-                                                                group != BLOCK_SPECNAME &&
-                                                                group != BLOCK_DEBUGINFO &&
-                                                                group != BLOCK_SYMLINKS &&
-                                                                group != BLOCK_TYPES &&
-                                                                group != BLOCK_UNICODE &&
-                                                                group != BLOCK_UPSTREAM &&
-                                                                group != BLOCK_VIRUS &&
-                                                                group != BLOCK_XML)) {
-                        block = BLOCK_IGNORE;
-                        group = BLOCK_NULL;
-                    } else if (!strcmp(key, SECTION_MACROFILES)) {
-                        block = BLOCK_MACROFILES;
-
-                        if (group != BLOCK_MACROFILES) {
-                            group = BLOCK_MACROFILES;
-                        }
-                    } else if (!strcmp(key, SECTION_SECURITY_PATH_PREFIX)) {
-                        block = BLOCK_SECURITY_PATH_PREFIX;
-
-                        if (group != BLOCK_SECURITY_PATH_PREFIX) {
-                            group = BLOCK_SECURITY_PATH_PREFIX;
-                        }
-                    } else if (!strcmp(key, SECTION_BADWORDS)) {
-                        block = BLOCK_BADWORDS;
-
-                        if (group != BLOCK_BADWORDS) {
-                            group = BLOCK_BADWORDS;
-                        }
-                    } else if (!strcmp(key, NAME_METADATA)) {
-                        block = BLOCK_NULL;
-                        group = BLOCK_METADATA;
-#ifdef _HAVE_MODULARITYLABEL
-                    } else if (!strcmp(key, NAME_MODULARITY)) {
-                        block = BLOCK_MODULARITY;
-                        group = BLOCK_NULL;
-#endif
-                    } else if (!strcmp(key, NAME_ELF)) {
-                        block = BLOCK_NULL;
-                        group = BLOCK_ELF;
-                    } else if (!strcmp(key, NAME_MANPAGE)) {
-                        block = BLOCK_NULL;
-                        group = BLOCK_MANPAGE;
-                    } else if (!strcmp(key, NAME_XML)) {
-                        block = BLOCK_NULL;
-                        group = BLOCK_XML;
-                    } else if (!strcmp(key, NAME_DESKTOP)) {
-                        block = BLOCK_NULL;
-                        group = BLOCK_DESKTOP;
-                    } else if (!strcmp(key, NAME_CHANGEDFILES)) {
-                        block = BLOCK_NULL;
-                        group = BLOCK_CHANGEDFILES;
-                    } else if (!strcmp(key, NAME_ADDEDFILES)) {
-                        block = BLOCK_NULL;
-                        group = BLOCK_ADDEDFILES;
-                    } else if (!strcmp(key, NAME_OWNERSHIP)) {
-                        block = BLOCK_NULL;
-                        group = BLOCK_OWNERSHIP;
-                    } else if (!strcmp(key, NAME_SHELLSYNTAX)) {
-                        block = BLOCK_NULL;
-                        group = BLOCK_SHELLSYNTAX;
-                    } else if (!strcmp(key, NAME_FILESIZE)) {
-                        block = BLOCK_NULL;
-                        group = BLOCK_FILESIZE;
-                    } else if (!strcmp(key, NAME_LTO)) {
-                        block = BLOCK_NULL;
-                        group = BLOCK_LTO;
-                    } else if (!strcmp(key, NAME_SPECNAME)) {
-                        block = BLOCK_SPECNAME;
-                        group = BLOCK_NULL;
-                    } else if (!strcmp(key, NAME_ANNOCHECK)) {
-                        block = BLOCK_NULL;
-                        group = BLOCK_ANNOCHECK;
-                    } else if (!strcmp(key, NAME_JAVABYTECODE)) {
-                        block = BLOCK_NULL;
-                        group = BLOCK_JAVABYTECODE;
-                    } else if (!strcmp(key, NAME_PATHMIGRATION)) {
-                        block = BLOCK_NULL;
-                        group = BLOCK_PATHMIGRATION;
-                    } else if (!strcmp(key, NAME_FILES)) {
-                        block = BLOCK_NULL;
-                        group = BLOCK_FILES;
-                    } else if (!strcmp(key, NAME_ABIDIFF)) {
-                        block = BLOCK_NULL;
-                        group = BLOCK_ABIDIFF;
-                    } else if (!strcmp(key, NAME_KMIDIFF)) {
-                        block = BLOCK_NULL;
-                        group = BLOCK_KMIDIFF;
-                    } else if (!strcmp(key, NAME_PATCHES)) {
-                        block = BLOCK_NULL;
-                        group = BLOCK_PATCHES;
-                    } else if (!strcmp(key, NAME_BADFUNCS)) {
-                        block = BLOCK_NULL;
-                        group = BLOCK_BADFUNCS;
-                    } else if (group == BLOCK_BADFUNCS && !strcmp(key, SECTION_ALLOWED)) {
-                        block = BLOCK_BADFUNCS_ALLOWED;
-                        group = BLOCK_BADFUNCS;
-                    } else if (group == BLOCK_BADFUNCS && !strcmp(key, SECTION_FORBIDDEN)) {
-                        block = BLOCK_BADFUNCS_FORBIDDEN;
-                        group = BLOCK_BADFUNCS;
-                    } else if (!strcmp(key, NAME_RUNPATH)) {
-                        block = BLOCK_NULL;
-                        group = BLOCK_RUNPATH;
-                    } else if (!strcmp(key, NAME_EMPTYRPM)) {
-                        block = BLOCK_NULL;
-                        group = BLOCK_EMPTYRPM;
-                    } else if (!strcmp(key, NAME_TYPES)) {
-                        block = BLOCK_NULL;
-                        group = BLOCK_TYPES;
-                    } else if (!strcmp(key, NAME_UNICODE)) {
-                        block = BLOCK_NULL;
-                        group = BLOCK_UNICODE;
-                    } else if (!strcmp(key, NAME_RPMDEPS)) {
-                        block = BLOCK_NULL;
-                        group = BLOCK_RPMDEPS;
-                    } else if (!strcmp(key, NAME_MOVEDFILES)) {
-                        block = BLOCK_NULL;
-                        group = BLOCK_MOVEDFILES;
-                    } else if (!strcmp(key, NAME_POLITICS)) {
-                        block = BLOCK_NULL;
-                        group = BLOCK_POLITICS;
-#ifdef _WITH_LIBCAP
-                    } else if (!strcmp(key, NAME_CAPABILITIES)) {
-                        block = BLOCK_NULL;
-                        group = BLOCK_CAPABILITIES;
-#endif
-                    } else if (!strcmp(key, NAME_CONFIG)) {
-                        block = BLOCK_NULL;
-                        group = BLOCK_CONFIG;
-                    } else if (!strcmp(key, NAME_DOC)) {
-                        block = BLOCK_NULL;
-                        group = BLOCK_DOC;
-#ifdef _WITH_LIBKMOD
-                    } else if (!strcmp(key, NAME_KMOD)) {
-                        block = BLOCK_NULL;
-                        group = BLOCK_KMOD;
-#endif
-                    } else if (!strcmp(key, NAME_PERMISSIONS)) {
-                        block = BLOCK_NULL;
-                        group = BLOCK_PERMISSIONS;
-                    } else if (!strcmp(key, NAME_REMOVEDFILES)) {
-                        block = BLOCK_NULL;
-                        group = BLOCK_REMOVEDFILES;
-                    } else if (!strcmp(key, NAME_SYMLINKS)) {
-                        block = BLOCK_NULL;
-                        group = BLOCK_SYMLINKS;
-                    } else if (!strcmp(key, NAME_UPSTREAM)) {
-                        block = BLOCK_NULL;
-                        group = BLOCK_UPSTREAM;
-                    } else if (!strcmp(key, NAME_VIRUS)) {
-                        block = BLOCK_NULL;
-                        group = BLOCK_VIRUS;
-                    } else if (!strcmp(key, NAME_DEBUGINFO)) {
-                        block = BLOCK_NULL;
-                        group = BLOCK_DEBUGINFO;
-                    }
-                }
-
-                if (symbol == SYMBOL_KEY) {
-                    /* save keys because they determine where values go */
-                    free(key);
-                    key = strdup(t);
-                    INIT_DEBUG_PRINT("    -> SYMBOL_KEY=%s\n", key);
-
-                    /* handle group subsection blocks here rather than above */
-                    if (group == BLOCK_PATHMIGRATION || group == BLOCK_MIGRATED_PATHS || group == BLOCK_PATHMIGRATION_EXCLUDED_PATHS) {
-                        if (!strcmp(key, SECTION_MIGRATED_PATHS)) {
-                            group = BLOCK_MIGRATED_PATHS;
-                        } else if (!strcmp(key, SECTION_EXCLUDED_PATHS)) {
-                            group = BLOCK_PATHMIGRATION_EXCLUDED_PATHS;
-                        } else if (!strcmp(key, SECTION_IGNORE)) {
-                            group = BLOCK_IGNORE;
-                        }
-                    } else if (group == BLOCK_METADATA) {
-                        if (!strcmp(key, SECTION_BUILDHOST_SUBDOMAIN)) {
-                            block = BLOCK_BUILDHOST_SUBDOMAIN;
-                        }
-                    } else if (group == BLOCK_VENDOR) {
-                        if (!strcmp(key, SECTION_LICENSEDB)) {
-                            block = BLOCK_LICENSEDB;
-                        }
-                    } else if (group == BLOCK_CHANGEDFILES) {
-                        if (!strcmp(key, SECTION_HEADER_FILE_EXTENSIONS)) {
-                            block = BLOCK_HEADER_FILE_EXTENSIONS;
-                        } else if (!strcmp(key, SECTION_IGNORE)) {
-                            block = BLOCK_IGNORE;
-                        }
-                    } else if (group == BLOCK_ADDEDFILES) {
-                        if (!strcmp(key, SECTION_FORBIDDEN_PATH_PREFIXES)) {
-                            block = BLOCK_FORBIDDEN_PATH_PREFIXES;
-                        } else if (!strcmp(key, SECTION_FORBIDDEN_PATH_SUFFIXES)) {
-                            block = BLOCK_FORBIDDEN_PATH_SUFFIXES;
-                        } else if (!strcmp(key, SECTION_FORBIDDEN_DIRECTORIES)) {
-                            block = BLOCK_FORBIDDEN_DIRECTORIES;
-                        } else if (!strcmp(key, SECTION_IGNORE)) {
-                            block = BLOCK_IGNORE;
-                        }
-                    } else if (group == BLOCK_OWNERSHIP) {
-                        if (!strcmp(key, SECTION_BIN_PATHS)) {
-                            block = BLOCK_BIN_PATHS;
-                        } else if (!strcmp(key, SECTION_FORBIDDEN_OWNERS)) {
-                            block = BLOCK_FORBIDDEN_OWNERS;
-                        } else if (!strcmp(key, SECTION_FORBIDDEN_GROUPS)) {
-                            block = BLOCK_FORBIDDEN_GROUPS;
-                        } else if (!strcmp(key, SECTION_IGNORE)) {
-                            block = BLOCK_IGNORE;
-                        }
-                    } else if (group == BLOCK_SHELLSYNTAX) {
-                        if (!strcmp(key, SECTION_SHELLS)) {
-                            block = BLOCK_SHELLS;
-                        } else if (!strcmp(key, SECTION_IGNORE)) {
-                            block = BLOCK_IGNORE;
-                        }
-                    } else if (group == BLOCK_LTO) {
-                        if (!strcmp(key, SECTION_LTO_SYMBOL_NAME_PREFIXES)) {
-                            block = BLOCK_LTO_SYMBOL_NAME_PREFIXES;
-                        } else if (!strcmp(key, SECTION_IGNORE)) {
-                            block = BLOCK_IGNORE;
-                        }
-                    } else if (group == BLOCK_FILES) {
-                        if (!strcmp(key, SECTION_FORBIDDEN_PATHS)) {
-                            block = BLOCK_FORBIDDEN_PATHS;
-                        } else if (!strcmp(key, SECTION_IGNORE)) {
-                            block = BLOCK_IGNORE;
-                        }
-                    } else if (group == BLOCK_ABIDIFF) {
-                        if (!strcmp(key, SECTION_IGNORE)) {
-                            block = BLOCK_IGNORE;
-                        }
-                    } else if (group == BLOCK_KMIDIFF) {
-                        if (!strcmp(key, SECTION_KERNEL_FILENAMES)) {
-                            block = BLOCK_KERNEL_FILENAMES;
-                        } else if (!strcmp(key, SECTION_IGNORE)) {
-                            block = BLOCK_IGNORE;
-                        }
-                    } else if (group == BLOCK_PATCHES) {
-                        if (!strcmp(key, SECTION_IGNORE_LIST)) {
-                            block = BLOCK_PATCH_FILENAMES;
-                        } else if (!strcmp(key, SECTION_AUTOMACROS)) {
-                            block = BLOCK_PATCH_AUTOMACROS;
-                        }
-                    } else if (group == BLOCK_RUNPATH) {
-                        if (!strcmp(key, SECTION_ALLOWED_PATHS)) {
-                            block = BLOCK_RUNPATH_ALLOWED_PATHS;
-                        } else if (!strcmp(key, SECTION_ALLOWED_ORIGIN_PATHS)) {
-                            block = BLOCK_RUNPATH_ALLOWED_ORIGIN_PATHS;
-                        } else if (!strcmp(key, SECTION_ORIGIN_PREFIX_TRIM)) {
-                            block = BLOCK_RUNPATH_ORIGIN_PREFIX_TRIM;
-                        } else if (!strcmp(key, SECTION_IGNORE)) {
-                            block = BLOCK_IGNORE;
-                        }
-                    } else if (group == BLOCK_ELF) {
-                        if (!strcmp(key, SECTION_IGNORE)) {
-                            block = BLOCK_IGNORE;
-                        }
-                    } else if (group == BLOCK_MANPAGE) {
-                        if (!strcmp(key, SECTION_IGNORE)) {
-                            block = BLOCK_IGNORE;
-                        }
-                    } else if (group == BLOCK_XML) {
-                        if (!strcmp(key, SECTION_IGNORE)) {
-                            block = BLOCK_IGNORE;
-                        }
-                    } else if (group == BLOCK_DESKTOP) {
-                        if (!strcmp(key, SECTION_IGNORE)) {
-                            block = BLOCK_IGNORE;
-                        }
-                    } else if (group == BLOCK_FILESIZE) {
-                        if (!strcmp(key, SECTION_IGNORE)) {
-                            block = BLOCK_IGNORE;
-                        }
-                    } else if (group == BLOCK_ANNOCHECK) {
-                        if (!strcmp(key, SECTION_FAILURE_SEVERITY)) {
-                            block = BLOCK_ANNOCHECK_FAILURE_SEVERITY;
-                        } else if (!strcmp(key, SECTION_JOBS)) {
-                            block = BLOCK_ANNOCHECK_JOBS;
-                        } else if (!strcmp(key, SECTION_EXTRA_OPTS)) {
-                            block = BLOCK_ANNOCHECK_EXTRA_OPTS;
-                        } else if (!strcmp(key, SECTION_IGNORE)) {
-                            block = BLOCK_IGNORE;
-                        } else if (!strcmp(key, SECTION_PROFILE)) {
-                            block = BLOCK_ANNOCHECK_PROFILE;
-                        } else if (strcmp(key, t)) {
-                            /* continue support the old syntax for the yaml file */
-                            process_table(key, t, false, false, &ri->annocheck);
-                        }
-                    } else if (group == BLOCK_JAVABYTECODE) {
-                        if (!strcmp(key, SECTION_IGNORE)) {
-                            block = BLOCK_IGNORE;
-                        }
-                    } else if (group == BLOCK_BADFUNCS) {
-                        if (!strcmp(key, SECTION_IGNORE)) {
-                            block = BLOCK_IGNORE;
-                        } else if (!strcmp(key, SECTION_ALLOWED)) {
-                            block = BLOCK_BADFUNCS_ALLOWED;
-                        } else if (!strcmp(key, SECTION_FORBIDDEN)) {
-                            block = BLOCK_BADFUNCS_FORBIDDEN;
-                        }
-                    } else if (group == BLOCK_EMPTYRPM) {
-                        if (!strcmp(key, SECTION_EXPECTED_EMPTY)) {
-                            block = BLOCK_EXPECTED_EMPTY_RPMS;
-                        }
-                    } else if (group == BLOCK_TYPES) {
-                        if (!strcmp(key, SECTION_IGNORE)) {
-                            block = BLOCK_IGNORE;
-                        }
-                    } else if (group == BLOCK_UNICODE) {
-                        if (!strcmp(key, SECTION_EXCLUDED_MIME_TYPES)) {
-                            block = BLOCK_UNICODE_EXCLUDED_MIME_TYPES;
-                        } else if (!strcmp(key, SECTION_FORBIDDEN_CODEPOINTS)) {
-                            block = BLOCK_UNICODE_FORBIDDEN_CODEPOINTS;
-                        } else if (!strcmp(key, SECTION_IGNORE)) {
-                            block = BLOCK_IGNORE;
-                        }
-                    } else if (group == BLOCK_RPMDEPS) {
-                        if (!strcmp(key, SECTION_IGNORE)) {
-                            block = BLOCK_IGNORE;
-                        }
-                    } else if (group == BLOCK_MOVEDFILES) {
-                        if (!strcmp(key, SECTION_IGNORE)) {
-                            block = BLOCK_IGNORE;
-                        }
-                    } else if (group == BLOCK_POLITICS) {
-                        if (!strcmp(key, SECTION_IGNORE)) {
-                            block = BLOCK_IGNORE;
-                        }
-#ifdef _WITH_LIBCAP
-                    } else if (group == BLOCK_CAPABILITIES) {
-                        if (!strcmp(key, SECTION_IGNORE)) {
-                            block = BLOCK_IGNORE;
-                        }
-#endif
-                    } else if (group == BLOCK_CONFIG) {
-                        if (!strcmp(key, SECTION_IGNORE)) {
-                            block = BLOCK_IGNORE;
-                        }
-                    } else if (group == BLOCK_DOC) {
-                        if (!strcmp(key, SECTION_IGNORE)) {
-                            block = BLOCK_IGNORE;
-                        }
-#ifdef _WITH_LIBKMOD
-                    } else if (group == BLOCK_KMOD) {
-                        if (!strcmp(key, SECTION_IGNORE)) {
-                            block = BLOCK_IGNORE;
-                        }
-#endif
-                    } else if (group == BLOCK_PERMISSIONS) {
-                        if (!strcmp(key, SECTION_IGNORE)) {
-                            block = BLOCK_IGNORE;
-                        }
-                    } else if (group == BLOCK_REMOVEDFILES) {
-                        if (!strcmp(key, SECTION_IGNORE)) {
-                            block = BLOCK_IGNORE;
-                        }
-                    } else if (group == BLOCK_SYMLINKS) {
-                        if (!strcmp(key, SECTION_IGNORE)) {
-                            block = BLOCK_IGNORE;
-                        }
-                    } else if (group == BLOCK_UPSTREAM) {
-                        if (!strcmp(key, SECTION_IGNORE)) {
-                            block = BLOCK_IGNORE;
-                        }
-                    } else if (group == BLOCK_VIRUS) {
-                        if (!strcmp(key, SECTION_IGNORE)) {
-                            block = BLOCK_IGNORE;
-                        }
-                    } else if (group == BLOCK_DEBUGINFO) {
-                        if (!strcmp(key, SECTION_IGNORE)) {
-                            block = BLOCK_IGNORE;
-                        }
-                    }
-                } else if (symbol == SYMBOL_VALUE) {
-                    INIT_DEBUG_PRINT("    -> SYMBOL_VALUE=%s\n", key);
-
-                    /* sort values in to the right settings based on the block */
-                    if (block == BLOCK_COMMON) {
-                        if (!strcmp(key, SECTION_WORKDIR)) {
-                            free(ri->workdir);
-                            ri->workdir = strdup(t);
-                        } else if (!strcmp(key, SECTION_PROFILEDIR)) {
-                            free(ri->profiledir);
-                            ri->profiledir = strdup(t);
-                        }
-                    } else if (block == BLOCK_ENVIRONMENT) {
-                        if (!strcmp(key, SECTION_PRODUCT_RELEASE)) {
-                            free(ri->product_release);
-                            ri->product_release = strdup(t);
-                        }
-                    } else if (block == BLOCK_KOJI) {
-                        if (!strcmp(key, SECTION_HUB)) {
-                            free(ri->kojihub);
-                            ri->kojihub = strdup(t);
-                        } else if (!strcmp(key, SECTION_DOWNLOAD_URSINE)) {
-                            free(ri->kojiursine);
-                            ri->kojiursine = strdup(t);
-                        } else if (!strcmp(key, SECTION_DOWNLOAD_MBS)) {
-                            free(ri->kojimbs);
-                            ri->kojimbs = strdup(t);
-                        }
-                    } else if (block == BLOCK_COMMANDS) {
-                        if (!strcmp(key, SECTION_MSGUNFMT)) {
-                            free(ri->commands.msgunfmt);
-                            ri->commands.msgunfmt = strdup(t);
-                        } else if (!strcmp(key, SECTION_DESKTOP_FILE_VALIDATE)) {
-                            free(ri->commands.desktop_file_validate);
-                            ri->commands.desktop_file_validate = strdup(t);
-#ifdef _WITH_ANNOCHECK
-                        } else if (!strcmp(key, SECTION_ANNOCHECK)) {
-                            free(ri->commands.annocheck);
-                            ri->commands.annocheck = strdup(t);
-#endif
-                        } else if (!strcmp(key, SECTION_ABIDIFF)) {
-                            free(ri->commands.abidiff);
-                            ri->commands.abidiff = strdup(t);
-                        } else if (!strcmp(key, SECTION_KMIDIFF)) {
-                            free(ri->commands.kmidiff);
-                            ri->commands.kmidiff = strdup(t);
-                        }
-                    } else if (group == BLOCK_METADATA) {
-                        /*
-                         * this block needs to come before BLOCK_VENDOR
-                         * the key 'vendor' is used in two places
-                         */
-                        if (!strcmp(key, SECTION_VENDOR)) {
-                            free(ri->vendor);
-                            ri->vendor = strdup(t);
-                        }
-                    } else if (group == BLOCK_VENDOR) {
-                        if (!strcmp(key, SECTION_VENDOR_DATA_DIR)) {
-                            free(ri->vendor_data_dir);
-                            ri->vendor_data_dir = strdup(t);
-                        } else if (!strcmp(key, SECTION_LICENSEDB)) {
-                            if (ri->licensedb == NULL) {
-                                ri->licensedb = calloc(1, sizeof(*(ri->licensedb)));
-                                assert(ri->licensedb != NULL);
-                                TAILQ_INIT(ri->licensedb);
-                            }
-
-                            ri->licensedb = list_add(ri->licensedb, t);
-                        } else if (!strcmp(key, SECTION_FAVOR_RELEASE)) {
-                            if (!strcasecmp(t, TOKEN_NONE)) {
-                                ri->favor_release = FAVOR_NONE;
-                            } else if (!strcasecmp(t, TOKEN_OLDEST)) {
-                                ri->favor_release = FAVOR_OLDEST;
-                            } else if (!strcasecmp(t, TOKEN_NEWEST)) {
-                                ri->favor_release = FAVOR_NEWEST;
-                            }
-                        }
-                    } else if (block == BLOCK_SPECNAME) {
-                        if (!strcmp(key, SECTION_MATCH)) {
-                            if (!strcasecmp(t, TOKEN_FULL)) {
-                                ri->specmatch = MATCH_FULL;
-                            } else if (!strcasecmp(t, TOKEN_PREFIX)) {
-                                ri->specmatch = MATCH_PREFIX;
-                            } else if (!strcasecmp(t, TOKEN_SUFFIX)) {
-                                ri->specmatch = MATCH_SUFFIX;
-                            } else {
-                                ri->specmatch = MATCH_FULL;
-                                warnx(_("*** unknown specname match setting '%s', defaulting to 'full'"), t);
-                            }
-                        } else if (!strcmp(key, SECTION_PRIMARY)) {
-                            if (!strcasecmp(t, TOKEN_NAME)) {
-                                ri->specprimary = PRIMARY_NAME;
-                            } else if (!strcasecmp(t, TOKEN_FILENAME)) {
-                                ri->specprimary = PRIMARY_FILENAME;
-                            } else {
-                                ri->specprimary = PRIMARY_NAME;
-                                warnx(_("*** unknown specname primary setting '%s', defaulting to 'name'"), t);
-                            }
-                        }
-#ifdef _HAVE_MODULARITYLABEL
-                    } else if (block == BLOCK_MODULARITY) {
-                        if (!strcmp(key, SECTION_STATIC_CONTEXT)) {
-                            if (!strcasecmp(t, TOKEN_REQUIRED)) {
-                                ri->modularity_static_context = STATIC_CONTEXT_REQUIRED;
-                            } else if (!strcasecmp(t, TOKEN_FORBIDDEN)) {
-                                ri->modularity_static_context = STATIC_CONTEXT_FORBIDDEN;
-                            } else if (!strcasecmp(t, TOKEN_RECOMMEND)) {
-                                ri->modularity_static_context = STATIC_CONTEXT_RECOMMEND;
-                            } else {
-                                ri->modularity_static_context = STATIC_CONTEXT_NULL;
-                                warnx(_("*** unknown modularity static context settings '%s'"), t);
-                            }
-                        }
-#endif
-                    } else if (group == BLOCK_ELF) {
-                        if (!strcmp(key, SECTION_INCLUDE_PATH)) {
-                            if (debug_mode) {
-                                free(ri->elf_path_include_pattern);
-                                ri->elf_path_include_pattern = strdup(t);
-                            }
-
-                            if (add_regex(t, &ri->elf_path_include) != 0) {
-                                warn(_("error reading elf include path"));
-                            }
-                        } else if (!strcmp(key, SECTION_EXCLUDE_PATH)) {
-                            if (debug_mode) {
-                                free(ri->elf_path_exclude_pattern);
-                                ri->elf_path_exclude_pattern = strdup(t);
-                            }
-
-                            if (add_regex(t, &ri->elf_path_exclude) != 0) {
-                                warn(_("error reading elf exclude path"));
-                            }
-                        }
-                    } else if (group == BLOCK_MANPAGE) {
-                        if (!strcmp(key, SECTION_INCLUDE_PATH)) {
-                            if (debug_mode) {
-                                free(ri->manpage_path_include_pattern);
-                                ri->manpage_path_include_pattern = strdup(t);
-                            }
-
-                            if (add_regex(t, &ri->manpage_path_include) != 0) {
-                                warn(_("error reading man page include path"));
-                            }
-                        } else if (!strcmp(key, SECTION_EXCLUDE_PATH)) {
-                            if (debug_mode) {
-                                free(ri->manpage_path_exclude_pattern);
-                                ri->manpage_path_exclude_pattern = strdup(t);
-                            }
-
-                            if (add_regex(t, &ri->manpage_path_exclude) != 0) {
-                                warn(_("error reading man page exclude path"));
-                            }
-                        }
-                    } else if (group == BLOCK_XML) {
-                        if (!strcmp(key, SECTION_INCLUDE_PATH)) {
-                            if (debug_mode) {
-                                free(ri->xml_path_include_pattern);
-                                ri->xml_path_include_pattern = strdup(t);
-                            }
-
-                            if (add_regex(t, &ri->xml_path_include) != 0) {
-                                warn(_("error reading xml include path"));
-                            }
-                        } else if (!strcmp(key, SECTION_EXCLUDE_PATH)) {
-                            if (debug_mode) {
-                                free(ri->xml_path_exclude_pattern);
-                                ri->xml_path_exclude_pattern = strdup(t);
-                            }
-
-                            if (add_regex(t, &ri->xml_path_exclude) != 0) {
-                                warn(_("error reading xml exclude path"));
-                            }
-                        }
-                    } else if (group == BLOCK_DESKTOP) {
-                        if (!strcmp(key, SECTION_DESKTOP_ENTRY_FILES_DIR)) {
-                            free(ri->desktop_entry_files_dir);
-                            ri->desktop_entry_files_dir = strdup(t);
-                        }
-                    } else if (group == BLOCK_OWNERSHIP) {
-                        if (!strcmp(key, SECTION_BIN_OWNER)) {
-                            free(ri->bin_owner);
-                            ri->bin_owner = strdup(t);
-                        } else if (!strcmp(key, SECTION_BIN_GROUP)) {
-                            free(ri->bin_group);
-                            ri->bin_group = strdup(t);
-                        }
-                    } else if (group == BLOCK_FILESIZE) {
-                        if (!strcmp(key, SECTION_SIZE_THRESHOLD)) {
-                            if (!strcasecmp(t, TOKEN_INFO) || !strcasecmp(t, TOKEN_INFO_ONLY) || !strcasecmp(t, TOKEN_INFO_ONLY2)) {
-                                ri->size_threshold = -1;
-                            } else {
-                                ri->size_threshold = strtol(t, 0, 10);
-
-                                if ((ri->size_threshold == LONG_MIN || ri->size_threshold == LONG_MAX) && errno == ERANGE) {
-                                    warn("strtol");
-                                    ri->size_threshold = 0;
-                                }
-                            }
-                        }
-                    } else if (group == BLOCK_ANNOCHECK) {
-                        if (block == BLOCK_ANNOCHECK_JOBS) {
-                            process_table(key, t, false, false, &ri->annocheck);
-                        } else if (block == BLOCK_ANNOCHECK_EXTRA_OPTS) {
-                            process_table(key, t, true, false, &ri->annocheck);
-                        } else if (block == BLOCK_ANNOCHECK_FAILURE_SEVERITY) {
-                            ri->annocheck_failure_severity = getseverity(t, RESULT_NULL);
-
-                            if (ri->annocheck_failure_severity == RESULT_NULL) {
-                                warnx(_("Invalid annocheck failure_reporting_level: %s, defaulting to %s."), t, strseverity(RESULT_VERIFY));
-                                ri->annocheck_failure_severity = RESULT_VERIFY;
-                            }
-                        } else if (block == BLOCK_ANNOCHECK_PROFILE) {
-                            free(ri->annocheck_profile);
-                            ri->annocheck_profile = strdup(t);
-                        }
-                    } else if (group == BLOCK_JAVABYTECODE) {
-                        process_table(key, t, false, true, &ri->jvm);
-                    } else if (group == BLOCK_MIGRATED_PATHS) {
-                        process_table(key, t, false, false, &ri->pathmigration);
-                    } else if (group == BLOCK_PRODUCTS) {
-                        process_table(key, t, false, false, &ri->products);
-                    } else if (block == BLOCK_INSPECTIONS) {
-                        if (!strcasecmp(t, TOKEN_ON)) {
-                            exclude = false;
-                        } else if (!strcasecmp(t, TOKEN_OFF)) {
-                            exclude = true;
-                        } else {
-                            exclude = false;
-                            warnx(_("*** inspection flag must be 'on' or 'off', ignoring for '%s'"), key);
-                        }
-
-                        if (!process_inspection_flag(key, exclude, &ri->tests)) {
-                            err(RI_PROGRAM_ERROR, _("*** Unknown inspection: `%s`"), key);
-                        }
-                    } else if (group == BLOCK_ABIDIFF) {
-                        if (!strcmp(key, SECTION_SUPPRESSION_FILE)) {
-                            free(ri->abidiff_suppression_file);
-                            ri->abidiff_suppression_file = strdup(t);
-                        } else if (!strcmp(key, SECTION_DEBUGINFO_PATH)) {
-                            free(ri->abidiff_debuginfo_path);
-                            ri->abidiff_debuginfo_path = strdup(t);
-                        } else if (!strcmp(key, SECTION_EXTRA_ARGS)) {
-                            free(ri->abidiff_extra_args);
-                            ri->abidiff_extra_args = strdup(t);
-                        } else if (!strcmp(key, SECTION_SECURITY_LEVEL_THRESHOLD)) {
-                            ri->abi_security_threshold = strtol(t, 0, 10);
-
-                            if ((ri->abi_security_threshold == LONG_MIN || ri->abi_security_threshold == LONG_MAX) && errno == ERANGE) {
-                                warn("strtol");
-                                ri->abi_security_threshold = DEFAULT_ABI_SECURITY_THRESHOLD;
-                            }
-                        }
-                    } else if (group == BLOCK_KMIDIFF) {
-                        if (!strcmp(key, SECTION_SUPPRESSION_FILE)) {
-                            free(ri->kmidiff_suppression_file);
-                            ri->kmidiff_suppression_file = strdup(t);
-                        } else if (!strcmp(key, SECTION_DEBUGINFO_PATH)) {
-                            free(ri->kmidiff_debuginfo_path);
-                            ri->kmidiff_debuginfo_path = strdup(t);
-                        } else if (!strcmp(key, SECTION_EXTRA_ARGS)) {
-                            free(ri->kmidiff_extra_args);
-                            ri->kmidiff_extra_args = strdup(t);
-                        } else if (!strcmp(key, SECTION_KABI_DIR)) {
-                            free(ri->kabi_dir);
-                            ri->kabi_dir = strdup(t);
-                        } else if (!strcmp(key, SECTION_KABI_FILENAME)) {
-                            free(ri->kabi_filename);
-                            ri->kabi_filename = strdup(t);
-                        }
-                    } else if (group == BLOCK_UNICODE && block == BLOCK_UNICODE_EXCLUDE) {
-                        if (add_regex(t, &ri->unicode_exclude) != 0) {
-                            warn(_("error reading unicode exclude regular expression"));
-                        }
-                    } else if (group == BLOCK_RPMDEPS && block == BLOCK_IGNORE) {
-                        /* determine dependency type first */
-                        depkey = TYPE_NULL;
-
-                        if (!strcmp(key, SECTION_REQUIRES)) {
-                            depkey = TYPE_REQUIRES;
-                        } else if (!strcmp(key, SECTION_PROVIDES)) {
-                            depkey = TYPE_PROVIDES;
-                        } else if (!strcmp(key, SECTION_CONFLICTS)) {
-                            depkey = TYPE_CONFLICTS;
-                        } else if (!strcmp(key, SECTION_OBSOLETES)) {
-                            depkey = TYPE_OBSOLETES;
-                        } else if (!strcmp(key, SECTION_ENHANCES)) {
-                            depkey = TYPE_ENHANCES;
-                        } else if (!strcmp(key, SECTION_RECOMMENDS)) {
-                            depkey = TYPE_RECOMMENDS;
-                        } else if (!strcmp(key, SECTION_SUGGESTS)) {
-                            depkey = TYPE_SUGGESTS;
-                        } else if (!strcmp(key, SECTION_SUPPLEMENTS)) {
-                            depkey = TYPE_SUPPLEMENTS;
-                        }
-
-                        /* look up valid dependency type */
-                        if (depkey != TYPE_NULL) {
-                            HASH_FIND_INT(ri->deprules_ignore, &depkey, drentry);
-                        }
-
-                        /* overwrite existing entry, otherwise create new one */
-                        if (drentry == NULL) {
-                            drentry = calloc(1, sizeof(*drentry));
-                            assert(drentry != NULL);
-                            drentry->type = depkey;
-
-                            if (debug_mode) {
-                                drentry->pattern = strdup(t);
-                            }
-
-                            if (add_regex(t, &drentry->ignore) != 0) {
-                                warn(_("error reading %s ignore pattern"), get_deprule_desc(depkey));
-                            }
-
-                            HASH_ADD_INT(ri->deprules_ignore, type, drentry);
-                        } else {
-                            free(drentry->pattern);
-                            drentry->pattern = NULL;
-                            drentry->type = depkey;
-
-                            if (debug_mode) {
-                                drentry->pattern = strdup(t);
-                            }
-
-                            regfree(drentry->ignore);
-                            drentry->ignore = NULL;
-
-                            if (add_regex(t, &drentry->ignore) != 0) {
-                                warn(_("error reading %s ignore pattern"), get_deprule_desc(depkey));
-                            }
-                        }
-                    } else if (group == BLOCK_DEBUGINFO) {
-                        if (!strcmp(key, SECTION_DEBUGINFO_SECTIONS)) {
-                            free(ri->debuginfo_sections);
-                            ri->debuginfo_sections = strdup(t);
-                        }
-                    }
-                } else if (symbol == SYMBOL_ENTRY) {
-                    INIT_DEBUG_PRINT("    -> SYMBOL_ENTRY=%s, block=%d, group=%d\n", t, block, group);
-
-                    /*
-                     * 'ignore' is handled first because of
-                     * per-inspection ignore lists and the symbol is
-                     * the same across blocks
-                     */
-                    if (block == BLOCK_IGNORE) {
-                        /*
-                         * BLOCK_NULL means we're reading the
-                         * top-level 'ignore' block.  Any other group
-                         * means we are reading the optional 'ignore'
-                         * subblock for an inspection.
-                         */
-                        if (group == BLOCK_NULL) {
-                            add_entry(&ri->ignores, t);
-                        } else {
-                            add_ignore(&ri->inspection_ignores, group, t);
-                        }
-                    } else if (group == BLOCK_BADFUNCS) {
-                        if (block == BLOCK_BADFUNCS_FORBIDDEN) {
-                            add_entry(&ri->bad_functions, t);
-                        } else if (block == BLOCK_BADFUNCS_ALLOWED) {
-                            add_string_list_map_entry(&ri->bad_functions_allowed, key, t);
-                        }
-                    } else if (block == BLOCK_LICENSEDB) {
-                        add_entry(&ri->licensedb, t);
-                    } else if (block == BLOCK_BADWORDS) {
-                        add_entry(&ri->badwords, t);
-                    } else if (block == BLOCK_MACROFILES) {
-                        add_entry(&ri->macrofiles, t);
-                    } else if (block == BLOCK_SECURITY_PATH_PREFIX) {
-                        add_entry(&ri->security_path_prefix, t);
-                    } else if (block == BLOCK_BUILDHOST_SUBDOMAIN) {
-                        add_entry(&ri->buildhost_subdomain, t);
-                    } else if (block == BLOCK_HEADER_FILE_EXTENSIONS) {
-                        add_entry(&ri->header_file_extensions, t);
-                    } else if (block == BLOCK_FORBIDDEN_PATH_PREFIXES) {
-                        add_entry(&ri->forbidden_path_prefixes, t);
-                    } else if (block == BLOCK_FORBIDDEN_PATH_SUFFIXES) {
-                        add_entry(&ri->forbidden_path_suffixes, t);
-                    } else if (block == BLOCK_FORBIDDEN_DIRECTORIES) {
-                        add_entry(&ri->forbidden_directories, t);
-                    } else if (block == BLOCK_BIN_PATHS) {
-                        add_entry(&ri->bin_paths, t);
-                    } else if (block == BLOCK_FORBIDDEN_OWNERS) {
-                        add_entry(&ri->forbidden_owners, t);
-                    } else if (block == BLOCK_FORBIDDEN_GROUPS) {
-                        add_entry(&ri->forbidden_groups, t);
-                    } else if (block == BLOCK_SHELLS) {
-                        add_entry(&ri->shells, t);
-                    } else if (block == BLOCK_LTO_SYMBOL_NAME_PREFIXES) {
-                        add_entry(&ri->lto_symbol_name_prefixes, t);
-                    } else if (block == BLOCK_FORBIDDEN_PATHS) {
-                        add_entry(&ri->forbidden_paths, t);
-                    } else if (block == BLOCK_KERNEL_FILENAMES) {
-                        add_entry(&ri->kernel_filenames, t);
-                    } else if (block == BLOCK_PATCH_FILENAMES) {
-                        add_entry(&ri->patch_ignore_list, t);
-                    } else if (block == BLOCK_PATCH_AUTOMACROS) {
-                        add_entry(&ri->automacros, t);
-                    } else if (group == BLOCK_PATHMIGRATION_EXCLUDED_PATHS) {
-                        add_entry(&ri->pathmigration_excluded_paths, t);
-                    } else if (block == BLOCK_RUNPATH_ALLOWED_PATHS) {
-                        add_entry(&ri->runpath_allowed_paths, t);
-                    } else if (block == BLOCK_RUNPATH_ALLOWED_ORIGIN_PATHS) {
-                        add_entry(&ri->runpath_allowed_origin_paths, t);
-                    } else if (block == BLOCK_RUNPATH_ORIGIN_PREFIX_TRIM) {
-                        add_entry(&ri->runpath_origin_prefix_trim, t);
-                    } else if (block == BLOCK_EXPECTED_EMPTY_RPMS) {
-                        add_entry(&ri->expected_empty_rpms, t);
-                    } else if (block == BLOCK_UNICODE_EXCLUDED_MIME_TYPES) {
-                        add_entry(&ri->unicode_excluded_mime_types, t);
-                    } else if (block == BLOCK_UNICODE_FORBIDDEN_CODEPOINTS) {
-                        add_entry(&ri->unicode_forbidden_codepoints, t);
-                    }
-                }
-
-                free(t);
-                break;
-            default:
-                break;
-        }
-
-        if (token.type != YAML_STREAM_END_TOKEN) {
-            yaml_token_delete(&token);
-        }
-    } while (token.type != YAML_STREAM_END_TOKEN);
-
-    INIT_DEBUG_PRINT("YAML_STREAM_END_TOKEN\n");
-
-    /* destroy the YAML parser, close the input file */
-    yaml_parser_delete(&parser);
-
-    if (fclose(fp) != 0) {
-        warn("fclose");
-        return -1;
+	free(s);
     }
 
-    /* clean up */
-    free(key);
+    handle_inspections(ri, p, ctx);
+    tabledict(p, ctx, "products", NULL, &ri->products, false, false);
+    array(p, ctx, "macrofiles", NULL, &ri->macrofiles);
+    array(p, ctx, "ignore", NULL, &ri->ignores);
+    array(p, ctx, "security_path_prefix", NULL, &ri->security_path_prefix);
+    array(p, ctx, "badwords", NULL, &ri->badwords);
+    strget(p, ctx, "metadata", "vendor", &ri->vendor);
+    array(p, ctx, "metadata", "buildhost_subdomain", &ri->buildhost_subdomain);
 
+#ifdef _HAVE_MODULARITYLABEL
+    s = p->getstr(ctx, "modularity", "static_context");
+
+    if (s != NULL) {
+	if (!strcasecmp(s, "required")) {
+	    ri->modularity_static_context = STATIC_CONTEXT_REQUIRED;
+	} else if (!strcasecmp(s, "forbidden")) {
+	    ri->modularity_static_context = STATIC_CONTEXT_FORBIDDEN;
+	} else if (!strcasecmp(s, "recommend")) {
+	    ri->modularity_static_context = STATIC_CONTEXT_RECOMMEND;
+	} else {
+	    ri->modularity_static_context = STATIC_CONTEXT_NULL;
+	    warnx(_("*** unknown modularity static context settiongs '%s'"), s);
+	}
+
+	free(s);
+    }
+#endif
+
+    ADD_INCL_EXCL(elf);
+    add_ignores(ri, p, ctx, "elf");
+    array(p, ctx, "emptyrpm", "expected_empty", &ri->expected_empty_rpms);
+    ADD_INCL_EXCL(manpage);
+    add_ignores(ri, p, ctx, "manpage");
+    ADD_INCL_EXCL(xml);
+    add_ignores(ri, p, ctx, "xml");
+    strget(p, ctx, "desktop", "desktop_entry_files_dir", &ri->desktop_entry_files_dir);
+    add_ignores(ri, p, ctx, "desktop");
+    array(p, ctx, "changedfiles", "header_file_extensions", &ri->header_file_extensions);
+    add_ignores(ri, p, ctx, "changedfiles");
+    array(p, ctx, "addedfiles", "forbidden_path_prefixes", &ri->forbidden_path_prefixes);
+    array(p, ctx, "addedfiles", "forbidden_path_suffixes", &ri->forbidden_path_suffixes);
+    array(p, ctx, "addedfiles", "forbidden_directories", &ri->forbidden_directories);
+    add_ignores(ri, p, ctx, "addedfiles");
+    add_ignores(ri, p, ctx, "movedfiles");
+    add_ignores(ri, p, ctx, "removedfiles");
+    array(p, ctx, "ownership", "bin_paths", &ri->bin_paths);
+    strget(p, ctx, "ownership", "bin_owner", &ri->bin_owner);
+    strget(p, ctx, "ownership", "bin-group", &ri->bin_group);
+    array(p, ctx, "ownership", "forbidden_owners", &ri->forbidden_owners);
+    array(p, ctx, "ownership", "forbidden_groups", &ri->forbidden_groups);
+    add_ignores(ri, p, ctx, "ownership");
+    array(p, ctx, "shellsyntax", "shells", &ri->shells);
+    add_ignores(ri, p, ctx, "shellsyntax");
+
+    s = p->getstr(ctx, "filesize", "size_threshold");
+
+    if (s != NULL) {
+	if (!strcasecmp(s, "info") || !strcasecmp(s, "info-only") || !strcasecmp(s, "info_only")) {
+	    ri->size_threshold = -1;
+	} else {
+	    ri->size_threshold = strtol(s, 0, 10);
+
+	    if ((ri->size_threshold == LONG_MIN || ri->size_threshold == LONG_MAX) && errno == ERANGE) {
+		warn("strtol");
+		ri->size_threshold = 0;
+	    }
+	}
+
+	free(s);
+    }
+
+    add_ignores(ri, p, ctx, "filesize");
+    array(p, ctx, "lto", "lto_symbol_name_prefixes", &ri->lto_symbol_name_prefixes);
+    add_ignores(ri, p, ctx, "lto");
+
+    s = p->getstr(ctx, "specname", "match");
+
+    if (s != NULL) {
+	if (!strcasecmp(s, "suffix")) {
+	    ri->specmatch = MATCH_SUFFIX;
+	} else if (!strcasecmp(s, "prefix")) {
+	    ri->specmatch = MATCH_PREFIX;
+	} else if (!strcasecmp(s, "full")) {
+	    ri->specmatch = MATCH_FULL;
+	} else {
+	    warnx(_("*** unknown specname match setting '%s', defaulting to 'full'"), s);
+	    ri->specmatch = MATCH_FULL;
+	}
+
+	free(s);
+    }
+
+    s = p->getstr(ctx, "specname", "primary");
+
+    if (s != NULL) {
+	if (!strcasecmp(s, "filename")) {
+	    ri->specprimary = PRIMARY_FILENAME;
+	} else if (!strcasecmp(s, "name")) {
+	    ri->specprimary = PRIMARY_NAME;
+	} else {
+	    warnx(_("*** unknown specname primary setting '%s', defaulting to 'name'"), s);
+	    ri->specprimary = PRIMARY_NAME;
+	}
+
+	free(s);
+    }
+
+    add_ignores(ri, p, ctx, "specname");
+
+    s = p->getstr(ctx, "annocheck", "failure_severity");
+
+    if (s != NULL) {
+	ri->annocheck_failure_severity = getseverity(s, RESULT_NULL);
+
+	if (ri->annocheck_failure_severity == RESULT_NULL) {
+	    warnx(_("Invalid annocheck failure_reporting_level: %s, defaulting to %s."), s, strseverity(RESULT_VERIFY));
+	    ri->annocheck_failure_severity = RESULT_VERIFY;
+	}
+
+	free(s);
+    }
+
+    strget(p, ctx, "annocheck", "profile", &ri->annocheck_profile);
+    tabledict(p, ctx, "annocheck", "jobs", &ri->annocheck, false, false);
+    tabledict(p, ctx, "annocheck", "extra_opts", &ri->annocheck, true, false);
+    add_ignores(ri, p, ctx, "annocheck");
+
+    /* Backward compatibility for annocheck jobs at top-level. */
+    if (ri->annocheck == NULL) {
+        p->strdict_foreach(ctx, "annocheck", NULL, annocheck_cb, &annocheck_cb_data);
+    }
+
+    tabledict(p, ctx, "javabytecode", NULL, &ri->jvm, false, true);
+    add_ignores(ri, p, ctx, "javabytecode");
+    tabledict(p, ctx, "pathmigration", "migrated_paths", &ri->pathmigration, false, false);
+    array(p, ctx, "pathmigration", "excluded_paths", &ri->pathmigration_excluded_paths);
+    add_ignores(ri, p, ctx, "pathmigraion");
+    add_ignores(ri, p, ctx, "politics");
+    array(p, ctx, "files", "forbidden_paths", &ri->forbidden_paths);
+    add_ignores(ri, p, ctx, "files");
+    strget(p, ctx, "abidiff", "suppression_file", &ri->abidiff_suppression_file);
+    strget(p, ctx, "abidiff", "debuginfo_path", &ri->abidiff_debuginfo_path);
+    strget(p, ctx, "abidiff", "extra_args", &ri->abidiff_extra_args);
+
+    s = p->getstr(ctx, "abdiff", "security_level_threshold");
+
+    if (s != NULL) {
+	ri->abi_security_threshold = strtol(s, 0, 10);
+
+	if ((ri->abi_security_threshold == LONG_MIN ||
+	     ri->abi_security_threshold == LONG_MAX) && errno == ERANGE) {
+	    warn("strtol");
+	    ri->abi_security_threshold = DEFAULT_ABI_SECURITY_THRESHOLD;
+	}
+
+	free(s);
+    }
+
+    add_ignores(ri, p, ctx, "abidiff");
+    strget(p, ctx, "kmidiff", "suppression_file", &ri->kmidiff_suppression_file);
+    strget(p, ctx, "kmidiff", "debuginfo_path", &ri->kmidiff_debuginfo_path);
+    strget(p, ctx, "kmidiff", "extra_args", &ri->kmidiff_extra_args);
+    array(p, ctx, "kmidiff", "kernel_filenames", &ri->kernel_filenames);
+    strget(p, ctx, "kmidiff", "kabi_dir", &ri->kabi_dir);
+    strget(p, ctx, "kmidiff", "kabi_filename", &ri->kabi_filename);
+    add_ignores(ri, p, ctx, "kmidiff");
+    array(p, ctx, "patches", "automacros", &ri->automacros);
+    array(p, ctx, "patches", "ignore_list", &ri->patch_ignore_list);
+    array(p, ctx, "badfuncs", "forbidden", &ri->bad_functions);
+
+    /* ri->bad_functions_allowed is a string_list_map_t, not string_map_t. */
+    if (p->strdict_foreach(ctx, "badfuncs", "allowed", badfuncs_allowed_cb, &ri->bad_functions_allowed)) {
+	warnx(_("Malformed badfuncs->allowed section"));
+    }
+
+    /* Backward compatibility for badfuncs prior to "forbidden". */
+    if (ri->bad_functions == NULL && ri->bad_functions_allowed == NULL) {
+        array(p, ctx, "badfuncs", NULL, &ri->bad_functions);
+    }
+
+    add_ignores(ri, p, ctx, "badfuncs");
+    array(p, ctx, "runpath", "allowed_paths", &ri->runpath_allowed_paths);
+    array(p, ctx, "runpath", "allowed_origin_paths", &ri->runpath_allowed_origin_paths);
+    array(p, ctx, "runpath", "origin_prefix_trim", &ri->runpath_origin_prefix_trim);
+    add_ignores(ri, p, ctx, "runpath");
+    add_ignores(ri, p, ctx, "types");
+
+    s = p->getstr(ctx, "unicode", "exclude");
+
+    if (s != NULL && add_regex(s, &ri->unicode_exclude) != 0) {
+	warn(_("error reading unicode exclude regular expression"));
+    }
+
+    free(s);
+
+    array(p, ctx, "unicode", "excluded_mime_types", &ri->unicode_excluded_mime_types);
+    array(p, ctx, "unicode", "forbidden_codepoints", &ri->unicode_forbidden_codepoints);
+    add_ignores(ri, p, ctx, "unicode");
+
+    if (p->strdict_foreach(ctx, "rpmdeps", "ignore", rpmdeps_cb, ri->deprules_ignore)) {
+	warnx(_("Malformed rpmdeps->ignore section; skipping"));
+    }
+
+    add_ignores(ri, p, ctx, "virus");
+    add_ignores(ri, p, ctx, "capabilities");
+    add_ignores(ri, p, ctx, "config");
+    add_ignores(ri, p, ctx, "doc");
+    add_ignores(ri, p, ctx, "kmod");
+    add_ignores(ri, p, ctx, "permissions");
+    add_ignores(ri, p, ctx, "symlinks");
+    add_ignores(ri, p, ctx, "upstream");
+    add_ignores(ri, p, ctx, "debuginfo");
+    strget(p, ctx, "debuginfo", "debuginfo_sections", &ri->debuginfo_sections);
+
+    p->fini(ctx);
     return 0;
 }
 
