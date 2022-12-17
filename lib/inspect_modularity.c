@@ -10,8 +10,8 @@
 #include <errno.h>
 #include <err.h>
 #include <assert.h>
-#include <yaml.h>
 
+#include "parser.h"
 #include "rpminspect.h"
 
 /* Globals */
@@ -22,15 +22,12 @@ static bool static_context = false;
  */
 static int read_modulemd(const char *fpath, __attribute__((unused)) const struct stat *sb, int tflag, __attribute__((unused)) struct FTW *ftwbuf)
 {
-    int r = 0;
     char *head = NULL;
     char *headptr = NULL;
     char *bn = NULL;
-    yaml_parser_t parser;
-    yaml_token_t token;
-    char *value = NULL;
-    int in_data = 0;
-    FILE *fp = NULL;
+    char *sc_val = NULL;
+    parser_plugin *p = &yaml_parser;
+    parser_context *ctx = NULL;
 
     if (tflag != FTW_F) {
         return 0;
@@ -41,70 +38,27 @@ static int read_modulemd(const char *fpath, __attribute__((unused)) const struct
     bn = basename(head);
 
     /* try to read this file */
-    if (!strcmp(bn, MODULEMD_FILENAME)) {
-        /* prepare a YAML parser */
-        if (!yaml_parser_initialize(&parser)) {
-            warn("yaml_parser_initializer");
-        }
-
-        /* open the modulemd file */
-        if ((fp = fopen(fpath, "r")) == NULL) {
-            err(RI_PROGRAM_ERROR, "fopen");
-        }
-
-        /* tell the YAML parser to read the modulemd file */
-        yaml_parser_set_input_file(&parser, fp);
-
-        /* Loop over the YAML file looking for /data/static_context */
-        do {
-            if (yaml_parser_scan(&parser, &token) == 0) {
-                warnx(_("ignoring malformed module metadata file: %s"), fpath);
-                free(headptr);
-                return -1;
-            }
-
-            value = (char *) token.data.scalar.value;
-
-            switch (token.type) {
-                case YAML_SCALAR_TOKEN:
-                    if ((in_data == 0) && !strcmp(value, "data")) {
-                        in_data++;
-                    } else if ((in_data == 1) && !strcmp(value, "static_context")) {
-                        in_data++;
-                    } else if (in_data == 2) {
-                        if (!strcasecmp(value, "true")) {
-                            static_context = true;
-                        }
-                    }
-
-                    break;
-                case YAML_BLOCK_END_TOKEN:
-                    in_data = 0;
-                    break;
-                default:
-                    break;
-            }
-
-            if (token.type != YAML_STREAM_END_TOKEN) {
-                yaml_token_delete(&token);
-            }
-
-            if (static_context) {
-                r = 1;
-                break;
-            }
-        } while (token.type != YAML_STREAM_END_TOKEN);
-
-        /* destroy the YAML parser, close the input file */
-        yaml_parser_delete(&parser);
-
-        if (fclose(fp) != 0) {
-            err(RI_PROGRAM_ERROR, "fclose");
-        }
+    if (strcmp(bn, MODULEMD_FILENAME)) {
+        free(headptr);
+        return 0;
     }
 
+    if (p->parse_file(&ctx, fpath)) {
+        warnx(_("ignoring malformed module metadata file: %s"), fpath);
+        free(headptr);
+        return -1;
+    }
+
+    sc_val = p->getstr(ctx, "data", "static_context");
+
+    if (sc_val != NULL && !strcasecmp(sc_val, "true")) {
+        static_context = true;
+    }
+
+    free(sc_val);
+    p->fini(ctx);
     free(headptr);
-    return r;
+    return 0;
 }
 
 /*
