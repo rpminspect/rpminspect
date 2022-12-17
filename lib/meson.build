@@ -87,6 +87,7 @@ librpminspect_sources = [
     'output_summary.c',
     'output_text.c',
     'output_xunit.c',
+    'parse_yaml.c',
     'pairfuncs.c',
     'paths.c',
     'peers.c',
