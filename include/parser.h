@@ -64,4 +64,6 @@ typedef struct {
     parser_keymap_fn keymap;
 } parser_plugin;
 
+extern parser_plugin yaml_parser;
+
 #endif /* _LIBRPMINSPECT_PARSER_H */
