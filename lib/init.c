@@ -213,7 +213,7 @@ static void add_entry(string_list_t **list, const char *s)
  * Given an inspection identifier from the config file reader and a
  * list value, add it to the per-inspection list of ignores.
  */
-static void add_string_list_map_entry(string_list_map_t **table, char *key, char *value)
+static void add_string_list_map_entry(string_list_map_t **table, const char *key, const char *value)
 {
     string_list_map_t *mapentry = NULL;
 
@@ -369,7 +369,7 @@ static void add_ignore(string_list_map_t **table, int i, char *s)
  *               otherwise it's a string list.
  * @param table Destination hash table.
  */
-static void process_table(char *key, char *value, const bool required, const bool single, string_map_t **table)
+static void process_table(const char *key, const char *value, const bool required, const bool single, string_map_t **table)
 {
     char *tmp = NULL;
     string_list_t *tokens = NULL;
