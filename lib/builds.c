@@ -25,7 +25,7 @@
 #include <errno.h>
 #include <err.h>
 #include <rpm/rpmlib.h>
-#include <yaml.h>
+#include "parser.h"
 #include "rpminspect.h"
 
 /* Local global variables */
@@ -212,6 +212,14 @@ static int copytree(const char *fpath, const struct stat *sb, int tflag, struct 
     return ret;
 }
 
+/* lambda for adding filtered entries. */
+static bool filter_cb(const char *entry, void *cb_data)
+{
+    string_list_t *filter = cb_data;
+    list_add(filter, entry);
+    return false;
+}
+
 /*
  * Given a remote artifact specification in a Koji build, download it
  * to our working directory.
@@ -234,11 +242,8 @@ static int download_build(struct rpminspect *ri, const struct koji_build *build)
     char *srcfmt = NULL;
     char *dst = NULL;
     char *pkg = NULL;
-    FILE *fp = NULL;
-    yaml_parser_t parser;
-    yaml_token_t token;
-    char *value = NULL;
-    int in_filter = 0;
+    parser_plugin *p = &yaml_parser;
+    parser_context *ctx = NULL;
     string_list_t *filter = NULL;
 
     assert(build != NULL);
@@ -341,67 +346,23 @@ static int download_build(struct rpminspect *ri, const struct koji_build *build)
 
             /* Get the list of artifacts to filter if we don't have it */
             if (filter == NULL) {
-                /* prepare a YAML parser */
-                if (!yaml_parser_initialize(&parser)) {
-                    warn("yaml_parser_initialize");
+                if (p->parse_file(&ctx, dst)) {
+                    warnx(_("ignoring malformed module metadata file: %s"), dst);
+                    return -1;
                 }
 
-                /* open the modulemd file */
-                if ((fp = fopen(dst, "r")) == NULL) {
-                    err(RI_PROGRAM_ERROR, "fopen");
-                }
-
-                /* initialize a string list for the loop */
+                /* Initialize a string list. */
                 filter = calloc(1, sizeof(*filter));
                 assert(filter != NULL);
                 TAILQ_INIT(filter);
 
-                /* tell the YAML parser to read the modulemd file */
-                yaml_parser_set_input_file(&parser, fp);
-
-                /*
-                 * Loop over the YAML file looking for the filter:
-                 * block and pull in the 'rpms' listed there.  Store
-                 * them as a string_list_t which we will turn in to
-                 * a hash table at the end.
-                 */
-                do {
-                    if (yaml_parser_scan(&parser, &token) == 0) {
-                        warnx(_("ignoring malformed module metadata file: %s"), dst);
-                        return -1;
-                    }
-
-                    value = (char *) token.data.scalar.value;
-
-                    switch (token.type) {
-                        case YAML_SCALAR_TOKEN:
-                            if ((in_filter == 0) && !strcmp(value, "filter")) {
-                                in_filter++;
-                            } else if ((in_filter == 1) && !strcmp(value, "rpms")) {
-                                in_filter++;
-                            } else if (in_filter == 2) {
-                                filter = list_add(filter, value);
-                            }
-
-                            break;
-                        case YAML_BLOCK_END_TOKEN:
-                            in_filter = 0;
-                            break;
-                        default:
-                            break;
-                    }
-
-                    if (token.type != YAML_STREAM_END_TOKEN) {
-                        yaml_token_delete(&token);
-                    }
-                } while (token.type != YAML_STREAM_END_TOKEN);
-
-                /* destroy the YAML parser, close the input file */
-                yaml_parser_delete(&parser);
-
-                if (fclose(fp) != 0) {
-                    err(RI_PROGRAM_ERROR, "fclose");
+                if (p->strarray_foreach(ctx, "filter", "rpms", filter_cb, filter)) {
+                    warnx(_("malformed rpm filters in file: %s"), dst);
+                    free(filter);
+                    return -1;
                 }
+
+                p->fini(ctx);
             }
 
             /* Need to use this in the next loop */
