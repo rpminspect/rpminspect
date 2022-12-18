@@ -495,7 +495,7 @@ void dump_cfg(const struct rpminspect *ri)
             printf("    migrated_paths:\n");
 
             HASH_ITER(hh, ri->pathmigration, hentry, tmp_hentry) {
-                printf("        - %s: %s\n", hentry->key, hentry->value);
+                printf("        %s: %s\n", hentry->key, hentry->value);
             }
         }
 
