@@ -650,15 +650,15 @@ pathmigration:
     # colon to note the old path and the right side of the colon to
     # note the new path.  For example:
     #
-    #    - /bin: /usr/bin
+    #    /bin: /usr/bin
     #
     # Any package containing a file in /bin will have a failure
     # reporting that file should be in /usr/bin.
     migrated_paths:
-        - /bin:   /usr/bin
-        - /sbin:  /usr/sbin
-        - /lib:   /usr/lib
-        - /lib64: /usr/lib64
+        /bin:   /usr/bin
+        /sbin:  /usr/sbin
+        /lib:   /usr/lib
+        /lib64: /usr/lib64
 
     # All rules have exceptions.  List paths here to exclude from the
     # pathmigration rules.
