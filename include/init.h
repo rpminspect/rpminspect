@@ -36,6 +36,7 @@
 #define SECTION_EXTRA_OPTS               "extra_opts"
 #define SECTION_FAILURE_SEVERITY         "failure_severity"
 #define SECTION_FAVOR_RELEASE            "favor_release"
+#define SECTION_FORBIDDEN                "forbidden"
 #define SECTION_FORBIDDEN_CODEPOINTS     "forbidden_codepoints"
 #define SECTION_FORBIDDEN_DIRECTORIES    "forbidden_directories"
 #define SECTION_FORBIDDEN_GROUPS         "forbidden_groups"

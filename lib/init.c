@@ -143,7 +143,8 @@ enum {
 #ifdef _HAVE_MODULARITYLABEL
     BLOCK_MODULARITY = 76,
 #endif
-    BLOCK_ANNOCHECK_PROFILE = 77
+    BLOCK_ANNOCHECK_PROFILE = 77,
+    BLOCK_BADFUNCS_FORBIDDEN = 78,
 };
 
 static int add_regex(const char *pattern, regex_t **regex_out)
@@ -829,6 +830,9 @@ static int read_cfgfile(struct rpminspect *ri, const char *filename)
                     } else if (group == BLOCK_BADFUNCS && !strcmp(key, SECTION_ALLOWED)) {
                         block = BLOCK_BADFUNCS_ALLOWED;
                         group = BLOCK_BADFUNCS;
+                    } else if (group == BLOCK_BADFUNCS && !strcmp(key, SECTION_FORBIDDEN)) {
+                        block = BLOCK_BADFUNCS_FORBIDDEN;
+                        group = BLOCK_BADFUNCS;
                     } else if (!strcmp(key, NAME_RUNPATH)) {
                         block = BLOCK_NULL;
                         group = BLOCK_RUNPATH;
@@ -1024,6 +1028,8 @@ static int read_cfgfile(struct rpminspect *ri, const char *filename)
                             block = BLOCK_IGNORE;
                         } else if (!strcmp(key, SECTION_ALLOWED)) {
                             block = BLOCK_BADFUNCS_ALLOWED;
+                        } else if (!strcmp(key, SECTION_FORBIDDEN)) {
+                            block = BLOCK_BADFUNCS_FORBIDDEN;
                         }
                     } else if (group == BLOCK_EMPTYRPM) {
                         if (!strcmp(key, SECTION_EXPECTED_EMPTY)) {
@@ -1457,7 +1463,7 @@ static int read_cfgfile(struct rpminspect *ri, const char *filename)
                             add_ignore(&ri->inspection_ignores, group, t);
                         }
                     } else if (group == BLOCK_BADFUNCS) {
-                        if (block == BLOCK_NULL) {
+                        if (block == BLOCK_BADFUNCS_FORBIDDEN) {
                             add_entry(&ri->bad_functions, t);
                         } else if (block == BLOCK_BADFUNCS_ALLOWED) {
                             add_string_list_map_entry(&ri->bad_functions_allowed, key, t);

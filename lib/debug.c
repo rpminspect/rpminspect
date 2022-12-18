@@ -606,10 +606,11 @@ void dump_cfg(const struct rpminspect *ri)
 
     if ((ri->bad_functions && !TAILQ_EMPTY(ri->bad_functions)) || mapentry != NULL) {
         printf("badfuncs:\n");
+        printf("    forbidden:\n");
 
         if (ri->bad_functions && !TAILQ_EMPTY(ri->bad_functions)) {
             TAILQ_FOREACH(entry, ri->bad_functions, items) {
-                printf("    - %s\n", entry->data);
+                printf("        - %s\n", entry->data);
             }
         }
 
