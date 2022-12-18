@@ -597,11 +597,8 @@ annocheck:
     #
     # This section is optional.  If no annocheck tests are defined
     # here, rpminspect will skip the annocheck inspection.
-    #
-    # These job entries may be listed here or under a block named
-    # 'jobs:' if you prefer.
     jobs:
-        - hardened: --ignore-unknown
+        hardened: --ignore-unknown
 
     # In an optional rpminspect.yaml file in the current directory,
     # you can supply extra arguments to defined annocheck runs.  If
@@ -610,7 +607,7 @@ annocheck:
     # above.
     #
     #extra_opts:
-    #    - hardened: --skip-short-enums
+    #    hardened: --skip-short-enums
 
     # Optional list of glob(7) specifications or path prefixes to
     # match files to ignore for this inspection.  The format of this

@@ -464,7 +464,7 @@ void dump_cfg(const struct rpminspect *ri)
         printf("    jobs:\n");
 
         HASH_ITER(hh, ri->annocheck, hentry, tmp_hentry) {
-            printf("    - %s: %s\n", hentry->key, hentry->value);
+            printf("    %s: %s\n", hentry->key, hentry->value);
         }
 
         dump_inspection_ignores(ri->inspection_ignores, NAME_ANNOCHECK);
