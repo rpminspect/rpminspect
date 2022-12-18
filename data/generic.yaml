@@ -803,23 +803,24 @@ badfuncs:
     # only provide them to users for backwards compatibility.
 
     # This is an array of forbidden function names.
-    - gethostbyname
-    - gethostbyname2
-    - gethostbyaddr
-    - inet_addr
-    - inet_aton
-    - inet_nsap_addr
-    - inet_ntoa
-    - inet_nsap_ntoa
-    - inet_makeaddr
-    - inet_netof
-    - inet_network
-    - inet_neta
-    - inet_net_ntop
-    - inet_net_pton
-    - rcmd
-    - rexec
-    - rresvport
+    forbidden:
+        - gethostbyname
+        - gethostbyname2
+        - gethostbyaddr
+        - inet_addr
+        - inet_aton
+        - inet_nsap_addr
+        - inet_ntoa
+        - inet_nsap_ntoa
+        - inet_makeaddr
+        - inet_netof
+        - inet_network
+        - inet_neta
+        - inet_net_ntop
+        - inet_net_pton
+        - rcmd
+        - rexec
+        - rresvport
 
     # Some libraries deliberately use forbidden functions.  In these
     # cases, you can specify an 'allowed' block listing path globs and
