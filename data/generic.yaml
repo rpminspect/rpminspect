@@ -631,7 +631,7 @@ javabytecode:
     # If the product release string is not found, the javabytecode
     # test will use the default entry.  You can have as many entries
     # as you want in this section.
-    - default: 43
+    default: 43
 
     # Optional list of glob(7) specifications or path prefixes to
     # match files to ignore for this inspection.  The format of this

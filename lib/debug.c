@@ -478,7 +478,7 @@ void dump_cfg(const struct rpminspect *ri)
         printf("javabytecode:\n");
 
         HASH_ITER(hh, ri->jvm, hentry, tmp_hentry) {
-            printf("    - %s: %s\n", hentry->key, hentry->value);
+            printf("    %s: %s\n", hentry->key, hentry->value);
         }
 
         dump_inspection_ignores(ri->inspection_ignores, NAME_JAVABYTECODE);
