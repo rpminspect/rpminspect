@@ -39,7 +39,6 @@ static int read_modulemd(const char *fpath, __attribute__((unused)) const struct
     headptr = head = strdup(fpath);
     assert(headptr != NULL);
     bn = basename(head);
-    static_context = false;
 
     /* try to read this file */
     if (!strcmp(bn, MODULEMD_FILENAME)) {
