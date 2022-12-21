@@ -64,15 +64,21 @@ static char *build_annocheck_cmd(const char *cmd, const char *opts, const char *
     assert(cmd != NULL);
     assert(path != NULL);
 
-    if (opts == NULL && profile == NULL && debugpath == NULL) {
-        xasprintf(&r, "%s %s", cmd, path);
-    } else if (opts && profile == NULL && debugpath == NULL) {
-        xasprintf(&r, "%s %s %s", cmd, opts, path);
-    } else if (opts && profile && debugpath == NULL) {
-        xasprintf(&r, "%s %s --profile=%s %s", cmd, opts, profile, path);
-    } else if (opts && profile && debugpath) {
-        xasprintf(&r, "%s %s --profile=%s --debug-dir=%s %s", cmd, opts, profile, debugpath, path);
+    r = strdup(cmd);
+
+    if (opts) {
+        r = strappend(r, " ", opts, NULL);
     }
+
+    if (profile) {
+        r = strappend(r, " --profile=", profile, NULL);
+    }
+
+    if (debugpath) {
+        r = strappend(r, " --debug-dir=", debugpath, NULL);
+    }
+
+    r = strappend(r, " ", path, NULL);
 
     return r;
 }
