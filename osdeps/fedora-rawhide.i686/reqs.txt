@@ -27,6 +27,7 @@ ksh
 libabigail.i686
 libarchive-devel.i686
 libcap-devel.i686
+libcdson-devel.i686
 libcurl-devel.i686
 /usr/include/ffi-x86_64.h
 libffi-devel.i686

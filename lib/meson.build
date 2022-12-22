@@ -87,6 +87,7 @@ librpminspect_sources = [
     'output_summary.c',
     'output_text.c',
     'output_xunit.c',
+    'parse_dson.c',
     'parse_json.c',
     'parse_yaml.c',
     'pairfuncs.c',
@@ -109,6 +110,7 @@ librpminspect_sources = [
 
 deps = [
     inspect_elf_bits_dep,
+    cdson,
     jsonc,
     xmlrpc,
     xmlrpc_client,

@@ -21,6 +21,7 @@ ksh
 libabigail
 libarchive-devel
 libcap-devel
+libcdson-devel
 libcurl-devel
 libffi-devel
 libicu-devel

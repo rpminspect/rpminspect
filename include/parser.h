@@ -64,6 +64,7 @@ typedef struct {
     parser_keymap_fn keymap;
 } parser_plugin;
 
+extern parser_plugin dson_parser;
 extern parser_plugin json_parser;
 extern parser_plugin yaml_parser;
 
