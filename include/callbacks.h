@@ -10,6 +10,7 @@
 #ifndef _LIBRPMINSPECT_CALLBACKS_H
 #define _LIBRPMINSPECT_CALLBACKS_H
 
+#include "parser.h"
 #include "types.h"
 
 /* Context structure for add_ignores() and add_ignores_cb() in lib/init.c. */
@@ -24,5 +25,13 @@ typedef struct {
     bool single;
     string_map_t **table;
 } tabledict_cb_data;
+
+/* Context structure for lic_cb() in lib/inspect_license.c. */
+typedef struct {
+    parser_plugin *p;
+    parser_context *db;
+    const char *lic;
+    bool valid;
+} lic_cb_data;
 
 #endif /* _LIBRPMINSPECT_CALLBACKS_H */
