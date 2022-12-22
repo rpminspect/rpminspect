@@ -326,6 +326,9 @@ endif
 
 m = declare_dependency(link_args : ['-lm'])
 
+# cdson
+cdson = dependency('cdson', required : true)
+
 # Check for sys/queue.h
 if not cc.has_header('sys/queue.h')
     message('<sys/queue.h> not found, using bundled copy')
