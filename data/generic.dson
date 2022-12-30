@@ -1,0 +1,146 @@
+such "common" is such "workdir" is "/var/tmp/rpminspect",
+                      "profiledir" is "/usr/share/rpminspect/profiles/generic" wow.
+     "environment" is empty!
+     "koji" is such "hub" is "http://koji-hub.example.com/api/v1",
+                    "download_ursine" is "http://download.example.com/downloadroot",
+                    "download_mbs" is "http://download.example.com/downloadroot" wow.
+     "commands" is empty!
+     "vendor" is such "vendor_data_dir" is "/usr/share/rpminspect",
+                      "licensedb" is so "generic.json" many wow.
+     "macrofiles" is so "/usr/lib/rpm/macros" and
+                        "/usr/lib/rpm/macros.d/macros.*" and
+                        "/usr/lib/rpm/platform/%{_target}/macros" and
+                        "/usr/lib/rpm/fileattrs/*.attr" and
+                        "/usr/lib/rpm/redhat/macros" and
+                        "/etc/rpm/macros.*" and
+                        "/etc/rpm/macros" and
+                        "/etc/rpm/%{_target}/macros" many,
+     "ignore" is so "/usr/lib*/python?.?/site-packages/__pycache__" and
+                     "/usr/lib*/python?.?/site-packages/*/*.pyc" and
+                     "/usr/lib*/python?.?/site-packages/*/*.pyo" many,
+     "security_path_prefix" is so "/etc/sudoers.d/" also
+                                  "/etc/polkit-1/" also
+                                  "/usr/share/polkit-1/actions/" many,
+     "badwords" is so "badword" and "anotherbadword" and "reallybadword" many,
+     "metadata" is such "vendor" is "Vendorco Ltd.",
+                        "buildhost_subdomain" is so "localhost" and
+                                                    ".localdomain" and
+                                                    ".example.com" many wow.
+     "modularity" is empty!
+     "elf" is such "exclude_path" is "(^(/boot/vmlinu|/lib/modules|/lib64/modules).*)|(.*/powerpc/lib/crtsavres.o$)|(^/usr/lib(64)?/kernel-wrapper$)" wow.
+     "manpage" is such "include_path" is "^(/usr|/usr/local)(/share/man/|/man/).*" wow.
+     "xml" is such "exclude_path" is ".*(\\.jsp|\\.rhtml|\\.html)$" wow.
+     "desktop" is such "desktop_entry_files_dir" is "/usr/share/applications" wow.
+     "changedfiles" is such "header_file_extensions" is so ".h" and
+                                                           ".hh" and
+                                                           ".hxx" and
+                                                           ".hpp" and
+                                                           ".H" many wow.
+     "addedfiles" is such "forbidden_path_prefixes" is so "/tmp/" and
+                                                          "/var/tmp" and
+                                                          "/etc/init.d" and
+                                                          "/etc/xinetd.d" many,
+                          "forbidden_path_suffixes" is so "~" and
+                                                          ".orig" many,
+                          "forbidden_directories" is so "__MACOSX" and
+                                                         "CVS" and
+                                                         ".svn" and
+                                                         ".hg" and
+                                                         ".git" many wow.
+     "movedfiles" is empty!
+     "removedfiles" is empty!
+     "ownership" is such "bin_paths" is so "/bin" and
+                                           "/sbin" and
+                                           "/usr/bin" and
+                                           "/usr/sbin" many,
+                         "bin_owner" is "root",
+                         "bin_group" is "root",
+                         "forbidden_owners" is so "mockbuild" many,
+                         "forbidden_groups" is so "mockbuild" many wow.
+     "shellsyntax" is such "shells" is so "sh" and
+                                          "ksh" and
+                                          "zsh" and
+                                          "csh" and
+                                          "tcsh" and
+                                          "rc" and
+                                          "bash" many wow.
+     "filesize" is such "size_threshold" is "info" wow.
+     "lto" is such "lto_symbol_name_prefixes" is so ".gnu.lto_" and
+                                                    ".gnu.debuglto_" and
+                                                    "__gnu_lto_v1" and
+                                                    "__gnu_lto_slim" many wow.
+     "specname" is such "match" is "full",
+                        "primary" is "name" wow.
+     "annocheck" is such "failure_severity" is "VERIFY",
+                         "jobs" is such "hardened" is "--ignore-unknown" wow wow.
+     "javabytecode" is such "default" is 53 wow.
+     "pathmigration" is such "migrated_paths" is such "/bin" is   "/usr/bin",
+                                                      "/sbin" is  "/usr/sbin",
+                                                      "/lib" is   "/usr/lib",
+                                                      "/lib64" is "/usr/lib64" wow.
+                             "excluded_paths" is so "/lib/modules" many wow.
+     "politics" is empty?
+     "files" is such "forbidden_paths" is so "/usr/lib" many wow.
+     "abidiff" is such "suppression_file" is ".abignore",
+                       "debuginfo_path" is "/usr/lib/debug/",
+                       "security_level_threshold" is 2 wow.
+     "kmidiff" is such "suppression_file" is ".abignore",
+                       "debuginfo_path" is "/usr/lib/debug/",
+                       "kernel_filenames" is so "vmlinux" and
+                                                "vmlinuz" many,
+                       "kabi_dir" is "/lib/modules/kabi-current",
+                       "kabi_filename" is "kabi_whitelist_${ARCH}" wow.
+     "patches" is such "automacros" is so "autopatch" and
+                                          "autosetup" and
+                                          "forgeautosetup" many wow.
+     "badfuncs" is such "forbidden" is so "gethostbyname" and
+                                          "gethostbyname2" and
+                                          "gethostbyaddr" and
+                                          "inet_addr" and
+                                          "inet_aton" and
+                                          "inet_nsap_addr" and
+                                          "inet_ntoa" and
+                                          "inet_nsap_ntoa" and
+                                          "inet_makeaddr" and
+                                          "inet_netof" and
+                                          "inet_network" and
+                                          "inet_neta" and
+                                          "inet_net_ntop" and
+                                          "inet_net_pton" and
+                                          "rcmd" and
+                                          "rexec" and
+                                          "rresvport" many wow.
+     "runpath" is such "allowed_paths" is so "/usr/src/kernels/" many,
+                       "allowed_origin_paths" is so "/" and
+                                                    "/usr" and
+                                                    "/lib" and
+                                                    "/lib64" many,
+                       "origin_prefix_trim" is so "^(opt/rh/[^/]+/root/)" many wow.
+     "types" is empty!
+     "unicode" is such "exclude" is "^(\\.git|\\.hg|\\.desktop|\\.ppd|\\.txt|\\.directory|ChangeLog|NEWS)$",
+                       "excluded_mime_types" is so "text/x-po" and
+                                                   "text/x-tex" and
+                                                   "text/x-troff" and
+                                                   "text/html" many,
+                       "forbidden_codepoints" is so "0x202A" and
+                                                    "0x202B" and
+                                                    "0x202C" and
+                                                    "0x202D" and
+                                                    "0x202E" and
+                                                    "0x2066" and
+                                                    "0x2067" and
+                                                    "0x2068" and
+                                                    "0x2069" many wow.
+     "rpmdeps" is empty!
+     "virus" is empty?
+     "capabilities" is empty!
+     "config" is empty!
+     "doc" is empty!
+     "kmod" is empty!
+     "permissions" is empty!
+     "symlinks" is empty!
+     "upstream" is empty!
+     "debuginfo" is such "ignore" is so "/lib/modules/*" and
+                                        "/usr/lib/debug/.dwz/*" and
+                                        "/usr/lib/grub/*" many,
+                         "debuginfo_sections" is ".symtab .debug_info .gdb_index" wow wow

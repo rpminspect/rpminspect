@@ -587,7 +587,7 @@ static bool badfuncs_allowed_cb(const char *key, const char *value, void *cb_dat
  */
 static int read_cfgfile(struct rpminspect *ri, const char *filename)
 {
-    parser_plugin *p = &yaml_parser;
+    parser_plugin *p = NULL;
     parser_context *ctx = NULL;
     char *s = NULL;
     tabledict_cb_data annocheck_cb_data = { false, false, &ri->annocheck };
@@ -597,7 +597,7 @@ static int read_cfgfile(struct rpminspect *ri, const char *filename)
 
     INIT_DEBUG_PRINT("filename=|%s|\n", filename);
 
-    if (p->parse_file(&ctx, filename)) {
+    if (parse_agnostic(filename, &p, &ctx)) {
 	warnx(_("ignoring malformed %s configuration file: %s"), COMMAND_NAME, filename);
 	return -1;
     }

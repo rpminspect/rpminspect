@@ -14,6 +14,7 @@
 #define _LIBRPMINSPECT_PARSER_H
 
 #include <stdbool.h>
+#include <string.h>
 
 /* Abstract type - implemtations should cast to an appropriate type. */
 typedef struct parser_context_st *parser_context;
@@ -67,5 +68,27 @@ typedef struct {
 extern parser_plugin dson_parser;
 extern parser_plugin json_parser;
 extern parser_plugin yaml_parser;
+
+static inline bool parse_agnostic(const char *filename, parser_plugin **plugin_out, parser_context **context_out)
+{
+    size_t l = strlen(filename) - 1;
+
+    *plugin_out = NULL;
+    *context_out = NULL;
+
+    if (filename[l--] == 'n' && filename[l--] == 'o' && filename[l--] == 's') {
+        if (filename[l] == 'd') {
+            *plugin_out = &dson_parser;
+        } else if (filename[l] == 'j') {
+            *plugin_out = &json_parser;
+        }
+    }
+
+    if (*plugin_out == NULL) {
+        *plugin_out = &yaml_parser;
+    }
+
+    return (*plugin_out)->parse_file(context_out, filename);
+}
 
 #endif /* _LIBRPMINSPECT_PARSER_H */
