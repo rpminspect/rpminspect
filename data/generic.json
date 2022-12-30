@@ -1,0 +1,258 @@
+{
+  "common": {
+    "workdir": "/var/tmp/rpminspect",
+    "profiledir": "/usr/share/rpminspect/profiles/generic"
+  },
+  "environment": null,
+  "koji": {
+    "hub": "http://koji-hub.example.com/api/v1",
+    "download_ursine": "http://download.example.com/downloadroot",
+    "download_mbs": "http://download.example.com/downloadroot"
+  },
+  "commands": null,
+  "vendor": {
+    "vendor_data_dir": "/usr/share/rpminspect",
+    "licensedb": [
+      "generic.json"
+    ]
+  },
+  "macrofiles": [
+    "/usr/lib/rpm/macros",
+    "/usr/lib/rpm/macros.d/macros.*",
+    "/usr/lib/rpm/platform/%{_target}/macros",
+    "/usr/lib/rpm/fileattrs/*.attr",
+    "/usr/lib/rpm/redhat/macros",
+    "/etc/rpm/macros.*",
+    "/etc/rpm/macros",
+    "/etc/rpm/%{_target}/macros"
+  ],
+  "ignore": [
+    "/usr/lib*/python?.?/site-packages/__pycache__",
+    "/usr/lib*/python?.?/site-packages/*/*.pyc",
+    "/usr/lib*/python?.?/site-packages/*/*.pyo"
+  ],
+  "security_path_prefix": [
+    "/etc/sudoers.d/",
+    "/etc/polkit-1/",
+    "/usr/share/polkit-1/actions/"
+  ],
+  "badwords": [
+    "badword",
+    "anotherbadword",
+    "reallybadword"
+  ],
+  "metadata": {
+    "vendor": "Vendorco Ltd.",
+    "buildhost_subdomain": [
+      "localhost",
+      ".localdomain",
+      ".example.com"
+    ]
+  },
+  "modularity": null,
+  "elf": {
+    "exclude_path": "(^(/boot/vmlinu|/lib/modules|/lib64/modules).*)|(.*/powerpc/lib/crtsavres.o$)|(^/usr/lib(64)?/kernel-wrapper$)"
+  },
+  "manpage": {
+    "include_path": "^(/usr|/usr/local)(/share/man/|/man/).*"
+  },
+  "xml": {
+    "exclude_path": ".*(\\.jsp|\\.rhtml|\\.html)$"
+  },
+  "desktop": {
+    "desktop_entry_files_dir": "/usr/share/applications"
+  },
+  "changedfiles": {
+    "header_file_extensions": [
+      ".h",
+      ".hh",
+      ".hxx",
+      ".hpp",
+      ".H"
+    ]
+  },
+  "addedfiles": {
+    "forbidden_path_prefixes": [
+      "/tmp/",
+      "/var/tmp",
+      "/etc/init.d",
+      "/etc/xinetd.d"
+    ],
+    "forbidden_path_suffixes": [
+      "~",
+      ".orig"
+    ],
+    "forbidden_directories": [
+      "__MACOSX",
+      "CVS",
+      ".svn",
+      ".hg",
+      ".git"
+    ]
+  },
+  "movedfiles": null,
+  "removedfiles": null,
+  "ownership": {
+    "bin_paths": [
+      "/bin",
+      "/sbin",
+      "/usr/bin",
+      "/usr/sbin"
+    ],
+    "bin_owner": "root",
+    "bin_group": "root",
+    "forbidden_owners": [
+      "mockbuild"
+    ],
+    "forbidden_groups": [
+      "mockbuild"
+    ]
+  },
+  "shellsyntax": {
+    "shells": [
+      "sh",
+      "ksh",
+      "zsh",
+      "csh",
+      "tcsh",
+      "rc",
+      "bash"
+    ]
+  },
+  "filesize": {
+    "size_threshold": "info"
+  },
+  "lto": {
+    "lto_symbol_name_prefixes": [
+      ".gnu.lto_",
+      ".gnu.debuglto_",
+      "__gnu_lto_v1",
+      "__gnu_lto_slim"
+    ]
+  },
+  "specname": {
+    "match": "full",
+    "primary": "name"
+  },
+  "annocheck": {
+    "failure_severity": "VERIFY",
+    "jobs": {
+      "hardened": "--ignore-unknown"
+    }
+  },
+  "javabytecode": {
+    "default": 43
+  },
+  "pathmigration": {
+    "migrated_paths": {
+      "/bin": "/usr/bin",
+      "/sbin": "/usr/sbin",
+      "/lib": "/usr/lib",
+      "/lib64": "/usr/lib64"
+    },
+    "excluded_paths": [
+      "/lib/modules"
+    ]
+  },
+  "politics": null,
+  "files": {
+    "forbidden_paths": [
+      "/usr/lib"
+    ]
+  },
+  "abidiff": {
+    "suppression_file": ".abignore",
+    "debuginfo_path": "/usr/lib/debug/",
+    "security_level_threshold": 2
+  },
+  "kmidiff": {
+    "suppression_file": ".abignore",
+    "debuginfo_path": "/usr/lib/debug/",
+    "kernel_filenames": [
+      "vmlinux",
+      "vmlinuz"
+    ],
+    "kabi_dir": "/lib/modules/kabi-current",
+    "kabi_filename": "kabi_whitelist_${ARCH}"
+  },
+  "patches": {
+    "automacros": [
+      "autopatch",
+      "autosetup",
+      "forgeautosetup"
+    ]
+  },
+  "badfuncs": {
+    "forbidden": [
+      "gethostbyname",
+      "gethostbyname2",
+      "gethostbyaddr",
+      "inet_addr",
+      "inet_aton",
+      "inet_nsap_addr",
+      "inet_ntoa",
+      "inet_nsap_ntoa",
+      "inet_makeaddr",
+      "inet_netof",
+      "inet_network",
+      "inet_neta",
+      "inet_net_ntop",
+      "inet_net_pton",
+      "rcmd",
+      "rexec",
+      "rresvport"
+    ]
+  },
+  "runpath": {
+    "allowed_paths": [
+      "/usr/src/kernels/"
+    ],
+    "allowed_origin_paths": [
+      "/",
+      "/usr",
+      "/lib",
+      "/lib64"
+    ],
+    "origin_prefix_trim": [
+      "^(opt/rh/[^/]+/root/)"
+    ]
+  },
+  "types": null,
+  "unicode": {
+    "exclude": "^(\\.git|\\.hg|\\.desktop|\\.ppd|\\.txt|\\.directory|ChangeLog|NEWS)$",
+    "excluded_mime_types": [
+      "text/x-po",
+      "text/x-tex",
+      "text/x-troff",
+      "text/html"
+    ],
+    "forbidden_codepoints": [
+      "0x202A",
+      "0x202B",
+      "0x202C",
+      "0x202D",
+      "0x202E",
+      "0x2066",
+      "0x2067",
+      "0x2068",
+      "0x2069"
+    ]
+  },
+  "rpmdeps": null,
+  "virus": null,
+  "capabilities": null,
+  "config": null,
+  "doc": null,
+  "kmod": null,
+  "permissions": null,
+  "symlinks": null,
+  "upstream": null,
+  "debuginfo": {
+    "ignore": [
+      "/lib/modules/*",
+      "/usr/lib/debug/.dwz/*",
+      "/usr/lib/grub/*"
+    ],
+    "debuginfo_sections": ".symtab .debug_info .gdb_index"
+  }
+}
