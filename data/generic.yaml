@@ -74,13 +74,14 @@ vendor:
     # Main directory for the vendor-specific data.
     vendor_data_dir: /usr/share/rpminspect
 
-    # Either the name of a license database file under the 'licenses/'
-    # subdirectory in the vendor_data_dir or a full path to a license
-    # database file to use.  This file is used by the 'license'
-    # inspection.
+    # All of list of license database files.  Files can be specified
+    # with either the name of a license database file under the
+    # 'licenses/' subdirectory in the vendor_data_dir or a full path
+    # to a license database file to use.  This file is used by the
+    # 'license' inspection.
     licensedb:
+        #- /usr/share/vendor-license-data/licenses/vendor-licenses.json
         - generic.json
-        #- licensedb: /usr/share/vendor-license-data/licenses/vendor-licenses.json
 
     # Which product release string to favor.  By default, rpminspect
     # favors the newest product release string.  You can change this
