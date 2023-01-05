@@ -256,7 +256,9 @@ static bool is_valid_expression(const struct json_object *db, const char *s, con
  */
 static bool is_valid_license(struct rpminspect *ri, struct result_params *params, const char *nevra, const char *tag)
 {
-    bool result = true;
+    bool result = false;
+    int good = 0;
+    int seen = 0;
     int balance = 0;
     size_t i = 0;
     char *tagtokens = NULL;
@@ -317,13 +319,23 @@ static bool is_valid_license(struct rpminspect *ri, struct result_params *params
                 continue;
             }
 
-            if (!is_valid_expression(db, token, nevra, params, &rq)) {
-                result = false;
+            if (is_valid_expression(db, token, nevra, params, &rq)) {
+                good++;
             }
+
+            seen++;
         }
 
         free(tagcopy);
         json_object_put(db);
+
+        if (good == seen) {
+            result = true;
+            break;
+        }
+
+        good = 0;
+        seen = 0;
     }
 
     /*
