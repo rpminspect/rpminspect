@@ -98,6 +98,40 @@ static const char *build_state_desc(const int state)
 }
 
 /*
+ * Return the string representation of xmlrpc fault code.  Do not free
+ * this string.
+ */
+static const char *get_xmlrpc_fault_desc(const int fault_code)
+{
+    switch (fault_code) {
+        case XMLRPC_INTERNAL_ERROR:
+            return "XMLRPC_INTERNAL_ERROR";
+        case XMLRPC_TYPE_ERROR:
+            return "XMLRPC_TYPE_ERROR";
+        case XMLRPC_INDEX_ERROR:
+            return "XMLRPC_INDEX_ERROR";
+        case XMLRPC_PARSE_ERROR:
+            return "XMLRPC_PARSE_ERROR";
+        case XMLRPC_NETWORK_ERROR:
+            return "XMLRPC_NETWORK_ERROR";
+        case XMLRPC_TIMEOUT_ERROR:
+            return "XMLRPC_TIMEOUT_ERROR";
+        case XMLRPC_NO_SUCH_METHOD_ERROR:
+            return "XMLRPC_NO_SUCH_METHOD_ERROR";
+        case XMLRPC_REQUEST_REFUSED_ERROR:
+            return "XMLRPC_REQUEST_REFUSED_ERROR";
+        case XMLRPC_INTROSPECTION_DISABLED_ERROR:
+            return "XMLRPC_INTROSPECTION_DISABLED_ERROR";
+        case XMLRPC_LIMIT_EXCEEDED_ERROR:
+            return "XMLRPC_LIMIT_EXCEEDED_ERROR";
+        case XMLRPC_INVALID_UTF8_ERROR:
+            return "XMLRPC_INVALID_UTF8_ERROR";
+        default:
+            return "undefined";
+    }
+}
+
+/*
  * General error handler for xmlrpc failures.  Could be improved
  * a bit to be more helpful to the user.
  */
@@ -612,6 +646,11 @@ struct koji_build *get_koji_build(struct rpminspect *ri, const char *buildspec)
             xmlrpc_env_clean(&env);
             xmlrpc_client_cleanup();
             free_koji_build(build);
+
+            if (env.fault_code < 0) {
+                warnx(_("xmlrpc fault code %s (%d): getBuild(%s) from %s"), get_xmlrpc_fault_desc(env.fault_code), env.fault_code, buildspec, ri->kojihub);
+            }
+
             return NULL;
         } else {
             /* we have no idea, so just fail */
@@ -1102,6 +1141,11 @@ struct koji_task *get_koji_task(struct rpminspect *ri, const char *taskspec)
             xmlrpc_env_clean(&env);
             xmlrpc_client_cleanup();
             free_koji_task(task);
+
+            if (env.fault_code < 0) {
+                warnx(_("xmlrpc fault code %s (%d): getTaskInfo(%s) from %s"), get_xmlrpc_fault_desc(env.fault_code), env.fault_code, taskspec, ri->kojihub);
+            }
+
             return NULL;
         } else {
             /* we have no idea, so just fail */
