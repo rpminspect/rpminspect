@@ -926,6 +926,7 @@ int gather_builds(struct rpminspect *ri, bool fo)
                 return r;
             }
         } else {
+            warnx(_("unable to locate after build: %s"), ri->after);
             free_koji_task(task);
             free_koji_build(build);
             return -1;
@@ -997,6 +998,7 @@ int gather_builds(struct rpminspect *ri, bool fo)
             return r;
         }
     } else {
+        warnx(_("unable to locate after build: %s"), ri->after);
         free_koji_task(task);
         free_koji_build(build);
         return -1;
