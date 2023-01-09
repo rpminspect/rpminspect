@@ -841,6 +841,110 @@ static int gather_local_build(const char *build)
     return 0;
 }
 
+static int _gather_build_types(struct rpminspect *ri)
+{
+    int r = 0;
+    bool gathered = false;
+    struct koji_build *build = NULL;
+    struct koji_build *innerbuild = NULL;
+    struct koji_task *task = NULL;
+    const char *spec = NULL;
+    const char *t = NULL;
+
+    assert(ri != NULL);
+
+    if (whichbuild == AFTER_BUILD) {
+        spec = ri->after;
+        t = _("after");
+    } else if (whichbuild == BEFORE_BUILD) {
+        spec = ri->before;
+        t = _("before");
+    }
+
+    /* try for a local Koji build or local RPM */
+    if (!gathered && (is_local_build(ri->workdir, spec, fetch_only) || is_local_rpm(ri, spec))) {
+        if (gather_local_build(spec) == -1) {
+            warnx(_("unable to gather %s build: %s"), t, spec);
+            return -1;
+        } else {
+            gathered = true;
+        }
+    }
+
+    /* try for remote RPM */
+    if (!gathered && is_remote_rpm(spec)) {
+        r = download_rpm(ri, spec);
+
+        if (r != RI_SUCCESS) {
+            warnx(_("unable to download %s RPM: %s"), t, spec);
+            return r;
+        } else {
+            gathered = true;
+        }
+    }
+
+    /* try for a Koji task identifier */
+    if (!gathered && is_task_id(spec)) {
+        task = get_koji_task(ri, spec);
+
+        if (task != NULL) {
+            innerbuild = get_koji_task_as_build(task);
+
+            if (innerbuild) {
+                r = download_build(ri, innerbuild);
+                free_koji_build(innerbuild);
+
+                if (r != RI_SUCCESS) {
+                    warnx(_("unable to download %s build: %s"), t, spec);
+                    free_koji_task(task);
+                    return r;
+                } else {
+                    gathered = true;
+                }
+
+                free_koji_task(task);
+            } else {
+                r = download_task(ri, task);
+
+                if (r != RI_SUCCESS) {
+                    warnx(_("unable to download %s task: %s"), t, spec);
+                    free_koji_task(task);
+                    return r;
+                } else {
+                    gathered = true;
+                }
+
+                free_koji_task(task);
+            }
+        }
+    }
+
+    /* try for a Koji build */
+    if (!gathered) {
+        build = get_koji_build(ri, spec);
+
+        if (build != NULL) {
+            r = download_build(ri, build);
+            free_koji_build(build);
+
+            if (r != RI_SUCCESS) {
+                warnx(_("unable to download %s build: %s"), t, spec);
+                return r;
+            } else {
+                gathered = true;
+            }
+        }
+    }
+
+    /* still not found a build and we're this far? */
+    if (!gathered) {
+        warnx(_("unable to locate %s build: %s"), t, spec);
+        return -1;
+    }
+
+    return 0;
+}
+
 /**
  * @brief Collects specified builds in to the working directory.
  *
@@ -859,9 +963,6 @@ static int gather_local_build(const char *build)
 int gather_builds(struct rpminspect *ri, bool fo)
 {
     int r = 0;
-    struct koji_build *build = NULL;
-    struct koji_build *innerbuild = NULL;
-    struct koji_task *task = NULL;
 
     assert(ri != NULL);
     assert(ri->after != NULL);
@@ -872,69 +973,11 @@ int gather_builds(struct rpminspect *ri, bool fo)
     /* process after first so the temp directory gets the NV of that pkg */
     if (ri->after != NULL) {
         whichbuild = AFTER_BUILD;
-        task = get_koji_task(ri, ri->after);
-        build = get_koji_build(ri, ri->after);
+        r = _gather_build_types(ri);
 
-        if (is_local_build(ri->workdir, ri->after, fetch_only) || is_local_rpm(ri, ri->after)) {
-            if (gather_local_build(ri->after) == -1) {
-                warnx(_("unable to gather after build: %s"), ri->after);
-                free_koji_task(task);
-                free_koji_build(build);
-                return -1;
-            }
-        } else if (is_remote_rpm(ri->after)) {
-            r = download_rpm(ri, ri->after);
-
-            if (r != RI_SUCCESS) {
-                warnx(_("unable to download after RPM: %s"), ri->after);
-                free_koji_task(task);
-                free_koji_build(build);
-                return r;
-            }
-        } else if (is_task_id(ri->after) && task != NULL) {
-            innerbuild = get_koji_task_as_build(task);
-
-            if (innerbuild) {
-                r = download_build(ri, innerbuild);
-
-                if (r != RI_SUCCESS) {
-                    warnx(_("unable to download after build: %s"), ri->after);
-                    free_koji_task(task);
-                    free_koji_build(build);
-                    free_koji_build(innerbuild);
-                    return r;
-                }
-
-                free_koji_build(innerbuild);
-            } else {
-                r = download_task(ri, task);
-
-                if (r != RI_SUCCESS) {
-                    warnx(_("unable to download after task: %s"), ri->after);
-                    free_koji_task(task);
-                    free_koji_build(build);
-                    return r;
-                }
-            }
-        } else if (build != NULL) {
-            r = download_build(ri, build);
-
-            if (r != RI_SUCCESS) {
-                warnx(_("unable to download after build: %s"), ri->after);
-                free_koji_task(task);
-                free_koji_build(build);
-                return r;
-            }
-        } else {
-            warnx(_("unable to locate after build: %s"), ri->after);
-            free_koji_task(task);
-            free_koji_build(build);
-            return -1;
+        if (r) {
+            return r;
         }
-
-        /* final cleanup for the after build */
-        free_koji_task(task);
-        free_koji_build(build);
     }
 
     /* did we get a before build specified? */
@@ -943,70 +986,11 @@ int gather_builds(struct rpminspect *ri, bool fo)
     }
 
     whichbuild = BEFORE_BUILD;
-    task = get_koji_task(ri, ri->before);
-    build = get_koji_build(ri, ri->before);
+    r = _gather_build_types(ri);
 
-    /* before build specified, find it */
-    if (is_local_build(ri->workdir, ri->before, fetch_only) || is_local_rpm(ri, ri->before)) {
-        if (gather_local_build(ri->before) == -1) {
-            warnx(_("unable to gather before build: %s"), ri->after);
-            free_koji_task(task);
-            free_koji_build(build);
-            return -1;
-        }
-    } else if (is_remote_rpm(ri->before)) {
-        r = download_rpm(ri, ri->before);
-
-        if (r != RI_SUCCESS) {
-            warnx(_("unable to download before RPM: %s"), ri->after);
-            free_koji_task(task);
-            free_koji_build(build);
-            return r;
-        }
-    } else if (is_task_id(ri->before) && task != NULL) {
-        innerbuild = get_koji_task_as_build(task);
-
-        if (innerbuild) {
-            r = download_build(ri, innerbuild);
-
-            if (r != RI_SUCCESS) {
-                warnx(_("unable to download before build: %s"), ri->after);
-                free_koji_build(innerbuild);
-                free_koji_build(build);
-                free_koji_task(task);
-                return r;
-            }
-
-            free_koji_build(innerbuild);
-        } else {
-            r = download_task(ri, task);
-
-            if (r != RI_SUCCESS) {
-                warnx(_("unable to download before task: %s"), ri->after);
-                free_koji_task(task);
-                free_koji_build(build);
-                free_koji_task(task);
-                return r;
-            }
-        }
-    } else if (build != NULL) {
-        r = download_build(ri, build);
-
-        if (r != RI_SUCCESS) {
-            warnx(_("unable to download before build: %s"), ri->after);
-            free_koji_build(build);
-            return r;
-        }
-    } else {
-        warnx(_("unable to locate after build: %s"), ri->after);
-        free_koji_task(task);
-        free_koji_build(build);
-        return -1;
+    if (r) {
+        return r;
     }
-
-    /* final cleanup for the before build */
-    free_koji_task(task);
-    free_koji_build(build);
 
     /*
      * init the arches list if the user did not specify it (we have
