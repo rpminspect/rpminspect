@@ -3,7 +3,10 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 #
 
+import unittest
+
 from baseclass import (
+    gethostname_works,
     VENDOR,
     TestSRPM,
     TestRPMs,
@@ -169,6 +172,9 @@ class LosingVendorCompareKojiBeforeAfterBuild(TestCompareKoji):
 
 # Verify invalid Buildhost subdomain fails on an SRPM (BAD)
 class InvalidBuildhostSubdomainSRPM(TestSRPM):
+    @unittest.skipUnless(
+        gethostname_works, "unable to determine expected RPMTAG_BUILDHOST subdomain"
+    )
     def setUp(self):
         super().setUp()
         self.buildhost_subdomain = ".totallylegitbuilder.com"
@@ -180,6 +186,9 @@ class InvalidBuildhostSubdomainSRPM(TestSRPM):
 
 # Verify invalid Buildhost subdomain fails on binary RPMs (BAD)
 class InvalidBuildhostSubdomainRPMs(TestRPMs):
+    @unittest.skipUnless(
+        gethostname_works, "unable to determine expected RPMTAG_BUILDHOST subdomain"
+    )
     def setUp(self):
         super().setUp()
         self.buildhost_subdomain = ".totallylegitbuilder.com"
@@ -191,6 +200,9 @@ class InvalidBuildhostSubdomainRPMs(TestRPMs):
 
 # Verify invalid Buildhost subdomain fails on Koji build (BAD)
 class InvalidBuildhostSubdomainKojiBuild(TestKoji):
+    @unittest.skipUnless(
+        gethostname_works, "unable to determine expected RPMTAG_BUILDHOST subdomain"
+    )
     def setUp(self):
         super().setUp()
         self.buildhost_subdomain = ".totallylegitbuilder.com"
