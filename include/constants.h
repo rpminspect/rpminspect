@@ -847,6 +847,13 @@
 #define ELF_GNU_DEBUGDATA ".gnu_debugdata"
 
 /**
+ * @def ELF_GNU_DEBUGLINK
+ *
+ * The '.gnu_debuglink' ELF section.
+ */
+#define ELF_GNU_DEBUGLINK ".gnu_debuglink"
+
+/**
  * @def ELF_DEBUG_INFO
  *
  * The '.debug_info' ELF section.

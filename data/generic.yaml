@@ -1062,6 +1062,6 @@ debuginfo:
 
     # The ELF section name(s) required in debuginfo packages.  The
     # default is shown here.  Some older releases may have to change
-    # this to .gdb_index, for instance.  This is a space-delimited
-    # string of section names.
-    debuginfo_sections: .gnu_debugdata
+    # this to remove .gdb_index, for instance.  This is a
+    # space-delimited string of section names.
+    debuginfo_sections: .symtab .debug_info .gdb_index

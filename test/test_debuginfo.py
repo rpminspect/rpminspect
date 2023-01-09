@@ -13,23 +13,22 @@ from baseclass import (
 )
 
 
-debuginfo_remove = "\n%define _find_debuginfo_opts "
-debuginfo_remove += '"--remove-section .symtab '
-debuginfo_remove += '--remove-section .debug_info"\n'
-
-debuginfo_keep = "\n%define _find_debuginfo_opts "
-debuginfo_keep += '"--keep-section .symtab '
-debuginfo_keep += "--keep-section .debug_info "
-debuginfo_keep += '--keep-section .gnu_debugdata"\n'
+# Manual block for %install that removes a debuginfo symbol
+debug_block = "%{__debug_install_post}\n"
+debug_block += "chmod 0755 $RPM_BUILD_ROOT/usr/lib/debug/usr/bin/hello-world*.debug\n"
+debug_block += "strip --remove-section=.gdb_index "
+debug_block += "$RPM_BUILD_ROOT/usr/lib/debug/usr/bin/hello-world*.debug\n"
+debug_block += "chmod 0444 $RPM_BUILD_ROOT/usr/lib/debug/usr/bin/hello-world*.debug\n"
 
 
-# Missing sections in the debuginfo package (BAD, except for SRPMs)
+# Missing .gdb_index in the debuginfo package (BAD, except for SRPMs)
 class MissingSectionsInDebuginfoPkgSRPM(TestSRPM):
     def setUp(self):
         super().setUp()
 
-        self.rpm.header += debuginfo_remove
+        self.rpm.makeDebugInfo = True
         self.rpm.add_simple_compilation(compileFlags="-g")
+        self.rpm.section_install += debug_block
 
         # this inspection is a no-op on SRPMs
         self.inspection = "debuginfo"
@@ -40,11 +39,13 @@ class MissingSectionsInDebuginfoPkgCompareSRPM(TestCompareSRPM):
     def setUp(self):
         super().setUp()
 
-        self.before_rpm.header += debuginfo_remove
+        self.before_rpm.makeDebugInfo = True
         self.before_rpm.add_simple_compilation(compileFlags="-g")
+        self.before_rpm.section_install += debug_block
 
-        self.after_rpm.header += debuginfo_remove
+        self.after_rpm.makeDebugInfo = True
         self.after_rpm.add_simple_compilation(compileFlags="-g")
+        self.after_rpm.section_install += debug_block
 
         # this inspection is a no-op on SRPMs
         self.inspection = "debuginfo"
@@ -55,35 +56,39 @@ class MissingSectionsInDebuginfoPkgRPMs(TestRPMs):
     def setUp(self):
         super().setUp()
 
-        self.rpm.header += debuginfo_remove
+        self.rpm.makeDebugInfo = True
         self.rpm.add_simple_compilation(compileFlags="-g")
+        self.rpm.section_install += debug_block
 
+        # this is a no-op because the RPM used is not a debuginfo RPM
         self.inspection = "debuginfo"
-        self.result = "BAD"
-        self.waiver_auth = "Anyone"
+        self.result = "OK"
 
 
 class MissingSectionsInDebuginfoPkgCompareRPMs(TestCompareRPMs):
     def setUp(self):
         super().setUp()
 
-        self.before_rpm.header += debuginfo_remove
+        self.before_rpm.makeDebugInfo = True
         self.before_rpm.add_simple_compilation(compileFlags="-g")
+        self.before_rpm.section_install += debug_block
 
-        self.after_rpm.header += debuginfo_remove
+        self.after_rpm.makeDebugInfo = True
         self.after_rpm.add_simple_compilation(compileFlags="-g")
+        self.after_rpm.section_install += debug_block
 
+        # this is a no-op because the RPM used is not a debuginfo RPM
         self.inspection = "debuginfo"
-        self.result = "BAD"
-        self.waiver_auth = "Anyone"
+        self.result = "INFO"
 
 
 class MissingSectionsInDebuginfoPkgKoji(TestKoji):
     def setUp(self):
         super().setUp()
 
-        self.rpm.header += debuginfo_remove
+        self.rpm.makeDebugInfo = True
         self.rpm.add_simple_compilation(compileFlags="-g")
+        self.rpm.section_install += debug_block
 
         self.inspection = "debuginfo"
         self.result = "BAD"
@@ -94,11 +99,13 @@ class MissingSectionsInDebuginfoPkgCompareKoji(TestCompareKoji):
     def setUp(self):
         super().setUp()
 
-        self.before_rpm.header += debuginfo_remove
+        self.before_rpm.makeDebugInfo = True
         self.before_rpm.add_simple_compilation(compileFlags="-g")
+        self.before_rpm.section_install += debug_block
 
-        self.after_rpm.header += debuginfo_remove
+        self.after_rpm.makeDebugInfo = True
         self.after_rpm.add_simple_compilation(compileFlags="-g")
+        self.after_rpm.section_install += debug_block
 
         self.inspection = "debuginfo"
         self.result = "BAD"
@@ -110,7 +117,8 @@ class HaveDebuggingSectionsInRegularPkgSRPM(TestSRPM):
     def setUp(self):
         super().setUp()
 
-        self.rpm.header += debuginfo_keep
+        # don't need debuginfo for SRPM test
+        self.rpm.makeDebugInfo = False
         self.rpm.add_simple_compilation(compileFlags="-g")
 
         # this inspection is a no-op on SRPMs
@@ -122,10 +130,11 @@ class HaveDebuggingSectionsInRegularPkgCompareSRPM(TestCompareSRPM):
     def setUp(self):
         super().setUp()
 
-        self.before_rpm.header += debuginfo_keep
-        self.before_rpm.add_simple_compilation(compileFlags="-g")
+        # don't need debuginfo for SRPM test
+        self.before_rpm.makeDebugInfo = False
+        self.after_rpm.makeDebugInfo = False
 
-        self.after_rpm.header += debuginfo_keep
+        self.before_rpm.add_simple_compilation(compileFlags="-g")
         self.after_rpm.add_simple_compilation(compileFlags="-g")
 
         # this inspection is a no-op on SRPMs
@@ -137,7 +146,8 @@ class HaveDebuggingSectionsInRegularPkgRPMs(TestRPMs):
     def setUp(self):
         super().setUp()
 
-        self.rpm.header += debuginfo_keep
+        # don't need debuginfo for SRPM test
+        self.rpm.makeDebugInfo = False
         self.rpm.add_simple_compilation(compileFlags="-g")
 
         self.inspection = "debuginfo"
@@ -149,10 +159,10 @@ class HaveDebuggingSectionsInRegularPkgCompareRPMs(TestCompareRPMs):
     def setUp(self):
         super().setUp()
 
-        self.before_rpm.header += debuginfo_keep
+        self.before_rpm.makeDebugInfo = False
         self.before_rpm.add_simple_compilation(compileFlags="-g")
 
-        self.after_rpm.header += debuginfo_keep
+        self.after_rpm.makeDebugInfo = False
         self.after_rpm.add_simple_compilation(compileFlags="-g")
 
         self.inspection = "debuginfo"
@@ -164,7 +174,7 @@ class HaveDebuggingSectionsInRegularPkgKoji(TestKoji):
     def setUp(self):
         super().setUp()
 
-        self.rpm.header += debuginfo_keep
+        self.rpm.makeDebugInfo = False
         self.rpm.add_simple_compilation(compileFlags="-g")
 
         self.inspection = "debuginfo"
@@ -176,10 +186,10 @@ class HaveDebuggingSectionsInRegularPkgCompareKoji(TestCompareKoji):
     def setUp(self):
         super().setUp()
 
-        self.before_rpm.header += debuginfo_keep
+        self.before_rpm.makeDebugInfo = False
         self.before_rpm.add_simple_compilation(compileFlags="-g")
 
-        self.after_rpm.header += debuginfo_keep
+        self.after_rpm.makeDebugInfo = False
         self.after_rpm.add_simple_compilation(compileFlags="-g")
 
         self.inspection = "debuginfo"
@@ -192,68 +202,31 @@ class BeforeStrippedAfterNotStrippedCompareKoji(TestCompareKoji):
     def setUp(self):
         super().setUp()
 
+        self.before_rpm.makeDebugInfo = True
         self.before_rpm.add_simple_compilation(compileFlags="-g")
+        self.before_rpm.section_install += debug_block
 
-        self.after_rpm.header += debuginfo_keep
+        self.after_rpm.makeDebugInfo = True
         self.after_rpm.add_simple_compilation(compileFlags="-g")
+
+        self.inspection = "debuginfo"
+        self.result = "INFO"
+        self.waiver_auth = "Not Waivable"
+
+
+# Before build is not stripped, but the after build is
+class BeforeNotStrippedAfterStrippedCompareKoji(TestCompareKoji):
+    def setUp(self):
+        super().setUp()
+
+        self.before_rpm.makeDebugInfo = True
+        self.before_rpm.add_simple_compilation(compileFlags="-g")
+        self.before_rpm.section_install += debug_block
+
+        self.after_rpm.makeDebugInfo = True
+        self.after_rpm.add_simple_compilation(compileFlags="-g")
+        self.after_rpm.section_install += debug_block
 
         self.inspection = "debuginfo"
         self.result = "BAD"
         self.waiver_auth = "Anyone"
-
-
-# XXX: need to figure out find_debuginfo_opts more
-# class BeforeStrippedAfterNotStrippedDebugInfoCompareKoji(TestCompareKoji):
-#    def setUp(self):
-#        super().setUp()
-#
-#        self.extra_cfg = {}
-#        self.extra_cfg["debuginfo"] = {}
-#        self.extra_cfg["debuginfo"]["debuginfo_sections"] = ".debug_info"
-#
-#        self.before_rpm.header += debuginfo_remove
-#        self.before_rpm.add_simple_compilation(compileFlags="")
-#
-#        self.after_rpm.add_simple_compilation(compileFlags="-g")
-#
-#        self.inspection = "debuginfo"
-#        self.result = "INFO"
-#        self.waiver_auth = "Not Waivable"
-
-
-# XXX:
-# Before build is not stripped, but the after build is
-# class BeforeNotStrippedAfterStrippedCompareKoji(TestCompareKoji):
-#    def setUp(self):
-#        super().setUp()
-#
-#        self.extra_cfg = {}
-#        self.extra_cfg["debuginfo"] = {}
-#        self.extra_cfg["debuginfo"]["debuginfo_sections"] = ".debug_info"
-#
-#        self.after_rpm.header += debuginfo_keep
-#        self.before_rpm.add_simple_compilation(compileFlags="-g")
-#
-#        self.after_rpm.add_simple_compilation(compileFlags="-g")
-#
-#        self.inspection = "debuginfo"
-#        self.result = "INFO"
-#        self.waiver_auth = "Not Waivable"
-
-# XXX:
-# class BeforeNotStrippedAfterStrippedCompareKoji(TestCompareKoji):
-#    def setUp(self):
-#        super().setUp()
-#
-#        self.extra_cfg = {}
-#        self.extra_cfg["debuginfo"] = {}
-#        self.extra_cfg["debuginfo"]["debuginfo_sections"] = ".debug_info"
-#
-#        self.after_rpm.header += debuginfo_keep
-#        self.before_rpm.add_simple_compilation(compileFlags="-g")
-#
-#        self.after_rpm.add_simple_compilation(compileFlags="-g")
-#
-#        self.inspection = "debuginfo"
-#        self.result = "BAD"
-#        self.waiver_auth = "Anyone"
