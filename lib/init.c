@@ -2234,7 +2234,7 @@ struct rpminspect *calloc_rpminspect(struct rpminspect *ri)
     ri->kmidiff_debuginfo_path = strdup(DEBUG_PATH);
     ri->annocheck_failure_severity = RESULT_VERIFY;
     ri->size_threshold = -1;
-    ri->debuginfo_sections = strdup(ELF_GNU_DEBUGDATA);
+    ri->debuginfo_sections = strdup(ELF_SYMTAB" "ELF_DEBUG_INFO);
 
     /* Initialize commands */
     ri->commands.msgunfmt = strdup(MSGUNFMT_CMD);

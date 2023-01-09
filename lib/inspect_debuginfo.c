@@ -15,7 +15,8 @@
 #define NEEDS_SYMTAB        (((uint64_t) 1) << 2)
 #define NEEDS_GDB_INDEX     (((uint64_t) 1) << 3)
 #define NEEDS_GNU_DEBUGDATA (((uint64_t) 1) << 4)
-#define NEEDS_DEBUG_INFO    (((uint64_t) 1) << 5)
+#define NEEDS_GNU_DEBUGLINK (((uint64_t) 1) << 5)
+#define NEEDS_DEBUG_INFO    (((uint64_t) 1) << 6)
 
 static uint64_t get_flags(const char *s)
 {
@@ -35,6 +36,8 @@ static uint64_t get_flags(const char *s)
             r |= NEEDS_GDB_INDEX;
         } else if (!strcasecmp(entry->data, ELF_GNU_DEBUGDATA)) {
             r |= NEEDS_GNU_DEBUGDATA;
+        } else if (!strcasecmp(entry->data, ELF_GNU_DEBUGLINK)) {
+            r |= NEEDS_GNU_DEBUGLINK;
         } else if (!strcasecmp(entry->data, ELF_DEBUG_INFO)) {
             r |= NEEDS_DEBUG_INFO;
         }
@@ -44,9 +47,9 @@ static uint64_t get_flags(const char *s)
     return r;
 }
 
-static uint64_t missing_sections(const char *fullpath, const uint64_t flags)
+static uint64_t _section_helper(const char *fullpath, const uint64_t flags, const bool check)
 {
-    uint64_t missing = 0;
+    uint64_t gathered = 0;
     int fd = 0;
     Elf *elf = NULL;
 
@@ -55,25 +58,39 @@ static uint64_t missing_sections(const char *fullpath, const uint64_t flags)
     elf = get_elf(fullpath, &fd);
     assert(elf != NULL);
 
-    if ((flags & NEEDS_SYMTAB) && !have_elf_section(elf, -1, ELF_SYMTAB)) {
-        missing |= NEEDS_SYMTAB;
+    if ((flags & NEEDS_SYMTAB) && have_elf_section(elf, -1, ELF_SYMTAB) == check) {
+        gathered |= NEEDS_SYMTAB;
     }
 
-    if ((flags & NEEDS_GDB_INDEX) && !have_elf_section(elf, -1, ELF_GDB_INDEX)) {
-        missing |= NEEDS_GDB_INDEX;
+    if ((flags & NEEDS_GDB_INDEX) && have_elf_section(elf, -1, ELF_GDB_INDEX) == check) {
+        gathered |= NEEDS_GDB_INDEX;
     }
 
-    if ((flags & NEEDS_GNU_DEBUGDATA) && !have_elf_section(elf, -1, ELF_GNU_DEBUGDATA)) {
-        missing |= NEEDS_GNU_DEBUGDATA;
+    if ((flags & NEEDS_GNU_DEBUGDATA) && have_elf_section(elf, -1, ELF_GNU_DEBUGDATA) == check) {
+        gathered |= NEEDS_GNU_DEBUGDATA;
     }
 
-    if ((flags & NEEDS_DEBUG_INFO) && !have_elf_section(elf, -1, ELF_DEBUG_INFO)) {
-        missing |= NEEDS_DEBUG_INFO;
+    if ((flags & NEEDS_GNU_DEBUGLINK) && have_elf_section(elf, -1, ELF_GNU_DEBUGLINK) == check) {
+        gathered |= NEEDS_GNU_DEBUGLINK;
+    }
+
+    if ((flags & NEEDS_DEBUG_INFO) && have_elf_section(elf, -1, ELF_DEBUG_INFO) == check) {
+        gathered |= NEEDS_DEBUG_INFO;
     }
 
     close(fd);
     elf_end(elf);
-    return missing;
+    return gathered;
+}
+
+static uint64_t have_sections(const char *fullpath, const uint64_t flags)
+{
+    return _section_helper(fullpath, flags, true);
+}
+
+static uint64_t missing_sections(const char *fullpath, const uint64_t flags)
+{
+    return _section_helper(fullpath, flags, false);
 }
 
 static char *strflags(const uint64_t flags)
@@ -87,6 +104,8 @@ static char *strflags(const uint64_t flags)
         list = list_add(list, ELF_GDB_INDEX);
     } else if (flags & NEEDS_GNU_DEBUGDATA) {
         list = list_add(list, ELF_GNU_DEBUGDATA);
+    } else if (flags & NEEDS_GNU_DEBUGLINK) {
+        list = list_add(list, ELF_GNU_DEBUGLINK);
     } else if (flags & NEEDS_DEBUG_INFO) {
         list = list_add(list, ELF_DEBUG_INFO);
     }
@@ -105,6 +124,7 @@ static bool debuginfo_driver(struct rpminspect *ri, rpmfile_entry_t *file)
     char *tmp = NULL;
     bool debugpkg = false;
     uint64_t flags = 0;
+    uint64_t have = 0;
     uint64_t missing = 0;
     int fd = 0;
     Elf *elf = NULL;
@@ -140,88 +160,88 @@ static bool debuginfo_driver(struct rpminspect *ri, rpmfile_entry_t *file)
     }
 
     /* set the sections to check for */
-    if (debugpkg) {
-        /* debugging packages need debugging symbols */
-        flags |= NEEDS_SYMTAB;
-        flags |= NEEDS_DEBUG_INFO;
-    } else {
-        /* default section (set in config file usually) */
-        flags = get_flags(ri->debuginfo_sections);
-    }
-
-    /* Golang packages should not have .gnu_debugdata */
-    elf = get_elf(file->fullpath, &fd);
-    assert(elf != NULL);
-
-    if (have_elf_section(elf, -1, ELF_GOSYMTAB)) {
-        flags &= ~NEEDS_GNU_DEBUGDATA;
-    }
-
-    elf_end(elf);
-    close(fd);
+    flags |= get_flags(ri->debuginfo_sections);
 
     /* Initialize the result parameters */
     init_result_params(&params);
     params.header = NAME_DEBUGINFO;
 
-    /* Check for and report missing sections for single builds */
-    missing = missing_sections(file->fullpath, flags);
-
-    if (missing) {
-        xasprintf(&params.msg, _("%s in %s on %s is missing ELF sections "), file->localpath, nvr, arch);
-        params.severity = RESULT_BAD;
-        params.waiverauth = WAIVABLE_BY_ANYONE;
-        params.verb = VERB_FAILED;
-        params.noun = _("missing debugging symbols");
+    /* Check for and report missing or misplaced debuginfo symbols */
+    if (file->peer_file == NULL) {
+        missing = missing_sections(file->fullpath, flags);
+        have = have_sections(file->fullpath, flags);
         params.file = file->localpath;
         params.arch = arch;
 
-        tmp = strflags(missing);
-        xasprintf(&params.details, _("Missing: %s"), tmp);
-        free(tmp);
-
-        add_result(ri, &params);
-
-        free(params.msg);
-        free(params.details);
-    }
-
-    /* When comparing builds, report changes */
-    if (file->peer_file) {
-        /* stripped in the before file but not the after file */
-        missing = missing_sections(file->peer_file->fullpath, flags);
-
-        if (missing && !missing_sections(file->fullpath, flags)) {
-            xasprintf(&params.msg, _("%s in %s on %s is no longer stripped"), file->localpath, nvr, arch);
+        if (debugpkg && missing) {
+            /* debuginfo packages should not be missing debugging symbols */
+            xasprintf(&params.msg, _("%s in %s on %s is missing debugging symbols"), file->localpath, nvr, arch);
+            params.severity = RESULT_BAD;
+            params.waiverauth = WAIVABLE_BY_ANYONE;
             params.verb = VERB_FAILED;
-            params.noun = _("need debugging symbols");
+            params.noun = _("missing debugging symbols");
+
+            tmp = strflags(missing);
+            xasprintf(&params.details, _("Missing: %s"), tmp);
+            free(tmp);
+
+            add_result(ri, &params);
+
+            free(params.msg);
+            free(params.details);
+
+            result = false;
+        } else if (!debugpkg && have) {
+            /* non-debuginfo packages should not contain debugging symbols */
+            xasprintf(&params.msg, _("%s in %s on %s contains debugging symbols"), file->localpath, nvr, arch);
+            params.severity = RESULT_BAD;
+            params.waiverauth = WAIVABLE_BY_ANYONE;
+            params.verb = VERB_FAILED;
+            params.noun = _("contains debugging symbols");
+            tmp = strflags(have);
+            xasprintf(&params.details, _("Contains: %s"), tmp);
+            free(tmp);
+
+            add_result(ri, &params);
+
+            free(params.msg);
+            free(params.details);
+
+            result = false;
+        }
+    } else {
+        missing = missing_sections(file->peer_file->fullpath, flags);
+        have = have_sections(file->fullpath, flags);
+
+        if (missing && have) {
+            /* stripped in the before file but not the after file */
+            xasprintf(&params.msg, _("%s in %s on %s gained debugging symbols"), file->localpath, nvr, arch);
+            params.noun = _("gained debugging symbols");
             params.file = file->localpath;
             params.arch = arch;
 
-            tmp = strflags(missing);
-            xasprintf(&params.details, _("Need: %s"), tmp);
+            tmp = strflags(have);
+            xasprintf(&params.details, _("Gained: %s"), tmp);
             free(tmp);
 
             if (debugpkg) {
+                params.verb = VERB_OK;
                 params.severity = RESULT_INFO;
                 params.waiverauth = NOT_WAIVABLE;
             } else {
+                params.verb = VERB_FAILED;
                 params.severity = RESULT_BAD;
                 params.waiverauth = WAIVABLE_BY_ANYONE;
+                result = false;
             }
 
             add_result(ri, &params);
 
             free(params.msg);
             free(params.details);
-        }
-
-        /* not stripped in the before file, stripped in the after file */
-        missing = missing_sections(file->fullpath, flags);
-
-        if (!missing_sections(file->peer_file->fullpath, flags) && missing) {
-            xasprintf(&params.msg, _("%s in %s on %s became stripped"), file->localpath, nvr, arch);
-            params.verb = VERB_FAILED;
+        } else if (missing && !have) {
+            /* not stripped in the before file, stripped in the after file */
+            xasprintf(&params.msg, _("%s in %s on %s lost debugging symbols"), file->localpath, nvr, arch);
             params.noun = _("lost debugging symbols");
             params.file = file->localpath;
             params.arch = arch;
@@ -231,9 +251,12 @@ static bool debuginfo_driver(struct rpminspect *ri, rpmfile_entry_t *file)
             free(tmp);
 
             if (debugpkg) {
+                params.verb = VERB_FAILED;
                 params.severity = RESULT_BAD;
                 params.waiverauth = WAIVABLE_BY_ANYONE;
+                result = false;
             } else {
+                params.verb = VERB_OK;
                 params.severity = RESULT_INFO;
                 params.waiverauth = NOT_WAIVABLE;
             }
@@ -243,6 +266,48 @@ static bool debuginfo_driver(struct rpminspect *ri, rpmfile_entry_t *file)
             free(params.msg);
             free(params.details);
         }
+    }
+
+    /* Final non-debuginfo package checks */
+    if (!debugpkg) {
+        /* Non-debuginfo packages should have .gnu_debuglink */
+        elf = get_elf(file->fullpath, &fd);
+        assert(elf != NULL);
+
+        if (!have_elf_section(elf, -1, ELF_GNU_DEBUGLINK)) {
+            xasprintf(&params.msg, _("%s in %s on %s is missing the .gnu_debuglink symbol"), file->localpath, nvr, arch);
+            params.verb = VERB_FAILED;
+            params.noun = _("lost .gnu_debuglink");
+            params.file = file->localpath;
+            params.arch = arch;
+            params.severity = RESULT_VERIFY;
+            params.waiverauth = WAIVABLE_BY_ANYONE;
+            params.details = NULL;
+            result = false;
+
+            add_result(ri, &params);
+
+            free(params.msg);
+        }
+
+        if (have_elf_section(elf, -1, ELF_GOSYMTAB) && have_elf_section(elf, -1, ELF_GNU_DEBUGDATA)) {
+            xasprintf(&params.msg, _("%s in %s on %s carries .gosymtab but should not have the .gnu_debugdata symbol"), file->localpath, nvr, arch);
+            params.verb = VERB_FAILED;
+            params.noun = _(".gnu_debugdata with .gosymtab");
+            params.file = file->localpath;
+            params.arch = arch;
+            params.severity = RESULT_VERIFY;
+            params.waiverauth = WAIVABLE_BY_ANYONE;
+            params.details = NULL;
+            result = false;
+
+            add_result(ri, &params);
+
+            free(params.msg);
+        }
+
+        close(fd);
+        elf_end(elf);
     }
 
     free(nvr);
