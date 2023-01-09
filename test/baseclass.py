@@ -35,6 +35,9 @@ if os.getenv("KEEP") is None:
 else:
     KEEP_RESULTS = True
 
+# Set to false if we cannot determine the hostname
+gethostname_works = True
+
 
 # Exceptions used by the test suite
 class MissingRpminspect(Exception):
@@ -264,19 +267,26 @@ class RequiresRpminspect(unittest.TestCase):
         if self.buildhost_subdomain:
             cfg["metadata"]["buildhost_subdomain"] = [self.buildhost_subdomain]
         else:
-            hn = socket.getfqdn()
+            hn = socket.gethostname()
             hnd = None
+            hnaddr = None
 
-            if hn.find(".") != -1:
-                hnd = "." + hn.split(".", 1)[1]
-
-            if hn.startswith("localhost"):
-                cfg["metadata"]["buildhost_subdomain"] = ["localhost", hn]
+            if hn:
+                hnaddr = socket.getaddrinfo(hn, 0)
             else:
-                cfg["metadata"]["buildhost_subdomain"] = [hn]
+                gethostname_works = False  # noqa: F841
 
-            if hnd:
-                cfg["metadata"]["buildhost_subdomain"].append(hnd)
+            if hnaddr:
+                if hn.find(".") != -1:
+                    hnd = "." + hn.split(".", 1)[1]
+
+                if hn.startswith("localhost"):
+                    cfg["metadata"]["buildhost_subdomain"] = ["localhost", hn]
+                else:
+                    cfg["metadata"]["buildhost_subdomain"] = [hn]
+
+                if hnd:
+                    cfg["metadata"]["buildhost_subdomain"].append(hnd)
 
         # any additional config settings for the test case
         if self.extra_cfg is not None:
