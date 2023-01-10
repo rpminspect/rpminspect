@@ -18,6 +18,8 @@
 
 #include "rpminspect.h"
 
+static bool reported = false;
+
 /* Main driver for the 'ownership' inspection */
 static bool ownership_driver(struct rpminspect *ri, rpmfile_entry_t *file)
 {
@@ -73,6 +75,7 @@ static bool ownership_driver(struct rpminspect *ri, rpmfile_entry_t *file)
         free(params.msg);
         free(params.remedy);
         result = false;
+        reported = true;
     }
 
     /* Report forbidden file groups */
@@ -87,6 +90,7 @@ static bool ownership_driver(struct rpminspect *ri, rpmfile_entry_t *file)
         free(params.msg);
         free(params.remedy);
         result = false;
+        reported = true;
     }
 
     /* Report files in bin paths not under the bin owner or group */
@@ -95,7 +99,9 @@ static bool ownership_driver(struct rpminspect *ri, rpmfile_entry_t *file)
             bin = true;
 
             /* Check the owner */
-            if (strcmp(owner, ri->bin_owner) && !match_fileinfo_owner(ri, file, owner, NAME_OWNERSHIP, NULL, NULL) && (ri->tests & INSPECT_OWNERSHIP)) {
+            if (strcmp(owner, ri->bin_owner)
+                && !match_fileinfo_owner(ri, file, owner, NAME_OWNERSHIP, NULL, NULL, &result, &reported)
+                && (ri->tests & INSPECT_OWNERSHIP)) {
                 xasprintf(&params.msg, _("File %s has owner `%s` on %s, but should be `%s`"), file->localpath, owner, arch, ri->bin_owner);
                 xasprintf(&params.remedy, REMEDY_OWNERSHIP_BIN_OWNER, ri->fileinfo_filename);
                 params.severity = RESULT_BAD;
@@ -106,6 +112,7 @@ static bool ownership_driver(struct rpminspect *ri, rpmfile_entry_t *file)
                 free(params.msg);
                 free(params.remedy);
                 result = false;
+                reported = true;
             }
 
             /* Check the group - special handling */
@@ -143,6 +150,7 @@ static bool ownership_driver(struct rpminspect *ri, rpmfile_entry_t *file)
                             free(params.msg);
                             free(params.remedy);
                             result = false;
+                            reported = true;
                         }
                     }
 
@@ -159,11 +167,14 @@ static bool ownership_driver(struct rpminspect *ri, rpmfile_entry_t *file)
                             free(params.msg);
                             free(params.remedy);
                             result = false;
+                            reported = true;
                         }
                     }
-                } else if (!match_fileinfo_group(ri, file, group, NAME_OWNERSHIP, NULL, NULL) && (ri->tests & INSPECT_OWNERSHIP)) {
+                } else if (!match_fileinfo_group(ri, file, group, NAME_OWNERSHIP, NULL, NULL, &result, &reported)
+                           && (ri->tests & INSPECT_OWNERSHIP)) {
 #else
-                if (!match_fileinfo_group(ri, file, group, NAME_OWNERSHIP, NULL, NULL) && (ri->tests & INSPECT_OWNERSHIP)) {
+                if (!match_fileinfo_group(ri, file, group, NAME_OWNERSHIP, NULL, NULL, &result, &reported)
+                    && (ri->tests & INSPECT_OWNERSHIP)) {
 #endif
                     xasprintf(&params.msg, _("File %s has group `%s` on %s, but should be `%s`"), file->localpath, group, arch, ri->bin_group);
                     xasprintf(&params.remedy, REMEDY_OWNERSHIP_BIN_GROUP, ri->fileinfo_filename);
@@ -175,6 +186,7 @@ static bool ownership_driver(struct rpminspect *ri, rpmfile_entry_t *file)
                     free(params.msg);
                     free(params.remedy);
                     result = false;
+                    reported = true;
                 }
             }
 
@@ -240,6 +252,7 @@ static bool ownership_driver(struct rpminspect *ri, rpmfile_entry_t *file)
             free(params.msg);
             free(params.remedy);
             result = false;
+            reported = true;
         }
 
         free(before_owner);
@@ -264,7 +277,7 @@ bool inspect_ownership(struct rpminspect *ri)
     assert(ri != NULL);
     result = foreach_peer_file(ri, NAME_OWNERSHIP, ownership_driver);
 
-    if (result) {
+    if (result && !reported) {
         init_result_params(&params);
         params.severity = RESULT_OK;
         params.header = NAME_OWNERSHIP;

@@ -59,14 +59,13 @@ static bool permissions_driver(struct rpminspect *ri, rpmfile_entry_t *file)
     }
 
     mode_diff = before_mode ^ after_mode;
-    allowed = match_fileinfo_mode(ri, file, NAME_PERMISSIONS, NULL);
+    allowed = match_fileinfo_mode(ri, file, NAME_PERMISSIONS, NULL, &result, &reported);
 
     /* if setuid/setgid or new mode is more open */
     if (mode_diff && file->peer_file && !allowed && (ri->tests & INSPECT_PERMISSIONS)) {
         if (!(before_mode & (S_ISUID|S_ISGID)) && (after_mode & (S_ISUID|S_ISGID))) {
             params.severity = RESULT_VERIFY;
             what = _("changed setuid/setgid");
-            result = false;
         } else if (S_ISDIR(file->st.st_mode) && !S_ISLNK(file->st.st_mode)) {
             if (((mode_diff & S_ISVTX) && !(after_mode & S_ISVTX)) || ((after_mode & mode_diff) != 0)) {
                 params.severity = RESULT_VERIFY;
@@ -76,6 +75,7 @@ static bool permissions_driver(struct rpminspect *ri, rpmfile_entry_t *file)
 
         if (params.severity >= RESULT_VERIFY) {
             params.waiverauth = WAIVABLE_BY_ANYONE;
+            result = false;
         }
 
         xasprintf(&params.msg, _("%s %s permissions from %04o to %04o on %s"), file->localpath, what, before_mode, after_mode, arch);
@@ -83,9 +83,10 @@ static bool permissions_driver(struct rpminspect *ri, rpmfile_entry_t *file)
         xasprintf(&noun, _("${FILE} permissions from %04o to %04o on ${ARCH}"), before_mode, after_mode);
         params.noun = noun;
         add_result(ri, &params);
-        reported = true;
         free(params.msg);
         free(noun);
+
+        reported = true;
     }
 
     /* check for world-writability */
@@ -98,9 +99,10 @@ static bool permissions_driver(struct rpminspect *ri, rpmfile_entry_t *file)
             params.verb = VERB_FAILED;
             params.noun = _("${FILE} is world-writable on ${ARCH}");
             add_result(ri, &params);
-            reported = true;
             free(params.msg);
+
             result = false;
+            reported = true;
         }
     }
 

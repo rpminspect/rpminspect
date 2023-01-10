@@ -23,9 +23,12 @@
  *               file is found.
  * @param remedy The remedy string to use for results reporting if the
  *               file is found.
+ * @param result The rpminspect test driver result.
+ * @param reported The rpminspect test driver reported indicator.
  * @return True if the file is on the fileinfo list, false otherwise.
  */
-bool match_fileinfo_mode(struct rpminspect *ri, const rpmfile_entry_t *file, const char *header, const char *remedy)
+bool match_fileinfo_mode(struct rpminspect *ri, const rpmfile_entry_t *file, const char *header,
+                         const char *remedy, bool *result, bool *reported)
 {
     fileinfo_entry_t *fientry = NULL;
     mode_t interesting = S_ISUID | S_ISGID | S_ISVTX | S_IRWXU | S_IRWXG | S_IRWXO;
@@ -58,6 +61,7 @@ bool match_fileinfo_mode(struct rpminspect *ri, const rpmfile_entry_t *file, con
                     add_result(ri, &params);
                     free(params.msg);
                     free(params.remedy);
+                    *reported = true;
                     return true;
                 } else {
                     params.severity = get_secrule_result_severity(ri, file, SECRULE_MODES);
@@ -68,6 +72,8 @@ bool match_fileinfo_mode(struct rpminspect *ri, const rpmfile_entry_t *file, con
                         add_result(ri, &params);
                         free(params.msg);
                         free(params.remedy);
+                        *result = false;
+                        *reported = true;
                         return true;
                     }
                 }
@@ -87,6 +93,8 @@ bool match_fileinfo_mode(struct rpminspect *ri, const rpmfile_entry_t *file, con
             add_result(ri, &params);
             free(params.msg);
             free(params.remedy);
+            *result = false;
+            *reported = true;
         }
     }
 
@@ -105,9 +113,11 @@ bool match_fileinfo_mode(struct rpminspect *ri, const rpmfile_entry_t *file, con
  * @param remedy The remedy string to use for results reporting if the
  *               file is found.  Must contain %s for fname.
  * @param fname The filename of the data package file to update.
+ * @param result The rpminspect test driver result for the caller.
  * @return True if the file is on the fileinfo list, false otherwise.
  */
-bool match_fileinfo_owner(struct rpminspect *ri, const rpmfile_entry_t *file, const char *owner, const char *header, const char *remedy, const char *fname)
+bool match_fileinfo_owner(struct rpminspect *ri, const rpmfile_entry_t *file, const char *owner, const char *header,
+                          const char *remedy, const char *fname, bool *result, bool *reported)
 {
     fileinfo_entry_t *fientry = NULL;
     const char *pkg = NULL;
@@ -142,6 +152,7 @@ bool match_fileinfo_owner(struct rpminspect *ri, const rpmfile_entry_t *file, co
                     add_result(ri, &params);
                     free(params.msg);
                     free(params.remedy);
+                    *reported = true;
                     return true;
                 } else {
                     params.severity = get_secrule_result_severity(ri, file, SECRULE_MODES);
@@ -152,6 +163,8 @@ bool match_fileinfo_owner(struct rpminspect *ri, const rpmfile_entry_t *file, co
                         add_result(ri, &params);
                         free(params.msg);
                         free(params.remedy);
+                        *result = false;
+                        *reported = true;
                         return true;
                     }
                 }
@@ -177,9 +190,11 @@ bool match_fileinfo_owner(struct rpminspect *ri, const rpmfile_entry_t *file, co
  * @param remedy The remedy string to use for results reporting if the
  *               file is found.  Must contain %s for fname.
  * @param fname The filename of the data package file to update.
+ * @param result The rpminspect test driver result for the caller.
  * @return True if the file is on the fileinfo list, false otherwise.
  */
-bool match_fileinfo_group(struct rpminspect *ri, const rpmfile_entry_t *file, const char *group, const char *header, const char *remedy, const char *fname)
+bool match_fileinfo_group(struct rpminspect *ri, const rpmfile_entry_t *file, const char *group, const char *header,
+                          const char *remedy, const char *fname, bool *result, bool *reported)
 {
     fileinfo_entry_t *fientry = NULL;
     const char *pkg = NULL;
@@ -213,6 +228,7 @@ bool match_fileinfo_group(struct rpminspect *ri, const rpmfile_entry_t *file, co
                     add_result(ri, &params);
                     free(params.msg);
                     free(params.remedy);
+                    *reported = true;
                     return true;
                 } else {
                     params.severity = get_secrule_result_severity(ri, file, SECRULE_MODES);
@@ -223,6 +239,8 @@ bool match_fileinfo_group(struct rpminspect *ri, const rpmfile_entry_t *file, co
                         add_result(ri, &params);
                         free(params.msg);
                         free(params.remedy);
+                        *result = false;
+                        *reported = false;
                         return true;
                     }
                 }

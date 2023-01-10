@@ -11,6 +11,8 @@
 
 #include "rpminspect.h"
 
+static bool reported = false;
+
 static bool capabilities_driver(struct rpminspect *ri, rpmfile_entry_t *file)
 {
     bool result = true;
@@ -30,6 +32,7 @@ static bool capabilities_driver(struct rpminspect *ri, rpmfile_entry_t *file)
 
     /* Skip debuginfo and debugsource packages */
     name = headerGetString(file->rpm_header, RPMTAG_NAME);
+
     if (strsuffix(name, DEBUGINFO_SUFFIX) || strsuffix(name, DEBUGSOURCE_SUFFIX)) {
         return true;
     }
@@ -83,7 +86,12 @@ static bool capabilities_driver(struct rpminspect *ri, rpmfile_entry_t *file)
                 add_result(ri, &params);
                 free(params.msg);
                 free(params.remedy);
-                result = false;
+
+                if (params.severity >= RESULT_VERIFY) {
+                    result = false;
+                }
+
+                reported = true;
             }
         } else if (!cap_compare(beforecap, aftercap) && (ri->tests & INSPECT_CAPABILITIES)) {
             xasprintf(&params.msg, _("File capabilities found for %s: '%s' on %s\n"), file->localpath, after, arch);
@@ -92,6 +100,7 @@ static bool capabilities_driver(struct rpminspect *ri, rpmfile_entry_t *file)
             params.verb = VERB_OK;
             add_result(ri, &params);
             free(params.msg);
+            reported = true;
         }
     }
 
@@ -117,6 +126,7 @@ static bool capabilities_driver(struct rpminspect *ri, rpmfile_entry_t *file)
             params.verb = VERB_OK;
             add_result(ri, &params);
             free(params.msg);
+            reported = true;
         } else if (cap_compare(aftercap, expected) && (ri->tests & INSPECT_CAPABILITIES)) {
             params.severity = get_secrule_result_severity(ri, file, SECRULE_CAPS);
 
@@ -129,7 +139,12 @@ static bool capabilities_driver(struct rpminspect *ri, rpmfile_entry_t *file)
                 add_result(ri, &params);
                 free(params.msg);
                 free(params.remedy);
-                result = false;
+
+                if (params.severity >= RESULT_VERIFY) {
+                    result = false;
+                }
+
+                reported = true;
             }
         }
     } else if (aftercap && !expected) {
@@ -144,7 +159,12 @@ static bool capabilities_driver(struct rpminspect *ri, rpmfile_entry_t *file)
             add_result(ri, &params);
             free(params.msg);
             free(params.remedy);
-            result = false;
+
+            if (params.severity >= RESULT_VERIFY) {
+                result = false;
+            }
+
+            reported = true;
         }
     } else if (!aftercap && expected) {
         params.severity = get_secrule_result_severity(ri, file, SECRULE_CAPS);
@@ -158,7 +178,12 @@ static bool capabilities_driver(struct rpminspect *ri, rpmfile_entry_t *file)
             add_result(ri, &params);
             free(params.msg);
             free(params.remedy);
-            result = false;
+
+            if (params.severity >= RESULT_VERIFY) {
+                result = false;
+            }
+
+            reported = true;
         }
     }
 
@@ -182,7 +207,7 @@ bool inspect_capabilities(struct rpminspect *ri)
     result = foreach_peer_file(ri, NAME_CAPABILITIES, capabilities_driver);
 
     /* if everything was fine, just say so */
-    if (result) {
+    if (result && !reported) {
         init_result_params(&params);
         params.severity = RESULT_OK;
         params.header = NAME_CAPABILITIES;
