@@ -228,7 +228,7 @@ static bool addedfiles_driver(struct rpminspect *ri, rpmfile_entry_t *file)
 
     /* Check for any new setuid or setgid files */
     if (!S_ISDIR(file->st.st_mode) && (file->st.st_mode & (S_ISUID|S_ISGID))) {
-        match_fileinfo_mode(ri, file, NAME_ADDEDFILES, remedy_addedfiles);
+        match_fileinfo_mode(ri, file, NAME_ADDEDFILES, remedy_addedfiles, &result, &reported);
         goto done;
     }
 

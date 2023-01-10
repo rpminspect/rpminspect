@@ -118,7 +118,8 @@ class ApprovedCapabilitiesKoji(TestKoji):
         )
 
         self.inspection = "capabilities"
-        self.result = "OK"
+        self.result = "INFO"
+        self.waiver_auth = "Not Waivable"
 
 
 class ApprovedCapabilitiesCompareRPMs(TestCompareRPMs):
@@ -133,7 +134,8 @@ class ApprovedCapabilitiesCompareRPMs(TestCompareRPMs):
         )
 
         self.inspection = "capabilities"
-        self.result = "OK"
+        self.result = "INFO"
+        self.waiver_auth = "Not Waivable"
 
 
 class ApprovedCapabilitiesCompareKoji(TestCompareKoji):
@@ -148,7 +150,8 @@ class ApprovedCapabilitiesCompareKoji(TestCompareKoji):
         )
 
         self.inspection = "capabilities"
-        self.result = "OK"
+        self.result = "INFO"
+        self.waiver_auth = "Not Waivable"
 
 
 class SecuritySKIPUnapprovedCapabilitiesRPMs(TestRPMs):
