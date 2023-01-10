@@ -271,6 +271,8 @@ static bool debuginfo_driver(struct rpminspect *ri, rpmfile_entry_t *file)
     /* Final non-debuginfo package checks */
     if (!debugpkg) {
         /* Non-debuginfo packages should have .gnu_debuglink */
+/*
+ * XXX -- should they?  instructions unclear at this point in time (10-Jan-2023)
         elf = get_elf(file->fullpath, &fd);
         assert(elf != NULL);
 
@@ -289,6 +291,7 @@ static bool debuginfo_driver(struct rpminspect *ri, rpmfile_entry_t *file)
 
             free(params.msg);
         }
+ */
 
         if (have_elf_section(elf, -1, ELF_GOSYMTAB) && have_elf_section(elf, -1, ELF_GNU_DEBUGDATA)) {
             xasprintf(&params.msg, _("%s in %s on %s carries .gosymtab but should not have the .gnu_debugdata symbol"), file->localpath, nvr, arch);
