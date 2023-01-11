@@ -363,7 +363,7 @@ static bool annocheck_driver(struct rpminspect *ri, rpmfile_entry_t *file)
             annoerr = libannocheck_run_tests(ah, &failed, &maybe);
 
             if (annoerr != libannocheck_error_none) {
-                warnx(_("blurp libannocheck_run_tests error: %s:"), libannocheck_get_error_message(ah, annoerr));
+                warnx(_("before libannocheck_run_tests error: %s (%d)"), libannocheck_get_error_message(ah, annoerr), annoerr);
                 libannocheck_finish(ah);
                 continue;
             }
@@ -407,7 +407,7 @@ static bool annocheck_driver(struct rpminspect *ri, rpmfile_entry_t *file)
         annoerr = libannocheck_run_tests(ah, &failed, &maybe);
 
         if (annoerr != libannocheck_error_none) {
-            warnx(_("flurfle libannocheck_run_tests error: %s:"), libannocheck_get_error_message(ah, annoerr));
+            warnx(_("after libannocheck_run_tests error: %s (%d)"), libannocheck_get_error_message(ah, annoerr), annoerr);
             libannocheck_finish(ah);
             continue;
         }
