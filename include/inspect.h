@@ -26,8 +26,12 @@
 #include <libelf.h>
 
 #ifdef _WITH_LIBKMOD
+#ifdef _LIBKMOD_HEADER_SUBDIR
+#include <kmod/libkmod.h>
+#else
 #include <libkmod.h>
-#endif
+#endif /* _LIBKMOD_HEADER_HEADER */
+#endif /* _WITH_LIBKMOD */
 
 #include "types.h"
 

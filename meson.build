@@ -71,6 +71,14 @@ icu_io = dependency('icu-io', required : true)
 if get_option('with_libkmod')
     libkmod = dependency('libkmod', required : true)
     add_project_arguments('-D_WITH_LIBKMOD', language : 'c')
+
+    if not cc.has_header('libkmod.h')
+        if cc.has_header('kmod/libkmod.h')
+            add_project_arguments('-D_LIBKMOD_HEADER_SUBDIR', language : 'c')
+        else
+            error('*** unable to find libkmod.h')
+        endif
+    endif
 else
     message('disabling Linux kernel module support (libkmod)')
     libkmod = disabler()
