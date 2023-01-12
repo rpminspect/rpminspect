@@ -786,11 +786,15 @@ bool inspect_debuginfo(struct rpminspect *ri);
  */
 #define INSPECT_SPECNAME                    (((uint64_t) 1) << 9)
 
+#ifdef _HAVE_MODULARITYLABEL
+
 /**
  * @def INSPECT_MODULARITY
  * 'modularity' inspection ID.
  */
 #define INSPECT_MODULARITY                  (((uint64_t) 1) << 10)
+
+#endif
 
 /**
  * @def INSPECT_JAVABYTECODE
@@ -1074,11 +1078,15 @@ bool inspect_debuginfo(struct rpminspect *ri);
  */
 #define NAME_SPECNAME                       "specname"
 
+#ifdef _HAVE_MODULARITYLABEL
+
 /**
  * @def NAME_MODULARITY
  * The string "modularity"
  */
 #define NAME_MODULARITY                     "modularity"
+
+#endif
 
 /**
  * @def NAME_JAVABYTECODE
@@ -1364,11 +1372,15 @@ bool inspect_debuginfo(struct rpminspect *ri);
  */
 #define DESC_SPECNAME _("Ensure the spec file name conforms to the NAME.spec naming format.")
 
+#ifdef _HAVE_MODULARITYLABEL
+
 /**
  * @def DESC_MODULARITY
  * The description for the 'modularity' inspection.
  */
 #define DESC_MODULARITY _("Ensure compliance with modularity build and packaging policies (only valid for module builds, no-op otherwise).")
+
+#endif
 
 /**
  * @def DESC_JAVABYTECODE

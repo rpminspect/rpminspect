@@ -38,7 +38,9 @@ struct inspect inspections[] = {
     { INSPECT_DESKTOP,       "desktop",       true,  &inspect_desktop },
     { INSPECT_DISTTAG,       "disttag",       true,  &inspect_disttag },
     { INSPECT_SPECNAME,      "specname",      true,  &inspect_specname },
+#ifdef _HAVE_MODULARITYLABEL
     { INSPECT_MODULARITY,    "modularity",    true,  &inspect_modularity },
+#endif
     { INSPECT_JAVABYTECODE,  "javabytecode",  true,  &inspect_javabytecode },
     { INSPECT_CHANGEDFILES,  "changedfiles",  false, &inspect_changedfiles },
     { INSPECT_MOVEDFILES,    "movedfiles",    false, &inspect_movedfiles },
@@ -153,8 +155,10 @@ uint64_t inspection_id(const char *name)
         return INSPECT_DISTTAG;
     } else if (!strcmp(name, NAME_SPECNAME)) {
         return INSPECT_SPECNAME;
+#ifdef _HAVE_MODULARITYLABEL
     } else if (!strcmp(name, NAME_MODULARITY)) {
         return INSPECT_MODULARITY;
+#endif
     } else if (!strcmp(name, NAME_JAVABYTECODE)) {
         return INSPECT_JAVABYTECODE;
     } else if (!strcmp(name, NAME_CHANGEDFILES)) {
@@ -260,8 +264,10 @@ const char *inspection_desc(const uint64_t inspection)
             return DESC_DISTTAG;
         case INSPECT_SPECNAME:
             return DESC_SPECNAME;
+#ifdef _HAVE_MODULARITYLABEL
         case INSPECT_MODULARITY:
             return DESC_MODULARITY;
+#endif
         case INSPECT_JAVABYTECODE:
             return DESC_JAVABYTECODE;
         case INSPECT_CHANGEDFILES:
@@ -368,8 +374,10 @@ const char *inspection_header_to_desc(const char *header)
         i = INSPECT_DISTTAG;
     } else if (!strcmp(header, NAME_SPECNAME)) {
         i = INSPECT_SPECNAME;
+#ifdef _HAVE_MODULARITYLABEL
     } else if (!strcmp(header, NAME_MODULARITY)) {
         i = INSPECT_MODULARITY;
+#endif
     } else if (!strcmp(header, NAME_JAVABYTECODE)) {
         i = INSPECT_JAVABYTECODE;
     } else if (!strcmp(header, NAME_CHANGEDFILES)) {

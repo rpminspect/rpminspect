@@ -140,7 +140,9 @@ enum {
     BLOCK_LICENSEDB = 73,
     BLOCK_DEBUGINFO = 74,
     BLOCK_PATCH_AUTOMACROS = 75,
+#ifdef _HAVE_MODULARITYLABEL
     BLOCK_MODULARITY = 76,
+#endif
     BLOCK_ANNOCHECK_PROFILE = 77
 };
 
@@ -760,9 +762,11 @@ static int read_cfgfile(struct rpminspect *ri, const char *filename)
                     } else if (!strcmp(key, NAME_METADATA)) {
                         block = BLOCK_NULL;
                         group = BLOCK_METADATA;
+#ifdef _HAVE_MODULARITYLABEL
                     } else if (!strcmp(key, NAME_MODULARITY)) {
                         block = BLOCK_MODULARITY;
                         group = BLOCK_NULL;
+#endif
                     } else if (!strcmp(key, NAME_ELF)) {
                         block = BLOCK_NULL;
                         group = BLOCK_ELF;
@@ -1191,6 +1195,7 @@ static int read_cfgfile(struct rpminspect *ri, const char *filename)
                                 warnx(_("*** unknown specname primary setting '%s', defaulting to 'name'"), t);
                             }
                         }
+#ifdef _HAVE_MODULARITYLABEL
                     } else if (block == BLOCK_MODULARITY) {
                         if (!strcmp(key, SECTION_STATIC_CONTEXT)) {
                             if (!strcasecmp(t, TOKEN_REQUIRED)) {
@@ -1204,6 +1209,7 @@ static int read_cfgfile(struct rpminspect *ri, const char *filename)
                                 warnx(_("*** unknown modularity static context settings '%s'"), t);
                             }
                         }
+#endif
                     } else if (group == BLOCK_ELF) {
                         if (!strcmp(key, SECTION_INCLUDE_PATH)) {
                             if (debug_mode) {

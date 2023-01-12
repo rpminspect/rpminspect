@@ -237,6 +237,8 @@
 
 /** @} */
 
+#ifdef _HAVE_MODULARITYLABEL
+
 /**
  * @defgroup modularity inspection remedy strings
  *
@@ -258,6 +260,8 @@
 #define REMEDY_MODULARITY_STATIC_CONTEXT _("This build either contains a valid or invalid /data/static_context setting.  Refer to the module rules for the product you are building to determine what the setting should be.  The rpminspect configuration settings also set the rules determining if the /data/static_context setting is required, forbidden, or recommend.")
 
 /** @} */
+
+#endif
 
 /**
  * @defgroup javabytecode inspection remedy strings

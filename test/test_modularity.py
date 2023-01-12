@@ -3,11 +3,20 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 #
 
+import os
+import unittest
 from baseclass import TestModule, TestCompareModules
 
+have_modularitylabel = False
+if os.system("grep -q MODULARITYLABEL /usr/include/rpm/rpmtag.h 2>/dev/null") == 0:
+    have_modularitylabel = True
 
-# Module has %{modularitylabel} defined (OK)
+
+# Module has ModularityLabel defined (OK)
 class ModuleHasModularityLabel(TestModule):
+    @unittest.skipUnless(
+        have_modularitylabel, "rpm lacks RPMTAG_MODULARITYLABEL support"
+    )
     def setUp(self):
         super().setUp(modularitylabel=True)
 
@@ -20,6 +29,9 @@ class ModuleHasModularityLabel(TestModule):
 
 
 class ModulesHaveModularityLabel(TestCompareModules):
+    @unittest.skipUnless(
+        have_modularitylabel, "rpm lacks RPMTAG_MODULARITYLABEL support"
+    )
     def setUp(self):
         super().setUp(modularitylabel=True)
 
@@ -31,8 +43,11 @@ class ModulesHaveModularityLabel(TestCompareModules):
         self.result = "OK"
 
 
-# Module does not have %{modularitylabel} defined (BAD)
+# Module does not have ModularityLabel defined (BAD)
 class ModuleLacksModularityLabel(TestModule):
+    @unittest.skipUnless(
+        have_modularitylabel, "rpm lacks RPMTAG_MODULARITYLABEL support"
+    )
     def setUp(self):
         super().setUp(modularitylabel=False)
 
@@ -46,6 +61,9 @@ class ModuleLacksModularityLabel(TestModule):
 
 
 class ModulesLacksModularityLabel(TestCompareModules):
+    @unittest.skipUnless(
+        have_modularitylabel, "rpm lacks RPMTAG_MODULARITYLABEL support"
+    )
     def setUp(self):
         super().setUp(modularitylabel=False)
 
@@ -60,6 +78,9 @@ class ModulesLacksModularityLabel(TestCompareModules):
 
 # Module has static_context and rules require it (OK)
 class ModuleHasStaticContext(TestModule):
+    @unittest.skipUnless(
+        have_modularitylabel, "rpm lacks RPMTAG_MODULARITYLABEL support"
+    )
     def setUp(self):
         super().setUp(static_context=True)
 
@@ -68,6 +89,9 @@ class ModuleHasStaticContext(TestModule):
 
 
 class ModulesHaveStaticContext(TestCompareModules):
+    @unittest.skipUnless(
+        have_modularitylabel, "rpm lacks RPMTAG_MODULARITYLABEL support"
+    )
     def setUp(self):
         super().setUp(static_context=True)
 
@@ -77,6 +101,9 @@ class ModulesHaveStaticContext(TestCompareModules):
 
 # Module has static_context and rules recommend it (OK)
 class ModuleHasStaticContextAndRecommended(TestModule):
+    @unittest.skipUnless(
+        have_modularitylabel, "rpm lacks RPMTAG_MODULARITYLABEL support"
+    )
     def setUp(self):
         super().setUp(static_context=True)
 
@@ -89,6 +116,9 @@ class ModuleHasStaticContextAndRecommended(TestModule):
 
 
 class ModulesHaveStaticContextAndRecommended(TestCompareModules):
+    @unittest.skipUnless(
+        have_modularitylabel, "rpm lacks RPMTAG_MODULARITYLABEL support"
+    )
     def setUp(self):
         super().setUp(static_context=True)
 
@@ -102,6 +132,9 @@ class ModulesHaveStaticContextAndRecommended(TestCompareModules):
 
 # Module has static_context and rules forbid it (VERIFY)
 class ModuleHasStaticContextAndForbidden(TestModule):
+    @unittest.skipUnless(
+        have_modularitylabel, "rpm lacks RPMTAG_MODULARITYLABEL support"
+    )
     def setUp(self):
         super().setUp(static_context=True)
 
@@ -115,6 +148,9 @@ class ModuleHasStaticContextAndForbidden(TestModule):
 
 
 class ModulesHaveStaticContextAndForbidden(TestCompareModules):
+    @unittest.skipUnless(
+        have_modularitylabel, "rpm lacks RPMTAG_MODULARITYLABEL support"
+    )
     def setUp(self):
         super().setUp(static_context=True)
 
@@ -129,6 +165,9 @@ class ModulesHaveStaticContextAndForbidden(TestCompareModules):
 
 # Module has static_context and rules do not exist (INFO)
 class ModuleHasStaticContextWithNoRule(TestModule):
+    @unittest.skipUnless(
+        have_modularitylabel, "rpm lacks RPMTAG_MODULARITYLABEL support"
+    )
     def setUp(self):
         super().setUp(static_context=True)
 
@@ -137,6 +176,9 @@ class ModuleHasStaticContextWithNoRule(TestModule):
 
 
 class ModulesHaveStaticContextWithNoRule(TestCompareModules):
+    @unittest.skipUnless(
+        have_modularitylabel, "rpm lacks RPMTAG_MODULARITYLABEL support"
+    )
     def setUp(self):
         super().setUp(static_context=True)
 
