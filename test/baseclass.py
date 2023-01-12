@@ -891,7 +891,7 @@ class TestModule(TestKoji):
 
         # add the modularitylabel to the built RPMs
         if modularitylabel:
-            self.rpm.header += "\n%define modularitylabel TEST_LABEL\n"
+            self.rpm.header += "\nModularityLabel: TEST_LABEL\n"
 
         # create the modulemd.txt file
         filesdir = os.path.join(self.kojidir, "files")
@@ -918,8 +918,8 @@ class TestCompareModules(TestCompareKoji):
 
         # add the modularitylabel to the built RPMs
         if modularitylabel:
-            self.before_rpm.header += "\n%define modularitylabel TEST_LABEL\n"
-            self.after_rpm.header += "\n%define modularitylabel TEST_LABEL\n"
+            self.before_rpm.header += "\nModularityLabel: TEST_LABEL\n"
+            self.after_rpm.header += "\nModularityLabel: TEST_LABEL\n"
 
         # create the modulemd.txt file
         beforefilesdir = os.path.join(self.kojidir, "before", "files")

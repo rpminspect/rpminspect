@@ -103,6 +103,20 @@ else
     error('*** unable to find librpmbuild')
 endif
 
+# check for RPMTAG_MODULARITYLABEL usability
+rpmtag_src = '''
+    #include <rpm/rpmtag.h>
+    int main(int argc, char **argv)
+    {
+        return RPMTAG_MODULARITYLABEL;
+    }
+    '''
+have_modularitylabel = cc.compiles(rpmtag_src, args: [ '-Werror' ], name: 'RPMTAG_MODULARITYLABEL availability test')
+
+if have_modularitylabel
+    add_project_arguments('-D_HAVE_MODULARITYLABEL', language : 'c')
+endif
+
 # libarchive (need to check for specific functions)
 libarchive = dependency('libarchive', required : true)
 

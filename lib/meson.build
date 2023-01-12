@@ -58,7 +58,6 @@ librpminspect_sources = [
     'inspect_lto.c',
     'inspect_manpage.c',
     'inspect_metadata.c',
-    'inspect_modularity.c',
     'inspect_movedfiles.c',
     'inspect_ownership.c',
     'inspect_patches.c',
@@ -129,6 +128,10 @@ deps = [
     icu_io,
     m,
 ]
+
+if have_modularitylabel
+    librpminspect_sources += [ 'inspect_modularity.c' ]
+endif
 
 if get_option('with_libkmod')
     librpminspect_sources += [ 'inspect_kmod.c', 'kmods.c' ]

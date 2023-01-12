@@ -321,6 +321,8 @@ typedef struct _caps_entry_t {
 
 typedef TAILQ_HEAD(caps_entry_s, _caps_entry_t) caps_t;
 
+#ifdef _HAVE_MODULARITYLABEL
+
 /* Modularity static context types */
 typedef enum _static_context_t {
     STATIC_CONTEXT_NULL = 0,
@@ -328,6 +330,8 @@ typedef enum _static_context_t {
     STATIC_CONTEXT_FORBIDDEN = 2,
     STATIC_CONTEXT_RECOMMEND = 3
 } static_context_t;
+
+#endif
 
 /* Spec filename matching types */
 typedef enum _specname_match_t {
@@ -497,8 +501,10 @@ struct rpminspect {
                                 */
     char *vendor;              /* Required vendor string */
 
+#ifdef _HAVE_MODULARITYLABEL
     /* Modularity values */
     static_context_t modularity_static_context;
+#endif
 
     /* Required subdomain for buildhosts -- multiple subdomains allowed */
     string_list_t *buildhost_subdomain;
