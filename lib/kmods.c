@@ -8,7 +8,13 @@
 #include <stdbool.h>
 #include <stdlib.h>
 #include <string.h>
+
+#ifdef _LIBKMOD_HEADER_SUBDIR
+#include <kmod/libkmod.h>
+#else
 #include <libkmod.h>
+#endif /* _LIBKMOD_HEADER_SUBDIR */
+
 #include "queue.h"
 #include "uthash.h"
 #include "inspect.h"
