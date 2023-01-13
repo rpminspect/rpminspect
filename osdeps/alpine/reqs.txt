@@ -11,14 +11,16 @@ cunit-dev
 curl
 curl-dev
 desktop-file-utils
+elfutils
 elfutils-dev
+file
 freshclam
-fts-dev
 g++
 gcc
 gcovr
 gettext
 git
+help2man
 icu-dev
 json-c-dev
 kmod-dev
@@ -29,6 +31,8 @@ make
 meson
 mksh
 musl-dev
+musl-fts-dev
+musl-legacy-error
 musl-libintl
 patchelf
 pkgconf
