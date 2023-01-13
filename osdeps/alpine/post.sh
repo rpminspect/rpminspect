@@ -52,10 +52,21 @@ cd libabigail || exit 1
 TAG="$(git tag -l | grep ^libabigail- | grep -v '\.rc' | sort -n | tail -n 1)"
 git checkout -b "${TAG}" "${TAG}"
 autoreconf -f -i -v
-if ! grep -q "<libgen\.h>" tools/abisym.cc >/dev/null 2>&1 ; then
-    sed -i -r '/^#include\ <elf\.h>/a #include <libgen.h>' tools/abisym.cc
+if [ ! -r /usr/lib/pkgconfig/fts-standalone.pc ]; then
+    ln -sf musl-fts.pc /usr/lib/pkgconfig/fts-standalone.pc
 fi
-env LIBS="-lfts" ./configure --prefix=/usr/local
+./configure --prefix=/usr/local
+make V=1
+make install
+
+# Install debugedit (/usr/bin/find-debuginfo) from git
+cd "${CWD}" || exit 1
+git clone git://sourceware.org/git/debugedit.git
+cd debugedit || exit 1
+TAG="$(git tag -l | grep ^debugedit- | sort -n | tail -n 1)"
+git checkout -b "${TAG}" "${TAG}"
+autoreconf -f -i -v
+./configure --prefix=/usr
 make V=1
 make install
 
