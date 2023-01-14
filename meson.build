@@ -130,7 +130,6 @@ rpmtag_src = '''
     }
     '''
 have_modularitylabel = cc.compiles(rpmtag_src,
-                                   args: [ '-Werror' ],
                                    name: 'RPMTAG_MODULARITYLABEL availability test')
 
 if have_modularitylabel
