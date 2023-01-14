@@ -2,11 +2,15 @@
 PATH=/bin:/usr/bin:/sbin:/usr/sbin
 CWD="$(pwd)"
 
-# There is no cbindgen package in Slackware Linux
-cargo install cbindgen
+# Install rust.  Slackware comes with Rust, but it's too old to build
+# clamav, which we also need.
+curl --proto '=https' --tlsv1.2 -sSf -o rustup.sh https://sh.rustup.rs
+chmod +x rustup.sh
+./rustup.sh -y
+. ${HOME}/.cargo/env
 
 # There is no clamav package in Slackware Linux
-git clone https://github.com/Cisco-Talos/clamav.git
+git clone -q https://github.com/Cisco-Talos/clamav.git
 cd clamav || exit 1
 TAG="$(git tag -l | grep -E "^clamav-[0-9\.]+$" | grep "\." | sort -V | tail -n 1)"
 git checkout -b "${TAG}" "${TAG}"
@@ -19,12 +23,12 @@ cmake -D ENABLE_MILTER=OFF \
       -D APP_CONFIG_DIRECTORY=/etc/clamav \
       -D DATABASE_DIRECTORY=/var/lib/clamav \
       -G Ninja ..
-ninja -v
-ninja -v install
+ninja
+ninja install
 cd "${CWD}" || exit 1
 
 # There is no CUnit package, so build from source
-svn checkout https://svn.code.sf.net/p/cunit/code/trunk cunit-code
+svn checkout -q https://svn.code.sf.net/p/cunit/code/trunk cunit-code
 cd cunit-code || exit 1
 ./bootstrap
 ./configure --prefix=/usr --libdir=/usr/lib64
@@ -33,7 +37,7 @@ make install
 cd "${CWD}" || exit 1
 
 # There is no xmlrpc-c package, so build from source
-svn checkout https://svn.code.sf.net/p/xmlrpc-c/code/trunk xmlrpc-c-code
+svn checkout -q https://svn.code.sf.net/p/xmlrpc-c/code/trunk xmlrpc-c-code
 cd xmlrpc-c-code || exit 1
 svn switch ^/stable
 ./configure --prefix=/usr --libdir=/usr/lib64
@@ -44,7 +48,7 @@ cd "${CWD}" || exit 1
 # There is no mandoc package, so build from source
 curl -O http://mandoc.bsd.lv/snapshots/mandoc.tar.gz
 SUBDIR="$(tar -tvf mandoc.tar.gz | head -n 1 | rev | cut -d ' ' -f 1 | rev)"
-tar -xvf mandoc.tar.gz
+tar -xf mandoc.tar.gz
 { echo 'PREFIX=/usr/local';
   echo 'BINDIR=/usr/local/bin';
   echo 'SBINDIR=/usr/local/sbin';
@@ -64,7 +68,7 @@ tar -xvf mandoc.tar.gz
 ( cd "${SUBDIR}" && ./configure && make && make lib-install )
 
 # The 'rc' shell is not available in Slackware Linux, build manually
-git clone https://github.com/rakitzis/rc.git
+git clone -q https://github.com/rakitzis/rc.git
 cd rc || exit 1
 autoreconf -f -i -v
 ./configure --prefix=/usr
@@ -73,18 +77,18 @@ make install
 cd "${CWD}" || exit 1
 
 # Install libabigail from git
-git clone git://sourceware.org/git/libabigail.git
+git clone -q git://sourceware.org/git/libabigail.git
 cd libabigail || exit 1
 TAG="$(git tag -l | grep ^libabigail- | grep -v '\.rc' | sort -n | tail -n 1)"
 git checkout -b "${TAG}" "${TAG}"
 autoreconf -f -i -v
 ./configure --prefix=/usr
-make
+make V=1
 make install
 cd "${CWD}" || exit 1
 
 # Install annobin from source
-git clone git://sourceware.org/git/annobin.git
+git clone -q git://sourceware.org/git/annobin.git
 cd annobin || exit 1
 autoreconf -f -i -v
 ./configure --prefix=/usr
