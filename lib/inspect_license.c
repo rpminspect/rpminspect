@@ -21,19 +21,16 @@
 #include <sys/stat.h>
 #include <fcntl.h>
 #include <stdarg.h>
-#include <json.h>
+#include "callbacks.h"
+#include "parser.h"
 #include "rpminspect.h"
 
 /* Local helper functions */
-static struct json_object *read_licensedb(struct rpminspect *ri, const char *db)
+static parser_plugin *read_licensedb(struct rpminspect *ri, const char *db, parser_context **context_out)
 {
-    struct json_object *r = NULL;
     char *actualdb = NULL;
-    struct json_tokener *tok = NULL;
-    enum json_tokener_error jerr;
-    int len = 0;
-    char *licdata = NULL;
-    off_t liclen = 0;
+    parser_plugin *p = &json_parser;
+    parser_context *context = NULL;
 
     assert(ri != NULL);
     assert(db != NULL);
@@ -41,105 +38,105 @@ static struct json_object *read_licensedb(struct rpminspect *ri, const char *db)
     /* build path to license db if necessary */
     if (db && db[0] == '/') {
         actualdb = strdup(db);
+        assert(actualdb != NULL);
     } else {
         xasprintf(&actualdb, "%s/%s/%s", ri->vendor_data_dir, LICENSES_DIR, db);
     }
 
-    assert(actualdb != NULL);
-
-    if (access(actualdb, F_OK|R_OK)) {
-        warn(_("unable to open license db %s"), actualdb);
+    if (p->parse_file(&context, actualdb)) {
+        warnx(_("parse error on license db %s"), db);
         free(actualdb);
         return NULL;
     }
 
-    licdata = read_file_bytes(actualdb, &liclen);
     free(actualdb);
-    tok = json_tokener_new();
-    assert(tok != NULL);
+    *context_out = context;
+    return p;
+}
 
-    len = strlen(licdata);
-    r = json_tokener_parse_ex(tok, licdata, len);
-    jerr = json_tokener_get_error(tok);
+static inline char *emptily(char *s)
+{
+    return s != NULL ? s : strdup("");
+}
 
-    if (jerr != json_tokener_success) {
-        warnx("json_tokener_parse_ex: %s", json_tokener_error_desc(jerr));
+/* lambda; checks against an entry in the license database. */
+static bool lic_cb(const char *license_name, void *cb_data)
+{
+    lic_cb_data *data = cb_data;
+    const char *lic = data->lic;
+    parser_plugin *p = data->p;
+    parser_context *db = data->db;
+    char *fedora_abbrev = NULL, *fedora_name = NULL, *spdx_abbrev = NULL;
+    char *approved = NULL;
+
+    if (data->valid) {
+        /* Already decided; no need to check further. */
+        return false;
     }
 
-    json_tokener_free(tok);
-    free(licdata);
+    if (strlen(license_name) == 0) {
+        return false;
+    }
 
-    return r;
+    fedora_abbrev = emptily(p->getstr(db, license_name, "fedora_abbrev"));
+    fedora_name = emptily(p->getstr(db, license_name, "fedora_name"));
+    spdx_abbrev = emptily(p->getstr(db, license_name, "spdx_abbrev"));
+    approved = emptily(p->getstr(db, license_name, "approved"));
+
+    /* Handle "commented out" fields - not proper JSON, but I'm not a cop. */
+    if (strlen(fedora_abbrev) > 0 && *fedora_abbrev == '#') {
+        free(fedora_abbrev);
+        fedora_abbrev = strdup("");
+    }
+
+    if (strlen(spdx_abbrev) > 0 && *spdx_abbrev == '#') {
+        free(spdx_abbrev);
+        spdx_abbrev = strdup("");;
+    }
+
+    /* No full tag match and no abbreviations; license entry invalid. */
+    if (strlen(fedora_abbrev) == 0 && strlen(spdx_abbrev) == 0 &&
+        strlen(fedora_name) == 0) {
+        goto done;
+    }
+
+    /*
+     * If the entire license string is approved, that is valid.
+     * If we hit 'fedora_abbrev', that is valid.
+     * If we hit 'spdx_abbrev' and approved is true, that is valid.
+     * NOTE: we only match the first hit in the license database
+     */
+    if (strcasecmp(approved, "true") && strcasecmp(approved, "yes")) {
+        /* invalid - do nothing */
+        goto done;
+    } else if ((!strcmp(lic, fedora_abbrev) || !strcmp(lic, spdx_abbrev)) ||
+               (strlen(fedora_abbrev) == 0 && strlen(spdx_abbrev) == 0 &&
+                !strcmp(lic, fedora_name))) {
+        data->valid = true;
+    }
+
+done:
+    free(fedora_abbrev);
+    free(fedora_name);
+    free(spdx_abbrev);
+    free(approved);
+    return false;
 }
 
 /*
  * Called by is_valid_license() to check each short license token.  It
  * will also try to do a whole match on the license tag string.
  */
-static bool check_license_abbrev(const struct json_object *db, const char *lic)
+static bool check_license_abbrev(parser_plugin *p, parser_context *db, const char *lic)
 {
-    struct json_object *ldb = (struct json_object *) db;
-    const char *fedora_abbrev = "";
-    const char *fedora_name = "";
-    const char *spdx_abbrev = "";
-    bool approved = false;
+    lic_cb_data data = { p, db, lic, false };
 
-    assert(ldb != NULL);
-    assert(lic != NULL);
-
-    json_object_object_foreach(ldb, license_name, val) {
-        /* first reset our variables */
-        fedora_abbrev = "";
-        fedora_name = "";
-        spdx_abbrev = "";
-        approved = false;
-
-        if (strlen(license_name) == 0) {
-            continue;
-        }
-
-        /* collect the properties */
-        json_object_object_foreach(val, prop, propval) {
-            if (!strcmp(prop, "fedora_abbrev")) {
-                fedora_abbrev = json_object_get_string(propval);
-            } else if (!strcmp(prop, "fedora_name")) {
-                fedora_name = json_object_get_string(propval);
-            } else if (!strcmp(prop, "spdx_abbrev")) {
-                spdx_abbrev = json_object_get_string(propval);
-            } else if (!strcmp(prop, "approved") && !strcasecmp(json_object_get_string(propval), "yes")) {
-                approved = true;
-            }
-        }
-
-        /* handle "commented out" fields */
-        if (strlen(fedora_abbrev) > 0 && *fedora_abbrev == '#') {
-            fedora_abbrev = "";
-        }
-
-        if (strlen(spdx_abbrev) > 0 && *spdx_abbrev == '#') {
-            spdx_abbrev = "";
-        }
-
-        /*
-         * no full tag match and no abbreviations, license entry invalid
-         */
-        if (strlen(fedora_abbrev) == 0 && strlen(spdx_abbrev) == 0 && strlen(fedora_name) == 0) {
-            continue;
-        }
-
-        /*
-         * if the entire license string is approved, that is valid
-         * if we hit 'fedora_abbrev', that is valid
-         * if we hit 'spdx_abbrev' and approved is true, that is valid
-         * NOTE: we only match the first hit in the license database
-         */
-        if (approved && ((!strcmp(lic, fedora_abbrev) || !strcmp(lic, spdx_abbrev)) ||
-                         (strlen(fedora_abbrev) == 0 && strlen(spdx_abbrev) == 0 && !strcmp(lic, fedora_name)))) {
-            return true;
-        }
+    if (p->keymap(db, NULL, NULL, lic_cb, &data)) {
+        warnx(_("problem checking licensedb"));
+        return false;
     }
 
-    return false;
+    return data.valid;
 }
 
 /*
@@ -167,7 +164,7 @@ static void token_append(char **dest, const char *token)
 /*
  * Given a license expression without parens, check it.
  */
-static bool is_valid_expression(const struct json_object *db, const char *s, const char *nevra, struct result_params *params, results_t **rq)
+static bool is_valid_expression(parser_plugin *p, parser_context *db, const char *s, const char *nevra, struct result_params *params, results_t **rq)
 {
     bool result = true;
     char *tagtokens = NULL;
@@ -180,7 +177,7 @@ static bool is_valid_expression(const struct json_object *db, const char *s, con
     assert(params != NULL);
 
     /* see if the entire substring matches */
-    if (check_license_abbrev(db, s)) {
+    if (check_license_abbrev(p, db, s)) {
         return true;
     }
 
@@ -197,7 +194,7 @@ static bool is_valid_expression(const struct json_object *db, const char *s, con
                 continue;
             }
 
-            if (!check_license_abbrev(db, lic)) {
+            if (!check_license_abbrev(p, db, lic)) {
                 result = false;
 
                 xasprintf(&params->msg, _("Unapproved license in %s: %s"), nevra, lic);
@@ -218,7 +215,7 @@ static bool is_valid_expression(const struct json_object *db, const char *s, con
 
     /* check final token */
     if (lic) {
-        if (!check_license_abbrev(db, lic)) {
+        if (!check_license_abbrev(p, db, lic)) {
             result = false;
 
             xasprintf(&params->msg, _("Unapproved license in %s: %s"), nevra, lic);
@@ -267,7 +264,8 @@ static bool is_valid_license(struct rpminspect *ri, struct result_params *params
     results_t *rq = NULL;
     results_entry_t *entry = NULL;
     string_entry_t *sentry = NULL;
-    struct json_object *db = NULL;
+    parser_plugin *p = NULL;
+    parser_context *db = NULL;
 
     assert(ri != NULL);
     assert(params != NULL);
@@ -300,14 +298,14 @@ static bool is_valid_license(struct rpminspect *ri, struct result_params *params
 
     /* read in each approved license database */
     TAILQ_FOREACH(sentry, ri->licensedb, items) {
-        db = read_licensedb(ri, sentry->data);
+        p = read_licensedb(ri, sentry->data, &db);
 
-        if (db == NULL) {
+        if (p == NULL) {
             continue;
         }
 
         /* First try to match the entire string */
-        if (check_license_abbrev(db, tag)) {
+        if (check_license_abbrev(p, db, tag)) {
             return true;
         }
 
@@ -319,7 +317,7 @@ static bool is_valid_license(struct rpminspect *ri, struct result_params *params
                 continue;
             }
 
-            if (is_valid_expression(db, token, nevra, params, &rq)) {
+            if (is_valid_expression(p, db, token, nevra, params, &rq)) {
                 good++;
             }
 
@@ -327,7 +325,7 @@ static bool is_valid_license(struct rpminspect *ri, struct result_params *params
         }
 
         free(tagcopy);
-        json_object_put(db);
+        p->fini(db);
 
         if (good == seen) {
             result = true;
