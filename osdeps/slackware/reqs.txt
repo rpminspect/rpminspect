@@ -41,7 +41,6 @@ python3
 python-pip
 python-setuptools
 rpm
-rust
 serf
 sqlite
 subversion
