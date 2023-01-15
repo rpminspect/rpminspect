@@ -168,7 +168,7 @@ void dump_cfg(const struct rpminspect *ri)
         printf("products:\n");
 
         HASH_ITER(hh, ri->products, hentry, tmp_hentry) {
-            printf("    - %s: %s\n", hentry->key, hentry->value);
+            printf("    %s: %s\n", hentry->key, hentry->value);
         }
     }
 
