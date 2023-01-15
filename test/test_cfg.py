@@ -58,6 +58,14 @@ class RpminspectYamlHate(RequiresRpminspect):
     def configFile(self):
         super().configFile()
 
+        # make a copy to run against
+        self.conffile_old = self.conffile + "_old"
+        outf = open(self.conffile_old, "w")
+        inf = open(self.conffile)
+        outf.write(inf.read())
+        outf.close()
+        inf.close()
+
         # customize our config file to check some deprecated things
         instream = open(self.conffile, "r")
         cfg = yaml.full_load(instream)
@@ -65,19 +73,22 @@ class RpminspectYamlHate(RequiresRpminspect):
 
         cfg["badfuncs"] = cfg["badfuncs"]["forbidden"]
         cfg["annocheck"] = cfg["annocheck"]["jobs"]
-        d = cfg["javabytecode"]["default"]
-        del(cfg["javabytecode"])
-        cfg["javabytecode"] = [d]
+        cfg["javabytecode"] = [cfg["javabytecode"]]
 
         outstream = open(self.conffile, "w")
-        oustream.write(yaml.dump(cfg).replace("- ", "  - "))
-        oustream.close()
+        outstream.write(yaml.dump(cfg).replace("- ", "  - "))
+        outstream.close()
+
+    def tearDown(self):
+        super().tearDown()
+        if not os.getenv("KEEP"):
+            os.unlink(self.conffile_old)
 
     def runTest(self):
-        RequiresRpminspect.configFile(self)
+        self.configFile()
 
         p = subprocess.Popen(
-            [self.rpminspect, "-Dc", os.environ["RPMINSPECT_YAML"]],
+            [self.rpminspect, "-Dc", self.conffile_old],
             stdout=subprocess.PIPE,
             stderr=subprocess.STDOUT,
         )
