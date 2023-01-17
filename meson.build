@@ -3,7 +3,7 @@ project('rpminspect',
         version : '1.11',
         default_options : [
             'c_std=c99',
-            'warning_level=2',
+            'warning_level=3',
             'werror=true',
             'buildtype=debugoptimized'
         ],
@@ -124,12 +124,14 @@ endif
 # check for RPMTAG_MODULARITYLABEL usability
 rpmtag_src = '''
     #include <rpm/rpmtag.h>
-    int main(int argc, char **argv)
+    int main(void)
     {
         return RPMTAG_MODULARITYLABEL;
     }
     '''
-have_modularitylabel = cc.compiles(rpmtag_src, args: [ '-Werror' ], name: 'RPMTAG_MODULARITYLABEL availability test')
+have_modularitylabel = cc.compiles(rpmtag_src,
+                                   args: [ '-Werror' ],
+                                   name: 'RPMTAG_MODULARITYLABEL availability test')
 
 if have_modularitylabel
     add_project_arguments('-D_HAVE_MODULARITYLABEL', language : 'c')
@@ -147,9 +149,12 @@ endif
 # openssl (need to check for the version info function)
 openssl = dependency('openssl', required : true)
 
-if not cc.has_function('OpenSSL_version', dependencies : [ openssl ]) and cc.has_function('SSLeay_version', dependencies : [ openssl ])
+have_openssl_version = cc.has_function('OpenSSL_version', dependencies : [ openssl ])
+have_ssleay_version = cc.has_function('SSLeay_version', dependencies : [ openssl ])
+
+if not have_openssl_version and have_ssleay_version
     add_project_arguments('-DOpenSSL_version=SSLeay_version', language : 'c')
-elif not cc.has_function('OpenSSL_version', dependencies : [ openssl ]) and not cc.has_function('SSLeay_version', dependencies : [ openssl ])
+elif not have_openssl_version and not have_ssleay_version
     add_project_arguments('-D_NO_OPENSSL_VERSION_FUNCTION', language : 'c')
 endif
 
