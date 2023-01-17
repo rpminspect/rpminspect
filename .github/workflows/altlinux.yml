@@ -72,5 +72,4 @@ jobs:
                   sudo -u tester meson setup build --werror -D b_buildtype=debug -D b_coverage=true
                   sudo -u tester ninja -C build -v
                   sudo -u tester meson test -C build -v
-                  sudo -u tester ninja -C build coverage
-                  curl -s https://codecov.io/bash | bash
+                  sudo -u tester ninja -C build coverage && ( curl -s https://codecov.io/bash | bash ) || :

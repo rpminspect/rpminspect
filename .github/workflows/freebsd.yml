@@ -69,9 +69,7 @@ jobs:
                       echo $? > exitcodes/build
                       env LANG=en_US.UTF-8 meson test -C build -v
                       echo $? > exitcodes/test
-                      ninja -C build coverage
-                      echo $? > exitcodes/coverage
-                      curl -s https://codecov.io/bash | bash
+                      ninja -C build coverage && ( curl -s https://codecov.io/bash | bash ) || :
                       mv exitcodes build
 
             # Process the exit codes outside the VM
