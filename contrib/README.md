@@ -1,5 +1,12 @@
 # Contrib
 
+## devel-rpminspect
+
+This is a script you can use to run rpminspect built from the source
+directory and pointing to the git clone of a vendor data package.  It
+may be easier to copy this script to a directory in your $PATH and
+then edit the top part to suit your directory layout.
+
 ## rpminspect-report
 
 [rpminspect-report](https://softwarefactory-project.io/r/plugins/gitiles/software-factory/rpminspect-report)

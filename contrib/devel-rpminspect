@@ -1,0 +1,55 @@
+#!/bin/sh
+#
+# Run local build of rpminspect using a local git clone of a vendor
+# data package.
+#
+
+### BEGIN CONFIGURATION ###
+
+# Set this to the directory where your clone of the rpminspect repo
+# lives.
+RPMINSPECT_SRC=${HOME}/scm/rpminspect
+
+# The default working directory for rpminspect is /var/tmp, but you
+# may override that here.
+#WORKDIR=/var/tmp
+
+# Set this to where your vendor data directory's main configuration
+# lives.
+CONF=${HOME}/scm/rpminspect-data-fedora/fedora.yaml
+
+### END CONFIGURATION ###
+
+PATH=/usr/bin
+RPMINSPECT_BIN=${RPMINSPECT_SRC}/build/src/rpminspect
+PROFILES="$(dirname "${CONF}")/profiles/$(basename "${CONF}" .yaml)"
+[ -z "${WORKDIR}" ] && WORKDIR=/var/tmp
+
+if [ ! -f "${CONF}" ]; then
+    echo "Missing ${CONF}, exiting." >&2
+    exit 1
+fi
+
+if [ ! -x "${RPMINSPECT_BIN}" ]; then
+    cd "${RPMINSPECT_SRC}" || exit 1
+    [ -d build ] || meson setup build
+    ninja -C build -v
+fi
+
+TMPCONF="$(mktemp -p ${WORKDIR} -t rpminspect.yaml.XXXXXX)"
+sed -e "s|profiledir:.*$|profiledir: ${PROFILES}|g" < "${CONF}" > "${TMPCONF}"
+sed -i -e "s|vendor_data_dir:.*$|vendor_data_dir: $(dirname "${CONF}")|g" "${TMPCONF}"
+trap 'rm "${TMPCONF}"' EXIT
+
+if [ "$1" = "-VG" ]; then
+    shift
+    valgrind --leak-check=full --track-fds=all --track-origins=yes "${RPMINSPECT_BIN}" -w "${WORKDIR}" -c "${TMPCONF}" "$@"
+elif [ "$1" = "-MG" ]; then
+    shift
+    valgrind --tool=massif "${RPMINSPECT_BIN}" -w "${WORKDIR}" -c "${TMPCONF}" "$@"
+elif [ "$1" = "-CG" ]; then
+    shift
+    valgrind --tool=callgrind "${RPMINSPECT_BIN}" -w "${WORKDIR}" -c "${TMPCONF}" "$@"
+else
+    ${RPMINSPECT_BIN} -w "${WORKDIR}" -c "${TMPCONF}" "$@"
+fi
