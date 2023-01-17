@@ -7,7 +7,7 @@
 # careful of ordering of explicit files and packages and then wildcard
 # rules.
 #
-# Each rule consists of four fields separated by spaces or tabs (any
+# Each rule consists of five fields separated by spaces or tabs (any
 # number):
 #
 #     path           The file or path, can use glob(7) syntax
