@@ -230,6 +230,9 @@ curl_off_t curl_get_size(const char *src)
     curl_off_t r = 0;
     CURL *c = NULL;
     CURLcode cc;
+#ifndef _HAVE_NEWER_CURLINFO
+    double len = 0;
+#endif
 
     assert(src != NULL);
 
@@ -253,7 +256,12 @@ curl_off_t curl_get_size(const char *src)
         return 0;
     }
 
+#ifdef _HAVE_NEWER_CURLINFO
     curl_easy_getinfo(c, CURLINFO_CONTENT_LENGTH_DOWNLOAD_T, &r);
+#else
+    curl_easy_getinfo(c, CURLINFO_CONTENT_LENGTH_DOWNLOAD, &len);
+    r = (curl_off_t) len;
+#endif
     curl_easy_cleanup(c);
 
     return r;
