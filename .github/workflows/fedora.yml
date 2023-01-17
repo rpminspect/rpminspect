@@ -76,8 +76,7 @@ jobs:
                   meson setup build --werror -Db_buildtype=debug -Db_coverage=true
                   ninja -C build -v
                   meson test -C build -v
-                  ninja -C build coverage
-                  curl -s https://codecov.io/bash | bash
+                  ninja -C build coverage && ( curl -s https://codecov.io/bash | bash ) || :
 
     # Fedora on i386
     i386:
@@ -114,5 +113,4 @@ jobs:
                   env CFLAGS="-m32" LDFLAGS="-m32" PKG_CONFIG_PATH=/usr/lib/pkgconfig meson setup build --werror -Db_buildtype=debug -Db_coverage=true
                   ninja -C build -v
                   meson test -C build -v
-                  ninja -C build coverage
-                  curl -s https://codecov.io/bash | bash
+                  ninja -C build coverage && ( curl -s https://codecov.io/bash | bash ) || :
