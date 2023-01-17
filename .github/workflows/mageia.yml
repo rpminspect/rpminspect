@@ -59,5 +59,4 @@ jobs:
                   meson setup build --werror -D b_buildtype=debug -D b_coverage=true
                   ninja -C build -v
                   env LANG=en_US.UTF-8 meson test -C build -v
-                  ninja -C build coverage
-                  curl -s https://codecov.io/bash | bash
+                  ninja -C build coverage && ( curl -s https://codecov.io/bash | bash ) || :
