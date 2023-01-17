@@ -67,6 +67,24 @@ clamav = dependency('libclamav', required : true)
 icu_uc = dependency('icu-uc', required : true)
 icu_io = dependency('icu-io', required : true)
 
+# Check for newer CURLcode in libcurl
+curlinfo_src = '''
+    #include <curl/curl.h>
+    int main(void)
+    {
+        CURLcode info = CURLINFO_CONTENT_LENGTH_DOWNLOAD_T;
+        return 0;
+    }
+    '''
+have_newer_curlinfo = cc.compiles(curlinfo_src,
+                                  args: [ '-Werror' ],
+                                  dependencies: [ libcurl ],
+                                  name: 'CURLINFO_CONTENT_LENGTH_DOWNLOAD_T availability test')
+
+if have_newer_curlinfo
+    add_project_arguments('-D_HAVE_NEWER_CURLINFO', language : 'c')
+endif
+
 # libkmod
 if get_option('with_libkmod')
     libkmod = dependency('libkmod', required : true)
