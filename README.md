@@ -45,6 +45,7 @@ following environments:
 | [Mageia Linux](https://www.mageia.org/) | stable | :heavy_check_mark: | :heavy_check_mark: | [![Mageia Linux](https://github.com/rpminspect/rpminspect/actions/workflows/mageia.yml/badge.svg)](https://github.com/rpminspect/rpminspect/actions/workflows/mageia.yml) | | | | |
 | [Alt Linux](https://en.altlinux.org/Main_Page) | stable | :heavy_check_mark: | :heavy_check_mark: | [![Alt Linux](https://github.com/rpminspect/rpminspect/actions/workflows/altlinux.yml/badge.svg)](https://github.com/rpminspect/rpminspect/actions/workflows/altlinux.yml) | | | | |
 | [Oracle Linux](https://www.oracle.com/linux/) | 8 | :heavy_check_mark: | :heavy_check_mark: | [![Oracle Linux](https://github.com/rpminspect/rpminspect/actions/workflows/oraclelinux.yml/badge.svg)](https://github.com/rpminspect/rpminspect/actions/workflows/oraclelinux.yml) | | | | |
+| [FreeBSD](https://www.freebsd.org/) | latest 13.x | :heavy_check_mark: | :heavy_check_mark: | [![FreeBSD](https://github.com/rpminspect/rpminspect/actions/workflows/freebsd.yml/badge.svg)](https://github.com/rpminspect/rpminspect/actions/workflows/freebsd.yml) | | | | |
 
 
 Documentation
