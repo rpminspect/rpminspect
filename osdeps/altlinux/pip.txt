@@ -1,4 +1,0 @@
-cpp-coveralls
-gcovr
-rpmfluff
-timeout-decorator

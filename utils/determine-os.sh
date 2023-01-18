@@ -60,15 +60,6 @@ elif [ -r /etc/rocky-release ] && [ "${ID}" = "rocky" ]; then
     fi
 elif [ ${IS_CRUX} -eq 0 ] && [ -f /etc/pkgadd.conf ] && [ -f /etc/pkgmk.conf ]; then
     echo "crux"
-elif [ -r /etc/altlinux-release ] && [ "${ID}" = "altlinux" ]; then
-    case "${VERSION_ID}" in
-        p9|p10)
-            echo "${ID}"
-            ;;
-        *)
-            echo "unknown OS: ${ID}:${VERSION_ID}" >&2
-            ;;
-    esac
 elif [ -r /etc/oracle-release ] && [ "${ID}" = "ol" ]; then
     v="$(echo "${VERSION_ID}" | cut -d '.' -f 1)"
     if [ "${v}" = "8" ]; then

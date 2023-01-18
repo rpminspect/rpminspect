@@ -23,14 +23,6 @@ have_elfdeps = False
 if os.path.isfile(elfdeps) and os.access(elfdeps, os.X_OK):
     have_elfdeps = True
 
-# need to know if we are on ALT Linux or not because rpmbuild
-# on that platform prohibits unexpanded macros, so we can skip
-# those test cases
-on_alt_linux = False
-
-if os.path.isfile("/etc/altlinux-release") or os.path.isfile("/etc/alt-release"):
-    on_alt_linux = True
-
 # determine if the Enhances tag type is present in librpm
 # version must be >= 4.12.0
 rpmver = list(map(lambda x: int(x), rpm.__version__.strip().split("-")[0].split(".")))
@@ -38,7 +30,7 @@ rpm_major = rpmver[0]
 rpm_minor = rpmver[1]
 rpm_update = rpmver[2]
 
-if (rpm_major < 4 or (rpm_major == 4 and rpm_minor < 12)) or on_alt_linux:
+if rpm_major < 4 or (rpm_major == 4 and rpm_minor < 12):
     have_enhances = False
 else:
     have_enhances = True
@@ -653,7 +645,6 @@ class MissingEpochEnhancesRebaseCompareKoji(TestCompareKoji):
 # Unexpanded macro in Enhances (BAD)
 class UnexpandedMacroEnhancesSRPM(TestSRPM):
     @unittest.skipUnless(have_enhances, "librpm too old to support Enhances")
-    @unittest.skipIf(on_alt_linux, "ALT Linux rpmbuild prohibits unexpanded macros")
     def setUp(self):
         super().setUp()
 
@@ -666,7 +657,6 @@ class UnexpandedMacroEnhancesSRPM(TestSRPM):
 
 class UnexpandedMacroEnhancesRPMs(TestRPMs):
     @unittest.skipUnless(have_enhances, "librpm too old to support Enhances")
-    @unittest.skipIf(on_alt_linux, "ALT Linux rpmbuild prohibits unexpanded macros")
     def setUp(self):
         super().setUp()
 
@@ -679,7 +669,6 @@ class UnexpandedMacroEnhancesRPMs(TestRPMs):
 
 class UnexpandedMacroEnhancesKoji(TestKoji):
     @unittest.skipUnless(have_enhances, "librpm too old to support Enhances")
-    @unittest.skipIf(on_alt_linux, "ALT Linux rpmbuild prohibits unexpanded macros")
     def setUp(self):
         super().setUp()
 
@@ -692,7 +681,6 @@ class UnexpandedMacroEnhancesKoji(TestKoji):
 
 class UnexpandedMacroEnhancesCompareSRPM(TestCompareSRPM):
     @unittest.skipUnless(have_enhances, "librpm too old to support Enhances")
-    @unittest.skipIf(on_alt_linux, "ALT Linux rpmbuild prohibits unexpanded macros")
     def setUp(self):
         super().setUp()
 
@@ -706,7 +694,6 @@ class UnexpandedMacroEnhancesCompareSRPM(TestCompareSRPM):
 
 class UnexpandedMacroEnhancesCompareRPMs(TestCompareRPMs):
     @unittest.skipUnless(have_enhances, "librpm too old to support Enhances")
-    @unittest.skipIf(on_alt_linux, "ALT Linux rpmbuild prohibits unexpanded macros")
     def setUp(self):
         super().setUp()
 
@@ -720,7 +707,6 @@ class UnexpandedMacroEnhancesCompareRPMs(TestCompareRPMs):
 
 class UnexpandedMacroEnhancesCompareKoji(TestCompareKoji):
     @unittest.skipUnless(have_enhances, "librpm too old to support Enhances")
-    @unittest.skipIf(on_alt_linux, "ALT Linux rpmbuild prohibits unexpanded macros")
     def setUp(self):
         super().setUp()
 

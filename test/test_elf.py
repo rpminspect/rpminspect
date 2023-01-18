@@ -40,7 +40,6 @@ if (
     proc.returncode == 0
     and str(out).find("@m32") != -1
     and os.path.isfile("/usr/include/gnu/stubs-32.h")
-    and not os.path.isfile("/etc/altlinux-release")
 ):
     have_gcc_multilib = True
 

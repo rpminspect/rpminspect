@@ -22,14 +22,6 @@ have_elfdeps = False
 if os.path.isfile(elfdeps) and os.access(elfdeps, os.X_OK):
     have_elfdeps = True
 
-# need to know if we are on ALT Linux or not because rpmbuild
-# on that platform prohibits unexpanded macros, so we can skip
-# those test cases
-on_alt_linux = False
-
-if os.path.isfile("/etc/altlinux-release") or os.path.isfile("/etc/alt-release"):
-    on_alt_linux = True
-
 before_requires = "important-package >= 2.0.2-47"
 after_requires = "important-package >= 4.7.0-1"
 unexpanded_requires = "important-package >= 4.7.1-1%{_macro}"
@@ -481,12 +473,8 @@ class MissingEpochRequiresKoji(TestKoji):
         sub.add_requires("%s = %s-%s" % (AFTER_NAME, AFTER_VER, AFTER_REL))
 
         self.inspection = "rpmdeps"
-
-        if on_alt_linux:
-            self.result = "OK"
-        else:
-            self.result = "BAD"
-            self.waiver_auth = "Anyone"
+        self.result = "BAD"
+        self.waiver_auth = "Anyone"
 
 
 class MissingEpochRequiresCompareSRPM(TestCompareSRPM):
@@ -597,12 +585,8 @@ class MissingEpochRequiresCompareKoji(TestCompareKoji):
         after_sub.add_requires("%s = %s-%s" % (AFTER_NAME, AFTER_VER, AFTER_REL))
 
         self.inspection = "rpmdeps"
-
-        if on_alt_linux:
-            self.result = "OK"
-        else:
-            self.result = "BAD"
-            self.waiver_auth = "Anyone"
+        self.result = "BAD"
+        self.waiver_auth = "Anyone"
 
 
 # Missing Epoch prefix on rebase compare (INFO)
@@ -719,7 +703,6 @@ class MissingEpochRequiresRebaseCompareKoji(TestCompareKoji):
 
 # Unexpanded macro in Requires (BAD)
 class UnexpandedMacroRequiresSRPM(TestSRPM):
-    @unittest.skipIf(on_alt_linux, "ALT Linux rpmbuild prohibits unexpanded macros")
     def setUp(self):
         super().setUp()
 
@@ -731,7 +714,6 @@ class UnexpandedMacroRequiresSRPM(TestSRPM):
 
 
 class UnexpandedMacroRequiresRPMs(TestRPMs):
-    @unittest.skipIf(on_alt_linux, "ALT Linux rpmbuild prohibits unexpanded macros")
     def setUp(self):
         super().setUp()
 
@@ -743,7 +725,6 @@ class UnexpandedMacroRequiresRPMs(TestRPMs):
 
 
 class UnexpandedMacroRequiresKoji(TestKoji):
-    @unittest.skipIf(on_alt_linux, "ALT Linux rpmbuild prohibits unexpanded macros")
     def setUp(self):
         super().setUp()
 
@@ -755,7 +736,6 @@ class UnexpandedMacroRequiresKoji(TestKoji):
 
 
 class UnexpandedMacroRequiresCompareSRPM(TestCompareSRPM):
-    @unittest.skipIf(on_alt_linux, "ALT Linux rpmbuild prohibits unexpanded macros")
     def setUp(self):
         super().setUp()
 
@@ -768,7 +748,6 @@ class UnexpandedMacroRequiresCompareSRPM(TestCompareSRPM):
 
 
 class UnexpandedMacroRequiresCompareRPMs(TestCompareRPMs):
-    @unittest.skipIf(on_alt_linux, "ALT Linux rpmbuild prohibits unexpanded macros")
     def setUp(self):
         super().setUp()
 
@@ -781,7 +760,6 @@ class UnexpandedMacroRequiresCompareRPMs(TestCompareRPMs):
 
 
 class UnexpandedMacroRequiresCompareKoji(TestCompareKoji):
-    @unittest.skipIf(on_alt_linux, "ALT Linux rpmbuild prohibits unexpanded macros")
     def setUp(self):
         super().setUp()
 
