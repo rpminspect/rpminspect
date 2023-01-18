@@ -9,7 +9,7 @@ sed -i -e '/^%vendor/d' /usr/lib/rpm/macros.d/*
 # header files, which we need to build rpminspect
 curl -O http://mandoc.bsd.lv/snapshots/mandoc.tar.gz
 SUBDIR="$(tar -tvf mandoc.tar.gz | head -n 1 | rev | cut -d ' ' -f 1 | rev)"
-tar -xvf mandoc.tar.gz
+tar -xf mandoc.tar.gz
 { echo 'PREFIX=/usr/local';
   echo 'BINDIR=/usr/local/bin';
   echo 'SBINDIR=/usr/local/sbin';
@@ -30,7 +30,7 @@ tar -xvf mandoc.tar.gz
 rm -rf mandoc.tar.gz "${SUBDIR}"
 
 # The 'rc' shell is not available in OpenSUSE Leap, build manually
-git clone https://github.com/rakitzis/rc.git
+git clone -q https://github.com/rakitzis/rc.git
 cd rc || exit 1
 autoreconf -f -i -v
 ./configure --prefix=/usr/local
