@@ -1,7 +1,7 @@
 #!/bin/sh
-PATH=/usr/local/bin:/bin:/usr/bin:/usr/local/sbin:/sbin:/usr/sbin
+PATH=/usr/local/bin:/usr/bin
 
-if [ "$(uname -a)" = "x86_64" ]; then
+if [ "$(uname -m)" = "x86_64" ]; then
     dpkg --add-architecture i386
     apt-get -y install lib32gcc-s1
 fi

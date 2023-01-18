@@ -1,5 +1,5 @@
 #!/bin/sh
-PATH=/bin:/usr/bin:/sbin:/usr/sbin
+PATH=/usr/local/bin:/usr/bin:/bin:/usr/local/sbin:/usr/sbin:/sbin
 
 # Install 32-bit development files on 64-bit systems when available
 case "$(uname -m)" in
@@ -11,14 +11,11 @@ case "$(uname -m)" in
         ;;
 esac
 
-# Install kernel headers for the running kernel
-apt-get -y install linux-headers-"$(uname -r)"
-
 # The mandoc package on Debian lacks libmandoc.a and
 # header files, which we need to build rpminspect
 curl -O http://mandoc.bsd.lv/snapshots/mandoc.tar.gz
 SUBDIR="$(tar -tvf mandoc.tar.gz | head -n 1 | rev | cut -d ' ' -f 1 | rev)"
-tar -xvf mandoc.tar.gz
+tar -xf mandoc.tar.gz
 { echo 'PREFIX=/usr/local';
   echo 'BINDIR=/usr/local/bin';
   echo 'SBINDIR=/usr/local/sbin';
@@ -43,5 +40,5 @@ sed -i -e 's|@echo|@/bin/echo|g' "${SUBDIR}"/configure
 rm -rf mandoc.tar.gz "${SUBDIR}"
 
 # Update clamav database
-systemctl stop clamav-freshclam.service
+service clamav-freshclam stop
 freshclam
