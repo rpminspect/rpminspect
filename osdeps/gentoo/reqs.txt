@@ -10,6 +10,7 @@ dev-libs/libyaml
 dev-libs/xmlrpc-c
 dev-python/pip
 dev-util/cunit
+dev-util/debugedit
 dev-util/desktop-file-utils
 dev-util/gcovr
 dev-util/libabigail

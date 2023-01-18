@@ -6,7 +6,7 @@ CWD="$(pwd)"
 # install the library.
 curl -O http://mandoc.bsd.lv/snapshots/mandoc.tar.gz
 SUBDIR="$(tar -tvf mandoc.tar.gz | head -n 1 | rev | cut -d ' ' -f 1 | rev)"
-tar -xvf mandoc.tar.gz
+tar -xf mandoc.tar.gz
 { echo 'PREFIX=/usr/local';
   echo 'BINDIR=/usr/local/bin';
   echo 'SBINDIR=/usr/local/sbin';
@@ -32,7 +32,7 @@ rm -rf mandoc.tar.gz "${SUBDIR}"
 
 # The 'rc' shell in Gentoo Linux is not the rc shell rpminspect
 # expects, so just build it manually.
-git clone https://github.com/rakitzis/rc.git
+git clone -q https://github.com/rakitzis/rc.git
 cd rc || exit 1
 autoreconf -f -i -v
 ./configure --prefix=/usr/local
@@ -48,10 +48,6 @@ pip3 install --user --upgrade pip setuptools
       ln -sf "$(realpath "${f}")" /usr/local/bin/"${f}"
   done
 )
-
-# Make sure the Linux source tree is usable for building modules
-make -C /usr/src/linux olddefconfig
-make -C /usr/src/linux prepare
 
 # Update the clamav database
 freshclam
