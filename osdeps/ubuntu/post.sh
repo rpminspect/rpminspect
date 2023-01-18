@@ -1,14 +1,11 @@
 #!/bin/sh
-PATH=/bin:/usr/bin:/sbin:/usr/sbin
-
-# Install kernel headers for the running kernel
-apt-get -y install linux-headers-"$(uname -r)"
+PATH=/usr/bin
 
 # The mandoc package on Ubuntu lacks libmandoc.a and
 # header files, which we need to build rpminspect
 curl -O http://mandoc.bsd.lv/snapshots/mandoc.tar.gz
 SUBDIR="$(tar -tvf mandoc.tar.gz | head -n 1 | rev | cut -d ' ' -f 1 | rev)"
-tar -xvf mandoc.tar.gz
+tar -xf mandoc.tar.gz
 { echo 'PREFIX=/usr/local';
   echo 'BINDIR=/usr/local/bin';
   echo 'SBINDIR=/usr/local/sbin';
@@ -29,5 +26,5 @@ tar -xvf mandoc.tar.gz
 rm -rf mandoc.tar.gz "${SUBDIR}"
 
 # Update the clamav database
-systemctl stop clamav-freshclam.service
+service clamav-freshclam stop
 freshclam

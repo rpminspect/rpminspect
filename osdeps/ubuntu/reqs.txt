@@ -2,6 +2,7 @@ abigail-tools
 cargo
 clamav
 desktop-file-utils
+elfutils
 gcc
 gcc-multilib
 gcovr
