@@ -1,5 +1,5 @@
 #!/bin/sh
-PATH=/bin:/usr/bin:/sbin:/usr/sbin
+PATH=/usr/bin
 
 if [ "$(uname -m)" = "x86_64" ]; then
     dpkg --add-architecture i386
