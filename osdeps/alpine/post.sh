@@ -5,7 +5,7 @@ CWD="$(pwd)"
 # The mandoc package in Alpine Linux lacks the library
 curl -O https://mandoc.bsd.lv/snapshots/mandoc.tar.gz
 SUBDIR="$(tar -tvf mandoc.tar.gz | head -n 1 | rev | cut -d ' ' -f 1 | rev)"
-tar -xvf mandoc.tar.gz
+tar -xf mandoc.tar.gz
 { echo 'PREFIX=/usr/local';
   echo 'BINDIR=/usr/local/bin';
   echo 'SBINDIR=/usr/local/sbin';
@@ -32,7 +32,7 @@ sed -i -e 's|^int dummy;$|extern int dummy;|g' "${SUBDIR}"/compat_err.c
 rm -rf mandoc.tar.gz "${SUBDIR}"
 
 # The 'rc' shell is not available in Arch Linux, build manually
-git clone https://github.com/rakitzis/rc.git
+git clone -q https://github.com/rakitzis/rc.git
 cd rc || exit 1
 autoreconf -f -i -v
 ./configure --prefix=/usr/local
@@ -47,7 +47,7 @@ ln -s mksh /bin/ksh
 
 # Install libabigail from git
 cd "${CWD}" || exit 1
-git clone git://sourceware.org/git/libabigail.git
+git clone -q git://sourceware.org/git/libabigail.git
 cd libabigail || exit 1
 TAG="$(git tag -l | grep ^libabigail- | grep -v '\.rc' | sort -n | tail -n 1)"
 git checkout -b "${TAG}" "${TAG}"
@@ -61,7 +61,7 @@ make install
 
 # Install debugedit (/usr/bin/find-debuginfo) from git
 cd "${CWD}" || exit 1
-git clone git://sourceware.org/git/debugedit.git
+git clone -q git://sourceware.org/git/debugedit.git
 cd debugedit || exit 1
 TAG="$(git tag -l | grep ^debugedit- | sort -n | tail -n 1)"
 git checkout -b "${TAG}" "${TAG}"
