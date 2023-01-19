@@ -5,7 +5,6 @@ clamav-devel
 clamav-update
 CUnit
 CUnit-devel
-dash
 desktop-file-utils
 elfutils-devel
 file-devel
@@ -37,7 +36,6 @@ python3-devel
 python3-pip
 python3-pyyaml
 python3-rpm
-python3-timeout-decorator
 rc
 rpm-build
 rpm-devel

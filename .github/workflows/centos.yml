@@ -26,12 +26,10 @@ jobs:
         runs-on: ubuntu-latest
 
         # Set up the matrix of distributions to test
-        #
-        # Once EPEL-9 is filled out more, add c9s to the mix:
-        #     "quay.io/centos/centos:stream9"
         strategy:
             matrix:
-                container: ["quay.io/centos/centos:stream8",
+                container: ["quay.io/centos/centos:stream9",
+                            "quay.io/centos/centos:stream8",
                             "quay.io/centos/centos:centos7"]
 
         # CentOS images come from quay.io now
@@ -51,10 +49,12 @@ jobs:
                       *stream9)
                           dnf install -y 'dnf-command(config-manager)'
                           dnf config-manager --set-enabled crb
-                          dnf install https://dl.fedoraproject.org/pub/epel/epel-release-latest-9.noarch.rpm \
-                                      https://dl.fedoraproject.org/pub/epel/epel-next-release-latest-9.noarch.rpm
+                          dnf install -y epel-release
                           ;;
-                      *)
+                      *stream8)
+                          dnf install -y epel-release
+                          ;;
+                      *centos7)
                           yum install -y epel-release
                           ;;
                   esac
@@ -63,7 +63,15 @@ jobs:
                       rpm --import /etc/pki/rpm-gpg/*
                   fi
 
-                  yum install -y git
+                  case "${{ matrix.container }}" in
+                      *stream8|*stream9)
+                          dnf install -y git
+                          ;;
+                      *centos7)
+                          yum install -y git
+                          ;;
+                  esac
+
                   git config --global --add safe.directory /__w/rpminspect/rpminspect
 
             # This means clone the git repo
@@ -74,13 +82,24 @@ jobs:
             - name: Build and run the test suite
               run: |
                   # Install make(1) so we can use the instreqs target
-                  yum install -y make
+                  case "${{ matrix.container }}" in
+                      *stream8|*stream9)
+                          dnf install -y make
+                          ;;
+                      *centos7)
+                          yum install -y make
+                          ;;
+                  esac
 
                   # Install build dependencies and set up the target
                   make instreqs
 
-                  # Build the software and run the test suite
+                  # Set things up to build
                   case "${{ matrix.container }}" in
+                      *stream8|*stream9)
+                          meson setup build --werror -D b_buildtype=debug -D b_coverage=true
+                          ;;
+
                       *centos7)
                           # Make sure /usr/local is in the PATH
                           export PATH=${PATH}:/usr/local/bin
@@ -89,14 +108,10 @@ jobs:
                           PYTHON_PROG="$(cd /usr/local/bin ; ls -1 python*.* | grep -v config)"
 
                           meson setup build --werror -D python_program="${PYTHON_PROG}" -D b_buildtype=debug -D b_coverage=true
-                          ninja -C build -v
-                          env LANG=en_US.UTF-8 meson test -C build -v
-                          ninja -C build coverage && ( curl -s https://codecov.io/bash | bash ) || :
-                          ;;
-                      *)
-                          meson setup build --werror -D b_buildtype=debug -D b_coverage=true
-                          ninja -C build -v
-                          env LANG=en_US.UTF-8 meson test -C build -v
-                          ninja -C build coverage && ( curl -s https://codecov.io/bash | bash ) || :
                           ;;
                   esac
+
+                  # Build and run the test suite
+                  ninja -C build -v
+                  env LANG=en_US.UTF-8 meson test -C build -v
+                  ninja -C build coverage && ( curl -s https://codecov.io/bash | bash ) || :
