@@ -16,7 +16,6 @@ git
 glibc-devel
 html401-dtds
 json-c-devel
-kernel-core
 kernel-devel
 kmod-devel
 ksh
@@ -33,6 +32,7 @@ make
 meson
 ninja-build
 openssl-devel
+openssl11-devel
 patchelf
 rc
 rpm-build
