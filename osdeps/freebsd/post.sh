@@ -10,7 +10,7 @@ PKG_PREFIX="py$(python3 --version | cut -d ' ' -f 2 | cut -d '.' -f 1,2 | sed -e
 pkg install -y ${PKG_PREFIX}-pip ${PKG_PREFIX}-pyaml ${PKG_PREFIX}-timeout-decorator
 
 # Now install modules with pip
-pip install cpp-coveralls gcovr rpmfluff
+env CRYPTOGRAPHY_DONT_BUILD_RUST=1 pip install cpp-coveralls gcovr rpmfluff
 
 # libmandoc is missing on FreeBSD
 curl -O https://mandoc.bsd.lv/snapshots/mandoc.tar.gz
