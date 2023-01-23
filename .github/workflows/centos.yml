@@ -49,26 +49,13 @@ jobs:
                       *stream9)
                           dnf install -y 'dnf-command(config-manager)'
                           dnf config-manager --set-enabled crb
-                          dnf install -y epel-release
+                          dnf install -y epel-release git
                           ;;
                       *stream8)
-                          dnf install -y epel-release
+                          dnf install -y epel-release git
                           ;;
                       *centos7)
-                          yum install -y epel-release
-                          ;;
-                  esac
-
-                  if [ -d /etc/pki/rpm-gpg ]; then
-                      rpm --import /etc/pki/rpm-gpg/*
-                  fi
-
-                  case "${{ matrix.container }}" in
-                      *stream8|*stream9)
-                          dnf install -y git
-                          ;;
-                      *centos7)
-                          yum install -y git
+                          yum install -y epel-release git
                           ;;
                   esac
 
