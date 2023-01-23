@@ -16,7 +16,7 @@ static bool permissions_driver(struct rpminspect *ri, rpmfile_entry_t *file)
 {
     bool result = true;
     const char *arch = NULL;
-    const char *what = _("changed");
+    char *change = NULL;
     mode_t before_mode;
     mode_t after_mode;
     mode_t mode_diff;
@@ -63,22 +63,56 @@ static bool permissions_driver(struct rpminspect *ri, rpmfile_entry_t *file)
 
     /* if setuid/setgid or new mode is more open */
     if (mode_diff && file->peer_file && !allowed && (ri->tests & INSPECT_PERMISSIONS)) {
+        params.msg = strdup(file->localpath);
+        assert(params.msg != NULL);
+
         if (!(before_mode & (S_ISUID|S_ISGID)) && (after_mode & (S_ISUID|S_ISGID))) {
             params.severity = RESULT_VERIFY;
-            what = _("changed setuid/setgid");
-        } else if (S_ISDIR(file->st.st_mode) && !S_ISLNK(file->st.st_mode)) {
+            params.msg = strappend(params.msg, _(" changed setuid/setgid;"));
+            assert(params.msg != NULL);
+        }
+
+        if (S_ISDIR(file->st.st_mode) && !S_ISDIR(file->peer_file->st.st_mode)) {
+            params.msg = strappend(params.msg, _(" became a directory;"), NULL);
+        } else if (S_ISCHR(file->st.st_mode) && !S_ISCHR(file->peer_file->st.st_mode)) {
+            params.msg = strappend(params.msg, _(" became a character device;"), NULL);
+        } else if (S_ISBLK(file->st.st_mode) && !S_ISBLK(file->peer_file->st.st_mode)) {
+            params.msg = strappend(params.msg, _(" became a block device;"), NULL);
+        } else if (S_ISREG(file->st.st_mode) && !S_ISREG(file->peer_file->st.st_mode)) {
+            params.msg = strappend(params.msg, _(" became a regular file;"), NULL);
+        } else if (S_ISFIFO(file->st.st_mode) && !S_ISFIFO(file->peer_file->st.st_mode)) {
+            params.msg = strappend(params.msg, _(" became a FIFO;"), NULL);
+        } else if (S_ISLNK(file->st.st_mode) && !S_ISLNK(file->peer_file->st.st_mode)) {
+            params.msg = strappend(params.msg, _(" became a symbolic link;"), NULL);
+        } else if (S_ISSOCK(file->st.st_mode) && !S_ISSOCK(file->peer_file->st.st_mode)) {
+            params.msg = strappend(params.msg, _(" became a socket;"), NULL);
+        }
+
+        assert(params.msg != NULL);
+        params.msg = strappend(params.msg, _(" permissions"), NULL);
+        assert(params.msg != NULL);
+
+        if (S_ISDIR(file->st.st_mode) && !S_ISLNK(file->st.st_mode)) {
             if (((mode_diff & S_ISVTX) && !(after_mode & S_ISVTX)) || ((after_mode & mode_diff) != 0)) {
                 params.severity = RESULT_VERIFY;
-                what = _("relaxed");
+                params.msg = strappend(params.msg, _(" relaxed"), NULL);
             }
+        } else {
+            params.msg = strappend(params.msg, _(" changed"), NULL);
         }
+
+        assert(params.msg != NULL);
 
         if (params.severity >= RESULT_VERIFY) {
             params.waiverauth = WAIVABLE_BY_ANYONE;
             result = false;
         }
 
-        xasprintf(&params.msg, _("%s %s permissions from %04o to %04o on %s"), file->localpath, what, before_mode, after_mode, arch);
+        xasprintf(&change, _("%s from %04o to %04o on %s"), params.msg, before_mode, after_mode, arch);
+        assert(change != NULL);
+        free(params.msg);
+        params.msg = change;
+
         params.verb = VERB_CHANGED;
         xasprintf(&noun, _("${FILE} permissions from %04o to %04o on ${ARCH}"), before_mode, after_mode);
         params.noun = noun;
