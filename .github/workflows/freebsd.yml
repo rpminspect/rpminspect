@@ -48,8 +48,10 @@ jobs:
 
                   # Requirements before the git clone can happen
                   prepare: |
+                      pkg update
                       pkg install -y git
                       git config --global --add safe.directory /__w/rpminspect/rpminspect
+
                   # Run the build and test
                   run: |
                       # Install GNU make(1) so we can use the instreqs target
