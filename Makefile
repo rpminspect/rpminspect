@@ -83,7 +83,7 @@ black:
 	python3 -m black --check --diff $(topdir)/test/ $(topdir)/doc/
 
 shellcheck:
-	find . -type f -name "*.sh" -exec shellcheck --severity=warning {} \;
+	find . -type f \( -iname "*.sh" ! -iname "find-debuginfo.sh" \) -exec shellcheck --severity=warning {} \;
 
 gate: all
 	$(topdir)/utils/gate.sh $(topdir)/build/src/rpminspect

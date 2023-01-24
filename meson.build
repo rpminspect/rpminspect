@@ -87,14 +87,19 @@ endif
 
 # libkmod
 if get_option('with_libkmod')
-    libkmod = dependency('libkmod', required : true)
-    add_project_arguments('-D_WITH_LIBKMOD', language : 'c')
+    if build_machine.system() == 'freebsd'
+        message('libkmod is not supported on FreeBSD, disabling support')
+        libkmod = disabler()
+    else
+        libkmod = dependency('libkmod', required : true)
+        add_project_arguments('-D_WITH_LIBKMOD', language : 'c')
 
-    if not cc.has_header('libkmod.h')
-        if cc.has_header('kmod/libkmod.h')
-            add_project_arguments('-D_LIBKMOD_HEADER_SUBDIR', language : 'c')
-        else
-            error('*** unable to find libkmod.h')
+        if not cc.has_header('libkmod.h')
+            if cc.has_header('kmod/libkmod.h')
+                add_project_arguments('-D_LIBKMOD_HEADER_SUBDIR', language : 'c')
+            else
+                error('*** unable to find libkmod.h')
+            endif
         endif
     endif
 else
@@ -258,17 +263,22 @@ magic = declare_dependency(link_args : ['-lmagic'])
 
 # libcap
 if get_option('with_libcap')
-    libcap = dependency('libcap', method : 'pkg-config', required : false)
+    if build_machine.system() == 'freebsd'
+        message('libcap is not supported on FreeBSD, disabling support')
+        libcap = disabler()
+    else
+        libcap = dependency('libcap', method : 'pkg-config', required : false)
 
-    if not libcap.found() and cc.has_function('cap_to_text', args : ['-lcap'])
-        libcap = declare_dependency(link_args : ['-lcap'])
+        if not libcap.found() and cc.has_function('cap_to_text', args : ['-lcap'])
+            libcap = declare_dependency(link_args : ['-lcap'])
+        endif
+
+        if not libcap.found()
+            error('*** unable to find libcap')
+        endif
+
+        add_project_arguments('-D_WITH_LIBCAP', language : 'c')
     endif
-
-    if not libcap.found()
-        error('*** unable to find libcap')
-    endif
-
-    add_project_arguments('-D_WITH_LIBCAP', language : 'c')
 else
     message('disabling Linux capability(7) support (libcap)')
     libcap = disabler()
@@ -280,14 +290,22 @@ if get_option('with_annocheck') and get_option('with_libannocheck')
 endif
 
 if get_option('with_annocheck')
-    add_project_arguments('-D_WITH_ANNOCHECK', language : 'c')
+    if build_machine.system() == 'freebsd'
+        message('disabling annocheck(1) support on FreeBSD')
+    else
+        add_project_arguments('-D_WITH_ANNOCHECK', language : 'c')
+    endif
 endif
 
 if get_option('with_libannocheck')
-    libannocheck = dependency('libannocheck', required : true)
-    add_project_arguments('-D_WITH_LIBANNOCHECK', language : 'c')
+    if build_machine.system() == 'freebsd'
+        message('libannocheck is not supported on FreeBSD, disabling support')
+    else
+        libannocheck = dependency('libannocheck', required : true)
+        add_project_arguments('-D_WITH_LIBANNOCHECK', language : 'c')
+    endif
 else
-    message('disable libannocheck support')
+    message('disabling libannocheck support')
 endif
 
 # dlopen

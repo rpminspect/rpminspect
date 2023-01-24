@@ -1,9 +1,12 @@
 autoconf
 automake
 bash
+ca_root_nss
 clamav
+coreutils
 cunit
 curl
+debugedit
 desktop-file-utils
 elfutils
 gcc
