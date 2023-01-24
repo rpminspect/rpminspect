@@ -1,5 +1,6 @@
 #!/bin/sh
 PATH=/bin:/usr/bin:/sbin:/usr/sbin:/usr/local/bin:/usr/local/sbin
+CWD="$(pwd)"
 
 # Hostname to make sure rpmbuild works (this is gross)
 echo "$(ifconfig | grep "inet " | grep -v "inet 127" | awk '{ print $2; }') $(hostname)" >> /etc/hosts
@@ -7,12 +8,13 @@ echo "$(ifconfig | grep "inet " | grep -v "inet 127" | awk '{ print $2; }') $(ho
 # Install Python modules from ports, but we have to determine the
 # package prefix based on the version of Python installed.
 PKG_PREFIX="py$(python3 --version | cut -d ' ' -f 2 | cut -d '.' -f 1,2 | sed -e 's|\.||g')"
-pkg install -y ${PKG_PREFIX}-pip ${PKG_PREFIX}-pyaml ${PKG_PREFIX}-timeout-decorator
+pkg install -y "${PKG_PREFIX}-pip" "${PKG_PREFIX}-pyaml" "${PKG_PREFIX}-timeout-decorator"
 
 # Now install modules with pip
-env CRYPTOGRAPHY_DONT_BUILD_RUST=1 pip install cpp-coveralls gcovr rpmfluff
+pip install cpp-coveralls gcovr rpmfluff
 
 # libmandoc is missing on FreeBSD
+cd "${CWD}" || exit 1
 curl -O https://mandoc.bsd.lv/snapshots/mandoc.tar.gz
 SUBDIR="$(tar -tvf mandoc.tar.gz | head -n 1 | rev | cut -d ' ' -f 1 | rev)"
 tar -xf mandoc.tar.gz
@@ -38,6 +40,10 @@ rm -rf mandoc.tar.gz "${SUBDIR}"
 
 # The ksh93 package does not install a 'ksh' executable, so create a symlink
 ln -sf ksh93 /usr/local/bin/ksh
+
+# Install a find-debuginfo that we can use with rpmbuild
+cp "${CWD}"/osdeps/freebsd/find-debuginfo.sh /usr/bin/find-debuginfo
+chmod 0755 /usr/bin/find-debuginfo
 
 # Update the clamav database
 freshclam

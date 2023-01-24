@@ -65,7 +65,7 @@ jobs:
                       echo $? > exitcodes/instreqs
 
                       # Build the software and run the test suite
-                      env CC=gcc CFLAGS=-I/usr/local/include LDFLAGS=-L/usr/local/lib meson setup build --werror -D b_buildtype=debug -D b_coverage=true -D with_libkmod=false -D with_libcap=false -D with_libannocheck=false
+                      env CC=gcc CFLAGS=-I/usr/local/include LDFLAGS=-L/usr/local/lib meson setup build --werror -D b_buildtype=debug -D b_coverage=true
                       echo $? > exitcodes/setup
                       ninja -C build -v
                       echo $? > exitcodes/build

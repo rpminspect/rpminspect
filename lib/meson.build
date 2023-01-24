@@ -133,21 +133,23 @@ if have_modularitylabel
     librpminspect_sources += [ 'inspect_modularity.c' ]
 endif
 
-if get_option('with_libkmod')
-    librpminspect_sources += [ 'inspect_kmod.c', 'kmods.c' ]
-    deps += [ libkmod ]
-endif
+if build_machine.system() != 'freebsd'
+    if get_option('with_libkmod')
+        librpminspect_sources += [ 'inspect_kmod.c', 'kmods.c' ]
+        deps += [ libkmod ]
+    endif
 
-if get_option('with_libcap')
-    librpminspect_sources += [ 'inspect_capabilities.c' ]
-    deps += [ libcap ]
-endif
+    if get_option('with_libcap')
+        librpminspect_sources += [ 'inspect_capabilities.c' ]
+        deps += [ libcap ]
+    endif
 
-if get_option('with_annocheck') or get_option('with_libannocheck')
-    librpminspect_sources += [ 'inspect_annocheck.c' ]
+    if get_option('with_annocheck') or get_option('with_libannocheck')
+        librpminspect_sources += [ 'inspect_annocheck.c' ]
 
-    if get_option('with_libannocheck')
-        deps += [ libannocheck ]
+        if get_option('with_libannocheck')
+            deps += [ libannocheck ]
+        endif
     endif
 endif
 
