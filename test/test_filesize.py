@@ -9,6 +9,8 @@ import rpmfluff
 
 from baseclass import TestCompareRPMs
 
+machine = platform.machine().replace("amd64", "x86_64")
+
 
 class FileSizeGrowsAtThreshold(TestCompareRPMs):
     """Assert when a file grows by exactly the configured threshold, VERIFY result occurs."""
@@ -27,7 +29,7 @@ class FileSizeGrowsAtThreshold(TestCompareRPMs):
         self.inspection = "filesize"
         self.result = "VERIFY"
         self.waiver_auth = "Anyone"
-        self.message = f"/some/file grew by 20% on {platform.machine()}"
+        self.message = f"/some/file grew by 20% on {machine}"
 
     def configFile(self):
         super().configFile()
@@ -61,7 +63,7 @@ class FileSizeGrowsAboveThreshold(TestCompareRPMs):
         self.inspection = "filesize"
         self.result = "VERIFY"
         self.waiver_auth = "Anyone"
-        self.message = f"/some/file grew by 100% on {platform.machine()}"
+        self.message = f"/some/file grew by 100% on {machine}"
 
     def configFile(self):
         super().configFile()
@@ -94,7 +96,7 @@ class FileSizeGrowsBelowThreshold(TestCompareRPMs):
         self.inspection = "filesize"
         self.result = "INFO"
         self.waiver_auth = "Not Waivable"
-        self.message = f"/some/file grew by 10% on {platform.machine()}"
+        self.message = f"/some/file grew by 10% on {machine}"
 
     def configFile(self):
         super().configFile()
@@ -127,7 +129,7 @@ class EmptyFileSizeGrows(TestCompareRPMs):
         self.inspection = "filesize"
         self.result = "VERIFY"
         self.waiver_auth = "Anyone"
-        self.message = f"/some/file became a non-empty file on {platform.machine()}"
+        self.message = f"/some/file became a non-empty file on {machine}"
 
     def configFile(self):
         super().configFile()
@@ -160,7 +162,7 @@ class FileSizeShrinksAtThreshold(TestCompareRPMs):
         self.inspection = "filesize"
         self.result = "VERIFY"
         self.waiver_auth = "Anyone"
-        self.message = f"/some/file shrank by 20% on {platform.machine()}"
+        self.message = f"/some/file shrank by 20% on {machine}"
 
     def configFile(self):
         super().configFile()
@@ -193,7 +195,7 @@ class FileSizeShrinksAboveThreshold(TestCompareRPMs):
         self.inspection = "filesize"
         self.result = "VERIFY"
         self.waiver_auth = "Anyone"
-        self.message = f"/some/file shrank by 80% on {platform.machine()}"
+        self.message = f"/some/file shrank by 80% on {machine}"
 
     def configFile(self):
         super().configFile()
@@ -226,7 +228,7 @@ class FileSizeShrinksBelowThreshold(TestCompareRPMs):
         self.inspection = "filesize"
         self.result = "INFO"
         self.waiver_auth = "Not Waivable"
-        self.message = f"/some/file shrank by 10% on {platform.machine()}"
+        self.message = f"/some/file shrank by 10% on {machine}"
 
     def configFile(self):
         super().configFile()
@@ -257,7 +259,7 @@ class FileSizeShrinksToEmpty(TestCompareRPMs):
         self.inspection = "filesize"
         self.result = "VERIFY"
         self.waiver_auth = "Anyone"
-        self.message = f"/some/file became an empty file on {platform.machine()}"
+        self.message = f"/some/file became an empty file on {machine}"
 
     def configFile(self):
         super().configFile()
