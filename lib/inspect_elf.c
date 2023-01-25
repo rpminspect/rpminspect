@@ -395,6 +395,7 @@ static bool inspect_elf_execstack(struct rpminspect *ri, Elf *after_elf, Elf *be
     char *fs = NULL;
     bool result = true;
     bool before_execstack = false;
+    bool after_execstack = false;
     struct result_params params;
 
     /* If there is no executable code, there is no executable stack */
@@ -405,6 +406,8 @@ static bool inspect_elf_execstack(struct rpminspect *ri, Elf *after_elf, Elf *be
     elf_type = get_elf_type(after_elf);
 
     /* If the peer file had an executable stack, turn down the result severity */
+    after_execstack = is_execstack_present(after_elf);
+
     if (before_elf) {
         before_execstack = is_stack_executable(before_elf, get_execstack_flags(before_elf));
     }
@@ -417,21 +420,22 @@ static bool inspect_elf_execstack(struct rpminspect *ri, Elf *after_elf, Elf *be
     params.file = file->localpath;
 
     /* Check if execstack information is present */
-    if (!is_execstack_present(after_elf)) {
+    if (!after_execstack) {
         params.severity = get_secrule_result_severity(ri, file, SECRULE_EXECSTACK);
+        params.msg = NULL;
 
         if (elf_type == ET_REL) {
             /* Missing .note.GNU-stack will result in an executable stack */
-            if (before_execstack) {
+            if (before_execstack && after_execstack) {
                 xasprintf(&params.msg, _("Object still has executable stack (no GNU-stack note): %s on %s"), file->localpath, arch);
-            } else {
+            } else if (after_execstack) {
                 xasprintf(&params.msg, _("Object has executable stack (no GNU-stack note): %s on %s"), file->localpath, arch);
             }
         } else {
             xasprintf(&params.msg, _("Program built without GNU_STACK: %s on %s"), file->localpath, arch);
         }
 
-        if (params.severity != RESULT_NULL && params.severity != RESULT_SKIP) {
+        if (params.msg != NULL && params.severity != RESULT_NULL && params.severity != RESULT_SKIP) {
             params.remedy = REMEDY_ELF_EXECSTACK_MISSING;
             params.verb = VERB_CHANGED;
             params.noun = _("GNU_STACK in ${FILE} on ${ARCH}");
@@ -445,7 +449,7 @@ static bool inspect_elf_execstack(struct rpminspect *ri, Elf *after_elf, Elf *be
     /* Check that the execstack flags make sense */
     execstack_flags = get_execstack_flags(after_elf);
 
-    if (!is_execstack_valid(after_elf, execstack_flags)) {
+    if (after_execstack && !is_execstack_valid(after_elf, execstack_flags)) {
         if (elf_type == ET_REL) {
             flaglist = calloc(1, sizeof(*flaglist));
             assert(flaglist != NULL);
@@ -510,7 +514,7 @@ static bool inspect_elf_execstack(struct rpminspect *ri, Elf *after_elf, Elf *be
     }
 
     /* Check that the stack is not marked as executable */
-    if (is_stack_executable(after_elf, execstack_flags)) {
+    if (after_execstack && is_stack_executable(after_elf, execstack_flags)) {
         params.severity = get_secrule_result_severity(ri, file, SECRULE_EXECSTACK);
 
         if (elf_type == ET_REL) {
@@ -839,21 +843,39 @@ static bool elf_driver(struct rpminspect *ri, rpmfile_entry_t *after)
     int before_elf_fd = -1;
     bool result = true;
 
+    name = headerGetString(after->rpm_header, RPMTAG_NAME);
+
     /* Skip source packages */
     if (headerIsSource(after->rpm_header)) {
         return true;
     }
 
+    /* Skip debuginfo packages and debugsource packages */
+    if (strsuffix(name, DEBUGINFO_SUFFIX) || strsuffix(name, DEBUGSOURCE_SUFFIX)) {
+        return true;
+    }
+
+    /* Skip anything that isn't a regular file */
     if (!after->fullpath || !S_ISREG(after->st.st_mode)) {
         return true;
     }
 
+    /* Process our ignore paths from the config file */
     if (!process_file_path(after, ri->elf_path_include, ri->elf_path_exclude)) {
         return true;
     }
 
+    /* Skip kernel modules */
+    after_elf = get_elf(after->fullpath, &after_elf_fd);
+
+    if (after_elf != NULL && get_elf_type(after_elf) == ET_REL && have_elf_section(after_elf, SHT_PROGBITS, ".modinfo")
+        && strsuffix(after->localpath, KERNEL_MODULE_FILENAME_EXTENSION)) {
+        close(after_elf_fd);
+        elf_end(after_elf);
+        return true;
+    }
+
     arch = get_rpm_header_arch(after->rpm_header);
-    name = headerGetString(after->rpm_header, RPMTAG_NAME);
 
     /* Is this an archive or a regular ELF file? */
     if ((after_elf = get_elf_archive(after->fullpath, &after_elf_fd)) != NULL) {
