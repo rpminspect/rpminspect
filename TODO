@@ -31,9 +31,6 @@ Other:
       download cache and then -k with -d (debug) specified, keep the
       builds but also the workdir files.
 
-    - Add a command line option to set the build type for local builds
-      (e.g., need a way to specify a local subdirectory is a regular
-      Koji build or a module).
 
 Test categories that have been migrated:
 ----------------------------------------
@@ -197,6 +194,162 @@ General functionality
 
 * Text mode reporting formatting.  Allow a user-specified column width
   and align output on columns.
+
+  * Add a new output format that looks like rpmdiff from rpmlint.
+    Specifically something like this:
+
+    $ rpmdiff ./auditwheel-4.0.0-1.fc36.noarch.rpm ./auditwheel-5.0.0-1.fc36.noarch.rpm
+    removed     REQUIRES python3.10dist(setuptools)
+    removed     PROVIDES auditwheel = 4.0.0-1.fc36
+    removed     PROVIDES python3.10dist(auditwheel) = 4
+    removed     PROVIDES python3dist(auditwheel) = 4
+    added       PROVIDES auditwheel = 5.0.0-1.fc36
+    added       PROVIDES python3.10dist(auditwheel) = 5
+    added       PROVIDES python3dist(auditwheel) = 5
+    ..........T /usr/bin/auditwheel
+    ..........T /usr/lib/python3.10/site-packages/auditwheel
+    removed     /usr/lib/python3.10/site-packages/auditwheel-4.0.0.dist-info
+    removed     /usr/lib/python3.10/site-packages/auditwheel-4.0.0.dist-info/INSTALLER
+    removed     /usr/lib/python3.10/site-packages/auditwheel-4.0.0.dist-info/LICENSE
+    removed     /usr/lib/python3.10/site-packages/auditwheel-4.0.0.dist-info/METADATA
+    removed     /usr/lib/python3.10/site-packages/auditwheel-4.0.0.dist-info/WHEEL
+    removed     /usr/lib/python3.10/site-packages/auditwheel-4.0.0.dist-info/entry_points.txt
+    removed     /usr/lib/python3.10/site-packages/auditwheel-4.0.0.dist-info/top_level.txt
+    added       /usr/lib/python3.10/site-packages/auditwheel-5.0.0.dist-info
+    added       /usr/lib/python3.10/site-packages/auditwheel-5.0.0.dist-info/INSTALLER
+    added       /usr/lib/python3.10/site-packages/auditwheel-5.0.0.dist-info/LICENSE
+    added       /usr/lib/python3.10/site-packages/auditwheel-5.0.0.dist-info/METADATA
+    added       /usr/lib/python3.10/site-packages/auditwheel-5.0.0.dist-info/WHEEL
+    added       /usr/lib/python3.10/site-packages/auditwheel-5.0.0.dist-info/entry_points.txt
+    added       /usr/lib/python3.10/site-packages/auditwheel-5.0.0.dist-info/pbr.json
+    added       /usr/lib/python3.10/site-packages/auditwheel-5.0.0.dist-info/top_level.txt
+    ..........T /usr/lib/python3.10/site-packages/auditwheel/__init__.py
+    S.5.......T /usr/lib/python3.10/site-packages/auditwheel/__main__.py
+    ..........T /usr/lib/python3.10/site-packages/auditwheel/__pycache__
+    ..5.......T /usr/lib/python3.10/site-packages/auditwheel/__pycache__/__init__.cpython-310.opt-1.pyc
+    ..5.......T /usr/lib/python3.10/site-packages/auditwheel/__pycache__/__init__.cpython-310.pyc
+    ..5.......T /usr/lib/python3.10/site-packages/auditwheel/__pycache__/__main__.cpython-310.opt-1.pyc
+    ..5.......T /usr/lib/python3.10/site-packages/auditwheel/__pycache__/__main__.cpython-310.pyc
+    S.5.......T /usr/lib/python3.10/site-packages/auditwheel/__pycache__/condatools.cpython-310.opt-1.pyc
+    S.5.......T /usr/lib/python3.10/site-packages/auditwheel/__pycache__/condatools.cpython-310.pyc
+    S.5.......T /usr/lib/python3.10/site-packages/auditwheel/__pycache__/elfutils.cpython-310.opt-1.pyc
+    S.5.......T /usr/lib/python3.10/site-packages/auditwheel/__pycache__/elfutils.cpython-310.pyc
+    added       /usr/lib/python3.10/site-packages/auditwheel/__pycache__/error.cpython-310.opt-1.pyc
+    added       /usr/lib/python3.10/site-packages/auditwheel/__pycache__/error.cpython-310.pyc
+    ..5.......T /usr/lib/python3.10/site-packages/auditwheel/__pycache__/genericpkgctx.cpython-310.opt-1.pyc
+    ..5.......T /usr/lib/python3.10/site-packages/auditwheel/__pycache__/genericpkgctx.cpython-310.pyc
+    ..5.......T /usr/lib/python3.10/site-packages/auditwheel/__pycache__/hashfile.cpython-310.opt-1.pyc
+    ..5.......T /usr/lib/python3.10/site-packages/auditwheel/__pycache__/hashfile.cpython-310.pyc
+    S.5.N.....T /usr/lib/python3.10/site-packages/auditwheel/__pycache__/lddtree.cpython-310.opt-1.pyc
+    S.5.N.....T /usr/lib/python3.10/site-packages/auditwheel/__pycache__/lddtree.cpython-310.pyc
+    added       /usr/lib/python3.10/site-packages/auditwheel/__pycache__/libc.cpython-310.opt-1.pyc
+    added       /usr/lib/python3.10/site-packages/auditwheel/__pycache__/libc.cpython-310.pyc
+    S.5.......T /usr/lib/python3.10/site-packages/auditwheel/__pycache__/main.cpython-310.opt-1.pyc
+    S.5.......T /usr/lib/python3.10/site-packages/auditwheel/__pycache__/main.cpython-310.pyc
+    S.5.......T /usr/lib/python3.10/site-packages/auditwheel/__pycache__/main_addtag.cpython-310.opt-1.pyc
+    S.5.......T /usr/lib/python3.10/site-packages/auditwheel/__pycache__/main_addtag.cpython-310.pyc
+    ..5.......T /usr/lib/python3.10/site-packages/auditwheel/__pycache__/main_lddtree.cpython-310.opt-1.pyc
+    ..5.......T /usr/lib/python3.10/site-packages/auditwheel/__pycache__/main_lddtree.cpython-310.pyc
+    S.5.......T /usr/lib/python3.10/site-packages/auditwheel/__pycache__/main_repair.cpython-310.opt-1.pyc
+    S.5.......T /usr/lib/python3.10/site-packages/auditwheel/__pycache__/main_repair.cpython-310.pyc
+    S.5.......T /usr/lib/python3.10/site-packages/auditwheel/__pycache__/main_show.cpython-310.opt-1.pyc
+    S.5.......T /usr/lib/python3.10/site-packages/auditwheel/__pycache__/main_show.cpython-310.pyc
+    added       /usr/lib/python3.10/site-packages/auditwheel/__pycache__/musllinux.cpython-310.opt-1.pyc
+    added       /usr/lib/python3.10/site-packages/auditwheel/__pycache__/musllinux.cpython-310.pyc
+    S.5.......T /usr/lib/python3.10/site-packages/auditwheel/__pycache__/patcher.cpython-310.opt-1.pyc
+    S.5.......T /usr/lib/python3.10/site-packages/auditwheel/__pycache__/patcher.cpython-310.pyc
+    S.5.......T /usr/lib/python3.10/site-packages/auditwheel/__pycache__/repair.cpython-310.opt-1.pyc
+    S.5.......T /usr/lib/python3.10/site-packages/auditwheel/__pycache__/repair.cpython-310.pyc
+    S.5.......T /usr/lib/python3.10/site-packages/auditwheel/__pycache__/tmpdirs.cpython-310.opt-1.pyc
+    S.5.......T /usr/lib/python3.10/site-packages/auditwheel/__pycache__/tmpdirs.cpython-310.pyc
+    S.5.......T /usr/lib/python3.10/site-packages/auditwheel/__pycache__/tools.cpython-310.opt-1.pyc
+    S.5.......T /usr/lib/python3.10/site-packages/auditwheel/__pycache__/tools.cpython-310.pyc
+    S.5.......T /usr/lib/python3.10/site-packages/auditwheel/__pycache__/wheel_abi.cpython-310.opt-1.pyc
+    S.5.......T /usr/lib/python3.10/site-packages/auditwheel/__pycache__/wheel_abi.cpython-310.pyc
+    S.5.......T /usr/lib/python3.10/site-packages/auditwheel/__pycache__/wheeltools.cpython-310.opt-1.pyc
+    S.5.......T /usr/lib/python3.10/site-packages/auditwheel/__pycache__/wheeltools.cpython-310.pyc
+    ..........T /usr/lib/python3.10/site-packages/auditwheel/_vendor
+    ..........T /usr/lib/python3.10/site-packages/auditwheel/_vendor/__init__.py
+    ..........T /usr/lib/python3.10/site-packages/auditwheel/_vendor/__pycache__
+    ..5.......T /usr/lib/python3.10/site-packages/auditwheel/_vendor/__pycache__/__init__.cpython-310.opt-1.pyc
+    ..5.......T /usr/lib/python3.10/site-packages/auditwheel/_vendor/__pycache__/__init__.cpython-310.pyc
+    ..........T /usr/lib/python3.10/site-packages/auditwheel/_vendor/wheel
+    added       /usr/lib/python3.10/site-packages/auditwheel/_vendor/wheel/LICENSE.txt
+    ..........T /usr/lib/python3.10/site-packages/auditwheel/_vendor/wheel/__init__.py
+    ..........T /usr/lib/python3.10/site-packages/auditwheel/_vendor/wheel/__pycache__
+    ..5.......T /usr/lib/python3.10/site-packages/auditwheel/_vendor/wheel/__pycache__/__init__.cpython-310.opt-1.pyc
+    ..5.......T /usr/lib/python3.10/site-packages/auditwheel/_vendor/wheel/__pycache__/__init__.cpython-310.pyc
+    S.5.......T /usr/lib/python3.10/site-packages/auditwheel/_vendor/wheel/__pycache__/pkginfo.cpython-310.opt-1.pyc
+    S.5.......T /usr/lib/python3.10/site-packages/auditwheel/_vendor/wheel/__pycache__/pkginfo.cpython-310.pyc
+    ..5.......T /usr/lib/python3.10/site-packages/auditwheel/_vendor/wheel/__pycache__/util.cpython-310.opt-1.pyc
+    ..5.......T /usr/lib/python3.10/site-packages/auditwheel/_vendor/wheel/__pycache__/util.cpython-310.pyc
+    S.5.......T /usr/lib/python3.10/site-packages/auditwheel/_vendor/wheel/__pycache__/wheelfile.cpython-310.opt-1.pyc
+    S.5.......T /usr/lib/python3.10/site-packages/auditwheel/_vendor/wheel/__pycache__/wheelfile.cpython-310.pyc
+    ..........T /usr/lib/python3.10/site-packages/auditwheel/_vendor/wheel/cli
+    ..........T /usr/lib/python3.10/site-packages/auditwheel/_vendor/wheel/cli/__init__.py
+    ..........T /usr/lib/python3.10/site-packages/auditwheel/_vendor/wheel/cli/__pycache__
+    ..5.......T /usr/lib/python3.10/site-packages/auditwheel/_vendor/wheel/cli/__pycache__/__init__.cpython-310.opt-1.pyc
+    ..5.......T /usr/lib/python3.10/site-packages/auditwheel/_vendor/wheel/cli/__pycache__/__init__.cpython-310.pyc
+    ..5.......T /usr/lib/python3.10/site-packages/auditwheel/_vendor/wheel/cli/__pycache__/convert.cpython-310.opt-1.pyc
+    ..5.......T /usr/lib/python3.10/site-packages/auditwheel/_vendor/wheel/cli/__pycache__/convert.cpython-310.pyc
+    ..5.......T /usr/lib/python3.10/site-packages/auditwheel/_vendor/wheel/cli/__pycache__/pack.cpython-310.opt-1.pyc
+    ..5.......T /usr/lib/python3.10/site-packages/auditwheel/_vendor/wheel/cli/__pycache__/pack.cpython-310.pyc
+    ..5.......T /usr/lib/python3.10/site-packages/auditwheel/_vendor/wheel/cli/__pycache__/unpack.cpython-310.opt-1.pyc
+    ..5.......T /usr/lib/python3.10/site-packages/auditwheel/_vendor/wheel/cli/__pycache__/unpack.cpython-310.pyc
+    ..........T /usr/lib/python3.10/site-packages/auditwheel/_vendor/wheel/cli/convert.py
+    ..........T /usr/lib/python3.10/site-packages/auditwheel/_vendor/wheel/cli/pack.py
+    ..........T /usr/lib/python3.10/site-packages/auditwheel/_vendor/wheel/cli/unpack.py
+    ..........T /usr/lib/python3.10/site-packages/auditwheel/_vendor/wheel/pkginfo.py
+    ..........T /usr/lib/python3.10/site-packages/auditwheel/_vendor/wheel/util.py
+    ..........T /usr/lib/python3.10/site-packages/auditwheel/_vendor/wheel/wheelfile.py
+    S.5.......T /usr/lib/python3.10/site-packages/auditwheel/condatools.py
+    S.5.......T /usr/lib/python3.10/site-packages/auditwheel/elfutils.py
+    added       /usr/lib/python3.10/site-packages/auditwheel/error.py
+    S.5.......T /usr/lib/python3.10/site-packages/auditwheel/genericpkgctx.py
+    ..........T /usr/lib/python3.10/site-packages/auditwheel/hashfile.py
+    S.5.......T /usr/lib/python3.10/site-packages/auditwheel/lddtree.py
+    added       /usr/lib/python3.10/site-packages/auditwheel/libc.py
+    S.5.......T /usr/lib/python3.10/site-packages/auditwheel/main.py
+    S.5.......T /usr/lib/python3.10/site-packages/auditwheel/main_addtag.py
+    S.5.......T /usr/lib/python3.10/site-packages/auditwheel/main_lddtree.py
+    S.5.......T /usr/lib/python3.10/site-packages/auditwheel/main_repair.py
+    S.5.......T /usr/lib/python3.10/site-packages/auditwheel/main_show.py
+    added       /usr/lib/python3.10/site-packages/auditwheel/musllinux.py
+    S.5.......T /usr/lib/python3.10/site-packages/auditwheel/patcher.py
+    ..........T /usr/lib/python3.10/site-packages/auditwheel/policy
+    S.5.......T /usr/lib/python3.10/site-packages/auditwheel/policy/__init__.py
+    ..........T /usr/lib/python3.10/site-packages/auditwheel/policy/__pycache__
+    S.5.N.....T /usr/lib/python3.10/site-packages/auditwheel/policy/__pycache__/__init__.cpython-310.opt-1.pyc
+    S.5.N.....T /usr/lib/python3.10/site-packages/auditwheel/policy/__pycache__/__init__.cpython-310.pyc
+    S.5.......T /usr/lib/python3.10/site-packages/auditwheel/policy/__pycache__/external_references.cpython-310.opt-1.pyc
+    S.5.......T /usr/lib/python3.10/site-packages/auditwheel/policy/__pycache__/external_references.cpython-310.pyc
+    S.5.......T /usr/lib/python3.10/site-packages/auditwheel/policy/__pycache__/versioned_symbols.cpython-310.opt-1.pyc
+    S.5.......T /usr/lib/python3.10/site-packages/auditwheel/policy/__pycache__/versioned_symbols.cpython-310.pyc
+    S.5.......T /usr/lib/python3.10/site-packages/auditwheel/policy/external_references.py
+    added       /usr/lib/python3.10/site-packages/auditwheel/policy/manylinux-policy.json
+    added       /usr/lib/python3.10/site-packages/auditwheel/policy/musllinux-policy.json
+    S.5.......T /usr/lib/python3.10/site-packages/auditwheel/policy/policy-schema.json
+    removed     /usr/lib/python3.10/site-packages/auditwheel/policy/policy.json
+    S.5.......T /usr/lib/python3.10/site-packages/auditwheel/policy/versioned_symbols.py
+    S.5.......T /usr/lib/python3.10/site-packages/auditwheel/repair.py
+    S.5.......T /usr/lib/python3.10/site-packages/auditwheel/tmpdirs.py
+    S.5.......T /usr/lib/python3.10/site-packages/auditwheel/tools.py
+    S.5.......T /usr/lib/python3.10/site-packages/auditwheel/wheel_abi.py
+    S.5.......T /usr/lib/python3.10/site-packages/auditwheel/wheeltools.py
+    ..........T /usr/share/doc/auditwheel
+    S.5.......T /usr/share/doc/auditwheel/README.rst
+
+    $ rpmdiff ./auditwheel-4.0.0-1.fc36.src.rpm ./auditwheel-5.0.0-1.fc36.src.rpm
+    removed     REQUIRES python3dist(setuptools)
+    removed     REQUIRES python3dist(tox) >= 1.6
+    removed     REQUIRES python3dist(tox-current-env) >= 0.0.6
+    added       REQUIRES python3dist(setuptools) >= 42
+    removed     PROVIDES auditwheel = 4.0.0-1.fc36
+    added       PROVIDES auditwheel = 5.0.0-1.fc36
+    removed     319.patch
+    removed     auditwheel-4.0.0.tar.gz
+    added       auditwheel-5.0.0.tar.gz
+    S.5.......T auditwheel.spec
 
 * Migrate to a TOML config file format--or a config file format that
   looks similar to something you would see in /etc but that we have
