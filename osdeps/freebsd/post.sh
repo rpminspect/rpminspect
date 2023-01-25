@@ -41,9 +41,5 @@ rm -rf mandoc.tar.gz "${SUBDIR}"
 # The ksh93 package does not install a 'ksh' executable, so create a symlink
 ln -sf ksh93 /usr/local/bin/ksh
 
-# Install a find-debuginfo that we can use with rpmbuild
-cp "${CWD}"/osdeps/freebsd/find-debuginfo.sh /usr/bin/find-debuginfo
-chmod 0755 /usr/bin/find-debuginfo
-
 # Update the clamav database
 freshclam
