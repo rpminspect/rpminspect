@@ -16,7 +16,7 @@ from baseclass import (
 # Manual block for %install that removes a debuginfo symbol
 debug_block = "%{__debug_install_post}\n"
 debug_block += "chmod 0755 $RPM_BUILD_ROOT/usr/lib/debug/usr/bin/hello-world*.debug\n"
-debug_block += "strip --remove-section=.gdb_index "
+debug_block += "strip --remove-section=.symtab "
 debug_block += "$RPM_BUILD_ROOT/usr/lib/debug/usr/bin/hello-world*.debug\n"
 debug_block += "chmod 0444 $RPM_BUILD_ROOT/usr/lib/debug/usr/bin/hello-world*.debug\n"
 
@@ -79,7 +79,7 @@ class MissingSectionsInDebuginfoPkgCompareRPMs(TestCompareRPMs):
 
         # this is a no-op because the RPM used is not a debuginfo RPM
         self.inspection = "debuginfo"
-        self.result = "INFO"
+        self.result = "OK"
 
 
 class MissingSectionsInDebuginfoPkgKoji(TestKoji):
@@ -221,7 +221,6 @@ class BeforeNotStrippedAfterStrippedCompareKoji(TestCompareKoji):
 
         self.before_rpm.makeDebugInfo = True
         self.before_rpm.add_simple_compilation(compileFlags="-g")
-        self.before_rpm.section_install += debug_block
 
         self.after_rpm.makeDebugInfo = True
         self.after_rpm.add_simple_compilation(compileFlags="-g")

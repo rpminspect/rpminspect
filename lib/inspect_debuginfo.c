@@ -115,6 +115,46 @@ static char *strflags(const uint64_t flags)
     return r;
 }
 
+/*
+ * If we see any section headers that begin with ".guile." then assume
+ * this is a Guile object file.
+ */
+static bool is_guile(const char *path)
+{
+    bool r = false;
+    Elf *elf = NULL;
+    int fd = -1;
+    string_list_t *sections = NULL;
+    string_entry_t *entry = NULL;
+
+    assert(path != NULL);
+
+    elf = get_elf(path, &fd);
+
+    if (elf == NULL) {
+        return false;
+    }
+
+    sections = get_elf_section_names(elf, SHT_PROGBITS);
+
+    if (sections == NULL || TAILQ_EMPTY(sections)) {
+        return false;
+    }
+
+    close(fd);
+    elf_end(elf);
+
+    TAILQ_FOREACH(entry, sections, items) {
+        if (strprefix(entry->data, ".guile.")) {
+            r = true;
+            break;
+        }
+    }
+
+    list_free(sections, free);
+    return r;
+}
+
 static bool debuginfo_driver(struct rpminspect *ri, rpmfile_entry_t *file)
 {
     bool result = true;
@@ -125,7 +165,8 @@ static bool debuginfo_driver(struct rpminspect *ri, rpmfile_entry_t *file)
     bool debugpkg = false;
     uint64_t flags = 0;
     uint64_t have = 0;
-    uint64_t missing = 0;
+    uint64_t before_missing = 0;
+    uint64_t after_missing = 0;
     int fd = 0;
     Elf *elf = NULL;
     struct result_params params;
@@ -167,53 +208,56 @@ static bool debuginfo_driver(struct rpminspect *ri, rpmfile_entry_t *file)
     params.header = NAME_DEBUGINFO;
 
     /* Check for and report missing or misplaced debuginfo symbols */
-    if (file->peer_file == NULL) {
-        missing = missing_sections(file->fullpath, flags);
-        have = have_sections(file->fullpath, flags);
+    after_missing = missing_sections(file->fullpath, flags);
+    have = have_sections(file->fullpath, flags);
+
+    if (debugpkg && after_missing) {
+        /* debuginfo packages should not be missing debugging symbols */
         params.file = file->localpath;
         params.arch = arch;
 
-        if (debugpkg && missing) {
-            /* debuginfo packages should not be missing debugging symbols */
-            xasprintf(&params.msg, _("%s in %s on %s is missing debugging symbols"), file->localpath, nvr, arch);
-            params.severity = RESULT_BAD;
-            params.waiverauth = WAIVABLE_BY_ANYONE;
-            params.verb = VERB_FAILED;
-            params.noun = _("missing debugging symbols");
+        xasprintf(&params.msg, _("%s in %s on %s is missing debugging symbols"), file->localpath, nvr, arch);
+        params.severity = RESULT_BAD;
+        params.waiverauth = WAIVABLE_BY_ANYONE;
+        params.verb = VERB_FAILED;
+        params.noun = _("missing debugging symbols");
 
-            tmp = strflags(missing);
-            xasprintf(&params.details, _("Missing: %s"), tmp);
-            free(tmp);
+        tmp = strflags(after_missing);
+        xasprintf(&params.details, _("Missing: %s"), tmp);
+        free(tmp);
 
-            add_result(ri, &params);
+        add_result(ri, &params);
 
-            free(params.msg);
-            free(params.details);
+        free(params.msg);
+        free(params.details);
 
-            result = false;
-        } else if (!debugpkg && have) {
-            /* non-debuginfo packages should not contain debugging symbols */
-            xasprintf(&params.msg, _("%s in %s on %s contains debugging symbols"), file->localpath, nvr, arch);
-            params.severity = RESULT_BAD;
-            params.waiverauth = WAIVABLE_BY_ANYONE;
-            params.verb = VERB_FAILED;
-            params.noun = _("contains debugging symbols");
-            tmp = strflags(have);
-            xasprintf(&params.details, _("Contains: %s"), tmp);
-            free(tmp);
+        result = false;
+    } else if (!debugpkg && !is_guile(file->fullpath) && have) {
+        /* non-debuginfo packages should not contain debugging symbols */
+        xasprintf(&params.msg, _("%s in %s on %s contains debugging symbols"), file->localpath, nvr, arch);
+        params.severity = RESULT_BAD;
+        params.waiverauth = WAIVABLE_BY_ANYONE;
+        params.verb = VERB_FAILED;
+        params.noun = _("contains debugging symbols");
+        tmp = strflags(have);
+        xasprintf(&params.details, _("Contains: %s"), tmp);
+        free(tmp);
 
-            add_result(ri, &params);
+        add_result(ri, &params);
 
-            free(params.msg);
-            free(params.details);
+        free(params.msg);
+        free(params.details);
 
-            result = false;
-        }
-    } else {
-        missing = missing_sections(file->peer_file->fullpath, flags);
+        result = false;
+    }
+
+    /* handle build comparisons */
+    if (file->peer_file) {
+        after_missing = missing_sections(file->fullpath, flags);
+        before_missing = missing_sections(file->peer_file->fullpath, flags);
         have = have_sections(file->fullpath, flags);
 
-        if (missing && have) {
+        if (before_missing && !after_missing && have) {
             /* stripped in the before file but not the after file */
             xasprintf(&params.msg, _("%s in %s on %s gained debugging symbols"), file->localpath, nvr, arch);
             params.noun = _("gained debugging symbols");
@@ -239,14 +283,14 @@ static bool debuginfo_driver(struct rpminspect *ri, rpmfile_entry_t *file)
 
             free(params.msg);
             free(params.details);
-        } else if (missing && !have) {
+        } else if (!before_missing && after_missing) {
             /* not stripped in the before file, stripped in the after file */
             xasprintf(&params.msg, _("%s in %s on %s lost debugging symbols"), file->localpath, nvr, arch);
             params.noun = _("lost debugging symbols");
             params.file = file->localpath;
             params.arch = arch;
 
-            tmp = strflags(missing);
+            tmp = strflags(after_missing);
             xasprintf(&params.details, _("Lost: %s"), tmp);
             free(tmp);
 
@@ -270,30 +314,9 @@ static bool debuginfo_driver(struct rpminspect *ri, rpmfile_entry_t *file)
 
     /* Final non-debuginfo package checks */
     if (!debugpkg) {
-        /* Non-debuginfo packages should have .gnu_debuglink */
-/*
- * XXX -- should they?  instructions unclear at this point in time (10-Jan-2023)
         elf = get_elf(file->fullpath, &fd);
-        assert(elf != NULL);
 
-        if (!have_elf_section(elf, -1, ELF_GNU_DEBUGLINK)) {
-            xasprintf(&params.msg, _("%s in %s on %s is missing the .gnu_debuglink symbol"), file->localpath, nvr, arch);
-            params.verb = VERB_FAILED;
-            params.noun = _("lost .gnu_debuglink");
-            params.file = file->localpath;
-            params.arch = arch;
-            params.severity = RESULT_VERIFY;
-            params.waiverauth = WAIVABLE_BY_ANYONE;
-            params.details = NULL;
-            result = false;
-
-            add_result(ri, &params);
-
-            free(params.msg);
-        }
- */
-
-        if (have_elf_section(elf, -1, ELF_GOSYMTAB) && have_elf_section(elf, -1, ELF_GNU_DEBUGDATA)) {
+        if (elf && have_elf_section(elf, -1, ELF_GOSYMTAB) && have_elf_section(elf, -1, ELF_GNU_DEBUGDATA)) {
             xasprintf(&params.msg, _("%s in %s on %s carries .gosymtab but should not have the .gnu_debugdata symbol"), file->localpath, nvr, arch);
             params.verb = VERB_FAILED;
             params.noun = _(".gnu_debugdata with .gosymtab");
@@ -305,12 +328,11 @@ static bool debuginfo_driver(struct rpminspect *ri, rpmfile_entry_t *file)
             result = false;
 
             add_result(ri, &params);
-
             free(params.msg);
-        }
 
-        close(fd);
-        elf_end(elf);
+            close(fd);
+            elf_end(elf);
+        }
     }
 
     free(nvr);
