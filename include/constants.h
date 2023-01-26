@@ -317,6 +317,15 @@
 #define ABI_DEBUG_INFO_DIR1 "--d1"
 
 /**
+ * @def ABI_HEADERS_DIR1
+ *
+ * The command line option for abidiff(1) to specify the location of
+ * header files in the before build.  This is the /usr/include
+ * directory, which may appear in multiple subpackages.
+ */
+#define ABI_HEADERS_DIR1 "--hd1"
+
+/**
  * @def ABI_DEBUG_INFO_DIR2
  *
  * The command line option for abidiff(1) to specify the location of
@@ -325,6 +334,15 @@
  * package.
  */
 #define ABI_DEBUG_INFO_DIR2 "--d2"
+
+/**
+ * @def ABI_HEADERS_DIR2
+ *
+ * The command line option for abidiff(1) to specify the location of
+ * header files in the after build.  This is the /usr/include
+ * directory, which may appear in multiple subpackages.
+ */
+#define ABI_HEADERS_DIR2 "--hd2"
 
 /**
  * @def KMIDIFF_CMD
@@ -464,13 +482,13 @@
 #define ABI_SUPPRESSION_FILE ".abignore"
 
 /**
- * @def INCLUDE_SUBDIR
+ * @def INCLUDE_DIR
  *
- * Default header file subdirectory name.  Anywhere we find an include
- * subdirectory, rpminspect will consider that a location for public
+ * Default header file directory name.  If a subpackage has this
+ * directory, rpminspect will consider that a location for public
  * header files.
  */
-#define INCLUDE_SUBDIR "/include"
+#define INCLUDE_DIR "/usr/include"
 
 /**
  * @def KERNEL_FILENAMES
