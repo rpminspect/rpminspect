@@ -22,6 +22,29 @@
 static char *cmdprefix = NULL;
 static string_list_t *suppressions = NULL;
 static abi_t *abi = NULL;
+static string_list_t *before_headers = NULL;
+static string_list_t *after_headers = NULL;
+
+static string_list_t *build_header_list(string_list_t *list, const char *root)
+{
+    char *tmp = NULL;
+    struct stat sb;
+
+    if (root == NULL) {
+        return list;
+    }
+
+    tmp = joinpath(root, INCLUDE_DIR, NULL);
+    assert(tmp != NULL);
+    memset(&sb, 0, sizeof(sb));
+
+    if (stat(tmp, &sb) == 0 && S_ISDIR(sb.st_mode)) {
+        list = list_add(list, tmp);
+    }
+
+    free(tmp);
+    return list;
+}
 
 static severity_t check_abi(const severity_t sev, const long int threshold, const char *path, const char *pkg, long int *compat)
 {
@@ -128,18 +151,35 @@ static bool abidiff_driver(struct rpminspect *ri, rpmfile_entry_t *file)
         }
     }
 
-    /* debug dir args */
+    /* debug dir1 args */
     tmp = joinpath(ri->worksubdir, ROOT_SUBDIR, BEFORE_SUBDIR, arch, DEBUG_PATH, NULL);
     assert(tmp != NULL);
     cmd = strappend(cmd, " ", ABI_DEBUG_INFO_DIR1, " ", tmp, NULL);
     assert(cmd != NULL);
     free(tmp);
 
+    /* header dir1 args */
+    if (before_headers && !TAILQ_EMPTY(before_headers)) {
+        TAILQ_FOREACH(entry, before_headers, items) {
+            cmd = strappend(cmd, " ", ABI_HEADERS_DIR1, " ", entry->data, NULL);
+            assert(cmd != NULL);
+        }
+    }
+
+    /* debug dir2 args */
     tmp = joinpath(ri->worksubdir, ROOT_SUBDIR, AFTER_SUBDIR, arch, DEBUG_PATH, NULL);
     assert(tmp != NULL);
     cmd = strappend(cmd, " ", ABI_DEBUG_INFO_DIR2, " ", tmp, NULL);
     assert(cmd != NULL);
     free(tmp);
+
+    /* header dir2 args */
+    if (after_headers && !TAILQ_EMPTY(after_headers)) {
+        TAILQ_FOREACH(entry, after_headers, items) {
+            cmd = strappend(cmd, " ", ABI_HEADERS_DIR2, " ", entry->data, NULL);
+            assert(cmd != NULL);
+        }
+    }
 
     /* the before and after builds */
     cmd = strappend(cmd, " ", file->peer_file->fullpath, " ", file->fullpath, NULL);
@@ -228,6 +268,7 @@ static bool abidiff_driver(struct rpminspect *ri, rpmfile_entry_t *file)
 bool inspect_abidiff(struct rpminspect *ri)
 {
     bool result = false;
+    rpmpeer_entry_t *peer = NULL;
     struct result_params params;
 
     assert(ri != NULL);
@@ -245,6 +286,12 @@ bool inspect_abidiff(struct rpminspect *ri)
         cmdprefix = strdup(ri->commands.abidiff);
     }
 
+    /* gather header directories */
+    TAILQ_FOREACH(peer, ri->peers, items) {
+        before_headers = build_header_list(before_headers, peer->before_root);
+        after_headers = build_header_list(after_headers, peer->after_root);
+    }
+
     /* run the main inspection */
     result = foreach_peer_file(ri, NAME_ABIDIFF, abidiff_driver);
 
@@ -252,6 +299,8 @@ bool inspect_abidiff(struct rpminspect *ri)
     free_abi(abi);
     free(cmdprefix);
     list_free(suppressions, free);
+    list_free(before_headers, free);
+    list_free(after_headers, free);
 
     /* report the inspection results */
     if (result) {
