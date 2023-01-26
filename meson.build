@@ -77,9 +77,9 @@ curlinfo_src = '''
     }
     '''
 have_newer_curlinfo = cc.compiles(curlinfo_src,
-                                  args: [ '-Werror' ],
                                   dependencies: [ libcurl ],
-                                  name: 'CURLINFO_CONTENT_LENGTH_DOWNLOAD_T availability test')
+                                  name: 'CURLINFO_CONTENT_LENGTH_DOWNLOAD_T availability test',
+                                  no_default_args: true)
 
 if have_newer_curlinfo
     add_project_arguments('-D_HAVE_NEWER_CURLINFO', language : 'c')
