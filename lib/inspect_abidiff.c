@@ -22,28 +22,71 @@
 static char *cmdprefix = NULL;
 static string_list_t *suppressions = NULL;
 static abi_t *abi = NULL;
-static string_list_t *before_headers = NULL;
-static string_list_t *after_headers = NULL;
+static pair_list_t *before_headers = NULL;
+static pair_list_t *after_headers = NULL;
 
-static string_list_t *build_header_list(string_list_t *list, const char *root)
+/*
+ * Helper function for build_header_list().
+ */
+static void add_header_path(const char *root, const char *arch, pair_list_t **headers)
 {
-    char *tmp = NULL;
+    char *incpath = NULL;
     struct stat sb;
+    pair_entry_t *entry = NULL;
 
-    if (root == NULL) {
-        return list;
-    }
+    assert(root != NULL);
+    assert(arch != NULL);
 
-    tmp = joinpath(root, INCLUDE_DIR, NULL);
-    assert(tmp != NULL);
+    incpath = joinpath(root, INCLUDE_DIR, NULL);
+    assert(incpath != NULL);
     memset(&sb, 0, sizeof(sb));
 
-    if (stat(tmp, &sb) == 0 && S_ISDIR(sb.st_mode)) {
-        list = list_add(list, tmp);
+    if (stat(incpath, &sb) == 0 && S_ISDIR(sb.st_mode)) {
+        if (!pair_contains_key(*headers, incpath)) {
+            entry = calloc(1, sizeof(*entry));
+            entry->key = strdup(incpath);
+            assert(entry->key != NULL);
+            entry->value = strdup(arch);
+            assert(entry->value != NULL);
+
+            if (*headers == NULL) {
+                *headers = calloc(1, sizeof(**headers));
+                assert(*headers != NULL);
+                TAILQ_INIT(*headers);
+            }
+
+            TAILQ_INSERT_TAIL(*headers, entry, items);
+        }
     }
 
-    free(tmp);
-    return list;
+    free(incpath);
+    return;
+}
+
+/*
+ * Populate before_headers and after_headers where the key is the
+ * header path and the value is the architecture.  These will be used
+ * when building abidiff command lines that actually run.
+ */
+static void build_header_list(const rpmpeer_entry_t *peer)
+{
+    const char *arch = NULL;
+
+    assert(peer != NULL);
+
+    /* before */
+    if (peer->before_hdr && peer->before_root) {
+        arch = get_rpm_header_arch(peer->before_hdr);
+        add_header_path(peer->before_root, arch, &before_headers);
+    }
+
+    /* after */
+    if (peer->after_hdr && peer->after_root) {
+        arch = get_rpm_header_arch(peer->after_hdr);
+        add_header_path(peer->after_root, arch, &after_headers);
+    }
+
+    return;
 }
 
 static severity_t check_abi(const severity_t sev, const long int threshold, const char *path, const char *pkg, long int *compat)
@@ -104,6 +147,7 @@ static bool abidiff_driver(struct rpminspect *ri, rpmfile_entry_t *file)
     bool rebase = false;
     char **argv = NULL;
     string_entry_t *entry = NULL;
+    pair_entry_t *pair = NULL;
     const char *arch = NULL;
     const char *name = NULL;
     int exitcode = 0;
@@ -160,9 +204,11 @@ static bool abidiff_driver(struct rpminspect *ri, rpmfile_entry_t *file)
 
     /* header dir1 args */
     if (before_headers && !TAILQ_EMPTY(before_headers)) {
-        TAILQ_FOREACH(entry, before_headers, items) {
-            cmd = strappend(cmd, " ", ABI_HEADERS_DIR1, " ", entry->data, NULL);
-            assert(cmd != NULL);
+        TAILQ_FOREACH(pair, before_headers, items) {
+            if (pair->key && pair->value && !strcmp(pair->value, arch)) {
+                cmd = strappend(cmd, " ", ABI_HEADERS_DIR1, " ", pair->key, NULL);
+                assert(cmd != NULL);
+            }
         }
     }
 
@@ -175,9 +221,11 @@ static bool abidiff_driver(struct rpminspect *ri, rpmfile_entry_t *file)
 
     /* header dir2 args */
     if (after_headers && !TAILQ_EMPTY(after_headers)) {
-        TAILQ_FOREACH(entry, after_headers, items) {
-            cmd = strappend(cmd, " ", ABI_HEADERS_DIR2, " ", entry->data, NULL);
-            assert(cmd != NULL);
+        TAILQ_FOREACH(pair, after_headers, items) {
+            if (pair->key && pair->value && !strcmp(pair->value, arch)) {
+                cmd = strappend(cmd, " ", ABI_HEADERS_DIR2, " ", pair->key, NULL);
+                assert(cmd != NULL);
+            }
         }
     }
 
@@ -288,8 +336,7 @@ bool inspect_abidiff(struct rpminspect *ri)
 
     /* gather header directories */
     TAILQ_FOREACH(peer, ri->peers, items) {
-        before_headers = build_header_list(before_headers, peer->before_root);
-        after_headers = build_header_list(after_headers, peer->after_root);
+        build_header_list(peer);
     }
 
     /* run the main inspection */
@@ -299,8 +346,8 @@ bool inspect_abidiff(struct rpminspect *ri)
     free_abi(abi);
     free(cmdprefix);
     list_free(suppressions, free);
-    list_free(before_headers, free);
-    list_free(after_headers, free);
+    free_pair(before_headers);
+    free_pair(after_headers);
 
     /* report the inspection results */
     if (result) {

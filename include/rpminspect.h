@@ -128,6 +128,7 @@ void free_rpminspect(struct rpminspect *);
 void free_deprules(deprule_list_t *list);
 
 /* pairfuncs.c */
+bool pair_contains_key(const pair_list_t *list, const char *key);
 void free_pair(pair_list_t *list);
 
 /* listfuncs.c */
