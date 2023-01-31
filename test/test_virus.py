@@ -107,7 +107,7 @@ class HasVirusSRPM(TestSRPM):
 
         self.inspection = "virus"
         self.result = "BAD"
-        self.waiver_auth = "Anyone"
+        self.waiver_auth = "Security"
 
 
 @timeout_decorator.timeout(500)
@@ -119,7 +119,7 @@ class HasVirusRPMs(TestRPMs):
 
         self.inspection = "virus"
         self.result = "BAD"
-        self.waiver_auth = "Anyone"
+        self.waiver_auth = "Security"
 
 
 @timeout_decorator.timeout(500)
@@ -131,7 +131,7 @@ class HasVirusKoji(TestKoji):
 
         self.inspection = "virus"
         self.result = "BAD"
-        self.waiver_auth = "Anyone"
+        self.waiver_auth = "Security"
 
 
 @timeout_decorator.timeout(500)
@@ -148,7 +148,7 @@ class HasVirusCompareSRPM(TestCompareSRPM):
 
         self.inspection = "virus"
         self.result = "BAD"
-        self.waiver_auth = "Anyone"
+        self.waiver_auth = "Security"
 
 
 @timeout_decorator.timeout(500)
@@ -165,7 +165,7 @@ class HasVirusCompareRPMs(TestCompareRPMs):
 
         self.inspection = "virus"
         self.result = "BAD"
-        self.waiver_auth = "Anyone"
+        self.waiver_auth = "Security"
 
 
 @timeout_decorator.timeout(500)
@@ -182,4 +182,4 @@ class HasVirusCompareKoji(TestCompareKoji):
 
         self.inspection = "virus"
         self.result = "BAD"
-        self.waiver_auth = "Anyone"
+        self.waiver_auth = "Security"
