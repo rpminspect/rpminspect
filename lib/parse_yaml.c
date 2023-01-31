@@ -180,10 +180,14 @@ static y_value *p_value(context *context)
     while (1) {
         next(context, &token);
 
-        if (token.type == YAML_BLOCK_END_TOKEN || token.type == YAML_FLOW_SEQUENCE_END_TOKEN || token.type == YAML_FLOW_MAPPING_END_TOKEN || token.type == YAML_NO_TOKEN) {
+        if (token.type == YAML_BLOCK_END_TOKEN
+            || token.type == YAML_FLOW_SEQUENCE_END_TOKEN
+            || token.type == YAML_FLOW_MAPPING_END_TOKEN
+            || token.type == YAML_NO_TOKEN) {
             /* 4 ways to start a block, but only 3 to end it.  Great job. */
             goto done;
-        } else if (token.type == YAML_FLOW_ENTRY_TOKEN || token.type == YAML_DOCUMENT_START_TOKEN) {
+        } else if (token.type == YAML_FLOW_ENTRY_TOKEN
+                   || token.type == YAML_DOCUMENT_START_TOKEN) {
             /* These tokens don't mean anything to us. */
             continue;
         } else if (token.type == YAML_SCALAR_TOKEN) {
@@ -193,7 +197,8 @@ static y_value *p_value(context *context)
             assert(ret->v.string);
 
             goto done;
-        } else if (token.type == YAML_BLOCK_MAPPING_START_TOKEN || token.type == YAML_FLOW_MAPPING_START_TOKEN) {
+        } else if (token.type == YAML_BLOCK_MAPPING_START_TOKEN
+                   || token.type == YAML_FLOW_MAPPING_START_TOKEN) {
             ret = xalloc(sizeof(*ret));
             ret->type = Y_DICT;
 
@@ -201,7 +206,8 @@ static y_value *p_value(context *context)
                 yaml_token_delete(&token);
                 next(context, &token);
 
-                if (token.type == YAML_BLOCK_END_TOKEN || token.type == YAML_FLOW_MAPPING_END_TOKEN) {
+                if (token.type == YAML_BLOCK_END_TOKEN
+                    || token.type == YAML_FLOW_MAPPING_END_TOKEN) {
                     /* Friggin YAML, I tell you hwat. */
                     break;
                 } else if (token.type != YAML_KEY_TOKEN) {
@@ -247,7 +253,9 @@ static y_value *p_value(context *context)
             }
 
             goto done;
-        } else if (token.type == YAML_BLOCK_SEQUENCE_START_TOKEN || token.type == YAML_FLOW_SEQUENCE_START_TOKEN || token.type == YAML_BLOCK_ENTRY_TOKEN) {
+        } else if (token.type == YAML_BLOCK_SEQUENCE_START_TOKEN
+                   || token.type == YAML_FLOW_SEQUENCE_START_TOKEN
+                   || token.type == YAML_BLOCK_ENTRY_TOKEN) {
             if (token.type == YAML_BLOCK_ENTRY_TOKEN) {
                 implicit = true;
             }
@@ -454,7 +462,7 @@ static bool yaml_strdict_foreach(parser_context *context, const char *key1, cons
             }
         }
 
-	return false;
+        return false;
     } else if (dictobj->type != Y_ARRAY) {
         return true;
     }

@@ -359,7 +359,7 @@ static inline void strget(parser_plugin *p, parser_context *ctx, const char *key
     res = p->getstr(ctx, key1, key2);
 
     if (res == NULL) {
-	return;
+        return;
     }
 
     free(*dest);
@@ -379,7 +379,7 @@ static bool array_cb(const char *entry, void *cb_data)
 static inline void array(parser_plugin *p, parser_context *ctx, const char *key1, const char *key2, string_list_t **list)
 {
     if (p->strarray_foreach(ctx, key1, key2, array_cb, list)) {
-	warnx(_("problem adding entries to array %s->%s"), key1, key2);
+        warnx(_("problem adding entries to array %s->%s"), key1, key2);
     }
 
     return;
@@ -399,7 +399,7 @@ static inline void add_ignores(struct rpminspect *ri, parser_plugin *p, parser_c
     add_ignores_cb_data data = { &ri->inspection_ignores, inspection };
 
     if (p->strarray_foreach(ctx, inspection, "ignores", add_ignores_cb, &data)) {
-	warnx(_("problem adding ignore entries to %s"), inspection);
+        warnx(_("problem adding ignore entries to %s"), inspection);
     }
 
     return;
@@ -409,33 +409,33 @@ static inline void add_ignores(struct rpminspect *ri, parser_plugin *p, parser_c
  * Handle inclusion and exclusion paths for an inspection.  Pass the bare name
  * of an inspection, not a string.  Reuses variables from context.
  */
-#define ADD_INCL_EXCL(inspection)					\
-    s = p->getstr(ctx, #inspection, "include_path");			\
-									\
-    if (s != NULL) {							\
-	if (debug_mode) {						\
-	    ri->inspection ## _path_include_pattern = strdup(s);	\
-	}								\
-									\
-	if (add_regex(s, &ri->inspection ## _path_include) != 0) {	\
-	    warn(_("error reading " #inspection " include path"));	\
-	}								\
-									\
-	free(s);							\
-    }									\
-									\
-    s = p->getstr(ctx, #inspection, "exclude_path");			\
-									\
-    if (s != NULL) {							\
-	if (debug_mode) {						\
-	    ri->inspection ## _path_exclude_pattern = strdup(s);	\
-	}								\
-									\
-	if (add_regex(s, &ri->inspection ## _path_exclude) != 0) {	\
-	    warn(_("error reading " #inspection " include path"));	\
-	}								\
-									\
-	free(s);							\
+#define ADD_INCL_EXCL(inspection)                                       \
+    s = p->getstr(ctx, #inspection, "include_path");                    \
+                                                                        \
+    if (s != NULL) {                                                    \
+        if (debug_mode) {                                               \
+            ri->inspection ## _path_include_pattern = strdup(s);        \
+        }                                                               \
+                                                                        \
+        if (add_regex(s, &ri->inspection ## _path_include) != 0) {      \
+            warn(_("error reading " #inspection " include path"));      \
+        }                                                               \
+                                                                        \
+        free(s);                                                        \
+    }                                                                   \
+                                                                        \
+    s = p->getstr(ctx, #inspection, "exclude_path");                    \
+                                                                        \
+    if (s != NULL) {                                                    \
+        if (debug_mode) {                                               \
+            ri->inspection ## _path_exclude_pattern = strdup(s);        \
+        }                                                               \
+                                                                        \
+        if (add_regex(s, &ri->inspection ## _path_exclude) != 0) {      \
+            warn(_("error reading " #inspection " include path"));      \
+        }                                                               \
+                                                                        \
+        free(s);                                                        \
     }
 
 /* lambda for tabledict below. */
@@ -445,7 +445,7 @@ static bool tabledict_cb(const char *key, const char *value, void *cb_data)
 
     /* javabytecode uses this at top-level, but also supports ignores. */
     if (!strcasecmp(key, "ignore")) {
-	return false;
+        return false;
     }
 
     process_table(key, value, data->required, data->single, data->table);
@@ -458,7 +458,7 @@ static void tabledict(parser_plugin *p, parser_context *ctx, const char *key1, c
     tabledict_cb_data data = { required, single, table };
 
     if (p->strdict_foreach(ctx, key1, key2, tabledict_cb, &data)) {
-	warnx(_("ignoring malformed section %s->%s"), key1, key2);
+        warnx(_("ignoring malformed section %s->%s"), key1, key2);
     }
 
     return;
@@ -486,57 +486,57 @@ static bool rpmdeps_cb(const char *key, const char *value, void *cb_data)
     deprule_ignore_map_t *drentry = NULL;
 
     if (!strcmp(key, "requires")) {
-	depkey = TYPE_REQUIRES;
+        depkey = TYPE_REQUIRES;
     } else if (!strcmp(key, "provides")) {
-	depkey = TYPE_PROVIDES;
+        depkey = TYPE_PROVIDES;
     } else if (!strcmp(key, "conflicts")) {
-	depkey = TYPE_CONFLICTS;
+        depkey = TYPE_CONFLICTS;
     } else if (!strcmp(key, "obsoletes")) {
-	depkey = TYPE_OBSOLETES;
+        depkey = TYPE_OBSOLETES;
     } else if (!strcmp(key, "enhances")) {
-	depkey = TYPE_ENHANCES;
+        depkey = TYPE_ENHANCES;
     } else if (!strcmp(key, "recommends")) {
-	depkey = TYPE_RECOMMENDS;
+        depkey = TYPE_RECOMMENDS;
     } else if (!strcmp(key, "suggests")) {
-	depkey = TYPE_SUGGESTS;
+        depkey = TYPE_SUGGESTS;
     } else if (!strcmp(key, "supplements")) {
-	depkey = TYPE_SUPPLEMENTS;
+        depkey = TYPE_SUPPLEMENTS;
     }
 
     if (depkey != TYPE_NULL) {
-	HASH_FIND_INT(deprules_ignore, &depkey, drentry);
+        HASH_FIND_INT(deprules_ignore, &depkey, drentry);
     }
 
     /* overwrite existing entry, otherwise create new one */
     if (drentry == NULL) {
-	drentry = calloc(1, sizeof(*drentry));
-	assert(drentry != NULL);
-	drentry->type = depkey;
+        drentry = calloc(1, sizeof(*drentry));
+        assert(drentry != NULL);
+        drentry->type = depkey;
 
-	if (debug_mode) {
-	    drentry->pattern = strdup(key);
-	}
+        if (debug_mode) {
+            drentry->pattern = strdup(key);
+        }
 
-	if (add_regex(value, &drentry->ignore) != 0) {
-	    warn(_("error reading %s ignore pattern"), get_deprule_desc(depkey));
-	}
+        if (add_regex(value, &drentry->ignore) != 0) {
+            warn(_("error reading %s ignore pattern"), get_deprule_desc(depkey));
+        }
 
-	HASH_ADD_INT(deprules_ignore, type, drentry);
+        HASH_ADD_INT(deprules_ignore, type, drentry);
     } else {
-	free(drentry->pattern);
-	drentry->pattern = NULL;
-	drentry->type = depkey;
+        free(drentry->pattern);
+        drentry->pattern = NULL;
+        drentry->type = depkey;
 
-	if (debug_mode) {
-	    drentry->pattern = strdup(key);
-	}
+        if (debug_mode) {
+            drentry->pattern = strdup(key);
+        }
 
-	regfree(drentry->ignore);
-	drentry->ignore = NULL;
+        regfree(drentry->ignore);
+        drentry->ignore = NULL;
 
-	if (add_regex(value, &drentry->ignore) != 0) {
-	    warn(_("error reading %s ignore pattern"), get_deprule_desc(depkey));
-	}
+        if (add_regex(value, &drentry->ignore) != 0) {
+            warn(_("error reading %s ignore pattern"), get_deprule_desc(depkey));
+        }
     }
 
     return false;
@@ -549,14 +549,14 @@ static bool handle_inspections_cb(const char *key, const char *value, void *cb_d
     bool onoff = true;
 
     if (!strcasecmp(value, "on")) {
-	onoff = false;
+        onoff = false;
     } else if (strcasecmp(value, "off")) {
-	warnx(_("*** flag must be 'on' or 'off'; ignoring '%s'"), value);
+        warnx(_("*** flag must be 'on' or 'off'; ignoring '%s'"), value);
     }
 
     if (!process_inspection_flag(key, onoff, tests)) {
-	err(RI_PROGRAM_ERROR, _("*** Unknown inspections: `%s`"), key);
-	return true;
+        err(RI_PROGRAM_ERROR, _("*** Unknown inspections: `%s`"), key);
+        return true;
     }
 
     return false;
@@ -566,7 +566,7 @@ static bool handle_inspections_cb(const char *key, const char *value, void *cb_d
 static inline void handle_inspections(struct rpminspect *ri, parser_plugin *p, parser_context *ctx)
 {
     if (p->strdict_foreach(ctx, "inspections", NULL, handle_inspections_cb, &ri->tests)) {
-	warnx(_("malformed/unknown inspections section"));
+        warnx(_("malformed/unknown inspections section"));
     }
 
     return;
@@ -598,8 +598,8 @@ static int read_cfgfile(struct rpminspect *ri, const char *filename)
     INIT_DEBUG_PRINT("filename=|%s|\n", filename);
 
     if (parse_agnostic(filename, &p, &ctx)) {
-	warnx(_("ignoring malformed %s configuration file: %s"), COMMAND_NAME, filename);
-	return -1;
+        warnx(_("ignoring malformed %s configuration file: %s"), COMMAND_NAME, filename);
+        return -1;
     }
 
     /* Processing order doesn't matter, so match data/generic.yaml. */
@@ -619,15 +619,15 @@ static int read_cfgfile(struct rpminspect *ri, const char *filename)
     s = p->getstr(ctx, "vendor", "favor_release");
 
     if (s != NULL) {
-	if (!strcasecmp(s, "oldest")) {
-	    ri->favor_release = FAVOR_OLDEST;
-	} else if (!strcasecmp(s, "newest")) {
-	    ri->favor_release = FAVOR_NEWEST;
-	} else {
-	    ri->favor_release = FAVOR_NONE;
-	}
+        if (!strcasecmp(s, "oldest")) {
+            ri->favor_release = FAVOR_OLDEST;
+        } else if (!strcasecmp(s, "newest")) {
+            ri->favor_release = FAVOR_NEWEST;
+        } else {
+            ri->favor_release = FAVOR_NONE;
+        }
 
-	free(s);
+        free(s);
     }
 
     handle_inspections(ri, p, ctx);
@@ -643,18 +643,18 @@ static int read_cfgfile(struct rpminspect *ri, const char *filename)
     s = p->getstr(ctx, "modularity", "static_context");
 
     if (s != NULL) {
-	if (!strcasecmp(s, "required")) {
-	    ri->modularity_static_context = STATIC_CONTEXT_REQUIRED;
-	} else if (!strcasecmp(s, "forbidden")) {
-	    ri->modularity_static_context = STATIC_CONTEXT_FORBIDDEN;
-	} else if (!strcasecmp(s, "recommend")) {
-	    ri->modularity_static_context = STATIC_CONTEXT_RECOMMEND;
-	} else {
-	    ri->modularity_static_context = STATIC_CONTEXT_NULL;
-	    warnx(_("*** unknown modularity static context settiongs '%s'"), s);
-	}
+        if (!strcasecmp(s, "required")) {
+            ri->modularity_static_context = STATIC_CONTEXT_REQUIRED;
+        } else if (!strcasecmp(s, "forbidden")) {
+            ri->modularity_static_context = STATIC_CONTEXT_FORBIDDEN;
+        } else if (!strcasecmp(s, "recommend")) {
+            ri->modularity_static_context = STATIC_CONTEXT_RECOMMEND;
+        } else {
+            ri->modularity_static_context = STATIC_CONTEXT_NULL;
+            warnx(_("*** unknown modularity static context settiongs '%s'"), s);
+        }
 
-	free(s);
+        free(s);
     }
 #endif
 
@@ -687,18 +687,18 @@ static int read_cfgfile(struct rpminspect *ri, const char *filename)
     s = p->getstr(ctx, "filesize", "size_threshold");
 
     if (s != NULL) {
-	if (!strcasecmp(s, "info") || !strcasecmp(s, "info-only") || !strcasecmp(s, "info_only")) {
-	    ri->size_threshold = -1;
-	} else {
-	    ri->size_threshold = strtol(s, 0, 10);
+        if (!strcasecmp(s, "info") || !strcasecmp(s, "info-only") || !strcasecmp(s, "info_only")) {
+            ri->size_threshold = -1;
+        } else {
+            ri->size_threshold = strtol(s, 0, 10);
 
-	    if ((ri->size_threshold == LONG_MIN || ri->size_threshold == LONG_MAX) && errno == ERANGE) {
-		warn("strtol");
-		ri->size_threshold = 0;
-	    }
-	}
+            if ((ri->size_threshold == LONG_MIN || ri->size_threshold == LONG_MAX) && errno == ERANGE) {
+                warn("strtol");
+                ri->size_threshold = 0;
+            }
+        }
 
-	free(s);
+        free(s);
     }
 
     add_ignores(ri, p, ctx, "filesize");
@@ -708,33 +708,33 @@ static int read_cfgfile(struct rpminspect *ri, const char *filename)
     s = p->getstr(ctx, "specname", "match");
 
     if (s != NULL) {
-	if (!strcasecmp(s, "suffix")) {
-	    ri->specmatch = MATCH_SUFFIX;
-	} else if (!strcasecmp(s, "prefix")) {
-	    ri->specmatch = MATCH_PREFIX;
-	} else if (!strcasecmp(s, "full")) {
-	    ri->specmatch = MATCH_FULL;
-	} else {
-	    warnx(_("*** unknown specname match setting '%s', defaulting to 'full'"), s);
-	    ri->specmatch = MATCH_FULL;
-	}
+        if (!strcasecmp(s, "suffix")) {
+            ri->specmatch = MATCH_SUFFIX;
+        } else if (!strcasecmp(s, "prefix")) {
+            ri->specmatch = MATCH_PREFIX;
+        } else if (!strcasecmp(s, "full")) {
+            ri->specmatch = MATCH_FULL;
+        } else {
+            warnx(_("*** unknown specname match setting '%s', defaulting to 'full'"), s);
+            ri->specmatch = MATCH_FULL;
+        }
 
-	free(s);
+        free(s);
     }
 
     s = p->getstr(ctx, "specname", "primary");
 
     if (s != NULL) {
-	if (!strcasecmp(s, "filename")) {
-	    ri->specprimary = PRIMARY_FILENAME;
-	} else if (!strcasecmp(s, "name")) {
-	    ri->specprimary = PRIMARY_NAME;
-	} else {
-	    warnx(_("*** unknown specname primary setting '%s', defaulting to 'name'"), s);
-	    ri->specprimary = PRIMARY_NAME;
-	}
+        if (!strcasecmp(s, "filename")) {
+            ri->specprimary = PRIMARY_FILENAME;
+        } else if (!strcasecmp(s, "name")) {
+            ri->specprimary = PRIMARY_NAME;
+        } else {
+            warnx(_("*** unknown specname primary setting '%s', defaulting to 'name'"), s);
+            ri->specprimary = PRIMARY_NAME;
+        }
 
-	free(s);
+        free(s);
     }
 
     add_ignores(ri, p, ctx, "specname");
@@ -742,14 +742,14 @@ static int read_cfgfile(struct rpminspect *ri, const char *filename)
     s = p->getstr(ctx, "annocheck", "failure_severity");
 
     if (s != NULL) {
-	ri->annocheck_failure_severity = getseverity(s, RESULT_NULL);
+        ri->annocheck_failure_severity = getseverity(s, RESULT_NULL);
 
-	if (ri->annocheck_failure_severity == RESULT_NULL) {
-	    warnx(_("Invalid annocheck failure_reporting_level: %s, defaulting to %s."), s, strseverity(RESULT_VERIFY));
-	    ri->annocheck_failure_severity = RESULT_VERIFY;
-	}
+        if (ri->annocheck_failure_severity == RESULT_NULL) {
+            warnx(_("Invalid annocheck failure_reporting_level: %s, defaulting to %s."), s, strseverity(RESULT_VERIFY));
+            ri->annocheck_failure_severity = RESULT_VERIFY;
+        }
 
-	free(s);
+        free(s);
     }
 
     strget(p, ctx, "annocheck", "profile", &ri->annocheck_profile);
@@ -777,15 +777,15 @@ static int read_cfgfile(struct rpminspect *ri, const char *filename)
     s = p->getstr(ctx, "abdiff", "security_level_threshold");
 
     if (s != NULL) {
-	ri->abi_security_threshold = strtol(s, 0, 10);
+        ri->abi_security_threshold = strtol(s, 0, 10);
 
-	if ((ri->abi_security_threshold == LONG_MIN ||
-	     ri->abi_security_threshold == LONG_MAX) && errno == ERANGE) {
-	    warn("strtol");
-	    ri->abi_security_threshold = DEFAULT_ABI_SECURITY_THRESHOLD;
-	}
+        if ((ri->abi_security_threshold == LONG_MIN ||
+             ri->abi_security_threshold == LONG_MAX) && errno == ERANGE) {
+            warn("strtol");
+            ri->abi_security_threshold = DEFAULT_ABI_SECURITY_THRESHOLD;
+        }
 
-	free(s);
+        free(s);
     }
 
     add_ignores(ri, p, ctx, "abidiff");
@@ -802,7 +802,7 @@ static int read_cfgfile(struct rpminspect *ri, const char *filename)
 
     /* ri->bad_functions_allowed is a string_list_map_t, not string_map_t. */
     if (p->strdict_foreach(ctx, "badfuncs", "allowed", badfuncs_allowed_cb, &ri->bad_functions_allowed)) {
-	warnx(_("Malformed badfuncs->allowed section"));
+        warnx(_("Malformed badfuncs->allowed section"));
     }
 
     /* Backward compatibility for badfuncs prior to "forbidden". */
@@ -820,7 +820,7 @@ static int read_cfgfile(struct rpminspect *ri, const char *filename)
     s = p->getstr(ctx, "unicode", "exclude");
 
     if (s != NULL && add_regex(s, &ri->unicode_exclude) != 0) {
-	warn(_("error reading unicode exclude regular expression"));
+        warn(_("error reading unicode exclude regular expression"));
     }
 
     free(s);
@@ -830,7 +830,7 @@ static int read_cfgfile(struct rpminspect *ri, const char *filename)
     add_ignores(ri, p, ctx, "unicode");
 
     if (p->strdict_foreach(ctx, "rpmdeps", "ignore", rpmdeps_cb, ri->deprules_ignore)) {
-	warnx(_("Malformed rpmdeps->ignore section; skipping"));
+        warnx(_("Malformed rpmdeps->ignore section; skipping"));
     }
 
     add_ignores(ri, p, ctx, "virus");
