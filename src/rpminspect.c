@@ -770,6 +770,7 @@ int main(int argc, char **argv)
             }
 
             if (!found) {
+                list_free(valid_arches, free);
                 free_rpminspect(ri);
                 rpmFreeMacros(NULL);
                 rpmFreeRpmrc();
