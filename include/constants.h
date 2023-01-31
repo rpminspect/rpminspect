@@ -625,13 +625,6 @@
  */
 #define ELF_LIB_EXTENSION ".so."
 
-/**
- * @def YAML_FILENAME_EXTENSION
- *
- * YAML filename extension
- */
-#define YAML_FILENAME_EXTENSION ".yaml"
-
 /** @} */
 
 /**
