@@ -1,5 +1,6 @@
 #!/bin/sh
 PATH=/usr/local/bin:/usr/bin:/bin:/usr/local/sbin:/usr/sbin:/sbin
+CWD="$(pwd)"
 
 # Install 32-bit development files on 64-bit systems when available
 case "$(uname -m)" in
@@ -38,6 +39,19 @@ sed -i -e 's|@echo|@/bin/echo|g' "${SUBDIR}"/configure
 
 ( cd "${SUBDIR}" && ./configure && make && make lib-install )
 rm -rf mandoc.tar.gz "${SUBDIR}"
+
+# cdson is not [yet] in Debian
+git clone https://github.com/frozencemetery/cdson.git
+cd cdson || exit 1
+TAG="$(git tag -l | sort -n | tail -n 1)"
+git checkout -b "${TAG}" "${TAG}"
+cd "${TAG}" || exit 1
+meson setup build
+ninja -C build -v
+meson -C build test
+meson -C build install
+cd "${CWD}" || exit 1
+rm -rf cdson
 
 # Update clamav database
 service clamav-freshclam stop

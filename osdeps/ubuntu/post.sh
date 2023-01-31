@@ -1,5 +1,6 @@
 #!/bin/sh
 PATH=/usr/bin
+CWD="$(pwd)"
 
 # The mandoc package on Ubuntu lacks libmandoc.a and
 # header files, which we need to build rpminspect
@@ -24,6 +25,19 @@ tar -xf mandoc.tar.gz
 } > "${SUBDIR}"/configure.local
 ( cd "${SUBDIR}" && ./configure && make && make lib-install )
 rm -rf mandoc.tar.gz "${SUBDIR}"
+
+# cdson is not [yet] in Ubuntu
+git clone https://github.com/frozencemetery/cdson.git
+cd cdson || exit 1
+TAG="$(git tag -l | sort -n | tail -n 1)"
+git checkout -b "${TAG}" "${TAG}"
+cd "${TAG}" || exit 1
+meson setup build
+ninja -C build -v
+meson -C build test
+meson -C build install
+cd "${CWD}" || exit 1
+rm -rf cdson
 
 # Update the clamav database
 service clamav-freshclam stop
