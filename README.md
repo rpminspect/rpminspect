@@ -121,6 +121,7 @@ meson and ninja, plus the following libraries:
 | [ClamAV](https://www.clamav.net/) | :heavy_check_mark: | | [GPL-2.0-only](https://spdx.org/licenses/GPL-2.0-only.html) |
 | [gettext](https://www.gnu.org/software/gettext/) | | .po to .mo | [GPL-3.0-or-later](https://spdx.org/licenses/GPL-3.0-or-later.html) |
 | [libannocheck](https://sourceware.org/annobin/) | | | [GPL-3.0-or-later](https://spdx.org/licenses/GPL-3.0-or-later.html) |
+| [cdson](https://github.com/frozencemetery/cdson) | :heavy_check_mark: | | [MPL-2.0](https://spdx.org/licenses/MPL-2.0.html) |
 
 Additionally, the unit test suite requires the following packages:
 
