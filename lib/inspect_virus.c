@@ -177,7 +177,7 @@ bool inspect_virus(struct rpminspect *ri)
 
     /* run the virus check on each file */
     params.severity = RESULT_BAD;
-    params.waiverauth = WAIVABLE_BY_ANYONE;
+    params.waiverauth = WAIVABLE_BY_SECURITY;
     params.header = NAME_VIRUS;
     params.verb = VERB_FAILED;
     params.noun = _("virus or malware in ${FILE} on ${ARCH}");
