@@ -1356,12 +1356,12 @@ string_list_t *get_all_arches(const struct rpminspect *ri)
         if (xmlrpc_value_type(value) == XMLRPC_TYPE_NIL) {
             xmlrpc_DECREF(value);
             free(element);
-            element = NULL;
             continue;
         }
 
         /* add this architecture to the list */
         arches = list_add(arches, element);
+        free(element);
     }
 
     xmlrpc_DECREF(result);
