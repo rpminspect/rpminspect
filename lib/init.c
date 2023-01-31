@@ -44,6 +44,9 @@ static const char *BIN_PATHS[] = {"/bin", "/sbin", "/usr/bin", "/usr/sbin", NULL
  */
 static const char *SHELLS[] = {"sh", "ksh", "zsh", "csh", "tcsh", "rc", "bash", NULL};
 
+/* Supported config filename endings (we assume type by this) */
+static const char *CFG_FILENAME_EXTENSIONS[] = {"yaml", "json", "dson", NULL};
+
 static int add_regex(const char *pattern, regex_t **regex_out)
 {
     int reg_result;
@@ -849,6 +852,46 @@ static int read_cfgfile(struct rpminspect *ri, const char *filename)
 }
 
 /*
+ * Given a directory and a filename with an extension, try to look for
+ * it under all support filename extensions.  If found, read it in and
+ * return true.  If report_finding is true, return false if we
+ * couldn't find any file by that name with any support extension.
+ */
+static bool find_cfgfile(struct rpminspect *ri, const char *dir, const char *name, const bool report_finding)
+{
+    int i = 0;
+    char *tmp = NULL;
+    char *filename = NULL;
+
+    assert(dir != NULL);
+    assert(name != NULL);
+
+    for (i = 0; CFG_FILENAME_EXTENSIONS[i] != NULL; i++) {
+        xasprintf(&tmp, "%s/%s.%s", dir, name, CFG_FILENAME_EXTENSIONS[i]);
+        filename = realpath(tmp, NULL);
+
+        if (filename && !access(filename, F_OK|R_OK)) {
+            i = read_cfgfile(ri, filename);
+
+            if (i) {
+                warn(_("*** error reading '%s'"), filename);
+            } else {
+                free(tmp);
+                return true;
+            }
+        }
+
+        free(tmp);
+    }
+
+    if (report_finding) {
+        return false;
+    } else {
+        return true;
+    }
+}
+
+/*
  * Initialize the fileinfo list for the given product release.  If the
  * file cannot be found, return false.
  */
@@ -1579,6 +1622,7 @@ struct rpminspect *calloc_rpminspect(struct rpminspect *ri)
 struct rpminspect *init_rpminspect(struct rpminspect *ri, const char *cfgfile, const char *profile)
 {
     int i = 0;
+    char cwd[PATH_MAX + 1];
     char *tmp = NULL;
     char *filename = NULL;
     char *kernelnames[] = KERNEL_FILENAMES;
@@ -1622,18 +1666,9 @@ struct rpminspect *init_rpminspect(struct rpminspect *ri, const char *cfgfile, c
 
     /* Look for and autoload a product release profile if we have one */
     if (ri->product_release) {
-        xasprintf(&tmp, "%s/%s/%s%s", ri->profiledir, PRODUCT_RELEASE_CFGFILE_SUBDIR, ri->product_release, YAML_FILENAME_EXTENSION);
-        filename = realpath(tmp, NULL);
-
-        if (filename && !access(filename, F_OK|R_OK)) {
-            i = read_cfgfile(ri, filename);
-
-            if (i) {
-                warn(_("*** error reading '%s'"), filename);
-                return NULL;
-            }
-        }
-
+        xasprintf(&tmp, "%s/%s", ri->profiledir, PRODUCT_RELEASE_CFGFILE_SUBDIR);
+        assert(tmp != NULL);
+        (void) find_cfgfile(ri, tmp, ri->product_release, false);
         free(tmp);
     }
 
@@ -1649,32 +1684,21 @@ struct rpminspect *init_rpminspect(struct rpminspect *ri, const char *cfgfile, c
             }
         } else {
             /* user specified a profile name, try to find it in profiledir */
-            xasprintf(&tmp, "%s/%s%s", ri->profiledir, profile, YAML_FILENAME_EXTENSION);
-            filename = realpath(tmp, NULL);
-
-            if ((filename == NULL) || (access(filename, F_OK|R_OK) == -1)) {
+            if (!find_cfgfile(ri, ri->profiledir, profile, true)) {
                 errx(RI_MISSING_PROFILE, _("*** unable to find profile '%s'"), profile);
             }
-
-            i = read_cfgfile(ri, filename);
-            free(tmp);
-
-            if (i) {
-                warn(_("*** error reading '%s'"), filename);
-                return NULL;
-            }
         }
     }
 
-    /* ./rpminspect.yaml if it exists */
-    if (access(CFGFILE, F_OK|R_OK) == 0) {
-        i = read_cfgfile(ri, CFGFILE);
+    /* get current dir */
+    memset(cwd, '\0', sizeof(cwd));
 
-        if (i) {
-            warn(_("*** error reading '%s'"), CFGFILE);
-            return NULL;
-        }
+    if (getcwd(cwd, PATH_MAX) == NULL) {
+        err(RI_PROGRAM_ERROR, "getcwd");
     }
+
+    /* optional config file from current directory */
+    (void) find_cfgfile(ri, cwd, COMMAND_NAME, false);
 
     /* Initialize some lists if we did not get any config file data */
     if (ri->kernel_filenames == NULL) {
