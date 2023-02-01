@@ -48,7 +48,7 @@ BuildRequires:  clamav-devel
 BuildRequires:  libmandoc-devel >= 1.14.5
 BuildRequires:  gnupg2
 BuildRequires:  libicu-devel
-BuildRequires:  libdson-devel
+BuildRequires:  libcdson-devel
 
 
 %description
