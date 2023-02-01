@@ -85,9 +85,7 @@ static json_object *getobj(json_object *jo, const char *key1, const char *key2)
         return NULL;
     }
 
-    cont = json_object_object_get(jo, key1);
-
-    if (cont == NULL) {
+    if (!json_object_object_get_ex(jo, key1, &cont)) {
         return NULL;
     }
 
