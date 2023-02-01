@@ -70,6 +70,20 @@ autoreconf -f -i -v
 make V=1
 make install
 
+# cdson is not [yet] in Alpine
+cd "${CWD}" || exit 1
+git clone https://github.com/frozencemetery/cdson.git
+cd cdson || exit 1
+TAG="$(git tag -l | sort -n | tail -n 1)"
+git checkout -b "${TAG}" "${TAG}"
+cd "${TAG}" || exit 1
+meson setup build
+ninja -C build -v
+meson -C build test
+meson -C build install
+cd "${CWD}" || exit 1
+rm -rf cdson
+
 # Avoid getting %{_arch} in filenames from rpmbuild
 echo "%_arch %(/bin/arch)" > ~/.rpmmacros
 
