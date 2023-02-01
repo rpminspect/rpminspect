@@ -564,14 +564,9 @@ class TestRPMs(RequiresRpminspect):
                 self.dumpResults()
 
             self.assertEqual(self.p.returncode, self.exitcode)
-            self.assertEqual(
-                self.results[self.result_inspection][0]["result"], self.result
+            check_results(
+                self.results, self.result_inspection, self.result, self.waiver_auth
             )
-            if "waiver authorization" in self.results[self.result_inspection][0]:
-                self.assertEqual(
-                    self.results[self.result_inspection][0]["waiver authorization"],
-                    self.waiver_auth,
-                )
 
     def tearDown(self):
         super().tearDown()
