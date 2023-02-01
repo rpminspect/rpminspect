@@ -220,6 +220,39 @@ static bool filter_cb(const char *entry, void *cb_data)
     return false;
 }
 
+/* Display insufficient space error. */
+static void report_insufficient_space(const unsigned long int avail, const unsigned long int need, const char *workdir, const char *type)
+{
+    char *availh = NULL;
+    char *needh = NULL;
+
+    assert(workdir != NULL);
+    assert(type != NULL);
+
+    availh = human_size(avail);
+    needh = human_size(need);
+
+    warn(_("There is not enough available space to download the requested %s.\n"), type);
+    warn(_("    Need %s in %s, have %s.\n"), needh, workdir, availh);
+    warn(_("See the `-w' option for specifying an alternate working directory.\n"));
+
+    free(availh);
+    free(needh);
+    return;
+}
+
+/* Display warning indicating the required space is unknown. */
+static void report_unknown_space(const char *workdir, const char *type)
+{
+    assert(workdir != NULL);
+    assert(type != NULL);
+
+    warn(_("Unable to determine the required space to download the requested %s.\n"), type);
+    warn(_("Ensure %s has sufficient space available."), workdir);
+
+    return;
+}
+
 /*
  * Given a remote artifact specification in a Koji build, download it
  * to our working directory.
@@ -227,8 +260,6 @@ static bool filter_cb(const char *entry, void *cb_data)
 static int download_build(struct rpminspect *ri, const struct koji_build *build)
 {
     unsigned long int avail = 0;
-    char *availh = NULL;
-    char *needh = NULL;
     size_t total_width = 0;
     koji_buildlist_entry_t *buildentry = NULL;
     koji_rpmlist_entry_t *rpm = NULL;
@@ -256,18 +287,12 @@ static int download_build(struct rpminspect *ri, const struct koji_build *build)
     /* Check to see that there's enough disk space available */
     avail = get_available_space(workri->workdir);
 
-    if (avail < build->total_size) {
-        availh = human_size(avail);
-        needh = human_size(build->total_size);
-
-        fprintf(stderr, _("There is not enough available space to download the requested build.\n"));
-        fprintf(stderr, _("    Need %s in %s, have %s.\n"), needh, workri->workdir, availh);
-        fprintf(stderr, _("See the `-w' option for specifying an alternate working directory.\n"));
-        fflush(stderr);
+    if (avail > 0 && avail < build->total_size) {
+        report_insufficient_space(avail, build->total_size, workri->workdir, _("build"));
         rmtree(workri->worksubdir, true, false);
-        free(needh);
-        free(availh);
         return RI_INSUFFICIENT_SPACE;
+    } else if (avail == 0) {
+        report_unknown_space(workri->workdir, _("build"));
     } else {
         ri->download_size += build->total_size;
     }
@@ -466,8 +491,6 @@ static int download_build(struct rpminspect *ri, const struct koji_build *build)
 static int download_task(struct rpminspect *ri, struct koji_task *task)
 {
     unsigned long int avail = 0;
-    char *availh = NULL;
-    char *needh = NULL;
     size_t len;
     char *pkg = NULL;
     char *src = NULL;
@@ -517,18 +540,12 @@ static int download_task(struct rpminspect *ri, struct koji_task *task)
     /* Check to see that there's enough disk space available */
     avail = get_available_space(workri->workdir);
 
-    if (avail < task->total_size) {
-        availh = human_size(avail);
-        needh = human_size(task->total_size);
-
-        fprintf(stderr, _("There is not enough available space to download the requested task.\n"));
-        fprintf(stderr, _("    Need %s in %s, have %s.\n"), needh, workri->workdir, availh);
-        fprintf(stderr, _("See the `-w' option for specifying an alternate working directory.\n"));
-        fflush(stderr);
+    if (avail > 0 && avail < task->total_size) {
+        report_insufficient_space(avail, task->total_size, workri->workdir, _("task"));
         rmtree(workri->worksubdir, true, false);
-        free(availh);
-        free(needh);
         return RI_INSUFFICIENT_SPACE;
+    } else if (avail == 0) {
+        report_unknown_space(workri->workdir, _("task"));
     } else {
         ri->download_size += task->total_size;
     }
@@ -628,8 +645,6 @@ static int download_rpm(struct rpminspect *ri, const char *rpm)
 {
     unsigned long int avail = 0;
     unsigned long int rpmsize = 0;
-    char *availh = NULL;
-    char *needh = NULL;
     char *pkg = NULL;
     char *dstdir = NULL;
     char *dst = NULL;
@@ -645,17 +660,11 @@ static int download_rpm(struct rpminspect *ri, const char *rpm)
 
     avail = get_available_space(workri->workdir);
 
-    if (avail < rpmsize) {
-        availh = human_size(avail);
-        needh = human_size(rpmsize);
-
-        fprintf(stderr, _("There is not enough available space to download the requested RPM.\n"));
-        fprintf(stderr, _("    Need %s in %s, have %s.\n"), needh, workri->workdir, availh);
-        fprintf(stderr, _("See the `-w' option for specifying an alternate working directory.\n"));
-        fflush(stderr);
-        free(availh);
-        free(needh);
+    if (avail > 0 && avail < rpmsize) {
+        report_insufficient_space(avail, rpmsize, workri->workdir, _("RPM"));
         return RI_INSUFFICIENT_SPACE;
+    } else if (avail == 0) {
+        report_unknown_space(workri->workdir, _("RPM"));
     } else {
         ri->download_size += rpmsize;
     }
