@@ -76,7 +76,6 @@ git clone https://github.com/frozencemetery/cdson.git
 cd cdson || exit 1
 TAG="$(git tag -l | sort -n | tail -n 1)"
 git checkout -b "${TAG}" "${TAG}"
-cd "${TAG}" || exit 1
 meson setup build
 ninja -C build -v
 meson -C build test
