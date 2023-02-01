@@ -78,8 +78,8 @@ TAG="$(git tag -l | sort -n | tail -n 1)"
 git checkout -b "${TAG}" "${TAG}"
 meson setup build
 ninja -C build -v
-meson -C build test
-meson -C build install
+ninja -C build test
+ninja -C build install
 cd "${CWD}" || exit 1
 rm -rf cdson
 
