@@ -178,6 +178,7 @@ void curl_get_file(const bool verbose, const char *src, const char *dst)
 
     curl_easy_setopt(c, CURLOPT_WRITEFUNCTION, NULL);
     curl_easy_setopt(c, CURLOPT_FOLLOWLOCATION, 1L);
+    curl_easy_setopt(c, CURLOPT_MAXREDIRS, 10L);
 
     if (verbose) {
 #if LIBCURL_VERSION_NUM >= 0x072000
@@ -247,6 +248,7 @@ curl_off_t curl_get_size(const char *src)
     curl_easy_setopt(c, CURLOPT_NOBODY, 1L);
     curl_easy_setopt(c, CURLOPT_FAILONERROR, true);
     curl_easy_setopt(c, CURLOPT_FOLLOWLOCATION, 1L);
+    curl_easy_setopt(c, CURLOPT_MAXREDIRS, 10L);
 #ifdef CURLOPT_TCP_FASTOPEN /* not available on all versions of libcurl (e.g., <= 7.29) */
     curl_easy_setopt(c, CURLOPT_TCP_FASTOPEN, 1);
 #endif
