@@ -171,7 +171,9 @@ bool inspect_virus(struct rpminspect *ri)
     params.arch = NULL;
     add_result(ri, &params);
     free(params.msg);
+    params.msg = NULL;
     free(params.details);
+    params.details = NULL;
 
     /* run the virus check on each file */
     params.severity = RESULT_BAD;
