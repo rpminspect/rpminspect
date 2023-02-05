@@ -401,7 +401,8 @@ static inline void add_ignores(struct rpminspect *ri, parser_plugin *p, parser_c
 {
     add_ignores_cb_data data = { &ri->inspection_ignores, inspection };
 
-    if (p->strarray_foreach(ctx, inspection, "ignores", add_ignores_cb, &data)) {
+    if (p->strarray_foreach(ctx, inspection, "ignore", add_ignores_cb, &data)
+        && p->strarray_foreach(ctx, inspection, "ignores", add_ignores_cb, &data)) {
         warnx(_("problem adding ignore entries to %s"), inspection);
     }
 
@@ -484,7 +485,7 @@ static bool annocheck_cb(const char *key, const char *value, void *cb_data)
 /* lambda to handle entries in the rpmdeps config file section. */
 static bool rpmdeps_cb(const char *key, const char *value, void *cb_data)
 {
-    deprule_ignore_map_t *deprules_ignore = cb_data;
+    deprule_ignore_map_t **deprules_ignore = cb_data;
     dep_type_t depkey = TYPE_NULL;
     deprule_ignore_map_t *drentry = NULL;
 
@@ -507,7 +508,7 @@ static bool rpmdeps_cb(const char *key, const char *value, void *cb_data)
     }
 
     if (depkey != TYPE_NULL) {
-        HASH_FIND_INT(deprules_ignore, &depkey, drentry);
+        HASH_FIND_INT(*deprules_ignore, &depkey, drentry);
     }
 
     /* overwrite existing entry, otherwise create new one */
@@ -517,21 +518,21 @@ static bool rpmdeps_cb(const char *key, const char *value, void *cb_data)
         drentry->type = depkey;
 
         if (debug_mode) {
-            drentry->pattern = strdup(key);
+            drentry->pattern = strdup(value);
         }
 
         if (add_regex(value, &drentry->ignore) != 0) {
             warn(_("error reading %s ignore pattern"), get_deprule_desc(depkey));
         }
 
-        HASH_ADD_INT(deprules_ignore, type, drentry);
+        HASH_ADD_INT(*deprules_ignore, type, drentry);
     } else {
         free(drentry->pattern);
         drentry->pattern = NULL;
         drentry->type = depkey;
 
         if (debug_mode) {
-            drentry->pattern = strdup(key);
+            drentry->pattern = strdup(value);
         }
 
         regfree(drentry->ignore);
@@ -832,7 +833,7 @@ static int read_cfgfile(struct rpminspect *ri, const char *filename)
     array(p, ctx, "unicode", "forbidden_codepoints", &ri->unicode_forbidden_codepoints);
     add_ignores(ri, p, ctx, "unicode");
 
-    if (p->strdict_foreach(ctx, "rpmdeps", "ignore", rpmdeps_cb, ri->deprules_ignore)) {
+    if (p->strdict_foreach(ctx, "rpmdeps", "ignore", rpmdeps_cb, &ri->deprules_ignore)) {
         warnx(_("Malformed rpmdeps->ignore section; skipping"));
     }
 
