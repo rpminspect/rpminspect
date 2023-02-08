@@ -446,6 +446,8 @@ static bool yaml_strarray_foreach(parser_context *context, const char *key1, con
 
 static bool yaml_strdict_foreach(parser_context *context, const char *key1, const char *key2, parser_strdict_entry_fn lambda, void *cb_data)
 {
+    size_t i = 0;
+    size_t j = 0;
     y_value *y = (y_value *) context;
     const y_value *dictobj = NULL;
     const y_value *arrayobj = NULL;
@@ -456,10 +458,21 @@ static bool yaml_strdict_foreach(parser_context *context, const char *key1, cons
     if (dictobj == NULL) {
         return false;
     } else if (dictobj->type == Y_DICT) {
-        for (size_t i = 0; dictobj->v.dict.keys[i] != NULL; i++) {
+        for (i = 0; dictobj->v.dict.keys[i] != NULL; i++) {
             val = dictobj->v.dict.values[i];
 
-            if (val == NULL || val->type != Y_STRING || lambda(dictobj->v.dict.keys[i], val->v.string, cb_data)) {
+            if (val == NULL) {
+                return true;
+            } else if (val->type == Y_ARRAY) {
+                /* handle dict members with an array of strings as the value */
+                for (j = 0; val->v.array[j] != NULL; j++) {
+                    arrayobj = val->v.array[j];
+
+                    if (arrayobj == NULL || arrayobj->type != Y_STRING || lambda(dictobj->v.dict.keys[i], arrayobj->v.string, cb_data)) {
+                        return true;
+                    }
+                }
+            } else if (val->type == Y_DICT || lambda(dictobj->v.dict.keys[i], val->v.string, cb_data)) {
                 return true;
             }
         }
@@ -475,7 +488,7 @@ static bool yaml_strdict_foreach(parser_context *context, const char *key1, cons
      */
     arrayobj = dictobj;
 
-    for (size_t i = 0; arrayobj->v.array[i] != NULL; i++) {
+    for (i = 0; arrayobj->v.array[i] != NULL; i++) {
         dictobj = arrayobj->v.array[i];
 
         /* Make sure it has only one element; else it's just malformed. */

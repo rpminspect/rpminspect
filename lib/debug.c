@@ -604,13 +604,32 @@ void dump_cfg(const struct rpminspect *ri)
 
     HASH_FIND_STR(ri->inspection_ignores, NAME_BADFUNCS, mapentry);
 
-    if ((ri->bad_functions && !TAILQ_EMPTY(ri->bad_functions)) || mapentry != NULL) {
+    if ((ri->bad_functions && !TAILQ_EMPTY(ri->bad_functions)) || ri->bad_functions_allowed || mapentry != NULL) {
         printf("badfuncs:\n");
-        printf("    forbidden:\n");
 
         if (ri->bad_functions && !TAILQ_EMPTY(ri->bad_functions)) {
+            printf("    forbidden:\n");
+
             TAILQ_FOREACH(entry, ri->bad_functions, items) {
                 printf("        - %s\n", entry->data);
+            }
+        }
+
+        if (ri->bad_functions_allowed) {
+            printf("    allowed:\n");
+
+            HASH_ITER(hh, ri->bad_functions_allowed, mapentry, tmp_mapentry) {
+                if (mapentry->key == NULL || (mapentry->value == NULL || TAILQ_EMPTY(mapentry->value))) {
+                    continue;
+                }
+
+                printf("        %s\n", mapentry->key);
+
+                if (mapentry->value && !TAILQ_EMPTY(mapentry->value)) {
+                    TAILQ_FOREACH(entry, mapentry->value, items) {
+                        printf("            - %s\n", entry->data);
+                    }
+                }
             }
         }
 
