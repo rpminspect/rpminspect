@@ -2,6 +2,7 @@
  * Copyright The rpminspect Project Authors
  * SPDX-License-Identifier: LGPL-3.0-or-later
  */
+
 /* such software.  many freedoms. */
 
 #include <assert.h>
@@ -22,18 +23,18 @@ static bool dson_parse_file(parser_context **context_out, const char *filepath)
     free(buf);
 
     if (errmsg != NULL) {
-        warnx("%s\n", errmsg);
+        warnx(errmsg);
         free(errmsg);
         return true;
     }
 
-    *context_out = (parser_context *)out;
+    *context_out = (parser_context *) out;
     return false;
 }
 
 static void dson_fini(parser_context *context)
 {
-    dson_value *tree = (dson_value *)context;
+    dson_value *tree = (dson_value *) context;
 
     dson_free(&tree);
     return;
@@ -61,7 +62,8 @@ static dson_value *getobj(dson_value *tree, const char *key1, const char *key2)
 static char *as_str(dson_value *v)
 {
     char *s = NULL;
-    double integ = 0, frac = 0;
+    double integ = 0;
+    double frac = 0;
 
     if (v == NULL) {
         return NULL;
@@ -91,14 +93,14 @@ static char *as_str(dson_value *v)
 
 static char *dson_getstr(parser_context *context, const char *key1, const char *key2)
 {
-    dson_value *tree = (dson_value *)context;
+    dson_value *tree = (dson_value *) context;
 
     return as_str(getobj(tree, key1, key2));
 }
 
 static bool dson_strarray_foreach(parser_context *context, const char *key1, const char *key2, parser_strarray_entry_fn lambda, void *cb_data)
 {
-    dson_value *tree = (dson_value *)context;
+    dson_value *tree = (dson_value *) context;
     dson_value *arrobj = NULL;
     char *cur = NULL;
 
@@ -126,7 +128,7 @@ static bool dson_strarray_foreach(parser_context *context, const char *key1, con
 
 static bool dson_strdict_foreach(parser_context *context, const char *key1, const char *key2, parser_strdict_entry_fn lambda, void *cb_data)
 {
-    dson_value *tree = (dson_value *)context;
+    dson_value *tree = (dson_value *) context;
     dson_value *dictobj = NULL;
     dson_dict *dict = NULL;
     char *cur = NULL;
@@ -157,7 +159,7 @@ static bool dson_strdict_foreach(parser_context *context, const char *key1, cons
 
 static bool dson_keymap(parser_context *context, const char *key1, const char *key2, parser_keymap_key_fn lambda, void *cb_data)
 {
-    dson_value *tree = (dson_value *)context;
+    dson_value *tree = (dson_value *) context;
     dson_value *dictobj = NULL;
 
     dictobj = getobj(tree, key1, key2);

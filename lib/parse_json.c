@@ -31,7 +31,7 @@ static bool json_parse_file(parser_context **context_out, const char *filepath)
         goto done;
     }
 
-    *context_out = (parser_context *)jo;    
+    *context_out = (parser_context *)jo;
     res = false;
 done:
     free(buf);
@@ -41,7 +41,7 @@ done:
 
 static void json_fini(parser_context *context)
 {
-    json_object *jo = (json_object *)context;
+    json_object *jo = (json_object *) context;
 
     json_object_put(jo);
     return;
@@ -94,7 +94,7 @@ static json_object *getobj(json_object *jo, const char *key1, const char *key2)
 
 static char *json_getstr(parser_context *context, const char *key1, const char *key2)
 {
-    json_object *jo = (json_object *)context;
+    json_object *jo = (json_object *) context;
     json_object *cur = NULL;
 
     cur = getobj(jo, key1, key2);
@@ -108,7 +108,7 @@ static char *json_getstr(parser_context *context, const char *key1, const char *
 
 static bool json_strarray_foreach(parser_context *context, const char *key1, const char *key2, parser_strarray_entry_fn lambda, void *cb_data)
 {
-    json_object *jo = (json_object *)context;
+    json_object *jo = (json_object *) context;
     json_object *arrayobj = NULL, *cur = NULL;
     size_t bound = 0;
     char *selt = NULL;
@@ -140,7 +140,7 @@ static bool json_strarray_foreach(parser_context *context, const char *key1, con
 
 static bool json_strdict_foreach(parser_context *context, const char *key1, const char *key2, parser_strdict_entry_fn lambda, void *cb_data)
 {
-    json_object *jo = (json_object *)context;
+    json_object *jo = (json_object *) context;
     json_object *dictobj = NULL;
     char *valstr = NULL;
 
@@ -166,7 +166,7 @@ static bool json_strdict_foreach(parser_context *context, const char *key1, cons
 
 static bool json_keymap(parser_context *context, const char *key1, const char *key2, parser_keymap_key_fn lambda, void *cb_data)
 {
-    json_object *jo = (json_object *)context;
+    json_object *jo = (json_object *) context;
     json_object *dictobj = NULL;
 
     dictobj = getobj(jo, key1, key2);
