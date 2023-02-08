@@ -10,6 +10,7 @@
 #include <stdbool.h>
 #include <stdlib.h>
 #include <string.h>
+#include <err.h>
 #include "parser.h"
 #include "tyranny.h"
 
@@ -20,13 +21,6 @@
 #else
 #    define dprintf(...)
 #endif
-
-#define warn(...)                                            \
-    {                                                        \
-        fprintf(stderr, "warn: %s:%u ", __FILE__, __LINE__); \
-        fprintf(stderr, ## __VA_ARGS__);                     \
-        fprintf(stderr, "\n");                               \
-    }
 
 /* Always 0-initialized, unless the compiler disagrees. */
 static inline void *xalloc(size_t s)
@@ -52,10 +46,12 @@ static inline void *xrealloc(void *p, size_t s)
     return ret;
 }
 
-/* Not only do they not give a method for this awfulness, and not only do
- * they put enums in their public headers, but they can't even be bothered to
- * initialize them.  Cross your fingers and hope we were built with a
- * compiler close enough to the distro's libyaml! */
+/*
+ * Not only do they not give a method for this awfulness, and not only
+ * do they put enums in their public headers, but they can't even be
+ * bothered to initialize them.  Cross your fingers and hope we were
+ * built with a compiler close enough to the distro's libyaml!
+ */
 const char *tokname(yaml_token_type_t t)
 {
     switch (t) {
@@ -113,7 +109,7 @@ static bool peek(context *c, yaml_token_t *token)
 {
     if (!c->have_lookahead) {
         if (yaml_parser_scan(c->parser, &c->token) == 0) {
-            warn("broken document");
+            warnx("%s: broken document", __func__);
             return true;
         }
 
@@ -138,7 +134,7 @@ static void next(context *c, yaml_token_t *token)
         memcpy(token, &c->token, sizeof(*token));
         return;
     } else if (yaml_parser_scan(c->parser, token) == 0) {
-        warn("broken document");
+        warnx("%s: broken document", __func__);
         exit(1);
     }
 
@@ -157,13 +153,14 @@ static void wait_for(context *c, yaml_token_t *token, yaml_token_type_t target)
     next(c, token);
 
     while (token->type != YAML_NO_TOKEN && token->type != target) {
-        warn("skipping token type %s", tokname(token->type));
+        warnx("skipping token type %s", tokname(token->type));
         yaml_token_delete(token);
         next(c, token);
     }
 }
 
-/* Terminology:
+/*
+ * Terminology:
  * - "block" is the weird yaml-y way of writing things; "flow" is json
  * - "sequence" is array; "mapping" is dict
  *
@@ -237,8 +234,11 @@ static y_value *p_value(context *context)
                 }
 
                 if (ptoken.type == YAML_KEY_TOKEN) {
-                    /* And this right here is the reason we need a lookahead
-                     * (key, scalar, value, key).  Really dubious behavior. */
+                    /*
+                     * And this right here is the reason we need a
+                     * lookahead (key, scalar, value, key).  Really
+                     * dubious behavior.
+                     */
                     ret->v.dict.values[i] = NULL;
                 } else {
                     ret->v.dict.values[i] = p_value(context);
@@ -298,7 +298,7 @@ static y_value *p_value(context *context)
 
             goto done;
         } else {
-            warn("skipping token type %s", tokname(token.type));
+            warnx("skipping token type %s", tokname(token.type));
         }
 
         yaml_token_delete(&token);
@@ -318,13 +318,12 @@ static bool yaml_parse_file(parser_context **context_out, const char *filename)
     y_value *value = NULL;
 
     if (filename == NULL) {
-        warn("NULL filename");
         return NULL;
     }
 
     /* prepare a YAML parser */
     if (!yaml_parser_initialize(&parser)) {
-        warn("yaml_parser_initialize");
+        warnx("yaml_parser_initialize");
         return NULL;
     }
 
@@ -354,7 +353,8 @@ static bool yaml_parse_file(parser_context **context_out, const char *filename)
     return false;
 }
 
-static void y_free_tree(y_value *v) {
+static void y_free_tree(y_value *v)
+{
     if (v == NULL || v->type == Y_UNINITIALIZED) {
         return;
     } else if (v->type == Y_STRING) {
@@ -374,7 +374,7 @@ static void y_free_tree(y_value *v) {
         free(v->v.dict.keys);
         free(v->v.dict.values);
     } else {
-        warn("malformed type - freed?");
+        warnx("malformed type - freed?");
         return;
     }
 
@@ -385,7 +385,7 @@ static void y_free_tree(y_value *v) {
 
 static void yaml_fini(parser_context *context)
 {
-    y_free_tree((void *)context);
+    y_free_tree((void *) context);
     return;
 }
 
@@ -409,7 +409,7 @@ static y_value *getobj(y_value *y, const char *key1, const char *key2)
 
 static char *yaml_getstr(parser_context *context, const char *key1, const char *key2)
 {
-    y_value *y = (y_value *)context;
+    y_value *y = (y_value *) context;
     y_value *cur = NULL;
 
     cur = getobj(y, key1, key2);
@@ -423,7 +423,7 @@ static char *yaml_getstr(parser_context *context, const char *key1, const char *
 
 static bool yaml_strarray_foreach(parser_context *context, const char *key1, const char *key2, parser_strarray_entry_fn lambda, void *cb_data)
 {
-    y_value *y = (y_value *)context;
+    y_value *y = (y_value *) context;
     const y_value *arrobj = NULL;
 
     arrobj = getobj(y, key1, key2);
@@ -446,8 +446,10 @@ static bool yaml_strarray_foreach(parser_context *context, const char *key1, con
 
 static bool yaml_strdict_foreach(parser_context *context, const char *key1, const char *key2, parser_strdict_entry_fn lambda, void *cb_data)
 {
-    y_value *y = (y_value *)context;
-    const y_value *dictobj = NULL, *arrayobj = NULL, *val = NULL;
+    y_value *y = (y_value *) context;
+    const y_value *dictobj = NULL;
+    const y_value *arrayobj = NULL;
+    const y_value *val = NULL;
 
     dictobj = getobj(y, key1, key2);
 
@@ -467,8 +469,10 @@ static bool yaml_strdict_foreach(parser_context *context, const char *key1, cons
         return true;
     }
 
-    /* Handle an array of single-element dicts as if it were a single dict
-     * for backward compatibility with the old parser. */
+    /*
+     * Handle an array of single-element dicts as if it were a single
+     * dict for backward compatibility with the old parser.
+     */
     arrayobj = dictobj;
 
     for (size_t i = 0; arrayobj->v.array[i] != NULL; i++) {
@@ -491,7 +495,7 @@ static bool yaml_strdict_foreach(parser_context *context, const char *key1, cons
 
 static bool yaml_keymap(parser_context *context, const char *key1, const char *key2, parser_keymap_key_fn lambda, void *cb_data)
 {
-    y_value *y = (y_value *)context;
+    y_value *y = (y_value *) context;
     const y_value *dictobj = NULL;
 
     dictobj = getobj(y, key1, key2);
