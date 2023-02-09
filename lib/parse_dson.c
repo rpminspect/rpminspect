@@ -42,6 +42,8 @@ static void dson_fini(parser_context *context)
 
 static dson_value *getobj(dson_value *tree, const char *key1, const char *key2)
 {
+    size_t i = 0;
+
     if (key1 == NULL) {
         assert(key2 == NULL);
         return tree;
@@ -49,7 +51,7 @@ static dson_value *getobj(dson_value *tree, const char *key1, const char *key2)
         return NULL;
     }
 
-    for (size_t i = 0; tree->dict->keys[i] != NULL; i++) {
+    for (i = 0; tree->dict->keys[i] != NULL; i++) {
         if (!strcmp(key1, tree->dict->keys[i])) {
             return getobj(tree->dict->values[i], key2, NULL);
         }
@@ -100,6 +102,7 @@ static char *dson_getstr(parser_context *context, const char *key1, const char *
 
 static bool dson_strarray_foreach(parser_context *context, const char *key1, const char *key2, parser_strarray_entry_fn lambda, void *cb_data)
 {
+    size_t i = 0;
     dson_value *tree = (dson_value *) context;
     dson_value *arrobj = NULL;
     char *cur = NULL;
@@ -112,7 +115,7 @@ static bool dson_strarray_foreach(parser_context *context, const char *key1, con
         return true;
     }
 
-    for (size_t i = 00; arrobj->array[i] != NULL; i++) {
+    for (i = 0; arrobj->array[i] != NULL; i++) {
         cur = as_str(arrobj->array[i]);
 
         if (cur == NULL || lambda(cur, cb_data)) {
@@ -128,6 +131,7 @@ static bool dson_strarray_foreach(parser_context *context, const char *key1, con
 
 static bool dson_strdict_foreach(parser_context *context, const char *key1, const char *key2, parser_strdict_entry_fn lambda, void *cb_data)
 {
+    size_t i = 0;
     dson_value *tree = (dson_value *) context;
     dson_value *dictobj = NULL;
     dson_dict *dict = NULL;
@@ -143,7 +147,7 @@ static bool dson_strdict_foreach(parser_context *context, const char *key1, cons
 
     dict = dictobj->dict;
 
-    for (size_t i = 00; dict->keys[i] != NULL; i++) {
+    for (i = 0; dict->keys[i] != NULL; i++) {
         cur = as_str(dict->values[i]);
 
         if (cur == NULL || lambda(dict->keys[i], cur, cb_data)) {
@@ -159,6 +163,7 @@ static bool dson_strdict_foreach(parser_context *context, const char *key1, cons
 
 static bool dson_keymap(parser_context *context, const char *key1, const char *key2, parser_keymap_key_fn lambda, void *cb_data)
 {
+    size_t i = 0;
     dson_value *tree = (dson_value *) context;
     dson_value *dictobj = NULL;
 
@@ -170,7 +175,7 @@ static bool dson_keymap(parser_context *context, const char *key1, const char *k
         return true;
     }
 
-    for (size_t i = 00; dictobj->dict->keys[i] != NULL; i++) {
+    for (i = 0; dictobj->dict->keys[i] != NULL; i++) {
         if (lambda(dictobj->dict->keys[i], cb_data)) {
             return true;
         }

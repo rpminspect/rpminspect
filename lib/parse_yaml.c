@@ -355,18 +355,20 @@ static bool yaml_parse_file(parser_context **context_out, const char *filename)
 
 static void y_free_tree(y_value *v)
 {
+    size_t i = 0;
+
     if (v == NULL || v->type == Y_UNINITIALIZED) {
         return;
     } else if (v->type == Y_STRING) {
         free(v->v.string);
     } else if (v->type == Y_ARRAY) {
-        for (size_t i = 0; v->v.array[i] != NULL; i++) {
+        for (i = 0; v->v.array[i] != NULL; i++) {
             y_free_tree(v->v.array[i]);
         }
 
         free(v->v.array);
     } else if (v->type == Y_DICT) {
-        for (size_t i = 0; v->v.dict.keys[i] != NULL; i++) {
+        for (i = 0; v->v.dict.keys[i] != NULL; i++) {
             free(v->v.dict.keys[i]);
             y_free_tree(v->v.dict.values[i]);
         }
@@ -391,6 +393,7 @@ static void yaml_fini(parser_context *context)
 
 static y_value *getobj(y_value *y, const char *key1, const char *key2)
 {
+    size_t i = 0;
     if (key1 == NULL) {
         assert(key2 == NULL);
         return y;
@@ -398,7 +401,7 @@ static y_value *getobj(y_value *y, const char *key1, const char *key2)
         return NULL;
     }
 
-    for (size_t i = 0; y->v.dict.keys[i] != NULL; i++) {
+    for (i = 0; y->v.dict.keys[i] != NULL; i++) {
         if (!strcmp(key1, y->v.dict.keys[i])) {
             return getobj(y->v.dict.values[i], key2, NULL);
         }
@@ -423,6 +426,7 @@ static char *yaml_getstr(parser_context *context, const char *key1, const char *
 
 static bool yaml_strarray_foreach(parser_context *context, const char *key1, const char *key2, parser_strarray_entry_fn lambda, void *cb_data)
 {
+    size_t i = 0;
     y_value *y = (y_value *) context;
     const y_value *arrobj = NULL;
 
@@ -434,7 +438,7 @@ static bool yaml_strarray_foreach(parser_context *context, const char *key1, con
         return true;
     }
 
-    for (size_t i = 0; arrobj->v.array[i] != NULL; i++) {
+    for (i = 0; arrobj->v.array[i] != NULL; i++) {
         if (arrobj->v.array[i]->type != Y_STRING ||
             lambda(arrobj->v.array[i]->v.string, cb_data)) {
             return true;
@@ -508,6 +512,7 @@ static bool yaml_strdict_foreach(parser_context *context, const char *key1, cons
 
 static bool yaml_keymap(parser_context *context, const char *key1, const char *key2, parser_keymap_key_fn lambda, void *cb_data)
 {
+    size_t i = 0;
     y_value *y = (y_value *) context;
     const y_value *dictobj = NULL;
 
@@ -519,7 +524,7 @@ static bool yaml_keymap(parser_context *context, const char *key1, const char *k
         return true;
     }
 
-    for (size_t i = 0; dictobj->v.dict.keys[i] != NULL; i++) {
+    for (i = 0; dictobj->v.dict.keys[i] != NULL; i++) {
         if (lambda(dictobj->v.dict.keys[i], cb_data)) {
             return true;
         }

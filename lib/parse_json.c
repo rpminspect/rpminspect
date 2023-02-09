@@ -108,6 +108,7 @@ static char *json_getstr(parser_context *context, const char *key1, const char *
 
 static bool json_strarray_foreach(parser_context *context, const char *key1, const char *key2, parser_strarray_entry_fn lambda, void *cb_data)
 {
+    size_t i = 0;
     json_object *jo = (json_object *) context;
     json_object *arrayobj = NULL, *cur = NULL;
     size_t bound = 0;
@@ -123,7 +124,7 @@ static bool json_strarray_foreach(parser_context *context, const char *key1, con
 
     bound = json_object_array_length(arrayobj);
 
-    for (size_t i = 0; i < bound; i++) {
+    for (i = 0; i < bound; i++) {
         cur = json_object_array_get_idx(arrayobj, i);
         selt = as_str(cur);
 
