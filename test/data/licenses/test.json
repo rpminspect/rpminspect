@@ -1,232 +1,140 @@
 {
-  "GNU General Public License v2.0 only": {
+  "0": {
     "approved": "yes",
     "fedora_abbrev": "GPLv2",
     "fedora_name": "GNU General Public License v2.0 only",
-    "id": "224",
-    "license_text": "",
     "spdx_abbrev": "GPL-2.0",
-    "spdx_name": "GNU General Public License v2.0 only",
-    "url": "http://www.gnu.org/licenses/old-licenses/gpl-2.0-standalone.html"
   },
-  "GNU General Public License v2.0 or later": {
+  "1": {
     "approved": "yes",
     "fedora_abbrev": "GPLv2+",
     "fedora_name": "GNU General Public License v2.0 or later",
-    "id": "227",
-    "license_text": "",
     "spdx_abbrev": "GPL-2.0+",
-    "spdx_name": "GNU General Public License v2.0 or later",
-    "url": "https://spdx.org/licenses/GPL-2.0+.html"
   },
-  "GNU General Public License v2.0 or later, with font embedding exception": {
+  "2": {
     "approved": "yes",
     "fedora_abbrev": "GPLv2+ with exceptions",
     "fedora_name": "GNU General Public License v2.0 or later, with font embedding exception",
-    "id": "229",
-    "license_text": "",
     "spdx_abbrev": "",
-    "spdx_name": "",
-    "url": "http://www.gnu.org/licenses/gpl-faq.html#FontException"
   },
-  "GNU General Public License v3.0 only": {
+  "3": {
     "approved": "yes",
     "fedora_abbrev": "GPLv3",
     "fedora_name": "GNU General Public License v3.0 only",
-    "id": "230",
-    "license_text": "",
     "spdx_abbrev": "GPL-3.0",
-    "spdx_name": "GNU General Public License v3.0 only",
-    "url": "http://www.gnu.org/licenses/gpl-3.0-standalone.html"
   },
-  "GNU General Public License v3.0 or later": {
+  "4": {
     "approved": "yes",
     "fedora_abbrev": "GPLv3+",
     "fedora_name": "GNU General Public License v3.0 or later",
-    "id": "233",
-    "license_text": "",
     "spdx_abbrev": "GPL-3.0+",
-    "spdx_name": "GNU General Public License v3.0 or later",
-    "url": "https://www.gnu.org/licenses/gpl.html"
   },
-  "MIT License": {
+  "5": {
     "approved": "yes",
     "fedora_abbrev": "",
     "fedora_name": "",
-    "id": "328",
-    "license_text": "",
     "spdx_abbrev": "MIT",
-    "spdx_name": "MIT License",
-    "url": "http://www.opensource.org/licenses/MIT"
   },
-  "The Apache License, Version 2.0": {
+  "6": {
     "approved": "yes",
     "fedora_abbrev": "ASL 2.0",
     "fedora_name": "Apache Software License 2.0",
-    "id": "578",
-    "license_text": "",
     "spdx_abbrev": "Apache-2.0",
-    "spdx_name": "Apache License 2.0",
-    "url": "http://www.apache.org/licenses/LICENSE-2.0"
   },
-  "Apple Public Source License 1.2": {
+  "7": {
     "approved": "no",
     "fedora_abbrev": "",
     "fedora_name": "Apple Public Source License 1.2",
-    "id": "41",
-    "license_text": "",
     "spdx_abbrev": "APSL-1.2",
-    "spdx_name": "Apple Public Source License 1.2",
-    "url": "http://www.samurajdata.se/opensource/mirror/licenses/apsl.php"
   },
-  "Apple Public Source License 2.0": {
+  "8": {
     "approved": "yes",
     "fedora_abbrev": "APSL 2.0",
     "fedora_name": "Apple Public Source License 2.0",
-    "id": "42",
-    "license_text": "",
     "spdx_abbrev": "APSL-2.0",
-    "spdx_name": "Apple Public Source License 2.0",
-    "url": "http://www.opensource.apple.com/license/apsl/"
   },
-  "CodeProject Open License (CPOL)": {
+  "9": {
     "approved": "no",
     "fedora_abbrev": "",
     "fedora_name": "CodeProject Open License (CPOL)",
-    "id": "109",
-    "license_text": "",
     "spdx_abbrev": "CPOL-1.02",
-    "spdx_name": "Code Project Open License 1.02",
-    "url": "http://www.codeproject.com/info/cpol10.aspx"
   },
-  "Artistic 2.0": {
+  "10": {
     "approved": "yes",
     "fedora_abbrev": "Artistic 2.0",
     "fedora_name": "Artistic 2.0",
-    "id": "47",
-    "license_text": "",
     "spdx_abbrev": "Artistic-2.0",
-    "spdx_name": "Artistic License 2.0",
-    "url": "http://www.perlfoundation.org/artistic_license_2_0"
   },
-  "Perl License": {
+  "11": {
     "approved": "yes",
     "fedora_abbrev": "GPL+ or Artistic",
     "fedora_name": "Perl License",
-    "id": "416",
-    "license_text": "",
     "spdx_abbrev": "",
-    "spdx_name": "",
-    "url": "http://dev.perl.org/licenses/"
   },
-  "MIT License": {
+  "12": {
     "approved": "yes",
     "fedora_abbrev": "",
     "fedora_name": "",
-    "id": "328",
-    "license_text": "",
     "spdx_abbrev": "MIT",
-    "spdx_name": "MIT License",
-    "url": "http://www.opensource.org/licenses/MIT"
   },
-  "BSD 3-Clause \"New\" or \"Revised\" License": {
+  "13": {
     "approved": "yes",
     "fedora_abbrev": "BSD",
     "fedora_name": "BSD License (no advertising)",
-    "id": "72",
-    "license_text": "",
     "spdx_abbrev": "BSD-3-Clause",
-    "spdx_name": "BSD 3-Clause \"New\" or \"Revised\" License",
-    "url": "http://www.opensource.org/licenses/BSD-3-Clause"
   },
-  "The Apache License, Version 2.0": {
+  "14": {
     "approved": "yes",
     "fedora_abbrev": "ASL 2.0",
     "fedora_name": "Apache Software License 2.0",
-    "id": "578",
-    "license_text": "",
     "spdx_abbrev": "Apache-2.0",
-    "spdx_name": "Apache License 2.0",
-    "url": "http://www.apache.org/licenses/LICENSE-2.0"
   },
-  "GNU Lesser General Public License v2 (or 2.1) or later": {
+  "15": {
     "approved": "yes",
     "fedora_abbrev": "LGPLv2+",
     "fedora_name": "GNU Lesser General Public License v2 (or 2.1) or later",
-    "id": "240",
-    "license_text": "",
     "spdx_abbrev": "",
-    "spdx_name": "",
-    "url": "http://www.gnu.org/licenses/old-licenses/lgpl-2.1.html"
   },
-  "GNU Lesser General Public License v2 (or 2.1) or later, with exceptions": {
+  "16": {
     "approved": "yes",
     "fedora_abbrev": "LGPLv2+ with exceptions",
     "fedora_name": "GNU Lesser General Public License v2 (or 2.1) or later, with exceptions",
-    "id": "241",
-    "license_text": "",
     "spdx_abbrev": "",
-    "spdx_name": "",
-    "url": ""
   },
-  "ISC License": {
+  "17": {
     "approved": "yes",
     "fedora_abbrev": "ISC",
     "fedora_name": "ISC License (Bind, DHCP Server)",
-    "id": "279",
-    "license_text": "",
     "spdx_abbrev": "ISC",
-    "spdx_name": "ISC License",
-    "url": "http://www.isc.org/downloads/software-support-policy/isc-license/"
   },
-  "Public Domain": {
+  "18": {
     "approved": "yes",
     "fedora_abbrev": "Public Domain",
     "fedora_name": "Public Domain",
-    "id": "429",
-    "license_text": "Being in the public domain is not a license; rather, it means the material is not copyrighted and no license is needed.",
     "spdx_abbrev": "",
-    "spdx_name": "",
-    "url": ""
   },
-  "GNU Free Documentation License": {
+  "19": {
     "approved": "yes",
     "fedora_abbrev": "GFDL",
     "fedora_name": "GNU Free Documentation License",
-    "id": "600",
-    "license_text": "",
     "spdx_abbrev": "GFDL-1.3",
-    "spdx_name": "GNU Free Documentation License v1.3",
-    "url": "http://www.fsf.org/licensing/licenses/fdl.html"
   },
-  "Inner Net License": {
+  "20": {
     "approved": "yes",
     "fedora_abbrev": "Inner-Net",
     "fedora_name": "Inner Net License",
-    "id": "9000",
-    "license_text": "",
     "spdx_abbrev": "",
-    "spdx_name": "",
-    "url": "https://old.calculate-linux.org/packages/licenses/inner-net"
   },
-  "Creative Commons Zero 1.0 Universal": {
+  "21": {
     "approved": "yes",
     "fedora_abbrev": "CC0",
     "fedora_name": "Creative Commons Zero 1.0 Universal",
-    "id": "158",
-    "license_text": "",
     "spdx_abbrev": "CC0-1.0",
-    "spdx_name": "Creative Commons Zero v1.0 Universal",
-    "url": "http://creativecommons.org/publicdomain/zero/1.0/legalcode"
   },
-  "Lorem ipsum": {
+  "22": {
     "approved": "yes",
     "fedora_abbrev": "",
     "fedora_name": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua",
-    "id": "8000",
-    "license_text": "",
     "spdx_abbrev": "",
-    "spdx_name": "",
-    "url": "https://www.lipsum.com/"
   }
 }
