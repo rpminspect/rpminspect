@@ -58,6 +58,7 @@ bool is_local_build(const char *workdir, const char *build, const bool fetch_onl
     }
 
     if (!S_ISDIR(sb.st_mode)) {
+        free(check);
         return false;
     }
 
