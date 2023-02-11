@@ -145,7 +145,7 @@ static char *match_product(string_map_t *products, const char *candidate)
  */
 static char *get_product_release(string_map_t *products, const favor_release_t favor_release, const char *before, const char *after)
 {
-    int c = -1;
+    int c = 0;
     size_t i = 0;
     char *r = NULL;
     char *before_candidate = NULL;
@@ -215,13 +215,7 @@ static char *get_product_release(string_map_t *products, const favor_release_t f
         after_product = match_product(products, after_candidate);
         before_product = match_product(products, before_candidate);
 
-        if (before_product && after_product) {
-            c = strcmp(before_product, after_product);
-        }
-
-        if (c) {
-            matched = false;
-        } else if (!c) {
+        if (before_product && after_product && !strcmp(before_product, after_product)) {
             matched = true;
         }
     } else {
@@ -267,18 +261,20 @@ static char *get_product_release(string_map_t *products, const favor_release_t f
     free(before_product);
 
     /* trim the leading period */
-    i = 0;
+    if (after_product) {
+        i = 0;
 
-    while (after_product[i] == '.' && after_product[i] != '\0') {
-        i++;
+        while (after_product[i] == '.' && after_product[i] != '\0') {
+            i++;
+        }
+
+        if (i < strlen(after_product)) {
+            r = strdup(after_product + i);
+            assert(r != NULL);
+        }
+
+        free(after_product);
     }
-
-    if (i < strlen(after_product)) {
-        r = strdup(after_product + i);
-        assert(r != NULL);
-    }
-
-    free(after_product);
 
     return r;
 }
