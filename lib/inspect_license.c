@@ -66,7 +66,9 @@ static bool lic_cb(const char *license_name, void *cb_data)
     const char *lic = data->lic;
     parser_plugin *p = data->p;
     parser_context *db = data->db;
-    char *fedora_abbrev = NULL, *fedora_name = NULL, *spdx_abbrev = NULL;
+    char *fedora_abbrev = NULL;
+    char *fedora_name = NULL;
+    char *spdx_abbrev = NULL;
     char *approved = NULL;
 
     if (data->valid) {
@@ -95,8 +97,7 @@ static bool lic_cb(const char *license_name, void *cb_data)
     }
 
     /* No full tag match and no abbreviations; license entry invalid. */
-    if (strlen(fedora_abbrev) == 0 && strlen(spdx_abbrev) == 0 &&
-        strlen(fedora_name) == 0) {
+    if (strlen(fedora_abbrev) == 0 && strlen(spdx_abbrev) == 0 && strlen(fedora_name) == 0) {
         goto done;
     }
 
@@ -110,8 +111,7 @@ static bool lic_cb(const char *license_name, void *cb_data)
         /* invalid - do nothing */
         goto done;
     } else if ((!strcmp(lic, fedora_abbrev) || !strcmp(lic, spdx_abbrev)) ||
-               (strlen(fedora_abbrev) == 0 && strlen(spdx_abbrev) == 0 &&
-                !strcmp(lic, fedora_name))) {
+               (strlen(fedora_abbrev) == 0 && strlen(spdx_abbrev) == 0 && !strcmp(lic, fedora_name))) {
         data->valid = true;
     }
 
@@ -139,52 +139,39 @@ static bool check_license_abbrev(parser_plugin *p, parser_context *db, const cha
     return data.valid;
 }
 
-/*
- * Dupe or append a token to the given string.
- */
-static void token_append(char **dest, const char *token)
+static void token_add(string_map_t **tags, const char *token)
 {
-    char *newdest = NULL;
+    string_map_t *tag_entry = NULL;
 
     assert(token != NULL);
 
-    if (*dest == NULL) {
-        *dest = strdup(token);
-        assert(*dest != NULL);
-    } else {
-        xasprintf(&newdest, "%s %s", *dest, token);
-        assert(newdest != NULL);
-        free(*dest);
-        *dest = newdest;
-    }
+    tag_entry = calloc(1, sizeof(*tag_entry));
+    assert(tag_entry != NULL);
+    tag_entry->key = strdup(token);
+    assert(tag_entry->key != NULL);
+    tag_entry->value = NULL;
+    HASH_ADD_KEYPTR(hh, *tags, tag_entry->key, strlen(tag_entry->key), tag_entry);
 
     return;
 }
 
 /*
- * Given a license expression without parens, check it.
+ * Split up the license expression in to tokens.  This can be an empty
+ * list on return.
  */
-static bool is_valid_expression(parser_plugin *p, parser_context *db, const char *s, const char *nevra, struct result_params *params, results_t **rq)
+static string_map_t *tokenize_license_tag(const char *license)
 {
-    bool result = true;
     char *tagtokens = NULL;
     char *tagcopy = NULL;
     char *token = NULL;
     char *lic = NULL;
+    string_map_t *tags = NULL;
 
-    assert(db != NULL);
-    assert(s != NULL);
-    assert(params != NULL);
+    assert(license != NULL);
 
-    /* see if the entire substring matches */
-    if (check_license_abbrev(p, db, s)) {
-        return true;
-    }
+    tagtokens = tagcopy = strdup(license);
 
-    /* fall back on checking each individual token */
-    tagtokens = tagcopy = strdup(s);
-
-    while ((token = strsep(&tagtokens, " ")) != NULL) {
+    while ((token = strsep(&tagtokens, " ()")) != NULL) {
         if (!strcmp(token, "")) {
             continue;
         }
@@ -194,43 +181,108 @@ static bool is_valid_expression(parser_plugin *p, parser_context *db, const char
                 continue;
             }
 
-            if (!check_license_abbrev(p, db, lic)) {
-                result = false;
+            /* add this tag to the hash table */
+            token_add(&tags, lic);
 
-                xasprintf(&params->msg, _("Unapproved license in %s: %s"), nevra, lic);
-                add_result_entry(rq, params);
-                free(params->msg);
-            } else {
-                DEBUG_PRINT("APPROVED: |%s|\n", lic);
-            }
-
+            /* clear the local tag to start over */
             free(lic);
             lic = NULL;
         } else if (lic == NULL) {
             lic = strdup(token);
         } else {
-            token_append(&lic, token);
+            lic = strappend(lic, " ", token, NULL);
         }
     }
 
-    /* check final token */
     if (lic) {
-        if (!check_license_abbrev(p, db, lic)) {
-            result = false;
-
-            xasprintf(&params->msg, _("Unapproved license in %s: %s"), nevra, lic);
-            add_result_entry(rq, params);
-            free(params->msg);
-        } else {
-            DEBUG_PRINT("APPROVED: |%s|\n", lic);
-        }
+        /* add this last tag to the hash table */
+        token_add(&tags, lic);
     }
 
     /* cleanup */
     free(lic);
     free(tagcopy);
 
-    return result;
+    return tags;
+}
+
+/* Free the license tags hash */
+static void free_tags(string_map_t *tags)
+{
+    string_map_t *tagtoken = NULL;
+    string_map_t *tmp_tagtoken = NULL;
+
+    if (tags == NULL) {
+        return;
+    }
+
+    HASH_ITER(hh, tags, tagtoken, tmp_tagtoken) {
+        tagtoken->value = NULL;
+    }
+
+    free_string_map(tags);
+    return;
+}
+
+/*
+ * This is very unique to how license tags have historically been used
+ * in Fedora and Red Hat.  Sometimes a compound expression is allowed
+ * but as individual tokens not all of them are allowed.  An example
+ * is Perl packages using "GPL+ or Artistic" as their license tag for
+ * a long time.  GPL+ was allowed but Artistic was not.  However the
+ * compound expression "GPL+ or Artistic" was allowed per the license
+ * database.  This is legacy stuff, but we still need to handle it
+ * until all packages have moved over to SPDX expressions exclusively.
+ *
+ * The two in-use instances of these types of legacy compound
+ * expression are either as the entire license tag or as an expression
+ * within parens.  We do not handle nested parens.  This function
+ * builds a list of compound expressions in parens and returns it to
+ * the caller.  The caller is responsible for freeing this list.
+ */
+static string_list_t *get_paren_expressions(const char *license)
+{
+    char *start = NULL;
+    char *end = NULL;
+    char *copy = NULL;
+    string_list_t *list = NULL;
+    string_entry_t *entry = NULL;
+
+    assert(license != NULL);
+
+    start = copy = strdup(license);
+    assert(start != NULL);
+
+    while ((start = strchr(start, '(')) != NULL) {
+        while (*start == '(') {
+            start++;
+        }
+
+        end = strchr(start, ')');
+
+        if ((end - start) > 0) {
+            entry = calloc(1, sizeof(*entry));
+            assert(entry != NULL);
+
+            entry->data = calloc(1, end - start + 1);
+            assert(entry->data != NULL);
+
+            entry->data = strncpy(entry->data, start, end - start);
+
+            if (list == NULL) {
+                list = calloc(1, sizeof(*list));
+                assert(list != NULL);
+                TAILQ_INIT(list);
+            }
+
+            TAILQ_INSERT_TAIL(list, entry, items);
+        }
+
+        start = end;
+    }
+
+    free(copy);
+    return list;
 }
 
 /*
@@ -242,7 +294,7 @@ static bool is_valid_expression(parser_plugin *p, parser_context *db, const char
  * the RPM cannot ship that.
  *
  * The check involved here consists of multiple parts:
- * 1) Check to see that expressions in parentheses are balance.  For
+ * 1) Check to see that expressions in parentheses are balanced.  For
  *    example, "(GPLv2+ and MIT) or LGPLv2+" is valid, but we want to
  *    make sure that "GPLv2+ and MIT) or (LGPLv2+" is invalid.
  * 2) Tokenize the license tag.
@@ -251,43 +303,44 @@ static bool is_valid_expression(parser_plugin *p, parser_context *db, const char
  * 4) The function returns true if all license tags are approved in the
  *    database.  Any single tag that is unapproved results in false.
  */
-static bool is_valid_license(struct rpminspect *ri, struct result_params *params, const char *nevra, const char *tag)
+static bool is_valid_license(struct rpminspect *ri, struct result_params *params, const char *nevra, const char *license)
 {
-    bool result = false;
-    int good = 0;
-    int seen = 0;
+    bool r = true;
     int balance = 0;
     size_t i = 0;
-    char *tagtokens = NULL;
-    char *tagcopy = NULL;
-    char *token = NULL;
-    results_t *rq = NULL;
-    results_entry_t *entry = NULL;
-    string_entry_t *sentry = NULL;
+    char *tmp = NULL;
+    char *wlicense = NULL;
+    char *nlicense = NULL;
+    string_map_t *tags = NULL;
+    string_map_t *tagtoken = NULL;
+    string_map_t *tmp_tagtoken = NULL;
+    string_entry_t *entry = NULL;
+    string_list_t *parenexps = NULL;
+    string_entry_t *pentry = NULL;
     parser_plugin *p = NULL;
     parser_context *db = NULL;
 
     assert(ri != NULL);
     assert(params != NULL);
     assert(nevra != NULL);
-    assert(tag != NULL);
+    assert(license != NULL);
 
     /* Set up the result parameters */
     params->severity = RESULT_BAD;
     params->remedy = REMEDY_UNAPPROVED_LICENSE;
 
     /* check for matching parens */
-    for (i = 0; i < strlen(tag); i++) {
+    for (i = 0; i < strlen(license); i++) {
         if (balance < 0) {
             return false;
         }
 
-        if (tag[i] == '(') {
+        if (license[i] == '(') {
             balance++;
             continue;
         }
 
-        if (tag[i] == ')') {
+        if (license[i] == ')') {
             balance--;
         }
     }
@@ -296,77 +349,136 @@ static bool is_valid_license(struct rpminspect *ri, struct result_params *params
         return false;
     }
 
-    /* read in each approved license database */
-    TAILQ_FOREACH(sentry, ri->licensedb, items) {
-        p = read_licensedb(ri, sentry->data, &db);
+    wlicense = strdup(license);
+    assert(wlicense != NULL);
+
+    /*
+     * loop over each license database and try to validate all license
+     * tags, but there are 3 distinct phases because everything has to
+     * be complicated
+     */
+
+    /*
+     * first, loop over each db trying to match the entire tag.  this
+     * is the common case.
+     */
+    TAILQ_FOREACH(entry, ri->licensedb, items) {
+        /* read in this license database */
+        p = read_licensedb(ri, entry->data, &db);
 
         if (p == NULL) {
             continue;
         }
 
-        /* First try to match the entire string */
-        if (check_license_abbrev(p, db, tag)) {
+        /* first, try to match the entire string */
+        if (check_license_abbrev(p, db, wlicense)) {
+            p->fini(db);
+            free(wlicense);
             return true;
         }
 
-        /* tokenize the license tag and validate each license */
-        tagtokens = tagcopy = strdup(tag);
-
-        while ((token = strsep(&tagtokens, "()")) != NULL) {
-            if (!strcmp(token, "")) {
-                continue;
-            }
-
-            if (is_valid_expression(p, db, token, nevra, params, &rq)) {
-                good++;
-            }
-
-            seen++;
-        }
-
-        free(tagcopy);
+        /* close this db */
         p->fini(db);
-
-        if (good == seen) {
-            result = true;
-            break;
-        }
-
-        good = 0;
-        seen = 0;
     }
 
     /*
-     * license tag is approved if number of seen tags equals
-     * number of valid tags
+     * second, try to match license substring tokens in parens (this
+     * is because of past bad policy decisions).  if any match, remove
+     * them from the whole license tag.  the reason for this is we
+     * only want the third phase to deal with whatever is leftoveer
+     * from this phase.
      */
-    if (result) {
-        free_results(rq);
-        return true;
-    } else {
-        if (ri->results == NULL) {
-            ri->results = init_results();
+    TAILQ_FOREACH(entry, ri->licensedb, items) {
+        /* read in this license database */
+        p = read_licensedb(ri, entry->data, &db);
+
+        if (p == NULL) {
+            continue;
         }
 
-        if (rq && !TAILQ_EMPTY(rq)) {
-            /*
-             * make sure to set the worst result based on queued
-             * license inspection failures.
-             */
-            TAILQ_FOREACH(entry, rq, items) {
-                if (entry->severity > ri->worst_result) {
-                    ri->worst_result = entry->severity;
+        parenexps = get_paren_expressions(wlicense);
+
+        if (parenexps && !TAILQ_EMPTY(parenexps)) {
+            TAILQ_FOREACH(pentry, parenexps, items) {
+                if (check_license_abbrev(p, db, pentry->data)) {
+                    xasprintf(&tmp, "(%s)", pentry->data);
+                    assert(tmp != NULL);
+                    nlicense = strreplace(wlicense, tmp, NULL);
+                    free(tmp);
+                    free(wlicense);
+                    wlicense = nlicense;
                 }
             }
 
-            /* append the queued license inspection failures */
-            TAILQ_CONCAT(ri->results, rq, items);
+            list_free(parenexps, free);
         }
 
-        return false;
+        /* close this db */
+        p->fini(db);
     }
 
-    return false;
+    /*
+     * third, check each remaining token not caught in the second
+     * step.  this is individual tag checking for whole compound
+     * expressions.
+     */
+    tags = tokenize_license_tag(wlicense);
+
+    if (tags) {
+        TAILQ_FOREACH(entry, ri->licensedb, items) {
+            /* read in this license database */
+            p = read_licensedb(ri, entry->data, &db);
+
+            if (p == NULL) {
+                continue;
+            }
+
+            HASH_ITER(hh, tags, tagtoken, tmp_tagtoken) {
+                if (tagtoken->value == tagtoken->key) {
+                    /* already validated */
+                    continue;
+                }
+
+                if (check_license_abbrev(p, db, tagtoken->key)) {
+                    /* set the value to non-NULL so we know it passed (DO NOT FREE) */
+                    tagtoken->value = tagtoken->key;
+                }
+            }
+
+            /* close this db */
+            p->fini(db);
+        }
+    }
+
+    /* report unapproved license tag tokens */
+    if (tags) {
+        HASH_ITER(hh, tags, tagtoken, tmp_tagtoken) {
+            if (tagtoken->value == NULL) {
+                r = false;
+
+                if (ri->results == NULL) {
+                    ri->results = init_results();
+                }
+
+                xasprintf(&params->msg, _("Unapproved license in %s: %s"), nevra, tagtoken->key);
+                add_result(ri, params);
+                free(params->msg);
+
+                /*
+                 * make sure to set the worst result based on queued
+                 * license inspection failures.
+                 */
+                if (params->severity > ri->worst_result) {
+                    ri->worst_result = params->severity;
+                }
+            }
+        }
+    }
+
+    free_tags(tags);
+    free(wlicense);
+
+    return r;
 }
 
 /*
