@@ -262,8 +262,6 @@ static char *get_product_release(string_map_t *products, const favor_release_t f
 
     /* trim the leading period */
     if (after_product) {
-        i = 0;
-
         while (after_product[i] == '.' && after_product[i] != '\0') {
             i++;
         }
