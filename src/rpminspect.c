@@ -154,7 +154,9 @@ static char *get_product_release(string_map_t *products, const favor_release_t f
     char *after_product = NULL;
     bool matched = false;
 
-    assert(after != NULL);
+    if (after == NULL) {
+        return NULL;
+    }
 
     /* skip up to the dist tag */
     while (*after != '.' && *after != '\0') {
