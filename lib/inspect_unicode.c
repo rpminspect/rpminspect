@@ -32,6 +32,7 @@ static char *subdirs[] = { RPMBUILD_BUILDDIR,
 static bool seen = false;
 
 /* these globals are used by the nftw() helper */
+static char *root = NULL;
 static char *build = NULL;
 static struct rpminspect *globalri = NULL;
 static bool globalresult = true;
@@ -414,15 +415,20 @@ static int validate_file(const char *fpath, __attribute__((unused)) const struct
          *     rpminspect-1.47.0/lib/magic.c
          */
         localpath += strlen(build);
+    } else if (root && strprefix(localpath, root)) {
+        /* this is a source file directly in the SRPM */
+        localpath += strlen(root);
+    }
 
+    if (localpath) {
         while (*localpath == '/' && *localpath != '\0') {
             localpath++;
         }
+    }
 
-        if (localpath == NULL) {
-            warnx(_("empty localpath on %s"), fpath);
-            return 0;
-        }
+    if (localpath == NULL) {
+        warnx(_("empty localpath on %s"), fpath);
+        return 0;
     }
 
     if (ignore_path(globalri, NAME_UNICODE, localpath, build)) {
@@ -528,10 +534,10 @@ static bool unicode_driver(struct rpminspect *ri, rpmfile_entry_t *file)
 
     /* when the spec file is found, prepare the source tree and check each file there */
     if (strsuffix(file->localpath, SPEC_FILENAME_EXTENSION)) {
-        if (rpm_prep_source(ri, file, &params.details) != NULL) {
+        if ((build = rpm_prep_source(ri, file, &params.details)) != NULL) {
             /* for the spec file, examine each file in the prepared source tree */
             prepped = true;
-        } else if (manual_prep_source(ri, file) != NULL) {
+        } else if ((build = manual_prep_source(ri, file)) != NULL) {
             /* try to fall back on unpacking archives manually */
             prepped = true;
             free(params.details);
@@ -580,6 +586,8 @@ bool inspect_unicode(struct rpminspect *ri)
     bool result = true;
     UChar32_entry_t *entry = NULL;
     string_entry_t *sentry = NULL;
+    rpmpeer_entry_t *peer = NULL;
+    rpmfile_entry_t *file = NULL;
     struct result_params params;
 
     assert(ri != NULL);
@@ -610,7 +618,25 @@ bool inspect_unicode(struct rpminspect *ri)
         globalri = ri;
 
         /* run the inspection */
-        result = foreach_peer_file(ri, NAME_UNICODE, unicode_driver);
+        TAILQ_FOREACH(peer, ri->peers, items) {
+            if (peer->after_files == NULL || TAILQ_EMPTY(peer->after_files)) {
+                continue;
+            }
+
+            /* this line is why we can't use foreach_peer_file() here */
+            root = peer->after_root;
+
+            TAILQ_FOREACH(file, peer->after_files, items) {
+                /* Ignore files we should be ignoring */
+                if (ignore_path(ri, NAME_UNICODE, file->localpath, peer->after_root)) {
+                    continue;
+                }
+
+                if (!unicode_driver(ri, file)) {
+                    result = false;
+                }
+            }
+        }
 
         /* free the forbidden list memory */
         while (!TAILQ_EMPTY(forbidden)) {
