@@ -170,6 +170,7 @@ static string_map_t *tokenize_license_tag(const char *license)
     assert(license != NULL);
 
     tagtokens = tagcopy = strdup(license);
+    assert(tagcopy != NULL);
 
     while ((token = strsep(&tagtokens, " ()")) != NULL) {
         if (!strcmp(token, "")) {
