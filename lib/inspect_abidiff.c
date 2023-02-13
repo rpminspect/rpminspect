@@ -150,6 +150,7 @@ static bool abidiff_driver(struct rpminspect *ri, rpmfile_entry_t *file)
     pair_entry_t *pair = NULL;
     const char *arch = NULL;
     const char *name = NULL;
+    char *soname = NULL;
     int exitcode = 0;
     char *cmd = NULL;
     char *tmp = NULL;
@@ -178,9 +179,18 @@ static bool abidiff_driver(struct rpminspect *ri, rpmfile_entry_t *file)
     }
 
     /* skip anything that is not an ELF shared library file.  */
-    if (!S_ISREG(file->st.st_mode) || !is_elf_shared_library(file->fullpath)) {
+    if (!S_ISREG(file->st.st_mode) || !is_elf_file(file->fullpath)) {
         return true;
     }
+
+    soname = get_elf_soname(file->fullpath);
+
+    /* ET_DYN with no DT_SONAME is _probably_ an executable */
+    if (is_elf_executable(file->fullpath) || (is_elf_shared_library(file->fullpath) && soname == NULL)) {
+        return true;
+    }
+
+    free(soname);
 
     /* get the package architecture */
     arch = get_rpm_header_arch(file->rpm_header);
