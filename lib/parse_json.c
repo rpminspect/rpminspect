@@ -82,7 +82,6 @@ static json_object *getobj(json_object *jo, const char *key1, const char *key2)
         assert(key2 == NULL);
         return jo;
     } else if (!json_object_is_type(jo, json_type_object)) {
-        warnx("json_object_is_type is %s for %s", json_type_to_name(json_object_get_type(jo)), key1);
         return NULL;
     }
 
