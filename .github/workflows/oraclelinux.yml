@@ -42,7 +42,7 @@ jobs:
                   # Oracle's EPEL copy
                   mkdir -p /etc/yum.repos.d
                   echo '[ol8_developer_EPEL]' > /etc/yum.repos.d/ol8-epel.repo
-                  echo 'name= Oracle Linux $releasever EPEL ($basearch)' >> /etc/yum.repos.d/ol8-epel.repo
+                  echo 'name=Oracle Linux $releasever EPEL ($basearch)' >> /etc/yum.repos.d/ol8-epel.repo
                   echo 'baseurl=https://yum.oracle.com/repo/OracleLinux/OL8/developer/EPEL/$basearch/' >> /etc/yum.repos.d/ol8-epel.repo
                   echo 'gpgkey=file:///etc/pki/rpm-gpg/RPM-GPG-KEY-oracle' >> /etc/yum.repos.d/ol8-epel.repo
                   echo 'gpgcheck=1' >> /etc/yum.repos.d/ol8-epel.repo
