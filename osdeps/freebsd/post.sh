@@ -38,6 +38,19 @@ tar -xf mandoc.tar.gz
 ( cd "${SUBDIR}" && ./configure && gmake && gmake lib-install )
 rm -rf mandoc.tar.gz "${SUBDIR}"
 
+# cdson is not [yet] in Debian
+cd "${CWD}" || exit 1
+git clone https://github.com/frozencemetery/cdson.git
+cd cdson || exit 1
+TAG="$(git tag -l | sort -n | tail -n 1)"
+git checkout -b "${TAG}" "${TAG}"
+meson setup build
+ninja -C build -v
+ninja -C build test
+ninja -C build install
+cd "${CWD}" || exit 1
+rm -rf cdson
+
 # The ksh93 package does not install a 'ksh' executable, so create a symlink
 ln -sf ksh93 /usr/local/bin/ksh
 
