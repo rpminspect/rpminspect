@@ -41,6 +41,18 @@ make install
 cd "${CWD}" || exit 1
 rm -rf rc
 
+# cdson is not [yet] in Amazon Linux
+git clone https://github.com/frozencemetery/cdson.git
+cd cdson || exit 1
+TAG="$(git tag -l | sort -n | tail -n 1)"
+git checkout -b "${TAG}" "${TAG}"
+meson setup build -D prefix=/usr
+ninja -C build -v
+ninja -C build test
+ninja -C build install
+cd "${CWD}" || exit 1
+rm -rf cdson
+
 # Update pip and setuptools
 pip3 install --user --upgrade pip setuptools
 ( cd /root/.local/bin || exit 1
