@@ -612,7 +612,7 @@ static int read_cfgfile(struct rpminspect *ri, const char *filename)
     strget(p, ctx, "environment", "product_release", &ri->product_release);
     strget(p, ctx, "koji", "hub", &ri->kojihub);
     strget(p, ctx, "koji", "download_ursine", &ri->kojiursine);
-    strget(p, ctx, "koji", "downloaded_mbs", &ri->kojimbs);
+    strget(p, ctx, "koji", "download_mbs", &ri->kojimbs);
     strget(p, ctx, "commands", "msgunfmt", &ri->commands.msgunfmt);
     strget(p, ctx, "commands", "desktop-file-validate", &ri->commands.desktop_file_validate);
     strget(p, ctx, "commands", "abidiff", &ri->commands.abidiff);
