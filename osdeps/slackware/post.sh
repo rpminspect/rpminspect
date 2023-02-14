@@ -108,5 +108,13 @@ ninja -C build install
 cd "${CWD}" || exit 1
 rm -rf cdson
 
+# freshclam
+cp /etc/clamav/freshclam.conf.sample /etc/clamav/freshclam.conf
+sed -i -e '/^Example$/d' /etc/clamav/freshclam.conf
+useradd clamav
+mkdir -p /var/lib/clamav
+chown 1000:1000 /var/lib/clamav
+freshclam
+
 # Update shared library cache
 ldconfig
