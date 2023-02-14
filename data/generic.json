@@ -253,6 +253,6 @@
       "/usr/lib/debug/.dwz/*",
       "/usr/lib/grub/*"
     ],
-    "debuginfo_sections": ".symtab .debug_info .gdb_index"
+    "debuginfo_sections": ".symtab .debug_info"
   }
 }
