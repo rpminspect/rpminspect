@@ -143,4 +143,4 @@ such "common" is such "workdir" is "/var/tmp/rpminspect",
      "debuginfo" is such "ignore" is so "/lib/modules/*" and
                                         "/usr/lib/debug/.dwz/*" and
                                         "/usr/lib/grub/*" many,
-                         "debuginfo_sections" is ".symtab .debug_info .gdb_index" wow wow
+                         "debuginfo_sections" is ".symtab .debug_info" wow wow
