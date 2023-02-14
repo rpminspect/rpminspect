@@ -35,7 +35,7 @@ rm -rf mandoc.tar.gz "${SUBDIR}"
 git clone -q https://github.com/rakitzis/rc.git
 cd rc || exit 1
 autoreconf -f -i -v
-./configure --prefix=/usr/local
+./configure --prefix=/usr
 make
 make install
 cd "${CWD}" || exit 1
@@ -58,7 +58,7 @@ git clone https://github.com/frozencemetery/cdson.git
 cd cdson || exit 1
 TAG="$(git tag -l | sort -n | tail -n 1)"
 git checkout -b "${TAG}" "${TAG}"
-meson setup build
+meson setup build -D prefix=/usr
 ninja -C build -v
 ninja -C build test
 ninja -C build install
