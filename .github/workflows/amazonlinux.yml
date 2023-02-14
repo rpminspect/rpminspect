@@ -40,11 +40,6 @@ jobs:
             - name: git clone requirements
               run: |
                   amazon-linux-extras install epel -y
-
-                  if [ -d /etc/pki/rpm-gpg ]; then
-                      rpm --import /etc/pki/rpm-gpg/*
-                  fi
-
                   yum install -y git
                   git config --global --add safe.directory /__w/rpminspect/rpminspect
 
