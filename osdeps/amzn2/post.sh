@@ -1,6 +1,9 @@
 #!/bin/sh
 PATH=/bin:/usr/bin:/sbin:/usr/sbin
 
+# ninja symlink so we don't have to munge our Makefile
+ln -sf ninja-build /usr/bin/ninja
+
 # Rebuild and install meson because of RPM dependency problems
 cd "${HOME}" || exit 1
 rpmdev-setuptree
@@ -22,9 +25,6 @@ ninja -C build test
 ninja -C build install
 cd "${CWD}" || exit 1
 rm -rf cdson
-
-# ninja symlink so we don't have to munge our Makefile
-ln -sf ninja-build /usr/bin/ninja
 
 # Update clamav database
 freshclam
