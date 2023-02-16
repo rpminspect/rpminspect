@@ -871,15 +871,9 @@ static bool find_cfgfile(struct rpminspect *ri, const char *dir, const char *nam
         xasprintf(&tmp, "%s/%s.%s", dir, name, CFG_FILENAME_EXTENSIONS[i]);
         filename = realpath(tmp, NULL);
 
-        if (filename && !access(filename, F_OK|R_OK)) {
-            i = read_cfgfile(ri, filename);
-
-            if (i) {
-                warn(_("*** error reading '%s'"), filename);
-            } else {
-                free(tmp);
-                return true;
-            }
+        if (filename && !access(filename, F_OK|R_OK) && read_cfgfile(ri, filename)) {
+            free(tmp);
+            return true;
         }
 
         free(tmp);
@@ -1625,7 +1619,6 @@ struct rpminspect *init_rpminspect(struct rpminspect *ri, const char *cfgfile, c
     int i = 0;
     char cwd[PATH_MAX + 1];
     char *tmp = NULL;
-    char *filename = NULL;
     char *kernelnames[] = KERNEL_FILENAMES;
     string_entry_t *cfg = NULL;
 
@@ -1647,10 +1640,7 @@ struct rpminspect *init_rpminspect(struct rpminspect *ri, const char *cfgfile, c
         }
 
         /* Read the main configuration file to get things started */
-        i = read_cfgfile(ri, cfg->data);
-
-        if (i) {
-            warn(_("*** error reading '%s'"), cfg->data);
+        if (read_cfgfile(ri, cfg->data)) {
             free(cfg->data);
             free(cfg);
             return NULL;
@@ -1675,14 +1665,8 @@ struct rpminspect *init_rpminspect(struct rpminspect *ri, const char *cfgfile, c
 
     /* If a profile is specified, read an overlay config file */
     if (profile) {
-        if (access(profile, F_OK|R_OK) == 0) {
-            /* user specified a path for the profile option, use it */
-            i = read_cfgfile(ri, filename);
-
-            if (i) {
-                warn(_("*** error reading '%s'"), filename);
-                return NULL;
-            }
+        if (access(profile, F_OK|R_OK) == 0 && read_cfgfile(ri, profile)) {
+            return NULL;
         } else {
             /* user specified a profile name, try to find it in profiledir */
             if (!find_cfgfile(ri, ri->profiledir, profile, true)) {

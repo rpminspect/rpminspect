@@ -299,6 +299,9 @@ static y_value *p_value(context *context)
             goto done;
         } else {
             warnx("skipping token type %s", tokname(token.type));
+            free(ret);
+            ret = NULL;
+            goto done;
         }
 
         yaml_token_delete(&token);
@@ -318,13 +321,13 @@ static bool yaml_parse_file(parser_context **context_out, const char *filename)
     y_value *value = NULL;
 
     if (filename == NULL) {
-        return NULL;
+        return true;
     }
 
     /* prepare a YAML parser */
     if (!yaml_parser_initialize(&parser)) {
         warnx("yaml_parser_initialize");
-        return NULL;
+        return true;
     }
 
     context.parser = &parser;
@@ -332,7 +335,7 @@ static bool yaml_parse_file(parser_context **context_out, const char *filename)
 
     if (fp == NULL) {
         warn("fopen");
-        return NULL;
+        return true;
     }
 
     yaml_parser_set_input_file(&parser, fp);
