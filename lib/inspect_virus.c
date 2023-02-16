@@ -145,6 +145,16 @@ bool inspect_virus(struct rpminspect *ri)
         assert(cvdpath != NULL);
         cvd = cl_cvdhead(cvdpath);
 
+        if (cvd == NULL) {
+            free(cvdpath);
+
+            if (closedir(d) == -1) {
+                warn("closedir");
+            }
+
+            return false;
+        }
+
         xasprintf(&dbver, _("%s version %u (%s)"), cvdpath, cvd->version, cvd->time);
         assert(dbver != NULL);
 
