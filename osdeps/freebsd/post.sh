@@ -8,7 +8,7 @@ git clone https://git.freebsd.org/ports.git /usr/ports
 echo "DEFAULT_VERSIONS+=ssl=openssl" >> /etc/make.conf
 
 # Build rpm4 from ports since the binary package lacks 'elfdeps'
-cd /usr/ports/archivers/rpm4
+cd /usr/ports/archivers/rpm4 || exit 1
 make BATCH=yes install
 
 # Hostname to make sure rpmbuild works (this is gross)
