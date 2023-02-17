@@ -3,6 +3,9 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 #
 
+import os
+import unittest
+
 from baseclass import (
     TestSRPM,
     TestCompareSRPM,
@@ -53,6 +56,9 @@ class MissingSectionsInDebuginfoPkgCompareSRPM(TestCompareSRPM):
 
 
 class MissingSectionsInDebuginfoPkgRPMs(TestRPMs):
+    @unittest.skipIf(
+        os.uname().sysname == "FreeBSD", "FreeBSD lacks find-debuginfo from debugedit"
+    )
     def setUp(self):
         super().setUp()
 
@@ -66,6 +72,9 @@ class MissingSectionsInDebuginfoPkgRPMs(TestRPMs):
 
 
 class MissingSectionsInDebuginfoPkgCompareRPMs(TestCompareRPMs):
+    @unittest.skipIf(
+        os.uname().sysname == "FreeBSD", "FreeBSD lacks find-debuginfo from debugedit"
+    )
     def setUp(self):
         super().setUp()
 
@@ -83,6 +92,9 @@ class MissingSectionsInDebuginfoPkgCompareRPMs(TestCompareRPMs):
 
 
 class MissingSectionsInDebuginfoPkgKoji(TestKoji):
+    @unittest.skipIf(
+        os.uname().sysname == "FreeBSD", "FreeBSD lacks find-debuginfo from debugedit"
+    )
     def setUp(self):
         super().setUp()
 
@@ -96,6 +108,9 @@ class MissingSectionsInDebuginfoPkgKoji(TestKoji):
 
 
 class MissingSectionsInDebuginfoPkgCompareKoji(TestCompareKoji):
+    @unittest.skipIf(
+        os.uname().sysname == "FreeBSD", "FreeBSD lacks find-debuginfo from debugedit"
+    )
     def setUp(self):
         super().setUp()
 
@@ -199,6 +214,9 @@ class HaveDebuggingSectionsInRegularPkgCompareKoji(TestCompareKoji):
 
 # Before build is stripped but now not stripped in the after build
 class BeforeStrippedAfterNotStrippedCompareKoji(TestCompareKoji):
+    @unittest.skipIf(
+        os.uname().sysname == "FreeBSD", "FreeBSD lacks find-debuginfo from debugedit"
+    )
     def setUp(self):
         super().setUp()
 
@@ -216,6 +234,9 @@ class BeforeStrippedAfterNotStrippedCompareKoji(TestCompareKoji):
 
 # Before build is not stripped, but the after build is
 class BeforeNotStrippedAfterStrippedCompareKoji(TestCompareKoji):
+    @unittest.skipIf(
+        os.uname().sysname == "FreeBSD", "FreeBSD lacks find-debuginfo from debugedit"
+    )
     def setUp(self):
         super().setUp()
 
