@@ -19,7 +19,7 @@ static bool politics_driver(struct rpminspect *ri, rpmfile_entry_t *file)
     char *digest = NULL;
     bool matched = false;
     bool allowed = false;
-    int flags = FNM_NOESCAPE | FNM_PERIOD;
+    int flags = FNM_PERIOD;
     const char *name = NULL;
     struct result_params params;
 
