@@ -1664,15 +1664,8 @@ struct rpminspect *init_rpminspect(struct rpminspect *ri, const char *cfgfile, c
     }
 
     /* If a profile is specified, read an overlay config file */
-    if (profile) {
-        if (access(profile, F_OK|R_OK) == 0 && read_cfgfile(ri, profile)) {
-            return NULL;
-        } else {
-            /* user specified a profile name, try to find it in profiledir */
-            if (!find_cfgfile(ri, ri->profiledir, profile, true)) {
-                errx(RI_MISSING_PROFILE, _("*** unable to find profile '%s'"), profile);
-            }
-        }
+    if (profile && find_cfgfile(ri, ri->profiledir, profile, true)) {
+        errx(RI_MISSING_PROFILE, _("*** unable to find profile '%s'"), profile);
     }
 
     /* get current dir */
