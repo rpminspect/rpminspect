@@ -2,6 +2,15 @@
 PATH=/bin:/usr/bin:/sbin:/usr/sbin:/usr/local/bin:/usr/local/sbin
 CWD="$(pwd)"
 
+# Sync ports tree from git
+rm -rf /usr/ports || :
+git clone https://git.freebsd.org/ports.git /usr/ports
+echo "DEFAULT_VERSIONS+=ssl=openssl" >> /etc/make.conf
+
+# Build rpm4 from ports since the binary package lacks 'elfdeps'
+cd /usr/ports/archivers/rpm4
+make BATCH=yes install
+
 # Hostname to make sure rpmbuild works (this is gross)
 echo "$(ifconfig | grep "inet " | grep -v "inet 127" | awk '{ print $2; }') $(hostname)" >> /etc/hosts
 

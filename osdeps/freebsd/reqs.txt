@@ -31,7 +31,6 @@ patchelf
 pkgconf
 python3
 rc
-rpm4
 rust
 valgrind
 xhtml
