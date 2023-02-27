@@ -769,11 +769,11 @@ bool inspect_rpmdeps(struct rpminspect *ri)
     TAILQ_FOREACH(peer, ri->peers, items) {
         /* Gather deprules */
         if (peer->before_hdr && peer->before_deprules == NULL) {
-            peer->before_deprules = gather_deprules(peer->before_hdr);
+            peer->before_deprules = gather_deprules(peer->before_hdr, ri->deprules_ignore);
         }
 
         if (peer->after_hdr && peer->after_deprules == NULL) {
-            peer->after_deprules = gather_deprules(peer->after_hdr);
+            peer->after_deprules = gather_deprules(peer->after_hdr, ri->deprules_ignore);
         }
 
         /* Peer up the before and after deps */

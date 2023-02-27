@@ -107,7 +107,7 @@ static void get_rpm_info(const char *pkg)
         return;
     }
 
-    add_peer(&workri->peers, whichbuild, fetch_only, pkg, h);
+    add_peer(&workri->peers, workri->deprules_ignore, whichbuild, fetch_only, pkg, h);
     return;
 }
 

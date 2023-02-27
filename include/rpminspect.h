@@ -236,7 +236,7 @@ char *extract_rpm_payload(const char *rpm);
 /* peers.c */
 rpmpeer_t *init_peers(void);
 void free_peers(rpmpeer_t *);
-void add_peer(rpmpeer_t **, int, bool, const char *, Header);
+void add_peer(rpmpeer_t **, deprule_ignore_map_t *, int, bool, const char *, Header);
 
 /**
  * @brief Iterate over all packages and extract them.
@@ -440,7 +440,7 @@ security_entry_t *get_secrule_by_path(struct rpminspect *ri, const rpmfile_entry
 severity_t get_secrule_result_severity(struct rpminspect *ri, const rpmfile_entry_t *file, const int type);
 
 /* deprules.c */
-deprule_list_t *gather_deprules(Header hdr);
+deprule_list_t *gather_deprules(Header hdr, deprule_ignore_map_t *ignores);
 void find_deprule_peers(deprule_list_t *before, deprule_list_t *after);
 const char *get_deprule_desc(const dep_type_t type);
 dep_op_t get_dep_operator(const rpmsenseFlags f);
