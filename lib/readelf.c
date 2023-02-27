@@ -237,7 +237,10 @@ string_list_t *get_elf_section_names(Elf *elf, size_t start)
 
     /* get the starting section */
     scn = elf_getscn(elf, start);
-    assert(scn != NULL);
+
+    if (scn == NULL) {
+        return NULL;
+    }
 
     /* iterate over the sections collecting the names */
     while ((scn = elf_nextscn(elf, scn)) != NULL) {
