@@ -69,7 +69,7 @@ jobs:
                       echo $? > exitcodes/setup
                       ninja -C build -v
                       echo $? > exitcodes/build
-                      env LANG=en_US.UTF-8 meson test -C build -v
+                      gmake check
                       echo $? > exitcodes/test
                       ninja -C build coverage && ( curl -s https://codecov.io/bash | bash ) || :
                       mv exitcodes build
