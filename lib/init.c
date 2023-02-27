@@ -866,10 +866,12 @@ static bool find_cfgfile(struct rpminspect *ri, const char *dir, const char *nam
 
         if (filename && !access(filename, F_OK|R_OK) && read_cfgfile(ri, filename)) {
             free(tmp);
+            free(filename);
             return true;
         }
 
         free(tmp);
+        free(filename);
     }
 
     if (report_finding) {

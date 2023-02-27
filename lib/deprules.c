@@ -29,7 +29,7 @@ static bool is_rich_dep(const char *requirement)
  * Gather the specific type of deprules and add them to rules.  Return
  * the list.
  */
-static deprule_list_t *gather_deprules_by_type(deprule_list_t *rules, Header hdr, dep_type_t type)
+static deprule_list_t *gather_deprules_by_type(deprule_list_t *rules, Header hdr, dep_type_t type, deprule_ignore_map_t *ignores)
 {
     rpmTag rtag, otag, vtag;
     rpmtd req = NULL;
@@ -40,6 +40,9 @@ static deprule_list_t *gather_deprules_by_type(deprule_list_t *rules, Header hdr
     const char *v = NULL;
     deprule_list_t *deprules = rules;
     deprule_entry_t *deprule_entry = NULL;
+    deprule_ignore_map_t *ignore_rule = NULL;
+    deprule_ignore_map_t *tmp_ignore_rule = NULL;
+    bool ignore = false;
 
     assert(hdr != NULL);
     assert(type != TYPE_NULL);
@@ -121,6 +124,26 @@ static deprule_list_t *gather_deprules_by_type(deprule_list_t *rules, Header hdr
                 continue;
             }
 
+            /* ignore any rules set by the configuration file */
+            if (ignores != NULL) {
+                ignore = false;
+
+                HASH_ITER(hh, ignores, ignore_rule, tmp_ignore_rule) {
+                    if (ignore_rule->type != type) {
+                        continue;
+                    }
+
+                    if (regexec(ignore_rule->ignore, r, 0, NULL, 0) == 0) {
+                        ignore = true;
+                        break;
+                    }
+                }
+
+                if (ignore) {
+                    continue;
+                }
+            }
+
             v = rpmtdGetString(ver);
 
             deprule_entry = calloc(1, sizeof(*deprule_entry));
@@ -161,7 +184,7 @@ static deprule_list_t *gather_deprules_by_type(deprule_list_t *rules, Header hdr
  * Collect the dependency type specified and return the allocated
  * deprule_list_t.
  */
-deprule_list_t *gather_deprules(Header hdr)
+deprule_list_t *gather_deprules(Header hdr, deprule_ignore_map_t *ignores)
 {
     deprule_list_t *rules = NULL;
     dep_type_t t = TYPE_NULL;
@@ -171,7 +194,7 @@ deprule_list_t *gather_deprules(Header hdr)
     }
 
     for (t = FIRST_DEP_TYPE; t <= LAST_DEP_TYPE; t++) {
-        rules = gather_deprules_by_type(rules, hdr, t);
+        rules = gather_deprules_by_type(rules, hdr, t, ignores);
     }
 
     return rules;

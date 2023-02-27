@@ -55,7 +55,7 @@ void free_peers(rpmpeer_t *peers)
 /*
  * Add the specified package as a peer in the list of packages.
  */
-void add_peer(rpmpeer_t **peers, int whichbuild, bool fetch_only, const char *pkg, Header hdr)
+void add_peer(rpmpeer_t **peers, deprule_ignore_map_t *ignores, int whichbuild, bool fetch_only, const char *pkg, Header hdr)
 {
     rpmpeer_entry_t *peer = NULL;
     bool found = false;
@@ -123,7 +123,7 @@ void add_peer(rpmpeer_t **peers, int whichbuild, bool fetch_only, const char *pk
         if (fetch_only) {
             peer->before_deprules = NULL;
         } else {
-            peer->before_deprules = gather_deprules(hdr);
+            peer->before_deprules = gather_deprules(hdr, ignores);
         }
     } else if (whichbuild == AFTER_BUILD) {
         peer->after_hdr = hdr;
@@ -135,7 +135,7 @@ void add_peer(rpmpeer_t **peers, int whichbuild, bool fetch_only, const char *pk
         if (fetch_only) {
             peer->after_deprules = NULL;
         } else {
-            peer->after_deprules = gather_deprules(hdr);
+            peer->after_deprules = gather_deprules(hdr, ignores);
         }
     }
 
