@@ -721,9 +721,10 @@ void dump_cfg(const struct rpminspect *ri)
 
     if (ri->deprules_ignore) {
         printf("rpmdeps:\n");
+        printf("    ignore:\n");
 
         HASH_ITER(hh, ri->deprules_ignore, drentry, tmp_drentry) {
-            printf("    %s: %s\n", get_deprule_desc(drentry->type), (drentry->pattern == NULL) ? "" : drentry->pattern);
+            printf("        %s: %s\n", get_deprule_desc(drentry->type), (drentry->pattern == NULL) ? "" : drentry->pattern);
         }
     }
 

@@ -516,10 +516,7 @@ static bool rpmdeps_cb(const char *key, const char *value, void *cb_data)
         drentry = calloc(1, sizeof(*drentry));
         assert(drentry != NULL);
         drentry->type = depkey;
-
-        if (debug_mode) {
-            drentry->pattern = strdup(value);
-        }
+        drentry->pattern = strdup(value);
 
         if (add_regex(value, &drentry->ignore) != 0) {
             warn(_("error reading %s ignore pattern"), get_deprule_desc(depkey));
@@ -530,11 +527,7 @@ static bool rpmdeps_cb(const char *key, const char *value, void *cb_data)
         free(drentry->pattern);
         drentry->pattern = NULL;
         drentry->type = depkey;
-
-        if (debug_mode) {
-            drentry->pattern = strdup(value);
-        }
-
+        drentry->pattern = strdup(value);
         regfree(drentry->ignore);
         drentry->ignore = NULL;
 
