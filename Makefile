@@ -46,14 +46,18 @@ RELEASED_TARBALL_ASC = $(RELEASED_TARBALL).asc
 all: setup
 	$(NINJA) -C $(MESON_BUILD_DIR) -v
 
-debug: setup-debug
-	$(NINJA) -C $(MESON_BUILD_DIR) -v
-
 setup:
 	meson setup $(MESON_BUILD_DIR)
 
+# The python executable to use for the debug build
+# (the default is python3 as noted in meson_options.txt)
+PYTHON ?= python3
+
+debug: setup-debug
+	$(NINJA) -C $(MESON_BUILD_DIR) -v
+
 setup-debug:
-	meson setup $(MESON_BUILD_DIR) --werror -Db_buildtype=debug -Db_coverage=true
+	meson setup $(MESON_BUILD_DIR) --werror -Dpython_program="$(PYTHON)" -Db_buildtype=debug -Db_coverage=true
 
 # NOTE: Set QA_RPATHS=63 so that check-rpaths is disabled during the
 # rpmfluff rpmbuild operations.  We want to let bad DT_RPATH values

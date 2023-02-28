@@ -84,7 +84,7 @@ jobs:
                   # Set things up to build
                   case "${{ matrix.container }}" in
                       *stream8|*stream9)
-                          meson setup build --werror -D b_buildtype=debug -D b_coverage=true
+                          make debug
                           ;;
 
                       *centos7)
@@ -94,11 +94,10 @@ jobs:
                           # Make sure to use the specific newer Python
                           PYTHON_PROG="$(cd /usr/local/bin ; ls -1 python*.* | grep -v config)"
 
-                          meson setup build --werror -D python_program="${PYTHON_PROG}" -D b_buildtype=debug -D b_coverage=true
+                          make debug PYTHONG="${PYTHON_PROG}"
                           ;;
                   esac
 
-                  # Build and run the test suite
-                  ninja -C build -v
-                  env LANG=en_US.UTF-8 meson test -C build -v
+                  # Run the test suite
+                  make check
                   ninja -C build coverage && ( curl -s https://codecov.io/bash | bash ) || :
