@@ -57,7 +57,6 @@ jobs:
                   make instreqs
 
                   # Build the software and run the test suite
-                  meson setup build --werror -D b_buildtype=debug -D b_coverage=true
-                  ninja -C build -v
-                  env LANG=en_US.UTF-8 meson test -C build -v
+                  make debug
+                  make check
                   ninja -C build coverage && ( curl -s https://codecov.io/bash | bash ) || :
