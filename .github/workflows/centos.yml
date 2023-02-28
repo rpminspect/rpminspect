@@ -81,10 +81,11 @@ jobs:
                   # Install build dependencies and set up the target
                   make instreqs
 
-                  # Set things up to build
+                  # Build and run the test suite
                   case "${{ matrix.container }}" in
                       *stream8|*stream9)
                           make debug
+                          make check
                           ;;
 
                       *centos7)
@@ -95,9 +96,9 @@ jobs:
                           PYTHON_PROG="$(cd /usr/local/bin ; ls -1 python*.* | grep -v config)"
 
                           make debug PYTHON="${PYTHON_PROG}"
+                          env LANG=en_US.UTF-8 make check PYTHON="${PYTHON_PROG}"
                           ;;
                   esac
 
-                  # Run the test suite
-                  make check
+                  # Report coverage
                   ninja -C build coverage && ( curl -s https://codecov.io/bash | bash ) || :

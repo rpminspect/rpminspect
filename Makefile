@@ -43,15 +43,14 @@ PRIMARY_AUTHORS = dcantrell@redhat.com
 RELEASED_TARBALL = $(PROJECT_NAME)-$(PROJECT_VERSION).tar.xz
 RELEASED_TARBALL_ASC = $(RELEASED_TARBALL).asc
 
+# The python executable to use for the debug build and tests
+PYTHON ?= python3
+
 all: setup
 	$(NINJA) -C $(MESON_BUILD_DIR) -v
 
 setup:
 	meson setup $(MESON_BUILD_DIR)
-
-# The python executable to use for the debug build
-# (the default is python3 as noted in meson_options.txt)
-PYTHON ?= python3
 
 debug: setup-debug
 	$(NINJA) -C $(MESON_BUILD_DIR) -v
@@ -83,14 +82,14 @@ check: setup
 		env RPMINSPECT=$(topdir)/build/src/rpminspect \
 		    RPMINSPECT_YAML=$(topdir)/data/generic.yaml \
 		    RPMINSPECT_TEST_DATA_PATH=$(topdir)/test/data \
-		python3 -Bm unittest discover -v $(topdir)/test/ $${test_script} ; \
+		$(PYTHON) -Bm unittest discover -v $(topdir)/test/ $${test_script} ; \
 	fi
 
 flake8:
-	python3 -m flake8
+	$(PYTHON) -m flake8
 
 black:
-	python3 -m black --check --diff $(topdir)/test/ $(topdir)/doc/
+	$(PYTHON) -m black --check --diff $(topdir)/test/ $(topdir)/doc/
 
 shellcheck:
 	find . -type f \( -iname "*.sh" ! -iname "find-debuginfo.sh" \) -exec shellcheck --severity=warning {} \;
