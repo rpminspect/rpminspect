@@ -94,7 +94,7 @@ jobs:
                           # Make sure to use the specific newer Python
                           PYTHON_PROG="$(cd /usr/local/bin ; ls -1 python*.* | grep -v config)"
 
-                          make debug PYTHONG="${PYTHON_PROG}"
+                          make debug PYTHON="${PYTHON_PROG}"
                           ;;
                   esac
 
