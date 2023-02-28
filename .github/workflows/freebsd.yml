@@ -75,7 +75,8 @@ jobs:
             # Process the exit codes outside the VM
             - name: Check exit codes
               run: |
-                  for ec in build/exitcodes/* ; do
-                      code=$(cat ${ec} 2>/dev/null)
+                  for ec in exitcodes/* ; do
+                      code="$(cat ${ec} 2>/dev/null)"
+                      [ -z "${code}" ] && code=0
                       [ ${code} -eq 0 ] || exit ${code}
                   done
