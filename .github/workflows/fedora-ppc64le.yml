@@ -76,5 +76,4 @@ jobs:
                   #
                   run: |
                       make instreqs
-                      meson setup build --werror -D b_buildtype=debug -D b_coverage=true
-                      ninja -C build -v
+                      make debug

@@ -73,9 +73,8 @@ jobs:
               run: |
                   dnf install -y make
                   make instreqs
-                  meson setup build --werror -Db_buildtype=debug -Db_coverage=true
-                  ninja -C build -v
-                  meson test -C build -v
+                  make debug
+                  make check
                   ninja -C build coverage && ( curl -s https://codecov.io/bash | bash ) || :
 
     # Fedora on i386
@@ -110,7 +109,6 @@ jobs:
                   dnf remove -y fedora-repos-modular
                   dnf install -y make
                   make instreqs OSDEPS_ARCH=i686
-                  env CFLAGS="-m32" LDFLAGS="-m32" PKG_CONFIG_PATH=/usr/lib/pkgconfig meson setup build --werror -Db_buildtype=debug -Db_coverage=true
-                  ninja -C build -v
-                  meson test -C build -v
+                  env CFLAGS="-m32" LDFLAGS="-m32" PKG_CONFIG_PATH=/usr/lib/pkgconfig make debug
+                  make check
                   ninja -C build coverage && ( curl -s https://codecov.io/bash | bash ) || :

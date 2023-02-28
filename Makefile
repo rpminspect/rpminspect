@@ -46,8 +46,14 @@ RELEASED_TARBALL_ASC = $(RELEASED_TARBALL).asc
 all: setup
 	$(NINJA) -C $(MESON_BUILD_DIR) -v
 
+debug: setup-debug
+	$(NINJA) -C $(MESON_BUILD_DIR) -v
+
 setup:
 	meson setup $(MESON_BUILD_DIR)
+
+setup-debug:
+	meson setup $(MESON_BUILD_DIR) --werror -Db_buildtype=debug -Db_coverage=true
 
 # NOTE: Set QA_RPATHS=63 so that check-rpaths is disabled during the
 # rpmfluff rpmbuild operations.  We want to let bad DT_RPATH values
