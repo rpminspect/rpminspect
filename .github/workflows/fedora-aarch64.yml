@@ -38,7 +38,7 @@ jobs:
         steps:
             # This means clone the git repo
             - uses: actions/checkout@v3
-            - uses: uraimo/run-on-arch-action@v2.0.5
+            - uses: uraimo/run-on-arch-action@v2
               id: buildtest
               timeout-minutes: 500
               with:
