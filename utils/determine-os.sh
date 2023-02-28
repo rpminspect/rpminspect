@@ -67,6 +67,19 @@ elif [ -r /etc/oracle-release ] && [ "${ID}" = "ol" ]; then
     else
         echo "unknown OS: ${ID}:${VERSION_ID}" >&2
     fi
+elif [ -r /etc/debian_version ] && [ "${ID}" = "debian" ]; then
+    # map version codename to debian "stream" (stable, testing, ...)
+    case "${VERSION_CODENAME}" in
+        bullseye)
+            echo "${ID}-stable"
+            ;;
+        bookworm)
+            echo "${ID}-testing"
+            ;;
+        *)
+            echo "unknown OS: ${ID}-${VERSION_CODENAME}" >&2
+            ;;
+    esac
 else
     case "${ID}" in
         opensuse-leap|opensuse-tumbleweed|ubuntu|debian|slackware|arch|gentoo|alpine|mageia|freebsd)
