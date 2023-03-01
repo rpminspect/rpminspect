@@ -684,6 +684,8 @@
 
 #define REMEDY_PATCHES_MISMATCHED_MACRO _("The named patch is defined but is mismatched by number with the %patch macro.  Make sure all numbered patches have corresponding %patch macros.  For example, Patch47 needs to have a %patch47 macro.")
 
+#define REMEDY_PATCHES_UNHANDLED_PATCH _("The defined patch file is not something rpminspect can handle.  This is likely a bug and should be reported to the upstream rpminspect project.")
+
 /** @} */
 
 /**
