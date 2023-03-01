@@ -358,7 +358,7 @@ bool find_all(Elf *elf, string_list_t **user_data);
 
 /* paths.c */
 /**
- * @brief Return the before build debuginfo package path where the
+ * @brief Return the selected build debuginfo package path where the
  * package was extracted for rpminspect.  The path must match the
  * architecture provided.
  *
@@ -367,25 +367,10 @@ bool find_all(Elf *elf, string_list_t **user_data);
  * @param ri The struct rpminspect for the program.
  * @param file The file we are looking for debuginfo for.
  * @param binarch The required debuginfo architecture.
- * @return Full path to the extract before build debuginfo package, or
- * NULL if not found.
+ * @return Full path to the extracted debuginfo package, or
+ *         NULL if not found.
  */
-const char *get_before_debuginfo_path(struct rpminspect *ri, const rpmfile_entry_t *file, const char *binarch);
-
-/**
- * @brief Return the after build debuginfo package path where the
- * package was extracted for rpminspect.  The path must match the
- * architecture provided.
- *
- * IMPORTANT: Do not free the returned string.
- *
- * @param ri The struct rpminspect for the program.
- * @param file The file we are looking for debuginfo for.
- * @param binarch The required debuginfo architecture.
- * @return Full path to the extract after build debuginfo package, or
- * NULL if not found.
- */
-const char *get_after_debuginfo_path(struct rpminspect *ri, const rpmfile_entry_t *file, const char *binarch);
+const char *get_debuginfo_path(struct rpminspect *ri, const rpmfile_entry_t *file, const char *binarch, int build);
 
 bool usable_path(const char *path);
 bool match_path(const char *pattern, const char *root, const char *path);

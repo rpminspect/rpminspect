@@ -8,6 +8,7 @@
 #include <errno.h>
 #include <err.h>
 #include <assert.h>
+#include <libgen.h>
 
 #ifdef _WITH_LIBANNOCHECK
 #include <libannocheck.h>
@@ -60,6 +61,7 @@ static char *trim_workdir(const rpmfile_entry_t *file, char *s)
 static char *build_annocheck_cmd(const char *cmd, const char *opts, const char *profile, const char *debugpath, const char *path)
 {
     char *r = NULL;
+    char *tmp = NULL;
 
     assert(cmd != NULL);
     assert(path != NULL);
@@ -75,7 +77,9 @@ static char *build_annocheck_cmd(const char *cmd, const char *opts, const char *
     }
 
     if (debugpath) {
-        r = strappend(r, " --debug-dir=", debugpath, NULL);
+        tmp = joinpath(debugpath, DEBUG_PATH, NULL);
+        r = strappend(r, " --debug-dir=", tmp, NULL);
+        free(tmp);
     }
 
     r = strappend(r, " ", path, NULL);
@@ -216,7 +220,7 @@ static struct libannocheck_internals *libannocheck_setup(struct rpminspect *ri, 
 
     if (anno == NULL) {
         /* initialize libannocheck for this test on this file */
-        annoerr = libannocheck_init(libannocheck_get_version(), file->fullpath, get_after_debuginfo_path(ri, file, arch), &anno);
+        annoerr = libannocheck_init(libannocheck_get_version(), file->fullpath, get_debuginfo_path(ri, file, arch, AFTER_BUILD), &anno);
 
         if (annoerr != libannocheck_error_none) {
              warnx(_("libannocheck_init error: %s"), libannocheck_get_error_message(anno, annoerr));
@@ -270,7 +274,7 @@ static struct libannocheck_internals *libannocheck_setup(struct rpminspect *ri, 
         set_libannocheck_profile(anno, ri->annocheck_profile, ri->product_release);
     } else {
         /* reinitialize with a new file */
-        annoerr = libannocheck_reinit(anno, file->fullpath, get_after_debuginfo_path(ri, file, arch));
+        annoerr = libannocheck_reinit(anno, file->fullpath, get_debuginfo_path(ri, file, arch, AFTER_BUILD));
 
         if (annoerr != libannocheck_error_none) {
              warnx(_("libannocheck_reinit error: %s"), libannocheck_get_error_message(anno, annoerr));
@@ -524,14 +528,14 @@ static bool annocheck_driver(struct rpminspect *ri, rpmfile_entry_t *file)
     return result;
 #else
         /* Run the test on the file */
-        after_cmd = build_annocheck_cmd(ri->commands.annocheck, hentry->value, annocheck_profile, get_after_debuginfo_path(ri, file, arch), file->fullpath);
+        after_cmd = build_annocheck_cmd(ri->commands.annocheck, hentry->value, annocheck_profile, get_debuginfo_path(ri, file, arch, AFTER_BUILD), file->fullpath);
         argv = build_argv(after_cmd);
         after_out = run_cmd_vpe(&after_exit, ri->worksubdir, argv);
         free_argv(argv);
 
         /* If we have a before build, run the command on that */
         if (file->peer_file) {
-            before_cmd = build_annocheck_cmd(ri->commands.annocheck, hentry->value, annocheck_profile, get_before_debuginfo_path(ri, file, arch), file->peer_file->fullpath);
+            before_cmd = build_annocheck_cmd(ri->commands.annocheck, hentry->value, annocheck_profile, get_debuginfo_path(ri, file, arch, BEFORE_BUILD), file->peer_file->fullpath);
             argv = build_argv(before_cmd);
             before_out = run_cmd_vpe(&before_exit, ri->workdir, argv);
             free_argv(argv);
