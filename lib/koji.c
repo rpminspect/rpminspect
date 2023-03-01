@@ -8,6 +8,7 @@
 #include <assert.h>
 #include <err.h>
 #include <limits.h>
+#include <fnmatch.h>
 #include <xmlrpc-c/client.h>
 #include <xmlrpc-c/client_global.h>
 #include "queue.h"
@@ -1359,8 +1360,17 @@ string_list_t *get_all_arches(const struct rpminspect *ri)
             continue;
         }
 
-        /* add this architecture to the list */
-        arches = list_add(arches, element);
+        /*
+         * If the architecture is something like i386 or i686, add a
+         * pattern instead to cover the range which built RPMs may
+         * report.  Otherwise add the architecture as-is to the list.
+         */
+        if (!fnmatch(RPM_X86_ARCH_PATTERN, element, 0)) {
+            arches = list_add(arches, RPM_X86_ARCH_PATTERN);
+        } else {
+            arches = list_add(arches, element);
+        }
+
         free(element);
     }
 

@@ -18,6 +18,7 @@
 #include <limits.h>
 #include <wordexp.h>
 #include <regex.h>
+#include <fnmatch.h>
 #include <zlib.h>
 #include <magic.h>
 #include <clamav.h>
@@ -759,7 +760,7 @@ int main(int argc, char **argv)
             found = false;
 
             TAILQ_FOREACH(arch, valid_arches, items) {
-                if (!strcmp(token, arch->data)) {
+                if (!fnmatch(arch->data, token, 0)) {
                     found = true;
                     break;
                 }

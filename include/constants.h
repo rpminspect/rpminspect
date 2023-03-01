@@ -402,6 +402,14 @@
 #define RPM_NOARCH_NAME "noarch"
 
 /**
+ * @def RPM_X86_ARCH_PATTERN
+ *
+ * An fnmatch(3) pattern for 32-bit x86 because Koji, rpm, and the
+ * toolchain cannot agree on what to call this architecture.
+ */
+#define RPM_X86_ARCH_PATTERN "i?86"
+
+/**
  * @def BIN_OWNER
  *
  * Default executable file owner.
