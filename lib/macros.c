@@ -226,7 +226,7 @@ string_list_t *get_macros(const char *s)
 
     /* collect all the macro names */
     TAILQ_FOREACH(entry, fields, items) {
-        if (!strcmp(entry->data, "%")) {
+        if (!strcmp(entry->data, "%") || strsuffix(entry->data, "%")) {
             found = true;
             continue;
         }

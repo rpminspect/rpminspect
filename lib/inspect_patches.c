@@ -103,8 +103,6 @@ static bool have_automacro(const struct rpminspect *ri, const rpmfile_entry_t *s
         return false;
     }
 
-    DEBUG_PRINT("specfile=|%s|\n", specfile->localpath);
-
     /* Look for %autopatch or %autosetup in valid sections */
     TAILQ_FOREACH(entry, contents, items) {
         if (entry->data == NULL) {
@@ -174,26 +172,70 @@ static bool have_automacro(const struct rpminspect *ri, const rpmfile_entry_t *s
 /* Returns true if this file is a Patch file */
 static bool is_patch(const rpmfile_entry_t *file)
 {
-    char *shortname = NULL;
     patches_t *hentry = NULL;
 
     assert(file != NULL);
+    assert(file->localpath != NULL);
 
     if (patches == NULL) {
         return false;
     }
 
-    /* The RPM header stores basenames */
-    shortname = rindex(file->fullpath, '/') + 1;
-
     /* See if this file is a Patch file */
-    HASH_FIND_STR(patches, shortname, hentry);
+    HASH_FIND_STR(patches, file->localpath, hentry);
 
     if (hentry) {
         return true;
     } else {
         return false;
     }
+}
+
+/*
+ * Given a patch filename, expand any RPM macros that may be in the
+ * name.  Function returns a newly allocated string that the caller
+ * must free.
+ */
+static char *expand_patchname_macros(Header hdr, const char *patchname)
+{
+    char *r = NULL;
+    char *tmp = NULL;
+    string_list_t *macros = NULL;
+    string_entry_t *entry = NULL;
+
+    assert(hdr != NULL);
+    assert(patchname != NULL);
+
+    r = strdup(patchname);
+    assert(r != NULL);
+
+    /* collect macros */
+    macros = get_macros(patchname);
+
+    /* no macros in the name, return a copy of the name */
+    if (macros == NULL || TAILQ_EMPTY(macros)) {
+        return r;
+    }
+
+    /* replace macros we are set to handle */
+    TAILQ_FOREACH(entry, macros, items) {
+        if (!strcmp(entry->data, "version")) {
+            tmp = strreplace(r, "%{version}", headerGetString(hdr, RPMTAG_VERSION));
+            assert(tmp != NULL);
+        } else if (!strcmp(entry->data, "name")) {
+            tmp = strreplace(r, "%{name}", headerGetString(hdr, RPMTAG_NAME));
+            assert(tmp != NULL);
+        }
+
+        if (tmp) {
+            free(r);
+            r = tmp;
+            tmp = NULL;
+        }
+    }
+
+    list_free(macros, free);
+    return r;
 }
 
 /*
@@ -526,6 +568,8 @@ bool inspect_patches(struct rpminspect *ri)
     string_entry_t *entry = NULL;
     patches_t *hentry = NULL;
     applied_patches_t *aentry = NULL;
+    char *patchfile = NULL;
+    char *patchhead = NULL;
     char *buf = NULL;
     size_t len = 0;
     struct result_params params;
@@ -640,8 +684,21 @@ bool inspect_patches(struct rpminspect *ri)
                         entry = TAILQ_NEXT(patch, items);
                         assert(entry != NULL);
 
+                        /* the patch file may contain macros, so try to replace those */
+                        patchhead = patchfile = expand_patchname_macros(specfile->rpm_header, entry->data);
+                        assert(patchfile != NULL);
+
                         /* see if we have this patch */
-                        if (!list_contains(patchfiles, entry->data)) {
+                        if (!list_contains(patchfiles, patchfile)) {
+                            params.severity = RESULT_VERIFY;
+                            params.waiverauth = WAIVABLE_BY_ANYONE;
+                            params.remedy = REMEDY_PATCHES_UNHANDLED_PATCH;
+                            xasprintf(&params.msg, _("Unhandled patch file `%s` defined in spec file"), patchfile);
+                            add_result(ri, &params);
+                            free(params.msg);
+                            reported = true;
+                            result = !(params.severity >= RESULT_VERIFY);
+
                             list_free(fields, free);
                             continue;
                         }
@@ -651,14 +708,14 @@ bool inspect_patches(struct rpminspect *ri)
                         buf += strlen(SPEC_TAG_PATCH);
 
                         /* patch entry may have leading whitespace */
-                        while (isspace(*(entry->data)) && *(entry->data) != '\0') {
-                            entry->data++;
+                        while (isspace(*patchfile) && *patchfile != '\0') {
+                            patchfile++;
                         }
 
                         /* add a new patch entry to the hash table */
                         hentry = calloc(1, sizeof(*hentry));
                         assert(hentry != NULL);
-                        hentry->patch = strdup(entry->data);
+                        hentry->patch = strdup(patchfile);
                         hentry->num = strtoll(buf, NULL, 10);
 
                         if (errno == ERANGE || errno == EINVAL) {
@@ -667,6 +724,7 @@ bool inspect_patches(struct rpminspect *ri)
                         }
 
                         HASH_ADD_KEYPTR(hh, patches, hentry->patch, strlen(hentry->patch), hentry);
+                        free(patchhead);
                     } else if (strprefix(specentry->data, SPEC_MACRO_PATCH)) {
                         /* split the line - first field is %patchN, second (optional) is opts */
                         fields = strsplit(specentry->data, " \t");
