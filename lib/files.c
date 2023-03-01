@@ -159,7 +159,7 @@ rpmfile_t *extract_rpm(struct rpminspect *ri, const char *pkg, Header hdr, const
 {
     rpmtd td = NULL;
 
-    const char *rpm_path;
+    const char *rpm_path = NULL;
     struct file_data *path_table = NULL;
     struct file_data *path_entry = NULL;
     struct file_data *tmp_entry = NULL;
@@ -168,12 +168,12 @@ rpmfile_t *extract_rpm(struct rpminspect *ri, const char *pkg, Header hdr, const
     char *hardlinkpath = NULL;
     struct archive *archive = NULL;
     struct archive_entry *entry = NULL;
-    const char *archive_path;
-    mode_t archive_perm;
-    int archive_result;
+    const char *archive_path = NULL;
+    mode_t archive_perm = 0;
+    int archive_result = 0;
 
-    int i;
-    rpmfile_entry_t *file_entry;
+    int i = 0;
+    rpmfile_entry_t *file_entry = NULL;
     rpmfile_t *file_list = NULL;
 
     const int archive_flags = ARCHIVE_EXTRACT_SECURE_NODOTDOT | ARCHIVE_EXTRACT_SECURE_SYMLINKS;
@@ -305,7 +305,7 @@ rpmfile_t *extract_rpm(struct rpminspect *ri, const char *pkg, Header hdr, const
         }
 
         /* Prepend output_dir to the path name */
-        xasprintf(&file_entry->fullpath, "%s/%s", *output_dir, archive_path);
+        xasprintf(&file_entry->fullpath, "%s%s%s", *output_dir, (strsuffix(*output_dir, "/") && strprefix(archive_path, "/")) ? "" : "/", archive_path);
         archive_entry_set_pathname(entry, file_entry->fullpath);
 
         /* Ensure the resulting file is user-rw and global-unwritable */
