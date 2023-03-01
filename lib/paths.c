@@ -17,10 +17,20 @@
 #include "queue.h"
 #include "rpminspect.h"
 
-/*
- * Helper for the debuginfo path functions.
+/**
+ * @brief Return the selected build debuginfo package path where the
+ * package was extracted for rpminspect.  The path must match the
+ * architecture provided.
+ *
+ * IMPORTANT: Do not free the returned string.
+ *
+ * @param ri The struct rpminspect for the program.
+ * @param file The file we are looking for debuginfo for.
+ * @param binarch The required debuginfo architecture.
+ * @return Full path to the extracted debuginfo package, or
+ *         NULL if not found.
  */
-static const char *_get_debuginfo_path_helper(struct rpminspect *ri, const rpmfile_entry_t *file, const char *binarch, int build)
+const char *get_debuginfo_path(struct rpminspect *ri, const rpmfile_entry_t *file, const char *binarch, int build)
 {
     char *r = NULL;
     rpmpeer_entry_t *peer = NULL;
@@ -28,8 +38,11 @@ static const char *_get_debuginfo_path_helper(struct rpminspect *ri, const rpmfi
     const char *name = NULL;
     const char *arch = NULL;
     char *root = NULL;
-    char *base = NULL;
+    char *pattern = NULL;
     char *check = NULL;
+    char *tmp = NULL;
+    rpmfile_t *files = NULL;
+    rpmfile_entry_t *pfile = NULL;
     unsigned int count = 0;
     struct stat sb;
 
@@ -38,13 +51,19 @@ static const char *_get_debuginfo_path_helper(struct rpminspect *ri, const rpmfi
     assert(binarch != NULL);
     assert(build == BEFORE_BUILD || build == AFTER_BUILD);
 
-    /* debuginfo base file */
-    xasprintf(&base, "%s-%s-%s.%s%s", file->localpath,
-                                      headerGetString(file->rpm_header, RPMTAG_VERSION),
-                                      headerGetString(file->rpm_header, RPMTAG_RELEASE),
-                                      get_rpm_header_arch(file->rpm_header),
-                                      DEBUG_FILE_SUFFIX);
-    assert(base != NULL);
+    /* debuginfo base pattern */
+    arch = get_rpm_header_arch(file->rpm_header);
+
+    if (!fnmatch(RPM_X86_ARCH_PATTERN, arch, 0)) {
+        arch = RPM_X86_ARCH_PATTERN;
+    }
+
+    xasprintf(&pattern, "%s-%s-%s.%s%s", file->localpath,
+                                         headerGetString(file->rpm_header, RPMTAG_VERSION),
+                                         headerGetString(file->rpm_header, RPMTAG_RELEASE),
+                                         arch,
+                                         DEBUG_FILE_SUFFIX);
+    assert(pattern != NULL);
 
     /* try to find a debuginfo package */
     TAILQ_FOREACH(peer, ri->peers, items) {
@@ -55,9 +74,11 @@ static const char *_get_debuginfo_path_helper(struct rpminspect *ri, const rpmfi
         if (build == BEFORE_BUILD) {
             arch = get_rpm_header_arch(peer->before_hdr);
             root = peer->before_root;
+            files = peer->before_files;
         } else {
             arch = get_rpm_header_arch(peer->after_hdr);
             root = peer->after_root;
+            files = peer->after_files;
         }
 
         assert(arch != NULL);
@@ -84,27 +105,44 @@ static const char *_get_debuginfo_path_helper(struct rpminspect *ri, const rpmfi
                 safety = peer;
             }
 
-            /* look for the debuginfo package here */
-            check = joinpath(root, DEBUG_PATH, base, NULL);
+            /* create a full pattern for matching */
+            tmp = pattern;
 
-            if (stat(check, &sb) == -1 || !S_ISREG(sb.st_mode)) {
-                /* file not in this package */
-                free(check);
-                continue;
+            if (strsuffix(DEBUG_PATH, "/")) {
+                while (*tmp == '/' && *tmp != '\0') {
+                    tmp++;
+                }
+            }
+
+            xasprintf(&check, "%s%s%s", root, DEBUG_PATH, tmp);
+            assert(check != NULL);
+
+            TAILQ_FOREACH(pfile, files, items) {
+                if (fnmatch(check, pfile->fullpath, 0)) {
+                    continue;
+                } else {
+                    if (stat(pfile->fullpath, &sb) == 0 && S_ISREG(sb.st_mode)) {
+                        /* just copy the pointer, no need to dupe it */
+                        if (build == BEFORE_BUILD) {
+                            r = peer->before_root;
+                        } else {
+                            r = peer->after_root;
+                        }
+
+                        break;
+                    }
+                }
             }
 
             free(check);
 
-            /* just copy the pointer, no need to dupe it */
-            if (build == BEFORE_BUILD) {
-                r = peer->before_root;
-            } else {
-                r = peer->after_root;
-            }
-
-            if (S_ISREG(sb.st_mode)) {
+            if (r) {
                 break;
             }
+        }
+
+        if (r) {
+            break;
         }
     }
 
@@ -117,44 +155,8 @@ static const char *_get_debuginfo_path_helper(struct rpminspect *ri, const rpmfi
         }
     }
 
-    free(base);
+    free(pattern);
     return r;
-}
-
-/**
- * @brief Return the before build debuginfo package path where the
- * package was extracted for rpminspect.  The path must match the
- * architecture provided.
- *
- * IMPORTANT: Do not free the returned string.
- *
- * @param ri The struct rpminspect for the program.
- * @param file The file we are looking for debuginfo for.
- * @param binarch The required debuginfo architecture.
- * @return Full path to the extract before build debuginfo package, or
- * NULL if not found.
- */
-const char *get_before_debuginfo_path(struct rpminspect *ri, const rpmfile_entry_t *file, const char *binarch)
-{
-    return _get_debuginfo_path_helper(ri, file, binarch, BEFORE_BUILD);
-}
-
-/**
- * @brief Return the after build debuginfo package path where the
- * package was extracted for rpminspect.  The path must match the
- * architecture provided.
- *
- * IMPORTANT: Do not free the returned string.
- *
- * @param ri The struct rpminspect for the program.
- * @param file The file we are looking for debuginfo for.
- * @param binarch The required debuginfo architecture.
- * @return Full path to the extract after build debuginfo package for
- * the name subpackage, or NULL if not found.
- */
-const char *get_after_debuginfo_path(struct rpminspect *ri, const rpmfile_entry_t *file, const char *binarch)
-{
-    return _get_debuginfo_path_helper(ri, file, binarch, AFTER_BUILD);
 }
 
 /*
