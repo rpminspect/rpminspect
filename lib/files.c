@@ -173,6 +173,8 @@ rpmfile_t *extract_rpm(struct rpminspect *ri, const char *pkg, Header hdr, const
     int archive_result = 0;
 
     int i = 0;
+    const char *tmp = NULL;
+    const char *div = NULL;
     rpmfile_entry_t *file_entry = NULL;
     rpmfile_t *file_list = NULL;
 
@@ -305,7 +307,27 @@ rpmfile_t *extract_rpm(struct rpminspect *ri, const char *pkg, Header hdr, const
         }
 
         /* Prepend output_dir to the path name */
-        xasprintf(&file_entry->fullpath, "%s%s%s", *output_dir, (strsuffix(*output_dir, "/") && strprefix(archive_path, "/")) ? "" : "/", archive_path);
+        tmp = archive_path;
+
+        if (strsuffix(*output_dir, "/")) {
+            if (strprefix(archive_path, "/")) {
+                div = "";
+
+                while (*tmp == '/' && *tmp != '\0') {
+                    tmp++;
+                }
+            } else {
+                div = "/";
+            }
+        } else {
+            if (strprefix(archive_path, "/")) {
+                div = "";
+            } else {
+                div = "/";
+            }
+        }
+
+        xasprintf(&file_entry->fullpath, "%s%s%s", *output_dir, div, tmp);
         archive_entry_set_pathname(entry, file_entry->fullpath);
 
         /* Ensure the resulting file is user-rw and global-unwritable */
