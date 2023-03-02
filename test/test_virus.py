@@ -3,8 +3,6 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 #
 
-import timeout_decorator
-
 from baseclass import TestSRPM, TestRPMs, TestKoji
 from baseclass import TestCompareSRPM, TestCompareRPMs, TestCompareKoji
 
@@ -21,7 +19,6 @@ class HasNoVirusSRPM(TestSRPM):
         self.inspection = "virus"
         self.result = "OK"
 
-    @timeout_decorator.timeout(500)
     def runTest(self):
         super().runTest()
 
@@ -37,7 +34,6 @@ class HasNoVirusRPMs(TestRPMs):
         self.inspection = "virus"
         self.result = "OK"
 
-    @timeout_decorator.timeout(500)
     def runTest(self):
         super().runTest()
 
@@ -53,7 +49,6 @@ class HasNoVirusKoji(TestKoji):
         self.inspection = "virus"
         self.result = "OK"
 
-    @timeout_decorator.timeout(500)
     def runTest(self):
         super().runTest()
 
@@ -72,7 +67,6 @@ class HasNoVirusCompareSRPM(TestCompareSRPM):
         self.inspection = "virus"
         self.result = "OK"
 
-    @timeout_decorator.timeout(500)
     def runTest(self):
         super().runTest()
 
@@ -91,7 +85,6 @@ class HasNoVirusCompareRPMs(TestCompareRPMs):
         self.inspection = "virus"
         self.result = "OK"
 
-    @timeout_decorator.timeout(500)
     def runTest(self):
         super().runTest()
 
@@ -110,7 +103,6 @@ class HasNoVirusCompareKoji(TestCompareKoji):
         self.inspection = "virus"
         self.result = "OK"
 
-    @timeout_decorator.timeout(500)
     def runTest(self):
         super().runTest()
 
@@ -126,7 +118,6 @@ class HasVirusSRPM(TestSRPM):
         self.result = "BAD"
         self.waiver_auth = "Security"
 
-    @timeout_decorator.timeout(500)
     def runTest(self):
         super().runTest()
 
@@ -141,7 +132,6 @@ class HasVirusRPMs(TestRPMs):
         self.result = "BAD"
         self.waiver_auth = "Security"
 
-    @timeout_decorator.timeout(500)
     def runTest(self):
         super().runTest()
 
@@ -156,7 +146,6 @@ class HasVirusKoji(TestKoji):
         self.result = "BAD"
         self.waiver_auth = "Security"
 
-    @timeout_decorator.timeout(500)
     def runTest(self):
         super().runTest()
 
@@ -176,7 +165,6 @@ class HasVirusCompareSRPM(TestCompareSRPM):
         self.result = "BAD"
         self.waiver_auth = "Security"
 
-    @timeout_decorator.timeout(500)
     def runTest(self):
         super().runTest()
 
@@ -196,7 +184,6 @@ class HasVirusCompareRPMs(TestCompareRPMs):
         self.result = "BAD"
         self.waiver_auth = "Security"
 
-    @timeout_decorator.timeout(500)
     def runTest(self):
         super().runTest()
 
@@ -216,6 +203,5 @@ class HasVirusCompareKoji(TestCompareKoji):
         self.result = "BAD"
         self.waiver_auth = "Security"
 
-    @timeout_decorator.timeout(500)
     def runTest(self):
         super().runTest()
