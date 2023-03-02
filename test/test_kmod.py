@@ -123,6 +123,7 @@ def get_derp_kmod_aliases(rpminspect):
 # kernel module parameters #
 ############################
 
+
 # Verify kmod params are good between before and after RPMs
 class GoodKmodParamsRPMs(TestCompareRPMs):
     @unittest.skipUnless(have_kernel_devel, "Need kernel devel files")
@@ -207,6 +208,7 @@ class LostKmodParamsKoji(TestCompareKoji):
 # kernel module depends #
 #########################
 
+
 # Verify kmod depends are good between before and after RPMs
 class GoodKmodDependsRPMs(TestCompareRPMs):
     @unittest.skipUnless(have_kernel_devel, "Need kernel devel files")
@@ -290,6 +292,7 @@ class LostKmodDependsKoji(TestCompareKoji):
 #########################
 # kernel module aliases #
 #########################
+
 
 # Verify kmod aliases are good between before and after RPMs
 class GoodKmodAliasesRPMs(TestCompareRPMs):

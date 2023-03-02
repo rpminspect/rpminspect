@@ -71,6 +71,7 @@ class SlashBinFileCompareKoji(TestCompareKoji):
 # /sbin #
 #########
 
+
 # File in /sbin in RPM (VERIFY)
 class SlashSbinFileRPM(TestRPMs):
     def setUp(self):
@@ -129,6 +130,7 @@ class SlashSbinFileCompareKoji(TestCompareKoji):
 # /lib #
 ########
 
+
 # File in /lib in RPM (VERIFY)
 class SlashLibFileRPM(TestRPMs):
     def setUp(self):
@@ -186,6 +188,7 @@ class SlashLibFileCompareKoji(TestCompareKoji):
 ##########
 # /lib64 #
 ##########
+
 
 # File in /lib64 in RPM (VERIFY)
 class SlashLib64FileRPM(TestRPMs):
