@@ -25,6 +25,10 @@ Use the upstream release repo for these steps:
 
 [ ] git add CHANGES.md && git commit -s -m "Update CHANGES.md"
 
+[ ] make authors
+
+[ ] git add AUTHORS.md && git commit -s -m "Update AUTHORS.md"
+
 [ ] make update-pot
 
 [ ] git add po && git commit -s -m "Update translation template"
