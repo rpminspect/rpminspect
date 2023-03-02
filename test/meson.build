@@ -171,7 +171,8 @@ if python.found()
              python,
              args : ['-B', '-m', 'unittest', 'discover', '-v', meson.source_root() + '/test', suite],
              env : test_env,
-             is_parallel : false
+             is_parallel : false,
+             timeout : 1500
             )
     endforeach
 
