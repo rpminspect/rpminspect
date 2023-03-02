@@ -144,6 +144,10 @@ koji: srpm
 clean:
 	-rm -rf $(MESON_BUILD_DIR)
 
+# Set to 'y' in the calling environment to skip the pip package
+# installation in instreqs.
+SKIP_PIP ?= n
+
 instreqs:
 	if [ -x $(topdir)/osdeps/$(OS_SUBDIR)/pre.sh ]; then \
 		env OSDEPS=$(topdir)/osdeps/$(OS_SUBDIR) $(topdir)/osdeps/$(OS_SUBDIR)/pre.sh ; \
@@ -151,7 +155,7 @@ instreqs:
 	if [ -f $(topdir)/osdeps/$(OS_SUBDIR)/reqs.txt ]; then \
 		$(PKG_CMD) $$(grep -v ^# $(topdir)/osdeps/$(OS_SUBDIR)/reqs.txt 2>/dev/null | awk 'NF' ORS=' ') ; \
 	fi
-	if [ -f $(topdir)/osdeps/$(OS_SUBDIR)/pip.txt ]; then \
+	if [ ! "$(SKIP_PIP)" = "y" ] && [ -f $(topdir)/osdeps/$(OS_SUBDIR)/pip.txt ]; then \
 		$(PIP_CMD) $$(grep -v ^# $(topdir)/osdeps/$(OS_SUBDIR)/pip.txt 2>/dev/null | awk 'NF' ORS=' ') ; \
 	fi
 	if [ -x $(topdir)/osdeps/$(OS_SUBDIR)/post.sh ]; then \
