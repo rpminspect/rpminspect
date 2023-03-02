@@ -75,5 +75,5 @@ jobs:
                   #    curl -s https://codecov.io/bash | bash
                   #
                   run: |
-                      make instreqs
-                      make debug
+                      make instreqs SKIP_PIP=y
+                      make
