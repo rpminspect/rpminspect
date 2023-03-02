@@ -45,7 +45,7 @@ static bool virus_driver(struct rpminspect *ri, rpmfile_entry_t *file)
 
         if (r != CL_SUCCESS) {
             cl_engine_free(engine);
-            errx(RI_PROGRAM_ERROR, _("cl_load: %s"), cl_strerror(r));
+            errx(RI_PROGRAM_ERROR, "cl_load: %s", cl_strerror(r));
         }
 
         /* compile engine */
@@ -53,7 +53,7 @@ static bool virus_driver(struct rpminspect *ri, rpmfile_entry_t *file)
 
         if (r != CL_SUCCESS) {
             cl_engine_free(engine);
-            errx(RI_PROGRAM_ERROR, _("cl_engine_compile: %s"), cl_strerror(r));
+            errx(RI_PROGRAM_ERROR, "cl_engine_compile: %s", cl_strerror(r));
         }
 
         /* remember to not do all this again */
@@ -89,7 +89,7 @@ static bool virus_driver(struct rpminspect *ri, rpmfile_entry_t *file)
 
         result = false;
     } else if (r != CL_CLEAN) {
-        warnx(_("cl_scanfile(%s): %s"), file->localpath, cl_strerror(r));
+        warnx("cl_scanfile(%s): %s", file->localpath, cl_strerror(r));
     }
 
     return result;
@@ -110,7 +110,7 @@ bool inspect_virus(struct rpminspect *ri)
     r = cl_init(CL_INIT_DEFAULT);
 
     if (r != CL_SUCCESS) {
-        warnx(_("cl_init: %s"), cl_strerror(r));
+        warnx("cl_init: %s", cl_strerror(r));
         return false;
     }
 
@@ -131,7 +131,7 @@ bool inspect_virus(struct rpminspect *ri)
     d = opendir(dbpath);
 
     if (d == NULL) {
-        err(EXIT_FAILURE, "opendir");
+        err(EXIT_FAILURE, _("missing %s"), dbpath);
     }
 
     errno = 0;
@@ -149,7 +149,7 @@ bool inspect_virus(struct rpminspect *ri)
             free(cvdpath);
 
             if (closedir(d) == -1) {
-                warn("closedir");
+                warn("closedir: %s", dbpath);
             }
 
             return false;
@@ -172,7 +172,7 @@ bool inspect_virus(struct rpminspect *ri)
     }
 
     if (closedir(d) == -1) {
-        warn("closedir");
+        warn("closedir: %s", dbpath);
     }
 
     params.verb = VERB_OK;
