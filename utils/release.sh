@@ -119,13 +119,11 @@ if [ "${OPT_BUMPVER}" = "y" ]; then
     sed -i -e "s|'${OLDVERSION}'|'${VERSION}'|g" meson.build
     git add meson.build
     git commit -m "New release (${VERSION})"
-else
-    OLDVERSION="${VERSION}"
 fi
 
 # Now tag the release
 if [ "${OPT_TAG}" = "y" ]; then
-    git tag -s -a -m "Tag release v${VERSION}" v"${VERSION}"
+    git tag -s -m "Tag release v${VERSION}" v"${VERSION}"
 fi
 
 # Generate the dist artifact and sign it
