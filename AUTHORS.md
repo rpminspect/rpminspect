@@ -37,6 +37,8 @@ Contributors
 
 - Miro Hrončok <miro@hroncok.cz>
 
+- Petr Písař <ppisar@redhat.com>
+
 - Pino Toscano <ptoscano@redhat.com>
 
 - Preston Watson <prwatson@redhat.com>
@@ -48,6 +50,8 @@ Contributors
 - Siddhesh Poyarekar <siddhesh@gotplt.org>
 
 - Tim Flink <tflink@fedoraproject.org>
+
+- Tomas Hoger <thoger@redhat.com>
 
 - wangqing <wangqing@uniontech.com>
 
