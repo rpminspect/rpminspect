@@ -69,8 +69,6 @@ jobs:
                       echo $? > exitcodes/build
                       gmake check
                       echo $? > exitcodes/test
-                      ninja -C build coverage && ( curl -s https://codecov.io/bash | bash ) || :
-                      mv exitcodes build
 
             # Process the exit codes outside the VM
             - name: Check exit codes
