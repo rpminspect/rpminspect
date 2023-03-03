@@ -1,3 +1,479 @@
+Changes in rpminspect-1.11
+--------------------------
+
+General release and build process changes:
+* check the results of meson's run_command()
+* Change clamav-data to Recommends in the spec file (#861)
+* Increase libabigail version dependency to 2.1
+* Add a Makefile target and script to update uthash.h
+* Use SPDX license identifiers in rpminspect.spec.in
+* Adjust BuildRequires for libannocheck requirement
+* BuildRequires: annobin-libannocheck
+* On FreeBSD, look for and add -lintl to the linker args
+* Change how test_env is defined.
+* Remove unnecessary dependencies from src/meson.build
+* On FreeBSD add -D__BSD_VISIBLE to the CFLAGS
+* Get strverscmp() from libiberty.a on FreeBSD
+* _HAVE_LIBIBERTY -> _FREEBSD_LIBIBERTY
+* Fix builds on EPEL >= 7 and Fedora >= 35
+* Default to with_annocheck rather than with_libannocheck
+* Add BSD-2-Clause to the License list in the spec file
+* Some meson.build improvements
+* Adjust the CURLINFO_CONTENT_LENGTH_DOWNLOAD_T test
+* Add 'BuildRequires: libcdson-devel' to the spec file
+* BuildRequires: libcdson-devel
+* Support skipping pip package installation in 'make instreqs'
+* Update RELEASE instructions
+
+Config file or data/ file changes:
+* Clarify the 'ignore' block in comments
+* Correct one small comment error in data/security/GENERIC
+* Update comments for the annocheck inspection in generic.yaml
+* Update the comment for the licensedb setting
+* Drop '.gdb_index' from the example debuginfo section list
+* Correct documentation of addedfiles.forbidden_path_prefixes
+* Fix invalid YAML definition of badfuncs
+* Fix invalid YAML definition of javabytecode
+* Simplify definition of pathmigration.migrated_paths
+* Simplify definition of annocheck.{jobs,extra_opts}
+* Simplify definition of products
+
+Changes to the GitHub Actions CI scripts and files:
+* Enable Fedora rawhide again for x86_64 and i686
+* Do not use a specific actions/checkout version for alpinelinux
+* Use actions/checkout@v3 in alpinelinux.yml
+* On alpinelinux, run git config to define the safe directory
+* Run git config command on all GitHub Actions jobs
+* Make sure 'git' is installed for the fedora GHA jobs
+* Update the Slackware Linux GHA job
+* Build clamav with '-D ENABLE_JSON_SHARED=ON' on Slackware
+* opensuse does not use yum
+* Ensure manual install of 'rc' on OpenSUSE Leap works
+* Install automake and automake for opensuse-leap job
+* Add bison and html2text to opensuse-leap reqs.txt list
+* Update GitHub Action yml files with correct branch name
+* s/annobin/annobin-annocheck/g for Fedora CI targets
+* Prevent RPMTAG_VENDOR override on OpenSUSE Leap jobs
+* python3-Pygments added to reqs.txt for opensuse-leap
+* Use vbatts/slackware:latest in GitHub Actions (#868)
+* Add annobin-annocheck to reqs.txt for almalinux8
+* Add Alma Linux 9 job to GHA
+* Add detection of Alma Linux 9 to utils/determine-os.sh
+* Modify test_annocheck.py a bit for Slackware Linux
+* Fix Alma Linux detection is utils/determine-os.sh
+* Disable annocheck tests on Amazon Linux 2
+* Do not run annocheck inspection tests on CentOS 7
+* Run ldconfig as last command in post.sh on Slackware Linux
+* Update FreeBSD files in osdeps/freebsd/
+* Add annobin-libannocheck to reqs.txt files for Fedora rawhide
+* Add annobin-libannocheck to reqs.txt files for Fedora latest
+* 32-bit Fedora CI jobs need to install annobin-libannocheck.i686
+* The i686 Fedora CI jobs need binutils-devel.i686
+* Add more settings to the FreeBSD osdeps files
+* Initial GitHub Actions file for FreeBSD CI for rpminspect
+* Use latest stable FreeBSD vmaction in FreeBSD CI
+* Set PATH environment variable for FreeBSD CI job
+* Another slight adjustment on the FreeBSD CI job
+* Need to install git explicitly for the FreeBSD CI job
+* s/-D with_annocheck/-D with_libannocheck/g in freebsd.yml
+* Use 'gmake check' to run the test suite on FreeBSD CI
+* Process build and step exit codes on the VM host for FreeBSD
+* OK, put exitcodes/ under build/
+* Drop verbose tar extract in osdeps/freebsd/post.sh
+* Make sure FreeBSD CI gets a 'ksh' symlink
+* hostname workaround for rpmbuild on FreeBSD CI
+* Slightly different way to add hostname and IP on FreeBSD CI
+* Write to /etc/hosts in the correct order in FreeBSD CI
+* Do not run FreeBSD CI on pull requests
+* Add 'env CRYPTOGRAPHY_DONT_BUILD_RUST=1' to PIP_CMD for fedora
+* Fix up the Alpine Linux post.sh script and reqs.txt list
+* Fix Slackware Linux CI job
+* Do not make the gcovr step fail a CI job
+* Do not make the gcovr step fail for the rest of the CI jobs
+* Fix Debian stable and testing CI jobs
+* Fix Ubuntu latest CI job
+* Minor updates to quiet the OpenSUSE Leap CI job
+* Remove ALT Linux from the CI job collection
+* Fix Gentoo Linux CI job
+* Quiet some tar and git operations
+* Fix CentOS 7 and CentOS Stream 8 jobs; add CentOS Stream 9
+* Use gcc for the FreeBSD CI job
+* Pass CRYPTOGRAPHY_DONT_BUILD_RUST=1 to pip on FreeBSD CI job
+* Do not run 'rpm --import /etc/pki/rpm-gpg/*' on CentOS jobs
+* Update the FreeBSD repo catalog before running the CI job
+* Fix the FreeBSD job
+* Do not carry the old find-debuginfo.sh for FreeBSD CI
+* Install cdson from git on Debian and Ubuntu CI jobs
+* Install cdson on various CI jobs
+* Install cdson from git on Oracle Linux
+* Remove invalid 'cd "${TAG}" || exit 1' lines from post.sh
+* Use ninja instead of meson when building cdson
+* Install rc and cdson to /usr on Arch Linux
+* Fixes for CI job on Oracle Linux 8
+* Expand PATH in pre.sh for Debian CI jobs
+* Install cdson to /usr for the Amazon Linux CI jobs
+* Install cdson on the Slackware Linux CI job
+* Install cdson on the Gentoo Linux CI job
+* Configure and run freshclan on the Slackware Linux CI job
+* Install cdson in the FreeBSD CI job
+* Link ninja-build to ninja early in post.sh for Amazon Linux
+* Install rpm4 from source on FreeBSD CI job
+* shellcheck fixes for osdeps/freebsd/post.sh
+* Run 'gmake check' for the test suite in the FreeBSD CI job
+* Fix Debian CI job and pip module installation
+* Add 'debug' and 'setup-debug' targets to Makefile
+* Convert CentOS and FreeBSD jobs to use 'make debug/check'
+* s/PYTHONG/PYTHON/g
+* Use uraimo/run-on-arch-action@v2 on non-x86 jobs
+* Split the Debian jobs in to stable and testing
+* Small fix up for the FreeBSD CI job
+* CentOS 7 job fixes
+* Remove CRYPTOGRAPHY_DONT_BUILD_RUST=1 from Fedora CI defs.mk
+* Quote ${ec} in .github/workflows/freebsd.yml
+* Run 'make instreqs SKIP_PIP=y ; make' on s390x, ppc64le, aarch64
+* Do not run coverage target on FreeBSD CI
+
+rpminspect(1) changes or improvements related to it:
+* Add missing format string to errx() calls
+* For fetch-only, do not override the argv counter in the loop
+* Match products with dist tags containing periods
+* Careful cleanup with rmtree() on exit
+* Honor the -s/--suppress option on json, xunit, and summary modes
+* Use errx() for RI_PROGRAM_ERROR conditions in rpminspect(1)
+* Do not assume before_product and after_product exist
+* Improve product release detection for build comparisons
+* Restore product release matching for single build analysis
+* Handle build comparisons where product release is half known
+* Fix handling of the -s and -t command line options
+* Support Koji task ID number for non-scratch builds
+* Small memory leak fix in rpminspect.c for the -w option
+* Add the -b/--build-type command line option to rpminspect
+* Trim the leading period from the product_release string
+* Trim leading period(s) after product release string matching
+* Fix double free on ri->product_release
+* Report skipped inspections in verbose mode and in results
+* Add dynamic HTML viewer
+* Add SKIP result type to viewer
+* Include string.h for strverscmp()
+* Just add the prototype for strverscmp() in libiberty
+* On FreeBSD, rpminspect must link with libintl
+* Handle missing after_product in get_product_release()
+* Removed unnecessary reset of i to 0
+* Do not crash when user tries to compare two incompatible builds
+
+Documentation changes:
+* Large set of Doxygen comments in header files
+* Add Doxygen comments for include/readelf.h
+* More Doxygen comment headers in include/
+* Expand build input description in the rpminspect(1) man page (#863)
+* Adjust git.md category description for cmd
+* Add link to rpminspect-report project page
+* Update the table of build requirements in README.md
+* Add FreeBSD to the list of CI platforms
+* Add cdson to the list of requirements in README.md
+
+General bug fix in the library or frontend program:
+* Normalize the KABI path and do not warn on access(3) failures
+* Do not try to mmap() zero length files in read_file()
+* Do not use warn() if read_file() returns NULL in get_patch_stats()
+* Handle NULL result->msg in output_xunit()
+* Reset the tmp pointer on realloc() in strxmlescape()
+* On stat() failure in read_file_bytes(), just return NULL
+* Use CURLINFO_CONTENT_LENGTH_DOWNLOAD on older libcurl releases
+* Correct the reporting of kmod parameter differences
+* Do not report fallthrough changes as VERIFY in changedfiles
+* Stop resetting the patch_ignore_list when reading config files
+* Honor all per-inspection ignore lists; match path prefix
+* Remove temporary files in the 'changelog' inspection
+* Carefully filter debug packages in gather_deprules_by_type()
+* Double free removed in match_fileinfo_mode()
+* read_file_bytes() must be restricted to S_ISREG() files
+* In rpmdeps, do not report new explicit Requires as VERIFY
+* Do not incorrectly report security-related files as new
+* Correctly handle addedfiles edge cases
+* Security path checking only applies to comparisons in addedfiles
+* Missing free() calls in the new list_remove() function
+* Use a long rather than int64_t for the patch number
+* Correct RPM dependency rule peering
+* Prevent double free() in the patches inspection
+* Correct handling of kmidiff(1) exit codes
+* Correctly check for forbidden directories in RPM payloads
+* Handle PatchN: lines in spec files with no space after ':'
+* Address some additional Patch and %patch line reading issues
+* strtrim() and strsplit() memory management fixes
+* Handle more auto deps in the kernel package correctly
+* Make sure INFO results in metadata do not fail rpminspect
+* Relax the 'types' inspection a bit
+* Try FNM_LEADING_DIR matches when patterns end in wildcard
+* Correctly pick up the use of %autopatch or %autosetup
+* strcmp() -> !strcmp() in the patches inspection
+* Memory management fix for the changelog inspection
+* Remove temporary files in the changelog inspection
+* Do not fail 'runpath' when comparing kernel builds
+* free before_output and after_output *after* using them
+* Do not fail dsodeps if ELF type is not ET_DYN
+* Tie the annocheck inspection result to reporting severity
+* Only report forbidden path additions as VERIFY in addedfiles
+* In 'removedfiles' report VERIFY and BAD for security paths
+* Account for leading executables in Exec= (e.g., "env VAR=VAL")
+* Output unified diff correctly in delta_out()
+* Simplify severity reporting in the changedfiles inspection
+* Add missing free(tmp) calls in the desktop inspection
+* Minimize total_width initialization for download progress bar
+* Fail if we cannot read RPMs before downloading
+* Adjust reporting severity in the permissions inspection
+* Prevent repetitive results reporting in 'types'
+* Correct rpmdeps inspection reporting levels
+* Correct results reporting for the permissions inspection
+* Correct results reporting for the types inspection
+* Correct results reporting for the filesize inspection
+* Allow NULL inputs to strprefix() and strsuffix()
+* Get per-inspection ignore list working in 'upstream'
+* Support per-file allowed lists for the badfuncs inspection
+* Use allowed_arch() in the arch and subpackages inspections
+* Remove unnecessary warning from failed chdir() call
+* Process per-inspection ignore blocks first in init.c
+* Round the width variable for the curl progress bar
+* Handle RPM payloads with individual entries >2GB
+* Small fixes to the 'patches' inspection
+* Handle unused parameter on extract_rpm_payload() on old librpm
+* Read in capabilities data files correctly
+* Report removed patches by checking RPMTAG_PATCHES list
+* Do not remove all () substrings from requirements in rpmdeps
+* Correctly build the abidiff(1) command line
+* Make sure abidiff can find all debuginfo type files
+* Use add_abidiff_arg() in the kmidiff inspection
+* Get Koji module downloading working consistently
+* Handle source packages in get_nevra() (#859) (#860)
+* Get reporting severity for removed files w/ WAIVABLE_BY_SECURITY (#862)
+* Set XML-RPC size limit to SIZE_MAX (#867)
+* Fix errors downloading some module builds (#869)
+* When the subpackages inspection succeeds, report an OK message
+* Only report multiple subpackages Provides for explicit Requires
+* Only report missing explicit Requires for single providers
+* Check for completed builds and closed tasks when fetching
+* Update XML-RPC handling for getBuild and getTaskInfo
+* Read Koji build state after reading the getBuild response
+* Small enum and static variable declaration cleanups
+* Error on old json-c version with json_object_object_foreach()
+* When reading config files, allow value overrides
+* Handle Koji XML-RPC failure code 1 when using getTaskInfo
+* Remove free() with module input in the upstream inspection
+* An unexpected exit of abidiff(1) is a VERIFY result
+* Drop unnecessary assert() in the badfuncs inspection
+* Various and assorted bug fixes
+* Correctly read the capabilities file lines
+* More memory management fixes in builds.c
+* Adjust now abidiff and kmidiff get --d1/--d2 arguments
+* severity_t values should go from best to worst
+* In removedfiles, properly report security path removals
+* Small fixes for the modularity inspection
+* Correctly report abidiff(1) results in the abidiff inspection
+* Do not report "New patch file (null) has appeared"
+* Small fixes to handle setting some build options to false
+* Do not assume SHF_ORDERED and SHF_EXCLUDE are defined
+* Match product release to annocheck profile string
+* Portability updates for byte swap functions in inspect_javabytecode.c
+* Honor with_libcap build time option in inspect_ownership.c
+* Portability fix in readfile.c
+* GLOB_PERIOD is a GNU extension
+* Modify match_path() to work with paths without leading '/'
+* Read XMLRPC_TYPE_INT and XMLRPC_TYPE_I8 correctly
+* Do not run libannocheck_finish() if libannocheck_init() fails
+* If libannocheck_init() fails, just fail the inspection early
+* Use libannocheck_get_version() in libannocheck_init() call
+* Report symlink destination via readlink() in results
+* When building with '-D with_annocheck=true', pass --profile
+* Fix build_annocheck_cmd() in inspect_annocheck.c
+* In the license inspection, stop at the first db match
+* Correct how the debuginfo checks for missing sections
+* Improve lostpayload inspection reporting by including arch
+* Correct results reporting for capabilities and permissions
+* Support systems with libkmod.h in /usr/include/kmod
+* Only use CURLINFO_CONTENT_LENGTH_DOWNLOAD_T in curl_get_size()
+* Add back support for older libcurl versions
+* Modularity support detection
+* Report file type changes in the permissions inspection
+* Do not incorrectly report missing debuginfo symbols
+* Handle kernel and debuginfo packages in 'elf' correctly
+* Pass public header directories to abidiff(1) for inspections
+* Avoid duplicate --hd1/--hd2 args to abidiff
+* Small memory management fix for get_all_arches()
+* Use json_object_object_get_ex() in parse_json.c
+* Nullify result params after they were freed
+* Set CURLOPT_FOLLOWLOCATION in curl_get_size()
+* If download space cannot be determined, warn user
+* Correctly read rpmdeps section and per-inspection ignores
+* Parse the badfuncs->allowed section in YAML config files
+* Small memory leak fixed in is_local_build()
+* Iterate over multiple licensedb files correctly
+* Cannot use warnx() here as it breaks parser output
+* Check return value of strdup() in tokenize_license_tag()
+* Strip temporary working dir from SRPM files in 'unicode'
+* Do not run abidiff inspection on ELF ET_DYN executables
+* "downloaded_mbs" -> "download_mbs" in read_cfgfile()
+* Check return value of cl_cvdhead() in virus inspection
+* Do not infinite loop on an empty rpminspect.yaml file
+* Look for user-specified profiles with any support file ending
+* Drop FNM_NOESCAPE from politics_driver() fnmatch() call
+* elf_getscn() can return NULL in get_elf_section_names()
+* Correct the reporting of rpmdeps ignore entries
+* Actually hook up the 'ignore' section of 'rpmdeps'
+* Prevent double slashes in fullpath in rpmfile_entry_t
+* Correctly handle 32-bit x86 packages in the annocheck inspection
+* Full fix for eliminating double slashes in fullpath
+* Fix severity_t enum placement of RESULT_DIAG
+* Replace bytes_to_str() with strndup()
+* Fix overriding external helper commands in init.c
+* Fix detection of modularity static_context
+* lib/init: constify applicable string arguments
+
+librpminspect feature or significant change:
+* Drop dependency on the external 'diffstat' command
+* Remove init_elf_data() function
+* Verify enough local disk space exists before downloading
+* Check for enough disk space before unpacking RPMs
+* Add strexitcode() and RI_INSUFFICIENT_SPACE exit code
+* Display insufficient space messages in human readable sizes
+* Doxygen comment work but also add and use missing remedy strings
+* Update to uthash 2.3.0
+* Drop the file count and line count checks in 'patches'
+* Default the filesize inspection size_threshold to 'info'
+* Rename init_rpmpeer() and free_rpmpeer() functions
+* Restrict the annocheck and lto inspections to ELF files
+* Simplify the librpm initialization call
+* Make the rpmdeps handle expected config() autodeps correctly
+* Adjust how the rpmdeps inspections trims ISA substrings
+* Add list_remove() function to librpminspect
+* Expand the patches inspection to verify patches are applied
+* Change how debuginfo dirs are matched for files
+* Add strtrim() function to librpminspect
+* In strsplit(), skip empty string tokens
+* Replace rpmDefineMacro usage with rpmPushMacro
+* In diagnostics, display download and unpack space reqs
+* Make the kmod inspection report changes as INFO only
+* Remove unnecessary archive_read_open_filename() warning
+* Always output 'diagnostics' results even if -s specified
+* Move ./rpminspect.yaml reading to init_rpminspect()
+* Support optional product release configuration files
+* Allow local rpminspect.yaml files to extend annocheck options
+* Use REG_EXTENDED in match_product()
+* In match_path(), honor common syntax of /path/to/dir/*
+* Add ints to the BLOCK_ enum in init.c
+* Define RESULT_DIAG for diagnostics results reporting
+* Support explicit paths for licensedb in the config file
+* Remove realloc() call from strtrim()
+* Only support RPM payload conversion with newer librpm releases
+* Support a new config file block called 'environment'
+* Rename abidiff-specific helper functions
+* Add headers dir support back to the the abidiff inspection
+* Move add_abidiff_arg() to abi.c and make non-static
+* When downloading modules, only display Downloading msg once
+* Minor fix for the download progress bar alignment (#870)
+* Change licensdb to a string_list_t in struct rpminspect
+* Support multiple license db files in the config file
+* Use section and token macros in init.c
+* Report Koji lookup error on stderr when searching
+* Add is_elf_executable() to readelf.c
+* Define struct buildtypes similar to struct inspect
+* When skipping the modularity inspection, explain why
+* When skipping the changelog inspection, explain why
+* Add the 'debuginfo' inspection
+* Refactor code to make better use of list_add()
+* Get list of %*auto* macros from the config file in 'patches'
+* Change how RPMs are unpacked when peering happens
+* Define VERB_SKIP and NULL_WAIVERAUTH in types.h
+* Modify the result reporting functions so waiverauth is optional
+* For inspections reporting no issues, do not set waiverauth
+* Drop ABI_HEADERS_DIR1 and ABI_HEADERS_DIR2
+* Allow profile specification by full path or basename
+* Check /data/static_context in modulemd.txt in 'modularity'
+* Style update, drop the explicit '!= NULL' check
+* Update initialization and data structures for libannocheck
+* Switch to using libannocheck for the annocheck inspection
+* Include libgen.h everywhere basename(3) is used
+* Make a copy of the path before basename(3) is called
+* Use execvp() instead of execvpe() in runcmd()
+* Correct the regcomp() usage in inspect_manpage.c
+* Honor the 'ignore' block under 'abidiff' in rpminspect.yaml
+* Bring back support for annocheck(1) in the annocheck inspection
+* When an input cannot be found anywhere, tell the user
+* Expand xmlrpc fault reporting for getBuild and getTaskInfo
+* Improve the failure reporting from gather_builds()
+* Disable the check for .gnu_debuglink in non-debuginfo
+* Show error code value from libannocheck_run_tests()
+* Disable the modularity inspection if librpm lacks support
+* Update uthash.h to latest version
+* Whitespace changes
+* Support initialization from YAML, JSON, or DSON files
+* Set CURLOPT_MAXREDIRS to prevent unlimited URL redirections
+* Adjust indentation when dumping config data
+* Style cleanups and use warn*() functions from err.h
+* Small coding style changes in parse_*.c files
+* Give more error information in getobj() in parse_json.c
+* Ensure first argument to warnx() is a format string
+* Make get_all_arches() return a list of fnmatch(3) patterns
+* Handle macros in patch file names in the patches inspection
+* Improve the error reporting when missing /var/lib/clamav
+* Add a common interface for parsers
+* Implement YAML parser interface
+* init: use new YAML parser for configuration files
+* builds: use new parser for extracting rpm filters
+* inspect_modularity: use new parser for reading modulemd
+* Implement parser interface for JSON
+* Use new JSON parser interface for license inspection
+* Implement parser interface for DSON
+* Support multiple config file formats
+
+New inspections or inspection changes (not bug fixes):
+* Make virus inspection failures WAIVABLE_BY_SECURITY.
+
+Test suite commits:
+* Adjust the addedfiles tests to handle new default size threshold
+* Disable all MultipleProvidersCompareRPMs test cases
+* Fix the MultipleProvidersCompareRPMs test cases
+* Correct the %autopatch and %autosetup test cases
+* Skip %autopatch and %autosetup tests on systems without lua
+* Update the test_addedfiles.py test cases
+* Verify automatic ELF Requires handle subpackage changes
+* Support optional rpminspect.yaml overrides per test
+* Use .update() rather than |= to merge dicts
+* export QA_RPATHS from the top level Makefile
+* Support DIAGNOSTICS as a test result and fix test_upstream
+* Set licensedb to a list in baseclass.py
+* Add integration tests for annocheck inspection
+* Update rpmdeps test cases for the multiple providers case
+* Update multiple providers test cases in test_rpmdeps_providers.py
+* added integration test for removedfiles inspection
+* Add "-fstack-clash-protection -flto" in test_annocheck.py
+* Skip annocheck tests if no 'annocheck' executable found
+* Modify baseclass.py to support buildtype override by test case
+* Handle Alpine Linux special casing in test_abidiff.py
+* Add test cases for the 'debuginfo' inspection
+* Support KEEP=y when running 'make check'
+* Sync up Copyright lines with format used in lib and src
+* Update the test suite to handle the new optional waiver_auth
+* Fix and enable the removedfiles inspection test cases
+* Adjust TestKoji and TestCompareKoji so they be base classes
+* Use super().setUp() and super().tearDown() consistently
+* Create TestModule and TestCompareModules in baseclass.py
+* Improvements and fixes for baseclass.py
+* Add 12 new test cases for the modularity inspection
+* Remove invalid self.kojidir blocks in some tearDown() functions
+* Fix some of the annocheck test cases
+* Portability fixes for the test suite on FreeBSD
+* Handle buildhost subdomain detection more like librpm
+* Handle systems that spell 'x86_64' as 'amd64'
+* Apply the timeout decorator on a method, not the whole class
+* Switch to check_results() in TestRPMs
+* Reduce test license database to only fields used by rpminspect
+* Skip debuginfo tests on FreeBSD that do not work
+* Drop timeout settings for the virus test cases
+* Add back timeout setting to test/meson.build
+* Minor Python syntax changes found by Python black
+* Add regression test for deprecated YAML parsing
+
+
 Changes in rpminspect-1.10
 --------------------------
 
