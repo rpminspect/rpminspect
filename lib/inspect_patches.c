@@ -196,15 +196,23 @@ static bool is_patch(const rpmfile_entry_t *file)
  * name.  Function returns a newly allocated string that the caller
  * must free.
  */
-static char *expand_patchname_macros(Header hdr, const char *patchname)
+static char *expand_patchname_macros(struct rpminspect *ri, const rpmfile_entry_t *specfile, const char *patchname)
 {
     char *r = NULL;
     char *tmp = NULL;
+    Header hdr;
+    int nmacros = 0;
+    pair_entry_t *pair = NULL;
+    char *macro = NULL;
     string_list_t *macros = NULL;
     string_entry_t *entry = NULL;
 
-    assert(hdr != NULL);
+    assert(ri != NULL);
+    assert(specfile != NULL);
     assert(patchname != NULL);
+
+    hdr = specfile->rpm_header;
+    assert(hdr != NULL);
 
     r = strdup(patchname);
     assert(r != NULL);
@@ -225,6 +233,23 @@ static char *expand_patchname_macros(Header hdr, const char *patchname)
         } else if (!strcmp(entry->data, "name")) {
             tmp = strreplace(r, "%{name}", headerGetString(hdr, RPMTAG_NAME));
             assert(tmp != NULL);
+        } else {
+            /* read in spec file macros */
+            nmacros = get_specfile_macros(ri, specfile->fullpath);
+
+            /* try to sub in any spec file defined macros */
+            if (nmacros > 0) {
+                TAILQ_FOREACH(pair, ri->macros, items) {
+                    if (!strcmp(entry->data, pair->key)) {
+                        xasprintf(&macro, "%%{%s}", pair->key);
+                        assert(macro != NULL);
+                        tmp = strreplace(r, macro, pair->value);
+                        assert(tmp != NULL);
+                        free(macro);
+                        break;
+                    }
+                }
+            }
         }
 
         if (tmp) {
@@ -685,7 +710,7 @@ bool inspect_patches(struct rpminspect *ri)
                         assert(entry != NULL);
 
                         /* the patch file may contain macros, so try to replace those */
-                        patchhead = patchfile = expand_patchname_macros(specfile->rpm_header, entry->data);
+                        patchhead = patchfile = expand_patchname_macros(ri, specfile, entry->data);
                         assert(patchfile != NULL);
 
                         /* see if we have this patch */

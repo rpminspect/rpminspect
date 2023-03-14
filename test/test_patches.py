@@ -482,3 +482,48 @@ class PatchDefinedWithoutFieldSpaceCompareSRPM(TestCompareSRPM):
         self.inspection = "patches"
         self.result = "INFO"
         self.waiver_auth = "Not Waivable"
+
+
+# patch filename has a spec file macro in it
+class PatchFilenameWithMacroSRPM(TestSRPM):
+    def setUp(self):
+        super().setUp()
+
+        # define a macro
+        self.rpm.header += "\n%define super_patch_number 47\n"
+
+        # add a patch using a macro in a filename
+        self.rpm.add_patch(
+            rpmfluff.SourceFile("some-47.patch", patch_file),
+            True,
+            patchUrl="some-%{super_patch_number}.patch",
+        )
+
+        self.inspection = "patches"
+        self.result = "INFO"
+        self.waiver_auth = "Not Waivable"
+
+
+class PatchFilenameWithMacroCompareSRPM(TestCompareSRPM):
+    def setUp(self):
+        super().setUp()
+
+        # define a macro
+        self.before_rpm.header += "\n%define super_patch_number 47\n"
+        self.after_rpm.header += "\n%define super_patch_number 47\n"
+
+        # add a patch using a macro in a filename
+        self.before_rpm.add_patch(
+            rpmfluff.SourceFile("some-47.patch", patch_file),
+            True,
+            patchUrl="some-%{super_patch_number}.patch",
+        )
+        self.after_rpm.add_patch(
+            rpmfluff.SourceFile("some-47.patch", patch_file),
+            True,
+            patchUrl="some-%{super_patch_number}.patch",
+        )
+
+        self.inspection = "patches"
+        self.result = "INFO"
+        self.waiver_auth = "Not Waivable"
