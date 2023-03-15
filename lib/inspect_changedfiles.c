@@ -192,6 +192,11 @@ static bool changedfiles_driver(struct rpminspect *ri, rpmfile_entry_t *file)
 
         if (read(fd, magic, sizeof(magic)) != sizeof(magic)) {
             warn("read");
+
+            if (close(fd) == -1) {
+                warn("close");
+            }
+
             return true;
         }
 
