@@ -70,6 +70,11 @@ static short get_jvm_major(const char *filename, const char *localpath, const ch
 
         if (read(fd, magic, sizeof(magic)) != sizeof(magic)) {
             warn("read");
+
+            if (close(fd) == -1) {
+                warn("close");
+            }
+
             return -1;
         }
 
