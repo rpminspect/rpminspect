@@ -83,7 +83,10 @@ int get_specfile_macros(struct rpminspect *ri, const char *specfile)
 
     /* Read in the spec file first */
     spec = read_file(specfile);
-    assert(spec != NULL);
+
+    if (spec == NULL) {
+        return 0;
+    }
 
     /* Use a regular expression to match macro lines we will break down */
     xasprintf(&buf, "(%s|%s)", SPEC_MACRO_DEFINE, SPEC_MACRO_GLOBAL);
