@@ -868,11 +868,19 @@ static bool elf_driver(struct rpminspect *ri, rpmfile_entry_t *after)
     /* Skip kernel modules */
     after_elf = get_elf(after->fullpath, &after_elf_fd);
 
-    if (after_elf != NULL && get_elf_type(after_elf) == ET_REL && have_elf_section(after_elf, SHT_PROGBITS, ".modinfo")
+    if (after_elf != NULL
+        && get_elf_type(after_elf) == ET_REL
+        && have_elf_section(after_elf, SHT_PROGBITS, ".modinfo")
         && strsuffix(after->localpath, KERNEL_MODULE_FILENAME_EXTENSION)) {
-        close(after_elf_fd);
         elf_end(after_elf);
+        close(after_elf_fd);
         return true;
+    }
+
+    /* close this handle so the test can start over for .a vs .so */
+    if (after_elf) {
+        elf_end(after_elf);
+        close(after_elf_fd);
     }
 
     arch = get_rpm_header_arch(after->rpm_header);
