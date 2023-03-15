@@ -4,7 +4,7 @@ binutils-devel.i686
 cargo
 clamav-data
 clamav-devel.i686
-clamav-update.i686
+clamav-update
 CUnit.i686
 CUnit-devel.i686
 dash
