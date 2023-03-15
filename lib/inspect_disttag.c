@@ -128,6 +128,9 @@ static bool disttag_driver(struct rpminspect *ri, rpmfile_entry_t *file)
     int macrocount = 0;
     struct result_params params;
 
+    assert(ri != NULL);
+    assert(file != NULL);
+
     /* Read in spec file macros */
     macrocount = get_specfile_macros(ri, file->fullpath);
 
