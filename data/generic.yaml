@@ -183,7 +183,7 @@ vendor:
     # And rpminspect will match the longer ones to fc31.  By default
     # there is no product release regexp mapping enabled.
     #
-    # fc31: ^\.fc31.*$
+    #fc31: ^\.fc31.*$
 
 macrofiles:
     # Paths to all RPM macro definitions that rpminspect should use.

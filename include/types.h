@@ -469,6 +469,9 @@ struct rpminspect {
     /* Commands */
     struct command_paths commands;
 
+    /* environment section present? */
+    bool have_environment;
+
     /* Vendor data */
     char *vendor_data_dir;     /* main vendor data directory */
     string_list_t *licensedb;  /* names of files under licenses/ to use */
