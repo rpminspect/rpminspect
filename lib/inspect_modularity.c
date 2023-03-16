@@ -118,7 +118,7 @@ static bool check_static_context(struct rpminspect *ri)
         /* comparing builds, verify after build is correct, but report changes */
         bsc = get_static_context(ri->worksubdir, BEFORE_SUBDIR);
 
-        if (bsc == asc) {
+        if (bsc && asc) {
             if (ri->modularity_static_context == STATIC_CONTEXT_FORBIDDEN) {
                 xasprintf(&params.msg, _("The /data/static_context value in %s matches the value in %s, but the product release rules forbid the presence of /data/static_context in the module metadata."), ri->before, ri->after);
                 params.severity = RESULT_VERIFY;
