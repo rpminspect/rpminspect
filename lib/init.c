@@ -474,7 +474,7 @@ static bool annocheck_cb(const char *key, const char *value, void *cb_data)
 {
     tabledict_cb_data *data = cb_data;
 
-    if (!strcasecmp(key, "failure_severity") || !strcasecmp(key, "extra_opts") || !strcasecmp(key, "ignore") || !strcasecmp(key, "ignore")) {
+    if (!strcasecmp(key, "failure_severity") || !strcasecmp(key, "extra_opts") || !strcasecmp(key, "ignore")) {
         return false;
     }
 
@@ -602,7 +602,6 @@ static int read_cfgfile(struct rpminspect *ri, const char *filename)
     /* Processing order doesn't matter, so match data/generic.yaml. */
     strget(p, ctx, "common", "workdir", &ri->workdir);
     strget(p, ctx, "common", "profiledir", &ri->profiledir);
-    strget(p, ctx, "environment", "product_release", &ri->product_release);
     strget(p, ctx, "koji", "hub", &ri->kojihub);
     strget(p, ctx, "koji", "download_ursine", &ri->kojiursine);
     strget(p, ctx, "koji", "download_mbs", &ri->kojimbs);
@@ -612,6 +611,15 @@ static int read_cfgfile(struct rpminspect *ri, const char *filename)
     strget(p, ctx, "commands", "kmidiff", &ri->commands.kmidiff);
     strget(p, ctx, "vendor", "vendor_data_dir", &ri->vendor_data_dir);
     array(p, ctx, "vendor", "licensedb", &ri->licensedb);
+
+    s = p->getstr(ctx, "environment", "product_release");
+
+    if (s != NULL) {
+        ri->have_environment = true;
+        free(ri->product_release);
+        ri->product_release = s;
+        s = NULL;
+    }
 
     s = p->getstr(ctx, "vendor", "favor_release");
 
