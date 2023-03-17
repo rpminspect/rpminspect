@@ -102,7 +102,7 @@ static bool check_static_context(struct rpminspect *ri)
     bool bsc = false;
     bool asc = false;
     struct result_params params;
-    char *after_compliance;
+    char *after_compliance = NULL;
 
     assert(ri != NULL);
 
