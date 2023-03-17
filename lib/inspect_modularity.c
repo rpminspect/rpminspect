@@ -116,23 +116,23 @@ static bool check_static_context(struct rpminspect *ri)
     asc = get_static_context(ri->worksubdir, AFTER_SUBDIR);
 
     if (asc && ri->modularity_static_context == STATIC_CONTEXT_FORBIDDEN) {
-        xasprintf(&after_compliance, _("The /data/static_context value in %s is %s, but the product release rules forbid the presence of /data/static_context in the module metadata."), ri->after, asc ? _("true") : _("false"));
+        xasprintf(&after_compliance, _("The /data/static_context value in %s is %s, but the product release rules forbid the presence of /data/static_context in the module metadata."), ri->after, asc ? "true" : "false");
         params.severity = RESULT_VERIFY;
         params.waiverauth = WAIVABLE_BY_ANYONE;
         params.remedy = REMEDY_MODULARITY_STATIC_CONTEXT;
         r = false;
     } else if (!asc && ri->modularity_static_context == STATIC_CONTEXT_REQUIRED) {
-        xasprintf(&after_compliance, _("The /data/static_context value in %s is %s, but the product release rules require the presence of /data/static_context in the module metadata."), ri->after, asc ? _("true") : _("false"));
+        xasprintf(&after_compliance, _("The /data/static_context value in %s is %s, but the product release rules require the presence of /data/static_context in the module metadata."), ri->after, asc ? "true" : "false");
         params.severity = RESULT_VERIFY;
         params.waiverauth = WAIVABLE_BY_ANYONE;
         params.remedy = REMEDY_MODULARITY_STATIC_CONTEXT;
         r = false;
     } else if (!asc && ri->modularity_static_context == STATIC_CONTEXT_RECOMMEND) {
-        xasprintf(&after_compliance, _("The /data/static_context value in %s is %s, but the product release rules recommend the presence of /data/static_context in the module metadata."), ri->after, asc ? _("true") : _("false"));
+        xasprintf(&after_compliance, _("The /data/static_context value in %s is %s, but the product release rules recommend the presence of /data/static_context in the module metadata."), ri->after, asc ? "true" : "false");
     } else if (ri->modularity_static_context == STATIC_CONTEXT_NULL) {
-        xasprintf(&after_compliance, _("The /data/static_context value in %s is %s, and the product release rules do not have a setting for /data/static_context in the module metadata."), ri->after, asc ? _("true") : _("false"));
+        xasprintf(&after_compliance, _("The /data/static_context value in %s is %s, and the product release rules do not have a setting for /data/static_context in the module metadata."), ri->after, asc ? "true" : "false");
     } else {
-        xasprintf(&after_compliance, _("The /data/static_context value in %s is %s as required by the product release rules."), ri->after, asc ? _("true") : _("false"));
+        xasprintf(&after_compliance, _("The /data/static_context value in %s is %s as required by the product release rules."), ri->after, asc ? "true" : "false");
     }
 
     if (ri->before) {
