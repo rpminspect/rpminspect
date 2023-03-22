@@ -196,6 +196,7 @@ bool match_path(const char *pattern, const char *root, const char *path)
 {
     bool match = false;
     int r = 0;
+    int flags = FNM_NOESCAPE | FNM_PATHNAME;
     int gflags = GLOB_NOSORT;
     char globpath[PATH_MAX + 1];
     char *globsub = NULL;
@@ -210,6 +211,11 @@ bool match_path(const char *pattern, const char *root, const char *path)
 
     /* Simple check first */
     if (!strcmp(pattern, path)) {
+        return true;
+    }
+
+    /* Try a simple glob match */
+    if (!fnmatch(pattern, path, flags)) {
         return true;
     }
 
