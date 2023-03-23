@@ -320,6 +320,7 @@ bool ignore_path(const struct rpminspect *ri, const char *inspection, const char
     string_list_map_t *mapentry = NULL;
 
     assert(ri != NULL);
+    assert(inspection != NULL);
 
     if (path == NULL) {
         return true;

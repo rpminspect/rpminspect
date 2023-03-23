@@ -23,66 +23,85 @@ struct inspect inspections[] = {
     /*
      * { INSPECT_TYPE (add to inspect.h),
      *   "short name",
+     *   bool--true if this inspection contains security checks,
      *   bool--true if for single build, false if before&after required,
      *   &function_pointer },
      *
      * NOTE: long descriptions are inspect.h and returned by inspection_desc()
      */
-    { INSPECT_LICENSE,       "license",       true,  &inspect_license },
-    { INSPECT_EMPTYRPM,      "emptyrpm",      true,  &inspect_emptyrpm },
-    { INSPECT_LOSTPAYLOAD,   "lostpayload",   false, &inspect_lostpayload },
-    { INSPECT_METADATA,      "metadata",      true,  &inspect_metadata },
-    { INSPECT_MANPAGE,       "manpage",       true,  &inspect_manpage },
-    { INSPECT_XML,           "xml",           true,  &inspect_xml },
-    { INSPECT_ELF,           "elf",           true,  &inspect_elf },
-    { INSPECT_DESKTOP,       "desktop",       true,  &inspect_desktop },
-    { INSPECT_DISTTAG,       "disttag",       true,  &inspect_disttag },
-    { INSPECT_SPECNAME,      "specname",      true,  &inspect_specname },
+    { INSPECT_LICENSE,       "license",       false, true,  &inspect_license },
+    { INSPECT_EMPTYRPM,      "emptyrpm",      false, true,  &inspect_emptyrpm },
+    { INSPECT_LOSTPAYLOAD,   "lostpayload",   false, false, &inspect_lostpayload },
+    { INSPECT_METADATA,      "metadata",      false, true,  &inspect_metadata },
+    { INSPECT_MANPAGE,       "manpage",       false, true,  &inspect_manpage },
+    { INSPECT_XML,           "xml",           false, true,  &inspect_xml },
+    { INSPECT_ELF,           "elf",           true,  true,  &inspect_elf },
+    { INSPECT_DESKTOP,       "desktop",       false, true,  &inspect_desktop },
+    { INSPECT_DISTTAG,       "disttag",       false, true,  &inspect_disttag },
+    { INSPECT_SPECNAME,      "specname",      false, true,  &inspect_specname },
 #ifdef _HAVE_MODULARITYLABEL
-    { INSPECT_MODULARITY,    "modularity",    true,  &inspect_modularity },
+    { INSPECT_MODULARITY,    "modularity",    false, true,  &inspect_modularity },
 #endif
-    { INSPECT_JAVABYTECODE,  "javabytecode",  true,  &inspect_javabytecode },
-    { INSPECT_CHANGEDFILES,  "changedfiles",  false, &inspect_changedfiles },
-    { INSPECT_MOVEDFILES,    "movedfiles",    false, &inspect_movedfiles },
-    { INSPECT_REMOVEDFILES,  "removedfiles",  false, &inspect_removedfiles },
-    { INSPECT_ADDEDFILES,    "addedfiles",    true,  &inspect_addedfiles },
-    { INSPECT_UPSTREAM,      "upstream",      false, &inspect_upstream },
-    { INSPECT_OWNERSHIP,     "ownership",     true,  &inspect_ownership },
-    { INSPECT_SHELLSYNTAX,   "shellsyntax",   true,  &inspect_shellsyntax },
+    { INSPECT_JAVABYTECODE,  "javabytecode",  false, true,  &inspect_javabytecode },
+    { INSPECT_CHANGEDFILES,  "changedfiles",  true,  false, &inspect_changedfiles },
+    { INSPECT_MOVEDFILES,    "movedfiles",    false, false, &inspect_movedfiles },
+    { INSPECT_REMOVEDFILES,  "removedfiles",  true,  false, &inspect_removedfiles },
+    { INSPECT_ADDEDFILES,    "addedfiles",    true,  true,  &inspect_addedfiles },
+    { INSPECT_UPSTREAM,      "upstream",      false, false, &inspect_upstream },
+    { INSPECT_OWNERSHIP,     "ownership",     true,  true,  &inspect_ownership },
+    { INSPECT_SHELLSYNTAX,   "shellsyntax",   false, true,  &inspect_shellsyntax },
 #if defined(_WITH_ANNOCHECK) || defined(_WITH_LIBANNOCHECK)
-    { INSPECT_ANNOCHECK,     "annocheck",     true,  &inspect_annocheck },
+    { INSPECT_ANNOCHECK,     "annocheck",     true,  true,  &inspect_annocheck },
 #endif
-    { INSPECT_DSODEPS,       "dsodeps",       false, &inspect_dsodeps },
-    { INSPECT_FILESIZE,      "filesize",      false, &inspect_filesize },
-    { INSPECT_PERMISSIONS,   "permissions",   true,  &inspect_permissions },
+    { INSPECT_DSODEPS,       "dsodeps",       false, false, &inspect_dsodeps },
+    { INSPECT_FILESIZE,      "filesize",      false, false, &inspect_filesize },
+    { INSPECT_PERMISSIONS,   "permissions",   true,  true,  &inspect_permissions },
 #ifdef _WITH_LIBCAP
-    { INSPECT_CAPABILITIES,  "capabilities",  true,  &inspect_capabilities },
+    { INSPECT_CAPABILITIES,  "capabilities",  true,  true,  &inspect_capabilities },
 #endif
 #ifdef _WITH_LIBKMOD
-    { INSPECT_KMOD,          "kmod",          false, &inspect_kmod },
+    { INSPECT_KMOD,          "kmod",          false, false, &inspect_kmod },
 #endif
-    { INSPECT_ARCH,          "arch",          false, &inspect_arch },
-    { INSPECT_SUBPACKAGES,   "subpackages",   false, &inspect_subpackages },
-    { INSPECT_CHANGELOG,     "changelog",     false, &inspect_changelog },
-    { INSPECT_PATHMIGRATION, "pathmigration", true,  &inspect_pathmigration },
-    { INSPECT_LTO,           "lto",           true,  &inspect_lto },
-    { INSPECT_SYMLINKS,      "symlinks",      true,  &inspect_symlinks },
-    { INSPECT_FILES,         "files",         true,  &inspect_files },
-    { INSPECT_TYPES,         "types",         false, &inspect_types },
-    { INSPECT_ABIDIFF,       "abidiff",       false, &inspect_abidiff },
-    { INSPECT_KMIDIFF,       "kmidiff",       false, &inspect_kmidiff },
-    { INSPECT_CONFIG,        "config",        false, &inspect_config },
-    { INSPECT_DOC,           "doc",           false, &inspect_doc },
-    { INSPECT_PATCHES,       "patches",       true,  &inspect_patches },
-    { INSPECT_VIRUS,         "virus",         true,  &inspect_virus },
-    { INSPECT_POLITICS,      "politics",      true,  &inspect_politics },
-    { INSPECT_BADFUNCS,      "badfuncs",      true,  &inspect_badfuncs },
-    { INSPECT_RUNPATH,       "runpath",       true,  &inspect_runpath },
-    { INSPECT_UNICODE,       "unicode",       true,  &inspect_unicode },
-    { INSPECT_RPMDEPS,       "rpmdeps",       true,  &inspect_rpmdeps },
-    { INSPECT_DEBUGINFO,     "debuginfo",     true,  &inspect_debuginfo },
-    { 0, NULL, false, NULL }
+    { INSPECT_ARCH,          "arch",          false, false, &inspect_arch },
+    { INSPECT_SUBPACKAGES,   "subpackages",   false, false, &inspect_subpackages },
+    { INSPECT_CHANGELOG,     "changelog",     false, false, &inspect_changelog },
+    { INSPECT_PATHMIGRATION, "pathmigration", false, true,  &inspect_pathmigration },
+    { INSPECT_LTO,           "lto",           false, true,  &inspect_lto },
+    { INSPECT_SYMLINKS,      "symlinks",      false, true,  &inspect_symlinks },
+    { INSPECT_FILES,         "files",         false, true,  &inspect_files },
+    { INSPECT_TYPES,         "types",         false, false, &inspect_types },
+    { INSPECT_ABIDIFF,       "abidiff",       false, false, &inspect_abidiff },
+    { INSPECT_KMIDIFF,       "kmidiff",       false, false, &inspect_kmidiff },
+    { INSPECT_CONFIG,        "config",        false, false, &inspect_config },
+    { INSPECT_DOC,           "doc",           false, false, &inspect_doc },
+    { INSPECT_PATCHES,       "patches",       false, true,  &inspect_patches },
+    { INSPECT_VIRUS,         "virus",         true,  true,  &inspect_virus },
+    { INSPECT_POLITICS,      "politics",      false, true,  &inspect_politics },
+    { INSPECT_BADFUNCS,      "badfuncs",      false, true,  &inspect_badfuncs },
+    { INSPECT_RUNPATH,       "runpath",       false, true,  &inspect_runpath },
+    { INSPECT_UNICODE,       "unicode",       true,  true,  &inspect_unicode },
+    { INSPECT_RPMDEPS,       "rpmdeps",       false, true,  &inspect_rpmdeps },
+    { INSPECT_DEBUGINFO,     "debuginfo",     false, true,  &inspect_debuginfo },
+    { 0, NULL, false, false, NULL }
 };
+
+/*
+ * Returns true if the named inspection has security checks.
+ */
+static bool has_security_checks(const char *inspection)
+{
+    int i = 0;
+
+    assert(inspection != NULL);
+
+    for (i = 0; inspections[i].name != NULL; i++) {
+        if (!strcmp(inspection, inspections[i].name)) {
+            return inspections[i].security_checks;
+        }
+    }
+
+    return false;
+}
 
 /**
  * @brief Iterate over each file in each package in a build.
@@ -115,7 +134,7 @@ bool foreach_peer_file(struct rpminspect *ri, const char *inspection, foreach_pe
 
         TAILQ_FOREACH(file, peer->after_files, items) {
             /* Ignore files we should be ignoring */
-            if (ignore_path(ri, inspection, file->localpath, peer->after_root)) {
+            if (ignore_path(ri, inspection, file->localpath, peer->after_root) && !has_security_checks(inspection)) {
                 continue;
             }
 
