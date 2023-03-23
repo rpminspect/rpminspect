@@ -386,6 +386,8 @@ bool match_path(const char *pattern, const char *root, const char *path);
  */
 bool ignore_path(const struct rpminspect *ri, const char *inspection, const char *path, const char *root);
 
+bool ignore_rpmfile_entry(const struct rpminspect *ri, const char *inspection, const rpmfile_entry_t *file);
+
 /* rebase.c */
 /**
  * @brief Determine if the program is inspecting a rebase build.  That

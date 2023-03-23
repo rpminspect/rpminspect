@@ -354,3 +354,35 @@ bool ignore_path(const struct rpminspect *ri, const char *inspection, const char
 
     return match;
 }
+
+/**
+ * Given an rpmfile_entry_t and an inspection name, determine if it
+ * should be ignored based on the current configuration rules.
+ *
+ * @param ri The struct rpminspect for the program.
+ * @param inspection The name of the inspection currently running.
+ * @param file The rpmfile_entry_t to check.
+ * @return True if path should be ignored, false otherwise.
+ */
+bool ignore_rpmfile_entry(const struct rpminspect *ri, const char *inspection, const rpmfile_entry_t *file)
+{
+    bool ignore = false;
+    char *head = NULL;
+    char save;
+
+    assert(ri != NULL);
+    assert(inspection != NULL);
+    assert(file != NULL);
+
+    head = file->fullpath;
+    head += strlen(head) - strlen(file->localpath);
+    save = *head;
+    *head = '\0';
+
+    ignore = ignore_path(ri, inspection, file->localpath, file->fullpath);
+
+    *head = save;
+    head = NULL;
+
+    return ignore;
+}
