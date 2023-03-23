@@ -109,7 +109,7 @@ static bool capabilities_driver(struct rpminspect *ri, rpmfile_entry_t *file)
     pkg = headerGetString(file->rpm_header, RPMTAG_NAME);
     flcaps = get_caps_entry(ri, pkg, file->localpath);
 
-    if (!flcaps) {
+    if (!aftercap && !flcaps) {
         free(after);
         free(before);
 
