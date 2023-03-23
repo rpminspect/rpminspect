@@ -6,6 +6,7 @@
 #include <regex.h>
 #include <stdlib.h>
 #include <string.h>
+#include <ctype.h>
 #include <limits.h>
 #include <assert.h>
 #include <errno.h>
@@ -1014,6 +1015,7 @@ bool init_caps(struct rpminspect *ri)
     char *line = NULL;
     char *token = NULL;
     char *delim = NULL;
+    char *end = NULL;
     string_list_t *contents = NULL;
     string_entry_t *entry = NULL;
     caps_field_t field = PACKAGE;
@@ -1107,7 +1109,22 @@ bool init_caps(struct rpminspect *ri)
                 /* reset to take the remaining part of the line as the 3rd field */
                 delim = "\r\n";
             } else if (field == CAPABILITIES && filelist_entry->caps == NULL) {
+                /* trim leading whitespace */
+                while (isspace(*token) && *token != '\0') {
+                    token++;
+                }
+
+                /* trim trailing whitespace */
+                end = token;
+                end += strlen(token);
+
+                while (isspace(*end) && end != token) {
+                    *end = '\0';
+                    end--;
+                }
+
                 filelist_entry->caps = strdup(token);
+                assert(filelist_entry->caps != NULL);
             } else {
                 errx(RI_PROGRAM_ERROR, _("*** unexpected token `%s' seen in %s, cannot continue"), token, ri->caps_filename);
             }
