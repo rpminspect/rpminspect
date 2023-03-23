@@ -133,6 +133,10 @@ static bool ownership_driver(struct rpminspect *ri, rpmfile_entry_t *file)
                         warnx("cap_get_flag");
                         have_setuid = CAP_CLEAR;
                     }
+
+                    if (cap_free(cap) == -1) {
+                        warn("cap_free");
+                    }
                 }
 
                 /* Handle if CAP_SETUID is present or not */

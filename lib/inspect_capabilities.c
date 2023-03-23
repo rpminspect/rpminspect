@@ -7,6 +7,7 @@
 #include <string.h>
 #include <errno.h>
 #include <assert.h>
+#include <err.h>
 #include <sys/capability.h>
 
 #include "rpminspect.h"
@@ -108,9 +109,18 @@ static bool capabilities_driver(struct rpminspect *ri, rpmfile_entry_t *file)
     pkg = headerGetString(file->rpm_header, RPMTAG_NAME);
     flcaps = get_caps_entry(ri, pkg, file->localpath);
 
-    if (!aftercap && !flcaps) {
+    if (!flcaps) {
         free(after);
         free(before);
+
+        if (cap_free(aftercap) == -1) {
+            warn("cap_free");
+        }
+
+        if (cap_free(beforecap) == -1) {
+            warn("cap_free");
+        }
+
         return true;
     }
 
@@ -189,6 +199,18 @@ static bool capabilities_driver(struct rpminspect *ri, rpmfile_entry_t *file)
 
     free(before);
     free(after);
+
+    if (cap_free(aftercap) == -1) {
+        warn("cap_free");
+    }
+
+    if (cap_free(beforecap) == -1) {
+        warn("cap_free");
+    }
+
+    if (cap_free(expected) == -1) {
+        warn("cap_free");
+    }
 
     return result;
 }
