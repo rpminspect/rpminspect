@@ -772,6 +772,13 @@ struct inspect {
     char *name;
 
     /*
+     * Does this inspection perform any security checks?  That is,
+     * checks that if they fail would result in a WAIVABLE_BY_SECURITY
+     * result.
+     */
+    bool security_checks;
+
+    /*
      * Does this inspection require a before and after package?
      * Some inspections run just against a single build, which
      * we can use when the user wants to run rpminspect against
