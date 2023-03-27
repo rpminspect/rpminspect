@@ -74,6 +74,7 @@ static bool have_forbidden_directory(const rpmfile_entry_t *file, const char *fo
 static bool addedfiles_driver(struct rpminspect *ri, rpmfile_entry_t *file)
 {
     bool result = true;
+    bool ignore = false;
     const char *name = NULL;
     char *subpath = NULL;
     char *localpath = NULL;
@@ -110,9 +111,8 @@ static bool addedfiles_driver(struct rpminspect *ri, rpmfile_entry_t *file)
         return true;
     }
 
-    /*
-     * Security checks first (works for single build runs as well.
-     */
+    /* We will skip checks for ignored files */
+    ignore = ignore_rpmfile_entry(ri, NAME_ADDEDFILES, file);
 
     /* The architecture is used in reporting messages */
     arch = get_rpm_header_arch(file->rpm_header);
@@ -127,66 +127,68 @@ static bool addedfiles_driver(struct rpminspect *ri, rpmfile_entry_t *file)
     params.verb = VERB_FAILED;
     params.remedy = remedy_addedfiles;
 
-    /* Check for any forbidden path prefixes */
-    if (ri->forbidden_path_prefixes && (ri->tests & INSPECT_ADDEDFILES)) {
-        TAILQ_FOREACH(entry, ri->forbidden_path_prefixes, items) {
-            subpath = entry->data;
-            localpath = file->localpath;
+    if (!ignore) {
+        /* Check for any forbidden path prefixes */
+        if (ri->forbidden_path_prefixes && (ri->tests & INSPECT_ADDEDFILES)) {
+            TAILQ_FOREACH(entry, ri->forbidden_path_prefixes, items) {
+                subpath = entry->data;
+                localpath = file->localpath;
 
-            /* ensure the paths do not start with '/' */
-            if (*subpath == '/') {
-                while (*subpath == '/') {
-                    subpath++;
+                /* ensure the paths do not start with '/' */
+                if (*subpath == '/') {
+                    while (*subpath == '/') {
+                        subpath++;
+                    }
+                }
+
+                if (*localpath == '/') {
+                    while (*localpath == '/') {
+                        localpath++;
+                    }
+                }
+
+                if (strprefix(localpath, subpath)) {
+                    xasprintf(&params.msg, _("Packages should not contain files or directories starting with `%s` on %s in %s: %s"), entry->data, arch, name, file->localpath);
+                    params.noun = _("invalid directory ${FILE} on ${ARCH}");
+                    add_result(ri, &params);
+                    result = !(params.severity >= RESULT_VERIFY);
+                    reported = true;
+                    goto done;
                 }
             }
+        }
 
-            if (*localpath == '/') {
-                while (*localpath == '/') {
-                    localpath++;
+        /* Check for any forbidden path suffixes */
+        if (ri->forbidden_path_suffixes && (ri->tests & INSPECT_ADDEDFILES)) {
+            TAILQ_FOREACH(entry, ri->forbidden_path_suffixes, items) {
+                if (strsuffix(file->localpath, entry->data)) {
+                    xasprintf(&params.msg, _("Packages should not contain files or directories ending with `%s` on %s in %s: %s"), entry->data, arch, name, file->localpath);
+                    params.noun = _("invalid directory ${FILE} on ${ARCH}");
+                    add_result(ri, &params);
+                    result = !(params.severity >= RESULT_VERIFY);
+                    reported = true;
+                    goto done;
                 }
             }
-
-            if (strprefix(localpath, subpath)) {
-                xasprintf(&params.msg, _("Packages should not contain files or directories starting with `%s` on %s in %s: %s"), entry->data, arch, name, file->localpath);
-                params.noun = _("invalid directory ${FILE} on ${ARCH}");
-                add_result(ri, &params);
-                result = !(params.severity >= RESULT_VERIFY);
-                reported = true;
-                goto done;
-            }
         }
-    }
 
-    /* Check for any forbidden path suffixes */
-    if (ri->forbidden_path_suffixes && (ri->tests & INSPECT_ADDEDFILES)) {
-        TAILQ_FOREACH(entry, ri->forbidden_path_suffixes, items) {
-            if (strsuffix(file->localpath, entry->data)) {
-                xasprintf(&params.msg, _("Packages should not contain files or directories ending with `%s` on %s in %s: %s"), entry->data, arch, name, file->localpath);
-                params.noun = _("invalid directory ${FILE} on ${ARCH}");
-                add_result(ri, &params);
-                result = !(params.severity >= RESULT_VERIFY);
-                reported = true;
-                goto done;
-            }
-        }
-    }
+        /* Check for any forbidden directories */
+        if (ri->forbidden_directories && (ri->tests & INSPECT_ADDEDFILES)) {
+            TAILQ_FOREACH(entry, ri->forbidden_directories, items) {
+                if (have_forbidden_directory(file, entry->data)) {
+                    xasprintf(&params.msg, _("Forbidden directory `%s` found on %s in %s: %s"), entry->data, arch, name, file->localpath);
+                    params.noun = _("forbidden directory ${FILE} on ${ARCH}");
+                    add_result(ri, &params);
+                    result = !(params.severity >= RESULT_VERIFY);
+                    reported = true;
+                    free(head);
+                    free(tail);
+                    goto done;
+                }
 
-    /* Check for any forbidden directories */
-    if (ri->forbidden_directories && (ri->tests & INSPECT_ADDEDFILES)) {
-        TAILQ_FOREACH(entry, ri->forbidden_directories, items) {
-            if (have_forbidden_directory(file, entry->data)) {
-                xasprintf(&params.msg, _("Forbidden directory `%s` found on %s in %s: %s"), entry->data, arch, name, file->localpath);
-                params.noun = _("forbidden directory ${FILE} on ${ARCH}");
-                add_result(ri, &params);
-                result = !(params.severity >= RESULT_VERIFY);
-                reported = true;
                 free(head);
                 free(tail);
-                goto done;
             }
-
-            free(head);
-            free(tail);
         }
     }
 
@@ -235,7 +237,7 @@ static bool addedfiles_driver(struct rpminspect *ri, rpmfile_entry_t *file)
     /*
      * Report that a new file has been added in a build comparison.
      */
-    if ((ri->tests & INSPECT_ADDEDFILES) && (ri->before != NULL && file->peer_file == NULL)) {
+    if (!ignore && (ri->tests & INSPECT_ADDEDFILES) && (ri->before != NULL && file->peer_file == NULL)) {
         params.severity = RESULT_INFO;
         params.waiverauth = NOT_WAIVABLE;
         params.verb = VERB_OK;

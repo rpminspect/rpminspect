@@ -24,6 +24,7 @@ static bool reported = false;
 static bool ownership_driver(struct rpminspect *ri, rpmfile_entry_t *file)
 {
     bool result = true;
+    bool ignore = false;
     const char *arch = NULL;
     char *owner = NULL;
     char *group = NULL;
@@ -46,6 +47,9 @@ static bool ownership_driver(struct rpminspect *ri, rpmfile_entry_t *file)
         return true;
     }
 
+    /* We will skip checks for ignored files */
+    ignore = ignore_rpmfile_entry(ri, NAME_OWNERSHIP, file);
+
     /* Get the arch, we'll use that */
     arch = get_rpm_header_arch(file->rpm_header);
 
@@ -64,7 +68,7 @@ static bool ownership_driver(struct rpminspect *ri, rpmfile_entry_t *file)
      */
 
     /* Report forbidden file owners */
-    if (ri->forbidden_owners && list_contains(ri->forbidden_owners, owner) && (ri->tests & INSPECT_OWNERSHIP)) {
+    if (!ignore && ri->forbidden_owners && list_contains(ri->forbidden_owners, owner) && (ri->tests & INSPECT_OWNERSHIP)) {
         xasprintf(&params.msg, _("File %s has forbidden owner `%s` on %s"), file->localpath, owner, arch);
         xasprintf(&params.remedy, REMEDY_OWNERSHIP_DEFATTR, ri->fileinfo_filename);
         params.severity = RESULT_BAD;
@@ -79,7 +83,7 @@ static bool ownership_driver(struct rpminspect *ri, rpmfile_entry_t *file)
     }
 
     /* Report forbidden file groups */
-    if (ri->forbidden_groups && list_contains(ri->forbidden_groups, group) && (ri->tests & INSPECT_OWNERSHIP)) {
+    if (!ignore && ri->forbidden_groups && list_contains(ri->forbidden_groups, group) && (ri->tests & INSPECT_OWNERSHIP)) {
         xasprintf(&params.msg, _("File %s has forbidden group `%s` on %s"), file->localpath, owner, arch);
         xasprintf(&params.remedy, REMEDY_OWNERSHIP_DEFATTR, ri->fileinfo_filename);
         params.severity = RESULT_BAD;
@@ -99,7 +103,8 @@ static bool ownership_driver(struct rpminspect *ri, rpmfile_entry_t *file)
             bin = true;
 
             /* Check the owner */
-            if (strcmp(owner, ri->bin_owner)
+            if (!ignore
+                && strcmp(owner, ri->bin_owner)
                 && !match_fileinfo_owner(ri, file, owner, NAME_OWNERSHIP, NULL, NULL, &result, &reported)
                 && (ri->tests & INSPECT_OWNERSHIP)) {
                 xasprintf(&params.msg, _("File %s has owner `%s` on %s, but should be `%s`"), file->localpath, owner, arch, ri->bin_owner);
@@ -174,10 +179,12 @@ static bool ownership_driver(struct rpminspect *ri, rpmfile_entry_t *file)
                             reported = true;
                         }
                     }
-                } else if (!match_fileinfo_group(ri, file, group, NAME_OWNERSHIP, NULL, NULL, &result, &reported)
+                } else if (!ignore
+                           && !match_fileinfo_group(ri, file, group, NAME_OWNERSHIP, NULL, NULL, &result, &reported)
                            && (ri->tests & INSPECT_OWNERSHIP)) {
 #else
-                if (!match_fileinfo_group(ri, file, group, NAME_OWNERSHIP, NULL, NULL, &result, &reported)
+                if (!ignore
+                    && !match_fileinfo_group(ri, file, group, NAME_OWNERSHIP, NULL, NULL, &result, &reported)
                     && (ri->tests & INSPECT_OWNERSHIP)) {
 #endif
                     xasprintf(&params.msg, _("File %s has group `%s` on %s, but should be `%s`"), file->localpath, group, arch, ri->bin_group);
@@ -201,7 +208,7 @@ static bool ownership_driver(struct rpminspect *ri, rpmfile_entry_t *file)
     /*
      * BEFORE AND AFTER
      */
-    if (file->peer_file && (ri->tests & INSPECT_OWNERSHIP)) {
+    if (!ignore && file->peer_file && (ri->tests & INSPECT_OWNERSHIP)) {
         /* Get the before file values */
         before_owner = get_rpm_header_value(file->peer_file, RPMTAG_FILEUSERNAME);
         before_group = get_rpm_header_value(file->peer_file, RPMTAG_FILEGROUPNAME);

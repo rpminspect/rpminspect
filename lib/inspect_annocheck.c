@@ -290,6 +290,7 @@ static struct libannocheck_internals *libannocheck_setup(struct rpminspect *ri, 
 static bool annocheck_driver(struct rpminspect *ri, rpmfile_entry_t *file)
 {
     bool result = true;
+    bool ignore = false;
     const char *arch = NULL;
     string_map_t *hentry = NULL;
     string_map_t *tmp_hentry = NULL;
@@ -332,14 +333,16 @@ static bool annocheck_driver(struct rpminspect *ri, rpmfile_entry_t *file)
         return true;
     }
 
-    /* We need the architecture for reporting */
-    arch = get_rpm_header_arch(file->rpm_header);
-
     /* Only run this check on ELF files */
-    if (!is_elf_file(file->fullpath)
-        || (!is_elf_file(file->fullpath) && file->peer_file && !is_elf_file(file->peer_file->fullpath))) {
+    if (!is_elf_file(file->fullpath) || (!is_elf_file(file->fullpath) && file->peer_file && !is_elf_file(file->peer_file->fullpath))) {
         return true;
     }
+
+    /* We will skip checks for ignored files */
+    ignore = ignore_rpmfile_entry(ri, NAME_ANNOCHECK, file);
+
+    /* We need the architecture for reporting */
+    arch = get_rpm_header_arch(file->rpm_header);
 
     /* Set up the result parameters */
     init_result_params(&params);
@@ -475,40 +478,42 @@ static bool annocheck_driver(struct rpminspect *ri, rpmfile_entry_t *file)
         }
 
         /* report the results */
-        if (after_worst == libannocheck_test_state_maybe || after_worst == libannocheck_test_state_failed) {
-            params.severity = ri->annocheck_failure_severity;
-            params.waiverauth = WAIVABLE_BY_ANYONE;
-        }
-
-        if (file->peer_file) {
-            if (before_worst == libannocheck_test_state_passed && after_worst == libannocheck_test_state_passed) {
-                xasprintf(&params.msg, _("libannocheck '%s' continues passing for %s on %s"), hentry->key, file->localpath, arch);
-            } else if ((before_worst == libannocheck_test_state_maybe || before_worst == libannocheck_test_state_failed) &&
-                       after_worst == libannocheck_test_state_passed) {
-                xasprintf(&params.msg, _("libannocheck '%s' test now passes for %s on %s"), hentry->key, file->localpath, arch);
-            } else if (before_worst == libannocheck_test_state_passed &&
-                       (after_worst == libannocheck_test_state_maybe || after_worst == libannocheck_test_state_failed)) {
-                xasprintf(&params.msg, _("libannocheck '%s' test now fails for %s on %s"), hentry->key, file->localpath, arch);
-                params.verb = VERB_CHANGED;
-            } else if (after_worst == libannocheck_test_state_maybe || after_worst == libannocheck_test_state_failed) {
-                xasprintf(&params.msg, _("libannocheck '%s' test fails for %s on %s"), hentry->key, file->localpath, arch);
-                params.verb = VERB_CHANGED;
+        if (!ignore) {
+            if (after_worst == libannocheck_test_state_maybe || after_worst == libannocheck_test_state_failed) {
+                params.severity = ri->annocheck_failure_severity;
+                params.waiverauth = WAIVABLE_BY_ANYONE;
             }
-        } else {
-            if (after_worst == libannocheck_test_state_passed) {
-                xasprintf(&params.msg, _("libannocheck '%s' test passes for %s on %s"), hentry->key, file->localpath, arch);
+
+            if (file->peer_file) {
+                if (before_worst == libannocheck_test_state_passed && after_worst == libannocheck_test_state_passed) {
+                    xasprintf(&params.msg, _("libannocheck '%s' continues passing for %s on %s"), hentry->key, file->localpath, arch);
+                } else if ((before_worst == libannocheck_test_state_maybe || before_worst == libannocheck_test_state_failed) &&
+                           after_worst == libannocheck_test_state_passed) {
+                    xasprintf(&params.msg, _("libannocheck '%s' test now passes for %s on %s"), hentry->key, file->localpath, arch);
+                } else if (before_worst == libannocheck_test_state_passed &&
+                           (after_worst == libannocheck_test_state_maybe || after_worst == libannocheck_test_state_failed)) {
+                    xasprintf(&params.msg, _("libannocheck '%s' test now fails for %s on %s"), hentry->key, file->localpath, arch);
+                    params.verb = VERB_CHANGED;
+                } else if (after_worst == libannocheck_test_state_maybe || after_worst == libannocheck_test_state_failed) {
+                    xasprintf(&params.msg, _("libannocheck '%s' test fails for %s on %s"), hentry->key, file->localpath, arch);
+                    params.verb = VERB_CHANGED;
+                }
             } else {
-                xasprintf(&params.msg, _("libannocheck '%s' test fails for %s on %s"), hentry->key, file->localpath, arch);
-                params.verb = VERB_CHANGED;
+                if (after_worst == libannocheck_test_state_passed) {
+                    xasprintf(&params.msg, _("libannocheck '%s' test passes for %s on %s"), hentry->key, file->localpath, arch);
+                } else {
+                    xasprintf(&params.msg, _("libannocheck '%s' test fails for %s on %s"), hentry->key, file->localpath, arch);
+                    params.verb = VERB_CHANGED;
+                }
             }
-        }
 
-        params.details = list_to_string(details, "\n");
-        add_result(ri, &params);
-        reported = true;
-        free(params.details);
-        free(params.msg);
-        list_free(details, free);
+            params.details = list_to_string(details, "\n");
+            add_result(ri, &params);
+            reported = true;
+            free(params.details);
+            free(params.msg);
+            list_free(details, free);
+        }
     }
 
     /* set result based on worst result encountered */
@@ -534,59 +539,61 @@ static bool annocheck_driver(struct rpminspect *ri, rpmfile_entry_t *file)
         free_argv(argv);
 
         /* If we have a before build, run the command on that */
-        if (file->peer_file) {
-            before_cmd = build_annocheck_cmd(ri->commands.annocheck, hentry->value, annocheck_profile, get_debuginfo_path(ri, file, arch, BEFORE_BUILD), file->peer_file->fullpath);
-            argv = build_argv(before_cmd);
-            before_out = run_cmd_vpe(&before_exit, ri->workdir, argv);
-            free_argv(argv);
+        if (!ignore) {
+            if (file->peer_file) {
+                before_cmd = build_annocheck_cmd(ri->commands.annocheck, hentry->value, annocheck_profile, get_debuginfo_path(ri, file, arch, BEFORE_BUILD), file->peer_file->fullpath);
+                argv = build_argv(before_cmd);
+                before_out = run_cmd_vpe(&before_exit, ri->workdir, argv);
+                free_argv(argv);
 
-            /* Build a reporting message if we need to */
-            if (before_exit == 0 && after_exit == 0) {
-                xasprintf(&params.msg, _("annocheck '%s' test passes for %s on %s"), hentry->key, file->localpath, arch);
-            } else if (before_exit && after_exit == 0) {
-                xasprintf(&params.msg, _("annocheck '%s' test now passes for %s on %s"), hentry->key, file->localpath, arch);
-            } else if (before_exit == 0 && after_exit) {
-                xasprintf(&params.msg, _("annocheck '%s' test now fails for %s on %s"), hentry->key, file->localpath, arch);
-                params.severity = ri->annocheck_failure_severity;
-                params.waiverauth = WAIVABLE_BY_ANYONE;
-                params.verb = VERB_CHANGED;
-                result = !(ri->annocheck_failure_severity >= RESULT_VERIFY);
-            } else if (after_exit) {
-                xasprintf(&params.msg, _("annocheck '%s' test fails for %s on %s"), hentry->key, file->localpath, arch);
-                params.severity = ri->annocheck_failure_severity;
-                params.waiverauth = WAIVABLE_BY_ANYONE;
-                params.verb = VERB_CHANGED;
-                result = !(ri->annocheck_failure_severity >= RESULT_VERIFY);
-            }
-        } else {
-            if (after_exit == 0) {
-                xasprintf(&params.msg, _("annocheck '%s' test passes for %s on %s"), hentry->key, file->localpath, arch);
-            } else if (after_exit) {
-                xasprintf(&params.msg, _("annocheck '%s' test fails for %s on %s"), hentry->key, file->localpath, arch);
-                params.severity = ri->annocheck_failure_severity;
-                params.waiverauth = WAIVABLE_BY_ANYONE;
-                params.verb = VERB_CHANGED;
-                result = !(ri->annocheck_failure_severity >= RESULT_VERIFY);
-            }
-        }
-
-        /* Report the results */
-        if (params.msg) {
-            /* trim the before build working directory and generate details */
-            if (before_cmd) {
-                before_cmd = trim_workdir(file->peer_file, before_cmd);
-                xasprintf(&details, "Command: %s\nExit Code: %d\n    compared with the output of:\nCommand: %s\nExit Code: %d\n\n%s", before_cmd, before_exit, after_cmd, after_exit, after_out);
+                /* Build a reporting message if we need to */
+                if (before_exit == 0 && after_exit == 0) {
+                    xasprintf(&params.msg, _("annocheck '%s' test passes for %s on %s"), hentry->key, file->localpath, arch);
+                } else if (before_exit && after_exit == 0) {
+                    xasprintf(&params.msg, _("annocheck '%s' test now passes for %s on %s"), hentry->key, file->localpath, arch);
+                } else if (before_exit == 0 && after_exit) {
+                    xasprintf(&params.msg, _("annocheck '%s' test now fails for %s on %s"), hentry->key, file->localpath, arch);
+                    params.severity = ri->annocheck_failure_severity;
+                    params.waiverauth = WAIVABLE_BY_ANYONE;
+                    params.verb = VERB_CHANGED;
+                    result = !(ri->annocheck_failure_severity >= RESULT_VERIFY);
+                } else if (after_exit) {
+                    xasprintf(&params.msg, _("annocheck '%s' test fails for %s on %s"), hentry->key, file->localpath, arch);
+                    params.severity = ri->annocheck_failure_severity;
+                    params.waiverauth = WAIVABLE_BY_ANYONE;
+                    params.verb = VERB_CHANGED;
+                    result = !(ri->annocheck_failure_severity >= RESULT_VERIFY);
+                }
             } else {
-                xasprintf(&details, "Command: %s\nExit Code: %d\n\n%s", after_cmd, after_exit, after_out);
+                if (after_exit == 0) {
+                    xasprintf(&params.msg, _("annocheck '%s' test passes for %s on %s"), hentry->key, file->localpath, arch);
+                } else if (after_exit) {
+                    xasprintf(&params.msg, _("annocheck '%s' test fails for %s on %s"), hentry->key, file->localpath, arch);
+                    params.severity = ri->annocheck_failure_severity;
+                    params.waiverauth = WAIVABLE_BY_ANYONE;
+                    params.verb = VERB_CHANGED;
+                    result = !(ri->annocheck_failure_severity >= RESULT_VERIFY);
+                }
             }
 
-            /* trim the after build working directory */
-            details = trim_workdir(file, details);
+            /* Report the results */
+            if (params.msg) {
+                /* trim the before build working directory and generate details */
+                if (before_cmd) {
+                    before_cmd = trim_workdir(file->peer_file, before_cmd);
+                    xasprintf(&details, "Command: %s\nExit Code: %d\n    compared with the output of:\nCommand: %s\nExit Code: %d\n\n%s", before_cmd, before_exit, after_cmd, after_exit, after_out);
+                } else {
+                    xasprintf(&details, "Command: %s\nExit Code: %d\n\n%s", after_cmd, after_exit, after_out);
+                }
 
-            params.details = details;
-            add_result(ri, &params);
-            reported = true;
-            free(params.msg);
+                /* trim the after build working directory */
+                details = trim_workdir(file, details);
+
+                params.details = details;
+                add_result(ri, &params);
+                reported = true;
+                free(params.msg);
+            }
         }
 
         /* Check for loss of -O2 -D_FORTIFY_SOURCE=2 */
