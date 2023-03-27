@@ -77,6 +77,8 @@ static char *run_and_capture(const char *where, char **output, char *cmd, const 
  */
 static bool changedfiles_driver(struct rpminspect *ri, rpmfile_entry_t *file)
 {
+    bool ignore = false;
+    int ct = 0;
     int flags = O_RDONLY | O_CLOEXEC;
     const char *arch = NULL;
     char *nvr = NULL;
@@ -134,6 +136,11 @@ static bool changedfiles_driver(struct rpminspect *ri, rpmfile_entry_t *file)
         return true;
     }
 
+    /* ELF content changing is handled by other inspections */
+    if (is_elf(file->fullpath)) {
+        return true;
+    }
+
     /*
      * Determine if we are running on a rebased package or just a
      * package update.
@@ -151,6 +158,9 @@ static bool changedfiles_driver(struct rpminspect *ri, rpmfile_entry_t *file)
     params.arch = arch;
     params.file = file->localpath;
 
+    /* We will skip checks for ignored files */
+    ignore = ignore_rpmfile_entry(ri, NAME_CHANGEDFILES, file);
+
     /* Set the waiver type if this is a file of security concern */
     if (ri->security_path_prefix) {
         TAILQ_FOREACH(entry, ri->security_path_prefix, items) {
@@ -161,6 +171,10 @@ static bool changedfiles_driver(struct rpminspect *ri, rpmfile_entry_t *file)
             if (strprefix(file->localpath, entry->data)) {
                 params.severity = RESULT_BAD;
                 params.waiverauth = WAIVABLE_BY_SECURITY;
+
+                /* security-related results cannot be ignored */
+                ignore = false;
+
                 break;
             }
         }
@@ -169,11 +183,6 @@ static bool changedfiles_driver(struct rpminspect *ri, rpmfile_entry_t *file)
     /* Get the MIME type of the file, will need that */
     type = get_mime_type(file);
 
-    /* ELF content changing is handled by other inspections */
-    if (is_elf(file->fullpath)) {
-        return true;
-    }
-
     /* Skip Java class files and JAR files (handled elsewhere) */
     if ((!strcmp(type, "application/zip") && strsuffix(file->fullpath, JAR_FILENAME_EXTENSION)) ||
         (!strcmp(type, "application/x-java-applet") && strsuffix(file->fullpath, CLASS_FILENAME_EXTENSION))) {
@@ -181,7 +190,9 @@ static bool changedfiles_driver(struct rpminspect *ri, rpmfile_entry_t *file)
     }
 
     /* Skip Python bytecode files (these always change) */
-    if (!strcmp(type, "application/octet-stream") && (strsuffix(file->fullpath, PYTHON_PYC_FILE_EXTENSION) || strsuffix(file->fullpath, PYTHON_PYO_FILE_EXTENSION))) {
+    if (!strcmp(type, "application/octet-stream")
+        && (strsuffix(file->fullpath, PYTHON_PYC_FILE_EXTENSION)
+            || strsuffix(file->fullpath, PYTHON_PYO_FILE_EXTENSION))) {
         /* Double check that this is a Python bytecode file */
         fd = open(file->fullpath, flags);
 
@@ -223,13 +234,14 @@ static bool changedfiles_driver(struct rpminspect *ri, rpmfile_entry_t *file)
      * build could change the compression ratios or other properties
      * but the uncompressed content would be the same.
      */
-    if ((!strcmp(type, "application/x-gzip") || !strcmp(type, "application/gzip") ||
-         !strcmp(type, "application/x-bzip2") || !strcmp(type, "application/bzip2") ||
-         !strcmp(type, "application/x-xz") || !strcmp(type, "application/xz") ||
-         (!strcmp(type, "application/octet-stream") && (strsuffix(file->localpath, ".gz") ||        /* this is a workaround for bad/old versions of libmagic */
-                                                        strsuffix(file->localpath, ".bz2") ||
-                                                        strsuffix(file->localpath, ".xz")))) &&
-        (params.waiverauth == WAIVABLE_BY_SECURITY || (ri->tests & INSPECT_CHANGEDFILES))) {
+
+    /* the octet-stream check is a workaround for bad/old versions of libmagic */
+    ct = (!strcmp(type, "application/x-gzip") || !strcmp(type, "application/gzip") || !strcmp(type, "application/x-bzip2") ||
+          !strcmp(type, "application/bzip2") || !strcmp(type, "application/x-xz") || !strcmp(type, "application/xz")) ||
+         (!strcmp(type, "application/octet-stream") &&
+          (strsuffix(file->localpath, ".gz") || strsuffix(file->localpath, ".bz2") || strsuffix(file->localpath, ".xz")));
+
+    if (ct && ((!ignore && (ri->tests & INSPECT_CHANGEDFILES)) || params.waiverauth == WAIVABLE_BY_SECURITY)) {
         /* uncompress the files to temporary files for comparison */
         before_uncompressed_file = uncompress_file(ri, file->peer_file->fullpath, NAME_CHANGEDFILES);
         after_uncompressed_file = uncompress_file(ri, file->fullpath, NAME_CHANGEDFILES);
@@ -309,7 +321,10 @@ static bool changedfiles_driver(struct rpminspect *ri, rpmfile_entry_t *file)
     /*
      * Compare gettext .mo files and report any changes.
      */
-    if (!strcmp(type, "application/x-gettext-translation") && strsuffix(file->localpath, MO_FILENAME_EXTENSION) && (ri->tests & INSPECT_CHANGEDFILES)) {
+    if (!ignore
+        && !strcmp(type, "application/x-gettext-translation")
+        && strsuffix(file->localpath, MO_FILENAME_EXTENSION)
+        && (ri->tests & INSPECT_CHANGEDFILES)) {
         /*
          * This one is somewhat complicated.  We run msgunfmt on the mo files,
          * but first we have to make temporary files for that output.  Then
@@ -383,7 +398,7 @@ static bool changedfiles_driver(struct rpminspect *ri, rpmfile_entry_t *file)
      * be a configuration file change.  But more importantly, this check
      * excludes any header files that lack a file ending like this.
      */
-    if (ri->header_file_extensions) {
+    if (!ignore && ri->header_file_extensions) {
         TAILQ_FOREACH(entry, ri->header_file_extensions, items) {
             if (strsuffix(file->localpath, entry->data)) {
                 possible_header = true;
@@ -439,7 +454,7 @@ static bool changedfiles_driver(struct rpminspect *ri, rpmfile_entry_t *file)
     }
 
     /* Finally, anything that gets down to here just compare checksums. */
-    if (!rebase && (ri->tests & INSPECT_CHANGEDFILES)) {
+    if (!rebase && !ignore && (ri->tests & INSPECT_CHANGEDFILES)) {
         before_sum = checksum(file->peer_file);
         after_sum = checksum(file);
 

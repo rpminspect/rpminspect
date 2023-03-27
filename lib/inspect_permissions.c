@@ -15,6 +15,7 @@ static bool reported = false;
 static bool permissions_driver(struct rpminspect *ri, rpmfile_entry_t *file)
 {
     bool result = true;
+    bool ignore = false;
     const char *arch = NULL;
     char *change = NULL;
     mode_t before_mode;
@@ -36,6 +37,9 @@ static bool permissions_driver(struct rpminspect *ri, rpmfile_entry_t *file)
     if (strprefix(file->localpath, DEBUG_PATH) || strprefix(file->localpath, DEBUG_SRC_PATH)) {
         return true;
     }
+
+    /* We will skip checks for ignored files */
+    ignore = ignore_rpmfile_entry(ri, NAME_PERMISSIONS, file);
 
     /* We need the architecture for reporting */
     arch = get_rpm_header_arch(file->rpm_header);
@@ -62,7 +66,7 @@ static bool permissions_driver(struct rpminspect *ri, rpmfile_entry_t *file)
     allowed = match_fileinfo_mode(ri, file, NAME_PERMISSIONS, NULL, &result, &reported);
 
     /* if setuid/setgid or new mode is more open */
-    if (mode_diff && file->peer_file && !allowed && (ri->tests & INSPECT_PERMISSIONS)) {
+    if (!ignore && mode_diff && file->peer_file && !allowed && (ri->tests & INSPECT_PERMISSIONS)) {
         params.msg = strdup(file->localpath);
         assert(params.msg != NULL);
 
