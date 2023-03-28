@@ -658,7 +658,7 @@ char *strtrim(char *s)
     }
 
     /* go to the end and remove trailing whitespace */
-    i = strlen(s) - 1;
+    i = strlen(s);
 
     while (isspace(s[i])) {
         s[i] = '\0';
