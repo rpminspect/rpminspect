@@ -78,8 +78,6 @@ static bool addedfiles_driver(struct rpminspect *ri, rpmfile_entry_t *file)
     const char *name = NULL;
     char *subpath = NULL;
     char *localpath = NULL;
-    char *head = NULL;
-    char *tail = NULL;
     const char *arch = NULL;
     bool peer_new = false;
     string_entry_t *entry = NULL;
@@ -181,13 +179,8 @@ static bool addedfiles_driver(struct rpminspect *ri, rpmfile_entry_t *file)
                     add_result(ri, &params);
                     result = !(params.severity >= RESULT_VERIFY);
                     reported = true;
-                    free(head);
-                    free(tail);
                     goto done;
                 }
-
-                free(head);
-                free(tail);
             }
         }
     }
