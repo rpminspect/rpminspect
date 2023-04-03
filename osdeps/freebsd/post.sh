@@ -11,6 +11,13 @@ echo "DEFAULT_VERSIONS+=ssl=openssl" >> /etc/make.conf
 cd /usr/ports/archivers/rpm4 || exit 1
 make BATCH=yes install
 
+# https://github.com/rpm-software-management/rpm/pull/2459
+grep RPM_MASK_RETURN_TYPE /usr/include/rpm/rpmtag.h 2>/dev/null | grep -q 0xffff0000 >/dev/null 2>&1
+if [ $? -eq 0 ]; then
+    sed -i -e 's|^.*RPM_MASK_RETURN_TYPE.*=.*0xffff0000$|#define RPM_MASK_RETURN_TYPE 0xffff0000|g' /usr/include/rpm/rpmtag.h
+    sed -i -e '/RPM_MAPPING_RETURN_TYPE/ s/\,$//' /usr/include/rpm/rpmtag.h
+fi
+
 # Hostname to make sure rpmbuild works (this is gross)
 echo "$(ifconfig | grep "inet " | grep -v "inet 127" | awk '{ print $2; }') $(hostname)" >> /etc/hosts
 
@@ -47,7 +54,7 @@ tar -xf mandoc.tar.gz
 ( cd "${SUBDIR}" && ./configure && gmake && gmake lib-install )
 rm -rf mandoc.tar.gz "${SUBDIR}"
 
-# cdson is not [yet] in Debian
+# cdson is not [yet] in FreeBSD
 cd "${CWD}" || exit 1
 git clone https://github.com/frozencemetery/cdson.git
 cd cdson || exit 1

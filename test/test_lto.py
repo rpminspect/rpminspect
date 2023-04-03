@@ -14,8 +14,8 @@ lto_src = open(datadir + "/mathlib.c").read()
 
 # NOTE: The add_simple_compilation() calls to rpmfluff use '-o a.out' in
 # the compileFlags due to a limitation in rpmfluff.  It always tries to
-# copy a compiled file by the name of 'a.out' so if you are invoking gcc
-# to compile a .o, you need to tell gcc to name the output a.out otherwise
+# copy a compiled file by the name of 'a.out' so if you are invoking cc
+# to compile a .o, you need to tell cc to name the output a.out otherwise
 # rpmfluff will fail.  This does not impact ELF executables which is the
 # more common use.
 

@@ -9,7 +9,6 @@ curl
 debugedit
 desktop-file-utils
 elfutils
-gcc
 gettext
 git
 gmake

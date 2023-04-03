@@ -46,6 +46,13 @@ RELEASED_TARBALL_ASC = $(RELEASED_TARBALL).asc
 # The python executable to use for the debug build and tests
 PYTHON ?= python3
 
+# FreeBSD installs ports to /usr/local, so make sure we pick up
+# libraries and headers correctly.
+ifeq ($(OS),freebsd)
+export CFLAGS=-I/usr/local/include
+export LDFLAGS=-L/usr/local/lib
+endif
+
 all: setup
 	$(NINJA) -C $(MESON_BUILD_DIR) -v
 
@@ -65,6 +72,12 @@ setup-debug:
 # environment variable -or- remove the script(s) from /usr/lib/rpm.
 # The environment variable is easier.
 export QA_RPATHS = 63
+
+# Make sure rpmfluff has a usable compiler.  gcc is not on default
+# FreeBSD installs anymore, so have it use 'cc'.
+ifeq ($(OS),freebsd)
+export CC = clang
+endif
 
 # To keep intermediate files and results files for each test case, set
 # KEEP=y (or to any value) in the calling environment when you run
