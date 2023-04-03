@@ -31,8 +31,8 @@ double exponent(double x, double y)
 """
 
 # Figure out if the system is 32-bit capable or not
-have_gcc_multilib = False
-args = ["gcc", "-print-multi-lib"]
+have_multilib = False
+args = ["cc", "-print-multi-lib"]
 proc = subprocess.Popen(args, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 (out, err) = proc.communicate()
 
@@ -41,7 +41,7 @@ if (
     and str(out).find("@m32") != -1
     and os.path.isfile("/usr/include/gnu/stubs-32.h")
 ):
-    have_gcc_multilib = True
+    have_multilib = True
 
 
 # Simple way to figure out if we are musl or glibc
@@ -600,14 +600,14 @@ class SecurityFAILFulltoPartialRELROCompareKoji(TestCompareKoji):
 
 # Program lost -fPIC in after (BAD, WAIVABLE_BY_SECURITY)
 class LostPICCompareRPMs(TestCompareRPMs):
-    @unittest.skipUnless(have_gcc_multilib, "gcc lacks multilib (-m32) support")
+    @unittest.skipUnless(have_multilib, "cc lacks multilib (-m32) support")
     def setUp(self):
         super().setUp()
 
         installPath = "usr/lib/libsimple.a"
 
         self.before_rpm.add_source(rpmfluff.SourceFile("simple.c", test_library_source))
-        self.before_rpm.section_build += "gcc -m32 -fPIC -c simple.c\n"
+        self.before_rpm.section_build += "cc -m32 -fPIC -c simple.c\n"
         self.before_rpm.section_build += "ar -crs libsimple.a simple.o\n"
         self.before_rpm.create_parent_dirs(installPath)
         self.before_rpm.section_install += (
@@ -619,7 +619,7 @@ class LostPICCompareRPMs(TestCompareRPMs):
 
         self.after_rpm.add_source(rpmfluff.SourceFile("simple.c", test_library_source))
         self.after_rpm.section_build += (
-            "gcc -m32 -shared -fno-PIC -o simple.o simple.c\n"
+            "cc -m32 -shared -fno-PIC -o simple.o simple.c\n"
         )
         self.after_rpm.section_build += "chmod 0644 simple.o\n"
         self.after_rpm.section_build += "ar -crs libsimple.a simple.o\n"
@@ -637,14 +637,14 @@ class LostPICCompareRPMs(TestCompareRPMs):
 
 
 class SecuritySKIPLostPICCompareRPMs(TestCompareRPMs):
-    @unittest.skipUnless(have_gcc_multilib, "gcc lacks multilib (-m32) support")
+    @unittest.skipUnless(have_multilib, "cc lacks multilib (-m32) support")
     def setUp(self):
         super().setUp()
 
         installPath = "usr/lib/libskip.a"
 
         self.before_rpm.add_source(rpmfluff.SourceFile("simple.c", test_library_source))
-        self.before_rpm.section_build += "gcc -m32 -fPIC -c simple.c\n"
+        self.before_rpm.section_build += "cc -m32 -fPIC -c simple.c\n"
         self.before_rpm.section_build += "ar -crs libsimple.a simple.o\n"
         self.before_rpm.create_parent_dirs(installPath)
         self.before_rpm.section_install += (
@@ -656,7 +656,7 @@ class SecuritySKIPLostPICCompareRPMs(TestCompareRPMs):
 
         self.after_rpm.add_source(rpmfluff.SourceFile("simple.c", test_library_source))
         self.after_rpm.section_build += (
-            "gcc -m32 -shared -fno-PIC -o simple.o simple.c\n"
+            "cc -m32 -shared -fno-PIC -o simple.o simple.c\n"
         )
         self.after_rpm.section_build += "chmod 0644 simple.o\n"
         self.after_rpm.section_build += "ar -crs libsimple.a simple.o\n"
@@ -673,14 +673,14 @@ class SecuritySKIPLostPICCompareRPMs(TestCompareRPMs):
 
 
 class SecurityINFORMLostPICCompareRPMs(TestCompareRPMs):
-    @unittest.skipUnless(have_gcc_multilib, "gcc lacks multilib (-m32) support")
+    @unittest.skipUnless(have_multilib, "cc lacks multilib (-m32) support")
     def setUp(self):
         super().setUp()
 
         installPath = "usr/lib/libinform.a"
 
         self.before_rpm.add_source(rpmfluff.SourceFile("simple.c", test_library_source))
-        self.before_rpm.section_build += "gcc -m32 -fPIC -c simple.c\n"
+        self.before_rpm.section_build += "cc -m32 -fPIC -c simple.c\n"
         self.before_rpm.section_build += "ar -crs libsimple.a simple.o\n"
         self.before_rpm.create_parent_dirs(installPath)
         self.before_rpm.section_install += (
@@ -692,7 +692,7 @@ class SecurityINFORMLostPICCompareRPMs(TestCompareRPMs):
 
         self.after_rpm.add_source(rpmfluff.SourceFile("simple.c", test_library_source))
         self.after_rpm.section_build += (
-            "gcc -m32 -shared -fno-PIC -o simple.o simple.c\n"
+            "cc -m32 -shared -fno-PIC -o simple.o simple.c\n"
         )
         self.after_rpm.section_build += "chmod 0644 simple.o\n"
         self.after_rpm.section_build += "ar -crs libsimple.a simple.o\n"
@@ -710,14 +710,14 @@ class SecurityINFORMLostPICCompareRPMs(TestCompareRPMs):
 
 
 class SecurityVERIFYLostPICCompareRPMs(TestCompareRPMs):
-    @unittest.skipUnless(have_gcc_multilib, "gcc lacks multilib (-m32) support")
+    @unittest.skipUnless(have_multilib, "cc lacks multilib (-m32) support")
     def setUp(self):
         super().setUp()
 
         installPath = "usr/lib/libverify.a"
 
         self.before_rpm.add_source(rpmfluff.SourceFile("simple.c", test_library_source))
-        self.before_rpm.section_build += "gcc -m32 -fPIC -c simple.c\n"
+        self.before_rpm.section_build += "cc -m32 -fPIC -c simple.c\n"
         self.before_rpm.section_build += "ar -crs libsimple.a simple.o\n"
         self.before_rpm.create_parent_dirs(installPath)
         self.before_rpm.section_install += (
@@ -729,7 +729,7 @@ class SecurityVERIFYLostPICCompareRPMs(TestCompareRPMs):
 
         self.after_rpm.add_source(rpmfluff.SourceFile("simple.c", test_library_source))
         self.after_rpm.section_build += (
-            "gcc -m32 -shared -fno-PIC -o simple.o simple.c\n"
+            "cc -m32 -shared -fno-PIC -o simple.o simple.c\n"
         )
         self.after_rpm.section_build += "chmod 0644 simple.o\n"
         self.after_rpm.section_build += "ar -crs libsimple.a simple.o\n"
@@ -747,14 +747,14 @@ class SecurityVERIFYLostPICCompareRPMs(TestCompareRPMs):
 
 
 class SecurityFAILLostPICCompareRPMs(TestCompareRPMs):
-    @unittest.skipUnless(have_gcc_multilib, "gcc lacks multilib (-m32) support")
+    @unittest.skipUnless(have_multilib, "cc lacks multilib (-m32) support")
     def setUp(self):
         super().setUp()
 
         installPath = "usr/lib/libfail.a"
 
         self.before_rpm.add_source(rpmfluff.SourceFile("simple.c", test_library_source))
-        self.before_rpm.section_build += "gcc -m32 -fPIC -c simple.c\n"
+        self.before_rpm.section_build += "cc -m32 -fPIC -c simple.c\n"
         self.before_rpm.section_build += "ar -crs libsimple.a simple.o\n"
         self.before_rpm.create_parent_dirs(installPath)
         self.before_rpm.section_install += (
@@ -766,7 +766,7 @@ class SecurityFAILLostPICCompareRPMs(TestCompareRPMs):
 
         self.after_rpm.add_source(rpmfluff.SourceFile("simple.c", test_library_source))
         self.after_rpm.section_build += (
-            "gcc -m32 -shared -fno-PIC -o simple.o simple.c\n"
+            "cc -m32 -shared -fno-PIC -o simple.o simple.c\n"
         )
         self.after_rpm.section_build += "chmod 0644 simple.o\n"
         self.after_rpm.section_build += "ar -crs libsimple.a simple.o\n"
@@ -784,14 +784,14 @@ class SecurityFAILLostPICCompareRPMs(TestCompareRPMs):
 
 
 class LostPICCompareKoji(TestCompareKoji):
-    @unittest.skipUnless(have_gcc_multilib, "gcc lacks multilib (-m32) support")
+    @unittest.skipUnless(have_multilib, "cc lacks multilib (-m32) support")
     def setUp(self):
         super().setUp()
 
         installPath = "usr/lib/libsimple.a"
 
         self.before_rpm.add_source(rpmfluff.SourceFile("simple.c", test_library_source))
-        self.before_rpm.section_build += "gcc -m32 -fPIC -c simple.c\n"
+        self.before_rpm.section_build += "cc -m32 -fPIC -c simple.c\n"
         self.before_rpm.section_build += "ar -crs libsimple.a simple.o\n"
         self.before_rpm.create_parent_dirs(installPath)
         self.before_rpm.section_install += (
@@ -803,7 +803,7 @@ class LostPICCompareKoji(TestCompareKoji):
 
         self.after_rpm.add_source(rpmfluff.SourceFile("simple.c", test_library_source))
         self.after_rpm.section_build += (
-            "gcc -m32 -shared -fno-PIC -o simple.o simple.c\n"
+            "cc -m32 -shared -fno-PIC -o simple.o simple.c\n"
         )
         self.after_rpm.section_build += "chmod 0644 simple.o\n"
         self.after_rpm.section_build += "ar -crs libsimple.a simple.o\n"
@@ -822,7 +822,7 @@ class LostPICCompareKoji(TestCompareKoji):
 
 # Program has or gained TEXTREL relocations (32-bit arches only)
 class HasTEXTRELRPMs(TestRPMs):
-    @unittest.skipUnless(have_gcc_multilib, "gcc lacks multilib (-m32) support")
+    @unittest.skipUnless(have_multilib, "cc lacks multilib (-m32) support")
     def setUp(self):
         super().setUp()
 
@@ -831,7 +831,7 @@ class HasTEXTRELRPMs(TestRPMs):
         # Can't use rpmfluff here because it always adds -fPIC
         self.rpm.add_source(rpmfluff.SourceFile("simple.c", simple_library_source))
         self.rpm.section_build += (
-            "gcc -m32 -fno-pic -shared -Wl,-z,noexecstack -o libsimple.so simple.c\n"
+            "cc -m32 -fno-pic -shared -Wl,-z,noexecstack -o libsimple.so simple.c\n"
         )
         self.rpm.create_parent_dirs(installPath)
         self.rpm.section_install += "cp libsimple.so $RPM_BUILD_ROOT/%s\n" % installPath
@@ -845,7 +845,7 @@ class HasTEXTRELRPMs(TestRPMs):
 
 
 class SecuritySKIPHasTEXTRELRPMs(TestRPMs):
-    @unittest.skipUnless(have_gcc_multilib, "gcc lacks multilib (-m32) support")
+    @unittest.skipUnless(have_multilib, "cc lacks multilib (-m32) support")
     def setUp(self):
         super().setUp()
 
@@ -854,7 +854,7 @@ class SecuritySKIPHasTEXTRELRPMs(TestRPMs):
         # Can't use rpmfluff here because it always adds -fPIC
         self.rpm.add_source(rpmfluff.SourceFile("simple.c", simple_library_source))
         self.rpm.section_build += (
-            "gcc -m32 -fno-pic -shared -Wl,-z,noexecstack -o libsimple.so simple.c\n"
+            "cc -m32 -fno-pic -shared -Wl,-z,noexecstack -o libsimple.so simple.c\n"
         )
         self.rpm.create_parent_dirs(installPath)
         self.rpm.section_install += "cp libsimple.so $RPM_BUILD_ROOT/%s\n" % installPath
@@ -867,7 +867,7 @@ class SecuritySKIPHasTEXTRELRPMs(TestRPMs):
 
 
 class SecurityINFORMHasTEXTRELRPMs(TestRPMs):
-    @unittest.skipUnless(have_gcc_multilib, "gcc lacks multilib (-m32) support")
+    @unittest.skipUnless(have_multilib, "cc lacks multilib (-m32) support")
     def setUp(self):
         super().setUp()
 
@@ -876,7 +876,7 @@ class SecurityINFORMHasTEXTRELRPMs(TestRPMs):
         # Can't use rpmfluff here because it always adds -fPIC
         self.rpm.add_source(rpmfluff.SourceFile("simple.c", simple_library_source))
         self.rpm.section_build += (
-            "gcc -m32 -fno-pic -shared -Wl,-z,noexecstack -o libsimple.so simple.c\n"
+            "cc -m32 -fno-pic -shared -Wl,-z,noexecstack -o libsimple.so simple.c\n"
         )
         self.rpm.create_parent_dirs(installPath)
         self.rpm.section_install += "cp libsimple.so $RPM_BUILD_ROOT/%s\n" % installPath
@@ -890,7 +890,7 @@ class SecurityINFORMHasTEXTRELRPMs(TestRPMs):
 
 
 class SecurityVERIFYHasTEXTRELRPMs(TestRPMs):
-    @unittest.skipUnless(have_gcc_multilib, "gcc lacks multilib (-m32) support")
+    @unittest.skipUnless(have_multilib, "cc lacks multilib (-m32) support")
     def setUp(self):
         super().setUp()
 
@@ -899,7 +899,7 @@ class SecurityVERIFYHasTEXTRELRPMs(TestRPMs):
         # Can't use rpmfluff here because it always adds -fPIC
         self.rpm.add_source(rpmfluff.SourceFile("simple.c", simple_library_source))
         self.rpm.section_build += (
-            "gcc -m32 -fno-pic -shared -Wl,-z,noexecstack -o libsimple.so simple.c\n"
+            "cc -m32 -fno-pic -shared -Wl,-z,noexecstack -o libsimple.so simple.c\n"
         )
         self.rpm.create_parent_dirs(installPath)
         self.rpm.section_install += "cp libsimple.so $RPM_BUILD_ROOT/%s\n" % installPath
@@ -913,7 +913,7 @@ class SecurityVERIFYHasTEXTRELRPMs(TestRPMs):
 
 
 class SecurityFAILHasTEXTRELRPMs(TestRPMs):
-    @unittest.skipUnless(have_gcc_multilib, "gcc lacks multilib (-m32) support")
+    @unittest.skipUnless(have_multilib, "cc lacks multilib (-m32) support")
     def setUp(self):
         super().setUp()
 
@@ -922,7 +922,7 @@ class SecurityFAILHasTEXTRELRPMs(TestRPMs):
         # Can't use rpmfluff here because it always adds -fPIC
         self.rpm.add_source(rpmfluff.SourceFile("simple.c", simple_library_source))
         self.rpm.section_build += (
-            "gcc -m32 -fno-pic -shared -Wl,-z,noexecstack -o libsimple.so simple.c\n"
+            "cc -m32 -fno-pic -shared -Wl,-z,noexecstack -o libsimple.so simple.c\n"
         )
         self.rpm.create_parent_dirs(installPath)
         self.rpm.section_install += "cp libsimple.so $RPM_BUILD_ROOT/%s\n" % installPath
@@ -936,7 +936,7 @@ class SecurityFAILHasTEXTRELRPMs(TestRPMs):
 
 
 class HasTEXTRELCompareRPMs(TestCompareRPMs):
-    @unittest.skipUnless(have_gcc_multilib, "gcc lacks multilib (-m32) support")
+    @unittest.skipUnless(have_multilib, "cc lacks multilib (-m32) support")
     def setUp(self):
         super().setUp()
 
@@ -947,7 +947,7 @@ class HasTEXTRELCompareRPMs(TestCompareRPMs):
             rpmfluff.SourceFile("simple.c", simple_library_source)
         )
         self.before_rpm.section_build += (
-            "gcc -m32 -fPIC -shared -Wl,-z,noexecstack -o libsimple.so simple.c\n"
+            "cc -m32 -fPIC -shared -Wl,-z,noexecstack -o libsimple.so simple.c\n"
         )
         self.before_rpm.create_parent_dirs(installPath)
         self.before_rpm.section_install += (
@@ -961,7 +961,7 @@ class HasTEXTRELCompareRPMs(TestCompareRPMs):
             rpmfluff.SourceFile("simple.c", simple_library_source)
         )
         self.after_rpm.section_build += (
-            "gcc -m32 -fno-pic -shared -Wl,-z,noexecstack -o libsimple.so simple.c\n"
+            "cc -m32 -fno-pic -shared -Wl,-z,noexecstack -o libsimple.so simple.c\n"
         )
         self.after_rpm.create_parent_dirs(installPath)
         self.after_rpm.section_install += (
@@ -977,7 +977,7 @@ class HasTEXTRELCompareRPMs(TestCompareRPMs):
 
 
 class SecuritySKIPHasTEXTRELCompareRPMs(TestCompareRPMs):
-    @unittest.skipUnless(have_gcc_multilib, "gcc lacks multilib (-m32) support")
+    @unittest.skipUnless(have_multilib, "cc lacks multilib (-m32) support")
     def setUp(self):
         super().setUp()
 
@@ -988,7 +988,7 @@ class SecuritySKIPHasTEXTRELCompareRPMs(TestCompareRPMs):
             rpmfluff.SourceFile("simple.c", simple_library_source)
         )
         self.before_rpm.section_build += (
-            "gcc -m32 -fPIC -shared -Wl,-z,noexecstack -o libsimple.so simple.c\n"
+            "cc -m32 -fPIC -shared -Wl,-z,noexecstack -o libsimple.so simple.c\n"
         )
         self.before_rpm.create_parent_dirs(installPath)
         self.before_rpm.section_install += (
@@ -1002,7 +1002,7 @@ class SecuritySKIPHasTEXTRELCompareRPMs(TestCompareRPMs):
             rpmfluff.SourceFile("simple.c", simple_library_source)
         )
         self.after_rpm.section_build += (
-            "gcc -m32 -fno-pic -shared -Wl,-z,noexecstack -o libsimple.so simple.c\n"
+            "cc -m32 -fno-pic -shared -Wl,-z,noexecstack -o libsimple.so simple.c\n"
         )
         self.after_rpm.create_parent_dirs(installPath)
         self.after_rpm.section_install += (
@@ -1017,7 +1017,7 @@ class SecuritySKIPHasTEXTRELCompareRPMs(TestCompareRPMs):
 
 
 class SecurityINFORMHasTEXTRELCompareRPMs(TestCompareRPMs):
-    @unittest.skipUnless(have_gcc_multilib, "gcc lacks multilib (-m32) support")
+    @unittest.skipUnless(have_multilib, "cc lacks multilib (-m32) support")
     def setUp(self):
         super().setUp()
 
@@ -1028,7 +1028,7 @@ class SecurityINFORMHasTEXTRELCompareRPMs(TestCompareRPMs):
             rpmfluff.SourceFile("simple.c", simple_library_source)
         )
         self.before_rpm.section_build += (
-            "gcc -m32 -fPIC -shared -Wl,-z,noexecstack -o libsimple.so simple.c\n"
+            "cc -m32 -fPIC -shared -Wl,-z,noexecstack -o libsimple.so simple.c\n"
         )
         self.before_rpm.create_parent_dirs(installPath)
         self.before_rpm.section_install += (
@@ -1042,7 +1042,7 @@ class SecurityINFORMHasTEXTRELCompareRPMs(TestCompareRPMs):
             rpmfluff.SourceFile("simple.c", simple_library_source)
         )
         self.after_rpm.section_build += (
-            "gcc -m32 -fno-pic -shared -Wl,-z,noexecstack -o libsimple.so simple.c\n"
+            "cc -m32 -fno-pic -shared -Wl,-z,noexecstack -o libsimple.so simple.c\n"
         )
         self.after_rpm.create_parent_dirs(installPath)
         self.after_rpm.section_install += (
@@ -1058,7 +1058,7 @@ class SecurityINFORMHasTEXTRELCompareRPMs(TestCompareRPMs):
 
 
 class SecurityVERIFYHasTEXTRELCompareRPMs(TestCompareRPMs):
-    @unittest.skipUnless(have_gcc_multilib, "gcc lacks multilib (-m32) support")
+    @unittest.skipUnless(have_multilib, "cc lacks multilib (-m32) support")
     def setUp(self):
         super().setUp()
 
@@ -1069,7 +1069,7 @@ class SecurityVERIFYHasTEXTRELCompareRPMs(TestCompareRPMs):
             rpmfluff.SourceFile("simple.c", simple_library_source)
         )
         self.before_rpm.section_build += (
-            "gcc -m32 -fPIC -shared -Wl,-z,noexecstack -o libsimple.so simple.c\n"
+            "cc -m32 -fPIC -shared -Wl,-z,noexecstack -o libsimple.so simple.c\n"
         )
         self.before_rpm.create_parent_dirs(installPath)
         self.before_rpm.section_install += (
@@ -1083,7 +1083,7 @@ class SecurityVERIFYHasTEXTRELCompareRPMs(TestCompareRPMs):
             rpmfluff.SourceFile("simple.c", simple_library_source)
         )
         self.after_rpm.section_build += (
-            "gcc -m32 -fno-pic -shared -Wl,-z,noexecstack -o libsimple.so simple.c\n"
+            "cc -m32 -fno-pic -shared -Wl,-z,noexecstack -o libsimple.so simple.c\n"
         )
         self.after_rpm.create_parent_dirs(installPath)
         self.after_rpm.section_install += (
@@ -1099,7 +1099,7 @@ class SecurityVERIFYHasTEXTRELCompareRPMs(TestCompareRPMs):
 
 
 class SecurityFAILHasTEXTRELCompareRPMs(TestCompareRPMs):
-    @unittest.skipUnless(have_gcc_multilib, "gcc lacks multilib (-m32) support")
+    @unittest.skipUnless(have_multilib, "cc lacks multilib (-m32) support")
     def setUp(self):
         super().setUp()
 
@@ -1110,7 +1110,7 @@ class SecurityFAILHasTEXTRELCompareRPMs(TestCompareRPMs):
             rpmfluff.SourceFile("simple.c", simple_library_source)
         )
         self.before_rpm.section_build += (
-            "gcc -m32 -fPIC -shared -Wl,-z,noexecstack -o libsimple.so simple.c\n"
+            "cc -m32 -fPIC -shared -Wl,-z,noexecstack -o libsimple.so simple.c\n"
         )
         self.before_rpm.create_parent_dirs(installPath)
         self.before_rpm.section_install += (
@@ -1124,7 +1124,7 @@ class SecurityFAILHasTEXTRELCompareRPMs(TestCompareRPMs):
             rpmfluff.SourceFile("simple.c", simple_library_source)
         )
         self.after_rpm.section_build += (
-            "gcc -m32 -fno-pic -shared -Wl,-z,noexecstack -o libsimple.so simple.c\n"
+            "cc -m32 -fno-pic -shared -Wl,-z,noexecstack -o libsimple.so simple.c\n"
         )
         self.after_rpm.create_parent_dirs(installPath)
         self.after_rpm.section_install += (
@@ -1140,7 +1140,7 @@ class SecurityFAILHasTEXTRELCompareRPMs(TestCompareRPMs):
 
 
 class HasTEXTRELCompareKoji(TestCompareKoji):
-    @unittest.skipUnless(have_gcc_multilib, "gcc lacks multilib (-m32) support")
+    @unittest.skipUnless(have_multilib, "cc lacks multilib (-m32) support")
     def setUp(self):
         super().setUp()
 
@@ -1151,7 +1151,7 @@ class HasTEXTRELCompareKoji(TestCompareKoji):
             rpmfluff.SourceFile("simple.c", simple_library_source)
         )
         self.before_rpm.section_build += (
-            "gcc -m32 -fPIC -shared -Wl,-z,noexecstack -o libsimple.so simple.c\n"
+            "cc -m32 -fPIC -shared -Wl,-z,noexecstack -o libsimple.so simple.c\n"
         )
         self.before_rpm.create_parent_dirs(installPath)
         self.before_rpm.section_install += (
@@ -1165,7 +1165,7 @@ class HasTEXTRELCompareKoji(TestCompareKoji):
             rpmfluff.SourceFile("simple.c", simple_library_source)
         )
         self.after_rpm.section_build += (
-            "gcc -m32 -fno-pic -shared -Wl,-z,noexecstack -o libsimple.so simple.c\n"
+            "cc -m32 -fno-pic -shared -Wl,-z,noexecstack -o libsimple.so simple.c\n"
         )
         self.after_rpm.create_parent_dirs(installPath)
         self.after_rpm.section_install += (
@@ -1181,7 +1181,7 @@ class HasTEXTRELCompareKoji(TestCompareKoji):
 
 
 class SecuritySKIPHasTEXTRELCompareKoji(TestCompareKoji):
-    @unittest.skipUnless(have_gcc_multilib, "gcc lacks multilib (-m32) support")
+    @unittest.skipUnless(have_multilib, "cc lacks multilib (-m32) support")
     def setUp(self):
         super().setUp()
 
@@ -1192,7 +1192,7 @@ class SecuritySKIPHasTEXTRELCompareKoji(TestCompareKoji):
             rpmfluff.SourceFile("simple.c", simple_library_source)
         )
         self.before_rpm.section_build += (
-            "gcc -m32 -fPIC -shared -Wl,-z,noexecstack -o libsimple.so simple.c\n"
+            "cc -m32 -fPIC -shared -Wl,-z,noexecstack -o libsimple.so simple.c\n"
         )
         self.before_rpm.create_parent_dirs(installPath)
         self.before_rpm.section_install += (
@@ -1206,7 +1206,7 @@ class SecuritySKIPHasTEXTRELCompareKoji(TestCompareKoji):
             rpmfluff.SourceFile("simple.c", simple_library_source)
         )
         self.after_rpm.section_build += (
-            "gcc -m32 -fno-pic -shared -Wl,-z,noexecstack -o libsimple.so simple.c\n"
+            "cc -m32 -fno-pic -shared -Wl,-z,noexecstack -o libsimple.so simple.c\n"
         )
         self.after_rpm.create_parent_dirs(installPath)
         self.after_rpm.section_install += (
@@ -1221,7 +1221,7 @@ class SecuritySKIPHasTEXTRELCompareKoji(TestCompareKoji):
 
 
 class SecurityINFORMHasTEXTRELCompareKoji(TestCompareKoji):
-    @unittest.skipUnless(have_gcc_multilib, "gcc lacks multilib (-m32) support")
+    @unittest.skipUnless(have_multilib, "cc lacks multilib (-m32) support")
     def setUp(self):
         super().setUp()
 
@@ -1232,7 +1232,7 @@ class SecurityINFORMHasTEXTRELCompareKoji(TestCompareKoji):
             rpmfluff.SourceFile("simple.c", simple_library_source)
         )
         self.before_rpm.section_build += (
-            "gcc -m32 -fPIC -shared -Wl,-z,noexecstack -o libsimple.so simple.c\n"
+            "cc -m32 -fPIC -shared -Wl,-z,noexecstack -o libsimple.so simple.c\n"
         )
         self.before_rpm.create_parent_dirs(installPath)
         self.before_rpm.section_install += (
@@ -1246,7 +1246,7 @@ class SecurityINFORMHasTEXTRELCompareKoji(TestCompareKoji):
             rpmfluff.SourceFile("simple.c", simple_library_source)
         )
         self.after_rpm.section_build += (
-            "gcc -m32 -fno-pic -shared -Wl,-z,noexecstack -o libsimple.so simple.c\n"
+            "cc -m32 -fno-pic -shared -Wl,-z,noexecstack -o libsimple.so simple.c\n"
         )
         self.after_rpm.create_parent_dirs(installPath)
         self.after_rpm.section_install += (
@@ -1262,7 +1262,7 @@ class SecurityINFORMHasTEXTRELCompareKoji(TestCompareKoji):
 
 
 class SecurityVERIFYHasTEXTRELCompareKoji(TestCompareKoji):
-    @unittest.skipUnless(have_gcc_multilib, "gcc lacks multilib (-m32) support")
+    @unittest.skipUnless(have_multilib, "cc lacks multilib (-m32) support")
     def setUp(self):
         super().setUp()
 
@@ -1273,7 +1273,7 @@ class SecurityVERIFYHasTEXTRELCompareKoji(TestCompareKoji):
             rpmfluff.SourceFile("simple.c", simple_library_source)
         )
         self.before_rpm.section_build += (
-            "gcc -m32 -fPIC -shared -Wl,-z,noexecstack -o libsimple.so simple.c\n"
+            "cc -m32 -fPIC -shared -Wl,-z,noexecstack -o libsimple.so simple.c\n"
         )
         self.before_rpm.create_parent_dirs(installPath)
         self.before_rpm.section_install += (
@@ -1287,7 +1287,7 @@ class SecurityVERIFYHasTEXTRELCompareKoji(TestCompareKoji):
             rpmfluff.SourceFile("simple.c", simple_library_source)
         )
         self.after_rpm.section_build += (
-            "gcc -m32 -fno-pic -shared -Wl,-z,noexecstack -o libsimple.so simple.c\n"
+            "cc -m32 -fno-pic -shared -Wl,-z,noexecstack -o libsimple.so simple.c\n"
         )
         self.after_rpm.create_parent_dirs(installPath)
         self.after_rpm.section_install += (
@@ -1303,7 +1303,7 @@ class SecurityVERIFYHasTEXTRELCompareKoji(TestCompareKoji):
 
 
 class SecurityFAILHasTEXTRELCompareKoji(TestCompareKoji):
-    @unittest.skipUnless(have_gcc_multilib, "gcc lacks multilib (-m32) support")
+    @unittest.skipUnless(have_multilib, "cc lacks multilib (-m32) support")
     def setUp(self):
         super().setUp()
 
@@ -1314,7 +1314,7 @@ class SecurityFAILHasTEXTRELCompareKoji(TestCompareKoji):
             rpmfluff.SourceFile("simple.c", simple_library_source)
         )
         self.before_rpm.section_build += (
-            "gcc -m32 -fPIC -shared -Wl,-z,noexecstack -o libsimple.so simple.c\n"
+            "cc -m32 -fPIC -shared -Wl,-z,noexecstack -o libsimple.so simple.c\n"
         )
         self.before_rpm.create_parent_dirs(installPath)
         self.before_rpm.section_install += (
@@ -1328,7 +1328,7 @@ class SecurityFAILHasTEXTRELCompareKoji(TestCompareKoji):
             rpmfluff.SourceFile("simple.c", simple_library_source)
         )
         self.after_rpm.section_build += (
-            "gcc -m32 -fno-pic -shared -Wl,-z,noexecstack -o libsimple.so simple.c\n"
+            "cc -m32 -fno-pic -shared -Wl,-z,noexecstack -o libsimple.so simple.c\n"
         )
         self.after_rpm.create_parent_dirs(installPath)
         self.after_rpm.section_install += (

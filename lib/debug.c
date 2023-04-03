@@ -236,6 +236,7 @@ void dump_cfg(const struct rpminspect *ri)
         }
     }
 
+#ifdef _HAVE_MODULARITYLABEL
     /* modularity */
 
     if (ri->modularity_static_context != STATIC_CONTEXT_NULL) {
@@ -252,6 +253,7 @@ void dump_cfg(const struct rpminspect *ri)
 
         printf("\n");
     }
+#endif
 
     /* elf */
 
@@ -825,6 +827,7 @@ void dump_cfg(const struct rpminspect *ri)
         dump_inspection_ignores(ri->inspection_ignores, NAME_VIRUS);
     }
 
+#ifdef _WITH_LIBCAP
     /* capabilities */
 
     HASH_FIND_STR(ri->inspection_ignores, NAME_CAPABILITIES, mapentry);
@@ -833,6 +836,7 @@ void dump_cfg(const struct rpminspect *ri)
         printf("capabilities:\n");
         dump_inspection_ignores(ri->inspection_ignores, NAME_CAPABILITIES);
     }
+#endif
 
     /* config */
 
@@ -852,6 +856,7 @@ void dump_cfg(const struct rpminspect *ri)
         dump_inspection_ignores(ri->inspection_ignores, NAME_DOC);
     }
 
+#ifdef _WITH_LIBKMOD
     /* kmod */
 
     HASH_FIND_STR(ri->inspection_ignores, NAME_KMOD, mapentry);
@@ -860,6 +865,7 @@ void dump_cfg(const struct rpminspect *ri)
         printf("kmod:\n");
         dump_inspection_ignores(ri->inspection_ignores, NAME_KMOD);
     }
+#endif
 
     /* permissions */
 

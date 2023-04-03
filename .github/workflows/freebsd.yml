@@ -65,7 +65,7 @@ jobs:
                       echo $? > exitcodes/instreqs
 
                       # Build the software and run the test suite
-                      env CC=gcc CFLAGS=-I/usr/local/include LDFLAGS=-L/usr/local/lib gmake debug
+                      gmake debug
                       echo $? > exitcodes/build
                       gmake check
                       echo $? > exitcodes/test

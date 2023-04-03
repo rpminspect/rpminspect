@@ -21,7 +21,7 @@ class ValidFilesSectionSRPM(TestSRPM):
         libraryName = "libfoo.so"
         sourceFileName = "foo.c"
         self.rpm.add_source(rpmfluff.SourceFile(sourceFileName, simple_library_source))
-        self.rpm.section_build += "gcc --shared -fPIC -o %s %s %s\n" % (
+        self.rpm.section_build += "cc --shared -fPIC -o %s %s %s\n" % (
             libraryName,
             "",
             sourceFileName,
@@ -47,7 +47,7 @@ class ValidFilesSectionKoji(TestKoji):
         libraryName = "libfoo.so"
         sourceFileName = "foo.c"
         self.rpm.add_source(rpmfluff.SourceFile(sourceFileName, simple_library_source))
-        self.rpm.section_build += "gcc --shared -fPIC -o %s %s %s\n" % (
+        self.rpm.section_build += "cc --shared -fPIC -o %s %s %s\n" % (
             libraryName,
             "",
             sourceFileName,
@@ -75,7 +75,7 @@ class ValidFilesSectionCompareSRPM(TestCompareSRPM):
         self.after_rpm.add_source(
             rpmfluff.SourceFile(sourceFileName, simple_library_source)
         )
-        self.after_rpm.section_build += "gcc --shared -fPIC -o %s %s %s\n" % (
+        self.after_rpm.section_build += "cc --shared -fPIC -o %s %s %s\n" % (
             libraryName,
             "",
             sourceFileName,
@@ -103,7 +103,7 @@ class ValidFilesSectionCompareKoji(TestCompareKoji):
         self.after_rpm.add_source(
             rpmfluff.SourceFile(sourceFileName, simple_library_source)
         )
-        self.after_rpm.section_build += "gcc --shared -fPIC -o %s %s %s\n" % (
+        self.after_rpm.section_build += "cc --shared -fPIC -o %s %s %s\n" % (
             libraryName,
             "",
             sourceFileName,

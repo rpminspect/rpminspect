@@ -2,7 +2,6 @@ project('rpminspect',
         'c',
         version : '1.12',
         default_options : [
-            'c_std=c99',
             'warning_level=3',
             'werror=true',
             'buildtype=debugoptimized'
@@ -16,6 +15,9 @@ add_global_arguments('-DPACKAGE_VERSION="@0@"'.format(meson.project_version()), 
 
 # Always add _GNU_SOURCE because some other libraries rely on this macro
 add_global_arguments('-D_GNU_SOURCE', language : 'c')
+
+# Define this to get around a problematic json_object.h macro
+add_global_arguments('-D__STRICT_ANSI__', language : 'c')
 
 # Library search dirs
 search_dirs = [ '/usr/local/lib', '/usr/lib64', '/usr/lib' ]
