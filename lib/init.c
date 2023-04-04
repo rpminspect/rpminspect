@@ -1327,8 +1327,8 @@ bool init_security(struct rpminspect *ri)
     string_list_t *kv = NULL;
     string_entry_t *key = NULL;
     string_entry_t *value = NULL;
-    int stype;
-    severity_t severity;
+    secrule_type_t stype = SECRULE_NULL;
+    severity_t severity = RESULT_NULL;
     security_entry_t *sentry = NULL;
     secrule_t *rule_entry = NULL;
 
@@ -1428,29 +1428,7 @@ bool init_security(struct rpminspect *ri)
                 value = TAILQ_LAST(kv, string_entry_s);
 
                 /* find the rule */
-                if (!strcasecmp(key->data, "caps")) {
-                    stype = SECRULE_CAPS;
-                } else if (!strcasecmp(key->data, "execstack")) {
-                    stype = SECRULE_EXECSTACK;
-                } else if (!strcasecmp(key->data, "relro")) {
-                    stype = SECRULE_RELRO;
-                } else if (!strcasecmp(key->data, "fortifysource")) {
-                    stype = SECRULE_FORTIFYSOURCE;
-                } else if (!strcasecmp(key->data, "pic")) {
-                    stype = SECRULE_PIC;
-                } else if (!strcasecmp(key->data, "textrel")) {
-                    stype = SECRULE_TEXTREL;
-                } else if (!strcasecmp(key->data, "setuid")) {
-                    stype = SECRULE_SETUID;
-                } else if (!strcasecmp(key->data, "worldwritable")) {
-                    stype = SECRULE_WORLDWRITABLE;
-                } else if (!strcasecmp(key->data, "securitypath")) {
-                    stype = SECRULE_SECURITYPATH;
-                } else if (!strcasecmp(key->data, "modes")) {
-                    stype = SECRULE_MODES;
-                } else {
-                    stype = SECRULE_NULL;
-                }
+                stype = get_secrule_type(key->data);
 
                 if (stype == SECRULE_NULL) {
                     warnx(_("*** unknown security rule: %s"), key->data);
@@ -1459,18 +1437,7 @@ bool init_security(struct rpminspect *ri)
                 }
 
                 /* find the action */
-                if (!strcasecmp(value->data, "skip")) {
-                    severity = RESULT_SKIP;
-                } else if (!strcasecmp(value->data, "inform")) {
-                    severity = RESULT_INFO;
-                } else if (!strcasecmp(value->data, "verify")) {
-                    severity = RESULT_VERIFY;
-                } else if (!strcasecmp(value->data, "fail")) {
-                    severity = RESULT_BAD;
-                } else {
-                    /* unknown text was present */
-                    severity = RESULT_NULL;
-                }
+                severity = get_secrule_severity(value->data);
 
                 if (severity == RESULT_NULL) {
                     warnx(_("*** unknown security action: %s"), value->data);
