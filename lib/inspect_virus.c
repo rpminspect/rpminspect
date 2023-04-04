@@ -80,14 +80,25 @@ static bool virus_driver(struct rpminspect *ri, rpmfile_entry_t *file)
 #endif
 
     if (r == CL_VIRUS) {
-        params.arch = get_rpm_header_arch(file->rpm_header);
-        params.file = file->localpath;
-        params.remedy = REMEDY_VIRUS;
-        xasprintf(&params.msg, _("Virus detected in %s in the %s package on %s: %s"), file->localpath, headerGetString(file->rpm_header, RPMTAG_NAME), params.arch, virus);
-        add_result(ri, &params);
-        free(params.msg);
+        params.severity = get_secrule_result_severity(ri, file, SECRULE_VIRUS);
 
-        result = false;
+        if (params.severity != RESULT_NULL && params.severity != RESULT_SKIP) {
+            if (params.severity == RESULT_INFO) {
+                params.waiverauth = NOT_WAIVABLE;
+                params.verb = VERB_OK;
+            } else {
+                params.waiverauth = WAIVABLE_BY_SECURITY;
+                params.verb = VERB_FAILED;
+                result = false;
+            }
+
+            params.arch = get_rpm_header_arch(file->rpm_header);
+            params.file = file->localpath;
+            params.remedy = REMEDY_VIRUS;
+            xasprintf(&params.msg, _("Virus detected in %s in the %s package on %s: %s"), file->localpath, headerGetString(file->rpm_header, RPMTAG_NAME), params.arch, virus);
+            add_result(ri, &params);
+            free(params.msg);
+        }
     } else if (r != CL_CLEAN) {
         warnx("cl_scanfile(%s): %s", file->localpath, cl_strerror(r));
     }
@@ -186,10 +197,7 @@ bool inspect_virus(struct rpminspect *ri)
     params.details = NULL;
 
     /* run the virus check on each file */
-    params.severity = RESULT_BAD;
-    params.waiverauth = WAIVABLE_BY_SECURITY;
     params.header = NAME_VIRUS;
-    params.verb = VERB_FAILED;
     params.noun = _("virus or malware in ${FILE} on ${ARCH}");
     result = foreach_peer_file(ri, NAME_VIRUS, virus_driver);
 

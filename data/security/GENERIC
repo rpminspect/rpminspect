@@ -39,6 +39,7 @@
 #     securitypath   Check for loss of file(s) that belong in a security
 #                    path prefix.
 #     modes          Check for expected file ownership and permissions.
+#     virus          Check for libclamav finding a virus signature.
 #
 # Available ACTIONS (case-insensitive in the config file):
 #

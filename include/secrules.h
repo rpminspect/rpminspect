@@ -77,7 +77,13 @@ typedef enum _secrule_type_t {
      * modes
      * File mode does not match expected mode from the fileinfo rules.
      */
-    SECRULE_MODES = 10
+    SECRULE_MODES = 10,
+
+    /*
+     * virus
+     * File contains a virus found by libclamav.
+     */
+    SECRULE_VIRUS = 11
 } secrule_type_t;
 
 #endif
