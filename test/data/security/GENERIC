@@ -47,3 +47,13 @@
 
 # ignore everything about the build-id files
 /usr/lib/.build-id     *           *           *           caps=SKIP,execstack=SKIP,relro=SKIP,fortifysource=SKIP,pic=SKIP,textrel=SKIP,setuid=SKIP,worldwritable=SKIP,securitypath=SKIP,modes=SKIP
+
+# for virus tests
+/usr/lib/wrskip.o      vaporware   *           *           virus=SKIP
+wrskip.pas             vaporware   *           *           virus=SKIP
+/usr/lib/wrinform.o    vaporware   *           *           virus=INFORM
+wrinform.pas           vaporware   *           *           virus=INFORM
+/usr/lib/wrverify.o    vaporware   *           *           virus=VERIFY
+wrverify.pas           vaporware   *           *           virus=VERIFY
+/usr/lib/wrfail.o      vaporware   *           *           virus=FAIL
+wrfail.pas             vaporware   *           *           virus=FAIL
