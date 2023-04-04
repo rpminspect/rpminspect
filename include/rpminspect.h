@@ -425,6 +425,8 @@ string_list_t *gather_diags(struct rpminspect *ri, const char *progname, const c
 /* secrule.c */
 security_entry_t *get_secrule_by_path(struct rpminspect *ri, const rpmfile_entry_t *file);
 severity_t get_secrule_result_severity(struct rpminspect *ri, const rpmfile_entry_t *file, const int type);
+secrule_type_t get_secrule_type(const char *s);
+severity_t get_secrule_severity(const char *s);
 
 /* deprules.c */
 deprule_list_t *gather_deprules(Header hdr, deprule_ignore_map_t *ignores);

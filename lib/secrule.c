@@ -92,3 +92,60 @@ severity_t get_secrule_result_severity(struct rpminspect *ri, const rpmfile_entr
     /* nothing found for this type, default result */
     return RESULT_BAD;
 }
+
+/*
+ * Given a secrule name from a configuration file, return the
+ * secrule_type_t value.
+ */
+secrule_type_t get_secrule_type(const char *s)
+{
+    if (s == NULL) {
+        return SECRULE_NULL;
+    }
+
+    if (!strcasecmp(s, "caps")) {
+        return SECRULE_CAPS;
+    } else if (!strcasecmp(s, "execstack")) {
+        return SECRULE_EXECSTACK;
+    } else if (!strcasecmp(s, "relro")) {
+        return SECRULE_RELRO;
+    } else if (!strcasecmp(s, "fortifysource")) {
+        return SECRULE_FORTIFYSOURCE;
+    } else if (!strcasecmp(s, "pic")) {
+        return SECRULE_PIC;
+    } else if (!strcasecmp(s, "textrel")) {
+        return SECRULE_TEXTREL;
+    } else if (!strcasecmp(s, "setuid")) {
+        return SECRULE_SETUID;
+    } else if (!strcasecmp(s, "worldwritable")) {
+        return SECRULE_WORLDWRITABLE;
+    } else if (!strcasecmp(s, "securitypath")) {
+        return SECRULE_SECURITYPATH;
+    } else if (!strcasecmp(s, "modes")) {
+        return SECRULE_MODES;
+    } else {
+        return SECRULE_NULL;
+    }
+}
+
+/*
+ * Like getseverity(), but for the security rules.
+ */
+severity_t get_secrule_severity(const char *s)
+{
+    if (s == NULL) {
+        return RESULT_NULL;
+    }
+
+    if (!strcasecmp(s, "skip")) {
+        return RESULT_SKIP;
+    } else if (!strcasecmp(s, "inform")) {
+        return RESULT_INFO;
+    } else if (!strcasecmp(s, "verify")) {
+        return RESULT_VERIFY;
+    } else if (!strcasecmp(s, "fail")) {
+        return RESULT_BAD;
+    } else {
+        return RESULT_NULL;
+    }
+}
