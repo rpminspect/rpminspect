@@ -1,1 +1,1 @@
-PKG_CMD = pkg install -y
+PKG_CMD = pkg install -q -y
