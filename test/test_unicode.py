@@ -3351,3 +3351,452 @@ class UnicodeBadStretchStringSourceArchiveCompareBadPrepSRPM(TestCompareSRPM):
         self.inspection = "unicode"
         self.waiver_auth = "Security"
         self.result = "BAD"
+
+
+# The following tests handle the unicode= security rules that may be present
+class UnicodeBadCSourceSkipSecRuleSRPM(TestSRPM):
+    def setUp(self):
+        super().setUp()
+
+        # this creates enough of a spec file to appease rpmbuild
+        self.rpm.add_installed_file(
+            "/usr/bin/status",
+            ProvidedSourceFile(
+                "status.sh", os.path.join(datadir, "unicode", "status.sh")
+            ),
+            mode=755,
+        )
+
+        # drop our known bad source files directly in the SRPM
+        self.rpm.add_source(
+            ProvidedSourceFile("badskip.c", os.path.join(datadir, "unicode", "bad.c"))
+        )
+
+        # the known bad file is skipped here, so unicode result should be 'OK'
+        self.inspection = "unicode"
+        self.result = "OK"
+
+
+class UnicodeBadCSourceSkipSecRuleKoji(TestKoji):
+    def setUp(self):
+        super().setUp()
+
+        # this creates enough of a spec file to appease rpmbuild
+        self.rpm.add_installed_file(
+            "/usr/bin/status",
+            ProvidedSourceFile(
+                "status.sh", os.path.join(datadir, "unicode", "status.sh")
+            ),
+            mode=755,
+        )
+
+        # drop our known bad source files directly in the SRPM
+        self.rpm.add_source(
+            ProvidedSourceFile("badskip.c", os.path.join(datadir, "unicode", "bad.c"))
+        )
+
+        # the known bad file is skipped here, so unicode result should be 'OK'
+        self.inspection = "unicode"
+        self.result = "OK"
+
+
+class UnicodeBadCSourceCompareSkipSecRuleSRPM(TestCompareSRPM):
+    def setUp(self):
+        super().setUp()
+
+        # this creates enough of a spec file to appease rpmbuild
+        self.before_rpm.add_installed_file(
+            "/usr/bin/status",
+            ProvidedSourceFile(
+                "status.sh", os.path.join(datadir, "unicode", "status.sh")
+            ),
+            mode=755,
+        )
+        self.after_rpm.add_installed_file(
+            "/usr/bin/status",
+            ProvidedSourceFile(
+                "status.sh", os.path.join(datadir, "unicode", "status.sh")
+            ),
+            mode=755,
+        )
+
+        # drop our known bad source files directly in the SRPM
+        self.before_rpm.add_source(
+            ProvidedSourceFile("badskip.c", os.path.join(datadir, "unicode", "bad.c"))
+        )
+        self.after_rpm.add_source(
+            ProvidedSourceFile("badskip.c", os.path.join(datadir, "unicode", "bad.c"))
+        )
+
+        # the known bad file is skipped here, so unicode result should be 'OK'
+        self.inspection = "unicode"
+        self.result = "OK"
+
+
+class UnicodeBadCSourceCompareSkipSecRuleKoji(TestCompareKoji):
+    def setUp(self):
+        super().setUp()
+
+        # this creates enough of a spec file to appease rpmbuild
+        self.before_rpm.add_installed_file(
+            "/usr/bin/status",
+            ProvidedSourceFile(
+                "status.sh", os.path.join(datadir, "unicode", "status.sh")
+            ),
+            mode=755,
+        )
+        self.after_rpm.add_installed_file(
+            "/usr/bin/status",
+            ProvidedSourceFile(
+                "status.sh", os.path.join(datadir, "unicode", "status.sh")
+            ),
+            mode=755,
+        )
+
+        # drop our known bad source files directly in the SRPM
+        self.before_rpm.add_source(
+            ProvidedSourceFile("badskip.c", os.path.join(datadir, "unicode", "bad.c"))
+        )
+        self.after_rpm.add_source(
+            ProvidedSourceFile("badskip.c", os.path.join(datadir, "unicode", "bad.c"))
+        )
+
+        # the known bad file is skipped here, so unicode result should be 'OK'
+        self.inspection = "unicode"
+        self.result = "OK"
+
+
+class UnicodeBadCSourceInformSecRuleSRPM(TestSRPM):
+    def setUp(self):
+        super().setUp()
+
+        # this creates enough of a spec file to appease rpmbuild
+        self.rpm.add_installed_file(
+            "/usr/bin/status",
+            ProvidedSourceFile(
+                "status.sh", os.path.join(datadir, "unicode", "status.sh")
+            ),
+            mode=755,
+        )
+
+        # drop our known bad source files directly in the SRPM
+        self.rpm.add_source(
+            ProvidedSourceFile("badinform.c", os.path.join(datadir, "unicode", "bad.c"))
+        )
+
+        self.inspection = "unicode"
+        self.waiver_auth = "Not Waivable"
+        self.result = "INFO"
+
+
+class UnicodeBadCSourceInformSecRuleKoji(TestKoji):
+    def setUp(self):
+        super().setUp()
+
+        # this creates enough of a spec file to appease rpmbuild
+        self.rpm.add_installed_file(
+            "/usr/bin/status",
+            ProvidedSourceFile(
+                "status.sh", os.path.join(datadir, "unicode", "status.sh")
+            ),
+            mode=755,
+        )
+
+        # drop our known bad source files directly in the SRPM
+        self.rpm.add_source(
+            ProvidedSourceFile("badinform.c", os.path.join(datadir, "unicode", "bad.c"))
+        )
+
+        self.inspection = "unicode"
+        self.waiver_auth = "Not Waivable"
+        self.result = "INFO"
+
+
+class UnicodeBadCSourceCompareInformSecRuleSRPM(TestCompareSRPM):
+    def setUp(self):
+        super().setUp()
+
+        # this creates enough of a spec file to appease rpmbuild
+        self.before_rpm.add_installed_file(
+            "/usr/bin/status",
+            ProvidedSourceFile(
+                "status.sh", os.path.join(datadir, "unicode", "status.sh")
+            ),
+            mode=755,
+        )
+        self.after_rpm.add_installed_file(
+            "/usr/bin/status",
+            ProvidedSourceFile(
+                "status.sh", os.path.join(datadir, "unicode", "status.sh")
+            ),
+            mode=755,
+        )
+
+        # drop our known bad source files directly in the SRPM
+        self.before_rpm.add_source(
+            ProvidedSourceFile("badinform.c", os.path.join(datadir, "unicode", "bad.c"))
+        )
+        self.after_rpm.add_source(
+            ProvidedSourceFile("badinform.c", os.path.join(datadir, "unicode", "bad.c"))
+        )
+
+        self.inspection = "unicode"
+        self.waiver_auth = "Not Waivable"
+        self.result = "INFO"
+
+
+class UnicodeBadCSourceCompareInformSecRuleKoji(TestCompareKoji):
+    def setUp(self):
+        super().setUp()
+
+        # this creates enough of a spec file to appease rpmbuild
+        self.before_rpm.add_installed_file(
+            "/usr/bin/status",
+            ProvidedSourceFile(
+                "status.sh", os.path.join(datadir, "unicode", "status.sh")
+            ),
+            mode=755,
+        )
+        self.after_rpm.add_installed_file(
+            "/usr/bin/status",
+            ProvidedSourceFile(
+                "status.sh", os.path.join(datadir, "unicode", "status.sh")
+            ),
+            mode=755,
+        )
+
+        # drop our known bad source files directly in the SRPM
+        self.before_rpm.add_source(
+            ProvidedSourceFile("badinform.c", os.path.join(datadir, "unicode", "bad.c"))
+        )
+        self.after_rpm.add_source(
+            ProvidedSourceFile("badinform.c", os.path.join(datadir, "unicode", "bad.c"))
+        )
+
+        self.inspection = "unicode"
+        self.waiver_auth = "Not Waivable"
+        self.result = "INFO"
+
+
+class UnicodeBadCSourceVerifySecRuleSRPM(TestSRPM):
+    def setUp(self):
+        super().setUp()
+
+        # this creates enough of a spec file to appease rpmbuild
+        self.rpm.add_installed_file(
+            "/usr/bin/status",
+            ProvidedSourceFile(
+                "status.sh", os.path.join(datadir, "unicode", "status.sh")
+            ),
+            mode=755,
+        )
+
+        # drop our known bad source files directly in the SRPM
+        self.rpm.add_source(
+            ProvidedSourceFile("badverify.c", os.path.join(datadir, "unicode", "bad.c"))
+        )
+
+        self.inspection = "unicode"
+        self.waiver_auth = "Security"
+        self.result = "VERIFY"
+
+
+class UnicodeBadCSourceVerifySecRuleKoji(TestKoji):
+    def setUp(self):
+        super().setUp()
+
+        # this creates enough of a spec file to appease rpmbuild
+        self.rpm.add_installed_file(
+            "/usr/bin/status",
+            ProvidedSourceFile(
+                "status.sh", os.path.join(datadir, "unicode", "status.sh")
+            ),
+            mode=755,
+        )
+
+        # drop our known bad source files directly in the SRPM
+        self.rpm.add_source(
+            ProvidedSourceFile("badverify.c", os.path.join(datadir, "unicode", "bad.c"))
+        )
+
+        self.inspection = "unicode"
+        self.waiver_auth = "Security"
+        self.result = "VERIFY"
+
+
+class UnicodeBadCSourceCompareVerifySecRuleSRPM(TestCompareSRPM):
+    def setUp(self):
+        super().setUp()
+
+        # this creates enough of a spec file to appease rpmbuild
+        self.before_rpm.add_installed_file(
+            "/usr/bin/status",
+            ProvidedSourceFile(
+                "status.sh", os.path.join(datadir, "unicode", "status.sh")
+            ),
+            mode=755,
+        )
+        self.after_rpm.add_installed_file(
+            "/usr/bin/status",
+            ProvidedSourceFile(
+                "status.sh", os.path.join(datadir, "unicode", "status.sh")
+            ),
+            mode=755,
+        )
+
+        # drop our known bad source files directly in the SRPM
+        self.before_rpm.add_source(
+            ProvidedSourceFile("badverify.c", os.path.join(datadir, "unicode", "bad.c"))
+        )
+        self.after_rpm.add_source(
+            ProvidedSourceFile("badverify.c", os.path.join(datadir, "unicode", "bad.c"))
+        )
+
+        self.inspection = "unicode"
+        self.waiver_auth = "Security"
+        self.result = "VERIFY"
+
+
+class UnicodeBadCSourceCompareVerifySecRuleKoji(TestCompareKoji):
+    def setUp(self):
+        super().setUp()
+
+        # this creates enough of a spec file to appease rpmbuild
+        self.before_rpm.add_installed_file(
+            "/usr/bin/status",
+            ProvidedSourceFile(
+                "status.sh", os.path.join(datadir, "unicode", "status.sh")
+            ),
+            mode=755,
+        )
+        self.after_rpm.add_installed_file(
+            "/usr/bin/status",
+            ProvidedSourceFile(
+                "status.sh", os.path.join(datadir, "unicode", "status.sh")
+            ),
+            mode=755,
+        )
+
+        # drop our known bad source files directly in the SRPM
+        self.before_rpm.add_source(
+            ProvidedSourceFile("badverify.c", os.path.join(datadir, "unicode", "bad.c"))
+        )
+        self.after_rpm.add_source(
+            ProvidedSourceFile("badverify.c", os.path.join(datadir, "unicode", "bad.c"))
+        )
+
+        self.inspection = "unicode"
+        self.waiver_auth = "Security"
+        self.result = "VERIFY"
+
+
+class UnicodeBadCSourceFailSecRuleSRPM(TestSRPM):
+    def setUp(self):
+        super().setUp()
+
+        # this creates enough of a spec file to appease rpmbuild
+        self.rpm.add_installed_file(
+            "/usr/bin/status",
+            ProvidedSourceFile(
+                "status.sh", os.path.join(datadir, "unicode", "status.sh")
+            ),
+            mode=755,
+        )
+
+        # drop our known bad source files directly in the SRPM
+        self.rpm.add_source(
+            ProvidedSourceFile("badfail.c", os.path.join(datadir, "unicode", "bad.c"))
+        )
+
+        self.inspection = "unicode"
+        self.waiver_auth = "Security"
+        self.result = "BAD"
+
+
+class UnicodeBadCSourceFailSecRuleKoji(TestKoji):
+    def setUp(self):
+        super().setUp()
+
+        # this creates enough of a spec file to appease rpmbuild
+        self.rpm.add_installed_file(
+            "/usr/bin/status",
+            ProvidedSourceFile(
+                "status.sh", os.path.join(datadir, "unicode", "status.sh")
+            ),
+            mode=755,
+        )
+
+        # drop our known bad source files directly in the SRPM
+        self.rpm.add_source(
+            ProvidedSourceFile("badfail.c", os.path.join(datadir, "unicode", "bad.c"))
+        )
+
+        self.inspection = "unicode"
+        self.waiver_auth = "Security"
+        self.result = "BAD"
+
+
+class UnicodeBadCSourceCompareFailSecRuleSRPM(TestCompareSRPM):
+    def setUp(self):
+        super().setUp()
+
+        # this creates enough of a spec file to appease rpmbuild
+        self.before_rpm.add_installed_file(
+            "/usr/bin/status",
+            ProvidedSourceFile(
+                "status.sh", os.path.join(datadir, "unicode", "status.sh")
+            ),
+            mode=755,
+        )
+        self.after_rpm.add_installed_file(
+            "/usr/bin/status",
+            ProvidedSourceFile(
+                "status.sh", os.path.join(datadir, "unicode", "status.sh")
+            ),
+            mode=755,
+        )
+
+        # drop our known bad source files directly in the SRPM
+        self.before_rpm.add_source(
+            ProvidedSourceFile("badfail.c", os.path.join(datadir, "unicode", "bad.c"))
+        )
+        self.after_rpm.add_source(
+            ProvidedSourceFile("badfail.c", os.path.join(datadir, "unicode", "bad.c"))
+        )
+
+        self.inspection = "unicode"
+        self.waiver_auth = "Security"
+        self.result = "BAD"
+
+
+class UnicodeBadCSourceCompareFailSecRuleKoji(TestCompareKoji):
+    def setUp(self):
+        super().setUp()
+
+        # this creates enough of a spec file to appease rpmbuild
+        self.before_rpm.add_installed_file(
+            "/usr/bin/status",
+            ProvidedSourceFile(
+                "status.sh", os.path.join(datadir, "unicode", "status.sh")
+            ),
+            mode=755,
+        )
+        self.after_rpm.add_installed_file(
+            "/usr/bin/status",
+            ProvidedSourceFile(
+                "status.sh", os.path.join(datadir, "unicode", "status.sh")
+            ),
+            mode=755,
+        )
+
+        # drop our known bad source files directly in the SRPM
+        self.before_rpm.add_source(
+            ProvidedSourceFile("badfail.c", os.path.join(datadir, "unicode", "bad.c"))
+        )
+        self.after_rpm.add_source(
+            ProvidedSourceFile("badfail.c", os.path.join(datadir, "unicode", "bad.c"))
+        )
+
+        self.inspection = "unicode"
+        self.waiver_auth = "Security"
+        self.result = "BAD"

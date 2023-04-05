@@ -57,3 +57,9 @@ wrinform.pas           vaporware   *           *           virus=INFORM
 wrverify.pas           vaporware   *           *           virus=VERIFY
 /usr/lib/wrfail.o      vaporware   *           *           virus=FAIL
 wrfail.pas             vaporware   *           *           virus=FAIL
+
+# for unicode tests
+badskip.c              vaporware   *           *           unicode=SKIP
+badinform.c            vaporware   *           *           unicode=INFORM
+badverify.c            vaporware   *           *           unicode=VERIFY
+badfail.c              vaporware   *           *           unicode=FAIL
