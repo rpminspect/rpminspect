@@ -83,7 +83,14 @@ typedef enum _secrule_type_t {
      * virus
      * File contains a virus found by libclamav.
      */
-    SECRULE_VIRUS = 11
+    SECRULE_VIRUS = 11,
+
+    /*
+     * unicode
+     * File contains a forbidden Unicode code point as defined in the
+     * configuration file.
+     */
+    SECRULE_UNICODE = 12
 } secrule_type_t;
 
 #endif

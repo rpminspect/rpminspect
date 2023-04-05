@@ -40,6 +40,7 @@
 #                    path prefix.
 #     modes          Check for expected file ownership and permissions.
 #     virus          Check for libclamav finding a virus signature.
+#     unicode        Check for forbidden Unicode code points in source files.
 #
 # Available ACTIONS (case-insensitive in the config file):
 #
