@@ -38,6 +38,7 @@ static struct rpminspect *globalri = NULL;
 static bool globalresult = true;
 static UChar32_list_t *forbidden = NULL;
 static const char *globalarch = NULL;
+static rpmfile_entry_t *globalfile = NULL;
 
 /*
  * Helper function to create a ~/rpmbuild tree in the working directory.
@@ -437,13 +438,10 @@ static int validate_file(const char *fpath, __attribute__((unused)) const struct
 
     /* initialize reporting results */
     init_result_params(&params);
-    params.severity = RESULT_BAD;
-    params.waiverauth = WAIVABLE_BY_SECURITY;
     params.header = NAME_UNICODE;
     params.arch = globalarch;
     params.file = localpath;
     params.noun = _("forbidden code point in ${FILE} on ${ARCH}");
-    params.verb = VERB_FAILED;
     params.remedy = REMEDY_UNICODE;
 
     /* Read in the file as Unicode data */
@@ -491,13 +489,35 @@ static int validate_file(const char *fpath, __attribute__((unused)) const struct
         TAILQ_FOREACH(uentry, forbidden, items) {
             needle = u_strchr32(line, uentry->data);
 
+            /* forbidden code point found */
             if (needle != NULL) {
-                /* forbidden code point found */
-                colnum = u_strlen(line) - u_strlen(needle);
-                xasprintf(&params.msg, _("A forbidden code point was found in the %s source file on line %ld at column %ld."), localpath, linenum, colnum);
-                add_result(globalri, &params);
-                free(params.msg);
-                globalresult = false;
+                /* build a pretend rpmfile_entry_t to look up the secrule */
+                globalfile->localpath = strdup(localpath);
+                assert(globalfile->localpath != NULL);
+
+                /* get reporting severity */
+                params.severity = get_secrule_result_severity(globalri, globalfile, SECRULE_UNICODE);
+
+                /* this will be recycled as nftw() runs validate_file() */
+                free(globalfile->localpath);
+                globalfile->localpath = NULL;
+
+                /* report result based on the secrule */
+                if (params.severity != RESULT_NULL && params.severity != RESULT_SKIP) {
+                    if (params.severity == RESULT_INFO) {
+                        params.waiverauth = NOT_WAIVABLE;
+                        params.verb = VERB_OK;
+                    } else {
+                        params.waiverauth = WAIVABLE_BY_SECURITY;
+                        params.verb = VERB_FAILED;
+                    }
+
+                    colnum = u_strlen(line) - u_strlen(needle);
+                    xasprintf(&params.msg, _("A forbidden code point was found in the %s source file on line %ld at column %ld."), localpath, linenum, colnum);
+                    add_result(globalri, &params);
+                    free(params.msg);
+                    globalresult = false;
+                }
             }
         }
 
@@ -528,6 +548,11 @@ static bool unicode_driver(struct rpminspect *ri, rpmfile_entry_t *file)
     /* for reporting results */
     globalarch = get_rpm_header_arch(file->rpm_header);
     assert(globalarch != NULL);
+
+    globalfile = calloc(1, sizeof(*globalfile));
+    assert(globalfile != NULL);
+    globalfile->rpm_header = file->rpm_header;
+    assert(globalfile->rpm_header != NULL);
 
     /* initialize result parameters */
     init_result_params(&params);
@@ -560,6 +585,7 @@ static bool unicode_driver(struct rpminspect *ri, rpmfile_entry_t *file)
             free(params.details);
 
             seen = true;
+            free(globalfile);
             return false;
         }
 
@@ -574,6 +600,7 @@ static bool unicode_driver(struct rpminspect *ri, rpmfile_entry_t *file)
 
     /* check the individual file */
     (void) validate_file(file->fullpath, NULL, FTW_F, NULL);
+    free(globalfile);
 
     return globalresult;
 }

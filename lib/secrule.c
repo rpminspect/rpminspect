@@ -125,6 +125,8 @@ secrule_type_t get_secrule_type(const char *s)
         return SECRULE_MODES;
     } else if (!strcasecmp(s, "virus")) {
         return SECRULE_VIRUS;
+    } else if (!strcasecmp(s, "unicode")) {
+        return SECRULE_UNICODE;
     } else {
         return SECRULE_NULL;
     }
