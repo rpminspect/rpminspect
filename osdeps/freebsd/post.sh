@@ -9,13 +9,16 @@ echo "DEFAULT_VERSIONS+=ssl=openssl" >> /etc/make.conf
 
 # Build rpm4 from ports since the binary package lacks 'elfdeps'
 cd /usr/ports/archivers/rpm4 || exit 1
-make BATCH=yes install
+printf "Installing /usr/ports/archivers/rpm4 (logging to /root/rpm4.log)..."
+make BATCH=yes install >/root/rpm4.log 2>&1
+printf "done.\n"
 
 # https://github.com/rpm-software-management/rpm/pull/2459
-grep RPM_MASK_RETURN_TYPE /usr/include/rpm/rpmtag.h 2>/dev/null | grep -q 0xffff0000 >/dev/null 2>&1
+RPMTAG_HDR="/usr/local/include/rpm/rpmtag.h"
+grep RPM_MASK_RETURN_TYPE ${RPMTAG_HDR} 2>/dev/null | grep -q 0xffff0000 >/dev/null 2>&1
 if [ $? -eq 0 ]; then
-    sed -i -e 's|^.*RPM_MASK_RETURN_TYPE.*=.*0xffff0000$|#define RPM_MASK_RETURN_TYPE 0xffff0000|g' /usr/include/rpm/rpmtag.h
-    sed -i -e '/RPM_MAPPING_RETURN_TYPE/ s/\,$//' /usr/include/rpm/rpmtag.h
+    sed -I -E 's|^.*RPM_MASK_RETURN_TYPE.*=.*0xffff0000$|#define RPM_MASK_RETURN_TYPE 0xffff0000|g' ${RPMTAG_HDR}
+    sed -I -E '/RPM_MAPPING_RETURN_TYPE/ s/\,$//' ${RPMTAG_HDR}
 fi
 
 # Hostname to make sure rpmbuild works (this is gross)
@@ -24,10 +27,10 @@ echo "$(ifconfig | grep "inet " | grep -v "inet 127" | awk '{ print $2; }') $(ho
 # Install Python modules from ports, but we have to determine the
 # package prefix based on the version of Python installed.
 PKG_PREFIX="py$(python3 --version | cut -d ' ' -f 2 | cut -d '.' -f 1,2 | sed -e 's|\.||g')"
-pkg install -y "${PKG_PREFIX}-pip" "${PKG_PREFIX}-pyaml" "${PKG_PREFIX}-timeout-decorator"
+pkg install -y -q "${PKG_PREFIX}-pip" "${PKG_PREFIX}-pyaml" "${PKG_PREFIX}-timeout-decorator"
 
 # Now install modules with pip
-pip install cpp-coveralls gcovr rpmfluff
+pip install -q cpp-coveralls gcovr rpmfluff
 
 # libmandoc is missing on FreeBSD
 cd "${CWD}" || exit 1
@@ -51,7 +54,7 @@ tar -xf mandoc.tar.gz
   echo 'CFLAGS="-g -fPIC"';
 } > "${SUBDIR}"/configure.local
 
-( cd "${SUBDIR}" && ./configure && gmake && gmake lib-install )
+( cd "${SUBDIR}" && ./configure && gmake -s && gmake lib-install )
 rm -rf mandoc.tar.gz "${SUBDIR}"
 
 # cdson is not [yet] in FreeBSD
@@ -61,7 +64,7 @@ cd cdson || exit 1
 TAG="$(git tag -l | sort -n | tail -n 1)"
 git checkout -b "${TAG}" "${TAG}"
 meson setup build
-ninja -C build -v
+ninja -C build
 ninja -C build test
 ninja -C build install
 cd "${CWD}" || exit 1
