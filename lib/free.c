@@ -97,6 +97,8 @@ void free_rpminspect(struct rpminspect *ri)
 
     free(ri->progname);
     list_free(ri->cfgfiles, free);
+    free(ri->localcfg);
+    list_free(ri->locallines, free);
     free(ri->workdir);
     free(ri->kojihub);
     free(ri->kojiursine);
