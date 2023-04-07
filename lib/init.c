@@ -583,7 +583,7 @@ static bool badfuncs_allowed_cb(const char *key, const char *value, void *cb_dat
  * Read either the main configuration file or a configuration file
  * overlay (profile) and populate the struct rpminspect members.
  */
-static int read_cfgfile(struct rpminspect *ri, const char *filename)
+static void read_cfgfile(struct rpminspect *ri, const char *filename)
 {
     parser_plugin *p = NULL;
     parser_context *ctx = NULL;
@@ -597,7 +597,7 @@ static int read_cfgfile(struct rpminspect *ri, const char *filename)
 
     if (parse_agnostic(filename, &p, &ctx)) {
         warnx(_("ignoring malformed %s configuration file: %s"), COMMAND_NAME, filename);
-        return -1;
+        return;
     }
 
     /* Processing order doesn't matter, so match data/generic.yaml. */
@@ -851,16 +851,17 @@ static int read_cfgfile(struct rpminspect *ri, const char *filename)
     strget(p, ctx, "debuginfo", "debuginfo_sections", &ri->debuginfo_sections);
 
     p->fini(ctx);
-    return 0;
+    return;
 }
 
 /*
  * Given a directory and a filename with an extension, try to look for
- * it under all support filename extensions.  If found, read it in and
- * return true.  If report_finding is true, return false if we
- * couldn't find any file by that name with any support extension.
+ * it under all support filename extensions.  If found, return the
+ * full path to the config file to the caller.  The caller is
+ * responsible for freeing this string.  NULL is return if no config
+ * file is found.
  */
-static bool find_cfgfile(struct rpminspect *ri, const char *dir, const char *name, const bool report_finding)
+static char *find_cfgfile(const char *dir, const char *name)
 {
     int i = 0;
     char *tmp = NULL;
@@ -873,21 +874,16 @@ static bool find_cfgfile(struct rpminspect *ri, const char *dir, const char *nam
         xasprintf(&tmp, "%s/%s.%s", dir, name, CFG_FILENAME_EXTENSIONS[i]);
         filename = realpath(tmp, NULL);
 
-        if (filename && !access(filename, F_OK|R_OK) && read_cfgfile(ri, filename)) {
+        if (filename && !access(filename, F_OK|R_OK)) {
             free(tmp);
-            free(filename);
-            return true;
+            return filename;
         }
 
         free(tmp);
         free(filename);
     }
 
-    if (report_finding) {
-        return false;
-    } else {
-        return true;
-    }
+    return NULL;
 }
 
 /*
@@ -1606,6 +1602,8 @@ struct rpminspect *init_rpminspect(struct rpminspect *ri, const char *cfgfile, c
     int i = 0;
     char cwd[PATH_MAX + 1];
     char *tmp = NULL;
+    char *cf = NULL;
+    char *bn = NULL;
     char *kernelnames[] = KERNEL_FILENAMES;
     string_entry_t *cfg = NULL;
 
@@ -1627,11 +1625,7 @@ struct rpminspect *init_rpminspect(struct rpminspect *ri, const char *cfgfile, c
         }
 
         /* Read the main configuration file to get things started */
-        if (read_cfgfile(ri, cfg->data)) {
-            free(cfg->data);
-            free(cfg);
-            return NULL;
-        }
+        read_cfgfile(ri, cfg->data);
 
         /* Store this config file as one we read in */
         if (!list_contains(ri->cfgfiles, cfg->data)) {
@@ -1646,13 +1640,25 @@ struct rpminspect *init_rpminspect(struct rpminspect *ri, const char *cfgfile, c
     if (ri->product_release) {
         xasprintf(&tmp, "%s/%s", ri->profiledir, PRODUCT_RELEASE_CFGFILE_SUBDIR);
         assert(tmp != NULL);
-        (void) find_cfgfile(ri, tmp, ri->product_release, false);
+        cf = find_cfgfile(tmp, ri->product_release);
         free(tmp);
+
+        if (cf) {
+            read_cfgfile(ri, cf);
+            free(cf);
+        }
     }
 
     /* If a profile is specified, read an overlay config file */
-    if (profile && find_cfgfile(ri, ri->profiledir, profile, true)) {
-        errx(RI_MISSING_PROFILE, _("*** unable to find profile '%s'"), profile);
+    if (profile) {
+        cf = find_cfgfile(ri->profiledir, profile);
+
+        if (cf) {
+            read_cfgfile(ri, cf);
+            free(cf);
+        } else {
+            errx(RI_MISSING_PROFILE, _("*** unable to find profile '%s'"), profile);
+        }
     }
 
     /* get current dir */
@@ -1663,7 +1669,21 @@ struct rpminspect *init_rpminspect(struct rpminspect *ri, const char *cfgfile, c
     }
 
     /* optional config file from current directory */
-    (void) find_cfgfile(ri, cwd, COMMAND_NAME, false);
+    cf = find_cfgfile(cwd, COMMAND_NAME);
+
+    if (cf) {
+        read_cfgfile(ri, cf);
+
+        /* save a copy of the local rpminspect config file for diagnostics */
+        bn = basename(cf);
+        assert(bn != NULL);
+        ri->localcfg = strdup(bn);
+        assert(ri->localcfg != NULL);
+        ri->locallines = read_file(cf);
+        assert(ri->locallines != NULL);
+
+        free(cf);
+    }
 
     /* Initialize some lists if we did not get any config file data */
     if (ri->kernel_filenames == NULL) {

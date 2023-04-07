@@ -462,6 +462,8 @@ typedef struct _applied_patches_t {
 struct rpminspect {
     char *progname;            /* Full path to the program */
     string_list_t *cfgfiles;   /* list of full path config files read (in order) */
+    char *localcfg;            /* Name of the optional local config file */
+    string_list_t *locallines; /* Contents of optional local config file */
     char *workdir;             /* full path to working directory */
     char *profiledir;          /* full path to profiles directory */
     char *worksubdir;          /* within workdir, where these builds go */

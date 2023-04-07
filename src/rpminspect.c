@@ -896,6 +896,15 @@ int main(int argc, char **argv)
     free(params.msg);
     free(params.details);
 
+    /* report optional local configuration file */
+    if (ri->localcfg && ri->locallines && !TAILQ_EMPTY(ri->locallines)) {
+        xasprintf(&params.msg, _("Local configuration file: %s"), ri->localcfg);
+        params.details = list_to_string(ri->locallines, "\n");
+        add_result_entry(&ri->results, &params);
+        free(params.msg);
+        free(params.details);
+    }
+
     /* make sure the worst result is set before running inspections */
     ri->worst_result = params.severity;
 
