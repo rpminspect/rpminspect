@@ -4,6 +4,7 @@
 #
 
 import os
+import subprocess
 
 from baseclass import TestRPMs, TestKoji, TestCompareRPMs, TestCompareKoji
 
@@ -11,6 +12,17 @@ datadir = os.environ["RPMINSPECT_TEST_DATA_PATH"]
 
 # Source code used for the -flto tests
 lto_src = open(datadir + "/mathlib.c").read()
+
+# Determine if 'cc' is clang or not, some tests will have different results
+proc = subprocess.Popen(
+    ["cc", "--version"], stdout=subprocess.PIPE, stderr=subprocess.PIPE
+)
+(out, err) = proc.communicate()
+
+if "clang" in out.decode().split():
+    have_clang = True
+else:
+    have_clang = False
 
 # NOTE: The add_simple_compilation() calls to rpmfluff use '-o a.out' in
 # the compileFlags due to a limitation in rpmfluff.  It always tries to
@@ -168,8 +180,12 @@ class LTOSymbolsRelocRPMs(TestRPMs):
             installPath="usr/lib/lto.o",
         )
         self.inspection = "lto"
-        self.result = "BAD"
-        self.waiver_auth = "Not Waivable"
+
+        if have_clang:
+            self.result = "OK"
+        else:
+            self.result = "BAD"
+            self.waiver_auth = "Not Waivable"
 
 
 class LTOSymbolsRelocKoji(TestKoji):
@@ -181,8 +197,12 @@ class LTOSymbolsRelocKoji(TestKoji):
             installPath="usr/lib/lto.o",
         )
         self.inspection = "lto"
-        self.result = "BAD"
-        self.waiver_auth = "Not Waivable"
+
+        if have_clang:
+            self.result = "OK"
+        else:
+            self.result = "BAD"
+            self.waiver_auth = "Not Waivable"
 
 
 class LTOSymbolsRelocCompareRPMs(TestCompareRPMs):
@@ -194,8 +214,12 @@ class LTOSymbolsRelocCompareRPMs(TestCompareRPMs):
             installPath="usr/lib/lto.o",
         )
         self.inspection = "lto"
-        self.result = "BAD"
-        self.waiver_auth = "Not Waivable"
+
+        if have_clang:
+            self.result = "OK"
+        else:
+            self.result = "BAD"
+            self.waiver_auth = "Not Waivable"
 
 
 class LTOSymbolsRelocCompareKoji(TestCompareKoji):
@@ -207,8 +231,12 @@ class LTOSymbolsRelocCompareKoji(TestCompareKoji):
             installPath="usr/lib/lto.o",
         )
         self.inspection = "lto"
-        self.result = "BAD"
-        self.waiver_auth = "Not Waivable"
+
+        if have_clang:
+            self.result = "OK"
+        else:
+            self.result = "BAD"
+            self.waiver_auth = "Not Waivable"
 
 
 # LTO symbols present in .a files (BAD)
@@ -231,8 +259,12 @@ class LTOSymbolsStaticLibRPMs(TestRPMs):
         sub.section_files += "/usr/lib/liblto.a\n"
 
         self.inspection = "lto"
-        self.result = "BAD"
-        self.waiver_auth = "Not Waivable"
+
+        if have_clang:
+            self.result = "OK"
+        else:
+            self.result = "BAD"
+            self.waiver_auth = "Not Waivable"
 
 
 class LTOSymbolsStaticLibKoji(TestKoji):
@@ -254,8 +286,12 @@ class LTOSymbolsStaticLibKoji(TestKoji):
         sub.section_files += "/usr/lib/liblto.a\n"
 
         self.inspection = "lto"
-        self.result = "BAD"
-        self.waiver_auth = "Not Waivable"
+
+        if have_clang:
+            self.result = "OK"
+        else:
+            self.result = "BAD"
+            self.waiver_auth = "Not Waivable"
 
 
 class LTOSymbolsStaticLibCompareRPMs(TestCompareRPMs):
@@ -277,8 +313,12 @@ class LTOSymbolsStaticLibCompareRPMs(TestCompareRPMs):
         sub.section_files += "/usr/lib/liblto.a\n"
 
         self.inspection = "lto"
-        self.result = "BAD"
-        self.waiver_auth = "Not Waivable"
+
+        if have_clang:
+            self.result = "OK"
+        else:
+            self.result = "BAD"
+            self.waiver_auth = "Not Waivable"
 
 
 class LTOSymbolsStaticLibCompareKoji(TestCompareKoji):
@@ -300,5 +340,9 @@ class LTOSymbolsStaticLibCompareKoji(TestCompareKoji):
         sub.section_files += "/usr/lib/liblto.a\n"
 
         self.inspection = "lto"
-        self.result = "BAD"
-        self.waiver_auth = "Not Waivable"
+
+        if have_clang:
+            self.result = "OK"
+        else:
+            self.result = "BAD"
+            self.waiver_auth = "Not Waivable"
