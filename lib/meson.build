@@ -79,6 +79,7 @@ librpminspect_sources = [
     'koji.c',
     'listfuncs.c',
     'local.c',
+    'llvm.c',
     'macros.c',
     'magic.c',
     'mkdirp.c',
