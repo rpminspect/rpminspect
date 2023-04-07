@@ -115,6 +115,11 @@ static bool lto_driver(struct rpminspect *ri, rpmfile_entry_t *file)
         return true;
     }
 
+    /* Only for regular files */
+    if (!S_ISREG(file->st.st_mode)) {
+        return true;
+    }
+
     /* LLVM IR bitcode is portable across compiler versions */
     if (is_llvm_ir_bitcode(file->fullpath)) {
         return true;
