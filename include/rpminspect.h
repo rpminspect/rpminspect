@@ -149,6 +149,9 @@ bool list_contains(const string_list_t *, const char *);
 string_list_t *list_add(string_list_t *list, const char *s);
 void list_remove(string_list_t *list, const char *s);
 
+/* llvm.c */
+bool is_llvm_ir_bitcode(const char *file);
+
 /* local.c */
 bool is_local_build(const char *workdir, const char *build, const bool fetch_only);
 bool is_local_rpm(struct rpminspect *, const char *);
