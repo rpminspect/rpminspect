@@ -109,6 +109,8 @@ static char *make_source_dirs(const char *worksubdir, const char *fullpath)
 static char *rpm_prep_source(struct rpminspect *ri, const rpmfile_entry_t *file, char **details)
 {
     int pfd[2];
+    int ocode = 0;
+    int ecode = 0;
     pid_t proc = 0;
     int status = 0;
     FILE *reader = NULL;
@@ -133,15 +135,24 @@ static char *rpm_prep_source(struct rpminspect *ri, const rpmfile_entry_t *file,
     proc = fork();
 
     if (proc == 0) {
+        /* close current handles */
+        if (close(STDIN_FILENO)) {
+            warn("close");
+            _exit(EXIT_FAILURE);
+        }
+
         /* connect the output */
-        if (dup2(pfd[STDOUT_FILENO], STDOUT_FILENO) == -1 || dup2(pfd[STDOUT_FILENO], STDERR_FILENO) == -1) {
+        ocode = dup2(STDOUT_FILENO, pfd[STDOUT_FILENO]);
+        ecode = dup2(STDERR_FILENO, pfd[STDOUT_FILENO]);
+
+        if (ocode == -1 || ecode == -1) {
             warn("dup2");
             _exit(EXIT_FAILURE);
         }
 
-        /* close the pipe */
-        if (close(pfd[STDIN_FILENO]) == -1 || close(pfd[STDOUT_FILENO]) == -1) {
-            warn("dup2");
+        /* close the incoming pipe */
+        if (close(pfd[STDIN_FILENO])) {
+            warn("close");
             _exit(EXIT_FAILURE);
         }
 
@@ -190,7 +201,14 @@ static char *rpm_prep_source(struct rpminspect *ri, const rpmfile_entry_t *file,
         /* clean up and exit */
         rpmSpecFree(spec);
         rpmtsFree(ts);
+        rpmFreeMacros(NULL);
+        rpmFreeRpmrc();
         free(ba);
+
+        if (close(pfd[STDOUT_FILENO])) {
+            warn("close");
+        }
+
         _exit(status);
     } else if (proc == -1) {
         /* failure */
