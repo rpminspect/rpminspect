@@ -329,10 +329,10 @@ static bool debuginfo_driver(struct rpminspect *ri, rpmfile_entry_t *file)
 
             add_result(ri, &params);
             free(params.msg);
-
-            close(fd);
-            elf_end(elf);
         }
+
+        close(fd);
+        elf_end(elf);
     }
 
     free(nvr);

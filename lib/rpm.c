@@ -10,6 +10,7 @@
 #include <rpm/rpmlib.h>
 #include <rpm/rpmts.h>
 #include <rpm/header.h>
+#include <rpm/rpmmacro.h>
 #include <archive.h>
 #include <archive_entry.h>
 
@@ -26,6 +27,8 @@ int init_librpm(struct rpminspect *ri)
         return RPMRC_OK;
     }
 
+    rpmFreeMacros(NULL);
+    rpmFreeRpmrc();
     result = rpmReadConfigFiles(NULL, NULL);
     ri->librpm_initialized = true;
 
