@@ -376,7 +376,7 @@ typedef TAILQ_HEAD(politics_entry_s, _politics_entry_t) politics_list_t;
 typedef enum _politics_field_t {
     PATTERN = 0,
     DIGEST = 1,
-    PERMISSION = 2,
+    PERMISSION = 2
 } politics_field_t;
 
 /* Commands used by rpminspect at runtime. */
