@@ -3,23 +3,12 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 #
 
-import os
-import unittest
-
 from baseclass import TestSRPM, TestRPMs, TestKoji
 from baseclass import TestCompareSRPM, TestCompareRPMs, TestCompareKoji
-
-# These tests more often than not time out in our FreeBSD CI job, so just
-# disable them on that platform.
-on_freebsd = False
-
-if os.uname().sysname == "FreeBSD":
-    on_freebsd = True
 
 
 # package that does not contain a virus (OK)
 class HasNoVirusSRPM(TestSRPM):
-    @unittest.skipIf(on_freebsd, "usually times out on FreeBSD")
     def setUp(self):
         super().setUp()
 
@@ -35,7 +24,6 @@ class HasNoVirusSRPM(TestSRPM):
 
 
 class HasNoVirusRPMs(TestRPMs):
-    @unittest.skipIf(on_freebsd, "usually times out on FreeBSD")
     def setUp(self):
         super().setUp()
 
@@ -51,7 +39,6 @@ class HasNoVirusRPMs(TestRPMs):
 
 
 class HasNoVirusKoji(TestKoji):
-    @unittest.skipIf(on_freebsd, "usually times out on FreeBSD")
     def setUp(self):
         super().setUp()
 
@@ -67,7 +54,6 @@ class HasNoVirusKoji(TestKoji):
 
 
 class HasNoVirusCompareSRPM(TestCompareSRPM):
-    @unittest.skipIf(on_freebsd, "usually times out on FreeBSD")
     def setUp(self):
         super().setUp()
 
@@ -86,7 +72,6 @@ class HasNoVirusCompareSRPM(TestCompareSRPM):
 
 
 class HasNoVirusCompareRPMs(TestCompareRPMs):
-    @unittest.skipIf(on_freebsd, "usually times out on FreeBSD")
     def setUp(self):
         super().setUp()
 
@@ -105,7 +90,6 @@ class HasNoVirusCompareRPMs(TestCompareRPMs):
 
 
 class HasNoVirusCompareKoji(TestCompareKoji):
-    @unittest.skipIf(on_freebsd, "usually times out on FreeBSD")
     def setUp(self):
         super().setUp()
 
@@ -125,7 +109,6 @@ class HasNoVirusCompareKoji(TestCompareKoji):
 
 # package that contains a virus (BAD)
 class HasVirusSRPM(TestSRPM):
-    @unittest.skipIf(on_freebsd, "usually times out on FreeBSD")
     def setUp(self):
         super().setUp()
 
@@ -140,7 +123,6 @@ class HasVirusSRPM(TestSRPM):
 
 
 class HasVirusRPMs(TestRPMs):
-    @unittest.skipIf(on_freebsd, "usually times out on FreeBSD")
     def setUp(self):
         super().setUp()
 
@@ -155,7 +137,6 @@ class HasVirusRPMs(TestRPMs):
 
 
 class HasVirusKoji(TestKoji):
-    @unittest.skipIf(on_freebsd, "usually times out on FreeBSD")
     def setUp(self):
         super().setUp()
 
@@ -170,7 +151,6 @@ class HasVirusKoji(TestKoji):
 
 
 class HasVirusCompareSRPM(TestCompareSRPM):
-    @unittest.skipIf(on_freebsd, "usually times out on FreeBSD")
     def setUp(self):
         super().setUp()
 
@@ -190,7 +170,6 @@ class HasVirusCompareSRPM(TestCompareSRPM):
 
 
 class HasVirusCompareRPMs(TestCompareRPMs):
-    @unittest.skipIf(on_freebsd, "usually times out on FreeBSD")
     def setUp(self):
         super().setUp()
 
@@ -210,7 +189,6 @@ class HasVirusCompareRPMs(TestCompareRPMs):
 
 
 class HasVirusCompareKoji(TestCompareKoji):
-    @unittest.skipIf(on_freebsd, "usually times out on FreeBSD")
     def setUp(self):
         super().setUp()
 
@@ -230,7 +208,6 @@ class HasVirusCompareKoji(TestCompareKoji):
 
 
 class HasKnownVirusSkipRPMs(TestRPMs):
-    @unittest.skipIf(on_freebsd, "usually times out on FreeBSD")
     def setUp(self):
         super().setUp()
         self.rpm.add_fake_virus("usr/lib/wrskip.o", "wrskip.pas", mode="0755")
@@ -239,7 +216,6 @@ class HasKnownVirusSkipRPMs(TestRPMs):
 
 
 class HasKnownVirusSkipCompareRPMs(TestCompareRPMs):
-    @unittest.skipIf(on_freebsd, "usually times out on FreeBSD")
     def setUp(self):
         super().setUp()
         self.before_rpm.add_fake_virus("usr/lib/wrskip.o", "wrskip.pas", mode="0755")
@@ -249,7 +225,6 @@ class HasKnownVirusSkipCompareRPMs(TestCompareRPMs):
 
 
 class HasKnownVirusSkipKoji(TestKoji):
-    @unittest.skipIf(on_freebsd, "usually times out on FreeBSD")
     def setUp(self):
         super().setUp()
         self.rpm.add_fake_virus("usr/lib/wrskip.o", "wrskip.pas", mode="0755")
@@ -258,7 +233,6 @@ class HasKnownVirusSkipKoji(TestKoji):
 
 
 class HasKnownVirusSkipCompareKoji(TestCompareKoji):
-    @unittest.skipIf(on_freebsd, "usually times out on FreeBSD")
     def setUp(self):
         super().setUp()
         self.before_rpm.add_fake_virus("usr/lib/wrskip.o", "wrskip.pas", mode="0755")
@@ -268,7 +242,6 @@ class HasKnownVirusSkipCompareKoji(TestCompareKoji):
 
 
 class HasKnownVirusInformRPMs(TestRPMs):
-    @unittest.skipIf(on_freebsd, "usually times out on FreeBSD")
     def setUp(self):
         super().setUp()
         self.rpm.add_fake_virus("usr/lib/wrinform.o", "wrinform.pas", mode="0755")
@@ -278,7 +251,6 @@ class HasKnownVirusInformRPMs(TestRPMs):
 
 
 class HasKnownVirusInformCompareRPMs(TestCompareRPMs):
-    @unittest.skipIf(on_freebsd, "usually times out on FreeBSD")
     def setUp(self):
         super().setUp()
         self.before_rpm.add_fake_virus(
@@ -291,7 +263,6 @@ class HasKnownVirusInformCompareRPMs(TestCompareRPMs):
 
 
 class HasKnownVirusInformKoji(TestKoji):
-    @unittest.skipIf(on_freebsd, "usually times out on FreeBSD")
     def setUp(self):
         super().setUp()
         self.rpm.add_fake_virus("usr/lib/wrinform.o", "wrinform.pas", mode="0755")
@@ -301,7 +272,6 @@ class HasKnownVirusInformKoji(TestKoji):
 
 
 class HasKnownVirusInformCompareKoji(TestCompareKoji):
-    @unittest.skipIf(on_freebsd, "usually times out on FreeBSD")
     def setUp(self):
         super().setUp()
         self.before_rpm.add_fake_virus(
@@ -314,7 +284,6 @@ class HasKnownVirusInformCompareKoji(TestCompareKoji):
 
 
 class HasKnownVirusVerifyRPMs(TestRPMs):
-    @unittest.skipIf(on_freebsd, "usually times out on FreeBSD")
     def setUp(self):
         super().setUp()
         self.rpm.add_fake_virus("usr/lib/wrverify.o", "wrverify.pas", mode="0755")
@@ -324,7 +293,6 @@ class HasKnownVirusVerifyRPMs(TestRPMs):
 
 
 class HasKnownVirusVerifyCompareRPMs(TestCompareRPMs):
-    @unittest.skipIf(on_freebsd, "usually times out on FreeBSD")
     def setUp(self):
         super().setUp()
         self.before_rpm.add_fake_virus(
@@ -337,7 +305,6 @@ class HasKnownVirusVerifyCompareRPMs(TestCompareRPMs):
 
 
 class HasKnownVirusVerifyKoji(TestKoji):
-    @unittest.skipIf(on_freebsd, "usually times out on FreeBSD")
     def setUp(self):
         super().setUp()
         self.rpm.add_fake_virus("usr/lib/wrverify.o", "wrverify.pas", mode="0755")
@@ -347,7 +314,6 @@ class HasKnownVirusVerifyKoji(TestKoji):
 
 
 class HasKnownVirusVerifyCompareKoji(TestCompareKoji):
-    @unittest.skipIf(on_freebsd, "usually times out on FreeBSD")
     def setUp(self):
         super().setUp()
         self.before_rpm.add_fake_virus(
@@ -360,7 +326,6 @@ class HasKnownVirusVerifyCompareKoji(TestCompareKoji):
 
 
 class HasKnownVirusFailRPMs(TestRPMs):
-    @unittest.skipIf(on_freebsd, "usually times out on FreeBSD")
     def setUp(self):
         super().setUp()
         self.rpm.add_fake_virus("usr/lib/wrfail.o", "wrfail.pas", mode="0755")
@@ -370,7 +335,6 @@ class HasKnownVirusFailRPMs(TestRPMs):
 
 
 class HasKnownVirusFailCompareRPMs(TestCompareRPMs):
-    @unittest.skipIf(on_freebsd, "usually times out on FreeBSD")
     def setUp(self):
         super().setUp()
         self.before_rpm.add_fake_virus("usr/lib/wrfail.o", "wrfail.pas", mode="0755")
@@ -381,7 +345,6 @@ class HasKnownVirusFailCompareRPMs(TestCompareRPMs):
 
 
 class HasKnownVirusFailKoji(TestKoji):
-    @unittest.skipIf(on_freebsd, "usually times out on FreeBSD")
     def setUp(self):
         super().setUp()
         self.rpm.add_fake_virus("usr/lib/wrfail.o", "wrfail.pas", mode="0755")
@@ -391,7 +354,6 @@ class HasKnownVirusFailKoji(TestKoji):
 
 
 class HasKnownVirusFailCompareKoji(TestCompareKoji):
-    @unittest.skipIf(on_freebsd, "usually times out on FreeBSD")
     def setUp(self):
         super().setUp()
         self.before_rpm.add_fake_virus("usr/lib/wrfail.o", "wrfail.pas", mode="0755")
