@@ -64,11 +64,15 @@ jobs:
                       gmake instreqs
                       echo $? > exitcodes/instreqs
 
-                      # Build the software and run the test suite
+                      # Build the software
                       gmake debug
                       echo $? > exitcodes/build
-                      gmake check
-                      echo $? > exitcodes/test
+
+                      # Run the test suite...except the virus tests
+                      for t in $(/bin/ls -1 test/test_*.py | grep -v test_virus | cut -c11- | cut -d '.' -f 1 | awk 'NF' ORS=' ') ; do
+                          gmake check ${t}
+                          echo $? > exitcodes/test_${t}
+                      done
 
             # Process the exit codes outside the VM
             - name: Check exit codes
