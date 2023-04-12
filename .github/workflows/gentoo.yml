@@ -39,6 +39,8 @@ jobs:
             # Requirements before the git clone can happen
             - name: git clone requirements
               run: |
+                  [ -d /etc/portage ] || mkdir -p /etc/portage
+                  echo 'FEATURES="-ipc-sandbox -network-sandbox -pid-sandbox"' >> /etc/portage/make.conf
                   emerge-webrsync
                   emerge dev-vcs/git
                   git config --global --add safe.directory /__w/rpminspect/rpminspect
