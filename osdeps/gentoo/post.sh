@@ -53,13 +53,5 @@ ninja -C build install
 cd "${CWD}" || exit 1
 rm -rf cdson
 
-# Update pip and setuptools
-pip3 install --user --upgrade pip setuptools
-( cd /root/.local/bin || exit 1
-  for f in * ; do
-      ln -sf "$(realpath "${f}")" /usr/local/bin/"${f}"
-  done
-)
-
 # Update the clamav database
 freshclam
