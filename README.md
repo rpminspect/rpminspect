@@ -27,25 +27,33 @@ Status
 For each merge and pull request, rpminspect is built and tested in the
 following environments:
 
-| Platform | Release | Build | Tests | [x86_64](https://en.wikipedia.org/wiki/X86-64) | [i686](https://en.wikipedia.org/wiki/P6_(microarchitecture)) | [aarch64](https://en.wikipedia.org/wiki/AArch64) | [ppc64le](https://en.wikipedia.org/wiki/Ppc64) | [s390x](https://en.wikipedia.org/wiki/Linux_on_IBM_Z) |
-| :--- | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: |
-| [Fedora Linux](https://getfedora.org/) | rawhide<br />stable | :heavy_check_mark: | :heavy_check_mark: | [![Fedora Linux](https://github.com/rpminspect/rpminspect/actions/workflows/fedora.yml/badge.svg)](https://github.com/rpminspect/rpminspect/actions/workflows/fedora.yml) | [![Fedora Linux](https://github.com/rpminspect/rpminspect/actions/workflows/fedora.yml/badge.svg)](https://github.com/rpminspect/rpminspect/actions/workflows/fedora.yml) | | | |
-| [Fedora Linux](https://getfedora.org/) | stable | :heavy_check_mark: | | | | [![Fedora Linux aarch64](https://github.com/rpminspect/rpminspect/actions/workflows/fedora-aarch64.yml/badge.svg)](https://github.com/rpminspect/rpminspect/actions/workflows/fedora-aarch64.yml) | [![Fedora Linux ppc64le](https://github.com/rpminspect/rpminspect/actions/workflows/fedora-ppc64le.yml/badge.svg)](https://github.com/rpminspect/rpminspect/actions/workflows/fedora-ppc64le.yml) | [![Fedora Linux s390x](https://github.com/rpminspect/rpminspect/actions/workflows/fedora-s390x.yml/badge.svg)](https://github.com/rpminspect/rpminspect/actions/workflows/fedora-s390x.yml) |
-| [CentOS](https://www.centos.org/) | 8<br />7 | :heavy_check_mark: | :heavy_check_mark: | [![CentOS](https://github.com/rpminspect/rpminspect/actions/workflows/centos.yml/badge.svg)](https://github.com/rpminspect/rpminspect/actions/workflows/centos.yml) | | | | |
-| [Slackware](http://www.slackware.com/) | stable | :heavy_check_mark: | :heavy_check_mark: | [![Slackware Linux](https://github.com/rpminspect/rpminspect/actions/workflows/slackware.yml/badge.svg)](https://github.com/rpminspect/rpminspect/actions/workflows/slackware.yml) | | | | |
-| [Ubuntu Linux](https://ubuntu.com/) | stable | :heavy_check_mark: | :heavy_check_mark: | [![Ubuntu Linux](https://github.com/rpminspect/rpminspect/actions/workflows/ubuntu.yml/badge.svg)](https://github.com/rpminspect/rpminspect/actions/workflows/ubuntu.yml) | | | | |
-| [Debian GNU/Linux](https://www.debian.org/) | testing<br />stable | :heavy_check_mark: | :heavy_check_mark: | [![Debian GNU/Linux](https://github.com/rpminspect/rpminspect/actions/workflows/debian.yml/badge.svg)](https://github.com/rpminspect/rpminspect/actions/workflows/debian.yml) | | | | |
-| [OpenSUSE](https://www.opensuse.org/) | Leap | :heavy_check_mark: | :heavy_check_mark: | [![OpenSUSE](https://github.com/rpminspect/rpminspect/actions/workflows/opensuse.yml/badge.svg)](https://github.com/rpminspect/rpminspect/actions/workflows/opensuse.yml) | | | | |
-| [Arch Linux](https://archlinux.org/) | stable | :heavy_check_mark: | :heavy_check_mark: | [![Arch Linux](https://github.com/rpminspect/rpminspect/actions/workflows/archlinux.yml/badge.svg)](https://github.com/rpminspect/rpminspect/actions/workflows/archlinux.yml) | | | | |
-| [Gentoo Linux](https://www.gentoo.org/) | stable | :heavy_check_mark: | :heavy_check_mark: | [![Gentoo Linux](https://github.com/rpminspect/rpminspect/actions/workflows/gentoo.yml/badge.svg)](https://github.com/rpminspect/rpminspect/actions/workflows/gentoo.yml) | | | | |
-| [Alpine Linux](https://www.alpinelinux.org/) | stable | :heavy_check_mark: | :heavy_check_mark: | [![Alpine Linux](https://github.com/rpminspect/rpminspect/actions/workflows/alpinelinux.yml/badge.svg)](https://github.com/rpminspect/rpminspect/actions/workflows/alpinelinux.yml) | | | | |
-| [AlmaLinux](https://almalinux.org/) | 8 | :heavy_check_mark: | :heavy_check_mark: | [![AlmaLinux](https://github.com/rpminspect/rpminspect/actions/workflows/almalinux.yml/badge.svg)](https://github.com/rpminspect/rpminspect/actions/workflows/almalinux.yml) | | | | |
-| [Rocky Linux](https://rockylinux.org/) | 8 | :heavy_check_mark: | :heavy_check_mark: | [![Rocky Linux](https://github.com/rpminspect/rpminspect/actions/workflows/rockylinux.yml/badge.svg)](https://github.com/rpminspect/rpminspect/actions/workflows/rockylinux.yml) | | | | |
-| [Amazon Linux](https://aws.amazon.com/amazon-linux-2/) | 2 | :heavy_check_mark: | :heavy_check_mark: | [![Amazon Linux](https://github.com/rpminspect/rpminspect/actions/workflows/amazonlinux.yml/badge.svg)](https://github.com/rpminspect/rpminspect/actions/workflows/amazonlinux.yml) | | | | |
-| [Mageia Linux](https://www.mageia.org/) | stable | :heavy_check_mark: | :heavy_check_mark: | [![Mageia Linux](https://github.com/rpminspect/rpminspect/actions/workflows/mageia.yml/badge.svg)](https://github.com/rpminspect/rpminspect/actions/workflows/mageia.yml) | | | | |
-| [Oracle Linux](https://www.oracle.com/linux/) | 8 | :heavy_check_mark: | :heavy_check_mark: | [![Oracle Linux](https://github.com/rpminspect/rpminspect/actions/workflows/oraclelinux.yml/badge.svg)](https://github.com/rpminspect/rpminspect/actions/workflows/oraclelinux.yml) | | | | |
-| [FreeBSD](https://www.freebsd.org/) | latest 13.x | :heavy_check_mark: | :heavy_check_mark: | [![FreeBSD](https://github.com/rpminspect/rpminspect/actions/workflows/freebsd.yml/badge.svg)](https://github.com/rpminspect/rpminspect/actions/workflows/freebsd.yml) | | | | |
+[x86_64](https://en.wikipedia.org/wiki/X86-64):
 
+| Platform | Release | Status |  
+|:-------------------------------------------------------|:----|----:|
+| [Fedora Linux](https://getfedora.org/)                 | rawhide<br />stable | [![Fedora Linux](https://github.com/rpminspect/rpminspect/actions/workflows/fedora.yml/badge.svg)](https://github.com/rpminspect/rpminspect/actions/workflows/fedora.yml) |
+| [CentOS Stream](https://www.centos.org/)               | 8<br />7 | [![CentOS](https://github.com/rpminspect/rpminspect/actions/workflows/centos.yml/badge.svg)](https://github.com/rpminspect/rpminspect/actions/workflows/centos.yml) |
+| [Slackware Linux](http://www.slackware.com/)           | stable | [![Slackware Linux](https://github.com/rpminspect/rpminspect/actions/workflows/slackware.yml/badge.svg)](https://github.com/rpminspect/rpminspect/actions/workflows/slackware.yml) |
+| [Ubuntu Linux](https://ubuntu.com/)                    | stable | [![Ubuntu Linux](https://github.com/rpminspect/rpminspect/actions/workflows/ubuntu.yml/badge.svg)](https://github.com/rpminspect/rpminspect/actions/workflows/ubuntu.yml) |
+| [Debian GNU/Linux](https://www.debian.org/)            | testing<br />stable | [![Debian GNU/Linux](https://github.com/rpminspect/rpminspect/actions/workflows/debian.yml/badge.svg)](https://github.com/rpminspect/rpminspect/actions/workflows/debian.yml) |
+| [OpenSUSE Linux](https://www.opensuse.org/)            | Leap | [![OpenSUSE](https://github.com/rpminspect/rpminspect/actions/workflows/opensuse.yml/badge.svg)](https://github.com/rpminspect/rpminspect/actions/workflows/opensuse.yml) |
+| [Arch Linux](https://archlinux.org/)                   | stable | [![Arch Linux](https://github.com/rpminspect/rpminspect/actions/workflows/archlinux.yml/badge.svg)](https://github.com/rpminspect/rpminspect/actions/workflows/archlinux.yml) |
+| [Gentoo Linux](https://www.gentoo.org/)                | stable | [![Gentoo Linux](https://github.com/rpminspect/rpminspect/actions/workflows/gentoo.yml/badge.svg)](https://github.com/rpminspect/rpminspect/actions/workflows/gentoo.yml) |
+| [Alpine Linux](https://www.alpinelinux.org/)           | stable | [![Alpine Linux](https://github.com/rpminspect/rpminspect/actions/workflows/alpinelinux.yml/badge.svg)](https://github.com/rpminspect/rpminspect/actions/workflows/alpinelinux.yml) |
+| [AlmaLinux](https://almalinux.org/)                    | 8 | [![AlmaLinux](https://github.com/rpminspect/rpminspect/actions/workflows/almalinux.yml/badge.svg)](https://github.com/rpminspect/rpminspect/actions/workflows/almalinux.yml) |
+| [Rocky Linux](https://rockylinux.org/)                 | 8 | [![Rocky Linux](https://github.com/rpminspect/rpminspect/actions/workflows/rockylinux.yml/badge.svg)](https://github.com/rpminspect/rpminspect/actions/workflows/rockylinux.yml) |
+| [Amazon Linux](https://aws.amazon.com/amazon-linux-2/) | 2 | [![Amazon Linux](https://github.com/rpminspect/rpminspect/actions/workflows/amazonlinux.yml/badge.svg)](https://github.com/rpminspect/rpminspect/actions/workflows/amazonlinux.yml) |
+| [Mageia Linux](https://www.mageia.org/)                | stable | [![Mageia Linux](https://github.com/rpminspect/rpminspect/actions/workflows/mageia.yml/badge.svg)](https://github.com/rpminspect/rpminspect/actions/workflows/mageia.yml) |
+| [Oracle Linux](https://www.oracle.com/linux/)          | 8 | [![Oracle Linux](https://github.com/rpminspect/rpminspect/actions/workflows/oraclelinux.yml/badge.svg)](https://github.com/rpminspect/rpminspect/actions/workflows/oraclelinux.yml) |
+| [FreeBSD](https://www.freebsd.org/)                    | 13.x | [![FreeBSD](https://github.com/rpminspect/rpminspect/actions/workflows/freebsd.yml/badge.svg)](https://github.com/rpminspect/rpminspect/actions/workflows/freebsd.yml) |
+
+In addition to the above test runs, rpminspect is built for Fedora Linux on these platforms:
+
+| Platform | Status |  
+|:-------------------|----:|
+| [aarch64](https://en.wikipedia.org/wiki/AArch64)      | [![Fedora Linux aarch64](https://github.com/rpminspect/rpminspect/actions/workflows/fedora-aarch64.yml/badge.svg)](https://github.com/rpminspect/rpminspect/actions/workflows/fedora-aarch64.yml) |
+| [ppc64le](https://en.wikipedia.org/wiki/Ppc64)        | [![Fedora Linux ppc64le](https://github.com/rpminspect/rpminspect/actions/workflows/fedora-ppc64le.yml/badge.svg)](https://github.com/rpminspect/rpminspect/actions/workflows/fedora-ppc64le.yml) |
+| [s390x](https://en.wikipedia.org/wiki/Linux_on_IBM_Z) | [![Fedora Linux s390x](https://github.com/rpminspect/rpminspect/actions/workflows/fedora-s390x.yml/badge.svg)](https://github.com/rpminspect/rpminspect/actions/workflows/fedora-s390x.yml) |
 
 Documentation
 -------------
