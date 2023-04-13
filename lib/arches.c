@@ -26,10 +26,6 @@ void init_arches(struct rpminspect *ri)
         return;
     }
 
-    ri->arches = calloc(1, sizeof(*ri->arches));
-    assert(ri->arches != NULL);
-    TAILQ_INIT(ri->arches);
-
     TAILQ_FOREACH(peer, ri->peers, items) {
         if (!peer->after_hdr) {
             continue;

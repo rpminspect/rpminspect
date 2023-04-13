@@ -381,7 +381,6 @@ static void add_execstack_flag_str(string_list_t *list, const char *s)
         return;
     }
 
-    assert(list != NULL);
     list = list_add(list, s);
 
     return;

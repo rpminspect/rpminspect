@@ -24,10 +24,6 @@ static string_list_t *get_tag_list(Elf *elf, const Elf64_Sxword tag)
     assert(elf != NULL);
 
     if (get_dynamic_tags(elf, tag, &dyn, &sz, &shdr)) {
-        result = calloc(1, sizeof(*result));
-        assert(result != NULL);
-        TAILQ_INIT(result);
-
         for (i = 0; i < sz; i++) {
             result = list_add(result, elf_strptr(elf, shdr.sh_link, (size_t) (dyn[i].d_un.d_ptr)));
         }
