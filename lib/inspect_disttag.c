@@ -20,7 +20,7 @@
  * in a way that no one would use it.  But I guess never say never,
  * right?
  */
-#define DIST_TAG_MARKER "_____!!!!!####D#I#S#T####!!!!!_____"
+#define DIST_TAG_MARKER "_._._._._._._.D.I.S.T._._._._._._._"
 
 static void append_macros(string_list_t **macros, const char *s)
 {
