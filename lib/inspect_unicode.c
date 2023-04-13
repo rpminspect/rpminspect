@@ -142,8 +142,8 @@ static char *rpm_prep_source(struct rpminspect *ri, const rpmfile_entry_t *file,
         }
 
         /* connect the output */
-        ocode = dup2(STDOUT_FILENO, pfd[STDOUT_FILENO]);
-        ecode = dup2(STDERR_FILENO, pfd[STDOUT_FILENO]);
+        ocode = dup2(pfd[STDOUT_FILENO], STDOUT_FILENO);
+        ecode = dup2(pfd[STDOUT_FILENO], STDERR_FILENO);
 
         if (ocode == -1 || ecode == -1) {
             warn("dup2");
