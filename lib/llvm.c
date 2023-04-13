@@ -35,8 +35,6 @@ bool is_llvm_ir_bitcode(const char *file)
     }
 
     if (read(fd, magic, sizeof(magic)) != sizeof(magic)) {
-        warn("read");
-
         if (close(fd) == -1) {
             warn("close");
         }
