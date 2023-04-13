@@ -96,15 +96,9 @@ static void add_entry(string_list_t **list, const char *s)
     assert(list != NULL);
     assert(s != NULL);
 
-    if (*list == NULL) {
-        *list = calloc(1, sizeof(*(*list)));
-        assert(*list != NULL);
-        TAILQ_INIT(*list);
-    } else {
+    if (*list != NULL && list_contains(*list, s)) {
         /* do not add entry if it exists in the list */
-        if (list_contains(*list, s)) {
-            return;
-        }
+        return;
     }
 
     *list = list_add(*list, s);
@@ -130,19 +124,9 @@ static void add_string_list_map_entry(string_list_map_t **table, const char *key
         mapentry = calloc(1, sizeof(*mapentry));
         assert(mapentry != NULL);
         mapentry->key = strdup(key);
-        mapentry->value = calloc(1, sizeof(*mapentry->value));
-        assert(mapentry->value != NULL);
-        TAILQ_INIT(mapentry->value);
         mapentry->value = list_add(mapentry->value, value);
         HASH_ADD_KEYPTR(hh, *table, mapentry->key, strlen(mapentry->key), mapentry);
     } else {
-        /* on the off chance we have an empty list of values */
-        if (mapentry->value == NULL) {
-            mapentry->value = calloc(1, sizeof(*mapentry->value));
-            assert(mapentry->value != NULL);
-            TAILQ_INIT(mapentry->value);
-        }
-
         /* add to existing ignore list */
         mapentry->value = list_add(mapentry->value, value);
     }
@@ -1688,10 +1672,6 @@ struct rpminspect *init_rpminspect(struct rpminspect *ri, const char *cfgfile, c
 
     /* Initialize some lists if we did not get any config file data */
     if (ri->kernel_filenames == NULL) {
-        ri->kernel_filenames = calloc(1, sizeof(*ri->kernel_filenames));
-        assert(ri->kernel_filenames != NULL);
-        TAILQ_INIT(ri->kernel_filenames);
-
         for(i = 0; kernelnames[i] != NULL; i++) {
             ri->kernel_filenames = list_add(ri->kernel_filenames, kernelnames[i]);
         }
