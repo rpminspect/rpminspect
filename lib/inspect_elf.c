@@ -18,12 +18,16 @@
 #include <sys/types.h>
 #include <err.h>
 #include <inttypes.h>
-
 #include <dlfcn.h>
-#include <link.h>
-
-#include <gelf.h>
 #include <libelf.h>
+
+#ifndef PT_GNU_STACK
+#define PT_GNU_STACK 0x647e551 /* Indicate executable stack */
+#endif
+
+#ifndef PT_GNU_RELRO
+#define PT_GNU_RELRO 0x647e552 /* Make read-only after relocation */
+#endif
 
 #include "queue.h"
 #include "inspect.h"

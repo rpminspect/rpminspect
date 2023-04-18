@@ -19,7 +19,6 @@
 #include <gelf.h>
 #include <stdbool.h>
 #include <stdint.h>
-#include <elf.h>
 
 #include "types.h"
 
