@@ -127,7 +127,6 @@ deps = [
     mandoc,
     magic,
     clamav,
-    dl,
     icu_uc,
     icu_io,
     m,
@@ -135,6 +134,10 @@ deps = [
 
 if have_modularitylabel
     librpminspect_sources += [ 'inspect_modularity.c' ]
+endif
+
+if build_machine.system() != 'netbsd'
+    deps += [ dl ]
 endif
 
 if build_machine.system() != 'freebsd'

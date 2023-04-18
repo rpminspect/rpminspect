@@ -1,5 +1,12 @@
+# The 'realpath' command may be installed under a different name, in
+# which cas4e the calling environment can set the REALPATH variable to
+# the command to use.  For example, on NetBSD you need to install
+# coreutils from pkgsrc and the command will be install as
+# /usr/pkg/bin/grealpath.
+REALPATH ?= realpath
+
 MESON_BUILD_DIR = build
-topdir := $(shell realpath $(dir $(lastword $(MAKEFILE_LIST))))
+topdir := $(shell $(REALPATH) $(dir $(lastword $(MAKEFILE_LIST))))
 
 # Project information (may be an easier way to get this from meson)
 PROJECT_NAME = $(shell grep ^project $(topdir)/meson.build | cut -d "'" -f 2)

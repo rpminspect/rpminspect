@@ -19,8 +19,21 @@ add_global_arguments('-D_GNU_SOURCE', language : 'c')
 # Define this to get around a problematic json_object.h macro
 add_global_arguments('-D__STRICT_ANSI__', language : 'c')
 
+# On NetBSD we need to build without pedantic errors because of some
+# things in pkgsrc
+if build_machine.system() == 'netbsd'
+    add_global_arguments('-Wno-pedantic', language : 'c')
+endif
+
 # Library search dirs
-search_dirs = [ '/usr/local/lib', '/usr/lib64', '/usr/lib' ]
+search_dirs = [ '/usr/local/lib', '/usr/pkg/lib', '/usr/lib64', '/usr/lib' ]
+
+# Header search dirs
+if build_machine.system() == 'netbsd'
+    inc = include_directories( '/usr/local/include', '/usr/pkg/include', '/usr/include' )
+else
+    inc = include_directories( '/usr/local/include', '/usr/include' )
+endif
 
 # On FreeBSD, figure out where strverscmp() is
 libiberty = cc.find_library('iberty',
@@ -92,12 +105,15 @@ if get_option('with_libkmod')
     if build_machine.system() == 'freebsd'
         message('libkmod is not supported on FreeBSD, disabling support')
         libkmod = disabler()
+    elif build_machine.system() == 'netbsd'
+        message('libkmod is not supported on NetBSD, disabling support')
+        libkmod = disabler()
     else
         libkmod = dependency('libkmod', required : true)
         add_project_arguments('-D_WITH_LIBKMOD', language : 'c')
 
-        if not cc.has_header('libkmod.h')
-            if cc.has_header('kmod/libkmod.h')
+        if not cc.has_header('libkmod.h', include_directories : inc)
+            if cc.has_header('kmod/libkmod.h', include_directories : inc)
                 add_project_arguments('-D_LIBKMOD_HEADER_SUBDIR', language : 'c')
             else
                 error('*** unable to find libkmod.h')
@@ -241,10 +257,10 @@ if not cc.has_function('mparse_alloc', dependencies : [mandoc, zlib])
     error('*** unable to find mparse_alloc() in libmandoc')
 endif
 
-if cc.has_header('mandoc_parse.h')
+if cc.has_header('mandoc_parse.h', include_directories : inc)
     add_project_arguments('-DNEWLIBMANDOC', language : 'c')
 else
-    if cc.has_header('mandoc/mandoc_parse.h')
+    if cc.has_header('mandoc/mandoc_parse.h', include_directories : inc)
         add_project_arguments('-DNEWLIBMANDOC', language : 'c')
         add_project_arguments('-DMANDOC_INCLUDE_SUBDIR', language : 'c')
     else
@@ -267,6 +283,9 @@ magic = declare_dependency(link_args : ['-lmagic'])
 if get_option('with_libcap')
     if build_machine.system() == 'freebsd'
         message('libcap is not supported on FreeBSD, disabling support')
+        libcap = disabler()
+    elif build_machine.system() == 'netbsd'
+        message('libcap is not supported on NetBSD, disabling support')
         libcap = disabler()
     else
         libcap = dependency('libcap', method : 'pkg-config', required : false)
@@ -311,11 +330,14 @@ else
 endif
 
 # dlopen
-if not cc.has_function('dlopen', args : ['-ldl'], dependencies : [zlib])
-    error('*** unable to find dlopen() in libdl')
-endif
+if build_machine.system() != 'netbsd'
+    # dlopen() is in libc on NetBSD, but in libdl elsewhere
+    if not cc.has_function('dlopen', args : ['-ldl'], dependencies : [zlib])
+        error('*** unable to find dlopen() in libdl')
+    endif
 
-dl = declare_dependency(link_args : ['-ldl'])
+    dl = declare_dependency(link_args : ['-ldl'])
+endif
 
 # libm
 if not cc.has_function('round', args : ['-lm'])
@@ -332,7 +354,7 @@ m = declare_dependency(link_args : ['-lm'])
 cdson = dependency('cdson', required : true)
 
 # Check for sys/queue.h
-if not cc.has_header('sys/queue.h')
+if not cc.has_header('sys/queue.h', include_directories : inc)
     message('<sys/queue.h> not found, using bundled copy')
     add_project_arguments('-D_COMPAT_QUEUE', language : 'c')
 endif

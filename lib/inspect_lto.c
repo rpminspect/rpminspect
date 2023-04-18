@@ -14,7 +14,7 @@
 #include <unistd.h>
 #include <stdbool.h>
 #include <assert.h>
-#include <elf.h>
+#include <libelf.h>
 #include <rpm/header.h>
 #include "queue.h"
 #include "rpminspect.h"

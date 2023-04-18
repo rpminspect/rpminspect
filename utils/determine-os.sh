@@ -16,6 +16,11 @@ fi
 grep -q ^CRUX /etc/issue >/dev/null 2>&1
 IS_CRUX=$?
 
+# NetBSD does not have an /etc/os-release file
+if [ -z "${ID}" ] && [ ! -f /etc/os-release ]; then
+    ID="$(uname | tr [A-Z] [a-z])"
+fi
+
 if [ -r /etc/fedora-release ] && [ "${ID}" = "fedora" ]; then
     if grep -q -i rawhide /etc/fedora-release >/dev/null 2>&1 ; then
         echo "${ID}-rawhide"
@@ -82,7 +87,7 @@ elif [ -r /etc/debian_version ] && [ "${ID}" = "debian" ]; then
     esac
 else
     case "${ID}" in
-        opensuse-leap|opensuse-tumbleweed|ubuntu|debian|slackware|arch|gentoo|alpine|mageia|freebsd)
+        opensuse-leap|opensuse-tumbleweed|ubuntu|debian|slackware|arch|gentoo|alpine|mageia|freebsd|netbsd)
             echo "${ID}"
             ;;
         amzn)
