@@ -168,65 +168,6 @@ class ForbiddenDirectoryCompareKoji(TestCompareKoji):
         self.waiver_auth = "Anyone"
 
 
-# Expected security mode as defined in fileinfo -> INFO
-class ExpectedSecurityModeRPMs(TestRPMs):
-    def setUp(self):
-        super().setUp()
-
-        self.rpm.add_installed_file(
-            "usr/bin/mount", rpmfluff.SourceFile("mount.bin", ri_bytes), mode="4755"
-        )
-
-        self.inspection = "addedfiles"
-        self.result = "INFO"
-        self.waiver_auth = "Not Waivable"
-
-
-class ExpectedSecurityModeKoji(TestKoji):
-    def setUp(self):
-        super().setUp()
-
-        self.rpm.add_installed_file(
-            "usr/bin/mount", rpmfluff.SourceFile("mount.bin", ri_bytes), mode="4755"
-        )
-
-        self.inspection = "addedfiles"
-        self.result = "INFO"
-        self.waiver_auth = "Not Waivable"
-
-
-class ExpectedSecurityModeCompareRPMs(TestCompareRPMs):
-    def setUp(self):
-        super().setUp()
-
-        self.before_rpm.add_installed_file(
-            "usr/bin/mount", rpmfluff.SourceFile("mount.bin", ri_bytes), mode="4755"
-        )
-        self.after_rpm.add_installed_file(
-            "usr/bin/mount", rpmfluff.SourceFile("mount.bin", ri_bytes), mode="4755"
-        )
-
-        self.inspection = "addedfiles"
-        self.result = "INFO"
-        self.waiver_auth = "Not Waivable"
-
-
-class ExpectedSecurityModeCompareKoji(TestCompareKoji):
-    def setUp(self):
-        super().setUp()
-
-        self.before_rpm.add_installed_file(
-            "usr/bin/mount", rpmfluff.SourceFile("mount.bin", ri_bytes), mode="4755"
-        )
-        self.after_rpm.add_installed_file(
-            "usr/bin/mount", rpmfluff.SourceFile("mount.bin", ri_bytes), mode="4755"
-        )
-
-        self.inspection = "addedfiles"
-        self.result = "INFO"
-        self.waiver_auth = "Not Waivable"
-
-
 # Unexpected security file (not defined in fileinfo) -> BAD
 # This check only happens for comparison runs because rpminspect needs a
 # before build to know that something new was added.
