@@ -29,8 +29,8 @@
 #     caps           Check file capabilities(7)
 #     execstack      Check for executable stack in ELF objects or programs
 #                    built without GNU_STACK.
-#     relro          Check for ELF objects losing GNU_RELRO protection.
-#     fortifysource  Check for ELF objects losing -D_FORTIFY_SOURCE.
+#     relro          Check for ELF objects without GNU_RELRO protection.
+#     fortifysource  Check for ELF objects without -D_FORTIFY_SOURCE.
 #     pic            Check for ELF objects built without -fPIC in static
 #                    libraries.
 #     textrel        Check for an TEXTREL relocations.
@@ -52,7 +52,16 @@
 #     FAIL           The finding is reported at the BAD level, which does
 #                    trigger a failing exit code.
 #
+# Paths to files are referenced relative to the installed system.  In
+# the case of source RPMs, the path is referenced from the top of the
+# %prep'ed source tree.  For example if you have a file that extracts
+# to projectname-1.2.3/src/somefile.c and you need to set a rule for
+# it, you can specify the path as "src/somefile.c".  For source files
+# that appear directly in a source RPM, you may just specify it as-is
+# without any leading directory specification.  Wildcards work for
+# path specifications in the same style you expect from the shell.
 
 #<path>           <package>   <version>   <release>   <rules>
 /usr/bin/slirp    slirp       *           *           caps=SKIP,execStack=INFORM,RELRO=verify,FortifySOURCE=FAIL,pic=inform,TEXTrel=Verify,setUID=FaIl,worldwritable=Skip,SECURITYPATH=verify,Modes=Inform
 /usr/bin/xanim    xanim       *           *           relro=inform,pic=SKIP
+test/badcode.c    procmail    *           *           unicode=SKIP

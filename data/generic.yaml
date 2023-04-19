@@ -929,14 +929,6 @@ unicode:
         - '0x2068'
         - '0x2069'
 
-    # Optional list of glob(7) specifications or path prefixes to
-    # match files to ignore for this inspection.  The format of this
-    # list is the same as the global 'ignore' list.  The difference is
-    # the items specified here will only be used during this
-    # inspection.
-    #ignore:
-    #    - /usr/lib*/libexample.so*
-
 rpmdeps:
     # Optional list of regular expressions to match against
     # requirement names to ignore.  For example, a dependency of the
@@ -975,24 +967,6 @@ rpmdeps:
     # Only one regexp can be expressed for each dependency type.
     # Additional listings will overwrite previous definitions in the
     # runtime configuration.
-
-virus:
-    # Optional list of glob(7) specifications or path prefixes to
-    # match files to ignore for this inspection.  The format of this
-    # list is the same as the global 'ignore' list.  The difference is
-    # the items specified here will only be used during this
-    # inspection.
-    #ignore:
-    #    - /usr/lib*/libexample.so*
-
-capabilities:
-    # Optional list of glob(7) specifications or path prefixes to
-    # match files to ignore for this inspection.  The format of this
-    # list is the same as the global 'ignore' list.  The difference is
-    # the items specified here will only be used during this
-    # inspection.
-    #ignore:
-    #    - /usr/lib*/libexample.so*
 
 config:
     # Optional list of glob(7) specifications or path prefixes to
