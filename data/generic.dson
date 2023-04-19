@@ -132,8 +132,6 @@ such "common" is such "workdir" is "/var/tmp/rpminspect",
                                                     "0x2068" and
                                                     "0x2069" many wow.
      "rpmdeps" is empty!
-     "virus" is empty?
-     "capabilities" is empty!
      "config" is empty!
      "doc" is empty!
      "kmod" is empty!
