@@ -31,6 +31,7 @@ class ExecutableWithSetUIDSRPM(TestSRPM):
         )
 
         self.inspection = "permissions"
+        # SRPM is a no-op
         self.result = "OK"
 
 
@@ -84,6 +85,7 @@ class ExecutableWithSetUIDCompareSRPM(TestCompareSRPM):
         )
 
         self.inspection = "permissions"
+        # SRPM is a no-op
         self.result = "OK"
 
 
