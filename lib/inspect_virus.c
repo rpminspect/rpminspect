@@ -148,7 +148,7 @@ bool inspect_virus(struct rpminspect *ri)
     errno = 0;
 
     while ((de = readdir(d)) != NULL) {
-        if (!strcmp(de->d_name, ".") || !strcmp(de->d_name, "..") || !strsuffix(de->d_name, ".cvd")) {
+        if (!strcmp(de->d_name, ".") || !strcmp(de->d_name, "..") || !strsuffix(de->d_name, ".cvd") || !strsuffix(de->d_name, ".cld")) {
             continue;
         }
 
