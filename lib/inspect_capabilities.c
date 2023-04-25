@@ -79,7 +79,7 @@ static bool capabilities_driver(struct rpminspect *ri, rpmfile_entry_t *file)
             params.severity = get_secrule_result_severity(ri, file, SECRULE_CAPS);
 
             if (params.severity != RESULT_NULL && params.severity != RESULT_SKIP) {
-                xasprintf(&params.msg, _("File capabilities for %s changed from '%s' to '%s' on %s\n"), file->localpath, before, after, arch);
+                xasprintf(&params.msg, _("File capabilities for %s changed from '%s' to '%s' in %s on %s\n"), file->localpath, before, after, name, arch);
                 xasprintf(&params.remedy, REMEDY_CAPABILITIES, ri->caps_filename);
                 params.waiverauth = WAIVABLE_BY_SECURITY;
                 params.verb = VERB_CHANGED;
@@ -95,7 +95,7 @@ static bool capabilities_driver(struct rpminspect *ri, rpmfile_entry_t *file)
                 reported = true;
             }
         } else if (!cap_compare(beforecap, aftercap) && (ri->tests & INSPECT_CAPABILITIES)) {
-            xasprintf(&params.msg, _("File capabilities found for %s: '%s' on %s\n"), file->localpath, after, arch);
+            xasprintf(&params.msg, _("File capabilities found for %s: '%s' in %s on %s\n"), file->localpath, after, name, arch);
             params.severity = RESULT_INFO;
             params.waiverauth = NOT_WAIVABLE;
             params.verb = VERB_OK;
@@ -128,20 +128,60 @@ static bool capabilities_driver(struct rpminspect *ri, rpmfile_entry_t *file)
         expected = cap_from_text(flcaps->caps);
     }
 
-    if (aftercap && expected) {
-        if (!cap_compare(aftercap, expected) && (ri->tests & INSPECT_CAPABILITIES)) {
-            xasprintf(&params.msg, _("File capabilities list entry found for %s: '%s' on %s, matches package\n"), file->localpath, flcaps->caps, arch);
-            params.severity = RESULT_INFO;
-            params.waiverauth = NOT_WAIVABLE;
-            params.verb = VERB_OK;
-            add_result(ri, &params);
-            free(params.msg);
-            reported = true;
-        } else if (cap_compare(aftercap, expected) && (ri->tests & INSPECT_CAPABILITIES)) {
+    if (!beforecap) {
+        if (aftercap && expected) {
+            if (!cap_compare(aftercap, expected) && (ri->tests & INSPECT_CAPABILITIES)) {
+                xasprintf(&params.msg, _("File capabilities list entry found for %s: '%s' in %s on %s, matches package\n"), file->localpath, flcaps->caps, name, arch);
+                params.severity = RESULT_INFO;
+                params.waiverauth = NOT_WAIVABLE;
+                params.verb = VERB_OK;
+                add_result(ri, &params);
+                free(params.msg);
+                reported = true;
+            } else if (cap_compare(aftercap, expected) && (ri->tests & INSPECT_CAPABILITIES)) {
+                params.severity = get_secrule_result_severity(ri, file, SECRULE_CAPS);
+
+                if (params.severity != RESULT_NULL && params.severity != RESULT_SKIP) {
+                    xasprintf(&params.msg, _("File capabilities list mismatch for %s: expected '%s', got '%s' in %s on %s\n"), file->localpath, flcaps->caps, after, name, arch);
+                    xasprintf(&params.remedy, REMEDY_CAPABILITIES, ri->caps_filename);
+                    params.waiverauth = WAIVABLE_BY_SECURITY;
+                    params.verb = VERB_FAILED;
+                    params.noun = _("${FILE} capabilities list on ${ARCH}");
+                    add_result(ri, &params);
+                    free(params.msg);
+                    free(params.remedy);
+
+                    if (params.severity >= RESULT_VERIFY) {
+                        result = false;
+                    }
+
+                    reported = true;
+                }
+            }
+        } else if (aftercap && !expected) {
             params.severity = get_secrule_result_severity(ri, file, SECRULE_CAPS);
 
             if (params.severity != RESULT_NULL && params.severity != RESULT_SKIP) {
-                xasprintf(&params.msg, _("File capabilities list mismatch for %s: expected '%s', got '%s'\n"), file->localpath, flcaps->caps, after);
+                xasprintf(&params.msg, _("File capabilities for %s (%s) not found on the capabilities list in %s on %s\n"), file->localpath, after, name, arch);
+                xasprintf(&params.remedy, REMEDY_CAPABILITIES, ri->caps_filename);
+                params.waiverauth = WAIVABLE_BY_SECURITY;
+                params.verb = VERB_REMOVED;
+                params.noun = _("${FILE} capabilities list on ${ARCH}");
+                add_result(ri, &params);
+                free(params.msg);
+                free(params.remedy);
+
+                if (params.severity >= RESULT_VERIFY) {
+                    result = false;
+                }
+
+                reported = true;
+            }
+        } else if (!aftercap && expected) {
+            params.severity = get_secrule_result_severity(ri, file, SECRULE_CAPS);
+
+            if (params.severity != RESULT_NULL && params.severity != RESULT_SKIP) {
+                xasprintf(&params.msg, _("File capabilities expected for %s in %s but not found on %s: expected '%s'\n"), file->localpath, name, arch, flcaps->caps);
                 xasprintf(&params.remedy, REMEDY_CAPABILITIES, ri->caps_filename);
                 params.waiverauth = WAIVABLE_BY_SECURITY;
                 params.verb = VERB_FAILED;
@@ -156,44 +196,6 @@ static bool capabilities_driver(struct rpminspect *ri, rpmfile_entry_t *file)
 
                 reported = true;
             }
-        }
-    } else if (aftercap && !expected) {
-        params.severity = get_secrule_result_severity(ri, file, SECRULE_CAPS);
-
-        if (params.severity != RESULT_NULL && params.severity != RESULT_SKIP) {
-            xasprintf(&params.msg, _("File capabilities for %s (%s) not found on the capabilities list on %s\n"), file->localpath, after, arch);
-            xasprintf(&params.remedy, REMEDY_CAPABILITIES, ri->caps_filename);
-            params.waiverauth = WAIVABLE_BY_SECURITY;
-            params.verb = VERB_REMOVED;
-            params.noun = _("${FILE} capabilities list on ${ARCH}");
-            add_result(ri, &params);
-            free(params.msg);
-            free(params.remedy);
-
-            if (params.severity >= RESULT_VERIFY) {
-                result = false;
-            }
-
-            reported = true;
-        }
-    } else if (!aftercap && expected) {
-        params.severity = get_secrule_result_severity(ri, file, SECRULE_CAPS);
-
-        if (params.severity != RESULT_NULL && params.severity != RESULT_SKIP) {
-            xasprintf(&params.msg, _("File capabilities expected for %s but not found on %s: expected '%s'\n"), file->localpath, arch, flcaps->caps);
-            xasprintf(&params.remedy, REMEDY_CAPABILITIES, ri->caps_filename);
-            params.waiverauth = WAIVABLE_BY_SECURITY;
-            params.verb = VERB_FAILED;
-            params.noun = _("${FILE} capabilities list on ${ARCH}");
-            add_result(ri, &params);
-            free(params.msg);
-            free(params.remedy);
-
-            if (params.severity >= RESULT_VERIFY) {
-                result = false;
-            }
-
-            reported = true;
         }
     }
 
