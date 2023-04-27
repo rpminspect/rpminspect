@@ -34,11 +34,21 @@ static bool seen = false;
 /* these globals are used by the nftw() helper */
 static char *root = NULL;
 static char *build = NULL;
+static bool uses_unpack_base = false;
 static struct rpminspect *globalri = NULL;
 static bool globalresult = true;
 static UChar32_list_t *forbidden = NULL;
+static const char *globalspec = NULL;
 static const char *globalarch = NULL;
 static rpmfile_entry_t *globalfile = NULL;
+
+/*
+ * Template for mkdtemp() when manual extraction of source archives
+ * has to happen.  This would be used when rpminspect cannot execute
+ * the spec file through the %prep section.
+ */
+#define UNPACK_BASE     "unpack-"
+#define UNPACK_TEMPLATE UNPACK_BASE"XXXXXX"
 
 /*
  * Helper function to create a ~/rpmbuild tree in the working directory.
@@ -330,10 +340,11 @@ static char *manual_prep_source(struct rpminspect *ri, const rpmfile_entry_t *fi
             }
 
             /* create a unique subdirectory for this source file */
-            xasprintf(&extractdir, "%s/unpack-XXXXXX", build);
+            xasprintf(&extractdir, "%s/%s", build, UNPACK_TEMPLATE);
             assert(extractdir != NULL);
             extractdir = mkdtemp(extractdir);
             assert(extractdir != NULL);
+            uses_unpack_base = true;
 
             /* try to unpack the file */
             if (unpack_archive(srcfile, extractdir, true)) {
@@ -434,6 +445,14 @@ static int validate_file(const char *fpath, __attribute__((unused)) const struct
          *     rpminspect-1.47.0/lib/magic.c
          */
         localpath += strlen(build);
+
+        /*
+         * for manual_prep_source() runs, also account for a potential
+         * unpack-XXXXXX/ leading directory and trim that too
+         */
+        if (uses_unpack_base && strprefix(localpath, UNPACK_BASE)) {
+            localpath += strlen(UNPACK_BASE);
+        }
     } else if (root && strprefix(localpath, root)) {
         /* this is a source file directly in the SRPM */
         localpath += strlen(root);
@@ -447,10 +466,6 @@ static int validate_file(const char *fpath, __attribute__((unused)) const struct
 
     if (localpath == NULL) {
         warnx(_("empty localpath on %s"), fpath);
-        return 0;
-    }
-
-    if (ignore_path(globalri, NAME_UNICODE, localpath, build)) {
         return 0;
     }
 
@@ -528,13 +543,13 @@ static int validate_file(const char *fpath, __attribute__((unused)) const struct
                     } else {
                         params.waiverauth = WAIVABLE_BY_SECURITY;
                         params.verb = VERB_FAILED;
+                        globalresult = false;
                     }
 
                     colnum = u_strlen(line) - u_strlen(needle);
-                    xasprintf(&params.msg, _("A forbidden code point was found in the %s source file on line %ld at column %ld."), localpath, linenum, colnum);
+                    xasprintf(&params.msg, _("A forbidden code point, 0x%04X, was found in the %s source file on line %ld at column %ld.  This source file is used by %s."), *needle, localpath, linenum, colnum, globalspec);
                     add_result(globalri, &params);
                     free(params.msg);
-                    globalresult = false;
                 }
             }
         }
@@ -577,18 +592,26 @@ static bool unicode_driver(struct rpminspect *ri, rpmfile_entry_t *file)
 
     /* when the spec file is found, prepare the source tree and check each file there */
     if (strsuffix(file->localpath, SPEC_FILENAME_EXTENSION)) {
-        if ((build = rpm_prep_source(ri, file, &params.details)) != NULL) {
-            /* for the spec file, examine each file in the prepared source tree */
+        /* for the spec file, examine each file in the prepared source tree */
+        build = rpm_prep_source(ri, file, &params.details);
+
+        if (build) {
             prepped = true;
-        } else if ((build = manual_prep_source(ri, file)) != NULL) {
-            /* try to fall back on unpacking archives manually */
-            prepped = true;
-            free(params.details);
-            params.details = NULL;
         }
 
+        /* try to fall back on unpacking archives manually */
         if (!prepped) {
-            /* failure case where we can't prep the source tree or manually unpack archives */
+            build = manual_prep_source(ri, file);
+
+            if (build) {
+                prepped = true;
+                free(params.details);
+                params.details = NULL;
+            }
+        }
+
+        /* failure case where we can't prep the source tree or manually unpack archives */
+        if (!prepped) {
             params.severity = RESULT_BAD;
             params.waiverauth = NOT_WAIVABLE;
             params.header = NAME_UNICODE;
@@ -606,6 +629,10 @@ static bool unicode_driver(struct rpminspect *ri, rpmfile_entry_t *file)
             free(globalfile);
             return false;
         }
+
+        /* copy the name of the spec file */
+        globalspec = file->localpath;
+        assert(globalspec != NULL);
 
         /* our tree dive result is saved in 'globalresult', -1 here is an internal error */
         if (nftw(build, validate_file, FOPEN_MAX, FTW_MOUNT|FTW_PHYS) == -1) {
@@ -672,11 +699,6 @@ bool inspect_unicode(struct rpminspect *ri)
             root = peer->after_root;
 
             TAILQ_FOREACH(file, peer->after_files, items) {
-                /* Ignore files we should be ignoring */
-                if (ignore_path(ri, NAME_UNICODE, file->localpath, peer->after_root)) {
-                    continue;
-                }
-
                 if (!unicode_driver(ri, file)) {
                     result = false;
                 }
