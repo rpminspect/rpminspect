@@ -626,7 +626,11 @@ static bool unicode_driver(struct rpminspect *ri, rpmfile_entry_t *file)
             free(params.details);
 
             seen = true;
+            (void) rmtree(build, true, false);
+
+            free(build);
             free(globalfile);
+
             return false;
         }
 
@@ -640,7 +644,10 @@ static bool unicode_driver(struct rpminspect *ri, rpmfile_entry_t *file)
         }
 
         seen = true;
+        (void) rmtree(build, true, false);
+
         free(params.details);
+        free(build);
     }
 
     /* check the individual file */
@@ -736,6 +743,5 @@ bool inspect_unicode(struct rpminspect *ri)
         result = true;
     }
 
-    free(build);
     return result;
 }
