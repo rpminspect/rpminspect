@@ -219,6 +219,16 @@ static char *rpm_prep_source(struct rpminspect *ri, const rpmfile_entry_t *file,
             warn("close");
         }
 
+        if (close(STDOUT_FILENO)) {
+            warn("close");
+            _exit(EXIT_FAILURE);
+        }
+
+        if (close(STDERR_FILENO)) {
+            warn("close");
+            _exit(EXIT_FAILURE);
+        }
+
         _exit(status);
     } else if (proc == -1) {
         /* failure */
@@ -262,7 +272,7 @@ static char *rpm_prep_source(struct rpminspect *ri, const rpmfile_entry_t *file,
 
         /* wipe the working directory if %prep failed */
         if (WEXITSTATUS(status) == 2) {
-            rmtree(build, true, true);
+            (void) rmtree(build, true, true);
             free(build);
             build = NULL;
         }
