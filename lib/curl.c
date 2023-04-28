@@ -160,6 +160,7 @@ static int legacy_download_progress(void *p, double dltotal, double dlnow, doubl
 void curl_get_file(const bool verbose, const char *src, const char *dst)
 {
     FILE *fp = NULL;
+    char *archive = NULL;
     CURL *c = NULL;
     CURLcode cc;
 
@@ -181,13 +182,19 @@ void curl_get_file(const bool verbose, const char *src, const char *dst)
     curl_easy_setopt(c, CURLOPT_MAXREDIRS, 10L);
 
     if (verbose) {
+        if (isatty(STDOUT_FILENO) == 1) {
 #if LIBCURL_VERSION_NUM >= 0x072000
-        curl_easy_setopt(c, CURLOPT_XFERINFOFUNCTION, download_progress);
+            curl_easy_setopt(c, CURLOPT_XFERINFOFUNCTION, download_progress);
 #else
-        curl_easy_setopt(c, CURLOPT_PROGRESSFUNCTION, legacy_download_progress);
+            curl_easy_setopt(c, CURLOPT_PROGRESSFUNCTION, legacy_download_progress);
 #endif
-        curl_easy_setopt(c, CURLOPT_NOPROGRESS, 0L);
-        setup_progress_bar(src);
+            curl_easy_setopt(c, CURLOPT_NOPROGRESS, 0L);
+            setup_progress_bar(src);
+        } else {
+            archive = rindex(src, '/') + 1;
+            assert(archive != NULL);
+            printf(">>> %s", archive);
+        }
     }
 
     /* perform the download */
