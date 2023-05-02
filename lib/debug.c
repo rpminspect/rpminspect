@@ -142,6 +142,10 @@ void dump_cfg(const struct rpminspect *ri)
     }
 #endif
 
+    if (ri->commands.udevadm) {
+        printf("    udevadm: %s\n", ri->commands.udevadm);
+    }
+
     /* vendor */
 
     printf("vendor:\n");
@@ -906,6 +910,25 @@ void dump_cfg(const struct rpminspect *ri)
         }
 
         dump_inspection_ignores(ri->inspection_ignores, NAME_DEBUGINFO);
+    }
+
+    /* udevrules */
+
+    HASH_FIND_STR(ri->inspection_ignores, NAME_UDEVRULES, mapentry);
+
+    if ((ri->udev_rules_dirs && !TAILQ_EMPTY(ri->udev_rules_dirs))
+        || mapentry != NULL) {
+        printf("udevrules:\n");
+
+        if (ri->udev_rules_dirs && !TAILQ_EMPTY(ri->udev_rules_dirs)) {
+            printf("    udev_rules_dirs:\n");
+
+            TAILQ_FOREACH(entry, ri->udev_rules_dirs, items) {
+                printf("        - %s\n", entry->data);
+            }
+        }
+
+        dump_inspection_ignores(ri->inspection_ignores, NAME_UDEVRULES);
     }
 
     printf("\n\n");

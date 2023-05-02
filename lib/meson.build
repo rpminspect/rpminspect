@@ -71,6 +71,7 @@ librpminspect_sources = [
     'inspect_subpackages.c',
     'inspect_symlinks.c',
     'inspect_types.c',
+    'inspect_udevrules.c',
     'inspect_unicode.c',
     'inspect_upstream.c',
     'inspect_virus.c',

@@ -223,6 +223,7 @@ void free_rpminspect(struct rpminspect *ri)
 #ifdef _WITH_ANNOCHECK
     free(ri->commands.annocheck);
 #endif
+    free(ri->commands.udevadm);
 
     list_free(ri->buildhost_subdomain, free, true);
     list_free(ri->macrofiles, free, true);
@@ -270,6 +271,7 @@ void free_rpminspect(struct rpminspect *ri)
     list_free(ri->unicode_forbidden_codepoints, free, true);
     free_deprule_ignore_map(ri->deprules_ignore);
     free(ri->debuginfo_sections);
+    list_free(ri->udev_rules_dirs, free);
 
     free_peers(ri->peers);
 

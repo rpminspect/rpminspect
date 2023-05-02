@@ -773,6 +773,15 @@
 
 /** @} */
 
+/**
+ * @def REMEDY_UDEVRULES
+ *
+ * How to address syntax check issues in udev rules files.
+ */
+#define REMEDY_UDEVRULES _("Refer to the udev documentation at https://www.freedesktop.org/software/systemd/man/udev.html for help correcting the errors and warnings.")
+
+/** @} */
+
 /** @} */
 
 #endif

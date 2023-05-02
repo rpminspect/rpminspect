@@ -61,6 +61,9 @@ commands:
     #abidiff: /usr/bin/abidiff
     #kmidiff: /usr/bin/kmidiff
 
+    # udevadm from the systemd project
+    #udevadm: udevadm
+
 vendor:
     # Where the vendor data files can be found.  The
     # rpminspect-data-generic package provides a template of where
@@ -158,6 +161,7 @@ vendor:
     #upstream: off
     #virus: off
     #xml: off
+    #udevrules: off
 
 #products:
     # Product release string matches.  rpminspect uses product release
@@ -1039,3 +1043,9 @@ debuginfo:
     # instance, some systems add a .gdb_index section to debuginfo
     # file.  This is a space-delimited string of section names.
     debuginfo_sections: .symtab .debug_info
+
+udevrules:
+    # Directories where udev rules live.
+    #udev_rules_dirs:
+    #    - /etc/udev/rules.d/
+    #    - /usr/lib/udev/rules.d/

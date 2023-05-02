@@ -78,6 +78,7 @@ struct inspect inspections[] = {
     { INSPECT_SUBPACKAGES,   "subpackages",   false, false, &inspect_subpackages },
     { INSPECT_SYMLINKS,      "symlinks",      false, true,  &inspect_symlinks },
     { INSPECT_TYPES,         "types",         false, false, &inspect_types },
+    { INSPECT_UDEVRULES,     "udevrules",     false, true,  &inspect_udevrules },
     { INSPECT_UNICODE,       "unicode",       true,  true,  &inspect_unicode },
     { INSPECT_UPSTREAM,      "upstream",      false, false, &inspect_upstream },
     { INSPECT_VIRUS,         "virus",         true,  true,  &inspect_virus },
@@ -252,6 +253,8 @@ uint64_t inspection_id(const char *name)
         return INSPECT_RPMDEPS;
     } else if (!strcmp(name, NAME_DEBUGINFO)) {
         return INSPECT_DEBUGINFO;
+    } else if (!strcmp(name, NAME_UDEVRULES)) {
+        return INSPECT_UDEVRULES;
     } else {
         return INSPECT_NULL;
     }
@@ -361,6 +364,8 @@ const char *inspection_desc(const uint64_t inspection)
             return DESC_RPMDEPS;
         case INSPECT_DEBUGINFO:
             return DESC_DEBUGINFO;
+        case INSPECT_UDEVRULES:
+            return DESC_UDEVRULES;
         default:
             return NULL;
     }
@@ -471,6 +476,8 @@ const char *inspection_header_to_desc(const char *header)
         i = INSPECT_RPMDEPS;
     } else if (!strcmp(header, NAME_DEBUGINFO)) {
         i = INSPECT_DEBUGINFO;
+    } else if (!strcmp(header, NAME_UDEVRULES)) {
+        i = INSPECT_UDEVRULES;
     }
 
     return inspection_desc(i);

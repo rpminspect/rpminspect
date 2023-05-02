@@ -378,6 +378,13 @@
  */
 #define KMIDIFF_KMI_WHITELIST "--kmi-whitelist"
 
+/**
+ * @def UDEVADM_CMD
+ *
+ * Executable providing udevadm verify.
+ */
+#define UDEVADM_CMD "udevadm"
+
 /** @} */
 
 /**
@@ -639,6 +646,13 @@
  * this extension ends with a period.
  */
 #define ELF_LIB_EXTENSION ".so."
+
+/**
+ * @def UDEV_RULES_FILENAME_EXTENSION
+ *
+ * udev rules filename extension
+ */
+#define UDEV_RULES_FILENAME_EXTENSION ".rules"
 
 /** @} */
 
