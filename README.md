@@ -153,6 +153,7 @@ there are a number of userspace programs used:
     /usr/bin/msgunfmt
     /usr/bin/abidiff [optional]
     /usr/bin/kmidiff [optional]
+    /usr/bin/udevadm [optional]
 
 The provided spec file template uses the Fedora locations for these
 files, but in the program, they must be on the runtime system.

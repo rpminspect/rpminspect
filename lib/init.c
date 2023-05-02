@@ -49,6 +49,13 @@ static const char *SHELLS[] = {"sh", "ksh", "zsh", "csh", "tcsh", "rc", "bash", 
 /* Supported config filename endings (we assume type by this) */
 static const char *CFG_FILENAME_EXTENSIONS[] = {"yaml", "json", "dson", NULL};
 
+/**
+ * @def UDEV_RULES_DIRS
+ * NULL terminated array of strings of directories where udev rules files
+ * may reside.
+ */
+static const char *UDEV_RULES_DIRS[] = {"/etc/udev/rules.d/", "/usr/lib/udev/rules.d/", NULL};
+
 static int add_regex(const char *pattern, regex_t **regex_out)
 {
     int reg_result;
@@ -595,6 +602,7 @@ static void read_cfgfile(struct rpminspect *ri, const char *filename)
     strget(p, ctx, "commands", "desktop-file-validate", &ri->commands.desktop_file_validate);
     strget(p, ctx, "commands", "abidiff", &ri->commands.abidiff);
     strget(p, ctx, "commands", "kmidiff", &ri->commands.kmidiff);
+    strget(p, ctx, "commands", "udevadm", &ri->commands.udevadm);
     strget(p, ctx, "vendor", "vendor_data_dir", &ri->vendor_data_dir);
     array(p, ctx, "vendor", "licensedb", &ri->licensedb);
 
@@ -834,6 +842,9 @@ static void read_cfgfile(struct rpminspect *ri, const char *filename)
     add_ignores(ri, p, ctx, "upstream");
     add_ignores(ri, p, ctx, "debuginfo");
     strget(p, ctx, "debuginfo", "debuginfo_sections", &ri->debuginfo_sections);
+
+    array(p, ctx, "udevrules", "udev_rules_dirs", &ri->udev_rules_dirs);
+    add_ignores(ri, p, ctx, "udevrules");
 
     p->fini(ctx);
     return;
@@ -1555,6 +1566,7 @@ struct rpminspect *calloc_rpminspect(struct rpminspect *ri)
     ri->annocheck_failure_severity = RESULT_VERIFY;
     ri->size_threshold = -1;
     ri->debuginfo_sections = strdup(ELF_SYMTAB" "ELF_DEBUG_INFO);
+    ri->udev_rules_dirs = list_from_array(UDEV_RULES_DIRS);
 
     /* Initialize commands */
     ri->commands.msgunfmt = strdup(MSGUNFMT_CMD);
@@ -1564,6 +1576,7 @@ struct rpminspect *calloc_rpminspect(struct rpminspect *ri)
 #ifdef _WITH_ANNOCHECK
     ri->commands.annocheck = strdup(ANNOCHECK_CMD);
 #endif
+    ri->commands.udevadm = strdup(UDEVADM_CMD);
 
     /* Store full paths to all config files read */
     if (ri->cfgfiles == NULL) {

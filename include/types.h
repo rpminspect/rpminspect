@@ -389,6 +389,7 @@ struct command_paths {
 #ifdef _WITH_ANNOCHECK
     char *annocheck;
 #endif
+    char *udevadm;
 };
 
 /* Hash table used for key/value situations where each is a string. */
@@ -684,6 +685,9 @@ struct rpminspect {
 
     /* debuginfo ELF section name(s) when checking for debugging symbols */
     char *debuginfo_sections;
+
+    /* Directories where udev rules live */
+    string_list_t *udev_rules_dirs;
 
     /* Options specified by the user */
     char *before;              /* before build ID arg given on cmdline */

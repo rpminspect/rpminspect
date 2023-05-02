@@ -712,6 +712,16 @@ bool inspect_rpmdeps(struct rpminspect *ri);
  */
 bool inspect_debuginfo(struct rpminspect *ri);
 
+/**
+ * @brief Perform the 'udevrules' inspection.
+ *
+ * Perform syntax check on udev rules files using udevadm verify.
+ *
+ * @param ri Pointer to the struct rpminspect for the program.
+ * @return True if the inspection passed, false otherwise.
+ */
+bool inspect_udevrules(struct rpminspect *ri);
+
 /** @} */
 
 /**
@@ -1010,6 +1020,12 @@ bool inspect_debuginfo(struct rpminspect *ri);
  */
 #define INSPECT_DEBUGINFO                   (((uint64_t) 1) << 45)
 
+/**
+ * @def INSPECT_UDEVRULES
+ * 'udevrules' inspection ID.
+ */
+#define INSPECT_UDEVRULES                   (((uint64_t) 1) << 46)
+
 /** @} */
 
 /**
@@ -1304,6 +1320,12 @@ bool inspect_debuginfo(struct rpminspect *ri);
  */
 #define NAME_DEBUGINFO                      "debuginfo"
 
+/**
+ * @def NAME_UDEVRULES
+ * The string "udevrules"
+ */
+#define NAME_UDEVRULES                      "udevrules"
+
 /** @} */
 
 /**
@@ -1591,6 +1613,12 @@ bool inspect_debuginfo(struct rpminspect *ri);
  * The description for the 'debuginfo' inspection.
  */
 #define DESC_DEBUGINFO _("Checks that files in RPM packages have their debugging symbols stripped and files in debuginfo packages carry debugging symbols.  When comparing builds, report where symbols unexpectedly appear or disappear and what corrective action is needed.")
+
+/**
+ * @def DESC_UDEVRULES
+ * The description for the 'udevrules' inspection.
+ */
+#define DESC_UDEVRULES _("Perform syntax check on udev rules files using udevadm verify.")
 
 /** @} */
 

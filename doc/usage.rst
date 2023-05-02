@@ -424,6 +424,10 @@ program.
     dependency metadata when inspecting a single build and report
     findings.
 
+- **udevrules**
+
+    Perform syntax check on udev rules files using udevadm verify.
+
 **Comparison Mode**
 
 These inspections run when a before and after build are specified as

@@ -117,6 +117,15 @@ Recommends:     libabigail >= 2.3
 Requires:       libabigail >= 2.3
 %endif
 
+# The udevrules inspection requires an external executable (udevadm verify)
+# provided by systemd-udev.  If the installed udevadm executable does not
+# provide 'verify' command, the udevrules inspection is skipped.
+%if 0%{?rhel} >= 8 || 0%{?epel} >= 8 || 0%{?fedora}
+Recommends:     systemd-udev
+%else
+Requires:       systemd-udev
+%endif
+
 %description -n librpminspect
 The library providing the backend test functionality and API for the
 rpminspect frontend program.  This library can also be used by other
