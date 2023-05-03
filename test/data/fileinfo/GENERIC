@@ -1,2 +1,4 @@
 -rwsr-xr-x          root       root       /usr/bin/mount
 -rwsr-xr-x          root       root       /usr/bin/umount
+-rwsr-xr-x          bin        bin        /usr/ucb/sowner
+-rwxr-sr-x          bin        bin        /usr/ucb/sgroup

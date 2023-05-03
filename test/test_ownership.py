@@ -3016,3 +3016,559 @@ class FileGroupChangedCompareKoji(TestCompareKoji):
         self.inspection = "ownership"
         self.result = "BAD"
         self.waiver_auth = "Anyone"
+
+
+#######################################
+# Unexpected ownership on setuid file #
+#######################################
+
+
+class ExpectedSetuidOwnerRPMs(TestRPMs):
+    def setUp(self):
+        super().setUp()
+
+        self.rpm.add_installed_file(
+            installPath="usr/ucb/sowner",
+            sourceFile=rpmfluff.SourceFile("rpminspect", ri_bytes),
+            owner="bin",
+            group="bin",
+            mode="4755",
+        )
+
+        self.inspection = "ownership"
+        self.result = "INFO"
+        self.waiver_auth = "Not Waivable"
+
+
+class UnexpectedSetuidOwnerRPMs(TestRPMs):
+    def setUp(self):
+        super().setUp()
+
+        self.rpm.add_installed_file(
+            installPath="usr/ucb/sowner",
+            sourceFile=rpmfluff.SourceFile("rpminspect", ri_bytes),
+            owner="root",
+            group="bin",
+            mode="4755",
+        )
+
+        self.inspection = "ownership"
+        self.result = "BAD"
+        self.waiver_auth = "Security"
+
+
+class UnexpectedSetuidOwnerKoji(TestKoji):
+    def setUp(self):
+        super().setUp()
+
+        self.rpm.add_installed_file(
+            installPath="usr/ucb/sowner",
+            sourceFile=rpmfluff.SourceFile("rpminspect", ri_bytes),
+            owner="root",
+            group="bin",
+            mode="4755",
+        )
+
+        self.inspection = "ownership"
+        self.result = "BAD"
+        self.waiver_auth = "Security"
+
+
+class UnexpectedSetuidOwnerCompareRPMs(TestCompareRPMs):
+    def setUp(self):
+        super().setUp()
+
+        self.before_rpm.add_installed_file(
+            installPath="usr/ucb/sowner",
+            sourceFile=rpmfluff.SourceFile("rpminspect", ri_bytes),
+            owner="root",
+            group="bin",
+            mode="4755",
+        )
+        self.after_rpm.add_installed_file(
+            installPath="usr/ucb/sowner",
+            sourceFile=rpmfluff.SourceFile("rpminspect", ri_bytes),
+            owner="root",
+            group="bin",
+            mode="4755",
+        )
+
+        self.inspection = "ownership"
+        self.result = "BAD"
+        self.waiver_auth = "Security"
+
+
+class UnexpectedSetuidOwnerCompareKoji(TestCompareKoji):
+    def setUp(self):
+        super().setUp()
+
+        self.before_rpm.add_installed_file(
+            installPath="usr/ucb/sowner",
+            sourceFile=rpmfluff.SourceFile("rpminspect", ri_bytes),
+            owner="root",
+            group="bin",
+            mode="4755",
+        )
+        self.after_rpm.add_installed_file(
+            installPath="usr/ucb/sowner",
+            sourceFile=rpmfluff.SourceFile("rpminspect", ri_bytes),
+            owner="root",
+            group="bin",
+            mode="4755",
+        )
+
+        self.inspection = "ownership"
+        self.result = "BAD"
+        self.waiver_auth = "Security"
+
+
+###################################
+# Unexpected group on setuid file #
+###################################
+
+
+class ExpectedSetuidGroupRPMs(TestRPMs):
+    def setUp(self):
+        super().setUp()
+
+        self.rpm.add_installed_file(
+            installPath="usr/ucb/sowner",
+            sourceFile=rpmfluff.SourceFile("rpminspect", ri_bytes),
+            owner="bin",
+            group="bin",
+            mode="4755",
+        )
+
+        self.inspection = "ownership"
+        self.result = "INFO"
+        self.waiver_auth = "Not Waivable"
+
+
+class UnexpectedSetuidGroupRPMs(TestRPMs):
+    def setUp(self):
+        super().setUp()
+
+        self.rpm.add_installed_file(
+            installPath="usr/ucb/sowner",
+            sourceFile=rpmfluff.SourceFile("rpminspect", ri_bytes),
+            owner="bin",
+            group="root",
+            mode="4755",
+        )
+
+        self.inspection = "ownership"
+        self.result = "BAD"
+        self.waiver_auth = "Security"
+
+
+class UnexpectedSetuidGroupKoji(TestKoji):
+    def setUp(self):
+        super().setUp()
+
+        self.rpm.add_installed_file(
+            installPath="usr/ucb/sowner",
+            sourceFile=rpmfluff.SourceFile("rpminspect", ri_bytes),
+            owner="bin",
+            group="root",
+            mode="4755",
+        )
+
+        self.inspection = "ownership"
+        self.result = "BAD"
+        self.waiver_auth = "Security"
+
+
+class UnexpectedSetuidGroupCompareRPMs(TestCompareRPMs):
+    def setUp(self):
+        super().setUp()
+
+        self.before_rpm.add_installed_file(
+            installPath="usr/ucb/sowner",
+            sourceFile=rpmfluff.SourceFile("rpminspect", ri_bytes),
+            owner="bin",
+            group="root",
+            mode="4755",
+        )
+        self.after_rpm.add_installed_file(
+            installPath="usr/ucb/sowner",
+            sourceFile=rpmfluff.SourceFile("rpminspect", ri_bytes),
+            owner="bin",
+            group="root",
+            mode="4755",
+        )
+
+        self.inspection = "ownership"
+        self.result = "BAD"
+        self.waiver_auth = "Security"
+
+
+class UnexpectedSetuidGroupCompareKoji(TestCompareKoji):
+    def setUp(self):
+        super().setUp()
+
+        self.before_rpm.add_installed_file(
+            installPath="usr/ucb/sowner",
+            sourceFile=rpmfluff.SourceFile("rpminspect", ri_bytes),
+            owner="bin",
+            group="root",
+            mode="4755",
+        )
+        self.after_rpm.add_installed_file(
+            installPath="usr/ucb/sowner",
+            sourceFile=rpmfluff.SourceFile("rpminspect", ri_bytes),
+            owner="bin",
+            group="root",
+            mode="4755",
+        )
+
+        self.inspection = "ownership"
+        self.result = "BAD"
+        self.waiver_auth = "Security"
+
+
+#######################################
+# Unexpected ownership on setgid file #
+#######################################
+
+
+class ExpectedSetgidOwnerRPMs(TestRPMs):
+    def setUp(self):
+        super().setUp()
+
+        self.rpm.add_installed_file(
+            installPath="usr/ucb/sgroup",
+            sourceFile=rpmfluff.SourceFile("rpminspect", ri_bytes),
+            owner="bin",
+            group="bin",
+            mode="2755",
+        )
+
+        self.inspection = "ownership"
+        self.result = "INFO"
+        self.waiver_auth = "Not Waivable"
+
+
+class UnexpectedSetgidOwnerRPMs(TestRPMs):
+    def setUp(self):
+        super().setUp()
+
+        self.rpm.add_installed_file(
+            installPath="usr/ucb/sgroup",
+            sourceFile=rpmfluff.SourceFile("rpminspect", ri_bytes),
+            owner="root",
+            group="bin",
+            mode="2755",
+        )
+
+        self.inspection = "ownership"
+        self.result = "BAD"
+        self.waiver_auth = "Security"
+
+
+class UnexpectedSetgidOwnerKoji(TestKoji):
+    def setUp(self):
+        super().setUp()
+
+        self.rpm.add_installed_file(
+            installPath="usr/ucb/sgroup",
+            sourceFile=rpmfluff.SourceFile("rpminspect", ri_bytes),
+            owner="root",
+            group="bin",
+            mode="2755",
+        )
+
+        self.inspection = "ownership"
+        self.result = "BAD"
+        self.waiver_auth = "Security"
+
+
+class UnexpectedSetgidOwnerCompareRPMs(TestCompareRPMs):
+    def setUp(self):
+        super().setUp()
+
+        self.before_rpm.add_installed_file(
+            installPath="usr/ucb/sgroup",
+            sourceFile=rpmfluff.SourceFile("rpminspect", ri_bytes),
+            owner="root",
+            group="bin",
+            mode="2755",
+        )
+        self.after_rpm.add_installed_file(
+            installPath="usr/ucb/sgroup",
+            sourceFile=rpmfluff.SourceFile("rpminspect", ri_bytes),
+            owner="root",
+            group="bin",
+            mode="2755",
+        )
+
+        self.inspection = "ownership"
+        self.result = "BAD"
+        self.waiver_auth = "Security"
+
+
+class UnexpectedSetgidOwnerCompareKoji(TestCompareKoji):
+    def setUp(self):
+        super().setUp()
+
+        self.before_rpm.add_installed_file(
+            installPath="usr/ucb/sgroup",
+            sourceFile=rpmfluff.SourceFile("rpminspect", ri_bytes),
+            owner="root",
+            group="bin",
+            mode="2755",
+        )
+        self.after_rpm.add_installed_file(
+            installPath="usr/ucb/sgroup",
+            sourceFile=rpmfluff.SourceFile("rpminspect", ri_bytes),
+            owner="root",
+            group="bin",
+            mode="2755",
+        )
+
+        self.inspection = "ownership"
+        self.result = "BAD"
+        self.waiver_auth = "Security"
+
+
+###################################
+# Unexpected group on setgid file #
+###################################
+
+
+class ExpectedSetgidGroupRPMs(TestRPMs):
+    def setUp(self):
+        super().setUp()
+
+        self.rpm.add_installed_file(
+            installPath="usr/ucb/sgroup",
+            sourceFile=rpmfluff.SourceFile("rpminspect", ri_bytes),
+            owner="bin",
+            group="bin",
+            mode="2755",
+        )
+
+        self.inspection = "ownership"
+        self.result = "INFO"
+        self.waiver_auth = "Not Waivable"
+
+
+class UnexpectedSetgidGroupRPMs(TestRPMs):
+    def setUp(self):
+        super().setUp()
+
+        self.rpm.add_installed_file(
+            installPath="usr/ucb/sgroup",
+            sourceFile=rpmfluff.SourceFile("rpminspect", ri_bytes),
+            owner="bin",
+            group="root",
+            mode="2755",
+        )
+
+        self.inspection = "ownership"
+        self.result = "BAD"
+        self.waiver_auth = "Security"
+
+
+class UnexpectedSetgidGroupKoji(TestKoji):
+    def setUp(self):
+        super().setUp()
+
+        self.rpm.add_installed_file(
+            installPath="usr/ucb/sgroup",
+            sourceFile=rpmfluff.SourceFile("rpminspect", ri_bytes),
+            owner="bin",
+            group="root",
+            mode="2755",
+        )
+
+        self.inspection = "ownership"
+        self.result = "BAD"
+        self.waiver_auth = "Security"
+
+
+class UnexpectedSetgidGroupCompareRPMs(TestCompareRPMs):
+    def setUp(self):
+        super().setUp()
+
+        self.before_rpm.add_installed_file(
+            installPath="usr/ucb/sgroup",
+            sourceFile=rpmfluff.SourceFile("rpminspect", ri_bytes),
+            owner="bin",
+            group="root",
+            mode="2755",
+        )
+        self.after_rpm.add_installed_file(
+            installPath="usr/ucb/sgroup",
+            sourceFile=rpmfluff.SourceFile("rpminspect", ri_bytes),
+            owner="bin",
+            group="root",
+            mode="2755",
+        )
+
+        self.inspection = "ownership"
+        self.result = "BAD"
+        self.waiver_auth = "Security"
+
+
+class UnexpectedSetgidGroupCompareKoji(TestCompareKoji):
+    def setUp(self):
+        super().setUp()
+
+        self.before_rpm.add_installed_file(
+            installPath="usr/ucb/sgroup",
+            sourceFile=rpmfluff.SourceFile("rpminspect", ri_bytes),
+            owner="bin",
+            group="root",
+            mode="2755",
+        )
+        self.after_rpm.add_installed_file(
+            installPath="usr/ucb/sgroup",
+            sourceFile=rpmfluff.SourceFile("rpminspect", ri_bytes),
+            owner="bin",
+            group="root",
+            mode="2755",
+        )
+
+        self.inspection = "ownership"
+        self.result = "BAD"
+        self.waiver_auth = "Security"
+
+
+#####################################
+# setuid file missing fileinfo rule #
+#####################################
+
+
+class MissingFileinfoRuleSetuidRPMs(TestRPMs):
+    def setUp(self):
+        super().setUp()
+
+        self.rpm.add_installed_file(
+            installPath="usr/ucb/smissing",
+            sourceFile=rpmfluff.SourceFile("rpminspect", ri_bytes),
+            owner="bin",
+            group="bin",
+            mode="4755",
+        )
+
+        self.inspection = "ownership"
+        self.result = "BAD"
+        self.waiver_auth = "Security"
+
+
+class MissingFileinfoRuleSetuidCompareRPMs(TestCompareRPMs):
+    def setUp(self):
+        super().setUp()
+
+        self.before_rpm.add_installed_file(
+            installPath="usr/ucb/smissing",
+            sourceFile=rpmfluff.SourceFile("rpminspect", ri_bytes),
+            owner="bin",
+            group="bin",
+            mode="4755",
+        )
+        self.after_rpm.add_installed_file(
+            installPath="usr/ucb/smissing",
+            sourceFile=rpmfluff.SourceFile("rpminspect", ri_bytes),
+            owner="bin",
+            group="bin",
+            mode="4755",
+        )
+
+        self.inspection = "ownership"
+        self.result = "BAD"
+        self.waiver_auth = "Security"
+
+
+class MissingFileinfoRuleSetuidCompareKoji(TestCompareKoji):
+    def setUp(self):
+        super().setUp()
+
+        self.before_rpm.add_installed_file(
+            installPath="usr/ucb/smissing",
+            sourceFile=rpmfluff.SourceFile("rpminspect", ri_bytes),
+            owner="bin",
+            group="bin",
+            mode="4755",
+        )
+        self.after_rpm.add_installed_file(
+            installPath="usr/ucb/smissing",
+            sourceFile=rpmfluff.SourceFile("rpminspect", ri_bytes),
+            owner="bin",
+            group="bin",
+            mode="4755",
+        )
+
+        self.inspection = "ownership"
+        self.result = "BAD"
+        self.waiver_auth = "Security"
+
+
+#####################################
+# setgid file missing fileinfo rule #
+#####################################
+
+
+class MissingFileinfoRuleSetgidRPMs(TestRPMs):
+    def setUp(self):
+        super().setUp()
+
+        self.rpm.add_installed_file(
+            installPath="usr/ucb/smissing",
+            sourceFile=rpmfluff.SourceFile("rpminspect", ri_bytes),
+            owner="bin",
+            group="bin",
+            mode="2755",
+        )
+
+        self.inspection = "ownership"
+        self.result = "BAD"
+        self.waiver_auth = "Security"
+
+
+class MissingFileinfoRuleSetgidCompareRPMs(TestCompareRPMs):
+    def setUp(self):
+        super().setUp()
+
+        self.before_rpm.add_installed_file(
+            installPath="usr/ucb/smissing",
+            sourceFile=rpmfluff.SourceFile("rpminspect", ri_bytes),
+            owner="bin",
+            group="bin",
+            mode="2755",
+        )
+        self.after_rpm.add_installed_file(
+            installPath="usr/ucb/smissing",
+            sourceFile=rpmfluff.SourceFile("rpminspect", ri_bytes),
+            owner="bin",
+            group="bin",
+            mode="2755",
+        )
+
+        self.inspection = "ownership"
+        self.result = "BAD"
+        self.waiver_auth = "Security"
+
+
+class MissingFileinfoRuleSetgidCompareKoji(TestCompareKoji):
+    def setUp(self):
+        super().setUp()
+
+        self.before_rpm.add_installed_file(
+            installPath="usr/ucb/smissing",
+            sourceFile=rpmfluff.SourceFile("rpminspect", ri_bytes),
+            owner="bin",
+            group="bin",
+            mode="2755",
+        )
+        self.after_rpm.add_installed_file(
+            installPath="usr/ucb/smissing",
+            sourceFile=rpmfluff.SourceFile("rpminspect", ri_bytes),
+            owner="bin",
+            group="bin",
+            mode="2755",
+        )
+
+        self.inspection = "ownership"
+        self.result = "BAD"
+        self.waiver_auth = "Security"
