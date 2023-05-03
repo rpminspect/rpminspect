@@ -193,6 +193,7 @@ if python.found()
         'test_specname.py',
         'test_symlinks.py',
         'test_types.py',
+        'test_udevrules.py',
         'test_unicode.py',
         'test_upstream.py',
         'test_virus.py',
