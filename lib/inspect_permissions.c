@@ -16,6 +16,7 @@ static bool permissions_driver(struct rpminspect *ri, rpmfile_entry_t *file)
 {
     bool result = true;
     bool ignore = false;
+    bool id_bit = false;
     const char *arch = NULL;
     char *change = NULL;
     mode_t before_mode;
@@ -65,12 +66,20 @@ static bool permissions_driver(struct rpminspect *ri, rpmfile_entry_t *file)
     mode_diff = before_mode ^ after_mode;
     allowed = match_fileinfo_mode(ri, file, NAME_PERMISSIONS, NULL, &result, &reported);
 
+    /* in cases of setuid or setgid bits on the mode, this is a non-ignorable check */
+    id_bit = (!(before_mode & (S_ISUID|S_ISGID)) && (after_mode & (S_ISUID|S_ISGID)));
+
+    if (id_bit) {
+        ignore = false;
+    }
+
     /* if setuid/setgid or new mode is more open */
     if (!ignore && mode_diff && file->peer_file && !allowed && (ri->tests & INSPECT_PERMISSIONS)) {
         params.msg = strdup(file->localpath);
         assert(params.msg != NULL);
 
-        if (!(before_mode & (S_ISUID|S_ISGID)) && (after_mode & (S_ISUID|S_ISGID))) {
+        /* initial check of this happens outside this block */
+        if (id_bit) {
             params.severity = RESULT_VERIFY;
             params.msg = strappend(params.msg, _(" changed setuid/setgid;"));
             assert(params.msg != NULL);
@@ -108,7 +117,12 @@ static bool permissions_driver(struct rpminspect *ri, rpmfile_entry_t *file)
         assert(params.msg != NULL);
 
         if (params.severity >= RESULT_VERIFY) {
-            params.waiverauth = WAIVABLE_BY_ANYONE;
+            if (id_bit) {
+                params.waiverauth = WAIVABLE_BY_SECURITY;
+            } else {
+                params.waiverauth = WAIVABLE_BY_ANYONE;
+            }
+
             result = false;
         }
 
