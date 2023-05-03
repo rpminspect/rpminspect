@@ -47,7 +47,12 @@ static bool ownership_driver(struct rpminspect *ri, rpmfile_entry_t *file)
         return true;
     }
 
-    /* We will skip checks for ignored files */
+    /* Ignore debuginfo and debugsource packages */
+    if (strprefix(file->localpath, DEBUG_PATH) || strprefix(file->localpath, DEBUG_SRC_PATH)) {
+        return true;
+    }
+
+    /* We will skip checks for ignored files for non-security checks */
     ignore = ignore_rpmfile_entry(ri, NAME_OWNERSHIP, file);
 
     /* Get the arch, we'll use that */
@@ -96,6 +101,10 @@ static bool ownership_driver(struct rpminspect *ri, rpmfile_entry_t *file)
         result = false;
         reported = true;
     }
+
+    /* fileinfo expected owner and group */
+    (void) match_fileinfo_owner(ri, file, owner, NAME_OWNERSHIP, NULL, NULL, &result, &reported);
+    (void) match_fileinfo_group(ri, file, group, NAME_OWNERSHIP, NULL, NULL, &result, &reported);
 
     /* Report files in bin paths not under the bin owner or group */
     TAILQ_FOREACH(entry, ri->bin_paths, items) {

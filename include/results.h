@@ -401,6 +401,13 @@
  */
 #define REMEDY_OWNERSHIP_CHANGED _("Verify the ownership changes are expected. If not, adjust the package build process to set correct owner and group information. If expected, update %s and send a patch to the project that owns it.")
 
+/**
+ * @def REMEDY_FILEINFO_RULE
+ *
+ * How to handle a missing fileinfo rule.
+ */
+#define REMEDY_FILEINFO_RULE _("rpminspect is expecting a fileinfo rule from the vendor data package for this file. Usually this means the file carries a non-standard set of permissions (e.g., setuid) which is a condition where rpminspect would check the fileinfo list to ensure the package conforms to the vendor rules. To remedy, add a fileinfo rule for this file to the vendor data package under the appropriate product release file.")
+
 /** @} */
 
 /**

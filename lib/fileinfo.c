@@ -13,6 +13,13 @@
 #include <rpm/header.h>
 #include "rpminspect.h"
 
+static mode_t get_interesting_perms(const mode_t mode)
+{
+    mode_t interesting = S_ISUID | S_ISGID | S_ISVTX | S_IRWXU | S_IRWXG | S_IRWXO;
+
+    return mode & interesting;
+}
+
 /**
  * @brief Check for the given path on the fileinfo list.  If found,
  * check the st_mode value and report accordingly.
@@ -31,7 +38,6 @@ bool match_fileinfo_mode(struct rpminspect *ri, const rpmfile_entry_t *file, con
                          const char *remedy, bool *result, bool *reported)
 {
     fileinfo_entry_t *fientry = NULL;
-    mode_t interesting = S_ISUID | S_ISGID | S_ISVTX | S_IRWXU | S_IRWXG | S_IRWXO;
     mode_t perms = 0;
     const char *pkg = NULL;
     struct result_params params;
@@ -39,7 +45,7 @@ bool match_fileinfo_mode(struct rpminspect *ri, const rpmfile_entry_t *file, con
     assert(ri != NULL);
     assert(file != NULL);
 
-    perms = file->st.st_mode & interesting;
+    perms = get_interesting_perms(file->st.st_mode);
     pkg = headerGetString(file->rpm_header, RPMTAG_NAME);
 
     init_result_params(&params);
@@ -120,6 +126,7 @@ bool match_fileinfo_owner(struct rpminspect *ri, const rpmfile_entry_t *file, co
                           const char *remedy, const char *fname, bool *result, bool *reported)
 {
     fileinfo_entry_t *fientry = NULL;
+    mode_t perms = 0;
     const char *pkg = NULL;
     struct result_params params;
 
@@ -131,6 +138,7 @@ bool match_fileinfo_owner(struct rpminspect *ri, const rpmfile_entry_t *file, co
         assert(fname != NULL);
     }
 
+    perms = get_interesting_perms(file->st.st_mode);
     pkg = headerGetString(file->rpm_header, RPMTAG_NAME);
 
     init_result_params(&params);
@@ -175,6 +183,22 @@ bool match_fileinfo_owner(struct rpminspect *ri, const rpmfile_entry_t *file, co
     }
 
     free(params.remedy);
+
+    /* catch anything not on the fileinfo list with setuid/setgid */
+    if (!(*reported) && (file->st.st_mode & (S_ISUID|S_ISGID))) {
+        params.severity = get_secrule_result_severity(ri, file, SECRULE_MODES);
+
+        if (params.severity != RESULT_NULL && params.severity != RESULT_SKIP) {
+            params.waiverauth = WAIVABLE_BY_SECURITY;
+            params.remedy = REMEDY_FILEINFO_RULE;
+            xasprintf(&params.msg, _("%s in %s on %s carries insecure mode %04o but has no fileinfo rule for owner specification, Security Team review may be required"), file->localpath, pkg, params.arch, perms);
+            add_result(ri, &params);
+            free(params.msg);
+            *result = false;
+            *reported = true;
+        }
+    }
+
     return false;
 }
 
@@ -197,6 +221,7 @@ bool match_fileinfo_group(struct rpminspect *ri, const rpmfile_entry_t *file, co
                           const char *remedy, const char *fname, bool *result, bool *reported)
 {
     fileinfo_entry_t *fientry = NULL;
+    mode_t perms = 0;
     const char *pkg = NULL;
     struct result_params params;
 
@@ -207,6 +232,7 @@ bool match_fileinfo_group(struct rpminspect *ri, const rpmfile_entry_t *file, co
         assert(fname != NULL);
     }
 
+    perms = get_interesting_perms(file->st.st_mode);
     pkg = headerGetString(file->rpm_header, RPMTAG_NAME);
 
     init_result_params(&params);
@@ -251,6 +277,22 @@ bool match_fileinfo_group(struct rpminspect *ri, const rpmfile_entry_t *file, co
     }
 
     free(params.remedy);
+
+    /* catch anything not on the fileinfo list with setuid/setgid */
+    if (!(*reported) && (file->st.st_mode & (S_ISUID|S_ISGID))) {
+        params.severity = get_secrule_result_severity(ri, file, SECRULE_MODES);
+
+        if (params.severity != RESULT_NULL && params.severity != RESULT_SKIP) {
+            params.waiverauth = WAIVABLE_BY_SECURITY;
+            params.remedy = REMEDY_FILEINFO_RULE;
+            xasprintf(&params.msg, _("%s in %s on %s carries insecure mode %04o but has no fileinfo rule for owner specification, Security Team review may be required"), file->localpath, pkg, params.arch, perms);
+            add_result(ri, &params);
+            free(params.msg);
+            *result = false;
+            *reported = true;
+        }
+    }
+
     return false;
 }
 
