@@ -91,13 +91,14 @@ char *run_cmd_vpe(int *exitcode, const char *workdir, char **argv)
             _exit(EXIT_FAILURE);
         }
 
-        /* close the pipe */
+        /* close the pipes */
         if (close(pfd[RD]) == -1 || close(pfd[WR]) == -1) {
-            warn("dup2");
+            warn("close");
             _exit(EXIT_FAILURE);
         }
 
         setlinebuf(stdout);
+        setlinebuf(stderr);
 
         /* run the command */
         if (execvp(argv[0], argv) == -1) {
