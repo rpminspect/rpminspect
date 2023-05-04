@@ -597,6 +597,9 @@ bool inspect_patches(struct rpminspect *ri)
     char *patchhead = NULL;
     char *buf = NULL;
     size_t len = 0;
+    size_t tl = 0;
+    size_t ml = 0;
+    bool numarg = false;
     struct result_params params;
 
     assert(ri != NULL);
@@ -674,7 +677,7 @@ bool inspect_patches(struct rpminspect *ri)
                 speclines = read_file(file->fullpath);
 
                 if (speclines == NULL) {
-                    err(RI_PROGRAM_ERROR, "read_contents");
+                    err(RI_PROGRAM_ERROR, "read_file");
                 }
 
                 TAILQ_FOREACH(specentry, speclines, items) {
@@ -751,19 +754,81 @@ bool inspect_patches(struct rpminspect *ri)
                         HASH_ADD_KEYPTR(hh, patches, hentry->patch, strlen(hentry->patch), hentry);
                         free(patchhead);
                     } else if (strprefix(specentry->data, SPEC_MACRO_PATCH)) {
-                        /* split the line - first field is %patchN, second (optional) is opts */
+                        /* split the line - first field is %patch, second and beyond (optional) is opts */
                         fields = strsplit(specentry->data, " \t");
                         patch = TAILQ_FIRST(fields);
                         assert(patch != NULL);
                         entry = TAILQ_NEXT(patch, items);
+                        buf = NULL;
 
                         /* extract just the number from the macro */
-                        buf = patch->data;
-                        len = strlen(buf);
-                        buf += strlen(SPEC_MACRO_PATCH);
-                        buf[strcspn(buf, " \t")] = '\0';
+                        tl = strlen(patch->data);
+                        ml = strlen(SPEC_MACRO_PATCH);
+
+                        if (!strcmp(patch->data, SPEC_MACRO_PATCH) && (tl == ml)) {
+                            /* either '%patch n' or '%patch -Pn' */
+                            TAILQ_FOREACH(entry, fields, items) {
+                                if (entry == patch) {
+                                    /* the first field is %patch, skip it in this loop */
+                                    continue;
+                                }
+
+                                buf = entry->data;
+
+                                if (strprefix(entry->data, SPEC_MACRO_PATCH_P_ARG)) {
+                                    /* patch number specified with -P, take it */
+                                    if (!strcmp(entry->data, SPEC_MACRO_PATCH_P_ARG)) {
+                                        /* user specified something like '-P 1' */
+                                        entry = TAILQ_NEXT(entry, items);
+                                        buf = entry->data;
+                                    } else {
+                                        /* user specified something like '-P1' */
+                                        buf += strlen(SPEC_MACRO_PATCH_P_ARG);
+
+                                        while (isspace(*buf) && *buf != '\0') {
+                                            buf++;
+                                        }
+                                    }
+
+                                    numarg = true;
+                                    buf[strcspn(buf, " \t")] = '\0';
+                                    break;
+                                } else {
+                                    /* check to see if the patch number is just specified as-is */
+                                    numarg = true;
+
+                                    while (*buf != '\0') {
+                                        if (!isdigit(*buf)) {
+                                            numarg = false;
+                                            break;
+                                        }
+
+                                        buf++;
+                                    }
+
+                                    if (numarg) {
+                                        buf = entry->data;
+                                        break;
+                                    }
+                                }
+                            }
+                        } else if (strprefix(patch->data, SPEC_MACRO_PATCH) && (tl > ml)) {
+                            /* '%patchN' */
+                            buf = patch->data;
+                            len = strlen(buf);
+                            buf += strlen(SPEC_MACRO_PATCH);
+                            buf[strcspn(buf, " \t")] = '\0';
+                        } else {
+                            warnx("*** Unrecognized %%patch line: %s", specentry->data);
+                            continue;
+                        }
 
                         /* add a new patch entry to the hash table */
+                        if (buf == NULL) {
+                            warnx("*** Unable to read spec file line: %s", specentry->data);
+                            continue;
+                        }
+
                         aentry = calloc(1, sizeof(*aentry));
                         assert(aentry != NULL);
                         aentry->num = strtoll(buf, NULL, 10);
