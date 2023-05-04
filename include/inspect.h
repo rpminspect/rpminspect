@@ -1548,7 +1548,7 @@ bool inspect_debuginfo(struct rpminspect *ri);
  * @def DESC_PATCHES
  * The description for the 'patches' inspection.
  */
-#define DESC_PATCHES _("Inspects all patches defined in the spec file and reports changes between builds.  At the INFO level, rpminspect reports file count, line count, and patch size changes.  If thresholds are reached regarding a change in the patch size or the number of files the patch touches, rpminspect reports the change at the VERIFY level unless the comparison is for a rebase.  The configuration file can also list patch names that rpminspect should ignore during the inspection.")
+#define DESC_PATCHES _("Inspects all patches defined in the spec file and reports changes between builds.  The functional check here is to ensure all defined patches in the preamble have a corresponding application macro in the spec file.  At the INFO level, rpminspect reports file count, line count, and patch size changes.  If thresholds are reached regarding a change in the patch size or the number of files the patch touches, rpminspect reports the change at the VERIFY level unless the comparison is for a rebase.  The configuration file can also list patch names that rpminspect should ignore during the inspection.")
 
 /**
  * @def DESC_VIRUS

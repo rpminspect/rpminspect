@@ -658,10 +658,17 @@
 /**
  * @def SPEC_MACRO_PATCH
  *
- * The %patchN macro used to apply patches.  N corresponds to the
- * patch number defined in the header.
+ * The %patch macro used to apply patches.
  */
 #define SPEC_MACRO_PATCH       "%patch"
+
+/**
+ * @def SPEC_MACRO_PATCH_P_ARG
+ *
+ * The -P argument to the %patch macro.  The -P argument is used to
+ * specify the patch number as defined in the header.
+ */
+#define SPEC_MACRO_PATCH_P_ARG "-P"
 
 /**
  * @def SPEC_SECTION_PREP
