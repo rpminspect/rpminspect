@@ -119,8 +119,6 @@ static char *make_source_dirs(const char *worksubdir, const char *fullpath)
 static char *rpm_prep_source(struct rpminspect *ri, const rpmfile_entry_t *file, char **details)
 {
     int pfd[2];
-    int ocode = 0;
-    int ecode = 0;
     pid_t proc = 0;
     int status = 0;
     FILE *reader = NULL;
@@ -145,43 +143,41 @@ static char *rpm_prep_source(struct rpminspect *ri, const rpmfile_entry_t *file,
     proc = fork();
 
     if (proc == 0) {
-        /* close current handles */
-        if (close(STDIN_FILENO)) {
-            warn("close");
-            _exit(EXIT_FAILURE);
-        }
-
         /* connect the output */
-        ocode = dup2(pfd[STDOUT_FILENO], STDOUT_FILENO);
-        ecode = dup2(pfd[STDOUT_FILENO], STDERR_FILENO);
-
-        if (ocode == -1 || ecode == -1) {
+        if (dup2(pfd[STDOUT_FILENO], STDOUT_FILENO) == -1 || dup2(pfd[STDOUT_FILENO], STDERR_FILENO) == -1) {
             warn("dup2");
             _exit(EXIT_FAILURE);
         }
 
-        /* close the incoming pipe */
-        if (close(pfd[STDIN_FILENO])) {
+        /* close pipes */
+        if (close(pfd[STDIN_FILENO]) == -1 || close(pfd[STDOUT_FILENO]) == -1) {
             warn("close");
             _exit(EXIT_FAILURE);
         }
 
         setlinebuf(stdout);
+        setlinebuf(stderr);
 
         /* define our top dir */
         topdir = make_source_dirs(ri->worksubdir, file->fullpath);
         assert(topdir != NULL);
+
         xasprintf(&macro, "_topdir %s", topdir);
         assert(macro != NULL);
         (void) rpmDefineMacro(NULL, macro, 0);
         free(macro);
-        free(topdir);
 
         /* read in the spec file */
-        spec = rpmSpecParse(file->fullpath, RPMBUILD_PREP | RPMSPEC_ANYARCH, NULL);
+        spec = rpmSpecParse(file->fullpath, RPMBUILD_PREP | RPMSPEC_ANYARCH, topdir);
+        free(topdir);
 
         if (spec == NULL) {
             warn("rpmSpecParse");
+
+            if (close(STDOUT_FILENO) == -1 || close(STDERR_FILENO) == -1) {
+                warn("close");
+            }
+
             _exit(EXIT_FAILURE);
         }
 
@@ -215,18 +211,8 @@ static char *rpm_prep_source(struct rpminspect *ri, const rpmfile_entry_t *file,
         rpmFreeRpmrc();
         free(ba);
 
-        if (close(pfd[STDOUT_FILENO])) {
+        if (close(STDOUT_FILENO) == -1 || close(STDERR_FILENO) == -1) {
             warn("close");
-        }
-
-        if (close(STDOUT_FILENO)) {
-            warn("close");
-            _exit(EXIT_FAILURE);
-        }
-
-        if (close(STDERR_FILENO)) {
-            warn("close");
-            _exit(EXIT_FAILURE);
         }
 
         _exit(status);
@@ -234,7 +220,7 @@ static char *rpm_prep_source(struct rpminspect *ri, const rpmfile_entry_t *file,
         /* failure */
         warn("fork");
     } else {
-        /* close the pipe */
+        /* close the unused part */
         if (close(pfd[STDOUT_FILENO]) == -1) {
             warn("close");
         }
@@ -258,6 +244,7 @@ static char *rpm_prep_source(struct rpminspect *ri, const rpmfile_entry_t *file,
 
         free(buf);
 
+        /* remember that fclose() closes underlying file handles */
         if (fclose(reader) == -1) {
             warn("fclose");
         }
@@ -396,6 +383,9 @@ static bool end_of_line(const UChar c)
  * Unicode with the ICU library:
  *
  * https://begriffs.com/posts/2019-05-23-unicode-icu.html
+ *
+ * NOTE: The global 'build' is used in this function, so make sure any
+ * calls to free build are done after calls to validate_file().
  */
 static int validate_file(const char *fpath, __attribute__((unused)) const struct stat *sb, int tflag, __attribute__((unused)) struct FTW *ftwbuf)
 {
@@ -403,7 +393,7 @@ static int validate_file(const char *fpath, __attribute__((unused)) const struct
     const char *localpath = fpath;
     string_entry_t *sentry = NULL;
     UFILE *src = NULL;
-    UChar c;
+    UChar32 c;
     UChar *line = NULL;
     UChar *line_new = NULL;
     size_t i = 0;
@@ -506,12 +496,12 @@ static int validate_file(const char *fpath, __attribute__((unused)) const struct
 
     while (!u_feof(src)) {
         /* read in one whole line of text from the file */
-        for (i = 0; (line[i] = u_fgetc(src)) != U_EOF && !end_of_line(line[i]); i++) {
+        for (i = 0; (line[i] = u_fgetcx(src)) != U_EOF && !end_of_line(line[i]); i++) {
             /* increase the buffer size if necessary */
             if (i >= sz) {
-                sz *= 2;
+                sz += (i - sz);
                 errno = 0;
-                line_new = realloc(line, sz * sizeof(*line));
+                line_new = reallocarray(line, sz, sizeof(*line));
 
                 if (errno == ENOMEM) {
                     warn("realloc");
@@ -526,7 +516,7 @@ static int validate_file(const char *fpath, __attribute__((unused)) const struct
         }
 
         /* eat newline if terminated by a carriage return */
-        if (line[i] == 0xD && (c = u_fgetc(src)) != 0xA) {
+        if (line[i] == 0xD && (c = u_fgetcx(src)) != 0xA) {
             u_fungetc(c, src);
         }
 
@@ -646,6 +636,9 @@ static bool unicode_driver(struct rpminspect *ri, rpmfile_entry_t *file)
             free(build);
             free(globalfile);
 
+            build = NULL;
+            globalfile = NULL;
+
             return false;
         }
 
@@ -662,12 +655,16 @@ static bool unicode_driver(struct rpminspect *ri, rpmfile_entry_t *file)
         (void) rmtree(build, true, false);
 
         free(params.details);
-        free(build);
     }
 
     /* check the individual file */
     (void) validate_file(file->fullpath, NULL, FTW_F, NULL);
+
+    /* cleanup */
     free(globalfile);
+    free(build);
+    globalfile = NULL;
+    build = NULL;
 
     return globalresult;
 }
