@@ -456,12 +456,17 @@ static int validate_file(const char *fpath, __attribute__((unused)) const struct
          */
         localpath += strlen(build);
 
+        /* trim the leading slash */
+        while (*localpath == '/' && *localpath != '\0') {
+            localpath++;
+        }
+
         /*
          * for manual_prep_source() runs, also account for a potential
          * unpack-XXXXXX/ leading directory and trim that too
          */
         if (uses_unpack_base && strprefix(localpath, UNPACK_BASE)) {
-            localpath += strlen(UNPACK_BASE);
+            localpath += strlen(UNPACK_TEMPLATE);
         }
     } else if (root && strprefix(localpath, root)) {
         /* this is a source file directly in the SRPM */
