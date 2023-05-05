@@ -499,7 +499,7 @@ static int validate_file(const char *fpath, __attribute__((unused)) const struct
         for (i = 0; (line[i] = u_fgetcx(src)) != U_EOF && !end_of_line(line[i]); i++) {
             /* increase the buffer size if necessary */
             if (i >= sz) {
-                sz += (i - sz);
+                sz *= 2;
                 errno = 0;
                 line_new = reallocarray(line, sz, sizeof(*line));
 
