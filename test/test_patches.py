@@ -527,3 +527,153 @@ class PatchFilenameWithMacroCompareSRPM(TestCompareSRPM):
         self.inspection = "patches"
         self.result = "INFO"
         self.waiver_auth = "Not Waivable"
+
+
+# '%patch N' syntax used to apply patch
+class PatchNMacroSRPM(TestSRPM):
+    def setUp(self):
+        super().setUp()
+
+        # add the patch with '%patch N' syntax
+        patch = rpmfluff.SourceFile("some.patch", patch_file)
+        patchIndex = len(self.rpm.patches)
+        self.rpm.patches[patchIndex] = patch
+
+        self.rpm.section_patches += "Patch%i: %s\n" % (patchIndex, patch.sourceName)
+        self.rpm.add_check(rpmfluff.check.CheckSourceFile(patch.sourceName))
+
+        self.rpm.section_prep += "%%patch %i\n" % patchIndex
+
+        self.inspection = "patches"
+        self.result = "INFO"
+        self.waiver_auth = "Not Waivable"
+
+
+class PatchNMacroCompareSRPM(TestCompareSRPM):
+    def setUp(self):
+        super().setUp()
+
+        # add the patch with '%patch N' syntax
+        patch = rpmfluff.SourceFile("some.patch", patch_file)
+
+        beforePatchIndex = len(self.before_rpm.patches)
+        self.before_rpm.patches[beforePatchIndex] = patch
+        self.before_rpm.section_patches += "Patch%i: %s\n" % (
+            beforePatchIndex,
+            patch.sourceName,
+        )
+        self.before_rpm.add_check(rpmfluff.check.CheckSourceFile(patch.sourceName))
+        self.before_rpm.section_prep += "%%patch %i\n" % beforePatchIndex
+
+        afterPatchIndex = len(self.after_rpm.patches)
+        self.after_rpm.patches[afterPatchIndex] = patch
+        self.after_rpm.section_patches += "Patch%i: %s\n" % (
+            afterPatchIndex,
+            patch.sourceName,
+        )
+        self.after_rpm.add_check(rpmfluff.check.CheckSourceFile(patch.sourceName))
+        self.after_rpm.section_prep += "%%patch %i\n" % afterPatchIndex
+
+        self.inspection = "patches"
+        self.result = "INFO"
+        self.waiver_auth = "Not Waivable"
+
+
+# '%patch -P N' syntax used to apply patch
+class PatchP_NMacroSRPM(TestSRPM):
+    def setUp(self):
+        super().setUp()
+
+        # add the patch with '%patch -P N' syntax
+        patch = rpmfluff.SourceFile("some.patch", patch_file)
+        patchIndex = len(self.rpm.patches)
+        self.rpm.patches[patchIndex] = patch
+
+        self.rpm.section_patches += "Patch%i: %s\n" % (patchIndex, patch.sourceName)
+        self.rpm.add_check(rpmfluff.check.CheckSourceFile(patch.sourceName))
+
+        self.rpm.section_prep += "%%patch -P %i\n" % patchIndex
+
+        self.inspection = "patches"
+        self.result = "INFO"
+        self.waiver_auth = "Not Waivable"
+
+
+class PatchP_NMacroCompareSRPM(TestCompareSRPM):
+    def setUp(self):
+        super().setUp()
+
+        # add the patch with '%patch -P N' syntax
+        patch = rpmfluff.SourceFile("some.patch", patch_file)
+
+        beforePatchIndex = len(self.before_rpm.patches)
+        self.before_rpm.patches[beforePatchIndex] = patch
+        self.before_rpm.section_patches += "Patch%i: %s\n" % (
+            beforePatchIndex,
+            patch.sourceName,
+        )
+        self.before_rpm.add_check(rpmfluff.check.CheckSourceFile(patch.sourceName))
+        self.before_rpm.section_prep += "%%patch -P %i\n" % beforePatchIndex
+
+        afterPatchIndex = len(self.after_rpm.patches)
+        self.after_rpm.patches[afterPatchIndex] = patch
+        self.after_rpm.section_patches += "Patch%i: %s\n" % (
+            afterPatchIndex,
+            patch.sourceName,
+        )
+        self.after_rpm.add_check(rpmfluff.check.CheckSourceFile(patch.sourceName))
+        self.after_rpm.section_prep += "%%patch -P %i\n" % afterPatchIndex
+
+        self.inspection = "patches"
+        self.result = "INFO"
+        self.waiver_auth = "Not Waivable"
+
+
+# '%patch -PN' syntax used to apply patch
+class PatchPNMacroSRPM(TestSRPM):
+    def setUp(self):
+        super().setUp()
+
+        # add the patch with '%patch -PN' syntax
+        patch = rpmfluff.SourceFile("some.patch", patch_file)
+        patchIndex = len(self.rpm.patches)
+        self.rpm.patches[patchIndex] = patch
+
+        self.rpm.section_patches += "Patch%i: %s\n" % (patchIndex, patch.sourceName)
+        self.rpm.add_check(rpmfluff.check.CheckSourceFile(patch.sourceName))
+
+        self.rpm.section_prep += "%%patch -P%i\n" % patchIndex
+
+        self.inspection = "patches"
+        self.result = "INFO"
+        self.waiver_auth = "Not Waivable"
+
+
+class PatchPNMacroCompareSRPM(TestCompareSRPM):
+    def setUp(self):
+        super().setUp()
+
+        # add the patch with '%patch -PN' syntax
+        patch = rpmfluff.SourceFile("some.patch", patch_file)
+
+        beforePatchIndex = len(self.before_rpm.patches)
+        self.before_rpm.patches[beforePatchIndex] = patch
+        self.before_rpm.section_patches += "Patch%i: %s\n" % (
+            beforePatchIndex,
+            patch.sourceName,
+        )
+        self.before_rpm.add_check(rpmfluff.check.CheckSourceFile(patch.sourceName))
+        self.before_rpm.section_prep += "%%patch -P%i\n" % beforePatchIndex
+
+        afterPatchIndex = len(self.after_rpm.patches)
+        self.after_rpm.patches[afterPatchIndex] = patch
+        self.after_rpm.section_patches += "Patch%i: %s\n" % (
+            afterPatchIndex,
+            patch.sourceName,
+        )
+        self.after_rpm.add_check(rpmfluff.check.CheckSourceFile(patch.sourceName))
+        self.after_rpm.section_prep += "%%patch -P%i\n" % afterPatchIndex
+
+        self.inspection = "patches"
+        self.result = "INFO"
+        self.waiver_auth = "Not Waivable"
