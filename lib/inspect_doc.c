@@ -54,7 +54,7 @@ static bool doc_driver(struct rpminspect *ri, rpmfile_entry_t *file)
     name = headerGetString(file->rpm_header, RPMTAG_NAME);
 
     /* skip debuginfo and debugsource packages */
-    if (strsuffix(name, DEBUGINFO_SUFFIX) || strsuffix(name, DEBUGSOURCE_SUFFIX)) {
+    if (is_debuginfo_rpm(file->rpm_header) || is_debugsource_rpm(file->rpm_header)) {
         return true;
     }
 

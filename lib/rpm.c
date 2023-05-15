@@ -456,3 +456,56 @@ cleanup:
     return payload;
 #endif
 }
+
+static bool _is_debug_rpm_helper(Header hdr, const char *provide, const char *substring)
+{
+    rpmtd req = NULL;
+    rpmFlags flags = HEADERGET_MINMEM | HEADERGET_EXT | HEADERGET_ARGV;
+    const char *p = NULL;
+    bool r = false;
+
+    assert(hdr != NULL);
+
+    /* start new header transactions */
+    req = rpmtdNew();
+
+    if (headerGet(hdr, RPMTAG_PROVIDENAME, req, flags)) {
+        /* collect all of the rules for this package */
+        while (rpmtdNext(req) != -1) {
+            p = rpmtdGetString(req);
+
+            if (provide && !strcmp(p, provide)) {
+                r = true;
+                break;
+            }
+
+            if (substring && strstr(p, substring)) {
+                r = true;
+                break;
+            }
+        }
+    }
+
+    rpmtdFreeData(req);
+    rpmtdFree(req);
+
+    return r;
+}
+
+/*
+ * Given the Header, return true if the package is a debuginfo
+ * package, false otherwise.
+ */
+bool is_debuginfo_rpm(Header hdr)
+{
+    return _is_debug_rpm_helper(hdr, DEBUGINFO_PROVIDE, DEBUGINFO_SUBSTRING);
+}
+
+/*
+ * Given the Header, return true if the package is a debugsource
+ * package, false otherwise.
+ */
+bool is_debugsource_rpm(Header hdr)
+{
+    return _is_debug_rpm_helper(hdr, NULL, DEBUGSOURCE_SUBSTRING);
+}

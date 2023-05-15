@@ -116,9 +116,9 @@ static deprule_list_t *gather_deprules_by_type(deprule_list_t *rules, Header hdr
             r = rpmtdGetString(req);
 
             /* skip some rules types */
-            if (!strcmp(r, "debuginfo(build-id)")
-                || strsuffix(r, DEBUGSOURCE_SUFFIX)
-                || strsuffix(r, DEBUGINFO_SUFFIX)
+            if (!strcmp(r, DEBUGINFO_PROVIDE)
+                || strstr(r, DEBUGSOURCE_SUBSTRING)
+                || strstr(r, DEBUGINFO_SUBSTRING)
                 || ((strprefix(r, "rpmlib(") || strprefix(r, "rtld(")) && strsuffix(r, ")"))
                 || ((strprefix(r, "kernel(") || strprefix(r, "modalias(") || strprefix(r, "ksym(") || strprefix(r, "kmod(")) && strsuffix(r, ")"))) {
                 continue;

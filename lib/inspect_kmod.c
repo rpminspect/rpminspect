@@ -84,7 +84,7 @@ static bool kmod_driver(struct rpminspect *ri, rpmfile_entry_t *file)
     /* Skip debuginfo and debugsource packages */
     aftername = headerGetString(file->rpm_header, RPMTAG_NAME);
 
-    if (strsuffix(aftername, DEBUGINFO_SUFFIX) || strsuffix(aftername, DEBUGSOURCE_SUFFIX)) {
+    if (is_debuginfo_rpm(file->rpm_header) || is_debugsource_rpm(file->rpm_header)) {
         return true;
     }
 

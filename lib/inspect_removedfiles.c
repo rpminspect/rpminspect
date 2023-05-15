@@ -154,7 +154,6 @@ bool inspect_removedfiles(struct rpminspect *ri)
     bool result = true;
     rpmpeer_entry_t *peer = NULL;
     rpmfile_entry_t *file = NULL;
-    const char *name = NULL;
     struct result_params params;
 
     assert(ri != NULL);
@@ -175,9 +174,7 @@ bool inspect_removedfiles(struct rpminspect *ri)
         }
 
         /* Skip debuginfo and debugsource packages */
-        name = headerGetString(peer->before_hdr, RPMTAG_NAME);
-
-        if (strsuffix(name, DEBUGINFO_SUFFIX) || strsuffix(name, DEBUGSOURCE_SUFFIX)) {
+        if (is_debuginfo_rpm(file->rpm_header) || is_debugsource_rpm(file->rpm_header)) {
             continue;
         }
 
