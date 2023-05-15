@@ -97,7 +97,7 @@ const char *get_debuginfo_path(struct rpminspect *ri, const rpmfile_entry_t *fil
         assert(name != NULL);
 
         /* found debuginfo package */
-        if (strsuffix(name, DEBUGINFO_SUFFIX)) {
+        if (is_debuginfo_rpm(file->rpm_header)) {
             count++;
 
             /* used for older systems that generate single debuginfo packages */

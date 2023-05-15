@@ -153,7 +153,7 @@ static bool kmidiff_driver(struct rpminspect *ri, rpmfile_entry_t *file)
     name = headerGetString(file->rpm_header, RPMTAG_NAME);
     assert(name != NULL);
 
-    if (!strsuffix(name, DEBUGINFO_SUFFIX)) {
+    if (!is_debuginfo_rpm(file->rpm_header)) {
         return true;
     }
 

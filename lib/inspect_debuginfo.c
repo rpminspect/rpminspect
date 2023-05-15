@@ -159,7 +159,6 @@ static bool debuginfo_driver(struct rpminspect *ri, rpmfile_entry_t *file)
 {
     bool result = true;
     const char *arch = NULL;
-    const char *name = NULL;
     char *nvr = NULL;
     char *tmp = NULL;
     bool debugpkg = false;
@@ -191,12 +190,11 @@ static bool debuginfo_driver(struct rpminspect *ri, rpmfile_entry_t *file)
     }
 
     /* the package nvr and arch is used for reporting */
-    name = headerGetString(file->rpm_header, RPMTAG_NAME);
     nvr = get_nevr(file->rpm_header);
     arch = get_rpm_header_arch(file->rpm_header);
 
     /* debuginfo and debugsource packages have special handling */
-    if (strsuffix(name, DEBUGINFO_SUFFIX) || strsuffix(name, DEBUGSOURCE_SUFFIX)) {
+    if (is_debuginfo_rpm(file->rpm_header) || is_debugsource_rpm(file->rpm_header)) {
         debugpkg = true;
     }
 

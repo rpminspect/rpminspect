@@ -854,7 +854,7 @@ static bool elf_driver(struct rpminspect *ri, rpmfile_entry_t *after)
     }
 
     /* Skip debuginfo packages and debugsource packages */
-    if (strsuffix(name, DEBUGINFO_SUFFIX) || strsuffix(name, DEBUGSOURCE_SUFFIX)) {
+    if (is_debuginfo_rpm(after->rpm_header) || is_debugsource_rpm(after->rpm_header)) {
         return true;
     }
 
