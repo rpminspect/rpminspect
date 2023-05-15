@@ -112,9 +112,9 @@ Requires:       bash
 # the same name, as provided by libabigail.  If it is not present on
 # the system, you can disable the relevant inspections.
 %if 0%{?rhel} >= 8 || 0%{?epel} >= 8 || 0%{?fedora}
-Recommends:     libabigail >= 2.1
+Recommends:     libabigail >= 2.3
 %else
-Requires:       libabigail >= 2.1
+Requires:       libabigail >= 2.3
 %endif
 
 %description -n librpminspect
