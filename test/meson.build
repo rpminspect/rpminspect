@@ -88,9 +88,20 @@ if cunit.found()
         c_args : '-D_BUILDDIR_="@0@"'.format(meson.current_build_dir()),
         link_with : [ librpminspect ],
     )
+
     test_arches = executable(
         'test-arches',
         ['lib/test-arches.c',
+         'lib/test-main.c'],
+        include_directories : inc,
+        dependencies : [ cunit, libkmod ],
+        c_args : '-D_BUILDDIR_="@0@"'.format(meson.current_build_dir()),
+        link_with : [ librpminspect ],
+    )
+
+    test_results = executable(
+        'test-results',
+        ['lib/test-results.c',
          'lib/test-main.c'],
         include_directories : inc,
         dependencies : [ cunit, libkmod ],
@@ -124,6 +135,7 @@ if cunit.found()
     test('test-abspath', test_abspath)
     test('test-humansize', test_humansize)
     test('test-arches', test_arches)
+    test('test-results', test_results)
 else
     warning('CUnit not found, skipping unit test suite')
 endif
