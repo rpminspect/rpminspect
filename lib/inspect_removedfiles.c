@@ -174,7 +174,7 @@ bool inspect_removedfiles(struct rpminspect *ri)
         }
 
         /* Skip debuginfo and debugsource packages */
-        if (is_debuginfo_rpm(file->rpm_header) || is_debugsource_rpm(file->rpm_header)) {
+        if (is_debuginfo_rpm(peer->before_hdr) || is_debugsource_rpm(peer->before_hdr)) {
             continue;
         }
 
