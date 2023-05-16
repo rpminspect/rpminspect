@@ -22,6 +22,7 @@ void output_json(const results_t *results, const char *dest, __attribute__((unus
     int len = 0;
     FILE *fp = NULL;
     const char *header = NULL;
+    const char* json_string = NULL;
     struct json_object *j = NULL;
     struct json_object *ji = NULL;
     struct json_object *jr = NULL;
@@ -101,7 +102,12 @@ void output_json(const results_t *results, const char *dest, __attribute__((unus
         }
 
         /* write out the results */
-        fprintf(fp, "%s\n", json_object_to_json_string_ext(j, flags));
+        json_string = json_object_to_json_string_ext(j, flags);
+        if (json_string == NULL) {
+            errx(RI_PROGRAM_ERROR, "failed to stringify object to json format");
+        }
+        /* write out the results */
+        fprintf(fp, "%s\n", json_string);
 
         /* tidy up and return */
         r = fflush(fp);
