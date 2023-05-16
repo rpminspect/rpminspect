@@ -35,6 +35,11 @@ else
     inc = include_directories( '/usr/local/include', '/usr/include' )
 endif
 
+# See if we have reallocarray in libc
+if cc.has_function('reallocarray')
+    add_global_arguments('-D_HAVE_REALLOCARRAY', language : 'c')
+endif
+
 # On FreeBSD, figure out where strverscmp() is
 libiberty = cc.find_library('iberty',
                             dirs : search_dirs,

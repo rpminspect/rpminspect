@@ -501,7 +501,11 @@ static int validate_file(const char *fpath, __attribute__((unused)) const struct
             if (i >= sz) {
                 sz *= 2;
                 errno = 0;
+#ifdef _HAVE_REALLOCARRAY
                 line_new = reallocarray(line, sz, sizeof(*line));
+#else
+                line_new = realloc(line, sz * sizeof(*line));
+#endif
 
                 if (errno == ENOMEM) {
                     warn("realloc");
