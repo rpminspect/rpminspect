@@ -181,7 +181,7 @@ static bool modularity_driver(struct rpminspect *ri, rpmfile_entry_t *file)
 
     /* Find how to find the header */
     tv = rpmTagGetValue("modularitylabel");
-    if (tv == -1) {
+    if (tv == RPMTAG_NOT_FOUND) {
         add_result(ri, &params);
         free(params.msg);
         return false;
