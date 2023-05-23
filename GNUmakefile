@@ -1,10 +1,17 @@
 # The 'realpath' command may be installed under a different name, in
-# which cas4e the calling environment can set the REALPATH variable to
+# which case the calling environment can set the REALPATH variable to
 # the command to use.  For example, on NetBSD you need to install
 # coreutils from pkgsrc and the command will be install as
 # /usr/pkg/bin/grealpath.
+ifeq ($(shell uname 2>/dev/null),NetBSD)
+REALPATH ?= grealpath
+else
+REALPATH ?= realpath
+endif
+
 REALPATH ?= realpath
 
+# Core directories
 MESON_BUILD_DIR = build
 topdir := $(shell $(REALPATH) $(dir $(lastword $(MAKEFILE_LIST))))
 
