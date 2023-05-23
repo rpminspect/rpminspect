@@ -17,6 +17,7 @@
 #include "inspect.h"
 #include "rpminspect.h"
 
+#ifndef _HAVE_XMLSETGENERICERRORFUNC
 /*
  * By default, libxml will send error messages to stderr.  Turn that off for
  * our purposes.
@@ -25,6 +26,7 @@ static void xml_silence_errors(void *ctx __attribute__((unused)), const char *ms
 {
     return;
 }
+#endif
 
 /*
  * Return true if the given file is a well-formed XML document, false otherwise.
@@ -34,13 +36,19 @@ static void xml_silence_errors(void *ctx __attribute__((unused)), const char *ms
 static bool is_xml_well_formed(const char *path, char **errors)
 {
     static bool initialized = false;
+#ifndef _HAVE_XMLSETGENERICERRORFUNC
     static xmlGenericErrorFunc silence = xml_silence_errors;
+#endif
     xmlParserCtxtPtr ctxt;
     xmlDocPtr doc;
     bool result = true;
 
     if (!initialized) {
+#ifdef _HAVE_XMLSETGENERICERRORFUNC
+        xmlSetGenericErrorFunc(NULL, NULL);
+#else
         initGenericErrorDefaultFunc(&silence);
+#endif
         LIBXML_TEST_VERSION
         initialized = true;
     }

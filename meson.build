@@ -87,6 +87,11 @@ clamav = dependency('libclamav', required : true)
 icu_uc = dependency('icu-uc', required : true)
 icu_io = dependency('icu-io', required : true)
 
+# Check for xmlSetGenericErrorFunc in newer releases of libxml
+if cc.has_function('xmlSetGenericErrorFunc', dependencies : [ libxml ])
+    add_project_arguments('-D_HAVE_XMLSETGENERICERRORFUNC', language : 'c')
+endif
+
 # Check for newer CURLcode in libcurl
 curlinfo_src = '''
     #include <curl/curl.h>
