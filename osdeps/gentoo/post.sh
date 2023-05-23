@@ -4,7 +4,15 @@ CWD="$(pwd)"
 
 # The mandoc package in Gentoo Linux is both masked and does not
 # install the library.
-curl -O http://mandoc.bsd.lv/snapshots/mandoc.tar.gz
+if curl -s http://mandoc.bsd.lv/ >/dev/null 2>&1 ; then
+    curl -O http://mandoc.bsd.lv/snapshots/mandoc.tar.gz
+else
+    # failed to connect to upstream host; take Debian's source
+    DEBIAN_URL=http://ftp.debian.org/debian/pool/main/m/mdocml/
+    # figure out which one is the latest and get that
+    SRCFILE="$(curl -s ${DEBIAN_URL} 2>/dev/null | sed -r 's/<[^>]*>//g' | sed -r 's/<[^>]*>$//g' | tr -s ' ' | grep -vE '^[ \t]*$' | grep ".orig.tar" | sed -r 's/[0-9]{4}-[0-9]{2}-[0-9]{2}.*$//g' | sort -n | tail -n 1)"
+    curl -o mandoc.tar.gz ${DEBIAN_URL}/"${SRCFILE}"
+fi
 SUBDIR="$(tar -tvf mandoc.tar.gz | head -n 1 | rev | cut -d ' ' -f 1 | rev)"
 tar -xf mandoc.tar.gz
 { echo 'PREFIX=/usr/local';

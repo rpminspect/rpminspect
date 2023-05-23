@@ -47,7 +47,15 @@ pip"${PYTHON_VER}" install cpp-coveralls gcovr PyYAML timeout-decorator rpmfluff
 # Install the latest mandoc package to /usr/local, the official EPEL-7
 # repos may be dated.
 cd "${CWD}" || exit 1
-curl -O http://mandoc.bsd.lv/snapshots/mandoc.tar.gz
+if curl -s http://mandoc.bsd.lv/ >/dev/null 2>&1 ; then
+    curl -O http://mandoc.bsd.lv/snapshots/mandoc.tar.gz
+else
+    # failed to connect to upstream host; take Debian's source
+    DEBIAN_URL=http://ftp.debian.org/debian/pool/main/m/mdocml/
+    # figure out which one is the latest and get that
+    SRCFILE="$(curl -s ${DEBIAN_URL} 2>/dev/null | sed -r 's/<[^>]*>//g' | sed -r 's/<[^>]*>$//g' | tr -s ' ' | grep -vE '^[ \t]*$' | grep ".orig.tar" | sed -r 's/[0-9]{4}-[0-9]{2}-[0-9]{2}.*$//g' | sort -n | tail -n 1)"
+    curl -o mandoc.tar.gz ${DEBIAN_URL}/"${SRCFILE}"
+fi
 SUBDIR="$(tar -tvf mandoc.tar.gz | head -n 1 | rev | cut -d ' ' -f 1 | rev)"
 tar -xf mandoc.tar.gz
 { echo 'PREFIX=/usr/local';
