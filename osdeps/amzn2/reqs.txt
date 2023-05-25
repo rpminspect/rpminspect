@@ -22,7 +22,6 @@ libabigail
 libarchive-devel
 libcap-devel
 libcurl-devel
-libdson-devel
 libffi-devel
 libicu-devel
 libmandoc-devel
