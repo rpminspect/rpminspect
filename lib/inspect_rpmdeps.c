@@ -423,7 +423,7 @@ static bool check_explicit_lib_deps(struct rpminspect *ri, Header h, deprule_lis
             result = false;
         }
 
-        list_free(explicit_requires, free);
+        list_free(explicit_requires, free, true);
     }
 
     return result;
@@ -682,13 +682,13 @@ static bool expected_deprule_change(const bool rebase, const deprule_entry_t *de
             free(vr);
             free(evr);
             free(buf);
-            free(suffix);
         }
     } else if (deprule->version == NULL && found) {
         r = true;
     }
 
     free(req);
+    free(suffix);
     return r;
 }
 

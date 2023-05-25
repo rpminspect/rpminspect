@@ -189,8 +189,8 @@ done:
 
     free(removed);
     free(added);
-    list_free(before_needed, free);
-    list_free(after_needed, free);
+    list_free(before_needed, free, true);
+    list_free(after_needed, free, true);
 
     return result;
 }

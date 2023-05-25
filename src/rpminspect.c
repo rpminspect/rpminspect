@@ -261,8 +261,6 @@ static char *get_product_release(string_map_t *products, const favor_release_t f
         after_product = NULL;
     }
 
-    free(before_product);
-
     /* trim the leading period */
     if (after_product) {
         while (after_product[i] == '.' && after_product[i] != '\0') {
@@ -625,7 +623,7 @@ int main(int argc, char **argv)
         if (ri == NULL) {
             errx(RI_PROGRAM_ERROR, _("Failed to read configuration file %s"), tmp_cfgfile);
         }
-    } else if (access(cfgfile, F_OK|R_OK) == 0) {
+    } else if (cfgfile && (access(cfgfile, F_OK|R_OK) == 0)) {
         /* -c configuration file if it exists */
         ri = init_rpminspect(ri, cfgfile, profile);
         initialized = true;
@@ -767,7 +765,7 @@ int main(int argc, char **argv)
             }
 
             if (!found) {
-                list_free(valid_arches, free);
+                list_free(valid_arches, free, true);
                 free_rpminspect(ri);
                 rpmFreeMacros(NULL);
                 rpmFreeRpmrc();
@@ -781,7 +779,7 @@ int main(int argc, char **argv)
 
         /* clean up */
         free(archopt);
-        list_free(valid_arches, free);
+        list_free(valid_arches, free, true);
     }
 
     /* create the working directory */
@@ -871,7 +869,7 @@ int main(int argc, char **argv)
     add_result_entry(&ri->results, &params);
     free(params.msg);
     free(params.details);
-    list_free(diags, free);
+    list_free(diags, free, true);
 
     /* add command line information to the results output */
     xasprintf(&params.msg, _("Command line arguments used to invoke %s."), COMMAND_NAME);

@@ -45,9 +45,8 @@ static void free_patches(patches_t *table)
     }
 
     HASH_ITER(hh, table, entry, tmp_entry) {
-        HASH_DEL(table, entry);
         free(entry->patch);
-        free(entry);
+        HASH_DEL(table, entry);
     }
 
     return;
@@ -66,9 +65,8 @@ static void free_applied_patches(applied_patches_t *table)
     }
 
     HASH_ITER(hh, table, entry, tmp_entry) {
-        HASH_DEL(table, entry);
         free(entry->opts);
-        free(entry);
+        HASH_DEL(table, entry);
     }
 
     return;
@@ -133,7 +131,6 @@ static bool have_automacro(const struct rpminspect *ri, const rpmfile_entry_t *s
                 || strprefix(buf, SPEC_SECTION_CHECK)) {
                 in_valid_section = true;
             } else if (!strcmp(buf, SPEC_SECTION_CHANGELOG)) {
-                in_valid_section = false;
                 break;
             }
         }
@@ -165,7 +162,7 @@ static bool have_automacro(const struct rpminspect *ri, const rpmfile_entry_t *s
         }
     }
 
-    list_free(contents, free);
+    list_free(contents, free, true);
     return r;
 }
 
@@ -259,7 +256,7 @@ static char *expand_patchname_macros(struct rpminspect *ri, const rpmfile_entry_
         }
     }
 
-    list_free(macros, free);
+    list_free(macros, free, true);
     return r;
 }
 
@@ -339,7 +336,7 @@ static patchstat_t get_patch_stats(const char *patch)
     }
 
     /* clean up */
-    list_free(lines, free);
+    list_free(lines, free, true);
 
     return r;
 }
@@ -660,7 +657,9 @@ bool inspect_patches(struct rpminspect *ri)
         automacro = have_automacro(ri, specfile);
 
         /* Initialize the patches hash table */
-        patchfiles = get_rpm_header_string_array(specfile->rpm_header, RPMTAG_PATCH);
+        if (specfile) {
+            patchfiles = get_rpm_header_string_array(specfile->rpm_header, RPMTAG_PATCH);
+        }
 
         if (patchfiles != NULL && !TAILQ_EMPTY(patchfiles)) {
             /* get patch numbers unless automacro is in use */
@@ -713,7 +712,7 @@ bool inspect_patches(struct rpminspect *ri)
                         assert(entry != NULL);
 
                         /* the patch file may contain macros, so try to replace those */
-                        patchhead = patchfile = expand_patchname_macros(ri, specfile, entry->data);
+                        patchfile = patchhead = expand_patchname_macros(ri, specfile, entry->data);
                         assert(patchfile != NULL);
 
                         /* see if we have this patch */
@@ -727,7 +726,7 @@ bool inspect_patches(struct rpminspect *ri)
                             reported = true;
                             result = !(params.severity >= RESULT_VERIFY);
 
-                            list_free(fields, free);
+                            list_free(fields, free, true);
                             continue;
                         }
 
@@ -790,7 +789,6 @@ bool inspect_patches(struct rpminspect *ri)
                                         }
                                     }
 
-                                    numarg = true;
                                     buf[strcspn(buf, " \t")] = '\0';
                                     break;
                                 } else {
@@ -854,11 +852,11 @@ bool inspect_patches(struct rpminspect *ri)
                     }
 
                     /* clean up */
-                    list_free(fields, free);
+                    list_free(fields, free, true);
                 }
 
                 /* clean up the spec file we read in */
-                list_free(speclines, free);
+                list_free(speclines, free, true);
             }
         }
 
@@ -870,7 +868,7 @@ bool inspect_patches(struct rpminspect *ri)
         }
 
         /* Report any removed patch files from the SRPM */
-        if (specfile->peer_file) {
+        if (specfile && specfile->peer_file) {
             before_patchfiles = get_rpm_header_string_array(specfile->peer_file->rpm_header, RPMTAG_PATCH);
 
             if (before_patchfiles != NULL && !TAILQ_EMPTY(before_patchfiles)) {
@@ -885,14 +883,14 @@ bool inspect_patches(struct rpminspect *ri)
                         result = !(params.severity >= RESULT_VERIFY);
                     }
 
-                    list_free(removed, free);
+                    list_free(removed, free, true);
                 }
 
-                list_free(before_patchfiles, free);
+                list_free(before_patchfiles, free, true);
             }
         }
 
-        list_free(patchfiles, free);
+        list_free(patchfiles, free, true);
     }
 
     /* Clean up the patches and applied hash tables */

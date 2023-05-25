@@ -437,10 +437,6 @@ char *extract_rpm_payload(const char *rpm)
         }
     }
 
-    if (rc == RPMERR_ITER_END) {
-        rc = 0;
-    }
-
 cleanup:
     free(hardlink);
     free(buf);

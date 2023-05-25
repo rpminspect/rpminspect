@@ -117,8 +117,8 @@ static bool types_driver(struct rpminspect *ri, rpmfile_entry_t *file)
     }
 
     /* clean up */
-    list_free(bmt, free);
-    list_free(amt, free);
+    list_free(bmt, free, true);
+    list_free(amt, free, true);
     free(bnevra);
     free(anevra);
 

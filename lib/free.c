@@ -18,10 +18,9 @@ static void free_string_list_map(string_list_map_t *table)
     }
 
     HASH_ITER(hh, table, entry, tmp_entry) {
-        HASH_DEL(table, entry);
         free(entry->key);
-        list_free(entry->value, free);
-        free(entry);
+        list_free(entry->value, free, false);
+        HASH_DEL(table, entry);
     }
 
     return;
@@ -66,10 +65,9 @@ void free_string_map(string_map_t *table)
     }
 
     HASH_ITER(hh, table, entry, tmp_entry) {
-        HASH_DEL(table, entry);
         free(entry->key);
         free(entry->value);
-        free(entry);
+        HASH_DEL(table, entry);
     }
 
     return;
@@ -96,9 +94,9 @@ void free_rpminspect(struct rpminspect *ri)
     }
 
     free(ri->progname);
-    list_free(ri->cfgfiles, free);
+    list_free(ri->cfgfiles, free, true);
     free(ri->localcfg);
-    list_free(ri->locallines, free);
+    list_free(ri->locallines, free, true);
     free(ri->workdir);
     free(ri->kojihub);
     free(ri->kojiursine);
@@ -106,7 +104,7 @@ void free_rpminspect(struct rpminspect *ri)
     free(ri->worksubdir);
 
     free(ri->vendor_data_dir);
-    list_free(ri->licensedb, free);
+    list_free(ri->licensedb, free, true);
 
     if (ri->fileinfo) {
         while (!TAILQ_EMPTY(ri->fileinfo)) {
@@ -153,7 +151,7 @@ void free_rpminspect(struct rpminspect *ri)
     }
 
     free(ri->caps_filename);
-    list_free(ri->rebaseable, free);
+    list_free(ri->rebaseable, free, true);
     free(ri->rebaseable_filename);
 
     if (ri->politics) {
@@ -184,7 +182,6 @@ void free_rpminspect(struct rpminspect *ri)
             if (sentry->rules) {
                 HASH_ITER(hh, sentry->rules, srentry, tmp_srentry) {
                     HASH_DEL(sentry->rules, srentry);
-                    free(srentry);
                 }
             }
 
@@ -195,8 +192,8 @@ void free_rpminspect(struct rpminspect *ri)
     }
 
     free(ri->security_filename);
-    list_free(ri->badwords, free);
-    list_free(ri->icons, free);
+    list_free(ri->badwords, free, true);
+    list_free(ri->icons, free, true);
     free(ri->icons_filename);
 
     free_regex(ri->elf_path_include);
@@ -208,8 +205,8 @@ void free_rpminspect(struct rpminspect *ri)
 
     free(ri->elf_path_include_pattern);
     free(ri->elf_path_exclude_pattern);
-    list_free(ri->automacros, free);
-    list_free(ri->bad_functions, free);
+    list_free(ri->automacros, free, true);
+    list_free(ri->bad_functions, free, true);
     free_string_list_map(ri->bad_functions_allowed);
     free(ri->manpage_path_include_pattern);
     free(ri->manpage_path_exclude_pattern);
@@ -227,60 +224,59 @@ void free_rpminspect(struct rpminspect *ri)
     free(ri->commands.annocheck);
 #endif
 
-    list_free(ri->buildhost_subdomain, free);
-    list_free(ri->macrofiles, free);
-    list_free(ri->security_path_prefix, free);
-    list_free(ri->header_file_extensions, free);
-    list_free(ri->forbidden_path_prefixes, free);
-    list_free(ri->forbidden_path_suffixes, free);
-    list_free(ri->forbidden_directories, free);
+    list_free(ri->buildhost_subdomain, free, true);
+    list_free(ri->macrofiles, free, true);
+    list_free(ri->security_path_prefix, free, true);
+    list_free(ri->header_file_extensions, free, true);
+    list_free(ri->forbidden_path_prefixes, free, true);
+    list_free(ri->forbidden_path_suffixes, free, true);
+    list_free(ri->forbidden_directories, free, true);
     free(ri->before);
     free(ri->after);
     free(ri->product_release);
-    list_free(ri->arches, free);
-    list_free(ri->bin_paths, free);
+    list_free(ri->arches, free, true);
+    list_free(ri->bin_paths, free, true);
     free(ri->bin_owner);
     free(ri->bin_group);
-    list_free(ri->forbidden_owners, free);
-    list_free(ri->forbidden_groups, free);
-    list_free(ri->shells, free);
+    list_free(ri->forbidden_owners, free, true);
+    list_free(ri->forbidden_groups, free, true);
+    list_free(ri->shells, free, true);
     free_string_map(ri->jvm);
     free_string_map(ri->annocheck);
     free(ri->annocheck_profile);
     free_string_map(ri->pathmigration);
-    list_free(ri->pathmigration_excluded_paths, free);
+    list_free(ri->pathmigration_excluded_paths, free, true);
     free_string_map(ri->products);
-    list_free(ri->ignores, free);
-    list_free(ri->lto_symbol_name_prefixes, free);
-    list_free(ri->forbidden_paths, free);
+    list_free(ri->ignores, free, true);
+    list_free(ri->lto_symbol_name_prefixes, free, true);
+    list_free(ri->forbidden_paths, free, true);
     free(ri->abidiff_suppression_file);
     free(ri->abidiff_debuginfo_path);
     free(ri->abidiff_extra_args);
     free(ri->kmidiff_suppression_file);
     free(ri->kmidiff_debuginfo_path);
     free(ri->kmidiff_extra_args);
-    list_free(ri->kernel_filenames, free);
+    list_free(ri->kernel_filenames, free, true);
     free(ri->kabi_dir);
     free(ri->kabi_filename);
-    list_free(ri->patch_ignore_list, free);
-    list_free(ri->runpath_allowed_paths, free);
-    list_free(ri->runpath_allowed_origin_paths, free);
-    list_free(ri->runpath_origin_prefix_trim, free);
+    list_free(ri->patch_ignore_list, free, true);
+    list_free(ri->runpath_allowed_paths, free, true);
+    list_free(ri->runpath_allowed_origin_paths, free, true);
+    list_free(ri->runpath_origin_prefix_trim, free, true);
     free_string_list_map(ri->inspection_ignores);
-    list_free(ri->expected_empty_rpms, free);
+    list_free(ri->expected_empty_rpms, free, true);
     free_regex(ri->unicode_exclude);
-    list_free(ri->unicode_excluded_mime_types, free);
-    list_free(ri->unicode_forbidden_codepoints, free);
+    list_free(ri->unicode_excluded_mime_types, free, true);
+    list_free(ri->unicode_forbidden_codepoints, free, true);
     free_deprule_ignore_map(ri->deprules_ignore);
     free(ri->debuginfo_sections);
 
     free_peers(ri->peers);
 
     HASH_ITER(hh, ri->header_cache, hentry, tmp_hentry) {
-        HASH_DEL(ri->header_cache, hentry);
         free(hentry->pkg);
         headerFree(hentry->hdr);
-        free(hentry);
+        HASH_DEL(ri->header_cache, hentry);
     }
 
     free(ri->before_rel);
@@ -308,7 +304,7 @@ void free_deprules(deprule_list_t *list)
         TAILQ_REMOVE(list, entry, items);
         free(entry->requirement);
         free(entry->version);
-        list_free(entry->providers, free);
+        list_free(entry->providers, free, true);
         free(entry);
     }
 

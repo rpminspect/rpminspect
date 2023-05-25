@@ -280,7 +280,7 @@ char **build_argv(const char *cmd)
         i++;
     }
 
-    list_free(list, free);
+    list_free(list, free, true);
     return r;
 }
 
@@ -319,9 +319,9 @@ void free_argv_table(struct rpminspect *ri, string_list_map_t *table)
     }
 
     HASH_ITER(hh, table, hentry, tmp_hentry) {
-        HASH_DEL(table, hentry);
         free(hentry->key);
-        list_free(hentry->value, free);
+        list_free(hentry->value, free, false);
+        HASH_DEL(table, hentry);
     }
 
     return;

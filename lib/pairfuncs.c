@@ -24,7 +24,7 @@ bool pair_contains_key(const pair_list_t *list, const char *key)
     TAILQ_FOREACH(pair, list, items) {
         if (key == NULL && pair->key == key) {
             return true;
-        } else if (!strcmp(key, pair->key)) {
+        } else if (key && pair->key && !strcmp(key, pair->key)) {
             return true;
         }
     }

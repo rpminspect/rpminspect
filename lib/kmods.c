@@ -164,11 +164,11 @@ bool compare_module_parameters(const struct kmod_list *before, const struct kmod
         *gain = list_copy(added);
     }
 
-    list_free(added, NULL);
-    list_free(difference, NULL);
-    list_free(before_parm_list, free);
-    list_free(after_parm_list, free);
-    list_free(combined, free);
+    list_free(added, NULL, true);
+    list_free(difference, NULL, true);
+    list_free(before_parm_list, free, true);
+    list_free(after_parm_list, free, true);
+    list_free(combined, free, true);
 
     return result;
 }
@@ -203,16 +203,16 @@ bool compare_module_dependencies(const struct kmod_list *before, const struct km
     if (difference == NULL || TAILQ_EMPTY(difference)) {
         DEBUG_PRINT("no kernel module deps differences\n");
 
-        list_free(difference, NULL);
-        list_free(before_depends_list, free);
-        list_free(after_depends_list, free);
+        list_free(difference, NULL, true);
+        list_free(before_depends_list, free, true);
+        list_free(after_depends_list, free, true);
 
         return true;
     }
 
     /* Otherwise, just free the difference, and return the before and after dependencies */
     DEBUG_PRINT("there are kernel module deps differences\n");
-    list_free(difference, NULL);
+    list_free(difference, NULL, true);
 
     *before_deps = before_depends_list;
     *after_deps = after_depends_list;
@@ -280,10 +280,9 @@ void free_module_aliases(kernel_alias_data_t *data)
     }
 
     HASH_ITER(hh, data, entry, tmp_entry) {
-        HASH_DEL(data, entry);
         free(entry->alias);
-        list_free(entry->modules, free);
-        free(entry);
+        list_free(entry->modules, free, false);
+        HASH_DEL(data, entry);
     }
 
     free(data);
@@ -386,7 +385,7 @@ bool compare_module_aliases(kernel_alias_data_t *before, kernel_alias_data_t *af
                 wildcard_search = true;
             }
 
-            list_free(difference, NULL);
+            list_free(difference, NULL, true);
         }
 
         /* Compare the results */
@@ -399,7 +398,7 @@ bool compare_module_aliases(kernel_alias_data_t *before, kernel_alias_data_t *af
 
         /* If after_modules was created from a wildcard search, free it */
         if (wildcard_search) {
-            list_free(after_modules, NULL);
+            list_free(after_modules, NULL, true);
         }
     }
 

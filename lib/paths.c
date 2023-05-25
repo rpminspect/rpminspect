@@ -278,7 +278,7 @@ bool match_path(const char *pattern, const char *root, const char *path)
         len++;
     }
 
-    gp = stpcpy(gp, pattern);
+    (void) stpcpy(gp, pattern);
     r = glob(globpath, gflags, NULL, &found);
 
     if (r == GLOB_NOSPACE || r == GLOB_ABORTED) {

@@ -82,8 +82,6 @@ static bool kmod_driver(struct rpminspect *ri, rpmfile_entry_t *file)
     }
 
     /* Skip debuginfo and debugsource packages */
-    aftername = headerGetString(file->rpm_header, RPMTAG_NAME);
-
     if (is_debuginfo_rpm(file->rpm_header) || is_debugsource_rpm(file->rpm_header)) {
         return true;
     }
@@ -198,7 +196,7 @@ static bool kmod_driver(struct rpminspect *ri, rpmfile_entry_t *file)
             reported = true;
         }
 
-        list_free(lost, free);
+        list_free(lost, free, true);
         lost = NULL;
     }
 
@@ -215,7 +213,7 @@ static bool kmod_driver(struct rpminspect *ri, rpmfile_entry_t *file)
             reported = true;
         }
 
-        list_free(gain, free);
+        list_free(gain, free, true);
         gain = NULL;
     }
 
@@ -236,7 +234,7 @@ static bool kmod_driver(struct rpminspect *ri, rpmfile_entry_t *file)
             reported = true;
         }
 
-        list_free(lost, free);
+        list_free(lost, free, true);
         lost = NULL;
     }
 
@@ -252,7 +250,7 @@ static bool kmod_driver(struct rpminspect *ri, rpmfile_entry_t *file)
             reported = true;
         }
 
-        list_free(gain, free);
+        list_free(gain, free, true);
         gain = NULL;
     }
 

@@ -43,7 +43,7 @@ static uint64_t get_flags(const char *s)
         }
     }
 
-    list_free(sections, free);
+    list_free(sections, free, true);
     return r;
 }
 
@@ -111,7 +111,7 @@ static char *strflags(const uint64_t flags)
     }
 
     r = list_to_string(list, " ");
-    list_free(list, free);
+    list_free(list, free, true);
     return r;
 }
 
@@ -151,7 +151,7 @@ static bool is_guile(const char *path)
         }
     }
 
-    list_free(sections, free);
+    list_free(sections, free, true);
     return r;
 }
 

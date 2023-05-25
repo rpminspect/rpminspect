@@ -82,7 +82,7 @@ abi_t *read_abi(const char *vendor_data_dir, const char *product_release)
 
             if (list_len(linekv) != 2) {
                 warn(_("malformed ABI level entry: %s"), line->data);
-                list_free(linekv, free);
+                list_free(linekv, free, true);
                 continue;
             }
 
@@ -94,7 +94,7 @@ abi_t *read_abi(const char *vendor_data_dir, const char *product_release)
 
             if (dsos == NULL) {
                 warn("malformed DSO list: %s", dso->data);
-                list_free(linekv, free);
+                list_free(linekv, free, true);
                 continue;
             }
 
@@ -127,14 +127,14 @@ abi_t *read_abi(const char *vendor_data_dir, const char *product_release)
             }
 
             /* clean up */
-            list_free(linekv, free);
-            list_free(dsos, free);
+            list_free(linekv, free, true);
+            list_free(dsos, free, true);
             entry = NULL;          /* for the next loop iteration */
         }
     }
 
     /* clean up */
-    list_free(contents, free);
+    list_free(contents, free, true);
 
     return r;
 }
@@ -152,9 +152,9 @@ void free_abi(abi_t *table)
     }
 
     HASH_ITER(hh, table, entry, tmp_entry) {
-        HASH_DEL(table, entry);
         free(entry->pkg);
-        list_free(entry->dsos, free);
+        list_free(entry->dsos, free, false);
+        HASH_DEL(table, entry);
     }
 
     free(table);

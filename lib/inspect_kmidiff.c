@@ -268,9 +268,6 @@ static bool kmidiff_driver(struct rpminspect *ri, rpmfile_entry_t *file)
         }
     }
 
-    /* check the ABI compat level list */
-    name = headerGetString(file->rpm_header, RPMTAG_NAME);
-
     /* add additional details */
     if (report) {
         params.file = file->localpath;
@@ -345,7 +342,7 @@ bool inspect_kmidiff(struct rpminspect *ri)
 
     /* clean up */
     free(cmdprefix);
-    list_free(suppressions, free);
+    list_free(suppressions, free, true);
     free(kabi_dir);
 
     /* report the inspection results */

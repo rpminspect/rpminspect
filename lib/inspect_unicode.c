@@ -355,7 +355,7 @@ static char *manual_prep_source(struct rpminspect *ri, const rpmfile_entry_t *fi
     }
 
     free(fp);
-    list_free(sources, free);
+    list_free(sources, free, true);
     return build;
 }
 
