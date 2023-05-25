@@ -39,13 +39,7 @@ jobs:
             # Requirements before the git clone can happen
             - name: git clone requirements
               run: |
-                  yum install -y epel-release
-
-                  if [ -d /etc/pki/rpm-gpg ]; then
-                      rpm --import /etc/pki/rpm-gpg/*
-                  fi
-
-                  yum install -y git
+                  yum install -y epel-release git
                   git config --global --add safe.directory /__w/rpminspect/rpminspect
 
             # This means clone the git repo
