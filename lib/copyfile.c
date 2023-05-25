@@ -85,6 +85,7 @@ int copyfile(const char *src, const char *dest, bool force, bool verbose)
 
     if (mkdirp(destdir, S_IRWXU) == -1) {
         warn("mkdirp");
+        free(destpath);
         return -1;
     }
 

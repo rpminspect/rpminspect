@@ -146,6 +146,7 @@ char *get_file_delta(const char *a, const char *b)
 
     if (fill_mmfile(&old, a) < 0 || fill_mmfile(&new, b) < 0) {
         warn("fill_mmfile");
+//        free(old.ptr);
         return NULL;
     }
 
@@ -176,7 +177,7 @@ char *get_file_delta(const char *a, const char *b)
     }
 
     r = list_to_string(list, "\n");
-    list_free(list, free);
+    list_free(list, free, true);
     free(old.ptr);
     free(new.ptr);
 

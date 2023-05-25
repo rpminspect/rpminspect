@@ -128,7 +128,7 @@ static bool files_driver(struct rpminspect *ri, rpmfile_entry_t *file)
         valid_macro = false;
     }
 
-    list_free(spec, free);
+    list_free(spec, free, true);
     return result;
 }
 

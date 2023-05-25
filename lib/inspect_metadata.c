@@ -152,7 +152,7 @@ static bool valid_peers(struct rpminspect *ri, const Header before_hdr, const He
             free(params.msg);
         }
 
-        if (strcmp(before_summary, after_summary)) {
+        if (before_summary && after_summary && strcmp(before_summary, after_summary)) {
             xasprintf(&params.msg, _("Package Summary change from \"%s\" to \"%s\" in %s"), before_summary, after_summary, after_name);
             params.severity = RESULT_INFO;
             params.waiverauth = NOT_WAIVABLE;
@@ -165,7 +165,7 @@ static bool valid_peers(struct rpminspect *ri, const Header before_hdr, const He
             free(params.msg);
         }
 
-        if (strcmp(before_description, after_description)) {
+        if (before_description && after_description && strcmp(before_description, after_description)) {
             xasprintf(&params.msg, _("Package Description changed in %s"), after_name);
             xasprintf(&params.details, _("from:\n\n%s\n\nto:\n\n%s"), before_description, after_description);
             params.severity = RESULT_INFO;

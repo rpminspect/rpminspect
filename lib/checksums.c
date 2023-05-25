@@ -87,8 +87,7 @@ char *compute_checksum(const char *filename, mode_t *st_mode, int type)
     }
 
     /* don't calculate the checksum of a device node */
-    if (S_ISCHR(*mode) || S_ISBLK(*mode) ||
-        S_ISFIFO(*mode) || S_ISSOCK(*mode)) {
+    if (S_ISCHR(*mode) || S_ISBLK(*mode) || S_ISFIFO(*mode) || S_ISSOCK(*mode)) {
         warnx(_("%s is a FIFO"), filename);
         return NULL;
     }
@@ -112,12 +111,16 @@ char *compute_checksum(const char *filename, mode_t *st_mode, int type)
     }
 
     /* read in the file to generate the requested checksum */
-    if ((input = open(filename, O_RDONLY)) == -1) {
+    input = open(filename, O_RDONLY);
+
+    if (input == -1) {
         warn("open");
         return NULL;
     }
 
-    if ((len = read(input, buf, sizeof(buf))) == -1) {
+    len = read(input, buf, sizeof(buf));
+
+    if (len == -1) {
         warn("read");
         return NULL;
     }
@@ -134,7 +137,9 @@ char *compute_checksum(const char *filename, mode_t *st_mode, int type)
             SHA512_Update(&sha512c, buf, len);
         }
 
-        if ((len = read(input, buf, sizeof(buf))) == -1) {
+        len = read(input, buf, sizeof(buf));
+
+        if (len == -1) {
             warn("read");
             return NULL;
         }
@@ -171,7 +176,9 @@ char *compute_checksum(const char *filename, mode_t *st_mode, int type)
     }
 
     /* this is our human readable digest, caller must free */
-    if ((ret = calloc(len + 1, sizeof(char *))) == NULL) {
+    ret = calloc(len + 1, sizeof(buf));
+
+    if (ret == NULL) {
         warn("calloc");
         return NULL;
     }

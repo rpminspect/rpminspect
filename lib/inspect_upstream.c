@@ -91,6 +91,7 @@ static bool upstream_driver(struct rpminspect *ri, rpmfile_entry_t *file)
             xasprintf(&params.msg, _("Upstream source file `%s` changed content"), params.file);
             params.verb = VERB_CHANGED;
             params.noun = _("checksum of ${FILE}");
+            params.details = diff_head;
             add_result(ri, &params);
             result = !(params.severity >= RESULT_VERIFY);
             reported = true;
@@ -201,9 +202,9 @@ bool inspect_upstream(struct rpminspect *ri)
             }
         }
 
-        list_free(removed, free);
-        list_free(before_source, free);
-        list_free(source, free);
+        list_free(removed, free, true);
+        list_free(before_source, free, true);
+        list_free(source, free, true);
     }
 
     free(params.remedy);

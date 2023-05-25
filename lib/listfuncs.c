@@ -231,14 +231,14 @@ string_list_t * list_symmetric_difference(const string_list_t *a, const string_l
     b_minus_a = list_difference(b, a);
 
     if (b_minus_a == NULL) {
-        list_free(a_minus_b, NULL);
+        list_free(a_minus_b, NULL, true);
         return NULL;
     }
 
     combination = list_union(a_minus_b, b_minus_a);
 
-    list_free(a_minus_b, NULL);
-    list_free(b_minus_a, NULL);
+    list_free(a_minus_b, NULL, true);
+    list_free(b_minus_a, NULL, true);
 
     return combination;
 }
@@ -247,7 +247,7 @@ string_list_t * list_symmetric_difference(const string_list_t *a, const string_l
  * Helper function to free a string_list_t and each entry->data.  If
  * the free_func is NULL, nothing is done to the entry->data values.
  */
-void list_free(string_list_t *list, list_entry_data_free_func free_func)
+void list_free(string_list_t *list, list_entry_data_free_func free_func, const bool free_list)
 {
     string_entry_t *entry = NULL;
 
@@ -266,7 +266,10 @@ void list_free(string_list_t *list, list_entry_data_free_func free_func)
         free(entry);
     }
 
-    free(list);
+    if (free_list) {
+        free(list);
+    }
+
     return;
 }
 
@@ -300,12 +303,9 @@ string_list_t *list_sort(const string_list_t *list)
 
     /* build a new string_list_t from the sorted hash table */
     HASH_ITER(hh, map, entry, tmp_entry) {
-        HASH_DEL(map, entry);
-
         sorted_list = list_add(sorted_list, entry->key);
-
         free(entry->key);
-        free(entry);
+        HASH_DEL(map, entry);
     }
 
     free(map);
@@ -331,7 +331,7 @@ size_t list_len(const string_list_t *list)
 
 /*
  * Returns a malloc'ed copy of the given list.  Caller must use
- * list_free(list, free) on the returned list.
+ * list_free(list, free, true) on the returned list.
  */
 string_list_t * list_copy(const string_list_t *list)
 {

@@ -20,7 +20,7 @@ static int printword(const char *word, const size_t width, const unsigned int in
 {
     int ret = 0;
 
-    if ((strlen(word) + lw) >= width) {
+    if (word && ((strlen(word) + lw) >= width)) {
         fprintf(dest, "\n");
         first = true;
 
@@ -603,7 +603,7 @@ char *strshorten(const char *s, size_t width)
     tail = stpncpy(tail, s, left_width);
     tail = stpcpy(tail, "...");
     s = s + input_len - right_width;
-    tail = stpcpy(tail, s);
+    (void) stpcpy(tail, s);
 
     return r;
 }

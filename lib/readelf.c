@@ -29,7 +29,6 @@
 static GElf_Half _get_elf_helper(Elf *elf, elfinfo_t type, GElf_Half fail)
 {
     GElf_Ehdr ehdr;
-    GElf_Half ret;
     Elf_Kind kind;
 
     assert(elf != NULL);
@@ -38,19 +37,19 @@ static GElf_Half _get_elf_helper(Elf *elf, elfinfo_t type, GElf_Half fail)
 
     if (gelf_getehdr(elf, &ehdr) == NULL) {
         warn("gelf_getehdr");
-        ret = fail;
+        return fail;
     }
 
     if (type == ELF_TYPE) {
-        ret = ehdr.e_type;
+        return ehdr.e_type;
     } else if (type == ELF_MACHINE) {
-        ret = ehdr.e_machine;
+        return ehdr.e_machine;
     } else {
         warn("unknown elftype_t %d", type);
-        ret = -1;
+        return fail;
     }
 
-    return ret;
+    return fail;
 }
 
 GElf_Half get_elf_type(Elf *elf)
@@ -246,7 +245,7 @@ string_list_t *get_elf_section_names(Elf *elf, size_t start)
     while ((scn = elf_nextscn(elf, scn)) != NULL) {
         /* get this header information */
         if (gelf_getshdr(scn, &shdr) != &shdr) {
-            list_free(names, free);
+            list_free(names, free, true);
             return NULL;
         }
 
@@ -517,12 +516,12 @@ static string_list_t *get_elf_symbol_list(Elf *elf, bool (*filter)(const char *)
 
     /* Get the section data */
     if ((data = elf_getdata(scn, NULL)) == NULL) {
-        list_free(list, NULL);
+        list_free(list, NULL, true);
         return NULL;
     }
 
     if ((xndxscn != NULL) && ((xndxdata = elf_getdata(xndxscn, NULL)) == NULL)) {
-        list_free(list, NULL);
+        list_free(list, NULL, true);
         return NULL;
     }
 
@@ -553,7 +552,7 @@ static string_list_t *get_elf_symbol_list(Elf *elf, bool (*filter)(const char *)
  * If filter is not NULL, only the symbol's returned true by the filter will be added.
  *
  * The memory pointed to by the list elements is owned by the Elf* context. The list
- * itself should be freed with list_free(<list>, NULL) by the caller.
+ * itself should be freed with list_free(<list>, NULL, true) by the caller.
  */
 string_list_t * get_elf_imported_functions(Elf *elf, bool (*filter)(const char *))
 {

@@ -51,7 +51,7 @@ static bool removedfiles_driver(struct rpminspect *ri, rpmfile_entry_t *file)
     }
 
     /* Skip moved files */
-    if (file->moved_path && file->peer_file->moved_path) {
+    if (file->moved_path && (file->peer_file && file->peer_file->moved_path)) {
         return true;
     }
 

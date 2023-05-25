@@ -74,6 +74,7 @@ int mkdirp(const char *path, mode_t mode)
                 continue;
             } else if (mkdir(start, mode) == -1) {
                 warn(_("*** unable to mkdir %s"), start);
+                free(start);
                 return -1;
             }
 
@@ -86,6 +87,7 @@ int mkdirp(const char *path, mode_t mode)
     /* final directory */
     if ((stat(start, &sb) != 0) && (mkdir(start, mode) == -1)) {
         warn(_("*** unable to mkdir %s"), start);
+        free(start);
         return -1;
     }
 

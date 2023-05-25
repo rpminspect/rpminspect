@@ -196,7 +196,7 @@ static bool check_runpath(struct rpminspect *ri, const rpmfile_entry_t *file, co
             }
         }
 
-        list_free(parts, free);
+        list_free(parts, free, true);
     }
 
     return r;
@@ -292,8 +292,8 @@ cleanup:
         close(fd);
     }
 
-    list_free(rpath, free);
-    list_free(runpath, free);
+    list_free(rpath, free, true);
+    list_free(runpath, free, true);
 
     return result;
 }

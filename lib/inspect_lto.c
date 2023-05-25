@@ -34,17 +34,16 @@ static string_list_t *lto_symbol_name_prefixes = NULL;
  * @param user_data string_list_t for results
  * @return True under normal conditions, false to indicate badness
  */
-static bool find_lto_symbols(Elf *elf, string_list_t **user_data)
+static bool find_lto_symbols(Elf *elf, __attribute__((unused)) string_list_t **user_data)
 {
-    string_list_t *specifics = *user_data;
+    string_list_t *specifics = NULL;
     string_list_t *names = NULL;
     string_entry_t *entry = NULL;
     string_entry_t *prefix = NULL;
-    Elf_Arhdr *arhdr;
 
     assert(elf != NULL);
 
-    if ((arhdr = elf_getarhdr(elf)) == NULL) {
+    if (elf_getarhdr(elf) == NULL) {
         return true;
     }
 
@@ -75,11 +74,11 @@ static bool find_lto_symbols(Elf *elf, string_list_t **user_data)
     }
 
     if (TAILQ_EMPTY(specifics)) {
-        list_free(specifics, free);
+        list_free(specifics, free, true);
         specifics = NULL;
     }
 
-    list_free(names, free);
+    list_free(names, free, true);
 
     return true;
 }
@@ -149,9 +148,9 @@ static bool lto_driver(struct rpminspect *ri, rpmfile_entry_t *file)
         elf_archive_iterate(fd, elf, find_lto_symbols, &names);
 
         if (names != NULL) {
-            params.noun = entry->data;
             badsyms = list_to_string(names, ", ");
             xasprintf(&params.msg, _("%s contains symbols [%s] on %s; this is not portable across compiler versions"), file->localpath, badsyms, arch);
+            params.noun = badsyms;
             add_result(ri, &params);
             free(params.msg);
             free(badsyms);
@@ -182,7 +181,7 @@ static bool lto_driver(struct rpminspect *ri, rpmfile_entry_t *file)
         close(fd);
     }
 
-    list_free(names, free);
+    list_free(names, free, true);
 
     return result;
 }

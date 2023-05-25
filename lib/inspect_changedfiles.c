@@ -297,7 +297,7 @@ static bool changedfiles_driver(struct rpminspect *ri, rpmfile_entry_t *file)
             }
 
             if (rindex(type, '-')) {
-                comptype = rindex(comptype, '-') + 1;
+                comptype = rindex(type, '-') + 1;
                 assert(comptype != NULL);
             }
 

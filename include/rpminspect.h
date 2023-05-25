@@ -140,7 +140,7 @@ string_list_t * list_intersection(const string_list_t *, const string_list_t *);
 string_list_t * list_union(const string_list_t *, const string_list_t *);
 string_list_t * list_symmetric_difference(const string_list_t *, const string_list_t *);
 typedef void (*list_entry_data_free_func)(void *);
-void list_free(string_list_t *, list_entry_data_free_func);
+void list_free(string_list_t *, list_entry_data_free_func, const bool);
 size_t list_len(const string_list_t *);
 string_list_t * list_sort(const string_list_t *);
 string_list_t * list_copy(const string_list_t *);

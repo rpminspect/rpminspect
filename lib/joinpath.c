@@ -75,8 +75,6 @@ char *joinpath(const char *path, ...)
         needsep = false;
 
         /* trim any extra trailing slashes */
-        i = strlen(built);
-
         while (*tail == '/') {
             *tail = '\0';
             tail--;

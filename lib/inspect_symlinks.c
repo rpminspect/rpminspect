@@ -153,7 +153,7 @@ static bool symlinks_driver(struct rpminspect *ri, rpmfile_entry_t *file)
             target++;
         }
 
-        tail = stpcpy(reltarget, target);
+        (void) stpcpy(reltarget, target);
     } else {
         /* link is relative */
         /*

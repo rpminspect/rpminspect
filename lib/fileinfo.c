@@ -66,7 +66,6 @@ bool match_fileinfo_mode(struct rpminspect *ri, const rpmfile_entry_t *file, con
                     params.waiverauth = NOT_WAIVABLE;
                     add_result(ri, &params);
                     free(params.msg);
-                    free(params.remedy);
                     *reported = true;
                     return true;
                 } else {
@@ -77,7 +76,6 @@ bool match_fileinfo_mode(struct rpminspect *ri, const rpmfile_entry_t *file, con
                         xasprintf(&params.msg, _("%s in %s on %s carries unexpected mode %04o; expected mode %04o; requires inspection by the Security Team"), file->localpath, pkg, params.arch, perms, fientry->mode);
                         add_result(ri, &params);
                         free(params.msg);
-                        free(params.remedy);
                         *result = false;
                         *reported = true;
                         return true;
@@ -98,12 +96,12 @@ bool match_fileinfo_mode(struct rpminspect *ri, const rpmfile_entry_t *file, con
             xasprintf(&params.msg, _("%s in %s on %s carries insecure mode %04o, Security Team review may be required"), file->localpath, pkg, params.arch, perms);
             add_result(ri, &params);
             free(params.msg);
-            free(params.remedy);
             *result = false;
             *reported = true;
         }
     }
 
+    free(params.remedy);
     return false;
 }
 

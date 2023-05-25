@@ -479,11 +479,11 @@ bool deprules_match(const deprule_entry_t *a, const deprule_entry_t *b)
     }
 
     /* trim any leading parens in case of rich deps */
-    while (*ra == '(') {
+    while (ra && *ra == '(') {
         ra++;
     }
 
-    while (*rb == '(') {
+    while (rb && *rb == '(') {
         rb++;
     }
 

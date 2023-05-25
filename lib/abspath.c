@@ -69,8 +69,8 @@ char *abspath(const char *path)
     }
 
     /* clean up */
-    list_free(tokens, free);
-    list_free(newpath, free);
+    list_free(tokens, free, true);
+    list_free(newpath, free, true);
     free(p);
 
     return r;

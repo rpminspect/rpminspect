@@ -359,9 +359,8 @@ rpmfile_t *extract_rpm(struct rpminspect *ri, const char *pkg, Header hdr, const
 
 cleanup:
     HASH_ITER(hh, path_table, path_entry, tmp_entry) {
-        HASH_DEL(path_table, path_entry);
         free(path_entry->path);
-        free(path_entry);
+        HASH_DEL(path_table, path_entry);
     }
 
     if (archive != NULL) {
@@ -817,7 +816,6 @@ void find_file_peers(rpmfile_t *before, rpmfile_t *after)
     /* Clean up the hash table */
     HASH_ITER(hh, after_table, entry, tmp_entry) {
         HASH_DEL(after_table, entry);
-        free(entry);
     }
 
     return;

@@ -477,7 +477,7 @@ static int download_build(struct rpminspect *ri, const struct koji_build *build)
             free(pkg);
         }
 
-        list_free(filter, free);
+        list_free(filter, free, true);
         filter = NULL;
     }
 
@@ -596,7 +596,7 @@ static int download_task(struct rpminspect *ri, struct koji_task *task)
                 dst = realloc(dst, len + strlen(pkg) + 2);
                 tail = dst + len;
                 tail = stpcpy(tail, "/");
-                tail = stpcpy(tail, pkg);
+                (void) stpcpy(tail, pkg);
                 assert(dst != NULL);
 
                 xasprintf(&src, "%s/work/%s", workri->kojiursine, entry->data);
@@ -669,10 +669,6 @@ static int download_rpm(struct rpminspect *ri, const char *rpm)
         ri->download_size += rpmsize;
     }
 
-    /* the RPM filename */
-    pkg = strdup(rpm);
-    assert(pkg != NULL);
-
     /* create the destination directory */
     if (fetch_only) {
         dstdir = strdup(workri->worksubdir);
@@ -682,8 +678,13 @@ static int download_rpm(struct rpminspect *ri, const char *rpm)
 
     if (mkdirp(dstdir, mode)) {
         warn("mkdirp");
+        free(dstdir);
         return -1;
     }
+
+    /* the RPM filename */
+    pkg = strdup(rpm);
+    assert(pkg != NULL);
 
     /* set working subdirectory */
     set_worksubdir(workri, LOCAL_WORKDIR, NULL, NULL);

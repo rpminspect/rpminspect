@@ -23,23 +23,37 @@ void test_abspath(void) {
 
     r = abspath("/../lib/jli");
     RI_ASSERT_PTR_NOT_NULL(r);
-    RI_ASSERT_EQUAL(strcmp(r, "/lib/jli"), 0);
-    free(r);
+
+    if (r) {
+        RI_ASSERT_EQUAL(strcmp(r, "/lib/jli"), 0);
+        free(r);
+    }
 
     r = abspath("/../lib64/");
     RI_ASSERT_PTR_NOT_NULL(r);
-    RI_ASSERT_EQUAL(strcmp(r, "/lib64"), 0);
-    free(r);
+
+    if (r) {
+        RI_ASSERT_EQUAL(strcmp(r, "/lib64"), 0);
+        free(r);
+    }
 
     r = abspath("/usr/lib/../lib64/../lib");
     RI_ASSERT_PTR_NOT_NULL(r);
-    RI_ASSERT_EQUAL(strcmp(r, "/usr/lib"), 0);
-    free(r);
+
+    if (r) {
+        RI_ASSERT_EQUAL(strcmp(r, "/usr/lib"), 0);
+        free(r);
+    }
 
     r = abspath("/usr/lib/../lib64/../lib/");
     RI_ASSERT_PTR_NOT_NULL(r);
-    RI_ASSERT_EQUAL(strcmp(r, "/usr/lib"), 0);
-    free(r);
+
+    if (r) {
+        RI_ASSERT_EQUAL(strcmp(r, "/usr/lib"), 0);
+        free(r);
+    }
+
+    return;
 }
 
 CU_pSuite get_suite(void) {

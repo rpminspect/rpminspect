@@ -64,7 +64,7 @@ char *read_release(const rpmfile_t *files)
         }
     }
 
-    list_free(spec, free);
+    list_free(spec, free, true);
 
     return rel;
 }
