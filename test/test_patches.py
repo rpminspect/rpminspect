@@ -3,11 +3,21 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 #
 
+import rpm
 import subprocess
 import rpmfluff
 import unittest
+from distutils.version import LooseVersion
 
 from baseclass import TestSRPM, TestCompareSRPM
+
+# rpm < v4.18 does not support '%patch N' syntax
+rpmver = list(map(lambda x: int(x), rpm.__version__.strip().split("-")[0].split(".")))
+
+if LooseVersion("%d.%d" % (rpmver[0], rpmver[1])) <= LooseVersion("4.18"):
+    patch_N_supported = False
+else:
+    patch_N_supported = True
 
 # Check to see if %autopatch works (requires lua)
 proc = subprocess.Popen(
@@ -531,6 +541,9 @@ class PatchFilenameWithMacroCompareSRPM(TestCompareSRPM):
 
 # '%patch N' syntax used to apply patch
 class PatchNMacroSRPM(TestSRPM):
+    @unittest.skipUnless(
+        patch_N_supported, "rpmbuild v4.14 does not support '%patch N' syntax"
+    )
     def setUp(self):
         super().setUp()
 
@@ -550,6 +563,9 @@ class PatchNMacroSRPM(TestSRPM):
 
 
 class PatchNMacroCompareSRPM(TestCompareSRPM):
+    @unittest.skipUnless(
+        patch_N_supported, "rpmbuild v4.14 does not support '%patch N' syntax"
+    )
     def setUp(self):
         super().setUp()
 
