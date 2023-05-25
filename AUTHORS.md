@@ -27,11 +27,17 @@ Contributors
 
 - Jakub Wilk <jwilk@jwilk.net>
 
+- Jan Macku <jamacku@redhat.com>
+
 - Jeremy Cline <jcline@redhat.com>
+
+- Jesus Checa Hidalgo <jchecahi@redhat.com>
 
 - Jim Bair <jbair@redhat.com>
 
 - Martin Pitt <martin@piware.de>
+
+- Michal Domonkos <mdomonko@redhat.com>
 
 - Michal Srb <michal@redhat.com>
 
