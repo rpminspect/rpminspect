@@ -501,6 +501,8 @@ int main(int argc, char **argv)
 
                     cwd = realpath(expand.we_wordv[0], NULL);
                     assert(cwd != NULL);
+                } else {
+                    err(RI_PROGRAM_ERROR, _("*** unable to use `%s' as working directory"), optarg);
                 }
 
                 wordfree(&expand);
