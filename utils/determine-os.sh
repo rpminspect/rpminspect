@@ -58,7 +58,7 @@ elif [ -r /etc/almalinux-release ] && [ "${ID}" = "almalinux" ]; then
     esac
 elif [ -r /etc/rocky-release ] && [ "${ID}" = "rocky" ]; then
     v="$(echo "${VERSION_ID}" | cut -d '.' -f 1)"
-    if [ "${v}" = "8" ]; then
+    if [ "${v}" = "8" ] || [ "${v}" = "9" ]; then
         echo "${ID}${v}"
     else
         echo "unknown OS: ${ID}:${v}" >&2
