@@ -75,7 +75,7 @@ int copyfile(const char *src, const char *dest, bool force, bool verbose)
 
     /* stat the source */
     if (lstat(src, &sb) == -1) {
-        warn("lstat");
+        warn("*** lstat");
         return -1;
     }
 
@@ -84,7 +84,6 @@ int copyfile(const char *src, const char *dest, bool force, bool verbose)
     destdir = dirname(destpath);
 
     if (mkdirp(destdir, S_IRWXU) == -1) {
-        warn("mkdirp");
         free(destpath);
         return -1;
     }
@@ -94,12 +93,12 @@ int copyfile(const char *src, const char *dest, bool force, bool verbose)
     /* if src is a symlink, handle it here */
     if (S_ISLNK(sb.st_mode)) {
         if (readlink(src, linkdest, PATH_MAX) == -1) {
-            warn("readlink");
+            warn("*** readlink");
             return -1;
         }
 
         if (symlink(linkdest, dest) == -1) {
-            warn("symlink");
+            warn("*** symlink");
             return -1;
         }
 
@@ -108,7 +107,7 @@ int copyfile(const char *src, const char *dest, bool force, bool verbose)
 
     /* copy src to dest */
     if ((in = fopen(src, "r")) == NULL) {
-        warn("fopen");
+        warn("*** fopen");
         return -1;
     }
 
@@ -124,11 +123,11 @@ int copyfile(const char *src, const char *dest, bool force, bool verbose)
                 }
 
                 if (remove(dest)) {
-                    warn("remove");
+                    warn("*** remove");
                     return -1;
                 } else {
                     if ((out_fd = open(dest, oflags, mode)) == -1) {
-                        warn("open");
+                        warn("*** open");
                     }
                 }
             } else {
@@ -137,36 +136,36 @@ int copyfile(const char *src, const char *dest, bool force, bool verbose)
                 return -1;
             }
         } else {
-            warn("open");
+            warn("*** open");
             return -1;
         }
     }
 
     if ((out = fdopen(out_fd, "wb")) == NULL) {
-        warn("fdopen");
+        warn("*** fdopen");
         return -1;
     }
 
     while ((s = fread(buf, sizeof(char), BUFSIZ, in)) > 0) {
         if (fwrite(buf, sizeof(char), s, out) != s) {
-            warn("fwrite");
+            warn("*** fwrite");
             success = -1;
             break;
         }
     }
 
     if (fflush(out) != 0) {
-        warn("fflush");
+        warn("*** fflush");
         success = -1;
     }
 
     if (fclose(out) != 0) {
-        warn("fclose");
+        warn("*** fclose");
         success = -1;
     }
 
     if (fclose(in) != 0) {
-        warn("fclose");
+        warn("*** fclose");
     }
 
     if (success != 0) {
@@ -176,13 +175,13 @@ int copyfile(const char *src, const char *dest, bool force, bool verbose)
     /* set ownerships and permissions */
     if (geteuid() == 0) {
         if (chown(dest, sb.st_uid, sb.st_gid) == -1) {
-            warn("chown");
+            warn("*** chown");
             success = -1;
         }
     }
 
     if (chmod(dest, (sb.st_mode & (S_ISUID | S_ISGID | S_ISVTX | S_IRWXU | S_IRWXG | S_IRWXO))) == -1) {
-        warn("chmod");
+        warn("*** chmod");
         success = -1;
     }
 

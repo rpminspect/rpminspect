@@ -47,7 +47,7 @@ void *read_file_bytes(const char *path, off_t *len)
     *len = lseek(fd, 0, SEEK_END);
 
     if (*len == -1) {
-        warn("unable to find end of %s", path);
+        warn(_("*** unable to find end of %s"), path);
         r = close(fd);
         assert(r != -1);
         return NULL;
@@ -57,7 +57,7 @@ void *read_file_bytes(const char *path, off_t *len)
     buf = mmap(NULL, *len, PROT_READ, MAP_PRIVATE, fd, 0);
 
     if (buf == MAP_FAILED) {
-        warn("unable to read %s", path);
+        warn(_("*** unable to read %s"), path);
         r = close(fd);
         assert(r != -1);
         return NULL;
@@ -65,7 +65,7 @@ void *read_file_bytes(const char *path, off_t *len)
 
     /* the actual file close we care about */
     if (close(fd) == -1) {
-        warn("unable to close %s", path);
+        warn(_("*** unable to close %s"), path);
     }
 
     /* break up the file in to lines */

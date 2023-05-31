@@ -72,7 +72,7 @@ static int add_regex(const char *pattern, regex_t **regex_out)
         assert(errbuf != NULL);
 
         regerror(reg_result, *regex_out, errbuf, errbuf_size);
-        warn("%s", errbuf);
+        warnx("*** %s", errbuf);
 
         /* Clean up and return error */
         free(errbuf);
@@ -173,7 +173,7 @@ static void process_table(const char *key, const char *value, const bool require
 
     if (entry == NULL) {
         if (required) {
-            warnx("missing key `%s', unable to append `%s'", key, value);
+            warnx("*** missing key `%s', unable to append `%s'", key, value);
         } else {
             /* add the new key/value pair to the table */
             entry = calloc(1, sizeof(*entry));
@@ -216,7 +216,7 @@ static mode_t parse_mode(const char *input)
     assert(input != NULL);
 
     if (strlen(input) != 10) {
-        warn(_("invalid input string `%s`"), input);
+        warnx(_("*** invalid input string `%s`"), input);
         return mode;
     }
 
@@ -368,7 +368,7 @@ static bool array_cb(const char *entry, void *cb_data)
 static inline void array(parser_plugin *p, parser_context *ctx, const char *key1, const char *key2, string_list_t **list)
 {
     if (p->strarray_foreach(ctx, key1, key2, array_cb, list)) {
-        warnx(_("problem adding entries to array %s->%s"), key1, key2);
+        warnx(_("*** problem adding entries to array %s->%s"), key1, key2);
     }
 
     return;
@@ -389,7 +389,7 @@ static inline void add_ignores(struct rpminspect *ri, parser_plugin *p, parser_c
 
     if (p->strarray_foreach(ctx, inspection, "ignore", add_ignores_cb, &data)
         && p->strarray_foreach(ctx, inspection, "ignores", add_ignores_cb, &data)) {
-        warnx(_("problem adding ignore entries to %s"), inspection);
+        warnx(_("*** problem adding ignore entries to %s"), inspection);
     }
 
     return;
@@ -408,7 +408,7 @@ static inline void add_ignores(struct rpminspect *ri, parser_plugin *p, parser_c
         }                                                               \
                                                                         \
         if (add_regex(s, &ri->inspection ## _path_include) != 0) {      \
-            warn(_("error reading " #inspection " include path"));      \
+            warnx(_("*** error reading " #inspection " include path"));      \
         }                                                               \
                                                                         \
         free(s);                                                        \
@@ -422,7 +422,7 @@ static inline void add_ignores(struct rpminspect *ri, parser_plugin *p, parser_c
         }                                                               \
                                                                         \
         if (add_regex(s, &ri->inspection ## _path_exclude) != 0) {      \
-            warn(_("error reading " #inspection " include path"));      \
+            warnx(_("*** error reading " #inspection " include path"));      \
         }                                                               \
                                                                         \
         free(s);                                                        \
@@ -448,7 +448,7 @@ static void tabledict(parser_plugin *p, parser_context *ctx, const char *key1, c
     tabledict_cb_data data = { required, single, table };
 
     if (p->strdict_foreach(ctx, key1, key2, tabledict_cb, &data)) {
-        warnx(_("ignoring malformed section %s->%s"), key1, key2);
+        warnx(_("*** ignoring malformed section %s->%s"), key1, key2);
     }
 
     return;
@@ -505,7 +505,7 @@ static bool rpmdeps_cb(const char *key, const char *value, void *cb_data)
         drentry->pattern = strdup(value);
 
         if (add_regex(value, &drentry->ignore) != 0) {
-            warn(_("error reading %s ignore pattern"), get_deprule_desc(depkey));
+            warnx(_("*** error reading %s ignore pattern"), get_deprule_desc(depkey));
         }
 
         HASH_ADD_INT(*deprules_ignore, type, drentry);
@@ -518,7 +518,7 @@ static bool rpmdeps_cb(const char *key, const char *value, void *cb_data)
         drentry->ignore = NULL;
 
         if (add_regex(value, &drentry->ignore) != 0) {
-            warn(_("error reading %s ignore pattern"), get_deprule_desc(depkey));
+            warnx(_("*** error reading %s ignore pattern"), get_deprule_desc(depkey));
         }
     }
 
@@ -538,7 +538,7 @@ static bool handle_inspections_cb(const char *key, const char *value, void *cb_d
     }
 
     if (!process_inspection_flag(key, onoff, tests)) {
-        err(RI_PROGRAM_ERROR, _("*** Unknown inspections: `%s`"), key);
+        err(RI_PROGRAM_ERROR, _("*** unknown inspections: `%s`"), key);
         return true;
     }
 
@@ -549,7 +549,7 @@ static bool handle_inspections_cb(const char *key, const char *value, void *cb_d
 static inline void handle_inspections(struct rpminspect *ri, parser_plugin *p, parser_context *ctx)
 {
     if (p->strdict_foreach(ctx, "inspections", NULL, handle_inspections_cb, &ri->tests)) {
-        warnx(_("malformed/unknown inspections section"));
+        warnx(_("*** malformed/unknown inspections section"));
     }
 
     return;
@@ -581,7 +581,7 @@ static void read_cfgfile(struct rpminspect *ri, const char *filename)
     INIT_DEBUG_PRINT("filename=|%s|\n", filename);
 
     if (parse_agnostic(filename, &p, &ctx)) {
-        warnx(_("ignoring malformed %s configuration file: %s"), COMMAND_NAME, filename);
+        warnx(_("*** ignoring malformed %s configuration file: %s"), COMMAND_NAME, filename);
         return;
     }
 
@@ -684,7 +684,7 @@ static void read_cfgfile(struct rpminspect *ri, const char *filename)
             ri->size_threshold = strtol(s, 0, 10);
 
             if ((ri->size_threshold == LONG_MIN || ri->size_threshold == LONG_MAX) && errno == ERANGE) {
-                warn("strtol");
+                warn("*** strtol");
                 ri->size_threshold = 0;
             }
         }
@@ -736,7 +736,7 @@ static void read_cfgfile(struct rpminspect *ri, const char *filename)
         ri->annocheck_failure_severity = getseverity(s, RESULT_NULL);
 
         if (ri->annocheck_failure_severity == RESULT_NULL) {
-            warnx(_("Invalid annocheck failure_reporting_level: %s, defaulting to %s."), s, strseverity(RESULT_VERIFY));
+            warnx(_("*** invalid annocheck failure_reporting_level: %s, defaulting to %s"), s, strseverity(RESULT_VERIFY));
             ri->annocheck_failure_severity = RESULT_VERIFY;
         }
 
@@ -772,7 +772,7 @@ static void read_cfgfile(struct rpminspect *ri, const char *filename)
 
         if ((ri->abi_security_threshold == LONG_MIN ||
              ri->abi_security_threshold == LONG_MAX) && errno == ERANGE) {
-            warn("strtol");
+            warn("*** strtol");
             ri->abi_security_threshold = DEFAULT_ABI_SECURITY_THRESHOLD;
         }
 
@@ -793,7 +793,7 @@ static void read_cfgfile(struct rpminspect *ri, const char *filename)
 
     /* ri->bad_functions_allowed is a string_list_map_t, not string_map_t. */
     if (p->strdict_foreach(ctx, "badfuncs", "allowed", badfuncs_allowed_cb, &ri->bad_functions_allowed)) {
-        warnx(_("Malformed badfuncs->allowed section"));
+        warnx(_("*** malformed badfuncs->allowed section"));
     }
 
     /* Backward compatibility for badfuncs prior to "forbidden". */
@@ -811,7 +811,7 @@ static void read_cfgfile(struct rpminspect *ri, const char *filename)
     s = p->getstr(ctx, "unicode", "exclude");
 
     if (s != NULL && add_regex(s, &ri->unicode_exclude) != 0) {
-        warn(_("error reading unicode exclude regular expression"));
+        warnx(_("*** error reading unicode exclude regular expression: %s"), s);
     }
 
     free(s);
@@ -821,7 +821,7 @@ static void read_cfgfile(struct rpminspect *ri, const char *filename)
     add_ignores(ri, p, ctx, "unicode");
 
     if (p->strdict_foreach(ctx, "rpmdeps", "ignore", rpmdeps_cb, &ri->deprules_ignore)) {
-        warnx(_("Malformed rpmdeps->ignore section; skipping"));
+        warnx(_("*** malformed rpmdeps->ignore section; skipping"));
     }
 
     add_ignores(ri, p, ctx, "virus");
@@ -1650,7 +1650,7 @@ struct rpminspect *init_rpminspect(struct rpminspect *ri, const char *cfgfile, c
     memset(cwd, '\0', sizeof(cwd));
 
     if (getcwd(cwd, PATH_MAX) == NULL) {
-        err(RI_PROGRAM_ERROR, "getcwd");
+        err(RI_PROGRAM_ERROR, "*** getcwd");
     }
 
     /* optional config file from current directory */

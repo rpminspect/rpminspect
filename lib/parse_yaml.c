@@ -11,8 +11,10 @@
 #include <stdlib.h>
 #include <string.h>
 #include <err.h>
+
 #include "parser.h"
 #include "tyranny.h"
+#include "rpminspect.h"
 
 /* Uncomment to enable debug printing. */
 /* #define DEBUG 1 */
@@ -109,7 +111,7 @@ static bool peek(context *c, yaml_token_t *token)
 {
     if (!c->have_lookahead) {
         if (yaml_parser_scan(c->parser, &c->token) == 0) {
-            warnx("%s: broken document", __func__);
+            warnx(_("*** %s: broken document"), __func__);
             return true;
         }
 
@@ -134,7 +136,7 @@ static void next(context *c, yaml_token_t *token)
         memcpy(token, &c->token, sizeof(*token));
         return;
     } else if (yaml_parser_scan(c->parser, token) == 0) {
-        warnx("%s: broken document", __func__);
+        warnx(_("*** %s: broken document"), __func__);
         exit(1);
     }
 
@@ -153,7 +155,7 @@ static void wait_for(context *c, yaml_token_t *token, yaml_token_type_t target)
     next(c, token);
 
     while (token->type != YAML_NO_TOKEN && token->type != target) {
-        warnx("skipping token type %s", tokname(token->type));
+        warnx(_("*** skipping token type %s"), tokname(token->type));
         yaml_token_delete(token);
         next(c, token);
     }
@@ -300,7 +302,7 @@ static y_value *p_value(context *context)
 
             goto done;
         } else {
-            warnx("skipping token type %s", tokname(token.type));
+            warnx(_("*** skipping token type %s"), tokname(token.type));
             free(ret);
             ret = NULL;
             goto done;
@@ -328,7 +330,7 @@ static bool yaml_parse_file(parser_context **context_out, const char *filename)
 
     /* prepare a YAML parser */
     if (!yaml_parser_initialize(&parser)) {
-        warnx("yaml_parser_initialize");
+        warnx("*** yaml_parser_initialize");
         return true;
     }
 
@@ -336,7 +338,7 @@ static bool yaml_parse_file(parser_context **context_out, const char *filename)
     fp = fopen(filename, "r");
 
     if (fp == NULL) {
-        warn("fopen");
+        warn("*** fopen");
         return true;
     }
 
@@ -381,7 +383,7 @@ static void y_free_tree(y_value *v)
         free(v->v.dict.keys);
         free(v->v.dict.values);
     } else {
-        warnx("malformed type - freed?");
+        warnx(_("*** malformed type - freed?"));
         return;
     }
 

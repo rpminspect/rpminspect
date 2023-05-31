@@ -92,12 +92,10 @@ static char *make_source_dirs(const char *worksubdir, const char *fullpath)
         if (!strcmp(subdirs[i], RPMBUILD_SOURCEDIR) || !strcmp(subdirs[i], RPMBUILD_SPECDIR)) {
             /* symlinks SOURCES and SPECS to where the SRPM is already extracted */
             if (symlink(shortname, sub) == -1) {
-                warn("symlink");
+                warn("*** symlink");
             }
         } else {
-            if (mkdirp(sub, mode) == -1) {
-                warn("mkdirp");
-            }
+            (void) mkdirp(sub, mode);
         }
 
         free(sub);
@@ -136,7 +134,7 @@ static char *rpm_prep_source(struct rpminspect *ri, const rpmfile_entry_t *file,
 
     /* perform the %prep step in a subprocess to capture stdout/stderr */
     if (pipe(pfd) == -1) {
-        warn("pipe");
+        warn("*** pipe");
         return NULL;
     }
 
@@ -145,13 +143,13 @@ static char *rpm_prep_source(struct rpminspect *ri, const rpmfile_entry_t *file,
     if (proc == 0) {
         /* connect the output */
         if (dup2(pfd[STDOUT_FILENO], STDOUT_FILENO) == -1 || dup2(pfd[STDOUT_FILENO], STDERR_FILENO) == -1) {
-            warn("dup2");
+            warn("*** dup2");
             _exit(EXIT_FAILURE);
         }
 
         /* close pipes */
         if (close(pfd[STDIN_FILENO]) == -1 || close(pfd[STDOUT_FILENO]) == -1) {
-            warn("close");
+            warn("*** close");
             _exit(EXIT_FAILURE);
         }
 
@@ -172,10 +170,10 @@ static char *rpm_prep_source(struct rpminspect *ri, const rpmfile_entry_t *file,
         free(topdir);
 
         if (spec == NULL) {
-            warn("rpmSpecParse");
+            warn("*** rpmSpecParse");
 
             if (close(STDOUT_FILENO) == -1 || close(STDERR_FILENO) == -1) {
-                warn("close");
+                warn("*** close");
             }
 
             _exit(EXIT_FAILURE);
@@ -212,24 +210,24 @@ static char *rpm_prep_source(struct rpminspect *ri, const rpmfile_entry_t *file,
         free(ba);
 
         if (close(STDOUT_FILENO) == -1 || close(STDERR_FILENO) == -1) {
-            warn("close");
+            warn("*** close");
         }
 
         _exit(status);
     } else if (proc == -1) {
         /* failure */
-        warn("fork");
+        warn("*** fork");
     } else {
         /* close the unused part */
         if (close(pfd[STDOUT_FILENO]) == -1) {
-            warn("close");
+            warn("*** close");
         }
 
         /* Read the child output back which would be what 'rpmbuild -bp' runs */
         reader = fdopen(pfd[STDIN_FILENO], "r");
 
         if (reader == NULL) {
-            warn("fdopen");
+            warn("*** fdopen");
             return NULL;
         }
 
@@ -246,12 +244,12 @@ static char *rpm_prep_source(struct rpminspect *ri, const rpmfile_entry_t *file,
 
         /* remember that fclose() closes underlying file handles */
         if (fclose(reader) == -1) {
-            warn("fclose");
+            warn("*** fclose");
         }
 
         /* wait for the child to exit */
         if (waitpid(proc, &status, 0) == -1) {
-            warn("waitpid");
+            warn("*** waitpid");
         }
 
         /* where unpacked sources can be found */
@@ -470,7 +468,7 @@ static int validate_file(const char *fpath, __attribute__((unused)) const struct
     }
 
     if (localpath == NULL) {
-        warnx(_("empty localpath on %s"), fpath);
+        warnx(_("*** empty localpath on %s"), fpath);
         return 0;
     }
 
@@ -486,7 +484,7 @@ static int validate_file(const char *fpath, __attribute__((unused)) const struct
     src = u_fopen(fpath, "r", NULL, NULL);
 
     if (src == NULL) {
-        warn("u_fopen");
+        warn("*** u_fopen");
         return 0;
     }
 
@@ -508,7 +506,7 @@ static int validate_file(const char *fpath, __attribute__((unused)) const struct
 #endif
 
                 if (errno == ENOMEM) {
-                    warn("realloc");
+                    warn("*** realloc");
                 }
 
                 line = line_new;
@@ -652,7 +650,7 @@ static bool unicode_driver(struct rpminspect *ri, rpmfile_entry_t *file)
 
         /* our tree dive result is saved in 'globalresult', -1 here is an internal error */
         if (nftw(build, validate_file, FOPEN_MAX, FTW_MOUNT|FTW_PHYS) == -1) {
-            warn("nftw");
+            warn("*** nftw");
         }
 
         seen = true;
@@ -701,7 +699,7 @@ bool inspect_unicode(struct rpminspect *ri)
             entry->data = strtol(sentry->data, NULL, 16);
 
             if (errno == ERANGE || errno == EINVAL) {
-                warn("strtol");
+                warn("*** strtol");
                 free(entry);
                 continue;
             }

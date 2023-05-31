@@ -29,12 +29,12 @@ char *mime_type(const char *path)
     cookie = magic_open(MAGIC_MIME | MAGIC_CHECK);
 
     if (cookie == NULL) {
-        warnx(_("unable to initialize the magic library"));
+        warnx(_("*** unable to initialize the magic library"));
         return NULL;
     }
 
     if (magic_load(cookie, NULL) != 0) {
-        warnx(_("unable to load the magic database: %s"), magic_error(cookie));
+        warnx(_("*** unable to load the magic database: %s"), magic_error(cookie));
         magic_close(cookie);
         return NULL;
     }

@@ -86,8 +86,8 @@ echo "$cpp_output" | sed -n -E 's/^#define[[:space:]]+(EM_[^[:space:]]+).*/\1/p'
 
 echo "        default:" >> "$1"
 # use printf to avoid a non-bash /bin/sh's echo messing up the \'s.
-printf '            warnx(_("unknown machine type %%u\\n"), machine);\n' >> "$1"
-printf '            warnx(_("Recompile librpminspect with a newer elf.h, or make necessary modifications to pic_bits.sh\\n"));\n' >> "$1"
+printf '            warnx(_("*** unknown machine type %%u\\n"), machine);\n' >> "$1"
+printf '            warnx(_("*** Recompile librpminspect with a newer elf.h, or make necessary modifications to pic_bits.sh\\n"));\n' >> "$1"
 echo "            return false;" >> "$1"
 echo "    }" >> "$1"
 echo "}" >> "$1"

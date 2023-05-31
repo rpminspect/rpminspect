@@ -133,7 +133,7 @@ static bool symlinks_driver(struct rpminspect *ri, rpmfile_entry_t *file)
     memset(cwd, '\0', sizeof(cwd));
 
     if (getcwd(cwd, PATH_MAX) == NULL) {
-        err(RI_PROGRAM_ERROR, "getcwd");
+        err(RI_PROGRAM_ERROR, "*** getcwd");
     }
 
     memset(reltarget, '\0', sizeof(reltarget));
@@ -185,7 +185,7 @@ static bool symlinks_driver(struct rpminspect *ri, rpmfile_entry_t *file)
                 free(params.details);
 
                 if (chdir(cwd) == -1) {
-                    warn("%s: chdir to %s", __func__, cwd);
+                    warn("*** chdir");
                 }
 
                 return false;
@@ -298,7 +298,7 @@ static bool symlinks_driver(struct rpminspect *ri, rpmfile_entry_t *file)
 
     /* return to D-station */
     if (chdir(cwd) == -1) {
-        warn("chdir");
+        warn("*** chdir");
     }
 
     return result;

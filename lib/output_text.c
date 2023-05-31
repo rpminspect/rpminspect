@@ -50,7 +50,7 @@ void output_text(const results_t *results, const char *dest, __attribute__((unus
                 fp = fopen(dest, "w");
 
                 if (fp == NULL) {
-                    warn(_("error opening %s for writing"), dest);
+                    warn(_("*** error opening %s for writing"), dest);
                     return;
                 }
             }

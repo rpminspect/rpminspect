@@ -68,7 +68,7 @@ Header get_rpm_header(struct rpminspect *ri, const char *pkg)
     fd = Fopen(pkg, "r.ufdio");
 
     if (fd == NULL || Ferror(fd)) {
-        warnx(_("Fopen failed for %s: %s"), pkg, Fstrerror(fd));
+        warnx(_("*** Fopen failed for %s: %s"), pkg, Fstrerror(fd));
 
         if (fd) {
             Fclose(fd);
@@ -324,7 +324,7 @@ char *extract_rpm_payload(const char *rpm)
     rc = rpmReadPackageFile(ts, fdi, COMMAND_NAME, &hdr);
 
     if (rc == RPMRC_NOTFOUND || rc == RPMRC_FAIL) {
-        warn("rpmReadPackageFile");
+        warn("*** rpmReadPackageFile");
         goto cleanup;
     }
 
@@ -338,7 +338,7 @@ char *extract_rpm_payload(const char *rpm)
     free(rpmio_flags);
 
     if (gzdi == NULL) {
-        warnx("Fdopen: %s", Fstrerror(gzdi));
+        warnx("*** Fdopen: %s", Fstrerror(gzdi));
         goto cleanup;
     }
 
@@ -349,12 +349,12 @@ char *extract_rpm_payload(const char *rpm)
     archive = archive_write_new();
 
     if (archive_write_add_filter_gzip(archive) != ARCHIVE_OK) {
-        warnx("archive_write_add_filter_gzip: %s", archive_error_string(archive));
+        warnx("*** archive_write_add_filter_gzip: %s", archive_error_string(archive));
         goto cleanup;
     }
 
     if (archive_write_set_format_pax_restricted(archive) != ARCHIVE_OK) {
-        warnx("archive_write_set_format_pax_restricted: %s", archive_error_string(archive));
+        warnx("*** archive_write_set_format_pax_restricted: %s", archive_error_string(archive));
         goto cleanup;
     }
 
@@ -362,7 +362,7 @@ char *extract_rpm_payload(const char *rpm)
     assert(payload != NULL);
 
     if (archive_write_open_filename(archive, payload) != ARCHIVE_OK) {
-        warnx("archive_write_open_filename: %s", archive_error_string(archive));
+        warnx("*** archive_write_open_filename: %s", archive_error_string(archive));
         goto cleanup;
     }
 
@@ -428,7 +428,7 @@ char *extract_rpm_payload(const char *rpm)
                 if (read == len) {
                     archive_write_data(archive, buf, len);
                 } else {
-                    warnx("error reading file from RPM payload");
+                    warnx(_("*** error reading file from RPM payload"));
                     break;
                 }
 

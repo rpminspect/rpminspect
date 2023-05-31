@@ -108,7 +108,7 @@ void add_peer(rpmpeer_t **peers, deprule_ignore_map_t *ignores, int whichbuild, 
         peer = calloc(1, sizeof(*peer));
 
         if (peer == NULL) {
-            warn("calloc");
+            warn("*** calloc");
             return;
         }
     }

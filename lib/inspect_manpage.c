@@ -78,7 +78,7 @@ static bool inspect_manpage_alloc(void)
     free(tmp);
     if (reg_result != 0) {
         regerror(reg_result, &sections_regex, reg_error, sizeof(reg_error));
-        warnx(_("unable to compile man page path regular expression: %s"), reg_error);
+        warnx(_("*** unable to compile man page path regular expression: %s"), reg_error);
         inspect_manpage_free();
         return false;
     }
@@ -304,7 +304,7 @@ static bool manpage_driver(struct rpminspect *ri, rpmfile_entry_t *file)
             result = false;
             free(params.msg);
         } else if (r == -1) {
-            warn("stat");
+            warn("*** stat");
         }
 
         free(uncompressed_man_page);

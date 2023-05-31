@@ -44,7 +44,7 @@ static int read_modulemd(const char *fpath, __attribute__((unused)) const struct
     }
 
     if (p->parse_file(&ctx, fpath)) {
-        warnx(_("ignoring malformed module metadata file: %s"), fpath);
+        warnx(_("*** ignoring malformed module metadata file: %s"), fpath);
         free(headptr);
         return -1;
     }
@@ -81,7 +81,7 @@ static bool get_static_context(const char *subdir, const char *build)
     static_context = false;
 
     if (nftw(path, read_modulemd, FOPEN_MAX, FTW_PHYS) == -1) {
-        warn("nftw");
+        warn("*** nftw");
         free(path);
         return false;
     }

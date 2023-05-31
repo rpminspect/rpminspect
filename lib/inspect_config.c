@@ -93,7 +93,7 @@ static bool config_driver(struct rpminspect *ri, rpmfile_entry_t *file)
                 n = readlink(file->peer_file->fullpath, before_dest, PATH_MAX);
 
                 if (n == -1) {
-                    warn("readlink(%s)", file->peer_file->fullpath);
+                    warn("*** readlink(%s)", file->peer_file->fullpath);
                     return true;
                 }
             }
@@ -104,7 +104,7 @@ static bool config_driver(struct rpminspect *ri, rpmfile_entry_t *file)
                 n = readlink(file->fullpath, after_dest, PATH_MAX);
 
                 if (n == -1) {
-                    warn("readlink(%s)", file->fullpath);
+                    warn("*** readlink(%s)", file->fullpath);
                     return true;
                 }
             }

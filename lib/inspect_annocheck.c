@@ -113,7 +113,7 @@ static void set_libannocheck_profile(struct libannocheck_internals *anno, const 
         annoerr = libannocheck_enable_profile(anno, annocheck_profile);
 
         if (annoerr != libannocheck_error_none) {
-            warnx(_("libannocheck_enable_profile error: %s"), libannocheck_get_error_message(anno, annoerr));
+            warnx(_("*** libannocheck_enable_profile: %s"), libannocheck_get_error_message(anno, annoerr));
         }
 
         return;
@@ -133,7 +133,7 @@ static void set_libannocheck_profile(struct libannocheck_internals *anno, const 
     annoerr = libannocheck_get_known_profiles(anno, &profiles, &num_profiles);
 
     if (annoerr != libannocheck_error_none) {
-         warnx(_("libannocheck_get_known_profiles error: %s"), libannocheck_get_error_message(anno, annoerr));
+         warnx(_("*** libannocheck_get_known_profiles: %s"), libannocheck_get_error_message(anno, annoerr));
          return;
     }
 
@@ -148,7 +148,7 @@ static void set_libannocheck_profile(struct libannocheck_internals *anno, const 
             annoerr = libannocheck_enable_profile(anno, profiles[i]);
 
             if (annoerr != libannocheck_error_none) {
-                warnx(_("libannocheck_enable_profile error: %s"), libannocheck_get_error_message(anno, annoerr));
+                warnx(_("*** libannocheck_enable_profile: %s"), libannocheck_get_error_message(anno, annoerr));
             }
 
             return;
@@ -223,7 +223,7 @@ static struct libannocheck_internals *libannocheck_setup(struct rpminspect *ri, 
         annoerr = libannocheck_init(libannocheck_get_version(), file->fullpath, get_debuginfo_path(ri, file, arch, AFTER_BUILD), &anno);
 
         if (annoerr != libannocheck_error_none) {
-             warnx(_("libannocheck_init error: %s"), libannocheck_get_error_message(anno, annoerr));
+             warnx(_("*** libannocheck_init: %s"), libannocheck_get_error_message(anno, annoerr));
              return NULL;
         }
 
@@ -252,7 +252,7 @@ static struct libannocheck_internals *libannocheck_setup(struct rpminspect *ri, 
                     }
 
                     if (annoerr != libannocheck_error_none) {
-                        warnx(_("libannocheck_%s_test error: %s:"), test, libannocheck_get_error_message(anno, annoerr));
+                        warnx(_("*** libannocheck_%s_test: %s"), test, libannocheck_get_error_message(anno, annoerr));
                         libannocheck_finish(anno);
                         return NULL;
                     }
@@ -264,7 +264,7 @@ static struct libannocheck_internals *libannocheck_setup(struct rpminspect *ri, 
             annoerr = libannocheck_enable_all_tests(anno);
 
             if (annoerr != libannocheck_error_none) {
-                warnx(_("libannocheck_enable_all_tests error: %s:"), libannocheck_get_error_message(anno, annoerr));
+                warnx(_("*** libannocheck_enable_all_tests: %s"), libannocheck_get_error_message(anno, annoerr));
                 libannocheck_finish(anno);
                 return NULL;
             }
@@ -277,7 +277,7 @@ static struct libannocheck_internals *libannocheck_setup(struct rpminspect *ri, 
         annoerr = libannocheck_reinit(anno, file->fullpath, get_debuginfo_path(ri, file, arch, AFTER_BUILD));
 
         if (annoerr != libannocheck_error_none) {
-             warnx(_("libannocheck_reinit error: %s"), libannocheck_get_error_message(anno, annoerr));
+             warnx(_("*** libannocheck_reinit: %s"), libannocheck_get_error_message(anno, annoerr));
              libannocheck_finish(anno);
              return NULL;
         }
@@ -370,7 +370,7 @@ static bool annocheck_driver(struct rpminspect *ri, rpmfile_entry_t *file)
             annoerr = libannocheck_run_tests(ah, &failed, &maybe);
 
             if (annoerr != libannocheck_error_none) {
-                warnx(_("before libannocheck_run_tests error: %s (%d)"), libannocheck_get_error_message(ah, annoerr), annoerr);
+                warnx(_("*** before libannocheck_run_tests: %s (%d)"), libannocheck_get_error_message(ah, annoerr), annoerr);
                 libannocheck_finish(ah);
                 continue;
             }
@@ -379,7 +379,7 @@ static bool annocheck_driver(struct rpminspect *ri, rpmfile_entry_t *file)
             annoerr = libannocheck_get_known_tests(ah, &annotests, &numtests);
 
             if (annoerr != libannocheck_error_none) {
-                warnx(_("libannocheck_get_known_tests error: %s"), libannocheck_get_error_message(ah, annoerr));
+                warnx(_("*** libannocheck_get_known_tests: %s"), libannocheck_get_error_message(ah, annoerr));
                 libannocheck_finish(ah);
                 continue;
             }
@@ -397,7 +397,7 @@ static bool annocheck_driver(struct rpminspect *ri, rpmfile_entry_t *file)
             annoerr = libannocheck_finish(ah);
 
             if (annoerr != libannocheck_error_none) {
-                warnx(_("libannocheck_finish error: %s"), libannocheck_get_error_message(ah, annoerr));
+                warnx(_("*** libannocheck_finish: %s"), libannocheck_get_error_message(ah, annoerr));
             }
 
             ah = NULL;
@@ -414,7 +414,7 @@ static bool annocheck_driver(struct rpminspect *ri, rpmfile_entry_t *file)
         annoerr = libannocheck_run_tests(ah, &failed, &maybe);
 
         if (annoerr != libannocheck_error_none) {
-            warnx(_("after libannocheck_run_tests error: %s (%d)"), libannocheck_get_error_message(ah, annoerr), annoerr);
+            warnx(_("*** after libannocheck_run_tests: %s (%d)"), libannocheck_get_error_message(ah, annoerr), annoerr);
             libannocheck_finish(ah);
             continue;
         }
@@ -423,7 +423,7 @@ static bool annocheck_driver(struct rpminspect *ri, rpmfile_entry_t *file)
         annoerr = libannocheck_get_known_tests(ah, &annotests, &numtests);
 
         if (annoerr != libannocheck_error_none) {
-             warnx(_("libannocheck_get_known_tests error: %s"), libannocheck_get_error_message(ah, annoerr));
+             warnx(_("*** libannocheck_get_known_tests: %s"), libannocheck_get_error_message(ah, annoerr));
              libannocheck_finish(ah);
              continue;
         }
@@ -527,7 +527,7 @@ static bool annocheck_driver(struct rpminspect *ri, rpmfile_entry_t *file)
     }
 
     if (annoerr != libannocheck_error_none) {
-        warnx(_("libannocheck_finish error: %s"), libannocheck_get_error_message(ah, annoerr));
+        warnx(_("*** libannocheck_finish: %s"), libannocheck_get_error_message(ah, annoerr));
     }
 
     return result;

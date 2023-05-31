@@ -139,7 +139,7 @@ static const char *get_xmlrpc_fault_desc(const int fault_code)
 static void xmlrpc_abort_on_fault(xmlrpc_env *env)
 {
     if (env->fault_occurred) {
-        errx(RI_PROGRAM_ERROR, _("XML-RPC Fault: %s (%d)"), env->fault_string, env->fault_code);
+        errx(RI_PROGRAM_ERROR, _("*** XML-RPC Fault: %s (%d)"), env->fault_string, env->fault_code);
     }
 }
 
@@ -649,7 +649,7 @@ struct koji_build *get_koji_build(struct rpminspect *ri, const char *buildspec)
             free_koji_build(build);
 
             if (env.fault_code < 0) {
-                warnx(_("xmlrpc fault code %s (%d): getBuild(%s) from %s"), get_xmlrpc_fault_desc(env.fault_code), env.fault_code, buildspec, ri->kojihub);
+                warnx(_("*** xmlrpc fault code %s (%d): getBuild(%s) from %s"), get_xmlrpc_fault_desc(env.fault_code), env.fault_code, buildspec, ri->kojihub);
             }
 
             return NULL;
@@ -881,7 +881,7 @@ struct koji_build *get_koji_build(struct rpminspect *ri, const char *buildspec)
 
     /* build must be complete */
     if (build->state != BUILD_COMPLETE) {
-        warnx(_("Koji build state is %s for %s, cannot continue."), build_state_desc(build->state), buildspec);
+        warnx(_("*** Koji build state is %s for %s, cannot continue"), build_state_desc(build->state), buildspec);
         free_koji_build(build);
         return NULL;
     }
@@ -1144,7 +1144,7 @@ struct koji_task *get_koji_task(struct rpminspect *ri, const char *taskspec)
             free_koji_task(task);
 
             if (env.fault_code < 0) {
-                warnx(_("xmlrpc fault code %s (%d): getTaskInfo(%s) from %s"), get_xmlrpc_fault_desc(env.fault_code), env.fault_code, taskspec, ri->kojihub);
+                warnx(_("*** xmlrpc fault code %s (%d): getTaskInfo(%s) from %s"), get_xmlrpc_fault_desc(env.fault_code), env.fault_code, taskspec, ri->kojihub);
             }
 
             return NULL;
@@ -1168,7 +1168,7 @@ struct koji_task *get_koji_task(struct rpminspect *ri, const char *taskspec)
 
     /* task must be closed */
     if (task->state != TASK_CLOSED) {
-        warnx(_("Koji task state is %s for task %s, cannot continue."), task_state_desc(task->state), taskspec);
+        warnx(_("*** Koji task state is %s for task %s, cannot continue"), task_state_desc(task->state), taskspec);
         xmlrpc_env_clean(&env);
         xmlrpc_client_cleanup();
         free_koji_task(task);
