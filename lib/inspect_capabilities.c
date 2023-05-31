@@ -114,11 +114,11 @@ static bool capabilities_driver(struct rpminspect *ri, rpmfile_entry_t *file)
         free(before);
 
         if (cap_free(aftercap) == -1) {
-            warn("cap_free");
+            warn("*** cap_free");
         }
 
         if (cap_free(beforecap) == -1) {
-            warn("cap_free");
+            warn("*** cap_free");
         }
 
         return true;
@@ -203,15 +203,15 @@ static bool capabilities_driver(struct rpminspect *ri, rpmfile_entry_t *file)
     free(after);
 
     if (cap_free(aftercap) == -1) {
-        warn("cap_free");
+        warn("*** cap_free");
     }
 
     if (cap_free(beforecap) == -1) {
-        warn("cap_free");
+        warn("*** cap_free");
     }
 
     if (cap_free(expected) == -1) {
-        warn("cap_free");
+        warn("*** cap_free");
     }
 
     return result;

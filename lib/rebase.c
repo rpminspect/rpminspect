@@ -85,6 +85,6 @@ bool is_rebase(struct rpminspect *ri)
         return true;
     } else {
         /* should not reach this */
-        err(RI_PROGRAM_ERROR, "is_rebase");
+        err(RI_PROGRAM_ERROR, "*** is_rebase");
     }
 }

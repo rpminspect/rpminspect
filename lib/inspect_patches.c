@@ -431,7 +431,7 @@ static bool patches_driver(struct rpminspect *ri, rpmfile_entry_t *file)
         before_patch = uncompress_file(ri, file->peer_file->fullpath, NAME_PATCHES);
 
         if (before_patch == NULL) {
-            warnx(_("unable to uncompress patch: %s"), file->peer_file->localpath);
+            warnx(_("*** unable to uncompress patch: %s"), file->peer_file->localpath);
             return false;
         }
     }
@@ -439,7 +439,7 @@ static bool patches_driver(struct rpminspect *ri, rpmfile_entry_t *file)
     after_patch = uncompress_file(ri, file->fullpath, NAME_PATCHES);
 
     if (after_patch == NULL) {
-        warnx(_("unable to uncompress patch: %s"), file->localpath);
+        warnx(_("*** unable to uncompress patch: %s"), file->localpath);
         return false;
     }
 
@@ -449,14 +449,14 @@ static bool patches_driver(struct rpminspect *ri, rpmfile_entry_t *file)
      * generating multiple patches against multiple branches.
      */
     if (stat(after_patch, &sb) != 0) {
-        warn("stat");
+        warn("*** stat");
         return false;
     }
 
     apsz = sb.st_size;
 
     if (file->peer_file && before_patch && stat(before_patch, &sb) != 0) {
-        warn("stat");
+        warn("*** stat");
         return false;
     }
 
@@ -676,7 +676,7 @@ bool inspect_patches(struct rpminspect *ri)
                 speclines = read_file(file->fullpath);
 
                 if (speclines == NULL) {
-                    err(RI_PROGRAM_ERROR, "read_file");
+                    err(RI_PROGRAM_ERROR, "*** read_file");
                 }
 
                 TAILQ_FOREACH(specentry, speclines, items) {
@@ -746,7 +746,7 @@ bool inspect_patches(struct rpminspect *ri)
                         hentry->num = strtoll(buf, NULL, 10);
 
                         if (errno == ERANGE || errno == EINVAL) {
-                            warn("strtoll");
+                            warn("*** strtoll");
                             hentry->num = -1;
                         }
 
@@ -817,13 +817,13 @@ bool inspect_patches(struct rpminspect *ri)
                             buf += strlen(SPEC_MACRO_PATCH);
                             buf[strcspn(buf, " \t")] = '\0';
                         } else {
-                            warnx("*** Unrecognized %%patch line: %s", specentry->data);
+                            warnx(_("*** unrecognized %%patch line: %s"), specentry->data);
                             continue;
                         }
 
                         /* add a new patch entry to the hash table */
                         if (buf == NULL) {
-                            warnx("*** Unable to read spec file line: %s", specentry->data);
+                            warnx(_("*** unable to read spec file line: %s"), specentry->data);
                             continue;
                         }
 
@@ -832,7 +832,7 @@ bool inspect_patches(struct rpminspect *ri)
                         aentry->num = strtoll(buf, NULL, 10);
 
                         if (errno == ERANGE || errno == EINVAL) {
-                            warn("strtoll");
+                            warn("*** strtoll");
                             aentry->num = -1;
                         }
 

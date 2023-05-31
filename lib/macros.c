@@ -95,7 +95,7 @@ int get_specfile_macros(struct rpminspect *ri, const char *specfile)
 
     if (reg_result != 0) {
         regerror(reg_result, &macro_regex, reg_error, sizeof(reg_error));
-        warnx("%s", reg_error);
+        warnx("*** regcomp: %s", reg_error);
         return 0;
     }
 

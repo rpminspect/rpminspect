@@ -62,12 +62,12 @@ char *run_cmd_vpe(int *exitcode, const char *workdir, char **argv)
         memset(cwd, '\0', sizeof(cwd));
 
         if (getcwd(cwd, PATH_MAX) == NULL) {
-            err(RI_PROGRAM_ERROR, "getcwd");
+            err(RI_PROGRAM_ERROR, "*** getcwd");
         }
 
         /* power through if it fails */
         if (chdir(workdir) == -1) {
-            warn("chdir");
+            warn("*** chdir");
         }
     }
 
@@ -77,7 +77,7 @@ char *run_cmd_vpe(int *exitcode, const char *workdir, char **argv)
             *exitcode = EXIT_FAILURE;
         }
 
-        warn("pipe");
+        warn("*** pipe");
         return NULL;
     }
 
@@ -87,13 +87,13 @@ char *run_cmd_vpe(int *exitcode, const char *workdir, char **argv)
     if (proc == 0) {
         /* connect the output */
         if (dup2(pfd[WR], STDOUT_FILENO) == -1 || dup2(pfd[WR], STDERR_FILENO) == -1) {
-            warn("dup2");
+            warn("*** dup2");
             _exit(EXIT_FAILURE);
         }
 
         /* close the pipes */
         if (close(pfd[RD]) == -1 || close(pfd[WR]) == -1) {
-            warn("close");
+            warn("*** close");
             _exit(EXIT_FAILURE);
         }
 
@@ -102,16 +102,16 @@ char *run_cmd_vpe(int *exitcode, const char *workdir, char **argv)
 
         /* run the command */
         if (execvp(argv[0], argv) == -1) {
-            warn("execvp");
+            warn("*** execvp");
             _exit(EXIT_FAILURE);
         }
     } else if (proc == -1) {
         /* failure */
-        warn("fork");
+        warn("*** fork");
     } else {
         /* close the pipe */
         if (close(pfd[WR]) == -1) {
-            warn("close");
+            warn("*** close");
         }
 
         /*
@@ -143,7 +143,7 @@ char *run_cmd_vpe(int *exitcode, const char *workdir, char **argv)
         free(buf);
 
         if (fclose(reader) == -1) {
-            warn("fclose");
+            warn("*** fclose");
         }
 
         /* wait for the command */
@@ -152,7 +152,7 @@ char *run_cmd_vpe(int *exitcode, const char *workdir, char **argv)
                 *exitcode = EXIT_FAILURE;
             }
 
-            warn("waitpid");
+            warn("*** waitpid");
         }
 
         if (WIFEXITED(status)) {
@@ -198,7 +198,7 @@ char *run_cmd_vpe(int *exitcode, const char *workdir, char **argv)
 
     /* go back to where we started */
     if (workdir && chdir(cwd) == -1) {
-        warn("chdir");
+        warn("*** chdir");
     }
 
     return output;

@@ -35,7 +35,7 @@ bool is_local_build(const char *workdir, const char *build, const bool fetch_onl
     memset(cwd, '\0', sizeof(cwd));
 
     if (getcwd(cwd, PATH_MAX) == NULL) {
-        err(RI_PROGRAM_ERROR, "getcwd");
+        err(RI_PROGRAM_ERROR, "*** getcwd");
     }
 
     /* Figure out where to look */
@@ -52,7 +52,7 @@ bool is_local_build(const char *workdir, const char *build, const bool fetch_onl
     }
 
     if (stat(check, &sb) == -1) {
-        warn("stat");
+        warn("*** stat");
         free(check);
         return false;
     }
@@ -63,7 +63,7 @@ bool is_local_build(const char *workdir, const char *build, const bool fetch_onl
     }
 
     if (chdir(check) == -1) {
-        warn("chdir");
+        warn("*** chdir");
         free(check);
         return false;
     }
@@ -71,7 +71,7 @@ bool is_local_build(const char *workdir, const char *build, const bool fetch_onl
     free(check);
 
     if (chdir(cwd) == -1) {
-        warn("chdir");
+        warn("*** chdir");
         return false;
     }
 

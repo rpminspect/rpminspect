@@ -51,7 +51,7 @@ void output_xunit(const results_t *results, const char *dest, const severity_t t
             }
 
             if (fp == NULL) {
-                warn(_("opening %s for writing"), dest);
+                warn(_("*** opening %s for writing"), dest);
                 return;
             }
 

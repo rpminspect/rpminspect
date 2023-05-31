@@ -35,7 +35,7 @@ static char *get_shell(const struct rpminspect *ri, const char *fullpath)
     fp = fopen(fullpath, "r");
 
     if (fp == NULL) {
-        warn("fopen");
+        warn("*** fopen");
         return NULL;
     }
 
@@ -43,11 +43,11 @@ static char *get_shell(const struct rpminspect *ri, const char *fullpath)
     start = buf;
 
     if (fclose(fp) == -1) {
-        warn("fclose");
+        warn("*** fclose");
     }
 
     if (r == -1) {
-        warn("getline");
+        warn("*** getline");
     } else if (!strncmp(buf, "#!", 2)) {
         /* trim newlines */
         buf[strcspn(buf, "\n")] = '\0';

@@ -165,7 +165,7 @@ static char *get_product_release(string_map_t *products, const favor_release_t f
     }
 
     if (!after) {
-        warnx(_("*** Product release for after build (%s) is empty"), after);
+        warnx(_("*** product release for after build (%s) is empty"), after);
         return NULL;
     }
 
@@ -176,7 +176,7 @@ static char *get_product_release(string_map_t *products, const favor_release_t f
     after_candidate = strdup(after);
 
     if (after_candidate == NULL) {
-        warnx(_("*** Product release for after build (%s) is empty"), after);
+        warnx(_("*** product release for after build (%s) is empty"), after);
         return NULL;
     }
 
@@ -193,7 +193,7 @@ static char *get_product_release(string_map_t *products, const favor_release_t f
         }
 
         if (!before) {
-            warnx(_("*** Product release for before build (%s) is empty"), before);
+            warnx(_("*** product release for before build (%s) is empty"), before);
             free(after_candidate);
             return NULL;
         }
@@ -201,7 +201,7 @@ static char *get_product_release(string_map_t *products, const favor_release_t f
         before_candidate = strdup(before);
 
         if (before_candidate == NULL) {
-            warnx(_("*** Product release for before build (%s) is empty"), before);
+            warnx(_("*** product release for before build (%s) is empty"), before);
             free(after_candidate);
             return NULL;
         }
@@ -256,7 +256,7 @@ static char *get_product_release(string_map_t *products, const favor_release_t f
     }
 
     if (!matched) {
-        warnx(_("*** Unable to determine product release for %s and %s"), before, after);
+        warnx(_("*** unable to determine product release for %s and %s"), before, after);
         warnx(_("*** See the 'favor_release' setting in the rpminspect configuration file."));
         after_product = NULL;
     }
@@ -284,7 +284,7 @@ static char *get_product_release(string_map_t *products, const favor_release_t f
 static void check_inspection_options(const bool inspection_opt)
 {
     if (inspection_opt) {
-        warnx(_("*** The -T and -E options are mutually exclusive"));
+        warnx(_("*** the -T and -E options are mutually exclusive"));
         errx(RI_PROGRAM_ERROR, _("*** See `%s --help` for more information."), COMMAND_NAME);
     }
 
@@ -300,7 +300,7 @@ static void check_found(const bool found, const char *inspection)
     assert(inspection != NULL);
 
     if (!found) {
-        warnx(_("*** Unknown inspection: `%s`"), inspection);
+        warnx(_("*** unknown inspection: `%s`"), inspection);
         errx(RI_PROGRAM_ERROR, _("*** See `%s --help` for more information."), COMMAND_NAME);
     }
 
@@ -451,7 +451,7 @@ int main(int argc, char **argv)
                 for (i = 0; buildtypes[i].type != KOJI_BUILD_NULL; i++) {
                     if (!strcasecmp(buildtypes[i].name, optarg)) {
                         if (!buildtypes[i].supported) {
-                            errx(RI_PROGRAM_ERROR, _("*** Unsupported build type: `%s`."), optarg);
+                            errx(RI_PROGRAM_ERROR, _("*** unsupported build type: `%s`."), optarg);
                         }
 
                         buildtype = buildtypes[i].type;
@@ -460,7 +460,7 @@ int main(int argc, char **argv)
                 }
 
                 if (buildtype == KOJI_BUILD_NULL) {
-                    errx(RI_PROGRAM_ERROR, _("*** Invalid build type: `%s`."), optarg);
+                    errx(RI_PROGRAM_ERROR, _("*** invalid build type: `%s`."), optarg);
                 }
 
                 break;
@@ -477,7 +477,7 @@ int main(int argc, char **argv)
                 }
 
                 if (formatidx < 0) {
-                    errx(RI_PROGRAM_ERROR, _("*** Invalid output format: `%s`."), optarg);
+                    errx(RI_PROGRAM_ERROR, _("*** invalid output format: `%s`."), optarg);
                 }
 
                 break;
@@ -489,7 +489,7 @@ int main(int argc, char **argv)
                 j = wordexp(optarg, &expand, 0);
 
                 if (j != 0 || expand.we_wordc != 1) {
-                    errx(RI_PROGRAM_ERROR, _("*** Unable to expand workdir: `%s`"), optarg);
+                    errx(RI_PROGRAM_ERROR, _("*** unable to expand working directory: `%s`"), optarg);
                 }
 
                 if (stat(expand.we_wordv[0], &sb) == 0) {
@@ -535,7 +535,7 @@ int main(int argc, char **argv)
                 printf(_("%s version %s\n"), COMMAND_NAME, PACKAGE_VERSION);
                 exit(0);
             default:
-                errx(RI_PROGRAM_ERROR, _("?? getopt returned character code 0%o ??"), c);
+                errx(RI_PROGRAM_ERROR, _("*** ?? getopt returned character code 0%o ??"), c);
         }
     }
 
@@ -623,7 +623,7 @@ int main(int argc, char **argv)
         initialized = true;
 
         if (ri == NULL) {
-            errx(RI_PROGRAM_ERROR, _("Failed to read configuration file %s"), tmp_cfgfile);
+            errx(RI_PROGRAM_ERROR, _("*** failed to read configuration file %s"), tmp_cfgfile);
         }
     } else if (cfgfile && (access(cfgfile, F_OK|R_OK) == 0)) {
         /* -c configuration file if it exists */
@@ -631,7 +631,7 @@ int main(int argc, char **argv)
         initialized = true;
 
         if (ri == NULL) {
-            errx(RI_PROGRAM_ERROR, _("Failed to read configuration file %s"), cfgfile);
+            errx(RI_PROGRAM_ERROR, _("*** failed to read configuration file %s"), cfgfile);
         }
     }
 
@@ -649,12 +649,12 @@ int main(int argc, char **argv)
         initialized = true;
 
         if (ri == NULL) {
-            errx(RI_PROGRAM_ERROR, _("Failed to read configuration file %s"), CFGFILE);
+            errx(RI_PROGRAM_ERROR, _("*** failed to read configuration file %s"), CFGFILE);
         }
     }
 
     if (!initialized) {
-        errx(RI_PROGRAM_ERROR, _("Please specify a configuration file using '-c' or supply ./%s"), CFGFILE);
+        errx(RI_PROGRAM_ERROR, _("*** Please specify a configuration file using '-c' or supply ./%s"), CFGFILE);
     }
 
     free(profile);
@@ -771,7 +771,7 @@ int main(int argc, char **argv)
                 free_rpminspect(ri);
                 rpmFreeMacros(NULL);
                 rpmFreeRpmrc();
-                warnx(_("*** Unsupported architecture specified: `%s`"), token);
+                warnx(_("*** unsupported architecture specified: `%s`"), token);
                 errx(RI_PROGRAM_ERROR, _("*** See `%s --help` for more information."), COMMAND_NAME);
             }
 
@@ -789,7 +789,7 @@ int main(int argc, char **argv)
         free_rpminspect(ri);
         rpmFreeMacros(NULL);
         rpmFreeRpmrc();
-        errx(RI_PROGRAM_ERROR, _("*** Unable to create directory %s"), ri->workdir);
+        errx(RI_PROGRAM_ERROR, _("*** unable to create directory %s"), ri->workdir);
     }
 
     /* validate and gather the builds specified */
@@ -806,7 +806,7 @@ int main(int argc, char **argv)
                 rpmFreeRpmrc();
 
                 if (j > 0) {
-                    errx(j, "%s", strexitcode(j));
+                    errx(j, "*** %s", strexitcode(j));
                 } else {
                     exit(j);
                 }
@@ -831,7 +831,7 @@ int main(int argc, char **argv)
             rpmFreeRpmrc();
 
             if (j > 0) {
-                errx(j, "%s", strexitcode(j));
+                errx(j, "*** %s", strexitcode(j));
             } else {
                 exit(j);
             }
@@ -916,7 +916,7 @@ int main(int argc, char **argv)
                 free_rpminspect(ri);
                 rpmFreeMacros(NULL);
                 rpmFreeRpmrc();
-                errx(RI_PROGRAM_ERROR, _("*** No peers, ensure packages exist for specified architecture(s)."));
+                errx(RI_PROGRAM_ERROR, _("*** no peers, ensure packages exist for specified architecture(s)"));
             }
 
             /* try to find a before and after peer */
@@ -937,7 +937,7 @@ int main(int argc, char **argv)
                 free_rpminspect(ri);
                 rpmFreeMacros(NULL);
                 rpmFreeRpmrc();
-                errx(RI_PROGRAM_ERROR, _("unable to find a set of peer packages between the before and after builds"));
+                errx(RI_PROGRAM_ERROR, _("*** unable to find a set of peer packages between the before and after builds"));
             }
 
             /* get the product release */
@@ -951,7 +951,7 @@ int main(int argc, char **argv)
                 free_rpminspect(ri);
                 rpmFreeMacros(NULL);
                 rpmFreeRpmrc();
-                errx(RI_PROGRAM_ERROR, _("*** Unable to determine product release or none specified (-r)."));
+                errx(RI_PROGRAM_ERROR, _("*** unable to determine product release or none specified (-r)."));
             }
         }
 

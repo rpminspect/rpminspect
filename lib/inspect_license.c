@@ -44,7 +44,7 @@ static parser_plugin *read_licensedb(struct rpminspect *ri, const char *db, pars
     }
 
     if (p->parse_file(&context, actualdb)) {
-        warnx(_("parse error on license db %s"), db);
+        warnx(_("*** parse error in license database %s"), db);
         free(actualdb);
         return NULL;
     }
@@ -132,7 +132,7 @@ static bool check_license_abbrev(parser_plugin *p, parser_context *db, const cha
     lic_cb_data data = { p, db, lic, false };
 
     if (p->keymap(db, NULL, NULL, lic_cb, &data)) {
-        warnx(_("problem checking licensedb"));
+        warnx(_("*** problem checking license database"));
         return false;
     }
 

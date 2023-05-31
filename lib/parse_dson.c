@@ -23,7 +23,7 @@ static bool dson_parse_file(parser_context **context_out, const char *filepath)
     free(buf);
 
     if (errmsg != NULL) {
-        warnx("%s", errmsg);
+        warnx("*** %s", errmsg);
         free(errmsg);
         return true;
     }

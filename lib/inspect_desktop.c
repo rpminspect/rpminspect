@@ -264,7 +264,7 @@ static bool validate_desktop_contents(struct rpminspect *ri, const rpmfile_entry
                 found = true;
 
                 if (lstat(file_to_find, &sb) == -1) {
-                    warn("stat");
+                    warn("*** lstat");
                     list_free(contents, free, true);
                     free(file_to_find);
                     return false;
@@ -343,7 +343,7 @@ static bool validate_desktop_contents(struct rpminspect *ri, const rpmfile_entry
                 found = true;
 
                 if (lstat(file_to_find, &sb) == -1) {
-                    warn("stat");
+                    warn("*** lstat");
                     list_free(contents, free, true);
                     free(file_to_find);
                     return false;

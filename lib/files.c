@@ -218,7 +218,7 @@ rpmfile_t *extract_rpm(struct rpminspect *ri, const char *pkg, Header hdr, const
         rpm_path = rpmtdNextString(td);
 
         if (rpm_path == NULL) {
-            warn("rpmtdNextString");
+            warn("*** rpmtdNextString");
             goto cleanup;
         }
 
@@ -246,7 +246,7 @@ rpmfile_t *extract_rpm(struct rpminspect *ri, const char *pkg, Header hdr, const
 
         if (archive_read_open_filename(archive, payload, 10240) != ARCHIVE_OK) {
             /* still bad, so bail */
-            warnx("archive_read_open_filename: %s", archive_error_string(archive));
+            warnx("*** archive_read_open_filename: %s", archive_error_string(archive));
             goto cleanup;
         }
     }
@@ -262,7 +262,7 @@ rpmfile_t *extract_rpm(struct rpminspect *ri, const char *pkg, Header hdr, const
         }
 
         if (archive_result != ARCHIVE_OK) {
-            warnx("archive_read_next_header: %s", archive_error_string(archive));
+            warnx("*** archive_read_next_header: %s", archive_error_string(archive));
             free_files(file_list);
             file_list = NULL;
             goto cleanup;
@@ -350,7 +350,7 @@ rpmfile_t *extract_rpm(struct rpminspect *ri, const char *pkg, Header hdr, const
 
         /* Write the file to disk */
         if (archive_read_extract(archive, entry, archive_flags) != ARCHIVE_OK) {
-            warnx("archive_read_extract: %s", archive_error_string(archive));
+            warnx("*** archive_read_extract: %s", archive_error_string(archive));
             free_files(file_list);
             file_list = NULL;
             goto cleanup;
@@ -369,7 +369,7 @@ cleanup:
 
     if (payload) {
         if (unlink(payload) == -1) {
-            warn("unlink");
+            warn("*** unlink");
         }
 
         free(payload);
@@ -512,7 +512,7 @@ static char *comparable_version_substrings(const char *s, const char *ignore)
 
     if (reg_result != 0) {
         regerror(reg_result, &num_regex, reg_error, sizeof(reg_error));
-        warn("regcomp: %s", reg_error);
+        warn("*** regcomp: %s", reg_error);
         return NULL;
     }
 

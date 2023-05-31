@@ -174,7 +174,7 @@ void curl_get_file(const bool verbose, const char *src, const char *dst)
     c = curl_easy_init();
 
     if (!c) {
-        warn("curl_easy_init");
+        warn("*** curl_easy_init");
         return;
     }
 
@@ -202,7 +202,7 @@ void curl_get_file(const bool verbose, const char *src, const char *dst)
     fp = fopen(dst, "wb");
 
     if (fp == NULL) {
-        err(RI_PROGRAM_ERROR, "fopen");
+        err(RI_PROGRAM_ERROR, "*** fopen");
     }
 
     curl_easy_setopt(c, CURLOPT_URL, src);
@@ -219,13 +219,13 @@ void curl_get_file(const bool verbose, const char *src, const char *dst)
     }
 
     if (fclose(fp) != 0) {
-        err(RI_PROGRAM_ERROR, "fclose");
+        err(RI_PROGRAM_ERROR, "*** fclose");
     }
 
     /* remove output file if there was a download error (e.g., 404) */
     if (cc != CURLE_OK) {
         if (unlink(dst)) {
-            warn("unlink");
+            warn("*** unlink");
         }
     }
 
@@ -247,7 +247,7 @@ curl_off_t curl_get_size(const char *src)
 
     /* initialize curl */
     if (!(c = curl_easy_init())) {
-        warn("curl_easy_init");
+        warn("*** curl_easy_init");
         return 0;
     }
 
@@ -264,7 +264,7 @@ curl_off_t curl_get_size(const char *src)
     cc = curl_easy_perform(c);
 
     if (cc != CURLE_OK) {
-        warnx("unable to read %s", src);
+        warnx(_("*** unable to read %s"), src);
         return 0;
     }
 

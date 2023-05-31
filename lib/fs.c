@@ -17,7 +17,7 @@ unsigned long int get_available_space(const char *path)
     assert(path != NULL);
 
     if (statvfs(path, &svb) == -1) {
-        warn("statvfs");
+        warn("*** statvfs");
         return 0;
     }
 

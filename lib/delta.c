@@ -33,7 +33,7 @@ static int fill_mmfile(mmfile_t *mf, const char *file)
     }
 
     if (stat(file, &sb)) {
-        warn("stat");
+        warn("*** stat");
         return 1;
     }
 
@@ -42,7 +42,7 @@ static int fill_mmfile(mmfile_t *mf, const char *file)
     buf = calloc(1, size + 1);
 
     if (buf == NULL) {
-        warn("malloc");
+        warn("*** malloc");
         return 1;
     }
 
@@ -72,7 +72,7 @@ static int fill_mmfile(mmfile_t *mf, const char *file)
     mf->size -= size;
 
     if (close(fd) < 0) {
-        warn("close");
+        warn("*** close");
     }
 
     return 0;
@@ -145,8 +145,7 @@ char *get_file_delta(const char *a, const char *b)
     char *r = NULL;
 
     if (fill_mmfile(&old, a) < 0 || fill_mmfile(&new, b) < 0) {
-        warn("fill_mmfile");
-//        free(old.ptr);
+        warn("*** fill_mmfile");
         return NULL;
     }
 
@@ -166,7 +165,7 @@ char *get_file_delta(const char *a, const char *b)
     ecb.outf = delta_out;
 
     if (xdl_diff(&old, &new, &xpp, &xecfg, &ecb) < 0) {
-        warn("xdl_diff");
+        warn("*** xdl_diff");
     }
 
     if (TAILQ_EMPTY(list)) {

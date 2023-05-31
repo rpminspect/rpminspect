@@ -36,7 +36,7 @@ static GElf_Half _get_elf_helper(Elf *elf, elfinfo_t type, GElf_Half fail)
     assert(kind == ELF_K_ELF);
 
     if (gelf_getehdr(elf, &ehdr) == NULL) {
-        warn("gelf_getehdr");
+        warn("*** gelf_getehdr");
         return fail;
     }
 
@@ -45,7 +45,7 @@ static GElf_Half _get_elf_helper(Elf *elf, elfinfo_t type, GElf_Half fail)
     } else if (type == ELF_MACHINE) {
         return ehdr.e_machine;
     } else {
-        warn("unknown elftype_t %d", type);
+        warnx(_("*** unknown elftype_t %d"), type);
         return fail;
     }
 
@@ -73,7 +73,7 @@ static Elf *get_elf_with_kind(const char *fullpath, int *out_fd, Elf_Kind kind)
     /* library version check */
     if (!initialized) {
         if (elf_version(EV_CURRENT) == EV_NONE) {
-            warnx(_("libelf version mismatch"));
+            warnx(_("*** libelf version mismatch"));
             return NULL;
         }
 
@@ -82,7 +82,7 @@ static Elf *get_elf_with_kind(const char *fullpath, int *out_fd, Elf_Kind kind)
 
     /* make sure this is a regular file */
     if (lstat(fullpath, &sbuf) != 0) {
-        warn("lstat(%s)", fullpath);
+        warn("*** lstat");
         return NULL;
     }
 

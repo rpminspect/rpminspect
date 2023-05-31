@@ -44,7 +44,7 @@ static bool politics_driver(struct rpminspect *ri, rpmfile_entry_t *file)
     TAILQ_FOREACH(pentry, ri->politics, items) {
         /* malformatted lines */
         if (pentry->pattern == NULL || pentry->digest == NULL) {
-            warnx(_("invalid politics entry with pattern=%s and digest=%s"), pentry->pattern, pentry->digest);
+            warnx(_("*** invalid politics entry with pattern=%s and digest=%s"), pentry->pattern, pentry->digest);
             continue;
         }
 
@@ -64,7 +64,7 @@ static bool politics_driver(struct rpminspect *ri, rpmfile_entry_t *file)
     TAILQ_FOREACH(pentry, ri->politics, items) {
         /* malformatted lines */
         if (pentry->pattern == NULL || pentry->digest == NULL) {
-            warnx(_("invalid politics entry with pattern=%s and digest=%s"), pentry->pattern, pentry->digest);
+            warnx(_("*** invalid politics entry with pattern=%s and digest=%s"), pentry->pattern, pentry->digest);
             continue;
         }
 
@@ -89,7 +89,7 @@ static bool politics_driver(struct rpminspect *ri, rpmfile_entry_t *file)
             } else if (strlen(pentry->digest) == (SHA512_DIGEST_LENGTH * 2)) {
                 type = SHA512SUM;
             } else {
-                warnx(_("unknown digest type for pattern %s: %s"), pentry->pattern, pentry->digest);
+                warnx(_("*** unknown digest type for pattern %s: %s"), pentry->pattern, pentry->digest);
                 continue;
             }
 

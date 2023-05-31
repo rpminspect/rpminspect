@@ -27,7 +27,7 @@ static bool json_parse_file(parser_context **context_out, const char *filepath)
     jerr = json_tokener_get_error(tok);
 
     if (jerr != json_tokener_success) {
-        warnx("json_tokener_parse_ex: %s", json_tokener_error_desc(jerr));
+        warnx("*** json_tokener_parse_ex: %s", json_tokener_error_desc(jerr));
         goto done;
     }
 

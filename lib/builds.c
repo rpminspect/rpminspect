@@ -70,7 +70,7 @@ static void set_worksubdir(struct rpminspect *ri, workdir_t wd, const struct koj
         }
 
         if (mkdirp(ri->worksubdir, mode)) {
-            err(RI_PROGRAM_ERROR, _("unable to create download directory %s"), ri->worksubdir);
+            err(RI_PROGRAM_ERROR, _("*** unable to create download directory %s"), ri->worksubdir);
         }
     } else {
         if (wd == LOCAL_WORKDIR) {
@@ -82,11 +82,11 @@ static void set_worksubdir(struct rpminspect *ri, workdir_t wd, const struct koj
             assert(build != NULL);
             xasprintf(&ri->worksubdir, "%s/%s-%s.XXXXXX", ri->workdir, build->name, build->version);
         } else {
-            errx(RI_PROGRAM_ERROR, _("unknown workdir type %d"), wd);
+            errx(RI_PROGRAM_ERROR, _("*** unknown working directory type: %d"), wd);
         }
 
         if (mkdtemp(ri->worksubdir) == NULL) {
-            err(RI_PROGRAM_ERROR, "mkdtemp");
+            err(RI_PROGRAM_ERROR, "*** mkdtemp");
         }
     }
 
@@ -139,7 +139,7 @@ static void prune_local(const int whichbuild)
     }
 
     if (closedir(d) == -1) {
-        warn("closedir");
+        warn("*** closedir");
         return;
     }
 
@@ -170,7 +170,7 @@ static int copytree(const char *fpath, const struct stat *sb, int tflag, struct 
 
     /* Ignore unreadable things */
     if (tflag == FTW_DNR || tflag == FTW_NS || tflag == FTW_SLN) {
-        warnx(_("unable to read %s, skipping"), fpath);
+        warnx(_("*** unable to read %s, skipping"), fpath);
         return 0;
     }
 
@@ -179,7 +179,6 @@ static int copytree(const char *fpath, const struct stat *sb, int tflag, struct 
 
     if (S_ISDIR(sb->st_mode)) {
         if (mkdirp(bufpath, mode)) {
-            warn("mkdirp");
             ret = -1;
         }
     } else if (S_ISREG(sb->st_mode) || S_ISLNK(sb->st_mode)) {
@@ -196,14 +195,14 @@ static int copytree(const char *fpath, const struct stat *sb, int tflag, struct 
         }
 
         if (copyfile(fpath, bufpath, true, false)) {
-            warn("copyfile");
+            warn("*** copyfile");
             ret = -1;
         }
 
         /* Gather the RPM header for packages */
         get_rpm_info(bufpath);
     } else {
-        warnx(_("unknown directory member encountered: %s"), fpath);
+        warnx(_("*** unknown directory member encountered: %s"), fpath);
         ret = -1;
     }
 
@@ -232,9 +231,9 @@ static void report_insufficient_space(const unsigned long int avail, const unsig
     availh = human_size(avail);
     needh = human_size(need);
 
-    warn(_("There is not enough available space to download the requested %s.\n"), type);
-    warn(_("    Need %s in %s, have %s.\n"), needh, workdir, availh);
-    warn(_("See the `-w' option for specifying an alternate working directory.\n"));
+    warnx(_("There is not enough available space to download the requested %s.\n"), type);
+    warnx(_("    Need %s in %s, have %s.\n"), needh, workdir, availh);
+    warnx(_("See the `-w' option for specifying an alternate working directory.\n"));
 
     free(availh);
     free(needh);
@@ -247,8 +246,8 @@ static void report_unknown_space(const char *workdir, const char *type)
     assert(workdir != NULL);
     assert(type != NULL);
 
-    warn(_("Unable to determine the required space to download the requested %s.\n"), type);
-    warn(_("Ensure %s has sufficient space available."), workdir);
+    warnx(_("Unable to determine the required space to download the requested %s.\n"), type);
+    warnx(_("Ensure %s has sufficient space available."), workdir);
 
     return;
 }
@@ -359,7 +358,6 @@ static int download_build(struct rpminspect *ri, const struct koji_build *build)
             }
 
             if (mkdirp(dst, mode)) {
-                warn("mkdirp");
                 return -1;
             }
 
@@ -372,7 +370,7 @@ static int download_build(struct rpminspect *ri, const struct koji_build *build)
             /* Get the list of artifacts to filter if we don't have it */
             if (filter == NULL) {
                 if (p->parse_file(&ctx, dst)) {
-                    warnx(_("ignoring malformed module metadata file: %s"), dst);
+                    warnx(_("*** ignoring malformed module metadata file: %s"), dst);
                     return -1;
                 }
 
@@ -382,7 +380,7 @@ static int download_build(struct rpminspect *ri, const struct koji_build *build)
                 TAILQ_INIT(filter);
 
                 if (p->strarray_foreach(ctx, "filter", "rpms", filter_cb, filter)) {
-                    warnx(_("malformed rpm filters in file: %s"), dst);
+                    warnx(_("*** malformed rpm filters in file: %s"), dst);
                     free(filter);
                     return -1;
                 }
@@ -409,7 +407,6 @@ static int download_build(struct rpminspect *ri, const struct koji_build *build)
             }
 
             if (mkdirp(dst, mode)) {
-                warn("mkdirp");
                 return -1;
             }
 
@@ -568,7 +565,6 @@ static int download_task(struct rpminspect *ri, struct koji_task *task)
         }
 
         if (mkdirp(dst, mode)) {
-            warn("mkdirp");
             free(dst);
             return -1;
         }
@@ -587,7 +583,6 @@ static int download_task(struct rpminspect *ri, struct koji_task *task)
                 }
 
                 if (mkdirp(dst, mode)) {
-                    warn("mkdirp");
                     free(dst);
                     return -1;
                 }
@@ -677,7 +672,6 @@ static int download_rpm(struct rpminspect *ri, const char *rpm)
     }
 
     if (mkdirp(dstdir, mode)) {
-        warn("mkdirp");
         free(dstdir);
         return -1;
     }
@@ -794,7 +788,7 @@ static int gather_local_build(const char *build)
     assert(build != NULL);
 
     if (fetch_only) {
-        warnx(_("`%s' already exists in %s"), build, workri->workdir);
+        warnx(_("*** `%s' already exists in %s"), build, workri->workdir);
         return -1;
     }
 
@@ -802,7 +796,7 @@ static int gather_local_build(const char *build)
 
     /* copy after tree */
     if (nftw(build, copytree, FOPEN_MAX, FTW_PHYS) == -1) {
-        warn("nftw");
+        warn("*** nftw");
         return -1;
     }
 
@@ -835,7 +829,7 @@ static int _gather_build_types(struct rpminspect *ri)
     /* try for a local Koji build or local RPM */
     if (!gathered && (is_local_build(ri->workdir, spec, fetch_only) || is_local_rpm(ri, spec))) {
         if (gather_local_build(spec) == -1) {
-            warnx(_("unable to gather %s build: %s"), t, spec);
+            warnx(_("*** unable to gather %s build: %s"), t, spec);
             return -1;
         } else {
             gathered = true;
@@ -847,7 +841,7 @@ static int _gather_build_types(struct rpminspect *ri)
         r = download_rpm(ri, spec);
 
         if (r != RI_SUCCESS) {
-            warnx(_("unable to download %s RPM: %s"), t, spec);
+            warnx(_("*** unable to download %s RPM: %s"), t, spec);
             return r;
         } else {
             gathered = true;
@@ -866,7 +860,7 @@ static int _gather_build_types(struct rpminspect *ri)
                 free_koji_build(innerbuild);
 
                 if (r != RI_SUCCESS) {
-                    warnx(_("unable to download %s build: %s"), t, spec);
+                    warnx(_("*** unable to download %s build: %s"), t, spec);
                     free_koji_task(task);
                     return r;
                 } else {
@@ -878,7 +872,7 @@ static int _gather_build_types(struct rpminspect *ri)
                 r = download_task(ri, task);
 
                 if (r != RI_SUCCESS) {
-                    warnx(_("unable to download %s task: %s"), t, spec);
+                    warnx(_("*** unable to download %s task: %s"), t, spec);
                     free_koji_task(task);
                     return r;
                 } else {
@@ -899,7 +893,7 @@ static int _gather_build_types(struct rpminspect *ri)
             free_koji_build(build);
 
             if (r != RI_SUCCESS) {
-                warnx(_("unable to download %s build: %s"), t, spec);
+                warnx(_("*** unable to download %s build: %s"), t, spec);
                 return r;
             } else {
                 gathered = true;
@@ -909,7 +903,7 @@ static int _gather_build_types(struct rpminspect *ri)
 
     /* still not found a build and we're this far? */
     if (!gathered) {
-        warnx(_("unable to locate %s build: %s"), t, spec);
+        warnx(_("*** unable to locate %s build: %s"), t, spec);
         return -1;
     }
 

@@ -124,7 +124,7 @@ static bool kmod_driver(struct rpminspect *ri, rpmfile_entry_t *file)
     kctx = kmod_new(NULL, NULL);
 
     if (kctx == NULL) {
-        warn("kmod_new");
+        warn("*** kmod_new");
         return true;
     }
 
@@ -142,7 +142,7 @@ static bool kmod_driver(struct rpminspect *ri, rpmfile_entry_t *file)
     kctx = kmod_new(NULL, NULL);
 
     if (kctx == NULL) {
-        warn("kmod_new");
+        warn("*** kmod_new");
         return true;
     }
 
@@ -161,7 +161,7 @@ static bool kmod_driver(struct rpminspect *ri, rpmfile_entry_t *file)
     err = kmod_module_get_info(beforekmod, &beforeinfo);
 
     if (err < 0) {
-        warn("kmod_module_get_info");
+        warn("*** kmod_module_get_info");
         kmod_module_unref(beforekmod);
         kmod_module_unref(afterkmod);
         kmod_unref(kctx);
@@ -171,7 +171,7 @@ static bool kmod_driver(struct rpminspect *ri, rpmfile_entry_t *file)
     err = kmod_module_get_info(afterkmod, &afterinfo);
 
     if (err < 0) {
-        warn("kmod_module_get_info");
+        warn("*** kmod_module_get_info");
         kmod_module_info_free_list(beforeinfo);
         kmod_module_unref(beforekmod);
         kmod_module_unref(afterkmod);

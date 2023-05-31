@@ -62,7 +62,7 @@ int rmtree(const char *path, const bool ignore_errors, const bool contentsonly)
         if (ignore_errors) {
             return 0;
         } else {
-            warn("stat(%s)", path);
+            warn("*** stat");
             return 1;
         }
     }
@@ -71,7 +71,7 @@ int rmtree(const char *path, const bool ignore_errors, const bool contentsonly)
         if (ignore_errors) {
             return 0;
         } else {
-            warn("%s is not a directory", path);
+            warnx(_("*** %s is not a directory"), path);
             return 2;
         }
     }

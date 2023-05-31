@@ -88,7 +88,7 @@ char *compute_checksum(const char *filename, mode_t *st_mode, int type)
 
     /* don't calculate the checksum of a device node */
     if (S_ISCHR(*mode) || S_ISBLK(*mode) || S_ISFIFO(*mode) || S_ISSOCK(*mode)) {
-        warnx(_("%s is a FIFO"), filename);
+        warnx(_("*** %s is a FIFO"), filename);
         return NULL;
     }
 
@@ -114,14 +114,14 @@ char *compute_checksum(const char *filename, mode_t *st_mode, int type)
     input = open(filename, O_RDONLY);
 
     if (input == -1) {
-        warn("open");
+        warn("*** open");
         return NULL;
     }
 
     len = read(input, buf, sizeof(buf));
 
     if (len == -1) {
-        warn("read");
+        warn("*** read");
         return NULL;
     }
 
@@ -140,13 +140,13 @@ char *compute_checksum(const char *filename, mode_t *st_mode, int type)
         len = read(input, buf, sizeof(buf));
 
         if (len == -1) {
-            warn("read");
+            warn("*** read");
             return NULL;
         }
     }
 
     if (close(input) == -1) {
-        warn("close");
+        warn("*** close");
         return NULL;
     }
 
@@ -179,7 +179,7 @@ char *compute_checksum(const char *filename, mode_t *st_mode, int type)
     ret = calloc(len + 1, sizeof(buf));
 
     if (ret == NULL) {
-        warn("calloc");
+        warn("*** calloc");
         return NULL;
     }
 

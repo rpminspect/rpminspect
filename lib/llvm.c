@@ -30,20 +30,20 @@ bool is_llvm_ir_bitcode(const char *file)
     fd = open(file, flags);
 
     if (fd == -1) {
-        warn("open");
+        warn("*** open");
         return false;
     }
 
     if (read(fd, magic, sizeof(magic)) != sizeof(magic)) {
         if (close(fd) == -1) {
-            warn("close");
+            warn("*** close");
         }
 
         return false;
     }
 
     if (close(fd) == -1) {
-        warn("close");
+        warn("*** close");
         return false;
     }
 

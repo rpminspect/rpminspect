@@ -82,6 +82,7 @@ lib/joinpath.c
 lib/kmods.c
 lib/koji.c
 lib/listfuncs.c
+lib/llvm.c
 lib/local.c
 lib/macros.c
 lib/magic.c

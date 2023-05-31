@@ -177,7 +177,7 @@ bool usable_path(const char *path)
     memset(&sb, 0, sizeof(sb));
 
     if (lstat(path, &sb) == -1) {
-        warn("lstat");
+        warn("*** lstat");
         return false;
     }
 
@@ -282,7 +282,7 @@ bool match_path(const char *pattern, const char *root, const char *path)
     r = glob(globpath, gflags, NULL, &found);
 
     if (r == GLOB_NOSPACE || r == GLOB_ABORTED) {
-        warn("glob");
+        warn("*** glob");
     }
 
     if (r != 0) {

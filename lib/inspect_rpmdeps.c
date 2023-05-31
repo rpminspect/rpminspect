@@ -46,7 +46,7 @@ static char *remove_isa_substring(char *requirement)
 
     /* isa substring regex pattern */
     if (regcomp(&re, "\\([a-zA-Z0-9]+-(32|64)\\)", REG_EXTENDED | REG_NEWLINE) != 0) {
-        warn("regcomp");
+        warn("*** regcomp");
         r = strdup(requirement);
         return r;
     }

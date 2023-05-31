@@ -96,7 +96,7 @@ void output_json(const results_t *results, const char *dest, __attribute__((unus
             fp = fopen(dest, "w");
 
             if (fp == NULL) {
-                warn(_("error opening %s for writing"), dest);
+                warn(_("*** error opening %s for writing"), dest);
                 return;
             }
         }
@@ -104,7 +104,7 @@ void output_json(const results_t *results, const char *dest, __attribute__((unus
         /* write out the results */
         json_string = json_object_to_json_string_ext(j, flags);
         if (json_string == NULL) {
-            errx(RI_PROGRAM_ERROR, "failed to stringify object to json format");
+            errx(RI_PROGRAM_ERROR, "*** failed to stringify object to json format");
         }
         /* write out the results */
         fprintf(fp, "%s\n", json_string);
