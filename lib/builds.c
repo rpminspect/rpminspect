@@ -814,22 +814,19 @@ static int _gather_build_types(struct rpminspect *ri)
     struct koji_build *innerbuild = NULL;
     struct koji_task *task = NULL;
     const char *spec = NULL;
-    const char *t = NULL;
 
     assert(ri != NULL);
 
     if (whichbuild == AFTER_BUILD) {
         spec = ri->after;
-        t = _("after");
     } else if (whichbuild == BEFORE_BUILD) {
         spec = ri->before;
-        t = _("before");
     }
 
     /* try for a local Koji build or local RPM */
     if (!gathered && (is_local_build(ri->workdir, spec, fetch_only) || is_local_rpm(ri, spec))) {
         if (gather_local_build(spec) == -1) {
-            warnx(_("*** unable to gather %s build: %s"), t, spec);
+            warnx(_("*** unable to find local build: %s"), spec);
             return -1;
         } else {
             gathered = true;
@@ -841,7 +838,7 @@ static int _gather_build_types(struct rpminspect *ri)
         r = download_rpm(ri, spec);
 
         if (r != RI_SUCCESS) {
-            warnx(_("*** unable to download %s RPM: %s"), t, spec);
+            warnx(_("*** unable to download RPM: %s"), spec);
             return r;
         } else {
             gathered = true;
@@ -860,7 +857,7 @@ static int _gather_build_types(struct rpminspect *ri)
                 free_koji_build(innerbuild);
 
                 if (r != RI_SUCCESS) {
-                    warnx(_("*** unable to download %s build: %s"), t, spec);
+                    warnx(_("*** unable to find build %s in Koji hub %s"), spec, ri->kojihub);
                     free_koji_task(task);
                     return r;
                 } else {
@@ -872,7 +869,7 @@ static int _gather_build_types(struct rpminspect *ri)
                 r = download_task(ri, task);
 
                 if (r != RI_SUCCESS) {
-                    warnx(_("*** unable to download %s task: %s"), t, spec);
+                    warnx(_("*** unable to find task %s in Koji hub %s"), spec, ri->kojihub);
                     free_koji_task(task);
                     return r;
                 } else {
@@ -893,7 +890,7 @@ static int _gather_build_types(struct rpminspect *ri)
             free_koji_build(build);
 
             if (r != RI_SUCCESS) {
-                warnx(_("*** unable to download %s build: %s"), t, spec);
+                warnx(_("*** unable to find build %s in Koji hub %s"), spec, ri->kojihub);
                 return r;
             } else {
                 gathered = true;
@@ -903,7 +900,7 @@ static int _gather_build_types(struct rpminspect *ri)
 
     /* still not found a build and we're this far? */
     if (!gathered) {
-        warnx(_("*** unable to locate %s build: %s"), t, spec);
+        warnx(_("*** unable to find build %s in Koji hub %s"), spec, ri->kojihub);
         return -1;
     }
 
