@@ -263,7 +263,7 @@ string_list_t *gather_diags(struct rpminspect *ri, const char *progname, const c
 
     entry = TAILQ_FIRST(details);
     ver = strdup(entry->data);
-    list_free(details, free);
+    list_free(details, free, true);
 
     entry = calloc(1, sizeof(*entry));
     assert(entry != NULL);
