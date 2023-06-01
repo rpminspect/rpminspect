@@ -905,6 +905,23 @@ int main(int argc, char **argv)
         free(params.details);
     }
 
+    /* add the builds */
+    if (ri->before != NULL) {
+        /* before build */
+        params.msg = _("Before Build");
+        params.details = ri->before;
+        add_result_entry(&ri->results, &params);
+
+        /* after build */
+        params.msg = _("After Build");
+    } else {
+        /* only have single build */
+        params.msg = _("Build");
+    }
+
+    params.details = ri->after;
+    add_result_entry(&ri->results, &params);
+
     /* make sure the worst result is set before running inspections */
     ri->worst_result = params.severity;
 
