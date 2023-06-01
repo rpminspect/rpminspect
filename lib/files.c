@@ -232,7 +232,7 @@ rpmfile_t *extract_rpm(struct rpminspect *ri, const char *pkg, Header hdr, const
     /* Open the file with libarchive */
     archive = new_archive_reader();
 
-    if (archive_read_open_filename(archive, pkg, 10240) != ARCHIVE_OK) {
+    if (archive_read_open_filename(archive, pkg, BUFSIZ) != ARCHIVE_OK) {
         /* maybe the payload has large files, so try to convert */
         payload = extract_rpm_payload(pkg);
 
@@ -244,9 +244,9 @@ rpmfile_t *extract_rpm(struct rpminspect *ri, const char *pkg, Header hdr, const
         archive_read_free(archive);
         archive = new_archive_reader();
 
-        if (archive_read_open_filename(archive, payload, 10240) != ARCHIVE_OK) {
+        if (archive_read_open_filename(archive, payload, BUFSIZ) != ARCHIVE_OK) {
             /* still bad, so bail */
-            warnx("*** archive_read_open_filename: %s", archive_error_string(archive));
+            warnx("*** archive_read_open_filename(%s): %s", pkg, archive_error_string(archive));
             goto cleanup;
         }
     }

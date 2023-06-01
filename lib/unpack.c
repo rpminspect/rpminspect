@@ -141,10 +141,9 @@ int unpack_archive(const char *archive, const char *dest, const bool force)
     archive_read_support_filter_all(input);
 #endif
     archive_read_support_format_all(input);
-    r = archive_read_open_filename(input, archive, 16384);
+    r = archive_read_open_filename(input, archive, BUFSIZ);
 
     if (r != ARCHIVE_OK) {
-        warnx("*** archive_read_open_filename: %s", archive_error_string(input));
         archive_read_free(input);
         return -1;
     }
