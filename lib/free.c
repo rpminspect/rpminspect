@@ -271,7 +271,7 @@ void free_rpminspect(struct rpminspect *ri)
     list_free(ri->unicode_forbidden_codepoints, free, true);
     free_deprule_ignore_map(ri->deprules_ignore);
     free(ri->debuginfo_sections);
-    list_free(ri->udev_rules_dirs, free);
+    list_free(ri->udev_rules_dirs, free, true);
 
     free_peers(ri->peers);
 
