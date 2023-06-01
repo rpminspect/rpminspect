@@ -112,7 +112,16 @@ jobs:
             # Set up
             - name: git clone requirements
               run: |
-                  dnf install -y git
+                  . /etc/os-release
+
+                  if [ "${REDHAT_BUGZILLA_PRODUCT_VERSION}" = "rawhide" ] || [ "${REDHAT_SUPPORT_PRODUCT_VERSION}" = "rawhide" ]; then
+                      rm -f /etc/dnf/dnf.conf
+                      dnf install -y dnf5
+                      dnf5 install -y git
+                  else
+                      dnf install -y git
+                  fi
+
                   git config --global --add safe.directory /__w/rpminspect/rpminspect
 
             # This means clone the git repo
@@ -122,8 +131,16 @@ jobs:
             # and run the test suite
             - name: Build and run the test suite
               run: |
-                  dnf remove -y fedora-repos-modular
-                  dnf install -y make
+                  . /etc/os-release
+
+                  if [ "${REDHAT_BUGZILLA_PRODUCT_VERSION}" = "rawhide" ] || [ "${REDHAT_SUPPORT_PRODUCT_VERSION}" = "rawhide" ]; then
+                      dnf5 remove -y fedora-repos-modular
+                      dnf5 install -y make
+                  else
+                      dnf remove -y fedora-repos-modular
+                      dnf install -y make
+                  fi
+
                   make instreqs OSDEPS_ARCH=i686
                   env CFLAGS="-m32" LDFLAGS="-m32" PKG_CONFIG_PATH=/usr/lib/pkgconfig make debug
                   make check
