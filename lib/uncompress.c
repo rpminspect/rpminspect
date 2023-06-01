@@ -172,7 +172,7 @@ char *uncompress_file(struct rpminspect *ri, const char *infile, const char *sub
     archive_read_support_format_empty(input);
 
     /* open the input file, decompress, and write to output */
-    r = archive_read_open_filename(input, infile, 16384);
+    r = archive_read_open_filename(input, infile, BUFSIZ);
 
     if (r != ARCHIVE_OK) {
         /* just stop trying to uncompress if this errors */
