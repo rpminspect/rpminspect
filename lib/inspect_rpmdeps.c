@@ -423,7 +423,7 @@ static bool check_explicit_lib_deps(struct rpminspect *ri, Header h, deprule_lis
             result = false;
         }
 
-        list_free(explicit_requires, free, true);
+        list_free(explicit_requires, free);
     }
 
     return result;

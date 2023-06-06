@@ -347,13 +347,12 @@ static char *manual_prep_source(struct rpminspect *ri, const rpmfile_entry_t *fi
             }
 
             free(extractdir);
-            free(mime);
             free(srcfile);
         }
     }
 
     free(fp);
-    list_free(sources, free, true);
+    list_free(sources, free);
     return build;
 }
 

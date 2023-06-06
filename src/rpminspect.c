@@ -767,7 +767,7 @@ int main(int argc, char **argv)
             }
 
             if (!found) {
-                list_free(valid_arches, free, true);
+                list_free(valid_arches, free);
                 free_rpminspect(ri);
                 rpmFreeMacros(NULL);
                 rpmFreeRpmrc();
@@ -781,7 +781,7 @@ int main(int argc, char **argv)
 
         /* clean up */
         free(archopt);
-        list_free(valid_arches, free, true);
+        list_free(valid_arches, free);
     }
 
     /* create the working directory */
@@ -871,7 +871,7 @@ int main(int argc, char **argv)
     add_result_entry(&ri->results, &params);
     free(params.msg);
     free(params.details);
-    list_free(diags, free, true);
+    list_free(diags, free);
 
     /* add command line information to the results output */
     xasprintf(&params.msg, _("Command line arguments used to invoke %s."), COMMAND_NAME);

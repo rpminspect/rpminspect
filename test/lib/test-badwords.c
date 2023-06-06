@@ -55,7 +55,7 @@ int init_test_badwords(void) {
 }
 
 int clean_test_badwords(void) {
-    list_free(forbidden_words, free, true);
+    list_free(forbidden_words, free);
     return 0;
 }
 

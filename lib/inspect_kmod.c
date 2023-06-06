@@ -196,7 +196,7 @@ static bool kmod_driver(struct rpminspect *ri, rpmfile_entry_t *file)
             reported = true;
         }
 
-        list_free(lost, free, true);
+        list_free(lost, free);
         lost = NULL;
     }
 
@@ -213,7 +213,7 @@ static bool kmod_driver(struct rpminspect *ri, rpmfile_entry_t *file)
             reported = true;
         }
 
-        list_free(gain, free, true);
+        list_free(gain, free);
         gain = NULL;
     }
 
@@ -234,7 +234,7 @@ static bool kmod_driver(struct rpminspect *ri, rpmfile_entry_t *file)
             reported = true;
         }
 
-        list_free(lost, free, true);
+        list_free(lost, free);
         lost = NULL;
     }
 
@@ -250,7 +250,7 @@ static bool kmod_driver(struct rpminspect *ri, rpmfile_entry_t *file)
             reported = true;
         }
 
-        list_free(gain, free, true);
+        list_free(gain, free);
         gain = NULL;
     }
 

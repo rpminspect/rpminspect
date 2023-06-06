@@ -102,10 +102,10 @@ bool inspect_arch(struct rpminspect *ri)
         result = false;
     }
 
-    list_free(lost, free, true);
-    list_free(gain, free, true);
-    list_free(before_arches, free, true);
-    list_free(after_arches, free, true);
+    list_free(lost, free);
+    list_free(gain, free);
+    list_free(before_arches, free);
+    list_free(after_arches, free);
 
     return result;
 }

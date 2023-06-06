@@ -131,7 +131,7 @@ int get_specfile_macros(struct rpminspect *ri, const char *specfile)
         if (list_len(fields) != 3) {
             /* not a macro line */
             DEBUG_PRINT("ignoring macro line (possibly a function): '%s'\n", specline->data);
-            list_free(fields, free, true);
+            list_free(fields, free);
             continue;
         }
 
@@ -147,7 +147,7 @@ int get_specfile_macros(struct rpminspect *ri, const char *specfile)
 
         if (strcmp(entry->data, SPEC_MACRO_DEFINE) && strcmp(entry->data, SPEC_MACRO_GLOBAL)) {
             /* ignore complex macros, like a conditional define with a %global */
-            list_free(fields, free, true);
+            list_free(fields, free);
             continue;
         }
 
@@ -155,7 +155,7 @@ int get_specfile_macros(struct rpminspect *ri, const char *specfile)
 
         if (strsuffix(entry->data, ")")) {
             /* ignore macro functions */
-            list_free(fields, free, true);
+            list_free(fields, free);
             continue;
         }
 
@@ -187,7 +187,7 @@ int get_specfile_macros(struct rpminspect *ri, const char *specfile)
     }
 
     /* clean up */
-    list_free(spec, free, true);
+    list_free(spec, free);
     regfree(&macro_regex);
 
     return n;
@@ -250,6 +250,6 @@ string_list_t *get_macros(const char *s)
         }
     }
 
-    list_free(fields, free, true);
+    list_free(fields, free);
     return macros;
 }

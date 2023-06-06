@@ -258,7 +258,7 @@ static struct libannocheck_internals *libannocheck_setup(struct rpminspect *ri, 
                     }
                 }
 
-                list_free(args, free, true);
+                list_free(args, free);
             }
         } else {
             annoerr = libannocheck_enable_all_tests(anno);
@@ -512,7 +512,7 @@ static bool annocheck_driver(struct rpminspect *ri, rpmfile_entry_t *file)
             reported = true;
             free(params.details);
             free(params.msg);
-            list_free(details, free, true);
+            list_free(details, free);
         }
     }
 
@@ -626,7 +626,7 @@ static bool annocheck_driver(struct rpminspect *ri, rpmfile_entry_t *file)
                 }
             }
 
-            list_free(slist, free, true);
+            list_free(slist, free);
         }
 
         /* Cleanup */

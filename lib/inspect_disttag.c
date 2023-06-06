@@ -74,7 +74,7 @@ static bool check_release_macros(const int macrocount, const pair_list_t *macros
     if (tag_macros == NULL) {
         return false;
     } else if (TAILQ_EMPTY(tag_macros)) {
-        list_free(tag_macros, free, true);
+        list_free(tag_macros, free);
         return false;
     }
 
@@ -112,7 +112,7 @@ static bool check_release_macros(const int macrocount, const pair_list_t *macros
     }
 
     /* clean up */
-    list_free(tag_macros, free, true);
+    list_free(tag_macros, free);
 
     return ret;
 }
@@ -198,7 +198,7 @@ static bool disttag_driver(struct rpminspect *ri, rpmfile_entry_t *file)
 
     free(expanded_release);
     free(params.msg);
-    list_free(contents, free, true);
+    list_free(contents, free);
     return result;
 }
 

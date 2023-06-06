@@ -550,9 +550,9 @@ void free_koji_task_entry(koji_task_entry_t *entry)
     }
 
     free_koji_task(entry->task);
-    list_free(entry->srpms, free, true);
-    list_free(entry->rpms, free, true);
-    list_free(entry->logs, free, true);
+    list_free(entry->srpms, free);
+    list_free(entry->rpms, free);
+    list_free(entry->logs, free);
     free(entry);
     entry = NULL;
 
