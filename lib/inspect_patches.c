@@ -45,8 +45,9 @@ static void free_patches(patches_t *table)
     }
 
     HASH_ITER(hh, table, entry, tmp_entry) {
-        free(entry->patch);
         HASH_DEL(table, entry);
+        free(entry->patch);
+        free(entry);
     }
 
     return;
@@ -65,8 +66,9 @@ static void free_applied_patches(applied_patches_t *table)
     }
 
     HASH_ITER(hh, table, entry, tmp_entry) {
-        free(entry->opts);
         HASH_DEL(table, entry);
+        free(entry->opts);
+        free(entry);
     }
 
     return;

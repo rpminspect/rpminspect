@@ -18,9 +18,10 @@ static void free_string_list_map(string_list_map_t *table)
     }
 
     HASH_ITER(hh, table, entry, tmp_entry) {
+        HASH_DEL(table, entry);
         free(entry->key);
         list_free(entry->value, free);
-        HASH_DEL(table, entry);
+        free(entry);
     }
 
     return;
@@ -65,9 +66,10 @@ void free_string_map(string_map_t *table)
     }
 
     HASH_ITER(hh, table, entry, tmp_entry) {
+        HASH_DEL(table, entry);
         free(entry->key);
         free(entry->value);
-        HASH_DEL(table, entry);
+        free(entry);
     }
 
     return;
@@ -182,6 +184,7 @@ void free_rpminspect(struct rpminspect *ri)
             if (sentry->rules) {
                 HASH_ITER(hh, sentry->rules, srentry, tmp_srentry) {
                     HASH_DEL(sentry->rules, srentry);
+                    free(srentry);
                 }
             }
 
@@ -276,9 +279,10 @@ void free_rpminspect(struct rpminspect *ri)
     free_peers(ri->peers);
 
     HASH_ITER(hh, ri->header_cache, hentry, tmp_hentry) {
+        HASH_DEL(ri->header_cache, hentry);
         free(hentry->pkg);
         headerFree(hentry->hdr);
-        HASH_DEL(ri->header_cache, hentry);
+        free(hentry);
     }
 
     free(ri->before_rel);

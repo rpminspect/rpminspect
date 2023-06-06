@@ -152,9 +152,10 @@ void free_abi(abi_t *table)
     }
 
     HASH_ITER(hh, table, entry, tmp_entry) {
-        free(entry->pkg);
-        list_free(entry->dsos, free);
         HASH_DEL(table, entry);
+        list_free(entry->dsos, free);
+        free(entry->pkg);
+        free(entry);
     }
 
     free(table);
