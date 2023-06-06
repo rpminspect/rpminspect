@@ -38,7 +38,7 @@ static void add_removedfiles_result(struct rpminspect *ri, struct result_params 
 static bool removedfiles_driver(struct rpminspect *ri, rpmfile_entry_t *file)
 {
     bool result = true;
-    char *type = NULL;
+    const char *type = NULL;
     const char *arch = NULL;
     char *soname = NULL;
     string_entry_t *entry = NULL;
@@ -71,7 +71,7 @@ static bool removedfiles_driver(struct rpminspect *ri, rpmfile_entry_t *file)
     }
 
     /* Collect the RPM architecture and file MIME type */
-    type = get_mime_type(file);
+    type = get_mime_type(ri, file);
     arch = get_rpm_header_arch(file->rpm_header);
 
     /* Get any possible security rule for this path */

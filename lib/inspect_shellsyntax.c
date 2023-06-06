@@ -81,7 +81,7 @@ static bool shellsyntax_driver(struct rpminspect *ri, rpmfile_entry_t *file)
 {
     bool result = true;
     const char *arch = NULL;
-    char *type = NULL;
+    const char *type = NULL;
     char *shell = NULL;
     char *before_shell = NULL;
     int exitcode = -1;
@@ -98,7 +98,7 @@ static bool shellsyntax_driver(struct rpminspect *ri, rpmfile_entry_t *file)
     }
 
     /* Get the mime type of the file */
-    type = get_mime_type(file);
+    type = get_mime_type(ri, file);
 
     if (!strprefix(type, "text/")) {
         return true;

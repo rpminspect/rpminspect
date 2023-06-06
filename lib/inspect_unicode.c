@@ -293,7 +293,7 @@ static char *manual_prep_source(struct rpminspect *ri, const rpmfile_entry_t *fi
     char *fp = NULL;
     char *srpmdir = NULL;
     char *srcfile = NULL;
-    char *mime = NULL;
+    const char *mime = NULL;
     char *extractdir = NULL;
     string_list_t *sources = NULL;
     string_entry_t *entry = NULL;
@@ -325,11 +325,10 @@ static char *manual_prep_source(struct rpminspect *ri, const rpmfile_entry_t *fi
             assert(srcfile != NULL);
 
             /* get the MIME type of the source file */
-            mime = mime_type(srcfile);
+            mime = mime_type(ri, srcfile);
 
             /* skip text files */
             if (strprefix(mime, "text/")) {
-                free(mime);
                 free(srcfile);
                 continue;
             }
@@ -386,7 +385,7 @@ static bool end_of_line(const UChar c)
  */
 static int validate_file(const char *fpath, __attribute__((unused)) const struct stat *sb, int tflag, __attribute__((unused)) struct FTW *ftwbuf)
 {
-    char *type = NULL;
+    const char *type = NULL;
     const char *localpath = fpath;
     string_entry_t *sentry = NULL;
     UFILE *src = NULL;
@@ -413,13 +412,12 @@ static int validate_file(const char *fpath, __attribute__((unused)) const struct
         return 0;
     }
 
-    type = mime_type(fpath);
+    type = mime_type(globalri, fpath);
 
     /* check for exclusion by MIME type */
     if (globalri->unicode_excluded_mime_types != NULL && !TAILQ_EMPTY(globalri->unicode_excluded_mime_types)) {
         TAILQ_FOREACH(sentry, globalri->unicode_excluded_mime_types, items) {
             if (!strcmp(type, sentry->data)) {
-                free(type);
                 return 0;
             }
         }
@@ -427,11 +425,8 @@ static int validate_file(const char *fpath, __attribute__((unused)) const struct
 
     /* ignore any non-text files */
     if (!strprefix(type, "text/")) {
-        free(type);
         return 0;
     }
-
-    free(type);
 
     /* check for exclusion by ignore list */
     if (build && strprefix(localpath, build)) {

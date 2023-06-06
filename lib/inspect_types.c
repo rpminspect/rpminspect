@@ -69,17 +69,17 @@ static bool types_driver(struct rpminspect *ri, rpmfile_entry_t *file)
     params.noun = _("${FILE} MIME type on ${ARCH}");
 
     /* Get the MIME types */
-    bmt = strsplit(get_mime_type(file->peer_file), "/");
-    amt = strsplit(get_mime_type(file), "/");
+    bmt = strsplit(get_mime_type(ri, file->peer_file), "/");
+    amt = strsplit(get_mime_type(ri, file), "/");
 
     /* A MIME type should be category/subcategory, so these lists should be length 2 */
     if (r && list_len(bmt) != 2) {
-        xasprintf(&params.msg, _("Unknown MIME type `%s' on %s in %s"), get_mime_type(file->peer_file), file->peer_file->localpath, bnevra);
+        xasprintf(&params.msg, _("Unknown MIME type `%s' on %s in %s"), get_mime_type(ri, file->peer_file), file->peer_file->localpath, bnevra);
         r = false;
     }
 
     if (r && list_len(amt) != 2) {
-        xasprintf(&params.msg, _("Unknown MIME type `%s' on %s in %s"), get_mime_type(file), file->localpath, anevra);
+        xasprintf(&params.msg, _("Unknown MIME type `%s' on %s in %s"), get_mime_type(ri, file), file->localpath, anevra);
         r = false;
     }
 

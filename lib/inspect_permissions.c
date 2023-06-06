@@ -146,7 +146,7 @@ static bool permissions_driver(struct rpminspect *ri, rpmfile_entry_t *file)
         params.severity = get_secrule_result_severity(ri, file, SECRULE_WORLDWRITABLE);
 
         if (params.severity != RESULT_NULL && params.severity != RESULT_SKIP) {
-            xasprintf(&params.msg, _("%s (%s) is world-writable on %s"), file->localpath, get_mime_type(file), arch);
+            xasprintf(&params.msg, _("%s (%s) is world-writable on %s"), file->localpath, get_mime_type(ri, file), arch);
             params.waiverauth = WAIVABLE_BY_SECURITY;
             params.verb = VERB_FAILED;
             params.noun = _("${FILE} is world-writable on ${ARCH}");

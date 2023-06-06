@@ -99,7 +99,7 @@ static bool doc_driver(struct rpminspect *ri, rpmfile_entry_t *file)
             }
 
             /* only add the diff output for text content */
-            if (strprefix(get_mime_type(file->peer_file), "text/") && strprefix(get_mime_type(file), "text/")) {
+            if (strprefix(get_mime_type(ri, file->peer_file), "text/") && strprefix(get_mime_type(ri, file), "text/")) {
                 params.details = diff_output;
             }
 
