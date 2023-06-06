@@ -17,6 +17,7 @@
 #include "rpminspect.h"
 
 /* Global variables */
+static struct rpminspect *sri = NULL;
 static char *file_to_find = NULL;
 static filetype_t filetype = FILETYPE_NULL;
 
@@ -105,7 +106,7 @@ static int find_file(const char *fpath, __attribute__((unused)) const struct sta
      * will pass.
      */
     if (filetype == FILETYPE_ICON) {
-        if (strsuffix(fpath, file_to_find) && strprefix(mime_type(fpath), "image/")) {
+        if (strsuffix(fpath, file_to_find) && strprefix(mime_type(sri, fpath), "image/")) {
             /* file is found and is an image type according to libmagic */
             free(file_to_find);
             file_to_find = strdup(fpath);
@@ -398,6 +399,9 @@ static bool desktop_driver(struct rpminspect *ri, rpmfile_entry_t *file)
     const char *arch = NULL;
     char *tmpbuf = NULL;
     struct result_params params;
+
+    /* allow static callback functions to see ri */
+    sri = ri;
 
     /*
      * Is this a file we should look at?

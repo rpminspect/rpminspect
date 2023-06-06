@@ -74,7 +74,7 @@ static bool upstream_driver(struct rpminspect *ri, rpmfile_entry_t *file)
 
         if (strcmp(before_sum, after_sum)) {
             /* capture 'diff -u' output for text files */
-            if (is_text_file(file->peer_file) && is_text_file(file)) {
+            if (is_text_file(ri, file->peer_file) && is_text_file(ri, file)) {
                 diff_head = diff_output = get_file_delta(file->peer_file->fullpath, file->fullpath);
 
                 /* skip the two leading lines */
