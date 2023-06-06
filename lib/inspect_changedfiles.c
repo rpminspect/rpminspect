@@ -82,7 +82,7 @@ static bool changedfiles_driver(struct rpminspect *ri, rpmfile_entry_t *file)
     int flags = O_RDONLY | O_CLOEXEC;
     const char *arch = NULL;
     char *nvr = NULL;
-    char *type = NULL;
+    const char *type = NULL;
     char *before_sum = NULL;
     char *after_sum = NULL;
     char *errors = NULL;
@@ -97,7 +97,7 @@ static bool changedfiles_driver(struct rpminspect *ri, rpmfile_entry_t *file)
     char *after_uncompressed_file = NULL;
     rpmfile_entry_t *bun = NULL;
     rpmfile_entry_t *aun = NULL;
-    char *comptype = NULL;
+    const char *comptype = NULL;
     char *s = NULL;
     int fd;
     char magic[4];
@@ -181,16 +181,18 @@ static bool changedfiles_driver(struct rpminspect *ri, rpmfile_entry_t *file)
     }
 
     /* Get the MIME type of the file, will need that */
-    type = get_mime_type(file);
+    type = get_mime_type(ri, file);
 
     /* Skip Java class files and JAR files (handled elsewhere) */
-    if ((!strcmp(type, "application/zip") && strsuffix(file->fullpath, JAR_FILENAME_EXTENSION)) ||
-        (!strcmp(type, "application/x-java-applet") && strsuffix(file->fullpath, CLASS_FILENAME_EXTENSION))) {
+    if (type
+        && ((!strcmp(type, "application/zip") && strsuffix(file->fullpath, JAR_FILENAME_EXTENSION))
+             || (!strcmp(type, "application/x-java-applet") && strsuffix(file->fullpath, CLASS_FILENAME_EXTENSION)))) {
         return true;
     }
 
     /* Skip Python bytecode files (these always change) */
-    if (!strcmp(type, "application/octet-stream")
+    if (type
+        && !strcmp(type, "application/octet-stream")
         && (strsuffix(file->fullpath, PYTHON_PYC_FILE_EXTENSION)
             || strsuffix(file->fullpath, PYTHON_PYO_FILE_EXTENSION))) {
         /* Double check that this is a Python bytecode file */
@@ -236,10 +238,12 @@ static bool changedfiles_driver(struct rpminspect *ri, rpmfile_entry_t *file)
      */
 
     /* the octet-stream check is a workaround for bad/old versions of libmagic */
-    ct = (!strcmp(type, "application/x-gzip") || !strcmp(type, "application/gzip") || !strcmp(type, "application/x-bzip2") ||
-          !strcmp(type, "application/bzip2") || !strcmp(type, "application/x-xz") || !strcmp(type, "application/xz")) ||
-         (!strcmp(type, "application/octet-stream") &&
-          (strsuffix(file->localpath, ".gz") || strsuffix(file->localpath, ".bz2") || strsuffix(file->localpath, ".xz")));
+    if (type) {
+        ct = (!strcmp(type, "application/x-gzip") || !strcmp(type, "application/gzip") || !strcmp(type, "application/x-bzip2") ||
+              !strcmp(type, "application/bzip2") || !strcmp(type, "application/x-xz") || !strcmp(type, "application/xz")) ||
+             (!strcmp(type, "application/octet-stream") &&
+              (strsuffix(file->localpath, ".gz") || strsuffix(file->localpath, ".bz2") || strsuffix(file->localpath, ".xz")));
+    }
 
     if (ct && ((!ignore && (ri->tests & INSPECT_CHANGEDFILES)) || params.waiverauth == WAIVABLE_BY_SECURITY)) {
         /* uncompress the files to temporary files for comparison */
@@ -260,7 +264,7 @@ static bool changedfiles_driver(struct rpminspect *ri, rpmfile_entry_t *file)
             bun->fullpath = strdup(before_uncompressed_file);
             aun->fullpath = strdup(after_uncompressed_file);
 
-            if (is_text_file(bun) && is_text_file(aun)) {
+            if (is_text_file(ri, bun) && is_text_file(ri, aun)) {
                 /* uncompressed files are text, use diff */
                 params.details = get_file_delta(before_uncompressed_file, after_uncompressed_file);
 
@@ -289,16 +293,22 @@ static bool changedfiles_driver(struct rpminspect *ri, rpmfile_entry_t *file)
             free(aun);
         }
 
-        if (exitcode) {
-            /* get a reporting type for the message */
-            if (rindex(type, '/')) {
-                comptype = rindex(type, '/') + 1;
-                assert(comptype != NULL);
-            }
+        if (exitcode || params.details) {
+            if (type) {
+                /* get a reporting type for the message */
+                if (rindex(type, '/')) {
+                    comptype = rindex(type, '/') + 1;
+                    assert(comptype != NULL);
+                } else {
+                    comptype = type;
+                }
 
-            if (rindex(type, '-')) {
-                comptype = rindex(type, '-') + 1;
-                assert(comptype != NULL);
+                if (rindex(comptype, '-')) {
+                    comptype = rindex(comptype, '-') + 1;
+                    assert(comptype != NULL);
+                }
+            } else {
+                type = "[unknown type]";
             }
 
             /* the files are different, report */
@@ -321,9 +331,8 @@ static bool changedfiles_driver(struct rpminspect *ri, rpmfile_entry_t *file)
     /*
      * Compare gettext .mo files and report any changes.
      */
-    if (!ignore
-        && !strcmp(type, "application/x-gettext-translation")
-        && strsuffix(file->localpath, MO_FILENAME_EXTENSION)
+    if (!ignore && type
+        && !strcmp(type, "application/x-gettext-translation") && strsuffix(file->localpath, MO_FILENAME_EXTENSION)
         && (ri->tests & INSPECT_CHANGEDFILES)) {
         /*
          * This one is somewhat complicated.  We run msgunfmt on the mo files,
@@ -407,7 +416,7 @@ static bool changedfiles_driver(struct rpminspect *ri, rpmfile_entry_t *file)
         }
     }
 
-    if (!strcmp(type, "text/x-c") && possible_header && (ri->tests & INSPECT_CHANGEDFILES)) {
+    if (type && !strcmp(type, "text/x-c") && possible_header && (ri->tests & INSPECT_CHANGEDFILES)) {
         /* Now diff the header content */
         errors = get_file_delta(file->peer_file->fullpath, file->fullpath);
 
