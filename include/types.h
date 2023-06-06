@@ -399,6 +399,12 @@ typedef struct _string_map_t {
     UT_hash_handle hh;
 } string_map_t;
 
+/* Hash table which is just a list of strings; think of it as a set */
+typedef struct _string_hash_t {
+    char *data;
+    UT_hash_handle hh;
+} string_hash_t;
+
 /* Hash table with a string key and a string_list_t value. */
 typedef struct _string_list_map_t {
     char *key;
