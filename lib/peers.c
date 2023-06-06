@@ -196,7 +196,7 @@ int extract_peers(struct rpminspect *ri, bool fetchonly)
 
         /* match up file peers between builds */
         if (peer->before_files && peer->after_files) {
-            find_file_peers(peer->before_files, peer->after_files);
+            find_file_peers(ri, peer->before_files, peer->after_files);
         }
     }
 
