@@ -14,6 +14,7 @@
 #include <rpm/rpmlib.h>
 #include <rpm/rpmfi.h>
 #include <unicode/utypes.h>
+#include <magic.h>
 
 #ifdef _WITH_LIBKMOD
 #ifdef _LIBKMOD_HEADER_SUBDIR
@@ -737,6 +738,11 @@ struct rpminspect {
 
     /* spec file macros */
     pair_list_t *macros;
+
+    /* MIME type stuff from libmagic */
+    magic_t magic_cookie;
+    bool magic_initialized;
+    string_hash_t *magic_types;
 
     /* inspection results */
     results_t *results;
