@@ -300,9 +300,10 @@ string_list_t *list_sort(const string_list_t *list)
 
     /* build a new string_list_t from the sorted hash table */
     HASH_ITER(hh, map, entry, tmp_entry) {
+        HASH_DEL(map, entry);
         sorted_list = list_add(sorted_list, entry->key);
         free(entry->key);
-        HASH_DEL(map, entry);
+        free(entry);
     }
 
     free(map);

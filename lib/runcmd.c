@@ -319,9 +319,10 @@ void free_argv_table(struct rpminspect *ri, string_list_map_t *table)
     }
 
     HASH_ITER(hh, table, hentry, tmp_hentry) {
-        free(hentry->key);
-        list_free(hentry->value, free);
         HASH_DEL(table, hentry);
+        list_free(hentry->value, free);
+        free(hentry->key);
+        free(hentry);
     }
 
     return;

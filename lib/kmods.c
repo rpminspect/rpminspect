@@ -280,8 +280,10 @@ void free_module_aliases(kernel_alias_data_t *data)
     }
 
     HASH_ITER(hh, data, entry, tmp_entry) {
-        free(entry->alias);
+        HASH_DEL(data, entry);
         list_free(entry->modules, free);
+        free(entry->alias);
+        free(entry);
     }
 
     free(data);
