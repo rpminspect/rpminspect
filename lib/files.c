@@ -613,7 +613,7 @@ static char *comparable_version_substrings(const char *s, const char *ignore)
  * @param after After build rpmfile_t list.
  * @param after_table Hash table of after build rpmfile_t localpaths.
  */
-static void find_one_peer(rpmfile_entry_t *file, rpmfile_t *after, struct file_data *after_table)
+static void find_one_peer(struct rpminspect *ri, rpmfile_entry_t *file, rpmfile_t *after, struct file_data *after_table)
 {
     struct file_data *entry = NULL;
     rpmfile_entry_t *after_file = NULL;
@@ -715,9 +715,9 @@ static void find_one_peer(rpmfile_entry_t *file, rpmfile_t *after, struct file_d
             }
 
             /* match files that move between subpackages */
-            if (strsuffix(after_file->localpath, file->localpath) &&
-                !strcmp(get_mime_type(file), get_mime_type(after_file)) &&
-                strcmp(headerGetString(file->rpm_header, RPMTAG_NAME), headerGetString(after_file->rpm_header, RPMTAG_NAME))) {
+            if (strsuffix(after_file->localpath, file->localpath)
+                && !strcmp(get_mime_type(ri, file), get_mime_type(ri, after_file))
+                && strcmp(headerGetString(file->rpm_header, RPMTAG_NAME), headerGetString(after_file->rpm_header, RPMTAG_NAME))) {
                 /*
                  * This is a best guess that checks the following:
                  * - localpath
@@ -736,8 +736,8 @@ static void find_one_peer(rpmfile_entry_t *file, rpmfile_t *after, struct file_d
                     file->peer_file->moved_subpackage = true;
                     return;
                 }
-            } else if ((S_ISREG(file->st.st_mode) && S_ISREG(after_file->st.st_mode)) ||
-                       (is_elf(file->fullpath) && is_elf(after_file->fullpath))) {
+            } else if ((S_ISREG(file->st.st_mode) && S_ISREG(after_file->st.st_mode))
+                       || (is_elf(file->fullpath) && is_elf(after_file->fullpath))) {
                 /*
                  * Try to match libraries that have changed versions.
                  * The idea is to look for ELF files that carry a
@@ -748,8 +748,8 @@ static void find_one_peer(rpmfile_entry_t *file, rpmfile_t *after, struct file_d
                  *
                  * Also try to match kernel modules between builds.
                  */
-                if (!(strstr(file->localpath, ELF_LIB_EXTENSION) && strstr(after_file->localpath, ELF_LIB_EXTENSION)) &&
-                    !(strstr(file->fullpath, KERNEL_MODULES_DIR) && strstr(after_file->fullpath, KERNEL_MODULES_DIR))) {
+                if (!(strstr(file->localpath, ELF_LIB_EXTENSION) && strstr(after_file->localpath, ELF_LIB_EXTENSION))
+                    && !(strstr(file->fullpath, KERNEL_MODULES_DIR) && strstr(after_file->fullpath, KERNEL_MODULES_DIR))) {
                     continue;
                 }
 
@@ -790,13 +790,14 @@ static void find_one_peer(rpmfile_entry_t *file, rpmfile_t *after, struct file_d
  * @param after After build package's rpmfile_t list.
  * @return 0 on success, -1 on failure.
  */
-void find_file_peers(rpmfile_t *before, rpmfile_t *after)
+void find_file_peers(struct rpminspect *ri, rpmfile_t *before, rpmfile_t *after)
 {
     struct file_data *after_table = NULL;
     struct file_data *entry = NULL;
     struct file_data *tmp_entry = NULL;
     rpmfile_entry_t *before_entry = NULL;
 
+    assert(ri != NULL);
     assert(before != NULL);
     assert(after != NULL);
 
@@ -811,7 +812,7 @@ void find_file_peers(rpmfile_t *before, rpmfile_t *after)
 
     /* Match peers */
     TAILQ_FOREACH(before_entry, before, items) {
-        find_one_peer(before_entry, after, after_table);
+        find_one_peer(ri, before_entry, after, after_table);
     }
 
     /* Clean up the hash table */
