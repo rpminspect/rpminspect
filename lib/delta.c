@@ -82,6 +82,7 @@ static int delta_out(void *priv, mmbuffer_t *mb, int nbuf)
 {
     int i = 0;
     char *prefix = NULL;
+    char *end = NULL;
     string_list_t *list = (string_list_t *) priv;
     string_entry_t *entry = NULL;
 
@@ -109,10 +110,15 @@ static int delta_out(void *priv, mmbuffer_t *mb, int nbuf)
 
         if ((mb[i].size > 1) && mb[i].ptr != NULL) {
             if (prefix) {
-                xasprintf(&entry->data, "%s%s", prefix, mb[i].ptr);
+                entry->data = calloc(1, strlen(prefix) + mb[i].size + 1);
+                assert(entry->data != NULL);
+
+                end = stpcpy(entry->data, prefix);
+                end = strncpy(end, mb[i].ptr, mb[i].size);
             } else {
                 entry->data = calloc(1, mb[i].size + 1);
                 assert(entry->data != NULL);
+
                 entry->data = strncpy(entry->data, mb[i].ptr, mb[i].size);
             }
         } else {
