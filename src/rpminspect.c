@@ -275,6 +275,7 @@ static char *get_product_release(string_map_t *products, const favor_release_t f
         free(after_product);
     }
 
+    free(before_product);
     return r;
 }
 
