@@ -162,7 +162,7 @@ static bool have_automacro(const struct rpminspect *ri, const rpmfile_entry_t *s
         }
     }
 
-    list_free(contents, free, true);
+    list_free(contents, free);
     return r;
 }
 
@@ -256,7 +256,7 @@ static char *expand_patchname_macros(struct rpminspect *ri, const rpmfile_entry_
         }
     }
 
-    list_free(macros, free, true);
+    list_free(macros, free);
     return r;
 }
 
@@ -336,7 +336,7 @@ static patchstat_t get_patch_stats(const char *patch)
     }
 
     /* clean up */
-    list_free(lines, free, true);
+    list_free(lines, free);
 
     return r;
 }
@@ -726,7 +726,7 @@ bool inspect_patches(struct rpminspect *ri)
                             reported = true;
                             result = !(params.severity >= RESULT_VERIFY);
 
-                            list_free(fields, free, true);
+                            list_free(fields, free);
                             continue;
                         }
 
@@ -852,11 +852,11 @@ bool inspect_patches(struct rpminspect *ri)
                     }
 
                     /* clean up */
-                    list_free(fields, free, true);
+                    list_free(fields, free);
                 }
 
                 /* clean up the spec file we read in */
-                list_free(speclines, free, true);
+                list_free(speclines, free);
             }
         }
 
@@ -883,14 +883,14 @@ bool inspect_patches(struct rpminspect *ri)
                         result = !(params.severity >= RESULT_VERIFY);
                     }
 
-                    list_free(removed, free, true);
+                    list_free(removed, free);
                 }
 
-                list_free(before_patchfiles, free, true);
+                list_free(before_patchfiles, free);
             }
         }
 
-        list_free(patchfiles, free, true);
+        list_free(patchfiles, free);
     }
 
     /* Clean up the patches and applied hash tables */

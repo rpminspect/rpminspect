@@ -176,7 +176,7 @@ char *get_file_delta(const char *a, const char *b)
     }
 
     r = list_to_string(list, "\n");
-    list_free(list, free, true);
+    list_free(list, free);
     free(old.ptr);
     free(new.ptr);
 

@@ -198,7 +198,7 @@ static void process_table(const char *key, const char *value, const bool require
             tokens = list_add(tokens, value);
 
             tmp = list_to_string(tokens, " ");
-            list_free(tokens, free, true);
+            list_free(tokens, free);
         } else {
             tmp = strdup(value);
         }
@@ -992,7 +992,7 @@ bool init_fileinfo(struct rpminspect *ri)
         field = MODE;
     }
 
-    list_free(contents, free, true);
+    list_free(contents, free);
 
     return true;
 }
@@ -1132,7 +1132,7 @@ bool init_caps(struct rpminspect *ri)
         field = PACKAGE;
     }
 
-    list_free(contents, free, true);
+    list_free(contents, free);
 
     return true;
 }
@@ -1194,7 +1194,7 @@ bool init_rebaseable(struct rpminspect *ri)
         ri->rebaseable = list_add(ri->rebaseable, line);
     }
 
-    list_free(contents, free, true);
+    list_free(contents, free);
 
     return true;
 }
@@ -1294,7 +1294,7 @@ bool init_politics(struct rpminspect *ri)
         field = PATTERN;
     }
 
-    list_free(contents, free, true);
+    list_free(contents, free);
 
     return true;
 }
@@ -1412,7 +1412,7 @@ bool init_security(struct rpminspect *ri)
                 /* we must have a rule and action */
                 if (list_len(kv) != 2) {
                     warnx(_("*** invalid security rule: %s"), rentry->data);
-                    list_free(kv, free, true);
+                    list_free(kv, free);
                     continue;
                 }
 
@@ -1424,7 +1424,7 @@ bool init_security(struct rpminspect *ri)
 
                 if (stype == SECRULE_NULL) {
                     warnx(_("*** unknown security rule: %s"), key->data);
-                    list_free(kv, free, true);
+                    list_free(kv, free);
                     continue;
                 }
 
@@ -1433,7 +1433,7 @@ bool init_security(struct rpminspect *ri)
 
                 if (severity == RESULT_NULL) {
                     warnx(_("*** unknown security action: %s"), value->data);
-                    list_free(kv, free, true);
+                    list_free(kv, free);
                     continue;
                 }
 
@@ -1452,7 +1452,7 @@ bool init_security(struct rpminspect *ri)
                 }
 
                 /* clean up */
-                list_free(kv, free, true);
+                list_free(kv, free);
             }
 
             /* add new entry to the security rules list */
@@ -1465,11 +1465,11 @@ bool init_security(struct rpminspect *ri)
         free(pkg);
         free(ver);
         free(rel);
-        list_free(rules, free, true);
+        list_free(rules, free);
         pos = 0;
     }
 
-    list_free(contents, free, true);
+    list_free(contents, free);
     free(path);
 
     return true;
@@ -1528,7 +1528,7 @@ bool init_icons(struct rpminspect *ri)
         ri->icons = list_add(ri->icons, line);
     }
 
-    list_free(contents, free, true);
+    list_free(contents, free);
 
     return true;
 }

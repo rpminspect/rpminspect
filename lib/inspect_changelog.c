@@ -311,8 +311,8 @@ static bool check_src_rpm_changelog(struct rpminspect *ri, const rpmpeer_entry_t
         }
     }
 
-    list_free(before_changelog, free, true);
-    list_free(after_changelog, free, true);
+    list_free(before_changelog, free);
+    list_free(after_changelog, free);
     free(before_nevr);
     free(after_nevr);
     free(before_output);
@@ -411,8 +411,8 @@ static bool check_bin_rpm_changelog(struct rpminspect *ri, const rpmpeer_entry_t
 
     free(before_output);
     free(after_output);
-    list_free(before_changelog, free, true);
-    list_free(after_changelog, free, true);
+    list_free(before_changelog, free);
+    list_free(after_changelog, free);
     free(before_nevr);
     free(after_nevr);
 

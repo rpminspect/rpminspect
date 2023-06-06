@@ -81,7 +81,7 @@ static int find_file(const char *fpath, __attribute__((unused)) const struct sta
                 if (strsuffix(fpath, tmp)) {
                     free(file_to_find);
                     file_to_find = strdup(fpath);
-                    list_free(list, free, true);
+                    list_free(list, free);
                     free(tmp);
                     return 1;
                 }
@@ -90,7 +90,7 @@ static int find_file(const char *fpath, __attribute__((unused)) const struct sta
             }
         }
 
-        list_free(list, free, true);
+        list_free(list, free);
     }
 
     /* Might be a base name missing a graphics format ending */
@@ -265,7 +265,7 @@ static bool validate_desktop_contents(struct rpminspect *ri, const rpmfile_entry
 
                 if (lstat(file_to_find, &sb) == -1) {
                     warn("*** lstat");
-                    list_free(contents, free, true);
+                    list_free(contents, free);
                     free(file_to_find);
                     return false;
                 }
@@ -344,7 +344,7 @@ static bool validate_desktop_contents(struct rpminspect *ri, const rpmfile_entry
 
                 if (lstat(file_to_find, &sb) == -1) {
                     warn("*** lstat");
-                    list_free(contents, free, true);
+                    list_free(contents, free);
                     free(file_to_find);
                     return false;
                 }
@@ -385,7 +385,7 @@ static bool validate_desktop_contents(struct rpminspect *ri, const rpmfile_entry
         free(file_to_find);
     }
 
-    list_free(contents, free, true);
+    list_free(contents, free);
 
     return result;
 }

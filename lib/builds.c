@@ -474,7 +474,7 @@ static int download_build(struct rpminspect *ri, const struct koji_build *build)
             free(pkg);
         }
 
-        list_free(filter, free, true);
+        list_free(filter, free);
         filter = NULL;
     }
 

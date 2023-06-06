@@ -355,7 +355,7 @@ bool inspect_abidiff(struct rpminspect *ri)
     /* clean up */
     free_abi(abi);
     free(cmdprefix);
-    list_free(suppressions, free, true);
+    list_free(suppressions, free);
     free_pair(before_headers);
     free_pair(after_headers);
 

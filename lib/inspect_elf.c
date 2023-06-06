@@ -496,7 +496,7 @@ static bool inspect_elf_execstack(struct rpminspect *ri, Elf *after_elf, Elf *be
             xasprintf(&params.msg, _("File %s has invalid execstack flags (%s) on %s"), file->localpath, fs, arch);
 
             free(fs);
-            list_free(flaglist, free, true);
+            list_free(flaglist, free);
         } else {
             xasprintf(&params.msg, _("File %s has unrecognized GNU_STACK '%s' (expected RW or RWE) on %s"), file->localpath, pflags_to_str(execstack_flags), arch);
         }
@@ -773,11 +773,11 @@ static bool elf_archive_tests(struct rpminspect *ri, Elf *after_elf, int after_e
 
     free(params.msg);
 
-    list_free(after_lost_pic, free, true);
-    list_free(after_new, free, true);
-    list_free(after_no_pic, free, true);
-    list_free(before_pic, free, true);
-    list_free(before_all, free, true);
+    list_free(after_lost_pic, free);
+    list_free(after_new, free);
+    list_free(after_no_pic, free);
+    list_free(before_pic, free);
+    list_free(before_all, free);
 
     free(screendump);
 

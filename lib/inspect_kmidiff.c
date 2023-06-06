@@ -342,7 +342,7 @@ bool inspect_kmidiff(struct rpminspect *ri)
 
     /* clean up */
     free(cmdprefix);
-    list_free(suppressions, free, true);
+    list_free(suppressions, free);
     free(kabi_dir);
 
     /* report the inspection results */

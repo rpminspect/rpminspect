@@ -202,9 +202,9 @@ bool inspect_upstream(struct rpminspect *ri)
             }
         }
 
-        list_free(removed, free, true);
-        list_free(before_source, free, true);
-        list_free(source, free, true);
+        list_free(removed, free);
+        list_free(before_source, free);
+        list_free(source, free);
     }
 
     free(params.remedy);

@@ -411,7 +411,7 @@ static bool is_valid_license(struct rpminspect *ri, struct result_params *params
                 }
             }
 
-            list_free(parenexps, free, true);
+            list_free(parenexps, free);
         }
 
         /* close this db */

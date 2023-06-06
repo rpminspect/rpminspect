@@ -245,7 +245,7 @@ string_list_t *get_elf_section_names(Elf *elf, size_t start)
     while ((scn = elf_nextscn(elf, scn)) != NULL) {
         /* get this header information */
         if (gelf_getshdr(scn, &shdr) != &shdr) {
-            list_free(names, free, true);
+            list_free(names, free);
             return NULL;
         }
 
@@ -516,12 +516,12 @@ static string_list_t *get_elf_symbol_list(Elf *elf, bool (*filter)(const char *)
 
     /* Get the section data */
     if ((data = elf_getdata(scn, NULL)) == NULL) {
-        list_free(list, NULL, true);
+        list_free(list, NULL);
         return NULL;
     }
 
     if ((xndxscn != NULL) && ((xndxdata = elf_getdata(xndxscn, NULL)) == NULL)) {
-        list_free(list, NULL, true);
+        list_free(list, NULL);
         return NULL;
     }
 
@@ -552,7 +552,7 @@ static string_list_t *get_elf_symbol_list(Elf *elf, bool (*filter)(const char *)
  * If filter is not NULL, only the symbol's returned true by the filter will be added.
  *
  * The memory pointed to by the list elements is owned by the Elf* context. The list
- * itself should be freed with list_free(<list>, NULL, true) by the caller.
+ * itself should be freed with list_free(<list>, NULL) by the caller.
  */
 string_list_t * get_elf_imported_functions(Elf *elf, bool (*filter)(const char *))
 {
