@@ -296,9 +296,9 @@ void output_summary(const results_t *results, const char *dest, const severity_t
 int unpack_archive(const char *, const char *, const bool);
 
 /* magic.c */
-char *mime_type(const char *);
-char *get_mime_type(rpmfile_entry_t *);
-bool is_text_file(rpmfile_entry_t *);
+const char *mime_type(struct rpminspect *, const char *);
+const char *get_mime_type(struct rpminspect *, rpmfile_entry_t *);
+bool is_text_file(struct rpminspect *, rpmfile_entry_t *);
 
 /* checksums.c */
 char *compute_checksum(const char *, mode_t *, int);

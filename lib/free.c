@@ -307,6 +307,12 @@ void free_rpminspect(struct rpminspect *ri)
     free(ri->after_rel);
     free_pair(ri->macros);
 
+    if (ri->magic_cookie) {
+        magic_close(ri->magic_cookie);
+    }
+
+    free_string_hash(ri->magic_types);
+
     free_results(ri->results);
 
     return;
