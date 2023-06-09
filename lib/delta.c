@@ -150,8 +150,14 @@ char *get_file_delta(const char *a, const char *b)
     string_list_t *list = NULL;
     char *r = NULL;
 
-    if (fill_mmfile(&old, a) < 0 || fill_mmfile(&new, b) < 0) {
+    if (fill_mmfile(&old, a) < 0) {
         warn("*** fill_mmfile");
+        return NULL;
+    }
+
+    if (fill_mmfile(&new, b) < 0) {
+        warn("*** fill_mmfile");
+        free(old.ptr);
         return NULL;
     }
 
@@ -172,13 +178,6 @@ char *get_file_delta(const char *a, const char *b)
 
     if (xdl_diff(&old, &new, &xpp, &xecfg, &ecb) < 0) {
         warn("*** xdl_diff");
-    }
-
-    if (TAILQ_EMPTY(list)) {
-        free(old.ptr);
-        free(new.ptr);
-        free(list);
-        return NULL;
     }
 
     r = list_to_string(list, "\n");

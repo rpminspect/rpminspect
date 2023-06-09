@@ -261,26 +261,26 @@ static bool changedfiles_driver(struct rpminspect *ri, rpmfile_entry_t *file)
             aun = calloc(1, sizeof(*aun));
             assert(aun != NULL);
 
-            bun->fullpath = strdup(before_uncompressed_file);
-            aun->fullpath = strdup(after_uncompressed_file);
+            bun->fullpath = before_uncompressed_file;
+            aun->fullpath = after_uncompressed_file;
 
             if (is_text_file(ri, bun) && is_text_file(ri, aun)) {
                 /* uncompressed files are text, use diff */
-                params.details = get_file_delta(before_uncompressed_file, after_uncompressed_file);
+                params.details = get_file_delta(bun->fullpath, aun->fullpath);
 
                 /* clean up the diff headers */
                 if (params.details) {
-                    s = strreplace(params.details, before_uncompressed_file, file->peer_file->localpath);
+                    s = strreplace(params.details, bun->fullpath, file->peer_file->localpath);
                     free(params.details);
                     params.details = s;
 
-                    s = strreplace(params.details, after_uncompressed_file, file->localpath);
+                    s = strreplace(params.details, aun->fullpath, file->localpath);
                     free(params.details);
                     params.details = s;
                 }
             } else {
                 /* perform a byte comparison of the uncompressed files */
-                exitcode = filecmp(before_uncompressed_file, after_uncompressed_file);
+                exitcode = filecmp(bun->fullpath, aun->fullpath);
             }
 
             /* clean up */
@@ -291,6 +291,9 @@ static bool changedfiles_driver(struct rpminspect *ri, rpmfile_entry_t *file)
             free(aun->fullpath);
             free(aun->type);
             free(aun);
+
+            before_uncompressed_file = NULL;
+            after_uncompressed_file = NULL;
         }
 
         if (exitcode || params.details) {
@@ -317,7 +320,6 @@ static bool changedfiles_driver(struct rpminspect *ri, rpmfile_entry_t *file)
             params.verb = VERB_CHANGED;
             params.noun = file->localpath;
             add_result(ri, &params);
-            free(nvr);
             reported = true;
         }
 
@@ -354,7 +356,6 @@ static bool changedfiles_driver(struct rpminspect *ri, rpmfile_entry_t *file)
             params.verb = VERB_FAILED;
             params.noun = _("msgunfmt on ${FILE}");
             add_result(ri, &params);
-            free(nvr);
             reported = true;
             goto done;
         }
@@ -369,22 +370,12 @@ static bool changedfiles_driver(struct rpminspect *ri, rpmfile_entry_t *file)
             params.verb = VERB_FAILED;
             params.noun = _("msgunfmt on ${FILE}");
             add_result(ri, &params);
-            free(nvr);
             reported = true;
             goto done;
         }
 
         /* Now diff the mo content */
         params.details = get_file_delta(before_tmp, after_tmp);
-
-        /* Remove the temporary files */
-        if (unlink(before_tmp) == -1) {
-            warn("*** unlink");
-        }
-
-        if (unlink(after_tmp) == -1) {
-            warn("*** unlink");
-        }
 
         if (params.details) {
             nvr = get_nevr(file->rpm_header);
@@ -394,7 +385,6 @@ static bool changedfiles_driver(struct rpminspect *ri, rpmfile_entry_t *file)
             params.verb = VERB_CHANGED;
             params.noun = _("${FILE}");
             add_result(ri, &params);
-            free(nvr);
             reported = true;
             goto done;
         }
@@ -452,11 +442,11 @@ static bool changedfiles_driver(struct rpminspect *ri, rpmfile_entry_t *file)
             params.verb = VERB_CHANGED;
             params.noun = _("${FILE}");
             add_result(ri, &params);
-            free(nvr);
             reported = true;
 
             /* details is not allocated here, freeing errors will take care of it */
             params.details = NULL;
+            free(errors);
 
             goto done;
         }
@@ -474,16 +464,29 @@ static bool changedfiles_driver(struct rpminspect *ri, rpmfile_entry_t *file)
             params.verb = VERB_CHANGED;
             params.noun = _("${FILE}");
             add_changedfiles_result(ri, &params);
-            free(nvr);
         }
     }
 
 done:
+    free(nvr);
     free(params.msg);
     free(params.details);
-    free(errors);
-    free(before_tmp);
-    free(after_tmp);
+
+    if (before_tmp) {
+        if (unlink(before_tmp) == -1) {
+            warn("*** unlink");
+        }
+
+        free(before_tmp);
+    }
+
+    if (after_tmp) {
+        if (unlink(after_tmp) == -1) {
+            warn("*** unlink");
+        }
+
+        free(after_tmp);
+    }
 
     if (params.severity >= RESULT_VERIFY && reported) {
         return false;
