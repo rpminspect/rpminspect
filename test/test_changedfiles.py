@@ -80,7 +80,7 @@ class GzipFileChangesRPMs(TestCompareRPMs):
         )
 
         self.inspection = "changedfiles"
-        self.result = "OK"
+        self.result = "INFO"
 
 
 class GzipFileChangesKoji(TestCompareKoji):
@@ -103,7 +103,7 @@ class GzipFileChangesKoji(TestCompareKoji):
         )
 
         self.inspection = "changedfiles"
-        self.result = "OK"
+        self.result = "INFO"
 
 
 # bzip2 file does not change between builds despite having different
@@ -175,7 +175,7 @@ class Bzip2FileChangesRPMs(TestCompareRPMs):
         )
 
         self.inspection = "changedfiles"
-        self.result = "OK"
+        self.result = "INFO"
 
 
 class Bzip2FileChangesKoji(TestCompareKoji):
@@ -198,7 +198,7 @@ class Bzip2FileChangesKoji(TestCompareKoji):
         )
 
         self.inspection = "changedfiles"
-        self.result = "OK"
+        self.result = "INFO"
 
 
 # xz file does not change between builds despite having different
@@ -270,7 +270,7 @@ class XzFileChangesRPMs(TestCompareRPMs):
         )
 
         self.inspection = "changedfiles"
-        self.result = "OK"
+        self.result = "INFO"
 
 
 class XzFileChangesKoji(TestCompareKoji):
@@ -293,4 +293,4 @@ class XzFileChangesKoji(TestCompareKoji):
         )
 
         self.inspection = "changedfiles"
-        self.result = "OK"
+        self.result = "INFO"
