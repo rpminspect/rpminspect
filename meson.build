@@ -8,6 +8,8 @@ project('rpminspect',
         ],
         license : 'GPL-3.0-or-later AND LGPL-3.0-or-later AND Apache-2.0 AND MIT')
 
+fs = import('fs')
+
 cc = meson.get_compiler('c')
 
 # Define the program version
@@ -30,10 +32,17 @@ search_dirs = [ '/usr/local/lib', '/usr/pkg/lib', '/usr/lib64', '/usr/lib' ]
 
 # Header search dirs
 if build_machine.system() == 'netbsd'
-    inc = include_directories( '/usr/local/include', '/usr/pkg/include', '/usr/include' )
+    include_dirs = [ '/usr/local/include', '/usr/pkg/include', '/usr/include' ]
 else
-    inc = include_directories( '/usr/local/include', '/usr/include' )
+    include_dirs = [ '/usr/local/include', '/usr/include' ]
 endif
+existing_include_dirs = []
+foreach dir : include_dirs
+    if fs.is_dir(dir)
+        existing_include_dirs += dir
+    endif
+endforeach
+inc = include_directories(existing_include_dirs)
 
 # See if we have reallocarray in libc
 if cc.has_function('reallocarray')
