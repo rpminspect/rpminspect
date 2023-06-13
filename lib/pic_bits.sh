@@ -32,7 +32,9 @@
 # reloc types are in the R_<arch>_<type> #define's. The only case we (sort of)
 # care about where the arch's don't match is ia64: it's EM_IA_64 but R_IA64_*.
 
-if ! cpp_output="$(cpp -dM /usr/include/elf.h)"; then
+elf_h_path="${ELF_H_PATH:-/usr/include/elf.h}"
+
+if ! cpp_output="$(cpp -dM "$elf_h_path")"; then
     echo "Unable to read elf.h" >&2
     echo "Ensure glibc-headers is installed" >&2
     exit 1
