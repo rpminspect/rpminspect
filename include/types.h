@@ -517,6 +517,9 @@ struct rpminspect {
 #ifdef _HAVE_MODULARITYLABEL
     /* Modularity values */
     static_context_t modularity_static_context;
+
+    /* Release substring regular expressions */
+    string_map_t *modularity_release;
 #endif
 
     /* Required subdomain for buildhosts -- multiple subdomains allowed */

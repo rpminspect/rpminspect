@@ -158,7 +158,58 @@ static bool check_static_context(struct rpminspect *ri)
     return r;
 }
 
-static bool modularity_driver(struct rpminspect *ri, rpmfile_entry_t *file)
+static bool check_release(struct rpminspect *ri, regex_t *release_regex, Header h)
+{
+    bool result = true;
+    const char *release = NULL;
+    int r = 0;
+    regmatch_t matches[1];
+    struct result_params params;
+
+    assert(ri != NULL);
+    assert(ri->modularity_release != NULL);
+    assert(release_regex != NULL);
+    assert(h != NULL);
+
+    /* Set up the result parameters */
+    init_result_params(&params);
+    params.severity = RESULT_BAD;
+    params.waiverauth = NOT_WAIVABLE;
+    params.header = NAME_MODULARITY;
+    params.remedy = REMEDY_MODULARITY_RELEASE;
+
+    /* Get the tag from the header */
+    release = headerGetString(h, RPMTAG_RELEASE);
+
+    /* Build the message we'll use for errors */
+    xasprintf(&params.msg, _("Package \"%s\" is part of a module but lacks a conformant Release header tag: %s."), headerGetString(h, RPMTAG_NAME), release ? release : "(null)");
+
+    /* Validate the Release tag */
+    if (release == NULL) {
+        goto bad_release;
+    }
+
+    /* Try to validate the Release tag value */
+    r = regexec(release_regex, release, 1, matches, 0);
+
+    if (r != 0) {
+        goto bad_release;
+    }
+
+    if (matches[0].rm_so > -1) {
+        goto good_release;
+    }
+
+bad_release:
+    result = false;
+    add_result(ri, &params);
+good_release:
+    free(params.msg);
+
+    return result;
+}
+
+static bool check_modularitylabel(struct rpminspect *ri, Header h)
 {
     bool result = true;
     rpmTagType tt;
@@ -167,20 +218,21 @@ static bool modularity_driver(struct rpminspect *ri, rpmfile_entry_t *file)
     struct result_params params;
 
     assert(ri != NULL);
-    assert(file != NULL);
+    assert(h != NULL);
 
     /* Set up the result parameters */
     init_result_params(&params);
     params.severity = RESULT_BAD;
     params.waiverauth = NOT_WAIVABLE;
     params.header = NAME_MODULARITY;
-    params.remedy = REMEDY_MODULARITY;
+    params.remedy = REMEDY_MODULARITY_LABEL;
 
     /* Build the message we'll use for errors */
-    xasprintf(&params.msg, _("Package \"%s\" is part of a module but lacks the '%%{modularitylabel}' header tag."), headerGetString(file->rpm_header, RPMTAG_NAME));
+    xasprintf(&params.msg, _("Package \"%s\" is part of a module but lacks the '%%{modularitylabel}' header tag."), headerGetString(h, RPMTAG_NAME));
 
     /* Find how to find the header */
     tv = rpmTagGetValue("modularitylabel");
+
     if (tv == RPMTAG_NOT_FOUND) {
         add_result(ri, &params);
         free(params.msg);
@@ -188,6 +240,7 @@ static bool modularity_driver(struct rpminspect *ri, rpmfile_entry_t *file)
     }
 
     tt = rpmTagGetTagType(tv);
+
     if (tt == RPM_NULL_TYPE) {
         add_result(ri, &params);
         free(params.msg);
@@ -195,7 +248,7 @@ static bool modularity_driver(struct rpminspect *ri, rpmfile_entry_t *file)
     }
 
     /* Get the tag from the header */
-    modularitylabel = headerGetString(file->rpm_header, tv);
+    modularitylabel = headerGetString(h, tv);
 
     if (modularitylabel == NULL) {
         add_result(ri, &params);
@@ -212,9 +265,15 @@ static bool modularity_driver(struct rpminspect *ri, rpmfile_entry_t *file)
  */
 bool inspect_modularity(struct rpminspect *ri)
 {
-    bool tag_result = false;
+    bool tag_result = true;
+    bool release_result = true;
     bool static_context_result = false;
     bool result = false;
+    string_map_t *hentry = NULL;
+    regex_t release_regex;
+    char reg_error[BUFSIZ];
+    int r = 0;
+    rpmpeer_entry_t *peer = NULL;
     struct result_params params;
 
     assert(ri != NULL);
@@ -230,14 +289,50 @@ bool inspect_modularity(struct rpminspect *ri)
         return true;
     }
 
-    /* check each RPM for the modularitylabel tag */
-    tag_result = foreach_peer_file(ri, NAME_MODULARITY, modularity_driver);
+    /* capture the modularity release tag value regexp, if it exists */
+    if (ri->modularity_release) {
+        HASH_FIND_STR(ri->modularity_release, ri->product_release, hentry);
+
+        if (hentry) {
+            r = regcomp(&release_regex, hentry->value, REG_EXTENDED);
+
+            if (r != 0) {
+                regerror(result, &release_regex, reg_error, sizeof(reg_error));
+                warnx(_("*** unable to compile modularity Release tag regular expression: %s"), reg_error);
+                hentry = NULL;
+            }
+        }
+    }
+
+    /*
+     * check each RPM for:
+     * - the modularitylabel tag
+     * - a conforming Release tag value
+     */
+    TAILQ_FOREACH(peer, ri->peers, items) {
+        if (!check_modularitylabel(ri, peer->after_hdr)) {
+            tag_result = false;
+        }
+
+        if (hentry && !check_release(ri, &release_regex, peer->after_hdr)) {
+            release_result = false;
+        }
+    }
+
+    if (hentry) {
+        regfree(&release_regex);
+    }
 
     /* check static context against static context rule */
     static_context_result = check_static_context(ri);
 
     /* final check of all results */
     result = tag_result && static_context_result;
+
+    if (hentry) {
+        /* only consider release_result if we have a release tag regexp defined */
+        result = result && release_result;
+    }
 
     if (result) {
         init_result_params(&params);

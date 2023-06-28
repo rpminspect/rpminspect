@@ -246,11 +246,18 @@
  */
 
 /**
- * @def REMEDY_MODULARITY
+ * @def REMEDY_MODULARITY_LABEL
  *
  * How to address modularity problems in RPMs that are built as part of modules.
  */
-#define REMEDY_MODULARITY _("This package is part of a module but is missing the %{modularitylabel} header tag.  Add this as a %define in the spec file and rebuild.")
+#define REMEDY_MODULARITY_LABEL _("This package is part of a module but is missing the %{modularitylabel} header tag.  Add this as a %define in the spec file and rebuild.")
+
+/**
+ * @def REMEDY_MODULARITY_RELEASE
+ *
+ * How to address a non-conformant Release value in RPMs that are build as part of modules.
+ */
+#define REMEDY_MODULARITY_RELEASE _("This package is part of a module but lacks a conformant Release tag value.  A Release tag in a modular RPM needs to carry a substring that is more specific than a major release dist tag (e.g., el8.9.0 rather than el8) and must carry '+module' as a substring before that specific dist tag.")
 
 /**
  * @def REMEDY_MODULARITY_STATIC_CONTEXT

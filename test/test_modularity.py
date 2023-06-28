@@ -184,3 +184,77 @@ class ModulesHaveStaticContextWithNoRule(TestCompareModules):
 
         self.inspection = "modularity"
         self.result = "OK"
+
+
+# Module has correct Release tag value (OK)
+class ModuleHasReleaseTagSubstring(TestModule):
+    @unittest.skipUnless(
+        have_modularitylabel, "rpm lacks RPMTAG_MODULARITYLABEL support"
+    )
+    def setUp(self):
+        super().setUp(release_substring=True)
+
+        self.extra_cfg = {}
+        self.extra_cfg["modularity"] = {}
+        self.extra_cfg["modularity"]["release_regexp"] = {}
+        self.extra_cfg["modularity"]["release_regexp"][
+            "GENERIC"
+        ] = "\+module\.[a-z0-9]+\.[0-9]+\.[0-9]+"  # noqa: W605
+
+        self.inspection = "modularity"
+        self.result = "OK"
+        self.waiverauth = "Anyone"
+
+
+class ModulesHaveReleaseTagSubstring(TestCompareModules):
+    @unittest.skipUnless(
+        have_modularitylabel, "rpm lacks RPMTAG_MODULARITYLABEL support"
+    )
+    def setUp(self):
+        super().setUp(release_substring=True)
+
+        self.extra_cfg = {}
+        self.extra_cfg["modularity"] = {}
+        self.extra_cfg["modularity"]["release_regexp"] = {}
+        self.extra_cfg["modularity"]["release_regexp"][
+            "GENERIC"
+        ] = "\+module\.[a-z0-9]+\.[0-9]+\.[0-9]+"  # noqa: W605
+
+        self.inspection = "modularity"
+        self.result = "OK"
+        self.waiverauth = "Anyone"
+
+
+# Module has non-conformant Release tag value (BAD)
+class ModuleHasBadReleaseTagSubstring(TestModule):
+    @unittest.skipUnless(
+        have_modularitylabel, "rpm lacks RPMTAG_MODULARITYLABEL support"
+    )
+    def setUp(self):
+        super().setUp(release_substring=True)
+
+        self.extra_cfg = {}
+        self.extra_cfg["modularity"] = {}
+        self.extra_cfg["modularity"]["release_regexp"] = {}
+        self.extra_cfg["modularity"]["release_regexp"]["GENERIC"] = "foobar"
+
+        self.inspection = "modularity"
+        self.result = "BAD"
+        self.waiverauth = "Anyone"
+
+
+class ModulesHaveBadReleaseTagSubstring(TestCompareModules):
+    @unittest.skipUnless(
+        have_modularitylabel, "rpm lacks RPMTAG_MODULARITYLABEL support"
+    )
+    def setUp(self):
+        super().setUp(release_substring=True)
+
+        self.extra_cfg = {}
+        self.extra_cfg["modularity"] = {}
+        self.extra_cfg["modularity"]["release_regexp"] = {}
+        self.extra_cfg["modularity"]["release_regexp"]["GENERIC"] = "foobar"
+
+        self.inspection = "modularity"
+        self.result = "BAD"
+        self.waiverauth = "Anyone"
