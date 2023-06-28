@@ -246,6 +246,10 @@ void free_rpminspect(struct rpminspect *ri)
 #endif
     free(ri->commands.udevadm);
 
+#ifdef _HAVE_MODULARITYLABEL
+    free_string_map(ri->modularity_release);
+#endif
+
     list_free(ri->buildhost_subdomain, free);
     list_free(ri->macrofiles, free);
     list_free(ri->security_path_prefix, free);

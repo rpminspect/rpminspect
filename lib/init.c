@@ -655,6 +655,8 @@ static void read_cfgfile(struct rpminspect *ri, const char *filename)
 
         free(s);
     }
+
+    tabledict(p, ctx, "modularity", "release_regexp", &ri->modularity_release, false, false);
 #endif
 
     ADD_INCL_EXCL(elf);

@@ -282,6 +282,15 @@ modularity:
     #                  will recommend its addition.
     #static_context: required
 
+    # Release tag value substrings that should be present in modular
+    # RPMs.  Define a regular expression that rpminspect should run on
+    # the Release tag value.  One regular expression per product
+    # release substring.  If you do not define a regexp here for a
+    # product release, the modularity inspection will skip this check
+    # when inspecting RPMs for that product.
+    #release_regexp:
+    #    fc31: \+module\.fc31\.[0-9]+
+
 elf:
     # File paths to include in or exclude from specific tests. Each
     # value is a POSIX extended regular expression (man 7

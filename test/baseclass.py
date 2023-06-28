@@ -880,7 +880,7 @@ class TestCompareKoji(TestCompareRPMs):
 
 # Base test case class that tests a fake module build
 class TestModule(TestKoji):
-    def setUp(self, modularitylabel=True, static_context=True):
+    def setUp(self, modularitylabel=True, static_context=True, release_substring=True):
         super().setUp()
         self.buildtype = "module"
 
@@ -902,11 +902,20 @@ class TestModule(TestKoji):
             f.write("   static_context: true\n")
         f.close()
 
+        # set the Release tag correctly
+        if release_substring:
+            self.rpm.release = "%s+module%%{?dist}.1.0" % AFTER_REL
+
 
 # Base test case class that compares before and after module builds
 class TestCompareModules(TestCompareKoji):
     def setUp(
-        self, rebase=False, same=False, modularitylabel=True, static_context=True
+        self,
+        rebase=False,
+        same=False,
+        modularitylabel=True,
+        static_context=True,
+        release_substring=True,
     ):
         super().setUp(rebase=rebase, same=same)
         self.buildtype = "module"
@@ -933,3 +942,8 @@ class TestCompareModules(TestCompareKoji):
         f.close()
 
         shutil.copy(modulemd, afterfilesdir)
+
+        # set the Release tag correctly
+        if release_substring:
+            self.before_rpm.release = "%s+module%%{?dist}.1.0" % BEFORE_REL
+            self.after_rpm.release = "%s+module%%{?dist}.2.0" % AFTER_REL
