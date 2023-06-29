@@ -21,7 +21,11 @@ Contributors
 
 - Denys Vlasenko <dvlasenk@redhat.com>
 
+- Dmitry V. Levin <ldv@strace.io>
+
 - Dodji Seketeli <dodji@seketeli.org>
+
+- Evan Goode <mail@evangoo.de>
 
 - Fabien Boucher <fboucher@redhat.com>
 

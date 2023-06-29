@@ -1,7 +1,7 @@
 # The 'realpath' command may be installed under a different name, in
 # which case the calling environment can set the REALPATH variable to
 # the command to use.  For example, on NetBSD you need to install
-# coreutils from pkgsrc and the command will be install as
+# coreutils from pkgsrc and the command will be installed as
 # /usr/pkg/bin/grealpath.
 ifeq ($(shell uname 2>/dev/null),NetBSD)
 REALPATH ?= grealpath
@@ -88,7 +88,7 @@ setup-debug:
 export QA_RPATHS = 63
 
 # Make sure rpmfluff has a usable compiler.  gcc is not on default
-# FreeBSD installs anymore, so have it use 'cc'.
+# FreeBSD installs anymore, so have it use 'clang'.
 ifeq ($(OS),freebsd)
 export CC = clang
 endif
