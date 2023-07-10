@@ -725,12 +725,14 @@ bool inspect_rpmdeps(struct rpminspect *ri)
     /*
      * create global package evr and vr substrings for comparisons
      */
-    peer = TAILQ_FIRST(ri->peers);
-    version = headerGetString(peer->after_hdr, RPMTAG_VERSION);
-    release = headerGetString(peer->after_hdr, RPMTAG_RELEASE);
-    pkg_epoch = headerGetNumber(peer->after_hdr, RPMTAG_EPOCH);
-    xasprintf(&pkg_vr, "%s-%s", version, release);
-    xasprintf(&pkg_evr, "%ju:%s-%s", pkg_epoch, version, release);
+    if (ri->peers && !TAILQ_EMPTY(ri->peers)) {
+        peer = TAILQ_FIRST(ri->peers);
+        version = headerGetString(peer->after_hdr, RPMTAG_VERSION);
+        release = headerGetString(peer->after_hdr, RPMTAG_RELEASE);
+        pkg_epoch = headerGetNumber(peer->after_hdr, RPMTAG_EPOCH);
+        xasprintf(&pkg_vr, "%s-%s", version, release);
+        xasprintf(&pkg_evr, "%ju:%s-%s", pkg_epoch, version, release);
+    }
 
     /*
      * for reporting, we need the name of the spec file from the SRPM

@@ -3,7 +3,9 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 #
 
+import shutil
 import subprocess
+import tempfile
 
 from baseclass import RequiresRpminspect
 
@@ -11,7 +13,7 @@ from baseclass import RequiresRpminspect
 # Verify --help gives help output
 class RpminspectHelp(RequiresRpminspect):
     def runTest(self):
-        RequiresRpminspect.configFile(self)
+        super().configFile()
         p = subprocess.Popen(
             [self.rpminspect, "--help"],
             stdout=subprocess.PIPE,
@@ -31,7 +33,7 @@ class RpminspectHelp(RequiresRpminspect):
 # Verify rpminspect doesn't segfault on release-less args
 class RpminspectSegv(RequiresRpminspect):
     def runTest(self):
-        RequiresRpminspect.configFile(self)
+        super().configFile()
         p = subprocess.Popen(
             [self.rpminspect, "42"],
             stdout=subprocess.DEVNULL,
@@ -39,3 +41,36 @@ class RpminspectSegv(RequiresRpminspect):
         )
         p.communicate()
         self.assertNotEqual(p.returncode, 139)
+
+
+# Verify rpminspect can handle an empty peer list
+class RpminspectEmptyPeerList(RequiresRpminspect):
+    def runTest(self):
+        super().configFile()
+        self.emptybuild = tempfile.mkdtemp()
+        p = subprocess.Popen(
+            [
+                self.rpminspect,
+                "-D",
+                "-d",
+                "-c",
+                self.conffile,
+                "-b",
+                self.buildtype,
+                "-F",
+                "json",
+                "-r",
+                "GENERIC",
+                "-o",
+                self.outputfile,
+                self.emptybuild,
+            ],
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+        )
+        (out, err) = p.communicate()
+        self.assertEqual(p.returncode, 0)
+
+    def tearDown(self):
+        super().tearDown()
+        shutil.rmtree(self.emptybuild, ignore_errors=True)
