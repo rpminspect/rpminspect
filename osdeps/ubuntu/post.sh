@@ -2,6 +2,9 @@
 PATH=/usr/bin
 CWD="$(pwd)"
 
+# Ubuntu Linux does not define an RPM dist tag
+echo '%dist .ri47' > ${HOME}/.rpmmacros
+
 # The mandoc package on Ubuntu lacks libmandoc.a and
 # header files, which we need to build rpminspect
 if curl -s http://mandoc.bsd.lv/ >/dev/null 2>&1 ; then
