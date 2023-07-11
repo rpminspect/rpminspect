@@ -2,6 +2,9 @@
 PATH=/usr/local/bin:/usr/bin:/bin:/usr/local/sbin:/usr/sbin:/sbin
 CWD="$(pwd)"
 
+# Debian Linux stable does not define an RPM dist tag
+echo '%dist .ri47' > ${HOME}/.rpmmacros
+
 # Install 32-bit development files on 64-bit systems when available
 case "$(uname -m)" in
     x86_64)
