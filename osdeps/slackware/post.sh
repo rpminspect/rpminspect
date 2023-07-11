@@ -2,6 +2,9 @@
 PATH=/bin:/usr/bin:/sbin:/usr/sbin
 CWD="$(pwd)"
 
+# Slackware Linux does not define an RPM dist tag
+echo '%dist .ri47' > ${HOME}/.rpmmacros
+
 # Install rust.  Slackware comes with Rust, but it's too old to build
 # clamav, which we also need.
 curl --proto '=https' --tlsv1.2 -sSf -o rustup.sh https://sh.rustup.rs
