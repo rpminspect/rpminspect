@@ -449,14 +449,14 @@
  *
  * The debuginfo package name substring.
  */
-#define DEBUGINFO_SUBSTRING "-debuginfo"
+#define DEBUGINFO_SUBSTRING "-debuginfo-"
 
 /**
  * @def DEBUGSOURCE_SUBSTRING
  *
  * The debugsource package name substring.
  */
-#define DEBUGSOURCE_SUBSTRING "-debugsource"
+#define DEBUGSOURCE_SUBSTRING "-debugsource-"
 
 /**
  * @def DEBUG_PATH
