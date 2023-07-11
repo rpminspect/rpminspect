@@ -2,6 +2,9 @@
 PATH=/bin:/usr/bin:/sbin:/usr/sbin
 CWD="$(pwd)"
 
+# Arch Linux does not define an RPM dist tag
+echo '%dist .ri47' > ${HOME}/.rpmmacros
+
 # There is no mandoc package in Arch Linux
 if curl -s http://mandoc.bsd.lv/ >/dev/null 2>&1 ; then
     curl -O http://mandoc.bsd.lv/snapshots/mandoc.tar.gz
