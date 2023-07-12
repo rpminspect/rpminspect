@@ -117,8 +117,8 @@ static deprule_list_t *gather_deprules_by_type(deprule_list_t *rules, Header hdr
 
             /* skip some rules types */
             if (!strcmp(r, DEBUGINFO_PROVIDE)
-                || strstr(r, DEBUGSOURCE_SUBSTRING)
-                || strstr(r, DEBUGINFO_SUBSTRING)
+                || strsuffix(r, DEBUGSOURCE_SUFFIX)
+                || strsuffix(r, DEBUGINFO_SUFFIX)
                 || ((strprefix(r, "rpmlib(") || strprefix(r, "rtld(")) && strsuffix(r, ")"))
                 || ((strprefix(r, "kernel(") || strprefix(r, "modalias(") || strprefix(r, "ksym(") || strprefix(r, "kmod(")) && strsuffix(r, ")"))) {
                 continue;

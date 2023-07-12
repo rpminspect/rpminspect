@@ -445,18 +445,18 @@
 #define DEBUGINFO_PROVIDE "debuginfo(build-id)"
 
 /**
- * @def DEBUGINFO_SUBSTRING
+ * @def DEBUGINFO_SUFFIX
  *
- * The debuginfo package name substring.
+ * The debuginfo package name suffix.
  */
-#define DEBUGINFO_SUBSTRING "-debuginfo-"
+#define DEBUGINFO_SUFFIX "-debuginfo"
 
 /**
- * @def DEBUGSOURCE_SUBSTRING
+ * @def DEBUGSOURCE_SUFFIX
  *
- * The debugsource package name substring.
+ * The debugsource package name suffix.
  */
-#define DEBUGSOURCE_SUBSTRING "-debugsource-"
+#define DEBUGSOURCE_SUFFIX "-debugsource"
 
 /**
  * @def DEBUG_PATH
