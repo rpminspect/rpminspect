@@ -453,7 +453,7 @@ cleanup:
 #endif
 }
 
-static bool _is_debug_rpm_helper(Header hdr, const char *provide, const char *substring)
+static bool _is_debug_rpm_helper(Header hdr, const char *provide, const char *suffix)
 {
     rpmtd req = NULL;
     rpmFlags flags = HEADERGET_MINMEM | HEADERGET_EXT | HEADERGET_ARGV;
@@ -475,7 +475,7 @@ static bool _is_debug_rpm_helper(Header hdr, const char *provide, const char *su
                 break;
             }
 
-            if (substring && strstr(p, substring)) {
+            if (suffix && strsuffix(p, suffix)) {
                 r = true;
                 break;
             }
@@ -494,7 +494,7 @@ static bool _is_debug_rpm_helper(Header hdr, const char *provide, const char *su
  */
 bool is_debuginfo_rpm(Header hdr)
 {
-    return _is_debug_rpm_helper(hdr, DEBUGINFO_PROVIDE, DEBUGINFO_SUBSTRING);
+    return _is_debug_rpm_helper(hdr, DEBUGINFO_PROVIDE, DEBUGINFO_SUFFIX);
 }
 
 /*
@@ -503,5 +503,5 @@ bool is_debuginfo_rpm(Header hdr)
  */
 bool is_debugsource_rpm(Header hdr)
 {
-    return _is_debug_rpm_helper(hdr, NULL, DEBUGSOURCE_SUBSTRING);
+    return _is_debug_rpm_helper(hdr, NULL, DEBUGSOURCE_SUFFIX);
 }
