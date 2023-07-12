@@ -34,12 +34,16 @@ static void init_magic_cookie(struct rpminspect *ri)
 
 /*
  * Get the MIME type of a file specified by path rather than
- * rpmfile_entry_t and bypass cached types.  It does use the open
- * libmagic handle if it's available.  Caller should not free the
- * returned string.
+ * rpmfile_entry_t.  It does use the open libmagic handle if it's
+ * available.  Caller should not free the returned string.
  */
 const char *mime_type(struct rpminspect *ri, const char *file)
 {
+    const char *tmp = NULL;
+    char *type = NULL;
+    char *pos = NULL;
+    string_hash_t *entry = NULL;
+
     assert(ri != NULL);
 
     if (file == NULL) {
@@ -51,42 +55,8 @@ const char *mime_type(struct rpminspect *ri, const char *file)
         init_magic_cookie(ri);
     }
 
-    return magic_file(ri->magic_cookie, file);
-}
-
-/*
- * Return the MIME type of the specified file.  The type is cached in the
- * rpmfile_entry_t.  If that is not NULL, this function returns that value.
- * Otherwise it gets the MIME type, caches it, and returns the value.
- * The caller should not free the pointer returned.
- */
-const char *get_mime_type(struct rpminspect *ri, rpmfile_entry_t *file)
-{
-    const char *tmp = NULL;
-    char *type = NULL;
-    char *pos = NULL;
-    string_hash_t *entry = NULL;
-
-    assert(ri != NULL);
-    assert(file != NULL);
-
-    /* no actual file; no actual MIME type */
-    if (file->fullpath == NULL) {
-        return NULL;
-    }
-
-    /* the type may already be cached */
-    if (file->type) {
-        return file->type;
-    }
-
-    /* only try to initialize libmagic if it hasn't been yet */
-    if (!ri->magic_initialized) {
-        init_magic_cookie(ri);
-    }
-
     /* get the type and see if it needs to be saved */
-    tmp = magic_file(ri->magic_cookie, file->fullpath);
+    tmp = magic_file(ri->magic_cookie, file);
 
     if (tmp) {
         type = strdup(tmp);
@@ -96,7 +66,7 @@ const char *get_mime_type(struct rpminspect *ri, rpmfile_entry_t *file)
     if (type != NULL) {
         /*
          * Trim any trailing metadata after the MIME type, such
-         * as 'charset=binary' and stuff like that.
+         * as '; charset=utf-8' and stuff like that.
          */
         if ((pos = index(type, ';')) != NULL) {
             *pos = '\0';
@@ -121,6 +91,31 @@ const char *get_mime_type(struct rpminspect *ri, rpmfile_entry_t *file)
     } else {
         return NULL;
     }
+}
+
+/*
+ * Return the MIME type of the specified file.  The type is cached in the
+ * rpmfile_entry_t.  If that is not NULL, this function returns that value.
+ * Otherwise it gets the MIME type, caches it, and returns the value.
+ * The caller should not free the pointer returned.
+ */
+const char *get_mime_type(struct rpminspect *ri, rpmfile_entry_t *file)
+{
+    assert(ri != NULL);
+    assert(file != NULL);
+
+    /* no actual file; no actual MIME type */
+    if (file->fullpath == NULL) {
+        return NULL;
+    }
+
+    /* the type may already be cached */
+    if (file->type) {
+        return file->type;
+    }
+
+    /* look it up */
+    return mime_type(ri, file->fullpath);
 }
 
 /* Return true if the named file is a text file according to libmagic */
