@@ -51,6 +51,37 @@ static rpmfile_entry_t *globalfile = NULL;
 #define UNPACK_TEMPLATE UNPACK_BASE"XXXXXX"
 
 /*
+ * Helper function to determine if we should skip the named file based
+ * on its MIME type.
+ */
+static bool is_excluded_mime_type(const char *path)
+{
+    const char *type = NULL;
+    string_entry_t *entry = NULL;
+
+    assert(globalri != NULL);
+
+    /* get the MIME type */
+    type = mime_type(globalri, path);
+
+    /* check to see if this MIME type is explicitly excluded */
+    if (globalri->unicode_excluded_mime_types != NULL && !TAILQ_EMPTY(globalri->unicode_excluded_mime_types)) {
+        TAILQ_FOREACH(entry, globalri->unicode_excluded_mime_types, items) {
+            if (!strcmp(type, entry->data)) {
+                return true;
+            }
+        }
+    }
+
+    /* ignore any non-text files */
+    if (!strprefix(type, "text/")) {
+        return true;
+    }
+
+    return false;
+}
+
+/*
  * Helper function to create a ~/rpmbuild tree in the working directory.
  */
 static char *make_source_dirs(const char *worksubdir, const char *fullpath)
@@ -385,9 +416,7 @@ static bool end_of_line(const UChar c)
  */
 static int validate_file(const char *fpath, __attribute__((unused)) const struct stat *sb, int tflag, __attribute__((unused)) struct FTW *ftwbuf)
 {
-    const char *type = NULL;
     const char *localpath = fpath;
-    string_entry_t *sentry = NULL;
     UFILE *src = NULL;
     UChar32 c;
     UChar *line = NULL;
@@ -412,19 +441,8 @@ static int validate_file(const char *fpath, __attribute__((unused)) const struct
         return 0;
     }
 
-    type = mime_type(globalri, fpath);
-
     /* check for exclusion by MIME type */
-    if (globalri->unicode_excluded_mime_types != NULL && !TAILQ_EMPTY(globalri->unicode_excluded_mime_types)) {
-        TAILQ_FOREACH(sentry, globalri->unicode_excluded_mime_types, items) {
-            if (!strcmp(type, sentry->data)) {
-                return 0;
-            }
-        }
-    }
-
-    /* ignore any non-text files */
-    if (!strprefix(type, "text/")) {
+    if (is_excluded_mime_type(fpath)) {
         return 0;
     }
 
@@ -576,6 +594,11 @@ static bool unicode_driver(struct rpminspect *ri, rpmfile_entry_t *file)
 
     /* skip binary packages */
     if (!headerIsSource(file->rpm_header)) {
+        return true;
+    }
+
+    /* skip files of explicitly excluded MIME types */
+    if (is_excluded_mime_type(file->fullpath)) {
         return true;
     }
 
