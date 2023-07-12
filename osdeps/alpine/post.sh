@@ -2,9 +2,6 @@
 PATH=/bin:/usr/bin:/sbin:/usr/sbin
 CWD="$(pwd)"
 
-# Alpine Linux does not define an RPM dist tag
-echo '%dist .ri47' > ${HOME}/.rpmmacros
-
 # The mandoc package in Alpine Linux lacks the library
 if curl -s http://mandoc.bsd.lv/ >/dev/null 2>&1 ; then
     curl -O http://mandoc.bsd.lv/snapshots/mandoc.tar.gz
@@ -96,6 +93,9 @@ rm -rf cdson
 
 # Avoid getting %{_arch} in filenames from rpmbuild
 echo "%_arch %(/bin/arch)" > ~/.rpmmacros
+
+# Alpine Linux does not define an RPM dist tag
+echo '%dist .ri47' >> ${HOME}/.rpmmacros
 
 # Update the clamav database
 freshclam
