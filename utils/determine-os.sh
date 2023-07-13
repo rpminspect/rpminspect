@@ -78,7 +78,7 @@ elif [ -r /etc/debian_version ] && [ "${ID}" = "debian" ]; then
         bullseye)
             echo "${ID}-stable"
             ;;
-        bookworm)
+        bookworm|trixie)
             echo "${ID}-testing"
             ;;
         *)
