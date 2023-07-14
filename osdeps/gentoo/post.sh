@@ -49,7 +49,7 @@ make install
 cd "${CWD}" || exit 1
 rm -rf rc
 
-# cdson is not [yet] in Amazon Linux
+# cdson is not [yet] in Gentoo Linux
 git clone https://github.com/frozencemetery/cdson.git
 cd cdson || exit 1
 TAG="$(git tag -l | sort -n | tail -n 1)"
@@ -60,6 +60,9 @@ ninja -C build test
 ninja -C build install
 cd "${CWD}" || exit 1
 rm -rf cdson
+
+# Gentoo Linux does not define an RPM dist tag
+echo '%dist .ri47' > ${HOME}/.rpmmacros
 
 # Update the clamav database
 freshclam
