@@ -51,6 +51,13 @@ char *find_cmd(const char *cmd)
         return NULL;
     }
 
+    /* if cmd contains a '/', use as-is */
+    if (strchr(cmd, '/')) {
+        r = strdup(cmd);
+        assert(r != NULL);
+        return r;
+    }
+
     /* get the effective UID and GID */
     u = geteuid();
     g = getegid();
