@@ -192,85 +192,100 @@ string_list_t *gather_diags(struct rpminspect *ri, const char *progname, const c
 
     /* msgunfmt */
     tmp = run_cmd(&exitcode, ri->worksubdir, ri->commands.msgunfmt, "--version", NULL);
-    details = strsplit(tmp, "\n");
-    free(tmp);
 
-    entry = TAILQ_FIRST(details);
-    ver = strdup(entry->data);
-    list_free(details, free);
+    if (exitcode == 0) {
+        details = strsplit(tmp, "\n");
+        free(tmp);
 
-    entry = calloc(1, sizeof(*entry));
-    assert(entry != NULL);
-    xasprintf(&entry->data, "%s", ver);
-    TAILQ_INSERT_TAIL(list, entry, items);
+        entry = TAILQ_FIRST(details);
+        ver = strdup(entry->data);
+        list_free(details, free);
 
-    free(ver);
+        entry = calloc(1, sizeof(*entry));
+        assert(entry != NULL);
+        xasprintf(&entry->data, "%s", ver);
+        TAILQ_INSERT_TAIL(list, entry, items);
+
+        free(ver);
+    }
 
 #ifdef _WITH_ANNOCHECK
     /* annocheck */
     tmp = run_cmd(&exitcode, ri->worksubdir, ri->commands.annocheck, "--version", NULL);
-    details = strsplit(tmp, "\n");
-    free(tmp);
 
-    entry = TAILQ_FIRST(details);
-    ver = strreplace(entry->data, ": Version ", " version ");
-    list_free(details, free);
+    if (exitcode == 0) {
+        details = strsplit(tmp, "\n");
+        free(tmp);
 
-    entry = calloc(1, sizeof(*entry));
-    assert(entry != NULL);
-    xasprintf(&entry->data, "%s", ver);
-    TAILQ_INSERT_TAIL(list, entry, items);
+        entry = TAILQ_FIRST(details);
+        ver = strreplace(entry->data, ": Version ", " version ");
+        list_free(details, free);
 
-    free(ver);
+        entry = calloc(1, sizeof(*entry));
+        assert(entry != NULL);
+        xasprintf(&entry->data, "%s", ver);
+        TAILQ_INSERT_TAIL(list, entry, items);
+
+        free(ver);
+    }
 #endif
 
     /* abidiff */
     tmp = run_cmd(&exitcode, ri->worksubdir, ri->commands.abidiff, "--version", NULL);
-    details = strsplit(tmp, "\n");
-    free(tmp);
 
-    entry = TAILQ_FIRST(details);
-    ver = strreplace(entry->data, ": ", " version ");
-    list_free(details, free);
+    if (exitcode == 0) {
+        details = strsplit(tmp, "\n");
+        free(tmp);
 
-    entry = calloc(1, sizeof(*entry));
-    assert(entry != NULL);
-    xasprintf(&entry->data, "%s", ver);
-    TAILQ_INSERT_TAIL(list, entry, items);
+        entry = TAILQ_FIRST(details);
+        ver = strreplace(entry->data, ": ", " version ");
+        list_free(details, free);
 
-    free(ver);
+        entry = calloc(1, sizeof(*entry));
+        assert(entry != NULL);
+        xasprintf(&entry->data, "%s", ver);
+        TAILQ_INSERT_TAIL(list, entry, items);
+
+        free(ver);
+    }
 
     /* kmidiff */
     tmp = run_cmd(&exitcode, ri->worksubdir, ri->commands.kmidiff, "--version", NULL);
-    details = strsplit(tmp, "\n");
-    free(tmp);
 
-    entry = TAILQ_FIRST(details);
-    ver = strreplace(entry->data, ": ", " version ");
-    list_free(details, free);
+    if (exitcode == 0) {
+        details = strsplit(tmp, "\n");
+        free(tmp);
 
-    entry = calloc(1, sizeof(*entry));
-    assert(entry != NULL);
-    xasprintf(&entry->data, "%s", ver);
-    TAILQ_INSERT_TAIL(list, entry, items);
+        entry = TAILQ_FIRST(details);
+        ver = strreplace(entry->data, ": ", " version ");
+        list_free(details, free);
 
-    free(ver);
+        entry = calloc(1, sizeof(*entry));
+        assert(entry != NULL);
+        xasprintf(&entry->data, "%s", ver);
+        TAILQ_INSERT_TAIL(list, entry, items);
+
+        free(ver);
+    }
 
     /* udevadm */
     tmp = run_cmd(&exitcode, ri->worksubdir, ri->commands.udevadm, "--version", NULL);
-    details = strsplit(tmp, "\n");
-    free(tmp);
 
-    entry = TAILQ_FIRST(details);
-    ver = strdup(entry->data);
-    list_free(details, free);
+    if (exitcode == 0) {
+        details = strsplit(tmp, "\n");
+        free(tmp);
 
-    entry = calloc(1, sizeof(*entry));
-    assert(entry != NULL);
-    xasprintf(&entry->data, "udevadm version %s", ver);
-    TAILQ_INSERT_TAIL(list, entry, items);
+        entry = TAILQ_FIRST(details);
+        ver = strdup(entry->data);
+        list_free(details, free);
 
-    free(ver);
+        entry = calloc(1, sizeof(*entry));
+        assert(entry != NULL);
+        xasprintf(&entry->data, "udevadm version %s", ver);
+        TAILQ_INSERT_TAIL(list, entry, items);
+
+        free(ver);
+    }
 
     return list;
 }
