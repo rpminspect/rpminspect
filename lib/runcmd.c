@@ -30,7 +30,7 @@
 #endif
 
 /*
- * Given a command name, try to find it in the pATH.  Returns an
+ * Given a command name, try to find it in the PATH.  Returns an
  * allocated string that the caller is responsible for freeing.
  */
 char *find_cmd(const char *cmd)
