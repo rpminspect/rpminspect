@@ -22,6 +22,97 @@
 #define RD STDIN_FILENO
 #define WR STDOUT_FILENO
 
+/* (pretend this program may build on Windows at some point) */
+#if defined(_WIN32) || defined(_WIN64) || defined(__CYGWIN__)
+#define PATH_ENV_SEP ";"
+#else
+#define PATH_ENV_SEP ":"
+#endif
+
+/*
+ * Given a command name, try to find it in the pATH.  Returns an
+ * allocated string that the caller is responsible for freeing.
+ */
+char *find_cmd(const char *cmd)
+{
+    char *r = NULL;
+    int i = 0;
+    struct stat sb;
+    uid_t u = 0;
+    gid_t g = 0;
+    mode_t m = 0;
+    char *pathvar = NULL;
+    string_list_t *path = NULL;
+    string_entry_t *entry = NULL;
+    char *candidate = NULL;
+
+    /* the no-op case */
+    if (cmd == NULL) {
+        return NULL;
+    }
+
+    /* get the effective UID and GID */
+    u = geteuid();
+    g = getegid();
+
+    /* the caller may have given us a perfectly usable command */
+    memset(&sb, 0, sizeof(sb));
+    i = stat(cmd, &sb);
+    m = sb.st_mode;
+
+    if (i == 0 && S_ISREG(sb.st_mode) && (((m & S_IXUSR) && sb.st_uid == u) || ((m & S_IXGRP) && sb.st_gid == g) || (m & S_IXOTH))) {
+        r = strdup(cmd);
+        assert(r != NULL);
+        return r;
+    }
+
+    /* get the PATH */
+    pathvar = getenv("PATH");
+
+    if (pathvar == NULL) {
+        /* just return the command given */
+        r = strdup(cmd);
+        assert(r != NULL);
+        return r;
+    }
+
+    /* split the path up in to directories */
+    path = strsplit(getenv("PATH"), PATH_ENV_SEP);
+
+    if (path == NULL || TAILQ_EMPTY(path)) {
+        warnx("unable to tokenize PATH");
+        list_free(path, free);
+        return NULL;
+    }
+
+    /* iterate over PATH elements looking for the command */
+    TAILQ_FOREACH(entry, path, items) {
+        /* try the first directory */
+        candidate = joinpath(entry->data, cmd, NULL);
+        assert(candidate != NULL);
+
+        /* where is it really? */
+        r = realpath(candidate, NULL);
+        free(candidate);
+
+        /* take a look */
+        memset(&sb, 0, sizeof(sb));
+        i = stat(r, &sb);
+        m = sb.st_mode;
+
+        if (i == 0 && S_ISREG(sb.st_mode) && (((m & S_IXUSR) && sb.st_uid == u) || ((m & S_IXGRP) && sb.st_gid == g) || (m & S_IXOTH))) {
+            break;
+        }
+
+        /* nope */
+        free(r);
+        r = NULL;
+    }
+
+    list_free(path, free);
+    return r;
+}
+
 /*
  * Generic fork()/execvp() wrapper to return the output of the
  * process and the exit code (if desired).  This function returns an
@@ -39,7 +130,7 @@
  * format string, all of the subsequent arguments need to be strings
  * because they all get concatenated together.
  */
-char *run_cmd_vpe(int *exitcode, const char *workdir, char **argv)
+char *run_cmd_vp(int *exitcode, const char *workdir, char **argv)
 {
     int i = 0;
     int pfd[2];
@@ -52,6 +143,7 @@ char *run_cmd_vpe(int *exitcode, const char *workdir, char **argv)
     size_t n = BUFSIZ;
     char *buf = NULL;
     char cwd[PATH_MAX + 1];
+    char *cmd = NULL;
 
     assert(argv != NULL);
     assert(argv[0] != NULL);
@@ -81,6 +173,9 @@ char *run_cmd_vpe(int *exitcode, const char *workdir, char **argv)
         return NULL;
     }
 
+    /* find the command */
+    cmd = find_cmd(argv[0]);
+
     /* run the command */
     proc = fork();
 
@@ -101,7 +196,7 @@ char *run_cmd_vpe(int *exitcode, const char *workdir, char **argv)
         setlinebuf(stderr);
 
         /* run the command */
-        if (execvp(argv[0], argv) == -1) {
+        if (execvp(cmd, argv) == -1) {
             warn("*** execvp");
             _exit(EXIT_FAILURE);
         }
@@ -205,7 +300,7 @@ char *run_cmd_vpe(int *exitcode, const char *workdir, char **argv)
 }
 
 /*
- * Wrapper for run_cmd_vpe() that lets you pass in varargs instead of a
+ * Wrapper for run_cmd_vp() that lets you pass in varargs instead of a
  * string_list_t.
  */
 char *run_cmd(int *exitcode, const char *workdir, const char *cmd, ...)
@@ -244,7 +339,7 @@ char *run_cmd(int *exitcode, const char *workdir, const char *cmd, ...)
     va_end(ap);
 
     /* run the command */
-    output = run_cmd_vpe(exitcode, workdir, argv);
+    output = run_cmd_vp(exitcode, workdir, argv);
 
     /* clean up */
     free_argv(argv);

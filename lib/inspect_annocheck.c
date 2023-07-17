@@ -535,7 +535,7 @@ static bool annocheck_driver(struct rpminspect *ri, rpmfile_entry_t *file)
         /* Run the test on the file */
         after_cmd = build_annocheck_cmd(ri->commands.annocheck, hentry->value, annocheck_profile, get_debuginfo_path(ri, file, arch, AFTER_BUILD), file->fullpath);
         argv = build_argv(after_cmd);
-        after_out = run_cmd_vpe(&after_exit, ri->worksubdir, argv);
+        after_out = run_cmd_vp(&after_exit, ri->worksubdir, argv);
         free_argv(argv);
 
         /* If we have a before build, run the command on that */
@@ -543,7 +543,7 @@ static bool annocheck_driver(struct rpminspect *ri, rpmfile_entry_t *file)
             if (file->peer_file) {
                 before_cmd = build_annocheck_cmd(ri->commands.annocheck, hentry->value, annocheck_profile, get_debuginfo_path(ri, file, arch, BEFORE_BUILD), file->peer_file->fullpath);
                 argv = build_argv(before_cmd);
-                before_out = run_cmd_vpe(&before_exit, ri->workdir, argv);
+                before_out = run_cmd_vp(&before_exit, ri->workdir, argv);
                 free_argv(argv);
 
                 /* Build a reporting message if we need to */

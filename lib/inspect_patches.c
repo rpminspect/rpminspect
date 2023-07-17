@@ -745,10 +745,10 @@ bool inspect_patches(struct rpminspect *ri)
                         hentry = calloc(1, sizeof(*hentry));
                         assert(hentry != NULL);
                         hentry->patch = strdup(patchfile);
+                        errno = 0;
                         hentry->num = strtoll(buf, NULL, 10);
 
                         if (errno == ERANGE || errno == EINVAL) {
-                            warn("*** strtoll");
                             hentry->num = -1;
                         }
 
@@ -831,10 +831,10 @@ bool inspect_patches(struct rpminspect *ri)
 
                         aentry = calloc(1, sizeof(*aentry));
                         assert(aentry != NULL);
+                        errno = 0;
                         aentry->num = strtoll(buf, NULL, 10);
 
                         if (errno == ERANGE || errno == EINVAL) {
-                            warn("*** strtoll");
                             aentry->num = -1;
                         }
 

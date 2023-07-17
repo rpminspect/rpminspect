@@ -224,7 +224,7 @@ static bool kmidiff_driver(struct rpminspect *ri, rpmfile_entry_t *file)
 
     /* run kmidiff */
     argv = build_argv(cmd);
-    output = run_cmd_vpe(&exitcode, ri->worksubdir, argv);
+    output = run_cmd_vp(&exitcode, ri->worksubdir, argv);
     free_argv(argv);
 
     /* determine if this is a rebase build */

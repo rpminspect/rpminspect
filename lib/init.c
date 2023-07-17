@@ -691,6 +691,7 @@ static void read_cfgfile(struct rpminspect *ri, const char *filename)
         if (!strcasecmp(s, "info") || !strcasecmp(s, "info-only") || !strcasecmp(s, "info_only")) {
             ri->size_threshold = -1;
         } else {
+            errno = 0;
             ri->size_threshold = strtol(s, 0, 10);
 
             if ((ri->size_threshold == LONG_MIN || ri->size_threshold == LONG_MAX) && errno == ERANGE) {
@@ -778,6 +779,7 @@ static void read_cfgfile(struct rpminspect *ri, const char *filename)
     s = p->getstr(ctx, "abdiff", "security_level_threshold");
 
     if (s != NULL) {
+        errno = 0;
         ri->abi_security_threshold = strtol(s, 0, 10);
 
         if ((ri->abi_security_threshold == LONG_MIN ||

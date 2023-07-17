@@ -268,6 +268,7 @@ bool inspect_javabytecode(struct rpminspect *ri)
         return false;
     }
 
+    errno = 0;
     supported_major = strtol(hentry->value, NULL, 10);
 
     if (errno == ERANGE) {
