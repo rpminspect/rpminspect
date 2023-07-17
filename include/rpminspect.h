@@ -305,7 +305,7 @@ char *compute_checksum(const char *, mode_t *, int);
 char *checksum(rpmfile_entry_t *);
 
 /* runcmd.c */
-char *run_cmd_vpe(int *exitcode, const char *workdir, char **argv);
+char *run_cmd_vp(int *exitcode, const char *workdir, char **argv);
 char *run_cmd(int *, const char *, const char *, ...) __attribute__((__sentinel__));
 void free_argv_table(struct rpminspect *ri, string_list_map_t *table);
 char **build_argv(const char *cmd);
@@ -379,6 +379,7 @@ const char *get_debuginfo_path(struct rpminspect *ri, const rpmfile_entry_t *fil
 
 bool usable_path(const char *path);
 bool match_path(const char *pattern, const char *root, const char *path);
+char *find_cmd(const char *cmd);
 
 /**
  * @brief Given a path and struct rpminspect, determine if the path

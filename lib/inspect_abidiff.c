@@ -244,7 +244,7 @@ static bool abidiff_driver(struct rpminspect *ri, rpmfile_entry_t *file)
 
     /* run abidiff */
     argv = build_argv(cmd);
-    output = run_cmd_vpe(&exitcode, NULL, argv);
+    output = run_cmd_vp(&exitcode, NULL, argv);
     free_argv(argv);
 
     /* determine if this is a rebase build */
