@@ -11,5 +11,14 @@ case "$(uname -m)" in
         ;;
 esac
 
+# Remove any potentially bad udev rules files
+if [ -d /usr/lib/udev/rules.d ]; then
+    for rulefile in /usr/lib/udev/rules.d/*.rules ; do
+        if ! udevadm verify ${rulefile} >/dev/null 2>&1 ; then
+            rm -f ${rulefile}
+        fi
+    done
+fi
+
 # Update the clamav database
 freshclam
