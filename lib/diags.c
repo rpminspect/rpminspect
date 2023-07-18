@@ -197,9 +197,22 @@ string_list_t *gather_diags(struct rpminspect *ri, const char *progname, const c
         details = strsplit(tmp, "\n");
         free(tmp);
 
-        entry = TAILQ_FIRST(details);
-        ver = strdup(entry->data);
-        list_free(details, free);
+        if (details) {
+            entry = TAILQ_FIRST(details);
+
+            if (entry && entry->data) {
+                ver = strdup(entry->data);
+            } else {
+                ver = NULL;
+            }
+
+            list_free(details, free);
+        }
+
+        if (ver == NULL) {
+            ver = realpath(ri->commands.msgunfmt, NULL);
+            assert(ver != NULL);
+        }
 
         entry = calloc(1, sizeof(*entry));
         assert(entry != NULL);
@@ -217,9 +230,22 @@ string_list_t *gather_diags(struct rpminspect *ri, const char *progname, const c
         details = strsplit(tmp, "\n");
         free(tmp);
 
-        entry = TAILQ_FIRST(details);
-        ver = strreplace(entry->data, ": Version ", " version ");
-        list_free(details, free);
+        if (details) {
+            entry = TAILQ_FIRST(details);
+
+            if (entry && entry->data) {
+                ver = strreplace(entry->data, ": Version ", " version ");
+            } else {
+                ver = NULL;
+            }
+
+            list_free(details, free);
+        }
+
+        if (ver == NULL) {
+            ver = realpath(ri->commands.annocheck, NULL);
+            assert(ver != NULL);
+        }
 
         entry = calloc(1, sizeof(*entry));
         assert(entry != NULL);
@@ -237,9 +263,22 @@ string_list_t *gather_diags(struct rpminspect *ri, const char *progname, const c
         details = strsplit(tmp, "\n");
         free(tmp);
 
-        entry = TAILQ_FIRST(details);
-        ver = strreplace(entry->data, ": ", " version ");
-        list_free(details, free);
+        if (details) {
+            entry = TAILQ_FIRST(details);
+
+            if (entry && entry->data) {
+                ver = strreplace(entry->data, ": ", " version ");
+            } else {
+                ver = NULL;
+            }
+
+            list_free(details, free);
+        }
+
+        if (ver == NULL) {
+            ver = realpath(ri->commands.abidiff, NULL);
+            assert(ver != NULL);
+        }
 
         entry = calloc(1, sizeof(*entry));
         assert(entry != NULL);
@@ -256,9 +295,22 @@ string_list_t *gather_diags(struct rpminspect *ri, const char *progname, const c
         details = strsplit(tmp, "\n");
         free(tmp);
 
-        entry = TAILQ_FIRST(details);
-        ver = strreplace(entry->data, ": ", " version ");
-        list_free(details, free);
+        if (details) {
+            entry = TAILQ_FIRST(details);
+
+            if (entry && entry->data) {
+                ver = strreplace(entry->data, ": ", " version ");
+            } else {
+                ver = NULL;
+            }
+
+            list_free(details, free);
+        }
+
+        if (ver == NULL) {
+            ver = realpath(ri->commands.kmidiff, NULL);
+            assert(ver != NULL);
+        }
 
         entry = calloc(1, sizeof(*entry));
         assert(entry != NULL);
@@ -275,9 +327,22 @@ string_list_t *gather_diags(struct rpminspect *ri, const char *progname, const c
         details = strsplit(tmp, "\n");
         free(tmp);
 
-        entry = TAILQ_FIRST(details);
-        ver = strdup(entry->data);
-        list_free(details, free);
+        if (details) {
+            entry = TAILQ_FIRST(details);
+
+            if (entry && entry->data) {
+                ver = strdup(entry->data);
+            } else {
+                ver = NULL;
+            }
+
+            list_free(details, free);
+        }
+
+        if (ver == NULL) {
+            ver = realpath(ri->commands.udevadm, NULL);
+            assert(ver != NULL);
+        }
 
         entry = calloc(1, sizeof(*entry));
         assert(entry != NULL);

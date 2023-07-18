@@ -351,12 +351,6 @@ General functionality
     added       auditwheel-5.0.0.tar.gz
     S.5.......T auditwheel.spec
 
-* Migrate to a TOML config file format--or a config file format that
-  looks similar to something you would see in /etc but that we have
-  our own parser for.  YAML is not ideal.  Though support for YAML
-  must remain as it is already established and supported.  It would be
-  nice to move the defaults over to not YAML.
-
 * Drop the need to fork/exec msgunfmt and just read in the po files
   directly.  This should be possible and will give us the information
   necessary for comparison purposes.
