@@ -285,6 +285,35 @@ char *get_rpm_header_string_array_value(const rpmfile_entry_t *file, rpmTag tag)
     return ret;
 }
 
+/*
+ * Given an RPM header tag, get that header tag array and return the
+ * string that matches the index value for this file.  That's complex,
+ * but some tags are arrays of strings (or ints) and what we need to
+ * do is first get the array, then knowing the index entry for the file
+ * we have, pull that array index out and return it.  NULL return means
+ * an empty value or the tag was not present in the header.
+ *
+ * Limitations:
+ * "tag" must refer to an h[] tag (see rpmtag.h from librpm)
+ * "file" must have a usable array index value (idx)
+ */
+uint64_t get_rpm_header_num_array_value(const rpmfile_entry_t *file, rpmTag tag)
+{
+    rpmtd td = NULL;
+    uint64_t ret = 0;
+
+    /* new header transaction */
+    if (_get_rpm_header_array_value_helper(&td, file, tag) != 0) {
+        return 0;
+    }
+
+    /* get the tag we are looking for and copy the value */
+    ret = rpmtdGetNumber(td);
+    rpmtdFree(td);
+
+    return ret;
+}
+
 /**
  * Given a path to an RPM package, extract the payload to a tar file
  * for later use with extract_rpm().  This happens in cases where
