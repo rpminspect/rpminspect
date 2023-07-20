@@ -218,6 +218,38 @@ string_list_t *get_rpm_header_string_array(Header hdr, rpmTagVal tag)
 }
 
 /*
+ * Helper function for functions below.  Create an rpmtd and position
+ * the td index at the named file for the given header tag.  Return
+ * the rpmtd.  Caller is responsible for freeing the rpmtd.
+ */
+static int _get_rpm_header_array_value_helper(rpmtd *td, const rpmfile_entry_t *file, rpmTag tag)
+{
+    rpmFlags flags = HEADERGET_MINMEM | HEADERGET_EXT | HEADERGET_ARGV;
+
+    assert(td != NULL);
+    assert(file != NULL);
+    assert(file->idx >= 0);
+
+    /* new header transaction */
+    *td = rpmtdNew();
+
+    /* find the header tag we want to extract values from */
+    if (!headerGet(file->rpm_header, tag, *td, flags)) {
+        rpmtdFree(*td);
+        return -1;
+    }
+
+    /* set the array index */
+    if (rpmtdSetIndex(*td, file->idx) == -1) {
+        warn(_("*** file index %d is out of bounds for %s"), file->idx, file->fullpath);
+        rpmtdFree(*td);
+        return -1;
+    }
+
+    return 0;
+}
+
+/*
  * Given an RPM header tag, get that header tag array and return the
  * string that matches the index value for this file.  That's complex,
  * but some tags are arrays of strings (or ints) and what we need to
@@ -231,38 +263,25 @@ string_list_t *get_rpm_header_string_array(Header hdr, rpmTagVal tag)
  *
  * Returned value must be free'd by caller.
  */
-char *get_rpm_header_value(const rpmfile_entry_t *file, rpmTag tag)
+char *get_rpm_header_string_array_value(const rpmfile_entry_t *file, rpmTag tag)
 {
     rpmtd td = NULL;
-    rpmFlags flags = HEADERGET_MINMEM | HEADERGET_EXT | HEADERGET_ARGV;
     const char *val = NULL;
     char *ret = NULL;
 
-    assert(file != NULL);
-    assert(file->idx >= 0);
-
     /* new header transaction */
-    td = rpmtdNew();
-
-    /* find the header tag we want to extract values from */
-    if (!headerGet(file->rpm_header, tag, td, flags)) {
-        rpmtdFree(td);
-        return ret;
-    }
-
-    /* set the array index */
-    if (rpmtdSetIndex(td, file->idx) == -1) {
-        warn(_("*** file index %d is out of bounds for %s"), file->idx, file->fullpath);
-        rpmtdFree(td);
-        return ret;
+    if (_get_rpm_header_array_value_helper(&td, file, tag) != 0) {
+        return NULL;
     }
 
     /* get the tag we are looking for and copy the value */
     val = rpmtdGetString(td);
-    assert(val != NULL);
-    ret = strdup(val);
-    rpmtdFree(td);
 
+    if (val) {
+        ret = strdup(val);
+    }
+
+    rpmtdFree(td);
     return ret;
 }
 

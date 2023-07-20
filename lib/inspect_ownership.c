@@ -59,8 +59,8 @@ static bool ownership_driver(struct rpminspect *ri, rpmfile_entry_t *file)
     arch = get_rpm_header_arch(file->rpm_header);
 
     /* Get the owner and group of the file */
-    owner = get_rpm_header_value(file, RPMTAG_FILEUSERNAME);
-    group = get_rpm_header_value(file, RPMTAG_FILEGROUPNAME);
+    owner = get_rpm_header_string_array_value(file, RPMTAG_FILEUSERNAME);
+    group = get_rpm_header_string_array_value(file, RPMTAG_FILEGROUPNAME);
 
     /* Set up result parameters */
     init_result_params(&params);
@@ -133,7 +133,7 @@ static bool ownership_driver(struct rpminspect *ri, rpmfile_entry_t *file)
             if (strcmp(group, ri->bin_group)) {
 #ifdef _WITH_LIBCAP
                 /* Gather capabilities(7) for the file we need */
-                captext = get_rpm_header_value(file, RPMTAG_FILECAPS);
+                captext = get_rpm_header_string_array_value(file, RPMTAG_FILECAPS);
 
                 if (captext && strcmp(captext, "")) {
                     cap = cap_from_text(captext);
@@ -219,8 +219,8 @@ static bool ownership_driver(struct rpminspect *ri, rpmfile_entry_t *file)
      */
     if (!ignore && file->peer_file && (ri->tests & INSPECT_OWNERSHIP)) {
         /* Get the before file values */
-        before_owner = get_rpm_header_value(file->peer_file, RPMTAG_FILEUSERNAME);
-        before_group = get_rpm_header_value(file->peer_file, RPMTAG_FILEGROUPNAME);
+        before_owner = get_rpm_header_string_array_value(file->peer_file, RPMTAG_FILEUSERNAME);
+        before_group = get_rpm_header_string_array_value(file->peer_file, RPMTAG_FILEGROUPNAME);
 
         /* Determine if anything changed */
         if (strcmp(before_owner, owner)) {
