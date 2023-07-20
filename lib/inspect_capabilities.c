@@ -44,7 +44,7 @@ static bool capabilities_driver(struct rpminspect *ri, rpmfile_entry_t *file)
     }
 
     /* Get the cap values */
-    after = get_rpm_header_value(file, RPMTAG_FILECAPS);
+    after = get_rpm_header_string_array_value(file, RPMTAG_FILECAPS);
 
     if (after && strcmp(after, "")) {
         aftercap = cap_from_text(after);
@@ -54,7 +54,7 @@ static bool capabilities_driver(struct rpminspect *ri, rpmfile_entry_t *file)
     }
 
     if (file->peer_file) {
-        before = get_rpm_header_value(file->peer_file, RPMTAG_FILECAPS);
+        before = get_rpm_header_string_array_value(file->peer_file, RPMTAG_FILECAPS);
 
         if (before && strcmp(before, "")) {
             beforecap = cap_from_text(before);
