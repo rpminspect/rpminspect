@@ -286,9 +286,7 @@ rpmfile_t *extract_rpm(struct rpminspect *ri, const char *pkg, Header hdr, const
         assert(file_entry != NULL);
 
         file_entry->rpm_header = hdr;
-        memcpy(&file_entry->st, archive_entry_stat(entry), sizeof(struct stat));
         file_entry->idx = path_entry->index;
-
         file_entry->localpath = strdup(archive_path);
         assert(file_entry->localpath);
 
@@ -298,6 +296,10 @@ rpmfile_t *extract_rpm(struct rpminspect *ri, const char *pkg, Header hdr, const
 #ifdef _WITH_LIBCAP
         file_entry->cap = NULL;
 #endif
+
+        memset(&(file_entry->st), 0, sizeof(file_entry->st));
+        file_entry->st.st_mode = get_rpm_header_num_array_value(file_entry, RPMTAG_FILEMODES);
+        file_entry->st.st_size = archive_entry_size(entry);
 
         TAILQ_INSERT_TAIL(file_list, file_entry, items);
 
