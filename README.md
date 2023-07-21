@@ -32,7 +32,7 @@ following environments:
 | Platform | Release | Status |  
 |:-------------------------------------------------------|:----|----:|
 | [Fedora Linux](https://getfedora.org/)                 | rawhide<br />stable | [![Fedora Linux](https://github.com/rpminspect/rpminspect/actions/workflows/fedora.yml/badge.svg)](https://github.com/rpminspect/rpminspect/actions/workflows/fedora.yml) |
-| [CentOS Stream](https://www.centos.org/)               | 8<br />7 | [![CentOS](https://github.com/rpminspect/rpminspect/actions/workflows/centos.yml/badge.svg)](https://github.com/rpminspect/rpminspect/actions/workflows/centos.yml) |
+| [CentOS](https://www.centos.org/)               | Stream 9<br />Stream 8<br />7 | [![CentOS](https://github.com/rpminspect/rpminspect/actions/workflows/centos.yml/badge.svg)](https://github.com/rpminspect/rpminspect/actions/workflows/centos.yml) |
 | [Slackware Linux](http://www.slackware.com/)           | stable | [![Slackware Linux](https://github.com/rpminspect/rpminspect/actions/workflows/slackware.yml/badge.svg)](https://github.com/rpminspect/rpminspect/actions/workflows/slackware.yml) |
 | [Ubuntu Linux](https://ubuntu.com/)                    | stable | [![Ubuntu Linux](https://github.com/rpminspect/rpminspect/actions/workflows/ubuntu.yml/badge.svg)](https://github.com/rpminspect/rpminspect/actions/workflows/ubuntu.yml) |
 | [Debian GNU/Linux](https://www.debian.org/)            | testing<br />stable | [![Debian GNU/Linux](https://github.com/rpminspect/rpminspect/actions/workflows/debian.yml/badge.svg)](https://github.com/rpminspect/rpminspect/actions/workflows/debian.yml) |
