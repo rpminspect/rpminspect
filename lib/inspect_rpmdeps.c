@@ -370,7 +370,7 @@ static bool check_explicit_lib_deps(struct rpminspect *ri, Header h, deprule_lis
             }
 
             /* report missing explicit package requires */
-            if (!found && potential_prov) {
+            if (!found && potential_prov && !is_debuginfo_rpm(h) && !is_debugsource_rpm(h)) {
                 r = strdeprule(req);
                 pn = headerGetString(potential_prov->after_hdr, RPMTAG_NAME);
 
