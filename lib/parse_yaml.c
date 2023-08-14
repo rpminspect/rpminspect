@@ -417,6 +417,24 @@ static y_value *getobj(y_value *y, const char *key1, const char *key2)
     return NULL;
 }
 
+static bool yaml_have_section(parser_context *context, const char *section)
+{
+    size_t i = 0;
+    y_value *y = (y_value *) context;
+
+    if (y == NULL || section == NULL) {
+        return false;
+    }
+
+    for (i = 0; y->v.dict.keys[i] != NULL; i++) {
+        if (!strcmp(section, y->v.dict.keys[i])) {
+            return true;
+        }
+    }
+
+    return false;
+}
+
 static char *yaml_getstr(parser_context *context, const char *key1, const char *key2)
 {
     y_value *y = (y_value *) context;
@@ -544,6 +562,7 @@ parser_plugin yaml_parser = {
     .name = "yaml",
     .parse_file = yaml_parse_file,
     .fini = yaml_fini,
+    .havesection = yaml_have_section,
     .getstr = yaml_getstr,
     .strarray_foreach = yaml_strarray_foreach,
     .strdict_foreach = yaml_strdict_foreach,

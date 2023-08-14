@@ -25,6 +25,9 @@ typedef bool (*parser_parse_file_fn)(parser_context **countext_out, const char *
 /* Deinitialize/deallocate a parser context. */
 typedef void (*parser_fini_fn)(parser_context *context);
 
+/* Returns true if the named section is present. */
+typedef bool (*parser_have_section_fn)(parser_context *context, const char *section);
+
 /*
  * Return a copy of the string at the specified position in the parsed
  * structure.  All structures are dictionary-like.  Pass NULL for the second
@@ -59,6 +62,7 @@ typedef struct {
     parser_parse_file_fn parse_file;
     parser_fini_fn fini;
 
+    parser_have_section_fn havesection;
     parser_getstr_fn getstr;
     parser_strarray_foreach_fn strarray_foreach;
     parser_strdict_foreach_fn strdict_foreach;
