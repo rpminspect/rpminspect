@@ -575,7 +575,7 @@ static bool badfuncs_allowed_cb(const char *key, const char *value, void *cb_dat
  * Read either the main configuration file or a configuration file
  * overlay (profile) and populate the struct rpminspect members.
  */
-static void read_cfgfile(struct rpminspect *ri, const char *filename)
+static void read_cfgfile(struct rpminspect *ri, const char *filename, const bool local)
 {
     parser_plugin *p = NULL;
     parser_context *ctx = NULL;
@@ -820,17 +820,21 @@ static void read_cfgfile(struct rpminspect *ri, const char *filename)
     add_ignores(ri, p, ctx, "runpath");
     add_ignores(ri, p, ctx, "types");
 
-    s = p->getstr(ctx, "unicode", "exclude");
+    if (p->havesection(ctx, "unicode") && local) {
+        warnx(_("*** ignoring 'unicode' section in %s; only allowed in system-wide configuration"), filename);
+    } else {
+        s = p->getstr(ctx, "unicode", "exclude");
 
-    if (s != NULL && add_regex(s, &ri->unicode_exclude) != 0) {
-        warnx(_("*** error reading unicode exclude regular expression: %s"), s);
+        if (s != NULL && add_regex(s, &ri->unicode_exclude) != 0) {
+            warnx(_("*** error reading unicode exclude regular expression: %s"), s);
+        }
+
+        free(s);
+
+        array(p, ctx, "unicode", "excluded_mime_types", &ri->unicode_excluded_mime_types);
+        array(p, ctx, "unicode", "forbidden_codepoints", &ri->unicode_forbidden_codepoints);
+        add_ignores(ri, p, ctx, "unicode");
     }
-
-    free(s);
-
-    array(p, ctx, "unicode", "excluded_mime_types", &ri->unicode_excluded_mime_types);
-    array(p, ctx, "unicode", "forbidden_codepoints", &ri->unicode_forbidden_codepoints);
-    add_ignores(ri, p, ctx, "unicode");
 
     if (p->strdict_foreach(ctx, "rpmdeps", "ignore", rpmdeps_cb, &ri->deprules_ignore)) {
         warnx(_("*** malformed rpmdeps->ignore section; skipping"));
@@ -1627,7 +1631,7 @@ struct rpminspect *init_rpminspect(struct rpminspect *ri, const char *cfgfile, c
         }
 
         /* Read the main configuration file to get things started */
-        read_cfgfile(ri, cfg->data);
+        read_cfgfile(ri, cfg->data, false);
 
         /* Store this config file as one we read in */
         if (!list_contains(ri->cfgfiles, cfg->data)) {
@@ -1646,7 +1650,7 @@ struct rpminspect *init_rpminspect(struct rpminspect *ri, const char *cfgfile, c
         free(tmp);
 
         if (cf) {
-            read_cfgfile(ri, cf);
+            read_cfgfile(ri, cf, false);
             free(cf);
         }
     }
@@ -1656,7 +1660,7 @@ struct rpminspect *init_rpminspect(struct rpminspect *ri, const char *cfgfile, c
         cf = find_cfgfile(ri->profiledir, profile);
 
         if (cf) {
-            read_cfgfile(ri, cf);
+            read_cfgfile(ri, cf, false);
             free(cf);
         } else {
             errx(RI_MISSING_PROFILE, _("*** unable to find profile '%s'"), profile);
@@ -1674,7 +1678,7 @@ struct rpminspect *init_rpminspect(struct rpminspect *ri, const char *cfgfile, c
     cf = find_cfgfile(cwd, COMMAND_NAME);
 
     if (cf) {
-        read_cfgfile(ri, cf);
+        read_cfgfile(ri, cf, true);
 
         /* save a copy of the local rpminspect config file for diagnostics */
         bn = basename(cf);
