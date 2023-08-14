@@ -93,6 +93,28 @@ static char *as_str(dson_value *v)
     return NULL;
 }
 
+static bool dson_have_section(parser_context *context, const char *section)
+{
+    size_t i = 0;
+    dson_value *tree = (dson_value *) context;
+
+    if (tree == NULL || section == NULL) {
+        return false;
+    }
+
+    if (tree->type != DSON_DICT) {
+        return false;
+    }
+
+    for (i = 0; tree->dict->keys[i] != NULL; i++) {
+        if (!strcmp(section, tree->dict->keys[i])) {
+            return true;
+        }
+    }
+
+    return false;
+}
+
 static char *dson_getstr(parser_context *context, const char *key1, const char *key2)
 {
     dson_value *tree = (dson_value *) context;
@@ -188,6 +210,7 @@ parser_plugin dson_parser = {
     .name = "dson",
     .parse_file = dson_parse_file,
     .fini = dson_fini,
+    .havesection = dson_have_section,
     .getstr = dson_getstr,
     .strarray_foreach = dson_strarray_foreach,
     .strdict_foreach = dson_strdict_foreach,

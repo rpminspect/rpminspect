@@ -92,6 +92,26 @@ static json_object *getobj(json_object *jo, const char *key1, const char *key2)
     return getobj(cont, key2, NULL);
 }
 
+static bool json_have_section(parser_context *context, const char *section)
+{
+    json_object *jo = (json_object *) context;
+    json_object *cont = NULL;
+
+    if (jo == NULL || section == NULL) {
+        return false;
+    }
+
+    if (!json_object_is_type(jo, json_type_object)) {
+        return false;
+    }
+
+    if (json_object_object_get_ex(jo, section, &cont)) {
+        return true;
+    }
+
+    return false;
+}
+
 static char *json_getstr(parser_context *context, const char *key1, const char *key2)
 {
     json_object *jo = (json_object *) context;
@@ -193,6 +213,7 @@ parser_plugin json_parser = {
     .name = "json",
     .parse_file = json_parse_file,
     .fini = json_fini,
+    .havesection = json_have_section,
     .getstr = json_getstr,
     .strarray_foreach = json_strarray_foreach,
     .strdict_foreach = json_strdict_foreach,
