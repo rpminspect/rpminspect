@@ -15,6 +15,7 @@
 #include "callbacks.h"
 #include "parser.h"
 #include "rpminspect.h"
+#include "init.h"
 #include "queue.h"
 #include "uthash.h"
 
@@ -394,8 +395,8 @@ static inline void add_ignores(struct rpminspect *ri, parser_plugin *p, parser_c
 {
     add_ignores_cb_data data = { &ri->inspection_ignores, inspection };
 
-    if (p->strarray_foreach(ctx, inspection, "ignore", add_ignores_cb, &data)
-        && p->strarray_foreach(ctx, inspection, "ignores", add_ignores_cb, &data)) {
+    if (p->strarray_foreach(ctx, inspection, RI_IGNORE, add_ignores_cb, &data)
+        && p->strarray_foreach(ctx, inspection, RI_IGNORES, add_ignores_cb, &data)) {
         warnx(_("*** problem adding ignore entries to %s"), inspection);
     }
 
@@ -407,7 +408,7 @@ static inline void add_ignores(struct rpminspect *ri, parser_plugin *p, parser_c
  * of an inspection, not a string.  Reuses variables from context.
  */
 #define ADD_INCL_EXCL(inspection)                                       \
-    s = p->getstr(ctx, #inspection, "include_path");                    \
+    s = p->getstr(ctx, #inspection, RI_INCLUDE_PATH);                   \
                                                                         \
     if (s != NULL) {                                                    \
         if (debug_mode) {                                               \
@@ -421,7 +422,7 @@ static inline void add_ignores(struct rpminspect *ri, parser_plugin *p, parser_c
         free(s);                                                        \
     }                                                                   \
                                                                         \
-    s = p->getstr(ctx, #inspection, "exclude_path");                    \
+    s = p->getstr(ctx, #inspection, RI_EXCLUDE_PATH);                   \
                                                                         \
     if (s != NULL) {                                                    \
         if (debug_mode) {                                               \
@@ -441,7 +442,7 @@ static bool tabledict_cb(const char *key, const char *value, void *cb_data)
     tabledict_cb_data *data = cb_data;
 
     /* javabytecode uses this at top-level, but also supports ignores. */
-    if (!strcasecmp(key, "ignore")) {
+    if (!strcasecmp(key, RI_IGNORE)) {
         return false;
     }
 
@@ -467,7 +468,7 @@ static bool annocheck_cb(const char *key, const char *value, void *cb_data)
 {
     tabledict_cb_data *data = cb_data;
 
-    if (!strcasecmp(key, "failure_severity") || !strcasecmp(key, "extra_opts") || !strcasecmp(key, "ignore")) {
+    if (!strcasecmp(key, RI_FAILURE_SEVERITY) || !strcasecmp(key, RI_EXTRA_OPTS) || !strcasecmp(key, RI_IGNORE)) {
         return false;
     }
 
@@ -482,21 +483,21 @@ static bool rpmdeps_cb(const char *key, const char *value, void *cb_data)
     dep_type_t depkey = TYPE_NULL;
     deprule_ignore_map_t *drentry = NULL;
 
-    if (!strcmp(key, "requires")) {
+    if (!strcmp(key, RI_REQUIRES)) {
         depkey = TYPE_REQUIRES;
-    } else if (!strcmp(key, "provides")) {
+    } else if (!strcmp(key, RI_PROVIDES)) {
         depkey = TYPE_PROVIDES;
-    } else if (!strcmp(key, "conflicts")) {
+    } else if (!strcmp(key, RI_CONFLICTS)) {
         depkey = TYPE_CONFLICTS;
-    } else if (!strcmp(key, "obsoletes")) {
+    } else if (!strcmp(key, RI_OBSOLETES)) {
         depkey = TYPE_OBSOLETES;
-    } else if (!strcmp(key, "enhances")) {
+    } else if (!strcmp(key, RI_ENHANCES)) {
         depkey = TYPE_ENHANCES;
-    } else if (!strcmp(key, "recommends")) {
+    } else if (!strcmp(key, RI_RECOMMENDS)) {
         depkey = TYPE_RECOMMENDS;
-    } else if (!strcmp(key, "suggests")) {
+    } else if (!strcmp(key, RI_SUGGESTS)) {
         depkey = TYPE_SUGGESTS;
-    } else if (!strcmp(key, "supplements")) {
+    } else if (!strcmp(key, RI_SUPPLEMENTS)) {
         depkey = TYPE_SUPPLEMENTS;
     }
 
@@ -538,9 +539,9 @@ static bool handle_inspections_cb(const char *key, const char *value, void *cb_d
     uint64_t *tests = cb_data;
     bool onoff = true;
 
-    if (!strcasecmp(value, "on")) {
+    if (!strcasecmp(value, RI_ON)) {
         onoff = false;
-    } else if (strcasecmp(value, "off")) {
+    } else if (strcasecmp(value, RI_OFF)) {
         warnx(_("*** flag must be 'on' or 'off'; ignoring '%s'"), value);
     }
 
@@ -555,7 +556,7 @@ static bool handle_inspections_cb(const char *key, const char *value, void *cb_d
 /* Turn inspections on and off from the "inspections" config section. */
 static inline void handle_inspections(struct rpminspect *ri, parser_plugin *p, parser_context *ctx)
 {
-    if (p->strdict_foreach(ctx, "inspections", NULL, handle_inspections_cb, &ri->tests)) {
+    if (p->strdict_foreach(ctx, RI_INSPECTIONS, NULL, handle_inspections_cb, &ri->tests)) {
         warnx(_("*** malformed/unknown inspections section"));
     }
 
@@ -593,20 +594,20 @@ static void read_cfgfile(struct rpminspect *ri, const char *filename, const bool
     }
 
     /* Processing order doesn't matter, so match data/generic.yaml. */
-    strget(p, ctx, "common", "workdir", &ri->workdir);
-    strget(p, ctx, "common", "profiledir", &ri->profiledir);
-    strget(p, ctx, "koji", "hub", &ri->kojihub);
-    strget(p, ctx, "koji", "download_ursine", &ri->kojiursine);
-    strget(p, ctx, "koji", "download_mbs", &ri->kojimbs);
-    strget(p, ctx, "commands", "msgunfmt", &ri->commands.msgunfmt);
-    strget(p, ctx, "commands", "desktop-file-validate", &ri->commands.desktop_file_validate);
-    strget(p, ctx, "commands", "abidiff", &ri->commands.abidiff);
-    strget(p, ctx, "commands", "kmidiff", &ri->commands.kmidiff);
-    strget(p, ctx, "commands", "udevadm", &ri->commands.udevadm);
-    strget(p, ctx, "vendor", "vendor_data_dir", &ri->vendor_data_dir);
-    array(p, ctx, "vendor", "licensedb", &ri->licensedb);
+    strget(p, ctx, RI_COMMON, RI_WORKDIR, &ri->workdir);
+    strget(p, ctx, RI_COMMON, RI_PROFILEDIR, &ri->profiledir);
+    strget(p, ctx, RI_KOJI, RI_HUB, &ri->kojihub);
+    strget(p, ctx, RI_KOJI, RI_DOWNLOAD_URSINE, &ri->kojiursine);
+    strget(p, ctx, RI_KOJI, RI_DOWNLOAD_MBS, &ri->kojimbs);
+    strget(p, ctx, RI_COMMANDS, RI_MSGUNFMT, &ri->commands.msgunfmt);
+    strget(p, ctx, RI_COMMANDS, RI_DESKTOP_FILE_VALIDATE, &ri->commands.desktop_file_validate);
+    strget(p, ctx, RI_COMMANDS, RI_ABIDIFF, &ri->commands.abidiff);
+    strget(p, ctx, RI_COMMANDS, RI_KMIDIFF, &ri->commands.kmidiff);
+    strget(p, ctx, RI_COMMANDS, RI_UDEVADM, &ri->commands.udevadm);
+    strget(p, ctx, RI_VENDOR, RI_VENDOR_DATA_DIR, &ri->vendor_data_dir);
+    array(p, ctx, RI_VENDOR, RI_LICENSEDB, &ri->licensedb);
 
-    s = p->getstr(ctx, "environment", "product_release");
+    s = p->getstr(ctx, RI_ENVIRONMENT, RI_PRODUCT_RELEASE);
 
     if (s != NULL) {
         ri->have_environment = true;
@@ -615,12 +616,12 @@ static void read_cfgfile(struct rpminspect *ri, const char *filename, const bool
         s = NULL;
     }
 
-    s = p->getstr(ctx, "vendor", "favor_release");
+    s = p->getstr(ctx, RI_VENDOR, RI_FAVOR_RELEASE);
 
     if (s != NULL) {
-        if (!strcasecmp(s, "oldest")) {
+        if (!strcasecmp(s, RI_OLDEST)) {
             ri->favor_release = FAVOR_OLDEST;
-        } else if (!strcasecmp(s, "newest")) {
+        } else if (!strcasecmp(s, RI_NEWEST)) {
             ri->favor_release = FAVOR_NEWEST;
         } else {
             ri->favor_release = FAVOR_NONE;
@@ -630,23 +631,23 @@ static void read_cfgfile(struct rpminspect *ri, const char *filename, const bool
     }
 
     handle_inspections(ri, p, ctx);
-    tabledict(p, ctx, "products", NULL, &ri->products, false, false);
-    array(p, ctx, "macrofiles", NULL, &ri->macrofiles);
-    array(p, ctx, "ignore", NULL, &ri->ignores);
-    array(p, ctx, "security_path_prefix", NULL, &ri->security_path_prefix);
-    array(p, ctx, "badwords", NULL, &ri->badwords);
-    strget(p, ctx, "metadata", "vendor", &ri->vendor);
-    array(p, ctx, "metadata", "buildhost_subdomain", &ri->buildhost_subdomain);
+    tabledict(p, ctx, RI_PRODUCTS, NULL, &ri->products, false, false);
+    array(p, ctx, RI_MACROFILES, NULL, &ri->macrofiles);
+    array(p, ctx, RI_IGNORE, NULL, &ri->ignores);
+    array(p, ctx, RI_SECURITY_PATH_PREFIX, NULL, &ri->security_path_prefix);
+    array(p, ctx, RI_BADWORDS, NULL, &ri->badwords);
+    strget(p, ctx, RI_METADATA, RI_VENDOR, &ri->vendor);
+    array(p, ctx, RI_METADATA, RI_BUILDHOST_SUBDOMAIN, &ri->buildhost_subdomain);
 
 #ifdef _HAVE_MODULARITYLABEL
-    s = p->getstr(ctx, "modularity", "static_context");
+    s = p->getstr(ctx, RI_MODULARITY, RI_STATIC_CONTEXT);
 
     if (s != NULL) {
-        if (!strcasecmp(s, "required")) {
+        if (!strcasecmp(s, RI_REQUIRED)) {
             ri->modularity_static_context = STATIC_CONTEXT_REQUIRED;
-        } else if (!strcasecmp(s, "forbidden")) {
+        } else if (!strcasecmp(s, RI_FORBIDDEN)) {
             ri->modularity_static_context = STATIC_CONTEXT_FORBIDDEN;
-        } else if (!strcasecmp(s, "recommend")) {
+        } else if (!strcasecmp(s, RI_RECOMMEND)) {
             ri->modularity_static_context = STATIC_CONTEXT_RECOMMEND;
         } else {
             ri->modularity_static_context = STATIC_CONTEXT_NULL;
@@ -656,39 +657,39 @@ static void read_cfgfile(struct rpminspect *ri, const char *filename, const bool
         free(s);
     }
 
-    tabledict(p, ctx, "modularity", "release_regexp", &ri->modularity_release, false, false);
+    tabledict(p, ctx, RI_MODULARITY, RI_RELEASE_REGEXP, &ri->modularity_release, false, false);
 #endif
 
     ADD_INCL_EXCL(elf);
-    add_ignores(ri, p, ctx, "elf");
-    array(p, ctx, "emptyrpm", "expected_empty", &ri->expected_empty_rpms);
+    add_ignores(ri, p, ctx, RI_ELF);
+    array(p, ctx, RI_EMPTYRPM, RI_EXPECTED_EMPTY, &ri->expected_empty_rpms);
     ADD_INCL_EXCL(manpage);
-    add_ignores(ri, p, ctx, "manpage");
+    add_ignores(ri, p, ctx, RI_MANPAGE);
     ADD_INCL_EXCL(xml);
-    add_ignores(ri, p, ctx, "xml");
-    strget(p, ctx, "desktop", "desktop_entry_files_dir", &ri->desktop_entry_files_dir);
-    add_ignores(ri, p, ctx, "desktop");
-    array(p, ctx, "changedfiles", "header_file_extensions", &ri->header_file_extensions);
-    add_ignores(ri, p, ctx, "changedfiles");
-    array(p, ctx, "addedfiles", "forbidden_path_prefixes", &ri->forbidden_path_prefixes);
-    array(p, ctx, "addedfiles", "forbidden_path_suffixes", &ri->forbidden_path_suffixes);
-    array(p, ctx, "addedfiles", "forbidden_directories", &ri->forbidden_directories);
-    add_ignores(ri, p, ctx, "addedfiles");
-    add_ignores(ri, p, ctx, "movedfiles");
-    add_ignores(ri, p, ctx, "removedfiles");
-    array(p, ctx, "ownership", "bin_paths", &ri->bin_paths);
-    strget(p, ctx, "ownership", "bin_owner", &ri->bin_owner);
-    strget(p, ctx, "ownership", "bin-group", &ri->bin_group);
-    array(p, ctx, "ownership", "forbidden_owners", &ri->forbidden_owners);
-    array(p, ctx, "ownership", "forbidden_groups", &ri->forbidden_groups);
-    add_ignores(ri, p, ctx, "ownership");
-    array(p, ctx, "shellsyntax", "shells", &ri->shells);
-    add_ignores(ri, p, ctx, "shellsyntax");
+    add_ignores(ri, p, ctx, RI_XML);
+    strget(p, ctx, RI_DESKTOP, RI_DESKTOP_ENTRY_FILES_DIR, &ri->desktop_entry_files_dir);
+    add_ignores(ri, p, ctx, RI_DESKTOP);
+    array(p, ctx, RI_CHANGEDFILES, RI_HEADER_FILE_EXTENSIONS, &ri->header_file_extensions);
+    add_ignores(ri, p, ctx, RI_CHANGEDFILES);
+    array(p, ctx, RI_ADDEDFILES, RI_FORBIDDEN_PATH_PREFIXES, &ri->forbidden_path_prefixes);
+    array(p, ctx, RI_ADDEDFILES, RI_FORBIDDEN_PATH_SUFFIXES, &ri->forbidden_path_suffixes);
+    array(p, ctx, RI_ADDEDFILES, RI_FORBIDDEN_DIRECTORIES, &ri->forbidden_directories);
+    add_ignores(ri, p, ctx, RI_ADDEDFILES);
+    add_ignores(ri, p, ctx, RI_MOVEDFILES);
+    add_ignores(ri, p, ctx, RI_REMOVEDFILES);
+    array(p, ctx, RI_OWNERSHIP, RI_BIN_PATHS, &ri->bin_paths);
+    strget(p, ctx, RI_OWNERSHIP, RI_BIN_OWNER, &ri->bin_owner);
+    strget(p, ctx, RI_OWNERSHIP, RI_BIN_GROUP, &ri->bin_group);
+    array(p, ctx, RI_OWNERSHIP, RI_FORBIDDEN_OWNERS, &ri->forbidden_owners);
+    array(p, ctx, RI_OWNERSHIP, RI_FORBIDDEN_GROUPS, &ri->forbidden_groups);
+    add_ignores(ri, p, ctx, RI_OWNERSHIP);
+    array(p, ctx, RI_SHELLSYNTAX, RI_SHELLS, &ri->shells);
+    add_ignores(ri, p, ctx, RI_SHELLSYNTAX);
 
-    s = p->getstr(ctx, "filesize", "size_threshold");
+    s = p->getstr(ctx, RI_FILESIZE, RI_SIZE_THRESHOLD);
 
     if (s != NULL) {
-        if (!strcasecmp(s, "info") || !strcasecmp(s, "info-only") || !strcasecmp(s, "info_only")) {
+        if (!strcasecmp(s, RI_INFO) || !strcasecmp(s, RI_INFO_ONLY0) || !strcasecmp(s, RI_INFO_ONLY1)) {
             ri->size_threshold = -1;
         } else {
             errno = 0;
@@ -703,18 +704,18 @@ static void read_cfgfile(struct rpminspect *ri, const char *filename, const bool
         free(s);
     }
 
-    add_ignores(ri, p, ctx, "filesize");
-    array(p, ctx, "lto", "lto_symbol_name_prefixes", &ri->lto_symbol_name_prefixes);
-    add_ignores(ri, p, ctx, "lto");
+    add_ignores(ri, p, ctx, RI_FILESIZE);
+    array(p, ctx, RI_LTO, RI_LTO_SYMBOL_NAME_PREFIXES, &ri->lto_symbol_name_prefixes);
+    add_ignores(ri, p, ctx, RI_LTO);
 
-    s = p->getstr(ctx, "specname", "match");
+    s = p->getstr(ctx, RI_SPECNAME, RI_MATCH);
 
     if (s != NULL) {
-        if (!strcasecmp(s, "suffix")) {
+        if (!strcasecmp(s, RI_SUFFIX)) {
             ri->specmatch = MATCH_SUFFIX;
-        } else if (!strcasecmp(s, "prefix")) {
+        } else if (!strcasecmp(s, RI_PREFIX)) {
             ri->specmatch = MATCH_PREFIX;
-        } else if (!strcasecmp(s, "full")) {
+        } else if (!strcasecmp(s, RI_FULL)) {
             ri->specmatch = MATCH_FULL;
         } else {
             warnx(_("*** unknown specname match setting '%s', defaulting to 'full'"), s);
@@ -724,12 +725,12 @@ static void read_cfgfile(struct rpminspect *ri, const char *filename, const bool
         free(s);
     }
 
-    s = p->getstr(ctx, "specname", "primary");
+    s = p->getstr(ctx, RI_SPECNAME, RI_PRIMARY);
 
     if (s != NULL) {
-        if (!strcasecmp(s, "filename")) {
+        if (!strcasecmp(s, RI_FILENAME)) {
             ri->specprimary = PRIMARY_FILENAME;
-        } else if (!strcasecmp(s, "name")) {
+        } else if (!strcasecmp(s, RI_NAME)) {
             ri->specprimary = PRIMARY_NAME;
         } else {
             warnx(_("*** unknown specname primary setting '%s', defaulting to 'name'"), s);
@@ -739,9 +740,9 @@ static void read_cfgfile(struct rpminspect *ri, const char *filename, const bool
         free(s);
     }
 
-    add_ignores(ri, p, ctx, "specname");
+    add_ignores(ri, p, ctx, RI_SPECNAME);
 
-    s = p->getstr(ctx, "annocheck", "failure_severity");
+    s = p->getstr(ctx, RI_ANNOCHECK, RI_FAILURE_SEVERITY);
 
     if (s != NULL) {
         ri->annocheck_failure_severity = getseverity(s, RESULT_NULL);
@@ -754,29 +755,29 @@ static void read_cfgfile(struct rpminspect *ri, const char *filename, const bool
         free(s);
     }
 
-    strget(p, ctx, "annocheck", "profile", &ri->annocheck_profile);
-    tabledict(p, ctx, "annocheck", "jobs", &ri->annocheck, false, false);
-    tabledict(p, ctx, "annocheck", "extra_opts", &ri->annocheck, true, false);
-    add_ignores(ri, p, ctx, "annocheck");
+    strget(p, ctx, RI_ANNOCHECK, RI_PROFILE, &ri->annocheck_profile);
+    tabledict(p, ctx, RI_ANNOCHECK, RI_JOBS, &ri->annocheck, false, false);
+    tabledict(p, ctx, RI_ANNOCHECK, RI_EXTRA_OPTS, &ri->annocheck, true, false);
+    add_ignores(ri, p, ctx, RI_ANNOCHECK);
 
     /* Backward compatibility for annocheck jobs at top-level. */
     if (ri->annocheck == NULL) {
-        p->strdict_foreach(ctx, "annocheck", NULL, annocheck_cb, &annocheck_cb_data);
+        p->strdict_foreach(ctx, RI_ANNOCHECK, NULL, annocheck_cb, &annocheck_cb_data);
     }
 
-    tabledict(p, ctx, "javabytecode", NULL, &ri->jvm, false, true);
-    add_ignores(ri, p, ctx, "javabytecode");
-    tabledict(p, ctx, "pathmigration", "migrated_paths", &ri->pathmigration, false, false);
-    array(p, ctx, "pathmigration", "excluded_paths", &ri->pathmigration_excluded_paths);
-    add_ignores(ri, p, ctx, "pathmigraion");
-    add_ignores(ri, p, ctx, "politics");
-    array(p, ctx, "files", "forbidden_paths", &ri->forbidden_paths);
-    add_ignores(ri, p, ctx, "files");
-    strget(p, ctx, "abidiff", "suppression_file", &ri->abidiff_suppression_file);
-    strget(p, ctx, "abidiff", "debuginfo_path", &ri->abidiff_debuginfo_path);
-    strget(p, ctx, "abidiff", "extra_args", &ri->abidiff_extra_args);
+    tabledict(p, ctx, RI_JAVABYTECODE, NULL, &ri->jvm, false, true);
+    add_ignores(ri, p, ctx, RI_JAVABYTECODE);
+    tabledict(p, ctx, RI_PATHMIGRATION, RI_MIGRATED_PATHS, &ri->pathmigration, false, false);
+    array(p, ctx, RI_PATHMIGRATION, RI_EXCLUDED_PATHS, &ri->pathmigration_excluded_paths);
+    add_ignores(ri, p, ctx, RI_PATHMIGRATION);
+    add_ignores(ri, p, ctx, RI_POLITICS);
+    array(p, ctx, RI_FILES, RI_FORBIDDEN_PATHS, &ri->forbidden_paths);
+    add_ignores(ri, p, ctx, RI_FILES);
+    strget(p, ctx, RI_ABIDIFF, RI_SUPPRESSION_FILE, &ri->abidiff_suppression_file);
+    strget(p, ctx, RI_ABIDIFF, RI_DEBUGINFO_PATH, &ri->abidiff_debuginfo_path);
+    strget(p, ctx, RI_ABIDIFF, RI_EXTRA_ARGS, &ri->abidiff_extra_args);
 
-    s = p->getstr(ctx, "abdiff", "security_level_threshold");
+    s = p->getstr(ctx, RI_ABIDIFF, RI_SECURITY_LEVEL_THRESHOLD);
 
     if (s != NULL) {
         errno = 0;
@@ -791,39 +792,39 @@ static void read_cfgfile(struct rpminspect *ri, const char *filename, const bool
         free(s);
     }
 
-    add_ignores(ri, p, ctx, "abidiff");
-    strget(p, ctx, "kmidiff", "suppression_file", &ri->kmidiff_suppression_file);
-    strget(p, ctx, "kmidiff", "debuginfo_path", &ri->kmidiff_debuginfo_path);
-    strget(p, ctx, "kmidiff", "extra_args", &ri->kmidiff_extra_args);
-    array(p, ctx, "kmidiff", "kernel_filenames", &ri->kernel_filenames);
-    strget(p, ctx, "kmidiff", "kabi_dir", &ri->kabi_dir);
-    strget(p, ctx, "kmidiff", "kabi_filename", &ri->kabi_filename);
-    add_ignores(ri, p, ctx, "kmidiff");
-    array(p, ctx, "patches", "automacros", &ri->automacros);
-    array(p, ctx, "patches", "ignore_list", &ri->patch_ignore_list);
-    array(p, ctx, "badfuncs", "forbidden", &ri->bad_functions);
+    add_ignores(ri, p, ctx, RI_ABIDIFF);
+    strget(p, ctx, RI_KMIDIFF, RI_SUPPRESSION_FILE, &ri->kmidiff_suppression_file);
+    strget(p, ctx, RI_KMIDIFF, RI_DEBUGINFO_PATH, &ri->kmidiff_debuginfo_path);
+    strget(p, ctx, RI_KMIDIFF, RI_EXTRA_ARGS, &ri->kmidiff_extra_args);
+    array(p, ctx, RI_KMIDIFF, RI_KERNEL_FILENAMES, &ri->kernel_filenames);
+    strget(p, ctx, RI_KMIDIFF, RI_KABI_DIR, &ri->kabi_dir);
+    strget(p, ctx, RI_KMIDIFF, RI_KABI_FILENAME, &ri->kabi_filename);
+    add_ignores(ri, p, ctx, RI_KMIDIFF);
+    array(p, ctx, RI_PATCHES, RI_AUTOMACROS, &ri->automacros);
+    array(p, ctx, RI_PATCHES, RI_IGNORE_LIST, &ri->patch_ignore_list);
+    array(p, ctx, RI_BADFUNCS, RI_FORBIDDEN, &ri->bad_functions);
 
     /* ri->bad_functions_allowed is a string_list_map_t, not string_map_t. */
-    if (p->strdict_foreach(ctx, "badfuncs", "allowed", badfuncs_allowed_cb, &ri->bad_functions_allowed)) {
+    if (p->strdict_foreach(ctx, RI_BADFUNCS, RI_ALLOWED, badfuncs_allowed_cb, &ri->bad_functions_allowed)) {
         warnx(_("*** malformed badfuncs->allowed section"));
     }
 
     /* Backward compatibility for badfuncs prior to "forbidden". */
     if (ri->bad_functions == NULL && ri->bad_functions_allowed == NULL) {
-        array(p, ctx, "badfuncs", NULL, &ri->bad_functions);
+        array(p, ctx, RI_BADFUNCS, NULL, &ri->bad_functions);
     }
 
-    add_ignores(ri, p, ctx, "badfuncs");
-    array(p, ctx, "runpath", "allowed_paths", &ri->runpath_allowed_paths);
-    array(p, ctx, "runpath", "allowed_origin_paths", &ri->runpath_allowed_origin_paths);
-    array(p, ctx, "runpath", "origin_prefix_trim", &ri->runpath_origin_prefix_trim);
-    add_ignores(ri, p, ctx, "runpath");
-    add_ignores(ri, p, ctx, "types");
+    add_ignores(ri, p, ctx, RI_BADFUNCS);
+    array(p, ctx, RI_RUNPATH, RI_ALLOWED_PATHS, &ri->runpath_allowed_paths);
+    array(p, ctx, RI_RUNPATH, RI_ALLOWED_ORIGIN_PATHS, &ri->runpath_allowed_origin_paths);
+    array(p, ctx, RI_RUNPATH, RI_ORIGIN_PREFIX_TRIM, &ri->runpath_origin_prefix_trim);
+    add_ignores(ri, p, ctx, RI_RUNPATH);
+    add_ignores(ri, p, ctx, RI_TYPES);
 
-    if (p->havesection(ctx, "unicode") && local) {
+    if (p->havesection(ctx, RI_UNICODE) && local) {
         warnx(_("*** ignoring 'unicode' section in %s; only allowed in system-wide configuration"), filename);
     } else {
-        s = p->getstr(ctx, "unicode", "exclude");
+        s = p->getstr(ctx, RI_UNICODE, RI_EXCLUDE);
 
         if (s != NULL && add_regex(s, &ri->unicode_exclude) != 0) {
             warnx(_("*** error reading unicode exclude regular expression: %s"), s);
@@ -831,28 +832,28 @@ static void read_cfgfile(struct rpminspect *ri, const char *filename, const bool
 
         free(s);
 
-        array(p, ctx, "unicode", "excluded_mime_types", &ri->unicode_excluded_mime_types);
-        array(p, ctx, "unicode", "forbidden_codepoints", &ri->unicode_forbidden_codepoints);
-        add_ignores(ri, p, ctx, "unicode");
+        array(p, ctx, RI_UNICODE, RI_EXCLUDED_MIME_TYPES, &ri->unicode_excluded_mime_types);
+        array(p, ctx, RI_UNICODE, RI_FORBIDDEN_CODEPOINTS, &ri->unicode_forbidden_codepoints);
+        add_ignores(ri, p, ctx, RI_UNICODE);
     }
 
-    if (p->strdict_foreach(ctx, "rpmdeps", "ignore", rpmdeps_cb, &ri->deprules_ignore)) {
+    if (p->strdict_foreach(ctx, RI_RPMDEPS, RI_IGNORE, rpmdeps_cb, &ri->deprules_ignore)) {
         warnx(_("*** malformed rpmdeps->ignore section; skipping"));
     }
 
-    add_ignores(ri, p, ctx, "virus");
-    add_ignores(ri, p, ctx, "capabilities");
-    add_ignores(ri, p, ctx, "config");
-    add_ignores(ri, p, ctx, "doc");
-    add_ignores(ri, p, ctx, "kmod");
-    add_ignores(ri, p, ctx, "permissions");
-    add_ignores(ri, p, ctx, "symlinks");
-    add_ignores(ri, p, ctx, "upstream");
-    add_ignores(ri, p, ctx, "debuginfo");
-    strget(p, ctx, "debuginfo", "debuginfo_sections", &ri->debuginfo_sections);
+    add_ignores(ri, p, ctx, RI_VIRUS);
+    add_ignores(ri, p, ctx, RI_CAPABILITIES);
+    add_ignores(ri, p, ctx, RI_CONFIG);
+    add_ignores(ri, p, ctx, RI_DOC);
+    add_ignores(ri, p, ctx, RI_KMOD);
+    add_ignores(ri, p, ctx, RI_PERMISSIONS);
+    add_ignores(ri, p, ctx, RI_SYMLINKS);
+    add_ignores(ri, p, ctx, RI_UPSTREAM);
+    add_ignores(ri, p, ctx, RI_DEBUGINFO);
+    strget(p, ctx, RI_DEBUGINFO, RI_DEBUGINFO_SECTIONS, &ri->debuginfo_sections);
 
-    array(p, ctx, "udevrules", "udev_rules_dirs", &ri->udev_rules_dirs);
-    add_ignores(ri, p, ctx, "udevrules");
+    array(p, ctx, RI_UDEVRULES, RI_UDEV_RULES_DIRS, &ri->udev_rules_dirs);
+    add_ignores(ri, p, ctx, RI_UDEVRULES);
 
     p->fini(ctx);
     return;

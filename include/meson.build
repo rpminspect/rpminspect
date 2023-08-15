@@ -1,6 +1,7 @@
 # Install header files
 install_headers(
     'constants.h',
+    'init.h',
     'inspect.h',
     'output.h',
     'readelf.h',
