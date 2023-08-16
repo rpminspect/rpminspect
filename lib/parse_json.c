@@ -27,6 +27,7 @@ static bool json_parse_file(parser_context **context_out, const char *filepath)
     jerr = json_tokener_get_error(tok);
 
     if (jerr != json_tokener_success) {
+        warnx("*** buf=|%s|\n", buf);
         warnx("*** json_tokener_parse_ex: %s", json_tokener_error_desc(jerr));
         goto done;
     }
@@ -105,11 +106,7 @@ static bool json_have_section(parser_context *context, const char *section)
         return false;
     }
 
-    if (json_object_object_get_ex(jo, section, &cont)) {
-        return true;
-    }
-
-    return false;
+    return json_object_object_get_ex(jo, section, &cont);
 }
 
 static char *json_getstr(parser_context *context, const char *key1, const char *key2)
