@@ -261,6 +261,7 @@ static bool runpath_driver(struct rpminspect *ri, rpmfile_entry_t *file)
         assert(arch != NULL);
 
         init_result_params(&params);
+        params.header = NAME_RUNPATH;
         params.severity = RESULT_BAD;
         params.waiverauth = NOT_WAIVABLE;
         params.remedy = REMEDY_RUNPATH_BOTH;
