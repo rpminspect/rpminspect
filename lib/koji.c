@@ -1112,6 +1112,7 @@ struct koji_task *get_koji_task(struct rpminspect *ri, const char *taskspec)
     char *key = NULL;
     struct koji_task *task = NULL;
     koji_task_entry_t *descendent = NULL;
+    string_entry_t *entry = NULL;
 
     assert(ri != NULL);
 
@@ -1211,7 +1212,12 @@ struct koji_task *get_koji_task(struct rpminspect *ri, const char *taskspec)
             read_koji_task_struct(&env, dstruct, descendent->task);
 
             /* gather the task results */
-            dresult = xmlrpc_client_call(&env, ri->kojihub, "getTaskResult", "(i)", descendent->task->id);
+            if (task->method && !strcmp(task->method, "wrapperRPM")) {
+                dresult = xmlrpc_client_call(&env, ri->kojihub, "getTaskResult", "(i)", descendent->task->parent);
+            } else {
+                dresult = xmlrpc_client_call(&env, ri->kojihub, "getTaskResult", "(i)", descendent->task->id);
+            }
+
             xmlrpc_abort_on_fault(&env);
 
             if (xmlrpc_value_type(dresult) == XMLRPC_TYPE_NIL) {
@@ -1233,11 +1239,26 @@ struct koji_task *get_koji_task(struct rpminspect *ri, const char *taskspec)
                 xmlrpc_DECREF(tr_k);
 
                 /* Read the values */
-                if (!strcmp(key, "brootid")) {
+                if (!strcmp(key, "brootid") || !strcmp(key, "buildroot_id")) {
                     xmlrpc_decompose_value(&env, tr_v, "i", &descendent->brootid);
                     xmlrpc_abort_on_fault(&env);
                 } else if (!strcmp(key, "srpms") && xmlrpc_value_type(tr_v) == XMLRPC_TYPE_ARRAY) {
                     descendent->srpms = read_koji_descendent_results(&env, tr_v);
+                } else if (!strcmp(key, "srpm") && xmlrpc_value_type(tr_v) == XMLRPC_TYPE_STRING) {
+                    /* we should not have both 'srpms' and 'srpm' */
+                    if (descendent->srpms == NULL) {
+                        descendent->srpms = calloc(1, sizeof(*(descendent->srpms)));
+                        assert(descendent->srpms != NULL);
+                        TAILQ_INIT(descendent->srpms);
+                    }
+
+                    entry = calloc(1, sizeof(*entry));
+                    assert(entry != NULL);
+                    xmlrpc_decompose_value(&env, tr_v, "s", &entry->data);
+                    xmlrpc_abort_on_fault(&env);
+                    assert(entry->data != NULL);
+
+                    TAILQ_INSERT_TAIL(descendent->srpms, entry, items);
                 } else if (!strcmp(key, "rpms")) {
                     descendent->rpms = read_koji_descendent_results(&env, tr_v);
                 } else if (!strcmp(key, "logs")) {

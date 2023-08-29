@@ -760,8 +760,13 @@ static struct koji_build *get_koji_task_as_build(const struct koji_task *task)
 
     srpm = strdup(entry->data);
     assert(srpm != NULL);
-    nvr = strrchr(srpm, '/');
-    nvr++;
+
+    if (strrchr(srpm, '/')) {
+        nvr = strrchr(srpm, '/');
+        nvr++;
+    } else {
+        nvr = srpm;
+    }
 
     if (nvr == NULL) {
         free(srpm);
