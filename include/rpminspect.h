@@ -277,6 +277,7 @@ void free_results(results_t *);
 void add_result_entry(results_t **, struct result_params *);
 void add_result(struct rpminspect *, struct result_params *);
 bool suppressed_results(const results_t *results, const char *header, const severity_t suppress);
+void debug_print_result(const results_entry_t *result);
 
 /* output.c */
 const char *format_desc(unsigned int);

@@ -75,6 +75,57 @@ void free_results(results_t *results)
 }
 
 /*
+ * Function to print one result for debugging purposes.
+ */
+void debug_print_result(const results_entry_t *result)
+{
+    char *v = NULL;
+
+    assert(result != NULL);
+
+    switch (result->verb) {
+        case VERB_NIL:
+            v = "nil";
+            break;
+        case VERB_ADDED:
+            v = "added";
+            break;
+        case VERB_REMOVED:
+            v = "removed";
+            break;
+        case VERB_CHANGED:
+            v = "changed";
+            break;
+        case VERB_FAILED:
+            v = "failed";
+            break;
+        case VERB_OK:
+            v = "ok";
+            break;
+        case VERB_SKIP:
+            v = "skip";
+            break;
+        default:
+            v = "UnKnOwN";
+            break;
+    }
+
+    DEBUG_PRINT("result:\n");
+    DEBUG_PRINT("    severity=|%s|\n", strseverity(result->severity));
+    DEBUG_PRINT("  waiverauth=|%s|\n", strwaiverauth(result->waiverauth));
+    DEBUG_PRINT("      header=|%s|\n", result->header ? result->header : "(null)");
+    DEBUG_PRINT("         msg=|%s|\n", result->msg ? result->msg : "(null)");
+    DEBUG_PRINT("     details=|%s|\n", result->details ? result->details : "(null)");
+    DEBUG_PRINT("      remedy=|%s|\n", result->remedy ? result->remedy : "(null)");
+    DEBUG_PRINT("        verb=|%s|\n", v);
+    DEBUG_PRINT("        noun=|%s|\n", result->noun ? result->noun : "(noun)");
+    DEBUG_PRINT("        arch=|%s|\n", result->arch ? result->arch : "(arch)");
+    DEBUG_PRINT("        file=|%s|\n", result->file ? result->file : "(null)");
+
+    return;
+}
+
+/*
  * Add the specified result to the list of results.  The parameters are the
  * members of the results_entry_t struct.  severity, waiverauth, header, and
  * msg are required.
