@@ -206,6 +206,8 @@ static bool check_explicit_lib_deps(struct rpminspect *ri, Header h, deprule_lis
     bool result = true;
     const char *name = NULL;
     const char *arch = NULL;
+    const char *srpm = NULL;
+    const char *peer_srpm = NULL;
     rpmpeer_entry_t *peer = NULL;
     rpmpeer_entry_t *potential_prov = NULL;
     deprule_entry_t *verify = NULL;
@@ -236,6 +238,7 @@ static bool check_explicit_lib_deps(struct rpminspect *ri, Header h, deprule_lis
 
     name = headerGetString(h, RPMTAG_NAME);
     arch = get_rpm_header_arch(h);
+    srpm = headerGetString(h, RPMTAG_SOURCERPM);
 
     init_result_params(&params);
     params.waiverauth = WAIVABLE_BY_ANYONE;
@@ -257,6 +260,16 @@ static bool check_explicit_lib_deps(struct rpminspect *ri, Header h, deprule_lis
         TAILQ_FOREACH(peer, ri->peers, items) {
             /* skip anything with no dependencies */
             if (peer->after_deprules == NULL || TAILQ_EMPTY(peer->after_deprules)) {
+                continue;
+            }
+
+            peer_srpm = headerGetString(peer->after_hdr, RPMTAG_SOURCERPM);
+
+            /*
+             * issue 1246: Prevent false positives when the library is provided
+             * by a subpackage coming from another SRPM.
+             */
+            if (ri->buildtype == KOJI_BUILD_MODULE && peer_srpm && strcmp(peer_srpm, srpm)) {
                 continue;
             }
 
