@@ -788,8 +788,10 @@ static struct koji_build *get_koji_task_as_build(const struct koji_task *task)
 }
 
 /* Gather local build */
-static int gather_local_build(const char *build)
+static int gather_local_build(struct rpminspect *ri, const char *build)
 {
+    char * modulemd_path = NULL;
+
     assert(build != NULL);
 
     if (fetch_only) {
@@ -798,6 +800,21 @@ static int gather_local_build(const char *build)
     }
 
     set_worksubdir(workri, LOCAL_WORKDIR, NULL, NULL);
+
+    /*
+     * Some inspections need to know which kind of build are testing. Remote
+     * builds know this from the metadata provided by Koji. For local builds, we
+     * need to tell it by the presence of the modulemd file.
+     */
+    modulemd_path = strdup(build);
+    modulemd_path = strappend(modulemd_path, "/files/", MODULEMD_FILENAME, NULL);
+
+    if (access(modulemd_path, F_OK) == 0){
+        ri->buildtype = KOJI_BUILD_MODULE;
+    } else{
+        ri->buildtype = KOJI_BUILD_RPM;
+    }
+    free(modulemd_path);
 
     /* copy after tree */
     if (nftw(build, copytree, FOPEN_MAX, FTW_PHYS) == -1) {
@@ -830,7 +847,7 @@ static int _gather_build_types(struct rpminspect *ri)
 
     /* try for a local Koji build or local RPM */
     if (!gathered && (is_local_build(ri->workdir, spec, fetch_only) || is_local_rpm(ri, spec))) {
-        if (gather_local_build(spec) == -1) {
+        if (gather_local_build(ri, spec) == -1) {
             warnx(_("*** unable to find local build: %s"), spec);
             return -1;
         } else {
