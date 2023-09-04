@@ -310,7 +310,7 @@ bool inspect_modularity(struct rpminspect *ri)
      * - a conforming Release tag value
      */
     TAILQ_FOREACH(peer, ri->peers, items) {
-        if (!check_modularitylabel(ri, peer->after_hdr)) {
+        if (peer->after_hdr && !check_modularitylabel(ri, peer->after_hdr)) {
             tag_result = false;
         }
 
