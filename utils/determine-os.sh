@@ -39,7 +39,7 @@ elif [ -r /etc/centos-release ] && [ "${ID}" = "centos" ]; then
 elif [ -r /etc/redhat-release ] && [ "${ID}" = "rhel" ]; then
     v="$(echo "${VERSION_ID}" | cut -d '.' -f 1)"
     case "${v}" in
-        7|8)
+        7|8|9)
             echo "${ID}${v}"
             ;;
         *)
