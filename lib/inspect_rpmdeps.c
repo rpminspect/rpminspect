@@ -430,21 +430,20 @@ static bool check_explicit_lib_deps(struct rpminspect *ri, Header h, deprule_lis
 }
 
 /*
- * For packages with an Epoch > 0, check each dependency rule string
- * that uses the package version and release and ensure it comes
- * prefixed with the Epoch followed by a colon.
+ * For packages in a deprule that carry an Epoch > 0, make sure they
+ * are listed with the explicit Epoch value in the deprule.
  */
 static bool check_explicit_epoch(struct rpminspect *ri, Header h, deprule_list_t *afterdeps)
 {
     bool result = true;
+    const char *pname = NULL;
     const char *name = NULL;
     const char *arch = NULL;
     uint64_t epoch;
-    char *verrel = NULL;
-    char *epochprefix = NULL;
     deprule_entry_t *deprule = NULL;
     char *drs = NULL;
     char *noun = NULL;
+    rpmpeer_entry_t *peer = NULL;
     struct result_params params;
 
     assert(ri != NULL);
@@ -453,17 +452,11 @@ static bool check_explicit_epoch(struct rpminspect *ri, Header h, deprule_list_t
         return true;
     }
 
-    name = headerGetString(h, RPMTAG_NAME);
+    pname = headerGetString(h, RPMTAG_NAME);
     arch = get_rpm_header_arch(h);
-    epoch = headerGetNumber(h, RPMTAG_EPOCH);
 
     /* need deps to continue here */
     if (afterdeps == NULL || TAILQ_EMPTY(afterdeps)) {
-        return true;
-    }
-
-    /* skip epoch values of 0 */
-    if (epoch == 0) {
         return true;
     }
 
@@ -480,42 +473,47 @@ static bool check_explicit_epoch(struct rpminspect *ri, Header h, deprule_list_t
         params.severity = RESULT_BAD;
     }
 
-    /*
-     * check every deprule here that uses the package version and
-     * release to ensure it is prefixed with the epoch
-     */
-    xasprintf(&verrel, "%s-%s", headerGetString(h, RPMTAG_VERSION), headerGetString(h, RPMTAG_RELEASE));
-    assert(verrel != NULL);
-    xasprintf(&epochprefix, "%ju:", epoch);
-    assert(epochprefix != NULL);
-
     TAILQ_FOREACH(deprule, afterdeps, items) {
+        /* skip deprules that just carry a package name */
         if (deprule->version == NULL) {
             continue;
         }
 
-        if (strsuffix(deprule->version, verrel) && !strprefix(deprule->version, epochprefix)) {
-            drs = strdeprule(deprule);
-            xasprintf(&params.msg, _("Missing epoch prefix on the version-release in '%s' for %s on %s"), drs, name, arch);
-            xasprintf(&noun, _("'${FILE}' needs epoch in %s on ${ARCH}"), name);
+        /* find the package providing this deprule */
+        TAILQ_FOREACH(peer, ri->peers, items) {
+            name = headerGetString(peer->after_hdr, RPMTAG_NAME);
+            assert(name != NULL);
 
-            params.remedy = REMEDY_RPMDEPS_EPOCH;
-            params.verb = VERB_FAILED;
-            params.noun = noun;
-            params.arch = arch;
-            params.file = drs;
+            if (strcmp(deprule->requirement, name)) {
+                /* not found */
+                continue;
+            }
 
-            add_result(ri, &params);
-            free(params.msg);
-            free(noun);
-            free(drs);
+            epoch = headerGetNumber(peer->after_hdr, RPMTAG_EPOCH);
 
-            result = false;
+            /* check the deprule to see that it carries the required Epoch */
+            if (epoch > 0 && !strstr(deprule->version, ":")) {
+                drs = strdeprule(deprule);
+                xasprintf(&params.msg, _("Missing epoch prefix on the version-release in '%s' for %s on %s"), drs, pname, arch);
+                xasprintf(&noun, _("'${FILE}' needs epoch in %s on ${ARCH}"), name);
+
+                params.remedy = REMEDY_RPMDEPS_EPOCH;
+                params.verb = VERB_FAILED;
+                params.noun = noun;
+                params.arch = arch;
+                params.file = drs;
+
+                add_result(ri, &params);
+                free(params.msg);
+                free(noun);
+                free(drs);
+
+                result = false;
+                break;
+            }
         }
     }
 
-    free(verrel);
-    free(epochprefix);
     return result;
 }
 
@@ -810,7 +808,7 @@ bool inspect_rpmdeps(struct rpminspect *ri)
             result = false;
         }
 
-        /* Check that packages defining an Epoch > 0 use it for Provides */
+        /* Check that packages defining an Epoch > 0 use it in deprules */
         if (!check_explicit_epoch(ri, peer->after_hdr, peer->after_deprules)) {
             result = false;
         }
