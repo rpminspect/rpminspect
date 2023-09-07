@@ -494,6 +494,10 @@ static bool check_explicit_epoch(struct rpminspect *ri, Header h, deprule_list_t
 
         /* find the package providing this deprule */
         TAILQ_FOREACH(peer, ri->peers, items) {
+            if (!peer->after_hdr) {
+                continue;
+            }
+
             name = headerGetString(peer->after_hdr, RPMTAG_NAME);
             assert(name != NULL);
 
