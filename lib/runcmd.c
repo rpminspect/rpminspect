@@ -180,9 +180,6 @@ char *run_cmd_vp(int *exitcode, const char *workdir, char **argv)
         return NULL;
     }
 
-    /* find the command */
-    cmd = find_cmd(argv[0]);
-
     /* run the command */
     proc = fork();
 
@@ -201,6 +198,9 @@ char *run_cmd_vp(int *exitcode, const char *workdir, char **argv)
 
         setlinebuf(stdout);
         setlinebuf(stderr);
+
+        /* find the command */
+        cmd = find_cmd(argv[0]);
 
         /* run the command */
         if (execvp(cmd, argv) == -1) {
