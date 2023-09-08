@@ -86,7 +86,7 @@ Recommends:     html401-dtds
 
 # Required to support things like %%autorelease in spec files
 %if 0%{?fedora} >= 33
-Recommends:     rpmautospec-rpm-macros
+Recommends:     rpm_macro(autorelease)
 %endif
 
 # These programs are only required for the 'shellsyntax' functionality.
