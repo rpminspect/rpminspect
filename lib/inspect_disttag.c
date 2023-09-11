@@ -166,6 +166,12 @@ static bool disttag_driver(struct rpminspect *ri, rpmfile_entry_t *file)
         release++;
     }
 
+    /* Allow %autorelease as the Release tag value */
+    if (release && !strcmp(release, SPEC_AUTORELEASE)) {
+        list_free(contents, free);
+        return true;
+    }
+
     /* Expand macros in the release value */
     expanded_release = rpmExpand(release, NULL);
 
