@@ -768,6 +768,14 @@
  */
 #define SPEC_DISTTAG           "%{?dist}"
 
+/**
+ * @def SPEC_AUTORELEASE
+ *
+ * The Release tag in a spec file may contain this token in place of
+ * an explicit release value and SPEC_DISTTAG.
+ */
+#define SPEC_AUTORELEASE       "%autorelease"
+
 /** @} */
 
 /**
