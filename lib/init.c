@@ -572,6 +572,36 @@ static bool badfuncs_allowed_cb(const char *key, const char *value, void *cb_dat
     return false;
 }
 
+/* Process a desktop skip array and merge it in to desktop_skips_t */
+static void process_desktop_skips(desktop_skips_t **desktop_skips, string_list_t *slist, int flag)
+{
+    string_entry_t *sentry = NULL;
+    desktop_skips_t *ds = NULL;
+
+    assert(desktop_skips != NULL);
+
+    if (slist == NULL || TAILQ_EMPTY(slist)) {
+        return;
+    }
+
+    TAILQ_FOREACH(sentry, slist, items) {
+        HASH_FIND_STR(*desktop_skips, sentry->data, ds);
+
+        if (ds == NULL) {
+            ds = calloc(1, sizeof(*ds));
+            assert(ds != NULL);
+            ds->path = strdup(sentry->data);
+            assert(ds->path != NULL);
+            ds->flags |= flag;
+            HASH_ADD_KEYPTR(hh, *desktop_skips, ds->path, strlen(ds->path), ds);
+        } else {
+            ds->flags |= flag;
+        }
+    }
+
+    return;
+}
+
 /*
  * Read either the main configuration file or a configuration file
  * overlay (profile) and populate the struct rpminspect members.
@@ -582,6 +612,7 @@ static void read_cfgfile(struct rpminspect *ri, const char *filename, const bool
     parser_context *ctx = NULL;
     char *s = NULL;
     tabledict_cb_data annocheck_cb_data = { false, false, &ri->annocheck };
+    string_list_t *slist = NULL;
 
     assert(ri != NULL);
     assert(filename != NULL);
@@ -667,7 +698,20 @@ static void read_cfgfile(struct rpminspect *ri, const char *filename, const bool
     add_ignores(ri, p, ctx, RI_MANPAGE);
     ADD_INCL_EXCL(xml);
     add_ignores(ri, p, ctx, RI_XML);
+
     strget(p, ctx, RI_DESKTOP, RI_DESKTOP_ENTRY_FILES_DIR, &ri->desktop_entry_files_dir);
+
+    /* handle the desktop skips as two arrays and then merge them in to desktop_skips */
+    array(p, ctx, RI_DESKTOP, RI_DESKTOP_SKIP_EXEC_CHECK, &slist);
+    process_desktop_skips(&ri->desktop_skips, slist, SKIP_EXEC);
+    list_free(slist, free);
+    slist = NULL;
+
+    array(p, ctx, RI_DESKTOP, RI_DESKTOP_SKIP_ICON_CHECK, &slist);
+    process_desktop_skips(&ri->desktop_skips, slist, SKIP_ICON);
+    list_free(slist, free);
+    slist = NULL;
+
     add_ignores(ri, p, ctx, RI_DESKTOP);
     array(p, ctx, RI_CHANGEDFILES, RI_HEADER_FILE_EXTENSIONS, &ri->header_file_extensions);
     add_ignores(ri, p, ctx, RI_CHANGEDFILES);

@@ -73,6 +73,10 @@ void dump_cfg(const struct rpminspect *ri)
     string_list_map_t *tmp_mapentry = NULL;
     deprule_ignore_map_t *drentry = NULL;
     deprule_ignore_map_t *tmp_drentry = NULL;
+    desktop_skips_t *ds = NULL;
+    desktop_skips_t *tmp_ds = NULL;
+    bool skip_exec = false;
+    bool skip_icon = false;
 
     assert(ri != NULL);
 
@@ -328,11 +332,52 @@ void dump_cfg(const struct rpminspect *ri)
 
     HASH_FIND_STR(ri->inspection_ignores, NAME_DESKTOP, mapentry);
 
-    if (ri->desktop_entry_files_dir || mapentry != NULL) {
+    if (ri->desktop_entry_files_dir || ri->desktop_skips || mapentry != NULL) {
         printf("desktop:\n");
 
         if (ri->desktop_entry_files_dir) {
             printf("    desktop_entry_files_dir: %s\n", ri->desktop_entry_files_dir);
+        }
+
+        if (ri->desktop_skips) {
+            /* determine which skip lists we have */
+            HASH_ITER(hh, ri->desktop_skips, ds, tmp_ds) {
+                assert(ds->path != NULL);
+
+                if (ds->flags & SKIP_EXEC) {
+                    skip_exec = true;
+                }
+
+                if (ds->flags & SKIP_ICON) {
+                    skip_icon = true;
+                }
+
+                if (skip_exec && skip_icon) {
+                    break;
+                }
+            }
+
+            /* Exec= skips list */
+            if (skip_exec) {
+                printf("    skip_exec_check:\n");
+
+                HASH_ITER(hh, ri->desktop_skips, ds, tmp_ds) {
+                    if (ds->flags & SKIP_EXEC) {
+                        printf("        - %s\n", ds->path);
+                    }
+                }
+            }
+
+            /* Icon= skips list */
+            if (skip_icon) {
+                printf("    skip_icon_check:\n");
+
+                HASH_ITER(hh, ri->desktop_skips, ds, tmp_ds) {
+                    if (ds->flags & SKIP_ICON) {
+                        printf("        - %s\n", ds->path);
+                    }
+                }
+            }
         }
 
         dump_inspection_ignores(ri->inspection_ignores, NAME_DESKTOP);

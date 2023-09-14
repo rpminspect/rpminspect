@@ -361,6 +361,26 @@ desktop:
     # Where desktop entry files live
     desktop_entry_files_dir: /usr/share/applications
 
+    # Optional list of full paths to desktop files to skip the Exec=
+    # check for.  The Exec= check looks for the name value appearing
+    # as an executable in a subpackage for the build.  This is useful
+    # for some packages that provide both the application and desktop
+    # launcher, but some packages are theme oriented and may include a
+    # bunch of desktop files but no actual executables.  That is also
+    # allowed.  In those cases, the Exec= check can be skipped.
+    #skip_exec_check:
+    #    - /usr/share/applications/evolution-calendar.desktop
+
+    # Optional list of full paths to desktop files to skip the Icon=
+    # check for.  The Icon= check looks for the name value appearing
+    # as an icon image file in a subpackage for the build.  This is
+    # useful for some packages that provide both the icon and desktop
+    # launcher, but some packages are theme oriented and may include a
+    # bunch of desktop files but no actual icons.  That is also
+    # allowed.  In those cases, the Icon= check can be skipped.
+    #skip_icon_check:
+    #    - /usr/share/applications/evolution-calendar.desktop
+
     # Optional list of glob(7) specifications or path prefixes to
     # match files to ignore for this inspection.  The format of this
     # list is the same as the global 'ignore' list.  The difference is
