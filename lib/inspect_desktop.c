@@ -187,6 +187,8 @@ static bool validate_desktop_contents(struct rpminspect *ri, const rpmfile_entry
     bool found = false;
     rpmpeer_entry_t *peer = NULL;
     struct result_params params;
+    desktop_skips_t *ds = NULL;
+    unsigned int flags = 0;
     char *key_exec = NULL;
     char *key_icon = NULL;
     char *key_tryexec = NULL;
@@ -221,6 +223,13 @@ static bool validate_desktop_contents(struct rpminspect *ri, const rpmfile_entry
         return false;
     }
 
+    /* Determine if we need to skip the Exec= check for this file. */
+    HASH_FIND_STR(ri->desktop_skips, file->localpath, ds);
+
+    if (ds != NULL) {
+        flags = ds->flags;
+    }
+
     /*
      * Iterate over the entire file line by line looking for Exec= and Icon=
      * lines.  When found, validate the value after the '='.
@@ -229,9 +238,9 @@ static bool validate_desktop_contents(struct rpminspect *ri, const rpmfile_entry
         buf = entry->data;
         filetype = FILETYPE_NULL;
 
-        if (strprefix(buf, "Exec=")) {
+        if (!(flags & SKIP_EXEC) && strprefix(buf, "Exec=")) {
             key_exec = buf + 5;
-        } else if (strprefix(buf, "Icon=")) {
+        } else if (!(flags & SKIP_ICON) && strprefix(buf, "Icon=")) {
             tmp = buf + 5;
             tmp[strcspn(tmp, "\n")] = 0;
 

@@ -33,6 +33,8 @@
 #define RI_DESKTOP                  "desktop"
 #define RI_DESKTOP_ENTRY_FILES_DIR  "desktop_entry_files_dir"
 #define RI_DESKTOP_FILE_VALIDATE    "desktop-file-validate"
+#define RI_DESKTOP_SKIP_EXEC_CHECK  "skip_exec_check"
+#define RI_DESKTOP_SKIP_ICON_CHECK  "skip_icon_check"
 #define RI_DOC                      "doc"
 #define RI_DOWNLOAD_MBS             "download_mbs"
 #define RI_DOWNLOAD_URSINE          "download_ursine"

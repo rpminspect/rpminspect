@@ -108,6 +108,8 @@ void free_rpminspect(struct rpminspect *ri)
     security_entry_t *sentry = NULL;
     secrule_t *srentry = NULL;
     secrule_t *tmp_srentry = NULL;
+    desktop_skips_t *dentry = NULL;
+    desktop_skips_t *tmp_dentry = NULL;
 
     if (ri == NULL) {
         return;
@@ -233,10 +235,15 @@ void free_rpminspect(struct rpminspect *ri)
     free(ri->manpage_path_exclude_pattern);
     free(ri->xml_path_include_pattern);
     free(ri->xml_path_exclude_pattern);
-
     free(ri->desktop_entry_files_dir);
-    free(ri->vendor);
 
+    HASH_ITER(hh, ri->desktop_skips, dentry, tmp_dentry) {
+        HASH_DEL(ri->desktop_skips, dentry);
+        free(dentry->path);
+        free(dentry);
+    }
+
+    free(ri->vendor);
     free(ri->commands.msgunfmt);
     free(ri->commands.desktop_file_validate);
     free(ri->commands.abidiff);

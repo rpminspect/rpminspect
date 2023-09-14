@@ -462,6 +462,19 @@ typedef struct _applied_patches_t {
 } applied_patches_t;
 
 /*
+ * Hash table used to hold desktop files and what checks to skip.  And
+ * the flag values.
+ */
+#define SKIP_EXEC (1 << 1)
+#define SKIP_ICON (1 << 2)
+
+typedef struct _desktop_skips_t {
+    char *path;
+    unsigned int flags;
+    UT_hash_handle hh;
+} desktop_skips_t;
+
+/*
  * Configuration and state instance for librpminspect run.
  * Applications using librpminspect should initialize the
  * library and retain this structure through the run of
@@ -587,6 +600,9 @@ struct rpminspect {
 
     /* Where desktop entry files live */
     char *desktop_entry_files_dir;
+
+    /* Hash table of file paths and the desktop inspection checks to skip */
+    desktop_skips_t *desktop_skips;
 
     /* Executable path prefixes and required ownership */
     string_list_t *bin_paths;
