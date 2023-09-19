@@ -33,7 +33,7 @@ static void xml_silence_errors(void *ctx __attribute__((unused)), const char *ms
  * This function first tries with DTD validation.  Failing that it tries to just
  * check the XML.  The tests get less and less strict.
  */
-static bool is_xml_well_formed(const char *path, char **errors)
+static bool is_xml_well_formed(const char *path, size_t prefixlen, char **errors)
 {
     static bool initialized = false;
 #ifndef _HAVE_XMLSETGENERICERRORFUNC
@@ -41,6 +41,8 @@ static bool is_xml_well_formed(const char *path, char **errors)
 #endif
     xmlParserCtxtPtr ctxt;
     xmlDocPtr doc;
+    int opts = XML_PARSE_NOERROR | XML_PARSE_NOWARNING | XML_PARSE_RECOVER | XML_PARSE_NONET;
+    char *line = NULL;
     bool result = true;
 
     if (!initialized) {
@@ -55,15 +57,15 @@ static bool is_xml_well_formed(const char *path, char **errors)
 
     ctxt = xmlNewParserCtxt();
     assert(ctxt != NULL);
-    doc = xmlCtxtReadFile(ctxt, path, NULL, XML_PARSE_RECOVER | XML_PARSE_NONET | XML_PARSE_DTDVALID);
+    doc = xmlCtxtReadFile(ctxt, path, NULL, opts | XML_PARSE_DTDVALID);
 
     /* try again if no DTD specified */
     if (!ctxt->valid && ctxt->errNo == XML_DTD_NO_DTD) {
         xmlFreeDoc(doc);
-        doc = xmlCtxtReadFile(ctxt, path, NULL, XML_PARSE_RECOVER | XML_PARSE_NONET);
+        doc = xmlCtxtReadFile(ctxt, path, NULL, opts);
     }
 
-    if (ctxt->errNo == XML_ERR_NONE) {
+    if (ctxt->wellFormed && ctxt->errNo == XML_ERR_NONE) {
         /* well-formed documents */
         result = true;
     } else if (ctxt->errNo == XML_ERR_UNDECLARED_ENTITY || ctxt->errNo == XML_WAR_UNDECLARED_ENTITY) {
@@ -76,7 +78,27 @@ static bool is_xml_well_formed(const char *path, char **errors)
 
     /* capture validity output */
     if (!ctxt->valid && errors != NULL && ctxt->lastError.message) {
+        ctxt->lastError.message[strcspn(ctxt->lastError.message, "\r\n")] = '\0';
         *errors = strdup(ctxt->lastError.message);
+
+        if (ctxt->lastError.file) {
+            xasprintf(&line, "%d", ctxt->lastError.line);
+            assert(line != NULL);
+            *errors = strappend(*errors, ctxt->lastError.file + prefixlen, " on line ", line, NULL);
+            free(line);
+        }
+
+        if (ctxt->lastError.str1) {
+            *errors = strappend(*errors, "\n%s", ctxt->lastError.str1, NULL);
+        }
+
+        if (ctxt->lastError.str2) {
+            *errors = strappend(*errors, "\n%s", ctxt->lastError.str2, NULL);
+        }
+
+        if (ctxt->lastError.str3) {
+            *errors = strappend(*errors, "\n%s", ctxt->lastError.str3, NULL);
+        }
     }
 
     if (doc != NULL) {
@@ -189,7 +211,7 @@ static bool xml_driver(struct rpminspect *ri, rpmfile_entry_t *file)
     params.arch = get_rpm_header_arch(file->rpm_header);
     params.file = file->localpath;
 
-    result = is_xml_well_formed(file->fullpath, &params.details);
+    result = is_xml_well_formed(file->fullpath, strlen(file->fullpath) - strlen(file->localpath), &params.details);
 
     if (result && params.details) {
         xasprintf(&params.msg, _("%s is a well-formed XML file in %s on %s, but is not a valid XML file"), file->localpath, pkg, params.arch);
