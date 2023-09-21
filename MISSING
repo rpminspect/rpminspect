@@ -58,7 +58,7 @@ TEST_METADATA (the 'fedora without red hat' string check)
     for any mention of 'Fedora' (case insensitive) without also
     mentioning 'Red Hat' (case insensitive) is a branding matter.  The
     check itself was not foolproof and did not take in to account word
-    boundaries of pathnames.  This kind of check is out of scope for
+    boundaries or pathnames.  This kind of check is out of scope for
     rpminspect as it provides no technical or security benefit.
 
 TEST_PATCHES (the file and line count thresholds as failures)

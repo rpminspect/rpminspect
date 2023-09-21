@@ -59,6 +59,8 @@ Contributors
 
 - Siddhesh Poyarekar <siddhesh@gotplt.org>
 
+- Stephen Gallagher <sgallagh@redhat.com>
+
 - Tim Flink <tflink@fedoraproject.org>
 
 - Tomas Hoger <thoger@redhat.com>
