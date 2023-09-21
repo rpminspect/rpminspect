@@ -99,7 +99,7 @@ const char *mime_type(struct rpminspect *ri, const char *file)
  * Otherwise it gets the MIME type, caches it, and returns the value.
  * The caller should not free the pointer returned.
  */
-const char *get_mime_type(struct rpminspect *ri, rpmfile_entry_t *file)
+const char *get_mime_type(struct rpminspect *ri, const rpmfile_entry_t *file)
 {
     assert(ri != NULL);
     assert(file != NULL);

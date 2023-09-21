@@ -299,7 +299,7 @@ int unpack_archive(const char *, const char *, const bool);
 
 /* magic.c */
 const char *mime_type(struct rpminspect *, const char *);
-const char *get_mime_type(struct rpminspect *, rpmfile_entry_t *);
+const char *get_mime_type(struct rpminspect *, const rpmfile_entry_t *);
 bool is_text_file(struct rpminspect *, rpmfile_entry_t *);
 
 /* checksums.c */
@@ -320,6 +320,10 @@ bool match_fileinfo_group(struct rpminspect *, const rpmfile_entry_t *, const ch
 #ifdef _WITH_LIBCAP
 caps_filelist_entry_t *get_caps_entry(struct rpminspect *, const char *, const char *);
 #endif
+
+/* permissions.c */
+bool check_ownership(struct rpminspect *, const rpmfile_entry_t *, const char *, bool *, bool);
+bool check_permissions(struct rpminspect *, const rpmfile_entry_t *, const char *, bool *, bool);
 
 /* flags.c */
 bool process_inspection_flag(const char *, const bool, uint64_t *);
