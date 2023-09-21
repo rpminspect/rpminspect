@@ -73,6 +73,10 @@ static bool capabilities_driver(struct rpminspect *ri, rpmfile_entry_t *file)
     params.arch = arch;
     params.file = file->localpath;
 
+    /* Check file mode and ownership*/
+    result &= check_permissions(ri, file, params.header, &reported, ri->tests & INSPECT_CAPABILITIES);
+    result &= check_ownership(ri, file, params.header, &reported, ri->tests & INSPECT_CAPABILITIES);
+
     /* Report if the caps are different */
     if (beforecap && aftercap) {
         if (cap_compare(beforecap, aftercap)) {
