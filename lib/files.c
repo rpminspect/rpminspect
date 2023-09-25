@@ -300,6 +300,7 @@ rpmfile_t *extract_rpm(struct rpminspect *ri, const char *pkg, Header hdr, const
         memset(&(file_entry->st), 0, sizeof(file_entry->st));
         file_entry->st.st_mode = get_rpm_header_num_array_value(file_entry, RPMTAG_FILEMODES);
         file_entry->st.st_size = archive_entry_size(entry);
+        file_entry->st.st_nlink = archive_entry_nlink(entry);
 
         TAILQ_INSERT_TAIL(file_list, file_entry, items);
 
@@ -344,7 +345,7 @@ rpmfile_t *extract_rpm(struct rpminspect *ri, const char *pkg, Header hdr, const
         archive_entry_set_perm(entry, archive_perm);
 
         /* If this is a hard link, update the hardlink destination path */
-        if (archive_entry_nlink(entry) > 1) {
+        if (file_entry->st.st_nlink > 1) {
             xasprintf(&hardlinkpath, "%s/%s", *output_dir, archive_entry_hardlink(entry));
             archive_entry_set_link(entry, hardlinkpath);
             free(hardlinkpath);
