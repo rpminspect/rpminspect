@@ -15,9 +15,6 @@ such "common" is such "workdir" is "/var/tmp/rpminspect",
                         "/etc/rpm/macros.*" and
                         "/etc/rpm/macros" and
                         "/etc/rpm/%{_target}/macros" many,
-     "ignore" is so "/usr/lib*/python?.?/site-packages/__pycache__" and
-                     "/usr/lib*/python?.?/site-packages/*/*.pyc" and
-                     "/usr/lib*/python?.?/site-packages/*/*.pyo" many,
      "security_path_prefix" is so "/etc/sudoers.d/" also
                                   "/etc/polkit-1/" also
                                   "/usr/share/polkit-1/actions/" many,

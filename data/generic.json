@@ -26,11 +26,6 @@
     "/etc/rpm/macros",
     "/etc/rpm/%{_target}/macros"
   ],
-  "ignore": [
-    "/usr/lib*/python?.?/site-packages/__pycache__",
-    "/usr/lib*/python?.?/site-packages/*/*.pyc",
-    "/usr/lib*/python?.?/site-packages/*/*.pyo"
-  ],
   "security_path_prefix": [
     "/etc/sudoers.d/",
     "/etc/polkit-1/",
