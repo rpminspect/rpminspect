@@ -8,6 +8,13 @@ import unittest
 from baseclass import TestRPMs, TestKoji
 from baseclass import TestCompareRPMs, TestCompareKoji
 
+from test_ownership import (
+    FileOwnerChangedCompareRPMs,
+    FileOwnerChangedCompareKoji,
+    FileGroupChangedCompareRPMs,
+    FileGroupChangedCompareKoji,
+)
+
 # Check that rpm is built with libcap
 have_caps_support = False
 lack_caps_msg = "rpm lacks %caps macro support"
@@ -908,3 +915,171 @@ class SecurityFAILUnexpectedCapabilitiesCompareKoji(TestCompareKoji):
         self.inspection = "capabilities"
         self.result = "BAD"
         self.waiver_auth = "Security"
+
+
+# File with capabilities is writable by others
+
+
+class SecurityFAILApprovedCapabilitiesIWOTHRPMs(TestRPMs):
+    @unittest.skipUnless(have_caps_support, lack_caps_msg)
+    def setUp(self):
+        super().setUp()
+
+        self.rpm.add_simple_compilation(installPath="usr/sbin/approved")
+        sub = self.rpm.get_subpackage(None)
+        sub.section_files = sub.section_files.replace(
+            "/usr/sbin/approved\n",
+            "%caps(cap_sys_nice=ep) %attr(0777,-,-) /usr/sbin/approved\n",
+        )
+
+        self.inspection = "capabilities"
+        self.result = "BAD"
+        self.waiver_auth = "Security"
+
+
+class SecurityFAILApprovedCapabilitiesIWOTHKoji(TestKoji):
+    @unittest.skipUnless(have_caps_support, lack_caps_msg)
+    def setUp(self):
+        super().setUp()
+
+        self.rpm.add_simple_compilation(installPath="usr/sbin/approved")
+        sub = self.rpm.get_subpackage(None)
+        sub.section_files = sub.section_files.replace(
+            "/usr/sbin/approved\n",
+            "%caps(cap_sys_nice=ep) %attr(0777,-,-) /usr/sbin/approved\n",
+        )
+
+        self.inspection = "capabilities"
+        self.result = "BAD"
+        self.waiver_auth = "Security"
+
+
+class SecurityFAILApprovedCapabilitiesIWOTHCompareRPMs(TestCompareRPMs):
+    @unittest.skipUnless(have_caps_support, lack_caps_msg)
+    def setUp(self):
+        super().setUp()
+
+        self.after_rpm.add_simple_compilation(installPath="usr/sbin/approved")
+        sub = self.after_rpm.get_subpackage(None)
+        sub.section_files = sub.section_files.replace(
+            "/usr/sbin/approved\n",
+            "%caps(cap_sys_nice=ep) %attr(0777,-,-) /usr/sbin/approved\n",
+        )
+
+        self.inspection = "capabilities"
+        self.result = "BAD"
+        self.waiver_auth = "Security"
+
+
+class SecurityFAILApprovedCapabilitiesIWOTHCompareKoji(TestCompareKoji):
+    @unittest.skipUnless(have_caps_support, lack_caps_msg)
+    def setUp(self):
+        super().setUp()
+
+        self.after_rpm.add_simple_compilation(installPath="usr/sbin/approved")
+        sub = self.after_rpm.get_subpackage(None)
+        sub.section_files = sub.section_files.replace(
+            "/usr/sbin/approved\n",
+            "%caps(cap_sys_nice=ep) %attr(0777,-,-) /usr/sbin/approved\n",
+        )
+
+        self.inspection = "capabilities"
+        self.result = "BAD"
+        self.waiver_auth = "Security"
+
+
+# File with capabilities has bad owner
+
+
+class ApprovedCapabilitiesBadOwnerRPMs(TestRPMs):
+    @unittest.skipUnless(have_caps_support, lack_caps_msg)
+    def setUp(self):
+        super().setUp()
+
+        self.rpm.add_simple_compilation(installPath="usr/sbin/approved")
+        sub = self.rpm.get_subpackage(None)
+        sub.section_files = sub.section_files.replace(
+            "/usr/sbin/approved\n",
+            "%caps(cap_sys_nice=ep) %attr(0700,mockbuild,mockbuild) /usr/sbin/approved\n",
+        )
+
+        self.inspection = "capabilities"
+        self.result = "BAD"
+
+
+class ApprovedCapabilitiesBadOwnerKoji(TestKoji):
+    @unittest.skipUnless(have_caps_support, lack_caps_msg)
+    def setUp(self):
+        super().setUp()
+
+        self.rpm.add_simple_compilation(installPath="usr/sbin/approved")
+        sub = self.rpm.get_subpackage(None)
+        sub.section_files = sub.section_files.replace(
+            "/usr/sbin/approved\n",
+            "%caps(cap_sys_nice=ep) %attr(0700,mockbuild,mockbuild) /usr/sbin/approved\n",
+        )
+
+        self.inspection = "capabilities"
+        self.result = "BAD"
+
+
+class ApprovedCapabilitiesBadOwnerCompareRPMs(TestCompareRPMs):
+    @unittest.skipUnless(have_caps_support, lack_caps_msg)
+    def setUp(self):
+        super().setUp()
+
+        self.after_rpm.add_simple_compilation(installPath="usr/sbin/approved")
+        sub = self.after_rpm.get_subpackage(None)
+        sub.section_files = sub.section_files.replace(
+            "/usr/sbin/approved\n",
+            "%caps(cap_sys_nice=ep) %attr(0700,mockbuild,mockbuild) /usr/sbin/approved\n",
+        )
+
+        self.inspection = "capabilities"
+        self.result = "BAD"
+
+
+class ApprovedCapabilitiesBadOwnerCompareKoji(TestCompareKoji):
+    @unittest.skipUnless(have_caps_support, lack_caps_msg)
+    def setUp(self):
+        super().setUp()
+
+        self.after_rpm.add_simple_compilation(installPath="usr/sbin/approved")
+        sub = self.after_rpm.get_subpackage(None)
+        sub.section_files = sub.section_files.replace(
+            "/usr/sbin/approved\n",
+            "%caps(cap_sys_nice=ep) %attr(0700,mockbuild,mockbuild) /usr/sbin/approved\n",
+        )
+
+        self.inspection = "capabilities"
+        self.result = "BAD"
+
+
+# Owner changed
+
+
+class CapabilitiesFileOwnerChangedCompareRPMs(FileOwnerChangedCompareRPMs):
+    def setUp(self):
+        super().setUp()
+        self.inspection = "capabilities"
+
+
+class CapabilitiesFileOwnerChangedCompareKoji(FileOwnerChangedCompareKoji):
+    def setUp(self):
+        super().setUp()
+        self.inspection = "capabilities"
+
+
+# Group changed
+
+
+class CapabilitiesFileGroupChangedCompareRPMs(FileGroupChangedCompareRPMs):
+    def setUp(self):
+        super().setUp()
+        self.inspection = "capabilities"
+
+
+class CapabilitiesFileGroupChangedCompareKoji(FileGroupChangedCompareKoji):
+    def setUp(self):
+        super().setUp()
+        self.inspection = "capabilities"
