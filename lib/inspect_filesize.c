@@ -8,6 +8,7 @@
 #include <string.h>
 #include <limits.h>
 #include <errno.h>
+#include <err.h>
 #include <assert.h>
 
 #include "rpminspect.h"
@@ -19,6 +20,8 @@ static bool filesize_driver(struct rpminspect *ri, rpmfile_entry_t *file)
     bool result = true;
     const char *arch = NULL;
     off_t change;
+    struct stat sb;
+    int r = 0;
     struct result_params params;
 
     assert(ri != NULL);
@@ -42,6 +45,37 @@ static bool filesize_driver(struct rpminspect *ri, rpmfile_entry_t *file)
     /* Only run this check on regular files */
     if (!S_ISREG(file->st.st_mode) && !S_ISREG(file->peer_file->st.st_mode)) {
         return true;
+    }
+
+    /*
+     * If the link count for the file is greater than 1, the file is a
+     * hard link.  If the size is 0, then try to read it again with
+     * stat(2) because during extraction from the RPM payload the size
+     * of a hard link is zero.  Give this one try because it is
+     * possible the file may still be size 0.  Save the size read with
+     * stat(2) in to the rpmfile_entry_t so it can be used by other
+     * inspections.
+     */
+    if ((file->st.st_nlink > 1) && (file->st.st_size == 0)) {
+        errno = 0;
+        r = stat(file->fullpath, &sb);
+
+        if (r == -1) {
+            warn("stat");
+        }
+
+        file->st.st_size = sb.st_size;
+    }
+
+    if ((file->peer_file->st.st_nlink > 1) && (file->peer_file->st.st_size == 0)) {
+        errno = 0;
+        r = stat(file->peer_file->fullpath, &sb);
+
+        if (r == -1) {
+            warn("stat");
+        }
+
+        file->peer_file->st.st_size = sb.st_size;
     }
 
     /* Nothing to do if the sizes are the same */
