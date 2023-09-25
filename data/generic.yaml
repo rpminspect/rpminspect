@@ -218,9 +218,7 @@ ignore:
     #
     # You can also add an entry that ends with a slash '/' and
     # rpminspect will treat it as a path prefix.
-    - /usr/lib*/python?.?/site-packages/__pycache__
-    - /usr/lib*/python?.?/site-packages/*/*.pyc
-    - /usr/lib*/python?.?/site-packages/*/*.pyo
+    #- /path/to/ignore
 
 security_path_prefix:
     # Optional: Path prefixes for files with security concerns.  This
