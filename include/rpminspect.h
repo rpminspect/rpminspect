@@ -63,11 +63,11 @@ extern volatile sig_atomic_t terminal_resized;
 #include <libintl.h>
 #include <locale.h>
 
-#define _(STRING) gettext(STRING)
-#define N_(STRING) ngettext(STRING)
+#define _(MSGID) gettext((MSGID))
+#define N_(MSGID, MSGID_PLURAL, N) ngettext((MSGID), (MSGID_PLURAL), (N))
 #else
-#define _(STRING) STRING
-#define N_(STRING) STRING
+#define _(MSGID) (MSGID)
+#define N_(MSGID, MSGID_PLURAL, N) (MSGID)
 #endif
 
 /*
