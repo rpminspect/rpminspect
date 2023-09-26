@@ -552,11 +552,11 @@ static bool patches_driver(struct rpminspect *ri, rpmfile_entry_t *file)
     params.file = file->localpath;
 
     if (ps.files == 0 && ps.lines > 0) {
-        xasprintf(&params.msg, _("%s touches as many as %ld line%s"), file->localpath, ps.lines, (ps.lines > 1) ? "s" : "");
+        xasprintf(&params.msg, N_("%s touches %ld line", "%s touches as many as %ld lines", ps.lines), file->localpath, ps.lines);
     } else if (ps.files > 0 && ps.lines == 0) {
-        xasprintf(&params.msg, _("%s touches %ld file%s"), file->localpath, ps.files, (ps.files > 1) ? "s" : "");
+        xasprintf(&params.msg, N_("%s touches %ld file", "%s touches %ld files", ps.files), file->localpath, ps.files);
     } else {
-        xasprintf(&params.msg, _("%s touches %ld file%s and %s%ld line%s"), file->localpath, ps.files, (ps.files > 1) ? "s" : "", (ps.lines > 1) ? _("as many as ") : "", ps.lines, (ps.lines > 1) ? "s" : "");
+        xasprintf(&params.msg, _("%s touches %ld files and as many as %ld lines"), file->localpath, ps.files, ps.lines);
     }
 
     add_result(ri, &params);
