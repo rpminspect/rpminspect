@@ -1,0 +1,66 @@
+#!/bin/sh
+#
+# Prevent pushing any fixup or squash commits.  Shamelessly repurposed
+# from the Tor project's script:
+# https://github.com/torproject/tor/blob/master/scripts/git/pre-push.git-hook
+#
+# Also run 'make flake8 black' to check Python code
+#
+
+PATH=/bin:/usr/bin
+
+echo "Running pre-push hook"
+
+# Check for any !fixup commits
+z40=0000000000000000000000000000000000000000
+
+# The working directory
+workdir=$(git rev-parse --show-toplevel)
+
+# The .git directory
+gitdir=$(git rev-parse --git-dir)
+
+cd "${workdir}" || exit 1
+
+remote="$1"
+remote_name=$(git remote --verbose | grep "$2" | awk '{print $1}' | head -n 1)
+
+while read -r local_ref local_sha remote_ref remote_sha ; do
+    if [ "${local_sha}" = "${z40}" ]; then
+        # Handle delete
+        continue
+    else
+        if [ "${remote_sha}" = "${z40}" ]; then
+            # New branch, examine commits not in main
+            range="main...${local_sha}"
+        else
+            # Update to existing branch, examine new commits
+            range="${remote_sha}..${local_sha}"
+        fi
+
+        # Check for fixup! commits
+        commit=$(git rev-list -n 1 --grep '^fixup!' "${range}")
+        if [ -n "${commit}" ]; then
+            echo >&2 "Found fixup! commit in ${local_ref}, not pushing"
+            echo >&2 "If you really want to push this, use --no-verify."
+            exit 1
+        fi
+
+        # Check for squash! commits
+        commit=$(git rev-list -n 1 --grep '^squash!' "${range}")
+        if [ -n "$commit" ]; then
+            echo >&2 "Found squash! commit in ${local_ref}, not pushing"
+            echo >&2 "If you really want to push this, use --no-verify."
+            exit 1
+        fi
+    fi
+done
+
+# Validate Python code
+make flake8 || exit 1
+make black || exit 1
+
+# Validate shell scripts
+make shellcheck || exit 1
+
+exit 0
