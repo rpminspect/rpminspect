@@ -67,7 +67,7 @@ extern volatile sig_atomic_t terminal_resized;
 #define N_(MSGID, MSGID_PLURAL, N) ngettext((MSGID), (MSGID_PLURAL), (N))
 #else
 #define _(MSGID) (MSGID)
-#define N_(MSGID, MSGID_PLURAL, N) (MSGID)
+#define N_(MSGID, MSGID_PLURAL, N) ((MSGID_PLURAL))
 #endif
 
 /*
