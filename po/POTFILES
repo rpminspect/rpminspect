@@ -94,12 +94,14 @@ lib/output_json.c
 lib/output_summary.c
 lib/output_text.c
 lib/output_xunit.c
+lib/ownership.c
 lib/pairfuncs.c
 lib/parse_dson.c
 lib/parse_json.c
 lib/parse_yaml.c
 lib/paths.c
 lib/peers.c
+lib/permissions.c
 lib/readelf.c
 lib/readfile.c
 lib/rebase.c
