@@ -17,7 +17,6 @@ static bool specname_driver(struct rpminspect *ri, rpmfile_entry_t *file)
 {
     char *specfile = NULL;
     char *dot = NULL;
-    char *desc = NULL;
     char *primary = NULL;
     struct result_params params;
 
@@ -68,14 +67,13 @@ static bool specname_driver(struct rpminspect *ri, rpmfile_entry_t *file)
         params.noun = _("unexpected spec filename");
 
         if (ri->specmatch == MATCH_FULL) {
-            desc = _("exactly match");
+            xasprintf(&params.msg, _("Spec filename does not exactly match the primary name %s; got '%s'"), primary, file->localpath);
         } else if (ri->specmatch == MATCH_PREFIX) {
-            desc = _("begin with");
+            xasprintf(&params.msg, _("Spec filename does not begin with the primary name %s; got '%s'"), primary, file->localpath);
         } else if (ri->specmatch == MATCH_SUFFIX) {
-            desc = _("end with");
+            xasprintf(&params.msg, _("Spec filename does not end with the primary name %s; got '%s'"), primary, file->localpath);
         }
 
-        xasprintf(&params.msg, _("Spec filename does not %s the primary name %s; got '%s'"), desc, primary, file->localpath);
         add_result(ri, &params);
         free(params.msg);
     }
