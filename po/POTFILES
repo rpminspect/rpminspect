@@ -1,6 +1,7 @@
 include/callbacks.h
 include/compat/queue.h
 include/constants.h
+include/init.h
 include/inspect.h
 include/output.h
 include/parser.h
@@ -74,6 +75,7 @@ lib/inspect_specname.c
 lib/inspect_subpackages.c
 lib/inspect_symlinks.c
 lib/inspect_types.c
+lib/inspect_udevrules.c
 lib/inspect_unicode.c
 lib/inspect_upstream.c
 lib/inspect_virus.c
