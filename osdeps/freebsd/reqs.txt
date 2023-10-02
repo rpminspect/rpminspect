@@ -37,6 +37,7 @@ pkgconf
 popt
 python3
 rc
+rpm4
 rust
 sqlite
 valgrind

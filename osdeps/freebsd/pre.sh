@@ -5,4 +5,4 @@ PATH=/usr/bin:/usr/sbin
 echo "DEFAULT_VERSIONS+=ssl=openssl" >> /etc/make.conf
 
 # Bootstrap the pkg command
-pkg bootstrap -y
+env IGNORE_OSVERSION=yes pkg bootstrap -y
