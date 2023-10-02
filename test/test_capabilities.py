@@ -1059,12 +1059,14 @@ class ApprovedCapabilitiesBadOwnerCompareKoji(TestCompareKoji):
 
 
 class CapabilitiesFileOwnerChangedCompareRPMs(FileOwnerChangedCompareRPMs):
+    @unittest.skipUnless(have_caps_support, lack_caps_msg)
     def setUp(self):
         super().setUp()
         self.inspection = "capabilities"
 
 
 class CapabilitiesFileOwnerChangedCompareKoji(FileOwnerChangedCompareKoji):
+    @unittest.skipUnless(have_caps_support, lack_caps_msg)
     def setUp(self):
         super().setUp()
         self.inspection = "capabilities"
@@ -1074,12 +1076,14 @@ class CapabilitiesFileOwnerChangedCompareKoji(FileOwnerChangedCompareKoji):
 
 
 class CapabilitiesFileGroupChangedCompareRPMs(FileGroupChangedCompareRPMs):
+    @unittest.skipUnless(have_caps_support, lack_caps_msg)
     def setUp(self):
         super().setUp()
         self.inspection = "capabilities"
 
 
 class CapabilitiesFileGroupChangedCompareKoji(FileGroupChangedCompareKoji):
+    @unittest.skipUnless(have_caps_support, lack_caps_msg)
     def setUp(self):
         super().setUp()
         self.inspection = "capabilities"
