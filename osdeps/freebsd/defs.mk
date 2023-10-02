@@ -1,1 +1,1 @@
-PKG_CMD = pkg install -q -y
+PKG_CMD = env IGNORE_OSVERSION=yes pkg install -q -y

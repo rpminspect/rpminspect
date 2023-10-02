@@ -7,12 +7,6 @@ rm -rf /usr/ports || :
 git clone https://git.freebsd.org/ports.git /usr/ports
 echo "DEFAULT_VERSIONS+=ssl=openssl" >> /etc/make.conf
 
-# Build rpm4 from ports since the binary package lacks 'elfdeps'
-cd /usr/ports/archivers/rpm4 || exit 1
-printf "Installing /usr/ports/archivers/rpm4 (logging to /root/rpm4.log)..."
-make BATCH=yes install >/root/rpm4.log 2>&1
-printf "done.\n"
-
 # https://github.com/rpm-software-management/rpm/pull/2459
 RPMTAG_HDR="/usr/local/include/rpm/rpmtag.h"
 grep RPM_MASK_RETURN_TYPE ${RPMTAG_HDR} 2>/dev/null | grep -q 0xffff0000 >/dev/null 2>&1
