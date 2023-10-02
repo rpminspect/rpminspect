@@ -274,7 +274,11 @@ static bool symlinks_driver(struct rpminspect *ri, rpmfile_entry_t *file)
 
     /* not found?  report */
     if (!found) {
-        xasprintf(&params.msg, _("%s %s %s a dangling symbolic link in %s on %s"), strtype(file->st.st_mode), file->localpath, (file->peer_file) ? "became" : "is", name, arch);
+        if (file->peer_file) {
+            xasprintf(&params.msg, _("%s %s became a dangling symbolic link in %s on %s"), strtype(file->st.st_mode), file->localpath, name, arch);
+        } else {
+            xasprintf(&params.msg, _("%s %s is a dangling symbolic link in %s on %s"), strtype(file->st.st_mode), file->localpath, name, arch);
+        }
 
         if (linkerr == ELOOP || linkerr == ENAMETOOLONG) {
             params.severity = RESULT_BAD;
