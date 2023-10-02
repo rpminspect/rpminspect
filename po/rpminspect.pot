@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: rpminspect\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-10-02 10:24-0400\n"
+"POT-Creation-Date: 2023-10-02 11:11-0400\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -1582,46 +1582,46 @@ msgstr ""
 msgid "forbidden functions in ${FILE} on ${ARCH}"
 msgstr ""
 
-#: lib/inspect_capabilities.c:82
+#: lib/inspect_capabilities.c:86
 #, c-format
 msgid "File capabilities for %s changed from '%s' to '%s' in %s on %s\n"
 msgstr ""
 
-#: lib/inspect_capabilities.c:86
+#: lib/inspect_capabilities.c:90
 msgid "${FILE} capabilities on ${ARCH}"
 msgstr ""
 
-#: lib/inspect_capabilities.c:98
+#: lib/inspect_capabilities.c:102
 #, c-format
 msgid "File capabilities found for %s: '%s' in %s on %s\n"
 msgstr ""
 
-#: lib/inspect_capabilities.c:134
+#: lib/inspect_capabilities.c:138
 #, c-format
 msgid ""
 "File capabilities list entry found for %s: '%s' in %s on %s, matches "
 "package\n"
 msgstr ""
 
-#: lib/inspect_capabilities.c:145
+#: lib/inspect_capabilities.c:149
 #, c-format
 msgid ""
 "File capabilities list mismatch for %s: expected '%s', got '%s' in %s on %s\n"
 msgstr ""
 
-#: lib/inspect_capabilities.c:149 lib/inspect_capabilities.c:169
-#: lib/inspect_capabilities.c:188
+#: lib/inspect_capabilities.c:153 lib/inspect_capabilities.c:173
+#: lib/inspect_capabilities.c:192
 msgid "${FILE} capabilities list on ${ARCH}"
 msgstr ""
 
-#: lib/inspect_capabilities.c:165
+#: lib/inspect_capabilities.c:169
 #, c-format
 msgid ""
 "File capabilities for %s (%s) not found on the capabilities list in %s on "
 "%s\n"
 msgstr ""
 
-#: lib/inspect_capabilities.c:184
+#: lib/inspect_capabilities.c:188
 #, c-format
 msgid ""
 "File capabilities expected for %s in %s but not found on %s: expected '%s'\n"
@@ -2540,72 +2540,6 @@ msgstr ""
 msgid "%s probably moved to %s on %s\n"
 msgstr ""
 
-#: lib/inspect_ownership.c:77
-#, c-format
-msgid "File %s has forbidden owner `%s` on %s"
-msgstr ""
-
-#: lib/inspect_ownership.c:82
-msgid "forbidden owner for ${FILE} on ${ARCH}"
-msgstr ""
-
-#: lib/inspect_ownership.c:92
-#, c-format
-msgid "File %s has forbidden group `%s` on %s"
-msgstr ""
-
-#: lib/inspect_ownership.c:97
-msgid "forbidden group for ${FILE} on ${ARCH}"
-msgstr ""
-
-#: lib/inspect_ownership.c:119
-#, c-format
-msgid "File %s has owner `%s` on %s, but should be `%s`"
-msgstr ""
-
-#: lib/inspect_ownership.c:124
-msgid "invalid owner for ${FILE} on ${ARCH}"
-msgstr ""
-
-#: lib/inspect_ownership.c:162
-#, c-format
-msgid ""
-"File %s on %s has CAP_SETUID capability but group `%s` and is world "
-"executable"
-msgstr ""
-
-#: lib/inspect_ownership.c:166
-msgid "CAP_SETUID and o+x for ${FILE} on ${ARCH}"
-msgstr ""
-
-#: lib/inspect_ownership.c:179
-#, c-format
-msgid ""
-"File %s on %s has CAP_SETUID capability but group `%s` and is group writable"
-msgstr ""
-
-#: lib/inspect_ownership.c:183
-msgid "CAP_SETUID and g+w for ${FILE} on ${ARCH}"
-msgstr ""
-
-#: lib/inspect_ownership.c:199
-#, c-format
-msgid "File %s has group `%s` on %s, but should be `%s`"
-msgstr ""
-
-#: lib/inspect_ownership.c:204
-msgid "invalid group for ${FILE} on ${ARCH}"
-msgstr ""
-
-#: lib/inspect_ownership.c:268
-#, c-format
-msgid "File %s changed %s from `%s` to `%s` on %s"
-msgstr ""
-
-#: lib/inspect_ownership.c:270
-msgid "${FILE} changed owner on ${ARCH}"
-msgstr ""
-
 #: lib/inspect_patches.c:395
 #, c-format
 msgid ""
@@ -2706,69 +2640,6 @@ msgstr ""
 #: lib/inspect_pathmigration.c:82
 #, c-format
 msgid "${FILE} should be in %s on ${ARCH}"
-msgstr ""
-
-#: lib/inspect_permissions.c:84
-msgid " changed setuid/setgid;"
-msgstr ""
-
-#: lib/inspect_permissions.c:89
-msgid " became a directory;"
-msgstr ""
-
-#: lib/inspect_permissions.c:91
-msgid " became a character device;"
-msgstr ""
-
-#: lib/inspect_permissions.c:93
-msgid " became a block device;"
-msgstr ""
-
-#: lib/inspect_permissions.c:95
-msgid " became a regular file;"
-msgstr ""
-
-#: lib/inspect_permissions.c:97
-msgid " became a FIFO;"
-msgstr ""
-
-#: lib/inspect_permissions.c:99
-msgid " became a symbolic link;"
-msgstr ""
-
-#: lib/inspect_permissions.c:101
-msgid " became a socket;"
-msgstr ""
-
-#: lib/inspect_permissions.c:105
-msgid " permissions"
-msgstr ""
-
-#: lib/inspect_permissions.c:111
-msgid " relaxed"
-msgstr ""
-
-#: lib/inspect_permissions.c:114
-msgid " changed"
-msgstr ""
-
-#: lib/inspect_permissions.c:129
-#, c-format
-msgid "%s from %04o to %04o on %s"
-msgstr ""
-
-#: lib/inspect_permissions.c:135
-#, c-format
-msgid "${FILE} permissions from %04o to %04o on ${ARCH}"
-msgstr ""
-
-#: lib/inspect_permissions.c:149
-#, c-format
-msgid "%s (%s) is world-writable on %s"
-msgstr ""
-
-#: lib/inspect_permissions.c:152
-msgid "${FILE} is world-writable on ${ARCH}"
 msgstr ""
 
 #: lib/inspect_politics.c:47 lib/inspect_politics.c:67
@@ -3353,6 +3224,72 @@ msgstr ""
 msgid "*** opening %s for writing"
 msgstr ""
 
+#: lib/ownership.c:77
+#, c-format
+msgid "File %s has forbidden owner `%s` on %s"
+msgstr ""
+
+#: lib/ownership.c:82
+msgid "forbidden owner for ${FILE} on ${ARCH}"
+msgstr ""
+
+#: lib/ownership.c:95
+#, c-format
+msgid "File %s has forbidden group `%s` on %s"
+msgstr ""
+
+#: lib/ownership.c:100
+msgid "forbidden group for ${FILE} on ${ARCH}"
+msgstr ""
+
+#: lib/ownership.c:122
+#, c-format
+msgid "File %s has owner `%s` on %s, but should be `%s`"
+msgstr ""
+
+#: lib/ownership.c:127
+msgid "invalid owner for ${FILE} on ${ARCH}"
+msgstr ""
+
+#: lib/ownership.c:166
+#, c-format
+msgid ""
+"File %s on %s has CAP_SETUID capability but group `%s` and is world "
+"executable"
+msgstr ""
+
+#: lib/ownership.c:170
+msgid "CAP_SETUID and o+x for ${FILE} on ${ARCH}"
+msgstr ""
+
+#: lib/ownership.c:183
+#, c-format
+msgid ""
+"File %s on %s has CAP_SETUID capability but group `%s` and is group writable"
+msgstr ""
+
+#: lib/ownership.c:187
+msgid "CAP_SETUID and g+w for ${FILE} on ${ARCH}"
+msgstr ""
+
+#: lib/ownership.c:203
+#, c-format
+msgid "File %s has group `%s` on %s, but should be `%s`"
+msgstr ""
+
+#: lib/ownership.c:208
+msgid "invalid group for ${FILE} on ${ARCH}"
+msgstr ""
+
+#: lib/ownership.c:273
+#, c-format
+msgid "File %s changed %s from `%s` to `%s` on %s"
+msgstr ""
+
+#: lib/ownership.c:275
+msgid "${FILE} changed owner on ${ARCH}"
+msgstr ""
+
 #: lib/parse_yaml.c:114 lib/parse_yaml.c:139
 #, c-format
 msgid "*** %s: broken document"
@@ -3370,6 +3307,69 @@ msgstr ""
 #: lib/peers.c:176
 #, c-format
 msgid "There is not enough available space to unpack all of the RPMs.\n"
+msgstr ""
+
+#: lib/permissions.c:90
+msgid " changed setuid/setgid;"
+msgstr ""
+
+#: lib/permissions.c:95
+msgid " became a directory;"
+msgstr ""
+
+#: lib/permissions.c:97
+msgid " became a character device;"
+msgstr ""
+
+#: lib/permissions.c:99
+msgid " became a block device;"
+msgstr ""
+
+#: lib/permissions.c:101
+msgid " became a regular file;"
+msgstr ""
+
+#: lib/permissions.c:103
+msgid " became a FIFO;"
+msgstr ""
+
+#: lib/permissions.c:105
+msgid " became a symbolic link;"
+msgstr ""
+
+#: lib/permissions.c:107
+msgid " became a socket;"
+msgstr ""
+
+#: lib/permissions.c:111
+msgid " permissions"
+msgstr ""
+
+#: lib/permissions.c:117
+msgid " relaxed"
+msgstr ""
+
+#: lib/permissions.c:120
+msgid " changed"
+msgstr ""
+
+#: lib/permissions.c:135
+#, c-format
+msgid "%s from %04o to %04o on %s"
+msgstr ""
+
+#: lib/permissions.c:141
+#, c-format
+msgid "${FILE} permissions from %04o to %04o on ${ARCH}"
+msgstr ""
+
+#: lib/permissions.c:155
+#, c-format
+msgid "%s (%s) is world-writable on %s"
+msgstr ""
+
+#: lib/permissions.c:158
+msgid "${FILE} is world-writable on ${ARCH}"
 msgstr ""
 
 #: lib/readelf.c:48
