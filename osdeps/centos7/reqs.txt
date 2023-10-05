@@ -28,6 +28,7 @@ libffi-devel
 libicu-devel
 libtool
 libxml2-devel
+libxslt-devel
 libyaml-devel
 make
 meson
