@@ -63,7 +63,7 @@ sed -e "s|profiledir:.*$|profiledir: ${PROFILES}|g" < "${CONF}" > "${TMPCONF}"
 sed -i -e "s|vendor_data_dir:.*$|vendor_data_dir: $(dirname "${CONF}")|g" "${TMPCONF}"
 
 run_rpminspect() {
-    ${RPMINSPECT} -c "${TMPCONF}" -a x86_64,noarch,src -v "$@";
+    ${RPMINSPECT} -c "${TMPCONF}" -a "$(uname -m)",noarch,src -v "$@";
 }
 
 # Run comparison against the latest packages, or fail
