@@ -29,6 +29,7 @@ rpm -Uvh "${SRPM}" 2>/dev/null
 rm -f "${SRPM}"
 cd ~/rpmbuild/SPECS || exit 1
 sed -i -e 's|^Name:.*$|Name: python3-rpm-rebuild|g' python3-rpm.spec
+sed -i -e "/%py3_build/a sed -i -e 's|distutils\.core|setuptools|g' setup.py" python3-rpm.spec
 # shellcheck disable=SC2046
 yum install -y $(rpmspec -q --buildrequires python3-rpm.spec)
 rpmbuild -ba \
