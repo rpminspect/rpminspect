@@ -59,6 +59,7 @@ jobs:
                           dnf install -y epel-release git
                           ;;
                       *centos7)
+                          yum upgrade -y
                           yum install -y epel-release git
                           ;;
                   esac
