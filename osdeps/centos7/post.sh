@@ -1,5 +1,5 @@
 #!/bin/sh
-PATH=/bin:/usr/bin:/usr/local/bin:/sbin:/usr/sbin:/usr/local/sbin
+PATH=/usr/local/bin:/usr/bin:/bin:/usr/local/sbin:/usr/sbin:/sbin
 CWD="$(pwd)"
 
 # Install 32-bit development files on x86_64 systems
@@ -18,6 +18,7 @@ sed -i -e 's/PKG_CONFIG openssl /PKG_CONFIG openssl11 /g' configure
 make -j "$(nproc)"
 make altinstall
 PYTHON_VER="$(./python -c 'import sys ; print("%d.%d" % (sys.version_info[0], sys.version_info[1]))')"
+unzip -d /usr/local/lib/python${PYTHON_VER}/site-packages /usr/local/lib/python${PYTHON_VER}/test/setuptools*whl
 
 # Now rebuild rpm because we need the Python bindings to use the newer
 # Python.
@@ -29,7 +30,8 @@ rpm -Uvh "${SRPM}" 2>/dev/null
 rm -f "${SRPM}"
 cd ~/rpmbuild/SPECS || exit 1
 sed -i -e 's|^Name:.*$|Name: python3-rpm-rebuild|g' python3-rpm.spec
-sed -i -e "/%py3_build/a sed -i -e 's|distutils\.core|setuptools|g' setup.py" python3-rpm.spec
+# You need to escape '\' like this to get a single on in the target file
+sed -i -e "/%py3_build/i sed -i -e 's|distutils\\\.core|setuptools|g' setup.py" python3-rpm.spec
 # shellcheck disable=SC2046
 yum install -y $(rpmspec -q --buildrequires python3-rpm.spec)
 rpmbuild -ba \
