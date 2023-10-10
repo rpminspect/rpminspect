@@ -42,15 +42,13 @@ rm -rf mandoc.tar.gz "${SUBDIR}"
 # expects, so just build it manually.
 git clone -q https://github.com/rakitzis/rc.git
 cd rc || exit 1
-autoreconf -f -i -v
-./configure --prefix=/usr/local
 make
 make install
 cd "${CWD}" || exit 1
 rm -rf rc
 
 # cdson is not [yet] in Gentoo Linux
-git clone https://github.com/frozencemetery/cdson.git
+git clone -q https://github.com/frozencemetery/cdson.git
 cd cdson || exit 1
 TAG="$(git tag -l | sort -n | tail -n 1)"
 git checkout -b "${TAG}" "${TAG}"

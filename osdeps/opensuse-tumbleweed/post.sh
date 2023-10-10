@@ -34,8 +34,6 @@ tar -xf mandoc.tar.gz
 
 # unusual workarounds for executable on OpenSUSE Tumbleweed
 sed -i -e 's|@echo|@/bin/echo|g' "${SUBDIR}"/configure
-sed -i -e 's|^int dummy;$|extern int dummy;|g' "${SUBDIR}"/compat_getline.c
-sed -i -e 's|^int dummy;$|extern int dummy;|g' "${SUBDIR}"/compat_err.c
 
 ( cd "${SUBDIR}" && ./configure && make && make lib-install )
 rm -rf mandoc.tar.gz "${SUBDIR}"
@@ -43,8 +41,6 @@ rm -rf mandoc.tar.gz "${SUBDIR}"
 # The 'rc' shell is not available in OpenSUSE Tumbleweed, build manually
 git clone -q https://github.com/rakitzis/rc.git
 cd rc || exit 1
-autoreconf -f -i -v
-./configure --prefix=/usr/local
 make
 make install
 cd "${CWD}" || exit 1

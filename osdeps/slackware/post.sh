@@ -81,8 +81,6 @@ tar -xf mandoc.tar.gz
 # The 'rc' shell is not available in Slackware Linux, build manually
 git clone -q https://github.com/rakitzis/rc.git
 cd rc || exit 1
-autoreconf -f -i -v
-./configure --prefix=/usr
 make
 make install
 cd "${CWD}" || exit 1
@@ -108,7 +106,7 @@ make install
 cd "${CWD}" || exit 1
 
 # cdson is not [yet] in Slackware Linux
-git clone https://github.com/frozencemetery/cdson.git
+git clone -q https://github.com/frozencemetery/cdson.git
 cd cdson || exit 1
 TAG="$(git tag -l | sort -n | tail -n 1)"
 git checkout -b "${TAG}" "${TAG}"
