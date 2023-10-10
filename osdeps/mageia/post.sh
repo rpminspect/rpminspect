@@ -33,9 +33,6 @@ tar -xf mandoc.tar.gz
 
 # something on Mageia causes the configure script grief, hack around it
 sed -i -e 's|^CC=.*$|CC=gcc|g' "${SUBDIR}"/configure
-sed -i -e 's|^int dummy;$|extern int dummy;|g' "${SUBDIR}"/compat_err.c
-sed -i -e 's|^int dummy;$|extern int dummy;|g' "${SUBDIR}"/compat_getline.c
-sed -i -e 's|^int dummy;$|extern int dummy;|g' "${SUBDIR}"/compat_reallocarray.c
 
 ( cd "${SUBDIR}" && ./configure && make && make lib-install )
 rm -rf mandoc.tar.gz "${SUBDIR}"
@@ -43,8 +40,6 @@ rm -rf mandoc.tar.gz "${SUBDIR}"
 # The 'rc' shell is not available in Mageia Linux, build manually
 git clone -q https://github.com/rakitzis/rc.git
 cd rc || exit 1
-autoreconf -f -i -v
-./configure --prefix=/usr/local
 make
 make install
 
@@ -61,7 +56,7 @@ make install
 
 # cdson is not [yet] in Mageia
 cd "${CWD}" || exit 1
-git clone https://github.com/frozencemetery/cdson.git
+git clone -q https://github.com/frozencemetery/cdson.git
 cd cdson || exit 1
 TAG="$(git tag -l | sort -n | tail -n 1)"
 git checkout -b "${TAG}" "${TAG}"
