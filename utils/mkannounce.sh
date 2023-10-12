@@ -43,8 +43,8 @@ done
 
 # now create a draft announcement grouped by category
 for category in "${TMPDIR}"/* ; do
-    if [ -f "${CWD}"/doc/git.md ]; then
-        desc="$(grep "\[$(basename "${category}")\]" "${CWD}"/doc/git.md | cut -d '|' -f 3 | awk '{$1=$1};1')"
+    if [ -f "${CWD}"/CONTRIBUTING.md ]; then
+        desc="$(grep "\[$(basename "${category}")\]" "${CWD}"/CONTRIBUTING.md | cut -d '|' -f 3 | awk '{$1=$1};1')"
     fi
 
     if [ -z "${desc}" ]; then
