@@ -1,3 +1,11 @@
+Changes in rpminspect-1.12.1
+----------------------------
+
+General release and build process changes:
+* Be sure to use 'sort -V' on git tags in .copr/Makefile
+* Use 'sort -V' when determining tags in mkannounce.sh
+
+
 Changes in rpminspect-1.12
 --------------------------
 
