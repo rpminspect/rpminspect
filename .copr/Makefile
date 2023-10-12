@@ -49,7 +49,7 @@ GITHASH          = $(shell git rev-parse --short HEAD)
 TARBALL_BASENAME = $(PKG)-$(VER)-$(GITDATE)git$(GITHASH)
 TAG              = HEAD
 else
-TAG              = $(shell git tag -l | tail -n 1)
+TAG              = $(shell git tag -l | sort -V | tail -n 1)
 endif
 
 ifeq ($(BUILDTYPE),release)
