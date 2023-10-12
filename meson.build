@@ -1,6 +1,6 @@
 project('rpminspect',
         'c',
-        version : '1.12',
+        version : '1.12.1',
         default_options : [
             'warning_level=3',
             'werror=true',
