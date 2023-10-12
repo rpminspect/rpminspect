@@ -16,10 +16,10 @@ trap 'rm -rf "${TMPDIR}"' EXIT
 
 # need the correct tags
 if [ "$1" = "--stable" ]; then
-    PREV_TAG="$(git tag -l | tail -n 2 | head -n 1)"
-    LATEST_TAG="$(git tag -l | tail -n 1)"
+    PREV_TAG="$(git tag -l | sort -V | tail -n 2 | head -n 1)"
+    LATEST_TAG="$(git tag -l | sort -V | tail -n 1)"
 else
-    PREV_TAG="$(git tag -l | tail -n 1)"
+    PREV_TAG="$(git tag -l | sort -V | tail -n 1)"
     LATEST_TAG="HEAD"
 fi
 
