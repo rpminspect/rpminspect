@@ -24,6 +24,8 @@ void output_summary(const results_t *results, const char *dest, __attribute__((u
     char *tmp = NULL;
     size_t width = tty_width();
 
+    fprintf(stderr, "*** DEPRECATION WARNING: the '-F summary' or '--format=summary' output mode is deprecated and will be removed in a future release.\n");
+
     /* output the results */
     TAILQ_FOREACH(result, results, items) {
         /* skip conditions */
