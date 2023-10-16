@@ -27,6 +27,9 @@ if build_machine.system() == 'netbsd'
     add_global_arguments('-Wno-pedantic', language : 'c')
 endif
 
+# Vendor data directory
+add_global_arguments('-DVENDOR_DATA_DIR="@0@"'.format(get_option('vendor_data_dir')), language : 'c')
+
 # Library search dirs
 search_dirs = [ '/usr/local/lib', '/usr/pkg/lib', '/usr/lib64', '/usr/lib' ]
 
