@@ -15,7 +15,7 @@ chmod +x rustup.sh
 # There is no clamav package in Slackware Linux
 git clone -q https://github.com/Cisco-Talos/clamav.git
 cd clamav || exit 1
-TAG="$(git tag -l | grep -E "^clamav-[0-9\.]+$" | grep "\." | sort -V | tail -n 1)"
+TAG="$(git tag -l | grep -E "^clamav-[0-9\.]+$" | grep "\." | grep -v "\-rc" | sort -V | tail -n 1)"
 git checkout -b "${TAG}" "${TAG}"
 mkdir build
 cd build || exit 1
