@@ -616,7 +616,7 @@ int main(int argc, char **argv)
      * This loop also handles reading in multiple configuration files
      * for overrides.
      */
-    xasprintf(&tmp_cfgfile, "%s/%s", CFGFILE_DIR, CFGFILE);
+    xasprintf(&tmp_cfgfile, "%s/%s", VENDOR_DATA_DIR, CFGFILE);
 
     if (cfgfile == NULL && (access(tmp_cfgfile, F_OK|R_OK) == 0)) {
         /* /usr/share/rpminspect/rpminspect.yaml exists */

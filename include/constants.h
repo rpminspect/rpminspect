@@ -84,11 +84,16 @@
 #define SOFTWARE_NAME "librpminspect"
 
 /**
- * @def CFGFILE_DIR
+ * @def VENDOR_DATA_DIR
  *
- * Configuration file directory.
+ * Configuration file directory.  This is the location of the vendor
+ * data configuration files used by rpminspect.  There will be the
+ * main vendor configuration file followed by individual files in the
+ * subdirectories for different types of data.
  */
-#define CFGFILE_DIR "/usr/share/rpminspect"
+#ifndef VENDOR_DATA_DIR
+#define VENDOR_DATA_DIR "/usr/share/rpminspect"
+#endif
 
 /**
  * @def CFGFILE
@@ -116,7 +121,9 @@
  * subdirectories within this directory so multiple concurrent jobs
  * can run.
  */
+#ifndef DEFAULT_WORKDIR
 #define DEFAULT_WORKDIR "/var/tmp/rpminspect"
+#endif
 
 /**
  * @def ROOT_SUBDIR
@@ -140,14 +147,6 @@
  * The name of the after build subdirectory in the working directory.
  */
 #define AFTER_SUBDIR "after"
-
-/**
- * @def VENDOR_DATA_DIR
- *
- * Default location for the vendor-specific data.  These files should
- * be provided by the vendor-specific rpminspect-data package.
- */
-#define VENDOR_DATA_DIR "/usr/share/rpminspect"
 
 /**
  * @def INSPECTIONS
@@ -883,42 +882,42 @@
 /**
  * @def ELF_SYMTAB
  *
- * The '.symtab' ELF section.
+ * The '.symtab' ELF section name.
  */
 #define ELF_SYMTAB ".symtab"
 
 /**
  * @def ELF_GDB_INDEX
  *
- * The '.gdb_index' ELF section.
+ * The '.gdb_index' ELF section name.
  */
 #define ELF_GDB_INDEX ".gdb_index"
 
 /**
  * @def ELF_GNU_DEBUGDATA
  *
- * The '.gnu_debugdata' ELF section.
+ * The '.gnu_debugdata' ELF section name.
  */
 #define ELF_GNU_DEBUGDATA ".gnu_debugdata"
 
 /**
  * @def ELF_GNU_DEBUGLINK
  *
- * The '.gnu_debuglink' ELF section.
+ * The '.gnu_debuglink' ELF section name.
  */
 #define ELF_GNU_DEBUGLINK ".gnu_debuglink"
 
 /**
  * @def ELF_DEBUG_INFO
  *
- * The '.debug_info' ELF section.
+ * The '.debug_info' ELF section name.
  */
 #define ELF_DEBUG_INFO ".debug_info"
 
 /**
  * @def ELF_GOSYMTAB
  *
- * The '.gosymtab' ELF section.
+ * The '.gosymtab' ELF section name.
  */
 #define ELF_GOSYMTAB ".gosymtab"
 

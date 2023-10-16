@@ -6,7 +6,7 @@ option('tests',
 option('python_program',
        type : 'string',
        value : 'python3',
-       description : ' The basename of the Python 3 executable the build system should use')
+       description : 'The basename of the Python 3 executable the build system should use.')
 
 option('nls',
        type : 'boolean',
@@ -32,3 +32,13 @@ option('with_libannocheck',
        type : 'boolean',
        value : false,
        description : 'Enable libannocheck support for binary file analysis.  Disabling libannocheck support will also disable the annocheck inspection.')
+
+option('vendor_data_dir',
+       type : 'string',
+       value : '/usr/share/rpminspect',
+       description : 'The location of vendor data files for rpminspect.')
+
+option('default_workdir',
+       type : 'string',
+       value : '/var/tmp/rpminspect',
+       description : 'Default working directory used by rpminspect.')
