@@ -340,3 +340,57 @@ class InvalidUseOfLicenseStringKoji(TestKoji):
         self.inspection = "license"
         self.result = "BAD"
         self.waiver_auth = "Not Waivable"
+
+
+class AllowedNewDBFormatLicenseSRPM(TestSRPM):
+    def setUp(self):
+        super().setUp()
+        self.rpm.addLicense("0BSD")
+        self.inspection = "license"
+        self.result = "INFO"
+        self.waiver_auth = "Not Waivable"
+
+
+class AllowedNewDBFormatLicenseRPMs(TestRPMs):
+    def setUp(self):
+        super().setUp()
+        self.rpm.addLicense("0BSD")
+        self.inspection = "license"
+        self.result = "INFO"
+        self.waiver_auth = "Not Waivable"
+
+
+class AllowedNewDBFormatLicenseKoji(TestKoji):
+    def setUp(self):
+        super().setUp()
+        self.rpm.addLicense("0BSD")
+        self.inspection = "license"
+        self.result = "INFO"
+        self.waiver_auth = "Not Waivable"
+
+
+class NotAllowedNewDBFormatLicenseSRPM(TestSRPM):
+    def setUp(self):
+        super().setUp()
+        self.rpm.addLicense("APSL-1.2")
+        self.inspection = "license"
+        self.result = "BAD"
+        self.waiver_auth = "Not Waivable"
+
+
+class NotAllowedNewDBFormatLicenseRPMs(TestRPMs):
+    def setUp(self):
+        super().setUp()
+        self.rpm.addLicense("APSL-1.2")
+        self.inspection = "license"
+        self.result = "BAD"
+        self.waiver_auth = "Not Waivable"
+
+
+class NotAllowedNewDBFormatLicenseKoji(TestKoji):
+    def setUp(self):
+        super().setUp()
+        self.rpm.addLicense("APSL-1.2")
+        self.inspection = "license"
+        self.result = "BAD"
+        self.waiver_auth = "Not Waivable"
