@@ -21,6 +21,7 @@
 #include <sys/stat.h>
 #include <fcntl.h>
 #include <stdarg.h>
+#include <json.h>
 #include "callbacks.h"
 #include "parser.h"
 #include "rpminspect.h"
@@ -54,11 +55,6 @@ static parser_plugin *read_licensedb(struct rpminspect *ri, const char *db, pars
     return p;
 }
 
-static inline char *emptily(char *s)
-{
-    return s != NULL ? s : strdup("");
-}
-
 /* lambda; checks against an entry in the license database. */
 static bool lic_cb(const char *license_name, void *cb_data)
 {
@@ -66,10 +62,16 @@ static bool lic_cb(const char *license_name, void *cb_data)
     const char *lic = data->lic;
     parser_plugin *p = data->p;
     parser_context *db = data->db;
-    char *fedora_abbrev = NULL;
-    char *fedora_name = NULL;
+    parser_context *cont = NULL;
+    json_bool r = 0;
+    json_object *block = NULL;
+    string_list_t *slist = NULL;
+    string_entry_t *entry = NULL;
+    string_list_t *fedora_abbrev = NULL;
+    string_list_t *fedora_name = NULL;
     char *spdx_abbrev = NULL;
-    char *approved = NULL;
+    bool approved = false;
+    char *t = NULL;
 
     if (data->valid) {
         /* Already decided; no need to check further. */
@@ -80,24 +82,62 @@ static bool lic_cb(const char *license_name, void *cb_data)
         return false;
     }
 
-    fedora_abbrev = emptily(p->getstr(db, license_name, "fedora_abbrev"));
-    fedora_name = emptily(p->getstr(db, license_name, "fedora_name"));
-    spdx_abbrev = emptily(p->getstr(db, license_name, "spdx_abbrev"));
-    approved = emptily(p->getstr(db, license_name, "approved"));
+    /* try to read new license data API, failing that fall back on the old API */\
+    r = json_object_object_get_ex((json_object *) db, license_name, &block);
 
-    /* Handle "commented out" fields - not proper JSON, but I'm not a cop. */
-    if (strlen(fedora_abbrev) > 0 && *fedora_abbrev == '#') {
-        free(fedora_abbrev);
-        fedora_abbrev = strdup("");
+    if (r && json_object_is_type(block, json_type_array)) {
+        cont = (parser_context *) block;
+
+        array(p, cont, "fedora", "legacy-abbreviation", &fedora_abbrev);
+        array(p, cont, "fedora", "legacy-name", &fedora_name);
+        spdx_abbrev = p->getstr(cont, "license", "expression");
+
+        approved = false;
+        array(p, cont, "license", "status", &slist);
+
+        if (list_len(slist)) {
+            TAILQ_FOREACH(entry, slist, items) {
+                if (!strcmp(entry->data, "allowed")) {
+                    approved = true;
+                    break;
+                }
+           }
+       }
+
+       list_free(slist, free);
     }
 
-    if (strlen(spdx_abbrev) > 0 && *spdx_abbrev == '#') {
+    /* new format failed, fall back on previous db format */
+    if (spdx_abbrev == NULL) {
+        list_free(fedora_abbrev, free);
+        list_free(fedora_name, free);
+        approved = false;
+
+        /* the new API format failed, fall back on the legacy format */
+        fedora_abbrev = list_add(fedora_abbrev, p->getstr(db, license_name, "fedora_abbrev"));
+        fedora_name = list_add(fedora_name, p->getstr(db, license_name, "fedora_name"));
+        spdx_abbrev = p->getstr(db, license_name, "spdx_abbrev");
+
+        t = p->getstr(db, license_name, "approved");
+
+        if (t && (!strcasecmp(t, "yes") || !strcasecmp(t, "true"))) {
+            approved = true;
+        } else {
+            approved = false;
+        }
+    }
+
+    /* Handle "commented out" fields - not proper JSON, but I'm not a cop. */
+    fedora_abbrev = list_trim(fedora_abbrev, "#");
+    fedora_name = list_trim(fedora_name, NULL);
+
+    if (spdx_abbrev && *spdx_abbrev == '#') {
         free(spdx_abbrev);
-        spdx_abbrev = strdup("");;
+        spdx_abbrev = NULL;
     }
 
     /* No full tag match and no abbreviations; license entry invalid. */
-    if (strlen(fedora_abbrev) == 0 && strlen(spdx_abbrev) == 0 && strlen(fedora_name) == 0) {
+    if (spdx_abbrev == NULL && fedora_abbrev == NULL && fedora_name == NULL) {
         goto done;
     }
 
@@ -107,19 +147,19 @@ static bool lic_cb(const char *license_name, void *cb_data)
      * If we hit 'spdx_abbrev' and approved is true, that is valid.
      * NOTE: we only match the first hit in the license database
      */
-    if (strcasecmp(approved, "true") && strcasecmp(approved, "yes")) {
+    if (!approved) {
         /* invalid - do nothing */
         goto done;
-    } else if ((!strcmp(lic, fedora_abbrev) || !strcmp(lic, spdx_abbrev)) ||
-               (strlen(fedora_abbrev) == 0 && strlen(spdx_abbrev) == 0 && !strcmp(lic, fedora_name))) {
+    } else if ((!strcmp(lic, spdx_abbrev) || list_contains(fedora_abbrev, lic)) ||
+               (list_len(fedora_abbrev) == 0 && (spdx_abbrev == NULL || strlen(spdx_abbrev) == 0) && list_contains(fedora_name, lic))) {
         data->valid = true;
     }
 
 done:
-    free(fedora_abbrev);
-    free(fedora_name);
+    list_free(fedora_abbrev, free);
+    list_free(fedora_name, free);
     free(spdx_abbrev);
-    free(approved);
+
     return false;
 }
 
