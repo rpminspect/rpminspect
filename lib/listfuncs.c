@@ -447,3 +447,38 @@ void list_remove(string_list_t *list, const char *s)
 
     return;
 }
+
+/*
+ * Given a string_list_t, trim out any empty list members.
+ * Optionally, trim out any list members with a string prefix matching
+ * prefix.  Modifies the list in place and returns a pointer to the
+ * list.
+ */
+string_list_t *list_trim(string_list_t *list, const char *prefix)
+{
+    string_entry_t *entry = NULL;
+
+    if (list == NULL) {
+        return list;
+    }
+
+    if (list_len(list)) {
+        TAILQ_FOREACH(entry, list, items) {
+            if (entry->data == NULL) {
+                TAILQ_REMOVE(list, entry, items);
+                free(entry);
+            } else if (!strcmp(entry->data, "") || (prefix && strprefix(entry->data, prefix))) {
+                TAILQ_REMOVE(list, entry, items);
+                free(entry->data);
+                free(entry);
+            }
+        }
+    }
+
+    if (TAILQ_EMPTY(list)) {
+        free(list);
+        list = NULL;
+    }
+
+    return list;
+}
