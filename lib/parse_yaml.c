@@ -464,8 +464,7 @@ static bool yaml_strarray_foreach(parser_context *context, const char *key1, con
     }
 
     for (i = 0; arrobj->v.array[i] != NULL; i++) {
-        if (arrobj->v.array[i]->type != Y_STRING ||
-            lambda(arrobj->v.array[i]->v.string, cb_data)) {
+        if (arrobj->v.array[i]->type != Y_STRING || lambda(arrobj->v.array[i]->v.string, cb_data)) {
             return true;
         }
     }
