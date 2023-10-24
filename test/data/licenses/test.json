@@ -136,5 +136,32 @@
     "fedora_abbrev": "",
     "fedora_name": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua",
     "spdx_abbrev": "",
+  },
+  "23": {
+    "license": {
+      "expression": "0BSD",
+      "status": [
+        "allowed"
+      ],
+      "url": "https://fedoraproject.org/wiki/Licensing/ZeroClauseBSD"
+    },
+    "fedora": {
+      "legacy-name": [
+        "Zero-Clause BSD"
+      ],
+      "legacy-abbreviation": [
+        "0BSD"
+      ]
+    }
+  },
+  "24": {
+    "license": {
+      "expression": "APSL-1.2",
+      "status": [
+        "not-allowed"
+      ],
+      "url": "https://fedoraproject.org/wiki/Licensing/Apple_Public_Source_License_1.2"
+    },
+    "fedora": {}
   }
 }
