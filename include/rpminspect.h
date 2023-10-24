@@ -24,6 +24,7 @@
 #include "results.h"
 #include "output.h"
 #include "readelf.h"
+#include "parser.h"
 
 #ifndef _LIBRPMINSPECT_RPMINSPECT_H
 #define _LIBRPMINSPECT_RPMINSPECT_H
@@ -536,5 +537,8 @@ char *human_size(const unsigned long int bytes);
  * @return Allocated path string that the caller must free.
  */
 char *joinpath(const char *path, ...);
+
+/* array.c */
+void array(parser_plugin *p, parser_context *ctx, const char *key1, const char *key2, string_list_t **list);
 
 #endif
