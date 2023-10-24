@@ -91,28 +91,6 @@ static int add_regex(const char *pattern, regex_t **regex_out)
     return 0;
 }
 
-/**
- * Given a string_list_t and a string, add the string to the list.  If
- * the list is NULL, initialize it to start a new list.  Caller is
- * responsible for freeing all memory associated with the list.
- *
- * @param list Pointer to a string_list_t to add entry to.
- * @param s String to add to the string_list_t.
- */
-static void add_entry(string_list_t **list, const char *s)
-{
-    assert(list != NULL);
-    assert(s != NULL);
-
-    if (*list != NULL && list_contains(*list, s)) {
-        /* do not add entry if it exists in the list */
-        return;
-    }
-
-    *list = list_add(*list, s);
-    return;
-}
-
 /*
  * Given an inspection identifier from the config file reader and a
  * list value, add it to the per-inspection list of ignores.
@@ -361,24 +339,6 @@ static inline void strget(parser_plugin *p, parser_context *ctx, const char *key
 
     free(*dest);
     *dest = res;
-    return;
-}
-
-/* lambda for array() below. */
-static bool array_cb(const char *entry, void *cb_data)
-{
-    string_list_t **list = cb_data;
-    add_entry(list, entry);
-    return false;
-}
-
-/* Transform configuration's array into a string_list_t. */
-static inline void array(parser_plugin *p, parser_context *ctx, const char *key1, const char *key2, string_list_t **list)
-{
-    if (p->strarray_foreach(ctx, key1, key2, array_cb, list)) {
-        warnx(_("*** problem adding entries to array %s->%s"), key1, key2);
-    }
-
     return;
 }
 
