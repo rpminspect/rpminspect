@@ -281,7 +281,7 @@ class ValidPerlHTTPMessageLicenseTagKoji(TestKoji):
 
 
 # Valid License string without any official abbreviations (OK)
-class ValidLoremIpsonLicenseTagSRPM(TestSRPM):
+class ValidLoremIpsumLicenseTagSRPM(TestSRPM):
     def setUp(self):
         super().setUp()
         self.rpm.addLicense(
@@ -292,7 +292,7 @@ class ValidLoremIpsonLicenseTagSRPM(TestSRPM):
         self.waiver_auth = "Not Waivable"
 
 
-class ValidLoremIpsonLicenseTagRPMs(TestRPMs):
+class ValidLoremIpsumLicenseTagRPMs(TestRPMs):
     def setUp(self):
         super().setUp()
         self.rpm.addLicense(
@@ -303,7 +303,7 @@ class ValidLoremIpsonLicenseTagRPMs(TestRPMs):
         self.waiver_auth = "Not Waivable"
 
 
-class ValidLoremIpsonLicenseTagKoji(TestKoji):
+class ValidLoremIpsumLicenseTagKoji(TestKoji):
     def setUp(self):
         super().setUp()
         self.rpm.addLicense(
