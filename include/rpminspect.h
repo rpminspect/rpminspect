@@ -149,6 +149,7 @@ string_list_t *list_from_array(const char **);
 bool list_contains(const string_list_t *, const char *);
 string_list_t *list_add(string_list_t *list, const char *s);
 void list_remove(string_list_t *list, const char *s);
+string_list_t *list_trim(string_list_t *list, const char *prefix);
 
 /* llvm.c */
 bool is_llvm_ir_bitcode(const char *file);
