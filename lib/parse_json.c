@@ -52,6 +52,7 @@ static char *as_str(json_object *jo)
 {
     json_type type = json_type_null;
     char *out = NULL;
+    const char *s = NULL;
 
     type = json_object_get_type(jo);
 
@@ -68,7 +69,13 @@ static char *as_str(json_object *jo)
         xasprintf(&out, "%"PRId32, json_object_get_int(jo));
         return out;
     } else if (type == json_type_string) {
-        return strdup(json_object_get_string(jo));
+        s = json_object_get_string(jo);
+
+        if (!strcmp(s, "")) {
+            return NULL;
+        } else {
+            return strdup(s);
+        }
     }
 
     return NULL;
