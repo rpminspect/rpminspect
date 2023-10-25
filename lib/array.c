@@ -42,6 +42,10 @@ static bool array_cb(const char *entry, void *cb_data)
 /* Transform configuration's array into a string_list_t. */
 void array(parser_plugin *p, parser_context *ctx, const char *key1, const char *key2, string_list_t **list)
 {
+    if (key1 == NULL || key2 == NULL) {
+        return;
+    }
+
     if (p->strarray_foreach(ctx, key1, key2, array_cb, list)) {
         warnx(_("*** problem adding entries to array %s->%s"), key1, key2);
     }
