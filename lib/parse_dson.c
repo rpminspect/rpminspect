@@ -70,7 +70,11 @@ static char *as_str(dson_value *v)
     if (v == NULL) {
         return NULL;
     } else if (v->type == DSON_STRING) {
-        return strdup(v->s);
+        if (!strcmp(v->s, "")) {
+            return NULL;
+        } else {
+            return strdup(v->s);
+        }
     } else if (v->type == DSON_BOOL) {
         if (v->b) {
             return strdup("true");
