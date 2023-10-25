@@ -23,7 +23,9 @@ class AnnocheckHardenedCompareRPMs(TestCompareRPMs):
     def setUp(self):
         super().setUp()
 
-        if os.path.isfile("/etc/slackware-version"):
+        if os.path.isfile("/etc/slackware-version") or os.path.isfile(
+            "/etc/fedora-release"
+        ):
             self.extra_cfg = {}
             self.extra_cfg["annocheck"] = {}
             self.extra_cfg["annocheck"]["jobs"] = [
@@ -46,7 +48,9 @@ class AnnocheckHardenedCompareKoji(TestCompareKoji):
     def setUp(self):
         super().setUp()
 
-        if os.path.isfile("/etc/slackware-version"):
+        if os.path.isfile("/etc/slackware-version") or os.path.isfile(
+            "/etc/fedora-release"
+        ):
             self.extra_cfg = {}
             self.extra_cfg["annocheck"] = {}
             self.extra_cfg["annocheck"]["jobs"] = [
@@ -95,7 +99,9 @@ class AnnocheckHardenedRPMs(TestRPMs):
     def setUp(self):
         super().setUp()
 
-        if os.path.isfile("/etc/slackware-version"):
+        if os.path.isfile("/etc/slackware-version") or os.path.isfile(
+            "/etc/fedora-release"
+        ):
             self.extra_cfg = {}
             self.extra_cfg["annocheck"] = {}
             self.extra_cfg["annocheck"]["jobs"] = [
@@ -117,7 +123,9 @@ class AnnocheckHardenedKoji(TestKoji):
     def setUp(self):
         super().setUp()
 
-        if os.path.isfile("/etc/slackware-version"):
+        if os.path.isfile("/etc/slackware-version") or os.path.isfile(
+            "/etc/fedora-release"
+        ):
             self.extra_cfg = {}
             self.extra_cfg["annocheck"] = {}
             self.extra_cfg["annocheck"]["jobs"] = [
