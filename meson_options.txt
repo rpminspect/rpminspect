@@ -26,12 +26,12 @@ option('with_libcap',
 option('with_annocheck',
        type : 'boolean',
        value : true,
-       description : 'Enable annocheck(1) support for binary file analysis.  Disabling annocheck(1) support will also disable the annocheck inspection.')
+       description : 'Use annocheck(1) rather than libannocheck for binary file analysis.  Mutually exclusive with the with_libannocheck option.  Disabling both annocheck options will disable the annocheck inspection.')
 
 option('with_libannocheck',
        type : 'boolean',
        value : false,
-       description : 'Enable libannocheck support for binary file analysis.  Disabling libannocheck support will also disable the annocheck inspection.')
+       description : 'Use libannocheck rather than annocheck(1) for binary file analysis.  Mutually exclusive with the with_annocheck option.  Disabling both annocheck options will disable the annocheck inspection.')
 
 option('vendor_data_dir',
        type : 'string',
