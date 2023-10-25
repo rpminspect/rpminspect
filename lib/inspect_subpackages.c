@@ -38,13 +38,13 @@ bool inspect_subpackages(struct rpminspect *ri)
     TAILQ_FOREACH(peer, ri->peers, items) {
         if (peer->before_hdr) {
             entry = calloc(1, sizeof(*entry));
-            xasprintf(&entry->data, "%s %s", headerGetString(peer->before_hdr, RPMTAG_NAME), headerGetString(peer->before_hdr, RPMTAG_ARCH));
+            xasprintf(&entry->data, "%s %s", headerGetString(peer->before_hdr, RPMTAG_NAME), get_rpm_header_arch(peer->before_hdr));
             TAILQ_INSERT_TAIL(before_pkgs, entry, items);
         }
 
         if (peer->after_hdr) {
             entry = calloc(1, sizeof(*entry));
-            xasprintf(&entry->data, "%s %s", headerGetString(peer->after_hdr, RPMTAG_NAME), headerGetString(peer->after_hdr, RPMTAG_ARCH));
+            xasprintf(&entry->data, "%s %s", headerGetString(peer->after_hdr, RPMTAG_NAME), get_rpm_header_arch(peer->after_hdr));
             TAILQ_INSERT_TAIL(after_pkgs, entry, items);
         }
     }
