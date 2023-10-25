@@ -150,8 +150,11 @@ static bool lic_cb(const char *license_name, void *cb_data)
     if (!approved) {
         /* invalid - do nothing */
         goto done;
-    } else if ((!strcmp(lic, spdx_abbrev) || list_contains(fedora_abbrev, lic)) ||
-               (list_len(fedora_abbrev) == 0 && (spdx_abbrev == NULL || strlen(spdx_abbrev) == 0) && list_contains(fedora_name, lic))) {
+    } else if (spdx_abbrev && !strcmp(lic, spdx_abbrev)) {
+        /* SPDX identifier matched */
+        data->valid = true;
+    } else if (list_contains(fedora_abbrev, lic) || (list_len(fedora_abbrev) == 0 && spdx_abbrev == NULL && list_contains(fedora_name, lic))) {
+        /* Old Fedora abbreviation matches -or- there are no Fedora abbreviations but a Fedora name matches */
         data->valid = true;
     }
 
