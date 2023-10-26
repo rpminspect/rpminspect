@@ -42,7 +42,7 @@ static bool array_cb(const char *entry, void *cb_data)
 /* Transform configuration's array into a string_list_t. */
 void array(parser_plugin *p, parser_context *ctx, const char *key1, const char *key2, string_list_t **list)
 {
-    if (key1 == NULL || key2 == NULL) {
+    if (key1 == NULL) {
         return;
     }
 
