@@ -63,7 +63,6 @@ static bool lic_cb(const char *license_name, void *cb_data)
     parser_plugin *p = data->p;
     parser_context *db = data->db;
     parser_context *cont = NULL;
-    json_bool r = 0;
     json_object *block = NULL;
     string_list_t *slist = NULL;
     string_entry_t *entry = NULL;
@@ -82,10 +81,13 @@ static bool lic_cb(const char *license_name, void *cb_data)
         return false;
     }
 
-    /* try to read new license data API, failing that fall back on the old API */\
-    r = json_object_object_get_ex((json_object *) db, license_name, &block);
+    /* get the license db block for this license name */
+    if (json_object_object_get_ex((json_object *) db, license_name, &block) == 0) {
+        return false;
+    }
 
-    if (r && json_object_is_type(block, json_type_array)) {
+    /* try to read new license data format */
+    if (json_object_is_type(block, json_type_object)) {
         cont = (parser_context *) block;
 
         array(p, cont, "fedora", "legacy-abbreviation", &fedora_abbrev);
@@ -107,7 +109,7 @@ static bool lic_cb(const char *license_name, void *cb_data)
        list_free(slist, free);
     }
 
-    /* new format failed, fall back on previous db format */
+    /* new format failed, fall back on previous format */
     if (spdx_abbrev == NULL) {
         list_free(fedora_abbrev, free);
         list_free(fedora_name, free);
