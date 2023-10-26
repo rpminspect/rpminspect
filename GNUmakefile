@@ -1,3 +1,9 @@
+# This GNU make Makefile is intended as a helper.  meson is used for
+# the actual build and configuration, but this Makefile provides some
+# useful targets for development and release purposes.  Type "gmake
+# help" for more details.  It is called GNUmakefile to indicate it
+# requires GNU make because we do build and test on BSD platforms.
+
 # The 'realpath' command may be installed under a different name, in
 # which case the calling environment can set the REALPATH variable to
 # the command to use.  For example, on NetBSD you need to install
@@ -211,7 +217,9 @@ help:
 	@echo "is intended as a simple helper for the common steps."
 	@echo
 	@echo "    all               Default target, setup tree to build and build"
+	@echo "    debug             Setup tree for debug build and build"
 	@echo "    setup             Run 'meson setup $(MESON_BUILD_DIR)'"
+	@echo "    setup-debug       The counterpart to 'setup'; called by 'debug'"
 	@echo "    check             Run 'meson test -C $(MESON_BUILD_DIR) -v'"
 	@echo "    update-pot        Update po/POTFILES and po/rpminspect.pot"
 	@echo "    srpm              Generate an SRPM package of the latest release"
