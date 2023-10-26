@@ -70,14 +70,6 @@ static bool doc_driver(struct rpminspect *ri, rpmfile_entry_t *file)
     params.verb = VERB_CHANGED;
     params.noun = _("%doc ${FILE}");
 
-    if (is_rebase(ri)) {
-        params.severity = RESULT_INFO;
-        params.waiverauth = NOT_WAIVABLE;
-    } else {
-        params.severity = RESULT_VERIFY;
-        params.waiverauth = WAIVABLE_BY_ANYONE;
-    }
-
     /* verify %doc values */
     before_doc |= file->peer_file->flags & RPMFILE_DOC;
     after_doc |= file->flags & RPMFILE_DOC;
@@ -98,8 +90,8 @@ static bool doc_driver(struct rpminspect *ri, rpmfile_entry_t *file)
                 xasprintf(&params.msg, _("%%doc file content change for %s in %s on %s\n"), file->localpath, name, arch);
             }
 
-            /* only add the diff output for text content */
-            if (strprefix(get_mime_type(ri, file->peer_file), "text/") && strprefix(get_mime_type(ri, file), "text/")) {
+            /* only add the diff output for text content and for non-rebased builds */
+            if (strprefix(get_mime_type(ri, file->peer_file), "text/") && strprefix(get_mime_type(ri, file), "text/") && !is_rebase(ri)) {
                 params.details = diff_output;
             }
 
@@ -110,6 +102,14 @@ static bool doc_driver(struct rpminspect *ri, rpmfile_entry_t *file)
             result = true;
         }
     } else if (before_doc || after_doc) {
+        if (is_rebase(ri)) {
+            params.severity = RESULT_INFO;
+            params.waiverauth = NOT_WAIVABLE;
+        } else {
+            params.severity = RESULT_VERIFY;
+            params.waiverauth = WAIVABLE_BY_ANYONE;
+        }
+
         xasprintf(&params.msg, _("%%doc file change for %s in %s on %s (%smarked as %%doc -> %smarked as %%doc)\n"), file->localpath, name, arch,
                   (before_doc ? "" : _("not ")), (after_doc ? "" : _("not ")));
         add_result(ri, &params);
