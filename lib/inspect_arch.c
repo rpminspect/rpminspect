@@ -46,8 +46,8 @@ bool inspect_arch(struct rpminspect *ri)
             continue;
         }
 
-        before_arch = headerGetString(peer->before_hdr, RPMTAG_ARCH);
-        after_arch = headerGetString(peer->after_hdr, RPMTAG_ARCH);
+        before_arch = get_rpm_header_arch(peer->before_hdr);
+        after_arch = get_rpm_header_arch(peer->after_hdr);
 
         /*
          * loss of a noarch package is not something this inspection
