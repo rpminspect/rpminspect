@@ -99,7 +99,7 @@ static bool lic_cb(const char *license_name, void *cb_data)
 
         if (list_len(slist)) {
             TAILQ_FOREACH(entry, slist, items) {
-                if (!strcmp(entry->data, "allowed")) {
+                if (!strcmp(entry->data, "allowed") || strprefix(entry->data, "allowed-")) {
                     approved = true;
                     break;
                 }
