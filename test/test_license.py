@@ -394,3 +394,35 @@ class NotAllowedNewDBFormatLicenseKoji(TestKoji):
         self.inspection = "license"
         self.result = "BAD"
         self.waiver_auth = "Not Waivable"
+
+
+class NotAllowedExceptionLicenseSRPM(TestSRPM):
+    def setUp(self):
+        super().setUp()
+        self.rpm.addLicense("DERP")
+        self.inspection = "license"
+        self.result = "INFO"
+        self.waiver_auth = "Not Waivable"
+
+
+class NotAllowedExceptionLicenseRPMs(TestRPMs):
+    def setUp(self):
+        super().setUp()
+        self.rpm.addLicense("DERP")
+        self.inspection = "license"
+
+        # this is a failure while the others are not because when
+        # comparing two RPMs we do not have the corresponding SRPM to
+        # get the source package name, which is what would be in the
+        # package_with_exceptions array in the license database
+        self.result = "BAD"
+        self.waiver_auth = "Not Waivable"
+
+
+class NotAllowedExceptionLicenseKoji(TestKoji):
+    def setUp(self):
+        super().setUp()
+        self.rpm.addLicense("DERP")
+        self.inspection = "license"
+        self.result = "INFO"
+        self.waiver_auth = "Not Waivable"
