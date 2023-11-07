@@ -26,6 +26,9 @@
 #include "parser.h"
 #include "rpminspect.h"
 
+/* Globals */
+static const char *srpm = NULL;
+
 /* Local helper functions */
 static parser_plugin *read_licensedb(struct rpminspect *ri, const char *db, parser_context **context_out)
 {
@@ -68,6 +71,7 @@ static bool lic_cb(const char *license_name, void *cb_data)
     string_entry_t *entry = NULL;
     string_list_t *fedora_abbrev = NULL;
     string_list_t *fedora_name = NULL;
+    string_list_t *exceptions = NULL;
     char *spdx_abbrev = NULL;
     bool approved = false;
     char *t = NULL;
@@ -96,10 +100,11 @@ static bool lic_cb(const char *license_name, void *cb_data)
 
         approved = false;
         array(p, cont, "license", "status", &slist);
+        array(p, cont, "license", "packages_with_exceptions", &exceptions);
 
         if (list_len(slist)) {
             TAILQ_FOREACH(entry, slist, items) {
-                if (!strcmp(entry->data, "allowed") || strprefix(entry->data, "allowed-")) {
+                if (!strcmp(entry->data, "allowed") || strprefix(entry->data, "allowed-") || (!strcmp(entry->data, "not-allowed") && list_contains(exceptions, srpm))) {
                     approved = true;
                     break;
                 }
@@ -107,6 +112,7 @@ static bool lic_cb(const char *license_name, void *cb_data)
        }
 
        list_free(slist, free);
+       list_free(exceptions, free);
     }
 
     /* new format failed, fall back on previous format */
@@ -625,6 +631,20 @@ bool inspect_license(struct rpminspect *ri)
         add_result(ri, &params);
         free(params.msg);
         return false;
+    }
+
+    /* Find the SRPM and get the package name */
+    TAILQ_FOREACH(peer, ri->peers, items) {
+        if (peer->after_rpm == NULL) {
+            continue;
+        }
+
+        if (headerIsSource(peer->after_hdr)) {
+            srpm = headerGetString(peer->after_hdr, RPMTAG_NAME);
+            assert(srpm != NULL);
+            break;
+        } else {
+        }
     }
 
     /*

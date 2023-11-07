@@ -163,5 +163,17 @@
       "url": "https://fedoraproject.org/wiki/Licensing/Apple_Public_Source_License_1.2"
     },
     "fedora": {}
+  },
+  "25": {
+    "license": {
+      "expression": "DERP",
+      "status": [
+        "not-allowed"
+      ],
+      "packages_with_exceptions": [
+        "vaporware"
+      ]
+    },
+    "fedora": {}
   }
 }
