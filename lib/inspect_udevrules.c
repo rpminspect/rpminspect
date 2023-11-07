@@ -59,7 +59,7 @@ static bool is_udev_rules_file(struct rpminspect *ri, const rpmfile_entry_t *fil
 static char *run_udevadm_verify(int *exitcode, const struct rpminspect *ri, const char *arg)
 {
     return run_cmd(exitcode, ri->worksubdir, ri->commands.udevadm, "verify",
-                   "--no-summary", "--resolve-names=never", arg, NULL);
+                   "--no-summary", "--no-style", "--resolve-names=never", arg, NULL);
 }
 
 static bool udevrules_driver(struct rpminspect *ri, rpmfile_entry_t *file)
