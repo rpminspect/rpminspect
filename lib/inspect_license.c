@@ -122,8 +122,14 @@ static bool lic_cb(const char *license_name, void *cb_data)
         approved = false;
 
         /* the new API format failed, fall back on the legacy format */
-        fedora_abbrev = list_add(fedora_abbrev, p->getstr(db, license_name, "fedora_abbrev"));
-        fedora_name = list_add(fedora_name, p->getstr(db, license_name, "fedora_name"));
+        t = p->getstr(db, license_name, "fedora_abbrev");
+        fedora_abbrev = list_add(fedora_abbrev, t);
+        free(t);
+
+        t = p->getstr(db, license_name, "fedora_name");
+        fedora_name = list_add(fedora_name, t);
+        free(t);
+
         spdx_abbrev = p->getstr(db, license_name, "spdx_abbrev");
 
         t = p->getstr(db, license_name, "approved");
@@ -133,6 +139,8 @@ static bool lic_cb(const char *license_name, void *cb_data)
         } else {
             approved = false;
         }
+
+        free(t);
     }
 
     /* Handle "commented out" fields - not proper JSON, but I'm not a cop. */
