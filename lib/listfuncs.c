@@ -457,13 +457,18 @@ void list_remove(string_list_t *list, const char *s)
 string_list_t *list_trim(string_list_t *list, const char *prefix)
 {
     string_entry_t *entry = NULL;
+    string_entry_t *next = NULL;
 
     if (list == NULL) {
         return list;
     }
 
     if (list_len(list)) {
-        TAILQ_FOREACH(entry, list, items) {
+        entry = TAILQ_FIRST(list);
+
+        while (entry) {
+            next = TAILQ_NEXT(entry, items);
+
             if (entry->data == NULL) {
                 TAILQ_REMOVE(list, entry, items);
                 free(entry);
@@ -472,6 +477,8 @@ string_list_t *list_trim(string_list_t *list, const char *prefix)
                 free(entry->data);
                 free(entry);
             }
+
+            entry = next;
         }
     }
 
