@@ -29,7 +29,7 @@ following environments:
 
 [x86_64](https://en.wikipedia.org/wiki/X86-64):
 
-| Platform | Release | Status |  
+| Platform | Release | Status |
 |:-------------------------------------------------------|:----|----:|
 | [Fedora Linux](https://getfedora.org/)                 | rawhide<br />stable | [![Fedora Linux](https://github.com/rpminspect/rpminspect/actions/workflows/fedora.yml/badge.svg)](https://github.com/rpminspect/rpminspect/actions/workflows/fedora.yml) |
 | [CentOS](https://www.centos.org/)               | Stream 9<br />Stream 8<br />7 | [![CentOS](https://github.com/rpminspect/rpminspect/actions/workflows/centos.yml/badge.svg)](https://github.com/rpminspect/rpminspect/actions/workflows/centos.yml) |
@@ -48,7 +48,7 @@ following environments:
 
 In addition to the above test runs, rpminspect is built for Fedora Linux on these platforms:
 
-| Platform | Status |  
+| Platform | Status |
 |:-------------------|----:|
 | [aarch64](https://en.wikipedia.org/wiki/AArch64)      | [![Fedora Linux aarch64](https://github.com/rpminspect/rpminspect/actions/workflows/fedora-aarch64.yml/badge.svg)](https://github.com/rpminspect/rpminspect/actions/workflows/fedora-aarch64.yml) |
 | [ppc64le](https://en.wikipedia.org/wiki/Ppc64)        | [![Fedora Linux ppc64le](https://github.com/rpminspect/rpminspect/actions/workflows/fedora-ppc64le.yml/badge.svg)](https://github.com/rpminspect/rpminspect/actions/workflows/fedora-ppc64le.yml) |
