@@ -62,6 +62,23 @@ class FileRemovedRPMs(TestCompareRPMs):
         )
 
         self.inspection = "removedfiles"
+        self.result = "VERIFY"
+        self.waiver_auth = "Anyone"
+
+
+class FileRemovedRebaseRPMs(TestCompareRPMs):
+    def setUp(self):
+        super().setUp(rebase=True)
+
+        with open(os.environ["RPMINSPECT"], "rb") as f:
+            before_src = f.read()
+
+        # create the test packages
+        self.before_rpm.add_installed_file(
+            "usr/bin/mount", rpmfluff.SourceFile("mount.bin", before_src), mode="0755"
+        )
+
+        self.inspection = "removedfiles"
         self.result = "INFO"
         self.waiver_auth = "Not Waivable"
 
@@ -97,4 +114,22 @@ class FileRemovedKoji(TestCompareKoji):
         )
 
         self.inspection = "removedfiles"
-        self.result = "OK"
+        self.result = "VERIFY"
+        self.waiver_auth = "Anyone"
+
+
+class FileRemovedRebaseKoji(TestCompareKoji):
+    def setUp(self):
+        super().setUp(rebase=True)
+
+        with open(os.environ["RPMINSPECT"], "rb") as f:
+            before_src = f.read()
+
+        # create the test packages
+        self.before_rpm.add_installed_file(
+            "usr/bin/mount", rpmfluff.SourceFile("mount.bin", before_src), mode="0755"
+        )
+
+        self.inspection = "removedfiles"
+        self.result = "INFO"
+        self.waiver_auth = "Not Waivable"
