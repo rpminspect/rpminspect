@@ -108,7 +108,11 @@ static bool removedfiles_driver(struct rpminspect *ri, rpmfile_entry_t *file)
         if (sentry || params.waiverauth == WAIVABLE_BY_SECURITY) {
             params.severity = get_secrule_result_severity(ri, file, SECRULE_SECURITYPATH);
         } else {
-            params.severity = RESULT_INFO;
+            if (rebase) {
+                params.severity = RESULT_INFO;
+            } else {
+                params.severity = RESULT_VERIFY;
+            }
         }
 
         if (params.severity <= RESULT_INFO) {
