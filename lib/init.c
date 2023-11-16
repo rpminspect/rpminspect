@@ -1408,14 +1408,17 @@ bool init_security(struct rpminspect *ri)
             assert(sentry != NULL);
 
             /* the main values of a rule */
-            free(sentry->path);
             sentry->path = strdup(path);
-            free(sentry->pkg);
+            assert(sentry->path != NULL);
+
             sentry->pkg = strdup(pkg);
-            free(sentry->ver);
+            assert(sentry->pkg != NULL);
+
             sentry->ver = strdup(ver);
-            free(sentry->rel);
+            assert(sentry->ver != NULL);
+
             sentry->rel = strdup(rel);
+            assert(sentry->rel != NULL);
 
             /* the list of individual rules */
             TAILQ_FOREACH(rentry, rules, items) {
@@ -1475,6 +1478,7 @@ bool init_security(struct rpminspect *ri)
         }
 
         /* clean up */
+        free(path);
         free(pkg);
         free(ver);
         free(rel);
@@ -1483,7 +1487,6 @@ bool init_security(struct rpminspect *ri)
     }
 
     list_free(contents, free);
-    free(path);
 
     return true;
 }
