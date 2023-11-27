@@ -109,6 +109,20 @@ if cunit.found()
         link_with : [ librpminspect ],
     )
 
+    if add_languages('cpp', required : false)
+        test_cpp = executable(
+            'test_cpp',
+            ['lib/test-cpp.cpp',
+             'lib/test-main.c'],
+            include_directories : inc,
+            dependencies : [ cunit ],
+            cpp_args : '-std=c++17',
+            link_with : [ librpminspect ],
+        )
+
+        test('test-cpp', test_cpp)
+    endif
+
     # Support program used by test-inspect-elf
     execstack_prog = executable(
         'execstack',
