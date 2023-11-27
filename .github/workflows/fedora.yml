@@ -148,6 +148,6 @@ jobs:
                   fi
 
                   make instreqs OSDEPS_ARCH=i686
-                  env CFLAGS="-m32" LDFLAGS="-m32" PKG_CONFIG_PATH=/usr/lib/pkgconfig make debug
+                  env CFLAGS="-m32" CXXFLAGS="-m32" LDFLAGS="-m32" PKG_CONFIG_PATH=/usr/lib/pkgconfig make debug
                   make check
                   ninja -C build coverage && ( curl -s https://codecov.io/bash | bash ) || :
