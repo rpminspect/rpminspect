@@ -12,8 +12,8 @@
 #include <string.h>
 #include <err.h>
 
+#include "internal/tyranny.h"
 #include "parser.h"
-#include "tyranny.h"
 #include "rpminspect.h"
 
 /* Uncomment to enable debug printing. */

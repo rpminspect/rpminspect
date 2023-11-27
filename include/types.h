@@ -7,6 +7,11 @@
  * This header defines types used by librpminspect
  */
 
+#ifdef __cplusplus
+extern "C"
+{
+#endif
+
 #include <regex.h>
 #include <stdint.h>
 #include <stdbool.h>
@@ -153,10 +158,10 @@ typedef enum _dep_op_t {
 typedef struct _deprule_entry_t {
     dep_type_t type;                       /* dependency type */
     char *requirement;                     /* dependency requirement name (e.g., glibc or /bin/sh) */
-    dep_op_t operator;                     /* dependency operator (e.g., >, >=) */
+    dep_op_t op;                           /* dependency operator (e.g., >, >=) */
     char *version;                         /* dependency version */
     bool rich;                             /* true if this dep is a rich dependency */
-    bool explicit;                         /* true if this dep is matched for automatic shared lib deps */
+    bool direct;                           /* true if this dep is matched for automatic shared lib deps */
     string_list_t *providers;              /* for TYPE_REQUIRES, list of subpackages providing it */
     struct _deprule_entry_t *peer_deprule; /* corresponding before/after deprule */
     TAILQ_ENTRY(_deprule_entry_t) items;
@@ -1128,4 +1133,8 @@ typedef struct _patchstat_t {
     long int lines;
 } patchstat_t;
 
+#endif
+
+#ifdef __cplusplus
+}
 #endif

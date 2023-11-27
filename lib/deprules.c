@@ -154,7 +154,7 @@ static deprule_list_t *gather_deprules_by_type(deprule_list_t *rules, Header hdr
             deprule_entry->requirement = strdup(r);
             assert(deprule_entry->requirement != NULL);
 
-            deprule_entry->operator = get_dep_operator(*(rpmtdGetUint32(op)));
+            deprule_entry->op = get_dep_operator(*(rpmtdGetUint32(op)));
 
             if (!strcmp(v, "")) {
                 deprule_entry->version = NULL;
@@ -164,7 +164,7 @@ static deprule_list_t *gather_deprules_by_type(deprule_list_t *rules, Header hdr
             }
 
             deprule_entry->rich = is_rich_dep(deprule_entry->requirement);
-            deprule_entry->explicit = false;
+            deprule_entry->direct = false;
 
             TAILQ_INSERT_TAIL(deprules, deprule_entry, items);
         }
@@ -243,7 +243,7 @@ static bool process_pair(deprule_entry_t *left, deprule_entry_t *right, const bo
 
     if (strict) {
         if ((left->requirement && right->requirement && !strcmp(left->requirement, right->requirement))
-            && left->operator == right->operator
+            && left->op == right->op
             && ((left->version == NULL && right->version == NULL) || (left->version && right->version && !strcmp(left->version, right->version)))) {
             match = true;
         }
@@ -428,8 +428,8 @@ char *strdeprule(const deprule_entry_t *deprule)
     assert(r != NULL);
 
     /* we may have an operator and version */
-    if (deprule->operator != OP_NULL && deprule->version) {
-        r = strappend(r, " ", get_deprule_operator_desc(deprule->operator), " ", deprule->version, NULL);
+    if (deprule->op != OP_NULL && deprule->version) {
+        r = strappend(r, " ", get_deprule_operator_desc(deprule->op), " ", deprule->version, NULL);
         assert(r != NULL);
     }
 
@@ -499,7 +499,7 @@ bool deprules_match(const deprule_entry_t *a, const deprule_entry_t *b)
     n_match = (ra == NULL && rb == NULL) || (ra && rb && !strcmp(ra, rb));
     v_match = (va == NULL && vb == NULL) || (va && vb && !strcmp(va, vb));
 
-    r = n_match && (a->operator == b->operator) && v_match;
+    r = n_match && (a->op == b->op) && v_match;
 
     free(ora);
     free(orb);

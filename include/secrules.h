@@ -3,6 +3,11 @@
  * SPDX-License-Identifier: LGPL-3.0-or-later
  */
 
+#ifdef __cplusplus
+extern "C"
+{
+#endif
+
 #ifndef _LIBRPMINSPECT_SECRULES_H
 #define _LIBRPMINSPECT_SECRULES_H
 
@@ -93,4 +98,8 @@ typedef enum _secrule_type_t {
     SECRULE_UNICODE = 12
 } secrule_type_t;
 
+#endif
+
+#ifdef __cplusplus
+}
 #endif

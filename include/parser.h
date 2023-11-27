@@ -10,6 +10,11 @@
  * false otherwise.
  */
 
+#ifdef __cplusplus
+extern "C"
+{
+#endif
+
 #ifndef _LIBRPMINSPECT_PARSER_H
 #define _LIBRPMINSPECT_PARSER_H
 
@@ -96,3 +101,7 @@ static inline bool parse_agnostic(const char *filename, parser_plugin **plugin_o
 }
 
 #endif /* _LIBRPMINSPECT_PARSER_H */
+
+#ifdef __cplusplus
+}
+#endif

@@ -11,6 +11,11 @@
  * @copyright LGPL-3.0-or-later
  */
 
+#ifdef __cplusplus
+extern "C"
+{
+#endif
+
 #ifndef _READELF_H
 #define _READELF_H
 
@@ -375,4 +380,8 @@ void elf_archive_iterate(int fd, Elf *archive, elf_ar_action action, string_list
 
 /** @} */
 
+#endif
+
+#ifdef __cplusplus
+}
 #endif

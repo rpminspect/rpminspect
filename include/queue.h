@@ -3,6 +3,11 @@
  * SPDX-License-Identifier: LGPL-3.0-or-later
  */
 
+#ifdef __cplusplus
+extern "C"
+{
+#endif
+
 #ifndef _QUEUE_H
 #define _QUEUE_H
 
@@ -13,4 +18,8 @@
 #include <sys/queue.h>
 #endif
 
+#endif
+
+#ifdef __cplusplus
+}
 #endif

@@ -7,6 +7,11 @@
  * This header includes the API definition for librpminspect.
  */
 
+#ifdef __cplusplus
+extern "C"
+{
+#endif
+
 #include <stdbool.h>
 #include <sys/types.h>
 #include <signal.h>
@@ -447,7 +452,7 @@ deprule_list_t *gather_deprules(Header hdr, deprule_ignore_map_t *ignores);
 void find_deprule_peers(deprule_list_t *before, deprule_list_t *after);
 const char *get_deprule_desc(const dep_type_t type);
 dep_op_t get_dep_operator(const rpmsenseFlags f);
-const char *get_deprule_operator_desc(const dep_op_t operator);
+const char *get_deprule_operator_desc(const dep_op_t op);
 bool deprules_match(const deprule_entry_t *a, const deprule_entry_t *b);
 char *strdeprule(const deprule_entry_t *deprule);
 
@@ -542,4 +547,8 @@ char *joinpath(const char *path, ...);
 /* array.c */
 void array(parser_plugin *p, parser_context *ctx, const char *key1, const char *key2, string_list_t **list);
 
+#endif
+
+#ifdef __cplusplus
+}
 #endif

@@ -6,6 +6,11 @@
 /* This file is derived from libtyranny:
  * https://github.com/frozencemetery/libtyranny/ */
 
+#ifdef __cplusplus
+extern "C"
+{
+#endif
+
 #ifndef _LIBRPMINSPECT_TYRANNY_H
 #define _LIBRPMINSPECT_TYRANNY_H
 
@@ -43,3 +48,7 @@ typedef struct {
 } context;
 
 #endif /* _LIBRPMINSPECT_TYRANNY_H */
+
+#ifdef __cplusplus
+}
+#endif
