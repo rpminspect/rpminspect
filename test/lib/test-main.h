@@ -3,6 +3,11 @@
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
+#ifdef __cplusplus
+extern "C"
+{
+#endif
+
 #ifndef _LIBRPMINSPECT_TEST_MAIN_H
 #define _LIBRPMINSPECT_TEST_MAIN_H
 
@@ -67,4 +72,8 @@ CU_BOOL RI_assert_impl(CU_BOOL, unsigned int, const char *, const char *, ...)
     free(actual);\
 }
 
+#endif
+
+#ifdef __cplusplus
+}
 #endif
