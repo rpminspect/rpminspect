@@ -1,9 +1,10 @@
-# Install header files
 install_headers(
     'constants.h',
     'init.h',
     'inspect.h',
     'output.h',
+    'parser.h',
+    'queue.h',
     'readelf.h',
     'results.h',
     'rpminspect.h',
@@ -12,3 +13,5 @@ install_headers(
     'uthash.h',
     subdir : 'librpminspect'
 )
+
+subdir('compat')

@@ -361,8 +361,8 @@ static bool check_explicit_lib_deps(struct rpminspect *ri, Header h, deprule_lis
                     isareq = remove_isa_substring(verify->requirement);
                     assert(isareq != NULL);
 
-                    if (!strcmp(isareq, pn) && verify->operator == OP_EQUAL && (!strcmp(verify->version, evr) || !strcmp(verify->version, vr))) {
-                        verify->explicit = true;
+                    if (!strcmp(isareq, pn) && verify->op == OP_EQUAL && (!strcmp(verify->version, evr) || !strcmp(verify->version, vr))) {
+                        verify->direct = true;
                         found = true;
                     }
 
@@ -571,7 +571,7 @@ static bool expected_deprule_change(const bool rebase, const deprule_entry_t *de
     }
 
     /* Rich dependencies and explicit dependencies for automatic deps are expected */
-    if (deprule->rich || deprule->explicit) {
+    if (deprule->rich || deprule->direct) {
         return true;
     }
 
@@ -634,7 +634,7 @@ static bool expected_deprule_change(const bool rebase, const deprule_entry_t *de
      * as:   Provides: thing = 1.2.3-4
      * where 1.2.3-4 matches %{version}-%{release}
      */
-    if (!found && deprule->version && deprule->operator == OP_EQUAL) {
+    if (!found && deprule->version && deprule->op == OP_EQUAL) {
         found = true;
         working_hdr = h;
     }

@@ -11,6 +11,11 @@
  * @copyright LGPL-3.0-or-later
  */
 
+#ifdef __cplusplus
+extern "C"
+{
+#endif
+
 #ifndef _LIBRPMINSPECT_CONSTANTS_H
 #define _LIBRPMINSPECT_CONSTANTS_H
 
@@ -947,4 +952,8 @@
 
 /** @} */
 
+#endif
+
+#ifdef __cplusplus
+}
 #endif

@@ -12,7 +12,7 @@
 #include <assert.h>
 #include <errno.h>
 #include <err.h>
-#include "callbacks.h"
+#include "internal/callbacks.h"
 #include "parser.h"
 #include "rpminspect.h"
 #include "init.h"

@@ -20,6 +20,11 @@
  * driver simple.
  */
 
+#ifdef __cplusplus
+extern "C"
+{
+#endif
+
 #include <stdint.h>
 #include <stdbool.h>
 #include <stdint.h>
@@ -1622,4 +1627,8 @@ bool inspect_udevrules(struct rpminspect *ri);
 
 /** @} */
 
+#endif
+
+#ifdef __cplusplus
+}
 #endif

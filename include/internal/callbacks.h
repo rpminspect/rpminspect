@@ -7,6 +7,11 @@
  * Internal structures used for passing context information to callbacks
  */
 
+#ifdef __cplusplus
+extern "C"
+{
+#endif
+
 #ifndef _LIBRPMINSPECT_CALLBACKS_H
 #define _LIBRPMINSPECT_CALLBACKS_H
 
@@ -35,3 +40,7 @@ typedef struct {
 } lic_cb_data;
 
 #endif /* _LIBRPMINSPECT_CALLBACKS_H */
+
+#ifdef __cplusplus
+}
+#endif

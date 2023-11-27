@@ -3,6 +3,11 @@
  * SPDX-License-Identifier: LGPL-3.0-or-later
  */
 
+#ifdef __cplusplus
+extern "C"
+{
+#endif
+
 #ifndef _LIBRPMINSPECT_INIT_H
 #define _LIBRPMINSPECT_INIT_H
 
@@ -151,4 +156,8 @@
 #define RI_WORKDIR                  "workdir"
 #define RI_XML                      "xml"
 
+#endif
+
+#ifdef __cplusplus
+}
 #endif

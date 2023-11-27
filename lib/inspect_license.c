@@ -22,7 +22,7 @@
 #include <fcntl.h>
 #include <stdarg.h>
 #include <json.h>
-#include "callbacks.h"
+#include "internal/callbacks.h"
 #include "parser.h"
 #include "rpminspect.h"
 
