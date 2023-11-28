@@ -506,34 +506,48 @@ static bool _is_debug_rpm_helper(Header hdr, const char *provide, const char *su
     rpmtd req = NULL;
     rpmFlags flags = HEADERGET_MINMEM | HEADERGET_EXT | HEADERGET_ARGV;
     const char *p = NULL;
-    bool r = false;
+    const char *n = NULL;
+    bool rn = false;
+    bool rp = false;
 
     assert(hdr != NULL);
 
-    /* start new header transactions */
-    req = rpmtdNew();
+    /* look at the package name as well */
+    if (suffix) {
+        n = headerGetString(hdr, RPMTAG_NAME);
 
-    if (headerGet(hdr, RPMTAG_PROVIDENAME, req, flags)) {
-        /* collect all of the rules for this package */
-        while (rpmtdNext(req) != -1) {
-            p = rpmtdGetString(req);
-
-            if (provide && !strcmp(p, provide)) {
-                r = true;
-                break;
-            }
-
-            if (suffix && strsuffix(p, suffix)) {
-                r = true;
-                break;
-            }
+        if (strsuffix(n, suffix)) {
+            rn = true;
         }
+    } else {
+        /* caller did not specify a suffix to check */
+        rn = true;
     }
 
-    rpmtdFreeData(req);
-    rpmtdFree(req);
+    /* start new header transactions */
+    if (provide) {
+        req = rpmtdNew();
 
-    return r;
+        if (headerGet(hdr, RPMTAG_PROVIDENAME, req, flags)) {
+            /* collect all of the rules for this package */
+            while (rpmtdNext(req) != -1) {
+                p = rpmtdGetString(req);
+
+                if (provide && !strcmp(p, provide)) {
+                    rp = true;
+                    break;
+                }
+            }
+        }
+
+        rpmtdFreeData(req);
+        rpmtdFree(req);
+    } else {
+        /* caller did not specify a provide to check */
+        rp = true;
+    }
+
+    return (rn && rp);
 }
 
 /*
