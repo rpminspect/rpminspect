@@ -664,7 +664,7 @@ class TooManySymlinkLevelsCompareKoji(TestCompareKoji):
         self.waiver_auth = "Anyone"
 
 
-# Directory becomes a symlink (VERIFY)
+# Directory becomes a symlink (BAD)
 class DirectoryBecomesSymlinkCompareRPMs(TestCompareRPMs):
     def setUp(self):
         super().setUp()
@@ -678,7 +678,7 @@ class DirectoryBecomesSymlinkCompareRPMs(TestCompareRPMs):
         self.after_rpm.add_installed_directory("usr/share/actualdirectory")
 
         self.inspection = "symlinks"
-        self.result = "VERIFY"
+        self.result = "BAD"
         self.waiver_auth = "Anyone"
 
 
@@ -695,11 +695,11 @@ class DirectoryBecomesSymlinkCompareKoji(TestCompareKoji):
         self.after_rpm.add_installed_directory("usr/share/actualdirectory")
 
         self.inspection = "symlinks"
-        self.result = "VERIFY"
+        self.result = "BAD"
         self.waiver_auth = "Anyone"
 
 
-# Non-directory becomes a symlink (VERIFY)
+# Non-directory becomes a symlink (INFO)
 class NonDirectoryBecomesSymlinkCompareRPMs(TestCompareRPMs):
     def setUp(self):
         super().setUp()
@@ -723,8 +723,8 @@ class NonDirectoryBecomesSymlinkCompareRPMs(TestCompareRPMs):
         self.after_rpm.add_installed_symlink("usr/bin/anotherrpminspect", "rpminspect")
 
         self.inspection = "symlinks"
-        self.result = "VERIFY"
-        self.waiver_auth = "Anyone"
+        self.result = "INFO"
+        self.waiver_auth = "Not Waivable"
 
 
 class NonDirectoryBecomesSymlinkCompareKoji(TestCompareKoji):
@@ -750,5 +750,5 @@ class NonDirectoryBecomesSymlinkCompareKoji(TestCompareKoji):
         self.after_rpm.add_installed_symlink("usr/bin/anotherrpminspect", "rpminspect")
 
         self.inspection = "symlinks"
-        self.result = "VERIFY"
-        self.waiver_auth = "Anyone"
+        self.result = "INFO"
+        self.waiver_auth = "Not Waivable"
