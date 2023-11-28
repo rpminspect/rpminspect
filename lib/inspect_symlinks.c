@@ -22,6 +22,60 @@
 #include <err.h>
 #include "rpminspect.h"
 
+/*
+ * Check if the symlink resolves to another file in a subpackage.
+ */
+static bool is_linkdest_reachable(const rpmpeer_t *peers, const char *target, const char *arch, int *linkerr)
+{
+    rpmpeer_entry_t *peer = NULL;
+    char *tmp = NULL;
+    bool found = false;
+    struct stat sb;
+
+    assert(peers != NULL);
+    assert(target != NULL);
+    assert(arch != NULL);
+
+    /* look for the symlink in each root */
+    TAILQ_FOREACH(peer, peers, items) {
+        /* skip debuginfo and debugsource packages */
+        if (is_debuginfo_rpm(peer->after_hdr) || is_debugsource_rpm(peer->after_hdr)) {
+            continue;
+        }
+
+        /* skip peers of different architectures, except 'noarch' */
+        if (strcmp(arch, get_rpm_header_arch(peer->after_hdr)) && !strcmp(arch, RPM_NOARCH_NAME)) {
+            continue;
+        }
+
+        /* create the full path to the link destination */
+        tmp = joinpath(peer->after_root, target, NULL);
+        assert(tmp != NULL);
+
+        if (linkerr != NULL) {
+            *linkerr = 0;
+        }
+
+        /* try to access the target */
+        if (lstat(tmp, &sb) == 0) {
+            found = true;
+            free(tmp);
+            break;
+        }
+
+        if (linkerr != NULL) {
+            if (errno == ELOOP || errno == ENAMETOOLONG) {
+                /* save interesting symlink errors */
+                *linkerr = errno;
+            }
+        }
+
+        free(tmp);
+    }
+
+    return found;
+}
+
 /**
  * @brief Called by the main symlinks inspection driver.
  *
@@ -49,8 +103,6 @@ static bool symlinks_driver(struct rpminspect *ri, rpmfile_entry_t *file)
     char *target = NULL;
     int linkerr = 0;
     char cwd[PATH_MAX + 1];
-    bool found = false;
-    rpmpeer_entry_t *peer = NULL;
     const char *name = NULL;
     const char *arch = NULL;
     char *tmp = NULL;
@@ -82,36 +134,10 @@ static bool symlinks_driver(struct rpminspect *ri, rpmfile_entry_t *file)
     /* initialize the result parameters */
     init_result_params(&params);
     params.header = NAME_SYMLINKS;
-    params.remedy = REMEDY_SYMLINKS;
     params.arch = get_rpm_header_arch(file->rpm_header);
     params.file = file->localpath;
 
-    /* first, check for things becoming symlinks to guard RPM */
-    if (file->peer_file && !S_ISLNK(file->peer_file->st.st_mode)) {
-        /* get the localpath link destination */
-        len = readlink(file->fullpath, localpath, sizeof(localpath) - 1);
-        localpath[len] = '\0';
-
-        if (S_ISDIR(file->peer_file->st.st_mode)) {
-            /* Some RPM versions cannot handle this on an upgrade */
-            params.remedy = REMEDY_SYMLINKS_DIRECTORY;
-            xasprintf(&params.msg, _("Directory %s became a symbolic link (to %s) in %s on %s; this is not allowed!"), file->peer_file->localpath, localpath, name, arch);
-        } else {
-            xasprintf(&params.msg, _("%s %s became a symbolic link (to %s) in %s on %s"), strtype(file->peer_file->st.st_mode), file->peer_file->localpath, localpath, name, arch);
-        }
-
-        memset(localpath, '\0', sizeof(localpath));
-
-        params.severity = RESULT_VERIFY;
-        params.waiverauth = WAIVABLE_BY_ANYONE;
-        params.verb = VERB_CHANGED;
-        params.noun = _("${FILE} became a symlink on ${ARCH}");
-        add_result(ri, &params);
-        free(params.msg);
-        result = false;
-    }
-
-    /* get the target */
+    /* get the link target */
     len = readlink(file->fullpath, linktarget, sizeof(linktarget) - 1);
     linktarget[len] = '\0';
     target = linktarget;
@@ -164,7 +190,6 @@ static bool symlinks_driver(struct rpminspect *ri, rpmfile_entry_t *file)
         assert(tmp != NULL);
         tail = stpcpy(reltarget, dirname(localpath));
         assert(reltarget != NULL);
-        DEBUG_PRINT("    reltarget=|%s|, target=|%s|\n", reltarget, target);
 
         while (target && *target != '\0') {
             if (*target == '/') {
@@ -196,7 +221,6 @@ static bool symlinks_driver(struct rpminspect *ri, rpmfile_entry_t *file)
                 *tmp = '\0';
                 tail = tmp;
                 target += 3;
-                DEBUG_PRINT("    reltarget=|%s|, target=|%s|\n", reltarget, target);
             } else {
                 /* copy the path segment we are currently looking at */
                 /*
@@ -226,7 +250,6 @@ static bool symlinks_driver(struct rpminspect *ri, rpmfile_entry_t *file)
                 /* append the path element to reltarget */
                 tail = stpcpy(tail, target);
                 assert(tail != NULL);
-                DEBUG_PRINT("    reltarget=|%s|\n", reltarget);
 
                 /* advance target past the first directory element and '/' */
                 target += strlen(target);
@@ -238,8 +261,6 @@ static bool symlinks_driver(struct rpminspect *ri, rpmfile_entry_t *file)
                     tail = stpcpy(tail, "/");
                     assert(tail != NULL);
                 }
-
-                DEBUG_PRINT("    tmp=|%s|, reltarget=|%s|, target=|%s|\n", tmp, reltarget, target);
             }
         }
     }
@@ -251,29 +272,42 @@ static bool symlinks_driver(struct rpminspect *ri, rpmfile_entry_t *file)
         target++;
     }
 
-    DEBUG_PRINT("final target=|%s|\n", target);
+    /* check for things becoming symlinks to guard RPM */
+    if (file->peer_file && !S_ISLNK(file->peer_file->st.st_mode)) {
+        /* get the localpath link destination */
+        len = readlink(file->fullpath, localpath, sizeof(localpath) - 1);
+        localpath[len] = '\0';
 
-    /* look for the symlink in each root */
-    TAILQ_FOREACH(peer, ri->peers, items) {
-        /* move to the subpackage root */
-        if (chdir(peer->after_root) == -1) {
-            continue;
+        if (S_ISDIR(file->peer_file->st.st_mode)) {
+            /* Some RPM versions cannot handle this on an upgrade */
+            params.remedy = REMEDY_SYMLINKS_DIRECTORY;
+            xasprintf(&params.msg, _("Directory %s became a symbolic link (to %s) in %s on %s; this is not allowed!"), file->peer_file->localpath, localpath, name, arch);
+            params.severity = RESULT_BAD;
+            params.waiverauth = WAIVABLE_BY_ANYONE;
+            result = false;
+        } else {
+            /* just report this change as information */
+            if (is_linkdest_reachable(ri->peers, target, arch, NULL)) {
+                xasprintf(&params.msg, _("%s %s became a symbolic link (to %s) in %s on %s; and the link destination is reachable"), strtype(file->peer_file->st.st_mode), file->peer_file->localpath, localpath, name, arch);
+                params.severity = RESULT_INFO;
+                params.waiverauth = NOT_WAIVABLE;
+            } else {
+                xasprintf(&params.msg, _("%s %s became a symbolic link (to %s) in %s on %s; and the link destination is unreachable"), strtype(file->peer_file->st.st_mode), file->peer_file->localpath, localpath, name, arch);
+                params.severity = RESULT_VERIFY;
+                params.waiverauth = WAIVABLE_BY_ANYONE;
+                params.remedy = REMEDY_SYMLINKS;
+            }
         }
 
-        /* try to access the target */
-        if (access(target, R_OK) == 0) {
-            found = true;
-            break;
-        }
-
-        if (errno == ELOOP || errno == ENAMETOOLONG) {
-            /* save interesting symlink errors */
-            linkerr = errno;
-        }
+        memset(localpath, '\0', sizeof(localpath));
+        params.verb = VERB_CHANGED;
+        params.noun = _("${FILE} became a symlink on ${ARCH}");
+        add_result(ri, &params);
+        free(params.msg);
     }
 
-    /* not found?  report */
-    if (!found) {
+    /* linkdest unreachable?  report */
+    if (!is_linkdest_reachable(ri->peers, target, arch, &linkerr)) {
         if (file->peer_file) {
             xasprintf(&params.msg, _("%s %s became a dangling symbolic link in %s on %s"), strtype(file->st.st_mode), file->localpath, name, arch);
         } else {
