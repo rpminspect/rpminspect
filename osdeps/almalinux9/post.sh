@@ -12,7 +12,7 @@ fi
 git clone https://git.kernel.org/pub/scm/utils/dash/dash.git
 cd dash || exit 1
 TAG="$(git tag -l | sort -V | tail -n 1)"
-git checkout -b ${TAG} ${TAG}
+git checkout -b "${TAG}" "${TAG}"
 ./autogen.sh
 ./configure --prefix=/usr/local
 make V=1
