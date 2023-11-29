@@ -9,6 +9,8 @@
 # $2   Full path to rpminspect configuration file to use (optional)
 #
 
+# shellcheck disable=SC2317
+
 PATH=/bin:/usr/bin
 CMD="$(basename "${0}")"
 RPMINSPECT="${1}"
@@ -37,7 +39,7 @@ packages="zsh kernel python3 firefox mutt emacs tmux elfutils"
 # Validate programs we need are present
 reqs="rpmbuild koji"
 for req in $reqs; do
-    if ! $req --help > /dev/null 2>&1; then
+    if ! $req --help >&- 2>&-; then
         echo "ERROR: Required program $req missing." >&2
         exit 1
     fi

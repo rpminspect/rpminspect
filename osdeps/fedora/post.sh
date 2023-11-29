@@ -13,7 +13,7 @@ case "$(uname -m)" in
 esac
 
 # Work around a bug in meson 0.55.0
-MESON_VER="$(meson --version 2>/dev/null)"
+MESON_VER="$(meson --version 2>&-)"
 
 if [ -z "${MESON_VER}" ] || [ ! "${MESON_VER}" = "0.55.0" ]; then
     exit 0
