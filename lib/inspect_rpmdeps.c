@@ -19,6 +19,30 @@ static char *pkg_vr = NULL;
 static uint64_t pkg_epoch = 0;
 
 /*
+ * Given a package name, return true if this is a valid subpackage in
+ * the current build.
+ */
+static bool is_subpackage(rpmpeer_t *peers, const char *package)
+{
+    rpmpeer_entry_t *peer = NULL;
+    const char *name = NULL;
+
+    assert(peers != NULL);
+    assert(package != NULL);
+
+    TAILQ_FOREACH(peer, peers, items) {
+        name = headerGetString(peer->after_hdr, RPMTAG_NAME);
+        assert(name != NULL);
+
+        if (!strcmp(name, package)) {
+            return true;
+        }
+    }
+
+    return false;
+}
+
+/*
  * Given a requirement string, remove any %{_isa} substring in it.
  * Returns a newly allocated string.  The %{_isa} substrings are all
  * defined in the macros files found in /usr/lib/rpm/platform/ and are
@@ -228,6 +252,10 @@ static bool check_explicit_lib_deps(struct rpminspect *ri, Header h, deprule_lis
     uint64_t epoch = 0;
     char *rulestr = NULL;
     bool found = false;
+    bool collect = false;
+    const char *tn = NULL;
+    string_entry_t *entry = NULL;
+    string_list_t *transitive = NULL;
     struct result_params params;
 
     assert(ri != NULL);
@@ -378,6 +406,70 @@ static bool check_explicit_lib_deps(struct rpminspect *ri, Header h, deprule_lis
                     found = true;
                 }
 
+                /* requires could be handled by a transitive dependency */
+                if (!found) {
+                    /*
+                     * Collect all Requires down the build/
+                     * This is weird, but first walk the current
+                     * package's Requires list and collect the package
+                     * names.  Then the next while loop will walk all
+                     * of those Requires and look at those peer
+                     * packages and gather their Requires until there
+                     * are no more to gather.  We have found it via a
+                     * transitive Requires if the transitive list
+                     * contains the potential_prov's package name.
+                     */
+                    TAILQ_FOREACH(verify, after_deps, items) {
+                        if (verify->type == TYPE_REQUIRES && *verify->requirement != '/'
+                            && !strprefix(verify->requirement, SHARED_LIB_PREFIX) && !strstr(verify->requirement, SHARED_LIB_SUFFIX)) {
+                            isareq = remove_isa_substring(verify->requirement);
+                            assert(isareq != NULL);
+
+                            if (is_subpackage(ri->peers, isareq) && !list_contains(transitive, isareq)) {
+                                transitive = list_add(transitive, isareq);
+                            }
+
+                            free(isareq);
+                        }
+                    }
+
+                    collect = true;
+
+                    while (collect) {
+                        TAILQ_FOREACH(peer, ri->peers, items) {
+                            tn = headerGetString(peer->after_hdr, RPMTAG_NAME);
+                            collect = false;
+
+                            TAILQ_FOREACH(entry, transitive, items) {
+                                if (!strcmp(tn, entry->data)) {
+                                    TAILQ_FOREACH(verify, peer->after_deprules, items) {
+                                        if (verify->type == TYPE_REQUIRES
+                                            && *verify->requirement != '/'
+                                            && !strprefix(verify->requirement, SHARED_LIB_PREFIX) && !strstr(verify->requirement, SHARED_LIB_SUFFIX)) {
+                                            isareq = remove_isa_substring(verify->requirement);
+                                            assert(isareq != NULL);
+
+                                            if (is_subpackage(ri->peers, isareq) && !list_contains(transitive, isareq)) {
+                                                transitive = list_add(transitive, isareq);
+                                                collect = true;
+                                            }
+
+                                            free(isareq);
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+
+                    if (list_contains(transitive, pn)) {
+                        found = true;
+                    }
+
+                    list_free(transitive, free);
+                    transitive = NULL;
+                }
+
                 free(evr);
                 free(vr);
             }
@@ -412,7 +504,7 @@ static bool check_explicit_lib_deps(struct rpminspect *ri, Header h, deprule_lis
             }
         }
 
-        /* check for multiple providers foreach Requires */
+        /* check for multiple providers for each Requires */
         if (list_len(req->providers) > 1 && list_len(explicit_requires) > 0) {
             r = strdeprule(req);
             multiples = list_to_string(req->providers, ", ");
