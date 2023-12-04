@@ -449,6 +449,12 @@ static bool check_explicit_lib_deps(struct rpminspect *ri, Header h, deprule_lis
                                             isareq = remove_isa_substring(verify->requirement);
                                             assert(isareq != NULL);
 
+                                            if (list_contains(transitive, pn)) {
+                                                found = true;
+                                                collect = false;
+                                                break;
+                                            }
+
                                             if (is_subpackage(ri->peers, isareq) && !list_contains(transitive, isareq)) {
                                                 transitive = list_add(transitive, isareq);
                                                 collect = true;
@@ -462,7 +468,7 @@ static bool check_explicit_lib_deps(struct rpminspect *ri, Header h, deprule_lis
                         }
                     }
 
-                    if (list_contains(transitive, pn)) {
+                    if (!found && list_contains(transitive, pn)) {
                         found = true;
                     }
 
