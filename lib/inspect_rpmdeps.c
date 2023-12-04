@@ -433,43 +433,45 @@ static bool check_explicit_lib_deps(struct rpminspect *ri, Header h, deprule_lis
                         }
                     }
 
-                    collect = true;
+                    if (transitive && !TAILQ_EMPTY(transitive)) {
+                        collect = true;
 
-                    while (collect) {
-                        TAILQ_FOREACH(peer, ri->peers, items) {
-                            tn = headerGetString(peer->after_hdr, RPMTAG_NAME);
-                            collect = false;
+                        while (collect) {
+                            TAILQ_FOREACH(peer, ri->peers, items) {
+                                tn = headerGetString(peer->after_hdr, RPMTAG_NAME);
+                                collect = false;
 
-                            TAILQ_FOREACH(entry, transitive, items) {
-                                if (!strcmp(tn, entry->data)) {
-                                    TAILQ_FOREACH(verify, peer->after_deprules, items) {
-                                        if (verify->type == TYPE_REQUIRES
-                                            && *verify->requirement != '/'
-                                            && !strprefix(verify->requirement, SHARED_LIB_PREFIX) && !strstr(verify->requirement, SHARED_LIB_SUFFIX)) {
-                                            isareq = remove_isa_substring(verify->requirement);
-                                            assert(isareq != NULL);
+                                TAILQ_FOREACH(entry, transitive, items) {
+                                    if (!strcmp(tn, entry->data)) {
+                                        TAILQ_FOREACH(verify, peer->after_deprules, items) {
+                                            if (verify->type == TYPE_REQUIRES
+                                                && *verify->requirement != '/'
+                                                && !strprefix(verify->requirement, SHARED_LIB_PREFIX) && !strstr(verify->requirement, SHARED_LIB_SUFFIX)) {
+                                                isareq = remove_isa_substring(verify->requirement);
+                                                assert(isareq != NULL);
 
-                                            if (list_contains(transitive, pn)) {
-                                                found = true;
-                                                collect = false;
-                                                break;
+                                                if (list_contains(transitive, pn)) {
+                                                    found = true;
+                                                    collect = false;
+                                                    break;
+                                                }
+
+                                                if (is_subpackage(ri->peers, isareq) && !list_contains(transitive, isareq)) {
+                                                    transitive = list_add(transitive, isareq);
+                                                    collect = true;
+                                                }
+
+                                                free(isareq);
                                             }
-
-                                            if (is_subpackage(ri->peers, isareq) && !list_contains(transitive, isareq)) {
-                                                transitive = list_add(transitive, isareq);
-                                                collect = true;
-                                            }
-
-                                            free(isareq);
                                         }
                                     }
                                 }
                             }
                         }
-                    }
 
-                    if (!found && list_contains(transitive, pn)) {
-                        found = true;
+                        if (!found && list_contains(transitive, pn)) {
+                            found = true;
+                        }
                     }
 
                     list_free(transitive, free);
