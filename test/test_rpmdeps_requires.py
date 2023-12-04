@@ -14,6 +14,10 @@ from baseclass import TestCompareKoji, TestCompareRPMs, TestCompareSRPM
 from baseclass import BEFORE_NAME, BEFORE_VER, BEFORE_REL
 from baseclass import AFTER_NAME, AFTER_VER, AFTER_REL
 
+# Read in the built rpminspect executable for use in these test RPMs
+with open(os.environ["RPMINSPECT"], mode="rb") as f:
+    ri_bytes = f.read()
+
 # determine if we have /usr/lib/rpm/elfdeps
 # (missing on Alpine Linux as of 14-Jan-2022)
 elfdeps = "/usr/lib/rpm/elfdeps"
@@ -1490,3 +1494,132 @@ class AutomaticRequiresMovesSubpackagesCompareKoji(TestCompareKoji):
         self.inspection = "rpmdeps"
         self.result = "INFO"
         self.waiver_auth = "Not Waivable"
+
+
+class ExplicitRequiresIsTransitiveKoji(TestKoji):
+    @unittest.skipUnless(have_elfdeps, "system lacks %s executable" % elfdeps)
+    def setUp(self):
+        super().setUp()
+
+        # add subpackages
+        self.rpm.add_subpackage("libs")
+        tools = self.rpm.add_subpackage("tools")
+
+        # add something to the tools subpackage
+        self.rpm.add_installed_file(
+            "usr/bin/tool",
+            SourceFile("tool.bin", ri_bytes),
+            mode="0755",
+            subpackageSuffix="tools",
+        )
+        tools.add_requires("vaporware-libs = %{version}-%{release}")
+
+        # we need some stuff in the packages, first a shared library
+        self.rpm.add_simple_library(
+            libraryName="libvaporware.so",
+            installPath="usr/lib/libvaporware.so",
+            subpackageSuffix="libs",
+            sourceContent=library_source,
+        )
+
+        # now add a program linked with that library
+        sourceFileName = "main.c"
+        installPath = "usr/bin/vaporware"
+        self.rpm.add_source(SourceFile(sourceFileName, hello_lib_world))
+        self.rpm.section_build += (
+            "%if 0%{?__isa_bits} == 32\n%define mopt -m32\n%endif\n"
+        )
+        self.rpm.section_build += (
+            CC + " %%{?mopt} %s -L. -lvaporware\n" % sourceFileName
+        )
+        self.rpm.create_parent_dirs(installPath)
+        self.rpm.section_install += "cp a.out $RPM_BUILD_ROOT/%s\n" % installPath
+        binsub = self.rpm.get_subpackage(None)
+        binsub.section_files += "/%s\n" % installPath
+        self.rpm.add_payload_check(installPath, None)
+
+        # explicit transitive Requires
+        self.rpm.add_requires("vaporware-tools = %{version}-%{release}")
+
+        self.inspection = "rpmdeps"
+        self.result = "OK"
+
+
+class ExplicitRequiresIsTransitiveCompareKoji(TestCompareKoji):
+    @unittest.skipUnless(have_elfdeps, "system lacks %s executable" % elfdeps)
+    def setUp(self):
+        super().setUp()
+
+        # add a subpackage
+        self.before_rpm.add_subpackage("libs")
+        before_tools = self.before_rpm.add_subpackage("tools")
+        self.after_rpm.add_subpackage("libs")
+        after_tools = self.after_rpm.add_subpackage("tools")
+
+        # add something to the tools subpackage
+        self.before_rpm.add_installed_file(
+            "usr/bin/tool",
+            SourceFile("tool.bin", ri_bytes),
+            mode="0755",
+            subpackageSuffix="tools",
+        )
+        before_tools.add_requires("vaporware-libs = %{version}-%{release}")
+
+        self.after_rpm.add_installed_file(
+            "usr/bin/tool",
+            SourceFile("tool.bin", ri_bytes),
+            mode="0755",
+            subpackageSuffix="tools",
+        )
+        after_tools.add_requires("vaporware-libs = %{version}-%{release}")
+
+        # we need some stuff in the packages, first a shared library
+        self.before_rpm.add_simple_library(
+            libraryName="libvaporware.so",
+            installPath="usr/lib/libvaporware.so",
+            subpackageSuffix="libs",
+            sourceContent=library_source,
+        )
+        self.after_rpm.add_simple_library(
+            libraryName="libvaporware.so",
+            installPath="usr/lib/libvaporware.so",
+            subpackageSuffix="libs",
+            sourceContent=library_source,
+        )
+
+        # now add a program linked with that library
+        sourceFileName = "main.c"
+        installPath = "usr/bin/vaporware"
+
+        self.before_rpm.add_source(SourceFile(sourceFileName, hello_lib_world))
+        self.before_rpm.section_build += (
+            "%if 0%{?__isa_bits} == 32\n%define mopt -m32\n%endif\n"
+        )
+        self.before_rpm.section_build += (
+            CC + " %%{?mopt} %s -L. -lvaporware\n" % sourceFileName
+        )
+        self.before_rpm.create_parent_dirs(installPath)
+        self.before_rpm.section_install += "cp a.out $RPM_BUILD_ROOT/%s\n" % installPath
+        binsub = self.before_rpm.get_subpackage(None)
+        binsub.section_files += "/%s\n" % installPath
+        self.before_rpm.add_payload_check(installPath, None)
+
+        self.after_rpm.add_source(SourceFile(sourceFileName, hello_lib_world))
+        self.after_rpm.section_build += (
+            "%if 0%{?__isa_bits} == 32\n%define mopt -m32\n%endif\n"
+        )
+        self.after_rpm.section_build += (
+            CC + " %%{?mopt} %s -L. -lvaporware\n" % sourceFileName
+        )
+        self.after_rpm.create_parent_dirs(installPath)
+        self.after_rpm.section_install += "cp a.out $RPM_BUILD_ROOT/%s\n" % installPath
+        binsub = self.after_rpm.get_subpackage(None)
+        binsub.section_files += "/%s\n" % installPath
+        self.after_rpm.add_payload_check(installPath, None)
+
+        # explicit transitive Requires
+        self.before_rpm.add_requires("vaporware-tools = %{version}-%{release}")
+        self.after_rpm.add_requires("vaporware-tools = %{version}-%{release}")
+
+        self.inspection = "rpmdeps"
+        self.result = "OK"
