@@ -199,7 +199,7 @@ class ModuleHasReleaseTagSubstring(TestModule):
         self.extra_cfg["modularity"]["release_regexp"] = {}
         self.extra_cfg["modularity"]["release_regexp"][
             "GENERIC"
-        ] = "\+module\.[a-z0-9]+\.[0-9]+\.[0-9]+"  # noqa: W605
+        ] = "+module.[a-z0-9]+.[0-9]+.[0-9]+"  # noqa: W605
 
         self.inspection = "modularity"
         self.result = "OK"
@@ -218,7 +218,7 @@ class ModulesHaveReleaseTagSubstring(TestCompareModules):
         self.extra_cfg["modularity"]["release_regexp"] = {}
         self.extra_cfg["modularity"]["release_regexp"][
             "GENERIC"
-        ] = "\+module\.[a-z0-9]+\.[0-9]+\.[0-9]+"  # noqa: W605
+        ] = "+module.[a-z0-9]+.[0-9]+.[0-9]+"  # noqa: W605
 
         self.inspection = "modularity"
         self.result = "OK"
