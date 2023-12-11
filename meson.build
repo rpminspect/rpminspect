@@ -13,22 +13,22 @@ fs = import('fs')
 cc = meson.get_compiler('c')
 
 # Define the program version
-add_global_arguments('-DPACKAGE_VERSION="@0@"'.format(meson.project_version()), language : 'c')
+add_global_arguments('-DPACKAGE_VERSION="@0@"'.format(meson.project_version()), language : ['c', 'cpp'])
 
 # Always add _GNU_SOURCE because some other libraries rely on this macro
-add_global_arguments('-D_GNU_SOURCE', language : 'c')
+add_global_arguments('-D_GNU_SOURCE', language : ['c', 'cpp'])
 
 # Define this to get around a problematic json_object.h macro
-add_global_arguments('-D__STRICT_ANSI__', language : 'c')
+add_global_arguments('-D__STRICT_ANSI__', language : ['c', 'cpp'])
 
 # On NetBSD we need to build without pedantic errors because of some
 # things in pkgsrc
 if build_machine.system() == 'netbsd'
-    add_global_arguments('-Wno-pedantic', language : 'c')
+    add_global_arguments('-Wno-pedantic', language : ['c', 'cpp'])
 endif
 
 # Vendor data directory
-add_global_arguments('-DVENDOR_DATA_DIR="@0@"'.format(get_option('vendor_data_dir')), language : 'c')
+add_global_arguments('-DVENDOR_DATA_DIR="@0@"'.format(get_option('vendor_data_dir')), language : ['c', 'cpp'])
 
 # Library search dirs
 search_dirs = [ '/usr/local/lib', '/usr/pkg/lib', '/usr/lib64', '/usr/lib' ]
@@ -49,7 +49,7 @@ inc = include_directories(existing_include_dirs)
 
 # See if we have reallocarray in libc
 if cc.has_function('reallocarray')
-    add_global_arguments('-D_HAVE_REALLOCARRAY', language : 'c')
+    add_global_arguments('-D_HAVE_REALLOCARRAY', language : ['c', 'cpp'])
 endif
 
 # On FreeBSD, figure out where strverscmp() is
@@ -61,14 +61,14 @@ libiberty = cc.find_library('iberty',
 if build_machine.system() == 'freebsd'
     # FreeBSD >= 14.x has it in libc
     if cc.has_function('strverscmp')
-        add_global_arguments('-D__BSD_VISIBLE', language : 'c')
+        add_global_arguments('-D__BSD_VISIBLE', language : ['c', 'cpp'])
     else
         # check GNU libiberty
         if not libiberty.found()
             error('*** unable to find libiberty.a for strverscmp()')
         endif
 
-        add_global_arguments('-D_FREEBSD_LIBIBERTY', language : 'c')
+        add_global_arguments('-D_FREEBSD_LIBIBERTY', language : ['c', 'cpp'])
     endif
 endif
 
@@ -85,7 +85,7 @@ if find_program('xgettext', required : get_option('nls')).found()
         endif
     endif
 
-    add_global_arguments('-DGETTEXT_DOMAIN="' + meson.project_name() + '"', language : 'c')
+    add_global_arguments('-DGETTEXT_DOMAIN="' + meson.project_name() + '"', language : ['c', 'cpp'])
     subdir('po')
 endif
 
@@ -101,7 +101,7 @@ icu_io = dependency('icu-io', required : true)
 
 # Check for xmlSetGenericErrorFunc in newer releases of libxml
 if cc.has_function('xmlSetGenericErrorFunc', dependencies : [ libxml ])
-    add_project_arguments('-D_HAVE_XMLSETGENERICERRORFUNC', language : 'c')
+    add_project_arguments('-D_HAVE_XMLSETGENERICERRORFUNC', language : ['c', 'cpp'])
 endif
 
 # Check for newer CURLcode in libcurl
@@ -119,7 +119,7 @@ have_newer_curlinfo = cc.compiles(curlinfo_src,
                                   no_builtin_args: true)
 
 if have_newer_curlinfo
-    add_project_arguments('-D_HAVE_NEWER_CURLINFO', language : 'c')
+    add_project_arguments('-D_HAVE_NEWER_CURLINFO', language : ['c', 'cpp'])
 endif
 
 # libkmod
@@ -132,11 +132,11 @@ if get_option('with_libkmod')
         libkmod = disabler()
     else
         libkmod = dependency('libkmod', required : true)
-        add_project_arguments('-D_WITH_LIBKMOD', language : 'c')
+        add_project_arguments('-D_WITH_LIBKMOD', language : ['c', 'cpp'])
 
         if not cc.has_header('libkmod.h', include_directories : inc)
             if cc.has_header('kmod/libkmod.h', include_directories : inc)
-                add_project_arguments('-D_LIBKMOD_HEADER_SUBDIR', language : 'c')
+                add_project_arguments('-D_LIBKMOD_HEADER_SUBDIR', language : ['c', 'cpp'])
             else
                 error('*** unable to find libkmod.h')
             endif
@@ -150,7 +150,7 @@ endif
 # If we're on an older API, note that for the build
 rpm = dependency('rpm', required : true)
 if rpm.version().version_compare('<4.15.0')
-    add_project_arguments('-D_HAVE_OLD_RPM_API', language : 'c')
+    add_project_arguments('-D_HAVE_OLD_RPM_API', language : ['c', 'cpp'])
 endif
 
 # librpmbuild
@@ -178,16 +178,16 @@ have_modularitylabel = cc.compiles(rpmtag_src,
                                    name: 'RPMTAG_MODULARITYLABEL availability test')
 
 if have_modularitylabel
-    add_project_arguments('-D_HAVE_MODULARITYLABEL', language : 'c')
+    add_project_arguments('-D_HAVE_MODULARITYLABEL', language : ['c', 'cpp'])
 endif
 
 # libarchive (need to check for specific functions)
 libarchive = dependency('libarchive', required : true)
 
 if cc.has_function('archive_version_details', dependencies : [ libarchive ])
-    add_project_arguments('-D_HAVE_ARCHIVE_VERSION_DETAILS', language : 'c')
+    add_project_arguments('-D_HAVE_ARCHIVE_VERSION_DETAILS', language : ['c', 'cpp'])
 elif cc.has_function('archive_version_string', dependencies : [ libarchive ])
-    add_project_arguments('-D_HAVE_ARCHIVE_VERSION_STRING', language : 'c')
+    add_project_arguments('-D_HAVE_ARCHIVE_VERSION_STRING', language : ['c', 'cpp'])
 endif
 
 # openssl (need to check for the version info function)
@@ -197,9 +197,9 @@ have_openssl_version = cc.has_function('OpenSSL_version', dependencies : [ opens
 have_ssleay_version = cc.has_function('SSLeay_version', dependencies : [ openssl ])
 
 if not have_openssl_version and have_ssleay_version
-    add_project_arguments('-DOpenSSL_version=SSLeay_version', language : 'c')
+    add_project_arguments('-DOpenSSL_version=SSLeay_version', language : ['c', 'cpp'])
 elif not have_openssl_version and not have_ssleay_version
-    add_project_arguments('-D_NO_OPENSSL_VERSION_FUNCTION', language : 'c')
+    add_project_arguments('-D_NO_OPENSSL_VERSION_FUNCTION', language : ['c', 'cpp'])
 endif
 
 # Test suite dependencies
@@ -280,11 +280,11 @@ if not cc.has_function('mparse_alloc', dependencies : [mandoc, zlib])
 endif
 
 if cc.has_header('mandoc_parse.h', include_directories : inc)
-    add_project_arguments('-DNEWLIBMANDOC', language : 'c')
+    add_project_arguments('-DNEWLIBMANDOC', language : ['c', 'cpp'])
 else
     if cc.has_header('mandoc/mandoc_parse.h', include_directories : inc)
-        add_project_arguments('-DNEWLIBMANDOC', language : 'c')
-        add_project_arguments('-DMANDOC_INCLUDE_SUBDIR', language : 'c')
+        add_project_arguments('-DNEWLIBMANDOC', language : ['c', 'cpp'])
+        add_project_arguments('-DMANDOC_INCLUDE_SUBDIR', language : ['c', 'cpp'])
     else
         message('using libmandoc < 1.14.5 API')
     endif
@@ -296,7 +296,7 @@ if not cc.has_function('magic_open', args : ['-lmagic'])
 endif
 
 if cc.has_function('magic_version', args : ['-lmagic'])
-    add_project_arguments('-D_HAVE_MAGIC_VERSION', language : 'c')
+    add_project_arguments('-D_HAVE_MAGIC_VERSION', language : ['c', 'cpp'])
 endif
 
 magic = declare_dependency(link_args : ['-lmagic'])
@@ -320,7 +320,7 @@ if get_option('with_libcap')
             error('*** unable to find libcap')
         endif
 
-        add_project_arguments('-D_WITH_LIBCAP', language : 'c')
+        add_project_arguments('-D_WITH_LIBCAP', language : ['c', 'cpp'])
     endif
 else
     message('disabling Linux capability(7) support (libcap)')
@@ -336,7 +336,7 @@ if get_option('with_annocheck')
     if build_machine.system() == 'freebsd'
         message('disabling annocheck(1) support on FreeBSD')
     else
-        add_project_arguments('-D_WITH_ANNOCHECK', language : 'c')
+        add_project_arguments('-D_WITH_ANNOCHECK', language : ['c', 'cpp'])
     endif
 endif
 
@@ -345,7 +345,7 @@ if get_option('with_libannocheck')
         message('libannocheck is not supported on FreeBSD, disabling support')
     else
         libannocheck = dependency('libannocheck', required : true)
-        add_project_arguments('-D_WITH_LIBANNOCHECK', language : 'c')
+        add_project_arguments('-D_WITH_LIBANNOCHECK', language : ['c', 'cpp'])
     endif
 else
     message('disabling libannocheck support')
@@ -378,7 +378,7 @@ cdson = dependency('cdson', required : true)
 # Check for sys/queue.h
 if not cc.has_header('sys/queue.h', include_directories : inc)
     message('<sys/queue.h> not found, using bundled copy')
-    add_project_arguments('-D_COMPAT_QUEUE', language : 'c')
+    add_project_arguments('-D_COMPAT_QUEUE', language : ['c', 'cpp'])
 endif
 
 # Header files for builds

@@ -70,8 +70,8 @@ cd debugedit || exit 1
 TAG="$(git tag -l | grep ^debugedit- | sort -n | tail -n 1)"
 git checkout -b "${TAG}" "${TAG}"
 autoreconf -f -i -v
-./configure --prefix=/usr
-make V=1
+env CFLAGS=-D_LARGEFILE64_SOURCE ./configure --prefix=/usr
+make -k V=1
 make install
 
 # cdson is not [yet] in Alpine
@@ -92,6 +92,9 @@ echo "%_arch %(/bin/arch)" > ~/.rpmmacros
 
 # Alpine Linux does not define an RPM dist tag
 echo '%dist .ri47' >> "${HOME}"/.rpmmacros
+
+# Alpine Linux gets find-debuginfo via this script
+echo '%__find_debuginfo /usr/bin/find-debuginfo' >> "${HOME}"/.rpmmacros
 
 # Update the clamav database
 freshclam

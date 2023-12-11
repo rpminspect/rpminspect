@@ -36,13 +36,16 @@ musl-legacy-error
 musl-libintl
 patchelf
 pkgconf
+py3-coveralls
 py3-pip
 py3-rpm
+py3-timeout-decorator
 py3-yaml
 python3-dev
 rpm-dev
 rust
 sed
+tar
 tcsh
 xmlrpc-c-dev
 yaml-dev
