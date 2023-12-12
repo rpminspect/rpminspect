@@ -160,17 +160,12 @@ cases you will need.
 
 The following inspections lack integration tests:
 
-    javabytecode
-    changedfiles (compare only...these do not apply to single package inputs)
-    removedfiles (compare only...these do not apply to single package inputs)
-    addedfiles (compare only...these do not apply to single package inputs)
-    DT_NEEDED
-    capabilities
     arch
-    subpackages
-    pathmigration
-    abidiff
+    dsodeps
+    javabytecode
     kmidiff
+    movedfiles
+    subpackages
 
 There are plenty of functions that can use unit tests too.  Look
 through the source in lib/ for functions that this would apply to and
