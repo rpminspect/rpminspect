@@ -38,7 +38,6 @@ static bool is_udev_rules_file(struct rpminspect *ri, const rpmfile_entry_t *fil
     }
 
     /* Make sure we are looking at a udev rules file */
-
     if (!strsuffix(file->localpath, UDEV_RULES_FILENAME_EXTENSION)) {
         return false;
     }
@@ -58,8 +57,10 @@ static bool is_udev_rules_file(struct rpminspect *ri, const rpmfile_entry_t *fil
  */
 static char *run_udevadm_verify(int *exitcode, const struct rpminspect *ri, const char *arg)
 {
-    return run_cmd(exitcode, ri->worksubdir, ri->commands.udevadm, "verify",
-                   "--no-summary", "--no-style", "--resolve-names=never", arg, NULL);
+    assert(ri != NULL);
+    assert(arg != NULL);
+
+    return run_cmd(exitcode, ri->worksubdir, ri->commands.udevadm, "verify", "--no-summary", "--no-style", "--resolve-names=never", arg, NULL);
 }
 
 static bool udevrules_driver(struct rpminspect *ri, rpmfile_entry_t *file)
@@ -154,7 +155,7 @@ bool inspect_udevrules(struct rpminspect *ri)
     assert(ri->peers != NULL);
 
     /* Check whether udevadm verify is available. */
-    details = run_udevadm_verify(&rc, ri, NULL);
+    details = run_cmd(&rc, ri->worksubdir, ri->commands.udevadm, "verify", "--help", NULL);
 
     /* Skip the inspection if udevadm verify is not available. */
     if (rc != 0) {
@@ -162,6 +163,7 @@ bool inspect_udevrules(struct rpminspect *ri)
         params.header = NAME_UDEVRULES;
         params.severity = RESULT_SKIP;
         params.verb = VERB_SKIP;
+        params.msg = _("The 'udevadm verify' command does not operate as expected on this system.");
         params.details = details;
         add_result(ri, &params);
         free(details);
