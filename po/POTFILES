@@ -1,8 +1,9 @@
-include/callbacks.h
 include/compat/queue.h
 include/constants.h
 include/init.h
 include/inspect.h
+include/internal/callbacks.h
+include/internal/tyranny.h
 include/output.h
 include/parser.h
 include/queue.h
@@ -11,11 +12,11 @@ include/results.h
 include/rpminspect.h
 include/secrules.h
 include/types.h
-include/tyranny.h
 include/uthash.h
 lib/abi.c
 lib/abspath.c
 lib/arches.c
+lib/array.c
 lib/badwords.c
 lib/builds.c
 lib/checksums.c
