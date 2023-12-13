@@ -743,7 +743,7 @@ extern "C"
  * @{
  */
 
-#define REMEDY_RUNPATH _("Either DT_RPATH or DT_RUNPATH properties were found on ELF shared objects in this package.  The use of DT_RPATH and DT_RUNPATH is discouraged except in certain situations.  Check to see that you a disabling rpath during the %build stage of the spec file.  If you are unable to do this easily, you can try using a program such as patchelf to remove these properties from the ELF files.")
+#define REMEDY_RUNPATH _("Either DT_RPATH or DT_RUNPATH properties were found on ELF shared objects in this package.  The use of DT_RPATH and DT_RUNPATH is discouraged except in certain situations.  Check to see that you are disabling rpath during the %build stage of the spec file.  If you are unable to do this easily, you can try using a program such as patchelf to remove these properties from the ELF files.")
 
 #define REMEDY_RUNPATH_BOTH _("Both DT_RPATH and DT_RUNPATH properties were found in an ELF shared object.  This indicates a linker error and should not happen.  ELF objects should only carry DT_RPATH or DT_RUNPATH, never both.")
 
