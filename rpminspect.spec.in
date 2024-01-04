@@ -65,9 +65,9 @@ Requires:       desktop-file-utils
 Requires:       gettext
 
 %if 0%{?rhel} >= 8 || 0%{?epel} >= 8 || 0%{?fedora}
-Recommends:     /usr/bin/annocheck
+Recommends:     annobin-annocheck
 %else
-Requires:       /usr/bin/annocheck
+Requires:       annobin-annocheck
 %endif
 
 # The clamav data is required for the virus inspection.  Either
