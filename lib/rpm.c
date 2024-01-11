@@ -519,9 +519,6 @@ static bool _is_debug_rpm_helper(Header hdr, const char *provide, const char *su
         if (strsuffix(n, suffix)) {
             rn = true;
         }
-    } else {
-        /* caller did not specify a suffix to check */
-        rn = true;
     }
 
     /* start new header transactions */
@@ -542,12 +539,9 @@ static bool _is_debug_rpm_helper(Header hdr, const char *provide, const char *su
 
         rpmtdFreeData(req);
         rpmtdFree(req);
-    } else {
-        /* caller did not specify a provide to check */
-        rp = true;
     }
 
-    return (rn && rp);
+    return (rn || rp);
 }
 
 /*
