@@ -56,10 +56,9 @@ jobs:
                   sed -i -e 's|enabled=0|enabled=1|g' /etc/yum.repos.d/oracle-linux-ol8.repo
 
                   dnf install -y git
-                  git config --global --add safe.directory /__w/rpminspect/rpminspect
 
             # This means clone the git repo
-            - uses: actions/checkout@v3
+            - uses: actions/checkout@v4
 
             # Within the container, install the dependencies, build,
             # and run the test suite

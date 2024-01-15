@@ -62,10 +62,9 @@ jobs:
               run: |
                   slackpkg install git nghttp2 brotli cyrus-sasl dcron perl ca-certificates
                   update-ca-certificates --fresh
-                  git config --global --add safe.directory /__w/rpminspect/rpminspect
 
             # This means clone the git repo
-            - uses: actions/checkout@v3
+            - uses: actions/checkout@v4
 
             # Within the container, install the dependencies, build,
             # and run the test suite
