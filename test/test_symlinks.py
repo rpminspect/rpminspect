@@ -28,8 +28,9 @@ if (
 else:
     rpm_handles_symlinks = True
 
-# OpenSUSE Leap does not trigger ELOOP for symlinks that have >=40 levels.
-# You get a dangling symlink but it returns ENOENT rather than ELOOP.
+# The following systems do not trigger ELOOP for symlinks that have
+# >=40 levels.  You get a dangling symlink but it returns ENOENT
+# rather than ELOOP.
 #
 # For our test cases, rpminspect will report the dangling symlink but
 # at the INFO level rather than BAD because of the ENOENT errno.
@@ -37,7 +38,11 @@ else:
 # rpminspect reports those as INFO.
 #
 # Maybe this is the beginning of this limit not existing anymore?
-if os.path.isdir("/etc/YaST2") and os.path.isfile("/usr/bin/zypper"):
+if (
+    (os.path.isdir("/etc/YaST2") and os.path.isfile("/usr/bin/zypper"))
+    or os.path.isfile("/etc/oracle-release")
+    or os.path.isfile("/etc/almalinux-release")
+):
     rpm_handles_symlinks = True
 
 
