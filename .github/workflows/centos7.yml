@@ -1,4 +1,4 @@
-name: CentOS
+name: CentOS 7
 
 on:
     push:
@@ -32,8 +32,7 @@ jobs:
         # Set up the matrix of distributions to test
         strategy:
             matrix:
-                container: ["quay.io/centos/centos:stream9",
-                            "quay.io/centos/centos:stream8"]
+                container: ["quay.io/centos/centos:centos7"]
 
         # CentOS images come from quay.io now
         container:
@@ -48,34 +47,34 @@ jobs:
             # Requirements before the git clone can happen
             - name: git clone requirements
               run: |
-                  case "${{ matrix.container }}" in
-                      *stream9)
-                          dnf install -y 'dnf-command(config-manager)'
-                          dnf config-manager --set-enabled crb
-                          dnf install -y epel-release git
-                          ;;
-                      *stream8)
-                          dnf install -y epel-release git
-                          ;;
-                  esac
-
+                  yum upgrade -y
+                  yum install -y epel-release git
 
             # This means clone the git repo
-            - uses: actions/checkout@v4
+            - uses: actions/checkout@v2
 
             # Within the container, install the dependencies, build,
             # and run the test suite
             - name: Build and run the test suite
               run: |
                   # Install make(1) so we can use the instreqs target
-                  dnf install -y make
+                  yum install -y make
 
                   # Install build dependencies and set up the target
                   make instreqs
 
                   # Build and run the test suite
-                  make debug
-                  make check
+                  # Make sure /usr/local is in the PATH
+                  export PATH=${PATH}:/usr/local/bin
+
+                  # Make sure to use the specific newer Python
+                  PYTHON_PROG="$(cd /usr/local/bin ; ls -1 python*.* | grep -v config)"
+
+                  # rpminspect uses variadic macros, which
+                  # were introduced with C99.  CentOS 7's gcc
+                  # does not default to C99 as the standard.
+                  make debug PYTHON="${PYTHON_PROG}" CFLAGS="-std=c99"
+                  env LANG=en_US.UTF-8 make check PYTHON="${PYTHON_PROG}"
 
                   # Report coverage
                   ninja -C build coverage && ( curl -s https://codecov.io/bash | bash ) || :
