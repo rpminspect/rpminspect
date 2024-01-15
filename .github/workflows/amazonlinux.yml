@@ -47,7 +47,7 @@ jobs:
                   yum install -y git
 
             # This means clone the git repo
-            - uses: actions/checkout@v4
+            - uses: actions/checkout@v2
 
             # Within the container, install the dependencies, build,
             # and run the test suite
