@@ -43,6 +43,7 @@ if (
     or os.path.isfile("/etc/oracle-release")
     or os.path.isfile("/etc/almalinux-release")
     or os.path.isfile("/usr/bin/amazon-linux-extras")
+    or os.path.isfile("/etc/centos-release")
 ):
     rpm_handles_symlinks = True
 
