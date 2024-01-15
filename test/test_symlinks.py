@@ -42,6 +42,7 @@ if (
     (os.path.isdir("/etc/YaST2") and os.path.isfile("/usr/bin/zypper"))
     or os.path.isfile("/etc/oracle-release")
     or os.path.isfile("/etc/almalinux-release")
+    or os.path.isfile("/usr/bin/amazon-linux-extras")
 ):
     rpm_handles_symlinks = True
 
