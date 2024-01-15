@@ -1,7 +1,7 @@
 #!/bin/sh
 
 # Enable Python support in things like rpm
-echo "USE='caps python'" >> /etc/portage/make.conf
+echo 'USE="caps python"' >> /etc/portage/make.conf
 
 # Allow installation of "masked" packages
 [ -d /etc/portage ] || mkdir -p /etc/portage

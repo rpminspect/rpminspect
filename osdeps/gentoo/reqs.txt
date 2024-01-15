@@ -15,5 +15,5 @@ dev-util/desktop-file-utils
 dev-util/gcovr
 dev-util/libabigail
 dev-util/patchelf
-dev-util/valgrind
+dev-debug/valgrind
 sys-devel/gettext
