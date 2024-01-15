@@ -45,10 +45,9 @@ jobs:
               run: |
                   amazon-linux-extras install epel -y
                   yum install -y git
-                  git config --global --add safe.directory /__w/rpminspect/rpminspect
 
             # This means clone the git repo
-            - uses: actions/checkout@v3
+            - uses: actions/checkout@v4
 
             # Within the container, install the dependencies, build,
             # and run the test suite

@@ -44,10 +44,9 @@ jobs:
             - name: git clone requirements
               run: |
                   dnf install -y git
-                  git config --global --add safe.directory /__w/rpminspect/rpminspect
 
             # This means clone the git repo
-            - uses: actions/checkout@v3
+            - uses: actions/checkout@v4
 
             # Within the container, install the dependencies, build,
             # and run the test suite
