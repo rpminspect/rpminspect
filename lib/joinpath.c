@@ -42,7 +42,6 @@ char *joinpath(const char *path, ...)
 {
     va_list ap;
     int i = 0;
-    int extralen = 0;
     bool needsep = false;
     char *element = NULL;
     char *tail = NULL;
@@ -71,7 +70,6 @@ char *joinpath(const char *path, ...)
 
     while ((element = va_arg(ap, char *)) != NULL) {
         /* for the trailing NUL */
-        extralen = 1;
         needsep = false;
 
         /* trim any extra trailing slashes */
@@ -95,7 +93,6 @@ char *joinpath(const char *path, ...)
 
         /* make sure we have at least one slash in case there are none */
         if (*element != '/' && *tail != '/') {
-            extralen++;
             needsep = true;
         }
 
