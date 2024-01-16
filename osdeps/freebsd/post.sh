@@ -5,7 +5,6 @@ CWD="$(pwd)"
 # Sync ports tree from git
 rm -rf /usr/ports || :
 git clone https://git.freebsd.org/ports.git /usr/ports
-echo "DEFAULT_VERSIONS+=ssl=openssl" >> /etc/make.conf
 
 # https://github.com/rpm-software-management/rpm/pull/2459
 RPMTAG_HDR="/usr/local/include/rpm/rpmtag.h"
@@ -55,7 +54,7 @@ tar -xf mandoc.tar.gz
   echo 'CFLAGS="-g -fPIC"';
 } > "${SUBDIR}"/configure.local
 
-( cd "${SUBDIR}" && ./configure && gmake -s && gmake lib-install )
+( cd "${SUBDIR}" && ./configure && gmake && gmake lib-install )
 rm -rf mandoc.tar.gz "${SUBDIR}"
 
 # cdson is not [yet] in FreeBSD

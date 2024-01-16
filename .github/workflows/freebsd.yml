@@ -26,9 +26,7 @@ on:
 
 jobs:
     freebsd:
-        # Use containers on this specific macos image
-        # https://github.com/marketplace/actions/freebsd-vm
-        runs-on: macos-12
+        runs-on: ubuntu-latest
 
         # Environment variables for the job
         env:
@@ -43,7 +41,7 @@ jobs:
             # Within the container, install the dependencies, build,
             # and run the test suite
             - name: Build and run the test suite
-              uses: vmactions/freebsd-vm@v0
+              uses: vmactions/freebsd-vm@v1
 
               with:
                   envs: 'PATH'
@@ -51,7 +49,7 @@ jobs:
 
                   # Requirements before the git clone can happen
                   prepare: |
-                      pkg update
+                      yes | pkg update -y
                       pkg install -q -y git
 
                   # Run the build and test
@@ -70,11 +68,9 @@ jobs:
                       gmake debug
                       echo $? > exitcodes/build
 
-                      # Run the test suite...except the virus tests
-                      for t in $(/bin/ls -1 test/test_*.py | grep -v test_virus | cut -c11- | cut -d '.' -f 1 | awk 'NF' ORS=' ') ; do
-                          gmake check ${t}
-                          echo $? > exitcodes/test_${t}
-                      done
+                      # Run the test suite
+                      gmake check
+                      echo $? > exitcodes/test
 
             # Process the exit codes outside the VM
             - name: Check exit codes
