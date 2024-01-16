@@ -21,7 +21,7 @@ vendor-specific data package.
 Status
 ------
 
-[![Python Checks](https://github.com/rpminspect/rpminspect/actions/workflows/python.yml/badge.svg)](https://github.com/rpminspect/rpminspect/actions/workflows/python.yml)
+[![pre-commit](https://github.com/rpminspect/rpminspect/actions/workflows/pre-commit.yml/badge.svg)](https://github.com/rpminspect/rpminspect/actions/workflows/pre-commit.yml)
 [![ShellCheck](https://github.com/rpminspect/rpminspect/actions/workflows/shellcheck.yml/badge.svg)](https://github.com/rpminspect/rpminspect/actions/workflows/shellcheck.yml)
 
 For each merge and pull request, rpminspect is built and tested in the
