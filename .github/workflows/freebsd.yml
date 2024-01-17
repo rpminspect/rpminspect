@@ -50,7 +50,8 @@ jobs:
                   # Requirements before the git clone can happen
                   prepare: |
                       yes | pkg update -y
-                      pkg install -q -y git
+                      pkg install -q -y git bash
+                      ln -sf ../local/bin/bash /usr/bin/bash
 
                   # Run the build and test
                   run: |
