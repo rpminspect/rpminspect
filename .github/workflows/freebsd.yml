@@ -50,8 +50,7 @@ jobs:
                   # Requirements before the git clone can happen
                   prepare: |
                       yes | pkg update -y
-                      pkg install -q -y git
-                      ln -sf /usr/bin/true /usr/local/bin/vncdotool
+                      pkg install -q -y git tree
 
                   # Run the build and test
                   run: |
