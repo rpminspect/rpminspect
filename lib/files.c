@@ -595,6 +595,78 @@ static char *comparable_version_substrings(const char *s, const char *ignore)
 }
 
 /**
+ * @brief Given a path string with a possible version-release
+ * substring, a version, and a release, generate a new substring to
+ * match the version-release pair for later path substring
+ * substitution.
+ *
+ * Trim the release string down to what might possibly match in the
+ * path.  For example, if the version string is 5.14.71 and the
+ * release string is 417.el9, but the path contains a substring of
+ * 5.14.71-417, we want to trim off the trailing .el9 for path
+ * matching.
+ *
+ * This is a very special case function for how some RPM packaging
+ * works and the accepted practices of packagers.
+ *
+ * @param path The path string.
+ * @param version The version subtring.
+ * @param release The release substring.
+ * @return A newly allocated version-release substring for use in path
+ * substring substitution.  Caller must free this returned string.
+ */
+static char *path_verrel_substring(const char *path, const char *version, const char *release)
+{
+    char *r = NULL;
+    char *subrel = NULL;
+    char *rel = NULL;
+    char *tmp = NULL;
+
+    assert(path != NULL);
+    assert(version != NULL);
+    assert(release != NULL);
+
+    /* try to find the version substring first in the path */
+    tmp = strstr(path, version);
+
+    if (tmp == NULL) {
+        return strdup(path);
+    }
+
+    /*
+     * now let's move past the version and find the matching part of
+     * the release
+     */
+    tmp += strlen(version);
+
+    if (tmp == NULL) {
+        return strdup(path);
+    }
+
+    rel = subrel = strdup(release);
+    assert(subrel != NULL);
+
+    while (*tmp == '-' && *tmp != '\0') {
+        tmp++;
+    }
+
+    while (*tmp != '\0' && *tmp == *subrel) {
+        tmp++;
+        subrel++;
+    }
+
+    *subrel = '\0';
+
+    /* build the new path */
+    xasprintf(&r, "%s-%s", version, rel);
+
+    /* cleanup */
+    free(rel);
+
+    return r;
+}
+
+/**
  * @brief For the given file from "before", attempt to find a matching
  * file in "after".
  *
@@ -664,17 +736,43 @@ static void find_one_peer(struct rpminspect *ri, rpmfile_entry_t *file, rpmfile_
         }
     }
 
-    /* Try substituting version-release */
+    /* Try substituting version-release variants */
     if (has_version) {
+        /* the Release value will carry a dist tag */
         before_release = headerGetString(file->rpm_header, RPMTAG_RELEASE);
         after_release = headerGetString(after_file->rpm_header, RPMTAG_RELEASE);
 
+        /* first we try replacing version-release */
         xasprintf(&before_tmp, "%s-%s", before_version, before_release);
         xasprintf(&after_tmp, "%s-%s", after_version, after_release);
 
-        if (strcmp(before_tmp, after_tmp) != 0) {
+        if (strstr(file->localpath, before_tmp) && strcmp(before_tmp, after_tmp) != 0) {
             search_path = strreplace(file->localpath, before_tmp, after_tmp);
+            free(before_tmp);
+            free(after_tmp);
 
+            HASH_FIND_STR(after_table, search_path, entry);
+            free(search_path);
+
+            if (entry) {
+                set_peer(file, entry);
+                return;
+            }
+        } else {
+            free(before_tmp);
+            free(after_tmp);
+        }
+
+        /* second we try version-release, but we trim release down to a part we see in the path */
+        before_tmp = path_verrel_substring(file->localpath, before_version, before_release);
+        assert(before_tmp != NULL);
+
+        after_tmp = path_verrel_substring(after_file->localpath, after_version, after_release);
+        assert(after_tmp != NULL);
+
+        if (strstr(file->localpath, before_tmp) && strcmp(before_tmp, after_tmp) != 0) {
+            DEBUG_PRINT("%s probably replaced by %s\n", file->localpath, after_file->localpath);
+            search_path = strreplace(file->localpath, before_tmp, after_tmp);
             free(before_tmp);
             free(after_tmp);
 
