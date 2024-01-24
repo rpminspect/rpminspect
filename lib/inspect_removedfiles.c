@@ -39,6 +39,7 @@ static bool removedfiles_driver(struct rpminspect *ri, rpmfile_entry_t *file)
 {
     bool result = true;
     const char *type = NULL;
+    const char *name = NULL;
     const char *arch = NULL;
     char *soname = NULL;
     string_entry_t *entry = NULL;
@@ -72,6 +73,7 @@ static bool removedfiles_driver(struct rpminspect *ri, rpmfile_entry_t *file)
 
     /* Collect the RPM architecture and file MIME type */
     type = get_mime_type(ri, file);
+    name = headerGetString(file->rpm_header, RPMTAG_NAME);
     arch = get_rpm_header_arch(file->rpm_header);
 
     /* Get any possible security rule for this path */
@@ -132,14 +134,14 @@ static bool removedfiles_driver(struct rpminspect *ri, rpmfile_entry_t *file)
             soname = get_elf_soname(file->fullpath);
 
             if (soname) {
-                xasprintf(&params.msg, _("ABI break: Library %s with SONAME '%s' removed from %s"), file->localpath, soname, arch);
+                xasprintf(&params.msg, _("ABI break: Library %s with SONAME '%s' removed from package %s on %s"), file->localpath, soname, name, arch);
                 params.noun = _("missing SONAME in ${FILE} on ${ARCH}");
                 free(soname);
             } else {
-                xasprintf(&params.msg, _("ABI break: Library %s removed from %s"), file->localpath, arch);
+                xasprintf(&params.msg, _("ABI break: Library %s removed from package %s on %s"), file->localpath, name, arch);
             }
         } else {
-            xasprintf(&params.msg, _("%s removed from %s"), file->localpath, arch);
+            xasprintf(&params.msg, _("%s removed from package %s on %s"), file->localpath, name, arch);
         }
 
         if (params.severity != RESULT_NULL && params.severity != RESULT_SKIP) {
