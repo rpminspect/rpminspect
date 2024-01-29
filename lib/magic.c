@@ -61,6 +61,8 @@ const char *mime_type(struct rpminspect *ri, const char *file)
     if (tmp) {
         type = strdup(tmp);
         assert(type != NULL);
+    } else {
+        return NULL;
     }
 
     if (type != NULL) {
@@ -68,7 +70,9 @@ const char *mime_type(struct rpminspect *ri, const char *file)
          * Trim any trailing metadata after the MIME type, such
          * as '; charset=utf-8' and stuff like that.
          */
-        if ((pos = index(type, ';')) != NULL) {
+        pos = strchr(type, ';');
+
+        if (pos != NULL) {
             *pos = '\0';
         }
 
@@ -85,12 +89,7 @@ const char *mime_type(struct rpminspect *ri, const char *file)
     }
 
     free(type);
-
-    if (entry) {
-        return entry->data;
-    } else {
-        return NULL;
-    }
+    return entry->data;
 }
 
 /*
