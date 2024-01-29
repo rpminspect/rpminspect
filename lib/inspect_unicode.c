@@ -64,6 +64,10 @@ static bool is_excluded_mime_type(const char *path)
     /* get the MIME type */
     type = mime_type(globalri, path);
 
+    if (type == NULL) {
+        return false;
+    }
+
     /* check to see if this MIME type is explicitly excluded */
     if (globalri->unicode_excluded_mime_types != NULL && !TAILQ_EMPTY(globalri->unicode_excluded_mime_types)) {
         TAILQ_FOREACH(entry, globalri->unicode_excluded_mime_types, items) {
