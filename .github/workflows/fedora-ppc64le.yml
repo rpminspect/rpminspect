@@ -39,10 +39,11 @@ jobs:
 
         # All of these steps run from within the main source
         # directory, so think of that as your $PWD
+        # NOTE: Pinned action version v2.7.0 because 2.7.1 removes fedora ppc64le
         steps:
             # This means clone the git repo
             - uses: actions/checkout@v4
-            - uses: uraimo/run-on-arch-action@v2
+            - uses: uraimo/run-on-arch-action@v2.7.0
               id: buildtest
               timeout-minutes: 500
               with:
