@@ -40,7 +40,7 @@
 
 /*
  * hash table used for file entries
- * Not all values are used each time this hash table is implemeneted.
+ * Not all values are used each time this hash table is implemented.
  * See below.  One place uses the path and index and another place
  * uses the path and rpmfile.
  */
@@ -610,7 +610,7 @@ static char *comparable_version_substrings(const char *s, const char *ignore)
  * works and the accepted practices of packagers.
  *
  * @param path The path string.
- * @param version The version subtring.
+ * @param version The version substring.
  * @param release The release substring.
  * @return A newly allocated version-release substring for use in path
  * substring substitution.  Caller must free this returned string.

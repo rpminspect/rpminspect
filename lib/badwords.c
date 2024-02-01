@@ -25,7 +25,7 @@
  *
  * Given a list of bad words, check the specified string for any of
  * those bad words and return true on a match.  The search is
- * conducted with **strcasestr(3)** as well as checking for a preceeding
+ * conducted with **strcasestr(3)** as well as checking for a preceding
  * space to ensure it avoids substrings in the middle of a word.  For
  * example, if the badwords list contains `flag' then this function
  * will match ` flag' and ` flagging' but not ` conflagration'.  If

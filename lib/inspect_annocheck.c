@@ -200,7 +200,7 @@ static libannocheck_test_state get_worst(libannocheck_test_state worst, libannoc
 
 /*
  * Do the libannocheck setup for a file.  If this is the first call,
- * it will initializae libannocheck.  Otherwise, it will reinit the
+ * it will initialize libannocheck.  Otherwise, it will reinit the
  * existing handle.  Returns libannocheck handle on success, NULL
  * otherwise.
  */

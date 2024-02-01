@@ -179,7 +179,7 @@ bool inspect_manpage(struct rpminspect *ri);
  *
  * Perform some RPM header checks. First, check that the Vendor
  * contains the expected string as defined in the configuration
- * file. Second, chec k that the build host is in the expected
+ * file. Second, check that the build host is in the expected
  * subdomain as defined in the configuration file. Third, check the
  * Summary string for any unprofessional words. Fourth, check the
  * Description for any unprofessional words. Lastly, if there is a

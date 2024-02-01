@@ -1320,7 +1320,7 @@ class SecurityFAILFileIWOTHandISVTXProhibitedCompareKoji(TestCompareKoji):
 class DirIWOTHProhibitedSRPM(TestSRPM):
     """
     Assert when a world-writable dir is in a package,
-    OK result occures when testing the SRPM.
+    OK result occurs when testing the SRPM.
     """
 
     def setUp(self):
@@ -1559,7 +1559,7 @@ class SecurityFAILDirIWOTHProhibitedKoji(TestKoji):
 class DirIWOTHProhibitedCompareSRPM(TestCompareSRPM):
     """
     Assert when a world-writable dir is in a package,
-    OK result occures when testing the SRPMs.
+    OK result occurs when testing the SRPMs.
     """
 
     def setUp(self):
@@ -1798,7 +1798,7 @@ class SecurityFAILDirIWOTHProhibitedCompareKoji(TestCompareKoji):
 class DirIWOTHandISVTXProhibitedSRPM(TestSRPM):
     """
     Assert when a world-writable dir with the sticky bit is in a package,
-    OK result occures when testing the SRPM.
+    OK result occurs when testing the SRPM.
     """
 
     def setUp(self):
@@ -2037,7 +2037,7 @@ class SecurityFAILDirIWOTHandISVTXProhibitedKoji(TestKoji):
 class DirIWOTHandISVTXProhibitedCompareSRPM(TestCompareSRPM):
     """
     Assert when a world-writable dir with the sticky bit is in a package,
-    OK result occures when testing the SRPMs.
+    OK result occurs when testing the SRPMs.
     """
 
     def setUp(self):
