@@ -21,7 +21,7 @@ extern "C"
 #include <stdbool.h>
 #include <string.h>
 
-/* Abstract type - implemtations should cast to an appropriate type. */
+/* Abstract type - implementations should cast to an appropriate type. */
 typedef struct parser_context_st *parser_context;
 
 /* Initialize a parser context for the given file. */
@@ -38,7 +38,7 @@ typedef bool (*parser_have_section_fn)(parser_context *context, const char *sect
  * structure.  All structures are dictionary-like.  Pass NULL for the second
  * key if there's only one level of nesting, and NULL for both keys to operate
  * on the top-level structure.  free() the returned string when done.  Returns
- * NULL if string not found or the object at the specfied position wasn't a
+ * NULL if string not found or the object at the specified position wasn't a
  * string.
  */
 typedef char *(*parser_getstr_fn)(parser_context *context, const char *key1, const char *key2);

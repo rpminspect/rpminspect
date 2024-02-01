@@ -364,7 +364,7 @@ static bool validate_desktop_contents(struct rpminspect *ri, const rpmfile_entry
                     params.severity = RESULT_VERIFY;
                     params.waiverauth = WAIVABLE_BY_ANYONE;
                     params.verb = VERB_FAILED;
-                    params.noun = _("${FILE} references unreadble icon on ${ARCH}");
+                    params.noun = _("${FILE} references unreadable icon on ${ARCH}");
                     add_result(ri, &params);
                     free(params.msg);
                     result = false;

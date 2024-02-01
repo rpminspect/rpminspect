@@ -316,7 +316,7 @@ static bool check_explicit_lib_deps(struct rpminspect *ri, Header h, deprule_lis
 
                 pn = headerGetString(peer->after_hdr, RPMTAG_NAME);
 
-                /* check that the Requires is explict and matches the Provides */
+                /* check that the Requires is explicit and matches the Provides */
                 if (!strcmp(req->requirement, prov->requirement)) {
                     /* a package is allowed to to Provide and Require the same thing */
                     /* otherwise we found the subpackage that Provides this explicit Requires */
@@ -331,7 +331,7 @@ static bool check_explicit_lib_deps(struct rpminspect *ri, Header h, deprule_lis
                     /*
                      * we may have a dependency such as:
                      *     Requires: %{name}-libs%{?_isa} = %{version}-%{release}'
-                     * trim the '(x86-64)' or similar ISA substring for comparision purposes
+                     * trim the '(x86-64)' or similar ISA substring for comparison purposes
                      * also trim leading '(' to account for rich deps
                      */
                     isareq = remove_isa_substring(req->requirement);

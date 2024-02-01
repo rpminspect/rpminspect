@@ -854,7 +854,7 @@ badfuncs:
     # Some libraries deliberately use forbidden functions.  In these
     # cases, you can specify an 'allowed' block listing path globs and
     # the specific functions they are allowed to use.  It is
-    # adviseable to add a comment indicating why the function is
+    # advisable to add a comment indicating why the function is
     # allowed to use forbidden functions for future reference.  The
     # path specifications can be explicit paths or patterns that are
     # compatible with fnmatch(3) and glob(3).
@@ -946,7 +946,7 @@ unicode:
         - text/html
 
     # List of forbidden Unicode codepoints in source code.  Codepoints
-    # are written in hexidecimal notation.  The case of the letters
+    # are written in hexadecimal notation.  The case of the letters
     # does not matter.  Be sure to prefix the code point with '0x' and
     # use single quotes around the values.
     forbidden_codepoints:

@@ -188,7 +188,7 @@ const char *get_rpm_header_arch(Header h)
  *
  * @param hdr RPM header
  * @param tag RPM header tag constant (e.g., RPMTAG_SOURCE)
- * @return Newly allocated string_list_t containg tag values.
+ * @return Newly allocated string_list_t containing tag values.
  */
 string_list_t *get_rpm_header_string_array(Header hdr, rpmTagVal tag)
 {

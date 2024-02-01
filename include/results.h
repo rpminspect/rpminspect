@@ -781,7 +781,7 @@ extern "C"
 
 #define REMEDY_RPMDEPS_LOST _("A dependency seen in the before build is not seen in the after build meaning it was removed or lost.  If this is a VERIFY result, it means rpminspect noticed the change in what it considers a maintenance update in a package.  An INFO result means it noticed this change, but deems it ok because it is comparing a rebased build.")
 
-#define REMEDY_RPMDEPS_EPOCH _("The package has an Epoch value greater than zero, but the explicit subpackage dependencies are not consistently using it.  For the dependency reported, the '= %{version}-%{release}' needs to change to '= %{epoch}:%{version}-%{release}' to capture the package package Epoch in the dependency.")
+#define REMEDY_RPMDEPS_EPOCH _("The package has an Epoch value greater than zero, but the explicit subpackage dependencies are not consistently using it.  For the dependency reported, the '= %{version}-%{release}' needs to change to '= %{epoch}:%{version}-%{release}' to capture the package Epoch in the dependency.")
 
 /** @} */
 

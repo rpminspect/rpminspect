@@ -621,7 +621,7 @@ extern "C"
  * @def KERNEL_MODULE_FILENAME_EXTENSION
  *
  * Linux loadable kernel module filename extension.  Note that kernel
- * modules can be compressed with a typical compression appened after
+ * modules can be compressed with a typical compression appended after
  * this string.  rpminspect can handle those cases.
  */
 #define KERNEL_MODULE_FILENAME_EXTENSION ".ko"

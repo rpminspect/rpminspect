@@ -50,7 +50,7 @@ class LostChangeLogCompareRPMs(TestCompareRPMs):
         self.after_rpm.section_changelog = None
 
         self.inspection = "changelog"
-        # this is INFO because it's only comapring the binary RPMs,
+        # this is INFO because it's only comparing the binary RPMs,
         # the other checks are for SRPMs
         self.result = "INFO"
         self.waiver_auth = "Not Waivable"
