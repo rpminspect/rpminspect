@@ -955,9 +955,17 @@ bool inspect_rpmdeps(struct rpminspect *ri)
                     /* determine what to report */
                     if (drs && pdrs == NULL) {
                         if (!strcmp(arch, SRPM_ARCH_NAME)) {
-                            xasprintf(&params.msg, _("Gained '%s' in source package %s"), drs, name);
+                            if (expected_deprule_change(rebase, deprule, peer->after_hdr, ri->peers)) {
+                                xasprintf(&params.msg, _("Gained '%s' in source package %s; this is expected"), drs, name);
+                            } else {
+                                xasprintf(&params.msg, _("Gained '%s' in source package %s"), drs, name);
+                            }
                         } else {
-                            xasprintf(&params.msg, _("Gained '%s' in subpackage %s on %s"), drs, name, arch);
+                            if (expected_deprule_change(rebase, deprule, peer->after_hdr, ri->peers)) {
+                                xasprintf(&params.msg, _("Gained '%s' in subpackage %s on %s; this is expected"), drs, name, arch);
+                            } else {
+                                xasprintf(&params.msg, _("Gained '%s' in subpackage %s on %s"), drs, name, arch);
+                            }
                         }
 
                         xasprintf(&noun, _("'${FILE}' in %s on ${ARCH}"), name);
@@ -965,9 +973,17 @@ bool inspect_rpmdeps(struct rpminspect *ri)
                         params.verb = VERB_ADDED;
                     } else if (deprules_match(deprule, deprule->peer_deprule)) {
                         if (!strcmp(arch, SRPM_ARCH_NAME)) {
-                            xasprintf(&params.msg, _("Retained '%s' in source package %s"), drs, name);
+                            if (expected_deprule_change(rebase, deprule, peer->after_hdr, ri->peers)) {
+                                xasprintf(&params.msg, _("Retained '%s' in source package %s; this is expected"), drs, name);
+                            } else {
+                                xasprintf(&params.msg, _("Retained '%s' in source package %s"), drs, name);
+                            }
                         } else {
-                            xasprintf(&params.msg, _("Retained '%s' in subpackage %s on %s"), drs, name, arch);
+                            if (expected_deprule_change(rebase, deprule, peer->after_hdr, ri->peers)) {
+                                xasprintf(&params.msg, _("Retained '%s' in subpackage %s on %s; this is expected"), drs, name, arch);
+                            } else {
+                                xasprintf(&params.msg, _("Retained '%s' in subpackage %s on %s"), drs, name, arch);
+                            }
                         }
 
                         xasprintf(&noun, _("'${FILE}' in %s on ${ARCH}"), name);
@@ -975,18 +991,22 @@ bool inspect_rpmdeps(struct rpminspect *ri)
                         params.verb = VERB_OK;
                     } else {
                         if (!strcmp(arch, SRPM_ARCH_NAME)) {
-                            xasprintf(&params.msg, _("Changed '%s' to '%s' in source package %s"), pdrs, drs, name);
+                            if (expected_deprule_change(rebase, deprule, peer->after_hdr, ri->peers)) {
+                                xasprintf(&params.msg, _("Changed '%s' to '%s' in source package %s; this is expected"), pdrs, drs, name);
+                            } else {
+                                xasprintf(&params.msg, _("Changed '%s' to '%s' in source package %s"), pdrs, drs, name);
+                            }
                         } else {
-                            xasprintf(&params.msg, _("Changed '%s' to '%s' in subpackage %s on %s"), pdrs, drs, name, arch);
+                            if (expected_deprule_change(rebase, deprule, peer->after_hdr, ri->peers)) {
+                                xasprintf(&params.msg, _("Changed '%s' to '%s' in subpackage %s on %s; this is expected"), pdrs, drs, name, arch);
+                            } else {
+                                xasprintf(&params.msg, _("Changed '%s' to '%s' in subpackage %s on %s"), pdrs, drs, name, arch);
+                            }
                         }
 
                         xasprintf(&noun, _("'%s' became '${FILE}' in %s on ${ARCH}"), pdrs, name);
                         params.remedy = REMEDY_RPMDEPS_CHANGED;
                         params.verb = VERB_CHANGED;
-                    }
-
-                    if (expected_deprule_change(rebase, deprule, peer->after_hdr, ri->peers)) {
-                        params.msg = strappend(params.msg, _("; this is expected"), NULL);
                     }
 
                     /* report the result */

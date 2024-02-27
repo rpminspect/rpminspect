@@ -23,6 +23,7 @@ bool check_permissions(struct rpminspect *ri, const rpmfile_entry_t *file, const
     bool result = true;
     bool ignore = false;
     bool id_bit = false;
+    bool relaxed = false;
     const char *arch = NULL;
     char *change = NULL;
     mode_t before_mode;
@@ -75,49 +76,118 @@ bool check_permissions(struct rpminspect *ri, const rpmfile_entry_t *file, const
     /* in cases of setuid or setgid bits on the mode, this is a non-ignorable check */
     id_bit = (!(before_mode & (S_ISUID|S_ISGID)) && (after_mode & (S_ISUID|S_ISGID)));
 
+    /* have permissions been relaxed in cases we want to verify? */
+    relaxed = (S_ISDIR(file->st.st_mode) && !S_ISLNK(file->st.st_mode)) && (((mode_diff & S_ISVTX) && !(after_mode & S_ISVTX)) || ((after_mode & mode_diff) != 0));
+
     if (id_bit) {
         ignore = false;
     }
 
     /* if setuid/setgid or new mode is more open */
     if (!ignore && mode_diff && file->peer_file && !allowed && ((ri->tests & INSPECT_PERMISSIONS) || force_non_security_checks)) {
-        params.msg = strdup(file->localpath);
-        assert(params.msg != NULL);
-
         /* initial check of this happens outside this block */
-        if (id_bit) {
+        if (id_bit || relaxed) {
             params.severity = RESULT_VERIFY;
-            params.msg = strappend(params.msg, _(" changed setuid/setgid;"));
-            assert(params.msg != NULL);
         }
 
         if (S_ISDIR(file->st.st_mode) && !S_ISDIR(file->peer_file->st.st_mode)) {
-            params.msg = strappend(params.msg, _(" became a directory;"), NULL);
-        } else if (S_ISCHR(file->st.st_mode) && !S_ISCHR(file->peer_file->st.st_mode)) {
-            params.msg = strappend(params.msg, _(" became a character device;"), NULL);
-        } else if (S_ISBLK(file->st.st_mode) && !S_ISBLK(file->peer_file->st.st_mode)) {
-            params.msg = strappend(params.msg, _(" became a block device;"), NULL);
-        } else if (S_ISREG(file->st.st_mode) && !S_ISREG(file->peer_file->st.st_mode)) {
-            params.msg = strappend(params.msg, _(" became a regular file;"), NULL);
-        } else if (S_ISFIFO(file->st.st_mode) && !S_ISFIFO(file->peer_file->st.st_mode)) {
-            params.msg = strappend(params.msg, _(" became a FIFO;"), NULL);
-        } else if (S_ISLNK(file->st.st_mode) && !S_ISLNK(file->peer_file->st.st_mode)) {
-            params.msg = strappend(params.msg, _(" became a symbolic link;"), NULL);
-        } else if (S_ISSOCK(file->st.st_mode) && !S_ISSOCK(file->peer_file->st.st_mode)) {
-            params.msg = strappend(params.msg, _(" became a socket;"), NULL);
-        }
-
-        assert(params.msg != NULL);
-        params.msg = strappend(params.msg, _(" permissions"), NULL);
-        assert(params.msg != NULL);
-
-        if (S_ISDIR(file->st.st_mode) && !S_ISLNK(file->st.st_mode)) {
-            if (((mode_diff & S_ISVTX) && !(after_mode & S_ISVTX)) || ((after_mode & mode_diff) != 0)) {
-                params.severity = RESULT_VERIFY;
-                params.msg = strappend(params.msg, _(" relaxed"), NULL);
+            if (id_bit) {
+                if (relaxed) {
+                    xasprintf(&params.msg, _("%s changed setuid/setgid; became a directory; permissions relaxed"), file->localpath);
+                } else {
+                    xasprintf(&params.msg, _("%s changed setuid/setgid; became a directory; permissions changed"), file->localpath);
+                }
+            } else {
+                if (relaxed) {
+                    xasprintf(&params.msg, _("%s became a directory; permissions relaxed"), file->localpath);
+                } else {
+                    xasprintf(&params.msg, _("%s became a directory; permissions changed"), file->localpath);
+                }
             }
-        } else {
-            params.msg = strappend(params.msg, _(" changed"), NULL);
+        } else if (S_ISCHR(file->st.st_mode) && !S_ISCHR(file->peer_file->st.st_mode)) {
+            if (id_bit) {
+                if (relaxed) {
+                    xasprintf(&params.msg, _("%s changed setuid/setgid; became a character device; permissions relaxed"), file->localpath);
+                } else {
+                    xasprintf(&params.msg, _("%s changed setuid/setgid; became a character device; permissions changed"), file->localpath);
+                }
+            } else {
+                if (relaxed) {
+                    xasprintf(&params.msg, _("%s became a character device; permissions relaxed"), file->localpath);
+                } else {
+                    xasprintf(&params.msg, _("%s became a character device; permissions changed"), file->localpath);
+                }
+            }
+        } else if (S_ISBLK(file->st.st_mode) && !S_ISBLK(file->peer_file->st.st_mode)) {
+            if (id_bit) {
+                if (relaxed) {
+                    xasprintf(&params.msg, _("%s changed setuid/setgid; became a block device; permissions relaxed"), file->localpath);
+                } else {
+                    xasprintf(&params.msg, _("%s changed setuid/setgid; became a block device; permissions changed"), file->localpath);
+                }
+            } else {
+                if (relaxed) {
+                    xasprintf(&params.msg, _("%s became a block device; permissions relaxed"), file->localpath);
+                } else {
+                    xasprintf(&params.msg, _("%s became a block device; permissions changed"), file->localpath);
+                }
+            }
+        } else if (S_ISREG(file->st.st_mode) && !S_ISREG(file->peer_file->st.st_mode)) {
+            if (id_bit) {
+                if (relaxed) {
+                    xasprintf(&params.msg, _("%s changed setuid/setgid; became a regular file; permissions relaxed"), file->localpath);
+                } else {
+                    xasprintf(&params.msg, _("%s changed setuid/setgid; became a regular file; permissions changed"), file->localpath);
+                }
+            } else {
+                if (relaxed) {
+                    xasprintf(&params.msg, _("%s became a regular file; permissions relaxed"), file->localpath);
+                } else {
+                    xasprintf(&params.msg, _("%s became a regular file; permissions changed"), file->localpath);
+                }
+            }
+        } else if (S_ISFIFO(file->st.st_mode) && !S_ISFIFO(file->peer_file->st.st_mode)) {
+            if (id_bit) {
+                if (relaxed) {
+                    xasprintf(&params.msg, _("%s changed setuid/setgid; became a FIFO; permissions relaxed"), file->localpath);
+                } else {
+                    xasprintf(&params.msg, _("%s changed setuid/setgid; became a FIFO; permissions changed"), file->localpath);
+                }
+            } else {
+                if (relaxed) {
+                    xasprintf(&params.msg, _("%s became a FIFO; permissions relaxed"), file->localpath);
+                } else {
+                    xasprintf(&params.msg, _("%s became a FIFO; permissions changed"), file->localpath);
+                }
+            }
+        } else if (S_ISLNK(file->st.st_mode) && !S_ISLNK(file->peer_file->st.st_mode)) {
+            if (id_bit) {
+                if (relaxed) {
+                    xasprintf(&params.msg, _("%s changed setuid/setgid; became a symbolic link; permissions relaxed"), file->localpath);
+                } else {
+                    xasprintf(&params.msg, _("%s changed setuid/setgid; became a symbolic link; permissions changed"), file->localpath);
+                }
+            } else {
+                if (relaxed) {
+                    xasprintf(&params.msg, _("%s became a symbolic link; permissions relaxed"), file->localpath);
+                } else {
+                    xasprintf(&params.msg, _("%s became a symbolic link; permissions changed"), file->localpath);
+                }
+            }
+        } else if (S_ISSOCK(file->st.st_mode) && !S_ISSOCK(file->peer_file->st.st_mode)) {
+            if (id_bit) {
+                if (relaxed) {
+                    xasprintf(&params.msg, _("%s changed setuid/setgid; became a socket; permissions relaxed"), file->localpath);
+                } else {
+                    xasprintf(&params.msg, _("%s changed setuid/setgid; became a socket; permissions changed"), file->localpath);
+                }
+            } else {
+                if (relaxed) {
+                    xasprintf(&params.msg, _("%s became a socket; permissions relaxed"), file->localpath);
+                } else {
+                    xasprintf(&params.msg, _("%s became a socket; permissions changed"), file->localpath);
+                }
+            }
         }
 
         assert(params.msg != NULL);

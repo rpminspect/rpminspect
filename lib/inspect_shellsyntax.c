@@ -188,10 +188,10 @@ static bool shellsyntax_driver(struct rpminspect *ri, rpmfile_entry_t *file)
             free(params.msg);
             result = false;
         } else if ((before_exitcode || before_errors) && (!exitcode && errors == NULL)) {
-            xasprintf(&params.msg, _("%s became a valid %s script on %s"), file->localpath, shell, arch);
-
             if (extglob) {
-                params.msg = strappend(params.msg, _(". The script fails with '-n' but passes with '-O extglob'; be sure 'shopt extglob' is set in the script."), NULL);
+                xasprintf(&params.msg, _("%s became a valid %s script on %s. The script fails with '-n' but passes with '-O extglob'; be sure 'shopt extglob' is set in the script."), file->localpath, shell, arch);
+            } else {
+                xasprintf(&params.msg, _("%s became a valid %s script on %s"), file->localpath, shell, arch);
             }
 
             params.severity = RESULT_INFO;

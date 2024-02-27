@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: rpminspect\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-12-13 10:07-0500\n"
+"POT-Creation-Date: 2024-02-27 09:48-0500\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -984,8 +984,7 @@ msgid ""
 "The package has an Epoch value greater than zero, but the explicit "
 "subpackage dependencies are not consistently using it.  For the dependency "
 "reported, the '= %{version}-%{release}' needs to change to '= %{epoch}:"
-"%{version}-%{release}' to capture the package package Epoch in the "
-"dependency."
+"%{version}-%{release}' to capture the package Epoch in the dependency."
 msgstr ""
 
 #: include/results.h:793
@@ -1628,44 +1627,45 @@ msgid ""
 "File capabilities expected for %s in %s but not found on %s: expected '%s'\n"
 msgstr ""
 
-#: lib/inspect_changedfiles.c:31
-msgid ""
-"  Changes to security policy related files require inspection by the "
-"Security Response Team."
-msgstr ""
-
-#: lib/inspect_changedfiles.c:319
+#: lib/inspect_changedfiles.c:300
 #, c-format
 msgid "Compressed %s file %s changed content in %s on %s."
 msgstr ""
 
-#: lib/inspect_changedfiles.c:353 lib/inspect_changedfiles.c:367
+#: lib/inspect_changedfiles.c:334 lib/inspect_changedfiles.c:348
 #, c-format
 msgid "Error running msgunfmt on %s in %s on %s; malformed mo file?"
 msgstr ""
 
-#: lib/inspect_changedfiles.c:357 lib/inspect_changedfiles.c:371
+#: lib/inspect_changedfiles.c:338 lib/inspect_changedfiles.c:352
 msgid "msgunfmt on ${FILE}"
 msgstr ""
 
-#: lib/inspect_changedfiles.c:382
+#: lib/inspect_changedfiles.c:363
 #, c-format
 msgid "Message catalog %s changed content in %s on %s"
 msgstr ""
 
-#: lib/inspect_changedfiles.c:386 lib/inspect_changedfiles.c:443
-#: lib/inspect_changedfiles.c:465
+#: lib/inspect_changedfiles.c:367 lib/inspect_changedfiles.c:424
+#: lib/inspect_changedfiles.c:445
 msgid "${FILE}"
 msgstr ""
 
-#: lib/inspect_changedfiles.c:439
+#: lib/inspect_changedfiles.c:420
 #, c-format
 msgid ""
 "Public header file %s changed content in %s on %s.  A unified diff of the "
 "changes follows."
 msgstr ""
 
-#: lib/inspect_changedfiles.c:462
+#: lib/inspect_changedfiles.c:448
+#, c-format
+msgid ""
+"File %s changed content in %s on %s.  Changes to security policy related "
+"files require inspection by the Security Response Team."
+msgstr ""
+
+#: lib/inspect_changedfiles.c:450
 #, c-format
 msgid "File %s changed content in %s on %s."
 msgstr ""
@@ -1822,7 +1822,7 @@ msgid "Desktop file %s on %s references icon %s but %s is not readable by all"
 msgstr ""
 
 #: lib/inspect_desktop.c:367
-msgid "${FILE} references unreadble icon on ${ARCH}"
+msgid "${FILE} references unreadable icon on ${ARCH}"
 msgstr ""
 
 #: lib/inspect_desktop.c:385
@@ -2671,33 +2671,49 @@ msgstr ""
 msgid "${FILE} is politically sensitive"
 msgstr ""
 
-#: lib/inspect_removedfiles.c:26
-msgid ""
-"; Removing security policy related files requires inspection by the Security "
-"Response Team."
-msgstr ""
-
-#: lib/inspect_removedfiles.c:85
+#: lib/inspect_removedfiles.c:73
 msgid "library ${FILE} removed on ${ARCH}"
 msgstr ""
 
-#: lib/inspect_removedfiles.c:135
+#: lib/inspect_removedfiles.c:124
 #, c-format
-msgid "ABI break: Library %s with SONAME '%s' removed from %s"
+msgid ""
+"ABI break: Library %s with SONAME '%s' removed from package %s on %s; "
+"Removing security policy related files requires inspection by the Security "
+"Response Team."
 msgstr ""
 
-#: lib/inspect_removedfiles.c:136
+#: lib/inspect_removedfiles.c:127
+#, c-format
+msgid "ABI break: Library %s with SONAME '%s' removed from package %s on %s"
+msgstr ""
+
+#: lib/inspect_removedfiles.c:130
 msgid "missing SONAME in ${FILE} on ${ARCH}"
 msgstr ""
 
-#: lib/inspect_removedfiles.c:139
+#: lib/inspect_removedfiles.c:134
 #, c-format
-msgid "ABI break: Library %s removed from %s"
+msgid ""
+"ABI break: Library %s removed from package %s on %s; Removing security "
+"policy related files requires inspection by the Security Response Team."
 msgstr ""
 
-#: lib/inspect_removedfiles.c:142
+#: lib/inspect_removedfiles.c:136
 #, c-format
-msgid "%s removed from %s"
+msgid "ABI break: Library %s removed from package %s on %s"
+msgstr ""
+
+#: lib/inspect_removedfiles.c:141
+#, c-format
+msgid ""
+"%s removed from package %s on %s; Removing security policy related files "
+"requires inspection by the Security Response Team."
+msgstr ""
+
+#: lib/inspect_removedfiles.c:143
+#, c-format
+msgid "%s removed from package %s on %s"
 msgstr ""
 
 #: lib/inspect_rpmdeps.c:152
@@ -2705,8 +2721,8 @@ msgstr ""
 msgid "Invalid looking %s dependency in the %s package on %s: %s"
 msgstr ""
 
-#: lib/inspect_rpmdeps.c:155 lib/inspect_rpmdeps.c:963
-#: lib/inspect_rpmdeps.c:973 lib/inspect_rpmdeps.c:1019
+#: lib/inspect_rpmdeps.c:155 lib/inspect_rpmdeps.c:971
+#: lib/inspect_rpmdeps.c:989 lib/inspect_rpmdeps.c:1039
 #, c-format
 msgid "'${FILE}' in %s on ${ARCH}"
 msgstr ""
@@ -2751,51 +2767,77 @@ msgstr ""
 msgid "spec file"
 msgstr ""
 
-#: lib/inspect_rpmdeps.c:958
+#: lib/inspect_rpmdeps.c:959
+#, c-format
+msgid "Gained '%s' in source package %s; this is expected"
+msgstr ""
+
+#: lib/inspect_rpmdeps.c:961
 #, c-format
 msgid "Gained '%s' in source package %s"
 msgstr ""
 
-#: lib/inspect_rpmdeps.c:960
+#: lib/inspect_rpmdeps.c:965
+#, c-format
+msgid "Gained '%s' in subpackage %s on %s; this is expected"
+msgstr ""
+
+#: lib/inspect_rpmdeps.c:967
 #, c-format
 msgid "Gained '%s' in subpackage %s on %s"
 msgstr ""
 
-#: lib/inspect_rpmdeps.c:968
+#: lib/inspect_rpmdeps.c:977
+#, c-format
+msgid "Retained '%s' in source package %s; this is expected"
+msgstr ""
+
+#: lib/inspect_rpmdeps.c:979
 #, c-format
 msgid "Retained '%s' in source package %s"
 msgstr ""
 
-#: lib/inspect_rpmdeps.c:970
+#: lib/inspect_rpmdeps.c:983
+#, c-format
+msgid "Retained '%s' in subpackage %s on %s; this is expected"
+msgstr ""
+
+#: lib/inspect_rpmdeps.c:985
 #, c-format
 msgid "Retained '%s' in subpackage %s on %s"
 msgstr ""
 
-#: lib/inspect_rpmdeps.c:978
+#: lib/inspect_rpmdeps.c:995
+#, c-format
+msgid "Changed '%s' to '%s' in source package %s; this is expected"
+msgstr ""
+
+#: lib/inspect_rpmdeps.c:997
 #, c-format
 msgid "Changed '%s' to '%s' in source package %s"
 msgstr ""
 
-#: lib/inspect_rpmdeps.c:980
+#: lib/inspect_rpmdeps.c:1001
+#, c-format
+msgid "Changed '%s' to '%s' in subpackage %s on %s; this is expected"
+msgstr ""
+
+#: lib/inspect_rpmdeps.c:1003
 #, c-format
 msgid "Changed '%s' to '%s' in subpackage %s on %s"
 msgstr ""
 
-#: lib/inspect_rpmdeps.c:983
+#: lib/inspect_rpmdeps.c:1007
 #, c-format
 msgid "'%s' became '${FILE}' in %s on ${ARCH}"
 msgstr ""
 
-#: lib/inspect_rpmdeps.c:989
-msgid "; this is expected"
-msgstr ""
-
-#: lib/inspect_rpmdeps.c:1011
+#: lib/inspect_rpmdeps.c:1031
 #, c-format
 msgid "Lost '%s' in source package %s"
 msgstr ""
 
-#: lib/inspect_rpmdeps.c:1013
+#: lib/inspect_rpmdeps.c:1033
 #, c-format
 msgid "Lost '%s' in subpackage %s on %s"
 msgstr ""
@@ -2847,15 +2889,16 @@ msgstr ""
 msgid "invalid shell script ${FILE} on ${ARCH}"
 msgstr ""
 
-#: lib/inspect_shellsyntax.c:191
+#: lib/inspect_shellsyntax.c:192
 #, c-format
-msgid "%s became a valid %s script on %s"
+msgid ""
+"%s became a valid %s script on %s. The script fails with '-n' but passes "
+"with '-O extglob'; be sure 'shopt extglob' is set in the script."
 msgstr ""
 
 #: lib/inspect_shellsyntax.c:194
-msgid ""
-". The script fails with '-n' but passes with '-O extglob'; be sure 'shopt "
-"extglob' is set in the script."
+#, c-format
+msgid "%s became a valid %s script on %s"
 msgstr ""
 
 #: lib/inspect_shellsyntax.c:202 lib/inspect_shellsyntax.c:225
@@ -2911,60 +2954,60 @@ msgstr ""
 msgid "Subpackage '%s' has appeared on '%s'"
 msgstr ""
 
-#: lib/inspect_symlinks.c:151
+#: lib/inspect_symlinks.c:153
 msgid "unable to read symlink ${FILE} on ${ARCH}"
 msgstr ""
 
-#: lib/inspect_symlinks.c:152
+#: lib/inspect_symlinks.c:154
 #, c-format
 msgid "An error occurred reading symbolic link %s in %s on %s."
 msgstr ""
 
-#: lib/inspect_symlinks.c:203
+#: lib/inspect_symlinks.c:205
 #, c-format
 msgid ""
 "%s %s has too many levels of redirects and cannot be resolved in %s on %s"
 msgstr ""
 
-#: lib/inspect_symlinks.c:207
+#: lib/inspect_symlinks.c:209
 msgid "too many redirects for ${FILE} on ${ARCH}"
 msgstr ""
 
-#: lib/inspect_symlinks.c:284
+#: lib/inspect_symlinks.c:286
 #, c-format
 msgid ""
 "Directory %s became a symbolic link (to %s) in %s on %s; this is not allowed!"
 msgstr ""
 
-#: lib/inspect_symlinks.c:291
+#: lib/inspect_symlinks.c:293
 #, c-format
 msgid ""
 "%s %s became a symbolic link (to %s) in %s on %s; and the link destination "
 "is reachable"
 msgstr ""
 
-#: lib/inspect_symlinks.c:295
+#: lib/inspect_symlinks.c:297
 #, c-format
 msgid ""
 "%s %s became a symbolic link (to %s) in %s on %s; and the link destination "
 "is unreachable"
 msgstr ""
 
-#: lib/inspect_symlinks.c:304
+#: lib/inspect_symlinks.c:306
 msgid "${FILE} became a symlink on ${ARCH}"
-msgstr ""
-
-#: lib/inspect_symlinks.c:312
-#, c-format
-msgid "%s %s became a dangling symbolic link in %s on %s"
 msgstr ""
 
 #: lib/inspect_symlinks.c:314
 #, c-format
+msgid "%s %s became a dangling symbolic link in %s on %s"
+msgstr ""
+
+#: lib/inspect_symlinks.c:316
+#, c-format
 msgid "%s %s is a dangling symbolic link in %s on %s"
 msgstr ""
 
-#: lib/inspect_symlinks.c:322
+#: lib/inspect_symlinks.c:324
 msgid "dangling symlink ${FILE} on ${ARCH}"
 msgstr ""
 
@@ -2982,55 +3025,60 @@ msgstr ""
 msgid "MIME type for %s in %s was `%s/%s' and became `%s/%s'"
 msgstr ""
 
-#: lib/inspect_udevrules.c:104 lib/inspect_udevrules.c:116
+#: lib/inspect_udevrules.c:105 lib/inspect_udevrules.c:117
 #, c-format
 msgid "%s is a valid udev rules file on %s"
 msgstr ""
 
-#: lib/inspect_udevrules.c:106
+#: lib/inspect_udevrules.c:107
 #, c-format
 msgid "%s is now a valid udev rules file on %s"
 msgstr ""
 
-#: lib/inspect_udevrules.c:109
+#: lib/inspect_udevrules.c:110
 #, c-format
 msgid "%s is no longer a valid udev rules file on %s"
 msgstr ""
 
-#: lib/inspect_udevrules.c:112 lib/inspect_udevrules.c:118
+#: lib/inspect_udevrules.c:113 lib/inspect_udevrules.c:119
 #, c-format
 msgid "%s is not a valid udev rules file on %s"
 msgstr ""
 
-#: lib/inspect_unicode.c:483
+#: lib/inspect_udevrules.c:166
+msgid ""
+"The 'udevadm verify' command does not operate as expected on this system."
+msgstr ""
+
+#: lib/inspect_unicode.c:487
 #, c-format
 msgid "*** empty localpath on %s"
 msgstr ""
 
-#: lib/inspect_unicode.c:492
+#: lib/inspect_unicode.c:496
 msgid "forbidden code point in ${FILE} on ${ARCH}"
 msgstr ""
 
-#: lib/inspect_unicode.c:569
+#: lib/inspect_unicode.c:573
 #, c-format
 msgid ""
 "A forbidden code point, 0x%04X, was found in the %s source file on line %ld "
 "at column %ld.  This source file is used by %s."
 msgstr ""
 
-#: lib/inspect_unicode.c:644
+#: lib/inspect_unicode.c:648
 #, c-format
 msgid "unable to run %prep in ${FILE}"
 msgstr ""
 
-#: lib/inspect_unicode.c:647
+#: lib/inspect_unicode.c:651
 #, c-format
 msgid ""
 "Unable to run through the %%prep section in %s or manually unpack sources "
 "for further scanning."
 msgstr ""
 
-#: lib/inspect_unicode.c:767
+#: lib/inspect_unicode.c:771
 msgid "The unicode inspection is only for source packages, skipping."
 msgstr ""
 
@@ -3319,66 +3367,164 @@ msgstr ""
 msgid "There is not enough available space to unpack all of the RPMs.\n"
 msgstr ""
 
-#: lib/permissions.c:90
-msgid " changed setuid/setgid;"
+#: lib/permissions.c:96
+#, c-format
+msgid "%s changed setuid/setgid; became a directory; permissions relaxed"
 msgstr ""
 
-#: lib/permissions.c:95
-msgid " became a directory;"
+#: lib/permissions.c:98
+#, c-format
+msgid "%s changed setuid/setgid; became a directory; permissions changed"
 msgstr ""
 
-#: lib/permissions.c:97
-msgid " became a character device;"
+#: lib/permissions.c:102
+#, c-format
+msgid "%s became a directory; permissions relaxed"
 msgstr ""
 
-#: lib/permissions.c:99
-msgid " became a block device;"
+#: lib/permissions.c:104
+#, c-format
+msgid "%s became a directory; permissions changed"
 msgstr ""
 
-#: lib/permissions.c:101
-msgid " became a regular file;"
+#: lib/permissions.c:110
+#, c-format
+msgid ""
+"%s changed setuid/setgid; became a character device; permissions relaxed"
 msgstr ""
 
-#: lib/permissions.c:103
-msgid " became a FIFO;"
+#: lib/permissions.c:112
+#, c-format
+msgid ""
+"%s changed setuid/setgid; became a character device; permissions changed"
 msgstr ""
 
-#: lib/permissions.c:105
-msgid " became a symbolic link;"
+#: lib/permissions.c:116
+#, c-format
+msgid "%s became a character device; permissions relaxed"
 msgstr ""
 
-#: lib/permissions.c:107
-msgid " became a socket;"
+#: lib/permissions.c:118
+#, c-format
+msgid "%s became a character device; permissions changed"
 msgstr ""
 
-#: lib/permissions.c:111
-msgid " permissions"
+#: lib/permissions.c:124
+#, c-format
+msgid "%s changed setuid/setgid; became a block device; permissions relaxed"
 msgstr ""
 
-#: lib/permissions.c:117
-msgid " relaxed"
+#: lib/permissions.c:126
+#, c-format
+msgid "%s changed setuid/setgid; became a block device; permissions changed"
 msgstr ""
 
-#: lib/permissions.c:120
-msgid " changed"
+#: lib/permissions.c:130
+#, c-format
+msgid "%s became a block device; permissions relaxed"
 msgstr ""
 
-#: lib/permissions.c:135
+#: lib/permissions.c:132
+#, c-format
+msgid "%s became a block device; permissions changed"
+msgstr ""
+
+#: lib/permissions.c:138
+#, c-format
+msgid "%s changed setuid/setgid; became a regular file; permissions relaxed"
+msgstr ""
+
+#: lib/permissions.c:140
+#, c-format
+msgid "%s changed setuid/setgid; became a regular file; permissions changed"
+msgstr ""
+
+#: lib/permissions.c:144
+#, c-format
+msgid "%s became a regular file; permissions relaxed"
+msgstr ""
+
+#: lib/permissions.c:146
+#, c-format
+msgid "%s became a regular file; permissions changed"
+msgstr ""
+
+#: lib/permissions.c:152
+#, c-format
+msgid "%s changed setuid/setgid; became a FIFO; permissions relaxed"
+msgstr ""
+
+#: lib/permissions.c:154
+#, c-format
+msgid "%s changed setuid/setgid; became a FIFO; permissions changed"
+msgstr ""
+
+#: lib/permissions.c:158
+#, c-format
+msgid "%s became a FIFO; permissions relaxed"
+msgstr ""
+
+#: lib/permissions.c:160
+#, c-format
+msgid "%s became a FIFO; permissions changed"
+msgstr ""
+
+#: lib/permissions.c:166
+#, c-format
+msgid "%s changed setuid/setgid; became a symbolic link; permissions relaxed"
+msgstr ""
+
+#: lib/permissions.c:168
+#, c-format
+msgid "%s changed setuid/setgid; became a symbolic link; permissions changed"
+msgstr ""
+
+#: lib/permissions.c:172
+#, c-format
+msgid "%s became a symbolic link; permissions relaxed"
+msgstr ""
+
+#: lib/permissions.c:174
+#, c-format
+msgid "%s became a symbolic link; permissions changed"
+msgstr ""
+
+#: lib/permissions.c:180
+#, c-format
+msgid "%s changed setuid/setgid; became a socket; permissions relaxed"
+msgstr ""
+
+#: lib/permissions.c:182
+#, c-format
+msgid "%s changed setuid/setgid; became a socket; permissions changed"
+msgstr ""
+
+#: lib/permissions.c:186
+#, c-format
+msgid "%s became a socket; permissions relaxed"
+msgstr ""
+
+#: lib/permissions.c:188
+#, c-format
+msgid "%s became a socket; permissions changed"
+msgstr ""
+
+#: lib/permissions.c:205
 #, c-format
 msgid "%s from %04o to %04o on %s"
 msgstr ""
 
-#: lib/permissions.c:141
+#: lib/permissions.c:211
 #, c-format
 msgid "${FILE} permissions from %04o to %04o on ${ARCH}"
 msgstr ""
 
-#: lib/permissions.c:155
+#: lib/permissions.c:225
 #, c-format
 msgid "%s (%s) is world-writable on %s"
 msgstr ""
 
-#: lib/permissions.c:158
+#: lib/permissions.c:228
 msgid "${FILE} is world-writable on ${ARCH}"
 msgstr ""
 

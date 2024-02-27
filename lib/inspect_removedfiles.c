@@ -17,20 +17,6 @@
 static bool rebase = false;
 static bool reported = false;
 
-static void add_removedfiles_result(struct rpminspect *ri, struct result_params *params)
-{
-    assert(ri != NULL);
-    assert(params != NULL);
-
-    if (params->waiverauth == WAIVABLE_BY_SECURITY) {
-        params->msg = strappend(params->msg, _("; Removing security policy related files requires inspection by the Security Response Team."), NULL);
-    }
-
-    add_result(ri, params);
-    reported = true;
-    return;
-}
-
 /*
  * Performs all of the tests associated with the removedfiles inspection.
  * NOTE:  This function is called while looping over before_files.
@@ -134,18 +120,33 @@ static bool removedfiles_driver(struct rpminspect *ri, rpmfile_entry_t *file)
             soname = get_elf_soname(file->fullpath);
 
             if (soname) {
-                xasprintf(&params.msg, _("ABI break: Library %s with SONAME '%s' removed from package %s on %s"), file->localpath, soname, name, arch);
+                if (params.waiverauth == WAIVABLE_BY_SECURITY) {
+                    xasprintf(&params.msg, _("ABI break: Library %s with SONAME '%s' removed from package %s on %s; Removing security policy related files requires inspection by the Security Response Team."), file->localpath, soname, name, arch);
+
+                } else {
+                    xasprintf(&params.msg, _("ABI break: Library %s with SONAME '%s' removed from package %s on %s"), file->localpath, soname, name, arch);
+                }
+
                 params.noun = _("missing SONAME in ${FILE} on ${ARCH}");
                 free(soname);
             } else {
-                xasprintf(&params.msg, _("ABI break: Library %s removed from package %s on %s"), file->localpath, name, arch);
+                if (params.waiverauth == WAIVABLE_BY_SECURITY) {
+                    xasprintf(&params.msg, _("ABI break: Library %s removed from package %s on %s; Removing security policy related files requires inspection by the Security Response Team."), file->localpath, name, arch);
+                } else {
+                    xasprintf(&params.msg, _("ABI break: Library %s removed from package %s on %s"), file->localpath, name, arch);
+                }
             }
         } else {
-            xasprintf(&params.msg, _("%s removed from package %s on %s"), file->localpath, name, arch);
+            if (params.waiverauth == WAIVABLE_BY_SECURITY) {
+                xasprintf(&params.msg, _("%s removed from package %s on %s; Removing security policy related files requires inspection by the Security Response Team."), file->localpath, name, arch);
+            } else {
+                xasprintf(&params.msg, _("%s removed from package %s on %s"), file->localpath, name, arch);
+            }
         }
 
         if (params.severity != RESULT_NULL && params.severity != RESULT_SKIP) {
-            add_removedfiles_result(ri, &params);
+            add_result(ri, &params);
+            reported = true;
             result = !(params.severity >= RESULT_VERIFY);
         }
 
