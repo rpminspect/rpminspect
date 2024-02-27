@@ -19,25 +19,6 @@
 static bool reported = false;
 
 /*
- * Called by changedfiles_driver() to add additional information for
- * files marked as security concerns.
- */
-static void add_changedfiles_result(struct rpminspect *ri, struct result_params *params)
-{
-    assert(ri != NULL);
-    assert(params != NULL);
-
-    if (params->waiverauth == WAIVABLE_BY_SECURITY) {
-        params->msg = strappend(params->msg, _("  Changes to security policy related files require inspection by the Security Response Team."), NULL);
-        assert(params->msg != NULL);
-    }
-
-    add_result(ri, params);
-    reported = true;
-    return;
-}
-
-/*
  * Runs a command and redirects standard out to a temporary file created
  * in this function.  Caller is responsible for removing the temporary
  * file.
@@ -459,11 +440,19 @@ static bool changedfiles_driver(struct rpminspect *ri, rpmfile_entry_t *file)
 
         if (before_sum && after_sum && strcmp(before_sum, after_sum)) {
             nvr = get_nevr(file->rpm_header);
-            xasprintf(&params.msg, _("File %s changed content in %s on %s."), file->localpath, nvr, arch);
             params.severity = RESULT_INFO;
             params.verb = VERB_CHANGED;
             params.noun = _("${FILE}");
-            add_changedfiles_result(ri, &params);
+
+            if (params.waiverauth == WAIVABLE_BY_SECURITY) {
+                xasprintf(&params.msg, _("File %s changed content in %s on %s.  Changes to security policy related files require inspection by the Security Response Team."), file->localpath, nvr, arch);
+            } else {
+                xasprintf(&params.msg, _("File %s changed content in %s on %s."), file->localpath, nvr, arch);
+            }
+
+            assert(params.msg != NULL);
+            add_result(ri, &params);
+            reported = true;
         }
     }
 
