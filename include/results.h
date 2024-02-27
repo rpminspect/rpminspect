@@ -108,6 +108,13 @@ extern "C"
  */
 #define REMEDY_UNAPPROVED_LICENSE _("The specified license abbreviation is not listed as approved in the license database.  The license database is specified in the rpminspect configuration file.  Check this file and send a pull request to the appropriate upstream project to update the database.  If the license is listed in the database but marked unapproved, you may need to work with the legal team regarding options for this software.")
 
+/**
+ * @def REMEDY_INVALID_BOOLEAN
+ *
+ * How to handle an invalid boolean token in the License tag.
+ */
+#define REMEDY_INVALID_BOOLEAN _("The License tag contains SPDX license identifiers.  When SPDX identifiers are used, the boolean joining terms must be written in all capitable letters per the spec.  The actual SPDX identifiers are case-insensitive.  It is only the boolean terms that must be in all capital letters.")
+
 /** @} */
 
 /**
