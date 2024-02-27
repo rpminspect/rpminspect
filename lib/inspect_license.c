@@ -28,6 +28,8 @@
 
 /* Globals */
 static const char *srpm = NULL;
+static int nspdx = 0;
+string_list_t *booleans = NULL;
 
 /* Local helper functions */
 static parser_plugin *read_licensedb(struct rpminspect *ri, const char *db, parser_context **context_out)
@@ -166,9 +168,10 @@ static bool lic_cb(const char *license_name, void *cb_data)
     if (!approved) {
         /* invalid - do nothing */
         goto done;
-    } else if (spdx_abbrev && !strcmp(lic, spdx_abbrev)) {
+    } else if (spdx_abbrev && !strcasecmp(lic, spdx_abbrev)) {
         /* SPDX identifier matched */
         data->valid = true;
+        nspdx++;
     } else if (list_contains(fedora_abbrev, lic) || (list_len(fedora_abbrev) == 0 && spdx_abbrev == NULL && list_contains(fedora_name, lic))) {
         /* Old Fedora abbreviation matches -or- there are no Fedora abbreviations but a Fedora name matches */
         data->valid = true;
@@ -237,6 +240,8 @@ static string_map_t *tokenize_license_tag(const char *license)
         }
 
         if (!strcasecmp(token, "and") || !strcasecmp(token, "or")) {
+            booleans = list_add(booleans, token);
+
             if (lic == NULL) {
                 continue;
             }
@@ -538,6 +543,22 @@ static bool is_valid_license(struct rpminspect *ri, struct result_params *params
     free_tags(tags);
     free(wlicense);
 
+    /* for SPDX tags found, ensure booleans are all uppercase */
+    if (nspdx > 0 && (booleans && !TAILQ_EMPTY(booleans))) {
+        TAILQ_FOREACH(entry, booleans, items) {
+            if ((!strcasecmp(entry->data, "AND") && strcmp(entry->data, "AND"))
+                || (!strcasecmp(entry->data, "OR") && strcmp(entry->data, "OR"))) {
+                r = false;
+
+                params->severity = RESULT_BAD;
+                params->remedy = REMEDY_INVALID_BOOLEAN;
+                xasprintf(&params->msg, _("SPDX license expressions in use, but an invalid boolean was found: %s; when using SPDX expression the booleans must be in all caps."), entry->data);
+                add_result(ri, params);
+                free(params->msg);
+            }
+        }
+    }
+
     return r;
 }
 
@@ -600,6 +621,9 @@ static int check_peer_license(struct rpminspect *ri, struct result_params *param
     }
 
     free(nevra);
+    list_free(booleans, free);
+    booleans = NULL;
+    nspdx = 0;
     return ret;
 }
 

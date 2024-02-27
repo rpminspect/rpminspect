@@ -81,7 +81,7 @@ class ForbiddenLicenseTagKoji(TestKoji):
 class BadWordLicenseTagSRPM(TestSRPM):
     def setUp(self):
         super().setUp()
-        self.rpm.addLicense("GPLv2+ and reallybadword and MIT")
+        self.rpm.addLicense("GPLv2+ and reallybadword and ASL 2.0")
         self.inspection = "license"
         self.result = "BAD"
         self.waiver_auth = "Not Waivable"
@@ -91,7 +91,7 @@ class BadWordLicenseTagSRPM(TestSRPM):
 class BadWordLicenseTagRPMs(TestRPMs):
     def setUp(self):
         super().setUp()
-        self.rpm.addLicense("GPLv2+ and reallybadword and MIT")
+        self.rpm.addLicense("GPLv2+ and reallybadword and ASL 2.0")
         self.inspection = "license"
         self.result = "BAD"
         self.waiver_auth = "Not Waivable"
@@ -101,7 +101,7 @@ class BadWordLicenseTagRPMs(TestRPMs):
 class BadWordLicenseTagKoji(TestKoji):
     def setUp(self):
         super().setUp()
-        self.rpm.addLicense("GPLv2+ and reallybadword and MIT")
+        self.rpm.addLicense("GPLv2+ and reallybadword and ASL 2.0")
         self.inspection = "license"
         self.result = "BAD"
         self.waiver_auth = "Not Waivable"
@@ -231,7 +231,7 @@ class ValidLicenseTagWithBooleanSpacesParensKoji(TestKoji):
 class AnotherValidLicenseTagWithBooleanSpacesParensSRPM(TestSRPM):
     def setUp(self):
         super().setUp()
-        self.rpm.addLicense("MIT and (BSD or ASL 2.0)")
+        self.rpm.addLicense("GPLv3+ and (BSD or ASL 2.0)")
         self.inspection = "license"
         self.result = "INFO"
         self.waiver_auth = "Not Waivable"
@@ -241,7 +241,7 @@ class AnotherValidLicenseTagWithBooleanSpacesParensSRPM(TestSRPM):
 class AnotherValidLicenseTagWithBooleanSpacesParensRPMs(TestRPMs):
     def setUp(self):
         super().setUp()
-        self.rpm.addLicense("MIT and (BSD or ASL 2.0)")
+        self.rpm.addLicense("GPLv3+ and (BSD or ASL 2.0)")
         self.inspection = "license"
         self.result = "INFO"
         self.waiver_auth = "Not Waivable"
@@ -251,7 +251,7 @@ class AnotherValidLicenseTagWithBooleanSpacesParensRPMs(TestRPMs):
 class AnotherValidLicenseTagWithBooleanSpacesParensKoji(TestKoji):
     def setUp(self):
         super().setUp()
-        self.rpm.addLicense("MIT and (BSD or ASL 2.0)")
+        self.rpm.addLicense("GPLv3+ and (BSD or ASL 2.0)")
         self.inspection = "license"
         self.result = "INFO"
         self.waiver_auth = "Not Waivable"
@@ -263,7 +263,7 @@ class ValidGlibcLicenseTagKoji(TestKoji):
         super().setUp()
         self.rpm.addLicense(
             "LGPLv2+ and LGPLv2+ with exceptions and GPLv2+ and GPLv2+ with exceptions "
-            "and BSD and Inner-Net and ISC and Public Domain and GFDL"
+            "and BSD and Inner-Net and Public Domain and GFDL"
         )
         self.inspection = "license"
         self.result = "INFO"
@@ -425,4 +425,60 @@ class NotAllowedExceptionLicenseKoji(TestKoji):
         self.rpm.addLicense("DERP")
         self.inspection = "license"
         self.result = "INFO"
+        self.waiver_auth = "Not Waivable"
+
+
+# Valid compound SPDX license expression (INFO)
+class ValidCompoundSPDXLicenseExpressionSRPM(TestSRPM):
+    def setUp(self):
+        super().setUp()
+        self.rpm.addLicense("MIT AND ISC")
+        self.inspection = "license"
+        self.result = "INFO"
+        self.waiver_auth = "Not Waivable"
+
+
+class ValidCompoundSPDXLicenseExpressionRPMs(TestRPMs):
+    def setUp(self):
+        super().setUp()
+        self.rpm.addLicense("MIT AND ISC")
+        self.inspection = "license"
+        self.result = "INFO"
+        self.waiver_auth = "Not Waivable"
+
+
+class ValidCompoundSPDXLicenseExpressionKoji(TestKoji):
+    def setUp(self):
+        super().setUp()
+        self.rpm.addLicense("MIT AND ISC")
+        self.inspection = "license"
+        self.result = "INFO"
+        self.waiver_auth = "Not Waivable"
+
+
+# Invalid compound SPDX license expression (BAD)
+class InvalidCompoundSPDXLicenseExpressionSRPM(TestSRPM):
+    def setUp(self):
+        super().setUp()
+        self.rpm.addLicense("MIT and ISC")
+        self.inspection = "license"
+        self.result = "BAD"
+        self.waiver_auth = "Not Waivable"
+
+
+class InvalidCompoundSPDXLicenseExpressionRPMs(TestRPMs):
+    def setUp(self):
+        super().setUp()
+        self.rpm.addLicense("MIT and ISC")
+        self.inspection = "license"
+        self.result = "BAD"
+        self.waiver_auth = "Not Waivable"
+
+
+class InvalidCompoundSPDXLicenseExpressionKoji(TestKoji):
+    def setUp(self):
+        super().setUp()
+        self.rpm.addLicense("MIT and ISC")
+        self.inspection = "license"
+        self.result = "BAD"
         self.waiver_auth = "Not Waivable"
