@@ -113,7 +113,7 @@ extern "C"
  *
  * How to handle an invalid boolean token in the License tag.
  */
-#define REMEDY_INVALID_BOOLEAN _("The License tag contains SPDX license identifiers.  When SPDX identifiers are used, the boolean joining terms must be written in all capitable letters per the spec.  The actual SPDX identifiers are case-insensitive.  It is only the boolean terms that must be in all capital letters.")
+#define REMEDY_INVALID_BOOLEAN _("The License tag contains SPDX license identifiers.  When SPDX identifiers are used, the boolean joining terms must be written in all capital letters per the spec.  The actual SPDX identifiers are case-insensitive.  It is only the boolean terms that must be in all capital letters.")
 
 /** @} */
 
