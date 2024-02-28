@@ -447,6 +447,7 @@ static bool inspect_elf_execstack(struct rpminspect *ri, Elf *after_elf, Elf *be
         }
 
         free(params.msg);
+        return result;
     }
 
     /* Check that the execstack flags make sense */
