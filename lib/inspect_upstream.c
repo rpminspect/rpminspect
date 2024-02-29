@@ -156,7 +156,7 @@ bool inspect_upstream(struct rpminspect *ri)
         /* versions are the same, likely maintenance */
         params.severity = RESULT_VERIFY;
         params.waiverauth = WAIVABLE_BY_ANYONE;
-        xasprintf(&params.remedy, REMEDY_UPSTREAM, ri->rebaseable_filename);
+        params.remedy = REMEDY_UPSTREAM;
     }
 
     /* Run the main inspection */
@@ -207,8 +207,6 @@ bool inspect_upstream(struct rpminspect *ri)
         list_free(source, free);
     }
 
-    free(params.remedy);
-    params.remedy = NULL;
     params.msg = NULL;
 
     /* Sound the everything-is-ok alarm if everything is, in fact, ok */
