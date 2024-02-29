@@ -15,7 +15,6 @@
 #include "rpminspect.h"
 
 static bool reported = false;
-static char *remedy_addedfiles = NULL;
 
 /*
  * Check the given file to see if the path has any forbidden directory in it.
@@ -123,7 +122,7 @@ static bool addedfiles_driver(struct rpminspect *ri, rpmfile_entry_t *file)
     params.arch = arch;
     params.file = file->localpath;
     params.verb = VERB_FAILED;
-    params.remedy = remedy_addedfiles;
+    params.remedy = REMEDY_ADDEDFILES;
 
     if (!ignore) {
         /* Check for any forbidden path prefixes */
@@ -245,10 +244,7 @@ bool inspect_addedfiles(struct rpminspect *ri)
     bool result;
     struct result_params params;
 
-    xasprintf(&remedy_addedfiles, REMEDY_ADDEDFILES, ri->fileinfo_filename ? ri->fileinfo_filename : _("the fileinfo list"));
-    assert(remedy_addedfiles != NULL);
     result = foreach_peer_file(ri, NAME_ADDEDFILES, addedfiles_driver);
-    free(remedy_addedfiles);
 
     if (result && !reported) {
         init_result_params(&params);

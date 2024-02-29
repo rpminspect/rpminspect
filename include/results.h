@@ -128,21 +128,21 @@ extern "C"
  *
  * How to address ELF objects containing non-position independent code.
  */
-#define REMEDY_ELF_TEXTREL _("Ensure all object files are compiled with -fPIC")
+#define REMEDY_ELF_TEXTREL _("Ensure all object files are compiled with -fPIC.")
 
 /**
  * @def REMEDY_ELF_EXECSTACK_MISSING
  *
  * How to address ELF objects missing execstack compiler flags.
  */
-#define REMEDY_ELF_EXECSTACK_MISSING _("Ensure that the package is being built with the correct compiler and compiler flags")
+#define REMEDY_ELF_EXECSTACK_MISSING _("Ensure that the package is being built with the correct compiler and compiler flags.")
 
 /**
  * @def REMEDY_ELF_EXECSTACK_INVALID
  *
  * How to address invalid ELF objects.
  */
-#define REMEDY_ELF_EXECSTACK_INVALID _("The data in an ELF file appears to be corrupt; ensure that packaged ELF files are not being truncated or incorrectly modified")
+#define REMEDY_ELF_EXECSTACK_INVALID _("The data in an ELF file appears to be corrupt; ensure that packaged ELF files are not being truncated or incorrectly modified.")
 
 /**
  * @def REMEDY_ELF_EXECSTACK_EXECUTABLE
@@ -156,14 +156,14 @@ extern "C"
  *
  * How to address ELF objects without read-only relocations.
  */
-#define REMEDY_ELF_GNU_RELRO _("Ensure executables are linked with with '-z relro -z now'")
+#define REMEDY_ELF_GNU_RELRO _("Ensure executables are linked with with '-z relro -z now'.")
 
 /**
  * @def REMEDY_ELF_FPIC
  *
  * How to address ELF objects with non-position independent code.
  */
-#define REMEDY_ELF_FPIC _("Ensure all object files are compiled with -fPIC")
+#define REMEDY_ELF_FPIC _("Ensure all object files are compiled with -fPIC.")
 
 /** @} */
 
@@ -200,7 +200,7 @@ extern "C"
  *
  * How to address XML file validity problems.
  */
-#define REMEDY_XML _("Correct the reported errors in the XML document")
+#define REMEDY_XML _("Correct the reported errors in the XML document.")
 
 /** @} */
 
@@ -215,7 +215,7 @@ extern "C"
  *
  * How to address *.desktop file validity problems.
  */
-#define REMEDY_DESKTOP _("Refer to the Desktop Entry Specification at https://standards.freedesktop.org/desktop-entry-spec/latest/ for help correcting the errors and warnings")
+#define REMEDY_DESKTOP _("Refer to the Desktop Entry Specification at https://standards.freedesktop.org/desktop-entry-spec/latest/ for help correcting the errors and warnings.")
 
 /** @} */
 
@@ -353,7 +353,7 @@ extern "C"
  *
  * How to handle unexpected file additions.
  */
-#define REMEDY_ADDEDFILES _("Unexpected file additions were found.  Verify these changes are correct.  If they are not, adjust the build to prevent the file additions between builds.  If they are correct, update %s and send a patch to the rpminspect data project owning that file so rpminspect knows to expect this change.  You may also need to update the data package or local configuration file and change the forbidden_path_prefixes or forbidden_path_suffixes list.")
+#define REMEDY_ADDEDFILES _("Unexpected file additions were found.  Verify these changes are correct.  If they are not, adjust the build to prevent the file additions between builds.  If they are correct, update the fileinfo list for this product release and send a patch to the rpminspect data project owning that file so rpminspect knows to expect this change.  You may also need to update the data package or local configuration file and change the forbidden_path_prefixes or forbidden_path_suffixes list.")
 
 /** @} */
 
@@ -368,7 +368,7 @@ extern "C"
  *
  * How to handle unexpected changes in upstream source content.
  */
-#define REMEDY_UPSTREAM _("Unexpected changed source archive content. The version of the package did not change between builds, but the source archive content did. This may be deliberate, but needs inspection. If this change is expected, update %s and send a patch to the project that owns that file.")
+#define REMEDY_UPSTREAM _("Unexpected changed source archive content. The version of the package did not change between builds, but the source archive content did. This may be deliberate, but needs inspection. If this change is expected, update the rebaseable exception list for this product release and send a patch to the project that owns the rpminspect data files.")
 
 /** @} */
 
@@ -383,42 +383,42 @@ extern "C"
  *
  * How to handle unexpected ownership settings in the RPM payload.
  */
-#define REMEDY_OWNERSHIP_DEFATTR _("Make sure the %%files section includes the %%defattr macro. If these permissions are expected, update %s and send a patch to the project that owns it.")
+#define REMEDY_OWNERSHIP_DEFATTR _("Make sure the %files section includes the %defattr macro. If these permissions are expected, update the fileinfo exception list for this product release and send a patch to the project that owns the rpminspect data files.")
 
 /**
  * @def REMEDY_OWNERSHIP_BIN_OWNER
  *
  * How to handle incorrect ownership of bin path files.
  */
-#define REMEDY_OWNERSHIP_BIN_OWNER _("Bin path files must be owned by the bin_owner set in the rpminspect configuration, which is usually root. If this ownership is expected, update %s and send a patch to the project that owns it.")
+#define REMEDY_OWNERSHIP_BIN_OWNER _("Bin path files must be owned by the bin_owner set in the rpminspect configuration, which is usually root. If this ownership is expected, update the fileinfo exception list for this product release and send a patch to the project that owns the rpminspect data files.")
 
 /**
  * @def REMEDY_OWNERSHIP_BIN_GROUP
  *
  * How to handle incorrect group ownership of bin path files.
  */
-#define REMEDY_OWNERSHIP_BIN_GROUP _("Bin path files must be owned by the bin_group set in the rpminspect configuration, which is usually root. If this ownership is expect, update %s and send a patch to the project that owns it.")
+#define REMEDY_OWNERSHIP_BIN_GROUP _("Bin path files must be owned by the bin_group set in the rpminspect configuration, which is usually root. If this ownership is expected, update the fileinfo exception list for this product release and send a patch to the project that owns the rpminspect data files.")
 
 /**
  * @def REMEDY_OWNERSHIP_IXOTH
  *
  * How to handle files with the world execute bit set where it should not be.
  */
-#define REMEDY_OWNERSHIP_IXOTH _("Either chgrp the file to the bin_group set in the rpminspect configuration or remove the world execute bit on the file (chmod o-x). If this ownership is expected, update %s and send a patch to the project that owns it.")
+#define REMEDY_OWNERSHIP_IXOTH _("Either chgrp the file to the bin_group set in the rpminspect configuration or remove the world execute bit on the file (chmod o-x). If this ownership is expected, update the fileinfo exception list for this product release and send a patch to the project that owns the rpminspect data files.")
 
 /**
  * @def REMEDY_OWNERSHIP_IWGRP
  *
  * How to handle files with the group write bit set where it should not be.
  */
-#define REMEDY_OWNERSHIP_IWGRP _("Either chgrp the file to the bin_group set in the rpminspect configuration or remove the group write bit on the file (chmod g-w). If this ownership is expected, update %s and send a patch to the project that owns it.")
+#define REMEDY_OWNERSHIP_IWGRP _("Either chgrp the file to the bin_group set in the rpminspect configuration or remove the group write bit on the file (chmod g-w). If this ownership is expected, update the fileinfo exception list for this product release and send a patch to the project that owns the rpminspect data files.")
 
 /**
  * @def REMEDY_OWNERSHIP_CHANGED
  *
  * How to handle unexpected file and directory ownership changes.
  */
-#define REMEDY_OWNERSHIP_CHANGED _("Verify the ownership changes are expected. If not, adjust the package build process to set correct owner and group information. If expected, update %s and send a patch to the project that owns it.")
+#define REMEDY_OWNERSHIP_CHANGED _("Verify the ownership changes are expected. If not, adjust the package build process to set correct owner and group information. If expected, update the fileinfo exception list for this product release and send a patch to the project that owns the rpminspect data files.")
 
 /**
  * @def REMEDY_FILEINFO_RULE
@@ -542,7 +542,7 @@ extern "C"
  *
  * How to address unexpected file capabilities(7).
  */
-#define REMEDY_CAPABILITIES _("Unexpected capabilities were found on the indicated file.  Consult capabilities(7) and either adjust the files in the package or modify the capabilities list in the rpminspect vendor data package.  The security team may also be of help for this situation.  If necessary, update %s with the changes found here and send a patch to the project that owns the data file.")
+#define REMEDY_CAPABILITIES _("Unexpected capabilities were found on the indicated file.  Consult capabilities(7) and either adjust the files in the package or modify the capabilities list in the rpminspect vendor data package.  The security team may also be of help for this situation.  If necessary, update the capabilities file for this product release with the changes found here and send a patch to the project that owns the rpminspect data file.")
 
 /** @} */
 
@@ -592,7 +592,7 @@ extern "C"
  * @{
  */
 
-#define REMEDY_SUBPACKAGES_LOST _("A subpackage present in the before build is now missing in the after build.  This may be deliberate, but check to make sure you have correct syntax defining the subpackage in the spec file")
+#define REMEDY_SUBPACKAGES_LOST _("A subpackage present in the before build is now missing in the after build.  This may be deliberate, but check to make sure you have correct syntax defining the subpackage in the spec file.")
 #define REMEDY_SUBPACKAGES_GAIN _("A new subpackage has appeared in the after build.  This may indicate progress in the world of computing.")
 
 /** @} */
@@ -730,7 +730,7 @@ extern "C"
  * @{
  */
 
-#define REMEDY_POLITICS _("A file with potential politically sensitive content was found in the package.  If this file is permitted, it should be added to the rpminspect vendor data package for the product.  Modify the %s file and send a patch to the project that owns it.")
+#define REMEDY_POLITICS _("A file with potential politically sensitive content was found in the package.  If this file is permitted, it should be added to the rpminspect vendor data package for the product.  Modify the politics allow/deny list file for this product release and send a patch to the project that owns the rpminspect data files.")
 
 /** @} */
 
