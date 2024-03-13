@@ -282,7 +282,7 @@ static bool symlinks_driver(struct rpminspect *ri, rpmfile_entry_t *file)
 
         if (S_ISDIR(file->peer_file->st.st_mode)) {
             /* Some RPM versions cannot handle this on an upgrade */
-            params.remedy = REMEDY_SYMLINKS_DIRECTORY;
+            params.remedy = get_remedy(REMEDY_SYMLINKS_DIRECTORY);
             xasprintf(&params.msg, _("Directory %s became a symbolic link (to %s) in %s on %s; this is not allowed!"), file->peer_file->localpath, localpath, name, params.arch);
             params.severity = RESULT_BAD;
             params.waiverauth = WAIVABLE_BY_ANYONE;
@@ -297,7 +297,7 @@ static bool symlinks_driver(struct rpminspect *ri, rpmfile_entry_t *file)
                 xasprintf(&params.msg, _("%s %s became a symbolic link (to %s) in %s on %s; and the link destination is unreachable"), strtype(file->peer_file->st.st_mode), file->peer_file->localpath, localpath, name, params.arch);
                 params.severity = RESULT_VERIFY;
                 params.waiverauth = WAIVABLE_BY_ANYONE;
-                params.remedy = REMEDY_SYMLINKS;
+                params.remedy = get_remedy(REMEDY_SYMLINKS);
             }
         }
 

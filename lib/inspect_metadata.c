@@ -44,7 +44,7 @@ static bool valid_peers(struct rpminspect *ri, const Header before_hdr, const He
         params.noun = NULL;
         params.file = NULL;
         params.arch = NULL;
-        params.remedy = REMEDY_VENDOR;
+        params.remedy = get_remedy(REMEDY_VENDOR);
         add_result(ri, &params);
         free(params.msg);
     } else if (after_vendor && strcmp(after_vendor, ri->vendor)) {
@@ -55,7 +55,7 @@ static bool valid_peers(struct rpminspect *ri, const Header before_hdr, const He
         params.noun = _("invalid vendor ${FILE} on ${ARCH}");
         params.file = after_vendor;
         params.arch = get_rpm_header_arch(after_hdr);
-        params.remedy = REMEDY_VENDOR;
+        params.remedy = get_remedy(REMEDY_VENDOR);
         add_result(ri, &params);
         free(params.msg);
         ret = false;
@@ -80,7 +80,7 @@ static bool valid_peers(struct rpminspect *ri, const Header before_hdr, const He
             params.noun = _("invalid build host ${FILE} on ${ARCH}");
             params.file = after_buildhost;
             params.arch = get_rpm_header_arch(after_hdr);
-            params.remedy = REMEDY_BUILDHOST;
+            params.remedy = get_remedy(REMEDY_BUILDHOST);
             add_result(ri, &params);
             free(params.msg);
             ret = false;
@@ -97,7 +97,7 @@ static bool valid_peers(struct rpminspect *ri, const Header before_hdr, const He
         params.noun = _("Summary contains unprofessional words on ${ARCH}");
         params.file = NULL;
         params.arch = get_rpm_header_arch(after_hdr);
-        params.remedy = REMEDY_BADWORDS;
+        params.remedy = get_remedy(REMEDY_BADWORDS);
         add_result(ri, &params);
         free(params.msg);
         free(params.details);
@@ -114,7 +114,7 @@ static bool valid_peers(struct rpminspect *ri, const Header before_hdr, const He
         params.noun = _("Description contains unprofessional words on ${ARCH}");
         params.file = NULL;
         params.arch = get_rpm_header_arch(after_hdr);
-        params.remedy = REMEDY_BADWORDS;
+        params.remedy = get_remedy(REMEDY_BADWORDS);
         add_result(ri, &params);
         free(params.msg);
         free(params.details);

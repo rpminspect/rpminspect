@@ -16,6 +16,7 @@
 #include "parser.h"
 #include "rpminspect.h"
 #include "init.h"
+#include "remedy.h"
 #include "queue.h"
 #include "uthash.h"
 
@@ -56,6 +57,9 @@ static const char *CFG_FILENAME_EXTENSIONS[] = {"yaml", "json", "dson", NULL};
  * may reside.
  */
 static const char *UDEV_RULES_DIRS[] = {"/etc/udev/rules.d/", "/usr/lib/udev/rules.d/", NULL};
+
+/* flag indicating the remedy strings have been initialized */
+static bool remedy_initialized = false;
 
 static int add_regex(const char *pattern, regex_t **regex_out)
 {
@@ -1620,6 +1624,12 @@ struct rpminspect *init_rpminspect(struct rpminspect *ri, const char *cfgfile, c
     char *bn = NULL;
     char *kernelnames[] = KERNEL_FILENAMES;
     string_entry_t *cfg = NULL;
+
+    /* initialize the default remedy strings */
+    if (!remedy_initialized) {
+        init_remedy_strings();
+        remedy_initialized = true;
+    }
 
     if (ri == NULL) {
         ri = calloc_rpminspect(ri);

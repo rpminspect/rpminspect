@@ -120,7 +120,7 @@ bool inspect_emptyrpm(struct rpminspect *ri)
                 params.noun = _("${FILE} has empty payload");
                 params.file = an;
                 params.arch = get_rpm_header_arch(peer->after_hdr);
-                params.remedy = REMEDY_EMPTYRPM;
+                params.remedy = get_remedy(REMEDY_EMPTYRPM);
                 good = false;
                 reported = true;
             }

@@ -137,7 +137,7 @@ static bool lto_driver(struct rpminspect *ri, rpmfile_entry_t *file)
     params.severity = RESULT_BAD;
     params.waiverauth = NOT_WAIVABLE;
     params.header = NAME_LTO;
-    params.remedy = REMEDY_LTO;
+    params.remedy = get_remedy(REMEDY_LTO);
     params.verb = VERB_FAILED;
     params.arch = arch;
     params.file = file->localpath;

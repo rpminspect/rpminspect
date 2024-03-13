@@ -333,7 +333,7 @@ static bool changedfiles_driver(struct rpminspect *ri, rpmfile_entry_t *file)
             nvr = get_nevr(file->rpm_header);
             xasprintf(&params.msg, _("Error running msgunfmt on %s in %s on %s; malformed mo file?"), file->localpath, nvr, arch);
             params.severity = RESULT_BAD;
-            params.remedy = REMEDY_CHANGEDFILES;
+            params.remedy = get_remedy(REMEDY_CHANGEDFILES);
             params.verb = VERB_FAILED;
             params.noun = _("msgunfmt on ${FILE}");
             add_result(ri, &params);
@@ -347,7 +347,7 @@ static bool changedfiles_driver(struct rpminspect *ri, rpmfile_entry_t *file)
             nvr = get_nevr(file->peer_file->rpm_header);
             xasprintf(&params.msg, _("Error running msgunfmt on %s in %s on %s; malformed mo file?"), file->peer_file->localpath, nvr, arch);
             params.severity = RESULT_BAD;
-            params.remedy = REMEDY_CHANGEDFILES;
+            params.remedy = get_remedy(REMEDY_CHANGEDFILES);
             params.verb = VERB_FAILED;
             params.noun = _("msgunfmt on ${FILE}");
             add_result(ri, &params);
@@ -362,7 +362,7 @@ static bool changedfiles_driver(struct rpminspect *ri, rpmfile_entry_t *file)
             nvr = get_nevr(file->rpm_header);
             xasprintf(&params.msg, _("Message catalog %s changed content in %s on %s"), file->localpath, nvr, arch);
             params.severity = RESULT_INFO;
-            params.remedy = REMEDY_CHANGEDFILES;
+            params.remedy = get_remedy(REMEDY_CHANGEDFILES);
             params.verb = VERB_CHANGED;
             params.noun = _("${FILE}");
             add_result(ri, &params);

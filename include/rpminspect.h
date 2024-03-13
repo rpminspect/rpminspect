@@ -26,8 +26,8 @@ extern "C"
 #include "constants.h"
 #include "types.h"
 #include "inspect.h"
-#include "results.h"
 #include "output.h"
+#include "remedy.h"
 #include "readelf.h"
 #include "parser.h"
 
@@ -42,6 +42,9 @@ extern struct inspect inspections[];
 
 /* List of all output format types (output.c) */
 extern struct format formats[];
+
+/* List of all default remedy strings (remedy.c) */
+extern struct remedy remedies[];
 
 /* List of all build types (koji.c) */
 extern struct buildtype buildtypes[];
@@ -63,17 +66,6 @@ extern volatile sig_atomic_t terminal_resized;
     _xasprintf_result = asprintf((dest), __VA_ARGS__); \
     assert(_xasprintf_result != -1);                   \
 }
-#endif
-
-#ifdef GETTEXT_DOMAIN
-#include <libintl.h>
-#include <locale.h>
-
-#define _(MSGID) gettext((MSGID))
-#define N_(MSGID, MSGID_PLURAL, N) ngettext((MSGID), (MSGID_PLURAL), (N))
-#else
-#define _(MSGID) (MSGID)
-#define N_(MSGID, MSGID_PLURAL, N) ((MSGID_PLURAL))
 #endif
 
 /*
@@ -321,7 +313,7 @@ char **build_argv(const char *cmd);
 void free_argv(char **argv);
 
 /* fileinfo.c */
-bool match_fileinfo_mode(struct rpminspect *, const rpmfile_entry_t *, const char *, const char *, bool *, bool *);
+bool match_fileinfo_mode(struct rpminspect *, const rpmfile_entry_t *, const char *, bool *, bool *);
 bool match_fileinfo_owner(struct rpminspect *, const rpmfile_entry_t *, const char *, const char *, const char *, const char *, bool *, bool *);
 bool match_fileinfo_group(struct rpminspect *, const rpmfile_entry_t *, const char *, const char *, const char *, const char *, bool *, bool *);
 #ifdef _WITH_LIBCAP

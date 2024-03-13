@@ -392,7 +392,7 @@ static bool is_valid_license(struct rpminspect *ri, struct result_params *params
 
     /* Set up the result parameters */
     params->severity = RESULT_BAD;
-    params->remedy = REMEDY_UNAPPROVED_LICENSE;
+    params->remedy = get_remedy(REMEDY_UNAPPROVED_LICENSE);
 
     /* check for matching parens */
     for (i = 0; i < strlen(license); i++) {
@@ -551,7 +551,7 @@ static bool is_valid_license(struct rpminspect *ri, struct result_params *params
                 r = false;
 
                 params->severity = RESULT_BAD;
-                params->remedy = REMEDY_INVALID_BOOLEAN;
+                params->remedy = get_remedy(REMEDY_INVALID_BOOLEAN);
                 xasprintf(&params->msg, _("SPDX license expressions in use, but an invalid boolean was found: %s; when using SPDX expression the booleans must be in all caps."), entry->data);
                 add_result(ri, params);
                 free(params->msg);
@@ -584,7 +584,7 @@ static int check_peer_license(struct rpminspect *ri, struct result_params *param
     if (license == NULL) {
         xasprintf(&params->msg, _("Empty License Tag in %s"), nevra);
         params->severity = RESULT_BAD;
-        params->remedy = REMEDY_LICENSE;
+        params->remedy = get_remedy(REMEDY_LICENSE);
         params->verb = VERB_FAILED;
         params->noun = _("missing License tag in ${FILE}");
         add_result(ri, params);
@@ -611,7 +611,7 @@ static int check_peer_license(struct rpminspect *ri, struct result_params *param
         if (has_bad_word(license, ri->badwords)) {
             xasprintf(&params->msg, _("License Tag contains unprofessional language in %s: %s"), nevra, license);
             params->severity = RESULT_BAD;
-            params->remedy = REMEDY_LICENSE;
+            params->remedy = get_remedy(REMEDY_LICENSE);
             params->verb = VERB_FAILED;
             params->noun = _("unprofessional language in License tag in ${FILE}");
             add_result(ri, params);
@@ -655,7 +655,7 @@ bool inspect_license(struct rpminspect *ri)
     if (ri->licensedb == NULL || TAILQ_EMPTY(ri->licensedb)) {
         xasprintf(&params.msg, _("Missing license database(s)."));
         params.severity = RESULT_BAD;
-        params.remedy = REMEDY_LICENSEDB;
+        params.remedy = get_remedy(REMEDY_LICENSEDB);
         params.verb = VERB_FAILED;
         params.noun = _("missing license database");
         params.file = NULL;

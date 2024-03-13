@@ -104,7 +104,7 @@ static bool check_runpath(struct rpminspect *ri, const rpmfile_entry_t *file, co
     params.severity = RESULT_VERIFY;
     params.waiverauth = WAIVABLE_BY_ANYONE;
     params.header = NAME_RUNPATH;
-    params.remedy = REMEDY_RUNPATH;
+    params.remedy = get_remedy(REMEDY_RUNPATH);
     params.arch = arch;
     params.file = file->localpath;
 
@@ -264,7 +264,7 @@ static bool runpath_driver(struct rpminspect *ri, rpmfile_entry_t *file)
         params.header = NAME_RUNPATH;
         params.severity = RESULT_BAD;
         params.waiverauth = NOT_WAIVABLE;
-        params.remedy = REMEDY_RUNPATH_BOTH;
+        params.remedy = get_remedy(REMEDY_RUNPATH_BOTH);
         params.file = file->localpath;
         params.arch = arch;
         params.verb = VERB_FAILED;

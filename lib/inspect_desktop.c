@@ -212,7 +212,7 @@ static bool validate_desktop_contents(struct rpminspect *ri, const rpmfile_entry
     /* Set up result parameters */
     init_result_params(&params);
     params.header = NAME_DESKTOP;
-    params.remedy = REMEDY_DESKTOP;
+    params.remedy = get_remedy(REMEDY_DESKTOP);
     params.arch = arch;
     params.file = file->localpath;
 
@@ -454,7 +454,7 @@ static bool desktop_driver(struct rpminspect *ri, rpmfile_entry_t *file)
     }
 
     params.header = NAME_DESKTOP;
-    params.remedy = REMEDY_DESKTOP;
+    params.remedy = get_remedy(REMEDY_DESKTOP);
     params.arch = arch;
     params.file = file->localpath;
     params.verb = VERB_CHANGED;

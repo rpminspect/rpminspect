@@ -119,13 +119,13 @@ static bool check_static_context(struct rpminspect *ri)
         xasprintf(&after_compliance, _("The /data/static_context value in %s is %s, but the product release rules forbid the presence of /data/static_context in the module metadata."), ri->after, asc ? "true" : "false");
         params.severity = RESULT_VERIFY;
         params.waiverauth = WAIVABLE_BY_ANYONE;
-        params.remedy = REMEDY_MODULARITY_STATIC_CONTEXT;
+        params.remedy = get_remedy(REMEDY_MODULARITY_STATIC_CONTEXT);
         r = false;
     } else if (!asc && ri->modularity_static_context == STATIC_CONTEXT_REQUIRED) {
         xasprintf(&after_compliance, _("The /data/static_context value in %s is %s, but the product release rules require the presence of /data/static_context in the module metadata."), ri->after, asc ? "true" : "false");
         params.severity = RESULT_VERIFY;
         params.waiverauth = WAIVABLE_BY_ANYONE;
-        params.remedy = REMEDY_MODULARITY_STATIC_CONTEXT;
+        params.remedy = get_remedy(REMEDY_MODULARITY_STATIC_CONTEXT);
         r = false;
     } else if (!asc && ri->modularity_static_context == STATIC_CONTEXT_RECOMMEND) {
         xasprintf(&after_compliance, _("The /data/static_context value in %s is %s, but the product release rules recommend the presence of /data/static_context in the module metadata."), ri->after, asc ? "true" : "false");
@@ -176,7 +176,7 @@ static bool check_release(struct rpminspect *ri, regex_t *release_regex, Header 
     params.severity = RESULT_BAD;
     params.waiverauth = NOT_WAIVABLE;
     params.header = NAME_MODULARITY;
-    params.remedy = REMEDY_MODULARITY_RELEASE;
+    params.remedy = get_remedy(REMEDY_MODULARITY_RELEASE);
 
     /* Get the tag from the header */
     release = headerGetString(h, RPMTAG_RELEASE);
@@ -225,7 +225,7 @@ static bool check_modularitylabel(struct rpminspect *ri, Header h)
     params.severity = RESULT_BAD;
     params.waiverauth = NOT_WAIVABLE;
     params.header = NAME_MODULARITY;
-    params.remedy = REMEDY_MODULARITY_LABEL;
+    params.remedy = get_remedy(REMEDY_MODULARITY_LABEL);
 
     /* Build the message we'll use for errors */
     xasprintf(&params.msg, _("Package \"%s\" is part of a module but lacks the '%%{modularitylabel}' header tag."), headerGetString(h, RPMTAG_NAME));

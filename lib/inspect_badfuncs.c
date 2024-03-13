@@ -169,7 +169,7 @@ static bool badfuncs_driver(struct rpminspect *ri, rpmfile_entry_t *after)
     params.severity = RESULT_VERIFY;
     params.waiverauth = WAIVABLE_BY_ANYONE;
     params.header = NAME_BADFUNCS;
-    params.remedy = REMEDY_BADFUNCS;
+    params.remedy = get_remedy(REMEDY_BADFUNCS);
     params.details = output_buffer;
     params.verb = VERB_FAILED;
     params.noun = _("forbidden functions in ${FILE} on ${ARCH}");

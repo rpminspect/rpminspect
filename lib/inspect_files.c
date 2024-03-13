@@ -59,7 +59,7 @@ static bool files_driver(struct rpminspect *ri, rpmfile_entry_t *file)
     params.severity = RESULT_VERIFY;
     params.waiverauth = WAIVABLE_BY_ANYONE;
     params.header = NAME_FILES;
-    params.remedy = REMEDY_FILES;
+    params.remedy = get_remedy(REMEDY_FILE_PATHS);
     params.file = file->localpath;
     params.arch = get_rpm_header_arch(file->rpm_header);
     params.verb = VERB_FAILED;

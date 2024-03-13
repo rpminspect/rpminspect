@@ -103,7 +103,7 @@ static bool filesize_driver(struct rpminspect *ri, rpmfile_entry_t *file)
         params.waiverauth = WAIVABLE_BY_ANYONE;
         params.verb = VERB_FAILED;
         params.noun = _("non-empty ${FILE} on ${ARCH}");
-        params.remedy = REMEDY_FILESIZE_BECAME_NOT_EMPTY;
+        params.remedy = get_remedy(REMEDY_FILESIZE_BECAME_NOT_EMPTY);
         result = false;
     } else if (file->st.st_size == 0 && file->peer_file->st.st_size > 0) {
         /* became empty */
@@ -112,7 +112,7 @@ static bool filesize_driver(struct rpminspect *ri, rpmfile_entry_t *file)
         params.waiverauth = WAIVABLE_BY_ANYONE;
         params.verb = VERB_FAILED;
         params.noun = _("empty ${FILE} on ${ARCH}");
-        params.remedy = REMEDY_FILESIZE_BECAME_EMPTY;
+        params.remedy = get_remedy(REMEDY_FILESIZE_BECAME_EMPTY);
         result = false;
     } else {
         change = ((file->st.st_size - file->peer_file->st.st_size) * 100 / file->peer_file->st.st_size);
@@ -131,12 +131,12 @@ static bool filesize_driver(struct rpminspect *ri, rpmfile_entry_t *file)
             /* file grew */
             xasprintf(&params.msg, _("%s grew by %lld%% on %s"), file->localpath, llabs(change), arch);
             params.noun = _("${FILE} size grew on ${ARCH}");
-            params.remedy = REMEDY_FILESIZE_GREW;
+            params.remedy = get_remedy(REMEDY_FILESIZE_GREW);
         } else if (change < 0) {
             /* file shrank */
             xasprintf(&params.msg, _("%s shrank by %lld%% on %s"), file->localpath, llabs(change), arch);
             params.noun = _("${FILE} size shrank on ${ARCH}");
-            params.remedy = REMEDY_FILESIZE_SHRANK;
+            params.remedy = get_remedy(REMEDY_FILESIZE_SHRANK);
         }
     }
 

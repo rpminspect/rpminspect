@@ -58,7 +58,7 @@ static bool pathmigration_driver(struct rpminspect *ri, rpmfile_entry_t *file)
     params.severity = RESULT_VERIFY;
     params.waiverauth = WAIVABLE_BY_ANYONE;
     params.header = NAME_PATHMIGRATION;
-    params.remedy = REMEDY_PATHMIGRATION;
+    params.remedy = get_remedy(REMEDY_PATHMIGRATION);
     params.verb = VERB_FAILED;
     params.file = file->localpath;
     params.arch = arch;

@@ -234,7 +234,7 @@ static bool kmidiff_driver(struct rpminspect *ri, rpmfile_entry_t *file)
     init_result_params(&params);
     params.header = NAME_KMIDIFF;
     params.waiverauth = WAIVABLE_BY_ANYONE;
-    params.remedy = REMEDY_KMIDIFF;
+    params.remedy = get_remedy(REMEDY_KMIDIFF);
     params.arch = arch;
     params.file = file->localpath;
 

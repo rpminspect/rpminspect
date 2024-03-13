@@ -349,7 +349,7 @@ static bool annocheck_driver(struct rpminspect *ri, rpmfile_entry_t *file)
     params.header = NAME_ANNOCHECK;
     params.severity = RESULT_INFO;
     params.waiverauth = NOT_WAIVABLE;
-    params.remedy = REMEDY_ANNOCHECK;
+    params.remedy = get_remedy(REMEDY_ANNOCHECK);
     params.verb = VERB_OK;
     params.arch = arch;
     params.file = file->localpath;
@@ -456,7 +456,7 @@ static bool annocheck_driver(struct rpminspect *ri, rpmfile_entry_t *file)
             if ((!strcmp(annotests[i].name, "fortify") || !strcmp(annotests[i].name, "optimization")) &&
                 (annotests[i].state == libannocheck_test_state_maybe || annotests[i].state == libannocheck_test_state_failed)) {
                 params.waiverauth = WAIVABLE_BY_SECURITY;
-                params.remedy = REMEDY_ANNOCHECK_FORTIFY_SOURCE;
+                params.remedy = get_remedy(REMEDY_ANNOCHECK_FORTIFY_SOURCE);
                 params.verb = VERB_REMOVED;
                 params.noun = _("lost -D_FORTIFY_SOURCE in ${FILE} on ${ARCH}");
                 params.severity = get_secrule_result_severity(ri, file, SECRULE_FORTIFYSOURCE);
@@ -606,7 +606,7 @@ static bool annocheck_driver(struct rpminspect *ri, rpmfile_entry_t *file)
                     init_result_params(&params);
                     params.header = NAME_ANNOCHECK;
                     params.waiverauth = WAIVABLE_BY_SECURITY;
-                    params.remedy = REMEDY_ANNOCHECK_FORTIFY_SOURCE;
+                    params.remedy = get_remedy(REMEDY_ANNOCHECK_FORTIFY_SOURCE);
                     params.arch = arch;
                     params.file = file->localpath;
                     params.verb = VERB_REMOVED;

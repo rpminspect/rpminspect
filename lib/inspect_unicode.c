@@ -494,7 +494,7 @@ static int validate_file(const char *fpath, __attribute__((unused)) const struct
     params.arch = globalarch;
     params.file = localpath;
     params.noun = _("forbidden code point in ${FILE} on ${ARCH}");
-    params.remedy = REMEDY_UNICODE;
+    params.remedy = get_remedy(REMEDY_UNICODE);
 
     /* Read in the file as Unicode data */
     src = u_fopen(fpath, "r", NULL, NULL);
@@ -647,7 +647,7 @@ static bool unicode_driver(struct rpminspect *ri, rpmfile_entry_t *file)
             params.file = file->localpath;
             params.noun = _("unable to run %prep in ${FILE}");
             params.verb = VERB_FAILED;
-            params.remedy = REMEDY_UNICODE_PREP_FAILED;
+            params.remedy = get_remedy(REMEDY_UNICODE_PREP_FAILED);
             xasprintf(&params.msg, _("Unable to run through the %%prep section in %s or manually unpack sources for further scanning."), file->localpath);
             add_result(globalri, &params);
             free(params.msg);

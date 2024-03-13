@@ -118,7 +118,7 @@ static bool check_class_file(struct rpminspect *ri, const char *fullpath, const 
     params.header = NAME_JAVABYTECODE;
     params.verb = VERB_FAILED;
     params.file = localpath;
-    params.remedy = REMEDY_JAVABYTECODE;
+    params.remedy = get_remedy(REMEDY_JAVABYTECODE);
 
     /* try to see if this is just a .class file */
     major = get_jvm_major(fullpath, localpath, container);
