@@ -24,7 +24,7 @@ static void lost_alias(const char *alias, const string_list_t *before_modules, c
     assert(before_modules != NULL);
     assert(ri != NULL);
 
-    params.remedy = REMEDY_KMOD_ALIAS;
+    params.remedy = get_remedy(REMEDY_KMOD_ALIAS);
     params.noun = _("${FILE} kernel module alias on ${ARCH}");
 
     TAILQ_FOREACH(entry, before_modules, items) {
@@ -186,7 +186,7 @@ static bool kmod_driver(struct rpminspect *ri, rpmfile_entry_t *file)
     if (!result_parm && lost != NULL && !TAILQ_EMPTY(lost)) {
         TAILQ_FOREACH(entry, lost, items) {
             xasprintf(&params.msg, _("Kernel module %s removes parameter '%s' (was present in %s)."), file->localpath, entry->data, file->peer_file->localpath);
-            params.remedy = REMEDY_KMOD_PARM;
+            params.remedy = get_remedy(REMEDY_KMOD_PARM);
             params.verb = VERB_REMOVED;
             params.noun = _("${FILE} kernel module parameter on ${ARCH}");
             params.file = file->localpath;
@@ -224,7 +224,7 @@ static bool kmod_driver(struct rpminspect *ri, rpmfile_entry_t *file)
     if (!result_deps && lost != NULL && !TAILQ_EMPTY(lost)) {
         TAILQ_FOREACH(entry, lost, items) {
             xasprintf(&params.msg, _("Kernel module %s removes dependency '%s' (was present in %s)."), file->localpath, entry->data, file->peer_file->localpath);
-            params.remedy = REMEDY_KMOD_DEPS;
+            params.remedy = get_remedy(REMEDY_KMOD_DEPS);
             params.verb = VERB_REMOVED;
             params.noun = _("${FILE} kernel module dependency on ${ARCH}");
             params.file = file->localpath;
@@ -241,7 +241,7 @@ static bool kmod_driver(struct rpminspect *ri, rpmfile_entry_t *file)
     if (gain != NULL && !TAILQ_EMPTY(gain)) {
         TAILQ_FOREACH(entry, gain, items) {
             xasprintf(&params.msg, _("Kernel module %s adds dependency '%s' (was not present in %s)."), file->localpath, entry->data, file->peer_file->localpath);
-            params.remedy = REMEDY_KMOD_DEPS;
+            params.remedy = get_remedy(REMEDY_KMOD_DEPS);
             params.verb = VERB_ADDED;
             params.noun = _("${FILE} kernel module parameter");
             params.file = file->localpath;

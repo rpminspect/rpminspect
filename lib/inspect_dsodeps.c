@@ -86,7 +86,7 @@ static bool dsodeps_driver(struct rpminspect *ri, rpmfile_entry_t *file)
     params.severity = RESULT_VERIFY;
     params.waiverauth = WAIVABLE_BY_ANYONE;
     params.header = NAME_DSODEPS;
-    params.remedy = REMEDY_DSODEPS;
+    params.remedy = get_remedy(REMEDY_DSODEPS);
     params.arch = arch;
     params.file = file->localpath;
 

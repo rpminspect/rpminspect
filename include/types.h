@@ -244,7 +244,7 @@ struct result_params {
     const char *header;
     char *msg;
     char *details;
-    char *remedy;
+    const char *remedy;
     verb_t verb;
     const char *noun;
     const char *arch;
@@ -257,7 +257,7 @@ typedef struct _results_entry_t {
     const char *header;       /* header string for reporting */
     char *msg;                /* the result message */
     char *details;            /* details (optional, can be NULL) */
-    char *remedy;             /* suggested correction for the result */
+    const char *remedy;       /* suggested correction for the result */
     verb_t verb;              /* verb indicating what happened */
     char *noun;               /* noun impacted by 'verb', one line
                                  (e.g., a file path or an RPM dependency
@@ -833,6 +833,21 @@ struct inspect {
 
     /* the driver function for the inspection */
     bool (*driver)(struct rpminspect *);
+};
+
+/*
+ * Definition of a remedy.  A remedy is a string with an identifier, a
+ * short name, and the string itself.
+ */
+struct remedy {
+    /* the remedy id from remedy.h */
+    unsigned int id;
+
+    /* short name of the remedy -- maps to config file key */
+    const char *name;
+
+    /* the default remedy string */
+    const char *remedy;
 };
 
 /*

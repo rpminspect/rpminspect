@@ -91,7 +91,7 @@ static bool removedfiles_driver(struct rpminspect *ri, rpmfile_entry_t *file)
      * File has been removed, report results.
      */
     if (params.waiverauth == WAIVABLE_BY_SECURITY || (ri->tests & INSPECT_REMOVEDFILES)) {
-        params.remedy = REMEDY_REMOVEDFILES;
+        params.remedy = get_remedy(REMEDY_REMOVEDFILES);
 
         if (sentry || params.waiverauth == WAIVABLE_BY_SECURITY) {
             params.severity = get_secrule_result_severity(ri, file, SECRULE_SECURITYPATH);

@@ -393,11 +393,11 @@ static bool patches_driver(struct rpminspect *ri, rpmfile_entry_t *file)
             /* a defined patch without an apply macro is a problem */
             if (aentry == NULL) {
                 xasprintf(&params.msg, _("Patch number %ld (%s) is missing a corresponding %%patch%ld macro, usually in %%prep."), pentry->num, pentry->patch, pentry->num);
-                params.remedy = REMEDY_PATCHES_MISSING_MACRO;
+                params.remedy = get_remedy(REMEDY_PATCHES_MISSING_MACRO);
                 params.noun = _("missing %%patch macro for ${FILE}");
             } else if (pentry->num != aentry->num) {
                 xasprintf(&params.msg, _("Patch number %ld (%s) is mismatched with %%patch%ld macro."), pentry->num, pentry->patch, pentry->num);
-                params.remedy = REMEDY_PATCHES_MISMATCHED_MACRO;
+                params.remedy = get_remedy(REMEDY_PATCHES_MISMATCHED_MACRO);
                 params.noun = _("mismatched %%patch macro for ${FILE}");
             }
 
@@ -468,7 +468,7 @@ static bool patches_driver(struct rpminspect *ri, rpmfile_entry_t *file)
         params.severity = RESULT_BAD;
         params.waiverauth = WAIVABLE_BY_ANYONE;
         params.details = NULL;
-        params.remedy = REMEDY_PATCHES_CORRUPT;
+        params.remedy = get_remedy(REMEDY_PATCHES_CORRUPT);
         params.verb = VERB_FAILED;
         params.noun = _("corrupt patch ${FILE}");
 
@@ -721,7 +721,7 @@ bool inspect_patches(struct rpminspect *ri)
                         if (!list_contains(patchfiles, patchfile)) {
                             params.severity = RESULT_VERIFY;
                             params.waiverauth = WAIVABLE_BY_ANYONE;
-                            params.remedy = REMEDY_PATCHES_UNHANDLED_PATCH;
+                            params.remedy = get_remedy(REMEDY_PATCHES_UNHANDLED_PATCH);
                             xasprintf(&params.msg, _("Unhandled patch file `%s` defined in spec file"), patchfile);
                             add_result(ri, &params);
                             free(params.msg);

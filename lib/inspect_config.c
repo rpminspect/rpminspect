@@ -60,7 +60,7 @@ static bool config_driver(struct rpminspect *ri, rpmfile_entry_t *file)
     params.header = NAME_CONFIG;
     params.arch = arch;
     params.file = file->localpath;
-    params.remedy = REMEDY_CONFIG;
+    params.remedy = get_remedy(REMEDY_CONFIG);
     params.verb = VERB_CHANGED;
     params.noun = _("%config ${FILE}");
 

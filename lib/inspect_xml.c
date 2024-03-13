@@ -207,7 +207,7 @@ static bool xml_driver(struct rpminspect *ri, rpmfile_entry_t *file)
     /* Set up result parameters */
     init_result_params(&params);
     params.header = NAME_XML;
-    params.remedy = REMEDY_XML;
+    params.remedy = get_remedy(REMEDY_XML);
     params.arch = get_rpm_header_arch(file->rpm_header);
     params.file = file->localpath;
 

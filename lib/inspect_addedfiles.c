@@ -122,7 +122,7 @@ static bool addedfiles_driver(struct rpminspect *ri, rpmfile_entry_t *file)
     params.arch = arch;
     params.file = file->localpath;
     params.verb = VERB_FAILED;
-    params.remedy = REMEDY_ADDEDFILES;
+    params.remedy = get_remedy(REMEDY_ADDEDFILES);
 
     if (!ignore) {
         /* Check for any forbidden path prefixes */

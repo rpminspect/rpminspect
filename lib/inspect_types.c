@@ -62,7 +62,7 @@ static bool types_driver(struct rpminspect *ri, rpmfile_entry_t *file)
     params.severity = RESULT_INFO;
     params.waiverauth = NOT_WAIVABLE;
     params.header = NAME_TYPES;
-    params.remedy = REMEDY_TYPES;
+    params.remedy = get_remedy(REMEDY_TYPES);
     params.arch = arch;
     params.file = file->localpath;
     params.verb = VERB_CHANGED;

@@ -127,7 +127,7 @@ static bool have_unexpanded_macros(struct rpminspect *ri, const char *name, cons
     init_result_params(&params);
     params.waiverauth = WAIVABLE_BY_ANYONE;
     params.header = NAME_RPMDEPS;
-    params.remedy = REMEDY_RPMDEPS_MACROS;
+    params.remedy = get_remedy(REMEDY_RPMDEPS_MACROS);
     params.file = specfile;
 
     /* check all dependencies */
@@ -489,10 +489,10 @@ static bool check_explicit_lib_deps(struct rpminspect *ri, Header h, deprule_lis
 
                 if (epoch > 0) {
                     rulestr = "%{epoch}:%{version}-%{release}";
-                    params.remedy = REMEDY_RPMDEPS_EXPLICIT_EPOCH;
+                    params.remedy = get_remedy(REMEDY_RPMDEPS_EXPLICIT_EPOCH);
                 } else {
                     rulestr = "%{version}-%{release}";
-                    params.remedy = REMEDY_RPMDEPS_EXPLICIT;
+                    params.remedy = get_remedy(REMEDY_RPMDEPS_EXPLICIT);
                 }
 
                 xasprintf(&params.msg, _("Subpackage %s on %s carries '%s' which comes from subpackage %s but does not carry an explicit package version requirement.  Please add 'Requires: %s = %s' to the spec file to avoid the need to test interoperability between various combinations of old and new subpackages."), name, arch, r, pn, pn, rulestr);
@@ -523,7 +523,7 @@ static bool check_explicit_lib_deps(struct rpminspect *ri, Header h, deprule_lis
             params.severity = RESULT_VERIFY;
             params.file = r;
             params.arch = arch;
-            params.remedy = REMEDY_RPMDEPS_MULTIPLE;
+            params.remedy = get_remedy(REMEDY_RPMDEPS_MULTIPLE);
             params.verb = VERB_FAILED;
             params.noun = noun;
             add_result(ri, &params);
@@ -614,7 +614,7 @@ static bool check_explicit_epoch(struct rpminspect *ri, Header h, deprule_list_t
                 xasprintf(&params.msg, _("Missing epoch prefix on the version-release in '%s' for %s on %s"), drs, pname, arch);
                 xasprintf(&noun, _("'${FILE}' needs epoch in %s on ${ARCH}"), name);
 
-                params.remedy = REMEDY_RPMDEPS_EPOCH;
+                params.remedy = get_remedy(REMEDY_RPMDEPS_EPOCH);
                 params.verb = VERB_FAILED;
                 params.noun = noun;
                 params.arch = arch;
@@ -969,7 +969,7 @@ bool inspect_rpmdeps(struct rpminspect *ri)
                         }
 
                         xasprintf(&noun, _("'${FILE}' in %s on ${ARCH}"), name);
-                        params.remedy = REMEDY_RPMDEPS_GAINED;
+                        params.remedy = get_remedy(REMEDY_RPMDEPS_GAINED);
                         params.verb = VERB_ADDED;
                     } else if (deprules_match(deprule, deprule->peer_deprule)) {
                         if (!strcmp(arch, SRPM_ARCH_NAME)) {
@@ -1005,7 +1005,7 @@ bool inspect_rpmdeps(struct rpminspect *ri)
                         }
 
                         xasprintf(&noun, _("'%s' became '${FILE}' in %s on ${ARCH}"), pdrs, name);
-                        params.remedy = REMEDY_RPMDEPS_CHANGED;
+                        params.remedy = get_remedy(REMEDY_RPMDEPS_CHANGED);
                         params.verb = VERB_CHANGED;
                     }
 
@@ -1034,7 +1034,7 @@ bool inspect_rpmdeps(struct rpminspect *ri)
                         }
 
                         params.details = NULL;
-                        params.remedy = REMEDY_RPMDEPS_LOST;
+                        params.remedy = get_remedy(REMEDY_RPMDEPS_LOST);
                         params.verb = VERB_REMOVED;
                         xasprintf(&noun, _("'${FILE}' in %s on ${ARCH}"), name);
                         params.noun = noun;

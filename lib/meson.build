@@ -102,6 +102,7 @@ librpminspect_sources = [
     'readfile.c',
     'rebase.c',
     'release.c',
+    'remedy.c',
     'results.c',
     'rmtree.c',
     'rpm.c',

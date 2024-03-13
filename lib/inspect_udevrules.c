@@ -126,7 +126,7 @@ static bool udevrules_driver(struct rpminspect *ri, rpmfile_entry_t *file)
     } else {
         params.severity = RESULT_BAD;
         params.waiverauth = WAIVABLE_BY_ANYONE;
-        params.remedy = REMEDY_UDEVRULES;
+        params.remedy = get_remedy(REMEDY_UDEVRULES);
         params.details = details;
         result = false;
     }

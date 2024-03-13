@@ -46,7 +46,7 @@ static bool movedfiles_driver(struct rpminspect *ri, rpmfile_entry_t *file)
         params.severity = RESULT_VERIFY;
         params.waiverauth = WAIVABLE_BY_ANYONE;
         params.verb = VERB_FAILED;
-        params.remedy = REMEDY_MOVEDFILES;
+        params.remedy = get_remedy(REMEDY_MOVEDFILES);
     }
 
     xasprintf(&noun, _("%s moved to ${FILE} on ${ARCH}"), file->peer_file->localpath);

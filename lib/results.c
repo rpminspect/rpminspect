@@ -57,14 +57,12 @@ void free_results(results_t *results)
         TAILQ_REMOVE(results, entry, items);
         free(entry->msg);
         free(entry->details);
-        free(entry->remedy);
         free(entry->noun);
         free(entry->arch);
         free(entry->file);
 
         /* these are all consts */
         entry->header = NULL;
-        entry->remedy = NULL;
 
         free(entry);
     }

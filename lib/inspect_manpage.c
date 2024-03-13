@@ -297,7 +297,7 @@ static bool manpage_driver(struct rpminspect *ri, rpmfile_entry_t *file)
 
         if (r == 0 && sb.st_size == 0) {
             xasprintf(&params.msg, _("Man page %s is possibly empty on %s in %s"), file->localpath, params.arch, pkg);
-            params.remedy = REMEDY_MAN_ERRORS;
+            params.remedy = get_remedy(REMEDY_MAN_ERRORS);
             params.details = NULL;
             params.noun = _("empty man page ${FILE} on ${ARCH}");
             add_result(ri, &params);
@@ -313,7 +313,7 @@ static bool manpage_driver(struct rpminspect *ri, rpmfile_entry_t *file)
     /* check man page validity */
     if ((manpage_errors = inspect_manpage_validity(file->fullpath, file->localpath)) != NULL) {
         xasprintf(&params.msg, _("Man page checker reported problems with %s on %s in %s"), file->localpath, params.arch, pkg);
-        params.remedy = REMEDY_MAN_ERRORS;
+        params.remedy = get_remedy(REMEDY_MAN_ERRORS);
         params.details = manpage_errors;
         params.noun = _("man page ${FILE} on ${ARCH} has errors");
         add_result(ri, &params);
@@ -325,7 +325,7 @@ static bool manpage_driver(struct rpminspect *ri, rpmfile_entry_t *file)
     /* check man page location on the filesystem */
     if (!inspect_manpage_path(file->fullpath)) {
         xasprintf(&params.msg, _("Man page %s has incorrect path on %s in %s"), file->localpath, params.arch, pkg);
-        params.remedy = REMEDY_MAN_PATH;
+        params.remedy = get_remedy(REMEDY_MAN_PATH);
         params.details = NULL;
         params.noun = _("man page ${FILE} on ${ARCH} has incorrect path");
         add_result(ri, &params);

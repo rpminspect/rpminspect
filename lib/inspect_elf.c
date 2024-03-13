@@ -439,7 +439,7 @@ static bool inspect_elf_execstack(struct rpminspect *ri, Elf *after_elf, Elf *be
         }
 
         if (params.msg != NULL && params.severity != RESULT_NULL && params.severity != RESULT_SKIP) {
-            params.remedy = REMEDY_ELF_EXECSTACK_MISSING;
+            params.remedy = get_remedy(REMEDY_ELF_EXECSTACK_MISSING);
             params.verb = VERB_CHANGED;
             params.noun = _("GNU_STACK in ${FILE} on ${ARCH}");
             add_result(ri, &params);
@@ -506,7 +506,7 @@ static bool inspect_elf_execstack(struct rpminspect *ri, Elf *after_elf, Elf *be
             params.severity = get_secrule_result_severity(ri, file, SECRULE_EXECSTACK);
 
             if (params.severity != RESULT_NULL && params.severity != RESULT_SKIP) {
-                params.remedy = REMEDY_ELF_EXECSTACK_INVALID;
+                params.remedy = get_remedy(REMEDY_ELF_EXECSTACK_INVALID);
                 params.verb = VERB_FAILED;
                 params.noun = _("execstack in ${FILE} on ${ARCH}");
                 add_result(ri, &params);
@@ -536,7 +536,7 @@ static bool inspect_elf_execstack(struct rpminspect *ri, Elf *after_elf, Elf *be
         }
 
         if (params.severity != RESULT_NULL && params.severity != RESULT_SKIP) {
-            params.remedy = REMEDY_ELF_EXECSTACK_EXECUTABLE;
+            params.remedy = get_remedy(REMEDY_ELF_EXECSTACK_EXECUTABLE);
             params.verb = VERB_FAILED;
             params.noun = _("execstack in ${FILE} on ${ARCH}");
             add_result(ri, &params);
@@ -572,7 +572,7 @@ static bool check_relro(struct rpminspect *ri, Elf *before_elf, Elf *after_elf, 
         params.severity = get_secrule_result_severity(ri, file, SECRULE_RELRO);
         params.waiverauth = WAIVABLE_BY_SECURITY;
         params.header = NAME_ELF;
-        params.remedy = REMEDY_ELF_GNU_RELRO;
+        params.remedy = get_remedy(REMEDY_ELF_GNU_RELRO);
         params.arch = arch;
         params.file = file->localpath;
         params.verb = VERB_REMOVED;
@@ -756,7 +756,7 @@ static bool elf_archive_tests(struct rpminspect *ri, Elf *after_elf, int after_e
     xasprintf(&params.msg, _("%s in %s has objects built without -fPIC on %s"), file->localpath, name, arch);
     params.waiverauth = WAIVABLE_BY_SECURITY;
     params.header = NAME_ELF;
-    params.remedy = REMEDY_ELF_FPIC;
+    params.remedy = get_remedy(REMEDY_ELF_FPIC);
     params.details = screendump;
     params.arch = arch;
     params.file = file->localpath;
@@ -794,7 +794,7 @@ static bool elf_regular_tests(struct rpminspect *ri, Elf *after_elf, Elf *before
     params.severity = get_secrule_result_severity(ri, file, SECRULE_TEXTREL);
     params.header = NAME_ELF;
     params.waiverauth = WAIVABLE_BY_SECURITY;
-    params.remedy = REMEDY_ELF_TEXTREL;
+    params.remedy = get_remedy(REMEDY_ELF_TEXTREL);
     params.arch = arch;
     params.file = file->localpath;
     params.noun = _("TEXTREL relocations in ${FILE} on ${ARCH}");

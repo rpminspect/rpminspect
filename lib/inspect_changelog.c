@@ -386,7 +386,7 @@ static bool check_bin_rpm_changelog(struct rpminspect *ri, const rpmpeer_entry_t
             xasprintf(&params.msg, "%%changelog entry has unprofessional language in the %s build", after_nevr);
             params.severity = RESULT_BAD;
             params.waiverauth = NOT_WAIVABLE;
-            params.remedy = REMEDY_CHANGELOG;
+            params.remedy = get_remedy(REMEDY_CHANGELOG);
             params.details = entry->data;
             params.verb = VERB_FAILED;
             params.noun = entry->data;

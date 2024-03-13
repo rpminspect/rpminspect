@@ -28,14 +28,11 @@ static mode_t get_interesting_perms(const mode_t mode)
  * @param file The file to find on the fileinfo list.
  * @param header The header string to use for results reporting if the
  *               file is found.
- * @param remedy The remedy string to use for results reporting if the
- *               file is found.
  * @param result The rpminspect test driver result.
  * @param reported The rpminspect test driver reported indicator.
  * @return True if the file is on the fileinfo list, false otherwise.
  */
-bool match_fileinfo_mode(struct rpminspect *ri, const rpmfile_entry_t *file, const char *header,
-                         const char *remedy, bool *result, bool *reported)
+bool match_fileinfo_mode(struct rpminspect *ri, const rpmfile_entry_t *file, const char *header, bool *result, bool *reported)
 {
     fileinfo_entry_t *fientry = NULL;
     mode_t perms = 0;
@@ -52,10 +49,6 @@ bool match_fileinfo_mode(struct rpminspect *ri, const rpmfile_entry_t *file, con
     params.header = header;
     params.arch = get_rpm_header_arch(file->rpm_header);
     params.file = file->localpath;
-
-    if (remedy) {
-        params.remedy = strdup(remedy);
-    }
 
     if (init_fileinfo(ri)) {
         TAILQ_FOREACH(fientry, ri->fileinfo, items) {
@@ -101,7 +94,6 @@ bool match_fileinfo_mode(struct rpminspect *ri, const rpmfile_entry_t *file, con
         }
     }
 
-    free(params.remedy);
     return false;
 }
 
@@ -144,10 +136,6 @@ bool match_fileinfo_owner(struct rpminspect *ri, const rpmfile_entry_t *file, co
     params.arch = get_rpm_header_arch(file->rpm_header);
     params.file = file->localpath;
 
-    if (remedy) {
-        xasprintf(&params.remedy, remedy, fname);
-    }
-
     if (init_fileinfo(ri)) {
         TAILQ_FOREACH(fientry, ri->fileinfo, items) {
             if (!strcmp(file->localpath, fientry->filename)) {
@@ -157,7 +145,6 @@ bool match_fileinfo_owner(struct rpminspect *ri, const rpmfile_entry_t *file, co
                     params.waiverauth = NOT_WAIVABLE;
                     add_result(ri, &params);
                     free(params.msg);
-                    free(params.remedy);
                     *reported = true;
                     return true;
                 } else {
@@ -168,7 +155,6 @@ bool match_fileinfo_owner(struct rpminspect *ri, const rpmfile_entry_t *file, co
                         xasprintf(&params.msg, _("%s in %s on %s carries unexpected owner '%s'; expected owner '%s'; requires inspection by the Security Team"), file->localpath, pkg, params.arch, owner, fientry->owner);
                         add_result(ri, &params);
                         free(params.msg);
-                        free(params.remedy);
                         *result = false;
                         *reported = true;
                         return true;
@@ -180,15 +166,13 @@ bool match_fileinfo_owner(struct rpminspect *ri, const rpmfile_entry_t *file, co
         }
     }
 
-    free(params.remedy);
-
     /* catch anything not on the fileinfo list with setuid/setgid */
     if (!(*reported) && (file->st.st_mode & (S_ISUID|S_ISGID))) {
         params.severity = get_secrule_result_severity(ri, file, SECRULE_MODES);
 
         if (params.severity != RESULT_NULL && params.severity != RESULT_SKIP) {
             params.waiverauth = WAIVABLE_BY_SECURITY;
-            params.remedy = REMEDY_FILEINFO_RULE;
+            params.remedy = get_remedy(REMEDY_FILEINFO_RULE);
             xasprintf(&params.msg, _("%s in %s on %s carries insecure mode %04o but has no fileinfo rule for owner specification, Security Team review may be required"), file->localpath, pkg, params.arch, perms);
             add_result(ri, &params);
             free(params.msg);
@@ -238,10 +222,6 @@ bool match_fileinfo_group(struct rpminspect *ri, const rpmfile_entry_t *file, co
     params.arch = get_rpm_header_arch(file->rpm_header);
     params.file = file->localpath;
 
-    if (remedy) {
-        xasprintf(&params.remedy, remedy, fname);
-    }
-
     if (init_fileinfo(ri)) {
         TAILQ_FOREACH(fientry, ri->fileinfo, items) {
             if (!strcmp(file->localpath, fientry->filename)) {
@@ -251,7 +231,6 @@ bool match_fileinfo_group(struct rpminspect *ri, const rpmfile_entry_t *file, co
                     params.waiverauth = NOT_WAIVABLE;
                     add_result(ri, &params);
                     free(params.msg);
-                    free(params.remedy);
                     *reported = true;
                     return true;
                 } else {
@@ -262,7 +241,6 @@ bool match_fileinfo_group(struct rpminspect *ri, const rpmfile_entry_t *file, co
                         xasprintf(&params.msg, _("%s in %s on %s carries group unexpected '%s'; expected group '%s'; requires inspection by the Security Team"), file->localpath, pkg, params.arch, group, fientry->group);
                         add_result(ri, &params);
                         free(params.msg);
-                        free(params.remedy);
                         *result = false;
                         *reported = false;
                         return true;
@@ -274,15 +252,13 @@ bool match_fileinfo_group(struct rpminspect *ri, const rpmfile_entry_t *file, co
         }
     }
 
-    free(params.remedy);
-
     /* catch anything not on the fileinfo list with setuid/setgid */
     if (!(*reported) && (file->st.st_mode & (S_ISUID|S_ISGID))) {
         params.severity = get_secrule_result_severity(ri, file, SECRULE_MODES);
 
         if (params.severity != RESULT_NULL && params.severity != RESULT_SKIP) {
             params.waiverauth = WAIVABLE_BY_SECURITY;
-            params.remedy = REMEDY_FILEINFO_RULE;
+            params.remedy = get_remedy(REMEDY_FILEINFO_RULE);
             xasprintf(&params.msg, _("%s in %s on %s carries insecure mode %04o but has no fileinfo rule for owner specification, Security Team review may be required"), file->localpath, pkg, params.arch, perms);
             add_result(ri, &params);
             free(params.msg);

@@ -84,7 +84,7 @@ static bool capabilities_driver(struct rpminspect *ri, rpmfile_entry_t *file)
 
             if (params.severity != RESULT_NULL && params.severity != RESULT_SKIP) {
                 xasprintf(&params.msg, _("File capabilities for %s changed from '%s' to '%s' in %s on %s\n"), file->localpath, before, after, name, arch);
-                params.remedy = REMEDY_CAPABILITIES;
+                params.remedy = get_remedy(REMEDY_CAPABILITIES);
                 params.waiverauth = WAIVABLE_BY_SECURITY;
                 params.verb = VERB_CHANGED;
                 params.noun = _("${FILE} capabilities on ${ARCH}");
@@ -146,7 +146,7 @@ static bool capabilities_driver(struct rpminspect *ri, rpmfile_entry_t *file)
 
                 if (params.severity != RESULT_NULL && params.severity != RESULT_SKIP) {
                     xasprintf(&params.msg, _("File capabilities list mismatch for %s: expected '%s', got '%s' in %s on %s\n"), file->localpath, flcaps->caps, after, name, arch);
-                    params.remedy = REMEDY_CAPABILITIES;
+                    params.remedy = get_remedy(REMEDY_CAPABILITIES);
                     params.waiverauth = WAIVABLE_BY_SECURITY;
                     params.verb = VERB_FAILED;
                     params.noun = _("${FILE} capabilities list on ${ARCH}");
@@ -165,7 +165,7 @@ static bool capabilities_driver(struct rpminspect *ri, rpmfile_entry_t *file)
 
             if (params.severity != RESULT_NULL && params.severity != RESULT_SKIP) {
                 xasprintf(&params.msg, _("File capabilities for %s (%s) not found on the capabilities list in %s on %s\n"), file->localpath, after, name, arch);
-                params.remedy = REMEDY_CAPABILITIES;
+                params.remedy = get_remedy(REMEDY_CAPABILITIES);
                 params.waiverauth = WAIVABLE_BY_SECURITY;
                 params.verb = VERB_REMOVED;
                 params.noun = _("${FILE} capabilities list on ${ARCH}");
@@ -183,7 +183,7 @@ static bool capabilities_driver(struct rpminspect *ri, rpmfile_entry_t *file)
 
             if (params.severity != RESULT_NULL && params.severity != RESULT_SKIP) {
                 xasprintf(&params.msg, _("File capabilities expected for %s in %s but not found on %s: expected '%s'\n"), file->localpath, name, arch, flcaps->caps);
-                params.remedy = REMEDY_CAPABILITIES;
+                params.remedy = get_remedy(REMEDY_CAPABILITIES);
                 params.waiverauth = WAIVABLE_BY_SECURITY;
                 params.verb = VERB_FAILED;
                 params.noun = _("${FILE} capabilities list on ${ARCH}");

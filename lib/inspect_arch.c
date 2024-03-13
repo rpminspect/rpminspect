@@ -72,7 +72,7 @@ bool inspect_arch(struct rpminspect *ri)
         TAILQ_FOREACH(entry, lost, items) {
             if (allowed_arch(ri, entry->data)) {
                 params.severity = RESULT_VERIFY;
-                params.remedy = REMEDY_ARCH_LOST;
+                params.remedy = get_remedy(REMEDY_ARCH_LOST);
                 params.verb = VERB_REMOVED;
                 params.noun = _("lost ${ARCH}");
                 params.arch = entry->data;
@@ -89,7 +89,7 @@ bool inspect_arch(struct rpminspect *ri)
         TAILQ_FOREACH(entry, gain, items) {
             if (allowed_arch(ri, entry->data)) {
                 params.severity = RESULT_INFO;
-                params.remedy = REMEDY_ARCH_GAIN;
+                params.remedy = get_remedy(REMEDY_ARCH_GAIN);
                 params.verb = VERB_ADDED;
                 params.noun = _("gained ${ARCH}");
                 params.arch = entry->data;

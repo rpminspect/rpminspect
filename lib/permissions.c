@@ -71,7 +71,7 @@ bool check_permissions(struct rpminspect *ri, const rpmfile_entry_t *file, const
     }
 
     mode_diff = before_mode ^ after_mode;
-    allowed = match_fileinfo_mode(ri, file, header, NULL, &result, reported);
+    allowed = match_fileinfo_mode(ri, file, header, &result, reported);
 
     /* in cases of setuid or setgid bits on the mode, this is a non-ignorable check */
     id_bit = (!(before_mode & (S_ISUID|S_ISGID)) && (after_mode & (S_ISUID|S_ISGID)));

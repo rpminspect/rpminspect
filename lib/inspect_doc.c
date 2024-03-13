@@ -66,7 +66,7 @@ static bool doc_driver(struct rpminspect *ri, rpmfile_entry_t *file)
     params.header = NAME_DOC;
     params.arch = arch;
     params.file = file->localpath;
-    params.remedy = REMEDY_DOC;
+    params.remedy = get_remedy(REMEDY_DOC);
     params.verb = VERB_CHANGED;
     params.noun = _("%doc ${FILE}");
 

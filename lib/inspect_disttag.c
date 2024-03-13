@@ -180,7 +180,7 @@ static bool disttag_driver(struct rpminspect *ri, rpmfile_entry_t *file)
     params.severity = RESULT_BAD;
     params.waiverauth = NOT_WAIVABLE;
     params.header = NAME_DISTTAG;
-    params.remedy = REMEDY_DISTTAG;
+    params.remedy = get_remedy(REMEDY_DISTTAG);
     params.details = release;
     params.arch = get_rpm_header_arch(file->rpm_header);
     params.file = file->localpath;

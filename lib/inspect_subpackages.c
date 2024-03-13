@@ -68,7 +68,7 @@ bool inspect_subpackages(struct rpminspect *ri)
                 xasprintf(&params.msg, _("Subpackage '%s' has disappeared on '%s'"), entry->data, arch);
                 params.severity = RESULT_VERIFY;
                 params.waiverauth = WAIVABLE_BY_ANYONE;
-                params.remedy = REMEDY_SUBPACKAGES_LOST;
+                params.remedy = get_remedy(REMEDY_SUBPACKAGES_LOST);
                 params.arch = arch;
                 params.file = entry->data;
                 params.verb = VERB_REMOVED;
@@ -92,7 +92,7 @@ bool inspect_subpackages(struct rpminspect *ri)
                 xasprintf(&params.msg, _("Subpackage '%s' has appeared on '%s'"), entry->data, arch);
                 params.severity = RESULT_INFO;
                 params.waiverauth = NOT_WAIVABLE;
-                params.remedy = REMEDY_SUBPACKAGES_GAIN;
+                params.remedy = get_remedy(REMEDY_SUBPACKAGES_GAIN);
                 params.arch = arch;
                 params.file = entry->data;
                 params.verb = VERB_ADDED;
