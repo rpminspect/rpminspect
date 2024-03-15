@@ -381,6 +381,13 @@ if not cc.has_header('sys/queue.h', include_directories : inc)
     add_project_arguments('-D_COMPAT_QUEUE', language : ['c', 'cpp'])
 endif
 
+# libtoml
+if not cc.has_function('toml_init', args : ['-ltoml'])
+    error('*** unable to find toml_init() in libtoml')
+endif
+
+toml = declare_dependency(link_args : ['-ltoml'])
+
 # Header files for builds
 inc = include_directories('include')
 incxdiff = include_directories('libxdiff')

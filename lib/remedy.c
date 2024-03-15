@@ -214,3 +214,25 @@ const char *get_remedy(const unsigned int id)
 
     return NULL;
 }
+
+/*
+ * Set a remedy override string from the config file.  Returns true if
+ * the remedy identifier was valid, false otherwise.
+ */
+bool set_remedy(const char *name, const char *remedy)
+{
+    unsigned int i = 0;
+
+    if (name == NULL) {
+        return false;
+    }
+
+    for (i = 0; remedies[i].name != NULL; i++) {
+        if (!strcmp(remedies[i].name, name)) {
+            remedies[i].remedy = remedy;
+            return true;
+        }
+    }
+
+    return false;
+}

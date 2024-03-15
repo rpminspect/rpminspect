@@ -94,6 +94,10 @@ void dump_cfg(const struct rpminspect *ri)
         if (ri->profiledir) {
             printf("    profiledir: %s\n", ri->profiledir);
         }
+
+        if (ri->remedyfile) {
+            printf("    remedyfile: %s\n", ri->remedyfile);
+        }
     }
 
     /* environment */

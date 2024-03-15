@@ -120,6 +120,8 @@ void free_rpminspect(struct rpminspect *ri)
     free(ri->localcfg);
     list_free(ri->locallines, free);
     free(ri->workdir);
+    free(ri->profiledir);
+    free(ri->remedyfile);
     free(ri->kojihub);
     free(ri->kojiursine);
     free(ri->kojimbs);
@@ -323,7 +325,7 @@ void free_rpminspect(struct rpminspect *ri)
     }
 
     free_string_hash(ri->magic_types);
-
+    list_free(ri->remedy_overrides, free);
     free_results(ri->results);
 
     return;
