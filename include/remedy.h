@@ -107,6 +107,9 @@ void init_remedy_strings(void);
 /* Get the remedy string for the specified remedy ID */
 const char *get_remedy(const unsigned int id);
 
+/* Set remedy override string */
+bool set_remedy(const char *name, const char *remedy);
+
 #endif /* _LIBRPMINSPECT_REMEDY_H */
 
 #ifdef __cplusplus

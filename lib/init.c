@@ -12,6 +12,7 @@
 #include <assert.h>
 #include <errno.h>
 #include <err.h>
+#include <toml.h>
 #include "internal/callbacks.h"
 #include "parser.h"
 #include "rpminspect.h"
@@ -567,6 +568,107 @@ static void process_desktop_skips(desktop_skips_t **desktop_skips, string_list_t
 }
 
 /*
+ * Callback function for toml_walk() to read in the data from the
+ * remedy override file.
+ */
+static inline void _remedy_walker(struct toml_node *node, void *data)
+{
+    char *r = NULL;
+    char *n = NULL;
+    string_entry_t *entry = NULL;
+    struct rpminspect *ri = (struct rpminspect *) data;
+    static bool in_remedy = false;
+
+    /* sure, beginning of document, got it */
+    if (toml_type(node) == TOML_ROOT) {
+        return;
+    }
+
+    /* the name in this context is like 'key' in key=value */
+    n = toml_name(node);
+
+    /* note if we are in the [remedy] section */
+    if (toml_type(node) == TOML_TABLE && n != NULL && !strcmp(n, "remedy")) {
+        in_remedy = true;
+        free(n);
+        return;
+    }
+
+    /* gather all strings in the remedy section that match a known remedy */
+    if (in_remedy && toml_type(node) == TOML_STRING) {
+        r = toml_value_as_string(node);
+
+        if (r) {
+            entry = calloc(1, sizeof(*entry));
+            assert(entry != NULL);
+            entry->data = r;
+
+            if (ri->remedy_overrides == NULL) {
+                ri->remedy_overrides = calloc(1, sizeof(*(ri->remedy_overrides)));
+                assert(ri->remedy_overrides != NULL);
+                TAILQ_INIT(ri->remedy_overrides);
+            }
+
+            TAILQ_INSERT_TAIL(ri->remedy_overrides, entry, items);
+        }
+
+        if (!set_remedy(n, r)) {
+            warnx("*** '%s' is not a valid remedy identifier", n);
+
+            if (r) {
+                TAILQ_REMOVE(ri->remedy_overrides, entry, items);
+                free(entry->data);
+                free(entry);
+            }
+        }
+    }
+
+    free(n);
+    return;
+}
+
+/*
+ * Parse remedy TOML file and load override remedy strings.
+ */
+static void read_remedy(const char *remedyfile, struct rpminspect *ri)
+{
+    struct toml_node *root = NULL;
+    char *buf = NULL;
+    off_t len;
+
+    assert(ri != NULL);
+
+    /* no remedyfile defined in the config file, fine */
+    if (remedyfile == NULL) {
+        return;
+    }
+
+    /* init libtoml and read in the file */
+    if (toml_init(&root)) {
+        warn("toml_init");
+        return;
+    }
+
+    buf = read_file_bytes(remedyfile, &len);
+
+    if (toml_parse(root, buf, strlen(buf))) {
+        warn("toml_parse");
+        free(buf);
+        toml_free(root);
+        return;
+    }
+
+    free(buf);
+
+    /* walk the results */
+    toml_walk(root, _remedy_walker, ri);
+
+    /* clean up */
+    toml_free(root);
+    return;
+}
+
+/*
  * Read either the main configuration file or a configuration file
  * overlay (profile) and populate the struct rpminspect members.
  */
@@ -589,8 +691,18 @@ static void read_cfgfile(struct rpminspect *ri, const char *filename, const bool
     }
 
     /* Processing order doesn't matter, so match data/generic.yaml. */
+
+    /* Read in common settings */
     strget(p, ctx, RI_COMMON, RI_WORKDIR, &ri->workdir);
     strget(p, ctx, RI_COMMON, RI_PROFILEDIR, &ri->profiledir);
+    strget(p, ctx, RI_COMMON, RI_REMEDYFILE, &ri->remedyfile);
+
+    if (ri->remedyfile != NULL) {
+        /* remedy override strings, try to read in */
+        read_remedy(ri->remedyfile, ri);
+    }
+
+    /* Read in some other basic settings */
     strget(p, ctx, RI_KOJI, RI_HUB, &ri->kojihub);
     strget(p, ctx, RI_KOJI, RI_DOWNLOAD_URSINE, &ri->kojiursine);
     strget(p, ctx, RI_KOJI, RI_DOWNLOAD_MBS, &ri->kojimbs);

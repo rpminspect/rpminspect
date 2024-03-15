@@ -125,6 +125,7 @@ extern "C"
 #ifdef _HAVE_MODULARITYLABEL
 #define RI_RELEASE_REGEXP           "release_regexp"
 #endif
+#define RI_REMEDYFILE               "remedyfile"
 #define RI_REMOVEDFILES             "removedfiles"
 #ifdef _HAVE_MODULARITYLABEL
 #define RI_REQUIRED                 "required"

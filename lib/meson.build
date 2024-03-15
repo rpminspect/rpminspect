@@ -128,6 +128,7 @@ deps = [
     libcurl,
     zlib,
     yaml,
+    toml,
     openssl,
     mandoc,
     magic,

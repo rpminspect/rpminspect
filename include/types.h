@@ -492,6 +492,7 @@ struct rpminspect {
     string_list_t *locallines; /* Contents of optional local config file */
     char *workdir;             /* full path to working directory */
     char *profiledir;          /* full path to profiles directory */
+    char *remedyfile;          /* full path to remedy strings override file */
     char *worksubdir;          /* within workdir, where these builds go */
 
     /* Commands */
@@ -767,6 +768,9 @@ struct rpminspect {
     magic_t magic_cookie;
     bool magic_initialized;
     string_hash_t *magic_types;
+
+    /* Override remedy strings */
+    string_list_t *remedy_overrides;
 
     /* inspection results */
     results_t *results;
