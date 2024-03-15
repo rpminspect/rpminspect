@@ -18,6 +18,22 @@ common:
     # exist in the profile directory.
     profiledir: /usr/share/rpminspect/profiles/generic
 
+    # Location of the optional remedy string override file.  Use this to
+    # customize the remedy strings in rpminspect output.  This may be
+    # useful to vendors needing to specify internal procedures to fix a
+    # particular finding by rpminspect.
+    #
+    # You only need to provide strings you wish to override.  rpminspect
+    # will default to its existing remedy strings if you do not provide
+    # them in the remedy file.
+    #
+    # Override strings need to be in the remedyfile in TOML format.
+    # They must all appear under a [remedy] block.  Strings are given
+    # in key=value format.  The key is a remedy short name as found in
+    # lib/remedy.c in the remedies struct.  See the example
+    # data/remedy/generic.toml file for more examples.
+    #remedyfile: /usr/share/rpminspect/remedy/generic.toml
+
 environment:
     # There may be instances where rpminspect cannot easily determine
     # the product release string from the dist tag.  The -r command
