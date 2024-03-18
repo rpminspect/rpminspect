@@ -80,5 +80,16 @@ tar -xf mandoc.tar.gz
 ( cd "${SUBDIR}" && ./configure && make && make lib-install )
 rm -rf mandoc.tar.gz "${SUBDIR}"
 
+# Install libtoml from git
+cd "${CWD}" || exit 1
+git clone -q https://github.com/ajwans/libtoml.git
+cd libtoml || exit 1
+cmake .
+make
+make test
+make install
+cd "${CWD}" || exit 1
+rm -rf libtoml
+
 # Update clamav database
 freshclam

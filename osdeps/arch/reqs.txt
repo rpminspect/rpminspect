@@ -2,6 +2,7 @@ autoconf
 automake
 bison
 clamav
+cmake
 cunit
 desktop-file-utils
 gcc
@@ -19,6 +20,7 @@ patchelf
 pkg-config
 python
 python-pip
+ragel
 rpm
 tcsh
 xmlrpc-c

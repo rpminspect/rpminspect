@@ -59,6 +59,17 @@ ninja -C build install
 cd "${CWD}" || exit 1
 rm -rf cdson
 
+# Install libtoml from git
+cd "${CWD}" || exit 1
+git clone -q https://github.com/ajwans/libtoml.git
+cd libtoml || exit 1
+cmake .
+make
+make test
+make install
+cd "${CWD}" || exit 1
+rm -rf libtoml
+
 # Gentoo Linux does not define an RPM dist tag
 echo '%dist .ri47' > "${HOME}"/.rpmmacros
 
