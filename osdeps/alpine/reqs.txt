@@ -7,6 +7,7 @@ cargo
 clamav-daemon
 clamav-db
 clamav-dev
+cmake
 cunit-dev
 curl
 curl-dev
@@ -42,6 +43,7 @@ py3-rpm
 py3-timeout-decorator
 py3-yaml
 python3-dev
+ragel
 rpm-dev
 rust
 sed
