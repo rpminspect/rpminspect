@@ -79,9 +79,11 @@ cd libtoml || exit 1
 cmake .
 make
 make test
-make install
+install -D -m 0755 libtoml.so /usr/lib64/libtoml.so
+install -D -m 0644 toml.h /usr/include/toml.h
 cd "${CWD}" || exit 1
 rm -rf libtoml
+ldconfig
 
 # Update the clamav database
 freshclam
