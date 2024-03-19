@@ -382,11 +382,14 @@ if not cc.has_header('sys/queue.h', include_directories : inc)
 endif
 
 # libtoml
-if not cc.has_function('toml_init', args : ['-ltoml'])
-    error('*** unable to find toml_init() in libtoml')
+# Default to bundled library, otherwise use the system one if we can.
+if get_option('with_system_libtoml') and cc.has_function('toml_init', args : ['-ltoml'])
+    inctoml = include_directories('libtoml')
+    toml = declare_dependency(link_args : ['-ltoml'])
+else
+    inctoml = include_directories('libtoml')
+    subdir('libtoml')
 endif
-
-toml = declare_dependency(link_args : ['-ltoml'])
 
 # Header files for builds
 inc = include_directories('include')
