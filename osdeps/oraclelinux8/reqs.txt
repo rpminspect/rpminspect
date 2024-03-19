@@ -3,7 +3,6 @@ bash
 clamav-data
 clamav-devel
 clamav-update
-cmake
 CUnit
 CUnit-devel
 dash
@@ -11,7 +10,6 @@ desktop-file-utils
 elfutils-devel
 file-devel
 gcc
-gcc-c++
 gettext
 gettext-devel
 git
@@ -40,7 +38,6 @@ python3-pip
 python3-pyyaml
 python3-rpm
 python3-timeout-decorator
-ragel
 rc
 rpm-build
 rpm-devel

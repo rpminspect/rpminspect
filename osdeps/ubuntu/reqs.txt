@@ -1,10 +1,8 @@
 abigail-tools
 cargo
 clamav
-cmake
 desktop-file-utils
 elfutils
-g++
 gcc
 gcc-multilib
 gcovr
@@ -34,7 +32,6 @@ pkg-config
 python3-pip
 python3-rpm
 python3-setuptools
-ragel
 rc
 rpm
 rustc

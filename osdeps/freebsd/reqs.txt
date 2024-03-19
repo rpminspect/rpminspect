@@ -4,7 +4,6 @@ bash
 binutils
 ca_root_nss
 clamav
-cmake
 coreutils
 cunit
 curl
@@ -37,7 +36,6 @@ patchelf
 pkgconf
 popt
 python3
-ragel
 rc
 rpm4
 rust

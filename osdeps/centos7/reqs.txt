@@ -2,7 +2,6 @@ bash
 clamav-data
 clamav-devel
 clamav-update
-cmake
 CUnit
 CUnit-devel
 dash
@@ -11,7 +10,6 @@ elfutils-devel
 fedora-packager
 file-devel
 gcc
-gcc-g++
 gettext
 gettext-devel
 git
@@ -38,7 +36,6 @@ ninja-build
 openssl11-devel
 openssl-devel
 patchelf
-ragel
 rc
 rpm-build
 rpm-devel
