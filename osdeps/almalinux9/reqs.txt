@@ -10,7 +10,7 @@ desktop-file-utils
 elfutils-devel
 file-devel
 gcc
-gcc-g++
+gcc-c++
 gettext
 gettext-devel
 git

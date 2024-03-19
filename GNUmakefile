@@ -83,7 +83,7 @@ debug: setup-debug
 	$(NINJA) -C $(MESON_BUILD_DIR) -v
 
 setup-debug:
-	meson setup $(MESON_BUILD_DIR) --werror -Dpython_program="$(PYTHON)" -Db_buildtype=debug -Db_coverage=true
+	meson setup $(MESON_BUILD_DIR) --werror --buildtype=debug -Dpython_program="$(PYTHON)" -Db_coverage=true
 
 # NOTE: Set QA_RPATHS=63 so that check-rpaths is disabled during the
 # rpmfluff rpmbuild operations.  We want to let bad DT_RPATH values
