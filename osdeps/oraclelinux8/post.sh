@@ -19,18 +19,5 @@ ninja -C build install
 cd "${CWD}" || exit 1
 rm -rf cdson
 
-# Install libtoml from git
-cd "${CWD}" || exit 1
-git clone -q https://github.com/ajwans/libtoml.git
-cd libtoml || exit 1
-cmake .
-make
-make test
-install -D -m 0755 libtoml.so /usr/lib64/libtoml.so
-install -D -m 0644 toml.h /usr/include/toml.h
-cd "${CWD}" || exit 1
-rm -rf libtoml
-ldconfig
-
 # Update clamav database
 freshclam

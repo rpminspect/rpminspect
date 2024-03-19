@@ -2,10 +2,8 @@ bash
 bison
 clamav
 clamav-db
-cmake
 dash
 desktop-file-utils
-gcc-c++
 gettext-devel
 git
 glibc-devel
@@ -37,7 +35,6 @@ python3-devel
 python3-pip
 python3-pyaml
 python3-rpm
-ragel
 rpm-build
 sssd-client
 tcsh

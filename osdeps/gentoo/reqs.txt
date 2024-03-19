@@ -4,7 +4,6 @@ app-shells/dash
 app-shells/ksh
 app-shells/tcsh
 app-shells/zsh
-dev-build/cmake
 dev-debug/valgrind
 dev-libs/icu
 dev-libs/json-c
@@ -17,5 +16,4 @@ dev-util/desktop-file-utils
 dev-util/gcovr
 dev-util/libabigail
 dev-util/patchelf
-dev-util/ragel
 sys-devel/gettext

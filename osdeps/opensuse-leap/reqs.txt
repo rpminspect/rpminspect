@@ -5,14 +5,12 @@ bison
 cargo
 clamav
 clamav-devel
-cmake
 cunit-devel
 curl
 desktop-file-utils
 file-devel
 gcc
 gcc-32bit
-gcc-c++
 gcovr
 gettext-tools
 git
@@ -44,7 +42,6 @@ python3-pip
 python3-Pygments
 python3-PyYAML
 python3-rpm
-ragel
 rpm-build
 rpm-devel
 rust

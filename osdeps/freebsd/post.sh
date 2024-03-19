@@ -73,17 +73,5 @@ rm -rf cdson
 # The ksh93 package does not install a 'ksh' executable, so create a symlink
 ln -sf ksh93 /usr/local/bin/ksh
 
-# Install libtoml from git
-cd "${CWD}" || exit 1
-git clone -q https://github.com/ajwans/libtoml.git
-cd libtoml || exit 1
-cmake .
-make
-make test
-install -D -m 0755 libtoml.so /usr/local/lib/libtoml.so
-install -D -m 0644 toml.h /usr/local/include/toml.h
-cd "${CWD}" || exit 1
-rm -rf libtoml
-
 # Update the clamav database
 freshclam
