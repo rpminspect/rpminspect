@@ -2,6 +2,7 @@ project('rpminspect',
         'c',
         version : '2.0',
         default_options : [
+            'c_std=gnu99',
             'warning_level=3',
             'werror=true',
             'buildtype=debugoptimized'
