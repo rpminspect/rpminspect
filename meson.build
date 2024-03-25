@@ -2,7 +2,7 @@ project('rpminspect',
         'c',
         version : '2.0',
         default_options : [
-            'c_std=gnu99',
+            'c_std=gnu11',
             'warning_level=3',
             'werror=true',
             'buildtype=debugoptimized'
@@ -21,6 +21,12 @@ add_global_arguments('-D_GNU_SOURCE', language : ['c', 'cpp'])
 
 # Define this to get around a problematic json_object.h macro
 add_global_arguments('-D__STRICT_ANSI__', language : ['c', 'cpp'])
+
+# Relax the compiler warnings->errors a bit on FreeBSD
+if build_machine.system() == 'freebsd'
+    add_global_arguments('-Wno-language-extension-token', language : [ 'c', 'cpp' ])
+    add_global_arguments('-Wno-unused-but-set-variable', language : [ 'c', 'cpp' ])
+endif
 
 # On NetBSD we need to build without pedantic errors because of some
 # things in pkgsrc
