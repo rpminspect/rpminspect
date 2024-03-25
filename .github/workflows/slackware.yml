@@ -55,13 +55,13 @@ jobs:
                   sed -i -e 's/^DEFAULT_ANSWER=.*$/DEFAULT_ANSWER=y/g' /etc/slackpkg/slackpkg.conf
 
                   # slackpkg needs knowledge
-                  yes | slackpkg update
+                  slackpkg update
 
             # Requirements before the git clone can happen
             - name: git clone requirements
               run: |
                   slackpkg install git nghttp2 brotli cyrus-sasl dcron perl ca-certificates
-                  update-ca-certificates --fresh
+                  env LANG=C update-ca-certificates --fresh
 
             # This means clone the git repo
             - uses: actions/checkout@v4
