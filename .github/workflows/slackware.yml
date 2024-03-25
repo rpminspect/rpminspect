@@ -61,7 +61,7 @@ jobs:
             - name: git clone requirements
               run: |
                   slackpkg install git nghttp2 brotli cyrus-sasl dcron perl ca-certificates
-                  env LANG=C update-ca-certificates --fresh
+                  env LANG=C /usr/sbin/update-ca-certificates --fresh
 
             # This means clone the git repo
             - uses: actions/checkout@v4
