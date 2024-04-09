@@ -50,6 +50,9 @@ BuildRequires:  libmandoc-devel >= 1.14.5
 BuildRequires:  gnupg2
 BuildRequires:  libicu-devel
 BuildRequires:  libcdson-devel
+%if 0%{?fedora}
+BuildRequires:  libtoml-devel
+%endif
 
 
 %description
@@ -88,6 +91,11 @@ Recommends:     html401-dtds
 # Required to support things like %%autorelease in spec files
 %if 0%{?fedora} >= 33
 Recommends:     rpm_macro(autorelease)
+%endif
+
+# Required because we build against the system libtoml in Fedora
+%if 0%{?fedora}
+Requires:       libtoml
 %endif
 
 # These programs are only required for the 'shellsyntax' functionality.
@@ -160,7 +168,7 @@ control files.
 
 
 %build
-%meson -D tests=false -D with_system_libtoml=true
+%meson -D tests=false %{?fedora:-D with_system_libtoml=true}
 %meson_build
 
 
