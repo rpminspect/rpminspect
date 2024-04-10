@@ -10,4 +10,5 @@ libtoml = static_library(
     libtoml_sources,
     include_directories : inc,
     install : false,
+    override_options: ['werror=false']
 )
