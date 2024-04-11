@@ -670,6 +670,8 @@ bool inspect_annocheck(struct rpminspect *ri)
         annocheck_profile = "el8";
     } else if (strprefix(ri->product_release, "el9")) {
         annocheck_profile = "el9";
+    } else if (strprefix(ri->product_release, "el10")) {
+        annocheck_profile = "el10";
     } else if (strprefix(ri->product_release, "fc") || !strcmp(ri->product_release, "rawhide")) {
         annocheck_profile = "rawhide";
     }
