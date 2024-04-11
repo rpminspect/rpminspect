@@ -52,7 +52,7 @@ foreach dir : include_dirs
         existing_include_dirs += dir
     endif
 endforeach
-inc = include_directories(existing_include_dirs)
+sysinc = include_directories(existing_include_dirs)
 
 # See if we have reallocarray in libc
 if cc.has_function('reallocarray')
@@ -141,8 +141,8 @@ if get_option('with_libkmod')
         libkmod = dependency('libkmod', required : true)
         add_project_arguments('-D_WITH_LIBKMOD', language : ['c', 'cpp'])
 
-        if not cc.has_header('libkmod.h', include_directories : inc)
-            if cc.has_header('kmod/libkmod.h', include_directories : inc)
+        if not cc.has_header('libkmod.h', include_directories : sysinc)
+            if cc.has_header('kmod/libkmod.h', include_directories : sysinc)
                 add_project_arguments('-D_LIBKMOD_HEADER_SUBDIR', language : ['c', 'cpp'])
             else
                 error('*** unable to find libkmod.h')
@@ -286,10 +286,10 @@ if not cc.has_function('mparse_alloc', dependencies : [mandoc, zlib])
     error('*** unable to find mparse_alloc() in libmandoc')
 endif
 
-if cc.has_header('mandoc_parse.h', include_directories : inc)
+if cc.has_header('mandoc_parse.h', include_directories : sysinc)
     add_project_arguments('-DNEWLIBMANDOC', language : ['c', 'cpp'])
 else
-    if cc.has_header('mandoc/mandoc_parse.h', include_directories : inc)
+    if cc.has_header('mandoc/mandoc_parse.h', include_directories : sysinc)
         add_project_arguments('-DNEWLIBMANDOC', language : ['c', 'cpp'])
         add_project_arguments('-DMANDOC_INCLUDE_SUBDIR', language : ['c', 'cpp'])
     else
@@ -383,24 +383,23 @@ m = declare_dependency(link_args : ['-lm'])
 cdson = dependency('cdson', required : true)
 
 # Check for sys/queue.h
-if not cc.has_header('sys/queue.h', include_directories : inc)
+if not cc.has_header('sys/queue.h', include_directories : sysinc)
     message('<sys/queue.h> not found, using bundled copy')
     add_project_arguments('-D_COMPAT_QUEUE', language : ['c', 'cpp'])
-endif
-
-# libtoml
-# Default to bundled library, otherwise use the system one if we can.
-if get_option('with_system_libtoml') and cc.has_function('toml_init', args : ['-ltoml'])
-    inctoml = include_directories('libtoml')
-    toml = declare_dependency(link_args : ['-ltoml'])
-else
-    inctoml = include_directories('libtoml')
-    subdir('libtoml')
 endif
 
 # Header files for builds
 inc = include_directories('include')
 incxdiff = include_directories('libxdiff')
+
+# libtoml
+# Default to bundled library, otherwise use the system one if we can.
+if get_option('with_system_libtoml') and cc.has_function('toml_init', args : ['-ltoml'])
+    toml = declare_dependency(link_args : ['-ltoml'])
+else
+    inctoml = include_directories('libtoml')
+    subdir('libtoml')
+endif
 
 # Include all of the relevant subdirectories of the source tree
 subdir('libxdiff')
