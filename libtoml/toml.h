@@ -1,7 +1,7 @@
 #ifndef TOML_H
 #define TOML_H
 
-#include "../include/helpers.h"
+#include "helpers.h"
 #include <stdio.h>
 
 #ifdef __cplusplus
