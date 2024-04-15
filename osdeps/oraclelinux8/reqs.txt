@@ -33,11 +33,11 @@ meson
 ninja-build
 openssl-devel
 patchelf
-python3-devel
-python3-pip
-python3-pyyaml
-python3-rpm
-python3-timeout-decorator
+python3.11-devel
+python3.11-pip
+python3.11-pyyaml
+python3.11-rpm
+python3.11-timeout-decorator
 rc
 rpm-build
 rpm-devel
