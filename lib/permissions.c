@@ -190,8 +190,6 @@ bool check_permissions(struct rpminspect *ri, const rpmfile_entry_t *file, const
             }
         }
 
-        assert(params.msg != NULL);
-
         if (params.severity >= RESULT_VERIFY) {
             if (id_bit) {
                 params.waiverauth = WAIVABLE_BY_SECURITY;
@@ -202,7 +200,7 @@ bool check_permissions(struct rpminspect *ri, const rpmfile_entry_t *file, const
             result = false;
         }
 
-        xasprintf(&change, _("%s from %04o to %04o on %s"), params.msg, before_mode, after_mode, arch);
+        xasprintf(&change, _("%s from %04o to %04o on %s"), (params.msg == NULL) ? file->localpath : params.msg, before_mode, after_mode, arch);
         assert(change != NULL);
         free(params.msg);
         params.msg = change;
