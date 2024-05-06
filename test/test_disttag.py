@@ -9,7 +9,7 @@ import shutil
 import subprocess
 import tempfile
 import unittest
-from distutils.version import LooseVersion
+from packaging.version import Version, parse
 from baseclass import TestSRPM, TestRPMs, TestKoji
 from baseclass import RequiresRpminspect, check_results
 
@@ -18,7 +18,7 @@ proc = subprocess.Popen(
     ["rpmbuild", "--version"], stdout=subprocess.PIPE, stderr=subprocess.PIPE
 )
 (out, err) = proc.communicate()
-if LooseVersion(out.split()[2].decode("utf-8")) <= LooseVersion("4.0.4"):
+if parse(out.split()[2].decode("utf-8")) <= Version("4.0.4"):
     have_old_rpm = True
 else:
     have_old_rpm = False
