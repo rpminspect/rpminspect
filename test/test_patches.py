@@ -7,14 +7,14 @@ import rpm
 import subprocess
 import rpmfluff
 import unittest
-from distutils.version import LooseVersion
+from packaging.version import Version, parse
 
 from baseclass import TestSRPM, TestCompareSRPM
 
 # rpm < v4.18 does not support '%patch N' syntax
 rpmver = list(map(lambda x: int(x), rpm.__version__.strip().split("-")[0].split(".")))
 
-if LooseVersion("%d.%d" % (rpmver[0], rpmver[1])) <= LooseVersion("4.18"):
+if parse("%d.%d" % (rpmver[0], rpmver[1])) <= Version("4.18"):
     patch_N_supported = False
 else:
     patch_N_supported = True
