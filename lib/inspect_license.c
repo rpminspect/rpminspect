@@ -29,6 +29,8 @@
 /* Globals */
 static const char *srpm = NULL;
 static int nspdx = 0;
+static int nlegacy = 0;
+static int ndual = 0;
 string_list_t *booleans = NULL;
 
 /* Local helper functions */
@@ -168,6 +170,12 @@ static bool lic_cb(const char *license_name, void *cb_data)
     if (!approved) {
         /* invalid - do nothing */
         goto done;
+    }
+
+    if (spdx_abbrev && !strcasecmp(lic, spdx_abbrev) && list_contains(fedora_abbrev, lic)) {
+        /* license token is valid under the legacy system and SPDX */
+        data->valid = true;
+        ndual++;
     } else if (spdx_abbrev && !strcasecmp(lic, spdx_abbrev)) {
         /* SPDX identifier matched */
         data->valid = true;
@@ -175,6 +183,7 @@ static bool lic_cb(const char *license_name, void *cb_data)
     } else if (list_contains(fedora_abbrev, lic) || (list_len(fedora_abbrev) == 0 && spdx_abbrev == NULL && list_contains(fedora_name, lic))) {
         /* Old Fedora abbreviation matches -or- there are no Fedora abbreviations but a Fedora name matches */
         data->valid = true;
+        nlegacy++;
     }
 
 done:
@@ -544,7 +553,7 @@ static bool is_valid_license(struct rpminspect *ri, struct result_params *params
     free(wlicense);
 
     /* for SPDX tags found, ensure booleans are all uppercase */
-    if (nspdx > 0 && (booleans && !TAILQ_EMPTY(booleans))) {
+    if (nlegacy == 0 && ndual == 0 && nspdx > 0 && (booleans && !TAILQ_EMPTY(booleans))) {
         TAILQ_FOREACH(entry, booleans, items) {
             if ((!strcasecmp(entry->data, "AND") && strcmp(entry->data, "AND"))
                 || (!strcasecmp(entry->data, "OR") && strcmp(entry->data, "OR"))) {
@@ -552,9 +561,12 @@ static bool is_valid_license(struct rpminspect *ri, struct result_params *params
 
                 params->severity = RESULT_BAD;
                 params->remedy = get_remedy(REMEDY_INVALID_BOOLEAN);
-                xasprintf(&params->msg, _("SPDX license expressions in use, but an invalid boolean was found: %s; when using SPDX expression the booleans must be in all caps."), entry->data);
+                xasprintf(&params->msg, _("SPDX license expressions in use in %s, but an invalid boolean was found: %s; when using SPDX expression the booleans must be in all caps."), nevra, entry->data);
+                xasprintf(&params->details, _("License: %s"), license);
                 add_result(ri, params);
                 free(params->msg);
+                free(params->details);
+                params->details = NULL;
             }
         }
     }
