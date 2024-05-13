@@ -13,6 +13,11 @@ from baseclass import TestSRPM, TestCompareSRPM
 rpmver = list(map(lambda x: int(x), rpm.__version__.strip().split("-")[0].split(".")))
 patch_N_supported = True
 
+# Starting with Python 3.10, distutils emits DeprecationWarnings and
+# more recent Python releases have simply removed distutils entirely.
+# Try the modern replacement before falling back on distutils.  This
+# should allow the test suite to work across a range of Python 3.x
+# releases.
 try:
     from packaging.version import Version, parse
 

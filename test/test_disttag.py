@@ -18,6 +18,11 @@ proc = subprocess.Popen(
 (out, err) = proc.communicate()
 have_old_rpm = False
 
+# Starting with Python 3.10, distutils emits DeprecationWarnings and
+# more recent Python releases have simply removed distutils entirely.
+# Try the modern replacement before falling back on distutils.  This
+# should allow the test suite to work across a range of Python 3.x
+# releases.
 try:
     from packaging.version import Version, parse
 
