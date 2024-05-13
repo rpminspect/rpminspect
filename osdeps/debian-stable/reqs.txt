@@ -2,6 +2,7 @@ abigail-tools
 clamav
 desktop-file-utils
 elfutils
+file
 gcc
 gcovr
 gettext
