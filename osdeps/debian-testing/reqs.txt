@@ -19,6 +19,7 @@ libkmod-dev
 libmagic-dev
 librpm-dev
 libssl-dev
+libterm-readline-perl-perl
 libxml2-dev
 libxmlrpc-core-c3-dev
 libyaml-dev
@@ -31,7 +32,6 @@ python3-rpm
 python3-setuptools
 rc
 rpm
-sssd
 tcsh
 valgrind
 zsh
