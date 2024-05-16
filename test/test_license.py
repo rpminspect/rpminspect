@@ -512,3 +512,31 @@ class InvalidCompoundLicenseExpressionKoji(TestKoji):
         self.inspection = "license"
         self.result = "BAD"
         self.waiver_auth = "Not Waivable"
+
+
+# Valid compound license expression mixing dual and SPDX (INFO)
+class ValidCompoundSPDXLicenseExpressionDualSRPM(TestSRPM):
+    def setUp(self):
+        super().setUp()
+        self.rpm.addLicense("Python-2.0.1 AND CC0-1.0 AND MIT")
+        self.inspection = "license"
+        self.result = "INFO"
+        self.waiver_auth = "Not Waivable"
+
+
+class ValidCompoundSPDXLicenseExpressionDualRPMs(TestRPMs):
+    def setUp(self):
+        super().setUp()
+        self.rpm.addLicense("Python-2.0.1 AND CC0-1.0 AND MIT")
+        self.inspection = "license"
+        self.result = "INFO"
+        self.waiver_auth = "Not Waivable"
+
+
+class ValidCompoundSPDXLicenseExpressionDualKoji(TestKoji):
+    def setUp(self):
+        super().setUp()
+        self.rpm.addLicense("Python-2.0.1 AND CC0-1.0 AND MIT")
+        self.inspection = "license"
+        self.result = "INFO"
+        self.waiver_auth = "Not Waivable"
