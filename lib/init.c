@@ -599,28 +599,17 @@ static inline void _remedy_walker(struct toml_node *node, void *data)
         r = toml_value_as_string(node);
 
         if (r) {
-            entry = calloc(1, sizeof(*entry));
-            assert(entry != NULL);
-            entry->data = r;
+            ri->remedy_overrides = list_add(ri->remedy_overrides, r);
 
-            if (ri->remedy_overrides == NULL) {
-                ri->remedy_overrides = calloc(1, sizeof(*(ri->remedy_overrides)));
-                assert(ri->remedy_overrides != NULL);
-                TAILQ_INIT(ri->remedy_overrides);
-            }
-
-            TAILQ_INSERT_TAIL(ri->remedy_overrides, entry, items);
-        }
-
-        if (!set_remedy(n, r)) {
-            warnx("*** '%s' is not a valid remedy identifier", n);
-
-            if (r) {
+            if (!set_remedy(n, r)) {
+                warnx("*** '%s' is not a valid remedy identifier", n);
                 TAILQ_REMOVE(ri->remedy_overrides, entry, items);
                 free(entry->data);
                 free(entry);
             }
         }
+
+        free(r);
     }
 
     free(n);
