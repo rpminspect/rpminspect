@@ -601,7 +601,7 @@ int main(int argc, char **argv)
     }
 
     /* Set up the main program data structure */
-    ri = calloc_rpminspect(ri);
+    ri = xalloc_rpminspect(ri);
     ri->progname = strdup(argv[0]);
     ri->verbose = verbose;
     ri->rebase_detection = rebase_detection;
@@ -881,7 +881,7 @@ int main(int argc, char **argv)
         cmdlen += strlen(argv[i]) + 1;
     }
 
-    params.details = calloc(1, cmdlen + 1);
+    params.details = xalloc(cmdlen + 1);
     assert(params.details != NULL);
     tail = params.details;
 

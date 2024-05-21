@@ -296,8 +296,7 @@ static void token_add(string_map_t **tags, const char *token)
 
     assert(token != NULL);
 
-    tag_entry = calloc(1, sizeof(*tag_entry));
-    assert(tag_entry != NULL);
+    tag_entry = xalloc(sizeof(*tag_entry));
     tag_entry->key = strdup(token);
     assert(tag_entry->key != NULL);
     tag_entry->value = NULL;
@@ -415,17 +414,12 @@ static string_list_t *get_paren_expressions(const char *license)
         end = strchr(start, ')');
 
         if ((end - start) > 0) {
-            entry = calloc(1, sizeof(*entry));
-            assert(entry != NULL);
-
-            entry->data = calloc(1, end - start + 1);
-            assert(entry->data != NULL);
-
+            entry = xalloc(sizeof(*entry));
+            entry->data = xalloc(end - start + 1);
             entry->data = strncpy(entry->data, start, end - start);
 
             if (list == NULL) {
-                list = calloc(1, sizeof(*list));
-                assert(list != NULL);
+                list = xalloc(sizeof(*list));
                 TAILQ_INIT(list);
             }
 

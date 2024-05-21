@@ -237,10 +237,8 @@ static bool changedfiles_driver(struct rpminspect *ri, rpmfile_entry_t *file)
             exitcode = filecmp(file->peer_file->fullpath, file->fullpath);
         } else {
             /* we can use diff on text files, so try that first */
-            bun = calloc(1, sizeof(*bun));
-            assert(bun != NULL);
-            aun = calloc(1, sizeof(*aun));
-            assert(aun != NULL);
+            bun = xalloc(sizeof(*bun));
+            aun = xalloc(sizeof(*aun));
 
             bun->fullpath = before_uncompressed_file;
             aun->fullpath = after_uncompressed_file;
