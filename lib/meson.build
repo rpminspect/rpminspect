@@ -112,6 +112,7 @@ librpminspect_sources = [
     'tty.c',
     'uncompress.c',
     'unpack.c',
+    'xalloc.c',
 ]
 
 deps = [

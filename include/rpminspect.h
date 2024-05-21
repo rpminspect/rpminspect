@@ -526,6 +526,14 @@ char *joinpath(const char *path, ...);
 /* array.c */
 void array(parser_plugin *p, parser_context *ctx, const char *key1, const char *key2, string_list_t **list);
 
+/* xalloc.c */
+void *xcalloc(size_t n, size_t s);
+void *xalloc(size_t s);
+void *xrealloc(void *p, size_t s);
+#ifdef _HAVE_REALLOCARRAY
+void *xreallocarray(void *p, size_t n, size_t s);
+#endif
+
 #endif
 
 #ifdef __cplusplus
