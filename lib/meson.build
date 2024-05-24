@@ -91,6 +91,7 @@ librpminspect_sources = [
     'output_text.c',
     'output_xunit.c',
     'ownership.c',
+    'parallel.c',
     'parse_dson.c',
     'parse_json.c',
     'parse_yaml.c',
