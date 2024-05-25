@@ -12,18 +12,17 @@
 #include <clamav.h>
 #include "rpminspect.h"
 
-static bool clamav_ready = false;
 static struct cl_engine *engine = NULL;
-static unsigned int sigs = 0;
+#ifndef CL_SCAN_STDOPT
+struct cl_scan_options clamav_opts;
+#endif
+
 static struct result_params params;
 
 static bool virus_driver(struct rpminspect *ri, rpmfile_entry_t *file)
 {
     bool result = true;
     int r = 0;
-#ifndef CL_SCAN_STDOPT
-    struct cl_scan_options opts;
-#endif
     const char *virus = NULL;
 
     /* only check regular files */
@@ -31,51 +30,10 @@ static bool virus_driver(struct rpminspect *ri, rpmfile_entry_t *file)
         return true;
     }
 
-    /* initialize clamav if we need to */
-    if (!clamav_ready) {
-        /* create clamav engine */
-        engine = cl_engine_new();
-
-        if (engine == NULL) {
-            errx(RI_PROGRAM_ERROR, _("*** cl_engine_new returned NULL, check clamav library"));
-        }
-
-        /* load clamav databases */
-        r = cl_load(cl_retdbdir(), engine, &sigs, CL_DB_STDOPT);
-
-        if (r != CL_SUCCESS) {
-            cl_engine_free(engine);
-            errx(RI_PROGRAM_ERROR, "*** cl_load: %s", cl_strerror(r));
-        }
-
-        /* compile engine */
-        r = cl_engine_compile(engine);
-
-        if (r != CL_SUCCESS) {
-            cl_engine_free(engine);
-            errx(RI_PROGRAM_ERROR, "*** cl_engine_compile: %s", cl_strerror(r));
-        }
-
-        /* remember to not do all this again */
-        clamav_ready = true;
-    }
-
+    /* scan the file */
 #ifndef CL_SCAN_STDOPT
-    /* set up the clamav scan options */
-    memset(&opts, 0, sizeof(opts));
-    opts.general = CL_SCAN_GENERAL_ALLMATCHES | CL_SCAN_GENERAL_COLLECT_METADATA;
-    opts.parse = ~0;
-
-    /* disable broken ELF detection */
-    opts.parse &= ~CL_SCAN_HEURISTIC_BROKEN;
-
-    /* disable max limit detection (filesize, etc) */
-    opts.parse &= ~CL_SCAN_HEURISTIC_EXCEEDS_MAX;
-
-    /* scan the file */
-    r = cl_scanfile(file->fullpath, &virus, NULL, engine, &opts);
+    r = cl_scanfile(file->fullpath, &virus, NULL, engine, &clamav_opts);
 #else
-    /* scan the file */
     r = cl_scanfile(file->fullpath, &virus, NULL, engine, CL_SCAN_STDOPT);
 #endif
 
@@ -116,6 +74,7 @@ bool inspect_virus(struct rpminspect *ri)
     struct cl_cvd *cvd = NULL;
     bool result = false;
     int r = 0;
+    unsigned int loaded_signatures; /* unused, exists to make cl_load() happy */
 
     /* initialize clamav */
     r = cl_init(CL_INIT_DEFAULT);
@@ -186,6 +145,41 @@ bool inspect_virus(struct rpminspect *ri)
         warn("*** closedir");
     }
 
+    /* initialize clamav engine */
+    engine = cl_engine_new();
+
+    if (engine == NULL) {
+        errx(RI_PROGRAM_ERROR, _("*** cl_engine_new returned NULL, check clamav library"));
+    }
+
+    /* load clamav databases */
+    r = cl_load(dbpath, engine, &loaded_signatures, CL_DB_STDOPT);
+
+    if (r != CL_SUCCESS) {
+        cl_engine_free(engine);
+        errx(RI_PROGRAM_ERROR, "*** cl_load: %s", cl_strerror(r));
+    }
+
+    /* compile engine */
+    r = cl_engine_compile(engine);
+
+    if (r != CL_SUCCESS) {
+        cl_engine_free(engine);
+        errx(RI_PROGRAM_ERROR, "*** cl_engine_compile: %s", cl_strerror(r));
+    }
+
+#ifndef CL_SCAN_STDOPT
+    /* set up the clamav scan options */
+    memset(&clamav_opts, 0, sizeof(clamav_opts));
+    clamav_opts.general = CL_SCAN_GENERAL_ALLMATCHES | CL_SCAN_GENERAL_COLLECT_METADATA;
+    clamav_opts.parse = ~0;
+
+    /* disable broken ELF detection */
+    clamav_opts.parse &= ~CL_SCAN_HEURISTIC_BROKEN;
+    /* disable max limit detection (filesize, etc) */
+    clamav_opts.parse &= ~CL_SCAN_HEURISTIC_EXCEEDS_MAX;
+#endif
+
     params.verb = VERB_OK;
     params.noun = NULL;
     params.file = NULL;
@@ -211,9 +205,8 @@ bool inspect_virus(struct rpminspect *ri)
     }
 
     /* clean up */
-    if (engine) {
-        cl_engine_free(engine);
-    }
+    cl_engine_free(engine);
+    engine = NULL;
 
     return result;
 }
