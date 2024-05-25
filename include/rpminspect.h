@@ -322,6 +322,9 @@ void dump_cfg(const struct rpminspect *);
 void *read_file_bytes(const char *path, off_t *len);
 string_list_t *read_file(const char *);
 
+/* io.c */
+ssize_t full_write(int fd, const void *buf, size_t len);
+
 /* release.c */
 char *read_release(const rpmfile_t *);
 const char *get_before_rel(struct rpminspect *);
