@@ -501,8 +501,8 @@ static bool patches_driver(struct rpminspect *ri, rpmfile_entry_t *file)
 
         if (params.details) {
             /* more than whitespace changed */
-            oldsize = file->peer_file->st.st_size;
-            newsize = file->st.st_size;
+            oldsize = file->peer_file->st_size;
+            newsize = file->st_size;
             xasprintf(&params.msg, _("%s changed (%ld bytes -> %ld bytes)"), file->localpath, oldsize, newsize);
             params.severity = RESULT_INFO;
             params.waiverauth = NOT_WAIVABLE;

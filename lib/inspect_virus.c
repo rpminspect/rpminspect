@@ -44,7 +44,7 @@ static bool virus_driver(struct rpminspect *ri __attribute__((unused)), rpmfile_
     }
 
     /* only check regular files */
-    if (!S_ISREG(file->st.st_mode)) {
+    if (!S_ISREG(file->st_mode)) {
         return true;
     }
 

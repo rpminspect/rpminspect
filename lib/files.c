@@ -294,15 +294,14 @@ rpmfile_t *extract_rpm(struct rpminspect *ri, const char *pkg, Header hdr, const
         file_entry->cap = NULL;
 #endif
 
-        memset(&(file_entry->st), 0, sizeof(file_entry->st));
-        file_entry->st.st_mode = get_rpm_header_num_array_value(file_entry, RPMTAG_FILEMODES);
-        file_entry->st.st_size = archive_entry_size(entry);
-        file_entry->st.st_nlink = archive_entry_nlink(entry);
+        file_entry->st_mode = get_rpm_header_num_array_value(file_entry, RPMTAG_FILEMODES);
+        file_entry->st_size = archive_entry_size(entry);
+        file_entry->st_nlink = archive_entry_nlink(entry);
 
         TAILQ_INSERT_TAIL(file_list, file_entry, items);
 
         /* Are we extracting this file? */
-        if (!(S_ISREG(file_entry->st.st_mode) || S_ISDIR(file_entry->st.st_mode) || S_ISLNK(file_entry->st.st_mode))) {
+        if (!(S_ISREG(file_entry->st_mode) || S_ISDIR(file_entry->st_mode) || S_ISLNK(file_entry->st_mode))) {
             continue;
         }
 
@@ -335,14 +334,14 @@ rpmfile_t *extract_rpm(struct rpminspect *ri, const char *pkg, Header hdr, const
         archive_perm |= S_IRUSR | S_IWUSR;
         archive_perm &= ~S_IWOTH;
 
-        if (S_ISDIR(file_entry->st.st_mode)) {
+        if (S_ISDIR(file_entry->st_mode)) {
             archive_perm |= S_IXUSR;
         }
 
         archive_entry_set_perm(entry, archive_perm);
 
         /* If this is a hard link, update the hardlink destination path */
-        if (file_entry->st.st_nlink > 1) {
+        if (file_entry->st_nlink > 1) {
             xasprintf(&hardlinkpath, "%s/%s", *output_dir, archive_entry_hardlink(entry));
             archive_entry_set_link(entry, hardlinkpath);
             free(hardlinkpath);
@@ -786,7 +785,7 @@ static void find_one_peer(struct rpminspect *ri, rpmfile_entry_t *file, rpmfile_
     }
 
     /* See if this file peer moved */
-    if (file->peer_file == NULL && S_ISREG(file->st.st_mode)) {
+    if (file->peer_file == NULL && S_ISREG(file->st_mode)) {
         /* .build-id files can be ignored, they always move */
         if (strstr(file->localpath, BUILD_ID_DIR)) {
             return;
@@ -833,7 +832,7 @@ static void find_one_peer(struct rpminspect *ri, rpmfile_entry_t *file, rpmfile_
                     file->peer_file->moved_subpackage = true;
                     return;
                 }
-            } else if ((S_ISREG(file->st.st_mode) && S_ISREG(after_file->st.st_mode))
+            } else if ((S_ISREG(file->st_mode) && S_ISREG(after_file->st_mode))
                        || (is_elf(file) && is_elf(after_file))) {
                 /*
                  * Try to match libraries that have changed versions.
