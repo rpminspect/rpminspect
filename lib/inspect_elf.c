@@ -859,7 +859,7 @@ static bool elf_driver(struct rpminspect *ri, rpmfile_entry_t *after)
     }
 
     /* Skip anything that isn't a regular file */
-    if (!after->fullpath || !S_ISREG(after->st.st_mode)) {
+    if (!after->fullpath || !S_ISREG(after->st_mode)) {
         return true;
     }
 

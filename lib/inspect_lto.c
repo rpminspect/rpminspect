@@ -115,7 +115,7 @@ static bool lto_driver(struct rpminspect *ri, rpmfile_entry_t *file)
     }
 
     /* Only for regular files */
-    if (!S_ISREG(file->st.st_mode)) {
+    if (!S_ISREG(file->st_mode)) {
         return true;
     }
 

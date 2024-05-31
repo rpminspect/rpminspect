@@ -207,6 +207,6 @@ char *checksum(rpmfile_entry_t *file)
         return file->checksum;
     }
 
-    file->checksum = compute_checksum(file->fullpath, &file->st.st_mode, DEFAULT_MESSAGE_DIGEST);
+    file->checksum = compute_checksum(file->fullpath, &file->st_mode, DEFAULT_MESSAGE_DIGEST);
     return file->checksum;
 }
