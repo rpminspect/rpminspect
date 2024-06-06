@@ -61,6 +61,9 @@ jobs:
                               echo >> /etc/yum.repos.d/ubi.repo
                           done
 
+                          # Avoid package conflicts
+                          rpm -e --nodeps openssl-fips-provider
+
                           # Upgrade things
                           dnf upgrade -y
 
