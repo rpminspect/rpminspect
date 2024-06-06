@@ -477,7 +477,7 @@ class PatchDefinedWithoutFieldSpaceSRPM(TestSRPM):
         self.rpm.patches[patchIndex] = patch
         self.rpm.section_patches += "Patch%s:%s\n" % (patchIndex, patch.sourceName)
         self.rpm.add_check(rpmfluff.CheckSourceFile(patch.sourceName))
-        self.rpm.section_prep += "%%patch%i\n" % patchIndex
+        self.rpm.section_prep += "%%patch -P %i\n" % patchIndex
 
         self.inspection = "patches"
         self.result = "INFO"
@@ -497,7 +497,7 @@ class PatchDefinedWithoutFieldSpaceCompareSRPM(TestCompareSRPM):
             patch.sourceName,
         )
         self.after_rpm.add_check(rpmfluff.CheckSourceFile(patch.sourceName))
-        self.after_rpm.section_prep += "%%patch%i\n" % patchIndex
+        self.after_rpm.section_prep += "%%patch -P %i\n" % patchIndex
 
         self.inspection = "patches"
         self.result = "INFO"
