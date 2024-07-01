@@ -15,7 +15,7 @@
 /*
  * Get the basename of the shell from the #! line of a script.
  * Return the name if it's in our list of shells to use.
- * Return if invalid or not found.
+ * Return NULL if invalid or not found.
  * Caller is responsible for freeing the returned string.
  */
 static char *get_shell(const struct rpminspect *ri, const char *fullpath)
@@ -25,8 +25,11 @@ static char *get_shell(const struct rpminspect *ri, const char *fullpath)
     char *buf = NULL;
     char *walk = NULL;
     char *start = NULL;
+    string_list_t *fields = NULL;
+    string_entry_t *entry = NULL;
     size_t len;
     int r = 0;
+    int pos = 0;
 
     assert(ri != NULL);
     assert(ri->shells != NULL);
@@ -39,12 +42,9 @@ static char *get_shell(const struct rpminspect *ri, const char *fullpath)
         return NULL;
     }
 
+    /* find the shell on the #! line */
     r = getline(&buf, &len, fp);
     start = buf;
-
-    if (fclose(fp) == -1) {
-        warn("*** fclose");
-    }
 
     if (r == -1) {
         warn("*** getline");
@@ -74,6 +74,72 @@ static char *get_shell(const struct rpminspect *ri, const char *fullpath)
     }
 
     free(start);
+
+    /* continue reading looking for a possible 'exec PROG' line */
+    buf = NULL;
+
+    while (getline(&buf, &len, fp) != -1) {
+        buf = strtrim(buf);
+
+        /* ignore blank lines and comments */
+        if ((strlen(buf) == 0 || !strcmp(buf, "")) || (*buf == '#')) {
+            free(buf);
+            buf = NULL;
+            continue;
+        } else {
+            fields = strsplit(buf, " \t");
+
+            /* code found, but can't be an exec line */
+            if (list_len(fields) < 2) {
+                free(buf);
+                buf = NULL;
+
+                list_free(fields, free);
+                fields = NULL;
+
+                continue;
+            }
+
+            /* possible exec line */
+            if (list_len(fields) >= 2) {
+                TAILQ_FOREACH(entry, fields, items) {
+                    if (pos == 0 && strcmp(entry->data, "exec")) {
+                        /* this script contains code but it doesn't begin with 'exec' -> ignore */
+                        break;
+                    } else if (pos == 1) {
+                        free(shell);
+
+                        if (list_contains(ri->shells, entry->data)) {
+                            /* known shell */
+                            shell = strdup(entry->data);
+                        } else {
+                            /* this script execs another interpreter that we do not understand */
+                            shell = NULL;
+                        }
+
+                        break;
+                    }
+
+                    pos++;
+                }
+
+                list_free(fields, free);
+                fields = NULL;
+            }
+        }
+
+        free(buf);
+        buf = NULL;
+    }
+
+    /* clean up and go */
+    if (fclose(fp) == -1) {
+        warn("*** fclose");
+    }
+
+    free(buf);
+    list_free(fields, free);
+
     return shell;
 }
 

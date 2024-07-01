@@ -52,6 +52,28 @@ then
 """
 
 
+wish_sh = """#! /usr/bin/sh
+# Tcl ignores the next line -*- tcl -*- \
+exec wish "$0" -- "$@"
+
+# Copyright © 2005-2016 Paul Mackerras.  All rights reserved.
+# This program is free software; it may be used, copied, modified
+# and distributed under the terms of the GNU General Public Licence,
+# either version 2, or (at your option) any later version.
+
+package require Tk
+
+proc hasworktree {} {
+    return [expr {[exec git rev-parse --is-bare-repository] == "false" &&
+                  [exec git rev-parse --is-inside-git-dir] == "false"}]
+}
+
+# (taken from /usr/bin/gitk, but only parts of it)
+
+set appname "gitk"
+"""
+
+
 class ShWellFormedRPM(TestRPMs):
     """
     Valid /bin/sh script is OK for RPMs
@@ -1731,3 +1753,49 @@ class BashWellMalformedCompareKoji(TestCompareKoji):
         self.inspection = "shellsyntax"
         self.result = "BAD"
         self.waiver_auth = "Anyone"
+
+
+class WishIgnoredRPMs(TestRPMs):
+    def setUp(self):
+        super().setUp()
+        self.rpm.add_installed_file(
+            "/usr/bin/gitk-snippet", rpmfluff.SourceFile("gitk-snippet.tcl", wish_sh)
+        )
+        self.inspection = "shellsyntax"
+        self.result = "OK"
+
+
+class WishIgnoredKoji(TestKoji):
+    def setUp(self):
+        super().setUp()
+        self.rpm.add_installed_file(
+            "/usr/bin/gitk-snippet", rpmfluff.SourceFile("gitk-snippet.tcl", wish_sh)
+        )
+        self.inspection = "shellsyntax"
+        self.result = "OK"
+
+
+class WishIgnoredCompareRPMs(TestCompareRPMs):
+    def setUp(self):
+        super().setUp()
+        self.before_rpm.add_installed_file(
+            "/usr/bin/gitk-snippet", rpmfluff.SourceFile("gitk-snippet.tcl", wish_sh)
+        )
+        self.after_rpm.add_installed_file(
+            "/usr/bin/gitk-snippet", rpmfluff.SourceFile("gitk-snippet.tcl", wish_sh)
+        )
+        self.inspection = "shellsyntax"
+        self.result = "OK"
+
+
+class WishIgnoredCompareKoji(TestCompareKoji):
+    def setUp(self):
+        super().setUp()
+        self.before_rpm.add_installed_file(
+            "/usr/bin/gitk-snippet", rpmfluff.SourceFile("gitk-snippet.tcl", wish_sh)
+        )
+        self.after_rpm.add_installed_file(
+            "/usr/bin/gitk-snippet", rpmfluff.SourceFile("gitk-snippet.tcl", wish_sh)
+        )
+        self.inspection = "shellsyntax"
+        self.result = "OK"
