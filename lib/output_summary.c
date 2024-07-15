@@ -19,7 +19,6 @@ void output_summary(const results_t *results, const char *dest, __attribute__((u
     results_entry_t *result = NULL;
     int r = 0;
     FILE *fp = NULL;
-    char *verb = NULL;
     char *msg = NULL;
     char *tmp = NULL;
     size_t width = tty_width();
@@ -50,23 +49,8 @@ void output_summary(const results_t *results, const char *dest, __attribute__((u
             }
         }
 
-        /* get a string representing the verb */
-        if (result->verb == VERB_ADDED) {
-            verb = _("added");
-        } else if (result->verb == VERB_REMOVED) {
-            verb = _("removed");
-        } else if (result->verb == VERB_CHANGED) {
-            verb = _("changed");
-        } else if (result->verb == VERB_FAILED) {
-            verb = _("FAILED");
-        } else if (result->verb == VERB_OK) {
-            verb = _("ok");
-        } else {
-            verb = _("unknown");
-        }
-
         /* construct the basic message */
-        xasprintf(&msg, "%-12s %s (%s)\n", verb, result->noun, result->header);
+        xasprintf(&msg, "%-12s %s (%s)\n", strverb(result->verb), result->noun, result->header);
 
         /* replace ${FILE} */
         if (strstr(msg, "${FILE}") && result->file != NULL) {
