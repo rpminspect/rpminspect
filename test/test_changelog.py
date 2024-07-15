@@ -30,8 +30,8 @@ class LostChangeLogCompareSRPM(TestCompareSRPM):
         self.after_rpm.section_changelog = None
 
         self.inspection = "changelog"
-        self.result = "VERIFY"
-        self.waiver_auth = "Anyone"
+        self.result = "INFO"
+        self.waiver_auth = "Not Waivable"
 
 
 class LostChangeLogCompareRPMs(TestCompareRPMs):
@@ -72,8 +72,8 @@ class LostChangeLogCompareKoji(TestCompareKoji):
         self.after_rpm.section_changelog = None
 
         self.inspection = "changelog"
-        self.result = "VERIFY"
-        self.waiver_auth = "Anyone"
+        self.result = "INFO"
+        self.waiver_auth = "Not Waivable"
 
 
 # 2) Prevent a %changelog in the before build but add one in the after
@@ -156,8 +156,8 @@ class SameChangeLogCompareSRPM(TestCompareSRPM):
         self.after_rpm.section_changelog = clog
 
         self.inspection = "changelog"
-        self.result = "BAD"
-        self.waiver_auth = "Anyone"
+        self.result = "INFO"
+        self.waiver_auth = "Not Waivable"
 
 
 class SameChangeLogCompareKoji(TestCompareKoji):
@@ -176,8 +176,8 @@ class SameChangeLogCompareKoji(TestCompareKoji):
         self.after_rpm.section_changelog = clog
 
         self.inspection = "changelog"
-        self.result = "BAD"
-        self.waiver_auth = "Anyone"
+        self.result = "INFO"
+        self.waiver_auth = "Not Waivable"
 
 
 # In the binary RPM:
