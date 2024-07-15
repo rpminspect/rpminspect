@@ -225,7 +225,7 @@ macrofiles:
     - /etc/rpm/macros
     - /etc/rpm/%{_target}/macros
 
-ignore:
+#ignore:
     # Sometimes you want certain files or directories ignored by
     # rpminspect.  This section lets you list paths--glob(7) syntax
     # allowed--that you want rpminspect to ignore for all inspections.
