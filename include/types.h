@@ -238,7 +238,8 @@ typedef enum _verb_t {
     VERB_CHANGED = 3,   /* changed file or metadata */
     VERB_FAILED = 4,    /* check failing */
     VERB_OK = 5,        /* the everything is ok alarm */
-    VERB_SKIP = 6       /* for skipped inspections or checks */
+    VERB_SKIP = 6,      /* for skipped inspections or checks */
+    VERB_MISSING = 7    /* item sought is missing */
 } verb_t;
 
 /*

@@ -182,6 +182,7 @@ bool strsuffix(const char *, const char *);
 int printwrap(const char *, const size_t, const unsigned int, FILE *);
 bool versioned_match(const char *, Header, const char *, Header);
 char *strseverity(const severity_t);
+char *strverb(const verb_t verb);
 severity_t getseverity(const char *, const severity_t);
 char *strwaiverauth(const waiverauth_t);
 char *strreplace(const char *, const char *, const char *);

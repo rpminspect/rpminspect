@@ -268,6 +268,35 @@ char *strseverity(const severity_t severity)
 }
 
 /*
+ * Given a verb_t, return a string representing the value.
+ */
+char *strverb(const verb_t verb)
+{
+    switch (verb) {
+        case VERB_NIL:
+            return _("nil");
+        case VERB_ADDED:
+            return _("added");
+        case VERB_REMOVED:
+            return _("removed");
+        case VERB_CHANGED:
+            return _("changed");
+        case VERB_FAILED:
+            return _("failed");
+        case VERB_OK:
+            return _("ok");
+        case VERB_SKIP:
+            return _("skip");
+        case VERB_MISSING:
+            return _("missing");
+        default:
+            return _("UnKnOwN");
+    }
+
+    return NULL;
+}
+
+/*
  * Given a severity string, return a severity_t matching it.
  * Or return the default.
  */
