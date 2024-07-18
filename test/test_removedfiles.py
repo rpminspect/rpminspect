@@ -49,6 +49,7 @@ class FileNoRemovedKoji(TestCompareKoji):
         self.result = "OK"
 
 
+# File removed from an after build but it's not a security-related file (OK)
 class FileRemovedRPMs(TestCompareRPMs):
     def setUp(self):
         super().setUp()
@@ -62,8 +63,25 @@ class FileRemovedRPMs(TestCompareRPMs):
         )
 
         self.inspection = "removedfiles"
-        self.result = "VERIFY"
-        self.waiver_auth = "Anyone"
+        self.result = "INFO"
+        self.waiver_auth = "Not Waivable"
+
+
+# File removed from an after build from a security path (BAD)
+class SecurityFileRemovedRPMs(TestCompareRPMs):
+    def setUp(self):
+        super().setUp()
+
+        # create the test packages
+        self.before_rpm.add_installed_file(
+            "etc/sudoers.d/s3kr1t",
+            rpmfluff.SourceFile("s3kr1t.sudo", "# This is a security related file!"),
+            mode="0644",
+        )
+
+        self.inspection = "removedfiles"
+        self.result = "BAD"
+        self.waiver_auth = "Security"
 
 
 class FileRemovedRebaseRPMs(TestCompareRPMs):
@@ -114,8 +132,24 @@ class FileRemovedKoji(TestCompareKoji):
         )
 
         self.inspection = "removedfiles"
-        self.result = "VERIFY"
-        self.waiver_auth = "Anyone"
+        self.result = "INFO"
+        self.waiver_auth = "Not Waivable"
+
+
+class SecurityFileRemovedKoji(TestCompareKoji):
+    def setUp(self):
+        super().setUp()
+
+        # create the test packages
+        self.before_rpm.add_installed_file(
+            "etc/sudoers.d/s3kr1t",
+            rpmfluff.SourceFile("s3kr1t.sudo", "# This is a security related file!"),
+            mode="0644",
+        )
+
+        self.inspection = "removedfiles"
+        self.result = "BAD"
+        self.waiver_auth = "Security"
 
 
 class FileRemovedRebaseKoji(TestCompareKoji):
