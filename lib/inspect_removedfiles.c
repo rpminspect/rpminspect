@@ -14,7 +14,6 @@
 
 #include "rpminspect.h"
 
-static bool rebase = false;
 static bool reported = false;
 
 /*
@@ -96,11 +95,7 @@ static bool removedfiles_driver(struct rpminspect *ri, rpmfile_entry_t *file)
         if (sentry || params.waiverauth == WAIVABLE_BY_SECURITY) {
             params.severity = get_secrule_result_severity(ri, file, SECRULE_SECURITYPATH);
         } else {
-            if (rebase) {
-                params.severity = RESULT_INFO;
-            } else {
-                params.severity = RESULT_VERIFY;
-            }
+            params.severity = RESULT_INFO;
         }
 
         if (params.severity <= RESULT_INFO) {
@@ -164,9 +159,6 @@ bool inspect_removedfiles(struct rpminspect *ri)
     struct result_params params;
 
     assert(ri != NULL);
-
-    /* is this a rebase comparison? */
-    rebase = is_rebase(ri);
 
     /*
      * This is like our after_files loop helper in inspect.c, but
