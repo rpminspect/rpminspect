@@ -143,6 +143,24 @@ class AutoReleaseDistTagKoji(TestKoji):
         self.inspection = "disttag"
 
 
+# Verify system wide macros in the dist tag work in SRPM (OK)
+class AutoReleaseOptionsDistTagSRPM(TestSRPM):
+    @unittest.skipIf(missing_rpmautospec, "test requires the rpmautospec macros")
+    def setUp(self):
+        super().setUp()
+        self.rpm.release = "%autorelease -b 3"
+        self.inspection = "disttag"
+
+
+# Verify system wide macros in the dist tag work in Koji build (OK)
+class AutoReleaseOptionsDistTagKoji(TestKoji):
+    @unittest.skipIf(missing_rpmautospec, "test requires the rpmautospec macros")
+    def setUp(self):
+        super().setUp()
+        self.rpm.release = "%autorelease -b 3"
+        self.inspection = "disttag"
+
+
 ########################################################################
 # The test cases below do not use rpmfluff due to limitations in that  #
 # Python module.  Instead these test cases inherit RequiresRpminspect  #
