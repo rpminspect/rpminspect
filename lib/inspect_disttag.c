@@ -121,6 +121,7 @@ static bool disttag_driver(struct rpminspect *ri, rpmfile_entry_t *file)
 {
     bool result = true;
     string_list_t *contents = NULL;
+    string_list_t *fields = NULL;
     string_entry_t *entry = NULL;
     char *buf = NULL;
     char *release = NULL;
@@ -167,9 +168,16 @@ static bool disttag_driver(struct rpminspect *ri, rpmfile_entry_t *file)
     }
 
     /* Allow %autorelease as the Release tag value */
-    if (release && !strcmp(release, SPEC_AUTORELEASE)) {
-        list_free(contents, free);
-        return true;
+    if (release && strprefix(release, SPEC_AUTORELEASE)) {
+        fields = strsplit(release, " \t");
+
+        if (list_contains(fields, SPEC_AUTORELEASE)) {
+            list_free(contents, free);
+            list_free(fields, free);
+            return true;
+        }
+
+        list_free(fields, free);
     }
 
     /* Expand macros in the release value */
