@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: rpminspect\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-05-23 14:45-0400\n"
+"POT-Creation-Date: 2024-07-22 10:47-0400\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -817,7 +817,7 @@ msgstr ""
 msgid "PASSED"
 msgstr ""
 
-#: lib/inspect_annocheck.c:172 lib/output_summary.c:61
+#: lib/inspect_annocheck.c:172
 msgid "FAILED"
 msgstr ""
 
@@ -829,7 +829,7 @@ msgstr ""
 msgid "skipped"
 msgstr ""
 
-#: lib/inspect_annocheck.c:178 lib/strfuncs.c:553
+#: lib/inspect_annocheck.c:178 lib/strfuncs.c:582
 msgid "UNKNOWN"
 msgstr ""
 
@@ -1052,12 +1052,12 @@ msgstr ""
 msgid "File %s changed content in %s on %s."
 msgstr ""
 
-#: lib/inspect_changelog.c:233 lib/inspect_changelog.c:367
+#: lib/inspect_changelog.c:233 lib/inspect_changelog.c:358
 #, c-format
 msgid "%%changelog"
 msgstr ""
 
-#: lib/inspect_changelog.c:436
+#: lib/inspect_changelog.c:427
 msgid "Inspection skipped because this build's type is not `rpm'."
 msgstr ""
 
@@ -1239,16 +1239,16 @@ msgid ""
 "File %s is not a valid desktop file on %s; desktop-file-validate reports:"
 msgstr ""
 
-#: lib/inspect_disttag.c:190
+#: lib/inspect_disttag.c:198
 #, c-format
 msgid "The %s file is missing the %s tag."
 msgstr ""
 
-#: lib/inspect_disttag.c:192
+#: lib/inspect_disttag.c:200
 msgid "${FILE} missing Release tag"
 msgstr ""
 
-#: lib/inspect_disttag.c:198
+#: lib/inspect_disttag.c:206
 #, c-format
 msgid ""
 "The %s tag value is missing the dist tag in the proper form. The dist tag "
@@ -1256,12 +1256,12 @@ msgid ""
 "After RPM macro expansion, no dist tag was found in this %s tag value."
 msgstr ""
 
-#: lib/inspect_disttag.c:200
+#: lib/inspect_disttag.c:208
 #, c-format
 msgid "${FILE} does not use '%%{?dist}' in Release"
 msgstr ""
 
-#: lib/inspect_disttag.c:269
+#: lib/inspect_disttag.c:277
 msgid "Specified package is not a source RPM, skipping."
 msgstr ""
 
@@ -2074,11 +2074,11 @@ msgstr ""
 msgid "${FILE} is politically sensitive"
 msgstr ""
 
-#: lib/inspect_removedfiles.c:73
+#: lib/inspect_removedfiles.c:72
 msgid "library ${FILE} removed on ${ARCH}"
 msgstr ""
 
-#: lib/inspect_removedfiles.c:124
+#: lib/inspect_removedfiles.c:119
 #, c-format
 msgid ""
 "ABI break: Library %s with SONAME '%s' removed from package %s on %s; "
@@ -2086,35 +2086,35 @@ msgid ""
 "Response Team."
 msgstr ""
 
-#: lib/inspect_removedfiles.c:127
+#: lib/inspect_removedfiles.c:122
 #, c-format
 msgid "ABI break: Library %s with SONAME '%s' removed from package %s on %s"
 msgstr ""
 
-#: lib/inspect_removedfiles.c:130
+#: lib/inspect_removedfiles.c:125
 msgid "missing SONAME in ${FILE} on ${ARCH}"
 msgstr ""
 
-#: lib/inspect_removedfiles.c:134
+#: lib/inspect_removedfiles.c:129
 #, c-format
 msgid ""
 "ABI break: Library %s removed from package %s on %s; Removing security "
 "policy related files requires inspection by the Security Response Team."
 msgstr ""
 
-#: lib/inspect_removedfiles.c:136
+#: lib/inspect_removedfiles.c:131
 #, c-format
 msgid "ABI break: Library %s removed from package %s on %s"
 msgstr ""
 
-#: lib/inspect_removedfiles.c:141
+#: lib/inspect_removedfiles.c:136
 #, c-format
 msgid ""
 "%s removed from package %s on %s; Removing security policy related files "
 "requires inspection by the Security Response Team."
 msgstr ""
 
-#: lib/inspect_removedfiles.c:143
+#: lib/inspect_removedfiles.c:138
 #, c-format
 msgid "%s removed from package %s on %s"
 msgstr ""
@@ -2268,52 +2268,52 @@ msgstr ""
 msgid "%s has both DT_RPATH and DT_RUNPATH on %s; this is not allowed"
 msgstr ""
 
-#: lib/inspect_shellsyntax.c:130
+#: lib/inspect_shellsyntax.c:196
 #, c-format
 msgid "%s is a shell script but was not before on %s"
 msgstr ""
 
-#: lib/inspect_shellsyntax.c:132
+#: lib/inspect_shellsyntax.c:198
 #, c-format
 msgid "%s is a %s script but was a %s script before on %s"
 msgstr ""
 
-#: lib/inspect_shellsyntax.c:140
+#: lib/inspect_shellsyntax.c:206
 msgid "changed shell script ${FILE} on ${ARCH}"
 msgstr ""
 
-#: lib/inspect_shellsyntax.c:180
+#: lib/inspect_shellsyntax.c:246
 #, c-format
 msgid "%s is no longer a valid %s script on %s"
 msgstr ""
 
-#: lib/inspect_shellsyntax.c:186 lib/inspect_shellsyntax.c:212
-#: lib/inspect_shellsyntax.c:234
+#: lib/inspect_shellsyntax.c:252 lib/inspect_shellsyntax.c:278
+#: lib/inspect_shellsyntax.c:300
 msgid "invalid shell script ${FILE} on ${ARCH}"
 msgstr ""
 
-#: lib/inspect_shellsyntax.c:192
+#: lib/inspect_shellsyntax.c:258
 #, c-format
 msgid ""
 "%s became a valid %s script on %s. The script fails with '-n' but passes "
 "with '-O extglob'; be sure 'shopt extglob' is set in the script."
 msgstr ""
 
-#: lib/inspect_shellsyntax.c:194
+#: lib/inspect_shellsyntax.c:260
 #, c-format
 msgid "%s became a valid %s script on %s"
 msgstr ""
 
-#: lib/inspect_shellsyntax.c:202 lib/inspect_shellsyntax.c:225
+#: lib/inspect_shellsyntax.c:268 lib/inspect_shellsyntax.c:291
 msgid "valid shell script ${FILE} on ${ARCH}"
 msgstr ""
 
-#: lib/inspect_shellsyntax.c:206 lib/inspect_shellsyntax.c:229
+#: lib/inspect_shellsyntax.c:272 lib/inspect_shellsyntax.c:295
 #, c-format
 msgid "%s is not a valid %s script on %s"
 msgstr ""
 
-#: lib/inspect_shellsyntax.c:219
+#: lib/inspect_shellsyntax.c:285
 #, c-format
 msgid ""
 "%s fails with '-n' but passes with '-O extglob'; be sure 'shopt extglob' is "
@@ -2512,36 +2512,36 @@ msgstr ""
 msgid "source file ${FILE} removed"
 msgstr ""
 
-#: lib/inspect_virus.c:40
-msgid "*** cl_engine_new returned NULL, check clamav library"
-msgstr ""
-
-#: lib/inspect_virus.c:98
-#, c-format
-msgid "Virus detected in %s in the %s package on %s: %s"
-msgstr ""
-
-#: lib/inspect_virus.c:135
+#: lib/inspect_virus.c:117
 msgid "clamav version information"
 msgstr ""
 
-#: lib/inspect_virus.c:140
+#: lib/inspect_virus.c:122
 #, c-format
 msgid "clamav version %s"
 msgstr ""
 
-#: lib/inspect_virus.c:145
+#: lib/inspect_virus.c:127
 #, c-format
 msgid "*** missing %s"
 msgstr ""
 
-#: lib/inspect_virus.c:169
+#: lib/inspect_virus.c:151
 #, c-format
 msgid "%s version %u (%s)"
 msgstr ""
 
-#: lib/inspect_virus.c:201
+#: lib/inspect_virus.c:175
+msgid "*** cl_engine_new returned NULL, check clamav library"
+msgstr ""
+
+#: lib/inspect_virus.c:216
 msgid "virus or malware in ${FILE} on ${ARCH}"
+msgstr ""
+
+#: lib/inspect_virus.c:303
+#, c-format
+msgid "Virus detected in %s in the %s package on %s: %s"
 msgstr ""
 
 #: lib/inspect_xml.c:217
@@ -2628,29 +2628,9 @@ msgid ""
 "with a paging program."
 msgstr ""
 
-#: lib/output_json.c:99 lib/output_summary.c:47 lib/output_text.c:53
+#: lib/output_json.c:99 lib/output_summary.c:46 lib/output_text.c:53
 #, c-format
 msgid "*** error opening %s for writing"
-msgstr ""
-
-#: lib/output_summary.c:55
-msgid "added"
-msgstr ""
-
-#: lib/output_summary.c:57
-msgid "removed"
-msgstr ""
-
-#: lib/output_summary.c:59
-msgid "changed"
-msgstr ""
-
-#: lib/output_summary.c:63
-msgid "ok"
-msgstr ""
-
-#: lib/output_summary.c:65
-msgid "unknown"
 msgstr ""
 
 #: lib/output_text.c:92 lib/output_xunit.c:83
@@ -3622,95 +3602,127 @@ msgstr ""
 msgid "%s tried to run the command and it received signal %s"
 msgstr ""
 
-#: lib/strfuncs.c:250 lib/strfuncs.c:282
+#: lib/strfuncs.c:250 lib/strfuncs.c:311
 msgid "NULL"
 msgstr ""
 
-#: lib/strfuncs.c:252 lib/strfuncs.c:284
+#: lib/strfuncs.c:252 lib/strfuncs.c:313
 msgid "OK"
 msgstr ""
 
-#: lib/strfuncs.c:254 lib/strfuncs.c:286
+#: lib/strfuncs.c:254 lib/strfuncs.c:315
 msgid "INFO"
 msgstr ""
 
-#: lib/strfuncs.c:256 lib/strfuncs.c:288
+#: lib/strfuncs.c:256 lib/strfuncs.c:317
 msgid "VERIFY"
 msgstr ""
 
-#: lib/strfuncs.c:258 lib/strfuncs.c:290
+#: lib/strfuncs.c:258 lib/strfuncs.c:319
 msgid "BAD"
 msgstr ""
 
-#: lib/strfuncs.c:260 lib/strfuncs.c:292
+#: lib/strfuncs.c:260 lib/strfuncs.c:321
 msgid "SKIP"
 msgstr ""
 
-#: lib/strfuncs.c:262 lib/strfuncs.c:294
+#: lib/strfuncs.c:262 lib/strfuncs.c:323
 msgid "DIAGNOSTICS"
 msgstr ""
 
-#: lib/strfuncs.c:264 lib/strfuncs.c:314
+#: lib/strfuncs.c:264 lib/strfuncs.c:293 lib/strfuncs.c:343
 msgid "UnKnOwN"
 msgstr ""
 
-#: lib/strfuncs.c:308
+#: lib/strfuncs.c:277
+msgid "nil"
+msgstr ""
+
+#: lib/strfuncs.c:279
+msgid "added"
+msgstr ""
+
+#: lib/strfuncs.c:281
+msgid "removed"
+msgstr ""
+
+#: lib/strfuncs.c:283
+msgid "changed"
+msgstr ""
+
+#: lib/strfuncs.c:285
+msgid "failed"
+msgstr ""
+
+#: lib/strfuncs.c:287
+msgid "ok"
+msgstr ""
+
+#: lib/strfuncs.c:289 src/rpminspect.c:999
+msgid "skip"
+msgstr ""
+
+#: lib/strfuncs.c:291
+msgid "missing"
+msgstr ""
+
+#: lib/strfuncs.c:337
 msgid "Not Waivable"
 msgstr ""
 
-#: lib/strfuncs.c:310
+#: lib/strfuncs.c:339
 msgid "Anyone"
 msgstr ""
 
-#: lib/strfuncs.c:312
+#: lib/strfuncs.c:341
 msgid "Security"
 msgstr ""
 
-#: lib/strfuncs.c:539
+#: lib/strfuncs.c:568
 msgid "regular file"
 msgstr ""
 
-#: lib/strfuncs.c:541
+#: lib/strfuncs.c:570
 msgid "directory"
 msgstr ""
 
-#: lib/strfuncs.c:543
+#: lib/strfuncs.c:572
 msgid "character device"
 msgstr ""
 
-#: lib/strfuncs.c:545
+#: lib/strfuncs.c:574
 msgid "block device"
 msgstr ""
 
-#: lib/strfuncs.c:547
+#: lib/strfuncs.c:576
 msgid "FIFO (named pipe)"
 msgstr ""
 
-#: lib/strfuncs.c:549
+#: lib/strfuncs.c:578
 msgid "symbolic link"
 msgstr ""
 
-#: lib/strfuncs.c:551
+#: lib/strfuncs.c:580
 msgid "socket"
 msgstr ""
 
-#: lib/strfuncs.c:609
+#: lib/strfuncs.c:638
 msgid "Success."
 msgstr ""
 
-#: lib/strfuncs.c:611
+#: lib/strfuncs.c:640
 msgid "One or more inspections failed."
 msgstr ""
 
-#: lib/strfuncs.c:613
+#: lib/strfuncs.c:642
 msgid "Program error."
 msgstr ""
 
-#: lib/strfuncs.c:615
+#: lib/strfuncs.c:644
 msgid "The specified profile is not found."
 msgstr ""
 
-#: lib/strfuncs.c:617
+#: lib/strfuncs.c:646
 msgid "Insufficient disk space in the working directory."
 msgstr ""
 
@@ -3920,8 +3932,8 @@ msgstr ""
 msgid "*** the -T and -E options are mutually exclusive"
 msgstr ""
 
-#: src/rpminspect.c:289 src/rpminspect.c:305 src/rpminspect.c:737
-#: src/rpminspect.c:776
+#: src/rpminspect.c:289 src/rpminspect.c:305 src/rpminspect.c:747
+#: src/rpminspect.c:786
 #, c-format
 msgid "*** See `%s --help` for more information."
 msgstr ""
@@ -3931,163 +3943,159 @@ msgstr ""
 msgid "*** unknown inspection: `%s`"
 msgstr ""
 
-#: src/rpminspect.c:455
+#: src/rpminspect.c:465
 #, c-format
 msgid "*** unsupported build type: `%s`."
 msgstr ""
 
-#: src/rpminspect.c:464
+#: src/rpminspect.c:474
 #, c-format
 msgid "*** invalid build type: `%s`."
 msgstr ""
 
-#: src/rpminspect.c:481
+#: src/rpminspect.c:491
 #, c-format
 msgid "*** invalid output format: `%s`."
 msgstr ""
 
-#: src/rpminspect.c:493
+#: src/rpminspect.c:503
 #, c-format
 msgid "*** unable to expand working directory: `%s`"
 msgstr ""
 
-#: src/rpminspect.c:506
+#: src/rpminspect.c:516
 #, c-format
 msgid "*** unable to use `%s' as working directory"
 msgstr ""
 
-#: src/rpminspect.c:536
+#: src/rpminspect.c:546
 #, c-format
 msgid "%s version %s\n"
 msgstr ""
 
-#: src/rpminspect.c:539
+#: src/rpminspect.c:549
 #, c-format
 msgid "*** ?? getopt returned character code 0%o ??"
 msgstr ""
 
-#: src/rpminspect.c:546
+#: src/rpminspect.c:556
 #, c-format
 msgid "Available build types:\n"
 msgstr ""
 
-#: src/rpminspect.c:567
+#: src/rpminspect.c:577
 #, c-format
 msgid ""
 "\n"
 "Available output formats:\n"
 msgstr ""
 
-#: src/rpminspect.c:584
+#: src/rpminspect.c:594
 #, c-format
 msgid ""
 "\n"
 "Available inspections:\n"
 msgstr ""
 
-#: src/rpminspect.c:627 src/rpminspect.c:635 src/rpminspect.c:653
+#: src/rpminspect.c:637 src/rpminspect.c:645 src/rpminspect.c:663
 #, c-format
 msgid "*** failed to read configuration file %s"
 msgstr ""
 
-#: src/rpminspect.c:658
+#: src/rpminspect.c:668
 #, c-format
 msgid "*** Please specify a configuration file using '-c' or supply ./%s"
 msgstr ""
 
-#: src/rpminspect.c:736
+#: src/rpminspect.c:746
 msgid "*** Invalid before and after build specification."
 msgstr ""
 
-#: src/rpminspect.c:744
+#: src/rpminspect.c:754
 msgid "*** unable to read RPM configuration"
 msgstr ""
 
-#: src/rpminspect.c:775
+#: src/rpminspect.c:785
 #, c-format
 msgid "*** unsupported architecture specified: `%s`"
 msgstr ""
 
-#: src/rpminspect.c:793
+#: src/rpminspect.c:803
 #, c-format
 msgid "*** unable to create directory %s"
 msgstr ""
 
-#: src/rpminspect.c:851
+#: src/rpminspect.c:861
 #, c-format
 msgid ""
 "Version information for libraries and programs used by %s as well as storage "
 "requirements.  This result is for informational and diagnostic purposes only."
 msgstr ""
 
-#: src/rpminspect.c:858
+#: src/rpminspect.c:868
 #, c-format
 msgid "Space required to download artifacts: %lu bytes (%s)\n"
 msgstr ""
 
-#: src/rpminspect.c:866
+#: src/rpminspect.c:876
 #, c-format
 msgid "Space required to unpack artifacts: %lu bytes (%s)\n"
 msgstr ""
 
-#: src/rpminspect.c:878
+#: src/rpminspect.c:888
 #, c-format
 msgid "Command line arguments used to invoke %s."
 msgstr ""
 
-#: src/rpminspect.c:902
+#: src/rpminspect.c:912
 #, c-format
 msgid "Local configuration file: %s"
 msgstr ""
 
-#: src/rpminspect.c:912
+#: src/rpminspect.c:922
 msgid "Before Build"
 msgstr ""
 
-#: src/rpminspect.c:917
+#: src/rpminspect.c:927
 msgid "After Build"
 msgstr ""
 
-#: src/rpminspect.c:920
+#: src/rpminspect.c:930
 msgid "Build"
 msgstr ""
 
-#: src/rpminspect.c:937
+#: src/rpminspect.c:947
 msgid "*** no peers, ensure packages exist for specified architecture(s)"
 msgstr ""
 
-#: src/rpminspect.c:958
+#: src/rpminspect.c:968
 msgid ""
 "*** unable to find a set of peer packages between the before and after builds"
 msgstr ""
 
-#: src/rpminspect.c:972
+#: src/rpminspect.c:982
 msgid "*** unable to determine product release or none specified (-r)."
 msgstr ""
 
-#: src/rpminspect.c:984
+#: src/rpminspect.c:994
 #, c-format
 msgid "Skipping %s inspection..."
 msgstr ""
 
-#: src/rpminspect.c:989
-msgid "skip"
-msgstr ""
-
-#: src/rpminspect.c:1009
+#: src/rpminspect.c:1019
 #, c-format
 msgid "Running %s inspection..."
 msgstr ""
 
-#: src/rpminspect.c:1018
+#: src/rpminspect.c:1028
 msgid "pass"
 msgstr ""
 
-#: src/rpminspect.c:1018
+#: src/rpminspect.c:1028
 msgid "FAIL"
 msgstr ""
 
-#: src/rpminspect.c:1046
+#: src/rpminspect.c:1056
 #, c-format
 msgid ""
 "\n"
