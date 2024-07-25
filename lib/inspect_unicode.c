@@ -506,7 +506,7 @@ static int validate_file(const char *fpath, __attribute__((unused)) const struct
 
     while (!u_feof(src)) {
         /* read in one whole line of text from the file */
-        for (i = 0; (line[i] = u_fgetcx(src)) != U_EOF && !end_of_line(line[i]); i++) {
+        for (i = 0; (line[i] = u_fgetc(src)) != U_EOF && !end_of_line(line[i]); i++) {
             /* increase the buffer size if necessary */
             if (i >= sz) {
                 sz *= 2;
@@ -521,7 +521,7 @@ static int validate_file(const char *fpath, __attribute__((unused)) const struct
         }
 
         /* eat newline if terminated by a carriage return */
-        if (line[i] == 0xD && (c = u_fgetcx(src)) != 0xA) {
+        if (line[i] == 0xD && (c = u_fgetc(src)) != 0xA) {
             u_fungetc(c, src);
         }
 
@@ -701,7 +701,7 @@ bool inspect_unicode(struct rpminspect *ri)
         TAILQ_FOREACH(sentry, ri->unicode_forbidden_codepoints, items) {
             entry = xalloc(sizeof(*entry));
             errno = 0;
-            entry->data = strtol(sentry->data, NULL, 16);
+            entry->data = strtoul(sentry->data, NULL, 16);
 
             if (errno == ERANGE || errno == EINVAL) {
                 warn("*** strtol");
