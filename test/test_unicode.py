@@ -3800,3 +3800,186 @@ class UnicodeBadCSourceCompareFailSecRuleKoji(TestCompareKoji):
         self.inspection = "unicode"
         self.waiver_auth = "Security"
         self.result = "BAD"
+
+
+# The following test is for a reported bug that showed a
+# bi-directional character present in 'table.txt', which was
+# incorrect.  All of these tests should pass as 'OK'.
+class UnicodeGoodIssue1418SRPM(TestSRPM):
+    def setUp(self):
+        super().setUp()
+
+        # this creates enough of a spec file to appease rpmbuild
+        self.rpm.add_installed_file(
+            "/usr/bin/status",
+            ProvidedSourceFile(
+                "status.sh", os.path.join(datadir, "unicode", "status.sh")
+            ),
+            mode=755,
+        )
+
+        # drop our known good source file directly in the SRPM
+        self.rpm.add_source(
+            ProvidedSourceFile(
+                "table.txt", os.path.join(datadir, "unicode", "table.txt")
+            )
+        )
+
+        self.inspection = "unicode"
+        self.result = "OK"
+
+
+class UnicodeGoodIssue1418RPMs(TestRPMs):
+    def setUp(self):
+        super().setUp()
+
+        # this creates enough of a spec file to appease rpmbuild
+        self.rpm.add_installed_file(
+            "/usr/bin/status",
+            ProvidedSourceFile(
+                "status.sh", os.path.join(datadir, "unicode", "status.sh")
+            ),
+            mode=755,
+        )
+
+        # drop our known good source file directly in the SRPM
+        self.rpm.add_source(
+            ProvidedSourceFile(
+                "table.txt", os.path.join(datadir, "unicode", "table.txt")
+            )
+        )
+
+        self.inspection = "unicode"
+        self.result = "OK"
+
+
+class UnicodeGoodIssue1418Koji(TestKoji):
+    def setUp(self):
+        super().setUp()
+
+        # this creates enough of a spec file to appease rpmbuild
+        self.rpm.add_installed_file(
+            "/usr/bin/status",
+            ProvidedSourceFile(
+                "status.sh", os.path.join(datadir, "unicode", "status.sh")
+            ),
+            mode=755,
+        )
+
+        # drop our known good source file directly in the SRPM
+        self.rpm.add_source(
+            ProvidedSourceFile(
+                "table.txt", os.path.join(datadir, "unicode", "table.txt")
+            )
+        )
+
+        self.inspection = "unicode"
+        self.result = "OK"
+
+
+class UnicodeGoodIssue1418CompareSRPM(TestCompareSRPM):
+    def setUp(self):
+        super().setUp()
+
+        # this creates enough of a spec file to appease rpmbuild
+        self.before_rpm.add_installed_file(
+            "/usr/bin/status",
+            ProvidedSourceFile(
+                "status.sh", os.path.join(datadir, "unicode", "status.sh")
+            ),
+            mode=755,
+        )
+        self.after_rpm.add_installed_file(
+            "/usr/bin/status",
+            ProvidedSourceFile(
+                "status.sh", os.path.join(datadir, "unicode", "status.sh")
+            ),
+            mode=755,
+        )
+
+        # drop our known good source file directly in the SRPM
+        self.before_rpm.add_source(
+            ProvidedSourceFile(
+                "table.txt", os.path.join(datadir, "unicode", "table.txt")
+            )
+        )
+        self.after_rpm.add_source(
+            ProvidedSourceFile(
+                "table.txt", os.path.join(datadir, "unicode", "table.txt")
+            )
+        )
+
+        self.inspection = "unicode"
+        self.result = "OK"
+
+
+class UnicodeGoodIssue1418CompareRPMs(TestCompareRPMs):
+    def setUp(self):
+        super().setUp()
+
+        # this creates enough of a spec file to appease rpmbuild
+        self.before_rpm.add_installed_file(
+            "/usr/bin/status",
+            ProvidedSourceFile(
+                "status.sh", os.path.join(datadir, "unicode", "status.sh")
+            ),
+            mode=755,
+        )
+        self.after_rpm.add_installed_file(
+            "/usr/bin/status",
+            ProvidedSourceFile(
+                "status.sh", os.path.join(datadir, "unicode", "status.sh")
+            ),
+            mode=755,
+        )
+
+        # drop our known good source file directly in the SRPM
+        self.before_rpm.add_source(
+            ProvidedSourceFile(
+                "table.txt", os.path.join(datadir, "unicode", "table.txt")
+            )
+        )
+        self.after_rpm.add_source(
+            ProvidedSourceFile(
+                "table.txt", os.path.join(datadir, "unicode", "table.txt")
+            )
+        )
+
+        self.inspection = "unicode"
+        self.result = "OK"
+
+
+class UnicodeGoodIssue1418CompareKoji(TestCompareKoji):
+    def setUp(self):
+        super().setUp()
+
+        # this creates enough of a spec file to appease rpmbuild
+        self.before_rpm.add_installed_file(
+            "/usr/bin/status",
+            ProvidedSourceFile(
+                "status.sh", os.path.join(datadir, "unicode", "status.sh")
+            ),
+            mode=755,
+        )
+        self.after_rpm.add_installed_file(
+            "/usr/bin/status",
+            ProvidedSourceFile(
+                "status.sh", os.path.join(datadir, "unicode", "status.sh")
+            ),
+            mode=755,
+        )
+
+        # drop our known good source file directly in the SRPM
+        self.before_rpm.add_source(
+            ProvidedSourceFile(
+                "table.txt", os.path.join(datadir, "unicode", "table.txt")
+            )
+        )
+        self.after_rpm.add_source(
+            ProvidedSourceFile(
+                "table.txt", os.path.join(datadir, "unicode", "table.txt")
+            )
+        )
+
+        self.inspection = "unicode"
+        self.result = "OK"
