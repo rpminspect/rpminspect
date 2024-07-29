@@ -19,9 +19,10 @@ from baseclass import (
 # Manual block for %install that removes a debuginfo symbol
 debug_block = "%{__debug_install_post}\n"
 debug_block += "chmod 0755 $RPM_BUILD_ROOT/usr/lib/debug/usr/bin/hello-world*.debug\n"
-debug_block += "strip --remove-section=.symtab "
-debug_block += "$RPM_BUILD_ROOT/usr/lib/debug/usr/bin/hello-world*.debug\n"
-debug_block += "chmod 0444 $RPM_BUILD_ROOT/usr/lib/debug/usr/bin/hello-world*.debug\n"
+debug_block += "fname=$(ls -1 $RPM_BUILD_ROOT/usr/lib/debug/usr/bin/hello-world*.debug | head -n 1)\n"
+debug_block += "strip --remove-section=.symtab -o ${fname}.new ${fname}\n"
+debug_block += "mv ${fname}.new ${fname}\n"
+debug_block += "chmod 0444 ${fname}\n"
 
 
 # Missing .gdb_index in the debuginfo package (BAD, except for SRPMs)
