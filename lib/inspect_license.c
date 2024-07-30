@@ -179,7 +179,7 @@ static bool dual_cb(const char *license_name, void *cb_data)
     }
 
     /* collect any dual licenses */
-    if (approved && spdx_abbrev && list_contains(fedora_abbrev, spdx_abbrev)) {
+    if (approved && spdx_abbrev && list_case_contains(fedora_abbrev, spdx_abbrev)) {
         dual = list_add(dual, spdx_abbrev);
     }
 
@@ -230,7 +230,7 @@ static bool lic_cb(const char *license_name, void *cb_data)
     }
 
     if (spdx_abbrev && !strcasecmp(data->lic, spdx_abbrev)) {
-        if (list_contains(dual, data->lic)) {
+        if (list_case_contains(dual, data->lic)) {
             /* license token is valid under the legacy system and SPDX */
             data->valid = true;
             ndual++;
