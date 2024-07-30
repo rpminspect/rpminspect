@@ -365,12 +365,7 @@ string_list_t *list_from_array(const char **array)
     return list;
 }
 
-/*
- * Return true if the given string list contains the given string.  It
- * compares string values, so the string in the list need not be the
- * same string requested.
- */
-bool list_contains(const string_list_t *list, const char *s)
+static bool _list_contains(const string_list_t *list, const char *s, const bool case_sensitive)
 {
     string_entry_t *entry = NULL;
 
@@ -383,12 +378,38 @@ bool list_contains(const string_list_t *list, const char *s)
     }
 
     TAILQ_FOREACH(entry, list, items) {
-        if (!strcmp(entry->data, s)) {
-            return true;
+        if (case_sensitive) {
+            if (!strcmp(entry->data, s)) {
+                return true;
+            }
+        } else {
+            if (!strcasecmp(entry->data, s)) {
+                return true;
+            }
         }
     }
 
     return false;
+}
+
+/*
+ * Return true if the given string list contains the given string,
+ * matching case.  It compares string values, so the string in the
+ * list need not be the same string requested.
+ */
+bool list_contains(const string_list_t *list, const char *s)
+{
+    return _list_contains(list, s, true);
+}
+
+/*
+ * Return true if the given string list contains the given string,
+ * case-insensitive.  It compares string values, so the string in the
+ * list need not be the same string requested.
+ */
+bool list_case_contains(const string_list_t *list, const char *s)
+{
+    return _list_contains(list, s, false);
 }
 
 /*
