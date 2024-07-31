@@ -44,10 +44,50 @@ jobs:
         # All of these steps run from within the main source
         # directory, so think of that as your $PWD
         steps:
+            # CentOS 7 is EOL, so fix the yum configuration
+            - name: yum repo configuration
+              run: |
+                  CONF="/etc/yum.repos.d/centos7.repo"
+                  BASEURL="http://archive.kernel.org/centos-vault/7.9.2009"
+
+                  echo "[base]" > ${CONF}
+                  echo "name=CentOS 7 - Base" >> ${CONF}
+                  echo "baseurl=${BASEURL}/os/\$basearch/" >> ${CONF}
+                  echo "enabled=1" >> ${CONF}
+                  echo "gpgcheck=1" >> ${CONF}
+                  echo "file:///etc/pki/rpm-gpg/RPM-GPG-KEY-CentOS-7" >> ${CONF}
+
+                  echo >> ${CONF}
+                  echo "[updates]" >> ${CONF}
+                  echo "name=CentOS 7 - Updates" >> ${CONF}
+                  echo "baseurl=${BASEURL}/updates/\$basearch/" >> ${CONF}
+                  echo "enabled=1" >> ${CONF}
+                  echo "gpgcheck=1" >> ${CONF}
+                  echo "file:///etc/pki/rpm-gpg/RPM-GPG-KEY-CentOS-7" >> ${CONF}
+
+                  echo >> ${CONF}
+                  echo "[extras]" >> ${CONF}
+                  echo "name=CentOS 7 - Extras" >> ${CONF}
+                  echo "baseurl=${BASEURL}/extras/\$basearch/" >> ${CONF}
+                  echo "enabled=1" >> ${CONF}
+                  echo "gpgcheck=1" >> ${CONF}
+                  echo "file:///etc/pki/rpm-gpg/RPM-GPG-KEY-CentOS-7" >> ${CONF}
+
+                  echo >> ${CONF}
+                  echo "[centosplus]" >> ${CONF}
+                  echo "name=CentOS 7 - Plus" >> ${CONF}
+                  echo "baseurl=${BASEURL}/centosplus/\$basearch/" >> ${CONF}
+                  echo "enabled=1" >> ${CONF}
+                  echo "gpgcheck=1" >> ${CONF}
+                  echo "file:///etc/pki/rpm-gpg/RPM-GPG-KEY-CentOS-7" >> ${CONF}
+
             # Requirements before the git clone can happen
             - name: git clone requirements
               run: |
+                  rm -f /etc/yum.repos.d/CentOS*.repo
+                  rpm --import /etc/pki/rpm-gpg/RPM-GPG-KEY-CentOS-7
                   yum upgrade -y
+                  rm -f /etc/yum.repos.d/CentOS*.repo
                   yum install -y epel-release git
 
             # This means clone the git repo
