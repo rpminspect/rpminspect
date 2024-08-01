@@ -91,7 +91,7 @@ jobs:
                   yum install -y epel-release git
 
             # This means clone the git repo
-            - uses: actions/checkout@v2
+            - uses: actions/checkout@v4
 
             # Within the container, install the dependencies, build,
             # and run the test suite
