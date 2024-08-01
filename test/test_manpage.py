@@ -353,11 +353,11 @@ class EmptyManPageRPM(TestRPMs):
         self.rpm.section_build += "touch foo.1\n"
         self.rpm.section_build += "gzip -9 foo.1\n"
         self.rpm.section_install += (
-            "mkdir -p %{buildroot}%{_mandir}/man1\n"
-            "install -m 0644 foo.1.gz %{buildroot}%{_mandir}/man1/foo.1.gz\n"
+            "mkdir -p %{buildroot}/usr/share/man/man1\n"
+            "install -m 0644 foo.1.gz %{buildroot}/usr/share/man/man1/foo.1.gz\n"
         )
         sub = self.rpm.get_subpackage(None)
-        sub.section_files += "%{_mandir}/man1/foo.1.gz\n"
+        sub.section_files += "/usr/share/man/man1/foo.1.gz\n"
 
         # the test
         self.inspection = "manpage"
@@ -377,11 +377,11 @@ class EmptyManPageKoji(TestKoji):
         self.rpm.section_build += "touch foo.1\n"
         self.rpm.section_build += "gzip -9 foo.1\n"
         self.rpm.section_install += (
-            "mkdir -p %{buildroot}%{_mandir}/man1\n"
-            "install -m 0644 foo.1.gz %{buildroot}%{_mandir}/man1/foo.1.gz\n"
+            "mkdir -p %{buildroot}/usr/share/man/man1\n"
+            "install -m 0644 foo.1.gz %{buildroot}/usr/share/man/man1/foo.1.gz\n"
         )
         sub = self.rpm.get_subpackage(None)
-        sub.section_files += "%{_mandir}/man1/foo.1.gz\n"
+        sub.section_files += "/usr/share/man/man1/foo.1.gz\n"
 
         # the test
         self.inspection = "manpage"
@@ -401,11 +401,11 @@ class EmptyManPageCompareRPMs(TestCompareRPMs):
         self.after_rpm.section_build += "touch foo.1\n"
         self.after_rpm.section_build += "gzip -9 foo.1\n"
         self.after_rpm.section_install += (
-            "mkdir -p %{buildroot}%{_mandir}/man1\n"
-            "install -m 0644 foo.1.gz %{buildroot}%{_mandir}/man1/foo.1.gz\n"
+            "mkdir -p %{buildroot}/usr/share/man/man1\n"
+            "install -m 0644 foo.1.gz %{buildroot}/usr/share/man/man1/foo.1.gz\n"
         )
         sub = self.after_rpm.get_subpackage(None)
-        sub.section_files += "%{_mandir}/man1/foo.1.gz\n"
+        sub.section_files += "/usr/share/man/man1/foo.1.gz\n"
 
         # the test
         self.inspection = "manpage"
@@ -425,11 +425,11 @@ class EmptyManPageCompareKoji(TestCompareKoji):
         self.after_rpm.section_build += "touch foo.1\n"
         self.after_rpm.section_build += "gzip -9 foo.1\n"
         self.after_rpm.section_install += (
-            "mkdir -p %{buildroot}%{_mandir}/man1\n"
-            "install -m 0644 foo.1.gz %{buildroot}%{_mandir}/man1/foo.1.gz\n"
+            "mkdir -p %{buildroot}/usr/share/man/man1\n"
+            "install -m 0644 foo.1.gz %{buildroot}/usr/share/man/man1/foo.1.gz\n"
         )
         sub = self.after_rpm.get_subpackage(None)
-        sub.section_files += "%{_mandir}/man1/foo.1.gz\n"
+        sub.section_files += "/usr/share/man/man1/foo.1.gz\n"
 
         # the test
         self.inspection = "manpage"
