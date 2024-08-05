@@ -29,6 +29,11 @@ jobs:
         # Use containers on their ubuntu latest image
         runs-on: ubuntu-latest
 
+        # Necessary to run against older libraries
+        env:
+            ACTIONS_RUNNER_FORCE_ACTIONS_NODE_VERSION: node16
+            ACTIONS_ALLOW_USE_UNSECURE_NODE_VERSION: true
+
         # Set up the matrix of distributions to test
         strategy:
             matrix:
