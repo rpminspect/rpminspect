@@ -29,15 +29,6 @@ jobs:
         # Use containers on their ubuntu latest image
         runs-on: ubuntu-latest
 
-        # Necessary to run against older libraries
-        # Amazon Linux can't use node20 for the checkout action
-        steps:
-            - name: Link node16 to node20
-            - run: |
-                  cd $RUNNER_HOME/actions-runner/externals
-                  mv node20 node20.orig
-                  ln -s node16 node20
-
         # Set up the matrix of distributions to test
         strategy:
             matrix:
@@ -49,6 +40,14 @@ jobs:
         # All of these steps run from within the main source
         # directory, so think of that as your $PWD
         steps:
+            # Necessary to run against older libraries
+            # Amazon Linux can't use node20 for the checkout action
+            - name: Link node16 to node20
+            - run: |
+                  cd $RUNNER_HOME/actions-runner/externals
+                  mv node20 node20.orig
+                  ln -s node16 node20
+
             # Requirements before the git clone can happen
             - name: git clone requirements
               run: |
