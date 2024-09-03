@@ -32,7 +32,7 @@ following environments:
 | Platform | Release | Status |
 |:-------------------------------------------------------|:----|----:|
 | [Fedora Linux](https://getfedora.org/)                 | rawhide<br />stable | [![Fedora Linux](https://github.com/rpminspect/rpminspect/actions/workflows/fedora.yml/badge.svg)](https://github.com/rpminspect/rpminspect/actions/workflows/fedora.yml) |
-| [CentOS](https://www.centos.org/)               | Stream 9<br />Stream 8<br />7 | [![CentOS](https://github.com/rpminspect/rpminspect/actions/workflows/centos.yml/badge.svg)](https://github.com/rpminspect/rpminspect/actions/workflows/centos.yml) |
+| [CentOS](https://www.centos.org/)               | Stream 9<br /> | [![CentOS](https://github.com/rpminspect/rpminspect/actions/workflows/centos.yml/badge.svg)](https://github.com/rpminspect/rpminspect/actions/workflows/centos.yml) |
 | [Ubuntu Linux](https://ubuntu.com/)                    | stable | [![Ubuntu Linux](https://github.com/rpminspect/rpminspect/actions/workflows/ubuntu.yml/badge.svg)](https://github.com/rpminspect/rpminspect/actions/workflows/ubuntu.yml) |
 | [Debian GNU/Linux](https://www.debian.org/)            | testing<br />stable | [![Debian GNU/Linux](https://github.com/rpminspect/rpminspect/actions/workflows/debian.yml/badge.svg)](https://github.com/rpminspect/rpminspect/actions/workflows/debian.yml) |
 | [OpenSUSE Linux](https://www.opensuse.org/)            | Leap | [![OpenSUSE](https://github.com/rpminspect/rpminspect/actions/workflows/opensuse.yml/badge.svg)](https://github.com/rpminspect/rpminspect/actions/workflows/opensuse.yml) |
@@ -40,7 +40,6 @@ following environments:
 | [Gentoo Linux](https://www.gentoo.org/)                | stable | [![Gentoo Linux](https://github.com/rpminspect/rpminspect/actions/workflows/gentoo.yml/badge.svg)](https://github.com/rpminspect/rpminspect/actions/workflows/gentoo.yml) |
 | [Alpine Linux](https://www.alpinelinux.org/)           | stable | [![Alpine Linux](https://github.com/rpminspect/rpminspect/actions/workflows/alpinelinux.yml/badge.svg)](https://github.com/rpminspect/rpminspect/actions/workflows/alpinelinux.yml) |
 | [AlmaLinux](https://almalinux.org/)                    | 8<br />9 | [![AlmaLinux](https://github.com/rpminspect/rpminspect/actions/workflows/almalinux.yml/badge.svg)](https://github.com/rpminspect/rpminspect/actions/workflows/almalinux.yml) |
-| [Amazon Linux](https://aws.amazon.com/amazon-linux-2/) | 2 | [![Amazon Linux](https://github.com/rpminspect/rpminspect/actions/workflows/amazonlinux.yml/badge.svg)](https://github.com/rpminspect/rpminspect/actions/workflows/amazonlinux.yml) |
 | [Mageia Linux](https://www.mageia.org/)                | stable | [![Mageia Linux](https://github.com/rpminspect/rpminspect/actions/workflows/mageia.yml/badge.svg)](https://github.com/rpminspect/rpminspect/actions/workflows/mageia.yml) |
 | [Oracle Linux](https://www.oracle.com/linux/)          | 8 | [![Oracle Linux](https://github.com/rpminspect/rpminspect/actions/workflows/oraclelinux.yml/badge.svg)](https://github.com/rpminspect/rpminspect/actions/workflows/oraclelinux.yml) |
 | [FreeBSD](https://www.freebsd.org/)                    | 13.x | [![FreeBSD](https://github.com/rpminspect/rpminspect/actions/workflows/freebsd.yml/badge.svg)](https://github.com/rpminspect/rpminspect/actions/workflows/freebsd.yml) |
