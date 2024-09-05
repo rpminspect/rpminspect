@@ -128,7 +128,7 @@ fi
 
 # Generate the dist artifact and sign it
 meson setup build
-ninja -v -C build dist
+meson dist -C build --formats gztar
 cd build/meson-dist || exit
 gpg --detach-sign --armor "${PROJECT}"-"${VERSION}".tar.gz
 cd "${CWD}" || exit
