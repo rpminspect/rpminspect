@@ -12,6 +12,7 @@ General release and build process changes:
 * Generate .tar.gz source archives rather than .tar.xz
 * Fix the include subdirectories variables in meson.build
 * Correct the check for CURLINFO_CONTENT_LENGTH_DOWNLOAD_T
+* Only create tar.gz archives with 'meson dist'
 
 Config file or data/ file changes:
 * Update generic config example with remedy override strings
