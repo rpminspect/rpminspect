@@ -1,3 +1,180 @@
+Changes in rpminspect-2.0
+-------------------------
+
+General release and build process changes:
+* Allow vendor data dir and work dir to be set at build time
+* Rephrase the with_annocheck and with_libannocheck help text
+* Add a comment to GNUmakefile and put debug options in help
+* Use SPDX-License-Identifier in regress/ scripts
+* (Requires|Recommends): /usr/bin/annocheck -> annobin-annocheck
+* Honor additional 'meson setup' options in 'make setup'
+* Set c_std='gnu99' so toml_parse.c will compile
+* Generate .tar.gz source archives rather than .tar.xz
+* Fix the include subdirectories variables in meson.build
+* Correct the check for CURLINFO_CONTENT_LENGTH_DOWNLOAD_T
+
+Config file or data/ file changes:
+* Update generic config example with remedy override strings
+* Exclude libpython3.so from the debuginfo tests
+* Note entries with file globbing need single quotes
+* Comment out the default empty 'ignore' block in example config
+
+Changes to the GitHub Actions CI scripts and files:
+* Ensure the Slackware CI job builds the latest release of clamav
+* Add CXXFLAGS="-m32" to the Fedora i386 CI job
+* Run shellcheck on all scripts and fix up common errors
+* Fix CI test cases on Alpine Linux
+* Add '--break-system-packages' to PIP_CMD on Alpine Linux
+* Drop CI jobs for Fedora on i386
+* OpenSUSE Leap does not give ELOOP on the too many symlinks check
+* Use actions/checkout@v4 for the git check part in CI jobs
+* Try an older checkout action due to the dynamic node problem
+* Split CentOS 7 job out to separate workflow file
+* Install valgrind correctly in the Gentoo CI job
+* Update the FreeBSD CI job
+* Install a /usr/bin/bash symlink in the FreeBSD job
+* Just make 'vncdotool' a symlink to true on FreeBSD CI job
+* Install tree in prepare block for the FreeBSD CI job
+* add .local/bin/ to freebsd build
+* Pin version of run-on-arch action for some fedora arches
+* Make sure the CI environments all have libtoml
+* libtoml lacks a 'make install' target; install manually
+* More CI job fixes for the libtoml library
+* Drop manual installation of libtoml in CI jobs
+* Use system libtoml in Fedora CI jobs
+* Add Oracle Linux 9 to the CI job pool
+* Drop CFLAGS override from the CentOS 7 CI job
+* Fix up failing Slackware Linux CI job
+* Fix failing FreeBSD CI job
+* Slackware needs the full path to the update-ca-certificates script
+* Remove Slackware Linux from the CI pool
+* Fix up failing CentOS 7 and Oracle Linux CI jobs
+* Remove python3.11-timeout-decorator from OEL8 reqs.txt
+* Add RHEL UBI9 as a new CI job
+* Drop non-x86_64 test build jobs
+* Fix Ubuntu GitHub Actions job
+* Add 'file' to reqs.txt for debian-stable and debian-testing
+* Match ubi9 CI job correctly in the workflow file
+* Fix the RHEL UBI9 job; drop 'cost' from c9s repo definitions
+* Remove openssl-fips-provider in UBI9 before updating everything
+* Remove CentOS Stream 8 job because it is now EOL
+* We can still do test jobs on CentOS 7
+* Use -o option on strip(1) in debuginfo tests
+* Fix CentOS 7 CI job
+* Fix manpage test cases on Gentoo Linux CI jobs
+* Use actions/checkout@v4 in amazonlinux.yml and centos8.yml
+* Try forcing use of node16 on Amazon Linux job
+* Use actions/checkout@v2 on Amazon Linux job
+* Try to link node16 to node20 on Amazon Linux
+* Move node16 link to main steps in Amazon Linux
+* YAML syntax fixes for Amazon Linux job
+* Link node16 to node20 for the Amazon Linux job
+* Remove CentOS 7 and Amazon Linux 2 from CI jobs
+
+Documentation changes:
+* Show pre-commit.yml status in README.md rather than python.yml
+
+General bug fix in the library or frontend program:
+* Fix a small error in the strtrim() function
+* Recognize source RPM packages in subpackages test
+* Modify the license inspection to support new license data spec
+* In array(), only return early if key1 is NULL
+* Recognize source RPM packages in arch test
+* Make sure the license check honors "allowed-*" licenses
+* Pass --no-style to the udevadm command in udevrules inspection
+* Modify list_trim() so it does not segfault in some instances
+* Close memory leaks in lic_cb() in inspect_license.c
+* In removedfiles, report removed files at VERIFY on non-rebases
+* Close small memory leak in the secrule reading code
+* Refactor _is_debug_rpm_helper() to make it somewhat more robust
+* Correctly resolve relative symlinks across subpackages
+* In the symlinks inspection, honor transitive Requires
+* Break out of the transitive explicit Requires check if match
+* Verify the transitive list is not NULL before iterating
+* Fix the REMEDY_RUNPATH string
+* Correctly check for a working 'udevadm' command in udevrules
+* Expand file peering code to support VER-REL without dist tag
+* Prevent a SIGSEGV in the unicode inspection
+* Handle peers with only before RPMs in the symlinks inspection
+* Honor case-insensitive SPDX names
+* s/capitable/capital/g
+* Do not crash if a user-provided config file is empty
+* Drop libtoml-devel BR from the spec file
+* Build against the system libtoml in Fedora
+* Pick the correct remedy string when displaying findings
+* Replace asprintf() with xasprintf() in libtoml source code
+* annocheck: fix the debuginfo package lookup
+* Small fixes and refactorings
+* Stop unpacking archive when we receive ARCHIVE_FATAL
+* Do not allow skipping of security checks via config file
+* Handle params.msg == NULL in permissions inspection
+* Properly handle license abbrevs that match SPDX and legacy
+* Correctly handle dual SPDX/legacy license identifiers
+* Use foreach_peer_file() in inspect_javabytecode()
+* Unset DEBUGINFOD_URLS to prevent downloading debuginfo rpms
+* Report removedfile findings as INFO except for security paths
+* Support %autorelease macro with options in the Release field
+* Fix Unicode character detection when UTF-32 is present
+* Correctly identify combined legacy and SPDX identifiers
+
+librpminspect feature or significant change:
+* Note the summary output mode is now deprecated
+* Move array() function from init.c to public librpminspect API
+* In list_add(), do not add list entries with empty strings
+* Add list_trim() function to librpminspect
+* Coding style adjustment in parse_yaml.c
+* If key1 or key2 is NULL in array(), just return
+* Do not dupe and return empty strings in as_str()
+* Split the SPDX and legacy license check in lib_cb()
+* License db blocks will be json_type_object not json_type_array
+* Do not include diff output in doc inspection for rebased builds
+* Honor packages_with_exceptions in the license database file
+* Modify headers so they work with C++ projects
+* Adjust _is_debug_rpm_helper() for other distributions
+* Remove unused 'extralen' variable in joinpath.c
+* Eliminate split sentences in reporting messages
+* End execstack testing early if there is no after_execstack
+* Remove format string parameters from some remedy strings
+* Refactor how remedy strings are handled in librpminspect
+* Implement option runtime remedy string override support
+* Embed libtoml in the source tree
+* Move xasprintf() macro into a separate header file
+* annocheck: Map el10 product release to the corresponding profile
+* Add xalloc.c with wrapper functions for memory allocation
+* Use xalloc.c wrapper functions for memory allocation
+* Add a "parallel collector" mechanism
+* add full_write() utility function
+* reduce struct size of rpmfile_entry_t
+* Expand shellsyntax to ignore scripts that use 'exec PROG'
+* Add strverb() and VERB_MISSING
+* Add list_case_contains() to listfuncs.c in librpminspect
+
+New inspections or inspection changes (not bug fixes):
+* inspect_virus: reorder code in preparation to parallelization
+* inspect_virus: use parallel collector to run clamav on all CPUs
+* Report all %changelog differences as RESULT_INFO now
+
+Test suite commits:
+* Add license db entries in the new format for the test suite
+* Add test cases for the license inspection using the new db format
+* s/Ipson/Ipsum/g in test_license.py
+* Add --skip-cf-protection for annocheck tests on Fedora
+* Add a test case to make sure librpminspect can link with C++ code
+* Add test cases for transitive explicit Requires dependencies
+* Fix two syntax errors in test_modularity.py
+* Exclude Oracle Linux and AlmaLinux from the symlinks ELOOP tests
+* Exclude Amazon Linux from the ELOOP symlinks tests
+* Exclude CentOS branchs from the ELOOP symlinks checks
+* LooseVersion from distutils.version is deprecated; replace it
+* Handle older Python 3.x releases without 'packaging' module
+* Add comments explaining the try/expect for packaging/distutils
+* Fix the Debian testing and stable GitHub Actions CI jobs
+* Use newer %patch syntax in test_patches.py
+* Update the changelog tests to work with the INFO reporting
+* Add disttag test cases for %autorelease with options
+* Add unicode test cases for correct UTF-32 detection
+
+
 Changes in rpminspect-1.12.1
 ----------------------------
 
