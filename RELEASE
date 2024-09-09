@@ -63,7 +63,7 @@ Use the upstream release repo for these steps:
 
         fedpkg switch-branch BRANCH
         git clean -dxf
-        git pull
+        fedpkg pull
         fedpkg update --type enhancement --request testing \
                       --notes "Upgrade to rpminspect-X.Y" \
                       --no-require-bugs --no-require-testcases
