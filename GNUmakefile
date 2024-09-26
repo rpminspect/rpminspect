@@ -4,6 +4,9 @@
 # help" for more details.  It is called GNUmakefile to indicate it
 # requires GNU make because we do build and test on BSD platforms.
 
+# Allow calling environment overrides to commands used in this
+# GNUmakefile.  Defaults are below.
+
 # The 'realpath' command may be installed under a different name, in
 # which case the calling environment can set the REALPATH variable to
 # the command to use.  For example, on NetBSD you need to install
@@ -11,11 +14,12 @@
 # /usr/pkg/bin/grealpath.
 ifeq ($(shell uname 2>/dev/null),NetBSD)
 REALPATH ?= grealpath
-else
-REALPATH ?= realpath
 endif
 
 REALPATH ?= realpath
+NINJA    ?= ninja
+MESON    ?= meson
+PYTHON   ?= python3
 
 # Core directories
 MESON_BUILD_DIR = build
@@ -24,12 +28,6 @@ topdir := $(shell $(REALPATH) $(dir $(lastword $(MAKEFILE_LIST))))
 # Project information (may be an easier way to get this from meson)
 PROJECT_NAME = $(shell grep ^project $(topdir)/meson.build | cut -d "'" -f 2)
 PROJECT_VERSION = $(shell grep version $(topdir)/meson.build | grep -E ',$$' | cut -d "'" -f 2)
-
-# ninja may be called something else
-NINJA := $(shell $(topdir)/utils/find-ninja.sh)
-ifeq ($(NINJA),)
-NINJA = $(error "*** unable to find a suitable `ninja' command")
-endif
 
 # Additional packages required to run the test suite, varies by OS
 OS = $(shell $(topdir)/utils/determine-os.sh)
@@ -63,9 +61,6 @@ PRIMARY_AUTHORS = dcantrell@redhat.com
 RELEASED_TARBALL = $(PROJECT_NAME)-$(PROJECT_VERSION).tar.gz
 RELEASED_TARBALL_ASC = $(RELEASED_TARBALL).asc
 
-# The python executable to use for the debug build and tests
-PYTHON ?= python3
-
 # FreeBSD installs ports to /usr/local, so make sure we pick up
 # libraries and headers correctly.
 ifeq ($(OS),freebsd)
@@ -77,13 +72,13 @@ all: setup
 	$(NINJA) -C $(MESON_BUILD_DIR) -v
 
 setup:
-	meson setup $(MESON_BUILD_DIR) $(MESON_OPTIONS)
+	$(MESON) setup $(MESON_BUILD_DIR) $(MESON_OPTIONS)
 
 debug: setup-debug
 	$(NINJA) -C $(MESON_BUILD_DIR) -v
 
 setup-debug:
-	meson setup $(MESON_BUILD_DIR) --werror --buildtype=debug -D python_program="$(PYTHON)" -D b_coverage=true $(MESON_OPTIONS)
+	$(MESON) setup $(MESON_BUILD_DIR) --werror --buildtype=debug -D python_program="$(PYTHON)" -D b_coverage=true $(MESON_OPTIONS)
 
 # NOTE: Set QA_RPATHS=63 so that check-rpaths is disabled during the
 # rpmfluff rpmbuild operations.  We want to let bad DT_RPATH values
@@ -105,7 +100,7 @@ endif
 check: setup
 	@test_name="$(call TARGET_ARG,)" ; \
 	if [ -z "$${test_name}" ]; then \
-		env meson test -C $(MESON_BUILD_DIR) -v ; \
+		env $(MESON) test -C $(MESON_BUILD_DIR) -v ; \
 	else \
 		test_script="test_$${test_name}.py" ; \
 		if [ ! -f "$(topdir)/test/$${test_script}" ]; then \
@@ -218,9 +213,9 @@ help:
 	@echo
 	@echo "    all               Default target, setup tree to build and build"
 	@echo "    debug             Setup tree for debug build and build"
-	@echo "    setup             Run 'meson setup $(MESON_BUILD_DIR)'"
+	@echo "    setup             Run '$(MESON) setup $(MESON_BUILD_DIR)'"
 	@echo "    setup-debug       The counterpart to 'setup'; called by 'debug'"
-	@echo "    check             Run 'meson test -C $(MESON_BUILD_DIR) -v'"
+	@echo "    check             Run '$(MESON) test -C $(MESON_BUILD_DIR) -v'"
 	@echo "    update-pot        Update po/POTFILES and po/rpminspect.pot"
 	@echo "    srpm              Generate an SRPM package of the latest release"
 	@echo "    copr-srpm         Generate an SRPM package of the latest HEAD revision"
