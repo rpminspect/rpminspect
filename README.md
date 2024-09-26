@@ -202,9 +202,6 @@ you can do this:
 
 You can get verbose build output with "ninja -C build -v".
 
-NOTE:  On CentOS 7.x and RHEL 7.x systems, the ninja command is named
-'ninja-build' and installed in /usr/bin.
-
 For more information on meson and ninja, see these sites:
 
     https://mesonbuild.com/

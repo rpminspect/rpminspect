@@ -7,7 +7,7 @@ project('rpminspect',
             'werror=true',
             'buildtype=debugoptimized'
         ],
-        license : 'GPL-3.0-or-later AND LGPL-3.0-or-later AND Apache-2.0 AND MIT')
+        license : 'GPL-3.0-or-later AND LGPL-3.0-or-later AND LGPL-2.1-or-later AND Apache-2.0 AND MIT AND BSD-1-Clause AND BSD-2-Clause AND BSD-3-Clause AND CC-BY-4.0')
 
 fs = import('fs')
 
