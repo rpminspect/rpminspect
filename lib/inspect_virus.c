@@ -175,6 +175,19 @@ bool inspect_virus(struct rpminspect *ri)
         errx(RI_PROGRAM_ERROR, _("*** cl_engine_new returned NULL, check clamav library"));
     }
 
+    /* scan large files, but dump error as warning if this doesn't work */
+    r = cl_engine_set_num(engine, CL_ENGINE_MAX_FILESIZE, 0);
+
+    if (r != CL_SUCCESS) {
+        warnx("*** cl_engine_set_num: %s", cl_strerror(r));
+    }
+
+    r = cl_engine_set_num(engine, CL_ENGINE_MAX_SCANSIZE, 0);
+
+    if (r != CL_SUCCESS) {
+        warnx("*** cl_engine_set_num: %s", cl_strerror(r));
+    }
+
     /* load clamav databases */
     r = cl_load(dbpath, engine, &loaded_signatures, CL_DB_STDOPT);
 
