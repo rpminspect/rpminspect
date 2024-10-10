@@ -1001,6 +1001,15 @@ unicode:
         - '0x2068'
         - '0x2069'
 
+    # Optional list of glob(7) specifications or path prefixes to
+    # match files to ignore for this inspection.  The format of this
+    # list is the same as the global 'ignore' list.  The difference is
+    # the items specified here will only be used during this
+    # inspection.  If globbing characters are used, be sure to wrap
+    # the string in single quotes.
+    #ignore:
+    #    - '/usr/lib*/libexample.so*'
+
 rpmdeps:
     # Optional list of regular expressions to match against
     # requirement names to ignore.  For example, a dependency of the

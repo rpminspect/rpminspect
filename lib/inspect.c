@@ -79,7 +79,7 @@ struct inspect inspections[] = {
     { INSPECT_SYMLINKS,      "symlinks",      false, true,  &inspect_symlinks },
     { INSPECT_TYPES,         "types",         false, false, &inspect_types },
     { INSPECT_UDEVRULES,     "udevrules",     false, true,  &inspect_udevrules },
-    { INSPECT_UNICODE,       "unicode",       true,  true,  &inspect_unicode },
+    { INSPECT_UNICODE,       "unicode",       false, true,  &inspect_unicode },
     { INSPECT_UPSTREAM,      "upstream",      false, false, &inspect_upstream },
     { INSPECT_VIRUS,         "virus",         true,  true,  &inspect_virus },
     { INSPECT_XML,           "xml",           false, true,  &inspect_xml },
