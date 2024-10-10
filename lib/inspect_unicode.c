@@ -417,6 +417,8 @@ static bool end_of_line(const UChar c)
  */
 static int validate_file(const char *fpath, __attribute__((unused)) const struct stat *sb, int tflag, __attribute__((unused)) struct FTW *ftwbuf)
 {
+    char realbuf[PATH_MAX];
+    char *real = realbuf;
     const char *localpath = fpath;
     UFILE *src = NULL;
     UChar32 c;
@@ -447,7 +449,11 @@ static int validate_file(const char *fpath, __attribute__((unused)) const struct
         return 0;
     }
 
-    /* check for exclusion by ignore list */
+    /* get your bearings */
+    memset(real, '\0', PATH_MAX);
+    real = realpath(fpath, real);
+
+    /* figure out the localpath */
     if (build && strprefix(localpath, build)) {
         /*
          * this is a file in the prepared source tree, so trim the
@@ -461,14 +467,13 @@ static int validate_file(const char *fpath, __attribute__((unused)) const struct
         while (*localpath == '/' && *localpath != '\0') {
             localpath++;
         }
-
+    } else if (uses_unpack_base && strprefix(localpath, UNPACK_BASE)) {
         /*
          * for manual_prep_source() runs, also account for a potential
          * unpack-XXXXXX/ leading directory and trim that too
          */
-        if (uses_unpack_base && strprefix(localpath, UNPACK_BASE)) {
-            localpath += strlen(UNPACK_TEMPLATE);
-        }
+
+        localpath += strlen(UNPACK_TEMPLATE);
     } else if (root && strprefix(localpath, root)) {
         /* this is a source file directly in the SRPM */
         localpath += strlen(root);
@@ -482,6 +487,11 @@ static int validate_file(const char *fpath, __attribute__((unused)) const struct
 
     if (localpath == NULL) {
         warnx(_("*** empty localpath on %s"), fpath);
+        return 0;
+    }
+
+    /* do we ignore this file */
+    if (ignore_path(globalri, NAME_UNICODE, localpath, real)) {
         return 0;
     }
 
