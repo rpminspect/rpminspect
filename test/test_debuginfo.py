@@ -60,6 +60,10 @@ class MissingSectionsInDebuginfoPkgRPMs(TestRPMs):
     @unittest.skipIf(
         os.uname().sysname == "FreeBSD", "FreeBSD lacks find-debuginfo from debugedit"
     )
+    @unittest.skipIf(
+        os.path.exists("/etc/arch-release"),
+        "debuginfo packages do not generate on Arch Linux right now",
+    )
     def setUp(self):
         super().setUp()
 
@@ -75,6 +79,10 @@ class MissingSectionsInDebuginfoPkgRPMs(TestRPMs):
 class MissingSectionsInDebuginfoPkgCompareRPMs(TestCompareRPMs):
     @unittest.skipIf(
         os.uname().sysname == "FreeBSD", "FreeBSD lacks find-debuginfo from debugedit"
+    )
+    @unittest.skipIf(
+        os.path.exists("/etc/arch-release"),
+        "debuginfo packages do not generate on Arch Linux right now",
     )
     def setUp(self):
         super().setUp()
@@ -96,6 +104,10 @@ class MissingSectionsInDebuginfoPkgKoji(TestKoji):
     @unittest.skipIf(
         os.uname().sysname == "FreeBSD", "FreeBSD lacks find-debuginfo from debugedit"
     )
+    @unittest.skipIf(
+        os.path.exists("/etc/arch-release"),
+        "debuginfo packages do not generate on Arch Linux right now",
+    )
     def setUp(self):
         super().setUp()
 
@@ -111,6 +123,10 @@ class MissingSectionsInDebuginfoPkgKoji(TestKoji):
 class MissingSectionsInDebuginfoPkgCompareKoji(TestCompareKoji):
     @unittest.skipIf(
         os.uname().sysname == "FreeBSD", "FreeBSD lacks find-debuginfo from debugedit"
+    )
+    @unittest.skipIf(
+        os.path.exists("/etc/arch-release"),
+        "debuginfo packages do not generate on Arch Linux right now",
     )
     def setUp(self):
         super().setUp()
@@ -218,6 +234,10 @@ class BeforeStrippedAfterNotStrippedCompareKoji(TestCompareKoji):
     @unittest.skipIf(
         os.uname().sysname == "FreeBSD", "FreeBSD lacks find-debuginfo from debugedit"
     )
+    @unittest.skipIf(
+        os.path.exists("/etc/arch-release"),
+        "debuginfo packages do not generate on Arch Linux right now",
+    )
     def setUp(self):
         super().setUp()
 
@@ -237,6 +257,10 @@ class BeforeStrippedAfterNotStrippedCompareKoji(TestCompareKoji):
 class BeforeNotStrippedAfterStrippedCompareKoji(TestCompareKoji):
     @unittest.skipIf(
         os.uname().sysname == "FreeBSD", "FreeBSD lacks find-debuginfo from debugedit"
+    )
+    @unittest.skipIf(
+        os.path.exists("/etc/arch-release"),
+        "debuginfo packages do not generate on Arch Linux right now",
     )
     def setUp(self):
         super().setUp()
