@@ -93,11 +93,6 @@ Recommends:     html401-dtds
 Recommends:     rpm_macro(autorelease)
 %endif
 
-# Required because we build against the system libtoml in Fedora
-%if 0%{?fedora}
-Requires:       libtoml
-%endif
-
 # These programs are only required for the 'shellsyntax' functionality.
 # You can use rpminspect without these installed, just disable the
 # shellsyntax inspection.
