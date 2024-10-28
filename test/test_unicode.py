@@ -5,6 +5,7 @@
 
 import os
 import rpmfluff
+import yaml
 
 from baseclass import BEFORE_NAME, BEFORE_VER, AFTER_NAME, AFTER_VER
 
@@ -3982,4 +3983,54 @@ class UnicodeGoodIssue1418CompareKoji(TestCompareKoji):
         )
 
         self.inspection = "unicode"
+        self.result = "OK"
+
+
+# The following test check that "ignore" rule for bad files work.
+# This also tests that filepaths from manual prepped archives got the
+# unpack_base prefix stripped.
+class UnicodeBadIgnoredCSourceArchiveSRPM(TestSRPM):
+    def configFile(self):
+        super().configFile()
+
+        # Setting self.extra_cfg['unicode']['ignore'] in setUp() would overwrite
+        # the default 'unicode' config from super().configFile(). Hence we need
+        # to allow the parent class method to create the self.conffile, then
+        # load it here and update the part that we are interested in.
+        with open(self.conffile, "r") as instream:
+            cfg = yaml.full_load(instream)
+
+        cfg["unicode"]["ignore"] = ["%s-*/bad.c" % (BEFORE_NAME)]
+
+        with open(self.conffile, "w") as outstream:
+            outstream.write(yaml.dump(cfg).replace("- ", "  - "))
+
+    def setUp(self):
+        super().setUp()
+        self.rpm.header += "\n%define debug_package %{nil}\n"
+        self.rpm.add_source(
+            rpmfluff.GeneratedTarball(
+                "%s-%s.tar.gz" % (AFTER_NAME, AFTER_VER),
+                "%s-%s" % (AFTER_NAME, AFTER_VER),
+                [
+                    ProvidedSourceFile(
+                        "Makefile", os.path.join(datadir, "unicode", "Makefile")
+                    ),
+                    ProvidedSourceFile(
+                        "bad.c", os.path.join(datadir, "unicode", "bad.c")
+                    ),
+                    ProvidedSourceFile(
+                        "status.sh", os.path.join(datadir, "unicode", "status.sh")
+                    ),
+                ],
+            )
+        )
+        self.rpm.section_prep = "%setup"
+        self.rpm.section_build += "make\n"
+        self.rpm.section_install += "make install DESTDIR=%{buildroot}\n"
+        sub = self.rpm.get_subpackage(None)
+        sub.section_files += "/usr/bin/status\n"
+
+        self.inspection = "unicode"
+        # The expected result is OK because the bad.c file is explicitly ignored
         self.result = "OK"
