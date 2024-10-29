@@ -47,5 +47,7 @@ sed
 tar
 tcsh
 xmlrpc-c-dev
+xxhash
+xxhash-dev
 yaml-dev
 zsh
