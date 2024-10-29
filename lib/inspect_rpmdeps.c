@@ -32,7 +32,10 @@ static bool is_subpackage(rpmpeer_t *peers, const char *package)
 
     TAILQ_FOREACH(peer, peers, items) {
         name = headerGetString(peer->after_hdr, RPMTAG_NAME);
-        assert(name != NULL);
+
+        if (name == NULL) {
+            continue;
+        }
 
         if (!strcmp(name, package)) {
             return true;
@@ -438,8 +441,12 @@ static bool check_explicit_lib_deps(struct rpminspect *ri, Header h, deprule_lis
 
                         while (collect) {
                             TAILQ_FOREACH(peer, ri->peers, items) {
-                                tn = headerGetString(peer->after_hdr, RPMTAG_NAME);
                                 collect = false;
+                                tn = headerGetString(peer->after_hdr, RPMTAG_NAME);
+
+                                if (tn == NULL) {
+                                    continue;
+                                }
 
                                 TAILQ_FOREACH(entry, transitive, items) {
                                     if (!strcmp(tn, entry->data)) {
@@ -861,10 +868,12 @@ bool inspect_rpmdeps(struct rpminspect *ri)
             continue;
         }
 
-        TAILQ_FOREACH(file, peer->after_files, items) {
-            if (strsuffix(file->localpath, SPEC_FILENAME_EXTENSION)) {
-                specfile = file->localpath;
-                found = true;
+        if (peer->after_files) {
+            TAILQ_FOREACH(file, peer->after_files, items) {
+                if (strsuffix(file->localpath, SPEC_FILENAME_EXTENSION)) {
+                    specfile = file->localpath;
+                    found = true;
+                }
             }
         }
 
