@@ -703,3 +703,54 @@ class PatchPNMacroCompareSRPM(TestCompareSRPM):
         self.inspection = "patches"
         self.result = "INFO"
         self.waiver_auth = "Not Waivable"
+
+
+# PatchN syntax allows a URL to a patch
+class PatchHasURLPathSRPM(TestSRPM):
+    def setUp(self):
+        super().setUp()
+
+        patch = rpmfluff.SourceFile("some.patch", patch_file)
+        patchIndex = len(self.rpm.patches)
+        self.rpm.patches[patchIndex] = patch
+
+        self.rpm.section_patches += (
+            "Patch%i: http://www.superfunpatchsite.com/open/source/software/randompatches/%s\n"
+            % (patchIndex, patch.sourceName)
+        )
+        self.rpm.add_check(rpmfluff.check.CheckSourceFile(patch.sourceName))
+
+        self.rpm.section_prep += "%%patch -P%i\n" % patchIndex
+
+        self.inspection = "patches"
+        self.result = "INFO"
+        self.waiver_auth = "Not Waivable"
+
+
+class PatchHasURLPathCompareSRPM(TestCompareSRPM):
+    def setUp(self):
+        super().setUp()
+
+        patch = rpmfluff.SourceFile("some.patch", patch_file)
+
+        beforePatchIndex = len(self.before_rpm.patches)
+        self.before_rpm.patches[beforePatchIndex] = patch
+        self.before_rpm.section_patches += (
+            "Patch%i: http://www.superfunpatchsite.com/open/source/software/randompatches/%s\n"
+            % (beforePatchIndex, patch.sourceName)
+        )
+        self.before_rpm.add_check(rpmfluff.check.CheckSourceFile(patch.sourceName))
+        self.before_rpm.section_prep += "%%patch -P%i\n" % beforePatchIndex
+
+        afterPatchIndex = len(self.after_rpm.patches)
+        self.after_rpm.patches[afterPatchIndex] = patch
+        self.after_rpm.section_patches += (
+            "Patch%i: http://www.superfunpatchsite.com/open/source/software/randompatches/%s\n"
+            % (afterPatchIndex, patch.sourceName)
+        )
+        self.after_rpm.add_check(rpmfluff.check.CheckSourceFile(patch.sourceName))
+        self.after_rpm.section_prep += "%%patch -P%i\n" % afterPatchIndex
+
+        self.inspection = "patches"
+        self.result = "INFO"
+        self.waiver_auth = "Not Waivable"
