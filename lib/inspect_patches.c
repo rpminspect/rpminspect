@@ -709,11 +709,12 @@ bool inspect_patches(struct rpminspect *ri)
 
                         patch = TAILQ_FIRST(fields);
                         assert(patch != NULL);
-                        entry = TAILQ_NEXT(patch, items);
+                        entry = TAILQ_LAST(fields, string_entry_s);
                         assert(entry != NULL);
 
                         /* the patch file may contain macros, so try to replace those */
-                        patchfile = patchhead = expand_patchname_macros(ri, specfile, entry->data);
+                        patchhead = expand_patchname_macros(ri, specfile, entry->data);
+                        patchfile = basename(patchhead);
                         assert(patchfile != NULL);
 
                         /* see if we have this patch */
@@ -726,7 +727,6 @@ bool inspect_patches(struct rpminspect *ri)
                             free(params.msg);
                             reported = true;
                             result = !(params.severity >= RESULT_VERIFY);
-
                             list_free(fields, free);
                             continue;
                         }
