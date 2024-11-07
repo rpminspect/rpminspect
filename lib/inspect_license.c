@@ -327,7 +327,7 @@ static string_map_t *tokenize_license_tag(const char *license)
             continue;
         }
 
-        if (!strcasecmp(token, "and") || !strcasecmp(token, "or")) {
+        if (!strcmp(token, "and") || !strcmp(token, "AND") || !strcmp(token, "or") || !strcasecmp(token, "OR")) {
             booleans = list_add(booleans, token);
 
             if (lic == NULL) {
@@ -627,11 +627,11 @@ static bool is_valid_license(struct rpminspect *ri, struct result_params *params
     free_tags(tags);
     free(wlicense);
 
-    /* for SPDX tags found, ensure booleans are all uppercase */
+    /* for SPDX tags found, ensure booleans are all uppercase or all lowercase */
     if (nlegacy == 0 && ndual == 0 && nspdx > 0 && (booleans && !TAILQ_EMPTY(booleans))) {
         TAILQ_FOREACH(entry, booleans, items) {
-            if ((!strcasecmp(entry->data, "AND") && strcmp(entry->data, "AND"))
-                || (!strcasecmp(entry->data, "OR") && strcmp(entry->data, "OR"))) {
+            if ((!strcmp(entry->data, "and") && strcmp(entry->data, "AND"))
+                || (!strcmp(entry->data, "or") && strcmp(entry->data, "OR"))) {
                 r = false;
 
                 params->severity = RESULT_BAD;

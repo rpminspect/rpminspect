@@ -3,6 +3,7 @@
  * SPDX-License-Identifier: LGPL-3.0-or-later
  */
 
+#include <libgen.h>
 #include <stdlib.h>
 #include <string.h>
 #include <assert.h>
@@ -11,7 +12,6 @@
 #include <unistd.h>
 #include <err.h>
 #include <limits.h>
-#include <libgen.h>
 #include <rpm/header.h>
 #include <rpm/rpmtag.h>
 #include "queue.h"

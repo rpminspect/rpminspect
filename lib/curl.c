@@ -3,11 +3,11 @@
  * SPDX-License-Identifier: LGPL-3.0-or-later
  */
 
+#include <libgen.h>
 #include <math.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
-#include <libgen.h>
 #include <string.h>
 #include <stdbool.h>
 #include <assert.h>
