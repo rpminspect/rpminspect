@@ -67,16 +67,7 @@ jobs:
             # Set up
             - name: git clone requirements
               run: |
-                  . /etc/os-release
-
-                  if [ "${REDHAT_BUGZILLA_PRODUCT_VERSION}" = "rawhide" ] || [ "${REDHAT_SUPPORT_PRODUCT_VERSION}" = "rawhide" ]; then
-                      rm -f /etc/dnf/dnf.conf
-                      dnf install -y dnf5
-                      dnf5 install -y git
-                  else
-                      dnf install -y git
-                  fi
-
+                  dnf install -y git
 
             # This means clone the git repo
             - uses: actions/checkout@v4
@@ -85,14 +76,7 @@ jobs:
             # and run the test suite
             - name: Build and run the test suite
               run: |
-                  . /etc/os-release
-
-                  if [ "${REDHAT_BUGZILLA_PRODUCT_VERSION}" = "rawhide" ] || [ "${REDHAT_SUPPORT_PRODUCT_VERSION}" = "rawhide" ]; then
-                      dnf5 install -y make
-                  else
-                      dnf install -y make
-                  fi
-
+                  dnf install -y make
                   make instreqs
                   make debug MESON_OPTIONS="-D with_system_libtoml=true"
                   make check
