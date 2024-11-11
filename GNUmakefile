@@ -36,14 +36,7 @@ ifeq ($(OS),)
 OS = $(error "*** unable to determine host operating system")
 endif
 
-# Handle optional architecture if specified
-ifeq ($(OSDEPS_ARCH),)
-OS_SUBDIR = $(OS)
-else
-OS_SUBDIR = $(OS).$(OSDEPS_ARCH)
-endif
-
--include $(topdir)/osdeps/$(OS_SUBDIR)/defs.mk
+-include $(topdir)/osdeps/$(OS)/defs.mk
 
 ifeq ($(PKG_CMD),)
 PKG_CMD = $(error "*** unable to determine host operating system package command")
@@ -177,17 +170,17 @@ clean:
 SKIP_PIP ?= n
 
 instreqs:
-	if [ -x $(topdir)/osdeps/$(OS_SUBDIR)/pre.sh ]; then \
-		env OSDEPS=$(topdir)/osdeps/$(OS_SUBDIR) $(topdir)/osdeps/$(OS_SUBDIR)/pre.sh ; \
+	if [ -x $(topdir)/osdeps/$(OS)/pre.sh ]; then \
+		env OSDEPS=$(topdir)/osdeps/$(OS) $(topdir)/osdeps/$(OS)/pre.sh ; \
 	fi
-	if [ -f $(topdir)/osdeps/$(OS_SUBDIR)/reqs.txt ]; then \
-		$(PKG_CMD) $$(grep -v ^# $(topdir)/osdeps/$(OS_SUBDIR)/reqs.txt 2>/dev/null | awk 'NF' ORS=' ') ; \
+	if [ -f $(topdir)/osdeps/$(OS)/reqs.txt ]; then \
+		$(PKG_CMD) $$(grep -v ^# $(topdir)/osdeps/$(OS)/reqs.txt 2>/dev/null | awk 'NF' ORS=' ') ; \
 	fi
-	if [ ! "$(SKIP_PIP)" = "y" ] && [ -f $(topdir)/osdeps/$(OS_SUBDIR)/pip.txt ]; then \
-		$(PIP_CMD) $$(grep -v ^# $(topdir)/osdeps/$(OS_SUBDIR)/pip.txt 2>/dev/null | awk 'NF' ORS=' ') ; \
+	if [ ! "$(SKIP_PIP)" = "y" ] && [ -f $(topdir)/osdeps/$(OS)/pip.txt ]; then \
+		$(PIP_CMD) $$(grep -v ^# $(topdir)/osdeps/$(OS)/pip.txt 2>/dev/null | awk 'NF' ORS=' ') ; \
 	fi
-	if [ -x $(topdir)/osdeps/$(OS_SUBDIR)/post.sh ]; then \
-		env OSDEPS=$(topdir)/osdeps/$(OS_SUBDIR) $(topdir)/osdeps/$(OS_SUBDIR)/post.sh ; \
+	if [ -x $(topdir)/osdeps/$(OS)/post.sh ]; then \
+		env OSDEPS=$(topdir)/osdeps/$(OS) $(topdir)/osdeps/$(OS)/post.sh ; \
 	fi
 
 authors:

@@ -12,20 +12,6 @@ case "$(uname -m)" in
         ;;
 esac
 
-# Work around a bug in meson 0.55.0
-MESON_VER="$(meson --version 2>/dev/null)"
-
-if [ -z "${MESON_VER}" ] || [ ! "${MESON_VER}" = "0.55.0" ]; then
-    exit 0
-fi
-
-PYDIR="$(dirname "$(rpm -ql meson | grep 'ninjabackend.py$')")"
-[ -d "${PYDIR}" ] || exit 2
-
-cd "${PYDIR}" || exit 1
-[ -f "${OSDEPS}/meson.patch" ] || exit 3
-patch -p0 < "${OSDEPS}/meson.patch"
-
 # This change to /usr/lib/rpm/macros was introduced on 24-Aug-2024 in
 # commit 1a9803d0f8daf15bb706dc17783ab19589906487 to rpm, but it
 # causes problems for the rpminspect test suite.  Undo the change.
