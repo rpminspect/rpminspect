@@ -224,26 +224,23 @@ static bool lic_cb(const char *license_name, void *cb_data)
      * If we hit 'spdx_abbrev' and approved is true, that is valid.
      * NOTE: we only match the first hit in the license database
      */
-    if (!approved) {
-        /* invalid - do nothing */
-        goto done;
-    }
+    if (approved) {
+        if (spdx_abbrev && !strcasecmp(data->lic, spdx_abbrev)) {
+            data->valid = true;
 
-    if (spdx_abbrev && !strcasecmp(data->lic, spdx_abbrev)) {
-        if (list_case_contains(dual, data->lic)) {
-            /* license token is valid under the legacy system and SPDX */
+            if (list_case_contains(dual, data->lic)) {
+                /* license token is valid under the legacy system and SPDX */
+                ndual++;
+            } else {
+                /* SPDX identifier matched */
+                nspdx++;
+            }
+        } else if ((list_contains(fedora_abbrev, data->lic) && !list_contains(dual, data->lic))
+                   || (list_len(fedora_abbrev) == 0 && spdx_abbrev == NULL && list_contains(fedora_name, data->lic))) {
+            /* Old Fedora abbreviation matches -or- there are no Fedora abbreviations but a Fedora name matches */
             data->valid = true;
-            ndual++;
-        } else {
-            /* SPDX identifier matched */
-            data->valid = true;
-            nspdx++;
+            nlegacy++;
         }
-    } else if ((list_contains(fedora_abbrev, data->lic) && !list_contains(dual, data->lic))
-               || (list_len(fedora_abbrev) == 0 && spdx_abbrev == NULL && list_contains(fedora_name, data->lic))) {
-        /* Old Fedora abbreviation matches -or- there are no Fedora abbreviations but a Fedora name matches */
-        data->valid = true;
-        nlegacy++;
     }
 
 done:
@@ -608,6 +605,8 @@ static bool is_valid_license(struct rpminspect *ri, struct result_params *params
                     ri->results = init_results();
                 }
 
+                params->severity = RESULT_BAD;
+                params->remedy = get_remedy(REMEDY_UNAPPROVED_LICENSE);
                 xasprintf(&params->msg, _("Unapproved license in %s: %s"), nevra, tagtoken->key);
                 add_result(ri, params);
                 result = get_result(result, params->severity);
