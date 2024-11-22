@@ -8,6 +8,7 @@ extern "C"
 {
 #endif
 
+#include <stdbool.h>
 #include "i18n.h"
 
 #ifndef _LIBRPMINSPECT_REMEDY_H
@@ -102,14 +103,14 @@ extern "C"
 #define REMEDY_XML                       86
 #define REMEDY_MIXED_LICENSE_TAGS        87
 
-/* Initialize default remedy strings */
-void init_remedy_strings(void);
-
 /* Get the remedy string for the specified remedy ID */
 const char *get_remedy(const unsigned int id);
 
 /* Set remedy override string */
-bool set_remedy(const char *name, const char *remedy);
+bool set_remedy(const char *name, char *remedy);
+
+/* Free remedy strings read in from config files */
+void free_remedy_strings(void);
 
 #endif /* _LIBRPMINSPECT_REMEDY_H */
 

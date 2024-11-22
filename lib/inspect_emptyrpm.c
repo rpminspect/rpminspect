@@ -99,7 +99,7 @@ bool inspect_emptyrpm(struct rpminspect *ri)
                 params.noun = NULL;
                 params.file = NULL;
                 params.arch = NULL;
-                params.remedy = NULL;
+                params.remedy = 0;
                 reported = true;
             } else if (payload_only_ghosts(peer->after_hdr)) {
                 xasprintf(&params.msg, _("New package %s is empty (no payloads); this is expected because the package only contains %%ghost entries"), bn);
@@ -109,7 +109,7 @@ bool inspect_emptyrpm(struct rpminspect *ri)
                 params.noun = NULL;
                 params.file = NULL;
                 params.arch = NULL;
-                params.remedy = NULL;
+                params.remedy = 0;
                 reported = true;
             } else {
                 an = basename(peer->after_rpm);
@@ -120,7 +120,7 @@ bool inspect_emptyrpm(struct rpminspect *ri)
                 params.noun = _("${FILE} has empty payload");
                 params.file = an;
                 params.arch = get_rpm_header_arch(peer->after_hdr);
-                params.remedy = get_remedy(REMEDY_EMPTYRPM);
+                params.remedy = REMEDY_EMPTYRPM;
                 good = false;
                 reported = true;
             }

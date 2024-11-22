@@ -5,6 +5,7 @@
 
 #include <regex.h>
 #include <stdlib.h>
+#include "remedy.h"
 #include "queue.h"
 #include "rpminspect.h"
 
@@ -327,6 +328,8 @@ void free_rpminspect(struct rpminspect *ri)
     free_string_hash(ri->magic_types);
     list_free(ri->remedy_overrides, free);
     free_results(ri->results);
+
+    free_remedy_strings();
 
     return;
 }

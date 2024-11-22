@@ -312,7 +312,7 @@ bool inspect_virus(struct rpminspect *ri)
 
                     params.arch = get_rpm_header_arch(file->rpm_header);
                     params.file = file->localpath;
-                    params.remedy = get_remedy(REMEDY_VIRUS);
+                    params.remedy = REMEDY_VIRUS;
                     xasprintf(&params.msg, _("Virus detected in %s in the %s package on %s: %s"), file->localpath, headerGetString(file->rpm_header, RPMTAG_NAME), params.arch, virus);
                     add_result(ri, &params);
                     free(params.msg);

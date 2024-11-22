@@ -252,7 +252,7 @@ struct result_params {
     const char *header;
     char *msg;
     char *details;
-    const char *remedy;
+    unsigned int remedy;
     verb_t verb;
     const char *noun;
     const char *arch;
@@ -265,7 +265,7 @@ typedef struct _results_entry_t {
     const char *header;       /* header string for reporting */
     char *msg;                /* the result message */
     char *details;            /* details (optional, can be NULL) */
-    const char *remedy;       /* suggested correction for the result */
+    unsigned int remedy;      /* suggested correction for the result */
     verb_t verb;              /* verb indicating what happened */
     char *noun;               /* noun impacted by 'verb', one line
                                  (e.g., a file path or an RPM dependency
@@ -859,7 +859,7 @@ struct remedy {
     const char *name;
 
     /* the default remedy string */
-    const char *remedy;
+    char *remedy;
 };
 
 /*

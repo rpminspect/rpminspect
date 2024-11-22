@@ -114,8 +114,8 @@ void output_xunit(const results_t *results, const char *dest, const severity_t t
             free(rawcdata);
         }
 
-        if (result->remedy != NULL) {
-            xasprintf(&rawcdata, _("Suggested Remedy:\n%s"), result->remedy);
+        if (result->remedy != REMEDY_NULL) {
+            xasprintf(&rawcdata, _("Suggested Remedy:\n%s"), get_remedy(result->remedy));
             assert(rawcdata != NULL);
             msg = strappend(msg, rawcdata, NULL);
             assert(msg != NULL);

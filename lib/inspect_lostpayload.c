@@ -66,7 +66,7 @@ bool inspect_lostpayload(struct rpminspect *ri)
             params.noun = _("missing subpackage ${FILE} on ${ARCH}");
             params.file = bn;
             params.arch = ba;
-            params.remedy = get_remedy(REMEDY_LOSTPAYLOAD);
+            params.remedy = REMEDY_LOSTPAYLOAD;
             add_result(ri, &params);
             free(params.msg);
             good = false;
@@ -86,7 +86,7 @@ bool inspect_lostpayload(struct rpminspect *ri)
                 params.noun = _("existing empty subpackage ${FILE} on ${ARCH}");
                 params.file = an;
                 params.arch = aa;
-                params.remedy = NULL;
+                params.remedy = 0;
                 add_result(ri, &params);
                 free(params.msg);
             } else {
@@ -97,7 +97,7 @@ bool inspect_lostpayload(struct rpminspect *ri)
                 params.noun = _("subpackage ${FILE} on ${ARCH} now has empty payload");
                 params.file = an;
                 params.arch = aa;
-                params.remedy = get_remedy(REMEDY_LOSTPAYLOAD);
+                params.remedy = REMEDY_LOSTPAYLOAD;
                 add_result(ri, &params);
                 free(params.msg);
                 good = false;

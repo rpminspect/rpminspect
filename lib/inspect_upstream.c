@@ -157,7 +157,7 @@ bool inspect_upstream(struct rpminspect *ri)
         /* versions are the same, likely maintenance */
         params.severity = RESULT_VERIFY;
         params.waiverauth = WAIVABLE_BY_ANYONE;
-        params.remedy = get_remedy(REMEDY_UPSTREAM);
+        params.remedy = REMEDY_UPSTREAM;
     }
 
     /* Run the main inspection */
@@ -209,7 +209,7 @@ bool inspect_upstream(struct rpminspect *ri)
     }
 
     params.msg = NULL;
-    params.remedy = NULL;
+    params.remedy = 0;
 
     /* Sound the everything-is-ok alarm if everything is, in fact, ok */
     if (result && !reported) {

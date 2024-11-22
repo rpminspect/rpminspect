@@ -472,7 +472,7 @@ static bool is_valid_license(struct rpminspect *ri, struct result_params *params
 
     /* Set up the result parameters */
     params->severity = RESULT_BAD;
-    params->remedy = get_remedy(REMEDY_UNAPPROVED_LICENSE);
+    params->remedy = REMEDY_UNAPPROVED_LICENSE;
 
     /* check for matching parens */
     for (i = 0; i < strlen(license); i++) {
@@ -606,7 +606,7 @@ static bool is_valid_license(struct rpminspect *ri, struct result_params *params
                 }
 
                 params->severity = RESULT_BAD;
-                params->remedy = get_remedy(REMEDY_UNAPPROVED_LICENSE);
+                params->remedy = REMEDY_UNAPPROVED_LICENSE;
                 xasprintf(&params->msg, _("Unapproved license in %s: %s"), nevra, tagtoken->key);
                 add_result(ri, params);
                 result = get_result(result, params->severity);
@@ -634,7 +634,7 @@ static bool is_valid_license(struct rpminspect *ri, struct result_params *params
                 r = false;
 
                 params->severity = RESULT_BAD;
-                params->remedy = get_remedy(REMEDY_INVALID_BOOLEAN);
+                params->remedy = REMEDY_INVALID_BOOLEAN;
                 xasprintf(&params->msg, _("SPDX license expressions in use in %s, but an invalid boolean was found: %s; when using SPDX expression the booleans must be in all caps."), nevra, entry->data);
                 xasprintf(&params->details, _("License: %s"), license);
                 add_result(ri, params);
@@ -649,7 +649,7 @@ static bool is_valid_license(struct rpminspect *ri, struct result_params *params
     /* mixed SPDX and legacy tags are forbidden */
     if (nlegacy > 0 && nspdx > 0 && ndual == 0) {
         params->severity = RESULT_BAD;
-        params->remedy = get_remedy(REMEDY_MIXED_LICENSE_TAGS);
+        params->remedy = REMEDY_MIXED_LICENSE_TAGS;
         xasprintf(&params->msg, _("Mixed SPDX and legacy license identifiers found in %s."), nevra);
         xasprintf(&params->details, _("License: %s"), license);
         add_result(ri, params);
@@ -684,7 +684,7 @@ static int check_peer_license(struct rpminspect *ri, struct result_params *param
     if (license == NULL) {
         xasprintf(&params->msg, _("Empty License Tag in %s"), nevra);
         params->severity = RESULT_BAD;
-        params->remedy = get_remedy(REMEDY_LICENSE);
+        params->remedy = REMEDY_LICENSE;
         params->verb = VERB_FAILED;
         params->noun = _("missing License tag in ${FILE}");
         add_result(ri, params);
@@ -698,7 +698,7 @@ static int check_peer_license(struct rpminspect *ri, struct result_params *param
         if (valid) {
             xasprintf(&params->msg, _("Valid License Tag in %s: %s"), nevra, license);
             params->severity = RESULT_INFO;
-            params->remedy = NULL;
+            params->remedy = 0;
             params->verb = VERB_OK;
             params->noun = NULL;
             params->file = NULL;
@@ -713,7 +713,7 @@ static int check_peer_license(struct rpminspect *ri, struct result_params *param
         if (has_bad_word(license, ri->badwords)) {
             xasprintf(&params->msg, _("License Tag contains unprofessional language in %s: %s"), nevra, license);
             params->severity = RESULT_BAD;
-            params->remedy = get_remedy(REMEDY_LICENSE);
+            params->remedy = REMEDY_LICENSE;
             params->verb = VERB_FAILED;
             params->noun = _("unprofessional language in License tag in ${FILE}");
             add_result(ri, params);
@@ -765,7 +765,7 @@ bool inspect_license(struct rpminspect *ri)
     if (ri->licensedb == NULL || TAILQ_EMPTY(ri->licensedb)) {
         xasprintf(&params.msg, _("Missing license database(s)."));
         params.severity = RESULT_BAD;
-        params.remedy = get_remedy(REMEDY_LICENSEDB);
+        params.remedy = REMEDY_LICENSEDB;
         params.verb = VERB_FAILED;
         params.noun = _("missing license database");
         params.file = NULL;
