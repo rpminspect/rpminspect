@@ -19,7 +19,7 @@ void init_result_params(struct result_params *params)
     params->header = NULL;
     params->msg = NULL;
     params->details = NULL;
-    params->remedy = NULL;
+    params->remedy = 0;
     params->verb = VERB_NIL;
     params->noun = NULL;
     params->arch = NULL;
@@ -84,7 +84,7 @@ void debug_print_result(const results_entry_t *result)
     DEBUG_PRINT("      header=|%s|\n", result->header ? result->header : "(null)");
     DEBUG_PRINT("         msg=|%s|\n", result->msg ? result->msg : "(null)");
     DEBUG_PRINT("     details=|%s|\n", result->details ? result->details : "(null)");
-    DEBUG_PRINT("      remedy=|%s|\n", result->remedy ? result->remedy : "(null)");
+    DEBUG_PRINT("      remedy=|%s|\n", result->remedy ? get_remedy(result->remedy) : "");
     DEBUG_PRINT("        verb=|%s|\n", strverb(result->verb));
     DEBUG_PRINT("        noun=|%s|\n", result->noun ? result->noun : "(noun)");
     DEBUG_PRINT("        arch=|%s|\n", result->arch ? result->arch : "(arch)");
@@ -130,10 +130,7 @@ void add_result_entry(results_t **results, struct result_params *params)
         entry->details = strdup(params->details);
     }
 
-    if (params->remedy != NULL) {
-        entry->remedy = strdup(params->remedy);
-    }
-
+    entry->remedy = params->remedy;
     entry->verb = params->verb;
 
     if (params->noun != NULL) {

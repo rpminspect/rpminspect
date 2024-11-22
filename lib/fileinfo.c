@@ -172,7 +172,7 @@ bool match_fileinfo_owner(struct rpminspect *ri, const rpmfile_entry_t *file, co
 
         if (params.severity != RESULT_NULL && params.severity != RESULT_SKIP) {
             params.waiverauth = WAIVABLE_BY_SECURITY;
-            params.remedy = get_remedy(REMEDY_FILEINFO_RULE);
+            params.remedy = REMEDY_FILEINFO_RULE;
             xasprintf(&params.msg, _("%s in %s on %s carries insecure mode %04o but has no fileinfo rule for owner specification, Security Team review may be required"), file->localpath, pkg, params.arch, perms);
             add_result(ri, &params);
             free(params.msg);
@@ -258,7 +258,7 @@ bool match_fileinfo_group(struct rpminspect *ri, const rpmfile_entry_t *file, co
 
         if (params.severity != RESULT_NULL && params.severity != RESULT_SKIP) {
             params.waiverauth = WAIVABLE_BY_SECURITY;
-            params.remedy = get_remedy(REMEDY_FILEINFO_RULE);
+            params.remedy = REMEDY_FILEINFO_RULE;
             xasprintf(&params.msg, _("%s in %s on %s carries insecure mode %04o but has no fileinfo rule for owner specification, Security Team review may be required"), file->localpath, pkg, params.arch, perms);
             add_result(ri, &params);
             free(params.msg);

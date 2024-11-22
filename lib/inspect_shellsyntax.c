@@ -201,7 +201,7 @@ static bool shellsyntax_driver(struct rpminspect *ri, rpmfile_entry_t *file)
         if (params.msg) {
             params.severity = RESULT_INFO;
             params.waiverauth = NOT_WAIVABLE;
-            params.remedy = get_remedy(REMEDY_SHELLSYNTAX_GAINED_SHELL);
+            params.remedy = REMEDY_SHELLSYNTAX_GAINED_SHELL;
             params.verb = VERB_OK;
             params.noun = _("changed shell script ${FILE} on ${ARCH}");
             add_result(ri, &params);
@@ -246,7 +246,7 @@ static bool shellsyntax_driver(struct rpminspect *ri, rpmfile_entry_t *file)
             xasprintf(&params.msg, _("%s is no longer a valid %s script on %s"), file->localpath, shell, arch);
             params.severity = RESULT_BAD;
             params.waiverauth = WAIVABLE_BY_ANYONE;
-            params.remedy = get_remedy(REMEDY_SHELLSYNTAX_BAD);
+            params.remedy = REMEDY_SHELLSYNTAX_BAD;
             params.details = errors;
             params.verb = VERB_FAILED;
             params.noun = _("invalid shell script ${FILE} on ${ARCH}");
@@ -263,7 +263,7 @@ static bool shellsyntax_driver(struct rpminspect *ri, rpmfile_entry_t *file)
             params.severity = RESULT_INFO;
             params.waiverauth = NOT_WAIVABLE;
             params.details = before_errors;
-            params.remedy = NULL;
+            params.remedy = 0;
             params.verb = VERB_OK;
             params.noun = _("valid shell script ${FILE} on ${ARCH}");
             add_result(ri, &params);
@@ -272,7 +272,7 @@ static bool shellsyntax_driver(struct rpminspect *ri, rpmfile_entry_t *file)
             xasprintf(&params.msg, _("%s is not a valid %s script on %s"), file->localpath, shell, arch);
             params.severity = RESULT_BAD;
             params.waiverauth = WAIVABLE_BY_ANYONE;
-            params.remedy = get_remedy(REMEDY_SHELLSYNTAX_BAD);
+            params.remedy = REMEDY_SHELLSYNTAX_BAD;
             params.details = errors;
             params.verb = VERB_FAILED;
             params.noun = _("invalid shell script ${FILE} on ${ARCH}");
@@ -286,7 +286,7 @@ static bool shellsyntax_driver(struct rpminspect *ri, rpmfile_entry_t *file)
             params.severity = RESULT_INFO;
             params.waiverauth = NOT_WAIVABLE;
             params.details = NULL;
-            params.remedy = NULL;
+            params.remedy = 0;
             params.verb = VERB_OK;
             params.noun = _("valid shell script ${FILE} on ${ARCH}");
             add_result(ri, &params);
@@ -296,7 +296,7 @@ static bool shellsyntax_driver(struct rpminspect *ri, rpmfile_entry_t *file)
             params.severity = RESULT_BAD;
             params.waiverauth = WAIVABLE_BY_ANYONE;
             params.details = errors;
-            params.remedy = get_remedy(REMEDY_SHELLSYNTAX_BAD);
+            params.remedy = REMEDY_SHELLSYNTAX_BAD;
             params.noun = _("invalid shell script ${FILE} on ${ARCH}");
             add_result(ri, &params);
             free(params.msg);

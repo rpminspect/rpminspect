@@ -99,13 +99,13 @@ void output_text(const results_t *results, const char *dest, __attribute__((unus
                 fprintf(fp, _("Details:\n%s\n\n"), result->details);
             }
 
-            if (result->remedy != NULL) {
-                xasprintf(&msg, _("Suggested Remedy:\n%s"), result->remedy);
+            if (result->remedy != REMEDY_NULL) {
+                xasprintf(&msg, _("Suggested Remedy:\n%s"), get_remedy(result->remedy));
 
                 if (width) {
                     printwrap(msg, width, 0, fp);
                 } else {
-                   fprintf(fp, "%s", msg);
+                    fprintf(fp, "%s", msg);
                 }
 
                 free(msg);

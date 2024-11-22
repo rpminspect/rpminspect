@@ -74,8 +74,8 @@ void output_json(const results_t *results, const char *dest, __attribute__((unus
             json_object_object_add(jr, "details", json_object_new_string(result->details));
         }
 
-        if (result->remedy != NULL) {
-            json_object_object_add(jr, "remedy", json_object_new_string(result->remedy));
+        if (result->remedy != REMEDY_NULL) {
+            json_object_object_add(jr, "remedy", json_object_new_string(get_remedy(result->remedy)));
         }
 
         /* add this result data to the inspection array */

@@ -254,7 +254,7 @@ static bool abidiff_driver(struct rpminspect *ri, rpmfile_entry_t *file)
     params.header = NAME_ABIDIFF;
     params.severity = RESULT_INFO;
     params.waiverauth = NOT_WAIVABLE;
-    params.remedy = get_remedy(REMEDY_ABIDIFF);
+    params.remedy = REMEDY_ABIDIFF;
     params.arch = arch;
     params.file = file->localpath;
 
