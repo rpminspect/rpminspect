@@ -33,6 +33,7 @@ typedef struct {
 
 /* Context structure for lic_cb() in lib/inspect_license.c. */
 typedef struct {
+    struct rpminspect *ri;
     parser_plugin *p;
     parser_context *db;
     const char *lic;

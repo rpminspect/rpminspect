@@ -193,6 +193,8 @@ string_list_t *strsplit(const char *, const char *);
 const char *strtype(const mode_t mode);
 char *strshorten(const char *s, size_t width);
 char *strtrim(char *s);
+bool isupperstr(const char *s);
+bool islowerstr(const char *s);
 
 /**
  * @brief Return descriptive string for the given exit code.

@@ -540,3 +540,115 @@ class ValidCompoundSPDXLicenseExpressionDualKoji(TestKoji):
         self.inspection = "license"
         self.result = "INFO"
         self.waiver_auth = "Not Waivable"
+
+
+# Valid license using 'WITH'
+class ValidLicenseTagWITHKeywordSRPM(TestSRPM):
+    def setUp(self):
+        super().setUp()
+        self.rpm.addLicense("GPL-3.0-or-later WITH Exceptions")
+        self.inspection = "license"
+        self.result = "INFO"
+        self.waiver_auth = "Not Waivable"
+
+
+class ValidLicenseTagWITHKeywordRPMs(TestRPMs):
+    def setUp(self):
+        super().setUp()
+        self.rpm.addLicense("GPL-3.0-or-later WITH Exceptions")
+        self.inspection = "license"
+        self.result = "INFO"
+        self.waiver_auth = "Not Waivable"
+
+
+class ValidLicenseTagWITHKeywordKoji(TestKoji):
+    def setUp(self):
+        super().setUp()
+        self.rpm.addLicense("GPL-3.0-or-later WITH Exceptions")
+        self.inspection = "license"
+        self.result = "INFO"
+        self.waiver_auth = "Not Waivable"
+
+
+# Valid license using 'with'
+class ValidLicenseTagwithKeywordSRPM(TestSRPM):
+    def setUp(self):
+        super().setUp()
+        self.rpm.addLicense("GPL-3.0-or-later with Exceptions")
+        self.inspection = "license"
+        self.result = "INFO"
+        self.waiver_auth = "Not Waivable"
+
+
+class ValidLicenseTagwithKeywordRPMs(TestRPMs):
+    def setUp(self):
+        super().setUp()
+        self.rpm.addLicense("GPL-3.0-or-later with Exceptions")
+        self.inspection = "license"
+        self.result = "INFO"
+        self.waiver_auth = "Not Waivable"
+
+
+class ValidLicenseTagwithKeywordKoji(TestKoji):
+    def setUp(self):
+        super().setUp()
+        self.rpm.addLicense("GPL-3.0-or-later with Exceptions")
+        self.inspection = "license"
+        self.result = "INFO"
+        self.waiver_auth = "Not Waivable"
+
+
+# Valid license using 'WITH' and combined with another license
+class ValidMultiLicenseTagWITHKeywordSRPM(TestSRPM):
+    def setUp(self):
+        super().setUp()
+        self.rpm.addLicense("MIT AND GPL-3.0-or-later WITH Exceptions")
+        self.inspection = "license"
+        self.result = "INFO"
+        self.waiver_auth = "Not Waivable"
+
+
+class ValidMultiLicenseTagWITHKeywordRPMs(TestRPMs):
+    def setUp(self):
+        super().setUp()
+        self.rpm.addLicense("MIT AND GPL-2.0-or-later WITH Exceptions")
+        self.inspection = "license"
+        self.result = "INFO"
+        self.waiver_auth = "Not Waivable"
+
+
+class ValidMultiLicenseTagWITHKeywordKoji(TestKoji):
+    def setUp(self):
+        super().setUp()
+        self.rpm.addLicense("MIT AND GPL-2.0-or-later WITH Exceptions")
+        self.inspection = "license"
+        self.result = "INFO"
+        self.waiver_auth = "Not Waivable"
+
+
+# Invalid SPDX capitalization for and, or, with
+class InvalidSPDXCapitalizationSRPM(TestSRPM):
+    def setUp(self):
+        super().setUp()
+        self.rpm.addLicense("MIT aNd GPL-2.0-or-later With Exceptions")
+        self.inspection = "license"
+        self.result = "BAD"
+        self.waiver_auth = "Not Waivable"
+
+
+class InvalidSPDXCapitalizationRPMs(TestRPMs):
+    def setUp(self):
+        super().setUp()
+        self.rpm.addLicense("MIT aNd GPL-2.0-or-later With Exceptions")
+        self.inspection = "license"
+        self.result = "BAD"
+        self.waiver_auth = "Not Waivable"
+
+
+class InvalidSPDXCapitalizationKoji(TestKoji):
+    def setUp(self):
+        super().setUp()
+        self.rpm.addLicense("MIT aNd GPL-2.0-or-later With Exceptions")
+        self.inspection = "license"
+        self.result = "BAD"
+        self.waiver_auth = "Not Waivable"

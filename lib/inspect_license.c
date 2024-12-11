@@ -161,6 +161,138 @@ static bool get_db_strings(const char *license_name, void *cb_data, char **spdx_
     return true;
 }
 
+/* lambda: check the case and matching of SPDX special words */
+static bool check_spdx_special_words(struct rpminspect *ri, const char *pkg_word, const char *db_word)
+{
+    struct result_params params;
+
+    assert(ri != NULL);
+    assert(pkg_word != NULL);
+    assert(db_word != NULL);
+
+    /* perform a loose match first */
+    if (strcasecmp(pkg_word, db_word)) {
+        return false;
+    }
+
+    /*
+     * The db_license string is going to be fine, so we are validating
+     * the pkg_license.  First, check and see if we have an SPDX
+     * special expression word.
+     */
+    if (!strcasecmp(pkg_word, "AND") || !strcasecmp(pkg_word, "OR") || !strcasecmp(pkg_word, "WITH")) {
+        if (isupperstr(pkg_word) || islowerstr(pkg_word)) {
+            return true;
+        } else {
+            /*
+             * Did we catch a forbidden capitalization of the words "and",
+             * "or", or "with"?  Call the police!
+             */
+            init_result_params(&params);
+            xasprintf(&params.msg, _("An invalid SPDX keyword was found.  The keyword '%s' must always be written in all lowercase or all uppercase (not mixed case)."), pkg_word);
+            params.header = NAME_LICENSE;
+            params.severity = RESULT_BAD;
+            params.remedy = REMEDY_INVALID_BOOLEAN;
+            params.verb = VERB_FAILED;
+            params.noun = _("invalid SPDX expression keyword");
+            add_result(ri, &params);
+            free(params.msg);
+
+            return false;
+        }
+    }
+
+    return false;
+}
+
+/* lambda: see if two candidate SPDX expression strings match SPDX rules */
+static bool spdx_expression_match(struct rpminspect *ri, const char *pkg_license, const char *db_license)
+{
+    bool match = false;
+    string_list_t *pkgtokens = NULL;
+    string_list_t *dbtokens = NULL;
+    string_entry_t *pkg = NULL;
+    string_entry_t *db = NULL;
+
+    assert(ri != NULL);
+
+    if ((pkg_license == NULL && db_license) || (pkg_license && db_license == NULL)) {
+        return false;
+    }
+
+    /* perform a loose match first */
+    if (strcasecmp(pkg_license, db_license)) {
+        return false;
+    }
+
+    /* we might have a match - split expression */
+    pkgtokens = strsplit(pkg_license, " ");
+    dbtokens = strsplit(db_license, " ");
+
+    /* if the token count doesn't match, skip it */
+    if (list_len(pkgtokens) != list_len(dbtokens)) {
+        list_free(pkgtokens, free);
+        list_free(dbtokens, free);
+        return false;
+    }
+
+    /* assume a match first */
+    match = true;
+
+    /* check each token */
+    pkg = TAILQ_FIRST(pkgtokens);
+    db = TAILQ_FIRST(dbtokens);
+
+    while (pkg && db) {
+        /* check special words first */
+        if (!strcasecmp(pkg->data, "AND") || !strcasecmp(pkg->data, "OR") || !strcasecmp(pkg->data, "WITH")) {
+            if (check_spdx_special_words(ri, pkg->data, db->data)) {
+                /* force a continue here since in SPDX-speak, "with == WITH" */
+                pkg = TAILQ_NEXT(pkg, items);
+                db = TAILQ_NEXT(db, items);
+                continue;
+            } else {
+                match = false;
+                break;
+            }
+        }
+
+        /* license identifiers can be case-insensitive */
+        if (strcasecmp(pkg->data, db->data)) {
+            match = false;
+            break;
+        }
+
+        pkg = TAILQ_NEXT(pkg, items);
+        db = TAILQ_NEXT(db, items);
+    }
+
+    list_free(pkgtokens, free);
+    list_free(dbtokens, free);
+    return match;
+}
+
+/* lamdba: given a list, see if an entry is a matching SPDX expression per SPDX case sensitivity rules */
+static bool list_contains_spdx_expression(string_list_t *list, const char *expression)
+{
+    bool match = false;
+    string_entry_t *entry = NULL;
+
+    if (expression == NULL || list == NULL || TAILQ_EMPTY(list)) {
+        return false;
+    }
+
+    /* for each expression in list, try to match it to the SPDX tokens */
+    TAILQ_FOREACH(entry, list, items) {
+        if (!strcmp(entry->data, expression)) {
+            match = true;
+            break;
+        }
+    }
+
+    return match;
+}
+
 /* lambda; finds dual legacy and SPDX license expressions */
 static bool dual_cb(const char *license_name, void *cb_data)
 {
@@ -179,7 +311,7 @@ static bool dual_cb(const char *license_name, void *cb_data)
     }
 
     /* collect any dual licenses */
-    if (approved && spdx_abbrev && list_case_contains(fedora_abbrev, spdx_abbrev)) {
+    if (approved && spdx_abbrev && (list_contains_spdx_expression(fedora_abbrev, spdx_abbrev) || list_contains_spdx_expression(fedora_name, spdx_abbrev))) {
         dual = list_add(dual, spdx_abbrev);
     }
 
@@ -204,17 +336,12 @@ static bool lic_cb(const char *license_name, void *cb_data)
     char *spdx_abbrev = NULL;
     bool approved = false;
 
-    if (data->valid) {
-        /* Already decided; no need to check further. */
-        return false;
-    }
-
     if (!get_db_strings(license_name, cb_data, &spdx_abbrev, &fedora_abbrev, &fedora_name, &approved)) {
         return false;
     }
 
     /* No full tag match and no abbreviations; license entry invalid. */
-    if (spdx_abbrev == NULL && fedora_abbrev == NULL && fedora_name == NULL) {
+    if (spdx_abbrev == NULL && (fedora_abbrev == NULL || TAILQ_EMPTY(fedora_abbrev)) && (fedora_name == NULL || TAILQ_EMPTY(fedora_name))) {
         goto done;
     }
 
@@ -225,21 +352,26 @@ static bool lic_cb(const char *license_name, void *cb_data)
      * NOTE: we only match the first hit in the license database
      */
     if (approved) {
-        if (spdx_abbrev && !strcasecmp(data->lic, spdx_abbrev)) {
+        if (spdx_expression_match(data->ri, data->lic, spdx_abbrev)) {
             data->valid = true;
+            nspdx++;
 
-            if (list_case_contains(dual, data->lic)) {
+            if (list_case_contains(dual, spdx_abbrev)) {
                 /* license token is valid under the legacy system and SPDX */
                 ndual++;
-            } else {
-                /* SPDX identifier matched */
-                nspdx++;
             }
-        } else if ((list_contains(fedora_abbrev, data->lic) && !list_contains(dual, data->lic))
-                   || (list_len(fedora_abbrev) == 0 && spdx_abbrev == NULL && list_contains(fedora_name, data->lic))) {
+        } else if ((fedora_abbrev && list_len(fedora_abbrev) > 0 && list_contains(fedora_abbrev, data->lic))
+                   || ((fedora_abbrev == NULL || list_len(fedora_abbrev) == 0)
+                       && (fedora_name && list_len(fedora_name) > 0)
+                       && list_contains(fedora_name, data->lic))) {
             /* Old Fedora abbreviation matches -or- there are no Fedora abbreviations but a Fedora name matches */
             data->valid = true;
             nlegacy++;
+
+            if (list_contains(dual, data->lic)) {
+                /* license token is valid under the legacy system and SPDX */
+                ndual++;
+            }
         }
     }
 
@@ -259,9 +391,9 @@ done:
  * Gathers all approved licenses with the same abbreviation for the
  * SPDX expression and the legacy name.
  */
-static void gather_dual_licenses(parser_plugin *p, parser_context *db)
+static void gather_dual_licenses(struct rpminspect *ri, parser_plugin *p, parser_context *db)
 {
-    lic_cb_data data = { p, db, NULL, false };
+    lic_cb_data data = { ri, p, db, NULL, false };
 
     if (p->keymap(db, NULL, NULL, dual_cb, &data)) {
         warnx(_("*** problem gathering dual SPDX/legacy license identifiers"));
@@ -275,9 +407,9 @@ static void gather_dual_licenses(parser_plugin *p, parser_context *db)
  * Called by is_valid_license() to check each short license token.  It
  * will also try to do a whole match on the license tag string.
  */
-static bool check_license_abbrev(parser_plugin *p, parser_context *db, const char *lic)
+static bool check_license_abbrev(struct rpminspect *ri, parser_plugin *p, parser_context *db, const char *lic)
 {
-    lic_cb_data data = { p, db, lic, false };
+    lic_cb_data data = { ri, p, db, lic, false };
 
     if (p->keymap(db, NULL, NULL, lic_cb, &data)) {
         warnx(_("*** problem checking license database"));
@@ -324,7 +456,7 @@ static string_map_t *tokenize_license_tag(const char *license)
             continue;
         }
 
-        if (!strcmp(token, "and") || !strcmp(token, "AND") || !strcmp(token, "or") || !strcasecmp(token, "OR")) {
+        if (!strcasecmp(token, "AND") || !strcasecmp(token, "OR")) {
             booleans = list_add(booleans, token);
 
             if (lic == NULL) {
@@ -516,7 +648,7 @@ static bool is_valid_license(struct rpminspect *ri, struct result_params *params
         }
 
         /* first, try to match the entire string */
-        if (check_license_abbrev(p, db, wlicense)) {
+        if (check_license_abbrev(ri, p, db, wlicense)) {
             p->fini(db);
             free(wlicense);
             return true;
@@ -545,7 +677,7 @@ static bool is_valid_license(struct rpminspect *ri, struct result_params *params
 
         if (parenexps && !TAILQ_EMPTY(parenexps)) {
             TAILQ_FOREACH(pentry, parenexps, items) {
-                if (check_license_abbrev(p, db, pentry->data)) {
+                if (check_license_abbrev(ri, p, db, pentry->data)) {
                     xasprintf(&tmp, "(%s)", pentry->data);
                     assert(tmp != NULL);
                     nlicense = strreplace(wlicense, tmp, NULL);
@@ -570,9 +702,9 @@ static bool is_valid_license(struct rpminspect *ri, struct result_params *params
     tags = tokenize_license_tag(wlicense);
 
     if (tags) {
-        TAILQ_FOREACH(entry, ri->licensedb, items) {
+        TAILQ_FOREACH(pentry, ri->licensedb, items) {
             /* read in this license database */
-            p = read_licensedb(ri, entry->data, &db);
+            p = read_licensedb(ri, pentry->data, &db);
 
             if (p == NULL) {
                 continue;
@@ -584,7 +716,7 @@ static bool is_valid_license(struct rpminspect *ri, struct result_params *params
                     continue;
                 }
 
-                if (check_license_abbrev(p, db, tagtoken->key)) {
+                if (check_license_abbrev(ri, p, db, tagtoken->key)) {
                     /* set the value to non-NULL so we know it passed (DO NOT FREE) */
                     tagtoken->value = tagtoken->key;
                 }
@@ -629,13 +761,12 @@ static bool is_valid_license(struct rpminspect *ri, struct result_params *params
     /* for SPDX tags found, ensure booleans are all uppercase or all lowercase */
     if (nlegacy == 0 && ndual == 0 && nspdx > 0 && (booleans && !TAILQ_EMPTY(booleans))) {
         TAILQ_FOREACH(entry, booleans, items) {
-            if ((!strcmp(entry->data, "and") && strcmp(entry->data, "AND"))
-                || (!strcmp(entry->data, "or") && strcmp(entry->data, "OR"))) {
+            if (strcmp(entry->data, "and") || strcmp(entry->data, "AND") || strcmp(entry->data, "or") || strcmp(entry->data, "OR") || strcmp(entry->data, "with") || strcmp(entry->data, "WITH")) {
                 r = false;
 
                 params->severity = RESULT_BAD;
                 params->remedy = REMEDY_INVALID_BOOLEAN;
-                xasprintf(&params->msg, _("SPDX license expressions in use in %s, but an invalid boolean was found: %s; when using SPDX expression the booleans must be in all caps."), nevra, entry->data);
+                xasprintf(&params->msg, _("SPDX license expressions in use in %s, but an invalid boolean was found: %s; when using SPDX expression the booleans must be in all lowercase or all uppercase (not mixed case)."), nevra, entry->data);
                 xasprintf(&params->details, _("License: %s"), license);
                 add_result(ri, params);
                 result = get_result(result, params->severity);
@@ -798,7 +929,7 @@ bool inspect_license(struct rpminspect *ri)
             continue;
         }
 
-        gather_dual_licenses(p, db);
+        gather_dual_licenses(ri, p, db);
 
         /* close this db */
         p->fini(db);

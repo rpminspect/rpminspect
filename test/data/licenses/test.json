@@ -3,31 +3,31 @@
     "approved": "yes",
     "fedora_abbrev": "GPLv2",
     "fedora_name": "GNU General Public License v2.0 only",
-    "spdx_abbrev": "GPL-2.0",
+    "spdx_abbrev": "GPL-2.0-only",
   },
   "1": {
     "approved": "yes",
     "fedora_abbrev": "GPLv2+",
     "fedora_name": "GNU General Public License v2.0 or later",
-    "spdx_abbrev": "GPL-2.0+",
+    "spdx_abbrev": "GPL-2.0-or-later",
   },
   "2": {
     "approved": "yes",
     "fedora_abbrev": "GPLv2+ with exceptions",
     "fedora_name": "GNU General Public License v2.0 or later, with font embedding exception",
-    "spdx_abbrev": "",
+    "spdx_abbrev": "GPL-2.0-or-later WITH Exceptions",
   },
   "3": {
     "approved": "yes",
     "fedora_abbrev": "GPLv3",
     "fedora_name": "GNU General Public License v3.0 only",
-    "spdx_abbrev": "GPL-3.0",
+    "spdx_abbrev": "GPL-3.0-only",
   },
   "4": {
     "approved": "yes",
     "fedora_abbrev": "GPLv3+",
     "fedora_name": "GNU General Public License v3.0 or later",
-    "spdx_abbrev": "GPL-3.0+",
+    "spdx_abbrev": "GPL-3.0-or-later",
   },
   "5": {
     "approved": "yes",
@@ -40,12 +40,6 @@
     "fedora_abbrev": "ASL 2.0",
     "fedora_name": "Apache Software License 2.0",
     "spdx_abbrev": "Apache-2.0",
-  },
-  "7": {
-    "approved": "no",
-    "fedora_abbrev": "",
-    "fedora_name": "Apple Public Source License 1.2",
-    "spdx_abbrev": "APSL-1.2",
   },
   "8": {
     "approved": "yes",
@@ -196,5 +190,14 @@
     "fedora_abbrev": "Python",
     "fedora_name": "Python License",
     "spdx_abbrev": "Python-2.0.1"
-  }
+  },
+  "27": {
+    "license": {
+      "expression": "GPL-3.0-or-later WITH Exceptions",
+      "status": [
+        "allowed"
+      ],
+    },
+    "fedora": {}
+  },
 }
