@@ -697,3 +697,37 @@ char *strtrim(char *s)
 
     return r;
 }
+
+/*
+ * Returns true if the given string is all uppercase, false otherwise.
+ * Non-alpha characters are ignored.
+ */
+bool isupperstr(const char *s)
+{
+    while (*s != '\0') {
+        if (isalpha(*s) && (isupper(*s) == 0)) {
+            return false;
+        }
+
+        s++;
+    }
+
+    return true;
+}
+
+/*
+ * Returns true if the given string is all lowercase, false otherwise.
+ * Non-alpha characters are ignored.
+ */
+bool islowerstr(const char *s)
+{
+    while (*s != '\0') {
+        if (isalpha(*s) && (islower(*s) == 0)) {
+            return false;
+        }
+
+        s++;
+    }
+
+    return true;
+}
