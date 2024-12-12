@@ -20,7 +20,7 @@ security_entry_t *get_secrule_by_path(struct rpminspect *ri, const rpmfile_entry
     const char *version = NULL;
     const char *release = NULL;
     security_entry_t *sentry = NULL;
-    int flags = FNM_NOESCAPE | FNM_PATHNAME;
+    int flags = FNM_NOESCAPE;
     int w = 0;
     int x = 0;
     int y = 0;

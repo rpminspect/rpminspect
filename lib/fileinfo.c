@@ -279,7 +279,7 @@ bool match_fileinfo_group(struct rpminspect *ri, const rpmfile_entry_t *file, co
 caps_filelist_entry_t *get_caps_entry(struct rpminspect *ri, const char *pkg, const char *filepath)
 {
     bool found = false;
-    int flags = FNM_NOESCAPE | FNM_PATHNAME;
+    int flags = FNM_NOESCAPE;
     caps_entry_t *entry = NULL;
     caps_filelist_entry_t *flentry = NULL;
 

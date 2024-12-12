@@ -199,7 +199,7 @@ bool match_path(const char *pattern, const char *root, const char *path)
 {
     bool match = false;
     int r = 0;
-    int flags = FNM_NOESCAPE | FNM_PATHNAME;
+    int flags = FNM_NOESCAPE;
     int gflags = GLOB_NOSORT;
     char globpath[PATH_MAX + 1];
     char *globsub = NULL;
