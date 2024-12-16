@@ -62,7 +62,7 @@ jobs:
                           done
 
                           # Avoid package conflicts
-                          rpm -e --nodeps openssl-fips-provider
+                          rpm -e --nodeps openssl-fips-provider openssl-fips-provider-so
 
                           # Upgrade things
                           dnf upgrade -y
