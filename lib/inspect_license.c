@@ -761,12 +761,14 @@ static bool is_valid_license(struct rpminspect *ri, struct result_params *params
     /* for SPDX tags found, ensure booleans are all uppercase or all lowercase */
     if (nlegacy == 0 && ndual == 0 && nspdx > 0 && (booleans && !TAILQ_EMPTY(booleans))) {
         TAILQ_FOREACH(entry, booleans, items) {
-            if (strcmp(entry->data, "and") || strcmp(entry->data, "AND") || strcmp(entry->data, "or") || strcmp(entry->data, "OR") || strcmp(entry->data, "with") || strcmp(entry->data, "WITH")) {
+            if ((!strcasecmp(entry->data, "AND") && strcmp(entry->data, "and") && strcmp(entry->data, "AND"))
+                || (!strcasecmp(entry->data, "OR") && strcmp(entry->data, "or") && strcmp(entry->data, "OR"))
+                || (!strcasecmp(entry->data, "WITH") && strcmp(entry->data, "with") && strcmp(entry->data, "WITH"))) {
                 r = false;
 
                 params->severity = RESULT_BAD;
                 params->remedy = REMEDY_INVALID_BOOLEAN;
-                xasprintf(&params->msg, _("SPDX license expressions in use in %s, but an invalid boolean was found: %s; when using SPDX expression the booleans must be in all lowercase or all uppercase (not mixed case)."), nevra, entry->data);
+                xasprintf(&params->msg, _("SPDX license expressions in use in %s, but an invalid SPDX special keyword was found: %s; when using SPDX expression the special keywords must be in all lowercase or all uppercase (not mixed case)."), nevra, entry->data);
                 xasprintf(&params->details, _("License: %s"), license);
                 add_result(ri, params);
                 result = get_result(result, params->severity);
