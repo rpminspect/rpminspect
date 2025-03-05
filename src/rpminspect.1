@@ -270,25 +270,36 @@ to try and download that package.
 .PP
 Examples:
 .IP
-rpminspect \-T ALL \-k zlib-1.2.7-1.fc29 zlib-1.2.7-2.fc29
+CFG=/usr/share/rpminspect/vendor.yaml
 .IP
-rpminspect \-T license,elfsyms perl-5.28.0-47.fc6 perl-5.28.1-1.fc6
+rpminspect \-c $CFG \-T ALL \-k zlib-1.2.7-1.fc29 zlib-1.2.7-2.fc29
 .IP
-rpminspect \-T !manpage x3270-3.6ga5-6.fc31 x3270-3.6ga6-1.fc31
+rpminspect \-c $CFG \-T license,elfsyms perl-5.28.0-47.fc6 perl-5.28.1-1.fc6
 .IP
-rpminspect \-T ALL \-a ppc64le zsh-5.7.1-3.fc31 zsh-5.7.1-4.fc31
+rpminspect \-c $CFG \-T !manpage x3270-3.6ga5-6.fc31 x3270-3.6ga6-1.fc31
 .IP
-rpminspect \-E disttag \-a ppc64le zsh-5.7.1-3.fc31 zsh-5.7.1-4.fc31
+rpminspect \-c $CFG \-T ALL \-a ppc64le zsh-5.7.1-3.fc31 zsh-5.7.1-4.fc31
 .IP
-rpminspect \-T ALL https://dl.fedoraproject.org/pub/fedora/linux/releases/36/Everything/x86_64/os/Packages/l/less-590-3.fc36.x86_64.rpm
+rpminspect \-c $CFG \-E disttag \-a ppc64le zsh-5.7.1-3.fc31 zsh-5.7.1-4.fc31
 .IP
-rpminspect \-T ALL /home/developer/rpmbuild/RPMS/less-590-3.fc36.x86_64.rpm /home/developer/rpmbuild/RPMS/less-590-4.fc36.x86_64.rpm
+rpminspect \-c $CFG \-T ALL https://dl.fedoraproject.org/pub/fedora/linux/releases/36/Everything/x86_64/os/Packages/l/less-590-3.fc36.x86_64.rpm
 .IP
-rpminspect /home/developer/rpmbuild/SRPMS/less-590-4.fc36.src.rpm
+rpminspect \-c $CFG \-T ALL /home/developer/rpmbuild/RPMS/less-590-3.fc36.x86_64.rpm /home/developer/rpmbuild/RPMS/less-590-4.fc36.x86_64.rpm
+.IP
+rpminspect \-c $CFG /home/developer/rpmbuild/SRPMS/less-590-4.fc36.src.rpm
 .PP
 The end result of running rpminspect is a report on standard output explaining
 what was found.  Descriptions of actions developers can take are provided in
 the findings.
+.PP
+Note that the vendor data packages for rpminspect usually include a
+wrapper script of the form
+.BR rpminspect-VENDOR
+where VENDOR is typically fedora, centos, or redhat.  If a wrapper
+script like this exists in the vendor data package, you should use it
+to invoke rpminspect with that vendor's configuration file.  If you
+use the wrapper script, you do not need the \-c option to specify the
+configuration file.
 .SH CONSTRUCTING LOCAL BUILD INPUTS
 .PP
 The most common use of rpminspect in continuous integration
