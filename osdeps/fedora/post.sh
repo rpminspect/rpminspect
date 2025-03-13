@@ -18,4 +18,5 @@ esac
 sed -i -e '/^%%global\ __debug_package\ 1\\/d' /usr/lib/rpm/macros
 
 # Update the clamav database
+chmod 0755 /var/lib/clamav
 freshclam
