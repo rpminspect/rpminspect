@@ -24,6 +24,3 @@ fi
 # commit 1a9803d0f8daf15bb706dc17783ab19589906487 to rpm, but it
 # causes problems for the rpminspect test suite.  Undo the change.
 sed -i -e '/^%%global\ __debug_package\ 1\\/d' /usr/lib/rpm/macros
-
-# Update the clamav database
-freshclam

@@ -2,7 +2,6 @@ annobin-libannocheck
 bash
 clamav-data
 clamav-devel
-clamav-freshclam
 clamav-update
 CUnit
 CUnit-devel
