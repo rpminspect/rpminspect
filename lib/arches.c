@@ -6,6 +6,7 @@
 #include <stdlib.h>
 #include <stdbool.h>
 #include <assert.h>
+#include <fnmatch.h>
 
 #include "rpminspect.h"
 
@@ -56,6 +57,8 @@ void init_arches(struct rpminspect *ri)
  */
 bool allowed_arch(const struct rpminspect *ri, const char *rpmarch)
 {
+    string_entry_t *arch = NULL;
+
     assert(ri != NULL);
     assert(rpmarch != NULL);
 
@@ -63,5 +66,15 @@ bool allowed_arch(const struct rpminspect *ri, const char *rpmarch)
         return true;
     }
 
-    return list_contains(ri->arches, rpmarch);
+    if (list_contains(ri->arches, rpmarch)) {
+        return true;
+    }
+
+    TAILQ_FOREACH(arch, ri->arches, items) {
+        if (!fnmatch(arch->data, rpmarch, 0)) {
+            return true;
+        }
+    }
+
+    return false;
 }
