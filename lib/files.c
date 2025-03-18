@@ -349,10 +349,7 @@ rpmfile_t *extract_rpm(struct rpminspect *ri, const char *pkg, Header hdr, const
 
         /* Write the file to disk */
         if (archive_read_extract(archive, entry, archive_flags) != ARCHIVE_OK) {
-            warnx("*** archive_read_extract: %s", archive_error_string(archive));
-            free_files(file_list);
-            file_list = NULL;
-            goto cleanup;
+            err(ENODATA, "*** archive_read_extract: %s", archive_error_string(archive));
         }
     }
 
