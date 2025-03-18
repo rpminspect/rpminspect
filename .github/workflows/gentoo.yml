@@ -45,6 +45,11 @@ jobs:
               run: |
                   [ -d /etc/portage ] || mkdir -p /etc/portage
                   echo 'FEATURES="-ipc-sandbox -network-sandbox -pid-sandbox"' >> /etc/portage/make.conf
+
+                  # workaround for a bug (18-Mar-2025)
+                  # https://www.reddit.com/r/Gentoo/comments/1jakhhs/circular_dependency_between_curl_cmake_and/
+                  echo 'USE="-http2 -http3 -quic -curl_quic_openssl"' >> /etc/portage/make.conf
+
                   emerge-webrsync
                   emerge dev-vcs/git
 
