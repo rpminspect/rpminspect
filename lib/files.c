@@ -45,8 +45,8 @@
  * uses the path and rpmfile.
  */
 struct file_data {
-    char *path;                  /* key, the localpath of the file */
     int index;                   /* RPM header index of this file */
+    char *path;                  /* key, the localpath of the file */
     rpmfile_entry_t *rpmfile;    /* rpmfile_entry_t for this file */
     UT_hash_handle hh;           /* makes this structure hashable */
 };
@@ -284,7 +284,13 @@ rpmfile_t *extract_rpm(struct rpminspect *ri, const char *pkg, Header hdr, const
 
         file_entry->rpm_header = hdr;
         file_entry->idx = path_entry->index;
-        file_entry->localpath = strdup(archive_path);
+
+        if (headerIsSource(hdr) && strrchr(archive_path, '/') != NULL) {
+            file_entry->localpath = strdup(strrchr(archive_path, '/'));
+        } else {
+            file_entry->localpath = strdup(archive_path);
+        }
+
         assert(file_entry->localpath);
 
         file_entry->flags = get_rpmtag_fileflags(hdr, file_entry->idx);
@@ -432,10 +438,10 @@ static struct file_data *files_to_table(rpmfile_t *list)
     rpmfile_entry_t *iter = NULL;
 
     assert(list != NULL);
-    assert(!TAILQ_EMPTY(list));
 
-    iter = TAILQ_FIRST(list);
-    assert(iter);
+    if (TAILQ_EMPTY(list)) {
+        return NULL;
+    }
 
     TAILQ_FOREACH(iter, list, items) {
         fentry = xalloc(sizeof(*fentry));
@@ -829,8 +835,7 @@ static void find_one_peer(struct rpminspect *ri, rpmfile_entry_t *file, rpmfile_
                     file->peer_file->moved_subpackage = true;
                     return;
                 }
-            } else if ((S_ISREG(file->st_mode) && S_ISREG(after_file->st_mode))
-                       || (is_elf(file) && is_elf(after_file))) {
+            } else if ((S_ISREG(file->st_mode) && S_ISREG(after_file->st_mode)) || (is_elf(file) && is_elf(after_file))) {
                 /*
                  * Try to match libraries that have changed versions.
                  * The idea is to look for ELF files that carry a
@@ -881,7 +886,6 @@ static void find_one_peer(struct rpminspect *ri, rpmfile_entry_t *file, rpmfile_
  *
  * @param before Before build package's rpmfile_t list.
  * @param after After build package's rpmfile_t list.
- * @return 0 on success, -1 on failure.
  */
 void find_file_peers(struct rpminspect *ri, rpmfile_t *before, rpmfile_t *after)
 {

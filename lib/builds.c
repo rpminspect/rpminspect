@@ -487,7 +487,12 @@ static int download_build(struct rpminspect *ri, const struct koji_build *build)
 static int download_task(struct rpminspect *ri, struct koji_task *task)
 {
     unsigned long int avail = 0;
+    size_t total_width = 0;
     size_t len;
+    size_t mlen = 0;
+    int i = 0;
+    char *mend = NULL;
+    char *verbose_msg = NULL;
     char *pkg = NULL;
     char *src = NULL;
     char *dst = NULL;
@@ -549,6 +554,37 @@ static int download_task(struct rpminspect *ri, struct koji_task *task)
     /* set working subdirectory */
     set_worksubdir(workri, TASK_WORKDIR, NULL, task);
 
+    /* Download status output */
+    if (ri->verbose) {
+        /* the progress bar will need the terminal width */
+        total_width = tty_width();
+
+        /* generate our downloading message */
+        xasprintf(&verbose_msg, _("Downloading task %d"), task->id);
+        assert(verbose_msg != NULL);
+
+        /* truncate the message to one line if it is too long */
+        mlen = strlen(verbose_msg);
+
+        if (mlen > total_width) {
+            mend = verbose_msg + total_width - 3;
+
+            for (i = 0; i < 3; i++) {
+                if (*mend == '\0') {
+                    break;
+                }
+
+                *mend++ = '.';
+            }
+
+            *mend = '\0';
+        }
+
+        /* display the message */
+        printf("%s\n", verbose_msg);
+        free(verbose_msg);
+    }
+
     /* download the task */
     TAILQ_FOREACH(descendent, task->descendents, items) {
         /* skip if we have nothing */
@@ -594,10 +630,16 @@ static int download_task(struct rpminspect *ri, struct koji_task *task)
                 assert(dst != NULL);
 
                 xasprintf(&src, "%s/work/%s", workri->kojiursine, entry->data);
-                curl_get_file(workri->verbose, src, dst);
 
-                /* gather the RPM header */
-                get_rpm_info(dst);
+                /* skip if we already have this one */
+                if (access(dst, F_OK | R_OK) == 0) {
+                    task->total_size -= curl_get_size(src);
+                } else {
+                    curl_get_file(workri->verbose, src, dst);
+
+                    /* gather the RPM header */
+                    get_rpm_info(dst);
+                }
 
                 free(dst);
                 free(src);
@@ -884,8 +926,6 @@ static int _gather_build_types(struct rpminspect *ri)
                 } else {
                     gathered = true;
                 }
-
-                free_koji_task(task);
             } else {
                 r = download_task(ri, task);
 
@@ -896,10 +936,10 @@ static int _gather_build_types(struct rpminspect *ri)
                 } else {
                     gathered = true;
                 }
-
-                free_koji_task(task);
             }
         }
+
+        free_koji_task(task);
     }
 
     /* try for a Koji build */
