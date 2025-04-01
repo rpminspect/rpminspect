@@ -9,6 +9,7 @@ dash
 desktop-file-utils
 elfutils-devel
 file-devel
+gawk
 gcc
 gcc-c++
 gcc-plugin-devel
