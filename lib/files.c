@@ -355,7 +355,7 @@ rpmfile_t *extract_rpm(struct rpminspect *ri, const char *pkg, Header hdr, const
 
         /* Write the file to disk */
         if (archive_read_extract(archive, entry, archive_flags) != ARCHIVE_OK) {
-            err(ENODATA, "*** archive_read_extract: %s", archive_error_string(archive));
+            err(EIO, "*** archive_read_extract: %s", archive_error_string(archive));
         }
     }
 
