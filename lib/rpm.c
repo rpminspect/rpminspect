@@ -487,8 +487,12 @@ cleanup:
     free(buf);
     Fclose(gzdi);
     archive_entry_free(entry);
-    archive_write_close(archive);
-    archive_write_free(archive);
+
+    if (archive != NULL) {
+        archive_write_close(archive);
+        archive_write_free(archive);
+    }
+
     rpmfilesFree(files);
     rpmfiFree(fi);
     headerFree(hdr);
