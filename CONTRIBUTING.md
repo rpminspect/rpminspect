@@ -55,3 +55,8 @@ The force push is required to your copy since you are rewriting the
 project history to match upstream.  You need to do this on a clean
 repo, so stash anything you are working on and ensure your copy is
 clean.
+
+### AI Policy
+
+As a policy, the rpminspect project does not accept use of generative
+AI in contributions.
