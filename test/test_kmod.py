@@ -52,15 +52,23 @@ if not have_kernel_devel:
 
 
 # Support functions to build the kernel modules we need
-def build_module(rpminspect, build_ext=None, extra_cflags=None):
+def build_module(rpminspect, build_ext=None):
     build = os.path.dirname(rpminspect)
     srcdir = os.path.realpath(
         os.path.join(os.environ["RPMINSPECT_TEST_DATA_PATH"], "derp-kmod")
     )
 
     if build_ext is None:
+        srcdir = os.path.realpath(
+            os.path.join(os.environ["RPMINSPECT_TEST_DATA_PATH"], "derp-kmod")
+        )
         moddir = os.path.join(build, "derp-kmod")
     else:
+        srcdir = os.path.realpath(
+            os.path.join(
+                os.environ["RPMINSPECT_TEST_DATA_PATH"], "derp-kmod" + build_ext
+            )
+        )
         moddir = os.path.join(build, "derp-kmod" + build_ext)
 
     kmod = os.path.join(moddir, "derp.ko")
@@ -76,17 +84,7 @@ def build_module(rpminspect, build_ext=None, extra_cflags=None):
 
     cwd = os.getcwd()
     os.chdir(moddir)
-
-    if extra_cflags is None:
-        cmd = "make -s KERNEL_BUILD_DIR=" + kernel_build_dir
-    else:
-        cmd = (
-            "make -s KERNEL_BUILD_DIR="
-            + kernel_build_dir
-            + " EXTRA_CFLAGS="
-            + extra_cflags
-        )
-
+    cmd = "make -C " + kernel_build_dir + " M=$(pwd) V=1"
     os.system(cmd)
     os.chdir(cwd)
 
@@ -102,21 +100,15 @@ def get_derp_kmod(rpminspect):
 
 
 def get_derp_kmod_params(rpminspect):
-    return build_module(
-        rpminspect, build_ext="-params", extra_cflags="-D_USE_MODULE_PARAMETERS"
-    )
+    return build_module(rpminspect, build_ext="-params")
 
 
 def get_derp_kmod_depends(rpminspect):
-    return build_module(
-        rpminspect, build_ext="-depends", extra_cflags="-D_USE_MODULE_DEPENDS"
-    )
+    return build_module(rpminspect, build_ext="-depends")
 
 
 def get_derp_kmod_aliases(rpminspect):
-    return build_module(
-        rpminspect, build_ext="-aliases", extra_cflags="-D_USE_MODULE_ALIASES"
-    )
+    return build_module(rpminspect, build_ext="-aliases")
 
 
 ############################
