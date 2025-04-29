@@ -349,7 +349,7 @@ rpmfile_t *extract_rpm(struct rpminspect *ri, const char *pkg, Header hdr, const
         /* If this is a hard link, update the hardlink destination path */
         if (file_entry->st_nlink > 1 && archive_entry_hardlink(entry) != NULL) {
             xasprintf(&hardlinkpath, "%s/%s", *output_dir, archive_entry_hardlink(entry));
-            archive_entry_set_link(entry, hardlinkpath);
+            archive_entry_set_hardlink(entry, hardlinkpath);
             free(hardlinkpath);
         }
 
