@@ -68,6 +68,18 @@ rm -rf cdson
 # causes problems for the rpminspect test suite.  Undo the change.
 sed -i -e '/^%%global\ __debug_package\ 1\\/d' /usr/lib/rpm/macros
 
+# There is a problem with xmlrpc-c in Debian testing right now.  The
+# xmlrpc-c-config script generates a CFLAGS line that is wrong.  Seems
+# upstream knows about, so just work around it here.
+if [ -x /usr/bin/xmlrpc-c-config ]; then
+    L1="$(grep -n xmlrpc_xmlparse /usr/bin/xmlrpc-c-config 2>/dev/null | cut -d ':' -f 1)"
+    L2="$(grep -n xmlrpc_xmltok /usr/bin/xmlrpc-c-config 2>/dev/null | cut -d ':' -f 1)"
+
+    if [ "${L1}" = "${L2}" ]; then
+        sed -i -e "${L1}s/.*/    LIBXML=/" /usr/bin/xmlrpc-c-config
+    fi
+fi
+
 # Update clamav database
 service clamav-freshclam stop
 freshclam

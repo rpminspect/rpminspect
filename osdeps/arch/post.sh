@@ -43,6 +43,10 @@ rm -rf mandoc.tar.gz "${SUBDIR}"
 # The 'rc' shell is not available in Arch Linux, build manually
 git clone -q https://github.com/rakitzis/rc.git
 cd rc || exit 1
+TAG="$(git tag -l | sort -V | tail -n 1)"
+git checkout -b ${TAG} ${TAG}
+autoreconf --force --install
+./configure --prefix=/usr
 make
 make install
 cd "${CWD}" || exit 1
@@ -58,6 +62,8 @@ autoreconf -f -i -v
 ./configure --prefix=/usr/local
 make
 make install
+cd "${CWD}" || exit 1
+rm -rf libabigail
 
 # cdson is not [yet] in Arch
 cd "${CWD}" || exit 1
