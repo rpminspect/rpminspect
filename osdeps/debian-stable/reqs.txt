@@ -31,6 +31,7 @@ pkg-config
 python3-pip
 python3-rpm
 python3-setuptools
+python3-timeout-decorator
 rc
 rpm
 tcsh

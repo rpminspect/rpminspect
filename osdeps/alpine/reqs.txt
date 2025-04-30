@@ -15,6 +15,7 @@ elfutils
 elfutils-dev
 file
 freshclam
+g++
 gcc
 gcovr
 gettext
