@@ -46,7 +46,7 @@ cd rc || exit 1
 TAG="$(git tag -l | sort -V | tail -n 1)"
 git checkout -b ${TAG} ${TAG}
 autoreconf --force --install
-./configure --prefix=/usr
+CC=c99 CFLAGS=-D_XOPEN_SOURCE=500 ./configure --prefix=/usr
 make
 make install
 cd "${CWD}" || exit 1
