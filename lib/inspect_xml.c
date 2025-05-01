@@ -33,7 +33,7 @@ static void xml_silence_errors(void *ctx __attribute__((unused)), const char *ms
  * This function first tries with DTD validation.  Failing that it tries to just
  * check the XML.  The tests get less and less strict.
  */
-static bool is_xml_well_formed(const char *path, size_t prefixlen, char **errors)
+static bool is_xml_well_formed(const char *path, size_t prefixlen __attribute__((unused)), char **errors)
 {
     static bool initialized = false;
 #ifndef _HAVE_XMLSETGENERICERRORFUNC
@@ -42,7 +42,9 @@ static bool is_xml_well_formed(const char *path, size_t prefixlen, char **errors
     xmlParserCtxtPtr ctxt;
     xmlDocPtr doc;
     int opts = XML_PARSE_NOERROR | XML_PARSE_NOWARNING | XML_PARSE_RECOVER | XML_PARSE_NONET;
+#if LIBXML_VERSION < 21400
     char *line = NULL;
+#endif
     bool result = true;
 
     if (!initialized) {
@@ -77,6 +79,7 @@ static bool is_xml_well_formed(const char *path, size_t prefixlen, char **errors
     }
 
     /* capture validity output */
+#if LIBXML_VERSION < 21400
     if (!ctxt->valid && errors != NULL && ctxt->lastError.message) {
         ctxt->lastError.message[strcspn(ctxt->lastError.message, "\r\n")] = '\0';
         *errors = strdup(ctxt->lastError.message);
@@ -100,6 +103,7 @@ static bool is_xml_well_formed(const char *path, size_t prefixlen, char **errors
             *errors = strappend(*errors, "\n%s", ctxt->lastError.str3, NULL);
         }
     }
+#endif
 
     if (doc != NULL) {
         xmlFreeDoc(doc);
