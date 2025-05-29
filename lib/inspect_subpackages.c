@@ -15,6 +15,7 @@
 bool inspect_subpackages(struct rpminspect *ri)
 {
     bool result = true;
+    bool rebase = false;
     rpmpeer_entry_t *peer = NULL;
     string_list_t *before_pkgs = NULL;
     string_list_t *after_pkgs = NULL;
@@ -55,6 +56,9 @@ bool inspect_subpackages(struct rpminspect *ri)
     init_result_params(&params);
     params.header = NAME_SUBPACKAGES;
 
+    /* check if this is a rebase comparison */
+    rebase = is_rebase(ri);
+
     /* Report results */
     if (lost != NULL && !TAILQ_EMPTY(lost)) {
         TAILQ_FOREACH(entry, lost, items) {
@@ -64,21 +68,25 @@ bool inspect_subpackages(struct rpminspect *ri)
 
             if (allowed_arch(ri, arch)) {
                 xasprintf(&params.msg, _("Subpackage '%s' has disappeared on '%s'"), entry->data, arch);
-                params.severity = RESULT_VERIFY;
                 params.waiverauth = WAIVABLE_BY_ANYONE;
                 params.remedy = REMEDY_SUBPACKAGES_LOST;
                 params.arch = arch;
                 params.file = entry->data;
                 params.verb = VERB_REMOVED;
                 params.noun = _("subpackage ${FILE}");
+
+                if (rebase) {
+                    params.severity = RESULT_INFO;
+                } else {
+                    params.severity = RESULT_VERIFY;
+                    result = false;
+                }
+
                 add_result(ri, &params);
                 free(params.msg);
             }
         }
-
-        result = false;
     }
-
 
     if (gain != NULL && !TAILQ_EMPTY(gain)) {
         TAILQ_FOREACH(entry, gain, items) {
@@ -88,19 +96,24 @@ bool inspect_subpackages(struct rpminspect *ri)
 
             if (allowed_arch(ri, arch)) {
                 xasprintf(&params.msg, _("Subpackage '%s' has appeared on '%s'"), entry->data, arch);
-                params.severity = RESULT_INFO;
                 params.waiverauth = NOT_WAIVABLE;
                 params.remedy = REMEDY_SUBPACKAGES_GAIN;
                 params.arch = arch;
                 params.file = entry->data;
                 params.verb = VERB_ADDED;
                 params.noun = _("subpackage ${FILE}");
+
+                if (rebase) {
+                    params.severity = RESULT_INFO;
+                } else {
+                    params.severity = RESULT_VERIFY;
+                    result = false;
+                }
+
                 add_result(ri, &params);
                 free(params.msg);
             }
         }
-
-        result = false;
     }
 
     list_free(lost, free);

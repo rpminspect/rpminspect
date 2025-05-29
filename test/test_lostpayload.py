@@ -17,12 +17,12 @@ class NewPkgHasEmptyPayload(TestCompareKoji):
         self.waiver_auth = "Anyone"
 
 
-# Packages continue to be empty (INFO)
+# Packages continue to be empty (VERIFY)
 class PkgStillHasEmptyPayload(TestCompareKoji):
     def setUp(self):
         super().setUp()
         self.inspection = "lostpayload"
-        self.result = "INFO"
+        self.result = "VERIFY"
 
 
 # Package lost payload across Koji builds (VERIFY)

@@ -15,6 +15,7 @@
 #include "rpminspect.h"
 
 static bool reported = false;
+static bool rebase = false;
 
 /*
  * Performs all of the tests associated with the removedfiles inspection.
@@ -72,7 +73,7 @@ static bool removedfiles_driver(struct rpminspect *ri, rpmfile_entry_t *file)
     params.noun = _("library ${FILE} removed on ${ARCH}");
 
     /* Set the waiver type if this is a file of security concern */
-    if (ri->security_path_prefix) {
+    if (ri->security_path_prefix && !rebase) {
         TAILQ_FOREACH(entry, ri->security_path_prefix, items) {
             while (*entry->data != '/') {
                 entry->data++;
@@ -159,6 +160,9 @@ bool inspect_removedfiles(struct rpminspect *ri)
     struct result_params params;
 
     assert(ri != NULL);
+
+    /* Check if this is a rebase comparison or not */
+    rebase = is_rebase(ri);
 
     /*
      * This is like our after_files loop helper in inspect.c, but
