@@ -30,15 +30,15 @@ bool inspect_lostpayload(struct rpminspect *ri)
 {
     bool good = true;
     bool messaged = false;
+    bool rebase = false;
     rpmpeer_entry_t *peer = NULL;
-    const char *aa = NULL;
-    const char *ba = NULL;
-    const char *an = NULL;
-    const char *bn = NULL;
     struct result_params params;
 
     assert(ri != NULL);
     assert(ri->peers != NULL);
+
+    /* Check if this is a rebase comparison */
+    rebase = is_rebase(ri);
 
     init_result_params(&params);
     params.header = NAME_LOSTPAYLOAD;
@@ -56,53 +56,91 @@ bool inspect_lostpayload(struct rpminspect *ri)
          * is intentional, sometimes not.
          */
         if (peer->before_rpm != NULL && peer->after_rpm == NULL) {
-            bn = headerGetString(peer->before_hdr, RPMTAG_NAME);
-            ba = get_rpm_header_arch(peer->before_hdr);
+            params.file = headerGetString(peer->before_hdr, RPMTAG_NAME);
+            params.arch = get_rpm_header_arch(peer->before_hdr);
 
-            xasprintf(&params.msg, _("Existing subpackage %s is now missing on %s"), bn, ba);
-            params.severity = RESULT_VERIFY;
-            params.waiverauth = WAIVABLE_BY_ANYONE;
-            params.verb = VERB_FAILED;
+            xasprintf(&params.msg, _("Existing subpackage %s is now missing on %s"), params.file, params.arch);
             params.noun = _("missing subpackage ${FILE} on ${ARCH}");
-            params.file = bn;
-            params.arch = ba;
             params.remedy = REMEDY_LOSTPAYLOAD;
+
+            if (rebase) {
+                params.severity = RESULT_INFO;
+                params.waiverauth = NOT_WAIVABLE;
+                params.verb = VERB_OK;
+                good = true;
+            } else {
+                params.severity = RESULT_VERIFY;
+                params.waiverauth = WAIVABLE_BY_ANYONE;
+                params.verb = VERB_FAILED;
+                good = false;
+            }
+
             add_result(ri, &params);
             free(params.msg);
-            good = false;
             messaged = true;
             continue;
         }
 
         if (peer->after_files == NULL || TAILQ_EMPTY(peer->after_files)) {
-            an = headerGetString(peer->after_hdr, RPMTAG_NAME);
-            aa = get_rpm_header_arch(peer->after_hdr);
+            params.file = headerGetString(peer->after_hdr, RPMTAG_NAME);
+            params.arch = get_rpm_header_arch(peer->after_hdr);
 
             if (peer->before_files == NULL || TAILQ_EMPTY(peer->before_files)) {
-                xasprintf(&params.msg, _("Package %s on %s continues to be empty (no payloads)"), an, aa);
+                xasprintf(&params.msg, _("Package %s on %s continues to be empty (no payloads)"), params.file, params.arch);
+                params.noun = _("existing empty subpackage ${FILE} on ${ARCH}");
+                params.remedy = 0;
+            } else {
+                xasprintf(&params.msg, _("Package %s on %s became empty (no payloads)"), params.file, params.arch);
+                params.noun = _("subpackage ${FILE} on ${ARCH} now has empty payload");
+                params.remedy = REMEDY_LOSTPAYLOAD;
+           }
+
+            if (rebase) {
                 params.severity = RESULT_INFO;
                 params.waiverauth = NOT_WAIVABLE;
                 params.verb = VERB_OK;
-                params.noun = _("existing empty subpackage ${FILE} on ${ARCH}");
-                params.file = an;
-                params.arch = aa;
-                params.remedy = 0;
-                add_result(ri, &params);
-                free(params.msg);
+                good = true;
             } else {
-                xasprintf(&params.msg, _("Package %s on %s became empty (no payloads)"), an, aa);
                 params.severity = RESULT_VERIFY;
                 params.waiverauth = WAIVABLE_BY_ANYONE;
                 params.verb = VERB_FAILED;
-                params.noun = _("subpackage ${FILE} on ${ARCH} now has empty payload");
-                params.file = an;
-                params.arch = aa;
-                params.remedy = REMEDY_LOSTPAYLOAD;
-                add_result(ri, &params);
-                free(params.msg);
                 good = false;
             }
 
+            add_result(ri, &params);
+            free(params.msg);
+            messaged = true;
+            continue;
+        }
+
+        if (peer->after_files == NULL || TAILQ_EMPTY(peer->after_files)) {
+            params.file = headerGetString(peer->after_hdr, RPMTAG_NAME);
+            params.arch = get_rpm_header_arch(peer->after_hdr);
+
+            if (peer->before_files == NULL || TAILQ_EMPTY(peer->before_files)) {
+                xasprintf(&params.msg, _("Package %s on %s continues to be empty (no payloads)"), params.file, params.arch);
+                params.noun = _("existing empty subpackage ${FILE} on ${ARCH}");
+                params.remedy = 0;
+            } else {
+                xasprintf(&params.msg, _("Package %s on %s became empty (no payloads)"), params.file, params.arch);
+                params.noun = _("subpackage ${FILE} on ${ARCH} now has empty payload");
+                params.remedy = REMEDY_LOSTPAYLOAD;
+            }
+
+            if (rebase) {
+                params.severity = RESULT_INFO;
+                params.waiverauth = NOT_WAIVABLE;
+                params.verb = VERB_OK;
+                good = true;
+            } else {
+                params.severity = RESULT_VERIFY;
+                params.waiverauth = WAIVABLE_BY_ANYONE;
+                params.verb = VERB_FAILED;
+                good = false;
+            }
+
+            add_result(ri, &params);
+            free(params.msg);
             messaged = true;
         }
     }
