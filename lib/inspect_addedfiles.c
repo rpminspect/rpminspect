@@ -15,6 +15,7 @@
 #include "rpminspect.h"
 
 static bool reported = false;
+static bool rebase = false;
 
 /*
  * Check the given file to see if the path has any forbidden directory in it.
@@ -116,13 +117,20 @@ static bool addedfiles_driver(struct rpminspect *ri, rpmfile_entry_t *file)
 
     /* Set up the result parameters */
     init_result_params(&params);
-    params.severity = RESULT_BAD;
-    params.waiverauth = WAIVABLE_BY_ANYONE;
     params.header = NAME_ADDEDFILES;
     params.arch = arch;
     params.file = file->localpath;
-    params.verb = VERB_FAILED;
     params.remedy = REMEDY_ADDEDFILES;
+
+    if (rebase) {
+        params.severity = RESULT_INFO;
+        params.waiverauth = NOT_WAIVABLE;
+        params.verb = VERB_OK;
+    } else {
+        params.severity = RESULT_BAD;
+        params.waiverauth = WAIVABLE_BY_ANYONE;
+        params.verb = VERB_FAILED;
+    }
 
     if (!ignore) {
         /* Check for any forbidden path prefixes */
@@ -201,10 +209,15 @@ static bool addedfiles_driver(struct rpminspect *ri, rpmfile_entry_t *file)
             }
 
             if (strprefix(file->localpath, subpath)) {
-                params.severity = get_secrule_result_severity(ri, file, SECRULE_SECURITYPATH);
+                if (rebase) {
+                    params.severity = RESULT_INFO;
+                    params.waiverauth = NOT_WAIVABLE;
+                } else {
+                    params.severity = get_secrule_result_severity(ri, file, SECRULE_SECURITYPATH);
+                    params.waiverauth = WAIVABLE_BY_SECURITY;
+               }
 
                 if (params.severity != RESULT_NULL && params.severity != RESULT_SKIP) {
-                    params.waiverauth = WAIVABLE_BY_SECURITY;
                     xasprintf(&params.msg, _("New security-related file `%s` added on %s in %s requires inspection by the Security Team"), file->localpath, arch, name);
                     params.verb = VERB_ADDED;
                     params.noun = _("new security-related file ${FILE} on ${ARCH}");
@@ -241,9 +254,10 @@ done:
 
 bool inspect_addedfiles(struct rpminspect *ri)
 {
-    bool result;
+    bool result = false;
     struct result_params params;
 
+    rebase = is_rebase(ri);
     result = foreach_peer_file(ri, NAME_ADDEDFILES, addedfiles_driver);
 
     if (result && !reported) {
