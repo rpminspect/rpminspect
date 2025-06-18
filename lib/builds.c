@@ -168,10 +168,10 @@ static int copytree(const char *fpath, const struct stat *sb, int tflag, struct 
         return 0;
     }
 
-    /* Ignore unreadable things */
+    /* Fail on unreadable things */
     if (tflag == FTW_DNR || tflag == FTW_NS || tflag == FTW_SLN) {
         warnx(_("*** unable to read %s, skipping"), fpath);
-        return 0;
+        return -1;
     }
 
     /* Copy file or create a directory */
@@ -487,6 +487,7 @@ static int download_build(struct rpminspect *ri, const struct koji_build *build)
 static int download_task(struct rpminspect *ri, struct koji_task *task)
 {
     unsigned long int avail = 0;
+    long int sz = 0;
     size_t total_width = 0;
     size_t len;
     size_t mlen = 0;
@@ -515,7 +516,12 @@ static int download_task(struct rpminspect *ri, struct koji_task *task)
         if (allowed_arch(workri, "src")) {
             TAILQ_FOREACH(entry, descendent->srpms, items) {
                 xasprintf(&src, "%s/work/%s", workri->kojiursine, entry->data);
-                task->total_size += curl_get_size(src);
+                sz = curl_get_size(src);
+
+                if (sz > 0) {
+                    task->total_size += sz;
+                }
+
                 free(src);
             }
         }
@@ -528,7 +534,12 @@ static int download_task(struct rpminspect *ri, struct koji_task *task)
             }
 
             xasprintf(&src, "%s/work/%s", workri->kojiursine, entry->data);
-            task->total_size += curl_get_size(src);
+            sz = curl_get_size(src);
+
+            if (sz < 0) {
+                task->total_size += sz;
+            }
+
             free(src);
         }
     }
@@ -633,7 +644,11 @@ static int download_task(struct rpminspect *ri, struct koji_task *task)
 
                 /* skip if we already have this one */
                 if (access(dst, F_OK | R_OK) == 0) {
-                    task->total_size -= curl_get_size(src);
+                    sz = curl_get_size(src);
+
+                    if (sz < 0) {
+                        task->total_size -= sz;
+                    }
                 } else {
                     curl_get_file(workri->verbose, src, dst);
 
@@ -679,8 +694,8 @@ static int download_task(struct rpminspect *ri, struct koji_task *task)
  */
 static int download_rpm(struct rpminspect *ri, const char *rpm)
 {
-    unsigned long int avail = 0;
-    unsigned long int rpmsize = 0;
+    long int avail = 0;
+    long int rpmsize = 0;
     char *pkg = NULL;
     char *dstdir = NULL;
     char *dst = NULL;
@@ -690,7 +705,7 @@ static int download_rpm(struct rpminspect *ri, const char *rpm)
     /* Check to see that there's enough disk space available */
     rpmsize = curl_get_size(rpm);
 
-    if (rpmsize == 0) {
+    if (rpmsize <= 0) {
         return -1;
     }
 
@@ -855,6 +870,7 @@ static int gather_local_build(struct rpminspect *ri, const char *build)
     } else{
         ri->buildtype = KOJI_BUILD_RPM;
     }
+
     free(modulemd_path);
 
     /* copy after tree */
