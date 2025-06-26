@@ -32,4 +32,4 @@ following:
   hand.
 
 Please make sure the subdirectories here map to job names in the
-'ci.yml' file for the GitHub Actions.
+appropriate 'OS.yml' file for the GitHub Actions.
