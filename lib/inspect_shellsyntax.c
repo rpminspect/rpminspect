@@ -83,17 +83,12 @@ static char *get_shell(const struct rpminspect *ri, const char *fullpath)
 
         /* ignore blank lines and comments */
         if ((strlen(buf) == 0 || !strcmp(buf, "")) || (*buf == '#')) {
-            free(buf);
-            buf = NULL;
             continue;
         } else {
             fields = strsplit(buf, " \t");
 
             /* code found, but can't be an exec line */
             if (list_len(fields) < 2) {
-                free(buf);
-                buf = NULL;
-
                 list_free(fields, free);
                 fields = NULL;
 
@@ -127,9 +122,6 @@ static char *get_shell(const struct rpminspect *ri, const char *fullpath)
                 fields = NULL;
             }
         }
-
-        free(buf);
-        buf = NULL;
     }
 
     /* clean up and go */
