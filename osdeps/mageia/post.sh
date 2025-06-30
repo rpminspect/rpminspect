@@ -40,6 +40,10 @@ rm -rf mandoc.tar.gz "${SUBDIR}"
 # The 'rc' shell is not available in Mageia Linux, build manually
 git clone -q https://github.com/rakitzis/rc.git
 cd rc || exit 1
+TAG="$(git tag -l | sort -V | tail -n 1)"
+git checkout -b ${TAG} ${TAG}
+autoreconf --force --install
+CC=c99 CFLAGS=-D_XOPEN_SOURCE=500 ./configure --prefix=/usr
 make
 make install
 
