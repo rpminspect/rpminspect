@@ -32,7 +32,9 @@ jobs:
         # Set up the matrix of distributions to test
         strategy:
             matrix:
-                container: [ "oraclelinux:8", "oraclelinux:9" ]
+                container: [ "oraclelinux:8",
+                             "oraclelinux:9",
+                             "oraclelinux:10" ]
         container:
             image: ${{ matrix.container }}
 
@@ -50,7 +52,14 @@ jobs:
                   mkdir -p /etc/yum.repos.d
                   echo '[ol_developer_EPEL]' > ${REPO}
                   echo 'name=Oracle Linux $releasever EPEL ($basearch)' >> ${REPO}
-                  echo "baseurl=https://yum.oracle.com/repo/OracleLinux/OL${V}/developer/EPEL/$(uname -m)/" >> "${REPO}"
+
+                  # fun with URLs!  I hate everything!
+                  if [ "${V}" = "10" ]; then
+                      echo "baseurl=https://yum.oracle.com/repo/OracleLinux/OL${V}/0/developer/EPEL/$(uname -m)/" >> "${REPO}"
+                  else
+                      echo "baseurl=https://yum.oracle.com/repo/OracleLinux/OL${V}/developer/EPEL/$(uname -m)/" >> "${REPO}"
+                  fi
+
                   echo 'gpgkey=file:///etc/pki/rpm-gpg/RPM-GPG-KEY-oracle' >> "${REPO}"
                   echo 'gpgcheck=1' >> "${REPO}"
                   echo 'enabled=1' >> "${REPO}"
