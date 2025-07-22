@@ -32,7 +32,8 @@ jobs:
         # Set up the matrix of distributions to test
         strategy:
             matrix:
-                container: ["quay.io/centos/centos:stream9"]
+                container: ["quay.io/centos/centos:stream9",
+                            "quay.io/centos/centos:stream10"]
 
         # CentOS images come from quay.io now
         container:
@@ -47,14 +48,9 @@ jobs:
             # Requirements before the git clone can happen
             - name: git clone requirements
               run: |
-                  case "${{ matrix.container }}" in
-                      *stream9)
-                          dnf install -y 'dnf-command(config-manager)'
-                          dnf config-manager --set-enabled crb
-                          dnf install -y epel-release git
-                          ;;
-                  esac
-
+                  dnf install -y 'dnf-command(config-manager)'
+                  dnf config-manager --set-enabled crb
+                  dnf install -y epel-release git
 
             # This means clone the git repo
             - uses: actions/checkout@v4
