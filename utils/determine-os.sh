@@ -29,7 +29,7 @@ if [ -r /etc/fedora-release ] && [ "${ID}" = "fedora" ]; then
     fi
 elif [ -r /etc/centos-release ] && [ "${ID}" = "centos" ]; then
     case "${VERSION_ID}" in
-        7|9)
+        7|8|9|10)
             echo "${ID}${VERSION_ID}"
             ;;
         *)
@@ -39,7 +39,7 @@ elif [ -r /etc/centos-release ] && [ "${ID}" = "centos" ]; then
 elif [ -r /etc/redhat-release ] && [ "${ID}" = "rhel" ]; then
     v="$(echo "${VERSION_ID}" | cut -d '.' -f 1)"
     case "${v}" in
-        7|8|9)
+        7|8|9|10)
             if [ -f /etc/yum.repos.d/ubi.repo ]; then
                 echo "ubi${v}"
             else
@@ -53,7 +53,7 @@ elif [ -r /etc/redhat-release ] && [ "${ID}" = "rhel" ]; then
 elif [ -r /etc/almalinux-release ] && [ "${ID}" = "almalinux" ]; then
     v="$(echo "${VERSION_ID}" | cut -d '.' -f 1)"
     case "${v}" in
-        8|9)
+        8|9|10)
             echo "${ID}${v}"
             ;;
         *)
@@ -65,7 +65,7 @@ elif [ ${IS_CRUX} -eq 0 ] && [ -f /etc/pkgadd.conf ] && [ -f /etc/pkgmk.conf ]; 
 elif [ -r /etc/oracle-release ] && [ "${ID}" = "ol" ]; then
     v="$(echo "${VERSION_ID}" | cut -d '.' -f 1)"
     case "${v}" in
-        8|9)
+        8|9|10)
             echo "oraclelinux${v}"
             ;;
         *)
