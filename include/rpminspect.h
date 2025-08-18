@@ -340,8 +340,6 @@ int gather_builds(struct rpminspect *, bool);
 
 /* macros.c */
 void load_macros(struct rpminspect *ri);
-string_list_t *get_macros(const char *);
-int get_specfile_macros(struct rpminspect *, const char *);
 
 /* inspect_elf.c */
 /*
@@ -524,6 +522,9 @@ void *xrealloc(void *p, size_t s);
 #ifdef _HAVE_REALLOCARRAY
 void *xreallocarray(void *p, size_t n, size_t s);
 #endif
+
+/* spec.c */
+string_list_t *read_spec(const char *specfile);
 
 #endif
 
