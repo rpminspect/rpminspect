@@ -511,25 +511,8 @@ bool is_remote_rpm(const char *url);
  */
 char *human_size(const unsigned long int bytes);
 
-/* joinpath.c */
-/**
- * @brief Join path substrings in to a single allocated and normalized
- * path string.  Caller must free this string.
- *
- * Given a list of path components as separate strings, join them in to a
- * correct (but unverified) Unix path.  Extra slashes are removed.  Spaces
- * and other special characters are not escaped.  This function allocates
- * memory for the returned value.  The caller must free this memory when
- * done.
- *
- * Usage: path = joinpath(a, b, c, ..., NULL);
- * (where a, b, and c are char *)
- *
- * @param path One or more strings that form path components.  These
- *             will be joined together and delimited with slashes.
- * @return Allocated path string that the caller must free.
- */
-char *joinpath(const char *path, ...);
+/* joindelim.c */
+char *joindelim(const char delim, const char *s, ...);
 
 /* array.c */
 void array(parser_plugin *p, parser_context *ctx, const char *key1, const char *key2, string_list_t **list);
