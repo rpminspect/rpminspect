@@ -78,7 +78,7 @@ librpminspect_sources = [
     'inspect_virus.c',
     'inspect_xml.c',
     'io.c',
-    'joinpath.c',
+    'joindelim.c',
     'koji.c',
     'listfuncs.c',
     'local.c',

@@ -36,6 +36,15 @@ extern "C"
  */
 
 /**
+ * @def PATH_SEP
+ *
+ * Path seperator for the filesystem.  This is usually "/" but I have
+ * no idea what the future holds.  Windows spells "/" as "\" and HFS
+ * on Macs spelled it ":".
+ */
+#define PATH_SEP '/'
+
+/**
  * @def DEFAULT_MESSAGE_DIGEST
  *
  * Default message digest to use internally.  The definition comes
