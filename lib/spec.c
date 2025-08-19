@@ -83,7 +83,7 @@ static char *filter_spec_file(struct rpminspect *ri, const char *specfile)
     }
 
     /* create the regular expression to filter with */
-    reg_result = regcomp(&filter_regex, "^%patch[0-9]+", REG_EXTENDED | REG_NEWLINE);
+    reg_result = regcomp(&filter_regex, "^%patch[[:digit:]]+[[:space:]]*", REG_EXTENDED | REG_NEWLINE);
 
     if (reg_result != 0) {
         regerror(reg_result, &filter_regex, reg_error, sizeof(reg_error));
@@ -164,7 +164,7 @@ string_list_t *read_spec(struct rpminspect *ri, const char *specfile)
     free(sfc);
 
     /* try to read and parse the spec file */
-    spec = rpmSpecParse(filtered, RPMBUILD_NOBUILD, NULL);
+    spec = rpmSpecParse(filtered, RPMSPEC_ANYARCH, NULL);
 
     if (unlink(filtered) == -1) {
         warn("*** unlink");
