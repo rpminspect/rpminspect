@@ -27,7 +27,7 @@ int init_librpm(struct rpminspect *ri)
         return RPMRC_OK;
     }
 
-    rpmFreeMacros(NULL);
+    rpmFreeMacros(rpmGlobalMacroContext);
     rpmFreeRpmrc();
     result = rpmReadConfigFiles(NULL, NULL);
     ri->librpm_initialized = true;

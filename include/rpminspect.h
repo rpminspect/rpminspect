@@ -524,7 +524,7 @@ void *xreallocarray(void *p, size_t n, size_t s);
 #endif
 
 /* spec.c */
-string_list_t *read_spec(const char *specfile);
+string_list_t *read_spec(struct rpminspect *ri, const char *specfile);
 
 #endif
 
