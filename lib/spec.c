@@ -5,7 +5,9 @@
 
 #include <assert.h>
 #include <err.h>
+#include <libgen.h>
 #include <rpm/rpmbuild.h>
+#include <rpm/rpmmacro.h>
 #include <rpm/rpmspec.h>
 #include "rpminspect.h"
 
@@ -19,10 +21,36 @@
 string_list_t *read_spec(const char *specfile)
 {
     string_list_t *r = NULL;
+    char *sfc = NULL;
+    char *sd = NULL;
+    char *sourcedir = NULL;
     rpmSpec spec = NULL;
     const char *s = NULL;
 
     assert(specfile != NULL);
+
+    /* get the spec file subdirectory */
+    sfc = strdup(specfile);
+    assert(sfc != NULL);
+    sd = dirname(sfc);
+    assert(sd != NULL);
+
+    /*
+     * For the purposes of our spec file parser, define the rpm
+     * SOURCES directory to be the same directory where the spec file
+     * lives.  This is because of how rpminspect unpacks the RPM so
+     * all files that would be in SOURCES are actually all in the same
+     * directory as the spec file.
+     */
+    xasprintf(&sourcedir, "_sourcedir %s", sd);
+    assert(sourcedir != NULL);
+
+    if (rpmDefineMacro(rpmGlobalMacroContext, sourcedir, 0) != 0) {
+        warn("rpmDefineMacro");
+    }
+
+    free(sourcedir);
+    free(sfc);
 
     /* try to read and parse the spec file */
     spec = rpmSpecParse(specfile, RPMBUILD_NOBUILD, NULL);
