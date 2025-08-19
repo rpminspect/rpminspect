@@ -36,7 +36,7 @@ static bool disttag_driver(struct rpminspect *ri, rpmfile_entry_t *file)
     assert(file != NULL);
 
     /* read in the spec file */
-    contents = read_spec(file->fullpath);
+    contents = read_spec(ri, file->fullpath);
 
     if (contents == NULL) {
         return true;

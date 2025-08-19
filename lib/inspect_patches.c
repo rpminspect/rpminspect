@@ -602,7 +602,7 @@ bool inspect_patches(struct rpminspect *ri)
                 }
             } else {
                 /* read in the spec file with macros expanded */
-                speclines = read_spec(file->fullpath);
+                speclines = read_spec(ri, file->fullpath);
 
                 if (speclines == NULL) {
                     err(RI_PROGRAM_ERROR, "*** read_file");

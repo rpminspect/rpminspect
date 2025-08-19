@@ -163,10 +163,10 @@ DEBUG_PRINT("package: %s-%s-%s\n", name, headerGetString(peer->after_hdr, RPMTAG
         TAILQ_FOREACH(file, peer->after_files, items) {
             /* find the spec file and read the lines */
             if (strsuffix(file->localpath, SPEC_FILENAME_EXTENSION)) {
-                speclines = read_spec(file->fullpath);
+                speclines = read_spec(ri, file->fullpath);
 
                 if (speclines == NULL || TAILQ_EMPTY(speclines)) {
-                    warn("read_spec");
+                    warn("*** read_spec");
                     continue;
                 }
 
