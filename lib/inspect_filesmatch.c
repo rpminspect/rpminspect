@@ -25,6 +25,20 @@ enum {
     FILES_EXCLUDES = 2
 };
 
+/* Return string describing %files entry type */
+static char *files_entry_description(const int type)
+{
+    if (type == FILES_GLOBS) {
+        return "   glob";
+    } else if (type == FILES_DIRS) {
+        return "    dir";
+    } else if (type == FILES_EXCLUDES) {
+        return "exclude";
+    } else {
+        return "unknown";
+    }
+}
+
 /* Helper function to save strings in a specified hash table */
 static void save_pathspec(const char *s, const int type)
 {
@@ -71,7 +85,7 @@ static void save_pathspec(const char *s, const int type)
         entry = xalloc(sizeof(*entry));
         assert(entry != NULL);
         entry->data = strdup(expanded);
-DEBUG_PRINT("type:pathspec: %d:|%s|\n", type, entry->data);
+        DEBUG_PRINT("type:pathspec: %s:|%s|\n", files_entry_description(type), entry->data);
         HASH_ADD_KEYPTR(hh, hash, entry->data, strlen(entry->data), entry);
     }
 
@@ -152,7 +166,7 @@ static void gather_files_entries(struct rpminspect *ri)
         }
 
         name = headerGetString(peer->after_hdr, RPMTAG_NAME);
-DEBUG_PRINT("package: %s-%s-%s\n", name, headerGetString(peer->after_hdr, RPMTAG_VERSION), headerGetString(peer->after_hdr, RPMTAG_RELEASE));
+        DEBUG_PRINT("package: %s-%s-%s\n", name, headerGetString(peer->after_hdr, RPMTAG_VERSION), headerGetString(peer->after_hdr, RPMTAG_RELEASE));
 
         /*
          * Iterate over the file list of the SRPM and read the spec file.
