@@ -423,7 +423,7 @@ string_list_t *list_add(string_list_t *list, const char *s)
 {
     string_entry_t *entry = NULL;
 
-    if (s == NULL || (s && !strcmp(s, ""))) {
+    if (s == NULL) {
         return list;
     }
 

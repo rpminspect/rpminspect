@@ -68,7 +68,7 @@ void *read_file_bytes(const char *path, off_t *len)
         warn(_("*** unable to close %s"), path);
     }
 
-    /* break up the file in to lines */
+    /* copy the data in to a buffer for the caller */
     data = xalloc(*len + 1);
     data = memcpy(data, buf, *len);
     assert(data != NULL);
