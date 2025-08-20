@@ -207,7 +207,7 @@ static void gather_files_entries(struct rpminspect *ri)
         }
 
         /* skip debuginfo and debugsource packages */
-        if (is_debuginfo_rpm(file->rpm_header) || is_debugsource_rpm(file->rpm_header)) {
+        if (is_debuginfo_rpm(peer->after_hdr) || is_debugsource_rpm(peer->after_hdr)) {
             continue;
         }
 
