@@ -9,20 +9,22 @@
 #include <err.h>
 #include <errno.h>
 #include <assert.h>
+#include <fnmatch.h>
+#include <sys/stat.h>
 #include <rpm/rpmmacro.h>
 
 #include "rpminspect.h"
 
 /* Globals */
-static bool result = true;
 static string_hash_t *files_globs = NULL;
 static string_hash_t *files_dirs = NULL;
 static string_hash_t *files_excludes = NULL;
 
 enum {
-    FILES_GLOBS = 0,
-    FILES_DIRS = 1,
-    FILES_EXCLUDES = 2
+    FILES_NONE = 0,
+    FILES_GLOBS = 1,
+    FILES_DIRS = 2,
+    FILES_EXCLUDES = 3
 };
 
 /* Return string describing %files entry type */
@@ -34,6 +36,8 @@ static char *files_entry_description(const int type)
         return "    dir";
     } else if (type == FILES_EXCLUDES) {
         return "exclude";
+    } else if (type == FILES_NONE) {
+        return "   none";
     } else {
         return "unknown";
     }
@@ -45,6 +49,8 @@ static void save_pathspec(const char *s, const int type)
     string_hash_t *hash = NULL;
     string_hash_t *entry = NULL;
     char *expanded = NULL;
+
+    assert(type != FILES_NONE);
 
     if (s == NULL) {
         return;
@@ -354,17 +360,145 @@ static void gather_files_entries(struct rpminspect *ri)
     return;
 }
 
+static bool match_file(const int type, const rpmfile_entry_t *file, const char *specline)
+{
+    bool r = false;
+    int i = 0;
+    struct stat sb;
+
+    assert(file != NULL);
+    assert(specline != NULL);
+
+    if (!strcmp(file->localpath, specline)) {
+        /* found an exact match */
+        r = true;
+    }
+
+    if (strsuffix(specline, "/") && strprefix(file->localpath, specline)) {
+        /* found a match that includes a directory and all of the contents */
+        r = true;
+    }
+
+    if ((strchr(specline, '*') || strchr(specline, '?')) && fnmatch(specline, file->localpath, FNM_PATHNAME) == 0) {
+        /* try an fnmatch() on this entry */
+        r = true;
+    }
+
+    if (type == FILES_DIRS) {
+        errno = 0;
+        i = stat(file->fullpath, &sb);
+
+        if ((i == -1) && (errno != ENOENT)) {
+            warn("*** stat");
+        } else if (S_ISDIR(sb.st_mode)) {
+            r = true;
+        }
+    }
+
+    return r;
+}
+
+static bool filesmatch_driver(struct rpminspect *ri, rpmfile_entry_t *file)
+{
+    bool r = false;
+    string_hash_t *entry = NULL;
+    string_hash_t *tmp_entry = NULL;
+    const char *name = NULL;
+    const char *arch = NULL;
+    struct result_params params;
+
+    assert(ri != NULL);
+    assert(file != NULL);
+
+    /* skip source packages */
+    if (headerIsSource(file->rpm_header)) {
+        return true;
+    }
+
+    /* used in message reporting below */
+    name = headerGetString(file->rpm_header, RPMTAG_NAME);
+    arch = get_rpm_header_arch(file->rpm_header);
+
+    /* initialize results reporting structure */
+    init_result_params(&params);
+    params.header = NAME_FILESMATCH;
+    params.waiverauth = WAIVABLE_BY_ANYONE;
+    params.arch = arch;
+    params.file = file->localpath;
+
+    /* check to see if this file is excluded */
+    if (files_excludes != NULL) {
+        HASH_ITER(hh, files_excludes, entry, tmp_entry) {
+            if (match_file(FILES_NONE, file, entry->data)) {
+                params.severity = RESULT_VERIFY;
+                params.remedy = REMEDY_FILESMATCH_EXCLUDE_FOUND;
+                params.details = file->localpath;
+                xasprintf(&params.msg, _("The file %s was found in the %s package on %s, but is marked for exclusion in the spec file by the %%exclude %s rule in the %%files section for %s."), file->localpath, name, arch, entry->data, name);
+                params.verb = VERB_ADDED;
+                params.noun = _("${FILE} in package but should be excluded");
+
+                add_result(ri, &params);
+                free(params.msg);
+
+                /* return because there is no need to perform the other checks */
+                return false;
+            }
+        }
+    }
+
+    r = false;
+
+    /* check to see if a glob matches */
+    if (!r && files_globs != NULL) {
+        HASH_ITER(hh, files_globs, entry, tmp_entry) {
+            if (match_file(FILES_GLOBS, file, entry->data)) {
+                r = true;
+                break;
+            }
+        }
+    }
+
+    /* check to see if a dir entry matches */
+    if (!r && files_dirs != NULL) {
+        HASH_ITER(hh, files_dirs, entry, tmp_entry) {
+            if (match_file(FILES_DIRS, file, entry->data)) {
+                r = true;
+                break;
+            }
+        }
+    }
+
+    /* do we have something to report? */
+    if (!r) {
+        params.severity = RESULT_VERIFY;
+        params.remedy = REMEDY_FILESMATCH_UNSPECIFIED_ENTRY;
+        params.details = file->localpath;
+        xasprintf(&params.msg, _("%s was found in the %s package on %s, but is not specified in the spec file's %%files section for %s."), file->localpath, name, arch, name);
+        params.verb = VERB_ADDED;
+        params.noun = _("${FILE} in package but is not specified");
+
+        add_result(ri, &params);
+        free(params.msg);
+    }
+
+    return r;
+}
+
 /*
  * Main driver for the 'filesmatch' inspection.
  */
 bool inspect_filesmatch(struct rpminspect *ri)
 {
+    bool result = true;
     struct result_params params;
 
     assert(ri != NULL);
 
     /* Read in all of the %files entries */
     gather_files_entries(ri);
+
+    /* Run the inspection */
+    result = foreach_peer_file(ri, NAME_FILESMATCH, filesmatch_driver);
 
     /* Set up result parameters */
     init_result_params(&params);
