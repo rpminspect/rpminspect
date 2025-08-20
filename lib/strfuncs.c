@@ -530,7 +530,7 @@ string_list_t *strsplit(const char *s, const char *delim)
     }
 
     /* given a string but no delim, just make a single entry list */
-    if (s && (delim == NULL || !strcmp(delim, "") || !strcmp(s, delim))) {
+    if (s && (delim == NULL || !strcmp(s, delim))) {
         list = list_add(list, s);
         return list;
     }
@@ -541,10 +541,6 @@ string_list_t *strsplit(const char *s, const char *delim)
 
     /* split the string and build the list */
     while ((token = strsep(&walk, delim)) != NULL) {
-        if (!strcmp(token, "")) {
-            continue;
-        }
-
         list = list_add(list, token);
     }
 
