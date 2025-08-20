@@ -186,6 +186,7 @@ static void gather_files_entries(struct rpminspect *ri)
     string_list_t *tokens = NULL;
     string_entry_t *token = NULL;
     bool found = false;
+    bool verify = false;
     const char *name = NULL;
     char *pathspec = NULL;
     int type = FILES_GLOBS;
@@ -273,6 +274,7 @@ static void gather_files_entries(struct rpminspect *ri)
 
                 /* walk over each token in the %files line */
                 type = FILES_GLOBS;
+                verify = false;
 
                 TAILQ_FOREACH(token, tokens, items) {
                     if (!strcmp(token->data, SPEC_FILES_DOC)) {
@@ -281,12 +283,22 @@ static void gather_files_entries(struct rpminspect *ri)
                     } else if (!strcmp(token->data, SPEC_FILES_LICENSE)) {
                         process_doc_lines(name, tokens, SPEC_FILES_LICENSE, SPEC_FILES_LICENSEDIR);
                         break;
+                    } else if (verify) {
+                        /* skip the tokens inside the %verify () expression */
+                        if (strsuffix(token->data, ")")) {
+                            verify = false;
+                        }
+
+                        continue;
                     } else if (strprefix(token->data, SPEC_FILES_ATTR) ||
                                strprefix(token->data, SPEC_FILES_CONFIG) ||
-                               strprefix(token->data, SPEC_FILES_VERIFY) ||
                                strprefix(token->data, SPEC_FILES_LANG) ||
                                strprefix(token->data, SPEC_FILES_CAPS)) {
-                        /* skip %attr, %config, %verify, %lang, and %caps */
+                        /* skip %attr, %config, %lang, and %caps */
+                        continue;
+                    } else if (!verify && strprefix(token->data, SPEC_FILES_VERIFY)) {
+                        /* skip %verify but note that it's a special case */
+                        verify = true;
                         continue;
                     } else if (strprefix(token->data, SPEC_FILES_DIR)) {
                         /*
