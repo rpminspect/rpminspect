@@ -69,7 +69,7 @@ static char *filter_spec_file(struct rpminspect *ri, const char *specfile)
     if (fd == -1) {
         warn("*** mkstemp");
 
-        if (unlink(r) == -1) {
+        if (!debug_mode && unlink(r) == -1) {
             warn("*** unlink");
         }
 
@@ -87,7 +87,7 @@ static char *filter_spec_file(struct rpminspect *ri, const char *specfile)
             warn("*** close");
         }
 
-        if (unlink(r) == -1) {
+        if (!debug_mode && unlink(r) == -1) {
             warn("*** unlink");
         }
 
@@ -128,7 +128,7 @@ static char *filter_spec_file(struct rpminspect *ri, const char *specfile)
             warn("*** close");
         }
 
-        if (unlink(r) == -1) {
+        if (!debug_mode && unlink(r) == -1) {
             warn("*** unlink");
         }
 
@@ -195,9 +195,9 @@ string_list_t *read_spec(struct rpminspect *ri, const char *specfile)
     free(sfc);
 
     /* try to read and parse the spec file */
-    spec = rpmSpecParse(filtered, RPMSPEC_ANYARCH, NULL);
+    spec = rpmSpecParse(filtered, RPMSPEC_NONE, NULL);
 
-    if (unlink(filtered) == -1) {
+    if (!debug_mode && unlink(filtered) == -1) {
         warn("*** unlink");
     }
 
