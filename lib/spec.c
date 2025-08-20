@@ -130,7 +130,7 @@ string_list_t *read_spec(struct rpminspect *ri, const char *specfile)
     string_list_t *r = NULL;
     char *sfc = NULL;
     char *sd = NULL;
-    char *sourcedir = NULL;
+    char *dir = NULL;
     char *filtered = NULL;
     rpmSpec spec = NULL;
     const char *s = NULL;
@@ -148,19 +148,28 @@ string_list_t *read_spec(struct rpminspect *ri, const char *specfile)
 
     /*
      * For the purposes of our spec file parser, define the rpm
-     * SOURCES directory to be the same directory where the spec file
-     * lives.  This is because of how rpminspect unpacks the RPM so
-     * all files that would be in SOURCES are actually all in the same
-     * directory as the spec file.
+     * SOURCES and SPECS directories to be the same directory where
+     * the spec file lives.  This is because of how rpminspect unpacks
+     * the RPM so all files that would be in SOURCES are actually all
+     * in the same directory as the spec file.
      */
-    xasprintf(&sourcedir, "_sourcedir %s", sd);
-    assert(sourcedir != NULL);
+    xasprintf(&dir, "_sourcedir %s", sd);
+    assert(dir != NULL);
 
-    if (rpmDefineMacro(rpmGlobalMacroContext, sourcedir, 0) != 0) {
+    if (rpmDefineMacro(rpmGlobalMacroContext, dir, 0) != 0) {
         warn("*** rpmDefineMacro");
     }
 
-    free(sourcedir);
+    free(dir);
+
+    xasprintf(&dir, "_specdir %s", sd);
+    assert(dir != NULL);
+
+    if (rpmDefineMacro(rpmGlobalMacroContext, dir, 0) != 0) {
+        warn("*** rpmDefineMacro");
+    }
+
+    free(dir);
     free(sfc);
 
     /* try to read and parse the spec file */
