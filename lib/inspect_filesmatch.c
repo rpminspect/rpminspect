@@ -147,7 +147,7 @@ static void process_doc_lines(const char *name, const string_list_t *tokens, con
     assert(path != NULL);
 
     /* directory prefix */
-    xasprintf(&prefix, "%%{%s}/%s", macro, name);
+    xasprintf(&prefix, "%%{%s}/%s", path, name);
     assert(prefix != NULL);
 
     /* expand each file listed on the macro line */
@@ -279,9 +279,11 @@ static void gather_files_entries(struct rpminspect *ri)
                 TAILQ_FOREACH(token, tokens, items) {
                     if (!strcmp(token->data, SPEC_FILES_DOC)) {
                         process_doc_lines(name, tokens, SPEC_FILES_DOC, SPEC_FILES_DOCDIR);
+                        pathspec = NULL;
                         break;
                     } else if (!strcmp(token->data, SPEC_FILES_LICENSE)) {
                         process_doc_lines(name, tokens, SPEC_FILES_LICENSE, SPEC_FILES_LICENSEDIR);
+                        pathspec = NULL;
                         break;
                     } else if (verify) {
                         /* skip the tokens inside the %verify () expression */
@@ -322,22 +324,21 @@ static void gather_files_entries(struct rpminspect *ri)
                     }
                 }
 
-                /*
-                 * there is a possibility of %files modifiers
-                 * existing without using space delimiters, so
-                 * trim those
-                 */
-                pathspec = trim_files_modifiers(pathspec);
+                if (pathspec) {
+                    /*
+                     * there is a possibility of %files modifiers
+                     * existing without using space delimiters, so
+                     * trim those
+                     */
+                    pathspec = trim_files_modifiers(pathspec);
 
-                /* trim and leading or trailing whitespace */
-                pathspec = strtrim(pathspec);
+                    /* trim and leading or trailing whitespace */
+                    pathspec = strtrim(pathspec);
 
-                if (pathspec == NULL) {
-                    /* no reason to continue if there's nothing here */
-                    continue;
+                    if (pathspec) {
+                        save_pathspec(pathspec, type);
+                    }
                 }
-
-                save_pathspec(pathspec, type);
 
                 /* cleanup */
                 list_free(tokens, free);
