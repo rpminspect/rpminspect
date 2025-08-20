@@ -45,6 +45,8 @@ struct remedy remedies[] = {
     { REMEDY_FILESIZE_BECAME_NOT_EMPTY, "filesize_became_not_empty", NULL },
     { REMEDY_FILESIZE_GREW, "filesize_grew", NULL },
     { REMEDY_FILESIZE_SHRANK, "filesize_shrank", NULL },
+    { REMEDY_FILESMATCH_EXCLUDE_FOUND, "excluded_file_found", NULL },
+    { REMEDY_FILESMATCH_UNSPECIFIED_ENTRY, "unspecified_entry_found", NULL },
     { REMEDY_FILE_PATHS, "file_paths", NULL },
     { REMEDY_INVALID_BOOLEAN, "invalid_boolean", NULL },
     { REMEDY_JAVABYTECODE, "javabytecode", NULL },
@@ -293,6 +295,10 @@ const char *get_remedy(const unsigned int id)
                     r = _("Correct the reported errors in the XML document.");
                 } else if (id == REMEDY_MIXED_LICENSE_TAGS) {
                     r = _("The License tag contains mixed used of SPDX and legacy license identifiers.  You must use either all SPDX license identifiers or all legacy license identifiers; you cannot mix the two systems.");
+                } else if (id == REMEDY_FILESMATCH_EXCLUDE_FOUND) {
+                    r = _("A file or directory was found in the package that matches an %%exclude definition in the spec file.  You need to ensure the files and directories that should be in the package are properly specified in the %%files section(s) in the spec file.");
+                } else if (id == REMEDY_FILESMATCH_UNSPECIFIED_ENTRY) {
+                    r = _("An unexpected file or directory was found in the package.  This file or directory does not match any definition from the %%files section(s) in the spec file.  You need to remove it from the built package (by modifying the %%install section of the spec file and rebuilding the package) or update the appropriate %%files section to include it.");
                 }
             }
         }
