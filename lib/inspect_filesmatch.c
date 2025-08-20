@@ -133,6 +133,47 @@ static char *trim_files_modifiers(char *s)
 }
 
 /*
+ * Process %doc and %license lines in %files blocks.
+ */
+static void process_doc_lines(const char *name, const string_list_t *tokens, const char *macro, const char *path)
+{
+    char *prefix = NULL;
+    char *p = NULL;
+    string_entry_t *token = NULL;
+
+    assert(name != NULL);
+    assert(tokens != NULL);
+    assert(macro != NULL);
+    assert(path != NULL);
+
+    /* directory prefix */
+    xasprintf(&prefix, "%%{%s}/%s", macro, name);
+    assert(prefix != NULL);
+
+    /* expand each file listed on the macro line */
+    TAILQ_FOREACH(token, tokens, items) {
+        if (!strcmp(token->data, macro)) {
+            continue;
+        } else if (strprefix(token->data, "%")) {
+            warn("*** unexpanded macro in %s line: %s", macro, token->data);
+            continue;
+        }
+
+        /* build the full path */
+        p = joindelim(PATH_SEP, prefix, token->data, NULL);
+        assert(p != NULL);
+
+        /* save this glob in the right hash table */
+        save_pathspec(p, FILES_GLOBS);
+
+        free(p);
+    }
+
+    free(prefix);
+    return;
+}
+
+/*
  * Read all of the %files section in spec files and gather the
  * macro-expanded entries.
  */
@@ -147,10 +188,6 @@ static void gather_files_entries(struct rpminspect *ri)
     bool found = false;
     const char *name = NULL;
     char *pathspec = NULL;
-    char *entry = NULL;
-    char *prefix = NULL;
-    char *macrofunc = NULL;
-    char *macro = NULL;
     int type = FILES_GLOBS;
 
     assert(ri != NULL);
@@ -194,8 +231,6 @@ static void gather_files_entries(struct rpminspect *ri)
 
         /* read in all of the glob(7) lines from %files sections */
         TAILQ_FOREACH(line, speclines, items) {
-            line->data = strtrim(line->data);
-            assert(line->data != NULL);
             type = FILES_GLOBS;
 
             /* skip empty lines */
@@ -229,121 +264,74 @@ static void gather_files_entries(struct rpminspect *ri)
                     break;
                 }
 
-                /* check for %doc and %license and set a prefix accordingly */
+                /* split up the line for further processing */
                 tokens = strsplit(pathspec, " \t");
 
-                if (list_len(tokens) >= 2) {
-                    token = TAILQ_FIRST(tokens);
-                } else {
-                    token = NULL;
-                }
-
-                if (token && !strcmp(token->data, SPEC_FILES_DOC)) {
-                    /* handle %doc */
-                    macrofunc = SPEC_FILES_DOC;
-                    macro = SPEC_FILES_DOCDIR;
-                } else if (token && !strcmp(token->data, SPEC_FILES_LICENSE)) {
-                    /* handle %licensedir */
-                    macrofunc = SPEC_FILES_LICENSE;
-                    macro = SPEC_FILES_LICENSEDIR;
-                }
-
-                list_free(tokens, free);
-
-                if (macrofunc && macro) {
-                    pathspec += strlen(macrofunc) + 1;
-
-                    while (*pathspec != '\0' && isspace(*pathspec)) {
-                        pathspec++;
-                    }
-
-                    xasprintf(&prefix, "%%{%s}/%s", macro, name);
-                    assert(prefix != NULL);
-
-                    tokens = strsplit(pathspec, " \t");
-                    macrofunc = NULL;
-                    macro = NULL;
-
-                    /* save docs and licenses if we are on one of those lines */
-                    TAILQ_FOREACH(token, tokens, items) {
-                        /* build this entry's path spec */
-                        entry = joindelim(PATH_SEP, prefix, token->data, NULL);
-                        assert(entry != NULL);
-
-                        /* save this glob in the right hash table */
-                        save_pathspec(entry, type);
-
-                        /* cleanup */
-                        free(entry);
-                    }
-
-                    free(prefix);
-                    prefix = NULL;
-                    list_free(tokens, free);
+                if (tokens == NULL || TAILQ_EMPTY(tokens)) {
                     continue;
                 }
 
-                /* now scan horizontally through the line */
-                tokens = strsplit(pathspec, " \t");
+                /* walk over each token in the %files line */
+                type = FILES_GLOBS;
 
-                if (tokens != NULL) {
-                    type = FILES_GLOBS;
-
-                    TAILQ_FOREACH(token, tokens, items) {
-                        if (strprefix(token->data, SPEC_FILES_ATTR) ||
-                            strprefix(token->data, SPEC_FILES_CONFIG) ||
-                            strprefix(token->data, SPEC_FILES_VERIFY) ||
-                            strprefix(token->data, SPEC_FILES_LANG) ||
-                            strprefix(token->data, SPEC_FILES_CAPS)) {
-                            /* skip %attr, %config, %verify, %lang, and %caps */
-                            continue;
-                        } else if (strprefix(token->data, SPEC_FILES_DIR)) {
-                            /*
-                             * this is a %dir specification so we
-                             * record it in a different hash table
-                             * because checking actual files in the
-                             * binary RPMs will be checking path
-                             * prefixes against these vs glob matching
-                             */
-                            type = FILES_DIRS;
-                        } else if (strprefix(token->data, SPEC_FILES_EXCLUDE)) {
-                            /*
-                             * this is an %exclude specification which
-                             * is a known glob that *SHOULD NOT* be
-                             * present in built RPMs
-                             */
-                            type = FILES_EXCLUDES;
-                        } else {
-                            /* at this point we should have the pathspec portion */
-                            pathspec = token->data;
-                            break;
-                        }
-                    }
-
-                    /*
-                     * there is a possibility of %files modifiers
-                     * existing without using space delimiters, so
-                     * trim those
-                     */
-                    pathspec = trim_files_modifiers(pathspec);
-
-                    /* trim and leading or trailing whitespace */
-                    pathspec = strtrim(pathspec);
-
-                    if (pathspec == NULL) {
-                        /* no reason to continue if there's nothing here */
+                TAILQ_FOREACH(token, tokens, items) {
+                    if (!strcmp(token->data, SPEC_FILES_DOC)) {
+                        process_doc_lines(name, tokens, SPEC_FILES_DOC, SPEC_FILES_DOCDIR);
+                        break;
+                    } else if (!strcmp(token->data, SPEC_FILES_LICENSE)) {
+                        process_doc_lines(name, tokens, SPEC_FILES_LICENSE, SPEC_FILES_LICENSEDIR);
+                        break;
+                    } else if (strprefix(token->data, SPEC_FILES_ATTR) ||
+                               strprefix(token->data, SPEC_FILES_CONFIG) ||
+                               strprefix(token->data, SPEC_FILES_VERIFY) ||
+                               strprefix(token->data, SPEC_FILES_LANG) ||
+                               strprefix(token->data, SPEC_FILES_CAPS)) {
+                        /* skip %attr, %config, %verify, %lang, and %caps */
                         continue;
+                    } else if (strprefix(token->data, SPEC_FILES_DIR)) {
+                        /*
+                         * this is a %dir specification so we
+                         * record it in a different hash table
+                         * because checking actual files in the
+                         * binary RPMs will be checking path
+                         * prefixes against these vs glob matching
+                         */
+                        type = FILES_DIRS;
+                    } else if (strprefix(token->data, SPEC_FILES_EXCLUDE)) {
+                        /*
+                         * this is an %exclude specification which
+                         * is a known glob that *SHOULD NOT* be
+                         * present in built RPMs
+                         */
+                        type = FILES_EXCLUDES;
+                    } else {
+                        /* at this point we should have the pathspec portion */
+                        pathspec = token->data;
                     }
-
-                    save_pathspec(pathspec, type);
-
-                    /* cleanup */
-                    list_free(tokens, free);
                 }
+
+                /*
+                 * there is a possibility of %files modifiers
+                 * existing without using space delimiters, so
+                 * trim those
+                 */
+                pathspec = trim_files_modifiers(pathspec);
+
+                /* trim and leading or trailing whitespace */
+                pathspec = strtrim(pathspec);
+
+                if (pathspec == NULL) {
+                    /* no reason to continue if there's nothing here */
+                    continue;
+                }
+
+                save_pathspec(pathspec, type);
+
+                /* cleanup */
+                list_free(tokens, free);
             } else if (!found && strprefix(line->data, SPEC_SECTION_FILES)) {
                 /* we found %files, start reading lines */
                 found = true;
-                continue;
             }
         }
 
