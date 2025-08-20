@@ -68,7 +68,13 @@ static char *filter_spec_file(struct rpminspect *ri, const char *specfile)
 
     if (fd == -1) {
         warn("*** mkstemp");
+
+        if (unlink(r) == -1) {
+            warn("*** unlink");
+        }
+
         free(r);
+        list_free(lines, free);
         return strdup(specfile);
     }
 
@@ -76,9 +82,17 @@ static char *filter_spec_file(struct rpminspect *ri, const char *specfile)
 
     if (fp == NULL) {
         warn("*** fdopen");
-        close(fd);
-        unlink(r);
+
+        if (close(fd) == -1) {
+            warn("*** close");
+        }
+
+        if (unlink(r) == -1) {
+            warn("*** unlink");
+        }
+
         free(r);
+        list_free(lines, free);
         return strdup(specfile);
     }
 
@@ -109,12 +123,20 @@ static char *filter_spec_file(struct rpminspect *ri, const char *specfile)
     /* close things up */
     if (fclose(fp) != 0) {
         warn("*** fclose");
-        close(fd);
-        unlink(r);
+
+        if (close(fd) == -1) {
+            warn("*** close");
+        }
+
+        if (unlink(r) == -1) {
+            warn("*** unlink");
+        }
+
         free(r);
-        return strdup(specfile);
+        r = strdup(specfile);
     }
 
+    list_free(lines, free);
     return r;
 }
 
