@@ -201,7 +201,13 @@ static void gather_files_entries(struct rpminspect *ri)
 
     /* Build the file glob list first */
     TAILQ_FOREACH(peer, ri->peers, items) {
+        /* skip source packages */
         if (!headerIsSource(peer->after_hdr)) {
+            continue;
+        }
+
+        /* skip debuginfo and debugsource packages */
+        if (is_debuginfo_rpm(file->rpm_header) || is_debugsource_rpm(file->rpm_header)) {
             continue;
         }
 
@@ -412,6 +418,11 @@ static bool filesmatch_driver(struct rpminspect *ri, rpmfile_entry_t *file)
 
     /* skip source packages */
     if (headerIsSource(file->rpm_header)) {
+        return true;
+    }
+
+    /* skip debuginfo and debugsource packages */
+    if (is_debuginfo_rpm(file->rpm_header) || is_debugsource_rpm(file->rpm_header)) {
         return true;
     }
 
