@@ -426,6 +426,11 @@ static bool filesmatch_driver(struct rpminspect *ri, rpmfile_entry_t *file)
         return true;
     }
 
+    /* skip build-id stuff */
+    if (strprefix(file->localpath, LIB_DIR_PREFIX) && strstr(file->localpath, BUILD_ID_DIR)) {
+        return true;
+    }
+
     /* used in message reporting below */
     name = headerGetString(file->rpm_header, RPMTAG_NAME);
     arch = get_rpm_header_arch(file->rpm_header);

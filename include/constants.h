@@ -526,6 +526,13 @@ extern "C"
 #define INCLUDE_DIR "/usr/include"
 
 /**
+ * @def LIB_DIR_PREFIX
+ *
+ * Library directory prefix (note the system could use /usr/lib64).
+ */
+#define LIB_DIR_PREFIX "/usr/lib"
+
+/**
  * @def KERNEL_FILENAMES
  *
  * Default array of kernel executable filename possibilities.
