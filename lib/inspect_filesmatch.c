@@ -102,6 +102,26 @@ static void save_pathspec(const char *s, const int type)
 }
 
 /*
+ * Returns true if the given string is a %files entry modifier macro.
+ */
+static bool is_files_modifier(const char *s)
+{
+    if (s == NULL) {
+        return false;
+    }
+
+    if (strprefix(s, SPEC_FILES_ATTR) ||
+        strprefix(s, SPEC_FILES_CONFIG) ||
+        strprefix(s, SPEC_FILES_VERIFY) ||
+        strprefix(s, SPEC_FILES_LANG) ||
+        strprefix(s, SPEC_FILES_CAPS)) {
+        return true;
+    }
+
+    return false;
+}
+
+/*
  * Trim any leading modifiers on %files entry lines that are not
  * delimited by spaces from the actual pathspec.  For instance, a line
  * like this:
@@ -120,11 +140,7 @@ static char *trim_files_modifiers(char *s)
         return NULL;
     }
 
-    if (strprefix(r, SPEC_FILES_ATTR) ||
-        strprefix(r, SPEC_FILES_CONFIG) ||
-        strprefix(r, SPEC_FILES_VERIFY) ||
-        strprefix(r, SPEC_FILES_LANG) ||
-        strprefix(r, SPEC_FILES_CAPS)) {
+    if (is_files_modifier(r)) {
         if (strchr(r, '(') && strchr(r, ')')) {
             r = strchr(r, ')');
         }
@@ -146,6 +162,7 @@ static void process_doc_lines(const char *name, const string_list_t *tokens, con
     char *prefix = NULL;
     char *p = NULL;
     string_entry_t *token = NULL;
+    int type = FILES_GLOBS;
 
     assert(name != NULL);
     assert(tokens != NULL);
@@ -159,8 +176,17 @@ static void process_doc_lines(const char *name, const string_list_t *tokens, con
     /* expand each file listed on the macro line */
     TAILQ_FOREACH(token, tokens, items) {
         if (!strcmp(token->data, macro)) {
+            /* skip the %doc or %license token */
+            continue;
+        } else if (is_files_modifier(token->data)) {
+            /* skip any %files entry modifiers like %attr */
+            continue;
+        } else if (!strcmp(token->data, SPEC_FILES_DIR)) {
+            /* the tokens for this %doc or %license entry are dirs */
+            type = FILES_DIRS;
             continue;
         } else if (strprefix(token->data, "%")) {
+            /* we should not get here, but just in case */
             warn("*** unexpanded macro in %s line: %s", macro, token->data);
             continue;
         }
@@ -170,7 +196,7 @@ static void process_doc_lines(const char *name, const string_list_t *tokens, con
         assert(p != NULL);
 
         /* save this glob in the right hash table */
-        save_pathspec(p, FILES_GLOBS);
+        save_pathspec(p, type);
 
         free(p);
     }
