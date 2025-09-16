@@ -594,11 +594,6 @@ int main(int argc, char **argv)
         printf(_("\nAvailable inspections:\n"));
 
         for (i = 0; inspections[i].name != NULL; i++) {
-            /* XXX: temporarily disable the filesmatch inspection */
-            if (inspections[i].flag == INSPECT_FILESMATCH) {
-                continue;
-            }
-
             if (i > 0 && verbose) {
                 printf("\n");
             }
@@ -989,11 +984,6 @@ int main(int argc, char **argv)
         }
 
         for (i = 0; inspections[i].name != NULL; i++) {
-            /* XXX: temporarily disable the filesmatch inspection */
-            if (inspections[i].flag == INSPECT_FILESMATCH) {
-                continue;
-            }
-
             /* test not selected by user */
             if (!(ri->tests & inspections[i].flag)) {
                 /*

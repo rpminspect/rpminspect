@@ -51,7 +51,6 @@ librpminspect_sources = [
     'inspect_emptyrpm.c',
     'inspect_files.c',
     'inspect_filesize.c',
-    'inspect_filesmatch.c',
     'inspect_javabytecode.c',
     'inspect_kmidiff.c',
     'inspect_license.c',
