@@ -187,7 +187,7 @@ authors:
 	echo "Primary Authors" > AUTHORS.md
 	echo "===============" >> AUTHORS.md
 	echo >> AUTHORS.md
-	git log --pretty="%an <%ae>" | sort -u | grep -E "$(PRIMARY_AUTHORS)" | sed -e 's|^|- |g' | sed G >> AUTHORS.md
+	git log --pretty="%aN <%aE>" | sort -u | grep -E "$(PRIMARY_AUTHORS)" | sed -e 's|^|- |g' | sed G >> AUTHORS.md
 	echo >> AUTHORS.md
 	echo "Contributors" >> AUTHORS.md
 	echo "============" >> AUTHORS.md

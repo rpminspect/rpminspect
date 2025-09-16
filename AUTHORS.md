@@ -1,7 +1,7 @@
 Primary Authors
 ===============
 
-- David Cantrell <dcantrell@redhat.com>
+- Dave Cantrell <dcantrell@redhat.com>
 
 
 Contributors
