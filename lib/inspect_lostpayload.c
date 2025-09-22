@@ -51,6 +51,11 @@ bool inspect_lostpayload(struct rpminspect *ri)
 
     /* Check the binary peers */
     TAILQ_FOREACH(peer, ri->peers, items) {
+        /* Expected empty RPM packages are ignored here */
+        if (peer->after_hdr && list_contains(ri->expected_empty_rpms, headerGetString(peer->after_hdr, RPMTAG_NAME))) {
+            continue;
+        }
+
         /*
          * Subpackages may disappear in subsequent builds.  Sometimes this
          * is intentional, sometimes not.
