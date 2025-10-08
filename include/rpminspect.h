@@ -526,6 +526,9 @@ void *xreallocarray(void *p, size_t n, size_t s);
 /* spec.c */
 string_list_t *read_spec(struct rpminspect *ri, const char *specfile);
 
+/* inspect.c */
+bool has_security_checks(const char *inspection);
+
 #endif
 
 #ifdef __cplusplus
