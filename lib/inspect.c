@@ -89,7 +89,7 @@ struct inspect inspections[] = {
 /*
  * Returns true if the named inspection has security checks.
  */
-static bool has_security_checks(const char *inspection)
+bool has_security_checks(const char *inspection)
 {
     int i = 0;
 

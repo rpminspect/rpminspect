@@ -66,7 +66,7 @@ static char *build_annocheck_cmd(const char *cmd, const char *opts, const char *
     assert(cmd != NULL);
     assert(path != NULL);
 
-    r = strdup(cmd);
+    r = strappend(r, cmd, " --no-use-debuginfod", NULL);
 
     if (opts) {
         r = strappend(r, " ", opts, NULL);
@@ -82,7 +82,7 @@ static char *build_annocheck_cmd(const char *cmd, const char *opts, const char *
         free(tmp);
     }
 
-    r = strappend(r, " ", path, NULL);
+    r = strappend(r, " .", path, NULL);
 
     return r;
 }
@@ -287,7 +287,7 @@ static struct libannocheck_internals *libannocheck_setup(struct rpminspect *ri, 
 }
 #endif
 
-static bool annocheck_driver(struct rpminspect *ri, rpmfile_entry_t *file)
+static bool annocheck_driver(struct rpminspect *ri, rpmfile_entry_t *file, rpmpeer_entry_t *peer)
 {
     bool result = true;
     bool ignore = false;
@@ -322,6 +322,7 @@ static bool annocheck_driver(struct rpminspect *ri, rpmfile_entry_t *file)
 
     assert(ri != NULL);
     assert(file != NULL);
+    assert(peer != NULL);
 
     /* Ignore files in the SRPM */
     if (headerIsSource(file->rpm_header)) {
@@ -533,17 +534,17 @@ static bool annocheck_driver(struct rpminspect *ri, rpmfile_entry_t *file)
     return result;
 #else
         /* Run the test on the file */
-        after_cmd = build_annocheck_cmd(ri->commands.annocheck, hentry->value, annocheck_profile, get_debuginfo_path(ri, file, arch, AFTER_BUILD), file->fullpath);
+        after_cmd = build_annocheck_cmd(ri->commands.annocheck, hentry->value, annocheck_profile, get_debuginfo_path(ri, file, arch, AFTER_BUILD), file->localpath);
         argv = build_argv(after_cmd);
-        after_out = run_cmd_vp(&after_exit, ri->worksubdir, argv);
+        after_out = run_cmd_vp(&after_exit, peer->after_root, argv);
         free_argv(argv);
 
         /* If we have a before build, run the command on that */
         if (!ignore) {
             if (file->peer_file) {
-                before_cmd = build_annocheck_cmd(ri->commands.annocheck, hentry->value, annocheck_profile, get_debuginfo_path(ri, file, arch, BEFORE_BUILD), file->peer_file->fullpath);
+                before_cmd = build_annocheck_cmd(ri->commands.annocheck, hentry->value, annocheck_profile, get_debuginfo_path(ri, file, arch, BEFORE_BUILD), file->peer_file->localpath);
                 argv = build_argv(before_cmd);
-                before_out = run_cmd_vp(&before_exit, ri->workdir, argv);
+                before_out = run_cmd_vp(&before_exit, peer->before_root, argv);
                 free_argv(argv);
 
                 /* Build a reporting message if we need to */
@@ -652,6 +653,8 @@ static bool annocheck_driver(struct rpminspect *ri, rpmfile_entry_t *file)
 bool inspect_annocheck(struct rpminspect *ri)
 {
     bool result = true;
+    rpmpeer_entry_t *peer = NULL;
+    rpmfile_entry_t *file = NULL;
     struct result_params params;
 
     assert(ri != NULL);
@@ -683,7 +686,23 @@ bool inspect_annocheck(struct rpminspect *ri)
     }
 
     /* run the annocheck tests across all ELF files */
-    result = foreach_peer_file(ri, NAME_ANNOCHECK, annocheck_driver);
+    TAILQ_FOREACH(peer, ri->peers, items) {
+        /* Disappearing subpackages are caught by INSPECT_EMPTYRPM */
+        if (peer->after_files == NULL || TAILQ_EMPTY(peer->after_files)) {
+            continue;
+        }
+
+        TAILQ_FOREACH(file, peer->after_files, items) {
+            /* Ignore files we should be ignoring */
+            if (ignore_path(ri, NAME_ANNOCHECK, file->localpath, peer->after_root) && !has_security_checks(NAME_ANNOCHECK)) {
+                continue;
+            }
+
+            if (!annocheck_driver(ri, file, peer)) {
+                result = false;
+            }
+        }
+    }
 
     /* if everything was fine, just say so */
     if (result && !reported) {

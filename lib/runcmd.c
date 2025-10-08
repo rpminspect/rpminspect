@@ -163,11 +163,6 @@ char *run_cmd_vp(int *exitcode, const char *workdir, char **argv)
         if (getcwd(cwd, PATH_MAX) == NULL) {
             err(RI_PROGRAM_ERROR, "*** getcwd");
         }
-
-        /* power through if it fails */
-        if (chdir(workdir) == -1) {
-            warn("*** chdir");
-        }
     }
 
     /* create pipes to interact with the child */
@@ -201,6 +196,11 @@ char *run_cmd_vp(int *exitcode, const char *workdir, char **argv)
 
         /* find the command */
         cmd = find_cmd(argv[0]);
+
+        /* change to the working directory */
+        if (chdir(workdir) == -1) {
+            warn("*** chdir");
+        }
 
         /* run the command */
         if (execvp(cmd, argv) == -1) {
