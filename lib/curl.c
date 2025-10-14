@@ -207,9 +207,9 @@ void curl_get_file(const bool verbose, const char *src, const char *dst)
 
     curl_easy_setopt(c, CURLOPT_URL, src);
     curl_easy_setopt(c, CURLOPT_WRITEDATA, fp);
-    curl_easy_setopt(c, CURLOPT_FAILONERROR, true);
+    curl_easy_setopt(c, CURLOPT_FAILONERROR, 1L);
 #ifdef CURLOPT_TCP_FASTOPEN /* not available on all versions of libcurl (e.g., <= 7.29) */
-    curl_easy_setopt(c, CURLOPT_TCP_FASTOPEN, 1);
+    curl_easy_setopt(c, CURLOPT_TCP_FASTOPEN, 1L);
 #endif
     cc = curl_easy_perform(c);
 
@@ -254,11 +254,11 @@ curl_off_t curl_get_size(const char *src)
     /* get the size */
     curl_easy_setopt(c, CURLOPT_URL, src);
     curl_easy_setopt(c, CURLOPT_NOBODY, 1L);
-    curl_easy_setopt(c, CURLOPT_FAILONERROR, true);
+    curl_easy_setopt(c, CURLOPT_FAILONERROR, 1L);
     curl_easy_setopt(c, CURLOPT_FOLLOWLOCATION, 1L);
     curl_easy_setopt(c, CURLOPT_MAXREDIRS, 10L);
 #ifdef CURLOPT_TCP_FASTOPEN /* not available on all versions of libcurl (e.g., <= 7.29) */
-    curl_easy_setopt(c, CURLOPT_TCP_FASTOPEN, 1);
+    curl_easy_setopt(c, CURLOPT_TCP_FASTOPEN, 1L);
 #endif
 
     cc = curl_easy_perform(c);
@@ -294,7 +294,7 @@ bool is_remote_rpm(const char *url)
 
     if (c) {
         curl_easy_setopt(c, CURLOPT_URL, url);
-        curl_easy_setopt(c, CURLOPT_NOBODY, 1);
+        curl_easy_setopt(c, CURLOPT_NOBODY, 1L);
         r = curl_easy_perform(c);
         curl_easy_cleanup(c);
     }
