@@ -8,10 +8,10 @@ echo '%dist .ri47' > "${HOME}"/.rpmmacros
 # Install 32-bit development files on 64-bit systems when available
 case "$(uname -m)" in
     x86_64)
-        apt-get -y install gcc-multilib libc6-i386
+        apt install -y gcc-multilib libc6-i386
         ;;
     s390x)
-        apt-get -y install gcc-multilib
+        apt install -y gcc-multilib
         ;;
 esac
 
