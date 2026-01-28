@@ -85,7 +85,7 @@ lib/inspect_upstream.c
 lib/inspect_virus.c
 lib/inspect_xml.c
 lib/io.c
-lib/joinpath.c
+lib/joindelim.c
 lib/kmods.c
 lib/koji.c
 lib/listfuncs.c
@@ -118,6 +118,7 @@ lib/rmtree.c
 lib/rpm.c
 lib/runcmd.c
 lib/secrule.c
+lib/spec.c
 lib/strfuncs.c
 lib/tty.c
 lib/uncompress.c
