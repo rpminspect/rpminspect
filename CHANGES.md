@@ -1,3 +1,124 @@
+Changes in rpminspect-2.1
+-------------------------
+
+General release and build process changes:
+* Remove duplicate AND from License tag
+* Drop utils/find-ninja.sh and update GNUmakefile and README.md
+* Remove explicit requires on libtoml
+* Fix FTBFS errors in the spec file for home.
+* Update the Copr srpm target to sub %autorelease correctly
+* Change the Release value used for Copr builds to 1.1....
+* Add 'Recommends: system-rpm-config' to the spec file template
+
+Config file or data/ file changes:
+* Drop 'id' from the example license JSON database
+
+Changes to the GitHub Actions CI scripts and files:
+* On Fedora rawhide, remove duplicate __debug_package in macros
+* Fix broken Debian Testing and Alpine Linux CI jobs
+* On Fedora stable, remove duplicate __debug_package in macros
+* Remove obsolete Fedora CI job files
+* Uninstall openssl-fips-provider-so in the RHEL UBI9 test environment
+* On Fedora systems, make sure /var/lib/clamav is 0755
+* Add clamav-freshclam to reqs.txt for Fedora
+* Do not run freshcleam on Fedora CI jobs
+* Workaround Gentoo bug with circular dependencies
+* Install 'gawk' on fedora and fedora-rawhide CI jobs
+* Default Fedora environment lacks awk now, so install it.
+* Fixes for some failing CI jobs
+* Fix how 'rc' compiles on Arch Linux
+* On OpenSUSE Leap builds, explicitly install which before git
+* Drop the modification of /usr/bin/xmlrpc-c-config on Debian testing
+* Fix 'rc' build and install Mageia Linux job
+* Recognize newer operating systems in determine-os.sh
+* Set /var/lib/clamav ownership on CentOS 10 CI job
+* Remove Oracle Linux jobs
+* Fix Debian GHA failures
+* Fix the Debian GitHub Action jobs
+* Minor fixes for the OpenSUSE and Ubuntu CI jobs on GitHub
+* Ignore changes in the .github/ and osdeps/ subdirectories
+* Do 'emerge -uDN world' in the Gentoo CI job before running
+* Try to reduce the amount of stuff built on Gentoo
+* Increase the timeout for Ubuntu GHA jobs
+* Add additional packages to Debian jobs and install annocheck
+* Upgrade Fedora rawhide test environments
+* Install libatomic.i686 on Fedora stable and rawhide jobs
+* Install lib64xxhash-devel on Mageia jobs
+* Build cc with CFLAGS=-std=gnu99 on Alpine Linux
+* Fix up the Gentoo CI jobs so they don't fail
+
+rpminspect(1) changes or improvements related to it:
+* Disable the 'filesmatch' inspection for now
+
+Documentation changes:
+* Update examples in the rpminspect(1) man page
+
+General bug fix in the library or frontend program:
+* Strip UNPACK_BASE directory in unicode inspection
+* Subpackage changes can cause some peer rpmdeps to be empty
+* Support PatchN specifications with URLs to the upstream patch
+* Make sure unapproved licenses are reported as such.
+* Refactor how remedy strings are handled in librpminspect
+* Correctly handle SPDX special keywords: AND, OR, WITH
+* Match 32-bit x86 RPMs when performing inspections
+* Add extra guards for hardlink handling in extract_rpm()
+* Prevent duplicate SRPMs in file lists when comparing tasks
+* Check if archive exists before closing it
+* Properly handle hard links on RPM payload extraction
+* Continued fixes for the new libxml2 API
+* Correct rebase build comparison in some inspections
+* Download failure does not exit with a error code
+* Memory leak fixes in strtrim()
+* Allow %{load} macros to work when calling rpmSpecParse()
+* Define _specdir in read_spec() for spec files that self-reference
+* Memory leak fixes in read_spec()
+* Retain empty lines when using strsplit()
+* Ignore the tokens within a %verify() expression in %files
+* Do not write untokenized %doc and %license lines to filtered spec
+* Skip debuginfo and debugsource packages in filesmatch
+* s/file->rpm_header/peer->after_hdr/g in filesmatch
+* Ignore .build-id subdirectories in the filesmatch inspection
+* Handle %dir and %files modifiers in %doc & %license lines
+* Invoke annocheck correctly so we do not get incorrect reporting
+* Fix some curl_easy_setop() calls that give warnings on FreeBSD
+* Correctly construct entry paths in extract_rpm()
+* Correct some formerly gcc warnings that are now errors
+
+librpminspect feature or significant change:
+* Disable file and scan size limits in clamav
+* Honor locally defined ignore list for the 'unicode' inspection
+* Favor POSIX basename(3) throughout librpminspect
+* Support SPDX 3.0 expression specification
+* Drop FNM_PATHNAME for path matching from rule files
+* When extracting payloads, if archive_read_extract() fails, error out
+* Change ENODATA to EIO in libarchive read loop
+* Expand the remedy strings for the 'patches' inspection
+* Handle newer versions of libxml2 and deprecated struct members
+* Minor memory management cleanups in shellsyntax inspection
+* Make free_string_hash() part of the public API
+* Define PATH_SEP and rename joinpath() to joindelim()
+* Add read_spec() function and use librpm for macro expansion
+* Introduce the 'filesmatch' inspection
+* Add filtering ability to the read_spec() function
+* Minor cleanups for the filesmatch inspection
+* Refactor how %doc and %license lines are processed in filesmatch
+* Hook up the actual filesmatch inspection
+* Remove the abandoned 'filesmatch' inspection.
+* Ignore expected empty RPM payloads in 'lostpayload' (#1518)
+* In runcmd.c, return NOT FOUND for not found commands
+* Account for RPM payloads carrying paths not in the RPM metadata
+* Handle additional annocheck profile name matching
+
+Test suite commits:
+* Work around a limitation on Arch Linux in test_debuginfo
+* Add a testcase for unicode ignored files
+* Adjust test_kmod to account for EXTRA_CFLAGS removal in 6.15
+* Increase test case timeouts to 5000 from 1500
+* Add --skip-implicit-values to annocheck test jobs
+* In test_elf.py add -Wl,-z,notext for TEXTREL and PIC tests
+* When writing to test rpminspect.yaml file, do not wrap lines
+
+
 Changes in rpminspect-2.0
 -------------------------
 
