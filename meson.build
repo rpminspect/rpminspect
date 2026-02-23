@@ -1,6 +1,6 @@
 project('rpminspect',
         'c',
-        version : '2.1',
+        version : '2.2',
         default_options : [
             'c_std=gnu11',
             'warning_level=3',
