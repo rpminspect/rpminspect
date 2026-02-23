@@ -52,6 +52,8 @@ BuildRequires:  libicu-devel
 BuildRequires:  libcdson-devel
 %if 0%{?fedora}
 BuildRequires:  libtoml-devel
+%else
+Provides:       bundled(libtoml)
 %endif
 
 
@@ -167,6 +169,8 @@ control files.
 %prep
 %{gpgverify} --keyring='%{SOURCE2}' --signature='%{SOURCE1}' --data='%{SOURCE0}'
 %autosetup
+# not always compatible with new warnings in latest GCC (particularly libtoml)
+sed -i -e 's|werror=true|werror=false|' meson.build
 
 
 %build
