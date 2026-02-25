@@ -417,7 +417,7 @@ toml_tojson(struct toml_node *toml_root, FILE *output)
 }
 
 static void
-toml_node_walker_free(struct toml_node* node, __attribute__((unused)) void* ctx)
+toml_node_walker_free(struct toml_node* node, void* ctx __attribute__((unused)))
 {
 	if (node->name)
 		free(node->name);
@@ -471,11 +471,11 @@ toml_value_as_string(struct toml_node* node)
 	switch (node->type)
 	{
 	case TOML_INT:
-		xasprintf(&ret, "%" PRId64, node->value.integer);
+		asprintf(&ret, "%" PRId64, node->value.integer);
 		break;
 
 	case TOML_FLOAT:
-		xasprintf(&ret, "%.*f", node->value.floating.precision,
+		asprintf(&ret, "%.*f", node->value.floating.precision,
 								node->value.floating.value);
 		break;
 
@@ -501,7 +501,7 @@ toml_value_as_string(struct toml_node* node)
 		if (!gmtime_r(&node->value.rfc3339_time.epoch, &tm))
 			break;
 
-		xasprintf(&ret, "%d-%02d-%02dT%02d:%02d:%02d%s%s",
+		asprintf(&ret, "%d-%02d-%02dT%02d:%02d:%02d%s%s",
 			1900 + tm.tm_year,
 			tm.tm_mon + 1, tm.tm_mday, tm.tm_hour, tm.tm_min, tm.tm_sec,
 			sec_frac, offset_string);
@@ -509,7 +509,7 @@ toml_value_as_string(struct toml_node* node)
 	}
 
 	case TOML_BOOLEAN:
-		xasprintf(&ret, "%s", node->value.integer ? "true" : "false");
+		asprintf(&ret, "%s", node->value.integer ? "true" : "false");
 		break;
 
 	default:

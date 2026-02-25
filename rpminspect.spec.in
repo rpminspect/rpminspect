@@ -26,6 +26,9 @@ Source0:        https://github.com/rpminspect/rpminspect/releases/download/v%{ve
 Source1:        https://github.com/rpminspect/rpminspect/releases/download/v%{version}/%{name}-%{version}.tar.gz.asc
 Source2:        %%GPGKEYRING%%
 Requires:       librpminspect%{?_isa} = %{version}-%{release}
+%if 0%{?fedora} == 0
+Provides:       bundled(libtoml)
+%endif
 
 BuildRequires:  meson
 BuildRequires:  ninja-build
@@ -52,8 +55,6 @@ BuildRequires:  libicu-devel
 BuildRequires:  libcdson-devel
 %if 0%{?fedora}
 BuildRequires:  libtoml-devel
-%else
-Provides:       bundled(libtoml)
 %endif
 
 
