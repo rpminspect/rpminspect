@@ -54,7 +54,7 @@ InsertTableArray(char* name, struct toml_node* place)
 }
 
 int
-SawTableArray(struct toml_node* root, char* tableArrayName, struct toml_node** lastTable, __attribute__((unused)) char** err)
+SawTableArray(struct toml_node* root, char* tableArrayName, struct toml_node** lastTable, char** err __attribute__((unused)))
 {
 	char*					ancestor;
 	bool					found = false;
@@ -119,7 +119,7 @@ SawTable(struct toml_node* place, char* name, struct toml_node** lastTable, char
 		int found = 0;
 
 		if (strcmp(ancestor, "") == 0) {
-			xasprintf(err, "empty implicit table");
+			asprintf(err, "empty implicit table");
 			return 1;
 		}
 
@@ -152,12 +152,12 @@ SawTable(struct toml_node* place, char* name, struct toml_node** lastTable, char
 	}
 
 	if (!item_added) {
-		xasprintf(err, "Duplicate item %s", name);
+		asprintf(err, "Duplicate item %s", name);
 		return 2;
 	}
 
 	if (place->type != TOML_TABLE) {
-		xasprintf(err, "Attempt to overwrite table %s", name);
+		asprintf(err, "Attempt to overwrite table %s", name);
 		return 3;
 	}
 
