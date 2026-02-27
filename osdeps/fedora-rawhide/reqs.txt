@@ -20,7 +20,6 @@ git
 glibc-devel
 html401-dtds
 json-c-devel
-kernel-core
 kernel-devel
 kmod-devel
 ksh
