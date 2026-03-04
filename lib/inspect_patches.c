@@ -78,6 +78,10 @@ static void free_applied_patches(applied_patches_t *table)
 /*
  * Returns true if the %autopatch or %autosetup macros are in use in
  * the spec file.
+ *
+ * Also return true if the spec file uses a declarative build system
+ * as explained here:
+ * https://rpm-software-management.github.io/rpm/manual/buildsystem.html
  */
 static bool have_automacro(const struct rpminspect *ri, const rpmfile_entry_t *specfile)
 {
@@ -115,8 +119,10 @@ static bool have_automacro(const struct rpminspect *ri, const rpmfile_entry_t *s
         /* trim line endings */
         buf[strcspn(buf, "\r\n")] = 0;
 
-        /* we made it to the changelog, nothing left of value */
-        if (strprefix(buf, SPEC_SECTION_CHANGELOG)) {
+        /* check for declarative buildsystem */
+        if (strlen(buf) >= 12 && !strncasecmp(buf, "buildsystem:", 12)) {
+            DEBUG_PRINT("found declarative build system:\n    %s\n", buf);
+            r = true;
             break;
         }
 
