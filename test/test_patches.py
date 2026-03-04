@@ -9,9 +9,14 @@ import rpmfluff
 import unittest
 from baseclass import TestSRPM, TestCompareSRPM
 
-# rpm < v4.18 does not support '%patch N' syntax
+# get the rpm version on the build system
 rpmver = list(map(lambda x: int(x), rpm.__version__.strip().split("-")[0].split(".")))
+
+# rpm < v4.18 does not support '%patch N' syntax
 patch_N_supported = True
+
+# rpm < v4.20 does not support declarative build syntax
+declarative_builds_supported = True
 
 # Starting with Python 3.10, distutils emits DeprecationWarnings and
 # more recent Python releases have simply removed distutils entirely.
@@ -23,11 +28,17 @@ try:
 
     if parse("%d.%d" % (rpmver[0], rpmver[1])) <= Version("4.18"):
         patch_N_supported = False
+
+    if parse("%d.%d" % (rpmver[0], rpmver[1])) <= Version("4.20"):
+        declarative_builds_supported = False
 except ImportError:
     from distutils.version import LooseVersion
 
     if LooseVersion("%d.%d" % (rpmver[0], rpmver[1])) < LooseVersion("4.18"):
         patch_N_supported = False
+
+    if parse("%d.%d" % (rpmver[0], rpmver[1])) <= Version("4.20"):
+        declarative_builds_supported = False
 
 # Check to see if %autopatch works (requires lua)
 proc = subprocess.Popen(
@@ -552,7 +563,8 @@ class PatchFilenameWithMacroCompareSRPM(TestCompareSRPM):
 # '%patch N' syntax used to apply patch
 class PatchNMacroSRPM(TestSRPM):
     @unittest.skipUnless(
-        patch_N_supported, "rpmbuild v4.14 does not support '%patch N' syntax"
+        patch_N_supported,
+        "rpmbuild v%s does not support '%%patch N' syntax" % rpm.__version__,
     )
     def setUp(self):
         super().setUp()
@@ -574,7 +586,8 @@ class PatchNMacroSRPM(TestSRPM):
 
 class PatchNMacroCompareSRPM(TestCompareSRPM):
     @unittest.skipUnless(
-        patch_N_supported, "rpmbuild v4.14 does not support '%patch N' syntax"
+        patch_N_supported,
+        "rpmbuild v%s does not support '%%patch N' syntax" % rpm.__version__,
     )
     def setUp(self):
         super().setUp()
@@ -760,6 +773,10 @@ class PatchHasURLPathCompareSRPM(TestCompareSRPM):
 # Handles spec files using declarative builds:
 # https://rpm-software-management.github.io/rpm/manual/buildsystem.html
 class PatchDefinedWithBuildSystemSRPM(TestSRPM):
+    @unittest.skipUnless(
+        declarative_builds_supported,
+        "rpmbuild v%s does not support declarative build syntax" % rpm.__version__,
+    )
     def setUp(self):
         super().setUp()
 
@@ -775,6 +792,10 @@ class PatchDefinedWithBuildSystemSRPM(TestSRPM):
 
 
 class PatchDefinedWithBuildSystemCompareSRPM(TestCompareSRPM):
+    @unittest.skipUnless(
+        declarative_builds_supported,
+        "rpmbuild v%s does not support declarative build syntax" % rpm.__version__,
+    )
     def setUp(self):
         super().setUp()
 
