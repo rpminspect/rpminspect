@@ -754,3 +754,36 @@ class PatchHasURLPathCompareSRPM(TestCompareSRPM):
         self.inspection = "patches"
         self.result = "INFO"
         self.waiver_auth = "Not Waivable"
+
+
+# patch defined and build system defined (INFO)
+# Handles spec files using declarative builds:
+# https://rpm-software-management.github.io/rpm/manual/buildsystem.html
+class PatchDefinedWithBuildSystemSRPM(TestSRPM):
+    def setUp(self):
+        super().setUp()
+
+        # define the patch
+        self.rpm.add_patch(rpmfluff.SourceFile("some.patch", patch_file), False)
+
+        # define a BuildSystem in the preamble
+        self.rpm.section_patches += "\nBuildSystem: pyproject\n\n"
+
+        self.inspection = "patches"
+        self.result = "INFO"
+        self.waiver_auth = "Not Waivable"
+
+
+class PatchDefinedWithBuildSystemCompareSRPM(TestCompareSRPM):
+    def setUp(self):
+        super().setUp()
+
+        # define the patch
+        self.after_rpm.add_patch(rpmfluff.SourceFile("some.patch", patch_file), False)
+
+        # define a BuildSystem in the preamble
+        self.after_rpm.section_patches += "\nBuildSystem: pyproject\n\n"
+
+        self.inspection = "patches"
+        self.result = "INFO"
+        self.waiver_auth = "Not Waivable"
