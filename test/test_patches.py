@@ -12,7 +12,7 @@ from baseclass import TestSRPM, TestCompareSRPM
 # get the rpm version on the build system
 rpmver = list(map(lambda x: int(x), rpm.__version__.strip().split("-")[0].split(".")))
 
-# rpm < v4.18 does not support '%patch N' syntax
+# rpm <= v4.18 does not support '%patch N' syntax
 patch_N_supported = True
 
 # rpm < v4.20 does not support declarative build syntax
@@ -29,7 +29,7 @@ try:
     if parse("%d.%d" % (rpmver[0], rpmver[1])) <= Version("4.18"):
         patch_N_supported = False
 
-    if parse("%d.%d" % (rpmver[0], rpmver[1])) <= Version("4.20"):
+    if parse("%d.%d" % (rpmver[0], rpmver[1])) < Version("4.20"):
         declarative_builds_supported = False
 except ImportError:
     from distutils.version import LooseVersion
@@ -37,7 +37,7 @@ except ImportError:
     if LooseVersion("%d.%d" % (rpmver[0], rpmver[1])) < LooseVersion("4.18"):
         patch_N_supported = False
 
-    if parse("%d.%d" % (rpmver[0], rpmver[1])) <= Version("4.20"):
+    if LooseVersion("%d.%d" % (rpmver[0], rpmver[1])) < LooseVersion("4.20"):
         declarative_builds_supported = False
 
 # Check to see if %autopatch works (requires lua)
