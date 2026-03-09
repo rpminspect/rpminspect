@@ -1,6 +1,7 @@
 #!/bin/sh
 PATH=/usr/bin:/usr/sbin
 CWD="$(pwd)"
+TESTDATA="$(realpath "${CWD}"/test/data)"
 
 # Debian Linux testing does not define an RPM dist tag
 echo '%dist .ri47' > "${HOME}"/.rpmmacros
@@ -73,7 +74,7 @@ cd annobin || exit 1
 meson setup -D clang-plugin=false -D llvm-plugin=false -D docs=false -D debuginfod=disabled build
 ninja -C build -v
 ninja -C build install
-install -D -m 0755 "${CWD}"/build/annocheck/annocheck /usr/local/bin/annocheck
+install -D -m 0755 "${CWD}"/annobin/build/annocheck/annocheck /usr/local/bin/annocheck
 cd "${CWD}" || exit 1
 rm -rf annobin
 
@@ -81,6 +82,12 @@ rm -rf annobin
 # commit 1a9803d0f8daf15bb706dc17783ab19589906487 to rpm, but it
 # causes problems for the rpminspect test suite.  Undo the change.
 sed -i -e '/^%%global\ __debug_package\ 1\\/d' /usr/lib/rpm/macros
+
+# Install declarative buildsystem macros for test cases if the system
+# does not provide them.
+if ! grep -r '%buildsystem_pyproject_' /usr/lib/rpm/* ; then
+    install -D -m 0644 "${TESTDATA}"/macros.pyproject /usr/lib/rpm/macros.d/macros.pyproject
+fi
 
 # Update clamav database
 service clamav-freshclam stop
