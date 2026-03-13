@@ -1,109 +1,171 @@
-You can list the koji XMLRPC API for the hub you are connecting to with this
-command:
-
-    koji list-api
-
-Of course, you need it locally configured and be authenticated (if
-necessary).
-
-
----------------------------------------------------------
-Koji API listing as of 05-Feb-2019 for an example system:
----------------------------------------------------------
-
-CGImport(metadata, directory)
+CGImport(metadata, directory, token=None)
   description: Import build from a content generator
 
-    metadata can be one of the following
-    - json encoded string representing the metadata
-    - a dictionary (parsed metadata)
-    - a filename containing the metadata
+metadata can be one of the following
+- json encoded string representing the metadata
+- a dictionary (parsed metadata)
+- a filename containing the metadata
+
+:param metadata: describes the content for this build.
+:param str directory: directory on the hub where files are located
+:param str token: (optional) a reservation token for this build.
+                  You obtain a token from the CGInitBuild method.
+                  If you specify a token, you must also specify a build_id
+                  in the metadata.
+:returns: buildinfo dict
+
+CGInitBuild(cg, data)
+  description: Create (reserve) a build_id for given data.
+
+If build or reservation already exists, init_build will raise GenericError
+
+:param str cg: content generator name
+:param dict data: build data same as for new_build, for given usecase
+                  only name,version,release,epoch keys make sense. Some
+                  other values will be ignored anyway (owner, state, ...)
+:return: dict with build_id and token
+
+CGRefundBuild(cg, build_id, token, state=3)
+  description: If build is reserved and not finished yet, there is an option
+to release reservation and mark build either FAILED or CANCELED.
+For this calling CG needs to know build_id and reservation token.
+
+Refunded build behaves like any other failed/canceled build. So,
+its nvr can be reclaimed again and get_next_release can return
+this nvr.
+
+:param str cg: content generator name
+:param int build_id: build id
+:param str token: token from CGInitBuild
+:param int state: new state (koji.BUILD_STATES)
+
+:return: None, on error raises exception
 
 _listapi()
+  description: List available API calls
+addArchiveType(name, description, extensions, compression_type=None)
+  description: 
+Add new archive type.
+
+Use this to tell Koji about new builds' files' extensions before
+importing the files.
+
+:param str name: archive type name, eg. "yaml"
+:param str description: eg. "YAML Ain't Markup Language"
+:param str extensions: space-separated list of descriptions, eg. "yaml yml"
+
 addBType(name)
   description: Add a new btype with the given name
+addChannel(channel_name, description=None)
+  description: Add a channel.
+
+:param str channel_name: channel name
+:param str description: description of channel
+
 addExternalRPM(rpminfo, external_repo, strict=True)
   description: Import an external RPM
 
-        This call is mainly for testing. Normal access will be through
-        a host call
-addExternalRepoToTag(tag_info, repo_info, priority)
-  description: Add an external repo to a tag
+This call is mainly for testing. Normal access will be through
+a host call
+addExternalRepoToTag(tag_info, repo_info, priority, merge_mode='koji', arches=None)
+  description: Add an external repo to a tag.
+
+:param tag_info: Tag name or ID number
+:param repo_info: External repository name or ID number
+:param int priority: Priority of this repository for this tag
+:param str merge_mode: This must be one of the values of the
+                       koji.REPO_MERGE_MODES set. If unspecified,
+                       the default is "koji".
+:param str arches: space-separated list of arches handled by the repo.
+
 addGroupMember(group, user, strict=True)
   description: Add user to group
-addHost(hostname, arches, krb_principal=None)
-  description: Add a host to the database
-addHostToChannel(hostname, channel_name, create=False)
+addHost(hostname, arches, krb_principal=None, force=False)
+  description: 
+Add a builder host to the database.
+
+:param str hostname: name for the host entry (fqdn recommended).
+:param list arches: list of architectures this builder supports.
+:param str krb_principal: (optional) a non-default kerberos principal
+                          for the host.
+:param bool force: override user type
+:returns: new host id
+
+If krb_principal is not given then that field will be generated
+from the HostPrincipalFormat setting (if available).
+
+addHostToChannel(hostname, channel_name, create=False, force=False)
   description: Add the host to the specified channel
 
-    Channel must already exist unless create option is specified
+Channel must already exist unless create option is specified
 
 addRPMSig(an_rpm, data)
   description: Store a signature header for an rpm
 
-        data: the signature header encoded as base64
+data: the signature header encoded as base64
 
+addUserKrbPrincipal(user, krb_principal)
+  description: Add a Kerberos principal for user
 addVolume(name, strict=True)
   description: Add a new storage volume in the database
 applyVolumePolicy(build, strict=False)
   description: Apply the volume policy to a given build
 
-        The volume policy is normally applied at import time, but it can
-        also be applied with this call.
+The volume policy is normally applied at import time, but it can
+also be applied with this call.
 
-        Parameters:
-            build: the build to apply the policy to
-            strict: if True, raises on exception on policy issues
+Parameters:
+    build: the build to apply the policy to
+    strict: if True, raises on exception on policy issues
 
-assignTask(task_id, host, force=False)
+assignTask(task_id, host, force=False, override=False)
   description: Assign a task to a host
 
-        Specify force=True to assign a non-free task
+Specify force=True to assign a non-free task
+Specify override=True to prevent the scheduler from reassigning later
 
 build(src, target, opts=None, priority=None, channel=None)
   description: Create a build task
 
-        priority: the amount to increase (or decrease) the task priority, relative
-                  to the default priority; higher values mean lower priority; only
-                  admins have the right to specify a negative priority here
-        channel: the channel to allocate the task to
-        Returns the task id
-
-buildContainer(src, target, opts=None, priority=None, channel='container')
-  description: Create a container build task
-
-    target: the build target
-    priority: the amount to increase (or decrease) the task priority, relative
-              to the default priority; higher values mean lower priority; only
-              admins have the right to specify a negative priority here
-    channel: the channel to allocate the task to (defaults to the "container"
-             channel)
-
-    Returns the task ID
+priority: the amount to increase (or decrease) the task priority, relative
+          to the default priority; higher values mean lower priority; only
+          admins have the right to specify a negative priority here
+channel: the channel to allocate the task to
+Returns the task id
 
 buildImage(name, version, arch, target, ksfile, img_type, opts=None, priority=None)
-  description:
-        Create an image using a kickstart file and group package list.
+  description: 
+Create an image using a kickstart file and group package list.
 
 buildImageIndirection(opts=None, priority=None)
-  description:
-        Create an image using two other images and an indirection template
+  description: 
+Create an image using two other images and an indirection template
 
 buildImageOz(name, version, arches, target, inst_tree, opts=None, priority=None)
-  description:
-        Create an image using a kickstart file and group package list.
+  description: 
+Create an image using a kickstart file and group package list.
 
-buildMap()
-  description: Map which builds were used in the buildroots of other builds
+buildReferences(build, limit=None, lazy=False)
+  description: Returns references to a build
 
-    To be used for garbage collection
+This call is used to determine whether a build can be deleted
 
-buildReferences(build, limit=None)
-cancelBuild(buildID)
+:param int build_id: numeric build id
+:param int limit: If given, only return up to N results of each ref type
+:param bool lazy: If true, stop when any reference is found
+
+:returns: dict of reference results for each reference type
+
+cancelBuild(buildID, strict=False)
   description: Cancel the build with the given buildID
 
-        If the build is associated with a task, cancel the task as well.
-        Return True if the build was successfully canceled, False if not.
+:param int|str|dict buildID: int ID, a string NVR, or
+                             a map containing 'name', 'version' and 'release'.
+:param bool strict: if strict is True and build is not existing, an exception is raised,
+                    if strict is False and build is not existing, returns False
+
+If the build is associated with a task, cancel the task as well.
+Return True if the build was successfully canceled, False if not.
 cancelTask(task_id, recurse=True)
   description: Cancel a task
 cancelTaskChildren(task_id)
@@ -113,37 +175,38 @@ cancelTaskFull(task_id, strict=True)
 chainBuild(srcs, target, opts=None, priority=None, channel=None)
   description: Create a chained build task for building sets of packages in order
 
-        srcs: list of pkg lists, ie [[src00, src01, src03],[src20],[src30,src31],...]
-              where each of the top-level lists gets built and a new repo is created
-              before the next list is built.
-        target: build target
-        priority: the amount to increase (or decrease) the task priority, relative
-                  to the default priority; higher values mean lower priority; only
-                  admins have the right to specify a negative priority here
-        channel: the channel to allocate the task to
-        Returns a list of all the dependent task ids
+srcs: list of pkg lists, ie [[src00, src01, src03],[src20],[src30,src31],...]
+      where each of the top-level lists gets built and a new repo is created
+      before the next list is built.
+target: build target
+priority: the amount to increase (or decrease) the task priority, relative
+          to the default priority; higher values mean lower priority; only
+          admins have the right to specify a negative priority here
+channel: the channel to allocate the task to
+
+:returns int: Task ID
 
 chainMaven(builds, target, opts=None, priority=None, channel='maven')
   description: Create a Maven chain-build task
 
-        builds: a list of maps defining the parameters for the sequence of builds
-        target: the build target
-        priority: the amount to increase (or decrease) the task priority, relative
-                  to the default priority; higher values mean lower priority; only
-                  admins have the right to specify a negative priority here
-        channel: the channel to allocate the task to (defaults to the "maven" channel)
+builds: a list of maps defining the parameters for the sequence of builds
+target: the build target
+priority: the amount to increase (or decrease) the task priority, relative
+          to the default priority; higher values mean lower priority; only
+          admins have the right to specify a negative priority here
+channel: the channel to allocate the task to (defaults to the "maven" channel)
 
-        Returns the task ID
+Returns the task ID
 
 changeBuildVolume(build, volume, strict=True)
   description: Move a build to a different storage volume
 checkTagAccess(tag_id, user_id=None)
   description: Determine if user has access to tag package with tag.
 
-    Returns a tuple (access, override, reason)
-        access: a boolean indicating whether access is allowed
-        override: a boolean indicating whether access may be forced
-        reason: the reason access is blocked
+Returns a tuple (access, override, reason)
+    access: a boolean indicating whether access is allowed
+    override: a boolean indicating whether access may be forced
+    reason: the reason access is blocked
 
 checkTagPackage(tag, pkg)
   description: Check that pkg is in the list for tag. Returns true/false
@@ -151,89 +214,193 @@ checkUpload(path, name, verify=None, tail=None, volume=None)
   description: Return basic information about an uploaded file
 count(methodName, *args, **kw)
   description: Execute the XML-RPC method with the given name and count the results.
-        A method return value of None will return O, a return value of type "list", "tuple", or "dict"
-        will return len(value), and a return value of any other type will return 1.  An invalid
-        methodName will raise an AttributeError, and invalid arguments will raise a TypeError.
+A method return value of None will return O, a return value of type "list", "tuple", or
+"dict" will return len(value), and a return value of any other type will return 1. An
+invalid methodName will raise GenericError.
 countAndFilterResults(methodName, *args, **kw)
   description: Filter results by a given name and count total results account.
 
-        Execute the XML-RPC method with the given name and filter the results
-        based on the options specified in the keyword option "filterOpts".
-        The method must return a list of maps.  Any other return type will
-        result in a TypeError.
+Execute the XML-RPC method with the given name and filter the results
+based on the options specified in the keywork option "filterOpts".
+The method must return a list of maps.  Any other return type will
+result in a GenericError.
 
-        Args:
-        offset: the number of elements to trim off the front of the list
-        limit: the maximum number of results to return
-        order: the map key to use to sort the list; the list will be sorted
-            before offset or limit are applied
-        noneGreatest: when sorting, consider 'None' to be greater than all
-            other values; python considers None less than all other values,
-            but Postgres sorts NULL higher than all other values; default
-            to True for consistency with database sorts
+Args:
+offset: the number of elements to trim off the front of the list
+limit: the maximum number of results to return
+order: the map key to use to sort the list; the list will be sorted
+    before offset or limit are applied
+noneGreatest: when sorting, consider 'None' to be greater than all
+    other values; python considers None less than all other values,
+    but Postgres sorts NULL higher than all other values; default
+    to True for consistency with database sorts
 
-        Returns:
-            Tuple of total results amount and the filtered results.
+Returns:
+    Tuple of total results amount and the filtered results.
 
 createBuildTarget(name, build_tag, dest_tag)
   description: Create a new build target
-createEmptyBuild(name, version, release, epoch, owner=None)
+createEmptyBuild(name, version, release, epoch, owner=None, draft=False)
+  description: Creates empty build entry
+
+:param str name: build name
+:param str version: build version
+:param str release: release version
+:param str epoch: epoch version
+:param owner: a str (Kerberos principal or name) or an int (user id)
+                 or a dict:
+                     - id: User's ID
+                     - name: User's name
+                     - krb_principal: Kerberos principal
+:param bool draft: create a draft build or not
+:return: int build ID
+
 createExternalRepo(name, url)
   description: Create a new external repo with the given name and url.
-    Return a map containing the id, name, and url
-    of the new repo.
+Return a map containing the id, name, and url
+of the new repo.
 createImageBuild(build_info)
-  description:
-        Associate image metadata with an existing build. The build must not
-        already have associated image metadata.
+  description: 
+Associate image metadata with an existing build. When build isn`t existing, creates a
+build. The build must not already have associated image metadata.
+
+:param build_info: int (build ID) if build exists
+                   str (in N-V-R format)
+                   or a dict:
+                       - name: build name
+                       - version: build version
+                       - release: build release
+                       - epoch: build epoch
+:raises: GenericError if type for build_info is not dict, when build isn`t existing.
+:raises: GenericError if draft: True in buildinfo, when build isn't existing.
+:raises: GenericError if build info doesn't have mandatory keys.
+:raises: GenericError if build is a draft, when it's existing.
 
 createMavenBuild(build_info, maven_info)
-  description:
-        Associate Maven metadata with an existing build.  The build must
-        not already have associated Maven metadata.  maven_info must be a dict
-        containing group_id, artifact_id, and version entries.
+  description: 
+Associate Maven metadata with an existing build. When build isn`t existing, creates a
+build. The build must not already have associated Maven metadata.  maven_info must be
+a dict containing group_id, artifact_id, and version entries.
+
+:param build_info: a str (build name) if build is existing
+                   or a dict:
+                       - name: build name
+                       - version: build version
+                       - release: build release
+                       - epoch: build epoch
+:param dict maven_info:
+                       - group_id: Group's ID
+                       - artifact_id: Artifact's ID
+                       - version: version
+:raises: GenericError if type for build_info is not dict, when build isn`t existing.
+:raises: GenericError if draft: True in buildinfo, when build isn't existing.
+:raises: GenericError if build info doesn't have mandatory keys.
+:raises: GenericError if build is a draft, when it's existing.
 
 createNotification(user_id, package_id, tag_id, success_only)
   description: Create a new notification.  If the user_id does not match the currently logged-in user
-        and the currently logged-in user is not an admin, raise a GenericError.
+and the currently logged-in user is not an admin, raise a GenericError.
+createNotificationBlock(user_id, package_id=None, tag_id=None)
+  description: Create notification block. If the user_id does not match the
+currently logged-in user and the currently logged-in user is not an
+admin, raise a GenericError.
+createSideTag(basetag, debuginfo=False, suffix=None)
+  description: Create a side tag.
+
+:param basetag: name or ID of base tag
+:type basetag: str or int
+
+:param debuginfo: should buildroot repos contain debuginfo?
+:type debuginfo: bool
+
+:param suffix: suffix which will be appended to generated sidetag name
+               List of allowed suffixes needs to be defined in config.
+:type suffix: str
+
+:returns dict: sidetag name + id
+
 createTag(name, parent=None, arches=None, perm=None, locked=False, maven_support=False, maven_include_all=False, extra=None)
   description: Create a new tag
 createUser(username, status=None, krb_principal=None)
   description: Add a user to the database
-createWinBuild(build_info, win_info)
-  description:
-        Associate Windows metadata with an existing build.  The build must
-        not already have associated Windows metadata.  win_info must be a dict
-        containing a platform entry.
 
-debugFunction(name, *args, **kwargs)
+:param str username: The username for this Koji user.
+:param int status: This must be one of the values of the
+                   koji.USER_STATUS enum. If unspecified,
+                   the default is koji.USER_STATUS['NORMAL'].
+:param str krb_principal: a custom Kerberos principal, or None.
+:raises: GenericError if the user or Kerberos principal already
+         exists.
+
+createWinBuild(build_info, win_info)
+  description: 
+Associate Windows metadata with an existing build. When build isn`t existing, creates
+a build. The build must not already have associated Windows metadata.  win_info must be
+a dict containing a platform entry.
+:param build_info: a str (build name) if build is existing
+                   or a dict:
+                       - name: build name
+                       - version: build version
+                       - release: build release
+                       - epoch: build epoch
+:param dict win_info:
+                       - platform: build platform
+:raises: GenericError if type for build_info is not dict, when build isn`t existing.
+:raises: GenericError if draft: True in buildinfo, when build isn't existing.
+:raises: GenericError if build info doesn't have mandatory keys.
+:raises: GenericError if build is a draft, when it's existing.
+
 deleteBuild(build, strict=True, min_ref_age=604800)
   description: delete a build, if possible
 
-    Attempts to delete a build. A build can only be deleted if it is
-    unreferenced.
+Attempts to delete a build. A build can only be deleted if it is
+unreferenced.
 
-    If strict is true (default), an exception is raised if the build cannot
-    be deleted.
+If strict is true (default), an exception is raised if the build cannot
+be deleted.
 
-    Note that a deleted build is not completely gone. It is marked deleted and some
-    data remains in the database.  Mainly, the rpms are removed.
+Note that a deleted build is not completely gone. It is marked deleted and some
+data remains in the database.  Mainly, the rpms are removed.
 
-    Note in particular that deleting a build DOES NOT free any NVRs (or NVRAs) for
-    reuse.
+Note in particular that deleting a build DOES NOT free any NVRs (or NVRAs) for
+reuse.
 
-    Returns True if successful, False otherwise
+Returns True if successful, False otherwise
 
 deleteBuildTarget(buildTargetInfo)
   description: Delete the build target with the given name.  If no build target
-    exists, raise a GenericError.
+exists, raise a GenericError.
 deleteExternalRepo(info)
-  description: Delete an external repo
+  description: 
+Remove an external repository for any tags and delete it.
+
+:param info: external repository name or ID number
+:raises: GenericError if the repository does not exist.
+
 deleteNotification(id)
   description: Delete the notification with the given ID.  If the currently logged-in
-        user is not the owner of the notification or an admin, raise a GenericError.
+user is not the owner of the notification or an admin, raise a GenericError.
+deleteNotificationBlock(id)
+  description: Delete the notification block with the given ID.  If the currently logged-in
+user is not the owner of the notification or an admin, raise a GenericError.
+deleteRPMSig(rpminfo, sigkey=None, all_sigs=False)
+  description: Delete rpm signature
+
+Only use this method in extreme situations, because it goes against
+Koji's design of immutable, auditable data.
+
+This call requires ``admin`` permission (``sign`` is not sufficient).
+
+:param dict/str/id rpm: map containing 'name', 'version', 'release', and 'arch'
+                        string N-V-R.A
+                        int ID
+:param str sigkey: Signature key.
+:param bool all_sigs: Delete all signed copies for specified RPM.
+
 deleteTag(tagInfo)
   description: Delete the specified tag.
+disableChannel(channelname, comment=None)
+  description: Mark a channel as disabled
 disableHost(hostname)
   description: Mark a host as disabled
 disableUser(username)
@@ -242,550 +409,916 @@ distRepo(tag, keys, **task_opts)
   description: Create a dist-repo task. returns task id
 downloadTaskOutput(taskID, fileName, offset=0, size=-1, volume=None)
   description: Download the file with the given name, generated by the task with the
-        given ID.
+given ID.
 dropGroupMember(group, user)
   description: Drop user from group
 echo(*args)
 editBuildTarget(buildTargetInfo, name, build_tag, dest_tag)
   description: Set the build_tag and dest_tag of an existing build_target to new values
+editChannel(channelInfo, **kw)
+  description: Edit information for an existing channel.
+
+:param str/int channelInfo: channel name or ID
+:param str name: new channel name
+:param str description: description of channel
+:param str comment: comment about channel
+
 editExternalRepo(info, name=None, url=None)
   description: Edit an existing external repo
 editHost(hostInfo, **kw)
   description: Edit information for an existing host.
-    hostInfo specifies the host to edit, either as an integer (id)
-    or a string (name).
-    fields to be changed are specified as keyword parameters:
-    - arches
-    - capacity
-    - description
-    - comment
+hostInfo specifies the host to edit, either as an integer (id)
+or a string (name).
+fields to be changed are specified as keyword parameters:
+- arches (a space-separated string)
+- capacity (float or int)
+- description (string)
+- comment (string)
 
-    Returns True if changes are made to the database, False otherwise.
+Returns True if changes are made to the database, False otherwise.
+
+editPermission(permission, description)
+  description: Edit a permission description
+editSideTag(sidetag, debuginfo=None, rpm_macros=None, remove_rpm_macros=None, extra=None, remove_extra=None)
+  description: Restricted ability to modify sidetags, parent tag must have:
+sidetag_debuginfo_allowed: 1
+sidetag_rpm_macros_allowed: list of allowed macros (or str.split() compatible string)
+in extra, if modifying functions should work. For blocking/unblocking
+further policy must be compatible with these operations.
+
+:param sidetag: sidetag id or name
+:type sidetag: int or str
+:param debuginfo: set or disable debuginfo repo generation
+:type debuginfo: bool
+:param rpm_macros: add/update rpms macros in extra
+:type rpm_macros: dict
+:param remove_rpm_macros: remove rpm macros from extra
+:type remove_rpm_macros: list of str
 
 editTag(tagInfo, name, arches, locked, permissionID, extra=None)
   description: Edit information for an existing tag.
 editTag2(tagInfo, **kwargs)
   description: Edit information for an existing tag.
 
-    tagInfo specifies the tag to edit
-    fields changes are provided as keyword arguments:
-        name: rename the tag
-        arches: change the arch list
-        locked: lock or unlock the tag
-        perm: change the permission requirement
-        maven_support: whether Maven repos should be generated for the tag
-        maven_include_all: include every build in this tag (including multiple
-                           versions of the same package) in the Maven repo
-        extra: add or update extra tag parameters (dictionary)
-        remove_extra: remove extra tag parameters (list)
+The tagInfo argument is the only required argument. After the tagInfo
+argument, specify any tag changes with additional keyword arguments.
 
-editTagExternalRepo(tag_info, repo_info, priority)
+:param tagInfo: koji tag ID or name to edit (required).
+:type tagInfo: int or str
+
+:param str name: rename the tag.
+:param str arches: a space-separated list of arches for this tag.
+:param bool locked: whether this tag is locked or not.
+:param perm: the permission ID or name for this tag.
+:type perm: int, str, or None
+:param bool maven_support: whether Maven repos should be generated for the
+                           tag.
+:param bool maven_include_all: include every build in this tag (including
+                               multiple versions of the same package) in
+                               the Maven repo.
+:param dict extra: add or update extra tag parameters.
+:param list remove_extra: remove extra tag parameters.
+:param list block_extra: block inherited extra tag parameters.
+
+editTagExternalRepo(tag_info, repo_info, priority=None, merge_mode=None, arches=None)
   description: Edit a tag<->external repo association
-    This allows you to update the priority without removing/adding the repo.
+This allows you to update the priority and merge_mode without removing/adding the repo.
+
+Note that None value of priority and merge_mode means no change on it
+
+editUser(userInfo, name=None, krb_principal_mappings=None)
+  description: Edit information for an existing user.
+
+Use this method to rename a user, or to add/remove/modify Kerberos
+principal(s) for this account.
+
+Example krb_principal_mappings values:
+
+To add a new Kerberos principal to a user account:
+  [{'old': None, 'new': 'myuser@NEW.EXAMPLE.COM'}]
+
+To remove an old Kerberos principal from a user account:
+  [{'old': 'myuser@OLD.EXAMPLE.COM', 'new': None}]
+
+To modify a user's old Kerberos principal to a new one:
+  [{'old': 'myuser@OLD.EXAMPLE.NET', 'new': 'myuser@NEW.EXAMPLE.NET'}]
+
+:param userInfo: username (str) or ID (int)
+:param str name: new name for this user account
+:param list krb_principal_mappings: List of changes to make for this
+                                    user's Kerberos principal. Each change
+                                    is a dict of "old" and "new"
+                                    Kerberos principals.
+:raises: GenericError if the user does not exist, or if there were
+         problems in the krb_principal_mappings.
+
+enableChannel(channelname, comment=None)
+  description: Mark a channel as enabled
 enableHost(hostname)
   description: Mark a host as enabled
 enableUser(username)
   description: Enable logins by the specified user
 error()
   description: debugging. raise an error
+evalPolicy(name, data)
+  description: Evaluate named policy with given data and return the result
+
+:param str name: the policy name
+:param dict data: the policy data
+:returns the action as a string
+:raises koji.GenericError if the policy is empty or not found
+
 exclusiveSession(*args, **opts)
   description: Make this session exclusive
 fault()
   description: debugging. raise an error
 filterResults(methodName, *args, **kw)
   description: Execute the XML-RPC method with the given name and filter the results
-        based on the options specified in the keyword option "filterOpts".  The method
-        must return a list of maps.  Any other return type will result in a TypeError.
-        Currently supported options are:
-        - offset: the number of elements to trim off the front of the list
-        - limit: the maximum number of results to return
-        - order: the map key to use to sort the list; the list will be sorted before
-                 offset or limit are applied
-        - noneGreatest: when sorting, consider 'None' to be greater than all other values;
-                        python considers None less than all other values, but Postgres sorts
-                        NULL higher than all other values; default to True for consistency
-                        with database sorts
+based on the options specified in the keywork option "filterOpts".  The method
+must return a list of maps.  Any other return type will result in a GenericError.
+Currently supported options are:
+- offset: the number of elements to trim off the front of the list
+- limit: the maximum number of results to return
+- order: the map key to use to sort the list; the list will be sorted before
+         offset or limit are applied
+- noneGreatest: when sorting, consider 'None' to be greater than all other values;
+                python considers None less than all other values, but Postgres sorts
+                NULL higher than all other values; default to True for consistency
+                with database sorts
 
 findBuildID(X, strict=False)
+  description: gets build ID for various inputs
+
+:param int|str|dict X: build ID | NVR | dict with name, version and release values
+
+:returns int: build ID
+
+flatpakBuild(src, target, opts=None, priority=None, channel=None)
+  description: Create a build task for a Flatpak
+
+priority: the amount to increase (or decrease) the task priority, relative
+            to the default priority; higher values mean lower priority; only
+            admins have the right to specify a negative priority here
+channel: the channel to allocate the task to
+Returns the task id
+
+flatpakSetExtra(task_id, build_id, build_extra, archive_extra)
+  description: set image data for Flatpak result
+    
 freeTask(task_id)
   description: Free a task
 getAPIVersion()
 getActiveRepos()
   description: Get data on all active repos
 
-    This is a list of all the repos that the repo daemon needs to worry about.
+This is a list of all the repos that the repo daemon needs to worry about.
 
 getAllArches()
   description: Return a list of all (canonical) arches available from hosts
 getAllPerms()
   description: Get a list of all permissions in the system.  Returns a list of maps.  Each
-        map contains the following keys:
+map contains the following keys:
 
-        - id
-        - name
+- id
+- name
+- description
 
 getArchive(archive_id, strict=False)
-  description:
-    Get information about the archive with the given ID.  Returns a map
-    containing the following keys:
+  description: 
+Get information about the archive with the given ID.  Returns a map
+containing the following keys:
 
-    id: unique id of the archive file (integer)
-    type_id: id of the archive type (Java jar, Solaris pkg, Windows exe, etc.) (integer)
-    build_id: id of the build that generated this archive (integer)
-    buildroot_id: id of the buildroot where this archive was built (integer)
-    filename: name of the archive (string)
-    size: size of the archive (integer)
-    checksum: checksum of the archive (string)
-    checksum_type: type of the checksum (integer)
+id: unique id of the archive file (integer)
+type_id: id of the archive type (Java jar, Solaris pkg, Windows exe, etc.) (integer)
+build_id: id of the build that generated this archive (integer)
+buildroot_id: id of the buildroot where this archive was built (integer)
+filename: name of the archive (string)
+size: size of the archive (integer)
+checksum: checksum of the archive (string)
+checksum_type: type of the checksum (integer)
 
-    If the archive is part of a Maven build, the following keys will be included:
-      group_id
-      artifact_id
-      version
-    If the archive is part of a Windows builds, the following keys will be included:
-      relpath
-      platforms
-      flags
+If the archive is part of a Maven build, the following keys will be included:
+  group_id
+  artifact_id
+  version
+If the archive is part of a Windows builds, the following keys will be included:
+  relpath
+  platforms
+  flags
 
-    If the archive is part of an image build, and it is the image file that
-    contains the root partitioning ('/'), there will be additional fields:
-      rootid
-      arch
+If the archive is part of an image build, and it is the image file that
+contains the root partitioning ('/'), there will be a additional fields:
+  rootid
+  arch
 
 getArchiveFile(archive_id, filename, strict=False)
-  description:
-    Get information about a file with the given filename
-    contained in the archive with the given ID.
-    Returns a map with following keys:
+  description: 
+Get information about a file with the given filename
+contained in the archive with the given ID.
+Returns a map with with following keys:
 
-    archive_id: id of the archive the file is contained in (integer)
-    name: name of the file (string)
-    size: uncompressed size of the file (integer)
+archive_id: id of the archive the file is contained in (integer)
+name: name of the file (string)
+size: uncompressed size of the file (integer)
 
-    If strict is True, raise GenericError if:
-      - this file is not found in the archive
-      - build btype of this archive belong to is not maven, win or image
-      - archive_type is not that we are able to expand
+If strict is True, raise GenericError if:
+  - this file is not found in the archive
+  - build btype of this archive belong to is not maven, win or image
+  - archive_type is not that we are able to expand
 
-    Regardless of strict, an error will be raised if the archive_id is invalid
+Regardless of strict, an error will be raised if the archive_id is invalid
 
 getArchiveType(filename=None, type_name=None, type_id=None, strict=False)
-  description:
-    Get the archive type for the given filename, type_name, or type_id.
+  description: 
+Get the archive type for the given filename, type_name, or type_id.
 
 getArchiveTypes()
-  description: Return a list of all supported archivetypes
-getAverageBuildDuration(package)
+  description: Return a list of all supported archive types.
+getAverageBuildDuration(package, age=None)
   description: Get the average duration of a build of the given package.
-        Returns a floating-point value indicating the
-        average number of seconds the package took to build.  If the package
-        has never been built, return None.
+
+:param int|str package: Package name or id
+:param int age: length of history in months
+
+:return float|None: average number of seconds - If package wasn't built
+                    during past age months (or never), None is returned
+
 getBuild(buildInfo, strict=False)
   description: Return information about a build.
 
-    buildID may be either an int ID, a string NVR, or a map containing
-    'name', 'version' and 'release.
+buildInfo may be either a int ID, a string NVR, or a map containing
+'name', 'version' and 'release'.
 
-    A map will be returned containing the following keys*:
-      id: build ID
-      package_id: ID of the package built
-      package_name: name of the package built
-      name: same as package_name
-      version
-      release
-      epoch
-      nvr
-      state
-      task_id: ID of the task that kicked off the build
-      owner_id: ID of the user who kicked off the build
-      owner_name: name of the user who kicked off the build
-      volume_id: ID of the storage volume
-      volume_name: name of the storage volume
-      creation_event_id: id of the create_event
-      creation_time: time the build was created (text)
-      creation_ts: time the build was created (epoch)
-      start_time: time the build was started (may be null)
-      start_ts: time the build was started (epoch, may be null)
-      completion_time: time the build was completed (may be null)
-      completion_ts: time the build was completed (epoch, may be null)
-      source: the SCM URL of the sources used in the build
-      extra: dictionary with extra data about the build
+A map will be returned containing the following keys*:
+  id: build ID
+  package_id: ID of the package built
+  package_name: name of the package built
+  name: same as package_name
+  version
+  release
+  epoch
+  nvr
+  draft: Whether the build is draft or not
+  state
+  task_id: ID of the task that kicked off the build
+  owner_id: ID of the user who kicked off the build
+  owner_name: name of the user who kicked off the build
+  volume_id: ID of the storage volume
+  volume_name: name of the storage volume
+  creation_event_id: id of the create_event
+  creation_time: time the build was created (text)
+  creation_ts: time the build was created (epoch)
+  start_time: time the build was started (may be null)
+  start_ts: time the build was started (epoch, may be null)
+  completion_time: time the build was completed (may be null)
+  completion_ts: time the build was completed (epoch, may be null)
+  source: the SCM URL of the sources used in the build -
+          dereferenced git hash is stored here
+  extra: dictionary with extra data about the build
+      - source:
+          - original_url: while build.source contains concrete
+            SCM hash, this field can contain SCM url which was
+            used when launching build (e.g. git_url#master)
+  cg_id: ID of CG which reserved or imported this build
+  cg_name: name of CG which reserved or imported this build
 
-    If there is no build matching the buildInfo given, and strict is specified,
-    raise an error.  Otherwise return None.
+If there is no build matching the buildInfo given, and strict is specified,
+raise an error.  Otherwise return None.
 
-    [*] Not every build will have data for all keys. E.g. not all builds will
-        associated task ids, and not all import methods provide source info.
+[*] Not every build will have data for all keys. E.g. not all builds will
+    associated task ids, and not all import methods provide source info.
 
 getBuildConfig(tag, event=None)
   description: Return build configuration associated with a tag
 getBuildLogs(build)
   description: Return a list of log files for the given build
-getBuildNotification(id)
-  description: Get the build notification with the given ID.  Return None
-        if there is no notification with the given ID.
+
+This method will only return logs for builds that are complete.
+If a build is in progress, failed, or canceled, you must look at the
+build's task logs instead (see listTaskOutput).
+
+:param build: A build ID (int), a NVR (string), or a dict containing
+              "name", "version" and "release".
+:returns: a possibly-empty list of log file entries. Each entry is a dict
+          with three keys:
+            "name" (log file name)
+            "dir" (immediate parent subdirectory)
+            "path" (the full path under koji's topdir)
+
+getBuildNotification(id, strict=False)
+  description: Get the build notification with the given ID.
+If there is no notification with the given ID, when strict is True,
+raise GenericError, else return None.
+
+getBuildNotificationBlock(id, strict=False)
+  description: Get the build notification with the given ID.
+If there is no notification with the given ID, when strict is True,
+raise GenericError, else return None.
+
+getBuildNotificationBlocks(userID=None)
+  description: Get build notifications for the user with the given ID, name or
+Kerberos principal. If no user is specified, get the notifications for
+the currently logged-in user. If there is no currently logged-in user,
+raise a GenericError.
 getBuildNotifications(userID=None)
-  description: Get build notifications for the user with the given ID.  If no ID
-        is specified, get the notifications for the currently logged-in user.  If
-        there is no currently logged-in user, raise a GenericError.
+  description: Get build notifications for the user with the given ID, name or
+Kerberos principal. If no user is specified, get the notifications for
+the currently logged-in user. If there is no currently logged-in user,
+raise a GenericError.
 getBuildTarget(info, event=None, strict=False)
   description: Return the build target with the given name or ID.
-    If there is no matching build target, return None.
+If there is no matching build target, return None.
 getBuildTargets(info=None, event=None, buildTagID=None, destTagID=None, queryOpts=None)
   description: Return data on all the build targets
+:param int, str, dist info:         build target name, ID or dict
+:param int event:                   provide event to query at a different time
+:param int, str, dict buildTagID:   build tag name, ID or dict
+:param int, str, dict destTagID:    destination tag name, ID or dict
+:param dict queryOpts:              additional options for this query.
 
-    provide event to query at a different time
 getBuildType(buildInfo, strict=False)
   description: Return type info about the build
 
-    buildInfo should be a valid build specification
+buildInfo should be a valid build specification
 
-    Returns a dictionary whose keys are type names and whose values are
-    the type info corresponding to that type
+Returns a dictionary whose keys are type names and whose values are
+the type info corresponding to that type
 
 getBuildroot(buildrootID, strict=False)
   description: Return information about a buildroot.  buildrootID must be an int ID.
 getBuildrootListing(id)
   description: Return a list of packages in the buildroot
-getChangelogEntries(buildID=None, taskID=None, filepath=None, author=None, before=None, after=None, queryOpts=None)
+getChangelogEntries(buildID=None, taskID=None, filepath=None, author=None, before=None, after=None, queryOpts=None, strict=False)
   description: Get changelog entries for the build with the given ID,
-           or for the rpm generated by the given task at the given path
+   or for the rpm generated by the given task at the given path
 
-        - author: only return changelogs with a matching author
-        - before: only return changelogs from before the given date (in UTC)
-                  (a datetime object, a string in the 'YYYY-MM-DD HH24:MI:SS format, or integer seconds
-                   since the epoch)
-        - after: only return changelogs from after the given date (in UTC)
-                 (a datetime object, a string in the 'YYYY-MM-DD HH24:MI:SS format, or integer seconds
-                  since the epoch)
-        - queryOpts: query options used by the QueryProcessor
+- author: only return changelogs with a matching author
+- before: only return changelogs from before the given date (in UTC)
+          (a datetime object, a string in the 'YYYY-MM-DD HH24:MI:SS format, or integer
+          seconds since the epoch)
+- after: only return changelogs from after the given date (in UTC)
+         (a datetime object, a string in the 'YYYY-MM-DD HH24:MI:SS format, or integer
+         seconds since the epoch)
+- queryOpts: query options used by the QueryProcessor
+- strict: if srpm doesn't exist raise an error, otherwise return empty list
 
-        If "order" is not specified in queryOpts, results will be returned in reverse chronological
-        order.
+If "order" is not specified in queryOpts, results will be returned in reverse chronological
+order.
 
-        Results will be returned as a list of maps with 'date', 'author', and 'text' keys.
-        If there are no results, an empty list will be returned.
+Results will be returned as a list of maps with 'date', 'author', and 'text' keys.
+If there are no results, an empty list will be returned.
 
 getChannel(channelInfo, strict=False)
-  description: Return information about a channel.
-getEvent(id)
-  description:
-        Get information about the event with the given id.
+  description: 
+Look up the ID number and name for a channel.
 
-        A map will be returned with the following keys:
-          - id (integer): id of the event
-          - ts (float): timestamp the event was created, in
-                        seconds since the epoch
+:param channelInfo: channel ID or name
+:type channelInfo: int or str
+:param bool strict: If True, raise an error if we found no matching
+                    channel. If False, simply return None if we found no
+                    matching channel. If unspecified, the default value is
+                    False.
+:returns: dict of the channel ID and name, or None.
+          For example, {'id': 20, 'name': 'container'}
 
-        If no event with the given id exists, an error will be raised.
+getEvent(id, strict=True)
+  description: 
+Get information about the event with the given id.
+
+:param int id: the event id
+:param bool strict: if True (the default), error on invalid event
+:returns: dict or None
+
+A map will be returned with the following keys:
+  - id (integer): id of the event
+  - ts (float): timestamp the event was created, in
+                seconds since the epoch
+
+If the event is not in the database, an error will be raised in the strict
+case, otherwise the call will return None.
 
 getExternalRepo(info, strict=False, event=None)
-  description: Get information about a single external repo.
-    info can either be a string (name) or an integer (id).
-    Returns a map containing the id, name, and url of the
-    repo.  If strict is True and no external repo has the
-    given name or id, raise an error.
+  description: 
+Get information about a single external repository.
+
+:param info: a string (name) or an integer (id).
+:param bool strict: If True, raise an error if we found no matching
+                    repository. If False, simply return None if we found
+                    no matching repository. If unspecified, the default
+                    value is False.
+:param int event: The event ID at which to search. If unspecified, the
+                  default behavior is to search for the "active" repo
+                  settings.
+:returns: a map containing the id, name, and url of the repository.
+
 getExternalRepoList(tag_info, event=None)
-  description:
-    Get an ordered list of all external repos associated with the tags in the
-    hierarchy rooted at the specified tag.  External repos will be returned
-    depth-first, and ordered by priority for each tag.  Duplicates will be
-    removed.  Returns a list of maps containing the following fields:
+  description: 
+Get an ordered list of all external repos associated with the tags in the
+hierarchy rooted at the specified tag.  External repos will be returned
+depth-first, and ordered by priority for each tag.  Duplicates will be
+removed.  Returns a list of maps containing the following fields:
 
-    tag_id
-    tag_name
-    external_repo_id
-    external_repo_name
-    url
-    priority
+tag_id
+tag_name
+external_repo_id
+external_repo_name
+url
+merge_mode
+priority
 
-getFullInheritance(tag, event=None, reverse=False, stops=None, jumps=None)
-getGlobalInheritance(event=None)
+getFullInheritance(tag, event=None, reverse=False, **kwargs)
+  description: 
+:param int|str tag: tag ID | name
+:param int event: event ID
+:param bool reverse: return reversed tree (descendants instead of
+                     parents)
+:param dict stops: SHOULD NOT BE USED, BACKWARDS COMPATIBLE ONLY
+:param dict jumps: SHOULD NOT BE USED, BACKWARDS COMPATIBLE ONLY
+
+:returns: list of node dicts
+
 getGroupMembers(group)
   description: Get the members of a group
 getHost(hostInfo, strict=False, event=None)
   description: Get information about the given host.  hostInfo may be
-    either a string (hostname) or int (host id).  A map will be returned
-    containing the following data:
+either a string (hostname) or int (host id).  A map will be returned
+containing the following data:
 
-    - id
-    - user_id
-    - name
-    - arches
-    - task_load
-    - capacity
-    - description
-    - comment
-    - ready
-    - enabled
+- id
+- user_id
+- name
+- update_ts
+- arches
+- task_load
+- capacity
+- description
+- comment
+- ready
+- enabled
 
 getImageArchive(archive_id, strict=False)
-  description:
-    Retrieve image-specific information about an archive.
-    Returns a map containing the following keys:
+  description: 
+Retrieve image-specific information about an archive.
+Returns a map containing the following keys:
 
-    archive_id: id of the build (integer)
-    arch: the architecture of the image
-    rootid: True if this image has the root '/' partition
+archive_id: id of the build (integer)
+arch: the architecture of the image
+rootid: True if this image has the root '/' partition
 
 getImageBuild(buildInfo, strict=False)
-  description:
-    Retrieve image-specific information about a build.
-    buildInfo can be either a string (n-v-r) or an integer
-    (build ID). This function really only exists to verify a build
-    is an image build; there is no additional data.
+  description: 
+Retrieve image-specific information about a build.
+buildInfo can be either a string (n-v-r) or an integer
+(build ID). This function really only exists to verify a build
+is an image build; there is no additional data.
 
-    Returns a map containing the following keys:
-    build_id: id of the build
+Returns a map containing the following keys:
+build_id: id of the build
 
 getInheritanceData(tag, event=None)
   description: Return inheritance data for tag
-getLastEvent(before=None)
-  description:
-        Get the id and timestamp of the last event recorded in the system.
-        Events are usually created as the result of a configuration change
-        in the database.
+getKojiVersion()
+getLastEvent(before=None, strict=True)
+  description: 
+Get the id and timestamp of the last event recorded in the system.
+Events are usually created as the result of a configuration change
+in the database.
 
-        If "before" (int or float) is specified, return the last event
-        that occurred before that time (in seconds since the epoch).
-        If there is no event before the given time, an error will be raised.
+If "before" (int or float) is specified, return the last event
+that occurred before that time (in seconds since the epoch).
+If there is no event before the given time, an error will be raised.
 
-        Note that due to differences in precision between the database and python,
-        this method can return an event with a timestamp the same or slightly higher
-        (by a few microseconds) than the value of "before" provided.  Code using this
-        method should check that the timestamp returned is in fact lower than the parameter.
-        When trying to find information about a specific event, the getEvent() method
-        should be used.
+Note that due to differences in precision between the database and python,
+this method can return an event with a timestamp the same or slightly higher
+(by a few microseconds) than the value of "before" provided.  Code using this
+method should check that the timestamp returned is in fact lower than the parameter.
+When trying to find information about a specific event, the getEvent() method
+should be used.
 
-getLastHostUpdate(hostID)
-  description: Return the latest update timestampt for the host
+getLastHostUpdate(hostID, ts=False)
+  description: Return the latest update timestamp for the host
 
-        The timestamp represents the last time the host with the given
-        ID contacted the hub. Returns None if the host has never contacted
-         the hub.
-getLatestBuilds(tag, event=None, package=None, type=None)
-  description: List latest builds for tag (inheritance enabled)
+The timestamp represents the last time the host with the given
+ID contacted the hub. Returns None if the host has never contacted
+the hub.
+
+The timestamp returned here may be different than the newer
+update_ts field now returned by the getHost and listHosts calls.
+
+getLatestBuilds(tag, event=None, package=None, type=None, draft=None)
+  description: List latest builds for tag (inheritance enabled, wrapper of readTaggedBuilds)
+
+:param int tag: tag ID
+:param int event: query at a time in the past
+:param int package: filter on package name
+:param str type: restrict the list to builds of the given type.  Currently the supported
+                 types are 'maven', 'win', 'image', or any custom content generator btypes.
+:param bool draft: bool or None option that indicates the filter based on draft field
+                   - None: no filter (both draft and regular builds)
+                   - True: draft only
+                   - False: regular only
+:returns [dict]: list of buildinfo dicts
+
 getLatestMavenArchives(tag, event=None, inherit=True)
   description: Return a list of the latest Maven archives in the tag, as of the given event
-           (or now if event is None).  If inherit is True, follow the tag hierarchy
-           and return a list of the latest archives for all tags in the tree.
-getLatestRPMS(tag, package=None, arch=None, event=None, rpmsigs=False, type=None)
-  description: List latest RPMS for tag (inheritance enabled)
+(or now if event is None).  If inherit is True, follow the tag hierarchy
+and return a list of the latest archives for all tags in the tree.
+getLatestRPMS(tag, package=None, arch=None, event=None, rpmsigs=False, type=None, draft=None)
+  description: List latest RPMS for tag (inheritance enabled, wrapper of readTaggedBuilds)
+
+:param int|str tag: The tag name or ID to search
+:param str package: Filter on a package name.
+:param str|list arch: Filter on an architecture (eg "x86_64") or list of
+                      architectures.
+:param int event: The event ID at which to search. If unspecified, the
+                  default behavior is to search for the "active" tag
+                  builds.
+:param bool rpmsigs: query will return one record per rpm/signature combination
+:param str type: Filter by build type. Supported types are 'maven',
+                 'win', and 'image'.
+:param bool draft: bool or None option that indicates the filter based on draft field
+                   - None: no filter (both draft and regular builds)
+                   - True: draft only
+                   - False: regular only
+:returns: a two-element list. The first element is the list of RPMs, and
+          the second element is the list of builds.
+
 getLoggedInUser()
   description: Return information about the currently logged-in user.  Returns data
-        in the same format as getUser(), plus the authtype.  If there is no
-        currently logged-in user, return None.
+in the same format as getUser(), plus the authtype.  If there is no
+currently logged-in user, return None.
 getMavenArchive(archive_id, strict=False)
-  description:
-    Retrieve Maven-specific information about an archive.
-    Returns a map containing the following keys:
+  description: 
+Retrieve Maven-specific information about an archive.
+Returns a map containing the following keys:
 
-    archive_id: id of the build (integer)
-    group_id: Maven groupId (string)
-    artifact_id: Maven artifact_Id (string)
-    version: Maven version (string)
+archive_id: id of the build (integer)
+group_id: Maven groupId (string)
+artifact_id: Maven artifact_Id (string)
+version: Maven version (string)
 
 getMavenBuild(buildInfo, strict=False)
-  description:
-    Retrieve Maven-specific information about a build.
-    buildInfo can be either a string (n-v-r) or an integer
-    (build ID).
-    Returns a map containing the following keys:
+  description: 
+Retrieve Maven-specific information about a build.
+buildInfo can be either a string (n-v-r) or an integer
+(build ID).
+Returns a map containing the following keys:
 
-    build_id: id of the build (integer)
-    group_id: Maven groupId (string)
-    artifact_id: Maven artifact_Id (string)
-    version: Maven version (string)
+build_id: id of the build (integer)
+group_id: Maven groupId (string)
+artifact_id: Maven artifact_Id (string)
+version: Maven version (string)
 
-getNextRelease(build_info)
-  description: find the last successful or deleted build of this N-V
+getNextRelease(build_info, incr=1)
+  description: 
+Find the next release for a package's version.
+
+This method searches the latest building, successful, or deleted build and
+returns the "next" release value for that version.
+
+Note that draft builds are excluded while getting that latest build.
+
+Examples:
+
+  None becomes "1"
+  "123" becomes "124"
+  "123.el8" becomes "124.el8"
+  "123.snapshot.456" becomes "123.snapshot.457"
+
+All other formats will raise koji.BuildError.
+
+:param dict build_info: a dict with two keys: a package "name" and
+                        "version" of the builds to search. For example,
+                        {"name": "bash", "version": "4.4.19"}
+:param int incr: value which should be added to latest found release
+                 (it is used for solving race-condition conflicts)
+:returns: a release string for this package, for example "15.el8".
+:raises: BuildError if the latest build uses a release value that Koji
+         does not know how to increment.
+
 getPackage(info, strict=False, create=False)
   description: Get the id,name for package
 getPackageConfig(tag, pkg, event=None)
   description: Get config for package in tag
-getPackageID(name)
+getPackageID(name, strict=False)
+  description: Get package ID by name.
+If package doesn't exist, return None, unless strict is True in which
+case an exception is raised.
 getPerms()
   description: Get a list of the permissions granted to the currently logged-in user.
 getRPM(rpminfo, strict=False, multi=False)
   description: Get information about the specified RPM
 
-    rpminfo may be any one of the following:
-    - an int ID
-    - a string N-V-R.A
-    - a string N-V-R.A@location
-    - a map containing 'name', 'version', 'release', and 'arch'
-      (and optionally 'location')
+rpminfo may be any one of the following:
+- the rpm id as an int
+- the rpm id as a string
+- a string N-V-R.A
+- a string N-V-R.A@location
+- a map containing 'name', 'version', 'release', and 'arch'
+  (and optionally 'location')
 
-    If specified, location should match the name of an external repo
+If specified, location should match the name of an external repo
 
-    A map will be returned, with the following keys:
-    - id
-    - name
-    - version
-    - release
-    - arch
-    - epoch
-    - payloadhash
-    - size
-    - buildtime
-    - build_id
-    - buildroot_id
-    - external_repo_id
-    - external_repo_name
-    - metadata_only
-    - extra
+A map will be returned, with the following keys:
+- id
+- name
+- version
+- release
+- arch
+- draft
+- epoch
+- payloadhash
+- size
+- buildtime
+- build_id
+- buildroot_id
+- external_repo_id
+- external_repo_name
+- metadata_only
+- extra
 
-    If there is no RPM with the given ID, None is returned, unless strict
-    is True in which case an exception is raised
+If there is no RPM with the given ID, None is returned, unless strict
+is True in which case an exception is raised
 
-    If more than one RPM matches, and multi is True, then a list of results is
-    returned. If multi is False, a single match is returned (an internal one if
-    possible).
+This function is normally expected to return a single rpm. However, there
+are cases where the given rpminfo could refer to multiple rpms. This is
+because of nvra overlap involving:
+  * draft rpms
+  * external rpms
 
-getRPMDeps(rpmID, depType=None, queryOpts=None)
+If more than one RPM matches, then in the default case (multi=False), this function
+will choose the best option in order of preference:
+  1. internal non-draft rpms (nvras are unique within this subset)
+  2. internal draft rpms (highest rpm id)
+  3. external rpms (highest rpm id)
+OTOH if multi is True, then all matching results are returned as a list
+
+getRPMChecksums(rpm_id, checksum_types=None, cacheonly=False)
+  description: Returns RPM checksums for specific rpm.
+
+:param int rpm_id: RPM id
+:param list checksum_type: List of checksum types. Default sha256 checksum type
+:param bool cacheonly: when False, checksum is created for missing checksum type
+                       when True, checksum is returned as None when checksum is missing
+                       for specific checksum type
+:returns: A dict of specific checksum types and checksums
+
+getRPMDeps(rpmID, depType=None, queryOpts=None, strict=False)
   description: Return dependency information about the RPM with the given ID.
-        If depType is specified, restrict results to dependencies of the given type.
-        Otherwise, return all dependency information.  A list of maps will be returned,
-        each with the following keys:
-        - name
-        - version
-        - flags
-        - type
+If depType is specified, restrict results to dependencies of the given type.
+Otherwise, return all dependency information.  A list of maps will be returned,
+each with the following keys:
+- name
+- version
+- flags
+- type
 
-        If there is no RPM with the given ID, or the RPM has no dependency information,
-        an empty list will be returned.
+If there is no *internal* RPM with the given ID, or no RPM file found,
+an empty list will be returned, unless strict is True in which case a
+GenericError is raised.
+If the RPM has no dependency information, an empty list will be returned.
 
-getRPMFile(rpmID, filename)
-  description:
-        Get info about the file in the given RPM with the given filename.
-        A map will be returned with the following keys:
-        - rpm_id
-        - name
-        - digest
-        - md5 (alias for digest)
-        - digest_algo
-        - size
-        - flags
-        - user
-        - group
-        - mtime
-        - mode
+getRPMFile(rpmID, filename, strict=False)
+  description: 
+Get info about the file in the given RPM with the given filename.
+A map will be returned with the following keys:
+- rpm_id
+- name
+- digest
+- md5 (alias for digest)
+- digest_algo
+- size
+- flags
+- user
+- group
+- mtime
+- mode
 
-        If no such file exists, an empty map will be returned.
+If there is no *internal* RPM with the given ID, or no RPM file found,
+an empty map will be returned, unless strict is True in which case a
+GenericError is raised.
+If no such file exists, an empty map will be returned, unless strict is
+True in which case a GenericError is raised.
 
-getRPMHeaders(rpmID=None, taskID=None, filepath=None, headers=None)
-  description:
-        Get the requested headers from the rpm.  Header names are case-insensitive.
-        If a header is requested that does not exist an exception will be raised.
-        Returns a map of header names to values.  If the specified ID
-        is not valid or the rpm does not exist on the file system, an empty map
-        will be returned.
+getRPMHeaders(rpmID=None, taskID=None, filepath=None, headers=None, strict=False)
+  description: 
+Get the requested headers from the rpm, specified either by rpmID or taskID + filepath
 
-getRepo(tag, state=None, event=None, dist=False)
-getSessionInfo()
-getTag(tagInfo, strict=False, event=None)
+If the specified ID is not valid or the rpm does not exist on the file system an empty
+map will be returned, unless strict=True is given.
+
+Header names are case-insensitive. If a header is requested that does not exist an
+exception will be raised (regardless of strict option).
+
+:param int|str rpmID: query the specified rpm
+:param int taskID: query a file from the specified task (filepath must also be passed)
+:param str filepath: the rpm path relative to the task directory
+:param list headers: a list of rpm header names (as strings)
+:param bool strict: raise an exception for invalid or missing rpms/paths
+:returns dict: a map of header names to values
+
+getRepo(tag, state=None, event=None, dist=False, min_event=None)
+  description: Get individual repository data based on tag and additional filters.
+If more repos fits, most recent is returned.
+
+:param int|str tag: tag ID or name
+:param int state: value from koji.REPO_STATES
+:param int event: maximum event ID. legacy arg
+:param bool dist: True = dist repo, False = regular repo
+:param int min_event: minimum event ID
+
+:returns: dict with repo data
+
+getSessionInfo(details=False, user_id=None)
+  description: Return session info for current user or all not expired sessions to specific user
+
+:param boolean details: add session ID and hostip to result
+:param str user_id: show all not expired sessions related to specific user
+
+:returns: dict or list of dicts session data
+
+getTag(tagInfo, strict=False, event=None, blocked=False)
   description: Get tag information based on the tagInfo.  tagInfo may be either
-    a string (the tag name) or an int (the tag ID).
-    Returns a map containing the following keys:
+a string (the tag name) or an int (the tag ID).
+Returns a map containing the following keys:
 
-    - id :      unique id for the tag
-    - name :    name of the tag
-    - perm_id : permission id (may be null)
-    - perm :    permission name (may be null)
-    - arches :  tag arches (string, may be null)
-    - locked :  lock setting (boolean)
-    - maven_support :           maven support flag (boolean)
-    - maven_include_all :       maven include all flag (boolean)
-    - extra :   extra tag parameters (dictionary)
+- id :      unique id for the tag
+- name :    name of the tag
+- perm_id : permission id (may be null)
+- perm :    permission name (may be null)
+- arches :  tag arches (string, may be null)
+- locked :  lock setting (boolean)
+- maven_support :           maven support flag (boolean)
+- maven_include_all :       maven include all flag (boolean)
+- extra :   extra tag parameters (dictionary)
+- query_event : return "event" parameter for current call
+                if something was passed in
 
-    If there is no tag matching the given tagInfo, and strict is False,
-    return None.  If strict is True, raise a GenericError.
+If there is no tag matching the given tagInfo, and strict is False,
+return None.  If strict is True, raise a GenericError.
 
-    Note that in order for a tag to 'exist', it must have an active entry
-    in tag_config. A tag whose name appears in the tag table but has no
-    active tag_config entry is considered deleted.
+Note that in order for a tag to 'exist', it must have an active entry
+in tag_config. A tag whose name appears in the tag table but has no
+active tag_config entry is considered deleted.
+
+event option can be either event_id or "auto" which will pick last
+recorded create_event (option for getting deleted tags)
 
 getTagExternalRepos(tag_info=None, repo_info=None, event=None)
-  description:
-    Get a list of tag<->external repo associations.
+  description: 
+Get a list of tag<->external repo associations.
 
-    Returns a map containing the following fields:
-    tag_id
-    tag_name
-    external_repo_id
-    external_repo_name
-    url
-    priority
+The list of associations is ordered by the priority field.
 
-getTagGroups(tag, event=None, inherit=True, incl_pkgs=True, incl_reqs=True)
+Each map containing the following fields:
+  tag_id
+  tag_name
+  external_repo_id
+  external_repo_name
+  url
+  merge_mode
+  priority
+
+:param tag_info: Tag name or ID number. This field is optional. If you
+                 specify a value here, Koji will only return
+                 repo association information for this single tag.
+:param repo_info: External repository name or ID number. This field is
+                  optional. If you specify a value here, Koji will only
+                  return tag association information for this single
+                  repository.
+:param int event: The event ID at which to search. If unspecified, the
+                  default behavior is to search for the "active" tag and
+                  repo settings.
+
+getTagGroups(tag, event=None, inherit=True, incl_pkgs=True, incl_reqs=True, incl_blocked=False)
   description: Return group data for the tag with blocked entries removed
 
-    Also scrubs data into an xmlrpc-safe format (no integer keys)
+Also scrubs data into an xmlrpc-safe format (no integer keys)
+
+Blocked packages/groups can alternatively also be listed if incl_blocked is set to True
 
 getTagID(info, strict=False, create=False)
   description: Get the id for tag
-getTaskChildren(task_id, request=False)
+getTaskChildren(task_id, request=False, strict=False)
   description: Return a list of the children
-        of the Task with the given ID.
+of the Task with the given ID.
 getTaskDescendents(task_id, request=False)
   description: Get all descendents of the task with the given ID.
-        Return a map of task_id -> list of child tasks.  If the given
-        task has no descendents, the map will contain a single elements
-        mapping the given task ID to an empty list.  Map keys will be strings
-        representing integers, due to limitations in xmlrpclib.  If "request"
-        is true, the parameters sent with the xmlrpc request will be decoded and
-        included in the map.
-getTaskInfo(task_id, request=False)
+Return a map of task_id -> list of child tasks.  If the given
+task has no descendents, the map will contain a single elements
+mapping the given task ID to an empty list.  Map keys will be strings
+representing integers, due to limitations in xmlrpclib.  If "request"
+is true, the parameters sent with the xmlrpc request will be decoded and
+included in the map.
+getTaskInfo(task_id, request=False, strict=False)
   description: Get information about a task
+
+:param int task_id: Task id (or list of ids)
+:param bool request: if True, return also task's request
+:param bool strict: raise exception, if task is not found
+
+:returns dict: task info (or list of dicts)
 getTaskRequest(taskId)
+  description: Return original task request as a list. Content depends on task type
+
+:param int taskId: id of task queried
+
+:returns list: request
+
 getTaskResult(taskId, raise_fault=True)
-getUser(userInfo=None, strict=False)
+  description: Returns task results depending on task type. For buildArch it is a dict with build info,
+for newRepo list with two items, etc.
+
+:param int taskId: id of task queried
+:param bool raise_fault: if task's result is a fault, raise it also here, otherwise
+                        just get dict with error code/message
+
+:returns any: dict/list/etc. with task result
+getUser(userInfo=None, strict=False, krb_princs=True, groups=False)
   description: Return information about a user.
 
-    userInfo may be either a str (Kerberos principal or name) or an int (user id).
+:param userInfo: a str (Kerberos principal or name) or an int (user id)
+                 or a dict:
+                     - id: User's ID
+                     - name: User's name
+                     - krb_principal: Kerberos principal
+:param bool strict: whether raising Error when no user found
+:param bool krb_princs: whether show krb_principals in result
+:return: a dict as user's information:
+    id: user id
+    name: user name
+    status: user status (int), may be null
+    usertype: user type (int), 0 person, 1 for host, may be null
+    krb_principals: the user's Kerberos principals (list)
 
-    A map will be returned with the following keys:
-      id: user id
-      name: user name
-      status: user status (int), may be null
-      usertype: user type (int), 0 person, 1 for host, may be null
-      krb_principal: the user's Kerberos principal
+getUserGroups(user)
+  description: 
+The groups associated with the given user
 
-getUserPerms(userID=None)
+:param user: a str (Kerberos principal or name) or an int (user id)
+             or a dict:
+                 - id: User's ID
+                 - name: User's name
+                 - krb_principal: Kerberos principal
+
+:returns: a list of dicts, each containing the id and name of
+          a group
+
+:raises: GenericError if the specified user is not found
+
+getUserPerms(userID=None, with_groups=True)
   description: Get a list of the permissions granted to the user with the given ID/name.
-        Options:
-        - userID: User ID or username. If no userID provided, current login user's
-                  permissions will be listed.
+Options:
+- userID: User ID or username. If no userID provided, current login user's
+          permissions will be listed.
+getUserPermsInheritance(userID)
+  description: Get a dict of the permissions granted directly to user or inherited from groups
+with the sources.
+
+:param int userID: User id
+:returns dict[str, list[str]]: list of permissions with source (None/group)
+
 getVolume(volume, strict=False)
   description: Lookup the given volume
 
-        Returns a dictionary containing the name and id of the matching
-        volume, or None if no match.
-        If strict is true, raises an error if no match.
+Returns a dictionary containing the name and id of the matching
+volume, or None if no match.
+If strict is true, raises an error if no match.
 
 getWinArchive(archive_id, strict=False)
-  description:
-    Retrieve Windows-specific information about an archive.
-    Returns a map containing the following keys:
+  description: 
+Retrieve Windows-specific information about an archive.
+Returns a map containing the following keys:
 
-    archive_id: id of the build (integer)
-    relpath: the relative path where the file is located (string)
-    platforms: space-separated list of platforms the file is suitable for use on (string)
-    flags: space-separated list of flags used when building the file (fre, chk) (string)
+archive_id: id of the build (integer)
+relpath: the relative path where the file is located (string)
+platforms: space-separated list of platforms the file is suitable for use on (string)
+flags: space-separated list of flags used when building the file (fre, chk) (string)
 
 getWinBuild(buildInfo, strict=False)
-  description:
-    Retrieve Windows-specific information about a build.
-    buildInfo can be either a string (n-v-r) or an integer
-    (build ID).
-    Returns a map containing the following keys:
+  description: 
+Retrieve Windows-specific information about a build.
+buildInfo can be either a string (n-v-r) or an integer
+(build ID).
+Returns a map containing the following keys:
 
-    build_id: id of the build (integer)
-    platform: the platform the build was performed on (string)
+build_id: id of the build (integer)
+platform: the platform the build was performed on (string)
 
 grantCGAccess(user, cg, create=False)
-  description: Grant user access to act as the given content generator
-grantPermission(userinfo, permission, create=False)
+  description: 
+Grant user access to act as the given content generator
+
+:param user: koji userid or username
+:type user: int or str
+:param cg: content generator id or name
+:type cg: int or str
+:param bool create: If True, and the requested cg name entry does not
+                    already exist, then Koji will create the content
+                    generator entry. In such a case, the cg parameter
+                    must be a string. The default is False.
+
+grantPermission(userinfo, permission, create=False, description=None)
   description: Grant a permission to a user
 groupListAdd(taginfo, grpinfo, block=False, force=False, **opts)
   description: Add to (or update) group list for tag
@@ -793,52 +1326,63 @@ groupListBlock(taginfo, grpinfo)
   description: Block the group in tag
 groupListRemove(taginfo, grpinfo, force=False)
   description: Remove group from the list for tag
+Permission required: admin
 
-    Really this shouldn't be used except in special cases
-    Most of the time you really want to use the block or unblock functions
+:param taginfo: tag id or name which group is removed from
+:type taginfo: int or str
+:param grpinfo: group id or name which is removed
+:type grpinfo: int or str
+:param bool force: If False(default), GenericException will be raised when
+                   no group found in the list for tag. If True, revoking
+                   will be force to execute, no matter if the relationship
+                   exists.
+
+Really this shouldn't be used except in special cases
+Most of the time you really want to use the block or unblock functions
 
 groupListUnblock(taginfo, grpinfo)
   description: Unblock the group in tag
 
-    If the group is blocked in this tag, then simply remove the block.
-    Otherwise, raise an error
+If the group is blocked in this tag, then simply remove the block.
+Otherwise, raise an error
 
 groupPackageListAdd(taginfo, grpinfo, pkg_name, block=False, force=False, **opts)
   description: Add package to group for tag
 groupPackageListBlock(taginfo, grpinfo, pkg_name)
   description: Block the package in group-tag
-groupPackageListRemove(taginfo, grpinfo, pkg_name, force=False)
+groupPackageListRemove(taginfo, grpinfo, pkg_name)
   description: Remove package from the list for group-tag
 
-    Really this shouldn't be used except in special cases
-    Most of the time you really want to use the block or unblock functions
+Really this shouldn't be used except in special cases
+Most of the time you really want to use the block or unblock functions
 
 groupPackageListUnblock(taginfo, grpinfo, pkg_name)
   description: Unblock the package in group-tag
 
-    If blocked (directly) in this tag, then simply remove the block.
-    Otherwise, raise an error
+If blocked (directly) in this tag, then simply remove the block.
+Otherwise, raise an error
 
 groupReqListAdd(taginfo, grpinfo, reqinfo, block=False, force=False, **opts)
   description: Add group requirement to group for tag
 groupReqListBlock(taginfo, grpinfo, reqinfo)
   description: Block the group requirement in group-tag
-groupReqListRemove(taginfo, grpinfo, reqinfo, force=False)
+groupReqListRemove(taginfo, grpinfo, reqinfo, force=None)
   description: Remove group requirement from the list for group-tag
 
-    Really this shouldn't be used except in special cases
-    Most of the time you really want to use the block or unblock functions
+Really this shouldn't be used except in special cases
+Most of the time you really want to use the block or unblock functions
 
 groupReqListUnblock(taginfo, grpinfo, reqinfo)
   description: Unblock the group requirement in group-tag
 
-    If blocked (directly) in this tag, then simply remove the block.
-    Otherwise, raise an error
+If blocked (directly) in this tag, then simply remove the block.
+Otherwise, raise an error
 
-hasPerm(perm)
+hasPerm(perm, strict=False)
   description: Check if the logged-in user has the given permission.  Return False if
-        they do not have the permission, or if they are not logged-in.
+they do not have the permission, or if they are not logged-in.
 hello(*args)
+  description: Simple testing call returning a string
 host.assertPolicy(name, data, default='deny')
 host.checkPolicy(name, data, default='deny', strict=False)
 host.closeTask(task_id, response)
@@ -851,33 +1395,33 @@ host.completeMavenBuild(task_id, build_id, maven_results, rpm_results)
 host.completeWinBuild(task_id, build_id, results, rpm_results)
   description: Complete a Windows build
 host.createMavenBuild(build_info, maven_info)
-  description:
-        Associate Maven metadata with an existing build.  Used
-        by the rpm2maven plugin.
+  description: 
+Associate Maven metadata with an existing build.  Used
+by the rpm2maven plugin.
 
 host.distRepoMove(repo_id, uploadpath, arch)
-  description:
-        Move one arch of a dist repo into its final location
+  description: 
+Move one arch of a dist repo into its final location
 
-        Unlike normal repos, dist repos have all their content linked (or
-        copied) into place.
+Unlike normal repos, dist repos have all their content linked (or
+copied) into place.
 
-        repo_id - the repo to move
-        uploadpath - where the uploaded files are
-        arch - the arch of the repo
+repo_id - the repo to move
+uploadpath - where the uploaded files are
+arch - the arch of the repo
 
-        uploadpath should contain a repo_manifest file
+uploadpath should contain a repo_manifest file
 
-        The uploaded files should include:
-            - kojipkgs: json file with information about the component rpms
-            - repo metadata files
+The uploaded files should include:
+    - kojipkgs: json file with information about the component rpms
+    - repo metadata files
 
 host.evalPolicy(name, data)
   description: Evaluate named policy with given data and return the result
 host.failBuild(task_id, build_id)
   description: Mark the build as failed.  If the current state is not
-        'BUILDING', or the current completion_time is not null, a
-        GenericError will be raised.
+'BUILDING', or the current completion_time is not null, a
+GenericError will be raised.
 host.failTask(task_id, response)
 host.freeTasks(tasks)
 host.getHost()
@@ -885,38 +1429,38 @@ host.getHost()
 host.getHostTasks()
 host.getID()
 host.getLoadData()
-host.getTask()
+host.getTasks()
 host.importArchive(filepath, buildinfo, type, typeInfo)
-  description:
-        Import an archive file and associate it with a build.  The archive can
-        be any non-rpm filetype supported by Koji.  Used by the rpm2maven plugin.
+  description: 
+Import an archive file and associate it with a build.  The archive can
+be any non-rpm filetype supported by Koji.  Used by the rpm2maven plugin.
 
-host.importImage(task_id, build_id, results)
-  description:
-        Import a built image, populating the database with metadata and
-        moving the image to its final location.
+host.importImage(task_id, build_info, results)
+  description: 
+Import a built image, populating the database with metadata and
+moving the image to its final location.
 
 host.importWrapperRPMs(task_id, build_id, rpm_results)
   description: Import the wrapper rpms and associate them with the given build.  The build
-        must not have any existing rpms associated with it.
+must not have any existing rpms associated with it.
 host.initBuild(data)
   description: Create a stub (rpm) build entry.
 
-        This is done at the very beginning of the build to inform the
-        system the build is underway.
+This is done at the very beginning of the build to inform the
+system the build is underway.
 
-        This function is only called for rpm builds, other build types
-        have their own init function
+This function is only called for rpm builds, other build types
+have their own init function
 
 host.initImageBuild(task_id, build_info)
   description: create a new in-progress image build
 host.initMavenBuild(task_id, build_info, maven_info)
   description: Create a new in-progress Maven build
-           Synthesize the release number by taking the (integer) release of the
-           last successful build and incrementing it.
+Synthesize the release number by taking the (integer) release of the
+last successful build and incrementing it.
 host.initWinBuild(task_id, build_info, win_info)
-  description:
-        Create a new in-progress Windows build.
+  description: 
+Create a new in-progress Windows build.
 
 host.isEnabled()
 host.moveBuildToScratch(task_id, srpm, rpms, logs=None)
@@ -929,540 +1473,771 @@ host.moveWinBuildToScratch(task_id, results, rpm_results)
   description: Move a completed Windows scratch build into place (not imported)
 host.newBuildRoot(repo, arch, task_id=None)
 host.openTask(task_id)
-host.repoAddRPM(repo_id, path)
-  description: Add an uploaded rpm to a repo
-host.repoDone(repo_id, data, expire=False)
+host.refuseTask(task_id, soft=True, msg='')
+host.repoDone(repo_id, data, expire=False, repo_json_updates=None)
   description: Finalize a repo
 
-        repo_id: the id of the repo
-        data: a dictionary of repo files in the form:
-              { arch: [uploadpath, [file1, file2, ...]], ...}
-        expire: if set to true, mark the repo expired immediately [*]
+:param int repo_id: the id of the repo
+:param dict data: a dictionary of repo files in the form:
+:param bool expire: (legacy) if true, mark repo expired
+:param dict repo_json_updates: updates for repo.json file
 
-        Actions:
-        * Move uploaded repo files into place
-        * Mark repo ready
-        * Expire earlier repos
-        * Move/create 'latest' symlink
+The data parameter should be of the form:
+    { arch: [uploadpath, [file1, file2, ...]], ...}
 
-        For dist repos, the move step is skipped (that is handled in
-        distRepoMove).
+Actions:
+* Move uploaded repo files into place
+* Mark repo ready (or expired)
+* Move/create 'latest' symlink if appropriate
 
-        * This is used when a repo from an older event is generated
+For dist repos, the move step is skipped (that is handled in
+distRepoMove).
 
-host.repoInit(tag, with_src=False, with_debuginfo=False, event=None)
+host.repoInit(tag, task_id=None, event=None, opts=None)
   description: Initialize a new repo for tag
 host.setBuildRootList(brootid, rpmlist, task_id=None)
 host.setBuildRootState(brootid, state, task_id=None)
+host.setHostData(hostdata)
+  description: Provide host data for the scheduler
+
+:param dict hostdata: host data
+
+For backwards compatibility, we also accept hostdata as a string containing a
+json-encoded dictionary.
+
 host.setTaskWeight(task_id, weight)
 host.subtask(method, arglist, parent, **opts)
 host.subtask2(_HostExports__parent, _HostExports__taskopts, _HostExports__method, *args, **opts)
   description: A wrapper around subtask with optional signature
 
-        Parameters:
-            __parent: task id of the parent task
-            __taskopts: dictionary of task options
-            __method: the method to be invoked
+Parameters:
+    __parent: task id of the parent task
+    __taskopts: dictionary of task options
+    __method: the method to be invoked
 
-        Remaining args are passed on to the subtask
+Remaining args are passed on to the subtask
 
 host.tagBuild(task_id, tag, build, force=False, fromtag=None)
   description: Tag a build (host version)
 
-        This tags as the user who owns the task
+This tags as the user who owns the task
 
-        If fromtag is specified, also untag the package (i.e. move in a single
-        transaction)
+If fromtag is specified, also untag the package (i.e. move in a single
+transaction)
 
-        No return value
+No return value
 
 host.tagNotification(is_successful, tag_id, from_id, build_id, user_id, ignore_success=False, failure_msg='')
   description: Create a tag notification message.
-        Handles creation of tagNotification tasks for hosts.
+Handles creation of tagNotification tasks for hosts.
 host.taskSetWait(parent, tasks)
 host.taskWait(parent)
 host.taskWaitResults(parent, tasks, canfail=None)
 host.updateBuildRootList(brootid, rpmlist, task_id=None)
 host.updateBuildrootArchives(brootid, task_id, archives, project=False)
-host.updateHost(task_load, ready)
-host.updateMavenBuildRootList(brootid, task_id, mavenlist, ignore=None, project=False, ignore_unknown=False, extra_deps=None)
-importArchive(filepath, buildinfo, type, typeInfo)
-  description:
-        Import an archive file and associate it with a build.  The archive can
-        be any non-rpm filetype supported by Koji.
+host.updateHost(task_load, ready, data=None)
+  description: Update host data
 
-        filepath: path to the archive file (relative to the Koji workdir)
-        buildinfo: information about the build to associate the archive with
-                   May be a string (NVR), integer (buildID), or dict (containing keys: name, version, release)
-        type: type of the archive being imported.  Currently supported archive types: maven, win
-        typeInfo: dict of type-specific information
+:param float task_load: current task load
+:param bool ready: whether the host is ready to take a task
+:param dict data: data for the scheduler
+
+
+host.updateMavenBuildRootList(brootid, task_id, mavenlist, ignore=None, project=False, ignore_unknown=False, extra_deps=None)
+host.writeSignedRPM(an_rpm, sigkey, force=False)
+  description: Write a signed copy of the rpm
+imageBuilderBuild(target, arches, types, name, version, opts=None, priority=None)
+  description: Create an image via image-builder
+importArchive(filepath, buildinfo, type, typeInfo)
+  description: 
+Import an archive file and associate it with a build.  The archive can
+be any non-rpm filetype supported by Koji.
+
+filepath: path to the archive file (relative to the Koji workdir)
+buildinfo: information about the build to associate the archive with
+           May be a string (NVR), integer (buildID), or dict (containing keys: name,
+           version, release)
+type: type of the archive being imported.  Currently supported archive types: maven, win
+typeInfo: dict of type-specific information
 
 importRPM(path, basename)
   description: Import an RPM into the database.
 
-        The file must be uploaded first.
+The file must be uploaded first.
 
-krbLogin(*args, **opts)
+kiwiBuild(target, arches, desc_url, desc_path, optional_arches=None, profile=None, scratch=False, priority=None, make_prep=False, repos=None, release=None, type=None, type_attr=None, result_bundle_name_format=None, use_buildroot_repo=False, version=None, repo_releasever=None)
 listArchiveFiles(archive_id, queryOpts=None, strict=False)
-  description:
-    Get information about the files contained in the archive with the given ID.
-    Returns a list of maps with following keys:
+  description: 
+Get information about the files contained in the archive with the given ID.
+Returns a list of maps with with following keys:
 
-    archive_id: id of the archive the file is contained in (integer)
-    name: name of the file (string)
-    size: uncompressed size of the file (integer)
+archive_id: id of the archive the file is contained in (integer)
+name: name of the file (string)
+size: uncompressed size of the file (integer)
 
-    If strict is True, raise GenericError if:
-      - the btype of this archive is not maven, win or image
-      - archive_type is not one that we are able to expand
+If strict is True, raise GenericError if archive_type is not one that we
+are able to expand
 
-    Regardless of strict, an error will be raised if the archive_id is invalid
+Regardless of strict, an error will be raised if the archive_id is invalid
 
-listArchives(buildID=None, buildrootID=None, componentBuildrootID=None, hostID=None, type=None, filename=None, size=None, checksum=None, typeInfo=None, queryOpts=None, imageID=None, archiveID=None, strict=False)
-  description:
-    Retrieve information about archives.
-    If buildID is not null it will restrict the list to archives built by the build with that ID.
-    If buildrootID is not null it will restrict the list to archives built in the buildroot with that ID.
-    If componentBuildrootID is not null it will restrict the list to archives that were present in the
-      buildroot with that ID.
-    If hostID is not null it will restrict the list to archives built on the host with that ID.
-    If filename, size, and/or checksum are not null it will filter the results to entries matching the provided values.
+listArchives(buildID=None, buildrootID=None, componentBuildrootID=None, hostID=None, type=None, filename=None, size=None, checksum=None, checksum_type=None, typeInfo=None, queryOpts=None, imageID=None, archiveID=None, strict=False)
+  description: 
+Retrieve information about archives.
+If buildID is not null it will restrict the list to archives built by the build with that ID.
+If buildrootID is not null it will restrict the list to archives built in the buildroot with
+that ID.
+If componentBuildrootID is not null it will restrict the list to archives that were present in
+the buildroot with that ID.
+If hostID is not null it will restrict the list to archives built on the host with that ID.
+If filename, size, checksum and/or checksum_type are not null it will filter
+the results to entries matching the provided values.
 
-    Returns a list of maps containing the following keys:
+Returns a list of maps containing the following keys:
 
-    id: unique id of the archive file (integer)
-    type_id: id of the archive type (Java jar, Solaris pkg, Windows exe, etc.) (integer)
-    type_name: name of the archive type
-    type_description: description of the archive
-    type_extensions: valid extensions for the type
-    build_id: id of the build that generated this archive (integer)
-    buildroot_id: id of the buildroot where this archive was built (integer)
-    filename: name of the archive (string)
-    size: size of the archive (integer)
-    checksum: checksum of the archive (string)
-    checksum_type: the checksum type (integer)
+id: unique id of the archive file (integer)
+type_id: id of the archive type (Java jar, Solaris pkg, Windows exe, etc.) (integer)
+type_name: name of the archive type
+type_description: description of the archive
+type_extensions: valid extensions for the type
+build_id: id of the build that generated this archive (integer)
+buildroot_id: id of the buildroot where this archive was built (integer)
+filename: name of the archive (string)
+size: size of the archive (integer)
+checksum: checksum of the archive (string)
+checksum_type: the checksum type (integer)
 
-    If componentBuildrootID is specified, then the map will also contain the following key:
-    project: whether the archive was pulled in as a project dependency, or as part of the
-             build environment setup (boolean)
+Koji only stores one checksum type per archive. Some content generators
+store md5 checksums in Koji, and others store sha256 checksums, and this may
+change for older and newer archives as different content generators upgrade
+to sha256.
 
-    If 'type' is specified, then the archives listed will be limited
-    those associated with additional metadata of the given type.
-    Currently supported types are:
+If you search for an archive by its sha256 checksum, and Koji has only
+stored an md5 checksum record for that archive, then Koji will not return a
+result for that archive. You may need to call listArchives multiple times,
+once for each checksum_type you want to search.
 
-    maven, win, image
+If componentBuildrootID is specified, then the map will also contain the following key:
+project: whether the archive was pulled in as a project dependency, or as part of the
+         build environment setup (boolean)
 
-    If 'maven' is specified as a type, each returned map will contain
-    these additional keys:
+If 'type' is specified, then the archives listed will be limited
+those associated with additional metadata of the given type.
+Supported types are "maven", "win", "image", or the btype name of any
+other content generator (eg. "remote-sources").
 
-    group_id: Maven groupId (string)
-    artifact_id: Maven artifactId (string)
-    version: Maven version (string)
+If 'maven' is specified as a type, each returned map will contain
+these additional keys:
 
-    if 'win' is specified as a type, each returned map will contain
-    these additional keys:
+group_id: Maven groupId (string)
+artifact_id: Maven artifactId (string)
+version: Maven version (string)
 
-    relpath: the relative path where the file is located (string)
-    platforms: space-separated list of platforms the file is suitable for use on (string)
-    flags: space-separated list of flags used when building the file (fre, chk) (string)
+if 'win' is specified as a type, each returned map will contain
+these additional keys:
 
-    if 'image' is specified as a type, each returned map will contain an
-    additional key:
+relpath: the relative path where the file is located (string)
+platforms: space-separated list of platforms the file is suitable for use on (string)
+flags: space-separated list of flags used when building the file (fre, chk) (string)
 
-    arch: The architecture if the image itself, which may be different from the
-          task that generated it
+if 'image' is specified as a type, each returned map will contain an
+additional key:
 
-    typeInfo is a dict that can be used to filter the output by type-specific info.
-    For the 'maven' type, this dict may contain one or more of group_id, artifact_id, or version,
-      and the output will be restricted to archives with matching attributes.
+arch: The architecture if the image itself, which may be different from the
+      task that generated it
 
-    If there are no archives matching the selection criteria, if strict is False,
-    an empty list is returned, otherwise GenericError is raised.
+typeInfo is a dict that can be used to filter the output by type-specific info.
+For the 'maven' type, this dict may contain one or more of group_id, artifact_id, or version,
+  and the output will be restricted to archives with matching attributes.
+
+If there are no archives matching the selection criteria, if strict is False,
+an empty list is returned, otherwise GenericError is raised.
 
 listBTypes(query=None, queryOpts=None)
   description: List btypes matching query
 
-    Options:
-        query - dictionary specifying selection parameters
-        queryOpts - dictionary specifying other query options
-
-    Supported query parameters:
-        name - select btypes by name
-        id - select btypes by id
-
-    If query is None, then all btypes are returned
+:param dict query: Select a particular btype by "name" or "id".
+                   Example: {"name": "image"}.
+                   If this parameter is None (default), Koji returns all
+                   btypes.
+:param dict queryOpts: additional options for this query.
+:returns: a list of btype dicts. If you specify a query parameter for a
+          btype name or id that does not exist, Koji will return an empty
+          list.
 
 listBuildRPMs(build)
   description: Get information about all the RPMs generated by the build with the given
-        ID.  A list of maps is returned, each map containing the following keys:
+ID.  A list of maps is returned, each map containing the following keys:
 
-        - id
-        - name
-        - version
-        - release
-        - arch
-        - epoch
-        - payloadhash
-        - size
-        - buildtime
-        - build_id
-        - buildroot_id
+- id
+- name
+- version
+- release
+- arch
+- epoch
+- draft
+- payloadhash
+- size
+- buildtime
+- build_id
+- buildroot_id
 
-        If no build has the given ID, or the build generated no RPMs, an empty list is returned.
-listBuildroots(hostID=None, tagID=None, state=None, rpmID=None, archiveID=None, taskID=None, buildrootID=None, queryOpts=None)
+If no build has the given ID, or the build generated no RPMs, an empty list is returned.
+listBuildroots(hostID=None, tagID=None, state=None, rpmID=None, archiveID=None, taskID=None, buildrootID=None, repoID=None, queryOpts=None)
   description: Return a list of matching buildroots
 
-    Optional args:
-        hostID - only buildroots on host.
-        tagID - only buildroots for tag.
-        state - only buildroots in state (may be a list)
-        rpmID - only buildroots the specified rpm was used in
-        archiveID - only buildroots the specified archive was used in
-        taskID - only buildroots associated with task.
-        buildrootID - only the specified buildroot
-        queryOpts - query options
+Optional args:
+    hostID - only buildroots on host.
+    tagID - only buildroots for tag.
+    state - only buildroots in state (may be a list)
+    rpmID - only buildroots the specified rpm was used in
+    archiveID - only buildroots the specified archive was used in
+    taskID - only buildroots associated with task.
+    buildrootID - only the specified buildroot
+    queryOpts - query options
 
-listBuilds(packageID=None, userID=None, taskID=None, prefix=None, state=None, volumeID=None, source=None, createdBefore=None, createdAfter=None, completeBefore=None, completeAfter=None, type=None, typeInfo=None, queryOpts=None)
-  description: Return a list of builds that match the given parameters
+listBuilds(packageID=None, userID=None, taskID=None, prefix=None, state=None, volumeID=None, source=None, createdBefore=None, createdAfter=None, completeBefore=None, completeAfter=None, type=None, typeInfo=None, queryOpts=None, pattern=None, cgID=None, draft=None)
+  description: 
+Return a list of builds that match the given parameters
 
-        Filter parameters
-            - packageID: only builds of the specified package (numeric id)
-            - userID: only builds owned by the given user (numeric id)
-            - taskID: only builds with the given task ID
-                If taskID is -1, only builds with a non-null task id
-            - volumeID: only builds stored on the given volume (numeric id)
-            - source: only builds where the source field matches (glob pattern)
-            - prefix: only builds whose package name starts with that prefix
-            - state: only builds in the given state (numeric value)
+Filter parameters
+:param int|str packageID: only builds of the specified package
+:param int|str userID: only builds owned by the given user
+:param int taskID: only builds with the given task ID
+    If taskID is -1, only builds with a non-null task id
+:param int volumeID: only builds stored on the given volume
+:param str source: only builds where the source field matches (glob pattern)
+:param str prefix: only builds whose package name starts with that prefix
+:param str pattern: only builds whose nvr matches the glob pattern
+:param int state: only builds in the given state
+:param int|str cgID: only build from given content generator
 
-        Timestamp filter parameters
-            - these limit the results to builds where the corresponding
-                timestamp is before or after the given time
-            - the time value may be specified as seconds since the epoch or
-                in ISO format ('YYYY-MM-DD HH24:MI:SS')
-            - filters for creation_time:
-                - createdBefore
-                - createdAfter
-            - filters for completion_time:
-                - completeBefore
-                - completeAfter
+Timestamp filter parameters
+    - these limit the results to builds where the corresponding
+        timestamp is before or after the given time
+    - the time value may be specified as seconds since the epoch or
+        in ISO format ('YYYY-MM-DD HH24:MI:SS')
+:param str|timestamp createdBefore: filter for creation_time
+:param str|timestamp createdAfter: filter for creation_time
+:param str|timestamp completeBefore: filter for completion_time
+:param str|timestamp completeAfter: filter for completion_time
 
-        Build type parameters:
-            - type: only builds of the given btype (such as maven or image)
-            - typeInfo: only builds with matching type-specific info (given
-                as a dictionary). Can only be used in conjunction with the
-                type parameter. Only limited types are supported.
+Build type parameters:
+:param str type: only builds of the given btype (such as maven or image)
+:param dict typeInfo: only builds with matching type-specific info (given
+    as a dictionary). Can only be used in conjunction with the
+    type parameter. Only limited types are supported.
 
-                For type=maven, the provided group_id, artifact_id, and/or version
-                fields are matched
+    For type=maven, the provided group_id, artifact_id, and/or version
+    fields are matched
 
-                For type=win, the provided platform fields are matched
+    For type=win, the provided platform fields are matched
+:param bool draft: bool or None option that indicates the filter based on draft field
+                   - None: no filter (both draft and regular builds)
+                   - True: draft only
+                   - False: regular only
 
-        Returns a list of maps.  Each map contains the following keys:
+:returns: Returns a list of maps.  Each map contains the following keys:
 
-          - build_id
-          - version
-          - release
-          - epoch
-          - state
-          - package_id
-          - package_name
-          - name (same as package_name)
-          - nvr (synthesized for sorting purposes)
-          - owner_id
-          - owner_name
-          - volume_id
-          - volume_name
-          - source
-          - creation_event_id
-          - creation_time
-          - creation_ts
-          - start_time
-          - start_ts
-          - completion_time
-          - completion_ts
-          - task_id
-          - extra
+      - build_id
+      - version
+      - release
+      - epoch
+      - draft
+      - state
+      - package_id
+      - package_name
+      - name (same as package_name)
+      - nvr (synthesized for sorting purposes)
+      - owner_id
+      - owner_name
+      - promoter_id
+      - promoter_name
+      - volume_id
+      - volume_name
+      - source
+      - creation_event_id
+      - creation_time
+      - creation_ts
+      - start_time
+      - start_ts
+      - completion_time
+      - completion_ts
+      - promotion_time
+      - promotion_ts
+      - task_id
+      - extra
 
-        If type == 'maven', each map will also contain the following keys:
+    If type == 'maven', each map will also contain the following keys:
 
-          - maven_group_id
-          - maven_artifact_id
-          - maven_version
+      - maven_group_id
+      - maven_artifact_id
+      - maven_version
 
-        If type == 'win', each map will also contain the following key:
+    If type == 'win', each map will also contain the following key:
 
-            - platform
+        - platform
 
-        If no builds match, an empty list is returned.
+    If no builds match, an empty list is returned.
 
-listChannels(hostID=None, event=None)
-  description: List channels.  If hostID is specified, only list
-    channels associated with the host with that ID.
+listCGs()
+  description: List all available content generators in the system
+
+:returns: A map of content generators, like {"name": data}. The data map
+          for each content generator has an "id" key for the content
+          generator ID, and a "users" key for the a list usernames who
+          are permitted to import for this content generator.
+
+listChannels(hostID=None, event=None, enabled=None)
+  description: 
+List builder channels.
+
+:param hostID: Koji builder host ID or hostname. If specified, Koji will
+               return only the channels associated with this builder host.
+               If unspecified, Koji will return all channels.
+:type hostID: int or str
+:param int event: The event ID at which to search. If unspecified, the
+                  default behavior is to search for the "active" host
+                  settings. You must specify a hostID parameter with this
+                  option.
+:param bool enabled: Enabled/disabled list of channels
+:returns: list of dicts, one per channel. For example,
+          [{'comment': 'test channel', 'description': 'container channel',
+          'enabled': True, 'id': 20, 'name': 'container', 'container channel' }]
+
 listExternalRepos(info=None, url=None, event=None, queryOpts=None)
   description: Get a list of external repos.  If info is not None it may be a
-    string (name) or an integer (id).
-    If url is not None, filter the list of repos to those matching the
-    given url.
+string (name) or an integer (id).
+If url is not None, filter the list of repos to those matching the
+given url.
 listHosts(arches=None, channelID=None, ready=None, enabled=None, userID=None, queryOpts=None)
-  description: Get a list of hosts.  "arches" is a list of string architecture
-        names, e.g. ['i386', 'ppc64'].  If one of the arches associated with a given
-        host appears in the list, it will be included in the results.  If "ready" and "enabled"
-        are specified, only hosts with the given value for the respective field will
-        be included.
-listPackages(tagID=None, userID=None, pkgID=None, prefix=None, inherited=False, with_dups=False, event=None, queryOpts=None)
-  description: List if tagID and/or userID is specified, limit the
-        list to packages belonging to the given user or with the
-        given tag.
+  description: List builder hosts.
 
-        A list of maps is returned.  Each map contains the
-        following keys:
+All parameters are optional.
 
-        - package_id
-        - package_name
+:param list arches: a list of string architecture names, e.g.
+                    ['x86_64', 'ppc64le']. If one of the arches
+                    associated with a given host appears in the list,
+                    it will be included in the results.
+:param int|str channelID: Channel name or ID to search. If specified,
+                          Koji will return only the builder hosts
+                          associated with this channel.
+:param bool ready: If specified, only include hosts that are ready
+                   (True) or not ready (False).
+:param bool enabled: If specified, only include hosts that are enabled
+                   (True) or not enabled (False).
+:param int|str userID: If specified, only include hosts corresponding
+                       to a builder "user" account name or ID number.
+:param queryOpts: query options used by the QueryProcessor.
+:returns: A list of maps containing information about each builder
+          host. If no matches are found, this method returns an empty
+          list.
 
-        If tagID, userID, or pkgID are specified, the maps will also contain the
-        following keys.
+listPackages(tagID=None, userID=None, pkgID=None, prefix=None, inherited=False, with_dups=False, event=None, queryOpts=None, with_owners=True, with_blocked=True)
+  description: 
+Returns a list of packages in Koji.
 
-        - tag_id
-        - tag_name
-        - owner_id
-        - owner_name
-        - extra_arches
-        - blocked
+All parameters are optional.
+
+Note that the returned data includes blocked entries
+
+In the simple case (no tagID, userID, or pkgID option), the call simply queries
+the package table. This will show all packages in the system. However, when any
+of these options are given, the call will query the tag_packages table, showing
+only packages that are included in some tag.
+
+This can lead to the confusing situation where a call to listPackages() shows
+a particular package, but a call to listPackages(pkgID=N) for said package reports
+no results.
+
+:param int|str tag: filter on tag ID or name
+:param int|str userID: filter on package owner
+:param int|str pkgID: filter on package
+:param str prefix: filter package names that start with a
+                   case-insensitive string.
+:param bool inherited: return also inherited packages
+:param bool with_dups: possible duplicates from inheritance, makes no
+                       sense with inherited=False
+:param int event: filter on event
+:param dict queryOpts: Options to order or filter the results. For
+                       example: {'order': 'name'}, or {'limit': 5}.
+                       Valid query options are "countOnly", "order",
+                       "offset", and "limit".
+:param bool with_owners: Return owner_id and owner_name in the list of
+                         packages. Default is True. This cannot be
+                         False if userID is not None.
+:returns [dict]: List of dicts with "package_id" and "package_name"
+                 keys. If tagID, userID, or pkgID are specified, the
+                 dicts will also contain the following keys.
+                   - tag_id
+                   - tag_name
+                   - owner_id
+                   - owner_name
+                   - extra_arches
+                   - blocked
 
 listPackagesSimple(prefix=None, queryOpts=None)
   description: list packages that starts with prefix and are filted
-        and ordered by queryOpts.
+and ordered by queryOpts.
 
-        Args:
-            prefix: default is None. If is not None will filter out
-                packages which name doesn't start with the prefix.
-            queryOpts: query options used by the QueryProcessor.
+Args:
+    prefix: default is None. If is not None will filter out
+        packages which name doesn't start with the prefix.
+    queryOpts: query options used by the QueryProcessor.
 
-        Returns:
-            A list of maps is returned, and each map contains key
-            'package_name' and 'package_id'.
+Returns:
+    A list of maps is returned, and each map contains key
+    'package_name' and 'package_id'.
 
 listRPMFiles(rpmID, queryOpts=None)
   description: List files associated with the RPM with the given ID.  A list of maps
-        will be returned, each with the following keys:
-        - name
-        - digest
-        - md5 (alias for digest)
-        - digest_algo
-        - size
-        - flags
+will be returned, each with the following keys:
+- name
+- digest
+- md5 (alias for digest)
+- digest_algo
+- size
+- flags
 
-        If there is no RPM with the given ID, or that RPM contains no files,
-        an empty list will be returned.
-listRPMs(buildID=None, buildrootID=None, imageID=None, componentBuildrootID=None, hostID=None, arches=None, queryOpts=None)
+If there is no RPM with the given ID, or that RPM contains no files,
+an empty list will be returned.
+listRPMs(buildID=None, buildrootID=None, imageID=None, componentBuildrootID=None, hostID=None, arches=None, queryOpts=None, draft=None)
   description: List RPMS.  If buildID, imageID and/or buildrootID are specified,
-    restrict the list of RPMs to only those RPMs that are part of that
-    build, or were built in that buildroot.  If componentBuildrootID is specified,
-    restrict the list to only those RPMs that will get pulled into that buildroot
-    when it is used to build another package.  A list of maps is returned, each map
-    containing the following keys:
+restrict the list of RPMs to only those RPMs that are part of that
+build, or were built in that buildroot.  If componentBuildrootID is specified,
+restrict the list to only those RPMs that will get pulled into that buildroot
+when it is used to build another package.  A list of maps is returned, each map
+containing the following keys:
 
-    - id
-    - name
-    - version
-    - release
-    - nvr (synthesized for sorting purposes)
-    - arch
-    - epoch
-    - payloadhash
-    - size
-    - buildtime
-    - build_id
-    - buildroot_id
-    - external_repo_id
-    - external_repo_name
-    - metadata_only
-    - extra
+- id
+- name
+- version
+- release
+- nvr (synthesized for sorting purposes)
+- arch
+- epoch
+- draft
+- payloadhash
+- size
+- buildtime
+- build_id
+- buildroot_id
+- external_repo_id
+- external_repo_name
+- metadata_only
+- extra
 
-    If componentBuildrootID is specified, two additional keys will be included:
-    - component_buildroot_id
-    - is_update
+If componentBuildrootID is specified, two additional keys will be included:
+- component_buildroot_id
+- is_update
 
-    If no build has the given ID, or the build generated no RPMs,
-    an empty list is returned.
-listTagged(tag, event=None, inherit=False, prefix=None, latest=False, package=None, owner=None, type=None)
-  description: List builds tagged with tag
-listTaggedArchives(tag, event=None, inherit=False, latest=False, package=None, type=None)
-  description: List archives and builds within a tag
-listTaggedRPMS(tag, event=None, inherit=False, latest=False, package=None, arch=None, rpmsigs=False, owner=None, type=None)
-  description: List rpms and builds within tag
-listTags(build=None, package=None, queryOpts=None)
-  description: List tags.  If build is specified, only return tags associated with the
-    given build.  If package is specified, only return tags associated with the
-    specified package.  If neither is specified, return all tags.  Build can be
-    either an integer ID or a string N-V-R.  Package can be either an integer ID
-    or a string name.  Only one of build and package may be specified.  Returns
-    a list of maps.  Each map contains keys:
-      - id
-      - name
-      - perm_id
-      - perm
-      - arches
-      - locked
+If no build has the given ID, or the build generated no RPMs,
+an empty list is returned.
 
-    If package is specified, each map will also contain:
-      - owner_id
-      - owner_name
-      - blocked
-      - extra_arches
+The option draft with a bool/None value is to filter rpm by that
+rpm belongs to a draft build, a regular build or both (default). It stands for:
+- None: no filter (both draft and regular builds)
+- True: draft only
+- False: regular only
 
-listTaskOutput(taskID, stat=False, all_volumes=False)
+listSideTags(basetag=None, user=None, queryOpts=None)
+  description: List all sidetags with additional filters
+
+:param basetag: filter by basteag id or name
+:type basetag: int or str
+:param user: filter by userid or username
+:type user: int or str
+:param queryOpts: additional query options
+                  {countOnly, order, offset, limit}
+:type queryOpts: dict
+
+:returns: list of dicts: id, name, user_id, user_name
+
+listTagged(tag, event=None, inherit=False, prefix=None, latest=False, package=None, owner=None, type=None, strict=True, extra=False, draft=None)
+  description: List builds tagged with tag.
+
+:param int|str tag: tag name or ID number
+:param int event: event ID
+:param bool inherit: If inherit is True, follow the tag hierarchy and return
+                     a list of tagged builds for all tags in the tree
+:param str prefix: only builds whose package name starts with that prefix
+:param bool|int latest: True for latest build per package,
+                        N to get N latest builds per package.
+:param str package: only builds of the specified package
+:param owner: only builds of the specified owner
+:param str type: only builds of the given btype (such as maven or image)
+:param bool strict: If tag doesn't exist, an exception is raised,
+                    unless strict is False in which case returns an empty list.
+:param bool extra: Set to "True" to get the build extra info
+:param bool draft: bool or None option that indicates the filter based on draft field
+                   - None: no filter (both draft and regular builds)
+                   - True: draft only
+                   - False: regular only
+
+listTaggedArchives(tag, event=None, inherit=False, latest=False, package=None, type=None, strict=True, extra=True)
+  description: List archives and builds within a tag.
+
+:param int|str tag: tag name or ID number
+:param int event: event ID
+:param bool inherit: If inherit is True, follow the tag hierarchy and return
+                a list of tagged archives for all tags in the tree
+:param  bool|int latest: Set to "True" to get tagged archives just from latest build.
+                Set latest=N to get only the N latest tagged RPMs.
+:param str package: only archives of the specified package
+:param str type: only archives of the given btype (such as maven or image)
+:param bool strict: If tag doesn't exist, an exception is raised,
+                unless strict is False in which case returns an empty list.
+:param bool extra: Set to "False" to skip the archive extra info
+
+listTaggedRPMS(tag, event=None, inherit=False, latest=False, package=None, arch=None, rpmsigs=False, owner=None, type=None, strict=True, extra=True, draft=None)
+  description: List rpms and builds within tag.
+
+:param int|str tag: tag name or ID number
+:param int event: event ID
+:param bool inherit: If inherit is True, follow the tag hierarchy and return
+                a list of tagged RPMs for all tags in the tree
+:param  bool|int latest: Set to "True" to get the single latest tagged build. Set
+                to an int "N" to get the "N" latest tagged builds. If
+                unspecified, the default value is "False", and
+                Koji will list all builds in the tag.
+:param str package: only rpms of the specified package
+:param str arch: only rpms of the specified arch
+:param bool rpmsigs: query will return one record per rpm/signature combination
+:param str owner: only rpms of the specified owner
+:param str type: only rpms of the given btype (such as maven or image)
+:param bool strict: If tag doesn't exist, an exception is raised,
+                unless strict is False in which case returns an empty list.
+:param bool extra: Set to "False" to skip the rpms extra info
+:param bool draft: bool or None option that indicates the filter based on draft field
+                   - None: no filter (both draft and regular builds)
+                   - True: draft only
+                   - False: regular only
+
+listTags(build=None, package=None, perms=True, queryOpts=None, pattern=None)
+  description: List tags according to filters
+
+:param int|str build: If build is specified, only return tags associated with
+                      the given build.  Build can be either an integer ID or
+                      a string N-V-R.
+:param int|str package: If package is specified, only return tags associated with the
+                        specified package. Package can be either an integer ID or a
+                        string name.
+
+                        In this case resulting map will have additional keys:
+                          - owner_id
+                          - owner_name
+                          - blocked
+                          - extra_arches
+:param bool perms: If perms is True, perm_id and perm is added to resulting maps.
+:param dict queryOpts: hash with query options for QueryProcessor
+:param pattern: If glob pattern is specified, only return tags matching that pattern.
+
+:returns list of dicts: Each map contains id, name, arches and locked keys and
+                        additional keys as specified via package or perms options.
+
+listTaskOutput(taskID, stat=False, all_volumes=False, strict=False)
   description: List the files generated by the task with the given ID.  This
-    will usually include one or more RPMs, and one or more log files.
-    If the task did not generate any files, or the output directory
-    for the task no longer exists, return an empty list.
+will usually include one or more RPMs, and one or more log files.
+If the task did not generate any files, or the output directory
+for the task no longer exists, return an empty list.
 
-    If stat is True, return a map of filename -> stat_info where stat_info
-    is a map containing the values of the st_* attributes returned by
-    os.stat().
+If stat is True, return a map of filename -> stat_info where stat_info
+is a map containing the values of the st_* attributes returned by
+os.stat().
 
-    If all_volumes is set, results are extended to deal with files in same
-    relative paths on different volumes.
+If all_volumes is set, results are extended to deal with files in same
+relative paths on different volumes.
 
-    With all_volumes=True, stat=False, return a map of filename -> list_of_volumes,
-        {'stdout.log': ['DEFAULT']}
+With all_volumes=True, stat=False, return a map of filename -> list_of_volumes,
+    {'stdout.log': ['DEFAULT']}
 
-    With all_volumes=True, stat=True, return a map of
-    filename -> map_of_volumes -> stat_info,
-        {'stdout.log':
-            {'DEFAULT': {
-                {
-                    'st_atime': 1488902587.2141163,
-                    'st_ctime': 1488902588.2281106,
-                    'st_mtime': 1488902588.2281106,
-                    'st_size': '526'
-                }
+With all_volumes=True, stat=True, return a map of
+filename -> map_of_volumes -> stat_info,
+    {'stdout.log':
+        {'DEFAULT': {
+            {
+                'st_atime': 1488902587.2141163,
+                'st_ctime': 1488902588.2281106,
+                'st_mtime': 1488902588.2281106,
+                'st_size': '526'
             }
         }
+    }
+
+If strict is set, function will raise a GenericError if task doesn't
+exist. Allows user to distinguish between empty output and non-existent task.
 
 listTasks(opts=None, queryOpts=None)
   description: Return list of tasks filtered by options
 
-        Options(dictionary):
-            option[type]: meaning
-            arch[list]: limit to tasks for given arches
-            not_arch[list]: limit to tasks without the given arches
-            state[list]: limit to tasks of given state
-            not_state[list]: limit to tasks not of the given state
-            owner[int|list]: limit to tasks owned by the user with the given ID
-            not_owner[int|list]: limit to tasks not owned by the user with the given ID
-            host_id[int|list]: limit to tasks running on the host with the given ID
-            not_host_id[int|list]: limit to tasks running on the hosts with IDs other than the given ID
-            channel_id[int|list]: limit to tasks in the specified channel
-            not_channel_id[int|list]: limit to tasks not in the specified channel
-            parent[int|list]: limit to tasks with the given parent
-            not_parent[int|list]: limit to tasks without the given parent
-            decode[bool]: whether or not xmlrpc data in the 'request' and 'result'
-                          fields should be decoded; defaults to False
-            method[str]: limit to tasks of the given method
-            createdBefore[float or str]: limit to tasks whose create_time is before the
-                                         given date, in either float (seconds since the epoch)
-                                         or str (ISO) format
-            createdAfter[float or str]: limit to tasks whose create_time is after the
-                                        given date, in either float (seconds since the epoch)
-                                        or str (ISO) format
-            startedBefore[float or str]: limit to tasks whose start_time is before the
-                                         given date, in either float (seconds since the epoch)
-                                         or str (ISO) format
-            startedAfter[float or str]: limit to tasks whose start_time is after the
-                                        given date, in either float (seconds since the epoch)
-                                        or str (ISO) format
-            completeBefore[float or str]: limit to tasks whose completion_time is before
-                                         the given date, in either float (seconds since the epoch)
-                                         or str (ISO) format
-            completeAfter[float or str]: limit to tasks whose completion_time is after
-                                         the given date, in either float (seconds since the epoch)
-                                         or str (ISO) format
+Options(dictionary):
+    option[type]: meaning
+    arch[list]: limit to tasks for given arches
+    not_arch[list]: limit to tasks without the given arches
+    state[list]: limit to tasks of given state
+    not_state[list]: limit to tasks not of the given state
+    owner[int|list]: limit to tasks owned by the user with the given ID
+    not_owner[int|list]: limit to tasks not owned by the user with the given ID
+    host_id[int|list]: limit to tasks running on the host with the given ID
+    not_host_id[int|list]: limit to tasks running on the hosts with IDs other than the
+                           given ID
+    channel_id[int|list]: limit to tasks in the specified channel
+    not_channel_id[int|list]: limit to tasks not in the specified channel
+    parent[int|list]: limit to tasks with the given parent
+    not_parent[int|list]: limit to tasks without the given parent
+    decode[bool]: whether or not xmlrpc data in the 'request' and 'result'
+                  fields should be decoded; defaults to False
+    method[str]: limit to tasks of the given method
+    createdBefore[float or str]: limit to tasks whose create_time is before the
+                                 given date, in either float (seconds since the epoch)
+                                 or str (ISO) format
+    createdAfter[float or str]: limit to tasks whose create_time is after the
+                                given date, in either float (seconds since the epoch)
+                                or str (ISO) format
+    startedBefore[float or str]: limit to tasks whose start_time is before the
+                                 given date, in either float (seconds since the epoch)
+                                 or str (ISO) format
+    startedAfter[float or str]: limit to tasks whose start_time is after the
+                                given date, in either float (seconds since the epoch)
+                                or str (ISO) format
+    completeBefore[float or str]: limit to tasks whose completion_time is before
+                                 the given date, in either float (seconds since the epoch)
+                                 or str (ISO) format
+    completeAfter[float or str]: limit to tasks whose completion_time is after
+                                 the given date, in either float (seconds since the epoch)
+                                 or str (ISO) format
 
-listUsers(userType=0, prefix=None, queryOpts=None)
-  description: List all users in the system.
-        userType can be an integer value from koji.USERTYPES (defaults to 0,
-        i.e. normal users).  Returns a list of maps with the following keys:
+listUsers(userType=0, prefix=None, queryOpts=None, perm=None, inherited_perm=False)
+  description: List users in the system
 
-        - id
-        - name
-        - status
-        - usertype
-        - krb_principal
+:param int|list|None userType: filter by type, defaults to normal users
+:param str prefix: only users whose name starts with prefix. optional
+:param dict queryOpts: query options. optional
+:param str perm: only users that have this permission. optional
+:param bool inherited_perm: consider inherited permissions. default: False
+:returns: a list of matching user entries
 
-        If no users of the specified
-        type exist, return an empty list.
+The userType option can either by a single integer or a list. These integer values
+correspond to the values from koji.USERTYPES (defaults to 0, i.e. normal users).
+
+The entries in the returned list have the following keys:
+- id
+- name
+- status
+- usertype
+- krb_principals
+
+If no users match, the list will be empty.
+
 listVolumes()
   description: List storage volumes
 login(*args, **opts)
-logout()
+  description: Create a login session with plain user/password credentials.
+
+:param str user: username
+:param str password: password
+:param dict opts: curently can contain only 'host_ip' key for overriding client IP address
+
+:returns dict: session info
+
+logout(session_id=None)
+  description: expire a login session
 logoutChild(session_id)
+  description: expire a subsession
+
+:param int subsession_id: subsession ID (for current session)
+
 makeTask(*args, **opts)
+  description: Creates task manually. This is mainly for debugging, only an admin
+can make arbitrary tasks. You need to supply all *args and **opts
+accordingly to the task.
+massTag(tag, builds)
+  description: 
+Substitute for tagBuildBypass - this call ignores every check, so special
+'tag' permission is needed. It bypass all tag access checks and policies.
+On error it will raise concrete exception
+
+:param builds: list of build NVRs
+:type builds: [str]
+
+:returns: None
+
 mavenBuild(url, target, opts=None, priority=None, channel='maven')
   description: Create a Maven build task
 
-        url: The url to checkout the source from.  May be a CVS, SVN, or GIT repository.
-        target: the build target
-        priority: the amount to increase (or decrease) the task priority, relative
-                  to the default priority; higher values mean lower priority; only
-                  admins have the right to specify a negative priority here
-        channel: the channel to allocate the task to (defaults to the "maven" channel)
+url: The url to checkout the source from.  May be a CVS, SVN, or GIT repository.
+target: the build target
+priority: the amount to increase (or decrease) the task priority, relative
+          to the default priority; higher values mean lower priority; only
+          admins have the right to specify a negative priority here
+channel: the channel to allocate the task to (defaults to the "maven" channel)
 
-        Returns the task ID
+Returns the task ID
 
 mavenEnabled()
+  description: Get status of maven support
 mergeScratch(task_id)
   description: Import the rpms generated by a scratch build, and associate
-        them with an existing build.
+them with an existing build.
 
-        To be eligible for import, the build must:
-         - be successfully completed
-         - contain at least one arch-specific rpm
+To be eligible for import, the build must:
+ - be successfully completed
+ - contain at least one arch-specific rpm
 
-        The task must:
-         - be a 'build' task
-         - be successfully completed
-         - use the exact same SCM URL as the build
-         - contain at least one arch-specific rpm
-         - have no overlap between the arches of the rpms it contains and
-           the rpms contained by the build
-         - contain a .src.rpm whose filename exactly matches the .src.rpm
-           of the build
+The task must:
+ - be a 'build' task
+ - be successfully completed
+ - use the exact same SCM URL as the build
+ - contain at least one arch-specific rpm
+ - have no overlap between the arches of the rpms it contains and
+   the rpms contained by the build
+ - contain a .src.rpm whose filename exactly matches the .src.rpm
+   of the build
 
-        Only arch-specific rpms will be imported.  noarch rpms and the src
-        rpm will be skipped.  Build logs and buildroot metadata from the
-        scratch build will be imported along with the rpms.
+Only arch-specific rpms will be imported.  noarch rpms and the src
+rpm will be skipped.  Build logs and buildroot metadata from the
+scratch build will be imported along with the rpms.
 
-        This is useful for bootstrapping a new arch.  RPMs can be built
-        for the new arch using a scratch build and then merged into an
-        existing build, incrementally expanding arch coverage and avoiding
-        the need for a mass-rebuild to support the new arch.
+This is useful for bootstrapping a new arch.  RPMs can be built
+for the new arch using a scratch build and then merged into an
+existing build, incrementally expanding arch coverage and avoiding
+the need for a mass-rebuild to support the new arch.
 
 moveAllBuilds(tag1, tag2, package, force=False)
   description: Move all builds of a package from tag1 to tag2 in the correct order
 
-        Returns the task id of the task performing the move
+Returns the task id of the task performing the move
 moveBuild(tag1, tag2, build, force=False)
   description: Move a build from tag1 to tag2
 
-        Returns the task id of the task performing the move
+Returns the task id of the task performing the move
 newGroup(name)
   description: Add a user group to the database
-newRepo(tag, event=None, src=False, debuginfo=False)
+newRepo(tag, event=None, src=False, debuginfo=False, separate_src=False)
   description: Create a newRepo task. returns task id
 packageListAdd(taginfo, pkginfo, owner=None, block=None, extra_arches=None, force=False, update=False)
   description: Add to (or update) package list for tag
-packageListBlock(taginfo, pkginfo)
+packageListBlock(taginfo, pkginfo, force=False)
   description: Block the package in tag
 packageListRemove(taginfo, pkginfo, force=False)
-  description: Remove package from the list for tag
+  description: Remove a package from a tag's package list
 
-    Most of the time you really want to use the block or unblock functions
+One reason to remove an entry like this is to remove an override so that
+the package data can be inherited from elsewhere.
 
-    The main reason to remove an entry like this is to remove an override so
-    that the package data can be inherited from elsewhere.
+Alternatively you can use the block or unblock functions.
+
+This method always returns None, even if the package does not exist in the
+tag.
+
+:param int|str taginfo: tag id or name to remove the package
+:param int|str pkginfo: package id or name to remove
+:param bool force: If False (default), Koji will check this
+                   operation against the package_list hub policy. If hub
+                   policy does not allow the current user to remove
+                   packages from this tag, then this method will raise
+                   an error.
+                   If True, then this method will bypass hub policy
+                   settings. Only admin users can set force to True.
 
 packageListSetArches(taginfo, pkginfo, arches, force=False)
   description: Set extra_arches for package in tag
@@ -1471,217 +2246,508 @@ packageListSetOwner(taginfo, pkginfo, owner, force=False)
 packageListUnblock(taginfo, pkginfo, force=False)
   description: Unblock the package in tag
 
-    Generally this just adds an unblocked duplicate of the blocked entry.
-    However, if the block is actually in tag directly (not through inheritance),
-    the blocking entry is simply removed
+Generally this just adds a unblocked duplicate of the blocked entry.
+However, if the block is actually in tag directly (not through inheritance),
+the blocking entry is simply removed
+promoteBuild(build, force=False)
+  description: Promote a draft build to a regular build.
+
+- The build type is limited to rpm so far.
+- The promoting action cannot be revoked.
+- The release wil be changed to the target one, so build_id isn't changed
+- buildpath will be changed as well and the old build path will symlink
+  to the new one, so both paths still will be existing until deleted.
+
+:param build: A build ID (int), a NVR (string), or a dict containing
+              "name", "version" and "release" of a draft build
+:type build: int, str, dict
+:param bool force: If False (default), Koji will check this
+                   operation against the draft_promotion hub policy. If hub
+                   policy does not allow the current user to promote the draft build,
+                   then this method will raise an error.
+                   If True, then this method will bypass hub policy settings.
+                   Only admin users can set force to True.
+:returns: latest build info
+:rtype: dict
+
 queryHistory(tables=None, **kwargs)
   description: Returns history data from various tables that support it
 
-    tables: list of versioned tables to search, no value implies all tables
-            valid entries: user_perms, user_groups, tag_inheritance, tag_config,
-                build_target_config, external_repo_config, tag_external_repos,
-                tag_listing, tag_packages, group_config, group_req_listing,
-                group_package_listing
+tables: list of versioned tables to search, no value implies all tables
+        valid entries: user_perms, user_groups, tag_inheritance, tag_config,
+            build_target_config, external_repo_config, tag_external_repos,
+            tag_listing, tag_packages, tag_package_owners, group_config,
+            group_req_listing, group_package_listing
 
-    - Time options -
-    times are specified as an integer event or a string timestamp
-    time options are valid for all record types
-    before: either created or revoked before timestamp
-    after: either created or revoked after timestamp
-    beforeEvent: either created or revoked before event id
-    afterEvent: either created or revoked after event id
+- Time options -
+times are specified as an integer event or a string timestamp
+time options are valid for all record types
+before: either created or revoked before timestamp
+after: either created or revoked after timestamp
+beforeEvent: either created or revoked before event id
+afterEvent: either created or revoked after event id
 
-    - other versioning options-
-    active: select by active status
-    editor: record created or revoked by user
+- other versioning options-
+active: select by active status
+editor: record created or revoked by user
 
-    - table-specific search options -
-    use of these options will implicitly limit the search to applicable tables
-    package: only for given package
-    build: only for given build
-    tag: only for given tag
-    user: only affecting a given user
-    permission: only relating to a given permission
-    external_repo: only relateing to an external repo
-    build_target: only relating to a build target
-    group: only relating to a (comps) group
-    cg: only relating to a content generator
+- table-specific search options -
+use of these options will implicitly limit the search to applicable tables
+package: only for given package
+build: only for given build
+tag: only for given tag
+user: only affecting a given user
+permission: only relating to a given permission
+external_repo: only relateing to an external repo
+build_target: only relating to a build target
+group: only relating to a (comps) group
+cg: only relating to a content generator
+
+- query
+queryOpts: for final query (countOnly/order/offset/limit)
 
 queryRPMSigs(rpm_id=None, sigkey=None, queryOpts=None)
-removeChannel(channel_name, force=False)
-  description: Remove a channel
+  description: Queries db for rpm signatures
 
-    Channel must have no hosts, unless force is set to True
-    If a channel has associated tasks, it cannot be removed
-    and an exception will be raised.
+:param rpm_id: a int RPM ID,
+               a string N-V-R.A,
+               a map containing 'name', 'version', 'release', and 'arch'
+:param int sigkey: signature key hash
+:param queryOpts: query options used by the QueryProcessor.
 
-    Removing channel will remove also remove complete history
-    for that channel.
+:returns: list of dicts (rpm_id, sigkey, sighash)
 
 removeExternalRepoFromTag(tag_info, repo_info)
-  description: Remove an external repo from a tag
+  description: 
+Remove an external repo from a tag
+
+:param tag_info: Tag name or ID number
+:param repo_info: External repository name or ID number
+:raises: GenericError if this external repo is not associated
+         with this tag.
+
 removeHostFromChannel(hostname, channel_name)
+  description: Remove the host from the specified channel
+
+:param str hostname: host name
+:param str channel_name: channel name
+
+removeSideTag(sidetag)
+  description: Remove a side tag
+
+:param sidetag: id or name of sidetag
+:type sidetag: int or str
+
+removeUserKrbPrincipal(user, krb_principal)
+  description: remove a Kerberos principal for user
 removeVolume(volume)
   description: Remove unused storage volume from the database
 renameChannel(old, new)
   description: Rename a channel
+repo.autoRequests()
+  description: [kojira] trigger automatic repo requests
+repo.checkQueue()
+  description: [kojira] trigger automatic repo requests
+repo.checkRequest(req_id)
+  description: Report status of repo request
+
+:param int req_id the request id
+:return: status dictionary
+
+The return dictionary will include 'request' and 'repo' fields
+
+repo.get(tag, min_event=None, at_event=None, opts=None)
+  description: Get best ready repo matching given requirements
+
+:param int|str tag: tag ID or name
+:param int min_event: minimum event ID
+:param int at_event: specific event ID
+:param dict opts: repo options
+
+:returns: dict with repo data
+
+repo.getExternalRepoData(erepo)
+repo.query(clauses, fields=None, opts=None)
+repo.queryQueue(clauses=None, fields=None, opts=None)
+repo.references(repo_id)
+  description: Return a list of buildroots that reference the repo
+repo.request(tag, min_event=None, at_event=None, opts=None, priority=None, force=False)
+  description: Request a repo for a tag
+
+:param int|str taginfo: tag id or name
+:param int|str min_event: minimum event for the repo (optional)
+:param int at_event: specific event for the repo (optional)
+:param dict opts: custom repo options (optional)
+:param bool force: force request creation, even if a matching repo exists
+
+The special value min_event="last" uses the most recent event for the tag
+Otherwise min_event should be an integer
+
+use opts=None (the default) to get default options for the tag.
+If opts is given, it should be a dictionary of repo options. These will override
+the defaults.
+
+repo.setExternalRepoData(external_repo_id, data)
+  description: Update tracking data for an external repo
+repo.setRequestPriority(req_id, priority)
+repo.setState(repo_id, state)
+  description: Set repo state
+repo.updateEndEvents()
+  description: [kojira] update end events for repos
 repoDelete(repo_id)
   description: Attempt to mark repo deleted, return number of references
 
-        If the number of references is nonzero, no change is made
-        Does not remove from disk
+If the number of references is nonzero, no change is made
+Does not remove from disk
 repoExpire(repo_id)
   description: mark repo expired
 repoInfo(repo_id, strict=False)
+  description: Get repo information
+
+:param int repo_id: repo ID
+:param bool strict: raise an error on non-existent repo
+
+:returns: dict (id, state, create_event, creation_time, tag_id, tag_name,
+          dist)
+
 repoProblem(repo_id)
   description: mark repo as broken
 resetBuild(build)
   description: Reset a build so that it can be reimported
 
-    WARNING: this function is highly destructive. use with care.
-    nulls task_id
-    sets state to CANCELED
-    clears all referenced data in other tables, including buildroot and
-        archive component tables
+WARNING: this function is highly destructive. use with care.
+nulls task_id
+sets state to CANCELED
+sets volume to DEFAULT
+clears all referenced data in other tables, including buildroot and
+    archive component tables
 
-    after reset, only the build table entry is left
+draft and extra are kept
+
+after reset, only the build table entry is left
 
 restartHosts(priority=5, options=None)
+  description: Spawns restartHosts task
+
+:param int priority: task priority
+:param dict options: additional task arguments (see restartHosts task)
+
+:returns: task ID
+
 resubmitTask(taskID)
   description: Retry a canceled or failed task, using the same parameter as the original task.
-        The logged-in user must be the owner of the original task or an admin.
+The logged-in user must be the owner of the original task or an admin.
 revokeCGAccess(user, cg)
-  description: Revoke a user's access to act as the given content generator
+  description: 
+Revoke a user's access to act as the given content generator
+
+:param user: koji userid or username
+:type user: int or str
+:param cg: content generator id or name
+:type cg: int or str
+
 revokePermission(userinfo, permission)
   description: Revoke a permission from a user
 runroot(tagInfo, arch, command, channel=None, **opts)
-  description:  Create a runroot task
+  description: Create a runroot task 
+saveFailedTree(buildrootID, full=False, **opts)
+  description: Create saveFailedTree task
+
+If arguments are invalid, error message is returned. Otherwise task id of
+newly created task is returned.
+scheduler.doRun(force=False)
+  description: Run the scheduler
+
+This is a debug tool and should not normally be needed.
+Scheduler runs are regularly triggered by builder checkins
+
+scheduler.getHostData(hostID=None)
+  description: Return actual builder data
+
+:param int hostID: Return data for given host (otherwise for all)
+:returns list[dict]: list of host_id/data dicts
+
+scheduler.getLogMessages(clauses=None, fields=None, opts=None)
+scheduler.getTaskRefusals(clauses=None, fields=None)
+scheduler.getTaskRuns(clauses=None, fields=None, opts=None)
 search(terms, type, matchType, queryOpts=None)
   description: Search for an item in the database matching "terms".
-        "type" specifies what object type to search for, and must be
-        one of "package", "build", "tag", "target", "user", "host",
-        "rpm", "maven", or "win".  "matchType" specifies the type of search to
-        perform, and must be one of "glob" or "regexp".  All searches
-        are case-insensitive.  A list of maps containing "id" and
-        "name" will be returned.  If no matches are found, an empty
-        list will be returned.
+
+:param str terms: Search for items in the database that match this
+                  value.
+:param str type: What object type to search for. Must be one of
+                 "package", "build", "tag", "target", "user", "host",
+                 "rpm", "maven", or "win".
+:param str matchType: The type of search to perform:
+                      - If you specify "glob", Koji will treat "terms"
+                        as a case-insensitive glob.
+                      - If you specify "regexp", Koji will treat
+                        "terms" as a case-insensitive regular
+                        expression.
+                      - Any other value here will cause to Koji to
+                        search for an exact string match for "terms".
+:param dict queryOpts: Options to pass into the database query. Use
+                       this to limit or order the results of the
+                       search. For example: {'order': 'name'},
+                       or {'limit': 5, 'order': '-build_id'}, etc.
+:returns: A list of maps containing "id" and "name".  If no matches
+          are found, this method returns an empty list.
+
 setBuildOwner(build, user)
+  description: Sets owner of a build
+
+:param int|str|dict build: build ID, NVR or dict with name, version and release
+:param user: a str (Kerberos principal or name) or an int (user id)
+             or a dict:
+                 - id: User's ID
+                 - name: User's name
+                 - krb_principal: Kerberos principal
+
+:returns: None
+
 setBuildTimestamp(build, ts)
   description: Set the completion time for a build
 
-        build should a valid nvr or build id
-        ts should be # of seconds since epoch or optionally an
-            xmlrpc DateTime value
+build should a valid nvr or build id
+ts should be # of seconds since epoch or optionally an
+    xmlrpc DateTime value
 setInheritanceData(tag, data, clear=False)
+  description: 
+Set inheritance relationships for a tag.
+
+This tag will be the "child" that inherits from a list of "parents".
+
+:param tag: The koji tag that will inherit from parent tags.
+:type tag: int or str
+:param list data: Inheritance rules to set for this child tag. This is
+                  a list of rules (dicts) for parent tags and
+                  priorities. If any rule dict in the list has a
+                  special "delete link": True key and value, Koji will
+                  remove this inheritance rule instead of adding it.
+:param bool clear: Wipe out all existing inheritance rules and only
+                   apply the ones you submit here. If unspecified,
+                   this defaults to False.
+
 setTaskPriority(task_id, priority, recurse=True)
   description: Set task priority
 sharedSession()
   description: Drop out of exclusive mode
-showOpts()
+showOpts(as_string=True)
+  description: Returns hub options
+
+:param bool as_string: if True (default) returns hub options as raw string,
+                       if False, returns hub options as dict
+
 showSession()
+  description: Return string representation of session for current user
+snapshotTag(src, dst, config=True, pkgs=True, builds=True, groups=True, latest_only=True, inherit_builds=True, event=None, force=False)
+  description: 
+Copy the tag and its current (or event) contents to new one. It doesn't copy inheritance.
+Suitable for creating snapshots of tags. External repos are not linked.
+Destination tag must not exist. For updating existing tags use snapshotTagModify
+
+Calling user needs to have 'admin' or 'tag' permission.
+
+:param [inst|str] src: source tag
+:param [int|str] dst: destination tag
+:param [bool] config: copy basic config (arches, permission, lock, maven_support,
+                      maven_include_all, extra)
+:param [bool] pkgs: copy package lists
+:param [bool] builds: copy tagged builds
+:param [bool] latest_only: copy only latest builds instead of all
+:param [bool] inherit_builds: use inherited builds, not only explicitly tagged
+:param [int] event: copy state of tag in given event id
+:param [bool] force: use force for all underlying operations
+:returns: None
+
+snapshotTagModify(src, dst, config=True, pkgs=True, builds=True, groups=True, latest_only=True, inherit_builds=True, event=None, force=False, remove=False)
+  description: 
+Copy the tag and its current (or event) contents to existing one. It doesn't copy
+inheritance. Suitable for creating snapshots of tags. External repos are not linked.
+Destination tag must already exist. For creating new snapshots use snapshotTag
+
+Calling user needs to have 'admin' or 'tag' permission.
+
+:param [int|str] src: source tag
+:param [int|str] dst: destination tag
+:param bool config: copy basic config (arches, permission, lock, maven_support,
+                    maven_include_all, extra)
+:param bool pkgs: copy package lists
+:param bool builds: copy tagged builds
+:param bool latest_only: copy only latest builds instead of all
+:param bool inherit_builds: use inherited builds, not only explicitly tagged
+:param int event: copy state of tag in given event id
+:param bool force: use force for all underlying operations
+:param remove: remove builds/groups/
+:returns: None
+
 sslLogin(*args, **opts)
+  description: Login via SSL certificate
+
+:param str proxyuser: proxy username
+:returns dict: session info
+
 subsession()
+  description: Create a subsession
 system.listMethods()
 system.methodHelp(method)
 system.methodSignature(method)
 tagBuild(tag, build, force=False, fromtag=None)
   description: Request that a build be tagged
 
-        The force option will attempt to force the action in the event of:
-            - tag locked
-            - missing permission
-            - package not in list for tag
-            - policy violation
-        The force option is really only effective for admins
+The force option will attempt to force the action in the event of:
+    - tag locked
+    - missing permission
+    - package not in list for tag
+    - policy violation
+The force option is really only effective for admins
 
-        If fromtag is specified, this becomes a move operation.
+If fromtag is specified, this becomes a move operation.
 
-        This call creates a task that was originally intended to perform more
-        extensive checks, but never has. We're stuck with this task system until
-        we're ready to break the api.
+This call creates a task that was originally intended to perform more
+extensive checks, but never has. We're stuck with this task system until
+we're ready to break the api.
 
-        The return value is the task id
+The return value is the task id
 
-tagBuildBypass(tag, build, force=False, notify=True)
+tagBuildBypass(tag, build, force=False, notify=False)
   description: Tag a build without running post checks
 
-        This is a short circuit function for imports.
-        Admin permission required.
+This is a short circuit function for imports.
+Admin or tag permission required.
 
-        Tagging with a locked tag is not allowed unless force is true.
-        Retagging is not allowed unless force is true. (retagging changes the order
-        of entries will affect which build is the latest)
+Tagging with a locked tag is not allowed unless force is true.
+Retagging is not allowed unless force is true. (retagging changes the order
+of entries will affect which build is the latest)
 
 tagChangedSinceEvent(event, taglist)
   description: Report whether any changes since event affect any of the tags in list
 
-    The function is used by the repo daemon to determine which of its repos
-    are up to date.
+The function is used by the repo daemon to determine which of its repos
+are up to date.
 
-    This function does not figure inheritance, the calling function should
-    expand the taglist to include any desired inheritance.
+This function does not figure inheritance, the calling function should
+expand the taglist to include any desired inheritance.
 
-    Returns: True or False
+Returns: True or False
 
-tagHistory(build=None, tag=None, package=None, active=None, queryOpts=None)
-  description: Returns historical tag data
+tagFirstChangeEvent(tag, after=None, inherit=True)
+  description: Report the earliest event that changed the tag, or None if unchanged
 
-    package: only for given package
-    build: only for given build
-    tag: only for given tag
+:param tag: tag to consider
+:type tag: int or str
+:param after: only consider events after this value
+:type after: int, optional
+:param inherit: follow inheritance
+:type inherit: bool
+
+:returns: event id or None
+:rtype: int or NoneType
+
+tagLastChangeEvent(tag, before=None, inherit=True)
+  description: Report the most recent event that changed the tag, or None
+
+:param tag: tag to consider
+:type tag: int or str
+:param before: only consider events before this value
+:type before: int, optional
+:param inherit: follow inheritance
+:type inherit: bool
+
+:returns: event id or None
+:rtype: int or NoneType
 
 taskFinished(taskId)
-taskReport(owner=None)
-  description: Return data on active or recent tasks
+  description: Returns True if task is finished
+
+:param int task: id of task queried
+
+:returns bool: task not/finished
+
 untagBuild(tag, build, strict=True, force=False)
   description: Untag a build
 
-        Unlike tagBuild, this does not create a task
-        No return value
-untagBuildBypass(tag, build, strict=True, force=False, notify=True)
+Unlike tagBuild, this does not create a task.
+
+:param int|str tag: tag name or ID
+:param int|str build: build name or ID
+:param bool strict: If True (default), Koji will raise a TagError if
+                    this build is not in the tag. If False, Koji will
+                    not raise TagError when the build is not in the
+                    tag.
+:param bool force: If False (default), Koji will check this operation
+                   against the tag hub policy. If hub policy does not
+                   allow the current user to untag packages from this
+                   tag, then this method will raise an error.
+                   If True, then this method will bypass hub policy
+                   settings. Only admin users can set force to True.
+:returns: None
+
+untagBuildBypass(tag, build, strict=True, force=False, notify=False)
   description: Untag a build without any checks
 
-        Admins only. Intended for syncs/imports.
+Admin and tag permission only. Intended for syncs/imports.
 
-        Unlike tagBuild, this does not create a task
-        No return value
-untaggedBuilds(name=None, queryOpts=None)
+Unlike tagBuild, this does not create a task
+No return value
+untaggedBuilds(name=None, queryOpts=None, draft=None)
   description: Returns the list of untagged builds
 updateNotification(id, package_id, tag_id, success_only)
   description: Update an existing build notification with new data.  If the notification
-        with the given ID doesn't exist, or the currently logged-in user is not the
-        owner or the notification or an admin, raise a GenericError.
-uploadFile(path, name, size, md5sum, offset, data, volume=None)
+with the given ID doesn't exist, or the currently logged-in user is not the
+owner or the notification or an admin, raise a GenericError.
+uploadFile(path, name, size, md5sum, offset, data, volume=None, checksum=None)
+  description: upload file to the hub
+
+Files can be uploaded in chunks, if so the hash and size describe the
+chunk rather than the whole file.
+
+:param str path: the relative path to upload to
+:param str name: the name of the file
+:param int size: size of contents (bytes)
+:param checksum: MD5 hex digest (see md5sum) or a tuple (hash_type, digest) of contents
+:type checksum: str or tuple
+:param str data: base64 encoded file contents
+:param int offset: The offset indicates where the chunk belongs.
+                   The special offset -1 is used to indicate the final
+                   chunk.
+:param str md5sum: legacy param name of checksum. md5sum name is misleading,
+                   but it is here for backwards compatibility
+
+:returns: True
+
 winBuild(vm, url, target, opts=None, priority=None, channel='vm')
-  description:
-        Create a Windows build task
+  description: 
+Create a Windows build task
 
-        vm: the name of the VM to run the build in
-        url: The url to checkout the source from.  May be a CVS, SVN, or GIT repository.
-        opts: task options
-        target: the build target
-        priority: the amount to increase (or decrease) the task priority, relative
-                  to the default priority; higher values mean lower priority; only
-                  admins have the right to specify a negative priority here
-        channel: the channel to allocate the task to (defaults to the "vm" channel)
+vm: the name of the VM to run the build in
+url: The url to checkout the source from.  May be a CVS, SVN, or GIT repository.
+opts: task options
+target: the build target
+priority: the amount to increase (or decrease) the task priority, relative
+          to the default priority; higher values mean lower priority; only
+          admins have the right to specify a negative priority here
+channel: the channel to allocate the task to (defaults to the "vm" channel)
 
-        Returns the task ID
+Returns the task ID
 
 winEnabled()
+  description: Get status of windows support
 wrapperRPM(build, url, target, priority=None, channel='maven', opts=None)
   description: Create a top-level wrapperRPM task
 
-        build: The build to generate wrapper rpms for.  Must be in the COMPLETE state and have no
-               rpms already associated with it.
-        url: SCM URL to a specfile fragment
-        target: The build target to use when building the wrapper rpm.  The build_tag of the target will
-                be used to populate the buildroot in which the rpms are built.
-        priority: the amount to increase (or decrease) the task priority, relative
-                  to the default priority; higher values mean lower priority; only
-                  admins have the right to specify a negative priority here
-        channel: the channel to allocate the task to (defaults to the "maven" channel)
+build: The build to generate wrapper rpms for.  Must be in the COMPLETE state and have no
+       rpms already associated with it.
+url: SCM URL to a specfile fragment
+target: The build target to use when building the wrapper rpm.
+        The build_tag of the target will be used to populate the buildroot in which the
+        rpms are built.
+priority: the amount to increase (or decrease) the task priority, relative
+          to the default priority; higher values mean lower priority; only
+          admins have the right to specify a negative priority here
+channel: the channel to allocate the task to (defaults to the "maven" channel)
 
-        returns the task ID
+returns the task ID
 
 writeSignedRPM(an_rpm, sigkey, force=False)
   description: Write a signed copy of the rpm
