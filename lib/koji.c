@@ -1097,7 +1097,6 @@ struct koji_task *get_koji_task(struct rpminspect *ri, const char *taskspec)
     char *key = NULL;
     struct koji_task *task = NULL;
     koji_task_entry_t *descendent = NULL;
-    string_entry_t *entry = NULL;
 
     assert(ri != NULL);
 
@@ -1226,19 +1225,6 @@ struct koji_task *get_koji_task(struct rpminspect *ri, const char *taskspec)
                     xmlrpc_abort_on_fault(&env);
                 } else if (!strcmp(key, "srpms") && xmlrpc_value_type(tr_v) == XMLRPC_TYPE_ARRAY) {
                     descendent->srpms = read_koji_descendent_results(&env, tr_v);
-                } else if (!strcmp(key, "srpm") && xmlrpc_value_type(tr_v) == XMLRPC_TYPE_STRING) {
-                    /* we should not have both 'srpms' and 'srpm' */
-                    if (descendent->srpms == NULL) {
-                        descendent->srpms = xalloc(sizeof(*(descendent->srpms)));
-                        TAILQ_INIT(descendent->srpms);
-                    }
-
-                    entry = xalloc(sizeof(*entry));
-                    xmlrpc_decompose_value(&env, tr_v, "s", &entry->data);
-                    xmlrpc_abort_on_fault(&env);
-                    assert(entry->data != NULL);
-
-                    TAILQ_INSERT_TAIL(descendent->srpms, entry, items);
                 } else if (!strcmp(key, "rpms")) {
                     descendent->rpms = read_koji_descendent_results(&env, tr_v);
                 } else if (!strcmp(key, "logs")) {
