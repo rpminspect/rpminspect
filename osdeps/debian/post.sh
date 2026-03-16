@@ -71,7 +71,7 @@ apt install -y gcc-${GCC_VER}-plugin-dev
 # Build and install annocheck
 git clone git://sourceware.org/git/annobin.git
 cd annobin || exit 1
-meson setup -D clang-plugin=false -D llvm-plugin=false -D docs=false -D debuginfod=disabled build
+meson setup -D clang-plugin=false -D llvm-plugin=false -D annocheck=true -D docs=false -D debuginfod=disabled build
 ninja -C build -v
 ninja -C build install
 install -D -m 0755 "${CWD}"/annobin/build/annocheck/annocheck /usr/local/bin/annocheck
