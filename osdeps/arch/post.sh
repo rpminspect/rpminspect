@@ -1,6 +1,7 @@
 #!/bin/sh
 PATH=/bin:/usr/bin:/sbin:/usr/sbin
 CWD="$(pwd)"
+TESTDATA="$(realpath "${CWD}"/test/data)"
 
 # Arch Linux does not define an RPM dist tag
 echo '%dist .ri47' > "${HOME}"/.rpmmacros
@@ -77,6 +78,12 @@ ninja -C build test
 ninja -C build install
 cd "${CWD}" || exit 1
 rm -rf cdson
+
+# Install declarative buildsystem macros for test cases if the system
+# does not provide them.
+if ! grep -r '%buildsystem_pyproject_' /usr/lib/rpm/* ; then
+    install -D -m 0644 "${TESTDATA}"/macros.pyproject /usr/lib/rpm/macros.d/macros.pyproject
+fi
 
 # Update the clamav database
 freshclam
