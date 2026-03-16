@@ -23,8 +23,10 @@ class AnnocheckHardenedCompareRPMs(TestCompareRPMs):
     def setUp(self):
         super().setUp()
 
-        if os.path.isfile("/etc/slackware-version") or os.path.isfile(
-            "/etc/fedora-release"
+        if (
+            os.path.isfile("/etc/slackware-version")
+            or os.path.isfile("/etc/fedora-release")
+            or os.path.isfile("/etc/debian_version")
         ):
             self.extra_cfg = {}
             self.extra_cfg["annocheck"] = {}
@@ -48,8 +50,10 @@ class AnnocheckHardenedCompareKoji(TestCompareKoji):
     def setUp(self):
         super().setUp()
 
-        if os.path.isfile("/etc/slackware-version") or os.path.isfile(
-            "/etc/fedora-release"
+        if (
+            os.path.isfile("/etc/slackware-version")
+            or os.path.isfile("/etc/fedora-release")
+            or os.path.isfile("/etc/debian_version")
         ):
             self.extra_cfg = {}
             self.extra_cfg["annocheck"] = {}
@@ -99,8 +103,10 @@ class AnnocheckHardenedRPMs(TestRPMs):
     def setUp(self):
         super().setUp()
 
-        if os.path.isfile("/etc/slackware-version") or os.path.isfile(
-            "/etc/fedora-release"
+        if (
+            os.path.isfile("/etc/slackware-version")
+            or os.path.isfile("/etc/fedora-release")
+            or os.path.isfile("/etc/debian_version")
         ):
             self.extra_cfg = {}
             self.extra_cfg["annocheck"] = {}
@@ -123,8 +129,10 @@ class AnnocheckHardenedKoji(TestKoji):
     def setUp(self):
         super().setUp()
 
-        if os.path.isfile("/etc/slackware-version") or os.path.isfile(
-            "/etc/fedora-release"
+        if (
+            os.path.isfile("/etc/slackware-version")
+            or os.path.isfile("/etc/fedora-release")
+            or os.path.isfile("/etc/debian_version")
         ):
             self.extra_cfg = {}
             self.extra_cfg["annocheck"] = {}
