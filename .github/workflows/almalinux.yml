@@ -41,6 +41,7 @@ jobs:
             # Requirements before the git clone can happen
             - name: git clone requirements
               run: |
+                  yum upgrade -y
                   yum install -y epel-release git
 
             # This means clone the git repo
