@@ -67,17 +67,6 @@ fi
 make V=1
 make install
 
-# Install debugedit (/usr/bin/find-debuginfo) from git
-cd "${CWD}" || exit 1
-git clone -q git://sourceware.org/git/debugedit.git
-cd debugedit || exit 1
-TAG="$(git tag -l | grep ^debugedit- | sort -n | tail -n 1)"
-git checkout -b "${TAG}" "${TAG}"
-autoreconf -f -i -v
-env CFLAGS=-D_LARGEFILE64_SOURCE ./configure --prefix=/usr
-make -k V=1
-make install
-
 # cdson is not [yet] in Alpine
 cd "${CWD}" || exit 1
 git clone -q https://github.com/frozencemetery/cdson.git

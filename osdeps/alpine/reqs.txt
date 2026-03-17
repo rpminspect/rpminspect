@@ -18,6 +18,7 @@ freshclam
 g++
 gcc
 gcovr
+gdb
 gettext
 git
 help2man

@@ -48,6 +48,8 @@ jobs:
             # do this.)
             - name: git clone requirements
               run: |
+                  apk update
+                  apk upgrade
                   apk add git
 
             # This means clone the git repo
