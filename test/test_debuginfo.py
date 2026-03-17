@@ -64,6 +64,10 @@ class MissingSectionsInDebuginfoPkgRPMs(TestRPMs):
         os.path.exists("/etc/arch-release"),
         "debuginfo packages do not generate on Arch Linux right now",
     )
+    @unittest.skipIf(
+        os.path.exists("/etc/alpine-release"),
+        "dwz and debugedit do not build on Alpine Linux",
+    )
     def setUp(self):
         super().setUp()
 
@@ -83,6 +87,10 @@ class MissingSectionsInDebuginfoPkgCompareRPMs(TestCompareRPMs):
     @unittest.skipIf(
         os.path.exists("/etc/arch-release"),
         "debuginfo packages do not generate on Arch Linux right now",
+    )
+    @unittest.skipIf(
+        os.path.exists("/etc/alpine-release"),
+        "dwz and debugedit do not build on Alpine Linux",
     )
     def setUp(self):
         super().setUp()
@@ -108,6 +116,10 @@ class MissingSectionsInDebuginfoPkgKoji(TestKoji):
         os.path.exists("/etc/arch-release"),
         "debuginfo packages do not generate on Arch Linux right now",
     )
+    @unittest.skipIf(
+        os.path.exists("/etc/alpine-release"),
+        "dwz and debugedit do not build on Alpine Linux",
+    )
     def setUp(self):
         super().setUp()
 
@@ -127,6 +139,10 @@ class MissingSectionsInDebuginfoPkgCompareKoji(TestCompareKoji):
     @unittest.skipIf(
         os.path.exists("/etc/arch-release"),
         "debuginfo packages do not generate on Arch Linux right now",
+    )
+    @unittest.skipIf(
+        os.path.exists("/etc/alpine-release"),
+        "dwz and debugedit do not build on Alpine Linux",
     )
     def setUp(self):
         super().setUp()
@@ -238,6 +254,10 @@ class BeforeStrippedAfterNotStrippedCompareKoji(TestCompareKoji):
         os.path.exists("/etc/arch-release"),
         "debuginfo packages do not generate on Arch Linux right now",
     )
+    @unittest.skipIf(
+        os.path.exists("/etc/alpine-release"),
+        "dwz and debugedit do not build on Alpine Linux",
+    )
     def setUp(self):
         super().setUp()
 
@@ -261,6 +281,10 @@ class BeforeNotStrippedAfterStrippedCompareKoji(TestCompareKoji):
     @unittest.skipIf(
         os.path.exists("/etc/arch-release"),
         "debuginfo packages do not generate on Arch Linux right now",
+    )
+    @unittest.skipIf(
+        os.path.exists("/etc/alpine-release"),
+        "dwz and debugedit do not build on Alpine Linux",
     )
     def setUp(self):
         super().setUp()
