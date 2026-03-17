@@ -1,6 +1,7 @@
 #!/bin/sh
 PATH=/bin:/usr/bin:/sbin:/usr/sbin
 CWD="$(pwd)"
+TESTDATA="$(realpath "${CWD}"/test/data)"
 
 # The mandoc package in Gentoo Linux is both masked and does not
 # install the library.
@@ -65,6 +66,12 @@ rm -rf cdson
 
 # Gentoo Linux does not define an RPM dist tag
 echo '%dist .ri47' > "${HOME}"/.rpmmacros
+
+# Install declarative buildsystem macros for test cases if the system
+# does not provide them.
+if ! grep -r '%buildsystem_pyproject_' /usr/libexec/rpm/* ; then
+    install -D -m 0644 "${TESTDATA}"/macros.pyproject /usr/libexec/rpm/macros.d/macros.pyproject
+fi
 
 # Update the clamav database
 freshclam
