@@ -75,6 +75,7 @@ meson setup -D clang-plugin=false -D llvm-plugin=false -D annocheck=true -D docs
 ninja -C build -v
 ninja -C build install
 install -D -m 0755 "${CWD}"/annobin/build/annocheck/annocheck /usr/local/bin/annocheck
+ln -sf /usr/local/bin/annocheck /usr/bin/annocheck
 cd "${CWD}" || exit 1
 rm -rf annobin
 
