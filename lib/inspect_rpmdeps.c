@@ -14,6 +14,7 @@
 
 /* For reporting */
 static const char *specfile = NULL;
+static const char *mainpkgname = NULL;
 static char *pkg_evr = NULL;
 static char *pkg_vr = NULL;
 static uint64_t pkg_epoch = 0;
@@ -255,7 +256,6 @@ static bool check_explicit_lib_deps(struct rpminspect *ri, Header h, deprule_lis
     uint64_t epoch = 0;
     char *rulestr = NULL;
     bool found = false;
-    bool collect = false;
     const char *tn = NULL;
     string_entry_t *entry = NULL;
     string_list_t *transitive = NULL;
@@ -412,15 +412,8 @@ static bool check_explicit_lib_deps(struct rpminspect *ri, Header h, deprule_lis
                 /* requires could be handled by a transitive dependency */
                 if (!found) {
                     /*
-                     * Collect all Requires down the build/
-                     * This is weird, but first walk the current
-                     * package's Requires list and collect the package
-                     * names.  Then the next while loop will walk all
-                     * of those Requires and look at those peer
-                     * packages and gather their Requires until there
-                     * are no more to gather.  We have found it via a
-                     * transitive Requires if the transitive list
-                     * contains the potential_prov's package name.
+                     * Collect all explicit Requires on the package we
+                     * are current looking at
                      */
                     TAILQ_FOREACH(verify, after_deps, items) {
                         if (verify->type == TYPE_REQUIRES && *verify->requirement != PATH_SEP
@@ -436,51 +429,81 @@ static bool check_explicit_lib_deps(struct rpminspect *ri, Header h, deprule_lis
                         }
                     }
 
+                    /*
+                     * Now if we had explicit Requires, go over all of
+                     * those and collective their explicit Requires.
+                     * Only add them for subpackages in this build (we
+                     * cannot inspect explicit Requires across SRPMs.
+                     * And only add them if we have not already picked
+                     * them up from a previous loop.
+                     */
                     if (transitive && !TAILQ_EMPTY(transitive)) {
-                        collect = true;
-
-                        while (collect) {
+                        TAILQ_FOREACH(entry, transitive, items) {
                             TAILQ_FOREACH(peer, ri->peers, items) {
-                                collect = false;
                                 tn = headerGetString(peer->after_hdr, RPMTAG_NAME);
 
-                                if (tn == NULL) {
+                                if (tn == NULL || strcmp(entry->data, tn)) {
                                     continue;
                                 }
 
-                                TAILQ_FOREACH(entry, transitive, items) {
-                                    if (!strcmp(tn, entry->data)) {
-                                        TAILQ_FOREACH(verify, peer->after_deprules, items) {
-                                            if (verify->type == TYPE_REQUIRES
-                                                && *verify->requirement != PATH_SEP
-                                                && !strprefix(verify->requirement, SHARED_LIB_PREFIX) && !strstr(verify->requirement, SHARED_LIB_SUFFIX)) {
-                                                isareq = remove_isa_substring(verify->requirement);
-                                                assert(isareq != NULL);
+                                TAILQ_FOREACH(verify, peer->after_deprules, items) {
+                                    if (verify->type == TYPE_REQUIRES
+                                        && *verify->requirement != PATH_SEP
+                                        && !strprefix(verify->requirement, SHARED_LIB_PREFIX) && !strstr(verify->requirement, SHARED_LIB_SUFFIX)) {
+                                        isareq = remove_isa_substring(verify->requirement);
+                                        assert(isareq != NULL);
 
-                                                if (list_contains(transitive, pn)) {
-                                                    found = true;
-                                                    collect = false;
-                                                    break;
-                                                }
-
-                                                if (is_subpackage(ri->peers, isareq) && !list_contains(transitive, isareq)) {
-                                                    transitive = list_add(transitive, isareq);
-                                                    collect = true;
-                                                }
-
-                                                free(isareq);
-                                            }
+                                        if (is_subpackage(ri->peers, isareq) && !list_contains(transitive, isareq)) {
+                                            transitive = list_add(transitive, isareq);
                                         }
+
+                                        free(isareq);
                                     }
                                 }
                             }
                         }
+                    }
 
-                        if (!found && list_contains(transitive, pn)) {
-                            found = true;
+                    /*
+                     * See if we have found the explicit Requires we
+                     * think we need or if lacking that, an explicit
+                     * Requires on the main package name.
+                     */
+                    if (list_contains(transitive, pn) || list_contains(transitive, mainpkgname)) {
+                        found = true;
+                    }
+
+                    /* See if the reverse transitive is present. */
+                    if (!found && !list_contains(transitive, pn)) {
+                        TAILQ_FOREACH(peer, ri->peers, items) {
+                            tn = headerGetString(peer->after_hdr, RPMTAG_NAME);
+
+                            if (strcmp(tn, pn)) {
+                                continue;
+                            }
+
+                            TAILQ_FOREACH(verify, peer->after_deprules, items) {
+                                if (verify->type == TYPE_REQUIRES
+                                    && *verify->requirement != PATH_SEP
+                                    && !strprefix(verify->requirement, SHARED_LIB_PREFIX) && !strstr(verify->requirement, SHARED_LIB_SUFFIX)) {
+                                    isareq = remove_isa_substring(verify->requirement);
+                                    assert(isareq != NULL);
+
+                                    if (!strcmp(isareq, name)) {
+                                        found = true;
+                                    }
+
+                                    free(isareq);
+                                }
+
+                                if (found) {
+                                    break;
+                                }
+                            }
                         }
                     }
 
+                    /* Clean up our working list of explicit Requires. */
                     list_free(transitive, free);
                     transitive = NULL;
                 }
@@ -872,6 +895,7 @@ bool inspect_rpmdeps(struct rpminspect *ri)
             TAILQ_FOREACH(file, peer->after_files, items) {
                 if (strsuffix(file->localpath, SPEC_FILENAME_EXTENSION)) {
                     specfile = file->localpath;
+                    mainpkgname = headerGetString(file->rpm_header, RPMTAG_NAME);
                     found = true;
                 }
             }
