@@ -980,6 +980,17 @@ void dump_cfg(const struct rpminspect *ri)
         dump_inspection_ignores(ri->inspection_ignores, NAME_UDEVRULES);
     }
 
+    /* changelog */
+
+    if (ri->changelog_forbidden && !TAILQ_EMPTY(ri->changelog_forbidden)) {
+        printf("changelog:\n");
+        printf("    forbidden:\n");
+
+        TAILQ_FOREACH(entry, ri->changelog_forbidden, items) {
+            printf("        - %s\n", entry->data);
+        }
+    }
+
     printf("\n\n");
     return;
 }

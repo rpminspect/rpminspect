@@ -234,6 +234,7 @@
     ]
   },
   "rpmdeps": null,
+  "changelog": null,
   "config": null,
   "doc": null,
   "kmod": null,
@@ -249,10 +250,5 @@
     ],
     "debuginfo_sections": ".symtab .debug_info"
   },
-  "udevrules": {
-    "udev_rules_dirs": [
-      "/etc/udev/rules.d/",
-      "/usr/lib/udev/rules.d/"
-    ]
-  }
+  "udevrules": null
 }

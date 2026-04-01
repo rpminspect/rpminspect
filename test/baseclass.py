@@ -263,6 +263,10 @@ class RequiresRpminspect(unittest.TestCase):
         cfg["metadata"]["vendor"] = VENDOR
         cfg["vendor"]["vendor_data_dir"] = os.environ["RPMINSPECT_TEST_DATA_PATH"]
         cfg["vendor"]["licensedb"] = ["test.json"]
+        cfg["changelog"] = {}
+        cfg["changelog"]["forbidden"] = [
+            "RPMAUTOSPEC:[[:space:]]+unresolvable[[:space:]]+merge"
+        ]
 
         if self.buildhost_subdomain:
             cfg["metadata"]["buildhost_subdomain"] = [self.buildhost_subdomain]

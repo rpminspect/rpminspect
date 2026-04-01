@@ -14,6 +14,88 @@
 #include "rpminspect.h"
 
 static struct result_params params;
+static regex_list_t *forbidden = NULL;
+
+/*
+ * Initialize a list of compiled regular expressions that the
+ * changelog inspection will use to look for forbidden entries.
+ */
+static void init_forbidden_regex(const string_list_t *list)
+{
+    regex_entry_t *rentry = NULL;
+    string_entry_t *sentry = NULL;
+
+    /* do nothing if no forbidden regexps are in the config file */
+    if (list == NULL || TAILQ_EMPTY(list)) {
+        return;
+    }
+
+    /* initialize the list */
+    forbidden = xalloc(sizeof(*forbidden));
+    assert(forbidden != NULL);
+    TAILQ_INIT(forbidden);
+
+    /* turn each regular expression in a regex_t ready to use */
+    TAILQ_FOREACH(sentry, list, items) {
+        rentry = xalloc(sizeof(*rentry));
+        assert(rentry != NULL);
+        rentry->src = sentry->data;
+
+        if (add_regex(rentry->src, &rentry->re) != 0) {
+            warnx(_("*** error processing forbidden changelog regular expression: %s"), rentry->src);
+        }
+
+        TAILQ_INSERT_TAIL(forbidden, rentry, items);
+    }
+
+    return;
+}
+
+/*
+ * Cleanup for the compiled forbidden regular expressions.
+ */
+static void free_forbidden_regex(void)
+{
+    regex_entry_t *entry = NULL;
+
+    if (forbidden == NULL || TAILQ_EMPTY(forbidden)) {
+        return;
+    }
+
+    while (!TAILQ_EMPTY(forbidden)) {
+        entry = TAILQ_FIRST(forbidden);
+        TAILQ_REMOVE(forbidden, entry, items);
+        regfree(entry->re);
+        free(entry);
+    }
+
+    free(forbidden);
+    return;
+}
+
+/*
+ * Check the given string for any forbidden regexp matches.
+ */
+static const char *has_forbidden_match(const char *s)
+{
+    int r = -1;
+    regmatch_t match[1];
+    regex_entry_t *entry = NULL;
+
+    if (s == NULL || (forbidden == NULL || TAILQ_EMPTY(forbidden))) {
+        return NULL;
+    }
+
+    TAILQ_FOREACH(entry, forbidden, items) {
+        r = regexec(entry->re, s, 1, match, REG_EXTENDED);
+
+        if (r == 0 && match[0].rm_so > -1) {
+            return entry->src;
+        }
+    }
+
+    return NULL;
+}
 
 /*
  * Given an RPM header, read the %changelog and reconstruct it as
@@ -197,6 +279,7 @@ static bool check_src_rpm_changelog(struct rpminspect *ri, const rpmpeer_entry_t
     char *before_output = NULL;
     char *after_output = NULL;
     char *diff_output = NULL;
+    const char *regexp = NULL;
 
     assert(ri != NULL);
     assert(peer != NULL);
@@ -289,6 +372,37 @@ static bool check_src_rpm_changelog(struct rpminspect *ri, const rpmpeer_entry_t
         result = false;
     }
 
+    /* Check for bad words and forbidden regexp match */
+    TAILQ_FOREACH(after, after_changelog, items) {
+        if (has_bad_word(after->data, ri->badwords)) {
+            xasprintf(&params.msg, "%%changelog entry has unprofessional language in the %s spec file", after_nevr);
+            params.severity = RESULT_BAD;
+            params.waiverauth = NOT_WAIVABLE;
+            params.remedy = REMEDY_CHANGELOG_BADWORDS;
+            params.details = after->data;
+            params.verb = VERB_FAILED;
+            params.noun = after->data;
+            add_result(ri, &params);
+            free(params.msg);
+            result = false;
+        }
+
+        regexp = has_forbidden_match(after->data);
+
+        if (regexp != NULL) {
+            xasprintf(&params.msg, "%%changelog entry matches forbidden regular expression '%s' in the %s spec", regexp, after_nevr);
+            params.severity = RESULT_VERIFY;
+            params.waiverauth = WAIVABLE_BY_ANYONE;
+            params.remedy = REMEDY_CHANGELOG_FORBIDDEN;
+            params.details = after->data;
+            params.verb = VERB_FAILED;
+            params.noun = after->data;
+            add_result(ri, &params);
+            free(params.msg);
+            result = false;
+        }
+    }
+
     /* cleanup */
     if (before_output) {
         if (unlink(before_output) != 0) {
@@ -317,7 +431,8 @@ static bool check_src_rpm_changelog(struct rpminspect *ri, const rpmpeer_entry_t
  * Perform %changelog checks on a single RPM packages between builds.
  * Do the following:
  *     - Report changed/removed lines or added lines as INFO
- *     * Check for unprofessional language and report as BAD
+ *     - Report unprofessional language and report as BAD
+ *     - Report matching forbidden regexps as VERIFY
  */
 static bool check_bin_rpm_changelog(struct rpminspect *ri, const rpmpeer_entry_t *peer)
 {
@@ -329,6 +444,7 @@ static bool check_bin_rpm_changelog(struct rpminspect *ri, const rpmpeer_entry_t
     char *before_output = NULL;
     char *after_output = NULL;
     char *diff_output = NULL;
+    const char *regexp = NULL;
     string_entry_t *entry = NULL;
 
     assert(ri != NULL);
@@ -369,13 +485,28 @@ static bool check_bin_rpm_changelog(struct rpminspect *ri, const rpmpeer_entry_t
 
     free(diff_output);
 
-    /* Check for bad words */
+    /* Check for bad words and forbidden regexp match */
     TAILQ_FOREACH(entry, after_changelog, items) {
         if (has_bad_word(entry->data, ri->badwords)) {
             xasprintf(&params.msg, "%%changelog entry has unprofessional language in the %s build", after_nevr);
             params.severity = RESULT_BAD;
             params.waiverauth = NOT_WAIVABLE;
-            params.remedy = REMEDY_CHANGELOG;
+            params.remedy = REMEDY_CHANGELOG_BADWORDS;
+            params.details = entry->data;
+            params.verb = VERB_FAILED;
+            params.noun = entry->data;
+            add_result(ri, &params);
+            free(params.msg);
+            result = false;
+        }
+
+        regexp = has_forbidden_match(entry->data);
+
+        if (regexp != NULL) {
+            xasprintf(&params.msg, "%%changelog entry matches forbidden regular expression '%s' in the %s build", regexp, after_nevr);
+            params.severity = RESULT_VERIFY;
+            params.waiverauth = WAIVABLE_BY_ANYONE;
+            params.remedy = REMEDY_CHANGELOG_FORBIDDEN;
             params.details = entry->data;
             params.verb = VERB_FAILED;
             params.noun = entry->data;
@@ -433,6 +564,9 @@ bool inspect_changelog(struct rpminspect *ri)
         return true;
     }
 
+    /* Initialize regular expressions */
+    init_forbidden_regex(ri->changelog_forbidden);
+
     /* Get the source and one binary package */
     TAILQ_FOREACH(peer, ri->peers, items) {
         if (src && bin) {
@@ -457,6 +591,9 @@ bool inspect_changelog(struct rpminspect *ri)
     if (bin) {
         bin_result = check_bin_rpm_changelog(ri, bin);
     }
+
+    /* Clean up forbidden regular expressions */
+    free_forbidden_regex();
 
     if (src_result && bin_result) {
         if (params.severity == RESULT_OK) {

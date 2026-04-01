@@ -95,6 +95,7 @@ extern volatile sig_atomic_t terminal_resized;
 /* Common functions */
 
 /* init.c */
+int add_regex(const char *pattern, regex_t **regex_out);
 bool init_fileinfo(struct rpminspect *);
 #ifdef _WITH_LIBCAP
 bool init_caps(struct rpminspect *);

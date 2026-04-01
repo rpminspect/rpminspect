@@ -26,7 +26,7 @@ extern "C"
 #define REMEDY_BUILDHOST                                        9
 #define REMEDY_CAPABILITIES                                    10
 #define REMEDY_CHANGEDFILES                                    11
-#define REMEDY_CHANGELOG                                       12
+#define REMEDY_CHANGELOG_BADWORDS                              12
 #define REMEDY_CONFIG                                          13
 #define REMEDY_DESKTOP                                         14
 #define REMEDY_DISTTAG                                         15
@@ -104,6 +104,7 @@ extern "C"
 #define REMEDY_MIXED_LICENSE_TAGS                              87
 #define REMEDY_FILESMATCH_EXCLUDE_FOUND                        88
 #define REMEDY_FILESMATCH_UNSPECIFIED_ENTRY                    89
+#define REMEDY_CHANGELOG_FORBIDDEN                             90
 
 /* Get the remedy string for the specified remedy ID */
 const char *get_remedy(const unsigned int id);

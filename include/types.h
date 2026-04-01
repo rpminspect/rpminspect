@@ -72,6 +72,17 @@ typedef struct _pair_entry_t {
 typedef TAILQ_HEAD(pair_entry_s, _pair_entry_t) pair_list_t;
 
 /*
+ * List of regex_t's.  Used by at least the changelog inspection.
+ */
+typedef struct _regex_entry_t {
+    regex_t *re;
+    const char *src;          /* pointer to source string, do not free */
+    TAILQ_ENTRY(_regex_entry_t) items;
+} regex_entry_t;
+
+typedef TAILQ_HEAD(regex_entry_s, _regex_entry_t) regex_list_t;
+
+/*
  * A file is information about a file in an RPM payload.
  *
  * If fullpath is not NULL, it is the absolute path of the unpacked
@@ -728,6 +739,9 @@ struct rpminspect {
 
     /* Directories where udev rules live */
     string_list_t *udev_rules_dirs;
+
+    /* List of regexps to find forbidden text in changelog lines */
+    string_list_t *changelog_forbidden;
 
     /* Options specified by the user */
     char *before;              /* before build ID arg given on cmdline */

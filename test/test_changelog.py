@@ -342,3 +342,77 @@ class UnprofessinalChangeLogEntryCompareKoji(TestCompareKoji):
         self.inspection = "changelog"
         self.result = "BAD"
         self.waiver_auth = "Not Waivable"
+
+
+# 4) Add forbidden string matched by a regular expression from the
+# config file.  Reported as VERIFY.
+class ForbiddenChangeLogEntryCompareSRPM(TestCompareSRPM):
+    def setUp(self):
+        super().setUp()
+
+        # create a change with a forbidden string
+        today = datetime.date.today().strftime("%a %b %d %Y")
+        after_prefix = (
+            "* %s Packie McPackerson <packie@mcpackerson.io> - 47.7-1\n"
+            "- RPMAUTOSPEC: unresolvable merge\n\n" % today
+        )
+        suffix = (
+            "* %s Packie McPackerson <packie@mcpackerson.io> - 1.0\n- Initial package\n"
+            % today
+        )
+
+        # modify the changelog
+        self.before_rpm.section_changelog = after_prefix + suffix
+        self.after_rpm.section_changelog = after_prefix + suffix
+
+        self.inspection = "changelog"
+        self.result = "VERIFY"
+        self.waiver_auth = "Anyone"
+
+
+class ForbiddenChangeLogEntryCompareRPMs(TestCompareRPMs):
+    def setUp(self):
+        super().setUp()
+
+        # create a change with a forbidden string
+        today = datetime.date.today().strftime("%a %b %d %Y")
+        after_prefix = (
+            "* %s Packie McPackerson <packie@mcpackerson.io> - 47.7-1\n"
+            "- RPMAUTOSPEC: unresolvable merge\n\n" % today
+        )
+        suffix = (
+            "* %s Packie McPackerson <packie@mcpackerson.io> - 1.0\n- Initial package\n"
+            % today
+        )
+
+        # modify the changelog
+        self.before_rpm.section_changelog = after_prefix + suffix
+        self.after_rpm.section_changelog = after_prefix + suffix
+
+        self.inspection = "changelog"
+        self.result = "VERIFY"
+        self.waiver_auth = "Anyone"
+
+
+class ForbiddenChangeLogEntryCompareKoji(TestCompareKoji):
+    def setUp(self):
+        super().setUp()
+
+        # create a change with a forbidden string
+        today = datetime.date.today().strftime("%a %b %d %Y")
+        after_prefix = (
+            "* %s Packie McPackerson <packie@mcpackerson.io> - 47.7-1\n"
+            "- RPMAUTOSPEC: unresolvable merge\n\n" % today
+        )
+        suffix = (
+            "* %s Packie McPackerson <packie@mcpackerson.io> - 1.0\n- Initial package\n"
+            % today
+        )
+
+        # modify the changelog
+        self.before_rpm.section_changelog = after_prefix + suffix
+        self.after_rpm.section_changelog = after_prefix + suffix
+
+        self.inspection = "changelog"
+        self.result = "VERIFY"
+        self.waiver_auth = "Anyone"
