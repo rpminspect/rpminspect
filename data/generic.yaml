@@ -1049,6 +1049,13 @@ rpmdeps:
     # Additional listings will overwrite previous definitions in the
     # runtime configuration.
 
+changelog:
+    # Optional list of regular expressions, regex(7), to match text
+    # that is forbidden in the text file.  Any of these matching a
+    # changelog entry in an RPM will result in a VERIFY result.
+    #forbidden:
+    #    - 'RPMAUTOSPEC:\s+unresolvable merge$'
+
 config:
     # Optional list of glob(7) specifications or path prefixes to
     # match files to ignore for this inspection.  The format of this

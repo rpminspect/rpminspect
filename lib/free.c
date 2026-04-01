@@ -307,6 +307,7 @@ void free_rpminspect(struct rpminspect *ri)
     free_deprule_ignore_map(ri->deprules_ignore);
     free(ri->debuginfo_sections);
     list_free(ri->udev_rules_dirs, free);
+    list_free(ri->changelog_forbidden, free);
 
     free_peers(ri->peers);
 

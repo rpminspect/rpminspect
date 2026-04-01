@@ -58,7 +58,7 @@ static const char *CFG_FILENAME_EXTENSIONS[] = {"yaml", "json", "dson", NULL};
  */
 static const char *UDEV_RULES_DIRS[] = {"/etc/udev/rules.d/", "/usr/lib/udev/rules.d/", NULL};
 
-static int add_regex(const char *pattern, regex_t **regex_out)
+int add_regex(const char *pattern, regex_t **regex_out)
 {
     int reg_result;
     char *errbuf = NULL;
@@ -947,6 +947,8 @@ static void read_cfgfile(struct rpminspect *ri, const char *filename)
 
     array(p, ctx, RI_UDEVRULES, RI_UDEV_RULES_DIRS, &ri->udev_rules_dirs);
     add_ignores(ri, p, ctx, RI_UDEVRULES);
+
+    array(p, ctx, RI_CHANGELOG, RI_FORBIDDEN, &ri->changelog_forbidden);
 
     p->fini(ctx);
     return;
