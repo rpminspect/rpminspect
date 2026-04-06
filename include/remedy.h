@@ -26,7 +26,7 @@ extern "C"
 #define REMEDY_BUILDHOST                                        9
 #define REMEDY_CAPABILITIES                                    10
 #define REMEDY_CHANGEDFILES                                    11
-#define REMEDY_CHANGELOG_BADWORDS                              12
+#define REMEDY_CHANGELOG                                       12
 #define REMEDY_CONFIG                                          13
 #define REMEDY_DESKTOP                                         14
 #define REMEDY_DISTTAG                                         15

@@ -27,7 +27,7 @@ struct remedy remedies[] = {
     { REMEDY_BUILDHOST, "buildhost", NULL },
     { REMEDY_CAPABILITIES, "capabilities", NULL },
     { REMEDY_CHANGEDFILES, "changedfiles", NULL },
-    { REMEDY_CHANGELOG_BADWORDS, "changelog_badwords", NULL },
+    { REMEDY_CHANGELOG, "changelog", NULL },
     { REMEDY_CHANGELOG_FORBIDDEN, "changelog_forbidden", NULL },
     { REMEDY_CONFIG, "config", NULL },
     { REMEDY_DESKTOP, "desktop", NULL },
@@ -144,7 +144,7 @@ const char *get_remedy(const unsigned int id)
                     r = _("Unexpected capabilities were found on the indicated file.  Consult capabilities(7) and either adjust the files in the package or modify the capabilities list in the rpminspect vendor data package.  The security team may also be of help for this situation.  If necessary, update the capabilities file for this product release with the changes found here and send a patch to the project that owns the rpminspect data file.");
                 } else if (id == REMEDY_CHANGEDFILES) {
                     r = _("File changes were found.  In most cases these are expected, but it is a good idea to verify the changes found are deliberate.");
-                } else if (id == REMEDY_CHANGELOG_BADWORDS) {
+                } else if (id == REMEDY_CHANGELOG) {
                     r = _("Make sure the %changelog in the after build spec file does not contain any unprofessional languages as defined in the rpminspect configuration settings.");
                 } else if (id == REMEDY_CHANGELOG_FORBIDDEN) {
                     r = _("Make sure the %changelog in the after build spec file does not contain any entries that match defined forbidden regular expressions as defined in the rpminspect configuration settings.");

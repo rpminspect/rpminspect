@@ -333,8 +333,15 @@ progress in the world of computing.
 """
 
 changelog = """
-Make sure the spec file in the after build contains a valid %changelog
-section.
+Make sure the %changelog in the after build spec file does not contain
+any unprofessional languages as defined in the rpminspect
+configuration settings.
+"""
+
+changelog_forbidden = """
+Make sure the %changelog in the after build spec file does not contain
+any entries that match defined forbidden regular expressions as defined
+in the rpminspect configuration settings.
 """
 
 pathmigration = """
