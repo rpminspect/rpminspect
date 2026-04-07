@@ -180,6 +180,7 @@ char *run_cmd_vp(int *exitcode, const char *workdir, char **argv)
         }
 
         warn("*** pipe");
+        free(cmd);
         return NULL;
     }
 
@@ -233,6 +234,7 @@ char *run_cmd_vp(int *exitcode, const char *workdir, char **argv)
                 *exitcode = EXIT_FAILURE;
             }
 
+            free(cmd);
             return NULL;
         }
 
@@ -307,6 +309,7 @@ char *run_cmd_vp(int *exitcode, const char *workdir, char **argv)
         warn("*** chdir");
     }
 
+    free(cmd);
     return output;
 }
 
