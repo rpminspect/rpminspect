@@ -156,8 +156,12 @@ static bool _is_elf_type(rpmfile_entry_t *file, int type)
         result = true;
     }
 
-    close(fd);
     elf_end(elf);
+
+    if (fd) {
+        close(fd);
+    }
+
     return result;
 }
 

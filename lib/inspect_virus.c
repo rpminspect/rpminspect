@@ -244,12 +244,23 @@ bool inspect_virus(struct rpminspect *ri)
         pid = fork();
 
         if (pid < 0) {
+            if (close(pipefd[0]) == -1) {
+                warn("*** close");
+            }
+
+            if (close(pipefd[1]) == -1) {
+                warn("*** close");
+            }
+
             err(EXIT_FAILURE, "fork"); /* fatal */
         }
 
         if (pid == 0) {
             /* child */
-            close(pipefd[0]);
+            if (close(pipefd[0]) == -1) {
+                warn("*** close");
+            }
+
             write_fd = pipefd[1];
 
             /* "If you’re using libclamav with a forking daemon you
@@ -260,6 +271,11 @@ bool inspect_virus(struct rpminspect *ri)
 
             /* run the virus check on each Nth file, then exit */
             foreach_peer_file(ri, NAME_VIRUS, virus_driver);
+
+            if (close(pipefd[1]) == -1) {
+                warn("*** close");
+            }
+
             _exit(0);
         }
 

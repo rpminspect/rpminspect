@@ -628,7 +628,12 @@ static void read_remedy(const char *remedyfile, struct rpminspect *ri)
 
     buf = read_file_bytes(remedyfile, &len);
 
-    if (toml_parse(root, buf, strlen(buf))) {
+    if (buf == NULL) {
+        toml_free(root);
+        return;
+    }
+
+    if (toml_parse(root, buf, len)) {
         warn("toml_parse");
         free(buf);
         toml_free(root);

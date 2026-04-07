@@ -132,13 +132,12 @@ static bool is_guile(rpmfile_entry_t *file)
     }
 
     sections = get_elf_section_names(elf, SHT_PROGBITS);
+    elf_end(elf);
+    close(fd);
 
     if (sections == NULL || TAILQ_EMPTY(sections)) {
         return false;
     }
-
-    close(fd);
-    elf_end(elf);
 
     TAILQ_FOREACH(entry, sections, items) {
         if (strprefix(entry->data, ".guile.")) {
