@@ -138,12 +138,12 @@ static void prune_local(const int whichbuild)
         free(apath);
     }
 
+    free(lpath);
+
     if (closedir(d) == -1) {
         warn("*** closedir");
         return;
     }
-
-    free(lpath);
 
     return;
 }

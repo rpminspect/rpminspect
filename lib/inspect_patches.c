@@ -763,13 +763,13 @@ bool inspect_patches(struct rpminspect *ri)
                             buf[strcspn(buf, " \t")] = '\0';
                         } else {
                             warnx(_("*** unrecognized %%patch line: %s"), specentry->data);
-                            continue;
+                            goto clean_continue;
                         }
 
                         /* add a new patch entry to the hash table */
                         if (buf == NULL) {
                             warnx(_("*** unable to read spec file line: %s"), specentry->data);
-                            continue;
+                            goto clean_continue;
                         }
 
                         aentry = xalloc(sizeof(*aentry));
@@ -794,6 +794,7 @@ bool inspect_patches(struct rpminspect *ri)
 
                         HASH_ADD_INT(applied, num, aentry);
 
+clean_continue:
                         /* clean up */
                         list_free(fields, free);
                     }

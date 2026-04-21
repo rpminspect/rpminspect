@@ -206,6 +206,7 @@ static bool javabytecode_driver(struct rpminspect *ri, rpmfile_entry_t *file)
         if (unpack_archive(file->fullpath, tmppath, true)) {
             /* not an archive, just clean up and skip */
             rmtree(tmppath, true, false);
+            free(tmppath);
             return true;
         }
 

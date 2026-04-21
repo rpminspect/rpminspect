@@ -702,6 +702,8 @@ static bool elf_archive_tests(struct rpminspect *ri, Elf *after_elf, int after_e
     elf_archive_iterate(before_elf_fd, before_elf, find_pic, &before_pic);
 
     if (after_no_pic == NULL || before_pic == NULL) {
+        list_free(after_no_pic, free);
+        list_free(before_pic, free);
         return true;
     }
 

@@ -185,8 +185,8 @@ done:
         close(before_fd);
     }
 
-    free(removed);
-    free(added);
+    list_free(removed, free);
+    list_free(added, free);
     list_free(before_needed, free);
     list_free(after_needed, free);
 

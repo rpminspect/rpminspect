@@ -597,6 +597,8 @@ static inline void _remedy_walker(struct toml_node *node, void *data)
                 free(entry->data);
                 free(entry);
             }
+
+            free(r);
         }
     }
 

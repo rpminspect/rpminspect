@@ -133,6 +133,8 @@ int unpack_archive(const char *archive, const char *dest, const bool force)
         }
     }
 
+    free(rfilename);
+
     /* archive reader */
     input = archive_read_new();
 #if ARCHIVE_VERSION_NUMBER < 3000000
@@ -196,6 +198,5 @@ int unpack_archive(const char *archive, const char *dest, const bool force)
         return -1;
     }
 
-    free(rfilename);
     return ret;
 }

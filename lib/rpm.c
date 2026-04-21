@@ -413,6 +413,8 @@ char *extract_rpm_payload(const char *rpm)
 
     if (archive_write_open_filename(archive, payload) != ARCHIVE_OK) {
         warnx("*** archive_write_open_filename: %s", archive_error_string(archive));
+        free(payload);
+        payload = NULL;
         goto cleanup;
     }
 

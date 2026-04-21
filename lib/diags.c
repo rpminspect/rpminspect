@@ -180,7 +180,6 @@ string_list_t *gather_diags(struct rpminspect *ri, const char *progname, const c
 
     if (exitcode == 0) {
         details = strsplit(tmp, "\n");
-        free(tmp);
 
         if (details) {
             entry = TAILQ_FIRST(details);
@@ -206,13 +205,14 @@ string_list_t *gather_diags(struct rpminspect *ri, const char *progname, const c
         free(ver);
     }
 
+    free(tmp);
+
 #ifdef _WITH_ANNOCHECK
     /* annocheck */
     tmp = run_cmd(&exitcode, ri->worksubdir, ri->commands.annocheck, "--version", NULL);
 
     if (exitcode == 0) {
         details = strsplit(tmp, "\n");
-        free(tmp);
 
         if (details) {
             entry = TAILQ_FIRST(details);
@@ -237,6 +237,8 @@ string_list_t *gather_diags(struct rpminspect *ri, const char *progname, const c
 
         free(ver);
     }
+
+    free(tmp);
 #endif
 
     /* abidiff */
@@ -244,7 +246,6 @@ string_list_t *gather_diags(struct rpminspect *ri, const char *progname, const c
 
     if (exitcode == 0) {
         details = strsplit(tmp, "\n");
-        free(tmp);
 
         if (details) {
             entry = TAILQ_FIRST(details);
@@ -270,12 +271,13 @@ string_list_t *gather_diags(struct rpminspect *ri, const char *progname, const c
         free(ver);
     }
 
+    free(tmp);
+
     /* kmidiff */
     tmp = run_cmd(&exitcode, ri->worksubdir, ri->commands.kmidiff, "--version", NULL);
 
     if (exitcode == 0) {
         details = strsplit(tmp, "\n");
-        free(tmp);
 
         if (details) {
             entry = TAILQ_FIRST(details);
@@ -301,12 +303,13 @@ string_list_t *gather_diags(struct rpminspect *ri, const char *progname, const c
         free(ver);
     }
 
+    free(tmp);
+
     /* udevadm */
     tmp = run_cmd(&exitcode, ri->worksubdir, ri->commands.udevadm, "--version", NULL);
 
     if (exitcode == 0) {
         details = strsplit(tmp, "\n");
-        free(tmp);
 
         if (details) {
             entry = TAILQ_FIRST(details);
@@ -331,6 +334,8 @@ string_list_t *gather_diags(struct rpminspect *ri, const char *progname, const c
 
         free(ver);
     }
+
+    free(tmp);
 
     return list;
 }
