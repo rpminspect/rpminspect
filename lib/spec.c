@@ -121,12 +121,8 @@ static char *filter_spec_file(struct rpminspect *ri, const char *specfile)
     regfree(&filter_regex);
 
     /* close things up */
-    if (fclose(fp) != 0) {
+    if (fclose(fp) == -1) {
         warn("*** fclose");
-
-        if (close(fd) == -1) {
-            warn("*** close");
-        }
 
         if (!debug_mode && unlink(r) == -1) {
             warn("*** unlink");

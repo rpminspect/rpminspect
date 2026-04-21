@@ -491,6 +491,7 @@ cleanup:
     free(hardlink);
     free(buf);
     Fclose(gzdi);
+    Fclose(fdi);
     archive_entry_free(entry);
 
     if (archive != NULL) {

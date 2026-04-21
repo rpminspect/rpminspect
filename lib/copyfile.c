@@ -106,11 +106,6 @@ int copyfile(const char *src, const char *dest, bool force, bool verbose)
     }
 
     /* copy src to dest */
-    if ((in = fopen(src, "r")) == NULL) {
-        warn("*** fopen");
-        return -1;
-    }
-
     if ((out_fd = open(dest, oflags, mode)) == -1) {
         if (errno == EEXIST) {
             if (verbose) {
@@ -143,6 +138,21 @@ int copyfile(const char *src, const char *dest, bool force, bool verbose)
 
     if ((out = fdopen(out_fd, "wb")) == NULL) {
         warn("*** fdopen");
+
+        if (close(out_fd) == -1) {
+            warn("*** close");
+        }
+
+        return -1;
+    }
+
+    if ((in = fopen(src, "r")) == NULL) {
+        warn("*** fopen");
+
+        if (fclose(out) == -1) {
+            warn("*** fclose");
+        }
+
         return -1;
     }
 

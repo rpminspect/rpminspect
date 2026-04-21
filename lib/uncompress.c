@@ -57,7 +57,8 @@ char *uncompress_file(struct rpminspect *ri, const char *infile, const char *sub
 
     if ((r == -1) && (errno != ENOENT)) {
         warn("*** stat");
-        goto error1;
+        free(outfile);
+        return NULL;
     }
 
     /*
@@ -66,7 +67,8 @@ char *uncompress_file(struct rpminspect *ri, const char *infile, const char *sub
      */
     if (errno == ENOENT) {
         if (mkdirp(outfile, mode) == -1) {
-            goto error1;
+            free(outfile);
+            return NULL;
         }
     }
 
@@ -88,7 +90,8 @@ char *uncompress_file(struct rpminspect *ri, const char *infile, const char *sub
 
     if (fd == -1) {
         warn("*** mkstemp");
-        goto error1;
+        free(outfile);
+        return NULL;
     }
 
     /*
@@ -176,14 +179,18 @@ char *uncompress_file(struct rpminspect *ri, const char *infile, const char *sub
 
     if (r != ARCHIVE_OK) {
         /* just stop trying to uncompress if this errors */
-        goto error2;
+        archive_read_free(input);
+        free(outfile);
+        return NULL;
     }
 
     r = archive_read_next_header(input, &entry);
 
     if (r == ARCHIVE_WARN || r == ARCHIVE_FAILED || r == ARCHIVE_FATAL) {
         warn("*** archive_read_next_header: %s", archive_error_string(input));
-        goto error2;
+        archive_read_free(input);
+        free(outfile);
+        return NULL;
     }
 
     if (r == ARCHIVE_OK) {
@@ -196,7 +203,14 @@ char *uncompress_file(struct rpminspect *ri, const char *infile, const char *sub
 
             if (write(fd, buf, size) == -1) {
                 warn("*** write");
-                goto error2;
+                archive_read_free(input);
+
+                if (close(fd) == -1) {
+                    warn("*** fclose");
+                }
+
+                free(outfile);
+                return NULL;
             }
         }
     } else {
@@ -205,7 +219,14 @@ char *uncompress_file(struct rpminspect *ri, const char *infile, const char *sub
 
         if (fp == NULL) {
             warn("*** fdopen");
-            goto error2;
+            archive_read_free(input);
+
+            if (close(fd) == -1) {
+                warn("*** fclose");
+            }
+
+            free(outfile);
+            return NULL;
         }
 
         /*
@@ -215,26 +236,18 @@ char *uncompress_file(struct rpminspect *ri, const char *infile, const char *sub
          */
         if (fclose(fp) == -1) {
             warn("*** fclose");
-            goto error2;
+
+            if (close(fd) == -1) {
+                warn("*** close");
+            }
+
+            free(outfile);
+            outfile = NULL;
         }
 
         fd = 0;
     }
 
     archive_read_free(input);
-
-    /* close up our uncompressed file */
-    if (fd && close(fd) == -1) {
-        warn("*** close");
-        goto error1;
-    }
-
     return outfile;
-
-error2:
-    close(fd);
-
-error1:
-    free(outfile);
-    return NULL;
 }

@@ -122,6 +122,11 @@ char *compute_checksum(const char *filename, mode_t *st_mode, int type)
 
     if (len == -1) {
         warn("*** read");
+
+        if (close(input) == -1) {
+            warn("*** close");
+        }
+
         return NULL;
     }
 
@@ -141,6 +146,11 @@ char *compute_checksum(const char *filename, mode_t *st_mode, int type)
 
         if (len == -1) {
             warn("*** read");
+
+            if (close(input) == -1) {
+                warn("*** close");
+            }
+
             return NULL;
         }
     }
