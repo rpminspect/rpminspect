@@ -158,8 +158,8 @@ endif
 if python.found()
     test_env = environment()
     test_env.set('RPMINSPECT', rpminspect_prog.full_path())
-    test_env.set('RPMINSPECT_YAML', meson.source_root() + '/data/generic.yaml')
-    test_env.set('RPMINSPECT_TEST_DATA_PATH', meson.source_root() + '/test/data')
+    test_env.set('RPMINSPECT_YAML', meson.project_source_root() + '/data/generic.yaml')
+    test_env.set('RPMINSPECT_TEST_DATA_PATH', meson.project_source_root() + '/test/data')
 
     test_suites = [
         'test_abidiff.py',
@@ -217,7 +217,7 @@ if python.found()
     foreach suite : test_suites
         test('rpminspect-test-suite.' + suite.split('.')[0],
              python,
-             args : ['-B', '-m', 'unittest', 'discover', '-v', meson.source_root() + '/test', suite],
+             args : ['-B', '-m', 'unittest', 'discover', '-v', meson.project_source_root() + '/test', suite],
              env : test_env,
              is_parallel : false,
              timeout : 5000
