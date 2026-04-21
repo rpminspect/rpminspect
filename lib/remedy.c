@@ -3,6 +3,7 @@
  * SPDX-License-Identifier: LGPL-3.0-or-later
  */
 
+#include <assert.h>
 #include "rpminspect.h"
 
 /*
@@ -329,7 +330,8 @@ bool set_remedy(const char *name, char *remedy)
     for (i = 0; remedies[i].name != NULL; i++) {
         if (!strcmp(remedies[i].name, name)) {
             free(remedies[i].remedy);
-            remedies[i].remedy = remedy;
+            remedies[i].remedy = strdup(remedy);
+            assert(remedies[i].remedy != NULL);
             return true;
         }
     }

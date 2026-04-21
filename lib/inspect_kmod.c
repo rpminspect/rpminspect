@@ -144,7 +144,6 @@ static bool kmod_driver(struct rpminspect *ri, rpmfile_entry_t *file)
     if (kctx == NULL) {
         warn("*** kmod_new");
         kmod_module_unref(beforekmod);
-        kmod_unref(kctx);
         return true;
     }
 
@@ -214,6 +213,11 @@ static bool kmod_driver(struct rpminspect *ri, rpmfile_entry_t *file)
         }
     }
 
+    list_free(lost, free);
+    lost = NULL;
+    list_free(gain, free);
+    gain = NULL;
+
     /* Compute lost and gained module dependencies */
     result_deps = compare_module_dependencies(beforeinfo, afterinfo, &lost, &gain);
 
@@ -245,8 +249,10 @@ static bool kmod_driver(struct rpminspect *ri, rpmfile_entry_t *file)
         }
     }
 
-    list_free(gain, free);
     list_free(lost, free);
+    lost = NULL;
+    list_free(gain, free);
+    gain = NULL;
 
     /* Compute lost PCI device IDs in kernel modules */
     beforealiases = gather_module_aliases(before_kmod_name, beforeinfo);

@@ -358,6 +358,7 @@ static int download_build(struct rpminspect *ri, const struct koji_build *build)
             }
 
             if (mkdirp(dst, mode)) {
+                free(dst);
                 return -1;
             }
 
@@ -406,6 +407,7 @@ static int download_build(struct rpminspect *ri, const struct koji_build *build)
             }
 
             if (mkdirp(dst, mode)) {
+                free(dst);
                 return -1;
             }
 

@@ -565,7 +565,6 @@ static inline void _remedy_walker(struct toml_node *node, void *data)
 {
     char *r = NULL;
     char *n = NULL;
-    string_entry_t *entry = NULL;
     struct rpminspect *ri = (struct rpminspect *) data;
     static bool in_remedy = false;
 
@@ -593,9 +592,6 @@ static inline void _remedy_walker(struct toml_node *node, void *data)
 
             if (!set_remedy(n, r)) {
                 warnx("*** '%s' is not a valid remedy identifier", n);
-                TAILQ_REMOVE(ri->remedy_overrides, entry, items);
-                free(entry->data);
-                free(entry);
             }
 
             free(r);

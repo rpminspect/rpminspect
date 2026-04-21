@@ -26,15 +26,16 @@ static int fill_mmfile(mmfile_t *mf, const char *file)
 
     mf->ptr = NULL;
     mf->size = 0;
-    fd = open(file, O_RDONLY);
-
-    if (fd < 0) {
-        return 0;
-    }
 
     if (stat(file, &sb)) {
         warn("*** stat");
         return 1;
+    }
+
+    fd = open(file, O_RDONLY);
+
+    if (fd < 0) {
+        return 0;
     }
 
     /* extra byte for the \0 */

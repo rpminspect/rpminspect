@@ -36,6 +36,7 @@ static bool valid_peers(struct rpminspect *ri, const Header before_hdr, const He
     params.header = NAME_METADATA;
 
     after_vendor = headerGetString(after_hdr, RPMTAG_VENDOR);
+
     if (ri->vendor == NULL) {
         xasprintf(&params.msg, _("Vendor not set in the rpminspect configuration, ignoring Package Vendor \"%s\" in %s"), after_vendor, after_nevra);
         params.severity = RESULT_INFO;
@@ -62,6 +63,7 @@ static bool valid_peers(struct rpminspect *ri, const Header before_hdr, const He
     }
 
     after_buildhost = headerGetString(after_hdr, RPMTAG_BUILDHOST);
+
     if (after_buildhost && ri->buildhost_subdomain != NULL) {
         valid_subdomain = false;
 
@@ -88,6 +90,7 @@ static bool valid_peers(struct rpminspect *ri, const Header before_hdr, const He
     }
 
     after_summary = headerGetString(after_hdr, RPMTAG_SUMMARY);
+
     if (after_summary && has_bad_word(after_summary, ri->badwords)) {
         xasprintf(&params.msg, _("Package Summary contains unprofessional language in %s"), after_nevra);
         xasprintf(&params.details, _("Summary: %s"), after_summary);
@@ -101,10 +104,12 @@ static bool valid_peers(struct rpminspect *ri, const Header before_hdr, const He
         add_result(ri, &params);
         free(params.msg);
         free(params.details);
+        params.details = NULL;
         ret = false;
     }
 
     after_description = headerGetString(after_hdr, RPMTAG_DESCRIPTION);
+
     if (after_description && has_bad_word(after_description, ri->badwords)) {
         xasprintf(&params.msg, _("Package Description contains unprofessional language in %s:"), after_nevra);
         xasprintf(&params.details, "%s", after_description);
@@ -118,6 +123,7 @@ static bool valid_peers(struct rpminspect *ri, const Header before_hdr, const He
         add_result(ri, &params);
         free(params.msg);
         free(params.details);
+        params.details = NULL;
         ret = false;
     }
 
@@ -178,6 +184,7 @@ static bool valid_peers(struct rpminspect *ri, const Header before_hdr, const He
             add_result(ri, &params);
             free(params.msg);
             free(params.details);
+            params.details = NULL;
        }
     }
 

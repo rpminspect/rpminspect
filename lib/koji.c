@@ -177,6 +177,7 @@ static void read_koji_task_struct(xmlrpc_env *env, xmlrpc_value *result, struct 
          * be present in the output.
          */
         if (xmlrpc_value_type(value) == XMLRPC_TYPE_NIL) {
+            free(key);
             xmlrpc_DECREF(value);
             continue;
         }
@@ -478,15 +479,6 @@ void init_koji_task_entry(koji_task_entry_t *entry)
 
     entry->brootid = -1;
 
-    entry->srpms = xalloc(sizeof(*entry->srpms));
-    TAILQ_INIT(entry->srpms);
-
-    entry->rpms = xalloc(sizeof(*entry->rpms));
-    TAILQ_INIT(entry->rpms);
-
-    entry->logs = xalloc(sizeof(*entry->logs));
-    TAILQ_INIT(entry->logs);
-
     return;
 }
 
@@ -634,14 +626,14 @@ struct koji_build *get_koji_build(struct rpminspect *ri, const char *buildspec)
 
     if (env.fault_occurred) {
         if (env.fault_code >= 1000 || env.fault_code < 0) {
+            if (env.fault_code < 0) {
+                warnx(_("*** xmlrpc fault code %s (%d): getBuild(%s) from %s"), get_xmlrpc_fault_desc(env.fault_code), env.fault_code, buildspec, ri->kojihub);
+            }
+
             /* server side error which means Koji protocol error */
             xmlrpc_env_clean(&env);
             xmlrpc_client_cleanup();
             free_koji_build(build);
-
-            if (env.fault_code < 0) {
-                warnx(_("*** xmlrpc fault code %s (%d): getBuild(%s) from %s"), get_xmlrpc_fault_desc(env.fault_code), env.fault_code, buildspec, ri->kojihub);
-            }
 
             return NULL;
         } else {
@@ -1122,14 +1114,14 @@ struct koji_task *get_koji_task(struct rpminspect *ri, const char *taskspec)
 
     if (env.fault_occurred) {
         if (env.fault_code >= 1000 || env.fault_code < 0 || env.fault_code == 1) {
+            if (env.fault_code < 0) {
+                warnx(_("*** xmlrpc fault code %s (%d): getTaskInfo(%s) from %s"), get_xmlrpc_fault_desc(env.fault_code), env.fault_code, taskspec, ri->kojihub);
+            }
+
             /* server side error which means Koji protocol error */
             xmlrpc_env_clean(&env);
             xmlrpc_client_cleanup();
             free_koji_task(task);
-
-            if (env.fault_code < 0) {
-                warnx(_("*** xmlrpc fault code %s (%d): getTaskInfo(%s) from %s"), get_xmlrpc_fault_desc(env.fault_code), env.fault_code, taskspec, ri->kojihub);
-            }
 
             return NULL;
         } else {
@@ -1178,6 +1170,8 @@ struct koji_task *get_koji_task(struct rpminspect *ri, const char *taskspec)
         dsize = xmlrpc_array_size(&env, xv);
 
         if (dsize == 0) {
+            xmlrpc_DECREF(xk);
+            xmlrpc_DECREF(xv);
             continue;
         }
 
@@ -1204,6 +1198,8 @@ struct koji_task *get_koji_task(struct rpminspect *ri, const char *taskspec)
             if (xmlrpc_value_type(dresult) == XMLRPC_TYPE_NIL) {
                 /* some task IDs may be nothing, so ignore */
                 xmlrpc_DECREF(dresult);
+                xmlrpc_DECREF(dstruct);
+                free_koji_task_entry(descendent);
                 continue;
             }
 
@@ -1327,14 +1323,6 @@ string_list_t *get_all_arches(const struct rpminspect *ri)
         /* Get the array element as a string */
         xmlrpc_decompose_value(&env, value, "s", &element);
         xmlrpc_abort_on_fault(&env);
-        xmlrpc_DECREF(value);
-
-        /* Flag what we have */
-        if (!strcmp(element, RPM_NOARCH_NAME)) {
-            have_noarch = true;
-        } else if (!strcmp(element, SRPM_ARCH_NAME)) {
-            have_src = true;
-        }
 
         /*
          * If the value of an element is nil, just skip over it.  We can't
@@ -1345,6 +1333,15 @@ string_list_t *get_all_arches(const struct rpminspect *ri)
             xmlrpc_DECREF(value);
             free(element);
             continue;
+        }
+
+        xmlrpc_DECREF(value);
+
+        /* Flag what we have */
+        if (!strcmp(element, RPM_NOARCH_NAME)) {
+            have_noarch = true;
+        } else if (!strcmp(element, SRPM_ARCH_NAME)) {
+            have_src = true;
         }
 
         /*
