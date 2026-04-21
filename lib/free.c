@@ -332,6 +332,8 @@ void free_rpminspect(struct rpminspect *ri)
 
     free_remedy_strings();
 
+    free(ri);
+
     return;
 }
 

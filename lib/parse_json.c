@@ -183,6 +183,8 @@ static bool json_strdict_foreach(parser_context *context, const char *key1, cons
             free(valstr);
             return true;
         }
+
+        free(valstr);
     }
 
     return false;

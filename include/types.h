@@ -406,7 +406,6 @@ typedef enum _politics_field_t {
 
 /* Commands used by rpminspect at runtime. */
 struct command_paths {
-    char *diff;
     char *msgunfmt;
     char *desktop_file_validate;
     char *abidiff;

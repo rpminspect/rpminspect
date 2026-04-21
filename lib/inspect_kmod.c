@@ -143,6 +143,8 @@ static bool kmod_driver(struct rpminspect *ri, rpmfile_entry_t *file)
 
     if (kctx == NULL) {
         warn("*** kmod_new");
+        kmod_module_unref(beforekmod);
+        kmod_unref(kctx);
         return true;
     }
 
@@ -151,6 +153,7 @@ static bool kmod_driver(struct rpminspect *ri, rpmfile_entry_t *file)
     if (err < 0) {
         /* not a kernel module */
         kmod_module_unref(beforekmod);
+        kmod_module_unref(afterkmod);
         kmod_unref(kctx);
         return true;
     } else {
@@ -195,9 +198,6 @@ static bool kmod_driver(struct rpminspect *ri, rpmfile_entry_t *file)
             free(params.msg);
             reported = true;
         }
-
-        list_free(lost, free);
-        lost = NULL;
     }
 
     if (gain != NULL && !TAILQ_EMPTY(gain)) {
@@ -212,9 +212,6 @@ static bool kmod_driver(struct rpminspect *ri, rpmfile_entry_t *file)
             free(params.msg);
             reported = true;
         }
-
-        list_free(gain, free);
-        gain = NULL;
     }
 
     /* Compute lost and gained module dependencies */
@@ -233,9 +230,6 @@ static bool kmod_driver(struct rpminspect *ri, rpmfile_entry_t *file)
             free(params.msg);
             reported = true;
         }
-
-        list_free(lost, free);
-        lost = NULL;
     }
 
     if (gain != NULL && !TAILQ_EMPTY(gain)) {
@@ -249,10 +243,10 @@ static bool kmod_driver(struct rpminspect *ri, rpmfile_entry_t *file)
             free(params.msg);
             reported = true;
         }
-
-        list_free(gain, free);
-        gain = NULL;
     }
+
+    list_free(gain, free);
+    list_free(lost, free);
 
     /* Compute lost PCI device IDs in kernel modules */
     beforealiases = gather_module_aliases(before_kmod_name, beforeinfo);

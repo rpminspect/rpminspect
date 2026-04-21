@@ -201,6 +201,7 @@ rpmfile_t *extract_rpm(struct rpminspect *ri, const char *pkg, Header hdr, const
     assert(*output_dir != NULL);
 
     if (mkdirp(*output_dir, S_IRWXU | S_IRGRP | S_IXGRP | S_IROTH | S_IXOTH) == -1) {
+        free(*output_dir);
         return NULL;
     }
 

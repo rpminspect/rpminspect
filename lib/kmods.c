@@ -161,8 +161,8 @@ bool compare_module_parameters(const struct kmod_list *before, const struct kmod
         *gain = list_copy(added);
     }
 
-    list_free(added, NULL);
-    list_free(difference, NULL);
+    list_free(added, free);
+    list_free(difference, free);
     list_free(before_parm_list, free);
     list_free(after_parm_list, free);
     list_free(combined, free);
@@ -397,6 +397,8 @@ bool compare_module_aliases(kernel_alias_data_t *before, kernel_alias_data_t *af
         if (wildcard_search) {
             list_free(after_modules, NULL);
         }
+
+        list_free(difference, NULL);
     }
 
     return result;

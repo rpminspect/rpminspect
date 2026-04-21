@@ -298,6 +298,8 @@ static bool shellsyntax_driver(struct rpminspect *ri, rpmfile_entry_t *file)
 
     free(shell);
     free(before_shell);
+    free(errors);
+    free(before_errors);
     return result;
 }
 

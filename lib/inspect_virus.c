@@ -140,6 +140,8 @@ bool inspect_virus(struct rpminspect *ri)
 
         if (cvd == NULL) {
             free(cvdpath);
+            free(params.msg);
+            free(params.details);
 
             if (closedir(d) == -1) {
                 warn("*** closedir");

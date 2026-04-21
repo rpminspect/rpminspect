@@ -73,11 +73,7 @@ static bool find_lto_symbols(Elf *elf, __attribute__((unused)) string_list_t **u
         }
     }
 
-    if (TAILQ_EMPTY(specifics)) {
-        list_free(specifics, free);
-        specifics = NULL;
-    }
-
+    list_free(specifics, free);
     list_free(names, free);
 
     return true;

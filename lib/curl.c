@@ -265,7 +265,7 @@ curl_off_t curl_get_size(const char *src)
 
     if (cc != CURLE_OK) {
         warnx(_("*** unable to read %s"), src);
-        return 0;
+        goto curl_done;
     }
 
 #ifdef _HAVE_NEWER_CURLINFO
@@ -275,6 +275,7 @@ curl_off_t curl_get_size(const char *src)
     r = (curl_off_t) len;
 #endif
 
+curl_done:
     curl_easy_cleanup(c);
     return r;
 }

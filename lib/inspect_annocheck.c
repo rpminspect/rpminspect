@@ -513,8 +513,10 @@ static bool annocheck_driver(struct rpminspect *ri, rpmfile_entry_t *file, rpmpe
             reported = true;
             free(params.details);
             free(params.msg);
-            list_free(details, free);
         }
+
+        list_free(details, free);
+        details = NULL;
     }
 
     /* set result based on worst result encountered */

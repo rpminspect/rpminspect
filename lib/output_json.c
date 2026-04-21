@@ -97,6 +97,7 @@ void output_json(const results_t *results, const char *dest, __attribute__((unus
 
             if (fp == NULL) {
                 warn(_("*** error opening %s for writing"), dest);
+                json_object_put(j);
                 return;
             }
         }

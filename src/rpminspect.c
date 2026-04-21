@@ -308,6 +308,25 @@ static void check_found(const bool found, const char *inspection)
     return;
 }
 
+/*
+ * Copy the option argument, but error out if we have already done
+ * that.  Enforces single use of options on the command line.
+ */
+static char *gather_arg(char *val, char *arg, const char *opt)
+{
+    char *r = NULL;
+
+    if (arg) {
+        warnx(_("*** multiple instances of command line option: `%s`"), opt);
+        errx(RI_PROGRAM_ERROR, _("*** See `%s --help` for more information."), COMMAND_NAME);
+    }
+
+    r = strdup(val);
+    assert(r != NULL);
+
+    return r;
+}
+
 int main(int argc, char **argv)
 {
     struct sigaction abrt;
@@ -428,31 +447,31 @@ int main(int argc, char **argv)
         switch (c) {
             case 'c':
                 /* Capture user specified config file */
-                cfgfile = strdup(optarg);
+                cfgfile = gather_arg(optarg, cfgfile, "-c");
                 break;
             case 'p':
                 /* Configuration profile to use */
-                profile = strdup(optarg);
+                profile = gather_arg(optarg, profile, "-p");
                 break;
             case 'T':
                 /* Inspections to enable */
                 check_inspection_options(inspection_opt);
-                insoptarg = strdup(optarg);
+                insoptarg = gather_arg(optarg, insoptarg, "-T");
                 exclude = false;
                 inspection_opt = true;
                 break;
             case 'E':
                 /* Inspections to disable */
                 check_inspection_options(inspection_opt);
-                insoptarg = strdup(optarg);
+                insoptarg = gather_arg(optarg, insoptarg, "-E");
                 exclude = true;
                 inspection_opt = true;
                 break;
             case 'a':
-                archopt = strdup(optarg);
+                archopt = gather_arg(optarg, archopt, "-a");
                 break;
             case 'r':
-                release = strdup(optarg);
+                release = gather_arg(optarg, release, "-r");
                 break;
             case 'n':
                 rebase_detection = false;
@@ -476,7 +495,7 @@ int main(int argc, char **argv)
 
                 break;
             case 'o':
-                output = strdup(optarg);
+                output = gather_arg(optarg, output, "-o");
                 break;
             case 'F':
                 /* validate the specified output format */
@@ -519,10 +538,10 @@ int main(int argc, char **argv)
                 wordfree(&expand);
                 break;
             case 't':
-                threshold = strdup(optarg);
+                threshold = gather_arg(optarg, threshold, "-t");
                 break;
             case 's':
-                suppress = strdup(optarg);
+                suppress = gather_arg(optarg, suppress, "-s");
                 break;
             case 'f':
                 fetch_only = true;        /* -f implies -k */

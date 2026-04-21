@@ -219,5 +219,8 @@ string_list_t *read_spec(struct rpminspect *ri, const char *specfile)
     /* split in to lines */
     r = strsplit(s, "\n\r");
 
+    /* cleanup */
+    rpmSpecFree(spec);
+
     return r;
 }
