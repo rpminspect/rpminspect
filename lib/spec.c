@@ -209,6 +209,7 @@ string_list_t *read_spec(struct rpminspect *ri, const char *specfile)
 
     if (s == NULL) {
         warn("*** rpmSpecGetSection");
+        rpmSpecFree(spec);
         return NULL;
     }
 

@@ -1077,7 +1077,7 @@ bool init_fileinfo(struct rpminspect *ri)
                     free(fientry->owner);
                     free(fientry->group);
                     free(fientry);
-                    entry = NULL;
+                    fientry = NULL;
                 } else {
                     fientry->filename = strdup(token);
                 }

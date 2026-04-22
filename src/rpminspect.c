@@ -258,6 +258,7 @@ static char *get_product_release(string_map_t *products, const favor_release_t f
     if (!matched) {
         warnx(_("*** unable to determine product release for %s and %s"), before, after);
         warnx(_("*** See the 'favor_release' setting in the rpminspect configuration file."));
+        free(after_product);
         after_product = NULL;
     }
 
@@ -848,6 +849,7 @@ int main(int argc, char **argv)
             ri->worksubdir = NULL;
         }
 
+        free(output);
         free_rpminspect(ri);
         rpmFreeMacros(NULL);
         rpmFreeRpmrc();

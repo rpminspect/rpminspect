@@ -84,8 +84,9 @@ static bool badfuncs_driver(struct rpminspect *ri, rpmfile_entry_t *after)
     string_list_t *after_symbols = NULL;
     string_list_t *used_symbols = NULL;
     string_list_t *sorted_used = NULL;
+    string_list_t *allowed_symbols = NULL;
+    string_list_t *tmp_list = NULL;
     string_entry_t *iter = NULL;
-    string_entry_t *entry = NULL;
     struct result_params params;
     FILE *output_stream = NULL;
     char *output_buffer = NULL;
@@ -133,13 +134,16 @@ static bool badfuncs_driver(struct rpminspect *ri, rpmfile_entry_t *after)
 
     /* Filter out any allowed forbidden symbols for this file */
     TAILQ_FOREACH(iter, used_symbols, items) {
-        entry = iter;
-
-        if (allowed_symbol(ri, after, entry->data)) {
-            TAILQ_REMOVE(used_symbols, entry, items);
-            free(entry->data);
-            free(entry);
+        if (allowed_symbol(ri, after, iter->data)) {
+            allowed_symbols = list_add(allowed_symbols, iter->data);
         }
+    }
+
+    if (allowed_symbols && !TAILQ_EMPTY(allowed_symbols)) {
+        tmp_list = list_difference(used_symbols, allowed_symbols);
+        list_free(used_symbols, free);
+        used_symbols = tmp_list;
+        list_free(allowed_symbols, free);
     }
 
     if (TAILQ_EMPTY(used_symbols)) {

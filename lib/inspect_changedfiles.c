@@ -343,6 +343,7 @@ static bool changedfiles_driver(struct rpminspect *ri, rpmfile_entry_t *file)
             goto done;
         }
 
+        free(params.details);
         params.details = run_and_capture(ri->workdir, &before_tmp, ri->commands.msgunfmt, file->peer_file->fullpath, &exitcode);
 
         if (exitcode) {
@@ -358,6 +359,7 @@ static bool changedfiles_driver(struct rpminspect *ri, rpmfile_entry_t *file)
         }
 
         /* Now diff the mo content */
+        free(params.details);
         params.details = get_file_delta(before_tmp, after_tmp);
 
         if (params.details) {

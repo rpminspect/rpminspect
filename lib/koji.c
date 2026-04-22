@@ -1235,7 +1235,11 @@ struct koji_task *get_koji_task(struct rpminspect *ri, const char *taskspec)
             TAILQ_INSERT_TAIL(task->descendents, descendent, items);
 
             xmlrpc_DECREF(dresult);
+            xmlrpc_DECREF(dstruct);
         }
+
+        xmlrpc_DECREF(xk);
+        xmlrpc_DECREF(xv);
     }
 
     xmlrpc_DECREF(result);

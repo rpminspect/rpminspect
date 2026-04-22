@@ -377,6 +377,7 @@ static bool patches_driver(struct rpminspect *ri, rpmfile_entry_t *file)
 
     if (after_patch == NULL) {
         warnx(_("*** unable to uncompress patch: %s"), file->localpath);
+        free(before_patch);
         return false;
     }
 
@@ -387,6 +388,8 @@ static bool patches_driver(struct rpminspect *ri, rpmfile_entry_t *file)
      */
     if (stat(after_patch, &sb) != 0) {
         warn("*** stat");
+        free(before_patch);
+        free(after_patch);
         return false;
     }
 
@@ -394,6 +397,8 @@ static bool patches_driver(struct rpminspect *ri, rpmfile_entry_t *file)
 
     if (file->peer_file && before_patch && stat(before_patch, &sb) != 0) {
         warn("*** stat");
+        free(before_patch);
+        free(after_patch);
         return false;
     }
 

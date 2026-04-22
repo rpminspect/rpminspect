@@ -324,7 +324,10 @@ static bool debuginfo_driver(struct rpminspect *ri, rpmfile_entry_t *file)
             free(params.msg);
         }
 
-        close(fd);
+        if (fd != 0) {
+            close(fd);
+        }
+
         elf_end(elf);
     }
 

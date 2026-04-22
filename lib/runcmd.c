@@ -216,6 +216,14 @@ char *run_cmd_vp(int *exitcode, const char *workdir, char **argv)
     } else if (proc == -1) {
         /* failure */
         warn("*** fork");
+
+        if (close(pfd[RD]) == -1) {
+            warn("*** close");
+        }
+
+        if (close(pfd[WR]) == -1) {
+            warn("*** close");
+        }
     } else {
         /* close the pipe */
         if (close(pfd[WR]) == -1) {
@@ -230,6 +238,10 @@ char *run_cmd_vp(int *exitcode, const char *workdir, char **argv)
         reader = fdopen(pfd[RD], "r");
 
         if (reader == NULL) {
+            if (close(pfd[RD]) == -1) {
+                warn("*** close");
+            }
+
             if (exitcode) {
                 *exitcode = EXIT_FAILURE;
             }

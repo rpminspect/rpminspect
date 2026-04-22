@@ -372,6 +372,7 @@ static int download_build(struct rpminspect *ri, const struct koji_build *build)
             if (filter == NULL) {
                 if (p->parse_file(&ctx, dst)) {
                     warnx(_("*** ignoring malformed module metadata file: %s"), dst);
+                    free(dst);
                     return -1;
                 }
 
@@ -381,7 +382,8 @@ static int download_build(struct rpminspect *ri, const struct koji_build *build)
 
                 if (p->strarray_foreach(ctx, "filter", "rpms", filter_cb, filter)) {
                     warnx(_("*** malformed rpm filters in file: %s"), dst);
-                    free(filter);
+                    list_free(filter, free);
+                    free(dst);
                     return -1;
                 }
 

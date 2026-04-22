@@ -83,9 +83,10 @@ static rpmfileAttrs get_rpmtag_fileflags(const Header h, const int i)
             idx = rpmtdSetIndex(td, i);
             assert(idx != -1);
             flags = *(rpmtdGetUint32(td));
-            rpmtdFreeData(td);
-            rpmtdFree(td);
         }
+
+        rpmtdFreeData(td);
+        rpmtdFree(td);
 
         rpmtdFreeData(filenames);
         rpmtdFree(filenames);
@@ -239,8 +240,6 @@ rpmfile_t *extract_rpm(struct rpminspect *ri, const char *pkg, Header hdr, const
         path_entry->index = i;
         HASH_ADD_KEYPTR(hh, path_table, path_entry->path, strlen(path_entry->path), path_entry);
     }
-
-    rpmtdFree(td);
 
     /* Open the file with libarchive */
     archive = new_archive_reader();
@@ -408,6 +407,9 @@ rpmfile_t *extract_rpm(struct rpminspect *ri, const char *pkg, Header hdr, const
     }
 
 cleanup:
+    rpmtdFreeData(td);
+    rpmtdFree(td);
+
     HASH_ITER(hh, path_table, path_entry, tmp_entry) {
         HASH_DEL(path_table, path_entry);
         free(path_entry->path);

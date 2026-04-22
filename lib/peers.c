@@ -108,6 +108,9 @@ void add_peer(rpmpeer_t **peers, deprule_ignore_map_t *ignores, int whichbuild, 
     }
 
     if (whichbuild == BEFORE_BUILD) {
+        free(peer->before_rpm);
+        free_deprules(peer->before_deprules);
+
         peer->before_hdr = hdr;
         peer->before_rpm = strdup(pkg);
         peer->before_files = NULL;
@@ -120,6 +123,9 @@ void add_peer(rpmpeer_t **peers, deprule_ignore_map_t *ignores, int whichbuild, 
             peer->before_deprules = gather_deprules(hdr, ignores);
         }
     } else if (whichbuild == AFTER_BUILD) {
+        free(peer->after_rpm);
+        free_deprules(peer->after_deprules);
+
         peer->after_hdr = hdr;
         peer->after_rpm = strdup(pkg);
         peer->after_files = NULL;
