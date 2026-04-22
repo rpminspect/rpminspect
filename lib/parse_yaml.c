@@ -24,6 +24,38 @@
 #    define dprintf(...)
 #endif
 
+static void y_free_tree(y_value *v)
+{
+    size_t i = 0;
+
+    if (v == NULL || v->type == Y_UNINITIALIZED) {
+        return;
+    } else if (v->type == Y_STRING) {
+        free(v->v.string);
+    } else if (v->type == Y_ARRAY) {
+        for (i = 0; v->v.array[i] != NULL; i++) {
+            y_free_tree(v->v.array[i]);
+        }
+
+        free(v->v.array);
+    } else if (v->type == Y_DICT) {
+        for (i = 0; v->v.dict.keys[i] != NULL; i++) {
+            free(v->v.dict.keys[i]);
+            y_free_tree(v->v.dict.values[i]);
+        }
+
+        free(v->v.dict.keys);
+        free(v->v.dict.values);
+    } else {
+        warnx(_("*** malformed type - freed?"));
+        return;
+    }
+
+    v->type = Y_UNINITIALIZED;
+    free(v);
+    return;
+}
+
 /*
  * Not only do they not give a method for this awfulness, and not only
  * do they put enums in their public headers, but they can't even be
@@ -189,7 +221,7 @@ static y_value *p_value(context *context)
                     break;
                 } else if (token.type != YAML_KEY_TOKEN) {
                     fprintf(stderr, "expected YAML_KEY_TOKEN, got %s\n", tokname(token.type));
-                    free(ret);
+                    y_free_tree(ret);
                     ret = NULL;
                     goto done;
                 }
@@ -208,7 +240,7 @@ static y_value *p_value(context *context)
                 wait_for(context, &token, YAML_VALUE_TOKEN);
 
                 if (peek(context, &ptoken)) {
-                    free(ret);
+                    y_free_tree(ret);
                     ret = NULL;
                     goto done;
                 }
@@ -249,7 +281,7 @@ static y_value *p_value(context *context)
                 ret->v.array[i + 1] = NULL;
 
                 if (peek(context, &ptoken)) {
-                    free(ret);
+                    y_free_tree(ret);
                     ret = NULL;
                     goto done;
                 }
@@ -315,6 +347,7 @@ static bool yaml_parse_file(parser_context **context_out, const char *filename)
 
     if (fp == NULL) {
         warn("*** fopen");
+        yaml_parser_delete(&parser);
         return true;
     }
 
@@ -334,38 +367,6 @@ static bool yaml_parse_file(parser_context **context_out, const char *filename)
 
     *context_out = (parser_context *)value;
     return false;
-}
-
-static void y_free_tree(y_value *v)
-{
-    size_t i = 0;
-
-    if (v == NULL || v->type == Y_UNINITIALIZED) {
-        return;
-    } else if (v->type == Y_STRING) {
-        free(v->v.string);
-    } else if (v->type == Y_ARRAY) {
-        for (i = 0; v->v.array[i] != NULL; i++) {
-            y_free_tree(v->v.array[i]);
-        }
-
-        free(v->v.array);
-    } else if (v->type == Y_DICT) {
-        for (i = 0; v->v.dict.keys[i] != NULL; i++) {
-            free(v->v.dict.keys[i]);
-            y_free_tree(v->v.dict.values[i]);
-        }
-
-        free(v->v.dict.keys);
-        free(v->v.dict.values);
-    } else {
-        warnx(_("*** malformed type - freed?"));
-        return;
-    }
-
-    v->type = Y_UNINITIALIZED;
-    free(v);
-    return;
 }
 
 static void yaml_fini(parser_context *context)

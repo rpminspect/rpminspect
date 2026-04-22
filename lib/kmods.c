@@ -395,7 +395,7 @@ bool compare_module_aliases(kernel_alias_data_t *before, kernel_alias_data_t *af
 
         /* If after_modules was created from a wildcard search, free it */
         if (wildcard_search) {
-            list_free(after_modules, NULL);
+            list_free(after_modules, free);
         }
 
         list_free(difference, NULL);

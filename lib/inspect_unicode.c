@@ -112,6 +112,7 @@ static char *make_source_dirs(const char *worksubdir, const char *fullpath)
 
     if (mkdirp(topdir, mode) == -1) {
         free(topdir);
+        free(fp);
         return NULL;
     }
 
@@ -251,6 +252,14 @@ static char *rpm_prep_source(struct rpminspect *ri, const rpmfile_entry_t *file,
     } else if (proc == -1) {
         /* failure */
         warn("*** fork");
+
+        if (close(pfd[STDIN_FILENO]) == -1) {
+            warn("*** close");
+        }
+
+        if (close(pfd[STDOUT_FILENO]) == -1) {
+            warn("*** close");
+        }
     } else {
         /* close the unused part */
         if (close(pfd[STDOUT_FILENO]) == -1) {
@@ -262,6 +271,11 @@ static char *rpm_prep_source(struct rpminspect *ri, const rpmfile_entry_t *file,
 
         if (reader == NULL) {
             warn("*** fdopen");
+
+            if (close(pfd[STDIN_FILENO]) == -1) {
+                warn("*** close");
+            }
+
             return NULL;
         }
 

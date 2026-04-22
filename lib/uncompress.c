@@ -181,6 +181,11 @@ char *uncompress_file(struct rpminspect *ri, const char *infile, const char *sub
         /* just stop trying to uncompress if this errors */
         archive_read_free(input);
         free(outfile);
+
+        if (close(fd) == -1) {
+            warn("*** close");
+        }
+
         return NULL;
     }
 
@@ -190,6 +195,11 @@ char *uncompress_file(struct rpminspect *ri, const char *infile, const char *sub
         warn("*** archive_read_next_header: %s", archive_error_string(input));
         archive_read_free(input);
         free(outfile);
+
+        if (close(fd) == -1) {
+            warn("*** close");
+        }
+
         return NULL;
     }
 
@@ -206,7 +216,7 @@ char *uncompress_file(struct rpminspect *ri, const char *infile, const char *sub
                 archive_read_free(input);
 
                 if (close(fd) == -1) {
-                    warn("*** fclose");
+                    warn("*** close");
                 }
 
                 free(outfile);
@@ -245,9 +255,16 @@ char *uncompress_file(struct rpminspect *ri, const char *infile, const char *sub
             outfile = NULL;
         }
 
-        fd = 0;
+        fd = -1;
     }
 
     archive_read_free(input);
+
+    if (fd != -1) {
+        if (close(fd) == -1) {
+            warn("*** close");
+        }
+    }
+
     return outfile;
 }

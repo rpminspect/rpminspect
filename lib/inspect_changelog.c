@@ -65,7 +65,7 @@ static void free_forbidden_regex(void)
     while (!TAILQ_EMPTY(forbidden)) {
         entry = TAILQ_FIRST(forbidden);
         TAILQ_REMOVE(forbidden, entry, items);
-        regfree(entry->re);
+        free_regex(entry->re);
         free(entry);
     }
 

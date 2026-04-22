@@ -43,6 +43,7 @@
 
 static FILE *error_stream = NULL;
 static regex_t sections_regex;
+static int reg_result = -1;
 
 /* Old API used an error message callback */
 #ifndef NEWLIBMANDOC
@@ -50,6 +51,7 @@ static void error_handler(enum mandocerr errtype, enum mandoclevel level,
                           const char *file, int line, int col, const char *msg)
 {
     fprintf(error_stream, _("Error parsing %s:%d:%d: %s: %s: %s\n"), basename(file), line, col, mparse_strlevel(level), mparse_strerror(errtype), msg);
+    return;
 }
 #endif
 
@@ -57,13 +59,17 @@ static void error_handler(enum mandocerr errtype, enum mandoclevel level,
 static void inspect_manpage_free(void)
 {
     mchars_free();
-    regfree(&sections_regex);
+
+    if (reg_result == 0) {
+        regfree(&sections_regex);
+    }
+
+    return;
 }
 
 /* Allocate memory used by inspect_manpage */
 static bool inspect_manpage_alloc(void)
 {
-    int reg_result;
     char reg_error[BUFSIZ];
     char *tmp = NULL;
 
@@ -76,6 +82,7 @@ static bool inspect_manpage_alloc(void)
     xasprintf(&tmp, "/man([^/]+)/[^/]+\\.([^.]+)\\%s$", GZIPPED_FILENAME_EXTENSION);
     reg_result = regcomp(&sections_regex, tmp, REG_EXTENDED);
     free(tmp);
+
     if (reg_result != 0) {
         regerror(reg_result, &sections_regex, reg_error, sizeof(reg_error));
         warnx(_("*** unable to compile man page path regular expression: %s"), reg_error);

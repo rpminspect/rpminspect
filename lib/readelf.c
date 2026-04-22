@@ -97,6 +97,16 @@ static Elf *get_elf_with_kind(const char *fullpath, int *out_fd, Elf_Kind kind)
 
     elf = elf_begin(fd, ELF_C_READ_MMAP_PRIVATE, NULL);
 
+    if (elf == NULL) {
+        warn("*** elf_begin");
+
+        if (close(fd) == -1) {
+            warn("*** close");
+        }
+
+        return NULL;
+    }
+
     if (elf_kind(elf) == kind) {
         *out_fd = fd;
         return elf;
@@ -507,7 +517,10 @@ char *get_elf_soname(rpmfile_entry_t *file)
     bool found = false;
 
     if ((e = get_elf(file, &fd)) == NULL) {
-        close(fd);
+        if (fd != 0) {
+            close(fd);
+        }
+
         return NULL;
     }
 
