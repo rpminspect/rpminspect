@@ -120,6 +120,7 @@ SawTable(struct toml_node* place, char* name, struct toml_node** lastTable, char
 
 		if (strcmp(ancestor, "") == 0) {
 			asprintf(err, "empty implicit table");
+			free(tofree);
 			return 1;
 		}
 
@@ -139,8 +140,10 @@ SawTable(struct toml_node* place, char* name, struct toml_node** lastTable, char
 
 		/* this is the auto-vivification */
 		item = malloc(sizeof(*item));
-		if (!item)
+		if (!item) {
+			free(tofree);
 			return ENOMEM;
+		}
 
 		item->node.name = strdup(ancestor);
 		item->node.type = TOML_TABLE;
@@ -153,11 +156,13 @@ SawTable(struct toml_node* place, char* name, struct toml_node** lastTable, char
 
 	if (!item_added) {
 		asprintf(err, "Duplicate item %s", name);
+		free(tofree);
 		return 2;
 	}
 
 	if (place->type != TOML_TABLE) {
 		asprintf(err, "Attempt to overwrite table %s", name);
+		free(tofree);
 		return 3;
 	}
 

@@ -234,6 +234,11 @@ _json_string_encode(const char* string)
 	}
 
 	ret = malloc(i + j + 1);
+
+	if (ret == NULL) {
+		return NULL;
+	}
+
 	for (i = 0, j = 0; string[i]; i++)
 	{
 		switch (string[i]) {
