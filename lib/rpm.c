@@ -389,6 +389,7 @@ char *extract_rpm_payload(const char *rpm)
 
     if (gzdi == NULL) {
         warnx("*** Fdopen: %s", Fstrerror(gzdi));
+        Fclose(fdi);
         goto cleanup;
     }
 
@@ -491,7 +492,6 @@ cleanup:
     free(hardlink);
     free(buf);
     Fclose(gzdi);
-    Fclose(fdi);
     archive_entry_free(entry);
 
     if (archive != NULL) {
