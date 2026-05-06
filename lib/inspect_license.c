@@ -535,6 +535,7 @@ static string_list_t *get_paren_expressions(const char *license)
     start = copy = strdup(license);
     assert(start != NULL);
 
+    /* do not use our wrappers for strchr() here because we need NULL */
     while ((start = strchr(start, '(')) != NULL) {
         while (*start == '(') {
             start++;
