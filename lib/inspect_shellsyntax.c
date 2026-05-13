@@ -79,6 +79,7 @@ static char *get_shell(const struct rpminspect *ri, const char *fullpath)
     buf = NULL;
 
     while (getline(&buf, &len, fp) != -1) {
+        pos = 0;
         buf = strtrim(buf);
 
         /* ignore blank lines and comments */

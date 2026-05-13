@@ -1219,12 +1219,14 @@ struct koji_task *get_koji_task(struct rpminspect *ri, const char *taskspec)
                 if (!strcmp(key, "brootid") || !strcmp(key, "buildroot_id")) {
                     xmlrpc_decompose_value(&env, tr_v, "i", &descendent->brootid);
                     xmlrpc_abort_on_fault(&env);
-                } else if (!strcmp(key, "srpms") && xmlrpc_value_type(tr_v) == XMLRPC_TYPE_ARRAY) {
-                    descendent->srpms = read_koji_descendent_results(&env, tr_v);
-                } else if (!strcmp(key, "rpms")) {
-                    descendent->rpms = read_koji_descendent_results(&env, tr_v);
-                } else if (!strcmp(key, "logs")) {
-                    descendent->logs = read_koji_descendent_results(&env, tr_v);
+                } else if (xmlrpc_value_type(tr_v) == XMLRPC_TYPE_ARRAY) {
+                    if (!strcmp(key, "srpms")) {
+                        descendent->srpms = read_koji_descendent_results(&env, tr_v);
+                    } else if (!strcmp(key, "rpms")) {
+                        descendent->rpms = read_koji_descendent_results(&env, tr_v);
+                    } else if (!strcmp(key, "logs")) {
+                        descendent->logs = read_koji_descendent_results(&env, tr_v);
+                    }
                 }
 
                 xmlrpc_DECREF(tr_v);
@@ -1324,10 +1326,6 @@ string_list_t *get_all_arches(const struct rpminspect *ri)
         xmlrpc_array_read_item(&env, result, i, &value);
         xmlrpc_abort_on_fault(&env);
 
-        /* Get the array element as a string */
-        xmlrpc_decompose_value(&env, value, "s", &element);
-        xmlrpc_abort_on_fault(&env);
-
         /*
          * If the value of an element is nil, just skip over it.  We can't
          * do anything with nil values, so it might as well just not
@@ -1339,6 +1337,9 @@ string_list_t *get_all_arches(const struct rpminspect *ri)
             continue;
         }
 
+        /* Get the array element as a string */
+        xmlrpc_decompose_value(&env, value, "s", &element);
+        xmlrpc_abort_on_fault(&env);
         xmlrpc_DECREF(value);
 
         /* Flag what we have */

@@ -96,6 +96,8 @@ static bool config_driver(struct rpminspect *ri, rpmfile_entry_t *file)
                     warn("*** readlink(%s)", file->peer_file->fullpath);
                     return true;
                 }
+
+                before_dest[n] = '\0';
             }
 
             /* read the after link destination */
@@ -107,6 +109,8 @@ static bool config_driver(struct rpminspect *ri, rpmfile_entry_t *file)
                     warn("*** readlink(%s)", file->fullpath);
                     return true;
                 }
+
+                after_dest[n] = '\0';
             }
 
             /* report changes */

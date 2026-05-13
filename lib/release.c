@@ -51,7 +51,10 @@ char *read_release(const rpmfile_t *files)
         if (strprefix(specline->data, "Release:")) {
             /* advance past 'Release:' */
             val = xstrchr(specline->data, ':');
-            while (*val++ == ':');
+
+            while (*val == ':') {
+                val++;
+            }
 
             /* advance to the value */
             while (*val == ' ' || *val == '\t') {

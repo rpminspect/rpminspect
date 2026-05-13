@@ -246,11 +246,6 @@ char *uncompress_file(struct rpminspect *ri, const char *infile, const char *sub
          */
         if (fclose(fp) == -1) {
             warn("*** fclose");
-
-            if (close(fd) == -1) {
-                warn("*** close");
-            }
-
             free(outfile);
             outfile = NULL;
         }

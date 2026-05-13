@@ -236,7 +236,7 @@ static struct libannocheck_internals *libannocheck_setup(struct rpminspect *ri, 
 
             if (args) {
                 TAILQ_FOREACH(entry, args, items) {
-                    if (strstr(entry->data, "=") || !strprefix(entry->data, "--test-") || !strprefix(entry->data, "--skip-")) {
+                    if (strstr(entry->data, "=") || (!strprefix(entry->data, "--test-") && !strprefix(entry->data, "--skip-"))) {
                         continue;
                     }
 
@@ -399,7 +399,7 @@ static bool annocheck_driver(struct rpminspect *ri, rpmfile_entry_t *file, rpmpe
             annoerr = libannocheck_finish(ah);
 
             if (annoerr != libannocheck_error_none) {
-                warnx(_("*** libannocheck_finish: %s"), libannocheck_get_error_message(ah, annoerr));
+                warnx("*** libannocheck_finish");
             }
 
             ah = NULL;
@@ -531,7 +531,7 @@ static bool annocheck_driver(struct rpminspect *ri, rpmfile_entry_t *file, rpmpe
     }
 
     if (annoerr != libannocheck_error_none) {
-        warnx(_("*** libannocheck_finish: %s"), libannocheck_get_error_message(ah, annoerr));
+        warnx("*** libannocheck_finish");
     }
 
     return result;

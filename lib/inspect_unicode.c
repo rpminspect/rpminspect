@@ -536,6 +536,7 @@ static int validate_file(const char *fpath, __attribute__((unused)) const struct
             /* increase the buffer size if necessary */
             if (i >= sz) {
                 sz *= 2;
+                sz++;
                 errno = 0;
 #ifdef _HAVE_REALLOCARRAY
                 line_new = xreallocarray(line, sz, sizeof(*line));

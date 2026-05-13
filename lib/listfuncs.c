@@ -326,7 +326,7 @@ size_t list_len(const string_list_t *list)
  * Returns a malloc'ed copy of the given list.  Caller must use
  * list_free(list, free) on the returned list.
  */
-string_list_t * list_copy(const string_list_t *list)
+string_list_t *list_copy(const string_list_t *list)
 {
     const string_entry_t *iter = NULL;
     string_list_t *result = NULL;

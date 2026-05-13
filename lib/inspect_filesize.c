@@ -73,9 +73,9 @@ static bool filesize_driver(struct rpminspect *ri, rpmfile_entry_t *file)
 
         if (r == -1) {
             warn("*** stat");
+        } else {
+            file->peer_file->st_size = sb.st_size;
         }
-
-        file->peer_file->st_size = sb.st_size;
     }
 
     /* Nothing to do if the sizes are the same */

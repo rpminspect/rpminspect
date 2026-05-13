@@ -86,7 +86,7 @@ static char *as_str(dson_value *v)
         frac = modf(v->n, &integ);
 
         if (frac == 0) {
-            xasprintf(&s, "%ld", (unsigned long)integ);
+            xasprintf(&s, "%lu", (unsigned long) integ);
         } else {
             xasprintf(&s, "%f", v->n);
         }

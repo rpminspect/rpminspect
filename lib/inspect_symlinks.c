@@ -140,7 +140,7 @@ static bool symlinks_driver(struct rpminspect *ri, rpmfile_entry_t *file)
     params.file = file->localpath;
 
     /* get the link target */
-    len = readlink(file->fullpath, linktarget, sizeof(linktarget) - 1);
+    len = readlink(file->fullpath, linktarget, PATH_MAX);
 
     if (len == -1) {
         /* a read error on the link here prevents further analysis */
@@ -191,6 +191,7 @@ static bool symlinks_driver(struct rpminspect *ri, rpmfile_entry_t *file)
          */
         tmp = strncpy(localpath, params.file, PATH_MAX);
         assert(tmp != NULL);
+        localpath[PATH_MAX] = '\0';
         tail = stpcpy(reltarget, dirname(localpath));
         assert(reltarget != NULL);
 
@@ -278,8 +279,15 @@ static bool symlinks_driver(struct rpminspect *ri, rpmfile_entry_t *file)
     /* check for things becoming symlinks to guard RPM */
     if (file->fullpath && file->peer_file && !S_ISLNK(file->peer_file->st_mode)) {
         /* get the localpath link destination */
-        len = readlink(file->fullpath, localpath, sizeof(localpath) - 1);
-        localpath[len] = '\0';
+        len = readlink(file->fullpath, localpath, PATH_MAX);
+
+        if (len == -1) {
+            warn("*** readlink");
+            strncpy(localpath, file->fullpath, PATH_MAX);
+            localpath[PATH_MAX] = '\0';
+        } else {
+            localpath[len] = '\0';
+        }
 
         if (S_ISDIR(file->peer_file->st_mode)) {
             /* Some RPM versions cannot handle this on an upgrade */

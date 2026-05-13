@@ -63,8 +63,13 @@ bool inspect_subpackages(struct rpminspect *ri)
     if (lost != NULL && !TAILQ_EMPTY(lost)) {
         TAILQ_FOREACH(entry, lost, items) {
             arch = strstr(entry->data, " ");
-            *arch = '\0';
-            arch++;
+
+            if (arch == NULL) {
+                continue;
+            } else {
+                *arch = '\0';
+                arch++;
+            }
 
             if (allowed_arch(ri, arch)) {
                 xasprintf(&params.msg, _("Subpackage '%s' has disappeared on '%s'"), entry->data, arch);
@@ -91,8 +96,13 @@ bool inspect_subpackages(struct rpminspect *ri)
     if (gain != NULL && !TAILQ_EMPTY(gain)) {
         TAILQ_FOREACH(entry, gain, items) {
             arch = strstr(entry->data, " ");
-            *arch = '\0';
-            arch++;
+
+            if (arch == NULL) {
+                continue;
+            } else {
+                *arch = '\0';
+                arch++;
+            }
 
             if (allowed_arch(ri, arch)) {
                 xasprintf(&params.msg, _("Subpackage '%s' has appeared on '%s'"), entry->data, arch);

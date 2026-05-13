@@ -44,7 +44,7 @@ static bool allowed_symbol(const struct rpminspect *ri, const rpmfile_entry_t *f
     lenp = strlen(file->localpath);
 
     if (lenr > lenp) {
-        root[strlen(root) - strlen(file->localpath) + 1] = '\0';
+        root[strlen(root) - strlen(file->localpath)] = '\0';
     }
 
     /* look for the given path in the bad functions allowed hash */

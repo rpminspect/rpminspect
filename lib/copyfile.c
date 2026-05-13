@@ -62,6 +62,7 @@ int copyfile(const char *src, const char *dest, bool force, bool verbose)
                                  * fdopen for out */
     char buf[BUFSIZ];
     size_t s;
+    ssize_t n;
     int success = 0;
     char *destpath = NULL;
     char *destdir = NULL;
@@ -92,10 +93,14 @@ int copyfile(const char *src, const char *dest, bool force, bool verbose)
 
     /* if src is a symlink, handle it here */
     if (S_ISLNK(sb.st_mode)) {
-        if (readlink(src, linkdest, PATH_MAX) == -1) {
+        n = readlink(src, linkdest, PATH_MAX);
+
+        if (n == -1) {
             warn("*** readlink");
             return -1;
         }
+
+        linkdest[n] = '\0';
 
         if (symlink(linkdest, dest) == -1) {
             warn("*** symlink");
