@@ -220,6 +220,7 @@ static bool symlinks_driver(struct rpminspect *ri, rpmfile_entry_t *file)
             } else if (strprefix(target, "../")) {
                 /* back up a directory level */
                 tmp = strrchr(reltarget, PATH_SEP);
+                assert(tmp != NULL);
                 *tmp = '\0';
                 tail = tmp;
                 target += 3;
