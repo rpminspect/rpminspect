@@ -297,7 +297,7 @@ bool inspect_modularity(struct rpminspect *ri)
             r = regcomp(&release_regex, hentry->value, REG_EXTENDED);
 
             if (r != 0) {
-                regerror(result, &release_regex, reg_error, sizeof(reg_error));
+                regerror(r, &release_regex, reg_error, sizeof(reg_error));
                 warnx(_("*** unable to compile modularity Release tag regular expression: %s"), reg_error);
                 hentry = NULL;
             }
@@ -314,7 +314,7 @@ bool inspect_modularity(struct rpminspect *ri)
             tag_result = false;
         }
 
-        if (hentry && !check_release(ri, &release_regex, peer->after_hdr)) {
+        if (hentry && peer->after_hdr && !check_release(ri, &release_regex, peer->after_hdr)) {
             release_result = false;
         }
     }

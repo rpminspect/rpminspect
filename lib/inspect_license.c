@@ -543,6 +543,10 @@ static string_list_t *get_paren_expressions(const char *license)
 
         end = strchr(start, ')');
 
+        if (end == NULL) {
+            break;
+        }
+
         if ((end - start) > 0) {
             entry = xalloc(sizeof(*entry));
             entry->data = xalloc(end - start + 1);

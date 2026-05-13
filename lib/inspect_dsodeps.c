@@ -61,7 +61,7 @@ static bool dsodeps_driver(struct rpminspect *ri, rpmfile_entry_t *file)
     bv = headerGetString(file->peer_file->rpm_header, RPMTAG_VERSION);
     av = headerGetString(file->rpm_header, RPMTAG_VERSION);
 
-    if (strcmp(bv, av)) {
+    if (bv != NULL && av != NULL && strcmp(bv, av)) {
         return true;
     }
 

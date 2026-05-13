@@ -138,7 +138,7 @@ static bool check_runpath(struct rpminspect *ri, const rpmfile_entry_t *file, co
                         }
 
                         /* no match, continue */
-                        reg_result = regexec(&origin_root, working_path, 3, origin_matches, REG_EXTENDED);
+                        reg_result = regexec(&origin_root, working_path, 3, origin_matches, 0);
 
                         if (reg_result == REG_NOMATCH) {
                             /* there was no match, check the next one */

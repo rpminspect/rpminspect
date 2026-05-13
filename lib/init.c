@@ -373,7 +373,7 @@ static inline void add_ignores(struct rpminspect *ri, parser_plugin *p, parser_c
         }                                                               \
                                                                         \
         if (add_regex(s, &ri->inspection ## _path_include) != 0) {      \
-            warnx(_("*** error reading " #inspection " include path"));      \
+            warnx(_("*** error reading " #inspection " include path")); \
         }                                                               \
                                                                         \
         free(s);                                                        \
@@ -387,7 +387,7 @@ static inline void add_ignores(struct rpminspect *ri, parser_plugin *p, parser_c
         }                                                               \
                                                                         \
         if (add_regex(s, &ri->inspection ## _path_exclude) != 0) {      \
-            warnx(_("*** error reading " #inspection " include path"));      \
+            warnx(_("*** error reading " #inspection " exclude path")); \
         }                                                               \
                                                                         \
         free(s);                                                        \
@@ -460,29 +460,29 @@ static bool rpmdeps_cb(const char *key, const char *value, void *cb_data)
 
     if (depkey != TYPE_NULL) {
         HASH_FIND_INT(*deprules_ignore, &depkey, drentry);
-    }
 
-    /* overwrite existing entry, otherwise create new one */
-    if (drentry == NULL) {
-        drentry = xalloc(sizeof(*drentry));
-        drentry->type = depkey;
-        drentry->pattern = strdup(value);
+        /* overwrite existing entry, otherwise create new one */
+        if (drentry == NULL) {
+            drentry = xalloc(sizeof(*drentry));
+            drentry->type = depkey;
+            drentry->pattern = strdup(value);
 
-        if (add_regex(value, &drentry->ignore) != 0) {
-            warnx(_("*** error reading %s ignore pattern"), get_deprule_desc(depkey));
-        }
+            if (add_regex(value, &drentry->ignore) != 0) {
+                warnx(_("*** error reading %s ignore pattern"), get_deprule_desc(depkey));
+            }
 
-        HASH_ADD_INT(*deprules_ignore, type, drentry);
-    } else {
-        free(drentry->pattern);
-        drentry->pattern = NULL;
-        drentry->type = depkey;
-        drentry->pattern = strdup(value);
-        regfree(drentry->ignore);
-        drentry->ignore = NULL;
+            HASH_ADD_INT(*deprules_ignore, type, drentry);
+        } else {
+            free(drentry->pattern);
+            drentry->pattern = NULL;
+            drentry->type = depkey;
+            drentry->pattern = strdup(value);
+            regfree(drentry->ignore);
+            drentry->ignore = NULL;
 
-        if (add_regex(value, &drentry->ignore) != 0) {
-            warnx(_("*** error reading %s ignore pattern"), get_deprule_desc(depkey));
+            if (add_regex(value, &drentry->ignore) != 0) {
+                warnx(_("*** error reading %s ignore pattern"), get_deprule_desc(depkey));
+            }
         }
     }
 

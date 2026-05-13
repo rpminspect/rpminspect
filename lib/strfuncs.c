@@ -472,7 +472,7 @@ char *strxmlescape(const char *s)
 
             /* reset the tmp pointer to the end of the new string */
             tmp = result;
-            tmp += strlen(result) + 1;
+            tmp += strlen(result);
         }
 
         /* next character */
@@ -681,7 +681,7 @@ char *strtrim(char *s)
     r[i] = '\0';
 
     /* go to the end and remove trailing whitespace */
-    i = strlen(s);
+    i = strlen(s) - 1;
 
     while (isspace(s[i])) {
         s[i] = '\0';

@@ -581,6 +581,11 @@ bool inspect_patches(struct rpminspect *ri)
             continue;
         }
 
+        /* Reset things before running checks */
+        specfile = NULL;
+        list_free(patchfiles, free);
+        patchfiles = NULL;
+
         /* On the off chance the SRPM is empty, just ignore */
         if (peer->after_files == NULL || TAILQ_EMPTY(peer->after_files)) {
             continue;
@@ -723,13 +728,17 @@ bool inspect_patches(struct rpminspect *ri)
                                 }
 
                                 buf = entry->data;
+                                len = strlen(buf);
 
                                 if (strprefix(entry->data, SPEC_MACRO_PATCH_P_ARG)) {
                                     /* patch number specified with -P, take it */
                                     if (!strcmp(entry->data, SPEC_MACRO_PATCH_P_ARG)) {
                                         /* user specified something like '-P 1' */
                                         entry = TAILQ_NEXT(entry, items);
-                                        buf = entry->data;
+
+                                        if (entry) {
+                                            buf = entry->data;
+                                        }
                                     } else {
                                         /* user specified something like '-P1' */
                                         buf += strlen(SPEC_MACRO_PATCH_P_ARG);
@@ -739,7 +748,10 @@ bool inspect_patches(struct rpminspect *ri)
                                         }
                                     }
 
-                                    buf[strcspn(buf, " \t")] = '\0';
+                                    if (buf) {
+                                        buf[strcspn(buf, " \t")] = '\0';
+                                    }
+
                                     break;
                                 } else {
                                     /* check to see if the patch number is just specified as-is */

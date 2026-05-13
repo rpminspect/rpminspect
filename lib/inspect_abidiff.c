@@ -126,6 +126,7 @@ static severity_t check_abi(const severity_t sev, const long int threshold, cons
                     /* do a soft match against the file basename */
                     basefn = strncpy(pathcopy, path, PATH_MAX);
                     assert(basefn != NULL);
+                    pathcopy[PATH_MAX - 1] = '\0';
                     basefn = basename(pathcopy);
                     assert(basefn != NULL);
 
@@ -265,15 +266,6 @@ static bool abidiff_driver(struct rpminspect *ri, rpmfile_entry_t *file)
         params.verb = VERB_FAILED;
         params.noun = _("abidiff usage error");;
         report = true;
-    } else if (exitcode & ABIDIFF_ABI_CHANGE) {
-        if (!rebase) {
-            params.severity = RESULT_VERIFY;
-            params.waiverauth = WAIVABLE_BY_ANYONE;
-        }
-
-        params.verb = VERB_CHANGED;
-        params.noun = _("ABI change in ${FILE} on ${ARCH}");
-        report = true;
     } else if (exitcode & ABIDIFF_ABI_INCOMPATIBLE_CHANGE) {
         if (!rebase) {
             params.severity = RESULT_BAD;
@@ -282,6 +274,15 @@ static bool abidiff_driver(struct rpminspect *ri, rpmfile_entry_t *file)
 
         params.verb = VERB_CHANGED;
         params.noun = _("ABI incompatible change in ${FILE} on ${ARCH}");
+        report = true;
+    } else if (exitcode & ABIDIFF_ABI_CHANGE) {
+        if (!rebase) {
+            params.severity = RESULT_VERIFY;
+            params.waiverauth = WAIVABLE_BY_ANYONE;
+        }
+
+        params.verb = VERB_CHANGED;
+        params.noun = _("ABI change in ${FILE} on ${ARCH}");
         report = true;
     }
 

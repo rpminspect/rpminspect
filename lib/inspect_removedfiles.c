@@ -75,10 +75,6 @@ static bool removedfiles_driver(struct rpminspect *ri, rpmfile_entry_t *file)
     /* Set the waiver type if this is a file of security concern */
     if (ri->security_path_prefix && !rebase) {
         TAILQ_FOREACH(entry, ri->security_path_prefix, items) {
-            while (*entry->data != PATH_SEP) {
-                entry->data++;
-            }
-
             if (strprefix(file->localpath, entry->data)) {
                 params.waiverauth = WAIVABLE_BY_SECURITY;
                 params.verb = VERB_FAILED;

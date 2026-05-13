@@ -3,6 +3,7 @@
  * SPDX-License-Identifier: LGPL-3.0-or-later
  */
 
+#include <errno.h>
 #include <unistd.h>
 
 /*
@@ -16,9 +17,16 @@
 ssize_t full_write(int fd, const void *buf, size_t len)
 {
     ssize_t total = 0;
+    static int tries = 0;
 
     while (len != 0) {
         ssize_t cc = write(fd, buf, len);
+
+        /* retry, but not forever */
+        if (cc == EINTR && tries < 3) {
+            tries++;
+            continue;
+        }
 
         if (cc < 0) {
             if (total) {

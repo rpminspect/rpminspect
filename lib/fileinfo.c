@@ -242,7 +242,7 @@ bool match_fileinfo_group(struct rpminspect *ri, const rpmfile_entry_t *file, co
                         add_result(ri, &params);
                         free(params.msg);
                         *result = false;
-                        *reported = false;
+                        *reported = true;
                         return true;
                     }
                 }

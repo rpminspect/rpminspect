@@ -61,7 +61,7 @@ abi_t *read_abi(const char *vendor_data_dir, const char *product_release)
              * get the compat level we found and make sure we have
              * seen it before
              */
-            if (sscanf(line->data + 7, "%d]", &found_level) == EOF) {
+            if (sscanf(line->data + 7, "%d]", &found_level) == 0) {
                 warn(_("*** malformed ABI level identifier: %s"), line->data);
                 skip_entries = true;
             }

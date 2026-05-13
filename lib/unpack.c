@@ -82,8 +82,10 @@ static int extract_entry(struct archive *input, struct archive *output, struct a
 
     if (r != ARCHIVE_OK) {
         warnx("*** archive_write_finish_entry: %s", archive_error_string(output));
-    } else if (r < ARCHIVE_WARN) {
-        ret = -1;
+
+        if (r < ARCHIVE_WARN) {
+            ret = -1;
+        }
     }
 
     return ret;

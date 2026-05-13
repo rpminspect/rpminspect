@@ -33,6 +33,10 @@ void output_xunit(const results_t *results, const char *dest, const severity_t t
         }
 
         header = result->header;
+
+        if (result->severity >= threshold) {
+            failures++;
+        }
     }
 
     /* output the results */

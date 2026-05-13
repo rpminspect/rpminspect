@@ -87,7 +87,7 @@ static const char *has_forbidden_match(const char *s)
     }
 
     TAILQ_FOREACH(entry, forbidden, items) {
-        r = regexec(entry->re, s, 1, match, REG_EXTENDED);
+        r = regexec(entry->re, s, 1, match, 0);
 
         if (r == 0 && match[0].rm_so > -1) {
             return entry->src;
@@ -228,7 +228,6 @@ static char *create_changelog(const string_list_t *changelog, const char *where)
 
     if (fclose(logfp) != 0) {
         warn("*** fclose");
-        close(fd);
         unlink(output);
         free(output);
         return NULL;

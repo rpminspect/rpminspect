@@ -306,7 +306,7 @@ const char *inspection_desc(const uint64_t inspection)
             return DESC_OWNERSHIP;
         case INSPECT_SHELLSYNTAX:
             return DESC_SHELLSYNTAX;
-#if defined(_WITH_ANNOCHECK) || defined(_WITH_LIBANNOCHECK_)
+#if defined(_WITH_ANNOCHECK) || defined(_WITH_LIBANNOCHECK)
         case INSPECT_ANNOCHECK:
             return DESC_ANNOCHECK;
 #endif

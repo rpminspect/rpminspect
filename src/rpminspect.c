@@ -164,7 +164,7 @@ static char *get_product_release(string_map_t *products, const favor_release_t f
         after++;
     }
 
-    if (!after) {
+    if (*after == '\0') {
         warnx(_("*** product release for after build (%s) is empty"), after);
         return NULL;
     }

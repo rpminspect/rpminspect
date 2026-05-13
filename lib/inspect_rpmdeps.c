@@ -478,7 +478,7 @@ static bool check_explicit_lib_deps(struct rpminspect *ri, Header h, deprule_lis
                         TAILQ_FOREACH(peer, ri->peers, items) {
                             tn = headerGetString(peer->after_hdr, RPMTAG_NAME);
 
-                            if (strcmp(tn, pn)) {
+                            if (tn == NULL || strcmp(tn, pn)) {
                                 continue;
                             }
 
@@ -872,11 +872,14 @@ bool inspect_rpmdeps(struct rpminspect *ri)
      */
     if (ri->peers && !TAILQ_EMPTY(ri->peers)) {
         peer = TAILQ_FIRST(ri->peers);
-        version = headerGetString(peer->after_hdr, RPMTAG_VERSION);
-        release = headerGetString(peer->after_hdr, RPMTAG_RELEASE);
-        pkg_epoch = headerGetNumber(peer->after_hdr, RPMTAG_EPOCH);
-        xasprintf(&pkg_vr, "%s-%s", version, release);
-        xasprintf(&pkg_evr, "%ju:%s-%s", pkg_epoch, version, release);
+
+        if (peer->after_hdr) {
+            version = headerGetString(peer->after_hdr, RPMTAG_VERSION);
+            release = headerGetString(peer->after_hdr, RPMTAG_RELEASE);
+            pkg_epoch = headerGetNumber(peer->after_hdr, RPMTAG_EPOCH);
+            xasprintf(&pkg_vr, "%s-%s", version, release);
+            xasprintf(&pkg_evr, "%ju:%s-%s", pkg_epoch, version, release);
+        }
     }
 
     /*
@@ -910,8 +913,6 @@ bool inspect_rpmdeps(struct rpminspect *ri)
     if (specfile == NULL) {
         specfile = _("spec file");
     }
-
-    params.file = specfile;
 
     /*
      * first pass gathers deps and performs simple checks
@@ -1045,7 +1046,6 @@ bool inspect_rpmdeps(struct rpminspect *ri)
                     /* report the result */
                     params.noun = noun;
                     params.arch = arch;
-                    params.file = drs;
                     add_result(ri, &params);
                     free(params.msg);
                     free(noun);
@@ -1071,7 +1071,6 @@ bool inspect_rpmdeps(struct rpminspect *ri)
                         params.verb = VERB_REMOVED;
                         xasprintf(&noun, _("'${FILE}' in %s on ${ARCH}"), name);
                         params.noun = noun;
-                        params.file = pdrs;
                         params.arch = arch;
                         params.waiverauth = NOT_WAIVABLE;
                         params.severity = RESULT_INFO;

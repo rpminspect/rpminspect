@@ -321,7 +321,7 @@ rpmfile_t *extract_rpm(struct rpminspect *ri, const char *pkg, Header hdr, const
                 tmp_ap = strdup(archive_path);
                 assert(tmp_ap != NULL);
 
-                if (xstrrchr(tmp_ap, PATH_SEP)) {
+                if (strrchr(tmp_ap, PATH_SEP)) {
                     len_ap = strlen(tmp_ap) - 1;
 
                     while (len_ap >= 0 && tmp_ap[len_ap] == PATH_SEP) {

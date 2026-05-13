@@ -41,7 +41,7 @@ static bool pathmigration_driver(struct rpminspect *ri, rpmfile_entry_t *file)
             }
 
             /* if matched, return */
-            if (strprefix(file->localpath, entry->data)) {
+            if (strprefix(file->localpath, old)) {
                 free(old);
                 return true;
             }
