@@ -146,7 +146,7 @@ static bool badfuncs_driver(struct rpminspect *ri, rpmfile_entry_t *after)
         list_free(allowed_symbols, free);
     }
 
-    if (TAILQ_EMPTY(used_symbols)) {
+    if (used_symbols == NULL || TAILQ_EMPTY(used_symbols)) {
         goto cleanup;
     }
 
