@@ -120985,8 +120985,8 @@ make_stack_item(struct toml_node* node)
 static void
 cleanup_context_stack(struct list_head* context_stack)
 {
-	struct toml_stack_item* item;
-	struct toml_stack_item* tmp;
+	struct toml_stack_item *item = NULL;
+	struct toml_stack_item *tmp = NULL;
 
 	list_for_each_safe(context_stack, item, tmp, list) {
 		list_del(&item->list);
@@ -121306,7 +121306,7 @@ toml_parse(struct toml_node* toml_root, char* buf, int buflen)
 					case 11:  {
 							{
 							
-							char*	te = p;
+							char	*te = p = NULL;
 							struct	toml_node node;
 							
 							node.type = TOML_DATE;
@@ -121335,9 +121335,7 @@ toml_parse(struct toml_node* toml_root, char* buf, int buflen)
 					}
 					case 12:  {
 							{
-							
-							struct toml_node *node;
-							
+							struct toml_node *node = NULL;
 							struct toml_stack_item* context = CONTEXT(&context_stack);
 							
 							if (context->list_type && context->list_type != TOML_LIST) {
@@ -121393,8 +121391,8 @@ toml_parse(struct toml_node* toml_root, char* buf, int buflen)
 							{
 							
 							char*					tablename = name;
-							struct toml_table_item*	item;
-							struct toml_node*		place;
+							struct toml_table_item	*item = NULL;
+							struct toml_node		*place = NULL;
 							bool					found = false;
 							
 							struct toml_stack_item*	context = CONTEXT(&context_stack);
@@ -121456,7 +121454,7 @@ toml_parse(struct toml_node* toml_root, char* buf, int buflen)
 							
 							// drop the previous context if it is a TABLE
 							struct toml_stack_item* context = CONTEXT(&context_stack);
-							struct toml_node *new_table;
+							struct toml_node *new_table = NULL;
 							
 							int		result;
 							char*	name = strndup(ts, len);
