@@ -120997,7 +120997,7 @@ cleanup_context_stack(struct list_head* context_stack)
 int
 toml_parse(struct toml_node* toml_root, char* buf, int buflen)
 {
-	int indent = 0, cs = 0, cur_line = 1;
+	int cs = 0, cur_line = 1;
 	char *p = NULL, *pe = NULL;
 	char *ts = NULL;
 	char string[1024], *strp = NULL;
@@ -121562,14 +121562,12 @@ toml_parse(struct toml_node* toml_root, char* buf, int buflen)
 					}
 					case 22:  {
 							{
-							in_text = 0; indent = 0;}
+							in_text = 0;}
 						
 
 						break; 
 					}
 					case 23:  {
-							{
-							indent++;}
 
 						break; 
 					}
