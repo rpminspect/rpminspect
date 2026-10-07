@@ -26,7 +26,6 @@ endif
 
 # Install packages before anything else
 _install := $(shell $(PKG_CMD) install -y git)
-_safedir := $(shell git config --global --add safe.directory $(topdir))
 
 # Pass BUILDTYPE=release to generate a release SRPM
 BUILDTYPE ?= copr
