@@ -233,7 +233,9 @@
       "0x2069"
     ]
   },
-  "rpmdeps": null,
+  "rpmdeps": {
+    "rebase_reporting_level": "INFO"
+  },
   "changelog": null,
   "config": null,
   "doc": null,

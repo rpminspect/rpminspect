@@ -665,6 +665,70 @@ static bool check_explicit_epoch(struct rpminspect *ri, Header h, deprule_list_t
 }
 
 /*
+ * Check if the deprule is satisfied by a subpackage in the same build.
+ * Returns true if this is an internal subpackage dependency.
+ */
+static bool is_internal_subpackage_dep(const deprule_entry_t *deprule, const rpmpeer_t *peers)
+{
+    rpmpeer_entry_t *peer = NULL;
+    const char *name = NULL;
+    const char *arch = NULL;
+    const char *peerarch = NULL;
+    char *req = NULL;
+    char *working_req = NULL;
+
+    assert(deprule != NULL);
+    assert(peers != NULL);
+
+    /* skip if no requirement */
+    if (deprule->requirement == NULL) {
+        return false;
+    }
+
+    /* skip Provides type dependencies */
+    if (deprule->type == TYPE_PROVIDES) {
+        return false;
+    }
+
+    /* copy the requirement and remove ISA substring for comparison */
+    working_req = req = remove_isa_substring(deprule->requirement);
+    assert(req != NULL);
+
+    /* trim any leading '(' to account for rich deps */
+    while (*working_req == '(') {
+        working_req++;
+    }
+
+    /* trim config() wrapper if present */
+    if (strprefix(working_req, "config(")) {
+        working_req += 7;
+        working_req[strcspn(working_req, ")")] = '\0';
+    }
+
+    /* check if any subpackage in the build matches this requirement */
+    TAILQ_FOREACH(peer, peers, items) {
+        if (peer->after_hdr == NULL) {
+            continue;
+        }
+
+        if (headerIsSource(peer->after_hdr)) {
+            continue;
+        }
+
+        name = headerGetString(peer->after_hdr, RPMTAG_NAME);
+        peerarch = get_rpm_header_arch(peer->after_hdr);
+
+        if (name != NULL && !strcmp(name, working_req)) {
+            free(req);
+            return true;
+        }
+    }
+
+    free(req);
+    return false;
+}
+
+/*
  * Check if the deprule change is expected (e.g., automatic Provides).
  */
 static bool expected_deprule_change(const bool rebase, const deprule_entry_t *deprule, const Header h, const rpmpeer_t *peers)
@@ -980,7 +1044,15 @@ bool inspect_rpmdeps(struct rpminspect *ri)
                 TAILQ_FOREACH(deprule, peer->after_deprules, items) {
                     /* reporting level */
                     params.waiverauth = NOT_WAIVABLE;
-                    params.severity = RESULT_INFO;
+
+                    /* internal subpackage dependencies are always INFO level */
+                    if (is_internal_subpackage_dep(deprule, ri->peers)) {
+                        params.severity = RESULT_INFO;
+                    } else if (rebase) {
+                        params.severity = ri->rebase_reporting_level;
+                    } else {
+                        params.severity = RESULT_INFO;
+                    }
 
                     /* use shorter variable names in the if expressions */
                     drs = strdeprule(deprule);

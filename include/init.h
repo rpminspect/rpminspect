@@ -132,6 +132,7 @@ extern "C"
 #define RI_REQUIRED                 "required"
 #endif
 #define RI_REQUIRES                 "requires"
+#define RI_REBASE_REPORTING_LEVEL   "rebase_reporting_level"
 #define RI_RPMDEPS                  "rpmdeps"
 #define RI_RUNPATH                  "runpath"
 #define RI_SECURITY_LEVEL_THRESHOLD "security_level_threshold"

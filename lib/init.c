@@ -937,6 +937,19 @@ static void read_cfgfile(struct rpminspect *ri, const char *filename)
         warnx(_("*** malformed rpmdeps->ignore section; skipping"));
     }
 
+    s = p->getstr(ctx, RI_RPMDEPS, RI_REBASE_REPORTING_LEVEL);
+
+    if (s != NULL) {
+        ri->rebase_reporting_level = getseverity(s, RESULT_NULL);
+
+        if (ri->rebase_reporting_level == RESULT_NULL) {
+            warnx(_("*** invalid rpmdeps rebase_reporting_level: %s, defaulting to %s"), s, strseverity(RESULT_INFO));
+            ri->rebase_reporting_level = RESULT_INFO;
+        }
+
+        free(s);
+    }
+
     add_ignores(ri, p, ctx, RI_VIRUS);
     add_ignores(ri, p, ctx, RI_CAPABILITIES);
     add_ignores(ri, p, ctx, RI_CONFIG);
@@ -1662,6 +1675,7 @@ struct rpminspect *xalloc_rpminspect(struct rpminspect *ri)
     ri->kmidiff_suppression_file = strdup(ABI_SUPPRESSION_FILE);
     ri->kmidiff_debuginfo_path = strdup(DEBUG_PATH);
     ri->annocheck_failure_severity = RESULT_VERIFY;
+    ri->rebase_reporting_level = RESULT_INFO;
     ri->size_threshold = -1;
     ri->debuginfo_sections = strdup(ELF_SYMTAB" "ELF_DEBUG_INFO);
     ri->udev_rules_dirs = list_from_array(UDEV_RULES_DIRS);

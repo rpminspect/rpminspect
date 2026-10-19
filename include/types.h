@@ -733,6 +733,9 @@ struct rpminspect {
     /* RPM dependency ignores -- regexps to match requirements to ignore */
     deprule_ignore_map_t *deprules_ignore;
 
+    /* RPM dependency reporting level for rebase builds */
+    severity_t rebase_reporting_level;
+
     /* debuginfo ELF section name(s) when checking for debugging symbols */
     char *debuginfo_sections;
 
