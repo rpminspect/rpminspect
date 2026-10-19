@@ -5,7 +5,7 @@
 
 /**
  * @file rebase.c
- * @author David Cantrell &lt;dcantrell@redhat.com&gt;
+ * @author Dave Cantrell &lt;dcantrell@burdell.org&gt;
  * @date 2020
  * @brief Debugging utility functions.
  * @copyright LGPL-3.0-or-later

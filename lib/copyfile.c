@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2018 David Cantrell <david.l.cantrell@gmail.com>
+ * Copyright 2003-2018 Dave Cantrell <david.l.cantrell@gmail.com>
  *                     David Shea <david@reallylongword.org>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -17,7 +17,7 @@
 
 /**
  * @file copyfile.c
- * @author David Cantrell &lt;david.l.cantrell@gmail.com&gt;
+ * @author Dave Cantrell &lt;david.l.cantrell@gmail.com&gt;
  * @author David Shea &lt;david@reallylongword.org&gt;
  * @date 2003-2018
  * @brief Generic file copy function

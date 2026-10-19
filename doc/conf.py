@@ -26,8 +26,8 @@ if read_the_docs_build:
 # -- Project information -----------------------------------------------------
 
 project = "rpminspect"
-copyright = "2021, David Cantrell"
-author = "David Cantrell"
+copyright = "2021, Dave Cantrell"
+author = "Dave Cantrell"
 
 
 # -- General configuration ---------------------------------------------------

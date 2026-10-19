@@ -5,7 +5,7 @@
 
 /**
  * @file readelf.h
- * @author David Shea &lt;dshea@redhat.com&gt; and David Cantrell &lt;dcantrell@redhat.com&gt;
+ * @author David Shea &lt;dshea@redhat.com&gt; and Dave Cantrell &lt;dcantrell@burdell.org&gt;
  * @date 2019
  * @brief ELF specific definitions and function prototypes.
  * @copyright LGPL-3.0-or-later

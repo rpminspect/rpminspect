@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 David Cantrell <david.l.cantrell@gmail.com>
+ * Copyright 2012 Dave Cantrell <david.l.cantrell@gmail.com>
  *                Chris Lumens <chris@bangmoney.org>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");

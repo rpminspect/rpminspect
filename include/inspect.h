@@ -5,7 +5,7 @@
 
 /**
  * @file inspect.h
- * @author David Cantrell &lt;dcantrell@redhat.com&gt;
+ * @author Dave Cantrell &lt;dcantrell@burdell.org&gt;
  * @date 2019-2020
  * @brief Test functions provided by librpminspect and result constants.
  * @copyright LGPL-3.0-or-later

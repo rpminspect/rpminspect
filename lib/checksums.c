@@ -3,7 +3,7 @@
 /*
  * Copyright 2004-2020 David Shea <david@reallylongword.org>
  *                     Chris Lumens <chris@bangmoney.org>
- *                     David Cantrell <david.l.cantrell@gmail.com>
+ *                     Dave Cantrell <david.l.cantrell@gmail.com>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,7 +21,7 @@
 
 /**
  * @file checksums.c
- * @author David Cantrell &lt;david.l.cantrell@gmail.com&gt;
+ * @author Dave Cantrell &lt;david.l.cantrell@gmail.com&gt;
  * @author Chris Lumens &lt;chris@bangmoney.org&gt;
  * @author David Shea &lt;david@reallylongword.org&gt;
  * @date 2004-2020

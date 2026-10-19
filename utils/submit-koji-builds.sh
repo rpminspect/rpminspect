@@ -2,7 +2,7 @@
 #
 # Build new releases in Koji
 #
-# Copyright David Cantrell
+# Copyright Dave Cantrell
 # SPDX-License-Identifier: GPL-3.0-or-later
 #
 
