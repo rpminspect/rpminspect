@@ -1,4 +1,4 @@
-# Copyright (C) 2019 David Cantrell <david.l.cantrell@gmail.com>
+# Copyright (C) 2019 Dave Cantrell <dcantrell@burdell.org>
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -24,8 +24,8 @@ else
 PKG_CMD = dnf
 endif
 
-# Install packages before anything else
-_install := $(shell $(PKG_CMD) install -y git)
+# Determine if git needs to be installed
+_HAVE_GIT := $(shell ls -1 /usr/bin/git 2>/dev/null)
 
 # Pass BUILDTYPE=release to generate a release SRPM
 BUILDTYPE ?= copr
@@ -43,12 +43,21 @@ PKG = $(shell grep ^Name: "$(SPEC_TEMPLATE)" | awk '{ print $$2; }')
 VER = $(shell grep 'version :' $(topdir)/meson.build | grep -E "'[0-9]+\.[0-9]+'" | cut -d "'" -f 2)
 
 ifeq ($(BUILDTYPE),copr)
-GITDATE          = $(shell date +'%Y%m%d%H%M')
-GITHASH          = $(shell git rev-parse --short HEAD)
-TARBALL_BASENAME = $(PKG)-$(VER)-$(GITDATE)git$(GITHASH)
-TAG              = HEAD
+GITDATE          := $(shell date +'%Y%m%d%H%M')
+GITHASH          := $(shell git rev-parse --short HEAD)
+TARBALL_BASENAME := $(PKG)-$(VER)-$(GITDATE)git$(GITHASH)
+
+# First try to take a snapshot on HEAD + staged commits.  Fall back on
+# HEAD if the tree is clean.  This lets local development use the
+# 'make copr-srpm' target to create an SRPM for scratch building.
+TAG              := $(shell git stash create)
 else
-TAG              = $(shell git tag -l | sort -V | tail -n 1)
+TAG              := $(shell git tag -l | sort -V | tail -n 1)
+endif
+
+# Backup case for a clean tree or no tags defined
+ifeq ($(TAG),)
+TAG              := HEAD
 endif
 
 ifeq ($(BUILDTYPE),release)
@@ -69,6 +78,9 @@ ifeq ($(BUILDTYPE),copr)
 	echo "- Build $(PKG)-$(VER)-$(GITDATE)git$(GITHASH) snapshot" >> "$(SPEC)"
 endif
 	rm -f "$(TARBALL_BASENAME)".tar.gz.asc
+ifeq ($(_HAVE_GIT),)
+	$(PKG_CMD) install -y git
+endif
 	git archive \
 		--format=tar \
 		--output='$(topdir)/$(TARBALL_BASENAME).tar' \
