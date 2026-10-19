@@ -20,5 +20,5 @@ uninitialized variables initialized, and unused variables removed.
 Other compile fixes have been committed to this fork.
 
 --
-David Cantrell
-<dcantrell@redhat.com>
+Dave Cantrell
+<dcantrell@burdell.org>

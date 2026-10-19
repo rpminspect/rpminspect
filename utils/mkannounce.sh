@@ -4,7 +4,7 @@
 # blog post.  Groups git log summaries by category and only includes
 # those log entries that have a category marking.
 #
-# Copyright David Cantrell
+# Copyright Dave Cantrell
 # SPDX-License-Identifier: GPL-3.0-or-later
 #
 

@@ -1,6 +1,6 @@
 /*
  * Copyright 2003 David Shea <david@reallylongword.org>
- *                David Cantrell <david.l.cantrell@gmail.com>
+ *                Dave Cantrell <david.l.cantrell@gmail.com>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.

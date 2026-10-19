@@ -1,7 +1,7 @@
 Primary Authors
 ===============
 
-- Dave Cantrell <dcantrell@redhat.com>
+- Dave Cantrell <dcantrell@burdell.org>
 
 
 Contributors
@@ -14,6 +14,8 @@ Contributors
 - Caolán McNamara <caolanm@redhat.com>
 
 - Charalampos Stratakis <cstratak@redhat.com>
+
+- Cristian Le <git@lecris.dev>
 
 - Danilo C. L. de Paula <ddepaula@redhat.com>
 
@@ -70,5 +72,7 @@ Contributors
 - Tomas Hoger <thoger@redhat.com>
 
 - wangqing <wangqing@uniontech.com>
+
+- Yaakov Selkowitz <yselkowi@redhat.com>
 
 - Zuzana Miklankova <zmiklank@redhat.com>

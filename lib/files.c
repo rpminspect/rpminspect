@@ -5,7 +5,7 @@
 
 /**
  * @file files.c
- * @author David Cantrell &lt;dcantrell@redhat.com&gt;
+ * @author Dave Cantrell &lt;dcantrell@burdell.org&gt;
  * @author David Shea &lt;dshea@redhat.com&gt;
  * @date 2019-2021
  * @brief Package extraction and file gathering functions.

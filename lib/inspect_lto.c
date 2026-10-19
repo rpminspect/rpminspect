@@ -5,7 +5,7 @@
 
 /**
  * @file inspect_lto.c
- * @author David Cantrell &lt;dcantrell@redhat.com&gt;
+ * @author Dave Cantrell &lt;dcantrell@burdell.org&gt;
  * @date 2020
  * @brief LTO bytecode inspection and helper functions.
  * @copyright LGPL-3.0-or-later

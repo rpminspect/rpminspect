@@ -4,7 +4,7 @@
 # use Copr for automated builds and that carry template RPM spec
 # files.  See README for more information.
 #
-# Copyright David Cantrell
+# Copyright Dave Cantrell
 # SPDX-License-Identifier: GPL-3.0-or-later
 #
 

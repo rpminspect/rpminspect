@@ -6,7 +6,7 @@
 # well. The purpose of this script is to give a general idea of
 # expected runtime on the inspections and downloading.
 #
-# Copyright David Cantrell <dcantrell@redhat.com>
+# Copyright Dave Cantrell <dcantrell@burdell.org>
 # SPDX-License-Identifier: GPL-3.0-or-later
 #
 

@@ -1,6 +1,6 @@
 /*
  * derp kernel module
- * Copyright 2020 David Cantrell <dcantrell@redhat.com>
+ * Copyright 2020 Dave Cantrell <dcantrell@burdell.org>
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -26,7 +26,7 @@
 #include <linux/seq_file.h>
 #include <linux/version.h>
 
-MODULE_AUTHOR("David Cantrell <dcantrell@redhat.com>");
+MODULE_AUTHOR("Dave Cantrell <dcantrell@burdell.org>");
 MODULE_DESCRIPTION("derp testing module");
 MODULE_LICENSE("GPL");
 MODULE_VERSION("0.1");
