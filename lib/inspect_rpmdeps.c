@@ -672,8 +672,6 @@ static bool is_internal_subpackage_dep(const deprule_entry_t *deprule, const rpm
 {
     rpmpeer_entry_t *peer = NULL;
     const char *name = NULL;
-    const char *arch = NULL;
-    const char *peerarch = NULL;
     char *req = NULL;
     char *working_req = NULL;
 
@@ -716,7 +714,6 @@ static bool is_internal_subpackage_dep(const deprule_entry_t *deprule, const rpm
         }
 
         name = headerGetString(peer->after_hdr, RPMTAG_NAME);
-        peerarch = get_rpm_header_arch(peer->after_hdr);
 
         if (name != NULL && !strcmp(name, working_req)) {
             free(req);
