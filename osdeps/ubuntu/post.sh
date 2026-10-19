@@ -1,6 +1,7 @@
 #!/bin/sh
 PATH=/usr/bin
 CWD="$(pwd)"
+TESTDATA="$(realpath "${CWD}"/test/data)"
 
 # Ubuntu Linux does not define an RPM dist tag
 echo '%dist .ri47' > "${HOME}"/.rpmmacros
