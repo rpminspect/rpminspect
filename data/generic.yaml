@@ -1011,6 +1011,18 @@ unicode:
     #    - '/usr/lib*/libexample.so*'
 
 rpmdeps:
+    # Optional: reporting level for dependency changes when comparing
+    # rebased packages.  By default, rpminspect will report dependency
+    # changes as INFO level.  You can change this to any valid
+    # rpminspect result type.  The valid choices are:
+    #     OK
+    #     INFO
+    #     VERIFY
+    #     BAD
+    # This only affects rebased builds where the before and after builds
+    # are being compared and dependency changes are expected.
+    #rebase_reporting_level: INFO
+
     # Optional list of regular expressions to match against
     # requirement names to ignore.  For example, a dependency of the
     # form:
