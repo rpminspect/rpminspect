@@ -34,7 +34,7 @@ double exponent(double x, double y)
 have_multilib = False
 args = ["cc", "-print-multi-lib"]
 proc = subprocess.Popen(args, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-(out, err) = proc.communicate()
+out, err = proc.communicate()
 
 if (
     proc.returncode == 0
@@ -48,7 +48,7 @@ if (
 have_musl_libc = False
 args = ["patchelf", "--print-interpreter", "/sbin/init"]
 proc = subprocess.Popen(args, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-(out, err) = proc.communicate()
+out, err = proc.communicate()
 
 if proc.returncode == 0 and str(out).find("ld-musl") != -1:
     have_musl_libc = True

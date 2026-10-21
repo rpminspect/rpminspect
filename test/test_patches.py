@@ -44,7 +44,7 @@ except ImportError:
 proc = subprocess.Popen(
     ["rpmbuild", "-E", "%autopatch"], stdout=subprocess.PIPE, stderr=subprocess.PIPE
 )
-(out, err) = proc.communicate()
+out, err = proc.communicate()
 
 if proc.returncode == 0:
     have_autopatch = True
@@ -55,7 +55,7 @@ else:
 proc = subprocess.Popen(
     ["rpmbuild", "-E", "%autosetup"], stdout=subprocess.PIPE, stderr=subprocess.PIPE
 )
-(out, err) = proc.communicate()
+out, err = proc.communicate()
 
 if proc.returncode == 0:
     have_autosetup = True

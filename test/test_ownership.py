@@ -18,7 +18,7 @@ lack_caps_msg = "rpm lacks %caps macro support"
 proc = subprocess.Popen(
     ["ldd", "/usr/bin/rpmbuild"], stdout=subprocess.PIPE, stderr=subprocess.PIPE
 )
-(out, err) = proc.communicate()
+out, err = proc.communicate()
 
 for line in out.split():
     if line.decode("utf-8").startswith("libcap"):
