@@ -37,7 +37,7 @@ libyaml-devel
 make
 meson
 ninja-build
-openssl-devel
+openssl3-devel
 patchelf
 python3-devel
 python3-pip
