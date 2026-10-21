@@ -45,7 +45,11 @@ BuildRequires:  libcurl-devel
 BuildRequires:  zlib-devel
 BuildRequires:  libyaml-devel
 BuildRequires:  file-devel
+%if 0%{?fedora} > 44
+BuildRequires:  openssl3-devel
+%else
 BuildRequires:  openssl-devel
+%endif
 BuildRequires:  libcap-devel
 BuildRequires:  gettext-devel
 BuildRequires:  clamav-devel
