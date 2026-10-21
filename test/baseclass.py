@@ -213,7 +213,7 @@ class RequiresRpminspect(unittest.TestCase):
         self.extra_cfg = None
 
         # use for rpminspect results
-        (handle, self.outputfile) = tempfile.mkstemp()
+        handle, self.outputfile = tempfile.mkstemp()
         os.close(handle)
 
         # settings that the inheriting test can override
@@ -249,7 +249,7 @@ class RequiresRpminspect(unittest.TestCase):
 
     def configFile(self):
         # create a copy of the sample conf file for test purposes
-        (handle, self.conffile) = tempfile.mkstemp()
+        handle, self.conffile = tempfile.mkstemp()
         os.close(handle)
 
         shutil.copyfile(os.environ["RPMINSPECT_YAML"], self.conffile)
@@ -361,7 +361,7 @@ class TestSRPM(RequiresRpminspect):
         args.append(self.rpm.get_built_srpm())
 
         self.p = subprocess.Popen(args, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-        (self.out, self.err) = self.p.communicate()
+        self.out, self.err = self.p.communicate()
 
         self.results = None
 
@@ -461,7 +461,7 @@ class TestCompareSRPM(RequiresRpminspect):
         args.append(self.after_rpm.get_built_srpm())
 
         self.p = subprocess.Popen(args, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-        (self.out, self.err) = self.p.communicate()
+        self.out, self.err = self.p.communicate()
 
         try:
             with open(self.outputfile) as f:
@@ -555,7 +555,7 @@ class TestRPMs(RequiresRpminspect):
             self.p = subprocess.Popen(
                 args, stdout=subprocess.PIPE, stderr=subprocess.PIPE
             )
-            (self.out, self.err) = self.p.communicate()
+            self.out, self.err = self.p.communicate()
 
             try:
                 with open(self.outputfile) as f:
@@ -656,7 +656,7 @@ class TestCompareRPMs(RequiresRpminspect):
             self.p = subprocess.Popen(
                 args, stdout=subprocess.PIPE, stderr=subprocess.PIPE
             )
-            (self.out, self.err) = self.p.communicate()
+            self.out, self.err = self.p.communicate()
 
             try:
                 with open(self.outputfile) as f:
@@ -741,7 +741,7 @@ class TestKoji(TestRPMs):
         args.append(self.kojidir)
 
         self.p = subprocess.Popen(args, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-        (self.out, self.err) = self.p.communicate()
+        self.out, self.err = self.p.communicate()
 
         try:
             with open(self.outputfile) as f:
@@ -843,7 +843,7 @@ class TestCompareKoji(TestCompareRPMs):
         args.append(os.path.join(self.kojidir, "after"))
 
         self.p = subprocess.Popen(args, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-        (self.out, self.err) = self.p.communicate()
+        self.out, self.err = self.p.communicate()
         self.results = []
 
         try:

@@ -17,7 +17,7 @@ lto_src = open(datadir + "/mathlib.c").read()
 proc = subprocess.Popen(
     ["cc", "--version"], stdout=subprocess.PIPE, stderr=subprocess.PIPE
 )
-(out, err) = proc.communicate()
+out, err = proc.communicate()
 
 if "clang" in out.decode().split():
     have_clang = True

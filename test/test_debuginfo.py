@@ -15,7 +15,6 @@ from baseclass import (
     TestCompareKoji,
 )
 
-
 # Manual block for %install that removes a debuginfo symbol
 debug_block = "%{__debug_install_post}\n"
 debug_block += "chmod 0755 $RPM_BUILD_ROOT/usr/lib/debug/usr/bin/hello-world*.debug\n"

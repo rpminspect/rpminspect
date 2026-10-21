@@ -33,7 +33,7 @@ if not have_kernel_devel:
         "kernel-devel",
     ]
     proc = subprocess.Popen(args, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-    (out, err) = proc.communicate()
+    out, err = proc.communicate()
     if proc.returncode == 0:
         for kver in out.splitlines():
             kmakefile = os.path.join("/lib/modules", str(kver), "build/Makefile")

@@ -15,7 +15,7 @@ from baseclass import RequiresRpminspect, check_results
 proc = subprocess.Popen(
     ["rpmbuild", "--version"], stdout=subprocess.PIPE, stderr=subprocess.PIPE
 )
-(out, err) = proc.communicate()
+out, err = proc.communicate()
 have_old_rpm = False
 
 # Starting with Python 3.10, distutils emits DeprecationWarnings and
@@ -218,7 +218,7 @@ class DistTagInMacroSRPM(RequiresRpminspect):
             args.insert(1, "--undefine")
 
         p = subprocess.Popen(args, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-        (out, err) = p.communicate()
+        out, err = p.communicate()
         self.srpm = os.path.join(self.tmpdir.name, "example-0.1-4.7.src.rpm")
 
         # the inspection we are checking
@@ -246,7 +246,7 @@ class DistTagInMacroSRPM(RequiresRpminspect):
         args += [self.srpm]
 
         self.p = subprocess.Popen(args, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-        (self.out, self.err) = self.p.communicate()
+        self.out, self.err = self.p.communicate()
 
         try:
             self.results = json.loads(self.out)
@@ -316,7 +316,7 @@ class TabbedDistTagInMacroSRPM(RequiresRpminspect):
             args.insert(1, "--undefine")
 
         p = subprocess.Popen(args, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-        (out, err) = p.communicate()
+        out, err = p.communicate()
         self.srpm = os.path.join(self.tmpdir.name, "example-0.1-4.7.src.rpm")
 
         # the inspection we are checking
@@ -344,7 +344,7 @@ class TabbedDistTagInMacroSRPM(RequiresRpminspect):
         args += [self.srpm]
 
         self.p = subprocess.Popen(args, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-        (self.out, self.err) = self.p.communicate()
+        self.out, self.err = self.p.communicate()
 
         try:
             self.results = json.loads(self.out)

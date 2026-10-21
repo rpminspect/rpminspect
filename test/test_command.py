@@ -19,7 +19,7 @@ class RpminspectHelp(RequiresRpminspect):
             stdout=subprocess.PIPE,
             stderr=subprocess.DEVNULL,
         )
-        (out, err) = p.communicate()
+        out, err = p.communicate()
         self.assertEqual(p.returncode, 0)
 
         out = out.splitlines()
@@ -68,7 +68,7 @@ class RpminspectEmptyPeerList(RequiresRpminspect):
             stdout=subprocess.PIPE,
             stderr=subprocess.PIPE,
         )
-        (out, err) = p.communicate()
+        out, err = p.communicate()
         self.assertEqual(p.returncode, 0)
 
     def tearDown(self):
