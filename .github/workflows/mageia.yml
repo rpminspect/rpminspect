@@ -45,6 +45,14 @@ jobs:
             # Requirements before the git clone can happen
             - name: git clone requirements
               run: |
+                  # Disable the mirrorlist usage in repo configs
+                  # because we are getting failures at the moment.
+                  # 21OCT2026
+                  for repofile in /etc/yum.repos.d/*.repo ; do
+                      sed -i -e 's|^#baseurl|baseurl|g' ${repofile}
+                      sed -i -e 's|^mirrorlist|#mirrorlist|g' ${repofile}
+                  done
+
                   dnf upgrade -y
                   dnf install -y git
 

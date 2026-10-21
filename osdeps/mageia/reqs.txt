@@ -28,6 +28,7 @@ lib64xmlrpc-c-devel
 lib64xxhash-devel
 lib64yaml-devel
 lib64zlib-devel
+libatomic-devel
 make
 meson
 ninja
