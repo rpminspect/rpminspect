@@ -38,7 +38,7 @@ sed -i -e 's|^CC=.*$|CC=gcc|g' "${SUBDIR}"/configure
 rm -rf mandoc.tar.gz "${SUBDIR}"
 
 # The 'rc' shell is not available in Mageia Linux, build manually
-git clone -q https://github.com/rakitzis/rc.git
+git clone https://github.com/rakitzis/rc.git
 cd rc || exit 1
 TAG="$(git tag -l | sort -V | tail -n 1)"
 git checkout -b ${TAG} ${TAG}
@@ -49,7 +49,7 @@ make install
 
 # Install libabigail from git
 cd "${CWD}" || exit 1
-git clone -q https://sourceware.org/git/libabigail.git
+git clone https://sourceware.org/git/libabigail.git
 cd libabigail || exit 1
 TAG="$(git tag -l | grep ^libabigail- | grep -v '\.rc' | sort -n | tail -n 1)"
 git checkout -b "${TAG}" "${TAG}"
@@ -60,7 +60,7 @@ make install
 
 # cdson is not [yet] in Mageia
 cd "${CWD}" || exit 1
-git clone -q https://github.com/frozencemetery/cdson.git
+git clone https://github.com/frozencemetery/cdson.git
 cd cdson || exit 1
 TAG="$(git tag -l | sort -n | tail -n 1)"
 git checkout -b "${TAG}" "${TAG}"

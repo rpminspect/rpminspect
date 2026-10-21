@@ -1,4 +1,6 @@
 annobin-annocheck
+autoconf
+automake
 bash
 clamav-data
 clamav-devel

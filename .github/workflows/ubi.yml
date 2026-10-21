@@ -33,7 +33,8 @@ jobs:
 
         strategy:
             matrix:
-                container: ["registry.access.redhat.com/ubi9/ubi:latest"]
+                container: ["registry.access.redhat.com/ubi9/ubi:latest",
+                            "registry.access.redhat.com/ubi10/ubi:latest"]
 
         container:
             image: ${{ matrix.container }}
@@ -44,37 +45,41 @@ jobs:
             # Requirements before the git clone can happen
             - name: git clone requirements
               run: |
+                  CSVER=
+
                   case "${{ matrix.container }}" in
+                      *ubi10*)
+                          CSVER=10 ;;
                       *ubi9*)
-                          # UBI by itself does not contain every BR we
-                          # need, so supplement with CentOS Stream 9
-                          if [ -d /etc/yum.repos.d ]; then
-                              rm -f /etc/yum.repos.d/ubi.repo
-                          else
-                              mkdir -p /etc/yum.repos.d
-                          fi
-
-                          for c in BaseOS AppStream CRB ; do
-                              echo "[c9s-${c}]" >> /etc/yum.repos.d/ubi.repo
-                              echo "name = CentOS Stream 9 - ${c}" >> /etc/yum.repos.d/ubi.repo
-                              echo "baseurl = https://mirror.stream.centos.org/9-stream/${c}/\$basearch/os/" >> /etc/yum.repos.d/ubi.repo
-                              echo "enabled = 1" >> /etc/yum.repos.d/ubi.repo
-                              echo "gpgcheck = 0" >> /etc/yum.repos.d/ubi.repo
-                              echo >> /etc/yum.repos.d/ubi.repo
-                          done
-
-                          # Avoid package conflicts
-                          rpm -e --nodeps openssl-fips-provider openssl-fips-provider-so
-
-                          # Upgrade things
-                          dnf upgrade -y
-
-                          # Now enable EPEL and install git
-                          dnf install -y https://dl.fedoraproject.org/pub/epel/epel-release-latest-9.noarch.rpm
-                          dnf install -y git
-                          ;;
+                          CSVER=9 ;;
                   esac
 
+                  # UBI by itself does not contain every BR we need,
+                  # so supplement with CentOS Stream
+                  if [ -d /etc/yum.repos.d ]; then
+                      rm -f /etc/yum.repos.d/ubi.repo
+                  else
+                      mkdir -p /etc/yum.repos.d
+                  fi
+
+                  for c in BaseOS AppStream CRB ; do
+                      echo "[c${CSVER}s-${c}]" >> /etc/yum.repos.d/ubi.repo
+                      echo "name = CentOS Stream ${CSVER} - ${c}" >> /etc/yum.repos.d/ubi.repo
+                      echo "baseurl = https://mirror.stream.centos.org/${CSVER}-stream/${c}/\$basearch/os/" >> /etc/yum.repos.d/ubi.repo
+                      echo "enabled = 1" >> /etc/yum.repos.d/ubi.repo
+                      echo "gpgcheck = 0" >> /etc/yum.repos.d/ubi.repo
+                      echo >> /etc/yum.repos.d/ubi.repo
+                  done
+
+                  # Avoid package conflicts
+                  rpm -e --nodeps openssl-fips-provider openssl-fips-provider-so
+
+                  # Upgrade things
+                  dnf upgrade -y
+
+                  # Now enable EPEL and install git
+                  dnf install -y https://dl.fedoraproject.org/pub/epel/epel-release-latest-${CSVER}.noarch.rpm
+                  dnf install -y git
 
             # This means clone the git repo
             - uses: actions/checkout@v4
