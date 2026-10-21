@@ -55,7 +55,7 @@ ln -s mksh /bin/ksh
 
 # Install libabigail from git
 cd "${CWD}" || exit 1
-git clone -q git://sourceware.org/git/libabigail.git
+git clone git://sourceware.org/git/libabigail.git
 cd libabigail || exit 1
 TAG="$(git tag -l | grep ^libabigail- | grep -v '\.rc' | sort -n | tail -n 1)"
 git checkout -b "${TAG}" "${TAG}"
@@ -63,13 +63,13 @@ autoreconf -f -i -v
 if [ ! -r /usr/lib/pkgconfig/fts-standalone.pc ]; then
     ln -sf musl-fts.pc /usr/lib/pkgconfig/fts-standalone.pc
 fi
-./configure --prefix=/usr/local
+env LDFLAGS=-largp ./configure --prefix=/usr/local
 make V=1
 make install
 
 # cdson is not [yet] in Alpine
 cd "${CWD}" || exit 1
-git clone -q https://github.com/frozencemetery/cdson.git
+git clone https://github.com/frozencemetery/cdson.git
 cd cdson || exit 1
 TAG="$(git tag -l | sort -n | tail -n 1)"
 git checkout -b "${TAG}" "${TAG}"
