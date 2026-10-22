@@ -4,14 +4,8 @@
 #
 
 import os
-import unittest
-
-from rpmfluff.sourcefile import SourceFile
-from rpmfluff.utils import CC
 
 from baseclass import TestCompareRPMs, TestCompareSRPM, TestCompareKoji
-from baseclass import BEFORE_NAME, BEFORE_VER, BEFORE_REL
-from baseclass import AFTER_NAME, AFTER_VER, AFTER_REL
 
 # Read in the built rpminspect executable for use in these test RPMs
 with open(os.environ["RPMINSPECT"], mode="rb") as f:
