@@ -1020,7 +1020,11 @@ rpmdeps:
     #     VERIFY
     #     BAD
     # This only affects rebased builds where the before and after builds
-    # are being compared and dependency changes are expected.
+    # are being compared and dependency changes are expected.  Changes
+    # to dependencies that follow the package version, such as the
+    # automatic Provides, are always reported as INFO.  Dependency
+    # changes in maintenance builds (same name and version, different
+    # release) are reported as VERIFY unless the change is expected.
     #rebase_reporting_level: INFO
 
     # Optional list of regular expressions to match against

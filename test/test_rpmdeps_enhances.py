@@ -163,7 +163,7 @@ class GainingEnhancesRebaseCompareKoji(TestCompareKoji):
         self.waiver_auth = "Not Waivable"
 
 
-# Gaining a new Enhances in a maint comparison
+# Gaining a new Enhances in a maint comparison (VERIFY)
 class GainingEnhancesCompareRPMs(TestCompareRPMs):
     @unittest.skipUnless(have_enhances, "librpm too old to support Enhances")
     def setUp(self):
@@ -172,8 +172,8 @@ class GainingEnhancesCompareRPMs(TestCompareRPMs):
         self.after_rpm.add_enhances(after_enhances)
 
         self.inspection = "rpmdeps"
-        self.result = "INFO"
-        self.waiver_auth = "Not Waivable"
+        self.result = "VERIFY"
+        self.waiver_auth = "Anyone"
 
 
 class GainingEnhancesCompareKoji(TestCompareKoji):
@@ -184,8 +184,8 @@ class GainingEnhancesCompareKoji(TestCompareKoji):
         self.after_rpm.add_enhances(after_enhances)
 
         self.inspection = "rpmdeps"
-        self.result = "INFO"
-        self.waiver_auth = "Not Waivable"
+        self.result = "VERIFY"
+        self.waiver_auth = "Anyone"
 
 
 # Changing a Enhances in a rebase comparison (INFO)
@@ -215,7 +215,7 @@ class ChangingEnhancesRebaseCompareKoji(TestCompareKoji):
         self.waiver_auth = "Not Waivable"
 
 
-# Changing a Enhances in a maint comparison
+# Changing a Enhances in a maint comparison (VERIFY)
 class ChangingEnhancesCompareRPMs(TestCompareRPMs):
     @unittest.skipUnless(have_enhances, "librpm too old to support Enhances")
     def setUp(self):
@@ -225,8 +225,8 @@ class ChangingEnhancesCompareRPMs(TestCompareRPMs):
         self.after_rpm.add_enhances(after_enhances)
 
         self.inspection = "rpmdeps"
-        self.result = "INFO"
-        self.waiver_auth = "Not Waivable"
+        self.result = "VERIFY"
+        self.waiver_auth = "Anyone"
 
 
 class ChangingEnhancesCompareKoji(TestCompareKoji):
@@ -238,8 +238,8 @@ class ChangingEnhancesCompareKoji(TestCompareKoji):
         self.after_rpm.add_enhances(after_enhances)
 
         self.inspection = "rpmdeps"
-        self.result = "INFO"
-        self.waiver_auth = "Not Waivable"
+        self.result = "VERIFY"
+        self.waiver_auth = "Anyone"
 
 
 # Changing a Enhances in a maint comparison due to NVR (INFO)
@@ -298,7 +298,7 @@ class LosingEnhancesRebaseCompareKoji(TestCompareKoji):
         self.waiver_auth = "Not Waivable"
 
 
-# Losing a Enhances in a maint comparison
+# Losing a Enhances in a maint comparison (VERIFY)
 class LosingEnhancesCompareRPMs(TestCompareRPMs):
     @unittest.skipUnless(have_enhances, "librpm too old to support Enhances")
     def setUp(self):
@@ -307,8 +307,8 @@ class LosingEnhancesCompareRPMs(TestCompareRPMs):
         self.before_rpm.add_enhances(before_enhances)
 
         self.inspection = "rpmdeps"
-        self.result = "INFO"
-        self.waiver_auth = "Not Waivable"
+        self.result = "VERIFY"
+        self.waiver_auth = "Anyone"
 
 
 class LosingEnhancesCompareKoji(TestCompareKoji):
@@ -319,8 +319,8 @@ class LosingEnhancesCompareKoji(TestCompareKoji):
         self.before_rpm.add_enhances(before_enhances)
 
         self.inspection = "rpmdeps"
-        self.result = "INFO"
-        self.waiver_auth = "Not Waivable"
+        self.result = "VERIFY"
+        self.waiver_auth = "Anyone"
 
 
 # Missing Epoch prefix on maint compare (BAD for Koji compares, OK

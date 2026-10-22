@@ -422,7 +422,16 @@ program.
     new build to an older build.  Changes are only reported when
     comparing builds, but this inspection will check for correct RPM
     dependency metadata when inspecting a single build and report
-    findings.
+    findings.  Gained, changed, and lost dependencies in rebased
+    packages are reported at the INFO level by default.  The
+    rebase_reporting_level setting in the rpmdeps section of the
+    configuration file changes this level.  Non-rebased packages
+    report these changes at the VERIFY level.  Retained dependencies
+    and dependencies on subpackages of the same build are always
+    reported at the INFO level.  Dependencies with a version that
+    follows the package version are also always reported at the
+    INFO level.  Other expected changes in non-rebased packages are
+    reported at the INFO level.
 
 - **udevrules**
 
