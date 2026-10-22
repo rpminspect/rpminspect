@@ -2,10 +2,6 @@
 PATH=/bin:/usr/bin:/sbin:/usr/sbin:/usr/local/bin:/usr/local/sbin
 CWD="$(pwd)"
 
-# Sync ports tree from git
-rm -rf /usr/ports || :
-git clone https://git.freebsd.org/ports.git /usr/ports
-
 # https://github.com/rpm-software-management/rpm/pull/2459
 RPMTAG_HDR="/usr/local/include/rpm/rpmtag.h"
 if grep RPM_MASK_RETURN_TYPE ${RPMTAG_HDR} 2>/dev/null | grep -q 0xffff0000 >/dev/null 2>&1 ; then
@@ -19,10 +15,10 @@ echo "$(ifconfig | grep "inet " | grep -v "inet 127" | awk '{ print $2; }') $(ho
 # Install Python modules from ports, but we have to determine the
 # package prefix based on the version of Python installed.
 PKG_PREFIX="py$(python3 --version | cut -d ' ' -f 2 | cut -d '.' -f 1,2 | sed -e 's|\.||g')"
-pkg install -y -q "${PKG_PREFIX}-pip" "${PKG_PREFIX}-pyaml" "${PKG_PREFIX}-timeout-decorator"
+pkg install -y "${PKG_PREFIX}-pip" "${PKG_PREFIX}-pyaml" "${PKG_PREFIX}-timeout-decorator"
 
 # Now install modules with pip
-pip install -q cpp-coveralls gcovr rpmfluff
+pip install cpp-coveralls gcovr rpmfluff
 
 # libmandoc is missing on FreeBSD
 cd "${CWD}" || exit 1
