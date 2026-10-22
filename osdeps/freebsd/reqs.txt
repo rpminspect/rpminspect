@@ -41,7 +41,6 @@ rpm4
 rust
 sqlite
 valgrind
-xhtml
 xmlrpc-c
 zsh
 zstd

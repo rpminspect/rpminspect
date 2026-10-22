@@ -124,10 +124,17 @@ if cunit.found()
     endif
 
     # Support program used by test-inspect-elf
+    linkargs = ['-Wl,-z,execstack', '-Wl,-z,relro,-z,lazy']
+    no_warn_execstack = run_command('sh', '-c', 'ld --help | grep -q "no-warn-execstack"', check: false)
+
+    if no_warn_execstack.returncode() == 0
+        linkargs += ['-Wl,--no-warn-execstack']
+    endif
+
     execstack_prog = executable(
         'execstack',
         ['lib/elftest.c'],
-        link_args : ['-Wl,--no-warn-execstack', '-Wl,-z,execstack', '-Wl,-z,relro,-z,lazy']
+        link_args : linkargs,
     )
 
     noexecstack_prog = executable(
@@ -201,6 +208,7 @@ if python.found()
         'test_rpmdeps_recommends.py',
         'test_rpmdeps_suggests.py',
         'test_rpmdeps_supplements.py',
+        'test_rpmdeps_rebase_reporting_level.py',
         'test_runpath.py',
         'test_securitypath.py',
         'test_shellsyntax.py',
