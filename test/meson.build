@@ -127,7 +127,7 @@ if cunit.found()
     execstack_prog = executable(
         'execstack',
         ['lib/elftest.c'],
-        link_args : ['-Wl,-z,execstack', '-Wl,-z,relro,-z,lazy']
+        link_args : ['-Wl,--no-warn-execstack', '-Wl,-z,execstack', '-Wl,-z,relro,-z,lazy']
     )
 
     noexecstack_prog = executable(
