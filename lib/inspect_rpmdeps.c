@@ -726,9 +726,10 @@ static bool is_internal_subpackage_dep(const deprule_entry_t *deprule, const rpm
 }
 
 /*
- * Check if the deprule change is expected (e.g., automatic Provides).
+ * Check if the deprule version follows the version of this package or
+ * one of its subpackages (e.g., automatic Provides).
  */
-static bool expected_deprule_change(const bool rebase, const deprule_entry_t *deprule, const Header h, const rpmpeer_t *peers)
+static bool own_deprule_change(const deprule_entry_t *deprule, const Header h, const rpmpeer_t *peers)
 {
     bool r = false;
     bool config = false;
@@ -751,21 +752,6 @@ static bool expected_deprule_change(const bool rebase, const deprule_entry_t *de
     assert(deprule != NULL);
     assert(h != NULL);
 
-    /* skip source packages */
-    if (headerIsSource(h)) {
-        return true;
-    }
-
-    /* changes always expected in a rebase */
-    if (rebase) {
-        return true;
-    }
-
-    /* Rich dependencies and explicit dependencies for automatic deps are expected */
-    if (deprule->rich || deprule->direct) {
-        return true;
-    }
-
     /* this package arch */
     arch = get_rpm_header_arch(h);
 
@@ -787,7 +773,7 @@ static bool expected_deprule_change(const bool rebase, const deprule_entry_t *de
 
     /* gather any + suffix from the version */
     if (deprule->version) {
-        buf = xstrrchr(deprule->version, '+');
+        buf = strrchr(deprule->version, '+');
 
         if (buf) {
             suffix = strdup(buf);
@@ -899,12 +885,72 @@ static bool expected_deprule_change(const bool rebase, const deprule_entry_t *de
 }
 
 /*
+ * Check if the deprule change is expected (e.g., automatic Provides).
+ */
+static bool expected_deprule_change(const bool rebase, const deprule_entry_t *deprule, const Header h, const rpmpeer_t *peers)
+{
+    assert(deprule != NULL);
+    assert(h != NULL);
+
+    /* skip source packages */
+    if (headerIsSource(h)) {
+        return true;
+    }
+
+    /* changes always expected in a rebase */
+    if (rebase) {
+        return true;
+    }
+
+    /* Rich dependencies and explicit dependencies for automatic deps are expected */
+    if (deprule->rich || deprule->direct) {
+        return true;
+    }
+
+    return own_deprule_change(deprule, h, peers);
+}
+
+/*
+ * Determine the reporting level for a gained, changed, or lost deprule.
+ * Rebases use the configured rebase_reporting_level unless the deprule
+ * follows the package version.  Maintenance builds report at VERIFY
+ * unless the change is expected.
+ */
+static severity_t deprule_severity(const struct rpminspect *ri, const bool rebase, const bool expected, const deprule_entry_t *deprule, const Header h)
+{
+    assert(ri != NULL);
+    assert(deprule != NULL);
+    assert(h != NULL);
+
+    /* internal subpackage dependencies are always INFO level */
+    if (is_internal_subpackage_dep(deprule, ri->peers)) {
+        return RESULT_INFO;
+    }
+
+    if (rebase) {
+        /* deps following our own version are always INFO level */
+        if (own_deprule_change(deprule, h, ri->peers)) {
+            return RESULT_INFO;
+        }
+
+        return ri->rebase_reporting_level;
+    }
+
+    if (expected) {
+        return RESULT_INFO;
+    }
+
+    return RESULT_VERIFY;
+}
+
+/*
  * Main driver for the 'rpmdeps' inspection.
  */
 bool inspect_rpmdeps(struct rpminspect *ri)
 {
     bool result = true;
     bool rebase = false;
+    bool expected = false;
     rpmpeer_entry_t *peer = NULL;
     rpmfile_entry_t *file = NULL;
     deprule_entry_t *deprule = NULL;
@@ -1040,16 +1086,8 @@ bool inspect_rpmdeps(struct rpminspect *ri)
             if (peer->after_deprules) {
                 TAILQ_FOREACH(deprule, peer->after_deprules, items) {
                     /* reporting level */
-                    params.waiverauth = NOT_WAIVABLE;
-
-                    /* internal subpackage dependencies are always INFO level */
-                    if (is_internal_subpackage_dep(deprule, ri->peers)) {
-                        params.severity = RESULT_INFO;
-                    } else if (rebase) {
-                        params.severity = ri->rebase_reporting_level;
-                    } else {
-                        params.severity = RESULT_INFO;
-                    }
+                    expected = expected_deprule_change(rebase, deprule, peer->after_hdr, ri->peers);
+                    params.severity = deprule_severity(ri, rebase, expected, deprule, peer->after_hdr);
 
                     /* use shorter variable names in the if expressions */
                     drs = strdeprule(deprule);
@@ -1058,13 +1096,13 @@ bool inspect_rpmdeps(struct rpminspect *ri)
                     /* determine what to report */
                     if (drs && pdrs == NULL) {
                         if (!strcmp(arch, SRPM_ARCH_NAME)) {
-                            if (expected_deprule_change(rebase, deprule, peer->after_hdr, ri->peers)) {
+                            if (expected && params.severity == RESULT_INFO) {
                                 xasprintf(&params.msg, _("Gained '%s' in source package %s; this is expected"), drs, name);
                             } else {
                                 xasprintf(&params.msg, _("Gained '%s' in source package %s"), drs, name);
                             }
                         } else {
-                            if (expected_deprule_change(rebase, deprule, peer->after_hdr, ri->peers)) {
+                            if (expected && params.severity == RESULT_INFO) {
                                 xasprintf(&params.msg, _("Gained '%s' in subpackage %s on %s; this is expected"), drs, name, arch);
                             } else {
                                 xasprintf(&params.msg, _("Gained '%s' in subpackage %s on %s"), drs, name, arch);
@@ -1075,14 +1113,17 @@ bool inspect_rpmdeps(struct rpminspect *ri)
                         params.remedy = REMEDY_RPMDEPS_GAINED;
                         params.verb = VERB_ADDED;
                     } else if (deprules_match(deprule, deprule->peer_deprule)) {
+                        /* retained dependencies are always INFO level */
+                        params.severity = RESULT_INFO;
+
                         if (!strcmp(arch, SRPM_ARCH_NAME)) {
-                            if (expected_deprule_change(rebase, deprule, peer->after_hdr, ri->peers)) {
+                            if (expected && params.severity == RESULT_INFO) {
                                 xasprintf(&params.msg, _("Retained '%s' in source package %s; this is expected"), drs, name);
                             } else {
                                 xasprintf(&params.msg, _("Retained '%s' in source package %s"), drs, name);
                             }
                         } else {
-                            if (expected_deprule_change(rebase, deprule, peer->after_hdr, ri->peers)) {
+                            if (expected && params.severity == RESULT_INFO) {
                                 xasprintf(&params.msg, _("Retained '%s' in subpackage %s on %s; this is expected"), drs, name, arch);
                             } else {
                                 xasprintf(&params.msg, _("Retained '%s' in subpackage %s on %s"), drs, name, arch);
@@ -1094,13 +1135,13 @@ bool inspect_rpmdeps(struct rpminspect *ri)
                         params.verb = VERB_OK;
                     } else {
                         if (!strcmp(arch, SRPM_ARCH_NAME)) {
-                            if (expected_deprule_change(rebase, deprule, peer->after_hdr, ri->peers)) {
+                            if (expected && params.severity == RESULT_INFO) {
                                 xasprintf(&params.msg, _("Changed '%s' to '%s' in source package %s; this is expected"), pdrs, drs, name);
                             } else {
                                 xasprintf(&params.msg, _("Changed '%s' to '%s' in source package %s"), pdrs, drs, name);
                             }
                         } else {
-                            if (expected_deprule_change(rebase, deprule, peer->after_hdr, ri->peers)) {
+                            if (expected && params.severity == RESULT_INFO) {
                                 xasprintf(&params.msg, _("Changed '%s' to '%s' in subpackage %s on %s; this is expected"), pdrs, drs, name, arch);
                             } else {
                                 xasprintf(&params.msg, _("Changed '%s' to '%s' in subpackage %s on %s"), pdrs, drs, name, arch);
@@ -1115,6 +1156,14 @@ bool inspect_rpmdeps(struct rpminspect *ri)
                     /* report the result */
                     params.noun = noun;
                     params.arch = arch;
+
+                    if (params.severity > RESULT_INFO) {
+                        params.waiverauth = WAIVABLE_BY_ANYONE;
+                        result = false;
+                    } else {
+                        params.waiverauth = NOT_WAIVABLE;
+                    }
+
                     add_result(ri, &params);
                     free(params.msg);
                     free(noun);
@@ -1141,8 +1190,15 @@ bool inspect_rpmdeps(struct rpminspect *ri)
                         xasprintf(&noun, _("'${FILE}' in %s on ${ARCH}"), name);
                         params.noun = noun;
                         params.arch = arch;
-                        params.waiverauth = NOT_WAIVABLE;
-                        params.severity = RESULT_INFO;
+                        expected = expected_deprule_change(rebase, deprule, peer->after_hdr, ri->peers);
+                        params.severity = deprule_severity(ri, rebase, expected, deprule, peer->after_hdr);
+
+                        if (params.severity > RESULT_INFO) {
+                            params.waiverauth = WAIVABLE_BY_ANYONE;
+                            result = false;
+                        } else {
+                            params.waiverauth = NOT_WAIVABLE;
+                        }
 
                         add_result(ri, &params);
                         free(params.msg);

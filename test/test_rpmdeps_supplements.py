@@ -163,7 +163,7 @@ class GainingSupplementsRebaseCompareKoji(TestCompareKoji):
         self.waiver_auth = "Not Waivable"
 
 
-# Gaining a new Supplements in a maint comparison
+# Gaining a new Supplements in a maint comparison (VERIFY)
 class GainingSupplementsCompareRPMs(TestCompareRPMs):
     @unittest.skipUnless(have_supplements, "librpm too old to support Supplements")
     def setUp(self):
@@ -172,8 +172,8 @@ class GainingSupplementsCompareRPMs(TestCompareRPMs):
         self.after_rpm.add_supplements(after_supplements)
 
         self.inspection = "rpmdeps"
-        self.result = "INFO"
-        self.waiver_auth = "Not Waivable"
+        self.result = "VERIFY"
+        self.waiver_auth = "Anyone"
 
 
 class GainingSupplementsCompareKoji(TestCompareKoji):
@@ -184,8 +184,8 @@ class GainingSupplementsCompareKoji(TestCompareKoji):
         self.after_rpm.add_supplements(after_supplements)
 
         self.inspection = "rpmdeps"
-        self.result = "INFO"
-        self.waiver_auth = "Not Waivable"
+        self.result = "VERIFY"
+        self.waiver_auth = "Anyone"
 
 
 # Changing a Supplements in a rebase comparison (INFO)
@@ -215,7 +215,7 @@ class ChangingSupplementsRebaseCompareKoji(TestCompareKoji):
         self.waiver_auth = "Not Waivable"
 
 
-# Changing a Supplements in a maint comparison
+# Changing a Supplements in a maint comparison (VERIFY)
 class ChangingSupplementsCompareRPMs(TestCompareRPMs):
     @unittest.skipUnless(have_supplements, "librpm too old to support Supplements")
     def setUp(self):
@@ -225,8 +225,8 @@ class ChangingSupplementsCompareRPMs(TestCompareRPMs):
         self.after_rpm.add_supplements(after_supplements)
 
         self.inspection = "rpmdeps"
-        self.result = "INFO"
-        self.waiver_auth = "Not Waivable"
+        self.result = "VERIFY"
+        self.waiver_auth = "Anyone"
 
 
 class ChangingSupplementsCompareKoji(TestCompareKoji):
@@ -238,8 +238,8 @@ class ChangingSupplementsCompareKoji(TestCompareKoji):
         self.after_rpm.add_supplements(after_supplements)
 
         self.inspection = "rpmdeps"
-        self.result = "INFO"
-        self.waiver_auth = "Not Waivable"
+        self.result = "VERIFY"
+        self.waiver_auth = "Anyone"
 
 
 # Changing a Supplements in a maint comparison due to NVR (INFO)
@@ -298,7 +298,7 @@ class LosingSupplementsRebaseCompareKoji(TestCompareKoji):
         self.waiver_auth = "Not Waivable"
 
 
-# Losing a Supplements in a maint comparison
+# Losing a Supplements in a maint comparison (VERIFY)
 class LosingSupplementsCompareRPMs(TestCompareRPMs):
     @unittest.skipUnless(have_supplements, "librpm too old to support Supplements")
     def setUp(self):
@@ -307,8 +307,8 @@ class LosingSupplementsCompareRPMs(TestCompareRPMs):
         self.before_rpm.add_supplements(before_supplements)
 
         self.inspection = "rpmdeps"
-        self.result = "INFO"
-        self.waiver_auth = "Not Waivable"
+        self.result = "VERIFY"
+        self.waiver_auth = "Anyone"
 
 
 class LosingSupplementsCompareKoji(TestCompareKoji):
@@ -319,8 +319,8 @@ class LosingSupplementsCompareKoji(TestCompareKoji):
         self.before_rpm.add_supplements(before_supplements)
 
         self.inspection = "rpmdeps"
-        self.result = "INFO"
-        self.waiver_auth = "Not Waivable"
+        self.result = "VERIFY"
+        self.waiver_auth = "Anyone"
 
 
 # Missing Epoch prefix on maint compare (BAD for Koji compares, OK

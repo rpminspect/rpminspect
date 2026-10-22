@@ -4,8 +4,11 @@
 #
 
 import os
+import platform
 
 from baseclass import TestCompareRPMs, TestCompareSRPM, TestCompareKoji
+
+machine = platform.machine().replace("amd64", "x86_64")
 
 # Read in the built rpminspect executable for use in these test RPMs
 with open(os.environ["RPMINSPECT"], mode="rb") as f:
@@ -365,3 +368,77 @@ class RebaseOwnDepsWithBadLevelKoji(TestCompareKoji):
 
         # Set rebase_reporting_level to BAD
         self.extra_cfg = {"rpmdeps": {"rebase_reporting_level": "BAD"}}
+
+
+# Only INFO results carry the "this is expected" message suffix
+class RebaseReportingLevelDefaultMessageRPMs(TestCompareRPMs):
+    def setUp(self):
+        super().setUp(rebase=True)
+
+        self.before_rpm.add_requires("external-somepkg = 1.0-1")
+        self.after_rpm.add_requires("external-somepkg = 2.0-1")
+
+        self.inspection = "rpmdeps"
+        self.result = "INFO"
+        self.waiver_auth = "Not Waivable"
+        self.message = (
+            "Changed 'Requires: external-somepkg = 1.0-1' to "
+            "'Requires: external-somepkg = 2.0-1' in subpackage "
+            f"vaporware on {machine}; this is expected"
+        )
+
+
+class RebaseReportingLevelVerifyMessageRPMs(TestCompareRPMs):
+    def setUp(self):
+        super().setUp(rebase=True)
+
+        self.before_rpm.add_requires("external-somepkg = 1.0-1")
+        self.after_rpm.add_requires("external-somepkg = 2.0-1")
+
+        self.inspection = "rpmdeps"
+        self.result = "VERIFY"
+        self.waiver_auth = "Anyone"
+        self.message = (
+            "Changed 'Requires: external-somepkg = 1.0-1' to "
+            "'Requires: external-somepkg = 2.0-1' in subpackage "
+            f"vaporware on {machine}"
+        )
+
+        # Set rebase_reporting_level to VERIFY
+        self.extra_cfg = {"rpmdeps": {"rebase_reporting_level": "VERIFY"}}
+
+
+class RebaseReportingLevelBadMessageSRPM(TestCompareSRPM):
+    def setUp(self):
+        super().setUp(rebase=True)
+
+        self.before_rpm.add_build_requires("external-somepkg = 1.0-1")
+        self.after_rpm.add_build_requires("external-somepkg = 2.0-1")
+
+        self.inspection = "rpmdeps"
+        self.result = "BAD"
+        self.waiver_auth = "Anyone"
+        self.message = (
+            "Changed 'Requires: external-somepkg = 1.0-1' to "
+            "'Requires: external-somepkg = 2.0-1' in source package vaporware"
+        )
+
+        # Set rebase_reporting_level to BAD
+        self.extra_cfg = {"rpmdeps": {"rebase_reporting_level": "BAD"}}
+
+
+class MaintReportingLevelDefaultMessageRPMs(TestCompareRPMs):
+    def setUp(self):
+        super().setUp()
+
+        self.before_rpm.add_requires("external-somepkg = 1.0-1")
+        self.after_rpm.add_requires("external-somepkg = 2.0-1")
+
+        self.inspection = "rpmdeps"
+        self.result = "VERIFY"
+        self.waiver_auth = "Anyone"
+        self.message = (
+            "Changed 'Requires: external-somepkg = 1.0-1' to "
+            "'Requires: external-somepkg = 2.0-1' in subpackage "
+            f"vaporware on {machine}"
+        )
