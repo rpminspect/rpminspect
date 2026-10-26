@@ -1623,3 +1623,117 @@ class ExplicitRequiresIsTransitiveCompareKoji(TestCompareKoji):
 
         self.inspection = "rpmdeps"
         self.result = "OK"
+
+
+# Build a program linked with libvaporware.so from the libs subpackage
+# and install it in the given subpackage (None for the main package)
+def add_linked_program(rpm, subpackageSuffix, installPath):
+    sourceFileName = "main.c"
+
+    rpm.add_simple_library(
+        libraryName="libvaporware.so",
+        installPath="usr/lib/libvaporware.so",
+        subpackageSuffix="libs",
+        sourceContent=library_source,
+    )
+
+    rpm.add_source(SourceFile(sourceFileName, hello_lib_world))
+    rpm.section_build += "%if 0%{?__isa_bits} == 32\n%define mopt -m32\n%endif\n"
+    rpm.section_build += CC + " %%{?mopt} %s -L. -lvaporware\n" % sourceFileName
+    rpm.create_parent_dirs(installPath)
+    rpm.section_install += "cp a.out $RPM_BUILD_ROOT/%s\n" % installPath
+    sub = rpm.get_subpackage(subpackageSuffix)
+    sub.section_files += "/%s\n" % installPath
+    rpm.add_payload_check(installPath, subpackageSuffix)
+
+
+# Reverse explicit Requires satisfies the automatic library dependency
+# (the libs subpackage requires the main package)
+class ReverseExplicitRequiresKoji(TestKoji):
+    @unittest.skipUnless(have_elfdeps, "system lacks %s executable" % elfdeps)
+    def setUp(self):
+        super().setUp()
+
+        libs = self.rpm.add_subpackage("libs")
+        add_linked_program(self.rpm, None, "usr/bin/vaporware")
+
+        # reverse explicit Requires
+        libs.add_requires("vaporware = %{version}-%{release}")
+
+        self.inspection = "rpmdeps"
+        self.result = "OK"
+
+
+# Explicit Requires on a common subpackage from both subpackages
+# satisfies the automatic library dependency
+class SharedExplicitRequiresKoji(TestKoji):
+    @unittest.skipUnless(have_elfdeps, "system lacks %s executable" % elfdeps)
+    def setUp(self):
+        super().setUp()
+
+        libs = self.rpm.add_subpackage("libs")
+        tools = self.rpm.add_subpackage("tools")
+        self.rpm.add_subpackage("common")
+        self.rpm.add_installed_file(
+            "usr/share/vaporware/common.txt",
+            SourceFile("common.txt", "common\n"),
+            subpackageSuffix="common",
+        )
+        add_linked_program(self.rpm, "tools", "usr/bin/vaporware-tool")
+
+        # both subpackages lock to the common subpackage
+        libs.add_requires("vaporware-common = %{version}-%{release}")
+        tools.add_requires("vaporware-common = %{version}-%{release}")
+
+        self.inspection = "rpmdeps"
+        self.result = "OK"
+
+
+# Same as above with %{_isa} on one of the explicit Requires
+class SharedExplicitRequiresIsaKoji(TestKoji):
+    @unittest.skipUnless(have_elfdeps, "system lacks %s executable" % elfdeps)
+    def setUp(self):
+        super().setUp()
+
+        libs = self.rpm.add_subpackage("libs")
+        tools = self.rpm.add_subpackage("tools")
+        self.rpm.add_subpackage("common")
+        self.rpm.add_installed_file(
+            "usr/share/vaporware/common.txt",
+            SourceFile("common.txt", "common\n"),
+            subpackageSuffix="common",
+        )
+        add_linked_program(self.rpm, "tools", "usr/bin/vaporware-tool")
+
+        # both subpackages lock to the common subpackage
+        libs.add_requires("vaporware-common = %{version}-%{release}")
+        tools.add_requires("vaporware-common%{?_isa} = %{version}-%{release}")
+
+        self.inspection = "rpmdeps"
+        self.result = "OK"
+
+
+# Unversioned Requires on a common subpackage do not lock the versions
+# of the subpackages (VERIFY)
+class SharedUnversionedRequiresKoji(TestKoji):
+    @unittest.skipUnless(have_elfdeps, "system lacks %s executable" % elfdeps)
+    def setUp(self):
+        super().setUp()
+
+        libs = self.rpm.add_subpackage("libs")
+        tools = self.rpm.add_subpackage("tools")
+        self.rpm.add_subpackage("common")
+        self.rpm.add_installed_file(
+            "usr/share/vaporware/common.txt",
+            SourceFile("common.txt", "common\n"),
+            subpackageSuffix="common",
+        )
+        add_linked_program(self.rpm, "tools", "usr/bin/vaporware-tool")
+
+        # unversioned Requires do not lock the subpackages together
+        libs.add_requires("vaporware-common")
+        tools.add_requires("vaporware-common")
+
+        self.inspection = "rpmdeps"
+        self.result = "VERIFY"
+        self.waiver_auth = "Anyone"

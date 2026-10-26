@@ -514,14 +514,18 @@ rpmdeps_explicit = """
 Add the indicated explicit Requires to the spec file for the named
 subpackage.  Subpackages depending on shared libraries in another
 subpackage must carry an explicit 'Requires: SUBPACKAGE_NAME =
-%{version}-%{release}' in the spec file.
+%{version}-%{release}' in the spec file.  A reverse explicit Requires from the
+library subpackage, or explicit Requires on the exact version of a
+common subpackage, also satisfies this.
 """
 
 rpmdeps_explicit_epoch = """
 Add the indicated explicit Requires to the spec file for the named
 subpackage.  Subpackages depending on shared libraries in another
 subpackage must carry an explicit 'Requires: SUBPACKAGE_NAME =
-%{epoch}:%{version}-%{release}' in the spec file.
+%{epoch}:%{version}-%{release}' in the spec file.  A reverse explicit Requires from the
+library subpackage, or explicit Requires on the exact version of a
+common subpackage, also satisfies this.
 """
 
 rpmdeps_multiple = """
