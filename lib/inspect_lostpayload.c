@@ -87,6 +87,11 @@ bool inspect_lostpayload(struct rpminspect *ri)
         }
 
         if (peer->after_files == NULL || TAILQ_EMPTY(peer->after_files)) {
+            /* %ghost only packages with no prior payload lost nothing */
+            if ((peer->before_files == NULL || TAILQ_EMPTY(peer->before_files)) && payload_only_ghosts(peer->after_hdr)) {
+                continue;
+            }
+
             params.file = headerGetString(peer->after_hdr, RPMTAG_NAME);
             params.arch = get_rpm_header_arch(peer->after_hdr);
 
