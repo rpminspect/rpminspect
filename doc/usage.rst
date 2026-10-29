@@ -227,7 +227,8 @@ program.
 
     Check all binary RPM_ packages in the build for any empty
     payloads. When comparing two builds, report new packages in the
-    after build with empty payloads.
+    after build with empty payloads.  Packages that only carry %ghost
+    entries are reported at the INFO level.
 
 - **metadata**
 
@@ -431,7 +432,13 @@ program.
     reported at the INFO level.  Dependencies with a version that
     follows the package version are also always reported at the
     INFO level.  Other expected changes in non-rebased packages are
-    reported at the INFO level.
+    reported at the INFO level.  Subpackages that depend on a shared
+    library from another subpackage must be held at the same
+    version-release.  An explicit Requires on the exact
+    version-release of a subpackage holds both subpackages together.
+    The Requires may be in the subpackage using the library, in the
+    subpackage providing the library, or in other subpackages that
+    link the two.
 
 - **udevrules**
 
@@ -447,7 +454,9 @@ run when in comparison mode.
 
     Check all binary RPM_ packages in the before and after builds for
     any empty payloads. Packages that lost payload data from the
-    before build to the after build are reported.
+    before build to the after build are reported.  Packages that only
+    carry %ghost entries and had no payload in the before build are
+    not reported.
 
 - **changedfiles**
 

@@ -3,7 +3,16 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 #
 
+import rpmfluff
+
 from baseclass import TestCompareKoji
+
+
+# Add a subpackage that only carries a %ghost directory
+def add_ghost_subpackage(rpm):
+    rpm.add_subpackage("ghost")
+    rpm.section_install += "mkdir -p $RPM_BUILD_ROOT/usr/share/vaporware.d\n"
+    rpm.get_subpackage("ghost").section_files += "%ghost %dir /usr/share/vaporware.d\n"
 
 
 # New package has empty payload across Koji builds (VERIFY)
@@ -41,6 +50,36 @@ class ExistingPkgMissing(TestCompareKoji):
         super().setUp()
         self.before_rpm.add_simple_payload_file()
         self.before_rpm.add_subpackage(self.before_rpm.name + "-newthing")
+        self.inspection = "lostpayload"
+        self.result = "VERIFY"
+        self.waiver_auth = "Anyone"
+
+
+# Subpackage continues to only carry %ghost entries (OK)
+class GhostSubpkgStillEmpty(TestCompareKoji):
+    def setUp(self):
+        super().setUp()
+        self.before_rpm.add_simple_payload_file()
+        self.after_rpm.add_simple_payload_file()
+        add_ghost_subpackage(self.before_rpm)
+        add_ghost_subpackage(self.after_rpm)
+        self.inspection = "lostpayload"
+        self.result = "OK"
+
+
+# Subpackage lost payload and now only carries %ghost entries (VERIFY)
+class GhostSubpkgLostPayload(TestCompareKoji):
+    def setUp(self):
+        super().setUp()
+        self.before_rpm.add_simple_payload_file()
+        self.after_rpm.add_simple_payload_file()
+        self.before_rpm.add_subpackage("ghost")
+        self.before_rpm.add_installed_file(
+            "/usr/share/vaporware.d/data",
+            rpmfluff.SourceFile("data", "vaporware\n"),
+            subpackageSuffix="ghost",
+        )
+        add_ghost_subpackage(self.after_rpm)
         self.inspection = "lostpayload"
         self.result = "VERIFY"
         self.waiver_auth = "Anyone"

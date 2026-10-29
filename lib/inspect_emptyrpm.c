@@ -17,36 +17,6 @@
 #include <assert.h>
 #include "rpminspect.h"
 
-static bool payload_only_ghosts(Header h)
-{
-    bool onlyghosts = true;
-    rpmtd td = NULL;
-    rpmFlags tdflags = HEADERGET_MINMEM | HEADERGET_EXT | HEADERGET_ARGV;
-    rpmfileAttrs fileflags = 0;
-
-    assert(h != NULL);
-
-    /* check to see if the package only contains %ghost entries */
-    td = rpmtdNew();
-
-    if (headerGet(h, RPMTAG_FILEFLAGS, td, tdflags)) {
-        while ((rpmtdNext(td) != -1)) {
-            fileflags = *(rpmtdGetUint32(td));
-
-            if (!(fileflags & RPMFILE_GHOST)) {
-                /* we found a non-ghost, something is wrong */
-                onlyghosts = false;
-                break;
-            }
-        }
-    }
-
-    rpmtdFreeData(td);
-    rpmtdFree(td);
-
-    return onlyghosts;
-}
-
 /**
  * @brief Perform the 'emptyrpm' inspection.
  *
