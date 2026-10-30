@@ -61,7 +61,7 @@ bool inspect_emptyrpm(struct rpminspect *ri)
             bn = basename(peer->after_rpm);
             assert(bn != NULL);
 
-            if (list_contains(ri->expected_empty_rpms, name)) {
+            if (list_contains_glob(ri->expected_empty_rpms, name)) {
                 xasprintf(&params.msg, _("New package %s is empty (no payloads); this is expected per the rpminspect configuration"), bn);
                 params.severity = RESULT_INFO;
                 params.waiverauth = NOT_WAIVABLE;
