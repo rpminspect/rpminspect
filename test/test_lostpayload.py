@@ -83,3 +83,16 @@ class GhostSubpkgLostPayload(TestCompareKoji):
         self.inspection = "lostpayload"
         self.result = "VERIFY"
         self.waiver_auth = "Anyone"
+
+
+# Empty subpackage matches a glob in expected_empty (OK)
+class ExpectedEmptyGlobStillEmpty(TestCompareKoji):
+    def setUp(self):
+        super().setUp()
+        self.before_rpm.add_simple_payload_file()
+        self.after_rpm.add_simple_payload_file()
+        self.before_rpm.add_subpackage("foo+bar-devel")
+        self.after_rpm.add_subpackage("foo+bar-devel")
+        self.extra_cfg = {"emptyrpm": {"expected_empty": ["vaporware-*+*-devel"]}}
+        self.inspection = "lostpayload"
+        self.result = "OK"

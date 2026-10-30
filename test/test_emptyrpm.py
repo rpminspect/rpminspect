@@ -80,3 +80,39 @@ class SubpkgHasOnlyGhostsKojiBuild(TestKoji):
         self.inspection = "emptyrpm"
         self.result = "INFO"
         self.waiver_auth = "Not Waivable"
+
+
+# Empty subpackage is listed in expected_empty (INFO)
+class ExpectedEmptyKojiBuild(TestKoji):
+    def setUp(self):
+        super().setUp()
+        self.rpm.add_simple_payload_file()
+        self.rpm.add_subpackage("devel")
+        self.extra_cfg = {"emptyrpm": {"expected_empty": ["vaporware-devel"]}}
+        self.inspection = "emptyrpm"
+        self.result = "INFO"
+        self.waiver_auth = "Not Waivable"
+
+
+# Empty subpackage matches a glob in expected_empty (INFO)
+class ExpectedEmptyGlobKojiBuild(TestKoji):
+    def setUp(self):
+        super().setUp()
+        self.rpm.add_simple_payload_file()
+        self.rpm.add_subpackage("foo+bar-devel")
+        self.extra_cfg = {"emptyrpm": {"expected_empty": ["vapor*+*-dev?l"]}}
+        self.inspection = "emptyrpm"
+        self.result = "INFO"
+        self.waiver_auth = "Not Waivable"
+
+
+# Empty subpackage does not match a glob in expected_empty (VERIFY)
+class ExpectedEmptyGlobMismatchKojiBuild(TestKoji):
+    def setUp(self):
+        super().setUp()
+        self.rpm.add_simple_payload_file()
+        self.rpm.add_subpackage("devel")
+        self.extra_cfg = {"emptyrpm": {"expected_empty": ["vaporware-*+*-devel"]}}
+        self.inspection = "emptyrpm"
+        self.result = "VERIFY"
+        self.waiver_auth = "Anyone"

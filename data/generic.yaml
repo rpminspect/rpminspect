@@ -335,9 +335,13 @@ elf:
 #emptyrpm:
     # Optional list of packages in a build that will contain an empty
     # payload.  Useful for SRPMs that build metapackages that will
-    # always have an empty payload.
+    # always have an empty payload.  Entries may be glob(7)
+    # specifications matched against the package name.  If globbing
+    # characters are used, be sure to wrap the string in single
+    # quotes.
     #expected_empty:
     #    - metapackagename
+    #    - 'rust-*+*-devel'
 
 manpage:
     # Regular expression (man 7 regex) matching man page installation

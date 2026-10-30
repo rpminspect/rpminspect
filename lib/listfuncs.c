@@ -5,6 +5,7 @@
 
 #include <assert.h>
 #include <errno.h>
+#include <fnmatch.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -410,6 +411,28 @@ bool list_contains(const string_list_t *list, const char *s)
 bool list_case_contains(const string_list_t *list, const char *s)
 {
     return _list_contains(list, s, false);
+}
+
+/*
+ * Return true if the given string matches any glob(7) pattern in
+ * the given string list.  Patterns are matched with fnmatch(3) in the
+ * same way the shell matches them.
+ */
+bool list_contains_glob(const string_list_t *list, const char *s)
+{
+    string_entry_t *entry = NULL;
+
+    if (list == NULL || TAILQ_EMPTY(list) || s == NULL) {
+        return false;
+    }
+
+    TAILQ_FOREACH(entry, list, items) {
+        if (!fnmatch(entry->data, s, 0)) {
+            return true;
+        }
+    }
+
+    return false;
 }
 
 /*
