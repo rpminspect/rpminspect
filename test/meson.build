@@ -99,6 +99,16 @@ if cunit.found()
         link_with : [ librpminspect ],
     )
 
+    test_spec = executable(
+        'test-spec',
+        ['lib/test-spec.c',
+         'lib/test-main.c'],
+        include_directories : inc,
+        dependencies : [ cunit, libkmod, rpm ],
+        c_args : '-D_BUILDDIR_="@0@"'.format(meson.current_build_dir()),
+        link_with : [ librpminspect ],
+    )
+
     test_results = executable(
         'test-results',
         ['lib/test-results.c',
@@ -157,6 +167,7 @@ if cunit.found()
     test('test-humansize', test_humansize)
     test('test-arches', test_arches)
     test('test-results', test_results)
+    test('test-spec', test_spec)
 else
     warning('CUnit not found, skipping unit test suite')
 endif
