@@ -345,6 +345,7 @@ int gather_builds(struct rpminspect *, bool);
 
 /* macros.c */
 void load_macros(struct rpminspect *ri);
+void reset_macros(struct rpminspect *ri);
 
 /* inspect_elf.c */
 /*

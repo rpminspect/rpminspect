@@ -153,6 +153,7 @@ string_list_t *read_spec(struct rpminspect *ri, const char *specfile)
     rpmSpec spec = NULL;
     const char *s = NULL;
 
+    assert(ri != NULL);
     assert(specfile != NULL);
 
     /* get the spec file subdirectory */
@@ -201,7 +202,7 @@ string_list_t *read_spec(struct rpminspect *ri, const char *specfile)
 
     if (spec == NULL) {
         warn("*** rpmSpecParse");
-        return NULL;
+        goto done;
     }
 
     /* get the fully expanded spec file */
@@ -209,15 +210,21 @@ string_list_t *read_spec(struct rpminspect *ri, const char *specfile)
 
     if (s == NULL) {
         warn("*** rpmSpecGetSection");
-        rpmSpecFree(spec);
-        return NULL;
+    } else {
+        /* split in to lines */
+        r = strsplit(s, "\n\r");
     }
-
-    /* split in to lines */
-    r = strsplit(s, "\n\r");
 
     /* cleanup */
     rpmSpecFree(spec);
+
+done:
+    /*
+     * issue 1544: Do not let macros from this spec file affect the
+     * next one.  Can happen for modules.  Macros the caller defined
+     * before this call, such as %dist, are dropped too.
+     */
+    reset_macros(ri);
 
     return r;
 }
