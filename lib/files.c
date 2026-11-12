@@ -291,7 +291,23 @@ rpmfile_t *extract_rpm(struct rpminspect *ri, const char *pkg, Header hdr, const
             }
         }
 
-        HASH_FIND_STR(path_table, archive_path, path_entry);
+        /*
+         * trim trailing PATH_SEP characters before the lookup, the
+         * tar from extract_rpm_payload() carries them on directories
+         */
+        tmp_ap = strdup(archive_path);
+        assert(tmp_ap != NULL);
+
+        if (strrchr(tmp_ap, PATH_SEP)) {
+            len_ap = strlen(tmp_ap) - 1;
+
+            while (len_ap >= 0 && tmp_ap[len_ap] == PATH_SEP) {
+                tmp_ap[len_ap] = '\0';
+                len_ap--;
+            }
+        }
+
+        HASH_FIND_STR(path_table, tmp_ap, path_entry);
 
         if (path_entry == NULL) {
             /*
@@ -302,7 +318,7 @@ rpmfile_t *extract_rpm(struct rpminspect *ri, const char *pkg, Header hdr, const
              * for the path.
              */
             path_entry = xalloc(sizeof(*path_entry));
-            path_entry->path = strdup(archive_path);
+            path_entry->path = strdup(tmp_ap);
             path_entry->index = -1;
             HASH_ADD_KEYPTR(hh, path_table, path_entry->path, strlen(path_entry->path), path_entry);
         }
@@ -317,25 +333,13 @@ rpmfile_t *extract_rpm(struct rpminspect *ri, const char *pkg, Header hdr, const
             if (headerIsSource(hdr)) {
                 file_entry->localpath = strdup(xstrrchr(archive_path, PATH_SEP));
             } else {
-                /* trim trailing PATH_SEP characters */
-                tmp_ap = strdup(archive_path);
-                assert(tmp_ap != NULL);
-
-                if (strrchr(tmp_ap, PATH_SEP)) {
-                    len_ap = strlen(tmp_ap) - 1;
-
-                    while (len_ap >= 0 && tmp_ap[len_ap] == PATH_SEP) {
-                        tmp_ap[len_ap] = '\0';
-                        len_ap--;
-                    }
-                }
-
                 file_entry->localpath = strdup(tmp_ap);
-                free(tmp_ap);
             }
         } else {
             file_entry->localpath = strdup(archive_path);
         }
+
+        free(tmp_ap);
 
         assert(file_entry->localpath);
 
