@@ -482,8 +482,8 @@ run when in comparison mode.
 - **removedfiles**
 
     Report removed files from the before build to the after
-    build. Shared libraries get additional reporting output as they
-    may be unexpected dependency removals. Files removed with a
+    build. Shared libraries with a SONAME get additional reporting
+    output as they may be unexpected dependency removals. Files removed with a
     security path prefix generated special reporting in case a
     security review is required. Source RPM_ packages and debuginfo
     files are ignored by this inspection.
