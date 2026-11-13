@@ -242,6 +242,10 @@ Here is a description of the subdirectories found in
     Subsequent runs of rpminspect on the package in question will
     follow the rule here and ideally not continue reporting the
     security failure.
+    Each rule type only applies to the findings it names.  For
+    example, the securitypath rule only applies to files under a
+    security_path_prefix entry.  A rule for one type does not cause
+    other inspections to treat the file as security related.
 
 .. _rpminspect: https://github.com/rpminspect/rpminspect
 
